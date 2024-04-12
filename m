@@ -1,139 +1,165 @@
-Return-Path: <kvm+bounces-14385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D158A25C6
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 07:35:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 064BD8A25DA
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 07:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CC68B245E1
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 05:35:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9EA7283E1F
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 05:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CAC1BC4C;
-	Fri, 12 Apr 2024 05:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E911BF24;
+	Fri, 12 Apr 2024 05:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Eq9dsrct"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PWmUo1a3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B53C1B96E
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 05:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4CC1B96E;
+	Fri, 12 Apr 2024 05:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712900100; cv=none; b=ubhh98AFGAIku3mP2UZcJUhhBFdLawVMIMMJBh6apQecpdCLE19r3Vkwq4ytWiT3VmGTYkHwrmtvTsKd/VK8gxp5+oDvc59UNbIUAdkO39xnShs0A9HQdQ4jKDzNFnJMQQpZl//TZwCNeSOqqOHEfTZuGc/HWOi1NXtgY29gfNg=
+	t=1712900659; cv=none; b=SfCOHi1Zxxx+MbVmK0BRMHDpA6mmTBoSrEr4M+rbkvke/jShGdc+/KUMcEb2o1eiqMCCApihgs2Xl1N/YOkEJvGE5HJ282EJcwL5lz9K49e+1Kd+s64QyCMhmd6kOEmwHLuzalhY3/hRmLw6+fWLGMfxOBqkjr7/woGMVdBWOW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712900100; c=relaxed/simple;
-	bh=mekwCTMyUIHf0Fvc6QFOxa55PFHUFQeuRMLlo60az0o=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=EEUCyrtAB5JxLRZw8xlstX0auLXNLKgAdwzltvt1Z1NaZ9/WFbB7GB9uP5N/mYCQ6GpQlgi2RQca8numkXms8nt3To6Eo4Vo+6ovSqcSB8+0IBf+8t+5Cx4ZwcYQguXIX1yWDchoH2+YhN/7OGdnjKHp/TvettoydSaWH2kAf1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Eq9dsrct; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc746178515so965842276.2
-        for <kvm@vger.kernel.org>; Thu, 11 Apr 2024 22:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712900099; x=1713504899; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=40CL73wib6boENITVkOBpqP4qrDROFAeF098K7rCEZo=;
-        b=Eq9dsrctp+oeiCMUetYY+mx5187uUTmAAILjPVRkuM/efzVXCL+moLjt3HW46gaFJF
-         mIt1K4bqnJPZhfCkbxP3YGzx7H1oDfr24z4inSkNYaHBlT7OVEHLv6KSuC1iG1EP5SE9
-         b5ugjNlYD/Bl/gK9y1OUKfxr2rdXutn23ND5+yJbT5D8O1VlhzU2moboODm70h0NZKvi
-         tAJvW+8Gc1saTFTD5qk2xFjCdsQQOkndgHKfMllBOjsfK8DYWOa8fSXpuHNLC1Rmitiy
-         tF1Hfk3aMKdL2dYncCWa2wItjV4ueOypd5+kyXR0xi5ESg0Jdw04f2QST0Lm1iOQEhSc
-         2kgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712900099; x=1713504899;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=40CL73wib6boENITVkOBpqP4qrDROFAeF098K7rCEZo=;
-        b=kSpbXdd/Qn/PgxGyk68F5tmEHexHFiCUFxIZOBGOqdRbfV9GKF1qoUDq167w7uwLXD
-         MqP09wAtYi1wWpV6kRpSwHvispmlYuk5U+O5nBAugj3G4C/5X2g3Ar63d6p49GtUXgFm
-         gXHRm3OfXSY4RkD8cbl6KDX7L4uY67bj14us5qWisuTuGr6KBt+FsYD6MOaYU2doinoY
-         F6Xgm6sHdXifJ1cPPVF5ZmPMdwjTNrSy2LMxbnI0fWr5l1TRgxkrrZaRcOBBX80Btb1K
-         Ybse8/Tp6R9hNhfGRSs7OsFGgTwp3axLD2l4mQGzIyES7i1urIPduwe1MWXsO5L54OOl
-         cTNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVHv2fGXn/mQxRF1Kz9IUs4hGbE1bBCHDuF3S8XYpj0DsTtoXfUAyAy6SX6YMIoiWk/3t5mOf+EVm0+hH4tve1hAJaS
-X-Gm-Message-State: AOJu0YwMeQOV9E/cYRP7gpE7qLNCBkdWOC5S5/Y7RwyvHpviAOFqU8L2
-	2gecQxXRZ9QMRCnD47U9LNaP+abYz5mBmK9QYj3jFBR/ZaWFig3+bIWdjXtL0DoKiT9VwvMNVZc
-	sfUELjtU8czdn7H/ZfW3JhA==
-X-Google-Smtp-Source: AGHT+IHBQ7oYt8rwDGfoTH5mMc+eE3PwbtEkoZpDVDKUDzWTMm/e3olIUnsS49ugB3YTyrfsMlcwC9w28DOEHyF/JA==
-X-Received: from ctop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:1223])
- (user=ackerleytng job=sendgmr) by 2002:a05:6902:1002:b0:dc6:e5d3:5f03 with
- SMTP id w2-20020a056902100200b00dc6e5d35f03mr510040ybt.4.1712900098616; Thu,
- 11 Apr 2024 22:34:58 -0700 (PDT)
-Date: Fri, 12 Apr 2024 05:34:54 +0000
-In-Reply-To: <3d69b44a-8542-4a11-b233-16487e980d54@intel.com> (dongsheng.x.zhang@intel.com)
+	s=arc-20240116; t=1712900659; c=relaxed/simple;
+	bh=t9IyVL79bJ8O2rJHXegBc6gcfFgf4W7Q52ai+x63gms=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OwX8gskqcCxvXh4ZeeInt3+3fn59jvvw2jm1r9aRucMZ2hN0OKZ4j7vUg26Aqswc3nYV84FG9qpiQd8/ygCRnz8HDBBg38tfi7ntRD/5YCzVgDgKVEClEFLnHAceVloDQwgHuPMDA7EzCR2dgiP0mKpm0eb9K4aokE9zRpLIKH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PWmUo1a3; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712900657; x=1744436657;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=t9IyVL79bJ8O2rJHXegBc6gcfFgf4W7Q52ai+x63gms=;
+  b=PWmUo1a3LTx+EAvExShndAmlfjHqxL8ZjPPzP0DyQjWD8GVyyTavlF1v
+   e9u90PlV3DibT9llfRU6zakUvlRexmtEYGWSqjyHfu7g/zp+Mew+wtlc3
+   4lgn9dKc13KnceB/mfRYDcslmgyudbY0xBjNuGr9DZfcqGCKUSYUorMPm
+   BZJRUInr50IW/Nooj1RNxmAQ8m9xT3BfF4utCBM4PkRNzPAcVAs/zd5/x
+   Gp/DU7EMlwdyqQHnHfRNLHUivjQZ3Qv01E325Zv66iO6f6EkFS3PhOOpk
+   QN+H0KFr5TNYXBwve/CdkOikySvjZKjC+Kx+9pK6Y40QrXnsTUWDLAacW
+   g==;
+X-CSE-ConnectionGUID: c5UXe7MkSV+oyZIAhhGW1w==
+X-CSE-MsgGUID: /bUfCvTJQPuRvEHIstZrBA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="8900269"
+X-IronPort-AV: E=Sophos;i="6.07,195,1708416000"; 
+   d="scan'208";a="8900269"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 22:44:16 -0700
+X-CSE-ConnectionGUID: Gis4aWxaStOcmdSKpzh2Pg==
+X-CSE-MsgGUID: eLxiMtO2SkuuciJo7EpFAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,195,1708416000"; 
+   d="scan'208";a="52100678"
+Received: from xiongzha-mobl1.ccr.corp.intel.com (HELO [10.124.244.162]) ([10.124.244.162])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 22:44:12 -0700
+Message-ID: <efc9f54b-a145-4ff5-bb8a-84b9970bc51e@linux.intel.com>
+Date: Fri, 12 Apr 2024 13:44:07 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzttk7jg8x.fsf@ctop-sg.c.googlers.com>
-Subject: Re: [RFC PATCH v5 05/29] KVM: selftests: Add helper functions to
- create TDX VMs
-From: Ackerley Tng <ackerleytng@google.com>
-To: dongsheng.x.zhang@intel.com
-Cc: sagis@google.com, linux-kselftest@vger.kernel.org, afranji@google.com, 
-	erdemaktas@google.com, isaku.yamahata@intel.com, seanjc@google.com, 
-	pbonzini@redhat.com, shuah@kernel.org, pgonda@google.com, haibo1.xu@intel.com, 
-	chao.p.peng@linux.intel.com, vannapurve@google.com, runanwang@google.com, 
-	vipinsh@google.com, jmattson@google.com, dmatlack@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 05/41] KVM: x86/pmu: Register PMI handler for
+ passthrough PMU
+Content-Language: en-US
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
+ kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com, Xiong Zhang <xiong.y.zhang@intel.com>
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+ <20240126085444.324918-6-xiong.y.zhang@linux.intel.com>
+ <Zhg0_B4ktNzQbWZZ@google.com>
+From: "Zhang, Xiong Y" <xiong.y.zhang@linux.intel.com>
+In-Reply-To: <Zhg0_B4ktNzQbWZZ@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-Thank you for your other comments!
 
->> <snip>
-
->> +static void load_td_per_vcpu_parameters(struct td_boot_parameters *params,
->> +					struct kvm_sregs *sregs,
->> +					struct kvm_vcpu *vcpu,
->> +					void *guest_code)
+On 4/12/2024 3:07 AM, Sean Christopherson wrote:
+> On Fri, Jan 26, 2024, Xiong Zhang wrote:
+>> From: Xiong Zhang <xiong.y.zhang@intel.com>
+>>
+>> Add function to register/unregister PMI handler at KVM module
+>> initialization and destroy time. This allows the host PMU with passthough
+>> capability enabled switch PMI handler at PMU context switch time.
+>>
+>> Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+>> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+>> ---
+>>  arch/x86/kvm/x86.c | 14 ++++++++++++++
+>>  1 file changed, 14 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 2c924075f6f1..4432e736129f 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -10611,6 +10611,18 @@ void __kvm_request_immediate_exit(struct kvm_vcpu *vcpu)
+>>  }
+>>  EXPORT_SYMBOL_GPL(__kvm_request_immediate_exit);
+>>  
+>> +void kvm_passthrough_pmu_handler(void)
+> 
+> s/pmu/pmi, and this needs a verb.  Maybe kvm_handle_guest_pmi()?  Definitely
+> open to other names.
+kvm_handle_guest_pmi() is ok. 
+> 
 >> +{
->> +	/* Store vcpu_index to match what the TDX module would store internally */
->> +	static uint32_t vcpu_index;
+>> +	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
 >> +
->> +	struct td_per_vcpu_parameters *vcpu_params = &params->per_vcpu[vcpu_index];
->
-> I think we can use vcpu->id in place of vcpu_index in this function, thus removing vcpu_index
->
-
-td_per_vcpu_parameters is used in the selftest setup code (see
-tools/testing/selftests/kvm/lib/x86_64/tdx/td_boot.S), (read via ESI) to
-access the set of parameters belonging to the vcpu running the selftest
-code, based on vcpu_index.
-
-ESI is used because according to the TDX base spec, RSI contains the
-vcpu index, which starts "from 0 and allocated sequentially on each
-successful TDH.VP.INIT".
-
-Hence, vcpu_index is set up to be static and is incremented once every
-time load_td_per_vcpu_parameters() is called, which is once every time
-td_vcpu_add() is called, which is aligned with the TDX base spec.
-
-vcpu->id can be specified by the user when vm_vcpu_add() is called, but
-that may not be the same as vcpu_index.
-
+>> +	if (!vcpu) {
+>> +		pr_warn_once("%s: no running vcpu found!\n", __func__);
+> 
+> Unless I misunderstand the code, this can/should be a full WARN_ON_ONCE.  If a
+> PMI skids all the way past vcpu_put(), we've got big problems.
+yes, it is big problems and user should be noticed.
+>  
+>> +		return;
+>> +	}
 >> +
->> +	TEST_ASSERT(vcpu->initial_stack_addr != 0,
->> +		"initial stack address should not be 0");
->> +	TEST_ASSERT(vcpu->initial_stack_addr <= 0xffffffff,
->> +		"initial stack address must fit in 32 bits");
->> +	TEST_ASSERT((uint64_t)guest_code <= 0xffffffff,
->> +		"guest_code must fit in 32 bits");
->> +	TEST_ASSERT(sregs->cs.selector != 0, "cs.selector should not be 0");
->> +
->> +	vcpu_params->esp_gva = (uint32_t)(uint64_t)vcpu->initial_stack_addr;
->> +	vcpu_params->ljmp_target.eip_gva = (uint32_t)(uint64_t)guest_code;
->> +	vcpu_params->ljmp_target.code64_sel = sregs->cs.selector;
->> +
->> +	vcpu_index++;
+>> +	kvm_make_request(KVM_REQ_PMI, vcpu);
 >> +}
-
->> <snip>
+>> +
+>>  /*
+>>   * Called within kvm->srcu read side.
+>>   * Returns 1 to let vcpu_run() continue the guest execution loop without
+>> @@ -13815,6 +13827,7 @@ static int __init kvm_x86_init(void)
+>>  {
+>>  	kvm_mmu_x86_module_init();
+>>  	mitigate_smt_rsb &= boot_cpu_has_bug(X86_BUG_SMT_RSB) && cpu_smt_possible();
+>> +	kvm_set_vpmu_handler(kvm_passthrough_pmu_handler);
+> 
+> Hmm, a few patches late, but the "kvm" scope is weird.  This calls a core x86
+> function, not a KVM function.
+> 
+> And to reduce exports and copy+paste, what about something like this?
+> 
+> void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void))
+> {
+> 	if (!handler)
+> 		handler = dummy_handler;
+> 
+> 	if (vector == POSTED_INTR_WAKEUP_VECTOR)
+> 		kvm_posted_intr_wakeup_handler = handler;
+> 	else if (vector == KVM_GUEST_PMI_VECTOR)
+> 		kvm_guest_pmi_handler = handler;
+> 	else
+> 		WARN_ON_ONCE(1);
+> 
+> 	if (handler == dummy_handler)
+> 		synchronize_rcu();
+> }
+> EXPORT_SYMBOL_GPL(x86_set_kvm_irq_handler);
+Good suggestion. Follow it in next version.
 
