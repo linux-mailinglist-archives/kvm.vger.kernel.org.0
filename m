@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-14517-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14518-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49CD78A2C82
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:37:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19A9A8A2C83
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:37:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2525B21CD7
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:37:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD5D71F239A0
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C08258AC8;
-	Fri, 12 Apr 2024 10:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9626758AD6;
+	Fri, 12 Apr 2024 10:35:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14F558AB2
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:35:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27B758ACE
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918123; cv=none; b=NgWkuVRO/c5m7vUrhTlJDyEGfsFqjsbfgVs1Hd+7VDKAB9B5NMlK/RWTos0YCvB9pMRCUQ8qLxcBsYm2MdZ4IjOTLK4CSwk9ewU++jxa1ZcHS06cVNeKZtRnnmvfVYEy3vNfI3d7PymWFqwXBE+27zmGtnHFtX928obKve5922k=
+	t=1712918125; cv=none; b=Y2MQrs29PlGJNRkfsdQU80HvmTcGf/BsUyoF4w0lj6FDQD1UpqYVJYa3gl/PpXSWOhfH45KOGmiQ98nvyoCjJ1QY5Fn6Nul/Pq3Sd+bth2VESMzq2U1TBwsyUGoTvuPuTafaBPADxGGfN7OlIbEFNyYUQ70o5KQf4EGdY3BFZsI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712918123; c=relaxed/simple;
-	bh=oYpaKPDZZUEB8h55LH9osV+NKs+2zNB4M/v9NtEQT/A=;
+	s=arc-20240116; t=1712918125; c=relaxed/simple;
+	bh=cS46VWdNhnMXNP7L6xDVjgUS7fCRT6ut00MGNI+G8p0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HJQiFji97+Tx0K1aP660DA4ODj6c7Y4fEa0AzNkgHlZzetApgp5Egjfyl8uJzwIFOLehuVBwKZk8/YV0iGhFnfnsIOyBrPbbmZY5SQcT6WyQaYWxg/DsyZlHpRWEai9hHC1zNcOjeNINip/s37pGz3x5sWWDlvXtB0usl75gh4U=
+	 MIME-Version; b=PswrBzONW9azbIXE7nq342sa44EexbSp94nf0Os59eMnIsTeIM0vVx2E4wLifplsfNQZV1LWbPAiy8PEYW/rCCrUvff1PN9XnOX3FfofNiwPnlPzMkfXhsyxO/ozKJFf4vhGvsKTaEZgk4kiaBOV0URiiWgwBCp/kerDfPBbHXM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B2D74113E;
-	Fri, 12 Apr 2024 03:35:50 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B00A91655;
+	Fri, 12 Apr 2024 03:35:52 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id BAA253F64C;
-	Fri, 12 Apr 2024 03:35:19 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B1CCB3F64C;
+	Fri, 12 Apr 2024 03:35:21 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc: kvm@vger.kernel.org,
 	andrew.jones@linux.dev,
 	eric.auger@redhat.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvm-unit-tests PATCH 31/33] arm: realm: Add a test for shared memory
-Date: Fri, 12 Apr 2024 11:34:06 +0100
-Message-Id: <20240412103408.2706058-32-suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 32/33] arm: Add memtest support
+Date: Fri, 12 Apr 2024 11:34:07 +0100
+Message-Id: <20240412103408.2706058-33-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
@@ -62,138 +62,174 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Do some basic tests that trigger marking a memory region as
-RIPAS_EMPTY and accessing the shared memory. Also, convert it back
-to RAM and make sure the contents are scrubbed.
+From: Joey Gouly <joey.gouly@arm.com>
 
+Add a test to touch all memory allocated to the guest.
+Provides options to allocate in block, shared mode etc.
+Also adds a "memstress" variant which would test all the
+combinations in order.
+
+PS: The memory allocator fragments the available memory
+on page allocation and doesn't allow merging them for a
+higher order allocation. Hence, all the block alloc tests
+are run one after the other, before any page allocation
+tests are run
+
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm/Makefile.arm64    |  1 +
- arm/realm-ns-memory.c | 86 +++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg     |  8 ++++
- 3 files changed, 95 insertions(+)
- create mode 100644 arm/realm-ns-memory.c
+ arm/selftest.c | 123 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 122 insertions(+), 1 deletion(-)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index 7a56029e..bd8c947d 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -68,6 +68,7 @@ tests += $(TEST_DIR)/fpu.$(exe)
- tests += $(TEST_DIR)/realm-rsi.$(exe)
- tests += $(TEST_DIR)/realm-sea.$(exe)
- tests += $(TEST_DIR)/realm-attest.$(exe)
-+tests += $(TEST_DIR)/realm-ns-memory.$(exe)
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
-diff --git a/arm/realm-ns-memory.c b/arm/realm-ns-memory.c
-new file mode 100644
-index 00000000..8360c371
---- /dev/null
-+++ b/arm/realm-ns-memory.c
-@@ -0,0 +1,86 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Copyright (C) 2022 Arm Limited.
-+ * All rights reserved.
-+ */
-+
-+#include <asm/io.h>
+diff --git a/arm/selftest.c b/arm/selftest.c
+index 7bc5fb76..d9fd9750 100644
+--- a/arm/selftest.c
++++ b/arm/selftest.c
+@@ -9,6 +9,7 @@
+ #include <util.h>
+ #include <devicetree.h>
+ #include <memregions.h>
 +#include <alloc_page.h>
-+#include <bitops.h>
+ #include <vmalloc.h>
+ #include <asm/setup.h>
+ #include <asm/ptrace.h>
+@@ -435,6 +436,123 @@ static void cpu_report(void *data __unused)
+ 	report_info("CPU%3d: MPIDR=%010" PRIx64, cpu, mpidr);
+ }
+ 
 +
-+#define GRANULE_SIZE 	0x1000
-+#define BUF_SIZE	(PAGE_SIZE * 2)
-+#define BUF_PAGES	(BUF_SIZE / PAGE_SIZE)
-+#define BUF_GRANULES	(BUF_SIZE / GRANULE_SIZE)
-+
-+static char __attribute__((aligned(PAGE_SIZE))) buffer[BUF_SIZE];
-+
-+static void static_shared_buffer_test(void)
++/*
++ * do_memtest: Accepts the following paramters.
++ *
++ * shared[=0/1] - Use shared page for the memtests.
++ * block[=0/1]  - Use SZ_2M allocation/free.
++ * nofree	- Do not free the pages after the test.
++ */
++static void do_memtest(int argc, char *argv[])
 +{
 +	int i;
++	int npages = 0;
++	bool result = true;
++	const char pattern = 0xFB;
++	void *prev_page = NULL;
++	uintptr_t *page_to_free = NULL;
++	int size;
++	void* (*alloc_order_fn)(unsigned int);
++	void (*free_order_fn)(void *, unsigned int);
++	bool shared = false;
++	bool block = false;
++	bool nofree = false;
++	int order = 0;
 +
-+	set_memory_decrypted((unsigned long)buffer, sizeof(buffer));
-+	for (i = 0; i < sizeof(buffer); i += GRANULE_SIZE)
-+		buffer[i] = (char)i;
++	for (i = 2; i < argc; i++) {
++		long val, len;
 +
-+	/*
-+	 * Verify the content of the NS buffer
-+	 */
-+	for (i = 0; i < sizeof(buffer); i += GRANULE_SIZE) {
-+		if (buffer[i] != (char)i) {
-+			report(false, "Failed to set Non Secure memory");
-+			return;
++		len = parse_keyval(argv[i], &val);
++		if (len == -1) {
++			if (!strcmp(argv[i], "shared")) {
++				shared = true;
++				continue;
++			} else if (!strcmp(argv[i], "nofree")) {
++				nofree = true;
++				continue;
++			} else if (!strcmp(argv[i], "block")) {
++				block = true;
++			} else {
++				printf("Unknown options %s\n", argv[i]);
++				abort();
++			}
++		} else if (!strncmp(argv[i], "block", len)) {
++			block = !!val;
++		} else if (!strncmp(argv[i], "shared", len)) {
++			shared = !!val;
 +		}
 +	}
 +
-+	/* Make the buffer back to protected... */
-+	set_memory_encrypted((unsigned long)buffer, sizeof(buffer));
-+	/* .. and check if the contents were destroyed */
-+	for (i = 0; i < sizeof(buffer); i += GRANULE_SIZE) {
-+		if (buffer[i] != 0) {
-+			report(false, "Failed to scrub protected memory");
-+			return;
-+		}
++	/* Block mapping is 2MB */
++	if (block)
++		order = (21 - PAGE_SHIFT);
++
++	size = (1 << order) * PAGE_SIZE;
++	if (shared) {
++		alloc_order_fn = &alloc_pages_shared;
++		free_order_fn = &free_pages_shared_by_order;
++	} else {
++		alloc_order_fn = &alloc_pages;
++		free_order_fn = &free_pages_by_order;
 +	}
 +
-+	report(true, "Conversion of protected memory to shared and back");
-+}
++	report_info("Running %smemtest with size %dK%s, order=%d",
++		    shared ? "shared " : "",
++		    size >> 10,
++		    nofree ? " with no freeing" :"",
++		    order);
 +
-+static void dynamic_shared_buffer_test(void)
-+{
-+	char *ns_buffer;
-+	int i;
-+	int order = get_order(BUF_PAGES);
++	while (1) {
++		void *page = alloc_order_fn(order);
 +
-+	ns_buffer = alloc_pages_shared(order);
-+	assert(ns_buffer);
-+	for (i = 0; i < sizeof(buffer); i += GRANULE_SIZE)
-+		ns_buffer[i] = (char)i;
++		if (!page)
++			break;
++		npages += 1;
 +
-+	/*
-+	 * Verify the content of the NS buffer
-+	 */
-+	for (i = 0; i < sizeof(buffer); i += GRANULE_SIZE) {
-+		if (ns_buffer[i] != (char)i) {
-+			report(false, "Failed to set Non Secure memory");
-+			return;
++		memset(page, pattern, size);
++
++		for (i = 0; i < size; i += 1) {
++			if (((char *)page)[i] != pattern) {
++				result = false;
++				report(false, "Failed to find the pattern in page %p, expected: %d, got: %d\n",
++					page, pattern, ((char *)page)[i]);
++				goto exit;
++			}
 +		}
++
++		/*
++		 * Save a pointer to the allocated page so that it can be
++		 * free'd at the end of the test.
++		*/
++		*(uintptr_t *)page = (uintptr_t)prev_page;
++		prev_page = page;
 +	}
-+	free_pages_shared(ns_buffer);
-+	report(true, "Dynamic allocation and free of shared memory\n");
++
++	page_to_free = prev_page;
++	while (!nofree && page_to_free) {
++		prev_page = (uintptr_t *)(*page_to_free);
++		free_order_fn(page_to_free, order);
++		page_to_free = prev_page;
++	}
++
++exit:
++	report(result, "Tested with %dKB", (npages  * size) >> 10);
 +}
 +
-+static void ns_test(void)
++static void do_memstress(void)
 +{
-+	static_shared_buffer_test();
-+	dynamic_shared_buffer_test();
++	char shared[16] = "shared";
++	char block[16] = "block";
++	char nofree[16] = "nofree";
++	char null[4] = "";
++
++	do_memtest(4, &((char *[]){ null, null, shared, block })[0]);
++	do_memtest(3, &((char *[]){ null, null, block })[0]);
++	do_memtest(3, &((char *[]){ null, null, shared })[0]);
++	do_memtest(3, &((char *[]){ null, null, nofree })[0]);
 +}
 +
-+int main(int argc, char **argv)
-+{
-+	report_prefix_pushf("ns-memory");
-+	ns_test();
-+	report_prefix_pop();
-+
-+	return report_summary();
-+}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index f95fc1ba..55a17f2b 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -367,3 +367,11 @@ smp = 1
- extra_params = -m 32 -append 'measurement'
- accel = kvm
- arch = arm64
-+
-+[realm-ns-memory]
-+file=realm-ns-memory.flat
-+groups = nodefault realms
-+smp = 1
-+extra_params = -m 32
-+accel = kvm
-+arch = arm64
+ int main(int argc, char **argv)
+ {
+ 	report_prefix_push("selftest");
+@@ -466,7 +584,10 @@ int main(int argc, char **argv)
+ 		smp_rmb();		/* Paired with wmb in cpu_report(). */
+ 		report(cpumask_full(&valid), "MPIDR test on all CPUs");
+ 		report_info("%d CPUs reported back", nr_cpus);
+-
++	} else if (strcmp(argv[1], "memtest") == 0) {
++		do_memtest(argc, argv);
++	} else if (strcmp(argv[1], "memstress") == 0) {
++		do_memstress();
+ 	} else {
+ 		printf("Unknown subtest\n");
+ 		abort();
 -- 
 2.34.1
 
