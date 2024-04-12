@@ -1,210 +1,232 @@
-Return-Path: <kvm+bounces-14569-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14570-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2D18A35EB
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 20:45:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F1298A3641
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 21:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E92AE1F24961
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 18:45:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14C712877FF
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 19:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC5914F13B;
-	Fri, 12 Apr 2024 18:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA6F150981;
+	Fri, 12 Apr 2024 19:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1dGZk9+h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BELHwLci"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E003914EC53
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 18:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76403502A9
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 19:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712947541; cv=none; b=L/Ohgoc6/nmZnfnGe6ZoMkQJgKlPUqRg4ihHhYAJtwJRUX2QjzhHHJQeln34odjAhz9uDR/jJRJrLiQ1V+aIZwb60FTfEwErtt5Bx/FoLG1oikqnGh/m8DpcCNNQmlXJs7ts6MBpUFZkMsIZD2VpchUj4LtS5vmW3zvxb5RMafs=
+	t=1712949425; cv=none; b=a0MZbarps9ugjIiYE7Myz3pbO1Fy7WHqBW8XFPOd5k+zphBWpb+MnksFZ+sWJosWpw+f10X4Ey7EpDhVwNXK7Lez7B1LJ9Wx23+wfFGjas4vNcb66lI6pU+Gz7NZuG6Vurac3jQQR0wn/YAb3Wi1a4MN/EBWf4pH0+oFIgTK5Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712947541; c=relaxed/simple;
-	bh=Mxmh9m8cG1SINwjvCiVceMBEadI/CDBdioZFxVCsP84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HO8QKs86UY5D52hNA2ChC5JGnvuNemEzM999Od6NFo5D8D3XgrMlcmKxB+Ld3iOz8Efjr1ejja/AEP37P+Z/jLOt6C5kyZZ0cA1hvl8oJ4krpOGpKqls+4DZJ/pILbZRZ43dVhTb36ga8cXHF8+wyTjfyuzpf4Vgqk5eQS/jzUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1dGZk9+h; arc=none smtp.client-ip=209.85.215.173
+	s=arc-20240116; t=1712949425; c=relaxed/simple;
+	bh=gXSq+T7XzqPxzRC/useeLBrjqvRyaotmwCPTNi4Tu1U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eaYMBMbUQLoeFMJtJxpOWCjmIAm1lgKHxPPG+SXxqd3jQV8myRtodVeGsK0y94P+PJx6dkwsag2rxJD5Na4plDbyklWI00ipf5gTdo4WEqB2dCJpv8tjXKWNvdyBaUIrMuB9uCmW5RTXSUM4j5UUKzKfAw30Su+FAPc/9ZGs4J0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BELHwLci; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5dbf7b74402so796705a12.0
-        for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 11:45:39 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6156cef8098so22724867b3.0
+        for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 12:17:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712947539; x=1713552339; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ISLMFGOGyzbAhcth9c+vgcaA14m4ctbEbkD9TmYI1+8=;
-        b=1dGZk9+h1Q2Q9iaogm/cvA5Gz6mo72i/ro8ANc77ALWCk9pUoomZCV5HtZc3B9gK78
-         RJJnF3JQEY+ySY7/MUIZcs1FxPGHpw+DmUXC9pv/+7+W2dJXBu01QFHhdQbr8hsaGILT
-         6bEfrqaZDwY0mgRTjaxhdHWP/m33XO5k3X7ISKx+hEYcvvzOJTNlWk/EJXyJ5IGM4BDP
-         gSM3t5NDjJGirvNAWympm58UnEyz6seuba0uaRW9Li4ZYzsPl1yK99tD97M/ETKM3aqh
-         4zX74JUJ3xnee0JvOAPmRXPI4OY7FNtyWa7ncsuHS1GKsX567dqXi3btGvG+z7n9YbRr
-         ol0Q==
+        d=google.com; s=20230601; t=1712949422; x=1713554222; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ZYm+Xc9AGuPFsnQm3QDSma2dM32/YHiWtmTC7mIj98=;
+        b=BELHwLciBDJOqbolC0twPLN6pusfksA9Wk1O7UW21mZKXGobDrSAWwT8s25SXaB9zn
+         1gq2sgXoyJEuZyQCQPZzvDhjomvltPVTbIUGB/ArUke6Gsf5vLSxmlbVu3mKXAHNrW9n
+         9DK8HP6dd/8kKRBVmYYA/7yKltD/VaXLnkBmZi2UIRSWN3m9osz/Ina1RdQefXGBhT8y
+         Ysf028Idia9gOI/UNfQWcpGnEW6/pfiUozYeFAEXMrqLn9D0rhzaaW7hg7aCd+e6z3mj
+         JqR8x3A6+NKplzlQqoTIh+bAK07hT8eBNM1Hzn3pdTyzrimL1CS2d1wvqD4of/FxdlTR
+         NXhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712947539; x=1713552339;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ISLMFGOGyzbAhcth9c+vgcaA14m4ctbEbkD9TmYI1+8=;
-        b=ToawAPZxyhlM8uP2fUC2EgXpMyImBiXz6Qjc0yE5vC7bnLCR5Zr+EpQRBNstID0o9o
-         Uid0YsXVdKXEnsvW/xW6NLwNX+v2nHZFMI2M9BZWrBPNJUaoM0IOFKHgOE0PjUvyaW9+
-         mDtxOB0sOCmoYaH2w/VYgNK9TyqAyIgHhKB4fq4OH2GHwNNxdYcl0xaxKPwyv9jVjjbC
-         CzvNdmLYC/74diMRH9lWIDUP2I8hxVc6vN3H9AJLUxKJWEXRfxkVUF9MFwkxNfyho2M5
-         Ng4VO/FBbbUGVACmKBZszJqBn5XEKnReiypWFlxAguxEI0dv1Hce/cg7qHbfc0AQp4AM
-         gXPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCb/8LHx8SACgxfK1YRZgk82jnrBs6aSVlfdYWDsre12FHRXLSnLyVrvs0cmSOXy6KT1zXKl1uebglGKtp9a+UyGr6
-X-Gm-Message-State: AOJu0Yx3GgiOUMRClPg/jS7hJvTVECB9gN4FFtmhTHc9NF0ECAGBa80O
-	uQiK7qO6uoCDZtr5GzBV6ZgfVKRsSA/TFOB4TNg84xQt/TZLErZNwN0SxIwFaQ==
-X-Google-Smtp-Source: AGHT+IErdx6N/Za0LUKOOdr+VzWwjNC6bZuRp56Svh5aVZ0iXA0UlC0kIs2SDcy0//cfbrlbvHooqg==
-X-Received: by 2002:a17:90a:9af:b0:2a5:3e4e:29a0 with SMTP id 44-20020a17090a09af00b002a53e4e29a0mr3344779pjo.6.1712947538843;
-        Fri, 12 Apr 2024 11:45:38 -0700 (PDT)
-Received: from google.com (210.73.125.34.bc.googleusercontent.com. [34.125.73.210])
-        by smtp.gmail.com with ESMTPSA id i20-20020a632214000000b005cd835182c5sm3009589pgi.79.2024.04.12.11.45.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 11:45:38 -0700 (PDT)
-Date: Fri, 12 Apr 2024 11:45:33 -0700
-From: David Matlack <dmatlack@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhao <yuzhao@google.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Sean Christopherson <seanjc@google.com>,
-	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
-	Ricardo Koller <ricarkol@google.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	David Rientjes <rientjes@google.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/7] mm: Add a bitmap into
- mmu_notifier_{clear,test}_young
-Message-ID: <ZhmBTUIhypg-Kxbx@google.com>
-References: <20240401232946.1837665-1-jthoughton@google.com>
- <20240401232946.1837665-2-jthoughton@google.com>
+        d=1e100.net; s=20230601; t=1712949422; x=1713554222;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ZYm+Xc9AGuPFsnQm3QDSma2dM32/YHiWtmTC7mIj98=;
+        b=ROO+WAObAuQL+J6xPRaAKG8dseB7vvA3EhZAoQYYKkWtx1Zioi1Z/YIeUSBiznMRvB
+         TigTzB+F/sE8AnbwZkNQhZSRZMAdOnoKFtYotzt7jZOI/lWf6yO4EJOmtLh6ys6hE2L4
+         UmICkvZFFz0kS13U053dZVkxpRxI3SzklgZLyNcpMTKVphReu1AIleCQMQy9jbqDU7Mz
+         9lsirrZj4wKWlTJRgEi7AA+yzlbYg//DFiw/tAqewX7XufDe1HoTQFym9Pux151GITPt
+         WGiINHWquUU4f6ikY9kXeovQNG78Aa5IXFRFTkopXHgsVD/Jnk2WmsH8RKmvpHsBYI3/
+         FtiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXZuwYh8xhWqVetlXZBfAG9517h6yL3vVZvMMETOrMozYKfKf/lcXvdrjA3dlDrKQonWctNA1jAs29oia9PKRM5RRsI
+X-Gm-Message-State: AOJu0YxNI0GcQwHCS5lJ2DRMaYlJlSd5CRHq9jnidE2srRWVGhAJY2WL
+	YNy//XpKKMlMbyloNvXrhw2fE1Y1Xi/z8l5yHbIOPYVCdTap0e0tP9sitH7TjDTlqaPB5CuGmqy
+	nWA==
+X-Google-Smtp-Source: AGHT+IFLnup6JSKkiSb0UzDwD6karEhA7d20IDFCl5FKvYbjyr3ssyUHXmtdP3hCGhAQnldQxZ8f2unxvjc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:480d:0:b0:614:e20c:d3ef with SMTP id
+ v13-20020a81480d000000b00614e20cd3efmr785979ywa.10.1712949422548; Fri, 12 Apr
+ 2024 12:17:02 -0700 (PDT)
+Date: Fri, 12 Apr 2024 12:17:01 -0700
+In-Reply-To: <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240401232946.1837665-2-jthoughton@google.com>
+Mime-Version: 1.0
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+ <20240126085444.324918-3-xiong.y.zhang@linux.intel.com> <ZhgmrczGpccfU-cI@google.com>
+ <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com>
+Message-ID: <ZhmIrQQVgblrhCZs@google.com>
+Subject: Re: [RFC PATCH 02/41] perf: Support guest enter/exit interfaces
+From: Sean Christopherson <seanjc@google.com>
+To: Kan Liang <kan.liang@linux.intel.com>
+Cc: Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, 
+	peterz@infradead.org, mizhang@google.com, kan.liang@intel.com, 
+	zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, jmattson@google.com, 
+	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 2024-04-01 11:29 PM, James Houghton wrote:
-> The bitmap is provided for secondary MMUs to use if they support it. For
-> test_young(), after it returns, the bitmap represents the pages that
-> were young in the interval [start, end). For clear_young, it represents
-> the pages that we wish the secondary MMU to clear the accessed/young bit
-> for.
+On Thu, Apr 11, 2024, Kan Liang wrote:
+> >> +/*
+> >> + * When a guest enters, force all active events of the PMU, which supports
+> >> + * the VPMU_PASSTHROUGH feature, to be scheduled out. The events of other
+> >> + * PMUs, such as uncore PMU, should not be impacted. The guest can
+> >> + * temporarily own all counters of the PMU.
+> >> + * During the period, all the creation of the new event of the PMU with
+> >> + * !exclude_guest are error out.
+> >> + */
+> >> +void perf_guest_enter(void)
+> >> +{
+> >> +	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+> >> +
+> >> +	lockdep_assert_irqs_disabled();
+> >> +
+> >> +	if (__this_cpu_read(__perf_force_exclude_guest))
+> > 
+> > This should be a WARN_ON_ONCE, no?
 > 
-> If a bitmap is not provided, the mmu_notifier_{test,clear}_young() API
-> should be unchanged except that if young PTEs are found and the
-> architecture supports passing in a bitmap, instead of returning 1,
-> MMU_NOTIFIER_YOUNG_FAST is returned.
+> To debug the improper behavior of KVM?
+
+Not so much "debug" as ensure that the platform owner noticies that KVM is buggy.
+
+> >> +static inline int perf_force_exclude_guest_check(struct perf_event *event,
+> >> +						 int cpu, struct task_struct *task)
+> >> +{
+> >> +	bool *force_exclude_guest = NULL;
+> >> +
+> >> +	if (!has_vpmu_passthrough_cap(event->pmu))
+> >> +		return 0;
+> >> +
+> >> +	if (event->attr.exclude_guest)
+> >> +		return 0;
+> >> +
+> >> +	if (cpu != -1) {
+> >> +		force_exclude_guest = per_cpu_ptr(&__perf_force_exclude_guest, cpu);
+> >> +	} else if (task && (task->flags & PF_VCPU)) {
+> >> +		/*
+> >> +		 * Just need to check the running CPU in the event creation. If the
+> >> +		 * task is moved to another CPU which supports the force_exclude_guest.
+> >> +		 * The event will filtered out and be moved to the error stage. See
+> >> +		 * merge_sched_in().
+> >> +		 */
+> >> +		force_exclude_guest = per_cpu_ptr(&__perf_force_exclude_guest, task_cpu(task));
+> >> +	}
+> > 
+> > These checks are extremely racy, I don't see how this can possibly do the
+> > right thing.  PF_VCPU isn't a "this is a vCPU task", it's a "this task is about
+> > to do VM-Enter, or just took a VM-Exit" (the "I'm a virtual CPU" comment in
+> > include/linux/sched.h is wildly misleading, as it's _only_ valid when accounting
+> > time slices).
+> >
 > 
-> This allows MGLRU's look-around logic to work faster, resulting in a 4%
-> improvement in real workloads[1]. Also introduce MMU_NOTIFIER_YOUNG_FAST
-> to indicate to main mm that doing look-around is likely to be
-> beneficial.
+> This is to reject an !exclude_guest event creation for a running
+> "passthrough" guest from host perf tool.
+> Could you please suggest a way to detect it via the struct task_struct?
 > 
-> If the secondary MMU doesn't support the bitmap, it must return
-> an int that contains MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE.
+> > Digging deeper, I think __perf_force_exclude_guest has similar problems, e.g.
+> > perf_event_create_kernel_counter() calls perf_event_alloc() before acquiring the
+> > per-CPU context mutex.
 > 
-> [1]: https://lore.kernel.org/all/20230609005935.42390-1-yuzhao@google.com/
+> Do you mean that the perf_guest_enter() check could be happened right
+> after the perf_force_exclude_guest_check()?
+> It's possible. For this case, the event can still be created. It will be
+> treated as an existing event and handled in merge_sched_in(). It will
+> never be scheduled when a guest is running.
 > 
-> Suggested-by: Yu Zhao <yuzhao@google.com>
-> Signed-off-by: James Houghton <jthoughton@google.com>
-> ---
->  include/linux/mmu_notifier.h | 93 +++++++++++++++++++++++++++++++++---
->  include/trace/events/kvm.h   | 13 +++--
->  mm/mmu_notifier.c            | 20 +++++---
->  virt/kvm/kvm_main.c          | 19 ++++++--
->  4 files changed, 123 insertions(+), 22 deletions(-)
-> 
-> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
-> index f349e08a9dfe..daaa9db625d3 100644
-> --- a/include/linux/mmu_notifier.h
-> +++ b/include/linux/mmu_notifier.h
-> @@ -61,6 +61,10 @@ enum mmu_notifier_event {
->  
->  #define MMU_NOTIFIER_RANGE_BLOCKABLE (1 << 0)
->  
-> +#define MMU_NOTIFIER_YOUNG			(1 << 0)
-> +#define MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE	(1 << 1)
+> The perf_force_exclude_guest_check() is to make sure most of the cases
+> can be rejected at the creation place. For the corner cases, they will
+> be rejected in the schedule stage.
 
-MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE appears to be unused by all callers
-of test/clear_young(). I would vote to remove it.
+Ah, the "rejected in the schedule stage" is what I'm missing.  But that creates
+a gross ABI, because IIUC, event creation will "randomly" succeed based on whether
+or not a CPU happens to be running in a KVM guest.  I.e. it's not just the kernel
+code that has races, the entire event creation is one big race.
 
-> +#define MMU_NOTIFIER_YOUNG_FAST			(1 << 2)
+What if perf had a global knob to enable/disable mediate PMU support?  Then when
+KVM is loaded with enable_mediated_true, call into perf to (a) check that there
+are no existing !exclude_guest events (this part could be optional), and (b) set
+the global knob to reject all new !exclude_guest events (for the core PMU?).
 
-Instead of MMU_NOTIFIER_YOUNG_FAST, how about
-MMU_NOTIFIER_YOUNG_LOOK_AROUND? i.e. The secondary MMU is returning
-saying it recommends doing a look-around and passing in a bitmap?
+Hmm, or probably better, do it at VM creation.  That has the advantage of playing
+nice with CONFIG_KVM=y (perf could reject the enabling without completely breaking
+KVM), and not causing problems if KVM is auto-probed but the user doesn't actually
+want to run VMs.
 
-That would avoid the whole "what does FAST really mean" confusion.
+E.g. (very roughly)
 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index fb49c2a60200..ca4b1ef9dfc2 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -917,10 +917,15 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
->  static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
->  					struct mm_struct *mm,
->  					unsigned long start,
-> -					unsigned long end)
-> +					unsigned long end,
-> +					unsigned long *bitmap)
->  {
->  	trace_kvm_age_hva(start, end);
->  
-> +	/* We don't support bitmaps. Don't test or clear anything. */
-> +	if (bitmap)
-> +		return MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE;
+int x86_perf_get_mediated_pmu(void)
+{
+	if (refcount_inc_not_zero(...))
+		return 0;
 
-Wouldn't it be a bug to get a bitmap here? The main MM is only suppost
-to pass in a bitmap if the secondary MMU returns
-MMU_NOTIFIER_YOUNG_FAST, which KVM does not do at this point.
+	if (<system wide events>)
+		return -EBUSY;
 
-Put another way, this check seems unneccessary.
+	<slow path with locking>
+}
 
-> +
->  	/*
->  	 * Even though we do not flush TLB, this will still adversely
->  	 * affect performance on pre-Haswell Intel EPT, where there is
-> @@ -939,11 +944,17 @@ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
->  
->  static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
->  				       struct mm_struct *mm,
-> -				       unsigned long address)
-> +				       unsigned long start,
-> +				       unsigned long end,
-> +				       unsigned long *bitmap)
->  {
-> -	trace_kvm_test_age_hva(address);
-> +	trace_kvm_test_age_hva(start, end);
-> +
-> +	/* We don't support bitmaps. Don't test or clear anything. */
-> +	if (bitmap)
-> +		return MMU_NOTIFIER_YOUNG_BITMAP_UNRELIABLE;
+void x86_perf_put_mediated_pmu(void)
+{
+	if (!refcount_dec_and_test(...))
+		return;
 
-Same thing here.
+	<slow path with locking>
+}
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1bbf312cbd73..f2994377ef44 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12467,6 +12467,12 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+        if (type)
+                return -EINVAL;
+ 
++       if (enable_mediated_pmu)
++               ret = x86_perf_get_mediated_pmu();
++               if (ret)
++                       return ret;
++       }
++
+        ret = kvm_page_track_init(kvm);
+        if (ret)
+                goto out;
+@@ -12518,6 +12524,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+        kvm_mmu_uninit_vm(kvm);
+        kvm_page_track_cleanup(kvm);
+ out:
++       x86_perf_put_mediated_pmu();
+        return ret;
+ }
+ 
+@@ -12659,6 +12666,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+        kvm_page_track_cleanup(kvm);
+        kvm_xen_destroy_vm(kvm);
+        kvm_hv_destroy_vm(kvm);
++       x86_perf_put_mediated_pmu();
+ }
+ 
+ static void memslot_rmap_free(struct kvm_memory_slot *slot)
+
 
