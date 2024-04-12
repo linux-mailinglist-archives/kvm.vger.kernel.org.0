@@ -1,56 +1,57 @@
-Return-Path: <kvm+bounces-14373-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14374-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B1198A2423
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 05:03:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20E008A242C
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 05:07:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F388BB219A2
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 03:03:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441831C2204E
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 03:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D280E14AB2;
-	Fri, 12 Apr 2024 03:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97EE1799F;
+	Fri, 12 Apr 2024 03:07:06 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5F3125BA;
-	Fri, 12 Apr 2024 03:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E44134B2;
+	Fri, 12 Apr 2024 03:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712890978; cv=none; b=rr2DN+lxTkUBzV/mwFlsLIZ3wIdTT6J2nbtkSH9zuZHttK6+kfXkuMRgJJqlanog+E8lMJ43q70RmHZN7KKB4zqoIkhGquUCz2UF0tUUdhKkXrPCWRBeFdQ1krtPNbQNr81vqnRi7HD7IJ6hK5evBDwteYxKX0GiWg+NX7Tbs2Y=
+	t=1712891226; cv=none; b=rdvlG0TfR8pHbLQPrJn9Bypw7li4m5Mviey3PYoF7uC4heuNZEmTdWw2dgwY1ukc3uPTFPIQIjCZcLiK5xfVUzyuoKst2EYRAv4FeRtNFGTJASll/pLxmGuZPwqENg7Ijg5sRmoJWR3AuMKDAuDRhmt0q5tUyReWUmf2vTYoTl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712890978; c=relaxed/simple;
-	bh=mksHlutSXcQUklVG/Sm4Rj52riQY7SIjyLfdHrSpKqs=;
+	s=arc-20240116; t=1712891226; c=relaxed/simple;
+	bh=WeQV3etAK0C96I94xGlBbd9Uo4UsxU5yT6PWfCgir+Y=;
 	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=eP7L9CfuodQqN7zp+EO37gl3gIo0lFg/waWod/8tWjBLXnXYTyGduPkF0XK+lUKF0/cHrKEwa82w0nNqad302nYfZPJIHtdkseraEI7OZoRLbjahXmCR4pdzhf2KhNqC5e8idTMF8Nkc51LMWq63eYFbJG7WlC4uFpN4KhBLTR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 In-Reply-To:Content-Type; b=b6wvYhfC3+3xKzghEvRWMr/tjGCupdDUB6kbnPbtBlwZuo0MhgXBkUKEJH8ZD2p9gHap2/qTF7RUqZ/KAT6IFjbnzfRLEfX9+FLhnp9uznJZ94LTFFXCzLudRcVUWUH3qVA5uTSeREFS4aZccIS8b9bMO69S1CIBq2ifCux6Esg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VG1Z34nHXz1S5M8;
-	Fri, 12 Apr 2024 11:02:03 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VG1cb4bnqztSdR;
+	Fri, 12 Apr 2024 11:04:15 +0800 (CST)
 Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8E4DC180063;
-	Fri, 12 Apr 2024 11:02:51 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 41B30140124;
+	Fri, 12 Apr 2024 11:07:01 +0800 (CST)
 Received: from [10.67.121.110] (10.67.121.110) by
  kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 11:02:51 +0800
-Subject: Re: [PATCH v4 4/4] Documentation: add debugfs description for hisi
- migration
+ 15.1.2507.35; Fri, 12 Apr 2024 11:07:00 +0800
+Subject: Re: [PATCH v4 2/4] hisi_acc_vfio_pci: Create subfunction for data
+ reading
 To: Alex Williamson <alex.williamson@redhat.com>
 CC: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+	<linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>,
+	=?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@redhat.com>
 References: <20240402032432.41004-1-liulongfang@huawei.com>
- <20240402032432.41004-5-liulongfang@huawei.com>
- <20240404140750.78549701.alex.williamson@redhat.com>
+ <20240402032432.41004-3-liulongfang@huawei.com>
+ <20240404140731.2b75cb80.alex.williamson@redhat.com>
 From: liulongfang <liulongfang@huawei.com>
-Message-ID: <699fed1e-51c0-2d74-0f1f-6f45813f4cb4@huawei.com>
-Date: Fri, 12 Apr 2024 11:02:50 +0800
+Message-ID: <f1ffdcc6-e74b-bf6c-bddb-73debd78900b@huawei.com>
+Date: Fri, 12 Apr 2024 11:07:00 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 Precedence: bulk
@@ -59,126 +60,134 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240404140750.78549701.alex.williamson@redhat.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+In-Reply-To: <20240404140731.2b75cb80.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemm600005.china.huawei.com (7.193.23.191)
 
 On 2024/4/5 4:07, Alex Williamson wrote:
-> On Tue, 2 Apr 2024 11:24:32 +0800
+> On Tue, 2 Apr 2024 11:24:30 +0800
 > Longfang Liu <liulongfang@huawei.com> wrote:
 > 
->> Add a debugfs document description file to help users understand
->> how to use the hisilicon accelerator live migration driver's
->> debugfs.
->>
->> Update the file paths that need to be maintained in MAINTAINERS
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  .../ABI/testing/debugfs-hisi-migration        | 34 +++++++++++++++++++
->>  MAINTAINERS                                   |  1 +
->>  2 files changed, 35 insertions(+)
->>  create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
->>
->> diff --git a/Documentation/ABI/testing/debugfs-hisi-migration b/Documentation/ABI/testing/debugfs-hisi-migration
->> new file mode 100644
->> index 000000000000..3d7339276e6f
->> --- /dev/null
->> +++ b/Documentation/ABI/testing/debugfs-hisi-migration
->> @@ -0,0 +1,34 @@
->> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/data
->> +Date:		Apr 2024
->> +KernelVersion:  6.9
+>> During the live migration process. It needs to obtain various status
+>> data of drivers and devices. In order to facilitate calling it in the
+>> debugfs function. For all operations that read data from device registers,
+>> the driver creates a subfunction.
+>> Also fixed the location of address data.
 > 
-> At best 6.10 with a merge window in May.
-> 
->> +Contact:	Longfang Liu <liulongfang@huawei.com>
->> +Description:	Read the live migration data of the vfio device.
->> +		These data include device status data, queue configuration
->> +		data and some task configuration data.
->> +		The output format of the data is defined by the live
->> +		migration driver.
-> 
-> "Dumps the device debug migration buffer, state must first be saved
-> using the 'save' attribute."
-> 
->> +
->> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/attr
->> +Date:		Apr 2024
->> +KernelVersion:  6.9
->> +Contact:	Longfang Liu <liulongfang@huawei.com>
->> +Description:	Read the live migration attributes of the vfio device.
->> +		it include device status attributes and data length attributes
->> +		The output format of the attributes is defined by the live
->> +		migration driver.
-> 
-> AFAICT from the previous patch, this attribute is useless.
-> 
->> +
->> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/cmd_state
->> +Date:		Apr 2024
->> +KernelVersion:  6.9
->> +Contact:	Longfang Liu <liulongfang@huawei.com>
->> +Description:	Used to obtain the device command sending and receiving
->> +		channel status. If successful, returns the command value.
->> +		If failed, return error log.
->> +
-> 
-> Seems like it statically returns "OK" plus the actual value.
-> 
-> 
->> +What:		/sys/kernel/debug/vfio/<device>/migration/hisi_acc/save
->> +Date:		Apr 2024
->> +KernelVersion:  6.9
->> +Contact:	Longfang Liu <liulongfang@huawei.com>
->> +Description:	Trigger the Hisilicon accelerator device to perform
->> +		the state saving operation of live migration through the read
->> +		operation, and output the operation log results.
-> 
-> These interfaces are confusing, attr and data only work if there has
-> either been a previous save OR the user migration process closed saving
-> or resuming fds in the interim, and the user doesn't know which one
-> they get.  Note that debug_migf isn't even discarded between
-> open/close, only cmd and save require the device to be opened by a
-> user, data and attr might continue to return data from some previous
-> user save, resume, or debugfs save.
+> Cédric noted privately and I agree, 1) fixes should be provided in
+> separate patches with a Fixes: tag rather than subtly included in a
+> minor refactoring, and 2) what does this imply about the existing
+> functionality of migration?  This would seem to suggest existing
+> migration data is bogus if we're offset by a register reading the DMA
+> address.  The commit log for the Fixes patch should describe this.
 >
 
-data: Indicates the device migration data obtained after the migration is completed.
-This data is saved in debug_migf. The user reads it through "cat" and
-presents it to the user in the form of hexadecimal pure data.
-
-attr: Indicates the configuration parameters of the migration process after the
-migration is completed. These parameters are saved in vfio device and debug_migf.
-The user reads it through "cat" and presents it to the user in the form of key-value
-pairs such as <attribute name, attribute value>.
-
-Save is an action process. After "cat" it, a migration save operation will be
-performed and the result data will be updated to debug_migf.
-
-There is still a big difference between data and attr, and the data formats are
-also different. Not merging makes it easier for users to obtain information.
-If you feel confused about save, it is recommended to use migrate_save.
+Okay, the modification of the DMA address offset part is split into
+a new patch, and the modification of this part is explained clearly.
 
 Thanks,
 Longfang.
 
-> 
-> 
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 7625911ec2f1..8c2d13b13273 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -23072,6 +23072,7 @@ M:	Longfang Liu <liulongfang@huawei.com>
->>  M:	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
->>  L:	kvm@vger.kernel.org
->>  S:	Maintained
->> +F:	Documentation/ABI/testing/debugfs-hisi-migration
->>  F:	drivers/vfio/pci/hisilicon/
+>>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 56 +++++++++++--------
+>>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.h    |  3 +
+>>  2 files changed, 37 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> index 45351be8e270..bf358ba94b5d 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+>> @@ -486,6 +486,39 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  	return 0;
+>>  }
 >>  
->>  VFIO MEDIATED DEVICE DRIVERS
+>> +static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
+>> +{
+>> +	struct device *dev = &vf_qm->pdev->dev;
+>> +	int ret;
+>> +
+>> +	ret = qm_get_regs(vf_qm, vf_data);
+>> +	if (ret)
+>> +		return -EINVAL;
+>> +
+>> +	/* Every reg is 32 bit, the dma address is 64 bit. */
+>> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
+>> +	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
+>> +	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
+>> +	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> +	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
+>> +
+>> +	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
+>> +	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to read SQC addr!\n");
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	ret = qm_get_cqc(vf_qm, &vf_data->cqc_dma);
+>> +	if (ret) {
+>> +		dev_err(dev, "failed to read CQC addr!\n");
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	return 0;
+>> +}
+>> +
+>>  static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  			    struct hisi_acc_vf_migration_file *migf)
+>>  {
+>> @@ -511,31 +544,10 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>>  		return ret;
+>>  	}
+>>  
+>> -	ret = qm_get_regs(vf_qm, vf_data);
+>> +	ret = vf_qm_read_data(vf_qm, vf_data);
+>>  	if (ret)
+>>  		return -EINVAL;
+>>  
+>> -	/* Every reg is 32 bit, the dma address is 64 bit. */
+>> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
+>> -	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
+>> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
+>> -	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+>> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
+>> -
+>> -	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
+>> -	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to read SQC addr!\n");
+>> -		return -EINVAL;
+>> -	}
+>> -
+>> -	ret = qm_get_cqc(vf_qm, &vf_data->cqc_dma);
+>> -	if (ret) {
+>> -		dev_err(dev, "failed to read CQC addr!\n");
+>> -		return -EINVAL;
+>> -	}
+>> -
+>>  	migf->total_length = sizeof(struct acc_vf_data);
+>>  	return 0;
+>>  }
+>> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> index 5bab46602fad..7a9dc87627cd 100644
+>> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+>> @@ -38,6 +38,9 @@
+>>  #define QM_REG_ADDR_OFFSET	0x0004
+>>  
+>>  #define QM_XQC_ADDR_OFFSET	32U
+>> +#define QM_XQC_ADDR_LOW		0x1
+>> +#define QM_XQC_ADDR_HIGH	0x2
+>> +
+>>  #define QM_VF_AEQ_INT_MASK	0x0004
+>>  #define QM_VF_EQ_INT_MASK	0x000c
+>>  #define QM_IFC_INT_SOURCE_V	0x0020
 > 
 > .
 > 
