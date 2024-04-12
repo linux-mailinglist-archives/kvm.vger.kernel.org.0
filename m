@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-14502-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14503-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0278A2C73
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:36:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE4C18A2C74
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 12:36:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EBCEB2133C
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:36:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61483B20B65
+	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 10:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38AA556751;
-	Fri, 12 Apr 2024 10:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364D056B63;
+	Fri, 12 Apr 2024 10:34:55 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F17C56472
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D1C85676A
+	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 10:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918092; cv=none; b=QZcyxU61jbJB6MuWiZsS9QcLZ+aorAGQ05hUtZQztFsrXXg69jNYFKrNkHbcVVouyJGta+Ish7zjiYzGOXOQomrRxwUUzzC0BNgXh+4IOJ6DGop0+0kDbDIjuAAuo3fgrEHwnvQIAPvbxa9Ay4CfGXGsVS4xBpS1xWOVPsa/75o=
+	t=1712918094; cv=none; b=opjcNidRY2zIi5n2kguc/j3ZaVbKqFBclxc45BDyDeVyNKYFXN0BGhlzbKl1balINsdjGDrvnwsSx8pOFcZGZkGeH78uVqB12ZXDv569kf6IovI5MxGdv42an7EDSrGgByKWyhA6TlS7zVm9ce0S3ZGuFud/4ruOuptWrMlgVv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712918092; c=relaxed/simple;
-	bh=ZtoAmbW+izceMK05Sk9cQC0HsyKwu1PdMxZlvB63Xp4=;
+	s=arc-20240116; t=1712918094; c=relaxed/simple;
+	bh=KksWxqwOaHZnIl8HsPu708eVscZc0fFNwMKoDG4QCNs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=u3tbTflS6R5n3bzfh3VVNKhNBN1o6jhDtv/d45zdzwl0/gL6VyUAH74/OuD68oEYJanI8NllQE5xS6whwAcNKJLpdVB8fZjiEpQ5Hxeu36TFdOx4+vzU6UXZJGpucD/X9CiH5r+TTiwu0iQeZbmeKLULDAYpFT78EXzQNOxATmQ=
+	 MIME-Version; b=A++CH3X9hWucrQmr/IhjK/Zjey1zMIvrnf5yNUH9z14IIZ4uuV3Oa9MsRQiH04uQFfV7Q449NeonBRaVRDiLGA5zc/XcChdiogPHuiibg7P7PjvW8ijZXc+XHUPSbj1kxGrT68AI3upHTrTpTuud0UayQ8nTxGqG42wO6EzHglo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C18D1596;
-	Fri, 12 Apr 2024 03:35:20 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7C53C15A1;
+	Fri, 12 Apr 2024 03:35:22 -0700 (PDT)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7C66B3F64C;
-	Fri, 12 Apr 2024 03:34:49 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 7C7303F64C;
+	Fri, 12 Apr 2024 03:34:51 -0700 (PDT)
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 To: kvmarm@lists.linux.dev
 Cc: kvm@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc: kvm@vger.kernel.org,
 	andrew.jones@linux.dev,
 	eric.auger@redhat.com,
 	Suzuki K Poulose <suzuki.poulose@arm.com>
-Subject: [kvm-unit-tests PATCH 16/33] arm64: add ESR_ELx EC.SVE
-Date: Fri, 12 Apr 2024 11:33:51 +0100
-Message-Id: <20240412103408.2706058-17-suzuki.poulose@arm.com>
+Subject: [kvm-unit-tests PATCH 17/33] arm64: enable SVE at startup
+Date: Fri, 12 Apr 2024 11:33:52 +0100
+Message-Id: <20240412103408.2706058-18-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240412103408.2706058-1-suzuki.poulose@arm.com>
 References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
@@ -64,40 +64,39 @@ Content-Transfer-Encoding: 8bit
 
 From: Joey Gouly <joey.gouly@arm.com>
 
-Add the SVE exception class, so that SVE exceptions are not printed
-as 'unknown' exceptions.
-
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- lib/arm64/asm/esr.h   | 1 +
- lib/arm64/processor.c | 1 +
- 2 files changed, 2 insertions(+)
+ arm/cstart64.S | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/lib/arm64/asm/esr.h b/lib/arm64/asm/esr.h
-index 8c351631..335343c5 100644
---- a/lib/arm64/asm/esr.h
-+++ b/lib/arm64/asm/esr.h
-@@ -26,6 +26,7 @@
- #define ESR_EL1_EC_SVC32	(0x11)
- #define ESR_EL1_EC_SVC64	(0x15)
- #define ESR_EL1_EC_SYS64	(0x18)
-+#define ESR_EL1_EC_SVE		(0x19)
- #define ESR_EL1_EC_IABT_EL0	(0x20)
- #define ESR_EL1_EC_IABT_EL1	(0x21)
- #define ESR_EL1_EC_PC_ALIGN	(0x22)
-diff --git a/lib/arm64/processor.c b/lib/arm64/processor.c
-index 06fd7cfc..eb93fd7c 100644
---- a/lib/arm64/processor.c
-+++ b/lib/arm64/processor.c
-@@ -43,6 +43,7 @@ static const char *ec_names[EC_MAX] = {
- 	[ESR_EL1_EC_SVC32]		= "SVC32",
- 	[ESR_EL1_EC_SVC64]		= "SVC64",
- 	[ESR_EL1_EC_SYS64]		= "SYS64",
-+	[ESR_EL1_EC_SVE]		= "SVE",
- 	[ESR_EL1_EC_IABT_EL0]		= "IABT_EL0",
- 	[ESR_EL1_EC_IABT_EL1]		= "IABT_EL1",
- 	[ESR_EL1_EC_PC_ALIGN]		= "PC_ALIGN",
+diff --git a/arm/cstart64.S b/arm/cstart64.S
+index 92631349..c081365f 100644
+--- a/arm/cstart64.S
++++ b/arm/cstart64.S
+@@ -94,8 +94,9 @@ start:
+ 	adrp    x4, stackptr
+ 	add     sp, x4, :lo12:stackptr
+ 
+-	/* enable FP/ASIMD */
+-	mov	x4, #(3 << 20)
++	/* enable FP/ASIMD and SVE */
++	mov	x4, (3 << 20)
++	orr	x4, x4, (3 << 16)
+ 	msr	cpacr_el1, x4
+ 
+ 	/* set up exception handling */
+@@ -278,8 +279,9 @@ get_mmu_off:
+ 
+ .globl secondary_entry
+ secondary_entry:
+-	/* Enable FP/ASIMD */
++	/* enable FP/ASIMD and SVE */
+ 	mov	x0, #(3 << 20)
++	orr	x0, x0, #(3 << 16)
+ 	msr	cpacr_el1, x0
+ 
+ 	/* set up exception handling */
 -- 
 2.34.1
 
