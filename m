@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-14590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14592-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBAA88A3A9A
-	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 05:19:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E22C8A3AA9
+	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 05:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EA2EB235A9
-	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 03:19:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7D271F24266
+	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 03:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B06A818E25;
-	Sat, 13 Apr 2024 03:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E101AAD3;
+	Sat, 13 Apr 2024 03:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f6Wi6bMn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MYkKD03H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A5818633;
-	Sat, 13 Apr 2024 03:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2240317722;
+	Sat, 13 Apr 2024 03:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712978360; cv=none; b=OEPeWDBpEUAXDWccgdfRwtkDez658BnDPFvXyJvUlKNRhgvQC2x7eREGP3MkjIzosSQWHMYD3iA1SBCTEbC+06RVBUMyLJFBn+opzxbkOOD57qRw/VVx19LB8/4hGziX2OBCSO3iez0JeFsBPXu+aZK3spLee7x4hBeOyFtITlc=
+	t=1712979004; cv=none; b=jEVxG4ermGbicCqV78q+RvzIhRbMTH8JU1/b73hNEuluaNFSw27gQL/zXCaGbKWJs2rRqpRNNaaWwxaSui+doLTQnpp+qKRPduYWkIDRpaOlPnv1fGpmYiUY2FDRwdmSU6Rtbzt3lqNrAar/FLZ8vLwzgOVsQjVuefh6qZUE/yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712978360; c=relaxed/simple;
-	bh=tlILtvfbKOnPFtHiyRvVuwQZc/uBd22Ge+UJkIuqyds=;
+	s=arc-20240116; t=1712979004; c=relaxed/simple;
+	bh=U63yV+bzfQZSVisuEs2mKLPCsBSfAnt51A8BFJqeIx0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P9D/+3HezoQY/W5QF1FfEmR4sM12x8C2vAzHWGLzQ2tzvlxGp9vBDRu38Rv57kRvLhMvs9MytFMqR3pFCeDjXGVcJ8l8WospYOpak0Fduo5dkFjsF75Z8DtraEcs3/2NEa6k8PdFcsN7jsTzVuLq6cqCHMcgHh8r03nCR6NqJCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f6Wi6bMn; arc=none smtp.client-ip=198.175.65.10
+	 In-Reply-To:Content-Type; b=pM41ik3a9AJARJYxa5vcm0w7wurZbxdUPrOB9kzTTNOolkfEmxIlAKSUjXB7ggCeQNxDlX1PTYb1LHZHqEAsnBdMXh3KhiMd6J/qTh9gcknfK2F5yfUmh9WX08Z3tbFphCp2czOkimEaYHulXLHst3Kv96Hp+CLqo/Ixu1Gw3X0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MYkKD03H; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712978360; x=1744514360;
+  t=1712979003; x=1744515003;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=tlILtvfbKOnPFtHiyRvVuwQZc/uBd22Ge+UJkIuqyds=;
-  b=f6Wi6bMnpj94ljsDv+gv6hRVd8dg2M9/vhWz1nNF5A0PYKLabJIv/Lhp
-   er1UpkVnAdlXpuyn0mbsGJk6tJ5pYWVuiNmm3072KYqUm56tHSyTa+7w1
-   KrgjOSfo/ff6blwtDWkdhQfRZgzzthqqypz7iAGhqy7Bf6n565QWS9e47
-   LHcXjEp4wUs+j8lQevQMikk2VwaDkG10uzq/gObl93o2gmQ7+kuIVIaZu
-   6hk23v1VSc5GdI1844icIegMtGKcyKDBVOcUlYea8KJEJ0XpCr43dOn40
-   Qv48AYB/biyKuWK5VF40GuiKJzNb8k4Kg5eBdAod/q/e+A1V0QIMPgSOB
-   g==;
-X-CSE-ConnectionGUID: OGKvaGVPQmqwSXcUV6bEbA==
-X-CSE-MsgGUID: qbTxctRTQrGbmTLNi2QzeA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="25908367"
+  bh=U63yV+bzfQZSVisuEs2mKLPCsBSfAnt51A8BFJqeIx0=;
+  b=MYkKD03HdYN2ke/sme1xXswtFL48yDWN9iQy7Lzf0I+05PQbhG5WXUM5
+   3G/d8A+NEeVJN6dLWzvlu/WyzZ1fJJzpfhtRPflvy4EHcFHcSgp1rgKMt
+   3qRrmyh8khW4PC0QWQDOukTncrTnsfg7jH4f9gG/j20fJtwZjQu3jxslO
+   W2jHI9MhkHfaEnzTn1FGseawO6ARNmDpS9p20zGzLKE7jQk6f3tVM+sCE
+   M9ofGZTxPoV+ghU/2y/7NPJurxaagCCbQPcBrYxJEKtqhkbcIVXrgh0ZL
+   yhBpBTjpa22ZIOgEKIrHhAuMJW9ULu+kLdze/pVoUTZTeVa98W/BF1dGD
+   Q==;
+X-CSE-ConnectionGUID: PJ00+z1/TdCoFNSBfcdBtA==
+X-CSE-MsgGUID: QE1qT6leQ/aaAooViZHBtQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8306769"
 X-IronPort-AV: E=Sophos;i="6.07,198,1708416000"; 
-   d="scan'208";a="25908367"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 20:19:19 -0700
-X-CSE-ConnectionGUID: MZvdWcstR9a2//TqUiwu2Q==
-X-CSE-MsgGUID: U28LofAETEu0YDXkt9VXzA==
+   d="scan'208";a="8306769"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 20:30:02 -0700
+X-CSE-ConnectionGUID: j5r019zuRyyfhPbNWxJf2A==
+X-CSE-MsgGUID: 8c2KW5U1RpWdwONbmCT8BA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,198,1708416000"; 
-   d="scan'208";a="44670199"
+   d="scan'208";a="25826620"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.92]) ([10.124.225.92])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 20:19:14 -0700
-Message-ID: <724e77ee-b70f-4b9e-8aaa-1ea572b14186@linux.intel.com>
-Date: Sat, 13 Apr 2024 11:19:11 +0800
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 20:29:58 -0700
+Message-ID: <64c895af-67a2-48de-b509-dd44d295ffe9@linux.intel.com>
+Date: Sat, 13 Apr 2024 11:29:55 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,67 +67,61 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
- state for Intel CPU
-To: Sean Christopherson <seanjc@google.com>, Jim Mattson <jmattson@google.com>
-Cc: Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
- peterz@infradead.org, mizhang@google.com, kan.liang@intel.com,
- zhenyuw@linux.intel.com, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
- zhiyuan.lv@intel.com, eranian@google.com, irogers@google.com,
- samantha.alt@intel.com, like.xu.linux@gmail.com, chao.gao@intel.com
+Subject: Re: [RFC PATCH 27/41] KVM: x86/pmu: Clear PERF_METRICS MSR for guest
+To: Sean Christopherson <seanjc@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
+ kan.liang@intel.com, zhenyuw@linux.intel.com, jmattson@google.com,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
 References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <20240126085444.324918-24-xiong.y.zhang@linux.intel.com>
- <ZhhZush_VOEnimuw@google.com>
- <CALMp9eS4H-WZXRCrp+6aAgwAp+qP2BgJx5ik5kA7vdyQ9qzARg@mail.gmail.com>
- <ZhhyxT66RdpiCRA2@google.com>
+ <20240126085444.324918-28-xiong.y.zhang@linux.intel.com>
+ <ZhhbJCGcJ6Rshkfk@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZhhyxT66RdpiCRA2@google.com>
+In-Reply-To: <ZhhbJCGcJ6Rshkfk@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
-On 4/12/2024 7:31 AM, Sean Christopherson wrote:
-> On Thu, Apr 11, 2024, Jim Mattson wrote:
->> On Thu, Apr 11, 2024 at 2:44 PM Sean Christopherson <seanjc@google.com> wrote:
->>>> +     /* Clear host global_ctrl and global_status MSR if non-zero. */
->>>> +     wrmsrl(MSR_CORE_PERF_GLOBAL_CTRL, 0);
->>> Why?  PERF_GLOBAL_CTRL will be auto-loaded at VM-Enter, why do it now?
->>>
->>>> +     rdmsrl(MSR_CORE_PERF_GLOBAL_STATUS, global_status);
->>>> +     if (global_status)
->>>> +             wrmsrl(MSR_CORE_PERF_GLOBAL_OVF_CTRL, global_status);
->>> This seems especially silly, isn't the full MSR being written below?  Or am I
->>> misunderstanding how these things work?
->> LOL! You expect CPU design to follow basic logic?!?
+On 4/12/2024 5:50 AM, Sean Christopherson wrote:
+> On Fri, Jan 26, 2024, Xiong Zhang wrote:
+>> From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 >>
->> Writing a 1 to a bit in IA32_PERF_GLOBAL_STATUS_SET sets the
->> corresponding bit in IA32_PERF_GLOBAL_STATUS to 1.
+>> Since perf topdown metrics feature is not supported yet, clear
+>> PERF_METRICS MSR for guest.
+> Please rewrite with --verbose, I have no idea what MSR_PERF_METRICS, and thus no
+> clue why it needs to be zeroed when loading guest context, e.g. it's not passed
+> through, so why does it matter?
+
+Sure. MSR_PERF_METRICS actually reports the perf topdown metrics 
+portion. I would add more details.
+
+
+>
+>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>> ---
+>>   arch/x86/kvm/vmx/pmu_intel.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
 >>
->> Writing a 0 to a bit in to IA32_PERF_GLOBAL_STATUS_SET is a nop.
+>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+>> index 4b4da7f17895..ad0434646a29 100644
+>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>> @@ -916,6 +916,10 @@ static void intel_restore_pmu_context(struct kvm_vcpu *vcpu)
+>>   	 */
+>>   	for (i = pmu->nr_arch_fixed_counters; i < kvm_pmu_cap.num_counters_fixed; i++)
+>>   		wrmsrl(MSR_CORE_PERF_FIXED_CTR0 + i, 0);
+>> +
+>> +	/* Clear PERF_METRICS MSR since guest topdown metrics is not supported yet. */
+>> +	if (kvm_caps.host_perf_cap & PMU_CAP_PERF_METRICS)
+>> +		wrmsrl(MSR_PERF_METRICS, 0);
+>>   }
+>>   
+>>   struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>> -- 
+>> 2.34.1
 >>
->> To clear a bit in IA32_PERF_GLOBAL_STATUS, you need to write a 1 to
->> the corresponding bit in IA32_PERF_GLOBAL_STATUS_RESET (aka
->> IA32_PERF_GLOBAL_OVF_CTRL).
-> If only C had a way to annotate what the code is doing. :-)
->
->>>> +     wrmsrl(MSR_CORE_PERF_GLOBAL_STATUS_SET, pmu->global_status);
-> IIUC, that means this should be:
->
-> 	if (pmu->global_status)
-> 		wrmsrl(MSR_CORE_PERF_GLOBAL_STATUS_SET, pmu->global_status);
->
-> or even better:
->
-> 	toggle = pmu->global_status ^ global_status;
-> 	if (global_status & toggle)
-> 		wrmsrl(MSR_CORE_PERF_GLOBAL_OVF_CTRL, global_status & toggle);
-> 	if (pmu->global_status & toggle)
-> 		wrmsrl(MSR_CORE_PERF_GLOBAL_STATUS_SET, pmu->global_status & toggle);
-Thanks, it looks better. Since PMU v4+, the MSR 
-CORE_PERF_GLOBAL_OVF_CTRL is renamed to CORE_PERF_GLOBAL_STATUS_RESET 
-with supporting more bits. CORE_PERF_GLOBAL_STATUS_RESET looks more 
-easily understand just from name than CORE_PERF_GLOBAL_OVF_CTRL, I would 
-prefer use this name in next version.
 
