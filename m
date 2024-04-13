@@ -1,155 +1,217 @@
-Return-Path: <kvm+bounces-14583-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14584-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD828A38B6
-	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 01:00:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517358A3912
+	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 02:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00EB7B231BE
-	for <lists+kvm@lfdr.de>; Fri, 12 Apr 2024 23:00:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2F901F22894
+	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 00:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D0415252B;
-	Fri, 12 Apr 2024 23:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352ED17C8;
+	Sat, 13 Apr 2024 00:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WD/eVOog"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lKTorjlP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F9574C6E
-	for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 23:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0D5173;
+	Sat, 13 Apr 2024 00:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712962806; cv=none; b=tcpUEpPOpYlhvAi3xv2GkwmHhAm2JGQ1nAvd3RNj/ENkBwpsr3O1Bf3agCYMPsvNmjRmioJ2K0saaGBS55CzBhx97uuDz0yIC4Cj9X6knkCQXUUzdPuDMEu4pJg8sDAsDhQ92Wq6XzuW2+uMUK7Oys05HEIz4wwhpZKLNSLvu8E=
+	t=1712967630; cv=none; b=eo/czndv0kzintZmfwLrPtxYvg5xor4o8TehY1fwaZvlrzddwBok/hVA6rlmd7rELBoufJbjyX4VE9uQwBPWVXCDEQLXtGXjiAilbbmRLQRxruKZVSEFdvo20wRVDjANOKLLHGiBTNEahe3BiX/M8VVFSSAhRV9EyLjRk/X5Np0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712962806; c=relaxed/simple;
-	bh=e5jrULAtUKpdI5emYxz+qUL2+/vP0GWvcFutzVEdFCw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=blSMq/T4mhU4PKzFQeTvVS6NIZ4egC4mNF1VeYXrE3MC3xYat1anpF4vvGQlWuCPRKnJKKe6GDdA182F3YbAnOESmT2tjVN/mVoAWeal6NTn4+V8aggGvlSkQzelwsmYUQDJdJBsQ54+2cot9aJDqDO0O1vWQQOdQPPs+bPYDKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WD/eVOog; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712962803;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XtdF5YIQMmHx7s8x+KaNdKrE1bMDggAMXEluGAHCnoQ=;
-	b=WD/eVOogLLTW/dtYpaPHTlZHKdjLUYHLL/VOuA5Xd/PGg4MTKRBMeqbEJPqYBZoGzyBJ4q
-	73IZogenIXAzpESw6nQzphVaXzcI2todcXE7tcV5mfXJRcmMjg0ffY01b0p+DwQcwAfdDU
-	Iz2E2SBajUWqfKlzOJbeXhke008dfW4=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-183-FRNPgD-SMridzBgUTv4O_w-1; Fri, 12 Apr 2024 19:00:02 -0400
-X-MC-Unique: FRNPgD-SMridzBgUTv4O_w-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7d682b4616eso143897739f.1
-        for <kvm@vger.kernel.org>; Fri, 12 Apr 2024 16:00:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712962801; x=1713567601;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XtdF5YIQMmHx7s8x+KaNdKrE1bMDggAMXEluGAHCnoQ=;
-        b=hMPA896shQYOqnNzEm9VcLAZPNaSKxgTTMUAjBESx4Z5WbRXMuE8qEaeGNecKfUtke
-         JCka0WRvi+M1qVz5ppitggMHl9flnaHVPSIDk2kz8s4tUugLBCgiSkRnNGetyCJekQ2F
-         M/2/icTt1jwgBsEdCfVUNJhSug4S4mDjtXY3NupesNpGLVPfzfe5DxWixILblnT5TLvh
-         UKd3JLjFheppz8ZotLVM0vhKy2hlRdH5GNbTWCjm00WRxu2o3ItZeyDflXub/aX+8Mdr
-         nmq3C9sBeqHW40BBWjdAbHI3ESA6mMqWkcWRYVQzEfOVBIaCDwHk5Ge3wsLgq4xgJAOQ
-         DYUw==
-X-Forwarded-Encrypted: i=1; AJvYcCWnqbFUP7N741RncNrYb2Mau1JPWhQotXDzjQKs3Z9Iftrw4l2538KBgCxTQb6k4j7REZAFgM2FCHIoNXX3e5/1V5gj
-X-Gm-Message-State: AOJu0YxzOosc+fM/OMVDdVzSzxzvZERsydztJWoF/4jUT5XvngNCCcQp
-	iHtdKBLablGdfXycCPIuXszaAOKO9ilCz4lJJmfek5f0El0g3mLBpGOknbl2L0gafsUhuBCBv6o
-	NbCmS7HBm7qj19zZXdP2l5uIpduY9WYVJ88FL+giR1hRziEDSvw==
-X-Received: by 2002:a05:6602:3e86:b0:7d0:ba6f:92c5 with SMTP id el6-20020a0566023e8600b007d0ba6f92c5mr5359839iob.13.1712962801557;
-        Fri, 12 Apr 2024 16:00:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpPzwFiwRVcn16zKGoAaDgOZpZ3ArB1zhEd7Vx4LLD00B6pR02mVtTXKuGag0ybQX8PSGIuw==
-X-Received: by 2002:a05:6602:3e86:b0:7d0:ba6f:92c5 with SMTP id el6-20020a0566023e8600b007d0ba6f92c5mr5359817iob.13.1712962801258;
-        Fri, 12 Apr 2024 16:00:01 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id bp15-20020a056638440f00b00482c7617f1dsm1338296jab.25.2024.04.12.16.00.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 16:00:00 -0700 (PDT)
-Date: Fri, 12 Apr 2024 16:59:59 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, Xin Zeng <xin.zeng@intel.com>,
- <jgg@nvidia.com>, <yishaih@nvidia.com>,
- <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>,
- <linux-crypto@vger.kernel.org>, <kvm@vger.kernel.org>,
- <qat-linux@intel.com>
-Subject: Re: [PATCH v5 00/10] crypto: qat - enable QAT GEN4 SRIOV VF live
- migration for QAT GEN4
-Message-ID: <20240412165959.4b7aefad.alex.williamson@redhat.com>
-In-Reply-To: <ZhlC4lWg1ExOuNnl@gcabiddu-mobl.ger.corp.intel.com>
-References: <20240306135855.4123535-1-xin.zeng@intel.com>
-	<ZgVLvdhhU6o7sJwF@gondor.apana.org.au>
-	<20240328090349.4f18cb36.alex.williamson@redhat.com>
-	<Zgty1rGVX+u6RRQf@gondor.apana.org.au>
-	<ZhlC4lWg1ExOuNnl@gcabiddu-mobl.ger.corp.intel.com>
-Organization: Red Hat
+	s=arc-20240116; t=1712967630; c=relaxed/simple;
+	bh=18zdulWfNXqxnZk+DxpyaW+RxzbmWkSojubS4Cu+eC0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dTj4nT95QWxmOi/9Is9jziYRSwWodbpU1JVkK+A7b60z/urNZMOW86xHlmlUfRkj/aix5dw2PXKcc/+G6SaM3BRht+j4qB1Nu8vr7dD+xz/BUOUPj+HJVr8GzYt1+RWeAETRb5NUkCbaso9WvQhqirr3cUqBVvCOXvzZhDE54lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lKTorjlP; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712967629; x=1744503629;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=18zdulWfNXqxnZk+DxpyaW+RxzbmWkSojubS4Cu+eC0=;
+  b=lKTorjlPauTec4qIk6t9qSqfODtyJA/Czb3ieyZGGvkqe+K+TxtBmy5Q
+   zDoQGQ8CwG9TyIXjq/AaWH6zYNg48zKdrFyjZG5QjshzEjHCHj7kPsS3d
+   9MRTGxZsCQkecwhTDxVBdcOST9MH8fY6PY6sMsz8C8XcALTNP397AvZCx
+   k20clX0RUWOUisW7Ms/24++nffvFFnEhM9z/4xdvWVxOIsWT4pMwivhtt
+   RlPK3/lGQJC+pEWTqvMtebrry/XifXWYR37KKYr0yx2pxOd/NVI/ahvqy
+   B03AQ8mD3aVURrTHsQCCUsozheynnfOw1v4Zmp5i1LVHxFam6FwA7PkFl
+   Q==;
+X-CSE-ConnectionGUID: UFh8Iu6/Q8GdTDQshDOt/Q==
+X-CSE-MsgGUID: xVGpPWb2RIO/bXI1tb2bXg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="19835101"
+X-IronPort-AV: E=Sophos;i="6.07,197,1708416000"; 
+   d="scan'208";a="19835101"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 17:20:28 -0700
+X-CSE-ConnectionGUID: 8njdxwpMSz28Atsn66Oz5Q==
+X-CSE-MsgGUID: +LQ08F12RPmjdxp9sE/6cQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,197,1708416000"; 
+   d="scan'208";a="26071131"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 17:20:28 -0700
+Date: Fri, 12 Apr 2024 17:20:26 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	Xiaoyao Li <xiaoyao.li@intel.com>,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	Chao Gao <chao.gao@intel.com>, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 088/130] KVM: x86: Add a switch_db_regs flag to
+ handle TDX's auto-switched behavior
+Message-ID: <20240413002026.GP3039520@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <ca5d0399cdbbaa6c7c6528ad85b3560cec0f0752.1708933498.git.isaku.yamahata@intel.com>
+ <aaa69c7d-7f33-44a3-b23c-82447a8452ce@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aaa69c7d-7f33-44a3-b23c-82447a8452ce@linux.intel.com>
 
-On Fri, 12 Apr 2024 15:19:14 +0100
-"Cabiddu, Giovanni" <giovanni.cabiddu@intel.com> wrote:
+On Sun, Apr 07, 2024 at 06:52:44PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
 
-> Hi Alex,
 > 
-> On Tue, Apr 02, 2024 at 10:52:06AM +0800, Herbert Xu wrote:
-> > On Thu, Mar 28, 2024 at 09:03:49AM -0600, Alex Williamson wrote:  
-> > >
-> > > Would you mind making a branch available for those in anticipation of
-> > > the qat vfio variant driver itself being merged through the vfio tree?
-> > > Thanks,  
+> 
+> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > > 
-> > OK, I've just pushed out a vfio branch.  Please take a look to
-> > see if I messed anything up.  
-> What are the next steps here?
+> > Add a flag, KVM_DEBUGREG_AUTO_SWITCHED_GUEST, to skip saving/restoring DRs
+> > irrespective of any other flags.
 > 
-> Shall we re-send the patch `vfio/qat: Add vfio_pci driver for Intel QAT
-> VF devices` rebased against vfio-next?
-> Or, wait for you to merge the branch from Herbert, then rebase and re-send?
-> Or, are you going to take the patch that was sent to the mailing list as is
-> and handle the rebase? (There is only a small conflict to sort on the
-> makefiles).
+> Here "irrespective of any other flags" sounds like other flags will be
+> ignored if KVM_DEBUGREG_AUTO_SWITCHED_GUEST is set.
+> But the code below doesn't align with it.
 
-Hi Giovanni,
+Sure, let's update the commit message.
 
-The code itself looks fine to me, the Makefile conflict is trivial,
-MAINTAINERS also requires a trivial re-ordering to keep it alphabetical
-now that virtio-vfio-pci is merged.  The only thing I spot that could
-use some attention is the documentation, where our acceptance criteria
-requests:
 
-  Additionally, drivers should make an attempt to provide sufficient
-  documentation for reviewers to understand the device specific
-  extensions, for example in the case of migration data, how is the
-  device state composed and consumed, which portions are not otherwise
-  available to the user via vfio-pci, what safeguards exist to validate
-  the data, etc.
+> >    TDX-SEAM unconditionally saves and
+> > restores guest DRs and reset to architectural INIT state on TD exit.
+> > So, KVM needs to save host DRs before TD enter without restoring guest DRs
+> > and restore host DRs after TD exit.
+> > 
+> > Opportunistically convert the KVM_DEBUGREG_* definitions to use BIT().
+> > 
+> > Reported-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > Co-developed-by: Chao Gao <chao.gao@intel.com>
+> > Signed-off-by: Chao Gao <chao.gao@intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >   arch/x86/include/asm/kvm_host.h | 10 ++++++++--
+> >   arch/x86/kvm/vmx/tdx.c          |  1 +
+> >   arch/x86/kvm/x86.c              | 11 ++++++++---
+> >   3 files changed, 17 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 3ab85c3d86ee..a9df898c6fbd 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -610,8 +610,14 @@ struct kvm_pmu {
+> >   struct kvm_pmu_ops;
+> >   enum {
+> > -	KVM_DEBUGREG_BP_ENABLED = 1,
+> > -	KVM_DEBUGREG_WONT_EXIT = 2,
+> > +	KVM_DEBUGREG_BP_ENABLED		= BIT(0),
+> > +	KVM_DEBUGREG_WONT_EXIT		= BIT(1),
+> > +	/*
+> > +	 * Guest debug registers (DR0-3 and DR6) are saved/restored by hardware
+> > +	 * on exit from or enter to guest. KVM needn't switch them. Because DR7
+> > +	 * is cleared on exit from guest, DR7 need to be saved/restored.
+> > +	 */
+> > +	KVM_DEBUGREG_AUTO_SWITCH	= BIT(2),
+> >   };
+> >   struct kvm_mtrr_range {
+> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> > index 7aa9188f384d..ab7403a19c5d 100644
+> > --- a/arch/x86/kvm/vmx/tdx.c
+> > +++ b/arch/x86/kvm/vmx/tdx.c
+> > @@ -586,6 +586,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+> >   	vcpu->arch.efer = EFER_SCE | EFER_LME | EFER_LMA | EFER_NX;
+> > +	vcpu->arch.switch_db_regs = KVM_DEBUGREG_AUTO_SWITCH;
+> >   	vcpu->arch.cr0_guest_owned_bits = -1ul;
+> >   	vcpu->arch.cr4_guest_owned_bits = -1ul;
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 1b189e86a1f1..fb7597c22f31 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11013,7 +11013,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >   	if (vcpu->arch.guest_fpu.xfd_err)
+> >   		wrmsrl(MSR_IA32_XFD_ERR, vcpu->arch.guest_fpu.xfd_err);
+> > -	if (unlikely(vcpu->arch.switch_db_regs)) {
+> > +	if (unlikely(vcpu->arch.switch_db_regs & ~KVM_DEBUGREG_AUTO_SWITCH)) {
+> >   		set_debugreg(0, 7);
+> >   		set_debugreg(vcpu->arch.eff_db[0], 0);
+> >   		set_debugreg(vcpu->arch.eff_db[1], 1);
+> > @@ -11059,6 +11059,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >   	 */
+> >   	if (unlikely(vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT)) {
+> >   		WARN_ON(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP);
+> > +		WARN_ON(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH);
+> >   		static_call(kvm_x86_sync_dirty_debug_regs)(vcpu);
+> >   		kvm_update_dr0123(vcpu);
+> >   		kvm_update_dr7(vcpu);
+> > @@ -11071,8 +11072,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >   	 * care about the messed up debug address registers. But if
+> >   	 * we have some of them active, restore the old state.
+> >   	 */
+> > -	if (hw_breakpoint_active())
+> > -		hw_breakpoint_restore();
+> > +	if (hw_breakpoint_active()) {
+> > +		if (!(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH))
+> > +			hw_breakpoint_restore();
+> > +		else
+> > +			set_debugreg(__this_cpu_read(cpu_dr7), 7);
+> 
+> According to TDX module 1.5 ABI spec:
+> DR0-3, DR6 and DR7 are set to their architectural INIT value, why is only
+> DR7 restored?
 
-A lot of the code here is very similar in flow to the other migration
-drivers, but I think it would be good to address some of the topics
-above in comments throughout the driver.  For example, how does the
-driver address P2P states, what information is provided in PRE_COPY,
-how is versioning handled, is user sensitive data included in the
-device migration data, typical ranges of device migration data size,
-etc.
+This hunk should be dropped. Thank you for finding this.
 
-Kevin might have an edge in understanding the theory of operation
-here already and documenting the interesting aspects of the driver in
-comments might drive a little more engagement.  Thanks,
+I checked the base SPEC, the ABI spec, and the TDX module code.  It seems the
+documentation bug of the TDX module 1.5 base architecture specification.
 
-Alex
 
+The TDX module code:
+- restores guest DR<N> on TD Entry to guest.
+- saves guest DR<N> on TD Exit from guest TD
+- initializes DR<N> on TD Exit to host VMM
+
+TDX module 1.5 base architecture specification:
+15.1.2.1 Context Switch
+By design, the Intel TDX module context-switches all debug/tracing state that
+the guest TD is allowed to use.
+        DR0-3, DR6 and IA32_DS_AREA MSR are context-switched in TDH.VP.ENTER and
+        TD exit flows
+        RFLAGS, IA32_DEBUGCTL MSR and DR7 are saved and cleared on VM exits from
+        the guest TD and restored on VM entry to the guest TD.
+
+TDX module 1.5 ABI specification:
+5.3.65. TDH.VP.ENTER Leaf
+CPU State Preservation Following a Successful TD Entry and a TD Exit
+Following a successful TD entry and a TD exit, some CPU state is modified:
+        Registers DR0, DR1, DR2, DR3, DR6 and DR7 are set to their architectural
+        INIT value.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
