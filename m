@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-14587-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14588-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6878A3A64
-	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 04:11:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A4D8A3A82
+	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 04:29:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6987C1F210B8
-	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 02:11:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B2F351C21A47
+	for <lists+kvm@lfdr.de>; Sat, 13 Apr 2024 02:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED28168DA;
-	Sat, 13 Apr 2024 02:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11A117C7C;
+	Sat, 13 Apr 2024 02:29:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iZMNZ7mh"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HHbMyNTp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19521078B;
-	Sat, 13 Apr 2024 02:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3722013ADA;
+	Sat, 13 Apr 2024 02:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712974250; cv=none; b=eRHCiuqjY0VCnJ6uY2JFxwYWpIZ/2WV9sjRlW7CrgethhZ4RLXSVBR2n2MYC2cFWvTgL5HrRsH+WfpaWy3/SbrRNDjDeLnxDsYG+RSICq5unAFdr9Jbkvih7DvgAFIrSPwW4RGSAdcJoG+77YTjw2KgydG9DbDjSyd73PojSliQ=
+	t=1712975368; cv=none; b=aZbW+iVJJQv/3XDbBzBWchhicIKpPlv3pdZ68yYtl65JVSvD2GdIUE25izr7hLanEXjGazr4a8SXKvuw81A/HJNfC2XeoV1mG85GDpAMZXN1jn+7H21HuDy0MsHahZiNBZlKzZxxL/2F9xDOxx2qzVWCGtDSLBcmRpc4RDMFojo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712974250; c=relaxed/simple;
-	bh=OHQ0j1BRVcloy4BuWZmIacv5fOSQtu9yvWGdKmWjE/I=;
+	s=arc-20240116; t=1712975368; c=relaxed/simple;
+	bh=29lpziG7mOimAw3cCKwckLgOvzVTIJh0F3g3jnh3bdQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B1xjxzULWubPxsdLUy59xkJK7TfFQPZuT45Cs0U98chR2zgUZZROQ5jBJgb/b8aTA1JgE34sq8q4wHalvRsbQfOCY/Ox2rRTewUYygt1rX8aYgkiYzHsfaSt9sHjxfAYuFrSDt4sLWzyzAFBCKMdnlybykbb8NuHI97O7ptWGlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iZMNZ7mh; arc=none smtp.client-ip=198.175.65.10
+	 In-Reply-To:Content-Type; b=WL9434PHlchnoC2IaoZb65xcHRUnzH98weEuCeUxvcx/h3ylUruoaPf8I8heEwlq0XiSxC0nATsSnduAtx4fK759gtd9UenUfhUDPPY8ZoA+AOuYYhJ6ylkRLvL8+bs5HFXKpw0ps251BFaKnKmBKmQiWYUlhoQrixQt44NNAhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HHbMyNTp; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712974249; x=1744510249;
+  t=1712975366; x=1744511366;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=OHQ0j1BRVcloy4BuWZmIacv5fOSQtu9yvWGdKmWjE/I=;
-  b=iZMNZ7mhFiUYhaNtKGkMHh9uwCwO4QeEsLTxn79Wnpp8ZxfzVhM0R5t7
-   32Ra/po026vPmBYKfyVuigBx9hwGCY7VrIC2vlqFTEpBXPJ7WRyvWomdT
-   GE0JHltpdWfReyJYv8FxFqPvtPiuepG5UZNDrKq/m0gZWBWZ6W+Mjc7rX
-   l+OGqWf3F/izZWTdaOacN/R3n6lFyxzT4G8Er83QU1Rupnr/J5bsQjaOL
-   8ljt5EBLlGp1ELY4xJE9VDeOf6am4y0GlIDkQ4VMr5UkZ1+ODwDiGlG4+
-   zwx3yTGHV50Mg3O76zQtfXcrrU+GAKDgRJqdZU2scg6UjFyJ+pb8n8W0G
-   w==;
-X-CSE-ConnectionGUID: 4YxoRRvtTyavhzpdNLhK7A==
-X-CSE-MsgGUID: IibtsFszTJ26sk2OF09IeA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="25906697"
-X-IronPort-AV: E=Sophos;i="6.07,197,1708416000"; 
-   d="scan'208";a="25906697"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 19:10:48 -0700
-X-CSE-ConnectionGUID: yXK6+BCYQQ+PUdBBnj1Dtg==
-X-CSE-MsgGUID: KQh4NgxVQPmCw9l2ry1y5g==
+  bh=29lpziG7mOimAw3cCKwckLgOvzVTIJh0F3g3jnh3bdQ=;
+  b=HHbMyNTp/Dd16xzOSFYM7wluBBZqDdS0HKo0YDH7E5lYWO+BdFtPAkRG
+   W4F0w2o8fFQwoQoqpOt6KCn9G49yl84N6qnkIB5EIuXGlDSuK45+8pOTj
+   AiKfDJ7DEqBXFjbqF2F90K7OHYtgA544suHuGmb8rxEHvn5HM77raRMnf
+   klV8lr9YCCSkF6EJ0m1DcMjzx/Hyn7tBceRypI266JaQhVui8C+0dQVOz
+   SW+6NdC4NdwFWBhxI+KgyoQnWa1wbLeG4TutysBWIdRGz9MBw+a0IwnC2
+   lSaExCT61YWVaf/8JVas09/NkwmT4H0SOqrc1HJ9PE92VKEbJ4pHRdiK9
+   A==;
+X-CSE-ConnectionGUID: 0gHgzWfaSrO8TjTOw3x+dQ==
+X-CSE-MsgGUID: fLTy8AovTFufYYOrRSXSlQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8997120"
+X-IronPort-AV: E=Sophos;i="6.07,198,1708416000"; 
+   d="scan'208";a="8997120"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 19:29:25 -0700
+X-CSE-ConnectionGUID: PDLcfHYZR3WcpCn+Zk2lnw==
+X-CSE-MsgGUID: PYzeBqfvTn+ujWOP8/+T5Q==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,197,1708416000"; 
-   d="scan'208";a="21422397"
+X-IronPort-AV: E=Sophos;i="6.07,198,1708416000"; 
+   d="scan'208";a="21829776"
 Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.92]) ([10.124.225.92])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 19:10:43 -0700
-Message-ID: <cb2f02e3-2a18-4c3a-a017-58bcb2029b3e@linux.intel.com>
-Date: Sat, 13 Apr 2024 10:10:40 +0800
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 19:29:21 -0700
+Message-ID: <1e6d458c-ce9e-4ef2-9985-359c7b708bd3@linux.intel.com>
+Date: Sat, 13 Apr 2024 10:29:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,64 +67,83 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 15/41] KVM: x86/pmu: Manage MSR interception for
- IA32_PERF_GLOBAL_CTRL
-To: Jim Mattson <jmattson@google.com>, Sean Christopherson <seanjc@google.com>
-Cc: Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
- peterz@infradead.org, mizhang@google.com, kan.liang@intel.com,
- zhenyuw@linux.intel.com, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
- zhiyuan.lv@intel.com, eranian@google.com, irogers@google.com,
- samantha.alt@intel.com, like.xu.linux@gmail.com, chao.gao@intel.com,
- Xiong Zhang <xiong.y.zhang@intel.com>
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Sean Christopherson <seanjc@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
+ kan.liang@intel.com, zhenyuw@linux.intel.com, jmattson@google.com,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
 References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <20240126085444.324918-16-xiong.y.zhang@linux.intel.com>
- <ZhhUZJ7rE0SbE6Vv@google.com>
- <CALMp9eQ01NJZKKYt8XhTbnu8rNpuhpk388ocvyPqWJiO+sov5g@mail.gmail.com>
+ <20240126085444.324918-24-xiong.y.zhang@linux.intel.com>
+ <ZhhVfOhFBfOWtK8E@google.com>
 Content-Language: en-US
 From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <CALMp9eQ01NJZKKYt8XhTbnu8rNpuhpk388ocvyPqWJiO+sov5g@mail.gmail.com>
+In-Reply-To: <ZhhVfOhFBfOWtK8E@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
-On 4/12/2024 6:30 AM, Jim Mattson wrote:
-> On Thu, Apr 11, 2024 at 2:21 PM Sean Christopherson <seanjc@google.com> wrote:
->> On Fri, Jan 26, 2024, Xiong Zhang wrote:
->>> +     if (is_passthrough_pmu_enabled(&vmx->vcpu)) {
->>> +             /*
->>> +              * Setup auto restore guest PERF_GLOBAL_CTRL MSR at vm entry.
->>> +              */
->>> +             if (vmentry_ctrl & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL)
->>> +                     vmcs_write64(GUEST_IA32_PERF_GLOBAL_CTRL, 0);
->>> +             else {
->>> +                     i = vmx_find_loadstore_msr_slot(&vmx->msr_autoload.guest,
->>> +                                                    MSR_CORE_PERF_GLOBAL_CTRL);
->>> +                     if (i < 0) {
->>> +                             i = vmx->msr_autoload.guest.nr++;
->>> +                             vmcs_write32(VM_ENTRY_MSR_LOAD_COUNT,
->>> +                                          vmx->msr_autoload.guest.nr);
->>> +                     }
->>> +                     vmx->msr_autoload.guest.val[i].index = MSR_CORE_PERF_GLOBAL_CTRL;
->>> +                     vmx->msr_autoload.guest.val[i].value = 0;
->> Eww, no.   Just make cpu_has_load_perf_global_ctrl() and VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL
->> hard requirements for enabling passthrough mode.  And then have clear_atomic_switch_msr()
->> yell if KVM tries to disable loading MSR_CORE_PERF_GLOBAL_CTRL.
-> Weren't you just complaining about the PMU version 4 constraint in
-> another patch? And here, you are saying, "Don't support anything older
-> than Sapphire Rapids."
->
-> Sapphire Rapids has PMU version 4, so if we require
-> VM_EXIT_SAVE_IA32_PERF_GLOBAL_CTRL, PMU version 4 is irrelevant.
+On 4/12/2024 5:26 AM, Sean Christopherson wrote:
+> On Fri, Jan 26, 2024, Xiong Zhang wrote:
+>>   static void intel_save_pmu_context(struct kvm_vcpu *vcpu)
+>>   {
+>> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>> +	struct kvm_pmc *pmc;
+>> +	u32 i;
+>> +
+>> +	if (pmu->version != 2) {
+>> +		pr_warn("only PerfMon v2 is supported for passthrough PMU");
+>> +		return;
+>> +	}
+>> +
+>> +	/* Global ctrl register is already saved at VM-exit. */
+>> +	rdmsrl(MSR_CORE_PERF_GLOBAL_STATUS, pmu->global_status);
+>> +	/* Clear hardware MSR_CORE_PERF_GLOBAL_STATUS MSR, if non-zero. */
+>> +	if (pmu->global_status)
+>> +		wrmsrl(MSR_CORE_PERF_GLOBAL_OVF_CTRL, pmu->global_status);
+>> +
+>> +	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+>> +		pmc = &pmu->gp_counters[i];
+>> +		rdpmcl(i, pmc->counter);
+>> +		rdmsrl(i + MSR_ARCH_PERFMON_EVENTSEL0, pmc->eventsel);
+>> +		/*
+>> +		 * Clear hardware PERFMON_EVENTSELx and its counter to avoid
+>> +		 * leakage and also avoid this guest GP counter get accidentally
+>> +		 * enabled during host running when host enable global ctrl.
+>> +		 */
+>> +		if (pmc->eventsel)
+>> +			wrmsrl(MSR_ARCH_PERFMON_EVENTSEL0 + i, 0);
+>> +		if (pmc->counter)
+>> +			wrmsrl(MSR_IA32_PMC0 + i, 0);
+>> +	}
+>> +
+>> +	rdmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl);
+>> +	/*
+>> +	 * Clear hardware FIXED_CTR_CTRL MSR to avoid information leakage and
+>> +	 * also avoid these guest fixed counters get accidentially enabled
+>> +	 * during host running when host enable global ctrl.
+>> +	 */
+>> +	if (pmu->fixed_ctr_ctrl)
+>> +		wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+>> +	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+>> +		pmc = &pmu->fixed_counters[i];
+>> +		rdpmcl(INTEL_PMC_FIXED_RDPMC_BASE | i, pmc->counter);
+>> +		if (pmc->counter)
+>> +			wrmsrl(MSR_CORE_PERF_FIXED_CTR0 + i, 0);
+>> +	}
+> For the next RFC, please make that it includes AMD support.  Mostly because I'm
+> pretty all of this code can be in common x86.  The fixed counters are ugly,
+> but pmu->nr_arch_fixed_counters is guaranteed to '0' on AMD, so it's _just_ ugly,
+> i.e. not functionally problematic.
 
-Just clarify Sapphire Rapids has PMU version 5 :).
+Sure. I believe Mingwei would integrate AMD supporting patches in next 
+version. Yeah, I agree there could be a part of code which can be put 
+into common x86/pmu, but there are still some vendor specific code, we 
+still keep an vendor specific callback.
 
-[    2.687826] Performance Events: XSAVE Architectural LBR, PEBS 
-fmt4+-baseline,  AnyThread deprecated, *Sapphire Rapids events*, 32-deep 
-LBR, full-width counters, Intel PMU driver.
-[    2.687925] ... version:                   5
-[    2.687928] ... bit width:                 48
-[    2.687929] ... generic counters:          8
 
->
 
