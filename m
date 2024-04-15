@@ -1,177 +1,227 @@
-Return-Path: <kvm+bounces-14691-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4DFF8A5B66
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 21:49:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D67A48A5BF4
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 22:04:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CAC2B23A95
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 19:49:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05C6B1C20BBF
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 20:04:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C04159910;
-	Mon, 15 Apr 2024 19:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DC0156661;
+	Mon, 15 Apr 2024 20:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bLS/tGNy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mns1Lm9i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60861598E7
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 19:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B775C15625E
+	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 20:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713210028; cv=none; b=lmrJaNf7Fja1QjR6i68kWg/WvlArwsKGqr608/Uad0aJkQvszqvmH2zG+KYrtDQL1/6dma/UZKPA0urCGYc28Tkmg7+0xIimhGP2KadFXzoBkrkO4g9ykwvneM7wnfZzEtEud6sao+LkaV2X+yL0zMbBfL/tokxKO2u0OPgbN1E=
+	t=1713211454; cv=none; b=tksghX9EtW15lM8NJV1p+Z4y/2BpguNowVRBIqY4vqJ1ibSCPgYxOiAxqa3cUwxlZIGTnV0tm/iCrWCJkONZH8Ah7riK95ftK7e4GyaHbG7kI9tyYT5T+dWqwJtmf1JyhsJSm/dxIDonUDqTLCx4rzrOzrXDmuycA5CDO5t/qX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713210028; c=relaxed/simple;
-	bh=HnQrke53HbieJQg1K+HmxDC5DcgHzycPVXayX92Uel0=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=tWrMiVpENnRDtIGtdE6r9UCA6v5aYKqcjj7DNVVm5Tl9Zb1Xu5WksEbjz4lTDrMxKdq9pApeVnq5dxznnsOxyqIFWCxJKyH5oB9SCSVyw4v7uOrSrz6lyTL7VdSgPnoSSP5QCeK1FDXIELSjijrqjkXwtYjuQfkJEugrUN/6I+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bLS/tGNy; arc=none smtp.client-ip=209.85.166.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-7cc7a6a04d9so453032639f.3
-        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 12:40:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713210026; x=1713814826; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=taYfEAMhWxZKhDVEpiZhlMgSXjBrsWj8geaLNIGWoBE=;
-        b=bLS/tGNySaiyrIyV7Ze0eNjuUOx5/KpUk4xcIxQgTNZkaZ6mQwsXLlD8eCVdZTd/K5
-         1zURDk2OGz+Bpv/xYUV00LhUDp8DWvF6Wo3P/dt5E6ktAQaLScHF6iRXZ/4VHPtQOurh
-         Yu83Cbk5q8HMgjJeVMrr+/vD0f+P8YrM5O7PRdDNs1zLYV+7F5kZrQNUAZ5MT/XsYapG
-         uOqbEXH6lXqSPuB4OieEaWoXcCl/b/MtRlyWLd+GJb5HBXjvCKMLA62tnw6oj9fKbV6i
-         WR1aYTHmLTo9jG9guV/aMPGZwYauhD72iG96dwIc/7s9V7lQXgquL2EUo7JlcQ3ex1zV
-         rMfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713210026; x=1713814826;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=taYfEAMhWxZKhDVEpiZhlMgSXjBrsWj8geaLNIGWoBE=;
-        b=H9Zut24ndzBq2FWVrzK4GrTtJDNCBm4bO51I/hgwTNsM4mbo14jKWq1jLNkaWmOr+I
-         k8mjce+U8L+Ec0PyrWbrauEGMYds8DnK7xQbAY74xtWnwd3ZLcT1RCi8hrg1Sm3vMGlK
-         LP6tQa4gHJy1+DdgOdH2HWldEofweXZEqCIsFcONiVGuZSsg3sXu8txVNL/0QZs/dS+K
-         e8LGXX7+f5KD2RGVpAohTT84GD9IBmINU/JooirD4Rvg+2b6aJmj1kYuhb3dNhAZc+rT
-         P0Pcl2rcKajRnai1v7pyU1EqUmeYnLxsmsjrsHHWthQCz6oejv9pqhzgRoAMkMfrMKgH
-         XEWA==
-X-Gm-Message-State: AOJu0YwmaOYR3jgXnie/X+i2UTM6yJUyiZT1rj6WHSzob8x17JRqw6r0
-	xFET/xk5eDzJBuNDzRjxA/bXFKGQfRCHEq6NijCN8YuOOgEO2kUXlSaKmQQxZnkxZir18d9lFdl
-	MBaMtxHIy1yWeqmRQ84bIPw==
-X-Google-Smtp-Source: AGHT+IGUqapQXFj2hPWnTQ4fKWHkr8XUX4Eacrb1Di5Og6Xvq8008PLajdkB1V4vRSdttFUHw7IRCbM2YDH38IdHzw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6638:34ab:b0:482:fc24:b74c with
- SMTP id t43-20020a05663834ab00b00482fc24b74cmr472110jal.0.1713210026131; Mon,
- 15 Apr 2024 12:40:26 -0700 (PDT)
-Date: Mon, 15 Apr 2024 19:40:24 +0000
-In-Reply-To: <86sezss5cm.wl-maz@kernel.org> (message from Marc Zyngier on Thu,
- 11 Apr 2024 08:53:13 +0100)
+	s=arc-20240116; t=1713211454; c=relaxed/simple;
+	bh=pr/4/oQR+r5R/l6P0ikxCsCgBmbd6uWclml/OEa3wn8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CQnaCVqxY4bc/OLivRlFcY+hNKKBs6WoInwav8ZdwgplbEAXgysGNbCqeyQ3ifXrr43p2KEKGhtg78swufv9BmeG/0dd/en5ysINKeG6APlBghlTJUdoelVrBj4eREAwU4Qv8tZP7hOszrUSbep+POG8F6njBnAUnsm2c0JYhbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mns1Lm9i; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713211451;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dfn+y1J1zY2Ja72aghi8awXYV9tGOwVsfBqRShbrfOE=;
+	b=Mns1Lm9iuFun3dNkBuh4PsOovncshW5270759zi3R3U3ehyHA7+kifQ9kim6RjoLCx7AvO
+	3U7syyzctw7tkSzLkxu1Bn/Q3g2FcA6BxcCLZqz5piCd0xMyRVJJ3TmpokP8I/zhWpoxc9
+	l5Vu4U9yBYCW49LAPf5f/eOJGlhef7Y=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-620-9efXX8AHOMmW2BIjYR2LjQ-1; Mon,
+ 15 Apr 2024 16:04:07 -0400
+X-MC-Unique: 9efXX8AHOMmW2BIjYR2LjQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 764111C0513D;
+	Mon, 15 Apr 2024 20:04:06 +0000 (UTC)
+Received: from tpad.localdomain (unknown [10.96.133.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C1312166B32;
+	Mon, 15 Apr 2024 20:04:05 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+	id BFE67401801CE; Mon, 15 Apr 2024 16:47:13 -0300 (-03)
+Date: Mon, 15 Apr 2024 16:47:13 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>,
+	Leonardo Bras <leobras@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+Message-ID: <Zh2EQVj5bC0z5R90@tpad>
+References: <20240328171949.743211-1-leobras@redhat.com>
+ <ZgsXRUTj40LmXVS4@google.com>
+ <ZhAAg8KNd8qHEGcO@tpad>
+ <ZhAN28BcMsfl4gm-@google.com>
+ <a7398da4-a72c-4933-bb8b-5bc8965d96d0@paulmck-laptop>
+ <ZhQmaEXPCqmx1rTW@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsnth6g2qus7.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v3] KVM: arm64: Add early_param to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, oliver.upton@linux.dev, james.morse@arm.com, 
-	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
-	will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZhQmaEXPCqmx1rTW@google.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Thanks for the review Marc.
+On Mon, Apr 08, 2024 at 10:16:24AM -0700, Sean Christopherson wrote:
+> On Fri, Apr 05, 2024, Paul E. McKenney wrote:
+> > On Fri, Apr 05, 2024 at 07:42:35AM -0700, Sean Christopherson wrote:
+> > > On Fri, Apr 05, 2024, Marcelo Tosatti wrote:
+> > > > rcuc wakes up (which might exceed the allowed latency threshold
+> > > > for certain realtime apps).
+> > > 
+> > > Isn't that a false negative? (RCU doesn't detect that a CPU is about to (re)enter
+> > > a guest)  I was trying to ask about the case where RCU thinks a CPU is about to
+> > > enter a guest, but the CPU never does (at least, not in the immediate future).
+> > > 
+> > > Or am I just not understanding how RCU's kthreads work?
+> > 
+> > It is quite possible that the current rcu_pending() code needs help,
+> > given the possibility of vCPU preemption.  I have heard of people doing
+> > nested KVM virtualization -- or is that no longer a thing?
+> 
+> Nested virtualization is still very much a thing, but I don't see how it is at
+> all unique with respect to RCU grace periods and quiescent states.  More below.
+> 
+> > But the help might well involve RCU telling the hypervisor that a given
+> > vCPU needs to run.  Not sure how that would go over, though it has been
+> > prototyped a couple times in the context of RCU priority boosting.
+> >
+> > > > > > 3 - It checks if the guest exit happened over than 1 second ago. This 1
+> > > > > >     second value was copied from rcu_nohz_full_cpu() which checks if the
+> > > > > >     grace period started over than a second ago. If this value is bad,
+> > > > > >     I have no issue changing it.
+> > > > > 
+> > > > > IMO, checking if a CPU "recently" ran a KVM vCPU is a suboptimal heuristic regardless
+> > > > > of what magic time threshold is used.  
+> > > > 
+> > > > Why? It works for this particular purpose.
+> > > 
+> > > Because maintaining magic numbers is no fun, AFAICT the heurisitic doesn't guard
+> > > against edge cases, and I'm pretty sure we can do better with about the same amount
+> > > of effort/churn.
+> > 
+> > Beyond a certain point, we have no choice.  How long should RCU let
+> > a CPU run with preemption disabled before complaining?  We choose 21
+> > seconds in mainline and some distros choose 60 seconds.  Android chooses
+> > 20 milliseconds for synchronize_rcu_expedited() grace periods.
+> 
+> Issuing a warning based on an arbitrary time limit is wildly different than using
+> an arbitrary time window to make functional decisions.  My objection to the "assume
+> the CPU will enter a quiescent state if it exited a KVM guest in the last second"
+> is that there are plenty of scenarios where that assumption falls apart, i.e. where
+> _that_ physical CPU will not re-enter the guest.
+> 
+> Off the top of my head:
+> 
+>  - If the vCPU is migrated to a different physical CPU (pCPU), the *old* pCPU
+>    will get false positives, and the *new* pCPU will get false negatives (though
+>    the false negatives aren't all that problematic since the pCPU will enter a
+>    quiescent state on the next VM-Enter.
+> 
+>  - If the vCPU halts, in which case KVM will schedule out the vCPU/task, i.e.
+>    won't re-enter the guest.  And so the pCPU will get false positives until the
+>    vCPU gets a wake event or the 1 second window expires.
+> 
+>  - If the VM terminates, the pCPU will get false positives until the 1 second
+>    window expires.
+> 
+> The false positives are solvable problems, by hooking vcpu_put() to reset
+> kvm_last_guest_exit.  And to help with the false negatives when a vCPU task is
+> scheduled in on a different pCPU, KVM would hook vcpu_load().
 
-Marc Zyngier <maz@kernel.org> writes:
+Hi Sean,
 
-> On Wed, 10 Apr 2024 18:54:37 +0100,
-> Colton Lewis <coltonlewis@google.com> wrote:
->> +
->> +enum kvm_interrupt_passthrough {
->> +	KVM_INTERRUPT_PASSTHROUGH_DEFAULT,
->> +	KVM_INTERRUPT_PASSTHROUGH_ALWAYS,
->> +	KVM_INTERRUPT_PASSTHROUGH_NEVER,
+So this should deal with it? (untested, don't apply...).
 
-> What does this mean? This is not dealing with interrupts, this is
-> supposed to deal with the behaviour of specific instructions
-> (WFI/WFE). The notion of "passthrough" is really odd as well. Finally,
-> both ALWAYS and NEVER are wrong -- the architecture makes no such
-> guarantee.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 48f31dcd318a..be90d83d631a 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -477,6 +477,16 @@ static __always_inline void guest_state_enter_irqoff(void)
+ 	lockdep_hardirqs_on(CALLER_ADDR0);
+ }
+ 
++DECLARE_PER_CPU(unsigned long, kvm_last_guest_exit);
++
++/*
++ * Returns time (jiffies) for the last guest exit in current cpu
++ */
++static inline unsigned long guest_exit_last_time(void)
++{
++	return this_cpu_read(kvm_last_guest_exit);
++}
++
+ /*
+  * Exit guest context and exit an RCU extended quiescent state.
+  *
+@@ -488,6 +498,9 @@ static __always_inline void guest_state_enter_irqoff(void)
+ static __always_inline void guest_context_exit_irqoff(void)
+ {
+ 	context_tracking_guest_exit();
++
++	/* Keeps track of last guest exit */
++	this_cpu_write(kvm_last_guest_exit, jiffies);
+ }
+ 
+ /*
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index fb49c2a60200..231d0e4d2cf1 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -110,6 +110,9 @@ static struct kmem_cache *kvm_vcpu_cache;
+ static __read_mostly struct preempt_ops kvm_preempt_ops;
+ static DEFINE_PER_CPU(struct kvm_vcpu *, kvm_running_vcpu);
+ 
++DEFINE_PER_CPU(unsigned long, kvm_last_guest_exit);
++EXPORT_SYMBOL_GPL(kvm_last_guest_exit);
++
+ struct dentry *kvm_debugfs_dir;
+ EXPORT_SYMBOL_GPL(kvm_debugfs_dir);
+ 
+@@ -210,6 +213,7 @@ void vcpu_load(struct kvm_vcpu *vcpu)
+ 	int cpu = get_cpu();
+ 
+ 	__this_cpu_write(kvm_running_vcpu, vcpu);
++	__this_cpu_write(kvm_last_guest_exit, 0);
+ 	preempt_notifier_register(&vcpu->preempt_notifier);
+ 	kvm_arch_vcpu_load(vcpu, cpu);
+ 	put_cpu();
+@@ -222,6 +226,7 @@ void vcpu_put(struct kvm_vcpu *vcpu)
+ 	kvm_arch_vcpu_put(vcpu);
+ 	preempt_notifier_unregister(&vcpu->preempt_notifier);
+ 	__this_cpu_write(kvm_running_vcpu, NULL);
++	__this_cpu_write(kvm_last_guest_exit, 0);
+ 	preempt_enable();
+ }
+ EXPORT_SYMBOL_GPL(vcpu_put);
 
-Looking at this, I did let the language get away from me by mixing up
-interrupts and the instructions dealing with them.
-
-"Passthrough" is not a technical term but has pervaded some of my
-internal conversations about this and I've just been using it to mean
-the opposite of trapping. That can be easily swapped.
-
-I understand always and never are not what the architecture guarantees,
-but was trying to capture what KVM code is attempting to do. I could
-just drop it entirely.
-
-So the enum values could be named something like:
-
-KVM_WFX_TRAP
-KVM_WFX_NOTRAP
-KVM_WFX_NOTRAP_SINGLE_TASK (default option)
-
->> -	if (single_task_running())
->> +	if ((kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_ALWAYS
->> +	     && kvm_vgic_global_state.has_gicv4) ||
->> +	    (kvm_interrupt_passthrough == KVM_INTERRUPT_PASSTHROUGH_DEFAULT
->> +	     && single_task_running()))
-
-> Why is this affecting both WFI and WFE? They are very different and
-> lumping them together makes little sense.
-
-It's true they are different, but I couldn't think of any cases where
-you would want trapping for one to be different than for the other. The
-current behavior also assumes trapping should be the same for both.
-
-Are you suggesting separate controls for the two?
-
->> @@ -2654,6 +2658,30 @@ static int __init early_kvm_mode_cfg(char *arg)
->>   }
->>   early_param("kvm-arm.mode", early_kvm_mode_cfg);
-
->> +static int __init early_kvm_interrupt_passthrough_cfg(char *arg)
->> +{
->> +	if (!arg)
->> +		return -EINVAL;
->> +
->> +	if (strcmp(arg, "always") == 0) {
->> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_ALWAYS;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "never") == 0) {
->> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_NEVER;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "default") == 0) {
->> +		kvm_interrupt_passthrough = KVM_INTERRUPT_PASSTHROUGH_DEFAULT;
->> +		return 0;
->> +	}
->> +
->> +	return -EINVAL;
->> +}
->> +early_param("kvm-arm.interrupt-passthrough",  
->> early_kvm_interrupt_passthrough_cfg);
->> +
-
-> Again, this is not dealing with interrupts. This is dealing with the
-> *potential* trapping of instructions in certain circumstances.
-
-Understood. Should be something like "kvm-arm.wfx-instruction-trapping".
-
->>   enum kvm_mode kvm_get_mode(void)
->>   {
->>   	return kvm_mode;
-
-> Finally, this needs to be documented.
-
-Right, in Documentation/admin-guide/kernel-parameters.txt
 
