@@ -1,150 +1,119 @@
-Return-Path: <kvm+bounces-14664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 817E18A52F9
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 16:22:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECB768A5396
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 16:29:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A8BC1C2149E
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 14:22:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 581B0B21EF0
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 14:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FC774E3A;
-	Mon, 15 Apr 2024 14:22:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E0F81AC4;
+	Mon, 15 Apr 2024 14:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dvSHlq4f"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WZrksUYi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8760773199
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 14:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B96762D2;
+	Mon, 15 Apr 2024 14:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713190936; cv=none; b=j+wiWnJy8+mp6mjbkehGMeCDFLmtpPfEPEO8JoNW2q0xeIt5K6mkK83WLAjnPAFWYjn0ZEFjlHNwMGQ66KcQ9E53tkLWYfXIIVIXT4JiXVMufMS2x7nX4OYNhrnByloLeTvv3QLEl1R1/KYscCdt2gh//JagJCw87mDm2HepLlQ=
+	t=1713191245; cv=none; b=DS7dcDz7q3C9Ag/vcSd+E5R8aatrkLscOww2eWZbLVOG/1XK7LAqKMG9N27R16m0J6rcvfwKLE62sV87tsRCtGOj4qrKql+zErL6kAyAvjf24nk9UF2frbaQnjrsQsUvdLcYiIa72f8WrRk6+FywgjI6blQN4SXIKiGIjiQ2bpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713190936; c=relaxed/simple;
-	bh=N6BsmOpUFv1NdzAIhR7wG4F9QbFYaKztoAW+/nHUQH4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KTmPWByYZTBWSADodsyzC37B82teSo0cJpYh3P7LZ0SCGM4wOZADxT+RFxWg6VsHkuZnPy+3FKZ860e9l2tMJkFFfeSJU5hEYSVWca1xpEg9or1KlKCntUYcPMzcZVRmpsleLeXnHVJeVKXYzVDQdgUGMe3XzVJxnFTzayGhi4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dvSHlq4f; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713190934;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=1PbOJBRpspxdDa6pRJjCuw+ncvorVUgjMaFCtffqZ+Q=;
-	b=dvSHlq4ffl9La6scN3ja6neyqrTkmRvMbdijqJyANEVsfbidiQGhGNQb815FooC27p1FNq
-	cwNGx5babAkcrg3M+2h3HhbkCPZmXHP5k8cEyp7LhcF58PYNoMNlE8Tiv3p+BMoING5Fv8
-	qwaRIVbL644ii/9QoHe/kCcs/wI44sA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-470-WOJdqkmvPCCwU6-wTNVQCg-1; Mon, 15 Apr 2024 10:22:12 -0400
-X-MC-Unique: WOJdqkmvPCCwU6-wTNVQCg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4165339d3a5so12156705e9.3
-        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 07:22:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713190931; x=1713795731;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1PbOJBRpspxdDa6pRJjCuw+ncvorVUgjMaFCtffqZ+Q=;
-        b=HjmeOgR6WO8FjuKVgQmKc12wccEZUI0Hk2ionaIR/U+UILjkdoFcU/34nSGzUNtLP0
-         Ti5SEEF+9WD81OCDDFZwuiIHwWxoo/woNwP6SzCM86NLgqC/4nR+Zuyl8EBQiI6XLJid
-         G5ZHUubCxIn5PzN8HoT+C8ApaM1pBoOvag25trcOMdQQMZpZ2Jf/dNYi8B916zJYGOHC
-         pE7vbYImds9uMi9X80uobaqqDUxKjJsh3KAa8bU4lqZgQ9xulQ28CcDNXj+aD8ipeZa1
-         NxxdB/tBoBM8jrKcIEEfh64l1YBS8ph5EwuhB1Gz1G0DtxW96uzFfDHEb9MBrqoYoYXZ
-         Sizg==
-X-Forwarded-Encrypted: i=1; AJvYcCXEYcrAsAqJ6BWwYIvcrzB3/q3cb0K8tO7DOTjojNhO9BkR6Ecq6HTDtZoy7NqELfowj+UGongOBI2dGVnsDrmQJ/YY
-X-Gm-Message-State: AOJu0Yy+lk2CgxQTSrklYXFkCrqpIKrWA+n75lT0aE8kRZH7TYOfVSNr
-	RZ17kI5KtaERiwM9Il2mZgF7Nk2Em+D0sBa/60JuRzd4A+Vaben9KNvIcMTvy6VhF5GMTwXZDST
-	QKSaSMx02vSmTvPNGA47fme/ne0HJFrQLfqCs6ZbqhBYfperHgg==
-X-Received: by 2002:a05:600c:1c81:b0:418:7401:b15f with SMTP id k1-20020a05600c1c8100b004187401b15fmr1322455wms.38.1713190931712;
-        Mon, 15 Apr 2024 07:22:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGDak1eTKoWVr2U+6dT5ZcLn1063lRhwGMlTXR2A2YuvZAJE2t6UbWSYNg3COoiiV+lBsHBiw==
-X-Received: by 2002:a05:600c:1c81:b0:418:7401:b15f with SMTP id k1-20020a05600c1c8100b004187401b15fmr1322438wms.38.1713190931354;
-        Mon, 15 Apr 2024 07:22:11 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c706:d800:568a:6ea7:5272:797c? (p200300cbc706d800568a6ea75272797c.dip0.t-ipconnect.de. [2003:cb:c706:d800:568a:6ea7:5272:797c])
-        by smtp.gmail.com with ESMTPSA id q12-20020a05600c46cc00b00417bab31bd2sm16449015wmo.26.2024.04.15.07.22.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 07:22:10 -0700 (PDT)
-Message-ID: <513a9e86-6159-43dd-8b70-f903637f2cd0@redhat.com>
-Date: Mon, 15 Apr 2024 16:22:09 +0200
+	s=arc-20240116; t=1713191245; c=relaxed/simple;
+	bh=U8+VhHtVtHYm99pwI9LXA/ypd0RLVR9GZnPOqy4ulUk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=aGnBqHcPXw/FE4iSI3epp+6Q4n0Ye8AjUw1dOUUAh/niV0z436I7iDXn38UBvLt+b1Oz6lRBrJK8Nn/HosEAK206sFxBsFKPPEuVYts919pYbGBU9NuA1oRjw6FKZNEtgU+3kw3SuHwr5NPfLR2aMnWrshrcZIYkjFDT3/fP2ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WZrksUYi; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43FEQXoW001397;
+	Mon, 15 Apr 2024 14:27:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=PN5/ARZMuUxRRpX+S1l+ndAR/7ixTDYrllzhIU8GDgQ=;
+ b=WZrksUYigDTsgLOK9ZdeecgKLxcSKnggI+E0yMaNB58dUxJ23v755TThJt/XzjGKzk/e
+ YD//8jiHXP8IEjQ4yEO4qgXNjnkSvc8zIVRtuYlEQ4J6PPkWOqsyQoXWSCTh8qazuh6W
+ yZGQk048U2ZNDkuuAAiozD8DZnz5LcrkJI8Z4xBWgH+iYfKxByQ/KvAzr/mADxEx2Wey
+ E+4HaiAws5TJhwIb01gUGKMZkTZYJaQwHOW2grhNUux6Qa2LDrM4PiNrUiZ5S4n02fAb
+ yT7t2CZ+fgBM1bfrAh67sOzO0Hlk4IvOUK9Uyvvpidi+YGi9vCaWyRgZUdHFIDrV37JK Dw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xfh2jm48g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 14:27:21 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43FERK9B002996;
+	Mon, 15 Apr 2024 14:27:20 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xfh2jm48e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 14:27:20 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43FDiM4p021347;
+	Mon, 15 Apr 2024 14:27:20 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xg6kk7ynt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 14:27:19 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43FEREXh49938780
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Apr 2024 14:27:16 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6EC5420043;
+	Mon, 15 Apr 2024 14:27:14 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2CE9B20040;
+	Mon, 15 Apr 2024 14:27:14 +0000 (GMT)
+Received: from [9.155.199.94] (unknown [9.155.199.94])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 15 Apr 2024 14:27:14 +0000 (GMT)
+Message-ID: <743bd638-2a9d-4c53-bc44-14292edef58a@linux.ibm.com>
+Date: Mon, 15 Apr 2024 16:27:14 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] KVM: s390x: selftests: Add shared zeropage test
+Content-Language: en-US
+To: Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>
+References: <20240412084329.30315-1-david@redhat.com>
+ <Zh03fI2oA0UkE0Kp@tuxmaker.boeblingen.de.ibm.com>
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <Zh03fI2oA0UkE0Kp@tuxmaker.boeblingen.de.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FT_VEbQt5d-W0Wbkq9NOT1W9eDcmA1cJ
+X-Proofpoint-ORIG-GUID: ruadlHnHpqBXQJv0mOBmsUmd1-A1fvBg
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] KVM: s390x: selftests: Add shared zeropage test
-To: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-References: <20240412084329.30315-1-david@redhat.com>
- <Zh03fI2oA0UkE0Kp@tuxmaker.boeblingen.de.ibm.com>
-Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <Zh03fI2oA0UkE0Kp@tuxmaker.boeblingen.de.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-15_11,2024-04-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 malwarescore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ mlxscore=0 priorityscore=1501 impostorscore=0 clxscore=1011 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404150094
 
-On 15.04.24 16:19, Alexander Gordeev wrote:
+
+
+Am 15.04.24 um 16:19 schrieb Alexander Gordeev:
 > On Fri, Apr 12, 2024 at 10:43:29AM +0200, David Hildenbrand wrote:
 > Hi David,
 >>   tools/testing/selftests/kvm/Makefile          |   1 +
@@ -153,12 +122,15 @@ On 15.04.24 16:19, Alexander Gordeev wrote:
 >>   create mode 100644 tools/testing/selftests/kvm/s390x/shared_zeropage_test.c
 > 
 > Tested-by: Alexander Gordeev <agordeev@linux.ibm.com>
+> 
+> @Janosch, Christian,
+> 
+> I think this patch should go via s390 tree together with
+> https://lore.kernel.org/r/20240411161441.910170-3-david@redhat.com
+> 
+> Do you agree?
 
-Thanks Alexander, especially also for discovering that nasty ifdef bug!
+Yes, thank you
 
--- 
-Cheers,
-
-David / dhildenb
-
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
