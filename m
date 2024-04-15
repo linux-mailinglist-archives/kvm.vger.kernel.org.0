@@ -1,237 +1,100 @@
-Return-Path: <kvm+bounces-14628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14629-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DAFB8A49C1
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 10:06:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84D598A49CF
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 10:09:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A5BF1C233E8
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 08:06:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39D741F24738
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 08:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2002E83C;
-	Mon, 15 Apr 2024 08:05:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE013364DA;
+	Mon, 15 Apr 2024 08:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cF6kmjYe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEzajtnN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C43CF2C848
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 08:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243423613E
+	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 08:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713168356; cv=none; b=A3nmSFXT+g5EerDDK3121XMyi2y7hNKgeB42imTyhN22IlFmniX5BjbjGVxGZLWLJVY7eFwTcWpxI7oZc/M1oOf8SZ6G5WXK0jQYb6LXRxOIqBgAuvUIgrtpsMElZHzIQWTFQRQPEOofxA3ZHMb3gTh5CbPaM503ahgne7j4YzU=
+	t=1713168582; cv=none; b=JYinigfK7XGRt8meoOa+oz+9ZqTJnwmRzBFCoKZxOkMziGN++iNP1VHKwTkU2QDAh5tzQu4FyljbtaoCAtRHdNX7Cd7vMjKLsaJMr31muAuZ6LuSW97l0S52MRR+7gZMk/dxUrRpFPSrm33YIhgqz2cXeMNW9iK5rKKU4LBAVWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713168356; c=relaxed/simple;
-	bh=rZM9zLd/gJBQJm1KKpYow/zuy2L1p9P1YdXH2k57Sf8=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=H+xOGadcOHJ4s7rySZwYzjf90Ls93qXRZ4G0qRKggtYFdnvUb5ysgBba/WE13P20/o9LwUq87Kk5cPhiUZad48TvdKjPjzlGQ/rMg0MwZLcRKGf6wdxfa3g90JJoGrxwIp5ibahWYppWqmBGQSbviSW1qGZaEAWGpaGjNZjWtL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cF6kmjYe; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61814249649so50046107b3.3
-        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 01:05:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713168354; x=1713773154; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=s+QzKS/TBsR0oqS/yx5/asjaA5pGnOo8W0mMCO+D7xM=;
-        b=cF6kmjYeIsXgANFA/jU9WKOtZNJ/TlSt/GZ5GPeSEqQ5tRR3o8e6Oj/4nENDF1dWiF
-         L3fGKS51kbi4tzcI1f9xhTBqsI/aZYGbzqrHAst5PZAh07S1U5QKxEoTxjR4xvZgi4Aj
-         Wd4FVjbXPySUjnbbKkmfemdq8XgVrjRSbGuiCrgXQwU8OtECljegNhAB7Feg5YPuiU9C
-         6P+cI2dPYdXkXmy9eik9Iyxiql+UP/9PLUHtRyGCG2iqn0WqN7DbiEddiW30ms5K379D
-         HHCjfKuJwROTIm2ZJDRLOnzKUMa0Eaj5gpo+csYmyRSXcTSClS/LQYOcyhQ3kKCsGRL0
-         mN9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713168354; x=1713773154;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s+QzKS/TBsR0oqS/yx5/asjaA5pGnOo8W0mMCO+D7xM=;
-        b=f4NpIQYJi48Jh+IUVAJiP1ki7Nx0pMLVTtIVbP8CY9hkUisO2n1+m3/w3oDbAvbrYW
-         tB4hOZ/HJNrWDRrLuVhqo4sOoNmwsqx/Sd8uABHkwomQc3oF5lgGhqtMOKCJSGKygHhr
-         N7bRov4gqGFvqHu5LyiTD4VNyLyY4NYv2g7s1G5sHg5BKDm0YTvvfnmRYiJDApzwGz30
-         9iDF3gMZIxpCNQjgSPc0+qbDhrt3PlEF6xARsx1MinCkMXVgEp+J9MvHKzlxf580QEx1
-         uAfdSPsgSQMGP36ifeHp0SxZ6RYwU0Fn3mJP455y7QW5DgVYiTe61AZXVamdknfeeKpK
-         ntUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWB3FF7A1ahillF0HOzll3yxfl4fyk7oJp7MP4PJ7ZjeFEReWIe8Wev1ZMRB/S0LhNsiyN39Jj57Zrxyz7eu7V5fr/5
-X-Gm-Message-State: AOJu0YyB644CEgc8zcz31rxkxHY5s+mYeW1RONp+ht5THt4Gi1iqYeHY
-	R7kk07T+xY+EVQQccEMqczc0FC0TJTjIXM2fbvUDUFU49YscI10q9f9/tQHXvNpx55QGOb2lf5e
-	lpUa8sD+0U++h+DvJ9FcCaw==
-X-Google-Smtp-Source: AGHT+IHMikC/U+kmGrGiTb25wJ2Cco4+xgMYwFQUfHjLotNG/XKGpj3Obvk5i4rsrXv7eys5ilLKnnIaps2TET0qpQ==
-X-Received: from ctop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:1223])
- (user=ackerleytng job=sendgmr) by 2002:a0d:d183:0:b0:61a:d41d:f969 with SMTP
- id t125-20020a0dd183000000b0061ad41df969mr320681ywd.3.1713168353903; Mon, 15
- Apr 2024 01:05:53 -0700 (PDT)
-Date: Mon, 15 Apr 2024 08:05:49 +0000
-In-Reply-To: <ZhkhvtijbhxKKAEk@yzhao56-desk.sh.intel.com> (message from Yan
- Zhao on Fri, 12 Apr 2024 19:57:50 +0800)
+	s=arc-20240116; t=1713168582; c=relaxed/simple;
+	bh=u73evQjQsNLA3yvgpwl923aejyJMWwCzkFx6NopO5LU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Ws9MMOIdpCpfhAb5jpEtPY5nmMHY5sN+JR6Wu9vw5rEjbMrfDDLbXaoEF9Z0TRvZ1QbE9yu71EYQtDaG3GDEErD1F85wAogDt3wxJyaNan/eH9kEfOt19XzZuATDO1v7Ur7f1H77SfTNxRohNj7p9gPB1WyGXCFJsJE5Ym6wxJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEzajtnN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B49FEC32786
+	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 08:09:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713168581;
+	bh=u73evQjQsNLA3yvgpwl923aejyJMWwCzkFx6NopO5LU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=YEzajtnNFwAe+8SPSICw/hEkIr1i3pgxxKPZpD+8c4lljV1Qk9BMRLJpiWhaA3CBE
+	 2BiG2iuJFW1vl/S15EzazLpCcg0Mc9me/EW0hph7hpjHJqoQLKsPUF+GXDgWQ6rIAe
+	 EM2VDWJceW2OSus0AhvYMF1+rWN2W3X5wG/3SJeX3sSQ1GN+txtAkbW8wsnJe04A5r
+	 dR7veek1dc0iSQVS5eeNaIvbRvHp5zve0yGnOLFiztKV+hFkMTRKjq3Q+ewt3aG8Cf
+	 gFj0zEyiQwZZ9Gc+EygJ2JDofWYxVb+90AhHfnugpJDWLAbEm2qxlKacBTKNvucQuS
+	 6wCmdeJKSR7Kw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id AEB8CC433E2; Mon, 15 Apr 2024 08:09:41 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218257] [Nested VM] Failed to boot L2 Windows guest on L1
+ Windows guest
+Date: Mon, 15 Apr 2024 08:09:41 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: xiangfeix.ma@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218257-28872-f0Eb46VlqT@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218257-28872@https.bugzilla.kernel.org/>
+References: <bug-218257-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzr0f7jbj6.fsf@ctop-sg.c.googlers.com>
-Subject: Re: [RFC PATCH v5 09/29] KVM: selftests: TDX: Add report_fatal_error test
-From: Ackerley Tng <ackerleytng@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: sagis@google.com, linux-kselftest@vger.kernel.org, afranji@google.com, 
-	erdemaktas@google.com, isaku.yamahata@intel.com, seanjc@google.com, 
-	pbonzini@redhat.com, shuah@kernel.org, pgonda@google.com, haibo1.xu@intel.com, 
-	chao.p.peng@linux.intel.com, vannapurve@google.com, runanwang@google.com, 
-	vipinsh@google.com, jmattson@google.com, dmatlack@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218257
 
-> On Fri, Apr 12, 2024 at 04:56:36AM +0000, Ackerley Tng wrote:
->> Yan Zhao <yan.y.zhao@intel.com> writes:
->> 
->> > ...
->> >> diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->> >> index b570b6d978ff..6d69921136bd 100644
->> >> --- a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->> >> +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
->> >> @@ -49,4 +49,23 @@ bool is_tdx_enabled(void);
->> >>   */
->> >>  void tdx_test_success(void);
->> >>  
->> >> +/**
->> >> + * Report an error with @error_code to userspace.
->> >> + *
->> >> + * Return value from tdg_vp_vmcall_report_fatal_error is ignored since execution
->> >> + * is not expected to continue beyond this point.
->> >> + */
->> >> +void tdx_test_fatal(uint64_t error_code);
->> >> +
->> >> +/**
->> >> + * Report an error with @error_code to userspace.
->> >> + *
->> >> + * @data_gpa may point to an optional shared guest memory holding the error
->> >> + * string.
->> >> + *
->> >> + * Return value from tdg_vp_vmcall_report_fatal_error is ignored since execution
->> >> + * is not expected to continue beyond this point.
->> >> + */
->> >> +void tdx_test_fatal_with_data(uint64_t error_code, uint64_t data_gpa);
->> > I found nowhere is using "data_gpa" as a gpa, even in patch 23, it's
->> > usage is to pass a line number ("tdx_test_fatal_with_data(ret, __LINE__)").
->> >
->> >
->> 
->> This function tdx_test_fatal_with_data() is meant to provide a generic
->> interface for TDX tests to use TDG.VP.VMCALL<ReportFatalError>, and so
->> the parameters of tdx_test_fatal_with_data() generically allow error_code and
->> data_gpa to be specified.
->> 
->> The tests just happen to use the data_gpa parameter to pass __LINE__ to
->> the host VMM, but other tests in future that use the
->> tdx_test_fatal_with_data() function in the TDX testing library could
->> actually pass a GPA through using data_gpa.
->> 
->> >>  #endif // SELFTEST_TDX_TEST_UTIL_H
->> >> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
->> >> index c2414523487a..b854c3aa34ff 100644
->> >> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
->> >> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
->> >> @@ -1,8 +1,31 @@
->> >>  // SPDX-License-Identifier: GPL-2.0-only
->> >>  
->> >> +#include <string.h>
->> >> +
->> >>  #include "tdx/tdcall.h"
->> >>  #include "tdx/tdx.h"
->> >>  
->> >> +void handle_userspace_tdg_vp_vmcall_exit(struct kvm_vcpu *vcpu)
->> >> +{
->> >> +	struct kvm_tdx_vmcall *vmcall_info = &vcpu->run->tdx.u.vmcall;
->> >> +	uint64_t vmcall_subfunction = vmcall_info->subfunction;
->> >> +
->> >> +	switch (vmcall_subfunction) {
->> >> +	case TDG_VP_VMCALL_REPORT_FATAL_ERROR:
->> >> +		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->> >> +		vcpu->run->system_event.ndata = 3;
->> >> +		vcpu->run->system_event.data[0] =
->> >> +			TDG_VP_VMCALL_REPORT_FATAL_ERROR;
->> >> +		vcpu->run->system_event.data[1] = vmcall_info->in_r12;
->> >> +		vcpu->run->system_event.data[2] = vmcall_info->in_r13;
->> >> +		vmcall_info->status_code = 0;
->> >> +		break;
->> >> +	default:
->> >> +		TEST_FAIL("TD VMCALL subfunction %lu is unsupported.\n",
->> >> +			  vmcall_subfunction);
->> >> +	}
->> >> +}
->> >> +
->> >>  uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
->> >>  				      uint64_t write, uint64_t *data)
->> >>  {
->> >> @@ -25,3 +48,19 @@ uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
->> >>  
->> >>  	return ret;
->> >>  }
->> >> +
->> >> +void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa)
->> >> +{
->> >> +	struct tdx_hypercall_args args;
->> >> +
->> >> +	memset(&args, 0, sizeof(struct tdx_hypercall_args));
->> >> +
->> >> +	if (data_gpa)
->> >> +		error_code |= 0x8000000000000000;
->> >> 
->> > So, why this error_code needs to set bit 63?
->> >
->> >
->> 
->> The Intel GHCI Spec says in R12, bit 63 is set if the GPA is valid. As a
-> But above "__LINE__" is obviously not a valid GPA.
->
-> Do you think it's better to check "data_gpa" is with shared bit on and
-> aligned in 4K before setting bit 63?
->
+Ma Xiangfei (xiangfeix.ma@intel.com) changed:
 
-I read "valid" in the spec to mean that the value in R13 "should be
-considered as useful" or "should be passed on to the host VMM via the
-TDX module", and not so much as in "validated".
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |xiangfeix.ma@intel.com
 
-We could validate the data_gpa as you suggested to check alignment and
-shared bit, but perhaps that could be a higher-level function that calls
-tdg_vp_vmcall_report_fatal_error()?
+--- Comment #2 from Ma Xiangfei (xiangfeix.ma@intel.com) ---
+This issue cannot reproduce in the latest kernel.
+KVM commit/branch: 9bc60f73
+Qemu commit/branch: 927284d6
+Host Kernel: 6.9.0-rc1
+Host OS: CentOS 9
 
-If it helps, shall we rename "data_gpa" to "data" for this lower-level,
-generic helper function and remove these two lines
+--=20
+You may reply to this email to add a comment.
 
-if (data_gpa)
-	error_code |= 0x8000000000000000;
-
-A higher-level function could perhaps do the validation as you suggested
-and then set bit 63.
-
-Are you objecting to the use of R13 to hold extra test information, such
-as __LINE__?
-
-I feel that R13 is just another register that could be used to hold
-error information, and in the case of this test, we can use it to send
-__LINE__ to aid in debugging selftests. On the host side of the
-selftest we can printf() :).
-
->> generic TDX testing library function, this check allows the user to use
->> tdg_vp_vmcall_report_fatal_error() with error_code and data_gpa and not
->> worry about setting bit 63 before calling
->> tdg_vp_vmcall_report_fatal_error(), though if the user set bit 63 before
->> that, there is no issue.
->> 
->> >> +	args.r11 = TDG_VP_VMCALL_REPORT_FATAL_ERROR;
->> >> +	args.r12 = error_code;
->> >> +	args.r13 = data_gpa;
->> >> +
->> >> +	__tdx_hypercall(&args, 0);
->> >> +}
->> 
->> >> <snip>
->> 
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
