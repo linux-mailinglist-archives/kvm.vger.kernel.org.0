@@ -1,117 +1,105 @@
-Return-Path: <kvm+bounces-14668-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14669-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 806788A559A
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 16:52:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F768A55C6
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 16:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3ACC6286122
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 14:52:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A43E71F22FF0
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 14:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8827581F;
-	Mon, 15 Apr 2024 14:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02530757E5;
+	Mon, 15 Apr 2024 14:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J/8KNIn1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t6DGZXBC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA3611E52A;
-	Mon, 15 Apr 2024 14:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F31C60EF9
+	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 14:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713192735; cv=none; b=teWM4QxOkdC57y3VMLjXrZi6TNpyfMTbnbdV0wf4oVrKVdNz0YtN3qLvGRLXY1J+tuZRXckXRbZc04YfwSCafGUDsQmUmZHwO+zQat+gZXIMtf789gDSSW0hAPaxS6M/qg9lgfR6BdEN22qJsW/lcEy3ZTKFaP3cl50g8jOaJFY=
+	t=1713193104; cv=none; b=M+e7OEDf67CNhRAmGeTfR9qQfEavnEj0Jo04e4O6Vv7b1nigv2xQ8P3sceeUOjfHue/ucUMfpigVxWogRnnr98SADubsi8C1Ok3u2U2NkcJr3N7442opSVhMgdf4jez3HCN81lT8ipGGk7R0FDXNbSFXADbupCOceuoKlKQFHjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713192735; c=relaxed/simple;
-	bh=JrjwZDSK1xsC8X65AoUHKJtl1BMmtd6zoPIlPcHRKQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ahcjPBElUOtWS/uhZj6eKJsmRRdqvQZDdtsZC9qVyhnE+LJCGFfNVwG3NDcaQxMP5XkVy9oweVz+kaVokV3ll4srMwVSVinmbbbBU2TLY/jGhEqzaQNrk08Yw2vwY2eKXawszFLkQn1NlYiiA9zpCKTdMRwLTqnFEXm3W9PD+Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J/8KNIn1; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43FETQDr007066;
-	Mon, 15 Apr 2024 14:52:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=O96ldazLk0ZQV95WUC8Xi+BiOKFMt4aoAGFLPkYn+VQ=;
- b=J/8KNIn1oIscZmC7O3HOGKiwpt6FFUuR04bNP5NFAAnTq7uhT6m4v1LHwcBR2m5paXpL
- TmTYZu9o3EgBCt0z/PqyPbfnqHEsjAZhY4ImLyp/hTnRDJQJ5ajdv4Ja9rFTAPvnxEU5
- tFCfsgg6NPWo6cVtYPwwM8hXCU7PNilfpGnAjCTxnr+uFgS1AjlzLXiaslJvY2SaqxEb
- nZxFwYDxb36sqRLrhGm8XTP7eDXu6b2ZP1YCcBmu3K4Q+E7NIq+1JGpeo/8OkIk0nM5T
- R25uEkxHYz0+0sHlyi15poFjS/AhhHkCQLrYvIHtdMtawmOLAoOScAX6tIE9fuxN6tFe FQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xh4r0r80v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Apr 2024 14:52:09 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43FEq9Nw010129;
-	Mon, 15 Apr 2024 14:52:09 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xh4r0r80t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Apr 2024 14:52:09 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43FCNOrr023681;
-	Mon, 15 Apr 2024 14:52:08 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xg5cnre1a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Apr 2024 14:52:08 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43FEq2i211403734
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 15 Apr 2024 14:52:04 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8A5572004D;
-	Mon, 15 Apr 2024 14:52:02 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64D7320043;
-	Mon, 15 Apr 2024 14:52:02 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 15 Apr 2024 14:52:02 +0000 (GMT)
-Date: Mon, 15 Apr 2024 16:52:01 +0200
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>
-Subject: Re: [PATCH v1] KVM: s390x: selftests: Add shared zeropage test
-Message-ID: <Zh0/EaRmNqGAo0Bo@tuxmaker.boeblingen.de.ibm.com>
-References: <20240412084329.30315-1-david@redhat.com>
+	s=arc-20240116; t=1713193104; c=relaxed/simple;
+	bh=2AYn/bmQeIzj6ulftp9H24+jIaZlPwCEpI/YcE8pXts=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iCLl7mRK0uw4hPIMie/TOSfw04q0VsmyOttknm+Dn+s/Ri8YklpAOojpvrVeh+4aLvSqYgUT1/Yz1r5XtCvsNVedTKUg4ZOQLzFoSH2l5Rk3GBd+QEOLCumuJCoNsE1teTBkz5Rs7tNP2Q+xsFauzMIst88USE3gnH4zdsAUf54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t6DGZXBC; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e5e5fa31dbso20132385ad.0
+        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 07:58:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713193102; x=1713797902; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IZNUm4Db7gXwKkeQwn/hIy/lkUEbm0FeK/51upL4Sbg=;
+        b=t6DGZXBCKRdLr8UlCxk6NUdn2f7DCNxfNWfEVtcafseU3mh+srbgG3uaHt4kkaSvg5
+         PV2tFr5SZ7rBg3bDO4HQV0UXu5r4Qbm4pF4REC8SBM1AyAZDOjDRkuCrAcsHWLJcX1Cq
+         NCZ9NqQr66KIL8WvewvpIj4FDnwID9vJoiUs/qXdmNLY9SvJGgQlNLuwwHNhCIU45+rH
+         F1FCpUdScUNAQss7arPEPFDM0MhvXf3vysrbt94oUXJF9ys8dLhP/rSrS7/ZhiKURPo6
+         O30+r+PF/8RiVuKS5/Crq1LxAhhS1NhPZ0MiAcfpv5MaEHqt1h6VxplEDC2xi5ga6BQQ
+         XX/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713193102; x=1713797902;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IZNUm4Db7gXwKkeQwn/hIy/lkUEbm0FeK/51upL4Sbg=;
+        b=h2GIW+g+uqkwOFeSofJgDBLqn4NUKC33CQSSVapnloIZX5ACF6bXXnY+lv9637KIhw
+         WHZfq+SEwcDlYJ2YIVydBhMGfUIVC2o4FQ7gi5YL9XeXyxdcaDArh6t7BjOioqzkLtF/
+         33P6Pxpff8RE50/+wZHnQGbQ6lxHQWM18pIcf1NHbr4y9mZfgNSR8b53WWSiD7uwnSwz
+         bTfnk7D5jQgT3y36Cc4RZtlm4JxKbbPX7ZtJR5VyK+pW6JZvjFZGDIwqfY3BFpY3uUex
+         NHogiEfJL/hUM2x55InUItz9zQ72RsZm7pfBAbvgLEiiPivnfddsIy5TSY0kHo9eIHkv
+         7X5A==
+X-Gm-Message-State: AOJu0YwxXmEEcikfxU05mSIp5cBAZDONqqZkNXN2KDSxxXB3SYAEFNmj
+	HvxJ1yda0Uzj2UU0PaJY65+nHL65/Rb9KVVXP+CPMdryfQSKfuz0NaCNTsepxwrdEgnviVoweMt
+	+pg==
+X-Google-Smtp-Source: AGHT+IEvHQs7kjxv+HTgyT2pDkZQVHAKuYQQBD8pMwSGui9CWOAcn97/q2lyUG02lxRqtnhgbRT5WRnRWew=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:d4c5:b0:1e4:32ec:ce5d with SMTP id
+ o5-20020a170902d4c500b001e432ecce5dmr252776plg.0.1713193102333; Mon, 15 Apr
+ 2024 07:58:22 -0700 (PDT)
+Date: Mon, 15 Apr 2024 07:58:21 -0700
+In-Reply-To: <627a61bf-de07-43a7-bb4a-9539673674b2@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412084329.30315-1-david@redhat.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: RpJoQoTbB6ln9BBhjyX_vPpnUfie5PFK
-X-Proofpoint-ORIG-GUID: avAcKcN0NG5JppCJT0GGz0-e2SO3sBMk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-15_12,2024-04-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=788 mlxscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- clxscore=1015 adultscore=0 impostorscore=0 priorityscore=1501 phishscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404150096
+Mime-Version: 1.0
+References: <20240313125844.912415-1-kraxel@redhat.com> <171270475472.1589311.9359836741269321589.b4-ty@google.com>
+ <afbe8c9a-19f9-42e8-a440-2e98271a4ce6@intel.com> <ZhlXzbL66Xzn2t_a@google.com>
+ <627a61bf-de07-43a7-bb4a-9539673674b2@intel.com>
+Message-ID: <Zh1AjYMP-v1z3Xp2@google.com>
+Subject: Re: [PATCH v4 0/2] kvm/cpuid: set proper GuestPhysBits in CPUID.0x80000008
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: kvm@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Apr 12, 2024 at 10:43:29AM +0200, David Hildenbrand wrote:
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../kvm/s390x/shared_zeropage_test.c          | 110 ++++++++++++++++++
->  2 files changed, 111 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/s390x/shared_zeropage_test.c
+On Mon, Apr 15, 2024, Xiaoyao Li wrote:
+> On 4/12/2024 11:48 PM, Sean Christopherson wrote:
+> > On Fri, Apr 12, 2024, Xiaoyao Li wrote:
+> > If we go deep enough, it becomes a functional problem.  It's not even _that_
+> > ridiculous/contrived :-)
+> > 
+> > L1 KVM is still aware that the real MAXPHYADDR=52, and so there are no immediate
+> > issues with reserved bits at that level.
+> > 
+> > But L1 userspace will unintentionally configure L2 with CPUID.0x8000_0008.EAX[7:0]=48,
+> > and so L2 KVM will incorrectly think bits 51:48 are reserved.  If both L0 and L1
+> > are using TDP, neither L0 nor L1 will intercept #PF.  And because L1 userspace
+> > was told MAXPHYADDR=48, it won't know that KVM needs to be configured with
+> > allow_smaller_maxphyaddr=true in order for the setup to function correctly.
+> 
+> In this case, a) L1 userspace was told by L1 KVM that MAXPHYADDR = 48 via
+> KVM_GET_SUPPORTED_CPUID. But b) L1 userspace gets MAXPHYADDR = 52 by
+> executing CPUID itself.
 
-Applied, thanks, David!
+KVM can't assume userspace will do raw CPUID.
 
