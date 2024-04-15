@@ -1,65 +1,54 @@
-Return-Path: <kvm+bounces-14621-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14622-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B8C28A47EB
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 08:17:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F7CB8A4843
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 08:39:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C6BD1C21761
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 06:17:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2A6FB21E82
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 06:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4F76101F2;
-	Mon, 15 Apr 2024 06:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6D9A208C1;
+	Mon, 15 Apr 2024 06:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YlJpUejI"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="kKgb/aOp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from forwardcorp1c.mail.yandex.net (forwardcorp1c.mail.yandex.net [178.154.239.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7E9F4F1
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 06:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA031C6B9;
+	Mon, 15 Apr 2024 06:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713161845; cv=none; b=BL4myros98lLdLGq/qTkHk7gFar4zI7OgzqDARQlHD80iLtLiYLp7adu9UHuX0nvoHUQ5U04aCzjGRorRhDlsH4GH3bP0IA6LKDGOtthKoHy1oVm2xjpqvY13vMrxHYXLl9SC79fS7FHPQ8EM7rw3wp7WphIk5xe8O4c0fvTsLw=
+	t=1713163103; cv=none; b=EL/kwx+eTTh/rjUpDscgD7BBVHyEG4vdwn2t3ePFpldu4P9rwrt4L8bnIp5Qx7CAoe6o6Yo19tweH7DH1NR8mcU1jfh4rlqA1WZW0WvYxaa0PdNhNhLUhhWiL7RJKsOROAFmygV+wumFAHWYVFtmVR8P451xNjXOmdfJLtPGCz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713161845; c=relaxed/simple;
-	bh=+CWlU/PUCnePB+sx0zuS7kVFDQrlRdMuqfUpBg6GL64=;
+	s=arc-20240116; t=1713163103; c=relaxed/simple;
+	bh=ke4GtrwiUaNd6EoLUT2zw42GFR+boZhwDst+k70ryFA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sjBJcJwg42Pni83/5HpNK6AOSGl1fM20byivruDaXT+JxiqFNJg5ndMWqAYvDMGBuINWcEqktVIg69ZgQEThVBMEbe4Tz9M0feiwI6GicRvwUcfX7ZF4JyVao0gwfAcvI2VUAT/wOIFpyvrkGDYG2jcMvpKWvuktYEey90fIinY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YlJpUejI; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713161843; x=1744697843;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+CWlU/PUCnePB+sx0zuS7kVFDQrlRdMuqfUpBg6GL64=;
-  b=YlJpUejIyG6TaKkTWi47WitFTro40Bi2a9KqeDHwQ0YFbNuKmrwWPpld
-   vWOYq+SEhZUvNTlZn/rqH4BOK8uIXPMiD3qgW6JjWLXTZejx7utUtl1tr
-   By4C0hQ1IsjAikodjOTVbtUj5xCudOXN+aPRNiVHH9mJk0Xp0PP1S1zoX
-   Um07X9RkDlc+VY3t2kKAgrnXCnEchVnkBrAO2RKKwpxQCL2+Q/KCvwUOD
-   +VRgDnUC+J2Tspq1JcCnuNsYadgkhJnfxdELy2grM06ymArYDjBUP4YSU
-   BDi0nYg8/5RXAyb+77T5MewzVUIxiH5tjhymzyJcI16R394rcXafxcivn
-   w==;
-X-CSE-ConnectionGUID: BVs0ewmYToCM6hcbFT/efA==
-X-CSE-MsgGUID: PTwZhd3PS7aSR2ybJ38Xog==
-X-IronPort-AV: E=McAfee;i="6600,9927,11044"; a="8389879"
-X-IronPort-AV: E=Sophos;i="6.07,202,1708416000"; 
-   d="scan'208";a="8389879"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2024 23:17:23 -0700
-X-CSE-ConnectionGUID: SV0cWM/mRGSylRePaVODfA==
-X-CSE-MsgGUID: Mv/R1fOfQgGpNIfkFw9hrg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,202,1708416000"; 
-   d="scan'208";a="21877335"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2024 23:17:21 -0700
-Message-ID: <627a61bf-de07-43a7-bb4a-9539673674b2@intel.com>
-Date: Mon, 15 Apr 2024 14:17:18 +0800
+	 In-Reply-To:Content-Type; b=nNeAdAkxWzdDo3DSK5Xtxe6mogwAWeio2PTduVzVx+iyg+322eOeLcXsH+v1xVKbAKP+rLy4KTvRMybspdGMuIsoULNXtGbnrofLjPkb00A11cf4mCEj98TceZqzKI/SWJXJc5ecMd9V8fR0kFFqmLLtTYoHSVQr5kJzsJ+YoeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=kKgb/aOp; arc=none smtp.client-ip=178.154.239.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:220a:0:640:7faf:0])
+	by forwardcorp1c.mail.yandex.net (Yandex) with ESMTPS id BF6B860C5A;
+	Mon, 15 Apr 2024 09:36:52 +0300 (MSK)
+Received: from [IPV6:2a02:6b8:b081:b5ae::1:26] (unknown [2a02:6b8:b081:b5ae::1:26])
+	by mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id paYKek1IaKo0-iypVP8rP;
+	Mon, 15 Apr 2024 09:36:51 +0300
+Precedence: bulk
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1713163012;
+	bh=ywwE6DRwLLT1SpVsnnbzNuGwJVoyApx9UB8DPg8vkco=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=kKgb/aOpknGh9USFJPoBvE7mZ7kudaNL2AT6eeDpofcnZ9suDthjcSDK6eqCA8wmY
+	 jtU5OyAJf5RvFFh2GNfheqOEoNQOdHLSKXJ/0X7GUdhjaC55yGxYN48DkSDO9q7J07
+	 b5kYaPZVRnbiHXCgkxsOLO5NticjCbVSqcvBrH3k=
+Authentication-Results: mail-nwsmtp-smtp-corp-main-66.iva.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Message-ID: <fbf1771d-d97c-488b-96ee-422d64016615@yandex-team.ru>
+Date: Mon, 15 Apr 2024 09:36:51 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,90 +56,47 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 0/2] kvm/cpuid: set proper GuestPhysBits in
- CPUID.0x80000008
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Gerd Hoffmann <kraxel@redhat.com>,
- Tom Lendacky <thomas.lendacky@amd.com>
-References: <20240313125844.912415-1-kraxel@redhat.com>
- <171270475472.1589311.9359836741269321589.b4-ty@google.com>
- <afbe8c9a-19f9-42e8-a440-2e98271a4ce6@intel.com>
- <ZhlXzbL66Xzn2t_a@google.com>
+Subject: Re: [PATCH] kvm_host: bump KVM_MAX_IRQ_ROUTE to 128k
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, yc-core@yandex-team.ru
+References: <20240321082442.195631-1-d-tatianin@yandex-team.ru>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZhlXzbL66Xzn2t_a@google.com>
+From: Daniil Tatianin <d-tatianin@yandex-team.ru>
+In-Reply-To: <20240321082442.195631-1-d-tatianin@yandex-team.ru>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 4/12/2024 11:48 PM, Sean Christopherson wrote:
-> On Fri, Apr 12, 2024, Xiaoyao Li wrote:
->> On 4/10/2024 8:19 AM, Sean Christopherson wrote:
->>> On Wed, 13 Mar 2024 13:58:41 +0100, Gerd Hoffmann wrote:
->>>> Use the GuestPhysBits field (EAX[23:16]) to communicate the max
->>>> addressable GPA to the guest.  Typically this is identical to the max
->>>> effective GPA, except in case the CPU supports MAXPHYADDR > 48 but does
->>>> not support 5-level TDP.
->>>>
->>>> See commit messages and source code comments for details.
->>>>
->>>> [...]
->>>
->>> Applied to kvm-x86 misc, with massaged changelogs to be more verbose when
->>> describing the impact of each change, e.g. to call out that patch 2 isn't an
->>> urgent fix because guest firmware can simply limit itself to using GPAs that
->>> can be addressed with 4-level paging.
->>>
->>> I also tagged patch 1 for stable@, as KVM-on-KVM will do the wrong thing when
->>> patch 2 lands, i.e. KVM will incorrectly advertise the addressable MAXPHYADDR
->>> as the raw/real MAXPHYADDR.
->>
->> you mean old KVM on new KVM?
-> 
-> Yep.
-> 
->> As far as I see, it seems no harm. e.g., if the userspace and L0 KVM have
->> the new implementation. On Intel SRF platform, L1 KVM sees EAX[23:16]=48,
->> EAX[7:0]=52. And when L1 KVM is old, it reports EAX[7:0] = 48 to L1
->> userspace.
-> 
-> Yep.
-> 
->> right, 48 is not the raw/real MAXPHYADDR. But I think there is not statement
->> on KVM that CPUID.0x8000_0008.EAX[7:0] of KVM_GET_SUPPORTED_CPUID reports
->> the raw/real MAXPHYADDR.
-> 
-> If we go deep enough, it becomes a functional problem.  It's not even _that_
-> ridiculous/contrived :-)
-> 
-> L1 KVM is still aware that the real MAXPHYADDR=52, and so there are no immediate
-> issues with reserved bits at that level.
-> 
-> But L1 userspace will unintentionally configure L2 with CPUID.0x8000_0008.EAX[7:0]=48,
-> and so L2 KVM will incorrectly think bits 51:48 are reserved.  If both L0 and L1
-> are using TDP, neither L0 nor L1 will intercept #PF.  And because L1 userspace
-> was told MAXPHYADDR=48, it won't know that KVM needs to be configured with
-> allow_smaller_maxphyaddr=true in order for the setup to function correctly.
+ping :)
 
-In this case, a) L1 userspace was told by L1 KVM that MAXPHYADDR = 48 
-via KVM_GET_SUPPORTED_CPUID. But b) L1 userspace gets MAXPHYADDR = 52 by 
-executing CPUID itself.
-
-So if L1 userspace decides to configure MAXPHYADDR to 48 for L2, 
-according to a). It is supposed to check if KVM is configured with 
-allow_smaller_maxphyaddr=y. Otherwise, it cannot expect it works 
-function correctly.
-
-> If L2 runs an L3, and does not use EPT, L2 will think it can generate a RSVD #PF
-> to accelerate emulated MMIO.  The GPA with bits 51:48!=0 created by L2 generates
-> an EPT violation in L1.  Because L1 doesn't have allow_smaller_maxphyaddr, L1
-> installs an EPT mapping for the wrong GPA (effectively drops bits 51:48), and
-> L3 hangs because L1 will keep doing nothing on the resulting EPT violation (L1
-> thinks there's already a valid mapping).
-> 
-> With patch 1 and the OVMF fixes backported, L1 KVM will enumerate MAXPHYADDR=52,
-> L1 userspace creates L2 with MAXPHYADDR=52, and L2 OVMF restricts its mappings to
-> bits 47:0.
-> 
-> At least, I think that's what will happen.
-
+On 3/21/24 11:24 AM, Daniil Tatianin wrote:
+> We would like to be able to create large VMs (up to 224 vCPUs atm) with
+> up to 128 virtio-net cards, where each card needs a TX+RX queue per vCPU
+> for optimal performance (as well as config & control interrupts per
+> card). Adding in extra virtio-blk controllers with a queue per vCPU (up
+> to 192 disks) yields a total of about ~100k IRQ routes, rounded up to
+> 128k for extra headroom and flexibility.
+>
+> The current limit of 4096 was set in 2018 and is too low for modern
+> demands. It also seems to be there for no good reason as routes are
+> allocated lazily by the kernel anyway (depending on the largest GSI
+> requested by the VM).
+>
+> Signed-off-by: Daniil Tatianin <d-tatianin@yandex-team.ru>
+> ---
+>   include/linux/kvm_host.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 48f31dcd318a..10a141add2a8 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2093,7 +2093,7 @@ static inline bool mmu_invalidate_retry_gfn_unsafe(struct kvm *kvm,
+>   
+>   #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
+>   
+> -#define KVM_MAX_IRQ_ROUTES 4096 /* might need extension/rework in the future */
+> +#define KVM_MAX_IRQ_ROUTES 131072 /* might need extension/rework in the future */
+>   
+>   bool kvm_arch_can_set_irq_routing(struct kvm *kvm);
+>   int kvm_set_irq_routing(struct kvm *kvm,
 
