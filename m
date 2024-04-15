@@ -1,310 +1,229 @@
-Return-Path: <kvm+bounces-14659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7388A51CA
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 15:41:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9576B8A5204
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 15:44:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E9A51C228F2
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 13:41:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 499B528175E
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 13:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3A5783CA3;
-	Mon, 15 Apr 2024 13:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E23673530;
+	Mon, 15 Apr 2024 13:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wiJLBwJz";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cJi8icg5";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="wiJLBwJz";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="cJi8icg5"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="BlkE2F4m"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7264E7691F
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 13:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DC773194
+	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 13:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713188198; cv=none; b=RBVsavJga3qXeyJibLsMr+XAJP2Z1VHQw54Ycxgt4KJ702eVPzwn5g3WUFL1dBtAl7S7250vYfu8UrzON70V9uOV/y1pUbY4sk4x2UXuAGbiR470v7xs0GhEXJ2+pOWEC9RFj6U3JvJxpuFpwMHfbtFjkXVA0+bVU8DmLwwUJPw=
+	t=1713188637; cv=none; b=tJ8BC2BjWX0AyyeVF80YqoTNr/wMEr2YSb/N9v4k//8lXjkZdx9Z+ASC7Y078wCaOcrsgHst5UitE2umIbn3I3iucPSdp7NM7FGHKJ4fbICuy1MXDkI26o0aRQGWJLhq4kgCHU9H6tlpu02pT9kZ+Z8ZXCH9KXWJPjcvw+HLXrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713188198; c=relaxed/simple;
-	bh=NX8yHODCOi86UhZ0dtxXRNCn0w6ixCBrGT+e5+vXb8U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IdrJnnQ0vKFoXA5cCT0DEs6ryj5ib8lmJXTzDRO/yZQiKpc5NOahxzfObT1JUFhwqyMNcObMiwwA51v0Qe7OOj8veHIeypdxB6WEE76yg2+wi4QzwWhKA4g3yVpko+3pLqS4L6kiyqZtCarUwakioX4RwSItQi4Z5ErkmZYrHM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wiJLBwJz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cJi8icg5; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=wiJLBwJz; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=cJi8icg5; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 30A5E37189;
-	Mon, 15 Apr 2024 13:36:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1713188190; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zQqbIB5kjeKVPKDHQZhZmwx8PhIheitUD54ORClWXGY=;
-	b=wiJLBwJz8Q1zCCnc6mkCTS/fbPX0ON711dPqBd1/MWmHnHKn5k5W1Ty/0+3CXBe1MmHz4Z
-	GC22rogQD14awW27tkl38hkGpO1wAdka2+VK5+4uFW9mAxp4TSUjhLRQSqZtpdzdRuDIgH
-	DH+/EFUAIxkktaSY1z+6Lr3g1R/GN60=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1713188190;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zQqbIB5kjeKVPKDHQZhZmwx8PhIheitUD54ORClWXGY=;
-	b=cJi8icg5W8/+PXRs+AfcCoB/dlgWP6RdVKonQnvDjSnAdMPbwfR9yTYLxi/JndbLmQcdeM
-	KD5ZVf8kFZlQhYAQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1713188190; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zQqbIB5kjeKVPKDHQZhZmwx8PhIheitUD54ORClWXGY=;
-	b=wiJLBwJz8Q1zCCnc6mkCTS/fbPX0ON711dPqBd1/MWmHnHKn5k5W1Ty/0+3CXBe1MmHz4Z
-	GC22rogQD14awW27tkl38hkGpO1wAdka2+VK5+4uFW9mAxp4TSUjhLRQSqZtpdzdRuDIgH
-	DH+/EFUAIxkktaSY1z+6Lr3g1R/GN60=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1713188190;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=zQqbIB5kjeKVPKDHQZhZmwx8PhIheitUD54ORClWXGY=;
-	b=cJi8icg5W8/+PXRs+AfcCoB/dlgWP6RdVKonQnvDjSnAdMPbwfR9yTYLxi/JndbLmQcdeM
-	KD5ZVf8kFZlQhYAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 190671368B;
-	Mon, 15 Apr 2024 13:36:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id cT6lBV4tHWZkFgAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 15 Apr 2024 13:36:30 +0000
-Message-ID: <a97d6ed3-f4f8-4d3e-9306-da93bf7c6b26@suse.cz>
-Date: Mon, 15 Apr 2024 15:36:29 +0200
+	s=arc-20240116; t=1713188637; c=relaxed/simple;
+	bh=wiZZBUwFBfFJ8JX5HoSa5Tz8CCR776e4YmB5I1+UeZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ODDnmzWKNZZu6XISxMGUHTQHbRlBFWUT1CwT0gp8lt373Tfm84UM7nomK8TXzUKbOjM1YMgDVm4KgLVV1fk2RnH/Oz6x7BgderYlNjxMLxNqhlXaeFeQWjnaxhxBcB94inZVbDDCJltXruZbwzqZmjt2y9eUQS56av3c2Dng9Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=BlkE2F4m; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-418798199a2so2823025e9.1
+        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 06:43:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1713188634; x=1713793434; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oBlw086cFKfVgD6m6+KXW8B1bVXOlMOqtJCrOvRcQ7k=;
+        b=BlkE2F4mvYE9aCDGWQJCq1e+ryZ81EKAPTFDkAxYayjeRNzo75dUVLoH0VGTya9fuK
+         iYTvKvlALY5I2jkDOoR7CZteAt0IJuKa4T/vZ5WkRDC3+bKSuI7Rai7zQhXyqd8Lc7vx
+         M2EnmeznJCQgrbotEzfNICshcB1NqWJbp3y2skgEEa+TbgJi0PRzrP/nClihWctqa1iZ
+         tVzdg+9z61thb1+AMc2v1/lqOS8qu9XQe3RA+tiPFGoVsEl9wMQG/5cZeqEnFSDIGM4X
+         g1n/aaGI1zrQPqTvC0cFtkzOJ9j3XnOSY9CBHqtC3g3S0ulEVQGHMTh7TVOz9JfEERGP
+         ZHlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713188634; x=1713793434;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oBlw086cFKfVgD6m6+KXW8B1bVXOlMOqtJCrOvRcQ7k=;
+        b=QNloLVnDYpp5Mu24kjmwUoB2AbAroA2bp6l+C3md5f6kyqdYKJuYXiu+3bbmwTtYWl
+         c9U3cbPViW6q9vJZgwIxtsCiFL+yheO3tcn7+5K09/cW6Wu0P+htJzWuvwZv/1brLMdC
+         DV4DsXOBnm7K4ZBPeOzAH9fCWtr9VT9B4UuwWOZVZDQ114Eszh/hcaLL67RsWQtzkPXn
+         ZrHzgxG1rVhz0P0jYWs/db/+wVfNTxu4Oz0cM5NUi3qiKaXJNDhynuLLewsEQweubx0x
+         L7hfC8avE3utcm5DnI4W17mVXhXUQVPU8rnxf1lnTNQgmb/2aUYG/erUsjNmC0mqTBGV
+         GZkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUpKht8I2Ok3F+eRuxXzB1RRv+oaNkI1IIWt2nJ0zF54a4X0O9deM0J3ftCIZUqe7A50KwJB8VXPev04daZW0xjbjao
+X-Gm-Message-State: AOJu0Yy6TFBDyemgecMKMK+qdZ+fXTNbqLitNojAUC9WKo+aMA6f6i3m
+	9cRKbKjLV7gg2Qhac0MBBRAL2fXiO8z213yPb2fEcmW9jHoJiYa3h3OF3qC2Clw=
+X-Google-Smtp-Source: AGHT+IFSJX/JAylOq7lyfTWV1n1rGtpOd6txYa80kvU3cra08zVigOgalF/jjTxDvlEfsaeWSmIeIQ==
+X-Received: by 2002:a05:600c:4ecb:b0:418:2d69:d978 with SMTP id g11-20020a05600c4ecb00b004182d69d978mr4057431wmq.10.1713188633673;
+        Mon, 15 Apr 2024 06:43:53 -0700 (PDT)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id l23-20020a05600c1d1700b004163ee3922csm19555595wms.38.2024.04.15.06.43.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 06:43:53 -0700 (PDT)
+Date: Mon, 15 Apr 2024 15:43:52 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, Ajay Kaher <ajay.kaher@broadcom.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, Will Deacon <will@kernel.org>, 
+	x86@kernel.org
+Subject: Re: [PATCH v6 24/24] KVM: riscv: selftests: Add commandline option
+ for SBI PMU test
+Message-ID: <20240415-8b9ad5a7e968b1808e99e3da@orel>
+References: <20240411000752.955910-1-atishp@rivosinc.com>
+ <20240411000752.955910-25-atishp@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH gmem 6/6] KVM: guest_memfd: Add interface for populating
- gmem pages with user data
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>,
- Isaku Yamahata <isaku.yamahata@linux.intel.com>,
- Xu Yilun <yilun.xu@linux.intel.com>, Binbin Wu <binbin.wu@linux.intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20240329212444.395559-1-michael.roth@amd.com>
- <20240329212444.395559-7-michael.roth@amd.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <20240329212444.395559-7-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.29
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.29 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.986];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amd.com:email]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240411000752.955910-25-atishp@rivosinc.com>
 
-On 3/29/24 10:24 PM, Michael Roth wrote:
-> During guest run-time, kvm_arch_gmem_prepare() is issued as needed to
-> prepare newly-allocated gmem pages prior to mapping them into the guest.
-> In the case of SEV-SNP, this mainly involves setting the pages to
-> private in the RMP table.
+On Wed, Apr 10, 2024 at 05:07:52PM -0700, Atish Patra wrote:
+> SBI PMU test comprises of multiple tests and user may want to run
+> only a subset depending on the platform. The most common case would
+> be to run all to validate all the tests. However, some platform may
+> not support all events or all ISA extensions.
 > 
-> However, for the GPA ranges comprising the initial guest payload, which
-> are encrypted/measured prior to starting the guest, the gmem pages need
-> to be accessed prior to setting them to private in the RMP table so they
-> can be initialized with the userspace-provided data. Additionally, an
-> SNP firmware call is needed afterward to encrypt them in-place and
-> measure the contents into the guest's launch digest.
+> The commandline option allows user to disable particular test if they
+> want to.
 > 
-> While it is possible to bypass the kvm_arch_gmem_prepare() hooks so that
-> this handling can be done in an open-coded/vendor-specific manner, this
-> may expose more gmem-internal state/dependencies to external callers
-> than necessary. Try to avoid this by implementing an interface that
-> tries to handle as much of the common functionality inside gmem as
-> possible, while also making it generic enough to potentially be
-> usable/extensible for use-cases beyond just SEV-SNP.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
 > ---
->  include/linux/kvm_host.h | 40 ++++++++++++++++++++++++++++++++++++++++
->  virt/kvm/guest_memfd.c   | 40 ++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 80 insertions(+)
+>  .../selftests/kvm/riscv/sbi_pmu_test.c        | 77 ++++++++++++++++---
+>  1 file changed, 68 insertions(+), 9 deletions(-)
 > 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 5b8308b5e4af..8a75787090f3 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2473,4 +2473,44 @@ bool kvm_arch_gmem_prepare_needed(struct kvm *kvm);
->  void kvm_arch_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
->  #endif
+> diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+> index 0fd9b76ae838..57025b07a403 100644
+> --- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+> +++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+> @@ -33,6 +33,16 @@ static unsigned long counter_mask_available;
 >  
-> +/**
-> + * kvm_gmem_populate_args - kvm_gmem_populate() argument structure
-> + *
-> + * @gfn: starting GFN to be populated
-> + * @src: userspace-provided buffer containing data to copy into GFN range
-> + * @npages: number of pages to copy from userspace-buffer
-> + * @do_memcpy: whether to do a direct memcpy of the data prior to issuing
-> + *             the post-populate callback
-> + * @post_populate: callback to issue for each gmem page that backs the GPA
-> + *                 range (which will be filled with corresponding contents from
-> + *                 @src if @do_memcpy was set)
-> + * @opaque: opaque data to pass to @post_populate callback
-> + */
-> +struct kvm_gmem_populate_args {
-> +	gfn_t gfn;
-> +	void __user *src;
-> +	int npages;
-> +	bool do_memcpy;
-> +	int (*post_populate)(struct kvm *kvm, struct kvm_memory_slot *slot,
-> +			     gfn_t gfn, kvm_pfn_t pfn, void __user *src, int order,
-> +			     void *opaque);
-> +	void *opaque;
+>  static bool illegal_handler_invoked;
+>  
+> +enum sbi_pmu_test_id {
+> +	SBI_PMU_TEST_BASIC = 0,
+> +	SBI_PMU_TEST_EVENTS,
+> +	SBI_PMU_TEST_SNAPSHOT,
+> +	SBI_PMU_TEST_OVERFLOW,
+> +	SBI_PMU_TEST_MAX,
 > +};
 > +
-> +/**
-> + * kvm_gmem_populate() - Populate/prepare a GPA range with guest data
-> + *
-> + * @kvm: KVM instance
-> + * @slot: slot containing the GPA range being prepared
-> + * @args: argument structure
-> + *
-> + * This is primarily intended for cases where a gmem-backed GPA range needs
-> + * to be initialized with userspace-provided data prior to being mapped into
-> + * the guest as a private page. This should be called with the slots->lock
-> + * held so that caller-enforced invariants regarding the expected memory
-> + * attributes of the GPA range do not race with KVM_SET_MEMORY_ATTRIBUTES.
-> + */
-> +int kvm_gmem_populate(struct kvm *kvm, struct kvm_memory_slot *slot,
-> +		      struct kvm_gmem_populate_args *args);
+> +static int disabled_test_id = SBI_PMU_TEST_MAX;
+
+I think we should allow specifying '-d' multiple times in case a user
+wants to disable more than one type of test. So we should set a bit
+in this variable instead of assigning it. We could also flip it
+around. If the user uses '-e' to enable test type then only type
+will be run, but then we'd probably want to allow multiple '-e'
+too so it doesn't gain anything.
+
 > +
->  #endif
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 3668a5f1d82b..3e3c4b7fff3b 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -643,3 +643,43 @@ int kvm_gmem_undo_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->  	return r;
+>  unsigned long pmu_csr_read_num(int csr_num)
+>  {
+>  #define switchcase_csr_read(__csr_num, __val)		{\
+> @@ -608,19 +618,68 @@ static void test_vm_events_overflow(void *guest_code)
+>  	test_vm_destroy(vm);
 >  }
->  EXPORT_SYMBOL_GPL(kvm_gmem_undo_get_pfn);
-> +
-> +int kvm_gmem_populate(struct kvm *kvm, struct kvm_memory_slot *slot,
-> +		      struct kvm_gmem_populate_args *args)
+>  
+> -int main(void)
+> +static void test_print_help(char *name)
+>  {
+> -	test_vm_basic_test(test_pmu_basic_sanity);
+> -	pr_info("SBI PMU basic test : PASS\n");
+> +	pr_info("Usage: %s [-h] [-d <test name>]\n", name);
+> +	pr_info("\t-d: Test to disable. Available tests are 'basic', 'events', 'snapshot', 'overflow'\n");
+> +	pr_info("\t-h: print this help screen\n");
+> +}
+>  
+> -	test_vm_events_test(test_pmu_events);
+> -	pr_info("SBI PMU event verification test : PASS\n");
+> +static bool parse_args(int argc, char *argv[])
 > +{
-> +	int ret, max_order, i;
+> +	int opt;
 > +
-> +	for (i = 0; i < args->npages; i += (1 << max_order)) {
-> +		void __user *src = args->src + i * PAGE_SIZE;
-> +		gfn_t gfn = args->gfn + i;
-> +		kvm_pfn_t pfn;
-> +
-> +		ret = __kvm_gmem_get_pfn(kvm, slot, gfn, &pfn, &max_order, false);
-> +		if (ret)
+> +	while ((opt = getopt(argc, argv, "hd:")) != -1) {
+> +		switch (opt) {
+> +		case 'd':
+> +			if (!strncmp("basic", optarg, 5))
+> +				disabled_test_id = SBI_PMU_TEST_BASIC;
+> +			else if (!strncmp("events", optarg, 6))
+> +				disabled_test_id = SBI_PMU_TEST_EVENTS;
+> +			else if (!strncmp("snapshot", optarg, 8))
+> +				disabled_test_id = SBI_PMU_TEST_SNAPSHOT;
+> +			else if (!strncmp("overflow", optarg, 8))
+> +				disabled_test_id = SBI_PMU_TEST_OVERFLOW;
+> +			else
+> +				goto done;
 > +			break;
-> +
-> +		if (!IS_ALIGNED(gfn, (1 << max_order)) ||
-> +		    (args->npages - i) < (1 << max_order))
-> +			max_order = 0;
-> +
-> +		if (args->do_memcpy && args->src) {
-> +			ret = copy_from_user(pfn_to_kaddr(pfn), src, (1 << max_order) * PAGE_SIZE);
-> +			if (ret)
-> +				goto e_release;> +		}
-> +
-> +		if (args->post_populate) {
-> +			ret = args->post_populate(kvm, slot, gfn, pfn, src, max_order,
-> +						  args->opaque);
-> +			if (ret)
-> +				goto e_release;
+> +		break;
 
-This if (ret) goto seems unnecessary, was there more code before the label
-in a previous version?
+Extra 'break'
 
-With that we could also change this block to "if (!ret &&
-args->post_populate)" and remove the first goto and the label.
-
+> +		case 'h':
+> +		default:
+> +			goto done;
 > +		}
-> +e_release:
-> +		put_page(pfn_to_page(pfn));
-> +		if (ret)
-> +			break;
+> +	}
+>  
+> -	test_vm_events_snapshot_test(test_pmu_events_snaphost);
+> -	pr_info("SBI PMU event verification with snapshot test : PASS\n");
+> +	return true;
+> +done:
+> +	test_print_help(argv[0]);
+> +	return false;
+> +}
+>  
+> -	test_vm_events_overflow(test_pmu_events_overflow);
+> -	pr_info("SBI PMU event verification with overflow test : PASS\n");
+> +int main(int argc, char *argv[])
+> +{
+> +	if (!parse_args(argc, argv))
+> +		exit(KSFT_SKIP);
+> +
+> +	if (disabled_test_id != SBI_PMU_TEST_BASIC) {
+> +		test_vm_basic_test(test_pmu_basic_sanity);
+> +		pr_info("SBI PMU basic test : PASS\n");
 > +	}
 > +
-> +	return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_gmem_populate);
+> +	if (disabled_test_id != SBI_PMU_TEST_EVENTS) {
+> +		test_vm_events_test(test_pmu_events);
+> +		pr_info("SBI PMU event verification test : PASS\n");
+> +	}
+> +
+> +	if (disabled_test_id != SBI_PMU_TEST_SNAPSHOT) {
+> +		test_vm_events_snapshot_test(test_pmu_events_snaphost);
+> +		pr_info("SBI PMU event verification with snapshot test : PASS\n");
+> +	}
+> +
+> +	if (disabled_test_id != SBI_PMU_TEST_OVERFLOW) {
+> +		test_vm_events_overflow(test_pmu_events_overflow);
+> +		pr_info("SBI PMU event verification with overflow test : PASS\n");
+> +	}
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.34.1
+>
 
+Thanks,
+drew
 
