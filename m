@@ -1,248 +1,343 @@
-Return-Path: <kvm+bounces-14692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD71C8A5BEC
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 22:00:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 444448A5C4C
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 22:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D03D71C21E17
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 20:00:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5111D1C21961
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 20:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3F2155A58;
-	Mon, 15 Apr 2024 20:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A45F7156891;
+	Mon, 15 Apr 2024 20:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bjk4GjP/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XT/gD6To"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DABC15575F
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 20:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CCF41C77;
+	Mon, 15 Apr 2024 20:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713211229; cv=none; b=sTU8AG77fMz4/jU8GlLb+wFEaSuHht5u6Isfm09pkPDPvOnUXdMaY5dJ6aMUmPN0RY9lfS0OUA3OiCaa5HwUPgbJl+nh1jxbDGaRhLU8dJWtG53SW5cQtXM1QB20/8yWMcs23YPpMGO/h2VZ/VJakhsG5M6L6LmwXqDERHG8TVY=
+	t=1713213606; cv=none; b=eJReLuNSn0R5AUywD+0N2mll+CscSkmeu6NMdzfJ5WP/pgNY3KX52GwScnrRGk16whtQnBEt58hyoAzu0Fa6BRBJ8Tj2vYWuBf8P81Q9v4HxP5Z6JBdgV4Ad39pYQVfWpzLXdXJU1fxOBOmyvQ5fH2fmgy8l+ugAcwN2V+nqoMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713211229; c=relaxed/simple;
-	bh=xXhcNfG113GvJD2OEwTo3qa1iQgotNM4aT6S1SSguJ4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q357SGQr7jaYB3jCJ2egHiUCjQTpnV6EdQJdplhCJPbcamKIlaA9X7llTH159KTUT9BgziOtemOxO8grfu5UaX9kHFkgIatDdotMzsZgahPmo/EOCXP4fN5K9Uyb1K5BSZKraVnMDJLZ8Kwqat/2oiv7ePBgv961JaXsYuMCEos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bjk4GjP/; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-617bd0cf61fso67525127b3.3
-        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 13:00:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713211226; x=1713816026; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dO9HanFFGKFK/j1cHNx96Mo7D8sNAuc5BfumQ1LiUu0=;
-        b=bjk4GjP/xvgDZ1Dndvr5CZyL93dFkUaB6JQIko7slcu5LhF5sohSZMAreq+Ps730Xj
-         lXji+zSMmYyy00qsyLrURipQmuOq/0R7kCI7JwO6o5gn81QEwc8NdAxdoSXvZvL09LQ1
-         pzir2FvSe1W+DYyF1ZNYA8NklTR0SV9tVvgv/dDrcOoa82ha74A8mG0XdrD0PHZ1nwXN
-         as9drFRhVE0mFfhUxw5Pa5sdasxtYLpEd85ZxGKIi1sgLI/FOOWAt6ovlsngZ5lcpAfP
-         0xocsUa6tHvZnbblJMR55BtHS4PseIxKT74lIzp6CbqEeY7eRZfgO7YskrntGDajusFO
-         EO4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713211226; x=1713816026;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dO9HanFFGKFK/j1cHNx96Mo7D8sNAuc5BfumQ1LiUu0=;
-        b=wMxBOz2wEixgeAUB1lxHKIhd83xz5kkgijDaZfh3AMAYROa+a42vqRA9sJndaBTa6Y
-         3KalDvmz+SRM8LX+R1zmbOdfYoP06V4sUINbx2Bk92puwj/s3FZpz8LvjZxiWwnIe5A0
-         1Ce269id2dqbCkjk97+afIJP/HUpUweAipS1uWSLKa/0Sa9FLcbhjdwAD2ot2aSk8Ml4
-         fH5YJBIOjzusOo/dxD+pgY1g+q4wpalMCmRX4OTO6EBmMkHanOamHisNxTg/pCxexmWK
-         r5atGzar01r2CKHJcxyKLO8mZQHwKOx/lNcJHZYxtDPXvRFvFoS6ftmrp7PvWR5JV9Bk
-         D2Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCVhF29Xv+63N+Rt40mE2UEyslSJljmkFlFxWNP37isRoNh/s7V5vj2cygWLz/EIqF1Y0foVjSMipZzuDMFkrxgxIXa2
-X-Gm-Message-State: AOJu0Yx2SMeg0CXtzACqOflMqIz4WesL3s2k9G1/RHF4Sm8n74RiEE1Z
-	kVFi7o7ksB5D168A8jYC+2wcmWw2+UPVdnDvKMvR9+1S/Mdh3omRL4QreOWtFwFsHLTQpySyuoq
-	tNA==
-X-Google-Smtp-Source: AGHT+IHGTFAIjRzWDev68FdmldmWfZ1UzLqfL8TLlEPHkR6OJqIQG9yV8JRbQ1pK64hUb9utypx7cF35cNw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2b8e:b0:dcc:e1a6:aca9 with SMTP id
- fj14-20020a0569022b8e00b00dcce1a6aca9mr3472192ybb.9.1713211226425; Mon, 15
- Apr 2024 13:00:26 -0700 (PDT)
-Date: Mon, 15 Apr 2024 13:00:24 -0700
-In-Reply-To: <Zh1h4gfOpImWHQsC@google.com>
+	s=arc-20240116; t=1713213606; c=relaxed/simple;
+	bh=FcEt0XxkE8fSeSF3sT6N0uD/Tsiupni4uEmvhHUYB44=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=awN4Y59b+96t0VYu7FetCptqO5XonenPqgTHEl5Qp4V/vJ7W5zpB0xVp/Su9OZau0AUU/kY0MAscaLSY055wvRAyFgZ4anK5qR3aCIjNYOmOTmBjvRHLq+tJl5bUCOk6PuIHubszggpSCAeK8zVg+Yg/zp6wooNb6fQVQyOdcVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XT/gD6To; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713213605; x=1744749605;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=FcEt0XxkE8fSeSF3sT6N0uD/Tsiupni4uEmvhHUYB44=;
+  b=XT/gD6ToKqcTLnb8GCccyBp7D/zi2j06IaImQopPiZt4qCD4qOvxuf8b
+   Hd9gn6NARqmLk3DKq3mpg0NZfpUGHsyq3ALQr8lCBIr2hCIgoCm95uY1a
+   V0sUNniL9WbknDGloVKiP++21qSycVbMP/fcVaJRwgBTSu1HARomV/Sa5
+   kQ4Zf2P9yi4bFXPaAxsw/wjd87nZthbeXLYWqZI1TOt0vOe3DNvAwiwhs
+   KtPzhM98z1TJaTG+NjAXmZCEySmWc9XMYLTrr+BTalZdgRZsImg2J5xGm
+   UzG0iCKTjD+81gp42Qc9D4Wk+hMeR9oao32mvNldFsGu57L16Lpxjq7dV
+   A==;
+X-CSE-ConnectionGUID: ByAY3ooORciGwgSd1iE0Pw==
+X-CSE-MsgGUID: mJu+/22BQ96r1jsuNM78vw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="8747725"
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="8747725"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 13:39:22 -0700
+X-CSE-ConnectionGUID: 2+NnO0HTTBOzXdD/ihfV/g==
+X-CSE-MsgGUID: Z9eyk0xgSyC02nPriCsNOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="22027406"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 13:39:21 -0700
+Date: Mon, 15 Apr 2024 13:43:54 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, iommu@lists.linux.dev, Lu Baolu
+ <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, Dave Hansen
+ <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
+ <mingo@redhat.com>, Paul Luse <paul.e.luse@intel.com>, Dan Williams
+ <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, Raj Ashok
+ <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>,
+ jim.harris@samsung.com, a.manzanares@samsung.com, Bjorn Helgaas
+ <helgaas@kernel.org>, guang.zeng@intel.com, robert.hoo.linux@gmail.com,
+ jacob.jun.pan@linux.intel.com, acme@kernel.org, kan.liang@intel.com,
+ "Kleen, Andi" <andi.kleen@intel.com>
+Subject: Re: [PATCH v2 05/13] x86/irq: Reserve a per CPU IDT vector for
+ posted MSIs
+Message-ID: <20240415134354.67c9d1d1@jacob-builder>
+In-Reply-To: <20240415115358.04e04204@jacob-builder>
+References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
+	<20240405223110.1609888-6-jacob.jun.pan@linux.intel.com>
+	<87edbb267x.ffs@tglx>
+	<20240415115358.04e04204@jacob-builder>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240402213656.3068504-1-dmatlack@google.com> <cb793d79-f476-3134-23b7-dc43801b133e@loongson.cn>
- <CALzav=c_qP2kLVS6R4VQRyS6aMvj0381WKCE=5JpqRUrdEYPyg@mail.gmail.com>
- <Zg7fAr7uYMiw_pc3@google.com> <CALzav=cF+tq-snKbdP76FpodUdd7Fhu9Pf3jTK5c5=vb-MY9cQ@mail.gmail.com>
- <Zg7utCRWGDvxdQ6a@google.com> <CALzav=coESqsXnLbX2emiO_P12WrPZh9WutxF6JWWqwX-6RFDg@mail.gmail.com>
- <Zh1h4gfOpImWHQsC@google.com>
-Message-ID: <Zh2HWPFvWAxQSRVM@google.com>
-Subject: Re: [PATCH v2] KVM: Aggressively drop and reacquire mmu_lock during CLEAR_DIRTY_LOG
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: maobibo <maobibo@loongson.cn>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 15, 2024, David Matlack wrote:
->  * I suspect the original issue my patch is trying to fix is actually specific
->    to the way the TDP MMU does eager page splitting and a more targeted fix is
->    warranted.
+
+On Mon, 15 Apr 2024 11:53:58 -0700, Jacob Pan
+<jacob.jun.pan@linux.intel.com> wrote:
+
+> Hi Thomas,
 > 
-> ---
+> On Thu, 11 Apr 2024 18:51:14 +0200, Thomas Gleixner <tglx@linutronix.de>
+> wrote:
 > 
-> To evaluate my patch I tested on x86 with different mmu_lock configurations
-> to simulate other architectures.
+> > On Fri, Apr 05 2024 at 15:31, Jacob Pan wrote:  
+> > > diff --git a/arch/x86/include/asm/irq_vectors.h
+> > > b/arch/x86/include/asm/irq_vectors.h index d18bfb238f66..1ee00be8218d
+> > > 100644 --- a/arch/x86/include/asm/irq_vectors.h
+> > > +++ b/arch/x86/include/asm/irq_vectors.h
+> > > @@ -97,9 +97,16 @@
+> > >  
+> > >  #define LOCAL_TIMER_VECTOR		0xec
+> > >  
+> > > +/*
+> > > + * Posted interrupt notification vector for all device MSIs delivered
+> > > to
+> > > + * the host kernel.
+> > > + */
+> > > +#define POSTED_MSI_NOTIFICATION_VECTOR	0xeb
+> > >  #define NR_VECTORS			 256
+> > >  
+> > > -#ifdef CONFIG_X86_LOCAL_APIC
+> > > +#ifdef CONFIG_X86_POSTED_MSI
+> > > +#define FIRST_SYSTEM_VECTOR
+> > > POSTED_MSI_NOTIFICATION_VECTOR +#elif defined(CONFIG_X86_LOCAL_APIC)
+> > >  #define FIRST_SYSTEM_VECTOR		LOCAL_TIMER_VECTOR
+> > >  #else
+> > >  #define FIRST_SYSTEM_VECTOR		NR_VECTORS    
+> > 
+> > This is horrible and we had attempts before to make the system vector
+> > space dense. They all did not work and making an exception for this is
+> > not what we want.
+> > 
+> > If we really care then we do it proper for _all_ of them. Something like
+> > the uncompiled below. There is certainly a smarter way to do the build
+> > thing, but my kbuild foo is rusty.  
+> I too had the concern of the wasting system vectors, but did not know how
+> to fix it. But now your code below works well. Tested without KVM in
+> .config to show the gaps:
 > 
->  Config 1: tdp_mmu=Y fast_page_fault_read_lock=N eager_page_split=Y
->  Config 2: tdp_mmu=Y fast_page_fault_read_lock=Y eager_page_split=Y
->  Config 3: tdp_mmu=N fast_page_fault_read_lock=N eager_page_split=N
+> In VECTOR IRQ domain.
 > 
-> Note: "fast_page_fault_read_lock" is a non-upstream parameter I added to
-> add a read_lock/unlock() in fast_page_fault().
+> BEFORE:
+> System: 46: 0-31,50,235-236,244,246-255
 > 
-> Config 1 is vanilla KVM/x86. Config 2 emulates KVM/arm64. Config 3 emulates
-> LoongArch if LoongArch added support for lockless write-protection fault
-> handling.
+> AFTER:
+> System: 46: 0-31,50,241-242,245-255
 > 
-> The test I ran was a Live Migration of a 16VCPU 64GB VM running an aggressive
-> write-heavy workload. To compare runs I evaluated 3 metrics:
+> The only gap is MANAGED_IRQ_SHUTDOWN_VECTOR(243), which is expected on a
+> running system.
 > 
->  * Duration of pre-copy.
->  * Amount of dirty memory going into post-copy.
->  * Total CPU usage of CLEAR_DIRTY_LOG.
+> Verified in irqvectors.s: .ascii "->MANAGED_IRQ_SHUTDOWN_VECTOR $243
 > 
-> The following table shows how each metric changed after adding my patch to drop
-> mmu_lock during CLEAR_DIRTY_LOG.
+> POSTED MSI/first system vector moved up from 235 to 241 for this case.
 > 
->           | Precopy Duration | Post-Copy Dirty | CLEAR_DIRTY_LOG CPU
->  ---------|------------------|-----------------|---------------------
->  Config 1 | -1%              | -1%             | +6%
->  Config 2 | -1%              | +1%             | +123%
->  Config 3 | +32%             | +158%           | +5200%
+> Will try to let tools/arch/x86/include/asm/irq_vectors.h also use it
+> instead of manually copy over each time. Any suggestions greatly
+> appreciated.
 > 
-> Config 2 and 3 both show regressions, with Config 3 severely regressed in all 3
-> dimensions.
+On a second thought, if we make system IRQ vector determined at compile
+time based on different CONFIG options, will it break userspace tools such
+as perf? More importantly the rule of not breaking userspace.
 
-...
++Arnaldo
 
-> If this is all true, then a better / more targeted fix for this issue would be
-> to drop mmu_lock in the TDP MMU eager page splitting path. For example, we
-> could limit the "allocate under lock" behavior to only when the read-lock is
-> held, e.g.
+> > ---
+> > --- a/arch/x86/Makefile
+> > +++ b/arch/x86/Makefile
+> > @@ -245,6 +245,7 @@ archscripts: scripts_basic
+> >  
+> >  archheaders:
+> >  	$(Q)$(MAKE) $(build)=arch/x86/entry/syscalls all
+> > +	$(Q)$(MAKE) $(build)=arch/x86/kernel/irqvectors all
+> >  
+> >  ###
+> >  # Kernel objects
+> > --- a/arch/x86/include/asm/irq_vectors.h
+> > +++ b/arch/x86/include/asm/irq_vectors.h
+> > @@ -43,59 +43,46 @@
+> >   */
+> >  #define ISA_IRQ_VECTOR(irq)		(((FIRST_EXTERNAL_VECTOR +
+> > 16) & ~15) + irq) 
+> > +#ifndef __ASSEMBLY__
+> >  /*
+> > - * Special IRQ vectors used by the SMP architecture, 0xf0-0xff
+> > - *
+> > - *  some of the following vectors are 'rare', they are merged
+> > - *  into a single vector (CALL_FUNCTION_VECTOR) to save vector space.
+> > - *  TLB, reschedule and local APIC vectors are performance-critical.
+> > + * Special IRQ vectors used by the SMP architecture, 0xff and downwards
+> >   */
+> > +enum {
+> > +	__SPURIOUS_APIC_VECTOR,
+> > +	__ERROR_APIC_VECTOR,
+> > +	__RESCHEDULE_VECTOR,
+> > +	__CALL_FUNCTION_VECTOR,
+> > +	__CALL_FUNCTION_SINGLE_VECTOR,
+> > +	__THERMAL_APIC_VECTOR,
+> > +	__THRESHOLD_APIC_VECTOR,
+> > +	__REBOOT_VECTOR,
+> > +	__X86_PLATFORM_IPI_VECTOR,
+> > +	__IRQ_WORK_VECTOR,
+> > +	__DEFERRED_ERROR_VECTOR,
+> >  
+> > -#define SPURIOUS_APIC_VECTOR		0xff
+> > -/*
+> > - * Sanity check
+> > - */
+> > -#if ((SPURIOUS_APIC_VECTOR & 0x0F) != 0x0F)
+> > -# error SPURIOUS_APIC_VECTOR definition error
+> > +#if IS_ENABLED(CONFIG_HYPERVISOR_GUEST)
+> > +	__HYPERVISOR_CALLBACK_VECTOR,
+> >  #endif
+> >  
+> > -#define ERROR_APIC_VECTOR		0xfe
+> > -#define RESCHEDULE_VECTOR		0xfd
+> > -#define CALL_FUNCTION_VECTOR		0xfc
+> > -#define CALL_FUNCTION_SINGLE_VECTOR	0xfb
+> > -#define THERMAL_APIC_VECTOR		0xfa
+> > -#define THRESHOLD_APIC_VECTOR		0xf9
+> > -#define REBOOT_VECTOR			0xf8
+> > -
+> > -/*
+> > - * Generic system vector for platform specific use
+> > - */
+> > -#define X86_PLATFORM_IPI_VECTOR		0xf7
+> > -
+> > -/*
+> > - * IRQ work vector:
+> > - */
+> > -#define IRQ_WORK_VECTOR			0xf6
+> > -
+> > -/* 0xf5 - unused, was UV_BAU_MESSAGE */
+> > -#define DEFERRED_ERROR_VECTOR		0xf4
+> > -
+> > -/* Vector on which hypervisor callbacks will be delivered */
+> > -#define HYPERVISOR_CALLBACK_VECTOR	0xf3
+> > -
+> > -/* Vector for KVM to deliver posted interrupt IPI */
+> > -#define POSTED_INTR_VECTOR		0xf2
+> > -#define POSTED_INTR_WAKEUP_VECTOR	0xf1
+> > -#define POSTED_INTR_NESTED_VECTOR	0xf0
+> > -
+> > -#define MANAGED_IRQ_SHUTDOWN_VECTOR	0xef
+> > +#if IS_ENABLED(CONFIG_KVM)
+> > +	/* Vector for KVM to deliver posted interrupt IPI */
+> > +	__POSTED_INTR_VECTOR,
+> > +	__POSTED_INTR_WAKEUP_VECTOR,
+> > +	__POSTED_INTR_NESTED_VECTOR,
+> > +#endif
+> > +	__MANAGED_IRQ_SHUTDOWN_VECTOR,
+> >  
+> >  #if IS_ENABLED(CONFIG_HYPERV)
+> > -#define HYPERV_REENLIGHTENMENT_VECTOR	0xee
+> > -#define HYPERV_STIMER0_VECTOR		0xed
+> > +	__HYPERV_REENLIGHTENMENT_VECTOR,
+> > +	__HYPERV_STIMER0_VECTOR,
+> >  #endif
+> > +	__LOCAL_TIMER_VECTOR,
+> > +};
+> > +#endif /* !__ASSEMBLY__ */
+> >  
+> > -#define LOCAL_TIMER_VECTOR		0xec
+> > +#ifndef COMPILE_OFFSETS
+> > +#include <asm/irqvectors.h>
+> > +#endif
+> >  
+> >  #define NR_VECTORS			 256
+> >  
+> > --- /dev/null
+> > +++ b/arch/x86/kernel/irqvectors/Makefile
+> > @@ -0,0 +1,11 @@
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +
+> > +irqvectors-file	:=
+> > arch/$(SRCARCH)/include/generated/asm/irqvectors.h +targets 	+=
+> > arch/$(SRCARCH)/kernel/irqvectors/irqvectors.s +
+> > +$(irqvectors-file): arch/$(SRCARCH)/kernel/irqvectors/irqvectors.s
+> > FORCE
+> > +	$(call filechk,offsets,__ASM_IRQVECTORS_H__)
+> > +
+> > +PHONY += all
+> > +all: $(irqvectors-file)
+> > +	@:
+> > --- /dev/null
+> > +++ b/arch/x86/kernel/irqvectors/irqvectors.c
+> > @@ -0,0 +1,42 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +#define COMPILE_OFFSETS
+> > +
+> > +#include <linux/kbuild.h>
+> > +#include <asm/irq_vectors.h>
+> > +
+> > +#define VECNR(v)	(0xFF - __##v)
+> > +#define VECTOR(v)	DEFINE(v, VECNR(v))
+> > +
+> > +static void __used common(void)
+> > +{
+> > +	VECTOR(SPURIOUS_APIC_VECTOR);
+> > +	VECTOR(ERROR_APIC_VECTOR);
+> > +	VECTOR(RESCHEDULE_VECTOR);
+> > +	VECTOR(CALL_FUNCTION_VECTOR);
+> > +	VECTOR(CALL_FUNCTION_SINGLE_VECTOR);
+> > +	VECTOR(THERMAL_APIC_VECTOR);
+> > +	VECTOR(THRESHOLD_APIC_VECTOR);
+> > +	VECTOR(REBOOT_VECTOR);
+> > +	VECTOR(X86_PLATFORM_IPI_VECTOR);
+> > +	VECTOR(IRQ_WORK_VECTOR);
+> > +	VECTOR(DEFERRED_ERROR_VECTOR);
+> > +
+> > +#if IS_ENABLED(CONFIG_HYPERVISOR_GUEST)
+> > +	VECTOR(HYPERVISOR_CALLBACK_VECTOR);
+> > +#endif
+> > +
+> > +#if IS_ENABLED(CONFIG_KVM)
+> > +	/* Vector for KVM to deliver posted interrupt IPI */
+> > +	VECTOR(POSTED_INTR_VECTOR);
+> > +	VECTOR(POSTED_INTR_WAKEUP_VECTOR);
+> > +	VECTOR(POSTED_INTR_NESTED_VECTOR);
+> > +#endif
+> > +	VECTOR(MANAGED_IRQ_SHUTDOWN_VECTOR);
+> > +
+> > +#if IS_ENABLED(CONFIG_HYPERV)
+> > +	VECTOR(HYPERV_REENLIGHTENMENT_VECTOR);
+> > +	VECTOR(HYPERV_STIMER0_VECTOR);
+> > +#endif
+> > +	VECTOR(LOCAL_TIMER_VECTOR);
+> > +}
+> > +
+> > 
+> > 
+> >   
 > 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7dfdc49a6ade..ea34f8232d97 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1472,9 +1472,11 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
->          * If this allocation fails we drop the lock and retry with reclaim
->          * allowed.
->          */
-> -       sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT, nid);
-> -       if (sp)
-> -               return sp;
-> +       if (shared) {
-> +               sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT, nid);
-> +               if (sp)
-> +                       return sp;
-> +       }
 > 
->         rcu_read_unlock();
+> Thanks,
 > 
-> I checked the KVM/arm64 eager page splitting code, and it drops the mmu_lock to
-> allocate page tables. So I suspect no fix is needed there and this is, in fact,
-> purely and x86-specific issue.
+> Jacob
 
-Hmm, it'd be nice if we didn't have to rely on random arch flows to coincidentally
-do the optimal thing for eager page splitting.  Not sure how best to document the
-"best known practice" though.
 
-As for the TDP MMU code, unless the cost of dropping and reacquiring mmu_lock for
-read is measurable, I would prefer to unconditionally drop mmu_lock, and delete
-the GFP_NOWAIT allocation.  There can be lock contention when mmu_lock is held
-for read, it's just less common.
+Thanks,
 
-On a related topic, I think we should take a hard look at the rwlock_needbreak()
-usage in tdp_mmu_iter_cond_resched().  Because dropping when allocating is really
-just speculatively dropping mmu_lock because it _might_ be contended, but doing
-so at a batch size that provides a good balance between doing enough work under
-mmu_lock and providing low latency for vCPUs.  I.e. in theory, we should be able
-to handle this fully in tdp_mmu_iter_cond_resched(), but that code is nowhere
-near smart enough and it's currently only for preemptible kernels (or at least,
-it's supposed to be only for preemptible kernels).
-
-Simply yielding on contention is not at all optimal, as evidenced by the whole
-dynamic preemption debacle[1][2].  The immediate issue was "fixed" by having vCPUs
-avoid taking mmu_lock, but KVM really shouldn't get into a situation where KVM is
-pathologically dropping mmu_lock to the point where a non-vCPU action grinds to
-a halt.
-
-The contention logic fails to take into account many things:
-
- (1) Is the other task higher priority?
-
- (2) Is the other task a vCPU, or something else?
-
- (3) Will yielding actually allow the other task to make forward progress?
-
- (4) What is the cost of dropping mmu_lock, e.g. is a remote TLB flush needed?
-
- (5) What is the expected duration this task is expected to hold mmu_lock?
-
- (6) Has this task made enough progress for yielding to be a decent choice?
-
-and probably many more than that.
-
-As we discussed off-list, I think there are two viable approaches:
-
- (a) We drop the preemption dependency from tdp_mmu_iter_cond_resched()'s lock
-     contention logic, and improve the logic (especially the forward progress
-     guarantees) so that tdp_mmu_iter_cond_resched() provides solid performance
-     in all cases.
-
- (b) We completely remove the rwlock_needbreak() checks from
-     tdp_mmu_iter_cond_resched(), and instead rely on unconditionally dropping
-     mmu_lock in flows where doing so provides the best overall balance, e.g. as
-     in the eager page split case.
-
-I don't have a strong preference between (a) and (b), though I think I'd lean
-towards (b), because it's simpler.  My guess is that we can achieve similar
-performance results with both.  E.g. odds are decent that the "best" batch size
-(see #6) is large enough that the cost of dropping and reacquiring mmu_lock is
-in the noise when it's not contented.
-
-The main argument I see for (b) is that it's simpler, as only code that actually
-has a justified need to drop mmu_lock does so.  The advantage I see with (a) is
-that it would provide structure and documentation for choosing when to drop
-mmu_lock (or not).
-
-E.g. dropping in the eager page split path makes sense because KVM does so at a
-large batch size, odds are good that the contending task is a vCPU, there's no
-TLB flush required, the total hold time of mmu_lock is high, and we know that
-dropping mmu_lock will allow vCPUs to make forward progress.  (a) would do a much
-better job of capturing all that in code, albeit with quite a bit more complexity.
-
-Regardless of which option we choose, I think we should drop the preemptible kernel
-dependency from the lock contention logic in tdp_mmu_iter_cond_resched(), i.e.
-manually check if mmu_lock is contented instead of bouncing through rwlock_needbreak().
-
-The current approach essentially means that there's zero testing of the performance
-of the yield-on-contention logic.  E.g. the complaints about the TDP MMU yielding
-too aggressively only popped up when commit c597bfddc9e9 ("sched: Provide Kconfig
-support for default dynamic preempt mode") unintentionally enabled
-rwlock_needbreak() by default.
-
-That's definitely easier said then done though, as I suspect that if we switched
-to rwlock_is_contended(), i.e. dropped the preemptible requirement, without also
-enhancing tdp_mmu_iter_cond_resched() to make it smarter as above, we'd see a lot
-of performance regressions.
-
-[1] https://lore.kernel.org/all/20240312193911.1796717-3-seanjc@google.com
-[2] https://lore.kernel.org/all/20240222012640.2820927-1-seanjc@google.com
+Jacob
 
