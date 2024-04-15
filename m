@@ -1,175 +1,157 @@
-Return-Path: <kvm+bounces-14615-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14607-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E58C8A4755
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 05:53:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67D328A4670
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 03:07:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B86A128344F
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 03:53:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB3C61F215E7
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 01:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 930461CF8F;
-	Mon, 15 Apr 2024 03:53:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81157C8E1;
+	Mon, 15 Apr 2024 01:07:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TkkCWgG9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GFYRa/iS"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE21D1C11
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 03:53:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB44134AC;
+	Mon, 15 Apr 2024 01:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713153182; cv=none; b=J5zIug9hHq6Br0gGqcM0dB+o44YxxFG2PaOE7IfjEEwsVW9pz6nRqli+wqGn3BjOtfBUFy8r17/w1whNju32OzFBdsnklWQsgBYQ64ZYNHGtsen5ZDbKVCvdhG+bVrzX95vEcEn9cLQhKG1Ae2k2bCWPPZEB1LEWdWWsVGOJ8RY=
+	t=1713143225; cv=none; b=ruw7+UFLXt97caJ2Ppdtcfqi1IBJNg6lZNgZ7Uv3TKyjw5/BZY4RR8flFT9iGJW01xPQ1JvgAmh+iJ0/d0XQ1v0XKRthalfe2UMoTV09YofybYlJ+u3p/3g/ZW5qdb7BeeUw9j3robRCobFWKl4IOeE6pf4va8JfDgXwCAqyaUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713153182; c=relaxed/simple;
-	bh=ergepOHk2Up2F+K2BlRT3j6+Mi33g2JFoZO9J6zxBhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PiniUIlpfnPqTxNJbVinN9KFI1kyiVPlI1OORv7vGtpgtYfWCySj/+cKuuPjrdsY+XPNHUNZjBh26vW5Q+vMgJKHWtHEznrtlmYPHQ/x1WbwExSY7N48SlQ8AACzMC/zlYIY85dEFiYF4M9e2/lpdrrK1l7Z6eXrUa6kBU7yWxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TkkCWgG9; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 12 Apr 2024 03:54:12 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713153178;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Sp9uhHvSslbHFr0rV64RPlTRaApRy5n5koOI6A6IDog=;
-	b=TkkCWgG9peqecfy6NrOEHHcavSOBgxVDo+CQStt76qokqk/hP9jC0Xj9e9xA4CwZmdARvO
-	4Hx0GSDLANCphBT9s8H5rv4I4lEvb7/2ajvk2a2hZxNbPH7itzOmmKZYMtVJAiBYpNlrEe
-	Lk4bTeCdzAHLMFKQVUi9QJNdB8BRwws=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [v2] Support for Arm CCA VMs on Linux
-Message-ID: <Zhgx1IDhEYo27OAR@vm3>
-References: <20240412084056.1733704-1-steven.price@arm.com>
+	s=arc-20240116; t=1713143225; c=relaxed/simple;
+	bh=bJNrSYB09b8z+tlGP3CjyvyKkpqB54wXqUvtpor+eRE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fab8r3aG2oSSAJNCT0ky10E/O+a4dondcvHcydSHrwitMVgeRbFRzkW/GAgRn/XkJeJhSXHew17yayLigW86QRFQbuBA1HaeraLe1/JprXcRcyC4VhJC7nkPZwyjRLZh2A8kBVBEsz9C4SA+QWwxTx1YTQn01LFWF85t/0qgmjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GFYRa/iS; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713143224; x=1744679224;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=bJNrSYB09b8z+tlGP3CjyvyKkpqB54wXqUvtpor+eRE=;
+  b=GFYRa/iSvrEJJg30AqDw5/TmoiR/fnClp2y8GRbBgtOHLi1JdFVYc5Nv
+   84dcOsaF0OLl9s5BNOLaXJo2xMG3btIrndExF8BGxzo2scsxotdaRDjLk
+   DvlLEVziLm4KdghgoixEoqeGBgc+nsO1Fi4vY0H3Musam8u9ZhwpnufIP
+   m91aNThm7INy4KqVAsNJWzl6ihyG06L/aUT+ohnrAyeCEyn3dvpD9w5+R
+   ZQKat0nqYqR+cffP0Y/hdIcn9gHgmWF1gIDguHjAApYxN2lXdU9KwvJex
+   K342M90ge53BBVuUAiaNjcWd0NTBboSAltc2UKAXSVlHdMmSY1e6kGuHB
+   w==;
+X-CSE-ConnectionGUID: eS5frwSiTtO5yb7eqme1YQ==
+X-CSE-MsgGUID: 0M0U979cSeOD7ZSQkpwVug==
+X-IronPort-AV: E=McAfee;i="6600,9927,11044"; a="12294494"
+X-IronPort-AV: E=Sophos;i="6.07,202,1708416000"; 
+   d="scan'208";a="12294494"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2024 18:07:03 -0700
+X-CSE-ConnectionGUID: B260IZR8SfOOnFPYEYIjdA==
+X-CSE-MsgGUID: u+xe5U4QTd+frt1uiy8XBg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,202,1708416000"; 
+   d="scan'208";a="22333842"
+Received: from xiongzha-mobl1.ccr.corp.intel.com (HELO [10.124.244.162]) ([10.124.244.162])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2024 18:06:59 -0700
+Message-ID: <9469faf7-1659-4436-848f-53ec01d967f2@linux.intel.com>
+Date: Mon, 15 Apr 2024 09:06:44 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412084056.1733704-1-steven.price@arm.com>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 00/41] KVM: x86/pmu: Introduce passthrough vPM
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
+ kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+ <ZhgX6BStTh05OfEd@google.com>
+ <f6f714ef-eb58-4aa9-9c4d-12bfe29c383b@linux.intel.com>
+ <Zhl-JFk5hw-hlyGi@google.com>
+Content-Language: en-US
+From: "Zhang, Xiong Y" <xiong.y.zhang@linux.intel.com>
+In-Reply-To: <Zhl-JFk5hw-hlyGi@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Steven,
 
-On Fri, Apr 12, 2024 at 09:40:56AM +0100, Steven Price wrote:
-> We are happy to announce the second version of the Arm Confidential
-> Compute Architecture (CCA) support for the Linux stack. The intention is
-> to seek early feedback in the following areas:
->  * KVM integration of the Arm CCA;
->  * KVM UABI for managing the Realms, seeking to generalise the
->    operations where possible with other Confidential Compute solutions;
->  * Linux Guest support for Realms.
-> 
-> See the previous RFC[1] for a more detailed overview of Arm's CCA
-> solution, or visible the Arm CCA Landing page[2].
-> 
-> This series is based on the final RMM v1.0 (EAC5) specification[3].
 
-It's great to see the updated "V2" series. Since you said you like
-"early" feedback on V2, does that mean it's likely to be followed by
-V3 and V4, anticipating large code-base changes from the current form
-(V2)? Do you have a rough timeframe to make this Arm CCA support landed
-in mainline? Do you Arm folk expect this is going to be a multiple-year 
-long project? 
+On 4/13/2024 2:32 AM, Sean Christopherson wrote:
+> On Fri, Apr 12, 2024, Xiong Y Zhang wrote:
+>>>> 2. NMI watchdog
+>>>>    the perf event for NMI watchdog is a system wide cpu pinned event, it
+>>>>    will be stopped also during vm running, but it doesn't have
+>>>>    attr.exclude_guest=1, we add it in this RFC. But this still means NMI
+>>>>    watchdog loses function during VM running.
+>>>>
+>>>>    Two candidates exist for replacing perf event of NMI watchdog:
+>>>>    a. Buddy hardlock detector[3] may be not reliable to replace perf event.
+>>>>    b. HPET-based hardlock detector [4] isn't in the upstream kernel.
+>>>
+>>> I think the simplest solution is to allow mediated PMU usage if and only if
+>>> the NMI watchdog is disabled.  Then whether or not the host replaces the NMI
+>>> watchdog with something else becomes an orthogonal discussion, i.e. not KVM's
+>>> problem to solve.
+>> Make sense. KVM should not affect host high priority work.
+>> NMI watchdog is a client of perf and is a system wide perf event, perf can't
+>> distinguish a system wide perf event is NMI watchdog or others, so how about
+>> we extend this suggestion to all the system wide perf events ?  mediated PMU
+>> is only allowed when all system wide perf events are disabled or non-exist at
+>> vm creation.
+> 
+> What other kernel-driven system wide perf events are there?
+does "kernel-driven" mean perf events created through perf_event_create_kernel_counter() like nmi_watchdog and kvm perf events ?
+User can create system wide perf event through "perf record -e {} -a" also, I call it as user-driven system wide perf events.
+Perf subsystem doesn't distinguish "kernel-driven" and "user-driven" system wide perf events.
+> 
+>> but NMI watchdog is usually enabled, this will limit mediated PMU usage.
+> 
+> I don't think it is at all unreasonable to require users that want optimal PMU
+> virtualization to adjust their environment.  And we can and should document the
+> tradeoffs and alternatives, e.g. so that users that want better PMU results don't
+> need to re-discover all the "gotchas" on their own.
+> 
+> This would even be one of the rare times where I would be ok with a dmesg log.
+> E.g. if KVM is loaded with enable_mediated_pmu=true, but there are system wide
+> perf events, pr_warn() to explain the conflict and direct the user at documentation
+> explaining how to make their system compatible with mediate PMU usage.> 
+>>>> 3. Dedicated kvm_pmi_vector
+>>>>    In emulated vPMU, host PMI handler notify KVM to inject a virtual
+>>>>    PMI into guest when physical PMI belongs to guest counter. If the
+>>>>    same mechanism is used in passthrough vPMU and PMI skid exists
+>>>>    which cause physical PMI belonging to guest happens after VM-exit,
+>>>>    then the host PMI handler couldn't identify this PMI belongs to
+>>>>    host or guest.
+>>>>    So this RFC uses a dedicated kvm_pmi_vector, PMI belonging to guest
+>>>>    has this vector only. The PMI belonging to host still has an NMI
+>>>>    vector.
+>>>>
+>>>>    Without considering PMI skid especially for AMD, the host NMI vector
+>>>>    could be used for guest PMI also, this method is simpler and doesn't
+>>>
+>>> I don't see how multiplexing NMIs between guest and host is simpler.  At best,
+>>> the complexity is a wash, just in different locations, and I highly doubt it's
+>>> a wash.  AFAIK, there is no way to precisely know that an NMI came in via the
+>>> LVTPC.
+>> when kvm_intel.pt_mode=PT_MODE_HOST_GUEST, guest PT's PMI is a multiplexing
+>> NMI between guest and host, we could extend guest PT's PMI framework to
+>> mediated PMU. so I think this is simpler.
+> 
+> Heh, what do you mean by "this"?  Using a dedicated IRQ vector, or extending the
+> PT framework of multiplexing NMI?
+here "this" means "extending the PT framework of multiplexing NMI".
 
-Thanks,
-Itaru.
-
+thanks
 > 
-> Quick-start guide
-> =================
-> 
-> The easiest way of getting started with the stack is by using
-> Shrinkwrap[4]. Currently Shrinkwrap has a configuration for the initial
-> v1.0-EAC5 release[5], so the following overlay needs to be applied to
-> the standard 'cca-3world.yaml' file. Note that the 'rmm' component needs
-> updating to 'main' because there are fixes that are needed and are not
-> yet in a tagged release. The following will create an overlay file and
-> build a working environment:
-> 
-> cat<<EOT >cca-v2.yaml
-> build:
->   linux:
->     repo:
->       revision: cca-full/v2
->   kvmtool:
->     repo:
->       kvmtool:
->         revision: cca/v2
->   rmm:
->     repo:
->       revision: main
->   kvm-unit-tests:
->     repo:
->       revision: cca/v2
-> EOT
-> 
-> shrinkwrap build cca-3world.yaml --overlay buildroot.yaml --btvar GUEST_ROOTFS='${artifact:BUILDROOT}' --overlay cca-v2.yaml
-> 
-> You will then want to modify the 'guest-disk.img' to include the files
-> necessary for the realm guest (see the documentation in cca-3world.yaml
-> for details of other options):
-> 
->   cd ~/.shrinkwrap/package/cca-3world
->   /sbin/e2fsck -fp rootfs.ext2 
->   /sbin/resize2fs rootfs.ext2 256M
->   mkdir mnt
->   sudo mount rootfs.ext2 mnt/
->   sudo mkdir mnt/cca
->   sudo cp guest-disk.img KVMTOOL_EFI.fd lkvm Image mnt/cca/
->   sudo umount mnt 
->   rmdir mnt/
-> 
-> Finally you can run the FVP with the host:
-> 
->   shrinkwrap run cca-3world.yaml --rtvar ROOTFS=$HOME/.shrinkwrap/package/cca-3world/rootfs.ext2
-> 
-> And once the host kernel has booted, login (user name 'root') and start
-> a realm guest:
-> 
->   cd /cca
->   ./lkvm run --realm --restricted_mem -c 2 -m 256 -k Image -p earlycon
-> 
-> Be patient and you should end up in a realm guest with the host's
-> filesystem mounted via p9.
-> 
-> It's also possible to use EFI within the realm guest, again see
-> cca-3world.yaml within Shrinkwrap for more details.
-> 
-> An branch of kvm-unit-tests including realm-specific tests is provided
-> here:
->   https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca/-/tree/cca/v2
-> 
-> [1] Previous RFC
->     https://lore.kernel.org/r/20230127112248.136810-1-suzuki.poulose%40arm.com
-> [2] Arm CCA Landing page (See Key Resources section for various documentation)
->     https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
-> [3] RMM v1.0-EAC5 specification
->     https://developer.arm.com/documentation/den0137/1-0eac5/
-> [4] Shrinkwrap
->     https://git.gitlab.arm.com/tooling/shrinkwrap
-> [5] Linux support for Arm CCA RMM v1.0-EAC5
->     https://lore.kernel.org/r/fb259449-026e-4083-a02b-f8a4ebea1f87%40arm.com
 
