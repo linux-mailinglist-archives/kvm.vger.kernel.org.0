@@ -1,230 +1,278 @@
-Return-Path: <kvm+bounces-14651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E1948A5149
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 15:28:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F988A5160
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 15:31:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 416631C222B3
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 13:28:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B57CB1C22540
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 13:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76EC83CAE;
-	Mon, 15 Apr 2024 13:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2AC1272A0;
+	Mon, 15 Apr 2024 13:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="zV/rFKzK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="muX5TlCA";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="zV/rFKzK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="muX5TlCA"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jaLialeB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0F2482D83
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 13:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713187266; cv=none; b=qy+LUW3j/Xfy3ZeCqvKMrX/uKXBvGM/QzYRD7uBG4n+0Y2jFgXtO9VvvqHtO/VJGdSZvdkVQjfhVASjuHfaInZlavEJj126+jqgK+lK/jhWYHJdez2H6LUGeHl5j6opkNKz0/AJwGsiM0UVhPYXhsjTqLSUHcCaDYYuomAjCErs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713187266; c=relaxed/simple;
-	bh=L14h34vj6AwTt1U2c4GcaYeibX/CB8tiJDY4fXFV2mA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fwXDPnPSVp1Ta9w5i7LaTBM8i3Qk3CEIltdh+VJOCj5Syaet+3NQkop2ANgQ6Q6WtJzh/uSOnSqK6RiDAyHMaYjv7FP4fZMKdc/knMlNGh7zBkk/rCMEBzG6XO9T6fk57BI6ok25REPttU7wjzyZ2SdtQPMN1lhjCPiSxZ5z9r4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=zV/rFKzK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=muX5TlCA; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=zV/rFKzK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=muX5TlCA; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0E26D3714D;
-	Mon, 15 Apr 2024 13:21:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1713187261; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jbL/JQHRpYSzVDpW2Lq4kFFAf3KTfAhArEGln1WHf+4=;
-	b=zV/rFKzKhvPAGbpJtreTUddCfM/h4FSMnN7iEdAQKFn+ZK4jqr9gYtdrUowMVxOvzERiAC
-	UsNmu2CqWvShRI1dCAQYOhsOKqfkwVfpjgnIXGaEc7z2sieSwDWFUHTcPvcjYImjzrtMPk
-	Qpv7s6P4Hoz+i+9AWX6J2+0Rd45wcu0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1713187261;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jbL/JQHRpYSzVDpW2Lq4kFFAf3KTfAhArEGln1WHf+4=;
-	b=muX5TlCA7RmLcU7WSFpFgmNAUjtm8Q9NLa/E/r0LRqdL0N0d+axgGLommxo26hqdoU0yzr
-	cclK2Wmk0FdIL4Ag==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="zV/rFKzK";
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=muX5TlCA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1713187261; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jbL/JQHRpYSzVDpW2Lq4kFFAf3KTfAhArEGln1WHf+4=;
-	b=zV/rFKzKhvPAGbpJtreTUddCfM/h4FSMnN7iEdAQKFn+ZK4jqr9gYtdrUowMVxOvzERiAC
-	UsNmu2CqWvShRI1dCAQYOhsOKqfkwVfpjgnIXGaEc7z2sieSwDWFUHTcPvcjYImjzrtMPk
-	Qpv7s6P4Hoz+i+9AWX6J2+0Rd45wcu0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1713187261;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jbL/JQHRpYSzVDpW2Lq4kFFAf3KTfAhArEGln1WHf+4=;
-	b=muX5TlCA7RmLcU7WSFpFgmNAUjtm8Q9NLa/E/r0LRqdL0N0d+axgGLommxo26hqdoU0yzr
-	cclK2Wmk0FdIL4Ag==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EE5811368B;
-	Mon, 15 Apr 2024 13:21:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 4Em+ObwpHWb5EAAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Mon, 15 Apr 2024 13:21:00 +0000
-Message-ID: <80712080-c0b6-433b-b991-e025bce69d21@suse.cz>
-Date: Mon, 15 Apr 2024 15:21:00 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 011F285C46;
+	Mon, 15 Apr 2024 13:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713187323; cv=fail; b=lHBcVO20wUKg4t2QdoaFRY2uCYxO4oD9bMM7Di1fB2jF2hZqjOwdJjl+AXKfv2RYsly0JyGkIsetK/IiLiUr3DRQMiuWYrEUMn6PuS+5LMRBFml8JoDrpszebM1zklkydS7Qi1KRxav5IZsMcMVNQolAOOeTKsa5bbJ4FDCyEuM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713187323; c=relaxed/simple;
+	bh=O/MnUPgAvzUvRqj5cebPKyRPlbPoitLPAxGevIXesb0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ATYrkUWvsoXsW7WymuSsdqR4SmPfhGjmMN6v+ZhctO780uC8IJhEZhP+MAhRbanQDE/JgmqHlczjMfHOQTg9neTJSjl4a5xTDh0jSACkQ34QU9+vOFdPZhOxz9QCZkb3xBII8gFB4sNoRI9EAJN5dAG4yU01+5jyEy/4E/SUmxE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jaLialeB; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713187321; x=1744723321;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=O/MnUPgAvzUvRqj5cebPKyRPlbPoitLPAxGevIXesb0=;
+  b=jaLialeBzCRdAqZjZ1vGkm7yIFJKPjRwA85DJbykHbLTtRp5+SAZqlWB
+   qfpuS/l+017/iJ8irKf3fILe+A5k8a2qubctHiHg1mikNn6/P18uC8eYY
+   bGXAtgZB2dOWMOy3yll4nw19MY2fstbNI6MAHe/vBbeI+N6/pjzVSdrdu
+   cZ5ncFoiotZwfU4HBgP8JblScpenPcPHBvghMcJjo/p+Lbi4/usi5VsC3
+   G4rOhQZWMnfZs0mso4ordwFRPqp7qCd+1iMX8kho52bfNHSzhy5dH93WW
+   gSM15eUvdhUcuABaB+ISmQ5kDarPaX3rdR9MYniepiSsWtBSCEsbUyZ0K
+   w==;
+X-CSE-ConnectionGUID: OqQMTA5jQfyO/ZP9nX214w==
+X-CSE-MsgGUID: pXLsfvDJSV+BHhD/xOY/sA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11044"; a="19724771"
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="19724771"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 06:22:00 -0700
+X-CSE-ConnectionGUID: 6w2oyz1+QVKS8LjMiLoZow==
+X-CSE-MsgGUID: +DsG19R0RouZa61R314FgQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="26334747"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Apr 2024 06:22:00 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Apr 2024 06:21:59 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Apr 2024 06:21:58 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 15 Apr 2024 06:21:58 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 15 Apr 2024 06:21:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Eb2GzfCGWHW+QKkt17EnQT8d+owSu7tzMZ35MP89p701O89CHlyR9VM645pH3nUl+BUdceejFXwikvxEyIfrp49kq2SSKo0hSnlT66Fnwd0C0QlxxNG6fx/QLjpqASn7YEt0ElGKGwDMBR0HOCqO9ip9UaflxItVm2+ILwA/cNJjkMvNK4hxrmOZsvzdZuRp42InvKiKpYckNBJBZVwHqao9cZ0/twWv83RDPXvIvx1YEB61d/43Al5Y/iNx9QRvCpfoW4Fzh8oF/j+3nNf3H+6nusqE3htQPOvw5JOJhf/pHMFqHIUUm+7J9WR4F2++nwmW2RwoEtKea7m4DGBX5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zct7Yv8RIHFsx8KcET64d/xGeL1NBrb5RumHusn5+6o=;
+ b=OOlqqXwWWPccb8ATuWLobsxMukK3mn8LeyUheWGtvsaIY8BCzWULinJn52t/Ck/dMAJ/ItZ0uCeRjBQ7wjLw2TM9rxEbU6UdiLtqwe+TaB5336VQ7Dia6+RWdBhVuiQpS4uQpz8pE2/7kXWUw/h33pLp2tyrYHBTJN839XQaYwW5jYc0on2ZWMQyyjJrcb/KI7eqnJm9fNBEtaEP4YtnAhiuSWlRcF6pQ5mRFiLYdbJ6vgroqodwOyR39EHCQcAEB4WOIaxN894qXbH/nacxi8xhd4yiyOYO/EutEHbtB3DTtQdgd+TyL16iGMIOBaZjEcBcjABRKzvA7LPK0IaTMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by DM4PR11MB6017.namprd11.prod.outlook.com (2603:10b6:8:5c::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.26; Mon, 15 Apr
+ 2024 13:21:56 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7452.041; Mon, 15 Apr 2024
+ 13:21:51 +0000
+Date: Mon, 15 Apr 2024 21:21:44 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Isaku Yamahata
+	<isaku.yamahata@intel.com>
+Subject: Re: [PATCH 07/10] KVM: VMX: Introduce test mode related to EPT
+ violation VE
+Message-ID: <Zh0p6Jz5eKBBmWci@chao-email>
+References: <20240412173532.3481264-1-pbonzini@redhat.com>
+ <20240412173532.3481264-8-pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240412173532.3481264-8-pbonzini@redhat.com>
+X-ClientProxiedBy: SI2PR01CA0036.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:192::22) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH gmem 5/6] KVM: guest_memfd: Use AS_INACCESSIBLE when
- creating guest_memfd inode
-Content-Language: en-US
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc: linux-coco@lists.linux.dev, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>,
- Isaku Yamahata <isaku.yamahata@linux.intel.com>,
- Xu Yilun <yilun.xu@linux.intel.com>, Binbin Wu <binbin.wu@linux.intel.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>
-References: <20240329212444.395559-1-michael.roth@amd.com>
- <20240329212444.395559-6-michael.roth@amd.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <20240329212444.395559-6-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Flag: NO
-X-Spam-Score: -4.50
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 0E26D3714D
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-4.50 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:email,amd.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|DM4PR11MB6017:EE_
+X-MS-Office365-Filtering-Correlation-Id: dadbd176-7879-4a9b-6492-08dc5d4f02dc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fJzO8zUOCvWallPD8XxLOh6vrMbUMtfA0nWtgpmKytTjNFIRDS76GfnDmYW5SOh+U3/NlSfS6NUxvnA8birrhi+btZevlcDsW4uQJk69PU3A1K2TJP4w3ci/b8W7HkWdk5PzW09KqhO1eTnhChOKam7aybeze67WpCEILjxtncy7aR7Xrn+FHyj3h3Wr7bvLJTHHpI9/JyQWkjr39kR8SH+XEXiKCpFtPwV6ceiiZt1GJtLusU2z5nbsFhgGTMti6k1iQjEvysJsDtGYhjlCnHQrSAZLNqacSQ0wbbdT5Jp/rlxS4F9dOFKYv7WWEGv6DnzqLkRuWnyjqqpTqZQ8apz4NkAgsS4RPypawazbrbMbxL15VGCLxewACEKMoBaJxplT9gyFGE8RK7ZAI/eV3P+3DyZi+6Ys9tBbcs2MnnxCBDu6a5BR1U/sgwy5qhQIk95Z8aDIIiStI7dirUscARMX0KlOBV2OVTg6BVunw5wFum+H5LVbc4kGx946NX+ir9Wbpf0/Y19QmT0FLe2YJwAtH+WSJkdMK7ispXGXsuJ/2aVJSKNAHJPH7GPMl6SWUpjINCGKxti4cTdZtph6RTw3hn0y84WhFwQisRUjuCKRXvoNaJZ/4gfijFPFFy9HAMakQASx8EaKoRyAVtSdfvq2VmFhIRVhuWoJQfEEHXQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SwoGRCEXujtNCAVfUXllDy1puYRVo+jBQTv8P8E1QDZ1L+/atZwBUBmd4HE0?=
+ =?us-ascii?Q?0CM/fserM/NPEs8RHjqvbXtiP6kNO++C2xu7QvGwCNmFk4SDlxvDIG4MLnxH?=
+ =?us-ascii?Q?CESsdqA9smNSjfpANDioYSzWFwKP4GOKNc2KS4AgJ6LoWnfspGeAJRGd/ZWt?=
+ =?us-ascii?Q?ahnCO3V7hr5+F4S+E7OoEJCa7mq8Ap52hF1/A+4mwx687A9uIvyA0Fiow1e/?=
+ =?us-ascii?Q?eyMCj1/0mu35fu2RHkYDPVd1FZVMu+JuUEN+cVh2hi76ncY/ImEnoJHDcZy2?=
+ =?us-ascii?Q?SQBjug5Q2Sp8HmDD/6MA9I/qADUuFNusKqeWp8fgyA48SMRKKkGmpXJuvDXl?=
+ =?us-ascii?Q?XQQ2H4VnDzfk6jTbuZ0q6CbPFEg8hk4J+cUlKEwW2qz1kt6wJlDzGz/q/XtN?=
+ =?us-ascii?Q?CQlZJ0TBxda/SKkR7sidJeYwQwzc4unf9m4p+4u/8fM/LSdt9smeG2m2npJ6?=
+ =?us-ascii?Q?YWj8F1klxRsmNWfFHQd3AvzxM3idcRZ02ErRAcE8HbX1WMIplwK1hxTFGnSm?=
+ =?us-ascii?Q?s2FfEq6mxhfOSwSedeFaO7zgday4mXOyQ9nsgxs0oRe02H1utqiSZWjwiWzd?=
+ =?us-ascii?Q?HcGxGT9i6C208UGJU93g1W2BVKRBiHAnDBao3/scNCyXLorR4Rohsw0/W9DA?=
+ =?us-ascii?Q?qNFL+sQtWi7llBTd2/pLK+GPaZlJuZQ0IJ45nThGYNlUpgWrAwndDtjm1pwE?=
+ =?us-ascii?Q?FzGT8OGZxM9guR0p7916XW3+M5wMcWwr4Oe4C+R62fuc26VNYcdcWot4zyvA?=
+ =?us-ascii?Q?phcFZj/rBM0qxj//iBXkt8++Oj2+/Kak8zwGWMEdDoEJsvxK8dPJ9Ja7hMJY?=
+ =?us-ascii?Q?/mtr2pZaSEsM/cp2CsegemG3pljDoP8WMzIPZvVziKyK/6Of8MPYG9Y1m2sU?=
+ =?us-ascii?Q?ZDTrHgzt/4GOn7rwkLkSLeepoplzLdyR16M+azZIU7xSliYWNrCgsUOVNgWJ?=
+ =?us-ascii?Q?/EbDD4HulObVh8ahoAihreyksnXsb+O+C4BpGIflvf0Sw53b/uBDmH6ynBRm?=
+ =?us-ascii?Q?97OkqXBv2I4WiAPHVLUZ48GMuP7Ha6q3Yzx7q4rN0/FSEcHDFqcnRUQKHTPS?=
+ =?us-ascii?Q?QA2YsCC4Thk3iJXLK0+Gk9Cp9m33asGB+C50r91xqmPQruFmuQwHJCtinBma?=
+ =?us-ascii?Q?XTfLGJ0nn11zDzoH1qA4rwbr5xCqCrWAgbRSQ1fEg9NZbHorAvdBV0rUuQ0o?=
+ =?us-ascii?Q?VyMDEDWmZO6TJPa0jzgJ5iDbNsj8UEBkuSUgnQvzgAf4R8gMrnkptuJSo6ZE?=
+ =?us-ascii?Q?n9Yv9p+bbh9A03miUiOWPzFGXxvuKjVSoVKyypsVf564uEOgDqSUL/YJuTeQ?=
+ =?us-ascii?Q?oicN2pH1QuWBGRgGbh9G7hx/e+SxLGB4QrcsgC+na6cUlpvrHGC01KEb8Nzv?=
+ =?us-ascii?Q?wtaFlNC4A4qwHvf1VGqGwyqmjOkkViIpKzrH7JY8k0LhaIbUiXdfWC6zCKlS?=
+ =?us-ascii?Q?ea/+7RyY6FkI07WidnKi+FhkIvBv6dJAMIzqFJa3GzxvSrMGHiHUB6APkPC2?=
+ =?us-ascii?Q?9F/bzDip3dgOL/6PXCyHQkeRn+VjOMWVQN/W+FUGoaPEHURcoHG5VWd1rBz7?=
+ =?us-ascii?Q?S98kmkorgs53wVPtd/7l28WPGoZZg4d7D8srS5n3?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dadbd176-7879-4a9b-6492-08dc5d4f02dc
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2024 13:21:51.5032
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Zdwlj0kOL+D84O6OA5YiG/MrOJpm7Vq/3LJiBGhedy5UYNP3MMjqeoaKeVK1lCHhmhi5anX+uNYRhqyav+ZmFQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6017
+X-OriginatorOrg: intel.com
 
-On 3/29/24 10:24 PM, Michael Roth wrote:
-> truncate_inode_pages_range() may attempt to zero pages before truncating
-> them, and this will occur before arch-specific invalidations can be
-> triggered via .invalidate_folio/.free_folio hooks via kvm_gmem_aops. For
-> AMD SEV-SNP this would result in an RMP #PF being generated by the
-> hardware, which is currently treated as fatal (and even if specifically
-> allowed for, would not result in anything other than garbage being
-> written to guest pages due to encryption). On Intel TDX this would also
-> result in undesirable behavior.
 > 
-> Set the AS_INACCESSIBLE flag to prevent the MM from attempting
-> unexpected accesses of this sort during operations like truncation.
-> 
-> This may also in some cases yield a decent performance improvement for
-> guest_memfd userspace implementations that hole-punch ranges immediately
-> after private->shared conversions via KVM_SET_MEMORY_ATTRIBUTES, since
-> the current implementation of truncate_inode_pages_range() always ends
-> up zero'ing an entire 4K range if it is backing by a 2M folio.
-> 
-> Link: https://lore.kernel.org/lkml/ZR9LYhpxTaTk6PJX@google.com/
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
+>-	if (cpu_has_secondary_exec_ctrls())
+>+	if (cpu_has_secondary_exec_ctrls()) {
+> 		secondary_exec_controls_set(vmx, vmx_secondary_exec_control(vmx));
+>+		if (secondary_exec_controls_get(vmx) &
+>+		    SECONDARY_EXEC_EPT_VIOLATION_VE) {
+>+			if (!vmx->ve_info) {
 
-Acked-by: Vlastimil Babka <vbabka@suse.cz>
+how about allocating ve_info in vmx_vcpu_create()? It is better to me because:
 
-> ---
->  virt/kvm/guest_memfd.c | 1 +
->  1 file changed, 1 insertion(+)
+a. symmetry. ve_info is free'd in vmx_vcpu_free().
+b. no need to check if this is the first call of init_vmcs(). and ENOMEM can
+be returned on allocation failure.
+
+>+				/* ve_info must be page aligned. */
+>+				struct page *page;
+>+
+>+				BUILD_BUG_ON(sizeof(*vmx->ve_info) > PAGE_SIZE);
+>+				page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+>+				if (page)
+>+					vmx->ve_info = page_to_virt(page);
+>+			}
+>+			if (vmx->ve_info) {
+>+				/*
+>+				 * Allow #VE delivery. CPU sets this field to
+>+				 * 0xFFFFFFFF on #VE delivery.  Another #VE can
+>+				 * occur only if software clears the field.
+>+				 */
+>+				vmx->ve_info->delivery = 0;
+
+Is it necessary to reset ve_info->delivery to 0 given __GFP_ZERO?
+
+>+				vmcs_write64(VE_INFORMATION_ADDRESS,
+>+					     __pa(vmx->ve_info));
+
+I think the logic here should just be:
+
+		if (secondary_exec_controls_get(vmx) & SECONDARY_EXEC_EPT_VIOLATION_VE)
+			vmcs_write64(VE_INFORMATION_ADDRESS, __pa(vmx->ve_info));
+
+>+			} else {
+>+				/*
+>+				 * Because SECONDARY_EXEC_EPT_VIOLATION_VE is
+>+				 * used only for debugging, it's okay to leave
+>+				 * it disabled.
+>+				 */
+>+				pr_err("Failed to allocate ve_info. disabling EPT_VIOLATION_VE.\n");
+>+				secondary_exec_controls_clearbit(vmx,
+>+								 SECONDARY_EXEC_EPT_VIOLATION_VE);
+>+			}
+>+		}
+>+	}
 > 
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 4ce0056d1149..3668a5f1d82b 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -428,6 +428,7 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
->  	inode->i_private = (void *)(unsigned long)flags;
->  	inode->i_op = &kvm_gmem_iops;
->  	inode->i_mapping->a_ops = &kvm_gmem_aops;
-> +	inode->i_mapping->flags |= AS_INACCESSIBLE;
->  	inode->i_mode |= S_IFREG;
->  	inode->i_size = size;
->  	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+> 	if (cpu_has_tertiary_exec_ctrls())
+> 		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
+>@@ -5200,6 +5243,12 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
+> 	if (is_invalid_opcode(intr_info))
+> 		return handle_ud(vcpu);
+> 
+>+	/*
+>+	 * #VE isn't supposed to happen.  Block the VM if it does.
+>+	 */
+>+	if (KVM_BUG_ON(is_ve_fault(intr_info), vcpu->kvm))
+>+		return -EIO;
+>+
+> 	error_code = 0;
+> 	if (intr_info & INTR_INFO_DELIVER_CODE_MASK)
+> 		error_code = vmcs_read32(VM_EXIT_INTR_ERROR_CODE);
+>@@ -7474,6 +7523,8 @@ void vmx_vcpu_free(struct kvm_vcpu *vcpu)
+> 	free_vpid(vmx->vpid);
+> 	nested_vmx_free_vcpu(vcpu);
+> 	free_loaded_vmcs(vmx->loaded_vmcs);
+>+	if (vmx->ve_info)
+>+		free_page((unsigned long)vmx->ve_info);
+> }
+> 
+> int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+>diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>index 65786dbe7d60..0da79a386825 100644
+>--- a/arch/x86/kvm/vmx/vmx.h
+>+++ b/arch/x86/kvm/vmx/vmx.h
+>@@ -362,6 +362,9 @@ struct vcpu_vmx {
+> 		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSTHROUGH_MSRS);
+> 		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
+> 	} shadow_msr_intercept;
+>+
+>+	/* ve_info must be page aligned. */
 
+this comment is not so useful. I think this should be placed above the call
+of alloc_page().
+
+>+	struct vmx_ve_information *ve_info;
+> };
+> 
+> struct kvm_vmx {
+>@@ -574,7 +577,8 @@ static inline u8 vmx_get_rvi(void)
+> 	 SECONDARY_EXEC_ENABLE_VMFUNC |					\
+> 	 SECONDARY_EXEC_BUS_LOCK_DETECTION |				\
+> 	 SECONDARY_EXEC_NOTIFY_VM_EXITING |				\
+>-	 SECONDARY_EXEC_ENCLS_EXITING)
+>+	 SECONDARY_EXEC_ENCLS_EXITING |					\
+>+	 SECONDARY_EXEC_EPT_VIOLATION_VE)
+> 
+> #define KVM_REQUIRED_VMX_TERTIARY_VM_EXEC_CONTROL 0
+> #define KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL			\
+>-- 
+>2.43.0
+>
+>
+>
 
