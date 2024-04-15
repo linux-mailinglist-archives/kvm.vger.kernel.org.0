@@ -1,136 +1,179 @@
-Return-Path: <kvm+bounces-14641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC02D8A4F01
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 14:27:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC5F08A5089
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 15:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C09F1F21F08
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 12:27:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50701B237F9
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 13:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9D16BFA3;
-	Mon, 15 Apr 2024 12:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43EF813AA3F;
+	Mon, 15 Apr 2024 12:53:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="DTEXAucD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mSPe5As7"
 X-Original-To: kvm@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38FED6BFA1;
-	Mon, 15 Apr 2024 12:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713184061; cv=none; b=ZZf02hS71KNGpaECLD+pFs2wVglmr7+bEt1R6+INcU0/OlajFcfdgBZD1bp5gBykTwQaHAN9Ba/do4wp9NlItYQWqBS55mE319EIzbE2aPniLtI7VYEG08fjZqzyQai0V0uqCLkuborvConLCO1Tlh2IISH/XHV+8rgj7eHRorE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713184061; c=relaxed/simple;
-	bh=R+1oCIb6sUcNrpF2+mQ87x0FA+lUvT43cnt4auGZ/OI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QTv1zvwwDB6pxtMM1v7eoXliNdThEZ/uIQSQDz/KbJaDKCoUsWM1mDMvlU7YpiVwXH2H2Kk+qHcIhx34+stV5y3wyJFbop/xxal6OSHi0Bi/SGHdqKlj3sL9StrMveKZEGzDvPYx1FUTn9Z8NM0WbruSpn/VkSvjSHRDuzZATyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=DTEXAucD; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1713184054;
-	bh=Kg0IaaFvkx0vPahWnl4bGsKUwrTtxLTCmAqwqLLNhTg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=DTEXAucDsJ8VGX3CWQW/+zFc9hYesJ1AQoYC/tgDzYYvxzgwWttp7PwmjONSIIknC
-	 voyIOgLBNjIKat/sXBpgag8hT7NbXvQ5zdBhhCXTp9ejd8f+3KuYJeGPDLi/dONU8Z
-	 FT19bxOAVbxsILJSynJuocMSKUA/4GeE9bGycq3LrCttC7cObYxFS6vcItJZERXO5f
-	 wQhPf3T4PcISwrjwyawazbTwIiEpXZrneAENXkD0xQvstWH1tbQLPC2c2hCn2jTvSQ
-	 xurQyggaf4ZdWOzQhAucric3Rb8cBh37xdKCtze3QQ10u78cZjw4WKZL4nys0/J1jr
-	 G1l/OvnLUYpgA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VJ5z968qgz4wcb;
-	Mon, 15 Apr 2024 22:27:33 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org, kvm-ppc@vger.kernel.org
-Cc: Vaibhav Jain <vaibhav@linux.ibm.com>, Nicholas Piggin
- <npiggin@gmail.com>, Jordan Niethe <jniethe5@gmail.com>, Vaidyanathan
- Srinivasan <svaidy@linux.vnet.ibm.com>, mikey@neuling.org,
- paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com,
- kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com,
- David.Laight@ACULAB.COM
-Subject: Re: [PATCH v2] KVM: PPC: Book3S HV nestedv2: Cancel pending DEC
- exception
-In-Reply-To: <20240415035731.103097-1-vaibhav@linux.ibm.com>
-References: <20240415035731.103097-1-vaibhav@linux.ibm.com>
-Date: Mon, 15 Apr 2024 22:27:32 +1000
-Message-ID: <8734rmdd57.fsf@mail.lhotse>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D7B6AF88;
+	Mon, 15 Apr 2024 12:53:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713185595; cv=fail; b=noG7hfqBNWm0+Q1XUUvki6/0/4xasaJwoHiEvswo9c1omMSbpNPVLHTUgfg4CDfv24+N2GriTnLgidXsPaoO/eXD9XLdyicGew8c0PKb0oIHGdratXGZzNMS6O2GsqlLEgwpPAjDOnZOGlrwQt1PefuSSxuzXsOEi24erPec37E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713185595; c=relaxed/simple;
+	bh=SOejPrh1oAcUeys+pF82fWydvPVfGi/hMf3Sx0c1YEk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Q2zHpcgpX5jonhwJMnCqpa7XsyXuXqmpQtEyZgU2cqAdwUBE/Lmbln54blcYR6GT6R2TvHVeXfOzMBZBu3Y/rx1xjnk7nMlHLt+mCDCZIwvfTGA7aA18s3UtEbJZpJdoj6/6hGtZIBfKoiVQKXeagp3nYkaWVrnO1LB8q0+Ln3s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mSPe5As7; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713185594; x=1744721594;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=SOejPrh1oAcUeys+pF82fWydvPVfGi/hMf3Sx0c1YEk=;
+  b=mSPe5As7oRycvHX6jPsdE4ObnqEPJ7R+UBxBypHnIthOBjXIaAM4q815
+   U7wZ9AnBX/em5YZcWxw+EU4xj8fz9eqbm20a5oNNuWiKi80iMKpDHW6xk
+   WFg8VHbrSSIpJwhGU7apH7FJiVDYx+hruPNI15uMvVU/qKwisgU7ywXb/
+   ChwvArdgjfVxv65vFhU8lTS+Rx6XGE70FD7XLXawAC5b0iORwQmg5mh9i
+   GoAvjvJ1bEuIpGH3mjt/55ncKB6KvxcEo2yWXxd5yv4DQ2vUwKukJAUvH
+   JjkbFZJKhHbZ3b3+MInItebMlC9gGh5lkU+yWOy4dMSfyN1+j8Yj/4xZM
+   A==;
+X-CSE-ConnectionGUID: +gcmY7osSvCoMa1x6MCuCg==
+X-CSE-MsgGUID: tyVgPQmyT9iNuH/A9XZiag==
+X-IronPort-AV: E=McAfee;i="6600,9927,11044"; a="12352266"
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="12352266"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 05:53:13 -0700
+X-CSE-ConnectionGUID: ZFpVTGmnT5OP9bz9cdNJTg==
+X-CSE-MsgGUID: H7iFZP24RlWpG38Z8zR7rw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="26537652"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Apr 2024 05:53:13 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Apr 2024 05:53:12 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 15 Apr 2024 05:53:12 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 15 Apr 2024 05:53:12 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 15 Apr 2024 05:53:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TpkXEaVKsCLRkm4cr5Ds+BZxlkft1Qjo532HjNNTd6uyIK+SQNfOLQAaOL8dk2Vfqt6JGyurlfY1AFKdZDvx6MyEBqBNtDjnjV1y+Kv6g3611KMBKpc5AQT2KCfI6nFrQKQaFsI+s37Fim5FGG38qlIek8vhO/6gaWbIQFryRsloV4UySix8jOJosG1HNOVcFVG9XOAU8VEZ9BRD7oElChwB15xdBDBvcen3HyPwsaVLTtz3CBCmlR07zuG42oPDgLpudGw/w6yaCwhpPmiM5kScl7G6injx1hvGHA/P2VvxCSmtJ/7x9k5KVorCos6XFTAh2DFrEFfkzE6KkDVx7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=twY8PSz4mBoJ7Ttf//cFiRt+sFGl5+o0XV5ecBLfuDA=;
+ b=B+l0tFy2MqeCbpAiFr1Tt5vJqtP0YW6Hlxv+qcysbJ8srSB9xg4ijnIBq9MihxK3hZW81Io1lZWi7JvPeBmovFDWCWdGezjOkVDVLScv7GMQ4wf2RxG1RMjTJft0KUvCkTyNSKHOIF/u1nNGSTFZynrgWadEEnWzJMi0LS5o8M9P5IhIGRGlN5NpuKbRNk1E/tpL3gsZe2kACXyQPfQCUg5QvNgTwNAP9DwqLJVM+F9qXrGSFF5U9mWWBL9DUvomwj1DLFo5dlIVdMzF4E1LCAS8hEzEvcWzN0J/yA9EdaDe6aVqF3Mf3S0OAzwYFAG7OeMBnXLj5ORVQ7AntWUQmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by MW4PR11MB5871.namprd11.prod.outlook.com (2603:10b6:303:188::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.30; Mon, 15 Apr
+ 2024 12:53:09 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7452.041; Mon, 15 Apr 2024
+ 12:53:09 +0000
+Date: Mon, 15 Apr 2024 20:53:00 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, Sean Christopherson
+	<seanjc@google.com>, Isaku Yamahata <isaku.yamahata@intel.com>, Xiaoyao Li
+	<xiaoyao.li@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
+Subject: Re: [PATCH 02/10] KVM: x86/mmu: Replace hardcoded value 0 for the
+ initial value for SPTE
+Message-ID: <Zh0jLB5Ym8eUPLp2@chao-email>
+References: <20240412173532.3481264-1-pbonzini@redhat.com>
+ <20240412173532.3481264-3-pbonzini@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240412173532.3481264-3-pbonzini@redhat.com>
+X-ClientProxiedBy: SI1PR02CA0031.apcprd02.prod.outlook.com
+ (2603:1096:4:1f6::11) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|MW4PR11MB5871:EE_
+X-MS-Office365-Filtering-Correlation-Id: 12a116fd-0f4e-44ed-9265-08dc5d4b0045
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: gKQHMl1yEsp+3kTODcNdE2gHFMMO7aYM8o5kVtxu+SauLm7zj2wHb6x0hUvLgjZspbyd5e6eMCh8y0H99wTZdH97dkHeThA/xNlMHDdCzlra1aoshiXzh28XIzIMeJ48ftLxsj8TLzltewBcx95yVA/QHR2ogoPE9smaCWh8XEjIIuoMEcMbeamEjEDUerbkAM0gDPTn3mvs4WLlsV7pOdMAd0S53nj+J/c2nWfNN+8/dZRTcV946I3FHtvg3rUwr5j13aGhS9i7UdDpjOvs7vVK3e+dCVp8C2xlQYNtNn3OjEmeuAmRqTrozNTUUnBopp7VJXUPmzRDvz/hcec7qTC8QBykwlOF0gV5E4tv5/RVP76BNtCXQRfx3HmGWyfOD4IN5DRcZw+L5FQF0xvrsiRRR/6DLEpGsrvukCTI9aMW/LtroR5GPEJWQFV0ld5OSxsBUqtefVAxxSqpMXjwBPNMA3KbCPHu8bMeM4naXd7f8FcslC8S9KPj0t4wn9FVPteDKr+CW0pnGp464XKAvlRpWCyxtbdmIFr94p/VdbmtsEQEPNLb0enVnrlr4q5/xeIFQ33+K4p5YUEcE3skURlXpFtU91qeTxuq9iJ6y6WXh78O6wm5SSOAMWlKY4EqobPb/XC6p6EM1n6nIJKK/oFOzYcYKGzykLt4N2QsBiI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gdCoXttBU+QN0aPow9Kel2LGNqGUVC/Ut52zot/Eb7LB/vhdhmg9j8u05ZCg?=
+ =?us-ascii?Q?jUN72FnkqxYSc54+yrOFQUVYvPvmjqLzKLYf774Buv5/3FxUB430JlWNpXOW?=
+ =?us-ascii?Q?8T9VQLx7FhcgwlbfLPf3eJV1fBnKjPxWO6QyOX8wIFQimVdOUgTwPEzA+eQJ?=
+ =?us-ascii?Q?qQuwtLKOyDXzCCNd0MPOK4w1vcjWdoNUhLU2tbohbLpI2eiL+koU47pGzSpb?=
+ =?us-ascii?Q?VsnNS6v246Ii48NLKkRyI8b/jIj2hSLrHm/NMF59xd4yW3Bp6cKKx3EK7LWs?=
+ =?us-ascii?Q?s/mkIuY2uqx0OF2JJOr8hFUd1p0nb7sAFuqQMfnlCLxpJ9UNAJFabhISS/ym?=
+ =?us-ascii?Q?iuWF7wTg6HMDES9VbpO88t/99XZfeHUS5wgSBAwfLl3kP6NEbRuvqJv44N8r?=
+ =?us-ascii?Q?gF6GsWSVnJptEJjkzZaZ6rGCjj3tt1Ui34oPKCpxxJE3B4teSzAI/XhGFokK?=
+ =?us-ascii?Q?60l+IvBqiOB+Y6GveGtarHbPHV9k77u1iXTm2szxYsYwaevbSfXToISncLCc?=
+ =?us-ascii?Q?iNpKeQRGlRHRwNb82+UFIHSW0lGI4H/u9KKjplujS9ppxSNbIBJYg11ohTCG?=
+ =?us-ascii?Q?akO5mFxgMX04f2uq+4WqBp0Z8b36kjr+mNnBuuiKZhASQ/URAV57YGGz8pbL?=
+ =?us-ascii?Q?Q8Br4TmjGIpRaTJKVCfraHoA9lQng51nXk48PgACZsZqyJHs/6y8UELVG+3y?=
+ =?us-ascii?Q?cm/+oB/VzcFcI9kLt79lB2WHzK5EX2JTtGMEY1rweI20nEVgSBIMr2PNnrk/?=
+ =?us-ascii?Q?YMYqLAkMKbOrGL7bHfykTcOi+SNI3Z7+9S9oRjklE4GooxNjcYVN4m+FYgds?=
+ =?us-ascii?Q?P7HY+Dn4I1hlEpRz5g1Z0pVyA0XDwG1JEzMZXtgUWJ6jNEckzBQSA5zS8TtZ?=
+ =?us-ascii?Q?H4yDVERnVdc+acEGKReD0lkPg/1io63oJSkXmp9YjHXPXxUoMpZhPif75yFG?=
+ =?us-ascii?Q?yZug6kxdaI/trCniR5au81SPiuTCWA9/MqXj4WJjwJLYfn0Exk+5xLEIKjA3?=
+ =?us-ascii?Q?VONrnmQ4xuClPhYqfngYau+52H65MhrEPCKIPTxKtfSq53rFCXAzfXyV04G9?=
+ =?us-ascii?Q?GIr1DeVrtjke6f03J1rVc1fJIOsceGiWZlqrykUGNYzESfAH98jG6NUvfgT1?=
+ =?us-ascii?Q?UZ3RN+g8CmhM2CfNRpWU+rmtpY7ITK54mEj2d00dn0QCY4m4AMxHEw4DvXhy?=
+ =?us-ascii?Q?W3VrGtgN8UX6pdPua6BhD/kiGcJHE484fvgfvBRQuCtA3QxLuNNIU4rICwDP?=
+ =?us-ascii?Q?O3430+Uvq4pKYKkiYwhyZuNaF59vB4HMgsZS2KEJ7plTTCuveJ/XyZfFTEo+?=
+ =?us-ascii?Q?B/r0/L3/wxCZSWgXg/LfHgOI4LhyagpgJjU+vSViyboRx4qGQ7XhuUiHqClT?=
+ =?us-ascii?Q?YgjAMRDtSw9Ki9zuytRP+rXT+HIjMLeurML7iKxLUBbK0aURRseu3EoAzUDm?=
+ =?us-ascii?Q?ZjRZqgkHtPQEoNaNWmRwGHrSeOT32n6E2DU/DbIL3clob2HvBfKBxUrDpZON?=
+ =?us-ascii?Q?jH+jizfWPapLpXfQJW5fVIldosDH6f6F8nxjHcpv5rho1RRpssz9wjWsi3wQ?=
+ =?us-ascii?Q?PfQBnSm2wX4E03EHlGxvYQ4vkRbuzmJydQxCecD5?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 12a116fd-0f4e-44ed-9265-08dc5d4b0045
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2024 12:53:08.9862
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BhpRwOabtypBK94g8z7FodTt+aDYgoXjo/QtmeQjmdYFahVG47uM9gn5hbf1jhWAJcw3CmaAchgVBQIxsGzazQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5871
+X-OriginatorOrg: intel.com
 
-Vaibhav Jain <vaibhav@linux.ibm.com> writes:
-> This reverts commit 180c6b072bf3 ("KVM: PPC: Book3S HV nestedv2: Do not
-> cancel pending decrementer exception") [1] which prevented canceling a
-> pending HDEC exception for nestedv2 KVM guests. It was done to avoid
-> overhead of a H_GUEST_GET_STATE hcall to read the 'DEC expiry TB' register
-> which was higher compared to handling extra decrementer exceptions.
->
-> However recent benchmarks indicate that overhead of not handling 'DECR'
-> expiry for Nested KVM Guest(L2) is higher and results in much larger exits
-> to Pseries Host(L1) as indicated by the Unixbench-arithoh bench[2]
+>@@ -194,7 +196,7 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
+>  *
+>  * Only used by the TDP MMU.
+>  */
+>-#define REMOVED_SPTE	0x5a0ULL
+>+#define REMOVED_SPTE	(SHADOW_NONPRESENT_VALUE | 0x5a0ULL)
+> 
 
-Any reason you chose that benchmark? At least on my system it seems to
-compile to an infinite loop incrementing a single register.
-
-Presumably the change is still good, but a more well known benchmark
-would be good, even if it's just stress-ng, at least that's a bit more
-standard.
-
-cheers
-
-> Metric	    	      | Current upstream    | Revert [1]  | Difference %
-> ========================================================================
-> arithoh-count (10)    |	3244831634	    | 3403089673  | +04.88%
-> kvm_hv:kvm_guest_exit |	513558		    | 152441	  | -70.32%
-> probe:kvmppc_gsb_recv |	28060		    | 28110	  | +00.18%
->
-> N=1
->
-> As indicated by the data above that reverting [1] results in substantial
-> reduction in number of L2->L1 exits with only slight increase in number of
-> H_GUEST_GET_STATE hcalls to read the value of 'DEC expiry TB'. This results
-> in an overall ~4% improvement of arithoh[2] throughput.
->
-> [1] commit 180c6b072bf3 ("KVM: PPC: Book3S HV nestedv2: Do not cancel pending decrementer exception")
-> [2] https://github.com/kdlucas/byte-unixbench/
->
-> Fixes: 180c6b072bf3 ("KVM: PPC: Book3S HV nestedv2: Do not cancel pending decrementer exception")
-> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
->
-> ---
-> Changelog:
-> Since v1: https://lore.kernel.org/all/20240313072625.76804-1-vaibhav@linux.ibm.com
-> * Updated/Corrected patch title and description
-> * Included data on test benchmark results for Unixbench-arithoh bench.
-> ---
->  arch/powerpc/kvm/book3s_hv.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 8e86eb577eb8..692a7c6f5fd9 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4857,7 +4857,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
->  	 * entering a nested guest in which case the decrementer is now owned
->  	 * by L2 and the L1 decrementer is provided in hdec_expires
->  	 */
-> -	if (!kvmhv_is_nestedv2() && kvmppc_core_pending_dec(vcpu) &&
-> +	if (kvmppc_core_pending_dec(vcpu) &&
->  			((tb < kvmppc_dec_expires_host_tb(vcpu)) ||
->  			 (trap == BOOK3S_INTERRUPT_SYSCALL &&
->  			  kvmppc_get_gpr(vcpu, 3) == H_ENTER_NESTED)))
-> -- 
-> 2.44.0
+"Use only low bits to avoid 64-bit immediates" in the comment above becomes
+stale w/ patch 3 applied.
 
