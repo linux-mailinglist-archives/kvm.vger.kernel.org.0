@@ -1,229 +1,161 @@
-Return-Path: <kvm+bounces-14660-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14661-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9576B8A5204
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 15:44:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6311E8A5212
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 15:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 499B528175E
-	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 13:44:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 199D628438A
+	for <lists+kvm@lfdr.de>; Mon, 15 Apr 2024 13:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E23673530;
-	Mon, 15 Apr 2024 13:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F7071B45;
+	Mon, 15 Apr 2024 13:44:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="BlkE2F4m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AEmL+NRy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5DC773194
-	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 13:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197C25A108
+	for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 13:44:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713188637; cv=none; b=tJ8BC2BjWX0AyyeVF80YqoTNr/wMEr2YSb/N9v4k//8lXjkZdx9Z+ASC7Y078wCaOcrsgHst5UitE2umIbn3I3iucPSdp7NM7FGHKJ4fbICuy1MXDkI26o0aRQGWJLhq4kgCHU9H6tlpu02pT9kZ+Z8ZXCH9KXWJPjcvw+HLXrU=
+	t=1713188682; cv=none; b=lTgCuiUT4YescUDnPifPk3oXLzWorlOISlVjyfU1+oPYovNtzf412l9L3s80V8BjBtjEupHgKYcItxRByIttDF25DMQd+poantTXKz/ohu5VnPjYLSpC1HfX7yTen/xLh+BxLwHep+rsqNqC0DnIEjDHwe0dY04Y+lMwpBcH2mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713188637; c=relaxed/simple;
-	bh=wiZZBUwFBfFJ8JX5HoSa5Tz8CCR776e4YmB5I1+UeZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ODDnmzWKNZZu6XISxMGUHTQHbRlBFWUT1CwT0gp8lt373Tfm84UM7nomK8TXzUKbOjM1YMgDVm4KgLVV1fk2RnH/Oz6x7BgderYlNjxMLxNqhlXaeFeQWjnaxhxBcB94inZVbDDCJltXruZbwzqZmjt2y9eUQS56av3c2Dng9Ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=BlkE2F4m; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-418798199a2so2823025e9.1
-        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 06:43:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1713188634; x=1713793434; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oBlw086cFKfVgD6m6+KXW8B1bVXOlMOqtJCrOvRcQ7k=;
-        b=BlkE2F4mvYE9aCDGWQJCq1e+ryZ81EKAPTFDkAxYayjeRNzo75dUVLoH0VGTya9fuK
-         iYTvKvlALY5I2jkDOoR7CZteAt0IJuKa4T/vZ5WkRDC3+bKSuI7Rai7zQhXyqd8Lc7vx
-         M2EnmeznJCQgrbotEzfNICshcB1NqWJbp3y2skgEEa+TbgJi0PRzrP/nClihWctqa1iZ
-         tVzdg+9z61thb1+AMc2v1/lqOS8qu9XQe3RA+tiPFGoVsEl9wMQG/5cZeqEnFSDIGM4X
-         g1n/aaGI1zrQPqTvC0cFtkzOJ9j3XnOSY9CBHqtC3g3S0ulEVQGHMTh7TVOz9JfEERGP
-         ZHlg==
+	s=arc-20240116; t=1713188682; c=relaxed/simple;
+	bh=W6XBYyBUrKFFa6NiRNU6Y8Ha5SDWXcBV9latNIYLvig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UJgGnGpOTkIi8/lXHJWB6Wah35YAeCHf+gYnIlaQ9FjMM605d5aNp4t9Hh1LIdqU7dbX6DtjgwXlptv+FyYvwCXPpcm/ThpQY5ABindk0iVsL+XnM6aodK0cOyT9jO6SfOkW+3nF8Awhvh1nPMt3gGYxPR4eMRIW/aww8Jteugs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AEmL+NRy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713188679;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=xOqza9Oa++0cIkrLsvcehiPDyb6oXbxz4r3dYceTOfA=;
+	b=AEmL+NRyA5tCmVkcf7vbhbCxdFwhD0Txope8OOLGSLha67JtjiXR8K97o6loY43HXrjtu6
+	vJbi4wsZDAGmZazHBi3dE9GKtqRlx75M9YrbXgJMGRm9oSmzLgvt3r/Vqyndf7JM2qgO4s
+	4INF56w8wH1NQ/mS3dFo2yBLuINRJ3E=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-487-DHwOKcdeOGu4GSKca45deA-1; Mon, 15 Apr 2024 09:44:38 -0400
+X-MC-Unique: DHwOKcdeOGu4GSKca45deA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-417df7b0265so12252825e9.3
+        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 06:44:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713188634; x=1713793434;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oBlw086cFKfVgD6m6+KXW8B1bVXOlMOqtJCrOvRcQ7k=;
-        b=QNloLVnDYpp5Mu24kjmwUoB2AbAroA2bp6l+C3md5f6kyqdYKJuYXiu+3bbmwTtYWl
-         c9U3cbPViW6q9vJZgwIxtsCiFL+yheO3tcn7+5K09/cW6Wu0P+htJzWuvwZv/1brLMdC
-         DV4DsXOBnm7K4ZBPeOzAH9fCWtr9VT9B4UuwWOZVZDQ114Eszh/hcaLL67RsWQtzkPXn
-         ZrHzgxG1rVhz0P0jYWs/db/+wVfNTxu4Oz0cM5NUi3qiKaXJNDhynuLLewsEQweubx0x
-         L7hfC8avE3utcm5DnI4W17mVXhXUQVPU8rnxf1lnTNQgmb/2aUYG/erUsjNmC0mqTBGV
-         GZkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUpKht8I2Ok3F+eRuxXzB1RRv+oaNkI1IIWt2nJ0zF54a4X0O9deM0J3ftCIZUqe7A50KwJB8VXPev04daZW0xjbjao
-X-Gm-Message-State: AOJu0Yy6TFBDyemgecMKMK+qdZ+fXTNbqLitNojAUC9WKo+aMA6f6i3m
-	9cRKbKjLV7gg2Qhac0MBBRAL2fXiO8z213yPb2fEcmW9jHoJiYa3h3OF3qC2Clw=
-X-Google-Smtp-Source: AGHT+IFSJX/JAylOq7lyfTWV1n1rGtpOd6txYa80kvU3cra08zVigOgalF/jjTxDvlEfsaeWSmIeIQ==
-X-Received: by 2002:a05:600c:4ecb:b0:418:2d69:d978 with SMTP id g11-20020a05600c4ecb00b004182d69d978mr4057431wmq.10.1713188633673;
-        Mon, 15 Apr 2024 06:43:53 -0700 (PDT)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id l23-20020a05600c1d1700b004163ee3922csm19555595wms.38.2024.04.15.06.43.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 06:43:53 -0700 (PDT)
-Date: Mon, 15 Apr 2024 15:43:52 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-kernel@vger.kernel.org, Ajay Kaher <ajay.kaher@broadcom.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Alexey Makhalov <alexey.amakhalov@broadcom.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Conor Dooley <conor.dooley@microchip.com>, 
-	Juergen Gross <jgross@suse.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, Will Deacon <will@kernel.org>, 
-	x86@kernel.org
-Subject: Re: [PATCH v6 24/24] KVM: riscv: selftests: Add commandline option
- for SBI PMU test
-Message-ID: <20240415-8b9ad5a7e968b1808e99e3da@orel>
-References: <20240411000752.955910-1-atishp@rivosinc.com>
- <20240411000752.955910-25-atishp@rivosinc.com>
+        d=1e100.net; s=20230601; t=1713188677; x=1713793477;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xOqza9Oa++0cIkrLsvcehiPDyb6oXbxz4r3dYceTOfA=;
+        b=J4/O3FHuQov9CcynlFt97kAa51fW80QDN0rXhAZNdNPzDHyHKxobedPpWfwezoPCCi
+         mJkSuwSSl3GWLS+oCqcW/fOezXUV5YVQqrEWlvtXX59jq9AbJzR1j9puyX64DBNkLocU
+         9iP0AFjhoEiW4PvwxD2Ms/cEtY6ySuOdEzRqz6ZJdrnuMMM+W6UhQSbIS7x6FD3O/snX
+         1YfjnmWPC+QueFtJ9xOFVdVnpyj7yI/bu9mYaEqVKBNJ4BEuJnxEvM8oLTEhWyK46KN0
+         SvwgnEk0zcGyTp3De2ZNh/V+dXGz+9aGy0MW29iaG/C66U38TBx9AEzhbK368lDzH+gj
+         /o1w==
+X-Gm-Message-State: AOJu0YwSx72MNZ7HYVxLiQR9rJpCuUcD8CG8/Vt4jwQe+jFABmAnfNSe
+	ZHsz+dTwGIjk3V34MxLDMeNMoeeQYJSS7FWncab3+GZpKiIqBI8hxvvLNElOTKRHFHaFRj1Lpqs
+	xmPvbLaTFGmidfaRY3LhMmSQbuC9mePihSfKDuWX5FtEjMyQDMw==
+X-Received: by 2002:a05:600c:154e:b0:418:32f7:e87 with SMTP id f14-20020a05600c154e00b0041832f70e87mr3269579wmg.32.1713188677423;
+        Mon, 15 Apr 2024 06:44:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHiRwU+/8YylRVVVdwJv5JoSH1o5G+L6ZC2TECa4CMY7dMB0ZAGAj0MKET6gwdYO/nLJbNwng==
+X-Received: by 2002:a05:600c:154e:b0:418:32f7:e87 with SMTP id f14-20020a05600c154e00b0041832f70e87mr3269569wmg.32.1713188677002;
+        Mon, 15 Apr 2024 06:44:37 -0700 (PDT)
+Received: from [192.168.0.9] (ip-109-43-179-142.web.vodafone.de. [109.43.179.142])
+        by smtp.gmail.com with ESMTPSA id t10-20020a05600c198a00b004186c58a9b5sm2772329wmq.44.2024.04.15.06.44.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Apr 2024 06:44:36 -0700 (PDT)
+Message-ID: <8be4ce83-ce76-4306-b454-93896d68a868@redhat.com>
+Date: Mon, 15 Apr 2024 15:44:35 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240411000752.955910-25-atishp@rivosinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH] gitlab-ci: Fix the cirrus pipelines
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: kvm@vger.kernel.org, Andrew Jones <andrew.jones@linux.dev>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20240415130321.149890-1-thuth@redhat.com>
+ <Zh0qAfYWGpORIGTl@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <Zh0qAfYWGpORIGTl@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 10, 2024 at 05:07:52PM -0700, Atish Patra wrote:
-> SBI PMU test comprises of multiple tests and user may want to run
-> only a subset depending on the platform. The most common case would
-> be to run all to validate all the tests. However, some platform may
-> not support all events or all ISA extensions.
+On 15/04/2024 15.22, Daniel P. Berrangé wrote:
+> On Mon, Apr 15, 2024 at 03:03:21PM +0200, Thomas Huth wrote:
+>> Pulling the "master" libvirt-ci containers does not work anymore,
+>> so we have to switch to the "latest" instead. See also:
 > 
-> The commandline option allows user to disable particular test if they
-> want to.
+> We explicitly changed to publish under the 'latest' tag.
 > 
-> Suggested-by: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  .../selftests/kvm/riscv/sbi_pmu_test.c        | 77 ++++++++++++++++---
->  1 file changed, 68 insertions(+), 9 deletions(-)
+>> https://gitlab.com/libvirt/libvirt/-/commit/5d591421220c850aa64a640
 > 
-> diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-> index 0fd9b76ae838..57025b07a403 100644
-> --- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-> +++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-> @@ -33,6 +33,16 @@ static unsigned long counter_mask_available;
->  
->  static bool illegal_handler_invoked;
->  
-> +enum sbi_pmu_test_id {
-> +	SBI_PMU_TEST_BASIC = 0,
-> +	SBI_PMU_TEST_EVENTS,
-> +	SBI_PMU_TEST_SNAPSHOT,
-> +	SBI_PMU_TEST_OVERFLOW,
-> +	SBI_PMU_TEST_MAX,
-> +};
-> +
-> +static int disabled_test_id = SBI_PMU_TEST_MAX;
+> This commit is the root cause:
+> 
+>    https://gitlab.com/libvirt/libvirt-ci/-/commit/6e3c5ccac77714be70c0dc52c5210c7cda8fe40f
+> 
+> The effects were dormant for a year as I didn't delete the old
+> ':master' tags until two weeks ago.
 
-I think we should allow specifying '-d' multiple times in case a user
-wants to disable more than one type of test. So we should set a bit
-in this variable instead of assigning it. We could also flip it
-around. If the user uses '-e' to enable test type then only type
-will be run, but then we'd probably want to allow multiple '-e'
-too so it doesn't gain anything.
+Thanks! I added that information to the commit message and pushed the patch 
+to the repository.
 
-> +
->  unsigned long pmu_csr_read_num(int csr_num)
->  {
->  #define switchcase_csr_read(__csr_num, __val)		{\
-> @@ -608,19 +618,68 @@ static void test_vm_events_overflow(void *guest_code)
->  	test_vm_destroy(vm);
->  }
->  
-> -int main(void)
-> +static void test_print_help(char *name)
->  {
-> -	test_vm_basic_test(test_pmu_basic_sanity);
-> -	pr_info("SBI PMU basic test : PASS\n");
-> +	pr_info("Usage: %s [-h] [-d <test name>]\n", name);
-> +	pr_info("\t-d: Test to disable. Available tests are 'basic', 'events', 'snapshot', 'overflow'\n");
-> +	pr_info("\t-h: print this help screen\n");
-> +}
->  
-> -	test_vm_events_test(test_pmu_events);
-> -	pr_info("SBI PMU event verification test : PASS\n");
-> +static bool parse_args(int argc, char *argv[])
-> +{
-> +	int opt;
-> +
-> +	while ((opt = getopt(argc, argv, "hd:")) != -1) {
-> +		switch (opt) {
-> +		case 'd':
-> +			if (!strncmp("basic", optarg, 5))
-> +				disabled_test_id = SBI_PMU_TEST_BASIC;
-> +			else if (!strncmp("events", optarg, 6))
-> +				disabled_test_id = SBI_PMU_TEST_EVENTS;
-> +			else if (!strncmp("snapshot", optarg, 8))
-> +				disabled_test_id = SBI_PMU_TEST_SNAPSHOT;
-> +			else if (!strncmp("overflow", optarg, 8))
-> +				disabled_test_id = SBI_PMU_TEST_OVERFLOW;
-> +			else
-> +				goto done;
-> +			break;
-> +		break;
+  Thomas
 
-Extra 'break'
 
-> +		case 'h':
-> +		default:
-> +			goto done;
-> +		}
-> +	}
->  
-> -	test_vm_events_snapshot_test(test_pmu_events_snaphost);
-> -	pr_info("SBI PMU event verification with snapshot test : PASS\n");
-> +	return true;
-> +done:
-> +	test_print_help(argv[0]);
-> +	return false;
-> +}
->  
-> -	test_vm_events_overflow(test_pmu_events_overflow);
-> -	pr_info("SBI PMU event verification with overflow test : PASS\n");
-> +int main(int argc, char *argv[])
-> +{
-> +	if (!parse_args(argc, argv))
-> +		exit(KSFT_SKIP);
-> +
-> +	if (disabled_test_id != SBI_PMU_TEST_BASIC) {
-> +		test_vm_basic_test(test_pmu_basic_sanity);
-> +		pr_info("SBI PMU basic test : PASS\n");
-> +	}
-> +
-> +	if (disabled_test_id != SBI_PMU_TEST_EVENTS) {
-> +		test_vm_events_test(test_pmu_events);
-> +		pr_info("SBI PMU event verification test : PASS\n");
-> +	}
-> +
-> +	if (disabled_test_id != SBI_PMU_TEST_SNAPSHOT) {
-> +		test_vm_events_snapshot_test(test_pmu_events_snaphost);
-> +		pr_info("SBI PMU event verification with snapshot test : PASS\n");
-> +	}
-> +
-> +	if (disabled_test_id != SBI_PMU_TEST_OVERFLOW) {
-> +		test_vm_events_overflow(test_pmu_events_overflow);
-> +		pr_info("SBI PMU event verification with overflow test : PASS\n");
-> +	}
->  
->  	return 0;
->  }
-> -- 
-> 2.34.1
->
-
-Thanks,
-drew
 
