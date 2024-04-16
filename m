@@ -1,145 +1,145 @@
-Return-Path: <kvm+bounces-14789-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14790-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 795F98A6F86
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 17:17:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 500918A6F88
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 17:18:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 197A11F22182
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 15:17:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA19FB2341F
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 15:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE26130AE6;
-	Tue, 16 Apr 2024 15:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2E0131737;
+	Tue, 16 Apr 2024 15:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ku+pcSFE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1m+wB+J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D511304B9
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 15:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57203131726
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 15:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713280663; cv=none; b=tyyws7Tfe2yADgBVd4OxX8WxGgiJiDwwIA34LUlCPuh6oyiVkxIVsYlLWX3GAAUbrNc7qJCCjDXQ15ptIaVJS2OmVrJEmyAUWAdLoR5AHIVdk2rB+f7rnZD6H7AFPVGSRXcZ72xoGwp08w23hl0UM7/kIyMZoEk+aOBo1DnuhHM=
+	t=1713280682; cv=none; b=bIn7MxQuwXD5cXTiGq0kC3Cr3I1ZqG8S1vKk7SBWrI6xW+N7kHJ4SJSFy0m8ys1ogxYJLaBROS9dpgFzie35NMonUHqHNoFfEeQotHxJzeM0HjjOmSb+EL+cMxqKiRWqfEAZ9PX9WTrhDQJsUHhV2MZRVzBU5mb28QVP+qfrnOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713280663; c=relaxed/simple;
-	bh=go1vbmHvk0Pb3VqNEc0jmnUBOnnVGwgjoeuYYNxHqa8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VvQWT4EpQalG9btLmFD1/uJtcZ2WEBrFLOOZt1+1ExyH/cGRePEVwdexqFEc4bzv0rQU5RQK/EkDzQIfI7D8iuESBqMStLzKxhgKAfV650TmwAoc1MIec6fbOZ24PPq2JIknEEhSb/VX/xLdwxqKkK6OoERjQLTZKg9R51HwOGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ku+pcSFE; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6183c4a6d18so67023917b3.3
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 08:17:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713280661; x=1713885461; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V3zj9QBfDL8j06rkJRFV/Dgsq0KfXCXS2xUHTpdOQOY=;
-        b=Ku+pcSFEqy343Mq4j2sk4SHNWQBaCoCzMmf7u9YqS8VvrEe9wZZalcR35aNIuBBXlV
-         K2jg58ZDly0+tM86HAoCJSL/KdomW4KLhLnpeTTm0v7tjAQPV8fn9m20wKTFC+F+XtQb
-         l4Oa8AZSbybSjaL6p/MZxx6kSMhwtsLK0gxFjYT8xfmC4x+LAXUKkCyEmPM6KjaRvtXo
-         SDtbH4HekpTtd1ybNPz6DqtuXogU8xmUOxBW14IktSglLGsXJ594cZgGTR28G47hCg+U
-         SqpYTNvz8A2KzMMa0T3ZXwUsyy6Sy8trOrNAFyoXeQFgbgaGHf1/4YsDs1ELHndtHyVF
-         P6vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713280661; x=1713885461;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=V3zj9QBfDL8j06rkJRFV/Dgsq0KfXCXS2xUHTpdOQOY=;
-        b=j43coup4A8QY1ey4TnjOg8orFxGk/d0ps+O5Na8/In/rNIPE4000ruBK08G2oi3V/C
-         BY+kQCTe2MZGsIb98xHPMKstnWbWAN0TI+P5fDIDggQy7O+uZMsA7hX+mAbn4uoD1kmb
-         L3x/kveciX7ONUotnZJ9VuYXIf2itRkQ0XR8UkMapCdrqWZ/h/VgtJSsz6d4kSAS86Aj
-         /dYpTVDHF4rxjJo3rNox/5Qih/85/46Y6/y1D03xUXcI/Xs693EVhTgerFlilJGrHR6h
-         k3PW6+1iFrURkI7ETZMpxNU8fwLHWWXX6nnaKyxS0IL9v1TB/KZMhJ5i/QKgomm3Y2/i
-         PRMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbz7xp3v1zAKIOjQ5fofUwaEtqi9HzeNf55MPpZH0qqrUkDFYgLpNcovQ2kNEGQ3i6X3UBqcVI/Fm8gsZRkGZXKlFp
-X-Gm-Message-State: AOJu0YwDwgFtJIgtz/HnEp/8W5b+lMubcJS4SSz1LlJOHH4uRlJIsE2R
-	IoWTtL5TfU6JC+g9JwFZSTJv0/0SCKwlHf6W5jXrRKiyLtlVQliN771E7ujnDDZnwJkN+S8wOML
-	9bQ==
-X-Google-Smtp-Source: AGHT+IHhRRb/O7U6wXqexpWPYdtot54ZdSme3vhOv+FN5wOtJOPUl+Sk8EtCPMwpGvcltsmeb9wmmXjCJvU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:ea09:0:b0:61a:cec3:e348 with SMTP id
- t9-20020a0dea09000000b0061acec3e348mr1389646ywe.8.1713280661544; Tue, 16 Apr
- 2024 08:17:41 -0700 (PDT)
-Date: Tue, 16 Apr 2024 08:17:40 -0700
-In-Reply-To: <ecb314c53c76bc6d2233a8b4d783a15297198ef8.camel@cyberus-technology.de>
+	s=arc-20240116; t=1713280682; c=relaxed/simple;
+	bh=tPtRVTsXis21eVmAj2j9npZRV3GxwQ/AaRJo8gVEatg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=gTbIsHSr8GTXOVzU0WoNCROPugffhzXKQMuzizlexWxeTUUA9q8nu59vLlQzuDpLNoQd1bVgNCC+cezZni+VZ2bpt+AuOMLZAxIVv3vhDTGgeSOUcNjattZFflyH2febVSKKdbgQm/pGJLjTPfyItBV+yXPk+UHLwsgJ+Xu19Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a1m+wB+J; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713280680;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tPtRVTsXis21eVmAj2j9npZRV3GxwQ/AaRJo8gVEatg=;
+	b=a1m+wB+Jlbvf29smpBLD4aJoQFC4yRnsn1IgLHn95CHF3mbP6VBOM9XUxW0+On+UHXGwem
+	iBo6zlVrhp+l3QK0yIduKvEgkoEbtUrBPf26ytQLJNQfmR1WczsczYP0JtV+l+XgbkjUTB
+	nhTIG9ZCQmwa7pyFqNcgiQs4TBP0//g=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-106-Gxm3JAxfNWyzzrw3LARPug-1; Tue, 16 Apr 2024 11:17:56 -0400
+X-MC-Unique: Gxm3JAxfNWyzzrw3LARPug-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A6AC7104B507;
+	Tue, 16 Apr 2024 15:17:55 +0000 (UTC)
+Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 597DB2026D1F;
+	Tue, 16 Apr 2024 15:17:55 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, Shaoqin Huang <shahuang@redhat.com>,
+ qemu-arm@nongnu.org
+Cc: Eric Auger <eauger@redhat.com>, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo
+ Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v9] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
+In-Reply-To: <227c96c8-4f17-4f79-9378-a15c9dce8d46@redhat.com>
+Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
+ Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
+ 153243,
+ =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
+ Michael O'Neill, Amy
+ Ross"
+References: <20240409024940.180107-1-shahuang@redhat.com>
+ <d1a76e23-e361-46a9-9baf-6ab51db5d7ba@redhat.com>
+ <47e0c03b-0a6f-4a58-8dd7-6f1b85bcf71c@redhat.com>
+ <227c96c8-4f17-4f79-9378-a15c9dce8d46@redhat.com>
+User-Agent: Notmuch/0.37 (https://notmuchmail.org)
+Date: Tue, 16 Apr 2024 17:17:54 +0200
+Message-ID: <875xwhjpzx.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240416123558.212040-1-julian.stecklina@cyberus-technology.de>
- <Zh6MmgOqvFPuWzD9@google.com> <ecb314c53c76bc6d2233a8b4d783a15297198ef8.camel@cyberus-technology.de>
-Message-ID: <Zh6WlOB8CS-By3DQ@google.com>
-Subject: Re: [PATCH 1/2] KVM: nVMX: fix CR4_READ_SHADOW when L0 updates CR4
- during a signal
-From: Sean Christopherson <seanjc@google.com>
-To: Thomas Prescher <thomas.prescher@cyberus-technology.de>
-Cc: Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
-	"x86@kernel.org" <x86@kernel.org>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>, "bp@alien8.de" <bp@alien8.de>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Tue, Apr 16, 2024, Thomas Prescher wrote:
-> Hi Sean,
->=20
-> On Tue, 2024-04-16 at 07:35 -0700, Sean Christopherson wrote:
-> > On Tue, Apr 16, 2024, Julian Stecklina wrote:
-> > > From: Thomas Prescher <thomas.prescher@cyberus-technology.de>
-> > >=20
-> > > This issue occurs when the kernel is interrupted by a signal while
-> > > running a L2 guest. If the signal is meant to be delivered to the L0 =
-VMM,
-> > > and L0 updates CR4 for L1, i.e. when the VMM sets KVM_SYNC_X86_SREGS =
-in
-> > > kvm_run->kvm_dirty_regs, the kernel programs an incorrect read shadow
-> > > value for L2's CR4.
-> > >=20
-> > > The result is that the guest can read a value for CR4 where bits from=
- L1
-> > > have leaked into L2.
-> >=20
-> > No, this is a userspace bug.=C2=A0 If L2 is active when userspace stuff=
-s
-> > register state, then from KVM's perspective the incoming value is L2's
-> > value.=C2=A0 E.g.  if userspace *wants* to update L2 CR4 for whatever r=
-eason,
-> > this patch would result in L2 getting a stale value, i.e. the value of =
-CR4
-> > at the time of VM-Enter.
-> >=20
-> > And even if userspace wants to change L1, this patch is wrong, as KVM i=
-s
-> > writing vmcs02.GUEST_CR4, i.e. is clobbering the L2 CR4 that was progra=
-mmed
-> > by L1, *and* is dropping the CR4 value that userspace wanted to stuff f=
-or
-> > L1.
-> >=20
-> > To fix this, your userspace needs to either wait until L2 isn't active,=
- or
-> > force the vCPU out of L2 (which isn't easy, but it's doable if absolute=
-ly
-> > necessary).
->=20
-> What you say makes sense. Is there any way for
-> userspace to detect whether L2 is currently active after
-> returning from KVM_RUN? I couldn't find anything in the official
-> documentation https://docs.kernel.org/virt/kvm/api.html
->=20
-> Can you point me into the right direction?
+On Wed, Apr 10 2024, Thomas Huth <thuth@redhat.com> wrote:
 
-Hmm, the only way to query that information is via KVM_GET_NESTED_STATE, wh=
-ich is
-a bit unfortunate as that is a fairly "heavy" ioctl().
+> On 09/04/2024 09.47, Shaoqin Huang wrote:
+>> Hi Thmoas,
+>>=20
+>> On 4/9/24 13:33, Thomas Huth wrote:
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert_has_feature(qts, "h=
+ost", "kvm-pmu-filter");
+>>>
+>>> So you assert here that the feature is available ...
+>>>
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert_has_feat=
+ure(qts, "host", "kvm-steal-time");
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert_has_feat=
+ure(qts, "host", "sve");
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 resp =3D do_que=
+ry_no_props(qts, "host");
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_supports_pmu_filter =
+=3D resp_get_feature_str(resp,=20
+>>>> "kvm-pmu-filter");
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_supports_st=
+eal_time =3D resp_get_feature(resp,=20
+>>>> "kvm-steal-time");
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_supports_sv=
+e =3D resp_get_feature(resp, "sve");
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vls =3D resp_ge=
+t_sve_vls(resp);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qobject_unref(r=
+esp);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm_supports_pmu_filte=
+r) { >
+>>> ... why do you then need to check for its availability here again?
+>>> I either don't understand this part of the code, or you could drop the=
+=20
+>>> kvm_supports_pmu_filter variable and simply always execute the code bel=
+ow.
+>>=20
+>> Thanks for your reviewing. I did so because all other feature like=20
+>> "kvm-steal-time" check its availability again. I don't know the original=
+=20
+>> reason why they did that. I just followed it.
+>>=20
+>> Do you think we should delete all the checking?
+>
+> resp_get_feature() seems to return a boolean value, so though these featu=
+re=20
+> could be there, they still could be disabled, I assume? Thus we likely ne=
+ed=20
+> to keep the check for those.
+
+This had confused me as well when I looked at it the last time -- one
+thing is to check whether we have a certain prop in the cpu model, the
+other one whether we actually support it. Maybe this needs some
+comments?
+
 
