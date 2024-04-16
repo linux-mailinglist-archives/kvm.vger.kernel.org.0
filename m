@@ -1,79 +1,82 @@
-Return-Path: <kvm+bounces-14910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7D8B8A7944
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 01:43:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC368A795C
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 01:52:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57040B21CB7
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 23:43:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88EB2B22EE8
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 23:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC6913AA3A;
-	Tue, 16 Apr 2024 23:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C508F13AA44;
+	Tue, 16 Apr 2024 23:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ScFb9Qhc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bKmCmapd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1988113A415;
-	Tue, 16 Apr 2024 23:43:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 431A28120A;
+	Tue, 16 Apr 2024 23:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713311018; cv=none; b=TqDKpOD84vJ8KCUZxVheUPPp01K1XtiUNGBg9NreijF+zpQkpxixzzWn+HrlsyDEjNl1TjyDDES9zCyZF40VlKD7bBi7VbLX5C/5WtFja22zeW5t7zAm0NUZ/iuhk2WIE74eMHKnZjOOJt7b28UVOTAwE+l8aZJyCfdBhb75fdU=
+	t=1713311553; cv=none; b=eaOw4NP4a2XJRwfNzrMmZlnb9Afc/ZwI84gNWR1wje0JldF3lOYCOZkv0n2J/L/6o0Xje9zqfN4LHORid2+uaisUUDVkxEVBjczxtqPtBZy9x0EsfBXto/FCoxORaOZFRQz0j9G/zbCnqQBYWCcUagIDe7U4m6bR6Yi0OVWJJRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713311018; c=relaxed/simple;
-	bh=8aUqXz+i9chtNJef9my3dWa4P1+x056EvnBQkIpWUR8=;
+	s=arc-20240116; t=1713311553; c=relaxed/simple;
+	bh=6HzpwzhVBJTxkosmKw85+TVSVUAqQ0ZL5X8gG+DYsjk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q4ZwGzCLKjfhB6XKfNBhtcN2HXXP0NeLmbw+X+ROstlqwXqpNtPs0OIuUeAQeUNkCUPrhDOZaljF97zPR0BLRQ8AnFzBBC0pamTsqo3mylrGUZR+hX3BE7EghHPRTHBqfHy1SePXzoS8KPyN7Yf5IchiGrbKS6n8Y9yODq0ODPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ScFb9Qhc; arc=none smtp.client-ip=192.198.163.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=QFkpAET27ZKc9BUYzyZYVOboPKaZZTbNc24FaogSIJuDwT7GZqZTH4T0f79Wgwou8rmXhXr3aWMxHP+taAzgnCVdVTFUAkkzWgvP0pL1H3JdoydiZTZU/4Zea3X51KGekCRpPJNEYB/uupO+uXahvnGPHUooUlPkX52nteLzhxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bKmCmapd; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713311016; x=1744847016;
+  t=1713311552; x=1744847552;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8aUqXz+i9chtNJef9my3dWa4P1+x056EvnBQkIpWUR8=;
-  b=ScFb9QhcCypvNMmgU0lDLbqUYks3Je3MDtnw2AfMuIxOfGztcU7aJX7D
-   H8lV6z55FNFM8yaiu0mCVq26oHSA73X8PS7TA1XT3Lx1XM35I3rBMST0d
-   l8MJmEGqp7WDfkH+QHhqN0BdzjoPDwLNQfOeXgkzv3aQZBLHSxecwpMh1
-   TwnJZpVk5srGakibMsSlJ0+y1tWwgyeFfdfzbhfxYRQuZCNDtKkcf17py
-   YLHtnN3mqxL0xiE1I3PCd3DqXFKozaRrPePv9vJvHMWu8CW4+y2iYicFz
-   DbQFvS7M9YI+xYnOBLNI8c4EqhSLfn7tNkq/p9+pK47RB0YeX0e3HXgQb
-   g==;
-X-CSE-ConnectionGUID: TdUH60YqTuKhfLP9reL6YQ==
-X-CSE-MsgGUID: jNx1m/9pRuqzBIlHJBLQ1g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8645383"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=6HzpwzhVBJTxkosmKw85+TVSVUAqQ0ZL5X8gG+DYsjk=;
+  b=bKmCmapdjwLSiPiouIYlodBAyuTwtQ1Ot8hPK9REm8LaqwKoEw6QrWew
+   at1RdGx/3SM6eCxnbbJQMeHc5hFALRDckNTj2fICVqTlR4gmFFmxPGjeG
+   KhV58RxhQiwOBbNnOGFPBTyfEEcOO/DnclJgKP5uQrJQYZd4igE0+FTRA
+   pzR3fSBr0eL7PdIwm/+VP1GAL5IFToYwIVvnSYwmlT3L3eYJCL179VFvt
+   Xh8sV/o6zsigyZtv4dVZj6gTB730S03X50ylMLO+0tEHUuXrxsaq0Q7uF
+   4aAN8JUDLfaKjm/XgYyWvuctBwVUGH20yhv9AmWr3rH9lBG41R3ayy8oY
+   w==;
+X-CSE-ConnectionGUID: m+jxZWecRRKxutRv1BvwdQ==
+X-CSE-MsgGUID: p+YPSCVKRp2LWlNPyr5Xyw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="12569131"
 X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
-   d="scan'208";a="8645383"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 16:43:35 -0700
-X-CSE-ConnectionGUID: fS8w87q+Rv2YO7ZuLxYjmw==
-X-CSE-MsgGUID: OGrvR6teSV+HtibVE03PkQ==
+   d="scan'208";a="12569131"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 16:52:31 -0700
+X-CSE-ConnectionGUID: YnWvpaNZRRukiRVAY3nJTQ==
+X-CSE-MsgGUID: 2JKklJJDToClpfxfwgBwNg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
-   d="scan'208";a="22834585"
+   d="scan'208";a="26865215"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 16:43:35 -0700
-Date: Tue, 16 Apr 2024 16:43:34 -0700
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 16:52:30 -0700
+Date: Tue, 16 Apr 2024 16:52:30 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, isaku.yamahata@gmail.com,
-	linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	David Matlack <dmatlack@google.com>,
-	Federico Parola <federico.parola@polito.it>,
-	Kai Huang <kai.huang@intel.com>, isaku.yamahata@linux.intel.com
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"seanjc@google.com" <seanjc@google.com>,
+	"Huang, Kai" <kai.huang@intel.com>,
+	"federico.parola@polito.it" <federico.parola@polito.it>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"dmatlack@google.com" <dmatlack@google.com>,
+	"michael.roth@amd.com" <michael.roth@amd.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>,
+	isaku.yamahata@linux.intel.com
 Subject: Re: [PATCH v2 03/10] KVM: x86/mmu: Extract __kvm_mmu_do_page_fault()
-Message-ID: <20240416234334.GA3039520@ls.amr.corp.intel.com>
+Message-ID: <20240416235230.GB3039520@ls.amr.corp.intel.com>
 References: <cover.1712785629.git.isaku.yamahata@intel.com>
  <ddf1d98420f562707b11e12c416cce8fdb986bb1.1712785629.git.isaku.yamahata@intel.com>
- <Zh41S8fh0IvXlKwX@chao-email>
+ <621c260399a05338ba6d034e275e19714ad3665c.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,77 +85,44 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Zh41S8fh0IvXlKwX@chao-email>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <621c260399a05338ba6d034e275e19714ad3665c.camel@intel.com>
 
-On Tue, Apr 16, 2024 at 04:22:35PM +0800,
-Chao Gao <chao.gao@intel.com> wrote:
+On Tue, Apr 16, 2024 at 02:36:31PM +0000,
+"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
 
+> On Wed, 2024-04-10 at 15:07 -0700, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > Extract out __kvm_mmu_do_page_fault() from kvm_mmu_do_page_fault().  The
+> > inner function is to initialize struct kvm_page_fault and to call the fault
+> > handler, and the outer function handles updating stats and converting
+> > return code.  KVM_MAP_MEMORY will call the KVM page fault handler.
+> > 
+> > This patch makes the emulation_type always set irrelevant to the return
+>            a comma would help parse this better ^
+> > code.
 > 
-> >This patch makes the emulation_type always set irrelevant to the return
-> >code.  kvm_mmu_page_fault() is the only caller of kvm_mmu_do_page_fault(),
-> >and references the value only when PF_RET_EMULATE is returned.  Therefore,
-> >this adjustment doesn't affect functionality.
->
-> This is benign. But what's the benefit of doing this?
-
-To avoid increment vcpu->stat.  Because originally this was VM ioctl, I wanted
-to avoid touch vCPU stat.  Now it's vCPU ioctl, it's fine to increment them.
-
-Probably we can drop this patch and use kvm_mmu_do_page_fault().
-
+> >   kvm_mmu_page_fault() is the only caller of kvm_mmu_do_page_fault(),
 > 
-> >+static inline int __kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> >+					  u64 err, bool prefetch, int *emulation_type)
-> > {
-> > 	struct kvm_page_fault fault = {
-> > 		.addr = cr2_or_gpa,
-> >@@ -318,14 +318,6 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > 		fault.slot = kvm_vcpu_gfn_to_memslot(vcpu, fault.gfn);
-> > 	}
-> > 
-> >-	/*
-> >-	 * Async #PF "faults", a.k.a. prefetch faults, are not faults from the
-> >-	 * guest perspective and have already been counted at the time of the
-> >-	 * original fault.
-> >-	 */
-> >-	if (!prefetch)
-> >-		vcpu->stat.pf_taken++;
-> >-
-> > 	if (IS_ENABLED(CONFIG_MITIGATION_RETPOLINE) && fault.is_tdp)
-> > 		r = kvm_tdp_page_fault(vcpu, &fault);
-> > 	else
-> >@@ -333,12 +325,30 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> > 
-> > 	if (r == RET_PF_EMULATE && fault.is_private) {
-> > 		kvm_mmu_prepare_memory_fault_exit(vcpu, &fault);
-> >-		return -EFAULT;
-> >+		r = -EFAULT;
-> > 	}
-> > 
-> > 	if (fault.write_fault_to_shadow_pgtable && emulation_type)
-> > 		*emulation_type |= EMULTYPE_WRITE_PF_TO_SP;
-> > 
-> >+	return r;
-> >+}
-> >+
-> >+static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-> >+					u64 err, bool prefetch, int *emulation_type)
-> >+{
-> >+	int r;
-> >+
-> >+	/*
-> >+	 * Async #PF "faults", a.k.a. prefetch faults, are not faults from the
-> >+	 * guest perspective and have already been counted at the time of the
-> >+	 * original fault.
-> >+	 */
-> >+	if (!prefetch)
-> >+		vcpu->stat.pf_taken++;
-> >+
-> >+	r = __kvm_mmu_do_page_fault(vcpu, cr2_or_gpa, err, prefetch, emulation_type);
+> Not technically correct, there are other callers that pass NULL for
+> emulation_type.
 > 
-> bail out if r < 0?
+> > and references the value only when PF_RET_EMULATE is returned.  Therefore,
+> > this adjustment doesn't affect functionality.
+> 
+> Is there a problem with dropping the argument then?
+> 
+> > 
+> > No functional change intended.
+> 
+> Can we not use the "intended"? It sounds like hedging for excuses.
 
-The following if clauses checks RET_PF_xxx > 0. 
+Thanks for review.
+As Chao pointed out, this patch is unnecessary.  I'll use
+kvm_mmu_do_page_fault() directly with updating vcpu->stat.
+
+https://lore.kernel.org/all/20240416234334.GA3039520@ls.amr.corp.intel.com/
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
