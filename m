@@ -1,79 +1,90 @@
-Return-Path: <kvm+bounces-14796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 054738A7192
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:40:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76E3B8A719C
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:44:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BF901F22955
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:40:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 364D7281844
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CBB86255;
-	Tue, 16 Apr 2024 16:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB33112BF3E;
+	Tue, 16 Apr 2024 16:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YxGhi2SS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KHzFYRX+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0114310A22;
-	Tue, 16 Apr 2024 16:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F4D2EAF9;
+	Tue, 16 Apr 2024 16:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713285644; cv=none; b=eeH/xr7rJkY0zhCGGbuGIPoYWbhC/pNOOTDLXqzhFfVNEJxQISjsy1TCfqmiOwiwORLsuOrIufgC7eWC9uceIzPBlaKELds69XP4gawIa58UmrFrJAHY7tRzRt3rsP7U33CmEdzN0Ri9MmE+LQjgBZHNL5t6F5zH3O63EsJX0uw=
+	t=1713285876; cv=none; b=g5V5V0fb/PfzDcFoyDaWwZgTLFHp8hzHRKek/egayBP/bnmWOs6SQ5dDN9EimUvEQVxgCsxdKt48d52KNU65pymb81O8yMlKaYc7xEA5j/j4lkiIbNYGI6WPmUWyyoNJprxt9lLnIJJMozHnSh4hVGuwLkqIsC80N3DKy/LHnc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713285644; c=relaxed/simple;
-	bh=c9rv2ENZUtW89CuH5U8B/1vQYk4rvmSwwB56Zf73aj0=;
+	s=arc-20240116; t=1713285876; c=relaxed/simple;
+	bh=30qVteymE6fYqV8CULZ2xQ59p/2UxVIXvjxQltbgNOU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QVYh8icJwtxDvfDZ1/B6LLHm5rg7CML4uH2WP1sRDvzjC9r+eYL3UTv98oWU/SW8Dva8+WHmMxeCeTGdngp6oO9AVbxTKNfaNyAQMwNt9r6AElcsoME23XuxfeFR2LIFjqgKEwrDWupW0XMF5Dfn1zpPMyGKaB1sJQeTTM2ZWn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YxGhi2SS; arc=none smtp.client-ip=192.198.163.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=hUwYMO9YRpf+e/Cs0+1BZS1SjN1V/Adzkr/hFJvcNfluWkHsnKOLQZ++03GZJVw3jfu6dz59QRtRWV+Ehtjw6Bt3WzQPKTn4t7ZoYl2LdRVSXub+4HiAgx0Th0ten3kmRX4uJrhhAXRsTrv7UoasdQsAqZ6tX2WaNfhS/jy/jBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KHzFYRX+; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713285643; x=1744821643;
+  t=1713285874; x=1744821874;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=c9rv2ENZUtW89CuH5U8B/1vQYk4rvmSwwB56Zf73aj0=;
-  b=YxGhi2SSRj8Tt4Q+I5ydNmpLNV51AWKHDX1hcvvR5yDXYe5yqzpR7z+4
-   DnJx0zkMIZXqn0S/YC9gkwQAwXu5sX28ku3gKEgyf/lOLB2XKukW37+sk
-   EhGFjzZ8+BjfJJz9g0o66NM7ZABAVPmwvUGrL5UkXRgnmzxGHRTYSI6GM
-   ghtPALwQsdGPGcwxCR7oh+SLPTLCKAt8uEyDZ3w7nykoPzt6I+hm7MIcb
-   qUVGwpXYk2qBNI4KyxJ3+mLTM3W6TKM11Qt24L4FEOHFFTYTMroBD1H+5
-   dYpjhvJBe2qYeccWqtAyMKCd/7n/gT5NpYEmZNNZsDTLkrgRZBPpPO8C3
-   w==;
-X-CSE-ConnectionGUID: RIuodRcSRUuVh0Vo1RHK3Q==
-X-CSE-MsgGUID: JWeJHHA8QeiHeMrOxwEsIA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="9289188"
+  bh=30qVteymE6fYqV8CULZ2xQ59p/2UxVIXvjxQltbgNOU=;
+  b=KHzFYRX+qBIULyTkfjMc8UKcJxniNsDT+OC82ot0xRx4tlEV75lOvsO7
+   chYyTIw7E9itE7/ItP5fJVrBu4F7JgCTn0KxtSP+RvCUCyR/1gcCLsMMR
+   ai0iXRroSjv842i7oLv9BPbHLRYl7waM7hFs7iOs9XsofOa+QaL21MN3l
+   7Lp6CbGA+HoLutQjv8IwLP10t6dFA4gNgwmFoJE0If2ap+Q56FEPueP1p
+   ausNJYhsYa7HxXum8ihQ9b+eljXIhqzpWJFfHGrtifXYm4bJwlrJY4Q5u
+   FdkdrPjc4YkHI5O43xE8PgXBgjtKY+Wl2Q/mxpR0/p5XCKkFsgMl4YTaA
+   g==;
+X-CSE-ConnectionGUID: 9qi7IXC3QRSQMYTJv4M5nQ==
+X-CSE-MsgGUID: 0pCgdxi9SmOKGVvEObZuWw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8853258"
 X-IronPort-AV: E=Sophos;i="6.07,206,1708416000"; 
-   d="scan'208";a="9289188"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:40:42 -0700
-X-CSE-ConnectionGUID: /u9bDAVcSWqs0tXiTvD9MQ==
-X-CSE-MsgGUID: IrKk4m3VQW+WflQgAuFKEw==
+   d="scan'208";a="8853258"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:44:33 -0700
+X-CSE-ConnectionGUID: oveVtZQlQVerpF8v9O7DpA==
+X-CSE-MsgGUID: +afBxC3MREm1jHYcxmSCig==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,206,1708416000"; 
-   d="scan'208";a="22371840"
+   d="scan'208";a="27110955"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:40:42 -0700
-Date: Tue, 16 Apr 2024 09:40:41 -0700
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:44:33 -0700
+Date: Tue, 16 Apr 2024 09:44:32 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: "Yamahata, Isaku" <isaku.yamahata@intel.com>,
 	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 038/130] KVM: TDX: create/destroy VM structure
-Message-ID: <20240416164041.GY3039520@ls.amr.corp.intel.com>
+	"Chatre, Reinette" <reinette.chatre@intel.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Aktas, Erdem" <erdemaktas@google.com>,
+	Sagi Shahar <sagis@google.com>, "Chen, Bo2" <chen.bo@intel.com>,
+	"Yuan, Hang" <hang.yuan@intel.com>,
+	"Zhang, Tina" <tina.zhang@intel.com>,
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
+Subject: Re: [PATCH v19 087/130] KVM: TDX: handle vcpu migration over logical
+ processor
+Message-ID: <20240416164432.GZ3039520@ls.amr.corp.intel.com>
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <7a508f88e8c8b5199da85b7a9959882ddf390796.1708933498.git.isaku.yamahata@intel.com>
- <8aad3a39-dc7a-471e-a5f0-b3b1d5a51a00@intel.com>
+ <b9fe57ceeaabe650f0aecb21db56ef2b1456dcfe.1708933498.git.isaku.yamahata@intel.com>
+ <0c3efffa-8dd5-4231-8e90-e0241f058a20@intel.com>
+ <20240412214201.GO3039520@ls.amr.corp.intel.com>
+ <Zhm5rYA8eSWIUi36@google.com>
+ <20240413004031.GQ3039520@ls.amr.corp.intel.com>
+ <Zh0wGQ_FfPRENgb0@google.com>
+ <20240415224828.GS3039520@ls.amr.corp.intel.com>
+ <a552a48d-81b6-441a-88cf-63301f6968a2@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,36 +93,77 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8aad3a39-dc7a-471e-a5f0-b3b1d5a51a00@intel.com>
+In-Reply-To: <a552a48d-81b6-441a-88cf-63301f6968a2@intel.com>
 
-On Mon, Apr 15, 2024 at 04:17:35PM +0800,
-Xiaoyao Li <xiaoyao.li@intel.com> wrote:
+On Tue, Apr 16, 2024 at 12:05:31PM +1200,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-> On 2/26/2024 4:25 PM, isaku.yamahata@intel.com wrote:
 > 
-> ...
 > 
-> > +
-> > +	kvm_tdx->tdcs_pa = tdcs_pa;
-> > +	for (i = 0; i < tdx_info->nr_tdcs_pages; i++) {
-> > +		err = tdh_mng_addcx(kvm_tdx->tdr_pa, tdcs_pa[i]);
-> > +		if (err == TDX_RND_NO_ENTROPY) {
-> > +			/* Here it's hard to allow userspace to retry. */
-> > +			ret = -EBUSY;
+> On 16/04/2024 10:48 am, Yamahata, Isaku wrote:
+> > On Mon, Apr 15, 2024 at 06:49:35AM -0700,
+> > Sean Christopherson <seanjc@google.com> wrote:
+> > 
+> > > On Fri, Apr 12, 2024, Isaku Yamahata wrote:
+> > > > On Fri, Apr 12, 2024 at 03:46:05PM -0700,
+> > > > Sean Christopherson <seanjc@google.com> wrote:
+> > > > 
+> > > > > On Fri, Apr 12, 2024, Isaku Yamahata wrote:
+> > > > > > On Fri, Apr 12, 2024 at 09:15:29AM -0700, Reinette Chatre <reinette.chatre@intel.com> wrote:
+> > > > > > > > +void tdx_mmu_release_hkid(struct kvm *kvm)
+> > > > > > > > +{
+> > > > > > > > +	while (__tdx_mmu_release_hkid(kvm) == -EBUSY)
+> > > > > > > > +		;
+> > > > > > > >   }
+> > > > > > > 
+> > > > > > > As I understand, __tdx_mmu_release_hkid() returns -EBUSY
+> > > > > > > after TDH.VP.FLUSH has been sent for every vCPU followed by
+> > > > > > > TDH.MNG.VPFLUSHDONE, which returns TDX_FLUSHVP_NOT_DONE.
+> > > > > > > 
+> > > > > > > Considering earlier comment that a retry of TDH.VP.FLUSH is not
+> > > > > > > needed, why is this while() loop here that sends the
+> > > > > > > TDH.VP.FLUSH again to all vCPUs instead of just a loop within
+> > > > > > > __tdx_mmu_release_hkid() to _just_ resend TDH.MNG.VPFLUSHDONE?
+> > > > > > > 
+> > > > > > > Could it be possible for a vCPU to appear during this time, thus
+> > > > > > > be missed in one TDH.VP.FLUSH cycle, to require a new cycle of
+> > > > > > > TDH.VP.FLUSH?
+> > > > > > 
+> > > > > > Yes. There is a race between closing KVM vCPU fd and MMU notifier release hook.
+> > > > > > When KVM vCPU fd is closed, vCPU context can be loaded again.
+> > > > > 
+> > > > > But why is _loading_ a vCPU context problematic?
+> > > > 
+> > > > It's nothing problematic.  It becomes a bit harder to understand why
+> > > > tdx_mmu_release_hkid() issues IPI on each loop.  I think it's reasonable
+> > > > to make the normal path easy and to complicate/penalize the destruction path.
+> > > > Probably I should've added comment on the function.
+> > > 
+> > > By "problematic", I meant, why can that result in a "missed in one TDH.VP.FLUSH
+> > > cycle"?  AFAICT, loading a vCPU shouldn't cause that vCPU to be associated from
+> > > the TDX module's perspective, and thus shouldn't trigger TDX_FLUSHVP_NOT_DONE.
+> > > 
+> > > I.e. looping should be unnecessary, no?
+> > 
+> > The loop is unnecessary with the current code.
+> > 
+> > The possible future optimization is to reduce destruction time of Secure-EPT
+> > somehow.  One possible option is to release HKID while vCPUs are still alive and
+> > destruct Secure-EPT with multiple vCPU context.  Because that's future
+> > optimization, we can ignore it at this phase.
 > 
-> So userspace is expected to stop creating TD and quit on this?
+> I kinda lost here.
 > 
-> If so, it exposes an DOS attack surface that malicious users in another can
-> drain the entropy with busy-loop on RDSEED.
+> I thought in the current v19 code, you have already implemented this
+> optimization?
 > 
-> Can you clarify why it's hard to allow userspace to retry? To me, it's OK to
-> retry that "teardown" cleans everything up, and userspace and issue the
-> KVM_TDX_INIT_VM again.
+> Or is this optimization totally different from what we discussed in an
+> earlier patch?
+> 
+> https://lore.kernel.org/lkml/8feaba8f8ef249950b629f3a8300ddfb4fbcf11c.camel@intel.com/
 
-The current patch has complicated error recovery path.  After simplifying
-the code, it would be possible to return -EAGAIN in this patch.
-
-For the retry case, we need to avoid TDH.MNG.CREATE() and TDH.MNG.KEY.CONFIG().
+That's only the first step.  We can optimize it further with multiple vCPUs
+context.
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
