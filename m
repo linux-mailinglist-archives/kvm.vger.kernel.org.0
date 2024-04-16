@@ -1,152 +1,292 @@
-Return-Path: <kvm+bounces-14822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086988A734E
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 20:35:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D01D8A7364
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 20:44:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BDD01C226D3
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:35:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D65401F219F5
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18375137761;
-	Tue, 16 Apr 2024 18:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697FF137761;
+	Tue, 16 Apr 2024 18:44:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mAjJXpqh"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="bQeNiMSZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90602D60A
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 18:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0582013541F
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 18:44:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713292516; cv=none; b=faO0yHTFKPnY0lvWQkpI8Wdb1EaII9ltr8Mq0KslbyiiALUPQvoBzWKo7ejNCwAyOAY8Q0ore9uLNsk6nqQSKg6pOVJ53TlmdiWdMgIoYiTJ/yP97wNDfvkgKFPrX8Fq4dZhP37vySEwj7EKz6JoVeXwBJF/RyBBIDUNTOLb6eo=
+	t=1713293083; cv=none; b=fXrADCdghx8XdSOynu6hO27eaNvRkztOLMUtHax1bqqAEJnjavdw15LiR336EODn7SKXr8XKp2hnm6SG74sGyqjPssuE/I9l5kQfeNKM/akBf5bsjKXEm3NRPrm/17Ty0IxU1DSkFG5PbW8drY1mQ2qW/RyiakisD7wb9Ql5R4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713292516; c=relaxed/simple;
-	bh=2DmfH0iZuBeBaf9fmZxw8bxd/Na/JJLdrJnni9XYYsI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=rdV9RFksm4vZUpXn5N64P42+X7hSk2K7evuOkaS9nf1+CKfo7bw2MqwWJ7mreFXGPPyLUIFAv7p+pn4Jshn9eBjbZHv8LGEko4Qn0yeXP00gXaW3Jf3kQU9JmWHZ0Cd8sVhuGO04wJmjMumkyVak85oMwGHY98infTw6U+z068w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mAjJXpqh; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e2be2a866aso50307245ad.3
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 11:35:13 -0700 (PDT)
+	s=arc-20240116; t=1713293083; c=relaxed/simple;
+	bh=Z1jmTcJrVyj/I2F/JiX6Yjr63qhv4nR8y5tKuk+tQvc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=MIyc60q4Xrnt3nyI6NquDQpBS1B98IbpuNDnytXZMdbG3CqTAySdFJpL5ha9XLiZ9pV6X6tJxFMCxAyrXlO+YaEojE+2n8X5XchMy0Delr1Ha5jWVqoZpl5eCQ0lfiKGFQIYag5ZGXNzLBmvLSOzWFcuFXnk3ZJ+ms5R0JpCFPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=bQeNiMSZ; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6ecee1f325bso4374167b3a.2
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 11:44:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713292513; x=1713897313; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y4IcmDFg9mXfsOm+KYa9etM9trKW2oRgOEYJLX5Llhs=;
-        b=mAjJXpqhNpvZHQD00GZO0U/Oz751ABA9G+j4q35BGnuTiqi1/cVAM2sOQCZ/cnwEUS
-         Zc92UALDTpfzuN9r9LHlhQ9BR+YIYqKSEDNa8PK7AumZVSOyHVXqpHM5+On/iggdWbLA
-         90vUzEu0vyHlgrGZmPRIW7EppLWhdhkKEY8nFm/mvo2Y2IhZS5i3z/i9SSRE0xE3UShQ
-         A+PUVOHg554RzM6UM+r8RbC7oydSTbn+vNNc3wLaXrAPdORAeJT0tN2RkD6J10oN09NT
-         pASk5elribF1Er6BZYJll0uASG7BiDh7wZJ7OXtH2L7gu3eZv30PjdP2M2ECTAN0ruPl
-         lNqA==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1713293081; x=1713897881; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QhffKe1izy+ovrNgc5YSpmfD4vFRIMFVFWBtmdrG8UI=;
+        b=bQeNiMSZIt4hMYxaJ2kSnBwfzyp+7qHqEDXXkOiVdkgnWC1fHCyHgR1ySQQ8Lejh44
+         CAmbAWxh3YIU2aw2WJL6ZfJ6IN/P9DXl3UhcwFCA8EInpPnNrjDLRYUe19p5F6tMYeWQ
+         cEb2SPGXBzgC0+YbScFc5h8imsWQg0XyACIvkeZOO5Cl0nTPKpVymvP4ORkZK/1sKupS
+         BvjH5/YQSxD4tq5EHNE2i/g3sMnc5XiGvwSoiMTKc2yDZxxX/pYsFaM7/2ErhBnwQhd5
+         0P+GKSqqY9lJSzByHKTAUp/P9/RAvBmdfnWcu2UmCQZAezMoRHfeqWr/u69TMkM40s/G
+         1c6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713292513; x=1713897313;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y4IcmDFg9mXfsOm+KYa9etM9trKW2oRgOEYJLX5Llhs=;
-        b=eLCsW/w5IjZ3z0KKu6sOZBO4zGEahXf9qSGhnqi4C8mI+o2miJ9KXgNM4r0QqdmXbF
-         aRVsxetDwC5IoMFJpMSAONWCxdXzKvqJZeGMInu5EALXPrVWDMgvvlw+szQvOQlw06yX
-         ufXSxkeWcvu5u/E5yifDLfNnzQU0y6nqSncRGmt9B/A+Bbyv0HpXB2L5aZQ4fBOeqD27
-         QGt76wqN6TvMGTGBaL2PX2fclbuSYIC1iB9JQ11KFhaMvWrc2oG8WBMD/uQMrAh3m3/1
-         mZMwUrT/GuxHsxV0vwUnLWq8nPiGbPDHJn0KYBi0NYOeW8J1EXZqG1h8C2/j40WGhIZ8
-         4Mlg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVmWalRQy6/ZQW7nAQ9TCWD8t61shjjWT2hgV9NZBc9rXoPzRMqu927wCNnxBRroX4xrU7bt1BsHp2w7x/TwFTXYuV
-X-Gm-Message-State: AOJu0Yy05rWQYrKq0Mb3dee6fQPHrBBtMisgfBwF4qx5vwtNzf7fy8pt
-	8F5WFbN6EP69Ob0H9XMeXNMkxFWAqmv/4qNnPtH05LHHV8UeN5ElSq5twKTq+xR4zlsqeOW77pO
-	x8g==
-X-Google-Smtp-Source: AGHT+IH2l/4Q1X0kmlazvUCeA2LxIdHYVFqddoS+Vcjn6XdYq8l7HIp0PwRH0csKmwi+ILtTtyM7Ra+SNYM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e80b:b0:1e3:ff3a:7a07 with SMTP id
- u11-20020a170902e80b00b001e3ff3a7a07mr93926plg.6.1713292513069; Tue, 16 Apr
- 2024 11:35:13 -0700 (PDT)
-Date: Tue, 16 Apr 2024 11:35:11 -0700
-In-Reply-To: <ZhkQsqRjy1ba+mRm@chao-email>
+        d=1e100.net; s=20230601; t=1713293081; x=1713897881;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QhffKe1izy+ovrNgc5YSpmfD4vFRIMFVFWBtmdrG8UI=;
+        b=w4FoxC9HaEghGrA5v9j2Bx7U23+/CXP+ofVRyZ0qAzcys6MIpNyQuAI7w1M94GVG7+
+         8lcaS2DTfVwD7O5U8ixv9Xi31VkOz/Vn36dGMP465zqwHBnoHSyMFX7GM1Nr6qiM2lyo
+         G91jeDxiNOWh5qZhPJE7h51JO9nfQIA18k32TFm5fwtflP5xZ3AnKmC0O6jmD3k0kb4G
+         Ldq7n68UQMcZgZGgKUiBhRj6tapQxlVDHqWHiETEjXAeBBwuTCDXV+uK+qbwC26ER2Wi
+         zGvvuNPoeqNpO0FrHNxTa5FDotBx3SQJknOl20WEZMKVAeQDeGPKg0616UbeO+sGhhlo
+         Hdkg==
+X-Forwarded-Encrypted: i=1; AJvYcCV5UeK/ojL74H2817+cKiDkONCz1OBhfbPJSyfJkxV+4es556E3j/h5HBGrH+yeXuptx4p5mLN9xsKZPxL5K9t0UU95
+X-Gm-Message-State: AOJu0Yy6lpO7RAW3PI09FAMWg2U2QhCcgHtvg1Nau1drhgCaAVM5fZYs
+	CeXGDkRgIIJGMHaW/4/x/fztSrRQhd8KqTkxKIqR9V7TAH3KcpcWG8AW8c/p3eg=
+X-Google-Smtp-Source: AGHT+IG6Lhdl6zfASnIBb8LsG3YDshK7PNssF4vC3rA9HZjmMOwT19n+1nhhvWp2m63P0+SWcFhksw==
+X-Received: by 2002:a17:90a:dc18:b0:2a2:dcee:f537 with SMTP id i24-20020a17090adc1800b002a2dceef537mr13602401pjv.33.1713293081257;
+        Tue, 16 Apr 2024 11:44:41 -0700 (PDT)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id o19-20020a17090aac1300b002a269828bb8sm8883645pjq.40.2024.04.16.11.44.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 11:44:40 -0700 (PDT)
+From: Atish Patra <atishp@rivosinc.com>
+To: linux-kernel@vger.kernel.org
+Cc: Atish Patra <atishp@rivosinc.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <anup@brainfault.org>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Juergen Gross <jgross@suse.com>,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Mark Rutland <mark.rutland@arm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Shuah Khan <shuah@kernel.org>,
+	virtualization@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	x86@kernel.org
+Subject: [PATCH v7 00/24] RISC-V SBI v2.0 PMU improvements and Perf sampling in KVM guest
+Date: Tue, 16 Apr 2024 11:43:57 -0700
+Message-Id: <20240416184421.3693802-1-atishp@rivosinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240215160136.1256084-1-alejandro.j.jimenez@oracle.com>
- <20240215160136.1256084-4-alejandro.j.jimenez@oracle.com> <ZhTj8kdChoqSLpi8@chao-email>
- <98493056-4a75-46ad-be79-eb6784034394@oracle.com> <ZhkQsqRjy1ba+mRm@chao-email>
-Message-ID: <Zh7E3yIYHYGTGGoB@google.com>
-Subject: Re: [RFC 3/3] x86: KVM: stats: Add a stat counter for GALog events
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org, 
-	pbonzini@redhat.com, linux-kernel@vger.kernel.org, joao.m.martins@oracle.com, 
-	boris.ostrovsky@oracle.com, mark.kanda@oracle.com, 
-	suravee.suthikulpanit@amd.com, mlevitsk@redhat.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 12, 2024, Chao Gao wrote:
-> On Tue, Apr 09, 2024 at 09:31:45PM -0400, Alejandro Jimenez wrote:
-> >
-> >On 4/9/24 02:45, Chao Gao wrote:
-> >> > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> >> > index 4b74ea91f4e6..853cafe4a9af 100644
-> >> > --- a/arch/x86/kvm/svm/avic.c
-> >> > +++ b/arch/x86/kvm/svm/avic.c
-> >> > @@ -165,8 +165,10 @@ int avic_ga_log_notifier(u32 ga_tag)
-> >> > 	 * bit in the vAPIC backing page. So, we just need to schedule
-> >> > 	 * in the vcpu.
-> >> > 	 */
-> >> > -	if (vcpu)
-> >> > +	if (vcpu) {
-> >> > 		kvm_vcpu_wake_up(vcpu);
-> >> > +		++vcpu->stat.ga_log_event;
-> >> > +	}
-> >> > 
-> >> 
-> >> I am not sure why this is added for SVM only.
-> >
-> >I am mostly familiar with AVIC, and much less so with VMX's PI, so this is
-> >why I am likely missing potential stats that could be useful to expose from
-> >the VMX  side. I'll be glad to implement any other suggestions you have.
-> >
-> >
-> >it looks to me GALog events are
-> >> similar to Intel IOMMU's wakeup events. Can we have a general name? maybe
-> >> iommu_wakeup_event
-> >
-> >I believe that after:
-> >d588bb9be1da ("KVM: VMX: enable IPI virtualization")
-> >
-> >both the VT-d PI and the virtualized IPIs code paths will use POSTED_INTR_WAKEUP_VECTOR
-> >for interrupts targeting a blocked vCPU. So on Intel hosts enabling IPI virtualization,
-> >a counter incremented in pi_wakeup_handler() would record interrupts from both virtualized
-> >IPIs and VT-d sources.
-> >
-> >I don't think it is correct to generalize this counter since AMD's implementation is
-> >different; when a blocked vCPU is targeted:
-> >
-> >- by device interrupts, it uses the GA Log mechanism
-> >- by an IPI, it generates an AVIC_INCOMPLETE_IPI #VMEXIT
-> >
-> >If the reasoning above is correct, we can add a VMX specific counter (vmx_pi_wakeup_event?)
-> >that is increased in pi_wakeup_handler() as you suggest, and document the difference
-> >in behavior so that is not confused as equivalent with the ga_log_event counter.
-> 
-> Correct. If we cannot generalize the counter, I think it is ok to
-> add the counter for SVM only. Thank you for the clarification.
+This series implements SBI PMU improvements done in SBI v2.0[1] i.e. PMU snapshot
+and fw_read_hi() functions. 
 
-There's already a generic stat, halt_wakeup, that more or less covers this case.
-And despite what the comment says, avic_ga_log_notifier() does NOT schedule in
-the task, kvm_vcpu_wake_up() only wakes up blocking vCPUs, no more, no less.
+SBI v2.0 introduced PMU snapshot feature which allows the SBI implementation
+to provide counter information (i.e. values/overflow status) via a shared
+memory between the SBI implementation and supervisor OS. This allows to minimize
+the number of traps in when perf being used inside a kvm guest as it relies on
+SBI PMU + trap/emulation of the counters. 
 
-I'm also not at all convinced that KVM needs to differentiate between IPIs and
-device interrupts that arrive when the vCPU isn't in the guest.  E.g. this can
-kinda sorta be used to confirm IRQ affinity, but if the vCPU is happily running
-in the guest, such a heuristic will get false negatives.
+The current set of ratified RISC-V specification also doesn't allow scountovf
+to be trap/emulated by the hypervisor. The SBI PMU snapshot bridges the gap
+in ISA as well and enables perf sampling in the guest. However, LCOFI in the
+guest only works via IRQ filtering in AIA specification. That's why, AIA
+has to be enabled in the hardware (at least the Ssaia extension) in order to
+use the sampling support in the perf. 
 
-And for confirming that GA logging is working, that's more or less covered by the
-proposed APICv stat.  If AVIC is enabled, the VM has assigned devices, and GA logging
-*isn't* working, then you'll probably find out quite quickly because the VM will
-have a lot of missed interrupts, e.g. vCPUs will get stuck in HLT.
+Here are the patch wise implementation details.
+
+PATCH 1,4,7,8,9,10,11,15 : Generic cleanups/improvements.
+PATCH 2,3,14 : FW_READ_HI function implementation
+PATCH 5-6: Add PMU snapshot feature in sbi pmu driver
+PATCH 12-13: KVM implementation for snapshot and sampling in kvm guests
+PATCH 16-17: Generic improvements for kvm selftests 
+PATCH 18-22: KVM selftests for SBI PMU extension
+
+The series is based on v6.9-rc4 and is available at:
+
+https://github.com/atishp04/linux/tree/kvm_pmu_snapshot_v7
+
+The kvmtool patch is also available at:
+https://github.com/atishp04/kvmtool/tree/sscofpmf
+
+It also requires Ssaia ISA extension to be present in the hardware in order to
+get perf sampling support in the guest. In Qemu virt machine, it can be done
+by the following config.
+
+```
+-cpu rv64,sscofpmf=true,x-ssaia=true
+```
+
+There is no other dependencies on AIA apart from that. Thus, Ssaia must be disabled
+for the guest if AIA patches are not available. Here is the example command.
+
+```
+./lkvm-static run -m 256 -c2 --console serial -p "console=ttyS0 earlycon" --disable-ssaia -k ./Image --debug 
+```
+
+The series has been tested only in Qemu.
+Here is the snippet of the perf running inside a kvm guest.
+
+===================================================
+$ perf record -e cycles -e instructions perf bench sched messaging -g 5
+...
+$ Running 'sched/messaging' benchmark:
+...
+[   45.928723] perf_duration_warn: 2 callbacks suppressed
+[   45.929000] perf: interrupt took too long (484426 > 483186), lowering kernel.perf_event_max_sample_rate to 250
+$ 20 sender and receiver processes per group
+$ 5 groups == 200 processes run
+
+     Total time: 14.220 [sec]
+[ perf record: Woken up 1 times to write data ]
+[ perf record: Captured and wrote 0.117 MB perf.data (1942 samples) ]
+$ perf report --stdio
+$ To display the perf.data header info, please use --header/--header-only optio>
+$
+$
+$ Total Lost Samples: 0
+$
+$ Samples: 943  of event 'cycles'
+$ Event count (approx.): 5128976844
+$
+$ Overhead  Command          Shared Object                Symbol               >
+$ ........  ...............  ...........................  .....................>
+$
+     7.59%  sched-messaging  [kernel.kallsyms]            [k] memcpy
+     5.48%  sched-messaging  [kernel.kallsyms]            [k] percpu_counter_ad>
+     5.24%  sched-messaging  [kernel.kallsyms]            [k] __sbi_rfence_v02_>
+     4.00%  sched-messaging  [kernel.kallsyms]            [k] _raw_spin_unlock_>
+     3.79%  sched-messaging  [kernel.kallsyms]            [k] set_pte_range
+     3.72%  sched-messaging  [kernel.kallsyms]            [k] next_uptodate_fol>
+     3.46%  sched-messaging  [kernel.kallsyms]            [k] filemap_map_pages
+     3.31%  sched-messaging  [kernel.kallsyms]            [k] handle_mm_fault
+     3.20%  sched-messaging  [kernel.kallsyms]            [k] finish_task_switc>
+     3.16%  sched-messaging  [kernel.kallsyms]            [k] clear_page
+     3.03%  sched-messaging  [kernel.kallsyms]            [k] mtree_range_walk
+     2.42%  sched-messaging  [kernel.kallsyms]            [k] flush_icache_pte
+
+===================================================
+
+[1] https://github.com/riscv-non-isa/riscv-sbi-doc
+
+Changes from v6->v7:
+1. Used SBI_SHMEM_DISABLE in the driver.
+2. Added RB Tags.
+3. Improved the sbi_pmu_test commandline to allow disabling multiple
+   tests.
+
+Changes from v5->v6:
+1. Added a patch for command line option for the sbi pmu tests.
+2. Removed redundant prints and restructure the code little bit.
+3. Added a patch for computing the sbi minor version correctly.
+4. Addressed all other comments on v5.  
+
+Changes from v4->v5:
+1. Moved sbi related definitions to its own header file from processor.h
+2. Added few helper functions for selftests.
+3. Improved firmware counter read and RV32 start/stop functions.
+4. Converted all the shifting operations to use BIT macro
+5. Addressed all other comments on v4.  
+
+Changes from v3->v4:
+1. Added selftests.
+2. Fixed an issue to clear the interrupt pending bits.
+3. Fixed the counter index in snapshot memory start function.
+
+Changes from v2->v3:
+1. Fixed a patchwork warning on patch6.
+2. Fixed a comment formatting & nit fix in PATCH 3 & 5.
+3. Moved the hvien update and sscofpmf enabling to PATCH 9 from PATCH 8.
+
+Changes from v1->v2:
+1. Fixed warning/errors from patchwork CI.
+2. Rebased on top of kvm-next.
+3. Added Acked-by tags.
+
+Changes from RFC->v1:
+1. Addressed all the comments on RFC series.
+2. Removed PATCH2 and merged into later patches.
+3. Added 2 more patches for minor fixes.
+4. Fixed KVM boot issue without Ssaia and made sscofpmf in guest dependent on
+   Ssaia in the host.
+
+Atish Patra (24):
+RISC-V: Fix the typo in Scountovf CSR name
+RISC-V: Add FIRMWARE_READ_HI definition
+drivers/perf: riscv: Read upper bits of a firmware counter
+drivers/perf: riscv: Use BIT macro for shifting operations
+RISC-V: Add SBI PMU snapshot definitions
+RISC-V: KVM: Rename the SBI_STA_SHMEM_DISABLE to a generic name
+RISC-V: Use the minor version mask while computing sbi version
+drivers/perf: riscv: Implement SBI PMU snapshot function
+drivers/perf: riscv: Fix counter mask iteration for RV32
+RISC-V: KVM: Fix the initial sample period value
+RISC-V: KVM: No need to update the counter value during reset
+RISC-V: KVM: No need to exit to the user space if perf event failed
+RISC-V: KVM: Implement SBI PMU Snapshot feature
+RISC-V: KVM: Add perf sampling support for guests
+RISC-V: KVM: Support 64 bit firmware counters on RV32
+RISC-V: KVM: Improve firmware counter read function
+KVM: riscv: selftests: Move sbi definitions to its own header file
+KVM: riscv: selftests: Add helper functions for extension checks
+KVM: riscv: selftests: Add Sscofpmf to get-reg-list test
+KVM: riscv: selftests: Add SBI PMU extension definitions
+KVM: riscv: selftests: Add SBI PMU selftest
+KVM: riscv: selftests: Add a test for PMU snapshot functionality
+KVM: riscv: selftests: Add a test for counter overflow
+KVM: riscv: selftests: Add commandline option for SBI PMU test
+
+arch/riscv/include/asm/csr.h                  |   5 +-
+arch/riscv/include/asm/kvm_vcpu_pmu.h         |  16 +-
+arch/riscv/include/asm/sbi.h                  |  38 +-
+arch/riscv/include/uapi/asm/kvm.h             |   1 +
+arch/riscv/kernel/paravirt.c                  |   6 +-
+arch/riscv/kvm/aia.c                          |   5 +
+arch/riscv/kvm/vcpu.c                         |  15 +-
+arch/riscv/kvm/vcpu_onereg.c                  |   6 +
+arch/riscv/kvm/vcpu_pmu.c                     | 260 ++++++-
+arch/riscv/kvm/vcpu_sbi_pmu.c                 |  17 +-
+arch/riscv/kvm/vcpu_sbi_sta.c                 |   4 +-
+drivers/perf/riscv_pmu.c                      |   1 +
+drivers/perf/riscv_pmu_sbi.c                  | 272 ++++++-
+include/linux/perf/riscv_pmu.h                |   6 +
+tools/testing/selftests/kvm/Makefile          |   1 +
+.../selftests/kvm/include/riscv/processor.h   |  49 +-
+.../testing/selftests/kvm/include/riscv/sbi.h | 141 ++++
+.../selftests/kvm/include/riscv/ucall.h       |   1 +
+.../selftests/kvm/lib/riscv/processor.c       |  12 +
+.../testing/selftests/kvm/riscv/arch_timer.c  |   2 +-
+.../selftests/kvm/riscv/get-reg-list.c        |   4 +
+.../selftests/kvm/riscv/sbi_pmu_test.c        | 681 ++++++++++++++++++
+tools/testing/selftests/kvm/steal_time.c      |   4 +-
+23 files changed, 1433 insertions(+), 114 deletions(-)
+create mode 100644 tools/testing/selftests/kvm/include/riscv/sbi.h
+create mode 100644 tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
+
+--
+2.34.1
+
 
