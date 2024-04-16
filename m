@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-14729-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14730-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB278A6497
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 09:14:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D2BF8A64E5
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 09:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 026302836CB
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 07:14:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7EA2282480
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 07:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B7A76044;
-	Tue, 16 Apr 2024 07:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52DF80BFE;
+	Tue, 16 Apr 2024 07:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dOYeuYsM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YXr143cE"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B875A39863
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 07:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE2C7D086
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 07:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713251648; cv=none; b=XlZO9GanzyG87x4LIzFybBylE48GGdeu1tEEhiCl3p2Sur7CmcPtVYG0q5asMnIYHcZZfBQIxkuh4M8HhMyzVLPJj4cpoVNkxKFhnLdKmUu1VSKDfsi4tSUb+mQokJDV7i8Bk4rURxdGBygjQx86wuxM+nXJFnVl5R2IEgQkIJY=
+	t=1713251931; cv=none; b=dPEklxU41RqgcbZHe9pv7Myaia/xegxgeZJKxhsAKh5HjLsz30mZRiU7CaSsn7ZEmih19azy/g8EQhEmgaqL0BfxRUimhEn61yFId0Ab6V26cgfa75YucVADzQUALlHkmwBrsGg3BCB4J8Ck7nuq9yBxQhCjSEL/vN/yHrXjTao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713251648; c=relaxed/simple;
-	bh=zhlPaLuG8LY4jm4pwLz4/7ygwkcekjYjJGpSIHundeA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z1lUs+Ix2aiFa3Mp3kFxmMA0VWQm0I2p9hHCd8mOSHZBYRZ7/gV60igzAvNRnYDuMinjXtCcr73b4u0z1x2wJspSfZtViFfGeEHStk7jBA+ZmXeEfT94oHS5G7ZYy3mXL54YTm+pq+kajbmrzkhOM316xnzHlT7XoyRt7sarFE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dOYeuYsM; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1713251931; c=relaxed/simple;
+	bh=CXwvyQqlDCMUJbkFs5lA3GpywIzQoFs1ouIlk/9KUys=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Gm2JAfLYpnhuCYZwVqeaf/mrJxZkEVSdE1/R6euLZaN7SXeK8Tu+8eEk3XsoUjDLPQGyzzelCBowojuAO7TeeiT9vtup4lXYCY5kFfk7cGV8nc1Os5/i5Xf0/r0xO11bNhRWdrxg8dyk1AXclyMPSBuaOzx7/vx9lSsGTd0Cbqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YXr143cE; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713251645;
+	s=mimecast20190719; t=1713251929;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8bMa2NdMCt/jjygLXBA/F/vbbeeUkOfz7KmWUdw8p0k=;
-	b=dOYeuYsM+9gpP3I8AiLdl/yaEFCuQjhorxmlgyQvAN0LgMtZQuFM/W5oAm/TWoRLn/iwAC
-	tUI954bfAxYgJzbN5EJ82VH+u2xgaNawitJcq7UYsg3AC1sr4MJ+ScJo1jbhqawCNQ8emJ
-	tvDb4+J4OQPBpImwg2P3g4k3u9G4WJg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=e5e+KDoend6ys1L9LmDT595ey+XRcm1nHptmRwP1piM=;
+	b=YXr143cETpKSgloF9DlJhmutws8PYwZ5qfOad/NzPY4rOm6AvJm5K5KplHx7LaROM+PHc3
+	i7Ru7Pqeaz2kRZ/2cY1ueOT0nx9yYNglumWm3HTIlWV3W74d35s0oAE9+JGN/QpyqfIyDa
+	/OnL+u9B2MBEodJd5AgTknomnShwoEs=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-604-e4RtEl7hN7ig9VHoi1tlKA-1; Tue, 16 Apr 2024 03:14:03 -0400
-X-MC-Unique: e4RtEl7hN7ig9VHoi1tlKA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a54c11dccfaso86026066b.2
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 00:14:03 -0700 (PDT)
+ us-mta-220-Zwnf8aiXPde6K5Z-Aux9gQ-1; Tue, 16 Apr 2024 03:18:47 -0400
+X-MC-Unique: Zwnf8aiXPde6K5Z-Aux9gQ-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-518c3c6e757so2053070e87.0
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 00:18:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713251642; x=1713856442;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8bMa2NdMCt/jjygLXBA/F/vbbeeUkOfz7KmWUdw8p0k=;
-        b=RufJ87bAAJmmQUUteDFAj9Bh2s1YfcLEu6zuuBYvIUxjsjsLhOTBoyST9j3/FcBdH7
-         v2cu9reoY9qqSQdQw8Bphm1+ylO/cvx1KnQVa9/vMt3QvkyEWonVEYYxdW+o3oFzoMcO
-         v1XMFDalTBuqm04sLZb1B3V0juFFBz7jWBPWBkAiPHijcm03F+CoOwuR1uW9XbwjWkQJ
-         tUFxYAb6Wu8VVggC04/EL6RDyedfkUgjYp9hcROWA4NtTL02uK1klNLzE3iXReDT2d+q
-         MLx1gEzDpmjhFFecmz0kctez54kKBYm5igGAoH6DX07QJ28xhRgGjsamSithKbDmU1az
-         JWug==
-X-Forwarded-Encrypted: i=1; AJvYcCXAe9Texvw1CfUBTImPBE0N8umJBF3j2fcJaZs305pWS66N9+ETkeKNZnMpd7Mu7LZ5/fvjfuO6X0gXVbWpujtpU/ik
-X-Gm-Message-State: AOJu0YzPvUPBYgliF17eqiBWcXK8D4bTbeQuHlBehKX0u50PjntY/gdF
-	HFK+jQVoftAp3gvne9oznfswGFhSdVXPDA4L1WwGxoKcWy8h9XWTsTsCt3r1Ar2TaY7NZNXoyvH
-	xGHnMoKgNrvs5h9vfSsqoQpUAF7C73wlN8FkSrEkTHTxuJ45s9KPG4THQ3A==
-X-Received: by 2002:a17:907:36ca:b0:a52:551e:7502 with SMTP id bj10-20020a17090736ca00b00a52551e7502mr7064202ejc.9.1713251642801;
-        Tue, 16 Apr 2024 00:14:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFjGVg/wKHQOfBuW1kLaLPCindSvX/WpMQR9ygezy0OgodDCIT2qFBWEa706lvyo3JP6F8U8g==
-X-Received: by 2002:a17:907:36ca:b0:a52:551e:7502 with SMTP id bj10-20020a17090736ca00b00a52551e7502mr7064184ejc.9.1713251642519;
-        Tue, 16 Apr 2024 00:14:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713251926; x=1713856726;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=e5e+KDoend6ys1L9LmDT595ey+XRcm1nHptmRwP1piM=;
+        b=VleT6Czl1lVO/mFQhm4Jyto18O8aL7UA9w2OnU3458EqCsotuyUa696Nio3cP1IODz
+         OZmqvKpaDHmd2RS/uR4ztBeuGrmIWJBWb89KGjxfGBQtgyOgl9g8IsaO2wGb9PGmWFCc
+         QoBMCZK98KyLnPzrgvmHE3f0cSwZpul58PwjHmOrG/HtlV+DwLfaeenqWW7/4NdKKUux
+         A7iHmaIvKqknd0232sdVKP6E+8EgnFp6wXmbek8Xv/y+CiGMLSM5tbRs1A7QYftCicJ5
+         DiRe5ITjhvOjkktRYZcg8Xc7HPld5bumMe7p50c0/9hcr6kuSad2jaEMw+dmCFeEULtU
+         rgWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/izuzoXgml1I1gnCOE39uuN06x9zMJFPts4yLKoLFm0/PIZHKtpmWyEXNAr0RcDn8qRbjm9+HJ6iW3/NBBk7HTxiZ
+X-Gm-Message-State: AOJu0YxXP+emb9z3l97Ef9BQE1eS6jBePD0U33cpOHzywGBEm2sXWyVA
+	fU8rDdruQMkqCSVJ1RJnHTiyia5MmRks3X++t9l5vesrOpf7zCPb6H7jF6GMF/Ua0UWlAv/0WKV
+	VBPi/6FrXMCNxqBVf9auyfi7Z9eAqFM3DAeJe5jI7Zu8uJXsC9g==
+X-Received: by 2002:a19:f013:0:b0:513:dd23:7a02 with SMTP id p19-20020a19f013000000b00513dd237a02mr7870989lfc.26.1713251926381;
+        Tue, 16 Apr 2024 00:18:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjafICuo5LMwPp30unfFJwJWF4tCZLumMUMpRA+B5uETtyWY+iRGeCE31PSoDRCrKXhxjOaQ==
+X-Received: by 2002:a19:f013:0:b0:513:dd23:7a02 with SMTP id p19-20020a19f013000000b00513dd237a02mr7870975lfc.26.1713251925956;
+        Tue, 16 Apr 2024 00:18:45 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-43-179-50.web.vodafone.de. [109.43.179.50])
-        by smtp.gmail.com with ESMTPSA id bv21-20020a170906b1d500b00a520b294d9dsm6450771ejb.150.2024.04.16.00.14.01
+        by smtp.gmail.com with ESMTPSA id k21-20020a17090666d500b00a518bcb41c1sm6421258ejp.126.2024.04.16.00.18.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Apr 2024 00:14:02 -0700 (PDT)
-Message-ID: <eb6044c5-27f6-4d71-a34c-03339a14f867@redhat.com>
-Date: Tue, 16 Apr 2024 09:14:00 +0200
+        Tue, 16 Apr 2024 00:18:45 -0700 (PDT)
+Message-ID: <bc91c2e1-6099-46c5-bbca-18bb7adb82d2@redhat.com>
+Date: Tue, 16 Apr 2024 09:18:44 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,16 +83,18 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v8 09/35] powerpc: Fix stack backtrace
- termination
-To: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v8 06/35] gitlab-ci: Run migration selftest
+ on s390x and powerpc
+From: Thomas Huth <thuth@redhat.com>
+To: Nico Boehr <nrb@linux.ibm.com>, Nicholas Piggin <npiggin@gmail.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
  <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
  linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
 References: <20240405083539.374995-1-npiggin@gmail.com>
- <20240405083539.374995-10-npiggin@gmail.com>
+ <20240405083539.374995-7-npiggin@gmail.com>
+ <171259239221.48513.3205716585028068515@t14-nrb>
+ <e6c452bd-9101-40b7-ae3b-02400fed9e42@redhat.com>
 Content-Language: en-US
-From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -135,28 +137,52 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240405083539.374995-10-npiggin@gmail.com>
+In-Reply-To: <e6c452bd-9101-40b7-ae3b-02400fed9e42@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 05/04/2024 10.35, Nicholas Piggin wrote:
-> The backtrace handler terminates when it sees a NULL caller address,
-> but the powerpc stack setup does not keep such a NULL caller frame
-> at the start of the stack.
+On 11/04/2024 21.22, Thomas Huth wrote:
+> On 08/04/2024 18.06, Nico Boehr wrote:
+>> Quoting Nicholas Piggin (2024-04-05 10:35:07)
+>>> The migration harness is complicated and easy to break so CI will
+>>> be helpful.
+>>>
+>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>> ---
+>>>   .gitlab-ci.yml      | 32 +++++++++++++++++++++++---------
+>>>   s390x/unittests.cfg |  8 ++++++++
+>>>   2 files changed, 31 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+>>> index ff34b1f50..60b3cdfd2 100644
+>>> --- a/.gitlab-ci.yml
+>>> +++ b/.gitlab-ci.yml
+>> [...]
+>>> @@ -135,7 +147,7 @@ build-riscv64:
+>>>   build-s390x:
+>>>    extends: .outoftree_template
+>>>    script:
+>>> - - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu
+>>> + - dnf install -y qemu-system-s390x gcc-s390x-linux-gnu nmap-ncat
+>>>    - mkdir build
+>>>    - cd build
+>>>    - ../configure --arch=s390x --cross-prefix=s390x-linux-gnu-
+>>> @@ -161,6 +173,8 @@ build-s390x:
+>>>         sclp-1g
+>>>         sclp-3g
+>>>         selftest-setup
+>>> +      selftest-migration-kvm
+>>
+>> We're running under TCG in the Gitlab CI. I'm a little bit confused why
+>> we're running a KVM-only test here.
 > 
-> This happens to work on pseries because the memory at 0 is mapped and
-> it contains 0 at the location of the return address pointer if it
-> were a stack frame. But this is fragile, and does not work with powernv
-> where address 0 contains firmware instructions.
-> 
-> Use the existing dummy frame on stack as the NULL caller, and create a
-> new frame on stack for the entry code.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   powerpc/cstart64.S | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
+> The build-s390x job is TCG, indeed, but we have the "s390x-kvm" job that 
+> runs on a KVM-capable s390x host, so it could be added there?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+I now gave it a try and it seems to work, so I updated this patch and pushed 
+it to the repository now.
+
+  Thomas
+
 
 
