@@ -1,243 +1,293 @@
-Return-Path: <kvm+bounces-14717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821FD8A61D4
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 05:48:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41A7D8A6253
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 06:18:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC64F1F23A4D
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 03:48:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAF631F2123B
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 04:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E727381BD;
-	Tue, 16 Apr 2024 03:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D689B37160;
+	Tue, 16 Apr 2024 04:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JuS7ucZw"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="eNzKnc7/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007E33839D;
-	Tue, 16 Apr 2024 03:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713239276; cv=fail; b=LX4dcy1qM4ftUxajtGAD7HXATzb3C1viEEMb/qBrerL7Fl/KQ4JmsdKIdFd1o9bAGhXc8YAFfQTVJ5QMTsxwbgooX/swn5RvmYoxWNn1x39u5aPTdqGMuDTC9CJ+5wHdnAV/CDTX2ZKfea7CFU/0/mhH3a3KhU+JgTFS+ev2840=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713239276; c=relaxed/simple;
-	bh=EBYXNbFqDrq7DGMFyp9+kM0gYQ2iFJb+u2Z0s2IQMI4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fW6tl6zZ9vta4Kn7QA1rKBWyhyJGGIo4h1kvc38uyF0eDGgPA45gVFzl00WeajImCN/MGdYrYvcudHCB8SeniMB5pf7qp9FZ/OzlzpbGNIXt70+5CPNDWGlfu9d9mfIsAQ9Pz0dqClCEMh3M2FFY6q+tJMlC3D/lDCJvmmVLwtI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JuS7ucZw; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713239275; x=1744775275;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=EBYXNbFqDrq7DGMFyp9+kM0gYQ2iFJb+u2Z0s2IQMI4=;
-  b=JuS7ucZw+6InGsUxCNWtWh1218kP6eZ2gc6zBMXMWRK6NvcVhbApr6aY
-   XrQcHvRcRZtlvrTNN7e5ZuIqtwNtP43mvPFjZdgZOyykK4482unvAX1r9
-   tF9OxwXKq0sGh1UagGJT1j9aFazguQPbvPlZpqSzXjd3prYyDcO4BbBq3
-   6+ZeJ2ii/zGwe7VoTJUyW9i7ZL4YNVlSTOiMK3t7154y7YyFIcpJpTFCT
-   ZIPwvBXYyhHoZSsBJavu/q0FrlfoMjHZKQ9VK7VHkdiTZl8dMEX6zoWrj
-   a1P/3wEtuTHafPdJpyfIMTpDsdI054G7zrNpWuhb3KS/UcrCSZMbDwf5d
-   Q==;
-X-CSE-ConnectionGUID: fjCZrSaUTwu7MhlB1Ye4vQ==
-X-CSE-MsgGUID: BJe18OSeTBiBpcXt9tJP+Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="26170923"
-X-IronPort-AV: E=Sophos;i="6.07,204,1708416000"; 
-   d="scan'208";a="26170923"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 20:47:54 -0700
-X-CSE-ConnectionGUID: 04qKRXp7Rpewi3cZN2y07w==
-X-CSE-MsgGUID: ak7YSUSVS+6Mai7PbSAjVg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,204,1708416000"; 
-   d="scan'208";a="22193975"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Apr 2024 20:47:54 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 15 Apr 2024 20:47:53 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 15 Apr 2024 20:47:52 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 15 Apr 2024 20:47:52 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 15 Apr 2024 20:47:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CdEhkaVmVMYDF1mHAaZbZIsUSgNQ3dmSjwegiy8GhXM7dEGEKnO3Ydh2xlWAyELCdYBHuXmHT5rkjeDoMSiB7iKTkZ90Sw8XHaxTkpqAkZX0Oar9sOQm9NIAFZhBu+NI9RjCLFsrgaPNYOQUZcxoHrB0VvxKmyK/wWRTL8+CZVlsKyfL+KrWUbXBP6wEg7zxat7svsjzsoUVSt1nE0Zn0r5KELPVxSknLqQzIdmHHz1NdYFOv96SdwGI1LaylsuqrbCbLzvUsk3tZ6XxlcPa1GF6b9OaEBx6qzfDWh8WSuMluxHKUCDlHQTNGn+Oz9+JtcTl7zFsfCvd2gNDiOlp2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cy1G/t3Zo6Iqs/KT9pmcDkzy6i42fjF6EJWQkvfc3o8=;
- b=YnqVEmYofdVROeekFgDe94X9spCbnzbnWTyTf/7bYvWCjaN3w5us8394CioacLEYFOA2wl35eeSGO1gC35yBQceqaJDimvkDOSqyYNl+O+9wam5WSxvIqtQWcJB5Iz9zvy5i8PRz3f/a46EWY1EGxfm7BW+pp3HXgADA9UA4+cTWWFu73nCsyfvFf0i6J/hhiPPaKjYBV4rd0YwUW1jculx/LE/EK32EqC6CXw/tI9juTzpwu1A2uc6NLVQxOnh9C71aatOtb2WAIoO307ZxnNvYf5qpcZiQQpMd6DnVy2QU1Br5D8bkeU37wEorocSe52HnmK70UVeTAwrkC5qf4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by MN0PR11MB6010.namprd11.prod.outlook.com (2603:10b6:208:371::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.28; Tue, 16 Apr
- 2024 03:47:50 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6c9f:86e:4b8e:8234]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6c9f:86e:4b8e:8234%6]) with mapi id 15.20.7472.027; Tue, 16 Apr 2024
- 03:47:48 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jacob Pan <jacob.jun.pan@linux.intel.com>
-CC: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, "Peter
- Zijlstra" <peterz@infradead.org>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
-	<baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
- Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
-	<mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan J"
-	<dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
-	<ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>, "seanjc@google.com"
-	<seanjc@google.com>, Robin Murphy <robin.murphy@arm.com>,
-	"jim.harris@samsung.com" <jim.harris@samsung.com>, "a.manzanares@samsung.com"
-	<a.manzanares@samsung.com>, Bjorn Helgaas <helgaas@kernel.org>, "Zeng, Guang"
-	<guang.zeng@intel.com>, "robert.hoo.linux@gmail.com"
-	<robert.hoo.linux@gmail.com>
-Subject: RE: [PATCH v2 10/13] x86/irq: Extend checks for pending vectors to
- posted interrupts
-Thread-Topic: [PATCH v2 10/13] x86/irq: Extend checks for pending vectors to
- posted interrupts
-Thread-Index: AQHah6hgttNy4xVG0Emr3Eje1s1aQLFkZmJAgACXWICABVSIQA==
-Date: Tue, 16 Apr 2024 03:47:48 +0000
-Message-ID: <BN9PR11MB5276129A5784849F2D06104D8C082@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
-	<20240405223110.1609888-11-jacob.jun.pan@linux.intel.com>
-	<BN9PR11MB5276215478903C50701D05498C042@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240412112331.5a3c1d18@jacob-builder>
-In-Reply-To: <20240412112331.5a3c1d18@jacob-builder>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|MN0PR11MB6010:EE_
-x-ms-office365-filtering-correlation-id: 567dbb34-a5d0-4ea1-fc73-08dc5dc7fbfd
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cU3ss7HcUPCaguc1J46E3DgEoM7SKkk6J65IiYzH6RDdGfur73Qo4jJOlSiVnKQQpNsZN40QDSQyvSnvOG1SWaAnESb2sS0b/k4uOmg6jQVVeqH0I2/3H1SogjBevsvXBZiSwbZYjAiE65wW6v3Z8dQmCgqblX35wakhFfwTULzYZKUA7uohDpIDYBYH1HN7sGX0LwAzJrJ03Yzb1MVY1UEQ/XrVAdOoMF3JtHMB1QQhHzTgja+nDOYXxRCEfIE7Vov2AQ2phz74oSK4SjAR2q9NjqNGtO8r6reP5cL45rDPjJNgfNKcJEg5ZhwEtnE+wrA4+k3Fh8a8Cgmg9qQVKGA/UytNm79ZHA60+ea08xK4ZxQzFxMpND3Nf6S3ZOuu1y4PtanZgR0IJXc92jAm02BNBfObNrQBer8ARs3AChgSl2VKiR/OTn1gir4XV1Faw/7C0Zj7Lo3o9sCz56k+blVYFwpeb5Z2RpF1Bk3SKE1+uzQ1im+eYG8psAMHb0b6VAUzBJMYxXjY/60+XI/9PuKUXkNIbScR/H+ejqIg7kdQncUVu5sUOcqKv+PhLwcMSveM+Zmph/CGnFSfecA3Qm9md393eYJ+kpRohS5BQSPU99qY3xt4tKPBU8/uJOZzBDXEaW5ycGi9DxWiBVWwl1fdy2IN4mqiJyMgfsflU9hwuiUoLui3moUxJMHNHCfldvJ9UUUZ2eN2UbTIFAI17egEo++xzu4LMoBAi71p7lk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?cPE49uNt0sfPmju6T15djiUPBzN9SMqDId845QGTJIfiNt8YWBI3it3CRnJZ?=
- =?us-ascii?Q?VpNyG/zYCgeItL/opzsXnbKi3rXmioP2VrLjHibjMQfzBLmqHa7OxQ5BHJfH?=
- =?us-ascii?Q?HuhK1AZ+QvdHkVS/ruq8KkivRQVaypWREmQpa9jCgHe7oregx6Oc3PDI/amE?=
- =?us-ascii?Q?/jk47UT5IQgKRSrwre0TP9NuEdUXRhy7tXfiY3wEnE5DeBMGZrjwMeAcjBnt?=
- =?us-ascii?Q?FUdMUgHLJrE+3QXT4nvv6CqD2PdFDmOvI0Gt7xTIJkHAMbU9kBsGwmrycxsy?=
- =?us-ascii?Q?nYfhqHTGrOf75lkyQ9ypaC+rNsbzPTIKByN4OzfeBQs6DypblIg8jeRU4wo1?=
- =?us-ascii?Q?RhNZZQzaP3sGr9/PoH+w+eKsj9YOhoKyGpiMn0FKWzb9QndDNivEpZ4HBc48?=
- =?us-ascii?Q?4Rj+KoQmR4Mvcs4oJByAZP56rFdVDTwoWj/t/KS2m/lRARayQ1QSCFNllbBQ?=
- =?us-ascii?Q?ZOi7fFbTaoe6dgMF7PhYZMQacFb/r6gKqF28Dw0v4lIBZd4WixX0bIo2O9/s?=
- =?us-ascii?Q?iv14LQcis8Ctdb0LpswUR9CkvLYSJfFwpP1z5GJGDPBMnSYlVLY3Ye15A/2c?=
- =?us-ascii?Q?oyFZAhkKXhFNwnuze3xNYu9HNHXpOfo8uafDIK2c3xOWcnpy3GnkVX9eRM5Q?=
- =?us-ascii?Q?ROfJdEgDxDrispZbf1RSoS2qmVPhWW+PkM+QDAlaOUAoXfhetYL2xr9aEGgt?=
- =?us-ascii?Q?IPq9rmXww77Lv+BlWaRlxVqWRHfnnDfCR3TD0+Hf6rBG4AqxiQ8iMoR1HPcl?=
- =?us-ascii?Q?3+G11EloRnr5+8lo81LHwrtbBL+V50uMZGBCKnwqu3/D0hOMbtKXLo70wMxX?=
- =?us-ascii?Q?G9ZCq/i5htuIKX04rrOgppgoj1QG6o8zv1yAUSrQnBzD5JBwVVJqgyB8q+f5?=
- =?us-ascii?Q?vvqG+3MNzOVp7+hnHfV5SpCwmpv0elQMXGV+vPQOWdEgqXGza2Vju4tsde6+?=
- =?us-ascii?Q?i5q7uStoGocEfZpydqs6W9QCCQev8GMvEhsUTEdnGnApSqJKGSy+JVnXTmkN?=
- =?us-ascii?Q?yUBqX5EdNC/0ZjDC14tIIEyiCg4DPRb4MK2WiXq7M1ufHwKYS5lSYtdxXFXr?=
- =?us-ascii?Q?34Vy2xtxHmb3FaK3YHk7e2lRcY+TMjwx8OOtNV9MnF8op0LtinNtBtWSbaW0?=
- =?us-ascii?Q?3sLsiWo3dghfsTi8beZYNzCi2HrNKLWu7DPUchfVeqSnCLmSIhfIo5Aosu+b?=
- =?us-ascii?Q?X/NlsLjd4ZCDh0oaJ3mWl4z31Avg5Wfwb6ZGlwCMusAHSMYYhlxiT+67okqG?=
- =?us-ascii?Q?MuGYuJVrqi1dG0/dOOFanTxRy3Q981owlAyWFN7jh/w6XjmSSjmp4LoaiUrf?=
- =?us-ascii?Q?0FlD6iUI6OdnZW73/4IDGKJ32n79/3Ev1R2kwaMnbOuULULaJCgSLMaaqXLH?=
- =?us-ascii?Q?+N4XoHzijN6QSQr+26PZbqxqV5pAfobntZaFnHpRf7sIZujsVDXHdveT+xK/?=
- =?us-ascii?Q?5CEbNo3srfY85b02uldEVJ47t+3B5L7/o0amRH2VSVSJJMMbZeLbjVISqSpD?=
- =?us-ascii?Q?HZpoRMNbzXicU0XQeB0DpoedxoTSg+Txy7vqTapYoWbE0LDpTCGmvEg++0x3?=
- =?us-ascii?Q?SqBbzSKbfwBChaAQTp/Nv2gfIwEmZ2g+h9Gxu8tG?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1CE23767
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 04:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713241083; cv=none; b=TrWwmNEjOHZEMNWyZa5/y3VC7AlfxEOLoRWsISkBJYrsRjTgDJePoxf8aKsyiCJNuw0l6CbWCpDTR09Vp5TtabtIj3oWlh5P1RQP3pOpMNiRGtFRHZe518CADArqcYi0psKUTEZAdUF6CInPR3TVhkMNnVpkDHWumV/KURyDLKA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713241083; c=relaxed/simple;
+	bh=nqZc/zqeI8mE/EuLZR8yNvRozNBYcUlzSgf/sfXXHoM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QIq98Z/Kk6QAN+kEARO3Ny+sTqOR7sdXg/0nAI6412OfrM6Nh0vF/FsqkqEoZX5dPYDsGwVsAM3qNRxyTqSAFl3N1W3rx6AixcxrhH3U+60opdyDyldYxPdjx0QnrMzcgjlq/x4VLd/RPZac48VyKEwbaqv/4iOVGseTsoF7eUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=eNzKnc7/; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-36b04b101b0so16589905ab.1
+        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 21:18:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1713241080; x=1713845880; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gAuDnQkBePCCRBA4gBXUbNdcJ4A8ZQKpcK9ZYMj4ixU=;
+        b=eNzKnc7/UWTurTtAqwf0KDDuoIJgTADNgTrOYfshk0HO6gKjh/vrfLSguBapMjCfiR
+         HoW6qz/4a1hiwk4EHoJkRp4NJxTeAFN0hPQ2eq2x2oQOm0cu8OkE6dYmjaUfrQ7uc3iC
+         oC26iH7ZtNfjhIoV+xMa0qTL9mQwIIolX4c1F84IwzarnkjOlSXT9DxN/e2abBWIpHsl
+         b5e8G+lfM6pwc0UEfGwUZlbqZdW+MTp/cHqXLfthy+iUyYeYzQkT/qth22RyIdBiRlWT
+         krmgayDeL5VrOX3CEsWvqZTpn570MeweItgyFIppquyTPeROsUBBmTfyFcD1YxcRAanG
+         Rq9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713241080; x=1713845880;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gAuDnQkBePCCRBA4gBXUbNdcJ4A8ZQKpcK9ZYMj4ixU=;
+        b=FfJkTpsUT5wGoRCWLjUubAon0nZ6thT7bnEYcTzSeyDcj/ssotoDQIiGI3dr+vIK0O
+         cjognzjjzs5hxm6vw9zMu5L9IxlR7+dWCx9gXenJ6GzzqGamOQ/EssnrQpG+gBCbdtAE
+         684EGiZL8a8eabddmYRs2vqGxE/WwMkkJJI4pOMCZRM24uIreTj5SBPX14P3AZRpv0yI
+         E4ORyVQCUPyNMBhggZA3NvmANb5fFJrePeWE2zeczTfNGsgtjYLBhywexlFQ1DDvmgF4
+         Vo9BiSFHton+E6yn709zn2sJ39lQ3wLdINm0iKuzNkBnR/IxuLHrflNJKRbFl0TmpnxQ
+         9ChA==
+X-Forwarded-Encrypted: i=1; AJvYcCW7+V8BljQSaoJybhYoWXbDd3d4WrBROmo7fh8h8UeF8urKZ6j/zgXGZQgXWsPDPF5fYb54YLbo1Ph9QeqJpbPxMHp5
+X-Gm-Message-State: AOJu0YxHnB/+a/CCxzbESMZ80DNq1+qCZlx5YlmHmz4gTASmOgtGqLJj
+	080hOJq8s73je8TK806/+syKUa6rpc0U9VGhswFF1rOwvQCHxfFlz2YowpMkOzedKJrmyAiVQRN
+	IUP+vpEjnmighV6thQmC9TZoznA5L9ANIEZbVVw==
+X-Google-Smtp-Source: AGHT+IFWpllJyARxELteXeEA6GOzuq9CBW5v25j+rCyBIdCoAZC4nyDKJEv30B3yEb59er4ybvWD/POKnoWTKcvkxbE=
+X-Received: by 2002:a05:6e02:12cc:b0:36b:16:9b5e with SMTP id
+ i12-20020a056e0212cc00b0036b00169b5emr15916805ilm.29.1713241079929; Mon, 15
+ Apr 2024 21:17:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 567dbb34-a5d0-4ea1-fc73-08dc5dc7fbfd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2024 03:47:48.6975
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QTHMJCqReRjpIrhvJYS7d2/TXv3a28bNmO0LAQRkB6tBLaOKKr8P5diOoadbwOjYcxIQHr8HVR6oC99RQ1F+kg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6010
-X-OriginatorOrg: intel.com
+References: <20240415031131.23443-1-liangshenlin@eswincomputing.com> <20240415031131.23443-3-liangshenlin@eswincomputing.com>
+In-Reply-To: <20240415031131.23443-3-liangshenlin@eswincomputing.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 16 Apr 2024 09:47:48 +0530
+Message-ID: <CAAhSdy2Lu_qdF+FqJGxZYqDHgNQCt7vkWtrV0bUOzzmKixALRw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] perf kvm/riscv: Port perf kvm stat to RISC-V
+To: peterz@infradead.org
+Cc: atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, mark.rutland@arm.com, 
+	alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com, 
+	adrian.hunter@intel.com, linux-perf-users@vger.kernel.org, 
+	Shenlin Liang <liangshenlin@eswincomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> Sent: Saturday, April 13, 2024 2:24 AM
->=20
-> Hi Kevin,
->=20
-> On Fri, 12 Apr 2024 09:25:57 +0000, "Tian, Kevin" <kevin.tian@intel.com>
-> wrote:
->=20
-> > > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-> > > Sent: Saturday, April 6, 2024 6:31 AM
-> > >
-> > > During interrupt affinity change, it is possible to have interrupts
-> > > delivered to the old CPU after the affinity has changed to the new on=
-e.
-> > > To prevent lost interrupts, local APIC IRR is checked on the old CPU.
-> > > Similar checks must be done for posted MSIs given the same reason.
-> > >
-> > > Consider the following scenario:
-> > > 	Device		system agent		iommu
-> > > 	memory CPU/LAPIC
-> > > 1	FEEX_XXXX
-> > > 2			Interrupt request
-> > > 3						Fetch IRTE	->
-> > > 4						->Atomic Swap
-> > > PID.PIR(vec) Push to Global
-> > > Observable(GO)
-> > > 5						if (ON*)
-> > > 	i						done;*
-> >
-> > there is a stray 'i'
-> will fix, thanks
->=20
-> >
-> > > 						else
-> > > 6							send a
-> > > notification ->
-> > >
-> > > * ON: outstanding notification, 1 will suppress new notifications
-> > >
-> > > If the affinity change happens between 3 and 5 in IOMMU, the old CPU'=
-s
-> > > posted
-> > > interrupt request (PIR) could have pending bit set for the vector bei=
-ng
-> > > moved.
-> >
-> > how could affinity change be possible in 3/4 when the cache line is
-> > locked by IOMMU? Strictly speaking it's about a change after 4 and
-> > before 6.
-> SW can still perform affinity change on IRTE and do the flushing on IR
-> cache after IOMMU fectched it (step 3). They are async events.
->=20
-> In step 4, the atomic swap is on the PID cacheline, not IRTE.
->=20
+On Mon, Apr 15, 2024 at 8:45=E2=80=AFAM Shenlin Liang
+<liangshenlin@eswincomputing.com> wrote:
+>
+> 'perf kvm stat report/record' generates a statistical analysis of KVM
+> events and can be used to analyze guest exit reasons.
+>
+> "report" reports statistical analysis of guest exit events.
+>
+> To record kvm events on the host:
+>  # perf kvm stat record -a
+>
+> To report kvm VM EXIT events:
+>  # perf kvm stat report --event=3Dvmexit
+>
+> Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
 
-yeah, I mixed IRTE with PID.
+LGTM.
+
+Reviewed-by: Anup Patel <anup@brainfault.org>
+
+@Peter Zijlstra, is it okay to take this through the KVM RISC-V tree ?
+
+Regards,
+Anup
+
+> ---
+>  tools/perf/arch/riscv/Makefile                |  1 +
+>  tools/perf/arch/riscv/util/Build              |  1 +
+>  tools/perf/arch/riscv/util/kvm-stat.c         | 78 +++++++++++++++++++
+>  .../arch/riscv/util/riscv_exception_types.h   | 41 ++++++++++
+>  4 files changed, 121 insertions(+)
+>  create mode 100644 tools/perf/arch/riscv/util/kvm-stat.c
+>  create mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
+>
+> diff --git a/tools/perf/arch/riscv/Makefile b/tools/perf/arch/riscv/Makef=
+ile
+> index a8d25d005207..e1e445615536 100644
+> --- a/tools/perf/arch/riscv/Makefile
+> +++ b/tools/perf/arch/riscv/Makefile
+> @@ -3,3 +3,4 @@ PERF_HAVE_DWARF_REGS :=3D 1
+>  endif
+>  PERF_HAVE_ARCH_REGS_QUERY_REGISTER_OFFSET :=3D 1
+>  PERF_HAVE_JITDUMP :=3D 1
+> +HAVE_KVM_STAT_SUPPORT :=3D 1
+> \ No newline at end of file
+> diff --git a/tools/perf/arch/riscv/util/Build b/tools/perf/arch/riscv/uti=
+l/Build
+> index 603dbb5ae4dc..d72b04f8d32b 100644
+> --- a/tools/perf/arch/riscv/util/Build
+> +++ b/tools/perf/arch/riscv/util/Build
+> @@ -1,5 +1,6 @@
+>  perf-y +=3D perf_regs.o
+>  perf-y +=3D header.o
+>
+> +perf-$(CONFIG_LIBTRACEEVENT) +=3D kvm-stat.o
+>  perf-$(CONFIG_DWARF) +=3D dwarf-regs.o
+>  perf-$(CONFIG_LIBDW_DWARF_UNWIND) +=3D unwind-libdw.o
+> diff --git a/tools/perf/arch/riscv/util/kvm-stat.c b/tools/perf/arch/risc=
+v/util/kvm-stat.c
+> new file mode 100644
+> index 000000000000..db7183e0f09f
+> --- /dev/null
+> +++ b/tools/perf/arch/riscv/util/kvm-stat.c
+> @@ -0,0 +1,78 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Arch specific functions for perf kvm stat.
+> + *
+> + * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
+> + *
+> + */
+> +#include <errno.h>
+> +#include <memory.h>
+> +#include "../../../util/evsel.h"
+> +#include "../../../util/kvm-stat.h"
+> +#include "riscv_exception_types.h"
+> +#include "debug.h"
+> +
+> +define_exit_reasons_table(riscv_exit_reasons, kvm_riscv_exception_class)=
+;
+> +
+> +const char *kvm_exit_reason =3D "scause";
+> +const char *kvm_entry_trace =3D "kvm:kvm_entry";
+> +const char *kvm_exit_trace =3D "kvm:kvm_exit";
+> +
+> +const char *kvm_events_tp[] =3D {
+> +       "kvm:kvm_entry",
+> +       "kvm:kvm_exit",
+> +       NULL,
+> +};
+> +
+> +static void event_get_key(struct evsel *evsel,
+> +                         struct perf_sample *sample,
+> +                         struct event_key *key)
+> +{
+> +       key->info =3D 0;
+> +       key->key =3D evsel__intval(evsel, sample, kvm_exit_reason);
+> +       key->key =3D (int)key->key;
+> +       key->exit_reasons =3D riscv_exit_reasons;
+> +}
+> +
+> +static bool event_begin(struct evsel *evsel,
+> +                       struct perf_sample *sample __maybe_unused,
+> +                       struct event_key *key __maybe_unused)
+> +{
+> +       return evsel__name_is(evsel, kvm_entry_trace);
+> +}
+> +
+> +static bool event_end(struct evsel *evsel,
+> +                     struct perf_sample *sample,
+> +                     struct event_key *key)
+> +{
+> +       if (evsel__name_is(evsel, kvm_exit_trace)) {
+> +               event_get_key(evsel, sample, key);
+> +               return true;
+> +       }
+> +       return false;
+> +}
+> +
+> +static struct kvm_events_ops exit_events =3D {
+> +       .is_begin_event =3D event_begin,
+> +       .is_end_event   =3D event_end,
+> +       .decode_key     =3D exit_event_decode_key,
+> +       .name           =3D "VM-EXIT"
+> +};
+> +
+> +struct kvm_reg_events_ops kvm_reg_events_ops[] =3D {
+> +       {
+> +               .name   =3D "vmexit",
+> +               .ops    =3D &exit_events,
+> +       },
+> +       { NULL, NULL },
+> +};
+> +
+> +const char * const kvm_skip_events[] =3D {
+> +       NULL,
+> +};
+> +
+> +int cpu_isa_init(struct perf_kvm_stat *kvm, const char *cpuid __maybe_un=
+used)
+> +{
+> +       kvm->exit_reasons_isa =3D "riscv64";
+> +       return 0;
+> +}
+> diff --git a/tools/perf/arch/riscv/util/riscv_exception_types.h b/tools/p=
+erf/arch/riscv/util/riscv_exception_types.h
+> new file mode 100644
+> index 000000000000..2e42150f72b2
+> --- /dev/null
+> +++ b/tools/perf/arch/riscv/util/riscv_exception_types.h
+> @@ -0,0 +1,41 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * RISCV exception types
+> + *
+> + * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
+> + *
+> + */
+> +#ifndef ARCH_PERF_RISCV_EXCEPTION_TYPES_H
+> +#define ARCH_PERF_RISCV_EXCEPTION_TYPES_H
+> +
+> +#define EXC_INST_MISALIGNED 0
+> +#define EXC_INST_ACCESS 1
+> +#define EXC_INST_ILLEGAL 2
+> +#define EXC_BREAKPOINT 3
+> +#define EXC_LOAD_MISALIGNED 4
+> +#define EXC_LOAD_ACCESS 5
+> +#define EXC_STORE_MISALIGNED 6
+> +#define EXC_STORE_ACCESS 7
+> +#define EXC_SYSCALL 8
+> +#define EXC_HYPERVISOR_SYSCALL 9
+> +#define EXC_SUPERVISOR_SYSCALL 10
+> +#define EXC_INST_PAGE_FAULT 12
+> +#define EXC_LOAD_PAGE_FAULT 13
+> +#define EXC_STORE_PAGE_FAULT 15
+> +#define EXC_INST_GUEST_PAGE_FAULT 20
+> +#define EXC_LOAD_GUEST_PAGE_FAULT 21
+> +#define EXC_VIRTUAL_INST_FAULT 22
+> +#define EXC_STORE_GUEST_PAGE_FAULT 23
+> +
+> +#define EXC(x) {EXC_##x, #x }
+> +
+> +#define kvm_riscv_exception_class                                       =
+    \
+> +       (EXC(INST_MISALIGNED), EXC(INST_ACCESS), EXC(INST_ILLEGAL),      =
+   \
+> +        EXC(BREAKPOINT), EXC(LOAD_MISALIGNED), EXC(LOAD_ACCESS),        =
+   \
+> +        EXC(STORE_MISALIGNED), EXC(STORE_ACCESS), EXC(SYSCALL),         =
+   \
+> +        EXC(HYPERVISOR_SYSCALL), EXC(SUPERVISOR_SYSCALL),               =
+   \
+> +        EXC(INST_PAGE_FAULT), EXC(LOAD_PAGE_FAULT), EXC(STORE_PAGE_FAULT=
+), \
+> +        EXC(INST_GUEST_PAGE_FAULT), EXC(LOAD_GUEST_PAGE_FAULT),         =
+   \
+> +        EXC(VIRTUAL_INST_FAULT), EXC(STORE_GUEST_PAGE_FAULT))
+> +
+> +#endif /* ARCH_PERF_RISCV_EXCEPTION_TYPES_H */
+> --
+> 2.37.2
+>
 
