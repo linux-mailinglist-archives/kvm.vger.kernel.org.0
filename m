@@ -1,157 +1,220 @@
-Return-Path: <kvm+bounces-14714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A3F8A61B1
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 05:26:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B94EF8A61C6
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 05:45:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2037D1F22A69
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 03:26:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D51C31C2204D
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 03:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256731803D;
-	Tue, 16 Apr 2024 03:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0321B5A4;
+	Tue, 16 Apr 2024 03:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AjQEDMVm"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="Za2WycaK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1092611C92;
-	Tue, 16 Apr 2024 03:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCF617999
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 03:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713238000; cv=none; b=tCr4DHNWhVpFoa4AW8VBGbL3cK0PGjpvz3zKtI91Hg/omAAKCiny8POV3GxFGZkvxyuBarxkmMI2Qa/2Uogl1jYbP+gIzKTK04QRdkLbQ3L4z+bcEnGyGB2RQurFspVHPpTY6noKMw2cwJMJuKesnJFwM8VU1J9wq25v7CYiTb4=
+	t=1713239106; cv=none; b=k9lMsn6w4Cy9h5Q5hS0LUNjnmMJZQtwt1eIWuMYwEFLMab0uzK46LtvmNrWEo7EcMuICtAOLY3Bi9VUsy6uhP2zsuNsSTWsmM1r00nHzU6UaeQrWXIyngAMNqx2P7zOJg3qozBmKEa1X8/GQHbJjZ+B0+0xba5CtorVGF6BMsOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713238000; c=relaxed/simple;
-	bh=mSo87wrI4SUul6dOUELPanCj87ouMVYaGJuolIWl2OY=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=mijXqbVVjh7QB45fJQKf4KCjD7cHKTRJav5RnLOi9KOWWWotiXnzsm48GTBlvBDU2151XXQ/M7qoWa3aUfhS3ibgcrWAOQk7IOMoFg+ziuuJs14YR73LSQRtBQ5V+2CroeTGk46Ksn41exPtZEa9Kid9G1BZWWGPFFqlxd+X5LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AjQEDMVm; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso3036956a12.3;
-        Mon, 15 Apr 2024 20:26:38 -0700 (PDT)
+	s=arc-20240116; t=1713239106; c=relaxed/simple;
+	bh=rtTj0lpweW3pLEkP0wMSlU8QXFMSyiSZmPuuup9Nu7s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=etwCwE921s+3VGNlVwBKr4U7hMfDX55t6TCXVVZ23kqQ6lDa100aDSJHfHbGPMGnGV4/v6iMBVulb4qw8rf5pY4hMv8n7MlRG0UzDn/laxKVUyhyijE7j2IZVp70SB3H/J87rNn9qzp0AVwm3pJ+fWJh+I/RDzbkkz5l+jKf1Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=Za2WycaK; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-36a260208e4so18636105ab.2
+        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 20:45:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713237998; x=1713842798; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1713239103; x=1713843903; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=V1fKVH44Qpf52nV3xcVtDJdI4iDiW1jMW0xvMeM9U7A=;
-        b=AjQEDMVmg0b8HwRpV0JWcQJ+s2JUXJe04LvgriC3wXxOjU6A+C9JRe26zcZdA2CN0s
-         mikfjc2UiTSjHf2b8HOB/9U35ueX4oBCU0+6ZWaTjCMmgIlzrKCdo72TY9gIdZ9PmEUQ
-         /hppsPyZNxmzG6AD5vnDIe5QrH72mtgBZNV8yw2H0q7cOIff5ATyVdrjTITg7Y+ePayL
-         Rw8COEuNLb9UyxgmjCpvRbm/jDLc4LVGXOGeF7OiZGnFmyOxt/kuFWW3r1V9DYBIdaQF
-         hHqfCZG1bAOVraV0rnPsBcoM72LBdS6vIYewzkQ1+TQBHDoNNqGZ2eJ6EY9/Zh+IY5mx
-         T1rA==
+        bh=GjVNvZt22r+EWb4gHg+TxC04BE92vOXLHjn3wNYwKN4=;
+        b=Za2WycaK3pBL14/FWKVRfpHN4xYiAKN/3KwT06D/CZEDPB6+o8U0dKOxF2d3s15LqY
+         5ieZ6ko6OU5aWQIV6a1m6xa3qbBeLdCdBd2uPQET7TlyV/wIVRIdwtI9Siu8U41bfbbc
+         /XdeLN4JojYgIT45wAWUGs4aNbNFY0dnbOEITIQEmY3lPPnjCnj3396o0XhXclauuZQw
+         NvQuqxk9xlj/aTRIPAJlq36BuNDDHFFggn1Omg3O0FHenGZrWNDfpe1s0VJLPwoxiCFM
+         9uHq52IYx98WztBwH6B+jU3+hFs+SX5/vb6K1DS5ykDwukDNTxW7C0Uw9PO+V5X1qSkf
+         U1iA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713237998; x=1713842798;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=V1fKVH44Qpf52nV3xcVtDJdI4iDiW1jMW0xvMeM9U7A=;
-        b=udF70XU9TlBaX4rhlKFvBPTB5qcy4Wun/Tu/Ka1oUDrVDjAgXRM4k7bGhCFUwzdjtd
-         UMdxtMNnIJpQn/NW3O7zqg77SO0iE7RKHH8JW9ZGvlyjGBNEHms5Jy1cECbi5EsKOVpB
-         q45xQYR30LRJmIZLVDHabnm2R79DkW9Lf7MBqvQzDEoDJU7TBrDhabjy5hOdsvRarbGK
-         WPK4ts+e2hGcly0Sh+G0oaz9vx4wROBuiV8lqP7IhycRsdpbHyt4gToLsk0SVUeSCuTC
-         L+29lWwIowI1tLOmy8kHcFFHJ0gOKS+/asOJ3GP4IwDEpHIYc+iMQaCm3Szlt7rt+cuw
-         rlgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWMbyUNYuD/qOJvVoohAZwowLWDar37c0YEoSXLsafGM+vH8fmNQcDyIgCxzRbZoA+rWzmPez80Kom523aB1YQbL0uU4LJ4Gdub0qrpuUqc/RvWsHWyGNzQPv+QuQmFOA==
-X-Gm-Message-State: AOJu0YygK4SjUcy9t832QnIt8zEktBHubKa3oT0RjZoP3aVeQzrZMgAi
-	dMi2MiBZF2Hn6183MT28vjZscZa6FgzbpPziWH0CFi43H9wAOeLY
-X-Google-Smtp-Source: AGHT+IG5x5Eh/Udr2OWTDSmF61V8WPyGJpOzKZ0mm5b1COfHDZpLuwTMMl+u7FXvmjLfRKTR71F77A==
-X-Received: by 2002:a05:6a20:718a:b0:1a7:51e1:258c with SMTP id s10-20020a056a20718a00b001a751e1258cmr12219760pzb.61.1713237998278;
-        Mon, 15 Apr 2024 20:26:38 -0700 (PDT)
-Received: from localhost ([1.146.57.129])
-        by smtp.gmail.com with ESMTPSA id u9-20020a1709026e0900b001e4753f7715sm7263967plk.12.2024.04.15.20.26.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 20:26:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713239103; x=1713843903;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GjVNvZt22r+EWb4gHg+TxC04BE92vOXLHjn3wNYwKN4=;
+        b=jdPHDUbuSdXohcqqLXEPMTowsE5/vYJvP4uGFj6bbovgLDWFArG2nGSwpiVD3wmOXv
+         WospyzqhavlOM3s7ukRAm6Ju8KdnlG5lvA7AtjdKYM2x7fwDThdUd6ha6ISO8hI44B8a
+         +QhYNPi9MwlO/HQb+Ebvgl8ardCmKr8aXy5yNbsF0oM8UrkJt8feKHBTx0nPg4nrlV2J
+         bhh9w98G5rvhVjd/95OQ4h5pFFpMB1cL9IXwi5ZST8vvWiq5Et2ZVoI5fmT0qrZACy9M
+         S3SlnoLsG4UHhdaMgPQnZI6oNSO49w2i0mzKKLXYYcdPycTJVp7bGLDxDSMY7RqnjOfL
+         a/2g==
+X-Forwarded-Encrypted: i=1; AJvYcCURpJZ1WwgvbgUURyKhzP7NheSCEMw8xpVaDgAac0s4bkDRZrTn2joGqPtZ8lWXKjH1nwT6q4I0WS42cfA8SnYZzMtc
+X-Gm-Message-State: AOJu0Yz21AJeC7E9bDXHYZKjnZYShFKhtPgfTuJOzwapebBi9tw8CWZP
+	VHQpUfv0xfXngkLyLZStUDjMu95AJ2ZePiFSTu7cGPHfER3PxD9/Znacb6iWvsnnece0dj2Tb9Q
+	zzUYFA/25dcHJBDr5ajGTiN0hIaNrOEvkmbhcg61qNc7ZZfip
+X-Google-Smtp-Source: AGHT+IFEdx6IwRBvg4lNdFx2fXV/SWpM2kkTaLW4RM2l5CIWFBgkJACESXjv1JNdZwpHPIEff6N3sNB/wyIhY+32lZw=
+X-Received: by 2002:a05:6e02:1a0f:b0:36b:46b:133b with SMTP id
+ s15-20020a056e021a0f00b0036b046b133bmr14616355ild.13.1713239103552; Mon, 15
+ Apr 2024 20:45:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20240415031131.23443-1-liangshenlin@eswincomputing.com> <20240415031131.23443-2-liangshenlin@eswincomputing.com>
+In-Reply-To: <20240415031131.23443-2-liangshenlin@eswincomputing.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Tue, 16 Apr 2024 09:14:51 +0530
+Message-ID: <CAAhSdy1D9x4GJVrXJMzzqU-2iYLxduSHeRvxezmeBTQhgcruJQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] RISCV: KVM: add tracepoints for entry and exit events
+To: Shenlin Liang <liangshenlin@eswincomputing.com>
+Cc: atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, 
+	mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, 
+	irogers@google.com, adrian.hunter@intel.com, linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 16 Apr 2024 13:26:28 +1000
-Message-Id: <D0L86IDPMTI3.2XFZ8C6UCVD1B@gmail.com>
-Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Alexandru Elisei"
- <alexandru.elisei@arm.com>, "Eric Auger" <eric.auger@redhat.com>, "Janosch
- Frank" <frankja@linux.ibm.com>, "Claudio Imbrenda"
- <imbrenda@linux.ibm.com>, =?utf-8?q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
- "David Hildenbrand" <david@redhat.com>, "Shaoqin Huang"
- <shahuang@redhat.com>, "Nikos Nikoleris" <nikos.nikoleris@arm.com>, "David
- Woodhouse" <dwmw@amazon.co.uk>, "Ricardo Koller" <ricarkol@google.com>,
- "rminmin" <renmm6@chinaunicom.cn>, "Gavin Shan" <gshan@redhat.com>, "Nina
- Schoetterl-Glausch" <nsg@linux.ibm.com>, "Sean Christopherson"
- <seanjc@google.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
- <kvm-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>
-Subject: Re: [RFC kvm-unit-tests PATCH v2 00/14] add shellcheck support
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
- <andrew.jones@linux.dev>
-X-Mailer: aerc 0.17.0
-References: <20240406123833.406488-1-npiggin@gmail.com>
- <a7cdd98e-93c1-4546-bba4-ac3a465f01f5@redhat.com>
-In-Reply-To: <a7cdd98e-93c1-4546-bba4-ac3a465f01f5@redhat.com>
 
-On Mon Apr 15, 2024 at 9:59 PM AEST, Thomas Huth wrote:
-> On 06/04/2024 14.38, Nicholas Piggin wrote:
-> > Tree here
-> >=20
-> > https://gitlab.com/npiggin/kvm-unit-tests/-/tree/shellcheck
-> >=20
-> > Again on top of the "v8 migration, powerpc improvements" series. I
-> > don't plan to rebase the other way around since it's a lot of work.
-> > So this is still in RFC until the other big series gets merged.
-> >=20
-> > Thanks to Andrew for a lot of review. A submitted the likely s390x
-> > bugs separately ahead of this series, and also disabled one of the
-> > tests and dropped its fix patch as-per review comments. Hence 3 fewer
-> > patches. Other than that, since last post:
-> >=20
-> > * Tidied commit messages and added some of Andrew's comments.
-> > * Removed the "SC2034 unused variable" blanket disable, and just
-> >    suppressed the config.mak and a couple of other warnings.
-> > * Blanket disabled "SC2235 Use { ..; } instead of (..)" and dropped
-> >    the fix for it.
-> > * Change warning suppression comments as per Andrew's review, also
-> >    mention in the new unittests doc about the "check =3D" option not
-> >    allowing whitespace etc in the name since we don't cope with that.
-> >=20
-> > Thanks,
-> > Nick
-> >=20
-> > Nicholas Piggin (14):
-> >    Add initial shellcheck checking
-> >    shellcheck: Fix SC2223
-> >    shellcheck: Fix SC2295
-> >    shellcheck: Fix SC2094
-> >    shellcheck: Fix SC2006
-> >    shellcheck: Fix SC2155
-> >    shellcheck: Fix SC2143
-> >    shellcheck: Fix SC2013
-> >    shellcheck: Fix SC2145
-> >    shellcheck: Fix SC2124
-> >    shellcheck: Fix SC2294
-> >    shellcheck: Fix SC2178
-> >    shellcheck: Fix SC2048
-> >    shellcheck: Suppress various messages
+On Mon, Apr 15, 2024 at 8:45=E2=80=AFAM Shenlin Liang
+<liangshenlin@eswincomputing.com> wrote:
 >
-> I went ahead and pushed a bunch of your patches to the k-u-t master branc=
-h=20
-> now. However, there were also some patches which did not apply cleanly to=
-=20
-> master anymore, so please rebase the remaining patches and then send them=
- again.
+> Like other architectures, RISCV KVM also needs to add these event
+> tracepoints to count the number of times kvm guest entry/exit.
+>
+> Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
 
-Hey Thomas,
+LGTM.
 
-Yeah the sc patches were based on top of the big series, so some
-collisions expected. I'll look at rebasing.
+Reviewed-by: Anup Patel <anup@brainfault.org>
 
-Thanks,
-Nick
+Regards,
+Anup
+
+> ---
+>  arch/riscv/kvm/trace.h | 67 ++++++++++++++++++++++++++++++++++++++++++
+>  arch/riscv/kvm/vcpu.c  |  7 +++++
+>  2 files changed, 74 insertions(+)
+>  create mode 100644 arch/riscv/kvm/trace.h
+>
+> diff --git a/arch/riscv/kvm/trace.h b/arch/riscv/kvm/trace.h
+> new file mode 100644
+> index 000000000000..3d54175d805c
+> --- /dev/null
+> +++ b/arch/riscv/kvm/trace.h
+> @@ -0,0 +1,67 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Tracepoints for RISC-V KVM
+> + *
+> + * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
+> + *
+> + */
+> +#if !defined(_TRACE_KVM_H) || defined(TRACE_HEADER_MULTI_READ)
+> +#define _TRACE_KVM_H
+> +
+> +#include <linux/tracepoint.h>
+> +
+> +#undef TRACE_SYSTEM
+> +#define TRACE_SYSTEM kvm
+> +
+> +TRACE_EVENT(kvm_entry,
+> +       TP_PROTO(struct kvm_vcpu *vcpu),
+> +       TP_ARGS(vcpu),
+> +
+> +       TP_STRUCT__entry(
+> +               __field(unsigned long, pc)
+> +       ),
+> +
+> +       TP_fast_assign(
+> +               __entry->pc     =3D vcpu->arch.guest_context.sepc;
+> +       ),
+> +
+> +       TP_printk("PC: 0x016%lx", __entry->pc)
+> +);
+> +
+> +TRACE_EVENT(kvm_exit,
+> +       TP_PROTO(struct kvm_cpu_trap *trap),
+> +       TP_ARGS(trap),
+> +
+> +       TP_STRUCT__entry(
+> +               __field(unsigned long, sepc)
+> +               __field(unsigned long, scause)
+> +               __field(unsigned long, stval)
+> +               __field(unsigned long, htval)
+> +               __field(unsigned long, htinst)
+> +       ),
+> +
+> +       TP_fast_assign(
+> +               __entry->sepc           =3D trap->sepc;
+> +               __entry->scause         =3D trap->scause;
+> +               __entry->stval          =3D trap->stval;
+> +               __entry->htval          =3D trap->htval;
+> +               __entry->htinst         =3D trap->htinst;
+> +       ),
+> +
+> +       TP_printk("SEPC:0x%lx, SCAUSE:0x%lx, STVAL:0x%lx, HTVAL:0x%lx, HT=
+INST:0x%lx",
+> +               __entry->sepc,
+> +               __entry->scause,
+> +               __entry->stval,
+> +               __entry->htval,
+> +               __entry->htinst)
+> +);
+> +
+> +#endif /* _TRACE_RSICV_KVM_H */
+> +
+> +#undef TRACE_INCLUDE_PATH
+> +#define TRACE_INCLUDE_PATH .
+> +#undef TRACE_INCLUDE_FILE
+> +#define TRACE_INCLUDE_FILE trace
+> +
+> +/* This part must be outside protection */
+> +#include <trace/define_trace.h>
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index b5ca9f2e98ac..f4e27004ceb8 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -21,6 +21,9 @@
+>  #include <asm/cacheflush.h>
+>  #include <asm/kvm_vcpu_vector.h>
+>
+> +#define CREATE_TRACE_POINTS
+> +#include "trace.h"
+> +
+>  const struct _kvm_stats_desc kvm_vcpu_stats_desc[] =3D {
+>         KVM_GENERIC_VCPU_STATS(),
+>         STATS_DESC_COUNTER(VCPU, ecall_exit_stat),
+> @@ -782,6 +785,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>                  */
+>                 kvm_riscv_local_tlb_sanitize(vcpu);
+>
+> +               trace_kvm_entry(vcpu);
+> +
+>                 guest_timing_enter_irqoff();
+>
+>                 kvm_riscv_vcpu_enter_exit(vcpu);
+> @@ -820,6 +825,8 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>
+>                 local_irq_enable();
+>
+> +               trace_kvm_exit(&trap);
+> +
+>                 preempt_enable();
+>
+>                 kvm_vcpu_srcu_read_lock(vcpu);
+> --
+> 2.37.2
+>
 
