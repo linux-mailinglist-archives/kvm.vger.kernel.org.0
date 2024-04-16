@@ -1,170 +1,118 @@
-Return-Path: <kvm+bounces-14889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54C78A7571
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 22:22:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4482B8A75EA
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 22:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B9791F2536A
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 20:22:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 003AF282B44
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 20:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043DC13C829;
-	Tue, 16 Apr 2024 20:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179755338C;
+	Tue, 16 Apr 2024 20:47:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZMikUaLI"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kUHeEz6z"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87A4013B794
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 20:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABDC24315B;
+	Tue, 16 Apr 2024 20:47:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713298787; cv=none; b=SfS1nPvgSvP6qqNeLM5GB7Mnch0vo9s3YiV5Iy+O6xtoi9FTz8oMNBMutBls60vAqhhBPozta+c4Vzxai0OHEdkK0JCkoIt+zks9u61iZuLI1WHRi6hEndMh7if0TfWzG3C+PHn8F8gBt+f81ax/UH8P61oL8l0yINxTGhQ0W8o=
+	t=1713300459; cv=none; b=kOAFjPBkDT87VfEuILTqRdXGY0PMh1nRrAvy1pVdPSbov5oV7ikaR15ZgiUjB2PNQglSrNh/NecPxv4U3ECIwyXGmDSOebA+SawP9CoCUR2+p3HWYN5ogFvQD8qBNk6WV+al66XCASA58npjyQXf3GIrL6XqgtJMwpPRLybZthM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713298787; c=relaxed/simple;
-	bh=czdR7Th8MzHIEsGl2kG3zA2zrMvBtsVZocV83LzMCJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cOVzpowCcWiwFgqz3fqqidjNLnaUyA/X3dkHbAWi6YdrRpN9kQW8mA/IuzWbnYnHAVL1/7QFuzqPKkj72pZiB1VQAreRuJPrFmNsm187MekINK7s6iP476nc/gigen56q2MMFi8Oilkj2WJb/K6wTr9a4Mkcz4c+9lGnUwVuWIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZMikUaLI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713298784;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wKHBMFyUvxqFiQQY3mVtCcupwWGc2q6fnOXY0GMQChE=;
-	b=ZMikUaLIJXCmIoA56qiW4Kg35117rQgjr2NO+0vTAXsVGQPKuNO2PWUHhCZMvuuW2CNZui
-	1wvs3FF04deS7y08qyjHGOIwLd38t+muSW8t9ASUSLZok5Wb8Ar4u2+olgsfU2BcbIW+o2
-	0uipZp1IzXrzJlWOlfELCvjsxlefKW0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-u1d24xX6M9u_JjXAYGDRMw-1; Tue, 16 Apr 2024 16:19:39 -0400
-X-MC-Unique: u1d24xX6M9u_JjXAYGDRMw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0B5FF88CE80;
-	Tue, 16 Apr 2024 20:19:39 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D353440B497B;
-	Tue, 16 Apr 2024 20:19:38 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: isaku.yamahata@intel.com,
-	xiaoyao.li@intel.com,
-	binbin.wu@linux.intel.com,
-	chao.gao@intel.com
-Subject: [PATCH v2 10/10] KVM: x86/mmu: check for invalid async page faults involving private memory
-Date: Tue, 16 Apr 2024 16:19:35 -0400
-Message-ID: <20240416201935.3525739-11-pbonzini@redhat.com>
-In-Reply-To: <20240416201935.3525739-1-pbonzini@redhat.com>
-References: <20240416201935.3525739-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1713300459; c=relaxed/simple;
+	bh=sHZ70WphkG+mYobRvEaiJSM2HM+D/4WJgqMLw/E/qg0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jUL2Z1Y/naBWoUSpsYdJYXGd451H/RwdXBye5QYJTz3zoHqrRgjwaHepf4S9ewt17BgbsTFvE8iPD64anypd1qTnpsbTKESEGV7+YSIL3u8M+UJ2Bz5nk5k2XgLFUgTeYeZ39JWe8EsTOWvpuMd+gdgCGF8oTZo5aDvlFnlVPFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=kUHeEz6z; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43GJju7K006461;
+	Tue, 16 Apr 2024 20:47:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=I8c2MHcIh6zhRXVAVEyIPq0j0sNudTyJwUHR7heApzo=;
+ b=kUHeEz6zCgRFCdZF1e5nO244Enp9BZHy8wanOfg1NRlrL94pXbwrZyXxPddjmVT4R0d5
+ BLQQRySXOdjnewfrdWpGVBJ2F7x0HC6B8Pb6sjVOf3g8ZX4u8bR0MZYIAfQsdM766+gO
+ KHduz2o1/EFI4U51Xmlf+2abpr9MS0TBwkyJGQl8Sb7v5VPzOAYJDbk27daeHGY7ulqs
+ tCUrnVJZUijK2mMEs51VUyzLEObU/cWqVtX6Py6K+HSe0aUkwjgto1+RFyllz5v4PAA3
+ inR9LfkJqWft3p8Wzi6k+9hKKm8S3ECpcm944ylhKF8tz0tC2orNAZ44G+D5mj3stznG BA== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xfgn2paee-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Apr 2024 20:47:31 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43GKjN6U004355;
+	Tue, 16 Apr 2024 20:47:29 GMT
+Received: from bostrovs-home.us.oracle.com (bostrovs-home.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.254.198])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3xfgge32vh-1;
+	Tue, 16 Apr 2024 20:47:29 +0000
+From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM/x86: Do not clear SIPI while in SMM
+Date: Tue, 16 Apr 2024 16:47:29 -0400
+Message-Id: <20240416204729.2541743-1-boris.ostrovsky@oracle.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-16_18,2024-04-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 adultscore=0
+ mlxlogscore=918 suspectscore=0 bulkscore=0 spamscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404160133
+X-Proofpoint-ORIG-GUID: W3SfqcGs4ClkKsf_37POG1ZbFgSYcSkM
+X-Proofpoint-GUID: W3SfqcGs4ClkKsf_37POG1ZbFgSYcSkM
 
-Right now the error code is not used when an async page fault is completed.
-This is not a problem in the current code, but it is untidy.  For protected
-VMs, we will also need to check that the page attributes match the current
-state of the page, because asynchronous page faults can only occur on
-shared pages (private pages go through kvm_faultin_pfn_private() instead of
-__gfn_to_pfn_memslot()).
+When a processor is running in SMM and receives INIT message the interrupt
+is left pending until SMM is exited. On the other hand, SIPI, which
+typically follows INIT, is discarded. This presents a problem since sender
+has no way of knowing that its SIPI has been dropped, which results in
+processor failing to come up.
 
-Start by piping the error code from kvm_arch_setup_async_pf() to
-kvm_arch_async_page_ready() via the architecture-specific async page
-fault data.  For now, it can be used to assert that there are no
-async page faults on private memory.
+Keeping the SIPI pending avoids this scenario.
 
-Extracted from a patch by Isaku Yamahata.
-
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/mmu/mmu.c          | 17 ++++++++++-------
- 2 files changed, 11 insertions(+), 7 deletions(-)
+I am not sure whether non-SMM cases should clear the bit.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7c73952b6f4e..57ec96bd4221 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1850,6 +1850,7 @@ struct kvm_arch_async_pf {
- 	gfn_t gfn;
- 	unsigned long cr3;
- 	bool direct_map;
-+	u64 error_code;
- };
- 
- extern u32 __read_mostly kvm_nr_uret_msrs;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 33aea47dce8b..402d04aa5423 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4207,24 +4207,27 @@ static u32 alloc_apf_token(struct kvm_vcpu *vcpu)
- 	return (vcpu->arch.apf.id++ << 12) | vcpu->vcpu_id;
- }
- 
--static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
--				    gfn_t gfn)
-+static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu,
-+				    struct kvm_page_fault *fault)
- {
- 	struct kvm_arch_async_pf arch;
- 
- 	arch.token = alloc_apf_token(vcpu);
--	arch.gfn = gfn;
-+	arch.gfn = fault->gfn;
- 	arch.direct_map = vcpu->arch.mmu->root_role.direct;
- 	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
- 
--	return kvm_setup_async_pf(vcpu, cr2_or_gpa,
--				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
-+	return kvm_setup_async_pf(vcpu, fault->addr,
-+				  kvm_vcpu_gfn_to_hva(vcpu, fault->gfn), &arch);
- }
- 
- void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- {
- 	int r;
- 
-+	if (WARN_ON_ONCE(work->arch.error_code & PFERR_GUEST_ENC_MASK))
-+		return;
-+
- 	if ((vcpu->arch.mmu->root_role.direct != work->arch.direct_map) ||
- 	      work->wakeup_all)
- 		return;
-@@ -4237,7 +4240,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
- 	      work->arch.cr3 != kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu))
- 		return;
- 
--	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true, NULL);
-+	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, work->arch.error_code, true, NULL);
- }
- 
- static inline u8 kvm_max_level_for_order(int order)
-@@ -4342,7 +4345,7 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 			trace_kvm_async_pf_repeated_fault(fault->addr, fault->gfn);
- 			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
- 			return RET_PF_RETRY;
--		} else if (kvm_arch_setup_async_pf(vcpu, fault->addr, fault->gfn)) {
-+		} else if (kvm_arch_setup_async_pf(vcpu, fault)) {
- 			return RET_PF_RETRY;
- 		}
+ arch/x86/kvm/lapic.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index cf37586f0466..4a57b69efc7f 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -3308,13 +3308,13 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
  	}
+ 
+ 	/*
+-	 * INITs are blocked while CPU is in specific states (SMM, VMX root
+-	 * mode, SVM with GIF=0), while SIPIs are dropped if the CPU isn't in
+-	 * wait-for-SIPI (WFS).
++	 * INIT/SIPI are blocked while CPU is in specific states (SMM, VMX root
++	 * mode, SVM with GIF=0).
+ 	 */
+ 	if (!kvm_apic_init_sipi_allowed(vcpu)) {
+ 		WARN_ON_ONCE(vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED);
+-		clear_bit(KVM_APIC_SIPI, &apic->pending_events);
++		if (!is_smm(vcpu))
++			clear_bit(KVM_APIC_SIPI, &apic->pending_events);
+ 		return 0;
+ 	}
+ 
 -- 
-2.43.0
+2.39.3
 
 
