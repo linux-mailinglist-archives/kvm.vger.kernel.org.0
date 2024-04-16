@@ -1,72 +1,73 @@
-Return-Path: <kvm+bounces-14858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 420298A740E
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 21:01:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54FF08A740F
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 21:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9031AB234FE
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 19:00:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11C65282CA3
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 19:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DBD137921;
-	Tue, 16 Apr 2024 19:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A59137C23;
+	Tue, 16 Apr 2024 19:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VQ7DwFuk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sFC+uzEB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F42913473F
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 19:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4B613473F
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 19:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713294045; cv=none; b=oY5KUtKAhYJSdAnlPfWNYLw0j1v2tLZ6KPigil38/N0u/d1KojIWeAv13ouB22uRXBybxUzdXKlnImqHou0CdKymgcA2SEXf4mpcXneeb+FGnqHp28oLZkTYAec+H+Ww7aOm8Rc8uHksk5/IDjRCMSjJTrk8B89/bNnog+lwb8M=
+	t=1713294052; cv=none; b=dRipftpHtcOP2hfuXKExgY5URp4R2SQfEZN87KSuKx2FqWuoR/jtgneJosXfVteLnbtPgnOR9M8p14p+YvoZFxRxNrQuRso+bO3E36byUidLPMEGFNBBdgTc2emZGToofH1Jvqmg8gqye43x8JhiFzmq/4ZOyrzfmxXPCrtf70c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713294045; c=relaxed/simple;
-	bh=cCJu5PLMQbpniJaVoT+Zoqnqi5eVWl1d4EkEQY1HXOY=;
+	s=arc-20240116; t=1713294052; c=relaxed/simple;
+	bh=SMaorDpOaYbz6v/qERun96TKmyKTWNE+5ViNkdRMHbI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GkhKQswtkEPustGjmoaIVAKhiXOHWnuI6qIeOcCBUUlvrqosjP9VzUzyI3KGIP/YG47SoXE7nEacg+1B37R/hqfM0hwguTi0fckxkAnMYmBQ8V/DiewXDIVqALxGVXhCwDVLXwWoTw5YkvwCBAdScowewn5QLlXuPrBoAxf7Fbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VQ7DwFuk; arc=none smtp.client-ip=209.85.221.52
+	 MIME-Version:Content-Type; b=rhN+LlbY8eeVuxS48bpFNYzJNCALxyrYuyIXbJS1Y/Sae4PufjfBMkqNJ3cGyWxfnRm5Hq6JdnjAbMJ/69xUbBhHEcvMUbWvHwkLWKeZbu49qSw/xmjR+Ikdm8ySjgcMizVSBWrLzdzknxuCva+sxNIX8zOv08mVabebzaqsNAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sFC+uzEB; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-346b09d474dso4528643f8f.2
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 12:00:43 -0700 (PDT)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-516d1c8dc79so6058839e87.1
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 12:00:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713294042; x=1713898842; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1713294049; x=1713898849; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XQMVapEs3CYgmDweUYusfpnz/y/x604jp5xhdw8yVc4=;
-        b=VQ7DwFuk7wg93DvZvUZIz8YSeohDOTLG/M5CMLRMyyOwX9sTNc/XhW842Q+0spD/mo
-         lbX6/S3LPtDHIxdMuvzhSedWE3NNkbiViH6RV9t/sI8CvV1crn7RYv7M0RyRQ7RwjH+v
-         V1xDtRN3036YIgBmZPFFiidqe/nTWCzy9HrUd86st/DaS/y+3F2wnOvJoS/n3t4i/7vv
-         8HLpWDXJBw7vBwYFW8MZOunCU9n0XEFYD0BZ762pfRW0pEVxBz7kswhkxD5FsDK0k/Nq
-         oQvvOWK6ucfUUzQIIxJ11NKIr3Ex7GeqS3XLeADI1gX+S6VM5hC1tdYS0gL7WEVBIZgg
-         m0cg==
+        bh=0cSOUYBAUJgDyQn/Z100iE3+Sgt5Cj+78hNwZltzxNs=;
+        b=sFC+uzEBsoa7UxsbJOrTnFjCnQ/eeaXfP/FhHMMlsXbI283rh0RX1fsdRuRyd5Xpv/
+         6R3DQFRjOdLjr4TXqYv3l8voOwVBtIXTH2frmjKLruSWX7nCahxqsULKnDyQDIuarMbN
+         veHgfPiTM2OTcY3IilRS3iJ86qEkIXZ1SVEGm8q04DkG3IWoDFRs1MeKMyX8liZ/1gRu
+         o/R8r6zHomBWVHXXuaZmY/hqw130A7iJZoPxDKiOhQZjlOeUwBbsEbq7GemtVhXmKiRs
+         rQ2lHKyH7ks3Img20KX0QJrcumoau0B04BRc/8TvppPOGEux0N6vYsZ7p6MQc1967wZc
+         MYCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713294042; x=1713898842;
+        d=1e100.net; s=20230601; t=1713294049; x=1713898849;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XQMVapEs3CYgmDweUYusfpnz/y/x604jp5xhdw8yVc4=;
-        b=VI97mXBtzeZHnvSokH7sbEq6ZFYYaJbWOA/CZKWS48CnrF9hr+pQQc6MehJwL8uEW9
-         RLDU+8qRKCCC2llSFUf2HpHWbeOX7UhlzgRVpqROh5Ysq/S+7kdX1gPL5Z0wzPmqOG4s
-         ZdLggPK2SOpmzpyuLMaG3zul7vArgHng+tf3TwCidGzYu53BLJ1hp17hbMp+GmxlsTKS
-         pLcLGf5xZhAwGB4YYVF6HG9gGVHCCWezBItS5k5KuYCD3vka3PiC/H+IhDKgNOXPmqbr
-         PymuRAo86A6kn3xY6T8gwiRxNbbnIOx6FPpp4pyogYGQpJOefMmb+6JygvGW+XHC62xM
-         VLGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDoAfZ4BfIeObZpk1ybbybrXBchq3dYmcts7Aczqtc2Jh2/QKj7SNE4gLi6431tD56v6G04nTNGv3/x8fbHGA1vpUe
-X-Gm-Message-State: AOJu0YwJZm3C4rU04UCbsVl7SPNGBxb1P/wHKIaMziu/ff0lTZYp9xQX
-	0QYViZlifCCrKwEWTK68VPqj9puUCeIbTOjTU0UIdNpf1hxh7l8Etru+w3hiSeY=
-X-Google-Smtp-Source: AGHT+IGnL5JmbtDDZEIcfbVuWwS/E0VTaHNwOqYN0lHrO8H585nWin8P9SPUGxY4DS0gePAUMMYiYA==
-X-Received: by 2002:a5d:6703:0:b0:347:82b7:abc2 with SMTP id o3-20020a5d6703000000b0034782b7abc2mr6710909wru.15.1713294042538;
-        Tue, 16 Apr 2024 12:00:42 -0700 (PDT)
+        bh=0cSOUYBAUJgDyQn/Z100iE3+Sgt5Cj+78hNwZltzxNs=;
+        b=MTx9mzBksiAOQiNK2LdacKRsFWd3ElePouKTdg8SV9cky8IP3cbUS+Iz10qz4bHJAa
+         bN5aGNfosbUfA+F2Xm66DuncJJPHpwP7LXYxtl2Ajqu7fBSiCFE2PMNnL7397T1GcSDN
+         6hnouhxILNHG90V3xFV/pIojk7CRTZ+6M4jeLERBJabZHRbzvPwA7wAVu7N+AY9Uf1XV
+         hARs/9mqWcV5XVjdhKx71VcUarSrbzJ5TXyaelYS9ZTxhWyKRaGg4y+/VYtY01uzHezI
+         0vtyJU1Q8OcU1C7n0iqWxlfRR5r7KlqaKK5TY86q7aE1qjK0/EuRHotdsNM/ocn08Hx1
+         iJow==
+X-Forwarded-Encrypted: i=1; AJvYcCXT1PaCLSe7pFKPzLOl9JpijAk86SD+naM9E/HUSXO2GEzNxV1ZgEA1w4JO+HDZ7Lm01pm2rCp3zjZlzLzwmR/ES1ZC
+X-Gm-Message-State: AOJu0YxLfNK604ofHGdSVekL1JZHeFI7Du48vR5+keOzg79dIWJ50PeT
+	HvwuoQw50o4uOhx/Ygpj7uoYKrvGwi3QqBT9De54W6Ib3kzfA+ZHrzPqcjdh0rPOEd92tzdlllV
+	+
+X-Google-Smtp-Source: AGHT+IHGTBCSVJo2t7yAUY9UWwABae+zuiW472THcqCnHvQ3bUekN+LNwbNpJnex0bMnOpxnGv/ltw==
+X-Received: by 2002:a05:6512:3c9e:b0:517:866a:117e with SMTP id h30-20020a0565123c9e00b00517866a117emr12821425lfv.7.1713294049051;
+        Tue, 16 Apr 2024 12:00:49 -0700 (PDT)
 Received: from m1x-phil.lan ([176.176.155.61])
-        by smtp.gmail.com with ESMTPSA id sa30-20020a1709076d1e00b00a522e95a580sm6417803ejc.217.2024.04.16.12.00.40
+        by smtp.gmail.com with ESMTPSA id du2-20020a17090772c200b00a52299d8eecsm6710577ejc.135.2024.04.16.12.00.47
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 16 Apr 2024 12:00:42 -0700 (PDT)
+        Tue, 16 Apr 2024 12:00:48 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Thomas Huth <thuth@redhat.com>
@@ -80,10 +81,12 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Zhao Liu <zhao1.liu@intel.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH v4 09/22] target/i386/kvm: Remove x86_cpu_change_kvm_default() and 'kvm-cpu.h'
-Date: Tue, 16 Apr 2024 20:59:25 +0200
-Message-ID: <20240416185939.37984-10-philmd@linaro.org>
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>
+Subject: [PATCH v4 10/22] hw/i386/pc: Remove PCMachineClass::smbios_uuid_encoded
+Date: Tue, 16 Apr 2024 20:59:26 +0200
+Message-ID: <20240416185939.37984-11-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240416185939.37984-1-philmd@linaro.org>
 References: <20240416185939.37984-1-philmd@linaro.org>
@@ -96,87 +99,57 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-x86_cpu_change_kvm_default() was only used out of kvm-cpu.c by
-the pc-i440fx-2.1 machine, which got removed. Make it static,
-and remove its declaration. "kvm-cpu.h" is now empty, remove it.
+PCMachineClass::smbios_uuid_encoded was only used by the
+pc-i440fx-2.1 machine, which got removed. It is now always
+true, remove it.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- target/i386/kvm/kvm-cpu.h | 41 ---------------------------------------
- target/i386/kvm/kvm-cpu.c |  3 +--
- 2 files changed, 1 insertion(+), 43 deletions(-)
- delete mode 100644 target/i386/kvm/kvm-cpu.h
+ include/hw/i386/pc.h | 1 -
+ hw/i386/fw_cfg.c     | 3 +--
+ hw/i386/pc.c         | 1 -
+ 3 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/target/i386/kvm/kvm-cpu.h b/target/i386/kvm/kvm-cpu.h
-deleted file mode 100644
-index e858ca21e5..0000000000
---- a/target/i386/kvm/kvm-cpu.h
-+++ /dev/null
-@@ -1,41 +0,0 @@
--/*
-- * i386 KVM CPU type and functions
-- *
-- *  Copyright (c) 2003 Fabrice Bellard
-- *
-- * This library is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU Lesser General Public
-- * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-- *
-- * This library is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * Lesser General Public License for more details.
-- *
-- * You should have received a copy of the GNU Lesser General Public
-- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-- */
--
--#ifndef KVM_CPU_H
--#define KVM_CPU_H
--
--#ifdef CONFIG_KVM
--/*
-- * Change the value of a KVM-specific default
-- *
-- * If value is NULL, no default will be set and the original
-- * value from the CPU model table will be kept.
-- *
-- * It is valid to call this function only for properties that
-- * are already present in the kvm_default_props table.
-- */
--void x86_cpu_change_kvm_default(const char *prop, const char *value);
--
--#else /* !CONFIG_KVM */
--
--#define x86_cpu_change_kvm_default(a, b)
--
--#endif /* CONFIG_KVM */
--
--#endif /* KVM_CPU_H */
-diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
-index 9c791b7b05..cb8c73d20c 100644
---- a/target/i386/kvm/kvm-cpu.c
-+++ b/target/i386/kvm/kvm-cpu.c
-@@ -10,7 +10,6 @@
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "host-cpu.h"
--#include "kvm-cpu.h"
- #include "qapi/error.h"
- #include "sysemu/sysemu.h"
- #include "hw/boards.h"
-@@ -144,7 +143,7 @@ static PropValue kvm_default_props[] = {
- /*
-  * Only for builtin_x86_defs models initialized with x86_register_cpudef_types.
-  */
--void x86_cpu_change_kvm_default(const char *prop, const char *value)
-+static void x86_cpu_change_kvm_default(const char *prop, const char *value)
- {
-     PropValue *pv;
-     for (pv = kvm_default_props; pv->prop; pv++) {
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index b528f17904..c2d9af36b2 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -109,7 +109,6 @@ struct PCMachineClass {
+     /* SMBIOS compat: */
+     bool smbios_defaults;
+     bool smbios_legacy_mode;
+-    bool smbios_uuid_encoded;
+     SmbiosEntryPointType default_smbios_ep_type;
+ 
+     /* RAM / address space compat: */
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index d802d2787f..f7c2501161 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -63,8 +63,7 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
+ 
+     if (pcmc->smbios_defaults) {
+         /* These values are guest ABI, do not change */
+-        smbios_set_defaults("QEMU", mc->desc, mc->name,
+-                            pcmc->smbios_uuid_encoded);
++        smbios_set_defaults("QEMU", mc->desc, mc->name, true);
+     }
+ 
+     /* tell smbios about cpuid version and features */
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index cd6335d6b4..2bf1bfd5b2 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1778,7 +1778,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     pcmc->has_acpi_build = true;
+     pcmc->rsdp_in_ram = true;
+     pcmc->smbios_defaults = true;
+-    pcmc->smbios_uuid_encoded = true;
+     pcmc->gigabyte_align = true;
+     pcmc->has_reserved_memory = true;
+     pcmc->enforce_aligned_dimm = true;
 -- 
 2.41.0
 
