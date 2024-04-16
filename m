@@ -1,169 +1,111 @@
-Return-Path: <kvm+bounces-14797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76E3B8A719C
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:44:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB1C8A71B4
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:52:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 364D7281844
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:44:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A61F2875BF
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB33112BF3E;
-	Tue, 16 Apr 2024 16:44:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B244312E1E8;
+	Tue, 16 Apr 2024 16:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KHzFYRX+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iSEUMcTx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F4D2EAF9;
-	Tue, 16 Apr 2024 16:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 963351F956
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 16:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713285876; cv=none; b=g5V5V0fb/PfzDcFoyDaWwZgTLFHp8hzHRKek/egayBP/bnmWOs6SQ5dDN9EimUvEQVxgCsxdKt48d52KNU65pymb81O8yMlKaYc7xEA5j/j4lkiIbNYGI6WPmUWyyoNJprxt9lLnIJJMozHnSh4hVGuwLkqIsC80N3DKy/LHnc8=
+	t=1713286341; cv=none; b=Mpi6L69b6hvsrTq4VNdDLJ5ZH0mE0ecgcx8bd6AaHX6aqfdHXYA1sH+ZdZE76J2Z7Y1/a7GPorl6slIdmodip+f0oARjUh2REswkrO7avmnR1BkZAXX8Em98sr3MBhnHp6WpWQyx8wwRghJjrhXhz785so8ZTM2EjYU0/Qs9Nis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713285876; c=relaxed/simple;
-	bh=30qVteymE6fYqV8CULZ2xQ59p/2UxVIXvjxQltbgNOU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hUwYMO9YRpf+e/Cs0+1BZS1SjN1V/Adzkr/hFJvcNfluWkHsnKOLQZ++03GZJVw3jfu6dz59QRtRWV+Ehtjw6Bt3WzQPKTn4t7ZoYl2LdRVSXub+4HiAgx0Th0ten3kmRX4uJrhhAXRsTrv7UoasdQsAqZ6tX2WaNfhS/jy/jBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KHzFYRX+; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713285874; x=1744821874;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=30qVteymE6fYqV8CULZ2xQ59p/2UxVIXvjxQltbgNOU=;
-  b=KHzFYRX+qBIULyTkfjMc8UKcJxniNsDT+OC82ot0xRx4tlEV75lOvsO7
-   chYyTIw7E9itE7/ItP5fJVrBu4F7JgCTn0KxtSP+RvCUCyR/1gcCLsMMR
-   ai0iXRroSjv842i7oLv9BPbHLRYl7waM7hFs7iOs9XsofOa+QaL21MN3l
-   7Lp6CbGA+HoLutQjv8IwLP10t6dFA4gNgwmFoJE0If2ap+Q56FEPueP1p
-   ausNJYhsYa7HxXum8ihQ9b+eljXIhqzpWJFfHGrtifXYm4bJwlrJY4Q5u
-   FdkdrPjc4YkHI5O43xE8PgXBgjtKY+Wl2Q/mxpR0/p5XCKkFsgMl4YTaA
-   g==;
-X-CSE-ConnectionGUID: 9qi7IXC3QRSQMYTJv4M5nQ==
-X-CSE-MsgGUID: 0pCgdxi9SmOKGVvEObZuWw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8853258"
-X-IronPort-AV: E=Sophos;i="6.07,206,1708416000"; 
-   d="scan'208";a="8853258"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:44:33 -0700
-X-CSE-ConnectionGUID: oveVtZQlQVerpF8v9O7DpA==
-X-CSE-MsgGUID: +afBxC3MREm1jHYcxmSCig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,206,1708416000"; 
-   d="scan'208";a="27110955"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:44:33 -0700
-Date: Tue, 16 Apr 2024 09:44:32 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	Sean Christopherson <seanjc@google.com>,
-	"Chatre, Reinette" <reinette.chatre@intel.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>,
-	Sagi Shahar <sagis@google.com>, "Chen, Bo2" <chen.bo@intel.com>,
-	"Yuan, Hang" <hang.yuan@intel.com>,
-	"Zhang, Tina" <tina.zhang@intel.com>,
-	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
-Subject: Re: [PATCH v19 087/130] KVM: TDX: handle vcpu migration over logical
- processor
-Message-ID: <20240416164432.GZ3039520@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <b9fe57ceeaabe650f0aecb21db56ef2b1456dcfe.1708933498.git.isaku.yamahata@intel.com>
- <0c3efffa-8dd5-4231-8e90-e0241f058a20@intel.com>
- <20240412214201.GO3039520@ls.amr.corp.intel.com>
- <Zhm5rYA8eSWIUi36@google.com>
- <20240413004031.GQ3039520@ls.amr.corp.intel.com>
- <Zh0wGQ_FfPRENgb0@google.com>
- <20240415224828.GS3039520@ls.amr.corp.intel.com>
- <a552a48d-81b6-441a-88cf-63301f6968a2@intel.com>
+	s=arc-20240116; t=1713286341; c=relaxed/simple;
+	bh=UDqgmtiCw61GSFK4OkUay/aYwj2pnAg59HNOcubz8Ok=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Rsvy/oY1ykEK2PNJk6BniQfeliAh6Ig6Bg3WrQgr7iJl/UYZw+AmGvR/1yE/Ncqu7fVlWtWRJDGzUP+W1Hh4jc2K+EyFpeFXCM5Wm4If6egoMEmCKN4iJvtE/P+EPhn6o/LtCjQCGv8ni0u/bbG3yenUyF2spDcNdtmbq36ubkI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iSEUMcTx; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61ab173fe00so50228977b3.3
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 09:52:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713286339; x=1713891139; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Je6c/wf9ELFjP+YNaGaAoQfY5Vex5LNYYIMKI4Vr5eU=;
+        b=iSEUMcTx3xOiKovgDIivBLVM6M7VqY9Ubi0ZVfeLpth5p0eEwmWinwF3pkK503C6bB
+         z2aT7T4qA4xcFCuicNr+4tcMRRWXJWO8ev5PjpZKMnCvpQrIr8WAPrMYTu5RH1EYSOiQ
+         svzCW3E9eXoBRvZy7/AEvsN0GBm2GLPNwk9P9nAkErhN6psXC88r1rM6rEBYgx7khu/v
+         pPA+gZ1KdRnBV+HLk9DqxwPDdb2iDYG6kiFRBerikiLFpMzFEuNdvU2nOIi2XAXH/ctr
+         7kgUfw8U44+yKI9rEP+CPPI9cpuMV8/Tvi0woXwZiF2qF8YtcfSuUhnCru+MbE4R625o
+         1R+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713286339; x=1713891139;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Je6c/wf9ELFjP+YNaGaAoQfY5Vex5LNYYIMKI4Vr5eU=;
+        b=RTbm48PAEPrA5kYqE+LLrfbOX+9mvhmt6jEhnYcKu1nLYNedVuDSoLTeiu4sSGci5c
+         ejtyxfU4H4JlP/GJg8gVrD+NNgeBIa+U/ss8O0ZIrklwd62l5UZGtALjqGgUjkzCGaYC
+         epT3fJB/3vcVo2+nOfGplcYLClzwGhjSOGutlKavuhfQ5EKH5SCm032KcDHNtVzohzmb
+         oE/L4JOPl680hFTyBQjQbqNeVOFOYkd78PF0GBZic6/SVjV0dfwuOYSsJdabZlgz6Is8
+         Yz60slqwWGG1bnpRnwqj73jre5KESZYdvnBVJxHeYIAL3lrNECpOsgj96UrhEUZamyZ4
+         DAHA==
+X-Forwarded-Encrypted: i=1; AJvYcCXK6mvgV8hSZlB7iFoXmCVv/RLbRDGdOwp7Y79tVA0VRahufHPOgUSEN4z8nzN7f4DsW3zZ08E6PzdgZqDrDkAJhtH8
+X-Gm-Message-State: AOJu0YwEWB9nRTl94NOxKyP6lPj9r+rmnyqFPmbvsjTrYOojvy5qs6/u
+	ZF/8FQLW6CD0W8M9vv1LaGJcHWt50kTLlYPf99lT6iV8kM7mTCvWJsF5zYl+zvyGoCNwFJr0taR
+	wsA==
+X-Google-Smtp-Source: AGHT+IHKhIwJradbjwMqe7+BH2hYVk5Z55iYNunoWgnfp/KSDtaofestsEZA+cJytxBXsVHpNqQfBKywHh8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:848b:0:b0:617:d650:11e2 with SMTP id
+ u133-20020a81848b000000b00617d65011e2mr3844316ywf.3.1713286339647; Tue, 16
+ Apr 2024 09:52:19 -0700 (PDT)
+Date: Tue, 16 Apr 2024 09:52:18 -0700
+In-Reply-To: <CAF7b7mqHWFnZbN5CHvggYYOZepcu9sVzUgNFwi89bLNxgnP_WQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <a552a48d-81b6-441a-88cf-63301f6968a2@intel.com>
+Mime-Version: 1.0
+References: <20240221195125.102479-1-shivam.kumar1@nutanix.com>
+ <20240221195125.102479-2-shivam.kumar1@nutanix.com> <CAF7b7mqHWFnZbN5CHvggYYOZepcu9sVzUgNFwi89bLNxgnP_WQ@mail.gmail.com>
+Message-ID: <Zh6swsLAnAE58hQj@google.com>
+Subject: Re: [PATCH v10 1/3] KVM: Implement dirty quota-based throttling of vcpus
+From: Sean Christopherson <seanjc@google.com>
+To: Anish Moorthy <amoorthy@google.com>
+Cc: Shivam Kumar <shivam.kumar1@nutanix.com>, maz@kernel.org, pbonzini@redhat.com, 
+	james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, 
+	yuzenghui@huawei.com, catalin.marinas@arm.com, aravind.retnakaran@nutanix.com, 
+	carl.waldspurger@nutanix.com, david.vrabel@nutanix.com, david@redhat.com, 
+	will@kernel.org, kvm@vger.kernel.org, 
+	Shaju Abraham <shaju.abraham@nutanix.com>, Manish Mishra <manish.mishra@nutanix.com>, 
+	Anurag Madnawat <anurag.madnawat@nutanix.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Apr 16, 2024 at 12:05:31PM +1200,
-"Huang, Kai" <kai.huang@intel.com> wrote:
+On Wed, Feb 21, 2024, Anish Moorthy wrote:
+> > @@ -3656,6 +3669,7 @@ void mark_page_dirty(struct kvm *kvm, gfn_t gfn)
+> >         struct kvm_memory_slot *memslot;
+> >
+> >         memslot = gfn_to_memslot(kvm, gfn);
+> > +       update_dirty_quota(kvm, PAGE_SIZE);
+> >         mark_page_dirty_in_slot(kvm, memslot, gfn);
+> >  }
+> 
+> Is mark_page_dirty() allowed to be used outside of a vCPU context?
 
-> 
-> 
-> On 16/04/2024 10:48 am, Yamahata, Isaku wrote:
-> > On Mon, Apr 15, 2024 at 06:49:35AM -0700,
-> > Sean Christopherson <seanjc@google.com> wrote:
-> > 
-> > > On Fri, Apr 12, 2024, Isaku Yamahata wrote:
-> > > > On Fri, Apr 12, 2024 at 03:46:05PM -0700,
-> > > > Sean Christopherson <seanjc@google.com> wrote:
-> > > > 
-> > > > > On Fri, Apr 12, 2024, Isaku Yamahata wrote:
-> > > > > > On Fri, Apr 12, 2024 at 09:15:29AM -0700, Reinette Chatre <reinette.chatre@intel.com> wrote:
-> > > > > > > > +void tdx_mmu_release_hkid(struct kvm *kvm)
-> > > > > > > > +{
-> > > > > > > > +	while (__tdx_mmu_release_hkid(kvm) == -EBUSY)
-> > > > > > > > +		;
-> > > > > > > >   }
-> > > > > > > 
-> > > > > > > As I understand, __tdx_mmu_release_hkid() returns -EBUSY
-> > > > > > > after TDH.VP.FLUSH has been sent for every vCPU followed by
-> > > > > > > TDH.MNG.VPFLUSHDONE, which returns TDX_FLUSHVP_NOT_DONE.
-> > > > > > > 
-> > > > > > > Considering earlier comment that a retry of TDH.VP.FLUSH is not
-> > > > > > > needed, why is this while() loop here that sends the
-> > > > > > > TDH.VP.FLUSH again to all vCPUs instead of just a loop within
-> > > > > > > __tdx_mmu_release_hkid() to _just_ resend TDH.MNG.VPFLUSHDONE?
-> > > > > > > 
-> > > > > > > Could it be possible for a vCPU to appear during this time, thus
-> > > > > > > be missed in one TDH.VP.FLUSH cycle, to require a new cycle of
-> > > > > > > TDH.VP.FLUSH?
-> > > > > > 
-> > > > > > Yes. There is a race between closing KVM vCPU fd and MMU notifier release hook.
-> > > > > > When KVM vCPU fd is closed, vCPU context can be loaded again.
-> > > > > 
-> > > > > But why is _loading_ a vCPU context problematic?
-> > > > 
-> > > > It's nothing problematic.  It becomes a bit harder to understand why
-> > > > tdx_mmu_release_hkid() issues IPI on each loop.  I think it's reasonable
-> > > > to make the normal path easy and to complicate/penalize the destruction path.
-> > > > Probably I should've added comment on the function.
-> > > 
-> > > By "problematic", I meant, why can that result in a "missed in one TDH.VP.FLUSH
-> > > cycle"?  AFAICT, loading a vCPU shouldn't cause that vCPU to be associated from
-> > > the TDX module's perspective, and thus shouldn't trigger TDX_FLUSHVP_NOT_DONE.
-> > > 
-> > > I.e. looping should be unnecessary, no?
-> > 
-> > The loop is unnecessary with the current code.
-> > 
-> > The possible future optimization is to reduce destruction time of Secure-EPT
-> > somehow.  One possible option is to release HKID while vCPUs are still alive and
-> > destruct Secure-EPT with multiple vCPU context.  Because that's future
-> > optimization, we can ignore it at this phase.
-> 
-> I kinda lost here.
-> 
-> I thought in the current v19 code, you have already implemented this
-> optimization?
-> 
-> Or is this optimization totally different from what we discussed in an
-> earlier patch?
-> 
-> https://lore.kernel.org/lkml/8feaba8f8ef249950b629f3a8300ddfb4fbcf11c.camel@intel.com/
+It's allowed, but only because we don't have a better option, i.e. it's more
+tolerated than allowed. :-)
 
-That's only the first step.  We can optimize it further with multiple vCPUs
-context.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+> The lack of a vcpu* makes me think it is- I assume we don't want to charge
+> vCPUs for accesses they're not making.
+> 
+> Unfortunately we do seem to use it *in* vCPU contexts (see
+> kvm_update_stolen_time() on arm64?), although not on x86 AFAICT.
+
+Use what?  mark_page_dirty_in_slot()?  x86 _only_ uses it from vCPU context.
 
