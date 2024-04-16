@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-14856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B5FB8A740C
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 21:00:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 112C08A740D
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 21:00:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5AA91F2285E
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 19:00:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8872DB23367
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 19:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEEFF137C2E;
-	Tue, 16 Apr 2024 19:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE7B137C3E;
+	Tue, 16 Apr 2024 19:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="baSO85H3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VmYWjVZk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74A8137916
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 19:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D578137920
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 19:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713294039; cv=none; b=jBJAqE64DV0kwdZ0jCXNRLxJ3tYBMeEUGIuP8lM/BQb5XZJ4TMnBGqlo0/Mo6Dkad/VNoz41KJ8wvQuHuyKWpmdwmUbqEp/PI4I6LWOJ/MRuLW0sEO8fMYMsyCR9DAAiACkcpDE74qdidTFDouOa1mRPmvXD93alto+xaZOTeAg=
+	t=1713294039; cv=none; b=BR8RSljSCqElAX01XkbRuc34mguNvIit10lWftspwYoh/fo/ANUS3UXfgKqCAG//tR5r0U7Y2rVhKUsEq/+CjZeLatePA79JLZPnrQaYU7f9yvtaxx6HHPoc2zs/0LKOrRGHJ2d+dYyI5CF5pIW8lZ/qYuYdMDQbkmFz1ZwgerI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713294039; c=relaxed/simple;
-	bh=bB39rOTaKMmBtbm2Su3lf5ak9SotLOPlSmxBENLNoZ8=;
+	bh=ZVnB053lui3yOtr9L8Bnnl3fUpOmFfcwya9mw/zaqk0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=s9rIWgGx0Iz6mcjGdhxkhsoQXVlLsSuQQbsLoQw5JVj1w/6Y8c0eQeXjSIIeFdkjAvYQjBIbUuF7xRKAJS4C62arx4vlGzpg0ZDaw/RO4ok2UYeZraZQr2x8DS3aGq5WD4KZYW7eJeiVcbo8uFS5Q3D071VofipiO+J7njMAFKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=baSO85H3; arc=none smtp.client-ip=209.85.208.49
+	 MIME-Version:Content-Type; b=sSHOBGbQ+e+y8B0L3Rr3mUSZ9gfGaOJTZiID5ElbCjtRJLG5F10L2YHcrugv5c73IgqmKMvFj9bbOHFPG2fe6d2qKnEocQ3H9k1krsdVr3/sBFMRgv9vd4bhUuaKPVnp9BheSHL0Jhjt5FeSDh0H8FGZWJnBrMC5KS+6BJcq+O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VmYWjVZk; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57009454c83so4243326a12.2
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 12:00:30 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a526d381d2fso15287466b.0
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 12:00:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713294029; x=1713898829; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1713294036; x=1713898836; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aDu2aZ9r50YKxf+dNaxDqKUjAn6DYpDYAzbmilk8iWY=;
-        b=baSO85H3dds7HXZ/fs/w+Sr7js98gPHMIKq64eaAVtpfEHwbGBxmP+lUedkJAyXou2
-         mQFYbu4KjTKx1TzTGKfgoMlHtlv6ypxSWnvAgnRRcyDJz6ekHbkSbf7enXm6QVR08h7L
-         Otu3sTdEjnr67gEdynUOhK56uHqk1iImdQguk4EamghZlOGlkKPFXuNp7FcRoGdlbi3J
-         qsmtFUWkSR8m3Kr/FnRoG5LjpORYbeO5zV79RpSYF3G1nVX1ZdZqKGrK7CBB/HVKC+lV
-         VozA1DfvqcOWwdMYkObCrR6Anyj/++zwT/xiEaIDPh2lJ1byCWmSzR2Q4OWMJV7rg8u4
-         gzYw==
+        bh=oIsya0WjT//mE9jDUk5oKmf9DZYf6HHN1KydCpfDiGI=;
+        b=VmYWjVZkwoosc4o0MdHU2idvzofJltjGyDbrT/gTEGUWsHTo/xaolL2SDv2N5vs3j3
+         HhhWrT6zGNePcw3hXMtDIaPdfgDlkyPcZ9lX4g476e970Sf9Lg+GV1sivv1HxQVgXUG7
+         NRlnJLTOVQDbaIerILriWpsDssrdwLgwd0uUXvr1gEmBE8mQBxt0CfJuBnzgDlmdFZ1f
+         /woUL2ivcT9UHLqiq2Kc5dH2frfZoGihpo8JEziBpP+fv6T5sVjR6gwwRBeHbTEAbGVD
+         dea/cjt7XGOdqfvSQnFCn8PVrqRH5ubiCXDhkepR/K5hCiJJtINws6Xh6PofHeac4Ca9
+         tqjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713294029; x=1713898829;
+        d=1e100.net; s=20230601; t=1713294036; x=1713898836;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aDu2aZ9r50YKxf+dNaxDqKUjAn6DYpDYAzbmilk8iWY=;
-        b=Ksqz7WJq0rejbEn2thAlxX9sU6LHvA0QRcvEq07zvNwvEZqanRL1M6taxmD21Dn7kK
-         main1K4yXYA7JnG/vbIx/mWRtqoZzNw4eK9XQv1ZCpQpg/tfBu+oWkjFo++P8mfDNqSg
-         ySY3QctroN7IoFtQp498tFJffQp9dguP4Xl8gGHm+l7opStaMbT8b+CF0lwPd11FWmkA
-         7REzKjagF1MqstWtpV3PPSwjyEszX9fDwZA9ptAYtT+gRVd+ukaspRabXoXvADfJNCm+
-         YlTqAA+1U6Ezhp/yhpaE467Vw0IPrs51/iQImAczpdKUlZHMSKOnQK0wyDQ0cnqDol6a
-         jGxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVq+5Gs0gM0Brql6Fq5SNzG87No1ZQM5e9hk2Zz4kVOqXNQ8qrQozBHne4D7YvxhSG0Z73KHAcNxQ/vHfL5yvaJhy0r
-X-Gm-Message-State: AOJu0YyHc3TGGvkC7TB6JLAQVahmfOD3yGHF6Pe9h/RNFKKrrgP7qWuy
-	AL38PzdGFmmZu7kll1GBI0BuWUN86bu10TBRA0KsKawRnN6iloXCK/SXlO8yb6Q=
-X-Google-Smtp-Source: AGHT+IEc0M7W+KyDB0aQ8QUm+zC7hkHWbLtW7gtPPIqf8ccsUyI98Px0KPtH3uOffjFEYOIbTwSX0w==
-X-Received: by 2002:a17:907:1b1d:b0:a52:2b39:879b with SMTP id mp29-20020a1709071b1d00b00a522b39879bmr10404824ejc.46.1713294029119;
-        Tue, 16 Apr 2024 12:00:29 -0700 (PDT)
+        bh=oIsya0WjT//mE9jDUk5oKmf9DZYf6HHN1KydCpfDiGI=;
+        b=I6/vJhMbxl7TtO0tsbxZlpKjjMN2MVVtolUN94gQ6Q/fzfwA5du5fsKnxxTVG7aClP
+         hrkq6QpZBDi1oWJq+EFOFUBpWqahxoP2OyyVV5elXDaX2VDjpAenOD5W5/SDk4mjwcJI
+         we2An7lQ+YGyzpW23wQIHIOhxoekOZl0DRuzAMhc89I82oGRQh0PcZLXHGYcMxEAunXl
+         bAwClPZddw7HTf3KoUQ9k7yXViaPyMrvhr9+VBoPl0wFBE34C+GT5TEMSWXPWsdIvtV3
+         LKxt6uMVGBXiOEeGhrDGNd+pRSiGbBiehOK5esV0Ydj+g27BKoiQjBQ3vWFqVx2JYRcf
+         7DHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ3W6jbfocDbnMc6X/IvLDCikSs3kBGhTBGxcw00a34RbzzOLdMten65dxhKoNOO5E7OmCWw9GOObBZEPE9zAcMpW8
+X-Gm-Message-State: AOJu0YyldLJOhMg/pQ/PaUiEx87tVp2G483BjoeShDzO64LHszgqA5LP
+	0DKLpYFlHwGtzi1tgjNqBgnQqjwiu7+hVV02Q6oInpOzVu5zWDmhgqn18Ua706U=
+X-Google-Smtp-Source: AGHT+IFDj5d7VWVz7q+k1CBxU1v/RoV6oF6KH+CKP4bBoCQ0TNhAr4e1atOn0sNoC+sKrGpdObJJKw==
+X-Received: by 2002:a17:906:b259:b0:a52:6b76:c722 with SMTP id ce25-20020a170906b25900b00a526b76c722mr3094545ejb.9.1713294035957;
+        Tue, 16 Apr 2024 12:00:35 -0700 (PDT)
 Received: from m1x-phil.lan ([176.176.155.61])
-        by smtp.gmail.com with ESMTPSA id em3-20020a170907288300b00a5180d5b31asm7161409ejc.32.2024.04.16.12.00.27
+        by smtp.gmail.com with ESMTPSA id bv13-20020a170906b1cd00b00a51a9d87570sm7266186ejb.17.2024.04.16.12.00.33
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 16 Apr 2024 12:00:28 -0700 (PDT)
+        Tue, 16 Apr 2024 12:00:35 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Thomas Huth <thuth@redhat.com>
@@ -80,11 +80,13 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Zhao Liu <zhao1.liu@intel.com>,
+	devel@lists.libvirt.org,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Ani Sinha <anisinha@redhat.com>
-Subject: [PATCH v4 07/22] hw/acpi/ich9: Remove dead code related to 'acpi_memory_hotplug'
-Date: Tue, 16 Apr 2024 20:59:23 +0200
-Message-ID: <20240416185939.37984-8-philmd@linaro.org>
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>
+Subject: [PATCH v4 08/22] hw/i386/pc: Remove deprecated pc-i440fx-2.1 machine
+Date: Tue, 16 Apr 2024 20:59:24 +0200
+Message-ID: <20240416185939.37984-9-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240416185939.37984-1-philmd@linaro.org>
 References: <20240416185939.37984-1-philmd@linaro.org>
@@ -97,87 +99,128 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-acpi_memory_hotplug::is_enabled is set to %true once via
-ich9_lpc_initfn() -> ich9_pm_add_properties(). No need to
-check it, so remove now dead code.
+The pc-i440fx-2.1 machine was deprecated for the 8.2
+release (see commit c7437f0ddb "docs/about: Mark the
+old pc-i440fx-2.0 - 2.3 machine types as deprecated"),
+time to remove it.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/acpi/ich9.c | 28 ++++++----------------------
- 1 file changed, 6 insertions(+), 22 deletions(-)
+ docs/about/deprecated.rst       |  2 +-
+ docs/about/removed-features.rst |  2 +-
+ include/hw/i386/pc.h            |  3 ---
+ hw/i386/pc.c                    |  7 -------
+ hw/i386/pc_piix.c               | 23 -----------------------
+ 5 files changed, 2 insertions(+), 35 deletions(-)
 
-diff --git a/hw/acpi/ich9.c b/hw/acpi/ich9.c
-index 9b605af21a..02d8546bd3 100644
---- a/hw/acpi/ich9.c
-+++ b/hw/acpi/ich9.c
-@@ -153,17 +153,10 @@ static int ich9_pm_post_load(void *opaque, int version_id)
-      .offset     = vmstate_offset_pointer(_state, _field, uint8_t),  \
-  }
+diff --git a/docs/about/deprecated.rst b/docs/about/deprecated.rst
+index b09ae3d55d..a2a1b9d337 100644
+--- a/docs/about/deprecated.rst
++++ b/docs/about/deprecated.rst
+@@ -219,7 +219,7 @@ deprecated; use the new name ``dtb-randomness`` instead. The new name
+ better reflects the way this property affects all random data within
+ the device tree blob, not just the ``kaslr-seed`` node.
  
--static bool vmstate_test_use_memhp(void *opaque)
--{
--    ICH9LPCPMRegs *s = opaque;
--    return s->acpi_memory_hotplug.is_enabled;
--}
+-``pc-i440fx-2.1`` up to ``pc-i440fx-2.3`` (since 8.2) and ``pc-i440fx-2.4`` up to ``pc-i440fx-2.12`` (since 9.1)
++``pc-i440fx-2.2`` up to ``pc-i440fx-2.3`` (since 8.2) and ``pc-i440fx-2.4`` up to ``pc-i440fx-2.12`` (since 9.1)
+ ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
+ These old machine types are quite neglected nowadays and thus might have
+diff --git a/docs/about/removed-features.rst b/docs/about/removed-features.rst
+index 51119e623f..01c55103d3 100644
+--- a/docs/about/removed-features.rst
++++ b/docs/about/removed-features.rst
+@@ -816,7 +816,7 @@ mips ``fulong2e`` machine alias (removed in 6.0)
+ 
+ This machine has been renamed ``fuloong2e``.
+ 
+-``pc-0.10`` up to ``pc-i440fx-2.0`` (removed in 4.0 up to 9.0)
++``pc-0.10`` up to ``pc-i440fx-2.1`` (removed in 4.0 up to 9.0)
+ ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
+ These machine types were very old and likely could not be used for live
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 4ad724601a..b528f17904 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -281,9 +281,6 @@ extern const size_t pc_compat_2_3_len;
+ extern GlobalProperty pc_compat_2_2[];
+ extern const size_t pc_compat_2_2_len;
+ 
+-extern GlobalProperty pc_compat_2_1[];
+-extern const size_t pc_compat_2_1_len;
 -
- static const VMStateDescription vmstate_memhp_state = {
-     .name = "ich9_pm/memhp",
-     .version_id = 1,
-     .minimum_version_id = 1,
--    .needed = vmstate_test_use_memhp,
-     .fields = (const VMStateField[]) {
-         VMSTATE_MEMORY_HOTPLUG(acpi_memory_hotplug, ICH9LPCPMRegs),
-         VMSTATE_END_OF_LIST()
-@@ -335,11 +328,9 @@ void ich9_pm_init(PCIDevice *lpc_pci, ICH9LPCPMRegs *pm, qemu_irq sci_irq)
-     legacy_acpi_cpu_hotplug_init(pci_address_space_io(lpc_pci),
-         OBJECT(lpc_pci), &pm->gpe_cpu, ICH9_CPU_HOTPLUG_IO_BASE);
+ #define DEFINE_PC_MACHINE(suffix, namestr, initfn, optsfn) \
+     static void pc_machine_##suffix##_class_init(ObjectClass *oc, void *data) \
+     { \
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 172814f604..cd6335d6b4 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -304,13 +304,6 @@ GlobalProperty pc_compat_2_2[] = {
+ };
+ const size_t pc_compat_2_2_len = G_N_ELEMENTS(pc_compat_2_2);
  
--    if (pm->acpi_memory_hotplug.is_enabled) {
--        acpi_memory_hotplug_init(pci_address_space_io(lpc_pci), OBJECT(lpc_pci),
--                                 &pm->acpi_memory_hotplug,
--                                 ACPI_MEMORY_HOTPLUG_BASE);
--    }
-+    acpi_memory_hotplug_init(pci_address_space_io(lpc_pci), OBJECT(lpc_pci),
-+                             &pm->acpi_memory_hotplug,
-+                             ACPI_MEMORY_HOTPLUG_BASE);
+-GlobalProperty pc_compat_2_1[] = {
+-    PC_CPU_MODEL_IDS("2.1.0")
+-    { "coreduo" "-" TYPE_X86_CPU, "vmx", "on" },
+-    { "core2duo" "-" TYPE_X86_CPU, "vmx", "on" },
+-};
+-const size_t pc_compat_2_1_len = G_N_ELEMENTS(pc_compat_2_1);
+-
+ GSIState *pc_gsi_create(qemu_irq **irqs, bool pci_enabled)
+ {
+     GSIState *s;
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 9e1bca7b17..dcf50684a4 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -66,7 +66,6 @@
+ #include "hw/hyperv/vmbus-bridge.h"
+ #include "hw/mem/nvdimm.h"
+ #include "hw/i386/acpi-build.h"
+-#include "kvm/kvm-cpu.h"
+ #include "target/i386/cpu.h"
+ 
+ #define XEN_IOAPIC_NUM_PIRQS 128ULL
+@@ -435,12 +434,6 @@ static void pc_compat_2_2_fn(MachineState *machine)
+     pc_compat_2_3_fn(machine);
  }
  
- static void ich9_pm_get_gpe0_blk(Object *obj, Visitor *v, const char *name,
-@@ -460,12 +451,7 @@ void ich9_pm_device_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
- 
--    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM) &&
--        !lpc->pm.acpi_memory_hotplug.is_enabled) {
--        error_setg(errp,
--                   "memory hotplug is not enabled: %s.memory-hotplug-support "
--                   "is not set", object_get_typename(OBJECT(lpc)));
--    } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         uint64_t negotiated = lpc->smi_negotiated_features;
- 
-         if (negotiated & BIT_ULL(ICH9_LPC_SMI_F_BROADCAST_BIT) &&
-@@ -509,8 +495,7 @@ void ich9_pm_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+-static void pc_compat_2_1_fn(MachineState *machine)
+-{
+-    pc_compat_2_2_fn(machine);
+-    x86_cpu_change_kvm_default("svm", NULL);
+-}
+-
+ #ifdef CONFIG_ISAPC
+ static void pc_init_isa(MachineState *machine)
  {
-     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
+@@ -851,22 +844,6 @@ static void pc_i440fx_2_2_machine_options(MachineClass *m)
+ DEFINE_I440FX_MACHINE(v2_2, "pc-i440fx-2.2", pc_compat_2_2_fn,
+                       pc_i440fx_2_2_machine_options);
  
--    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
--        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         acpi_memory_unplug_request_cb(hotplug_dev,
-                                       &lpc->pm.acpi_memory_hotplug, dev,
-                                       errp);
-@@ -545,8 +530,7 @@ void ich9_pm_device_unplug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+-static void pc_i440fx_2_1_machine_options(MachineClass *m)
+-{
+-    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
+-
+-    pc_i440fx_2_2_machine_options(m);
+-    m->hw_version = "2.1.0";
+-    m->default_display = NULL;
+-    compat_props_add(m->compat_props, hw_compat_2_1, hw_compat_2_1_len);
+-    compat_props_add(m->compat_props, pc_compat_2_1, pc_compat_2_1_len);
+-    pcmc->smbios_uuid_encoded = false;
+-    pcmc->enforce_aligned_dimm = false;
+-}
+-
+-DEFINE_I440FX_MACHINE(v2_1, "pc-i440fx-2.1", pc_compat_2_1_fn,
+-                      pc_i440fx_2_1_machine_options);
+-
+ #ifdef CONFIG_ISAPC
+ static void isapc_machine_options(MachineClass *m)
  {
-     ICH9LPCState *lpc = ICH9_LPC_DEVICE(hotplug_dev);
- 
--    if (lpc->pm.acpi_memory_hotplug.is_enabled &&
--        object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-+    if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         acpi_memory_unplug_cb(&lpc->pm.acpi_memory_hotplug, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
-                !lpc->pm.cpu_hotplug_legacy) {
 -- 
 2.41.0
 
