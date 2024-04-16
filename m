@@ -1,166 +1,176 @@
-Return-Path: <kvm+bounces-14771-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14772-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2448A6CEA
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 15:55:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DA068A6D55
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61D9F1C215A8
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 13:55:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ADAD1F217F9
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 14:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D7A12C7E1;
-	Tue, 16 Apr 2024 13:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A3312D1F6;
+	Tue, 16 Apr 2024 14:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nM2kbBeN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YrVQfmJz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D47D1272AA
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 13:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5EA712C485
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 14:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713275712; cv=none; b=YDyc1h0iaavJiAffcPJvD5BlOafubc015ZTCi253gd+3l9yc73Zpc0achrDh1DVE0mRPTsUPuDRPzjs+gKIaXcFYjNNHVZyoZeXT2RGkN3ST6ZacSZt4VuCdmq9qpKvcEuN631rXaqiV0GLocNNTlnYR+sBdLIcF7I7of9p6Zbg=
+	t=1713276457; cv=none; b=gs3iwLO/Bu+H+/N6rp0FEfwhwFTCfazKkMYEVaRaz//09qyOwIaoJpAp4UjprI9q/nU1dr9ss0DDL3RZMaoH01pis4AhKb9EqmMa6T3JZ4uLgGrnpKpqdLjjJl9AgztMqxtttkHXVDE2TkIERITQXKqntsWg2zjNCxCUbxH503M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713275712; c=relaxed/simple;
-	bh=7gnNlQpmPTha3BrmsvmwHEikdOtnoTPEc28vlwcQwEE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P8yffm5nMUNc1jqQ0QE+OhDtIXZX5kohPEWlVIWofbnSFhb9qiuptHmk4QVBy6oVePcLL1V2BTOdCP2nJG1VXV2dGHjJM4wY12W2yWyQoI5QGmnNdvJNmhPY9QIbnpXjwvISMFFchirjWS6GuUe2gWML0ZM0vzWPQNpRTZtTuIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nM2kbBeN; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5700a9caee0so4086006a12.2
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 06:55:10 -0700 (PDT)
+	s=arc-20240116; t=1713276457; c=relaxed/simple;
+	bh=Pujm/r3xB6YlHkRLKYxgDrcLT8Z+/QffDjAZvYeDnX4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=RMUOpXnPYP33uFVYTFFL+caoEQJ7s4lQFAl0B7wSXIGB2ha9QwRfiuUBgX2n2C/vygZ6pzVmnRxO0h+i+usKbHD50bbagVlf7i8JsxzY8ENt7++3R1fZkwUm6jXEfVe2rRO+vCA0Si0yCcyUv2VHJRVIWMq9LwpRRJLCXMVTO1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YrVQfmJz; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a5457a8543so3929798a91.0
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 07:07:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713275709; x=1713880509; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h1653K/UfEWnXUTbr/YeJw2UmUosHHOUFfds+vppZrE=;
-        b=nM2kbBeN/UIVspqTXT+yaIS98etFtqxG5iR/OOL8rnSI+p6hR64adbFDAYqKIUv3qi
-         GRiAKSMDuTBlWAzDS/NUA6obLmYPyDFbkqyiZDk+2j3qgB2/EpqQAkv1xXCY2DtPY1xa
-         TZkaf1DSCuAAEBZJC5iY5PIZ0xre5LEs2q4cmZsjM7DZC5c5F3FMQLyqoX+IYfOPY/Jx
-         GpCf90RiENfUjoAKWkM8Kfx9wLhfNTUs+6dWLO/ej9VSIM9VnukDCxLvmyaB1iUpuh7i
-         i75i6YXNqtunlYAHxhvMmueoWds1TYFBPpOOeWDAdWutDjTGJUFWmOkA7Fq825xynEMX
-         TuQg==
+        d=google.com; s=20230601; t=1713276454; x=1713881254; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3HMGW99TX0Cqe3aYrj5LiSxtL+KydbJYyp90EN1U2HI=;
+        b=YrVQfmJzyJVaQXvU58xrq3XdY0+gE8OO+M3CJeVtaC86Ki3fsDWRBiKpENeWyCzSMR
+         bTe2xJigvkXGTAJDDlox6sD4VVAO+S42nTxvkIujiRRYwjtXX8SM2GeTw3fZFSZ2WIvS
+         eGrldgepvtDEHtogynwU8ERcY+z+zYcmDDjyaIwZmQviOtKc09pTX4e3cGqa0dBttZg3
+         jAOEZmsXX5O78DA6BmgevrzVSGNlvtykzfJwO0AS2uzTR2Q5rYh66YkgHelwVBQUUKUz
+         dio09jg/f2ZwGllzJSx5oEM2lz5dI9FBpEYNyB0UFTxwE5C5gdDkOtt19P2tbCCCmbRP
+         iWpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713275709; x=1713880509;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h1653K/UfEWnXUTbr/YeJw2UmUosHHOUFfds+vppZrE=;
-        b=hFaa7FxdE7Ha2O5ip0Wcq4Cgbga2BoMuyUMRzr71Jw86dXyuCcBMEslDsLlaA7bEiZ
-         rGeS2bgTXmJNoEZqCEuP4ftjp29l4ZJtjru7pRGYxE4Pt8bJSoVvmGH6kdiz/qFz8QAw
-         2jWu27EwQFZveiLwbMzGhcl28dqqlaq4yKJHUyKvwgFFMJ5r+65mu1Hva1Pc4jw3+g/S
-         6YBYwoWYOAP5erTDd6EeOUm03isKjeSwKeqW1YDJQD1fxIZyQHv2UF+ZDVdvE1G4uSRv
-         87WKuwiGuHUaLJ/Vol21TpOUw9LTXxJPwQABRPsle0Ywy4VrqoUKm7buw0FkfPyY/NYg
-         GtCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUr+ccWT8ubUnSgHwPJyzkoygEgU2HFo0RNqnJkxnI9qDlnpAOFyMxKTfIXPvuMfsN0kvFG7AeNIsor5UZkerXwSMpZ
-X-Gm-Message-State: AOJu0Yz3wAnRSf1kgPeoQD7J6kL/OgH6CC8IXn1yboXSeq9X/HBAxBqe
-	Q6JOZj49urP1fN08qf/LhpyqRGKaT8xDL+38Wx36SY3D7Ps0FgpqdDmON2x1VjA=
-X-Google-Smtp-Source: AGHT+IHkUMQgIFsx5SzP07ohbcv44kLEvoExY/YrMlXFyL1i8R4mcChXMZxYy0/mFxCZjbzS5CDwpg==
-X-Received: by 2002:a50:8ace:0:b0:568:d5e7:37a1 with SMTP id k14-20020a508ace000000b00568d5e737a1mr8273701edk.36.1713275708861;
-        Tue, 16 Apr 2024 06:55:08 -0700 (PDT)
-Received: from m1x-phil.lan ([176.176.155.61])
-        by smtp.gmail.com with ESMTPSA id bl19-20020a056402211300b0056e064a6d2dsm6108679edb.2.2024.04.16.06.55.07
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 16 Apr 2024 06:55:08 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-To: qemu-devel@nongnu.org,
-	Thomas Huth <thuth@redhat.com>
-Cc: Ani Sinha <anisinha@redhat.com>,
-	qemu-riscv@nongnu.org,
-	qemu-ppc@nongnu.org,
-	Zhao Liu <zhao1.liu@intel.com>,
-	David Hildenbrand <david@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Igor Mammedov <imammedo@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	kvm@vger.kernel.org
-Subject: [PATCH v3 21/22] target/i386: Remove X86CPU::kvm_no_smi_migration field
-Date: Tue, 16 Apr 2024 15:52:50 +0200
-Message-ID: <20240416135252.8384-22-philmd@linaro.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240416135252.8384-1-philmd@linaro.org>
-References: <20240416135252.8384-1-philmd@linaro.org>
+        d=1e100.net; s=20230601; t=1713276454; x=1713881254;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3HMGW99TX0Cqe3aYrj5LiSxtL+KydbJYyp90EN1U2HI=;
+        b=GAVM4AiFFC34GybN3SZ3mmMteCd+usww0OOI9EX2AXNE1z0f6S2xuA9ZAm+w98NR3F
+         p3ZfE9ZznQX9yh+TTGW2191eZyEK2RT7yaNHlZLT7HB6fNrE7CyKB1y77wHJRWgapQTE
+         V0MqQ6/4J74gIpASXehoVpU54RaGR832LGfV+Go5TbVhjxQWPSHK+URqYovp9w+oHEDR
+         gH1rss5d8C+52JQbt37Iab1bfw8wcjCzb0ZzFu4enkN/2w0B7ym0FyJ+VWXENt/HmFCP
+         3N2GkyICfAah+OCWIHbarUX7cBiXQqFaRIE4PSa3A+nMRdGARMmQu0ycXBzK1nJs46+X
+         FCtA==
+X-Forwarded-Encrypted: i=1; AJvYcCUl0WwrMeWpTmWal+LIO0jPbFVthI3qJvKoF70TYi61q4Mcv4HemhrVxYYhLsaEB9lfwX8xgLt7exG0Z+EOg+x6scqR
+X-Gm-Message-State: AOJu0Yz/tIOy4F7xC+Rgtfy+Wpiwk6vfEth8LsjrHJ/v6PYdefqoIjvr
+	bDTTPNkZeClBn4U6soXyEhdPuO1xkdEoVHfIW7ANVroZ7x6enScQKImk0+KZC1gEw+cltc1JTpz
+	MBA==
+X-Google-Smtp-Source: AGHT+IHY9YzbCwBFObbbVKUprvWZ1lVsqt1aqVyeCtv5WiwA+nKUa0M0YnEHgFtBrjfmqeer2cDphAZ9lOw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e74b:b0:1e2:3051:8194 with SMTP id
+ p11-20020a170902e74b00b001e230518194mr60970plf.11.1713276453910; Tue, 16 Apr
+ 2024 07:07:33 -0700 (PDT)
+Date: Tue, 16 Apr 2024 07:07:32 -0700
+In-Reply-To: <Zh5w6rAWL+08a5lj@tpad>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240328171949.743211-1-leobras@redhat.com> <ZgsXRUTj40LmXVS4@google.com>
+ <ZhAAg8KNd8qHEGcO@tpad> <ZhAN28BcMsfl4gm-@google.com> <a7398da4-a72c-4933-bb8b-5bc8965d96d0@paulmck-laptop>
+ <ZhQmaEXPCqmx1rTW@google.com> <Zh2EQVj5bC0z5R90@tpad> <Zh2cPJ-5xh72ojzu@google.com>
+ <Zh5w6rAWL+08a5lj@tpad>
+Message-ID: <Zh6GC0NRonCpzpV4@google.com>
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+From: Sean Christopherson <seanjc@google.com>
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>, Leonardo Bras <leobras@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>, Joel Fernandes <joel@joelfernandes.org>, 
+	Josh Triplett <josh@joshtriplett.org>, Boqun Feng <boqun.feng@gmail.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Lai Jiangshan <jiangshanlai@gmail.com>, Zqiang <qiang.zhang1211@gmail.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-X86CPU::kvm_no_smi_migration was only used by the
-pc-i440fx-2.3 machine, which got removed. Remove it
-and simplify kvm_put_vcpu_events().
+On Tue, Apr 16, 2024, Marcelo Tosatti wrote:
+> On Mon, Apr 15, 2024 at 02:29:32PM -0700, Sean Christopherson wrote:
+> > And snapshotting the VM-Exit time will get false negatives when the vCPU is about
+> > to run, but for whatever reason has kvm_last_guest_exit=0, e.g. if a vCPU was
+> > preempted and/or migrated to a different pCPU.
+> 
+> Right, for the use-case where waking up rcuc is a problem, the pCPU is
+> isolated (there are no userspace processes and hopefully no kernel threads
+> executing there), vCPU pinned to that pCPU.
+> 
+> So there should be no preemptions or migrations.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
----
- target/i386/cpu.h     | 3 ---
- target/i386/cpu.c     | 2 --
- target/i386/kvm/kvm.c | 7 +------
- 3 files changed, 1 insertion(+), 11 deletions(-)
+I understand that preemption/migration will not be problematic if the system is
+configured "correctly", but we still need to play nice with other scenarios and/or
+suboptimal setups.  While false positives aren't fatal, KVM still should do its
+best to avoid them, especially when it's relatively easy to do so.
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 6b05738079..5b016d6667 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -2018,9 +2018,6 @@ struct ArchCPU {
-     /* if set, limit maximum value for phys_bits when host_phys_bits is true */
-     uint8_t host_phys_bits_limit;
- 
--    /* Stop SMI delivery for migration compatibility with old machines */
--    bool kvm_no_smi_migration;
--
-     /* Forcefully disable KVM PV features not exposed in guest CPUIDs */
-     bool kvm_pv_enforce_cpuid;
- 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 33760a2ee1..f9991e7398 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -7905,8 +7905,6 @@ static Property x86_cpu_properties[] = {
-     DEFINE_PROP_BOOL("x-vendor-cpuid-only", X86CPU, vendor_cpuid_only, true),
-     DEFINE_PROP_BOOL("lmce", X86CPU, enable_lmce, false),
-     DEFINE_PROP_BOOL("l3-cache", X86CPU, enable_l3_cache, true),
--    DEFINE_PROP_BOOL("kvm-no-smi-migration", X86CPU, kvm_no_smi_migration,
--                     false),
-     DEFINE_PROP_BOOL("kvm-pv-enforce-cpuid", X86CPU, kvm_pv_enforce_cpuid,
-                      false),
-     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index e68cbe9293..88f4a7da33 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4337,6 +4337,7 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-     events.sipi_vector = env->sipi_vector;
- 
-     if (has_msr_smbase) {
-+        events.flags |= KVM_VCPUEVENT_VALID_SMM;
-         events.smi.smm = !!(env->hflags & HF_SMM_MASK);
-         events.smi.smm_inside_nmi = !!(env->hflags2 & HF2_SMM_INSIDE_NMI_MASK);
-         if (kvm_irqchip_in_kernel()) {
-@@ -4351,12 +4352,6 @@ static int kvm_put_vcpu_events(X86CPU *cpu, int level)
-             events.smi.pending = 0;
-             events.smi.latched_init = 0;
-         }
--        /* Stop SMI delivery on old machine types to avoid a reboot
--         * on an inward migration of an old VM.
--         */
--        if (!cpu->kvm_no_smi_migration) {
--            events.flags |= KVM_VCPUEVENT_VALID_SMM;
--        }
-     }
- 
-     if (level >= KVM_PUT_RESET_STATE) {
--- 
-2.41.0
+> > My understanding is that RCU already has a timeout to avoid stalling RCU.  I don't
+> > see what is gained by effectively duplicating that timeout for KVM.
+> 
+> The point is not to avoid stalling RCU. The point is to not perform RCU
+> core processing through rcuc thread (because that interrupts execution
+> of the vCPU thread), if it is known that an extended quiescent state 
+> will occur "soon" anyway (via VM-entry).
 
+I know.  My point is that, as you note below, RCU will wake-up rcuc after 1 second
+even if KVM is still reporting a VM-Enter is imminent, i.e. there's a 1 second
+timeout to avoid an RCU stall to due to KVM never completing entry to the guest.
+
+> If the extended quiescent state does not occur in 1 second, then rcuc
+> will be woken up (the time_before call in rcu_nohz_full_cpu function 
+> above).
+> 
+> > Why not have
+> > KVM provide a "this task is in KVM_RUN" flag, and then let the existing timeout
+> > handle the (hopefully rare) case where KVM doesn't "immediately" re-enter the guest?
+> 
+> Do you mean something like:
+> 
+> diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+> index d9642dd06c25..0ca5a6a45025 100644
+> --- a/kernel/rcu/tree.c
+> +++ b/kernel/rcu/tree.c
+> @@ -3938,7 +3938,7 @@ static int rcu_pending(int user)
+>                 return 1;
+>  
+>         /* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
+> -       if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
+> +       if ((user || rcu_is_cpu_rrupt_from_idle() || this_cpu->in_kvm_run) && rcu_nohz_full_cpu())
+>                 return 0;
+
+Yes.  This, https://lore.kernel.org/all/ZhAN28BcMsfl4gm-@google.com, plus logic
+in kvm_sched_{in,out}().
+
+>         /* Is the RCU core waiting for a quiescent state from this CPU? */
+> 
+> The problem is:
+> 
+> 1) You should only set that flag, in the VM-entry path, after the point
+> where no use of RCU is made: close to guest_state_enter_irqoff call.
+
+Why?  As established above, KVM essentially has 1 second to enter the guest after
+setting in_guest_run_loop (or whatever we call it).  In the vast majority of cases,
+the time before KVM enters the guest can probably be measured in microseconds.
+
+Snapshotting the exit time has the exact same problem of depending on KVM to
+re-enter the guest soon-ish, so I don't understand why this would be considered
+a problem with a flag to note the CPU is in KVM's run loop, but not with a
+snapshot to say the CPU recently exited a KVM guest.
+
+> 2) While handling a VM-exit, a host timer interrupt can occur before that,
+> or after the point where "this_cpu->in_kvm_run" is set to false.
+>
+> And a host timer interrupt calls rcu_sched_clock_irq which is going to
+> wake up rcuc.
+
+If in_kvm_run is false when the IRQ is handled, then either KVM exited to userspace
+or the vCPU was scheduled out.  In the former case, rcuc won't be woken up if the
+CPU is in userspace.  And in the latter case, waking up rcuc is absolutely the
+correct thing to do as VM-Enter is not imminent.
+
+For exits to userspace, there would be a small window where an IRQ could arrive
+between KVM putting the vCPU and the CPU actually returning to userspace, but
+unless that's problematic in practice, I think it's a reasonable tradeoff.
 
