@@ -1,145 +1,238 @@
-Return-Path: <kvm+bounces-14790-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14791-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 500918A6F88
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 17:18:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C50808A6FB7
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 17:24:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA19FB2341F
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 15:18:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2741FB25356
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 15:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2E0131737;
-	Tue, 16 Apr 2024 15:18:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6622A12B154;
+	Tue, 16 Apr 2024 15:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a1m+wB+J"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="RD8mcjcc"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57203131726
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 15:18:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B6913048E
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 15:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713280682; cv=none; b=bIn7MxQuwXD5cXTiGq0kC3Cr3I1ZqG8S1vKk7SBWrI6xW+N7kHJ4SJSFy0m8ys1ogxYJLaBROS9dpgFzie35NMonUHqHNoFfEeQotHxJzeM0HjjOmSb+EL+cMxqKiRWqfEAZ9PX9WTrhDQJsUHhV2MZRVzBU5mb28QVP+qfrnOE=
+	t=1713281036; cv=none; b=iFrBVcWlSBTc47vNiaX8wM7n30uPqKdj199cTncIQ+aT5XJAsWYXmMbleGMvourcE8/ZmVmDUEgtPNZggzbLhCTfCDS2uar9/dD5xNzHqFCZX4HKOlH9fjOMUcSognIefdQy3oW6VKX0mbd7NC41gTv8eJeMfuKbDaSDsK6Zjl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713280682; c=relaxed/simple;
-	bh=tPtRVTsXis21eVmAj2j9npZRV3GxwQ/AaRJo8gVEatg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gTbIsHSr8GTXOVzU0WoNCROPugffhzXKQMuzizlexWxeTUUA9q8nu59vLlQzuDpLNoQd1bVgNCC+cezZni+VZ2bpt+AuOMLZAxIVv3vhDTGgeSOUcNjattZFflyH2febVSKKdbgQm/pGJLjTPfyItBV+yXPk+UHLwsgJ+Xu19Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a1m+wB+J; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713280680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tPtRVTsXis21eVmAj2j9npZRV3GxwQ/AaRJo8gVEatg=;
-	b=a1m+wB+Jlbvf29smpBLD4aJoQFC4yRnsn1IgLHn95CHF3mbP6VBOM9XUxW0+On+UHXGwem
-	iBo6zlVrhp+l3QK0yIduKvEgkoEbtUrBPf26ytQLJNQfmR1WczsczYP0JtV+l+XgbkjUTB
-	nhTIG9ZCQmwa7pyFqNcgiQs4TBP0//g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-106-Gxm3JAxfNWyzzrw3LARPug-1; Tue, 16 Apr 2024 11:17:56 -0400
-X-MC-Unique: Gxm3JAxfNWyzzrw3LARPug-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A6AC7104B507;
-	Tue, 16 Apr 2024 15:17:55 +0000 (UTC)
-Received: from localhost (dhcp-192-239.str.redhat.com [10.33.192.239])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 597DB2026D1F;
-	Tue, 16 Apr 2024 15:17:55 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, Shaoqin Huang <shahuang@redhat.com>,
- qemu-arm@nongnu.org
-Cc: Eric Auger <eauger@redhat.com>, =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo
- Bonzini <pbonzini@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v9] arm/kvm: Enable support for KVM_ARM_VCPU_PMU_V3_FILTER
-In-Reply-To: <227c96c8-4f17-4f79-9378-a15c9dce8d46@redhat.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20240409024940.180107-1-shahuang@redhat.com>
- <d1a76e23-e361-46a9-9baf-6ab51db5d7ba@redhat.com>
- <47e0c03b-0a6f-4a58-8dd7-6f1b85bcf71c@redhat.com>
- <227c96c8-4f17-4f79-9378-a15c9dce8d46@redhat.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date: Tue, 16 Apr 2024 17:17:54 +0200
-Message-ID: <875xwhjpzx.fsf@redhat.com>
+	s=arc-20240116; t=1713281036; c=relaxed/simple;
+	bh=Pr5+GjYuYOFAl78wT/LGhzYKkJLFb3gm/JoyNBitLqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BwJXO6WIa4rX7ULLCR+4mK179fA9jWENpTNB8zSmoSgOcfedLTfLtikKo10rJKiuUab9coX/tZDFjxEM8LhZvbPizP5aKY/MkuxkDQPiLfClqvrJWeOk3ic3YqYWyh/Yjic2BXn6GxwIeFi1pY7KITe2BaJfN0WBu+o5U9iFff8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=RD8mcjcc; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-346407b8c9aso1839107f8f.0
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 08:23:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1713281032; x=1713885832; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ftHdCf+Oy0iSSs5fiaJVa2OnViNL7pkEe11MNtYDb00=;
+        b=RD8mcjcckUMX5UWLrH0e/WAvJBHqELiRBzd8YzpXIOJr6mTYYv4TKU9LxBww27WaNY
+         zNqWDvNHfVZpFbuoL7W/g2GQAhXYol65uvud2TpR3+reX91ik5nCxuDWMb011DI43rGY
+         2lwO+XTc8iQrls8h8uhIl2wpswNB5MkXVciXqBTq8ccf9UeQlTkyBXdQmagssJME+cAW
+         5Kgvjav5KxevrEdSiJvTeXWfhvtGx8flMTdZY7dBni6rHRe5lu132o2oZEdr2wTqCRhX
+         woKJg/7v83DPSfEGN7ehjXsbXbh8p9YulEEsh7fHOSHZ+oHyzFiiQt3hKqj2dsUzpOq/
+         DgWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713281032; x=1713885832;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ftHdCf+Oy0iSSs5fiaJVa2OnViNL7pkEe11MNtYDb00=;
+        b=w3Ws9zBTdSmLtpEmMWGsic5qhM1CB08UXwBuhpUQh779/7xUCU4Od0gQh/AjKoPv26
+         pOrD0urpID4GD+qjGDdwPNLnjoSlf0VskJL5a8WT1JCo4ftp8w8GAPMHfjFT4+sEMq+V
+         4KJjzzLysP86OkkYLphwCCXuCkAu8aAAe31r36dNbfSoBPN1hzMhJ2Gjuua0sC0z2cHb
+         PJg7Eddwd3mhv4/VLD3P8Kj3NVuVbsBwRRi6pyfJH1U7hrGXEsCAuwpmWo6X7Yr+raC9
+         vd5Z4twBHpb4msC93wGBr4vRj78u84/lT4mPe4ot5CC3VVouvKd6eORzYmytVoshC1eT
+         Ut6g==
+X-Forwarded-Encrypted: i=1; AJvYcCXgPcqYwV+Ta/q0KEvcOHmlthI/8EV7ia0Dvpa6lXjPu37hYd20mA4jzZ91S7aIZrRc0rH8cCZhwPWH2Lm+b64FPU8z
+X-Gm-Message-State: AOJu0YxXQIDLmTiysogzvvD4zntqqVD/NZ4Jr6uyuQiIDaxn4DlEYutD
+	+QOQoLg4+FsgxJEqj9LZ/TfUSU6TmcMbMoFSocMRBBre0Na3rbRwaxfX7qINkh4=
+X-Google-Smtp-Source: AGHT+IFao7Xx/Iig7k1Su+KI3NkDAc6z/M7OBmPS/atvQDSy7dIv8/22UyweiFrQmQy3+uJBLdIOwQ==
+X-Received: by 2002:adf:f308:0:b0:346:65dd:55e6 with SMTP id i8-20020adff308000000b0034665dd55e6mr8879060wro.1.1713281032278;
+        Tue, 16 Apr 2024 08:23:52 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:999:a3a0:8df:1203:de22:f515? ([2a01:e0a:999:a3a0:8df:1203:de22:f515])
+        by smtp.gmail.com with ESMTPSA id gb32-20020a05600045a000b003462b54bc8asm15162474wrb.109.2024.04.16.08.23.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Apr 2024 08:23:51 -0700 (PDT)
+Message-ID: <1eab3b4f-0d46-4df5-b574-6a5f796d3bcf@rivosinc.com>
+Date: Tue, 16 Apr 2024 17:23:51 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 07/10] riscv: add ISA extension parsing for Zcmop
+To: Conor Dooley <conor@kernel.org>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+ Deepak Gupta <debug@rivosinc.com>, Jonathan Corbet <corbet@lwn.net>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+ Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+References: <20240410091106.749233-8-cleger@rivosinc.com>
+ <ZhcFeVYUQJmBAKuv@debug.ba.rivosinc.com>
+ <20240410-jawless-cavalry-a3eaf9c562a4@spud>
+ <20240410-judgingly-appease-5df493852b70@spud>
+ <ZhcTiakvfbjb2hon@debug.ba.rivosinc.com>
+ <1287e6e9-cb8e-4a78-9195-ce29f1c4bace@rivosinc.com>
+ <20240411-superglue-errant-b32e5118695f@wendy>
+ <c86f9fa8-e273-4509-83fa-f21d3265d5c9@rivosinc.com>
+ <20240411-backwater-opal-00c9aed2231e@wendy>
+ <5eda3278-24bc-4c17-a741-523ad5ff79f7@rivosinc.com>
+ <20240416-gave-apron-3234098ce416@spud>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20240416-gave-apron-3234098ce416@spud>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 10 2024, Thomas Huth <thuth@redhat.com> wrote:
 
-> On 09/04/2024 09.47, Shaoqin Huang wrote:
->> Hi Thmoas,
->>=20
->> On 4/9/24 13:33, Thomas Huth wrote:
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert_has_feature(qts, "h=
-ost", "kvm-pmu-filter");
+
+On 16/04/2024 16:54, Conor Dooley wrote:
+> On Mon, Apr 15, 2024 at 11:10:24AM +0200, Clément Léger wrote:
+>>
+>>
+>> On 11/04/2024 13:53, Conor Dooley wrote:
+>>> On Thu, Apr 11, 2024 at 11:08:21AM +0200, Clément Léger wrote:
+>>>>>> If we consider to have potentially broken isa string (ie extensions
+>>>>>> dependencies not correctly handled), then we'll need some way to
+>>>>>> validate this within the kernel.
+>>>>>
+>>>>> No, the DT passed to the kernel should be correct and we by and large we
+>>>>> should not have to do validation of it. What I meant above was writing
+>>>>> the binding so that something invalid will not pass dtbs_check.
+>>>>
+>>>> Acked, I was mainly answering Deepak question about dependencies wrt to
+>>>> using __RISCV_ISA_EXT_SUPERSET() which does not seems to be relevant
+>>>> since we expect a correct isa string to be passed.
 >>>
->>> So you assert here that the feature is available ...
+>>> Ahh, okay.
 >>>
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert_has_feat=
-ure(qts, "host", "kvm-steal-time");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 assert_has_feat=
-ure(qts, "host", "sve");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 resp =3D do_que=
-ry_no_props(qts, "host");
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_supports_pmu_filter =
-=3D resp_get_feature_str(resp,=20
->>>> "kvm-pmu-filter");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_supports_st=
-eal_time =3D resp_get_feature(resp,=20
->>>> "kvm-steal-time");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kvm_supports_sv=
-e =3D resp_get_feature(resp, "sve");
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vls =3D resp_ge=
-t_sve_vls(resp);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 qobject_unref(r=
-esp);
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (kvm_supports_pmu_filte=
-r) { >
->>> ... why do you then need to check for its availability here again?
->>> I either don't understand this part of the code, or you could drop the=
-=20
->>> kvm_supports_pmu_filter variable and simply always execute the code bel=
-ow.
->>=20
->> Thanks for your reviewing. I did so because all other feature like=20
->> "kvm-steal-time" check its availability again. I don't know the original=
-=20
->> reason why they did that. I just followed it.
->>=20
->> Do you think we should delete all the checking?
->
-> resp_get_feature() seems to return a boolean value, so though these featu=
-re=20
-> could be there, they still could be disabled, I assume? Thus we likely ne=
-ed=20
-> to keep the check for those.
+>>>> But as you stated, DT
+>>>> validation clearly make sense. I think a lot of extensions strings would
+>>>> benefit such support (All the Zv* depends on V, etc).
+>>>
+>>> I think it is actually as simple something like this, which makes it
+>>> invalid to have "d" without "f":
+>>>
+>>> | diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
+>>> | index 468c646247aa..594828700cbe 100644
+>>> | --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+>>> | +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+>>> | @@ -484,5 +484,20 @@ properties:
+>>> |              Registers in the AX45MP datasheet.
+>>> |              https://www.andestech.com/wp-content/uploads/AX45MP-1C-Rev.-5.0.0-Datasheet.pdf
+>>> |  
+>>> | +allOf:
+>>> | +  - if:
+>>> | +      properties:
+>>> | +        riscv,isa-extensions:
+>>> | +          contains:
+>>> | +            const: "d"
+>>> | +          not:
+>>> | +            contains:
+>>> | +              const: "f"
+>>> | +    then:
+>>> | +      properties:
+>>> | +        riscv,isa-extensions:
+>>> | +          false
+>>> | +
+>>> | +
+>>> |  additionalProperties: true
+>>> |  ...
+>>>
+>>> If you do have d without f, the checker will say:
+>>> cpu@2: riscv,isa-extensions: False schema does not allow ['i', 'm', 'a', 'd', 'c']
+>>>
+>>> At least that's readable, even though not clear about what to do. I wish
+>>
+>> That looks really readable indeed but the messages that result from
+>> errors are not so informative.
+>>
+>> It tried playing with various constructs and found this one to yield a
+>> comprehensive message:
+>>
+>> +allOf:
+>> +  - if:
+>> +      properties:
+>> +        riscv,isa-extensions:
+>> +          contains:
+>> +            const: zcf
+>> +          not:
+>> +            contains:
+>> +              const: zca
+>> +    then:
+>> +      properties:
+>> +        riscv,isa-extensions:
+>> +          items:
+>> +            anyOf:
+>> +              - const: zca
+>>
+>> arch/riscv/boot/dts/allwinner/sun20i-d1-dongshan-nezha-stu.dtb: cpu@0:
+>> riscv,isa-extensions:10: 'anyOf' conditional failed, one must be fixed:
+>>         'zca' was expected
+>>         from schema $id: http://devicetree.org/schemas/riscv/extensions.yaml
+>>
+>> Even though dt-bindings-check passed, not sure if this is totally a
+>> valid construct though...
+> 
+> I asked Rob about this yesterday, he suggested adding:
+> riscv,isa-extensions:
+>   if:
+>     contains:
+>       const: zcf
+>   then:
+>     contains:
+>       const: zca
 
-This had confused me as well when I looked at it the last time -- one
-thing is to check whether we have a certain prop in the cpu model, the
-other one whether we actually support it. Maybe this needs some
-comments?
+That is way more readable and concise !
 
+> to the existing property, not in an allOf. I think that is by far the
+> most readable version in terms of what goes into the binding. The output
+> would look like:
+> cpu@0: riscv,isa-extensions: ['i', 'm', 'a', 'd', 'c'] does not contain items matching the given schema
+> (for d requiring f cos I am lazy)
+
+Than fine by me. The error is at least a bit more understandable than
+the one with the false schema ;)
+
+> 
+> Also, his comment about your one that gives the nice message was that it
+> would wrong as the anyOf was pointless and it says all items must be
+> "zca".
+
+That's what I understood also.
+
+> I didn't try it, but I have a feeling your nice output will be
+> rather less nice if several different deps are unmet - but hey, probably
+> will still be better than having an undocumented extension!
+> 
+
+If you are ok with that, let's go with Rob suggestion. I'll resubmit a
+V2 with validation for these extensions and probably a followup for the
+other ones lacking dependency checking.
+
+Thanks,
+
+Clément
 
