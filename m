@@ -1,73 +1,72 @@
-Return-Path: <kvm+bounces-14859-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14860-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54FF08A740F
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 21:01:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA878A7410
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 21:01:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11C65282CA3
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 19:01:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8F981F22819
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 19:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A59137C23;
-	Tue, 16 Apr 2024 19:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F62B13792A;
+	Tue, 16 Apr 2024 19:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sFC+uzEB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kqETOtcv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4B613473F
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 19:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B8D13473F
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 19:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713294052; cv=none; b=dRipftpHtcOP2hfuXKExgY5URp4R2SQfEZN87KSuKx2FqWuoR/jtgneJosXfVteLnbtPgnOR9M8p14p+YvoZFxRxNrQuRso+bO3E36byUidLPMEGFNBBdgTc2emZGToofH1Jvqmg8gqye43x8JhiFzmq/4ZOyrzfmxXPCrtf70c=
+	t=1713294059; cv=none; b=jqBtj2J6oOMiLWZ7YLhaEe/mH4HDGW5wmeBkYmht9B5aptL+iIGoMz3VtN1w1it6G0wvYjNKBpYBNb0KI0PCon5fcmPPrisbbJQgzS0L6lVZuN+0bmgUEhVSKETih4KhNFzZHrk1vNLgsDkqsum/f7eNyGRJ05RL3tQAS7boXIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713294052; c=relaxed/simple;
-	bh=SMaorDpOaYbz6v/qERun96TKmyKTWNE+5ViNkdRMHbI=;
+	s=arc-20240116; t=1713294059; c=relaxed/simple;
+	bh=rMcTD0LEHby8jL8jilQsu6UDinvXj3I/MOn9cbEDiHY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rhN+LlbY8eeVuxS48bpFNYzJNCALxyrYuyIXbJS1Y/Sae4PufjfBMkqNJ3cGyWxfnRm5Hq6JdnjAbMJ/69xUbBhHEcvMUbWvHwkLWKeZbu49qSw/xmjR+Ikdm8ySjgcMizVSBWrLzdzknxuCva+sxNIX8zOv08mVabebzaqsNAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sFC+uzEB; arc=none smtp.client-ip=209.85.167.52
+	 MIME-Version:Content-Type; b=ky8nhwT0SfPR9A84XnnBcRas1J4+eGMOcOD9QmPx2qLyIJWTLGIv95ziIBjwe1o5bmJ9c9eE2Ou5QiCHhvAAFXZ/zBwlYIDaGaRKzZiMEUEXaFHw+D/bKVm/eQqN+tCzXR+rghq/yKBYrJDHEvadhBJ/VHKQYCCccvip3MX9YYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kqETOtcv; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-516d1c8dc79so6058839e87.1
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 12:00:50 -0700 (PDT)
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-518e2283bd3so4238752e87.1
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 12:00:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713294049; x=1713898849; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1713294056; x=1713898856; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0cSOUYBAUJgDyQn/Z100iE3+Sgt5Cj+78hNwZltzxNs=;
-        b=sFC+uzEBsoa7UxsbJOrTnFjCnQ/eeaXfP/FhHMMlsXbI283rh0RX1fsdRuRyd5Xpv/
-         6R3DQFRjOdLjr4TXqYv3l8voOwVBtIXTH2frmjKLruSWX7nCahxqsULKnDyQDIuarMbN
-         veHgfPiTM2OTcY3IilRS3iJ86qEkIXZ1SVEGm8q04DkG3IWoDFRs1MeKMyX8liZ/1gRu
-         o/R8r6zHomBWVHXXuaZmY/hqw130A7iJZoPxDKiOhQZjlOeUwBbsEbq7GemtVhXmKiRs
-         rQ2lHKyH7ks3Img20KX0QJrcumoau0B04BRc/8TvppPOGEux0N6vYsZ7p6MQc1967wZc
-         MYCw==
+        bh=UuGQRWMqmr6ruVhTw3v1+AueGwovFmnNusAak3fPiJU=;
+        b=kqETOtcvEJcJY58VfYr199Z7Us1qhhUQkEYpC0jnetcm/y777H0hsIKSFqINcorgKQ
+         ABWikjlT+m5K01r28VVSA9wJk/NYYSmpnpfmT7b48gYeTEqsp3hLTK3/347+S2Ziow56
+         h/6q/YVCEqVtRzASjUjdStraoZ6dmCF6Pl3F+hNyLsenRciiessxNzYWyX80zWxamAdO
+         cU040tE7A/dPiMSpBDXSnk37a2oACbktu1uWkxvAtZI26C0VYJwmqJbofWo/WNPdtx0z
+         bjggPB+VlOO6gQwV2cPYXAw5Wf0/gXvckcVwHu855ZRZxGweQMM+s8m1paDcEfn/+D4r
+         Cj7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713294049; x=1713898849;
+        d=1e100.net; s=20230601; t=1713294056; x=1713898856;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0cSOUYBAUJgDyQn/Z100iE3+Sgt5Cj+78hNwZltzxNs=;
-        b=MTx9mzBksiAOQiNK2LdacKRsFWd3ElePouKTdg8SV9cky8IP3cbUS+Iz10qz4bHJAa
-         bN5aGNfosbUfA+F2Xm66DuncJJPHpwP7LXYxtl2Ajqu7fBSiCFE2PMNnL7397T1GcSDN
-         6hnouhxILNHG90V3xFV/pIojk7CRTZ+6M4jeLERBJabZHRbzvPwA7wAVu7N+AY9Uf1XV
-         hARs/9mqWcV5XVjdhKx71VcUarSrbzJ5TXyaelYS9ZTxhWyKRaGg4y+/VYtY01uzHezI
-         0vtyJU1Q8OcU1C7n0iqWxlfRR5r7KlqaKK5TY86q7aE1qjK0/EuRHotdsNM/ocn08Hx1
-         iJow==
-X-Forwarded-Encrypted: i=1; AJvYcCXT1PaCLSe7pFKPzLOl9JpijAk86SD+naM9E/HUSXO2GEzNxV1ZgEA1w4JO+HDZ7Lm01pm2rCp3zjZlzLzwmR/ES1ZC
-X-Gm-Message-State: AOJu0YxLfNK604ofHGdSVekL1JZHeFI7Du48vR5+keOzg79dIWJ50PeT
-	HvwuoQw50o4uOhx/Ygpj7uoYKrvGwi3QqBT9De54W6Ib3kzfA+ZHrzPqcjdh0rPOEd92tzdlllV
-	+
-X-Google-Smtp-Source: AGHT+IHGTBCSVJo2t7yAUY9UWwABae+zuiW472THcqCnHvQ3bUekN+LNwbNpJnex0bMnOpxnGv/ltw==
-X-Received: by 2002:a05:6512:3c9e:b0:517:866a:117e with SMTP id h30-20020a0565123c9e00b00517866a117emr12821425lfv.7.1713294049051;
-        Tue, 16 Apr 2024 12:00:49 -0700 (PDT)
+        bh=UuGQRWMqmr6ruVhTw3v1+AueGwovFmnNusAak3fPiJU=;
+        b=sEejTkFtLOI1NyafhDQEfB0nR/3M8NE4n7LEpnV+sE/CI20PWi5/umSLfxSJWq/jGY
+         cISDcwg5OM5LUjsfJBgBQsOy3UOXKsU3EBpAovHz0bh+1BZRx9jcGY+bv1K0T4NHn6vh
+         0ZJKnXl9XhZcHdRbeC2drIJ2uiwz/YUYXz7u4XTemV1E0XCwCh6bK5eqJpJnKbXj6SyS
+         QaKdu6KkDR04yf0ctYCWjGTNEEocMt21nJnZqytPCAkNo9LgH1lR68j3jdl21lxonXRO
+         L7m4WPUsONlhvgHsU6ZiwmXrU71NaXSjmYWsho6a8qasNoYo215jVLOaHkqi6EiGlBHj
+         tvkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWU+JPPhePchp1ptf/SBTzkM54tL07SHEo8vj66slNfKDQ2ZntE+0F08ZN7De3knmGtjj+oiX9f197FRHXZ9fdBcRy0
+X-Gm-Message-State: AOJu0YyojaJd0qHlgM51U4cwy/yNZWt9nRCUOC1/6n9VigsDJB/JK59G
+	8afs8jI9aqbjWB2SO7cwCmocY2Kd+k3zf+uQv8jsub5xmoTIt0OrKg7S2qAE8cE=
+X-Google-Smtp-Source: AGHT+IG1FZVocW1TT1LaE4TnKm6GW66mYhxJUhe6LV7zFSRJXa0dXAPuxXWVIiAcjn4r+uQvOHwYFA==
+X-Received: by 2002:a05:6512:158d:b0:518:c59b:4fa9 with SMTP id bp13-20020a056512158d00b00518c59b4fa9mr8481593lfb.50.1713294056253;
+        Tue, 16 Apr 2024 12:00:56 -0700 (PDT)
 Received: from m1x-phil.lan ([176.176.155.61])
-        by smtp.gmail.com with ESMTPSA id du2-20020a17090772c200b00a52299d8eecsm6710577ejc.135.2024.04.16.12.00.47
+        by smtp.gmail.com with ESMTPSA id g17-20020a170906349100b00a4e2dc1283asm7167171ejb.50.2024.04.16.12.00.53
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 16 Apr 2024 12:00:48 -0700 (PDT)
+        Tue, 16 Apr 2024 12:00:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: qemu-devel@nongnu.org,
 	Thomas Huth <thuth@redhat.com>
@@ -81,12 +80,21 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
 	Zhao Liu <zhao1.liu@intel.com>,
+	Peter Maydell <peter.maydell@linaro.org>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>
-Subject: [PATCH v4 10/22] hw/i386/pc: Remove PCMachineClass::smbios_uuid_encoded
-Date: Tue, 16 Apr 2024 20:59:26 +0200
-Message-ID: <20240416185939.37984-11-philmd@linaro.org>
+	Eduardo Habkost <eduardo@habkost.net>,
+	Song Gao <gaosong@loongson.cn>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Bin Meng <bin.meng@windriver.com>,
+	Weiwei Li <liwei1518@gmail.com>,
+	Daniel Henrique Barboza <dbarboza@ventanamicro.com>,
+	Liu Zhiwei <zhiwei_liu@linux.alibaba.com>,
+	Ani Sinha <anisinha@redhat.com>
+Subject: [PATCH v4 11/22] hw/smbios: Remove 'uuid_encoded' argument from smbios_set_defaults()
+Date: Tue, 16 Apr 2024 20:59:27 +0200
+Message-ID: <20240416185939.37984-12-philmd@linaro.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240416185939.37984-1-philmd@linaro.org>
 References: <20240416185939.37984-1-philmd@linaro.org>
@@ -99,57 +107,112 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-PCMachineClass::smbios_uuid_encoded was only used by the
-pc-i440fx-2.1 machine, which got removed. It is now always
-true, remove it.
+'uuid_encoded' is always true, remove it.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- include/hw/i386/pc.h | 1 -
- hw/i386/fw_cfg.c     | 3 +--
- hw/i386/pc.c         | 1 -
- 3 files changed, 1 insertion(+), 4 deletions(-)
+ include/hw/firmware/smbios.h | 3 +--
+ hw/arm/virt.c                | 3 +--
+ hw/i386/fw_cfg.c             | 2 +-
+ hw/loongarch/virt.c          | 2 +-
+ hw/riscv/virt.c              | 2 +-
+ hw/smbios/smbios.c           | 6 ++----
+ 6 files changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index b528f17904..c2d9af36b2 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -109,7 +109,6 @@ struct PCMachineClass {
-     /* SMBIOS compat: */
-     bool smbios_defaults;
-     bool smbios_legacy_mode;
--    bool smbios_uuid_encoded;
-     SmbiosEntryPointType default_smbios_ep_type;
+diff --git a/include/hw/firmware/smbios.h b/include/hw/firmware/smbios.h
+index 8d3fb2fb3b..f066ab7262 100644
+--- a/include/hw/firmware/smbios.h
++++ b/include/hw/firmware/smbios.h
+@@ -331,8 +331,7 @@ void smbios_add_usr_blob_size(size_t size);
+ void smbios_entry_add(QemuOpts *opts, Error **errp);
+ void smbios_set_cpuid(uint32_t version, uint32_t features);
+ void smbios_set_defaults(const char *manufacturer, const char *product,
+-                         const char *version,
+-                         bool uuid_encoded);
++                         const char *version);
+ void smbios_set_default_processor_family(uint16_t processor_family);
+ uint8_t *smbios_get_table_legacy(size_t *length, Error **errp);
+ void smbios_get_tables(MachineState *ms,
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index a9a913aead..a55ef916cb 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1650,8 +1650,7 @@ static void virt_build_smbios(VirtMachineState *vms)
+     }
  
-     /* RAM / address space compat: */
+     smbios_set_defaults("QEMU", product,
+-                        vmc->smbios_old_sys_ver ? "1.0" : mc->name,
+-                        true);
++                        vmc->smbios_old_sys_ver ? "1.0" : mc->name);
+ 
+     /* build the array of physical mem area from base_memmap */
+     mem_array.address = vms->memmap[VIRT_MEM].base;
 diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index d802d2787f..f7c2501161 100644
+index f7c2501161..ecc4047a4b 100644
 --- a/hw/i386/fw_cfg.c
 +++ b/hw/i386/fw_cfg.c
-@@ -63,8 +63,7 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
+@@ -63,7 +63,7 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
  
      if (pcmc->smbios_defaults) {
          /* These values are guest ABI, do not change */
--        smbios_set_defaults("QEMU", mc->desc, mc->name,
--                            pcmc->smbios_uuid_encoded);
-+        smbios_set_defaults("QEMU", mc->desc, mc->name, true);
+-        smbios_set_defaults("QEMU", mc->desc, mc->name, true);
++        smbios_set_defaults("QEMU", mc->desc, mc->name);
      }
  
      /* tell smbios about cpuid version and features */
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index cd6335d6b4..2bf1bfd5b2 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1778,7 +1778,6 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     pcmc->has_acpi_build = true;
-     pcmc->rsdp_in_ram = true;
-     pcmc->smbios_defaults = true;
--    pcmc->smbios_uuid_encoded = true;
-     pcmc->gigabyte_align = true;
-     pcmc->has_reserved_memory = true;
-     pcmc->enforce_aligned_dimm = true;
+diff --git a/hw/loongarch/virt.c b/hw/loongarch/virt.c
+index 441d764843..00d3005e54 100644
+--- a/hw/loongarch/virt.c
++++ b/hw/loongarch/virt.c
+@@ -355,7 +355,7 @@ static void virt_build_smbios(LoongArchMachineState *lams)
+         return;
+     }
+ 
+-    smbios_set_defaults("QEMU", product, mc->name, true);
++    smbios_set_defaults("QEMU", product, mc->name);
+ 
+     smbios_get_tables(ms, SMBIOS_ENTRY_POINT_TYPE_64,
+                       NULL, 0,
+diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+index d171e74f7b..1ed9b0552e 100644
+--- a/hw/riscv/virt.c
++++ b/hw/riscv/virt.c
+@@ -1277,7 +1277,7 @@ static void virt_build_smbios(RISCVVirtState *s)
+         product = "KVM Virtual Machine";
+     }
+ 
+-    smbios_set_defaults("QEMU", product, mc->name, true);
++    smbios_set_defaults("QEMU", product, mc->name);
+ 
+     if (riscv_is_32bit(&s->soc[0])) {
+         smbios_set_default_processor_family(0x200);
+diff --git a/hw/smbios/smbios.c b/hw/smbios/smbios.c
+index eed5787b15..8261eb716f 100644
+--- a/hw/smbios/smbios.c
++++ b/hw/smbios/smbios.c
+@@ -30,7 +30,7 @@
+ #include "hw/pci/pci_device.h"
+ #include "smbios_build.h"
+ 
+-static bool smbios_uuid_encoded = true;
++static const bool smbios_uuid_encoded = true;
+ /*
+  * SMBIOS tables provided by user with '-smbios file=<foo>' option
+  */
+@@ -1017,11 +1017,9 @@ void smbios_set_default_processor_family(uint16_t processor_family)
+ }
+ 
+ void smbios_set_defaults(const char *manufacturer, const char *product,
+-                         const char *version,
+-                         bool uuid_encoded)
++                         const char *version)
+ {
+     smbios_have_defaults = true;
+-    smbios_uuid_encoded = uuid_encoded;
+ 
+     SMBIOS_SET_DEFAULT(smbios_type1.manufacturer, manufacturer);
+     SMBIOS_SET_DEFAULT(smbios_type1.product, product);
 -- 
 2.41.0
 
