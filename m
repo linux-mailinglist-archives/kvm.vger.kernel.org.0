@@ -1,118 +1,157 @@
-Return-Path: <kvm+bounces-14903-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE29A8A7794
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 00:15:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CF0C8A778D
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 00:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F9C81F23B84
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 22:15:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 834271C21AF0
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 22:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1FD84D34;
-	Tue, 16 Apr 2024 22:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB90884E1A;
+	Tue, 16 Apr 2024 22:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zFKUXqyp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DnbmLz0s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AAB78C7F
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 22:14:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C628984DED;
+	Tue, 16 Apr 2024 22:11:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713305697; cv=none; b=Fq6uL9D8YouCXdSnL1+wV6QmEQUPI7jnXU6UgJ7En3DMm9oWhO8daHMinboRx1WDjA227OmQUBhUvqgW22H2cBFuVxw9PguRPvb1CAh5iiT18PbQnCm0fi1cPK1+1G15i+5oiYRM1MCksj7jMigRYDqI8ihcpzNWQavNLAWn4xA=
+	t=1713305475; cv=none; b=FtaEc6DJm+JllDxbLR6fb8Htyjb3GNkdXd8IxlKWWXiNLNOuTMtTwsu6CqrqTasHMQyjb/lknj/3/0S13a4cN8/DO1mrYqedQaW1ibbq8WX9YWAW7VLKRI16gmQkG29E1lmnfeC2v3/qcxavajFfjDxWl9KiUXpxeHn5Tjzg6S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713305697; c=relaxed/simple;
-	bh=7y3M+0fa7LjUGCW8zz0dPkhDbnFqBsAs1zY2vanoPcw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ryGAvZbeaOLBlZmY4q1fabnFPx6dt2Y8SR58mYgLj4D6m/H+cCFp0skQmn1WkGwBZVVlpNoISLztjcYry9sSPbOASV3EfN9aPsCmNEUNA96/K7zp52Pm9ceUKmFG2ELYPWi+X2VKPTO+6NJjatgtSf7FD08ndyr6flXWDL75t4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zFKUXqyp; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61afae89be3so14792867b3.0
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 15:14:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713305695; x=1713910495; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ojAEudSaSnS6y1Hv+EyDUIwvL32E3n7xtXtPYkUfBj0=;
-        b=zFKUXqypvTvGF555bgjBt0erX55aDgTTyZK71AWJQw+5G/tYwc3GnK7nbUnYvk25lX
-         QYooX3CiiN0l5ott4sBi9bqQhCoXTjT5l9he33Q023Ifb9KSkx0i3oHYqtk0fhL9ub1b
-         DSVCt8LYv9MZr/CF4QkL7j+fRN9L/GxBIjqRhDvpjtG8hFEE9wYFFvR1t8X3EpMjGhuv
-         KnKJGPzXURs/LssuZFAG0XcLddvEa4X/tPREccHd2ch0VuQy5HaVkK450kC9HMiRgUQ4
-         cSb35f6ZAmI9i5CCQtnAstADEhBFAWw4fBMIgGRxPoujleH2UcVO3k7k8dTueHYd0l0Y
-         T91Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713305695; x=1713910495;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ojAEudSaSnS6y1Hv+EyDUIwvL32E3n7xtXtPYkUfBj0=;
-        b=nkGCZsZFSgnqwM31dqFI2CDiRfHL/O3xaKtR0C+NiAFuTWtrE6SpFWkgxkRN1tiUqa
-         4NP7ObCkPROj3C1Dqvu/yxcLGgKvqU7+dCy9SVRxn07Kwj4Mz6oFiEpFOoFxj6NnhWOm
-         2ggZmQuzecbYHJpeWSoucqQ5s/OhtDcKLng3e+1RQKmdAyPGTu/c35hK5zyulhPBieY1
-         KJF7wV8SSiRnD7CEvM1NvyzjIRvfMQFj2CbqQUjVhlSWLcMHgBq3RYzM2evpJ9nmSleg
-         XfZOSQ4l8lpNxsUX+qZJuleIE7gh++UiLU8bwixe2eulTg3fj4KLYqVC2cdUIBZ8RqE/
-         mgXg==
-X-Forwarded-Encrypted: i=1; AJvYcCV0CyMopZ0KihoBMPWZqcOUtanCd0pT0yFRsZFUSsC24/fzpXeV7t44Kk738qy+u79A94stlt3Disld3wuyX8DcbKiR
-X-Gm-Message-State: AOJu0YwPEtam30UgTOrJpnHCcrdq4Gic6tjZEjOdMZjYDrlEYk0oRPLk
-	sWKDCza7CGdWhC2pxCHwDvn2YgxlANbhT7ByLFT2d54bUyBdAsO2WD1KQHo5Keu7VM2hmj6MWGO
-	GJQ==
-X-Google-Smtp-Source: AGHT+IEGWsaw9u26zK3PN5zbRSPRYyfDKGBaFt2K6uHPnxrP/X83MK3MKEIo+XYbUZDKfg8SYvyQ6tKroEc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4e94:0:b0:61b:46e:62da with SMTP id
- c142-20020a814e94000000b0061b046e62damr161189ywb.4.1713305695455; Tue, 16 Apr
- 2024 15:14:55 -0700 (PDT)
-Date: Tue, 16 Apr 2024 15:14:53 -0700
-In-Reply-To: <CABgObfZ-dFnWK46pyvuaO8TKEKC5pntqa1nXm-7Cwr0rpg5a3w@mail.gmail.com>
+	s=arc-20240116; t=1713305475; c=relaxed/simple;
+	bh=rdpsXIWGDG4PvT893grQx+rL878rDudcA5OJ2YWiugA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jq6evJSgj8w6LZcP8HPv5fwjvCi5J7IP/wS20xN6t/nF8oSH7tz9qKLT9C5CQgsohagpZinJPRUfLGWB3cmx4+XET/LIIIBce+eMuyho4kcYl7v37enrSqonUcAkSXoa/jNm8X4HR9onJTHcz77svKkfBSB+6gPvXYHkAKHhfM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DnbmLz0s; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713305474; x=1744841474;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=rdpsXIWGDG4PvT893grQx+rL878rDudcA5OJ2YWiugA=;
+  b=DnbmLz0sIaJCmIiAdcoqj0SC/n7hhg6kVSTlRmSbyVlrsAzdulVbcNpf
+   3tr6LcrNAxHS9Xdzt4N4nwV2PbmDDQVJBAcp9p5ZTCgzvpumOlP2M7UFf
+   PMLJp80ywz7IQyWPUiMWH3mTjVKDItPYpZakPM9nT9Rwmwyj5XVbIjwyG
+   V1ob1OnZf3lzLYzPZ7WWZs6F69Vm/zbzPoN1wyMHeNzWlMcmZDFA6J5DW
+   LfLh96sFunUmGBe5/t+7htlpSYqrnHCMOgXU9NyQGnpnWZu1Q++fM73DF
+   ca++N3RNVYEamiGx9+Ew5uIClf4pjI2lBn0mnekcrJ+gjiNQFf6Lb2lbk
+   w==;
+X-CSE-ConnectionGUID: Xx1lQBwvS2CNAy/JbWq3OA==
+X-CSE-MsgGUID: hmCokJaCSqaQgxSKhVCXxA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="19379750"
+X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
+   d="scan'208";a="19379750"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 15:11:13 -0700
+X-CSE-ConnectionGUID: aOB0hx/ZTfejf2l/oBjZZA==
+X-CSE-MsgGUID: pDbsOPGDQQKNgY3FIPHMFw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
+   d="scan'208";a="22884358"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 15:11:12 -0700
+Date: Tue, 16 Apr 2024 15:15:46 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter
+ Zijlstra <peterz@infradead.org>, "iommu@lists.linux.dev"
+ <iommu@lists.linux.dev>, Thomas Gleixner <tglx@linutronix.de>, Lu Baolu
+ <baolu.lu@linux.intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "Hansen, Dave" <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H.
+ Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
+ <mingo@redhat.com>, "Luse, Paul E" <paul.e.luse@intel.com>, "Williams, Dan
+ J" <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, "Raj, Ashok"
+ <ashok.raj@intel.com>, "maz@kernel.org" <maz@kernel.org>,
+ "seanjc@google.com" <seanjc@google.com>, Robin Murphy
+ <robin.murphy@arm.com>, "jim.harris@samsung.com" <jim.harris@samsung.com>,
+ "a.manzanares@samsung.com" <a.manzanares@samsung.com>, Bjorn Helgaas
+ <helgaas@kernel.org>, "Zeng, Guang" <guang.zeng@intel.com>,
+ "robert.hoo.linux@gmail.com" <robert.hoo.linux@gmail.com>,
+ jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH v2 12/13] iommu/vt-d: Add an irq_chip for posted MSIs
+Message-ID: <20240416151546.31a539e8@jacob-builder>
+In-Reply-To: <BN9PR11MB5276051CAD86374C666ACFD48C042@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
+	<20240405223110.1609888-13-jacob.jun.pan@linux.intel.com>
+	<BN9PR11MB5276051CAD86374C666ACFD48C042@BN9PR11MB5276.namprd11.prod.outlook.com>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240416204729.2541743-1-boris.ostrovsky@oracle.com>
- <c7091688-8af5-4e70-b2d7-6d0a7134dbbe@redhat.com> <66cc2113-3417-42d0-bf47-d707816cbb53@oracle.com>
- <CABgObfZ-dFnWK46pyvuaO8TKEKC5pntqa1nXm-7Cwr0rpg5a3w@mail.gmail.com>
-Message-ID: <Zh74XcF2xWSq7_ZA@google.com>
-Subject: Re: [PATCH] KVM/x86: Do not clear SIPI while in SMM
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: boris.ostrovsky@oracle.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2024, Paolo Bonzini wrote:
-> On Tue, Apr 16, 2024 at 10:57=E2=80=AFPM <boris.ostrovsky@oracle.com> wro=
-te:
-> > On 4/16/24 4:53 PM, Paolo Bonzini wrote:
-> > > On 4/16/24 22:47, Boris Ostrovsky wrote:
-> > >> Keeping the SIPI pending avoids this scenario.
-> > >
-> > > This is incorrect - it's yet another ugly legacy facet of x86, but we
-> > > have to live with it.  SIPI is discarded because the code is supposed
-> > > to retry it if needed ("INIT-SIPI-SIPI").
-> >
-> > I couldn't find in the SDM/APM a definitive statement about whether SIP=
-I
-> > is supposed to be dropped.
+Hi Kevin,
+
+On Fri, 12 Apr 2024 09:36:10 +0000, "Tian, Kevin" <kevin.tian@intel.com>
+wrote:
+
+> > From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+> > Sent: Saturday, April 6, 2024 6:31 AM
+> >=20
+> > + *
+> > + * For the example below, 3 MSIs are coalesced into one CPU
+> > notification. Only
+> > + * one apic_eoi() is needed.
+> > + *
+> > + * __sysvec_posted_msi_notification()
+> > + *	irq_enter();
+> > + *		handle_edge_irq()
+> > + *			irq_chip_ack_parent()
+> > + *				dummy(); // No EOI
+> > + *			handle_irq_event()
+> > + *				driver_handler()
+> > + *	irq_enter();
+> > + *		handle_edge_irq()
+> > + *			irq_chip_ack_parent()
+> > + *				dummy(); // No EOI
+> > + *			handle_irq_event()
+> > + *				driver_handler()
+> > + *	irq_enter();
+> > + *		handle_edge_irq()
+> > + *			irq_chip_ack_parent()
+> > + *				dummy(); // No EOI
+> > + *			handle_irq_event()
+> > + *				driver_handler() =20
 >=20
-> I think the manual is pretty consistent that SIPIs are never latched,
-> they're only ever used in wait-for-SIPI state.
+> typo: you added three irq_enter()'s here
+right, will remove the middle two.
 
-Ya, the "Interrupt Command Register (ICR)" section for "110 (Start-Up)" exp=
-licitly
-says it's software's responsibility to detect whether or not the SIPI was d=
-elivered,
-and to resend SIPI(s) if needed.
+>=20
+> > + *	apic_eoi()
+> > + * irq_exit()
+> > + */
+> > +static struct irq_chip intel_ir_chip_post_msi =3D {
+> > +	.name			=3D "INTEL-IR-POST",
+> > +	.irq_ack		=3D dummy,
+> > +	.irq_set_affinity	=3D intel_ir_set_affinity,
+> > +	.irq_compose_msi_msg	=3D intel_ir_compose_msi_msg,
+> > +	.irq_set_vcpu_affinity	=3D intel_ir_set_vcpu_affinity,
+> > +}; =20
+>=20
+> What about putting this patch at end of the series (combining the
+> change in intel_irq_remapping_alloc()) to finally enable this
+> feature?
+>=20
+> It reads slightly better to me to first get those callbacks extended
+> to deal with the new mechanism (i.e. most changes in patch13)
+> before using them in the new irqchip. =F0=9F=98=8A
 
-  IPIs sent with this delivery mode are not automatically retried if the so=
-urce
-  APIC is unable to deliver it. It is up to the software to determine if th=
-e
-  SIPI was not successfully delivered and to reissue the SIPI if necessary.
+makes sense, will do.
+
+Thanks,
+
+Jacob
 
