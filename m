@@ -1,229 +1,208 @@
-Return-Path: <kvm+bounces-14736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05748A6633
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 10:33:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE408A664A
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 10:39:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DAFE1F21E24
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 08:33:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D72F92837F0
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 08:39:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B5784FD2;
-	Tue, 16 Apr 2024 08:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF48839E5;
+	Tue, 16 Apr 2024 08:38:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="pZksqERT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q7ugUH24"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F8F8289C
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 08:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713256409; cv=none; b=TO2ryyKtoFJ/n9StQhR317WTy/+gM+IroEdSQqeBc/MqR6tceb0ZCfdx3WapbdTDk22r+FmvXPiKnwqKPIk63R1+mdzRhRBqn3AZVV4exdZg+4LIWfCSJZJ4fJkPfLWsU9tjvWt1//vWsKK3uV+Fq89cy6x2cJ0CnRBQWaFi9Jw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713256409; c=relaxed/simple;
-	bh=1r2dYmGOG85xb9RvVvwdeFQUgSPsmVG5HQTBso1uuLg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Tordm9RYDeQPDbf7dl4aqktH8cIFCJjh0wGByCiM4y6n+bv03Go4vFAbLWG+DZH9fYNwIOnhnzvlbs6xnH+TNkBqtD8kDeUQIXVY6W8ErWrGe7+omZ+0GqGuhQuqVXRyyz3l8BXfwpMlQx95F4gTjoQW2un35vpDGp8dthqD918=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=pZksqERT; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6ead4093f85so3342022b3a.3
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 01:33:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1713256405; x=1713861205; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5TvjvzDX9+vy4W2zxmJXwerRo6Lh0Y1bVDzHJUICCWo=;
-        b=pZksqERTbBW99qFXhmT8dWj1ZfN+zVxjVOFSGZhWwnVA0WVaulsfxSUCphKXlsjA20
-         iRo3t3oTN/0qD6wdcA8za6hzoWLwuc0G5vL+9EDoNaDdAxhl14/oD/TQV0y7rmH0u0A3
-         AJCytknoVRY6wUlnofVYBj2cEH45vo7WI1oobjnZQf37KijVH/oP14YMjdqoUxNKgNdk
-         0Jud0YycsKQWpdN3OAPtq4rKG1piXqmBeVnmO7mvVdApiMW/nL71KvSEEymtBAUsLDN8
-         hg+NuY2wuc/lDZKtOU3pSWf6Y+/iHF4Hasg9u8lP3LFvUqRqkyQx3ZNazNdyoeAMM0R2
-         T69g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713256405; x=1713861205;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5TvjvzDX9+vy4W2zxmJXwerRo6Lh0Y1bVDzHJUICCWo=;
-        b=HGzBpSmSam+UkDl2vh4Tt5di/mKGk72J+5sv7jbT8ne7MCdasMUTnAM0Fa3j/nxGDb
-         QuGmD5hEzAYxMTaIqgDd7SxPm7j4kAh/9V4itCRcuhTvV5wMBXLDA8p7mdKoPjfdv4Z1
-         +h4OCOdS05p0Oh9CAe+lNQZ/O9i45F54w/Ss/kVt+mWghS1h58BHYeZco7qPRXEVj5be
-         Zjn+v/scfF/bi6lB8RpR/D5hDMLGZpJ3Uea2n42EDD0DGHYbMlXKYdaSN7Jk+8Kt/mqx
-         4sgm35fKpb/KLRFjYkhJgYE+j0ExLFTfr4amzT9K2/PmkEpzcSuQ6yf6jUe7htpN2w8Y
-         BpIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVT+56hdWU1siTXxhDU2uZzFh1aOUrgGywowgfN/kvRvFiNutOfPsbYL3QHTkcVwJxOIu1g/kguuA0t5bOJ+1Vk/FI6
-X-Gm-Message-State: AOJu0YyHmR4wf8aD+Fjhojw2l3pVjJDCHE3Pd+SW8Uqi4PyJGhEN8nh4
-	4Q9QW1e2JFkh1Qxkw9C4jHbAu9dq3hYElQfyOgRZFJk9kOLEjTpkfFCG6nD20DY=
-X-Google-Smtp-Source: AGHT+IHrkeBmdYGDSxY9lkjSHA0b7Iv/w+m0cDIN2acr0IYgXgd79F0r3F5ys4RmCJ4iNsyU6E2Lrg==
-X-Received: by 2002:a05:6a20:d49b:b0:1a9:c6fd:d2b9 with SMTP id im27-20020a056a20d49b00b001a9c6fdd2b9mr8196272pzb.8.1713256404819;
-        Tue, 16 Apr 2024 01:33:24 -0700 (PDT)
-Received: from [172.16.0.33] (c-67-188-2-18.hsd1.ca.comcast.net. [67.188.2.18])
-        by smtp.gmail.com with ESMTPSA id y25-20020aa78559000000b006e6c0f8ce1bsm8490363pfn.47.2024.04.16.01.33.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Apr 2024 01:33:24 -0700 (PDT)
-Message-ID: <dd14fc53-deda-4086-aac0-2dde7f065bb0@rivosinc.com>
-Date: Tue, 16 Apr 2024 01:33:22 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C02E205E10
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 08:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713256735; cv=fail; b=UsOz1x9NSDIqUHlWeJBx8MlD5VWTdbW3JbQRN+kwLgpDC6aej7gk97wtW5/Q5185qkLKh6c0ouemLr5c9TnrInKgiibmDa1U3v5u/0dbLFGeD79MG+esp4DLXvTn8W8VMEp/KakftecU+UmkgUYiHUvGXGEe22vLyW2s0lim4vA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713256735; c=relaxed/simple;
+	bh=WI7qb+QVFYCA+ej3Dg4eW7sq/qi6ba+Dj18G5Bm+xTI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XjFjGv+NUxF9OkzjY03FDp54FTHkLO91QEpc80oVOQLgSejCj22H+x+1/vocD6s89LgYiismohe3wBUMZkZUCtTzcnJktGR93wznt9tfU3S6Y/h1+Nx1W+8KkAxINnWWcVs4ItpSHsCgV5i32JUscLql8lHX3q3NWOXIf+/C4VM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q7ugUH24; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713256733; x=1744792733;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WI7qb+QVFYCA+ej3Dg4eW7sq/qi6ba+Dj18G5Bm+xTI=;
+  b=Q7ugUH24kgUupMnOBa6S6uHhUmbNv7cPKAFfN/F6eTHI9BPK+Cubs+qQ
+   bcd21X/Ga11MfK7POsICsgR1ef64J7oRAIKU6mRJSvUtZ+q9D3QVWJ5IH
+   R7SP4K3XQmOCZPf+T3hp9EDW60VqouQGh7tm0iQWL5t4PUj3qqoaqqMGt
+   sMRv4r2bZdW1wacrrlv9Wrz4Jo0+ktej5idfcFmJYYi7195Yjt5L48Csh
+   OoLJNNSBfGN7S0wt9amXD4bDQUsNxrnNi2YfgNVouEIPAfhjGaFDDTVxp
+   e18+CTfjGagTX6/Zs7FRYibRGtlfeYSWBMeCMtREJTl0QeOTMfdh4FcLA
+   A==;
+X-CSE-ConnectionGUID: sHw/Lt1NTKC/aVTIfj18IQ==
+X-CSE-MsgGUID: nCpKeLucRnWO1QVAfg4w9w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="20103687"
+X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
+   d="scan'208";a="20103687"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 01:38:52 -0700
+X-CSE-ConnectionGUID: v2d2lPKpR7WYtgjurlnf7A==
+X-CSE-MsgGUID: iVuAdk1FQ4auxNZtY3ZcAA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
+   d="scan'208";a="22227599"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Apr 2024 01:38:52 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 16 Apr 2024 01:38:52 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 16 Apr 2024 01:38:51 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 16 Apr 2024 01:38:51 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 16 Apr 2024 01:38:51 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XcD8FTGeN89m1BwaJKxsnnYvr0aj2FAHYEoFhYUJRX0FeGlDA+EJiWy/5byfpGd0FZ6X3+gdJZwOHdnqitkSqClfBOCuisIvV7+DAUKmALv7sZmnsD6ygdX6kH+DUdP+oCwhm9KltRvwveaBgOsLr5Q/PdoJp3VZN1dRpGC+NVF1MzQxQ8UZ7TVtwSzcXqJFctHlCy+QQNPoioMVrAytx7nt8NEBvMg/dzADHBovT8IlvNAhD0tmIQkrNZ9qWADJAjj5cXQAFBdv9cqrtT45UVIzl3Y+P6Oz00IXxbq2+WTkjhmMhPrLh+JBiymsjWSv6uoSGoGDmTbAWdQ9CaS6cQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=UcvkFiaVosYlqbHOID9nblFtrZ61Mu6RR9Vl07alxqY=;
+ b=jqNS3ZAf/xoKQWlxWUnj3/u32vQzwpmusO99GvKKwbt3qpVagswl3C+MDyx7+cXGdII6wd2+Fwb4fP+UWDL9G3m+RPgBUaazLQcrhbRY7EgspetmnW+nfp8U2vVCqYjEWq+IlULvL1uGzTYOy0SZ3B687+O8Pj2gbZOYel5H2/mmgAn51RD56yJThEtj7n3dptpDXIl95vvwCGyeMKbCQx1F6KEpGV+mFwpfOBw14TgGg53TAIxqdyG1vBqp0Q6RQ/Zsm662Jidtyl4gcE5pOBhSmvyyEsG55H4CvXCspFvwHtsRyaFgw/IPAgRhdzsYm+37ShgwElp17p/3g/VDMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by LV3PR11MB8484.namprd11.prod.outlook.com (2603:10b6:408:1b4::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.26; Tue, 16 Apr
+ 2024 08:38:50 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6c9f:86e:4b8e:8234]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6c9f:86e:4b8e:8234%6]) with mapi id 15.20.7472.027; Tue, 16 Apr 2024
+ 08:38:50 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "alex.williamson@redhat.com"
+	<alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>
+CC: "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
+	<robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+	"nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
+	<baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+	"Pan, Jacob jun" <jacob.jun.pan@intel.com>
+Subject: RE: [PATCH v2 0/4] vfio-pci support pasid attach/detach
+Thread-Topic: [PATCH v2 0/4] vfio-pci support pasid attach/detach
+Thread-Index: AQHajLJtgFipqDFp5kGVxfWLZ+e8jbFqmBhw
+Date: Tue, 16 Apr 2024 08:38:50 +0000
+Message-ID: <BN9PR11MB5276318EF2CD66BEF826F59A8C082@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240412082121.33382-1-yi.l.liu@intel.com>
+In-Reply-To: <20240412082121.33382-1-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|LV3PR11MB8484:EE_
+x-ms-office365-filtering-correlation-id: 06f0ad5d-2cdb-441b-3472-08dc5df0a400
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JWTJxKlbk0CXeeSmkX2KND8tSs1O7cgq6tDH45Tg1DfCHHBFQk2sS5QvwHXfPwOqlugLeXUhTpuU0IVoA3ty1MfiEUCwV3J94FZxvvdhWkP0hsaWVk6znw9MhMQhrQLyCJf1qNWlgyCCcTBVfOqSbGES55PO/6utE9THhm/cgo80faL6HE3zOXHzd2dulEKevjdXtoS1pv/jRC8Pg91oVcD6JTffP54gKXmWm4B/1AxM/uwNDvjBYZm5Qsj9/V6g0q44BILRb2fpgdsb7f85DeSl8vG5n2347nhwncLaOpnrCyDjsrDXmVT707h9/fEcnMinIIePtMrg414KcwVBFK8rTB5OMbZo2UrjQXEtet05IDfqnZ+45sNAwwFLVxTi9ZWY4HKrU6bUUvromf9H/Ch21z6t4S+qehxMW2CAutPZr35MPQ8wCh1t5v5bWtiDEAxDwJZ7wkzTAq18e9t9wYBZdcGmF2gwhV28Q0Yi1TeYIr50dvazPIglTXZjBkq7XQ5wbbtVW8dqpFt+sHWiGM0BLqrrm40VofDx7wPYxEKz0cl1W4QWc/ivFkRRBXe5e+uPUL/aSxFj/zk7C+034tysJCoxSMkd3Y3b9ej8afhmvWG3xw4CXR0qdZVKzf6y8IZKS72qQiwDfQAkdWHxVl53IUfaABw9iZfSt7Xm444hWCDZHxXseQPZ9l272roF1kMIN7SCBnQJaBAbymGImUf/hPM1crH4QPlaZTY0wVY=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?NukG+MkdorFtkKbLK6SAPBLkUtB17adT7WniulKwKJpM32gkSVtZGTk5xEdh?=
+ =?us-ascii?Q?0K683jYh3zZfgWg5B8C5sqWm1xSEK4UNv5tWSdgNREMYiRWUNnixWgwsNHlv?=
+ =?us-ascii?Q?+hT9t5t7xbV6i7Fa/Y9WwPr2TBk7HW7nzSjlHW4W3zxpxYTH0Kh61tEUnqS7?=
+ =?us-ascii?Q?A3UHjZ8F1aOc4kffDTF04fnrfoYfHfFjXYBxBwVzWY+8wIqvTJ0KlMbeRThv?=
+ =?us-ascii?Q?UnUHRFSwh7HkVLRnDnk5GECVttfZwkfz85VCV39i6bcu/HX9Luv4MFzexuIS?=
+ =?us-ascii?Q?novu9vp3sQXv495mAx8eahf/0Cawc9ASaPGRMNVO0ScBaRXQmJfMQ3dysoxY?=
+ =?us-ascii?Q?0pBC0aiEdBJi8PtbIr4Jb4CC2nJ/OLnOoYa/qXj/qZXjfnOH6SY4LDbiuW9j?=
+ =?us-ascii?Q?XepA7ojZQgfaNt4keLQlWhAcbaSUfipEjSWIuJJUeHQpst0BX7UI1W2eNTRK?=
+ =?us-ascii?Q?h/gqnGilamAt6DwZ8xhQbVLg9eQX+l+dqtygKWaa+Jxo7uoX4z5jp2Um0RIX?=
+ =?us-ascii?Q?BeYBXYXkaE8IV0qFN0bTtfc92d7v8Eubi2eDGYr6VEQyt9l4Lvg3T0e9EpxH?=
+ =?us-ascii?Q?/pzaCrPizaNJqPDtu7o7Em67vAjAT/Uay2kF/bOV6J09/ZGwRWbF3kEkGrBV?=
+ =?us-ascii?Q?kdWfSJp1yVZ/ITzZmI06/H7+Xy8WMSx/uxnnOgkSkM+WCCgsDdM8FDcJs/wU?=
+ =?us-ascii?Q?zPYik52YSemw4clNhss5thPH+Y9TCsGL3vWSv2Z0wx3tCmEOVX7OmezeZwPt?=
+ =?us-ascii?Q?cysqU8YbYE+pWUEB554c/0qjdP0IZOGQa7Kwc7Zq3xDBbbJOQD7qKNkMGz26?=
+ =?us-ascii?Q?AzGFNuQBMYm0hHXrFHUGUZuahufRdvJDbc9YCsZPts3J2KXqjyt6pqYhRm2Y?=
+ =?us-ascii?Q?T7Oc8Mkmrig2t1g+1fhXUXHupp6GwSDj2iPK8DPO03qHhKfJ78Q5Pa6RqpdF?=
+ =?us-ascii?Q?NbYdVM/cQc0vNqjqotmXRk4pZn3i7Vw43AuAGYnIZhxvYOhV26YR6MAn0xBv?=
+ =?us-ascii?Q?G8iVKUC1GN+PsfxqcNboknnZdXNoqyAyxU6UkHcgpraiXb08cAELvrUGpbTw?=
+ =?us-ascii?Q?lXm4hRDmfWPTxyW5vGfZ7FQxFbFXBgaWUTk9bDma45BJi0KWR3mZbUbGUlJQ?=
+ =?us-ascii?Q?U4KNtgL1UiqFgbdkONIs8knPQCBct7FKJvPGPwjvuOvnSbUtBLM+j07Ipalw?=
+ =?us-ascii?Q?d8coFCe8gKY07yO8LSWPkFi0aN7k5d3lrbXSVNJtZJU4QZ2SWaGJelnyOkNB?=
+ =?us-ascii?Q?fy3xcA/XSiehvH4EIxtDyz1pGMqGTFruIYoP8G82gEydxdKaIB47BQbg64lD?=
+ =?us-ascii?Q?UAfADQ4LO5g5Ai8TZb1Jy7Aqx32VfU7KeRqlDLXSuQW7NP/Gwd+GwI4epH1Y?=
+ =?us-ascii?Q?PamSUDodGwq5w6fWL6Q2AHlULMOs4wsohGqdFmabfHAYWUaFXp79RTjx3A6g?=
+ =?us-ascii?Q?B7tHLWAwCoO8u0qu1erkNlbuQsu2aC8+wRCl+wgb6Ynz1LAF1xjKH7M9A64B?=
+ =?us-ascii?Q?ErAVIvmIcxKs4V3ubXiTrqJqDI4GjoJbOLmipEY2Vxq09ufSe4qDz1IknqmQ?=
+ =?us-ascii?Q?O3jRb+fP8bumby41mDgDwDahm8d6LUY3dKOo8Dq9?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 08/24] drivers/perf: riscv: Implement SBI PMU snapshot
- function
-Content-Language: en-US
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: linux-kernel@vger.kernel.org, Palmer Dabbelt <palmer@rivosinc.com>,
- Anup Patel <anup@brainfault.org>, Conor Dooley <conor.dooley@microchip.com>,
- Ajay Kaher <ajay.kaher@broadcom.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alexghiti@rivosinc.com>,
- Alexey Makhalov <alexey.amakhalov@broadcom.com>,
- Atish Patra <atishp@atishpatra.org>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Juergen Gross <jgross@suse.com>,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
- Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>,
- virtualization@lists.linux.dev, Will Deacon <will@kernel.org>, x86@kernel.org
-References: <20240411000752.955910-1-atishp@rivosinc.com>
- <20240411000752.955910-9-atishp@rivosinc.com>
- <20240415-1654deb9446d6c0ebb858b30@orel>
-From: Atish Patra <atishp@rivosinc.com>
-In-Reply-To: <20240415-1654deb9446d6c0ebb858b30@orel>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 06f0ad5d-2cdb-441b-3472-08dc5df0a400
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2024 08:38:50.4292
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dWgLkCan6JPqsEJ4CEDAAQEt0p7arcVqqA7XO7P0F2g9sprdK0JvuIQsSRMSHBlJOFHHSc9MxZsyxGikB9nDRQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8484
+X-OriginatorOrg: intel.com
 
-On 4/15/24 06:15, Andrew Jones wrote:
-> On Wed, Apr 10, 2024 at 05:07:36PM -0700, Atish Patra wrote:
->> SBI v2.0 SBI introduced PMU snapshot feature which adds the following
->> features.
->>
->> 1. Read counter values directly from the shared memory instead of
->> csr read.
->> 2. Start multiple counters with initial values with one SBI call.
->>
->> These functionalities optimizes the number of traps to the higher
->> privilege mode. If the kernel is in VS mode while the hypervisor
->> deploy trap & emulate method, this would minimize all the hpmcounter
->> CSR read traps. If the kernel is running in S-mode, the benefits
->> reduced to CSR latency vs DRAM/cache latency as there is no trap
->> involved while accessing the hpmcounter CSRs.
->>
->> In both modes, it does saves the number of ecalls while starting
->> multiple counter together with an initial values. This is a likely
->> scenario if multiple counters overflow at the same time.
->>
->> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
->> Reviewed-by: Anup Patel <anup@brainfault.org>
->> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->> Signed-off-by: Atish Patra <atishp@rivosinc.com>
->> ---
->>   drivers/perf/riscv_pmu.c       |   1 +
->>   drivers/perf/riscv_pmu_sbi.c   | 224 +++++++++++++++++++++++++++++++--
->>   include/linux/perf/riscv_pmu.h |   6 +
->>   3 files changed, 219 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/perf/riscv_pmu.c b/drivers/perf/riscv_pmu.c
->> index b4efdddb2ad9..36d348753d05 100644
->> --- a/drivers/perf/riscv_pmu.c
->> +++ b/drivers/perf/riscv_pmu.c
->> @@ -408,6 +408,7 @@ struct riscv_pmu *riscv_pmu_alloc(void)
->>   		cpuc->n_events = 0;
->>   		for (i = 0; i < RISCV_MAX_COUNTERS; i++)
->>   			cpuc->events[i] = NULL;
->> +		cpuc->snapshot_addr = NULL;
->>   	}
->>   	pmu->pmu = (struct pmu) {
->>   		.event_init	= riscv_pmu_event_init,
->> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
->> index f23501898657..e2881415ca0a 100644
->> --- a/drivers/perf/riscv_pmu_sbi.c
->> +++ b/drivers/perf/riscv_pmu_sbi.c
->> @@ -58,6 +58,9 @@ PMU_FORMAT_ATTR(event, "config:0-47");
->>   PMU_FORMAT_ATTR(firmware, "config:63");
->>   
->>   static bool sbi_v2_available;
->> +static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
->> +#define sbi_pmu_snapshot_available() \
->> +	static_branch_unlikely(&sbi_pmu_snapshot_available)
->>   
->>   static struct attribute *riscv_arch_formats_attr[] = {
->>   	&format_attr_event.attr,
->> @@ -508,14 +511,109 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
->>   	return ret;
->>   }
->>   
->> +static void pmu_sbi_snapshot_free(struct riscv_pmu *pmu)
->> +{
->> +	int cpu;
->> +
->> +	for_each_possible_cpu(cpu) {
->> +		struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
->> +
->> +		if (!cpu_hw_evt->snapshot_addr)
->> +			continue;
->> +
->> +		free_page((unsigned long)cpu_hw_evt->snapshot_addr);
->> +		cpu_hw_evt->snapshot_addr = NULL;
->> +		cpu_hw_evt->snapshot_addr_phys = 0;
->> +	}
->> +}
->> +
->> +static int pmu_sbi_snapshot_alloc(struct riscv_pmu *pmu)
->> +{
->> +	int cpu;
->> +	struct page *snapshot_page;
->> +
->> +	for_each_possible_cpu(cpu) {
->> +		struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
->> +
->> +		if (cpu_hw_evt->snapshot_addr)
->> +			continue;
->> +
->> +		snapshot_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
->> +		if (!snapshot_page) {
->> +			pmu_sbi_snapshot_free(pmu);
->> +			return -ENOMEM;
->> +		}
->> +		cpu_hw_evt->snapshot_addr = page_to_virt(snapshot_page);
->> +		cpu_hw_evt->snapshot_addr_phys = page_to_phys(snapshot_page);
->> +	}
->> +
->> +	return 0;
->> +}
->> +
->> +static int pmu_sbi_snapshot_disable(void)
->> +{
->> +	struct sbiret ret;
->> +
->> +	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM, -1,
->> +			-1, 0, 0, 0, 0);
-> 
-> The SBI_SHMEM_DISABLE patch got moved in front of this patch, but looks
-> like it was forgotten to apply it.
-> 
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Friday, April 12, 2024 4:21 PM
+>=20
+> A userspace VMM is supposed to get the details of the device's PASID
+> capability
+> and assemble a virtual PASID capability in a proper offset in the virtual=
+ PCI
+> configuration space. While it is still an open on how to get the availabl=
+e
+> offsets. Devices may have hidden bits that are not in the PCI cap chain. =
+For
+> now, there are two options to get the available offsets.[2]
+>=20
+> - Report the available offsets via ioctl. This requires device-specific l=
+ogic
+>   to provide available offsets. e.g., vfio-pci variant driver. Or may the=
+ device
+>   provide the available offset by DVSEC.
+> - Store the available offsets in a static table in userspace VMM. VMM get=
+s the
+>   empty offsets from this table.
+>=20
 
-Oops. My bad. Fixed it.
+I'm not a fan of requesting a variant driver for every PASID-capable
+VF just for the purpose of reporting a free range in the PCI config space.
 
-> Otherwise,
-> 
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> 
-> Thanks,
-> drew
-> 
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+It's easier to do that quirk in userspace.
 
+But I like Alex's original comment that at least for PF there is no reason
+to hide the offset. there could be a flag+field to communicate it. or=20
+if there will be a new variant VF driver for other purposes e.g. migration
+it can certainly fill the field too.
 
