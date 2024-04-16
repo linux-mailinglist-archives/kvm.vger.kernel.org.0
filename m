@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-14724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9814E8A62DC
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 07:12:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7AD48A6307
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 07:34:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1DADB22B84
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 05:12:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69003286BA9
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 05:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F9539FFE;
-	Tue, 16 Apr 2024 05:12:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081313B7AC;
+	Tue, 16 Apr 2024 05:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SPDuRXQf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D9V+0Cju"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316011CD06;
-	Tue, 16 Apr 2024 05:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850CE11720;
+	Tue, 16 Apr 2024 05:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713244329; cv=none; b=SAvSMfoC7rS0qmlxu1pYZG2SesW87G34D4EoUSvkMBHUiD7rBP6KjECikBVBPh+0Id2QeVTnAaLrVZu0sy726zJoyPqmIfgE3tjQ0LQQhKe+7rZaXYbyoNqSySrFP+uSGo00kX6zBPBwNJFgZidlzARBOIHnNcmJpctKvpKUEBQ=
+	t=1713245670; cv=none; b=Lg8yP7AFt/yrXcoYyopi95R+x65UTd7CiyXcHewwlGr5WfxZt7JAtc2cx14fQTKabmwta1KhuloI8WNyvk6Z76BsvBw/CxIYMcd+Is5rDxutkVhUQFRArhiVKVh6p3XyGJLFLEMx4rdKdlCoxaECli8xKNKgAGwz/ilYxrC8wv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713244329; c=relaxed/simple;
-	bh=Xk702F0LwWoR8IwEhI5DFA1b/JYz97xwQQDY6dFv2D0=;
+	s=arc-20240116; t=1713245670; c=relaxed/simple;
+	bh=kzqpX5pisSA0RMcIWuJDckngNn3ETsX1+xRIIt6hxSc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q9cmMabzss4T8wGkfRdXZS4YUWwR8wTL63bAjo43VI5bkQY5TUv1gJayuEUpGjoowLCfQuDjhZGBn0IknEU08kHKSvkB5V6OgFiussQmbsM0T3wuP1cl/260cVhWSfEBzs4y+mOCttYmPgXKPyQtDAe8Q+KBp3kvbirelAnDxok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SPDuRXQf; arc=none smtp.client-ip=192.198.163.8
+	 In-Reply-To:Content-Type; b=bi5br6OilCfjXEjWccH8Exvt/jBS1TXhDEglUj8d1te733uSNJeAPSK1N4SMHva6jOe6c0IBZwLihmro75WqewEgV037Xe7XjmYKrH0fhQm53cy3j0BuKDFow69Yw+p+EY2BnR4FkCSO2Wq8R5loLjjAOpWhmCww47R1P/91lPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D9V+0Cju; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713244327; x=1744780327;
+  t=1713245669; x=1744781669;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=Xk702F0LwWoR8IwEhI5DFA1b/JYz97xwQQDY6dFv2D0=;
-  b=SPDuRXQfPnneAtiIunkL2WyCSAYe4nWwTWZelvNb8iTEfQRTcoFMLYKl
-   cgiiDqKDzTETF0eiD1NXPVnvYdC45CPdqL/U3s2pYQJj6iF1RvEkCWNxz
-   AKmRque/0YzPuHTvytkE1TMp+Cv1LEX5irC3MbBqmy+EEM1AKJmRY6uXP
-   oZ8Yf9rCVjzLgb9NAvrMkI3g0zK+NT+3mJ9CjoiCMZbQPZFE7sw0IpzW0
-   BYx5+81rDyW+Zy8FKq3kMHVdbQD47A2HXjoHYtYCw0IzapGonRFEXe7Wz
-   fiy2AnAaKvNdC5gC1SRdsKhYuILyBlW4vuvthxdEWrTRGCvUBwMYuoWL3
-   A==;
-X-CSE-ConnectionGUID: em44YNQOTuSzGSubBV8JqQ==
-X-CSE-MsgGUID: rnLFtWddQVmDXCxNudp8qA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="26176781"
+  bh=kzqpX5pisSA0RMcIWuJDckngNn3ETsX1+xRIIt6hxSc=;
+  b=D9V+0CjuqeXOwW7abvZlf0HPAiiYlG+Gn1mkYkrTOUyTs0c3A+lTmE6f
+   hCSFQxRP18YSjYcWuz1fGN+6BMzW43tM+OYoj6S61qa4tEFfG6IvhTei1
+   uCDrpV8ypYpxQ+BVh9kE3EM9rb1j1+7j6ioeZbeUcTdJ/YrYfQi/1Tp9y
+   CzryJfrRe9VCxKMFuzJRcWweKN/Ym8Snmgqui3IrU+ltKcr409zXqxZTT
+   LUATMqo8sKYIE8qpxBT73KozrYBDc950F/stpeQVGLP2j2S6QTLpVYU72
+   5tXezf4KFMOW54SREmZffzbDbP2jr4VbKZbjwDgW9pP/auFC8q31Lgf6m
+   Q==;
+X-CSE-ConnectionGUID: bp11ffVLSp6Flp61qhPF4Q==
+X-CSE-MsgGUID: mL9wRkw/T5GxEaXu1OJ0zA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="9217857"
 X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
-   d="scan'208";a="26176781"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:12:06 -0700
-X-CSE-ConnectionGUID: fwpcdSv+Qg6Ln0RoMBkODw==
-X-CSE-MsgGUID: onzIOJOaQOSwKu1xjB+Qcg==
+   d="scan'208";a="9217857"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:34:27 -0700
+X-CSE-ConnectionGUID: m6n7iNoyThqdyNYIr9nF7A==
+X-CSE-MsgGUID: IV4WrLTeRgaMvvY208Uxrg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
-   d="scan'208";a="26801136"
+   d="scan'208";a="22615794"
 Received: from unknown (HELO [10.238.128.139]) ([10.238.128.139])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:12:02 -0700
-Message-ID: <47157187-47d8-424e-9bd1-b98690dfe68a@linux.intel.com>
-Date: Tue, 16 Apr 2024 13:11:59 +0800
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:34:23 -0700
+Message-ID: <998fd76f-2bd9-4492-bf2e-e8cd981df67f@linux.intel.com>
+Date: Tue, 16 Apr 2024 13:34:20 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,8 +67,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 00/41] KVM: x86/pmu: Introduce passthrough vPM
-To: Sean Christopherson <seanjc@google.com>
+Subject: Re: [RFC PATCH 02/41] perf: Support guest enter/exit interfaces
+To: "Liang, Kan" <kan.liang@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>
 Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
  kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com,
  jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
@@ -76,117 +77,110 @@ Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
  irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
  chao.gao@intel.com
 References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <ZhgX6BStTh05OfEd@google.com>
- <f6f714ef-eb58-4aa9-9c4d-12bfe29c383b@linux.intel.com>
- <Zhl-JFk5hw-hlyGi@google.com>
- <9469faf7-1659-4436-848f-53ec01d967f2@linux.intel.com>
- <Zh1CL8Gf1YpBvvXd@google.com>
+ <20240126085444.324918-3-xiong.y.zhang@linux.intel.com>
+ <ZhgmrczGpccfU-cI@google.com>
+ <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com>
+ <ZhmIrQQVgblrhCZs@google.com>
+ <2342a4e2-2834-48e2-8403-f0050481e59e@linux.intel.com>
+ <ab2953b7-18fd-4b4c-a83b-ab243e2a21e1@linux.intel.com>
 Content-Language: en-US
 From: "Zhang, Xiong Y" <xiong.y.zhang@linux.intel.com>
-In-Reply-To: <Zh1CL8Gf1YpBvvXd@google.com>
+In-Reply-To: <ab2953b7-18fd-4b4c-a83b-ab243e2a21e1@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 4/15/2024 11:05 PM, Sean Christopherson wrote:
-> On Mon, Apr 15, 2024, Xiong Y Zhang wrote:
->> On 4/13/2024 2:32 AM, Sean Christopherson wrote:
->>> On Fri, Apr 12, 2024, Xiong Y Zhang wrote:
->>>>>> 2. NMI watchdog
->>>>>>    the perf event for NMI watchdog is a system wide cpu pinned event, it
->>>>>>    will be stopped also during vm running, but it doesn't have
->>>>>>    attr.exclude_guest=1, we add it in this RFC. But this still means NMI
->>>>>>    watchdog loses function during VM running.
->>>>>>
->>>>>>    Two candidates exist for replacing perf event of NMI watchdog:
->>>>>>    a. Buddy hardlock detector[3] may be not reliable to replace perf event.
->>>>>>    b. HPET-based hardlock detector [4] isn't in the upstream kernel.
->>>>>
->>>>> I think the simplest solution is to allow mediated PMU usage if and only if
->>>>> the NMI watchdog is disabled.  Then whether or not the host replaces the NMI
->>>>> watchdog with something else becomes an orthogonal discussion, i.e. not KVM's
->>>>> problem to solve.
->>>> Make sense. KVM should not affect host high priority work.
->>>> NMI watchdog is a client of perf and is a system wide perf event, perf can't
->>>> distinguish a system wide perf event is NMI watchdog or others, so how about
->>>> we extend this suggestion to all the system wide perf events ?  mediated PMU
->>>> is only allowed when all system wide perf events are disabled or non-exist at
->>>> vm creation.
+On 4/16/2024 12:03 AM, Liang, Kan wrote:
+> 
+> 
+> On 2024-04-12 4:56 p.m., Liang, Kan wrote:
+>>> What if perf had a global knob to enable/disable mediate PMU support?  Then when
+>>> KVM is loaded with enable_mediated_true, call into perf to (a) check that there
+>>> are no existing !exclude_guest events (this part could be optional), and (b) set
+>>> the global knob to reject all new !exclude_guest events (for the core PMU?).
 >>>
->>> What other kernel-driven system wide perf events are there?
->> does "kernel-driven" mean perf events created through
->> perf_event_create_kernel_counter() like nmi_watchdog and kvm perf events ?
-> 
-> By kernel-driven I meant events that aren't tied to a single userspace process
-> or action.
-> 
-> E.g. KVM creates events, but those events are effectively user-driven because
-> they will go away if the associated VM terminates.
-> 
->> User can create system wide perf event through "perf record -e {} -a" also, I
->> call it as user-driven system wide perf events.  Perf subsystem doesn't
->> distinguish "kernel-driven" and "user-driven" system wide perf events.
-> 
-> Right, but us humans can build a list, even if it's only for documentation, e.g.
-> to provide help for someone to run KVM guests with mediated PMUs, but can't
-> because there are active !exclude_guest events.
-> 
->>>> but NMI watchdog is usually enabled, this will limit mediated PMU usage.
+>>> Hmm, or probably better, do it at VM creation.  That has the advantage of playing
+>>> nice with CONFIG_KVM=y (perf could reject the enabling without completely breaking
+>>> KVM), and not causing problems if KVM is auto-probed but the user doesn't actually
+>>> want to run VMs.
+>> I think it should be doable, and may simplify the perf implementation.
+>> (The check in the schedule stage should not be necessary anymore.)
+>>
+>> With this, something like NMI watchdog should fail the VM creation. The
+>> user should either disable the NMI watchdog or use a replacement.
+>>
+>> Thanks,
+>> Kan
+>>> E.g. (very roughly)
 >>>
->>> I don't think it is at all unreasonable to require users that want optimal PMU
->>> virtualization to adjust their environment.  And we can and should document the
->>> tradeoffs and alternatives, e.g. so that users that want better PMU results don't
->>> need to re-discover all the "gotchas" on their own.
+>>> int x86_perf_get_mediated_pmu(void)
+>>> {
+>>> 	if (refcount_inc_not_zero(...))
+>>> 		return 0;
 >>>
->>> This would even be one of the rare times where I would be ok with a dmesg log.
->>> E.g. if KVM is loaded with enable_mediated_pmu=true, but there are system wide
->>> perf events, pr_warn() to explain the conflict and direct the user at documentation
->>> explaining how to make their system compatible with mediate PMU usage.> 
->>>>>> 3. Dedicated kvm_pmi_vector
->>>>>>    In emulated vPMU, host PMI handler notify KVM to inject a virtual
->>>>>>    PMI into guest when physical PMI belongs to guest counter. If the
->>>>>>    same mechanism is used in passthrough vPMU and PMI skid exists
->>>>>>    which cause physical PMI belonging to guest happens after VM-exit,
->>>>>>    then the host PMI handler couldn't identify this PMI belongs to
->>>>>>    host or guest.
->>>>>>    So this RFC uses a dedicated kvm_pmi_vector, PMI belonging to guest
->>>>>>    has this vector only. The PMI belonging to host still has an NMI
->>>>>>    vector.
->>>>>>
->>>>>>    Without considering PMI skid especially for AMD, the host NMI vector
->>>>>>    could be used for guest PMI also, this method is simpler and doesn't
->>>>>
->>>>> I don't see how multiplexing NMIs between guest and host is simpler.  At best,
->>>>> the complexity is a wash, just in different locations, and I highly doubt it's
->>>>> a wash.  AFAIK, there is no way to precisely know that an NMI came in via the
->>>>> LVTPC.
->>>> when kvm_intel.pt_mode=PT_MODE_HOST_GUEST, guest PT's PMI is a multiplexing
->>>> NMI between guest and host, we could extend guest PT's PMI framework to
->>>> mediated PMU. so I think this is simpler.
+>>> 	if (<system wide events>)
+>>> 		return -EBUSY;
 >>>
->>> Heh, what do you mean by "this"?  Using a dedicated IRQ vector, or extending the
->>> PT framework of multiplexing NMI?
->> here "this" means "extending the PT framework of multiplexing NMI".
+>>> 	<slow path with locking>
+>>> }
+>>>
+>>> void x86_perf_put_mediated_pmu(void)
+>>> {
+>>> 	if (!refcount_dec_and_test(...))
+>>> 		return;
+>>>
+>>> 	<slow path with locking>
+>>> }
 > 
-> The PT framework's multiplexing is just as crude as regular PMIs though.  Perf
-> basically just asks KVM: is this yours?  And KVM simply checks that the callback
-> occurred while KVM_HANDLING_NMI is set.
 > 
-> E.g. prior to commit 11df586d774f ("KVM: VMX: Handle NMI VM-Exits in noinstr region"),
-> nothing would prevent perf from miscontruing a host PMI as a guest PMI, because
-> KVM re-enabled host PT prior to servicing guest NMIs, i.e. host PT would be active
-> while KVM_HANDLING_NMI is set.
+> I think the locking should include the refcount check and system wide
+> event check as well.
+> It should be possible that two VMs are created very close.
+> The second creation may mistakenly return 0 if there is no lock.
 > 
-> And conversely, if a guest PMI skids past VM-Exit, as things currently stand, the
-> NMI will always be treated as host PMI, because KVM will not be in KVM_HANDLING_NMI.
-> KVM's emulated PMI can (and should) eliminate false positives for host PMIs by
-> precisely checking exclude_guest, but that doesn't help with false negatives for
-> guest PMIs, nor does it help with NMIs that aren't perf related, i.e. didn't come
-> from the LVTPC> 
-> Is a naive implementation simpler?  Maybe.  But IMO, multiplexing NMI and getting
-> all the edge cases right is more complex than using a dedicated vector for guest
-> PMIs, as the latter provides a "hard" boundary and allows the kernel to _know_ that
-> an interrupt is for a guest PMI.
->Totally agree the complex to fix multiplexing NMI corner case. Thanks for explanation.
+> I plan to do something as below (not test yet).
+> 
+> +/*
+> + * Currently invoked at VM creation to
+> + * - Check whether there are existing !exclude_guest system wide events
+> + *   of PMU with PERF_PMU_CAP_MEDIATED_VPMU
+> + * - Set nr_mediated_pmu to prevent !exclude_guest event creation on
+> + *   PMUs with PERF_PMU_CAP_MEDIATED_VPMU
+> + *
+> + * No impact for the PMU without PERF_PMU_CAP_MEDIATED_VPMU. The perf
+> + * still owns all the PMU resources.
+> + */
+> +int x86_perf_get_mediated_pmu(void)
+> +{
+> +	int ret = 0;
+> +	mutex_lock(&perf_mediated_pmu_mutex);
+> +	if (refcount_inc_not_zero(&nr_mediated_pmu_vms))
+> +		goto end;
+> +
+> +	if (atomic_read(&nr_include_guest_events)) {
+> +		ret = -EBUSY;
+> +		goto end;
+> +	}
+> +	refcount_inc(&nr_mediated_pmu_vms);
+> +end:
+> +	mutex_unlock(&perf_mediated_pmu_mutex);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_GPL(x86_perf_get_mediated_pmu);
+> +
+> +void x86_perf_put_mediated_pmu(void)
+> +{
+> +	mutex_lock(&perf_mediated_pmu_mutex);
+> +	refcount_dec(&nr_mediated_pmu_vms);
+> +	mutex_unlock(&perf_mediated_pmu_mutex);
+> +}
+> +EXPORT_SYMBOL_GPL(x86_perf_put_mediated_pmu);
+> 
+> 
+> Thanks,
+> Kan
+x86_perf_get_mediated_pmu() is called at vm_create(), x86_perf_put_mediated_pmu() is called at vm_destroy(), then system wide perf events without exclude_guest=1 can not be created during the whole vm life cycle (where nr_mediated_pmu_vms > 0 always), do I understand and use the interface correctly ?
+
+thanks
 
