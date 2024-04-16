@@ -1,238 +1,263 @@
-Return-Path: <kvm+bounces-14791-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14792-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50808A6FB7
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 17:24:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3BC8A70D7
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:03:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2741FB25356
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 15:24:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8333D2814AB
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6622A12B154;
-	Tue, 16 Apr 2024 15:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B68DF130AC3;
+	Tue, 16 Apr 2024 16:03:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="RD8mcjcc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jCpExVX4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24B6913048E
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 15:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4057F130492
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 16:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713281036; cv=none; b=iFrBVcWlSBTc47vNiaX8wM7n30uPqKdj199cTncIQ+aT5XJAsWYXmMbleGMvourcE8/ZmVmDUEgtPNZggzbLhCTfCDS2uar9/dD5xNzHqFCZX4HKOlH9fjOMUcSognIefdQy3oW6VKX0mbd7NC41gTv8eJeMfuKbDaSDsK6Zjl4=
+	t=1713283424; cv=none; b=YfX3gvKvbT5CMs7nTQIW5+BZiqoMHR3M9cD+zhZs3LIwSBNqZE0rGyS2ZqrDh9HjOyvpbVq7Y6qgbTwBy6+TEeHXtpDu8/FlHEnJ5byCEhfPccywCIW2g9UVgWGpO7FS2eRBmo/DxZi1xAmfqPqJE2VPzS3BOPTw8j9LZo6i5R0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713281036; c=relaxed/simple;
-	bh=Pr5+GjYuYOFAl78wT/LGhzYKkJLFb3gm/JoyNBitLqk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BwJXO6WIa4rX7ULLCR+4mK179fA9jWENpTNB8zSmoSgOcfedLTfLtikKo10rJKiuUab9coX/tZDFjxEM8LhZvbPizP5aKY/MkuxkDQPiLfClqvrJWeOk3ic3YqYWyh/Yjic2BXn6GxwIeFi1pY7KITe2BaJfN0WBu+o5U9iFff8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=RD8mcjcc; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-346407b8c9aso1839107f8f.0
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 08:23:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1713281032; x=1713885832; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ftHdCf+Oy0iSSs5fiaJVa2OnViNL7pkEe11MNtYDb00=;
-        b=RD8mcjcckUMX5UWLrH0e/WAvJBHqELiRBzd8YzpXIOJr6mTYYv4TKU9LxBww27WaNY
-         zNqWDvNHfVZpFbuoL7W/g2GQAhXYol65uvud2TpR3+reX91ik5nCxuDWMb011DI43rGY
-         2lwO+XTc8iQrls8h8uhIl2wpswNB5MkXVciXqBTq8ccf9UeQlTkyBXdQmagssJME+cAW
-         5Kgvjav5KxevrEdSiJvTeXWfhvtGx8flMTdZY7dBni6rHRe5lu132o2oZEdr2wTqCRhX
-         woKJg/7v83DPSfEGN7ehjXsbXbh8p9YulEEsh7fHOSHZ+oHyzFiiQt3hKqj2dsUzpOq/
-         DgWA==
+	s=arc-20240116; t=1713283424; c=relaxed/simple;
+	bh=si6bSXALhcGafn0TtYNK4HLYq/pmOcGZ8JvxEosmpvw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GICfA50DpV7faY6AQZdr0iwkcH6NiryhhPa+UnL4YUpgD4UJt/nJuii3h9VfwDLv/Frs16kgwv+hTcr7dinrxxFpCGs0xh7dd/IWXzaen0dWcFHH09Ey0IhENpakL3tdIOTUEuHw0cNpd4nVVGWqBt0dgts0hVNZzGy8jXwLQwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jCpExVX4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713283419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V1uoik0NkY6s/5+CwKoUEiuhmIYFgX72G/vMa5Zu8RA=;
+	b=jCpExVX4GnzLB8WcNRpr//1tgcKbKblKaPnAwTyr35qUI6JhgGq0h5gMCNbFGwLal1RPCu
+	3/Fc28NT/UYmtmdMkGi024/2+SZLs2EqosS9BkCSMnsrWgnQnCKRzHVY2YUa/HG3AMNl2e
+	+TlLtxHuF/8vjBGvMwOCEmxkXM0/UIM=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-561-mtOqjDD7Plu4HgtMNpEwyg-1; Tue, 16 Apr 2024 12:03:33 -0400
+X-MC-Unique: mtOqjDD7Plu4HgtMNpEwyg-1
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-36afb9ef331so51455895ab.1
+        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 09:03:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713281032; x=1713885832;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ftHdCf+Oy0iSSs5fiaJVa2OnViNL7pkEe11MNtYDb00=;
-        b=w3Ws9zBTdSmLtpEmMWGsic5qhM1CB08UXwBuhpUQh779/7xUCU4Od0gQh/AjKoPv26
-         pOrD0urpID4GD+qjGDdwPNLnjoSlf0VskJL5a8WT1JCo4ftp8w8GAPMHfjFT4+sEMq+V
-         4KJjzzLysP86OkkYLphwCCXuCkAu8aAAe31r36dNbfSoBPN1hzMhJ2Gjuua0sC0z2cHb
-         PJg7Eddwd3mhv4/VLD3P8Kj3NVuVbsBwRRi6pyfJH1U7hrGXEsCAuwpmWo6X7Yr+raC9
-         vd5Z4twBHpb4msC93wGBr4vRj78u84/lT4mPe4ot5CC3VVouvKd6eORzYmytVoshC1eT
-         Ut6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXgPcqYwV+Ta/q0KEvcOHmlthI/8EV7ia0Dvpa6lXjPu37hYd20mA4jzZ91S7aIZrRc0rH8cCZhwPWH2Lm+b64FPU8z
-X-Gm-Message-State: AOJu0YxXQIDLmTiysogzvvD4zntqqVD/NZ4Jr6uyuQiIDaxn4DlEYutD
-	+QOQoLg4+FsgxJEqj9LZ/TfUSU6TmcMbMoFSocMRBBre0Na3rbRwaxfX7qINkh4=
-X-Google-Smtp-Source: AGHT+IFao7Xx/Iig7k1Su+KI3NkDAc6z/M7OBmPS/atvQDSy7dIv8/22UyweiFrQmQy3+uJBLdIOwQ==
-X-Received: by 2002:adf:f308:0:b0:346:65dd:55e6 with SMTP id i8-20020adff308000000b0034665dd55e6mr8879060wro.1.1713281032278;
-        Tue, 16 Apr 2024 08:23:52 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:999:a3a0:8df:1203:de22:f515? ([2a01:e0a:999:a3a0:8df:1203:de22:f515])
-        by smtp.gmail.com with ESMTPSA id gb32-20020a05600045a000b003462b54bc8asm15162474wrb.109.2024.04.16.08.23.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Apr 2024 08:23:51 -0700 (PDT)
-Message-ID: <1eab3b4f-0d46-4df5-b574-6a5f796d3bcf@rivosinc.com>
-Date: Tue, 16 Apr 2024 17:23:51 +0200
+        d=1e100.net; s=20230601; t=1713283412; x=1713888212;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V1uoik0NkY6s/5+CwKoUEiuhmIYFgX72G/vMa5Zu8RA=;
+        b=AIwuqYGVYNXJFKBrZfqGkV7yDK9nZgxzb2nDlQVfu9bKqmNVzmOfyr6kqmR0royyOu
+         0qI4NPT4LBdR0pe1kV3ipZjiKdaXtUrjJUCKhouKdTryDOuDXDSHhRUvdgQq6DkdiRn2
+         UafNFOE8CJ7PsXapZYaO+qhD6Hy96SLsF7+MA9J5wOfU8Sz39lfm7ykT6njbGsXrFFIv
+         uQvBL3Q645dB8NzfVhjOcq+hojBsrM3IgyKEAgEwAM1N/+HK6xK3gTFZKcvy3lDmZK+y
+         oJr8FpEcZsu3I9ZzRfXoeduew3R5ieTv2mi3kwHcSkXvpACpsN1fEVaIUEwKjRet4yzp
+         QKFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV7zVPMXYmjbS5V/PjzNqYhcey2ZzYiLBXqZ7nkltZ9eVrK4a0P0uLAhfibP6lob3rBOyxjrkyy8O2gW42ROxcvV5Ob
+X-Gm-Message-State: AOJu0Yy5mWrgaOG8Mr2fiuUTo8uNJS5UkzWlzl/OAyObMPs7Es8imiON
+	8pYh5yWccWLMgLDQrJeDy16kiIpnrP3q0c9P0jRCYy2hcoVbpr3d/OUQ5RTIxDuhgNyppLzRqb6
+	WVpO35EEiviiWmf9BVI9ppag6/7Gwxs+52T52L1Qeyb73/Fuu6A==
+X-Received: by 2002:a05:6e02:1381:b0:36a:2351:60a with SMTP id d1-20020a056e02138100b0036a2351060amr15722304ilo.25.1713283412568;
+        Tue, 16 Apr 2024 09:03:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEP6XbG7AtMfSt8tTbG0ms4D7qY6F6Q/+JOauf6Lfwl470OQ4wnMZZbLNCupK1yrrHtrfsj7Q==
+X-Received: by 2002:a05:6e02:1381:b0:36a:2351:60a with SMTP id d1-20020a056e02138100b0036a2351060amr15722277ilo.25.1713283412251;
+        Tue, 16 Apr 2024 09:03:32 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ay24-20020a056638411800b0048300215ce3sm1861970jab.155.2024.04.16.09.03.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 09:03:31 -0700 (PDT)
+Date: Tue, 16 Apr 2024 10:03:29 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: jgg@nvidia.com, kevin.tian@intel.com, joro@8bytes.org,
+ robin.murphy@arm.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+ kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
+ baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+ jacob.jun.pan@intel.com, Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH v2 1/4] ida: Add ida_get_lowest()
+Message-ID: <20240416100329.35cede17.alex.williamson@redhat.com>
+In-Reply-To: <20240412082121.33382-2-yi.l.liu@intel.com>
+References: <20240412082121.33382-1-yi.l.liu@intel.com>
+	<20240412082121.33382-2-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/10] riscv: add ISA extension parsing for Zcmop
-To: Conor Dooley <conor@kernel.org>
-Cc: Conor Dooley <conor.dooley@microchip.com>,
- Deepak Gupta <debug@rivosinc.com>, Jonathan Corbet <corbet@lwn.net>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
- Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-References: <20240410091106.749233-8-cleger@rivosinc.com>
- <ZhcFeVYUQJmBAKuv@debug.ba.rivosinc.com>
- <20240410-jawless-cavalry-a3eaf9c562a4@spud>
- <20240410-judgingly-appease-5df493852b70@spud>
- <ZhcTiakvfbjb2hon@debug.ba.rivosinc.com>
- <1287e6e9-cb8e-4a78-9195-ce29f1c4bace@rivosinc.com>
- <20240411-superglue-errant-b32e5118695f@wendy>
- <c86f9fa8-e273-4509-83fa-f21d3265d5c9@rivosinc.com>
- <20240411-backwater-opal-00c9aed2231e@wendy>
- <5eda3278-24bc-4c17-a741-523ad5ff79f7@rivosinc.com>
- <20240416-gave-apron-3234098ce416@spud>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20240416-gave-apron-3234098ce416@spud>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Fri, 12 Apr 2024 01:21:18 -0700
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-
-On 16/04/2024 16:54, Conor Dooley wrote:
-> On Mon, Apr 15, 2024 at 11:10:24AM +0200, Clément Léger wrote:
->>
->>
->> On 11/04/2024 13:53, Conor Dooley wrote:
->>> On Thu, Apr 11, 2024 at 11:08:21AM +0200, Clément Léger wrote:
->>>>>> If we consider to have potentially broken isa string (ie extensions
->>>>>> dependencies not correctly handled), then we'll need some way to
->>>>>> validate this within the kernel.
->>>>>
->>>>> No, the DT passed to the kernel should be correct and we by and large we
->>>>> should not have to do validation of it. What I meant above was writing
->>>>> the binding so that something invalid will not pass dtbs_check.
->>>>
->>>> Acked, I was mainly answering Deepak question about dependencies wrt to
->>>> using __RISCV_ISA_EXT_SUPERSET() which does not seems to be relevant
->>>> since we expect a correct isa string to be passed.
->>>
->>> Ahh, okay.
->>>
->>>> But as you stated, DT
->>>> validation clearly make sense. I think a lot of extensions strings would
->>>> benefit such support (All the Zv* depends on V, etc).
->>>
->>> I think it is actually as simple something like this, which makes it
->>> invalid to have "d" without "f":
->>>
->>> | diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
->>> | index 468c646247aa..594828700cbe 100644
->>> | --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
->>> | +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
->>> | @@ -484,5 +484,20 @@ properties:
->>> |              Registers in the AX45MP datasheet.
->>> |              https://www.andestech.com/wp-content/uploads/AX45MP-1C-Rev.-5.0.0-Datasheet.pdf
->>> |  
->>> | +allOf:
->>> | +  - if:
->>> | +      properties:
->>> | +        riscv,isa-extensions:
->>> | +          contains:
->>> | +            const: "d"
->>> | +          not:
->>> | +            contains:
->>> | +              const: "f"
->>> | +    then:
->>> | +      properties:
->>> | +        riscv,isa-extensions:
->>> | +          false
->>> | +
->>> | +
->>> |  additionalProperties: true
->>> |  ...
->>>
->>> If you do have d without f, the checker will say:
->>> cpu@2: riscv,isa-extensions: False schema does not allow ['i', 'm', 'a', 'd', 'c']
->>>
->>> At least that's readable, even though not clear about what to do. I wish
->>
->> That looks really readable indeed but the messages that result from
->> errors are not so informative.
->>
->> It tried playing with various constructs and found this one to yield a
->> comprehensive message:
->>
->> +allOf:
->> +  - if:
->> +      properties:
->> +        riscv,isa-extensions:
->> +          contains:
->> +            const: zcf
->> +          not:
->> +            contains:
->> +              const: zca
->> +    then:
->> +      properties:
->> +        riscv,isa-extensions:
->> +          items:
->> +            anyOf:
->> +              - const: zca
->>
->> arch/riscv/boot/dts/allwinner/sun20i-d1-dongshan-nezha-stu.dtb: cpu@0:
->> riscv,isa-extensions:10: 'anyOf' conditional failed, one must be fixed:
->>         'zca' was expected
->>         from schema $id: http://devicetree.org/schemas/riscv/extensions.yaml
->>
->> Even though dt-bindings-check passed, not sure if this is totally a
->> valid construct though...
+> There is no helpers for user to check if a given ID is allocated or not,
+> neither a helper to loop all the allocated IDs in an IDA and do something
+> for cleanup. With the two needs, a helper to get the lowest allocated ID
+> of a range can help to achieve it.
 > 
-> I asked Rob about this yesterday, he suggested adding:
-> riscv,isa-extensions:
->   if:
->     contains:
->       const: zcf
->   then:
->     contains:
->       const: zca
-
-That is way more readable and concise !
-
-> to the existing property, not in an allOf. I think that is by far the
-> most readable version in terms of what goes into the binding. The output
-> would look like:
-> cpu@0: riscv,isa-extensions: ['i', 'm', 'a', 'd', 'c'] does not contain items matching the given schema
-> (for d requiring f cos I am lazy)
-
-Than fine by me. The error is at least a bit more understandable than
-the one with the false schema ;)
-
+> Caller can check if a given ID is allocated or not by:
+> 	int id = 200, rc;
 > 
-> Also, his comment about your one that gives the nice message was that it
-> would wrong as the anyOf was pointless and it says all items must be
-> "zca".
-
-That's what I understood also.
-
-> I didn't try it, but I have a feeling your nice output will be
-> rather less nice if several different deps are unmet - but hey, probably
-> will still be better than having an undocumented extension!
+> 	rc = ida_get_lowest(&ida, id, id);
+> 	if (rc == id)
+> 		//id 200 is used
+> 	else
+> 		//id 200 is not used
 > 
+> Caller can iterate all allocated IDs by:
+> 	int id = 0;
+> 
+> 	while (!ida_is_empty(&pasid_ida)) {
+> 		id = ida_get_lowest(pasid_ida, id, INT_MAX);
+> 		if (id < 0)
+> 			break;
+> 		//anything to do with the allocated ID
+> 		ida_free(pasid_ida, pasid);
+> 	}
+> 
+> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  include/linux/idr.h |  1 +
+>  lib/idr.c           | 67 +++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 68 insertions(+)
+> 
+> diff --git a/include/linux/idr.h b/include/linux/idr.h
+> index da5f5fa4a3a6..1dae71d4a75d 100644
+> --- a/include/linux/idr.h
+> +++ b/include/linux/idr.h
+> @@ -257,6 +257,7 @@ struct ida {
+>  int ida_alloc_range(struct ida *, unsigned int min, unsigned int max, gfp_t);
+>  void ida_free(struct ida *, unsigned int id);
+>  void ida_destroy(struct ida *ida);
+> +int ida_get_lowest(struct ida *ida, unsigned int min, unsigned int max);
+>  
+>  /**
+>   * ida_alloc() - Allocate an unused ID.
+> diff --git a/lib/idr.c b/lib/idr.c
+> index da36054c3ca0..03e461242fe2 100644
+> --- a/lib/idr.c
+> +++ b/lib/idr.c
+> @@ -476,6 +476,73 @@ int ida_alloc_range(struct ida *ida, unsigned int min, unsigned int max,
+>  }
+>  EXPORT_SYMBOL(ida_alloc_range);
+>  
+> +/**
+> + * ida_get_lowest - Get the lowest used ID.
+> + * @ida: IDA handle.
+> + * @min: Lowest ID to get.
+> + * @max: Highest ID to get.
+> + *
+> + * Get the lowest used ID between @min and @max, inclusive.  The returned
+> + * ID will not exceed %INT_MAX, even if @max is larger.
+> + *
+> + * Context: Any context. Takes and releases the xa_lock.
+> + * Return: The lowest used ID, or errno if no used ID is found.
+> + */
+> +int ida_get_lowest(struct ida *ida, unsigned int min, unsigned int max)
+> +{
+> +	unsigned long index = min / IDA_BITMAP_BITS;
+> +	unsigned int offset = min % IDA_BITMAP_BITS;
+> +	unsigned long *addr, size, bit;
+> +	unsigned long flags;
+> +	void *entry;
+> +	int ret;
+> +
+> +	if (min >= INT_MAX)
+> +		return -EINVAL;
+> +	if (max >= INT_MAX)
+> +		max = INT_MAX;
+> +
 
-If you are ok with that, let's go with Rob suggestion. I'll resubmit a
-V2 with validation for these extensions and probably a followup for the
-other ones lacking dependency checking.
+Could these be made consistent with the test in ida_alloc_range(), ie:
 
-Thanks,
+	if ((int)min < 0)
+		return -EINVAL;
+	if ((int)max < 0)
+		max = INT_MAX;
 
-Clément
+
+> +	xa_lock_irqsave(&ida->xa, flags);
+> +
+> +	entry = xa_find(&ida->xa, &index, max / IDA_BITMAP_BITS, XA_PRESENT);
+> +	if (!entry) {
+> +		ret = -ENOTTY;
+
+-ENOENT?  Same for all below too.
+
+> +		goto err_unlock;
+> +	}
+> +
+> +	if (index > min / IDA_BITMAP_BITS)
+> +		offset = 0;
+> +	if (index * IDA_BITMAP_BITS + offset > max) {
+> +		ret = -ENOTTY;
+> +		goto err_unlock;
+> +	}
+> +
+> +	if (xa_is_value(entry)) {
+> +		unsigned long tmp = xa_to_value(entry);
+> +
+> +		addr = &tmp;
+> +		size = BITS_PER_XA_VALUE;
+> +	} else {
+> +		addr = ((struct ida_bitmap *)entry)->bitmap;
+> +		size = IDA_BITMAP_BITS;
+> +	}
+> +
+> +	bit = find_next_bit(addr, size, offset);
+> +
+> +	xa_unlock_irqrestore(&ida->xa, flags);
+> +
+> +	if (bit == size ||
+> +	    index * IDA_BITMAP_BITS + bit > max)
+> +		return -ENOTTY;
+> +
+> +	return index * IDA_BITMAP_BITS + bit;
+> +
+> +err_unlock:
+> +	xa_unlock_irqrestore(&ida->xa, flags);
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL(ida_get_lowest);
+
+The API is a bit awkward to me, I wonder if it might be helped with
+some renaming and wrappers...
+
+int ida_find_first_range(struct ida *ida, unsigned int min, unsigned int max);
+
+bool ida_exists(struct ida *ida, unsigned int id)
+{
+	return ida_find_first_range(ida, id, id) == id;
+}
+
+int ida_find_first(struct ida *ida)
+{
+	return ida_find_first_range(ida, 0, ~0);
+}
+
+_min and _max variations of the latter would align with existing
+ida_alloc variants, but maybe no need to add them preemptively.
+
+Possibly an ida_for_each() could be useful in the use case of
+disassociating each id, but not required for the brute force iterative
+method.  Thanks,
+
+Alex
+
+> +
+>  /**
+>   * ida_free() - Release an allocated ID.
+>   * @ida: IDA handle.
+
 
