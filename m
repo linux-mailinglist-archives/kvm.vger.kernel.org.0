@@ -1,119 +1,214 @@
-Return-Path: <kvm+bounces-14784-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14785-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C4298A6EFD
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:51:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3F6B8A6F15
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBBE2280CE2
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 14:51:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 267D41F2154E
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 14:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B9A130E46;
-	Tue, 16 Apr 2024 14:49:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354C312FB3A;
+	Tue, 16 Apr 2024 14:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RrpBiHO1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pEtD5pH9"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5738512FF98
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 14:49:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D60812DD95;
+	Tue, 16 Apr 2024 14:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713278982; cv=none; b=it+RJyGMFyUNzIrX0p3/8u0lR6Mw65FZGAuQJF9IpQCd4b7XF1BocBvvg03tqA85bf/AMxQmPCVpn1eZL+I9W1fVrsybtf0alxr5JWZHrOIbkLtIyXFVnOkvNtQPy//tBTeKUye9R5VNQv715wnDmlQvTvYHGnAfSOGv6YYb43s=
+	t=1713279278; cv=none; b=cZr5f2QER4b0uU8/8C+UVRVMP+r/1VjKj0twBMLBrHw/IVTBoMMoYY6O+WUsK9I5lmRAChEwlFXKNjmMTSFAWEDk1eqsztmdNzgQckHiQhtb1H4Kw2fZVpD3GH209cKb3XBWRm4MwsWD6jyMvmXf7JTX6VY/aFe0qFy+ZyKdmgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713278982; c=relaxed/simple;
-	bh=7ARtCr6gtBIZWPixhMOKo/+c9HV56ed5oMvKe8ko6Dw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EnsH/dKHHRK0bbr8/UHwIFDqhryao9dEr7tSpLVROQF9Pi6bEUUg/Wqpq4RE8kx0vG5AvP53n822jkzJVtwir4aXGLUBoqmbI1eRu9ulLvP8gI5+unPOg3Z03n2xOZv0yFOlJWnVmMHbpU2gwo/1cIEAkw8Szud69yAFplVoxYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RrpBiHO1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713278979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Kro/6N3hNJUz0mvlhxtTHwRpm8U0aOExj9xAbQAp3R0=;
-	b=RrpBiHO1J9ueoJSFRY1JNYQkAQmKftHGnGlkKZAHe+j6pxRPKitgQhAS2ckgQA2bUd9ScV
-	1KTx/+t5g3SZlpPec3/6CRIF6SqiFhf0YoIVH9dtTb71kSc9Lor06auzZqHhwDLIYFcFze
-	lqmbnAynkzj7KgCbPm1Qfzq5Pu6xhUg=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-488-F48Bfbb7NgShjBLlx_GDCQ-1; Tue,
- 16 Apr 2024 10:49:35 -0400
-X-MC-Unique: F48Bfbb7NgShjBLlx_GDCQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 860931C4C3A0;
-	Tue, 16 Apr 2024 14:49:34 +0000 (UTC)
-Received: from t14s.redhat.com (unknown [10.39.194.131])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C9847492BD4;
-	Tue, 16 Apr 2024 14:49:31 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	llvm@lists.linux.dev,
-	David Hildenbrand <david@redhat.com>,
-	Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH v1] LoongArch/tlb: fix "error: parameter 'ptep' set but not used" due to __tlb_remove_tlb_entry()
-Date: Tue, 16 Apr 2024 16:49:26 +0200
-Message-ID: <20240416144926.599101-1-david@redhat.com>
+	s=arc-20240116; t=1713279278; c=relaxed/simple;
+	bh=Ky37z6+ib9PoHukGJLoU7Q3WV2IiY+rxAfk1Wn5VtXw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qc/Bnd05bTi+qix6TpAXfrNOqFEVqmQ0cON4HupJ/f/lFtZI7ZiaXyHZyvKwQPKffET5AHI7uxknR9AjUBqg3J1N02yVZOPyd4xDvAEtn/jxit4oZvqSZhl9JV/7gKjHmPHZ9joJRYuZUgukzfCSwIuWTfZjcC1jM8nUac4K94o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pEtD5pH9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32502C113CE;
+	Tue, 16 Apr 2024 14:54:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713279277;
+	bh=Ky37z6+ib9PoHukGJLoU7Q3WV2IiY+rxAfk1Wn5VtXw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pEtD5pH9wGVvkTiTrN/Zv2kB3piFiOp8GLYBuZ4Qvza0csKCqdYE+T3XNrOkZjcDc
+	 xLdcPJG/CY+e52NYakI14kcCBLgoFt4AC7dD13hoHCIYKPPMgiadW7sCMUb2+3f51T
+	 Uh5lw6yh263zVY9j1V2bdrYKM8Z3hsKoibYhJehcBQi5CVj2ortZ3LUbKSZyi+qPkh
+	 fWP2aQd4lM7J9clMqP5DvtTkwtiOuHZ66G937Na1DSHjmW9tjeRkAT+T2hHadeJdVQ
+	 m3vTMM9KI0jjLuhJMk74BB1SDedHpANEBwdIUJW+fw+awljjiGKv2V+RLXB1Q+23H2
+	 KyWk2I4BCHAqA==
+Date: Tue, 16 Apr 2024 15:54:32 +0100
+From: Conor Dooley <conor@kernel.org>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	Deepak Gupta <debug@rivosinc.com>, Jonathan Corbet <corbet@lwn.net>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 07/10] riscv: add ISA extension parsing for Zcmop
+Message-ID: <20240416-gave-apron-3234098ce416@spud>
+References: <20240410091106.749233-8-cleger@rivosinc.com>
+ <ZhcFeVYUQJmBAKuv@debug.ba.rivosinc.com>
+ <20240410-jawless-cavalry-a3eaf9c562a4@spud>
+ <20240410-judgingly-appease-5df493852b70@spud>
+ <ZhcTiakvfbjb2hon@debug.ba.rivosinc.com>
+ <1287e6e9-cb8e-4a78-9195-ce29f1c4bace@rivosinc.com>
+ <20240411-superglue-errant-b32e5118695f@wendy>
+ <c86f9fa8-e273-4509-83fa-f21d3265d5c9@rivosinc.com>
+ <20240411-backwater-opal-00c9aed2231e@wendy>
+ <5eda3278-24bc-4c17-a741-523ad5ff79f7@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="o4oWfyukzOIBXo40"
+Content-Disposition: inline
+In-Reply-To: <5eda3278-24bc-4c17-a741-523ad5ff79f7@rivosinc.com>
 
-With LLVM=1 and W=1 we get:
 
-  ./include/asm-generic/tlb.h:629:10: error: parameter 'ptep' set
-  but not used [-Werror,-Wunused-but-set-parameter]
+--o4oWfyukzOIBXo40
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We fixed a similar issue via Arnd in the introducing commit, missed the
-loongarch variant. Turns out, there is no need for loongarch to have a
-custom variant, so let's just drop it and rely on the asm-generic one.
+On Mon, Apr 15, 2024 at 11:10:24AM +0200, Cl=E9ment L=E9ger wrote:
+>=20
+>=20
+> On 11/04/2024 13:53, Conor Dooley wrote:
+> > On Thu, Apr 11, 2024 at 11:08:21AM +0200, Cl=E9ment L=E9ger wrote:
+> >>>> If we consider to have potentially broken isa string (ie extensions
+> >>>> dependencies not correctly handled), then we'll need some way to
+> >>>> validate this within the kernel.
+> >>>
+> >>> No, the DT passed to the kernel should be correct and we by and large=
+ we
+> >>> should not have to do validation of it. What I meant above was writing
+> >>> the binding so that something invalid will not pass dtbs_check.
+> >>
+> >> Acked, I was mainly answering Deepak question about dependencies wrt to
+> >> using __RISCV_ISA_EXT_SUPERSET() which does not seems to be relevant
+> >> since we expect a correct isa string to be passed.
+> >=20
+> > Ahh, okay.
+> >=20
+> >> But as you stated, DT
+> >> validation clearly make sense. I think a lot of extensions strings wou=
+ld
+> >> benefit such support (All the Zv* depends on V, etc).
+> >=20
+> > I think it is actually as simple something like this, which makes it
+> > invalid to have "d" without "f":
+> >=20
+> > | diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml =
+b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > | index 468c646247aa..594828700cbe 100644
+> > | --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > | +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > | @@ -484,5 +484,20 @@ properties:
+> > |              Registers in the AX45MP datasheet.
+> > |              https://www.andestech.com/wp-content/uploads/AX45MP-1C-R=
+ev.-5.0.0-Datasheet.pdf
+> > | =20
+> > | +allOf:
+> > | +  - if:
+> > | +      properties:
+> > | +        riscv,isa-extensions:
+> > | +          contains:
+> > | +            const: "d"
+> > | +          not:
+> > | +            contains:
+> > | +              const: "f"
+> > | +    then:
+> > | +      properties:
+> > | +        riscv,isa-extensions:
+> > | +          false
+> > | +
+> > | +
+> > |  additionalProperties: true
+> > |  ...
+> >=20
+> > If you do have d without f, the checker will say:
+> > cpu@2: riscv,isa-extensions: False schema does not allow ['i', 'm', 'a'=
+, 'd', 'c']
+> >=20
+> > At least that's readable, even though not clear about what to do. I wish
+>=20
+> That looks really readable indeed but the messages that result from
+> errors are not so informative.
+>=20
+> It tried playing with various constructs and found this one to yield a
+> comprehensive message:
+>=20
+> +allOf:
+> +  - if:
+> +      properties:
+> +        riscv,isa-extensions:
+> +          contains:
+> +            const: zcf
+> +          not:
+> +            contains:
+> +              const: zca
+> +    then:
+> +      properties:
+> +        riscv,isa-extensions:
+> +          items:
+> +            anyOf:
+> +              - const: zca
+>=20
+> arch/riscv/boot/dts/allwinner/sun20i-d1-dongshan-nezha-stu.dtb: cpu@0:
+> riscv,isa-extensions:10: 'anyOf' conditional failed, one must be fixed:
+>         'zca' was expected
+>         from schema $id: http://devicetree.org/schemas/riscv/extensions.y=
+aml
+>=20
+> Even though dt-bindings-check passed, not sure if this is totally a
+> valid construct though...
 
-Reported-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Closes: https://lkml.kernel.org/r/CANiq72mQh3O9S4umbvrKBgMMorty48UMwS01U22FR0mRyd3cyQ@mail.gmail.com
-Fixes: 4d5bf0b6183f ("mm/mmu_gather: add tlb_remove_tlb_entries()")
-Tested-by: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/loongarch/include/asm/tlb.h | 2 --
- 1 file changed, 2 deletions(-)
+I asked Rob about this yesterday, he suggested adding:
+riscv,isa-extensions:
+  if:
+    contains:
+      const: zcf
+  then:
+    contains:
+      const: zca
+to the existing property, not in an allOf. I think that is by far the
+most readable version in terms of what goes into the binding. The output
+would look like:
+cpu@0: riscv,isa-extensions: ['i', 'm', 'a', 'd', 'c'] does not contain ite=
+ms matching the given schema
+(for d requiring f cos I am lazy)
 
-diff --git a/arch/loongarch/include/asm/tlb.h b/arch/loongarch/include/asm/tlb.h
-index da7a3b5b9374a..e071f5e9e8580 100644
---- a/arch/loongarch/include/asm/tlb.h
-+++ b/arch/loongarch/include/asm/tlb.h
-@@ -132,8 +132,6 @@ static __always_inline void invtlb_all(u32 op, u32 info, u64 addr)
- 		);
- }
- 
--#define __tlb_remove_tlb_entry(tlb, ptep, address) do { } while (0)
--
- static void tlb_flush(struct mmu_gather *tlb);
- 
- #define tlb_flush tlb_flush
--- 
-2.44.0
+Also, his comment about your one that gives the nice message was that it
+would wrong as the anyOf was pointless and it says all items must be
+"zca". I didn't try it, but I have a feeling your nice output will be
+rather less nice if several different deps are unmet - but hey, probably
+will still be better than having an undocumented extension!
 
+
+--o4oWfyukzOIBXo40
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZh6RJwAKCRB4tDGHoIJi
+0gKiAPwO95yHRMreVZI1sGkG9R4vNU1EfJdXv3oNOqMEeB8Z7wEA/fI5rZ01fYH6
+ZiMSKf0BThc7H4AEo7Lo2lqLwVoBngw=
+=iSce
+-----END PGP SIGNATURE-----
+
+--o4oWfyukzOIBXo40--
 
