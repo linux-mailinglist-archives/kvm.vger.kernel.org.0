@@ -1,42 +1,43 @@
-Return-Path: <kvm+bounces-14760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 071748A6B2B
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 14:37:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D658A6B2E
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 14:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2A802824D0
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 12:37:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C614E1F21B6B
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 12:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5A6312A166;
-	Tue, 16 Apr 2024 12:36:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF35112BF1D;
+	Tue, 16 Apr 2024 12:36:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b="H57J/a7b"
+	dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b="OVp/Yu12"
 X-Original-To: kvm@vger.kernel.org
 Received: from DEU01-BE0-obe.outbound.protection.outlook.com (mail-be0deu01on2104.outbound.protection.outlook.com [40.107.127.104])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E409B101D4;
-	Tue, 16 Apr 2024 12:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F357A42059;
+	Tue, 16 Apr 2024 12:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.127.104
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713271005; cv=fail; b=kgatMyPFPX0I1k+69jVNKp4y0BxCFlUFzJIo4sgJ0SZxT/gzKMroyygxbqkZwVOTLFiP7wKTRjuwkEuWwL/TN+IbqKty6WgkjoZ5blZJsn5YsnkxHmwQfoAX5cU9RDKvy6zHN1W3OmtbGKixykhlLsccYkco77W5mNXY9I7pheY=
+	t=1713271007; cv=fail; b=FDUcrlYWPde3qdavFJ7HU6YtKE+iF+giz4AOHCYVJZfj3MkfAMRX2aBm6uF+uBcy1u1VCabLL3O+A6ewn9TxD2/WOHNG+Z8ktJOeOB3OAaNcRaejZuT2G+mxTMN9bzxbShB0db+rFfEIicOxF5TtDmGS4kwKXpMwpTsn7NdqIa4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713271005; c=relaxed/simple;
-	bh=PaQi7Kdg+bSprtejyY3NaMGR8af5tS/cAE59T4HAdv0=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=uqkMquYot1HBWCiGD2gbhJ/NKJjiENfLhpw506Mb2oUGwzZlPahfAvj8C5LyWQNBLoi8G6PHDKRVKvaMaxceJqpKSrHMrURWKg5fDD3IKQWhACbVTz28NKv/eXogYyXWoeaG9A0e15jDltpau+xzbxIP9MRuKC7FI5wrWNWwvXk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de; spf=pass smtp.mailfrom=cyberus-technology.de; dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b=H57J/a7b; arc=fail smtp.client-ip=40.107.127.104
+	s=arc-20240116; t=1713271007; c=relaxed/simple;
+	bh=aUYVOjc6Vc5BHwVUVDe3y3bHM4F0WyVoIq8DE38Y+V8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FurCmmUluZOAWPy0Tk7PcLWOG1LEoAyi67GWQCZp76ZF3PvzgU8vDHrvs7VFNmsVEPKY1+YRyaUpY2yWHySE2jO8gLfE8IxiUQPhjPZTKMj5B5Ij3JCt4G1tkPpzu7pm0wboyGfnNMOJWH6+W6Ut18wYUOBjyzNnJTUjEMfDYf8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de; spf=pass smtp.mailfrom=cyberus-technology.de; dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b=OVp/Yu12; arc=fail smtp.client-ip=40.107.127.104
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyberus-technology.de
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M72vljV2SBTYQZs/FehW4F5hLnfLlCqc/cuHGn2aFd2YrnACDgwQWdFFTLcLBHqq3RuLWoCuYgXXoAiYJGBQ+nRSBoxXC3+El0TFLivpOLi2WO4B5CJSMhjgpGxZ75Yf0L8VhQcPLyOfbO95m7HgALJKr5jSsVta2tGrgDTroRxl8QZ1VT2l01UdP2M0IEt4ll6/HxG9WrjaiumY3rSTYMKz49dSwng4sGFU/yjfUBMsNWAPVW04mb2kp4Sn8byOxfVc4TP265F8JOGhGMybqoi4eaMCZacLP9W+T4FwJXRWqDFSnfCxau+58j6f/gKInkQ7XEeRWbJh1FroJqZQrQ==
+ b=mwfgsefvV8kD+tzgqhOOHIS3edApzmfVvgmpe49s4bSLYslRW8UX40YxsLVqVIdq2SJy3vzFavI5JYsSE85fAaPh7MyPVv0xk4IUkc74ACVHoeE6ed/6HD7h158XKZDWfTa5dVvPzJWFYCuAW0yF5/th2afPAfcxm+EoTwUI+e73RGNCxjtIsrDmUTmH37Be25xSak1WwQ3lq2t5XqpufpxGz7leEiaLRXlo5oonzzHtJfCsC9G7X60TGmbqag9TQVPrTCzvCbzYt+WzrkHaomHDtrZzoFeH+fh2BqbzZRwP/Nia0gVQULQcWLjKSFAQWSS/bxpZdMo6OvEFhfY3OQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7RaaYZ/Ezw21a6jN9N1MR606d2UFF0BBp5iTDn6vPHc=;
- b=jGTCmTy3noxTU0mtvBf6Dbv91BCvIlHf0cAGZFeSzfipizR6yeUuPhj7WFKlRhKZSQt6a1LM7H3aLEt8VTxUkERRUEwsdjChyoPPM/lxaHny6/oFLDCSRRyJIlz+74lv4vjUExMeXDY7+RkBY4lAnMi9b442k21dE+svZU9SxYIuNpHpRJ0PSnpet/dT5fUwgp29fILGfzN5NtzAJJtv+UNQIgvW+QPyOxH+k+MtzBh0CmhWVbzO5RTkwe+jqUp2KKWtGoBHnHRT6O1mrG+OYfEI3llbTehMIH++crOEYv1CCHWVWr7szWsxsxnX33P+TW3QCEFpTQtpYR9NsnPJiA==
+ bh=3KIei3UMKdcBvkO9uGMBgk4HTS/AsvarqcqWzTFqpcU=;
+ b=OUaVyB7LPEryeYPm0xPPxxNZPBszuOi+hfp4D20Kz4CVeybjH0TPZitqv1ByShJjyK8ozT5a9OnS2EsiC6pNfSZzXji4v4qDXbBjbjkmRHkTEpwBKcD3/BtTHqyk4NGqlRgIEQx7XakK6/Z/JxnUn7KMZsryVXXrHhW1lxbQyCC/CAi1+2oDFLYMflJEdu6XuRDSQqcGp/sLSGPQmrsJj6qRvAdMT+Mg0ajbxo6llADBYHabeZYxrbSeXABqAnvURPyITB/pQ9RpaZgAp3bWRorb9xRNaTt75JJEo5h05IcEqKasR7GeUxT6swpmxOe9qguSM1B7U7c+Nnwivuoy3Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=cyberus-technology.de; dmarc=pass action=none
  header.from=cyberus-technology.de; dkim=pass header.d=cyberus-technology.de;
@@ -44,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyberus-technology.de;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7RaaYZ/Ezw21a6jN9N1MR606d2UFF0BBp5iTDn6vPHc=;
- b=H57J/a7bh5xJ80fvXfIIpf426yVugwWUbDXNH48s/wIEu/FnUXfP8ZcIuFpG7CCCbDJiuEiaFVYhmlkFJrbYsS2gfKeZQvTZs086oB5m8grQbbPApTNRjqBk6Pwm+JrisY8vV9guQTpIyYDiQV2YSxJhEfoJInMC3QsrULyzBJPWOBAJTK8ilzhkSogwUcogxaW8sF/f/kUXQBPwYYYnlz7B5c7oWl12Mwl/4xKQ14dEYAsmPl8IDdveAQ+S7BQ95JiY257JWG/j2qibkD1ooWbljWAw0PwxzM45Q3RNuK0/RvXV830RsYlJSGI7ySGZ/npsKrsnrHYqa4MQq98ndw==
+ bh=3KIei3UMKdcBvkO9uGMBgk4HTS/AsvarqcqWzTFqpcU=;
+ b=OVp/Yu12BBYWjkZh9ZlDBT/3ekL7EiOI0hlV1goBrTmizpoUFpb3v468AjGk0Bn1Qk6vxnQaJWFqV9KgpstzUdkMlfvbcZSiQ2ckWICP91GmJ/HkgulN5X7kD+3rqGiC6502C5uyIXRIOKeBhnIL3NTCIt6AIuwV4O8YD0vlE9nosE/E4XGFPYRZdnPj82n5o627JnwWecNQ+a5OKuZ+raUUGmZwtJ98U3w8Oi2zdZrxdXO9d3fuAfH6yrZ/LkRpWhjLDA6NduOLLQVit7tbNM+0hzV54I8mj/JDVBuOUANmSnp7ZscHOxiZkBei0rmOCbFkKvxDTB86foL9LCyTmQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=cyberus-technology.de;
 Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:38::7) by
  FR2P281MB1543.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:90::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.50; Tue, 16 Apr 2024 12:36:38 +0000
+ 15.20.7452.50; Tue, 16 Apr 2024 12:36:39 +0000
 Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
  ([fe80::cd58:a187:5d01:55f5]) by FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
  ([fe80::cd58:a187:5d01:55f5%6]) with mapi id 15.20.7452.049; Tue, 16 Apr 2024
- 12:36:38 +0000
+ 12:36:39 +0000
 From: Julian Stecklina <julian.stecklina@cyberus-technology.de>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -69,10 +70,12 @@ Cc: Thomas Prescher <thomas.prescher@cyberus-technology.de>,
 	Julian Stecklina <julian.stecklina@cyberus-technology.de>,
 	kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] KVM: nVMX: fix CR4_READ_SHADOW when L0 updates CR4 during a signal
-Date: Tue, 16 Apr 2024 14:35:56 +0200
-Message-ID: <20240416123558.212040-1-julian.stecklina@cyberus-technology.de>
+Subject: [PATCH 2/2] KVM: nVMX: remove unnecessary CR4_READ_SHADOW write
+Date: Tue, 16 Apr 2024 14:35:57 +0200
+Message-ID: <20240416123558.212040-2-julian.stecklina@cyberus-technology.de>
 X-Mailer: git-send-email 2.43.2
+In-Reply-To: <20240416123558.212040-1-julian.stecklina@cyberus-technology.de>
+References: <20240416123558.212040-1-julian.stecklina@cyberus-technology.de>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: MA2P292CA0026.ESPP292.PROD.OUTLOOK.COM (2603:10a6:250::12)
@@ -85,135 +88,101 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: FR2P281MB2329:EE_|FR2P281MB1543:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a5f1b05-de4c-4a1e-a355-08dc5e11dc72
+X-MS-Office365-Filtering-Correlation-Id: f4dee769-aa7d-4890-8267-08dc5e11dd0f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?+vNTtfVdsVui/hQRR+5jU8gWU03ea8Z4GjDhqthOoQg/jD7QRtGbOvzVqHGc?=
- =?us-ascii?Q?H3D+EfgNBroMmZgOgJMWS7IriCmo+2kAtTjf5MhoapyYu6aV2q+79afM6cl2?=
- =?us-ascii?Q?DuB2Yfl/rc570Fm1WDFUFUeepNyPvMlWXfYZn0gCT7pry6aQI5iY9rG9y5RD?=
- =?us-ascii?Q?xdVXTOV5MB+LJmJdzTQUq5085eZ7Ksd43wQTMEUm6r6q9h0iulZhPMvm+lnm?=
- =?us-ascii?Q?r3NslvMoZWy5gouiwCkTW4lFf9VuUyktP9d2M2kwZk8v7sboh3P7oNql0/d5?=
- =?us-ascii?Q?ceWwuP2WlId7zyETlNUh9IFkKLheEJKhDW5QQzbXLCcSg8+lBdXW+94GmtRL?=
- =?us-ascii?Q?a5w+JomdCzsYjyrBc48gowmlK1sdPKSFs77mOh1RE8OMr2DfEIbSCnX2BHpk?=
- =?us-ascii?Q?rEynZZPLTIqoWksyrcF2g3J3KZwdau1zlob0PiTChCon08J3Z5OOy/3cGSJv?=
- =?us-ascii?Q?P5wA2xKB5eaGt1QiAMw/Iq4RAsocoYXyNgaYzW21RMZAIdqctAkDqNNR8wmU?=
- =?us-ascii?Q?oC9hf0dddX2Bm48Inx1nbUR2vYClYBs/R30jiocwrQbIw5sDg7uyyf8E+w6d?=
- =?us-ascii?Q?eQIEVxmE4SYa+Nqknbo9qA8XES35LmDXXT1Kpi4TP37cJ+OXUH7Ex7jNyub3?=
- =?us-ascii?Q?7+DUt8gm5JpN/IHKb50WbFMZfx7wzyZtT5EohkafaarGfHY6Ro7s2BJuZ+fV?=
- =?us-ascii?Q?Dzyo7OtT2hlKlL4vWfxW9oygOV96K/be8H1uiJweQ58uU2hCz2g77LVpzfmQ?=
- =?us-ascii?Q?OUsNYkTjZjgg6NEUYxC1VwZ5j0lfZmdXFLGL79V9Cm6ZaO1bcZkegAd2U63S?=
- =?us-ascii?Q?dOx4J6BfB39uu1GCZ7MLE5ZEgNi7r/1DnFmUkx6NOgsMx+QjKP6/KDykwIkL?=
- =?us-ascii?Q?RvXFKNcI3hAhMH46Lw0GcaTadbiAF94+W8RTuXn26rrsQ9abO1uDfstpfeF5?=
- =?us-ascii?Q?JlnhwJhZBT4MVdeWNSovsNc14QTKt5BhOCGieX8gBJKVDMoR7waLZWn1ZMVX?=
- =?us-ascii?Q?P+P2dT5MJNCZ/avLZ6DQbp9Sg4mW7O6n14nSuNMuCyiZK8YDPECcFVUiIEO4?=
- =?us-ascii?Q?uoqp3xThvj5JbafppUGeMx++OVWiHO0TcYbfkIvXGGTU/Zo68y63KQje4aBb?=
- =?us-ascii?Q?xnjwoH1dAop3NcaAa4UlYHbsf8FJkqJliDnxFsikNcnbd+i6H2cTc++KKjtK?=
- =?us-ascii?Q?VqBvMUDyJB92jncmLuAupWgvUMcKahgknElpxqM1z1vqFYhIrHNhQIVbxLyk?=
- =?us-ascii?Q?ivGhZdGLU65FxOw8DP5kTkS4AyFdlyER6ZpkuIpNSA=3D=3D?=
+	=?us-ascii?Q?1VWeVcC+YKjgl7oc98xwdalfxOseo7lIN32aet2FtEVs5eKpc1xrmw1jnn/L?=
+ =?us-ascii?Q?1OOFqhoQRXGgluGiVCH8supY5CP/aDtCLnSUeUeddlxuOtuUNypaf8ZiKVOJ?=
+ =?us-ascii?Q?dCOHHa/iS5eBz990okYidl8kMOI44x8VaQu94+RvrkpTNzrwkzennMxWJE5q?=
+ =?us-ascii?Q?0jAf//ryNKVgwCVVDT7l98Z/cZOxe0zhWdQ7IHxCm79/lbdrc1LOut+J5+Yr?=
+ =?us-ascii?Q?A51d19V2UHGvaWD1vHXwVlE7ljEeB4PMmZuj2WC84lypV0pn+JFc+gAd9bzM?=
+ =?us-ascii?Q?iErczKWEPvmvXotXJdQho6M4+/4ysjsdXcz11kH9OvGnd3aKy4ln8gaKIaqK?=
+ =?us-ascii?Q?YLkbkG6+2/DEU8+W3hCtKUDsN+7vmJPL948T9MFnkPlKmkVIrg40jqLRp1Bi?=
+ =?us-ascii?Q?PMCtLq8V4usCBIOHI75wWYSoDfb6g3RdVne+wyyFm1JTYT1e5iTk7aSTcopf?=
+ =?us-ascii?Q?pblgbsGV5y6MztMPCGgWE9F8j7L02QkCvxb6kI1wT+l2Y5St3fWzHArqyjrZ?=
+ =?us-ascii?Q?Njw43i9R1ZrlbdD0sQJJiBxAnAmgK4/EFwOyUNIobeCEGEFymwvjGqg3TTqa?=
+ =?us-ascii?Q?Gn2x2V5YpJXfwMgW9CZKVkmsJ77+jn0v/DBKcJLO5oRziK2GH0MQeLnE7TKz?=
+ =?us-ascii?Q?GdwrI+Oy1OAJlpjdZ68lmW4Q6gXzXsvuxBvBf+U86IqL4s1p9YPTSZxE9WOs?=
+ =?us-ascii?Q?cAFthmCNCaSTrsvgJkiDLFLMeBoB8hxwDcGO4mnx3R36gbePUQMe+CQKiEwR?=
+ =?us-ascii?Q?Mjjye6HhTTJFSGSNytrQ0sFbyZbEsKdgQ0IOaZ8/rEU/zoiQJdeHcS6s7C3n?=
+ =?us-ascii?Q?YuDnfRs31MO9gSxQd9BtYmdQ8MCzKABz7rYpbqDDqNUw4y0QN3VMiq+npdiB?=
+ =?us-ascii?Q?JEKNTTcKT5FgE4PlLy9Dg4gkW/WCEXgu54B1eSXyoiJ1A0DVYjix0bQ51nZm?=
+ =?us-ascii?Q?pdLAjWnJ4WrTJRgk5lQ2q4SHul11QFfyrWY7SrtaUNcFe/Ng8/fwKug9FBoL?=
+ =?us-ascii?Q?NkFKoNKdVAhYLyhSvwjTsyEBtKaU0MnsRg1PK4noJkkWKUa7UgREW7j0PpL4?=
+ =?us-ascii?Q?5xfa9ffOoU8tm9lzeWkO8DY0B/KocjdHuwnkLEw0DEjJPqN3YFbgiZQM70dk?=
+ =?us-ascii?Q?yc9vsW2uSN8x/FgyRVAjgglyYpPr9rKTK9pfnv/pMHWgEpL47VR7tU0Cnb/j?=
+ =?us-ascii?Q?e0yGId3BK30jTVPIKY7Y3Otuk81vbQJTGCYIIjpE7RtdWy+/6pmqJScfW7om?=
+ =?us-ascii?Q?FOLU4dOfcq8HznJPPFbrGIz1yi++EiQT54Oo3TL4c+rDiTm657XYcPzmeqfy?=
+ =?us-ascii?Q?EbVM0M4pbo7hF44gJLXoA4I9oOR3zCoZcfMNEzNGFcTgVA=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(7416005)(376005)(1800799015)(366007)(52116005)(38350700005);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?mUYSpRUs8SNZuhhpPdAO4waLeoDnjYiZ1xTRSDM7fGp2cbyY+akneOaGj80g?=
- =?us-ascii?Q?yqcw6837IcIlkhtwF+iGniJUTQAecVSBTKGwnUiktjH+eZimM0VwhX/FkYTP?=
- =?us-ascii?Q?NMXW2lY375+daOSmAGEISDGCjZlwz08kAYwCrVkuS/Tr7pKfcF7/8xEg/r1h?=
- =?us-ascii?Q?vd2doLzzLjcIUCCraSTGfxBsMqkkr2HRTEPa/bdMBuAQca7QOGUW4CsrY9l+?=
- =?us-ascii?Q?SWqxrIw8HW505kGru2E4N2O+GnH/2jAuLQiUzXA+ZT37HRt9JT9oneCfqpqi?=
- =?us-ascii?Q?aqEdrjVr2bINhPMEFRpxhS1TWgsb30PAlcXXTMdbGOxS+VOCeHw6jsKlXQSq?=
- =?us-ascii?Q?Cid6YlkMDXz2AfCvgvZSBZ5DI0Iz7lZrKEO9fYAGbMxYx1xchBPivfEXdHbX?=
- =?us-ascii?Q?WXspvIrivysdXHllwlKJ+luqv7wM4iPkIxaEmVpKylwlXjlUYBEuC+PmvAQw?=
- =?us-ascii?Q?ggXpma4QO58FN85paGkTOPA/DBBsWZsKww/HDFme70WmlTw2l8ThKVzDjcG8?=
- =?us-ascii?Q?jq9+pv+uK1QzYBl5K14Dop2N+ERN74FOIVm74NnnwkPJz+62X4C3ZUvxAwx1?=
- =?us-ascii?Q?u20rFogiTZiUSvCxxF9j/oxWi7sezzrYpimeJg4EzjwexjOWDAEMSWGVt+oW?=
- =?us-ascii?Q?QX9KRZhSsgItE5zJBCbFlJ7TBpme1kcKkztJmpIMckW5Yco+ZJF3ta/fvqxJ?=
- =?us-ascii?Q?tXoUdH+8LOjp1KHkEOT/wmUYi0H8kapHLHTxzirEc1VNHTvLq/OT0ZCtjaAR?=
- =?us-ascii?Q?2G0hdL4DXm6BvlS7sVZm6e6vycl+vk8YLfUQXTv/WgHm3DKRnWBhsOlPTTKB?=
- =?us-ascii?Q?dOiWDdl2ANhOyvBFN5CLw451HvRVyIJJApp4sLzpfuvnYF3UQcGqNgkPmx9N?=
- =?us-ascii?Q?FZ0F9iC53EcbVAYKMaU7Nl6VEyaLbp9UOXNU9tlupy6eP/PmSV5aEHbyQfdl?=
- =?us-ascii?Q?TBrMOfMtZMKld5fvdUrVxMOgPNHI48Bilz4dlPXRll6k//w56ttnCQ4dZmBR?=
- =?us-ascii?Q?s2VDEgyp3soBsLChLRtBsszqsCf8KFV/9J6LvRYEl/niZde3fnFzc+aIjana?=
- =?us-ascii?Q?0YjjoPT3ki2aMwaYQJFAK8mywZ5Q6/NY2dMcJCrR2/csGaUOeOzeQgcBIin5?=
- =?us-ascii?Q?wlOIH8DPq6F7U0dqaGPFaOqEH2iKGBK4Ko6QhdCxzp+4vkP+z6OrjzMlmrHX?=
- =?us-ascii?Q?qCzWIR3MRw33kbezAeFOZZU3MUF9+ZOQr2gTkiBVHSn+vcbgqF31HadycrDt?=
- =?us-ascii?Q?iS9PWLYPCK/ox5Z4stSg/eUMx3JwwXA7siYZS/3MMtv14oKX27jcHYNgsLXj?=
- =?us-ascii?Q?iiMBQuHKTu7A4SqhL8YZI1XfqmOZInJxu+Xla/WbJSZyEhEXlasS2WkJBpUM?=
- =?us-ascii?Q?ozLXgriE55tiTrLZr58zsdHiKmfXUfFcZUM96xhJKxhRUidKENWp+/UFsY5I?=
- =?us-ascii?Q?/s36TygwDTbnGBWfEWem61nhp8pWVT5EXeLJqTCZEE4N1gH6mSwvgUIVTqVk?=
- =?us-ascii?Q?Qh4ci+euVvJIdfWc83NhNqv8ZHXinHzpIOnbWjqwZpms0edB4BZzn2ZJkdBx?=
- =?us-ascii?Q?8o9eIN8pPD8M0rm+wyoZ+8xXvT7Zl1or8x8FMqXgPhgwvrcnG5Vwcsz+XLaU?=
- =?us-ascii?Q?Szilt6Th9n0CklZ+SpUxHcU=3D?=
+	=?us-ascii?Q?7qKqF0IADGO/IznKZXCMkvvC3Y4AcLA/EgfSS0DPQWnlZItl8iy7dPt4PLQZ?=
+ =?us-ascii?Q?SyMsOCiprEB1iP/AM96csJXswDYE+lDIeWUd0jSuafev8gJRbl27b4nlnvri?=
+ =?us-ascii?Q?z2p7+yO/jIXw4s9zjkOsAHIchRWw7YXQxiLfsoVxMQw+09FxZA01oC5XYIYy?=
+ =?us-ascii?Q?NLhPJMqQ4Qicv2mihIfDNWfGK8gRCQdypKq2psoORRD7ntRo3zXU9aFZ99kg?=
+ =?us-ascii?Q?Jb/KiWMDLvUjNWilUBT5rlwDVQ3q2AgpScZI2r+cX4CRoGcRuyD8QEKG/c92?=
+ =?us-ascii?Q?g/x3Rfz3i8ZIbwZBEqTN+GaSejeaOmhXfUNKrkQ8eZEG8tukMMBhgzrlX/u6?=
+ =?us-ascii?Q?O0/y+pL1J1+IOEQhJvq6c0bwRrAXq6JNr7PShXSR+0M2Sbcy1j6PKkvDzO/U?=
+ =?us-ascii?Q?s66AkfH0w5VMXcRPDgx/qR683OnQv2cGxmn2ZBBXfSaGa0BTVCPttddhHYzU?=
+ =?us-ascii?Q?hHn+lZj2b1VsAPc7IYNuuIO4ziivRy3hu04NN9In4oqZQ7cxT7aR7MM3RUD8?=
+ =?us-ascii?Q?xvvM5/A7k1wM3qkUfVdnCxwTWfcUPx9XCx5ugKSOe72bfZeLGhE08xTZkTht?=
+ =?us-ascii?Q?6T0N+7NOfGmzUpyLt36UR8ckex/JQRVlxEDUXo4N5lC3yaQkE8OEztj+Peml?=
+ =?us-ascii?Q?Wl2DvrJrDSSRkrZ8/px9RXkJtuPRi+J3gHhzQ0/KLcBoczzomx06ukxBm3S+?=
+ =?us-ascii?Q?zl8UDkw8imniDPJGR5BkZfK1u1v4DksHfS2j4ek9wocELp9XkiCX5mITysRW?=
+ =?us-ascii?Q?8CXAVA0P2PKmtMR84Dfy+XkokG5g9WsuTHHFbE5PuN39tyC2Apblg+DZ0gnE?=
+ =?us-ascii?Q?QswFsKB9x933QVdMiEGGB4iVxULbI2oq5ws3qNkJ2OydmpdQSlEQ/FZdBXQv?=
+ =?us-ascii?Q?ZCzhCQ9LNHwGLMrjjJndXjXyHAEu+Ca13Sts0Ig30SksBzrXj4xrXBwRcwZx?=
+ =?us-ascii?Q?SmXORYb25pHqPiclG4PHEaf+OXXSwqb9/6jTieDq0pPc7MADbbrSguufAYKd?=
+ =?us-ascii?Q?W5oqGiJF2mmEIDSeY0uqQnCEqNQonXKOMEj0B7ZNnhmonlgivGrjqOQNHzJi?=
+ =?us-ascii?Q?uhOtcz1ziW0wTL5UjvXSN8dIMyV2TcOTnSOVXtNgixXf91E3Q5FHX4yay9d0?=
+ =?us-ascii?Q?Mxo5r6RraEbQI62UoA86QqgCLGnQnpkvaLMndfM78TpkkGKkezLrYfGfH0AL?=
+ =?us-ascii?Q?oSi6Kiq5bgGqO1tc0stJ7/zxnEOr9MAP28+bez+PVh3enqZFcqa4guewlc75?=
+ =?us-ascii?Q?7T0YQJLdby1bDhtXlWrKsNsxTKRwqo7A9xTNK63+b9No4mk58ontYajua/hw?=
+ =?us-ascii?Q?EHGm3AOE+jOK2nGRjHBHF5PwQTUa9Ap9ICL68ZeTfmhhNWYUiqinJ/a1BlJe?=
+ =?us-ascii?Q?S6NdBFBzM4hNwYBqEzmsbvNJ5MqA7mQK/p94ydIUROEwiU+jKfcTuiGEzuHU?=
+ =?us-ascii?Q?U1ClkLLZOGfyWWtHa6fbYC/nrL7Jd568/vkpdAL9rngPZ8uRlwVmYATsGMXa?=
+ =?us-ascii?Q?hOPFQmklJjp4mo/LyOqnlYajHV4RP7IKXz3xtLDWyAyoOXx7TzZoRzgkPePS?=
+ =?us-ascii?Q?9huLDU43qUAG4G0xPTElepTZeoMwMyziYsJyu9KVc45Oge8SVX3Y6R16AHP8?=
+ =?us-ascii?Q?fvC9HTRbZtiITnt4i2H4DrU=3D?=
 X-OriginatorOrg: cyberus-technology.de
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a5f1b05-de4c-4a1e-a355-08dc5e11dc72
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4dee769-aa7d-4890-8267-08dc5e11dd0f
 X-MS-Exchange-CrossTenant-AuthSource: FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2024 12:36:38.7138
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2024 12:36:39.8804
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: f4e0f4e0-9d68-4bd6-a95b-0cba36dbac2e
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3Ve3BSVMTG8EUL5E8/sY+Agm/CBL0j4mQ8Kl+N6YSXyWuqbDaNw8t1m+xXwnKU0lN3/QlRKm0vQ0kmf5Rx0hCMYXNChJWj0xmN1CMWF47/vo3RkdvUY7Vt5kxYyk8iGU
+X-MS-Exchange-CrossTenant-UserPrincipalName: /7UhVMmMGVk53/UTLYCOyASftyk+feDu5rUB4BGJXhyvJsQlXuLNKV5g7uuUNUzgXSBWKmjnwfQeTKtm8b4ot9osGUdSxHAS0Iytc8UYy5n6piYQVjXpHp3LLfvF0Nng
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR2P281MB1543
 
 From: Thomas Prescher <thomas.prescher@cyberus-technology.de>
 
-This issue occurs when the kernel is interrupted by a signal while
-running a L2 guest. If the signal is meant to be delivered to the L0
-VMM, and L0 updates CR4 for L1, i.e. when the VMM sets
-KVM_SYNC_X86_SREGS in kvm_run->kvm_dirty_regs, the kernel programs an
-incorrect read shadow value for L2's CR4.
-
-The result is that the guest can read a value for CR4 where bits from
-L1 have leaked into L2.
-
-We found this issue by running uXen [1] as L2 in VirtualBox/KVM [2].
-The issue can also easily be reproduced in Qemu/KVM if we force a sreg
-sync on each call to KVM_RUN [3]. The issue can also be reproduced by
-running a L2 Windows 10. In the Windows case, CR4.VMXE leaks from L1
-to L2 causing the OS to blue-screen with a kernel thread exception
-during TLB invalidation where the following code sequence triggers the
-issue:
-
-mov rax, cr4 <--- L2 reads CR4 with contents from L1
-mov rcx, cr4
-btc 0x7, rax <--- L2 toggles CR4.PGE
-mov cr4, rax <--- #GP because L2 writes CR4 with reserved bits set
-mov cr4, rcx
-
-The existing code seems to fixup CR4_READ_SHADOW after calling
-vmx_set_cr4 except in __set_sregs_common. While we could fix it there
-as well, it's easier to just handle it centrally.
-
-There might be a similar issue with CR0.
-
-[1] https://github.com/OpenXT/uxen
-[2] https://github.com/cyberus-technology/virtualbox-kvm
-[3] https://github.com/tpressure/qemu/commit/d64c9d5e76f3f3b747bea7653d677bd61e13aafe
+This explicit change of CR4_READ_SHADOW is no longer necessary because
+it is now handled in vmx_set_cr4.
 
 Signed-off-by: Julian Stecklina <julian.stecklina@cyberus-technology.de>
 Signed-off-by: Thomas Prescher <thomas.prescher@cyberus-technology.de>
 ---
- arch/x86/kvm/vmx/vmx.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/nested.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6780313914f8..0d4af00245f3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3474,7 +3474,11 @@ void vmx_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
- 			hw_cr4 &= ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE);
- 	}
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index d05ddf751491..e191bf5d4831 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -2639,7 +2639,6 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 	vmcs_writel(CR0_READ_SHADOW, nested_read_cr0(vmcs12));
  
--	vmcs_writel(CR4_READ_SHADOW, cr4);
-+	if (is_guest_mode(vcpu))
-+		vmcs_writel(CR4_READ_SHADOW, nested_read_cr4(get_vmcs12(vcpu)));
-+	else
-+		vmcs_writel(CR4_READ_SHADOW, cr4);
-+
- 	vmcs_writel(GUEST_CR4, hw_cr4);
+ 	vmx_set_cr4(vcpu, vmcs12->guest_cr4);
+-	vmcs_writel(CR4_READ_SHADOW, nested_read_cr4(vmcs12));
  
- 	if ((cr4 ^ old_cr4) & (X86_CR4_OSXSAVE | X86_CR4_PKE))
+ 	vcpu->arch.efer = nested_vmx_calc_efer(vmx, vmcs12);
+ 	/* Note: may modify VM_ENTRY/EXIT_CONTROLS and GUEST/HOST_IA32_EFER */
 -- 
 2.43.2
 
