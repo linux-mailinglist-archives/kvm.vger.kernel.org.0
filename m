@@ -1,275 +1,159 @@
-Return-Path: <kvm+bounces-14794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14795-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE3798A7142
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:21:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26DBD8A7158
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 18:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11F71C22757
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:21:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57DE91C218B1
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 16:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BE9C132813;
-	Tue, 16 Apr 2024 16:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58760132493;
+	Tue, 16 Apr 2024 16:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pCxVV0w2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FH+yTqMC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FF61327E7
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 16:21:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7500F43AA5;
+	Tue, 16 Apr 2024 16:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713284495; cv=none; b=MjVHc5bsRnsjrQFkb2422toQmXQXNGgTlMsGkirgkOyNa6/gj5yuRP09wd4A+YLdhxms/nbbUztWpZA2ZD0/zYgmnvvh6FILZ1/aY5pIwIzcRl2UVXO0UEj45pvV61Vdl/HpMKXeM7GTaR1BD/cFMs87EeDeevCOEEoP+MfElrQ=
+	t=1713284913; cv=none; b=s98UsKO0O7L8fmn0P9J9bA0D7cjmNSpvJH7ksXP8ohpIxvfhoG6hSSgtpJvwEjcCPHVe5S2zo989TTySVXJ+gdBp5CAYKN7PMDffyZicTsfAjBFn9hfphZCYGQdHRcDdE0VhbnFayUXWi7x/HiHPwflJCeLe2JgwatFr0T3eQGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713284495; c=relaxed/simple;
-	bh=O5b9c5640BzzfVMVLecu7NgRW4URHOvsieLJjWOVZfY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=f8/93+QG/BXtdWGtAjc2/8BqmRGPDbrsvUpoq85OnboOogyf/IM9NdDCPN0tS19hWshfHHuJgBvcBMDn96D+xrf3yj1eyo/3Yc/Pq/PSNa4FjrrnjypHe/+FZLU8xzjVUH8jYnc7pla2fTHseiZDZPsOJLougczwiGlRqcAuH40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pCxVV0w2; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a5e1e7bab9so4682934a91.2
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 09:21:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713284493; x=1713889293; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K6HaXmqGlR6KdW24efqaI5FbhvJWf4Fq5iqQ3ifJoOs=;
-        b=pCxVV0w2flvn85NzSYG9IY/ZOkNjwmufFIfh5l4+2Bl7ZKB5FwkRuFxeYT9kHIUC1j
-         Wi/1nSZ7gR5kIGUKF0PrQLRDRe0WHHnRHIUlcJhjT4Pzy99kGD7wjnkxvxD/D0pL+diP
-         I4aONBjcPXII34lEtxyHTFA9m8m77UL81LfcIRBQUUVMrFGiKWHBnqr4yRfc1dcgpXCO
-         UGj4Cw7uNpvzkUyfsp7PtrCBqi/433FXb87zMlPbhLkaQeuU8cT/yyIKA7eB5AJ5KCwN
-         ZJpE5588kMfeU7Hniehum6SVOpswkssSRYIl9m2aUfAVzIRYSd9ig/DVFBy7ubOhr3ej
-         0LEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713284493; x=1713889293;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K6HaXmqGlR6KdW24efqaI5FbhvJWf4Fq5iqQ3ifJoOs=;
-        b=ee5YCXjlFXVj31+uXidTIIG0ghOmU2jI/4ENCpVB91dt/CGYUoAlmyIEVgPUfLbNdR
-         rn2ThjNPoYHOeB1SDdCVuzF8aObasfsP/tYCXV3f/m500wGQS3FAkrXfG+azXLQC7mzk
-         Y56O96W7VgQ8OIbZv7E3GRvXG8a8QtxhogWh2owYVD/Re+5PQ3SIjFLNnQFQXyE67mlo
-         UfTCxeABV7UCjsiT6jTRzc/y8DqAajCYCn+eMyNX+WBAXaIqoNFUNgG+4ayFb2la7/HN
-         U7hJzkX7p7PMY9Hx9uY8vNlBbbbKq49GUO7VENHXwgIw3RoeaFYSADpY+qlGzntfR5Dv
-         eEeg==
-X-Forwarded-Encrypted: i=1; AJvYcCXuacI9Dh/ATp60yYOffZckcUWly6MZY2IKEQN+17vYcUAGIKJQJEso4vek6owm2wv70SGDptgATWrNdLIC7ovSZsI9
-X-Gm-Message-State: AOJu0YxLvsbJYaZB95fC7RkEXc3wZ5r9pkUMdZDtGEKAcjrMKr19wK8O
-	npI+JqE2a0HnBRdMBquolWVh0LyZMW/Ki58JTPEv3zF7qQPJ+zuKXXYxGifziaxmD7B7k7SDZ13
-	yYQ==
-X-Google-Smtp-Source: AGHT+IESndRZxmVYR3aWQFc8J3ywMq+W9T8nbAizR36ZNBEdo81XF49H9z5CVIBA1GFiZzgDNPlxqeFfE1o=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:cf01:b0:2a2:8afc:944d with SMTP id
- h1-20020a17090acf0100b002a28afc944dmr60424pju.3.1713284492989; Tue, 16 Apr
- 2024 09:21:32 -0700 (PDT)
-Date: Tue, 16 Apr 2024 09:21:31 -0700
-In-Reply-To: <20240415172542.1830566-1-mizhang@google.com>
+	s=arc-20240116; t=1713284913; c=relaxed/simple;
+	bh=T/abZooFugAj5fz0p2vl9vQhNez0p7OvvM+rxDxJ2ac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hDqXKMIR/eiptbWtCRAxcRCkhLd0jGr8Gce2crBdsVmFhS1FRmSU+CRtU9uz1GxcS5PrnxRGeWQSGqiLI6OrLZ5Y8g8Rc3zyMwIkrBb7u0yUfetoG1nodu351LRQc0gEVaoDT1Jin4nrqNW/jep4YO7job7BP0na5sfkBndzmsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FH+yTqMC; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713284912; x=1744820912;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=T/abZooFugAj5fz0p2vl9vQhNez0p7OvvM+rxDxJ2ac=;
+  b=FH+yTqMCDvf8koO7XPBGBsxwKMrjuxaaJO/BwpmzYkQcYFYjIZWBGrQA
+   9M1Ra+YUhKT3mZuKUUjy34t61kkEX14bhSMlB8ifpFw12iTTLM3gS9+HW
+   tT9UWRL4B07dtP97NFlEVwAZoMxOPl8Dr0UP5WLHUqISUIgEMrQYLwEz7
+   ZxCEJpqTj8uZ9b6y2LcWgU5D/kQBnZ8HIaDMVIv5XmyXffOErcmHK9fLs
+   HywKaTEhFE8DM2+I2I9p4OPAavT1vvBaOyMm3w+/3VrrE0PL0ADfY5lZT
+   PCLK8OtEIoKY3ICTGG3dNME5Q9cxM6Gbles1Anfv4IIvueuH4ASqisWB5
+   g==;
+X-CSE-ConnectionGUID: nuVlL5YyTkW9qR9EFMHXRQ==
+X-CSE-MsgGUID: BPBa/PxVRauZUJnK9DCcuQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="19340694"
+X-IronPort-AV: E=Sophos;i="6.07,206,1708416000"; 
+   d="scan'208";a="19340694"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:28:30 -0700
+X-CSE-ConnectionGUID: ybFrKtxWSpC4MSyQ4EzKyQ==
+X-CSE-MsgGUID: 3nxJX9YSRPaX5zL3yFj1wQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,206,1708416000"; 
+   d="scan'208";a="22384243"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 09:28:30 -0700
+Date: Tue, 16 Apr 2024 09:28:29 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>
+Cc: Isaku Yamahata <isaku.yamahata@linux.intel.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, isaku.yamahata@intel.com,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, chen.bo@intel.com,
+	hang.yuan@intel.com, tina.zhang@intel.com,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH v19 027/130] KVM: TDX: Define TDX architectural
+ definitions
+Message-ID: <20240416162829.GX3039520@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <522cbfe6e5a351f88480790fe3c3be36c82ca4b1.1708933498.git.isaku.yamahata@intel.com>
+ <ZeGC64sAzg4EN3G5@yzhao56-desk.sh.intel.com>
+ <20240305082138.GD10568@ls.amr.corp.intel.com>
+ <34d64c12-9ed5-4c63-8465-29f7fdce20dc@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240415172542.1830566-1-mizhang@google.com>
-Message-ID: <Zh6liyoOJL9_Wifg@google.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: msr: Remove the loop for testing
- reserved bits in MSR_IA32_FLUSH_CMD
-From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <34d64c12-9ed5-4c63-8465-29f7fdce20dc@intel.com>
 
-On Mon, Apr 15, 2024, Mingwei Zhang wrote:
-> Avoid testing reserved bits in MSR_IA32_FLUSH_CMD. Since KVM passes through
-> the MSR at runtime, testing reserved bits directly touches the HW and
-> should generate #GP. However, some older CPU models like skylake with
-> certain FMS do not generate #GP.
+On Tue, Apr 16, 2024 at 12:55:33PM +1200,
+"Huang, Kai" <kai.huang@intel.com> wrote:
+
 > 
-> Ideally, it could be fixed by enumerating all such CPU models. The value
-> added is would be low. So just remove the testing loop and allow the test
-> pass.
 > 
-> Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> ---
->  x86/msr.c | 2 --
->  1 file changed, 2 deletions(-)
+> On 5/03/2024 9:21 pm, Isaku Yamahata wrote:
+> > On Fri, Mar 01, 2024 at 03:25:31PM +0800,
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> > 
+> > > > + * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
+> > > > + */
+> > > > +#define TDX_MAX_VCPUS	(~(u16)0)
+> > > This value will be treated as -1 in tdx_vm_init(),
+> > > 	"kvm->max_vcpus = min(kvm->max_vcpus, TDX_MAX_VCPUS);"
+> > > 
+> > > This will lead to kvm->max_vcpus being -1 by default.
+> > > Is this by design or just an error?
+> > > If it's by design, why not set kvm->max_vcpus = -1 in tdx_vm_init() directly.
+> > > If an unexpected error, may below is better?
+> > > 
+> > > #define TDX_MAX_VCPUS   (int)((u16)(~0UL))
+> > > or
+> > > #define TDX_MAX_VCPUS 65536
+> > 
+> > You're right. I'll use ((int)U16_MAX).
+> > As TDX 1.5 introduced metadata MAX_VCPUS_PER_TD, I'll update to get the value
+> > and trim it further. Something following.
+> > 
 > 
-> diff --git a/x86/msr.c b/x86/msr.c
-> index 3a041fab..76c80d29 100644
-> --- a/x86/msr.c
-> +++ b/x86/msr.c
-> @@ -302,8 +302,6 @@ static void test_cmd_msrs(void)
->  		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", 0);
->  		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", L1D_FLUSH);
->  	}
-> -	for (i = 1; i < 64; i++)
-> -		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", BIT_ULL(i));
+> [...]
+> 
+> > +	u16 max_vcpus_per_td;
+> > +
+> 
+> [...]
+> 
+> > -	kvm->max_vcpus = min(kvm->max_vcpus, TDX_MAX_VCPUS);
+> > +	kvm->max_vcpus = min3(kvm->max_vcpus, tdx_info->max_vcpus_per_td,
+> > +			     TDX_MAX_VCPUS);
+> 
+> [...]
+> 
+> > -#define TDX_MAX_VCPUS	(~(u16)0)
+> > +#define TDX_MAX_VCPUS	((int)U16_MAX)
+> 
+> Why do you even need TDX_MAX_VCPUS, given it cannot exceed U16_MAX and you
+> will have the 'u16 max_vcpus_per_td' anyway?
+> 
+> IIUC, in KVM_ENABLE_CAP(KVM_CAP_MAX_VCPUS), we can overwrite the
+> kvm->max_vcpus to the 'max_vcpus' provided by the userspace, and make sure
+> it doesn't exceed tdx_info->max_vcpus_per_td.
+> 
+> Anything I am missing?
 
-Rather than remove this entirely, what forcing emulation?  E.g. (compile tested
-only, and haven't verified all macros)
+With the latest TDX 1.5 module, we don't need TDX_MAX_VCPUS.
 
----
- lib/x86/desc.h      | 30 ++++++++++++++++++++++++------
- lib/x86/processor.h | 18 ++++++++++++++----
- x86/msr.c           | 16 +++++++++++++++-
- 3 files changed, 53 insertions(+), 11 deletions(-)
+The metadata MD_FIELD_ID_MAX_VCPUS_PER_TD was introduced at the middle version
+of TDX 1.5. (I don't remember the exact version.), the logic was something
+like as follows.  Now if we fail to read the metadata, disable TDX.
 
-diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index 7778a0f8..92c45a48 100644
---- a/lib/x86/desc.h
-+++ b/lib/x86/desc.h
-@@ -272,9 +272,9 @@ extern gdt_entry_t *get_tss_descr(void);
- extern unsigned long get_gdt_entry_base(gdt_entry_t *entry);
- extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
- 
--#define asm_safe(insn, inputs...)					\
-+#define __asm_safe(fep, insn, inputs...)				\
- ({									\
--	asm volatile(ASM_TRY("1f")					\
-+	asm volatile(__ASM_TRY(fep, "1f")				\
- 		     insn "\n\t"					\
- 		     "1:\n\t"						\
- 		     :							\
-@@ -283,9 +283,15 @@ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
- 	exception_vector();						\
- })
- 
--#define asm_safe_out1(insn, output, inputs...)				\
-+#define asm_safe(insn, inputs...)					\
-+	__asm_safe("", insn, inputs)
-+
-+#define asm_fep_safe(insn, output, inputs...)				\
-+	__asm_safe_out1(KVM_FEP, insn, output, inputs)
-+
-+#define __asm_safe_out1(fep, insn, output, inputs...)			\
- ({									\
--	asm volatile(ASM_TRY("1f")					\
-+	asm volatile(__ASM_TRY(fep, "1f")				\
- 		     insn "\n\t"					\
- 		     "1:\n\t"						\
- 		     : output						\
-@@ -294,9 +300,15 @@ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
- 	exception_vector();						\
- })
- 
--#define asm_safe_out2(insn, output1, output2, inputs...)		\
-+#define asm_safe_out1(insn, output, inputs...)				\
-+	__asm_safe_out1("", insn, output, inputs)
-+
-+#define asm_fep_safe_out1(insn, output, inputs...)			\
-+	__asm_safe_out1(KVM_FEP, insn, output, inputs)
-+
-+#define __asm_safe_out2(fep, insn, output1, output2, inputs...)		\
- ({									\
--	asm volatile(ASM_TRY("1f")					\
-+	asm volatile(__ASM_TRY(fep, "1f")				\
- 		     insn "\n\t"					\
- 		     "1:\n\t"						\
- 		     : output1, output2					\
-@@ -305,6 +317,12 @@ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
- 	exception_vector();						\
- })
- 
-+#define asm_safe_out2(fep, insn, output1, output2, inputs...)		\
-+	__asm_safe_out2("", insn, output1, output2, inputs)
-+
-+#define asm_fep_safe_out2(insn, output1, output2, inputs...)		\
-+	__asm_safe_out2(KVM_FEP, insn, output1, output2, inputs)
-+
- #define __asm_safe_report(want, insn, inputs...)			\
- do {									\
- 	int vector = asm_safe(insn, inputs);				\
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index 44f4fd1e..d20496c0 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -430,12 +430,12 @@ static inline void wrmsr(u32 index, u64 val)
- 	asm volatile ("wrmsr" : : "a"(a), "d"(d), "c"(index) : "memory");
- }
- 
--#define rdreg64_safe(insn, index, val)					\
-+#define __rdreg64_safe(fep, insn, index, val)				\
- ({									\
- 	uint32_t a, d;							\
- 	int vector;							\
- 									\
--	vector = asm_safe_out2(insn, "=a"(a), "=d"(d), "c"(index));	\
-+	vector = __asm_safe_out2(fep, insn, "=a"(a), "=d"(d), "c"(index));\
- 									\
- 	if (vector)							\
- 		*(val) = 0;						\
-@@ -444,13 +444,18 @@ static inline void wrmsr(u32 index, u64 val)
- 	vector;								\
- })
- 
--#define wrreg64_safe(insn, index, val)					\
-+#define rdreg64_safe(insn, index, val)					\
-+	__rdreg64_safe("", insn, index, val)
-+
-+#define __wrreg64_safe(fep, insn, index, val)				\
- ({									\
- 	uint32_t eax = (val), edx = (val) >> 32;			\
- 									\
--	asm_safe(insn, "a" (eax), "d" (edx), "c" (index));		\
-+	__asm_safe(fep, insn, "a" (eax), "d" (edx), "c" (index));	\
- })
- 
-+#define wrreg64_safe(insn, index, val)					\
-+	__wrreg64_safe("", insn, index, val)
- 
- static inline int rdmsr_safe(u32 index, uint64_t *val)
- {
-@@ -462,6 +467,11 @@ static inline int wrmsr_safe(u32 index, u64 val)
- 	return wrreg64_safe("wrmsr", index, val);
- }
- 
-+static inline int wrmsr_fep_safe(u32 index, u64 val)
-+{
-+	return __wrreg64_safe(KVM_FEP, "wrmsr", index, val);
-+}
-+
- static inline int rdpmc_safe(u32 index, uint64_t *val)
- {
- 	return rdreg64_safe("rdpmc", index, val);
-diff --git a/x86/msr.c b/x86/msr.c
-index 3a041fab..2830530b 100644
---- a/x86/msr.c
-+++ b/x86/msr.c
-@@ -112,6 +112,16 @@ static void test_rdmsr_fault(u32 msr, const char *name)
- 	       "Expected #GP on RDSMR(%s), got vector %d", name, vector);
- }
- 
-+static void test_wrmsr_fep_fault(u32 msr, const char *name,
-+				 unsigned long long val)
-+{
-+	unsigned char vector = wrmsr_fep_safe(msr, val);
-+
-+	report(vector == GP_VECTOR,
-+	       "Expected #GP on emulated WRSMR(%s, 0x%llx), got vector %d",
-+	       name, val, vector);
-+}
-+
- static void test_msr(struct msr_info *msr, bool is_64bit_host)
- {
- 	if (is_64bit_host || !msr->is_64bit_only) {
-@@ -302,8 +312,12 @@ static void test_cmd_msrs(void)
- 		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", 0);
- 		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", L1D_FLUSH);
- 	}
-+
-+	if (!is_fep_available())
-+		return;
-+
- 	for (i = 1; i < 64; i++)
--		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", BIT_ULL(i));
-+		test_wrmsr_fep_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", BIT_ULL(i));
- }
- 
- int main(int ac, char **av)
+read metadata MD_FIELD_ID_MAX_VCPUS_PER_TD;
+if success
+  tdx_info->max_vcpu_per_td = the value read metadata
+else
+  tdx_info->max_vcpu_per_td = TDX_MAX_VCPUS;
 
-base-commit: 38135e08a580b9f3696f9b4ae5ca228dc71a1a56
 -- 
-
+Isaku Yamahata <isaku.yamahata@intel.com>
 
