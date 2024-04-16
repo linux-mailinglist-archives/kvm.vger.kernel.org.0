@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-14720-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14721-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFA78A628C
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 06:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD068A629A
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 06:51:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5044B22D59
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 04:46:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2F0BB20EAB
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 04:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186602C1A0;
-	Tue, 16 Apr 2024 04:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C6F381BD;
+	Tue, 16 Apr 2024 04:50:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FA0eGcjg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BS2MaIcC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E313381A1
-	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 04:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4CE1642B
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 04:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713242784; cv=none; b=VmzLgeQRJD60PLJ5uu8aL0vU++PacCK9dkN9uM9yqCvgGoW+02mZcixksYxKGxJWNZEgLeDE8G+v3m5peatZT2IMwJihyEYJEsH36E+cnDJTDo+mWJ/ERUDL+zKjvAMvIPS7inNDZvBCHD8lNZNzRQxSGnbw6hMTD5MgJRj47fo=
+	t=1713243057; cv=none; b=Zkmi/HX8a7zAZSz3KRGxjmmbTjlE6p91TWbKMvlWlw2ckmgJR4J6QVRzULAtu91rkduDhd6Q72d0x51tgCUEiNBleSNcQ8R2CvL/Mu5ovd6CIbP9GldTClLlyve6D2YgAeCKk8zeO9pHxbBJOJissqf0UA/KhJFs18TpO9sKqzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713242784; c=relaxed/simple;
-	bh=80hUjCkjKS5u7V5gbiuzD+oIL+4s0qQV1OKu5uzzkvs=;
+	s=arc-20240116; t=1713243057; c=relaxed/simple;
+	bh=MGaBtjkC6syhJC5ja6KzKgyK6NUV8gWsHzIDwykuvOQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fb45k5eYF8alsBiM0WIRPe80HR2Ytym8LbRQukhzGnZ7izXIhTkdWRC3VkAzx6PQ1vDOvjBk5eGzkM2DkyyUdfDAJ+58e02tzNOLfHr8Rchm1CTf3BzKe/qWj3x0RDvEeuQLUJ3NrYyQ3lqUFMhwdzRIky1RpZCuwlW3ZCguLEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FA0eGcjg; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=U8noCFrTEtZAoqH8Y7r18gkHNOdCT27j1R/09C0TYcwk5iGlKxV+5EUQJfgRZGDryZR67WeyjaOKwTzte3qyg53v4tCQnOcj4dG6AMlKTRtxg/6kfdaSKAf4+2P5fFjjjCk0OmXhhIQgVUgm4oivB5OQ8wnTd+BCPd6n6cFi+Gw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BS2MaIcC; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713242781;
+	s=mimecast20190719; t=1713243054;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=rMDcgaXiXzVs8uPv0yj1Wn6dMRjFJOR9or+OJI4S4LI=;
-	b=FA0eGcjg6+Iod/uCWL1tUWiHX1zK2pisrZrqma48XAwOxbPFw0pZpuHIMmt1PLINy//iZT
-	psVYDEnvh5j0GjNQE69ibd22HSxYnz9l5F/0gql0mLTbMSyj2zCtKVRw/kLgTgNSI//S0e
-	72ysg4sWdOY44eMXHDGwQrB73YJr5Yw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hUMvOI44LQITn0QQfxWuxppp606ZUuM5f4XktOIdKpI=;
+	b=BS2MaIcC1PFp2ELskB0le82aeBDxjtFr1hSTNhU2zDSpfXPYhjcvzEw95oELn6PUYwi24M
+	rZQE51H9JtcOSlWGAyFQVyS2NosIGOWF8CC2PDSod5lEQM739CpCNGH/VNqYVkZKHTHwi8
+	Aimy9qsWaLmVI4RBhxq21oBtYjjByvI=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-443-62em1Su_Mh-X3XkYbL0nWw-1; Tue, 16 Apr 2024 00:46:19 -0400
-X-MC-Unique: 62em1Su_Mh-X3XkYbL0nWw-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-56e46bd7f6eso2160951a12.2
-        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 21:46:19 -0700 (PDT)
+ us-mta-662-MbXDLzeRMFKp-UM22iMJDw-1; Tue, 16 Apr 2024 00:50:52 -0400
+X-MC-Unique: MbXDLzeRMFKp-UM22iMJDw-1
+Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-56e7187af0fso2371126a12.0
+        for <kvm@vger.kernel.org>; Mon, 15 Apr 2024 21:50:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713242778; x=1713847578;
+        d=1e100.net; s=20230601; t=1713243052; x=1713847852;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rMDcgaXiXzVs8uPv0yj1Wn6dMRjFJOR9or+OJI4S4LI=;
-        b=kx8MN9BdeOdkvYZD55WMouqT4uI72iBOAVT5VRaaj/0qLVzy8Ng830+PKNgb+N3E9U
-         QptxHBQLCgWfT9jMZCfDVZf5lAcGNe4hH5o98fGSr/Oru/otifObsqcNdojP2VNh4S6R
-         cEbBo5lo5RArRvItmLvOBUFyI7nnx0xntno7FUCXcLmpsSFaZuKnA95geTmEquGo6kkt
-         UjrmoiNTyX3t0kt0yFpOtYJQZt/Ve9JFjIHL00lv2ONTHzMledzmSZH7LW6jQDO/LWKv
-         JYpe4R29Mq3X+GVN4paEYWJuCrQmpt1qD6D94VwHn2dga0n+eMmoSDCZJRrdUAILHthD
-         Q+Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCXme8NnRRfDSmb0jkDnhKT9osMwdqac1Sm4Kq7X4K8bK6iu9LC36NYGjIbuuPx8k/ZgsI9n6eOF96O6CiwAbKsO2SGD
-X-Gm-Message-State: AOJu0YyIgqXGkplz0+HuoXhpxmVYc+8qz8qlBcHPCCiisHRaectlAuHR
-	2eE4KS0JLiiwp6/DlqzGd0XpDcHDJzRKSMUH+2XKmGtkTtPkkXsCQIzWEKLQ/wwm3bzqUm2N3dM
-	HZmIGr0u0Kon8mNZO+YWxts+YjTEkpDN0hC6e6RE70ob469HCtg==
-X-Received: by 2002:a50:ab15:0:b0:56e:2493:e3c2 with SMTP id s21-20020a50ab15000000b0056e2493e3c2mr7416026edc.37.1713242778416;
-        Mon, 15 Apr 2024 21:46:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHjJiN4sk7slyW1gbhfGoFcXXDmV9FAeRULRLojKqmJEU/91CsGyWgRN1k0slv+TC4KPAhXiw==
-X-Received: by 2002:a50:ab15:0:b0:56e:2493:e3c2 with SMTP id s21-20020a50ab15000000b0056e2493e3c2mr7415995edc.37.1713242778055;
-        Mon, 15 Apr 2024 21:46:18 -0700 (PDT)
+        bh=hUMvOI44LQITn0QQfxWuxppp606ZUuM5f4XktOIdKpI=;
+        b=b3Dnh8fjfuNtC/qbySQfOZWJImUHQ+OF4hmi0m3jDQc4ji8tch22qXypGEM+/abU3C
+         P7GpVTwPVWacp0EWzfXkt+6rIzBypZsqWtvqOruT4wlfEag6EEX0pP7Q0oFdoq5yIHuj
+         t2Kx5MxJFsNsyWUmyHGtVpqNNSZGX2+D1I2UOkKwNZYRbKAUSdKbWrgGOrGbsOUS58ee
+         Kqavm1p6Xj7Fkqs8jW51/4kLxSlNR39J1DXDBgCTMUI301YjTqp2zXPxwngsXf9u0hA6
+         LtFA0AASsbC39LmMPW+FSbTRlV9E+eh0Oqjv1ehbD3BiEJaarY0It1K4lql7z+N9vnXV
+         8iSg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYlf0OmLb6fUOqtsfZIFuPDoX670Oqz9T08sRIm/3E0hfSVtewITEUt08XnY4jFLbN01tst5s2W/CHrgULbCNaqqaa
+X-Gm-Message-State: AOJu0Yx6Z4D969i5EEBedLJYTsvlrqsY0XbK2ouLc6W5Jnb/8MsNvSVL
+	SSDjZ7NlXiybtWoCJTD6jIszP3Qi14wDMkZwbzzfWU9EDlxe+xssPQQrQUMg/MZCIrmIbsWseGZ
+	K+uudPD3H4LMocwweIvlnOcYezuvcgQJH64Ufn8RNHZYSpqk4s0htDOR8Jw==
+X-Received: by 2002:a50:9b53:0:b0:56d:f637:4515 with SMTP id a19-20020a509b53000000b0056df6374515mr7177621edj.42.1713243051869;
+        Mon, 15 Apr 2024 21:50:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH7YK9mWnBYKfr61YvddWRbU4muyppecHDHP8vmEPrtiwDcag/GTEQQUt6A2tVbOEJ+/qlDtg==
+X-Received: by 2002:a50:9b53:0:b0:56d:f637:4515 with SMTP id a19-20020a509b53000000b0056df6374515mr7177612edj.42.1713243051583;
+        Mon, 15 Apr 2024 21:50:51 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-43-179-50.web.vodafone.de. [109.43.179.50])
-        by smtp.gmail.com with ESMTPSA id i8-20020a05640200c800b00562d908daf4sm5602008edu.84.2024.04.15.21.46.16
+        by smtp.gmail.com with ESMTPSA id e21-20020a056402105500b0056e685b1d45sm5638987edu.87.2024.04.15.21.50.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 21:46:17 -0700 (PDT)
-Message-ID: <3ed01604-3b9e-4131-9ec0-c354c6d65cc8@redhat.com>
-Date: Tue, 16 Apr 2024 06:46:15 +0200
+        Mon, 15 Apr 2024 21:50:51 -0700 (PDT)
+Message-ID: <75b85c85-1c82-487b-91dd-024c2e7163e1@redhat.com>
+Date: Tue, 16 Apr 2024 06:50:50 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,24 +83,16 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC kvm-unit-tests PATCH v2 00/14] add shellcheck support
-To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Eric Auger <eric.auger@redhat.com>, Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, =?UTF-8?Q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- Shaoqin Huang <shahuang@redhat.com>,
- Nikos Nikoleris <nikos.nikoleris@arm.com>,
- David Woodhouse <dwmw@amazon.co.uk>, Ricardo Koller <ricarkol@google.com>,
- rminmin <renmm6@chinaunicom.cn>, Gavin Shan <gshan@redhat.com>,
- Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
- Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev, kvm-riscv@lists.infradead.org,
- linux-s390@vger.kernel.org
-References: <20240406123833.406488-1-npiggin@gmail.com>
- <a7cdd98e-93c1-4546-bba4-ac3a465f01f5@redhat.com>
- <D0L86IDPMTI3.2XFZ8C6UCVD1B@gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v8 03/35] migration: Add a migrate_skip
+ command
+To: Nicholas Piggin <npiggin@gmail.com>, Nico Boehr <nrb@linux.ibm.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
+ <andrew.jones@linux.dev>, Paolo Bonzini <pbonzini@redhat.com>,
+ linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
+References: <20240405083539.374995-1-npiggin@gmail.com>
+ <20240405083539.374995-4-npiggin@gmail.com>
+ <171259197029.48513.5232971921641010684@t14-nrb>
+ <D0L83A745KF8.1KXG6GEDFXSZD@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -145,65 +137,45 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <D0L86IDPMTI3.2XFZ8C6UCVD1B@gmail.com>
+In-Reply-To: <D0L83A745KF8.1KXG6GEDFXSZD@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 16/04/2024 05.26, Nicholas Piggin wrote:
-> On Mon Apr 15, 2024 at 9:59 PM AEST, Thomas Huth wrote:
->> On 06/04/2024 14.38, Nicholas Piggin wrote:
->>> Tree here
->>>
->>> https://gitlab.com/npiggin/kvm-unit-tests/-/tree/shellcheck
->>>
->>> Again on top of the "v8 migration, powerpc improvements" series. I
->>> don't plan to rebase the other way around since it's a lot of work.
->>> So this is still in RFC until the other big series gets merged.
->>>
->>> Thanks to Andrew for a lot of review. A submitted the likely s390x
->>> bugs separately ahead of this series, and also disabled one of the
->>> tests and dropped its fix patch as-per review comments. Hence 3 fewer
->>> patches. Other than that, since last post:
->>>
->>> * Tidied commit messages and added some of Andrew's comments.
->>> * Removed the "SC2034 unused variable" blanket disable, and just
->>>     suppressed the config.mak and a couple of other warnings.
->>> * Blanket disabled "SC2235 Use { ..; } instead of (..)" and dropped
->>>     the fix for it.
->>> * Change warning suppression comments as per Andrew's review, also
->>>     mention in the new unittests doc about the "check =" option not
->>>     allowing whitespace etc in the name since we don't cope with that.
->>>
->>> Thanks,
->>> Nick
->>>
->>> Nicholas Piggin (14):
->>>     Add initial shellcheck checking
->>>     shellcheck: Fix SC2223
->>>     shellcheck: Fix SC2295
->>>     shellcheck: Fix SC2094
->>>     shellcheck: Fix SC2006
->>>     shellcheck: Fix SC2155
->>>     shellcheck: Fix SC2143
->>>     shellcheck: Fix SC2013
->>>     shellcheck: Fix SC2145
->>>     shellcheck: Fix SC2124
->>>     shellcheck: Fix SC2294
->>>     shellcheck: Fix SC2178
->>>     shellcheck: Fix SC2048
->>>     shellcheck: Suppress various messages
+On 16/04/2024 05.22, Nicholas Piggin wrote:
+> On Tue Apr 9, 2024 at 1:59 AM AEST, Nico Boehr wrote:
+>> Quoting Nicholas Piggin (2024-04-05 10:35:04)
+>> [...]
+>>> diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
+>>> index 39419d4e2..4a1aab48d 100644
+>>> --- a/scripts/arch-run.bash
+>>> +++ b/scripts/arch-run.bash
+>> [...]
+>>> @@ -179,8 +189,11 @@ run_migration ()
+>>>                  # Wait for test exit or further migration messages.
+>>>                  if ! seen_migrate_msg ${src_out} ;  then
+>>>                          sleep 0.1
+>>> -               else
+>>> +               elif grep -q "Now migrate the VM" < ${src_out} ; then
+>>>                          do_migration || return $?
+>>> +               elif [ $skip_migration -eq 0 ] && grep -q "Skipped VM migration" < ${src_out} ; then
+>>> +                       echo > ${src_infifo} # Resume src and carry on.
+>>> +                       break;
 >>
->> I went ahead and pushed a bunch of your patches to the k-u-t master branch
->> now. However, there were also some patches which did not apply cleanly to
->> master anymore, so please rebase the remaining patches and then send them again.
+>> If I understand the code correctly, this simply makes the test PASS when
+>> migration is skipped, am I wrong?
 > 
-> Hey Thomas,
+> This just gets the harness past the wait-for-migration phase, it
+> otherwise should not change behaviour.
 > 
-> Yeah the sc patches were based on top of the big series, so some
-> collisions expected. I'll look at rebasing.
+>> If so, can we set ret=77 here so we get a nice SKIP?
+> 
+> The harness _should_ still scan the status value printed by the
+> test case when it exits. Is it not working as expected? We
+> certainly should be able to make it SKIP.
 
-Ah, ok, we can also try to get in the big series first ... I just lack 
-enough spare time for reviewing currently, so it might take a while :-/
+I just gave it a try (by modifying the selftest-migration-skip test 
+accordingly), and it seems to work fine, so I think this patch here should 
+be ok.
 
   Thomas
 
