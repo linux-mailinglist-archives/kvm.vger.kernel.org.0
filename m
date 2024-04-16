@@ -1,360 +1,208 @@
-Return-Path: <kvm+bounces-14763-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14764-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 603498A6B43
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 14:39:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08DD38A6B5E
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 14:44:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82CE41C215AD
-	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 12:39:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63D10B22056
+	for <lists+kvm@lfdr.de>; Tue, 16 Apr 2024 12:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5784612C463;
-	Tue, 16 Apr 2024 12:39:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDFB12BF02;
+	Tue, 16 Apr 2024 12:44:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b="IycdZ+eJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5DF12A17F;
-	Tue, 16 Apr 2024 12:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713271139; cv=none; b=rMIeKux87WGUGAFobu6IuG/ACHRihIi2avbMtuecYXH+mEmEmLk/p2tq1/3cEVyevY3TbX9RBVtT+8CNhckz2yZBHFeUC0MUqGKU4BJV4JaMIyhgTQi+wPRE4WOYYQ8rL0H2dwj3EDQT69m2MKII4LGaj/5/oyDp56g7mNcjlgM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713271139; c=relaxed/simple;
-	bh=Wn1oi3HNvkWuFzc1P/9TrLuABi6hae0ecEko9TXGDdQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Iv+3SLIW0aT1q65I18KOXxDVAebjrPXlAuznH6sq2S0QLKh3hNjSNQ2jNZ6GaE/WvYoZE4peNfJRPA66WLINuXGJHPWdurwl+sNVl0VdQvrnaNPsTqBWTkwEFZs0xlpQKXujZriZcI2W2Y+B2ihTOVxeyQvmRJW2p4lrZIz5usI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B330339;
-	Tue, 16 Apr 2024 05:39:23 -0700 (PDT)
-Received: from [10.1.197.1] (ewhatever.cambridge.arm.com [10.1.197.1])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76D673F738;
-	Tue, 16 Apr 2024 05:38:52 -0700 (PDT)
-Message-ID: <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
-Date: Tue, 16 Apr 2024 13:38:51 +0100
+Received: from DEU01-BE0-obe.outbound.protection.outlook.com (mail-be0deu01on2100.outbound.protection.outlook.com [40.107.127.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837A4128398
+	for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 12:44:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.127.100
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713271458; cv=fail; b=nF+5gS02VlowvE1yEAdMInQWtaLbenT1b3B2OjvtwjLGCDN2xNA5st+K4Pz4OunjTT7HNFY42Jx8r0m0WldgZKn8ZE/+VKDZTpzEV0IQ23AWJcKTMTzznEnjpdZziRtdssSj8gMGvMl6YTHAktdDuruGiddcmBhsc7EzrnHnxuU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713271458; c=relaxed/simple;
+	bh=nFSw4EhZOPBbrESykFUSh43x4xlvvfWguGoXIrWIrO8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=d+hdlhnxZRFFOxtNf0z/QaAYxBuLsmHGWYhLBG3DGTYlHxjwuhHfM4z81Xu5rG8ZPEWlrZPgMhhExcR3nWyn3JqohInkX0XgNPO1sOlE5lsNVQyCliYzrUaqFploUG+VUoFvC3i9h0T91D61rfObr4JXIfh/c9QTwtAPWAjQ68w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de; spf=pass smtp.mailfrom=cyberus-technology.de; dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b=IycdZ+eJ; arc=fail smtp.client-ip=40.107.127.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyberus-technology.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SdDGTKKPvjCBIgbvvBXibUwhAwAEvth1cShibZx0iox+H+vxMQDFEfuEiy7CipQKxgktCMswbiMqy3Fs0Le6QXpNxISnsrXeVlzNqsgVsGriNSZlpVYJXzhM9D07ipvOwTO/eJrikSHSJpfFQb5n6rMnXD1mx5al54Po5l04H7c1BVS7/XKp68dFNSxbrwI4tSUtcXE7b4AEsYIuPrQGyoAm8tfUcBcYn3p7tg0c5Rks5gLNGtVvfbKei2/Qc/Ii+LGSZG4pXnd03M+lRSW0EV2bb2BauRs4p0TPgMcjtdwIisX79ZEAJud8QUWUVlpsFNYt8wyVVLt/I6YSQPv4Xw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nFSw4EhZOPBbrESykFUSh43x4xlvvfWguGoXIrWIrO8=;
+ b=G8ZHUxixOh/snTOP6nyEHwB1uULubtdoS6ViqWk+RgJbsS4J2FKu80y6QmO/6J+2Jh3orGSzMdD4+UKVxhA2xdFs1q9IZot4CMxBtgL7e/EzETbwqzEN68Z4z1gy/GvWPDeePb9k3zkQbqCiluWJI/fxDfLHgZzshdvPQIU0iOYSQM0pXAVV+njewo4rGVC9PF2hiLBo9y9iGOhERNy1VpMF/nGSijSRwxNeX8esak8Bjgo0mOVzNSb/GEpCVlMU3oy2UHPuxIaceM7xPdrVtFqufUqFZ9EvgCiYEUF5ZtyF3aa+NPUZyw9RhuDA/thrba24y3G7/Jlf2XQlwlqG5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=cyberus-technology.de; dmarc=pass action=none
+ header.from=cyberus-technology.de; dkim=pass header.d=cyberus-technology.de;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyberus-technology.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nFSw4EhZOPBbrESykFUSh43x4xlvvfWguGoXIrWIrO8=;
+ b=IycdZ+eJCxxejd4xNXTQYJl+oqu70cBTMJ3JTJt/FeD+AsMAFZ4wSHXSNZexuY9dryskB6fmXfGt85kaLrMKI00xNnTiubmdwbOFGMfSihvV969ZXs1HHQ0xRpSSN/4kNhpwjqMP29n9toHEu29deb8Gib8zPbnqzihRlqgezRo+KkEnZuui+gwrfjIVV3ttGJ6DwrxiVo+Vx04ZOK38NyM5+EwRpOJcEQzX40yWvgjWsd/mSAWbX/o3sYGSopqXNxHtdxcy57nnZhTpdO80so7B3P007zbhUkSWzh08aMlx1HtbQKk/OEroveY/wk3BfByMtWPjjL7NEGh7Gt+2Lg==
+Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:38::7) by
+ FR5P281MB4056.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:106::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.50; Tue, 16 Apr 2024 12:44:13 +0000
+Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::cd58:a187:5d01:55f5]) by FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::cd58:a187:5d01:55f5%6]) with mapi id 15.20.7452.049; Tue, 16 Apr 2024
+ 12:44:13 +0000
+From: Julian Stecklina <julian.stecklina@cyberus-technology.de>
+To: "seanjc@google.com" <seanjc@google.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Thomas Prescher
+	<thomas.prescher@cyberus-technology.de>
+Subject: Re: Timer Signals vs KVM
+Thread-Topic: Timer Signals vs KVM
+Thread-Index: AQHagE068r/MPqfdwUiSZ7JW+AmgHbFUBZKAgBbxZAA=
+Date: Tue, 16 Apr 2024 12:44:13 +0000
+Message-ID:
+ <af2ede328efee9dc3761333bd47648ee6f752686.camel@cyberus-technology.de>
+References:
+ <acb3fe5acbfe3e126fba5ce16b708e0ea1a9adc9.camel@cyberus-technology.de>
+	 <Zgszp5wvxGtu2YHS@google.com>
+In-Reply-To: <Zgszp5wvxGtu2YHS@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=cyberus-technology.de;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: FR2P281MB2329:EE_|FR5P281MB4056:EE_
+x-ms-office365-filtering-correlation-id: 21261803-a4da-495b-e129-08dc5e12eb70
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?eGNMcXFaVWs5akI2WmdTSG9zQy9odkl4ZXg3eXg5SVRzNmwzSlh2S3RZWXlB?=
+ =?utf-8?B?UHJVMlJUYi9MNmpIdXVQclZzb3ZDR0YxZzNNcE9paHQza2RTd2RvdHBQbyt2?=
+ =?utf-8?B?STlnQWlBQ0tRNC8wMFBLWm9kVExqSGhyZXVZeHNCWEtLUkI2QW56QlVEQ0tj?=
+ =?utf-8?B?RmNyWERjSVpWM05CZkl1UlpJS2hhV2hBUHVTTzBvdUx3SjZMcVFnWlY1S0I4?=
+ =?utf-8?B?WHBSZU9PL3IvYXRxZzNOSjB0dDMwL3RETHRvNUIzL3ZIN3liUWVtMkVrYlIx?=
+ =?utf-8?B?VmxFWDhKVVVzYTlDbG9TT2NEaUdhZUxSNWhzcVlRY0V5bUJCaTRXTUIySWxI?=
+ =?utf-8?B?eGlpdTR1ZmRpT1JyQzYzRi9TUUR1SzNmZ2lobGdXYXMzRWpxSkU0eXlYT0Mx?=
+ =?utf-8?B?NE5mVHVIN0ZuQjA5UzZUNlVYa2M2N2NrbDA4WkJQVmE5cDF4d3BvMXFPNXlx?=
+ =?utf-8?B?OW1ZMythWGdtYXF0WGdKNFZZSGxMOXlMbzZ3VTlLSEJEUmtZSGpOVWhpTEJ3?=
+ =?utf-8?B?bkNGWnRoY1V4dTFLaStKcnNyZDRCajRpQkZhOVdVeDRZMTVIWG1WbWYxc0xV?=
+ =?utf-8?B?RDB4ZGlLMFhCTWNvbzEyUlJYbXRkaVYvamY5Y01Ua0NvNFg3anhFZDdwa25m?=
+ =?utf-8?B?UWlsUXJJMGt0YkJqcCs2eDhwOWNoanYvcmNuck9DbS9qQXY2UDA0VDFETXgy?=
+ =?utf-8?B?R2pUSUFVY2FXdEsrZmQ5bWdsbWt4VEZROUhBWEFmWEN3cGduYytzZ3YydkxX?=
+ =?utf-8?B?UEljbllwYXdjMEFGa0NtWjNiQ3Brby9GL01yZlpIZUU4R1BNYVIwYm5nblpw?=
+ =?utf-8?B?QXNLR3JrQW9rclVrRWlvRzU1eEFIRXE3SmFXOFpmeGZxVVJOZm12SGdFM1l0?=
+ =?utf-8?B?dGRpTmMwZDdjLzRCZFNSalNzUGZjRFZwRERsbW9NTzJxU0FsdlJSNVV2NHlo?=
+ =?utf-8?B?R2lwL00yUGoyTUNEOCs0NnN1NDUwb3ZYSzJ6WkdaZkwvaEhXb3hnR1ZuTmd1?=
+ =?utf-8?B?RjczWHNLNW5MY3U3T3QrT0tuRjBhWDRHc1FlNVRTNEtFVDlNS2orVVNBZkFM?=
+ =?utf-8?B?eVBCWVlJdzk3TGhxcXdjVjRQZG5qMlN3RGJ2Yk1LREtUVVd1d0ZlMVRYV05K?=
+ =?utf-8?B?N2J4bDVmM28xVHFZSVlua0NEV3lSbDBPUGVEemloTjVTRGpFRXpCVkoxaEtQ?=
+ =?utf-8?B?K3I4OTd2QkEzQUlTK1FXeXFQSFpvVCt2WUJiNW52aDRVZW92UHpJekVHbCt2?=
+ =?utf-8?B?azM0eWZ1NjZJVlViYzc0L0R0cDBTdS93Y1B0WmlRbWVMcTN6dklad3VRbmhE?=
+ =?utf-8?B?YmplcXJVMk5NOGI3bUxEUk1wZG95WHdwdmVPc1JqWjRDbHRFR1ozenN6V3ZI?=
+ =?utf-8?B?b2ZhNEdFUHpjOHpha21CWWkwUGxPUEhBTmNLQ2VJTjZpMjFpMGRkcWxRZ2pq?=
+ =?utf-8?B?enhhWk1FNXFldTBxS2VTVDM2SmM1M0RVQ21EWW91eFhvUXUvVGZ6SEJMYkZF?=
+ =?utf-8?B?Yk0xWU1jdjJyb2dONzNyTW16SFNhSDFoNC8vZFg5UWJOTk1KdnppL0dPeU9E?=
+ =?utf-8?B?OEREWUtEWFJ2bU9IblJGTFZLbjZWUmJldzRXTFFRckI4eHV4WWswMHlMd04r?=
+ =?utf-8?B?TEtJcExDSTNScFhjMFF4aVZoOHJzaDM0WWUxSjAyb2s1NjdrcndIR25ZOFBB?=
+ =?utf-8?B?LzNDUmdTeDNXTVVyWXFZcVNXWVlGNHltUFVtZmRVa0pBYmNBV2VvMThRPT0=?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?QTNnSzhlc1hMZVgvbnlrc0dlMFRGMHhTUkRBdzY0eENCK09vMVpySFFyNlRM?=
+ =?utf-8?B?YTNFVEtrRnA5Z3hsQld6aDFXMmFUUldGOEVwUzlyanJEUUw1V1hFT1pOODRp?=
+ =?utf-8?B?UUFRZnZ2ZXhndzFVSHROVEsvbjh2SmMzQndKclZPbDJsTmlIdmFrOHBOMDBr?=
+ =?utf-8?B?YnRna0VMMGk3Zi83SGc1MWNIUy8rV3JKb0lpaVBPU1ErdFlUWHBWVGpxS2lW?=
+ =?utf-8?B?SVNzMkZZOEdBeXpObm9UcmtaRjZwb0pGb09OelBmdWo0WUhGb3k4K1dpUWxS?=
+ =?utf-8?B?M0prUXoxVHg1eXc3THB2UHVpZE1XaFVOMHJmWDNBV0t6RE5zMFkxK2hTc3Fs?=
+ =?utf-8?B?ZlN1REsyOUNqOW91ZVBMNVQwcHY5MTFoUGJkbnpQUWlCNXFSeVV0RmhlSkpk?=
+ =?utf-8?B?cWNRWnJvYVA4ekoyeXViejNnVEJkNmtIZG5nbGl3TFJ4RzlRdmo0MzE0dWNw?=
+ =?utf-8?B?akN3ajBaQmVQWDJrR1dzY0QwOUQ2RTBPY2d1VkF2dFZ2cUZZUElnVzVpQ0NH?=
+ =?utf-8?B?YjlyOWZ5Mlo4VEJ2Unk0eUNFckt6WGl4cXlnaHVuVW1tOHhzR1Nja0dFT1Vk?=
+ =?utf-8?B?YVZsN2U2VEVNbFJZRHhxMjFzTlhIKzI1RFZ0TWJHREtKMXR4UXJkV3V1b3Vu?=
+ =?utf-8?B?RVlTWVJaRXJVK2s4ZlE3ZWdUYmptME95TDV6RWFqMXNJckd6dXNwWEUrN3Er?=
+ =?utf-8?B?UWl1aFh5S29MbjhiUC9laVhPMUwrMFBPVWxYZkhleFBDS2RVOUx4STZRRlBG?=
+ =?utf-8?B?SElrQjVoOGpJZThnR3B5ekRkTDh0UHQ1NEtzcE1GMFRJRUdLc2tkLzJyMGht?=
+ =?utf-8?B?K3d5cFltK29wNVp4YmZPZStKeGtoaXM2cmNqRG9BQ0pLV2NNeUFsbE03Kzhz?=
+ =?utf-8?B?Q2VWRyttcU01RTdFSjhCQi9qL1RTdE42YmhBRzIzSzd3RlZrdHdMVFk0dnBh?=
+ =?utf-8?B?eDBHNFVnSWMvcDQzTTQyTlRHUkxHT2VEV3c2NTByTEVhekJrcUxjeWJ0TUJN?=
+ =?utf-8?B?Z0RzNmF3RHI5Nk1GbFNCSGtrTDBwaEdsZmJqV0t0OVJZT3hkRGRTNUNVcmlp?=
+ =?utf-8?B?TUVqRXVXdGxkaXJYNUZKMDRrM3FhNm9OVVBzWUNnYVVxY2hLKy9ER2UzelpF?=
+ =?utf-8?B?Q0drU2N3VUNIUEF2SFpMamRVMXhlT2pzbnpaTUIxejRjdmlGT0c1TEJkejBT?=
+ =?utf-8?B?bm1wWkxObW1rM0xvelhlQ2FuK205SkR4Uk9qMHU5TWV2T1ZaREE0ZnN4OG8x?=
+ =?utf-8?B?U0tIa2l5a205Um4xQ0t3VGd3VnNwV2E3ODlMSG5BamVieEg0cDhySVY3QTN4?=
+ =?utf-8?B?TFdlcGNaazBEckNheUVCMmZvNmtjeEQ2YW8zaFNCSU1ZV0RsNDZ1bDRraDRv?=
+ =?utf-8?B?azhqS1kyQm9kVEpCV0ttNDM5QnJuWCszU0gwZEhXYXpHR0liSExmY2JwRzRH?=
+ =?utf-8?B?ajZHRThjN0lTWWVyNEVFOGR4WGc2Z1BqWVVJWWVaYS93RkxnOVVmL2lpQVFy?=
+ =?utf-8?B?UjhaQ20ybndTbEJYeWhRU1dCVVcvVVdCWE1ESkl3UVk1Q2ZaMFRVSG5mcm90?=
+ =?utf-8?B?T2FObkhqa203ZmJnalRkbFZGd3BiVU5UTW1PMUFYTEJXMllxTjhObEpWdUNU?=
+ =?utf-8?B?K0Q2cUhwbWY5bnp2UGI2Y3ViUjZVTHBid1RodDJ3cmRCUjdiblNKR0wwUmNh?=
+ =?utf-8?B?OWJjSzFWa01zOWtMNForUkE0SGd2Nlh5VGxMblRIeFlHNGxLd1NSQ1FpSDlY?=
+ =?utf-8?B?bkFpM1RUSk5uSENLY0FQUDJjY2pUbVo1VTBTT2N6c3VBUmNNM3FYVmpqZlpR?=
+ =?utf-8?B?alRrWDBOVjVRUXlXWEJMNy9RS05TSkVEZnNCenlYUGNVK0lJNUhDclhzenQ4?=
+ =?utf-8?B?UnU1aFBGUnRjdWtXcHlGckJQT3M4Tzg1Nk1XeC9CVnpPUEt4NHcwcHZjQWVZ?=
+ =?utf-8?B?RVhDSmorZnlJWm9KMkR4OWx2WTlDUys4UERPbU4wY1VRYTErQ3c0aVRFZmJ2?=
+ =?utf-8?B?bTRIWUVDa3NGS2ZJTXdTMUJmY1lOanM4R05wQmQ1dFgyb0dDZjluTUJxVjRy?=
+ =?utf-8?B?eWthbW9kenREWFhxYStueVF2L3lmODJERTZDV1lsZmYyc3ptOVNDRjJLQi9l?=
+ =?utf-8?B?NXZ6VHAyL1JSVkFTOXJCcThHWVFrdkRmQnBOZmNaVExpR1h6YkNvZjY0d25X?=
+ =?utf-8?Q?sGVJ6dgn3c4mR048K3TbxccvmYqNwbLC4kKjkQwixPbd?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <88F875BF29FC8D44B78B8FBF09A6F0EF@DEUP281.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/43] arm64: RME: Add SMC definitions for calling the
- RMM
-To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-6-steven.price@arm.com>
-Content-Language: en-US
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <20240412084309.1733783-6-steven.price@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: cyberus-technology.de
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21261803-a4da-495b-e129-08dc5e12eb70
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2024 12:44:13.1853
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f4e0f4e0-9d68-4bd6-a95b-0cba36dbac2e
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cPGrkLEtqUyHD8Upp4T8pOrluOewqmgaZUfC93CU4XzzQIMkLeZ8JJwGIhfcJKDyCk+08wx8Rj9w9BSt7gPqUJpOSiLr60EyHyk5p7YIUgNxiHjlcw2/T2TrV9wGOJHl
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR5P281MB4056
 
-Hi Steven
-
-On 12/04/2024 09:42, Steven Price wrote:
-> The RMM (Realm Management Monitor) provides functionality that can be
-> accessed by SMC calls from the host.
-> 
-> The SMC definitions are based on DEN0137[1] version 1.0-eac5
-> 
-> [1] https://developer.arm.com/documentation/den0137/1-0eac5/
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->   arch/arm64/include/asm/rmi_smc.h | 250 +++++++++++++++++++++++++++++++
->   1 file changed, 250 insertions(+)
->   create mode 100644 arch/arm64/include/asm/rmi_smc.h
-> 
-> diff --git a/arch/arm64/include/asm/rmi_smc.h b/arch/arm64/include/asm/rmi_smc.h
-> new file mode 100644
-> index 000000000000..c205efdb18d8
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/rmi_smc.h
-> @@ -0,0 +1,250 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * Copyright (C) 2023 ARM Ltd.
-> + *
-> + * The values and structures in this file are from the Realm Management Monitor
-> + * specification (DEN0137) version A-bet0:
-> + * https://developer.arm.com/documentation/den0137/1-0bet0/
-
-This should now point to eac5 instead.
-
-> + */
-> +
-> +#ifndef __ASM_RME_SMC_H
-> +#define __ASM_RME_SMC_H
-> +
-> +#include <linux/arm-smccc.h>
-> +
-> +#define SMC_RxI_CALL(func)				\
-> +	ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,		\
-> +			   ARM_SMCCC_SMC_64,		\
-> +			   ARM_SMCCC_OWNER_STANDARD,	\
-> +			   (func))
-> +
-> +#define SMC_RMI_DATA_CREATE		SMC_RxI_CALL(0x0153)
-> +#define SMC_RMI_DATA_CREATE_UNKNOWN	SMC_RxI_CALL(0x0154)
-> +#define SMC_RMI_DATA_DESTROY		SMC_RxI_CALL(0x0155)
-> +#define SMC_RMI_FEATURES		SMC_RxI_CALL(0x0165)
-> +#define SMC_RMI_GRANULE_DELEGATE	SMC_RxI_CALL(0x0151)
-> +#define SMC_RMI_GRANULE_UNDELEGATE	SMC_RxI_CALL(0x0152)
-> +#define SMC_RMI_PSCI_COMPLETE		SMC_RxI_CALL(0x0164)
-> +#define SMC_RMI_REALM_ACTIVATE		SMC_RxI_CALL(0x0157)
-> +#define SMC_RMI_REALM_CREATE		SMC_RxI_CALL(0x0158)
-> +#define SMC_RMI_REALM_DESTROY		SMC_RxI_CALL(0x0159)
-> +#define SMC_RMI_REC_AUX_COUNT		SMC_RxI_CALL(0x0167)
-> +#define SMC_RMI_REC_CREATE		SMC_RxI_CALL(0x015a)
-> +#define SMC_RMI_REC_DESTROY		SMC_RxI_CALL(0x015b)
-> +#define SMC_RMI_REC_ENTER		SMC_RxI_CALL(0x015c)
-> +#define SMC_RMI_RTT_CREATE		SMC_RxI_CALL(0x015d)
-> +#define SMC_RMI_RTT_DESTROY		SMC_RxI_CALL(0x015e)
-> +#define SMC_RMI_RTT_FOLD		SMC_RxI_CALL(0x0166)
-> +#define SMC_RMI_RTT_INIT_RIPAS		SMC_RxI_CALL(0x0168)
-> +#define SMC_RMI_RTT_MAP_UNPROTECTED	SMC_RxI_CALL(0x015f)
-> +#define SMC_RMI_RTT_READ_ENTRY		SMC_RxI_CALL(0x0161)
-> +#define SMC_RMI_RTT_SET_RIPAS		SMC_RxI_CALL(0x0169)
-> +#define SMC_RMI_RTT_UNMAP_UNPROTECTED	SMC_RxI_CALL(0x0162)
-> +#define SMC_RMI_VERSION			SMC_RxI_CALL(0x0150)
-> +
-> +#define RMI_ABI_MAJOR_VERSION	1
-> +#define RMI_ABI_MINOR_VERSION	0
-> +
-> +#define RMI_UNASSIGNED			0
-> +#define RMI_ASSIGNED			1
-> +#define RMI_TABLE			2
-> +
-> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
-> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
-> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
-> +
-> +#define RMI_RETURN_STATUS(ret)		((ret) & 0xFF)
-> +#define RMI_RETURN_INDEX(ret)		(((ret) >> 8) & 0xFF)
-> +
-> +#define RMI_SUCCESS		0
-> +#define RMI_ERROR_INPUT		1
-> +#define RMI_ERROR_REALM		2
-> +#define RMI_ERROR_REC		3
-> +#define RMI_ERROR_RTT		4
-> +
-> +#define RMI_EMPTY		0
-> +#define RMI_RAM			1
-> +#define RMI_DESTROYED		2
-> +
-> +#define RMI_NO_MEASURE_CONTENT	0
-> +#define RMI_MEASURE_CONTENT	1
-> +
-> +#define RMI_FEATURE_REGISTER_0_S2SZ		GENMASK(7, 0)
-> +#define RMI_FEATURE_REGISTER_0_LPA2		BIT(8)
-> +#define RMI_FEATURE_REGISTER_0_SVE_EN		BIT(9)
-> +#define RMI_FEATURE_REGISTER_0_SVE_VL		GENMASK(13, 10)
-> +#define RMI_FEATURE_REGISTER_0_NUM_BPS		GENMASK(17, 14)
-> +#define RMI_FEATURE_REGISTER_0_NUM_WPS		GENMASK(21, 18)
-> +#define RMI_FEATURE_REGISTER_0_PMU_EN		BIT(22)
-> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS	GENMASK(27, 23)
-> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256	BIT(28)
-> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512	BIT(29)
-> +
-> +#define RMI_REALM_PARAM_FLAG_LPA2		BIT(0)
-> +#define RMI_REALM_PARAM_FLAG_SVE		BIT(1)
-> +#define RMI_REALM_PARAM_FLAG_PMU		BIT(2)
-> +
-> +/*
-> + * Note many of these fields are smaller than u64 but all fields have u64
-> + * alignment, so use u64 to ensure correct alignment.
-> + */
-> +struct realm_params {
-> +	union { /* 0x0 */
-> +		struct {
-> +			u64 flags;
-> +			u64 s2sz;
-> +			u64 sve_vl;
-> +			u64 num_bps;
-> +			u64 num_wps;
-> +			u64 pmu_num_ctrs;
-> +			u64 hash_algo;
-> +		};
-> +		u8 padding_1[0x400];
-> +	};
-> +	union { /* 0x400 */
-> +		u8 rpv[64];
-> +		u8 padding_2[0x400];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 vmid;
-> +			u64 rtt_base;
-> +			s64 rtt_level_start;
-> +			u64 rtt_num_start;
-> +		};
-> +		u8 padding_3[0x800];
-> +	};
-> +};
-> +
-> +/*
-> + * The number of GPRs (starting from X0) that are
-> + * configured by the host when a REC is created.
-> + */
-> +#define REC_CREATE_NR_GPRS		8
-> +
-> +#define REC_PARAMS_FLAG_RUNNABLE	BIT_ULL(0)
-> +
-> +#define REC_PARAMS_AUX_GRANULES		16
-> +
-> +struct rec_params {
-> +	union { /* 0x0 */
-> +		u64 flags;
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		u64 mpidr;
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 pc;
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		u64 gprs[REC_CREATE_NR_GPRS];
-> +		u8 padding4[0x500];
-> +	};
-> +	union { /* 0x800 */
-> +		struct {
-> +			u64 num_rec_aux;
-> +			u64 aux[REC_PARAMS_AUX_GRANULES];
-> +		};
-> +		u8 padding5[0x800];
-> +	};
-> +};
-> +
-> +#define RMI_EMULATED_MMIO		BIT(0)
-> +#define RMI_INJECT_SEA			BIT(1)
-> +#define RMI_TRAP_WFI			BIT(2)
-> +#define RMI_TRAP_WFE			BIT(3)
-
-For completeness, we could add :
-
-#define RMI_RIPAS_RESPONSE		BIT(4)
-
-Not sure if we use it later in the series.
-
-> +
-> +#define REC_RUN_GPRS			31
-> +#define REC_GIC_NUM_LRS			16
-> +
-> +struct rec_entry {
-> +	union { /* 0x000 */
-> +		u64 flags;
-> +		u8 padding0[0x200];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_GIC_NUM_LRS];
-> +		};
-> +		u8 padding3[0x100];
-> +	};
-> +	u8 padding4[0x400];
-> +};
-> +
-> +struct rec_exit {
-> +	union { /* 0x000 */
-> +		u8 exit_reason;
-> +		u8 padding0[0x100];
-> +	};
-> +	union { /* 0x100 */
-> +		struct {
-> +			u64 esr;
-> +			u64 far;
-> +			u64 hpfar;
-> +		};
-> +		u8 padding1[0x100];
-> +	};
-> +	union { /* 0x200 */
-> +		u64 gprs[REC_RUN_GPRS];
-> +		u8 padding2[0x100];
-> +	};
-> +	union { /* 0x300 */
-> +		struct {
-> +			u64 gicv3_hcr;
-> +			u64 gicv3_lrs[REC_GIC_NUM_LRS];
-> +			u64 gicv3_misr;
-> +			u64 gicv3_vmcr;
-> +		};
-> +		u8 padding3[0x100];
-> +	};
-> +	union { /* 0x400 */
-> +		struct {
-> +			u64 cntp_ctl;
-> +			u64 cntp_cval;
-> +			u64 cntv_ctl;
-> +			u64 cntv_cval;
-> +		};
-> +		u8 padding4[0x100];
-> +	};
-> +	union { /* 0x500 */
-> +		struct {
-> +			u64 ripas_base;
-> +			u64 ripas_top;
-> +			u64 ripas_value;
-> +		};
-> +		u8 padding5[0x100];
-> +	};
-> +	union { /* 0x600 */
-> +		u16 imm;
-> +		u8 padding6[0x100];
-> +	};
-> +	union { /* 0x700 */
-> +		struct {
-> +			u64 pmu_ovf_status;
-
-This is u8 as per section B4.4.10 RmiPmuOverflowStatus type.
-
-> +		};
-> +		u8 padding7[0x100];
-> +	};
-> +};
-> +
-> +struct rec_run {
-> +	struct rec_entry entry;
-> +	struct rec_exit exit;
-> +};
-> +
-> +#define RMI_EXIT_SYNC			0x00
-> +#define RMI_EXIT_IRQ			0x01
-> +#define RMI_EXIT_FIQ			0x02
-> +#define RMI_EXIT_PSCI			0x03
-> +#define RMI_EXIT_RIPAS_CHANGE		0x04
-> +#define RMI_EXIT_HOST_CALL		0x05
-> +#define RMI_EXIT_SERROR			0x06
-
-Minor nit: Like the other definitions, it may be good to keep the 
-defintions of the "exit_reason" above the field declaration.
-
-
-Rest looks fine to me.
-
-Suzuki
-> +
-> +#endif
-
+T24gTW9uLCAyMDI0LTA0LTAxIGF0IDE1OjIyIC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBXZWQsIE1hciAyNywgMjAyNCwgSnVsaWFuIFN0ZWNrbGluYSB3cm90ZToNCj4g
+DQo+ID4gDQo+ID4gV2hlbiB3ZSBlbmFibGUgbmVzdGVkIHZpcnR1YWxpemF0aW9uLCB3ZSBzZWUg
+d2hhdCBsb29rcyBsaWtlIGNvcnJ1cHRpb24gaW4NCj4gPiB0aGUNCj4gPiBuZXN0ZWQgZ3Vlc3Qu
+IFRoZSBndWVzdCB0cmlwcyBvdmVyIGV4Y2VwdGlvbnMgdGhhdCBzaG91bGRuJ3QgYmUgdGhlcmUu
+IFdlDQo+ID4gYXJlDQo+ID4gY3VycmVudGx5IGRlYnVnZ2luZyB0aGlzIHRvIGZpbmQgb3V0IGRl
+dGFpbHMsIGJ1dCB0aGUgc2V0dXAgaXMgcHJldHR5DQo+ID4gcGFpbmZ1bA0KPiA+IGFuZCBpdCB3
+aWxsIHRha2UgYSBiaXQuIElmIHdlIGRpc2FibGUgdGhlIHRpbWVyIHNpZ25hbHMsIHRoaXMgaXNz
+dWUgZ29lcw0KPiA+IGF3YXkNCj4gPiAoYXQgdGhlIGNvc3Qgb2YgYnJva2VuIFZCb3ggdGltZXJz
+IG9idmlvdXNseS4uLikuwqAgVGhpcyBpcyB3ZWlyZCBhbmQgaGFzDQo+ID4gbGVmdCB1cw0KPiA+
+IHdvbmRlcmluZywgd2hldGhlciB0aGVyZSBtaWdodCBiZSBzb21ldGhpbmcgYnJva2VuIHdpdGgg
+c2lnbmFscyBpbiB0aGlzDQo+ID4gc2NlbmFyaW8sIGVzcGVjaWFsbHkgc2luY2Ugbm9uZSBvZiB0
+aGUgb3RoZXIgVk1NcyB1c2VzIHRoaXMgbWV0aG9kLg0KPiANCj4gSXQncyBjZXJ0YWlubHkgcG9z
+c2libGUgdGhlcmUncyBhIGtlcm5lbCBidWcsIGJ1dCBpdCdzIHByb2JhYmx5IG1vcmUgbGlrZWx5
+IGENCj4gcHJvYmxlbSBpbiB5b3VyIHVzZXJzcGFjZS7CoCBRRU1VIChhbmQgb3RoZXJzIFZNTXMp
+IGRvIHVzZSBzaWduYWxzIHRvIGludGVycnVwdA0KPiB2Q1BVcywgZS5nLiB0byB0YWtlIGNvbnRy
+b2wgZm9yIGxpdmUgbWlncmF0aW9uLsKgIFRoYXQncyBvYnZpb3VzbHkgZGlmZmVyZW50DQo+IHRo
+YW4NCj4gd2hhdCB5b3UncmUgZG9pbmcsIGFuZCB3aWxsIGhhdmUgb3JkZXJzIG9mIG1hZ25pdHVk
+ZSBsb3dlciB2b2x1bWUgb2Ygc2lnbmFscw0KPiBpbg0KPiBuZXN0ZWQgZ3Vlc3RzLCBidXQgdGhl
+IGVmZmVjdGl2ZSBjb3ZlcmFnZSBpc24ndCAiemVybyIuDQoNCkFmdGVyIHNvbWUgd2Vla3Mgb2Yg
+YnVnIGh1bnRpbmcsIG15IGNvbGxlYWd1ZSBUaG9tYXMgaGFzIGZvdW5kIHRoZSBpc3N1ZSBhbmQg
+d2UNCnBvc3RlZCBhIHBhdGNoOg0KDQpodHRwczovL2xvcmUua2VybmVsLm9yZy9rdm0vMjAyNDA0
+MTYxMjM1NTguMjEyMDQwLTEtanVsaWFuLnN0ZWNrbGluYUBjeWJlcnVzLXRlY2hub2xvZ3kuZGUv
+VC8jdA0KDQpHaXZlbiB0aGUgY29tcGxleGl0eSBvZiB0aGUgbmVzdGluZyBjb2RlLCB3ZSdyZSBu
+b3QgZW50aXJlbHkgc3VyZSB3aGV0aGVyIHRoaXMNCmlzIHRoZSBiZXN0IHdheSBvZiBmaXhpbmcg
+dGhpcywgdGhvdWdoLg0KDQpCdXQgd2l0aCB0aGlzIHBhdGNoIHdlIGNhbiBydW4gdVhlbiAoYXMg
+dXNlZCBieSBIUCBTdXJlIENsaWNrIGFrYSBCcm9taXVtKQ0KaW5zaWRlIG9mIFZpcnR1YWxCb3gu
+IEl0IGFsc28gZml4ZXMgdGhlIG90aGVyIG5lc3RpbmcgcHJvYmxlbXMgd2Ugc2F3IHdpdGgNClZC
+b3gvS1ZNIQ0KDQpUaGUgcmVhc29uIHdoeSB0aGlzIHRyaWdnZXJzIGluIFZpcnR1YWxCb3ggYW5k
+IG5vdCBpbiBRZW11IGlzIHRoYXQgdGhlcmUgYXJlDQpjYXNlcyB3aGVyZSBWaXJ0dWFsQm94IG1h
+cmtzIENSNCBkaXJ0eSBldmVuIHRob3VnaCBpdCBoYXNuJ3QgY2hhbmdlZC4NCg0KVGhhbmtzLA0K
+DQpKdWxpYW4NCg==
 
