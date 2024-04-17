@@ -1,116 +1,200 @@
-Return-Path: <kvm+bounces-15000-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15001-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C88BF8A8BAC
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 20:54:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C4288A8C1A
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 21:28:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 671CB1F255CC
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 18:54:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E3D51C20FFC
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 19:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F79D1DA58;
-	Wed, 17 Apr 2024 18:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B2628DD5;
+	Wed, 17 Apr 2024 19:28:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IQ+lCLWe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bpyFimpT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562CA1BF53;
-	Wed, 17 Apr 2024 18:54:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13805171A1;
+	Wed, 17 Apr 2024 19:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713380075; cv=none; b=oVw+zWT8WZsGWF4D4N0WtmdrJfv9UWZgN1s6oVgEQoj0/FrTQIyfxbM7JiuaKOVKaQZ4PdGW/jMzt8MUsaeh7WR2URzrEmnp8iEV8n72FGBJI67ksM6RW0KI/ndNeb/TCIZ0vUCZp6AVWpD8knf/5+2bghhk3KMKN6PyRXivBFs=
+	t=1713382123; cv=none; b=mFXfdvzhlG+eyD3kjAVzYqcH66S5o67ZdtSSB6MzGf58XhxNMqyW/vORLlA+UzBLeCxCX5eTrISm9zRDBCDqgIOovCO2iCHiEpITA110/ifSlMBMjw0EJCPsBJ8d0ORTyUcXdLXAD2GV1V3Ok8NP82inU7e2zAxuVQc3gLoNDAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713380075; c=relaxed/simple;
-	bh=hyCQyZHf2ncj/nXm1VIUe6nfA7at8m+jSmVswf1Wnnc=;
+	s=arc-20240116; t=1713382123; c=relaxed/simple;
+	bh=EIlDoNIPXH+XILg6sUfM2OP7zrOgxF9nJjznQmRNeLE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Te3w6j4KwKSFIyQgchhhFHKi7vKVtKS0/7IAZpp0kyn9SevL+HHHFAyhXQ7N2CsS42TI/azF+f0/f7WRKqtLrIQIl6VPP3sx3fmykbHPXGZAksEIYwwoeb8g725CSTE7heQ7C9eMD3JF3qAE67FjnyHZsqOrPKFE0kpLw0mUKS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IQ+lCLWe; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=AGUfmABIZuDzqZfad8MLTnY2Dd5fWYXTDVPEL+XWhDEMUe8T408N/sVriSP9p0AOkv46zCLF69YmWSFjGX+ku4VcT/d0GmPXpVkGJkcYUNPWfc3arGxQJCB0uJICegi2drA/J2DoQZjUpNdAN5tef/OlINUB4OBIlXYXr9zM7Jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bpyFimpT; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713380074; x=1744916074;
+  t=1713382122; x=1744918122;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=hyCQyZHf2ncj/nXm1VIUe6nfA7at8m+jSmVswf1Wnnc=;
-  b=IQ+lCLWervtdqjtpe7jjl3H1R/H5KCO2y8b8UEJQGHeZxCAda5G/dSY/
-   JXG/M9GMA29CxzYYHADASFyKQFpedY1i0RM+Q6cUc1OoBIz3TvF+NW/JR
-   WW21asAuwNaRpRyPKXTPG2xLjaQ0RA8ZwLHu0Dw+Nv5ylV5I+xaOdFd/G
-   7kaJGFA9fdooh+Az9K1gmPksu157Jip8m9IN1kfYGiagI2phjVzv6UxnL
-   ILGHuecXlsX2cFlCeDfydNkghvm7Gsof8WnvsF7XS9cKCTOQ4v4VY+Y0M
-   segmovyGeSXeyYm14dkWQyw1QVsApxCuat7gPzGZWfPwr22NcAt3H4FW5
-   w==;
-X-CSE-ConnectionGUID: jiVHNqO2Q4CiwlJHlhB/Qw==
-X-CSE-MsgGUID: j5sM6DohQGCcEVvzZuqtVw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="9441220"
+  bh=EIlDoNIPXH+XILg6sUfM2OP7zrOgxF9nJjznQmRNeLE=;
+  b=bpyFimpT7EJ7fifmPbb+Z8xifEh/VKWull5RRmJN72Xa9TTSsoxE96T+
+   2PwkYpITBkyGPYLX2R0X2UhDt0FOshP4ysXL8moSidAhs9muJeBqCGMHJ
+   LKtG63gz8h2wID3wJKJp4QtNnwV8DDRW6akdUBzpQG+rK2ETLhQqwc6EM
+   S98Gq6CmHs+RIFdgs6M5smPEs4veu4fQmNkfbOrk/9J3zNSyC5PKiCPEM
+   YdcKR+MydzigMTeA5laXKyoDh5YA0P5xHyTymmvo4K68PJnuHEJfvFflg
+   IitZ18Yz0FjIP1xNNmRsOSpEB7zU5ydmiP1m9ZVSK0hDQ/IgvsSCiHNX+
+   Q==;
+X-CSE-ConnectionGUID: nf7GmXoiRRSPCfQM0ICJsA==
+X-CSE-MsgGUID: oCdNKcj9St2m+FZGshSePA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="9118392"
 X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
-   d="scan'208";a="9441220"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 11:54:34 -0700
-X-CSE-ConnectionGUID: PsnZ84biQUCxtewMM+gp4g==
-X-CSE-MsgGUID: IIUXUP1qTau8TFgvTNTJ+Q==
+   d="scan'208";a="9118392"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 12:28:38 -0700
+X-CSE-ConnectionGUID: Frk9jLpxQyubAijxw+aNbw==
+X-CSE-MsgGUID: vCczW+iySzeVk2qn/vJHGA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
-   d="scan'208";a="22729937"
-Received: from wangc3-mobl.amr.corp.intel.com (HELO desk) ([10.209.4.219])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 11:54:33 -0700
-Date: Wed, 17 Apr 2024 11:54:27 -0700
-From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-kernel@vger.kernel.org,
-	Dave Hansen <dave.hansen@linux.intel.com>, kvm@vger.kernel.org,
-	kernel test robot <oliver.sang@intel.com>
-Subject: Re: [linus:master] [x86/bugs] 6613d82e61:
- general_protection_fault:#[##]
-Message-ID: <20240417185427.4msriy5rrt5gej2x@desk>
-References: <202403281553.79f5a16f-lkp@intel.com>
- <20240328211742.bh2y3zsscranycds@desk>
- <8c77ccfd-d561-45a1-8ed5-6b75212c7a58@leemhuis.info>
+   d="scan'208";a="53932182"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 12:28:38 -0700
+Date: Wed, 17 Apr 2024 12:28:37 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	isaku.yamahata@intel.com, xiaoyao.li@intel.com,
+	binbin.wu@linux.intel.com, seanjc@google.com,
+	rick.p.edgecombe@intel.com, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH 6/7] KVM: x86: Implement kvm_arch_vcpu_map_memory()
+Message-ID: <20240417192837.GI3039520@ls.amr.corp.intel.com>
+References: <20240417153450.3608097-1-pbonzini@redhat.com>
+ <20240417153450.3608097-7-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8c77ccfd-d561-45a1-8ed5-6b75212c7a58@leemhuis.info>
+In-Reply-To: <20240417153450.3608097-7-pbonzini@redhat.com>
 
-On Sun, Apr 14, 2024 at 08:41:52AM +0200, Linux regression tracking (Thorsten Leemhuis) wrote:
-> Hi, Thorsten here, the Linux kernel's regression tracker.
-> 
-> On 28.03.24 22:17, Pawan Gupta wrote:
-> > On Thu, Mar 28, 2024 at 03:36:28PM +0800, kernel test robot wrote:
-> >> compiler: clang-17
-> >> test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
-> >>
-> >> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> >> the same patch/commit), kindly add following tags
-> >> | Reported-by: kernel test robot <oliver.sang@intel.com>
-> >> | Closes: https://lore.kernel.org/oe-lkp/202403281553.79f5a16f-lkp@intel.com
-> 
-> TWIMC, a user report general protection faults with dosemu that were
-> bisected to a 6.6.y backport of the commit that causes the problem
-> discussed in this thread (6613d82e617dd7 ("x86/bugs: Use ALTERNATIVE()
-> instead of mds_user_clear static key")).
-> 
-> User compiles using gcc, so it might be a different problem. Happens
-> with 6.8.y as well.
-> 
-> The problem occurs with x86-32 kernels, but strangely only on some of
-> the x86-32 systems the reporter has (e.g. on some everything works
-> fine). Makes me wonder if the commit exposed an older problem that only
-> happens on some machines.
-> 
-> For details see https://bugzilla.kernel.org/show_bug.cgi?id=218707
-> Could not CC the reporter here due to the bugzilla privacy policy; if
-> you want to get in contact, please use bugzilla.
+On Wed, Apr 17, 2024 at 11:34:49AM -0400,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Sorry for the late response, I was off work. I will look into this and
-get back. I might need help reproducing this issue, but let me first see
-if I can reproduce with the info in the bugzilla.
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> Wire KVM_MAP_MEMORY ioctl to kvm_mmu_map_tdp_page() to populate guest
+> memory.  When KVM_CREATE_VCPU creates vCPU, it initializes the x86
+> KVM MMU part by kvm_mmu_create() and kvm_init_mmu().  vCPU is ready to
+> invoke the KVM page fault handler.
+
+
+As a record for the past discussion and to address Rick comment at
+https://lore.kernel.org/all/75b213fd73fcb5872703f89a9c6bb67ea91e3bd7.camel@intel.com/
+
+  The current implementation supports TDP only because the population with GVA
+  is moot based on the thread [1].  If necessary, this restriction can be
+  relaxed in future.
+  
+  [1] https://lore.kernel.org/all/116179545fafbf39ed01e1f0f5ac76e0467fc09a.camel@intel.com/
+
+
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Message-ID: <7138a3bc00ea8d3cbe0e59df15f8c22027005b59.1712785629.git.isaku.yamahata@intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/Kconfig |  1 +
+>  arch/x86/kvm/x86.c   | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 44 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 7632fe6e4db9..e58360d368ec 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -44,6 +44,7 @@ config KVM
+>  	select KVM_VFIO
+>  	select HAVE_KVM_PM_NOTIFIER if PM
+>  	select KVM_GENERIC_HARDWARE_ENABLING
+> +	select KVM_GENERIC_MAP_MEMORY
+>  	help
+>  	  Support hosting fully virtualized guest machines using hardware
+>  	  virtualization extensions.  You will need a fairly recent
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 83b8260443a3..f84c75c2a47f 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4715,6 +4715,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>  	case KVM_CAP_MEMORY_FAULT_INFO:
+>  		r = 1;
+>  		break;
+> +	case KVM_CAP_MAP_MEMORY:
+> +		r = tdp_enabled;
+> +		break;
+>  	case KVM_CAP_EXIT_HYPERCALL:
+>  		r = KVM_EXIT_HYPERCALL_VALID_MASK;
+>  		break;
+> @@ -5867,6 +5870,46 @@ static int kvm_vcpu_ioctl_enable_cap(struct kvm_vcpu *vcpu,
+>  	}
+>  }
+>  
+> +int kvm_arch_vcpu_map_memory(struct kvm_vcpu *vcpu,
+> +			     struct kvm_map_memory *mapping)
+> +{
+> +	u64 mapped, end, error_code = 0;
+> +	u8 level = PG_LEVEL_4K;
+> +	int r;
+> +
+> +	/*
+> +	 * Shadow paging uses GVA for kvm page fault.  The first implementation
+> +	 * supports GPA only to avoid confusion.
+> +	 */
+> +	if (!tdp_enabled)
+> +		return -EOPNOTSUPP;
+> +
+> +	/*
+> +	 * reload is efficient when called repeatedly, so we can do it on
+> +	 * every iteration.
+> +	 */
+> +	kvm_mmu_reload(vcpu);
+> +
+> +	if (kvm_arch_has_private_mem(vcpu->kvm) &&
+> +	    kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(mapping->base_address)))
+> +		error_code |= PFERR_PRIVATE_ACCESS;
+> +
+> +	r = kvm_tdp_map_page(vcpu, mapping->base_address, error_code, &level);
+> +	if (r)
+> +		return r;
+> +
+> +	/*
+> +	 * level can be more than the alignment of mapping->base_address if
+> +	 * the mapping can use a huge page.
+> +	 */
+> +	end = (mapping->base_address & KVM_HPAGE_MASK(level)) +
+> +		KVM_HPAGE_SIZE(level);
+
+end = ALIGN(mapping->base_address, KVM_HPAGE_SIZE(level));
+
+ALIGN() simplifies this as Chao pointed out.
+https://lore.kernel.org/all/Zh94V8ochIXEkO17@chao-email/
+
+
+> +	mapped = min(mapping->size, end - mapping->base_address);
+> +	mapping->size -= mapped;
+> +	mapping->base_address += mapped;
+> +	return r;
+> +}
+> +
+>  long kvm_arch_vcpu_ioctl(struct file *filp,
+>  			 unsigned int ioctl, unsigned long arg)
+>  {
+> -- 
+> 2.43.0
+> 
+> 
+> 
+
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
