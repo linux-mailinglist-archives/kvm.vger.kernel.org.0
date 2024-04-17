@@ -1,324 +1,286 @@
-Return-Path: <kvm+bounces-15029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A3B48A8F20
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 01:10:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1728A8F23
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 01:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8871F22203
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 23:10:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A274B1F21C02
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 23:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51CE18563E;
-	Wed, 17 Apr 2024 23:10:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B703285297;
+	Wed, 17 Apr 2024 23:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ln8e7hBY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JS0fmU7U"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6C5481B5;
-	Wed, 17 Apr 2024 23:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713395399; cv=fail; b=i/ZmQrf0I1B5Tncw0UnwdrnoE8hsWt1s5XrwtFTbQw8Vnbbr3Htrri0Q8Uy1ojm4oYq28jcRn93wHDhEhPVLb2RqhhctdhI/4gIMmRKP1okFrFuOSYsRah/DvJSCuL4RjPDie6O+zdlAdJVpXdBwDpYJbtGbaxSBUk1ygXpJoQM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713395399; c=relaxed/simple;
-	bh=JrMgCkJM9M1B/UqmbQYKAzaJo4yFN/LSihpVM72AWtI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=odhU/JK3fBWSLEMQnxhxS+B2lX5WFFFWpD/0MhWQVIqJs6BxoIOYAj6V89FLP9cOQq6A8nShFcnMqIjwOxYYrF9bmSdkef6KpB8qjgS9GsUYouchDS6uPuyqNn/CEhWtPW2L/3cBB/X4QJUOPhZSEr3VF+IKz/gEsh7FxMYCs4g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ln8e7hBY; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713395398; x=1744931398;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JrMgCkJM9M1B/UqmbQYKAzaJo4yFN/LSihpVM72AWtI=;
-  b=Ln8e7hBY3J8L8iuVQWxrd0e54QXYZCfA15i468rg6RzpyJqJJ4gf3bph
-   D2dHQU7xvMMzqwoCwiPOZVj6OtFOPgykhOqnW5pkPLt1eaPvVDkYgT+dI
-   mt8iyKOErfe4kHrF8K4wrqFdlGs8Qo1QFkTAByBM7VHBePr1YUa3nP3O+
-   3uhLGSdamEX8UwrRa6e+9/whS1s9PsTW9NJUA1tF6MvS9cyuRPVSbNLaC
-   5pr9J1suPeqU+XoD76OSjzIjjyyYrYxYbQbITHUMLqsCJUqcmzOWAc+6S
-   YYtv3/1I5DrSirfOlNo4i+12LM5FsUrTiOznL1ETS0mTpMwR0V7c3pO3N
-   g==;
-X-CSE-ConnectionGUID: em8ptlxGRPi6LNvZSnSahg==
-X-CSE-MsgGUID: FHRd+qUPT1y4uYTwqr3Zkw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="20339976"
-X-IronPort-AV: E=Sophos;i="6.07,210,1708416000"; 
-   d="scan'208";a="20339976"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 16:09:57 -0700
-X-CSE-ConnectionGUID: LtNjAHBwSgShVAb4FEZ9Hg==
-X-CSE-MsgGUID: xSbN353VTcyb5ohM/pEEJQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,210,1708416000"; 
-   d="scan'208";a="22869806"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Apr 2024 16:09:56 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 17 Apr 2024 16:09:55 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 17 Apr 2024 16:09:55 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 17 Apr 2024 16:09:55 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 17 Apr 2024 16:09:54 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dmDV5GaaxvE1Gr0URXY/t9zmvbRxweuM5kYIMoCZvFeGh93vJKYwd+N5bmI+9z2m8i4P1KPxqcEl+sJvnf+E8EDhSd/skzgTmtAelB1kKtVrBMijmEJKt6jng1jBNOrL0uzpRkxAcXo1SjJ2O4KwMnKoZgGNXnS5d7Cjl8Jat6I8yEhdpuujymVqEylDigDHygjh35GNUhYFSJk7Ah3+XGzUu36ESBDYLJ5x+CUKT8IX+HHZr09OLX0aum0ongivz5Gf059OTlLLfd8/JbNp6FQ4BkflXjmOxYvjHgsr+87KgoO41lq9mWzLlSXPCvbM07RBHVV4yNjAg5d1iCgc9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2Jt4jYFFUOFKQkU4Uc7DgRtrDyFcX0JVIYPo2oBaiP4=;
- b=X4MymsV0Zb5gPwWGU71dq/tabYuf/Wo3NYkmnvWM1h3ro6BwJPsQHPCSKT4rHKHSLb6XrfysLPZr6ZB6sAOpTwYBzxb0WtHrCbHbOAX25Spf56N/bozH1tcK45TWoU8/D9sk2gY9U3/nFV+023hN1paDEQwoxqaeBoI2x/jkrgmf4JkHPmcBuTrrRpF+1KHM8gxgBxCjVLkVmqOX8FPys7naWeMZXNWSU4qWHyZQvplzww2Bj8YFdo1BMnXSxfTnmkiT2JKKkDuErjRavxQGu1N5tRyhIFMbVcqYpJZsEd54GDXXYpwxUL8n44Io9Zw+R7gT0FRcE+4wWjHhjawGog==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by CH3PR11MB8239.namprd11.prod.outlook.com (2603:10b6:610:156::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.39; Wed, 17 Apr
- 2024 23:09:51 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7472.037; Wed, 17 Apr 2024
- 23:09:51 +0000
-Message-ID: <2383a1e9-ba2b-470f-8807-5f5f2528c7ad@intel.com>
-Date: Thu, 18 Apr 2024 11:09:41 +1200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D97179C8
+	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 23:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713395508; cv=none; b=W06IvyraJrW9USjretgZx4Us3v6wEd6WRVpQZe6RpI4dRkhfjeC2BOWuwELAGzLhAepVk8oLkH2ne4FZxQatjisbIEkrtMPgTnqyUXNpAhfG7VRJhQWtDOQBAqLZ4hrWu55jFYbMO0RqcD6ZcDOPyGhfkBIeeF/9a6aI2CTG310=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713395508; c=relaxed/simple;
+	bh=oNdCx80C856RTWnN8JuE5CtARwLd5sIwDWjLYgG9s5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FC1eNe4po4BbCjpN6l3W6YESZo4/PHFqilRi7wjaINWsNGi54TkuuavHkGq049F+Py29Tu9EVxdD7ZNHzxJzLYYyu/Wigm9PS9uTM0GOioWmSnMDDEofKniajleV9Swsl/WbtTb4Cc5czVt9rIP2DjkkiX/4qdMjawCfK38UKdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JS0fmU7U; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ed691fb83eso299311b3a.1
+        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 16:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713395506; x=1714000306; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WDEQNAoYNlRT/tCG4E+zr2OPdV3cIDvK0F0Tz/De9sE=;
+        b=JS0fmU7UpKcCzkW4Lg2i+ICBWO8xwvLpNcw/xUfYgi91wLtQXA2S5zXAJGxptZr0Zj
+         z4Ehvz89tdnvD9O+6aEHhMq1bRZIgWi9YmZrabwxPP96WNhQfSnbqfPN2tQSaZFv8hvK
+         Y5ylB4yzyvtv8/Jh0jS5lz6J5O+F8/vSoSBEF6lRnxiO0pl3+XG4ZyENwDYO2axeil8b
+         XlR/xqdEfd90x8uqzwV5lZYS0YMHUy5Lk3i6Bpl4tZmNq/w2t2hPIze6dlaF+PU+4Lks
+         LXQ0rWaqsiXX63oiKvbplRdK6sTh8JIPP1Hh2XEQjZpSHimFDmCiYLv9ACJ++SdPF2QW
+         OpqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713395506; x=1714000306;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WDEQNAoYNlRT/tCG4E+zr2OPdV3cIDvK0F0Tz/De9sE=;
+        b=f/uUkQIb9WfrF7cA3f4cJcuOp2LdcmWqpLym2ZHsV0wTY6RERbBSBOWsNaJJZnSWqu
+         fLly8Vxnyx3E0f31odzJVQcxpZkHkBhFjZxSrGGSroGPg3UqTUjM0QJx0BQTn+xYq+Jz
+         BdoRADieNwTgbJniyzy+nAHBIfDMMjmjHahW9ZtEE3+jNSXMOwWE5lYh5Zo3kVfyvQBf
+         SU/g0+UmhA/PiW3iBT+kwBOZY3nidyTG/DwS6PXhC1OYC2gJXvObpETNTFHx5EXsklPM
+         vcRpSJRFMQmvKZjxcVc0g3Z/sTPKe5WSyBLlCXYjliKCszl5niq2PRGpB/2rfkiRWxgH
+         nAmA==
+X-Forwarded-Encrypted: i=1; AJvYcCXJly0zsooh1tOncH9T78MMUexTWVaEmSwMOLtecoKKCD+wSOPyfzcxxvW+FyMprspyiH2bjC3GdaTKIO6+L88fYkFG
+X-Gm-Message-State: AOJu0YyXE0mHeHyb1oKs3MRfVBkBcy8sqoDkCgXIvuj10Oqd6ZTunAsj
+	Xka7NHrX20geNEQNeeBlBTuNFZVeBhNtMJwUZqQDDEhwAySC8hhEZVxErtll0w==
+X-Google-Smtp-Source: AGHT+IHiJTrHCyJ+purlro9U8tyOMuKDMSMjZou53yWbw6hoOBMZed+uj11RDumfPQug4qIVeJVtAg==
+X-Received: by 2002:a05:6a21:2b13:b0:1aa:6612:fea5 with SMTP id ss19-20020a056a212b1300b001aa6612fea5mr1217099pzb.59.1713395505389;
+        Wed, 17 Apr 2024 16:11:45 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id q5-20020a170902bd8500b001db8145a1a2sm170114pls.274.2024.04.17.16.11.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 16:11:44 -0700 (PDT)
+Date: Wed, 17 Apr 2024 23:11:39 +0000
+From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>
-CC: "Zhang, Tina" <tina.zhang@intel.com>, "Yuan, Hang" <hang.yuan@intel.com>,
-	"Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Aktas, Erdem"
-	<erdemaktas@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "Yamahata, Isaku"
-	<isaku.yamahata@intel.com>, "isaku.yamahata@linux.intel.com"
-	<isaku.yamahata@linux.intel.com>
-References: <f028d43abeadaa3134297d28fb99f283445c0333.1708933498.git.isaku.yamahata@intel.com>
- <d45bb93fb5fc18e7cda97d587dad4a1c987496a1.camel@intel.com>
- <20240322212321.GA1994522@ls.amr.corp.intel.com>
- <461b78c38ffb3e59229caa806b6ed22e2c847b77.camel@intel.com>
- <ZhawUG0BduPVvVhN@google.com>
- <8afbb648-b105-4e04-bf90-0572f589f58c@intel.com>
- <Zhftbqo-0lW-uGGg@google.com>
- <6cd2a9ce-f46a-44d0-9f76-8e493b940dc4@intel.com>
- <Zh7KrSwJXu-odQpN@google.com>
- <900fc6f75b3704780ac16c90ace23b2f465bb689.camel@intel.com>
- <Zh_exbWc90khzmYm@google.com>
-Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <Zh_exbWc90khzmYm@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0202.namprd03.prod.outlook.com
- (2603:10b6:a03:2ef::27) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH] x86: msr: Remove the loop for testing
+ reserved bits in MSR_IA32_FLUSH_CMD
+Message-ID: <ZiBXK43AcxAxKuSE@google.com>
+References: <20240415172542.1830566-1-mizhang@google.com>
+ <Zh6liyoOJL9_Wifg@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|CH3PR11MB8239:EE_
-X-MS-Office365-Filtering-Correlation-Id: ccdba919-d775-4e26-f85c-08dc5f337c84
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: /c4m9/+Ectjo/5QEOvsveC9LP3SuqRNXkDGZMDahzeOqh5/lXUUDejcrb0CN+I040Vda66cxncPhsAA9Mouau+0ywdVdXvWP3nycoYxA/bN5GnptzN2BFyq/rSr9seTyPI0wEvlztGx3aOCbflu61+aZwCzDpikuoDhD7JcbkPezX1IkbW9fapg3bUPQhK0sxkjaSLcUoSDDxjp2fsj3S9Odo0m9agAE1N32AUQRcZEDDXc69MbFinu+YYWPXseOBoQNo1vqUdhrommA41oCPXaFhlZxTP6+0doUkWv3dElAFdSzCkoTB//5rSLEaP9BVTXbtQntu/06ZutVbQr9s8gERi/pzekCjOoEn3r1x+WDZ6/IYe8QbF5XUxia+UpJTKcmKthifl4O/xox6NZvSQ2P4shXsPJN/UU12+c1iMHvQnwYtNW7hCEuXBgbFYqjXgI7pbX6G7OyR+CYrpzf/rmovRun+W+k2T/+fbSyDccggaDUWTiz8fHyYNS5l7dFzW+mHAiBOz73EF+udmn9xcmFuI4cDjW8wMGbXDX2BBeUQCZ8aQffFUcddI8VIX1yLrxB5iYkBQxykSBlnxMNIL7Z7Pgbqr7j64o0FCJzNe992QQFWylMhga29hPg+cYSQCKWZMgoAaK6DHF4TpRGbjgNsZtGGxKAzMh/arFeDu0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cXZVZzZrSDZ6ZGVYWk1tV2daZkJuZUkrekFhUHVXQ1NuY2tCQ20rOWNlZkI2?=
- =?utf-8?B?SkczYVhINHM1SThUREJvMEc5eHpRQUdnMUlwQjAwb3FvV0dUS2xpb1JnK0lx?=
- =?utf-8?B?VnF5elFwZVdYOVpBNmFhU2RrczRwN3didk5OaVNRU2kxN2NMVDZITnZZV0JX?=
- =?utf-8?B?Q2VxbmMrckRDM0JXdVdzYVNaenUzRkpqVlRqTEdhaGY3bFRQTEN0UjdnbkFS?=
- =?utf-8?B?L0VNeUxPZVJLdk51MnNzVTF6dWpwK1NJdVRSZ0hEY2t0U0o1MTVFamNmK2l2?=
- =?utf-8?B?anlobWdPMmYrOWhNMTJpMkZFSXIybDRFU0Y0bzVQNnJFWENndm92cHp5RmRB?=
- =?utf-8?B?cjJxNll3R1BUTE53Y3J3QVdjczZGcENQeDlGT2ZISkZJbHRSMjh3SVR1d0NJ?=
- =?utf-8?B?NTdpN1BNeXAzMHRBWmVnQ2hZbjg4bTdLV2x6dnBBU3N1N040bnZib1YwUXYz?=
- =?utf-8?B?MEtrNVFvYzZVbzRoVVI4WTZCK1kxNE5JbVV6c0ZyWjBiTWovZi81SU9ubFhp?=
- =?utf-8?B?OU1BeGZZZHAycGh5K0s0SjNHS1hIcG40dW5ETFJMdzZlZmp2eVFhMVp1cTRz?=
- =?utf-8?B?UnNNQmdjTVZzUkUrMzhsTFJIa3BVSjlPTjJ4NlJGQm91TENmdGJCSk1kMWlJ?=
- =?utf-8?B?R0dOcXM5VTUzTnRBUUErenNwMUFQSEplcjJGM0RMVFpYc1ZRalZlU090K3Zy?=
- =?utf-8?B?MlFDUWMrbmQwOUkrSzZkdVpqS0FsM1V0KzRYczNYSG9uK0lOdkRvWDNNL1pH?=
- =?utf-8?B?bC9xd0hIL3JjdERWdmVpZksxTVNOY29Hc0RWQWxwOTFiVHdEcUVrOHoxUkVo?=
- =?utf-8?B?NGwzR1FmY29ZMFU3YUVzWkdYYWppUnI1Zm9OeXREVkl1UTYwenVIa3A0cG5D?=
- =?utf-8?B?bk9WQXNlU0dlN2RLaXczWFc5TTkzN2lmT3NLMnBnSnd2bENMQXJVZnZkUEt2?=
- =?utf-8?B?b3RtWk9iUVlEQTA2LzRoY1FCdEg4TGlSVUJHaTlIQlRadnZwaTUxak51WXI0?=
- =?utf-8?B?bEtPcHIrS1NYOE52dDF6Nk5XUEZ4TnF5c2N6SDdhTWZBN3dRSXFJdEFnU0ZM?=
- =?utf-8?B?WGl1Zkdya1JlWVlZS2RWejY5QkFOKzFxRGNIZ2pUWXR6Ly9MYmlwZ0xGK0Fn?=
- =?utf-8?B?ZXJUMGhZeHhxQjQyK1JpV1FXT2NTYi9EdWxGdHRLN2U3bWVPZjRZRWdBZDZn?=
- =?utf-8?B?TFczTmJ0bXBSSmhXRlladGdzdDIwRm5aamx2REZjRU9aVE15bHR2UmM5TUw3?=
- =?utf-8?B?NFBabStDWndUbUpnTkRCR2lhTVdxTTFnaklrcm5TdXZwTmNmazdqcWhGZllO?=
- =?utf-8?B?OVdiL01iZGNpcHBoc3d1azhzb3FDdUZVaEpLWExmM1pXN0xSKzVIWHUyWGpY?=
- =?utf-8?B?Mkdoc0ZkbVM0MVZvZDdTcFRtVys4SG5ZYk10TDlQVGpOWTVMeTBOeVMzUzdS?=
- =?utf-8?B?cTZ0L3N6VUlTV1B1TFJHN3NVM08zQnE4N29BUHRKRjd5TFhtZzhoVlZLNjVC?=
- =?utf-8?B?S3h6UzZQckNNTVdNZElVcjRpMmc4SHM0a0ZWMFJLeVk0VDJkYVUvVTJEUXA1?=
- =?utf-8?B?NU5rWkJiRk10emlHVDJRYk1XVXBXcVMvNTN4WFNac2NieXA1b3N5YW8rZjVo?=
- =?utf-8?B?a0tXWEhUcXlDb3dmT25ZYTNJeGJlb3VWUWg0a0c1d3ZNMzNja1lES0NuWDhj?=
- =?utf-8?B?QjB2Ly9Vd1c3M3FNWDVpWjNwQnVsSC9mYnB0YVAyUGRNOU81RTJsYmMrZytv?=
- =?utf-8?B?MFJ2U3ZBa3pTR1hEenlhWkx2WlgwVmhtTGtGRU9hUUd4bFJMUEt1TzVKelhL?=
- =?utf-8?B?cW4zeFB5Yk13VmZMM0tRTk04SzNBeUpjK0lETEFaeUFRc1krSXlSQnN1cmp6?=
- =?utf-8?B?bFJsUTFwcUpDejNIbk00YnlFUkV4WVdERU8xYjVoQjlMdlFVTGk3SmJtanRn?=
- =?utf-8?B?c25XYzhIaVJXNUZIUjViK2lUc3J1SzVtcy9Oc0ZNalcvQkxJb0NyMk5xRGhX?=
- =?utf-8?B?Vnd0N2NKeUF3dlFlYm9iSWJoM0xWMzg3ZitPQlVEL3ZDcmxTMnIrVlpxYUZz?=
- =?utf-8?B?ZGpuSWluZXFpL1F0aFlFVE9zYzdOVThPQVV6bGREbTNWNUFpbDU4UXNEckRp?=
- =?utf-8?Q?XDbUivy7F05Qi5BgiWxEeBdvE?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: ccdba919-d775-4e26-f85c-08dc5f337c84
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2024 23:09:51.8800
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n9O1qJoUJkjWWCGqa7XLVsulqEs3gBdQHDPzZzfBiEnlQyC86KQYLdf+BJG1NFQQ2hTvkuUcZdIV42DFtXbLDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8239
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zh6liyoOJL9_Wifg@google.com>
 
-
-
-On 18/04/2024 2:40 am, Sean Christopherson wrote:
-> On Wed, Apr 17, 2024, Kai Huang wrote:
->> On Tue, 2024-04-16 at 13:58 -0700, Sean Christopherson wrote:
->>> On Fri, Apr 12, 2024, Kai Huang wrote:
->>>> On 12/04/2024 2:03 am, Sean Christopherson wrote:
->>>>> On Thu, Apr 11, 2024, Kai Huang wrote:
->>>>>> I can certainly follow up with this and generate a reviewable patchset if I
->>>>>> can confirm with you that this is what you want?
->>>>>
->>>>> Yes, I think it's the right direction.  I still have minor concerns about VMX
->>>>> being enabled while kvm.ko is loaded, which means that VMXON will _always_ be
->>>>> enabled if KVM is built-in.  But after seeing the complexity that is needed to
->>>>> safely initialize TDX, and after seeing just how much complexity KVM already
->>>>> has because it enables VMX on-demand (I hadn't actually tried removing that code
->>>>> before), I think the cost of that complexity far outweighs the risk of "always"
->>>>> being post-VMXON.
->>>>
->>>> Does always leaving VMXON have any actual damage, given we have emergency
->>>> virtualization shutdown?
->>>
->>> Being post-VMXON increases the risk of kexec() into the kdump kernel failing.
->>> The tradeoffs that we're trying to balance are: is the risk of kexec() failing
->>> due to the complexity of the emergency VMX code higher than the risk of us breaking
->>> things in general due to taking on a ton of complexity to juggle VMXON for TDX?
->>>
->>> After seeing the latest round of TDX code, my opinion is that being post-VMXON
->>> is less risky overall, in no small part because we need that to work anyways for
->>> hosts that are actively running VMs.
->>
->> How about we only keep VMX always on when TDX is enabled?
+On Tue, Apr 16, 2024, Sean Christopherson wrote:
+> On Mon, Apr 15, 2024, Mingwei Zhang wrote:
+> > Avoid testing reserved bits in MSR_IA32_FLUSH_CMD. Since KVM passes through
+> > the MSR at runtime, testing reserved bits directly touches the HW and
+> > should generate #GP. However, some older CPU models like skylake with
+> > certain FMS do not generate #GP.
+> > 
+> > Ideally, it could be fixed by enumerating all such CPU models. The value
+> > added is would be low. So just remove the testing loop and allow the test
+> > pass.
+> > 
+> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> > ---
+> >  x86/msr.c | 2 --
+> >  1 file changed, 2 deletions(-)
+> > 
+> > diff --git a/x86/msr.c b/x86/msr.c
+> > index 3a041fab..76c80d29 100644
+> > --- a/x86/msr.c
+> > +++ b/x86/msr.c
+> > @@ -302,8 +302,6 @@ static void test_cmd_msrs(void)
+> >  		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", 0);
+> >  		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", L1D_FLUSH);
+> >  	}
+> > -	for (i = 1; i < 64; i++)
+> > -		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", BIT_ULL(i));
 > 
-> Paolo also suggested that forcing VMXON only if TDX is enabled, mostly because
-> kvm-intel.ko and kvm-amd.ko may be auto-loaded based on MODULE_DEVICE_TABLE(),
-> which in turn causes problems for out-of-tree hypervisors that want control over
-> VMX and SVM.
-> 
-> I'm not opposed to the idea, it's the complexity and messiness I dislike.  E.g.
-> the TDX code shouldn't have to deal with CPU hotplug locks, core KVM shouldn't
-> need to expose nolock helpers, etc.  And if we're going to make non-trivial
-> changes to the core KVM hardware enabling code anyways...
-> 
-> What about this?  Same basic idea as before, but instead of unconditionally doing
-> hardware enabling during module initialization, let TDX do hardware enabling in
-> a late_hardware_setup(), and then have KVM x86 ensure virtualization is enabled
-> when creating VMs.
-> 
-> This way, architectures that aren't saddled with out-of-tree hypervisors can do
-> the dead simple thing of enabling hardware during their initialization sequence,
-> and the TDX code is much more sane, e.g. invoke kvm_x86_enable_virtualization()
-> during late_hardware_setup(), and kvm_x86_disable_virtualization() during module
-> exit (presumably).
+> Rather than remove this entirely, what forcing emulation?  E.g. (compile tested
+> only, and haven't verified all macros)
 
-Fine to me, given I am not familiar with other ARCHs, assuming always 
-enable virtualization when KVM present is fine to them. :-)
+For sure. Nice, thank you! I think this FEP thing also benefits other
+tests like PMU.
 
-Two questions below:
-
-> +int kvm_x86_enable_virtualization(void)
+Thanks.
+-Mingwei
+> 
+> ---
+>  lib/x86/desc.h      | 30 ++++++++++++++++++++++++------
+>  lib/x86/processor.h | 18 ++++++++++++++----
+>  x86/msr.c           | 16 +++++++++++++++-
+>  3 files changed, 53 insertions(+), 11 deletions(-)
+> 
+> diff --git a/lib/x86/desc.h b/lib/x86/desc.h
+> index 7778a0f8..92c45a48 100644
+> --- a/lib/x86/desc.h
+> +++ b/lib/x86/desc.h
+> @@ -272,9 +272,9 @@ extern gdt_entry_t *get_tss_descr(void);
+>  extern unsigned long get_gdt_entry_base(gdt_entry_t *entry);
+>  extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
+>  
+> -#define asm_safe(insn, inputs...)					\
+> +#define __asm_safe(fep, insn, inputs...)				\
+>  ({									\
+> -	asm volatile(ASM_TRY("1f")					\
+> +	asm volatile(__ASM_TRY(fep, "1f")				\
+>  		     insn "\n\t"					\
+>  		     "1:\n\t"						\
+>  		     :							\
+> @@ -283,9 +283,15 @@ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
+>  	exception_vector();						\
+>  })
+>  
+> -#define asm_safe_out1(insn, output, inputs...)				\
+> +#define asm_safe(insn, inputs...)					\
+> +	__asm_safe("", insn, inputs)
+> +
+> +#define asm_fep_safe(insn, output, inputs...)				\
+> +	__asm_safe_out1(KVM_FEP, insn, output, inputs)
+> +
+> +#define __asm_safe_out1(fep, insn, output, inputs...)			\
+>  ({									\
+> -	asm volatile(ASM_TRY("1f")					\
+> +	asm volatile(__ASM_TRY(fep, "1f")				\
+>  		     insn "\n\t"					\
+>  		     "1:\n\t"						\
+>  		     : output						\
+> @@ -294,9 +300,15 @@ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
+>  	exception_vector();						\
+>  })
+>  
+> -#define asm_safe_out2(insn, output1, output2, inputs...)		\
+> +#define asm_safe_out1(insn, output, inputs...)				\
+> +	__asm_safe_out1("", insn, output, inputs)
+> +
+> +#define asm_fep_safe_out1(insn, output, inputs...)			\
+> +	__asm_safe_out1(KVM_FEP, insn, output, inputs)
+> +
+> +#define __asm_safe_out2(fep, insn, output1, output2, inputs...)		\
+>  ({									\
+> -	asm volatile(ASM_TRY("1f")					\
+> +	asm volatile(__ASM_TRY(fep, "1f")				\
+>  		     insn "\n\t"					\
+>  		     "1:\n\t"						\
+>  		     : output1, output2					\
+> @@ -305,6 +317,12 @@ extern unsigned long get_gdt_entry_limit(gdt_entry_t *entry);
+>  	exception_vector();						\
+>  })
+>  
+> +#define asm_safe_out2(fep, insn, output1, output2, inputs...)		\
+> +	__asm_safe_out2("", insn, output1, output2, inputs)
+> +
+> +#define asm_fep_safe_out2(insn, output1, output2, inputs...)		\
+> +	__asm_safe_out2(KVM_FEP, insn, output1, output2, inputs)
+> +
+>  #define __asm_safe_report(want, insn, inputs...)			\
+>  do {									\
+>  	int vector = asm_safe(insn, inputs);				\
+> diff --git a/lib/x86/processor.h b/lib/x86/processor.h
+> index 44f4fd1e..d20496c0 100644
+> --- a/lib/x86/processor.h
+> +++ b/lib/x86/processor.h
+> @@ -430,12 +430,12 @@ static inline void wrmsr(u32 index, u64 val)
+>  	asm volatile ("wrmsr" : : "a"(a), "d"(d), "c"(index) : "memory");
+>  }
+>  
+> -#define rdreg64_safe(insn, index, val)					\
+> +#define __rdreg64_safe(fep, insn, index, val)				\
+>  ({									\
+>  	uint32_t a, d;							\
+>  	int vector;							\
+>  									\
+> -	vector = asm_safe_out2(insn, "=a"(a), "=d"(d), "c"(index));	\
+> +	vector = __asm_safe_out2(fep, insn, "=a"(a), "=d"(d), "c"(index));\
+>  									\
+>  	if (vector)							\
+>  		*(val) = 0;						\
+> @@ -444,13 +444,18 @@ static inline void wrmsr(u32 index, u64 val)
+>  	vector;								\
+>  })
+>  
+> -#define wrreg64_safe(insn, index, val)					\
+> +#define rdreg64_safe(insn, index, val)					\
+> +	__rdreg64_safe("", insn, index, val)
+> +
+> +#define __wrreg64_safe(fep, insn, index, val)				\
+>  ({									\
+>  	uint32_t eax = (val), edx = (val) >> 32;			\
+>  									\
+> -	asm_safe(insn, "a" (eax), "d" (edx), "c" (index));		\
+> +	__asm_safe(fep, insn, "a" (eax), "d" (edx), "c" (index));	\
+>  })
+>  
+> +#define wrreg64_safe(insn, index, val)					\
+> +	__wrreg64_safe("", insn, index, val)
+>  
+>  static inline int rdmsr_safe(u32 index, uint64_t *val)
+>  {
+> @@ -462,6 +467,11 @@ static inline int wrmsr_safe(u32 index, u64 val)
+>  	return wrreg64_safe("wrmsr", index, val);
+>  }
+>  
+> +static inline int wrmsr_fep_safe(u32 index, u64 val)
 > +{
-> +	int r;
-> +
-> +	guard(mutex)(&vendor_module_lock);
-
-It's a little bit odd to take the vendor_module_lock mutex.
-
-It is called by kvm_arch_init_vm(), so more reasonablly we should still 
-use kvm_lock?
-
-Also, if we invoke kvm_x86_enable_virtualization() from 
-kvm_x86_ops->late_hardware_setup(), then IIUC we will deadlock here 
-because kvm_x86_vendor_init() already takes the vendor_module_lock?
-
-> +
-> +	if (kvm_usage_count++)
-> +		return 0;
-> +
-> +	r = kvm_enable_virtualization();
-> +	if (r)
-> +		--kvm_usage_count;
-> +
-> +	return r;
+> +	return __wrreg64_safe(KVM_FEP, "wrmsr", index, val);
 > +}
-> +EXPORT_SYMBOL_GPL(kvm_x86_enable_virtualization);
 > +
-
-[...]
-
-> +int kvm_enable_virtualization(void)
->   {
-> +	int r;
+>  static inline int rdpmc_safe(u32 index, uint64_t *val)
+>  {
+>  	return rdreg64_safe("rdpmc", index, val);
+> diff --git a/x86/msr.c b/x86/msr.c
+> index 3a041fab..2830530b 100644
+> --- a/x86/msr.c
+> +++ b/x86/msr.c
+> @@ -112,6 +112,16 @@ static void test_rdmsr_fault(u32 msr, const char *name)
+>  	       "Expected #GP on RDSMR(%s), got vector %d", name, vector);
+>  }
+>  
+> +static void test_wrmsr_fep_fault(u32 msr, const char *name,
+> +				 unsigned long long val)
+> +{
+> +	unsigned char vector = wrmsr_fep_safe(msr, val);
 > +
-> +	r = cpuhp_setup_state(CPUHP_AP_KVM_ONLINE, "kvm/cpu:online",
-> +			      kvm_online_cpu, kvm_offline_cpu);
-> +	if (r)
-> +		return r;
+> +	report(vector == GP_VECTOR,
+> +	       "Expected #GP on emulated WRSMR(%s, 0x%llx), got vector %d",
+> +	       name, val, vector);
+> +}
 > +
-> +	register_syscore_ops(&kvm_syscore_ops);
+>  static void test_msr(struct msr_info *msr, bool is_64bit_host)
+>  {
+>  	if (is_64bit_host || !msr->is_64bit_only) {
+> @@ -302,8 +312,12 @@ static void test_cmd_msrs(void)
+>  		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", 0);
+>  		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", L1D_FLUSH);
+>  	}
 > +
-> +	/*
-> +	 * Manually undo virtualization enabling if the system is going down.
-> +	 * If userspace initiated a forced reboot, e.g. reboot -f, then it's
-> +	 * possible for an in-flight module load to enable virtualization
-> +	 * after syscore_shutdown() is called, i.e. without kvm_shutdown()
-> +	 * being invoked.  Note, this relies on system_state being set _before_
-> +	 * kvm_shutdown(), e.g. to ensure either kvm_shutdown() is invoked
-> +	 * or this CPU observes the impedning shutdown.  Which is why KVM uses
-> +	 * a syscore ops hook instead of registering a dedicated reboot
-> +	 * notifier (the latter runs before system_state is updated).
-> +	 */
-> +	if (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF ||
-> +	    system_state == SYSTEM_RESTART) {
-> +		unregister_syscore_ops(&kvm_syscore_ops);
-> +		cpuhp_remove_state(CPUHP_AP_KVM_ONLINE);
-> +		return -EBUSY;
-> +	}
+> +	if (!is_fep_available())
+> +		return;
 > +
-
-Aren't we also supposed to do:
-
-	on_each_cpu(__kvm_enable_virtualization, NULL, 1);
-
-here?
-
->   	return 0;
->   }
->   
-
+>  	for (i = 1; i < 64; i++)
+> -		test_wrmsr_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", BIT_ULL(i));
+> +		test_wrmsr_fep_fault(MSR_IA32_FLUSH_CMD, "FLUSH_CMD", BIT_ULL(i));
+>  }
+>  
+>  int main(int ac, char **av)
+> 
+> base-commit: 38135e08a580b9f3696f9b4ae5ca228dc71a1a56
+> -- 
+> 
 
