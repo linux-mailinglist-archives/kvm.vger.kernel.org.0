@@ -1,83 +1,80 @@
-Return-Path: <kvm+bounces-14998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14999-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA0C48A8B3A
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 20:39:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1A5B8A8B68
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 20:44:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 270931C23C65
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 18:39:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B5C1285E19
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 18:44:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A6E11725;
-	Wed, 17 Apr 2024 18:39:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119121BC40;
+	Wed, 17 Apr 2024 18:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lgl7eBnY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lQUQj5zI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787EBE570;
-	Wed, 17 Apr 2024 18:39:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD5E22338;
+	Wed, 17 Apr 2024 18:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713379152; cv=none; b=jX31tOKstVx+alvR+VDK/9C+/YdfWEF3yXvKr11TnXpQ+y73Zuz0MAQtKeYLaUjT63FTbVhwWIpcMvkxrSThEFRcKHcwhN8WD9QrMRYa/GtAMGN7rr+RNbhx/eLtBaAt79rLnQ0uqnhQXeVvZb/SKPE9wLz82eCXr+7ihg/JLYk=
+	t=1713379464; cv=none; b=AO1aJUcBi4Pvvfk2fk7yhCyPRJxdwvtV97zDZu39P4glwmUMTCJUJUvTbfBFEk+kfEqdCtHyhUcH6A5+0rLO8+aPIw2sbm5wvJmpe0/3cSiniE73MDZt2mzKW7YeEQXQbtaWZawXDhox4m7iQmWDTLW1UdilqJkju4yoAYuG+HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713379152; c=relaxed/simple;
-	bh=sMNIB4tkcKWqS/aTQJ3ll+HLyA2/rEy8wqHL4XzD9QU=;
+	s=arc-20240116; t=1713379464; c=relaxed/simple;
+	bh=/MgPf3JdMf3WsCCU3RTyq2hSaaAaGOGjKybT8hE2a0I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SLpgUlSPVmMgvLB5BsYt5Detwo18fSH0OP/dz+zRfSaMdj5Iwk/KRtclR1FvGCH67UbQX5XPPTGV7CvIzqcBip2ponSvb+Vp1/fKbStDsSRO1GN40jpYWyd7+DKtVKT9n2rk4dKAp4X8IXY//IvLjlllHmIKEHjEHeqvlnAaN/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lgl7eBnY; arc=none smtp.client-ip=192.198.163.16
+	 Content-Type:Content-Disposition:In-Reply-To; b=sGa0ChI8bzRsPaJJq4UbJeHL01jSrbflGrowoTURe24+EcjYKKtkxIlLyKv3e7URSdnxyKCkgf6p2kArQ2BMibcFYoL318pzsAxEKc8S2BFSEhSSKc1XOSw/rmVeqNyq6yUB75frR9QUqh5Hon3R8yaFCgi2sViVaFOQop3fyGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lQUQj5zI; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713379150; x=1744915150;
+  t=1713379463; x=1744915463;
   h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=sMNIB4tkcKWqS/aTQJ3ll+HLyA2/rEy8wqHL4XzD9QU=;
-  b=lgl7eBnY2fqYaJna0G02SVpxcrXRiFqS9auIHmopYcTZW82AjUa8N6de
-   DIBI7w+/bBAYVwRaQSxRttHYzruqVMycmOQJ3nAsVYuhop5vB6EyIxA14
-   0EsXK8u+L/Sewh25tYsmpj7x92CRvLe2UWR6sU0ZCilVrAuMquWoQJqbq
-   ++7Tg7zceV3be0ohuyjsT93nGtpcOYlsgbptD13FGBEQ/+gOpPKDAJbtv
-   Og27pPJWcZbvv4Nyfi3cwKFBIUEzQBJ+vSAQjFfeDkn50jirtPJ2S1wsO
-   qd954uQkfpNnppW4xH2tOpYXkloZhJvw4qEmbAtY0i42S02EEaDPk7eK6
+   mime-version:in-reply-to;
+  bh=/MgPf3JdMf3WsCCU3RTyq2hSaaAaGOGjKybT8hE2a0I=;
+  b=lQUQj5zIIGR6weey/tTW2jLddzXuGwoTJTe+mYjX6rP6idX9WEiy19ps
+   0M0rfhDW91jw8A+lvYVksbUUHD9iqTa9kQH0AyNoXBDYMvXvsD4b1k8NZ
+   IFtgzHyF75cP2merojVuK28RjSGWlbpIpZDmKcUPWxYRxVzRbFMf60gTM
+   raLyiGzqatq/u627rWLyYZxtoel/bgB5lReBOvJhd9elNIcGk+MgZxn10
+   II1mZM4bkA85CrWkPxhWV0Bk378vCwHdoPJlS+EM3hIgTOghuXKzixFC/
+   BFl080/bXyPyT46Cglr5PUrMqzJBOiXA0UNtuf07Pej3E8yFEF+y6uY0Z
    A==;
-X-CSE-ConnectionGUID: Y59NaKY9SWiCv696iyAh7g==
-X-CSE-MsgGUID: m0vWN33nTtKMolNREsHwwg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="9439205"
+X-CSE-ConnectionGUID: ksZfUWL5SiesRffaqWKNYw==
+X-CSE-MsgGUID: eMc8i/Z/RuibjJQCwTWIIw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="9047005"
 X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
-   d="scan'208";a="9439205"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 11:39:09 -0700
-X-CSE-ConnectionGUID: uFT/P/boQzq8hqlLXADjlQ==
-X-CSE-MsgGUID: 28WSxGr9SIa3iWDlOHWcWw==
+   d="scan'208";a="9047005"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 11:44:22 -0700
+X-CSE-ConnectionGUID: 2uUunGCcR+SpwJWuzhuYtA==
+X-CSE-MsgGUID: dL8AWQALQ66oDjtbRMoRDg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
-   d="scan'208";a="22727431"
+   d="scan'208";a="23309529"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 11:39:09 -0700
-Date: Wed, 17 Apr 2024 11:39:08 -0700
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 11:44:21 -0700
+Date: Wed, 17 Apr 2024 11:44:20 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"seanjc@google.com" <seanjc@google.com>,
-	"Huang, Kai" <kai.huang@intel.com>,
-	"federico.parola@polito.it" <federico.parola@polito.it>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"dmatlack@google.com" <dmatlack@google.com>,
-	"michael.roth@amd.com" <michael.roth@amd.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>,
-	isaku.yamahata@linux.intel.com
+To: Chao Gao <chao.gao@intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, isaku.yamahata@gmail.com,
+	linux-kernel@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	David Matlack <dmatlack@google.com>,
+	Federico Parola <federico.parola@polito.it>,
+	Kai Huang <kai.huang@intel.com>, isaku.yamahata@linux.intel.com
 Subject: Re: [PATCH v2 05/10] KVM: x86/mmu: Introduce kvm_tdp_map_page() to
  populate guest memory
-Message-ID: <20240417183908.GG3039520@ls.amr.corp.intel.com>
+Message-ID: <20240417184420.GH3039520@ls.amr.corp.intel.com>
 References: <cover.1712785629.git.isaku.yamahata@intel.com>
  <9b866a0ae7147f96571c439e75429a03dcb659b6.1712785629.git.isaku.yamahata@intel.com>
- <8c4ee32de5016f7ebeaa76fcff7c70887024c34b.camel@intel.com>
+ <Zh90aFh2xr+nEcCQ@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,30 +83,83 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8c4ee32de5016f7ebeaa76fcff7c70887024c34b.camel@intel.com>
+In-Reply-To: <Zh90aFh2xr+nEcCQ@chao-email>
 
-On Tue, Apr 16, 2024 at 02:46:17PM +0000,
-"Edgecombe, Rick P" <rick.p.edgecombe@intel.com> wrote:
+On Wed, Apr 17, 2024 at 03:04:08PM +0800,
+Chao Gao <chao.gao@intel.com> wrote:
 
-> On Wed, 2024-04-10 at 15:07 -0700, isaku.yamahata@intel.com wrote:
-> >  
-> > +int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
-> > +                    u8 *level)
-> > +{
-> > +       int r;
-> > +
-> > +       /* Restrict to TDP page fault. */
-> > +       if (vcpu->arch.mmu->page_fault != kvm_tdp_page_fault)
-> > +               return -EINVAL;
-> > +
-> > +       r = __kvm_mmu_do_page_fault(vcpu, gpa, error_code, false, NULL,
-> > level);
+> On Wed, Apr 10, 2024 at 03:07:31PM -0700, isaku.yamahata@intel.com wrote:
+> >From: Isaku Yamahata <isaku.yamahata@intel.com>
+> >
+> >Introduce a helper function to call the KVM fault handler.  It allows a new
+> >ioctl to invoke the KVM fault handler to populate without seeing RET_PF_*
+> >enums or other KVM MMU internal definitions because RET_PF_* are internal
+> >to x86 KVM MMU.  The implementation is restricted to two-dimensional paging
+> >for simplicity.  The shadow paging uses GVA for faulting instead of L1 GPA.
+> >It makes the API difficult to use.
+> >
+> >Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> >---
+> >v2:
+> >- Make the helper function two-dimensional paging specific. (David)
+> >- Return error when vcpu is in guest mode. (David)
+> >- Rename goal_level to level in kvm_tdp_mmu_map_page(). (Sean)
+> >- Update return code conversion. Don't check pfn.
+> >  RET_PF_EMULATE => EINVAL, RET_PF_CONTINUE => EIO (Sean)
+> >- Add WARN_ON_ONCE on RET_PF_CONTINUE and RET_PF_INVALID. (Sean)
+> >- Drop unnecessary EXPORT_SYMBOL_GPL(). (Sean)
+> >---
+> > arch/x86/kvm/mmu.h     |  3 +++
+> > arch/x86/kvm/mmu/mmu.c | 32 ++++++++++++++++++++++++++++++++
+> > 2 files changed, 35 insertions(+)
+> >
+> >diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> >index e8b620a85627..51ff4f67e115 100644
+> >--- a/arch/x86/kvm/mmu.h
+> >+++ b/arch/x86/kvm/mmu.h
+> >@@ -183,6 +183,9 @@ static inline void kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
+> > 	__kvm_mmu_refresh_passthrough_bits(vcpu, mmu);
+> > }
+> > 
+> >+int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+> >+		     u8 *level);
+> >+
+> > /*
+> >  * Check if a given access (described through the I/D, W/R and U/S bits of a
+> >  * page fault error code pfec) causes a permission fault with the given PTE
+> >diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> >index 91dd4c44b7d8..a34f4af44cbd 100644
+> >--- a/arch/x86/kvm/mmu/mmu.c
+> >+++ b/arch/x86/kvm/mmu/mmu.c
+> >@@ -4687,6 +4687,38 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> > 	return direct_page_fault(vcpu, fault);
+> > }
+> > 
+> >+int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+> >+		     u8 *level)
+> >+{
+> >+	int r;
+> >+
+> >+	/* Restrict to TDP page fault. */
 > 
-> Why not prefetch = true? Doesn't it fit? It looks like the behavior will be to
-> not set the access bit.
+> need to explain why. (just as you do in the changelog)
 
-Makes sense. Yes, the difference is to set A/D bit or not.
+Sure.
+
+
+> >+	if (vcpu->arch.mmu->page_fault != kvm_tdp_page_fault)
+> 
+> page fault handlers (i.e., vcpu->arch.mmu->page_fault()) will be called
+> finally. why not let page fault handlers reject the request to get rid of
+> this ad-hoc check? We just need to plumb a flag indicating this is a
+> pre-population request into the handlers. I think this way is clearer.
+> 
+> What do you think?
+
+__kvm_mmu_do_page_fault() doesn't check if the mmu mode is TDP or not.
+If we don't want to check page_fault handler, the alternative check would
+be if (!vcpu->arch.mmu->direct).  Or we will require the caller to guarantee
+that MMU mode is tdp (direct or tdp_mmu).
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
