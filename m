@@ -1,199 +1,202 @@
-Return-Path: <kvm+bounces-15009-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15010-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0748A8CDE
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 22:26:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 837488A8CE3
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 22:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B9C91C21906
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 20:26:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6D4B1C2105C
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 20:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1C238F94;
-	Wed, 17 Apr 2024 20:26:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C5239877;
+	Wed, 17 Apr 2024 20:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WFRGkQ5B"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yMGtJeKo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A88D37703
-	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 20:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356EC25619
+	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 20:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713385563; cv=none; b=FecVn5pfDlFtwX4jqMsKLU819mVVvyc8JIhhifIfEA/C+n2fWxX0GQT57H23PamUKWtKCNmmVuGGI6CcRJUWcp4/QCZkTeljE8hYuHZUjGCsEgudymsBDle3tpFYNtR9KsvqcHbsAFfTs2xUemQxlRU+1vlWiM5h850xXZblvck=
+	t=1713385690; cv=none; b=PuNr5G/vHny4VWbycVj06V0rD6ncwIZNP1U7DQYy6v7ZbJnObPfxAwdonYnej62370py/Nwt/dEczc5YNWsZyb7g4MMOOtaFl3cVZIy4NyEYsS9+IbbgStwPO5/olQq5AHNV849dLYqVXWnAy4yReEmQdMNNZVH4NH7iaBgUdLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713385563; c=relaxed/simple;
-	bh=7BZHgF3W5ZZE54WPCFL5+Yv9SFz3jbsd5fEweJQ2Yk4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D+0LGb12EPsvhsSH1I4IXjoVLJkgzb2aSiCFe+lRZUwjYalLID322wcWiHUqusZXfQexAVBv3V7vPZQ9+25YKKMKqztRITz84EwZ8rgQo23Jrwb+yCkP1666VP5E/BK6WeT4ZmRwdc5HUs5CZ+LEF8VeM+2sbzFZ36AboJMtn2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WFRGkQ5B; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713385559;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4IOnfC4A0RohZ6kwMqfDoY6+tZsEAo9YyC45xU6vlkc=;
-	b=WFRGkQ5Byh1XCRZltRCJgSPIfU27SODNismT0y8UnUKx0WKhYP1e0wg/Kfw4MXnScFbbdF
-	i9H9oFm+7qkcyvE5vbJQeGtPHQqlCMtG2sUjAuc9gIiGgiAsHrW7cwukY/JjpHx4XBK11X
-	QM+XWmLirpTntj/R/dhQ07D2BlvszqU=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-461-eRLpzgWBOa6AbKWB6W1-dg-1; Wed, 17 Apr 2024 16:25:57 -0400
-X-MC-Unique: eRLpzgWBOa6AbKWB6W1-dg-1
-Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6eb5968cdc8so114713a34.1
-        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 13:25:57 -0700 (PDT)
+	s=arc-20240116; t=1713385690; c=relaxed/simple;
+	bh=TKa18tGzAfrtBiHI97dQCwDXkQzwG1WcyFcf/12hjHE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=e/oQod9ij3ROemeRYkWA3wMLw1vRD3QP2PgkEUuN+LjONZVEGvBF1RsQ+SaixU9+dxM7d1PYXAIIkzzcHPYNx4xdCvuCnVkq3n9lRJyYZKwrcUDlcJXIwHiE0BlDVezDVn+jp/u3FgWkgjbYKY2qQwbpv/XOP++UOaFSjINgA78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yMGtJeKo; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-60a20c33f06so1106767b3.2
+        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 13:28:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713385688; x=1713990488; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G8rpi8+pt1UAh2lq4JjPOfu96xW6K+NN18uPPlVeL70=;
+        b=yMGtJeKorKMyFrQJcIiNa+LxqdGWuBp4gY+Jikkm9CThfRtFSumaiBNQ8O46Eg+6Kk
+         yFtt08S60Ec72CFJ32UFV12lkUFyvHDwcgoeYrQ1/VFhv7hKeRadJnajaJy7f0PuNvdk
+         kkmWp47xsq2BiETjsQBFXgVRc2POXoqw9xoa9AJOOWCOGeW1Q4y995LR5NjIkOWOVVFC
+         h6gnKRuGHsexZc4Z3M6+Upq2jug1F6TdZgXThHxAbOG9EET5D4B6iinDfM5N4XkcHvvp
+         4M31pZk/4nE6ru8+1Fc08JxCuLDIBjwE+3QJpbcmplxwZz83lN8o7PK4ja6bRFkaEZrn
+         kj6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713385557; x=1713990357;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4IOnfC4A0RohZ6kwMqfDoY6+tZsEAo9YyC45xU6vlkc=;
-        b=VFqvB3jL2ycfg96qgXHMw8fKEH1nbdC+wJ+EOmDq1BAbeN+C/NusdAK89r8puWVN8q
-         jAf/LkO8EHdGSTMjbrC2xrURkyPT/1o5Wgkjw/Oyrv+22cKc2tGhtzLLXZxXResbiuWM
-         1Jb0Km0GnHVschgqfo0g3YaWDY6BSdTcu42E2lB3DIWEYppUXISKb2sREIzuuf5YKJE1
-         Pn+AhadqH7fFEI/loozAhLxHB74L9SJxnT8HD8sULqBAR988adJwlCePy6UXTFifQONn
-         Yi23+d55VBttqnMSx8LKBqiFyem2ASfnZMZvgFHOU4DaXfDU1HnONxiJ/0kUUWDOBpmn
-         RD/A==
-X-Forwarded-Encrypted: i=1; AJvYcCV547DYZr6y7YFu29sQuMG9BWXnYdBwCLNF/k4aT3Ttcv0nG4veKWyw+N4oQlUrjTdySIExRBfOMMuZzwaliXZfpZk/
-X-Gm-Message-State: AOJu0YxBulc1FZjpIw2l7hJDY3oio/7epaKGlNIFtPZDplYc4fZflxi0
-	GxFGJdKgMZuSUPwHdh6eW2UeUU2k6r/t8GjKyJ9zhQSewbiLtPnnDhjVC+pS3RbxNIeqtkkIjRr
-	V/7shkPEV41hwgej+HjyGYy7mFoGSKjyM7E5j4Z4pGLDOBvbW8g==
-X-Received: by 2002:a9d:69c7:0:b0:6eb:7685:f230 with SMTP id v7-20020a9d69c7000000b006eb7685f230mr605425oto.28.1713385556796;
-        Wed, 17 Apr 2024 13:25:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGAA5+8BHEzfd8XxwBjBN2DsH0fwZ0zsVuy97fzw0ylgtBKgn+V148PXZFfakl/bTMjiYFHUw==
-X-Received: by 2002:a9d:69c7:0:b0:6eb:7685:f230 with SMTP id v7-20020a9d69c7000000b006eb7685f230mr605407oto.28.1713385556512;
-        Wed, 17 Apr 2024 13:25:56 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id m6-20020a9d7ac6000000b006eb7e6d2f3dsm30683otn.37.2024.04.17.13.25.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 13:25:55 -0700 (PDT)
-Date: Wed, 17 Apr 2024 14:25:52 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
- "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
- <robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
- <chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
- <baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "Pan, Jacob jun" <jacob.jun.pan@intel.com>
-Subject: Re: [PATCH v2 4/4] vfio: Report PASID capability via
- VFIO_DEVICE_FEATURE ioctl
-Message-ID: <20240417142552.44382198.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276D245515E81844B5EC1068C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240412082121.33382-1-yi.l.liu@intel.com>
-	<20240412082121.33382-5-yi.l.liu@intel.com>
-	<20240416115722.78d4509f.alex.williamson@redhat.com>
-	<BN9PR11MB5276D245515E81844B5EC1068C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1713385688; x=1713990488;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G8rpi8+pt1UAh2lq4JjPOfu96xW6K+NN18uPPlVeL70=;
+        b=o5ezgHfHOe0z1kKcaKB305Zm1y+qP5JthYnbh6RNxngqJAkl1hH9eoSmrImjbZKFvE
+         MencC6Nop4Ep7lGpVx0ILt42D9q9qmdB7g4cFj3sQo+RHs5/U/5ZWPabE+aUlaodTmSA
+         J6Xyo8/uNGgLpTVutJ559tRrWR+bTEtoZZT9k01gEOw7Og3a1lLTd97NdfNAfYFjk33+
+         WahNPKKdRt5Hi9FSVT0Ay/33eeV7Vecm5qRWjMBRsArokQWbOgyIy7BAn5nq6Y3xc36Q
+         deVkAjAdjFi3OBdxKd8zev9iVWtRZj9mYOxX5dyajh995f4PvIuTYBHYVB+yRTLnmDHF
+         jAUg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmsfwGaY857mkMRjqZYInsVqlCizB0D1PMV5M3ykX88fs0AiKbMrMuoji2hijakU3BV1EtSgkpmjyIWCIq4zK4GHL6
+X-Gm-Message-State: AOJu0Yzauz2eHV6Ba5HXecmvCOg8WsQirYl6NK39rPfdG9P1CrYPO2/z
+	7w8VL4HZBWq+BuHO663aey7M29m1nqUF0er1IhoVWdcg8Rx+ZAplJpW+8eM1y4M1hH07PAbrOPh
+	/eg==
+X-Google-Smtp-Source: AGHT+IFhJMi+k8vbtha0g5GO0c7KEfVkisb1ShxsP0uYBV363cNoXzS6Y/3HV3imow+Sivxokcm9sC0algc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:d808:0:b0:61b:11e0:a98c with SMTP id
+ a8-20020a0dd808000000b0061b11e0a98cmr74105ywe.4.1713385688298; Wed, 17 Apr
+ 2024 13:28:08 -0700 (PDT)
+Date: Wed, 17 Apr 2024 13:28:06 -0700
+In-Reply-To: <20240417153450.3608097-2-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240417153450.3608097-1-pbonzini@redhat.com> <20240417153450.3608097-2-pbonzini@redhat.com>
+Message-ID: <ZiAw1jd8840jXqok@google.com>
+Subject: Re: [PATCH 1/7] KVM: Document KVM_MAP_MEMORY ioctl
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	isaku.yamahata@intel.com, xiaoyao.li@intel.com, binbin.wu@linux.intel.com, 
+	rick.p.edgecombe@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, 17 Apr 2024 07:09:52 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Wed, Apr 17, 2024, Paolo Bonzini wrote:
+> +4.143 KVM_MAP_MEMORY
+> +------------------------
+> +
+> +:Capability: KVM_CAP_MAP_MEMORY
+> +:Architectures: none
+> +:Type: vcpu ioctl
+> +:Parameters: struct kvm_map_memory (in/out)
+> +:Returns: 0 on success, < 0 on error
+> +
+> +Errors:
+> +
+> +  ========== ===============================================================
+> +  EINVAL     The specified `base_address` and `size` were invalid (e.g. not
+> +             page aligned or outside the defined memory slots).
 
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Wednesday, April 17, 2024 1:57 AM
-> >=20
-> > On Fri, 12 Apr 2024 01:21:21 -0700
-> > Yi Liu <yi.l.liu@intel.com> wrote:
-> >  =20
-> > > + */
-> > > +struct vfio_device_feature_pasid {
-> > > +	__u16 capabilities;
-> > > +#define VFIO_DEVICE_PASID_CAP_EXEC	(1 << 0)
-> > > +#define VFIO_DEVICE_PASID_CAP_PRIV	(1 << 1)
-> > > +	__u8 width;
-> > > +	__u8 __reserved;
-> > > +}; =20
-> >=20
-> > Building on Kevin's comment on the cover letter, if we could describe
-> > an offset for emulating a PASID capability, this seems like the place
-> > we'd do it.  I think we're not doing that because we'd like an in-band
-> > mechanism for a device to report unused config space, such as a DVSEC
-> > capability, so that it can be implemented on a physical device.  As
-> > noted in the commit log here, we'd also prefer not to bloat the kernel
-> > with more device quirks.
-> >=20
-> > In an ideal world we might be able to jump start support of that DVSEC
-> > option by emulating the DVSEC capability on top of the PASID capability
-> > for PFs, but unfortunately the PASID capability is 8 bytes while the
-> > DVSEC capability is at least 12 bytes, so we can't implement that
-> > generically either. =20
->=20
-> Yeah, that's a problem.
->=20
-> >=20
-> > I don't know there's any good solution here or whether there's actually
-> > any value to the PASID capability on a PF, but do we need to consider
-> > leaving a field+flag here to describe the offset for that scenario? =20
->=20
-> Yes, I prefer to this way.
->=20
-> > Would we then allow variant drivers to take advantage of it?  Does this
-> > then turn into the quirk that we're trying to avoid in the kernel
-> > rather than userspace and is that a problem?  Thanks,
-> >  =20
->=20
-> We don't want to proactively pursue quirks in the kernel.
->=20
-> But if a variant driver exists for other reasons, I don't see why it=20
-> should be prohibited from deciding an offset to ease the
-> userspace. =F0=9F=98=8A
+"outside the memslots" should probably be -EFAULT, i.e. keep EINVAL for things
+that can _never_ succeed.
 
-At that point we've turned the corner into an arbitrary policy decision
-that I can't defend.  A "worthy" variant driver can implement something
-through a side channel vfio API, but implementing that side channel
-itself is not enough to justify a variant driver?  It doesn't make
-sense.
+> +  EAGAIN     The ioctl should be invoked again and no page was processed.
+> +  EINTR      An unmasked signal is pending and no page was processed.
 
-Further, if we have a variant driver, why do we need a side channel for
-the purpose of describing available config space when we expect devices
-themselves to eventually describe the same through a DVSEC capability?
-The purpose of enabling variant drivers is to enhance the functionality
-of the device.  Adding an emulated DVSEC capability seems like a valid
-enhancement to justify a variant driver to me.
+I'm guessing we'll want to handle large ranges, at which point we'll likely end
+up with EAGAIN and/or EINTR after processing at least one page.
 
-So the more I think about it, it would be easy to add something here
-that hints a location for an emulated PASID capability in the VMM, but
-it would also be counterproductive to an end goal of having a DVSEC
-capability that describes unused config space.  The very narrow scope
-where that side-band channel would be useful is an unknown PF device
-which doesn't implement a DVSEC capability and without intervention
-simply behaves as it always has, without PASID support.
+> +  EFAULT     The parameter address was invalid.
+> +  EOPNOTSUPP The architecture does not support this operation, or the
+> +             guest state does not allow it.
 
-A vendor desiring such support can a) implement DVSEC in the hardware,
-b) implement a variant driver emulating a DVSEC capability, or c)
-directly modify the VMM to tell it where to place the PASID capability.
-I also don't think we should exclude the possibility that b) could turn
-into a shared variant driver that knows about multiple devices and has
-a table of free config space for each.  Option c) is only the last
-resort if there's not already 12 bytes of contiguous, aligned free
-space to place a DVSEC capability.  That seems unlikely.
+I would phrase this as something like:
 
-At some point we need to define the format and use of this DVSEC.  Do
-we allow (not require) one at every gap in config space that's at least
-12-bytes long and adjust the DVSEC Length to describe longer gaps, or do
-we use a single DVSEC to describe a table of ranges throughout extended
-(maybe even conventional) config space?  The former seems easier,
-especially if we expect a device has a large block of free space,
-enough for multiple emulated capabilities and described by a single
-DVSEC.  Thanks,
+                Mapping memory given for a GPA is unsupported by the
+                architecture, and/or for the current vCPU state/mode.
 
-Alex
+It's not that the guest state doesn't "allow" it, it's that it's explicitly
+unsupported because it's nonsensical without a GVA (or L2 GPA).
 
+> +  ========== ===============================================================
+> +
+> +::
+> +
+> +  struct kvm_map_memory {
+> +	/* in/out */
+> +	__u64 base_address;
+
+I think we should commit to this being limited to gpa mappings, e.g. go with
+"gpa", or "guest_physical_address" if we want to be verbose (I vote for "gpa").
+
+> +	__u64 size;
+> +	/* in */
+> +	__u64 flags;
+> +	__u64 padding[5];
+> +  };
+> +
+> +KVM_MAP_MEMORY populates guest memory in the page tables of a vCPU.
+
+I think we should word this very carefully and explicitly so that KVM doesn't
+commit to behavior that can't be guaranteed.  We might even want to use a name
+that explicitly captures the semantics, e.g. KVM_PRE_FAULT_MEMORY?
+
+Also, this doesn't populate guest _memory_, and "in the page tables of a vCPU"
+could be interpreted as the _guest's_ page tables.
+
+Something like:
+
+  KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
+  for the current vCPU state.  KVM maps memory as if the vCPU generated a
+  stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
+  CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
+
+> +When the ioctl returns, the input values are updated to point to the
+> +remaining range.  If `size` > 0 on return, the caller can just issue
+> +the ioctl again with the same `struct kvm_map_memory` argument.
+
+This is likely misleading.  Unless KVM explicitly zeros size on *every* failure,
+a pedantic reading of this would suggest that userspace can retry and it should
+eventually succeed.
+
+> +In some cases, multiple vCPUs might share the page tables.  In this
+> +case, if this ioctl is called in parallel for multiple vCPUs the
+> +ioctl might return with `size` > 0.
+
+Why?  If there's already a valid mapping, mission accomplished.  I don't see any
+reason to return an error.  If x86's page fault path returns RET_PF_RETRY, then I
+think it makes sense to retry in KVM, not punt this to userspace.
+
+> +The ioctl may not be supported for all VMs, and may just return
+> +an `EOPNOTSUPP` error if a VM does not support it.  You may use
+> +`KVM_CHECK_EXTENSION` on the VM file descriptor to check if it is
+> +supported.
+
+Why per-VM?  I don't think there's any per-VM state that would change the behavior.
+The TDP MMU being enabled is KVM wide, and the guest state modifiers that cause
+problems are per-vCPU, not per-VM.
+
+Adding support for KVM_CHECK_EXTENSION on vCPU FDs is probably overkill, e.g. I
+don't think it would add much value beyond returning EOPNOTSUPP for the ioctl()
+itself.
+
+> +Also, shadow page tables cannot support this ioctl because they
+> +are indexed by virtual address or nested guest physical address.
+> +Calling this ioctl when the guest is using shadow page tables (for
+> +example because it is running a nested guest) will also fail.
+
+Running a nested guest using TDP.
+
+> +
+> +`flags` must currently be zero.
+> +
+> +
+>  5. The kvm_run structure
+>  ========================
+>  
+> -- 
+> 2.43.0
+> 
+> 
 
