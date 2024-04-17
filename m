@@ -1,148 +1,173 @@
-Return-Path: <kvm+bounces-14917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5D98A79F1
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 02:41:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 155C18A7A38
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 03:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6596DB2147E
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 00:41:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCE11C2146D
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 01:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51545EBB;
-	Wed, 17 Apr 2024 00:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E29F4428;
+	Wed, 17 Apr 2024 01:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MBSL+D/0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fmMEKnsB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48AEA364
-	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 00:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23AB463A9;
+	Wed, 17 Apr 2024 01:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713314473; cv=none; b=D72P64n7beIMOTVIGS/uQAbdJop65DzENLFPVL+DCSOzCnS9Nhw/YUDlWqXc+2dVGhfkzuRC5zTIM3+tZ9U/LOMteHJ3PZ/W+H6iW1Jl+k/kxZuYZ4EZW0MF3V/Lg1AOQuysgf43Ufa32i1D9F/UzPiOHUsVb9MbWcRN/KrS764=
+	t=1713318053; cv=none; b=bb5J5Mx8G+L6mjwrxYHk5HGanjV4IGkDGyciUYCPVv0OwLDf/S/YrsC1JWKCdoiDzT5vmOzUFxHLlDrIIIM04UxQ7iCpfqp4T8fvxn65jPL4XIWA6lMLc+WrZ6ubw6uFvPFQURauxzKbb9nf8lSLv46Ybhh/IneMDD+qNOn4cbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713314473; c=relaxed/simple;
-	bh=zvD4XMdGTzFY0Wym9GpZCUT0mTRBCcf3hzycyqsbzCY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KOj4o807vfEGvEbodWN32aJaRQ6o2CXLrjM0jci+JfNg9vI0Dbhztx/oKzRX8vwx/v60X73F9vbG10oPG1HwOMYHkgIwRxVguNKJCt+2MKWt8GLIhbN4kfxl9NkDIuabZdZ87RPoNHk5RpKGvwSZ8qrwlURHqecEC+VguTmxcLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MBSL+D/0; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a4b48d7a19so234108a91.1
-        for <kvm@vger.kernel.org>; Tue, 16 Apr 2024 17:41:12 -0700 (PDT)
+	s=arc-20240116; t=1713318053; c=relaxed/simple;
+	bh=qd+oXhdytQdMGQjfxPuaaFQdJ9/xiGThuh+6RN0NtNo=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=adLmtgUh4V0AqymCuK3y6uYoznhrLK18T2UUHnrhCWx3BcPoQDOJ9vJOxrvGbVR+naM+pDYRVQkSN5a9xwHhnn5phev7Et450FiUNkZAsJ/l5YjQ3A0p+KuQq9XdgfUSH/phaHTtcNb6ooofBusUwqKpiBuiO0Jg2YQbdDA/JiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fmMEKnsB; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2a614b0391dso3473765a91.1;
+        Tue, 16 Apr 2024 18:40:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713314471; x=1713919271; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xsd2FsNYrExxge3t8q+jEIhidNdHyk8FEItAsJ0XUOo=;
-        b=MBSL+D/03Z17yEnR6uTzeH6hw9OqjWeWNVmkpOdfKkqHHmuimN/zCQv4TwjIol6nkY
-         dNbqssCHQ5zIRbmsPpCfFiwpmSLQrntlbIO7JMuhMvCHPVj7Jr5cM89f8q1iVBO5Z+W6
-         CjIUgVDgFGviEZytBpJiXZt+YXINme0KcYB0rsxcsjd+qYdZ43QCzW37X+u/k7///trk
-         6vqYaChENzQJqdGJrCyIReOOGhofeFR0aBJSXzome9d8fxK4NRLm5vK7Fve0iUR1NaV6
-         EKbB62JtYn0pxSJ20+gIVoiHk8VzJnVitWYheMrQREnkpo1IN/OFwRucIOW++Mq12dLT
-         uAnw==
+        d=gmail.com; s=20230601; t=1713318051; x=1713922851; darn=vger.kernel.org;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m6kw6dCQ+cydDghFyBvYaAs0p3Ma1QKkt6qhRC1Ap34=;
+        b=fmMEKnsB4rbUTUAs93w1/FF9uu3HbInuwO9K6tQhYafnF18FEDNXguh6p4yZ24Kc7q
+         4feeTdD9aecW4x3mdUmzSmEoa7ixdYUwv3uSK/Uwx9cwjK7mrtv4dAOFZIqowsW86HW8
+         ypa+9wM0O9JXuG1ozU04rLKhtkjtTVsDr8x7/kTaTsNNTPz2FHHc4eOGHmCInPMwS2pR
+         V/EQW9atcHDDWd/bfys2SxiyWyTAY3C6FUD8vOHXRqe7+IxOPHGgRJLQABHM5DlZ5NAs
+         PzqOXuMqs5E9bAZ3IINaamc6RxOGQY8m7gt0ii8wlNKZSoWKpOThTwp3CZ2SrvTXMa3U
+         MRUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713314471; x=1713919271;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xsd2FsNYrExxge3t8q+jEIhidNdHyk8FEItAsJ0XUOo=;
-        b=i9ZYrJix7sscKbVYpSHl0R/ZDoAflcdR0EoaaPBkJFpt+C44yJMloZint2qYcXssR6
-         I8yqjh5tTnFjSlFFYRWx01wAh82XHoQNW/z+4dm1Yg+XtAV4J8VbEL3LqFvihxhURHsW
-         JzI6RBq9jX5G9HjlVd8z+JjomHgdv87r8DFu8NbmvIWSR8LCHlr/9JlV7KbPrhYeJzey
-         CEA8wzIrlXaYwZVYdVcrgSsCu5lhkqmnG9clL1G2yHOICwKj7VK63xZ1sqP/PCLgkGZM
-         98JbGcrK5cV7xz76lsEwKxf0dronADZVWwzwFvJQv2N5L7hGmpLx83DkNZN0RbR3FRYQ
-         tBLg==
-X-Gm-Message-State: AOJu0Ywo+xD5RVtAQSskbHSKqvaMdV/mfLJXYMfBzQK5oRWJ4Hm4azJG
-	Zt7TndFXyqARCwJNKXjiZYkIPZODIR0ZiKGvYZU/pAkUmAmejGM5toK/c01mz/1lVdBBOGd8E09
-	B7w==
-X-Google-Smtp-Source: AGHT+IFq1gDvPYY8ymsQjmyAfQZkOKYaHVR9royRVZPhqq+SmgF9D/N7aBkyaE+/yEqqmMSivsChBS4uIBo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:bd8d:b0:2a4:2d22:6721 with SMTP id
- z13-20020a17090abd8d00b002a42d226721mr30200pjr.2.1713314471395; Tue, 16 Apr
- 2024 17:41:11 -0700 (PDT)
-Date: Tue, 16 Apr 2024 17:41:10 -0700
-In-Reply-To: <20240404232651.1645176-1-venkateshs@chromium.org>
+        d=1e100.net; s=20230601; t=1713318051; x=1713922851;
+        h=in-reply-to:references:cc:to:from:subject:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=m6kw6dCQ+cydDghFyBvYaAs0p3Ma1QKkt6qhRC1Ap34=;
+        b=bd7zp+eJMedMxYNCQf77PgPGDiec10l0phN6LcJNvTFmyar6lrQbvfQzuRuSlVzNuO
+         UVs/fVSa80zTI2LM4sE7aHQHga8uiwWo1v9+y7iyZY1uu/84nqiQmDdWTTwNiFC+jrC0
+         IWgxWdmeEewVy3t8/J0/A/baDSMcd9xsvCHnD4aOH4eduKjPaK6NcRtZ0S2wgUP62OLe
+         OMf1iaLP6cvGN4A5ZEJJcS64zRGCaq17hUOVnHrqu+Gbg2qD0HvWdoB533zYsbcJ+BB6
+         19fNaV/taub5F2f1fBicKmAvUUiwIMez+2T4wB++ZeKJxjmB1sfWh1oFmTeUOjswsh61
+         ouGw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCmoW15yQnF0RMfoMV2SKKg9zbhH1h/HYLUt+5eni4z0S8C0uJsMC4SpDwSrGa/0MqLqiNYmnRXVAdXmzqebKjoMCd+F7M427p7441HcRtancz6ErBzdX/A9N5vkDerQ==
+X-Gm-Message-State: AOJu0YxZES6vPn1gvVuo5Q3HleUM/okkcyH8vJa0xvAT8Q/PwSmMdU8e
+	DfY1DgqVeib2HPrYi2D4kwMUtryhItmFScz77vDHkMUMgZs6ybf2
+X-Google-Smtp-Source: AGHT+IEuN9i6b2kO7+yPYNxq5M/Sp0bpfJQ/y0HJK8y0kGe81d5INGjTCRH6pUQ3OUq2XgGUoTKysA==
+X-Received: by 2002:a17:90a:d24d:b0:2a5:c3a7:39d9 with SMTP id o13-20020a17090ad24d00b002a5c3a739d9mr11513430pjw.45.1713318051302;
+        Tue, 16 Apr 2024 18:40:51 -0700 (PDT)
+Received: from localhost (gla2734477.lnk.telstra.net. [110.145.172.154])
+        by smtp.gmail.com with ESMTPSA id p9-20020a17090a428900b002a3a154b974sm250417pjg.55.2024.04.16.18.40.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Apr 2024 18:40:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240404232651.1645176-1-venkateshs@chromium.org>
-Message-ID: <Zh8aphM4dbC8DFIa@google.com>
-Subject: Re: [PATCH] KVM: Remove kvm_make_all_cpus_request_except
-From: Sean Christopherson <seanjc@google.com>
-To: Venkatesh Srinivas <venkateshs@chromium.org>
-Cc: kvm@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 17 Apr 2024 11:40:40 +1000
+Message-Id: <D0M0K25RUX0G.1FCOQS1GR21N4@gmail.com>
+Subject: Re: [RFC kvm-unit-tests PATCH v2 00/14] add shellcheck support
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Thomas Huth" <thuth@redhat.com>, "Andrew Jones"
+ <andrew.jones@linux.dev>
+Cc: "Paolo Bonzini" <pbonzini@redhat.com>, "Alexandru Elisei"
+ <alexandru.elisei@arm.com>, "Eric Auger" <eric.auger@redhat.com>, "Janosch
+ Frank" <frankja@linux.ibm.com>, "Claudio Imbrenda"
+ <imbrenda@linux.ibm.com>, =?utf-8?q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>,
+ "David Hildenbrand" <david@redhat.com>, "Shaoqin Huang"
+ <shahuang@redhat.com>, "Nikos Nikoleris" <nikos.nikoleris@arm.com>, "David
+ Woodhouse" <dwmw@amazon.co.uk>, "Ricardo Koller" <ricarkol@google.com>,
+ "rminmin" <renmm6@chinaunicom.cn>, "Gavin Shan" <gshan@redhat.com>, "Nina
+ Schoetterl-Glausch" <nsg@linux.ibm.com>, "Sean Christopherson"
+ <seanjc@google.com>, <kvm@vger.kernel.org>, <kvmarm@lists.linux.dev>,
+ <kvm-riscv@lists.infradead.org>, <linux-s390@vger.kernel.org>
+X-Mailer: aerc 0.17.0
+References: <20240406123833.406488-1-npiggin@gmail.com>
+ <a7cdd98e-93c1-4546-bba4-ac3a465f01f5@redhat.com>
+ <D0L86IDPMTI3.2XFZ8C6UCVD1B@gmail.com>
+ <3ed01604-3b9e-4131-9ec0-c354c6d65cc8@redhat.com>
+In-Reply-To: <3ed01604-3b9e-4131-9ec0-c354c6d65cc8@redhat.com>
 
-On Thu, Apr 04, 2024, Venkatesh Srinivas wrote:
-> except argument was not used.
+On Tue Apr 16, 2024 at 2:46 PM AEST, Thomas Huth wrote:
+> On 16/04/2024 05.26, Nicholas Piggin wrote:
+> > On Mon Apr 15, 2024 at 9:59 PM AEST, Thomas Huth wrote:
+> >> On 06/04/2024 14.38, Nicholas Piggin wrote:
+> >>> Tree here
+> >>>
+> >>> https://gitlab.com/npiggin/kvm-unit-tests/-/tree/shellcheck
+> >>>
+> >>> Again on top of the "v8 migration, powerpc improvements" series. I
+> >>> don't plan to rebase the other way around since it's a lot of work.
+> >>> So this is still in RFC until the other big series gets merged.
+> >>>
+> >>> Thanks to Andrew for a lot of review. A submitted the likely s390x
+> >>> bugs separately ahead of this series, and also disabled one of the
+> >>> tests and dropped its fix patch as-per review comments. Hence 3 fewer
+> >>> patches. Other than that, since last post:
+> >>>
+> >>> * Tidied commit messages and added some of Andrew's comments.
+> >>> * Removed the "SC2034 unused variable" blanket disable, and just
+> >>>     suppressed the config.mak and a couple of other warnings.
+> >>> * Blanket disabled "SC2235 Use { ..; } instead of (..)" and dropped
+> >>>     the fix for it.
+> >>> * Change warning suppression comments as per Andrew's review, also
+> >>>     mention in the new unittests doc about the "check =3D" option not
+> >>>     allowing whitespace etc in the name since we don't cope with that=
+.
+> >>>
+> >>> Thanks,
+> >>> Nick
+> >>>
+> >>> Nicholas Piggin (14):
+> >>>     Add initial shellcheck checking
+> >>>     shellcheck: Fix SC2223
+> >>>     shellcheck: Fix SC2295
+> >>>     shellcheck: Fix SC2094
+> >>>     shellcheck: Fix SC2006
+> >>>     shellcheck: Fix SC2155
+> >>>     shellcheck: Fix SC2143
+> >>>     shellcheck: Fix SC2013
+> >>>     shellcheck: Fix SC2145
+> >>>     shellcheck: Fix SC2124
+> >>>     shellcheck: Fix SC2294
+> >>>     shellcheck: Fix SC2178
+> >>>     shellcheck: Fix SC2048
+> >>>     shellcheck: Suppress various messages
+> >>
+> >> I went ahead and pushed a bunch of your patches to the k-u-t master br=
+anch
+> >> now. However, there were also some patches which did not apply cleanly=
+ to
+> >> master anymore, so please rebase the remaining patches and then send t=
+hem again.
+> >=20
+> > Hey Thomas,
+> >=20
+> > Yeah the sc patches were based on top of the big series, so some
+> > collisions expected. I'll look at rebasing.
+>
+> Ah, ok, we can also try to get in the big series first ... I just lack=20
 
-Please write changelogs with a bit more verbosity.  This one is easy enough to
-fixup when applying, but for the future...
+They should have come first, but I'd written the multi migration code
+before Andrew suggested adding sc, and it looked like hard work to
+rebase the other way. I'll try again.
 
-> Signed-off-by: Venkatesh Srinivas <venkateshs@chromium.org>
-> ---
->  include/linux/kvm_host.h |  2 --
->  virt/kvm/kvm_main.c      | 10 +---------
->  2 files changed, 1 insertion(+), 11 deletions(-)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 9807ea98b568..5483a6af82a5 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -193,8 +193,6 @@ static inline bool is_error_page(struct page *page)
->  bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
->  				 unsigned long *vcpu_bitmap);
->  bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req);
-> -bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
-> -				      struct kvm_vcpu *except);
->  
->  #define KVM_USERSPACE_IRQ_SOURCE_ID		0
->  #define KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID	1
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d1fd9cb5d037..53351febb813 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -311,8 +311,7 @@ bool kvm_make_vcpus_request_mask(struct kvm *kvm, unsigned int req,
->  	return called;
->  }
->  
-> -bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
-> -				      struct kvm_vcpu *except)
-> +bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
->  {
->  	struct kvm_vcpu *vcpu;
->  	struct cpumask *cpus;
-> @@ -326,8 +325,6 @@ bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
->  	cpumask_clear(cpus);
->  
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
+> enough spare time for reviewing currently, so it might take a while :-/
 
-Nit, curly braces are no longer necessary (also can fixup when applying).
+Understandable. You've done heaps of reviewing already so I really
+appreciate it.
 
-> -		if (vcpu == except)
-> -			continue;
->  		kvm_make_vcpu_request(vcpu, req, cpus, me);
->  	}
->  
-> @@ -336,11 +333,6 @@ bool kvm_make_all_cpus_request_except(struct kvm *kvm, unsigned int req,
->  
->  	return called;
->  }
-> -
-> -bool kvm_make_all_cpus_request(struct kvm *kvm, unsigned int req)
-> -{
-> -	return kvm_make_all_cpus_request_except(kvm, req, NULL);
-> -}
->  EXPORT_SYMBOL_GPL(kvm_make_all_cpus_request);
->  
->  void kvm_flush_remote_tlbs(struct kvm *kvm)
-> -- 
-> 2.44.0.478.gd926399ef9-goog
-> 
+Thanks,
+Nick
 
