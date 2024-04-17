@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-14920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D93AC8A7A97
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 04:32:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 208CB8A7AD9
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 05:05:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73D061F21FCB
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 02:32:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE5C71F22548
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 03:05:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 428078BFA;
-	Wed, 17 Apr 2024 02:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EE7BA46;
+	Wed, 17 Apr 2024 03:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hYbPpnd0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g8jRRMsN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C496FA8
-	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 02:31:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F3E7470;
+	Wed, 17 Apr 2024 03:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713321115; cv=none; b=azoK+KwWUz/mdqva8/n2VcB1ygasI8fByHWEbfVSXKhi/Z6noNNy8rm/MX2JCl8UtRpkoevU6cl8YKz9zwsf6W64giPlo57NTqIknqPixPyneAjYsM6sDRtJITyO4dqnMx2mZj/ZvC02x+zqWWBeN3fIILbJi/aeOnC/Yw3zSqc=
+	t=1713323114; cv=none; b=paaVGVdZBJCCC82UtSR4150Cf44ZezPY5/O3uMvprRTcuB+9q4kJbVnfKfVcwVAtKzAv0sInJOOakq49zYFQO4S56Vs4F60gmalYwpIUdY2brWzF+sjqqERo5c5Y1CKHXbvRAv1GtIY8+yJ0rwlOdnR33PDLCWLBiCj4ngqQWIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713321115; c=relaxed/simple;
-	bh=lfgRoJpHnPpBk8HQOm7R0ffOnvDHRrB135HSdBlp87w=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=izePPXhp88cCq3QdNmuBLpiqdkTWV7wS6+ztz/0Bqd3fVPwwYeUB0qNDccPGeG2HPaMq6aUwtS80GXza+JtYwyz87yzKtQFOEZ6S3nb1rLO19XSUsWOr+4y7ZWU5NlLoy6tEmP+K2lP72j6h7vyzS4Zd69VmdgydK74VuXYbCcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hYbPpnd0; arc=none smtp.client-ip=192.198.163.18
+	s=arc-20240116; t=1713323114; c=relaxed/simple;
+	bh=Ba8ZIoV9AFjElPasNWGPuIvN3p9BEsdOKGL+1Iz5T/A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q8UiUuA0Wikd/sKQ1/ZqQenBQw+S1e19IycWwlo0NwvXnZeGEndwUxRY+qWBwCtl4GZrWxxxFCOxiWRSfPln62mcUVc2inwEoTDZo5G9qmOESmsvIvYRVo+cOv+HMyqNPw2PsmMkx6VYRVkPEMaHeuawbrxiZ6WbqfHxqRALNLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g8jRRMsN; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713321114; x=1744857114;
-  h=message-id:date:mime-version:cc:subject:to:references:
+  t=1713323113; x=1744859113;
+  h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=lfgRoJpHnPpBk8HQOm7R0ffOnvDHRrB135HSdBlp87w=;
-  b=hYbPpnd0kZd9ql9saq9VpVz9zK+sgsVK01q5WFvNkH74S/Q0TorEqTbg
-   RkP4Flk65Vl569fM17Z6stsC3VilauYLFF3FG/qe8jF3EQK886FNfqwOJ
-   cMwTa1AkuP8AToZasNJeznRrUm5oX4RBY8l88PLEL2qbuCnrh7Dxt9JwY
-   wV2w7jxcvbF930NeG+BfVniMItpqQYwmmDZFEBikTfAyt0G8zxXc8h9JW
-   6ZMy7VbCDyq6rySB/BT88SkPvtVjH/v+2afRyPy2mNMZue+70o60diwsV
-   V77EVQ5LBydbcGowmqt+DRWZz/Qs0Eq5Vm/uVwBj9KkwVH5CB7nTuBW26
+  bh=Ba8ZIoV9AFjElPasNWGPuIvN3p9BEsdOKGL+1Iz5T/A=;
+  b=g8jRRMsN7piMUDpL8INLkA2KzJfiuPcLICBPb7MXvkkWvdA4zr+3H2VT
+   COTHMjk3Jk1D/j/6AFsP4PSa+ibutYFHV/nOxeRL561Sz8WCQZUrIf+MZ
+   4vlkTHjyAdJUufPLbf+TrnHM08oPgp8++M5PoaJXFUrdbq32fy0Edg/Ej
+   2gPmhyoYdhbCT7z/+qjM9WzSMVY0b6aEEd26CPv3RtZfw6o3bihS61JlB
+   +LSopdW9O8eGjVhlQlROIqb57bsial8jo3PIJGDN/K5m+keZ3WXsBczMB
+   o6QAwrM6rbcpQ0AA1qaCXGoFdrtHPN5Mglpv3zKpM83Q9VS+1LgItLOEZ
    w==;
-X-CSE-ConnectionGUID: ms10Mo/BTxSPLcGWXYRRaw==
-X-CSE-MsgGUID: tO4kgbV7RDyScxPySCt8UQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8657398"
-X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
-   d="scan'208";a="8657398"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 19:31:53 -0700
-X-CSE-ConnectionGUID: ixh1WPkDSUaD3plApszSvQ==
-X-CSE-MsgGUID: rS+7Rz3DQz6sgNI/HEfOFg==
+X-CSE-ConnectionGUID: u8pyolaaTLGZsvIQVEu74w==
+X-CSE-MsgGUID: D67qaksMQMCsxWV70T6lHA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8720974"
+X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
+   d="scan'208";a="8720974"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 20:05:11 -0700
+X-CSE-ConnectionGUID: dp/KWL6bRM+0UBrKHB5CAQ==
+X-CSE-MsgGUID: foXm7HnxRJ6HTGS9uHWSEw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
-   d="scan'208";a="27131122"
-Received: from unknown (HELO [10.239.159.127]) ([10.239.159.127])
-  by fmviesa004.fm.intel.com with ESMTP; 16 Apr 2024 19:31:49 -0700
-Message-ID: <a0543205-18a8-4878-8b24-3d87bee24645@linux.intel.com>
-Date: Wed, 17 Apr 2024 10:30:35 +0800
+X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
+   d="scan'208";a="22549772"
+Received: from unknown (HELO [10.238.13.36]) ([10.238.13.36])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 20:05:07 -0700
+Message-ID: <ac0e50a6-6da4-4e07-8422-0e9f477c3fb3@linux.intel.com>
+Date: Wed, 17 Apr 2024 11:05:05 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,82 +67,89 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, alex.williamson@redhat.com,
- robin.murphy@arm.com, eric.auger@redhat.com, nicolinc@nvidia.com,
- kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev,
- zhenzhong.duan@intel.com, jacob.jun.pan@intel.com
-Subject: Re: [PATCH v2 10/12] iommu/vt-d: Return if no dev_pasid is found in
- domain
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com
-References: <20240412081516.31168-1-yi.l.liu@intel.com>
- <20240412081516.31168-11-yi.l.liu@intel.com>
- <ed73dfc1-a6a2-4a19-b716-7c1f245db75b@linux.intel.com>
- <373e52b4-e663-4b2d-9a6b-feaf3a93892b@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <373e52b4-e663-4b2d-9a6b-feaf3a93892b@intel.com>
+Subject: Re: [PATCH v19 102/130] KVM: TDX: handle EXCEPTION_NMI and
+ EXTERNAL_INTERRUPT
+To: Isaku Yamahata <isaku.yamahata@intel.com>, Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ isaku.yamahata@linux.intel.com
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <3ac413f1d4adbac7db88a2cade97ded3b076c540.1708933498.git.isaku.yamahata@intel.com>
+ <ZgpuqJW365ZfuJao@chao-email>
+ <20240403185103.GK2444378@ls.amr.corp.intel.com>
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240403185103.GK2444378@ls.amr.corp.intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 4/16/24 5:21 PM, Yi Liu wrote:
-> 
-> n 2024/4/15 14:04, Baolu Lu wrote:
->> On 4/12/24 4:15 PM, Yi Liu wrote:
->>> If no dev_pasid is found, it should be a problem of caller. So a WARN_ON
->>> is fine, but no need to go further as nothing to be cleanup and also it
->>> may hit unknown issue.
->>
->> If "... it should be a problem of caller ...", then the check and WARN()
->> should be added in the caller instead of individual drivers.
->>
+
+
+On 4/4/2024 2:51 AM, Isaku Yamahata wrote:
+> On Mon, Apr 01, 2024 at 04:22:00PM +0800,
+> Chao Gao <chao.gao@intel.com> wrote:
+>
+>> On Mon, Feb 26, 2024 at 12:26:44AM -0800, isaku.yamahata@intel.com wrote:
+>>> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >>>
->>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+>>> Because guest TD state is protected, exceptions in guest TDs can't be
+>>> intercepted.  TDX VMM doesn't need to handle exceptions.
+>>> tdx_handle_exit_irqoff() handles NMI and machine check.  Ignore NMI and
+>> tdx_handle_exit_irqoff() doesn't handle NMIs.
+> Will it to tdx_handle_exception().
+
+I don't get  why tdx_handle_exception()?
+
+NMI is handled in tdx_vcpu_enter_exit() prior to leaving the safety of 
+noinstr, according to patch 098.
+https://lore.kernel.org/kvm/88920c598dcb55c15219642f27d0781af6d0c044.1708933498.git.isaku.yamahata@intel.com/
+
+@@ -837,6 +857,12 @@ static noinstr void tdx_vcpu_enter_exit(struct 
+vcpu_tdx *tdx)
+      WARN_ON_ONCE(!kvm_rebooting &&
+               (tdx->exit_reason.full & TDX_SW_ERROR) == TDX_SW_ERROR);
+
++    if ((u16)tdx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
++        is_nmi(tdexit_intr_info(vcpu))) {
++        kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
++        vmx_do_nmi_irqoff();
++        kvm_after_interrupt(vcpu);
++    }
+      guest_state_exit_irqoff();
+  }
+
+>
+>
+>>> machine check and continue guest TD execution.
+>>>
+>>> For external interrupt, increment stats same to the VMX case.
+>>>
+>>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 >>> ---
->>>   drivers/iommu/intel/iommu.c | 3 ++-
->>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>> arch/x86/kvm/vmx/tdx.c | 23 +++++++++++++++++++++++
+>>> 1 file changed, 23 insertions(+)
 >>>
->>> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
->>> index df49aed3df5e..fff7dea012a7 100644
->>> --- a/drivers/iommu/intel/iommu.c
->>> +++ b/drivers/iommu/intel/iommu.c
->>> @@ -4614,8 +4614,9 @@ static void intel_iommu_remove_dev_pasid(struct 
->>> device *dev, ioasid_t pasid,
->>>               break;
->>>           }
->>>       }
->>> -    WARN_ON_ONCE(!dev_pasid);
->>>       spin_unlock_irqrestore(&dmar_domain->lock, flags);
->>> +    if (WARN_ON_ONCE(!dev_pasid))
->>> +        return;
+>>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>>> index 0db80fa020d2..bdd74682b474 100644
+>>> --- a/arch/x86/kvm/vmx/tdx.c
+>>> +++ b/arch/x86/kvm/vmx/tdx.c
+>>> @@ -918,6 +918,25 @@ void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+>>> 		vmx_handle_exception_irqoff(vcpu, tdexit_intr_info(vcpu));
+>>> }
+>>>
+>>> +static int tdx_handle_exception(struct kvm_vcpu *vcpu)
+
+Should this function be named as tdx_handle_exception_nmi() since it's 
+checking nmi as well?
+
+>>> +{
+>>> +	u32 intr_info = tdexit_intr_info(vcpu);
+>>> +
+>>> +	if (is_nmi(intr_info) || is_machine_check(intr_info))
+>>> +		return 1;
 >>
->> The iommu core calls remove_dev_pasid op to tear down the translation on
->> a pasid and park it in a BLOCKED state. Since this is a must-be-
->> successful callback, it makes no sense to return before tearing down the
->> pasid table entry.
-> 
-> but if no dev_pasid is found, does it mean there is no pasid table entry
-> to be destroyed? That's why I think it deserves a warn, but no need to
-> continue.
 
-The pasid table is allocated in the iommu probe path, hence the entry is
-*always* there. Teardown a pasid translation just means zeroing out all
-fields of the entry.
-
-> 
->>
->>  From the Intel iommu driver's perspective, the pasid devices have
->> already been tracked in the core, hence the dev_pasid is a duplicate and
->> will be removed later, so don't use it for other purposes.
-> 
-> 
-> good to know it. But for the current code, if we continue, it would hit
-> call trace in the end in the intel_iommu_debugfs_remove_dev_pasid().
-
-The debugfs interface should be designed to be self-contained. That
-means, even if one passes a NULL pointer to
-intel_iommu_debugfs_remove_dev_pasid(), it should handle it gracefully.
-
-Best regards,
-baolu
 
