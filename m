@@ -1,121 +1,247 @@
-Return-Path: <kvm+bounces-14989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 074818A882B
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 17:52:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF11E8A8893
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 18:13:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A3D8B25458
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 15:52:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ACD11F259C5
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 16:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF249148305;
-	Wed, 17 Apr 2024 15:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF54915B567;
+	Wed, 17 Apr 2024 16:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WM7nA/sL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G6+lPSUl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C3E1487C0
-	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 15:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F1D9148FF0
+	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 16:11:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713369142; cv=none; b=ICAmcZnBv+XAzMkAjhRbAwL4ToLy992v9v8wex7VFc6YbmBgUTjyFb2GbBZdUYvjh84p2DRjn0WTdqQ4CFW5KXXNopeUNU5n1ABB5OgKc2hH9kOogXP3+R1hhbaifE7kEaSVSwP1t6lbkbTqz3/QCKZoFn8UqvoVZMsxDhPMDzw=
+	t=1713370292; cv=none; b=aV7A9J7bK7TDmVwFoh4xxwpyiwpUITOAVrhnXEgaRVKSTjGS6RMXLlC5TTOAhuWAheM9TR9eMLe3y7FzD9NpuaFyBu9gLdapCpr3FjNdLgjb56lvGjd2QrhoHrG2Tg0dOrEbwWUq7pBA5+20TRF5KPjo6EJTaFd1KC89FD/0ip0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713369142; c=relaxed/simple;
-	bh=d6wYdf8GBT2sfnqVX9ehWmUTyi1CnG5W0K3/E5HKxbs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Gu6eUIz9oR4t35Eh4wrAcbkIjhPxUwa/Bf/yJpb8PgPeGuDR/6wceqyETeWiJudd2HQ/27bgWZ91th9dgJjCWBWaGR91ouecdDMl8EfNk4p+LlSMW9JtlOYr1WjHflwsauQ8WFR0kxm5gTOAG1JVLfHaX01mbwdKif3r7fuBLDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WM7nA/sL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713369139;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d6wYdf8GBT2sfnqVX9ehWmUTyi1CnG5W0K3/E5HKxbs=;
-	b=WM7nA/sLJ3zUoozqT1LVkUJ9BBlJw2jXfLabLO/mxHOHYmYDDqknLE558EzpOAW8NgJDyB
-	vDxD/kjfciaNJxzV6WqWtCwaMr3PxDEzb0gIEcstRSOoBo2IuMzXX/s1WukHOYr0FhxxVe
-	Q0Vhq26jIsuJHaXwqZUQvxmWHcYwovI=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-591-1FufNZcPPb2I9TZeyAumyA-1; Wed, 17 Apr 2024 11:52:18 -0400
-X-MC-Unique: 1FufNZcPPb2I9TZeyAumyA-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2a5457a8543so5137088a91.0
-        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 08:52:18 -0700 (PDT)
+	s=arc-20240116; t=1713370292; c=relaxed/simple;
+	bh=Xv58JPBMkvjqeTUuWpAmGROcJfdavCAx5eUeGZ+QKbs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OEE3z9yddCqDDAU0JVW3SeBiv7gVTsaOrtsUvbZL0uCayWdzTW59yzeSWMHbjDQqIpgZ5qZD0/Snp+Qzsrm+yZ4EwcB9ay2oeYhslmtHdnGPJY64KUVTOMfBXu8JrEssX0SaD3VatfeeWRhcWKJHqwllBHsQkq48S+6DNdQgJV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G6+lPSUl; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61ab7fc5651so58097287b3.2
+        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 09:11:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713370290; x=1713975090; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6K92tAN08KHDtbc83C/Gfrb2VXY13bOFkYmFFlvk/bM=;
+        b=G6+lPSUl0S9c7EatAnRCShOiab1KZyn4G/1xJF+e3+rHSOvoErmQWRZzI0VD6i1ydr
+         WpoL/8ctCbjr47xY1z+QnArVSkNe/GMHBm44xqxsMdvHx0dkSgcjapyyYFhh+KI6DQBb
+         e6RdwhS+DBa66HYNlm0gOrPhWte14pZ0H4SD4LuuAD3DQ8pN1HQsdt+e9t6YZhZI+HB4
+         OWoFIg0y16KU9BE7tEwr0PKGk++8VknDGz1nDFCG75ijBCrTzhZrixloN8tMq+6PWILX
+         H7iNywKGW37QsO4bO++j92pheRrd4i2rgGBb9bKLiQkiWTWaIbbEYIZ5kJ1BvoUPDOHS
+         NjAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713369137; x=1713973937;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d6wYdf8GBT2sfnqVX9ehWmUTyi1CnG5W0K3/E5HKxbs=;
-        b=qEqThyl9BYJFi3hOygZI9oe4OcuEZ/xoodE1FY3sOciOStPY2lWcaUYrGorhx32O+U
-         q4MJyLITyfsvI9RF4Gi1n2HdMzRHGrwk8FjYbxGja+iJgeu6eRS8RhcrF2duj/thxGUF
-         gi7BUd7tIi56hdyG2HWGRQqLTaJ92kRrUq28/FEaycyL864QU9ZHBZ2n7k5qPiQvXjNx
-         UIb13neoM7617euqMDHmmTDAFM4E4b8+O9liMKu7WQmwn77um5bN7QxBzWMRDJR9Ib9C
-         i+Vaagqq7DghIQXcNtaMAbcjkiIzCUzhC21ZGTgt8qwKEnPK+sbavWYt62xy5+Az/lPl
-         YPdA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQoiJBAld6/ZoPYGXcKQxCW6ktyq8rTDsfxyjLj+9s/BSFrneDSSNDFCCxriXwiUNh8lsGLOwCAMuV96R3CabGjSEA
-X-Gm-Message-State: AOJu0YxCuu9j5ZSckGXzQJR0/u0pj5lWI9PNxejTqx347OxtmgQCUmWH
-	CMhTGpveY8PC7mYBq4vJXEvhX49dtosuyxnYC6i2pEqG3UtI72GIohUCsAeqPLRAbWEPMd8ZvtN
-	eccfzyQKmovH97gOpxF9l9FUgrvHN9g0VsKuJXUPZAnFJRzx0D1CyaVX+UQctspCe8PdR8Aa8VO
-	DM0zwD/bwwEVBx0e8ZFSXjXhGg
-X-Received: by 2002:a17:90a:f507:b0:2a2:bc9d:f44f with SMTP id cs7-20020a17090af50700b002a2bc9df44fmr13568198pjb.13.1713369137259;
-        Wed, 17 Apr 2024 08:52:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGrwgkJpJ6yrADjqJeDHRbvSm/QmomCjDCukl/vp4hRX+B1cOq6oqnam+PyQ/LHk6FBukBta+2ZpaJGDJsgFtw=
-X-Received: by 2002:a17:90a:f507:b0:2a2:bc9d:f44f with SMTP id
- cs7-20020a17090af50700b002a2bc9df44fmr13568177pjb.13.1713369136809; Wed, 17
- Apr 2024 08:52:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713370290; x=1713975090;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6K92tAN08KHDtbc83C/Gfrb2VXY13bOFkYmFFlvk/bM=;
+        b=oWJ295uTucoJOr/2+W1oTCay9MM8kfthLkj+6OyiEicR5WgQG403DN+zDArSSRUdCU
+         w/7osTKdfgPJJ3zBgO34ZTrl4TyEXTnSgjCzHi87U3bNPmqBaUw5WBOYt7K/b3FJ38OA
+         yxt01AbLjA7Yhyk36wMJyJTfTygJ2IhS60TFK0vqgIIzwT7rC/6CaeWLbI+RZZ7m9jqx
+         A8TYqjbiKw+/PyJsd9QtaU1+4DJ2n5ZUlJtP5dWbx1RQpIncPKD5SNkYXAsJtumeDHCK
+         C0j5rsxCvHZbDAxkiXRepxbtZ4n3kl7jV/9vko9jdB/dK3G+25fbmwYPS7tMYMvQvnB4
+         RysA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtTGwv/5wtCowB986b9bAE3yFG8i+p0z9SLefadx3T6u0GJe4u3kDULiMV7yBN/ahyZ2C6DKqJX9qTVrf419F9ifuE
+X-Gm-Message-State: AOJu0YxSPUWvNRJ7Ti1gYxrs7KqsZ4EZYEPgLDliycpWsuhSRLkYSUsF
+	McrAnkzRtLQUg2NkRrrhLQV/w40nzodgDjmt7Y7jP/ZfuxR9a+a5Fc7KM43pR+OHQrubBMxmXt/
+	PTg==
+X-Google-Smtp-Source: AGHT+IHHi4gPgfR9HpFmvtb4m3ZR/Jd0g2m2zqQWUWOwbR8uDRfBGUR7GOF/YtaHwXsoAud3JyBTo7Ik95k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:528b:0:b0:61a:d437:fab with SMTP id
+ g133-20020a81528b000000b0061ad4370fabmr652276ywb.0.1713370289823; Wed, 17 Apr
+ 2024 09:11:29 -0700 (PDT)
+Date: Wed, 17 Apr 2024 09:11:28 -0700
+In-Reply-To: <adb07a02b3923eeb49f425d38509b340f4837e17.camel@cyberus-technology.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <1d10cd73-2ae7-42d5-a318-2f9facc42bbe@alu.unizg.hr>
- <20240318202124.GCZfiiRGVV0angYI9j@fat_crate.local> <12619bd4-9e9e-4883-8706-55d050a4d11a@alu.unizg.hr>
- <20240326101642.GAZgKgisKXLvggu8Cz@fat_crate.local> <8fc784c2-2aad-4d1d-ba0f-e5ab69d28ec5@alu.unizg.hr>
- <20240328123830.dma3nnmmlb7r52ic@amd.com> <20240402101549.5166-1-bp@kernel.org>
- <20240402133856.dtzinbbudsu7rg7d@amd.com> <20240403121436.GDZg1ILCn0a4Ddif3g@fat_crate.local>
- <Zg1QFlDdRrLRZchi@google.com> <20240404134452.GDZg6u1A-mPTTRqs6d@fat_crate.local>
-In-Reply-To: <20240404134452.GDZg6u1A-mPTTRqs6d@fat_crate.local>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 17 Apr 2024 17:52:03 +0200
-Message-ID: <CABgObfYkMjbY3_PFKmEJPf4BiNk5ueGWmUowDwax7k+=LTG3Gw@mail.gmail.com>
-Subject: Re: [BUG net-next] arch/x86/kernel/cpu/bugs.c:2935: "Unpatched return
- thunk in use. This should not happen!" [STACKTRACE]
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sean Christopherson <seanjc@google.com>, Michael Roth <michael.roth@amd.com>, 
-	Josh Poimboeuf <jpoimboe@kernel.org>, bp@kernel.org, bgardon@google.com, 
-	dave.hansen@linux.intel.com, dmatlack@google.com, hpa@zytor.com, 
-	kvm@vger.kernel.org, leitao@debian.org, linux-kernel@vger.kernel.org, 
-	maz@kernel.org, mingo@redhat.com, mirsad.todorovac@alu.unizg.hr, 
-	pawan.kumar.gupta@linux.intel.com, peterz@infradead.org, shahuang@redhat.com, 
-	tabba@google.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20240416123558.212040-1-julian.stecklina@cyberus-technology.de>
+ <Zh6MmgOqvFPuWzD9@google.com> <ecb314c53c76bc6d2233a8b4d783a15297198ef8.camel@cyberus-technology.de>
+ <Zh6WlOB8CS-By3DQ@google.com> <c2ca06e2d8d7ef66800f012953b8ea4be0147c92.camel@cyberus-technology.de>
+ <Zh6-e9hy7U6DD2QM@google.com> <adb07a02b3923eeb49f425d38509b340f4837e17.camel@cyberus-technology.de>
+Message-ID: <Zh_0sJPPoHKce5Ky@google.com>
+Subject: Re: [PATCH 1/2] KVM: nVMX: fix CR4_READ_SHADOW when L0 updates CR4
+ during a signal
+From: Sean Christopherson <seanjc@google.com>
+To: Thomas Prescher <thomas.prescher@cyberus-technology.de>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>, 
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>, 
+	"tglx@linutronix.de" <tglx@linutronix.de>, "bp@alien8.de" <bp@alien8.de>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"mingo@redhat.com" <mingo@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 4, 2024 at 3:45=E2=80=AFPM Borislav Petkov <bp@alien8.de> wrote=
-:
->
-> On Wed, Apr 03, 2024 at 05:48:22AM -0700, Sean Christopherson wrote:
-> > I'm guessing a general solution for OBJECT_FILES_NON_STANDARD is needed
->
-> Yeah.
->
-> > but I have a series to drop it for vmenter.S.
-> >
-> > https://lore.kernel.org/all/20240223204233.3337324-9-seanjc@google.com
->
-> Cool, ship it.
+On Wed, Apr 17, 2024, Thomas Prescher wrote:
+> On Tue, 2024-04-16 at 11:07 -0700, Sean Christopherson wrote:
+> > Hur dur, I forgot that KVM provides a "guest_mode" stat.=C2=A0 Userspac=
+e can do
+> > KVM_GET_STATS_FD on the vCPU FD to get a file handle to the binary stat=
+s,
+> > and then you wouldn't need to call back into KVM just to query guest_mo=
+de.
+> >=20
+> > Ah, and I also forgot that we have kvm_run.flags, so adding
+> > KVM_RUN_X86_GUEST_MODE would also be trivial (I almost suggested it
+> > earlier, but didn't want to add a new field to kvm_run without a very g=
+ood
+> > reason).
+>=20
+> Thanks for the pointers. This is really helpful.
+>=20
+> I tried the "guest_mode" stat as you suggested and it solves the
+> immediate issue we have with VirtualBox/KVM.
 
-Applied for 6.9.
+Note,=20
 
-Paolo
+> What I don't understand is that we do not get the effective CR4 value
+> of the L2 guest in kvm_run.s.regs.sregs.cr4.
+
+Because what you're asking for is *not* the effective CR4 value of L2.
+
+E.g. if L1 is using legacy shadowing paging to run L2, L1 is likely going t=
+o run
+L2 with GUEST_CR0.PG=3D1, GUEST_CR4.PAE=3D1, and GUEST_CR4.PSE=3D0 (though =
+PSE is largely
+irrelevant), i.e. will either use PAE paging or 64-bit paging to shadow L2.
+
+But L2 itself could be unpaged (CR0.PG=3D0, CR4.PAE=3Dx, CR4.PSE=3Dx), usin=
+g 32-bit
+paging (CR0.PG=3D1, CR4.PAE=3D0, CR4.PSE=3D0), or using 32-bit paging with =
+4MiB hugepages
+(CR0.PG=3D1, CR4.PAE=3D0, CR4.PSE=3D1).  In all of those cases, the effecti=
+ve CR0 and CR4
+values consumed by hardware are CR0.PG=3D1, CR4.PAE=3D1, and CR4.PSE.
+
+Or to convolute things even further, if L0 is running L1 with shadowing pag=
+ing,
+and L1 is running L2 with shadow paging but doing something weird and using=
+ PSE
+paging, then it would be possible to end up with:
+
+  vmcs12->guest_cr4:
+     .pae =3D 0
+     .pse =3D 1
+
+  vmcs12->cr4_read_shadow:
+     .pae =3D 0
+     .pse =3D 0
+
+  vmcs02->guest_cr4:
+     .pae =3D 1
+     .pse =3D 0
+
+> Instead, userland sees the contents of Vmcs::GUEST_CR4.=C2=A0Shouldn't th=
+is be the
+> combination of GUEST_CR4, GUEST_CR4_MASK and CR4_READ_SHADOW, i.e. what L=
+2
+> actually sees as CR4 value?
+
+Because KVM_{G,S}ET_SREGS (and all other uAPIs in that vein) are defined to=
+ operate
+on actual vCPU state, and having them do something different if the vCPU is=
+ in guest
+mode would confusing/odd, and nonsensical to differences between VMX and SV=
+M.
+
+SVM doesn't have per-bit CR0/CR4 controls, i.e. CR4 loads and stores need t=
+o be
+intercepted, and so having KVM_{G,S}ET_SREGS operate on CR4_READ_SHADOW for=
+ VMX
+would yield different ABI for VMX versus SVM.
+
+Note, what L2 *sees* is not a combination of the above; what L2 sees is pur=
+ely
+CR4_READ_SHADOW.  The other fields are consulted only if L2 attempts to loa=
+d CR4.
+
+> If this is expected, can you please explain the reasoning behind this
+> interface decision? For me, it does not make sense that writing back
+> the same value we receive at exit time causes a change in what L2 sees
+> for CR4.
+
+I doubt there was ever a concious decision, rather it never came up and thu=
+s the
+code is the result of doing nothing when nested VMX support was added.
+
+That said, KVM's behavior is probably the least awful choice.  The changelo=
+g of
+the proposed patch is wrong when it says:
+
+  If the signal is meant to be delivered to the L0 VMM, and L0 updates CR4 =
+for L1
+
+because the update isn't for L1, it's for the active vCPU state, which is L=
+2.
+
+At first glance, skipping the vmcs02.CR4_READ_SHADOW seems to make sense, b=
+ut it
+would create a bizarre inconsistency as KVM_SET_SREGS would effectively ove=
+rride
+vmcs12->guest_cr4, but not vmcs12->cr4_read_shadow.  KVM doesn't know the i=
+ntent
+of userspace, i.e. KVM can't know if userspace wants to change just the eff=
+ective
+value for CR4, or if userspace wants to change the effective *and* observab=
+le
+value for CR4.
+
+In your case, where writing CR4 is spurious, preserving the read shadow wor=
+ks,
+but if there were some use case where userspace actually wanted to change L=
+2's
+CR4, leaving the read shadow set to vmcs12 would be wrong.
+
+The whole situation is rather nonsensical, because if userspace actually di=
+d change
+CR4, the changes would be lost on the next nested VM-Exit =3D> VM-Entry.  T=
+hat could
+be solved by writing to vmcs12, but that creates a headache of its own beca=
+use then
+userspace changes to L2 become visible to L1, without userspace explicitly =
+requesting
+that.
+
+Unfortunately, simply disallowing state save/restore when L2 is active does=
+n't
+work either, because userspace needs to be able to save/restore state that =
+_isn't_
+context switched by hardware, i.e. isn't in the VMCS or VMCB.
+
+In short, yes, it's goofy and annoying, but there's no great solution and t=
+he
+issue really does need to be solved/avoided in userspace
+
+> Another question is: when we want to save the VM state during a
+> savevm/loadvm cycle, we kick all vCPUs via a singal and save their
+> state. If any vCPU runs in L2 at the time of the exit, we somehow need
+> to let it continue to run until we get an exit with the L1 state. Is
+> there a mechanism to help us here?=20
+
+Hmm, no?  What is it you're trying to do, i.e. why are you doing save/load?=
+  If
+you really want to save/load _all_ state, the right thing to do is to also =
+save
+and load nested state.
 
 
