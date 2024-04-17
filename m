@@ -1,327 +1,127 @@
-Return-Path: <kvm+bounces-14968-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14969-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94D878A83EA
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 15:12:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B4B8A8421
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 15:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2264B1F24EE1
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 13:12:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D86811C21D7A
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 13:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1648F13E41B;
-	Wed, 17 Apr 2024 13:12:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fYCRva+T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C68A913EFFB;
+	Wed, 17 Apr 2024 13:18:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A6F13D892;
-	Wed, 17 Apr 2024 13:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B5113C3E0;
+	Wed, 17 Apr 2024 13:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713359524; cv=none; b=U352MPOl+W4ZfMB8Cp+QYrlovbLMW8uW8XduA+lvCw6kRvlJnVgvwvo5iHalTnpEeYcDy61tP5H86YMDNdZS7Ybe7qG5LicCl5Pu6bMUf3XSbByRppuPnfq69ghHqsEa5FRapJ/MF5pAefIbAQYTEmDypBmbBSWwIPh9sJEtGe4=
+	t=1713359926; cv=none; b=VH6GWKU+19IEllNnbNB37hYWcATvwO6jbcjdBEp2LzHIU/lD0ARJm3JcHqjFE1WyZn45DTyQkZpYsQ5PkgKJzzHHprQKE05+2J33DB7kTG2SK9v+8xPQ1vapRWC4V7OhoHDqB+KCzhm/hYPQMS1QVQnH6mVpAGyTNMOATNepgRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713359524; c=relaxed/simple;
-	bh=GyaPboPEL2rOAOK0TAO7wW1CTxmk8Gw7xhEdNBWguKg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k1Tkq3YlQC8UpU/nhxmbKrm7VPn/ZN/g8rX0DedMgHm+lQtTfMBaTmb0E8IAqWpC/CUZl3ffkkOpCgokeXM/eT5tYGhWqDdepREJfbKxWFKPYjaHb30XLQ9t3zwoB9xdSnSOsRvC9wZLLr0R9fhMCEUM+XR+/WvkytkaRhqb8lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fYCRva+T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2987CC072AA;
-	Wed, 17 Apr 2024 13:11:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713359523;
-	bh=GyaPboPEL2rOAOK0TAO7wW1CTxmk8Gw7xhEdNBWguKg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fYCRva+TEbeI8lHSL5KgZTLK304JVk22e0gyDw72neADh2DRRscI5GqNNsL0r9sc/
-	 PQybGvggeulo+MscxzZtzNb00VcaYdYAWR7V1+FpwAHuGrWidwHe5mLMRkMUiKY5EM
-	 dD1qEKrr8gPWg50sSXSQ7NHJU0p9Q8h4jqMOLQh7z5WMgHqZmcRU24Aph39VkiIuky
-	 AcxN6m8Jk9TCbZxp1pG7Ftp1Fa8duJyBWB1zPGDvPMzJkT8QawezIfiNlzrlSeyD+r
-	 LqyY5FmjEp2cH1muibEPw5FgNlj9FTKmlIiwBJ8sgY8spYFfkXUWfaYebL2wYN92kQ
-	 tuMGVHv4toyEQ==
-Date: Wed, 17 Apr 2024 14:11:58 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Cc: Conor Dooley <conor.dooley@microchip.com>,
-	Deepak Gupta <debug@rivosinc.com>, Jonathan Corbet <corbet@lwn.net>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
-	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 07/10] riscv: add ISA extension parsing for Zcmop
-Message-ID: <20240417-smelting-rascal-d19dec72e0a5@spud>
-References: <20240410-jawless-cavalry-a3eaf9c562a4@spud>
- <20240410-judgingly-appease-5df493852b70@spud>
- <ZhcTiakvfbjb2hon@debug.ba.rivosinc.com>
- <1287e6e9-cb8e-4a78-9195-ce29f1c4bace@rivosinc.com>
- <20240411-superglue-errant-b32e5118695f@wendy>
- <c86f9fa8-e273-4509-83fa-f21d3265d5c9@rivosinc.com>
- <20240411-backwater-opal-00c9aed2231e@wendy>
- <5eda3278-24bc-4c17-a741-523ad5ff79f7@rivosinc.com>
- <20240416-gave-apron-3234098ce416@spud>
- <1eab3b4f-0d46-4df5-b574-6a5f796d3bcf@rivosinc.com>
+	s=arc-20240116; t=1713359926; c=relaxed/simple;
+	bh=zDIOvTM9o+jTTu1NNu/JxBSI7hr2E1MIf2PNjleRc6M=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=E+vqVJ3DJFADe/ZYNvQBNRRJpDHVa85yCQS3098DJ4Zhn2MBEVtbaqS0cwQ8LNv9j998iPUI7ymWAaUbB4ZHXxmNeOZxYlbbw3m475uWaNf8KfnbZ0UJBgRuOc5WO/NVyGU9eekzGRa02luZO14qIVzwcV28H4XfQfXjqExKh1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VKLxQ3gh3zXlNZ;
+	Wed, 17 Apr 2024 21:15:22 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 812AD140485;
+	Wed, 17 Apr 2024 21:18:41 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 17 Apr
+ 2024 21:18:41 +0800
+Subject: Re: [PATCH net-next v2 07/15] mm: page_frag: add '_va' suffix to
+ page_frag API
+To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jeroen de Borst
+	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
+	Shailend Chand <shailend@google.com>, Eric Dumazet <edumazet@google.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha
+ sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
+	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
+ Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
+	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
+	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
+ Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+	<jolsa@kernel.org>, David Howells <dhowells@redhat.com>, Marc Dionne
+	<marc.dionne@auristor.com>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
+	<jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
+	<kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+	<tom@talpey.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, Anna
+ Schumaker <anna@kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-nvme@lists.infradead.org>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>,
+	<bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
+	<linux-nfs@vger.kernel.org>
+References: <20240415131941.51153-1-linyunsheng@huawei.com>
+ <20240415131941.51153-8-linyunsheng@huawei.com>
+ <18ca19fa64267b84bee10473a81cbc63f53104a0.camel@gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <74e7259a-c462-e3c1-73ac-8e3f49fb80b8@huawei.com>
+Date: Wed, 17 Apr 2024 21:18:40 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HIRb2NogcVEwLV+i"
-Content-Disposition: inline
-In-Reply-To: <1eab3b4f-0d46-4df5-b574-6a5f796d3bcf@rivosinc.com>
+In-Reply-To: <18ca19fa64267b84bee10473a81cbc63f53104a0.camel@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
+On 2024/4/17 0:12, Alexander H Duyck wrote:
+> On Mon, 2024-04-15 at 21:19 +0800, Yunsheng Lin wrote:
+>> Currently most of the API for page_frag API is returning
+>> 'virtual address' as output or expecting 'virtual address'
+>> as input, in order to differentiate the API handling between
+>> 'virtual address' and 'struct page', add '_va' suffix to the
+>> corresponding API mirroring the page_pool_alloc_va() API of
+>> the page_pool.
+>>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> 
+> This patch is a total waste of time. By that logic we should be
+> renaming __get_free_pages since it essentially does the same thing.
+> 
+> This just seems like more code changes for the sake of adding code
+> changes rather than fixing anything. In my opinion it should be dropped
+> from the set.
 
---HIRb2NogcVEwLV+i
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The rename is to support different use case as mentioned below in patch
+14:
+"Depending on different use cases, callers expecting to deal with va, page or
+both va and page for them may call page_frag_alloc_va*, page_frag_alloc_pg*,
+or page_frag_alloc* API accordingly."
 
-On Tue, Apr 16, 2024 at 05:23:51PM +0200, Cl=E9ment L=E9ger wrote:
->=20
->=20
-> On 16/04/2024 16:54, Conor Dooley wrote:
-> > On Mon, Apr 15, 2024 at 11:10:24AM +0200, Cl=E9ment L=E9ger wrote:
-> >>
-> >>
-> >> On 11/04/2024 13:53, Conor Dooley wrote:
-> >>> On Thu, Apr 11, 2024 at 11:08:21AM +0200, Cl=E9ment L=E9ger wrote:
-> >>>>>> If we consider to have potentially broken isa string (ie extensions
-> >>>>>> dependencies not correctly handled), then we'll need some way to
-> >>>>>> validate this within the kernel.
-> >>>>>
-> >>>>> No, the DT passed to the kernel should be correct and we by and lar=
-ge we
-> >>>>> should not have to do validation of it. What I meant above was writ=
-ing
-> >>>>> the binding so that something invalid will not pass dtbs_check.
-> >>>>
-> >>>> Acked, I was mainly answering Deepak question about dependencies wrt=
- to
-> >>>> using __RISCV_ISA_EXT_SUPERSET() which does not seems to be relevant
-> >>>> since we expect a correct isa string to be passed.
-> >>>
-> >>> Ahh, okay.
-> >>>
-> >>>> But as you stated, DT
-> >>>> validation clearly make sense. I think a lot of extensions strings w=
-ould
-> >>>> benefit such support (All the Zv* depends on V, etc).
-> >>>
-> >>> I think it is actually as simple something like this, which makes it
-> >>> invalid to have "d" without "f":
-> >>>
-> >>> | diff --git a/Documentation/devicetree/bindings/riscv/extensions.yam=
-l b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >>> | index 468c646247aa..594828700cbe 100644
-> >>> | --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >>> | +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >>> | @@ -484,5 +484,20 @@ properties:
-> >>> |              Registers in the AX45MP datasheet.
-> >>> |              https://www.andestech.com/wp-content/uploads/AX45MP-1C=
--Rev.-5.0.0-Datasheet.pdf
-> >>> | =20
-> >>> | +allOf:
-> >>> | +  - if:
-> >>> | +      properties:
-> >>> | +        riscv,isa-extensions:
-> >>> | +          contains:
-> >>> | +            const: "d"
-> >>> | +          not:
-> >>> | +            contains:
-> >>> | +              const: "f"
-> >>> | +    then:
-> >>> | +      properties:
-> >>> | +        riscv,isa-extensions:
-> >>> | +          false
-> >>> | +
-> >>> | +
-> >>> |  additionalProperties: true
-> >>> |  ...
-> >>>
-> >>> If you do have d without f, the checker will say:
-> >>> cpu@2: riscv,isa-extensions: False schema does not allow ['i', 'm', '=
-a', 'd', 'c']
-> >>>
-> >>> At least that's readable, even though not clear about what to do. I w=
-ish
-> >>
-> >> That looks really readable indeed but the messages that result from
-> >> errors are not so informative.
-> >>
-> >> It tried playing with various constructs and found this one to yield a
-> >> comprehensive message:
-> >>
-> >> +allOf:
-> >> +  - if:
-> >> +      properties:
-> >> +        riscv,isa-extensions:
-> >> +          contains:
-> >> +            const: zcf
-> >> +          not:
-> >> +            contains:
-> >> +              const: zca
-> >> +    then:
-> >> +      properties:
-> >> +        riscv,isa-extensions:
-> >> +          items:
-> >> +            anyOf:
-> >> +              - const: zca
-> >>
-> >> arch/riscv/boot/dts/allwinner/sun20i-d1-dongshan-nezha-stu.dtb: cpu@0:
-> >> riscv,isa-extensions:10: 'anyOf' conditional failed, one must be fixed:
-> >>         'zca' was expected
-> >>         from schema $id: http://devicetree.org/schemas/riscv/extension=
-s.yaml
-> >>
-> >> Even though dt-bindings-check passed, not sure if this is totally a
-> >> valid construct though...
-> >=20
-> > I asked Rob about this yesterday, he suggested adding:
-> > riscv,isa-extensions:
-> >   if:
-> >     contains:
-> >       const: zcf
-> >   then:
-> >     contains:
-> >       const: zca
->=20
-> That is way more readable and concise !
->=20
-> > to the existing property, not in an allOf. I think that is by far the
-> > most readable version in terms of what goes into the binding. The output
-> > would look like:
-> > cpu@0: riscv,isa-extensions: ['i', 'm', 'a', 'd', 'c'] does not contain=
- items matching the given schema
-> > (for d requiring f cos I am lazy)
->=20
-> Than fine by me. The error is at least a bit more understandable than
-> the one with the false schema ;)
->=20
-> >=20
-> > Also, his comment about your one that gives the nice message was that it
-> > would wrong as the anyOf was pointless and it says all items must be
-> > "zca".
->=20
-> That's what I understood also.
->=20
-> > I didn't try it, but I have a feeling your nice output will be
-> > rather less nice if several different deps are unmet - but hey, probably
-> > will still be better than having an undocumented extension!
-> >=20
->=20
-> If you are ok with that, let's go with Rob suggestion. I'll resubmit a
-> V2 with validation for these extensions and probably a followup for the
-> other ones lacking dependency checking.
+Naming is hard anyway, I am open to better API naming for the above use cases.
 
-Also, Rob made some modifications to dt-schema yesterday, so now the
-report about an undocumented extension looks like:
-cpu@1: riscv,isa-extensions:3: '0' is not one of ['i', 'm', 'a', 'f', 'd', =
-'q', 'c', 'v', 'h', 'smaia', 'smstateen', 'ssaia', 'sscofpmf', 'sstc', 'svi=
-nval', 'svnapot', 'svpbmt', 'zacas', 'zba', 'zbb', 'zbc', 'zbkb', 'zbkc', '=
-zbkx', 'zbs', 'zfa', 'zfh', 'zfhmin', 'zk', 'zkn', 'zknd', 'zkne', 'zknh', =
-'zkr', 'zks', 'zksed', 'zksh', 'zkt', 'zicbom', 'zicbop', 'zicboz', 'zicntr=
-', 'zicond', 'zicsr', 'zifencei', 'zihintpause', 'zihintntl', 'zihpm', 'zts=
-o', 'zvbb', 'zvbc', 'zvfh', 'zvfhmin', 'zvkb', 'zvkg', 'zvkn', 'zvknc', 'zv=
-kned', 'zvkng', 'zvknha', 'zvknhb', 'zvks', 'zvksc', 'zvksed', 'zvksh', 'zv=
-ksg', 'zvkt', 'xandespmu']
-instead of
-cpu@0: riscv,isa-extensions:4: 'anyOf' conditional failed, one must be fixe=
-d:
-	'i' was expected
-	'm' was expected
-	'a' was expected
-	'f' was expected
-	'd' was expected
-	'q' was expected
-	'c' was expected
-	'v' was expected
-	'h' was expected
-	'smaia' was expected
-	'smstateen' was expected
-	'ssaia' was expected
-	'sscofpmf' was expected
-	'sstc' was expected
-	'svinval' was expected
-	'svnapot' was expected
-	'svpbmt' was expected
-	'zacas' was expected
-	'zba' was expected
-	'zbb' was expected
-	'zbc' was expected
-	'zbkb' was expected
-	'zbkc' was expected
-	'zbkx' was expected
-	'zbs' was expected
-	'zfa' was expected
-	'zfh' was expected
-	'zfhmin' was expected
-	'zk' was expected
-	'zkn' was expected
-	'zknd' was expected
-	'zkne' was expected
-	'zknh' was expected
-	'zkr' was expected
-	'zks' was expected
-	'zksed' was expected
-	'zksh' was expected
-	'zkt' was expected
-	'zicbom' was expected
-	'zicbop' was expected
-	'zicboz' was expected
-	'zicntr' was expected
-	'zicond' was expected
-	'zicsr' was expected
-	'zifencei' was expected
-	'zihintpause' was expected
-	'zihintntl' was expected
-	'zihpm' was expected
-	'ztso' was expected
-	'zvbb' was expected
-	'zvbc' was expected
-	'zvfh' was expected
-	'zvfhmin' was expected
-	'zvkb' was expected
-	'zvkg' was expected
-	'zvkn' was expected
-	'zvknc' was expected
-	'zvkned' was expected
-	'zvkng' was expected
-	'zvknha' was expected
-	'zvknhb' was expected
-	'zvks' was expected
-	'zvksc' was expected
-	'zvksed' was expected
-	'zvksh' was expected
-	'zvksg' was expected
-	'zvkt' was expected
-	'xandespmu' was expected
-	from schema $id: http://devicetree.org/schemas/riscv/cpus.yaml#
-
-Which is really great from a readability pov. Not only is it compressed
-to a single line, it actually points out which extension is the
-offender.
-
-Thanks,
-Conor.
-
---HIRb2NogcVEwLV+i
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZh/KnQAKCRB4tDGHoIJi
-0rS2AP4tYLrh/eXDFYhHN6RFYGaDkHa5QoOTDGCuiOux9TzJugEA6lkqPZDvjYPG
-J84YQJbfPA3XcZTUTJSFs3XuDrr2Vgg=
-=knP8
------END PGP SIGNATURE-----
-
---HIRb2NogcVEwLV+i--
+> 
+> .
+> 
 
