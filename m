@@ -1,208 +1,211 @@
-Return-Path: <kvm+bounces-14949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A39278A8001
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 11:42:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08AA88A8017
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 11:48:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C71A91C20F79
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 09:42:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ACE3B2171E
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 09:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EE313328A;
-	Wed, 17 Apr 2024 09:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25785137C33;
+	Wed, 17 Apr 2024 09:48:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eb4PXhIp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rn8aKDCp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9A0F516;
-	Wed, 17 Apr 2024 09:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A4412F59F
+	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 09:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713346939; cv=none; b=DcbMRYPhYCq2OVU6XQ4uZlq0OY+iYNbQM38fQ8UJJuDClUhvkvxUjOI2jQ6wqxrMrYTAsClAO1SOjazMn5X2RAypdGrjfUP6OHefEyf3c7Ou63mtOBD/i9NrOdm82xhpKTKXOcgMpo4jIUO0Y4gSlXBkJeG8PIbmCUruzR6AHJQ=
+	t=1713347300; cv=none; b=ON8P8iX3o+F/taAQ/+Fs8XroS1YGBCzz4LJZscB9NLcegTJhTjSRBDrBHutosbSCAyYBoclyCK0CRQEzUZ0kXt8t2aeg/5+ByU/DLXZWZZ8kObjoFN82lfB1Y89lCIi8RyYDsi/cOEO/UGCkV7KsmyO1YQpAAavSDmXTYByprJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713346939; c=relaxed/simple;
-	bh=RO/yekuzKpjnK5J65tWon3xbJlWRuk0W24/pV3bTqkc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f44tAu9CvHbWXFKJEFhqHAN+ED0ch9aAzksK4MjLXuFBUIpAWzOGlWujOEJhdM9HAv9uxEGLHbDBV2wRtLavBscNowMe+xef5hJsJjO45nFi7/NAJq6o+AedPaY0NJ7aCTetTZptDsJpnWr10S4U1EPF+6OL+dPkMtHLjBAQyeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eb4PXhIp; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713346938; x=1744882938;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RO/yekuzKpjnK5J65tWon3xbJlWRuk0W24/pV3bTqkc=;
-  b=Eb4PXhIpzms1Ys0uHThHaQHNa3B2491pmscThh6HNjW2w0IxE2bzZztb
-   A6Wc0SMhlGtovpL3vrvNybDwwk/AxZsnCh/ZGFT+6HBOZJB9KqG7SiLY5
-   8XnYRJhR5SntH7Lj6/V2+Dw0UpvG4P8gjC1du1cPijo2pXdlIRdvDbtb3
-   7IC5hrnhzARBdOUUU3QmS33uInviIp3ITllN1uPouWDdbNhohhKXpf+GM
-   MQ4+aaFytnCDAShDl2dzfamnxqTM2EHeoZIhmo2OtJl3kqYgzlRoUEObz
-   8hlOh3aLSzp9c/t8ppl+fxdvrgVchtVw9MNB8nqir282sUYb2LMH4XC7j
-   Q==;
-X-CSE-ConnectionGUID: hKu2qcy6QJK8xXXcE4SOug==
-X-CSE-MsgGUID: 63w4+mJcTUWPup6nefuL4g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="12612527"
-X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
-   d="scan'208";a="12612527"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 02:42:17 -0700
-X-CSE-ConnectionGUID: X2o1a1jsSf23UfRZFeShcw==
-X-CSE-MsgGUID: fS5thnUAR++movCeIe9QYA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
-   d="scan'208";a="22632595"
-Received: from xiongzha-mobl1.ccr.corp.intel.com (HELO [10.125.241.186]) ([10.125.241.186])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 02:42:12 -0700
-Message-ID: <9056f6a2-546b-41fc-a07c-7b86173887db@linux.intel.com>
-Date: Wed, 17 Apr 2024 17:42:00 +0800
+	s=arc-20240116; t=1713347300; c=relaxed/simple;
+	bh=i68APQ2lyTogjhJB0PE4zswrWF6uoMSKRUDeEj8xzHc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oyBG0dECJE/2YoKJ1C+1A6Nnb6b/e/xNRC/mXV/Ops7XilaMejMRZU0+QAmu4e//XMDlYgvXrCKJO2P5IxO9KAbFCsb60yW/aXXyq5kYIrmEg87joPMHI7jL5LHRxQlmFsBao+iRZ0wiHxddEd/teQlYQ2JBftCT+mYUzNiVFhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rn8aKDCp; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713347297;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zlZxHt3hkdiGt31RAOSNUlAzN6IqVMpUhfirTvNIdlw=;
+	b=Rn8aKDCpSZqXytSSt1XndRpdq9G1XiKUs3BoSqSgrY3aHTu2E8mwBiRT80ioSoDI7VJatg
+	2XtpwYiAaT3f3g4nUjQ8Z5EBkgnkSKOS+QMqqLoq0n4G/rF/nfxiKsToTwn3vij5fTfc07
+	8C7Y0HCag45IqsvxfHxsdga0IZ1Nayk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-42-D7klw1IrPhCMrutcteVZBQ-1; Wed, 17 Apr 2024 05:48:15 -0400
+X-MC-Unique: D7klw1IrPhCMrutcteVZBQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-349e1effeb5so39301f8f.1
+        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 02:48:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713347294; x=1713952094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zlZxHt3hkdiGt31RAOSNUlAzN6IqVMpUhfirTvNIdlw=;
+        b=K+oJ3N62vgQnE18B3TBWWBMFJ+yLs2F9FseBhvdld4jCooiEnRFDeKZ9nf073wPl3Q
+         UqwaP/nn/Xl8U3ykLS4Cx7towEsRq9PjALK9Yx5dGnFEg2z/SjBjJwcqch8r8Tu9urg6
+         UGTKB9kOWWMkCoAA+M0VhdFF//ux/GcFvn0qrPaIeQZOrafSZsf7+D6atykjiwZ/owvJ
+         aCReXwqHGyz0ciSsrptHDgh9SLZ8fXNyyM3w7qkSQa6SDThcLSYuFGf4tdjcE7EcIT7f
+         X1haPZ8M5iQsY0uzM9t5uvNjhIvYOaaH9b32MgfwE74XmoI9Bx/R2kpRlzPBUosqA+Cq
+         ZjIA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEjjwjxA8WVvqRqYfrcUZc8WfAtoujvE6hK526sGBDBP9+zhDrgefd6CJ/6TqY1sRyKsIHLQKGYIFjcYhOn826UlUg
+X-Gm-Message-State: AOJu0YzfgOIr4Rktt9Cq47c5g4k+Sn60m5oeJssWAVpfyDMmAoswTVNU
+	nERt86IZwwjEZI4ZzQfyegXPzp8J0nGWYsXno0A6KzttDmQ9lHGfNZxZpC/N2eBZqh6j92DYqT+
+	ya0IuolaJQnFLxdaLQvdjKe4rXRgp8Tb/RjQVFVOHdYKPcpl2AWKJIzzhTQfhZIE8f3xOq3iU2S
+	0Dq+S00Zlew2ErE6zulhmtyf4F
+X-Received: by 2002:a5d:591b:0:b0:346:f830:db09 with SMTP id v27-20020a5d591b000000b00346f830db09mr4009523wrd.31.1713347294590;
+        Wed, 17 Apr 2024 02:48:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEQeuW8BecLZVPGV76NLmrX87lWpte9uNU+aOHfPGt/rbtIo4U4Ln8Ue3LR30ngxFm9oN2rCQ0jUO/W+zuxjMY=
+X-Received: by 2002:a5d:591b:0:b0:346:f830:db09 with SMTP id
+ v27-20020a5d591b000000b00346f830db09mr4009506wrd.31.1713347294140; Wed, 17
+ Apr 2024 02:48:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 02/41] perf: Support guest enter/exit interfaces
-To: "Liang, Kan" <kan.liang@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
- kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com,
- jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
- irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
- chao.gao@intel.com
-References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <20240126085444.324918-3-xiong.y.zhang@linux.intel.com>
- <ZhgmrczGpccfU-cI@google.com>
- <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com>
- <ZhmIrQQVgblrhCZs@google.com>
- <2342a4e2-2834-48e2-8403-f0050481e59e@linux.intel.com>
- <ab2953b7-18fd-4b4c-a83b-ab243e2a21e1@linux.intel.com>
- <998fd76f-2bd9-4492-bf2e-e8cd981df67f@linux.intel.com>
- <eca7cdb9-6c8d-4d2e-8ac6-b87ea47a1bac@linux.intel.com>
-Content-Language: en-US
-From: "Zhang, Xiong Y" <xiong.y.zhang@linux.intel.com>
-In-Reply-To: <eca7cdb9-6c8d-4d2e-8ac6-b87ea47a1bac@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240215160136.1256084-1-alejandro.j.jimenez@oracle.com>
+ <Zh6-h0lBCpYBahw7@google.com> <CABgObfZ4kqaXLaOAOj4aGB5GAe9GxOmJmOP+7kdke6OqA35HzA@mail.gmail.com>
+ <Zh79D2BdtS0jKO6W@google.com>
+In-Reply-To: <Zh79D2BdtS0jKO6W@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 17 Apr 2024 11:48:01 +0200
+Message-ID: <CABgObfaSTa7pC0FBhx45NVGyLtBGceZJCZbjjko-tA-J8a1tiA@mail.gmail.com>
+Subject: Re: [RFC 0/3] Export APICv-related state via binary stats interface
+To: Sean Christopherson <seanjc@google.com>
+Cc: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, joao.m.martins@oracle.com, 
+	boris.ostrovsky@oracle.com, mark.kanda@oracle.com, 
+	suravee.suthikulpanit@amd.com, mlevitsk@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Apr 17, 2024 at 12:35=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+> > > The hiccup with stats are that they are ABI, e.g. we can't (easily) d=
+itch stats
+> > > once they're added, and KVM needs to maintain the exact behavior.
+> >
+> > Stats are not ABI---why would they be?
+>
+> Because they exposed through an ioctl(), and userspace can and will use s=
+tats for
+> functional purposes?  Maybe I just had the wrong takeaway from an old thr=
+ead about
+> adding a big pile of stats[1], where unfortunately (for me) you weighed i=
+n on
+> whether or not tracepoints are ABI, but not stats.
 
+I think we can agree that:
+- you don't want hundreds of stats (Marc's point)
+- a large part of the stats are very stable, but just as many (while
+useful) depend on details which are very much implementation dependent
+- a subset of stats is pretty close to being ABI (e.g. guest_mode),
+but others can change meaning depending on processor model, guest
+configuration and/or guest type (e.g. all of them affect
+interrupt-related stats due to APICv inhibits).
 
-On 4/16/2024 8:48 PM, Liang, Kan wrote:
-> 
-> 
-> On 2024-04-16 1:34 a.m., Zhang, Xiong Y wrote:
->>
->>
->> On 4/16/2024 12:03 AM, Liang, Kan wrote:
->>>
->>>
->>> On 2024-04-12 4:56 p.m., Liang, Kan wrote:
->>>>> What if perf had a global knob to enable/disable mediate PMU support?  Then when
->>>>> KVM is loaded with enable_mediated_true, call into perf to (a) check that there
->>>>> are no existing !exclude_guest events (this part could be optional), and (b) set
->>>>> the global knob to reject all new !exclude_guest events (for the core PMU?).
->>>>>
->>>>> Hmm, or probably better, do it at VM creation.  That has the advantage of playing
->>>>> nice with CONFIG_KVM=y (perf could reject the enabling without completely breaking
->>>>> KVM), and not causing problems if KVM is auto-probed but the user doesn't actually
->>>>> want to run VMs.
->>>> I think it should be doable, and may simplify the perf implementation.
->>>> (The check in the schedule stage should not be necessary anymore.)
->>>>
->>>> With this, something like NMI watchdog should fail the VM creation. The
->>>> user should either disable the NMI watchdog or use a replacement.
->>>>
->>>> Thanks,
->>>> Kan
->>>>> E.g. (very roughly)
->>>>>
->>>>> int x86_perf_get_mediated_pmu(void)
->>>>> {
->>>>> 	if (refcount_inc_not_zero(...))
->>>>> 		return 0;
->>>>>
->>>>> 	if (<system wide events>)
->>>>> 		return -EBUSY;
->>>>>
->>>>> 	<slow path with locking>
->>>>> }
->>>>>
->>>>> void x86_perf_put_mediated_pmu(void)
->>>>> {
->>>>> 	if (!refcount_dec_and_test(...))
->>>>> 		return;
->>>>>
->>>>> 	<slow path with locking>
->>>>> }
->>>
->>>
->>> I think the locking should include the refcount check and system wide
->>> event check as well.
->>> It should be possible that two VMs are created very close.
->>> The second creation may mistakenly return 0 if there is no lock.
->>>
->>> I plan to do something as below (not test yet).
->>>
->>> +/*
->>> + * Currently invoked at VM creation to
->>> + * - Check whether there are existing !exclude_guest system wide events
->>> + *   of PMU with PERF_PMU_CAP_MEDIATED_VPMU
->>> + * - Set nr_mediated_pmu to prevent !exclude_guest event creation on
->>> + *   PMUs with PERF_PMU_CAP_MEDIATED_VPMU
->>> + *
->>> + * No impact for the PMU without PERF_PMU_CAP_MEDIATED_VPMU. The perf
->>> + * still owns all the PMU resources.
->>> + */
->>> +int x86_perf_get_mediated_pmu(void)
->>> +{
->>> +	int ret = 0;
->>> +	mutex_lock(&perf_mediated_pmu_mutex);
->>> +	if (refcount_inc_not_zero(&nr_mediated_pmu_vms))
->>> +		goto end;
->>> +
->>> +	if (atomic_read(&nr_include_guest_events)) {
->>> +		ret = -EBUSY;
->>> +		goto end;
->>> +	}
->>> +	refcount_inc(&nr_mediated_pmu_vms);
->>> +end:
->>> +	mutex_unlock(&perf_mediated_pmu_mutex);
->>> +	return ret;
->>> +}
->>> +EXPORT_SYMBOL_GPL(x86_perf_get_mediated_pmu);
->>> +
->>> +void x86_perf_put_mediated_pmu(void)
->>> +{
->>> +	mutex_lock(&perf_mediated_pmu_mutex);
->>> +	refcount_dec(&nr_mediated_pmu_vms);
->>> +	mutex_unlock(&perf_mediated_pmu_mutex);
->>> +}
->>> +EXPORT_SYMBOL_GPL(x86_perf_put_mediated_pmu);
->>>
->>>
->>> Thanks,
->>> Kan
->> x86_perf_get_mediated_pmu() is called at vm_create(), x86_perf_put_mediated_pmu() is called at vm_destroy(), then system wide perf events without exclude_guest=1 can not be created during the whole vm life cycle (where nr_mediated_pmu_vms > 0 always), do I understand and use the interface correctly ?
-> 
-> Right, but it only impacts the events of PMU with the
-> PERF_PMU_CAP_MEDIATED_VPMU.
-> For other PMUs, the event with exclude_guest=1 can still be created.
-> KVM should not touch the counters of the PMU without
-> PERF_PMU_CAP_MEDIATED_VPMU.
-> 
-> BTW: I will also remove the prefix x86, since the functions are in the
-> generic code.
-> 
-> Thanks,
-> Kan
-After userspace VMM call VCPU SET_CPUID() ioctl, KVM knows whether vPMU is enabled or not. If perf_get_mediated_pmu() is called at vm create, it is too early. 
-it is better to let perf_get_mediated_pmu() track per cpu PMU state, so perf_get_mediated_pmu() can be called by kvm after vcpu_cpuid_set(). Note user space vmm may call SET_CPUID() on one vcpu multi times, then here refcount maybe isn't suitable. what's a better solution ?
+While there are exceptions, the main consumer of stats (but indeed not
+the only one) is intended to be the user, not a program. This is the
+same as tracepoints, and it's why the introspection bits exist.
+(User-friendliness also means that bitmask stats are "ouch"; I guess
+we could add support for bit-sized boolean stats is things get out of
+control).
 
-thanks
+For many stats, using them for functional purposes would be
+wrong/dumb. You have to be ready for the exact behavior to change even
+if the stats remain the same. If userspace doesn't, it's being dumb.
+KVM can't be blocked from supporting new features just because they
+"break" stats, and shouldn't be blocked from adding useful debugging
+stats just because userspace could be dumb.
+
+For example, the point of pf_fast is mostly to compare it with other
+pf_* stats and see if there's something smelly going on.pf_fast used
+to affect pretty much only dirty bits; nowadays it also affects
+accessed bits on !ept_ad machines and it does not affect dirty bits if
+you have PML. So in the past it was possible to use pf_fast as a proxy
+for the number of dirty pages, for example during migration. That
+usage doesn't work anymore. Tough luck.
+
+Perhaps you could use the halt-polling stats to toggle DISABLE_EXITS
+for VMs that consume a lot of time polling. That would be a more
+plausible use of stats to drive heuristics, but again, the power to
+look into low-level details of KVM and guest behavior comes with the
+accompanying responsibility. It is _not_ guaranteed to keep working in
+the same way as processors come out and optimizations are added to
+KVM.
+
+So you would have to look at intentional stats breakages one by one,
+and this is again a lot like tracepoints. And many potential breakages
+would go unnoticed anyway, because there's an infinite supply of bad
+ideas when it comes to stats and heuristics.
+
+> That said, I'm definitely not opposed to stats _not_ being ABI, because t=
+hat would
+> give us a ton of flexibility.  E.g. we have a non-trivial number of inter=
+nal stats
+> that are super useful _for us_, but are rather heavy and might not be des=
+irable
+> for most environments.  If stats aren't considered ABI, then I'm pretty s=
+ure we
+> could land some of the more generally useful ones upstream, but off-by-de=
+fault
+> and guarded by a Kconfig.  E.g. we have a pile of stats related to mmu_lo=
+ck that
+> are very helpful in identifying performance issues, but they aren't thing=
+s I would
+> want enabled by default.
+
+That would be great indeed.
+
+> > Not everything makes a good stat but, if in doubt and it's cheap
+> > enough to collect it, go ahead and add it.
+>
+> Marc raised the (IMO) valid concern that "if it's cheap, add it" will lea=
+d to
+> death by a thousand cuts.  E.g. add a few hundred vCPU stats and suddenly=
+ vCPUs
+> consumes an extra KiB or three of memory.
+>
+> A few APIC stats obviously aren't going to move the needle much, I'm just=
+ pointing
+> out that not everyone agrees that KVM should be hyper permissive when it =
+comes to
+> adding new stats.
+
+Yeah, that's why I made it conditional to "if in doubt". "Stats are
+not ABI" is not a free pass to add anything, also because the truth is
+closer than "Stats are generally not ABI but keeping them stable is a
+good idea". Many more stats are obviously bad to have upstream, than
+there are good ones; and when adding stats it makes sense to consider
+their stability but without making it an absolute criterion for
+inclusion.
+
+So for this patch, I would weigh advantages to be substantial:
++ APICv inhibits at this point are relatively stable
++ the performance impact is large enough that APICv/AVIC stats _can_
+be useful, both boolean and cumulative ones; so for example I'd add an
+interrupt_injections stat for unaccelerated injections causing a
+vmexit or otherwise hitting lapic.c.
+
+But absolutely would not go with a raw bitmask because:
+- the exact set of inhibits is subject to change
+- super high detail into niche APICv inhibits is unlikely to be useful
+- many if not most inhibits are trivially derived from VM configuration
+
+Paolo
+
 
