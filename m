@@ -1,155 +1,99 @@
-Return-Path: <kvm+bounces-14921-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14922-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 208CB8A7AD9
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 05:05:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40B088A7B01
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 05:18:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE5C71F22548
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 03:05:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF7A9285135
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 03:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EE7BA46;
-	Wed, 17 Apr 2024 03:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D075EAD2;
+	Wed, 17 Apr 2024 03:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g8jRRMsN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqLw8Z27"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F3E7470;
-	Wed, 17 Apr 2024 03:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FE38F66;
+	Wed, 17 Apr 2024 03:18:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713323114; cv=none; b=paaVGVdZBJCCC82UtSR4150Cf44ZezPY5/O3uMvprRTcuB+9q4kJbVnfKfVcwVAtKzAv0sInJOOakq49zYFQO4S56Vs4F60gmalYwpIUdY2brWzF+sjqqERo5c5Y1CKHXbvRAv1GtIY8+yJ0rwlOdnR33PDLCWLBiCj4ngqQWIY=
+	t=1713323919; cv=none; b=r8P+NA+6b8X4cbz9aChuMuW0ud/kEy5GdR+U/OAH7OMIfTnYJa4dTGJlX/QLAfYDRgG9qTSIKUn2yQvrN0vllYL029R4GPLFoKY7GQYOW6NVEi/2xBl4zJTek85K72VwvbjHl09h/MakS44FvByNTx1opSwYnzYjyVtgw7NuhKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713323114; c=relaxed/simple;
-	bh=Ba8ZIoV9AFjElPasNWGPuIvN3p9BEsdOKGL+1Iz5T/A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q8UiUuA0Wikd/sKQ1/ZqQenBQw+S1e19IycWwlo0NwvXnZeGEndwUxRY+qWBwCtl4GZrWxxxFCOxiWRSfPln62mcUVc2inwEoTDZo5G9qmOESmsvIvYRVo+cOv+HMyqNPw2PsmMkx6VYRVkPEMaHeuawbrxiZ6WbqfHxqRALNLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g8jRRMsN; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713323113; x=1744859113;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Ba8ZIoV9AFjElPasNWGPuIvN3p9BEsdOKGL+1Iz5T/A=;
-  b=g8jRRMsN7piMUDpL8INLkA2KzJfiuPcLICBPb7MXvkkWvdA4zr+3H2VT
-   COTHMjk3Jk1D/j/6AFsP4PSa+ibutYFHV/nOxeRL561Sz8WCQZUrIf+MZ
-   4vlkTHjyAdJUufPLbf+TrnHM08oPgp8++M5PoaJXFUrdbq32fy0Edg/Ej
-   2gPmhyoYdhbCT7z/+qjM9WzSMVY0b6aEEd26CPv3RtZfw6o3bihS61JlB
-   +LSopdW9O8eGjVhlQlROIqb57bsial8jo3PIJGDN/K5m+keZ3WXsBczMB
-   o6QAwrM6rbcpQ0AA1qaCXGoFdrtHPN5Mglpv3zKpM83Q9VS+1LgItLOEZ
-   w==;
-X-CSE-ConnectionGUID: u8pyolaaTLGZsvIQVEu74w==
-X-CSE-MsgGUID: D67qaksMQMCsxWV70T6lHA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8720974"
-X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
-   d="scan'208";a="8720974"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 20:05:11 -0700
-X-CSE-ConnectionGUID: dp/KWL6bRM+0UBrKHB5CAQ==
-X-CSE-MsgGUID: foXm7HnxRJ6HTGS9uHWSEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
-   d="scan'208";a="22549772"
-Received: from unknown (HELO [10.238.13.36]) ([10.238.13.36])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 20:05:07 -0700
-Message-ID: <ac0e50a6-6da4-4e07-8422-0e9f477c3fb3@linux.intel.com>
-Date: Wed, 17 Apr 2024 11:05:05 +0800
+	s=arc-20240116; t=1713323919; c=relaxed/simple;
+	bh=QROgXz5UDuoxzxyfomvlU9PtVelcpq1hfiHqc4D5Rl0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SpdWEdy9ipzN4E7UtHI1h33Wvdi8EBXuwybgHqsPtWpDaIKgscWbktvhjKKn5l3zRLyfcUJQk5mllzWJvmrAc6WQgqoKGmHpe8Jvd7LQ7glZG+zsnJTYBKlZQkNH+aE46enytHiug3iOiGcjtR4PlMjWf/TT1cFnyEFIdX/BnM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqLw8Z27; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8643C113CE;
+	Wed, 17 Apr 2024 03:18:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713323918;
+	bh=QROgXz5UDuoxzxyfomvlU9PtVelcpq1hfiHqc4D5Rl0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=kqLw8Z27o9tczw3gVr+DQw78bY/vuXNieAm6RyqMBwaTqF/7X62dbj+UjOxE3ttnL
+	 2ZHQRFwFQ527o1zHAoWGxPRsSChSta5s3Qdo8utMdB0p8CyQwhT8DI8Kd7jhYvuiG7
+	 33RNm5tlzJ02TMnUvv20OfOTueGMJK1t/sON/wuc5oqLkuzcny3J/WV6W4QMOb8rMo
+	 cM6UPl1gX0DIebasc6xLyZzMu+E5mqXOzHmwGQCtfDXO/i/uHJ0HVlY00nqjPICMG1
+	 JcBGCdqzs/ZVRCDuJKxwrLWIJsYfpOFoN/8QpAdGI35eTR2Dpr6eF/R4ItNr8donPs
+	 ySgxiuYSJOLuw==
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a51969e780eso665324566b.3;
+        Tue, 16 Apr 2024 20:18:38 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVtwSKA1LqTH1kIyO1kT10hx7beoh69PHL/+hqOaMycKUMFc2NqRZgXPSuwrHT16h1dJ0hHl1FGzrcNyRvoQ4WO0RAkIf/zXaFTorSnl4labBY3NbUAhgqePdazYLMme69hwztGX8wIAoH7KOPX/SVJJdRpMxsbBIxQX5i0tA==
+X-Gm-Message-State: AOJu0YywLV5fM28Sg3p7iuY2FRA/nO4KIjRr6HjSDBRsAwkefuKRk+iw
+	F2AmAdCi7rKvsvLvt0e4ahT/IpfudHbpvDfTLsK9SFliGEwQ4H5A5B9icAqXYTbWztxMFwj+TUl
+	KE+eN6JF9trt/6v+eMV/DQoqQjK8=
+X-Google-Smtp-Source: AGHT+IGAV0JKt0Q8Wt6Fx+5t3raYHvV2CbyQ2onGWJZvBZMtZILfGwV4qyHAs5ucw4zU1joYNfqugznQTR7cPZhmh20=
+X-Received: by 2002:a17:907:1c0d:b0:a4e:7a36:4c38 with SMTP id
+ nc13-20020a1709071c0d00b00a4e7a364c38mr13676826ejc.20.1713323917285; Tue, 16
+ Apr 2024 20:18:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 102/130] KVM: TDX: handle EXCEPTION_NMI and
- EXTERNAL_INTERRUPT
-To: Isaku Yamahata <isaku.yamahata@intel.com>, Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- isaku.yamahata@linux.intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <3ac413f1d4adbac7db88a2cade97ded3b076c540.1708933498.git.isaku.yamahata@intel.com>
- <ZgpuqJW365ZfuJao@chao-email>
- <20240403185103.GK2444378@ls.amr.corp.intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240403185103.GK2444378@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240416144926.599101-1-david@redhat.com> <CANiq72kACt+FfeYXJxfQpmGH=uPqkDA0oprfnebw52VSKyn7kQ@mail.gmail.com>
+In-Reply-To: <CANiq72kACt+FfeYXJxfQpmGH=uPqkDA0oprfnebw52VSKyn7kQ@mail.gmail.com>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Wed, 17 Apr 2024 11:18:27 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5mt0GaaZ3s44CYb4aKqYeDYm+Q16hY__FdQ6xYJh+bgg@mail.gmail.com>
+Message-ID: <CAAhV-H5mt0GaaZ3s44CYb4aKqYeDYm+Q16hY__FdQ6xYJh+bgg@mail.gmail.com>
+Subject: Re: [PATCH v1] LoongArch/tlb: fix "error: parameter 'ptep' set but
+ not used" due to __tlb_remove_tlb_entry()
+To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-arch@vger.kernel.org, loongarch@lists.linux.dev, llvm@lists.linux.dev, 
+	Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, 
+	WANG Xuerui <kernel@xen0n.name>, Nathan Chancellor <nathan@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Queued for loongarch-fixes, thanks.
 
+Huacai
 
-On 4/4/2024 2:51 AM, Isaku Yamahata wrote:
-> On Mon, Apr 01, 2024 at 04:22:00PM +0800,
-> Chao Gao <chao.gao@intel.com> wrote:
+On Wed, Apr 17, 2024 at 3:25=E2=80=AFAM Miguel Ojeda
+<miguel.ojeda.sandonis@gmail.com> wrote:
 >
->> On Mon, Feb 26, 2024 at 12:26:44AM -0800, isaku.yamahata@intel.com wrote:
->>> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>>
->>> Because guest TD state is protected, exceptions in guest TDs can't be
->>> intercepted.  TDX VMM doesn't need to handle exceptions.
->>> tdx_handle_exit_irqoff() handles NMI and machine check.  Ignore NMI and
->> tdx_handle_exit_irqoff() doesn't handle NMIs.
-> Will it to tdx_handle_exception().
-
-I don't get  why tdx_handle_exception()?
-
-NMI is handled in tdx_vcpu_enter_exit() prior to leaving the safety of 
-noinstr, according to patch 098.
-https://lore.kernel.org/kvm/88920c598dcb55c15219642f27d0781af6d0c044.1708933498.git.isaku.yamahata@intel.com/
-
-@@ -837,6 +857,12 @@ static noinstr void tdx_vcpu_enter_exit(struct 
-vcpu_tdx *tdx)
-      WARN_ON_ONCE(!kvm_rebooting &&
-               (tdx->exit_reason.full & TDX_SW_ERROR) == TDX_SW_ERROR);
-
-+    if ((u16)tdx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
-+        is_nmi(tdexit_intr_info(vcpu))) {
-+        kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
-+        vmx_do_nmi_irqoff();
-+        kvm_after_interrupt(vcpu);
-+    }
-      guest_state_exit_irqoff();
-  }
-
+> On Tue, Apr 16, 2024 at 4:49=E2=80=AFPM David Hildenbrand <david@redhat.c=
+om> wrote:
+> >
+> > With LLVM=3D1 and W=3D1 we get:
 >
+> Hmm... I didn't need W=3D1 to trigger it (LLVM 18.1.2).
 >
->>> machine check and continue guest TD execution.
->>>
->>> For external interrupt, increment stats same to the VMX case.
->>>
->>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>> arch/x86/kvm/vmx/tdx.c | 23 +++++++++++++++++++++++
->>> 1 file changed, 23 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->>> index 0db80fa020d2..bdd74682b474 100644
->>> --- a/arch/x86/kvm/vmx/tdx.c
->>> +++ b/arch/x86/kvm/vmx/tdx.c
->>> @@ -918,6 +918,25 @@ void tdx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
->>> 		vmx_handle_exception_irqoff(vcpu, tdexit_intr_info(vcpu));
->>> }
->>>
->>> +static int tdx_handle_exception(struct kvm_vcpu *vcpu)
-
-Should this function be named as tdx_handle_exception_nmi() since it's 
-checking nmi as well?
-
->>> +{
->>> +	u32 intr_info = tdexit_intr_info(vcpu);
->>> +
->>> +	if (is_nmi(intr_info) || is_machine_check(intr_info))
->>> +		return 1;
->>
-
+> > Reported-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+>
+> Thanks, looks good to me -- built-tested:
+>
+> Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+> Tested-by: Miguel Ojeda <ojeda@kernel.org>
+>
+> Cheers,
+> Miguel
 
