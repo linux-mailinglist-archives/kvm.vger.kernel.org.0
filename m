@@ -1,171 +1,177 @@
-Return-Path: <kvm+bounces-15025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15027-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C678A8F10
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 01:00:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3881B8A8F13
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 01:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19C91F216B6
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 23:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4A022822F2
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 23:02:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE5785620;
-	Wed, 17 Apr 2024 23:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189FB86158;
+	Wed, 17 Apr 2024 23:02:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4bmbtJFC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e+3s34Sc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732E383CD1
-	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 23:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8FC85C79
+	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 23:02:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713394823; cv=none; b=NJ0JrREPr20jBuJfLFq1Xqcln58KDu36ba6hHnhDiSc3TuOcD3XTLlwc+/padhZUQcRdmMdYkihseh4xF8hAsSNJcSU3DGMOWuK62mj0eA8mXO/Jz3Tj6dskaDU6BeBXuePiGoQpKVN2/VF331/3DkHrmCOqreoX5BDhikYLHsg=
+	t=1713394947; cv=none; b=qYWEF21dkcMkqV1G6otDwL2vKmhEP3FMwzk3FoNFClz+Qezv1CStrrBym4NAF7sQhEcFkykSYR6Fyq2DV8weBiCr0fkJQXjMEVQWrcexYRa674DLUcUva6M3oNSShbLiV54UCtggXAsXyp7EzowN10wlsLaK/GAv81Y6guU8Fwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713394823; c=relaxed/simple;
-	bh=jSyOnZL52ZqVwEzR7qnXau+1BNj/PByM/S+zvuIt55s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EtvM63q92D43rIXhCUsHAhsR1N2dA0IxYB8pcMQVk53MCKAmmqYnrwL7hX/hOoM8J1R/Q8rDXEkpjudgDcDL+t75Zo558JgNaVEvCA7zW68bgYjlqYpiVayv2ztq88vWkVB5pCMH2E/qb41XwGZX/hJWJwWW94Okl6Jzv/D3CQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4bmbtJFC; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcdc3db67f0so1764809276.1
-        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 16:00:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713394821; x=1713999621; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u4nCdNbCZqVRKbbSCp3PB5n/hRBdzB/PkmDJ8ZQ9Io8=;
-        b=4bmbtJFCGf8ZLkBrpPOBBqpTz2+jBdpHCUP/AvYKloaIXe122ZlyHhB7A4JR5PWuEf
-         Dwqbg8eMJjbncCEbaDln3VzYDHG3hy2GHhd9lLjYa7bQoIPlBP7dMsStqWlVG9O7a21/
-         J4B2BGIpm/lsvba6sW4f+gL7EWoIQEszaUuB6BRdzEzP4m8tjSMsWcq6bxxJt8LwRmBI
-         qCESsfY1uXEcslTxOtYxc+ChhkUnmPbz9dtf/jIND0ZNwGJbAgiZG4jybUl594wPjM3l
-         FijdzthwBnI9HBM0eteF3dFf0hdMAPvckxSZbvxyb3g2isXN0B0U19TYfgGPWSOGG4m1
-         S0Ag==
+	s=arc-20240116; t=1713394947; c=relaxed/simple;
+	bh=LBU3fLFom8vb/7JkuEvy+I6UW8qanTPcmH2t8cVFq8c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JMFOgty1Vo1/LcnMCLAtjqBubj2lyWtEmFFK/ZgwkeqB4GSXYM/NDLJqnCOps9YJu0dC51WX8ESLEAPlCB5Y1AZ0ih5e05doAndoRH8BjFFpD/gB0VqqE1JTB47ce6Z9KTMOEYflLnas4O9geneJjyRBipQbUewZdHS1g8ZIM+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e+3s34Sc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713394944;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LV6Nb717r/ECNUv4GKXXSYG0oYIZ4itZI6Tnma6j0S4=;
+	b=e+3s34ScGJhxVpe5z+CkZAiPZpPGZ4X+kyRHB9D8++vD/9phHMKEerWt7L4ZByH6U4IlnI
+	1PNm70Sq5ZKquGh/5wDwMMwQcaUEVPjEx9ucVOpxUa7pvWvFs+8MB8qMQ20XZac+lgrHFy
+	HrwMqf8dH5FtP+b6XkHWdpTXjCBqehQ=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-386-E-Y_yBlvPwODgeTlcaEyFQ-1; Wed, 17 Apr 2024 19:02:21 -0400
+X-MC-Unique: E-Y_yBlvPwODgeTlcaEyFQ-1
+Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-5aa3c983f88so325774eaf.3
+        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 16:02:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713394821; x=1713999621;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=u4nCdNbCZqVRKbbSCp3PB5n/hRBdzB/PkmDJ8ZQ9Io8=;
-        b=g71HUSJ7AmCTY84hoahBnQpaszNPbu8iUFn0TyAxfFwGfWm+BMZWNnoS4vPBoiz76V
-         U5jJLKXAO6n8pohwMu6M1NYj1UR5olQKmIBJB46dsTXEyoI23EIn+L2px2aM0Y61lYT6
-         TiqiK6UyzvyR0yB31zMuTroe++NhD55GgwM162W+Db1nvz7ezeWh/Iax3Xn9G66y+/ZW
-         gCsbZeJGpkKu/ezltX1FTY+t7Rh59aPBw8QrOa8YtNCSj7C05BaBWA6P7TQU/c+bz2Qo
-         S9kGZpkPPqlQDNPtKP3UMyAkIq5M6u7iyVvRyqoHsmJbc3gr1j80AvVfU9xwAzbbJ3v9
-         oMpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUzap9AxyaXTVt0sSIRmgPAtHsmRbsXKUMcVDimUsFqP9KTZ3KZqTQoJqm/HP3POlfgfBBShWXF1QsnDvVAR6PlYqvb
-X-Gm-Message-State: AOJu0Yw5G+yMlaYm0YS3PY2O4yooZyIIJO5pIpL6nyzf4CAfj/u/VbWI
-	YuJoFuyjv/Et54w7dHKRl+6sxgvef6bQhbtdbteNgp53cJdInYZ9r09RcdAHkmrCD0ieya3fxia
-	Idg==
-X-Google-Smtp-Source: AGHT+IEeNEsWHT8VERP4lM1dSYCHd0Yfs+VWW6MBBqn8/3TSXT4elHQ9+G8Z2MnLnKVQOPfuV4XfJB8cw18=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1001:b0:dda:c4ec:7db5 with SMTP id
- w1-20020a056902100100b00ddac4ec7db5mr152739ybt.4.1713394821463; Wed, 17 Apr
- 2024 16:00:21 -0700 (PDT)
-Date: Wed, 17 Apr 2024 16:00:19 -0700
-In-Reply-To: <20240416201935.3525739-8-pbonzini@redhat.com>
+        d=1e100.net; s=20230601; t=1713394940; x=1713999740;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LV6Nb717r/ECNUv4GKXXSYG0oYIZ4itZI6Tnma6j0S4=;
+        b=kO2R6DyDKA/bNr3pfDogTBQ8dhvjgq964hLKVYk2voT5BHRnmUf5aNtrim3XOBcHKs
+         7kDyUB8v+33zhDL2SRIE6rPaCgU7X7/zaV/XBoUBHItw6Fnk05qeG+yYyKzIFGF4uxRp
+         kfhsXLROHo+6LRr+9UTfHtyyIbRroQcm+k5sjw+hF3dsCXXmd/l3FAj3kqzytAXzxn2H
+         rl558tBv/d8lgtoq3BBQfl68NcfKt/SozsC5Q7LHnwRwdkAhKW0NAC77AFWNM77jLcz3
+         6H4QTcfjX0B6y8iDoNpVXPMMe292sW2ZOiAdwjC8vInFH2DOJUxNcA4VvH3P7yYTL8ek
+         8Zug==
+X-Forwarded-Encrypted: i=1; AJvYcCUxk6rAwceKFW3Sq32D6QGeZq1m+2fRjnHvU4T6hVxtsZ+nb5tS2CkhEdk6XVubcns9L8xgprPuik+YnaDISG9Eyp+Y
+X-Gm-Message-State: AOJu0Yyxp67bUAZuW8NMiWqU4CM/M72NxRsBOvVy/bL94OQzxePiALXn
+	xCVCcROwTCrmZi0a2QmF/LPEOQ8Ar1uW902ZEotOhlyepDXG55PQCk/gYha6dBtz2RyzoYc8b/E
+	DnBeYYZlAXMttGkKL1GzOTNwSjw8MUOSStz+iEDZ5rG02ZmCtnQ==
+X-Received: by 2002:a4a:98c6:0:b0:5aa:5252:6efc with SMTP id b6-20020a4a98c6000000b005aa52526efcmr1287486ooj.9.1713394940289;
+        Wed, 17 Apr 2024 16:02:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEzaXJdXFiq9LMPiWxQaCBmqb2idfqAHM9IG+BCrxxovArqOWEnbc06EItG1q9EXTRxNzWIYg==
+X-Received: by 2002:a4a:98c6:0:b0:5aa:5252:6efc with SMTP id b6-20020a4a98c6000000b005aa52526efcmr1287472ooj.9.1713394940025;
+        Wed, 17 Apr 2024 16:02:20 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id m7-20020a4aab87000000b005a4a656860bsm77843oon.2.2024.04.17.16.02.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 16:02:19 -0700 (PDT)
+Date: Wed, 17 Apr 2024 17:02:16 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
+ "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
+ <robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
+ <chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
+ <iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
+ <baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+ "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
+Message-ID: <20240417170216.1db4334a.alex.williamson@redhat.com>
+In-Reply-To: <20240417122051.GN3637727@nvidia.com>
+References: <20240412082121.33382-1-yi.l.liu@intel.com>
+	<BN9PR11MB5276318EF2CD66BEF826F59A8C082@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20240416175018.GJ3637727@nvidia.com>
+	<BN9PR11MB5276E6975F78AE96F8DEC66D8C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20240417122051.GN3637727@nvidia.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240416201935.3525739-1-pbonzini@redhat.com> <20240416201935.3525739-8-pbonzini@redhat.com>
-Message-ID: <ZiBUg-81eIPUAy9P@google.com>
-Subject: Re: [PATCH v2 07/10] KVM: VMX: Introduce test mode related to EPT
- violation VE
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, binbin.wu@linux.intel.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 16, 2024, Paolo Bonzini wrote:
-> @@ -4711,8 +4722,21 @@ static void init_vmcs(struct vcpu_vmx *vmx)
->  
->  	exec_controls_set(vmx, vmx_exec_control(vmx));
->  
-> -	if (cpu_has_secondary_exec_ctrls())
-> +	if (cpu_has_secondary_exec_ctrls()) {
->  		secondary_exec_controls_set(vmx, vmx_secondary_exec_control(vmx));
-> +		if (vmx->ve_info) {
-> +			vmcs_write64(VE_INFORMATION_ADDRESS,
-> +				     __pa(vmx->ve_info));
-> +		} else {
-> +			/*
-> +			 * Because SECONDARY_EXEC_EPT_VIOLATION_VE is
-> +			 * used only for debugging, it's okay to leave
-> +			 * it disabled.
-> +			 */
-> +			secondary_exec_controls_clearbit(vmx,
-> +							 SECONDARY_EXEC_EPT_VIOLATION_VE);
+On Wed, 17 Apr 2024 09:20:51 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-As below, this is silly.
+> On Wed, Apr 17, 2024 at 07:16:05AM +0000, Tian, Kevin wrote:
+> > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > Sent: Wednesday, April 17, 2024 1:50 AM
+> > > 
+> > > On Tue, Apr 16, 2024 at 08:38:50AM +0000, Tian, Kevin wrote:  
+> > > > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > > > Sent: Friday, April 12, 2024 4:21 PM
+> > > > >
+> > > > > A userspace VMM is supposed to get the details of the device's PASID
+> > > > > capability
+> > > > > and assemble a virtual PASID capability in a proper offset in the virtual  
+> > > PCI  
+> > > > > configuration space. While it is still an open on how to get the available
+> > > > > offsets. Devices may have hidden bits that are not in the PCI cap chain.  
+> > > For  
+> > > > > now, there are two options to get the available offsets.[2]
+> > > > >
+> > > > > - Report the available offsets via ioctl. This requires device-specific logic
+> > > > >   to provide available offsets. e.g., vfio-pci variant driver. Or may the  
+> > > device  
+> > > > >   provide the available offset by DVSEC.
+> > > > > - Store the available offsets in a static table in userspace VMM. VMM gets  
+> > > the  
+> > > > >   empty offsets from this table.
+> > > > >  
+> > > >
+> > > > I'm not a fan of requesting a variant driver for every PASID-capable
+> > > > VF just for the purpose of reporting a free range in the PCI config space.
+> > > >
+> > > > It's easier to do that quirk in userspace.
+> > > >
+> > > > But I like Alex's original comment that at least for PF there is no reason
+> > > > to hide the offset. there could be a flag+field to communicate it. or
+> > > > if there will be a new variant VF driver for other purposes e.g. migration
+> > > > it can certainly fill the field too.  
+> > > 
+> > > Yes, since this has been such a sticking point can we get a clean
+> > > series that just enables it for PF and then come with a solution for
+> > > VF?
+> > >   
+> > 
+> > sure but we at least need to reach consensus on a minimal required
+> > uapi covering both PF/VF to move forward so the user doesn't need
+> > to touch different contracts for PF vs. VF.  
+> 
+> Do we? The situation where the VMM needs to wholly make a up a PASID
+> capability seems completely new and seperate from just using an
+> existing PASID capability as in the PF case.
 
-> +		}
-> +	}
->  
->  	if (cpu_has_tertiary_exec_ctrls())
->  		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
-> @@ -5200,6 +5224,12 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  	if (is_invalid_opcode(intr_info))
->  		return handle_ud(vcpu);
->  
-> +	/*
-> +	 * #VE isn't supposed to happen.  Block the VM if it does.
-> +	 */
+But we don't actually expose the PASID capability on the PF and as
+argued in path 4/ we can't because it would break existing userspace.
 
-Doesn't need to be a multi-line comment.  Though I would just drop the comment,
-the KVM_BUG_ON() makes it pretty darn clear #VE is unexpected.
+> If it needs to make another system call or otherwise to do that then
+> that seems fine to do incrementally??
 
-> +	if (KVM_BUG_ON(is_ve_fault(intr_info), vcpu->kvm))
-> +		return -EIO;
-> +
->  	error_code = 0;
->  	if (intr_info & INTR_INFO_DELIVER_CODE_MASK)
->  		error_code = vmcs_read32(VM_EXIT_INTR_ERROR_CODE);
-> @@ -7474,6 +7504,8 @@ void vmx_vcpu_free(struct kvm_vcpu *vcpu)
->  	free_vpid(vmx->vpid);
->  	nested_vmx_free_vcpu(vcpu);
->  	free_loaded_vmcs(vmx->loaded_vmcs);
-> +	if (vmx->ve_info)
+With PASID currently hidden, VF and PF support really seem too similar
+not to handle them both at the same time.  What's missing is a
+mechanism to describe unused config space where userspace can implement
+an emulated PASID capability.  Defining a DVSEC capability to handle
+this seemed to be the preferred solution from the LPC discussion.  PF
+and VF devices that implement a TBD DVSEC capability could avoid
+needing a variant driver.  Until then we need to be careful not to
+undermine a future world with that preferred solution by introducing
+side-band mechanisms which only work for variant drivers and PF
+devices.  Thanks,
 
-free_page() handles '0', though hopefully this becomes a moot point.
-
-> +		free_page((unsigned long)vmx->ve_info);
->  }
->  
->  int vmx_vcpu_create(struct kvm_vcpu *vcpu)
-> @@ -7567,6 +7599,19 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
->  			goto free_vmcs;
->  	}
->  
-> +	if (vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_EPT_VIOLATION_VE) {
-> +		struct page *page;
-> +
-> +		BUILD_BUG_ON(sizeof(*vmx->ve_info) > PAGE_SIZE);
-> +
-> +		/* ve_info must be page aligned. */
-> +		page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> +		if (page)
-
-Can we please just treat this as an error.  The odds of us screwing up checks
-against vmx->ve_info are higher than the odds of someone enabling KVM_INTEL_PROVE_VE
-on a machine with such high memory pressure that a 4KiB allocation fails, all
-subequent memory allocations succeeding, *and* caring that VM creation fails.
-
-The pr_err() in the failure path is even more ridiculous.
-
-> +			vmx->ve_info = page_to_virt(page);
-> +		else
-> +			pr_err("Failed to allocate ve_info. disabling EPT_VIOLATION_VE.\n");
-> +	}
-> +
->  	if (vmx_can_use_ipiv(vcpu))
->  		WRITE_ONCE(to_kvm_vmx(vcpu->kvm)->pid_table[vcpu->vcpu_id],
->  			   __pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
+Alex
 
 
