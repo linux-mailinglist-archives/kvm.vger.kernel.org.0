@@ -1,130 +1,155 @@
-Return-Path: <kvm+bounces-15021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 488118A8ED1
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 00:26:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D953F8A8EE7
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 00:37:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76C101C21346
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 22:26:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DEEE283B6F
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 22:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6677D147C78;
-	Wed, 17 Apr 2024 22:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBCA983CBA;
+	Wed, 17 Apr 2024 22:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TRvFn44g"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s2g7Mzbv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8F21E484
-	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 22:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B6F7BB0A
+	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 22:37:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713392800; cv=none; b=omj+Lj5cAlVkO9hOqFFdHWJI2oQ+lSnFTNK9cd0N2TqWh+Vm9E3qkeAm/szUWtc2m/s9tcsqdPlsE1juFptLXsIq2xKpY4nKl0SjVqyCm53TOzQUKmV/tMKGxfo44ZXgfWtadkG0bbezwxOhMHJR3D8od93zdh0+aJcLnWD0Pw0=
+	t=1713393443; cv=none; b=f/Kqf37Iy65l7Vk/NEs9/4+Gly2xQC5wbc5ed1/CRzSeqXJ1/vkUNzkgYGDHMEfCNHYNGgHe8UQHPcbQBH7k/7wlg4YterGBt9+E16Bn7nhPzRJqSoLYO7ruOznxNxXpb46a4EHM0BkK7gnCOICLWOwnhyOEQVyYUB0q/ZR8LOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713392800; c=relaxed/simple;
-	bh=XmJUdCd/Xl3LfoQUvHoCZ8uS6N6zHJE4OLXgnHRlR/s=;
+	s=arc-20240116; t=1713393443; c=relaxed/simple;
+	bh=9Diuar4zSEBe6PV6jqdWT8jOdW7PHA+9wjn/yHJKVn0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lGPYBTVn6J7fjUxd/TDbrbb4TsZKyOvKTRebY3lRUaJ+XqluRUmzX4B1F14O0RwONljR7FEyjCw6fnYvHpT7hVfMWmEUfNpVU4yvNVHhBcXAmt1rGF/Jjt4pSVdPZjytmRQyGO63aDSbbCWkIW7+Xn8F2fvHBvH4ss6BcEUIrbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TRvFn44g; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=Wv1mHbV/K7sl5nxtYEfoXPLavdf53VTZ+pXb4LiDMF4gx0c6i01iI8jr7+qqyRRtN/OVhCaaknqoIEuvOG5CDWFh678uUYEPXiRNRdJfCs8uzxBFsALJ7twgv1oKAhNKDow1CXI7wds8vr1gsGPV/7Gwzg1ECOb8+f2O2C8kC/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s2g7Mzbv; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61890f3180aso3292557b3.2
-        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 15:26:39 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc4563611cso479330276.3
+        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 15:37:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713392798; x=1713997598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BiFELyysG8+48TNhbAr5tpc1m8bNuNEGFuwVu5J7UpA=;
-        b=TRvFn44gPZyrGFTvHYx8L25f69jm3X1FB7kd35jCseL3yKvm6xyUKAO1ROw4FbsfJV
-         a7VZQSSz8M/onglawRnAroFfoFZlyN1EhEaDIm1cKksmhGPDwqtChYSGvWncxDva1awR
-         Lh1GOJbQlt3w6dNNRDFZjoBeWGIUCLzUUg3bUL7X2bUM+hZIsAbGcVYOwdbJUQUnB2Mv
-         HKvhrXheD7KZQ/W1uoMIPTtHexXItTD5FQMagt+J/ZQlvV9YUCgxFNKXvnSAJ2IPtuD1
-         HFrBe/x3wVN2vphfftMr73Bk7drMNXxuGv75rXxNvrFSmlMf/wdj9TZ1t30B+0jQs69c
-         XaLw==
+        d=google.com; s=20230601; t=1713393439; x=1713998239; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bLOqVnpH5dycTSpt7sJQ0gumy6eJRRhFek46wdDt8Nc=;
+        b=s2g7Mzbv5FuAUrI/cD7e26NBv1YyWe5RsppfBbxAGZvKZtuYJkdh5/4eFeB7kR20U+
+         4Eh7FjsP+O75woIk+BJy/RpgE2/MnTe8D9jP9mDRPWZ4hwFAefFFpwdBiaP4QKfZpSIY
+         dAFnx7aqfRaC6vvwkuI12p3bTPBlFZed58Zqywv2Zupnmi2AHhG2zsaH7KyvePYdW9jK
+         tkbbJgc+B6Bu5Elg/ELhWc9UgiUwtwKef/I1+wq/+ux7g29nFhtFV0qOgREmuTuYqECE
+         zNkNRF2zqEoNT40/cd0bHtyX5KkIQolbaraT4AhWSURv065jI7ZCWS9F7NuI8YXv+O1a
+         MCFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713392798; x=1713997598;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BiFELyysG8+48TNhbAr5tpc1m8bNuNEGFuwVu5J7UpA=;
-        b=BrBjXDXjeTDC+17G25u9TR/cBXKGh1TM0H8DMH/r2anBOWehcyVrg54eqR1tJAyoZx
-         PgUnLn5rUOnWoHQrq9DAuqii+u1CPudEJevGxMVMbXfFbHOxtnS72bcYfB8Vww7bLt0X
-         hZnKK4mZg6n1IakWHWyz4Buu9gstCy6swqsjHisLs5BFckXA/JQEfEB2rpSphLonu2kL
-         rCvCYK2gKBqBmHt870XmJY00hwjiAVRC6OtIt+mbYZdMQo7djdD5UEi7nSfcuhKOhM04
-         92Hmcx2JHI4VUxxtkWEA4Sd1Z+O7NqoIXH/5yaO7LWcXJGNREqrfd7UIXho4dOkiOxok
-         xBsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVrK8CnGHRk6u/9kGQjErvtu1d0LuRAEGuiRtFq6fueIsy32kJQIif7TilyITrDDFHyW4AaGCHB8BrS+DwcXQ34n9YR
-X-Gm-Message-State: AOJu0YwkQBJOUA/5RpV0+HqwhPxGBXNJLglLTJ/5NHvQbAfGhhm3DDNH
-	/D+9YMpwY3lFCszat3dgMwEG7zvQPX2hCK7BjiA/gQdoyxz/iLpdpX1Qd1MNOd4iDsb8tjqgRU3
-	JcQ==
-X-Google-Smtp-Source: AGHT+IFkllFiRQzAztePeedBStPuMuyosO8Mm41hPtz3vxUqPqhc6YjEe96EAt6RMIol8O9rlxi5RI4mwCw=
+        d=1e100.net; s=20230601; t=1713393439; x=1713998239;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bLOqVnpH5dycTSpt7sJQ0gumy6eJRRhFek46wdDt8Nc=;
+        b=H+5/YIidk1u3NpfZ0Sg0s+pM17mmkByy7WY5XqYczPI/HHim1eOTaqncOc7kpyRPF5
+         770QeSQajlKZwB2sDRewu/YwlIKDNiO+w5cOKV+8irLKnCskSUpIetITgAQips4GehsB
+         LJDAcSaVEmimNxXTx/j9y1CSETfS7T8LzvxkBz+fan5tUVL1FccBttWQXbJgK66bsXf2
+         NUAF9CLT3wsIzRAXyBCkkKdd82BZ2mcmiBABElEdKmPLlYfsvDak16axm2irtj/rre6j
+         2D+KJqV5whAhsjq1P0bOIooHaynbbVP7XoPeGJtew+h3tYRAh3GYe9wyj8x6BWNAirrd
+         EvhQ==
+X-Gm-Message-State: AOJu0YxfqOdPSBdHbt6KKornTUpa2EKsQZqphUzLdfia1Xk+OeSJRdzs
+	v1Lv4vaimMkIt+pUAIDYzKeON1KbuTtN59vS2BSr0+0W35aA9mF4ek1nFOuPERSTbyF9/3Ap9a7
+	wvA==
+X-Google-Smtp-Source: AGHT+IFla4GDZfHaU90+p/2AOWX0WflGLZrF5O8BHncJtppZttlhhCuIMLc3r7pr43yg6goGgjFtLzAvkvQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:ccce:0:b0:61b:1346:3cd5 with SMTP id
- o197-20020a0dccce000000b0061b13463cd5mr143602ywd.9.1713392798464; Wed, 17 Apr
- 2024 15:26:38 -0700 (PDT)
-Date: Wed, 17 Apr 2024 15:26:36 -0700
-In-Reply-To: <CABgObfaoVMzEhu6O5HPe=GXH-bCkpTwSy8Ji0a1=je6f3eSqRQ@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1104:b0:dc2:1f34:fac4 with SMTP id
+ o4-20020a056902110400b00dc21f34fac4mr202972ybu.2.1713393439333; Wed, 17 Apr
+ 2024 15:37:19 -0700 (PDT)
+Date: Wed, 17 Apr 2024 15:37:17 -0700
+In-Reply-To: <20240417200849.971433-2-alejandro.j.jimenez@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240417153450.3608097-1-pbonzini@redhat.com> <20240417153450.3608097-6-pbonzini@redhat.com>
- <ZiA-DQi52hroCSZ8@google.com> <CABgObfaoVMzEhu6O5HPe=GXH-bCkpTwSy8Ji0a1=je6f3eSqRQ@mail.gmail.com>
-Message-ID: <ZiBMnHoyMsoRhLAL@google.com>
-Subject: Re: [PATCH 5/7] KVM: x86/mmu: Introduce kvm_tdp_map_page() to
- populate guest memory
+References: <20240417200849.971433-1-alejandro.j.jimenez@oracle.com> <20240417200849.971433-2-alejandro.j.jimenez@oracle.com>
+Message-ID: <ZiBPHVKKnQPYK7Xy@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Only set APICV_INHIBIT_REASON_ABSENT if
+ APICv is enabled
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	isaku.yamahata@intel.com, xiaoyao.li@intel.com, binbin.wu@linux.intel.com, 
-	rick.p.edgecombe@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
+	joao.m.martins@oracle.com, boris.ostrovsky@oracle.com, 
+	suravee.suthikulpanit@amd.com, mlevitsk@redhat.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Apr 17, 2024, Paolo Bonzini wrote:
-> On Wed, Apr 17, 2024 at 11:24=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> > Do we want to restrict this to the TDP MMU?  Not for any particular rea=
-son,
-> > mostly just to keep moving towards officially deprecating/removing TDP
-> > support from the shadow MMU.
->=20
-> Heh, yet another thing I briefly thought about while reviewing Isaku's
-> work. In the end I decided that, with the implementation being just a
-> regular prefault, there's not much to save from keeping the shadow MMU
-> away from this.
+On Wed, Apr 17, 2024, Alejandro Jimenez wrote:
+> Use the APICv enablement status to determine if APICV_INHIBIT_REASON_ABSENT
+> needs to be set, instead of unconditionally setting the reason during
+> initialization.
+> 
+> Specifically, in cases where AVIC is disabled via module parameter or lack
+> of hardware support, unconditionally setting an inhibit reason due to the
+> absence of an in-kernel local APIC can lead to a scenario where the reason
+> incorrectly remains set after a local APIC has been created by either
+> KVM_CREATE_IRQCHIP or the enabling of KVM_CAP_IRQCHIP_SPLIT. This is
+> because the helpers in charge of removing the inhibit return early if
+> enable_apicv is not true, and therefore the bit remains set.
+> 
+> This leads to confusion as to the cause why APICv is not active, since an
+> incorrect reason will be reported by tracepoints and/or a debugging tool
+> that examines the currently set inhibit reasons.
+> 
+> Fixes: ef8b4b720368 ("KVM: ensure APICv is considered inactive if there is no APIC")
+> Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+> ---
+>  arch/x86/kvm/x86.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 26288ca05364..eadd88fabadc 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9999,7 +9999,20 @@ static void kvm_apicv_init(struct kvm *kvm)
+>  
+>  	init_rwsem(&kvm->arch.apicv_update_lock);
+>  
+> -	set_or_clear_apicv_inhibit(inhibits, APICV_INHIBIT_REASON_ABSENT, true);
+> +	/*
+> +	 * Unconditionally inhibiting APICv due to the absence of in-kernel
+> +	 * local APIC can lead to a scenario where APICV_INHIBIT_REASON_ABSENT
+> +	 * remains set in the apicv_inhibit_reasons after a local APIC has been
+> +	 * created by either KVM_CREATE_IRQCHIP or the enabling of
+> +	 * KVM_CAP_IRQCHIP_SPLIT.
+> +	 * Hardware support and module parameters governing APICv enablement
+> +	 * have already been evaluated and the initial status is available in
+> +	 * enable_apicv, so it can be used here to determine if an inhibit needs
+> +	 * to be set.
+> +	 */
 
-Yeah.
+Eh, this is good changelog material, but I don't think it's not necessary for
+a comment.  Readers of this code really should be able to deduce that enable_apicv
+can't be toggled on, i.e. DISABLE can't go away.
 
-> The real ugly part is that if the memslots are zapped the
-> pre-population effect basically goes away (damn
-> kvm_arch_flush_shadow_memslot).=20
+> +	if (enable_apicv)
+> +		set_or_clear_apicv_inhibit(inhibits,
+> +					   APICV_INHIBIT_REASON_ABSENT, true);
+>  
+>  	if (!enable_apicv)
+>  		set_or_clear_apicv_inhibit(inhibits,
 
-Ah, the eternal thorn in my side.=20
+This can more concisely be:
 
-> This is the reason why I initially thought of KVM_CHECK_EXTENSION for the=
- VM
-> file descriptor, to only allow this for TDX VMs.
+	enum kvm_apicv_inhibit reason = enable_apicv ? APICV_INHIBIT_REASON_ABSENT :
+						       APICV_INHIBIT_REASON_DISABLE;
 
-I'm fairly certain memslot deletion is mostly a QEMU specific problem.  All=
-egedly
-(I haven't verified), our userspace+firmware doesn't delete any memslots du=
-ring
-boot.
+	set_or_clear_apicv_inhibit(&kvm->arch.apicv_inhibit_reasons, reason, true);
 
-And it might even be solvable for QEMU, at least for some configurations.  =
-E.g.
-during boot, my QEMU+OVMF setup creates and deletes the SMRAM memslot (desp=
-ite my
-KVM build not supporting SMM), and deletes the lower RAM memslot when reloc=
-ating
-BIOS.  The SMRAM is definitely solvable, and the BIOS relocation stuff seem=
-s like
-it's solvable too.
+	init_rwsem(&kvm->arch.apicv_update_lock);
+
+which I think also helps the documentation side, e.g. it's shows the VM starts
+with either ABSENT *or* DISABLE.
+
+> -- 
+> 2.39.3
+> 
 
