@@ -1,170 +1,199 @@
-Return-Path: <kvm+bounces-15008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15009-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1AD38A8CCA
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 22:11:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED0748A8CDE
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 22:26:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F4712814D5
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 20:11:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B9C91C21906
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 20:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B56E2383BF;
-	Wed, 17 Apr 2024 20:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1C238F94;
+	Wed, 17 Apr 2024 20:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eimtY/Yj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WFRGkQ5B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4802208D6;
-	Wed, 17 Apr 2024 20:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A88D37703
+	for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 20:26:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713384674; cv=none; b=GzROvuIrV6q48YMdbIhGlXX7k+17WKMg6ODjsROmnxlsYbNX9nPqhGj8SarieiHoQBuff8S50nC8kF8z31eKXLMwkdlUeh2PBBLbhy53/8WD+PDOeEp87rU4MtOYjAAC95w1asEAzlA8ws3iiLbY5wuEPns27/j5+N8g/awsiFI=
+	t=1713385563; cv=none; b=FecVn5pfDlFtwX4jqMsKLU819mVVvyc8JIhhifIfEA/C+n2fWxX0GQT57H23PamUKWtKCNmmVuGGI6CcRJUWcp4/QCZkTeljE8hYuHZUjGCsEgudymsBDle3tpFYNtR9KsvqcHbsAFfTs2xUemQxlRU+1vlWiM5h850xXZblvck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713384674; c=relaxed/simple;
-	bh=WOJjjXPmt5T73gBoMsSOip3W1PBw8vG3OglSmkgGACQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X52qONXKGYtSKW6aIKM78Lfy6d9uXcl9J5LzuPujGEMJ8HIuC/+DajyWZ6p7wMtCD+MZsU9NBrSLjgxaJLBfwOH7kPMy1tYEKqLsr2HE2pP36gYCc4E7yyP+85FtJI/U7Q3vHdxsD+qeq8ekDJQMPENH+CbhO0Y3ApyXXlucryU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eimtY/Yj; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713384673; x=1744920673;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WOJjjXPmt5T73gBoMsSOip3W1PBw8vG3OglSmkgGACQ=;
-  b=eimtY/YjR9PtC7cnPrO7XmcR2n805QQJFDB8phGYmAN0PolshS20jk1L
-   ZtkQ81ihYIADNHMC5Mbmwq8vkn3Rw469A5mqOTVItLDJbNEHiaYuQrDxI
-   yFT3yT4SPvafrh+wT5Vlbk/kLaKYU+bSYq4o+3DBHkZy2lg9l+2FHNSkP
-   WYcOujgpmmeygnV719Ju+YX98JnCNZZU3AANKpyjbi8Huqmjfdi/mBDbA
-   5RoPnDfu08R8QICgt9h3UaSBO7hWP1btGiiMlwhNrwej6M2GrEPBNnVbj
-   RG7dKq211yKzf/QfA0vZuS9Ym297+Sx6h2C8D4UqYBAU04KJ5KWmw4BaR
-   Q==;
-X-CSE-ConnectionGUID: QQz/d5juT4G8XOlvihFcIQ==
-X-CSE-MsgGUID: 1M1AL+4dQpqPAtXpF99YfQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="19504694"
-X-IronPort-AV: E=Sophos;i="6.07,210,1708416000"; 
-   d="scan'208";a="19504694"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 13:10:59 -0700
-X-CSE-ConnectionGUID: BwxQWrhIRgKaGHE0XVmIEA==
-X-CSE-MsgGUID: IpseWg/9TG6DSsxubstNxA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,210,1708416000"; 
-   d="scan'208";a="23336391"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 13:10:58 -0700
-Date: Wed, 17 Apr 2024 13:10:58 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 109/130] KVM: TDX: Handle TDX PV port io hypercall
-Message-ID: <20240417201058.GL3039520@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <4f4aaf292008608a8717e9553c3315ee02f66b20.1708933498.git.isaku.yamahata@intel.com>
- <00bb2871-8020-4d60-bdb6-d2cebe79d543@linux.intel.com>
+	s=arc-20240116; t=1713385563; c=relaxed/simple;
+	bh=7BZHgF3W5ZZE54WPCFL5+Yv9SFz3jbsd5fEweJQ2Yk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D+0LGb12EPsvhsSH1I4IXjoVLJkgzb2aSiCFe+lRZUwjYalLID322wcWiHUqusZXfQexAVBv3V7vPZQ9+25YKKMKqztRITz84EwZ8rgQo23Jrwb+yCkP1666VP5E/BK6WeT4ZmRwdc5HUs5CZ+LEF8VeM+2sbzFZ36AboJMtn2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WFRGkQ5B; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713385559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4IOnfC4A0RohZ6kwMqfDoY6+tZsEAo9YyC45xU6vlkc=;
+	b=WFRGkQ5Byh1XCRZltRCJgSPIfU27SODNismT0y8UnUKx0WKhYP1e0wg/Kfw4MXnScFbbdF
+	i9H9oFm+7qkcyvE5vbJQeGtPHQqlCMtG2sUjAuc9gIiGgiAsHrW7cwukY/JjpHx4XBK11X
+	QM+XWmLirpTntj/R/dhQ07D2BlvszqU=
+Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
+ [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-461-eRLpzgWBOa6AbKWB6W1-dg-1; Wed, 17 Apr 2024 16:25:57 -0400
+X-MC-Unique: eRLpzgWBOa6AbKWB6W1-dg-1
+Received: by mail-ot1-f72.google.com with SMTP id 46e09a7af769-6eb5968cdc8so114713a34.1
+        for <kvm@vger.kernel.org>; Wed, 17 Apr 2024 13:25:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713385557; x=1713990357;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4IOnfC4A0RohZ6kwMqfDoY6+tZsEAo9YyC45xU6vlkc=;
+        b=VFqvB3jL2ycfg96qgXHMw8fKEH1nbdC+wJ+EOmDq1BAbeN+C/NusdAK89r8puWVN8q
+         jAf/LkO8EHdGSTMjbrC2xrURkyPT/1o5Wgkjw/Oyrv+22cKc2tGhtzLLXZxXResbiuWM
+         1Jb0Km0GnHVschgqfo0g3YaWDY6BSdTcu42E2lB3DIWEYppUXISKb2sREIzuuf5YKJE1
+         Pn+AhadqH7fFEI/loozAhLxHB74L9SJxnT8HD8sULqBAR988adJwlCePy6UXTFifQONn
+         Yi23+d55VBttqnMSx8LKBqiFyem2ASfnZMZvgFHOU4DaXfDU1HnONxiJ/0kUUWDOBpmn
+         RD/A==
+X-Forwarded-Encrypted: i=1; AJvYcCV547DYZr6y7YFu29sQuMG9BWXnYdBwCLNF/k4aT3Ttcv0nG4veKWyw+N4oQlUrjTdySIExRBfOMMuZzwaliXZfpZk/
+X-Gm-Message-State: AOJu0YxBulc1FZjpIw2l7hJDY3oio/7epaKGlNIFtPZDplYc4fZflxi0
+	GxFGJdKgMZuSUPwHdh6eW2UeUU2k6r/t8GjKyJ9zhQSewbiLtPnnDhjVC+pS3RbxNIeqtkkIjRr
+	V/7shkPEV41hwgej+HjyGYy7mFoGSKjyM7E5j4Z4pGLDOBvbW8g==
+X-Received: by 2002:a9d:69c7:0:b0:6eb:7685:f230 with SMTP id v7-20020a9d69c7000000b006eb7685f230mr605425oto.28.1713385556796;
+        Wed, 17 Apr 2024 13:25:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGAA5+8BHEzfd8XxwBjBN2DsH0fwZ0zsVuy97fzw0ylgtBKgn+V148PXZFfakl/bTMjiYFHUw==
+X-Received: by 2002:a9d:69c7:0:b0:6eb:7685:f230 with SMTP id v7-20020a9d69c7000000b006eb7685f230mr605407oto.28.1713385556512;
+        Wed, 17 Apr 2024 13:25:56 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id m6-20020a9d7ac6000000b006eb7e6d2f3dsm30683otn.37.2024.04.17.13.25.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 13:25:55 -0700 (PDT)
+Date: Wed, 17 Apr 2024 14:25:52 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: "Liu, Yi L" <yi.l.liu@intel.com>, "jgg@nvidia.com" <jgg@nvidia.com>,
+ "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
+ <robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
+ <chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
+ <iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
+ <baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+ "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+Subject: Re: [PATCH v2 4/4] vfio: Report PASID capability via
+ VFIO_DEVICE_FEATURE ioctl
+Message-ID: <20240417142552.44382198.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276D245515E81844B5EC1068C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240412082121.33382-1-yi.l.liu@intel.com>
+	<20240412082121.33382-5-yi.l.liu@intel.com>
+	<20240416115722.78d4509f.alex.williamson@redhat.com>
+	<BN9PR11MB5276D245515E81844B5EC1068C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <00bb2871-8020-4d60-bdb6-d2cebe79d543@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2024 at 08:51:39PM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On Wed, 17 Apr 2024 07:09:52 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-> 
-> 
-> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > Wire up TDX PV port IO hypercall to the KVM backend function.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> > v18:
-> > - Fix out case to set R10 and R11 correctly when user space handled port
-> >    out.
-> > ---
-> >   arch/x86/kvm/vmx/tdx.c | 67 ++++++++++++++++++++++++++++++++++++++++++
-> >   1 file changed, 67 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index a2caf2ae838c..55fc6cc6c816 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -1152,6 +1152,71 @@ static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
-> >   	return kvm_emulate_halt_noskip(vcpu);
-> >   }
-> > +static int tdx_complete_pio_out(struct kvm_vcpu *vcpu)
-> > +{
-> > +	tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
-> > +	tdvmcall_set_return_val(vcpu, 0);
-> > +	return 1;
-> > +}
-> > +
-> > +static int tdx_complete_pio_in(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
-> > +	unsigned long val = 0;
-> > +	int ret;
-> > +
-> > +	WARN_ON_ONCE(vcpu->arch.pio.count != 1);
-> > +
-> > +	ret = ctxt->ops->pio_in_emulated(ctxt, vcpu->arch.pio.size,
-> > +					 vcpu->arch.pio.port, &val, 1);
-> > +	WARN_ON_ONCE(!ret);
-> > +
-> > +	tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
-> > +	tdvmcall_set_return_val(vcpu, val);
-> > +
-> > +	return 1;
-> > +}
-> > +
-> > +static int tdx_emulate_io(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
-> > +	unsigned long val = 0;
-> > +	unsigned int port;
-> > +	int size, ret;
-> > +	bool write;
-> > +
-> > +	++vcpu->stat.io_exits;
-> > +
-> > +	size = tdvmcall_a0_read(vcpu);
-> > +	write = tdvmcall_a1_read(vcpu);
-> > +	port = tdvmcall_a2_read(vcpu);
-> > +
-> > +	if (size != 1 && size != 2 && size != 4) {
-> > +		tdvmcall_set_return_code(vcpu, TDVMCALL_INVALID_OPERAND);
-> > +		return 1;
-> > +	}
-> > +
-> > +	if (write) {
-> > +		val = tdvmcall_a3_read(vcpu);
-> > +		ret = ctxt->ops->pio_out_emulated(ctxt, size, port, &val, 1);
-> > +
-> > +		/* No need for a complete_userspace_io callback. */
-> I am confused about the comment.
-> 
-> The code below sets the complete_userspace_io callback for write case,
-> i.e. tdx_complete_pio_out().
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Wednesday, April 17, 2024 1:57 AM
+> >=20
+> > On Fri, 12 Apr 2024 01:21:21 -0700
+> > Yi Liu <yi.l.liu@intel.com> wrote:
+> >  =20
+> > > + */
+> > > +struct vfio_device_feature_pasid {
+> > > +	__u16 capabilities;
+> > > +#define VFIO_DEVICE_PASID_CAP_EXEC	(1 << 0)
+> > > +#define VFIO_DEVICE_PASID_CAP_PRIV	(1 << 1)
+> > > +	__u8 width;
+> > > +	__u8 __reserved;
+> > > +}; =20
+> >=20
+> > Building on Kevin's comment on the cover letter, if we could describe
+> > an offset for emulating a PASID capability, this seems like the place
+> > we'd do it.  I think we're not doing that because we'd like an in-band
+> > mechanism for a device to report unused config space, such as a DVSEC
+> > capability, so that it can be implemented on a physical device.  As
+> > noted in the commit log here, we'd also prefer not to bloat the kernel
+> > with more device quirks.
+> >=20
+> > In an ideal world we might be able to jump start support of that DVSEC
+> > option by emulating the DVSEC capability on top of the PASID capability
+> > for PFs, but unfortunately the PASID capability is 8 bytes while the
+> > DVSEC capability is at least 12 bytes, so we can't implement that
+> > generically either. =20
+>=20
+> Yeah, that's a problem.
+>=20
+> >=20
+> > I don't know there's any good solution here or whether there's actually
+> > any value to the PASID capability on a PF, but do we need to consider
+> > leaving a field+flag here to describe the offset for that scenario? =20
+>=20
+> Yes, I prefer to this way.
+>=20
+> > Would we then allow variant drivers to take advantage of it?  Does this
+> > then turn into the quirk that we're trying to avoid in the kernel
+> > rather than userspace and is that a problem?  Thanks,
+> >  =20
+>=20
+> We don't want to proactively pursue quirks in the kernel.
+>=20
+> But if a variant driver exists for other reasons, I don't see why it=20
+> should be prohibited from deciding an offset to ease the
+> userspace. =F0=9F=98=8A
 
-You're correct. This comment is stale and should be removed it.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+At that point we've turned the corner into an arbitrary policy decision
+that I can't defend.  A "worthy" variant driver can implement something
+through a side channel vfio API, but implementing that side channel
+itself is not enough to justify a variant driver?  It doesn't make
+sense.
+
+Further, if we have a variant driver, why do we need a side channel for
+the purpose of describing available config space when we expect devices
+themselves to eventually describe the same through a DVSEC capability?
+The purpose of enabling variant drivers is to enhance the functionality
+of the device.  Adding an emulated DVSEC capability seems like a valid
+enhancement to justify a variant driver to me.
+
+So the more I think about it, it would be easy to add something here
+that hints a location for an emulated PASID capability in the VMM, but
+it would also be counterproductive to an end goal of having a DVSEC
+capability that describes unused config space.  The very narrow scope
+where that side-band channel would be useful is an unknown PF device
+which doesn't implement a DVSEC capability and without intervention
+simply behaves as it always has, without PASID support.
+
+A vendor desiring such support can a) implement DVSEC in the hardware,
+b) implement a variant driver emulating a DVSEC capability, or c)
+directly modify the VMM to tell it where to place the PASID capability.
+I also don't think we should exclude the possibility that b) could turn
+into a shared variant driver that knows about multiple devices and has
+a table of free config space for each.  Option c) is only the last
+resort if there's not already 12 bytes of contiguous, aligned free
+space to place a DVSEC capability.  That seems unlikely.
+
+At some point we need to define the format and use of this DVSEC.  Do
+we allow (not require) one at every gap in config space that's at least
+12-bytes long and adjust the DVSEC Length to describe longer gaps, or do
+we use a single DVSEC to describe a table of ranges throughout extended
+(maybe even conventional) config space?  The former seems easier,
+especially if we expect a device has a large block of free space,
+enough for multiple emulated capabilities and described by a single
+DVSEC.  Thanks,
+
+Alex
+
 
