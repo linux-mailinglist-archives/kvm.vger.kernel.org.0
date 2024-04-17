@@ -1,99 +1,105 @@
-Return-Path: <kvm+bounces-14922-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-14923-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40B088A7B01
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 05:18:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D9B08A7B19
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 05:37:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF7A9285135
-	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 03:18:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF97BB21611
+	for <lists+kvm@lfdr.de>; Wed, 17 Apr 2024 03:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D075EAD2;
-	Wed, 17 Apr 2024 03:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04711405D8;
+	Wed, 17 Apr 2024 03:37:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqLw8Z27"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AtvX+FHj"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FE38F66;
-	Wed, 17 Apr 2024 03:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E142260A;
+	Wed, 17 Apr 2024 03:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713323919; cv=none; b=r8P+NA+6b8X4cbz9aChuMuW0ud/kEy5GdR+U/OAH7OMIfTnYJa4dTGJlX/QLAfYDRgG9qTSIKUn2yQvrN0vllYL029R4GPLFoKY7GQYOW6NVEi/2xBl4zJTek85K72VwvbjHl09h/MakS44FvByNTx1opSwYnzYjyVtgw7NuhKE=
+	t=1713325065; cv=none; b=GhhFiRZgEYI5dtPsoFGqDHVkGwI3cG3BiznQFkQ4Z+Mxl/cEunFguDKOKYiTQjNeZCGjk1XwvWvMWHbBN8PHKt26BC3oLUF5iyubmExOhGaq+228xG9gLHZt6mnRv+26sxdLOnGpIHk1IzUKKA18kuZkr26HUW0m+qs+1DXAGf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713323919; c=relaxed/simple;
-	bh=QROgXz5UDuoxzxyfomvlU9PtVelcpq1hfiHqc4D5Rl0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SpdWEdy9ipzN4E7UtHI1h33Wvdi8EBXuwybgHqsPtWpDaIKgscWbktvhjKKn5l3zRLyfcUJQk5mllzWJvmrAc6WQgqoKGmHpe8Jvd7LQ7glZG+zsnJTYBKlZQkNH+aE46enytHiug3iOiGcjtR4PlMjWf/TT1cFnyEFIdX/BnM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqLw8Z27; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8643C113CE;
-	Wed, 17 Apr 2024 03:18:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713323918;
-	bh=QROgXz5UDuoxzxyfomvlU9PtVelcpq1hfiHqc4D5Rl0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=kqLw8Z27o9tczw3gVr+DQw78bY/vuXNieAm6RyqMBwaTqF/7X62dbj+UjOxE3ttnL
-	 2ZHQRFwFQ527o1zHAoWGxPRsSChSta5s3Qdo8utMdB0p8CyQwhT8DI8Kd7jhYvuiG7
-	 33RNm5tlzJ02TMnUvv20OfOTueGMJK1t/sON/wuc5oqLkuzcny3J/WV6W4QMOb8rMo
-	 cM6UPl1gX0DIebasc6xLyZzMu+E5mqXOzHmwGQCtfDXO/i/uHJ0HVlY00nqjPICMG1
-	 JcBGCdqzs/ZVRCDuJKxwrLWIJsYfpOFoN/8QpAdGI35eTR2Dpr6eF/R4ItNr8donPs
-	 ySgxiuYSJOLuw==
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a51969e780eso665324566b.3;
-        Tue, 16 Apr 2024 20:18:38 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVtwSKA1LqTH1kIyO1kT10hx7beoh69PHL/+hqOaMycKUMFc2NqRZgXPSuwrHT16h1dJ0hHl1FGzrcNyRvoQ4WO0RAkIf/zXaFTorSnl4labBY3NbUAhgqePdazYLMme69hwztGX8wIAoH7KOPX/SVJJdRpMxsbBIxQX5i0tA==
-X-Gm-Message-State: AOJu0YywLV5fM28Sg3p7iuY2FRA/nO4KIjRr6HjSDBRsAwkefuKRk+iw
-	F2AmAdCi7rKvsvLvt0e4ahT/IpfudHbpvDfTLsK9SFliGEwQ4H5A5B9icAqXYTbWztxMFwj+TUl
-	KE+eN6JF9trt/6v+eMV/DQoqQjK8=
-X-Google-Smtp-Source: AGHT+IGAV0JKt0Q8Wt6Fx+5t3raYHvV2CbyQ2onGWJZvBZMtZILfGwV4qyHAs5ucw4zU1joYNfqugznQTR7cPZhmh20=
-X-Received: by 2002:a17:907:1c0d:b0:a4e:7a36:4c38 with SMTP id
- nc13-20020a1709071c0d00b00a4e7a364c38mr13676826ejc.20.1713323917285; Tue, 16
- Apr 2024 20:18:37 -0700 (PDT)
+	s=arc-20240116; t=1713325065; c=relaxed/simple;
+	bh=00HJtH0QWrCENAFZgWCzA9lQHeGivlTimNrmNg+L6yU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hy17a+VZNUoRtN/eqarGb7RLLScnlX89HsYZI7GNsbBez9y/VdHts1kY9Qtjm3EzHgRzt4wZvl6iAiLBuAVhZ5Ram8RW+maVTHtkRiFCNGzwpo6otRsJkiBsiSK/h8/dDzsg9ZSJCv1UVaE+12icoMq0CMlXluqJKcE4cnhalIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AtvX+FHj; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713325064; x=1744861064;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=00HJtH0QWrCENAFZgWCzA9lQHeGivlTimNrmNg+L6yU=;
+  b=AtvX+FHjTpbd+w4ZVrm4IiGURpLrspuw36qLGDgVFWvQN4xd2Rucw4w7
+   btJzxouTnbcrst8xHm9dEuWhX8K8VeRX81x5VKYboBJMr8035smrx6ELE
+   65jH7rvsiCfF0GYIsWGunclZYhUS2WTX/r5r8L7a5CJNniHlhnsKgnYZa
+   yvDuJtsvdNUshrW0mCYexvoLSkYBW3NB3CemyZsYEvdGC2ZYLoHXxDRBO
+   SuzOEaz9dCfU8OZ8lSVpxWQPVlGaw4Lb3OcqijOW1fywH5nnGxSBPinzw
+   Sv/Pnu6XuLh/rn/PJi1ZQYt7ipEkLRVcKWQanBNtvDdYmjN7Zm0xpLoe7
+   Q==;
+X-CSE-ConnectionGUID: oXe97HuOTuK1SXv3a2RmZg==
+X-CSE-MsgGUID: wIL6GU5BRzKrBt/ZS6KnBw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8659938"
+X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
+   d="scan'208";a="8659938"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 20:37:43 -0700
+X-CSE-ConnectionGUID: 7Lv2mrblQ367wKv/S6Z1TA==
+X-CSE-MsgGUID: +DJGUsdbQWOmCJVdobaxlA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
+   d="scan'208";a="53452059"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.238.14]) ([10.124.238.14])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 20:37:39 -0700
+Message-ID: <1e26b405-f382-45f4-9dd5-3ea5db68302a@intel.com>
+Date: Wed, 17 Apr 2024 11:37:37 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416144926.599101-1-david@redhat.com> <CANiq72kACt+FfeYXJxfQpmGH=uPqkDA0oprfnebw52VSKyn7kQ@mail.gmail.com>
-In-Reply-To: <CANiq72kACt+FfeYXJxfQpmGH=uPqkDA0oprfnebw52VSKyn7kQ@mail.gmail.com>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Wed, 17 Apr 2024 11:18:27 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5mt0GaaZ3s44CYb4aKqYeDYm+Q16hY__FdQ6xYJh+bgg@mail.gmail.com>
-Message-ID: <CAAhV-H5mt0GaaZ3s44CYb4aKqYeDYm+Q16hY__FdQ6xYJh+bgg@mail.gmail.com>
-Subject: Re: [PATCH v1] LoongArch/tlb: fix "error: parameter 'ptep' set but
- not used" due to __tlb_remove_tlb_entry()
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	linux-arch@vger.kernel.org, loongarch@lists.linux.dev, llvm@lists.linux.dev, 
-	Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, 
-	WANG Xuerui <kernel@xen0n.name>, Nathan Chancellor <nathan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V4 3/4] KVM: x86: Add a capability to configure bus
+ frequency for APIC timer
+To: Reinette Chatre <reinette.chatre@intel.com>, isaku.yamahata@intel.com,
+ pbonzini@redhat.com, erdemaktas@google.com, vkuznets@redhat.com,
+ seanjc@google.com, vannapurve@google.com, jmattson@google.com,
+ mlevitsk@redhat.com, chao.gao@intel.com, rick.p.edgecombe@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1711035400.git.reinette.chatre@intel.com>
+ <6146ef9f9e5a17a1940b0efb571c5143b0e9ef8f.1711035400.git.reinette.chatre@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <6146ef9f9e5a17a1940b0efb571c5143b0e9ef8f.1711035400.git.reinette.chatre@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Queued for loongarch-fixes, thanks.
+On 3/22/2024 12:37 AM, Reinette Chatre wrote:
 
-Huacai
+...
 
-On Wed, Apr 17, 2024 at 3:25=E2=80=AFAM Miguel Ojeda
-<miguel.ojeda.sandonis@gmail.com> wrote:
->
-> On Tue, Apr 16, 2024 at 4:49=E2=80=AFPM David Hildenbrand <david@redhat.c=
-om> wrote:
-> >
-> > With LLVM=3D1 and W=3D1 we get:
->
-> Hmm... I didn't need W=3D1 to trigger it (LLVM 18.1.2).
->
-> > Reported-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
->
-> Thanks, looks good to me -- built-tested:
->
-> Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
-> Tested-by: Miguel Ojeda <ojeda@kernel.org>
->
-> Cheers,
-> Miguel
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 0b5a33ee71ee..20080fe4b8ee 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8063,6 +8063,23 @@ error/annotated fault.
+>   
+>   See KVM_EXIT_MEMORY_FAULT for more information.
+>   
+> +7.35 KVM_CAP_X86_APIC_BUS_FREQUENCY
+
+As sean mentioned it previous comment, I would be the one prefers 
+KVM_CAP_X86_APIC_BUS_CYCLES_NS
+
+   Depending on whether people get hung up on nanoseconds not being a
+   "frequency", either KVM_CAP_X86_APIC_BUS_FREQUENCY or
+   KVM_CAP_X86_APIC_BUS_CYCLES_NS.
 
