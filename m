@@ -1,73 +1,73 @@
-Return-Path: <kvm+bounces-15123-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15124-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5E1E8AA205
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:28:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CDDE8AA21D
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:37:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A8EB281EFC
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 18:28:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1EDF28259B
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 18:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F081717AD6A;
-	Thu, 18 Apr 2024 18:28:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA392178CEC;
+	Thu, 18 Apr 2024 18:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gcUJK8Rx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rS82ilXo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3DD178CFA
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 18:28:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EB016F843
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 18:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713464890; cv=none; b=OlpIXo190KG/xpiIXEbT2/6bt3sYChLmlOe9dnZ7oOrxrU/DxjPzOzgwGcflj0ok26/zNc7BE9LJgskAZfm3jNCncbLvmhTD6JFvZBWMLTE3lzNl1jE3NB8Pox81aKubsPWcOYdPjSbrksaYgoi70B1ftngurEeBenFfXor7yqE=
+	t=1713465421; cv=none; b=DLD1c1UqL9+4XJsEbm3QD3uR2aKeG+ZOYivQEGAVpg8kw8VEvLzzEorEkzuNqgmOt+crwIZp9A70oWQfyheLjYl46nbjiP0uV3w46c2pdm7z5nSsTHyToGpDuMiaCbikatdHP3CLpH6wr4MFsBSIkGV5rrLoQw5zNdOh28BffBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713464890; c=relaxed/simple;
-	bh=R1lVfxWdHMgZEl/GJ+t31bj2vLOAc95uyRSzDMDSSs8=;
+	s=arc-20240116; t=1713465421; c=relaxed/simple;
+	bh=5M7sY2eNkmePxZYEhbphJRX7F7XSNeGGbs2z+TtGQ10=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TN72hT39+65p+iYvMzuHC/RsmomfUFDHMT/MyCGG2WgCpYFfBXW5VQuzM8WbdOblEGhFkvbhslWZatGD0ozFpqhwHz356Y+1sk+Qe1hYDQqKap2X3UBqSSbFwFIGa6RK1fAnWzxPrOlSKc1IWQ2dVmvD6hwj1vt4xTEhHa+g8dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gcUJK8Rx; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=llXnI/x21oYV5JassrT5aGjrHLFSVziDmLI3ZBVNAnKLWOediWDTWTJ1zTZDtsDjtU7b+k0PPQwsHOFQiQ61fI82VWr+3Ma0fRJO3LytM5Xd5TVRPRtiqF1hIse7Eo85SAH4etaW4A9vdIyoYm3hBE7RGjoFwFiEXKl7r/dSIYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rS82ilXo; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ab1e248aa2so1138084a91.0
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 11:28:08 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a482a2360aso2021642a91.0
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 11:36:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713464888; x=1714069688; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713465419; x=1714070219; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=R1lVfxWdHMgZEl/GJ+t31bj2vLOAc95uyRSzDMDSSs8=;
-        b=gcUJK8RxBPlQJ0oThEWu8gLi+vHuozTXWlVR/zfZeYB4blvYyqswvocX+jeT/dX9x4
-         cKyqLC3+ID++vFeyhWudOUYu596MNcSuzv8hyShp9CCvf2zFo+FrZgO23wXlUSKqfC6h
-         5jYZ69bNl6KBrJNaqPqKQsf4mh4KzUwTG+VxYNFSZ3KyW1Z0LbeSnFtuvLDUxVYzmV9q
-         x9wbV9xJmTc8UHX9PJEOCUGOV2VzwBLBHFBfd+KRzMo43EenNO6IBaneXLvcjMWrwBEi
-         nZDC9M6txIdOZ0etM/nGXqajLPjgEO7jN5EBF2vMkeWXWy3EadfD/TAIwnu1cuFW2FdH
-         Qjsw==
+        bh=+wlN/ce91bTf9rbFasUDQdfgpzsyETmNKvn6NbsAl7o=;
+        b=rS82ilXoy6GZhfwknA0JqCrTPIg4eHWWzsNFXY1+6YnMxmOVOpz2aPS6qs/yvXNBC/
+         IY3p6GFKqzBramDmAMK2oJckpsfw/Yn598Tt+qBYIbQXbpPg6r7dHXVYtSC9+j8yen4A
+         dy9TKe3tzEbKadQoCnB6lloa+66xFKtdSB3yzhbns4IPAoFx9sWYXfxqEmbOvbrr7ZK3
+         Hx97/T559MRJtWsHSU0EpXXuuGNu70C0n9jExU8vFZuGpJy9SBuFgezejK6ccnSJSS0g
+         rX93TTJp4H1GGbpedbgpkbLoU1sFTgy2HMnDjqDK7y1T3VFujup1bgFNb4wy/Fp7G4nu
+         6ozg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713464888; x=1714069688;
+        d=1e100.net; s=20230601; t=1713465419; x=1714070219;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=R1lVfxWdHMgZEl/GJ+t31bj2vLOAc95uyRSzDMDSSs8=;
-        b=jrgOm7+vSDuohVT74HoHfP2jibn9VHfPXZI4Sg2zfDNH89ulI7Zx24XEfrkR6krQ6U
-         vzHtazKIc6KjRR9zG6Kt3Uyxw02bEQCF1AbQgVeAv3lc455yUhrEVGc5CPtGeaVUEfpj
-         25FsbaLGk3EXLBlgLkkpM6iN/aDoVpqZNpwTvtFsCRdcheMdyhiA2IERgmlKI+JyxQle
-         7Be7dsaNFstIQ7Pi2nBNOs1AvlFRtOFLtdp2D56nMmAXWW5FIZRVXKv0B3g92zWit0tS
-         I8wYFrU9dSYhXLLc5a15kQShPs0yX1wFBeIWr9cwBx4cG6Xmn7Xj6x0erV2AdhW6Smm0
-         4qwA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEIP1Am3HcAJcIuD7lkLQmhv8mcibg94XXotpSz8EQOx+UKrobDMGPIBB2emIllrQ8BOxjRpcqTM0dfaIX16njYH6l
-X-Gm-Message-State: AOJu0Ywikz3RujxuolmCXZsTbFo89DYdt09ewUrjnbk806WfNbX16GFq
-	G3DK9RVQDRGiNSA1Bj8MCSRu+n+0PEvArZDKH9jNcgi8aeAVIYGObxozqpZDgMfwO9WQm86y1yW
-	5jg==
-X-Google-Smtp-Source: AGHT+IH6+dEsojfP78ePOpECHaVC9H/FxDZBqEHzlzo35Zf7DJWYV84P4QmzTSmrn+DF+gA6LVDNeaQl5WE=
+        bh=+wlN/ce91bTf9rbFasUDQdfgpzsyETmNKvn6NbsAl7o=;
+        b=vfO6FdwpXio4B0QuIYuGXP9pm6XOR93CThr4QvXxTj1GmCGruCaGBYj6Fs2aTw0Mlo
+         L/43ASbX6SnGa65GGaeUAmkhmQbueQUTJZcNJ8rXHfsI2anhzm/JEjA49itndO9uA+Sy
+         b8yyWZrtJ4YttUdXJTcWFm/y05AmkFOCjNkeWey9EMd8rmS6BPMeguyAlMPpTXlid75S
+         XW+NzEojqpq/25Qv2oBwxQEPIROk2EFZRj1+RPyNHtvARbUkA9EZRx9ZSK0bXhE161en
+         zoAm2tKluPEM7V9tt3uNtutdd7rbGBRgjpS5yb5RRlzniPYrDienqxhdiB4DL5wXx6xq
+         B64g==
+X-Forwarded-Encrypted: i=1; AJvYcCVYJsAjIJG0qR9q3j3AedMow9W1oKAw+6SMJ89ud8/ugxzPskMmCphAZrANsFQnZ0gJDLUWohBuiNPipfa1kp636WC8
+X-Gm-Message-State: AOJu0YwrqumX7MQq9ZjQQEFrW5RrzH9YUDKMJZyNQ6aT4KBwtUe8BjsI
+	uy7cNw3B0mC+oisti0XSNzYBdTfFjuOSzxsrvYGKzIT0v4Z4L0qnsQzxtt7vjZkRf5ICloqnkzL
+	3FA==
+X-Google-Smtp-Source: AGHT+IEEQdqUCVbpG8urZmuw0tUnHYvNqYQTHwsqXS5Je37zGkNyPzcVm0cNUkYflnrODXJVMl1KaQDGJeY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1914:b0:2a2:8888:807b with SMTP id
- mp20-20020a17090b191400b002a28888807bmr15304pjb.4.1713464888075; Thu, 18 Apr
- 2024 11:28:08 -0700 (PDT)
-Date: Thu, 18 Apr 2024 11:28:06 -0700
-In-Reply-To: <61f14bc6415d5d8407fc3ae6f6c3348caa2a97e9.camel@cyberus-technology.de>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:3d4f:b0:2a2:bcae:83c1 with SMTP id
+ o15-20020a17090a3d4f00b002a2bcae83c1mr15360pjf.3.1713465419139; Thu, 18 Apr
+ 2024 11:36:59 -0700 (PDT)
+Date: Thu, 18 Apr 2024 11:36:57 -0700
+In-Reply-To: <70f9f3f847e614cbb95be4c011ecb0a5cbd2ef34.camel@cyberus-technology.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,8 +78,8 @@ References: <20240416123558.212040-1-julian.stecklina@cyberus-technology.de>
  <Zh6MmgOqvFPuWzD9@google.com> <ecb314c53c76bc6d2233a8b4d783a15297198ef8.camel@cyberus-technology.de>
  <Zh6WlOB8CS-By3DQ@google.com> <c2ca06e2d8d7ef66800f012953b8ea4be0147c92.camel@cyberus-technology.de>
  <Zh6-e9hy7U6DD2QM@google.com> <adb07a02b3923eeb49f425d38509b340f4837e17.camel@cyberus-technology.de>
- <Zh_0sJPPoHKce5Ky@google.com> <Zh_4tsd5rAo4G1Lv@google.com> <61f14bc6415d5d8407fc3ae6f6c3348caa2a97e9.camel@cyberus-technology.de>
-Message-ID: <ZiFmNmlUxfQnXIua@google.com>
+ <Zh_0sJPPoHKce5Ky@google.com> <70f9f3f847e614cbb95be4c011ecb0a5cbd2ef34.camel@cyberus-technology.de>
+Message-ID: <ZiFoSdKY7nrh7cfL@google.com>
 Subject: Re: [PATCH 1/2] KVM: nVMX: fix CR4_READ_SHADOW when L0 updates CR4
  during a signal
 From: Sean Christopherson <seanjc@google.com>
@@ -94,45 +94,49 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Thu, Apr 18, 2024, Thomas Prescher wrote:
-> On Wed, 2024-04-17 at 09:28 -0700, Sean Christopherson wrote:
-> > On Wed, Apr 17, 2024, Sean Christopherson wrote:
-> > > On Wed, Apr 17, 2024, Thomas Prescher wrote:
-> > > > On Tue, 2024-04-16 at 11:07 -0700, Sean Christopherson wrote:
-> > > > > Hur dur, I forgot that KVM provides a "guest_mode" stat.=C2=A0
-> > > > > Userspace can do
-> > > > > KVM_GET_STATS_FD on the vCPU FD to get a file handle to the
-> > > > > binary stats,
-> > > > > and then you wouldn't need to call back into KVM just to query
-> > > > > guest_mode.
-> > > > >=20
-> > > > > Ah, and I also forgot that we have kvm_run.flags, so adding
-> > > > > KVM_RUN_X86_GUEST_MODE would also be trivial (I almost
-> > > > > suggested it
-> > > > > earlier, but didn't want to add a new field to kvm_run without
-> > > > > a very good
-> > > > > reason).
-> > > >=20
-> > > > Thanks for the pointers. This is really helpful.
-> > > >=20
-> > > > I tried the "guest_mode" stat as you suggested and it solves the
-> > > > immediate issue we have with VirtualBox/KVM.
-> > >=20
-> > > Note,=20
-> >=20
-> > Gah, got distracted.=C2=A0 I was going to say that we should add
-> > KVM_RUN_X86_GUEST_MODE,
-> > because stats aren't guaranteed ABI[*], i.e. relying on guest_mode
-> > could prove
-> > problematic in the long run (though that's unlikely).
-> >=20
-> > [*]
-> > https://lore.kernel.org/all/CABgObfZ4kqaXLaOAOj4aGB5GAe9GxOmJmOP+7kdke6=
-OqA35HzA@mail.gmail.com
+> You are right. After your pointers and looking at the nesting code
+> again, I think I know what to do. Just to make sure I understand this
+> correctly:=C2=A0
 >=20
-> Allright. I will propose a patch that sets the KVM_RUN_X86_GUEST_MODE
-> flag in the next couple of days. Do we also need a new capability for
-> this flag so userland can query whether this field is actually updated
-> by KVM?
+> If L0 exits with L2 state, KVM_GET_NESTED_STATE will have
+> KVM_STATE_NESTED_RUN_PENDING set in the flags field.
 
-Hmm, yeah, I don't see any way around that.
+Not necessarily.  KVM_STATE_NESTED_GUEST_MODE is the flag that says "L2 sta=
+te is
+loaded", the NESTED_RUN_PENDING flag is effectively a modifier on top of th=
+at.
+
+KVM_STATE_NESTED_RUN_PENDING is set when userspace interrupts KVM in the mi=
+ddle
+of nested VM-Enter emulation.  In that case, KVM needs to complete emulatio=
+n of
+the VM-Enter instruction (VMLAUNCH, VMRESUME, or VMRUN) before doing anythi=
+ng.
+I.e. KVM has loaded L2 state and is committed to completing VM-Enter, but h=
+asn't
+actually done so yet.
+
+In retrospect, KVM probably should have forced userspace to call back into =
+KVM to
+complete emulation before allowing KVM_GET_NESTED_STATE to succeed, but it'=
+s a
+minor blip.
+
+> So when we restore the vCPU state after a vmsave/vmload cycle, we don't n=
+eed
+> to update anything in kvm_run.s.regs because KVM will enter the L2
+> immediately.  Is that correct?
+
+No?  Presumably your touching vCPU state, otherwise you wouldn't be doing
+vmsave/vmload.  And if you touch vCPU state, then you need to restore the o=
+ld
+state for things to work.
+
+Again, what are you trying to do, at a higher level?  I.e. _why_ are you do=
+ing
+a save/restore cycle?  If it's for something akin to live migration, where =
+you
+need to save and restore *everything*, then stating the obvious, you need t=
+o
+save and restore everything in KVM too, which includes nested state.
 
