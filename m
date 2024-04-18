@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-15087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 385088A9AFD
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 15:17:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A09A8A9AFF
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 15:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E508928291C
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 13:17:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83F7E1F21E2F
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 13:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0979315F3FD;
-	Thu, 18 Apr 2024 13:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD8615CD50;
+	Thu, 18 Apr 2024 13:17:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604E7EECF;
-	Thu, 18 Apr 2024 13:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D2DEECF;
+	Thu, 18 Apr 2024 13:17:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713446244; cv=none; b=SFukHRGE72Qavj1AtjHhf+d6CuRfGmFQU1j64MUs2W6vZc8ZhrT8szd78Rix7J2c4d9hGEAFbNU22qIGpiDu9j8z5WkwZKB90svSUwCYikK09NXTaJPchUcB6cUQoqCSYCoGlej62VCJ7t34cP7BO4O/kIaUSXsL5da8dD3Y/gg=
+	t=1713446250; cv=none; b=WoXmJcqE+LVjGR+MDabpwj2OKqptkSUR2Ftm439L/c6iwUeoAtnkVPloTpWpVFhtwYDnNBT7APNb/nQal8FQeyZpn/Ll8AyWmhwK+av30d2lYlAN4KsJxWVwGxvHHM7UFXIeWH2VPoOlmZ6XrUPQIg17/RQPXFdsprq+Y7AsOPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713446244; c=relaxed/simple;
-	bh=JwQ6WKAgwkgGDjlwTjWbko4n+LA0bmKAxcEWpDK1XLo=;
+	s=arc-20240116; t=1713446250; c=relaxed/simple;
+	bh=uFBVCzKTwIgEfdvC7/2meAWUHLTgMbNu/QYppjfZugI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C3Ul+Yi27QlK3zvrNijAVU+Jwc26HjMWxFpIQiwe1gcH9HT4X8YvPxKXKEJpPYRB/r0/llfj+lGpZ4GBwxS/zCYUaYgYLo6GxHyBYebWOTAm7kcUivsi/Kjsk7wB1o3OAP445/G3xxgudzzh+9RvoU6t+kMYH6jBts88Gxvx2F0=
+	 In-Reply-To:Content-Type; b=YAJl6lxOJF9eh0FCivvtZKueUtxrbPxRI9qmPuWFawCTq3AFBHzwjM0pMIwjM29H/+/B+sP0OVM/CAHoPAt4gVDbapj+8gSXI8vP0cBxYa95xFC9IQQi2QTL0iPwF6tJvqhr7LkCubxuzzp5iv5ub8MNxJS3TWoXmRzfgKOPq2E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 97EC8339;
-	Thu, 18 Apr 2024 06:17:48 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB529DA7;
+	Thu, 18 Apr 2024 06:17:55 -0700 (PDT)
 Received: from [10.1.35.34] (e122027.cambridge.arm.com [10.1.35.34])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DAEDF3F738;
-	Thu, 18 Apr 2024 06:17:16 -0700 (PDT)
-Message-ID: <f934c0ae-336a-4529-9eaa-71f69291dc71@arm.com>
-Date: Thu, 18 Apr 2024 14:17:14 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFCFF3F738;
+	Thu, 18 Apr 2024 06:17:23 -0700 (PDT)
+Message-ID: <f5b87486-89b5-4c86-aadb-47204fb39bea@arm.com>
+Date: Thu, 18 Apr 2024 14:17:23 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,8 +42,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/43] arm64: RME: Handle Granule Protection Faults
- (GPFs)
+Subject: Re: [PATCH v2 05/43] arm64: RME: Add SMC definitions for calling the
+ RMM
 To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
  kvmarm@lists.linux.dev
 Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
@@ -56,103 +56,335 @@ Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 References: <20240412084056.1733704-1-steven.price@arm.com>
  <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-5-steven.price@arm.com>
- <d452859e-8b35-4aac-83d5-5b8d44ed4406@arm.com>
+ <20240412084309.1733783-6-steven.price@arm.com>
+ <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
 From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <d452859e-8b35-4aac-83d5-5b8d44ed4406@arm.com>
+In-Reply-To: <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 16/04/2024 12:17, Suzuki K Poulose wrote:
+On 16/04/2024 13:38, Suzuki K Poulose wrote:
+> Hi Steven
+> 
 > On 12/04/2024 09:42, Steven Price wrote:
->> If the host attempts to access granules that have been delegated for use
->> in a realm these accesses will be caught and will trigger a Granule
->> Protection Fault (GPF).
+>> The RMM (Realm Management Monitor) provides functionality that can be
+>> accessed by SMC calls from the host.
 >>
->> A fault during a page walk signals a bug in the kernel and is handled by
->> oopsing the kernel. A non-page walk fault could be caused by user space
->> having access to a page which has been delegated to the kernel and will
->> trigger a SIGBUS to allow debugging why user space is trying to access a
->> delegated page.
+>> The SMC definitions are based on DEN0137[1] version 1.0-eac5
+>>
+>> [1] https://developer.arm.com/documentation/den0137/1-0eac5/
 >>
 >> Signed-off-by: Steven Price <steven.price@arm.com>
 >> ---
->>   arch/arm64/mm/fault.c | 29 ++++++++++++++++++++++++-----
->>   1 file changed, 24 insertions(+), 5 deletions(-)
+>>   arch/arm64/include/asm/rmi_smc.h | 250 +++++++++++++++++++++++++++++++
+>>   1 file changed, 250 insertions(+)
+>>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
 >>
->> diff --git a/arch/arm64/mm/fault.c b/arch/arm64/mm/fault.c
->> index 8251e2fea9c7..91da0f446dd9 100644
->> --- a/arch/arm64/mm/fault.c
->> +++ b/arch/arm64/mm/fault.c
->> @@ -765,6 +765,25 @@ static int do_tag_check_fault(unsigned long far,
->> unsigned long esr,
->>       return 0;
->>   }
->>   +static int do_gpf_ptw(unsigned long far, unsigned long esr, struct
->> pt_regs *regs)
->> +{
->> +    const struct fault_info *inf = esr_to_fault_info(esr);
->> +
->> +    die_kernel_fault(inf->name, far, esr, regs);
->> +    return 0;
->> +}
->> +
->> +static int do_gpf(unsigned long far, unsigned long esr, struct
->> pt_regs *regs)
->> +{
->> +    const struct fault_info *inf = esr_to_fault_info(esr);
->> +
->> +    if (!is_el1_instruction_abort(esr) && fixup_exception(regs))
->> +        return 0;
->> +
->> +    arm64_notify_die(inf->name, regs, inf->sig, inf->code, far, esr);
->> +    return 0;
->> +}
->> +
->>   static const struct fault_info fault_info[] = {
->>       { do_bad,        SIGKILL, SI_KERNEL,    "ttbr address size
->> fault"    },
->>       { do_bad,        SIGKILL, SI_KERNEL,    "level 1 address size
->> fault"    },
->> @@ -802,11 +821,11 @@ static const struct fault_info fault_info[] = {
->>       { do_alignment_fault,    SIGBUS,  BUS_ADRALN,    "alignment
->> fault"        },
->>       { do_bad,        SIGKILL, SI_KERNEL,    "unknown 34"            },
->>       { do_bad,        SIGKILL, SI_KERNEL,    "unknown 35"            },
+>> diff --git a/arch/arm64/include/asm/rmi_smc.h
+>> b/arch/arm64/include/asm/rmi_smc.h
+>> new file mode 100644
+>> index 000000000000..c205efdb18d8
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/rmi_smc.h
+>> @@ -0,0 +1,250 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2023 ARM Ltd.
+>> + *
+>> + * The values and structures in this file are from the Realm
+>> Management Monitor
+>> + * specification (DEN0137) version A-bet0:
+>> + * https://developer.arm.com/documentation/den0137/1-0bet0/
 > 
-> Should this also be converted to do_gpf_ptw, "GPF at level -1", given we
-> support LPA2 ?
+> This should now point to eac5 instead.
 
-Ah, yes I somehow missed that. Although something has gone majorly wrong
-if this triggers! ;)
+Typical - I searched through the commit logs, but forgot I'd put a
+reference in the code too! Thanks for spotting.
+
+>> + */
+>> +
+>> +#ifndef __ASM_RME_SMC_H
+>> +#define __ASM_RME_SMC_H
+>> +
+>> +#include <linux/arm-smccc.h>
+>> +
+>> +#define SMC_RxI_CALL(func)                \
+>> +    ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,        \
+>> +               ARM_SMCCC_SMC_64,        \
+>> +               ARM_SMCCC_OWNER_STANDARD,    \
+>> +               (func))
+>> +
+>> +#define SMC_RMI_DATA_CREATE        SMC_RxI_CALL(0x0153)
+>> +#define SMC_RMI_DATA_CREATE_UNKNOWN    SMC_RxI_CALL(0x0154)
+>> +#define SMC_RMI_DATA_DESTROY        SMC_RxI_CALL(0x0155)
+>> +#define SMC_RMI_FEATURES        SMC_RxI_CALL(0x0165)
+>> +#define SMC_RMI_GRANULE_DELEGATE    SMC_RxI_CALL(0x0151)
+>> +#define SMC_RMI_GRANULE_UNDELEGATE    SMC_RxI_CALL(0x0152)
+>> +#define SMC_RMI_PSCI_COMPLETE        SMC_RxI_CALL(0x0164)
+>> +#define SMC_RMI_REALM_ACTIVATE        SMC_RxI_CALL(0x0157)
+>> +#define SMC_RMI_REALM_CREATE        SMC_RxI_CALL(0x0158)
+>> +#define SMC_RMI_REALM_DESTROY        SMC_RxI_CALL(0x0159)
+>> +#define SMC_RMI_REC_AUX_COUNT        SMC_RxI_CALL(0x0167)
+>> +#define SMC_RMI_REC_CREATE        SMC_RxI_CALL(0x015a)
+>> +#define SMC_RMI_REC_DESTROY        SMC_RxI_CALL(0x015b)
+>> +#define SMC_RMI_REC_ENTER        SMC_RxI_CALL(0x015c)
+>> +#define SMC_RMI_RTT_CREATE        SMC_RxI_CALL(0x015d)
+>> +#define SMC_RMI_RTT_DESTROY        SMC_RxI_CALL(0x015e)
+>> +#define SMC_RMI_RTT_FOLD        SMC_RxI_CALL(0x0166)
+>> +#define SMC_RMI_RTT_INIT_RIPAS        SMC_RxI_CALL(0x0168)
+>> +#define SMC_RMI_RTT_MAP_UNPROTECTED    SMC_RxI_CALL(0x015f)
+>> +#define SMC_RMI_RTT_READ_ENTRY        SMC_RxI_CALL(0x0161)
+>> +#define SMC_RMI_RTT_SET_RIPAS        SMC_RxI_CALL(0x0169)
+>> +#define SMC_RMI_RTT_UNMAP_UNPROTECTED    SMC_RxI_CALL(0x0162)
+>> +#define SMC_RMI_VERSION            SMC_RxI_CALL(0x0150)
+>> +
+>> +#define RMI_ABI_MAJOR_VERSION    1
+>> +#define RMI_ABI_MINOR_VERSION    0
+>> +
+>> +#define RMI_UNASSIGNED            0
+>> +#define RMI_ASSIGNED            1
+>> +#define RMI_TABLE            2
+>> +
+>> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
+>> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
+>> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
+>> +
+>> +#define RMI_RETURN_STATUS(ret)        ((ret) & 0xFF)
+>> +#define RMI_RETURN_INDEX(ret)        (((ret) >> 8) & 0xFF)
+>> +
+>> +#define RMI_SUCCESS        0
+>> +#define RMI_ERROR_INPUT        1
+>> +#define RMI_ERROR_REALM        2
+>> +#define RMI_ERROR_REC        3
+>> +#define RMI_ERROR_RTT        4
+>> +
+>> +#define RMI_EMPTY        0
+>> +#define RMI_RAM            1
+>> +#define RMI_DESTROYED        2
+>> +
+>> +#define RMI_NO_MEASURE_CONTENT    0
+>> +#define RMI_MEASURE_CONTENT    1
+>> +
+>> +#define RMI_FEATURE_REGISTER_0_S2SZ        GENMASK(7, 0)
+>> +#define RMI_FEATURE_REGISTER_0_LPA2        BIT(8)
+>> +#define RMI_FEATURE_REGISTER_0_SVE_EN        BIT(9)
+>> +#define RMI_FEATURE_REGISTER_0_SVE_VL        GENMASK(13, 10)
+>> +#define RMI_FEATURE_REGISTER_0_NUM_BPS        GENMASK(17, 14)
+>> +#define RMI_FEATURE_REGISTER_0_NUM_WPS        GENMASK(21, 18)
+>> +#define RMI_FEATURE_REGISTER_0_PMU_EN        BIT(22)
+>> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS    GENMASK(27, 23)
+>> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256    BIT(28)
+>> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512    BIT(29)
+>> +
+>> +#define RMI_REALM_PARAM_FLAG_LPA2        BIT(0)
+>> +#define RMI_REALM_PARAM_FLAG_SVE        BIT(1)
+>> +#define RMI_REALM_PARAM_FLAG_PMU        BIT(2)
+>> +
+>> +/*
+>> + * Note many of these fields are smaller than u64 but all fields have
+>> u64
+>> + * alignment, so use u64 to ensure correct alignment.
+>> + */
+>> +struct realm_params {
+>> +    union { /* 0x0 */
+>> +        struct {
+>> +            u64 flags;
+>> +            u64 s2sz;
+>> +            u64 sve_vl;
+>> +            u64 num_bps;
+>> +            u64 num_wps;
+>> +            u64 pmu_num_ctrs;
+>> +            u64 hash_algo;
+>> +        };
+>> +        u8 padding_1[0x400];
+>> +    };
+>> +    union { /* 0x400 */
+>> +        u8 rpv[64];
+>> +        u8 padding_2[0x400];
+>> +    };
+>> +    union { /* 0x800 */
+>> +        struct {
+>> +            u64 vmid;
+>> +            u64 rtt_base;
+>> +            s64 rtt_level_start;
+>> +            u64 rtt_num_start;
+>> +        };
+>> +        u8 padding_3[0x800];
+>> +    };
+>> +};
+>> +
+>> +/*
+>> + * The number of GPRs (starting from X0) that are
+>> + * configured by the host when a REC is created.
+>> + */
+>> +#define REC_CREATE_NR_GPRS        8
+>> +
+>> +#define REC_PARAMS_FLAG_RUNNABLE    BIT_ULL(0)
+>> +
+>> +#define REC_PARAMS_AUX_GRANULES        16
+>> +
+>> +struct rec_params {
+>> +    union { /* 0x0 */
+>> +        u64 flags;
+>> +        u8 padding1[0x100];
+>> +    };
+>> +    union { /* 0x100 */
+>> +        u64 mpidr;
+>> +        u8 padding2[0x100];
+>> +    };
+>> +    union { /* 0x200 */
+>> +        u64 pc;
+>> +        u8 padding3[0x100];
+>> +    };
+>> +    union { /* 0x300 */
+>> +        u64 gprs[REC_CREATE_NR_GPRS];
+>> +        u8 padding4[0x500];
+>> +    };
+>> +    union { /* 0x800 */
+>> +        struct {
+>> +            u64 num_rec_aux;
+>> +            u64 aux[REC_PARAMS_AUX_GRANULES];
+>> +        };
+>> +        u8 padding5[0x800];
+>> +    };
+>> +};
+>> +
+>> +#define RMI_EMULATED_MMIO        BIT(0)
+>> +#define RMI_INJECT_SEA            BIT(1)
+>> +#define RMI_TRAP_WFI            BIT(2)
+>> +#define RMI_TRAP_WFE            BIT(3)
+> 
+> For completeness, we could add :
+> 
+> #define RMI_RIPAS_RESPONSE        BIT(4)
+> 
+> Not sure if we use it later in the series.
+
+Yes, I'll add for completeness. Currently KVM will never reject a RIPAS
+change request from the guest. I'm not sure in what situation it would
+make sense to do such a thing. The current uABI doesn't allow the VMM to
+have a say in it either as the RIPAS change is completed before the exit
+to the VMM. The expectation is therefore that the VMM would simply
+terminate a Realm guest that attempted a RIPAS change that it disagreed
+with.
+
+>> +
+>> +#define REC_RUN_GPRS            31
+>> +#define REC_GIC_NUM_LRS            16
+>> +
+>> +struct rec_entry {
+
+While I'm reading this (and the spec) again - I notice that the spec
+says "RecEnter" not 'entry' - I'll rename this to be consistent.
+
+>> +    union { /* 0x000 */
+>> +        u64 flags;
+>> +        u8 padding0[0x200];
+>> +    };
+>> +    union { /* 0x200 */
+>> +        u64 gprs[REC_RUN_GPRS];
+>> +        u8 padding2[0x100];
+>> +    };
+>> +    union { /* 0x300 */
+>> +        struct {
+>> +            u64 gicv3_hcr;
+>> +            u64 gicv3_lrs[REC_GIC_NUM_LRS];
+>> +        };
+>> +        u8 padding3[0x100];
+>> +    };
+>> +    u8 padding4[0x400];
+>> +};
+>> +
+>> +struct rec_exit {
+>> +    union { /* 0x000 */
+>> +        u8 exit_reason;
+>> +        u8 padding0[0x100];
+>> +    };
+>> +    union { /* 0x100 */
+>> +        struct {
+>> +            u64 esr;
+>> +            u64 far;
+>> +            u64 hpfar;
+>> +        };
+>> +        u8 padding1[0x100];
+>> +    };
+>> +    union { /* 0x200 */
+>> +        u64 gprs[REC_RUN_GPRS];
+>> +        u8 padding2[0x100];
+>> +    };
+>> +    union { /* 0x300 */
+>> +        struct {
+>> +            u64 gicv3_hcr;
+>> +            u64 gicv3_lrs[REC_GIC_NUM_LRS];
+>> +            u64 gicv3_misr;
+>> +            u64 gicv3_vmcr;
+>> +        };
+>> +        u8 padding3[0x100];
+>> +    };
+>> +    union { /* 0x400 */
+>> +        struct {
+>> +            u64 cntp_ctl;
+>> +            u64 cntp_cval;
+>> +            u64 cntv_ctl;
+>> +            u64 cntv_cval;
+>> +        };
+>> +        u8 padding4[0x100];
+>> +    };
+>> +    union { /* 0x500 */
+>> +        struct {
+>> +            u64 ripas_base;
+>> +            u64 ripas_top;
+>> +            u64 ripas_value;
+>> +        };
+>> +        u8 padding5[0x100];
+>> +    };
+>> +    union { /* 0x600 */
+>> +        u16 imm;
+>> +        u8 padding6[0x100];
+>> +    };
+>> +    union { /* 0x700 */
+>> +        struct {
+>> +            u64 pmu_ovf_status;
+> 
+> This is u8 as per section B4.4.10 RmiPmuOverflowStatus type.
+
+Indeed - I'm not sure where I got u64 from - it was probably to provide
+padding in an older version of the spec.
+
+>> +        };
+>> +        u8 padding7[0x100];
+>> +    };
+>> +};
+>> +
+>> +struct rec_run {
+>> +    struct rec_entry entry;
+>> +    struct rec_exit exit;
+>> +};
+>> +
+>> +#define RMI_EXIT_SYNC            0x00
+>> +#define RMI_EXIT_IRQ            0x01
+>> +#define RMI_EXIT_FIQ            0x02
+>> +#define RMI_EXIT_PSCI            0x03
+>> +#define RMI_EXIT_RIPAS_CHANGE        0x04
+>> +#define RMI_EXIT_HOST_CALL        0x05
+>> +#define RMI_EXIT_SERROR            0x06
+> 
+> Minor nit: Like the other definitions, it may be good to keep the
+> defintions of the "exit_reason" above the field declaration.
+
+Yes, makes sense - I'll move these.
+
+Thanks for the review!
 
 Steve
 
->> -    { do_bad,        SIGKILL, SI_KERNEL,    "unknown 36"            },
->> -    { do_bad,        SIGKILL, SI_KERNEL,    "unknown 37"            },
->> -    { do_bad,        SIGKILL, SI_KERNEL,    "unknown 38"            },
->> -    { do_bad,        SIGKILL, SI_KERNEL,    "unknown 39"            },
->> -    { do_bad,        SIGKILL, SI_KERNEL,    "unknown 40"            },
->> +    { do_gpf_ptw,        SIGKILL, SI_KERNEL,    "Granule Protection
->> Fault at level 0" },
->> +    { do_gpf_ptw,        SIGKILL, SI_KERNEL,    "Granule Protection
->> Fault at level 1" },
->> +    { do_gpf_ptw,        SIGKILL, SI_KERNEL,    "Granule Protection
->> Fault at level 2" },
->> +    { do_gpf_ptw,        SIGKILL, SI_KERNEL,    "Granule Protection
->> Fault at level 3" },
->> +    { do_gpf,        SIGBUS,  SI_KERNEL,    "Granule Protection Fault
->> not on table walk" },
->>       { do_bad,        SIGKILL, SI_KERNEL,    "level -1 address size
->> fault"    },
->>       { do_bad,        SIGKILL, SI_KERNEL,    "unknown 42"            },
->>       { do_translation_fault,    SIGSEGV, SEGV_MAPERR,    "level -1
->> translation fault"    },
-> 
 > 
 > Rest looks fine to me.
 > 
 > Suzuki
+>> +
+>> +#endif
+> 
 
 
