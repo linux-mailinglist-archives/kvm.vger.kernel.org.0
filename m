@@ -1,136 +1,347 @@
-Return-Path: <kvm+bounces-15121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15122-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0F28AA1C1
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:06:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C228AA1FE
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C1D11C20FF1
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 18:05:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DE7C1C21558
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 18:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E719A179956;
-	Thu, 18 Apr 2024 18:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34A3017AD85;
+	Thu, 18 Apr 2024 18:26:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bRQBvS3H"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hTskooSC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86478175552;
-	Thu, 18 Apr 2024 18:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43C7171092
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 18:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713463552; cv=none; b=DD9KH3o9PRNUoa2zIFgtMOMqtPJvLFjJcYYSXVtu/eQfVZOwTBVuH1V+//UTMxaUpSkzzh8Zp+kpC5zTVfet3gkjHOIz0LrHAQnoEz4GyQPSky+Y3gzn0fDS0197TtLKFH9w/De8encs5DQ1a6tRtF6pTueNLGG4OIAIWr1YD6o=
+	t=1713464775; cv=none; b=PR0PhugD1ME/FOHvhMGh/5iZclArlfjM7JJZ13gT1YDcR/xXt+PKKAuNrbD+6LE5oGPbWbQ4B18+ALAfA7RSPhHSxBgUi3n+XO42XMi0tyLXykY6fA/SUxb+gC1QdyNw+DBCgkUzlpFZH6NAI91jBIu6eqkY4Dru5jw8RbMbjfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713463552; c=relaxed/simple;
-	bh=UHN9/iLhwy7XwyYNUPmUuZCVMwtBGVwjLhwBImjcW3k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j8d0HhNN5tRqIX029MAVgmSysahSOus3YDuzYPc7VYge/g6/bFNrCllKerKYGUi8oTOC1T2fANSrWwNaVdKDVICi8jmxusF1ykj51jqGF9mY2WJm1Lvmh3wktrpP60416mXhg7p0zsq0TTWUhipDvqc/qOitHaxbB1PouLvSSdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bRQBvS3H; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713463550; x=1744999550;
-  h=date:from:to:cc:subject:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UHN9/iLhwy7XwyYNUPmUuZCVMwtBGVwjLhwBImjcW3k=;
-  b=bRQBvS3Hs/ruNvL4j2NVTMAvu+YYzFOATLj4UHty4e3z+k8VPSqa3R6d
-   MiFNuTfRTjQP/5KoO5bVP1qoSH4PLIYB6DzHAWQ/LbDUV7BeX/vlhDWzm
-   LceELYuhBtuNREBgLAP54XOX7XjnPwbTu/V52L84yhqjOiqhffLlgjr9+
-   N6G8NydpLoUnZ0uHMGPU+xCS9WGd2n9GJ9UQNSQ/7eTJqEEFawaQS054B
-   AGhXUk5O76GIBvrca8+CIKiV/UyDHQnpWTy7cqnpL+f8BiMlCXmA3YDKL
-   sgluorsVjOWt2qDcB5WfpGlFkSsn/77a896AsM03mmDPUtCdDQ7d4XPcR
-   g==;
-X-CSE-ConnectionGUID: dUv7SPFGRbaD4zk06Eth0g==
-X-CSE-MsgGUID: zgEivhkdSXWaZlsJI9BJAQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="11977317"
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="11977317"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 11:05:49 -0700
-X-CSE-ConnectionGUID: YaL3ncS1Su+LuCzG6gfi1A==
-X-CSE-MsgGUID: Y6AeD5voQ5qMqlYMs/So9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="53990641"
-Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 11:05:50 -0700
-Date: Thu, 18 Apr 2024 11:10:24 -0700
-From: Jacob Pan <jacob.jun.pan@linux.intel.com>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Sean Christopherson <seanjc@google.com>, LKML
- <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, iommu@lists.linux.dev, Lu Baolu
- <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, Dave Hansen
- <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H. Peter Anvin"
- <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
- <mingo@redhat.com>, Paul Luse <paul.e.luse@intel.com>, Dan Williams
- <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, Raj Ashok
- <ashok.raj@intel.com>, Kevin Tian <kevin.tian@intel.com>, maz@kernel.org,
- Robin Murphy <robin.murphy@arm.com>, jim.harris@samsung.com,
- a.manzanares@samsung.com, Bjorn Helgaas <helgaas@kernel.org>,
- guang.zeng@intel.com, robert.hoo.linux@gmail.com, oliver.sang@intel.com,
- jacob.jun.pan@linux.intel.com
-Subject: Re: [PATCH v2 03/13] x86/irq: Remove bitfields in posted interrupt
- descriptor
-Message-ID: <20240418111024.615aa95e@jacob-builder>
-In-Reply-To: <87wmouy3w3.ffs@tglx>
-References: <20240405223110.1609888-1-jacob.jun.pan@linux.intel.com>
-	<20240405223110.1609888-4-jacob.jun.pan@linux.intel.com>
-	<Zh8aTitLwSYYlZW5@google.com>
-	<20240417110131.4aaf1d66@jacob-builder>
-	<87wmouy3w3.ffs@tglx>
-Organization: OTC
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1713464775; c=relaxed/simple;
+	bh=FhDtn/1Oncebi5qTzuSBS0nrpK3TbxVu093eT7IPIoA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hVCFbKPMzmDN3H12MRB9AdSRAIN7SYrtR395RgQFcBnZxhWHZPMs33l68Uu7YQM6Dx5isg+p6YnQ/HFGkvBJfLsT87oYEU6A45OpTEyCstyKW5jkeSJ+sRFf4bqgrBMuol21ubnF5N8/JEN3BfiDMunpLJEQSPfxOfiZhsYInOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hTskooSC; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e2a553aad6so13252475ad.1
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 11:26:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713464773; x=1714069573; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RmUziw85ELNs5DunGMczbwZRDhKt3LNvBNFMebu6TKQ=;
+        b=hTskooSCAkgxaDEFuU3btjif1PSvVS2WsIJ0A3+Ahx4yIBxpUevhls1HOla39JZslH
+         u7bpeZrFVoFVPeiO23p7L5F3DNN131xbSIekK2QzjeGPcvZYDVjIaGZxDCuu9IeRdqAZ
+         A3NakElPETPYe0pP/w78yYkxylgZU4PFquRgxBV9iOOjMGf+Di6bLvGe9GpGDM/OFFj5
+         3qLskCTb5cBTO+3QpmwKUNV4Aw9tXPAZk5lau/FbvB+Bj7jMNphteEKDoOkDKXRajM1q
+         bgnVA3Ubwp3x4v+/QEoQr0PmAPEhmsZx01NCzlJT8GPaQvfK6cjIrrd8p0W6tqie6SF7
+         e07w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713464773; x=1714069573;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RmUziw85ELNs5DunGMczbwZRDhKt3LNvBNFMebu6TKQ=;
+        b=nbr3jGrlerDJqBHeNQuofPS7PHRuhdG/CoQYKpDfDjXh/f6MyKJt68x46gb7uD/yNe
+         mhvJcEjtlIkOudhaHL5P61lGPD7TsVkmso/a4pZbsqSETFUxjJ8JndJTwTbswTB1sLsM
+         1DNaMzdRQbrMk+9UYtwR6h8tPcW12T2HFT6pT250WoDV5bNYjv0zeOcfK77MFGz0yZc0
+         MHjyB35dkjYWSUNUr6UwXHlT84TW4dVQRPZZOf4lj32C+JcZrz2sE20JwzI4XSblbdll
+         3XQ9RflwEM4MqqCQm+jPbdHSa8GArkI2phSFuVgACujFjUbT4O1LTbdgonhLaJUejaBf
+         5/lw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqFj5F4LMtDAPvG6tXQltst/DiGOJNjC0P2GsUGM5hpgm+wY/FXcmmgtPuWPqO3PWd2nJTQ7BkqOmpg0+3bbFBD/ez
+X-Gm-Message-State: AOJu0YywLLhLktkuq3GcH7BnQFYYLtwRhf5xcnkDrIUPxQOiL3enh9TY
+	NTQXjnFKW01XUAuBD3HelRrduV/fpkjCJ4Qm/Jz8cOYS3AxCTEseQLfH0rft81nxMSu6V3BGgvU
+	7yQ==
+X-Google-Smtp-Source: AGHT+IHi4MYznpirLYLsYvqS5mZfsgjkGMGyYW3vGG4C7v/qV79tzP+wzMFnQyGkJtLGYkIfMLxse2hFPSI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e5c2:b0:1e0:afa0:cc94 with SMTP id
+ u2-20020a170902e5c200b001e0afa0cc94mr8974plf.7.1713464773080; Thu, 18 Apr
+ 2024 11:26:13 -0700 (PDT)
+Date: Thu, 18 Apr 2024 11:26:11 -0700
+In-Reply-To: <m536wofeimei4wdronpl3xlr3ljcap3zazi3ffknpxzdfbrzsr@plk4veaz5d22>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <8f64043a6c393c017347bf8954d92b84b58603ec.1708933498.git.isaku.yamahata@intel.com>
+ <e6e8f585-b718-4f53-88f6-89832a1e4b9f@intel.com> <bd21a37560d4d0695425245658a68fcc2a43f0c0.camel@intel.com>
+ <54ae3bbb-34dc-4b10-a14e-2af9e9240ef1@intel.com> <ZfR4UHsW_Y1xWFF-@google.com>
+ <ay724yrnkvsuqjffsedi663iharreuu574nzc4v7fc5mqbwdyx@6ffxkqo3x5rv>
+ <39e9c5606b525f1b2e915be08cc95ac3aecc658b.camel@intel.com> <m536wofeimei4wdronpl3xlr3ljcap3zazi3ffknpxzdfbrzsr@plk4veaz5d22>
+Message-ID: <ZiFlw_lInUZgv3J_@google.com>
+Subject: Re: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
+From: Sean Christopherson <seanjc@google.com>
+To: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, Tina Zhang <tina.zhang@intel.com>, 
+	Dave Hansen <dave.hansen@intel.com>, Hang Yuan <hang.yuan@intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>, Kai Huang <kai.huang@intel.com>, Bo2 Chen <chen.bo@intel.com>, 
+	"sagis@google.com" <sagis@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, Erdem Aktas <erdemaktas@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Thomas,
-
-On Thu, 18 Apr 2024 19:30:52 +0200, Thomas Gleixner <tglx@linutronix.de>
-wrote:
-
-> On Wed, Apr 17 2024 at 11:01, Jacob Pan wrote:
-> > On Tue, 16 Apr 2024 17:39:42 -0700, Sean Christopherson
-> > <seanjc@google.com> wrote:  
-> >> > diff --git a/arch/x86/kvm/vmx/posted_intr.c
-> >> > b/arch/x86/kvm/vmx/posted_intr.c index af662312fd07..592dbb765675
-> >> > 100644 --- a/arch/x86/kvm/vmx/posted_intr.c
-> >> > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> >> > @@ -107,7 +107,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int
-> >> > cpu)
-> >> >  		 * handle task migration (@cpu != vcpu->cpu).
-> >> >  		 */
-> >> >  		new.ndst = dest;
-> >> > -		new.sn = 0;
-> >> > +		new.notif_ctrl &= ~POSTED_INTR_SN;    
-> >> 
-> >> At the risk of creating confusing, would it make sense to add
-> >> double-underscore, non-atomic versions of the set/clear helpers for ON
-> >> and SN?
-> >> 
-> >> I can't tell if that's a net positive versus open coding clear() and
-> >> set() here and below.  
-> > IMHO, we can add non-atomic helpers when we have more than one user for
-> > each operation.
-> >
-> > I do have a stupid bug here, it should be:
-> > -               new.notif_ctrl &= ~POSTED_INTR_SN;
-> > +               new.notif_ctrl &= ~BIT(POSTED_INTR_SN);  
+On Thu, Apr 18, 2024, kirill.shutemov@linux.intel.com wrote:
+> On Tue, Apr 16, 2024 at 07:45:18PM +0000, Edgecombe, Rick P wrote:
+> > On Wed, 2024-04-10 at 15:49 +0300, Kirill A. Shutemov wrote:
+> > > On Fri, Mar 15, 2024 at 09:33:20AM -0700, Sean Christopherson wrote:
+> > > > So my feedback is to not worry about the exports, and instead focus on
+> > > > figuring
+> > > > out a way to make the generated code less bloated and easier to read/debug.
+> > > 
+> > > I think it was mistake trying to centralize TDCALL/SEAMCALL calls into
+> > > few megawrappers. I think we can get better results by shifting leaf
+> > > function wrappers into assembly.
+> > > 
+> > > We are going to have more assembly, but it should produce better result.
+> > > Adding macros can help to write such wrapper and minimizer boilerplate.
+> > > 
+> > > Below is an example of how it can look like. It's not complete. I only
+> > > converted TDCALLs, but TDVMCALLs or SEAMCALLs. TDVMCALLs are going to be
+> > > more complex.
+> > > 
+> > > Any opinions? Is it something worth investing more time?
+> > 
+> > We discussed offline how implementing these for each TDVM/SEAMCALL increases the
+> > chances of a bug in just one TDVM/SEAMCALL. Which could making debugging
+> > problems more challenging. Kirill raised the possibility of some code generating
+> > solution like cpufeatures.h, that could take a spec and generate correct calls.
+> > 
+> > So far no big wins have presented themselves. Kirill, do we think the path to
+> > move the messy part out-of-line will not work?
 > 
-> That's a perfect reason to use a proper helper.
-I just proved I was wrong:) will do.
+> I converted all TDCALL and TDVMCALL leafs to direct assembly wrappers.
+> Here's WIP branch: https://github.com/intel/tdx/commits/guest-tdx-asm/
+> 
+> I still need to clean it up and write commit messages and comments for all
+> wrappers.
+> 
+> Now I think it worth the shot.
+> 
+> Any feedback?
 
-Thanks,
+I find it hard to review for correctness, and extremely susceptible to developer
+error.  E.g. lots of copy+paste, and manual encoding of RCX to expose registers.
+It also bleeds TDX ABI into C code, e.g.
 
-Jacob
+	/*
+	 * As per TDX GHCI CPUID ABI, r12-r15 registers contain contents of
+	 * EAX, EBX, ECX, EDX registers after the CPUID instruction execution.
+	 * So copy the register contents back to pt_regs.
+	 */
+	regs->ax = args.r12;
+	regs->bx = args.r13;
+	regs->cx = args.r14;
+	regs->dx = args.r15;
+
+Oh, and it requires input/output paramters, which is quite gross for C code *and*
+for assembly code, e.g.
+
+	u64 tdvmcall_map_gpa(u64 *gpa, u64 size);
+
+and then the accompanying assembly code:
+
+		FRAME_BEGIN
+
+		save_regs r12,r13
+
+		movq	(%rdi), %r12
+		movq	%rsi, %r13
+
+		movq	$(TDX_R10 | TDX_R11 | TDX_R12 | TDX_R13), %rcx
+
+		tdvmcall	$TDVMCALL_MAP_GPA
+
+		movq	%r11, (%rdi)
+
+		restore_regs r13,r12
+
+		FRAME_END
+		RET
+
+I think having one trampoline makes sense, e.g. to minimize the probability of
+leaking register state to the VMM.  The part that I don't like, and which generates
+awful code, is shoving register state into a memory structure.
+
+The annoying part with the TDX ABI is that it heavily uses r8-r15, and asm()
+constraints don't play nice with r8-15.  But that doesn't mean we can't use asm()
+with macros, it just means we have to play games with registers.
+
+Because REG-REG moves are super cheap, and ignoring the fatal error goofiness,
+there are at most four inputs.  That means having a single trampoline take *all*
+possible inputs is a non-issue.  And we can avoiding polluting the inline code if
+we bury the register shuffling in the trampoline.
+
+And if we use asm() wrappers to call the trampoline, then the trampoline doesn't
+need to precisely follow the C calling convention.  I.e. the trampoline can return
+with the outputs still in r12-r15, and let the asm() wrappers extract the outputs
+they want.
+
+As it stands, TDVMCALLs either have 0, 1, or 4 outputs.  I.e. we only need three
+asm() wrappers.  We could get away with one wrapper, but then users of the wrappers
+would need dummy variables for inputs *and* outputs, and the outputs get gross.
+
+Completely untested, but this is what I'm thinking.  Side topic, I think making
+"tdcall" a macro that takes a leaf is a mistake.  If/when an assembler learns what
+tdcall is, we're going to have to rewrite all of that code.  And what a coincidence,
+my suggestion needs a bare TDCALL!  :-)
+
+Side topic #2, I don't think the trampoline needs a stack frame, its a leaf function.
+
+Side topic #3, the ud2 to induce panic should be out-of-line.
+
+Weird?  Yeah.  But at least we one need to document one weird calling convention,
+and the ugliness is contained to three macros and a small assembly function.
+
+.pushsection .noinstr.text, "ax"
+SYM_FUNC_START(tdvmcall_trampoline)
+	movq	$TDX_HYPERCALL_STANDARD, %r10
+	movq	%rax, %r11
+	movq	%rdi, %r12
+	movq	%rsi, %r13
+	movq	%rdx, %r14
+	movq	%rcx, %r15
+
+	movq	$(TDX_R10 | TDX_R11 | TDX_R12 | TDX_R13 | TDX_R14 | TDX_R15), %rcx
+
+	tdcall
+
+	testq	%rax, %rax
+	jnz	.Lpanic
+
+	ret
+
+.Lpanic:
+	ud2
+SYM_FUNC_END(tdvmcall_trampoline)
+.popsection
+
+
+#define TDVMCALL(reason, in1, in2, in3, in4)				\
+({									\
+	long __ret;							\
+									\
+	asm(								\
+		"call tdvmcall_trampoline\n\t"				\
+		"mov %%r10, %0\n\t"					\
+		: "=r" (__ret)						\
+		: "D" (in1), "S"(in2), "d"(in3), "c" (in4)		\
+		: "r12", "r13", "r14", "r15"				\
+	);								\
+	__ret;								\
+})
+
+#define TDVMCALL_1(reason, in1, in2, in3, in4, out1)			\
+({									\
+	long __ret;							\
+									\
+	asm(								\
+		"call tdvmcall_trampoline\n\t"				\
+		"mov %%r10, %0\n\t"					\
+		"mov %%r12, %1\n\t"					\
+		: "=r"(__ret) "=r" (out1)				\
+		: "a"(reason), "D" (in1), "S"(in2), "d"(in3), "c" (in4)	\
+		: "r12", "r13", "r14", "r15"				\
+	);								\
+	__ret;								\
+})
+
+#define TDVMCALL_4(reason, in1, in2, in3, in4, out1, out2, out3, out4)	\
+({									\
+	long __ret;							\
+									\
+	asm(								\
+		"call tdvmcall_trampoline\n\t"				\
+		"mov %%r10, %0\n\t"					\
+		"mov %%r12, %1\n\t"					\
+		"mov %%r13, %2\n\t"					\
+		"mov %%r14, %3\n\t"					\
+		"mov %%r15, %4\n\t"					\
+		: "=r" (__ret),						\
+		  "=r" (out1), "=r" (out2), "=r" (out3), "=r" (out4)	\
+		: "a"(reason), "D" (in1), "S"(in2), "d"(in3), "c" (in4)	\
+		  [reason] "i" (reason) 				\
+		: "r12", "r13", "r14", "r15"				\
+	);								\
+	__ret;								\
+})
+
+static int handle_halt(struct ve_info *ve)
+{
+	if (TDVMCALL(EXIT_REASON_HALT, irqs_disabled(), 0, 0, 0))
+		return -EIO;
+
+	return ve_instr_len(ve);
+}
+
+void __cpuidle tdx_safe_halt(void)
+{
+	WARN_ONCE(TDVMCALL(EXIT_REASON_HALT, false, 0, 0, 0),
+		  "HLT instruction emulation failed");
+}
+
+static int read_msr(struct pt_regs *regs, struct ve_info *ve)
+{
+	u64 val;
+
+	if (TDVMCALL_1(EXIT_REASON_MSR_READ, regs->cx, 0, 0, 0, val))
+		return -EIO;
+
+	regs->ax = lower_32_bits(val);
+	regs->dx = upper_32_bits(val);
+
+	return ve_instr_len(ve);
+}
+
+static int write_msr(struct pt_regs *regs, struct ve_info *ve)
+{
+	u64 val = (u64)regs->dx << 32 | regs->ax;
+
+	if (TDVMCALL(EXIT_REASON_MSR_WRITE, regs->cx, val, 0, 0))
+		return -EIO;
+
+	return ve_instr_len(ve);
+}
+static int handle_cpuid(struct pt_regs *regs, struct ve_info *ve)
+{
+	/*
+	 * Only allow VMM to control range reserved for hypervisor
+	 * communication.
+	 *
+	 * Return all-zeros for any CPUID outside the range. It matches CPU
+	 * behaviour for non-supported leaf.
+	 */
+	if (regs->ax < 0x40000000 || regs->ax > 0x4FFFFFFF) {
+		regs->ax = regs->bx = regs->cx = regs->dx = 0;
+		return ve_instr_len(ve);
+	}
+
+	if (TDVMCALL_4(EXIT_REASON_CPUID, regs->ax, regs->cx, 0, 0,
+		       regs->ax, regs->bx, regs->cx, regs->dx))
+		return -EIO;
+
+	return ve_instr_len(ve);
+}
+
+static bool mmio_read(int size, u64 gpa, u64 *val)
+{
+	*val = 0;
+	return !TDVMCALL_1(EXIT_REASON_EPT_VIOLATION, size, EPT_READ, gpa, 0, val);
+}
+
+static bool mmio_write(int size, u64 gpa, u64 val)
+{
+	return !TDVMCALL(EXIT_REASON_EPT_VIOLATION, size, EPT_WRITE, gpa, val);
+}
 
