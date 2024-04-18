@@ -1,151 +1,160 @@
-Return-Path: <kvm+bounces-15085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 768B58A9A46
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 14:48:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35F948A9AE5
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 15:10:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B7651F21B1F
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 12:48:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E10BE1F21D0F
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 13:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459C716C873;
-	Thu, 18 Apr 2024 12:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393BB15FD19;
+	Thu, 18 Apr 2024 13:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="rcVYDbtp"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GStT0MXM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF84A16C69D
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 12:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17440145337;
+	Thu, 18 Apr 2024 13:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713444252; cv=none; b=E8jeHNgOdy+FPfB+fhj2j9N5hQI9XnhcM1CVGnX6/+PNECia1aRkDeaX2FhGhOungbOJcQvvIFK7ztJJ4gWk1A6UsiTJ12vxdgZCM8NZotdHui79hvnuRiHjkQCgsnAVe/xa8+61zAqZj2kOd7HIMpHqzUMwPhzzBQ1x6092O7Y=
+	t=1713445776; cv=none; b=MZO4gUdzaNju7YKoBPkizDMrTEIpFe7OAl714NNjtB2h4lolKe8ivcDGwj/6UCxooVv4zpQIrZ9MlC53XLlN/tXFwjw0lXGCObRILGPi3iWmw6SxgtAJe+sTWT6+JKJQFAGPpKPJho5O+Qiy6850FTGHaHudaqYh1uJzkL+eyKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713444252; c=relaxed/simple;
-	bh=dIKOQ7+8Gx69BlGHAWDa8bC1hIUZKhgNODc1wgGNviA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uUjqOjBwx2EjSNYjYaIGUPV1cQH/ytG/kqnrOofGMN8W2Fuy/tmPjKgS+gbwnYnbXMhoYvPWEGWAqGLLzmDEi/X3/xb6dWTVGoL1dIDozRyGQT4+3bLqa2AnXqwZGBtnfZ2leW4KbQsMmzTsw6wMol8suwRbLSWkVl3RAofWquM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=rcVYDbtp; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-34801b1bc4aso150504f8f.0
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 05:44:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1713444249; x=1714049049; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OKIlCd7jL5ol5qvLgWGPfJLjgIu96MFC3958FRvJI8w=;
-        b=rcVYDbtp/oD3iclrRo+gTusRE4UnxE6WooQhL6SfF+Ch++PeE5AqV5jXpYdcWYwxuT
-         SX7aUPDxG26yTxFy9Nd9dwaRFmLphf7Q/+HvDjn5uv0e+jj9E49UVpeoVoyqo/ba68Sl
-         nDXcKmUtmQLOQY5jbol4B1j0YOdV9T6P6ZxBLAgqNIxCFJctnsw8JnUNopPs6YK2vUlQ
-         S1gWGgL2beA7YvD240cxprgyfZ4kFCAVkpt76H7IMtU9dyoy5DD2yp4utLUNG47XCVsC
-         O07A0FtrBncCnnOVTaivuuE6P4nX+NjqZKc9fF3eqNKmBfX9SdZfdPBDNOU6xh7Ukubm
-         SjwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713444249; x=1714049049;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OKIlCd7jL5ol5qvLgWGPfJLjgIu96MFC3958FRvJI8w=;
-        b=S7bMudDQ2e4JlUdvQNF1JGV5AdE8aIJehxEqYhRpVabZ4bIv+kr2xn5Qn95yzsgJtg
-         h+Qr6t5AudHu4ztG0SBuqABLGLEMhym7Wm2iMDVcOxLi/IsGX/zRDZBcK5hQLoSFm1Do
-         DnXrSnwVQnEhmZa2syLC5MUFF1k13MxQAp1ekhDXJ5D7fDZEm+dR8NQ3swHdVPa+dNqg
-         QaIMQ041pafXjGmCxJy3bu3b26nR+c6SfY6wHDy3LIZoAIPobXC051qHy4H372Toj2Cw
-         itKGQEyg4QdgP3SqyKQ/ro673tPBfRxsOItawaoofXgPmARdQnISN8WjUkyIzkEu/2Kt
-         tSJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsOSe17TBMzmPwosl07cvgpZb39xxbAVsm/8xXH4rderrxhf7lV3tyeiSOQuqWBdAR99D0Z3NHvOZ2f+qh+4Wvzz4y
-X-Gm-Message-State: AOJu0YwGwYm4GiATaXBU61X1Hu4O0uA5y5GTtAc1ANGc5of1LLRyglk3
-	qlMxxiyaec1oiwgVBqoT5alu2ENLL3xYppIfl2zwbq8bmtV/aw41l75xjwMNb9c=
-X-Google-Smtp-Source: AGHT+IEuz3T/wADyuU6lhNByO66nc3HwRSSRfc4RI/wUE1r6vwDm0YQy96IvGIrIEPLWf2aV5baVXg==
-X-Received: by 2002:a05:600c:47cf:b0:418:f991:70ff with SMTP id l15-20020a05600c47cf00b00418f99170ffmr135350wmo.1.1713444249424;
-        Thu, 18 Apr 2024 05:44:09 -0700 (PDT)
-Received: from carbon-x1.. ([2a01:e0a:999:a3a0:7b64:4d1d:16d8:e38b])
-        by smtp.gmail.com with ESMTPSA id bi18-20020a05600c3d9200b00418d5b16fa2sm3373412wmb.30.2024.04.18.05.44.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 05:44:08 -0700 (PDT)
-From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Conor Dooley <conor@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Anup Patel <anup@brainfault.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	linux-doc@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v2 12/12] KVM: riscv: selftests: Add Zcmop extension to get-reg-list test
-Date: Thu, 18 Apr 2024 14:42:35 +0200
-Message-ID: <20240418124300.1387978-13-cleger@rivosinc.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240418124300.1387978-1-cleger@rivosinc.com>
-References: <20240418124300.1387978-1-cleger@rivosinc.com>
+	s=arc-20240116; t=1713445776; c=relaxed/simple;
+	bh=Z8LqLKETTuqPbNx9AIZuOgf3LNGzlBMZYBlVi5bQc3A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rnDtckvEwxWz9Et4vskt67uJGDbZ7mgaS51UmbTwIstPRn3h9ei9S32ufvpOxnezeITCzP2cIkQjbPBWy+W24YMo1AbYU23lP/LJLrFqEm1yQfBL3gyVI1aY1JGodfeQJPdsNlcUpdG/ivC/WP3D8d/qoKq/CsRz5kuUQuHThSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GStT0MXM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43ID8jU3007642;
+	Thu, 18 Apr 2024 13:09:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=RaI5RA/Q5QPRrrhoR9duIhNVwqkwcc6C9qMHRKNHl+Q=;
+ b=GStT0MXMLM/fZ9pe8YXt69mb+WpGa4ehYFCflmtI1TebfTGuMbPUuO7bFFnEttDSGBpW
+ wVjQT2tYVG8bdJ5Dp0s8vaUIjKR3RCxcLs48OrDl9BDsHP8mgIt4bC3h/HXWy87Ur1ea
+ OG9YwjXWDQgRJ3xAyBqYuela6as1U9OG3ItFOtMY6xuJO3ksmt8+q6QcY4JBOUX8EU6t
+ aTY6SuWGr6L6Sa3qMYJOWu+A/ACjxwgvja03h9WYrHbiyap/VyGC7jtnVQ3bkhm2zmeo
+ liJWDwa2pRwk/Mgrered6Ws1P8sjCBP9Z2EJssVeAecdv7ag1WdPqSTLHHeM5tyWcBQQ 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xk44rr044-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 13:09:28 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43ID9SkW008360;
+	Thu, 18 Apr 2024 13:09:28 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xk44rr041-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 13:09:28 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43IB566T027289;
+	Thu, 18 Apr 2024 13:09:27 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xg4s0aw1y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 13:09:27 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43ID9LH348693672
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 18 Apr 2024 13:09:23 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8FB9520043;
+	Thu, 18 Apr 2024 13:09:21 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 591E320040;
+	Thu, 18 Apr 2024 13:09:21 +0000 (GMT)
+Received: from [9.152.224.222] (unknown [9.152.224.222])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 18 Apr 2024 13:09:21 +0000 (GMT)
+Message-ID: <453afb13-c7e3-4156-9dbb-c6317503c715@linux.ibm.com>
+Date: Thu, 18 Apr 2024 15:09:20 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] s390/mm: re-enable the shared zeropage for !PV and
+ !skeys KVM guests
+Content-Language: en-US
+To: David Hildenbrand <david@redhat.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Peter Xu <peterx@redhat.com>, Sven Schnelle <svens@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Andrea Arcangeli <aarcange@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20240411161441.910170-1-david@redhat.com>
+ <20240411161441.910170-3-david@redhat.com>
+ <Zh1w1QTNSy+rrCH7@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <8533cb18-42ff-42bc-b9e5-b0537aa51b21@redhat.com>
+ <Zh4cqZkuPR9V1t1o@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <20d1d8c5-70e9-4b00-965b-918f275cfae7@linux.ibm.com>
+ <a6a4b284-e21b-4a04-88d1-7402eb5a08ef@redhat.com>
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <a6a4b284-e21b-4a04-88d1-7402eb5a08ef@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: U_NintKTDQIUuOR8ZvOzcdWvOEEHjrHp
+X-Proofpoint-ORIG-GUID: T0JHOIK5lgqLYJh6QQs6jAcpUgEmZbJt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-18_11,2024-04-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=782
+ priorityscore=1501 mlxscore=0 suspectscore=0 phishscore=0 adultscore=0
+ clxscore=1015 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404180093
 
-The KVM RISC-V allows Zcmop extension for Guest/VM so add this
-extension to get-reg-list test.
 
-Signed-off-by: Clément Léger <cleger@rivosinc.com>
----
- tools/testing/selftests/kvm/riscv/get-reg-list.c | 4 ++++
- 1 file changed, 4 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-index 61cad4514197..9604c8ece787 100644
---- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-@@ -59,6 +59,7 @@ bool filter_reg(__u64 reg)
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCB:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCD:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCF:
-+	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZCMOP:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFA:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFH:
- 	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_ZFHMIN:
-@@ -429,6 +430,7 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
- 		KVM_ISA_EXT_ARR(ZCB),
- 		KVM_ISA_EXT_ARR(ZCD),
- 		KVM_ISA_EXT_ARR(ZCF),
-+		KVM_ISA_EXT_ARR(ZCMOP),
- 		KVM_ISA_EXT_ARR(ZFA),
- 		KVM_ISA_EXT_ARR(ZFH),
- 		KVM_ISA_EXT_ARR(ZFHMIN),
-@@ -957,6 +959,7 @@ KVM_ISA_EXT_SIMPLE_CONFIG(zca, ZCA),
- KVM_ISA_EXT_SIMPLE_CONFIG(zcb, ZCB),
- KVM_ISA_EXT_SIMPLE_CONFIG(zcd, ZCD),
- KVM_ISA_EXT_SIMPLE_CONFIG(zcf, ZCF),
-+KVM_ISA_EXT_SIMPLE_CONFIG(zcmop, ZCMOP);
- KVM_ISA_EXT_SIMPLE_CONFIG(zfa, ZFA);
- KVM_ISA_EXT_SIMPLE_CONFIG(zfh, ZFH);
- KVM_ISA_EXT_SIMPLE_CONFIG(zfhmin, ZFHMIN);
-@@ -1017,6 +1020,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
- 	&config_zcb,
- 	&config_zcd,
- 	&config_zcf,
-+	&config_zcmop,
- 	&config_zfa,
- 	&config_zfh,
- 	&config_zfhmin,
--- 
-2.43.0
+Am 16.04.24 um 15:41 schrieb David Hildenbrand:
+> On 16.04.24 14:02, Christian Borntraeger wrote:
+>>
+>>
+>> Am 16.04.24 um 08:37 schrieb Alexander Gordeev:
+>>
+>>>> We could piggy-back on vm_fault_to_errno(). We could use
+>>>> vm_fault_to_errno(rc, FOLL_HWPOISON), and only continue (retry) if the rc is 0 or
+>>>> -EFAULT, otherwise fail with the returned error.
+>>>>
+>>>> But I'd do that as a follow up, and also use it in break_ksm() in the same fashion.
+>>>
+>>> @Christian, do you agree with this suggestion?
+>>
+>> I would need to look into that more closely to give a proper answer. In general I am ok
+>> with this but I prefer to have more eyes on that.
+>>   From what I can tell we should cover all the normal cases with our CI as soon as it hits
+>> next. But maybe we should try to create/change a selftest to trigger these error cases?
+> 
+> If we find a shared zeropage we expect the next unsharing fault to succeed except:
+> 
+> (1) OOM, in which case we translate to -ENOMEM.
+> 
+> (2) Some obscure race with MADV_DONTNEED paired with concurrent truncate(), in which case we get an error, but if we look again, we will find the shared zeropage no longer mapped. (this is what break_ksm() describes)
+> 
+> (3) MCE while copying the page, which doesn't quite apply here.
+> 
+> For the time being, we only get shared zeropages in (a) anon mappings (b) MAP_PRIVATE shmem mappings via UFFDIO_ZEROPAGE. So (2) is hard or even impossible to trigger. (1) is hard to test as well, and (3) ...
+> 
+> No easy way to extend selftests that I can see.
 
+Yes, lets just go forward.
+> 
+> If we repeatedly find a shared zeropage in a COW mapping and get an error from the unsharing fault, something else would be deeply flawed. So I'm not really worried about that, but I agree that having a more centralized check will make sense.
 
