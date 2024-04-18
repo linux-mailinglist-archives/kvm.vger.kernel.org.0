@@ -1,213 +1,212 @@
-Return-Path: <kvm+bounces-15170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C1AE8AA437
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 22:46:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53C398AA4A9
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 23:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25E011F22C19
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 043E62819C3
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 21:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE96A190698;
-	Thu, 18 Apr 2024 20:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D3B194C96;
+	Thu, 18 Apr 2024 21:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JdH5bB/L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m0Fe3erW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D8A2E416
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 20:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3132F30
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 21:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713473167; cv=none; b=BNbscFzm90v87YS2lpkUD8/7ydTeFt+JyEDKvC5i3k95WkKAXAFBCMaGb21e/G9UgsDfxsIwYDVmC+QBtsjaRv8Pv2e+8LthEqD22uvjACNPJ/kxmPxwpl9uRoU53DytGe0do9lJL78AxEu2hCU8I4p+6mmHV+r5NrANW8GBg/0=
+	t=1713475285; cv=none; b=VGvzJEQ+ySJ+JgctDlNWH8GcoPqqGoGej4bCLm+4RD6BoocIa9k0Tc7upknE+yzrIevkta7cz0V6mH5D5vdVy8lr67R/r39j8eF6Kgg0MTjnXe71U0JpRDARjAdeQZEtskED1uFqUgVvJc0AfJcDhO+IAVfMeyEk0JWGE2z1syI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713473167; c=relaxed/simple;
-	bh=HMVi7br3BVBav1YEFm3hGbVBKQuo4jcCj8gERVq5mRM=;
+	s=arc-20240116; t=1713475285; c=relaxed/simple;
+	bh=y2QgvTIQc5YxNGACMLJ77qipzbYe9QndhuNBBIXYMJ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p7DYxj6vZNpbuAqoqFl5fhQz3a80RP6ut90F27ZFYjzPZ+R8HICnyNi9vRV+XuBh2TTB8GFO0UfvGb41a4kUVLxmOyAgMSJvHHMWX6NyRelP6AVPtUYd3pcjrYhGWU+BdLhEvffW/S5VbteaegR/2tndn1T4AZyq5qvPlUSq0x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JdH5bB/L; arc=none smtp.client-ip=209.85.214.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=gtq0PXQUeMJCeS84ZPl7o7UPSYJs3eyDG5xHjwdXqGZ50SKFVgkbGJ6gibG3RU3LdiDlizJuvhdaYFarXB6wibojGTeplctgyzAE/5tLaTzqofo+w+UGzsbqsd7oGLse89ZusRJy93HFOh0F6YS7s+AI3uuseli7qeSLBIdgLoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m0Fe3erW; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1e40042c13eso10955095ad.2
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 13:46:05 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e853131a9cso9099575ad.3
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 14:21:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713473165; x=1714077965; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NAMRKO5ZJMAgar9h9RnJOh/Wa8p7zabMhMg01dIRGOg=;
-        b=JdH5bB/LtWsQ8gpygCvhWh+bg2ci8KwLNDdR08ZBJmHIRs2pseOZh1D+tG57AJUvzX
-         dPJbsDO4P4m0lHrHZMefPaLcFJulBSeM+VIqQPAulLFiEwylLqX+6K6ksoOclnAT/iOs
-         nGpPYsw6vKJ9IEwflZF+FlhJpCX1hxxib8hKDBOV3NvAY+hNHKFa9hib+xbaRpNNDSes
-         fXQvNZY3+W4Y4S84EcKPcwLDJnC0PYuSEtDkyqRgKVIrrVSyzMK9wU6whMsvcmsnhtJl
-         57JWx2Onw6HxGFv8PxcIp8tWSvQxgsFlZiHuqwPT5aYG7QlakmHxKj15Ob6gYiPUbjG1
-         62tA==
+        d=google.com; s=20230601; t=1713475284; x=1714080084; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=5sgNP1y4Gb7YIm3QO4qpq0MpsRY6PlbBal0iGG5g8TU=;
+        b=m0Fe3erW80A0CZwax3+DZGtrz17LHgBCbAF3txTrP0Mp+hUTAyi28mDkbR3ZwgTYuu
+         2zpZJp+DWq9V/9gQS55SPHJtB3d+m3pkATKeQoATbOyqVOrD5CejTJnBRx4au/u0PybW
+         60r3Mwrohm1pJ15h2nPfR7ZQE4NjnK/PlIO9AD23WqML7lj6fk0Zgcqsw4J/K+eIcUBI
+         JmUvRuFES2nMRnLyMo8lCyQTNb5xv9i+pkUgutzfLj/oji8LN6OEmmZ+MapcGSy7G5GM
+         5z0GXL3ihzmz7EpK4BnG+whlkQwBaZWnsi1VtlSvqH8nKDyg9VDKOZXczQCvyEnf95qm
+         xmIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713473165; x=1714077965;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NAMRKO5ZJMAgar9h9RnJOh/Wa8p7zabMhMg01dIRGOg=;
-        b=Ifva8tJjKHHBrsZTDv9+Fv2xs86iz30gYsoAFpvjkipAVVfTCgebrHJToEqJ0du1JH
-         mDgaaaJnA2YYdMyphIeBMyrpqc7qEfaU4YqOEGnNfA/0doWmBi0ijyMQLHLvpMuC2mc/
-         uHkTJ/RGAvVYNhj+IRONbbmWF14DRjy3lnoqhoEeS7lzV0zuFwAftZTMl/G6gitRx9IH
-         PyoBx4TIh765v8riHqWo7QeZnOQVrZXCeAlVV75lDZyKUP1PwMzFqmsgwztkSzwKsCDX
-         SOTQ4fnxO9VIL3z4e71yhjFDLpDQfa46Vu3zNeM6e4nYB1/Jo2khs7D8XDdWYVw7K/bG
-         Uz5w==
-X-Forwarded-Encrypted: i=1; AJvYcCXjzjvC+DtOQ6XBJUIG+s38uusIeOOma3HNz+DPyJoqL7MN0Lrety3ro7rnc5fR2n3d3jSaKPXbmvpNsqFjMNY+BRX9
-X-Gm-Message-State: AOJu0YzEJWqTV7r7MK/N/cfYV3M3kK8hvgjrfNAMK4lgjyQFjaNqx/mp
-	232Sovahuiau4l9aWMaJ5hk1lJ+VmIs0vJVYXPaZnxGZs7NPe0YmrNhOwX4RdA==
-X-Google-Smtp-Source: AGHT+IE6CmWwjk53jvURZMn2e6RsrDhXbrmpgr8uKqK7f4ECwf5qlnvF3BLnuP+6gnpYzXORmkclsw==
-X-Received: by 2002:a17:90b:3696:b0:2a5:3438:a31b with SMTP id mj22-20020a17090b369600b002a53438a31bmr284502pjb.37.1713473164448;
-        Thu, 18 Apr 2024 13:46:04 -0700 (PDT)
-Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
-        by smtp.gmail.com with ESMTPSA id iq2-20020a17090afb4200b002a9f707ec45sm3611970pjb.11.2024.04.18.13.46.03
+        d=1e100.net; s=20230601; t=1713475284; x=1714080084;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5sgNP1y4Gb7YIm3QO4qpq0MpsRY6PlbBal0iGG5g8TU=;
+        b=WOmngkb8KLIrwsqIh+6yMoVhL3mJlaLrJ2ugTjADpB66A3+8XU/+m7XsMZ4mFS124f
+         +5HaHr1rbucayMDHK9Ea3nHp3TmMvihkpPCdIzHIS+CGc3TI1DKGISyvHQxNcoJkaHSn
+         sQjCn01jXEoqmNtr+j0hoKlLskDSyvyIp60mlhyd7nIwsDGKk/r3FDnZBoYH6LjbiX+H
+         h/T2G55+GQn4mvpMeBvKvrambW9YCnYdUBwE3wu8eJrpRTge+TeWR9Pwha7MgG46jBsK
+         aDpQ6m9RInJ9j/LiHq9beE+EnTziXw+nv2NMIdJsn46bz8DEcn7QX4LYyG7KeoaoEkCH
+         /FdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLBIIGWSYebpBbTc8/+od4VyRZR6CIldFANCg7zLika7mS6zgX6HV84lTxPNxCAR1NrYkksejIBfmvCyOiEG7bPA1v
+X-Gm-Message-State: AOJu0YxhWXIDFXbZjtckvoxxlPUGU2wCrKEqe4vyMnHmf51mqaMMh6FG
+	GeVudnzfXTogcsmnmzLtNPg7r524GjBiC97/6EBzV9C/AoDxfBXJ7xzUKDVIDQ==
+X-Google-Smtp-Source: AGHT+IGX5dXWK+/OuDV3SnGTkiNhOLMg+CP/zOhDyYHin5mNvqs8Y6muo/1+IDVrLzHgXecxX918Dw==
+X-Received: by 2002:a17:902:6b42:b0:1e4:4ade:f504 with SMTP id g2-20020a1709026b4200b001e44adef504mr248052plt.46.1713475283392;
+        Thu, 18 Apr 2024 14:21:23 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id x6-20020a170902a38600b001e79072ee58sm2028346pla.62.2024.04.18.14.21.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 13:46:03 -0700 (PDT)
-Date: Thu, 18 Apr 2024 20:46:00 +0000
+        Thu, 18 Apr 2024 14:21:22 -0700 (PDT)
+Date: Thu, 18 Apr 2024 21:21:18 +0000
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
 	peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
-	dapeng1.mi@linux.intel.com, jmattson@google.com,
-	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com,
-	eranian@google.com, irogers@google.com, samantha.alt@intel.com,
-	like.xu.linux@gmail.com, chao.gao@intel.com
-Subject: Re: [RFC PATCH 00/41] KVM: x86/pmu: Introduce passthrough vPM
-Message-ID: <ZiGGiOspm6N-vIta@google.com>
+	jmattson@google.com, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+	zhiyuan.lv@intel.com, eranian@google.com, irogers@google.com,
+	samantha.alt@intel.com, like.xu.linux@gmail.com, chao.gao@intel.com
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of
+ PMU state for Intel CPU
+Message-ID: <ZiGOzkLhQm57EPlx@google.com>
 References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <ZhgX6BStTh05OfEd@google.com>
+ <20240126085444.324918-24-xiong.y.zhang@linux.intel.com>
+ <ZhhZush_VOEnimuw@google.com>
+ <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <Zhn9TGOiXxcV5Epx@google.com>
+ <4c47b975-ad30-4be9-a0a9-f0989d1fa395@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com>
+ <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZhgX6BStTh05OfEd@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zh1mKoHJcj22rKy8@google.com>
 
-On Thu, Apr 11, 2024, Sean Christopherson wrote:
-> <bikeshed>
+On Mon, Apr 15, 2024, Sean Christopherson wrote:
+> On Mon, Apr 15, 2024, Mingwei Zhang wrote:
+> > On Mon, Apr 15, 2024 at 3:04 AM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
+> > > On 4/15/2024 2:06 PM, Mingwei Zhang wrote:
+> > > > On Fri, Apr 12, 2024 at 9:25 PM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
+> > > >>>> It's necessary to clear the EVENTSELx MSRs for both GP and fixed counters.
+> > > >>>> Considering this case, Guest uses GP counter 2, but Host doesn't use it. So
+> > > >>>> if the EVENTSEL2 MSR is not cleared here, the GP counter 2 would be enabled
+> > > >>>> unexpectedly on host later since Host perf always enable all validate bits
+> > > >>>> in PERF_GLOBAL_CTRL MSR. That would cause issues.
+> > > >>>>
+> > > >>>> Yeah,  the clearing for PMCx MSR should be unnecessary .
+> > > >>>>
+> > > >>> Why is clearing for PMCx MSR unnecessary? Do we want to leaking counter
+> > > >>> values to the host? NO. Not in cloud usage.
+> > > >> No, this place is clearing the guest counter value instead of host
+> > > >> counter value. Host always has method to see guest value in a normal VM
+> > > >> if he want. I don't see its necessity, it's just a overkill and
+> > > >> introduce extra overhead to write MSRs.
+> > > >>
+> > > > I am curious how the perf subsystem solves the problem? Does perf
+> > > > subsystem in the host only scrubbing the selector but not the counter
+> > > > value when doing the context switch?
+> > >
+> > > When context switch happens, perf code would schedule out the old events
+> > > and schedule in the new events. When scheduling out, the ENABLE bit of
+> > > EVENTSELx MSR would be cleared, and when scheduling in, the EVENTSELx
+> > > and PMCx MSRs would be overwritten with new event's attr.config and
+> > > sample_period separately.  Of course, these is only for the case when
+> > > there are new events to be programmed on the PMC. If no new events, the
+> > > PMCx MSR would keep stall value and won't be cleared.
+> > >
+> > > Anyway, I don't see any reason that PMCx MSR must be cleared.
+> > >
+> > 
+> > I don't have a strong opinion on the upstream version. But since both
+> > the mediated vPMU and perf are clients of PMU HW, leaving PMC values
+> > uncleared when transition out of the vPMU boundary is leaking info
+> > technically.
 > 
-> I think we should call this a mediated PMU, not a passthrough PMU.  KVM still
-> emulates the control plane (controls and event selectors), while the data is
-> fully passed through (counters).
+> I'm not objecting to ensuring guest PMCs can't be read by any entity that's not
+> in the guest's TCB, which is what I would consider a true leak.  I'm objecting
+> to blindly clearing all PMCs, and more specifically objecting to *KVM* clearing
+> PMCs when saving guest state without coordinating with perf in any way.
+
+Agree. blindly clearing PMCs is the basic implementation. I am thinking
+about what coordination between perf and KVM as well.
+
 > 
-> </bikeshed>
-Sean,
+> I am ok if we start with (or default to) a "safe" implementation that zeroes all
+> PMCs when switching to host context, but I want KVM and perf to work together to
+> do the context switches, e.g. so that we don't end up with code where KVM writes
+> to all PMC MSRs and that perf also immediately writes to all PMC MSRs.
 
-I feel "mediated PMU" seems to be a little bit off the ..., no? In
-KVM, almost all of features are mediated. In our specific case, the
-legacy PMU is mediated by KVM and perf subsystem on the host. In new
-design, it is mediated by KVM only.
+Sure. Point taken.
+> 
+> One my biggest complaints with the current vPMU code is that the roles and
+> responsibilities between KVM and perf are poorly defined, which leads to suboptimal
+> and hard to maintain code.
 
-We intercept the control plan in current design, but the only thing
-we do is the event filtering. No fancy code change to emulate the control
-registers. So, it is still a passthrough logic.
+Right.
+> 
+> Case in point, I'm pretty sure leaving guest values in PMCs _would_ leak guest
+> state to userspace processes that have RDPMC permissions, as the PMCs might not
+> be dirty from perf's perspective (see perf_clear_dirty_counters()).
+> 
 
-In some (rare) business cases, I think maybe we could fully passthrough
-the control plan as well. For instance, sole-tenant machine, or
-full-machine VM + full offload. In case if there is a cpu errata, KVM
-can force vmexit and dynamically intercept the selectors on all vcpus
-with filters checked. It is not supported in current RFC, but maybe
-doable in later versions.
+ah. This is a good point.
 
-With the above, I wonder if we can still use passthrough PMU for
-simplicity? But no strong opinion if you really want to keep this name.
-I would have to take some time to convince myself.
+		switch_mm_irqs_off() =>
+		cr4_update_pce_mm() =>
+		/*
+		 * Clear the existing dirty counters to
+		 * prevent the leak for an RDPMC task.
+		 */
+		perf_clear_dirty_counters()
+
+So perf does clear dirty counter values on process context switch. This
+is nice to know.
+
+perf_clear_dirty_counters() clear the counter values according to
+cpuc->dirty except for those assigned counters.
+
+> Blindly clearing PMCs in KVM "solves" that problem, but in doing so makes the
+> overall code brittle because it's not clear whether KVM _needs_ to clear PMCs,
+> or if KVM is just being paranoid.
+
+There is a difference between KVM and perf subsystem on PMU context
+switch. The latter has the notion of "perf_events", while the former
+currently does not. It is quite hard for KVM to know which counters are
+really "in use".
+
+Another point I want to raise up to you is that, KVM PMU context switch
+and Perf PMU context switch happens at different timing:
+
+ - The former is a context switch between guest/host state of the same
+   process, happening at VM-enter/exit boundary.
+ - The latter is a context switch beteen two host-level processes.
+ - The former happens before the latter.
+ - Current design has no PMC partitioning between host/guest due to
+   arch limitation.
+
+From the above, I feel that it might be impossible to combine them or to
+add coordination? Unless we do the KVM PMU context switch at vcpu loop
+boundary...
 
 Thanks.
 -Mingwei
-> 
-> On Fri, Jan 26, 2024, Xiong Zhang wrote:
-> 
-> > 1. host system wide / QEMU events handling during VM running
-> >    At VM-entry, all the host perf events which use host x86 PMU will be
-> >    stopped. These events with attr.exclude_guest = 1 will be stopped here
-> >    and re-started after vm-exit. These events without attr.exclude_guest=1
-> >    will be in error state, and they cannot recovery into active state even
-> >    if the guest stops running. This impacts host perf a lot and request
-> >    host system wide perf events have attr.exclude_guest=1.
-> > 
-> >    This requests QEMU Process's perf event with attr.exclude_guest=1 also.
-> > 
-> >    During VM running, perf event creation for system wide and QEMU
-> >    process without attr.exclude_guest=1 fail with -EBUSY. 
-> > 
-> > 2. NMI watchdog
-> >    the perf event for NMI watchdog is a system wide cpu pinned event, it
-> >    will be stopped also during vm running, but it doesn't have
-> >    attr.exclude_guest=1, we add it in this RFC. But this still means NMI
-> >    watchdog loses function during VM running.
-> > 
-> >    Two candidates exist for replacing perf event of NMI watchdog:
-> >    a. Buddy hardlock detector[3] may be not reliable to replace perf event.
-> >    b. HPET-based hardlock detector [4] isn't in the upstream kernel.
-> 
-> I think the simplest solution is to allow mediated PMU usage if and only if
-> the NMI watchdog is disabled.  Then whether or not the host replaces the NMI
-> watchdog with something else becomes an orthogonal discussion, i.e. not KVM's
-> problem to solve.
-> 
-> > 3. Dedicated kvm_pmi_vector
-> >    In emulated vPMU, host PMI handler notify KVM to inject a virtual
-> >    PMI into guest when physical PMI belongs to guest counter. If the
-> >    same mechanism is used in passthrough vPMU and PMI skid exists
-> >    which cause physical PMI belonging to guest happens after VM-exit,
-> >    then the host PMI handler couldn't identify this PMI belongs to
-> >    host or guest.
-> >    So this RFC uses a dedicated kvm_pmi_vector, PMI belonging to guest
-> >    has this vector only. The PMI belonging to host still has an NMI
-> >    vector.
-> > 
-> >    Without considering PMI skid especially for AMD, the host NMI vector
-> >    could be used for guest PMI also, this method is simpler and doesn't
-> 
-> I don't see how multiplexing NMIs between guest and host is simpler.  At best,
-> the complexity is a wash, just in different locations, and I highly doubt it's
-> a wash.  AFAIK, there is no way to precisely know that an NMI came in via the
-> LVTPC.
-> 
-> E.g. if an IPI NMI arrives before the host's PMU is loaded, confusion may ensue.
-> SVM has the luxury of running with GIF=0, but that simply isn't an option on VMX.
-> 
-> >    need x86 subsystem to reserve the dedicated kvm_pmi_vector, and we
-> >    didn't meet the skid PMI issue on modern Intel processors.
-> > 
-> > 4. per-VM passthrough mode configuration
-> >    Current RFC uses a KVM module enable_passthrough_pmu RO parameter,
-> >    it decides vPMU is passthrough mode or emulated mode at kvm module
-> >    load time.
-> >    Do we need the capability of per-VM passthrough mode configuration?
-> >    So an admin can launch some non-passthrough VM and profile these
-> >    non-passthrough VMs in host, but admin still cannot profile all
-> >    the VMs once passthrough VM existence. This means passthrough vPMU
-> >    and emulated vPMU mix on one platform, it has challenges to implement.
-> >    As the commit message in commit 0011, the main challenge is 
-> >    passthrough vPMU and emulated vPMU have different vPMU features, this
-> >    ends up with two different values for kvm_cap.supported_perf_cap, which
-> >    is initialized at module load time. To support it, more refactor is
-> >    needed.
-> 
-> I have no objection to an all-or-nothing setup.  I'd honestly love to rip out the
-> existing vPMU support entirely, but that's probably not be realistic, at least not
-> in the near future.
-> 
-> > Remain Works
-> > ===
-> > 1. To reduce passthrough vPMU overhead, optimize the PMU context switch.
-> 
-> Before this gets out of its "RFC" phase, I would at least like line of sight to
-> a more optimized switch.  I 100% agree that starting with a conservative
-> implementation is the way to go, and the kernel absolutely needs to be able to
-> profile KVM itself (and everything KVM calls into), i.e. _always_ keeping the
-> guest PMU loaded for the entirety of KVM_RUN isn't a viable option.
-> 
-> But I also don't want to get into a situation where can't figure out a clean,
-> robust way to do the optimized context switch without needing (another) massive
-> rewrite.
 
