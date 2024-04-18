@@ -1,699 +1,247 @@
-Return-Path: <kvm+bounces-15167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15169-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDBA88AA39E
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 22:01:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF6738AA41A
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 22:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8361228119D
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:01:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FFE82821B6
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB7118131D;
-	Thu, 18 Apr 2024 20:01:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D78190661;
+	Thu, 18 Apr 2024 20:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="nvRvxPTo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cBAbLwMf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E2881802A1
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 20:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7A22E416
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 20:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713470485; cv=none; b=ZnCJ9F1Dk6i53mZMtARESn993xN1ZNjMiQVVGj3MiyoGrB5FKv8AKjU9KT7pmmwrYGhqlB5QScnDCu7yCMXwMSNqX3+ITWijMcMVVtSpCa5M+dU/iyVmFoyyso6laa7d7y3TsypTbe0njepgelO1aVPzTfSxsnhrRWnqEkN1a24=
+	t=1713472675; cv=none; b=KsfRmmOqz+RUxv2ltFVYVyZrKrn6r5DReZEQ7UqobRDZ6m4+F3s5QtXXNi6qaZPlz4TRXU0Z9H9vs9OTC6rwNsI4XbLks+8DwzGBnLfV3DsOd/n3XyN8i3zgspxeqO6R+KjOO5KFb9bpLUB4LlfymaGaUZdmA8LUJsR5DI0LE8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713470485; c=relaxed/simple;
-	bh=cf0PCQhBT408dQRYP8aFl+Rz+dJetAri5k+t1+9NKnc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FWx9jj9nCo+vzmgLahE8L5ZqR4BgyU/Nh5wfWO00NM2X/x3mUpg4WO8uikO98APg07RhlK2YR60lflPPKUeOttyh1mt/haGeU2xjFN3uMV0RA14W+5rvWFD2z41uSeq58Ug1Fu4QRIV9D4ZcCsvG63i4wxrMTkXhVi8jkxKOKoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=nvRvxPTo; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-36b1774e453so3946505ab.1
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 13:01:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1713470482; x=1714075282; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wp2qHt8JRoKGgCZU0XBGYwPmPX8gJPIBeFYJ91EsI3E=;
-        b=nvRvxPTo9iJhQgrA6MVGKz9VKglSWnJfVCOxwEDFEOfh8wq8EnDDLpDPjnMBKF3Mzi
-         JiVlpK8zO3mdsnV3enaxent6AXjvsjBLDWDPYKaZqiVHwRhP7UHJ0ov57byLVvHOlIxo
-         cOdOOjBZMBhTq5EhOYp4nBcQS1dmz5td9xN4fSqWd5hsyyrRC7Q2WZJLaAfUtyFRwH1o
-         E7Aj2C73yrKP3sJGBSr8H/xXKFvBhSwdnCHUBpbtRCCB+3AVZRM8kzmxP+rzJHlkAsci
-         xIqDuFb561z4pNgiymlS9SQ8T8occcoXRi1+O0OToAVxz8/E5+GKhT2B5kAYBtGazMwi
-         L3Ng==
+	s=arc-20240116; t=1713472675; c=relaxed/simple;
+	bh=9rCCdJIOXGK5mMIJxWx6y9XaXwhCfvryMYkeNkglHYg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E4zhdjo40h6FAiumI2fydp4f6qGUyqFnxbfOXmxHlUwpKC/m8IkJWqQ5iTNJfgaSsu7eVPwtXfY1aDl+d5AUyyj2XmEXp4MI+Duko+9HDW/rUNdoJrBX59HDE76xAByvv2T/8V2XmXNyS4qVcZpUjRVn+Xril85BKyek9rmCCXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cBAbLwMf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713472672;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Pn2/BXHQsJTtbsxPcLAeb1M670ku7QSTpIAaDmdaDfE=;
+	b=cBAbLwMfNQG0lQbG9fmV5FHxM6dXz6p5JT2/b7wnj4xgl1s5g63HRRhIVGs/gfmeig0VoW
+	qhUHJbUxvYul6sHawvn/EaYPj2vQ24SwRtPUKLcfmDsEOPNXXUhtPQKMEjSlVZsUb8OfVr
+	mnfIgoDjldh5Dj6fPh4KVQQmQp/PVxA=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-FXowgnq1MB6z7JmuHgcuzw-1; Thu, 18 Apr 2024 16:37:51 -0400
+X-MC-Unique: FXowgnq1MB6z7JmuHgcuzw-1
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36b34b3a5fdso16619745ab.0
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 13:37:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713470482; x=1714075282;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wp2qHt8JRoKGgCZU0XBGYwPmPX8gJPIBeFYJ91EsI3E=;
-        b=iTYFFPNiraO2DMIyXgB4TC4VxD6zXQnfh6PY8VwRWKhewVTu/yiFt9X5GbZPSCvpdq
-         mJGmvL6SLB/x5Vd5/+svAyM/kV396/gCB2mc9fCGEloGcI496p6UgP9EX17fGh5dMWUl
-         4eE5/o144RgYlTcqDsU9VF5wMCUt7XFVVm33HUdvWc3BaL/lEaQfnDOpctjyQYBr/HKJ
-         ErBZcdBeln2b6BB4neu25QsuSIKcDJhRuhMMlJklRYMF1k7zb0LoKkECIUcRmn3pVLMq
-         LUbkgD9bD7Cam6dmv38sRWWWgcKfR6dePp3pRViRd5JSyYlGKg244ubzTb1fqdvL8ps0
-         PjVA==
-X-Forwarded-Encrypted: i=1; AJvYcCUazdVrgj/Z0oxlBUUo6pJit1qqUIltOqp4h7XQ56tKDpSil6yzdeAFp3Qv+EHNXwjRCgiG+iA1VFfKMOtDQ8euUFGI
-X-Gm-Message-State: AOJu0YynyCYW7N8RBv4WxLcvyaH7rl+ISYU2UtCq8MOoLYotr4By5vFw
-	NgMVOna9Rik7UP2HvVDnNO3KzyW0Di2MMc9n0bx+61AfukT9Hu3tROudjpOEDEA=
-X-Google-Smtp-Source: AGHT+IHZgp+rgkg+h161qh+wLcjvodsoRVcNbQf96rmD4T3Z5SagsXuBNe3TLPAKphIwq8th60Fs1g==
-X-Received: by 2002:a05:6e02:1848:b0:36a:36d9:36eb with SMTP id b8-20020a056e02184800b0036a36d936ebmr157054ilv.27.1713470482386;
-        Thu, 18 Apr 2024 13:01:22 -0700 (PDT)
-Received: from [100.64.0.1] ([170.85.6.197])
-        by smtp.gmail.com with ESMTPSA id b16-20020a92dcd0000000b0036b1ebe9e47sm445352ilr.75.2024.04.18.13.01.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Apr 2024 13:01:21 -0700 (PDT)
-Message-ID: <1e13e981-14f2-4993-afba-dd3baadffe29@sifive.com>
-Date: Thu, 18 Apr 2024 15:01:00 -0500
+        d=1e100.net; s=20230601; t=1713472670; x=1714077470;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Pn2/BXHQsJTtbsxPcLAeb1M670ku7QSTpIAaDmdaDfE=;
+        b=HaBa4cS5ytU7JpLRGaGT4IE3B51CXofyvPs9YDe4cchWL/UIdU7PEDDn8PHKlIOQEQ
+         9lhkEwKgUq06eZ4dbEAybid6KfSkEifEfsvukKOxyoO2syXuQrIyQJh9Sv1+nVrK7jRF
+         2yxPVwOoVWJHWys+RV/EGlQWdJRlTG/pZdx198E7y7AiUluv0LCqMqWDjSLWmDZVnIoJ
+         MfNAdGaZLDvAf+t+Y77IMn+YG/KO0PHxMx1ZDfa/4Y4nYdTlR390UDcRfgy40NEIn1yn
+         AjbIlH7eHZwDdWiyTSRiZDBeGMQ1cqMBNWZ0oiB4riuMWiy/HV9QuKpFd+BSUf1ECfpD
+         6n+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXGMJ9iRkuVCKexSv/L+reP56W2JZ7uTKRjyVYO6VhXGPwQ7t8klpjsi19h9sfJ2MeYpj2xhK22zYducS0gVQ+XaPjw
+X-Gm-Message-State: AOJu0YzJ6IRuCPsN+M5P4xBD94kSSyeJTd0j5AEG6YEYNTNbKzo40/DE
+	0StFkmmHI6jtbGnW40pZMRuwUWS1gNfLD6URQ7HZZz9S/fAoKgdjitEivPNmeXSUNFf7tpwqD8R
+	NUlhmsBJBa5rvKplGE3HneIwrsqYF4MiwHgWk+YYvA7zlNFvqHg==
+X-Received: by 2002:a05:6e02:1a28:b0:36b:2c7d:cd91 with SMTP id g8-20020a056e021a2800b0036b2c7dcd91mr306698ile.25.1713472670672;
+        Thu, 18 Apr 2024 13:37:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF1WTU9ZaZTA/+3VejLlx0uNmpHA2zKOaPH8HbGoZrE1W44hFuolUWSTZ3FJje7EeKvr4YJ3A==
+X-Received: by 2002:a05:6e02:1a28:b0:36b:2c7d:cd91 with SMTP id g8-20020a056e021a2800b0036b2c7dcd91mr306682ile.25.1713472670299;
+        Thu, 18 Apr 2024 13:37:50 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id y26-20020a056638015a00b004829428d517sm633977jao.63.2024.04.18.13.37.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 13:37:49 -0700 (PDT)
+Date: Thu, 18 Apr 2024 14:37:47 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: "Tian, Kevin" <kevin.tian@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
+ "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
+ <robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
+ "nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
+ <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
+ <chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
+ <iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
+ <baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+ "Pan, Jacob jun" <jacob.jun.pan@intel.com>
+Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
+Message-ID: <20240418143747.28b36750.alex.williamson@redhat.com>
+In-Reply-To: <4037d5f4-ae6b-4c17-97d8-e0f7812d5a6d@intel.com>
+References: <20240412082121.33382-1-yi.l.liu@intel.com>
+	<BN9PR11MB5276318EF2CD66BEF826F59A8C082@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20240416175018.GJ3637727@nvidia.com>
+	<BN9PR11MB5276E6975F78AE96F8DEC66D8C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<20240417122051.GN3637727@nvidia.com>
+	<20240417170216.1db4334a.alex.williamson@redhat.com>
+	<BN9PR11MB52765314C4E965D4CEADA2178C0E2@BN9PR11MB5276.namprd11.prod.outlook.com>
+	<4037d5f4-ae6b-4c17-97d8-e0f7812d5a6d@intel.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 08/24] drivers/perf: riscv: Implement SBI PMU snapshot
- function
-To: Atish Patra <atishp@rivosinc.com>
-Cc: Palmer Dabbelt <palmer@rivosinc.com>, Anup Patel <anup@brainfault.org>,
- Conor Dooley <conor.dooley@microchip.com>,
- Andrew Jones <ajones@ventanamicro.com>, Ajay Kaher
- <ajay.kaher@broadcom.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexandre Ghiti <alexghiti@rivosinc.com>, Juergen Gross <jgross@suse.com>,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org,
- Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley
- <paul.walmsley@sifive.com>, Shuah Khan <shuah@kernel.org>,
- virtualization@lists.linux.dev, Will Deacon <will@kernel.org>,
- x86@kernel.org, linux-kernel@vger.kernel.org
-References: <20240416184421.3693802-1-atishp@rivosinc.com>
- <20240416184421.3693802-9-atishp@rivosinc.com>
- <d4923b62-3cda-4bdd-900e-265059593cf2@sifive.com>
- <c3dab594-473e-4644-9543-66c172ae61bb@rivosinc.com>
-From: Samuel Holland <samuel.holland@sifive.com>
-Content-Language: en-US
-In-Reply-To: <c3dab594-473e-4644-9543-66c172ae61bb@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Atish,
+On Thu, 18 Apr 2024 17:03:15 +0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-On 2024-04-18 2:47 AM, Atish Patra wrote:
-> 
-> On 4/16/24 21:02, Samuel Holland wrote:
->> Hi Atish,
->>
->> On 2024-04-16 1:44 PM, Atish Patra wrote:
->>> SBI v2.0 SBI introduced PMU snapshot feature which adds the following
->>> features.
->>>
->>> 1. Read counter values directly from the shared memory instead of
->>> csr read.
->>> 2. Start multiple counters with initial values with one SBI call.
->>>
->>> These functionalities optimizes the number of traps to the higher
->>> privilege mode. If the kernel is in VS mode while the hypervisor
->>> deploy trap & emulate method, this would minimize all the hpmcounter
->>> CSR read traps. If the kernel is running in S-mode, the benefits
->>> reduced to CSR latency vs DRAM/cache latency as there is no trap
->>> involved while accessing the hpmcounter CSRs.
->>>
->>> In both modes, it does saves the number of ecalls while starting
->>> multiple counter together with an initial values. This is a likely
->>> scenario if multiple counters overflow at the same time.
->>>
->>> Acked-by: Palmer Dabbelt <palmer@rivosinc.com>
->>> Reviewed-by: Anup Patel <anup@brainfault.org>
->>> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
->>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->>> Signed-off-by: Atish Patra <atishp@rivosinc.com>
->>> ---
->>>   drivers/perf/riscv_pmu.c       |   1 +
->>>   drivers/perf/riscv_pmu_sbi.c   | 224 +++++++++++++++++++++++++++++++--
->>>   include/linux/perf/riscv_pmu.h |   6 +
->>>   3 files changed, 219 insertions(+), 12 deletions(-)
->>>
->>> diff --git a/drivers/perf/riscv_pmu.c b/drivers/perf/riscv_pmu.c
->>> index b4efdddb2ad9..36d348753d05 100644
->>> --- a/drivers/perf/riscv_pmu.c
->>> +++ b/drivers/perf/riscv_pmu.c
->>> @@ -408,6 +408,7 @@ struct riscv_pmu *riscv_pmu_alloc(void)
->>>           cpuc->n_events = 0;
->>>           for (i = 0; i < RISCV_MAX_COUNTERS; i++)
->>>               cpuc->events[i] = NULL;
->>> +        cpuc->snapshot_addr = NULL;
->>>       }
->>>       pmu->pmu = (struct pmu) {
->>>           .event_init    = riscv_pmu_event_init,
->>> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
->>> index f23501898657..dabf8a17b096 100644
->>> --- a/drivers/perf/riscv_pmu_sbi.c
->>> +++ b/drivers/perf/riscv_pmu_sbi.c
->>> @@ -58,6 +58,9 @@ PMU_FORMAT_ATTR(event, "config:0-47");
->>>   PMU_FORMAT_ATTR(firmware, "config:63");
->>>     static bool sbi_v2_available;
->>> +static DEFINE_STATIC_KEY_FALSE(sbi_pmu_snapshot_available);
->>> +#define sbi_pmu_snapshot_available() \
->>> +    static_branch_unlikely(&sbi_pmu_snapshot_available)
->>>     static struct attribute *riscv_arch_formats_attr[] = {
->>>       &format_attr_event.attr,
->>> @@ -508,14 +511,109 @@ static int pmu_sbi_event_map(struct perf_event *event,
->>> u64 *econfig)
->>>       return ret;
->>>   }
->>>   +static void pmu_sbi_snapshot_free(struct riscv_pmu *pmu)
->>> +{
->>> +    int cpu;
->>> +
->>> +    for_each_possible_cpu(cpu) {
->>> +        struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
->>> +
->>> +        if (!cpu_hw_evt->snapshot_addr)
->>> +            continue;
->>> +
->>> +        free_page((unsigned long)cpu_hw_evt->snapshot_addr);
->>> +        cpu_hw_evt->snapshot_addr = NULL;
->>> +        cpu_hw_evt->snapshot_addr_phys = 0;
->>> +    }
->>> +}
->>> +
->>> +static int pmu_sbi_snapshot_alloc(struct riscv_pmu *pmu)
->>> +{
->>> +    int cpu;
->>> +    struct page *snapshot_page;
->>> +
->>> +    for_each_possible_cpu(cpu) {
->>> +        struct cpu_hw_events *cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
->>> +
->>> +        if (cpu_hw_evt->snapshot_addr)
->>> +            continue;
->> This condition can never occur because pmu_sbi_snapshot_free() is called in the
->> error path.
-> 
-> Yeah. Removed it.
-> 
->>
->>> +
->>> +        snapshot_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
->>> +        if (!snapshot_page) {
->>> +            pmu_sbi_snapshot_free(pmu);
->>> +            return -ENOMEM;
->>> +        }
->>> +        cpu_hw_evt->snapshot_addr = page_to_virt(snapshot_page);
->>> +        cpu_hw_evt->snapshot_addr_phys = page_to_phys(snapshot_page);
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int pmu_sbi_snapshot_disable(void)
->>> +{
->>> +    struct sbiret ret;
->>> +
->>> +    ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
->>> SBI_SHMEM_DISABLE,
->>> +            SBI_SHMEM_DISABLE, 0, 0, 0, 0);
->>> +    if (ret.error) {
->>> +        pr_warn("failed to disable snapshot shared memory\n");
->>> +        return sbi_err_map_linux_errno(ret.error);
->>> +    }
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int pmu_sbi_snapshot_setup(struct riscv_pmu *pmu, int cpu)
->>> +{
->>> +    struct cpu_hw_events *cpu_hw_evt;
->>> +    struct sbiret ret = {0};
->>> +
->>> +    cpu_hw_evt = per_cpu_ptr(pmu->hw_events, cpu);
->>> +    if (!cpu_hw_evt->snapshot_addr_phys)
->>> +        return -EINVAL;
->>> +
->>> +    if (cpu_hw_evt->snapshot_set_done)
->>> +        return 0;
->>> +
->>> +    if (IS_ENABLED(CONFIG_32BIT))
->>> +        ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
->>> +                cpu_hw_evt->snapshot_addr_phys,
->>> +                (u64)(cpu_hw_evt->snapshot_addr_phys) >> 32, 0, 0, 0, 0);
->> phys_addr_t on riscv32 is 32 bits, so the high argument will always be zero.
->> (I'm guessing the compiler warned without the cast?) Do we need this special
->> case?
-> 
-> As per the spec maximum physical address bits can be 34 bits on RV32. Linux
-> kernel doesn't support it yet though.
-> But the casting is there just for forward compatibility. We can remove it and
-> leave a commit but I thought of keeping it
-> there to make things explicit.
-> 
->>> +    else
->>> +        ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_SNAPSHOT_SET_SHMEM,
->>> +                cpu_hw_evt->snapshot_addr_phys, 0, 0, 0, 0, 0);
->>> +
->>> +    /* Free up the snapshot area memory and fall back to SBI PMU calls
->>> without snapshot */
->>> +    if (ret.error) {
->>> +        if (ret.error != SBI_ERR_NOT_SUPPORTED)
->>> +            pr_warn("pmu snapshot setup failed with error %ld\n", ret.error);
->>> +        cpu_hw_evt->snapshot_set_done = false;
->> This statement has no effect; snapshot_set_done is known to be false above.
-> 
-> Removed it.
-> 
->>> +        return sbi_err_map_linux_errno(ret.error);
->>> +    }
->>> +
->>> +    cpu_hw_evt->snapshot_set_done = true;
->>> +
->>> +    return 0;
->>> +}
->>> +
->>>   static u64 pmu_sbi_ctr_read(struct perf_event *event)
->>>   {
->>>       struct hw_perf_event *hwc = &event->hw;
->>>       int idx = hwc->idx;
->>>       struct sbiret ret;
->>>       u64 val = 0;
->>> +    struct riscv_pmu *pmu = to_riscv_pmu(event->pmu);
->>> +    struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
->>> +    struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
->>>       union sbi_pmu_ctr_info info = pmu_ctr_list[idx];
->>>   +    /* Read the value from the shared memory directly */
->>> +    if (sbi_pmu_snapshot_available()) {
->>> +        val = sdata->ctr_values[idx];
->>> +        return val;
->>> +    }
->> This does not work if pmu_sbi_ctr_read() is called while the counter is started,
->> because ctr_values is only updated when stopping the counter (and the shared
->> memory is only updated at that time as well). So you would need to check for
->> PERF_HES_STOPPED or being in the overflow handler here. And this can't possibly
-> 
-> Do you see a case where it is not called before counters are stopped ?
-> IIRC, perf framework invokes pmu->read() function when counters are stopped
-> 
-> riscv_pmu.c invokes it only after stopping the counters
-> riscv_pmu_stop->riscv_pmu_event_update->rvpmu->ctr_read
+> On 2024/4/18 08:06, Tian, Kevin wrote:
+> >> From: Alex Williamson <alex.williamson@redhat.com>
+> >> Sent: Thursday, April 18, 2024 7:02 AM
+> >>
+> >> On Wed, 17 Apr 2024 09:20:51 -0300
+> >> Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >>  
+> >>> On Wed, Apr 17, 2024 at 07:16:05AM +0000, Tian, Kevin wrote:  
+> >>>>> From: Jason Gunthorpe <jgg@nvidia.com>
+> >>>>> Sent: Wednesday, April 17, 2024 1:50 AM
+> >>>>>
+> >>>>> On Tue, Apr 16, 2024 at 08:38:50AM +0000, Tian, Kevin wrote:  
+> >>>>>>> From: Liu, Yi L <yi.l.liu@intel.com>
+> >>>>>>> Sent: Friday, April 12, 2024 4:21 PM
+> >>>>>>>
+> >>>>>>> A userspace VMM is supposed to get the details of the device's  
+> >> PASID  
+> >>>>>>> capability
+> >>>>>>> and assemble a virtual PASID capability in a proper offset in the  
+> >> virtual  
+> >>>>> PCI  
+> >>>>>>> configuration space. While it is still an open on how to get the  
+> >> available  
+> >>>>>>> offsets. Devices may have hidden bits that are not in the PCI cap  
+> >> chain.  
+> >>>>> For  
+> >>>>>>> now, there are two options to get the available offsets.[2]
+> >>>>>>>
+> >>>>>>> - Report the available offsets via ioctl. This requires device-specific  
+> >> logic  
+> >>>>>>>    to provide available offsets. e.g., vfio-pci variant driver. Or may the  
+> >>>>> device  
+> >>>>>>>    provide the available offset by DVSEC.
+> >>>>>>> - Store the available offsets in a static table in userspace VMM.  
+> >> VMM gets  
+> >>>>> the  
+> >>>>>>>    empty offsets from this table.
+> >>>>>>>  
+> >>>>>>
+> >>>>>> I'm not a fan of requesting a variant driver for every PASID-capable
+> >>>>>> VF just for the purpose of reporting a free range in the PCI config  
+> >> space.  
+> >>>>>>
+> >>>>>> It's easier to do that quirk in userspace.
+> >>>>>>
+> >>>>>> But I like Alex's original comment that at least for PF there is no  
+> >> reason  
+> >>>>>> to hide the offset. there could be a flag+field to communicate it. or
+> >>>>>> if there will be a new variant VF driver for other purposes e.g.  
+> >> migration  
+> >>>>>> it can certainly fill the field too.  
+> >>>>>
+> >>>>> Yes, since this has been such a sticking point can we get a clean
+> >>>>> series that just enables it for PF and then come with a solution for
+> >>>>> VF?
+> >>>>>  
+> >>>>
+> >>>> sure but we at least need to reach consensus on a minimal required
+> >>>> uapi covering both PF/VF to move forward so the user doesn't need
+> >>>> to touch different contracts for PF vs. VF.  
+> >>>
+> >>> Do we? The situation where the VMM needs to wholly make a up a PASID
+> >>> capability seems completely new and seperate from just using an
+> >>> existing PASID capability as in the PF case.  
+> >>
+> >> But we don't actually expose the PASID capability on the PF and as
+> >> argued in path 4/ we can't because it would break existing userspace.
+> > > Come back to this statement.  
+> > 
+> > Does 'break' means that legacy Qemu will crash due to a guest write
+> > to the read-only PASID capability, or just a conceptually functional
+> > break i.e. non-faithful emulation due to writes being dropped?
 
-It is also called through riscv_pmu_read(). A trivial example where the counters
-are read while started is `perf stat -C <cpu> -I <interval>`. With logging the
-function and event_idx:
+I expect more the latter.
 
-root@riscv64:~# perf stat -C 0 -I 1000 -e cycles
-[  104.785970] riscv-pmu-sbi: pmu_sbi_ctr_start: 000001
-[  105.793160] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-#           time             counts unit events
-     1.001090667         1015156505      cycles
-[  106.800077] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-     2.008009126         1014973064      cycles
-[  107.806955] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-     3.014884251         1014937544      cycles
-[  108.813842] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-     4.021772502         1014941900      cycles
-[  109.820759] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-     5.028687252         1014974904      cycles
-[  110.827678] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-     6.035604711         1014971076      cycles
-[  111.835107] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-     7.043036628         1015488590      cycles
-^C[  111.959028] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-     7.166958420[  111.964343] riscv-pmu-sbi: pmu_sbi_ctr_stop: 000001
-[  111.970435] riscv-pmu-sbi: pmu_sbi_ctr_read: 000001
-[  111.975337] riscv-pmu-sbi: pmu_sbi_ctr_stop: 000001
-          124942006      cycles
+> > If the latter it's probably not a bad idea to allow exposing the PASID
+> > capability on the PF as a sane guest shouldn't enable the PASID
+> > capability w/o seeing vIOMMU supporting PASID. And there is no
+> > status bit defined in the PASID capability to check back so even
+> > if an insane guest wants to blindly enable PASID it will naturally
+> > write and done. The only niche case is that the enable bits are
+> > defined as RW so ideally reading back those bits should get the
+> > latest written value. But probably this can be tolerated?
 
-root@riscv64:~#
+Some degree of inconsistency is likely tolerated, the guest is unlikely
+to check that a RW bit was set or cleared.  How would we virtualize the
+control registers for a VF and are they similarly virtualized for a PF
+or would we allow the guest to manipulate the physical PASID control
+registers?
 
->> work for idx >= XLEN.
+> > With that then should we consider exposing the PASID capability
+> > in PCI config space as the first option? For PF it's simple as how
+> > other caps are exposed. For VF a variant driver can also fake the
+> > PASID capability or emulate a DVSEC capability for unused space
+> > (to motivate the physical implementation so no variant driver is
+> > required in the future)  
 > 
-> The idx should be less than num_counters as that's what pmu_ctr_list is
-> allocated for.
-> ctr_values size limitation is 64 as per the spec which is sufficient as given
-> number of defined
-> firmware events + hpmcounters < 64.
+> If kernel exposes pasid cap for PF same as other caps, and in the meantime
+> the variant driver chooses to emulate a DVSEC cap, then userspace follows
+> the below steps to expose pasid cap to VM.
 
-Yes, but only the first XLEN elements in ctr_values can be read/updated by an
-SBI call, and XLEN < 64 on riscv32. This actually works with the current code
-for the non-overflow case, because SBI_PMU_START_FLAG_INIT_SNAPSHOT is not used,
-and the value copying code in pmu_sbi_ctr_stop() isn't limited by XLEN.
+If we have a variant driver, why wouldn't it expose an emulated PASID
+capability rather than a DVSEC if we're choosing to expose PASID for
+PFs?
 
-However, pmu_sbi_stop_hw_ctrs() is broken, even after the next patch. Stopping
-counters 32-63 will clobber (an arbitrary subset of) the values for counters
-0-31. You would need code to move the values for counters 32-63 from the first
-half of ctr_values to the second half. And because ctr_values is only written by
-the SBI implementation _when the counter is stopped_, we can't ask the SBI
-implementation to restore the values for counters 0-31, so those values must be
-backed up somewhere else.
+> 
+> 1) Check if a pasid cap is already present in the virtual config space
+>     read from kernel. If no, but user wants pasid, then goto step 2).
+> 2) Userspace invokes VFIO_DEVICE_FETURE to check if the device support
+>     pasid cap. If yes, goto step 3).
 
-The simple solution might be to have a shadow copy of ctr_values, that always
-puts the values at the same (absolute) offset.
+Why do we need the vfio feature interface if a physical or virtual PASID
+capability on the device exposes the same info?
 
-> We can add a paranoia check for idx but idx is retrieved from event->hw which is
-> filled by the driver itself.
-> There are lot of function which access idx from event->hw as well.
-> 
-> That's why, I don't think it is required.
+> 3) Userspace gets an available offset via reading the DVSEC cap.
 
-Right, I wasn't concerned about bounds checking, only that
-SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT is limited to writing to the first XLEN elements
-of ctr_values.
+What's the scenario where we'd have a VF wanting to expose PASID
+support which doesn't also have a variant driver that could implement a
+virtual PASID?
 
->>> +
->>>       if (pmu_sbi_is_fw_event(event)) {
->>>           ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_FW_READ,
->>>                   hwc->idx, 0, 0, 0, 0, 0);
->>> @@ -565,6 +663,7 @@ static void pmu_sbi_ctr_start(struct perf_event *event,
->>> u64 ival)
->>>       struct hw_perf_event *hwc = &event->hw;
->>>       unsigned long flag = SBI_PMU_START_FLAG_SET_INIT_VALUE;
->>>   +    /* There is no benefit setting SNAPSHOT FLAG for a single counter */
->>>   #if defined(CONFIG_32BIT)
->>>       ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, hwc->idx,
->>>               1, flag, ival, ival >> 32, 0);
->>> @@ -585,16 +684,36 @@ static void pmu_sbi_ctr_stop(struct perf_event *event,
->>> unsigned long flag)
->>>   {
->>>       struct sbiret ret;
->>>       struct hw_perf_event *hwc = &event->hw;
->>> +    struct riscv_pmu *pmu = to_riscv_pmu(event->pmu);
->>> +    struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
->>> +    struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
->>>         if ((hwc->flags & PERF_EVENT_FLAG_USER_ACCESS) &&
->>>           (hwc->flags & PERF_EVENT_FLAG_USER_READ_CNT))
->>>           pmu_sbi_reset_scounteren((void *)event);
->>>   +    if (sbi_pmu_snapshot_available())
->>> +        flag |= SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
->>> +
->>>       ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, hwc->idx, 1,
->>> flag, 0, 0, 0);
->>> -    if (ret.error && (ret.error != SBI_ERR_ALREADY_STOPPED) &&
->>> -        flag != SBI_PMU_STOP_FLAG_RESET)
->>> +    if (!ret.error && sbi_pmu_snapshot_available()) {
->>> +        /*
->>> +         * The counter snapshot is based on the index base specified by
->>> hwc->idx.
->>> +         * The actual counter value is updated in shared memory at index 0
->>> when counter
->>> +         * mask is 0x01. To ensure accurate counter values, it's necessary
->>> to transfer
->>> +         * the counter value to shared memory. However, if hwc->idx is zero,
->>> the counter
->>> +         * value is already correctly updated in shared memory, requiring no
->>> further
->>> +         * adjustment.
->>> +         */
->>> +        if (hwc->idx > 0) {
->>> +            sdata->ctr_values[hwc->idx] = sdata->ctr_values[0];
->>> +            sdata->ctr_values[0] = 0;
->> This clobbers sdata->ctr_values[0], which may be used later by
->> pmu_sbi_ctr_read(). This only happens to work if riscv_pmu_stop() is always
->> called with the PERF_EF_UPDATE flag, and riscv_pmu_read() is never called with
->> the event stopped but still in PERF_EVENT_STATE_ACTIVE. I think both of those
->> conditions are true at the moment, but this is still rather fragile.
+> 4) Userspace assembles a pasid cap and inserts it to the vconfig space.
 > 
-> I don't understand the concern of being fragile when the current implementation
-> does it what you just described.
-> 
-> Can you describe the use case when you think it will be fragile ? Do you
-> envision some core perf framework
-> changes that would call pmu->stop() without PERF_EF_UPDATE ?
+> For PF, step 1) is enough. For VF, it needs to go through all the 4 steps.
+> This is a bit different from what we planned at the beginning. But sounds
+> doable if we want to pursue the staging direction.
 
-PERF_EF_UPDATE is a flag, so the API seems to have been designed with the
-expectation that it is set only sometimes. I can't predict how the core perf
-logic will change, but I doubt whoever is changing it will be aware of the
-subtle undocumented requirements for correctness here. Regardless, it's not an
-issue if we copy the counter values outside the shared memory.
+Seems like if we decide that we can just expose the PASID capability
+for a PF then we should just have any VF variant drivers also implement
+a virtual PASID capability.  In this case DVSEC would only be used to
+provide information for a purely userspace emulation of PASID (in which
+case it also wouldn't necessarily need the vfio feature because it
+might implicitly know the PASID capabilities of the device).  Thanks,
 
->>> +        }
->>> +    } else if (ret.error && (ret.error != SBI_ERR_ALREADY_STOPPED) &&
->>> +        flag != SBI_PMU_STOP_FLAG_RESET) {
->>>           pr_err("Stopping counter idx %d failed with error %d\n",
->>>               hwc->idx, sbi_err_map_linux_errno(ret.error));
->>> +    }
->>>   }
->>>     static int pmu_sbi_find_num_ctrs(void)
->>> @@ -652,10 +771,14 @@ static inline void pmu_sbi_stop_all(struct riscv_pmu *pmu)
->>>   static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
->>>   {
->>>       struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
->>> +    unsigned long flag = 0;
->>> +
->>> +    if (sbi_pmu_snapshot_available())
->>> +        flag = SBI_PMU_STOP_FLAG_TAKE_SNAPSHOT;
->>>         /* No need to check the error here as we can't do anything about the
->>> error */
->>>       sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP, 0,
->>> -          cpu_hw_evt->used_hw_ctrs[0], 0, 0, 0, 0);
->>> +          cpu_hw_evt->used_hw_ctrs[0], flag, 0, 0, 0);
->> This only updates the overflow bitmap and counter values for the first XLEN
->> counters. You need a second call for any remaining counters on riscv32. Of
->> course, this will clobber (up to) the entire shared memory, breaking later calls
->> to pmu_sbi_ctr_read().
-> 
-> It's done in the next patch.
-> https://lore.kernel.org/lkml/20240416184421.3693802-10-atishp@rivosinc.com/
-
-This still isn't right (overflowed_ctrs and ctr_ovf_mask also need to be 64
-bits), and the fix should come before patches adding new features.
-
->>>   }
->>>     /*
->>> @@ -664,11 +787,10 @@ static inline void pmu_sbi_stop_hw_ctrs(struct
->>> riscv_pmu *pmu)
->>>    * while the overflowed counters need to be started with updated
->>> initialization
->>>    * value.
->>>    */
->>> -static inline void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
->>> -                           unsigned long ctr_ovf_mask)
->>> +static noinline void pmu_sbi_start_ovf_ctrs_sbi(struct cpu_hw_events
->>> *cpu_hw_evt,
->>> +                        unsigned long ctr_ovf_mask)
->>>   {
->>>       int idx = 0;
->>> -    struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
->>>       struct perf_event *event;
->>>       unsigned long flag = SBI_PMU_START_FLAG_SET_INIT_VALUE;
->>>       unsigned long ctr_start_mask = 0;
->>> @@ -703,6 +825,48 @@ static inline void pmu_sbi_start_overflow_mask(struct
->>> riscv_pmu *pmu,
->>>       }
->>>   }
->>>   +static noinline void pmu_sbi_start_ovf_ctrs_snapshot(struct cpu_hw_events
->>> *cpu_hw_evt,
->>> +                             unsigned long ctr_ovf_mask)
->> Why do these two functions need to be noinline?
->>
-> They don't. I will remove it.
-> 
->>> +{
->>> +    int idx = 0;
->>> +    struct perf_event *event;
->>> +    unsigned long flag = SBI_PMU_START_FLAG_INIT_SNAPSHOT;
->>> +    u64 max_period, init_val = 0;
->>> +    struct hw_perf_event *hwc;
->>> +    struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
->>> +
->>> +    for_each_set_bit(idx, cpu_hw_evt->used_hw_ctrs, RISCV_MAX_COUNTERS) {
->>> +        if (ctr_ovf_mask & BIT(idx)) {
->> This is also broken on riscv32 (as is the existing code), since ctr_ovf_mask is
->> only 32 bits there, but idx counts from 0 to 63.
-> 
-> For RV32, if there is a counter idx that is beyond 32 bits, it is not supported
-> in counter overflow
-> scenario anyways. So it doesn't matter now.
-> 
-> We need to change the pmu_sbi_ovf_handler to handle counter overflows for
-> counters > 32 bit though.
-> As there is not use case right now, I did not add it.
-
-There are two sets of indexes here. There's the bits in SCOUNTOVF, which are
-limited to 32 bits; and there are the SBI counter indexes, which go up to 64. A
-bit < 32 in SCOUNTOVF might map to a SBI counter index >= 32. The fact that
-pmu_sbi_ovf_handler() is limited to SBI counter indexes < XLEN is a bug.
-
->>> +            event = cpu_hw_evt->events[idx];
->>> +            hwc = &event->hw;
->>> +            max_period = riscv_pmu_ctr_get_width_mask(event);
->>> +            init_val = local64_read(&hwc->prev_count) & max_period;
->>> +            sdata->ctr_values[idx] = init_val;
->>> +        }
->>> +        /*
->>> +         * We do not need to update the non-overflow counters the previous
->>> +         * value should have been there already.
->>> +         */
->>> +    }
->>> +
->>> +    for (idx = 0; idx < BITS_TO_LONGS(RISCV_MAX_COUNTERS); idx++) {
->>> +        /* Start all the counters in a single shot */
->>> +        sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_START, idx * BITS_PER_LONG,
->>> +              cpu_hw_evt->used_hw_ctrs[idx], flag, 0, 0, 0);
->>> +    }
->>> +}
->>> +
->>> +static void pmu_sbi_start_overflow_mask(struct riscv_pmu *pmu,
->>> +                    unsigned long ctr_ovf_mask)
->>> +{
->>> +    struct cpu_hw_events *cpu_hw_evt = this_cpu_ptr(pmu->hw_events);
->>> +
->>> +    if (sbi_pmu_snapshot_available())
->>> +        pmu_sbi_start_ovf_ctrs_snapshot(cpu_hw_evt, ctr_ovf_mask);
->>> +    else
->>> +        pmu_sbi_start_ovf_ctrs_sbi(cpu_hw_evt, ctr_ovf_mask);
->>> +}
->>> +
->>>   static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
->>>   {
->>>       struct perf_sample_data data;
->>> @@ -716,6 +880,7 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
->>>       unsigned long overflowed_ctrs = 0;
->>>       struct cpu_hw_events *cpu_hw_evt = dev;
->>>       u64 start_clock = sched_clock();
->>> +    struct riscv_pmu_snapshot_data *sdata = cpu_hw_evt->snapshot_addr;
->>>         if (WARN_ON_ONCE(!cpu_hw_evt))
->>>           return IRQ_NONE;
->>> @@ -737,8 +902,10 @@ static irqreturn_t pmu_sbi_ovf_handler(int irq, void *dev)
->>>       pmu_sbi_stop_hw_ctrs(pmu);
->>>         /* Overflow status register should only be read after counter are
->>> stopped */
->>> -    ALT_SBI_PMU_OVERFLOW(overflow);
->>> -
->> nit: no need to remove this line.
-> 
-> Fixed.
-> 
-> 
->>> +    if (sbi_pmu_snapshot_available())
->>> +        overflow = sdata->ctr_overflow_mask;
->>> +    else
->>> +        ALT_SBI_PMU_OVERFLOW(overflow);
->>>       /*
->>>        * Overflow interrupt pending bit should only be cleared after stopping
->>>        * all the counters to avoid any race condition.
->>> @@ -819,6 +986,9 @@ static int pmu_sbi_starting_cpu(unsigned int cpu, struct
->>> hlist_node *node)
->>>           enable_percpu_irq(riscv_pmu_irq, IRQ_TYPE_NONE);
->>>       }
->>>   +    if (sbi_pmu_snapshot_available())
->>> +        return pmu_sbi_snapshot_setup(pmu, cpu);
->>> +
->>>       return 0;
->>>   }
->>>   @@ -831,6 +1001,9 @@ static int pmu_sbi_dying_cpu(unsigned int cpu, struct
->>> hlist_node *node)
->>>       /* Disable all counters access for user mode now */
->>>       csr_write(CSR_SCOUNTEREN, 0x0);
->>>   +    if (sbi_pmu_snapshot_available())
->>> +        return pmu_sbi_snapshot_disable();
->>> +
->>>       return 0;
->>>   }
->>>   @@ -939,6 +1112,11 @@ static inline void riscv_pm_pmu_unregister(struct
->>> riscv_pmu *pmu) { }
->>>     static void riscv_pmu_destroy(struct riscv_pmu *pmu)
->>>   {
->>> +    if (sbi_v2_available) {
->>> +        pmu_sbi_snapshot_free(pmu);
->>> +        if (sbi_pmu_snapshot_available())
->>> +            pmu_sbi_snapshot_disable();
->> This is technically fine because nothing is writing to the shmem at this time,
->> but it certainly looks like a possible use-after-free.
-> 
-> Yes. It would have been use-after-free if pmu_sbi_snapshot_disable uses the
-> allocated
-> address. I guess the the function name doesn't indicate that the disable happens
-> by passing -1 instead
-> of the previously allocated address.
-> 
-> 
->> Also, this whole block can go inside the sbi_pmu_snapshot_available() check,
->> because either the branch is set or pmu_sbi_snapshot_free() is already called in
->> the error case below.
-> 
-> I kept it above because the conditions are different logically.
-> The sbi_pmu_snapshot_available is only enabled when snapshot_setup succeeds not
-> when snapshot_alloc is successful.
-> 
-> In reality, it doesn't matter though as we free it in the error case as you
-> pointed.
-> 
-> Either way, I will move it inside.
-
-Makes sense to me.
-
-Regards,
-Samuel
-
->>> +    }
->>>       riscv_pm_pmu_unregister(pmu);
->>>       cpuhp_state_remove_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->node);
->>>   }
->>> @@ -1106,10 +1284,6 @@ static int pmu_sbi_device_probe(struct platform_device
->>> *pdev)
->>>       pmu->event_unmapped = pmu_sbi_event_unmapped;
->>>       pmu->csr_index = pmu_sbi_csr_index;
->>>   -    ret = cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->node);
->>> -    if (ret)
->>> -        return ret;
->>> -
->>>       ret = riscv_pm_pmu_register(pmu);
->>>       if (ret)
->>>           goto out_unregister;
->>> @@ -1118,8 +1292,34 @@ static int pmu_sbi_device_probe(struct platform_device
->>> *pdev)
->>>       if (ret)
->>>           goto out_unregister;
->>>   +    /* SBI PMU Snapsphot is only available in SBI v2.0 */
->>> +    if (sbi_v2_available) {
->>> +        ret = pmu_sbi_snapshot_alloc(pmu);
->>> +        if (ret)
->>> +            goto out_unregister;
->>> +
->>> +        ret = pmu_sbi_snapshot_setup(pmu, smp_processor_id());
->>> +        if (ret) {
->>> +            /* Snapshot is an optional feature. Continue if not available */
->>> +            pmu_sbi_snapshot_free(pmu);
->>> +        } else {
->>> +            pr_info("SBI PMU snapshot detected\n");
->>> +            /*
->>> +             * We enable it once here for the boot cpu. If snapshot shmem setup
->>> +             * fails during cpu hotplug process, it will fail to start the cpu
->>> +             * as we can not handle hetergenous PMUs with different snapshot
->>> +             * capability.
->>> +             */
->>> +            static_branch_enable(&sbi_pmu_snapshot_available);
->>> +        }
->>> +    }
->>> +
->>>       register_sysctl("kernel", sbi_pmu_sysctl_table);
->>>   +    ret = cpuhp_state_add_instance(CPUHP_AP_PERF_RISCV_STARTING, &pmu->node);
->>> +    if (ret)
->>> +        goto out_unregister;
->>> +
->>>       return 0;
->>>     out_unregister:
->>> diff --git a/include/linux/perf/riscv_pmu.h b/include/linux/perf/riscv_pmu.h
->>> index 43282e22ebe1..c3fa90970042 100644
->>> --- a/include/linux/perf/riscv_pmu.h
->>> +++ b/include/linux/perf/riscv_pmu.h
->>> @@ -39,6 +39,12 @@ struct cpu_hw_events {
->>>       DECLARE_BITMAP(used_hw_ctrs, RISCV_MAX_COUNTERS);
->>>       /* currently enabled firmware counters */
->>>       DECLARE_BITMAP(used_fw_ctrs, RISCV_MAX_COUNTERS);
->>> +    /* The virtual address of the shared memory where counter snapshot will
->>> be taken */
->>> +    void *snapshot_addr;
->>> +    /* The physical address of the shared memory where counter snapshot will
->>> be taken */
->>> +    phys_addr_t snapshot_addr_phys;
->>> +    /* Boolean flag to indicate setup is already done */
->>> +    bool snapshot_set_done;
->>>   };
->>>     struct riscv_pmu {
+Alex
 
 
