@@ -1,285 +1,178 @@
-Return-Path: <kvm+bounces-15166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E128AA38D
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 21:58:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A71758AA3A7
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 22:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 869D71F248B2
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 19:58:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D366C1C233AD
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 20:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328A9190699;
-	Thu, 18 Apr 2024 19:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB6F17B4F8;
+	Thu, 18 Apr 2024 20:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YZ1pWEwS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gdHx1lqI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2063.outbound.protection.outlook.com [40.107.102.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DE8184125
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 19:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713470011; cv=none; b=YS26UGixQeSwUJF5FCIW95EDB5VpfcOWlOpDOVEdzI2//maALTUPaBNeAtZhO4fU3GTu46MZ1/Us+UUZO0/HloP6b0q095156lel5HfjFClIX15+INjnxlgYfdvq6ZTA3GxGJl5CW8YCiXaX6GA816T5zfita+eFZulrIlM/mdo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713470011; c=relaxed/simple;
-	bh=il+9bbj7Kl9RhDUwHRlD6PElXcZpj4hshubhhFULYxI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=be3qMrl4lLHPvYdlk+26n8rCmeUQdNiv65x25iEVeRGvizswKiko5HMBp4Bh8lET0qmSdDisaioQcUruMdOdvUFM7bqeWUZR3H/CsdzdAUJ7lEyph8rw6ObC+uIx3PTG9qC7PW5Oh4qmjoFJ/stncqJP4QoGGPbqMDMclYtU3Rs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YZ1pWEwS; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61ab173fe00so24923117b3.3
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 12:53:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713470008; x=1714074808; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Fwrx9M7PjHp4hPBDgNAvgC8cnKrAzhv9n1yaPxLSA8=;
-        b=YZ1pWEwSwKfzg29f9CqfdwlDzesejVg5BnUVEIHZzcqRbanwhqMfZiiymZMMlSolTP
-         yDUM8GypdJ86L4YlWlGhM3mKp/o8JN9UfuoNWuXVZh/peYJwZcFq7mlR6GTKMsrZaFyG
-         mpNUhhYJgN8v+v7wKuGQUHCLjP+XANOb6wlBrWPglMl5rE13W7eO2ZFiFMWHB7fv+i0L
-         CBHqkmzCUUqZ1ociyNy+YaP1rIT5swURz1a2JJtNfV8vJY+8BiCBSMSZ2+j7MgXwDlGM
-         VNdnNStKxdzrd07anmf+8UtlCC+fS2TeftumhDxZuNeoF1+7D3tEP+fLPfFnqcKcqGcw
-         MsiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713470008; x=1714074808;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Fwrx9M7PjHp4hPBDgNAvgC8cnKrAzhv9n1yaPxLSA8=;
-        b=VduMEKZ0dC6ng8uUBocp6nnptZa2dHOmiyabsr2bca5CeQL9GVmd2SZqj/8Ga2+S6q
-         Ru89MKD6cdjgxzYgEvBCzaEwQpxabIU77bLXcNDjqG1ebstZYLDqisKA0V5DY81/MtpO
-         rKTCKMuko3DvWvldR1IHi2aV6mOfYWFR8zqQyhQaWzLqIGfnlolR0OV+l7nQ+dWGmTvB
-         HIhHEYR9jSr1/Lo/H/L4VQlrhcUIfeUwZXS5+YMJWLf85yixfyOdLF6lr3wa406tgC9m
-         l2CerzG76Ns/9HNlvYUzxkBV1hQ1YjiESl4+JgwtsNELktiGLLZ0LJ1dbe9VoBD7ojjw
-         gHDw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJo7oFu6Y8htCCZR3JsiKaQpS1n2eytgaYnKTmtH2C8umcdzEWTDAgn+Yv92DJ2X/40oqSEhPXFCqO7XVysePuyMTP
-X-Gm-Message-State: AOJu0YxnlWo/SjSUz/GSgwbHFmuentS4LW6Yc0B9FzdyrZTrJSRXcQUZ
-	k8kRBnvjwSfwaTvQpRZKHuzf6QED5ORT7ZzXhOnqZeNdGw5zTikWTD8P5qs2INyAjQqrIcuMWpz
-	hEA==
-X-Google-Smtp-Source: AGHT+IGGyn2/Eis9yr5uvFbHSsNr+5jpucEC9aioMrlcMqw+x+tJjikMNMKUFalz9faFMmsjcJGmE2MmVtI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:d9d3:0:b0:618:9044:4f8b with SMTP id
- b202-20020a0dd9d3000000b0061890444f8bmr785538ywe.7.1713470008510; Thu, 18 Apr
- 2024 12:53:28 -0700 (PDT)
-Date: Thu, 18 Apr 2024 12:53:26 -0700
-In-Reply-To: <20240418141932.GA1855@willie-the-truck>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600BB3D62;
+	Thu, 18 Apr 2024 20:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713470604; cv=fail; b=Rxi6X+rygzlCsrfUNo3wAU0xA14QHfdINxomZi+cFlo7je292hFXs4KNbCPf3KxmHjYRjDq8n+kVkBGFTqPpGiFDyjdbMxMZ/9fZk/yQnMqjFAz8ZIuKiccFpSFHZI7XJmaYJzsTL/e+QhGuY6tJrEg6+/Ya/sNsd/YW0UaEBJ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713470604; c=relaxed/simple;
+	bh=052H+aW9suF3VfJSnAm85r92IAzTRYyjmGREvPhhEJM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PpUnxJLxjya3RoYhJK+cOncpZJjx7d0WG70/XHqVO4IVBDzctseGlH/djTqxIquD8ccB79a24LmC1XGslWJCOn703T/8GekzfDuLRIqTgB/EN6vNuZDobgoxHcc0ieb9NVBCmeAevEIM88z+qBE38Q1H8QgUF+CYPfXfcaY5Dw4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gdHx1lqI; arc=fail smtp.client-ip=40.107.102.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AGhP7uiwuD8meaSLEgq6eNWYi5WcHZWypPagBUFVSB6RoU4F8MDVMjU/LqaBcTkfsyhjGIZ/U9Yb2ph9tpIH1ooYxXbS4XEq0Om1QvXpoW3+NRxW3klq2fHpzJzhxx8OJGY0p4TeFAQdGfBz9sutQ2KoZPB9T/DUS12t8qOvp5vNXwqTSO+m5JlCfHAP/UcT9TD2KDNqQckfPBhFL7vMR9+PhDTAIjz4/278HnfCNybIcN3tQo7VZVkS5eu4vGryX1HjPQ9tU/f+4bRWmJ4scOTRXQQWvd1dTzz0rOo31ZRE+QkLx4QmmmUDaH5VU5DSJsJg4ZTakG/5R44EoGzSOw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mWUZwqBM7GZGVd9g4qAU12o35H4l74rP3aHiyiVwwp0=;
+ b=Qblz3eH4nNts/lZFkkD2NsrPGjD6zbYXMfHW63tVzAK1S4Kh5APnXj5YLfA2mxSpFbrQmC6IRtiBV6+DxJvnhBFF58/Wr0YFzRWVEKnfgxkvL+wjJ2WLJU0z+NahOYQLEm9IddyO4Y+EFIfe7OhxOYc7oPaTxQypr+cysdQCghrC0feEmCTEH0g7SshmOpoEf9cdyluh6x5DR5FMjE//mrCVsAygkeVP+ERqIjk+8rgV7nxvUjekbt0qKHZN512arkYPlOt6jsxiDoDLqITkaeUKiB9Ah5rEXoeC3gxj8dzvL6x4GnsKgKFcI88GfhNfZRbVnL7eS7q0l4kNE0Tt5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mWUZwqBM7GZGVd9g4qAU12o35H4l74rP3aHiyiVwwp0=;
+ b=gdHx1lqIxigYH474PYgDlI2vDqyZ4z+EKe7BFPoKPEKX5X2nrr1bvqNNKXE74hH/uJjeWkeFgoTpxDrjrvMrWiEI7F/kK7/uC7DvCKkS0P0JSAUyb27a0XMCS21mMqnDeCMy0KBuPj3JXOE8XsrTa56QqlmYFi+gPIxZcfEj9Es=
+Received: from MN2PR18CA0001.namprd18.prod.outlook.com (2603:10b6:208:23c::6)
+ by DM4PR12MB8521.namprd12.prod.outlook.com (2603:10b6:8:17e::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Thu, 18 Apr
+ 2024 20:03:15 +0000
+Received: from MN1PEPF0000ECDB.namprd02.prod.outlook.com
+ (2603:10b6:208:23c:cafe::19) by MN2PR18CA0001.outlook.office365.com
+ (2603:10b6:208:23c::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.26 via Frontend
+ Transport; Thu, 18 Apr 2024 20:03:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000ECDB.mail.protection.outlook.com (10.167.242.139) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7452.22 via Frontend Transport; Thu, 18 Apr 2024 20:03:15 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 18 Apr
+ 2024 15:03:14 -0500
+Date: Thu, 18 Apr 2024 14:57:54 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: Re: [PATCH v12 22/29] KVM: SEV: Implement gmem hook for invalidating
+ private pages
+Message-ID: <20240418195754.h6gl5qd62kas7crx@amd.com>
+References: <20240329225835.400662-1-michael.roth@amd.com>
+ <20240329225835.400662-23-michael.roth@amd.com>
+ <f1e5aef5-989c-4f07-82af-9ed54cc192be@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240405115815.3226315-1-pbonzini@redhat.com> <20240405115815.3226315-2-pbonzini@redhat.com>
- <20240412104408.GA27645@willie-the-truck> <86jzl2sovz.wl-maz@kernel.org>
- <ZhlLHtfeSHk9gRRO@google.com> <86h6g5si0m.wl-maz@kernel.org>
- <Zh1d94Pl6gneVoDd@google.com> <20240418141932.GA1855@willie-the-truck>
-Message-ID: <ZiF6NgGYLSsPNEOg@google.com>
-Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
-From: Sean Christopherson <seanjc@google.com>
-To: Will Deacon <will@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin <npiggin@gmail.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <f1e5aef5-989c-4f07-82af-9ed54cc192be@redhat.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDB:EE_|DM4PR12MB8521:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4012ab85-c981-4eab-f4e6-08dc5fe295a2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	YzpMOCb/tgZpKgq6eE8r5BNSDeWJt2o4Yg9Smzth5/FJTwpiH9MUp6rj2xRIpTur8IaHEL2t8TNyNtzefBdWy2GEiHzQrrRn4Ealkm2QYHQZaLwn75B1UmfArVMkQPSe2JwgUmYf5+DefztPZcBJy9i9kWRfZad+oKrN4IxwwrX0Q/6rmEwtVMBr58tx6lJrVX9qVXcXWifnfG4mD5obuq9/UpA3kvecnVVp6nPkVSnDGqeqeM1R0FlVj4Mw/JpNdVVy9cqp2mwn59jGGrhIGcAIkStv+4Z7qxXVIxUz0PqcEOnpAO5hSQUA5SgBlDPNNqEly5phg21cyF7JCP+VFoQ+8sgAIKm60VGDXi7tfxUBbrPmdM/VrZYSwaHftz9FuhcQiNEEWb48XpSU4wmU++xVIOGVxDLRm2ZBNrSuw9U0qbZlPo1iljG2IK78NasMFznlpoMI1uE8GqDxpO9mzi5iHWtuDCdP/gGC6r2BAxbmm/wjwBNz3jTHgHhMNHzF90Tln9RnatyEwVCev+X0bA+ZXTViPS1FdY1hLS6X8amjSs4SJ5J41WQA6D4EpeF+9tUKYfYkOsz/ICI+8dEjFVqsgRqHZQSqQwv91E6O3ZOqa47pQzMnp5790v1mHdPj3SIyq7Gso/nE30kX6UPNFvACqv2lsGxNh8Q9JtULXFkrmSg1g4QHqYgX2TBRW7DFMQSj/oGcM1aY9QLJGK97fg==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(7416005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 20:03:15.5937
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4012ab85-c981-4eab-f4e6-08dc5fe295a2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECDB.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8521
 
-On Thu, Apr 18, 2024, Will Deacon wrote:
-> On Mon, Apr 15, 2024 at 10:03:51AM -0700, Sean Christopherson wrote:
-> > On Sat, Apr 13, 2024, Marc Zyngier wrote:
-> > > On Fri, 12 Apr 2024 15:54:22 +0100, Sean Christopherson <seanjc@google.com> wrote:
-> > > > 
-> > > > On Fri, Apr 12, 2024, Marc Zyngier wrote:
-> > > > > On Fri, 12 Apr 2024 11:44:09 +0100, Will Deacon <will@kernel.org> wrote:
-> > > > > > On Fri, Apr 05, 2024 at 07:58:12AM -0400, Paolo Bonzini wrote:
-> > > > > > Also, if you're in the business of hacking the MMU notifier code, it
-> > > > > > would be really great to change the .clear_flush_young() callback so
-> > > > > > that the architecture could handle the TLB invalidation. At the moment,
-> > > > > > the core KVM code invalidates the whole VMID courtesy of 'flush_on_ret'
-> > > > > > being set by kvm_handle_hva_range(), whereas we could do a much
-> > > > > > lighter-weight and targetted TLBI in the architecture page-table code
-> > > > > > when we actually update the ptes for small ranges.
-> > > > > 
-> > > > > Indeed, and I was looking at this earlier this week as it has a pretty
-> > > > > devastating effect with NV (it blows the shadow S2 for that VMID, with
-> > > > > costly consequences).
-> > > > > 
-> > > > > In general, it feels like the TLB invalidation should stay with the
-> > > > > code that deals with the page tables, as it has a pretty good idea of
-> > > > > what needs to be invalidated and how -- specially on architectures
-> > > > > that have a HW-broadcast facility like arm64.
-> > > > 
-> > > > Would this be roughly on par with an in-line flush on arm64?  The simpler, more
-> > > > straightforward solution would be to let architectures override flush_on_ret,
-> > > > but I would prefer something like the below as x86 can also utilize a range-based
-> > > > flush when running as a nested hypervisor.
-> > 
-> > ...
-> > 
-> > > I think this works for us on HW that has range invalidation, which
-> > > would already be a positive move.
-> > > 
-> > > For the lesser HW that isn't range capable, it also gives the
-> > > opportunity to perform the iteration ourselves or go for the nuclear
-> > > option if the range is larger than some arbitrary constant (though
-> > > this is additional work).
-> > > 
-> > > But this still considers the whole range as being affected by
-> > > range->handler(). It'd be interesting to try and see whether more
-> > > precise tracking is (or isn't) generally beneficial.
-> > 
-> > I assume the idea would be to let arch code do single-page invalidations of
-> > stage-2 entries for each gfn?
+On Sat, Mar 30, 2024 at 10:31:47PM +0100, Paolo Bonzini wrote:
+> On 3/29/24 23:58, Michael Roth wrote:
+> > +		/*
+> > +		 * If an unaligned PFN corresponds to a 2M region assigned as a
+> > +		 * large page in he RMP table, PSMASH the region into individual
+> > +		 * 4K RMP entries before attempting to convert a 4K sub-page.
+> > +		 */
+> > +		if (!use_2m_update && rmp_level > PG_LEVEL_4K) {
+> > +			rc = snp_rmptable_psmash(pfn);
+> > +			if (rc)
+> > +				pr_err_ratelimited("SEV: Failed to PSMASH RMP entry for PFN 0x%llx error %d\n",
+> > +						   pfn, rc);
+> > +		}
 > 
-> Right, as it's the only code which knows which ptes actually ended up
-> being aged.
+> Ignoring the PSMASH failure is pretty scary...  At this point .free_folio
+> cannot fail, should the psmash part of this patch be done in
+> kvm_gmem_invalidate_begin() before kvm_mmu_unmap_gfn_range()?
 > 
-> > Unless I'm having a brain fart, x86 can't make use of that functionality.  Intel
-> > doesn't provide any way to do targeted invalidation of stage-2 mappings.  AMD
-> > provides an instruction to do broadcast invalidations, but it takes a virtual
-> > address, i.e. a stage-1 address.  I can't tell if it's a host virtual address or
-> > a guest virtual address, but it's a moot point because KVM doen't have the guest
-> > virtual address, and if it's a host virtual address, there would need to be valid
-> > mappings in the host page tables for it to work, which KVM can't guarantee.
+> Also, can you get PSMASH_FAIL_INUSE and if so what's the best way to address
+> it?  Should fallocate() return -EBUSY?
+
+FAIL_INUSE shouldn't occur since at this point the pages have been unmapped
+from NPT and only the task doing the cleanup should be attempting to
+access/PSMASH this particular 2M HPA range at this point.
+
+However, since FAIL_INUSE is transient, there isn't a good reason why we
+shouldn't retry until it clears itself up rather than risk hosing the
+system if some unexpected case ever did pop up, so I've updated
+snp_rmptable_psmash() to handle that case automatically and simplify the
+handling in sev_handle_rmp_fault() as well. (in the case of #NPF RMP
+faults there is actually potential for PSMASH errors other than
+FAIL_INUSE due to races with other vCPU threads which can interleave and
+put the RMP entry in an unexpected state, so there's additional
+handling/reporting to deal with those cases, but here they are not expected
+and will trigger WARN_*ONCE()'s now)
+
+I used this hacked up version of Sean's original patch to re-enable 2MB
+hugepage support in gmem for the purposes of re-testing this:
+
+  https://github.com/mdroth/linux/commit/15aa4f81811485997953130fc184e829ba4399d2
+
+-Mike
+
 > 
-> Ah, so it sounds like it would need to be an arch opt-in then.
-
-Even if x86 (or some other arch code) could use the precise tracking, I think it
-would make sense to have the behavior be arch specific.  Adding infrastructure
-to get information from arch code, only to turn around and give it back to arch
-code would be odd.
-
-Unless arm64 can't do the invalidation immediately after aging the stage-2 PTE,
-the best/easiest solution would be to let arm64 opt out of the common TLB flush
-when a SPTE is made young.
-
-With the range-based flushing bundled in, this?
-
----
- include/linux/kvm_host.h |  2 ++
- virt/kvm/kvm_main.c      | 40 +++++++++++++++++++++++++---------------
- 2 files changed, 27 insertions(+), 15 deletions(-)
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index afbc99264ffa..8fe5f5e16919 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2010,6 +2010,8 @@ extern const struct kvm_stats_header kvm_vcpu_stats_header;
- extern const struct _kvm_stats_desc kvm_vcpu_stats_desc[];
- 
- #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
-+int kvm_arch_flush_tlb_if_young(void);
-+
- static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
- {
- 	if (unlikely(kvm->mmu_invalidate_in_progress))
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 38b498669ef9..5ebef8ef239c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -595,6 +595,11 @@ static void kvm_null_fn(void)
- }
- #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
- 
-+int __weak kvm_arch_flush_tlb_if_young(void)
-+{
-+	return true;
-+}
-+
- /* Iterate over each memslot intersecting [start, last] (inclusive) range */
- #define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
- 	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
-@@ -611,6 +616,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- 	struct kvm_gfn_range gfn_range;
- 	struct kvm_memory_slot *slot;
- 	struct kvm_memslots *slots;
-+	bool need_flush = false;
- 	int i, idx;
- 
- 	if (WARN_ON_ONCE(range->end <= range->start))
-@@ -663,10 +669,22 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- 					break;
- 			}
- 			r.ret |= range->handler(kvm, &gfn_range);
-+
-+		       /*
-+			* Use a precise gfn-based TLB flush when possible, as
-+			* most mmu_notifier events affect a small-ish range.
-+			* Fall back to a full TLB flush if the gfn-based flush
-+			* fails, and don't bother trying the gfn-based flush
-+			* if a full flush is already pending.
-+			*/
-+		       if (range->flush_on_ret && !need_flush && r.ret &&
-+			   kvm_arch_flush_remote_tlbs_range(kvm, gfn_range.start,
-+							    gfn_range.end - gfn_range.start + 1))
-+			       need_flush = true;
- 		}
- 	}
- 
--	if (range->flush_on_ret && r.ret)
-+	if (need_flush)
- 		kvm_flush_remote_tlbs(kvm);
- 
- 	if (r.found_memslot)
-@@ -680,7 +698,8 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
- static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 						unsigned long start,
- 						unsigned long end,
--						gfn_handler_t handler)
-+						gfn_handler_t handler,
-+						bool flush_on_ret)
- {
- 	struct kvm *kvm = mmu_notifier_to_kvm(mn);
- 	const struct kvm_mmu_notifier_range range = {
-@@ -688,7 +707,7 @@ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
- 		.end		= end,
- 		.handler	= handler,
- 		.on_lock	= (void *)kvm_null_fn,
--		.flush_on_ret	= true,
-+		.flush_on_ret	= flush_on_ret,
- 		.may_block	= false,
- 	};
- 
-@@ -700,17 +719,7 @@ static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notifier *mn
- 							 unsigned long end,
- 							 gfn_handler_t handler)
- {
--	struct kvm *kvm = mmu_notifier_to_kvm(mn);
--	const struct kvm_mmu_notifier_range range = {
--		.start		= start,
--		.end		= end,
--		.handler	= handler,
--		.on_lock	= (void *)kvm_null_fn,
--		.flush_on_ret	= false,
--		.may_block	= false,
--	};
--
--	return __kvm_handle_hva_range(kvm, &range).ret;
-+	return kvm_handle_hva_range(mn, start, end, handler, false);
- }
- 
- void kvm_mmu_invalidate_begin(struct kvm *kvm)
-@@ -876,7 +885,8 @@ static int kvm_mmu_notifier_clear_flush_young(struct mmu_notifier *mn,
- {
- 	trace_kvm_age_hva(start, end);
- 
--	return kvm_handle_hva_range(mn, start, end, kvm_age_gfn);
-+	return kvm_handle_hva_range(mn, start, end, kvm_age_gfn,
-+				    kvm_arch_flush_tlb_if_young());
- }
- 
- static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
-
-base-commit: eae53272c8ad4e7ed2bbb11bd0456eb5b0484f0c
--- 
-
+> Thanks,
+> 
+> Paolo
+> 
+> 
 
