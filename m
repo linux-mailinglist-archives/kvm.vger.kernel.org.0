@@ -1,224 +1,282 @@
-Return-Path: <kvm+bounces-15101-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15104-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B2098A9CE3
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 16:23:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C1968A9D0F
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 16:29:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E807AB220DF
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 14:23:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BD81B24556
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 14:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682F716C698;
-	Thu, 18 Apr 2024 14:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F3F16C87E;
+	Thu, 18 Apr 2024 14:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bEhtwcV/"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="YU8IcQvL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DC216ABF3;
-	Thu, 18 Apr 2024 14:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713450007; cv=fail; b=BQ+r3GtFb8f/JBOgs21niW+P2nL250ETqTSRVCntTFIn6c6AzvKsSrVUuo5HWRTULTfHgxVLv25eiDF+Zhx3zF+5zwV0SCGoz0hz5RKQ2e8kYtxhHOqMrAW34cAB9lZwRVXA2e8dpQveSScEndxUGduUx4admoMSuBlU1e+DaXk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713450007; c=relaxed/simple;
-	bh=BAO27R21wLTG8/8ay6L6Qq23at/hMADruGMJBbYVz4c=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mvAeM9zP3S19Pu45X4gn2KTdNe99caiKPH+mSYoWlGHP4pfQvUR/9ZqIfTzV3/75tzthfBywYcCTVu9Hqcg/4SxykvtqxXN5OJZyHUyu5kk/eRjTk/uSQ5xMu0YT0VQkliIUDaIBpPGwaNeGJ1UBHgBSSSuv31ZgxvaH0iagog4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bEhtwcV/; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713450006; x=1744986006;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BAO27R21wLTG8/8ay6L6Qq23at/hMADruGMJBbYVz4c=;
-  b=bEhtwcV/ebns6Pp7NMrqBsrJxOUoZfviOmON/ASq3NYMNTc1Ey8JKqhr
-   tsGuk5AGt0xyVjuFMClwAkGkDm3588ZRRCwEyMK4B8vhaXMQCRMmSdeVH
-   aoDBU5DIyxUJGrSODAGw+ZarRgd1NW40KYMNf8A3spdL25etqKR+mQhZi
-   wUSXes6SnlSyO5KJtQEwWSSpOFhDD/A3p4mRwv20IT6Hfx2xLcZAF9xVa
-   hUPcZ8xM4scyI8LEvzXjyADHGvaDv9ksoFbL/VCRe2RnVqkEtc2uq3CjD
-   Y/kyvHbg6UiXWOF8GEmRHvjM/kYzmnSnGn17y7K4ZS++odMM2JWlNr+4U
-   A==;
-X-CSE-ConnectionGUID: YpKeBG3CQxGU2p2SIdpQcg==
-X-CSE-MsgGUID: gZqsPZ1UR0WrkRubWWd2lg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="9222167"
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="9222167"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 07:20:04 -0700
-X-CSE-ConnectionGUID: ObhzbTF+Qoq8Fq53tZSgHQ==
-X-CSE-MsgGUID: 5uY22s7NTnG1Li8b1vAXsg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="60423315"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Apr 2024 07:20:04 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 18 Apr 2024 07:20:03 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 18 Apr 2024 07:20:03 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 18 Apr 2024 07:20:03 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 18 Apr 2024 07:20:03 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ILB7nu7PRNayc4vSSZWEck+21L8SqjcobYWkvl86d5yHeSh7VbgRSoryHn0wn1QpJMZaeftRwpEsJHZ0Lmq+Ayb3zVgRdiS7MN74z8uZMetNKH7LnJjOubyg0FpqIr+lLxm3N/8moWjYqbXBgtG5v8TNu/PboiFuRnKmqniU7dgspOtrTHzy0VAf96CtRaGI4XOsYY4Cnytpnfu6n4zPztNTPVBaTlWydyLz0fzGfoS4Bluecb9c/uqNOsmqPZZnTNCvSabDwfKq7BqR+XGQQErEmlTvblvWZ1VB9vEWb5Qy4n8aIGkS1W2GakiaBHbSiAE1Xs1LZL1r4Ax/BblXUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=I14oD4PoCRGtITF2sZWeoRpVqY4r2lzf+1biu9CSkGc=;
- b=l3zjCgCH2xnp0IgL1D8r8vz3A+LUfBH/7vETCeFZT0FW7+k1U0fhP+JqVx9793WpSbaIJ3zK/EBIwdy/TqxWNSx/t7LwWZ8mgciAQ1lwEml89YwVQ+gEDJAwvZvMCDI3pECq13zSoRgiERC/pgpGaEi1GFyL12d91cgT5fWkkJgUQRmCNOnlPVkmhuyvXsELqnuDLvMAk6E6ml36IKGN8DBPZOapMNP09Ra6C+L4OAue6wyXwyOAsF3qELXgTMMVhvnwUfknsYykIrzl7sE/n4WzADTRXS1S/fRqIE04JZhdFh4D9RUxd2dRvRL/mgiV6RDCuuA3G3Su5Yu8z821wQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB6373.namprd11.prod.outlook.com (2603:10b6:8:cb::20) by
- DM4PR11MB5295.namprd11.prod.outlook.com (2603:10b6:5:392::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.30; Thu, 18 Apr 2024 14:20:01 +0000
-Received: from DS0PR11MB6373.namprd11.prod.outlook.com
- ([fe80::55de:b95:2c83:7e6c]) by DS0PR11MB6373.namprd11.prod.outlook.com
- ([fe80::55de:b95:2c83:7e6c%7]) with mapi id 15.20.7519.010; Thu, 18 Apr 2024
- 14:20:01 +0000
-From: "Wang, Wei W" <wei.w.wang@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH v1] KVM: x86: Introduce macros to simplify KVM_X86_OPS
- static calls
-Thread-Topic: [RFC PATCH v1] KVM: x86: Introduce macros to simplify
- KVM_X86_OPS static calls
-Thread-Index: AQHakNiYqtvKEMFbS0SvTLh/C3Jv+7FsplwAgACN6vCAANskAIAAAkcQ
-Date: Thu, 18 Apr 2024 14:20:01 +0000
-Message-ID: <DS0PR11MB6373B4170ECA01D31830CA20DC0E2@DS0PR11MB6373.namprd11.prod.outlook.com>
-References: <20240417150354.275353-1-wei.w.wang@intel.com>
- <Zh_4QN7eFxyu9hgA@google.com>
- <DS0PR11MB63739BE4347EC6369ED22EBADC0E2@DS0PR11MB6373.namprd11.prod.outlook.com>
- <ZiEnIFW3ZQhDwdZ-@google.com>
-In-Reply-To: <ZiEnIFW3ZQhDwdZ-@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB6373:EE_|DM4PR11MB5295:EE_
-x-ms-office365-filtering-correlation-id: 5350ae52-890c-4749-9f8a-08dc5fb2a28c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 95fKt10lnJaX4Wta6z9mLgHNAgn9PVQufXxMzABoJAVi8kXUlA+Rv++K9s+IanDsY+m9Q4T0APnh/BvNRH4Aid5YvkGdA8Jd456DFS2njaQJrRWdSbqpyBv6mLp50X1yEBrfb1GAzUhL6DYRd8xj2U59iL4IoXPMfLgQEWwlFz5N82u5SDHJz7Umt80uPRPjsKtSr5iUtAMgNOX+Z4ilJfnmDeE/dPZfV4eb2BUeLUscLfzbTL5g9DwcufcWxQLa0T/evJCg4hcGNh/YqKpFELaHW5EJtjpbXmxT8++EzwP9ZYQCLiss/IAvQ2ftkw+ctOCPkKbjXQyKRa9IKUJ8VjpuJ882b+vywJoYNZlN2I09sA1Jf1IzlszTjmRI4N0vVRVrLv7iCK8fraXhVoIM6kQJEAX0YBWjL/Agt/5f4a48Xq6JokO3cXXHPcytB9PMzHPgVPsSKrS1s51JKK8iCWUaQaAjbiWb+4hj3ZiTey4kbeEWk2+ZTNh/AmSir4YLzwHTs7KN39LiAPH2N0IF6XVpUn0ho/1IhEy+GC6aq9mQsd8O9wCLpWy1pn8wju7omW9n8As43zsU+FbT76FS6RAoPoKzvTNt6GHEClZHsP9QszEQgTJX6wWLFWZz4WgX1IBL11mZvzxN4fdHfo5UCoAO5lBsnUoF/L9Js9jBBYxy81slx+KB1QA+hg6W5jl1LbL+jcUaOGrGDEVbv0VF/9A6KNdFZbUfxVuuVMHf74c=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB6373.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?oVGHFBZDRP/mI1HxBzs+LFw9DR6kz+9MRP390kLnkoCpNSswg8ew+IOQ6Uv4?=
- =?us-ascii?Q?36qoOJXq6vVRNrQ5lNtMPEs8M1HLKovpVAB2G4d1qozFsYVdt4w0ixsGCeff?=
- =?us-ascii?Q?WV+o+3oZyAGfFHG0ncgnmfDf4KGchUZg+zpzh+iKWF7BujOLHZUiVJKnfPNJ?=
- =?us-ascii?Q?3Kvl6JvU0CWCdZBAKa08uPCCDyd+SHNYQauI2ZujNN3TFKeYUy6pwQPxpqYX?=
- =?us-ascii?Q?fpNpKsJ4k7z9UsF9UE4KWkFuzWXwjyzbFQySnu1L9XHHcVCWkjdb/Kv+HAbo?=
- =?us-ascii?Q?cQJp9PaRCFfCPO6xxBYh5lO/9MP5l2YOOWZMwo9iIt6nB08cqM+nsm7Pt9hg?=
- =?us-ascii?Q?XekSXOWOlWBzyMjSRHEEX6VRQk10J8+lwpoHwPYXqiLr03zZYnTAZ6arptRR?=
- =?us-ascii?Q?v0uUHI5txahYSp94D99NsEUmsSLAXDVGsilr5J+ZpWUXvSuH9IRgYaGxGvsq?=
- =?us-ascii?Q?jcLWuCmYILar6VtZwGGU2nymCvCmqw3muWjDJSAsqp/CizrkYOKCSKEAGL10?=
- =?us-ascii?Q?vzDHJv88u4L2Dez3vrSxcwBD11lsxodQWLLg0oU/LO81WgVc6ktqgk2jKq5t?=
- =?us-ascii?Q?wlLpgBsEUKKpPPfE7bcZ/YkPT7idtR3gq/4OeqiiK3YocfxMB/3qH/KjR6W8?=
- =?us-ascii?Q?JqO2eHEdOptclGqNCZ2ka87aJ5cfXxPZB26ROM6oOO8np5uURxGtZ/HxHbm8?=
- =?us-ascii?Q?i4glGgDbB4AfgzgEBPV//rWVKyR9m+SYy6qfj8jp0uYBsZV4CLJTdm9IAo5P?=
- =?us-ascii?Q?pr0ya7aQ5+NSaqi+VY/VtzjaNDECKp32L1FVsbfFG/w7lh2iUA8RV3dEvjZZ?=
- =?us-ascii?Q?wbVWXsCoyS/BVG0bbWlNep+gHH88fOMDaDav/Dv5/s/WfSnLZKDIYe/CejDj?=
- =?us-ascii?Q?ZCKWeNOHcmqJ/OzKj1fcEsn2f1xB69LsnUNVaxzD1vbXs4LddFC+ENWbSJXl?=
- =?us-ascii?Q?ai/lJYBx0Fh3w1TVJQFfq0QTv4mXLFZiOPK2MqeDSmRYr5KaFz8DWA+LGmde?=
- =?us-ascii?Q?vFXFQ2wA71mayV7KPGU5vYlpCoJWb1XSoAYXHfNLZv2QxLynensdb7H7di91?=
- =?us-ascii?Q?3CrJ4nVnCSllfeq+SqSrTePe7/HC4tB9asJvaqLFTxiuDfDQj+3ArpqjIDkS?=
- =?us-ascii?Q?2WvFE5XoquwlmFKMFjucIeXkz+EOL1rwUi5xA94Zoah5FwzpJbX595OomIfY?=
- =?us-ascii?Q?LkPGrsVCMfsZtMJp7SrVxnnhzBbuJgFQBjMvcDAEhkz3nyKi+zrnV9sIaHj3?=
- =?us-ascii?Q?qppKHqLarbauXyUw625EHn/Xr3gWsIz1Gqk7rsf+zwMdDvf2RC3807prSXDI?=
- =?us-ascii?Q?VXbkSguwImXskKEU4IyJSxw3EkTrEJ822gJwxbcjvsiPCVcSBGyaojNpK6mk?=
- =?us-ascii?Q?40Yy/+WjohXe+VnuGFg06Pt/MYxGtWSH6o5W0YdN+hbeDZXisPWMSREJF3q1?=
- =?us-ascii?Q?rkssDmiQR1o0B63QjJC+aZ9YYfh3TkkcByVDs3EfctEceJQE3li85tA4rzD6?=
- =?us-ascii?Q?ffgQcBDf4otCL3k/sO74z+jrpjUN3D09VlM71DPhofVyzBDWmkrW2rrLyw?=
- =?us-ascii?Q?=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7EB168AF0
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 14:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713450436; cv=none; b=DRRK2RzDOuYCXSSMci4QcNiOi+tgvvUDDxV/KHb5/yRTPgNGrhZYarXhygAw8X3eqEXsiFCueFuVZY8nzASHdpjRtdB7GmQPqVvFQ6mqWROt/zsas8Vs3HH1nEsJzKaaE0tZMqoz+tOwgjvi94yfDpreQF5yjQQqLGdWXhhyc6s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713450436; c=relaxed/simple;
+	bh=4xAZjsq5NBCk8pMTWSn7cGEZjggQAqPnOuHGhTfr1N4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B3tAdNYkI0L3xLwuRGVcbWuvqRWRDnE1jv61zCN7JXzfClZXMkeEQ/qGV+kP5TzGb+ctGdy8x6jKNEM81P+T5/d8Wdiq3X/PdguyQJFJ9j9hUnNdKqYU/ErMPUIfeFqkMkdW1R5gOmx4qdJyFYn5SEsxYsZ2bqDFc7ovTz7pCSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=YU8IcQvL; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-349a35aba9dso167587f8f.3
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 07:27:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1713450430; x=1714055230; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=p3RiUuSEoG2S8esV/YzS5auTHlA7j5ReVp1mTpYduo8=;
+        b=YU8IcQvLzq9Q8bZtr3YqGNHYXi9jReRjVxb/R36xMx/8xGG8lrZiSXtRZhbC6+ZgLs
+         wHue9C5RQ+UWNIo8YMUjUHz1hH9ys7HCBz1vIYWAdAUFOTK09+RAZ/7aKM/SilbYrx/P
+         XVMJGHh2oWPHIbU5boayw1RD4dO5X4vCkuU9L57E2xV1CiV53YJpXKGwqDKGwMwa/Phk
+         oaGNohhWNULpW7bhOuUv+66M8uk9ngicnDHQNBBv0+nGRstAvTGON6AdHsxZRRb5kXdt
+         Rpfpm67eR4PrS6y5UGP93OwNCH/sD8wlk67qiy+ZI/XYju3s2thIjPaNP0lm4Hmn4jGI
+         5abA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713450430; x=1714055230;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=p3RiUuSEoG2S8esV/YzS5auTHlA7j5ReVp1mTpYduo8=;
+        b=DeteK3KLHRln3LgTE2UgDbdNR9k1q4VcPK3wJf+WYzqj4c4YVvYB9oAItPrkso1gZB
+         3qwOMV/zkUFme2AgsGrV1pC1oyMkUVdRnLw4ry8+2YzpNSPv/SuLHa4C2VbWmnaN12qN
+         wPkF7GG9Lsc10QGY9QmNkcLDfAgAqJrsvaoSNMeG3MQt5lIRe5w9VG/zMIrir3JKshv8
+         1uaQdTlvpSQ8yGNVA1CQqeg2rzERrU9IfagMJKCXMtjckd6o8AU2piG+rgrBlnrrcEQQ
+         yhcik4S9ZCeltpUPBQjmvf20ewGQaICM/A/Bx0pwBSc+lELg4sDYkOKrFFX46x/Xxdy8
+         lYPw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4bRbHBGog+p/sEw20i9rofAsBVY35AKHjVV/Gq0acvr8mExQSjCVMGpLaeiirlCxzmtXCRgjkRflqJWQ94jyNxGvh
+X-Gm-Message-State: AOJu0YzI/JJg5lKOYMpg8D9t/FcZIpLtyoP8SyXpeBPYDmn0xXzU9T85
+	2+Ahv0aKB9jIBwp11seYEZ4b9/Jk6qUJn5jbYQj8WhLN+BJYrjOlbglPoC7y4P8=
+X-Google-Smtp-Source: AGHT+IFEKKLATpLTVwutm2tzIoiZ11Ga9pVF4NMfg4vCen7e5iSouPTou2BE8D1MsN0dG3NtPPHp/g==
+X-Received: by 2002:a05:600c:524a:b0:418:2719:6b14 with SMTP id fc10-20020a05600c524a00b0041827196b14mr2077367wmb.3.1713450430306;
+        Thu, 18 Apr 2024 07:27:10 -0700 (PDT)
+Received: from carbon-x1.. ([2a01:e0a:999:a3a0:7b64:4d1d:16d8:e38b])
+        by smtp.gmail.com with ESMTPSA id v10-20020a05600c470a00b00418a386c059sm2873645wmo.42.2024.04.18.07.27.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 07:27:09 -0700 (PDT)
+From: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>
+To: Conor Dooley <conor@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>
+Cc: =?UTF-8?q?Cl=C3=A9ment=20L=C3=A9ger?= <cleger@rivosinc.com>,
+	linux-riscv@lists.infradead.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	Ved Shanbhogue <ved@rivosinc.com>
+Subject: [RFC PATCH 0/7] riscv: Add support for Ssdbltrp extension
+Date: Thu, 18 Apr 2024 16:26:39 +0200
+Message-ID: <20240418142701.1493091-1-cleger@rivosinc.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB6373.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5350ae52-890c-4749-9f8a-08dc5fb2a28c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2024 14:20:01.5080
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: j/JLtya/aaopytnx/0e2SaMcPtpj7X7cPEYsilRjE4l+hxuMu1UUUqZSDXU9spTiMUP+UtytXObEbl5WKhYVJw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5295
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thursday, April 18, 2024 9:59 PM, Sean Christopherson wrote:
-> On Thu, Apr 18, 2024, Wei W Wang wrote:
-> > On Thursday, April 18, 2024 12:27 AM, Sean Christopherson wrote:
-> > > On Wed, Apr 17, 2024, Wei Wang wrote:
-> > > > Introduces two new macros, KVM_X86_SC() and KVM_X86_SCC(), to
-> > > > streamline the usage of KVM_X86_OPS static calls. The current
-> > > > implementation of these calls is verbose and can lead to alignment
-> > > > challenges due to the two pairs of parentheses. This makes the
-> > > > code susceptible to exceeding the "80 columns per single line of co=
-de"
-> > > > limit as defined in the coding-style document. The two macros are
-> > > > added to improve code readability and maintainability, while
-> > > > adhering to
-> > > the coding style guidelines.
-> > >
-> > > Heh, I've considered something similar on multiple occasionsi.  Not
-> > > because the verbosity bothers me, but because I often search for
-> > > exact "word" matches when looking for function usage and the kvm_x86_
-> prefix trips me up.
-> >
-> > Yeah, that's another compelling reason for the improvement.
-> >
-> > > IIRC, static_call_cond() is essentially dead code, i.e. it's the
-> > > exact same as static_call().  I believe there's details buried in a
-> > > proposed series to remove it[*].  And to not lead things astray, I
-> > > verified that invoking a NULL kvm_x86_op with static_call() does no h=
-arm
-> (well, doesn't explode at least).
-> > >
-> > > So if we add wrapper macros, I would be in favor in removing all
-> > > static_call_cond() as a prep patch so that we can have a single macro=
-.
-> >
-> > Sounds good. Maybe KVM_X86_OP_OPTIONAL could now also be removed?
->=20
-> No, KVM_X86_OP_OPTIONAL() is what allow KVM to WARN if a mandatory
-> hook isn't defined.  Without the OPTIONAL and OPTIONAL_RET variants, KVM
-> would need to assume every hook is optional, and thus couldn't WARN.
+A double trap typically arises during a sensitive phase in trap handling
+operations — when an exception or interrupt occurs while the trap
+handler (the component responsible for managing these events) is in a
+non-reentrant state. This non-reentrancy usually occurs in the early
+phase of trap handling, wherein the trap handler has not yet preserved
+the necessary state to handle and resume from the trap. The occurrence
+of such event is unlikely but can happen when dealing with hardware
+errors.
 
-Yes, KVM_X86_OP_OPTIONAL is used to enforce the definition of mandatory hoo=
-ks
-with WARN_ON(). But the distinction between mandatory and optional hooks
-has now become ambiguous. For example, all the hooks, whether defined or
-undefined (NULL), are invoked via static_call() without issues now. In some=
- sense,
-all hooks could potentially be deemed as optional, and the undefined ones j=
-ust lead
-to NOOP when unconditionally invoked by the kvm/x86 core code.=20
-(the KVM_X86_OP_RET0 is needed)
-Would you see any practical issues without that WARN_ON?
+This series adds support for Ssdbltrp[1]. It is based on SSE support as well as
+firmware feature to enable double trap.
+
+Ssdbltrp can be tested using qemu[1], opensbi[2], linux[3] and
+kvm-unit-tests[5]. Assuming you have a riscv environment available and
+configured (CROSS_COMPILE), it can be built for riscv64 using the
+following instructions:
+
+Qemu:
+  $ git clone https://github.com/rivosinc/qemu.git
+  $ cd qemu
+  $ git switch dev/cleger/dbltrp_rfc_v1
+  $ mkdir build && cd build
+  $ ../configure --target-list=riscv64-softmmu
+  $ make
+
+OpenSBI:
+  $ git clone https://github.com/rivosinc/opensbi.git
+  $ cd opensbi
+  $ git switch dev/cleger/dbltrp_rfc_v1
+  $ make O=build PLATFORM_RISCV_XLEN=64 PLATFORM=generic
+
+Linux:
+  $ git clone https://github.com/rivosinc/linux.git
+  $ cd linux
+  $ git switch dev/cleger/dbltrp_rfc_v1
+  $ export ARCH=riscv
+  $ make O=build defconfig
+  $ ./script/config --file build/.config --enable RISCV_DBLTRP
+  $ make O=build
+
+kvm-unit-tests:
+  $ git clone https://github.com/clementleger/kvm-unit-tests.git
+  $ cd kvm-unit-tests
+  $ git switch dev/cleger/dbltrp_rfc_v1
+  $ ./configure --arch=riscv64 --cross-prefix=$CROSS_COMPILE
+  $ make
+
+You will also need kvmtool in your rootfs. One can build a buildroot
+rootfs using the buildroot provided at [6] (which contains an update
+of kvmtool with riscv support).
+
+Run with kvm-unit-test test as kernel:
+  $ qemu-system-riscv64 \
+    -M virt \
+    -cpu rv64,x-ssdbltrp=true,x-smdbltrp=true \
+    -nographic \
+    -serial mon:stdio \
+    -bios opensbi/build/platform/generic/firmware/fw_jump.bin \
+    -kernel kvm-unit-tests-dbltrp/riscv/sbi_dbltrp.flat
+  ...
+  [OpenSBI boot partially elided]
+  Boot HART ISA Extensions  : sscofpmf,sstc,zicntr,zihpm,zicboz,zicbom,sdtrig,svadu,ssdbltrp
+  ...
+  ##########################################################################
+  #    kvm-unit-tests
+  ##########################################################################
+
+  PASS: sbi: fwft: FWFT extension probing no error
+  PASS: sbi: fwft: FWFT extension is present
+  PASS: sbi: fwft: dbltrp: Get double trap enable feature value
+  PASS: sbi: fwft: dbltrp: Set double trap enable feature value == 0
+  PASS: sbi: fwft: dbltrp: Get double trap enable feature value == 0
+  PASS: sbi: fwft: dbltrp: Double trap disabled, trap first time ok
+  PASS: sbi: fwft: dbltrp: Set double trap enable feature value == 1
+  PASS: sbi: fwft: dbltrp: Get double trap enable feature value == 1
+  PASS: sbi: fwft: dbltrp: Trapped twice allowed ok
+  INFO: sbi: fwft: dbltrp: Should generate a double trap and crash !
+
+  sbi_trap_error: hart0: trap0: double trap handler failed (error -10)
+
+  sbi_trap_error: hart0: trap0: mcause=0x0000000000000010 mtval=0x0000000000000000
+  sbi_trap_error: hart0: trap0: mtval2=0x0000000000000003 mtinst=0x0000000000000000
+  sbi_trap_error: hart0: trap0: mepc=0x00000000802000d8 mstatus=0x8000000a01006900
+  sbi_trap_error: hart0: trap0: ra=0x00000000802001fc sp=0x0000000080213e70
+  sbi_trap_error: hart0: trap0: gp=0x0000000000000000 tp=0x0000000080088000
+  sbi_trap_error: hart0: trap0: s0=0x0000000080213e80 s1=0x0000000000000001
+  sbi_trap_error: hart0: trap0: a0=0x0000000080213e80 a1=0x0000000080208193
+  sbi_trap_error: hart0: trap0: a2=0x000000008020dc20 a3=0x000000000000000f
+  sbi_trap_error: hart0: trap0: a4=0x0000000080210cd8 a5=0x00000000802110d0
+  sbi_trap_error: hart0: trap0: a6=0x00000000802136e4 a7=0x0000000046574654
+  sbi_trap_error: hart0: trap0: s2=0x0000000080210cd9 s3=0x0000000000000000
+  sbi_trap_error: hart0: trap0: s4=0x0000000000000000 s5=0x0000000000000000
+  sbi_trap_error: hart0: trap0: s6=0x0000000000000000 s7=0x0000000000000001
+  sbi_trap_error: hart0: trap0: s8=0x0000000000002000 s9=0x0000000080083700
+  sbi_trap_error: hart0: trap0: s10=0x0000000000000000 s11=0x0000000000000000
+  sbi_trap_error: hart0: trap0: t0=0x0000000000000000 t1=0x0000000080213ed8
+  sbi_trap_error: hart0: trap0: t2=0x0000000000001000 t3=0x0000000080213ee0
+  sbi_trap_error: hart0: trap0: t4=0x0000000000000000 t5=0x000000008020f8d0
+  sbi_trap_error: hart0: trap0: t6=0x0000000000000000
+
+Run with linux and kvm-unit-test test in kvm (testing VS-mode):
+  $ qemu-system-riscv64 \
+    -M virt \
+    -cpu rv64,x-ssdbltrp=true,x-smdbltrp=true \
+    -nographic \
+    -serial mon:stdio \
+    -bios opensbi/build/platform/generic/firmware/fw_jump.bin \
+    -kernel linux/build/arch/riscv/boot/Image
+  ...
+  [Linux boot partially elided]
+  [    0.735079] riscv-dbltrp: Double trap handling registered
+  ...
+
+  $ lkvm run -k sbi_dbltrp.flat -m 128 -c 2
+  ##########################################################################
+  #    kvm-unit-tests
+  ##########################################################################
+
+  PASS: sbi: fwft: FWFT extension probing no error
+  PASS: sbi: fwft: FWFT extension is present
+  PASS: sbi: fwft: dbltrp: Get double trap enable feature value
+  PASS: sbi: fwft: dbltrp: Set double trap enable feature value == 0
+  PASS: sbi: fwft: dbltrp: Get double trap enable feature value == 0
+  PASS: sbi: fwft: dbltrp: Double trap disabled, trap first time ok
+  PASS: sbi: fwft: dbltrp: Set double trap enable feature value == 1
+  PASS: sbi: fwft: dbltrp: Get double trap enable feature value == 1
+  PASS: sbi: fwft: dbltrp: Trapped twice allowed ok
+  INFO: sbi: fwft: dbltrp: Should generate a double trap and crash !
+  [   51.939077] Guest double trap
+  [   51.939323] kvm [93]: VCPU exit error -95
+  [   51.939683] kvm [93]: SEPC=0x802000d8 SSTATUS=0x200004520 HSTATUS=0x200200180
+  [   51.939947] kvm [93]: SCAUSE=0x10 STVAL=0x0 HTVAL=0x3 HTINST=0x0
+  KVM_RUN failed: Operation not supported
+  $
+
+Link: https://github.com/riscv/riscv-double-trap/releases/download/v0.56/riscv-double-trap.pdf [1]
+Link: https://github.com/rivosinc/qemu/tree/dev/cleger/dbltrp_rfc_v1 [2]
+Link: https://github.com/rivosinc/opensbi/tree/dev/cleger/dbltrp_rfc_v1 [3]
+Link: https://github.com/rivosinc/linux/tree/dev/cleger/dbltrp_rfc_v1 [4]
+Link: https://github.com/clementleger/kvm-unit-tests/tree/dev/cleger/dbltrp_rfc_v1 [5]
+Link: https://github.com/clementleger/buildroot/tree/dev/cleger/kvmtool [6]
+---
+
+Clément Léger (7):
+  riscv: kvm: add support for FWFT SBI extension
+  dt-bindings: riscv: add Ssdbltrp ISA extension description
+  riscv: add Ssdbltrp ISA extension parsing
+  riscv: handle Ssdbltrp mstatus SDT bit
+  riscv: add double trap driver
+  riscv: kvm: add SBI FWFT support for SBI_FWFT_DOUBLE_TRAP_ENABLE
+  RISC-V: KVM: add support for double trap exception
+
+ .../devicetree/bindings/riscv/extensions.yaml |   6 +
+ arch/riscv/include/asm/csr.h                  |   3 +
+ arch/riscv/include/asm/hwcap.h                |   1 +
+ arch/riscv/include/asm/kvm_host.h             |  12 +-
+ arch/riscv/include/asm/kvm_vcpu_sbi.h         |   1 +
+ arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h    |  37 ++++
+ arch/riscv/include/asm/sbi.h                  |   1 +
+ arch/riscv/include/uapi/asm/kvm.h             |   2 +
+ arch/riscv/kernel/cpufeature.c                |   1 +
+ arch/riscv/kernel/entry.S                     |  52 ++---
+ arch/riscv/kernel/head.S                      |   4 +
+ arch/riscv/kernel/sse_entry.S                 |   4 +-
+ arch/riscv/kvm/Makefile                       |   1 +
+ arch/riscv/kvm/vcpu.c                         |  28 +--
+ arch/riscv/kvm/vcpu_exit.c                    |  33 +++-
+ arch/riscv/kvm/vcpu_insn.c                    |  15 +-
+ arch/riscv/kvm/vcpu_onereg.c                  |   2 +
+ arch/riscv/kvm/vcpu_sbi.c                     |   8 +-
+ arch/riscv/kvm/vcpu_sbi_fwft.c                | 177 ++++++++++++++++++
+ arch/riscv/kvm/vcpu_switch.S                  |  19 +-
+ drivers/firmware/Kconfig                      |   7 +
+ drivers/firmware/Makefile                     |   1 +
+ drivers/firmware/riscv_dbltrp.c               |  95 ++++++++++
+ include/linux/riscv_dbltrp.h                  |  19 ++
+ 24 files changed, 466 insertions(+), 63 deletions(-)
+ create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+ create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
+ create mode 100644 drivers/firmware/riscv_dbltrp.c
+ create mode 100644 include/linux/riscv_dbltrp.h
+
+-- 
+2.43.0
+
 
