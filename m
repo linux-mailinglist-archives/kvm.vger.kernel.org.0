@@ -1,185 +1,316 @@
-Return-Path: <kvm+bounces-15116-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15117-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 659AD8A9FB4
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 18:12:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD468A9FF3
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 18:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D2F3283A34
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 16:12:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D8391C20E65
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 16:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243FC16F909;
-	Thu, 18 Apr 2024 16:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578F416F90F;
+	Thu, 18 Apr 2024 16:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rG8oYPZx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNuobibY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A3B16078D
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 16:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF87E16C84E
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 16:23:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713456713; cv=none; b=GPv4QisUo9KFfGqzfvGKcuLOsgVU92mx9QumaUGvDprOu1opmfKJ65f+3anS4AKLAoizNXHfIfqyq0Nqoqeke7UNerLiGz6KbnLTBv0JZ6vht2usLUDYfPGeP0mQn4q5M6wBOwwszmE0Dcvdt7GDH4HerOYKwmvlA3MU0BIokVg=
+	t=1713457401; cv=none; b=LFy1nkEP29pvoKe+XOq46B8N8nbRBWCHHMOvo6rvZc3qOf8MJT76CqJLoThRzvRNafqGWxAeZkNWg+8jNgvNWhQey0yA9TPe61EPtg4pi4gfLomvnGR5EA6laDdeA+iKNdJK0TDSvMm87Pz+GeJ7fUdaBafPZi7jpqGJbxD1xLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713456713; c=relaxed/simple;
-	bh=x3+WlO+0LAXP8uQDsB5xiS+LPQq9LE56J9dxO3ax1z8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=asQMDospWFbh9gjU26tXlJHxU9C+IZWDIFJ/axfsWp3Xs0p4gSrBuEI3k8F4x3f1z9zMYlmhhkqUX9CD5sVmNv0OpKF8KFKC27Ud3So6asrrrLOFwQG4KRONWNYjAf1oGlp3Ks5Uux398XJz+rAdvSv6Q2EiDUmOIQbdBV5Ge0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rG8oYPZx; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b028ae5easo19533467b3.3
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 09:11:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713456710; x=1714061510; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YYC+ElnlnIhIYtT3pTmbpV3Sx6LVeGekU37IYxjEoOk=;
-        b=rG8oYPZxj9hljCcywnA5vP6jjy4i5nHEhQsdoNsnj3R0npMJh/qPo6E43KLmbL0HH1
-         euVeNkZItiJdIjESi/0IAnSNd6OfsdNSL7cQRqiWzqfks/8/aEEbUtGP3s4vJ8WOTN3u
-         NPETkYh2Z1kW3TLkbi7qwgKAONjPSgm6HHEezEAjN313MEI5hGw5uiaVr/hj5pSjd9sl
-         1msS6BpLn7p6uTyStcf0pwT161yRCuWu5aJwUr4lsQwvwyIf6OKlIk1L+BWzHsdD76Ur
-         rgluC1RVyiV51AwOLDmm6L3Wh5XjckOGb65hQnKFD9HNcMaF2I74VNTcqwkP1yI6QXgW
-         HUXA==
+	s=arc-20240116; t=1713457401; c=relaxed/simple;
+	bh=TjOvDbdSH+dx9HkxftsUqbLvpLxJA7iClDmwglPSNDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XKfOFa904Vc0EZyfl8AnY+UUW1DdFKa1lYiM0V6T2KFx2azjXMzK8nYFfiisQjYVTO7kBtq7kRz3TM8Q39mR8m7RFnjnuAG5LrntUDIkgQNsbWXYGE4N529SDqVRrKG+VHWZ/UKkNSbUWbsYoN9uYg91VfoMhChGyRFFo5sP+pM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SNuobibY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713457398;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OpPhF8w7waMvk5Q41LU8inZX3Uugvi3adKbK1DhEk7o=;
+	b=SNuobibYq04lJnrgikZnxW6m8K61R7wFoLv5S/iN+lqjaQvx53UAAolNiCn6ulmascx6WY
+	cS3Zhg5quay1fBseWCJHRC5i9T3EtDsuABmWhYE127wJ54hPWBu98DhBSY2yR7g0a1Dsfb
+	A5TXClLt9MfTfhE1BVAeJleItjYS45w=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-82-n1Rr5Mk7O5ykzWFd85Ys2g-1; Thu, 18 Apr 2024 12:23:17 -0400
+X-MC-Unique: n1Rr5Mk7O5ykzWFd85Ys2g-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7da435d3306so8067839f.2
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 09:23:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713456710; x=1714061510;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YYC+ElnlnIhIYtT3pTmbpV3Sx6LVeGekU37IYxjEoOk=;
-        b=pEnyjArdMh/1pDuFWfD/kqdljiW2hNDFP3nzYY+AzCMqwp0KkDLNcXO+VHwBaauuRE
-         FhzNQYMw1ce5zaVXFqXEuC2PturATcXDjZ8BnHh0am86eUTQYwB144PlJCzR4f8CU153
-         nOT2/L9fYFMyhhQTklWEYaavkuXBuIxTSlcubuPv+0scZgNE/q5DsD3U7cmmBJYwaqg3
-         9F/bKqyF3kO/QolX48h0/VXO5EJw3j7mdISJVjHtc9FRdxqwCT2VzhekyPu2kQ8YzS1I
-         jHHYLkcj/RX8UpdzW3RbstSsTMXQnDqCmlBBe8tCw1h19LtTPn6dSi1Dlb8tde3S5Td3
-         kPdA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+hX+om90iRd8dr1ENdk9pMkjEoEitR9ZAhDWI9BND53K+eHXR43Wm8c9HQaYOOPXi2kzLBuAgJhQStf1ifXPbCTa6
-X-Gm-Message-State: AOJu0YzrYLY2YHnUwJfaZFLId/7haUbFqmvLzVwlHzW3mglR5hrseHiz
-	lC/S+0bkHcawM19gGK0CmsdOCfqfR39c4qQWXSlU96IELQAqDgGkuiGDWUCkvYE6HhNewG6hfSZ
-	Qxw==
-X-Google-Smtp-Source: AGHT+IGBG0Jt5UIr5Hv3ErOh24L4EYGuYkMTUr3on3b8sqAWcVn4NNfmefrFusmoxB6a86KjwyKVnEISv+U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:10c1:b0:dc6:e8a7:fdba with SMTP id
- w1-20020a05690210c100b00dc6e8a7fdbamr827651ybu.4.1713456710299; Thu, 18 Apr
- 2024 09:11:50 -0700 (PDT)
-Date: Thu, 18 Apr 2024 09:11:48 -0700
-In-Reply-To: <9056f6a2-546b-41fc-a07c-7b86173887db@linux.intel.com>
+        d=1e100.net; s=20230601; t=1713457396; x=1714062196;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OpPhF8w7waMvk5Q41LU8inZX3Uugvi3adKbK1DhEk7o=;
+        b=Oy38RbbxX8dvsUlAnHXPIwaqiwi3JwpAFTi03VD19/yUfIoUgMSyMzrwIAPYKhQ/D1
+         Zoo2+xkA0mtt+PiOhnzguVlYy4Ycy+XK2NNovhDBT7h/aBs80wuszPiZUoSzCzfne1FG
+         VLnQ6SPTT7vWnS+i6SthQQ2tZXf3T6UL7y3LZCZRWk99Wg5nuOTsmgGJh442zPl5vaMA
+         ydHgpEjNXRliM+A7+D7lEP0v6DD4YWrJYt1bTfhtd0VpNthpR1+rnnw55f4VmEcpEJZR
+         eSSmjm1P/rJP5P0moFBbZgIgHnSMSzBWRcH6xbqOp6BE9roDK9wLYFUUyhA2OjxbtlVw
+         LjNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWK7+uk1Jtqba7wnP+6Op0Rdz4ri/hym9oEJriiRNxYEAJ549hBTEdpAfUsb3qmx+rh2LuTsNmV6EjAT2OLG8A8mut6
+X-Gm-Message-State: AOJu0YxW/ctuoboim6vZwAg81I/HMO0Xe2BE6VAaZPt+pA/4q0fiFVU/
+	2DQ14UO3yX2RjaceSxjCQfaIXXLdiEf1xboteMS3qrEQ7tY4zS03vlyGx1RPM6S8+HSsiTpGLgU
+	exmbFOQ0Dm7gOtR68xSvq2q54o7z4enzql8So9EsBGFGYmx+Gcg==
+X-Received: by 2002:a05:6602:2289:b0:7d5:f591:2cc2 with SMTP id d9-20020a056602228900b007d5f5912cc2mr3572773iod.17.1713457396758;
+        Thu, 18 Apr 2024 09:23:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGfNtiABViCn51G//5YknWbS0WdR7g/EL6w1vtnNGKLFbqCipmFcU3Cc0Lw1gIFArYQDtFutw==
+X-Received: by 2002:a05:6602:2289:b0:7d5:f591:2cc2 with SMTP id d9-20020a056602228900b007d5f5912cc2mr3572741iod.17.1713457396409;
+        Thu, 18 Apr 2024 09:23:16 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id hj18-20020a0566021d9200b007d5d1e0ae05sm419393iob.44.2024.04.18.09.23.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 09:23:15 -0700 (PDT)
+Date: Thu, 18 Apr 2024 10:23:14 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
+ <robin.murphy@arm.com>, <eric.auger@redhat.com>, <nicolinc@nvidia.com>,
+ <kvm@vger.kernel.org>, <chao.p.peng@linux.intel.com>,
+ <iommu@lists.linux.dev>, <baolu.lu@linux.intel.com>,
+ <zhenzhong.duan@intel.com>, <jacob.jun.pan@intel.com>, Matthew Wilcox
+ <willy@infradead.org>
+Subject: Re: [PATCH v2 1/4] ida: Add ida_get_lowest()
+Message-ID: <20240418102314.6a3d344a.alex.williamson@redhat.com>
+In-Reply-To: <e3531550-8644-4a7e-94bd-75bdb52182be@intel.com>
+References: <20240412082121.33382-1-yi.l.liu@intel.com>
+	<20240412082121.33382-2-yi.l.liu@intel.com>
+	<20240416100329.35cede17.alex.williamson@redhat.com>
+	<e3531550-8644-4a7e-94bd-75bdb52182be@intel.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <20240126085444.324918-3-xiong.y.zhang@linux.intel.com> <ZhgmrczGpccfU-cI@google.com>
- <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com> <ZhmIrQQVgblrhCZs@google.com>
- <2342a4e2-2834-48e2-8403-f0050481e59e@linux.intel.com> <ab2953b7-18fd-4b4c-a83b-ab243e2a21e1@linux.intel.com>
- <998fd76f-2bd9-4492-bf2e-e8cd981df67f@linux.intel.com> <eca7cdb9-6c8d-4d2e-8ac6-b87ea47a1bac@linux.intel.com>
- <9056f6a2-546b-41fc-a07c-7b86173887db@linux.intel.com>
-Message-ID: <ZiFGRFb45oZrmqnJ@google.com>
-Subject: Re: [RFC PATCH 02/41] perf: Support guest enter/exit interfaces
-From: Sean Christopherson <seanjc@google.com>
-To: Xiong Y Zhang <xiong.y.zhang@linux.intel.com>
-Cc: Kan Liang <kan.liang@linux.intel.com>, pbonzini@redhat.com, peterz@infradead.org, 
-	mizhang@google.com, kan.liang@intel.com, zhenyuw@linux.intel.com, 
-	dapeng1.mi@linux.intel.com, jmattson@google.com, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	zhiyuan.lv@intel.com, eranian@google.com, irogers@google.com, 
-	samantha.alt@intel.com, like.xu.linux@gmail.com, chao.gao@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 17, 2024, Xiong Y Zhang wrote:
-> On 4/16/2024 8:48 PM, Liang, Kan wrote:
-> >> x86_perf_get_mediated_pmu() is called at vm_create(),
-> >> x86_perf_put_mediated_pmu() is called at vm_destroy(), then system wide
-> >> perf events without exclude_guest=1 can not be created during the whole vm
-> >> life cycle (where nr_mediated_pmu_vms > 0 always), do I understand and use
-> >> the interface correctly ?
+On Thu, 18 Apr 2024 15:02:46 +0800
+Yi Liu <yi.l.liu@intel.com> wrote:
+
+> On 2024/4/17 00:03, Alex Williamson wrote:
+> > On Fri, 12 Apr 2024 01:21:18 -0700
+> > Yi Liu <yi.l.liu@intel.com> wrote:
+> >   
+> >> There is no helpers for user to check if a given ID is allocated or not,
+> >> neither a helper to loop all the allocated IDs in an IDA and do something
+> >> for cleanup. With the two needs, a helper to get the lowest allocated ID
+> >> of a range can help to achieve it.
+> >>
+> >> Caller can check if a given ID is allocated or not by:
+> >> 	int id = 200, rc;
+> >>
+> >> 	rc = ida_get_lowest(&ida, id, id);
+> >> 	if (rc == id)
+> >> 		//id 200 is used
+> >> 	else
+> >> 		//id 200 is not used
+> >>
+> >> Caller can iterate all allocated IDs by:
+> >> 	int id = 0;
+> >>
+> >> 	while (!ida_is_empty(&pasid_ida)) {
+> >> 		id = ida_get_lowest(pasid_ida, id, INT_MAX);
+> >> 		if (id < 0)
+> >> 			break;
+> >> 		//anything to do with the allocated ID
+> >> 		ida_free(pasid_ida, pasid);
+> >> 	}
+> >>
+> >> Cc: Matthew Wilcox (Oracle) <willy@infradead.org>
+> >> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> >> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> >> ---
+> >>   include/linux/idr.h |  1 +
+> >>   lib/idr.c           | 67 +++++++++++++++++++++++++++++++++++++++++++++
+> >>   2 files changed, 68 insertions(+)
+> >>
+> >> diff --git a/include/linux/idr.h b/include/linux/idr.h
+> >> index da5f5fa4a3a6..1dae71d4a75d 100644
+> >> --- a/include/linux/idr.h
+> >> +++ b/include/linux/idr.h
+> >> @@ -257,6 +257,7 @@ struct ida {
+> >>   int ida_alloc_range(struct ida *, unsigned int min, unsigned int max, gfp_t);
+> >>   void ida_free(struct ida *, unsigned int id);
+> >>   void ida_destroy(struct ida *ida);
+> >> +int ida_get_lowest(struct ida *ida, unsigned int min, unsigned int max);
+> >>   
+> >>   /**
+> >>    * ida_alloc() - Allocate an unused ID.
+> >> diff --git a/lib/idr.c b/lib/idr.c
+> >> index da36054c3ca0..03e461242fe2 100644
+> >> --- a/lib/idr.c
+> >> +++ b/lib/idr.c
+> >> @@ -476,6 +476,73 @@ int ida_alloc_range(struct ida *ida, unsigned int min, unsigned int max,
+> >>   }
+> >>   EXPORT_SYMBOL(ida_alloc_range);
+> >>   
+> >> +/**
+> >> + * ida_get_lowest - Get the lowest used ID.
+> >> + * @ida: IDA handle.
+> >> + * @min: Lowest ID to get.
+> >> + * @max: Highest ID to get.
+> >> + *
+> >> + * Get the lowest used ID between @min and @max, inclusive.  The returned
+> >> + * ID will not exceed %INT_MAX, even if @max is larger.
+> >> + *
+> >> + * Context: Any context. Takes and releases the xa_lock.
+> >> + * Return: The lowest used ID, or errno if no used ID is found.
+> >> + */
+> >> +int ida_get_lowest(struct ida *ida, unsigned int min, unsigned int max)
+> >> +{
+> >> +	unsigned long index = min / IDA_BITMAP_BITS;
+> >> +	unsigned int offset = min % IDA_BITMAP_BITS;
+> >> +	unsigned long *addr, size, bit;
+> >> +	unsigned long flags;
+> >> +	void *entry;
+> >> +	int ret;
+> >> +
+> >> +	if (min >= INT_MAX)
+> >> +		return -EINVAL;
+> >> +	if (max >= INT_MAX)
+> >> +		max = INT_MAX;
+> >> +  
 > > 
-> > Right, but it only impacts the events of PMU with the
-> > PERF_PMU_CAP_MEDIATED_VPMU.  For other PMUs, the event with exclude_guest=1
-> > can still be created.  KVM should not touch the counters of the PMU without
-> > PERF_PMU_CAP_MEDIATED_VPMU.
+> > Could these be made consistent with the test in ida_alloc_range(), ie:
 > > 
-> > BTW: I will also remove the prefix x86, since the functions are in the
-> > generic code.
+> > 	if ((int)min < 0)
+> > 		return -EINVAL;
+> > 	if ((int)max < 0)
+> > 		max = INT_MAX;
+> >   
+> 
+> sure.
+> 
+> >> +	xa_lock_irqsave(&ida->xa, flags);
+> >> +
+> >> +	entry = xa_find(&ida->xa, &index, max / IDA_BITMAP_BITS, XA_PRESENT);
+> >> +	if (!entry) {
+> >> +		ret = -ENOTTY;  
 > > 
-> > Thanks,
-> > Kan
-> After userspace VMM call VCPU SET_CPUID() ioctl, KVM knows whether vPMU is
-> enabled or not. If perf_get_mediated_pmu() is called at vm create, it is too
-> early.
+> > -ENOENT?  Same for all below too.  
+> 
+> I see.
+> 
+> >> +		goto err_unlock;
+> >> +	}
+> >> +
+> >> +	if (index > min / IDA_BITMAP_BITS)
+> >> +		offset = 0;
+> >> +	if (index * IDA_BITMAP_BITS + offset > max) {
+> >> +		ret = -ENOTTY;
+> >> +		goto err_unlock;
+> >> +	}
+> >> +
+> >> +	if (xa_is_value(entry)) {
+> >> +		unsigned long tmp = xa_to_value(entry);
+> >> +
+> >> +		addr = &tmp;
+> >> +		size = BITS_PER_XA_VALUE;
+> >> +	} else {
+> >> +		addr = ((struct ida_bitmap *)entry)->bitmap;
+> >> +		size = IDA_BITMAP_BITS;
+> >> +	}
+> >> +
+> >> +	bit = find_next_bit(addr, size, offset);
+> >> +
+> >> +	xa_unlock_irqrestore(&ida->xa, flags);
+> >> +
+> >> +	if (bit == size ||
+> >> +	    index * IDA_BITMAP_BITS + bit > max)
+> >> +		return -ENOTTY;
+> >> +
+> >> +	return index * IDA_BITMAP_BITS + bit;
+> >> +
+> >> +err_unlock:
+> >> +	xa_unlock_irqrestore(&ida->xa, flags);
+> >> +	return ret;
+> >> +}
+> >> +EXPORT_SYMBOL(ida_get_lowest);  
+> > 
+> > The API is a bit awkward to me, I wonder if it might be helped with
+> > some renaming and wrappers...
+> > 
+> > int ida_find_first_range(struct ida *ida, unsigned int min, unsigned int max);  
+> 
+> ok.
+> 
+> > bool ida_exists(struct ida *ida, unsigned int id)
+> > {
+> > 	return ida_find_first_range(ida, id, id) == id;
+> > }  
+> 
+> this does helps in next patch.
+> 
+> > 
+> > int ida_find_first(struct ida *ida)
+> > {
+> > 	return ida_find_first_range(ida, 0, ~0);
+> > }
+> >  
+> 
+> perhaps it can be added in future. This series has two usages. One is to
+> check if a given ID is allocated. This can be covered by your ida_exists().
+> Another usage is to loop each IDs, do detach and free. This can still use
+> the ida_find_first_range() like the example in the commit message. The
+> first loop starts from 0, and next would start from the last found ID.
+> This may be more efficient than starts from 0 in every loop.
+> 
+> 
+> > _min and _max variations of the latter would align with existing
+> > ida_alloc variants, but maybe no need to add them preemptively.  
+> 
+> yes.
+> 
+> > Possibly an ida_for_each() could be useful in the use case of
+> > disassociating each id, but not required for the brute force iterative
+> > method.  Thanks,  
+> 
+> yep. maybe we can start with the below code, no need for ida_for_each()
+> today.
+> 
+> 
+>   	int id = 0;
+> 
+>   	while (!ida_is_empty(&pasid_ida)) {
+>   		id = ida_find_first_range(pasid_ida, id, INT_MAX);
 
-Eh, if someone wants to create _only_ VMs without vPMUs, then they should load
-KVM with enable_pmu=false.  I can see people complaining about not being able to
-create VMs if they don't want to use have *any* vPMU usage, but I doubt anyone
-has a use cases where they want a mix of PMU-enabled and PMU- disabled VMs, *and*
-they are ok with VM creation failing for some VMs but not others.
+You've actually already justified the _min function here:
 
-> it is better to let perf_get_mediated_pmu() track per cpu PMU state,
-> so perf_get_mediated_pmu() can be called by kvm after vcpu_cpuid_set(). Note
-> user space vmm may call SET_CPUID() on one vcpu multi times, then here
-> refcount maybe isn't suitable. 
+static inline int ida_find_first_min(struct ida *ida, unsigned int min)
+{
+	return ida_find_first_range(ida, min, ~0);
+}
 
-Yeah, waiting until KVM_SET_CPUID2 would be unpleasant for both KVM and userspace.
-E.g. failing KVM_SET_CPUID2 because KVM can't enable mediated PMU support would
-be rather confusing for userspace.
+Thanks,
+Alex
 
-> what's a better solution ?
-
-If doing the checks at VM creation is a stick point for folks, then the best
-approach is probably to use KVM_CAP_PMU_CAPABILITY, i.e. require userspace to
-explicitly opt-in to enabling mediated PMU usage.  Ha!  We can even do that
-without additional uAPI, because KVM interprets cap->args[0]==0 as "enable vPMU".
-
-The big problem with this is that enabling mediated PMU support by default would
-break userspace.  Hmm, but that's arguably the case no matter what, as a setup
-that worked before would suddenly start failing if the host was configured to use
-the PMU-based NMI watchdog.
-
-E.g. this, if we're ok commiting to never enabling mediated PMU by default.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 47d9f03b7778..01d9ee2114c8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6664,9 +6664,21 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-                        break;
- 
-                mutex_lock(&kvm->lock);
--               if (!kvm->created_vcpus) {
--                       kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
--                       r = 0;
-+               /*
-+                * To keep PMU configuration "simple", setting vPMU support is
-+                * disallowed if vCPUs are created, or if mediated PMU support
-+                * was already enabled for the VM.
-+                */
-+               if (!kvm->created_vcpus &&
-+                   (!enable_mediated_pmu || !kvm->arch.enable_pmu)) {
-+                       if (enable_mediated_pmu &&
-+                           !(cap->args[0] & KVM_PMU_CAP_DISABLE))
-+                               r = x86_perf_get_mediated_pmu();
-+                       else
-+                               r = 0;
-+
-+                       if (!r)
-+                               kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
-                }
-                mutex_unlock(&kvm->lock);
-                break;
-@@ -12563,7 +12575,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 
-        kvm->arch.default_tsc_khz = max_tsc_khz ? : tsc_khz;
-        kvm->arch.guest_can_read_msr_platform_info = true;
--       kvm->arch.enable_pmu = enable_pmu;
-+
-+       /* PMU virtualization is opt-in when mediated PMU support is enabled. */
-+       kvm->arch.enable_pmu = enable_pmu && !enable_mediated_pmu;
- 
- #if IS_ENABLED(CONFIG_HYPERV)
-        spin_lock_init(&kvm->arch.hv_root_tdp_lock);
+>   		if (unlikely(WARN_ON(id < 0))
+> 			break;
+>   		iommufd_device_pasid_detach();
+>   		ida_free(pasid_ida, pasid);
+>   	}
+> 
+> >   
+> >> +
+> >>   /**
+> >>    * ida_free() - Release an allocated ID.
+> >>    * @ida: IDA handle.  
+> >   
+> 
 
 
