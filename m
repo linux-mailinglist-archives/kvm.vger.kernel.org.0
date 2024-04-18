@@ -1,127 +1,120 @@
-Return-Path: <kvm+bounces-15050-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15051-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF23A8A9166
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 05:03:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD1258A916A
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 05:07:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665991F21BAB
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 03:03:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35D08B2151A
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 03:07:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078374F8A0;
-	Thu, 18 Apr 2024 03:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyuRU+nb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B014F606;
+	Thu, 18 Apr 2024 03:07:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265C16138;
-	Thu, 18 Apr 2024 03:03:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from njjs-sys-mailin01.njjs.baidu.com (mx315.baidu.com [180.101.52.204])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8993433BC
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 03:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.101.52.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713409407; cv=none; b=dLQaXfdzMlZDGhEWrQIgNOuAJPzIMKlJmzir68nb/BC0QhcTaHUZcSeQrVfhOt9iMpSetsLpfFh9dLZtXngpJQOFeLvTJLkVmHQIFJQO230Xoe0GmUDXtzKHmKf56NuQNTJ2ylSYGjZaZoQhsuf8nP8+wdGWCii2NtE/L5W8Wyw=
+	t=1713409639; cv=none; b=chmLB6ABe0Fo/bhknHo25DK33Aei+oxCuJy5zDnj98qtBY+y/mKQ7+3Yc515gpYnmFOkfbL6cx0+jGsb3EY/VUs6tg+Dl+Br2qFE2+bujSWj4LOGHmdnRlJ0aWU9fZKAPNA4+7ZxWvEZLTnv4VD/A4hHYEO4aHzb62S0Rz1/+AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713409407; c=relaxed/simple;
-	bh=kfEJQjTwgGJh4Zkx43Z0VD1r+pL2rJMimsZzyjREVEM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=idbxgrIsfyS/1CyxhANwP59PhrAA7nkhxu0xyZQ2ermbCrKljh5KOAhva0SIVVADTWhU5jurGaLCbweT0OL7tZl4p1dNZjqOYxfQQZibJneayX6xGCxa5qsE2JGRF9JfAsPXF0ubJ2VOJ2aUNIn0FFqHw6cG+5sELUrsM6/CU58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyuRU+nb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4761C3277B;
-	Thu, 18 Apr 2024 03:03:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713409406;
-	bh=kfEJQjTwgGJh4Zkx43Z0VD1r+pL2rJMimsZzyjREVEM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=DyuRU+nbBlfEefDgkjYMaeHuZxrD+lMlRPMalkQi5IC69YYTWZ6zEdir/RupkAap0
-	 17RzMJVBVaskBzoD8lhK/LtZy2kUP7k21+CDiY0gBXnPmT64owTkQbxHdf0JyAPAYx
-	 tx0a4zLTnGo0CFjFFObQkeT4Qn82jY+d6vAZT/fd9qDpC/vddsmWPQ9f5r1pkH+Cb2
-	 yh2V+NoEvWckhqYS09yUlUYUkVb0oMebHG0BQarTzSCq4o2/7SwOGQyDEXewhte9Sg
-	 Lhmm69YwKDOmE0MM0CShULZ5v9DJpyzWisMvETTr/zB7h29YiU62z1Gam5322XaIMS
-	 pcQhx3sXD225A==
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a557044f2ddso14279466b.2;
-        Wed, 17 Apr 2024 20:03:26 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVYKBvBKXRyEWqu+7BMTN77g23vYSb9E9bArH7hfvTIghiag/MV+qvk4XmR5INFtomffqPPFlh+s8vQWKAi4RnQo85AkDORjSw451cYRAndTDWtxewb3sSYp29xO9zLAfnOrmE8IJ2ABj7V18PlQRY8973N2Y2YKNz8hiBgxA==
-X-Gm-Message-State: AOJu0YwTmdPOq6cIBzMY6EttEpJ6P48l+q/jzt9p7qRSflkzKL6A2qnN
-	gQZx6cmmVQKpw+SE3FrN3Ru5bXY0cEu9Q4J08AmXVKoTNaxtZD8726TNrmwXp5NKClwqWG+BxVX
-	aFcE24gn1dYoTXmH3RufPXhh1N0M=
-X-Google-Smtp-Source: AGHT+IEGnzxcLzKogVMafWt/io2wledXtCG2nYVIAR7Lu4aQp3Gm16la5nxK3JKrgyWlsMhlzCjZG627hEMlqWAR0dk=
-X-Received: by 2002:a17:906:f8da:b0:a55:596b:c9ca with SMTP id
- lh26-20020a170906f8da00b00a55596bc9camr830982ejb.39.1713409405224; Wed, 17
- Apr 2024 20:03:25 -0700 (PDT)
+	s=arc-20240116; t=1713409639; c=relaxed/simple;
+	bh=eLGYf9+4xKjaA3w9rXH6UWaMDq+2OZIUXroleEk31Ko=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=LCtd/nRvLd/FX5ftip1GBooOVeDI4RDI+FlnBNnusFl2mek5pHv/0y2GW7/Rya1g04jgi6NjPFsMXV2yETfqVEwJNxXwrBKgCKqNDo8bOLpnZAPW+wybyTz1xUSZAIHKs+pxQABCcoEADMq9goJX3X+KYmhC+d9WSAfZ5CWffBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=180.101.52.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
+	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 171CA7F0005E;
+	Thu, 18 Apr 2024 11:07:06 +0800 (CST)
+From: Li RongQing <lirongqing@baidu.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	kvm@vger.kernel.org
+Cc: Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH] KVM: SVM: Consider NUMA affinity when allocating per-CPU save_area
+Date: Thu, 18 Apr 2024 11:07:03 +0800
+Message-Id: <20240418030703.38628-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.9.4
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240416144926.599101-1-david@redhat.com> <CANiq72kACt+FfeYXJxfQpmGH=uPqkDA0oprfnebw52VSKyn7kQ@mail.gmail.com>
- <CAAhV-H5mt0GaaZ3s44CYb4aKqYeDYm+Q16hY__FdQ6xYJh+bgg@mail.gmail.com> <20240417135834.ddaa9c038a8a8af2bd9e39aa@linux-foundation.org>
-In-Reply-To: <20240417135834.ddaa9c038a8a8af2bd9e39aa@linux-foundation.org>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Thu, 18 Apr 2024 11:03:18 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4O6_9Ukgz-GrPcWTq3cAN2c1OkXQWRbUgMR2ZwUuQQHA@mail.gmail.com>
-Message-ID: <CAAhV-H4O6_9Ukgz-GrPcWTq3cAN2c1OkXQWRbUgMR2ZwUuQQHA@mail.gmail.com>
-Subject: Re: [PATCH v1] LoongArch/tlb: fix "error: parameter 'ptep' set but
- not used" due to __tlb_remove_tlb_entry()
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, David Hildenbrand <david@redhat.com>, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arch@vger.kernel.org, 
-	loongarch@lists.linux.dev, llvm@lists.linux.dev, 
-	Arnd Bergmann <arnd@arndb.de>, WANG Xuerui <kernel@xen0n.name>, Nathan Chancellor <nathan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi, Andrew,
+save_area of per-CPU svm_data are dominantly accessed from their
+own local CPUs, so allocate them node-local for performance reason
 
-On Thu, Apr 18, 2024 at 4:58=E2=80=AFAM Andrew Morton <akpm@linux-foundatio=
-n.org> wrote:
->
-> On Wed, 17 Apr 2024 11:18:27 +0800 Huacai Chen <chenhuacai@kernel.org> wr=
-ote:
->
-> > On Wed, Apr 17, 2024 at 3:25=E2=80=AFAM Miguel Ojeda
-> > <miguel.ojeda.sandonis@gmail.com> wrote:
-> > >
-> > > On Tue, Apr 16, 2024 at 4:49=E2=80=AFPM David Hildenbrand <david@redh=
-at.com> wrote:
-> > > >
-> > > > With LLVM=3D1 and W=3D1 we get:
-> > >
-> > > Hmm... I didn't need W=3D1 to trigger it (LLVM 18.1.2).
-> > >
-> > > > Reported-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-> > >
-> > > Thanks, looks good to me -- built-tested:
-> > >
-> > > Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
-> > > Tested-by: Miguel Ojeda <ojeda@kernel.org>
-> > >
-> >
-> > Queued for loongarch-fixes, thanks.
-> >
->
-> (top-posting repaired so I can sensibly reply to this.  Please avoid
-> top-posting!)
-Sorry, I only top-posting with "Queued ...", "Applied ..." because I
-saw others do like this. If this is also unacceptable, I will not do
-it again.
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+---
+ arch/x86/kvm/svm/sev.c | 6 +++---
+ arch/x86/kvm/svm/svm.c | 2 +-
+ arch/x86/kvm/svm/svm.h | 6 +++++-
+ 3 files changed, 9 insertions(+), 5 deletions(-)
 
->
-> I'd rather carry this in mm.git with your ack please.  Otherwise mm.git
-> won't compile without it and if I retain this patch we'll get
-> duplicate-patch emails from Stephen and I won't be able to merge
-> mm.git's mm-nonmm-stable tree into Linus until loongarch-fixes has
-> merged.
-loongarch-next always merges loongarch-fixes, so when I apply a patch
-it will be in linux-next. Now this patch I have already applied to
-loongarch-fixes and loongarch-next. In future, I will give an Acked-by
-for you if needed.
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 61a7531..cce8ec7 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3179,13 +3179,13 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
+ }
+ 
+-struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
++struct page *snp_safe_alloc_page_node(struct kvm_vcpu *vcpu, int node)
+ {
+ 	unsigned long pfn;
+ 	struct page *p;
+ 
+ 	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
+-		return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
++		return alloc_pages_node(node, GFP_KERNEL_ACCOUNT | __GFP_ZERO, 0);
+ 
+ 	/*
+ 	 * Allocate an SNP-safe page to workaround the SNP erratum where
+@@ -3196,7 +3196,7 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
+ 	 * Allocate one extra page, choose a page which is not
+ 	 * 2MB-aligned, and free the other.
+ 	 */
+-	p = alloc_pages(GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
++	p = alloc_pages_node(node, GFP_KERNEL_ACCOUNT | __GFP_ZERO, 1);
+ 	if (!p)
+ 		return NULL;
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d1a9f995..69fc809 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -703,7 +703,7 @@ static int svm_cpu_init(int cpu)
+ 	int ret = -ENOMEM;
+ 
+ 	memset(sd, 0, sizeof(struct svm_cpu_data));
+-	sd->save_area = snp_safe_alloc_page(NULL);
++	sd->save_area = snp_safe_alloc_page_node(NULL, cpu_to_node(cpu));
+ 	if (!sd->save_area)
+ 		return ret;
+ 
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 7f1fbd8..3bbf638 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -694,8 +694,12 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm);
+ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa);
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm);
+-struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu);
++struct page *snp_safe_alloc_page_node(struct kvm_vcpu *vcpu, int node);
+ 
++static inline struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
++{
++	return snp_safe_alloc_page_node(vcpu, NUMA_NO_NODE);
++}
+ /* vmenter.S */
+ 
+ void __svm_sev_es_vcpu_run(struct vcpu_svm *svm, bool spec_ctrl_intercepted);
+-- 
+2.9.4
 
-Huacai
-
->
->
 
