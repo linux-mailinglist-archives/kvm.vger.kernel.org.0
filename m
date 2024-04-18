@@ -1,157 +1,185 @@
-Return-Path: <kvm+bounces-15176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8299C8AA4E3
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 23:54:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B4188AA58A
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 00:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C40828224E
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 21:54:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8911AB22B1E
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 22:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC2CD199E97;
-	Thu, 18 Apr 2024 21:54:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE85E4AED6;
+	Thu, 18 Apr 2024 22:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X9CCQAGP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WD/or5iL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA163178CE4
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 21:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592CF4A20
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 22:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713477279; cv=none; b=ZvQCNQCwEfFBm7Up0tMZEhv3MuYtlNvehK71fklcc/Ej80PV32YotLI7KhuZD8VRZZViACvr4Tdx5rklFaIfvaILF3Rc223dA1u0RF5dQtKwJfc0xLvWNVcKMtwJoFo0M+1OSZB2H460+Rxn+YnhtuBFiN+ZX+avbMUgQqyY1ss=
+	t=1713480882; cv=none; b=Hzw+1zYtb49oZ/Evnh2dnNA7sia2rlu0HyvY686hV8DeB90kT3+aTIUbVLr21hbpgEExHSZWTV1znOpulSRyS7O866cXrkLqWcFOEDFVjolRBi3MkDbfs4LHJlhJ6vqZRcGBWvVsXauV22Hi87Ss/c7HFg4YeJTVwL001OH5Kpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713477279; c=relaxed/simple;
-	bh=/fIZnrTgxkprElJlF6zWXgMXsg0CVEGbxuta0DCFlM4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KIBVZJWcDlfqXfRpLC9VY0/EsKcHOoY5rDrDus2Z3JwrVoaaFfMIYQeXkmn4zU+KBQklPtv+rjWdojhQEL4qseJx3cVuNAuZFMtPGk28Z1myiIaY0m2ELuq7WezIJ/g9msLeUu98QsQEapdW+EIztozEdKrmrlNKN06w60/oSfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X9CCQAGP; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ed627829e6so1529792b3a.1
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 14:54:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713477277; x=1714082077; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UzoUB/DlZEEpnQQocpp8LNj0cC4Hbh3hYFeNjb1gymQ=;
-        b=X9CCQAGPZ99SN2MkP9S6gDKVi6ocby6DNLHtZcj6MwvEp1nmeacQZb++EMmDCHE9+W
-         aOvPUB4UsnBY0lgm7Zr7IlzW1DKehF5DXMEEMvXGFzYiquQWqHxaQen37pQB8PqD4T7N
-         7PaE8vS0VkI31dEtGCbF3lUZeUvQ8kQ2r3ZOmmYyuEJXqI+04C5SRJiVk8fF+HTyFeDm
-         h/kK/06ygZ+cPhZm5RBpMPsMZWf50zSVeEVOv9qlX7rD3Pj/gIyAGjjNDHxyQ8mNy+qV
-         KAHXfbwEsbEBJJI8GKuoDyNPL2wJmeePkJKyP5NELwmOIWWbtjKgynB8UyjEgHdSuJqN
-         /xNA==
+	s=arc-20240116; t=1713480882; c=relaxed/simple;
+	bh=YhdtaVfh4088buH+XZg/IkImHaxqcTSecceCrXaDNTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j/H+Yu75UxihZRzaVYfpPO3kOGFTnUAdfcGupEnErem8Q8UWOy6bplAAEPGaVQxPqILly79071pcUPaTwQDsj2GXfKWOvhaAXFeFC2JryrlbuzdmBciG3LatCklSwdGNsN5WX+gCNJvfBrSmkV1Y18s7reXzMxdamwlfl9l4Aqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WD/or5iL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713480879;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Qa3hR1GgJrmWTXgAvlGxLrVho0/A5qeW+iYF0awOyc=;
+	b=WD/or5iLokdv12x7J6kufpcpOgNr6YTZ2zDrCIa2R+8h5YOOsb9EelWHmxY4ZoXPKNw4p3
+	H9ixZTGXGTiXg442oLNKNOO0bI2f9MILVRlRjLDlWxaYEPXYpX0v05Z3G18yK9gPAeWqaQ
+	kPv0O+/uJVX1XZOPey5s3hjGh9WmTrg=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-339-y9ahBIBRMWGVGNvX2V5swg-1; Thu, 18 Apr 2024 18:54:38 -0400
+X-MC-Unique: y9ahBIBRMWGVGNvX2V5swg-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36b36e64789so23586735ab.0
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 15:54:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713477277; x=1714082077;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UzoUB/DlZEEpnQQocpp8LNj0cC4Hbh3hYFeNjb1gymQ=;
-        b=SoXbtGADzdueVbWyKUL7W1DE5dBosXzHxprngSpOUd3E+77Rn9MYZntKsUDdG8e6Ox
-         fBt9SjJh9uBJkcaK4XnR3vidkvY5UFchLShyU5EPHdoBKLDoZSM5crnjxRj9K3XXxvyg
-         eVOF1mz1tv5JDQmNu1j0vAjyaLZeZavMNfB5zjMOIXsQX4dil5i1wdRVBNBUKzzj1IxM
-         wAit5TeRfLZa4Do9PVBbwf+L476XSdu/+bNB6Rr8yPkfvlzAIuGihrfpjXhe9emMLZK6
-         nJVyKLJsRNSdflMPpFt0hKApwK/rT7Y2hgnHOZnn+LS2ffrOga9oBaQMiwEXNjLgCYN7
-         8T0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWYhLDEOpE+0DMS62FgK0wQmbZQ1EU6RfAgmnxrTOwl3HD9yIzp8xbueC1jV2oqHX1hA9p4iHp64sQHpz/GIFt6JSe2
-X-Gm-Message-State: AOJu0YzdQLvMIn/FANeaCjewDvKhwmiSHdnbzNj8vxVz4Rr3vo3MOWQU
-	rqOdrv8fASSqlwtnyHjdIKYk8mKxKd9wncvGZnMozv21HhVXzh5aUND5MY3Xaw==
-X-Google-Smtp-Source: AGHT+IE3z+8bNqqr4xeyAId229RXIQ3OirfWY3drhqnoI012Iq7hg1mMY9eY9ZzsD1VRqnMYJE/4/g==
-X-Received: by 2002:a05:6a00:2e8f:b0:6ea:86f2:24fb with SMTP id fd15-20020a056a002e8f00b006ea86f224fbmr541761pfb.25.1713477276564;
-        Thu, 18 Apr 2024 14:54:36 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id z8-20020a056a00240800b006ecf6417a9bsm1970815pfh.29.2024.04.18.14.54.35
+        d=1e100.net; s=20230601; t=1713480877; x=1714085677;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0Qa3hR1GgJrmWTXgAvlGxLrVho0/A5qeW+iYF0awOyc=;
+        b=mxCr0nlbFi3RMLDq4yO3qJmYCxtmihlMzmDp0R3yUs5e0BqKvwsFbQwYaz5trRlten
+         BG9KH1PLxCVwT28mo80OIwF24mD8TwxyOjLTrqkrULkh4oG7tjP85IJxvU4k9fXaZU7K
+         757igmtSr9v9egSO5zH9LHWrgDR+MVyUJxnq0cnKNuQKEJ3RfibMFBM2SI9vEovmalN4
+         MVpIA6UJRe4+Mcp3bbhrkfHhL1LAkRXocUSmq7x1NzmsGwIxc08jXPZJiy9fO+3XM+xY
+         hao/ewL37wHnBPfrf70+eiGi1YC+1nXvMWIoHZF6Hhi4hcT2dHvyzLG5Xs/BPqi/wGXm
+         e8iw==
+X-Forwarded-Encrypted: i=1; AJvYcCXhfzEYxHyXCTXHO3s/TSXQaVmJZoKU5Xjc+Sf5PCUVuDJ9+IZD4JxU/pgNMoNK740zpw01khgASoO6s1cbFkuP+P4B
+X-Gm-Message-State: AOJu0YyKLXbzqiByDOGS876h5WY6D9U4IqaX3KaTeMf7h/JNUv/KJfDe
+	WfF3ZxCYSj+/J5RQBzGta37gwizIm0RBXldYrkZ++8nH0K/jf4nMnvDiMhv3dzamynq0VGqxBmc
+	t0zOTzpV1McZ4JbDCKAYHD7hfAySVNv/gs3PQo9EOjQOsjgkDCg==
+X-Received: by 2002:a05:6e02:1688:b0:36b:36b:1115 with SMTP id f8-20020a056e02168800b0036b036b1115mr5408052ila.1.1713480877276;
+        Thu, 18 Apr 2024 15:54:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IElkIPKIuNl9ph1Phq9PzvzzBElJf7MnvsKrZ/DLV6aq5UhFYH+VCNTGKZAYpXsg0QJpGLyAg==
+X-Received: by 2002:a05:6e02:1688:b0:36b:36b:1115 with SMTP id f8-20020a056e02168800b0036b036b1115mr5408028ila.1.1713480876877;
+        Thu, 18 Apr 2024 15:54:36 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id i3-20020a05663813c300b00482f19f6d4csm650381jaj.110.2024.04.18.15.54.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 14:54:35 -0700 (PDT)
-Date: Thu, 18 Apr 2024 21:54:32 +0000
-From: Mingwei Zhang <mizhang@google.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
-	peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
-	dapeng1.mi@linux.intel.com, jmattson@google.com,
-	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com,
-	eranian@google.com, irogers@google.com, samantha.alt@intel.com,
-	like.xu.linux@gmail.com, chao.gao@intel.com
-Subject: Re: [RFC PATCH 40/41] KVM: x86/pmu: Separate passthrough PMU logic
- in set/get_msr() from non-passthrough vPMU
-Message-ID: <ZiGWmCgu8fGZHULu@google.com>
-References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <20240126085444.324918-41-xiong.y.zhang@linux.intel.com>
- <ZhhvyhdvF-1LZNlu@google.com>
+        Thu, 18 Apr 2024 15:54:36 -0700 (PDT)
+Date: Thu, 18 Apr 2024 16:54:34 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Xin Zeng <xin.zeng@intel.com>
+Cc: herbert@gondor.apana.org.au, jgg@nvidia.com, yishaih@nvidia.com,
+ shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+ linux-crypto@vger.kernel.org, kvm@vger.kernel.org, qat-linux@intel.com,
+ Yahui Cao <yahui.cao@intel.com>
+Subject: Re: [PATCH v6 1/1] vfio/qat: Add vfio_pci driver for Intel QAT
+ SR-IOV VF devices
+Message-ID: <20240418165434.1da52cf0.alex.williamson@redhat.com>
+In-Reply-To: <20240417143141.1909824-2-xin.zeng@intel.com>
+References: <20240417143141.1909824-1-xin.zeng@intel.com>
+	<20240417143141.1909824-2-xin.zeng@intel.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhhvyhdvF-1LZNlu@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2024, Sean Christopherson wrote:
-> On Fri, Jan 26, 2024, Xiong Zhang wrote:
-> > From: Mingwei Zhang <mizhang@google.com>
-> > 
-> > Separate passthrough PMU logic from non-passthrough vPMU code. There are
-> > two places in passthrough vPMU when set/get_msr() may call into the
-> > existing non-passthrough vPMU code: 1) set/get counters; 2) set global_ctrl
-> > MSR.
-> > 
-> > In the former case, non-passthrough vPMU will call into
-> > pmc_{read,write}_counter() which wires to the perf API. Update these
-> > functions to avoid the perf API invocation.
-> > 
-> > The 2nd case is where global_ctrl MSR writes invokes reprogram_counters()
-> > which will invokes the non-passthrough PMU logic. So use pmu->passthrough
-> > flag to wrap out the call.
-> > 
-> > Signed-off-by: Mingwei Zhang <mizhang@google.com>
-> > ---
-> >  arch/x86/kvm/pmu.c |  4 +++-
-> >  arch/x86/kvm/pmu.h | 10 +++++++++-
-> >  2 files changed, 12 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> > index 9e62e96fe48a..de653a67ba93 100644
-> > --- a/arch/x86/kvm/pmu.c
-> > +++ b/arch/x86/kvm/pmu.c
-> > @@ -652,7 +652,9 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> >  		if (pmu->global_ctrl != data) {
-> >  			diff = pmu->global_ctrl ^ data;
-> >  			pmu->global_ctrl = data;
-> > -			reprogram_counters(pmu, diff);
-> > +			/* Passthrough vPMU never reprogram counters. */
-> > +			if (!pmu->passthrough)
-> 
-> This should probably be handled in reprogram_counters(), otherwise we'll be
-> playing whack-a-mole, e.g. this misses MSR_IA32_PEBS_ENABLE, which benign, but
-> only because PEBS isn't yet supported.
-> 
-> > +				reprogram_counters(pmu, diff);
-> >  		}
-> >  		break;
-> >  	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
-> > diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> > index 0fc37a06fe48..ab8d4a8e58a8 100644
-> > --- a/arch/x86/kvm/pmu.h
-> > +++ b/arch/x86/kvm/pmu.h
-> > @@ -70,6 +70,9 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
-> >  	u64 counter, enabled, running;
-> >  
-> >  	counter = pmc->counter;
-> > +	if (pmc_to_pmu(pmc)->passthrough)
-> > +		return counter & pmc_bitmask(pmc);
-> 
-> Won't perf_event always be NULL for mediated counters?  I.e. this can be dropped,
-> I think.
+On Wed, 17 Apr 2024 22:31:41 +0800
+Xin Zeng <xin.zeng@intel.com> wrote:
 
-yeah. I double checked and seems when perf_event == NULL, the logic is
-correct. If so, we can drop that.
+> Add vfio pci variant driver for Intel QAT SR-IOV VF devices. This driver
+> registers to the vfio subsystem through the interfaces exposed by the
+> susbsystem. It follows the live migration protocol v2 defined in
+> uapi/linux/vfio.h and interacts with Intel QAT PF driver through a set
+> of interfaces defined in qat/qat_mig_dev.h to support live migration of
+> Intel QAT VF devices.
 
-Thanks.
--Mingwei
+=46rom here down could actually just be a comment towards the top of the
+driver.
+
+> The migration data of each Intel QAT GEN4 VF device is encapsulated into
+> a 4096 bytes block. The data consists of two parts.
+>=20
+> The first is a pre-configured set of attributes of the VF being migrated,
+> which are only set when it is created. This can be migrated during pre-co=
+py
+> stage and used for a device compatibility check.
+>=20
+> The second is the VF state. This includes the required MMIO regions and
+> the shadow states maintained by the QAT PF driver. This part can only be
+> saved when the VF is fully quiesced and be migrated during stop-copy stag=
+e.
+>=20
+> Both these 2 parts of data are saved in hierarchical structures including
+> a preamble section and several raw state sections.
+>=20
+> When the pre-configured part of the migration data is fully retrieved from
+> user space, the preamble section are used to validate the correctness of
+> the data blocks and check the version compatibility. The raw state
+> sections are then used to do a device compatibility check.
+>=20
+> When the device transits from RESUMING state, the VF states are extracted
+> from the raw state sections of the VF state part of the migration data and
+> then loaded into the device.
+>=20
+> This version only covers migration for Intel QAT GEN4 VF devices.
+>=20
+> Co-developed-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
+> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
+> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+> ---
+>  MAINTAINERS                   |   8 +
+>  drivers/vfio/pci/Kconfig      |   2 +
+>  drivers/vfio/pci/Makefile     |   2 +
+>  drivers/vfio/pci/qat/Kconfig  |  12 +
+>  drivers/vfio/pci/qat/Makefile |   3 +
+>  drivers/vfio/pci/qat/main.c   | 679 ++++++++++++++++++++++++++++++++++
+>  6 files changed, 706 insertions(+)
+>  create mode 100644 drivers/vfio/pci/qat/Kconfig
+>  create mode 100644 drivers/vfio/pci/qat/Makefile
+>  create mode 100644 drivers/vfio/pci/qat/main.c
+...
+> +static struct file *qat_vf_pci_step_device_state(struct qat_vf_core_devi=
+ce *qat_vdev, u32 new)
+> +{
+> +	u32 cur =3D qat_vdev->mig_state;
+> +	int ret;
+> +
+> +	/*
+> +	 * As the device is not capable of just stopping P2P DMAs, suspend the
+> +	 * device completely once any of the P2P states are reached.
+> +	 * On the opposite direction, resume the device after transiting from
+> +	 * the P2P state.
+> +	 */
+> +	if ((cur =3D=3D VFIO_DEVICE_STATE_RUNNING && new =3D=3D VFIO_DEVICE_STA=
+TE_RUNNING_P2P) ||
+> +	    (cur =3D=3D VFIO_DEVICE_STATE_PRE_COPY && new =3D=3D VFIO_DEVICE_ST=
+ATE_PRE_COPY_P2P)) {
+> +		ret =3D qat_vfmig_suspend(qat_vdev->mdev);
+> +		if (ret)
+> +			return ERR_PTR(ret);
+> +		return NULL;
+> +	}
+
+This doesn't appear to be a valid way to support P2P, the P2P states
+are defined as running states.  The guest driver may legitimately
+access and modify the device state during P2P states.  Should this
+device be advertising support for P2P?  Thanks,
+
+Alex
+
 
