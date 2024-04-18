@@ -1,127 +1,127 @@
-Return-Path: <kvm+bounces-15048-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 148D08A911F
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 04:19:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF23A8A9166
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 05:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 943BC281DCC
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 02:19:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665991F21BAB
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 03:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48B0C4F218;
-	Thu, 18 Apr 2024 02:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078374F8A0;
+	Thu, 18 Apr 2024 03:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ORlCIRlN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyuRU+nb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EB56FB0;
-	Thu, 18 Apr 2024 02:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265C16138;
+	Thu, 18 Apr 2024 03:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713406719; cv=none; b=tKmGehBwCcAZXbojWuTYa5Azl2bj/fch5ryBGiIncC8KwclEnQPdzkYAtNtUdJkHWuQ3wOBMqiA7U2/O+Vska8K9lA3E4+KXFbmnpjCcSjfPTaAupL+oh1Jfk4aLjtQIM1XwL617f9SExnWQsMgC5lxHKy2fXKXU3Zy/ely/WRc=
+	t=1713409407; cv=none; b=dLQaXfdzMlZDGhEWrQIgNOuAJPzIMKlJmzir68nb/BC0QhcTaHUZcSeQrVfhOt9iMpSetsLpfFh9dLZtXngpJQOFeLvTJLkVmHQIFJQO230Xoe0GmUDXtzKHmKf56NuQNTJ2ylSYGjZaZoQhsuf8nP8+wdGWCii2NtE/L5W8Wyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713406719; c=relaxed/simple;
-	bh=oQpiWnJBZrZr5K7EFvEe+HixtI3es0yTeL+0nXlBB3k=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aCc7xb8F/xsCI67f7KrK01QU64R+gI7x1NlFCeen9x/t2pOhqCkIy1Er38Eon77Cj8G6nS7Lt7nrIkmmNHq6xKP3fCWsKgcTHVMQrDTuVO/zqqGL1kMHD7dyQ7oTKn/Rg8wfnlXJ2l82ZsC6ibDH6cmYCONvTEUvUq7v3XcXQfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ORlCIRlN; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43HM5CxA012527;
-	Thu, 18 Apr 2024 02:18:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2023-11-20;
- bh=wiNpZO58EjLUyweT0dnyy20j0eWeP31mSBEQlOyqWFY=;
- b=ORlCIRlNB5QimE+bb091LVCN+/R6COLt6FYjpSCKmmCxbXcoYvkGfo+4JZVknrOO+8VP
- oDYywVE+bLZaZP/gX56ldCmc214Th9TpnFXg2m9qnwVCRkvzH9s+ocXkcziHgTEjgp9f
- 0bVr0kobrc5AR6AQPYbOyMuplWGU5MUHUeUntzhVLVsg1KJIBjzspDz0uvmIAhsPMExZ
- YGvppuWAyVHYhC44QZ3PIAazA5FDdeLbwLObCCglhCs96Rt0dHQTSBbYpE5Vdtlqpvhq
- KYx+Hx1RKNNvu4sjA8zp/pxsfHdDTkNqEefqvBB7D8jOPnVmLOAR/m0Z55rgvh8wgRKd dA== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xfgn2s9gj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 18 Apr 2024 02:18:32 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43I1jG04029181;
-	Thu, 18 Apr 2024 02:18:32 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xfgg9qa2e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 18 Apr 2024 02:18:32 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43I2ITLq012052;
-	Thu, 18 Apr 2024 02:18:31 GMT
-Received: from alaljime-dev-e4flex-vm.osdevelopmeniad.oraclevcn.com (alaljime-dev-e4flex-vm.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.106])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3xfgg9q9y8-3;
-	Thu, 18 Apr 2024 02:18:31 +0000
-From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-To: kvm@vger.kernel.org, seanjc@google.com
-Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org,
-        joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
-        suravee.suthikulpanit@amd.com, mlevitsk@redhat.com,
-        alejandro.j.jimenez@oracle.com
-Subject: [PATCH v2 2/2] KVM: x86: Remove VT-d mention in posted interrupt tracepoint
-Date: Thu, 18 Apr 2024 02:18:23 +0000
-Message-Id: <20240418021823.1275276-3-alejandro.j.jimenez@oracle.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240418021823.1275276-1-alejandro.j.jimenez@oracle.com>
-References: <20240418021823.1275276-1-alejandro.j.jimenez@oracle.com>
+	s=arc-20240116; t=1713409407; c=relaxed/simple;
+	bh=kfEJQjTwgGJh4Zkx43Z0VD1r+pL2rJMimsZzyjREVEM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=idbxgrIsfyS/1CyxhANwP59PhrAA7nkhxu0xyZQ2ermbCrKljh5KOAhva0SIVVADTWhU5jurGaLCbweT0OL7tZl4p1dNZjqOYxfQQZibJneayX6xGCxa5qsE2JGRF9JfAsPXF0ubJ2VOJ2aUNIn0FFqHw6cG+5sELUrsM6/CU58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyuRU+nb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4761C3277B;
+	Thu, 18 Apr 2024 03:03:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713409406;
+	bh=kfEJQjTwgGJh4Zkx43Z0VD1r+pL2rJMimsZzyjREVEM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=DyuRU+nbBlfEefDgkjYMaeHuZxrD+lMlRPMalkQi5IC69YYTWZ6zEdir/RupkAap0
+	 17RzMJVBVaskBzoD8lhK/LtZy2kUP7k21+CDiY0gBXnPmT64owTkQbxHdf0JyAPAYx
+	 tx0a4zLTnGo0CFjFFObQkeT4Qn82jY+d6vAZT/fd9qDpC/vddsmWPQ9f5r1pkH+Cb2
+	 yh2V+NoEvWckhqYS09yUlUYUkVb0oMebHG0BQarTzSCq4o2/7SwOGQyDEXewhte9Sg
+	 Lhmm69YwKDOmE0MM0CShULZ5v9DJpyzWisMvETTr/zB7h29YiU62z1Gam5322XaIMS
+	 pcQhx3sXD225A==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a557044f2ddso14279466b.2;
+        Wed, 17 Apr 2024 20:03:26 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVYKBvBKXRyEWqu+7BMTN77g23vYSb9E9bArH7hfvTIghiag/MV+qvk4XmR5INFtomffqPPFlh+s8vQWKAi4RnQo85AkDORjSw451cYRAndTDWtxewb3sSYp29xO9zLAfnOrmE8IJ2ABj7V18PlQRY8973N2Y2YKNz8hiBgxA==
+X-Gm-Message-State: AOJu0YwTmdPOq6cIBzMY6EttEpJ6P48l+q/jzt9p7qRSflkzKL6A2qnN
+	gQZx6cmmVQKpw+SE3FrN3Ru5bXY0cEu9Q4J08AmXVKoTNaxtZD8726TNrmwXp5NKClwqWG+BxVX
+	aFcE24gn1dYoTXmH3RufPXhh1N0M=
+X-Google-Smtp-Source: AGHT+IEGnzxcLzKogVMafWt/io2wledXtCG2nYVIAR7Lu4aQp3Gm16la5nxK3JKrgyWlsMhlzCjZG627hEMlqWAR0dk=
+X-Received: by 2002:a17:906:f8da:b0:a55:596b:c9ca with SMTP id
+ lh26-20020a170906f8da00b00a55596bc9camr830982ejb.39.1713409405224; Wed, 17
+ Apr 2024 20:03:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-18_01,2024-04-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0
- mlxlogscore=999 phishscore=0 mlxscore=0 malwarescore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404180015
-X-Proofpoint-ORIG-GUID: HqoFHBG1TtnDZsAVsCNUDbLCwOvve6Tq
-X-Proofpoint-GUID: HqoFHBG1TtnDZsAVsCNUDbLCwOvve6Tq
+References: <20240416144926.599101-1-david@redhat.com> <CANiq72kACt+FfeYXJxfQpmGH=uPqkDA0oprfnebw52VSKyn7kQ@mail.gmail.com>
+ <CAAhV-H5mt0GaaZ3s44CYb4aKqYeDYm+Q16hY__FdQ6xYJh+bgg@mail.gmail.com> <20240417135834.ddaa9c038a8a8af2bd9e39aa@linux-foundation.org>
+In-Reply-To: <20240417135834.ddaa9c038a8a8af2bd9e39aa@linux-foundation.org>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Thu, 18 Apr 2024 11:03:18 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H4O6_9Ukgz-GrPcWTq3cAN2c1OkXQWRbUgMR2ZwUuQQHA@mail.gmail.com>
+Message-ID: <CAAhV-H4O6_9Ukgz-GrPcWTq3cAN2c1OkXQWRbUgMR2ZwUuQQHA@mail.gmail.com>
+Subject: Re: [PATCH v1] LoongArch/tlb: fix "error: parameter 'ptep' set but
+ not used" due to __tlb_remove_tlb_entry()
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, David Hildenbrand <david@redhat.com>, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-arch@vger.kernel.org, 
+	loongarch@lists.linux.dev, llvm@lists.linux.dev, 
+	Arnd Bergmann <arnd@arndb.de>, WANG Xuerui <kernel@xen0n.name>, Nathan Chancellor <nathan@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The kvm_pi_irte_update tracepoint is called from both SVM and VMX vendor
-code, and while the "posted interrupt" naming is also adopted by SVM in
-several places, VT-d specifically refers to Intel's "Virtualization
-Technology for Directed I/O".
+Hi, Andrew,
 
-Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
----
- arch/x86/kvm/trace.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Thu, Apr 18, 2024 at 4:58=E2=80=AFAM Andrew Morton <akpm@linux-foundatio=
+n.org> wrote:
+>
+> On Wed, 17 Apr 2024 11:18:27 +0800 Huacai Chen <chenhuacai@kernel.org> wr=
+ote:
+>
+> > On Wed, Apr 17, 2024 at 3:25=E2=80=AFAM Miguel Ojeda
+> > <miguel.ojeda.sandonis@gmail.com> wrote:
+> > >
+> > > On Tue, Apr 16, 2024 at 4:49=E2=80=AFPM David Hildenbrand <david@redh=
+at.com> wrote:
+> > > >
+> > > > With LLVM=3D1 and W=3D1 we get:
+> > >
+> > > Hmm... I didn't need W=3D1 to trigger it (LLVM 18.1.2).
+> > >
+> > > > Reported-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+> > >
+> > > Thanks, looks good to me -- built-tested:
+> > >
+> > > Reviewed-by: Miguel Ojeda <ojeda@kernel.org>
+> > > Tested-by: Miguel Ojeda <ojeda@kernel.org>
+> > >
+> >
+> > Queued for loongarch-fixes, thanks.
+> >
+>
+> (top-posting repaired so I can sensibly reply to this.  Please avoid
+> top-posting!)
+Sorry, I only top-posting with "Queued ...", "Applied ..." because I
+saw others do like this. If this is also unacceptable, I will not do
+it again.
 
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index c6b4b1728006..9d0b02ef307e 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1074,7 +1074,7 @@ TRACE_EVENT(kvm_smm_transition,
- );
- 
- /*
-- * Tracepoint for VT-d posted-interrupts.
-+ * Tracepoint for VT-d posted-interrupts and AMD-Vi Guest Virtual APIC.
-  */
- TRACE_EVENT(kvm_pi_irte_update,
- 	TP_PROTO(unsigned int host_irq, unsigned int vcpu_id,
-@@ -1100,7 +1100,7 @@ TRACE_EVENT(kvm_pi_irte_update,
- 		__entry->set		= set;
- 	),
- 
--	TP_printk("VT-d PI is %s for irq %u, vcpu %u, gsi: 0x%x, "
-+	TP_printk("PI is %s for irq %u, vcpu %u, gsi: 0x%x, "
- 		  "gvec: 0x%x, pi_desc_addr: 0x%llx",
- 		  __entry->set ? "enabled and being updated" : "disabled",
- 		  __entry->host_irq,
--- 
-2.39.3
+>
+> I'd rather carry this in mm.git with your ack please.  Otherwise mm.git
+> won't compile without it and if I retain this patch we'll get
+> duplicate-patch emails from Stephen and I won't be able to merge
+> mm.git's mm-nonmm-stable tree into Linus until loongarch-fixes has
+> merged.
+loongarch-next always merges loongarch-fixes, so when I apply a patch
+it will be in linux-next. Now this patch I have already applied to
+loongarch-fixes and loongarch-next. In future, I will give an Acked-by
+for you if needed.
 
+Huacai
+
+>
+>
 
