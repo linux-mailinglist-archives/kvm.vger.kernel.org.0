@@ -1,390 +1,160 @@
-Return-Path: <kvm+bounces-15088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A09A8A9AFF
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 15:17:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC7B8A9B19
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 15:21:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83F7E1F21E2F
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 13:17:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A8411C21FB1
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 13:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD8615CD50;
-	Thu, 18 Apr 2024 13:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA38A1635D0;
+	Thu, 18 Apr 2024 13:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="TSCNfPRI"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D2DEECF;
-	Thu, 18 Apr 2024 13:17:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2B2161319
+	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 13:20:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713446250; cv=none; b=WoXmJcqE+LVjGR+MDabpwj2OKqptkSUR2Ftm439L/c6iwUeoAtnkVPloTpWpVFhtwYDnNBT7APNb/nQal8FQeyZpn/Ll8AyWmhwK+av30d2lYlAN4KsJxWVwGxvHHM7UFXIeWH2VPoOlmZ6XrUPQIg17/RQPXFdsprq+Y7AsOPU=
+	t=1713446437; cv=none; b=BInVnPaFXFjzVSbQvPsd8pQA70JUoPcfWrMugMyosrXxL6KNMJcCaNLphKciDcUHrzQnvqsJRUfHwvxRpMN9pDqAkY4shfYM9lj4w3evBz5UpEm5p9VER2PHF+JhWQAsr8Po7U1WbIRWLvPdEAIIjBoMqlMFWChog2T9yyoMS1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713446250; c=relaxed/simple;
-	bh=uFBVCzKTwIgEfdvC7/2meAWUHLTgMbNu/QYppjfZugI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YAJl6lxOJF9eh0FCivvtZKueUtxrbPxRI9qmPuWFawCTq3AFBHzwjM0pMIwjM29H/+/B+sP0OVM/CAHoPAt4gVDbapj+8gSXI8vP0cBxYa95xFC9IQQi2QTL0iPwF6tJvqhr7LkCubxuzzp5iv5ub8MNxJS3TWoXmRzfgKOPq2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AB529DA7;
-	Thu, 18 Apr 2024 06:17:55 -0700 (PDT)
-Received: from [10.1.35.34] (e122027.cambridge.arm.com [10.1.35.34])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id EFCFF3F738;
-	Thu, 18 Apr 2024 06:17:23 -0700 (PDT)
-Message-ID: <f5b87486-89b5-4c86-aadb-47204fb39bea@arm.com>
-Date: Thu, 18 Apr 2024 14:17:23 +0100
+	s=arc-20240116; t=1713446437; c=relaxed/simple;
+	bh=cwotXz71csJK5NlYG6cUePZxsMutZ9CiCnXSbJcpnco=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UBp3cCpYY4a1FAz//4vdEcQibJa409uh/veGYjNH578feu8ab22CZniadRJMRZ0jOWBUf0Ce4jyI63Zvh2pUSCf/Dx2NKwXf5CBMKumieze6wVfOpgK8kSX4CuE+oDqLWrlSqVGs/UK8kgRzp9uTpOrSCpxtzpU00ghWmnV6iOQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=TSCNfPRI; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7d63a883dd4so32388839f.0
+        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 06:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1713446433; x=1714051233; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gx9GnWevREtFfaeT4x816rwBBhgS4sWYP/+TT0BrELo=;
+        b=TSCNfPRI1RBVqjumWW+SebIW/fHuwvPmbonl6jPsmmqibhiG+Shsj8O9jPbUptnrEc
+         jj2QOifC1vrvquAmOPI7yIzYoZ3b6DQS6cUWLzHgOhcg8DMd14IgRdpR1Tl123fKkEeg
+         bIoI76VZGQAVEbPgD3GqJbLE9CT24DrapGocyc1+lzAxVzYiGi05kNvs0sy7Ng/S3Jvj
+         3jQoX6qnJHr9SHckphFFLSYaXM0RFdHdmv2oD+y1MwjYFEHy9VzWjfPF9hPk7moAmxeO
+         pGEqoWLyDb0GeRxmTmqegs4Q/Jb1UVbSloOgmHf0NJbFklUEWYKHnEfLn5Hh1bF4+Xis
+         DnJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713446433; x=1714051233;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gx9GnWevREtFfaeT4x816rwBBhgS4sWYP/+TT0BrELo=;
+        b=wIwq1PBmsQNm+EharXbnRIzW3ooql+SWl0YhVqHT1u+9/oXe1xMeNXEk0LYOIGqkZI
+         dKOUSvKVlhzlJDUoCA1dbF+v9Kh36kcptGMK6R0BxWLRiG63Fj3IH2tJw6cN5yD86ne2
+         tJzJPcuMtcEiHKlCyrAO7X3tRRCHwyMoW+s72ujDU3sYzzHv5S+5u4wnip07uiCZNVSf
+         grmx2grN6sGt2FRqBFqiBag3bmPg4yMZhA2dDMvFi69mfgcHbQvjkMeaC6vSUfRA6MIh
+         0hah5BDu+eSgIJIv+kV4FUXJ4fiBt70THg0+wK6gzwnTEjaaRsWHjbP7rsDStrmpvvRA
+         DwyA==
+X-Forwarded-Encrypted: i=1; AJvYcCWkEgpcC6OsPdOkDwi71hWFOzZFQsueHCsgFNAzq4Uss1nPG1W3Ng8a8OKLQ3CX5My21SZnv85681uKIHbDVupzEQh1
+X-Gm-Message-State: AOJu0Yza3TxAfqSQBVOYvCXgRs7WC/b/Aap86sZ2aTR+bYoXcmBmj7ln
+	FXXd9z6bi6C6A7wfPadEa4FUGCUWaxPPjVZpLoPxLaR+4oOVzmHPK64/8rbigFZFGFx2EiXVxpk
+	2hiFOLsT7OQY+EQdN489Oc/uPWkLfzQpG8OLH33WYfy4dI9ef
+X-Google-Smtp-Source: AGHT+IGMAebq+hy93GujthN3vp/oiNgylMXL32FxuMysUl+JA4YBKBsEzN18erjOu1anh/0QSxfZh2bW0X+CZoU6xFA=
+X-Received: by 2002:a05:6e02:1d85:b0:36a:28a8:ca5 with SMTP id
+ h5-20020a056e021d8500b0036a28a80ca5mr3399351ila.7.1713446433235; Thu, 18 Apr
+ 2024 06:20:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 05/43] arm64: RME: Add SMC definitions for calling the
- RMM
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-6-steven.price@arm.com>
- <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <e6ece61d-ceb6-44f3-a17c-c678b4562991@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240418124300.1387978-1-cleger@rivosinc.com> <20240418124300.1387978-7-cleger@rivosinc.com>
+In-Reply-To: <20240418124300.1387978-7-cleger@rivosinc.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Thu, 18 Apr 2024 18:50:21 +0530
+Message-ID: <CAAhSdy33=s_J=0HJ1VfbxPVkBgyTZ1rpM3G15R8rJGbnNA_zeg@mail.gmail.com>
+Subject: Re: [PATCH v2 06/12] RISC-V: KVM: Allow Zca, Zcf, Zcd and Zcb
+ extensions for Guest/VM
+To: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Conor Dooley <conor@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Shuah Khan <shuah@kernel.org>, 
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org, kvm@vger.kernel.org, 
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 16/04/2024 13:38, Suzuki K Poulose wrote:
-> Hi Steven
-> 
-> On 12/04/2024 09:42, Steven Price wrote:
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by SMC calls from the host.
->>
->> The SMC definitions are based on DEN0137[1] version 1.0-eac5
->>
->> [1] https://developer.arm.com/documentation/den0137/1-0eac5/
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/rmi_smc.h | 250 +++++++++++++++++++++++++++++++
->>   1 file changed, 250 insertions(+)
->>   create mode 100644 arch/arm64/include/asm/rmi_smc.h
->>
->> diff --git a/arch/arm64/include/asm/rmi_smc.h
->> b/arch/arm64/include/asm/rmi_smc.h
->> new file mode 100644
->> index 000000000000..c205efdb18d8
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rmi_smc.h
->> @@ -0,0 +1,250 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + *
->> + * The values and structures in this file are from the Realm
->> Management Monitor
->> + * specification (DEN0137) version A-bet0:
->> + * https://developer.arm.com/documentation/den0137/1-0bet0/
-> 
-> This should now point to eac5 instead.
+On Thu, Apr 18, 2024 at 6:14=E2=80=AFPM Cl=C3=A9ment L=C3=A9ger <cleger@riv=
+osinc.com> wrote:
+>
+> Extend the KVM ISA extension ONE_REG interface to allow KVM user space
+> to detect and enable Zca, Zcf, Zcd and Zcb extensions for Guest/VM.
+>
+> Signed-off-by: Cl=C3=A9ment L=C3=A9ger <cleger@rivosinc.com>
 
-Typical - I searched through the commit logs, but forgot I'd put a
-reference in the code too! Thanks for spotting.
+LGTM.
 
->> + */
->> +
->> +#ifndef __ASM_RME_SMC_H
->> +#define __ASM_RME_SMC_H
->> +
->> +#include <linux/arm-smccc.h>
->> +
->> +#define SMC_RxI_CALL(func)                \
->> +    ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,        \
->> +               ARM_SMCCC_SMC_64,        \
->> +               ARM_SMCCC_OWNER_STANDARD,    \
->> +               (func))
->> +
->> +#define SMC_RMI_DATA_CREATE        SMC_RxI_CALL(0x0153)
->> +#define SMC_RMI_DATA_CREATE_UNKNOWN    SMC_RxI_CALL(0x0154)
->> +#define SMC_RMI_DATA_DESTROY        SMC_RxI_CALL(0x0155)
->> +#define SMC_RMI_FEATURES        SMC_RxI_CALL(0x0165)
->> +#define SMC_RMI_GRANULE_DELEGATE    SMC_RxI_CALL(0x0151)
->> +#define SMC_RMI_GRANULE_UNDELEGATE    SMC_RxI_CALL(0x0152)
->> +#define SMC_RMI_PSCI_COMPLETE        SMC_RxI_CALL(0x0164)
->> +#define SMC_RMI_REALM_ACTIVATE        SMC_RxI_CALL(0x0157)
->> +#define SMC_RMI_REALM_CREATE        SMC_RxI_CALL(0x0158)
->> +#define SMC_RMI_REALM_DESTROY        SMC_RxI_CALL(0x0159)
->> +#define SMC_RMI_REC_AUX_COUNT        SMC_RxI_CALL(0x0167)
->> +#define SMC_RMI_REC_CREATE        SMC_RxI_CALL(0x015a)
->> +#define SMC_RMI_REC_DESTROY        SMC_RxI_CALL(0x015b)
->> +#define SMC_RMI_REC_ENTER        SMC_RxI_CALL(0x015c)
->> +#define SMC_RMI_RTT_CREATE        SMC_RxI_CALL(0x015d)
->> +#define SMC_RMI_RTT_DESTROY        SMC_RxI_CALL(0x015e)
->> +#define SMC_RMI_RTT_FOLD        SMC_RxI_CALL(0x0166)
->> +#define SMC_RMI_RTT_INIT_RIPAS        SMC_RxI_CALL(0x0168)
->> +#define SMC_RMI_RTT_MAP_UNPROTECTED    SMC_RxI_CALL(0x015f)
->> +#define SMC_RMI_RTT_READ_ENTRY        SMC_RxI_CALL(0x0161)
->> +#define SMC_RMI_RTT_SET_RIPAS        SMC_RxI_CALL(0x0169)
->> +#define SMC_RMI_RTT_UNMAP_UNPROTECTED    SMC_RxI_CALL(0x0162)
->> +#define SMC_RMI_VERSION            SMC_RxI_CALL(0x0150)
->> +
->> +#define RMI_ABI_MAJOR_VERSION    1
->> +#define RMI_ABI_MINOR_VERSION    0
->> +
->> +#define RMI_UNASSIGNED            0
->> +#define RMI_ASSIGNED            1
->> +#define RMI_TABLE            2
->> +
->> +#define RMI_ABI_VERSION_GET_MAJOR(version) ((version) >> 16)
->> +#define RMI_ABI_VERSION_GET_MINOR(version) ((version) & 0xFFFF)
->> +#define RMI_ABI_VERSION(major, minor)      (((major) << 16) | (minor))
->> +
->> +#define RMI_RETURN_STATUS(ret)        ((ret) & 0xFF)
->> +#define RMI_RETURN_INDEX(ret)        (((ret) >> 8) & 0xFF)
->> +
->> +#define RMI_SUCCESS        0
->> +#define RMI_ERROR_INPUT        1
->> +#define RMI_ERROR_REALM        2
->> +#define RMI_ERROR_REC        3
->> +#define RMI_ERROR_RTT        4
->> +
->> +#define RMI_EMPTY        0
->> +#define RMI_RAM            1
->> +#define RMI_DESTROYED        2
->> +
->> +#define RMI_NO_MEASURE_CONTENT    0
->> +#define RMI_MEASURE_CONTENT    1
->> +
->> +#define RMI_FEATURE_REGISTER_0_S2SZ        GENMASK(7, 0)
->> +#define RMI_FEATURE_REGISTER_0_LPA2        BIT(8)
->> +#define RMI_FEATURE_REGISTER_0_SVE_EN        BIT(9)
->> +#define RMI_FEATURE_REGISTER_0_SVE_VL        GENMASK(13, 10)
->> +#define RMI_FEATURE_REGISTER_0_NUM_BPS        GENMASK(17, 14)
->> +#define RMI_FEATURE_REGISTER_0_NUM_WPS        GENMASK(21, 18)
->> +#define RMI_FEATURE_REGISTER_0_PMU_EN        BIT(22)
->> +#define RMI_FEATURE_REGISTER_0_PMU_NUM_CTRS    GENMASK(27, 23)
->> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_256    BIT(28)
->> +#define RMI_FEATURE_REGISTER_0_HASH_SHA_512    BIT(29)
->> +
->> +#define RMI_REALM_PARAM_FLAG_LPA2        BIT(0)
->> +#define RMI_REALM_PARAM_FLAG_SVE        BIT(1)
->> +#define RMI_REALM_PARAM_FLAG_PMU        BIT(2)
->> +
->> +/*
->> + * Note many of these fields are smaller than u64 but all fields have
->> u64
->> + * alignment, so use u64 to ensure correct alignment.
->> + */
->> +struct realm_params {
->> +    union { /* 0x0 */
->> +        struct {
->> +            u64 flags;
->> +            u64 s2sz;
->> +            u64 sve_vl;
->> +            u64 num_bps;
->> +            u64 num_wps;
->> +            u64 pmu_num_ctrs;
->> +            u64 hash_algo;
->> +        };
->> +        u8 padding_1[0x400];
->> +    };
->> +    union { /* 0x400 */
->> +        u8 rpv[64];
->> +        u8 padding_2[0x400];
->> +    };
->> +    union { /* 0x800 */
->> +        struct {
->> +            u64 vmid;
->> +            u64 rtt_base;
->> +            s64 rtt_level_start;
->> +            u64 rtt_num_start;
->> +        };
->> +        u8 padding_3[0x800];
->> +    };
->> +};
->> +
->> +/*
->> + * The number of GPRs (starting from X0) that are
->> + * configured by the host when a REC is created.
->> + */
->> +#define REC_CREATE_NR_GPRS        8
->> +
->> +#define REC_PARAMS_FLAG_RUNNABLE    BIT_ULL(0)
->> +
->> +#define REC_PARAMS_AUX_GRANULES        16
->> +
->> +struct rec_params {
->> +    union { /* 0x0 */
->> +        u64 flags;
->> +        u8 padding1[0x100];
->> +    };
->> +    union { /* 0x100 */
->> +        u64 mpidr;
->> +        u8 padding2[0x100];
->> +    };
->> +    union { /* 0x200 */
->> +        u64 pc;
->> +        u8 padding3[0x100];
->> +    };
->> +    union { /* 0x300 */
->> +        u64 gprs[REC_CREATE_NR_GPRS];
->> +        u8 padding4[0x500];
->> +    };
->> +    union { /* 0x800 */
->> +        struct {
->> +            u64 num_rec_aux;
->> +            u64 aux[REC_PARAMS_AUX_GRANULES];
->> +        };
->> +        u8 padding5[0x800];
->> +    };
->> +};
->> +
->> +#define RMI_EMULATED_MMIO        BIT(0)
->> +#define RMI_INJECT_SEA            BIT(1)
->> +#define RMI_TRAP_WFI            BIT(2)
->> +#define RMI_TRAP_WFE            BIT(3)
-> 
-> For completeness, we could add :
-> 
-> #define RMI_RIPAS_RESPONSE        BIT(4)
-> 
-> Not sure if we use it later in the series.
+Reviewed-by: Anup Patel <anup@brainfault.org>
+Acked-by: Anup Patel <anup@brainfault.org>
 
-Yes, I'll add for completeness. Currently KVM will never reject a RIPAS
-change request from the guest. I'm not sure in what situation it would
-make sense to do such a thing. The current uABI doesn't allow the VMM to
-have a say in it either as the RIPAS change is completed before the exit
-to the VMM. The expectation is therefore that the VMM would simply
-terminate a Realm guest that attempted a RIPAS change that it disagreed
-with.
+Thanks,
+Anup
 
->> +
->> +#define REC_RUN_GPRS            31
->> +#define REC_GIC_NUM_LRS            16
->> +
->> +struct rec_entry {
-
-While I'm reading this (and the spec) again - I notice that the spec
-says "RecEnter" not 'entry' - I'll rename this to be consistent.
-
->> +    union { /* 0x000 */
->> +        u64 flags;
->> +        u8 padding0[0x200];
->> +    };
->> +    union { /* 0x200 */
->> +        u64 gprs[REC_RUN_GPRS];
->> +        u8 padding2[0x100];
->> +    };
->> +    union { /* 0x300 */
->> +        struct {
->> +            u64 gicv3_hcr;
->> +            u64 gicv3_lrs[REC_GIC_NUM_LRS];
->> +        };
->> +        u8 padding3[0x100];
->> +    };
->> +    u8 padding4[0x400];
->> +};
->> +
->> +struct rec_exit {
->> +    union { /* 0x000 */
->> +        u8 exit_reason;
->> +        u8 padding0[0x100];
->> +    };
->> +    union { /* 0x100 */
->> +        struct {
->> +            u64 esr;
->> +            u64 far;
->> +            u64 hpfar;
->> +        };
->> +        u8 padding1[0x100];
->> +    };
->> +    union { /* 0x200 */
->> +        u64 gprs[REC_RUN_GPRS];
->> +        u8 padding2[0x100];
->> +    };
->> +    union { /* 0x300 */
->> +        struct {
->> +            u64 gicv3_hcr;
->> +            u64 gicv3_lrs[REC_GIC_NUM_LRS];
->> +            u64 gicv3_misr;
->> +            u64 gicv3_vmcr;
->> +        };
->> +        u8 padding3[0x100];
->> +    };
->> +    union { /* 0x400 */
->> +        struct {
->> +            u64 cntp_ctl;
->> +            u64 cntp_cval;
->> +            u64 cntv_ctl;
->> +            u64 cntv_cval;
->> +        };
->> +        u8 padding4[0x100];
->> +    };
->> +    union { /* 0x500 */
->> +        struct {
->> +            u64 ripas_base;
->> +            u64 ripas_top;
->> +            u64 ripas_value;
->> +        };
->> +        u8 padding5[0x100];
->> +    };
->> +    union { /* 0x600 */
->> +        u16 imm;
->> +        u8 padding6[0x100];
->> +    };
->> +    union { /* 0x700 */
->> +        struct {
->> +            u64 pmu_ovf_status;
-> 
-> This is u8 as per section B4.4.10 RmiPmuOverflowStatus type.
-
-Indeed - I'm not sure where I got u64 from - it was probably to provide
-padding in an older version of the spec.
-
->> +        };
->> +        u8 padding7[0x100];
->> +    };
->> +};
->> +
->> +struct rec_run {
->> +    struct rec_entry entry;
->> +    struct rec_exit exit;
->> +};
->> +
->> +#define RMI_EXIT_SYNC            0x00
->> +#define RMI_EXIT_IRQ            0x01
->> +#define RMI_EXIT_FIQ            0x02
->> +#define RMI_EXIT_PSCI            0x03
->> +#define RMI_EXIT_RIPAS_CHANGE        0x04
->> +#define RMI_EXIT_HOST_CALL        0x05
->> +#define RMI_EXIT_SERROR            0x06
-> 
-> Minor nit: Like the other definitions, it may be good to keep the
-> defintions of the "exit_reason" above the field declaration.
-
-Yes, makes sense - I'll move these.
-
-Thanks for the review!
-
-Steve
-
-> 
-> Rest looks fine to me.
-> 
-> Suzuki
->> +
->> +#endif
-> 
-
+> ---
+>  arch/riscv/include/uapi/asm/kvm.h | 4 ++++
+>  arch/riscv/kvm/vcpu_onereg.c      | 8 ++++++++
+>  2 files changed, 12 insertions(+)
+>
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/=
+asm/kvm.h
+> index 35a12aa1953e..57db3fea679f 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -168,6 +168,10 @@ enum KVM_RISCV_ISA_EXT_ID {
+>         KVM_RISCV_ISA_EXT_ZTSO,
+>         KVM_RISCV_ISA_EXT_ZACAS,
+>         KVM_RISCV_ISA_EXT_ZIMOP,
+> +       KVM_RISCV_ISA_EXT_ZCA,
+> +       KVM_RISCV_ISA_EXT_ZCB,
+> +       KVM_RISCV_ISA_EXT_ZCD,
+> +       KVM_RISCV_ISA_EXT_ZCF,
+>         KVM_RISCV_ISA_EXT_MAX,
+>  };
+>
+> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
+> index 12436f6f0d20..a2747a6dbdb6 100644
+> --- a/arch/riscv/kvm/vcpu_onereg.c
+> +++ b/arch/riscv/kvm/vcpu_onereg.c
+> @@ -48,6 +48,10 @@ static const unsigned long kvm_isa_ext_arr[] =3D {
+>         KVM_ISA_EXT_ARR(ZBKC),
+>         KVM_ISA_EXT_ARR(ZBKX),
+>         KVM_ISA_EXT_ARR(ZBS),
+> +       KVM_ISA_EXT_ARR(ZCA),
+> +       KVM_ISA_EXT_ARR(ZCB),
+> +       KVM_ISA_EXT_ARR(ZCD),
+> +       KVM_ISA_EXT_ARR(ZCF),
+>         KVM_ISA_EXT_ARR(ZFA),
+>         KVM_ISA_EXT_ARR(ZFH),
+>         KVM_ISA_EXT_ARR(ZFHMIN),
+> @@ -128,6 +132,10 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsig=
+ned long ext)
+>         case KVM_RISCV_ISA_EXT_ZBKC:
+>         case KVM_RISCV_ISA_EXT_ZBKX:
+>         case KVM_RISCV_ISA_EXT_ZBS:
+> +       case KVM_RISCV_ISA_EXT_ZCA:
+> +       case KVM_RISCV_ISA_EXT_ZCB:
+> +       case KVM_RISCV_ISA_EXT_ZCD:
+> +       case KVM_RISCV_ISA_EXT_ZCF:
+>         case KVM_RISCV_ISA_EXT_ZFA:
+>         case KVM_RISCV_ISA_EXT_ZFH:
+>         case KVM_RISCV_ISA_EXT_ZFHMIN:
+> --
+> 2.43.0
+>
 
