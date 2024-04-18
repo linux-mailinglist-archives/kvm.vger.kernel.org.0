@@ -1,65 +1,40 @@
-Return-Path: <kvm+bounces-15062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15063-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2BD78A9630
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 11:30:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC958A9633
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 11:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EE931F22C22
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 09:30:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB57C1C21DB6
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 09:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0954E15AD9B;
-	Thu, 18 Apr 2024 09:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IOvOXYGu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32B415ADB1;
+	Thu, 18 Apr 2024 09:30:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164AA15AAB3;
-	Thu, 18 Apr 2024 09:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC8B152E12;
+	Thu, 18 Apr 2024 09:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713432610; cv=none; b=lelzGS7unv8MGBNFmCrpv5PwykAmnBP59T3l2mqafE0bE2n+z5AasVglgtepqEQNHb7a+o/PvynB0Qia/L6OC3oQhtMTTHJS/1KfRHcbytzOkdT9rhjR6U8pBJ0G7i3/BgKaw4md8YwvVbIBzi3iR6U6MFuJg75eYxHkSLiYO6Q=
+	t=1713432645; cv=none; b=gS+Ri/iybKCpoZhQggx70+hAPVdbN6wmTjMkzGCbRuy/KorFJM3HiM41bJeWQiNbW7FUP1YnyiD9bkTBeVm4DdwUt2mX7rUh3I+q4YELOIjzhkDTCHZWCNVXYf7h1OwAOKaT3UHZUUNFOQXiLID3TEQNYeQ0Hiz1qZm5PLr+1so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713432610; c=relaxed/simple;
-	bh=KTC/5h+4P88i8jlp71n8fmWzUjluo3avp8IXAeXSmCc=;
+	s=arc-20240116; t=1713432645; c=relaxed/simple;
+	bh=jkUdI1l7jyx9l2Q/C9KSmfjWLcjVVTRQwdO0plAvfWU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Htqj2hXdTJlrAScOEeGxsme+P0A3PaMr3xhZRPZmHyaEDyyGKlCz5k0uwJo1m3B0jOBpPL/OrWTeQHp9AQHUNLKiyjMkZbBPSSQItJYvQOjb+OJ5J2zcSrRJbyg6gcQX58qt59mdaXVRpD6UeUWHVgBmO1+HS2bxh6Lf8LdLgdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IOvOXYGu; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713432608; x=1744968608;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KTC/5h+4P88i8jlp71n8fmWzUjluo3avp8IXAeXSmCc=;
-  b=IOvOXYGuCWtSpJg0FFdiJQhIXbe0YLexH0ur/WHE8fJUQ+ztQorJo2dT
-   Kz5xki4xmWK07HIRy2lFeHfrMKYjwui99VFzgTOFUc7Kt/Qa7d3MYP2O7
-   wCtCm/PJqBPEDg751VAvH7C0HWFu+FuwvamdmFtweQGn60SdHkW5K1243
-   QVJ1aYhWMLaRI7DPga4rk3VU+vMqBrs6PWMMkztbLZOTNaXPbLPxm5gfy
-   ZSKltaf7vNR6wgKrC7Qbus7+qaALApXtlhjb2uzhEzzrCHpumDHztTAza
-   msCTOkqVGxe7DQWzQMEaIX6zK4vWS8NoB3nGLzqWuTXF5NAdxJG0z2S4y
-   g==;
-X-CSE-ConnectionGUID: O5LTIcxTQlKLnBlE0psyvA==
-X-CSE-MsgGUID: Y7KaU8yDSwqfyid5RRKcWw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="8832523"
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="8832523"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 02:29:50 -0700
-X-CSE-ConnectionGUID: fKVN5g7GQ5SES0YEOJM/rA==
-X-CSE-MsgGUID: 6fyCwlNXSn68Add3gP9mmQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="23009598"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.236.140]) ([10.124.236.140])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 02:29:46 -0700
-Message-ID: <e2400cf8-ee36-4e7f-ba1f-bb0c740b045c@linux.intel.com>
-Date: Thu, 18 Apr 2024 17:29:43 +0800
+	 In-Reply-To:Content-Type; b=W+cTGpTL8LrjhrDW11X2HqBReHxX07RzsPJ6cxZRdlmVEe/kG3JP6omALuekp/Zac+8VyvZZUcg0kTMAxl5AAj6jReemRew9TFaKSJGO6gs0V82SZBGS3idyCa6lM5kBATKgu+hZGEN2RvUNmTjFwd+Y9kgwczUcQNAuUtcb2s4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D4500339;
+	Thu, 18 Apr 2024 02:31:09 -0700 (PDT)
+Received: from [10.57.84.16] (unknown [10.57.84.16])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AA4E33F64C;
+	Thu, 18 Apr 2024 02:30:39 -0700 (PDT)
+Message-ID: <785075df-4a0e-4cd3-bace-a59db7caa746@arm.com>
+Date: Thu, 18 Apr 2024 10:30:38 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,227 +42,162 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
-To: isaku.yamahata@intel.com,
- Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
+Subject: Re: [PATCH v2 16/43] KVM: arm64: Support timers in realm RECs
+Content-Language: en-GB
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <20240412084309.1733783-1-steven.price@arm.com>
+ <20240412084309.1733783-17-steven.price@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <20240412084309.1733783-17-steven.price@arm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 12/04/2024 09:42, Steven Price wrote:
+> The RMM keeps track of the timer while the realm REC is running, but on
+> exit to the normal world KVM is responsible for handling the timers.
+> 
+
+minor nit: It may be worth mentioning this will be hooked in, when we
+add the Realm exit handling.
+
+Otherwise looks good to me.
 
 
-On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> Export kvm_io_bus_read and kvm_mmio tracepoint and wire up TDX PV MMIO
-> hypercall to the KVM backend functions.
->
-> kvm_io_bus_read/write() searches KVM device emulated in kernel of the given
-> MMIO address and emulates the MMIO.  As TDX PV MMIO also needs it, export
-> kvm_io_bus_read().  kvm_io_bus_write() is already exported.  TDX PV MMIO
-> emulates some of MMIO itself.  To add trace point consistently with x86
-> kvm, export kvm_mmio tracepoint.
->
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Suzuki
+
+
+> Signed-off-by: Steven Price <steven.price@arm.com>
 > ---
->   arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/x86.c     |   1 +
->   virt/kvm/kvm_main.c    |   2 +
->   3 files changed, 117 insertions(+)
->
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 55fc6cc6c816..389bb95d2af0 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1217,6 +1217,118 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
->   	return ret;
->   }
+>   arch/arm64/kvm/arch_timer.c  | 45 ++++++++++++++++++++++++++++++++----
+>   include/kvm/arm_arch_timer.h |  2 ++
+>   2 files changed, 43 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 879982b1cc73..0b2be34a9ba3 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -162,6 +162,13 @@ static void timer_set_cval(struct arch_timer_context *ctxt, u64 cval)
 >   
-> +static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
-> +{
-> +	unsigned long val = 0;
-> +	gpa_t gpa;
-> +	int size;
-> +
-> +	KVM_BUG_ON(vcpu->mmio_needed != 1, vcpu->kvm);
-> +	vcpu->mmio_needed = 0;
-> +
-> +	if (!vcpu->mmio_is_write) {
-> +		gpa = vcpu->mmio_fragments[0].gpa;
-> +		size = vcpu->mmio_fragments[0].len;
-> +
-> +		memcpy(&val, vcpu->run->mmio.data, size);
-> +		tdvmcall_set_return_val(vcpu, val);
-> +		trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-> +	}
-> +	return 1;
-> +}
-> +
-> +static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
-> +				 unsigned long val)
-> +{
-> +	if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-> +	    kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-> +		return -EOPNOTSUPP;
-> +
-> +	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
-> +	return 0;
-> +}
-> +
-> +static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
-> +{
-> +	unsigned long val;
-> +
-> +	if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
-> +	    kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
-> +		return -EOPNOTSUPP;
-> +
-> +	tdvmcall_set_return_val(vcpu, val);
-> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-> +	return 0;
-> +}
-> +
-> +static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_memory_slot *slot;
-> +	int size, write, r;
-> +	unsigned long val;
-> +	gpa_t gpa;
-> +
-> +	KVM_BUG_ON(vcpu->mmio_needed, vcpu->kvm);
-> +
-> +	size = tdvmcall_a0_read(vcpu);
-> +	write = tdvmcall_a1_read(vcpu);
-> +	gpa = tdvmcall_a2_read(vcpu);
-> +	val = write ? tdvmcall_a3_read(vcpu) : 0;
-> +
-> +	if (size != 1 && size != 2 && size != 4 && size != 8)
-> +		goto error;
-> +	if (write != 0 && write != 1)
-> +		goto error;
-> +
-> +	/* Strip the shared bit, allow MMIO with and without it set. */
-Based on the discussion 
-https://lore.kernel.org/all/ZcUO5sFEAIH68JIA@google.com/
-Do we still allow the MMIO without shared bit?
-
-> +	gpa = gpa & ~gfn_to_gpa(kvm_gfn_shared_mask(vcpu->kvm));
-> +
-> +	if (size > 8u || ((gpa + size - 1) ^ gpa) & PAGE_MASK)
-"size > 8u" can be removed, since based on the check of size above, it 
-can't be greater than 8.
-
-
-> +		goto error;
-> +
-> +	slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
-> +	if (slot && !(slot->flags & KVM_MEMSLOT_INVALID))
-> +		goto error;
-> +
-> +	if (!kvm_io_bus_write(vcpu, KVM_FAST_MMIO_BUS, gpa, 0, NULL)) {
-Should this be checked for write first?
-
-I check the handle_ept_misconfig() in VMX, it doesn't check write first 
-neither.
-
-Functionally, it should be OK since guest will not read the address 
-range of fast mmio.
-So the read case will be filtered out by ioeventfd_write().
-But it has take a long way to get to ioeventfd_write().
-Isn't it more efficient to check write first?
-
-
-> +		trace_kvm_fast_mmio(gpa);
-> +		return 1;
-> +	}
-> +
-> +	if (write)
-> +		r = tdx_mmio_write(vcpu, gpa, size, val);
-> +	else
-> +		r = tdx_mmio_read(vcpu, gpa, size);
-> +	if (!r) {
-> +		/* Kernel completed device emulation. */
-> +		tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
-> +		return 1;
-> +	}
-> +
-> +	/* Request the device emulation to userspace device model. */
-> +	vcpu->mmio_needed = 1;
-> +	vcpu->mmio_is_write = write;
-> +	vcpu->arch.complete_userspace_io = tdx_complete_mmio;
-> +
-> +	vcpu->run->mmio.phys_addr = gpa;
-> +	vcpu->run->mmio.len = size;
-> +	vcpu->run->mmio.is_write = write;
-> +	vcpu->run->exit_reason = KVM_EXIT_MMIO;
-> +
-> +	if (write) {
-> +		memcpy(vcpu->run->mmio.data, &val, size);
-> +	} else {
-> +		vcpu->mmio_fragments[0].gpa = gpa;
-> +		vcpu->mmio_fragments[0].len = size;
-> +		trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
-> +	}
-> +	return 0;
-> +
-> +error:
-> +	tdvmcall_set_return_code(vcpu, TDVMCALL_INVALID_OPERAND);
-> +	return 1;
-> +}
-> +
->   static int handle_tdvmcall(struct kvm_vcpu *vcpu)
+>   static void timer_set_offset(struct arch_timer_context *ctxt, u64 offset)
 >   {
->   	if (tdvmcall_exit_type(vcpu))
-> @@ -1229,6 +1341,8 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
->   		return tdx_emulate_hlt(vcpu);
->   	case EXIT_REASON_IO_INSTRUCTION:
->   		return tdx_emulate_io(vcpu);
-> +	case EXIT_REASON_EPT_VIOLATION:
-> +		return tdx_emulate_mmio(vcpu);
->   	default:
->   		break;
+> +	struct kvm_vcpu *vcpu = ctxt->vcpu;
+> +
+> +	if (kvm_is_realm(vcpu->kvm)) {
+> +		WARN_ON(offset);
+> +		return;
+> +	}
+> +
+>   	if (!ctxt->offset.vm_offset) {
+>   		WARN(offset, "timer %ld\n", arch_timer_ctx_index(ctxt));
+>   		return;
+> @@ -460,6 +467,21 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
 >   	}
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 03950368d8db..d5b18cad9dcd 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13975,6 +13975,7 @@ EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
->   
->   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
->   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
-> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_mmio);
->   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
->   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_inj_virq);
->   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_page_fault);
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index e27c22449d85..bc14e1f2610c 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2689,6 +2689,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
->   
->   	return NULL;
 >   }
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
 >   
->   bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
+> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu)
+> +{
+> +	struct arch_timer_cpu *arch_timer = &vcpu->arch.timer_cpu;
+> +	int i;
+> +
+> +	for (i = 0; i < NR_KVM_EL0_TIMERS; i++) {
+> +		struct arch_timer_context *timer = &arch_timer->timers[i];
+> +		bool status = timer_get_ctl(timer) & ARCH_TIMER_CTRL_IT_STAT;
+> +		bool level = kvm_timer_irq_can_fire(timer) && status;
+> +
+> +		if (level != timer->irq.level)
+> +			kvm_timer_update_irq(vcpu, level, timer);
+> +	}
+> +}
+> +
+>   /* Only called for a fully emulated timer */
+>   static void timer_emulate(struct arch_timer_context *ctx)
 >   {
-> @@ -5992,6 +5993,7 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->   	r = __kvm_io_bus_read(vcpu, bus, &range, val);
->   	return r < 0 ? r : 0;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_io_bus_read);
+> @@ -831,6 +853,8 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>   	if (unlikely(!timer->enabled))
+>   		return;
 >   
->   int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
->   			    int len, struct kvm_io_device *dev)
+> +	kvm_timer_unblocking(vcpu);
+> +
+>   	get_timer_map(vcpu, &map);
+>   
+>   	if (static_branch_likely(&has_gic_active_state)) {
+> @@ -844,8 +868,6 @@ void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu)
+>   		kvm_timer_vcpu_load_nogic(vcpu);
+>   	}
+>   
+> -	kvm_timer_unblocking(vcpu);
+> -
+>   	timer_restore_state(map.direct_vtimer);
+>   	if (map.direct_ptimer)
+>   		timer_restore_state(map.direct_ptimer);
+> @@ -988,7 +1010,9 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>   
+>   	ctxt->vcpu = vcpu;
+>   
+> -	if (timerid == TIMER_VTIMER)
+> +	if (kvm_is_realm(vcpu->kvm))
+> +		ctxt->offset.vm_offset = NULL;
+> +	else if (timerid == TIMER_VTIMER)
+>   		ctxt->offset.vm_offset = &kvm->arch.timer_data.voffset;
+>   	else
+>   		ctxt->offset.vm_offset = &kvm->arch.timer_data.poffset;
+> @@ -1011,13 +1035,19 @@ static void timer_context_init(struct kvm_vcpu *vcpu, int timerid)
+>   void kvm_timer_vcpu_init(struct kvm_vcpu *vcpu)
+>   {
+>   	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
+> +	u64 cntvoff;
+>   
+>   	for (int i = 0; i < NR_KVM_TIMERS; i++)
+>   		timer_context_init(vcpu, i);
+>   
+> +	if (kvm_is_realm(vcpu->kvm))
+> +		cntvoff = 0;
+> +	else
+> +		cntvoff = kvm_phys_timer_read();
+> +
+>   	/* Synchronize offsets across timers of a VM if not already provided */
+>   	if (!test_bit(KVM_ARCH_FLAG_VM_COUNTER_OFFSET, &vcpu->kvm->arch.flags)) {
+> -		timer_set_offset(vcpu_vtimer(vcpu), kvm_phys_timer_read());
+> +		timer_set_offset(vcpu_vtimer(vcpu), cntvoff);
+>   		timer_set_offset(vcpu_ptimer(vcpu), 0);
+>   	}
+>   
+> @@ -1525,6 +1555,13 @@ int kvm_timer_enable(struct kvm_vcpu *vcpu)
+>   		return -EINVAL;
+>   	}
+>   
+> +	/*
+> +	 * We don't use mapped IRQs for Realms because the RMI doesn't allow
+> +	 * us setting the LR.HW bit in the VGIC.
+> +	 */
+> +	if (vcpu_is_rec(vcpu))
+> +		return 0;
+> +
+>   	get_timer_map(vcpu, &map);
+>   
+>   	ret = kvm_vgic_map_phys_irq(vcpu,
+> diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+> index c819c5d16613..d8ab297560d0 100644
+> --- a/include/kvm/arm_arch_timer.h
+> +++ b/include/kvm/arm_arch_timer.h
+> @@ -112,6 +112,8 @@ int kvm_arm_timer_set_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>   int kvm_arm_timer_get_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>   int kvm_arm_timer_has_attr(struct kvm_vcpu *vcpu, struct kvm_device_attr *attr);
+>   
+> +void kvm_realm_timers_update(struct kvm_vcpu *vcpu);
+> +
+>   u64 kvm_phys_timer_read(void);
+>   
+>   void kvm_timer_vcpu_load(struct kvm_vcpu *vcpu);
 
 
