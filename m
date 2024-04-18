@@ -1,185 +1,368 @@
-Return-Path: <kvm+bounces-15177-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15178-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B4188AA58A
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 00:54:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2EB18AA5A3
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 01:09:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8911AB22B1E
-	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 22:54:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87C8E283927
+	for <lists+kvm@lfdr.de>; Thu, 18 Apr 2024 23:09:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE85E4AED6;
-	Thu, 18 Apr 2024 22:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1426F060;
+	Thu, 18 Apr 2024 23:09:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WD/or5iL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="P9tId6Uq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592CF4A20
-	for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 22:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713480882; cv=none; b=Hzw+1zYtb49oZ/Evnh2dnNA7sia2rlu0HyvY686hV8DeB90kT3+aTIUbVLr21hbpgEExHSZWTV1znOpulSRyS7O866cXrkLqWcFOEDFVjolRBi3MkDbfs4LHJlhJ6vqZRcGBWvVsXauV22Hi87Ss/c7HFg4YeJTVwL001OH5Kpo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713480882; c=relaxed/simple;
-	bh=YhdtaVfh4088buH+XZg/IkImHaxqcTSecceCrXaDNTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j/H+Yu75UxihZRzaVYfpPO3kOGFTnUAdfcGupEnErem8Q8UWOy6bplAAEPGaVQxPqILly79071pcUPaTwQDsj2GXfKWOvhaAXFeFC2JryrlbuzdmBciG3LatCklSwdGNsN5WX+gCNJvfBrSmkV1Y18s7reXzMxdamwlfl9l4Aqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WD/or5iL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713480879;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0Qa3hR1GgJrmWTXgAvlGxLrVho0/A5qeW+iYF0awOyc=;
-	b=WD/or5iLokdv12x7J6kufpcpOgNr6YTZ2zDrCIa2R+8h5YOOsb9EelWHmxY4ZoXPKNw4p3
-	H9ixZTGXGTiXg442oLNKNOO0bI2f9MILVRlRjLDlWxaYEPXYpX0v05Z3G18yK9gPAeWqaQ
-	kPv0O+/uJVX1XZOPey5s3hjGh9WmTrg=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-339-y9ahBIBRMWGVGNvX2V5swg-1; Thu, 18 Apr 2024 18:54:38 -0400
-X-MC-Unique: y9ahBIBRMWGVGNvX2V5swg-1
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36b36e64789so23586735ab.0
-        for <kvm@vger.kernel.org>; Thu, 18 Apr 2024 15:54:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713480877; x=1714085677;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0Qa3hR1GgJrmWTXgAvlGxLrVho0/A5qeW+iYF0awOyc=;
-        b=mxCr0nlbFi3RMLDq4yO3qJmYCxtmihlMzmDp0R3yUs5e0BqKvwsFbQwYaz5trRlten
-         BG9KH1PLxCVwT28mo80OIwF24mD8TwxyOjLTrqkrULkh4oG7tjP85IJxvU4k9fXaZU7K
-         757igmtSr9v9egSO5zH9LHWrgDR+MVyUJxnq0cnKNuQKEJ3RfibMFBM2SI9vEovmalN4
-         MVpIA6UJRe4+Mcp3bbhrkfHhL1LAkRXocUSmq7x1NzmsGwIxc08jXPZJiy9fO+3XM+xY
-         hao/ewL37wHnBPfrf70+eiGi1YC+1nXvMWIoHZF6Hhi4hcT2dHvyzLG5Xs/BPqi/wGXm
-         e8iw==
-X-Forwarded-Encrypted: i=1; AJvYcCXhfzEYxHyXCTXHO3s/TSXQaVmJZoKU5Xjc+Sf5PCUVuDJ9+IZD4JxU/pgNMoNK740zpw01khgASoO6s1cbFkuP+P4B
-X-Gm-Message-State: AOJu0YyKLXbzqiByDOGS876h5WY6D9U4IqaX3KaTeMf7h/JNUv/KJfDe
-	WfF3ZxCYSj+/J5RQBzGta37gwizIm0RBXldYrkZ++8nH0K/jf4nMnvDiMhv3dzamynq0VGqxBmc
-	t0zOTzpV1McZ4JbDCKAYHD7hfAySVNv/gs3PQo9EOjQOsjgkDCg==
-X-Received: by 2002:a05:6e02:1688:b0:36b:36b:1115 with SMTP id f8-20020a056e02168800b0036b036b1115mr5408052ila.1.1713480877276;
-        Thu, 18 Apr 2024 15:54:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IElkIPKIuNl9ph1Phq9PzvzzBElJf7MnvsKrZ/DLV6aq5UhFYH+VCNTGKZAYpXsg0QJpGLyAg==
-X-Received: by 2002:a05:6e02:1688:b0:36b:36b:1115 with SMTP id f8-20020a056e02168800b0036b036b1115mr5408028ila.1.1713480876877;
-        Thu, 18 Apr 2024 15:54:36 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id i3-20020a05663813c300b00482f19f6d4csm650381jaj.110.2024.04.18.15.54.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 15:54:36 -0700 (PDT)
-Date: Thu, 18 Apr 2024 16:54:34 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Xin Zeng <xin.zeng@intel.com>
-Cc: herbert@gondor.apana.org.au, jgg@nvidia.com, yishaih@nvidia.com,
- shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
- linux-crypto@vger.kernel.org, kvm@vger.kernel.org, qat-linux@intel.com,
- Yahui Cao <yahui.cao@intel.com>
-Subject: Re: [PATCH v6 1/1] vfio/qat: Add vfio_pci driver for Intel QAT
- SR-IOV VF devices
-Message-ID: <20240418165434.1da52cf0.alex.williamson@redhat.com>
-In-Reply-To: <20240417143141.1909824-2-xin.zeng@intel.com>
-References: <20240417143141.1909824-1-xin.zeng@intel.com>
-	<20240417143141.1909824-2-xin.zeng@intel.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBD04F5EC;
+	Thu, 18 Apr 2024 23:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713481787; cv=fail; b=UDjCAkGJbRcj1mESWKnZslbfHUC0TLMLFI07yRegEqsvOIsqne0T0SUDNT35TScUmnSKOJ2A7nFRxalgQEefjAaa9JTTBaTpaXqa7ZCkunDjjA+vqeRtHR0lFyKiJFhMuSqvxwFSIVUchVRXTHtnThBSBCxr5Ok7bCqvIWpK59M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713481787; c=relaxed/simple;
+	bh=NrQlIRKMN4BcInRx0GoD75XgJ2KY+FMLSVfitckN8I4=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KuTOZ2NhwzrY1VvH+9TTkt+IlwNsiD3Xl9/4b011GVDbEE7M0PLliW7VI2eGbymAbLojkyso4+6ocisf5yNGRdJ0xoC2wPekAIP85jdAGFQvG28E74XN9v2Hd1A6cHUQkfMNjXTl24A/ZrZtPEmAdbAnihxxbaThuqa9pjU3jrw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=P9tId6Uq; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713481786; x=1745017786;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=NrQlIRKMN4BcInRx0GoD75XgJ2KY+FMLSVfitckN8I4=;
+  b=P9tId6Uqed89lKA0i59CuN7UlXbUTlICZpl0vTRG562X28Xa6MtnHzcg
+   oKTm5jnM2I6QpISfrU1MdGkAIkk2Th8Oyp5UoM9RCEpE/CZwWSpzN9kgS
+   yHwkGSopmDi/N1BcEtQ8ukR0bBWctONlrNss9sGLceUM4BrP8ZmDyNDA9
+   gRhhM5qWTDC1VQnJdtZQdHE/0YOW6SK4S36ZvS25s7+uvzIgjPBAdW7gO
+   iSrrg1L4bx1A5Bl0myrDyzSBYzZi8pv6gTQrVY8W6o4wZN8+CttxRDIyb
+   Yn/Dw8D/HgxIzfDnzlj1gM4v1hYziTjhA2p7S3diZqXihWSgOywyIYKyn
+   A==;
+X-CSE-ConnectionGUID: Im+6k1/HTnOa8VXVOZ6vOA==
+X-CSE-MsgGUID: YQvAv7AjSoeJMw5+cojaLw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="19626409"
+X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
+   d="scan'208";a="19626409"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 16:09:45 -0700
+X-CSE-ConnectionGUID: Fs/jTUVBQWO8WpUSOS0pyQ==
+X-CSE-MsgGUID: k66P8h7jRWG0YmaJoyjUag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
+   d="scan'208";a="23758146"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Apr 2024 16:09:45 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 18 Apr 2024 16:09:43 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 18 Apr 2024 16:09:43 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 18 Apr 2024 16:09:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EXV/Xr1YhmlbnQxPEgYW0HTF443GAanYjVIdKwBvFiYhwOGhnsYcnR11LGUWAPc9g385JQ3s9Wwf/b9bY1CorGqVDWAI+Dy1SPf2chDyAj5ZD87sicTrHXEYJPccJTAHOlJ+V7WJGMPZIedTClHK2sTZnVjNRXcS2IRHr+QdrLBePrtnAGTuGj3uw98uSNBsshFr+FQVK9HDdVwf0AIzsld/PHTXGxt9NPqDZBtx3n+PNVERCVCcJDZmDeNxjsXbGLpo6zsPk+INbRpG7mp9PS0RF4MuAONm2AKCTGXYIBk/8qwnyC1OCL0hXjkt3Q22i7TucKMYNK2KMC9jNZkIYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NDkFfGPowe2kOddAAs3eG9zVCbCm1+kDR0uIEUuLC1g=;
+ b=SxqvDGaBkFk5LV7r/z90TH+vQuPsrbXIvPIQU1RNB3hv3RsVcdhZcdAzJidBfJ1q8ilA9b40eT4Iz1zoqrYopVcT3cBWfPSFiFQWD538q2AZM0Sp/wYy8TbWKzQ15kaxoxkbpKqFU62jYMgXqSNJP2qleOAw82cJgGjiKpWc08Dq6CwRupBS4EEMYAW+xHd6bc8aV64R5GXhPyaiOHPHzLSb/lHzxW0Sn/fNCYfyChQjr2iOgYUgi060Qh/BgxB/+8/IUJngKnQJOpouI0jMqT00Vnc7wPT6jPXdWRlotmYLBqeAzhdVGGtvJk/crJb6cHiRgs7b+pLxkAhraYGUoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH0PR11MB7446.namprd11.prod.outlook.com (2603:10b6:510:26d::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.37; Thu, 18 Apr
+ 2024 23:09:40 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7472.037; Thu, 18 Apr 2024
+ 23:09:40 +0000
+Message-ID: <22b19d11-056c-402b-ac19-a389000d6339@intel.com>
+Date: Fri, 19 Apr 2024 11:09:30 +1200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+To: Sean Christopherson <seanjc@google.com>
+CC: Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>, "Bo2
+ Chen" <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Erdem Aktas
+	<erdemaktas@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, Isaku Yamahata
+	<isaku.yamahata@intel.com>, "isaku.yamahata@linux.intel.com"
+	<isaku.yamahata@linux.intel.com>
+References: <ZhawUG0BduPVvVhN@google.com>
+ <8afbb648-b105-4e04-bf90-0572f589f58c@intel.com>
+ <Zhftbqo-0lW-uGGg@google.com>
+ <6cd2a9ce-f46a-44d0-9f76-8e493b940dc4@intel.com>
+ <Zh7KrSwJXu-odQpN@google.com>
+ <900fc6f75b3704780ac16c90ace23b2f465bb689.camel@intel.com>
+ <Zh_exbWc90khzmYm@google.com>
+ <2383a1e9-ba2b-470f-8807-5f5f2528c7ad@intel.com>
+ <ZiBc13qU6P3OBn7w@google.com>
+ <5ffd4052-4735-449a-9bee-f42563add778@intel.com>
+ <ZiEulnEr4TiYQxsB@google.com>
+Content-Language: en-US
+From: "Huang, Kai" <kai.huang@intel.com>
+In-Reply-To: <ZiEulnEr4TiYQxsB@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR01CA0038.prod.exchangelabs.com (2603:10b6:a03:94::15)
+ To BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|PH0PR11MB7446:EE_
+X-MS-Office365-Filtering-Correlation-Id: 21088b87-5c27-46ce-e4ae-08dc5ffca010
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1p9Kno7FdNtpVUcUd7ZUWk6UMAWoaUbzhfiCoow0GwbVLk6LCqdeAPL5AKsCT0sBSqc7ntqTXpPZU9kOcTVdFs2ih4uow656+ap1+HqMXStrUbhzYg3zga6KhAqcr5R/iCFZctfhm+CTFiVxXI5LZ2aDiYmLfGTSdwQBXzqHm736IHvpPyEQcZc51wn+zfJ5ztth1gBduMsW8R5LJ0/kVmliBL1DS6JsuqhT2+un6Pg6oL6VdOGMwTUqB0NGIHgIvwqZPiiVdI/h8Ep2SeUAUF2eIOKTB8ZiYop29c8uugGbcgfWP1wZLE1pOTz2iY12WCK68OA2aU8H6ifDuMdEsrgtvlXbxurguLg4GgI1PkvgdNTCQ9sYfJ8TE+mmOiemuv4bM+FTDzvsoFxZPVOaz+ZS+4zDpOTiQuJ6ZyL0soIn/djMy2fp8P4SoP/ljMJLS8ve01H/y1ZV08K3iv797aeG4/yp5uIZyl4ZOnVZ/n1zLvM+jeIiLVwKDtll8NkWTrXC/YGPZESfDaPAXcbTSDdOC8F9IfV98Xbb99lSWJMHNU6A4v0ndS9ntPN4o78Ta9f8XXe7UiEzD0D0lULZOzy4ULn5FoaRfIDnSZJ0I55rQjS0F6+CpMCUiOcnYOOklfbYaMP5/N0n5CwUaUEbtH4iNbqXEIf6d4ErxdFEkJk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QlNQZXNDOFR5aWFjUkJVb1NZaVJPZmpBWkNyUGxCdFJWVGRPK3dqNTFBQXBR?=
+ =?utf-8?B?c3VNdVJ5Yk1UZjNVdkluYVRJQUFBUmN2d2ZKb29rNWFoMEE5MW1tNEE0L0Nu?=
+ =?utf-8?B?cGdta3lPZFJnVHFKMmtpalhsZjhBWkxMbTdzOWZETW5HNHowYWViT0FvamJi?=
+ =?utf-8?B?NVlHWE92cWxPdFlkTkpTUEdPQVVCWTc4NmtoYkVmZURsWXJsRzlLR1loWUpw?=
+ =?utf-8?B?YzhPTzZZamRoR0ZMeGtjcVVoWVlkb2owdk1QQW1FQVMrM1FJNU9BNnpkL2tI?=
+ =?utf-8?B?NmJYUWsrRU0wZ3pqdUlQTldGK3hCUFdqbmtXZjh1b3hxY2JES05SOGVJbzdj?=
+ =?utf-8?B?ejJYWEE0RFN2d1lOcDE5NWViNk9WbVhaeFBEL0FsbDI4TlUwaWZRMkViM3FI?=
+ =?utf-8?B?R0JhWGxuZ2NJdkZ6QlZxeUhoTU5yVTNYRnBCZU9oWWNrZzBGNDcxd0xGRzZL?=
+ =?utf-8?B?R0xPdFVGZWg3NjBQUDFPYVV0ZGhoUU9waFB1UExZdUpBaWJUczZkYlFBODkw?=
+ =?utf-8?B?VW4wRit4ZnByL0p2TGo1VXBKN2hSNWpiUEVlZ0UraWdNNHhWMDZiMFFKd093?=
+ =?utf-8?B?QWZQNlV3bDl4UkxlNmRhd2NlOWE1TEV2VFVpckgrWklUYk5pdTRLTE5lLzMr?=
+ =?utf-8?B?c1EvL1ZTOGZHbjNtZGpENVU3UmRnbXdWYUlTMTN5V3B2eVAxMW10YWd6eHR3?=
+ =?utf-8?B?VVF6UWRPUk5rV25GS0dBcGFpV1Z5VVB0Ukg3bUhzN2pSUDg3bnNzQWI5MGNm?=
+ =?utf-8?B?Q2JGU0FPQW9BOFEyNEIreDJXdjdtOCtSRDAvRVR2WGtlcFdRMW0xblRtcVRk?=
+ =?utf-8?B?SHFtdlM5RHI4YXowUmIxSUV2M04yaEhwcVBpa3d5S0R5NDRGL0JpVFUxclVL?=
+ =?utf-8?B?bUlIMXpNUTJoOGFQRG9BN05QcVE2K3RHazFocS9QWlhQa1dTZXFtQWlMaTlT?=
+ =?utf-8?B?VWtVc2cvVzdxazJxR0VSZ3I2STNNRmtjbENMQWJrRHNpOHdUYngwVUZFcnRy?=
+ =?utf-8?B?Vm5oSlM1bUtPZzdqM3ppSm8rV00xYllUNnZxOTIrVEJ4QWxVTEtEdVJIM3JF?=
+ =?utf-8?B?bUhJRUdNK1VYUEZqTUd2OE1tNEQrMnA4RnRrcFdnU1ZUcG95Y05SRWhUVU03?=
+ =?utf-8?B?SGtkZkR0SFNvc1BXVEJSZGtNaTMrU3g3VjYrNHJmS2c3dWUxUERpSTRmUmQ1?=
+ =?utf-8?B?OGVtQURYc0lSbmlVRm51Y21WNUtMZGc0Y0lSVkxjWXpRc09TYkF6alg3WWY4?=
+ =?utf-8?B?bVFuRW5neXFNdER1SXB2Nk5UNWZBT2VmWkhDTmZ1UHEwQmZFOGdkN1Nqbmwz?=
+ =?utf-8?B?S0llbm9ONktIUFVRaG1yWmRkeE90ZUx0SnNnVGxuaHloWnUyR3RPVzhDSS9k?=
+ =?utf-8?B?cXdjazh6NlhHbGNaalVyWUVSWUhMSUZ4c1hFRE9uRDgyTjBFVVlkSzFhVG9G?=
+ =?utf-8?B?THJsSElsYmY4b0EzZG5ldGpzVjR2ekxmalJMUk45c1VKZTV4NXhKbHY2WHF2?=
+ =?utf-8?B?L09yZ2RZZGxFRG9LYWdVY24zNE9OWWlWS3dOWXRjV1VJbTY1bnlWTE13SVh2?=
+ =?utf-8?B?ZGxINWsxODN4aTRGeFlzZW1IZkFvVnZyY2s4SDRaMGZUSjFSSWdCbi9EUDF3?=
+ =?utf-8?B?anVPWGZwTzFxMStXWjk1N1FPdlRETzVYekF0Sks0Mk1kNGZZUjNDTjdBMGJO?=
+ =?utf-8?B?Q2FpZmJHKzNyYkhQaVFDMXBiRVFRR2h1a2I4MzdZeGZ0RDl5VGkyRk0rUEpD?=
+ =?utf-8?B?Rmh6Ym5sNkJOdjFlRjhnczJEK2tPeDlxN21rVC9tZG9HWFpyWXM5TlV1YlZJ?=
+ =?utf-8?B?ZXRDZVh4aW82b2MrTjQwb3pkOEM4Z3dUMmhzVTU1NXBWRWEvR2I1RkswWVVq?=
+ =?utf-8?B?YUR5MGRhK3oxYXlWSjVzNE9MakJPaTk0WVgwUGxLbDVIcDdUZjhPM0JJK2w3?=
+ =?utf-8?B?amdVYWpjMzBMTGJyNllQS3pqQktnVVlsQU83RnZReVBrUHZoYkZYN2FsQTE2?=
+ =?utf-8?B?ckFRSnZHTE1YV3VZMUZyejFiMHJia1hvRWhMbUNXVCtOTVNKd2ZzaW5WNXdp?=
+ =?utf-8?B?YkNucFcvOWp5d0pJWVVSTlh6S1NyYkNOQW1zMXN2SGxYbmhIcExSSXBwekVT?=
+ =?utf-8?Q?uYReRzAIv7awbjZOmj6AvcsI/?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21088b87-5c27-46ce-e4ae-08dc5ffca010
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 23:09:40.3463
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 32VTK1+eRFK9BBKlsavPUlDs7Ow5iJAHFyzvf43vF0VhxI2OPfUkHQxv8xXHSKUUVxkvxNwqnxsYvpAP5m3QkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7446
+X-OriginatorOrg: intel.com
 
-On Wed, 17 Apr 2024 22:31:41 +0800
-Xin Zeng <xin.zeng@intel.com> wrote:
 
-> Add vfio pci variant driver for Intel QAT SR-IOV VF devices. This driver
-> registers to the vfio subsystem through the interfaces exposed by the
-> susbsystem. It follows the live migration protocol v2 defined in
-> uapi/linux/vfio.h and interacts with Intel QAT PF driver through a set
-> of interfaces defined in qat/qat_mig_dev.h to support live migration of
-> Intel QAT VF devices.
 
-=46rom here down could actually just be a comment towards the top of the
-driver.
+On 19/04/2024 2:30 am, Sean Christopherson wrote:
+> On Thu, Apr 18, 2024, Kai Huang wrote:
+>> On 18/04/2024 11:35 am, Sean Christopherson wrote:
+>>> Ah, yeah.  Oh, duh.  I think the reason I didn't initially suggest late_hardware_setup()
+>>> is that I was assuming/hoping TDX setup could be done after kvm_x86_vendor_exit().
+>>> E.g. in vt_init() or whatever it gets called:
+>>>
+>>> 	r = kvm_x86_vendor_exit(...);
+>>> 	if (r)
+>>> 		return r;
+>>>
+>>> 	if (enable_tdx) {
+>>> 		r = tdx_blah_blah_blah();
+>>> 		if (r)
+>>> 			goto vendor_exit;
+>>> 	}
+>>
+>>
+>> I assume the reason you introduced the late_hardware_setup() is purely
+>> because you want to do:
+>>
+>>    cpu_emergency_register_virt_callback(kvm_x86_ops.emergency_enable);
+>>
+>> after
+>>
+>>    kvm_ops_update()?
+> 
+> No, kvm_ops_update() needs to come before kvm_x86_enable_virtualization(), as the
+> static_call() to hardware_enable() needs to be patched in.
 
-> The migration data of each Intel QAT GEN4 VF device is encapsulated into
-> a 4096 bytes block. The data consists of two parts.
->=20
-> The first is a pre-configured set of attributes of the VF being migrated,
-> which are only set when it is created. This can be migrated during pre-co=
-py
-> stage and used for a device compatibility check.
->=20
-> The second is the VF state. This includes the required MMIO regions and
-> the shadow states maintained by the QAT PF driver. This part can only be
-> saved when the VF is fully quiesced and be migrated during stop-copy stag=
-e.
->=20
-> Both these 2 parts of data are saved in hierarchical structures including
-> a preamble section and several raw state sections.
->=20
-> When the pre-configured part of the migration data is fully retrieved from
-> user space, the preamble section are used to validate the correctness of
-> the data blocks and check the version compatibility. The raw state
-> sections are then used to do a device compatibility check.
->=20
-> When the device transits from RESUMING state, the VF states are extracted
-> from the raw state sections of the VF state part of the migration data and
-> then loaded into the device.
->=20
-> This version only covers migration for Intel QAT GEN4 VF devices.
->=20
-> Co-developed-by: Yahui Cao <yahui.cao@intel.com>
-> Signed-off-by: Yahui Cao <yahui.cao@intel.com>
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> ---
->  MAINTAINERS                   |   8 +
->  drivers/vfio/pci/Kconfig      |   2 +
->  drivers/vfio/pci/Makefile     |   2 +
->  drivers/vfio/pci/qat/Kconfig  |  12 +
->  drivers/vfio/pci/qat/Makefile |   3 +
->  drivers/vfio/pci/qat/main.c   | 679 ++++++++++++++++++++++++++++++++++
->  6 files changed, 706 insertions(+)
->  create mode 100644 drivers/vfio/pci/qat/Kconfig
->  create mode 100644 drivers/vfio/pci/qat/Makefile
->  create mode 100644 drivers/vfio/pci/qat/main.c
-...
-> +static struct file *qat_vf_pci_step_device_state(struct qat_vf_core_devi=
-ce *qat_vdev, u32 new)
-> +{
-> +	u32 cur =3D qat_vdev->mig_state;
-> +	int ret;
-> +
-> +	/*
-> +	 * As the device is not capable of just stopping P2P DMAs, suspend the
-> +	 * device completely once any of the P2P states are reached.
-> +	 * On the opposite direction, resume the device after transiting from
-> +	 * the P2P state.
-> +	 */
-> +	if ((cur =3D=3D VFIO_DEVICE_STATE_RUNNING && new =3D=3D VFIO_DEVICE_STA=
-TE_RUNNING_P2P) ||
-> +	    (cur =3D=3D VFIO_DEVICE_STATE_PRE_COPY && new =3D=3D VFIO_DEVICE_ST=
-ATE_PRE_COPY_P2P)) {
-> +		ret =3D qat_vfmig_suspend(qat_vdev->mdev);
-> +		if (ret)
-> +			return ERR_PTR(ret);
-> +		return NULL;
-> +	}
+Right.  I was talking about that the reason you introduced the 
+late_hardware_setup() was because we need to do 
+kvm_x86_virtualization_enabled() and the above 
+cpu_emergency_register_virt_callback() after kvm_ops_update().
 
-This doesn't appear to be a valid way to support P2P, the P2P states
-are defined as running states.  The guest driver may legitimately
-access and modify the device state during P2P states.  Should this
-device be advertising support for P2P?  Thanks,
+> 
+> Oh, and my adjust patch is broken, the code to do the compat checks should NOT
+> be removed; it could be removed if KVM unconditionally enabled VMX during setup,
+> but it needs to stay in the !TDX case.
 
-Alex
+Right.
 
+> 
+> -       for_each_online_cpu(cpu) {
+> -               smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &r, 1);
+> -               if (r < 0)
+> -                       goto out_unwind_ops;
+> -       }
+> 
+> Which is another reason to defer kvm_x86_enable_virtualization(), though to be
+> honest not a particularly compelling reason on its own.
+> 
+>> Anyway, we can also do 'enable_tdx' outside of kvm_x86_vendor_init() as
+>> above, given it cannot be done in hardware_setup() anyway.
+>>
+>> If we do 'enable_tdx' in late_hardware_setup(), we will need a
+>> kvm_x86_enable_virtualization_nolock(), but that's also not a problem to me.
+>>
+>> So which way do you prefer?
+>>
+>> Btw, with kvm_x86_virtualization_enable(), it seems the compatibility check
+>> is lost, which I assume is OK?
+> 
+> Heh, and I obviously wasn't reading ahead :-)
+> 
+>> Btw2, currently tdx_enable() requires cpus_read_lock() must be called prior.
+>> If we do unconditional tdx_cpu_enable() in vt_hardware_enable(), then with
+>> your proposal IIUC there's no such requirement anymore, because no task will
+>> be scheduled to the new CPU before it reaches CPUHP_AP_ACTIVE.
+> 
+> Correct.
+> 
+>> But now calling cpus_read_lock()/unlock() around tdx_enable() also acceptable
+>> to me.
+> 
+> No, that will deadlock as cpuhp_setup_state() does cpus_read_lock().
+
+Right, but it takes cpus_read_lock()/unlock() internally.  I was talking 
+about:
+
+	if (enable_tdx) {
+		kvm_x86_virtualization_enable();
+
+		/*
+		 * Unfortunately currently tdx_enable() internally has
+		 * lockdep_assert_cpus_held().
+		 */
+		cpus_read_lock();
+		tdx_enable();
+		cpus_read_unlock();
+	}
+	
+> 
+>>>>> +int kvm_enable_virtualization(void)
+>>>>>     {
+>>>>> +	int r;
+>>>>> +
+>>>>> +	r = cpuhp_setup_state(CPUHP_AP_KVM_ONLINE, "kvm/cpu:online",
+>>>>> +			      kvm_online_cpu, kvm_offline_cpu);
+>>>>> +	if (r)
+>>>>> +		return r;
+>>>>> +
+>>>>> +	register_syscore_ops(&kvm_syscore_ops);
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * Manually undo virtualization enabling if the system is going down.
+>>>>> +	 * If userspace initiated a forced reboot, e.g. reboot -f, then it's
+>>>>> +	 * possible for an in-flight module load to enable virtualization
+>>>>> +	 * after syscore_shutdown() is called, i.e. without kvm_shutdown()
+>>>>> +	 * being invoked.  Note, this relies on system_state being set _before_
+>>>>> +	 * kvm_shutdown(), e.g. to ensure either kvm_shutdown() is invoked
+>>>>> +	 * or this CPU observes the impedning shutdown.  Which is why KVM uses
+>>>>> +	 * a syscore ops hook instead of registering a dedicated reboot
+>>>>> +	 * notifier (the latter runs before system_state is updated).
+>>>>> +	 */
+>>>>> +	if (system_state == SYSTEM_HALT || system_state == SYSTEM_POWER_OFF ||
+>>>>> +	    system_state == SYSTEM_RESTART) {
+>>>>> +		unregister_syscore_ops(&kvm_syscore_ops);
+>>>>> +		cpuhp_remove_state(CPUHP_AP_KVM_ONLINE);
+>>>>> +		return -EBUSY;
+>>>>> +	}
+>>>>> +
+>>>>
+>>>> Aren't we also supposed to do:
+>>>>
+>>>> 	on_each_cpu(__kvm_enable_virtualization, NULL, 1);
+>>>>
+>>>> here?
+>>>
+>>> No, cpuhp_setup_state() invokes the callback, kvm_online_cpu(), on each CPU.
+>>> I.e. KVM has been doing things the hard way by using cpuhp_setup_state_nocalls().
+>>> That's part of the complexity I would like to get rid of.
+>>
+>> Ah, right :-)
+>>
+>> Btw, why couldn't we do the 'system_state' check at the very beginning of
+>> this function?
+> 
+> We could, but we'd still need to check after, and adding a small bit of extra
+> complexity just to try to catch a very rare situation isn't worth it.
+> 
+> To prevent races, system_state needs to be check after register_syscore_ops(),
+> because only once kvm_syscore_ops is registered is KVM guaranteed to get notified
+> of a shutdown. >
+> And because the kvm_syscore_ops hooks disable virtualization, they should be called
+> after cpuhp_setup_state().  That's not strictly required, as the per-CPU
+> hardware_enabled flag will prevent true problems if the system enter shutdown
+> state before KVM reaches cpuhp_setup_state().
+> 
+> Hmm, but the same edge cases exists in the above flow.  If the system enters
+> shutdown _just_ after register_syscore_ops(), KVM would see that in system_state
+> and do cpuhp_remove_state(), i.e. invoke kvm_offline_cpu() and thus do a double
+> disable (which again is benign because of hardware_enabled).
+> 
+> Ah, but registering syscore ops before doing cpuhp_setup_state() has another race,
+> and one that could be fatal.  If the system does suspend+resume before the cpuhup
+> hooks are registered, kvm_resume() would enable virtualization.  And then if
+> cpuhp_setup_state() failed, virtualization would be left enabled.
+> 
+> So cpuhp_setup_state() *must* come before register_syscore_ops(), and
+> register_syscore_ops() *must* come before the system_state check.
+
+OK.  I guess I have to double check here to completely understand the 
+races.  :-)
+
+So I think we have consensus to go with the approach that shows in your 
+second diff -- that is to always enable virtualization during module 
+loading for all other ARCHs other than x86, for which we only always 
+enables virtualization during module loading for TDX.
+
+Then how about "do kvm_x86_virtualization_enable()  within 
+late_hardware_setup() in kvm_x86_vendor_init()"  vs "do 
+kvm_x86_virtualization_enable() in TDX-specific code after 
+kvm_x86_vendor_init()"?
+
+Which do you prefer?
 
