@@ -1,72 +1,75 @@
-Return-Path: <kvm+bounces-15252-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15253-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DEB88AADB6
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:30:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4DBE8AADB7
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:30:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B78ED1F21E76
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 11:30:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B05D2830C0
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 11:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E35823C8;
-	Fri, 19 Apr 2024 11:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 546AE84E0A;
+	Fri, 19 Apr 2024 11:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g3BS/44h"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fmvbVaGx"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5D578285;
-	Fri, 19 Apr 2024 11:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837FE83CCB;
+	Fri, 19 Apr 2024 11:30:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713526199; cv=none; b=JolqtklZ5goBhondkOzX54clQEsRJu8rypngtbvE5y2toeASLF4eozdPW9VxfE34i6H1AFkEeS60yKFcgV57hzFK1vDMXQ8QSzyoYsTYs5GMZNB4Ea/XrW2Tuz4RCkLUZd+kUJvtbyIvSDIf/VGHFJvRroE69EruEyJ2iR770HU=
+	t=1713526204; cv=none; b=T8/3zUsfwmuEkSNYnXCwWFIKyZssWtCKfhnF+W4Yp6r21KO5kVP/FNLA9fgkunNeBBk3PxJlWZP9fAwZyRhterqed/9//Yz6ioLf1DP4DaaxYaIIlLkqo86gqEa6EsEWWY4u80OclEl+INcL6J+3F1I1EkaYO+NkbyozaTwTl7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713526199; c=relaxed/simple;
-	bh=+bgZ66r1XGRBk2c6wtWJJhlAaqhyQ4KaIrVWshIh8zA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ug73NuXGCUlydZdKm/QuiC/z7sGVADV8h4qQxYkFPVanYdb0M8416WzA7ywbiEcZVP3HojITVBv/KDQwNc9fosJVtDyePxiIEBuwZQJUETzcNBFz8LlWWnXMs4KoEx2cX56EcJP9+a+Wp7hoz0PQETXjVfNNNYMgVCNzpBGLzWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g3BS/44h; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1713526204; c=relaxed/simple;
+	bh=9FcSi3XTI3ln2y168KAZQnR8H7RaQ88F++eKNYeUC/A=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Bjl3vVFQkDYRLcgcfD9TI0BpfKuntGI3MOaWTceWnTx5D0M1wlxk/F76x597tauEm9e0o8bQqyfamf9Y+CMbK64rmrMwIgqRH6c1R31NMy1GKo1ciyr/TMIzIqUUhfoNW3VzhooZyIkcX2iW0v5AxBBT5dYmwjBry9u3U6q5ewA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fmvbVaGx; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713526197; x=1745062197;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+bgZ66r1XGRBk2c6wtWJJhlAaqhyQ4KaIrVWshIh8zA=;
-  b=g3BS/44h4DneImDzo/n3Sn3UrnyvVOC4TB6tBuSpEZ/1CgAATDoynV1B
-   sI32YS19MystuQZ8hG0GxFet5C7vQBeSxHwD2bfxBy1u1MAz79RVv4m2z
-   tZ4l6OvMIZ4CDEMM20aD6fN1XljGxk0wFnMmGtKLgWKTU5Q7YbVILvUSc
-   dJHkuqOkXauOww6XbeWg7UzouH5QRfjQo86xNiTIi3+IrsWK1rdZ67Xpt
-   34gkRsIfkycElm2mL0zQmw1rhFvEMnNdZ6w4nWOjgLTIqaWZy/O8Jf9pi
-   e0Ol8w9LwiBJ+kstzuNMiowW9DQ/YeIoTj5EWdUnk2sylHI3QRcESkzeZ
+  t=1713526203; x=1745062203;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9FcSi3XTI3ln2y168KAZQnR8H7RaQ88F++eKNYeUC/A=;
+  b=fmvbVaGxD0p5CoQVpZNvePBs4FQgkZJp1LUd1+gopbakhq65sYu6dS5P
+   JIB0dvRzYYYKPX1unED0ee9Pkc6cEEGOPatqmNaYW66ztqCl58M+jQhK5
+   gNq9BkAUh46sZhLbqxGtwupp3ckIhjrdbLwq44Z+2cJLRcxdwxcl+0TT8
+   whvoyhZEFLL9qq/W6nEM/1D5TU3UlhbwSj1MX8JQYQpHR3pRUKGXC3gaR
+   1228SlXf6njUtXc7o6pAX+/wGjfmhsqqiPR0xxtlS1sHurvGzJtsN7/6I
+   H7mKnmExg/0qDfDtA4gmlr9SSl0fyodCUwkLhl1g7scPnbeFAQaPt1j+4
    g==;
-X-CSE-ConnectionGUID: L8cyjuKoSSGkai2JJSwLQg==
-X-CSE-MsgGUID: Dz/PEdN5Rnu7OVU5W3JkNw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="20513150"
+X-CSE-ConnectionGUID: i/o/2fIQT+CEIjWJW3FJsQ==
+X-CSE-MsgGUID: uUeN+V16TQ24Xs8H9TKuMQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="20513164"
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="20513150"
+   d="scan'208";a="20513164"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 04:29:57 -0700
-X-CSE-ConnectionGUID: w+ysnRBiRmaupn2nQVQRMg==
-X-CSE-MsgGUID: KxMnYFbPQ5OyUTIfl97Pxw==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 04:30:02 -0700
+X-CSE-ConnectionGUID: Qlv1WddTS4SK/RAU6S4m8A==
+X-CSE-MsgGUID: Fc74Z4TOSuySWkpRFRyhLQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="23389358"
+   d="scan'208";a="23389376"
 Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by fmviesa008.fm.intel.com with ESMTP; 19 Apr 2024 04:29:55 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 19 Apr 2024 04:30:01 -0700
 From: Wei Wang <wei.w.wang@intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com
 Cc: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Wei Wang <wei.w.wang@intel.com>
-Subject: [PATCH v2 0/5] KVM/x86: Enhancements to static calls
-Date: Fri, 19 Apr 2024 19:29:47 +0800
-Message-Id: <20240419112952.15598-1-wei.w.wang@intel.com>
+Subject: [PATCH v2 1/5] KVM: x86: Replace static_call_cond() with static_call()
+Date: Fri, 19 Apr 2024 19:29:48 +0800
+Message-Id: <20240419112952.15598-2-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20240419112952.15598-1-wei.w.wang@intel.com>
+References: <20240419112952.15598-1-wei.w.wang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,60 +78,273 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset addresses two primary concerns with the current
-implementation related to static calls in kvm/x86:
-1) It is implemented based on the assumption that static_call() cannot
-handle undefined (i.e., NULL) hooks. As Sean pointed out, this is no
-longer accurate as static_call() has treated a "NULL" pointer as a NOP
-on x86.
-2) Its usage is verbose and can lead to code alignment challenges, and the
-addition of kvm_x86_ prefix to hooks at the static_call() sites hinders
-code readability and navigation.
+static_call_cond() has become redundant as static_call() now handles a
+NULL pointer as a NOP on x86. So replace it with static_call().
 
-This patchset aims to rectify the above issues. Patch 4 and 5 are marked
-as RFC, as they were not accepted yet at the idea level in the previous
-discussions, so present the code changes here and give it one more try,
-in case I didn't explain that well. Despite being marked as RFC, they've
-gone through my tests (guest launch, a few vPMU tests, live migration
-tests) without an issue.
+Link: https://lore.kernel.org/all/3916caa1dcd114301a49beafa5030eca396745c1.1679456900.git.jpoimboe@kernel.org/
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  4 ++--
+ arch/x86/kvm/irq.c              |  2 +-
+ arch/x86/kvm/lapic.c            | 24 ++++++++++++------------
+ arch/x86/kvm/pmu.c              |  6 +++---
+ arch/x86/kvm/x86.c              | 24 ++++++++++++------------
+ 5 files changed, 30 insertions(+), 30 deletions(-)
 
-v1->v2 changes:
-- Replace static_call_cond() with static_call()
-- Rename KVM_X86_SC to KVM_X86_CALL, and updated all the call sites
-- Add KVM_PMU_CALL() 
-- Add patch 4 and 5 to review the idea of removing KVM_X86_OP_OPTIONAL
-
-Wei Wang (5):
-  KVM: x86: Replace static_call_cond() with static_call()
-  KVM: x86: Introduce KVM_X86_CALL() to simplify static calls of
-    kvm_x86_ops
-  KVM: x86/pmu: Add KVM_PMU_CALL() to simplify static calls of
-    kvm_pmu_ops
-  KVM: x86: Remove KVM_X86_OP_OPTIONAL
-  KVM: x86/pmu: Remove KVM_X86_PMU_OP_OPTIONAL
-
- arch/x86/include/asm/kvm-x86-ops.h     | 100 ++++----
- arch/x86/include/asm/kvm-x86-pmu-ops.h |  20 +-
- arch/x86/include/asm/kvm_host.h        |  14 +-
- arch/x86/kvm/cpuid.c                   |   2 +-
- arch/x86/kvm/hyperv.c                  |   6 +-
- arch/x86/kvm/irq.c                     |   2 +-
- arch/x86/kvm/kvm_cache_regs.h          |  10 +-
- arch/x86/kvm/lapic.c                   |  42 +--
- arch/x86/kvm/lapic.h                   |   2 +-
- arch/x86/kvm/mmu.h                     |   6 +-
- arch/x86/kvm/mmu/mmu.c                 |   4 +-
- arch/x86/kvm/mmu/spte.c                |   4 +-
- arch/x86/kvm/pmu.c                     |  31 +--
- arch/x86/kvm/smm.c                     |  44 ++--
- arch/x86/kvm/trace.h                   |  12 +-
- arch/x86/kvm/x86.c                     | 342 ++++++++++++-------------
- arch/x86/kvm/x86.h                     |   2 +-
- arch/x86/kvm/xen.c                     |   4 +-
- 18 files changed, 317 insertions(+), 330 deletions(-)
-
-
-base-commit: 49ff3b4aec51e3abfc9369997cc603319b02af9a
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6efd1497b026..b45a73a93efa 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2280,12 +2280,12 @@ static inline bool kvm_irq_is_postable(struct kvm_lapic_irq *irq)
+ 
+ static inline void kvm_arch_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+-	static_call_cond(kvm_x86_vcpu_blocking)(vcpu);
++	static_call(kvm_x86_vcpu_blocking)(vcpu);
+ }
+ 
+ static inline void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ {
+-	static_call_cond(kvm_x86_vcpu_unblocking)(vcpu);
++	static_call(kvm_x86_vcpu_unblocking)(vcpu);
+ }
+ 
+ static inline int kvm_cpu_get_apicid(int mps_cpu)
+diff --git a/arch/x86/kvm/irq.c b/arch/x86/kvm/irq.c
+index ad9ca8a60144..7cf93d427484 100644
+--- a/arch/x86/kvm/irq.c
++++ b/arch/x86/kvm/irq.c
+@@ -157,7 +157,7 @@ void __kvm_migrate_timers(struct kvm_vcpu *vcpu)
+ {
+ 	__kvm_migrate_apic_timer(vcpu);
+ 	__kvm_migrate_pit_timer(vcpu);
+-	static_call_cond(kvm_x86_migrate_timers)(vcpu);
++	static_call(kvm_x86_migrate_timers)(vcpu);
+ }
+ 
+ bool kvm_arch_irqfd_allowed(struct kvm *kvm, struct kvm_irqfd *args)
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index ebf41023be38..eaf840699d27 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -728,7 +728,7 @@ static inline void apic_clear_irr(int vec, struct kvm_lapic *apic)
+ 	if (unlikely(apic->apicv_active)) {
+ 		/* need to update RVI */
+ 		kvm_lapic_clear_vector(vec, apic->regs + APIC_IRR);
+-		static_call_cond(kvm_x86_hwapic_irr_update)(apic->vcpu,
++		static_call(kvm_x86_hwapic_irr_update)(apic->vcpu,
+ 							    apic_find_highest_irr(apic));
+ 	} else {
+ 		apic->irr_pending = false;
+@@ -755,7 +755,7 @@ static inline void apic_set_isr(int vec, struct kvm_lapic *apic)
+ 	 * just set SVI.
+ 	 */
+ 	if (unlikely(apic->apicv_active))
+-		static_call_cond(kvm_x86_hwapic_isr_update)(vec);
++		static_call(kvm_x86_hwapic_isr_update)(vec);
+ 	else {
+ 		++apic->isr_count;
+ 		BUG_ON(apic->isr_count > MAX_APIC_VECTOR);
+@@ -800,7 +800,7 @@ static inline void apic_clear_isr(int vec, struct kvm_lapic *apic)
+ 	 * and must be left alone.
+ 	 */
+ 	if (unlikely(apic->apicv_active))
+-		static_call_cond(kvm_x86_hwapic_isr_update)(apic_find_highest_isr(apic));
++		static_call(kvm_x86_hwapic_isr_update)(apic_find_highest_isr(apic));
+ 	else {
+ 		--apic->isr_count;
+ 		BUG_ON(apic->isr_count < 0);
+@@ -2567,7 +2567,7 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+ 
+ 	if ((old_value ^ value) & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)) {
+ 		kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
+-		static_call_cond(kvm_x86_set_virtual_apic_mode)(vcpu);
++		static_call(kvm_x86_set_virtual_apic_mode)(vcpu);
+ 	}
+ 
+ 	apic->base_address = apic->vcpu->arch.apic_base &
+@@ -2677,7 +2677,7 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	u64 msr_val;
+ 	int i;
+ 
+-	static_call_cond(kvm_x86_apicv_pre_state_restore)(vcpu);
++	static_call(kvm_x86_apicv_pre_state_restore)(vcpu);
+ 
+ 	if (!init_event) {
+ 		msr_val = APIC_DEFAULT_PHYS_BASE | MSR_IA32_APICBASE_ENABLE;
+@@ -2732,9 +2732,9 @@ void kvm_lapic_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vcpu->arch.pv_eoi.msr_val = 0;
+ 	apic_update_ppr(apic);
+ 	if (apic->apicv_active) {
+-		static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
+-		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, -1);
+-		static_call_cond(kvm_x86_hwapic_isr_update)(-1);
++		static_call(kvm_x86_apicv_post_state_restore)(vcpu);
++		static_call(kvm_x86_hwapic_irr_update)(vcpu, -1);
++		static_call(kvm_x86_hwapic_isr_update)(-1);
+ 	}
+ 
+ 	vcpu->arch.apic_arb_prio = 0;
+@@ -3014,7 +3014,7 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+ 	struct kvm_lapic *apic = vcpu->arch.apic;
+ 	int r;
+ 
+-	static_call_cond(kvm_x86_apicv_pre_state_restore)(vcpu);
++	static_call(kvm_x86_apicv_pre_state_restore)(vcpu);
+ 
+ 	kvm_lapic_set_base(vcpu, vcpu->arch.apic_base);
+ 	/* set SPIV separately to get count of SW disabled APICs right */
+@@ -3041,9 +3041,9 @@ int kvm_apic_set_state(struct kvm_vcpu *vcpu, struct kvm_lapic_state *s)
+ 	kvm_lapic_set_reg(apic, APIC_TMCCT, 0);
+ 	kvm_apic_update_apicv(vcpu);
+ 	if (apic->apicv_active) {
+-		static_call_cond(kvm_x86_apicv_post_state_restore)(vcpu);
+-		static_call_cond(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
+-		static_call_cond(kvm_x86_hwapic_isr_update)(apic_find_highest_isr(apic));
++		static_call(kvm_x86_apicv_post_state_restore)(vcpu);
++		static_call(kvm_x86_hwapic_irr_update)(vcpu, apic_find_highest_irr(apic));
++		static_call(kvm_x86_hwapic_isr_update)(apic_find_highest_isr(apic));
+ 	}
+ 	kvm_make_request(KVM_REQ_EVENT, vcpu);
+ 	if (ioapic_in_kernel(vcpu->kvm))
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index a593b03c9aed..1d456b69ddc6 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -607,7 +607,7 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+ void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
+ {
+ 	if (lapic_in_kernel(vcpu)) {
+-		static_call_cond(kvm_x86_pmu_deliver_pmi)(vcpu);
++		static_call(kvm_x86_pmu_deliver_pmi)(vcpu);
+ 		kvm_apic_local_deliver(vcpu->arch.apic, APIC_LVTPC);
+ 	}
+ }
+@@ -740,7 +740,7 @@ static void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+ 
+ 	pmu->fixed_ctr_ctrl = pmu->global_ctrl = pmu->global_status = 0;
+ 
+-	static_call_cond(kvm_x86_pmu_reset)(vcpu);
++	static_call(kvm_x86_pmu_reset)(vcpu);
+ }
+ 
+ 
+@@ -818,7 +818,7 @@ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
+ 			pmc_stop_counter(pmc);
+ 	}
+ 
+-	static_call_cond(kvm_x86_pmu_cleanup)(vcpu);
++	static_call(kvm_x86_pmu_cleanup)(vcpu);
+ 
+ 	bitmap_zero(pmu->pmc_in_use, X86_PMC_IDX_MAX);
+ }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ebcc12d1e1de..4e6cbbab1e18 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5134,7 +5134,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+ static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
+ 				    struct kvm_lapic_state *s)
+ {
+-	static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
++	static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+ 
+ 	return kvm_apic_get_state(vcpu, s);
+ }
+@@ -9285,7 +9285,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 			kvm_rip_write(vcpu, ctxt->eip);
+ 			if (r && (ctxt->tf || (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
+ 				r = kvm_vcpu_do_singlestep(vcpu);
+-			static_call_cond(kvm_x86_update_emulated_instruction)(vcpu);
++			static_call(kvm_x86_update_emulated_instruction)(vcpu);
+ 			__kvm_set_rflags(vcpu, ctxt->eflags);
+ 		}
+ 
+@@ -10680,7 +10680,7 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+ 	if (irqchip_split(vcpu->kvm))
+ 		kvm_scan_ioapic_routes(vcpu, vcpu->arch.ioapic_handled_vectors);
+ 	else {
+-		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
++		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+ 		if (ioapic_in_kernel(vcpu->kvm))
+ 			kvm_ioapic_scan_entry(vcpu, vcpu->arch.ioapic_handled_vectors);
+ 	}
+@@ -10703,17 +10703,17 @@ static void vcpu_load_eoi_exitmap(struct kvm_vcpu *vcpu)
+ 		bitmap_or((ulong *)eoi_exit_bitmap,
+ 			  vcpu->arch.ioapic_handled_vectors,
+ 			  to_hv_synic(vcpu)->vec_bitmap, 256);
+-		static_call_cond(kvm_x86_load_eoi_exitmap)(vcpu, eoi_exit_bitmap);
++		static_call(kvm_x86_load_eoi_exitmap)(vcpu, eoi_exit_bitmap);
+ 		return;
+ 	}
+ #endif
+-	static_call_cond(kvm_x86_load_eoi_exitmap)(
++	static_call(kvm_x86_load_eoi_exitmap)(
+ 		vcpu, (u64 *)vcpu->arch.ioapic_handled_vectors);
+ }
+ 
+ void kvm_arch_guest_memory_reclaimed(struct kvm *kvm)
+ {
+-	static_call_cond(kvm_x86_guest_memory_reclaimed)(kvm);
++	static_call(kvm_x86_guest_memory_reclaimed)(kvm);
+ }
+ 
+ static void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
+@@ -10721,7 +10721,7 @@ static void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
+ 	if (!lapic_in_kernel(vcpu))
+ 		return;
+ 
+-	static_call_cond(kvm_x86_set_apic_access_page_addr)(vcpu);
++	static_call(kvm_x86_set_apic_access_page_addr)(vcpu);
+ }
+ 
+ /*
+@@ -10961,7 +10961,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	 * i.e. they can post interrupts even if APICv is temporarily disabled.
+ 	 */
+ 	if (kvm_lapic_enabled(vcpu))
+-		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
++		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+ 
+ 	if (kvm_vcpu_exit_request(vcpu)) {
+ 		vcpu->mode = OUTSIDE_GUEST_MODE;
+@@ -11010,7 +11010,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 			break;
+ 
+ 		if (kvm_lapic_enabled(vcpu))
+-			static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
++			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+ 
+ 		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
+ 			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
+@@ -11758,7 +11758,7 @@ static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
+ 	*mmu_reset_needed |= kvm_read_cr3(vcpu) != sregs->cr3;
+ 	vcpu->arch.cr3 = sregs->cr3;
+ 	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+-	static_call_cond(kvm_x86_post_set_cr3)(vcpu, sregs->cr3);
++	static_call(kvm_x86_post_set_cr3)(vcpu, sregs->cr3);
+ 
+ 	kvm_set_cr8(vcpu, sregs->cr8);
+ 
+@@ -12713,7 +12713,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+ 		mutex_unlock(&kvm->slots_lock);
+ 	}
+ 	kvm_unload_vcpu_mmus(kvm);
+-	static_call_cond(kvm_x86_vm_destroy)(kvm);
++	static_call(kvm_x86_vm_destroy)(kvm);
+ 	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
+ 	kvm_pic_destroy(kvm);
+ 	kvm_ioapic_destroy(kvm);
+@@ -13409,7 +13409,7 @@ bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu)
+ void kvm_arch_start_assignment(struct kvm *kvm)
+ {
+ 	if (atomic_inc_return(&kvm->arch.assigned_device_count) == 1)
+-		static_call_cond(kvm_x86_pi_start_assignment)(kvm);
++		static_call(kvm_x86_pi_start_assignment)(kvm);
+ }
+ EXPORT_SYMBOL_GPL(kvm_arch_start_assignment);
+ 
 -- 
 2.27.0
 
