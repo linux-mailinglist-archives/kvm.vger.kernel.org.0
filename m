@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-15193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B906D8AA768
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 05:48:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3551D8AA76A
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 05:48:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA0431C230FC
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 03:48:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8FCAB23718
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 03:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C627836B00;
-	Fri, 19 Apr 2024 03:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE1A5C2D6;
+	Fri, 19 Apr 2024 03:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OwaoMflC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OJcrAJl/"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03102E41C;
-	Fri, 19 Apr 2024 03:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAAC3E485;
+	Fri, 19 Apr 2024 03:46:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713498359; cv=none; b=Vuq/bnD14QOQl++oiv+7w7Q+j2YqWVoF/xjNqKYRE8sJ8Kx4vwg69yXYfparz7D0w2G5nzYs22AuoRETp2tiTm0zVWW5/SMgsONeNSiQcFq706ZX2ttZ6ytbisUjsj2nRuS3vY6kDro/89e+VQW3GJZMimUm21IT+jBAvBwl4QM=
+	t=1713498361; cv=none; b=pSUvwHLeNooNqihy7B0g+xkpBDh+DATl7hyJkfPd5Xp1aAX0qU77i+fPIx+tN0SwRQkwS3IZK/livNNo4li5TArPdpoNrNtGL8nxfHfgzheTyJjB9jHpSGSkwQAxUlkZWr9iFoCO+PpPdrq1qGtkfO7nyqPdcSvWlU49Iep3LhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713498359; c=relaxed/simple;
-	bh=bBwGEz/zSa/hCAv0OjbB+yO6hHyuL/TvJodBdVmlGns=;
+	s=arc-20240116; t=1713498361; c=relaxed/simple;
+	bh=5/QEb1aKZvreLoUXtF0uNhYLsiRGyvEfapJ7il+jZgM=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fjCa67LKJLrcnBB3AzmDI4rui5wd2Kkp5k3GfzHKMluHSktQ9AuBHoSFQy/EkTLH7lt6Dh1GiBONPLlZmQ1btbze42VwBiXfP8i2JfZtbITsSLP+62rvdxUYI6G9h/wubT83YhL0WodFO1FyJHfjPFMF1ZcCiN/C8dCsN9jw3lE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OwaoMflC; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=INtOocGN7P+Q5gJbGg9tADbXCBXfnUGQaErdIhFYjEMBDT4dEmzDpOx5F+IH3oG788Cvi+VFZtAP2w175Ec7zdYKW0B+xtDs3t3tjj1pXFqWMSx159uNUWxOJrbxdM28zCvbV4IUApsSitTBu/Mn9tNBjlJhEoCj674exVosNIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OJcrAJl/; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713498357; x=1745034357;
+  t=1713498360; x=1745034360;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bBwGEz/zSa/hCAv0OjbB+yO6hHyuL/TvJodBdVmlGns=;
-  b=OwaoMflC68rPwC2OH0zfCh919dhL4EmkP8zYPIPo7AJPlCMLvQXB0NUx
-   sG0XxndfzOqOj2uZoNiA0Hk1ScsLa8kX7Jdeo15GFZKqIjG+gAt3N+emI
-   5X3NlucI82DJX41IpeHMaquQqqnYSZnZYtja9iBKyH+LdL/bjFt2qh+cb
-   LmUYgaKy1zWFecrkwNrh7D47rrc5tQKgqgdRmVGSyDgHnXHjErjYhQ2bq
-   e86XeQfqNnjV4WgqSZE3okmssN2JhWm9F54lf8mld5ZlRUH+HfbZPA2Pa
-   PYu7i/kzFuC9lKDJbyn+ZZUiekaPc7vmYTNYJrrvyX4mRbl50uaCXnJIY
-   g==;
-X-CSE-ConnectionGUID: d1MLEUJxTni4KxwK1+qysw==
-X-CSE-MsgGUID: l1isJZncSe6c94aYBwn16A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="31565457"
+  bh=5/QEb1aKZvreLoUXtF0uNhYLsiRGyvEfapJ7il+jZgM=;
+  b=OJcrAJl/n9RN5vX+2KhRr6pe09D6MWR2oJqmgACAEFksvcfZoiBdZtMa
+   wfx4X4j3NYZSLXwXr+osbtYNYA8gD03+zIip5qIbqtm9XKYMwlpA8Uk5o
+   twJ3Lvfniju74P95bvDK/k3Bbrs9UxODYGYKALny/A9R8v3ijmX2guiZ/
+   Otu8+oIj55ZoJy7mFJYjtKO9t+LKv2JqCuHyYujOVjmdH5kO4hTa9V6kr
+   3Z7UdQCYajFdUDLODt99AEMzXzNtF1MZppsae3SZAm3qrKTB2AOtixft+
+   Jc6V2Mvrfb5xwV2jyEY1vF5ZIn79i9TcnrejJH6QJH31G8U3JtF9yB33y
+   Q==;
+X-CSE-ConnectionGUID: 7SByHVvVQr2GgV0z14Yhzg==
+X-CSE-MsgGUID: fdvePZ+nRHqBS+EA2jsSjQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="31565463"
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="31565457"
+   d="scan'208";a="31565463"
 Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 20:45:57 -0700
-X-CSE-ConnectionGUID: SmE3ZuSZR2W1MvQMgHjH9w==
-X-CSE-MsgGUID: GswCXT3bTPqdfBgfgyD5eQ==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 20:46:00 -0700
+X-CSE-ConnectionGUID: wtrIdJe7TvmMzrRFSpU+JQ==
+X-CSE-MsgGUID: xj6HBejRTIKIRZ4yRuSWcA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="54410171"
+   d="scan'208";a="54410183"
 Received: from unknown (HELO dmi-pnp-i7.sh.intel.com) ([10.239.159.155])
-  by fmviesa001.fm.intel.com with ESMTP; 18 Apr 2024 20:45:54 -0700
+  by fmviesa001.fm.intel.com with ESMTP; 18 Apr 2024 20:45:57 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
@@ -71,9 +71,9 @@ Cc: kvm@vger.kernel.org,
 	Jinrong Liang <cloudliang@tencent.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [kvm-unit-tests Patch v4 08/17] x86: pmu: Use macro to replace hard-coded branches event index
-Date: Fri, 19 Apr 2024 11:52:24 +0800
-Message-Id: <20240419035233.3837621-9-dapeng1.mi@linux.intel.com>
+Subject: [kvm-unit-tests Patch v4 09/17] x86: pmu: Use macro to replace hard-coded ref-cycles event index
+Date: Fri, 19 Apr 2024 11:52:25 +0800
+Message-Id: <20240419035233.3837621-10-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240419035233.3837621-1-dapeng1.mi@linux.intel.com>
 References: <20240419035233.3837621-1-dapeng1.mi@linux.intel.com>
@@ -85,55 +85,51 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Currently the branches event index is a hard-coded number. User could
-add new events and cause the branches event index changes in the future,
-but don't notice the hard-coded event index and forget to update the
-event index synchronously, then the issue comes.
-
-Thus, replace the hard-coded index to a macro.
+Replace hard-coded ref-cycles event index with macro to avoid possible
+mismatch issue if new event is added in the future and cause ref-cycles
+event index changed, but forget to update the hard-coded ref-cycles
+event index.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- x86/pmu.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ x86/pmu.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 43ef7ecbcaea..fd1b22104fc4 100644
+index fd1b22104fc4..6ae46398d84b 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -49,6 +49,22 @@ struct pmu_event {
- 	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
+@@ -54,6 +54,7 @@ struct pmu_event {
+  * intel_gp_events[].
+  */
+ enum {
++	INTEL_REF_CYCLES_IDX	= 2,
+ 	INTEL_BRANCHES_IDX	= 5,
  };
  
-+/*
-+ * Events index in intel_gp_events[], ensure consistent with
-+ * intel_gp_events[].
-+ */
-+enum {
-+	INTEL_BRANCHES_IDX	= 5,
-+};
-+
-+/*
-+ * Events index in amd_gp_events[], ensure consistent with
-+ * amd_gp_events[].
-+ */
-+enum {
-+	AMD_BRANCHES_IDX	= 2,
-+};
-+
- char *buf;
- 
- static struct pmu_event *gp_events;
-@@ -481,7 +497,8 @@ static void check_emulated_instr(void)
+@@ -697,7 +698,8 @@ static void set_ref_cycle_expectations(void)
  {
- 	uint64_t status, instr_start, brnch_start;
- 	uint64_t gp_counter_width = (1ull << pmu.gp_counter_width) - 1;
--	unsigned int branch_idx = pmu.is_intel ? 5 : 2;
-+	unsigned int branch_idx = pmu.is_intel ?
-+				  INTEL_BRANCHES_IDX : AMD_BRANCHES_IDX;
- 	pmu_counter_t brnch_cnt = {
- 		.ctr = MSR_GP_COUNTERx(0),
- 		/* branch instructions */
+ 	pmu_counter_t cnt = {
+ 		.ctr = MSR_IA32_PERFCTR0,
+-		.config = EVNTSEL_OS | EVNTSEL_USR | intel_gp_events[2].unit_sel,
++		.config = EVNTSEL_OS | EVNTSEL_USR |
++			  intel_gp_events[INTEL_REF_CYCLES_IDX].unit_sel,
+ 	};
+ 	uint64_t tsc_delta;
+ 	uint64_t t0, t1, t2, t3;
+@@ -733,8 +735,10 @@ static void set_ref_cycle_expectations(void)
+ 	if (!tsc_delta)
+ 		return;
+ 
+-	intel_gp_events[2].min = (intel_gp_events[2].min * cnt.count) / tsc_delta;
+-	intel_gp_events[2].max = (intel_gp_events[2].max * cnt.count) / tsc_delta;
++	intel_gp_events[INTEL_REF_CYCLES_IDX].min =
++		(intel_gp_events[INTEL_REF_CYCLES_IDX].min * cnt.count) / tsc_delta;
++	intel_gp_events[INTEL_REF_CYCLES_IDX].max =
++		(intel_gp_events[INTEL_REF_CYCLES_IDX].max * cnt.count) / tsc_delta;
+ }
+ 
+ static void check_invalid_rdpmc_gp(void)
 -- 
 2.34.1
 
