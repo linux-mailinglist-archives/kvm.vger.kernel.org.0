@@ -1,248 +1,251 @@
-Return-Path: <kvm+bounces-15248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9B58AAD6B
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:09:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1528AAD8C
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:18:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D50B01F224F4
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 11:09:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCA611F220F5
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 11:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDCC8564F;
-	Fri, 19 Apr 2024 11:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FnQDYn+6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F01983CA0;
+	Fri, 19 Apr 2024 11:18:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FC984D2E;
-	Fri, 19 Apr 2024 11:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94282839F1;
+	Fri, 19 Apr 2024 11:18:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713524931; cv=none; b=G2XKu6Wm6nZNWqNeN+PSYSerqpNz0/fnj9sH0qAn9RsC5cmo2kS7ztpp5nbP3khgb4/FYnHtk4M+/oGpXODdNtUQupurXPvWQsvOD3bQV00pIY+P0HpeT6KR1NXcF4PDnqK4vPqoUk3/RAUdJmMVacUOReNnjv5DCvORYcqQQUs=
+	t=1713525511; cv=none; b=S04zRu882Zk7OLCByd3S1ywDi4mlQEP9uPFKd2B0Jsdg9w8EEdI28FC/v50XrQsGKrhahaB8bdykhNrpltC6lIOVeiGMIbKAA9AZER02jpEu/vnmz2l7lqrd4WjttVkSPRGhHqKmHFcD5F0AURcBDlPQhgYm1YHZ6zBnQZ8b4Uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713524931; c=relaxed/simple;
-	bh=sgd0fnLt4r0RsBT24bZl6Ymc5Cr9jd8UGDKTw3oGxVo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AfJtab+Ukz3wv3uutNRcZZvZN8lGL9IBlfKA/vA3ahYoFYyqsTql4BtDEzvxrZ0kxYYMMDvZIDhhojIeYEWK3m71hVJ0AhzGnyuvVbu4Qu6A0tNI4NsinKvKd7a5c1J38vKIK30A7ZNQUvSa5oXHmKAlxBC0I3nbn5totIF32UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FnQDYn+6; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a5561b88bb3so207744866b.0;
-        Fri, 19 Apr 2024 04:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713524928; x=1714129728; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2fP3T1HRg4APmOPCr1i20fy3OAFGb9fSrnxRLKsDwOU=;
-        b=FnQDYn+6iSLNMs9xOgGywna20u9bs/S15XW0t1y85QovUidQy5rFapaq06PRVB61Hk
-         Cisnk/PfejXxYWgfSpmCJ28IPV9Mivl6M2WMkS+Pb1noomVBjvUeV4sf0Wgc8c8b2tWc
-         UF82mCV/wBeqY4Do5hZbpSsY215JK2Oi78XqqAkxmviTt5CvQPjcS44UEAsAGavjNQ/0
-         qbra4Gcq8Qww4/QMR2GDzDNwLqKRZDuD/YoqACVSNNScWHLvvF2rg+pMMB1/34CNl3ak
-         dQAmKbAW9Zgeu6M0nT9m6FG39TAitVhpTQglh3joIAz/Mbx/sZ8pL9PbPU4glUxxL8BP
-         zjQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713524928; x=1714129728;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2fP3T1HRg4APmOPCr1i20fy3OAFGb9fSrnxRLKsDwOU=;
-        b=w6gTjJECk8WQifhJSTDRdbqyNhWVpdjSAJyM1d/KhmE0PW1b6f71+uufsHwasXB7k2
-         66vfygy8iSuBWAsZMil3UlYE7R6196kHSrVzx6MmtPhLwSQ0uDGFzXrrX9x7iPzUkjX5
-         i9QvEqmyCnmp9ziHQM5YgkJNH/6G9+j+AXFZgIIJjDn6g2oM94mWxkQmwaDy5eIvP02u
-         BWzTTxVa2RIp+4MngWxKcseiVLXSJB3AJ9S2eH5u1ZdqRhjehFKhRfGsm+gzut0a28nd
-         ethBqJSv+Q0CDi5SIvNKMAbJCOLCWOywBjTnuislRGdYL1/PONJrW1xwPh0+V1TAJV2K
-         HMJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCR7jymh/4t7ZkELLLjMo2vzUr9nxKufjLZGj2P/zI15E821EankDuOILkJAMxj5BXcPsSPdLTEzjHyjC/dMBeVIHeNDlc6iu+2hNM7PHeow9DzxLaH2Ef/1Ul
-X-Gm-Message-State: AOJu0YyX5TYhEdvEm8jqzzPS1bOWVjvPHthlBe94Muhhe+0n/LjNjqPk
-	E8fTy9h0bz2JWVjpAQ9YodKiPGs9JVNAFuLhw6ppvyR+PmWniXda3kYJOA==
-X-Google-Smtp-Source: AGHT+IFy2QsdrmLfOtT9EYc1USivrPyf0Bwi5GEdqAq0Fpn53sZdiNwWQaN42/Mf/SYmqQzPfik1yw==
-X-Received: by 2002:a17:906:a206:b0:a52:2c00:9850 with SMTP id r6-20020a170906a20600b00a522c009850mr1380280ejy.59.1713524927726;
-        Fri, 19 Apr 2024 04:08:47 -0700 (PDT)
-Received: from 127.0.0.1localhost ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id z13-20020a17090655cd00b00a4739efd7cesm2082525ejp.60.2024.04.19.04.08.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 04:08:46 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Paul Durrant <paul@xen.org>,
-	xen-devel@lists.xenproject.org,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [PATCH io_uring-next/net-next v2 4/4] io_uring/notif: implement notification stacking
-Date: Fri, 19 Apr 2024 12:08:42 +0100
-Message-ID: <bf1e7f9b72f9ecc99999fdc0d2cded5eea87fd0b.1713369317.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1713369317.git.asml.silence@gmail.com>
-References: <cover.1713369317.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1713525511; c=relaxed/simple;
+	bh=qdD+zvfn8A8+Jt0/OJZ4b0GtvV63He1oE6Vd2NNNvac=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EQPbrTHkDAYBEFGPaL3RnnAeQ86IgEKmKBHcLk8WjnbYakGpqemolMK6NGupgGlUNkcFXdNbl1GPnb2z0+km0Et0KtRNBwhn7zahh3Ywk6hpIn9naVfTEIyMFAOszVRwluQRsTBHqXq7rjogfBK61cgdbESGvQvsPiRvLSYYXFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 345AD2F;
+	Fri, 19 Apr 2024 04:18:55 -0700 (PDT)
+Received: from [10.1.32.31] (e122027.cambridge.arm.com [10.1.32.31])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7F78D3F792;
+	Fri, 19 Apr 2024 04:18:23 -0700 (PDT)
+Message-ID: <3ee316c9-0660-4b21-a02c-cda8fe9fd118@arm.com>
+Date: Fri, 19 Apr 2024 12:18:21 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 06/43] arm64: RME: Add wrappers for RMI calls
+To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <20240412084309.1733783-1-steven.price@arm.com>
+ <20240412084309.1733783-7-steven.price@arm.com>
+ <b8019da1-d361-445b-a224-0761640aa616@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <b8019da1-d361-445b-a224-0761640aa616@arm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The network stack allows only one ubuf_info per skb, and unlike
-MSG_ZEROCOPY, each io_uring zerocopy send will carry a separate
-ubuf_info. That means that send requests can't reuse a previosly
-allocated skb and need to get one more or more of new ones. That's fine
-for large sends, but otherwise it would spam the stack with lots of skbs
-carrying just a little data each.
+On 16/04/2024 14:14, Suzuki K Poulose wrote:
+> Hi Steven
+> 
+> On 12/04/2024 09:42, Steven Price wrote:
+>> The wrappers make the call sites easier to read and deal with the
+>> boiler plate of handling the error codes from the RMM.
+>>
+> 
+> I have compared the parameters and output values to that of the RMM spec
+> and they match. There are some minor nits below.
+> 
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>   arch/arm64/include/asm/rmi_cmds.h | 509 ++++++++++++++++++++++++++++++
+>>   1 file changed, 509 insertions(+)
+>>   create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+>>
+>> diff --git a/arch/arm64/include/asm/rmi_cmds.h
+>> b/arch/arm64/include/asm/rmi_cmds.h
+>> new file mode 100644
+>> index 000000000000..c21414127e8e
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/rmi_cmds.h
+>> @@ -0,0 +1,509 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * Copyright (C) 2023 ARM Ltd.
+>> + */
+>> +
+>> +#ifndef __ASM_RMI_CMDS_H
+>> +#define __ASM_RMI_CMDS_H
+>> +
+>> +#include <linux/arm-smccc.h>
+>> +
+>> +#include <asm/rmi_smc.h>
+>> +
+>> +struct rtt_entry {
+>> +    unsigned long walk_level;
+>> +    unsigned long desc;
+>> +    int state;
+>> +    int ripas;
+>> +};
+>> +
+> 
+> ...
+> 
+>> +/**
+>> + * rmi_data_destroy() - Destroy a Data Granule
+>> + * @rd: PA of the RD
+>> + * @ipa: IPA at which the granule is mapped in the guest
+>> + * @data_out: PA of the granule which was destroyed
+>> + * @top_out: Top IPA of non-live RTT entries
+>> + *
+>> + * Transitions the granule to DESTROYED state, the address cannot be
+>> used by
+>> + * the guest for the lifetime of the Realm.
+>> + *
+>> + * Return: RMI return code
+>> + */
+>> +static inline int rmi_data_destroy(unsigned long rd, unsigned long ipa,
+>> +                   unsigned long *data_out,
+>> +                   unsigned long *top_out)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_1_1_invoke(SMC_RMI_DATA_DESTROY, rd, ipa, &res);
+>> +
+>> +    *data_out = res.a1;
+>> +    *top_out = res.a2;
+> 
+> minor nit: Do we need to be safer by checking the parameters before
+> filling them in ? i.e.,
+> 
+>     if (ptr)
+>         *ptr = result_out;
+> 
+> This applies for others calls below.
 
-To help with that implement linking notification (i.e. an io_uring wrapper
-around ubuf_info) into a list. Each is refcounted by skbs and the stack
-as usual. additionally all non head entries keep a reference to the
-head, which they put down when their refcount hits 0. When the head have
-no more users, it'll efficiently put all notifications in a batch.
+I had taken the approach of making all the out-parameters required (i.e.
+non-NULL). But I guess I can switch over to allowing NULL - hopefully
+the compiler will optimise these checks away, but there are some
+situations where we are currently ignoring the extra out-parameters that
+could be tidied up.
 
-As mentioned previously about ->io_link_skb, the callback implementation
-always allows to bind to an skb without a ubuf_info.
+> 
+>> +
+>> +    return res.a0;
+>> +}
+> 
+>> +
+>> +/**
+>> + * rmi_realm_destroy() - Destroy a Realm
+>> + * @rd: PA of the RD
+>> + *
+>> + * Destroys a Realm, all objects belonging to the Realm must be
+>> destroyed first.
+>> + *
+>> + * Return: RMI return code
+>> + */
+>> +static inline int rmi_realm_destroy(unsigned long rd)
+>> +{
+>> +    struct arm_smccc_res res;
+>> +
+>> +    arm_smccc_1_1_invoke(SMC_RMI_REALM_DESTROY, rd, &res);
+>> +
+>> +    return res.a0;
+>> +}
+>> +
+>> +/**
+>> + * rmi_rec_aux_count() - Get number of auxiliary Granules required
+>> + * @rd: PA of the RD
+>> + * @aux_count: Number of pages written to this pointer
+>> + *
+>> + * A REC may require extra auxiliary pages to be delegateed for the
+>> RMM to
+> 
+> minor nit: "s/delegateed/delegated/"
+> 
+> ...
+> 
+>> +/**
+>> + * rmi_rtt_read_entry() - Read an RTTE
+>> + * @rd: PA of the RD
+>> + * @ipa: IPA for which to read the RTTE
+>> + * @level: RTT level at which to read the RTTE
+>> + * @rtt: Output structure describing the RTTE
+>> + *
+>> + * Reads a RTTE (Realm Translation Table Entry).
+>> + *
+>> + * Return: RMI return code
+>> + */
+>> +static inline int rmi_rtt_read_entry(unsigned long rd, unsigned long
+>> ipa,
+>> +                     long level, struct rtt_entry *rtt)
+>> +{
+>> +    struct arm_smccc_1_2_regs regs = {
+>> +        SMC_RMI_RTT_READ_ENTRY,
+>> +        rd, ipa, level
+>> +    };
+>> +
+>> +    arm_smccc_1_2_smc(&regs, &regs);
+>> +
+>> +    rtt->walk_level = regs.a1;
+>> +    rtt->state = regs.a2 & 0xFF;
+> 
+> minor nit: We mask the state, but not the "ripas". Both of them are u8.
+> For consistency, we should mask both or neither.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- io_uring/notif.c | 71 +++++++++++++++++++++++++++++++++++++++++++-----
- io_uring/notif.h |  3 ++
- 2 files changed, 67 insertions(+), 7 deletions(-)
+Good point - I'll mask ripas as well. I suspect this is a bug that crept
+in when I was updating for the new RIPAS state.
 
-diff --git a/io_uring/notif.c b/io_uring/notif.c
-index 26680176335f..d58cdc01e691 100644
---- a/io_uring/notif.c
-+++ b/io_uring/notif.c
-@@ -9,18 +9,28 @@
- #include "notif.h"
- #include "rsrc.h"
- 
-+static const struct ubuf_info_ops io_ubuf_ops;
-+
- static void io_notif_tw_complete(struct io_kiocb *notif, struct io_tw_state *ts)
- {
- 	struct io_notif_data *nd = io_notif_to_data(notif);
- 
--	if (unlikely(nd->zc_report) && (nd->zc_copied || !nd->zc_used))
--		notif->cqe.res |= IORING_NOTIF_USAGE_ZC_COPIED;
-+	do {
-+		notif = cmd_to_io_kiocb(nd);
- 
--	if (nd->account_pages && notif->ctx->user) {
--		__io_unaccount_mem(notif->ctx->user, nd->account_pages);
--		nd->account_pages = 0;
--	}
--	io_req_task_complete(notif, ts);
-+		lockdep_assert(refcount_read(&nd->uarg.refcnt) == 0);
-+
-+		if (unlikely(nd->zc_report) && (nd->zc_copied || !nd->zc_used))
-+			notif->cqe.res |= IORING_NOTIF_USAGE_ZC_COPIED;
-+
-+		if (nd->account_pages && notif->ctx->user) {
-+			__io_unaccount_mem(notif->ctx->user, nd->account_pages);
-+			nd->account_pages = 0;
-+		}
-+
-+		nd = nd->next;
-+		io_req_task_complete(notif, ts);
-+	} while (nd);
- }
- 
- void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
-@@ -39,12 +49,56 @@ void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
- 	if (!refcount_dec_and_test(&uarg->refcnt))
- 		return;
- 
-+	if (nd->head != nd) {
-+		io_tx_ubuf_complete(skb, &nd->head->uarg, success);
-+		return;
-+	}
- 	notif->io_task_work.func = io_notif_tw_complete;
- 	__io_req_task_work_add(notif, IOU_F_TWQ_LAZY_WAKE);
- }
- 
-+static int io_link_skb(struct sk_buff *skb, struct ubuf_info *uarg)
-+{
-+	struct io_notif_data *nd, *prev_nd;
-+	struct io_kiocb *prev_notif, *notif;
-+	struct ubuf_info *prev_uarg = skb_zcopy(skb);
-+
-+	nd = container_of(uarg, struct io_notif_data, uarg);
-+	notif = cmd_to_io_kiocb(nd);
-+
-+	if (!prev_uarg) {
-+		net_zcopy_get(&nd->uarg);
-+		skb_zcopy_init(skb, &nd->uarg);
-+		return 0;
-+	}
-+	/* handle it separately as we can't link a notif to itself */
-+	if (unlikely(prev_uarg == &nd->uarg))
-+		return 0;
-+	/* we can't join two links together, just request a fresh skb */
-+	if (unlikely(nd->head != nd || nd->next))
-+		return -EEXIST;
-+	/* don't mix zc providers */
-+	if (unlikely(prev_uarg->ops != &io_ubuf_ops))
-+		return -EEXIST;
-+
-+	prev_nd = container_of(prev_uarg, struct io_notif_data, uarg);
-+	prev_notif = cmd_to_io_kiocb(nd);
-+
-+	/* make sure all noifications can be finished in the same task_work */
-+	if (unlikely(notif->ctx != prev_notif->ctx ||
-+		     notif->task != prev_notif->task))
-+		return -EEXIST;
-+
-+	nd->head = prev_nd->head;
-+	nd->next = prev_nd->next;
-+	prev_nd->next = nd;
-+	net_zcopy_get(&nd->head->uarg);
-+	return 0;
-+}
-+
- static const struct ubuf_info_ops io_ubuf_ops = {
- 	.complete = io_tx_ubuf_complete,
-+	.link_skb = io_link_skb,
- };
- 
- struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx)
-@@ -65,6 +119,9 @@ struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx)
- 	nd = io_notif_to_data(notif);
- 	nd->zc_report = false;
- 	nd->account_pages = 0;
-+	nd->next = NULL;
-+	nd->head = nd;
-+
- 	nd->uarg.flags = IO_NOTIF_UBUF_FLAGS;
- 	nd->uarg.ops = &io_ubuf_ops;
- 	refcount_set(&nd->uarg.refcnt, 1);
-diff --git a/io_uring/notif.h b/io_uring/notif.h
-index 2cf9ff6abd7a..f3589cfef4a9 100644
---- a/io_uring/notif.h
-+++ b/io_uring/notif.h
-@@ -14,6 +14,9 @@ struct io_notif_data {
- 	struct file		*file;
- 	struct ubuf_info	uarg;
- 
-+	struct io_notif_data	*next;
-+	struct io_notif_data	*head;
-+
- 	unsigned		account_pages;
- 	bool			zc_report;
- 	bool			zc_used;
--- 
-2.44.0
+>> +    rtt->desc = regs.a3;
+>> +    rtt->ripas = regs.a4;
+>> +
+>> +    return regs.a0;
+>> +}
+>> +
+> 
+> ...
+> 
+>> +/**
+>> + * rmi_rtt_get_phys() - Get the PA from a RTTE
+>> + * @rtt: The RTTE
+>> + *
+>> + * Return: the physical address from a RTT entry.
+>> + */
+>> +static inline phys_addr_t rmi_rtt_get_phys(struct rtt_entry *rtt)
+>> +{
+>> +    return rtt->desc & GENMASK(47, 12);
+>> +}
+> 
+> I guess this may need to change with the LPA2 support in RMM and must be
+> used in conjunction with the "realm" object to make the correct
+> conversion.
+
+Actually this is currently unused, and there's a potential bug lurking
+in realm_map_protected() where rtt->desc is assumed to be a valid
+physical address. I'll move the function there and fix it up by also
+taking a realm argument. I've tried to keep the realm structure out of
+this file.
+
+Thanks,
+
+Steve
 
 
