@@ -1,199 +1,127 @@
-Return-Path: <kvm+bounces-15375-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15376-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8EC8AB701
-	for <lists+kvm@lfdr.de>; Sat, 20 Apr 2024 00:03:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 439048AB736
+	for <lists+kvm@lfdr.de>; Sat, 20 Apr 2024 00:24:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 174C01F223E8
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 22:03:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE610282341
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 22:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D12B13D278;
-	Fri, 19 Apr 2024 22:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA46713D2AF;
+	Fri, 19 Apr 2024 22:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GuATQqUW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="P8isnNkf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB0913C914
-	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 22:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CFE139583
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 22:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713564205; cv=none; b=ePj4vk43L7P1Bv6C/UyhIogN4QJ8Gaga/EToAPjMbTtRcg2/gqQXGrxcqYRfdYhbUEoa/Lxo3+bvSUlR93hrgS8+YYeR0FbJTDOGD6Z8yPF/vZokV6aPF7Af7YrViMt1iFqw+I5TdruNCGtM2b3cPVtYg6OzRD5qsIxldS57D74=
+	t=1713565435; cv=none; b=JIzP6yBXFwpsqDLReQmvppMKmzOqtNIdCbvI+/RT5AMhejqFEHpbIsFgD9QgQtfB6tcvA7LRuisxi3FeBdxQ5Q/sDGx6Tjfesw0diKzsgzGQWRAg0z8X7IvDrKQZtzLBYYth4pxi/4DLVn8GEMr/uCycved1CF6fC9FXXbzB7nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713564205; c=relaxed/simple;
-	bh=Q/Zh4Phu3kMJZN8fjVTRc3aiOk1qAnHvnKyLpI/2Y4A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=evtCQszNwagmaGx2dy1N78GaOtTEJeNG8qB9A4+2J08VH8A9TOEtUb6eU9u7TzzfGCA1HeIcSU/WzEOlwRv+2lZqnEozJE5rJJ+dbHYq2sIy5IDyNLdhJeadjUb864av3C39auX1BdhW47EYnty1kPCHxJzq9dAiQFPA+20cO+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GuATQqUW; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e78970853so5703394a12.0
-        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 15:03:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713564202; x=1714169002; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fPM7E5V6o141sK0f0dMZ+PfvZ9fH+BP0EjEziH4VhA8=;
-        b=GuATQqUWiwG1eUfs4DKhOcSeJuMl+U18hqa0DM7T10yr42EjEYFAngxc3rMjZBfDcp
-         VyPa0TRuzdxejmQKvSybH0ssnIBaWC/xS6EmkW8PYemSNQ2tpej3YAfPvMpL30ty7zQL
-         4f7VQMgUcrU3+CU14FzZfNh4Mtdesg/EqyTUNipPjvX9Etz57rzAXxMsNJQF7ASFUL64
-         T88gMWBRkFN6bZpH4K+Mr3eTay7ech0itguD+sqAkzBWGJQntV/aGsRYZDtCvwE+/zwF
-         p3J5CcKD7+U2Hp0+kUNTxPDrvCf9PfS6TwBbLRAq7sFna/uvoirA1shCVk+omdqjLwm1
-         01hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713564202; x=1714169002;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fPM7E5V6o141sK0f0dMZ+PfvZ9fH+BP0EjEziH4VhA8=;
-        b=P4dHBSzrhxA/GmEl5FQamfEtMsXLj0Ft/Q0+lTI9uXFrkprPqB/j9IJ8oDYosTComJ
-         qn9+B7X3BE5G5cdnYYNLWDUIdok0hxG57caTW2O/JcSm9B0MsT+GtdZMsZrO8uJ1/Dnr
-         ECRdv6SqiACDJNl9t2z1f4gQwSHG0u9u5qs3sKiPtDfochupkqygQqZthgRpVtulTq6q
-         eLmHHFC346kpraOv1/RkzEg37LtHCimSZwFBSTLcZLO+s0pzQiCXRmbKX89UFwdOQDjZ
-         nLbs6fCnduUZJWDHRGc0ev2YwHMK/Gs8dVZUXubkq+WXm8y4cr4BihY7BAx6l5zwCSj+
-         Ta1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX6Dk3E98KLLZ34YsJqwIr46zte1LTlolRM4nMhE0d199BGRrnVwvklRs/hlQ6DvZbd/AK5igj4xqwmgxs3m65tAKY4
-X-Gm-Message-State: AOJu0Yyi2UD5s2qQAHqgk4SlJqm5Q9blhkeVmOSyXIQSxqW9jIEr9aWX
-	RE33L2vDzUwiKEo6oQBGToEk1fPl7MJJSF/Uzft0JOOQxitlucWJKD6kfgGA/mRjnQdRffzCzTo
-	MN10bLb3+EnN18aEBDqlFUibuhs7Zc1Lal7Lt
-X-Google-Smtp-Source: AGHT+IH6ct4MXT/M9EFtlx7SpDj0we1LDpdCBQKOb3ZdBzAm5rjExj/ulUG+TNKLIMaXMb5ECEpOvDwF5d4LvllnADc=
-X-Received: by 2002:a17:906:c34c:b0:a55:6d17:6fbf with SMTP id
- ci12-20020a170906c34c00b00a556d176fbfmr3229721ejb.5.1713564202210; Fri, 19
- Apr 2024 15:03:22 -0700 (PDT)
+	s=arc-20240116; t=1713565435; c=relaxed/simple;
+	bh=VD6QFxX1Xd3DNVIOsaev//o7h4mZlv5eWXjCnxaWhik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RIWnAhOqAqQuFeJLiddMhB5jRGHDhk4MICws/69LPiYiIV7slrK4WhAhIj+RWftB9YCupS2rgpOnzGrqvKW3FSCa/RPjuZYF0ZQb0tw6izdDlVj0DHNsVE8c0a3yeKGPUkeWnQdM63x7iPO+pKF7cJV+ijyCqTyAjKq9bSk9OK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=P8isnNkf; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Fri, 19 Apr 2024 22:23:43 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713565432;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mthBWOOhcNSWoMZhMTAfzR7XGep2Qks53Rpg12wvEhs=;
+	b=P8isnNkfBYXWB0pGZ4e76KozKbuIPo6rHG7Ox+d9b31tlskAlwzX5Fiy922x3848sQHdds
+	2boqaE4bF1mMbPeod2X267+67KV2A02qKBDa6v3fbd7lZbgPblznjJvZe8hzyomSxDd6nH
+	88u9gjkSLzKAR6O3WgIDpbW6x4ZMNao=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: James Houghton <jthoughton@google.com>
+Cc: David Matlack <dmatlack@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>, Yu Zhao <yuzhao@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Jonathan Corbet <corbet@lwn.net>, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Shaoqin Huang <shahuang@redhat.com>, Gavin Shan <gshan@redhat.com>,
+	Ricardo Koller <ricarkol@google.com>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	David Rientjes <rientjes@google.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-mm@kvack.org,
+	linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/7] mm/kvm: Improve parallelism for access bit
+ harvesting
+Message-ID: <ZiLu72SZ3tl_Cdvm@linux.dev>
+References: <20240401232946.1837665-1-jthoughton@google.com>
+ <ZhmAR1akBHjvZ9_4@google.com>
+ <CADrL8HW+4Yq-wBr1+DzJvSwRRL_hqt5RaCCLgOQndPGUqoX+Rg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <ZhgX6BStTh05OfEd@google.com> <ZiGGiOspm6N-vIta@google.com> <ZiLCjutwO6XIQp5Z@google.com>
-In-Reply-To: <ZiLCjutwO6XIQp5Z@google.com>
-From: Mingwei Zhang <mizhang@google.com>
-Date: Fri, 19 Apr 2024 15:02:45 -0700
-Message-ID: <CAL715WJQuhnNB6M8vAKVicvkp1Jt_K6H9C8rj866+YmbxYXGcg@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/41] KVM: x86/pmu: Introduce passthrough vPM
-To: Sean Christopherson <seanjc@google.com>
-Cc: Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, 
-	peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com, 
-	dapeng1.mi@linux.intel.com, jmattson@google.com, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	zhiyuan.lv@intel.com, eranian@google.com, irogers@google.com, 
-	samantha.alt@intel.com, like.xu.linux@gmail.com, chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADrL8HW+4Yq-wBr1+DzJvSwRRL_hqt5RaCCLgOQndPGUqoX+Rg@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-> Currently, at a feature level, I mentally bin things into two rough categories
-> in KVM:
->
->  1. Virtualized - Guest state is loaded into hardware, or hardware supports
->                   running with both host and guest state (e.g. TSC scaling), and
->                   the guest has full read/write access to its state while running.
->
->  2. Emulated    - Guest state is never loaded into hardware, and instead the
->                   feature/state is emulated in software.
->
-> There is no "Passthrough" because that's (mostly) covered by my Virtualized
-> definition.   And because I also think of passthrough as being about *assets*,
-> not about the features themselves.
+On Fri, Apr 19, 2024 at 01:57:03PM -0700, James Houghton wrote:
+> On Fri, Apr 12, 2024 at 11:41 AM David Matlack <dmatlack@google.com> wrote:
+> >
+> > On 2024-04-01 11:29 PM, James Houghton wrote:
+> > > This patchset adds a fast path in KVM to test and clear access bits on
+> > > sptes without taking the mmu_lock. It also adds support for using a
+> > > bitmap to (1) test the access bits for many sptes in a single call to
+> > > mmu_notifier_test_young, and to (2) clear the access bits for many ptes
+> > > in a single call to mmu_notifier_clear_young.
+> >
+> > How much improvement would we get if we _just_ made test/clear_young
+> > lockless on x86 and hold the read-lock on arm64? And then how much
+> > benefit does the bitmap look-around add on top of that?
 
-Sure. In fact, "virtualized" works for me as well. My mind is aligned with this.
+Thanks David for providing the suggestion.
 
->
-> They are far from perfect definitions, e.g. individual assets can be passed through,
-> virtualized by hardware, or emulated in software.  But for the most part, I think
-> classifying features as virtualized vs. emulated works well, as it helps reason
-> about the expected behavior and performance of a feature.
->
-> E.g. for some virtualized features, certain assets may need to be explicitly passed
-> through, e.g. access to x2APIC MSRs for APICv.  But APICv itself still falls
-> into the virtualized category, e.g. the "real" APIC state isn't passed through
-> to the guest.
->
-> If KVM didn't already have a PMU implementation to deal with, this wouldn't be
-> an issue, e.g. we'd just add "enable_pmu" and I'd mentally bin it into the
-> virtualized category.  But we need to distinguish between the two PMU models,
-> and using "enable_virtualized_pmu" would be comically confusing for users. :-)
->
-> And because this is user visible, I would like to come up with a name that (some)
-> KVM users will already be familiar with, i.e. will have some chance of intuitively
-> understand without having to go read docs.
->
-> Which is why I proposed "mediated"; what we are proposing for the PMU is similar
-> to the "mediated device" concepts in VFIO.  And I also think "mediated" is a good
-> fit in general, e.g. this becomes my third classification:
->
->  3. Mediated    - Guest is context switched at VM-Enter/VM-Exit, i.e. is loaded
->                   into hardware, but the guest does NOT have full read/write access
->                   to the feature.
->
-> But my main motiviation for using "mediated" really is that I hope that it will
-> help KVM users grok the basic gist of the design without having to read and
-> understand KVM documentation, because there is already existing terminology in
-> the broader KVM space.
+> I don't have these results right now. For the next version I will (1)
+> separate the series into the locking change and the bitmap change, and
+> I will (2) have performance data for each change separately. It is
+> conceivable that the bitmap change should just be considered as a
+> completely separate patchset.
 
-Understand this part. Mediated is the fact that KVM sits in between,
-but I feel we can find a better name :)
->
-> > We intercept the control plan in current design, but the only thing
-> > we do is the event filtering. No fancy code change to emulate the control
-> > registers. So, it is still a passthrough logic.
->
-> It's not though.  Passthrough very specifically means the guest has unfettered
-> access to some asset, and/or KVM does no filtering/adjustments whatseover.
->
-> "Direct" is similar, e.g. KVM's uses "direct" in MMU context to refer to addresses
-> that don't require KVM to intervene and translate.  E.g. entire MMUs can be direct,
-> but individual shadow pages can also be direct (no corresponding guest PTE to
-> translate).
+That'd be great. Having the performance numbers will make it even more
+compelling, but I'd be tempted to go for the lock improvement just
+because it doesn't add any new complexity and leverages existing patterns
+in the architectures that people seem to want improvements for.
 
-Oh, isn't "direct" a perfect word for this? Look, our new design does
-not require KVM to translate the encodings into events and into
-encoding again (in "perf subsystem") before entering HW. It is really
-"direct" in this sense, no?
+The bitmap interface, OTOH, is rather complex. At least the current
+implementation breaks some of the isolation we have between the MMU code
+and the page table walker library on arm64, which I'm not ecstatic about.
+It _could_ be justified by a massive performance uplift over locking, but
+it'd have to be a sizable win.
 
-Neither does KVM do any translation of the event encodings across
-micro-architectures. So, it is really _direct_ from this perspective
-as well.
-
-On the other hand, "direct" means straightforward, indicating
-passthrough, but not always, in which KVM retains the power of
-control.
-
->
-> For this flavor of PMU, it's not full passthrough or direct.  Some assets are
-> passed through, e.g. PMCs, but others are not.
->
-> > In some (rare) business cases, I think maybe we could fully passthrough
-> > the control plan as well. For instance, sole-tenant machine, or
-> > full-machine VM + full offload. In case if there is a cpu errata, KVM
-> > can force vmexit and dynamically intercept the selectors on all vcpus
-> > with filters checked. It is not supported in current RFC, but maybe
-> > doable in later versions.
->
-> Heh, that's an argument for using something other than "passthrough", because if
-> we ever do support such a use case, we'd end up with enable_fully_passthrough_pmu,
-> or in the spirit of KVM shortlogs, really_passthrough_pmu :-)
-
-Full passthrough is possible and the naming of "really_passthrough"
-and others can all be alive under the "direct PMU".
-
->
-> Though I think even then I would vote for "enable_dedicated_pmu", or something
-> along those lines, purely to avoid overloading "passthrough", i.e. to try to use
-> passhtrough strictly when talking about assets, not features.  And because unless
-> we can also passthrough LVTPC, it still wouldn't be a complete passthrough of the
-> PMU as KVM would be emulating PMIs.
-
-I agree to avoid "passthrough". Dedicated is also a fine word. It
-indicates the PMU is dedicated to serve the KVM guests. But the scope
-might be a little narrow. This is just my opinion. Maybe it is because
-my mind has been stuck with "direct" :)
-
-Thanks.
-
--Mingwei
+-- 
+Thanks,
+Oliver
 
