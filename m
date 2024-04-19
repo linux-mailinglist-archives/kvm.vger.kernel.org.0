@@ -1,211 +1,146 @@
-Return-Path: <kvm+bounces-15290-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15291-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73148AAFCA
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 15:53:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE91C8AAFD5
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 15:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 258111F22627
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:53:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA447283CE0
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 674C012C819;
-	Fri, 19 Apr 2024 13:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE7612D1E8;
+	Fri, 19 Apr 2024 13:55:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EmKPcGhZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PyeSAbMi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FB8312C534;
-	Fri, 19 Apr 2024 13:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3ED12C817
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 13:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713534818; cv=none; b=arVBADXYMbmFmngM/qd5sT9tCZS7TRCAHfPu8oxjGpvCFCtCbYeybpSk/od2adN9CQRVWHaUKAV9erGUmLs3hCFE8vK3zkkOMqkanPw9QdhOxBfnQ/aavCaVxas3qkQPWnVxQRs6Fw+62onICuBh2euWE64C0QUl2P1J1sPNzhQ=
+	t=1713534912; cv=none; b=Kecvy0PA5rBzJ5wYy9m+yr11vjEsNVecBybQTGIZG0Eegj/b5miwraLJ3L1B904qfgsTpE0bkRd6BmCrGxXXnpX3OtzXnizDcdtSkCKLD0kkt72ipnv3ypvFJEX7iEW21q5PDfkxlVdHB4ZYyw0Afozzw0lHZ02HiqmlhRu8KA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713534818; c=relaxed/simple;
-	bh=iDYeJLnLcgO40R6gEmIE6Jo/vKhEDL5cey5xmLIJnN8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f1mzGyKTWq6TbjiZyb/ovB8QVeiVZJjJzLII0Ijz4kz6bZ2DvL2rODhedEHk/nczAS7p2rYxc/e+yb7+VwpEQVZ6/gPsvY2fqMKMQltob+6wTdqCUOh6NHj140UO9zz+82W/szca5SEX88MRHJYdUuu4oZsx5fuFYjjfbrS8gRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EmKPcGhZ; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43JDllSc017688;
-	Fri, 19 Apr 2024 13:53:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=5OD2gteKqsKmUUPyL9EwUUlgJQzDAzMpVdrUU7VCHn4=;
- b=EmKPcGhZGVjfg2+qfA3Udsfhuru9euAKy0JrIndmOaXZRZkQjX7J3u8xCEnUVy5CCXUH
- AAFGXqdY1jBVrmiZpEY2D1PBkmMq0vg+F4b2C5YliK/vPGhAJaoW5z6W0tUpur/UlJfZ
- MoxhAmbOLT6dhP6uWLavsxrhpo51aW9obzp5aFu/YuhuDIjr3tlE+61v+RO/sgBH8atn
- qQNUa6Z3bbMRykKMsoaga61mSstJr5d2b3PG5L151wFQBoZ0Wnao0wryxHAoBccmadfI
- 1pQN58Rkgd/z31AZG6KLLh5gd+5xZm5drxNFHcCnGMiUWT4RCKVSS+rwdn/3bPLcbubw uQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xkske01er-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 13:53:33 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43JDrW0f026661;
-	Fri, 19 Apr 2024 13:53:32 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xkske01en-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 13:53:32 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43JCOGvc010653;
-	Fri, 19 Apr 2024 13:53:32 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xkbmm3x2d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 19 Apr 2024 13:53:31 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43JDrQ8647382864
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 19 Apr 2024 13:53:28 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4C9832004B;
-	Fri, 19 Apr 2024 13:53:26 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ECA1A20043;
-	Fri, 19 Apr 2024 13:53:25 +0000 (GMT)
-Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 19 Apr 2024 13:53:25 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Ankit Agrawal <ankita@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Ben Segal <bpsegal@us.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH] vfio/pci: Support 8-byte PCI loads and stores
-Date: Fri, 19 Apr 2024 15:53:23 +0200
-Message-ID: <20240419135323.1282064-1-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1713534912; c=relaxed/simple;
+	bh=35xtwLDOwMLSiN0iWProcPjGusx6q1ZiX+FpgyM+nVc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E4YfRQNaPyIwVTlmhQAm8QG6wzQoDoBgzQumCDR6EQ/fo7Ucqn2STmbB/nZyoKU0lojLFcWW9VWunMM+Mko5HgZSN9wLeWF3XTGE5mZaTQFW4Awp1cpKisrZusjJyjXhMt+7f4nmca2aRWhsQpbkERPT0XpMHFYURHNUCpfsAlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PyeSAbMi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713534909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RjqRpX+pS+vo3/Lr5IudRNzeQilnxl4tMq9R6OC0a+0=;
+	b=PyeSAbMitBigz8lXWf/1gjs/paPcIwpG06loPGrXh7DjXjLykfvlsijBz51xOUfN9MjbOv
+	m5u2zMs/EIy/65JEaNbDz50ZvarOeT0TrmQOgzSi6MBVWfGgVBcU+s14boO6z4msPgf2B9
+	60CzWHOgw6OQWnF67qa6zm1UNBYk+/k=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-418-g8uUmWBzOQq8VAEzfZo1hQ-1; Fri, 19 Apr 2024 09:55:08 -0400
+X-MC-Unique: g8uUmWBzOQq8VAEzfZo1hQ-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7da42520069so147819139f.2
+        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 06:55:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713534907; x=1714139707;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RjqRpX+pS+vo3/Lr5IudRNzeQilnxl4tMq9R6OC0a+0=;
+        b=p/vud/HneRl2KzVKUH24DgQE+3fDwGBuk/j9E6+aQFgHPzbwH4ZzSR0QbQKpeRv18b
+         5Z4Q0vcRLpmayAek0lGzqJfXtTSekvkKyVCMTmzqbPcT7s6aWb4jPlReVt8aRQ7o+Z2O
+         hSFh2K05BuD9WjYMVDS4lOQk3v3/DdIcDD4WXH389j+45i45SIvwYHHiw6iHURTcKBYC
+         lMdUpo9ZFfvCQPjV48YflU1/AjApFQYKbBL2/GgaosoiFdElhoLZic8hb1UgzOwXUZ7K
+         vnRE1wZ/qH+d5wWdp+QnEr7EHM+VJGuQcgXoFUFBK+WpPTbmb6g0XWx5F9SpySYmIUc0
+         NuRg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRzS4WktyuyazSzxrlRFueXO0paRXaVaDESQMIzwqCpznL5g6NIQgI5FaEbeGXmVmnna1UKBsJW7zlwf1neZDX/mu6
+X-Gm-Message-State: AOJu0Yw1ocLpT9HSZKgwLUSN9TFv/VI3Z56gziXDy0FOdc/rZcjZnGlV
+	5ejKMjShEx4AeaPmwogeCzOm4DlKAEb6lk2rm2QOW/6nWw7YTY8zh1KhmNto63coWuvlzzZrwRn
+	CnIpYzndoEDua+dfGkyRYIj6rTnpLr/X9YZVN4/Ll+3lNC/10fg==
+X-Received: by 2002:a5d:8603:0:b0:7d9:e3ba:7971 with SMTP id f3-20020a5d8603000000b007d9e3ba7971mr2501126iol.17.1713534907433;
+        Fri, 19 Apr 2024 06:55:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG2IyxruJ6/BotipF2aVkllUgehptgnXhLyHQJtiyR1xz0obyh3STzQZCR7FRU+Jv1P9PumQw==
+X-Received: by 2002:a5d:8603:0:b0:7d9:e3ba:7971 with SMTP id f3-20020a5d8603000000b007d9e3ba7971mr2501096iol.17.1713534907037;
+        Fri, 19 Apr 2024 06:55:07 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ha14-20020a0566386b8e00b0047f1b5975e5sm1030494jab.76.2024.04.19.06.55.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 06:55:06 -0700 (PDT)
+Date: Fri, 19 Apr 2024 07:55:04 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Yi Liu <yi.l.liu@intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, <kevin.tian@intel.com>,
+ <joro@8bytes.org>, <robin.murphy@arm.com>, <eric.auger@redhat.com>,
+ <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
+ <chao.p.peng@linux.intel.com>, <iommu@lists.linux.dev>,
+ <baolu.lu@linux.intel.com>, <zhenzhong.duan@intel.com>,
+ <jacob.jun.pan@intel.com>, Matthew Wilcox <willy@infradead.org>
+Subject: Re: [PATCH v2 1/4] ida: Add ida_get_lowest()
+Message-ID: <20240419075504.47dc3d75.alex.williamson@redhat.com>
+In-Reply-To: <d4674745-1978-43b2-9206-3bf05c6cd75a@intel.com>
+References: <20240412082121.33382-1-yi.l.liu@intel.com>
+	<20240412082121.33382-2-yi.l.liu@intel.com>
+	<20240416100329.35cede17.alex.williamson@redhat.com>
+	<e3531550-8644-4a7e-94bd-75bdb52182be@intel.com>
+	<20240418102314.6a3d344a.alex.williamson@redhat.com>
+	<20240418171208.GC3050601@nvidia.com>
+	<d4674745-1978-43b2-9206-3bf05c6cd75a@intel.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 11fIw2jmKjLm80pLk7Ud5m8_8ifjlVet
-X-Proofpoint-ORIG-GUID: hHIEC9zBqar6UtHTzqN-0FxwS8rQaZuc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-19_09,2024-04-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- phishscore=0 clxscore=1011 lowpriorityscore=0 adultscore=0 bulkscore=0
- mlxlogscore=665 mlxscore=0 impostorscore=0 priorityscore=1501 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404190104
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Ben Segal <bpsegal@us.ibm.com>
+On Fri, 19 Apr 2024 21:43:17 +0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-Many PCI adapters can benefit or even require full 64bit read
-and write access to their registers. In order to enable work on
-user-space drivers for these devices add two new variations
-vfio_pci_core_io{read|write}64 of the existing access methods
-when the architecture supports 64-bit ioreads and iowrites.
+> On 2024/4/19 01:12, Jason Gunthorpe wrote:
+> > On Thu, Apr 18, 2024 at 10:23:14AM -0600, Alex Williamson wrote:  
+> >>> yep. maybe we can start with the below code, no need for ida_for_each()
+> >>> today.
+> >>>
+> >>>
+> >>>    	int id = 0;
+> >>>
+> >>>    	while (!ida_is_empty(&pasid_ida)) {
+> >>>    		id = ida_find_first_range(pasid_ida, id, INT_MAX);  
+> >>
+> >> You've actually already justified the _min function here:
+> >>
+> >> static inline int ida_find_first_min(struct ida *ida, unsigned int min)
+> >> {
+> >> 	return ida_find_first_range(ida, min, ~0);
+> >> }  
+> > 
+> > It should also always start from 0..  
+> 
+> any special reason to always start from 0? Here we want to loop all the
+> IDs, and remove them. In this usage, it should be more efficient if we
+> start from the last found ID.
 
-Signed-off-by: Ben Segal <bpsegal@us.ibm.com>
-Co-developed-by: Gerd Bayer <gbayer@linux.ibm.com>
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
+In the above version, there's a possibility of an infinite loop, in the
+below there's not.  I don't think the infinite loop is actually
+reachable, but given the xarray backend to ida I'm not sure you're
+gaining much to restart after the previously found id either.  Thanks,
 
-Hi all,
+Alex
 
-we've successfully used this patch with a user-mode driver for a PCI
-device that requires 64bit register read/writes on s390. A quick grep
-showed that there are several other drivers for PCI devices in the kernel
-that use readq/writeq and eventually could use this too.
-So we decided to propose this for general inclusion.
-
-We've added conditional compiles for non-64bit architectures that
-produce graceful run-time errors. However, that path is just
-compile-tested.
-
-Thank you,
-Gerd Bayer
-
- drivers/vfio/pci/vfio_pci_rdwr.c | 39 +++++++++++++++++++++++++++++++-
- include/linux/vfio_pci_core.h    |  3 +++
- 2 files changed, 41 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 03b8f7ada1ac..3f91945ea3ff 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -89,6 +89,9 @@ EXPORT_SYMBOL_GPL(vfio_pci_core_ioread##size);
- VFIO_IOREAD(8)
- VFIO_IOREAD(16)
- VFIO_IOREAD(32)
-+#ifdef ioread64
-+VFIO_IOREAD(64)
-+#endif
- 
- /*
-  * Read or write from an __iomem region (MMIO or I/O port) with an excluded
-@@ -114,7 +117,41 @@ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
- 		else
- 			fillable = 0;
- 
--		if (fillable >= 4 && !(off % 4)) {
-+		if (fillable >= 8 && !(off % 8)) {
-+#if defined(ioread64) || defined(iowrite64)
-+			u64 val;
-+#endif
-+
-+			if (iswrite) {
-+#ifndef iowrite64
-+				pr_err_once("vfio does not support iowrite64 on this arch");
-+				return -EIO;
-+#else
-+				if (copy_from_user(&val, buf, 8))
-+					return -EFAULT;
-+
-+				ret = vfio_pci_core_iowrite64(vdev, test_mem,
-+							 val, io + off);
-+				if (ret)
-+					return ret;
-+#endif
-+			} else {
-+#ifndef ioread64
-+				pr_err_once("vfio does not support ioread64 on this arch");
-+				return -EIO;
-+#else
-+				ret = vfio_pci_core_ioread64(vdev, test_mem,
-+							&val, io + off);
-+				if (ret)
-+					return ret;
-+
-+				if (copy_to_user(buf, &val, 8))
-+					return -EFAULT;
-+#endif
-+			}
-+
-+			filled = 8;
-+		} else if (fillable >= 4 && !(off % 4)) {
- 			u32 val;
- 
- 			if (iswrite) {
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index a2c8b8bba711..f4cf5fd2350c 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -157,5 +157,8 @@ int vfio_pci_core_ioread##size(struct vfio_pci_core_device *vdev,	\
- VFIO_IOREAD_DECLATION(8)
- VFIO_IOREAD_DECLATION(16)
- VFIO_IOREAD_DECLATION(32)
-+#ifdef ioread64
-+VFIO_IOREAD_DECLATION(64)
-+#endif
- 
- #endif /* VFIO_PCI_CORE_H */
--- 
-2.44.0
+> > Ideally written more like:
+> > 
+> > while ((id = ida_find_first(pasid_ida)) != EMPTY_IDA) {
+> >    ida_remove(id);
+> > }  
+> 
 
 
