@@ -1,108 +1,194 @@
-Return-Path: <kvm+bounces-15363-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15364-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF4A8AB598
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 21:35:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B12C8AB5C2
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 21:53:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D58D1C21324
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 19:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2205C1F226DB
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 19:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C57E13C9B7;
-	Fri, 19 Apr 2024 19:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAD113C9C8;
+	Fri, 19 Apr 2024 19:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PMit3UJV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y7mZVB6F"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B7F1C10;
-	Fri, 19 Apr 2024 19:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 308BA13C3F2
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 19:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713555290; cv=none; b=omY8UFD0Hoz3Isf10YeBRQkMbe2+59+dUTAZD/UMkSYBC9Y5FxavHRJcdcrTSGM0MmzIPXkOFA5/OXNrhEXfU1RCtpLLqta44Sa+2eLvz78gT5f3jU3tcN0oOCOLAY+ZIODjy17JiBpE16R7zXmV9DtsSFTC8SzjabD91J2R1Zc=
+	t=1713556403; cv=none; b=eYtH4ndDCtGly9bGcc8S4mRq9j/cua0n5Jf77HtjzCiVSuFcY/NjZHkqbXBmUH53b9rpA3krD8SVA/BUYv+RWxXuCLe7r7gceniAsYgkhVdpn5w1OsfoNIXg8P2Q8CPolMtGuiursSkIanrESbSBCYtwYy6V3ymJrxOmUoIW8rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713555290; c=relaxed/simple;
-	bh=A8n0J4h+vxWU70gw6aLE6thR3YCxol3CBu+SGEyLGxQ=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=lTHUUXQxC3VXI8VSgsjKUoxqNJE5JmLwVZiz69z4hCYFRgm8jCCKKydtLTuIEBWpACgzG8yqjGIQrjMscVy/L9qI+zwoAUvl2AxUtuDSx5l4y9rydVB2y4EAqL+NVboiAwCJo7bih5vFdAReaXFXXNNkD45PSue+b7k+GbWXiyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=PMit3UJV; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:Sender
-	:Reply-To:Content-ID:Content-Description;
-	bh=A8n0J4h+vxWU70gw6aLE6thR3YCxol3CBu+SGEyLGxQ=; b=PMit3UJVifZl7GZqHAeVlXqJqp
-	XMzMboZhtuwi8PqPnR/lQeQPWZA/oG3+taObZoT1jdqPVuoZq7fSNPbEwjYj0qEzXyS16id00fG8m
-	3dQIdg3fm88DswLD+UOSoSAAeDjXgpiT+hwz+QhG5Jskz3fsyPr0YI9BCZZYpWcfj82i8dK6jc5wQ
-	DLvTqnt2mbrWLbUL/XX/je8pjlOQf5MyLbN4qj/vUDtP17DfhJF3K/HnEWm+TEsVSUg2W5U3GKKBb
-	RYmHjLFV/Jyp1Few4SZ6TZdrT9JdrUERap8+RmoYO+pyLXvy7OjluquH9B6uXDd+2Bl7TkpjNu35Y
-	vBB3ogpw==;
-Received: from [2a00:23ee:1548:3009:99e7:ae19:af82:c4cc] (helo=[IPv6:::1])
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rxu0J-00000008NdL-1uH7;
-	Fri, 19 Apr 2024 19:34:35 +0000
-Date: Fri, 19 Apr 2024 20:34:34 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: "Chen, Zide" <zide.chen@intel.com>, Jack Allister <jalliste@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Sean Christopherson <seanjc@google.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Shuah Khan <shuah@kernel.org>
-CC: Paul Durrant <paul@xen.org>, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_2/2=5D_KVM=3A_selftests=3A_Add_KVM/PV_c?=
- =?US-ASCII?Q?lock_selftest_to_prove_timer_drift_correction?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <3664e8ec-1fa1-48c0-a80d-546b7f6cd671@intel.com>
-References: <20240408220705.7637-1-jalliste@amazon.com> <20240408220705.7637-3-jalliste@amazon.com> <3664e8ec-1fa1-48c0-a80d-546b7f6cd671@intel.com>
-Message-ID: <FABCFBD0-4B76-4662-9F7B-7E1A856BBBB6@infradead.org>
+	s=arc-20240116; t=1713556403; c=relaxed/simple;
+	bh=9OWcSt3yVGiW4uguyXv0diQ+gU+gxGZ9VFWWTIFQCPU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Dmx3gn+8ldI17zVdPaAdoAYyOEic0bPK5bH1Ht+JEG3qJgdrGdCeF7rvo8crdfFJ64lgD6KGrkfmOtQPVZGmhyqKDEi+JCWlDtlvifrtYmnFNr0kh2zwX0DCUDKscXn0EliHZNddetU6dz4XtXe7zQEXCpLg+KMv/y/IIOIXsVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y7mZVB6F; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e2a5cb5455so29840335ad.2
+        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 12:53:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713556401; x=1714161201; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RyXlje7tlmjC6LDfIbraTHbtAwfnUO3tmVw5L5e0voM=;
+        b=Y7mZVB6FPvjGsa9VTdOiDkZo3S3mKIftvRz0/AfLat6tQl8GHABy2cmdzGOit77Lbg
+         BMZ1/dfgXFPdPqlon9F9LITz3us0D0ysnMpdtnaSlL8u3VJyXqSuhDuhjD7lNLY9VXF4
+         72HE/DPk30KpeG1fUY3Vjtir8D0Kc/vp9wddmj/KYFLW93hqT+LezJTypTNKsUAheHzB
+         HPX4WfsBu4BFlpQuxkRZop/0KBdSbTiG5e4r5icBlIT+IPMnfiwI7O6Np0pmioTLnNG+
+         KOVGGArBEFxSR+f6Ht8qxrMR3JnZhCp14jS76cvc+OIEcLjAFCyIhxBR6qGs9dBPuEeJ
+         SNTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713556401; x=1714161201;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RyXlje7tlmjC6LDfIbraTHbtAwfnUO3tmVw5L5e0voM=;
+        b=Ewo6UFjL2+OP7J5ShRDu8JGzLHf8WdKbvQVdz2lwhSnNlO2a583Hdi6wUmlNAZNP1N
+         kedXGB6ukl36GEjWxb7KrpylRijpNcPszhqKzHwXND/HrpXLaWh/4dt+j5Nr1LAwZqn4
+         adMZ8Nd03i2nNvF0fOHbxjBES2RB6Fgc/wfU2QWWcB3Yx983xMNBW6Y7QBQnI2libIQ0
+         I92+A0MmmOBVfFuSZ9A5JC3Vdvvreva3KflyCK8z3nHqg/ZzGPToeoX/gh3woxIakkvT
+         781SW+9uLWvWb5XeWFDrcpj11AE3xkA/fYEw5xehgaq2daxu7RfLpzr/57uTE6AYvao8
+         4LKg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMaJ4kYqRaygtnUpHVELsNoo5n12RkazGF5baXlIfjRMoVeEaeirgAvwmnahpaIkNdR+TfLemlQqBpYD79MdS2Kj/C
+X-Gm-Message-State: AOJu0YzaY536tsdyvlnhgCCVRlBhiJIv+3Op9cKZRLLjNkv/0niTQYus
+	APS6OEMBKV+iMTpqr+PlwyRPJlaA3WtwMT6Bhk242X/rq9JUSRCMK25vSjteSblRzphCznxpbDV
+	dcA==
+X-Google-Smtp-Source: AGHT+IE7Tx4wWL7LXm8ank13gSpeI651363AT50rpGcBKQD9CVQX/vTBwgCbg58Oz/RmKRPHnsgc6TCln1o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ea06:b0:1e8:6d8b:5fee with SMTP id
+ s6-20020a170902ea0600b001e86d8b5feemr273152plg.5.1713556401455; Fri, 19 Apr
+ 2024 12:53:21 -0700 (PDT)
+Date: Fri, 19 Apr 2024 12:53:19 -0700
+In-Reply-To: <7otbchwoxaaqxoxjfqmifma27dmxxo4wlczyee5pv2ussguwyw@uqr2jbmawg6b>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+References: <8f64043a6c393c017347bf8954d92b84b58603ec.1708933498.git.isaku.yamahata@intel.com>
+ <e6e8f585-b718-4f53-88f6-89832a1e4b9f@intel.com> <bd21a37560d4d0695425245658a68fcc2a43f0c0.camel@intel.com>
+ <54ae3bbb-34dc-4b10-a14e-2af9e9240ef1@intel.com> <ZfR4UHsW_Y1xWFF-@google.com>
+ <ay724yrnkvsuqjffsedi663iharreuu574nzc4v7fc5mqbwdyx@6ffxkqo3x5rv>
+ <39e9c5606b525f1b2e915be08cc95ac3aecc658b.camel@intel.com>
+ <m536wofeimei4wdronpl3xlr3ljcap3zazi3ffknpxzdfbrzsr@plk4veaz5d22>
+ <ZiFlw_lInUZgv3J_@google.com> <7otbchwoxaaqxoxjfqmifma27dmxxo4wlczyee5pv2ussguwyw@uqr2jbmawg6b>
+Message-ID: <ZiLLrzGqSIxoirwx@google.com>
+Subject: Re: [PATCH v19 007/130] x86/virt/tdx: Export SEAMCALL functions
+From: Sean Christopherson <seanjc@google.com>
+To: "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, Tina Zhang <tina.zhang@intel.com>, 
+	Dave Hansen <dave.hansen@intel.com>, Hang Yuan <hang.yuan@intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>, Kai Huang <kai.huang@intel.com>, Bo2 Chen <chen.bo@intel.com>, 
+	"sagis@google.com" <sagis@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, Erdem Aktas <erdemaktas@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 19 April 2024 18:13:16 BST, "Chen, Zide" <zide=2Echen@intel=2Ecom> wrote=
-:
->I'm wondering what's the underling theory that we definitely can achieve
->=C2=B11ns accuracy? I tested it on a Sapphire Rapids @2100MHz TSC frequen=
-cy,
->and I can see delta_corrected=3D2 in ~2% cases=2E
+On Fri, Apr 19, 2024, kirill.shutemov@linux.intel.com wrote:
+> On Thu, Apr 18, 2024 at 11:26:11AM -0700, Sean Christopherson wrote:
+> > On Thu, Apr 18, 2024, kirill.shutemov@linux.intel.com wrote:
+> > I think having one trampoline makes sense, e.g. to minimize the probability of
+> > leaking register state to the VMM.  The part that I don't like, and which generates
+> > awful code, is shoving register state into a memory structure.
+> 
+> I don't think we can get away with single trampoline. We have outliers.
 
-Hm=2E Thanks for testing!
+Yeah, I should have said "one trampoline for all of the not insane APIs" :-)
 
-So the KVM clock is based on the guest TSC=2E Given a delta between the gu=
-est TSC T and some reference point in time R, the KVM clock is expressed as=
- a(T-R)+r, where little r is the value of the KVM clock when the guest TSC =
-was R, and (a) is the rate of the guest TSC=2E
+> See TDG.VP.VMCALL<ReportFatalError> that uses pretty much all registers as
+> input. And I hope we wouldn't need TDG.VP.VMCALL<Instruction.PCONFIG> any
+> time soon. It uses all possible output registers.
 
-When set the clock with KVM_SET_CLOCK_GUEST, we are changing the values of=
- R and r to a new point in time=2E Call the new ones Q and q respectively=
-=2E
+XMM: just say no.
 
-But we calculate precisely (within 1ns at least) what the KVM clock would =
-have been with the *old* formula, and adjust our new offset (q) so that at =
-our new reference TSC value Q, the formulae give exactly the same result=2E
+> But I guess we can make a *few* wrappers that covers all needed cases.
 
-And because the *rates* are the same, they should continue to give the sam=
-e results, =C2=B11ns=2E
+Yeah.  I suspect two will suffice.  One for the calls that say at or below four
+inputs, and one for the fat ones like ReportFatalError that use everything under
+the sun.
 
-Or such *was* my theory, at least=2E=20
+For the latter one, marshalling data into registers via an in-memory structure
+makes, especially if we move away from tdx_module_args, e.g. this is quite clean
+and reasonable:
 
-Would be interesting to see it disproven with actual numbers for the old+n=
-ew pvclock structs, so I can understand where the logic goes wrong=2E
+	union {
+		/* Define register order according to the GHCI */
+		struct { u64 r14, r15, rbx, rdi, rsi, r8, r9, rdx; };
 
-Were you using frequency scaling?
+		char str[64];
+	} message;
+
+	/* VMM assumes '\0' in byte 65, if the message took all 64 bytes */
+	strtomem_pad(message.str, msg, '\0');
+
+	/*
+	 * This hypercall should never return and it is not safe
+	 * to keep the guest running. Call it forever if it
+	 * happens to return.
+	 */
+	while (1)
+		tdx_fat_tdvmcall(&message);
+
+> > Weird?  Yeah.  But at least we one need to document one weird calling convention,
+> > and the ugliness is contained to three macros and a small assembly function.
+> 
+> Okay, the approach is worth exploring. I can work on it.
+> 
+> You focuses here on TDVMCALL. What is your take on the rest of TDCALL?
+
+Not sure, haven't looked at them recently.  At a glance, something similar?  The
+use of high registers instead of RDI and RSI is damn annoying :-/
+
+Hmm, but it looks like there are enough simple TDCALLs that stay away from high
+registers that open coding inline asm() is a viable (best?) approach.
+
+RAX being the leaf and the return value is annoying, so maybe a simple macro to
+make it easier to deal with that?  It won't allow for perfectly optimal code
+generation, but forcing a MOV for a TDCALL isn't going to affect performance, and
+it will make reading the code dead simple.
+
+  #define tdcall_leaf(leaf) "mov $" leaf ", %%eax\n\t.byte 0x66,0x0f,0x01,0xcc\n\t"
+
+Then PAGE_ACCEPT is simply:
+
+	asm(tdcall_leaf(TDG_MEM_PAGE_ACCEPT)
+	    : "=a"(ret),
+            : "c"(start | page_size));
+	if (ret)
+		return 0;
+
+And even the meanies that use R8 are reasonably easy to handle:
+
+	asm("xor %%r8d, %%r8d\n\t"
+	    tdcall_leaf(TDG_MR_REPORT)
+	    : "=a"(ret)
+	    : "c"(__pa(report)), "d"(__pa(data)));
+
+
+and (though using names for the outputs, I just can't remember the syntax as I'm
+typing this :-/)
+
+	asm(tdcall_leaf(TDG_VM_RD)
+	    "mov %%r8, %0\n\t"
+	    : "=r"(value), "=a"(ret)
+	    : "c"(0), "d"(no_idea_what_this_is));
+
+	if (ret)
+		<cry>
+
+	return value;
+
+Or, if you wanted to get fancy, use asm_goto_output() to bail on an error so that
+you could optimize for using RAX as the return value, because *that's going to
+make all the difference :-D
 
 
