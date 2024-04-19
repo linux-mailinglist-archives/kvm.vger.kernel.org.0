@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-15182-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15183-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D9808AA69A
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 03:43:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBDBA8AA6FD
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 04:33:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ED571C21B75
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 01:43:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A618328306B
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 02:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E8B3C28;
-	Fri, 19 Apr 2024 01:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59C1F7494;
+	Fri, 19 Apr 2024 02:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="expQ49LH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TBL2myTo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE38F1362;
-	Fri, 19 Apr 2024 01:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980DC137E;
+	Fri, 19 Apr 2024 02:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713490977; cv=none; b=kjN7OMC6pnG6/WaKrltBxeNJLsP+lfgPRhcSr9CtD4h4BDVT8K6ehrujN72kBoIeexI1WccJWQujBzjLQ92iZnCtDWdR5pALM4TC22GKJp+Dq9QXeqwM0dUxd4y78AyG9wfzFBGCMrXbcJWP6bIHq/Pg7EbTeIa5ZbGCQL3NmaY=
+	t=1713494026; cv=none; b=jPYoZPoVv8bMqpYPN/pfXBa4ak68MlFnhvaIpIvFpa43DJ5xQysRasDvGN83C6ael9dwKiufTPbhXZXdNmOdTuHCwz757dRk7+D7x5jWAwzWMVIqn8qryn2hwZRafLS/84Ztotz8Z9yQTC/P7HiOySrROs3FXLTeU0IR/aW0Fzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713490977; c=relaxed/simple;
-	bh=cSZkElQuxZTV1/D8NzqIO8txy29Fe8ChfyA1kCtXJjc=;
+	s=arc-20240116; t=1713494026; c=relaxed/simple;
+	bh=2wIhKyVav/6pmMUaeB/ndew7d5QjwaWfJyhDVU1jIHU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X9zz8RMue4jzCZAvLyo8wKmwISWshIM8POHkOvuriK2sb76HD//m1xlLsB26j4cbfa8aQ/YY/d9v/o5Amq1l9LS0w91ZGNlhPu1TsQQEx6E9cnoel7pSo/0RylqOesmmF/njz7qENCVJKt5cRbirVohG7B0MQgFAPcSzFjY8ZRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=expQ49LH; arc=none smtp.client-ip=198.175.65.16
+	 In-Reply-To:Content-Type; b=XSFA4irfDbdCn+jWHcXRcOSuOQ3sVOH3Z4ItSYXdlTwm6AuJdCldIkexe/HBblO1mtrPBSlfyLC0Fy7H3pEFfZOhBbfTn7nIshXfNlqYaL4Rk6enLFT8tVFnkkcoAIKUgR527QoXNT9Cw+G6+LOvuzXxqzl53AwPllCyd19vcGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TBL2myTo; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713490976; x=1745026976;
+  t=1713494024; x=1745030024;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=cSZkElQuxZTV1/D8NzqIO8txy29Fe8ChfyA1kCtXJjc=;
-  b=expQ49LHOkuMzeynhwff9X397oAp+6/VTsZZDO/K0KfwmsDp9Pv43Qii
-   o77Gv3d9d4CEey9Yus/TE0ypfzoRHDw+VRdfiMvTxeRSU4chiUhGrzntp
-   WDOY8NOmX/B2JI9X1FjvG06deUvBJQH84/7cPofHAcQGq7IWC82guaK7j
-   89NXLhHP27+WZgB1uVmKsNXz67wWJIMOLUzis9eNz23JqKQ4P/HQSFHgL
-   nHmcwJdpSHoghOy8wvFzlR+N3eBIW2NeNfUH3jFdwrrcllIMAsP+ucome
-   f1sKVWN17B0dOydvRwS9RX6yRInVfAzSivHgZNcl+beAVsUXl0Fzmne+2
+  bh=2wIhKyVav/6pmMUaeB/ndew7d5QjwaWfJyhDVU1jIHU=;
+  b=TBL2myToGfCdXgLfZoXVl4ubrkWLRDNbA6/WgR+cX8ymehEdx1v0KYkN
+   fZzQeHGXvv5Pumk9G7ok8pepRNte3YQaWO4OIGwVsy5/T9KA1W5CjHJeg
+   0tRZzuIOWDuESW6xZeXHIvH3iCBFiNHQGDDCc0lRLZ9tvT4DPWc6MkQ/5
+   Uj5u6Sw0j50u3o7qbyf3pHXq70N0/O33Rp4TMTz62xSjtzOCtTXp21QF/
+   AF72b+ks2nIfXDJLnYXsa/SZ5mv4vW/f1BNIyLxvExlrEl7xMOHMauDEL
+   XLI2e0Q9oXjP0omf+Yw+52Gl4LS8z3p6axg4/iqszHIdp3N6IXG4ZhmEs
    w==;
-X-CSE-ConnectionGUID: 7AEnpK7iScGwU1yme1Cg4g==
-X-CSE-MsgGUID: 87iGdm0DQeGtqRV9R4HCxg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="9202175"
+X-CSE-ConnectionGUID: bsE9WiQISEqCZwOLZJ9pNw==
+X-CSE-MsgGUID: CEhCkaGRRUmPbPGKip8zZQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="9003502"
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="9202175"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 18:42:55 -0700
-X-CSE-ConnectionGUID: 1iL09b7CTDqgzgzUMFAIlw==
-X-CSE-MsgGUID: dw35IcYrRCet56oNwtTe1A==
+   d="scan'208";a="9003502"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 19:33:44 -0700
+X-CSE-ConnectionGUID: CqasudqxRLCQuA3e+VqL5Q==
+X-CSE-MsgGUID: sgCaoODlTh2JdEssWqKUIg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="23250130"
+   d="scan'208";a="54106958"
 Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.242.47]) ([10.124.242.47])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 18:42:51 -0700
-Message-ID: <f83f6923-7aa2-4a10-8e83-3fa77400c446@linux.intel.com>
-Date: Fri, 19 Apr 2024 09:42:48 +0800
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 19:33:40 -0700
+Message-ID: <fac35db2-f796-4d9e-86d4-77f171b6e38e@linux.intel.com>
+Date: Fri, 19 Apr 2024 10:33:37 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,65 +67,72 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
- Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
- Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>,
- Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, hang.yuan@intel.com,
- tina.zhang@intel.com, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH v19 111/130] KVM: TDX: Implement callbacks for MSR
+ operations for TDX
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
 References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
- <e2400cf8-ee36-4e7f-ba1f-bb0c740b045c@linux.intel.com>
- <dac4aa8c-94d1-475e-ae97-20229bd9ade2@linux.intel.com>
- <20240418212214.GB3596705@ls.amr.corp.intel.com>
+ <62f8890cb90e49a3e0b0d5946318c0267b80c540.1708933498.git.isaku.yamahata@intel.com>
 From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240418212214.GB3596705@ls.amr.corp.intel.com>
+In-Reply-To: <62f8890cb90e49a3e0b0d5946318c0267b80c540.1708933498.git.isaku.yamahata@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
 
 
-On 4/19/2024 5:22 AM, Isaku Yamahata wrote:
-> On Thu, Apr 18, 2024 at 07:04:11PM +0800,
-> Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
->>
->> On 4/18/2024 5:29 PM, Binbin Wu wrote:
->>>> +
->>>> +static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +    struct kvm_memory_slot *slot;
->>>> +    int size, write, r;
->>>> +    unsigned long val;
->>>> +    gpa_t gpa;
->>>> +
->>>> +    KVM_BUG_ON(vcpu->mmio_needed, vcpu->kvm);
->>>> +
->>>> +    size = tdvmcall_a0_read(vcpu);
->>>> +    write = tdvmcall_a1_read(vcpu);
->>>> +    gpa = tdvmcall_a2_read(vcpu);
->>>> +    val = write ? tdvmcall_a3_read(vcpu) : 0;
->>>> +
->>>> +    if (size != 1 && size != 2 && size != 4 && size != 8)
->>>> +        goto error;
->>>> +    if (write != 0 && write != 1)
->>>> +        goto error;
->>>> +
->>>> +    /* Strip the shared bit, allow MMIO with and without it set. */
->>> Based on the discussion
->>> https://lore.kernel.org/all/ZcUO5sFEAIH68JIA@google.com/
->>> Do we still allow the MMIO without shared bit?
-> That's independent.  The part is how to work around guest accesses the
-> MMIO region with private GPA.  This part is,  the guest issues
-> TDG.VP.VMCALL<MMMIO> and KVM masks out the shared bit to make it friendly
-> to the user space VMM.
-It's similar.
-The tdvmcall from the guest for mmio can also be private GPA, which is 
-not reasonable, right?
-According to the comment, kvm doens't care about if the TD guest issue 
-the tdvmcall with private GPA or shared GPA.
+> Implements set_msr/get_msr/has_emulated_msr methods for TDX to handle
+> hypercall from guest TD for paravirtualized rdmsr and wrmsr.  The TDX
+> module virtualizes MSRs.  For some MSRs, it injects #VE to the guest TD
+> upon RDMSR or WRMSR.  The exact list of such MSRs are defined in the spec.
+>
+> Upon #VE, the guest TD may execute hypercalls,
+> TDG.VP.VMCALL<INSTRUCTION.RDMSR> and TDG.VP.VMCALL<INSTRUCTION.WRMSR>,
+> which are defined in GHCI (Guest-Host Communication Interface) so that the
+> host VMM (e.g. KVM) can virtualize the MSRs.
+>
+> There are three classes of MSRs virtualization.
+> - non-configurable: TDX module directly virtualizes it. VMM can't
+>    configure. the value set by KVM_SET_MSR_INDEX_LIST is ignored.
+> - configurable: TDX module directly virtualizes it. VMM can configure at
+>    the VM creation time.  The value set by KVM_SET_MSR_INDEX_LIST is used.
+> - #VE case
+>    Guest TD would issue TDG.VP.VMCALL<INSTRUCTION.{WRMSR,RDMSR> and
+>    VMM handles the MSR hypercall. The value set by KVM_SET_MSR_INDEX_LIST
+>    is used.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+[...]
+> +
+> +bool tdx_has_emulated_msr(u32 index, bool write)
+> +{
+> +	switch (index) {
+> +	case MSR_IA32_UCODE_REV:
+> +	case MSR_IA32_ARCH_CAPABILITIES:
+> +	case MSR_IA32_POWER_CTL:
+> +	case MSR_IA32_CR_PAT:
+> +	case MSR_IA32_TSC_DEADLINE:
+> +	case MSR_IA32_MISC_ENABLE:
+> +	case MSR_PLATFORM_INFO:
+> +	case MSR_MISC_FEATURES_ENABLES:
+> +	case MSR_IA32_MCG_CAP:
+> +	case MSR_IA32_MCG_STATUS:
+It not about this patch directly.
+
+Intel SDM says:
+"An attempt to write to IA32_MCG_STATUS with any value other than 0 
+would result in #GP".
+
+But in set_msr_mce(), IA32_MCG_STATUS is set without any check.
+Should it be checked against 0 if it is not host_initiated？
 
 
 
