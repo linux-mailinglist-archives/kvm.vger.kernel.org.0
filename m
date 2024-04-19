@@ -1,140 +1,115 @@
-Return-Path: <kvm+bounces-15359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A9548AB512
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 20:29:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC6D68AB52C
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 20:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF51D1F221E6
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:29:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60F8C1F22A66
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76F913C9D2;
-	Fri, 19 Apr 2024 18:28:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65529130A5B;
+	Fri, 19 Apr 2024 18:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SjLIet3E"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CNTgdd1M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC5D13C9C2;
-	Fri, 19 Apr 2024 18:28:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD50225CF;
+	Fri, 19 Apr 2024 18:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713551331; cv=none; b=bRmPswUlj0yCLNMGVsE7lE01LG1/vzinshcSPG+w+Hqn40PztzDh/m9Q3c5OCDXap7mjXzrtILJojgAUYHnv8xC/5ltAm12UaH5jAAMRWuPWpyQ8w826oxVW8uSHKlo9ObBKtDMOndb4nDk9elq0/MYA4Y61XZrg9BFzclGMYGg=
+	t=1713552345; cv=none; b=Bqk3fd+PQkfb900tSbCjDE5TdLkkj083tqHd/5e61p1ypxi/tkFoDJxv7E282GcoPozT7VKiKto+3SrktjQCkAHs5od4qHxver/7VTQGkbTGE4yQHestBKDaC1HDSmXGDJDh1ret6sXgZ4Es8QiuWJK0xqjNnuo2a0TrQnPp7m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713551331; c=relaxed/simple;
-	bh=M8YCz1l4+lVCy1G5QB3VTe1tQ3kMUzwdhw6ZeI71acc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KHRvD7UMO+5O8VQR/LrqSjYBWlwiLKgpWqaJmVhCNXDHdgMaNx1nHonfN1yNc1yctgKc2MeiQdd3OmdwaO8ou2krV1dL8P/r6Yf4SHHeAo/XubJrx38JgoGx7DYXMaBbTzBqkMN+RJP6JEbA3byX1Ncz0X3LBb5/L6JFbLZF66g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SjLIet3E; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713551329; x=1745087329;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=M8YCz1l4+lVCy1G5QB3VTe1tQ3kMUzwdhw6ZeI71acc=;
-  b=SjLIet3E1mOab7oeGLM9ayRlURAwqpJEiBigVnybvwaXfRfkYOocItmH
-   HYaAIvHQvYsNwbZj4IS7jI8hxyj2Sq6sbujwgD8Su91M37nwE3UYFvueg
-   3FRoHrH5qCSgRqk9lGds7iUvfpf6DLP3iiQFXjHl6yNtmNQzvqPGUv02E
-   WEeOc8W31WHmJiy5kMXQUbDWvyECEip4PqAEtpDoF+O4P3pO48RDeVFGo
-   C+IzOVH/3n8fTRq1PVw5wXGaL4++bwVbflEoElu+Cgt2i725gti8XeSTl
-   YsejN8nV7MFkPdkm1tJeggrHlqC+sC0esb1BZU4czrNuQRw4J4N3Lx3sM
-   A==;
-X-CSE-ConnectionGUID: geSL8RDZTT6RU+cgtp7yJQ==
-X-CSE-MsgGUID: lVgkbk31QE6H2Bw2/XGzNg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="9038286"
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="9038286"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 11:28:48 -0700
-X-CSE-ConnectionGUID: lZZYufypTZq1LxnkDtZSiA==
-X-CSE-MsgGUID: Y7ab4wxlRzyZ4YeiJDEcUw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="27867809"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 11:28:48 -0700
-Date: Fri, 19 Apr 2024 11:28:48 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 010/130] KVM: x86: Pass is_private to gmem hook of
- gmem_max_level
-Message-ID: <20240419182848.GI3596705@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <8108cc2b8ff01ec22de68f0d0758ef0671db43fc.1708933498.git.isaku.yamahata@intel.com>
- <ZiHGoUUcGlZObQvx@yzhao56-desk.sh.intel.com>
+	s=arc-20240116; t=1713552345; c=relaxed/simple;
+	bh=TRulkkAOvsGRfjsQewped+Ly0aSe8u9aY8qD+MMGqPI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=reNkSt69FBGMWu1R0xiTajG18SwZp+SLm7uCnNeV93msOXgx3qe/Nm7IRTo/xy0L+4usZlO3LMaiymgtmlWu6GBZscV92XJKpoAdDTyMBR1WEToM3Ul3Jo1i+lAylHUxoxBlyLfPLCRJbcrFmxux8f2Zcd98oUbzWLgtRGWmOIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CNTgdd1M; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:Sender
+	:Reply-To:Content-ID:Content-Description;
+	bh=TRulkkAOvsGRfjsQewped+Ly0aSe8u9aY8qD+MMGqPI=; b=CNTgdd1MuSz3QNZBgNyK++zRA8
+	IJCzl9muTPkk0MydVImRTa0dpivKn7Dbi1kcYJH3iJzoWJZBE0lG6owXlMrn99Ek6WSIT8Vhuxiwn
+	8n3toDSKggCO04GXUpRkuvZRnoKujay3W9tIqazCJTtqsiwCrYwUdEPQW8XRCDw5TTrDYD2cjfhXf
+	QLHOpGNeKBvSxoEK/VM7RHlNPAs2wkvlCCrO6pGiG8fRHUlNcT58B08uI5I6xvr52LVhiJ0ychxPy
+	9kBjqE02y5l4F6PhemUgLGn2HgJWe8BmPp21xtRCiekrbuCg2mGo8DV8OB/s/ZdQMZjYS5Yqu9VVy
+	4AMVwlag==;
+Received: from [154.49.97.68] (helo=[127.0.0.1])
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rxtEg-00000008IaG-2MiK;
+	Fri, 19 Apr 2024 18:45:23 +0000
+Date: Fri, 19 Apr 2024 19:43:43 +0100
+From: David Woodhouse <dwmw2@infradead.org>
+To: "Chen, Zide" <zide.chen@intel.com>, Jack Allister <jalliste@amazon.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Sean Christopherson <seanjc@google.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Shuah Khan <shuah@kernel.org>
+CC: Paul Durrant <paul@xen.org>, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_2/2=5D_KVM=3A_selftests=3A_Add_KVM/PV_c?=
+ =?US-ASCII?Q?lock_selftest_to_prove_timer_drift_correction?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <17F1A2E9-6BAD-40E7-ACDD-B110CFC124B3@infradead.org>
+References: <20240408220705.7637-1-jalliste@amazon.com> <20240408220705.7637-3-jalliste@amazon.com> <3664e8ec-1fa1-48c0-a80d-546b7f6cd671@intel.com> <17F1A2E9-6BAD-40E7-ACDD-B110CFC124B3@infradead.org>
+Message-ID: <65FF4D51-05A8-42E0-9D07-6E42913CC75E@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZiHGoUUcGlZObQvx@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Fri, Apr 19, 2024 at 09:19:29AM +0800,
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On 19 April 2024 19:40:06 BST, David Woodhouse <dwmw2@infradead=2Eorg> wrot=
+e:
+>On 19 April 2024 18:13:16 BST, "Chen, Zide" <zide=2Echen@intel=2Ecom> wro=
+te:
+>>I'm wondering what's the underling theory that we definitely can achieve
+>>=C2=B11ns accuracy? I tested it on a Sapphire Rapids @2100MHz TSC freque=
+ncy,
+>>and I can see delta_corrected=3D2 in ~2% cases=2E
+>
+>Hm=2E Thanks for testing!
+>
+>So the KVM clock is based on the guest TSC=2E Given a delta between the g=
+uest TSC T and some reference point in time R, the KVM clock is expressed a=
+s a(T-R)+r, where little r is the value of the KVM clock when the guest TSC=
+ was R, and (a) is the rate of the guest TSC=2E
+>
+>When set the clock with KVM_SET_CLOCK_GUEST, we are changing the values o=
+f R and r to a new point in time=2E Call the new ones Q and q respectively=
+=2E
+>
+>But we calculate precisely (within 1ns at least) what the KVM clock would=
+ have been with the *old* formula, and adjust our new offset (q) so that at=
+ our new reference TSC value Q, the formulae give exactly the same result=
+=2E
+>
+>And because the *rates* are the same, they should continue to give the sa=
+me results, =C2=B11ns=2E
+>
+>Or such *was* my theory, at least=2E=20
+>
+>Would be interesting to see it disproven with actual numbers for the old+=
+new pvclock structs, so I can understand where the logic goes wrong=2E
+>
+>Were you using frequency scaling?
+>
 
-> On Mon, Feb 26, 2024 at 12:25:12AM -0800, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > TDX wants to know the faulting address is shared or private so that the max
-> > level is limited by Secure-EPT or not.  Because fault->gfn doesn't include
-> > shared bit, gfn doesn't tell if the faulting address is shared or not.
-> > Pass is_private for TDX case.
-> > 
-> > TDX logic will be if (!is_private) return 0; else return PG_LEVEL_4K.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h | 3 ++-
-> >  arch/x86/kvm/mmu/mmu.c          | 3 ++-
-> >  2 files changed, 4 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index d15f5b4b1656..57ce89fc2740 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1797,7 +1797,8 @@ struct kvm_x86_ops {
-> >  
-> >  	gva_t (*get_untagged_addr)(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
-> >  
-> > -	int (*gmem_max_level)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, u8 *max_level);
-> > +	int (*gmem_max_level)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
-> > +			      bool is_private, u8 *max_level);
-> >  };
-> >  
-> >  struct kvm_x86_nested_ops {
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 1e5e12d2707d..22db1a9f528a 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4324,7 +4324,8 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> >  
-> >  	max_level = kvm_max_level_for_order(max_order);
-> >  	r = static_call(kvm_x86_gmem_max_level)(vcpu->kvm, fault->pfn,
-> > -						fault->gfn, &max_level);
-> > +						fault->gfn, fault->is_private,
-> > +						&max_level);
-> fault->is_private is always true in kvm_faultin_pfn_private().
-> Besides, as shared page allocation will not go to kvm_faultin_pfn_private(),
-> why do we need to add the "is_private" parameter ?
-
-You're right, we don't need this patch.
-As Paolo picked the patch to add a hook, the discussion is happening at
-https://lore.kernel.org/all/20240409234632.fb5mly7mkgvzbtqo@amd.com/#t
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Oh, also please could you test the updated version I posted yesterday, fro=
+m https://git=2Einfradead=2Eorg/?p=3Dusers/dwmw2/linux=2Egit;a=3Dshortlog;h=
+=3Drefs/heads/clocks
 
