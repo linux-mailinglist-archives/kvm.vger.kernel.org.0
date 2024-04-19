@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-15331-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15333-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A6AA8AB322
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:16:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80B18AB325
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:17:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D16681F21226
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 16:16:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04D7C1C229E5
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 16:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20E9E131E23;
-	Fri, 19 Apr 2024 16:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6602132806;
+	Fri, 19 Apr 2024 16:16:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hUx8dKSP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="arb7ORdr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F008E130E3B
-	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 16:16:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB712130AF4
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 16:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713543395; cv=none; b=LnJvIcZ6omZnWYv2s4LJRRPn5Wws86slCfx5oD2gYmGluEwvOK5tHRRbO46kkVaFcX8JccsTjzZ9gb+OxeNgnGvSAUlMySLHZAZOiFo189Qq60FBPyQAFuAzD8gvjLTk4F/ilBh9lo7zqkvzUeSkD8fxil7okw7LnZEVCfTNkvE=
+	t=1713543397; cv=none; b=CY7t+vdyXKn6C3wR6TYECcuBG6I0FDpj7mI5QDjKmiC+EyXBPAWgM1Bje687uB2DQpinx8GzYj43VyA+7v507D1gb6mPdovTzxDaf+fqBpcOpjMSl9Xgrgw5kBzI+FAM7G6GqO1U4whKfrHTG+NSZvSc9FVW8XOcRVPkcJIs1T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713543395; c=relaxed/simple;
-	bh=LxpqhNiHAz6SvsLDXG7NrMJEe2ibA6UXfjbUpU8Y7ag=;
+	s=arc-20240116; t=1713543397; c=relaxed/simple;
+	bh=MpmAFJIdUDUmyZX6ssESNp8lCaFimhUztgev8k291ok=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ejS3bGKK/usw5Rr6iQSK8GZINet0kpRZRXfU6wbmutFPFCR1KT5KONHdrgFo9Es7qAqphbXAUjRG5Nx6920hWFV7y2r/qMQlTko/TaWbsmKeo8ADZLSlvII/AgqpJg6/seDO7GY2rSY8YN2EwcEpKzAM5lOXNAgCaZc37dHKOOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hUx8dKSP; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=YUjBOJC5hiXrbmiRmT+w8EEhpfcBIHhRy5C11U+OTMiWDVaypensGu8RuqPUYWC9VT8iHI0NKlI5EpeoWNaw+8ZeU2g89vUIoXTrvpgXMY8BLnRh59IBQRmmDMH9mA6GzVlkxore9Z3uaXagWiioyVKjieSqEt7byhTxt2ZsXnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=arb7ORdr; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-419c8c314d4so3020915e9.0
-        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 09:16:32 -0700 (PDT)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41551500a7eso15574095e9.2
+        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 09:16:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713543390; x=1714148190; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713543392; x=1714148192; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xin2iwTu/4c1Gy3XovoLyL3hBpjPxSwWtnXs1CtSYxs=;
-        b=hUx8dKSPucKK0MRmjv5QHcTa5hoTkLn9AEU9UIEsIvJzxqC+odg04oEx1A2IDbeCj+
-         BlUxfjakxXmcFCg8a/dJVd+cVfaBxQNfYtftk3t1Y1xL25H2682vFR6rT/mKSddDQRRR
-         YpOmnDS2/ApC1h9LC3I7M21EtBYhXbjlksh26N+SiifDXlfUTjyQBZxpW2OOdQtMPFU5
-         KX6rcXl842L4PyebUA/G0j5rNRdMFSpCY0KTtM2xMjqoC/il4SVMRwqBdcByaExdMhUr
-         mfPRQEUSGlUdaccGS8UWp4xEeMHGkNM7bPyb+2/d9MReDw9QNnff4KnDAEqrqOX8I5to
-         bndg==
+        bh=a8WSdV+XPd4kPmSOlQjvtsKQnLM79YA3yJXgIa1yDz8=;
+        b=arb7ORdr0byhymSVeJPQOGGfjnnrYu4OGsAZBSReMVski3UDNukP0wViwxY+mq25wK
+         2FsXIma/HEgr+Bnl//kxqddx48Ns1Zgj1fIoOSLH3jR0R1ofnWg9uxxm9rYy9Hdb4ySx
+         NqlF0+MbdGeTU/sndctAlVoI5LogxDQDVFhN2YXNekvYFnwXHWgX61r3Iqm5TQGXRQO4
+         X3TWtunnxS/NY8QlWL1cPilUhXVZC6Aw2KLWUe/+gUWByMwswtBPAIEy+n+nMa6eIrwL
+         d2Ql0kHSEdN2mZnW0Xwm8pfRqaGqNo5U4v8WdEUS0eId39RuwgabhtNlGe7wcp9sXRLH
+         sDcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713543390; x=1714148190;
+        d=1e100.net; s=20230601; t=1713543392; x=1714148192;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xin2iwTu/4c1Gy3XovoLyL3hBpjPxSwWtnXs1CtSYxs=;
-        b=JKypCuhAY9WHnFY+abV0LTiIFB5g90n54hKf35lbzBGRVki8n6EUzBpoyfWa+WyHhr
-         cjEBXMTm71MaS2fEgEwm3ynsrPZ/xts0NvTSWcu6K7N9PcioL0JjlsLp5AoNQe9xaDS7
-         5XMKfKYDbJU77aUsEafWP7eWjTeJfofmch6OuxY4YVJre/40GgjL6i2nCb2edQf+lKSI
-         UZpA1qPkqlHB9FG+RSvBAMSLkZ9GssiPd6+fZqXS/134R/OpZoh9JpwKwh4MGMnvSoPY
-         Fkxj1YMdnGk4eUebKZV0sZWIxVA8pSfNt//pmsC9JMr5vEFGlWxdnnwyyBd2NO5wRH4q
-         jvJg==
-X-Gm-Message-State: AOJu0Yyu3IVu1b1OoalYN2ZNehQ4/fiubkwWboNlLi3uTz43aEXNAg8+
-	zOGbcyAntM3wNhm4dvd6swXYLM71r6k2vTi37Qq/RgEnH2skwVhSAIMv9JxF
-X-Google-Smtp-Source: AGHT+IGDrm5er1UOnpGoWEpeGySkavL0qR0vR6toV9W2VLrk7yx+hjPJsKMJNCpY8Vzp04VMN9WEbg==
-X-Received: by 2002:a05:600c:1554:b0:418:a620:15a1 with SMTP id f20-20020a05600c155400b00418a62015a1mr1778781wmg.30.1713543390487;
-        Fri, 19 Apr 2024 09:16:30 -0700 (PDT)
+        bh=a8WSdV+XPd4kPmSOlQjvtsKQnLM79YA3yJXgIa1yDz8=;
+        b=NupSZIffMO4v7qoR18N8X6eOQIDQiUMAyUie0a7LmcsVZF1YXG6s/J1QENMsQK6hn5
+         61mD/Gz+/Y7/pv47Sy4WmR4wI3rmR4ocwtWsE9TOrazXVGOadfwqSXJ42rvMKg4nhxNO
+         XguQsH8XQJfGpPHD1rR5dLxX36ySlC/gRWVzljngwaUvMBYlBq/f9gH/UXsl1G97Tdtn
+         Qxez7rgduoaA30RZjVGO1saHXpPn5zDkVHDr442XS9418uhzo5jUPvLIgASjXfaHn/oW
+         kNLSzNDY3Zjx6tanwTd8smqd6sk/JxgKAjzje4WkE9fiwKrl7RxOIyDiwKxrQa0E2Ow0
+         HbFQ==
+X-Gm-Message-State: AOJu0YzNFv0ypM2HqqAdhYiJDgHxYML0mF7etU06sV373KHaotYAiyxa
+	yTMCJQ/yUQeokexMG5xWb3ixDwOnNJfJrB1GvZPKlZckIoMwYlqmeXy7CqNM
+X-Google-Smtp-Source: AGHT+IFYpar+QPDAKEcTqP5RgexChBskv4WtGrImjKhheU20lLd4fHaZjPxTAa/VMBwk03SPpNvDnQ==
+X-Received: by 2002:a05:600c:1554:b0:418:a620:15a1 with SMTP id f20-20020a05600c155400b00418a62015a1mr1778822wmg.30.1713543391646;
+        Fri, 19 Apr 2024 09:16:31 -0700 (PDT)
 Received: from vasant-suse.suse.cz ([2001:9e8:ab5e:9e00:8bce:ff73:6d2f:5c25])
-        by smtp.gmail.com with ESMTPSA id je12-20020a05600c1f8c00b004183edc31adsm10742188wmb.44.2024.04.19.09.16.29
+        by smtp.gmail.com with ESMTPSA id je12-20020a05600c1f8c00b004183edc31adsm10742188wmb.44.2024.04.19.09.16.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 09:16:29 -0700 (PDT)
+        Fri, 19 Apr 2024 09:16:31 -0700 (PDT)
 From: vsntk18@gmail.com
 To: kvm@vger.kernel.org
 Cc: pbonzini@redhat.com,
@@ -74,11 +74,10 @@ Cc: pbonzini@redhat.com,
 	papaluri@amd.com,
 	andrew.jones@linux.dev,
 	Vasant Karasulli <vkarasulli@suse.de>,
-	Varad Gautam <varad.gautam@suse.com>,
-	Marc Orr <marcorr@google.com>
-Subject: [kvm-unit-tests PATCH v7 02/11] x86: Move svm.h to lib/x86/
-Date: Fri, 19 Apr 2024 18:16:14 +0200
-Message-Id: <20240419161623.45842-3-vsntk18@gmail.com>
+	Varad Gautam <varad.gautam@suse.com>
+Subject: [kvm-unit-tests PATCH v7 03/11] lib: Define unlikely()/likely() macros in compiler.h
+Date: Fri, 19 Apr 2024 18:16:15 +0200
+Message-Id: <20240419161623.45842-4-vsntk18@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240419161623.45842-1-vsntk18@gmail.com>
 References: <20240419161623.45842-1-vsntk18@gmail.com>
@@ -92,45 +91,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Vasant Karasulli <vkarasulli@suse.de>
 
-This enables sharing common definitions across testcases and lib/.
+So that they can be shared across testcases and lib/.
+Linux's x86 instruction decoder refrences them.
 
 Signed-off-by: Varad Gautam <varad.gautam@suse.com>
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
-Reviewed-by: Marc Orr <marcorr@google.com>
 ---
- {x86 => lib/x86}/svm.h | 0
- x86/svm.c              | 2 +-
- x86/svm_tests.c        | 2 +-
- 3 files changed, 2 insertions(+), 2 deletions(-)
- rename {x86 => lib/x86}/svm.h (100%)
+ lib/linux/compiler.h | 3 +++
+ x86/kvmclock.c       | 4 ----
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/x86/svm.h b/lib/x86/svm.h
-similarity index 100%
-rename from x86/svm.h
-rename to lib/x86/svm.h
-diff --git a/x86/svm.c b/x86/svm.c
-index e715e270..252d5301 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -2,7 +2,7 @@
-  * Framework for testing nested virtualization
-  */
+diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
+index bf3313bd..9f4ef162 100644
+--- a/lib/linux/compiler.h
++++ b/lib/linux/compiler.h
+@@ -121,5 +121,8 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
+ 	__u.__val;					\
+ })
 
--#include "svm.h"
-+#include "x86/svm.h"
- #include "libcflat.h"
- #include "processor.h"
- #include "desc.h"
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index c81b7465..a180939f 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1,4 +1,4 @@
--#include "svm.h"
-+#include "x86/svm.h"
- #include "libcflat.h"
- #include "processor.h"
- #include "desc.h"
++#define unlikely(x)	__builtin_expect(!!(x), 0)
++#define likely(x)	__builtin_expect(!!(x), 1)
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* !__LINUX_COMPILER_H */
+diff --git a/x86/kvmclock.c b/x86/kvmclock.c
+index f9f21032..487c12af 100644
+--- a/x86/kvmclock.c
++++ b/x86/kvmclock.c
+@@ -5,10 +5,6 @@
+ #include "kvmclock.h"
+ #include "asm/barrier.h"
+
+-#define unlikely(x)	__builtin_expect(!!(x), 0)
+-#define likely(x)	__builtin_expect(!!(x), 1)
+-
+-
+ struct pvclock_vcpu_time_info __attribute__((aligned(4))) hv_clock[MAX_CPU];
+ struct pvclock_wall_clock wall_clock;
+ static unsigned char valid_flags = 0;
 --
 2.34.1
 
