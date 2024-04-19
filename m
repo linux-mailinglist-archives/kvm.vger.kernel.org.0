@@ -1,210 +1,192 @@
-Return-Path: <kvm+bounces-15280-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F17498AAF11
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 15:03:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB0068AAEE6
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 14:59:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 690F21F21BCA
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:03:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9196B283B62
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 12:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC3812B141;
-	Fri, 19 Apr 2024 13:01:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2151B126F1C;
+	Fri, 19 Apr 2024 12:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nUhywHFx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fp1ku6qu"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2085.outbound.protection.outlook.com [40.107.244.85])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC5F129A68
-	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 13:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713531677; cv=fail; b=W/M4h0+fyfXmgpt8A8RqFUoauihuVv1w6yOuUCJfpYqfb5OaHRS8HhaqF98O+UHyfdCoZpJ97P9+pBdpTXJiEPqHYgMIsDEpBbyWmDvnkW079H0aaLPI6S82VPX473zSjYC+B3mzkyvYMvacS5o7WgKSemNDG7TCUe96WDUs+zw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713531677; c=relaxed/simple;
-	bh=eAPyrMINYzkq/OYx/DeUeSYhtx2mDzCe51P1bAUqMK4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hAMFqwO4xf+r9IY9T2gKaCznXKdgxzHpmkDDM34KW4lFb9IRP1zaSY0J0KyRECTjKC83ec4ATcllC1M1o/nlkfY8yJx6JD4sxH4hJnOogpscZC+6NR+bUtSBsE170X27RZNT7mwexIRYfLTuDlEhXDCRGy1ront8/MaieHMIPpI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nUhywHFx; arc=fail smtp.client-ip=40.107.244.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cm8K5Hncy80hNNZsl5v56DQo7HuDNh9DhVEOWESJlcptubwhTOwA8QEHzlzn1m9dKJ595lIPA/p/rQUGce8q1X1tAqrz9vev4PIrYJ/FHoGEJjiHGAKlxGF2o3LKkO3Sp7JqSSy2q+q6ldFaJfk7FtWaqXbIhhkS/qJdjH3zYoq6sYSCD6wJJF+D4fE6Na3ai9kJ+U33T0R3HMv3Y5c6KHgMabu09kWGxHOfK1fS9mjQwyJlXRqVQG1aQ5cdtUiTmyqdY7bXRSsGaAEbXrtPW5JY1fmi/helOUSDiO/QtJmHAYdvAXyqONI6Nigw+FMEU6NoGoksrVoqFv3iRtPwYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TgKIntb4lfdYDdnoxcM6dD3Z1x+9xugo6c/wWHwFBSE=;
- b=Zu46SI0Ymk/LIitr4hHr0prj35zJKtE5nkkLd5q8/pzUUO0hXFIB5fSNuD8NXQKXy2sHL+GUDdf6JsXbPaw3anYzyfyat8ld9STp0mR6N3AFgViAZ67ah4MD3NZ0F/z9sCSr5b/M0gbo3s64YnOKdb1Ce+KY3aSW6jyJBZbdX53XjjbDiZHJFcrC/ei7MV4EhrRmuCPlkX9bv+4TUzTY5Ts5ji52tiiSxP/L3vsmMFlsgqt3gltVpjC7v78QyCEsrfRbxjYORq2NJE1Ox7OMVuguq6C2Z/abGWxcnkOtFKb8aA0Xngl5PrxPf1A6QrSDr1k4mZXI9Tfdg7tETKCEBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TgKIntb4lfdYDdnoxcM6dD3Z1x+9xugo6c/wWHwFBSE=;
- b=nUhywHFxJLpzqi7e7MPcPoNKAoA2jiGi1WNkZpH2PSmz+76aQruYsFm6ERA39t/k46ENRFOLzPZtvbTveKdZP2sCZJutV5BybX423Pr0J8w+ArLqCf0ftrcqk6KAYkoYtRGZjQ7t7WQrh8R0J2EFtNt7645d1/Z7yasEfoFErcQ=
-Received: from SA9PR13CA0088.namprd13.prod.outlook.com (2603:10b6:806:23::33)
- by SA1PR12MB8641.namprd12.prod.outlook.com (2603:10b6:806:388::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Fri, 19 Apr
- 2024 13:01:10 +0000
-Received: from SN1PEPF00036F3F.namprd05.prod.outlook.com
- (2603:10b6:806:23:cafe::ac) by SA9PR13CA0088.outlook.office365.com
- (2603:10b6:806:23::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.14 via Frontend
- Transport; Fri, 19 Apr 2024 13:01:10 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF00036F3F.mail.protection.outlook.com (10.167.248.23) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7452.22 via Frontend Transport; Fri, 19 Apr 2024 13:01:09 +0000
-Received: from ethanolx16dchost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 19 Apr
- 2024 08:01:08 -0500
-From: Pavan Kumar Paluri <papaluri@amd.com>
-To: <kvm@vger.kernel.org>
-CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christophersen
-	<seanjc@google.com>, Michael Roth <michael.roth@amd.com>, Tom Lendacky
-	<thomas.lendacky@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>, "Kim
- Phillips" <kim.phillips@amd.com>, Vasant Karasulli <vkarasulli@suse.de>
-Subject: [kvm-unit-tests RFC PATCH 13/13] x86 AMD SEV-SNP: Test-2: Perform Intermix to 2M private to 2M shared PSCs
-Date: Fri, 19 Apr 2024 07:57:59 -0500
-Message-ID: <20240419125759.242870-14-papaluri@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240419125759.242870-1-papaluri@amd.com>
-References: <20240419125759.242870-1-papaluri@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E9B8624B
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 12:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713531531; cv=none; b=JjRcZxImIiWnenegvIH/UmnH5pM9GFACNnBWSH15vzFm7Ikf8+7WQf2Zmvz1RvqhWCqDzr6jmdSzb2mFTSSYv1LAxpeWl6fXi73ZA0y1bD7Rh/DyciOLHn2Qpf0TrERfjuD3d79V7l54yL/bnhaP/0LtLofbm8FxNS+Jbh5XTfI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713531531; c=relaxed/simple;
+	bh=6Zi4dffDXqoSeWakmnxczB43BLdpL7HhEoJrIZmU3LA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=s3LzJw9oxYGI8NBdZhbqiCz9uGN8dUPwm+YPLSPhF+P6RrZr7sdmHDAzhasatCiclAETcjgEACE2fDTJJ/AjPI2g7gS/irCj4xh5ez401Z/EJJSkgt8QKgIsduik4/iLYfqo/sytoBveMONRfWipoRTrTE6YUWpMQC778I0XdRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fp1ku6qu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713531528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Z2d3iqx05Gqxh4rph9K0FnqpHu231qlz9mgP4t0RVZk=;
+	b=Fp1ku6quEJi9PR1lCeC0Ov9rh8l4aiqwaAKUaoI7ClYGQvW3c+X+kMH8Kwbg+bDy6g03M2
+	wX6sjTc9JxeemQBluWpPh+tDaEJ9u9dZvgYbcyBURC3pOEiHXnNiENjjp3UPVSXbVWMSkZ
+	GPHIwTgECrXOGTopAObLft+ESZDr0Ug=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-50-YTPe-WrFOhSOJarlzVYy4g-1; Fri, 19 Apr 2024 08:58:47 -0400
+X-MC-Unique: YTPe-WrFOhSOJarlzVYy4g-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4183d08093bso11641415e9.1
+        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 05:58:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713531526; x=1714136326;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Z2d3iqx05Gqxh4rph9K0FnqpHu231qlz9mgP4t0RVZk=;
+        b=HK7tzTQDB68iLcuu4QCFCd6iWWPFNn81l+l4Bu2xVAh8DqZUpd/VaON3gtYf/I9OVg
+         bC7sj8pkW8I/72jEgAjSSPA048Cs6/4JPemvccqKLjmoWPmIn/eQgLuE5IsN4gspKasr
+         eB8t7jgceja2wF27BmsPJkzJ7hlMJov9mVjDQUUvwlDVEDe88z5tUI0H9fqj8dHSEueX
+         jdPBYv51Qx71kpyYVyRUpkzL2w2dm1gOdA0UGEVO1hzxyGc1BiAEcfyvElRDMpx7O8Es
+         YdFYF9TPfBzWqMSCSDP2SLdvuF4lfUOWYWclDX9duHy5Ty+Vudy9PMmKTib5o4R2zLlx
+         pxHA==
+X-Forwarded-Encrypted: i=1; AJvYcCURPJz20Acs3NZ/mkf7nhtiiQpiwvsjlWxX7NerLLCFrxprQXvm85CMQpqXNcjrftacKg+hQFjpBasNeAvtDX8PsDUs
+X-Gm-Message-State: AOJu0Yz5510Sdgrp8oR+dACMM0Pi9YwXqY50qPkrvGX0lIBr+K8NFEXr
+	S0d46NXD807IEUSW4ac7TWL70PY2WaOtm30hUZ7PhTObVoDDATOn5bqW7gtj+e7aMU7SC4Wnfx9
+	0kvkvQ302jNRKYtQKc+WnD6b0g4XpPf2C70WN3+GLd/4+4I+w2w==
+X-Received: by 2002:a5d:6a46:0:b0:346:b581:ff57 with SMTP id t6-20020a5d6a46000000b00346b581ff57mr1650292wrw.68.1713531526313;
+        Fri, 19 Apr 2024 05:58:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH7m8NTVqsbUldIBxMAx8E1NGImyAQjyh5UpwPAdGx0OoeBVIRTXxysKxRh8PdQ61Jjn+Ewpg==
+X-Received: by 2002:a5d:6a46:0:b0:346:b581:ff57 with SMTP id t6-20020a5d6a46000000b00346b581ff57mr1650273wrw.68.1713531525824;
+        Fri, 19 Apr 2024 05:58:45 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c716:f300:c9f0:f643:6aa2:16? (p200300cbc716f300c9f0f6436aa20016.dip0.t-ipconnect.de. [2003:cb:c716:f300:c9f0:f643:6aa2:16])
+        by smtp.gmail.com with ESMTPSA id w15-20020a5d544f000000b00349c63eb484sm4363099wrv.23.2024.04.19.05.58.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Apr 2024 05:58:45 -0700 (PDT)
+Message-ID: <a6086ba5-6137-44a0-9e51-ce4df5eb6ce4@redhat.com>
+Date: Fri, 19 Apr 2024 14:58:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F3F:EE_|SA1PR12MB8641:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3877aa23-388c-4026-f678-08dc6070c8cd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	J8nJeJhTNfVETym77ZKf3bg9YSS15Y8PQz42id1UHrGH5Yn9CFZ1BTGS/UEWxROQcxa/xhAhFQXmlUPqBip1CyGbehYMxp9klRTCvOqwDq5pX6bIi9rYZ1VR21OlfhAp+mpdMiJoguXKvaHyILjp/YRirBzS2FG0hkdOetKn1jVDYFe2kGZ3zroB1R+M1+oUyw4xMzL6W0XRK52O6G5ExQ4J+ZxERlmtyUM/n/j2GTTaYuozXa/WJGth+4AQCLOwJjpYr6Lw081EM2hEc4r58KQgEyggJKyg59kwQoAQJWLIv9S0A7EzREmo76inBRbDZM9q+dG8GiByjQ2NMV0lYOPZ66HFppyeEjaN9ib9Y3LxLr+S/3cn8rCvHpQlbW6HvPCf5wQj9phAEzXiK9w3LjaSn7WsjYhkzoGptPpi8PlpbJ7e0VQwe2AzTz8vWRBRMWH3ePCSkliJaL+sVf43C9Q3HyizY/D6kQ6zn5vWW9fcGK1A4hkh4Ar6G8dpja7+pwZbKscTStFKW+F4quke0mYcOV9YzQa0azIyZ8k7+Jv4uLy6iMcKmE8giIXuU1EeJ+7H04XwqEinlfNuQ76NDrumqZSMnW31yQ8GzgNBOGp5SPzdgDyffDENgiaCiHTnSto7i9ECdLZZmYnxpk6M5fZ8txpbE1COOclFuM14mEvp1wH2lUpbisxQ3NZdc6Nr+5PzALR1FjtcMuHZHXPuTT9utSRlfcbjH2PLmcng/KjKfaTL0NJL5YnXVQaNOMaV
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(36860700004)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 13:01:09.9906
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3877aa23-388c-4026-f678-08dc6070c8cd
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F3F.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8641
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 04/26] KVM: guest_memfd: Fix PTR_ERR() handling in
+ __kvm_gmem_get_pfn()
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+ jmattson@google.com, luto@kernel.org, dave.hansen@linux.intel.com,
+ slp@redhat.com, pgonda@google.com, peterz@infradead.org,
+ srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+ dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+ kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+ sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+ jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+ pankaj.gupta@amd.com, liam.merwick@oracle.com
+References: <20240418194133.1452059-1-michael.roth@amd.com>
+ <20240418194133.1452059-5-michael.roth@amd.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240418194133.1452059-5-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The test performs the following actions:
-1. Allocates a 2M private page (512 4K entries) and performs 2M private
-   to shared conversion.
-2. Performs a write operation on these un-encrypted pages.
-3. Performs partial page state changes (shared->private) on first 256
-   sub-pages and conducts a re-validation ('pvalidate') check on one of
-   these entries to ensure its state has been changed to private.
-4. Performs write test on the other set of sub-pages whose state is shared.
-5. Performs PSC from 2M intermixed state to private, backed up with a
-   re-validation check on the 2M range to ensure successfull conversion.
-6. Performs PSC from 2M private to 2M shared followed by a write
-   operation to ensure the 2M page is successfully changed to shared.
+On 18.04.24 21:41, Michael Roth wrote:
+> kvm_gmem_get_folio() may return a PTR_ERR() rather than just NULL. In
+> particular, for cases where EEXISTS is returned when FGP_CREAT_ONLY
+> flag is used. Handle this properly in __kvm_gmem_get_pfn().
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>   virt/kvm/guest_memfd.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index ccf22e44f387..9d7c6a70c547 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -580,8 +580,8 @@ static int __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
+>   	}
+>   
+>   	folio = kvm_gmem_get_folio(file_inode(file), index, prepare);
+> -	if (!folio)
+> -		return -ENOMEM;
+> +	if (IS_ERR_OR_NULL(folio))
+> +		return folio ? PTR_ERR(folio) : -ENOMEM;
 
-The main goal of this test is to ensure 2MB page state changes are
-handled properly even if the 2MB range is a mix of private/shared pages.
+Will it even return NULL?  Staring at other filemap_grab_folio() users, 
+they all check for IS_ERR().
 
-Suggested-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
----
- x86/amd_sev.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+>   
+>   	if (folio_test_hwpoison(folio)) {
+>   		r = -EHWPOISON;
 
-diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-index 7b53ef9c44d0..94944fb80a70 100644
---- a/x86/amd_sev.c
-+++ b/x86/amd_sev.c
-@@ -657,6 +657,32 @@ static void __test_sev_psc_private(unsigned long vaddr, struct ghcb *ghcb,
- 	       "Expected 2M page state: Private");
- }
- 
-+static void __test_sev_psc_shared(unsigned long vaddr, struct ghcb *ghcb,
-+				  bool large_page, pteval_t *pte)
-+{
-+	allow_noupdate = true;
-+
-+	set_pte_encrypted((unsigned long)vaddr, 1 << INTERMIX_PSC_ORDER);
-+
-+	/* Convert the intermixed 2M range to 2M private */
-+	sev_set_pages_state(vaddr, 512, SNP_PAGE_STATE_PRIVATE, ghcb,
-+			    large_page);
-+
-+	allow_noupdate = false;
-+
-+	report(is_validated_private_page(vaddr, large_page, 1),
-+	       "Expected 2M page state: Private");
-+
-+	/* 2M private->shared conversion */
-+	sev_set_pages_state(vaddr, 512, SNP_PAGE_STATE_SHARED, ghcb,
-+			    large_page);
-+
-+	set_pte_decrypted((unsigned long)vaddr, 1 << INTERMIX_PSC_ORDER);
-+
-+	report(!test_write((unsigned long)vaddr, 512),
-+	       "Write to a 2M un-encrypted range");
-+}
-+
- static void test_sev_psc_intermix(bool is_private)
- {
- 	unsigned long *vm_page;
-@@ -714,6 +740,9 @@ static void test_sev_psc_intermix(bool is_private)
- 	if (is_private)
- 		__test_sev_psc_private((unsigned long)vm_page, ghcb,
- 				       large_page, pte);
-+	else
-+		__test_sev_psc_shared((unsigned long)vm_page, ghcb,
-+				      large_page, pte);
- 
- 	/* Cleanup */
- 	free_pages_by_order(vm_page, INTERMIX_PSC_ORDER);
-@@ -724,6 +753,11 @@ static void test_sev_psc_intermix_to_private(void)
- 	test_sev_psc_intermix(true);
- }
- 
-+static void test_sev_psc_intermix_to_shared(void)
-+{
-+	test_sev_psc_intermix(false);
-+}
-+
- int main(void)
- {
- 	int rtn;
-@@ -738,6 +772,7 @@ int main(void)
- 		test_sev_psc_ghcb_msr();
- 		test_sev_psc_ghcb_nae();
- 		test_sev_psc_intermix_to_private();
-+		test_sev_psc_intermix_to_shared();
- 	}
- 
- 	return report_summary();
+Do we have a Fixes: tag?
+
 -- 
-2.34.1
+Cheers,
+
+David / dhildenb
 
 
