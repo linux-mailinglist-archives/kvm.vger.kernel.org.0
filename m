@@ -1,230 +1,133 @@
-Return-Path: <kvm+bounces-15314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7FC08AB252
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 17:50:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225CC8AB25A
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 17:50:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9242E281185
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 15:50:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 652BCB22F8C
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 15:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C57E1311AD;
-	Fri, 19 Apr 2024 15:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145991304A5;
+	Fri, 19 Apr 2024 15:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cXF3MH9U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e9+9WSiP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3452712F361;
-	Fri, 19 Apr 2024 15:49:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA84B130AD3;
+	Fri, 19 Apr 2024 15:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713541768; cv=none; b=t6KZLjCf4lACE1BE7kznBNG8qf6yacZKAkzybTGxT4+dW3PmKbTOT+uwyzAKGGIF4PP4h7C/klVlqMRHYKz7Ma1zB+Z+kDtjUh4v0pjypVaDp1x8JwkdFHFiTRYN/vCGpkKY4ybQeyJYzlU4Wg00aCrPzGh6wl468ceHlBifvtI=
+	t=1713541795; cv=none; b=qwKY/WrIa/x/KibvROiHLIGs8oUJdZf7n9VFj8A7djTxaCrt1wXykdE3F57ROE/PgfcMGVGO6R90lDDafJvzVKWarKvlFH7peLKtr2vsx81H6LXP8VaxxOJLgdwmP+LdzKlTyPu+XBIokyzI27KvV/xK+jOLrmFcthbn2O+Aluw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713541768; c=relaxed/simple;
-	bh=MMNCu9qXo/Sui8C3tMfJ7lzuoTJCSLI1PUO4ACRkh8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qJ6i3sVogZDql9IK1FPHjM//a/a0+aWriVDV1PSuWxinBgR/rIb/vt0ZzSJN9lScLjnky2zAh0vVxWZtwM2lNMygkt2MxcvqENFA3P4LGgxlrNoe/n2JiAOs6OqAl89C99F1d/joDO+mHSX0Aw2IkReTp8XWKloY1hggs//LHDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cXF3MH9U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F25C2BD10;
-	Fri, 19 Apr 2024 15:49:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713541768;
-	bh=MMNCu9qXo/Sui8C3tMfJ7lzuoTJCSLI1PUO4ACRkh8M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cXF3MH9UhHZaW5c+fQbICV8+tqL8zZd3GbsK+MMtlVnuI+U9MykD5EdYMbnqzGiQA
-	 clolbwi+WJpRnCi8Bgt+tEF57vK45kHXEgAivOzflaV60ugfWPJize6jQXFRFHwjyr
-	 VRS95okpFhaUArffiB/+u6m+wylmbq/z7sLeQsbFvkITQqoo7UuMHWOkDxb5E4UPYj
-	 yAg41C5DHBDH+t2YzcwksmCMBm7ZYDOWSL2q4WPfoHN6O8DqUXWH6xY+zsUNil7480
-	 D0X+YTTKNs+W1AwuRvHl2QI8DgHMxQgN51X8xpUibgE1yudXL+nOsnAy3LXdkfDXNg
-	 tmjlh9MV2WO1A==
-Date: Fri, 19 Apr 2024 16:49:16 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
-	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v2 03/12] dt-bindings: riscv: add Zc* extension rules
- implied by C extension
-Message-ID: <20240419-blinked-timid-da722ec6ddc4@spud>
-References: <20240418124300.1387978-1-cleger@rivosinc.com>
- <20240418124300.1387978-4-cleger@rivosinc.com>
+	s=arc-20240116; t=1713541795; c=relaxed/simple;
+	bh=3RFiDxez2acLIv9fQtWjSUCFeGh7FTIM9bGr4s+3eCI=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qUSxvHI/1CW5KB3KQjEujEF5T0YlJg1bAj1W31iANjLrX3IMCHhz9xLrvw89l0we/B7qUxkZtEATfKfxSIGNpEq7i73RbtT22G9t9S4ODNCQP9Ae0/ElATczoYSacrscqGHTdaEYSaoi0OneMi8GKrGJsEex47HPifOZYEPFihM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e9+9WSiP; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-516d1ecaf25so2852118e87.2;
+        Fri, 19 Apr 2024 08:49:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713541792; x=1714146592; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XTjTrX8k/OV8D/4FwhpKGos9bwoXHtumU35pP/xvPFY=;
+        b=e9+9WSiPH9Xp00OMES6T9bIfFbA+p4XB4/aF18gPHZtaoqHUMrI7ENdSb/9riIad4t
+         4g2X6iwSeAeOP7Ep2RTxWmcVP1ASFCkmIlnVXFbVzfnho5Bio4wS/cey1wPXP/Vmw9ag
+         O7q2iXVpnbOuAzhIqNL7ORnq4L7KrKEefuQT9XxEWldIrT745qkcQOLAwDBYn1WWlUMQ
+         zypBi94DBiT9THsrMYxGh3y7rzpy2RiXjeG84i7ybbcbvMWQOeF5O/BKn4sp7duBWqe7
+         u9P6kyNUA9YvW5N3PIr9+y+cgdWw2BrA20TPcov+OuaN0k87J1gqdx3uSZjy36tSStKT
+         FnHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713541792; x=1714146592;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XTjTrX8k/OV8D/4FwhpKGos9bwoXHtumU35pP/xvPFY=;
+        b=CQLwrxZosoD/E56Z5dKVgl6xwxSFklpQO8kJN6zQiZ6VXu56+AS5hEN8+wD2hxr0oe
+         vUrzdP5sfGT5Yv3xkIW30G7tL9Cn18sm/6C9otQ7tmyBcf99vujx9rXeKAjLVzocznso
+         8Hrq4ecMcLiTaGms7Iw1y/2wy23R6Y2L+FnFLArqUkAOHmcY41HCBH3ssn3TuZGb/aTf
+         GnPGb/1LDGJIUyocWaUH1QJIXJWzy45LPCIcV5e2UCNDuA+MSd+chyaDKeCjPwWAktz6
+         XwFw/0oSbzvHUKUwRG2OpNBU68DkENaP9yMTmOQFHnUfILM1eslmkJbIEvp2gBhLR/eR
+         TEig==
+X-Forwarded-Encrypted: i=1; AJvYcCVN42plrEqGTrBo0+3xrrvb3ZtOAvLjNMGSTTGJTZef43naQrEgK6d5FNWq7kl+elJMJleRAejVXvqPkx/yRo7K+Yt4wcuJdeXbzNd/Qp8ffhoDWPTog1Jg2rV2yTatv1bcoRPa+mUNclA57OYhAOWFdrWar8hcJvUQSvdFiGizHZjIcHqKN3FOKCDS/KiqVFzLv/oWIFYaCjZpPl44
+X-Gm-Message-State: AOJu0YxGZDJ79oCFyXmgjfgRfPGOo2cqnBOz7BYzUzJSR4I84I5sAoje
+	Fgwf6/7lQ9jOEBR/eBe56dm5nfY3BsCaR+glqKF8nowFqIu9j9/Z
+X-Google-Smtp-Source: AGHT+IGcX6lS6veqQqFahWGmcR+WcN6ooev8tXvu2kdoTkGGDXWaB4LRz/cu4Z6BuJpEFCW9f4FolQ==
+X-Received: by 2002:a19:7501:0:b0:516:a115:4a4d with SMTP id y1-20020a197501000000b00516a1154a4dmr1601293lfe.68.1713541791631;
+        Fri, 19 Apr 2024 08:49:51 -0700 (PDT)
+Received: from [192.168.18.253] (54-240-197-236.amazon.com. [54.240.197.236])
+        by smtp.gmail.com with ESMTPSA id t8-20020a170906a10800b00a4e253c8735sm2357376ejy.52.2024.04.19.08.49.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Apr 2024 08:49:51 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <21bc05cf-0227-4d57-8cfa-81097b95535b@xen.org>
+Date: Fri, 19 Apr 2024 16:49:49 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="DpdcO0rlxZdj1hXZ"
-Content-Disposition: inline
-In-Reply-To: <20240418124300.1387978-4-cleger@rivosinc.com>
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH 06/10] KVM: x86: Add KVM_VCPU_TSC_SCALE and fix the
+ documentation on TSC migration
+To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ Oliver Upton <oliver.upton@linux.dev>, Marcelo Tosatti
+ <mtosatti@redhat.com>, jalliste@amazon.co.uk, sveith@amazon.de
+References: <20240418193528.41780-1-dwmw2@infradead.org>
+ <20240418193528.41780-7-dwmw2@infradead.org>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <20240418193528.41780-7-dwmw2@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-
---DpdcO0rlxZdj1hXZ
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Apr 18, 2024 at 02:42:26PM +0200, Cl=E9ment L=E9ger wrote:
-> As stated by Zc* spec:
->=20
-> "As C defines the same instructions as Zca, Zcf and Zcd, the rule is that:
->  - C always implies Zca
->  - C+F implies Zcf (RV32 only)
->  - C+D implies Zcd"
->=20
-> Add additionnal validation rules to enforce this in dts.
-
-I'll get it out of the way: NAK, and the dts patch is the perfect
-example of why. I don't want us to have to continually update
-devicetrees. If these are implied due to being subsets of other
-extensions, then software should be able to enable them when that
-other extension is present.
-
-My fear is that, and a quick look at the "add probing" commit seemed to
-confirm it, new subsets would require updates to the dts, even though
-the existing extension is perfectly sufficient to determine presence.
-
-I definitely want to avoid continual updates to the devicetree for churn
-reasons whenever subsets are added, but not turning on the likes of Zca
-when C is present because "the bindings were updated to enforce this"
-is a complete blocker. I do concede that having two parents makes that
-more difficult and will likely require some changes to how we probe - do
-we need to have a "second round" type thing?
-Taking Zcf as an example, maybe something like making both of C and F into
-"standard" supersets and adding a case to riscv_isa_extension_check()
-that would mandate that Zca and F are enabled before enabling it, and we
-would ensure that C implies Zca before it implies Zcf?
-
-Given we'd be relying on ordering, we have to perform the same implication
-for both F and C and make sure that the "implies" struct has Zca before Zcf.
-I don't really like that suggestion, hopefully there's a nicer way of doing
-that, but I don't like the dt stuff here.
-
-Thanks,
-Conor.
-
->=20
-> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
+On 18/04/2024 20:34, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The documentation on TSC migration using KVM_VCPU_TSC_OFFSET is woefully
+> inadequate. It ignores TSC scaling, and ignores the fact that the host
+> TSC may differ from one host to the next (and in fact because of the way
+> the kernel calibrates it, it generally differs from one boot to the next
+> even on the same hardware).
+> 
+> Add KVM_VCPU_TSC_SCALE to extract the actual scale ratio and frac_bits,
+> and attempt to document the *awful* process that we're requiring userspace
+> to follow to merely preserve the TSC across migration.
+> 
+> I may have thrown up in my mouth a little when writing that documentation.
+> It's an awful API. If we do this, we should be ashamed of ourselves.
+> (I also haven't tested the documented process yet).
+> 
+> Let's use Simon's KVM_VCPU_TSC_VALUE instead.
+> https://lore.kernel.org/all/20230202165950.483430-1-sveith@amazon.de/
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->  .../devicetree/bindings/riscv/cpus.yaml       |  8 +++--
->  .../devicetree/bindings/riscv/extensions.yaml | 34 +++++++++++++++++++
->  2 files changed, 39 insertions(+), 3 deletions(-)
->=20
-> diff --git a/Documentation/devicetree/bindings/riscv/cpus.yaml b/Document=
-ation/devicetree/bindings/riscv/cpus.yaml
-> index d87dd50f1a4b..c4e2c65437b1 100644
-> --- a/Documentation/devicetree/bindings/riscv/cpus.yaml
-> +++ b/Documentation/devicetree/bindings/riscv/cpus.yaml
-> @@ -168,7 +168,7 @@ examples:
->                  i-cache-size =3D <16384>;
->                  reg =3D <0>;
->                  riscv,isa-base =3D "rv64i";
-> -                riscv,isa-extensions =3D "i", "m", "a", "c";
-> +                riscv,isa-extensions =3D "i", "m", "a", "c", "zca";
-> =20
->                  cpu_intc0: interrupt-controller {
->                          #interrupt-cells =3D <1>;
-> @@ -194,7 +194,8 @@ examples:
->                  reg =3D <1>;
->                  tlb-split;
->                  riscv,isa-base =3D "rv64i";
-> -                riscv,isa-extensions =3D "i", "m", "a", "f", "d", "c";
-> +                riscv,isa-extensions =3D "i", "m", "a", "f", "d", "c", "=
-zca",
-> +                                       "zcd";
-> =20
->                  cpu_intc1: interrupt-controller {
->                          #interrupt-cells =3D <1>;
-> @@ -215,7 +216,8 @@ examples:
->                  compatible =3D "riscv";
->                  mmu-type =3D "riscv,sv48";
->                  riscv,isa-base =3D "rv64i";
-> -                riscv,isa-extensions =3D "i", "m", "a", "f", "d", "c";
-> +                riscv,isa-extensions =3D "i", "m", "a", "f", "d", "c", "=
-zca",
-> +                                       "zcd";
-> =20
->                  interrupt-controller {
->                          #interrupt-cells =3D <1>;
-> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Do=
-cumentation/devicetree/bindings/riscv/extensions.yaml
-> index db7daf22b863..0172cbaa13ca 100644
-> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> @@ -549,6 +549,23 @@ properties:
->                  const: zca
->              - contains:
->                  const: f
-> +      # C extension implies Zca
-> +      - if:
-> +          contains:
-> +            const: c
-> +        then:
-> +          contains:
-> +            const: zca
-> +      # C extension implies Zcd if d
-> +      - if:
-> +          allOf:
-> +            - contains:
-> +                const: c
-> +            - contains:
-> +                const: d
-> +        then:
-> +          contains:
-> +            const: zcd
-> =20
->  allOf:
->    # Zcf extension does not exists on rv64
-> @@ -566,6 +583,23 @@ allOf:
->            not:
->              contains:
->                const: zcf
-> +  # C extension implies Zcf if f on rv32 only
-> +  - if:
-> +      properties:
-> +        riscv,isa-extensions:
-> +          allOf:
-> +            - contains:
-> +                const: c
-> +            - contains:
-> +                const: f
-> +        riscv,isa-base:
-> +          contains:
-> +            const: rv32i
-> +    then:
-> +      properties:
-> +        riscv,isa-extensions:
-> +          contains:
-> +            const: zcf
-> =20
->  additionalProperties: true
->  ...
-> --=20
-> 2.43.0
->=20
+>   Documentation/virt/kvm/devices/vcpu.rst | 115 ++++++++++++++++++------
+>   arch/x86/include/uapi/asm/kvm.h         |   6 ++
+>   arch/x86/kvm/x86.c                      |  15 ++++
+>   3 files changed, 109 insertions(+), 27 deletions(-)
+> 
 
---DpdcO0rlxZdj1hXZ
-Content-Type: application/pgp-signature; name="signature.asc"
+Reviewed-by: Paul Durrant <paul@xen.org>
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZiKSfAAKCRB4tDGHoIJi
-0p0bAQCI0ZdOO2q+xaWhcL7Krk9HCdLpniOsKdATTU8zMWqUWgEA7ccpybuwBzK1
-KglS0OiA5rjSvLYmJv2WgOCxlKn58AQ=
-=l0RY
------END PGP SIGNATURE-----
-
---DpdcO0rlxZdj1hXZ--
 
