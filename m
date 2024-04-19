@@ -1,228 +1,222 @@
-Return-Path: <kvm+bounces-15344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F348AB36B
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:36:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90EBF8AB376
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:37:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D2532842CC
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 16:36:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0833B1F21161
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 16:37:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BDFB130E5C;
-	Fri, 19 Apr 2024 16:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF04131BBC;
+	Fri, 19 Apr 2024 16:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z69/byjY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MwDWX/fI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB477F7C7
-	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 16:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713544558; cv=none; b=CXMfxP4HUMrm0fSVS0alxN02a3t3CD9wdhj8MhlMQsMoK7ec3bvBFSfoZUvxz5IEIWkhcR4Mn4ZQ1CTUI+VQynjtvXf+4VCZSLITjUHZ1nJFzlDkvueyV0vXUElpMvJnYAuMEC6fBfR4Lk8HdR9vFERSJGqCggQtGVudLd2jx6c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713544558; c=relaxed/simple;
-	bh=xENYoPum6yNYeS/E/8CEtcTyk7Gf7L25b78k5uOhFmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HZagk3vT33jTA9hfz8WvWC/XOIQa/1fJ66gCScjPp3YsECDsKFkG9dvaDhp09mxDnOX32F5ObAEzrzfxzEJnfN+QEmQSLYM293vq73rWJ0kB1M0R6PWDjtK0+oBxYlMAd9qU35dA8ZHnGkJQcEf6SBmOGB/KQrgYJLkobr1p+y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z69/byjY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713544555;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fdVR6ih/gpqSFGIptaTHhY1yJ/xUplAZaeOP0TUfrNM=;
-	b=Z69/byjYOM8OTYrTdLIvzvmFrvYvDYFySQwTlAFLCcq1RrGKW3mJmSypbOJaD5PqZGtc8e
-	8KVCrvEV3i93C5W1gUSoUk1p4oCJgszgWguo8NTfwNwPK6fqvsRfl6eY/MZqJb5z+kZh8j
-	+47gz0ShpSkpB+ZnWRG6I5Jzux8/Zz8=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-473-UBCTyxV6PdW1mH7bMoaThw-1; Fri, 19 Apr 2024 12:35:54 -0400
-X-MC-Unique: UBCTyxV6PdW1mH7bMoaThw-1
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7cc78077032so350732939f.0
-        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 09:35:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713544553; x=1714149353;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fdVR6ih/gpqSFGIptaTHhY1yJ/xUplAZaeOP0TUfrNM=;
-        b=AuWrmfu4G37PudFeET8NBUfRIS9BxmOjxULDooTabiiNR+3lG6xLei1am+YxAlOrDa
-         TaaCcj5Xh239/dTjQX0V2k8QqItU+2cG+pd2Ss35KJrwsOlgnkV32E0xGkpiGERUr+OA
-         GXLwu56Ew/3rwDfGk+IrmAYCC8XDML1Q7T21n6q/BUPZJ2SGXx6xeZdiAtIFP9B1lLMU
-         bBiWAVrNWj1XOMqV1Bnzzfq367/zkM4t8rLJi4mBsFc7J2ji1MCV8N2xbZ9i/NVHy0Tq
-         rlQJIyJV9IeGXwVZqn4k28dGabMMM5c02wjgcVjUHETmMU9lj+m6/ujWPgkyxN5W9Ap3
-         LyTw==
-X-Forwarded-Encrypted: i=1; AJvYcCXro5vd0wYZ8MmZwfsEA+vsVzKUOksJSSRXkl3MQYCNYnUUY+PH5TAzSCjaz1Xg2iRBnsCt8KqXWrmdevQY9ckUYd0T
-X-Gm-Message-State: AOJu0Yw0DdchPuBOSwuVFCw6fg52+kCREEr0PwssLTxXrtZ1nLJHTHzT
-	A2meKrFT4XB46VNnoqt99pihrMtz5JCcBddMTw7nu8KPHMH4B43NjI0jNz2XO4wYBZCe8wNDAE/
-	VWRp2l0tEirJELEClA9XSCk9WCZb7SvXpYw+szyBBNkvqneQA9Q==
-X-Received: by 2002:a5d:9c12:0:b0:7d3:eb4b:ca06 with SMTP id 18-20020a5d9c12000000b007d3eb4bca06mr3102138ioe.4.1713544553590;
-        Fri, 19 Apr 2024 09:35:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHoahWr9Ra1p/zkH9TWQjcfyp7eDiqGYVUds6eGBvIjVVtf4CShyMAPy4jI4wLEeWo1+a0pvg==
-X-Received: by 2002:a5d:9c12:0:b0:7d3:eb4b:ca06 with SMTP id 18-20020a5d9c12000000b007d3eb4bca06mr3102115ioe.4.1713544553254;
-        Fri, 19 Apr 2024 09:35:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id y18-20020a05663824d200b004829446d63dsm1173221jat.175.2024.04.19.09.35.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 09:35:52 -0700 (PDT)
-Date: Fri, 19 Apr 2024 10:35:50 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Liu, Yi L" <yi.l.liu@intel.com>, Jason Gunthorpe <jgg@nvidia.com>,
- "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
- <robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
- <chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
- <baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "Pan, Jacob jun" <jacob.jun.pan@intel.com>
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-Message-ID: <20240419103550.71b6a616.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276819C9596480DB4C172228C0D2@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240412082121.33382-1-yi.l.liu@intel.com>
-	<BN9PR11MB5276318EF2CD66BEF826F59A8C082@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20240416175018.GJ3637727@nvidia.com>
-	<BN9PR11MB5276E6975F78AE96F8DEC66D8C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20240417122051.GN3637727@nvidia.com>
-	<20240417170216.1db4334a.alex.williamson@redhat.com>
-	<BN9PR11MB52765314C4E965D4CEADA2178C0E2@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<4037d5f4-ae6b-4c17-97d8-e0f7812d5a6d@intel.com>
-	<20240418143747.28b36750.alex.williamson@redhat.com>
-	<BN9PR11MB5276819C9596480DB4C172228C0D2@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CA319F;
+	Fri, 19 Apr 2024 16:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713544649; cv=fail; b=H8t4/v15jskpIxMGhcsmGTO8EB3ASmRWXN+lACSbO2iZ7rWXsdaPp71544+8JvSMliEGIsTVtVg5a2sZRpiXfcgZ99bL8qMIQ81ZgwFbB5rjzY/aP0OwJDVkQRogXHrSeA7+wM1bUJrnRAfldUM5rHWhvWjGpTbvBACz8GIqoIo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713544649; c=relaxed/simple;
+	bh=CxuXHyWbWIIY5LognbDkLsBYU67KskSEDAC7/gK3dXc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FOMH3tjQXbHlSa5cLj6OAu5y5sCBdpo1qoLh+R5mk+QB9G9E/xneD/EXdL6XOxt7AoIgQene1doulwNakPymDqwegBBRAbkhywYXjf7dVR+EgtyyCiyQpm/h/l3FraY09kRP95/RyEyaVxya93PByfW0FnYARF8RB8XzY5GyNEM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MwDWX/fI; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713544648; x=1745080648;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=CxuXHyWbWIIY5LognbDkLsBYU67KskSEDAC7/gK3dXc=;
+  b=MwDWX/fIcoRRoGWypFiITMd/f5O9gRPuEIc9FfAFf+iQ5bCLD9/17SKY
+   sF+mvisEA78UXJyJ2dbKcbrLqVF4OW2Z2UYQcFUlTOx7R2DWDlQxXyOYt
+   rRf73cv4yBnz3MtLJBBbX69pUpjz7A/lEOgFu5VIWmgdw8OWPKBJ5HutG
+   2KzTCtKH9BPZJPFgW4Bc5vLBwBJSIAF+T1/I+Vu7uYDSbyN9pIOImqGLz
+   Th5jSEohfTJnJ3zZ9A3D2t8H8G41YtDdDr1BEqxRSsBKJ/o0Tsvi5Yt8w
+   KmZGlQWWPifM8mZkolgzk1asEtvzlb3m6L3yNkRDJFRgAy601uIt7wuGG
+   w==;
+X-CSE-ConnectionGUID: cPdnVtxOSJCJGvYH08frlA==
+X-CSE-MsgGUID: kcXkW1MWS7CmIDkXUp2dvQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="9269605"
+X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
+   d="scan'208";a="9269605"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 09:37:27 -0700
+X-CSE-ConnectionGUID: SikrWuEhQt2cRlVFtI/PuQ==
+X-CSE-MsgGUID: z19acvIoQ+yc3Xx/UAub0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
+   d="scan'208";a="28202401"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Apr 2024 09:37:27 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 19 Apr 2024 09:37:26 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 19 Apr 2024 09:37:26 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Fri, 19 Apr 2024 09:37:26 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 19 Apr 2024 09:37:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g2iP2nFMLWIJRHM/KaAvri70bt+VofsbBF+5eWU32NsmwIrklwQVCjgrUOGCl4v6ci82Pgp0bEhOND4PRl71Rcmrocw3QY1Wni/UBwwOibvjpyJobfoGZfdoQK56uwbDCAhT/kSm6MmLC1XiFUju8VY8+iAS5/V8eGmGB0Vss5sDb1kILptho7Gj2Tjt3WIsK4tkBUHdiZee9eP1/8EsVotzvA4VO3HcGUcp9pOsFlUFztQSq8fWhlK/dq+7gj9Z3QTC9sebJsfgI9Tl+KNHYk5KDJtbPtp0XvS84CzgV7QEL+h8k6ErI0BgX5DyhmZKX2gMPKQkVILVWSRr5pBj7Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GZFXPeDAz2HRQltCM3Lm1RN2sStLnbOuJBo9VH05JH4=;
+ b=deQIqMGdUJ6qWOLCebEa8OSzXuvXbnIfVS2wtOG17BXdxF/o57ZJ4Hfu7jaV8SOyF/funS5Xd2OpIauKhWWuJaiHhjjaLsmQLOFEhinxFxPO9YydU1/aDHvGivZD3deEN7EZrDp8AOp3L33VpSJwWgS2rY3w600mWgAr840YiXruGOu6HWrWOC3FETspLl7pSZBfKIPaQwDqtJFY5lINLo+xb/zIpEla7Q9lMw+2QsYbxCoFRLQarWeWdsKx9RvFga3KPanXt8Go0VtInF9ii9eB3nLGD7RavCc2HSavqlYrnrzgCEVf2S//CmtiQIZkcSbQLZ0ezW5dLfvy1Fqapg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com (2603:10b6:806:25d::22)
+ by DS0PR11MB8051.namprd11.prod.outlook.com (2603:10b6:8:121::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.29; Fri, 19 Apr
+ 2024 16:37:24 +0000
+Received: from SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::1d15:ecf5:e16c:c48e]) by SA1PR11MB6734.namprd11.prod.outlook.com
+ ([fe80::1d15:ecf5:e16c:c48e%5]) with mapi id 15.20.7519.010; Fri, 19 Apr 2024
+ 16:37:24 +0000
+From: "Li, Xin3" <xin3.li@intel.com>
+To: "Gao, Chao" <chao.gao@intel.com>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net"
+	<corbet@lwn.net>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
+	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "shuah@kernel.org"
+	<shuah@kernel.org>, "vkuznets@redhat.com" <vkuznets@redhat.com>,
+	"peterz@infradead.org" <peterz@infradead.org>, "Shankar, Ravi V"
+	<ravi.v.shankar@intel.com>, "xin@zytor.com" <xin@zytor.com>
+Subject: RE: [PATCH v2 09/25] KVM: VMX: Switch FRED RSP0 between host and
+ guest
+Thread-Topic: [PATCH v2 09/25] KVM: VMX: Switch FRED RSP0 between host and
+ guest
+Thread-Index: AQHaWe/p8mDo/Zfb1Ue0O++EkKDe07FwFkwAgAAja6A=
+Date: Fri, 19 Apr 2024 16:37:24 +0000
+Message-ID: <SA1PR11MB6734AC2442F6615CB3DA7203A80D2@SA1PR11MB6734.namprd11.prod.outlook.com>
+References: <20240207172646.3981-1-xin3.li@intel.com>
+ <20240207172646.3981-10-xin3.li@intel.com> <ZiJ+RkHDJzalqN05@chao-email>
+In-Reply-To: <ZiJ+RkHDJzalqN05@chao-email>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB6734:EE_|DS0PR11MB8051:EE_
+x-ms-office365-filtering-correlation-id: 4200ee6b-5c61-454b-324a-08dc608efdde
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Ssgc7AbMjmuVybITdFhsm/BP6oKGxKb4S3h+mgcQ75bzfarx5Csxxa3uKnEAaK4qbLB48uGZLBBTdgJP0eVw4jzbj1AXkCS5pMD+NY6bZEkb/K4XFN9wIO3zQCtoWiOMbIA+fmzk+ArtJCnXBtl9vunViedvBhJZNjzTxb7cKXhxrrd/OdsjsA8ZHVeCLjxjnzpBEY8qWQIzRJ1CWsgnbxwlZwyV2FP31I4JdT57BC2lx8EBTjEk3qaCbk2B4pnvq40CgcAUFJVSbgnExPCVtdURu1bse/5o1/f4uEmsmZRbGgifLL1lIoArqcdldLrn5Ze5BYHMTZ7ScQe8hXXepUPsDRejqs969qZlICM7UOOx0oCes2uhwEFHn4LVYF2D0GYq+C5NgCNM3/SiAQRY+7JxCO9J+ivelI1z30zmoz7UCS0tsJqacinwoCTBw3L+dQ925qzY8A3jjrTQ/HPrChfyWSLl8R7KRoED920a3yxtBF/MWnUjqPsA3oY2QUR28hG2nRNcuJnZe56jHSCuJls0uZN66WYl2HiaeMUx1koxKwZkOFEH7rDRGezVxPj4kNZDBl6HlX10j3WMxpANawYpNl4JpC+azIE+ayLdQWm340V/CeO/HJCQu833q+me6AT5bqx8sp29D2XTLSK6CO3fHt/2pvBVtBNYHmzAcaAjc6z788CIEaBfPtLI+RRIX4fsqxI99AFZKPYgTJ47fw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6734.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Jw+syHabGdQG9RaRPwK+NFwlQ6hDzZPkobtCtmL1ZPVJlpYyKKizYJg66br5?=
+ =?us-ascii?Q?UTKXkVnBiAk82mBTDliQ+y/DWYuh2kFJtr2J0lTf0og+64gvkTvBe5/Ki5MP?=
+ =?us-ascii?Q?dtn6aJYK0ysRe+WUIkyuUp2ob6mObUcIs8oe/lMRiHmAw3wFb2tDqek4i46w?=
+ =?us-ascii?Q?S8NKNd1jhOdcr8lf8rrYSHtliLIbF9pP86yoRv166Rc6vd0yKNd3U/AXaqcA?=
+ =?us-ascii?Q?IgQUgufZfnIJSYygiTxze0FN4FXAwmwTPq879nIzcI9HPPZNg7Jx24WfVsJm?=
+ =?us-ascii?Q?EXbQnEAXTt+9sWdtyCdh0UDpvifZVOu4AheyjZaGvTIw9Y8+o+ZmeHDTW2Sc?=
+ =?us-ascii?Q?TYH9tl3Ve4/epDKQPyqeE4JjhyS/k4J4W4ETHFDU62y0AGS6FIJqiz3TyigD?=
+ =?us-ascii?Q?NDA8Uyb2K2wPX8lWolrHgGTwtiqB4Wf4QkolJbqjr9Keh35ZB8jsrMkC673/?=
+ =?us-ascii?Q?2yBHsum+p90muL1HhXhMsBW2r88Kuar+hictdkqbNYhqwtSFD5QwATQ9QEMw?=
+ =?us-ascii?Q?9vyURPUUabiNAmjA8djstTPjJoATIdTz/sC4Nl4bu8ds7z/pJzIcbmhLi+FG?=
+ =?us-ascii?Q?duxntDKFphFHXL76JA4uNmJ3d0dMLNPWkCa0MLW7w/y+wPBvdLx3ZSlZumix?=
+ =?us-ascii?Q?sWTnb/GZnIjcM3bqP5YMqs2X4QsSAN1vtfHbWFHDHhLoQaviajHvhrysLrl1?=
+ =?us-ascii?Q?qPU4nAQmxq/z8MXcmrn5Z8dz6k4beYaUhnNw7Z5cm0dZhhOgnBJA+HVyATPd?=
+ =?us-ascii?Q?X7EavX8NP402fRZke6mZ3m6wbROd7sijC3nkHJ0vxcZclrVb4h2zefwb11er?=
+ =?us-ascii?Q?oKV0nr/Mvc3lSLTUXoeIQTnk+j59Q0hUyKFort9FfExazhg+qiUZ62vMFm+a?=
+ =?us-ascii?Q?UVMU8dCmP0LzLmnBhsexTrezpM8iiypb0t5lVB7vnNnwaoInkgFba+UAnJBu?=
+ =?us-ascii?Q?3RStuDzN1k73Nhejgl6apECUzPiEbD72XOIMM9xSNnvNjyJ3OvUHGC5VVKTD?=
+ =?us-ascii?Q?mOmTHqDw1oMYVRPfjNDw+KYYPBM9QOYOBRjG2TsLZUdxkPBlf7tXBPQoVqoH?=
+ =?us-ascii?Q?f+80e5Mj1zHXmg9RpLkF/9saV3v8kxNl8ACXZakVHRCxLqL821UVW/xilcPu?=
+ =?us-ascii?Q?2uL3v+FiT7r2w+m4pih+GJqitoQnW3K3hUcBIChHDCdaUulQBCuURmg5Jqa4?=
+ =?us-ascii?Q?QnzddKWQK+6r71F3gtmd4DUCcKZVfzLusMVIfOXaREqS7oNw6/Z09JmLC9sW?=
+ =?us-ascii?Q?q/crg619q+bV8soUHnBDzFcmAtdCXrgYcHdNgDn1AGMHTeoi4SazsZTI8noM?=
+ =?us-ascii?Q?gv4YEl9KZx7DPYbIV2PuYUPnoJV1SI5cVnKWkvTcWwJQodUnhIT9a6EO7oRQ?=
+ =?us-ascii?Q?u9/F6vmc7sdKziNtxn+ASHiyaYVqdV47N/6Ps+PHhDRYt+bi4FQzS/O+UNNJ?=
+ =?us-ascii?Q?1otTM5Wv30cxtWJlspc4rBMklDwI6iEhr3wTpLw6CSePtuB0o3cyHudIVXOE?=
+ =?us-ascii?Q?KIEbqcqCktjMDgrFDSCFmVAnW6BvwmgcogtmhqjWWj9um8g6NBrMYr1zpOBl?=
+ =?us-ascii?Q?GdZjSKvz8ozgsIIAMGTqA60s6vJAv0Z6tsMzx0GJ?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6734.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4200ee6b-5c61-454b-324a-08dc608efdde
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2024 16:37:24.0510
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1MoKENc4arE40Oa4qVGM8RbvW+g7gcYlwcF8rrvAVOzSU2goErfAh1FsfiVcIghTHi1epXkVDAHq6PJvrd2acQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8051
+X-OriginatorOrg: intel.com
 
-On Fri, 19 Apr 2024 05:52:01 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
-
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, April 19, 2024 4:38 AM
-> >=20
-> > On Thu, 18 Apr 2024 17:03:15 +0800
-> > Yi Liu <yi.l.liu@intel.com> wrote:
-> >  =20
-> > > On 2024/4/18 08:06, Tian, Kevin wrote: =20
-> > > >> From: Alex Williamson <alex.williamson@redhat.com>
-> > > >> Sent: Thursday, April 18, 2024 7:02 AM
-> > > >>
-> > > >> But we don't actually expose the PASID capability on the PF and as
-> > > >> argued in path 4/ we can't because it would break existing userspa=
-ce.
-> > > > > Come back to this statement. =20
-> > > >
-> > > > Does 'break' means that legacy Qemu will crash due to a guest write
-> > > > to the read-only PASID capability, or just a conceptually functional
-> > > > break i.e. non-faithful emulation due to writes being dropped? =20
-> >=20
-> > I expect more the latter.
-> >  =20
-> > > > If the latter it's probably not a bad idea to allow exposing the PA=
-SID
-> > > > capability on the PF as a sane guest shouldn't enable the PASID
-> > > > capability w/o seeing vIOMMU supporting PASID. And there is no
-> > > > status bit defined in the PASID capability to check back so even
-> > > > if an insane guest wants to blindly enable PASID it will naturally
-> > > > write and done. The only niche case is that the enable bits are
-> > > > defined as RW so ideally reading back those bits should get the
-> > > > latest written value. But probably this can be tolerated? =20
-> >=20
-> > Some degree of inconsistency is likely tolerated, the guest is unlikely
-> > to check that a RW bit was set or cleared.  How would we virtualize the
-> > control registers for a VF and are they similarly virtualized for a PF
-> > or would we allow the guest to manipulate the physical PASID control
-> > registers? =20
+> >+		if (unlikely(vmx->msr_host_fred_rsp0 =3D=3D 0))
+> >+			vmx->msr_host_fred_rsp0 =3D
+> read_msr(MSR_IA32_FRED_RSP0);
 >=20
-> it's shared so the guest shouldn't be allowed to touch the physical
-> register.
+> can we just drop this and use "(unsigned long)task_stack_page(current) +
+> THREAD_SIZE"
+> as host fred rsp0?
+
+I thought about it, however, don't see a strong reason that it's better,
+ i.e., is RDMSR slower than reading 'stack' from current task_struct?
+
 >=20
-> Even for PF this is virtualized as the physical control is toggled by
-> the iommu driver today. We discussed before whether there is a
-> value moving the control to device driver but the conclusion is no.
-
-So in both cases we virtualize the PASID bits in the vfio variant
-driver in order to maintain spec compliant behavior of the register
-(ie. the control bits are RW with no underlying hardware effect and
-capability bits only reflect the features enabled by the host in the
-control register)?
-
-> > > 4) Userspace assembles a pasid cap and inserts it to the vconfig spac=
-e.
-> > >
-> > > For PF, step 1) is enough. For VF, it needs to go through all the 4 s=
-teps.
-> > > This is a bit different from what we planned at the beginning. But so=
-unds
-> > > doable if we want to pursue the staging direction. =20
-> >=20
-> > Seems like if we decide that we can just expose the PASID capability
-> > for a PF then we should just have any VF variant drivers also implement
-> > a virtual PASID capability.  In this case DVSEC would only be used to =
-=20
+> >+		wrmsrl(MSR_IA32_FRED_RSP0, vmx->msr_guest_fred_rsp0);
 >=20
-> I'm leaning toward this direction now.
+> any reason to not use wrmsrns?
+
+Good call!
+
+
+> >+	}
+> > #else
+> > 	savesegment(fs, fs_sel);
+> > 	savesegment(gs, gs_sel);
+> >@@ -1381,6 +1391,11 @@ static void vmx_prepare_switch_to_host(struct
+> vcpu_vmx *vmx)
+> > 	invalidate_tss_limit();
+> > #ifdef CONFIG_X86_64
+> > 	wrmsrl(MSR_KERNEL_GS_BASE, vmx->msr_host_kernel_gs_base);
+> >+
+> >+	if (guest_can_use(&vmx->vcpu, X86_FEATURE_FRED)) {
+> >+		vmx->msr_guest_fred_rsp0 =3D read_msr(MSR_IA32_FRED_RSP0);
+> >+		wrmsrl(MSR_IA32_FRED_RSP0, vmx->msr_host_fred_rsp0);
 >=20
-> > provide information for a purely userspace emulation of PASID (in which
-> > case it also wouldn't necessarily need the vfio feature because it
-> > might implicitly know the PASID capabilities of the device).  Thanks,
-> >  =20
->=20
-> that's a good point. Then no new contract is required.
->=20
-> and allowing variant driver to implement a virtual PASID capability
-> seems also make a room for making a shared variant driver to host
-> a table of virtual capabilities (both offset and content) for VFs, just
-> as discussed in patch4 having a shared driver to host a table for DVSEC?
+> same question.
 
-Yes, vfio-pci-core would support virtualizing the PF PASID capability
-mapped 1:1 at the physical PASID location.  We should architect that
-support to be easily reused for a driver provided offset for the VF use
-case and then we'd need to decide if a lookup table to associate an
-offset to a VF vendor:device warrants a variant driver (which could be
-shared by multiple devices) or if we'd accept that into vfio-pci-core.
+Will do!
 
-> Along this route probably most vendors will just extend the table in
-> the shared driver, leading to decreased value on DVSEC and question
-> on its necessity...
->=20
-> then it's back to the quirk-in-kernel approach... but if simple enough
-> probably not a bad idea to pursue? =F0=9F=98=8A
-
-A DVSEC to express unused config space could still support a generic
-vfio-pci-core or variant driver implementation of PASID virtualization.
-The table lookup would provide a device-specific quirk to a base
-implementation of carving it from DVSEC reported free space.
-
-The question of whether it should be in kernel or userspace is
-difficult.  There are certainly other capabilities where vfio-pci
-exposes RW registers as read-only and we rely on the userspace VMM to
-emulate them.  We could consider this one of those cases so long as the
-change of exposing PASID as a read-only capability is tolerated for old
-QEMU, new kernel.
-
-Then come VFs.  AFAIK, it would not be possible for an unprivileged
-QEMU to inspect the PASID state for the PF.  Therefore I think vfio
-needs to provide that information either in-band (ie. emulated PASID) or
-out-of-band (device feature).  At that point, there's some kernel code
-regardless, which leans me towards virtualizing in the kernel.  I'd
-welcome a complete, coherent proposal that could be done in userspace
-though.  Thanks,
-
-Alex
+Thanks!
+    Xin
 
 
