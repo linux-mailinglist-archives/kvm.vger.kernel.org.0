@@ -1,143 +1,173 @@
-Return-Path: <kvm+bounces-15327-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15328-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05FD38AB2EF
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:12:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 288618AB308
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 18:13:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99B5D1F22DA1
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 16:11:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D88DB232C0
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 16:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3766F12F394;
-	Fri, 19 Apr 2024 16:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D550F131BB2;
+	Fri, 19 Apr 2024 16:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="B08WCqC/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bpc2mp6S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975A0130E4F
-	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 16:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD74130AEB
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 16:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713543099; cv=none; b=No14Bf9gGT8ysbD1xcDxeeFJfxnQozwO4T4YF+Ugh6fR7aPMjv0m4XX4UyW7ZJr2JRddSgW+ST7PxMKOjNe9B1XzbMc2T/RBLucjmp5O1qfMsndQwGFBWQVyINfCuFKM6kSM85v/j0r1c7HNCskLDB4a5OBBZyDlLt4wOCLEaJs=
+	t=1713543150; cv=none; b=T7EdQf41gn5POh5G5qgB8VnjpdxG8tGARp4DNX+ZvLMnoHBghLYDamvaNL4pU942RFomYWkhPUcPf5T5LePHXl/KPHqBIvT2I2NC40OqpXTBqQtgEUuYUVE7CVB3vezpRYbni+cbzE+0BRgHM8PnuxonPBwtYyUElZ84U2HscLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713543099; c=relaxed/simple;
-	bh=c355FjzRXp2PV5fV7cTtv8D/0hSyaEEZty37+zds9PA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bq7xEAoAm1LITuvHV+2RpmPHqcqx00EZJttGWuHz8FhfwbVp7NW8vHDb64B1di1eEzRGtdLibJMqlvyklNGsgFtWI80UM+lW18a45vya4rYrC6peo4Zrzsi+645acl6atsuW/bjAU5T6IRHz3V4QX47K8hnlRDTDlRSqq7tm6D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=B08WCqC/; arc=none smtp.client-ip=209.85.210.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6ebb815f688so1408773a34.1
-        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 09:11:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1713543096; x=1714147896; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gPdDMUXyiuiq86o/a5LL/jaZpq2sMZf3qusGMS3HcBg=;
-        b=B08WCqC/Tlnrq8SKJFHKOOhcHEKDCWyhvENSKiZ47tVdUkiSGE1zWPRCsywsSFebTc
-         T+GtiRhCq29lQ7czlkfKIcu4UlQ4iFHwvNoGuIA2z8hQrSIQrM/SJBSbn01+iSrs5J6W
-         VaFp3+KzY23aUWCkHkU/xXwrylnpJKzX10mlUPpGvbTxqhGXdWELY/Hu6cwcmnn647Hp
-         zqJTEOnh394QwaR7G6OiAgPaGW33XT62z5I+W930K90NZAsCRu6Jnfc1PjdvFi7h+ktd
-         bOv6qmTwUIsL1Nk7oBiNGNqUD4sJgpQzu7PCD3bhUONcOlqX+sRomnFIBajV/vyciMIh
-         w9nA==
+	s=arc-20240116; t=1713543150; c=relaxed/simple;
+	bh=BoY/Dy3UEpWzAlEVCqDQTE76CEu5CAwU1Yr/gwGs0FU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h5FogOH2PDI8ZaypJO1BhQWqrPPUY8u7AvRJKvXN4xcgzf61gvkMehcQqKiRcz9WeOyE310KsGwJUZdYMmI2xj48AHQCzLszgnQd47SrrrkZClY25hednU6nV9vBpDQUq1ZZXD7tgEEsnWmNq+8ARTQgXllnEI1ukoNrqMzuXVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bpc2mp6S; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713543147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9uBiWyy2Y6aSUbUd2veflvDo2gmH6uQXxYZf3A1GRsI=;
+	b=Bpc2mp6SLG7zIQdxlmAKtdIxjFmShYq7tjJaZ+Rn28vu9VxFhO1io2a7EX3WfzX2gqzvqL
+	r/009oZ14Cvn/A882ptEdpPfDG25PiYvHsarV8Bwd+d4tDzx/TaICQXMYgqmD68jqZy7Gh
+	bYiqar9zJ8SFjsHzAnb6+ZYej0rElCY=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-34-TNNMVgUVNSqNVtutQBTzYA-1; Fri, 19 Apr 2024 12:12:24 -0400
+X-MC-Unique: TNNMVgUVNSqNVtutQBTzYA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-343f8b51910so1339925f8f.3
+        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 09:12:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713543096; x=1714147896;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gPdDMUXyiuiq86o/a5LL/jaZpq2sMZf3qusGMS3HcBg=;
-        b=l49j36+zNfSjakuhi47wxduskxePSj8ofrsVnliCk5+jAF4bQJoXmfE4c32/cJ8/uc
-         6imNNfr6gFJ4SR/lfRvcDAZQzFjvJVL2P5lBsxQqVq56fpBbR+iSG7xyFaMVKcPWNvWB
-         B/fiQupsgHoDss1c0N45mSouykEbteS5+BSlEoo6HUsktNP2LAqFy8cuA7yoPAn3gfXH
-         41aF1cb22WE3O0NrWJ7Rd5rGciFLMmnvCzOkW+HjCxVH6do1P7JtvMdBa+uym2+y6MPL
-         +QhBlVw7UPhrSRKlYRA2fnU/+ls2z81k1rrhYuEW3S2je+F1o/LDcGffN1mv6jjeVRGF
-         YKOA==
-X-Forwarded-Encrypted: i=1; AJvYcCVY2JVWrLSSLoD4zJsxxLu4BygJH9WSk4XrLTOgSHRjOLOSu43WpJPb3x9Lw9J7Vwt8x1p6A7HaUHimzYMFl92Zd4Pn
-X-Gm-Message-State: AOJu0YzhpjGdK/on/24n4s4JUu+1T8ujsW6EKFaY1GVLzpRjjK/ZVI2+
-	PZuk35j2DUBFZ9+TvjC9s1s3g1sKrLswjLVFmOEqBBwmi+kH37UO79dfieIcZ04=
-X-Google-Smtp-Source: AGHT+IF7DVUq+dJZOo43uX5z1JMrxdHIu7CEnQutVFVuFx4NCCMcQbbW/K0XBawjCJRf1j78VXk34A==
-X-Received: by 2002:a9d:7e8b:0:b0:6eb:b2d4:dd30 with SMTP id m11-20020a9d7e8b000000b006ebb2d4dd30mr2812878otp.0.1713543096601;
-        Fri, 19 Apr 2024 09:11:36 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id p2-20020a9d76c2000000b006ea19aa0e4fsm733309otl.29.2024.04.19.09.11.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 09:11:36 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rxqpr-00Fd4B-5i;
-	Fri, 19 Apr 2024 13:11:35 -0300
-Date: Fri, 19 Apr 2024 13:11:35 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Gerd Bayer <gbayer@linux.ibm.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>,
-	Ben Segal <bpsegal@us.ibm.com>
-Subject: Re: [PATCH] vfio/pci: Support 8-byte PCI loads and stores
-Message-ID: <20240419161135.GF223006@ziepe.ca>
-References: <20240419135323.1282064-1-gbayer@linux.ibm.com>
- <20240419135823.GE223006@ziepe.ca>
- <c5ba134a1d4f4465b5956027e6a4ea6f6beff969.camel@linux.ibm.com>
+        d=1e100.net; s=20230601; t=1713543143; x=1714147943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9uBiWyy2Y6aSUbUd2veflvDo2gmH6uQXxYZf3A1GRsI=;
+        b=ssUeqIKV3MW8CEA5VRCYFQlQtzCerfkkW6JZ1x0X882y+7DPq5r/NSDAGL4/RTSvBP
+         OK6K4Y3osOgq0MDVmjavB68blOaA2lm4VUjmuuQIkdw3oFdLuhYcy/20XzXZR60rxniL
+         ll4oGHLhcIHSiDIN2/L5D0VWiGLKyh7NUWw5yHTEw27kIjKPy22hfpS8MqlPbn2BVBgl
+         x8leqA3HxJc2uB7DnTRd62cHrLNp1MFzvefU/3HZVVBDAGt6HzdCGtOctdPRBdwuGZ5h
+         pZ//Q41C3UFj9GkADvnIgQxn6Fjbpcsf8pGMXbFGLSp3oC08/5doBLYheCO91pytu0VW
+         jdBA==
+X-Gm-Message-State: AOJu0YyGiT0hvD+0Oygtwfp8H3r5QrogoSKphRh9oS2ReVj3ywTdwXdM
+	jJ2aHdRkCeTa9KpPfElF23PtYrvcMp9/g60cLN+HJLbXTSSrAZ7L0PY523dot+WY9g+sfWyfJKR
+	yF0od+2NCsUpeJYz+QUqF31QgX8GILYirCaPwhOKDgnd5JtzdVb0/FQSktTKaTTIM07z+y+gggR
+	Ri2VhmsYNsk1LQda8wxUvt6MFF
+X-Received: by 2002:a05:6000:f:b0:34a:72d:8dae with SMTP id h15-20020a056000000f00b0034a072d8daemr1744505wrx.22.1713543142967;
+        Fri, 19 Apr 2024 09:12:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGu/laGQnrA9BrIF/Cu+lsjfknC5maDVu87SwW7AhUXq8hp5tDZF8U2qhpYBw4LEzoXCxA4xzi8O802s4cFw3o=
+X-Received: by 2002:a05:6000:f:b0:34a:72d:8dae with SMTP id
+ h15-20020a056000000f00b0034a072d8daemr1744478wrx.22.1713543142601; Fri, 19
+ Apr 2024 09:12:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c5ba134a1d4f4465b5956027e6a4ea6f6beff969.camel@linux.ibm.com>
+References: <20240418194133.1452059-1-michael.roth@amd.com>
+ <20240418194133.1452059-11-michael.roth@amd.com> <CABgObfaj4-GXSCWFx+=o7Cdhouo8Ftz4YEWgsQ2XNRc3KD-jPg@mail.gmail.com>
+In-Reply-To: <CABgObfaj4-GXSCWFx+=o7Cdhouo8Ftz4YEWgsQ2XNRc3KD-jPg@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 19 Apr 2024 18:12:11 +0200
+Message-ID: <CABgObfa9Ya-taTKkRbmUQGcwqYG+6cs_=kwdqzmFrbgBQG3Epw@mail.gmail.com>
+Subject: Re: [PATCH v13 10/26] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 19, 2024 at 05:57:52PM +0200, Niklas Schnelle wrote:
-> On Fri, 2024-04-19 at 10:58 -0300, Jason Gunthorpe wrote:
-> > On Fri, Apr 19, 2024 at 03:53:23PM +0200, Gerd Bayer wrote:
-> > > From: Ben Segal <bpsegal@us.ibm.com>
-> > > 
-> > > Many PCI adapters can benefit or even require full 64bit read
-> > > and write access to their registers. In order to enable work on
-> > > user-space drivers for these devices add two new variations
-> > > vfio_pci_core_io{read|write}64 of the existing access methods
-> > > when the architecture supports 64-bit ioreads and iowrites.
-> > > 
-> > > Signed-off-by: Ben Segal <bpsegal@us.ibm.com>
-> > > Co-developed-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > > ---
-> > > 
-> > > Hi all,
-> > > 
-> > > we've successfully used this patch with a user-mode driver for a PCI
-> > > device that requires 64bit register read/writes on s390.
-> > 
-> > But why? S390 already has a system call for userspace to do the 64 bit
-> > write, and newer S390 has a userspace instruction to do it.
-> > 
-> > Why would you want to use a VFIO system call on the mmio emulation
-> > path?
-> > 
-> > mmap the registers and access them normally?
-> 
-> It's a very good point and digging into why this wasn't used by
-> Benjamin. It turns out VFIO_PCI_MMAP is disabled for S390 which it
-> really shouldn't be especially now that we have the user-space
-> instructions. Before that though Benjamin turned to this interface
-> which then lead him to this limitation. So yeah we'll definitely verify
-> that it also works via VFIO_PCI_MMAP and send a patch to enable that.
+On Fri, Apr 19, 2024 at 1:56=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+> > +       ret =3D kvm_gmem_populate(kvm, params.gfn_start, u64_to_user_pt=
+r(params.uaddr),
+> > +                               npages, sev_gmem_post_populate, &sev_po=
+pulate_args);
+> > +       if (ret < 0) {
+> > +               argp->error =3D sev_populate_args.fw_error;
+> > +               pr_debug("%s: kvm_gmem_populate failed, ret %d (fw_erro=
+r %d)\n",
+> > +                        __func__, ret, argp->error);
+> > +       } else if (ret < npages) {
+> > +               params.len =3D ret * PAGE_SIZE;
+> > +               ret =3D -EINTR;
+>
+> This probably should 1) update also gfn_start and uaddr 2) return 0
+> for consistency with the planned KVM_PRE_FAULT_MEMORY ioctl (aka
+> KVM_MAP_MEMORY).
 
-Make sense to me!
+To be more precise, params.len should be set to the number of bytes *left*,=
+ i.e.
 
-> That said I still think it's odd not to have the 8 byte case working
-> here even if it isn't the right approach. Could still be useful for
-> debug/testing without having to add the MIO instructions or the our
-> special syscall.
+   params.len -=3D ret * PAGE_SIZE;
+   params.gfn_start +=3D ret * PAGE_SIZE;
+   if (params.type !=3D KVM_SEV_SNP_PAGE_TYPE_ZERO)
+       params.uaddr +=3D ret * PAGE_SIZE;
 
-Yes, this also makes sense, but this patch needs some adjusting
+Also this patch needs some other changes:
 
-Jason
+1) snp_launch_update() should have something like this:
+
+   src =3D params.type =3D=3D KVM_SEV_SNP_PAGE_TYPE_ZERO ? NULL :
+u64_to_user_ptr(params.uaddr),;
+
+so that then...
+
+> +               vaddr =3D kmap_local_pfn(pfn + i);
+> +               ret =3D copy_from_user(vaddr, src + i * PAGE_SIZE, PAGE_S=
+IZE);
+> +               if (ret) {
+> +                       pr_debug("Failed to copy source page into GFN 0x%=
+llx\n", gfn);
+> +                       goto out_unmap;
+> +               }
+
+... the copy can be done only if src is non-NULL
+
+2) the struct should have some more fields
+
+> +        struct kvm_sev_snp_launch_update {
+> +                __u64 gfn_start;        /* Guest page number to load/enc=
+rypt data into. */
+> +                __u64 uaddr;            /* Userspace address of data to =
+be loaded/encrypted. */
+> +                __u32 len;              /* 4k-aligned length in bytes to=
+ copy into guest memory.*/
+> +                __u8 type;              /* The type of the guest pages b=
+eing initialized. */
+
+__u8 pad0;
+__u16 flags;   // must be zero
+__u64 pad1[5];
+
+with accompanying flags check in snp_launch_update().
+
+If you think IMI can be implemented already (with a bit in flags) go
+ahead and do it.
+
+Paolo
+
 
