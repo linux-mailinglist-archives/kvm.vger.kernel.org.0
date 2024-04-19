@@ -1,210 +1,260 @@
-Return-Path: <kvm+bounces-15265-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15266-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE88E8AAEDA
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 14:53:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE87E8AAEE3
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 14:58:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96F002833E5
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 12:53:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75CD9283B7E
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 12:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9951585C74;
-	Fri, 19 Apr 2024 12:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA43485951;
+	Fri, 19 Apr 2024 12:58:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g6vcS7Zh"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GiI+U+bv"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2047.outbound.protection.outlook.com [40.107.92.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8642C8563B;
-	Fri, 19 Apr 2024 12:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713531174; cv=none; b=uZKeYNz+7uD7oUBPR8Vl4KhFxPWnWQHnhj31I4U0dvbCpilb97Q6ZmRtqNgPz8MJtLL5ovaIW8jgtdImYMjHNJIzWs/TUldPSQ81+BnjoUFNSxxyUAuobrsg/xefdR0Rom124kRehBV2fNPnQpsf890Et5YopBO372e83DCRZEg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713531174; c=relaxed/simple;
-	bh=kAT+R3YnmcMWhcay1NNgbxYxoVw+Xu9c6mKu5iN8XdY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FPEMOOhO7eqvgXu5i5EmDRoibRTS0AZBGtY8IVlrwHtZAVHgP8FbXBwDVZf9mePZps3d2/C1+aXVlvqxl+hJBEEPpa8aVdpNlvEPzyau8aW0A1RehUPc5AQWq3an880EJP7P7p8n1jntJY39jiMnur1sKixUEhQdFJtzlpGIgGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=g6vcS7Zh; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=kAT+R3YnmcMWhcay1NNgbxYxoVw+Xu9c6mKu5iN8XdY=; b=g6vcS7Zh1AnsQuf4aCy4TIJgG4
-	QkZVkwqdMSrmE+Rp8mWWNp45hj2MRLuh1yP0IfXI6Tw5b3eww3HvJfCOLE2GdyfoE1r56lQpDRmMi
-	TvmIySlB+mhTvLf16BnOh8u0MBkbp2UsWBuc3VhTHYDWO8HVKEOjMvdm/3RYGUIFh7e4V0Hx/sDxZ
-	gTXc1Juv7RhjYG7b2lAyKNHk55KuOtJuR6xz0dkY8GVBw0+dfWYrSpPET8FzLN6GSGHLbiUpe5oQr
-	5rFewUmE4gmqEVsTgxNBOgkSXswjqlY3xO9BQzZfSH2UCtkKqCGPeYy6zb9QPyQIM+D2M+p9yGE2Z
-	EtVqLqmg==;
-Received: from [2001:8b0:10b:5:c08e:a4fc:45a2:fa90] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rxnjW-00000007gEE-2EPm;
-	Fri, 19 Apr 2024 12:52:51 +0000
-Message-ID: <a6723ac9e0169839cb33e8022a47c2de213866ac.camel@infradead.org>
-Subject: Re: [RFC PATCH 0/10] Cleaning up the KVM clock mess
-From: David Woodhouse <dwmw2@infradead.org>
-To: kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
- Sean Christopherson <seanjc@google.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>,  Paul Durrant <paul@xen.org>, Shuah Khan
- <shuah@kernel.org>, linux-doc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, Oliver Upton
- <oliver.upton@linux.dev>, Marcelo Tosatti <mtosatti@redhat.com>, 
- jalliste@amazon.co.uk, sveith@amazon.de, Dongli Zhang
- <dongli.zhang@oracle.com>
-Date: Fri, 19 Apr 2024 13:52:49 +0100
-In-Reply-To: <20240418193528.41780-1-dwmw2@infradead.org>
-References: <20240418193528.41780-1-dwmw2@infradead.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-F+ZAV3X8oAmmyvjhh9O5"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4A98592C
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 12:58:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713531494; cv=fail; b=HD3JvHGq/LUqHDlCwHAOb/+g/dfDCA0+F0Fv2S6TqFvZe6kF7E2dZHS4li13oeEXUIEbYEGMeub8Ux9MoYAw40xNxdiDLWNltQWSRfNrY7BzhGJTAR5EUESn7Pt76Sew5X3rp+M0Cl0Zky82RPUw+bhziTRp4CUmFvPRQNnZW+g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713531494; c=relaxed/simple;
+	bh=czcdZvVKvaqCxmIxAnhlpGD2V6+rSZKHGCmovUFLjYM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tl8gA1zKD44wzhcq06GSaenZKThsBiQng83POMBMw58fczlpw02tfNsGKCli6qMvFHU+LT7tBMmpl0Sced4mX6lYpvXZtbwSnB0cMOITzxcIYYxDOJUHbBgvrd6mRotOicpzR6yCno4IRI1mp6Ft/qTxmGDMRytgFykaJANPebk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GiI+U+bv; arc=fail smtp.client-ip=40.107.92.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PAd7uAOsmejJYF8tQj58BTVAlgXy6YOr+U8AxCUmlhVuoMheO1kA5D80ah+J+LGwv1obA8eO4gHUvTs3vGYCgfgu7Puqzmk48oiaeWTEYbuCK1FHph8RQS+NpFwlGVXuErTR3nDcGkM4I7AZEE0DaR2pdOzqAp9DZWHJ8jBadiNe0w6iucqVDIq924XuAt321TzMIGdkx/LZnXJL+/RJNw4K4RDdly9cG8K/8U1VG7JazJYmtme+qRakUTh3LpsIz+0ErPmI4HgIHlt78/r5dw1+33dWjo/hD44We1DigVjzK13iGWUMjSQTO1dfL6ZM0FRTVlYblWoKDxcQu7wcsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z7IJ+IklMoApgTBabxXfJigQN5DPJIqnnhSY1xWnmmo=;
+ b=MUJLCtWpAd2NsLHcr1dYGnKg1QKFBWSPn/VgfNMBXwNfWx691OEGGMx85rYUnWzk6gcDrCbGEvOHYdGRg08kJm4xnSsWcmcvlZZGuiUy5rKyxi3XSgCDO7yEHIT68HWwNfF3iKftJ8gsfFDWmlpN+1NQTEV6r7oWnpiMlRTATzqWdAy4Fp8+QP5ZUiLg7wXSW5g2HFaa1WK0lH+matebQKklxr3nLmvmumIVpQ8qJ+iyxbKInZeLbBIKM7k8iKS5mFhKLJhZleimsSnzYkQOijlHxdFKSc5ttIdkL+wYsLW/dqBR70EEaEMUa7M0FMlSwvLNGF/lDEjCRyGPjic1cA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z7IJ+IklMoApgTBabxXfJigQN5DPJIqnnhSY1xWnmmo=;
+ b=GiI+U+bvvr9oQ6/tNg2at0vby597qAb0qOq3pVwNMsrv5VMiSKwo3c5diN9ytOIkdLA4iXUL+zvtudlGREvYKuly/vstxZ3lHX6Nf6mAorNETGWVJu6w/K82GcMyPKk1+Nmxk6ODtiEFIBMTUL6rdYbMxnohTu/GsAUKjdxUdnU=
+Received: from BYAPR01CA0016.prod.exchangelabs.com (2603:10b6:a02:80::29) by
+ SJ0PR12MB8139.namprd12.prod.outlook.com (2603:10b6:a03:4e8::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7472.42; Fri, 19 Apr 2024 12:58:10 +0000
+Received: from SN1PEPF00036F42.namprd05.prod.outlook.com
+ (2603:10b6:a02:80:cafe::12) by BYAPR01CA0016.outlook.office365.com
+ (2603:10b6:a02:80::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.26 via Frontend
+ Transport; Fri, 19 Apr 2024 12:58:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SN1PEPF00036F42.mail.protection.outlook.com (10.167.248.26) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7452.22 via Frontend Transport; Fri, 19 Apr 2024 12:58:09 +0000
+Received: from ethanolx16dchost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 19 Apr
+ 2024 07:58:08 -0500
+From: Pavan Kumar Paluri <papaluri@amd.com>
+To: <kvm@vger.kernel.org>
+CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christophersen
+	<seanjc@google.com>, Michael Roth <michael.roth@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>, "Kim
+ Phillips" <kim.phillips@amd.com>, Vasant Karasulli <vkarasulli@suse.de>
+Subject: [kvm-unit-tests RFC PATCH 00/13] Introduce SEV-SNP Support
+Date: Fri, 19 Apr 2024 07:57:46 -0500
+Message-ID: <20240419125759.242870-1-papaluri@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF00036F42:EE_|SJ0PR12MB8139:EE_
+X-MS-Office365-Filtering-Correlation-Id: c3a81df8-ee4b-448c-6dc4-08dc60705d4e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+UHe6jnrll8bOVXSe5bCfIH6b7AxoVEItvIMm/qHe2+beEy/eJ8fpoZwJRmPkPm3d28g7ZZKiml8QtW9MBic73zOHSmRA4j9zkiLwZjvXgBco07wj2tSixOH6NKvfIkmli3qchwfE+u5qIshpgHFqWK/AC6TIzbH16NJJVLWOBXrtB7E/UAqxyL+mWJszf7x+zul2gqLwBAQ8J9+XEz37I36REWkMt1+1uMSB4IRNxdU69duYNeeYkxiErszIdPuwh3GSDUu1z2MAmpdU9zL1wAo7andMPsJOQ+4kaDDbu6LsAOUWKYoEWM05EvFZgwBMjezNPjI+Gzp4MLgwa66ALwp8exIiV/WZ9DVD/j8bGc1L2u2rTBAB0P7VDI/6dko5FreOkPc4wMYJzVQCGkOjWpnjZaaleZDB2YfIPluVIJzwHhFhE0GVUKU0/E7JLss1Xui+D2wni9BGjGuAV18W3Vq3OjWrBQNGs2J+x7aAQJWr3kbh7J8D1A+fHkfigziIsRMNfz6S8wD1D+wNK+I4JF7ZzmSdShUbpd3solfKuYWN+1yvD85Yo1gTodWj83ZxsvYhgPg6AJ2kTtXYruKaOIf1p2Qw4oNq7fctSfwmcYO2EvvudUxxGn8Lnzt6Y4kr2EhncXRpezyUUwd13n6293wHGl75wXuaNFEDISdK9bw64ArZZQl8ygbGDetrCZ0BbEmlJZloOHZReEaRTH7zRjVaIRVW2SqVjlwNeznqpr/AbspXl12QfwRPtOmIhMdNmbYChYJPg/xsa+RP/Puzw==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(1800799015)(82310400014)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 12:58:09.6542
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3a81df8-ee4b-448c-6dc4-08dc60705d4e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF00036F42.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8139
 
+This series introduces support for SNP features to KVM-Unit-Tests
+environment. Goal of this work is to use KUT to build and develop a test
+suite for KVM hypervisor with SEV-SNP support to test basic
+functionality as well as determine whether hypervisor can handle edge
+cases that a normal SNP guest otherwise wouldn't perform/request.
 
---=-F+ZAV3X8oAmmyvjhh9O5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+These patches are rebased on top of [1] and are available at:
+	https://github.com/pvpk1994/kvm-unit-tests-1/tree/SNP_RFC_v1
 
-On Thu, 2024-04-18 at 20:34 +0100, David Woodhouse wrote:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KVM: x86: Remove periodic global clock upd=
-ates
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 KVM: x86: Kill KVM_REQ_GLOBAL_CLOCK_UPDATE
+which is in-turn is rebased on top of kvm-unit-tests master tree
+(Commit: e96011b32944):
+	https://gitlab.com/kvm-unit-tests/kvm-unit-tests
 
-Meh, I might have to put those back. They were originally introduced to
-cope with NTP frequency skew which is no longer a problem, but we now
-know there's a systemic skew even between the host CLOCK_MONOTONIC_RAW
-and the KVM clock as calculated via the guest's TSC.
+============
+Patch layout
+============
+Patches 1-2: Provide MMIO access support to the APIC page by unsetting
+	     C-bit in guest page table for SEV-ES/SEV-SNP guest.
 
-So at least when !ka->use_master_clock I think the forced resync does
-need to happen.
+Patch 3: Enables support for running SEV-SNP tests in UEFI environment.
 
+Patches 4-6: Enables support for SEV-SNP in KUT and provides an
+	     acitvation test to determine whether SEV-SNP has been
+	     enabled or not.
 
+Patch 7: Sets up a new page table to enable page allocation support in
+	 UEFI environment for SEV-SNP related tests that are introduced
+	 in this patchset.
 
---=-F+ZAV3X8oAmmyvjhh9O5
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Patches 8-9: Enables support to perform page state changes
+	     (Private <=> Shared) using GHCB MSR protocol.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNDE5MTI1MjQ5WjAvBgkqhkiG9w0BCQQxIgQg0u4p0DAg
-xQtdo/XAvVwUEWoxMLpfEioFmtcBRDQ8Agswgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCW0uPUxZzGgmtiBDmM6qS/BdSkbe3IYIXM
-pHeqKMd8qMpep+sklSkXLD5gN+o4dw9Cqa0xx3ZqRqKea4zM4A2SUGaujo9KAoF16oJkam8uQ97P
-vsnRABZ0I9WpzP0WXBlapUXdzSDr/wOrYCVI12H50iTH0HS3r8hTYJdyCPx6wp/lMC55BJrGQSdx
-tWlK70iV91ha0oow8p7beHKAwv1y5BX6VAzceXDLzPI3Xh3BH5wwn9pN1ee2lNAPc0UO7q+fJKfJ
-g+QZsCfGxhgp9LpYnct7a2mNTnaRZQWjzZ1l6AYCbXtUIhtib7RSpCKgMm7ZTzUXCvrlJUjTYWaG
-fMqWzbvoZUgDu+WVKbJ3xOl8DFnMRAK8Vx6i1rlIWu1T+VwS0Qpa9TTS4OUsGYI4SCD1IWBWFOdY
-H1frNScONgPRIQvmJIqqlE9OA0BzPLwp+zXprrP7LgH2f6sQUTxxlkueX+2KLJy8tEKQ9Sp0n0sL
-hu3RHFuNKY+RZbQ2UraHcrrqheRS6ANK1+059cpfI4wnoNSEnLHPqHku3dS7RM6fHcPSQBQ3sD5a
-fAayN7sIe0Bc1DAQD66AStZi5dV81EJG4FdCl3mkoV6eptO46YNbHx7FzIViKSU/Bd0C6pbGgSWy
-BwBETm2K7Zj4Hkwf5leVxN5lu9PeVTalyMePbZCsHwAAAAAAAA==
+Patches 10-11: Enables support to perform page state changes
+	       (Private <=> Shared) using GHCB NAE events. These tests
+	       support 2M and 4K pages.
 
+Patches 12-13: Introduces tests that perform page state conversions within
+	       a 2M range to demonstrate how hypervisor/qemu handle page
+	       state conversions that a regular SNP guest would not
+	       perform during its lifetime.
 
---=-F+ZAV3X8oAmmyvjhh9O5--
+================================
+Procedure to run this test-suite
+================================
+SEV-SNP KUT guest requires UEFI/OVMF to bootup. Information on how to
+run the SEV-SNP tests with UEFI support can be found in
+x86/efi/README.md introduced in this patchset.
+
+Use the following (Kernel, OVMF, QEMU)  to run the SNP tests:
+Use qemu (SNP supported) that is listed here:
+    https://github.com/AMDESE/qemu/tree/snp-latest
+    (Commit: a4f571b72e03 at the time of writing)
+
+Use OVMF (SNP supported) available at:
+    https://github.com/AMDESE/ovmf/tree/snp-latest
+    (Commit: f992fee06f64 at the time of writing)
+
+Use SNP host kernel available at:
+    https://github.com/AMDESE/linux/tree/snp-host-latest
+    (Commit: f9b5bc22b945 at the time of writing) 
+
+The following scripts can help build QEMU, OVMF, kernel:
+    https://github.com/AMDESE/AMDSEV/tree/snp-latest
+    (Commit: 111ad2cc8dfd at the time of writing)
+
+System can be configured as follows to run UEFI SNP tests:
+    ./configure --enable-efi
+     This will configure KUT to use #VC handler that it sets up once 
+     GHCB page is mapped.
+
+    ./configure --enable-efi --amdsev-efi-vc
+    The above configuration option will build KUT and let SNP test use 
+    #VC handler that is setup by OVMF throughout the lifetime of SNP 
+    guest. 
+
+The SNP tests introduced in this patchset run well with both the above
+configuration options (--enable-efi & --enable-efi --amdsev-efi-vc).
+
+Once configured, SEV-SNP support can be tested as follows:
+    export QEMU=/path/to/qemu-system-x86_64
+    export EFI_UEFI=/path/to/OVMF_CODE.fd
+    export EFI_VARS=/path/to/OVMF_VARS.fd (if any)
+    EFI_SNP=y ./x86/efi/run ./x86/amd_sev.efi
+
+NOTE: Ensure the memory provided via "size=" above matches with the
+memory passed in x86/efi/run ($TEST_DIR/run -m 1G). Otherwise, QEMU will
+report about machine memory size mismatch with size of memory backend.
+
+=====
+TODOs
+=====
+  * Introduce an edge case for when page size is 2MB, the 
+    page_state_change.cur_page must be incremented for each successful 
+    4K page processed. (Documented in GHCB spec - Page State Change 
+    section)
+  * Addition of more edge cases in Page state changes to ensure 
+    host/qemu handle these cases correctly.
+
+==========
+References
+==========
+[1] https://lore.kernel.org/all/20240411172944.23089-1-vsntk18@gmail.com/
+
+Any feedback/review is very much appreciated!
+Pavan
+
+-----------------------------------------------------------------------
+Pavan Kumar Paluri (13):
+  x86/apic: Include asm/io.h and use those definitions to avoid
+    duplication
+  x86/apic: Add MMIO access support for SEV-ES/SNP guest with C-bit
+    unset
+  x86/efi: Add support for running tests with UEFI in SEV-SNP
+    environment
+  x86 AMD SEV-ES: Rename setup_amd_sev_es() to setup_vc_handler()
+  x86 AMD SEV-SNP: Enable SEV-SNP support
+  x86 AMD SEV-SNP: Add tests for presence of confidential computing blob
+  x86 AMD SEV-ES: Set GHCB page attributes for a new page table
+  x86 AMD SEV-SNP: Test Private->Shared Page state changes using GHCB
+    MSR
+  x86 AMD SEV-SNP: Test Shared->Private Page State Changes using GHCB
+    MSR
+  x86 AMD SEV-SNP: Change guest pages from Private->Shared using GHCB
+    NAE
+  x86 AMD SEV-SNP: Change guest pages from Shared->Private using GHCB
+    NAE
+  x86 AMD SEV-SNP: Test-1: Perform Intermix to 2M Private PSCs
+  x86 AMD SEV-SNP: Test-2: Perform Intermix to 2M private to 2M shared
+    PSCs
+
+ lib/linux/efi.h      |   1 +
+ lib/x86/amd_sev.c    |  22 +-
+ lib/x86/amd_sev.h    |  95 +++++-
+ lib/x86/amd_sev_vc.c |   2 +-
+ lib/x86/apic.c       |  18 +-
+ lib/x86/setup.c      |   8 +-
+ lib/x86/svm.h        |   1 +
+ lib/x86/vm.c         |   6 +
+ x86/amd_sev.c        | 682 +++++++++++++++++++++++++++++++++++++++++++
+ x86/efi/README.md    |   6 +
+ x86/efi/run          |  37 ++-
+ 11 files changed, 858 insertions(+), 20 deletions(-)
+
+-- 
+2.34.1
+
 
