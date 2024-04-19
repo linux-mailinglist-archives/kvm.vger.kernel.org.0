@@ -1,221 +1,196 @@
-Return-Path: <kvm+bounces-15180-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15181-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 720618AA684
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 03:20:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B24B88AA691
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 03:38:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAF3AB221A7
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 01:20:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D63BF1C211DB
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 01:38:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DF915A4;
-	Fri, 19 Apr 2024 01:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605871C2D;
+	Fri, 19 Apr 2024 01:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Atkya+/E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fhrpbinw"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7247E2;
-	Fri, 19 Apr 2024 01:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713489608; cv=fail; b=Tt9gEbT6tUWe9WgxD0+TW37cHFD1v+QIP9Cs1iV+Fg2BjPa01idZD+uICTmXR/P99Xc2hFUisS37Fj4NDwM5zJk7KzuQGHcNwgTW4PjgPNbgHFOG8DTNWCaELGToOq+UAPRrHooyxdh7ayCPs127YsM60jh0ewnqQM5qQbABZ5k=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713489608; c=relaxed/simple;
-	bh=3y3sq6tnPcCZD9seVcPzPV+zTsSniUps734NaS9GsPo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=RnQF86QgF3o9WjrHtgQecUZtmI1QuS2u+uyLMeQvIW5bEsIrF82qkBYKPcLecVk4tgbOKDHUiOS/g5vR52Le9Nr3+Lb3W7Es+t09ZhtFPlx00t5/VRLdJ85H26rp+2defb9vz+f/Yb+OoHp9Go9RZP+Kr8NcAYIFSvsshVl7wzU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Atkya+/E; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE481362;
+	Fri, 19 Apr 2024 01:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713490676; cv=none; b=P9g7YY5keqIkkHT843UbJZ9zqKIiYKJrGg7Eq3XEW74L6ypn56sN+canZ6AHBrC3ergoeV074o3QTScBDZqiDsgnm8gq1ZUY8UxnRSFS6hULhp1TtBN7HfjPiNj+tdX0db6Q654AtcO8Lpk70/GInaD5fi3c2FWk7NBLU7uDihE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713490676; c=relaxed/simple;
+	bh=t5rbnrB5WNEoCu3hBvWoGz+Np+VUMTEtUNw6ITpqlYI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P1ndPA+BqXJimoUkEdumQQr+kOuvG1EzeXkK2wXsC6mhJ+TiFfY4A3kQBxyMXtuZfAbSSiuWkWgcQ39iqAkPC39QhOkHjMd+SNwegG4vzHvug7yfbissSXIH13MuoRfe+T1Rwmq9n4dVGuq9c5pyw7QLpxhhk06IIYww6YlHlvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fhrpbinw; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713489606; x=1745025606;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=3y3sq6tnPcCZD9seVcPzPV+zTsSniUps734NaS9GsPo=;
-  b=Atkya+/EEtDDN9CAaNRxuusFbd76598oOBYvww/J+mlgzqVj1FA6Vj3b
-   8qbzy+C2nc9jvKfNjkjOqCQrFsjj/B3EwsWtEmwuNkZ8pU54C3RJZSnIt
-   STKlAODzEqOk3ZNQOM51l6BfIvj0K2h0C15NPFbrR3GD8+tXXNMi3jve1
-   G6/ipkxF70avBwQJNlc0fQ2ZNqxjVsSTeisxg+l8jHDHD05GyFofz9508
-   FItno/QpuonfJ3BK2mBtlQxjV4PwpIr5utMYm7Ny93ftPyDuV0wB4M8zf
-   c5kkvSUL1fObbaAYxkUhY+vQDUksHhCa4/qfIoLVIU4yONO5AKKaYbEzg
-   Q==;
-X-CSE-ConnectionGUID: JDS7dM8pToS/RliWsIwPIw==
-X-CSE-MsgGUID: cLQK0/7WSmO7VeerbphqYQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="12909762"
+  t=1713490675; x=1745026675;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=t5rbnrB5WNEoCu3hBvWoGz+Np+VUMTEtUNw6ITpqlYI=;
+  b=Fhrpbinw8SVFJ4w+v7XkAtIW4WWZfltyOO09xq6resFKh+PUN9K6WC/i
+   WtheAVO8I6AU8TCZkSTLtu+OcL4LaRCTWka+dVkyGzjtt6G/nx/E+NhR3
+   r4LCbs4WKdBKArGDlFIhDJJNb6gP7maDEnT+2rZ5qo/S6MZaYAvo2spk3
+   INiPLW8hOVlftUNgBcLFQrDG4irLNbLDeDv/PSAnjZDh3OntaSvfn+7Sc
+   wDjfBweqPQZ7JIjMBjwiwG44jASaXrmoOVaCNRPGkTg47sYxxvLzNN7Xi
+   UvJjwXVTRIIkTcz04D+v26aejJpccKKddAgb1jqOhrazGGhCUAMnkPQd1
+   A==;
+X-CSE-ConnectionGUID: lBAXm3nVTrmoFQ3u+RYeRw==
+X-CSE-MsgGUID: ZCnwkZj9RTSa5FW76Jb1Fg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="12911158"
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="12909762"
+   d="scan'208";a="12911158"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 18:20:05 -0700
-X-CSE-ConnectionGUID: rrym30iKQE6XiUerij14jg==
-X-CSE-MsgGUID: yiAsPvgKQDi6x5168Zd6Fg==
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 18:37:54 -0700
+X-CSE-ConnectionGUID: c0w7UrwhTwiD00wh2c8rbQ==
+X-CSE-MsgGUID: rL7ADMgLS1qnBFlogsI7SQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="46461053"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Apr 2024 18:20:04 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 18 Apr 2024 18:20:04 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 18 Apr 2024 18:20:04 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 18 Apr 2024 18:20:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J8k0tH1ocN2Yu6Dx4gBfocGaA409cpOc70wYyzI71qlFFoVatPXfnhOzDz81KiiCWPMDMtPntwVVsAQtITPpklqjMXXhszZbATM4TI4C7MCRDrT+E//IAtnLBmT3sJ0Jwhobz//1tSwinigwuha6CUGlKUYtIDn+skODd+QdSw+Kjx+fMGITSdSzHR040nX8pZrhqeXHWGuYu5570LHZy99HiGpZl37AR7qJLaIhVLvXPUlZ0z4NM22Njb6KGT+gkXMxBhU6sRoerqZeIhf4IEpij3kvxg9Y/CQUSbkQ4ldMpqZKyz+cIoSOBOccid/H/Vqqrq76Po4lm53YPA0oyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MuMzn4/Vh4VUHst1GLhiTQLGwDtLm4tKO5lqOf9dtho=;
- b=QJVqcUkmTaHpYrZtyh6Twl7l1cgSXAiDgi3Q3sGOP9ESJtyCarLBye1dgVCjs83/zkQ2+s9+0xRWhAI81SdyRSITieooIM0T9cPOcZ/OFf16J/dHc5+tViQtJ/r+y8yX4SfTdLxXgDCSWr0EhwdPQAYiUBJP6NswC5W26kH3Xf7i2bgaq5Mf4xtEdFtI44hKdU01+Ads+PHcVEfz6OIybEvMnnk2K1CVbtLDHqqsY7c0VlwvlfyC+5tr/C5TJ976Z/LYyT+h6PXyfIL8bBdv9fHhGZoPCnLaN/g2IcbFE8r+iy8trKZTog2AxzHCOCou/8bAF+jCkaGlvrQ856bZhw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- PH7PR11MB7450.namprd11.prod.outlook.com (2603:10b6:510:27e::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.12; Fri, 19 Apr
- 2024 01:20:00 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::55f1:8d0:2fa1:c7af%5]) with mapi id 15.20.7472.042; Fri, 19 Apr 2024
- 01:20:00 +0000
-Date: Fri, 19 Apr 2024 09:19:29 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: <isaku.yamahata@intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	<erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>, Sagi Shahar
-	<sagis@google.com>, Kai Huang <kai.huang@intel.com>, <chen.bo@intel.com>,
-	<hang.yuan@intel.com>, <tina.zhang@intel.com>
-Subject: Re: [PATCH v19 010/130] KVM: x86: Pass is_private to gmem hook of
- gmem_max_level
-Message-ID: <ZiHGoUUcGlZObQvx@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <8108cc2b8ff01ec22de68f0d0758ef0671db43fc.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <8108cc2b8ff01ec22de68f0d0758ef0671db43fc.1708933498.git.isaku.yamahata@intel.com>
-X-ClientProxiedBy: SI2P153CA0015.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::21) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+   d="scan'208";a="46465195"
+Received: from xiongzha-mobl1.ccr.corp.intel.com (HELO [10.125.241.186]) ([10.125.241.186])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 18:37:49 -0700
+Message-ID: <e3fb79b1-7fc8-4e3a-ba17-b097aabcb2c2@linux.intel.com>
+Date: Fri, 19 Apr 2024 09:37:46 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB7450:EE_
-X-MS-Office365-Filtering-Correlation-Id: 82acfa71-037b-4129-4679-08dc600ed553
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
-X-Microsoft-Antispam-Message-Info: MIR62ymj8A+qSuLIKIO8qrfOvzlxr7Iyz4sEoVsnJ98ml2KLHQY36PfLDoA43Gxl/BNEPT84n5XxjhnOX0YLBGrr6rZriG1v1UOBrwq/8ZC1PG6gnaDVNOYuczEase3fMHZePX3cZ/OISn4Nu+BtwaPqtqAfR1we6Oc5Ipp4q5pUmxNeUodDYV/uYWJ23FavOwFoq0x1bIY8GoSomgxAIwjM/23JS2Mtd7Az7dG7auk2tP12SaeCyfJiSIYGlALlbO+QEwm5VVeYnmYueKOVTL4bSUjJ75230aiXMn7kzSG4UVB2qCxkUp1PACxQ/I8HpXmgLu84BD/oZcx8rx1/GmjJlBOXkgBESPP4BRcHorg8BsU64qG0VUQoa9LdgKFgN4PFOB/nrxbF82t8zl2RisWmcQIzu4vKzW9SN+Uh1JqHn+rzGWS4EnvLhf9JeEdmgZmfLh3U3L8oyI/qSuNuXArkrhzpkx0eFzhclCF5mCB39EwnFaWQjOPTmgiVQq1iM40/teXbeFLMLEzmskR04EWhmXKwoK8CWx8zkfaujyLypuCWlRjkw2lLPGZgqri73pUfEv+G7WUxK9SqIUAhjKGSAjgOPD4Z/VE4gWXwb1LzH7DXBpVuNY0CDlCr8r73xuOGJDEs7nk1kcynSPQtyBwkkhzF7aO8VC1jhoVEUzg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?npuQps64/wUWKsTtgbK4SEu3fTTGfjw6HN1NMSkDobk6eOVyJoQl770EBfWj?=
- =?us-ascii?Q?XmZOZ8Ev9n5A/k4G+LI6juaubCyz1M+ByHxkNlhdo+P1XkP/yr8OPsToAgJ/?=
- =?us-ascii?Q?tZJCyDLYaXaAomUThsMVUiOHLGy/mewez7QEpKtM4mEgKh3bAflvGQ/uESI2?=
- =?us-ascii?Q?/78jGNPbijoTVJk95yuarYDTFkKUvmA7w0pbCg0PWWhL641xt8VKQqp8gbfl?=
- =?us-ascii?Q?024ncfYodtJ9EeWJyHtYczl+RlnCoD+vtyH+U5TYEBURdmjhlY9st2k7VdWZ?=
- =?us-ascii?Q?u8Okc7qT5xTfI/daPVdzE6Oml5gcH9Jeduo5IGuWTG6/v/+Ex8X1+dJn/+ER?=
- =?us-ascii?Q?rjb81zyZES2zqFVMBthx85hMvZTIB/aVuB3DwrNr2bhYG9eYF9+LmVIbEHm6?=
- =?us-ascii?Q?ivkgwED+hXTdUh7FrtjfAuUPAHJ5Ky3V9HJvZ1KuyLXTAP0ESog2+12JcONV?=
- =?us-ascii?Q?V3cnEVuiOfbXVfRbmnDsjB2taIyVBwXXeuu59BLSc54cccHqwYRyQssZKMOK?=
- =?us-ascii?Q?5JB2TFs2psoZuG8LEvsVK08BruvTvAxgtYsXKjkS0EZ5Ropxz9RGfnE6aJEH?=
- =?us-ascii?Q?wKdHqxqrRFTZMUGS0Re6ivMX7/IDVETje4rfUgEXdK2sSu+wht4lohcRv5T5?=
- =?us-ascii?Q?mLwFFWFMCYWCRM6CqChfCr0TDAQmK7A9G+2ZmMZagYV60amgl3PwKNsy6rRS?=
- =?us-ascii?Q?SYe8wuUVexcXbq2E2ZGa5FcvZo/YhPiitiwgPbamelhV8MkZBFA0MgB0ilvL?=
- =?us-ascii?Q?64J3TK3ca82zdksvLSES0GVu8PrIkuTDlx8UxK9Wupcumb+1bWlVk/uFkghr?=
- =?us-ascii?Q?iPEWRklSfoAvSjVlnnxmf4D6me4MnJtwMASfxXcIMhBkgbXb48EACF0sCGfG?=
- =?us-ascii?Q?QlwCNFkZm4DzeXe8Tyh+EfHg6AfPkBUUojCX6NN1ZnZDaGq4JvDi1BoT0k0E?=
- =?us-ascii?Q?g4e7Lqx5dQXJRbOq2DBzB4VfoB/bwvtP1KO0kLwNDrG5TQ68qV/Zq0s+Yp/Z?=
- =?us-ascii?Q?YT9pQJVM5jbQq9EWhD8t7/X+Vq3oTTHaRKUEbf2k0Y/Igko/0LfeTXwTuQGF?=
- =?us-ascii?Q?tcwpVW9L5SxUiCGpsxWTAsXdDpiKRNP7oH8tjaccWUFOFW8xIhlhDynwF0Jc?=
- =?us-ascii?Q?LE0fo28p3Y+PwZGTMcnHUf/MudpGi1Q4zyHipZM6aZBVG8IzZacO9ffOClYE?=
- =?us-ascii?Q?bm2eQBOYSX5TXyKCdJ+O74S39cmPeyUl4LYWwI1c3APDgvh+BTqNWOlLkMhp?=
- =?us-ascii?Q?gHE9GDBRlibWVafoWT0OXUA/+dzlFkH3pQFErgWIPyWBVMtafN/y9lvFd+vI?=
- =?us-ascii?Q?WUYpS4GDmazshxlAL8SL1HfsH3bUZ3o2koagw5LoKipjfM4Pedk3ZnzUhXvu?=
- =?us-ascii?Q?tOxCbuQMolELlAG4hEMT2MfUhJzc3jBzrSCI7tgGnA7leL/YjJzpRlepnuSN?=
- =?us-ascii?Q?6DFjRYVaLXl0pTZtdglkEPzszZBmD6JrpcinZsdMTqgQ604FDxi0SUWLzmPT?=
- =?us-ascii?Q?yREofitk7vxE8iUYQoaWKvW3mYOtlknUA6gtJV1/qnnbf1TDIifSBjXxPo86?=
- =?us-ascii?Q?WGXodu7n5Dhk8BwNtkDL0Zzqd0nDB+1SNl2StwTw?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82acfa71-037b-4129-4679-08dc600ed553
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 01:20:00.5796
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /JwphqgG1WDNznrxkrmYvzwedQdOuTkm74XhDyEv8N2NzZnmJdpTL5HDF4QueQ4XMO5YY69w8qd/uMSPsbHjDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7450
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 02/41] perf: Support guest enter/exit interfaces
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kan Liang <kan.liang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, mizhang@google.com, kan.liang@intel.com,
+ zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com, jmattson@google.com,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
+ <20240126085444.324918-3-xiong.y.zhang@linux.intel.com>
+ <ZhgmrczGpccfU-cI@google.com>
+ <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com>
+ <ZhmIrQQVgblrhCZs@google.com>
+ <2342a4e2-2834-48e2-8403-f0050481e59e@linux.intel.com>
+ <ab2953b7-18fd-4b4c-a83b-ab243e2a21e1@linux.intel.com>
+ <998fd76f-2bd9-4492-bf2e-e8cd981df67f@linux.intel.com>
+ <eca7cdb9-6c8d-4d2e-8ac6-b87ea47a1bac@linux.intel.com>
+ <9056f6a2-546b-41fc-a07c-7b86173887db@linux.intel.com>
+ <ZiFGRFb45oZrmqnJ@google.com>
+Content-Language: en-US
+From: "Zhang, Xiong Y" <xiong.y.zhang@linux.intel.com>
+In-Reply-To: <ZiFGRFb45oZrmqnJ@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 26, 2024 at 12:25:12AM -0800, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> TDX wants to know the faulting address is shared or private so that the max
-> level is limited by Secure-EPT or not.  Because fault->gfn doesn't include
-> shared bit, gfn doesn't tell if the faulting address is shared or not.
-> Pass is_private for TDX case.
-> 
-> TDX logic will be if (!is_private) return 0; else return PG_LEVEL_4K.
-> 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 3 ++-
->  arch/x86/kvm/mmu/mmu.c          | 3 ++-
->  2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index d15f5b4b1656..57ce89fc2740 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1797,7 +1797,8 @@ struct kvm_x86_ops {
->  
->  	gva_t (*get_untagged_addr)(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
->  
-> -	int (*gmem_max_level)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, u8 *max_level);
-> +	int (*gmem_max_level)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn,
-> +			      bool is_private, u8 *max_level);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 1e5e12d2707d..22db1a9f528a 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4324,7 +4324,8 @@ static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
->  
->  	max_level = kvm_max_level_for_order(max_order);
->  	r = static_call(kvm_x86_gmem_max_level)(vcpu->kvm, fault->pfn,
-> -						fault->gfn, &max_level);
-> +						fault->gfn, fault->is_private,
-> +						&max_level);
-fault->is_private is always true in kvm_faultin_pfn_private().
-Besides, as shared page allocation will not go to kvm_faultin_pfn_private(),
-why do we need to add the "is_private" parameter ?
 
->  	if (r) {
->  		kvm_release_pfn_clean(fault->pfn);
->  		return r;
-> -- 
-> 2.25.1
+
+On 4/19/2024 12:11 AM, Sean Christopherson wrote:
+> On Wed, Apr 17, 2024, Xiong Y Zhang wrote:
+>> On 4/16/2024 8:48 PM, Liang, Kan wrote:
+>>>> x86_perf_get_mediated_pmu() is called at vm_create(),
+>>>> x86_perf_put_mediated_pmu() is called at vm_destroy(), then system wide
+>>>> perf events without exclude_guest=1 can not be created during the whole vm
+>>>> life cycle (where nr_mediated_pmu_vms > 0 always), do I understand and use
+>>>> the interface correctly ?
+>>>
+>>> Right, but it only impacts the events of PMU with the
+>>> PERF_PMU_CAP_MEDIATED_VPMU.  For other PMUs, the event with exclude_guest=1
+>>> can still be created.  KVM should not touch the counters of the PMU without
+>>> PERF_PMU_CAP_MEDIATED_VPMU.
+>>>
+>>> BTW: I will also remove the prefix x86, since the functions are in the
+>>> generic code.
+>>>
+>>> Thanks,
+>>> Kan
+>> After userspace VMM call VCPU SET_CPUID() ioctl, KVM knows whether vPMU is
+>> enabled or not. If perf_get_mediated_pmu() is called at vm create, it is too
+>> early.
+> 
+> Eh, if someone wants to create _only_ VMs without vPMUs, then they should load
+> KVM with enable_pmu=false.  I can see people complaining about not being able to
+> create VMs if they don't want to use have *any* vPMU usage, but I doubt anyone
+> has a use cases where they want a mix of PMU-enabled and PMU- disabled VMs, *and*
+> they are ok with VM creation failing for some VMs but not others.
+enable_mediated_pmu and PMU-based nmi_watchdog are enabled by default on my ubuntu system, some ubuntu services create vm during ubuntu bootup, these ubuntu services fail after I add perf_get_mediated_pmu() in kvm_arch_init_vm(). so do this checking at vm creation may break some bootup services.
+  
+> 
+>> it is better to let perf_get_mediated_pmu() track per cpu PMU state,
+>> so perf_get_mediated_pmu() can be called by kvm after vcpu_cpuid_set(). Note
+>> user space vmm may call SET_CPUID() on one vcpu multi times, then here
+>> refcount maybe isn't suitable. 
+> 
+> Yeah, waiting until KVM_SET_CPUID2 would be unpleasant for both KVM and userspace.
+> E.g. failing KVM_SET_CPUID2 because KVM can't enable mediated PMU support would
+> be rather confusing for userspace.
+> 
+>> what's a better solution ?
+> 
+> If doing the checks at VM creation is a stick point for folks, then the best
+> approach is probably to use KVM_CAP_PMU_CAPABILITY, i.e. require userspace to
+> explicitly opt-in to enabling mediated PMU usage.  Ha!  We can even do that
+> without additional uAPI, because KVM interprets cap->args[0]==0 as "enable vPMU".
+> 
+QEMU doesn't use KVM_CAP_PMU_CAPABILITY to enable/disable pmu. enable_cap(KVM_CAP_PMU_CAPABILITY) will be added into QEMU for mediated PMU.
+With old QEMU, guest PMU will always use emulated vPMU, mediated PMU won't be enabled, if emulated vPMU is replaced later, the old QEMU guest will be broken.
+> The big problem with this is that enabling mediated PMU support by default would
+> break userspace.  Hmm, but that's arguably the case no matter what, as a setup
+> that worked before would suddenly start failing if the host was configured to use
+> the PMU-based NMI watchdog.
+Based on perf_get_mediated_pmu() interface, admin need to disable all the system wide perf events before vm creation, no matter where the perf_get_mediated_pmu() is called in vm_create() or enable_cap(KVM_CAP_PMU_CAPABILITY) ioctl.
+> 
+> E.g. this, if we're ok commiting to never enabling mediated PMU by defau
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 47d9f03b7778..01d9ee2114c8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -6664,9 +6664,21 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>                         break;
+>  
+>                 mutex_lock(&kvm->lock);
+> -               if (!kvm->created_vcpus) {
+> -                       kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
+> -                       r = 0;
+> +               /*
+> +                * To keep PMU configuration "simple", setting vPMU support is
+> +                * disallowed if vCPUs are created, or if mediated PMU support
+> +                * was already enabled for the VM.
+> +                */
+> +               if (!kvm->created_vcpus &&
+> +                   (!enable_mediated_pmu || !kvm->arch.enable_pmu)) {
+> +                       if (enable_mediated_pmu &&
+> +                           !(cap->args[0] & KVM_PMU_CAP_DISABLE))
+> +                               r = x86_perf_get_mediated_pmu();
+> +                       else
+> +                               r = 0;
+> +
+> +                       if (!r)
+> +                               kvm->arch.enable_pmu = !(cap->args[0] & KVM_PMU_CAP_DISABLE);
+>                 }
+>                 mutex_unlock(&kvm->lock);
+>                 break;
+> @@ -12563,7 +12575,9 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+>  
+>         kvm->arch.default_tsc_khz = max_tsc_khz ? : tsc_khz;
+>         kvm->arch.guest_can_read_msr_platform_info = true;
+> -       kvm->arch.enable_pmu = enable_pmu;
+> +
+> +       /* PMU virtualization is opt-in when mediated PMU support is enabled. */
+> +       kvm->arch.enable_pmu = enable_pmu && !enable_mediated_pmu;
+>  
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>         spin_lock_init(&kvm->arch.hv_root_tdp_lock);
 > 
 > 
 
