@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-15260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E1F08AADF7
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 13:58:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E12BC8AADFF
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 14:01:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B1B928263E
-	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 11:58:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 968401F21E5D
+	for <lists+kvm@lfdr.de>; Fri, 19 Apr 2024 12:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA02C83CD1;
-	Fri, 19 Apr 2024 11:58:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 494ED84D3A;
+	Fri, 19 Apr 2024 12:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Im8fOYFq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Akw+r+IT"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C68B2823A8
-	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 11:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464F183A09
+	for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 12:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713527904; cv=none; b=hrIwFUhEH3YNFa19LpBEiy+gIbA45eFtOITWLarcLfOvQtINvLUj936Um2wxXlJvkW8pJj7jNEgpQUBYyaMviSAU0spdYXeJmXf5EtfVjju1bM+pjrDpyVvEu2Y5klNundPqj5iEiZSOzZ/pQhMhHaTeG+YDgPhbyS+2P5VRMTc=
+	t=1713528106; cv=none; b=PmHzAYMsri/qdDDWWIl5JJwXVqZkEJPLm/tp98eaXNEs04uHDlqGn3nJNJVrxCs0iK97253t//Xq2V8CjGNjK0KTzW895hBas+g2hPUW0RSvDtW/aKIUPZyVMtmpK9GJV2Yx8HJ4qfkf8H1AEdqAZ0qyX8HNEM1B9f6vpfvhqCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713527904; c=relaxed/simple;
-	bh=wBbLhac8QaUF0O5nwHjFjj5cUq+nWt4AMbemYENl12c=;
+	s=arc-20240116; t=1713528106; c=relaxed/simple;
+	bh=acN4eXWZt8iLvqysCB2S2Dc6auK2r1UT70yxAxadgbw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S6tURDDBB0dBgGmC08ETYkYfd4zo7VwP+Hx+TCpFIqRikCWRvbUIzXhzyCAdYf8WzoIudQHzY2OeI+4xP14v2tKwCdvOVah1VAXGXePUZhAZmYCC3jpc+sxPHP3kXnvqNZf5/Iqs/tcZeIpricF60TGhfcCPG8kp2//ANNP9Xvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Im8fOYFq; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=hBiVTUVek1ugXqfCM9i71Fy6SrDzsYsYuFAkD5FnK7kHW2HtWPzNu/4xUNCvs1/rJTnGj603AorftnDuF2ibJvNOXM5rbpm2zyw6TXZ1miAsOjVNAz88NwvDCcsp1Cbtjq2T8D7ywA4j/oPqVCNTb56W136SG1F8ckQYEgLko9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Akw+r+IT; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713527901;
+	s=mimecast20190719; t=1713528104;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CwxWxYK6yFiOYVQyI4AiRXsN6yKGGl+jXN1TxSL+A3k=;
-	b=Im8fOYFqW2uQiH2FdGj/kjrDq2Ge2hlx5Dx7E39iy6PuRTw/2Qo51ARU8uly2F2galkwRp
-	HVIctYB9Vl+ItXC0YQRPAZOTdDXhxfopDfyke/C3D3E/ESRKXjNptxp8lLMblluS6CXSWF
-	JlFFSksRgrPBjPQ0CjrO9O3TIz4nH2U=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Vahs511qBysOkO0uiEmPvdJfNTUFHsURAvS7DcBv8xY=;
+	b=Akw+r+ITtB6jgATaNf+mskwcKMUt3m4QXf/7JL+1hd09iQ5PHq5rQXrX7dnOXhSuRl3mFj
+	/aIHEa/JxbuZfgCKM4urVzCW5K1QcHziyzYv1fpSx/jxey70qhHOQj8AlWanPXL3sgf7M1
+	VNlofBOtP56Y9kWFuTP0tWPDr72JY70=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-626-v7YM6DPgM4ebT-jI0OvW9g-1; Fri, 19 Apr 2024 07:58:20 -0400
-X-MC-Unique: v7YM6DPgM4ebT-jI0OvW9g-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3479b511725so1358787f8f.3
-        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 04:58:20 -0700 (PDT)
+ us-mta-3-2JOVSfE4N0eXIy9-uBdMRg-1; Fri, 19 Apr 2024 08:01:42 -0400
+X-MC-Unique: 2JOVSfE4N0eXIy9-uBdMRg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-41828dd7c29so10044605e9.3
+        for <kvm@vger.kernel.org>; Fri, 19 Apr 2024 05:01:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713527899; x=1714132699;
+        d=1e100.net; s=20230601; t=1713528101; x=1714132901;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CwxWxYK6yFiOYVQyI4AiRXsN6yKGGl+jXN1TxSL+A3k=;
-        b=I4ESwMzz/eWKfCUiwuStv3tBg8UmIYR4qbvYa17RlIZ5nnQC9Hzxpw9CsxB/qo4MIN
-         PZP9dj8UB0eYsnsjxJx2mZfWYhNBouwP6S9WEtNBvb3SWlFazDefraUCxUy87fz6skN6
-         EwCwEPVmDGl6rjqxmnQbls+lDyAyANybi4/5yOgHwwa/KpWFQfGQijy3fkSqI/zaPWig
-         LrDCb9EdnI3s/6I0rokXiobiAUrTwUh0vtUVNAFNKmQN+6t0OS5QzT8Gi16V3iSNGeVX
-         EQ2OFx2x8xJn2KNen/FVVXaOtMemH8zu/TWDLtiZpZEOUXgW37u43Qc4Bp1IrvCItQDY
-         1oSQ==
-X-Gm-Message-State: AOJu0YyZBcTaJRXSkoB+iTOlvQbYEU28fTL316zydRZXF0xOg6EZZJJg
-	svOG6A6B9OBi5BuUA6ZbNR2CUskxZVIvPvwhcoAikFmC96hMKUcCzstDG1I2VQsVlTP548a99B5
-	3pHKQi7t2ieIHPsmR5rurba04Me0v4QGPobBedceaNFEFQ2MecijgKnCmJtQgFrxXnmcM7fbEMi
-	ebR6Jqk4nYpjvx0rYeZ8m4jhkV
-X-Received: by 2002:a5d:50d1:0:b0:33d:b376:8a07 with SMTP id f17-20020a5d50d1000000b0033db3768a07mr1167246wrt.8.1713527899438;
-        Fri, 19 Apr 2024 04:58:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHM7xQDK90cgpkqMe8qHCL2Dpb0GVAovL4zmOZ8Y/f+iUHPX7N3URgMIDSP1Agr9DUXYvSVNpPPSl3w69ic80Y=
-X-Received: by 2002:a5d:50d1:0:b0:33d:b376:8a07 with SMTP id
- f17-20020a5d50d1000000b0033db3768a07mr1167205wrt.8.1713527899035; Fri, 19 Apr
- 2024 04:58:19 -0700 (PDT)
+        bh=Vahs511qBysOkO0uiEmPvdJfNTUFHsURAvS7DcBv8xY=;
+        b=mfYRZDu/AvWValpEC9qiZYa6D9AvbOBWZx5knEEYyR4kk8/8K04RwR3wkeV4O2eVEa
+         0WPbZBB5ohZ5zpH9EzUaM4stjFr75On9UvXt11zS4DAZLw8zHNwzFIAgAL9RHWda7J5D
+         iemvm70zODxNY3HdudkDs+yLd88FSO8H53MnRacwJnZClIt2xEEMEKXmt6J0fLv0GWDK
+         C0YzM3Z48CvkoMZzO/T4kxJHoElQhS3fELF/YgmvMfZldz2RqLe/KuI/4c7pXHpotqF/
+         V86qDt8QdqYFDQp+UOjth+giOhlEWMD9PaO4/8vJjcuufmLfMN4BZulVzsCBpnyzUKIQ
+         X2qA==
+X-Gm-Message-State: AOJu0YzYlNJ+wGmDJd+cJ0JXLiiA5SP1x5WxNoc+NbX6XJ+tZUjSCSwy
+	VBTB+RlTgXyE79wUZaAyD3C8/9PEUl1TUx51VENIdwP9VLV3WpXonFsUoAPeMiR+rHo4EHj87ay
+	T/Eh9YlZHDqdj0Odn2TltQmaMR57fjfudDs6mt3DxNolPpXaiJgcaAt96yHFSXyfsk36wsXpLvo
+	xkXhOSmcZ+aN4ngXhVCGhwq7sf
+X-Received: by 2002:a05:600c:45cd:b0:418:9ba3:ee76 with SMTP id s13-20020a05600c45cd00b004189ba3ee76mr1378074wmo.4.1713528101576;
+        Fri, 19 Apr 2024 05:01:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEaFUZhMFYFAs3ZhsYYcBoV+2/MzoyjDzM+1t4+goj9WAVZ/2QAmnhBwnZ/PquJCML4YzG+HJVNxiJvWhvW6sY=
+X-Received: by 2002:a05:600c:45cd:b0:418:9ba3:ee76 with SMTP id
+ s13-20020a05600c45cd00b004189ba3ee76mr1378024wmo.4.1713528101121; Fri, 19 Apr
+ 2024 05:01:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240418194133.1452059-1-michael.roth@amd.com> <20240418194133.1452059-9-michael.roth@amd.com>
-In-Reply-To: <20240418194133.1452059-9-michael.roth@amd.com>
+References: <20240418194133.1452059-1-michael.roth@amd.com> <20240418194133.1452059-17-michael.roth@amd.com>
+In-Reply-To: <20240418194133.1452059-17-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 19 Apr 2024 13:58:07 +0200
-Message-ID: <CABgObfbNd2Z85o3Wb-yr5qYSWYTadxZGuh6PP=r-5dNpa06ErA@mail.gmail.com>
-Subject: Re: [PATCH v13 08/26] KVM: SEV: Add initial SEV-SNP support
+Date: Fri, 19 Apr 2024 14:01:29 +0200
+Message-ID: <CABgObfYzM4tsoYtVdACtbY4ZXs4j2hrsVEafD9=EnqnXjoJ+2Q@mail.gmail.com>
+Subject: Re: [PATCH v13 16/26] KVM: SEV: Support SEV-SNP AP Creation NAE event
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
 	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
@@ -99,63 +99,22 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 18, 2024 at 9:51=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
+On Thu, Apr 18, 2024 at 9:45=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
  wrote:
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 535018f152a3..d31404953bf1 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4899,7 +4899,8 @@ static int svm_vm_init(struct kvm *kvm)
+>          * the VMSA will be NULL if this vCPU is the destination for intr=
+ahost
+>          * migration, and will be copied later.
+>          */
+> -       if (svm->sev_es.vmsa)
+> +       if (!svm->sev_es.snp_has_guest_vmsa)
+>                 svm->vmcb->control.vmsa_pa =3D __pa(svm->sev_es.vmsa);
 >
->         if (type !=3D KVM_X86_DEFAULT_VM &&
->             type !=3D KVM_X86_SW_PROTECTED_VM) {
-> -               kvm->arch.has_protected_state =3D (type =3D=3D KVM_X86_SE=
-V_ES_VM);
-> +               kvm->arch.has_protected_state =3D
-> +                       (type =3D=3D KVM_X86_SEV_ES_VM || type =3D=3D KVM=
-_X86_SNP_VM);
+>         /* Can't intercept CR register access, HV can't modify CR registe=
+rs */
 
-I'd rather set has_private_mem here too, rather than in x86.c
-
-Also this patch is the place to have
-
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d31404953bf1..6209f70ab11a 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2056,6 +2056,9 @@ static int npf_interception(struct kvm_vcpu *vcpu)
-     if (WARN_ON_ONCE(error_code & PFERR_SYNTHETIC_MASK))
-         error_code &=3D ~PFERR_SYNTHETIC_MASK;
-
-+    if (sev_snp_guest(vcpu) && (error_code & PFERR_GUEST_ENC_MASK))
-+        error_code |=3D PFERR_PRIVATE_ACCESS;
-+
-     trace_kvm_page_fault(vcpu, fault_address, error_code);
-     return kvm_mmu_page_fault(vcpu, fault_address, error_code,
-             static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
-
-
-for the final shape of the MMU changes.
+This needs to be svm->sev_es.vmsa && ... (see existing comment above the "i=
+f").
 
 Paolo
-
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 83b8260443a3..9923921904a2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12598,7 +12598,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned lo=
-ng type)
->
->         kvm->arch.vm_type =3D type;
->         kvm->arch.has_private_mem =3D
-> -               (type =3D=3D KVM_X86_SW_PROTECTED_VM);
-> +               (type =3D=3D KVM_X86_SW_PROTECTED_VM || type =3D=3D KVM_X=
-86_SNP_VM);
->
->         ret =3D kvm_page_track_init(kvm);
->         if (ret)
-> --
-> 2.25.1
->
 
 
