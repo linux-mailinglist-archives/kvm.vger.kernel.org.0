@@ -1,65 +1,89 @@
-Return-Path: <kvm+bounces-15412-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15413-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 772DF8ABA4F
-	for <lists+kvm@lfdr.de>; Sat, 20 Apr 2024 10:35:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D54918ABA6A
+	for <lists+kvm@lfdr.de>; Sat, 20 Apr 2024 10:58:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0B251F222C9
-	for <lists+kvm@lfdr.de>; Sat, 20 Apr 2024 08:35:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91EBA281041
+	for <lists+kvm@lfdr.de>; Sat, 20 Apr 2024 08:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9492114AB0;
-	Sat, 20 Apr 2024 08:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9462315AE0;
+	Sat, 20 Apr 2024 08:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C+a+o15Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mW3Y+hQl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD830134BF
-	for <kvm@vger.kernel.org>; Sat, 20 Apr 2024 08:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC4D0205E31;
+	Sat, 20 Apr 2024 08:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713602106; cv=none; b=cZp27EDS/zNJREvOyCqFr/VS/pHrdu3IUiNiAq7tTGMKZCUJAJ7Hnf779P6dY3V7zbIDhfXDP41nhqXKcIJCYfp5YmgEFIZlP91hk7/pKc7EnnPfYUgp3GvZ8Oky7q8fLHURgrk91KRK6aE/yqoPOxfjz0FzZOKRNugoQu4NI5c=
+	t=1713603479; cv=none; b=ajcaOlC1huemL99A/4h3MaW4SiPO2BTx/lYlnnuG6WjOOtO8bSuB/fDcJpacm3450MeYph1EW1cHPFeETwW+ILsddCjeLHpo9yAi+5burLqwZnFe0ib2nz+nTvjPJo5rhbENpUYhYXNGsc46QhQKVzEFeQa/8XN0b4O3GInDt3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713602106; c=relaxed/simple;
-	bh=sqVG+a/S+zk12II7AeFEZhAVsiWjW1ScyvLAr+oX/j0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kwL8p/O1xxZjpvsf5NPAb5QJ2UfDgRNGGmteOMLdhsoo84zVBlwehTx2L9b93vkOiMnI8erPB6vkQpAIPFixmP0DAJmiTDoy1HiWhmXCryKP0KB/XgUHGzSFB7ZWobgBBihQyZhzyLvFA+BZnFKufT5t7MZocmvfm/PfyMoxN2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C+a+o15Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713602103;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=iZq4P3HHVC0RfCF2HHIcIAnQe5aCLFWGD5vDn+X2/Z0=;
-	b=C+a+o15QxD8LagnSXxeXoUibDhOEBbXAC1wEYFOyHXwZ9/dCIu5jJ1doof+f6CiMCPlCD+
-	FMukytAgrC5SvCAqxGwXANU7fDpW5f5Z7D8FuDBLnVWiRnZImq5GQq15GFOKkRKY6nKC4w
-	wcYxEcJH4W+DJu9rYaWfPAIF+PMk7Zk=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-119-wVRD5RxuMAu8vbwJCbqSFQ-1; Sat,
- 20 Apr 2024 04:34:59 -0400
-X-MC-Unique: wVRD5RxuMAu8vbwJCbqSFQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0B06B3C025B0;
-	Sat, 20 Apr 2024 08:34:59 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E054FC1A225;
-	Sat, 20 Apr 2024 08:34:58 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] KVM changes for Linux 6.9-rc5
-Date: Sat, 20 Apr 2024 04:34:58 -0400
-Message-ID: <20240420083458.3692711-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1713603479; c=relaxed/simple;
+	bh=9SRG5NGgAQWbJ7b1PO89EyFuba/zQaF5gPA0aAKRqE8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=fIpHTkuyXmnniU7Eplz6hst4HJoCihmLUKjbikA/o0zT5gSBbdBd9n8maNqtwWyuqUvWSqdeJoqeWy46u5agdAI9Gro4mIBFA4TVx2osW+7TXf7qwZzlvDyXCp2nI5qdl5LiZrii7kqt2JFzSEG33ccwdsOpSLAegUPERT3fwo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mW3Y+hQl; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2a5ef566c7aso2187549a91.1;
+        Sat, 20 Apr 2024 01:57:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713603477; x=1714208277; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=48Iq+30cR26jwufNHZ2YfXYM/ol31EjO7UuID9EN8+c=;
+        b=mW3Y+hQlOJLtGQYMmwgwZK7x5xro9cefM3KFNwcPq5zTGwmXrsuPlJOcKx+r61ERpo
+         gvN30git/K2O+YWkuKYmLfkHeXWIWu97G2aDRyPRBFPhlaLgetMNxyxl1Vhz2234792v
+         YD1g3hTrwpy2k0p08eejPPAHnYxfnZb8JwkA5JRaQZTkt3vXoeRc2huS2CdX31uxh9gJ
+         UbEHAU6IJpGT4yRsZJjQY2ksn+uLqDmJxF1LrYdlChKgw5UwdQCw+ym0gfmScWuqYFrp
+         PReQtoIm/8iDovbQpfXtJuc8wTGmUNrb+0dX9CHpMgXqTnilLBgd9eWEoLbh3ta2vJRK
+         M3kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713603477; x=1714208277;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=48Iq+30cR26jwufNHZ2YfXYM/ol31EjO7UuID9EN8+c=;
+        b=kixk73HE0VUNlbusAVUufFZlaFpqf3BjBaIaOFw+eK9cHAJ7/STEIFInd7vdEn2RA3
+         hQ0+qTqGPmebygkg+v+ZRw4xDd8wMvlgiJi0LW/xSmqdyahuWASz9NpFXU6u+dDFM2YR
+         5OzEvlgRxrHQ5SylIWg3afiZFtzJJaiHT5uhHdUnzPwUdYvJZoq/odRnKRcPYiTPr/Fj
+         eFPOJPHtrhSZDp0QwMyS08JykShaIWrMmrmKecrlStyLNVlG9dD50WdzYpmO/3eh25Z0
+         OobjnZpOswuitUF2PAns8EEiwajEQwv8fCPiFe108j+j0S81SJw791+5syvkgz1aEj1u
+         36KA==
+X-Forwarded-Encrypted: i=1; AJvYcCX1FrA7GykciXcuEGzUHsb8lr7JXCkm2RiU+EpKWo2PI4mFAFbwxNqEQSRh/oh9EelLxuoVRgtdaKO+HS8DuWTYKCJI+iXzFPWvPMg3iL/74qY3+fOvOudk+AcqC4KyO39o
+X-Gm-Message-State: AOJu0YzsgxxrtSExTOPlV9d4Np1N+AyN3ekkl9uNtWu5/Ol00mU6Onnk
+	SSJq+vIWpyNtWm7bwDyHnmBVaL02zR840hzACQMegyC4C4+ujtOX
+X-Google-Smtp-Source: AGHT+IG8EU9aw+RsorFWmCwNnDqhjyjrO+DrkR5PkJw3blIHTNDCMPTP7m8lFUkodGAIDAyljL2Ckw==
+X-Received: by 2002:a17:903:191:b0:1e4:4125:806f with SMTP id z17-20020a170903019100b001e44125806fmr5617293plg.11.1713603477162;
+        Sat, 20 Apr 2024 01:57:57 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id mp6-20020a170902fd0600b001e256cb48f7sm4653132plb.197.2024.04.20.01.57.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 20 Apr 2024 01:57:56 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com
+Cc: stefanha@redhat.com,
+	sgarzare@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH virt] virt: fix uninit-value in vhost_vsock_dev_open
+Date: Sat, 20 Apr 2024 17:57:50 +0900
+Message-Id: <20240420085750.64274-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <000000000000be4e1c06166fdc85@google.com>
+References: <000000000000be4e1c06166fdc85@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,153 +91,30 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-Linus,
+Change vhost_vsock_dev_open() to use kvzalloc() instead of kvmalloc()
+to avoid uninit state.
 
-The following changes since commit fec50db7033ea478773b159e0e2efb135270e3b7:
+Reported-by: syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com
+Fixes: dcda9b04713c ("mm, tree wide: replace __GFP_REPEAT by __GFP_RETRY_MAYFAIL with more useful semantic")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+---
+ drivers/vhost/vsock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  Linux 6.9-rc3 (2024-04-07 13:22:46 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-for you to fetch changes up to 44ecfa3e5f1ce2b5c7fa7003abde8a667c158f88:
-
-  Merge branch 'svm' of https://github.com/kvm-x86/linux into HEAD (2024-04-17 11:44:37 -0400)
-
-This is a bit on the large side, mostly due to two parts of the pull request:
-
-* changes to disable some broken PMU virtualization
-
-* a clean up to SVM's enter/exit assembly code so that it can be compiled
-  without OBJECT_FILES_NON_STANDARD, fixing a warning that appeared in
-  6.9-rc1.
-
-Everything else is small bugfixes and selftest changes.
-
-----------------------------------------------------------------
-* Clean up SVM's enter/exit assembly code so that it can be compiled
-  without OBJECT_FILES_NON_STANDARD.  This fixes a warning
-  "Unpatched return thunk in use. This should not happen!" when running
-  KVM selftests.
-
-* Fix a mostly benign bug in the gfn_to_pfn_cache infrastructure where KVM
-  would allow userspace to refresh the cache with a bogus GPA.  The bug has
-  existed for quite some time, but was exposed by a new sanity check added in
-  6.9 (to ensure a cache is either GPA-based or HVA-based).
-
-* Drop an unused param from gfn_to_pfn_cache_invalidate_start() that got left
-  behind during a 6.9 cleanup.
-
-* Fix a math goof in x86's hugepage logic for KVM_SET_MEMORY_ATTRIBUTES that
-  results in an array overflow (detected by KASAN).
-
-* Fix a bug where KVM incorrectly clears root_role.direct when userspace sets
-  guest CPUID.
-
-* Fix a dirty logging bug in the where KVM fails to write-protect SPTEs used
-  by a nested guest, if KVM is using Page-Modification Logging and the nested
-  hypervisor is NOT using EPT.
-
-x86 PMU:
-
-* Drop support for virtualizing adaptive PEBS, as KVM's implementation is
-  architecturally broken without an obvious/easy path forward, and because
-  exposing adaptive PEBS can leak host LBRs to the guest, i.e. can leak
-  host kernel addresses to the guest.
-
-* Set the enable bits for general purpose counters in PERF_GLOBAL_CTRL at
-  RESET time, as done by both Intel and AMD processors.
-
-* Disable LBR virtualization on CPUs that don't support LBR callstacks, as
-  KVM unconditionally uses PERF_SAMPLE_BRANCH_CALL_STACK when creating the
-  perf event, and would fail on such CPUs.
-
-Tests:
-
-* Fix a flaw in the max_guest_memory selftest that results in it exhausting
-  the supply of ucall structures when run with more than 256 vCPUs.
-
-* Mark KVM_MEM_READONLY as supported for RISC-V in set_memory_region_test.
-
-----------------------------------------------------------------
-Andrew Jones (1):
-      KVM: selftests: fix supported_flags for riscv
-
-Christophe JAILLET (1):
-      KVM: SVM: Remove a useless zeroing of allocated memory
-
-David Matlack (4):
-      KVM: x86/mmu: Write-protect L2 SPTEs in TDP MMU when clearing dirty status
-      KVM: x86/mmu: Remove function comments above clear_dirty_{gfn_range,pt_masked}()
-      KVM: x86/mmu: Fix and clarify comments about clearing D-bit vs. write-protecting
-      KVM: selftests: Add coverage of EPT-disabled to vmx_dirty_log_test
-
-Maxim Levitsky (1):
-      KVM: selftests: fix max_guest_memory_test with more that 256 vCPUs
-
-Paolo Bonzini (2):
-      Merge tag 'kvm-x86-fixes-6.9-rcN' of https://github.com/kvm-x86/linux into HEAD
-      Merge branch 'svm' of https://github.com/kvm-x86/linux into HEAD
-
-Rick Edgecombe (1):
-      KVM: x86/mmu: x86: Don't overflow lpage_info when checking attributes
-
-Sandipan Das (1):
-      KVM: x86/pmu: Do not mask LVTPC when handling a PMI on AMD platforms
-
-Sean Christopherson (20):
-      KVM: Add helpers to consolidate gfn_to_pfn_cache's page split check
-      KVM: Check validity of offset+length of gfn_to_pfn_cache prior to activation
-      KVM: Explicitly disallow activatating a gfn_to_pfn_cache with INVALID_GPA
-      KVM: x86/pmu: Disable support for adaptive PEBS
-      KVM: x86/pmu: Set enable bits for GP counters in PERF_GLOBAL_CTRL at "RESET"
-      KVM: selftests: Verify post-RESET value of PERF_GLOBAL_CTRL in PMCs test
-      KVM: SVM: Create a stack frame in __svm_vcpu_run() for unwinding
-      KVM: SVM: Wrap __svm_sev_es_vcpu_run() with #ifdef CONFIG_KVM_AMD_SEV
-      KVM: SVM: Drop 32-bit "support" from __svm_sev_es_vcpu_run()
-      KVM: SVM: Clobber RAX instead of RBX when discarding spec_ctrl_intercepted
-      KVM: SVM: Save/restore non-volatile GPRs in SEV-ES VMRUN via host save area
-      KVM: SVM: Save/restore args across SEV-ES VMRUN via host save area
-      KVM: SVM: Create a stack frame in __svm_sev_es_vcpu_run()
-      KVM: x86: Stop compiling vmenter.S with OBJECT_FILES_NON_STANDARD
-      KVM: x86: Snapshot if a vCPU's vendor model is AMD vs. Intel compatible
-      KVM: VMX: Snapshot LBR capabilities during module initialization
-      perf/x86/intel: Expose existence of callback support to KVM
-      KVM: VMX: Disable LBR virtualization if the CPU doesn't support LBR callstacks
-      KVM: x86/mmu: Precisely invalidate MMU root_role during CPUID update
-      KVM: Drop unused @may_block param from gfn_to_pfn_cache_invalidate_start()
-
-Tao Su (1):
-      KVM: VMX: Ignore MKTME KeyID bits when intercepting #PF for allow_smaller_maxphyaddr
-
- arch/x86/events/intel/lbr.c                        |  1 +
- arch/x86/include/asm/kvm_host.h                    |  1 +
- arch/x86/include/asm/perf_event.h                  |  1 +
- arch/x86/kvm/Makefile                              |  5 --
- arch/x86/kvm/cpuid.c                               |  1 +
- arch/x86/kvm/cpuid.h                               | 10 +++
- arch/x86/kvm/lapic.c                               |  3 +-
- arch/x86/kvm/mmu/mmu.c                             | 11 +--
- arch/x86/kvm/mmu/tdp_mmu.c                         | 51 +++++-------
- arch/x86/kvm/pmu.c                                 | 16 +++-
- arch/x86/kvm/svm/sev.c                             |  2 +-
- arch/x86/kvm/svm/svm.c                             | 17 ++--
- arch/x86/kvm/svm/svm.h                             |  3 +-
- arch/x86/kvm/svm/vmenter.S                         | 97 ++++++++++------------
- arch/x86/kvm/vmx/pmu_intel.c                       |  2 +-
- arch/x86/kvm/vmx/vmx.c                             | 41 +++++++--
- arch/x86/kvm/vmx/vmx.h                             |  6 +-
- arch/x86/kvm/x86.c                                 |  2 +-
- .../testing/selftests/kvm/max_guest_memory_test.c  | 15 ++--
- .../testing/selftests/kvm/set_memory_region_test.c |  2 +-
- .../selftests/kvm/x86_64/pmu_counters_test.c       | 20 ++++-
- .../selftests/kvm/x86_64/vmx_dirty_log_test.c      | 60 +++++++++----
- virt/kvm/kvm_main.c                                |  3 +-
- virt/kvm/kvm_mm.h                                  |  6 +-
- virt/kvm/pfncache.c                                | 50 +++++++----
- 25 files changed, 267 insertions(+), 159 deletions(-)
-
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index ec20ecff85c7..652ef97a444b 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -656,7 +656,7 @@ static int vhost_vsock_dev_open(struct inode *inode, struct file *file)
+ 	/* This struct is large and allocation could fail, fall back to vmalloc
+ 	 * if there is no other way.
+ 	 */
+-	vsock = kvmalloc(sizeof(*vsock), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
++	vsock = kvzalloc(sizeof(*vsock), GFP_KERNEL | __GFP_RETRY_MAYFAIL);
+ 	if (!vsock)
+ 		return -ENOMEM;
+ 
+-- 
+2.34.1
 
