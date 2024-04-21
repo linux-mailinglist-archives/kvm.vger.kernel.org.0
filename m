@@ -1,61 +1,60 @@
-Return-Path: <kvm+bounces-15426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15428-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 856638AC06A
-	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 20:03:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238608AC070
+	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 20:04:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A87F41C2039F
-	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 18:03:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90AC41F210F6
+	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 18:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9703BBDF;
-	Sun, 21 Apr 2024 18:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74823BBE3;
+	Sun, 21 Apr 2024 18:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YFCO0C5m"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4IYqzs4B"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2079.outbound.protection.outlook.com [40.107.92.79])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E55C376FC;
-	Sun, 21 Apr 2024 18:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.79
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244DF3AC34;
+	Sun, 21 Apr 2024 18:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.85
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713722611; cv=fail; b=YHFCfjiZlUIpvxD0ocbYNRJbVoQr4Hg+zm1rl8rMOlsRwSzt612JYqytDvhrZ37llmUvPzXC+GED651V2yDX6juDO9Ni0jxRpCxA/AaJVbm3ZbHUZKb3zIEEM0zIluIFhAZ3QctLOFM+c3Q4ii/6PizYWir9wD65d+YrDwHeB/g=
+	t=1713722650; cv=fail; b=cg46BI9xM7FiNYRiTV9dKJ/8JT402TVOa5ZniJZTs5Sgt9zezdjfahxPUWcGFLeepwwzKYzB/05FFtbDkd3x59cPTFxswLGCkByBYUuHyecWozn1pQTLrzF79HGROfW1aYGIQ02CNRnV5gX9Pbt+LLew8ZgIlDrQESJJPc3b8GU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713722611; c=relaxed/simple;
-	bh=76qVH3yW00COXdlwOgMgNQTZM25IBEI0g3tTHYBdRPU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=do1OWzrIf8zgAtheKV4xAXHwv00Mk49qpTllnmIzZmfb1i3/xeOmE2gEVH8V207HOkOexxt7CGp+raJTwaDWGPrxMYoKxF8y3EZLTkGIvksymT5uQr3FogaCm5+1RxCW+VM8t4XIkQ4WmMFl6IHJLZPqtK5pqli18fZLFWS5Jt0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YFCO0C5m; arc=fail smtp.client-ip=40.107.92.79
+	s=arc-20240116; t=1713722650; c=relaxed/simple;
+	bh=wmWrFX6BbcCTB3sxNjf36voLYu/jjORwbtrjU6CmqG0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cjkvrhHKSqt5UjoSR1CNgKpNtzEnm3uHhF7l2ImlOqTzyoHMoPbleRNC/03WqOBhJ5Y7PwBJSP0F4tpuUtAYUVXqS7VU6JiIp3vyZX5FanNjfLFMzisOdtM1mSv1OcCPIx5YniHYocF7kM2GNcviJ0vgmPVwV703ZozyCQ4ejSY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4IYqzs4B; arc=fail smtp.client-ip=40.107.220.85
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e1Ob2u4hYIQwx7XQsuZcqfU3lKx77awx2LtzQUcvijOqymTfTRy62O6RAYg+0KlrvvVyC3RVCi+nGAUvy64/NEQ7wfoEmjF1/SnYrEwZDU6W+uuqEcJwaP6Hlw8/aLnp/GiNZ/OG6a9EM0qXn09Js8i7NFrG3vSG0BJiXG/diyEPQdE88vFuHzYtr4LHPlz7XhFNjQTeEwcvvEuNXvdIh9L9hJkkzJgrIY6cvtPJzhqBIXo8ZQNdpUveElPqj3uNXhKxk+C1gEMSjz/X8kv3O5gTHoOJQu/YFsS577ymx/kjGjIvyWq+r/o+pQW9rTjkp5bqaNvOnpzJ5BhrizmAiA==
+ b=oF1aYYGpQDxWTxMz3I9VWM2b+dLcrVcV3UP9Axh6vdLOD7b+XNV/M/O4jXQ/kR9PyXbq9UiORi9UxiNJ7kZL3uK/Yq3Mmt+htFnuQLyzXpFGllvRssme3xfUqqGrZ+lksm6M09kr7zDHThW2TKodcCYvf9Wi20XolQqVbOM695+4LP7rD7z4w6wmYdlgXl2+F2lJKeki1fcCIkfwBy52EFvFnIESj4IWfz9ih5RYnY4dpM5WkaTovX8hzegm164l2BaJsqyDw63KyGYaoeLllIIJu5pe0rieZ36ZdV6ocgmYqn6t5/Txjv4dBgKSbSV0h/G5jCZhXd2kN19B3fW8Iw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XgK+wk8bsGy4rKToqYdvg77hh1L0DI8bg/xj6fFNtII=;
- b=dM5Gp2RRTIqXkTszcVjwcnd1MjLTkJcHo9aqpbRpTA+9Dwrp3V0WE6VuU1Jiw3c3tTXty4/+qLZptE+5tiSvQjsSdTmCcI8g4GPA7wn3CKMI6NeXCiwZOQ0d0hDKdZ49LyIoQDCbavI5z7HIgcGB3SVtrAbP1vX8VUN07plflCd1xr/YE4sMl4A+9kHv51N34b1G5ruvx/jYFwspE19bb+r8vMBhFX8CM41q1mlORAKa8elGrva72vfY2ymRvAN589UcsFeezwaAyrxUa/RluvIjULPfyzKYCg4HlegXXanVa0Rl/iMkIjDdq5yTVe+erEkE8k2AGxjW/ga0ea8dAg==
+ bh=IuujAtDVbUa+N3+9ahDzXugZQ28JCmpW1NoSSp1apTI=;
+ b=BZJwQnRo/AaONdMWxVz5IZVY4Zc2/iRooB1PXQr5AGWURjIav8m9ua48uE7lWZwh5Mme8gId30COruAq0/b02nICTPCrPt0r+F5jBJ7sVQPVjyOIYenoTjEY2XA/WAR5ZUYYT9sZP7eCOPdqe73NMJPR8KxX9HC8zlIbcElNxOi48C9SILhySWNm93NiM2WzXzEQYaLSYhibIZ9bKuoQR7cL/R/DcxiaFsDtIqkKO1jV6T2WZVxatUHZ1j9za1o3/LzmrAKlGGZTZHNvxKxwdBQIfZLUBf9tB47/28ixc6e2UBMlpQHHXbStLxX/ahwYuUma2Hd0LwEg8fMbrtVw9w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XgK+wk8bsGy4rKToqYdvg77hh1L0DI8bg/xj6fFNtII=;
- b=YFCO0C5me/uC1nCLz7623r5zrSUP06rrAsAFVIR2DqAo8Ra54jBqfWr0+VOntkpCowgMo2RWHPTDYYJcbAENP6FPwv0uKIiWg34Ab8rAkfpRzTpEny0Ixne6M/hzchDfVrWrlnS5xEmhph+OBSjKsycRelukhfPNpclhsGPtFV4=
-Received: from BL6PEPF00013DF7.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:22e:400:0:1001:0:9) by MW4PR12MB5668.namprd12.prod.outlook.com
- (2603:10b6:303:16b::13) with Microsoft SMTP Server (version=TLS1_2,
+ bh=IuujAtDVbUa+N3+9ahDzXugZQ28JCmpW1NoSSp1apTI=;
+ b=4IYqzs4BOnOWjBE7GTS9HqBeXuOw7UVEmgL659dZ/Iw1a+mszYGm9a2+X/zm6K9B0fFc6nPAgkQMKMB6a7Oqy3Z0QOKyScDk48JXFkiPmQzdzUr9jJCgikAbXPrgGLkroLVWSYnQ1jtUADTuI68nx0lWyUiBJ3ygSzoz+qb3cbE=
+Received: from BL1PR13CA0094.namprd13.prod.outlook.com (2603:10b6:208:2b9::9)
+ by IA0PR12MB8352.namprd12.prod.outlook.com (2603:10b6:208:3dd::14) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Sun, 21 Apr
- 2024 18:03:22 +0000
-Received: from MN1PEPF0000ECD8.namprd02.prod.outlook.com
- (2a01:111:f403:f902::2) by BL6PEPF00013DF7.outlook.office365.com
- (2603:1036:903:4::4) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.33 via Frontend
- Transport; Sun, 21 Apr 2024 18:03:22 +0000
+ 2024 18:04:04 +0000
+Received: from MN1PEPF0000ECDB.namprd02.prod.outlook.com
+ (2603:10b6:208:2b9:cafe::1a) by BL1PR13CA0094.outlook.office365.com
+ (2603:10b6:208:2b9::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.20 via Frontend
+ Transport; Sun, 21 Apr 2024 18:04:04 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +62,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MN1PEPF0000ECD8.mail.protection.outlook.com (10.167.242.137) with Microsoft
+ MN1PEPF0000ECDB.mail.protection.outlook.com (10.167.242.139) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7519.19 via Frontend Transport; Sun, 21 Apr 2024 18:03:22 +0000
+ 15.20.7519.19 via Frontend Transport; Sun, 21 Apr 2024 18:04:04 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 21 Apr
- 2024 13:03:21 -0500
+ 2024 13:04:04 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -85,14 +84,11 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
-	<brijesh.singh@amd.com>
-Subject: [PATCH v14 09/22] KVM: SEV: Add support to handle MSR based Page State Change VMGEXIT
-Date: Sun, 21 Apr 2024 13:01:09 -0500
-Message-ID: <20240421180122.1650812-10-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: [PATCH v14 00/22] Add AMD Secure Nested Paging (SEV-SNP) Hypervisor Support
+Date: Sun, 21 Apr 2024 13:01:00 -0500
+Message-ID: <20240421180122.1650812-1-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240421180122.1650812-1-michael.roth@amd.com>
-References: <20240421180122.1650812-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -105,240 +101,336 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD8:EE_|MW4PR12MB5668:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4b0fb1f0-ec97-47af-16c7-08dc622d551b
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECDB:EE_|IA0PR12MB8352:EE_
+X-MS-Office365-Filtering-Correlation-Id: f27a584a-0810-4495-2e8e-08dc622d6e83
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?vdq+VbfFpAn/rUDNdZCcdlEJ6yXayKY1o9aEnCfKtdsF9jvlsM2+fl0xafx4?=
- =?us-ascii?Q?yzOAIqzV7XBpafsu0NsAkPFgzglpX8OPzngCluUjfNTbMmGPdlTXe1ZXUP9b?=
- =?us-ascii?Q?SwaBt31TDqH/X5m6rrVP7b2+Gl6Uix4q0ePHgwy7s5seVXjmRUcWil4xNjna?=
- =?us-ascii?Q?Aaokj/Mrhb1R1txAzNnCrZ+oT8ZFHnuU9t42B50JiF9oggisCz824t7PGzOs?=
- =?us-ascii?Q?fifpHmfDr7qJsqksez7DomUYxYF8LQi0nripBSqHUM257RQNnT05bzRoaNOT?=
- =?us-ascii?Q?8ujMm8T4gUYoxbG9DrTkzpetGoJrfuVLa75L85A8BTfWJpc76C+EZD5+wzAA?=
- =?us-ascii?Q?tBhyLKqMUm5VTCbwaX0c1qZgcFgKP2J/DFS6zd6eSADFNT1Ig80g27eG21zC?=
- =?us-ascii?Q?pK9zGZtX3w6y9G54EkBlQSBtqBktFpS+VuWRGl1KAryq2MNgOEDHCPcohxxs?=
- =?us-ascii?Q?9XCdTkyn3ZuIO4qgLoWRYxhTtrOscSKXEqFkYHnJ70lIfPBTU+70njyLS+9B?=
- =?us-ascii?Q?bF+2fnFnptWBR07ZxZqnzryYMBJHRNdt6XcMhv8oJBnsDNtt1OgMz7RlYMJH?=
- =?us-ascii?Q?iqEQrCc+MwZjAYfehTULkLLS4W14u7Z9mRC/hsGKwryF+UfaWmCbXt+4s8rL?=
- =?us-ascii?Q?+Az2PGxEV5ADaczY9u1mULVQbvxRfaCk1b7vNTtV067jNqG/L95JWJBJ80bp?=
- =?us-ascii?Q?XA55OpSTCNnNMfJoJEMU8LMi9L0SlcYndcolAXj4C+TKAxZJUoghkEm6CYqv?=
- =?us-ascii?Q?JKJm3AvmEa4DY81iCqXKdhbOLR2gvCXd2lCIEO0JbjPIzAbrhV6qyFo43ccO?=
- =?us-ascii?Q?0Pcm0lyozDiPzpzamp3/BxqYPi7noZUTIoIw+A1ICoXEnul0tuFcsW7fOy1x?=
- =?us-ascii?Q?blu0gPm4KSaSrtd1k17sx6VK54sIvZVwRaqzx+iJI+5ltzAj6kmcZ0ohx7WD?=
- =?us-ascii?Q?jhA2sy5lTtAnCv3lWWQkE/cXZrCMUSfKuLKzF2iNOBvcyt3pPGp+hFQ8FfoV?=
- =?us-ascii?Q?1XpfO0iuv70ViQUWxJaiu1Q6FIASmFselt9whh8vSke9IND/87jCdv35XFll?=
- =?us-ascii?Q?npokilukwvtaZ2yu90YQCi7KD3xgXJAX0wK1uo2GU2Io35MfseBSJ7ipkVqT?=
- =?us-ascii?Q?Bu8EBvgtwTfeDa0hdm7T/7gmnxuDV0BhOTEU1rVnCPSOprGaVHOIq1mm+0y2?=
- =?us-ascii?Q?l5vc/IGPkN1Y4rUpfDR/qIrS6iwqS/JwXrfLkjRWaasABPNSYE2RQBI9C2vJ?=
- =?us-ascii?Q?SHM7vkiR5yAvvDSmOTGWuNFuUli+izUYbY41sxfBlDfofV5bNzBo/6RXyIH6?=
- =?us-ascii?Q?PRNsWFj5EgpNj4IBi/X55hJmTKajWdlwgvWsGlosFeXaRdjuowytA7vPzN50?=
- =?us-ascii?Q?jgeZdbUp3H/HgoJO9aLolIWIWlDB?=
+	=?us-ascii?Q?IyriSh++16kr/PtMMqPNapouefGjBjzvxBIBDAAyE3nNETHyKIfIn5Itd4Gq?=
+ =?us-ascii?Q?UqOz5XJPYhmdPP3TU5NG3M13ceZO0YPyWoXtlEgQcCbR1OZNlXSspJykuftr?=
+ =?us-ascii?Q?y1aGbotnHmvUCXacZeV67osp1dwSOhQ0NAZnRECFjCxy4ZUhVQBDfeLWu12O?=
+ =?us-ascii?Q?MPmk4dGB7eJoJY88mZ6jF5jNIytZjDNX/8MC3nSv81w4VTBs1f0PvaCYR8s+?=
+ =?us-ascii?Q?c2jsjRLAo0sm4eiEeYbQiX6V3BO8bi5JxlbQ3HYOltaHVAr2219cibJgqG6r?=
+ =?us-ascii?Q?s0hsN6Wsdo4h2Ri+CFh3TA8ECfCtakaDItVSAd98Tq5t6KE+3EDWz2w84Lhz?=
+ =?us-ascii?Q?oKfkx0djHEaxB1MMMk98RdiYoSIAdQQA80QktjKd7LycHoQgCvnCwoiw0eVm?=
+ =?us-ascii?Q?dt1ooldt68zt5if8qlMvRp06uR7fXxsc/HZYDUWzNg/wr1WQUihyPnqLDSX1?=
+ =?us-ascii?Q?sJy9kbmUUoqqYZhoP1wkpVe/r+j9vXhBrp2uAieqjmGbU3Kwl/SwyRjMcy7K?=
+ =?us-ascii?Q?EOfZbjZtEP+yHx8HMx9thgyiwo064Jk0xRYmoFSOwzUNS2Ou7B+okYnNha1Q?=
+ =?us-ascii?Q?c+rfdLA1AJrw3wrHBbp8vl4bxFD5QOOQXS+OB6+QHG40PbqKfi0wNuDqsrDz?=
+ =?us-ascii?Q?39RAs90YCZgKuWduTFnuAPWi3MIPqmONwP5kBCRojftfxdzybpGUOjW339md?=
+ =?us-ascii?Q?3apSwW7MLr2zXtghJ9UGfP8eA5qQNzCMaovGLlB2FzuA6Lq3yVaaoP1wBuXb?=
+ =?us-ascii?Q?RDbbe5lEnuJwSg7q3Pfn0eziLSkF2A1dT7ejTFsMzG6Aev8+E9uJziCnvOHN?=
+ =?us-ascii?Q?cupVgLNWjLGiLAb9wc92dhQfCqHjtqU40n/KP8JB2BAwMZrajAM5fP1y6Kyu?=
+ =?us-ascii?Q?uvnd/ageDUnUiNpoLrnYOlugBxS0BQ+EXjYPDYXL26tWYIfAaOPbuMcxPtpw?=
+ =?us-ascii?Q?GXE/2pvJ3Y6SjkNKQOK8PhUdbw5t2goLzz1ed/7kJw2MHThk81PEjj7F1kS9?=
+ =?us-ascii?Q?9KjWrHKaA86ItTl4Z8C3ePyhuqbFD0xVSvQX+dYBC0q2q6fWzCZLNzIjo+qK?=
+ =?us-ascii?Q?Ws4FMQHam/9qJGE6s5HvYr/pHpQDBSVf7CwLy0GDZW4vj5lw8Kra3fnM+WuI?=
+ =?us-ascii?Q?p9Ogzxib9v+PVheEt3JtVj2kV0cgA0Br3+pZ7l5jESGRCXvESxMJdCREiTRK?=
+ =?us-ascii?Q?eAjReFJDG0Zdtfd4s1i1Hv1tmQRnz5iwsRHsv4A4DgsjNMHKxlbUR2zuUq/6?=
+ =?us-ascii?Q?2K2fOmALE6oytFPV5E91YidRChJFhbqDXQ3q+AGKoaGmNSJVXogZquheAq+0?=
+ =?us-ascii?Q?9fuhS82OAfi3+RsmbFcn+7XSdSfG2o+75dvQUmjylnDmA0tfPwmYj9izgJTw?=
+ =?us-ascii?Q?QrlOhi7GMI0VIqFGXkzCe4YE0tlm?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(7416005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(36860700004)(82310400014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 18:03:22.0188
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 18:04:04.6440
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b0fb1f0-ec97-47af-16c7-08dc622d551b
+X-MS-Exchange-CrossTenant-Network-Message-Id: f27a584a-0810-4495-2e8e-08dc622d6e83
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	MN1PEPF0000ECD8.namprd02.prod.outlook.com
+	MN1PEPF0000ECDB.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5668
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8352
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+This patchset is also available at:
 
-SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
-table to be private or shared using the Page State Change MSR protocol
-as defined in the GHCB specification.
+  https://github.com/amdese/linux/commits/snp-host-v14
 
-When using gmem, private/shared memory is allocated through separate
-pools, and KVM relies on userspace issuing a KVM_SET_MEMORY_ATTRIBUTES
-KVM ioctl to tell the KVM MMU whether or not a particular GFN should be
-backed by private memory or not.
+and is based on commit 20cc50a0410f (just before the v13 SNP patches) from:
 
-Forward these page state change requests to userspace so that it can
-issue the expected KVM ioctls. The KVM MMU will handle updating the RMP
-entries when it is ready to map a private page into a guest.
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=kvm-coco-queue
 
-Define a new KVM_EXIT_VMGEXIT for exits of this type, and structure it
-so that it can be extended for other cases where VMGEXITs need some
-level of handling in userspace.
 
-Co-developed-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- Documentation/virt/kvm/api.rst    | 33 +++++++++++++++++++++++++++++++
- arch/x86/include/asm/sev-common.h |  6 ++++++
- arch/x86/kvm/svm/sev.c            | 33 +++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h          | 17 ++++++++++++++++
- 4 files changed, 89 insertions(+)
+Patch Layout
+------------
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index f0b76ff5030d..4a7a2945bc78 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -7060,6 +7060,39 @@ Please note that the kernel is allowed to use the kvm_run structure as the
- primary storage for certain register types. Therefore, the kernel may use the
- values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
- 
-+::
-+
-+		/* KVM_EXIT_VMGEXIT */
-+		struct kvm_user_vmgexit {
-+		#define KVM_USER_VMGEXIT_PSC_MSR	1
-+			__u32 type; /* KVM_USER_VMGEXIT_* type */
-+			union {
-+				struct {
-+					__u64 gpa;
-+		#define KVM_USER_VMGEXIT_PSC_MSR_OP_PRIVATE	1
-+		#define KVM_USER_VMGEXIT_PSC_MSR_OP_SHARED	2
-+					__u8 op;
-+					__u32 ret;
-+				} psc_msr;
-+			};
-+		};
-+
-+If exit reason is KVM_EXIT_VMGEXIT then it indicates that an SEV-SNP guest
-+has issued a VMGEXIT instruction (as documented by the AMD Architecture
-+Programmer's Manual (APM)) to the hypervisor that needs to be serviced by
-+userspace. These are generally handled by the host kernel, but in some
-+cases some aspects handling a VMGEXIT are handled by userspace.
-+
-+A kvm_user_vmgexit structure is defined to encapsulate the data to be
-+sent to or returned by userspace. The type field defines the specific type
-+of exit that needs to be serviced, and that type is used as a discriminator
-+to determine which union type should be used for input/output.
-+
-+For the KVM_USER_VMGEXIT_PSC_MSR type, the psc_msr union type is used. The
-+kernel will supply the 'gpa' and 'op' fields, and userspace is expected to
-+update the private/shared state of the GPA using the corresponding
-+KVM_SET_MEMORY_ATTRIBUTES ioctl. The 'ret' field is to be set to 0 by
-+userpace on success, or some non-zero value on failure.
- 
- 6. Capabilities that can be enabled on vCPUs
- ============================================
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 1006bfffe07a..6d68db812de1 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -101,11 +101,17 @@ enum psc_op {
- 	/* GHCBData[11:0] */				\
- 	GHCB_MSR_PSC_REQ)
- 
-+#define GHCB_MSR_PSC_REQ_TO_GFN(msr) (((msr) & GENMASK_ULL(51, 12)) >> 12)
-+#define GHCB_MSR_PSC_REQ_TO_OP(msr) (((msr) & GENMASK_ULL(55, 52)) >> 52)
-+
- #define GHCB_MSR_PSC_RESP		0x015
- #define GHCB_MSR_PSC_RESP_VAL(val)			\
- 	/* GHCBData[63:32] */				\
- 	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
- 
-+/* Set highest bit as a generic error response */
-+#define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
-+
- /* GHCB Hypervisor Feature Request/Response */
- #define GHCB_MSR_HV_FT_REQ		0x080
- #define GHCB_MSR_HV_FT_RESP		0x081
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 76084e109f66..f6f54a889fde 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3463,6 +3463,36 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
- 	svm->vmcb->control.ghcb_gpa = value;
- }
- 
-+static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	u64 vmm_ret = vcpu->run->vmgexit.psc_msr.ret;
-+
-+	set_ghcb_msr(svm, (vmm_ret << 32) | GHCB_MSR_PSC_RESP);
-+
-+	return 1; /* resume guest */
-+}
-+
-+static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
-+{
-+	u64 gpa = gfn_to_gpa(GHCB_MSR_PSC_REQ_TO_GFN(ghcb_msr));
-+	u8 op = GHCB_MSR_PSC_REQ_TO_OP(ghcb_msr);
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+
-+	if (op != SNP_PAGE_STATE_PRIVATE && op != SNP_PAGE_STATE_SHARED) {
-+		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
-+		return 1; /* resume guest */
-+	}
-+
-+	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
-+	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC_MSR;
-+	vcpu->run->vmgexit.psc_msr.gpa = gpa;
-+	vcpu->run->vmgexit.psc_msr.op = op;
-+	vcpu->arch.complete_userspace_io = snp_complete_psc_msr;
-+
-+	return 0; /* forward request to userspace */
-+}
-+
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -3561,6 +3591,9 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 				  GHCB_MSR_INFO_POS);
- 		break;
- 	}
-+	case GHCB_MSR_PSC_REQ:
-+		ret = snp_begin_psc_msr(vcpu, control->ghcb_gpa);
-+		break;
- 	case GHCB_MSR_TERM_REQ: {
- 		u64 reason_set, reason_code;
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2190adbe3002..54b81e46a9fa 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -135,6 +135,20 @@ struct kvm_xen_exit {
- 	} u;
- };
- 
-+struct kvm_user_vmgexit {
-+#define KVM_USER_VMGEXIT_PSC_MSR	1
-+	__u32 type; /* KVM_USER_VMGEXIT_* type */
-+	union {
-+		struct {
-+			__u64 gpa;
-+#define KVM_USER_VMGEXIT_PSC_MSR_OP_PRIVATE	1
-+#define KVM_USER_VMGEXIT_PSC_MSR_OP_SHARED	2
-+			__u8 op;
-+			__u32 ret;
-+		} psc_msr;
-+	};
-+};
-+
- #define KVM_S390_GET_SKEYS_NONE   1
- #define KVM_S390_SKEYS_MAX        1048576
- 
-@@ -178,6 +192,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_NOTIFY           37
- #define KVM_EXIT_LOONGARCH_IOCSR  38
- #define KVM_EXIT_MEMORY_FAULT     39
-+#define KVM_EXIT_VMGEXIT          40
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -433,6 +448,8 @@ struct kvm_run {
- 			__u64 gpa;
- 			__u64 size;
- 		} memory_fault;
-+		/* KVM_EXIT_VMGEXIT */
-+		struct kvm_user_vmgexit vmgexit;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
--- 
-2.25.1
+01-04: These patches add some basic infrastructure and introduces a new
+       KVM_X86_SNP_VM vm_type to handle differences verses the existing
+       KVM_X86_SEV_VM and KVM_X86_SEV_ES_VM types.
+
+05-07: These implement the KVM API to handle the creation of a
+       cryptographic launch context, encrypt/measure the initial image
+       into guest memory, and finalize it before launching it.
+
+08-13: These implement handling for various guest-generated events such
+       as page state changes, onlining of additional vCPUs, etc.
+
+14-17: These implement the gmem hooks needed to prepare gmem-allocated
+       pages before mapping them into guest private memory ranges as
+       well as cleaning them up prior to returning them to the host for
+       use as normal memory. Because this supplants certain activities
+       like issued WBINVDs during KVM MMU invalidations, there's also
+       a patch to avoid duplicating that work to avoid unecessary
+       overhead.
+
+18:    With all the core support in place, the patch adds a kvm_amd module
+       parameter to enable SNP support.
+
+19-22: These patches all deal with the servicing of guest requests to handle
+       things like attestation, as well as some related host-management
+       interfaces.
+
+
+Testing
+-------
+
+For testing this via QEMU, use the following tree:
+
+  https://github.com/amdese/qemu/commits/snp-v4-wip3b
+
+A patched OVMF is also needed due to upstream KVM no longer supporting MMIO
+ranges that are mapped as private. It is recommended you build the AmdSevX64
+variant as it provides the kernel-hashing support present in this series:
+
+  https://github.com/amdese/ovmf/commits/apic-mmio-fix1d
+
+A basic command-line invocation for SNP would be:
+
+ qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
+  -machine q35,confidential-guest-support=sev0,memory-backend=ram1
+  -object memory-backend-memfd,id=ram1,size=4G,share=true,reserve=false
+  -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,id-auth=
+  -bios OVMF_CODE-upstream-20240410-apic-mmio-fix1d-AmdSevX64.fd
+
+With kernel-hashing and certificate data supplied:
+
+ qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
+  -machine q35,confidential-guest-support=sev0,memory-backend=ram1
+  -object memory-backend-memfd,id=ram1,size=4G,share=true,reserve=false
+  -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,id-auth=,certs-path=/home/mroth/cert.blob,kernel-hashes=on
+  -bios OVMF_CODE-upstream-20240410-apic-mmio-fix1d-AmdSevX64.fd
+  -kernel /boot/vmlinuz-$ver
+  -initrd /boot/initrd.img-$ver
+  -append "root=UUID=d72a6d1c-06cf-4b79-af43-f1bac4f620f9 ro console=ttyS0,115200n8"
+
+With standard X64 OVMF package with separate image for persistent NVRAM:
+
+ qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
+  -machine q35,confidential-guest-support=sev0,memory-backend=ram1
+  -object memory-backend-memfd,id=ram1,size=4G,share=true,reserve=false
+  -object sev-snp-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,id-auth=
+  -bios OVMF_CODE-upstream-20240410-apic-mmio-fix1d.fd 
+  -drive if=pflash,format=raw,unit=0,file=OVMF_VARS-upstream-20240410-apic-mmio-fix1d.fd,readonly=off
+
+
+Known issues / TODOs
+--------------------
+
+ * Base tree in some cases reports "Unpatched return thunk in use. This should 
+   not happen!" the first time it runs an SVM/SEV/SNP guests. This a recent
+   regression upstream and unrelated to this series:
+
+     https://lore.kernel.org/linux-kernel/CANpmjNOcKzEvLHoGGeL-boWDHJobwfwyVxUqMq2kWeka3N4tXA@mail.gmail.com/T/
+
+ * 2MB hugepage support has been dropped pending discussion on how we plan to
+   re-enable it in gmem.
+
+ * Host kexec should work, but there is a known issue with host kdump support
+   while SNP guests are running that will be addressed as a follow-up.
+
+ * SNP kselftests are currently a WIP and will be included as part of SNP
+   upstreaming efforts in the near-term.
+
+
+SEV-SNP Overview
+----------------
+
+This part of the Secure Encrypted Paging (SEV-SNP) series focuses on the
+changes required to add KVM support for SEV-SNP. This series builds upon
+SEV-SNP guest support, which is now in mainline, and and SEV-SNP host
+initialization support, which is now in linux-next.
+
+While series provides the basic building blocks to support booting the
+SEV-SNP VMs, it does not cover all the security enhancement introduced by
+the SEV-SNP such as interrupt protection, which will added in the future.
+
+With SNP, when pages are marked as guest-owned in the RMP table, they are
+assigned to a specific guest/ASID, as well as a specific GFN with in the
+guest. Any attempts to map it in the RMP table to a different guest/ASID,
+or a different GFN within a guest/ASID, will result in an RMP nested page
+fault.
+
+Prior to accessing a guest-owned page, the guest must validate it with a
+special PVALIDATE instruction which will set a special bit in the RMP table
+for the guest. This is the only way to set the validated bit outside of the
+initial pre-encrypted guest payload/image; any attempts outside the guest to
+modify the RMP entry from that point forward will result in the validated
+bit being cleared, at which point the guest will trigger an exception if it
+attempts to access that page so it can be made aware of possible tampering.
+
+One exception to this is the initial guest payload, which is pre-validated
+by the firmware prior to launching. The guest can use Guest Message requests 
+to fetch an attestation report which will include the measurement of the
+initial image so that the guest can verify it was booted with the expected
+image/environment.
+
+After boot, guests can use Page State Change requests to switch pages
+between shared/hypervisor-owned and private/guest-owned to share data for
+things like DMA, virtio buffers, and other GHCB requests.
+
+In this implementation of SEV-SNP, private guest memory is managed by a new
+kernel framework called guest_memfd (gmem). With gmem, a new
+KVM_SET_MEMORY_ATTRIBUTES KVM ioctl has been added to tell the KVM
+MMU whether a particular GFN should be backed by shared (normal) memory or
+private (gmem-allocated) memory. To tie into this, Page State Change
+requests are forward to userspace via KVM_EXIT_VMGEXIT exits, which will
+then issue the corresponding KVM_SET_MEMORY_ATTRIBUTES call to set the
+private/shared state in the KVM MMU.
+
+The gmem / KVM MMU hooks implemented in this series will then update the RMP
+table entries for the backing PFNs to set them to guest-owned/private when
+mapping private pages into the guest via KVM MMU, or use the normal KVM MMU
+handling in the case of shared pages where the corresponding RMP table
+entries are left in the default shared/hypervisor-owned state.
+
+Feedback/review is very much appreciated!
+
+-Mike
+
+
+Changes since v13:
+
+ * rebase to new kvm-coco-queue and wire up to PFERR_PRIVATE_ACCESS (Paolo)
+ * handle setting kvm->arch.has_private_mem in same location as
+   kvm->arch.has_protected_state (Paolo)
+ * add flags and additional padding fields to
+   snp_launch{start,update,finish} APIs to address alignment and
+   expandability (Paolo)
+ * update snp_launch_update() to update input struct values to reflect
+   current progress of command in situations where mulitple calls are
+   needed (Paolo)
+ * update snp_launch_update() to avoid copying/accessing 'src' parameter
+   when dealing with zero pages. (Paolo)
+ * update snp_launch_update() to use u64 as length input parameter instead
+   of u32 and adjust padding accordingly
+ * modify ordering of SNP_POLICY_MASK_* definitions to be consistent with
+   bit order of corresponding flags
+ * let firmware handle enforcement of policy bits corresponding to
+   user-specified minimum API version
+ * add missing "0x" prefixs in pr_debug()'s for snp_launch_start()
+ * fix handling of VMSAs during in-place migration (Paolo)
+
+Changes since v12:
+
+ * rebased to latest kvm-coco-queue branch (commit 4d2deb62185f)
+ * add more input validation for SNP_LAUNCH_START, especially for handling
+   things like MBO/MBZ policy bits, and API major/minor minimums. (Paolo)
+ * block SNP KVM instances from being able to run legacy SEV commands (Paolo)
+ * don't attempt to measure VMSA for vcpu 0/BSP before the others, let
+   userspace deal with the ordering just like with SEV-ES (Paolo)
+ * fix up docs for SNP_LAUNCH_FINISH (Paolo)
+ * introduce svm->sev_es.snp_has_guest_vmsa flag to better distinguish
+   handling for guest-mapped vs non-guest-mapped VMSAs, rename
+   'snp_ap_create' flag to 'snp_ap_waiting_for_reset' (Paolo)
+ * drop "KVM: SEV: Use a VMSA physical address variable for populating VMCB"
+   as it is no longer needed due to above VMSA rework
+ * replace pr_debug_ratelimited() messages for RMP #NPFs with a single trace
+   event
+ * handle transient PSMASH_FAIL_INUSE return codes in kvm_gmem_invalidate(),
+   switch to WARN_ON*()'s to indicate remaining error cases are not expected
+   and should not be seen in practice. (Paolo)
+ * add a cond_resched() in kvm_gmem_invalidate() to avoid soft lock-ups when
+   cleaning up large guest memory ranges.
+ * rename VLEK_REQUIRED to VCEK_DISABLE. it's be more applicable if another
+   key type ever gets added.
+ * don't allow attestation to be paused while an attestation request is
+   being processed by firmware (Tom)
+ * add missing Documentation entry for SNP_VLEK_LOAD
+ * collect Reviewed-by's from Paolo and Tom
+
+Changes since v11:
+
+ * Rebase series on kvm-coco-queue and re-work to leverage more
+   infrastructure between SNP/TDX series.
+ * Drop KVM_SNP_INIT in favor of the new KVM_SEV_INIT2 interface introduced
+   here (Paolo):
+     https://lore.kernel.org/lkml/20240318233352.2728327-1-pbonzini@redhat.com/
+ * Drop exposure API fields related to things like VMPL levels, migration
+   agents, etc., until they are actually supported/used (Sean)
+ * Rework KVM_SEV_SNP_LAUNCH_UPDATE handling to use a new
+   kvm_gmem_populate() interface instead of copying data directly into
+   gmem-allocated pages (Sean)
+ * Add support for SNP_LOAD_VLEK, rework the SNP_SET_CONFIG_{START,END} to
+   have simpler semantics that are applicable to management of SNP_LOAD_VLEK
+   updates as well, rename interfaces to the now more appropriate
+   SNP_{PAUSE,RESUME}_ATTESTATION
+ * Fix up documentation wording and do print warnings for
+   userspace-triggerable failures (Peter, Sean)
+ * Fix a race with AP_CREATION wake-up events (Jacob, Sean)
+ * Fix a memory leak with VMSA pages (Sean)
+ * Tighten up handling of RMP page faults to better distinguish between real
+   and spurious cases (Tom)
+ * Various patch/documentation rewording, cleanups, etc.
+
+
+----------------------------------------------------------------
+Ashish Kalra (1):
+      KVM: SEV: Avoid WBINVD for HVA-based MMU notifications for SNP
+
+Brijesh Singh (11):
+      KVM: SEV: Add GHCB handling for Hypervisor Feature Support requests
+      KVM: SEV: Add initial SEV-SNP support
+      KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
+      KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command
+      KVM: SEV: Add KVM_SEV_SNP_LAUNCH_FINISH command
+      KVM: SEV: Add support to handle GHCB GPA register VMGEXIT
+      KVM: SEV: Add support to handle MSR based Page State Change VMGEXIT
+      KVM: SEV: Add support to handle Page State Change VMGEXIT
+      KVM: SEV: Add support to handle RMP nested page faults
+      KVM: SVM: Add module parameter to enable SEV-SNP
+      KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE event
+
+Michael Roth (8):
+      KVM: SEV: Select KVM_GENERIC_PRIVATE_MEM when CONFIG_KVM_AMD_SEV=y
+      KVM: SEV: Add support for GHCB-based termination requests
+      KVM: SEV: Implement gmem hook for initializing private pages
+      KVM: SEV: Implement gmem hook for invalidating private pages
+      KVM: x86: Implement gmem hook for determining max NPT mapping level
+      crypto: ccp: Add the SNP_VLEK_LOAD command
+      crypto: ccp: Add the SNP_{PAUSE,RESUME}_ATTESTATION commands
+      KVM: SEV: Provide support for SNP_EXTENDED_GUEST_REQUEST NAE event
+
+Tom Lendacky (2):
+      KVM: SEV: Add support to handle AP reset MSR protocol
+      KVM: SEV: Support SEV-SNP AP Creation NAE event
+
+ Documentation/virt/coco/sev-guest.rst              |   69 +-
+ Documentation/virt/kvm/api.rst                     |   73 +
+ .../virt/kvm/x86/amd-memory-encryption.rst         |  110 +-
+ arch/x86/include/asm/kvm_host.h                    |    2 +
+ arch/x86/include/asm/sev-common.h                  |   22 +-
+ arch/x86/include/asm/sev.h                         |   15 +
+ arch/x86/include/asm/svm.h                         |    9 +-
+ arch/x86/include/uapi/asm/kvm.h                    |   48 +
+ arch/x86/kvm/Kconfig                               |    3 +
+ arch/x86/kvm/mmu.h                                 |    2 -
+ arch/x86/kvm/mmu/mmu.c                             |    1 +
+ arch/x86/kvm/svm/sev.c                             | 1447 +++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c                             |   44 +-
+ arch/x86/kvm/svm/svm.h                             |   50 +
+ arch/x86/kvm/trace.h                               |   31 +
+ arch/x86/kvm/x86.c                                 |   17 +
+ arch/x86/virt/svm/sev.c                            |   80 ++
+ drivers/crypto/ccp/sev-dev.c                       |   83 ++
+ include/linux/psp-sev.h                            |    4 +-
+ include/uapi/linux/kvm.h                           |   28 +
+ include/uapi/linux/psp-sev.h                       |   39 +
+ include/uapi/linux/sev-guest.h                     |    9 +
+ virt/kvm/guest_memfd.c                             |    4 +-
+ 23 files changed, 2155 insertions(+), 35 deletions(-)
+
 
 
