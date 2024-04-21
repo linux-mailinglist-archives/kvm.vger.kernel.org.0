@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-15439-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15442-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF8D28AC091
-	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 20:08:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A05168AC09B
+	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 20:09:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F35611C209E9
-	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 18:08:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 572BB281354
+	for <lists+kvm@lfdr.de>; Sun, 21 Apr 2024 18:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A623E479;
-	Sun, 21 Apr 2024 18:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21E63D3A4;
+	Sun, 21 Apr 2024 18:09:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jNGIwzij"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="nLjc85bm"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2073.outbound.protection.outlook.com [40.107.95.73])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2053.outbound.protection.outlook.com [40.107.243.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E903A8D2;
-	Sun, 21 Apr 2024 18:08:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529C72C853;
+	Sun, 21 Apr 2024 18:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713722885; cv=fail; b=JpFjhFDvb6AO7dM9vaeZoB/ZK+F+xGTsc0WtJkznJwwyuz4XGIEZReyoXTHzWV4W+wmVC5LyHuoUmX4evWiU+6kGCHSoVTJb/3J2a9xAiN8Y/Z8Ew24GCsB6+sy3b6vDFgw9MNNb0s2GqG+6LzHjUisU3J7masNPNBIGjJ7Zblc=
+	t=1713722952; cv=fail; b=CfJ/R+3Ts6jDbEawUaYMVk4F4NedZT0GJQnHvaJolcV3q3ATEkly7aDh7Yf58zSwe8B97Qpzvze/AbF1UMgjRgk+/nsiCIIOdhu0Dhp46wcDKONGpL2BC/vjD6HFXbK7nE9UrsseG2MbzuFrN758BkxxQtmxDdDLzI2slOkD1jg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713722885; c=relaxed/simple;
-	bh=FJCMQvRyfp5Z1IhuXUvGBSE2rK2rAfv2nhEopFQTfmA=;
+	s=arc-20240116; t=1713722952; c=relaxed/simple;
+	bh=uQ7Kx3TwQhw26SgLxowep5X/GtjYEaH5Eg1Jg4fANxI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oBxDcd8rI/1/WReUr1P+bK3rj+XkFYt7tNiw5wzorR5xg8e+7ck5/sWWpEpiWctGYbCR8YbhU8k79z8ZDhX1hzLiIMcIGd1ZcT4zr/kgrm7hRxrOhpC6on/1ciMKg2hWAomAVXLQFqOdieW028US07e/LlPD/kH51fG8y47/aC4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jNGIwzij; arc=fail smtp.client-ip=40.107.95.73
+	 MIME-Version:Content-Type; b=XvmGQrhVsD+5qbkMHg1qqAakImG0xl2BpsT2Jo/scBZKeJ9XI4TbZpL3bzAZq52Rv8ATLC2SqpK/81wOwDbEVUvsF5WrEWNsWIzH3PI8yYccKq02O6egA+GEJdGlHBfTEHqefs7gAig7CYzd9Q3Lz/N8AL4ZUBECKWs16yMHDkA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=nLjc85bm; arc=fail smtp.client-ip=40.107.243.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aUET9UShXNzkoIumpCSTkHfkNbTLI8FoD2hpzMvjJ327upulYGzw3bJJdkXJ8zY1bj8JsonJm3Wa65ZuNKbzdS7vnqGoMwDTutQB2pSdjSoDPkhmNwiwtT5kVH8s7J5iUvHQ51YPLzf0yZ4kT0r/JzLfC3m/hHI+P+qqpVZsRtVQJQmNr0hVKqbUxi/7KT5CutZxnKaxdbyCZuj3wDptdKVQZZbgWk0lknBVttflr6vMXhBs0NfJHGwHApLcPXYXDMoQC6sLdsk2NiZkpMap/W39wmJguyw+BcxktALIz/ay13x5y2rnPL700t0c9xnBwzTUpmGyRBQuQMUgURKl2Q==
+ b=GhTe5uq0el5Ao6VZyd18+tbbXC5IVMDSuCKTOuGuUE+VFFy6CinTW6rOYBqsOEnWPDnf7CcKUZbq28b0wVVxx4Eh1/AdJk8CWarMMb2/ZFTvMHhJAkfEOd6Z+tE2iQhkrZJVGgX9Ec5t+5QPL59Obd9/LZGdkyh8Euduh3r+1uIKjZJQ+rK/UpiS/T/bAGxLJUkU8kAPxpY5/auFcLjV5b1k/u3ilVitlzW6wg4YtMZcm2Q4GUIMl8J0YyQSr8mK1fFOYkUgS+pH4fbGO7x3y8A/qeFOzJVrPxqNvW+wKSVRizelJbIO06KnBZezzBUi5GIyUDznbf8LCGfgF4WYeA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cXRnpadbMHv81jR+cczjNT88FJu0zOLgWChtKNLc+po=;
- b=mmPxUQn63g704oM2HDmjqZrE0ovTfRwobZ4Tir+k9GSdRdUUfnItYDb1H1lviUWlpOEttneXhr6FBaKYxvUmiGtYAgFBNDVH4y4FR1UY4aziqXjagzj30rQNAuK/epQ25SZ4NwmGHey3s7J1hV1Xyf45kdmIC4SXufLSmI0p7kutnkPRiOffOi+iIWle0b040Y15fcgxTWVn3ic22Ap7dW0Wdz8MnqSpbBRuqNPN07IdYb05aK6t2KGv/9qs+QCusmQWQvS9VbO9CbRJpbiL+plzdq0JPyKRB0mOGGmBpmBqXXMNju6WgdcaHWsQMHT/+b2HLd16GLbn0Z6vlsQimw==
+ bh=mUcwiyFHOOyR1TxaHBGwT/R8u08BH+n1ydQXmt0BUDo=;
+ b=UD8V9GBwoE04GYRd7YZQ0YI4AVyftlEsmbz1G0z9Axszdc7TROobl6ErRfftmNvc1KTvyPHl8dHEtFokQeHygHc4ZY59WOgPlKdJDvpWE0CfHlo97o1xAnhx9zlNdWoNyPUN6cofILh+PGKMR2nEMIh/hHdLZOPzStUZ9gLHOvaTcTXkE8JPO4D8FJ8rGLvq630nsH0j68X/BEXHPeeRpIW6Dz8cNyk5DfqIZ2yWwV2i0sFTVN3e1sPZxQwC+tpbfAjDaGHXb/WSZQEOoVsvK5e52VLdalR4YDmNUKwoRqdQ80tZJB+/WI2nTK+ECyjYzLgM2Aw8zJE1JUfLE7SJmg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cXRnpadbMHv81jR+cczjNT88FJu0zOLgWChtKNLc+po=;
- b=jNGIwzij1LL7OzMWrMyVixUzZqLyPKmKAE8joenzylDExAw8vvdnc9v03KuYB+Ki0jn2McxIaAVy1J4KPp6HD4YEINcPLvqqAwePERodS3Exlvg2gaFc2g+dtvoBmdpBhkfjW8Aydz7QuG2RO8vCNSK/GpXQ9a7BNIvXbNQxSdQ=
-Received: from DS7PR03CA0266.namprd03.prod.outlook.com (2603:10b6:5:3b3::31)
- by PH7PR12MB8106.namprd12.prod.outlook.com (2603:10b6:510:2ba::9) with
+ bh=mUcwiyFHOOyR1TxaHBGwT/R8u08BH+n1ydQXmt0BUDo=;
+ b=nLjc85bmeMpHY4+KmPiz1lSmKf5c3iGwtbhjaOCa1ZeHxPklaTmVD8BByuNP6/RzHwGAA838g9SSQN6KUlHoYmaALQMIVR+Kv4IstiGxzJta9u36646ByjECHLgOAElTI15osR/CSVJh8C6ZHSztFR4VENXjLfbc+6WvjeQMU7Y=
+Received: from BYAPR11CA0097.namprd11.prod.outlook.com (2603:10b6:a03:f4::38)
+ by PH8PR12MB7448.namprd12.prod.outlook.com (2603:10b6:510:214::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.39; Sun, 21 Apr
- 2024 18:08:01 +0000
-Received: from CY4PEPF0000FCBF.namprd03.prod.outlook.com
- (2603:10b6:5:3b3:cafe::36) by DS7PR03CA0266.outlook.office365.com
- (2603:10b6:5:3b3::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.23 via Frontend
- Transport; Sun, 21 Apr 2024 18:08:00 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Sun, 21 Apr
+ 2024 18:09:03 +0000
+Received: from CY4PEPF0000FCC4.namprd03.prod.outlook.com
+ (2603:10b6:a03:f4:cafe::68) by BYAPR11CA0097.outlook.office365.com
+ (2603:10b6:a03:f4::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.32 via Frontend
+ Transport; Sun, 21 Apr 2024 18:09:03 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CY4PEPF0000FCBF.mail.protection.outlook.com (10.167.242.101) with Microsoft
+ CY4PEPF0000FCC4.mail.protection.outlook.com (10.167.242.106) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7519.19 via Frontend Transport; Sun, 21 Apr 2024 18:08:00 +0000
+ 15.20.7519.19 via Frontend Transport; Sun, 21 Apr 2024 18:09:03 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 21 Apr
- 2024 13:07:58 -0500
+ 2024 13:09:02 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -85,10 +85,11 @@ CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
-Subject: [PATCH v14 01/22] KVM: SEV: Select KVM_GENERIC_PRIVATE_MEM when CONFIG_KVM_AMD_SEV=y
-Date: Sun, 21 Apr 2024 13:01:01 -0500
-Message-ID: <20240421180122.1650812-2-michael.roth@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
+	<brijesh.singh@amd.com>
+Subject: [PATCH v14 02/22] KVM: SEV: Add support to handle AP reset MSR protocol
+Date: Sun, 21 Apr 2024 13:01:02 -0500
+Message-ID: <20240421180122.1650812-3-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240421180122.1650812-1-michael.roth@amd.com>
 References: <20240421180122.1650812-1-michael.roth@amd.com>
@@ -104,71 +105,190 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCBF:EE_|PH7PR12MB8106:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1c03493-3d07-441d-f0f2-08dc622dfb3d
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC4:EE_|PH8PR12MB7448:EE_
+X-MS-Office365-Filtering-Correlation-Id: fc9b7ceb-3d34-4834-4b05-08dc622e20b5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?kjNFs8omnqx05yyFPHINeNWf1DiSBVYTOi4Hv8QxeiuSNhfBnHh2M+vnSO5u?=
- =?us-ascii?Q?M7bE3U40N1xViU6dv8r6d/o8ItcsAIJ0soKG9DU/d77dw9kraiKbkepddsUX?=
- =?us-ascii?Q?hlsMYNzbT+mKuTKFrjeFrfyEuC0ZBa84bwtDLtuz8h0Qz9xJESen9eKosje5?=
- =?us-ascii?Q?ZfJL8bkeZD71WE/Do2UJvpOGjdzKs4kgbMDoTLf83cU5RTGaBaFpNii/8Fsc?=
- =?us-ascii?Q?pvjjFsWeShqYYEkvJmJRQik/ByWvUK0rqZ9djy7hLDRe0ct2xzPygysPq/fW?=
- =?us-ascii?Q?yDE3qF5Db6dUnjWPLoFwIeKR6VZ0iaxOoy4PRzRAgxdknt2WqU75CEOatGC7?=
- =?us-ascii?Q?HKiBl7TOPesnt2dtsabjmjuxDRj2M2xhxUNqONCucOlh+M1jPJmsFCmoHWHb?=
- =?us-ascii?Q?xEkka4TW4Ti+MLxESck58q5zXU7kNmwYQmbcunuaMNWqqBnBym6Mzb4mp8rH?=
- =?us-ascii?Q?rrxjdFkQXLk0c6tq3uW7g5Hn06ZpLr5I6z63AqmfIU+XERIK2uD0igWcAhF8?=
- =?us-ascii?Q?O6sGeHGPAJBrat4I4PuNGKvLZNO17WRaIp6nEaKPE3w+o5QmRYYJ1r5xaaAN?=
- =?us-ascii?Q?hUBwzhEJNle9koyLWQSp2snjx4gyJRhvt57r2r+pUKFmuHsp8JumIU2uspc6?=
- =?us-ascii?Q?wmIGrOQSPhs9H5O58WlxFZTz5JRFFjMfQoEAtG/3CynjnjWUU4W0GP6RAwv4?=
- =?us-ascii?Q?UkhW5Jvswye9RSoO5F64gO56CIbH+vGunAVLbb2h/uZCRGzCk9m1xj+M10RK?=
- =?us-ascii?Q?gpTY5eXtu0X9V3ASP49dfMz+buq35aTJeIVarFWEPUiirLS1MXFJAeBPqud4?=
- =?us-ascii?Q?DhV+izo07QbwXOQqahNPeLB/mEOvXWUkdb7Hf2AWOFwokSlyhyyX0Rl43GKk?=
- =?us-ascii?Q?3Ljd6M0QgXwHgYpLqPgU/KCNkJEMRmDZ7E7cG2OsqnKwsTqZ3F6zPW/yCPfQ?=
- =?us-ascii?Q?T77I/BkiXoQuI1XmuXc30SaICSZjnEEreN4F86gOTlPvQ2q23PiQ0jsSNpGn?=
- =?us-ascii?Q?vblNNWHTuBvNfVpfuer5AuTdl7wsrmYb3mpeZAOAT5GAR5i79/NE6u6vp0nH?=
- =?us-ascii?Q?AMS35MnTMw3W+7eGDjGaNKi4GZsPFlrUFIHWWywmA8akZfd949DeKYC0jVuL?=
- =?us-ascii?Q?N6KS3t4hqUBrS+pqWaPB0z7u1jTB1rN8sjQZ86qCW0bb3P6Hg9lreARYNMxU?=
- =?us-ascii?Q?KL7TOrop2j2Eq5MyCCrlGnGbImzPUFiS3hmBS7ms+ST8Y1zdCNJ5gzIqeBma?=
- =?us-ascii?Q?VMivlffhwKlnfMJkF1GaslytsPDB/74si4zRRK6mz4vDPJ74XU9HsJweL0FC?=
- =?us-ascii?Q?fXuv9yKSyeUo1EOlxBHKzaIsWPr2wMsLnxOnj6j/uhwn+VR6w2+f42sG4TR2?=
- =?us-ascii?Q?PvsAi6a4nj8GtUKvj38wriVgzLIQ?=
+	=?us-ascii?Q?huaABAK0E6/58H8ZcUROohLzz652unpG7GsDtz3fKe1GK/gXuqVQ7p2y0Mtt?=
+ =?us-ascii?Q?RBYj+WLS/ftxC2RzSd9Yz9DRWfRK3OvsUKu8b3zkVvBzMutUDBPAv8WmOODr?=
+ =?us-ascii?Q?gUrcu9JZQ/b/aRWdcL+Ud+0IPLU9aSOadWlPySp8h4KjN/Rboicfqis3Dg/Q?=
+ =?us-ascii?Q?23UcDk8bUwSUEQI1qyWOeN13JZtEkHOA4iv+KJevJPn1cVQ/wNmy5VEdOKyP?=
+ =?us-ascii?Q?27UXOoO6lO6mvNxAH/S5VOtMF8egrCY6DkJ6OTs92TbwjEWL1juhO0hPHWri?=
+ =?us-ascii?Q?fs40gfXmhSyMSr1bNtQ3pa3O7QsTZ7pEuaF1j7X4nS3JGlN8w6AO9hdzISw3?=
+ =?us-ascii?Q?COG57HHeQsD3BH+sZ3gXbf+ermmqi7kOZ9RAch/HORr2KQdgsDbAZzHMjYQS?=
+ =?us-ascii?Q?c9faN7AbSbqDyTx4E0O5+QHoY5NwtgYlTmJozQM5zd3O9KrFsVJtyHL2DE1g?=
+ =?us-ascii?Q?X27W8OT9rlV9eqswPDtZvxGRdB4yWl+WiYsPqFFX/bcbQADr+4yfpRir18sl?=
+ =?us-ascii?Q?2EiJ3vk1SqP3trfWIcn+nS2XcEpS8Ym5QKP6x9Ln7JNIkt0DziUi2xpa+aPF?=
+ =?us-ascii?Q?qLQhxNh/NP1l2557/7UgqlL/gl7hKsiRVjs9NLAYpHwFGMtvDJSWSJPUEEp2?=
+ =?us-ascii?Q?8QaxJ44vldiKHuwjepeyWuHmIydwRNasNGgMh5gou5ZrwuIQYVeXAww5nNGq?=
+ =?us-ascii?Q?lcQhBvvZR/z56h1XPhStBhJeQiqUcLIbca6lCDZMjH1eMztCcpjBPR6GVbxZ?=
+ =?us-ascii?Q?2HZC/pIJJt6vQqo1DzxoR5BrhqMIEhlvPcwtHF3zZcAP8UccwfwAMsdrqn+J?=
+ =?us-ascii?Q?Q+/1JJx5vVWqbMf2f2jFDoETcqZt7EW5nzuW6cCVuwGJguhUEkcEFFjjSn9L?=
+ =?us-ascii?Q?cWmXgsnKc02xJj7k6asNVPFlxmsNvMzBeIsXwGNURvqIw8lXuHh6hucjWZpu?=
+ =?us-ascii?Q?ZkHwu2X0P/M1OSyHg/lwPVZ2umY2l22AM/ri1F8+Uj6Bw0sysSdm9pBnWROj?=
+ =?us-ascii?Q?9k/CXgHi7zL/MwZY+/4OMh9nPm6ldfgyaQn4xZRJ60DnaV1OMkjkxSFZTSZ4?=
+ =?us-ascii?Q?FXXPTuBtwA8Co5cVEjUYbmdmvr+xr1nRSBheAt9/lAkuHt430GRUrUG7oAQt?=
+ =?us-ascii?Q?fFcK3f4LxelFImvcLuJH/ptm9tZSOuHpAegBRFgeiENzbQSpCzD2KazSu8so?=
+ =?us-ascii?Q?0uMuY9BzcRzlj0JhtQ94wRyXmBoHczUIWOQbJzZB44OGnleErZ+JxKgDdReh?=
+ =?us-ascii?Q?3u5xTLvZ3NOn6AZb+U1Q3CdhUS3RKRQEhOTdBPXe59OouCfCtrToTQhXnslp?=
+ =?us-ascii?Q?n/jYjODTGsOs6Plk60x75p8i4kC/SlHYiwVOM43BhmV81p972EiOcumU2suF?=
+ =?us-ascii?Q?n3GbuKkwSxIOZkL9UZbT4Vw7gJyh?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(82310400014)(376005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(1800799015)(7416005)(376005)(82310400014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 18:08:00.6865
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Apr 2024 18:09:03.5600
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1c03493-3d07-441d-f0f2-08dc622dfb3d
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc9b7ceb-3d34-4834-4b05-08dc622e20b5
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCBF.namprd03.prod.outlook.com
+	CY4PEPF0000FCC4.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8106
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7448
 
-SEV-SNP relies on private memory support to run guests, so make sure to
-enable that support via the CONFIG_KVM_GENERIC_PRIVATE_MEM config
-option.
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
+Add support for AP Reset Hold being invoked using the GHCB MSR protocol,
+available in version 2 of the GHCB specification.
+
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ arch/x86/include/asm/sev-common.h |  6 ++--
+ arch/x86/kvm/svm/sev.c            | 56 ++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.h            |  1 +
+ 3 files changed, 53 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index d64fb2b3eb69..5e72faca4e8f 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -136,6 +136,7 @@ config KVM_AMD_SEV
- 	depends on KVM_AMD && X86_64
- 	depends on CRYPTO_DEV_SP_PSP && !(KVM_AMD=y && CRYPTO_DEV_CCP_DD=m)
- 	select ARCH_HAS_CC_PLATFORM
-+	select KVM_GENERIC_PRIVATE_MEM
- 	help
- 	  Provides support for launching Encrypted VMs (SEV) and Encrypted VMs
- 	  with Encrypted State (SEV-ES) on AMD processors.
+diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
+index b463fcbd4b90..01261f7054ad 100644
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@ -54,8 +54,10 @@
+ 	(((unsigned long)fn) << 32))
+ 
+ /* AP Reset Hold */
+-#define GHCB_MSR_AP_RESET_HOLD_REQ	0x006
+-#define GHCB_MSR_AP_RESET_HOLD_RESP	0x007
++#define GHCB_MSR_AP_RESET_HOLD_REQ		0x006
++#define GHCB_MSR_AP_RESET_HOLD_RESP		0x007
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_POS	12
++#define GHCB_MSR_AP_RESET_HOLD_RESULT_MASK	GENMASK_ULL(51, 0)
+ 
+ /* GHCB GPA Register */
+ #define GHCB_MSR_REG_GPA_REQ		0x012
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 598d78b4107f..6e31cb408dd8 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -49,6 +49,10 @@ static bool sev_es_debug_swap_enabled = true;
+ module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0444);
+ static u64 sev_supported_vmsa_features;
+ 
++#define AP_RESET_HOLD_NONE		0
++#define AP_RESET_HOLD_NAE_EVENT		1
++#define AP_RESET_HOLD_MSR_PROTO		2
++
+ static u8 sev_enc_bit;
+ static DECLARE_RWSEM(sev_deactivate_lock);
+ static DEFINE_MUTEX(sev_bitmap_lock);
+@@ -2727,6 +2731,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 
+ void sev_es_unmap_ghcb(struct vcpu_svm *svm)
+ {
++	/* Clear any indication that the vCPU is in a type of AP Reset Hold */
++	svm->sev_es.ap_reset_hold_type = AP_RESET_HOLD_NONE;
++
+ 	if (!svm->sev_es.ghcb)
+ 		return;
+ 
+@@ -2938,6 +2945,22 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 				  GHCB_MSR_INFO_POS);
+ 		break;
+ 	}
++	case GHCB_MSR_AP_RESET_HOLD_REQ:
++		svm->sev_es.ap_reset_hold_type = AP_RESET_HOLD_MSR_PROTO;
++		ret = kvm_emulate_ap_reset_hold(&svm->vcpu);
++
++		/*
++		 * Preset the result to a non-SIPI return and then only set
++		 * the result to non-zero when delivering a SIPI.
++		 */
++		set_ghcb_msr_bits(svm, 0,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
++
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
+ 	case GHCB_MSR_TERM_REQ: {
+ 		u64 reason_set, reason_code;
+ 
+@@ -3037,6 +3060,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 		ret = 1;
+ 		break;
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
++		svm->sev_es.ap_reset_hold_type = AP_RESET_HOLD_NAE_EVENT;
+ 		ret = kvm_emulate_ap_reset_hold(vcpu);
+ 		break;
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE: {
+@@ -3280,15 +3304,31 @@ void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
+ 		return;
+ 	}
+ 
+-	/*
+-	 * Subsequent SIPI: Return from an AP Reset Hold VMGEXIT, where
+-	 * the guest will set the CS and RIP. Set SW_EXIT_INFO_2 to a
+-	 * non-zero value.
+-	 */
+-	if (!svm->sev_es.ghcb)
+-		return;
++	/* Subsequent SIPI */
++	switch (svm->sev_es.ap_reset_hold_type) {
++	case AP_RESET_HOLD_NAE_EVENT:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set SW_EXIT_INFO_2 to a non-zero value.
++		 */
++		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
++		break;
++	case AP_RESET_HOLD_MSR_PROTO:
++		/*
++		 * Return from an AP Reset Hold VMGEXIT, where the guest will
++		 * set the CS and RIP. Set GHCB data field to a non-zero value.
++		 */
++		set_ghcb_msr_bits(svm, 1,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_MASK,
++				  GHCB_MSR_AP_RESET_HOLD_RESULT_POS);
+ 
+-	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, 1);
++		set_ghcb_msr_bits(svm, GHCB_MSR_AP_RESET_HOLD_RESP,
++				  GHCB_MSR_INFO_MASK,
++				  GHCB_MSR_INFO_POS);
++		break;
++	default:
++		break;
++	}
+ }
+ 
+ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 323901782547..6fd0f5862681 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -199,6 +199,7 @@ struct vcpu_sev_es_state {
+ 	u8 valid_bitmap[16];
+ 	struct kvm_host_map ghcb_map;
+ 	bool received_first_sipi;
++	unsigned int ap_reset_hold_type;
+ 
+ 	/* SEV-ES scratch area support */
+ 	u64 sw_scratch;
 -- 
 2.25.1
 
