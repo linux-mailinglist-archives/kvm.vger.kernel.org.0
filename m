@@ -1,241 +1,382 @@
-Return-Path: <kvm+bounces-15451-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15452-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 941F18AC315
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 05:35:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B4F8AC340
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 05:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C5771C209B3
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 03:35:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 451751C20B23
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 03:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7899EFBEA;
-	Mon, 22 Apr 2024 03:35:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D22A910A2B;
+	Mon, 22 Apr 2024 03:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OY880Cb+"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="WU8Zb0zF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7804C97;
-	Mon, 22 Apr 2024 03:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713756899; cv=fail; b=teKONVbMhfr/v+wTZ/kBPAgJcYigwojvJpRxkyJsy5BFW55hkvQsv8TFVgnu5arwnwV0AW3TjDz+SCcoykCdr05V723I7B/5s0rAI1fcXPQkzeF5pDdC9dU/SrmxOlFqwy/F6dqFknZTpep8D7x+StRIXdmjEfB8FghcU8V6hxA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713756899; c=relaxed/simple;
-	bh=zq5GWBiedCO8+HZp9QPXJGopyfrkSnvsX3q1HbU2YtU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=izlpx5/j9oIm63bfZR/RaOkWJZoT7zHy5IEIZWxUsrgs2td1UY7WmewWOskLz3t2T/OLSWLe2tX18bfWafciWgtlIjOOw+aN5GSFxVlag/urn5BR1TgxV4mZ3QCjF3YSoakxPLRkPg7iI5/Tq2+zQWqYMCP49WNyImjMwvn92NI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OY880Cb+; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713756898; x=1745292898;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=zq5GWBiedCO8+HZp9QPXJGopyfrkSnvsX3q1HbU2YtU=;
-  b=OY880Cb+h6CJMADxCmOzAb/DVLY7Y7iI21SpbWESiumn17xdM6uKmmrx
-   s0hEwQdO4Jj6iM6O7nKWR03Anc5UQRVB765wKifDIe0Jxc9E/hJWiZVYd
-   XIsVTMY2Jbtv/3GlUWDp94vUWadZLe8EfCTS9n4tNLDUAPbVF7mqOVWD+
-   N2371zTjONYpYUgnXR4H62WdRpfqeuCYitlUZyuJv+/ui+B2o5105vq3p
-   AHqbuCJADHnMVlWnoU7/jKNOUMwFQZiYmurormYTAfh0NMjzd955oegxc
-   AtE05XjKcj8vprd07hixNv4VpITY+VDD8LbfoQD2gTld/FOv6a0eCJIFg
-   A==;
-X-CSE-ConnectionGUID: gIif89HOQGah31ac3rMsNQ==
-X-CSE-MsgGUID: eVGjjmSyQsWDmIlVHIm0dg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11051"; a="13053720"
-X-IronPort-AV: E=Sophos;i="6.07,219,1708416000"; 
-   d="scan'208";a="13053720"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2024 20:34:57 -0700
-X-CSE-ConnectionGUID: jkiIql6HRK+mLWPAvha0xg==
-X-CSE-MsgGUID: LVQNWj+ORRWLoLulijxB8g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,219,1708416000"; 
-   d="scan'208";a="47177889"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Apr 2024 20:34:56 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 21 Apr 2024 20:34:55 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Sun, 21 Apr 2024 20:34:55 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sun, 21 Apr 2024 20:34:55 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GDw2++LjtplAmZUlFGzfW2xdtMuHBoqdtdK1RqoQkG3k/EKqsZ8MYic0DeoXO4McRJnPa852DKGSHbOQC7eNWOJOx1469j18PGJZtFlf80E/HiOftSaOgyNfaiLHCjofwfPlcgZuhc9/3LlY1wNk6KqXR7TejgQ2iOhSgqmuxKWcq3m20PRaRCrXnPPOt048pYPzviiGlKJEfjzSelYxi6u9VinxEDmu9kPq8YxeKXyLkWXf7DSNG9XgspMPk/Kqz5MfCm/Hb/rsdusdwuP/DvoqVKJZgRbUGoJgCdvNwSltKROEm0eyWxzBRiw1C55VwClTCJn7U6WcAPlgz+U8CA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sbMj5fgZx43+lwB9xuVMJrmpKjIEYHk1LDBZMM1DoqY=;
- b=ipELJCbtjttzfoIEz/CYt+fd0JWDmPB/KTWEYHzcq0hGtefCKf/Qduk2TM6OX+mWgeH96eW3DHswmd7nJ2cOMfhRGLd4MHUrkjND5ehqjZsxBkZJkFqtGhQudfrEkF2Qx7/vSFm8GjdKGuiUOddG1CayNlofwESVjNSDArX5MZrw14Y4t6fhe7i9cjthygXw2yb9rVcoukEzVnQUL4G58oC2n8nL6vVQo17ABLTNAV2CKSE6x2Fs3/aV7ZRlpoAZgKzYO9P1zNcxA60fqwnfdnBtqa4bclPiinxSHkaehN1etiIKcDXgUrgh273OhNzq8rVuD2Tw6q3oxD8DiwjsHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- CO1PR11MB4929.namprd11.prod.outlook.com (2603:10b6:303:6d::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7519.20; Mon, 22 Apr 2024 03:34:52 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::f62c:98e2:37af:8073]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::f62c:98e2:37af:8073%7]) with mapi id 15.20.7519.018; Mon, 22 Apr 2024
- 03:34:52 +0000
-Date: Mon, 22 Apr 2024 11:34:18 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: <isaku.yamahata@intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	<erdemaktas@google.com>, Sean Christopherson <seanjc@google.com>, Sagi Shahar
-	<sagis@google.com>, Kai Huang <kai.huang@intel.com>, <chen.bo@intel.com>,
-	<hang.yuan@intel.com>, <tina.zhang@intel.com>, Binbin Wu
-	<binbin.wu@linux.intel.com>
-Subject: Re: [PATCH v19 058/130] KVM: x86/mmu: Add a private pointer to
- struct kvm_mmu_page
-Message-ID: <ZiXautOkEweWfUL0@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <9d86b5a2787d20ffb5a58f86e43601a660521f16.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <9d86b5a2787d20ffb5a58f86e43601a660521f16.1708933498.git.isaku.yamahata@intel.com>
-X-ClientProxiedBy: SG2PR02CA0087.apcprd02.prod.outlook.com
- (2603:1096:4:90::27) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87821FBE8
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 03:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713758240; cv=none; b=IfqDXDuGT6upn0SJw7cPGPJ1rYOkI0jf7ho6pSIEixRYPJ02dFeAlMBWvuH7vgd1qmXehX6j5764pQTd6Rl1xBDjPjXtuqh4ZFqlPBigZFTkKJ0/3/pBeRRNxq7Lvj1D6vPV6ScshXbkn/Az5nVJJTwjIaeBs0K3q3adAX4oSYw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713758240; c=relaxed/simple;
+	bh=C7oXOAIueSChCOFjBf4yXr47ijuvzjjzUww+hjXS/Ic=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ncqXSN/NUFU8VDEz+/2SJ5lXwEXieKeQ1h90YeHiUaI8jwlN5VjQtygDx0oKPeBHUFbIJahmhSYQ79SaENob1+maFc5segmdsTK8DNtaSPKqRGh4yWQzf8ul00SwW89CYH39e1EB9FW/FWr3c1OIzrSlu+MbA0kIA7QpCSoRTJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=WU8Zb0zF; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-7d5f87224a8so177291439f.1
+        for <kvm@vger.kernel.org>; Sun, 21 Apr 2024 20:57:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1713758236; x=1714363036; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IxMvEkhMO/oefS5y2Vv6EBhGarUlSL5vA59TpkffJtE=;
+        b=WU8Zb0zFtVY6Kck2Yq0iB631WeJ4bUW9xlpqLYZdUWdGYewIHoIbICUHCw+Om0PBSO
+         OW9NRmkWK7qdd94DOM7tegKUWUE496os78y9TNllruxGQQtMQilT2JIVRF44RvF+vg6H
+         rgybH7JocQm77Wn8A7W8iR2mdQzEUpbUvGun4zVk2/WwXX++dD/JnwwLOc8Tiyzj8a9k
+         pIdH0XlbDdnvDNwWemE9QgyCM7yz5GG4FcmXQcB5ldquygw42xEb1Ky2Xda8VeZtwpg/
+         XDzaeP+l1S/pnaWTabhRKrl7QySj0pfNwXZ6rYGGYzHu3QACOkX2i6BDNQ7SBWAD3GJZ
+         VAlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713758236; x=1714363036;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IxMvEkhMO/oefS5y2Vv6EBhGarUlSL5vA59TpkffJtE=;
+        b=VO+dKBf9P/fzKFRmUMzxW65dy92RqAhRwKmlux7r5tgS+PvVMrW/jBS3I+6R58YyOu
+         qvNwsf8IG9CL2azpl3/R4dC17j9ltfWRvei1GAKs0JAt1i7c8Y7b3B214DD7j4J8Oi3y
+         LYSIeTYi9+PMjtrNKowmjeRRLBOjeTAVOIaJ8afOXrQQE/xbVVAQVr3BaM2ebDzqYG4P
+         mp/lelFnSWiYYknGDMxId3Pv2/5TxWw0pfFIB6QwBI+RZwXy/0GHv0cEEv+z9MyfxWm5
+         CYKo47uUGhD5jNS2SHlG6Ew0whIjGUhwnwF9dzCOj3UyLowYDvnPNASBec+MCdfCPmSI
+         usxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+x50d+VxO41Vdn7t1GXRpZfmeg9UFG1stQ08Zu3i2dRxsC8Vts9eX228tRtt8TbaSEIQ7NDlsVw3o9sGnDBEL/v2b
+X-Gm-Message-State: AOJu0YxuuwmBbQKk5Z5MwFXFsevnWxa83SGjfnaN8nHxP5O/EItBCJlU
+	HN8wR0xe6Hj4PRaVb2D7NJM+WkRzj1hB8VSkA14RVjivNMgcGJ9ucHEfb5YRLlrDZfmvXmyOPWj
+	VDozPpyc2W94mLRGVWtYGXYZqx+wicrTnbgpjaOb4Mr9vut4r
+X-Google-Smtp-Source: AGHT+IEfXmNboQBWQv5TaehVyCZXDONHrrHKtvj+JX6Jhm2LM11IausIv6pX26KiIKRgmVbB/rGXl1IvBxb6iREpPdo=
+X-Received: by 2002:a05:6e02:4c9:b0:36b:ffc1:d1ad with SMTP id
+ f9-20020a056e0204c900b0036bffc1d1admr9986145ils.18.1713758236580; Sun, 21 Apr
+ 2024 20:57:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CO1PR11MB4929:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9281dbfc-6294-4ced-1a26-08dc627d2b9b
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Q/GS/3+gOdFzhNhwuLsSZ7coEUZVhsLXhxRE73S6w/ohJOT5x+TGkKSFcNRe?=
- =?us-ascii?Q?WyYsLcii0Sq6NOknlOAxzo+bIPh6Qae2MqpuLQmcQ17iabpWMuJzfuT4kRHx?=
- =?us-ascii?Q?qM0/9/cvjhJm/DMSzZ5dnyxOmou/nYMlsPihREPQ8IPptVjApmphxDgZQ0QM?=
- =?us-ascii?Q?yeLiE0WmY3h0g2GmAHwefYsxE8sWv5xv9jnum+tb5+Eb0d2jkGhycTgK1LCF?=
- =?us-ascii?Q?7ne329nfQsIIXKzCo23RBIiGXXsCbmYGf2rfAnjNR54GSM3UlAc0PjTBahDv?=
- =?us-ascii?Q?OYXr+JhjMk7e/e9FmIuVFj9HwOnEi8k0o4QwnKtghsQbHiGJ4S9KGawbIPXv?=
- =?us-ascii?Q?5RqFuQm323xmtocQ1xh6E8EjfuYVHQg8iKsDd4PKX6jziJ7XBrd76XWplJno?=
- =?us-ascii?Q?dWv9JcpZAcJaDAEzdpen7aJESIoWcCAmgQL8M5rcNMyd37udvMths3mNClvC?=
- =?us-ascii?Q?yPJGszRT9UG1GGz2/6xbVDdLULOY60nTVpLh4xhZEnQlkp2b5MDx7tmqffOE?=
- =?us-ascii?Q?jT53DXinoLejHpSxZhzOtKjhO8v4eCVpaHvb86LKpip6jBWQ8c18qaclbwsx?=
- =?us-ascii?Q?gN3k6AjPDe7gQup8Q9VPKFhYj6tNd2j/lmLOyC2fsrSDxHTOMqOK9tLWHwQa?=
- =?us-ascii?Q?HRN95iATkytziTM526Sq1X/8Tew5SylSotDZTBUCMMb/VKT/H0AVE7+W5F4K?=
- =?us-ascii?Q?vwBfcxTXK6EUvYcLL7fykCR9KpqYG97BVkP2nXXtBAlSpRmJaLbs9ioLVTwv?=
- =?us-ascii?Q?K3qGZiNipgPlQ2lj0urWZiy8GqdEb9QySrLO4D4GGkO44iprIKCFvNYrWp2a?=
- =?us-ascii?Q?ixBZF5kpgWaQ36NHGx4TCTz4K/VucobKYrzXqyHiMLbcuTPdaeHj1KWwtsS/?=
- =?us-ascii?Q?YH+7gGlZA694FtAuKwa58mK0dkrsiQCS1ChjsH85G4NvEIEXyEY+MHreQbff?=
- =?us-ascii?Q?+gA3pBuJXEArY8LlJtCzzXHaghv6g7BkwjaF9IbE1k7rj2nqxAfmTJqWXlqh?=
- =?us-ascii?Q?+W1O6vlWTG9W2rE0+IxWYV61aI/Q8OmwiH6dTYM7G5bZ56wV5PRD17a+9Vht?=
- =?us-ascii?Q?HXJWnNItFkpu6ofL/I6Shtrh/BXf+KJrCMItfHe2IjjPceEbhMmCm0NLYhX4?=
- =?us-ascii?Q?NrKT9vJvWFtkWYbyxGo3As2JQ9dYntq7N5LsNF1QI4IcttcFj4KZI3qW14pS?=
- =?us-ascii?Q?1xeOq+NgewzpZvqG/ZjfFSctqIekFmgrpojIAwIk07f83avDbTlPVclo5N5V?=
- =?us-ascii?Q?Ol+Xosk+4IR2nZBoZe9jYwoElm5+TjorpjjBcE8zJQ=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SL9PeiRrLaI8vDvP5J7qhWXqiHl191a4Y4LZdf92OURL2xxjBwcmrwOQpbp2?=
- =?us-ascii?Q?btv53LsGUlGWYeLiIIFFKJXEiOiDWromO6OqYxjYIeVC46/dbcC2iMJd4Ywa?=
- =?us-ascii?Q?bdy7xFTTpQo3MbHah8Xkclij62BaXxvctk7tfPI0AiJO59G7qGUxT2BMQraP?=
- =?us-ascii?Q?tdJvmGzggsMol1X9vJhmn8vk9fdmzorrkEe3ljSvzbbytJHEOZFxxXL7bemF?=
- =?us-ascii?Q?3SXvMswGXDMCcIbj9u5qT1vT3ywg4fW3RX4eJdWmBpHbhnaLr+d+H8APuCAS?=
- =?us-ascii?Q?D6irEVZw2ttMx0RsOOfM781suPU7GOcghSvs5pXuVP2BXJKYc4eO0TV38scT?=
- =?us-ascii?Q?+kCI2a/si8oMO/u4FalGP0uQOA25w7+bfYo5MF8c3EuunENxhtIQUDXKZX6Z?=
- =?us-ascii?Q?Zeut0IADH7Yrea0UI1zbRpfkPUVCB2QK8XNurQeJuyliLAjqR5v8tQ3ZQD+Y?=
- =?us-ascii?Q?oHYFOUyKjM0i20JCpjESu17wkhWXzxTEcZVrSUU1IVbVTNl57WCYxgumAcWP?=
- =?us-ascii?Q?YHBo7XOzuni3C9KmUPsecAVkO9JZb34axmZ628l1XX6IVpfRl+oAiWuyBiVR?=
- =?us-ascii?Q?kmnhJyH6dZrzFSGKE+er4745IoAfkeatEgealc7TwSQwEPstxc4PptFQnrkg?=
- =?us-ascii?Q?fjFqi5b9YHl5i4qrJoqsvWZHg96lD9xA+zHGkwa0Eo1iGMYy3OfuwemKvRkT?=
- =?us-ascii?Q?mkrCbkLMCUK1d2G0IBaTx/SQ2Ivkaw5gVS20lkFG6XCnu4ckeq7rBSEf3QKv?=
- =?us-ascii?Q?6c1TJPr0g++Ay9ZbovgrnVeyImQPC//60dIl5aEWy4k/KVI6CpAhIjRio4O+?=
- =?us-ascii?Q?HL1MAHoVNUSGr9rapT1vhTOOyodgW2mslhVEomqXlPbrL/DeyiQdJsS3nGjQ?=
- =?us-ascii?Q?z5MwvQvAx5Z6oXOTIkqvonKlYKRq7lSCNSXMXkXWDsFQ7h6QeN7WojWpoi8/?=
- =?us-ascii?Q?sok3VEHSv38KxrE0TFeUky3Hmu3dCCB/rYLIZ2sjPixElKnrtWOn55dmlPZp?=
- =?us-ascii?Q?LnxPiwoVCjNfBcsqmXXnI8SSC4tY8sBK1ojeacmaTGegbYuw8+weASobpeMf?=
- =?us-ascii?Q?Ih77RRYJqx5wWfwdXSm7YR12BNXn0w+gGJD8ahgx+03oYzvcGSyCpjXy1f6u?=
- =?us-ascii?Q?PR99Y3ijTvCKOFtOvAL1uJ6bj0SY5I1ZUkPpXOnFvL8vasxSdq7TPPJJTP7g?=
- =?us-ascii?Q?SNoLwZEEA2yQb6jxfsZUTPKNrJaRaTxYIhlD9UXqchDtSehYCYgUL3IANz3k?=
- =?us-ascii?Q?crLLqtpc7qJEoDBcRgt1FzC6yuUizzWiEnzR1m0NI/hGnSbHsLn5C7OngRAE?=
- =?us-ascii?Q?LjwVXc7z6eRxNmmt4KnecxGqotTYZUmr0ZroX4SbLuS2ZOLQ5ERMvPC7XWJ+?=
- =?us-ascii?Q?9ulBZ0/G2dhCbVQSSI8O1neMrbcAWqA/+CZNl6CBs2ZseVVSFDrSowoLgdXW?=
- =?us-ascii?Q?y/5cxQOhryYswcWSfIHy08amFdD+1uzhOtf5UXHMc57Ghhpf+k7YN28a0QzS?=
- =?us-ascii?Q?p2/9qKJHbNfX77fAy2uGy/bvC6o3PsBucF302r0lzNYIvduqFvALWbjPgAsl?=
- =?us-ascii?Q?N7OcNTK03ug4Cu1tfRR05h4ae7ze+eJKltzoM0/6?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9281dbfc-6294-4ced-1a26-08dc627d2b9b
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2024 03:34:52.3191
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 50UMemuLAzPc7Hf6/TNM30//fJo01rfm9NOxeMyUMiaVLv0kSik+CNNBlt02ajQQz5McjB5eRwCikvyiQ3fOFw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4929
-X-OriginatorOrg: intel.com
+References: <20240417074528.16506-1-yongxuan.wang@sifive.com> <20240417074528.16506-2-yongxuan.wang@sifive.com>
+In-Reply-To: <20240417074528.16506-2-yongxuan.wang@sifive.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Mon, 22 Apr 2024 09:27:05 +0530
+Message-ID: <CAAhSdy30XpKzewqF1-UEinis6ScrQnB2aT1+iJakWC7eFDSbGA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] RISCV: KVM: Introduce mp_state_lock to avoid lock
+ inversion in SBI_EXT_HSM_HART_START
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
+	greentime.hu@sifive.com, vincent.chen@sifive.com, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 26, 2024 at 12:26:00AM -0800, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> +static inline void *kvm_mmu_private_spt(struct kvm_mmu_page *sp)
+On Wed, Apr 17, 2024 at 1:15=E2=80=AFPM Yong-Xuan Wang <yongxuan.wang@sifiv=
+e.com> wrote:
+>
+> Documentation/virt/kvm/locking.rst advises that kvm->lock should be
+> acquired outside vcpu->mutex and kvm->srcu. However, when KVM/RISC-V
+> handling SBI_EXT_HSM_HART_START, the lock ordering is vcpu->mutex,
+> kvm->srcu then kvm->lock.
+>
+> Although the lockdep checking no longer complains about this after commit
+> f0f44752f5f6 ("rcu: Annotate SRCU's update-side lockdep dependencies"),
+> it's necessary to replace kvm->lock with a new dedicated lock to ensure
+> only one hart can execute the SBI_EXT_HSM_HART_START call for the target
+> hart simultaneously.
+>
+> Additionally, this patch also rename "power_off" to "mp_state" with two
+> possible values. The vcpu->mp_state_lock also protects the access of
+> vcpu->mp_state.
+>
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> ---
+>  arch/riscv/include/asm/kvm_host.h |  7 ++--
+>  arch/riscv/kvm/vcpu.c             | 56 ++++++++++++++++++++++++-------
+>  arch/riscv/kvm/vcpu_sbi.c         |  7 ++--
+>  arch/riscv/kvm/vcpu_sbi_hsm.c     | 23 ++++++++-----
+>  4 files changed, 68 insertions(+), 25 deletions(-)
+>
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
+vm_host.h
+> index 484d04a92fa6..64d35a8c908c 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -252,8 +252,9 @@ struct kvm_vcpu_arch {
+>         /* Cache pages needed to program page tables with spinlock held *=
+/
+>         struct kvm_mmu_memory_cache mmu_page_cache;
+>
+> -       /* VCPU power-off state */
+> -       bool power_off;
+> +       /* VCPU power state */
+> +       struct kvm_mp_state mp_state;
+> +       spinlock_t mp_state_lock;
+>
+>         /* Don't run the VCPU (blocked) */
+>         bool pause;
+> @@ -375,7 +376,9 @@ void kvm_riscv_vcpu_flush_interrupts(struct kvm_vcpu =
+*vcpu);
+>  void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu);
+>  bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, u64 mask);
+>  void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu);
+> +void __kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
+>  void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu);
+> +bool kvm_riscv_vcpu_stopped(struct kvm_vcpu *vcpu);
+>
+>  void kvm_riscv_vcpu_sbi_sta_reset(struct kvm_vcpu *vcpu);
+>  void kvm_riscv_vcpu_record_steal_time(struct kvm_vcpu *vcpu);
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index b5ca9f2e98ac..70937f71c3c4 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -102,6 +102,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>         struct kvm_cpu_context *cntx;
+>         struct kvm_vcpu_csr *reset_csr =3D &vcpu->arch.guest_reset_csr;
+>
+> +       spin_lock_init(&vcpu->arch.mp_state_lock);
+> +
+>         /* Mark this VCPU never ran */
+>         vcpu->arch.ran_atleast_once =3D false;
+>         vcpu->arch.mmu_page_cache.gfp_zero =3D __GFP_ZERO;
+> @@ -201,7 +203,7 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>  int kvm_arch_vcpu_runnable(struct kvm_vcpu *vcpu)
+>  {
+>         return (kvm_riscv_vcpu_has_interrupts(vcpu, -1UL) &&
+> -               !vcpu->arch.power_off && !vcpu->arch.pause);
+> +               !kvm_riscv_vcpu_stopped(vcpu) && !vcpu->arch.pause);
+>  }
+>
+>  int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+> @@ -429,26 +431,50 @@ bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu =
+*vcpu, u64 mask)
+>         return kvm_riscv_vcpu_aia_has_interrupts(vcpu, mask);
+>  }
+>
+> -void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu)
+> +static void __kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu)
+>  {
+> -       vcpu->arch.power_off =3D true;
+> +       vcpu->arch.mp_state.mp_state =3D KVM_MP_STATE_STOPPED;
+>         kvm_make_request(KVM_REQ_SLEEP, vcpu);
+>         kvm_vcpu_kick(vcpu);
+>  }
+>
+> -void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu)
+> +void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu)
 > +{
-> +	return sp->private_spt;
+> +       spin_lock(&vcpu->arch.mp_state_lock);
+> +       __kvm_riscv_vcpu_power_off(vcpu);
+> +       spin_unlock(&vcpu->arch.mp_state_lock);
 > +}
 > +
-> +static inline void kvm_mmu_init_private_spt(struct kvm_mmu_page *sp, void *private_spt)
+> +void __kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu)
+>  {
+> -       vcpu->arch.power_off =3D false;
+> +       vcpu->arch.mp_state.mp_state =3D KVM_MP_STATE_RUNNABLE;
+>         kvm_vcpu_wake_up(vcpu);
+>  }
+>
+> +void kvm_riscv_vcpu_power_on(struct kvm_vcpu *vcpu)
 > +{
-> +	sp->private_spt = private_spt;
+> +       spin_lock(&vcpu->arch.mp_state_lock);
+> +       __kvm_riscv_vcpu_power_on(vcpu);
+> +       spin_unlock(&vcpu->arch.mp_state_lock);
 > +}
-This function is actually not used for initialization.
-Instead, it's only called after failure of free_private_spt() in order to
-intentionally leak the page to prevent kernel from accessing the encrypted page.
-
-So to avoid confusion, how about renaming it to kvm_mmu_leak_private_spt() and
-always resetting the pointer to NULL?
-
-static inline void kvm_mmu_leak_private_spt(struct kvm_mmu_page *sp)
-{
-	sp->private_spt = NULL;
-}
-
 > +
-> +static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+> +bool kvm_riscv_vcpu_stopped(struct kvm_vcpu *vcpu)
 > +{
-> +	bool is_root = vcpu->arch.root_mmu.root_role.level == sp->role.level;
+> +       bool ret;
 > +
-> +	KVM_BUG_ON(!kvm_mmu_page_role_is_private(sp->role), vcpu->kvm);
-> +	if (is_root)
-> +		/*
-> +		 * Because TDX module assigns root Secure-EPT page and set it to
-> +		 * Secure-EPTP when TD vcpu is created, secure page table for
-> +		 * root isn't needed.
-> +		 */
-> +		sp->private_spt = NULL;
-> +	else {
-> +		/*
-> +		 * Because the TDX module doesn't trust VMM and initializes
-> +		 * the pages itself, KVM doesn't initialize them.  Allocate
-> +		 * pages with garbage and give them to the TDX module.
-> +		 */
-> +		sp->private_spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_private_spt_cache);
-> +		/*
-> +		 * Because mmu_private_spt_cache is topped up before starting
-> +		 * kvm page fault resolving, the allocation above shouldn't
-> +		 * fail.
-> +		 */
-> +		WARN_ON_ONCE(!sp->private_spt);
-> +	}
+> +       spin_lock(&vcpu->arch.mp_state_lock);
+> +       ret =3D vcpu->arch.mp_state.mp_state =3D=3D KVM_MP_STATE_STOPPED;
+> +       spin_unlock(&vcpu->arch.mp_state_lock);
+> +
+> +       return ret;
+
+Checking mp_state is very expensive this way because spin locks
+are implicit fences.
+
+Instead of this, we can simply use READ_ONCE() here and we
+use WRITE_ONCE() + spin lock to serialize writes.
+
+I will take care of this at the time of merging this patch.
+
 > +}
+> +
+>  int kvm_arch_vcpu_ioctl_get_mpstate(struct kvm_vcpu *vcpu,
+>                                     struct kvm_mp_state *mp_state)
+>  {
+> -       if (vcpu->arch.power_off)
+> -               mp_state->mp_state =3D KVM_MP_STATE_STOPPED;
+> -       else
+> -               mp_state->mp_state =3D KVM_MP_STATE_RUNNABLE;
+> +       spin_lock(&vcpu->arch.mp_state_lock);
+> +       *mp_state =3D vcpu->arch.mp_state;
+> +       spin_unlock(&vcpu->arch.mp_state_lock);
+>
+>         return 0;
+>  }
+> @@ -458,17 +484,21 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu=
+ *vcpu,
+>  {
+>         int ret =3D 0;
+>
+> +       spin_lock(&vcpu->arch.mp_state_lock);
+> +
+>         switch (mp_state->mp_state) {
+>         case KVM_MP_STATE_RUNNABLE:
+> -               vcpu->arch.power_off =3D false;
+> +               vcpu->arch.mp_state.mp_state =3D KVM_MP_STATE_RUNNABLE;
+>                 break;
+>         case KVM_MP_STATE_STOPPED:
+> -               kvm_riscv_vcpu_power_off(vcpu);
+> +               __kvm_riscv_vcpu_power_off(vcpu);
+>                 break;
+>         default:
+>                 ret =3D -EINVAL;
+>         }
+>
+> +       spin_unlock(&vcpu->arch.mp_state_lock);
+> +
+>         return ret;
+>  }
+>
+> @@ -584,11 +614,11 @@ static void kvm_riscv_check_vcpu_requests(struct kv=
+m_vcpu *vcpu)
+>                 if (kvm_check_request(KVM_REQ_SLEEP, vcpu)) {
+>                         kvm_vcpu_srcu_read_unlock(vcpu);
+>                         rcuwait_wait_event(wait,
+> -                               (!vcpu->arch.power_off) && (!vcpu->arch.p=
+ause),
+> +                               (!kvm_riscv_vcpu_stopped(vcpu)) && (!vcpu=
+->arch.pause),
+>                                 TASK_INTERRUPTIBLE);
+>                         kvm_vcpu_srcu_read_lock(vcpu);
+>
+> -                       if (vcpu->arch.power_off || vcpu->arch.pause) {
+> +                       if (kvm_riscv_vcpu_stopped(vcpu) || vcpu->arch.pa=
+use) {
+>                                 /*
+>                                  * Awaken to handle a signal, request to
+>                                  * sleep again later.
+> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+> index 72a2ffb8dcd1..1851fc979bd2 100644
+> --- a/arch/riscv/kvm/vcpu_sbi.c
+> +++ b/arch/riscv/kvm/vcpu_sbi.c
+> @@ -138,8 +138,11 @@ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu=
+ *vcpu,
+>         unsigned long i;
+>         struct kvm_vcpu *tmp;
+>
+> -       kvm_for_each_vcpu(i, tmp, vcpu->kvm)
+> -               tmp->arch.power_off =3D true;
+> +       kvm_for_each_vcpu(i, tmp, vcpu->kvm) {
+> +               spin_lock(&vcpu->arch.mp_state_lock);
+> +               tmp->arch.mp_state.mp_state =3D KVM_MP_STATE_STOPPED;
+> +               spin_unlock(&vcpu->arch.mp_state_lock);
+> +       }
+>         kvm_make_all_cpus_request(vcpu->kvm, KVM_REQ_SLEEP);
+>
+>         memset(&run->system_event, 0, sizeof(run->system_event));
+> diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.=
+c
+> index 7dca0e9381d9..115a6c6525fd 100644
+> --- a/arch/riscv/kvm/vcpu_sbi_hsm.c
+> +++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
+> @@ -18,12 +18,18 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vc=
+pu)
+>         struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
+>         struct kvm_vcpu *target_vcpu;
+>         unsigned long target_vcpuid =3D cp->a0;
+> +       int ret =3D 0;
+>
+>         target_vcpu =3D kvm_get_vcpu_by_id(vcpu->kvm, target_vcpuid);
+>         if (!target_vcpu)
+>                 return SBI_ERR_INVALID_PARAM;
+> -       if (!target_vcpu->arch.power_off)
+> -               return SBI_ERR_ALREADY_AVAILABLE;
+> +
+> +       spin_lock(&target_vcpu->arch.mp_state_lock);
+> +
+> +       if (target_vcpu->arch.mp_state.mp_state !=3D KVM_MP_STATE_STOPPED=
+) {
+> +               ret =3D SBI_ERR_ALREADY_AVAILABLE;
+> +               goto out;
+> +       }
+>
+>         reset_cntx =3D &target_vcpu->arch.guest_reset_context;
+>         /* start address */
+> @@ -34,14 +40,18 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vc=
+pu)
+>         reset_cntx->a1 =3D cp->a2;
+>         kvm_make_request(KVM_REQ_VCPU_RESET, target_vcpu);
+>
+> -       kvm_riscv_vcpu_power_on(target_vcpu);
+> +       __kvm_riscv_vcpu_power_on(target_vcpu);
+> +
+> +out:
+> +       spin_unlock(&target_vcpu->arch.mp_state_lock);
+> +
+>
+>         return 0;
+>  }
+>
+>  static int kvm_sbi_hsm_vcpu_stop(struct kvm_vcpu *vcpu)
+>  {
+> -       if (vcpu->arch.power_off)
+> +       if (kvm_riscv_vcpu_stopped(vcpu))
+>                 return SBI_ERR_FAILURE;
+>
+>         kvm_riscv_vcpu_power_off(vcpu);
+> @@ -58,7 +68,7 @@ static int kvm_sbi_hsm_vcpu_get_status(struct kvm_vcpu =
+*vcpu)
+>         target_vcpu =3D kvm_get_vcpu_by_id(vcpu->kvm, target_vcpuid);
+>         if (!target_vcpu)
+>                 return SBI_ERR_INVALID_PARAM;
+> -       if (!target_vcpu->arch.power_off)
+> +       if (!kvm_riscv_vcpu_stopped(target_vcpu))
+>                 return SBI_HSM_STATE_STARTED;
+>         else if (vcpu->stat.generic.blocking)
+>                 return SBI_HSM_STATE_SUSPENDED;
+> @@ -71,14 +81,11 @@ static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *v=
+cpu, struct kvm_run *run,
+>  {
+>         int ret =3D 0;
+>         struct kvm_cpu_context *cp =3D &vcpu->arch.guest_context;
+> -       struct kvm *kvm =3D vcpu->kvm;
+>         unsigned long funcid =3D cp->a6;
+>
+>         switch (funcid) {
+>         case SBI_EXT_HSM_HART_START:
+> -               mutex_lock(&kvm->lock);
+>                 ret =3D kvm_sbi_hsm_vcpu_start(vcpu);
+> -               mutex_unlock(&kvm->lock);
+>                 break;
+>         case SBI_EXT_HSM_HART_STOP:
+>                 ret =3D kvm_sbi_hsm_vcpu_stop(vcpu);
+> --
+> 2.17.1
+>
+
+Reviewed-by: Anup Patel <anup@brainfault.org>
+
+Regards,
+Anup
 
