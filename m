@@ -1,121 +1,134 @@
-Return-Path: <kvm+bounces-15544-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15545-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53F118AD354
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 19:34:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1A768AD36C
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 19:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5D9DB20F08
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 17:34:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C2792832CC
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 17:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC1B2153BF5;
-	Mon, 22 Apr 2024 17:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF31153BF5;
+	Mon, 22 Apr 2024 17:43:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gNx/9Y6w"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="DUQwm9ry"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D354146A6A;
-	Mon, 22 Apr 2024 17:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D2C146A6A
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 17:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713807259; cv=none; b=O7475xpMNMib79axnx42znY6Xi1kOoOSXYINaq+ZKIZVtj0YmLsBStg5fBE9Xdhs5nu70QM9Cdxb/76wkUUVggeFTKsKcPEWzb7srXAkwqfE1r28V2h30TnZ19G805BLi/E/QWW4g8oBYUb8et5e6Rt2Rg8ntkidjKnFFfeY8e8=
+	t=1713807788; cv=none; b=pOf0XbbKOANYiPSYKYEnElsxR+Gr8V6U/3GGvI5dS/SNSYCO9Xn0JmuQjjY9kTOyIB5AecnB6KcpdckmmXqg4yfRgulHP5qln+8lC+0QxieIKTgUBbukNZ+QttC6WQj1LfVCHmUOjtNeuDsIWQCfclfoQpZqhIPFp+19W8HINik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713807259; c=relaxed/simple;
-	bh=CtkdzXdAdH5gbzYeGAqYpxDqL2frKUxXG+eSiaqEq0Y=;
+	s=arc-20240116; t=1713807788; c=relaxed/simple;
+	bh=FPRYflSYPTzX630Jd0+hB1WOM3PbajZTXlGiVPiZLwM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXljtWTgY02hgk07iQRmh0TGag8WlGg3ZpjoB/YdubgxDRTCUAKTxalhechPSIZYeBd7nm1ePh21PzfSzaUy2cEaBK2/wXcniLaO+x6xJMpitaoBShCWAzf0pcHf3A2fPXm/CPRCV0x3+B2Rc+dc4UWL4uvfB/VDknwY8u70IzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gNx/9Y6w; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713807258; x=1745343258;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=CtkdzXdAdH5gbzYeGAqYpxDqL2frKUxXG+eSiaqEq0Y=;
-  b=gNx/9Y6wXT6VI62sAu4ehpCtj1zss+8AIAaEqAqs197hI+8qzJTzKZDf
-   VxOEVtgGebhQ3OsJ13KDi3CCtuBkyHE/sql6sNcBLaj05uPL85iXX2uoC
-   6CW5YzHoUBJxlmy7h9mZT/zFBvMLlTPyY9QkDQX7XHBqEUIXFp5q/vgaR
-   4k0pLvFie3i2rue/GiUcmjjvUAHqCHM4QAQspcgI6kEyt9oMHMMq7/8HZ
-   ApnUHCmtxUJMlfeEC3z6bYNRHne1iN0rxMsyFj1N/4LJAMVQl9zXTDjJb
-   OJ4jDwvJYsWsVkL6ACBaZajY9lXZL4QHaV/6BlzxPkCQFChP5WEcz4IF6
-   Q==;
-X-CSE-ConnectionGUID: ToG5ZEPiSHiM67+vxm0Ctg==
-X-CSE-MsgGUID: giGBvsBKQmeT4wZIC/WXVA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="13193756"
-X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
-   d="scan'208";a="13193756"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 10:34:18 -0700
-X-CSE-ConnectionGUID: 0Kr9rkLySKmCW5Evqz0lKQ==
-X-CSE-MsgGUID: piQOTgyTQmCywsB4u+mvfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
-   d="scan'208";a="55019332"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 10:34:16 -0700
-Date: Mon, 22 Apr 2024 10:34:15 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH v19 125/130] KVM: TDX: Add methods to ignore virtual apic
- related operation
-Message-ID: <20240422173415.GK3596705@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <52300c655b1e7d6cc0a13727d977f1f02729a4bb.1708933498.git.isaku.yamahata@intel.com>
- <1a3f4283-0dfd-4b7d-ae1b-f22c13a8c4e1@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JJE1ePdaq2R05tGWErYc19Kba/89ygeQe/TWdJhfg7hSWbPJ7A7YmP2pdrjvqtoptKOOndiR/13a10pLG8hmzkG96xyW5GSiPZlmPb2sihepBcFsFbTgWSM8dxH9EardMGIQf8TuNe0wlPOckvCAadBpE1XiVfkj0JN3s/jz/hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=DUQwm9ry; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-69b24162dd6so22000736d6.2
+        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 10:43:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1713807786; x=1714412586; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=k/KOCqovdO5PsKSs9PxME/OsGBVBN8Xn1TisHFdx68w=;
+        b=DUQwm9ryLZY0bh3kXfAbzC7p/jLS0DsNSzp0F6Xrso2bUIDG0KSP//+N1wUGLLwnfx
+         x5Qe4eJV2BgMp/R7vpPijfIwOPPtfj1HTPk/jdKeAWj//gzi+dCOUviK/CqxPfQ3C5Lg
+         RYB6ViVzk8WuAba5UjVxgYzdG6YCEWDyD/tGp775u5jVOxuKOx/Dy7yVxqKmfa+2IDfq
+         OEtQ9VW0TXKEsb3ehsczY/VJ043vTpmetD2J8YrbdX/IHQKBteoueg3F80KCzkxvJr6J
+         03d2weegRHQPRaX0ZuP5D+hZrLXplxdixVqqUU7YtRvsyvZa+1PAYNJR/Tsej6o+vMUh
+         zOTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713807786; x=1714412586;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k/KOCqovdO5PsKSs9PxME/OsGBVBN8Xn1TisHFdx68w=;
+        b=SbXk1QAPKTFcZ+UQFskKTXSa3/L0aqeI4N4yjGJ52ZtLN7wunMcGX3l99c2hKCH+/W
+         W809kLc8zqm8UO7nPK5a/39YQu2dIOupRhw7kYBNeAewYbKwKb51IrbdjLUvgmCDa/+h
+         BIUdz4kNsQ21Kh+gG1jFFHVsLg7ePG79GTrXWLkfChR1uqQGnNGBkTAKJ99dbdvCDmLD
+         EpbHWLjrDrxZAkVSqGBZ41J4+I2SPuFuITUf5qNKOPDZveLhn+CAm15KjTf4gCkktySJ
+         4BZPhbjBiTnw/ntV4KljDNIwnUPe9UJePbrpphlYkdKx6CfqoNqS461te1oT1mAwbOgw
+         3gDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUAcbrVut86tJKKa5taprWeLpwQf6jXx+tld6XhxqlN1733h6WsX5VQ+vLotflZhAbWfov8/iiylq4Hvm+fnnoO4qmu
+X-Gm-Message-State: AOJu0Yyy6i4pL4s3wbw6qQRFeBy0al1Mb8xE1v6oAx4g8ZiuzG97GOkj
+	5hIAURhWhidCEQ7FpiVc5LY3hiokN1V7V3EEKgsri7PoOkrbMDDou3ctSZj34ro=
+X-Google-Smtp-Source: AGHT+IGHiFa58Cxg/cz+5GibMHdsBS0/TvPvketvKNLRvd4ffYu0hhtDDfBaJpWtYAmFnVmikIfyBA==
+X-Received: by 2002:a0c:f8c9:0:b0:6a0:5e9a:a9a4 with SMTP id h9-20020a0cf8c9000000b006a05e9aa9a4mr12406744qvo.7.1713807786099;
+        Mon, 22 Apr 2024 10:43:06 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id x1-20020a0c8e81000000b0069b40c06b11sm4430054qvb.105.2024.04.22.10.43.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Apr 2024 10:43:05 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1ryxh3-000ykz-20;
+	Mon, 22 Apr 2024 14:43:05 -0300
+Date: Mon, 22 Apr 2024 14:43:05 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>, kvm@vger.kernel.org,
+	linux-s390@vger.kernel.org, Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>,
+	Ben Segal <bpsegal@us.ibm.com>
+Subject: Re: [PATCH v2] vfio/pci: Support 8-byte PCI loads and stores
+Message-ID: <20240422174305.GB231144@ziepe.ca>
+References: <20240422153508.2355844-1-gbayer@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1a3f4283-0dfd-4b7d-ae1b-f22c13a8c4e1@linux.intel.com>
+In-Reply-To: <20240422153508.2355844-1-gbayer@linux.ibm.com>
 
-On Mon, Apr 22, 2024 at 09:56:05AM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
-
+On Mon, Apr 22, 2024 at 05:35:08PM +0200, Gerd Bayer wrote:
+> From: Ben Segal <bpsegal@us.ibm.com>
 > 
+> Many PCI adapters can benefit or even require full 64bit read
+> and write access to their registers. In order to enable work on
+> user-space drivers for these devices add two new variations
+> vfio_pci_core_io{read|write}64 of the existing access methods
+> when the architecture supports 64-bit ioreads and iowrites.
 > 
-> On 2/26/2024 4:27 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > TDX protects TDX guest APIC state from VMM.  Implement access methods of
-> > TDX guest vAPIC state to ignore them or return zero.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/kvm/vmx/main.c    | 61 ++++++++++++++++++++++++++++++++++----
-> >   arch/x86/kvm/vmx/tdx.c     |  6 ++++
-> >   arch/x86/kvm/vmx/x86_ops.h |  3 ++
-> >   3 files changed, 64 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> > index fae5a3668361..c46c860be0f2 100644
-> > --- a/arch/x86/kvm/vmx/main.c
-> > +++ b/arch/x86/kvm/vmx/main.c
-> > @@ -352,6 +352,14 @@ static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
-> >   	return vmx_apic_init_signal_blocked(vcpu);
-> >   }
-> > +static void vt_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
-> > +{
-> > +	if (is_td_vcpu(vcpu))
-> > +		return tdx_set_virtual_apic_mode(vcpu);
-> Can open code this function...
+> Since these access methods are instantiated on 64bit architectures,
+> only, their use in vfio_pci_core_do_io_rw() is restricted by conditional
+> compiles to these architectures.
+> 
+> Signed-off-by: Ben Segal <bpsegal@us.ibm.com>
+> Co-developed-by: Gerd Bayer <gbayer@linux.ibm.com>
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> ---
+> Hi all,
+> 
+> we've successfully used this patch with a user-mode driver for a PCI
+> device that requires 64bit register read/writes on s390. A quick grep
+> showed that there are several other drivers for PCI devices in the kernel
+> that use readq/writeq and eventually could use this, too.
+> So we decided to propose this for general inclusion.
+> 
+> Thank you,
+> Gerd Bayer
+> 
+> Changes v1 -> v2:
+> - On non 64bit architecture use at most 32bit accesses in
+>   vfio_pci_core_do_io_rw and describe that in the commit message.
+> - Drop the run-time error on 32bit architectures.
+> - The #endif splitting the "else if" is not really fortunate, but I'm
+>   open to suggestions.
 
-Yes, the function is empty currently.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Provide a iowrite64() that does back to back writes for 32 bit?
+
+Jason
 
