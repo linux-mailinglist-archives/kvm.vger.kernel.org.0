@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-15562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41A5B8AD585
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:03:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 729738AD586
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:03:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5B301F2131D
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:03:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DC9C283EF5
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06AF2156863;
-	Mon, 22 Apr 2024 20:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4FE156883;
+	Mon, 22 Apr 2024 20:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rPV3fhOb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dHm7sECa"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CF47156677
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96186156862
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713816149; cv=none; b=PFJB4iF+9VLh8THJARa6+tcEeBIohsAoOzDxo30nnMyLRB3k0F/ezavuCL36c92FbJtz7lVb2jDammS2gtunZ5ha6KrwYmn6QxueUGnBiwK/Tx1eoKBVSM40DWPCv6K6+PbBdpwc9Du8LMuKecOG5+3VX+Cl0KF9GFh2WN10Z/g=
+	t=1713816151; cv=none; b=j4P+UcdyCwB/MEtJwkYY4XJHRnK64aa+ziMMvP+ru9pWRfUC+21VvrBnRkehrnEBQGH0exWSFt+4rrW0WlLteb2fA5alYdHhGbeh/tJpevA+a68F9dqbkAB9qYI8TaL9EWRL45YjsP1+02IByFwJRN6SX2+L7/PtsJ3Z6D6UVKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713816149; c=relaxed/simple;
-	bh=RmdMS+sIid5yrctiw8/krFqPZXM8wl8DA6R1nJjTSns=;
+	s=arc-20240116; t=1713816151; c=relaxed/simple;
+	bh=itnfuxJ6+rE6BiAHmDFHZm/1xEx8lmseJ9IXHRrfrts=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=POrw964uGC49HUPlTfI4ESnDPEg/OyULbdzw9zni1PswiQmaAzNZOD9rwfdIc5kBdQLHDkwo2PGS7p48zK1E0iwn2sr2C6tVQOhfMy7g/g1VG5X8UK8hZedVq3o+eaXCIlexYY0Cg4f56ko4aKjLtn/6qn2gITlIRpl8fiabaCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rPV3fhOb; arc=none smtp.client-ip=91.218.175.175
+	 MIME-Version; b=F8Of8oJ3HhIlHvlha5zetQ1IvePPs7/xB6dsLAW6kQzySkMbUB/bLQa7he/KmMDnSyfSKW10Og4kt9vE5Cs65rTGA6X4/VoPH//U6SXu8eeLB5jBO8yqAy6BGH5M02rDKz3BZDJ46lvAMtE7scLbPqIEZ4ystkZF13I3OF5IQBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dHm7sECa; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713816146;
+	t=1713816147;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=S6Xo45VnyP5WiZLRvoro1+6VksntUTupRoJw5sX+LPo=;
-	b=rPV3fhObEXAbI+qw8bTgHnE/cNdZUv1UQlGr1C2ClZhjLTvpGf4ZnmYJkE24fc/CRtDpUs
-	5xHrgalYmz/Hr/aE8yh6qjMZ/fFcv8ViZZHuG6wSWWrsEy7QQLgFgTr1kran59sH5hQf4A
-	EDCfdH+zWZZ6Ts7/UEHrGyjK5Z7dj8A=
+	bh=usZ21hBIEurq53tziYoF2qW5yO8+NMKdWd+TT+5MVfU=;
+	b=dHm7sECaS+PH1UztzGnYlrno2KmepshOV2cpGZk7HJi8fhd0wB3MQt0Ng3SQGl31TxfacQ
+	epI3ZRFKXzE7LtPZBxe9t3yCrkMXIhjNFB9JlO0OywBqjqhf6TJI444gZUtzWRY4x0N1n9
+	lvTlMBEe3X9JuNzezzKOqbNKfL5qD+E=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -51,9 +51,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 08/19] KVM: arm64: vgic-its: Maintain a translation cache per ITS
-Date: Mon, 22 Apr 2024 20:01:47 +0000
-Message-ID: <20240422200158.2606761-9-oliver.upton@linux.dev>
+Subject: [PATCH v3 09/19] KVM: arm64: vgic-its: Spin off helper for finding ITS by doorbell addr
+Date: Mon, 22 Apr 2024 20:01:48 +0000
+Message-ID: <20240422200158.2606761-10-oliver.upton@linux.dev>
 In-Reply-To: <20240422200158.2606761-1-oliver.upton@linux.dev>
 References: <20240422200158.2606761-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -65,133 +65,78 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Within the context of a single ITS, it is possible to use an xarray to
-cache the device ID & event ID translation to a particular irq
-descriptor. Take advantage of this to build a translation cache capable
-of fitting all valid translations for a given ITS.
+The fast path will soon need to find an ITS by doorbell address, as the
+translation caches will become local to an ITS. Spin off a helper to do
+just that.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 37 +++++++++++++++++++++++++++++++++-
- include/kvm/arm_vgic.h         |  6 ++++++
- 2 files changed, 42 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 35 ++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 2caa30bf20c7..1cea0d78025b 100644
+index 1cea0d78025b..237e92016c1b 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -511,6 +511,11 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
+@@ -511,9 +511,29 @@ static unsigned long vgic_mmio_read_its_idregs(struct kvm *kvm,
  	return 0;
  }
  
-+static unsigned long vgic_its_cache_key(u32 devid, u32 eventid)
++static struct vgic_its *__vgic_doorbell_to_its(struct kvm *kvm, gpa_t db)
 +{
-+	return (((unsigned long)devid) << VITS_TYPER_IDBITS) | eventid;
++	struct kvm_io_device *kvm_io_dev;
++	struct vgic_io_device *iodev;
++
++	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, db);
++	if (!kvm_io_dev)
++		return ERR_PTR(-EINVAL);
++
++	if (kvm_io_dev->ops != &kvm_io_gic_ops)
++		return ERR_PTR(-EINVAL);
++
++	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
++	if (iodev->iodev_type != IODEV_ITS)
++		return ERR_PTR(-EINVAL);
++
++	return iodev->its;
 +}
 +
- static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
- 					       phys_addr_t db,
- 					       u32 devid, u32 eventid)
-@@ -564,8 +569,10 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 				       u32 devid, u32 eventid,
- 				       struct vgic_irq *irq)
+ static unsigned long vgic_its_cache_key(u32 devid, u32 eventid)
  {
-+	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct vgic_translation_cache_entry *cte;
-+	struct vgic_irq *old;
- 	unsigned long flags;
- 	phys_addr_t db;
- 
-@@ -604,6 +611,15 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
- 	 */
- 	lockdep_assert_held(&its->its_lock);
+ 	return (((unsigned long)devid) << VITS_TYPER_IDBITS) | eventid;
 +
-+	/*
-+	 * Yes, two references are necessary at the moment:
-+	 *  - One for the global LPI translation cache
-+	 *  - Another for the translation cache belonging to @its
-+	 *
-+	 * This will soon disappear.
-+	 */
-+	vgic_get_irq_kref(irq);
- 	vgic_get_irq_kref(irq);
- 
- 	cte->db		= db;
-@@ -613,6 +629,16 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 
- 	/* Move the new translation to the head of the list */
- 	list_move(&cte->entry, &dist->lpi_translation_cache);
-+	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+
-+	/*
-+	 * The per-ITS cache is a perfect cache, so it may already have an
-+	 * identical translation even if it were missing from the global
-+	 * cache. Ensure we don't leak a reference if that is the case.
-+	 */
-+	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
-+	if (old)
-+		vgic_put_irq(kvm, old);
- 
- out:
- 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-@@ -623,7 +649,8 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
- 	struct kvm *kvm = its->dev->kvm;
- 	struct vgic_dist *dist = &kvm->arch.vgic;
- 	struct vgic_translation_cache_entry *cte;
--	unsigned long flags;
-+	unsigned long flags, idx;
-+	struct vgic_irq *irq;
- 
- 	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
- 
-@@ -640,6 +667,11 @@ static void vgic_its_invalidate_cache(struct vgic_its *its)
- 	}
- 
- 	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+
-+	xa_for_each(&its->translation_cache, idx, irq) {
-+		xa_erase(&its->translation_cache, idx);
-+		vgic_put_irq(kvm, irq);
-+	}
  }
  
- void vgic_its_invalidate_all_caches(struct kvm *kvm)
-@@ -1962,6 +1994,7 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
+@@ -721,8 +741,6 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi)
+ {
+ 	u64 address;
+-	struct kvm_io_device *kvm_io_dev;
+-	struct vgic_io_device *iodev;
  
- 	INIT_LIST_HEAD(&its->device_list);
- 	INIT_LIST_HEAD(&its->collection_list);
-+	xa_init(&its->translation_cache);
+ 	if (!vgic_has_its(kvm))
+ 		return ERR_PTR(-ENODEV);
+@@ -732,18 +750,7 @@ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi)
  
- 	dev->kvm->arch.vgic.msis_require_devid = true;
- 	dev->kvm->arch.vgic.has_its = true;
-@@ -1992,6 +2025,8 @@ static void vgic_its_destroy(struct kvm_device *kvm_dev)
+ 	address = (u64)msi->address_hi << 32 | msi->address_lo;
  
- 	vgic_its_free_device_list(kvm, its);
- 	vgic_its_free_collection_list(kvm, its);
-+	vgic_its_invalidate_cache(its);
-+	xa_destroy(&its->translation_cache);
+-	kvm_io_dev = kvm_io_bus_get_dev(kvm, KVM_MMIO_BUS, address);
+-	if (!kvm_io_dev)
+-		return ERR_PTR(-EINVAL);
+-
+-	if (kvm_io_dev->ops != &kvm_io_gic_ops)
+-		return ERR_PTR(-EINVAL);
+-
+-	iodev = container_of(kvm_io_dev, struct vgic_io_device, dev);
+-	if (iodev->iodev_type != IODEV_ITS)
+-		return ERR_PTR(-EINVAL);
+-
+-	return iodev->its;
++	return __vgic_doorbell_to_its(kvm, address);
+ }
  
- 	mutex_unlock(&its->its_lock);
- 	kfree(its);
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index ac7f15ec1586..c15e7fcccb86 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -210,6 +210,12 @@ struct vgic_its {
- 	struct mutex		its_lock;
- 	struct list_head	device_list;
- 	struct list_head	collection_list;
-+
-+	/*
-+	 * Caches the (device_id, event_id) -> vgic_irq translation for
-+	 * LPIs that are mapped and enabled.
-+	 */
-+	struct xarray		translation_cache;
- };
- 
- struct vgic_state_iter;
+ /*
 -- 
 2.44.0.769.g3c40516874-goog
 
