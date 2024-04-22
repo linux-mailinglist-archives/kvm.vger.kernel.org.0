@@ -1,105 +1,118 @@
-Return-Path: <kvm+bounces-15503-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B988ACDC8
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:06:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 798408ACDFB
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:15:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A50D61C20D1B
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 13:06:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB3EA1C222B4
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 13:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8473814EC7D;
-	Mon, 22 Apr 2024 13:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D5414F136;
+	Mon, 22 Apr 2024 13:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qw3UZiZT"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="XaC5f4gj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E43F14EC77
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 13:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A92314F120;
+	Mon, 22 Apr 2024 13:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713791203; cv=none; b=VTADl+tAUKFgUz8QY9yUEyFCmYkrmHvJlPIePJQMaoX52QcHHVHaQ1c+cKC8CaBYjAvnmOyrUzkEz0UF2bUyQvwkvXUbkcLd8E059NURE+taRbi6s569uwBqMs076ZiBT+e3sjknX8RTzJPzbvKKjNngZSBixdSUqobd6ip2H2w=
+	t=1713791741; cv=none; b=etXz2ngCKUzcKbfQ1xpsKTnSjhCDCgIh4dRZedrxUVNyO+dJp/vtKneApkpOTPgFzEl26dp+oT1EASfCKIdtcG27yleJ7zz/ugCRBOmgn3ozAI08fgg6yNuq8qN40IpL1Pjx2Uow946b1fPQ2Ds0ju+7jIpyI08SjPGdZX+7uh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713791203; c=relaxed/simple;
-	bh=g5dM56OQsuK11FfsV0dssIcrLxjbEh5TECTLujgTLMs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=a5LJGtRntmIgXB6qWHCKqL50aVAqyo4j1zEQ037v6EKE+DFckFuIxhBe60PoF3TFXUbgPbL1PHMT9eQoOLpgFGQq1h5CU37yxpRG37Ab/yZ9RKPaSEJGi9nqTSBD8f1PC4zfN0DpY6VmyrqSfHGUpIhCPMla2uJ6Hynir3ZWf3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qw3UZiZT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713791197;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g5dM56OQsuK11FfsV0dssIcrLxjbEh5TECTLujgTLMs=;
-	b=Qw3UZiZTa5R4EXpSxGIpi0Qw4Eek9tdAj0tlGHQ1MkZ1moZltzM0qaPg+ibQEXAoeb3rQb
-	2hclrg6Kd1WaBBxEsxHmn7cFA9PGkW+9P+iPJrKpQAheBQQvBqDUODQNkObu12OIfF2m4Q
-	XDTOd0RhVZUe20896c7iBXb8uWxaSas=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-296-OsbaLYA8My2t1KgeONgwIA-1; Mon,
- 22 Apr 2024 09:06:34 -0400
-X-MC-Unique: OsbaLYA8My2t1KgeONgwIA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7A6E3C23FC3;
-	Mon, 22 Apr 2024 13:06:33 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.247])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id B47CA200AFA2;
-	Mon, 22 Apr 2024 13:06:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 8C17621E6680; Mon, 22 Apr 2024 15:06:32 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: <qemu-devel@nongnu.org>,  <kvm@vger.kernel.org>,  Tom Lendacky
- <thomas.lendacky@amd.com>,  "Paolo Bonzini" <pbonzini@redhat.com>,  Daniel
- P . =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>,  Pankaj Gupta
- <pankaj.gupta@amd.com>,
-  Xiaoyao Li <xiaoyao.li@intel.com>,  Isaku Yamahata
- <isaku.yamahata@linux.intel.com>
-Subject: Re: [PATCH v3 21/49] i386/sev: Introduce "sev-common" type to
- encapsulate common SEV state
-In-Reply-To: <20240320083945.991426-22-michael.roth@amd.com> (Michael Roth's
-	message of "Wed, 20 Mar 2024 03:39:17 -0500")
-References: <20240320083945.991426-1-michael.roth@amd.com>
-	<20240320083945.991426-22-michael.roth@amd.com>
-Date: Mon, 22 Apr 2024 15:06:32 +0200
-Message-ID: <87frvdeecn.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1713791741; c=relaxed/simple;
+	bh=GjhTJjoSiC3IDIVXzgKQ4P+qNveHUQ6lI+EgnHlfUqo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TW68cmkH9mzVjo5TDS8IZsvyrBakPluW7FjU/e3YEWK2n2LBCoGUg9KruwCBByDsBWISF9iEwkQnEXupwfzUMFCVeCyaaGtsHJNkiwlZaFtJSosZlo6eDnN5dmb6B/zUSJdc0CVCEHnjC+rqpqbm+0zPfhgyrPVoAkHwGg6M734=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=XaC5f4gj; arc=none smtp.client-ip=84.16.66.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VNQYc6JShz3q7;
+	Mon, 22 Apr 2024 15:08:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1713791332;
+	bh=GjhTJjoSiC3IDIVXzgKQ4P+qNveHUQ6lI+EgnHlfUqo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XaC5f4gjQmTg7HWgvo8OaBYgvZVVaUnv+Y6B/jdsg0Q4f2OLDr4AYla0dAr871yUg
+	 SXigC7/aA4mp4zabDYUfQYwz/kj2V8GznfSGfeIslpVajiSP9OYd5T8+9TTpiL7YOt
+	 axM86vO0S3TpXTEvr00XTnMRotQwMoJZqzDgMjqE=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VNQYb16q2zrw3;
+	Mon, 22 Apr 2024 15:08:50 +0200 (CEST)
+Date: Mon, 22 Apr 2024 15:08:50 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Guenter Roeck <linux@roeck-us.net>, David Gow <davidgow@google.com>
+Cc: Brendan Higgins <brendanhiggins@google.com>, 
+	Rae Moar <rmoar@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
+	Alan Maguire <alan.maguire@oracle.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>, 
+	Ingo Molnar <mingo@redhat.com>, James Morris <jamorris@linux.microsoft.com>, 
+	Kees Cook <keescook@chromium.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marco Pagani <marpagan@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Stephen Boyd <sboyd@kernel.org>, Thara Gopinath <tgopinath@microsoft.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
+	Wanpeng Li <wanpengli@tencent.com>, Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org
+Subject: Re: [PATCH v3 7/7] kunit: Add tests for fault
+Message-ID: <20240422.thesh7quoo0U@digikod.net>
+References: <20240319104857.70783-1-mic@digikod.net>
+ <20240319104857.70783-8-mic@digikod.net>
+ <928249cc-e027-4f7f-b43f-502f99a1ea63@roeck-us.net>
+ <b70332b0-3e55-4375-935f-35ef3167a151@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b70332b0-3e55-4375-935f-35ef3167a151@roeck-us.net>
+X-Infomaniak-Routing: alpha
 
-Michael Roth <michael.roth@amd.com> writes:
+On Fri, Apr 19, 2024 at 04:38:01PM -0700, Guenter Roeck wrote:
+> On Fri, Apr 19, 2024 at 03:33:49PM -0700, Guenter Roeck wrote:
+> > Hi,
+> > 
+> > On Tue, Mar 19, 2024 at 11:48:57AM +0100, Mickaël Salaün wrote:
+> > > Add a test case to check NULL pointer dereference and make sure it would
+> > > result as a failed test.
+> > > 
+> > > The full kunit_fault test suite is marked as skipped when run on UML
+> > > because it would result to a kernel panic.
+> > > 
+> > > Tested with:
+> > > ./tools/testing/kunit/kunit.py run --arch x86_64 kunit_fault
+> > > ./tools/testing/kunit/kunit.py run --arch arm64 \
+> > >   --cross_compile=aarch64-linux-gnu- kunit_fault
+> > > 
+> > 
+> > What is the rationale for adding those tests unconditionally whenever
+> > CONFIG_KUNIT_TEST is enabled ? This completely messes up my test system
+> > because it concludes that it is pointless to continue testing
+> > after the "Unable to handle kernel NULL pointer dereference" backtrace.
+> > At the same time, it is all or nothing, meaning I can not disable
+> > it but still run other kunit tests.
+> > 
 
-> Currently all SEV/SEV-ES functionality is managed through a single
-> 'sev-guest' QOM type. With upcoming support for SEV-SNP, taking this
-> same approach won't work well since some of the properties/state
-> managed by 'sev-guest' is not applicable to SEV-SNP, which will instead
-> rely on a new QOM type with its own set of properties/state.
->
-> To prepare for this, this patch moves common state into an abstract
-> 'sev-common' parent type to encapsulate properties/state that are
-> common to both SEV/SEV-ES and SEV-SNP, leaving only SEV/SEV-ES-specific
-> properties/state in the current 'sev-guest' type. This should not
-> affect current behavior or command-line options.
+CONFIG_KUNIT_TEST is to test KUnit itself.  Why does this messes up your
+test system, and what is your test system?  Is it related to the kernel
+warning and then the message you previously sent?
+https://lore.kernel.org/r/fd604ae0-5630-4745-acf2-1e51c69cf0c0@roeck-us.net
+It seems David has a solution to suppress such warning.
 
-QAPI schema refactoring except for the misleading "since" documentation
-pointed out by Daniel
-Acked-by: Markus Armbruster <armbru@redhat.com>
-
-[...]
-
+> 
+> Oh, never mind. I just disabled CONFIG_KUNIT_TEST in my test bed
+> to "solve" the problem. I'll take that as one of those "unintended
+> consequences" items: Instead of more tests, there are fewer.
+> 
+> Guenter
+> 
 
