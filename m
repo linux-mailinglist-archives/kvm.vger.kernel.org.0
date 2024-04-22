@@ -1,312 +1,972 @@
-Return-Path: <kvm+bounces-15549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24F188AD3C4
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:18:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDDCF8AD3CF
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 436D31C20BA7
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 18:18:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AF821F21BBE
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 18:23:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF416154441;
-	Mon, 22 Apr 2024 18:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0AA50271;
+	Mon, 22 Apr 2024 18:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pKbnRnEV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ktDxJyYp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8221E15442B
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 18:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C91D15443C
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 18:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713809886; cv=none; b=nwGnoEqhA3bq+BsymfomBbgdvxRhAiNGSu05157F4kaPoBvUFeGXnplYhTKUCoZP/KPAxAb1+1Aor6MLluhM574jpC8oMVqPq4FmIwEebUV/siyOKiuuITjo+QYHUPS81oAjQRsxJm7x3UmhyuCVtnod9ib5glRdxrE1HeOlxlU=
+	t=1713810202; cv=none; b=iRUAwg4Xzb+gawu3K2YiUw2+2phMjHaRCf1G4jCFmLSsS70bVhHeA2GDBHcaQzpOXzrYOzP0VXEfmQ+x7ym7nv13SYYEhQzN+cGb98E86hN4VkdwOmiXGvLJHVnjfumck7Ik9jGef8uyEetQxC12MZwW18e5gBPj82BO53OZvHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713809886; c=relaxed/simple;
-	bh=EqSTPNMowwCgymn+v0WtAz03SumIq2vQhNLhAloGFtY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qTG4RMR5rsQhQ5AiBCIskqdnN8HQt92yf+bEkPkME5JyQYh7YD9+heJrg5t6Ap1jgnOEr3Il6nIylmKd6tDObUzGBYE3JsouvY7Xi9QA3KiwLl+EN2RKfGMTk71Q4FDHTJFuhvmZOcmWUIhGfnD3qDsY6Rp4a7nI7mT2Qk06EuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pKbnRnEV; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1713810202; c=relaxed/simple;
+	bh=AZl5RxK9YcNk0IKvN2iaaPKO5nk4m92L4med83DUpX4=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=m4IZF/ndg6u4n7KZM5Ny7gtYtrjU4sURJPDgWW4m66hyc3ALo/gDLPug+VFvIghbeHGKWx64XRKtY/y5kuUac+MYZJzezkqvFIz1yeXjOLCDO9jF+TJAVZsdshPs3RPWzPSpGj11IaU53oi7vjqvpxsdk1ERCnWPuMkZzgfAwso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ktDxJyYp; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de45daf49deso10578938276.2
-        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 11:18:04 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a5457a8543so5330574a91.0
+        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 11:23:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713809883; x=1714414683; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=oI5PsFH5OqKQcxn/PnstoUW6QKwHJtSKvuBDm6LMOPQ=;
-        b=pKbnRnEV65ACHdGVwgFVSUZzRLua3oGnFQMaL2/i4rbgRF51NDYA18+BcNwylo9hNU
-         XWlhNR3iD52iUng3JBx7RTqc9mcK5LBXJWs50pkm8vqAeOOmZTerUqj6zydKrCQTFzAd
-         qPjYK0uB7VgUigjnRZ2urSNTGAVE8NyQEnUhK+jzyJ1DC1fdxk9Y6yj2Zr7myQ2whFl3
-         UQJ7NtYgJtL9CFBaocVMIjaD90QBIQLAJoZlbjcPZE0MOqN/Dsb3Zppk9SKzzIqUuEcK
-         Cv+o5aagoChNb3AIeSyD4eQ0B6LY0iu7OBbHQ55OkPGjikbnUnoDqZEQZQ/oDJLnJ2Pg
-         skdQ==
+        d=google.com; s=20230601; t=1713810200; x=1714415000; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=iVO+imZpifbLHaeEuxAYMXBjbbRFP4GDOOLoCMHfR6k=;
+        b=ktDxJyYp1nO0QZmNx32RjXEamnsbyrI1vqFoXUol/0CfNraikTpKp2EPSHD/ye+P6n
+         0Q8tbbDKHeVVPR4rD2/lE4EnGG6jAFa4URjzqdAgJqTQdQtDhOYOAmyEARE6lmelxRgS
+         RXNX5itzPO0qIeB8OmOcR/aRjySQrKvQPgupUHloMGf4vbLlhlr1fo519kmkaMCwjhLs
+         nbYkg+ACzzXr2F9wVkh4qSF1jwmUS6AW/5Yh7l2t+cmQiBCD4fcYzDudUupySCV7m8OB
+         5zrGb6nVucWO1M9+jJ4o6J4KPlE4GbqpmlyW0E74PP9cCJtCBsX9wE/Zr8SG54LXSrKH
+         SKrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713809883; x=1714414683;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oI5PsFH5OqKQcxn/PnstoUW6QKwHJtSKvuBDm6LMOPQ=;
-        b=dKX1B5X+Q7U5/o7japPqluMjprtUepkmYg122Ez0ceT2kUAaNcXBk+/OYimeALPI4G
-         IAeghhmk4ERneSsISUCcoshKyj3eFsdlmses/LAP+gzeTm2PlVl5jxhJ1zwZHogckPoh
-         kjPkKIvx5N+VM+SD/iOgmBgWw/v7j5VRVGcR/YtjBiDz9zBueaejuUV6fp1GgG1huXPx
-         jmZ+BcvdzL9A081Hf/Dg1FqX8ENOW9grbvobrADFKHNCtrAWZq0P58ZNu9nt+r5df+ZK
-         5Mdi1L1w1sOaOFjZjRY/iEUAzmhreVG82zbvbjMOYHnUS659a8Xq50PWVgtbk8StaOzR
-         O0pA==
-X-Gm-Message-State: AOJu0YwG5980BZWAZE/aMJp/FBq01aMxVYaVXSHguTLrMIQZ5mu/Axap
-	mzNDFKdZ1WgH2I9aGuR9uaUCJQO7DsrXRKDvQQJk6UoK79wjBQsmN35vTBrBNr9H9U0AmMurUAl
-	D0a2CeiS0rT45c5DhBvvKwK9K9gXq2M8IDlw8YYuayrWz/NGxp9QpHFCgMQj8pqM2T6C1lnceEY
-	2/puW6OZ2TL/npA5+w2VOto9Twd5VfZiy4bsvIlBV0rTghk1ZgBwVjHYQ=
-X-Google-Smtp-Source: AGHT+IEKODLHt0IICOPUeVBmNrFEXzRI0P6fCZGRCIutCpq1JEBl/VDOZ6TtUkQgtYk3XxRPPL+MJTGy5Ijvtnur4w==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6902:1146:b0:dc7:49a9:6666 with
- SMTP id p6-20020a056902114600b00dc749a96666mr3364862ybu.3.1713809883531; Mon,
- 22 Apr 2024 11:18:03 -0700 (PDT)
-Date: Mon, 22 Apr 2024 18:17:16 +0000
+        d=1e100.net; s=20230601; t=1713810200; x=1714415000;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iVO+imZpifbLHaeEuxAYMXBjbbRFP4GDOOLoCMHfR6k=;
+        b=DfXldYXP67Tg2POySeW1BquDyl15wiL9+4s/0GejtWs3oQ0lg056A1XGzLR3Ih/oXz
+         vlXJATtut1T48UEupPAwNCr+peTrZymThCEgtHma43w/8LhRlQzTHqmqsy7mz5CBY3dI
+         kaatL3JjqYytP2Uy0HHQgrdudrQGzdMA4jK0CDDs0cTrAAmyHNJWAgd1Y1V64TWO601Z
+         ztvswpCEMimUi/YeRm3r1btbBXL/Ja94FlvHwOjG+NrV0bBleE/oKH0jnXDfSiQQr/mK
+         BeQNcCRxPoAD/Ptl+UvOX408v4m7MxjL+JJEGV0CIHXF4RzA3zuu6i9YdkEz2VLelzyR
+         QrXw==
+X-Forwarded-Encrypted: i=1; AJvYcCXWNnT5BqLK3Xvn38t+7IKx8mDrV/KTFV4Xn+pDW+Dcr6kcxPFHzEOj3qf5QBIaeedlblK6hGazsBrnfxTexPKlfrVy
+X-Gm-Message-State: AOJu0YwfHA/AgzwyqNEJkzpc/4PXVpiyeGP7kgE3Lo+deEeDjkg+J3iZ
+	3NrGffkQjYDyVWq5FUEStRaOeXP4Lto3nqrR3Nt9POtP/ry+fYZtQwX/VpsudDYmLz7SqKUhLi5
+	jTw==
+X-Google-Smtp-Source: AGHT+IH8En3k8Zrt0zKZ4iL2xf0AtDbxnu/0y9oasQCODyJ3lQKGpbyMNvu6LDy7gvzMdSGgRGNm+ULIEYw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3145:b0:2ae:6e94:b02b with SMTP id
+ ip5-20020a17090b314500b002ae6e94b02bmr3372pjb.4.1713810199705; Mon, 22 Apr
+ 2024 11:23:19 -0700 (PDT)
+Date: Mon, 22 Apr 2024 11:23:18 -0700
+In-Reply-To: <20240422170842.2073979-1-usama.anjum@collabora.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240422181716.237284-1-coltonlewis@google.com>
-Subject: [PATCH v4] KVM: arm64: Add early_param to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20240422170842.2073979-1-usama.anjum@collabora.com>
+Message-ID: <ZiarFpdLZFusHCO1@google.com>
+Subject: Re: [PATCH] selftests: kvm: fix undeclared function error
+From: Sean Christopherson <seanjc@google.com>
+To: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, kernel@collabora.com, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-Add an early_params to control WFI and WFE trapping. This is to
-control the degree guests can wait for interrupts on their own without
-being trapped by KVM. Options for each param are trap, notrap, and
-default. trap enables the trap. notrap disables the trap. default
-preserves current behavior, disabling the trap if only a single task
-is running and enabling otherwise.
+On Mon, Apr 22, 2024, Muhammad Usama Anjum wrote:
+> Include kvm_test_harness.h first which will include kselftest_harness.h
+> for _GNU_SOURCE to get defined first before inclusion of stdio.h. It
+> is required for declaration of asprintf(). It removes the following
+> build error caught by clang-17:
+> 
+> In file included from x86_64/fix_hypercall_test.c:12:
+> In file included from include/kvm_test_harness.h:11:
+> ../kselftest_harness.h:1169:2: error: call to undeclared function
+> 'asprintf'; ISO C99 and later do not support implicit function declarations
+> [-Wimplicit-function-declaration]
+>  1169 |         asprintf(&test_name, "%s%s%s.%s", f->name,
+>       |         ^
+> 
+> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c b/tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
+> index f3c2239228b10..75306dcfaad6c 100644
+> --- a/tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/fix_hypercall_test.c
+> @@ -4,12 +4,12 @@
+>   *
+>   * Tests for KVM paravirtual feature disablement
+>   */
+> +#include "kvm_test_harness.h"
+>  #include <asm/kvm_para.h>
+>  #include <linux/kvm_para.h>
+>  #include <linux/stringify.h>
+>  #include <stdint.h>
+>  
+> -#include "kvm_test_harness.h"
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
-v4:
+Oof, that's ugly.  We should fix this by doing what we should have done a long
+time ago: define _GNU_SOURCE in CFLAGS for all selftests.  I'll post the below
+formally once I've smoke tested to make sure it doesn't break in weird ways.
 
-* Fixed inaccurate names that incorrectly implied this controls interrupts
-  themselves instead of instructions waiting for interrupts and events
-* Split into two separate params as interrupts (WFI) and events (WFE) do
-  different things and may warrant separate controls.
-* Document new params in Documentation/admin-guide/kernel-parameters.txt
-
-
-v3:
-https://lore.kernel.org/kvmarm/20240410175437.793508-1-coltonlewis@google.com/
-
-v2:
-https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
-
-v1:
-https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
-
- .../admin-guide/kernel-parameters.txt         | 22 +++++++-
- arch/arm64/include/asm/kvm_emulate.h          | 24 ++++++++-
- arch/arm64/include/asm/kvm_host.h             |  7 +++
- arch/arm64/kvm/arm.c                          | 54 +++++++++++++++++--
- 4 files changed, 101 insertions(+), 6 deletions(-)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 31b3a25680d0..f8d16c792e66 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2653,6 +2653,27 @@
- 			[KVM,ARM] Allow use of GICv4 for direct injection of
- 			LPIs.
-
-+	kvm-arm.wfe_trap_policy=
-+			[KVM,ARM] Control when to set wfe instruction trap.
-+
-+			trap: set wfe instruction trap
-+
-+			notrap: clear wfe instruction trap
-+
-+			default: set wfe instruction trap only if multiple
-+				 tasks are running on the CPU
-+
-+	kvm-arm.wfi_trap_policy=
-+			[KVM,ARM] Control when to set wfi instruction trap.
-+
-+			trap: set wfi instruction trap
-+
-+			notrap: clear wfi instruction trap
-+
-+			default: set wfi instruction trap only if multiple
-+				 tasks are running on the CPU
-+
-+
- 	kvm_cma_resv_ratio=n [PPC]
- 			Reserves given percentage from system memory area for
- 			contiguous memory allocation for KVM hash pagetable
-@@ -7394,4 +7415,3 @@
- 				memory, and other data can't be written using
- 				xmon commands.
- 			off	xmon is disabled.
--
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index b804fe832184..efd0a3fb6f00 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -109,9 +109,13 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
- 	return (unsigned long *)&vcpu->arch.hcr_el2;
- }
-
--static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
-+static inline void vcpu_clear_wfe_trap(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 &= ~HCR_TWE;
-+}
-+
-+static inline void vcpu_clear_wfi_trap(struct kvm_vcpu *vcpu)
-+{
- 	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
- 	    vcpu->kvm->arch.vgic.nassgireq)
- 		vcpu->arch.hcr_el2 &= ~HCR_TWI;
-@@ -119,12 +123,28 @@ static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 |= HCR_TWI;
- }
-
--static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
-+static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
-+{
-+	vcpu_clear_wfe_trap(vcpu);
-+	vcpu_clear_wfi_trap(vcpu);
-+}
-+
-+static inline void vcpu_set_wfe_trap(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 |= HCR_TWE;
-+}
-+
-+static inline void vcpu_set_wfi_trap(struct kvm_vcpu *vcpu)
-+{
- 	vcpu->arch.hcr_el2 |= HCR_TWI;
- }
-
-+static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
-+{
-+	vcpu_set_wfe_trap(vcpu);
-+	vcpu_set_wfi_trap(vcpu);
-+}
-+
- static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 21c57b812569..315ee7bfc1cb 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -67,6 +67,13 @@ enum kvm_mode {
- 	KVM_MODE_NV,
- 	KVM_MODE_NONE,
- };
-+
-+enum kvm_wfx_trap_policy {
-+	KVM_WFX_NOTRAP_SINGLE_TASK, /* Default option */
-+	KVM_WFX_NOTRAP,
-+	KVM_WFX_TRAP,
-+};
-+
- #ifdef CONFIG_KVM
- enum kvm_mode kvm_get_mode(void);
- #else
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index a25265aca432..5106ba5a8a39 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -46,6 +46,8 @@
- #include <kvm/arm_psci.h>
-
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-+static enum kvm_wfx_trap_policy kvm_wfi_trap_policy = KVM_WFX_NOTRAP_SINGLE_TASK;
-+static enum kvm_wfx_trap_policy kvm_wfe_trap_policy = KVM_WFX_NOTRAP_SINGLE_TASK;
-
- DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
-
-@@ -423,6 +425,12 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
-
- }
-
-+static bool kvm_should_clear_wfx_trap(enum kvm_wfx_trap_policy p)
-+{
-+	return (p == KVM_WFX_NOTRAP && kvm_vgic_global_state.has_gicv4)
-+		|| (p == KVM_WFX_NOTRAP_SINGLE_TASK && single_task_running());
-+}
-+
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct kvm_s2_mmu *mmu;
-@@ -456,10 +464,15 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
- 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
-
--	if (single_task_running())
--		vcpu_clear_wfx_traps(vcpu);
-+	if (kvm_should_clear_wfx_trap(kvm_wfi_trap_policy))
-+		vcpu_clear_wfi_trap(vcpu);
- 	else
--		vcpu_set_wfx_traps(vcpu);
-+		vcpu_set_wfi_trap(vcpu);
-+
-+	if (kvm_should_clear_wfx_trap(kvm_wfe_trap_policy))
-+		vcpu_clear_wfe_trap(vcpu);
-+	else
-+		vcpu_set_wfe_trap(vcpu);
-
- 	if (vcpu_has_ptrauth(vcpu))
- 		vcpu_ptrauth_disable(vcpu);
-@@ -2654,6 +2667,41 @@ static int __init early_kvm_mode_cfg(char *arg)
- }
- early_param("kvm-arm.mode", early_kvm_mode_cfg);
-
-+static int __init early_kvm_wfx_trap_policy_cfg(char *arg, enum kvm_wfx_trap_policy *p)
-+{
-+	if (!arg)
-+		return -EINVAL;
-+
-+	if (strcmp(arg, "trap") == 0) {
-+		*p = KVM_WFX_TRAP;
-+		return 0;
-+	}
-+
-+	if (strcmp(arg, "notrap") == 0) {
-+		*p = KVM_WFX_NOTRAP;
-+		return 0;
-+	}
-+
-+	if (strcmp(arg, "default") == 0) {
-+		*p = KVM_WFX_NOTRAP_SINGLE_TASK;
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static int __init early_kvm_wfi_trap_policy_cfg(char *arg)
-+{
-+	return early_kvm_wfx_trap_policy_cfg(arg, &kvm_wfi_trap_policy);
-+}
-+early_param("kvm-arm.wfi_trap_policy", early_kvm_wfi_trap_policy_cfg);
-+
-+static int __init early_kvm_wfe_trap_policy_cfg(char *arg)
-+{
-+	return early_kvm_wfx_trap_policy_cfg(arg, &kvm_wfe_trap_policy);
-+}
-+early_param("kvm-arm.wfe_trap_policy", early_kvm_wfe_trap_policy_cfg);
-+
- enum kvm_mode kvm_get_mode(void)
- {
- 	return kvm_mode;
 --
-2.44.0.769.g3c40516874-goog
+Subject: [PATCH] KVM: selftest: Define _GNU_SOURCE for all selftests code
+
+Define _GNU_SOURCE is the base CFLAGS instead of relying on selftests to
+manually #define _GNU_SOURCE, which is repetitive and error prone.  E.g.
+kselftest_harness.h requres _GNU_SOURCE for asprintf(), but if a selftest
+includes kvm_test_harness.h after stdio.h, the include guards result in
+the effective version of stdio.h consumed by kvm_test_harness.h not
+defining asprintf():
+
+  In file included from x86_64/fix_hypercall_test.c:12:
+  In file included from include/kvm_test_harness.h:11:
+ ../kselftest_harness.h:1169:2: error: call to undeclared function
+  'asprintf'; ISO C99 and later do not support implicit function declarations
+  [-Wimplicit-function-declaration]
+   1169 |         asprintf(&test_name, "%s%s%s.%s", f->name,
+        |         ^
+
+When including the rseq selftest's "library" code, #undef _GNU_SOURCE so
+that rseq.c controls whether or not it wants to build with _GNU_SOURCE.
+
+Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/Makefile                 |  4 ++--
+ tools/testing/selftests/kvm/aarch64/arch_timer.c     |  2 --
+ .../testing/selftests/kvm/aarch64/page_fault_test.c  |  1 -
+ tools/testing/selftests/kvm/aarch64/psci_test.c      |  3 ---
+ tools/testing/selftests/kvm/aarch64/vgic_init.c      |  1 -
+ tools/testing/selftests/kvm/arch_timer.c             |  3 ---
+ tools/testing/selftests/kvm/demand_paging_test.c     |  3 ---
+ tools/testing/selftests/kvm/dirty_log_test.c         |  3 ---
+ tools/testing/selftests/kvm/guest_memfd_test.c       |  2 --
+ tools/testing/selftests/kvm/hardware_disable_test.c  |  3 ---
+ tools/testing/selftests/kvm/include/kvm_util_base.h  | 12 ++++++------
+ .../testing/selftests/kvm/include/userfaultfd_util.h |  3 ---
+ tools/testing/selftests/kvm/kvm_binary_stats_test.c  |  2 --
+ tools/testing/selftests/kvm/kvm_create_max_vcpus.c   |  2 --
+ tools/testing/selftests/kvm/kvm_page_table_test.c    |  3 ---
+ tools/testing/selftests/kvm/lib/assert.c             |  3 ---
+ tools/testing/selftests/kvm/lib/kvm_util.c           |  2 --
+ tools/testing/selftests/kvm/lib/memstress.c          |  2 --
+ tools/testing/selftests/kvm/lib/test_util.c          |  2 --
+ tools/testing/selftests/kvm/lib/userfaultfd_util.c   |  3 ---
+ tools/testing/selftests/kvm/lib/x86_64/sev.c         |  1 -
+ tools/testing/selftests/kvm/max_guest_memory_test.c  |  2 --
+ .../selftests/kvm/memslot_modification_stress_test.c |  3 ---
+ tools/testing/selftests/kvm/riscv/arch_timer.c       |  3 ---
+ tools/testing/selftests/kvm/rseq_test.c              | 12 +++++++++---
+ tools/testing/selftests/kvm/s390x/cmma_test.c        |  2 --
+ tools/testing/selftests/kvm/s390x/sync_regs_test.c   |  2 --
+ tools/testing/selftests/kvm/set_memory_region_test.c |  1 -
+ tools/testing/selftests/kvm/steal_time.c             |  1 -
+ tools/testing/selftests/kvm/x86_64/amx_test.c        |  2 --
+ .../kvm/x86_64/exit_on_emulation_failure_test.c      |  3 ---
+ tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c   |  2 --
+ tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c    |  2 --
+ tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c    |  1 -
+ tools/testing/selftests/kvm/x86_64/hyperv_ipi.c      |  2 --
+ tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c |  1 -
+ .../testing/selftests/kvm/x86_64/hyperv_tlb_flush.c  |  2 --
+ .../selftests/kvm/x86_64/nested_exceptions_test.c    |  2 --
+ .../selftests/kvm/x86_64/nx_huge_pages_test.c        |  3 ---
+ .../selftests/kvm/x86_64/platform_info_test.c        |  2 --
+ .../testing/selftests/kvm/x86_64/pmu_counters_test.c |  2 --
+ .../selftests/kvm/x86_64/pmu_event_filter_test.c     |  3 ---
+ .../kvm/x86_64/private_mem_conversions_test.c        |  1 -
+ tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c |  1 -
+ tools/testing/selftests/kvm/x86_64/set_sregs_test.c  |  1 -
+ .../kvm/x86_64/smaller_maxphyaddr_emulation_test.c   |  3 ---
+ tools/testing/selftests/kvm/x86_64/smm_test.c        |  1 -
+ tools/testing/selftests/kvm/x86_64/state_test.c      |  1 -
+ tools/testing/selftests/kvm/x86_64/sync_regs_test.c  |  2 --
+ .../selftests/kvm/x86_64/ucna_injection_test.c       |  2 --
+ .../selftests/kvm/x86_64/userspace_msr_exit_test.c   |  2 --
+ .../selftests/kvm/x86_64/vmx_dirty_log_test.c        |  3 ---
+ .../testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c |  1 -
+ .../selftests/kvm/x86_64/vmx_preemption_timer_test.c |  1 -
+ tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c  |  2 --
+ .../testing/selftests/kvm/x86_64/xapic_state_test.c  |  1 -
+ tools/testing/selftests/kvm/x86_64/xss_msr_test.c    |  2 --
+ 57 files changed, 17 insertions(+), 120 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 741c7dc16afc..4f30296e0bbb 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -225,8 +225,8 @@ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+ endif
+ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+ 	-Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT \
+-	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+-	-fno-builtin-strnlen \
++	-D_GNU_SOURCE -fno-builtin-memcmp -fno-builtin-memcpy \
++	-fno-builtin-memset -fno-builtin-strnlen \
+ 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+ 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+ 	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+diff --git a/tools/testing/selftests/kvm/aarch64/arch_timer.c b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+index 4eaba83cdcf3..5369959e9fc2 100644
+--- a/tools/testing/selftests/kvm/aarch64/arch_timer.c
++++ b/tools/testing/selftests/kvm/aarch64/arch_timer.c
+@@ -5,8 +5,6 @@
+  *
+  * Copyright (c) 2021, Google LLC.
+  */
+-#define _GNU_SOURCE
+-
+ #include "arch_timer.h"
+ #include "delay.h"
+ #include "gic.h"
+diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+index a2a158e2c0b8..d29b08198b42 100644
+--- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
++++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+@@ -7,7 +7,6 @@
+  * hugetlbfs with a hole). It checks that the expected handling method is
+  * called (e.g., uffd faults with the right address and write/read flag).
+  */
+-#define _GNU_SOURCE
+ #include <linux/bitmap.h>
+ #include <fcntl.h>
+ #include <test_util.h>
+diff --git a/tools/testing/selftests/kvm/aarch64/psci_test.c b/tools/testing/selftests/kvm/aarch64/psci_test.c
+index 9b004905d1d3..1c8c6f0c1ca3 100644
+--- a/tools/testing/selftests/kvm/aarch64/psci_test.c
++++ b/tools/testing/selftests/kvm/aarch64/psci_test.c
+@@ -10,9 +10,6 @@
+  *  - A test for KVM's handling of PSCI SYSTEM_SUSPEND and the associated
+  *    KVM_SYSTEM_EVENT_SUSPEND UAPI.
+  */
+-
+-#define _GNU_SOURCE
+-
+ #include <linux/psci.h>
+ 
+ #include "kvm_util.h"
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+index eef816b80993..e93022870cac 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+@@ -4,7 +4,6 @@
+  *
+  * Copyright (C) 2020, Red Hat, Inc.
+  */
+-#define _GNU_SOURCE
+ #include <linux/kernel.h>
+ #include <sys/syscall.h>
+ #include <asm/kvm.h>
+diff --git a/tools/testing/selftests/kvm/arch_timer.c b/tools/testing/selftests/kvm/arch_timer.c
+index ae1f1a6d8312..fcebd8d81ce4 100644
+--- a/tools/testing/selftests/kvm/arch_timer.c
++++ b/tools/testing/selftests/kvm/arch_timer.c
+@@ -19,9 +19,6 @@
+  *
+  * Copyright (c) 2021, Google LLC.
+  */
+-
+-#define _GNU_SOURCE
+-
+ #include <stdlib.h>
+ #include <pthread.h>
+ #include <linux/sizes.h>
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 056ff1c87345..bc5c4ada5f0d 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -6,9 +6,6 @@
+  * Copyright (C) 2018, Red Hat, Inc.
+  * Copyright (C) 2019, Google, Inc.
+  */
+-
+-#define _GNU_SOURCE /* for pipe2 */
+-
+ #include <inttypes.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index eaad5b20854c..bf1ebc29f22a 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -4,9 +4,6 @@
+  *
+  * Copyright (C) 2018, Red Hat, Inc.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_name */
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <pthread.h>
+diff --git a/tools/testing/selftests/kvm/guest_memfd_test.c b/tools/testing/selftests/kvm/guest_memfd_test.c
+index 92eae206baa6..309fe84b84ad 100644
+--- a/tools/testing/selftests/kvm/guest_memfd_test.c
++++ b/tools/testing/selftests/kvm/guest_memfd_test.c
+@@ -4,8 +4,6 @@
+  *
+  * Author: Chao Peng <chao.p.peng@linux.intel.com>
+  */
+-
+-#define _GNU_SOURCE
+ #include <stdlib.h>
+ #include <string.h>
+ #include <unistd.h>
+diff --git a/tools/testing/selftests/kvm/hardware_disable_test.c b/tools/testing/selftests/kvm/hardware_disable_test.c
+index decc521fc760..bce73bcb973c 100644
+--- a/tools/testing/selftests/kvm/hardware_disable_test.c
++++ b/tools/testing/selftests/kvm/hardware_disable_test.c
+@@ -4,9 +4,6 @@
+  * kvm_arch_hardware_disable is called and it attempts to unregister the user
+  * return notifiers.
+  */
+-
+-#define _GNU_SOURCE
+-
+ #include <fcntl.h>
+ #include <pthread.h>
+ #include <semaphore.h>
+diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
+index 3e0db283a46a..0c004036309d 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util_base.h
++++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
+@@ -27,12 +27,12 @@
+ 
+ /*
+  * Provide a version of static_assert() that is guaranteed to have an optional
+- * message param.  If _ISOC11_SOURCE is defined, glibc (/usr/include/assert.h)
+- * #undefs and #defines static_assert() as a direct alias to _Static_assert(),
+- * i.e. effectively makes the message mandatory.  Many KVM selftests #define
+- * _GNU_SOURCE for various reasons, and _GNU_SOURCE implies _ISOC11_SOURCE.  As
+- * a result, static_assert() behavior is non-deterministic and may or may not
+- * require a message depending on #include order.
++ * message param.  _GNU_SOURCE is defined for all KVM selftests, _GNU_SOURCE
++ * implies _ISOC11_SOURCE, and if _ISOC11_SOURCE is defined, glibc #undefs and
++ * #defines static_assert() as a direct alias to _Static_assert() (see
++ * usr/include/assert.h).  Define a custom macro instead of redefining
++ * static_assert() to avoid creating non-deterministic behavior that is
++ * dependent on include order.
+  */
+ #define __kvm_static_assert(expr, msg, ...) _Static_assert(expr, msg)
+ #define kvm_static_assert(expr, ...) __kvm_static_assert(expr, ##__VA_ARGS__, #expr)
+diff --git a/tools/testing/selftests/kvm/include/userfaultfd_util.h b/tools/testing/selftests/kvm/include/userfaultfd_util.h
+index 24f2cc5f4292..60f7f9d435dc 100644
+--- a/tools/testing/selftests/kvm/include/userfaultfd_util.h
++++ b/tools/testing/selftests/kvm/include/userfaultfd_util.h
+@@ -5,9 +5,6 @@
+  * Copyright (C) 2018, Red Hat, Inc.
+  * Copyright (C) 2019-2022 Google LLC
+  */
+-
+-#define _GNU_SOURCE /* for pipe2 */
+-
+ #include <inttypes.h>
+ #include <time.h>
+ #include <pthread.h>
+diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+index 698c1cfa3111..f02355c3c4c2 100644
+--- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
++++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+@@ -6,8 +6,6 @@
+  *
+  * Test the fd-based interface for KVM statistics.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+index b9e23265e4b3..c78f34699f73 100644
+--- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
++++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+@@ -6,8 +6,6 @@
+  *
+  * Test for KVM_CAP_MAX_VCPUS and KVM_CAP_MAX_VCPU_ID.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
+index e0ba97ac1c56..7759c685086b 100644
+--- a/tools/testing/selftests/kvm/kvm_page_table_test.c
++++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
+@@ -8,9 +8,6 @@
+  * page size have been pre-allocated on your system, if you are planning to
+  * use hugepages to back the guest memory for testing.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_name */
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <time.h>
+diff --git a/tools/testing/selftests/kvm/lib/assert.c b/tools/testing/selftests/kvm/lib/assert.c
+index 2bd25b191d15..b49690658c60 100644
+--- a/tools/testing/selftests/kvm/lib/assert.c
++++ b/tools/testing/selftests/kvm/lib/assert.c
+@@ -4,9 +4,6 @@
+  *
+  * Copyright (C) 2018, Google LLC.
+  */
+-
+-#define _GNU_SOURCE /* for getline(3) and strchrnul(3)*/
+-
+ #include "test_util.h"
+ 
+ #include <execinfo.h>
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index b2262b5fad9e..1eaf001d0ad4 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright (C) 2018, Google LLC.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_name */
+ #include "test_util.h"
+ #include "kvm_util.h"
+ #include "processor.h"
+diff --git a/tools/testing/selftests/kvm/lib/memstress.c b/tools/testing/selftests/kvm/lib/memstress.c
+index cf2c73971308..555e3932e529 100644
+--- a/tools/testing/selftests/kvm/lib/memstress.c
++++ b/tools/testing/selftests/kvm/lib/memstress.c
+@@ -2,8 +2,6 @@
+ /*
+  * Copyright (C) 2020, Google LLC.
+  */
+-#define _GNU_SOURCE
+-
+ #include <inttypes.h>
+ #include <linux/bitmap.h>
+ 
+diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+index 5a8f8becb129..8ed0b74ae837 100644
+--- a/tools/testing/selftests/kvm/lib/test_util.c
++++ b/tools/testing/selftests/kvm/lib/test_util.c
+@@ -4,8 +4,6 @@
+  *
+  * Copyright (C) 2020, Google LLC.
+  */
+-
+-#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <stdarg.h>
+ #include <assert.h>
+diff --git a/tools/testing/selftests/kvm/lib/userfaultfd_util.c b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+index 0ba866c4af69..7c9de8414462 100644
+--- a/tools/testing/selftests/kvm/lib/userfaultfd_util.c
++++ b/tools/testing/selftests/kvm/lib/userfaultfd_util.c
+@@ -6,9 +6,6 @@
+  * Copyright (C) 2018, Red Hat, Inc.
+  * Copyright (C) 2019-2022 Google LLC
+  */
+-
+-#define _GNU_SOURCE /* for pipe2 */
+-
+ #include <inttypes.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
+index e248d3364b9c..e83809febae1 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
+@@ -1,5 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <stdint.h>
+ #include <stdbool.h>
+ 
+diff --git a/tools/testing/selftests/kvm/max_guest_memory_test.c b/tools/testing/selftests/kvm/max_guest_memory_test.c
+index 6628dc4dda89..9b7fc3908be6 100644
+--- a/tools/testing/selftests/kvm/max_guest_memory_test.c
++++ b/tools/testing/selftests/kvm/max_guest_memory_test.c
+@@ -1,6 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0
+-#define _GNU_SOURCE
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <pthread.h>
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 156361966612..05fcf902e067 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -6,9 +6,6 @@
+  * Copyright (C) 2018, Red Hat, Inc.
+  * Copyright (C) 2020, Google, Inc.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_name */
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <sys/syscall.h>
+diff --git a/tools/testing/selftests/kvm/riscv/arch_timer.c b/tools/testing/selftests/kvm/riscv/arch_timer.c
+index 0f9cabd99fd4..4b5004ef9c6b 100644
+--- a/tools/testing/selftests/kvm/riscv/arch_timer.c
++++ b/tools/testing/selftests/kvm/riscv/arch_timer.c
+@@ -7,9 +7,6 @@
+  *
+  * Copyright (c) 2024, Intel Corporation.
+  */
+-
+-#define _GNU_SOURCE
+-
+ #include "arch_timer.h"
+ #include "kvm_util.h"
+ #include "processor.h"
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 28f97fb52044..0728b15b5d3a 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -1,5 +1,13 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#define _GNU_SOURCE /* for program_invocation_short_name */
++
++/*
++ * Include rseq.c without _GNU_SOURCE defined, before including any headers, so
++ * that rseq.c is compiled with its configuration, not KVM selftests' config.
++ */
++#undef _GNU_SOURCE
++#include "../rseq/rseq.c"
++#define _GNU_SOURCE
++
+ #include <errno.h>
+ #include <fcntl.h>
+ #include <pthread.h>
+@@ -20,8 +28,6 @@
+ #include "processor.h"
+ #include "test_util.h"
+ 
+-#include "../rseq/rseq.c"
+-
+ /*
+  * Any bug related to task migration is likely to be timing-dependent; perform
+  * a large number of migrations to reduce the odds of a false negative.
+diff --git a/tools/testing/selftests/kvm/s390x/cmma_test.c b/tools/testing/selftests/kvm/s390x/cmma_test.c
+index 626a2b8a2037..84ba79c42ab1 100644
+--- a/tools/testing/selftests/kvm/s390x/cmma_test.c
++++ b/tools/testing/selftests/kvm/s390x/cmma_test.c
+@@ -7,8 +7,6 @@
+  * Authors:
+  *  Nico Boehr <nrb@linux.ibm.com>
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/s390x/sync_regs_test.c b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+index 43fb25ddc3ec..53def355ccba 100644
+--- a/tools/testing/selftests/kvm/s390x/sync_regs_test.c
++++ b/tools/testing/selftests/kvm/s390x/sync_regs_test.c
+@@ -10,8 +10,6 @@
+  *
+  * Test expected behavior of the KVM_CAP_SYNC_REGS functionality.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index 06b43ed23580..4a436a40e4b0 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -1,5 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <pthread.h>
+ #include <sched.h>
+diff --git a/tools/testing/selftests/kvm/steal_time.c b/tools/testing/selftests/kvm/steal_time.c
+index 4be5a1ffa06a..b6938bd2442c 100644
+--- a/tools/testing/selftests/kvm/steal_time.c
++++ b/tools/testing/selftests/kvm/steal_time.c
+@@ -4,7 +4,6 @@
+  *
+  * Copyright (C) 2020, Red Hat, Inc.
+  */
+-#define _GNU_SOURCE
+ #include <stdio.h>
+ #include <time.h>
+ #include <sched.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+index eae521f050e0..8e5713e36d4b 100644
+--- a/tools/testing/selftests/kvm/x86_64/amx_test.c
++++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+@@ -6,8 +6,6 @@
+  *
+  * Tests for amx #NM exception and save/restore.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c b/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
+index 6c2e5e0ceb1f..9c21b6bccc38 100644
+--- a/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
++++ b/tools/testing/selftests/kvm/x86_64/exit_on_emulation_failure_test.c
+@@ -4,9 +4,6 @@
+  *
+  * Test for KVM_CAP_EXIT_ON_EMULATION_FAILURE.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+-
+ #include "flds_emulation.h"
+ 
+ #include "test_util.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c b/tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c
+index df351ae17029..10b1b0ba374e 100644
+--- a/tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c
++++ b/tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c
+@@ -2,8 +2,6 @@
+ /*
+  * Copyright (C) 2023, Google LLC.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <sys/ioctl.h>
+ 
+ #include "test_util.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+index 5c27efbf405e..4f5881d4ef66 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+@@ -7,8 +7,6 @@
+  * This work is licensed under the terms of the GNU GPL, version 2.
+  *
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+index 4c7257ecd2a6..4f3f3a9b038b 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+@@ -4,7 +4,6 @@
+  *
+  * Tests for Enlightened VMCS, including nested guest state.
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+index f1617762c22f..8206f5ef42dd 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_ipi.c
+@@ -5,8 +5,6 @@
+  * Copyright (C) 2022, Red Hat, Inc.
+  *
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <pthread.h>
+ #include <inttypes.h>
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+index c9b18707edc0..b987a3d79715 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+@@ -4,7 +4,6 @@
+  *
+  * Tests for Hyper-V extensions to SVM.
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+index 05b56095cf76..077cd0ec3040 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c
+@@ -5,8 +5,6 @@
+  * Copyright (C) 2022, Red Hat, Inc.
+  *
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <asm/barrier.h>
+ #include <pthread.h>
+ #include <inttypes.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c b/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
+index 3670331adf21..3eb0313ffa39 100644
+--- a/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c
+@@ -1,6 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+-
+ #include "test_util.h"
+ #include "kvm_util.h"
+ #include "processor.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+index 17bbb96fc4df..e7efb2b35f8b 100644
+--- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+@@ -5,9 +5,6 @@
+  *
+  * Copyright (C) 2022, Google LLC.
+  */
+-
+-#define _GNU_SOURCE
+-
+ #include <fcntl.h>
+ #include <stdint.h>
+ #include <time.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/platform_info_test.c b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
+index 87011965dc41..2165b1ad8b38 100644
+--- a/tools/testing/selftests/kvm/x86_64/platform_info_test.c
++++ b/tools/testing/selftests/kvm/x86_64/platform_info_test.c
+@@ -9,8 +9,6 @@
+  * Verifies expected behavior of controlling guest access to
+  * MSR_PLATFORM_INFO.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+index 29609b52f8fa..842d87c8d6b6 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+@@ -2,8 +2,6 @@
+ /*
+  * Copyright (C) 2023, Tencent, Inc.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <x86intrin.h>
+ 
+ #include "pmu.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+index 3c85d1ae9893..5ce53b8c46e0 100644
+--- a/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
++++ b/tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c
+@@ -9,9 +9,6 @@
+  * Verifies the expected behavior of allow lists and deny lists for
+  * virtual PMU events.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+-
+ #include "kvm_util.h"
+ #include "pmu.h"
+ #include "processor.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c b/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
+index e0f642d2a3c4..82a8d88b5338 100644
+--- a/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
++++ b/tools/testing/selftests/kvm/x86_64/private_mem_conversions_test.c
+@@ -2,7 +2,6 @@
+ /*
+  * Copyright (C) 2022, Google LLC.
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <limits.h>
+ #include <pthread.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+index 366cf18600bc..d691d86e5bc3 100644
+--- a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
++++ b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+@@ -4,7 +4,6 @@
+  *
+  * Copyright (C) 2020, Red Hat, Inc.
+  */
+-#define _GNU_SOURCE /* for program_invocation_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+index 3610981d9162..c021c0795a96 100644
+--- a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+@@ -10,7 +10,6 @@
+  * That bug allowed a user-mode program that called the KVM_SET_SREGS
+  * ioctl to put a VCPU's local APIC into an invalid state.
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+index 416207c38a17..362be40fc00d 100644
+--- a/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c
+@@ -5,9 +5,6 @@
+  * Test that KVM emulates instructions in response to EPT violations when
+  * allow_smaller_maxphyaddr is enabled and guest.MAXPHYADDR < host.MAXPHYADDR.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+-
+ #include "flds_emulation.h"
+ 
+ #include "test_util.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/smm_test.c b/tools/testing/selftests/kvm/x86_64/smm_test.c
+index e18b86666e1f..55c88d664a94 100644
+--- a/tools/testing/selftests/kvm/x86_64/smm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/smm_test.c
+@@ -4,7 +4,6 @@
+  *
+  * Tests for SMM.
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+index 88b58aab7207..1c756db329e5 100644
+--- a/tools/testing/selftests/kvm/x86_64/state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+@@ -6,7 +6,6 @@
+  *
+  * Tests for vCPU state save/restore, including nested guest state.
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+index adb5593daf48..8fa3948b0170 100644
+--- a/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/sync_regs_test.c
+@@ -8,8 +8,6 @@
+  * including requesting an invalid register set, updates to/from values
+  * in kvm_run.s.regs when kvm_valid_regs and kvm_dirty_regs are toggled.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+index dcbb3c29fb8e..abe71946941f 100644
+--- a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
++++ b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+@@ -17,8 +17,6 @@
+  * delivered into the guest or not.
+  *
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <pthread.h>
+ #include <inttypes.h>
+ #include <string.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+index f4f61a2d2464..53afbea4df88 100644
+--- a/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
++++ b/tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c
+@@ -4,8 +4,6 @@
+  *
+  * Tests for exiting into userspace on registered MSRs
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <sys/ioctl.h>
+ 
+ #include "kvm_test_harness.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c b/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
+index 7f6f5f23fb9b..a39cba19c058 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c
+@@ -4,9 +4,6 @@
+  *
+  * Copyright (C) 2018, Red Hat, Inc.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_name */
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <linux/bitmap.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index ea0cb3cae0f7..3b93f262b797 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -10,7 +10,6 @@
+  * and check it can be retrieved with KVM_GET_MSR, also test
+  * the invalid LBR formats are rejected.
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <sys/ioctl.h>
+ 
+ #include <linux/bitmap.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+index affc32800158..00dd2ac07a61 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c
+@@ -9,7 +9,6 @@
+  * value instead of partially decayed timer value
+  *
+  */
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+index 725c206ba0b9..c78e5f755116 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c
+@@ -19,8 +19,6 @@
+  * Migration is a command line option. When used on non-numa machines will 
+  * exit with error. Test is still usefull on non-numa for testing IPIs.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <getopt.h>
+ #include <pthread.h>
+ #include <inttypes.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+index ab75b873a4ad..69849acd95b0 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+@@ -1,5 +1,4 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <fcntl.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+diff --git a/tools/testing/selftests/kvm/x86_64/xss_msr_test.c b/tools/testing/selftests/kvm/x86_64/xss_msr_test.c
+index 167c97abff1b..f331a4e9bae3 100644
+--- a/tools/testing/selftests/kvm/x86_64/xss_msr_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xss_msr_test.c
+@@ -4,8 +4,6 @@
+  *
+  * Tests for the IA32_XSS MSR.
+  */
+-
+-#define _GNU_SOURCE /* for program_invocation_short_name */
+ #include <sys/ioctl.h>
+ 
+ #include "test_util.h"
+
+base-commit: 9f92c06e184074930174e469205f4e78338651f8
+-- 
+
 
