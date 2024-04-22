@@ -1,134 +1,125 @@
-Return-Path: <kvm+bounces-15545-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15546-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A768AD36C
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 19:43:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8E08AD37D
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 19:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C2792832CC
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 17:43:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D8B51F21B21
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 17:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF31153BF5;
-	Mon, 22 Apr 2024 17:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54023154422;
+	Mon, 22 Apr 2024 17:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="DUQwm9ry"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZipYcwWS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D2C146A6A
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 17:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E221152197;
+	Mon, 22 Apr 2024 17:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713807788; cv=none; b=pOf0XbbKOANYiPSYKYEnElsxR+Gr8V6U/3GGvI5dS/SNSYCO9Xn0JmuQjjY9kTOyIB5AecnB6KcpdckmmXqg4yfRgulHP5qln+8lC+0QxieIKTgUBbukNZ+QttC6WQj1LfVCHmUOjtNeuDsIWQCfclfoQpZqhIPFp+19W8HINik=
+	t=1713808238; cv=none; b=R+Zn/kE4wVMONVMk5jkB/+NkZUXWVSubYxiOXXBvf6iTwxTm+LBc2cYiywDt1YcryeP0mxuw/CD0ElkpuD/+AACQ8PWwGMi9IVfD0lIMQ/fPkkXuXURJtymcFaIy5OZWS/O26J7LPDQpZXRwxhxYw2MSjG2A7SQ9JvDbOpl7ibs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713807788; c=relaxed/simple;
-	bh=FPRYflSYPTzX630Jd0+hB1WOM3PbajZTXlGiVPiZLwM=;
+	s=arc-20240116; t=1713808238; c=relaxed/simple;
+	bh=Qw/XTx7VLmthJ54XYfaELgIcf7RnZMS2pyeRWr1PD90=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JJE1ePdaq2R05tGWErYc19Kba/89ygeQe/TWdJhfg7hSWbPJ7A7YmP2pdrjvqtoptKOOndiR/13a10pLG8hmzkG96xyW5GSiPZlmPb2sihepBcFsFbTgWSM8dxH9EardMGIQf8TuNe0wlPOckvCAadBpE1XiVfkj0JN3s/jz/hA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=DUQwm9ry; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-69b24162dd6so22000736d6.2
-        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 10:43:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1713807786; x=1714412586; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k/KOCqovdO5PsKSs9PxME/OsGBVBN8Xn1TisHFdx68w=;
-        b=DUQwm9ryLZY0bh3kXfAbzC7p/jLS0DsNSzp0F6Xrso2bUIDG0KSP//+N1wUGLLwnfx
-         x5Qe4eJV2BgMp/R7vpPijfIwOPPtfj1HTPk/jdKeAWj//gzi+dCOUviK/CqxPfQ3C5Lg
-         RYB6ViVzk8WuAba5UjVxgYzdG6YCEWDyD/tGp775u5jVOxuKOx/Dy7yVxqKmfa+2IDfq
-         OEtQ9VW0TXKEsb3ehsczY/VJ043vTpmetD2J8YrbdX/IHQKBteoueg3F80KCzkxvJr6J
-         03d2weegRHQPRaX0ZuP5D+hZrLXplxdixVqqUU7YtRvsyvZa+1PAYNJR/Tsej6o+vMUh
-         zOTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713807786; x=1714412586;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k/KOCqovdO5PsKSs9PxME/OsGBVBN8Xn1TisHFdx68w=;
-        b=SbXk1QAPKTFcZ+UQFskKTXSa3/L0aqeI4N4yjGJ52ZtLN7wunMcGX3l99c2hKCH+/W
-         W809kLc8zqm8UO7nPK5a/39YQu2dIOupRhw7kYBNeAewYbKwKb51IrbdjLUvgmCDa/+h
-         BIUdz4kNsQ21Kh+gG1jFFHVsLg7ePG79GTrXWLkfChR1uqQGnNGBkTAKJ99dbdvCDmLD
-         EpbHWLjrDrxZAkVSqGBZ41J4+I2SPuFuITUf5qNKOPDZveLhn+CAm15KjTf4gCkktySJ
-         4BZPhbjBiTnw/ntV4KljDNIwnUPe9UJePbrpphlYkdKx6CfqoNqS461te1oT1mAwbOgw
-         3gDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUAcbrVut86tJKKa5taprWeLpwQf6jXx+tld6XhxqlN1733h6WsX5VQ+vLotflZhAbWfov8/iiylq4Hvm+fnnoO4qmu
-X-Gm-Message-State: AOJu0Yyy6i4pL4s3wbw6qQRFeBy0al1Mb8xE1v6oAx4g8ZiuzG97GOkj
-	5hIAURhWhidCEQ7FpiVc5LY3hiokN1V7V3EEKgsri7PoOkrbMDDou3ctSZj34ro=
-X-Google-Smtp-Source: AGHT+IGHiFa58Cxg/cz+5GibMHdsBS0/TvPvketvKNLRvd4ffYu0hhtDDfBaJpWtYAmFnVmikIfyBA==
-X-Received: by 2002:a0c:f8c9:0:b0:6a0:5e9a:a9a4 with SMTP id h9-20020a0cf8c9000000b006a05e9aa9a4mr12406744qvo.7.1713807786099;
-        Mon, 22 Apr 2024 10:43:06 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id x1-20020a0c8e81000000b0069b40c06b11sm4430054qvb.105.2024.04.22.10.43.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 10:43:05 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1ryxh3-000ykz-20;
-	Mon, 22 Apr 2024 14:43:05 -0300
-Date: Mon, 22 Apr 2024 14:43:05 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org, Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Ben Segal <bpsegal@us.ibm.com>
-Subject: Re: [PATCH v2] vfio/pci: Support 8-byte PCI loads and stores
-Message-ID: <20240422174305.GB231144@ziepe.ca>
-References: <20240422153508.2355844-1-gbayer@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RaWslKgrLngLFKEg6bXXtGjQodBUCoxVR1LZyBbIYu6riQWMxhrOvGGKOrmsSfhlJj5n7pz6n/FBUy3ipBK78C38GzcrgNksdL4nCOSGwDFNKQ++1UWcfgHT0prbS/xCfwkmmdLckCfpYQodPopWDtUPf0WZoYWcsHmz0rqWzOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZipYcwWS; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713808235; x=1745344235;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Qw/XTx7VLmthJ54XYfaELgIcf7RnZMS2pyeRWr1PD90=;
+  b=ZipYcwWSDnUvQ+p3thVKxnR0KgjG7Pn9TfPbbjD2m3bVSRrxfNKaupgG
+   nHfmPl3pEf0dqBGtLYgfMhGP8doEpwGr5Acah+5cJZeRAMT8j8B7mgC6p
+   eXgp5ubuwgDUBLH97he+pcY2zYlKzkdXZMLcBpvR/ymMJKEO/+PMm441B
+   JPgvslgfZJ/86IXhkhjkg9AAm1PPPEP3Nkd1UBSNLooENgd5jyw7NFw/x
+   4JNbpt41/cEAXLmNsL67hVXm1kHYglRn55SDqVl+/sVd4OwXjugtk5Z4N
+   ynb+T8wJxC1ozsS6pVTiPs+tCXGdH8ydXiq92JJUPbx/dAohBn2uJpu7A
+   Q==;
+X-CSE-ConnectionGUID: XL1wmoxjRmyAW3OEyojiJg==
+X-CSE-MsgGUID: RCTNhaV7QOGEeklY9JGJVw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="9191158"
+X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
+   d="scan'208";a="9191158"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 10:50:35 -0700
+X-CSE-ConnectionGUID: IeyaIZ5ORR+2ySyY7QiO9g==
+X-CSE-MsgGUID: zwNY0vCbQoS3GTyZeOJhfA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
+   d="scan'208";a="24142083"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 10:50:34 -0700
+Date: Mon, 22 Apr 2024 10:50:33 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	isaku.yamahata@intel.com, xiaoyao.li@intel.com,
+	binbin.wu@linux.intel.com, seanjc@google.com,
+	rick.p.edgecombe@intel.com, isaku.yamahata@linux.intel.com
+Subject: Re: [PATCH 6/6] KVM: selftests: x86: Add test for
+ KVM_PRE_FAULT_MEMORY
+Message-ID: <20240422175033.GL3596705@ls.amr.corp.intel.com>
+References: <20240419085927.3648704-1-pbonzini@redhat.com>
+ <20240419085927.3648704-7-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240422153508.2355844-1-gbayer@linux.ibm.com>
+In-Reply-To: <20240419085927.3648704-7-pbonzini@redhat.com>
 
-On Mon, Apr 22, 2024 at 05:35:08PM +0200, Gerd Bayer wrote:
-> From: Ben Segal <bpsegal@us.ibm.com>
+On Fri, Apr 19, 2024 at 04:59:27AM -0400,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Many PCI adapters can benefit or even require full 64bit read
-> and write access to their registers. In order to enable work on
-> user-space drivers for these devices add two new variations
-> vfio_pci_core_io{read|write}64 of the existing access methods
-> when the architecture supports 64-bit ioreads and iowrites.
+> Add a test case to exercise KVM_PRE_FAULT_MEMORY and run the guest to access the
+> pre-populated area.  It tests KVM_PRE_FAULT_MEMORY ioctl for KVM_X86_DEFAULT_VM
+> and KVM_X86_SW_PROTECTED_VM.
 > 
-> Since these access methods are instantiated on 64bit architectures,
-> only, their use in vfio_pci_core_do_io_rw() is restricted by conditional
-> compiles to these architectures.
-> 
-> Signed-off-by: Ben Segal <bpsegal@us.ibm.com>
-> Co-developed-by: Gerd Bayer <gbayer@linux.ibm.com>
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Message-ID: <32427791ef42e5efaafb05d2ac37fa4372715f47.1712785629.git.isaku.yamahata@intel.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
-> Hi all,
+>  tools/include/uapi/linux/kvm.h                |   8 +
+>  tools/testing/selftests/kvm/Makefile          |   1 +
+>  .../selftests/kvm/pre_fault_memory_test.c     | 146 ++++++++++++++++++
+>  3 files changed, 155 insertions(+)
+>  create mode 100644 tools/testing/selftests/kvm/pre_fault_memory_test.c
 > 
-> we've successfully used this patch with a user-mode driver for a PCI
-> device that requires 64bit register read/writes on s390. A quick grep
-> showed that there are several other drivers for PCI devices in the kernel
-> that use readq/writeq and eventually could use this, too.
-> So we decided to propose this for general inclusion.
-> 
-> Thank you,
-> Gerd Bayer
-> 
-> Changes v1 -> v2:
-> - On non 64bit architecture use at most 32bit accesses in
->   vfio_pci_core_do_io_rw and describe that in the commit message.
-> - Drop the run-time error on 32bit architectures.
-> - The #endif splitting the "else if" is not really fortunate, but I'm
->   open to suggestions.
+> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+> index c3308536482b..4d66d8afdcd1 100644
+> --- a/tools/include/uapi/linux/kvm.h
+> +++ b/tools/include/uapi/linux/kvm.h
+> @@ -2227,4 +2227,12 @@ struct kvm_create_guest_memfd {
+>  	__u64 reserved[6];
+>  };
+>  
+> +#define KVM_PRE_FAULT_MEMORY	_IOWR(KVMIO, 0xd5, struct kvm_pre_fault_memory)
+> +
+> +struct kvm_pre_fault_memory {
+> +	__u64 gpa;
+> +	__u64 size;
+> +	__u64 flags;
 
-Provide a iowrite64() that does back to back writes for 32 bit?
+nitpick: catch up for struct update.
++       __u64 padding[5];
 
-Jason
+> +};
+> +
+>  #endif /* __LINUX_KVM_H */
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
