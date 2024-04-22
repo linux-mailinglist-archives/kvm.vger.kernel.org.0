@@ -1,118 +1,218 @@
-Return-Path: <kvm+bounces-15506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15504-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 798408ACDFB
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:15:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DA128ACDDD
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB3EA1C222B4
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 13:15:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5C8EB240B7
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 13:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D5414F136;
-	Mon, 22 Apr 2024 13:15:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="XaC5f4gj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F60D14F134;
+	Mon, 22 Apr 2024 13:09:34 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A92314F120;
-	Mon, 22 Apr 2024 13:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5739A14F11A
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 13:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713791741; cv=none; b=etXz2ngCKUzcKbfQ1xpsKTnSjhCDCgIh4dRZedrxUVNyO+dJp/vtKneApkpOTPgFzEl26dp+oT1EASfCKIdtcG27yleJ7zz/ugCRBOmgn3ozAI08fgg6yNuq8qN40IpL1Pjx2Uow946b1fPQ2Ds0ju+7jIpyI08SjPGdZX+7uh8=
+	t=1713791373; cv=none; b=bIANH1DSypFD8iBP/7pGJ4nxN3n9FkipXCTSv0F5IP/DNSp6W5HcE2ulyc89QfeUXGo43BQ5i1KVoJuUn8ObIGNNhLkHucD8DSGVKVgxofOMfx1ZXx17J4Tqwws274l2rOS5+Kns+SkWbcg3+1q1gO28y2UvI1fsuzrxIPt5u8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713791741; c=relaxed/simple;
-	bh=GjhTJjoSiC3IDIVXzgKQ4P+qNveHUQ6lI+EgnHlfUqo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TW68cmkH9mzVjo5TDS8IZsvyrBakPluW7FjU/e3YEWK2n2LBCoGUg9KruwCBByDsBWISF9iEwkQnEXupwfzUMFCVeCyaaGtsHJNkiwlZaFtJSosZlo6eDnN5dmb6B/zUSJdc0CVCEHnjC+rqpqbm+0zPfhgyrPVoAkHwGg6M734=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=XaC5f4gj; arc=none smtp.client-ip=84.16.66.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VNQYc6JShz3q7;
-	Mon, 22 Apr 2024 15:08:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1713791332;
-	bh=GjhTJjoSiC3IDIVXzgKQ4P+qNveHUQ6lI+EgnHlfUqo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XaC5f4gjQmTg7HWgvo8OaBYgvZVVaUnv+Y6B/jdsg0Q4f2OLDr4AYla0dAr871yUg
-	 SXigC7/aA4mp4zabDYUfQYwz/kj2V8GznfSGfeIslpVajiSP9OYd5T8+9TTpiL7YOt
-	 axM86vO0S3TpXTEvr00XTnMRotQwMoJZqzDgMjqE=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VNQYb16q2zrw3;
-	Mon, 22 Apr 2024 15:08:50 +0200 (CEST)
-Date: Mon, 22 Apr 2024 15:08:50 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Guenter Roeck <linux@roeck-us.net>, David Gow <davidgow@google.com>
-Cc: Brendan Higgins <brendanhiggins@google.com>, 
-	Rae Moar <rmoar@google.com>, Shuah Khan <skhan@linuxfoundation.org>, 
-	Alan Maguire <alan.maguire@oracle.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>, 
-	Ingo Molnar <mingo@redhat.com>, James Morris <jamorris@linux.microsoft.com>, 
-	Kees Cook <keescook@chromium.org>, Luis Chamberlain <mcgrof@kernel.org>, 
-	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marco Pagani <marpagan@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Stephen Boyd <sboyd@kernel.org>, Thara Gopinath <tgopinath@microsoft.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Wanpeng Li <wanpengli@tencent.com>, Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, linux-um@lists.infradead.org, x86@kernel.org
-Subject: Re: [PATCH v3 7/7] kunit: Add tests for fault
-Message-ID: <20240422.thesh7quoo0U@digikod.net>
-References: <20240319104857.70783-1-mic@digikod.net>
- <20240319104857.70783-8-mic@digikod.net>
- <928249cc-e027-4f7f-b43f-502f99a1ea63@roeck-us.net>
- <b70332b0-3e55-4375-935f-35ef3167a151@roeck-us.net>
+	s=arc-20240116; t=1713791373; c=relaxed/simple;
+	bh=LCKC3kHuMfKoPyK5Z1bQT5d6VLOxW68gtJxYo2urtbM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OJJfSvKR3arLjrJ7P/eLnUxItq7rqvd2VI747fHxOvBQAPUXCji4rUgkXdNtoskMVBcAqWfwx66JRUrX/cqTD8Wewnax7NXyYL3Hrdimil3QsKEdqUH1dD+r08KBqFigIfY3xBXiu3IM+bpTv36K5RdDoqn2CBieiy+Dbmv8G/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 183D1339;
+	Mon, 22 Apr 2024 06:10:00 -0700 (PDT)
+Received: from [10.57.84.177] (unknown [10.57.84.177])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 166223F73F;
+	Mon, 22 Apr 2024 06:09:29 -0700 (PDT)
+Message-ID: <81957f31-27e1-492c-b294-c89a2f590d99@arm.com>
+Date: Mon, 22 Apr 2024 14:09:28 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b70332b0-3e55-4375-935f-35ef3167a151@roeck-us.net>
-X-Infomaniak-Routing: alpha
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH 08/33] arm: realm: Make uart available
+ before MMU is enabled
+Content-Language: en-GB
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com,
+ steven.price@arm.com, james.morse@arm.com, oliver.upton@linux.dev,
+ yuzenghui@huawei.com, andrew.jones@linux.dev, eric.auger@redhat.com
+References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
+ <20240412103408.2706058-9-suzuki.poulose@arm.com> <ZiZQ8USVlxz0RFs3@arm.com>
+ <f793a86c-2143-4db6-a2ae-a151c00a7b56@arm.com> <ZiZWqXUbpCXZn9z/@arm.com>
+ <ZiZZ17+/Br80pLLm@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <ZiZZ17+/Br80pLLm@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 19, 2024 at 04:38:01PM -0700, Guenter Roeck wrote:
-> On Fri, Apr 19, 2024 at 03:33:49PM -0700, Guenter Roeck wrote:
-> > Hi,
-> > 
-> > On Tue, Mar 19, 2024 at 11:48:57AM +0100, Mickaël Salaün wrote:
-> > > Add a test case to check NULL pointer dereference and make sure it would
-> > > result as a failed test.
-> > > 
-> > > The full kunit_fault test suite is marked as skipped when run on UML
-> > > because it would result to a kernel panic.
-> > > 
-> > > Tested with:
-> > > ./tools/testing/kunit/kunit.py run --arch x86_64 kunit_fault
-> > > ./tools/testing/kunit/kunit.py run --arch arm64 \
-> > >   --cross_compile=aarch64-linux-gnu- kunit_fault
-> > > 
-> > 
-> > What is the rationale for adding those tests unconditionally whenever
-> > CONFIG_KUNIT_TEST is enabled ? This completely messes up my test system
-> > because it concludes that it is pointless to continue testing
-> > after the "Unable to handle kernel NULL pointer dereference" backtrace.
-> > At the same time, it is all or nothing, meaning I can not disable
-> > it but still run other kunit tests.
-> > 
+Hi Alex
 
-CONFIG_KUNIT_TEST is to test KUnit itself.  Why does this messes up your
-test system, and what is your test system?  Is it related to the kernel
-warning and then the message you previously sent?
-https://lore.kernel.org/r/fd604ae0-5630-4745-acf2-1e51c69cf0c0@roeck-us.net
-It seems David has a solution to suppress such warning.
+On 22/04/2024 13:36, Alexandru Elisei wrote:
+> Hi,
+> 
+> On Mon, Apr 22, 2024 at 01:23:05PM +0100, Alexandru Elisei wrote:
+>> Hi,
+>>
+>> On Mon, Apr 22, 2024 at 01:09:13PM +0100, Suzuki K Poulose wrote:
+>>> Hi Alexandru
+>>>
+>>> On 22/04/2024 12:58, Alexandru Elisei wrote:
+>>>> Hi,
+>>>>
+>>>> On Fri, Apr 12, 2024 at 11:33:43AM +0100, Suzuki K Poulose wrote:
+>>>>> From: Joey Gouly <joey.gouly@arm.com>
+>>>>>
+>>>>> A Realm must access any emulated I/O mappings with the PTE_NS_SHARED bit set.
+>>>>> This is modelled as a PTE attribute, but is actually part of the address.
+>>>>>
+>>>>> So, when MMU is disabled, the "physical address" must reflect this bit set. We
+>>>>> access the UART early before the MMU is enabled. So, make sure the UART is
+>>>>> accessed always with the bit set.
+>>>>>
+>>>>> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+>>>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>>> ---
+>>>>>    lib/arm/asm/pgtable.h   |  5 +++++
+>>>>>    lib/arm/io.c            | 24 +++++++++++++++++++++++-
+>>>>>    lib/arm64/asm/pgtable.h |  5 +++++
+>>>>>    3 files changed, 33 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
+>>>>> index 350039ff..7e85e7c6 100644
+>>>>> --- a/lib/arm/asm/pgtable.h
+>>>>> +++ b/lib/arm/asm/pgtable.h
+>>>>> @@ -112,4 +112,9 @@ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
+>>>>>    	return pte_offset(pmd, addr);
+>>>>>    }
+>>>>> +static inline unsigned long arm_shared_phys_alias(void *x)
+>>>>> +{
+>>>>> +	return ((unsigned long)(x) | PTE_NS_SHARED);
+>>>>> +}
+>>>>
+>>>> Is it allowed for a realm to run in aarch32 mode?
+>>>
+>>> No. Realm EL1 must be Aarch64.
+>>
+>> Ok, then can you make the above function return the original address?
+>>
+>>>
+>>>>
+>>>>> +
+>>>>>    #endif /* _ASMARM_PGTABLE_H_ */
+>>>>> diff --git a/lib/arm/io.c b/lib/arm/io.c
+>>>>> index 836fa854..127727e4 100644
+>>>>> --- a/lib/arm/io.c
+>>>>> +++ b/lib/arm/io.c
+>>>>> @@ -15,6 +15,8 @@
+>>>>>    #include <asm/psci.h>
+>>>>>    #include <asm/spinlock.h>
+>>>>>    #include <asm/io.h>
+>>>>> +#include <asm/mmu-api.h>
+>>>>> +#include <asm/pgtable.h>
+>>>>>    #include "io.h"
+>>>>> @@ -30,6 +32,24 @@ static struct spinlock uart_lock;
+>>>>>    static volatile u8 *uart0_base = UART_EARLY_BASE;
+>>>>>    bool is_pl011_uart;
+>>>>> +static inline volatile u8 *get_uart_base(void)
+>>>>> +{
+>>>>> +	/*
+>>>>> +	 * The address of the UART base may be different
+>>>>> +	 * based on whether we are running with/without
+>>>>> +	 * MMU enabled.
+>>>>> +	 *
+>>>>> +	 * For realms, we must force to use the shared physical
+>>>>> +	 * alias with MMU disabled, to make sure the I/O can
+>>>>> +	 * be emulated.
+>>>>> +	 * When the MMU is turned ON, the mappings are created
+>>>>> +	 * appropriately.
+>>>>> +	 */
+>>>>> +	if (mmu_enabled())
+>>>>> +		return uart0_base;
+>>>>> +	return (u8 *)arm_shared_phys_alias((void *)uart0_base);
+>>>>> +}
+>>>>> +
+>>>>>    static void uart0_init_fdt(void)
+>>>>>    {
+>>>>>    	/*
+>>>>> @@ -109,9 +129,11 @@ void io_init(void)
+>>>>>    void puts(const char *s)
+>>>>>    {
+>>>>> +	volatile u8 *uart_base = get_uart_base();
+>>
+>> Is it just my email client or is the indentation missing here?
+
+I can confirm that the original patch/email is correctly indented
+with TAB.
+
+>>
+>>>>> +
+>>>>>    	spin_lock(&uart_lock);
+>>>>>    	while (*s)
+>>>>> -		writeb(*s++, uart0_base);
+>>>>> +		writeb(*s++, uart_base);
+>>>>>    	spin_unlock(&uart_lock);
+>>>>>    }
+>>>>> diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
+>>>>> index 5b9f40b0..871c03e9 100644
+>>>>> --- a/lib/arm64/asm/pgtable.h
+>>>>> +++ b/lib/arm64/asm/pgtable.h
+>>>>> @@ -28,6 +28,11 @@ extern unsigned long prot_ns_shared;
+>>>>>    */
+>>>>>    #define PTE_NS_SHARED		(prot_ns_shared)
+>>>>> +static inline unsigned long arm_shared_phys_alias(void *addr)
+>>>>> +{
+>>>>> +	return ((unsigned long)addr | PTE_NS_SHARED);
+>>>>> +}
+>>>>
+>>>> Have you considered specifying the correct UART address at compile time using
+>>>> ./configure --earlycon?
+>>>
+>>> Do you mean
+>>>
+>>> ./configure --earlycon=<NS-Alias-normal-UART-Address> for Realms ?
+>>>
+>>> If so, there are multiple issues with that :
+>>>
+>>> 1. A payload could be run in a normal VM or a Realm VM. Having the above
+>>> restricts using the same payload in different worlds. (e.g., comparison).
+>>>
+>>> 2. The IPA width of the Realm and thus the PTE_NS_SHARED is dynamic
+>>> and really depends on what the VMM decides to choose the IPA size.
+>>> (Could be based on user input).
+>>
+>> Does it depend on the chosen IPA size, or on the VA size, or on both?
+>> Because uart0_base is used with both the MMU on and off.
+> 
+> Oh, ok, my bad, I hadn't realized that the uart address is modified only if the
+> MMU is not enabled. So it's actually only the IPA that must have the bit set.
+> 
+> I have to say that a PTE attribute, as it is called in the commit message, which
+> has a variable bit position that depends on the output address size is quite
+> surprising. I was under the impression that the bit position is constant when I
+> made the suggestion.
+
+I understand, may be we could make that clear in the commit description.
 
 > 
-> Oh, never mind. I just disabled CONFIG_KUNIT_TEST in my test bed
-> to "solve" the problem. I'll take that as one of those "unintended
-> consequences" items: Instead of more tests, there are fewer.
-> 
-> Guenter
-> 
+> Yeah, it makes sense to have a helper to set the bit based on whether or not the
+> MMU is enabled.
+
+Thanks
+
+Suzuki
+
 
