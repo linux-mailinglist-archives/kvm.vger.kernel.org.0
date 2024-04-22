@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-15555-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15556-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBBE28AD57B
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:02:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB4E08AD57E
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 090D51C21295
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:02:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A2911F2124A
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEE215539E;
-	Mon, 22 Apr 2024 20:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D870155754;
+	Mon, 22 Apr 2024 20:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="me3XbiC3"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ApDN2pWG"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A73155354
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84BC1553B2
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713816135; cv=none; b=O0Eba67Z3bIHfZUeGp9+tI4lwiF1T7aa5QSiXo/Jxn1f9nCROqnRNaXqtN5jolwJxu9VgmKKBrz3Ns0a3RWbIoPoJDjahPNZtg+Rt4MaObFjCSGLkqHPfWRAi8xDutJWJyXK5MBD0F+yLIXq77i89Iu2bPyoj9SIXFZ6qZ1UfMo=
+	t=1713816137; cv=none; b=CBhPCgQocoqjvYhcd5WawbKX7AScvr/o5jJk+oUiLlWOSrj0LRr4DKVxgydzNs3iCvkXs0BJpZi/AALppkLxUH5b4DKj+n7Rr9cjNkvW9GixFMF12bFVS7rBVyDPor5Ho5N87BqVoMAKNSIsFYiEoVesMNqeQTMkLUQ7evZ0oko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713816135; c=relaxed/simple;
-	bh=dOdCMtV8e6b36zSdTT8BwjG+NSdp42iVnHem1jiIdek=;
+	s=arc-20240116; t=1713816137; c=relaxed/simple;
+	bh=RK/yM6qsOPw3n0OH0gCLys55qhO8zYpWnFFNNWH/wDQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hgNnZJM7DxG691HWgkE5sObW9Tb4BwoULWQY6SgRNkQqQpixoCA2JqXFOtftPH47x/eKNz87lFzFigyWoTIJhuTBU+Sbdk9vvtk9ltPLecMeaftrWtv2NpzPxEk9+Tsa6s5x4pHuaw9KcT217Wg0RLD4v9UkR632mQKR4YHFHeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=me3XbiC3; arc=none smtp.client-ip=91.218.175.187
+	 MIME-Version; b=Bj074FjpSiMolcx/kGouv+hS1joa4rw0PBujIzqdWbYZIuVrc2pivep4qy2FJwDRyIICy7+N7TINaa8aExflqQxnfRC1YzBGZZhwu4D+Quql9PBvLOms2P/GvTA2VTB8QyTvWPfSVT6xigDPWf7EcBXnO7wXJCAngrxp6qoNiB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ApDN2pWG; arc=none smtp.client-ip=91.218.175.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713816132;
+	t=1713816134;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GJJqqZnMoG1V2LuZsq0jM/45KJtVgKZEDxyRtl+U1Ow=;
-	b=me3XbiC3GqRPVxjp4FFs9wtSvhYW6QVdCpsqQSAHu/9jcJZPM70hCP6GTviIG7PUpimu7S
-	925IBTkWUb4/v1WXu+5wmAwVvv+bhas289tmT9ZBFJ9SG2KLMO2LLgv2LtkV1Zu51e7mfO
-	A8838qQfQPW7CPiLfU5GcraCs3OQmcI=
+	bh=iQTl/Amd80cS3RGpOqQqk/wdPqY6PhjicfoJOM1VxG4=;
+	b=ApDN2pWGW8vmGi+uCNyev+N1fHs/YaFPNGvJxAR5Py3bIpDzgf4J+5KHc2lCcXIeuNZO9U
+	A4G7d0A+59Dwb5DQ4iM7yDwlcRBeZGE4n47fnP4CubuE7Dt2pK+wvYuMm6KfB3s2N46Qhr
+	HRwJLw04ocSmYUpRmMS2JUEBgzSvVnk=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -50,12 +50,10 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>
-Subject: [PATCH v3 01/19] KVM: Treat the device list as an rculist
-Date: Mon, 22 Apr 2024 20:01:40 +0000
-Message-ID: <20240422200158.2606761-2-oliver.upton@linux.dev>
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 02/19] KVM: arm64: vgic-its: Walk LPI xarray in its_sync_lpi_pending_table()
+Date: Mon, 22 Apr 2024 20:01:41 +0000
+Message-ID: <20240422200158.2606761-3-oliver.upton@linux.dev>
 In-Reply-To: <20240422200158.2606761-1-oliver.upton@linux.dev>
 References: <20240422200158.2606761-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -67,82 +65,80 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-A subsequent change to KVM/arm64 will necessitate walking the device
-list outside of the kvm->lock. Prepare by converting to an rculist. This
-has zero effect on the VM destruction path, as it is expected every
-reader is backed by a reference on the kvm struct.
+The new LPI xarray makes it possible to walk the VM's LPIs without
+holding a lock, meaning that vgic_copy_lpi_list() is no longer
+necessary. Prepare for the deletion by walking the LPI xarray directly
+in its_sync_lpi_pending_table().
 
-On the other hand, ensure a given device is completely destroyed before
-dropping the kvm->lock in the release() path, as certain devices expect
-to be a singleton (e.g. the vfio-kvm device).
-
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- virt/kvm/kvm_main.c | 14 +++++++++++---
- virt/kvm/vfio.c     |  2 ++
- 2 files changed, 13 insertions(+), 3 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 27 ++++++++++-----------------
+ 1 file changed, 10 insertions(+), 17 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index fb49c2a60200..6c09fe40948f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1329,6 +1329,12 @@ static void kvm_destroy_devices(struct kvm *kvm)
- 	 * We do not need to take the kvm->lock here, because nobody else
- 	 * has a reference to the struct kvm at this point and therefore
- 	 * cannot access the devices list anyhow.
-+	 *
-+	 * The device list is generally managed as an rculist, but list_del()
-+	 * is used intentionally here. If a bug in KVM introduced a reader that
-+	 * was not backed by a reference on the kvm struct, the hope is that
-+	 * it'd consume the poisoned forward pointer instead of suffering a
-+	 * use-after-free, even though this cannot be guaranteed.
- 	 */
- 	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
- 		list_del(&dev->vm_node);
-@@ -4725,7 +4731,8 @@ static int kvm_device_release(struct inode *inode, struct file *filp)
+diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+index e85a495ada9c..bdb7718b923a 100644
+--- a/arch/arm64/kvm/vgic/vgic-its.c
++++ b/arch/arm64/kvm/vgic/vgic-its.c
+@@ -446,23 +446,18 @@ static u32 max_lpis_propbaser(u64 propbaser)
+ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+ {
+ 	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
++	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
++	unsigned long intid, flags;
+ 	struct vgic_irq *irq;
+ 	int last_byte_offset = -1;
+ 	int ret = 0;
+-	u32 *intids;
+-	int nr_irqs, i;
+-	unsigned long flags;
+ 	u8 pendmask;
  
- 	if (dev->ops->release) {
- 		mutex_lock(&kvm->lock);
--		list_del(&dev->vm_node);
-+		list_del_rcu(&dev->vm_node);
-+		synchronize_rcu();
- 		dev->ops->release(dev);
- 		mutex_unlock(&kvm->lock);
- 	}
-@@ -4808,7 +4815,7 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
- 		kfree(dev);
- 		return ret;
- 	}
--	list_add(&dev->vm_node, &kvm->devices);
-+	list_add_rcu(&dev->vm_node, &kvm->devices);
- 	mutex_unlock(&kvm->lock);
+-	nr_irqs = vgic_copy_lpi_list(vcpu->kvm, vcpu, &intids);
+-	if (nr_irqs < 0)
+-		return nr_irqs;
+-
+-	for (i = 0; i < nr_irqs; i++) {
++	xa_for_each(&dist->lpi_xa, intid, irq) {
+ 		int byte_offset, bit_nr;
  
- 	if (ops->init)
-@@ -4819,7 +4826,8 @@ static int kvm_ioctl_create_device(struct kvm *kvm,
- 	if (ret < 0) {
- 		kvm_put_kvm_no_destroy(kvm);
- 		mutex_lock(&kvm->lock);
--		list_del(&dev->vm_node);
-+		list_del_rcu(&dev->vm_node);
-+		synchronize_rcu();
- 		if (ops->release)
- 			ops->release(dev);
- 		mutex_unlock(&kvm->lock);
-diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-index ca24ce120906..76b7f6085dcd 100644
---- a/virt/kvm/vfio.c
-+++ b/virt/kvm/vfio.c
-@@ -366,6 +366,8 @@ static int kvm_vfio_create(struct kvm_device *dev, u32 type)
- 	struct kvm_device *tmp;
- 	struct kvm_vfio *kv;
+-		byte_offset = intids[i] / BITS_PER_BYTE;
+-		bit_nr = intids[i] % BITS_PER_BYTE;
++		byte_offset = intid / BITS_PER_BYTE;
++		bit_nr = intid % BITS_PER_BYTE;
  
-+	lockdep_assert_held(&dev->kvm->lock);
+ 		/*
+ 		 * For contiguously allocated LPIs chances are we just read
+@@ -472,25 +467,23 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+ 			ret = kvm_read_guest_lock(vcpu->kvm,
+ 						  pendbase + byte_offset,
+ 						  &pendmask, 1);
+-			if (ret) {
+-				kfree(intids);
++			if (ret)
+ 				return ret;
+-			}
 +
- 	/* Only one VFIO "device" per VM */
- 	list_for_each_entry(tmp, &dev->kvm->devices, vm_node)
- 		if (tmp->ops == &kvm_vfio_ops)
+ 			last_byte_offset = byte_offset;
+ 		}
+ 
+-		irq = vgic_get_irq(vcpu->kvm, NULL, intids[i]);
++		irq = vgic_get_irq(vcpu->kvm, NULL, intid);
+ 		if (!irq)
+ 			continue;
+ 
+ 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
+-		irq->pending_latch = pendmask & (1U << bit_nr);
++		if (irq->target_vcpu == vcpu)
++			irq->pending_latch = pendmask & (1U << bit_nr);
+ 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
+ 		vgic_put_irq(vcpu->kvm, irq);
+ 	}
+ 
+-	kfree(intids);
+-
+ 	return ret;
+ }
+ 
 -- 
 2.44.0.769.g3c40516874-goog
 
