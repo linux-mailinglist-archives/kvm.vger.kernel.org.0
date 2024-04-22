@@ -1,126 +1,150 @@
-Return-Path: <kvm+bounces-15449-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15450-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4F78AC2A7
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 03:56:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3543E8AC2BD
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 04:14:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57C31280E51
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 01:56:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E72661F2152C
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 02:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80974C6F;
-	Mon, 22 Apr 2024 01:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e8Vrgf8w"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AECF63C7;
+	Mon, 22 Apr 2024 02:14:32 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D032595;
-	Mon, 22 Apr 2024 01:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577872F2D;
+	Mon, 22 Apr 2024 02:14:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713750974; cv=none; b=kA5uwtXtMbECYmwWxMY1Pmpnaq5KoWrpfuLUXC4dgUTjuSXqLsnEtZ1DZ1Mg6G7PZZ9ONCcU/FMSLojIPYztpsleaWycjciaGzW4S2wJrQX4zWPTaQd5HowEntXt3c6cLlFlbFt7D9DGZaZoTp0TJcpXhAhuCNcnD/q2hqobUX4=
+	t=1713752072; cv=none; b=QbXA1eRZuh/Kjn0zBDvpKJaKpopBcjg7JeoL9N5pJV/D70c1CrGqGDqKJC2szHAbppQucVJLFZHyVil/APAwV0lhEe6D9xB2AjMmiKQbKClJy15BF0ej4qNoA8ClSWoHPWkG9kThpI45glFgvn1POBOlb6xzffX+oTtNc+nsr7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713750974; c=relaxed/simple;
-	bh=pc0+DFhUnhDyqWAXr1SyPZIimJcwgm1tRpRj/vXiOPI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s1upm3H7wEU06oP3GNGIzjZotHNlqlXJL03Gxt+rHRd9rVFDDON/BXvXcXcb3Bb+gf1drJxuujMDilD9eOIiRFCXrgyzVuleKym4DVuuaUUZn7p5x78YkAAMTxtNMPislQmcn5zryivQmyRqiX+gH+6lw/Y+nBCDTXSG9bTEhGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e8Vrgf8w; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713750973; x=1745286973;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=pc0+DFhUnhDyqWAXr1SyPZIimJcwgm1tRpRj/vXiOPI=;
-  b=e8Vrgf8wkggUkIm8gXRVpuvg7yTPD2/cA//yq+LXC/y9Se3xPqp7g/7e
-   Jjpki3Tge+m3DuplQuWyHXeWndLoWH14wS1fHSiox1qUIR40p/GaF3QE5
-   79aiDkurvzXlvQNnCTjKNT87Dg1VM89s6giTYmFIfpfODYNoWPnMrpzR6
-   ElaTDncXG4s50/T1cyWdXLmSE/XqOyxqKTYeGi31ZTZ8mKExM7qnUoRQ1
-   Y6dXiPTVvvSL4hhAdT/dUo+c4HwylVtGjeySN7q+TaSM1/CHcZPuC4A8C
-   qvs+D5Kv6KDqwmukahYnWgbbP2bBXsSxJbS79NfWLVKAnu8Zb/Wsqfa1F
-   Q==;
-X-CSE-ConnectionGUID: jYx0fKqITTuvJSW1O9Z7Yw==
-X-CSE-MsgGUID: rhEFXTPKQ6WBC1RzFPvNDw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11051"; a="9131984"
-X-IronPort-AV: E=Sophos;i="6.07,219,1708416000"; 
-   d="scan'208";a="9131984"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2024 18:56:12 -0700
-X-CSE-ConnectionGUID: wi5hlz+XRde6C1OlC/+K2w==
-X-CSE-MsgGUID: 834t/sWqSJqftSHZnQR6OA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,219,1708416000"; 
-   d="scan'208";a="61310180"
-Received: from unknown (HELO [10.238.8.201]) ([10.238.8.201])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2024 18:56:08 -0700
-Message-ID: <1a3f4283-0dfd-4b7d-ae1b-f22c13a8c4e1@linux.intel.com>
-Date: Mon, 22 Apr 2024 09:56:05 +0800
+	s=arc-20240116; t=1713752072; c=relaxed/simple;
+	bh=6H+7xt2iNnE7kHtM2+NfnHVy0wCagkXB/VcEwCoXFFo=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=N6SWLiU3ocoNi7Kf6oq5B5WI5nGU83aYhtXzta73Cj/aGeH5Dm+7szdyy8kXoIpnymWPypUjZNFVKSOeNddWpdLy0EOpNGjQcAxaDS4ZoQTD+6V505IHXBV9ipkoy/oXzKRSz6s5QkA1+pVxngs9V5qGLjArH0JPxz8EZLEqLBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8Bxnuv+xyVm8H0AAA--.1644S3;
+	Mon, 22 Apr 2024 10:14:22 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxjd76xyVmQNAAAA--.3779S3;
+	Mon, 22 Apr 2024 10:14:20 +0800 (CST)
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Sean Christopherson <seanjc@google.com>,
+ Mingwei Zhang <mizhang@google.com>
+Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <20240126085444.324918-24-xiong.y.zhang@linux.intel.com>
+ <ZhhZush_VOEnimuw@google.com>
+ <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <Zhn9TGOiXxcV5Epx@google.com>
+ <4c47b975-ad30-4be9-a0a9-f0989d1fa395@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com>
+ <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com>
+ <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
+ <Zh2uFkfH8BA23lm0@google.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
+Date: Mon, 22 Apr 2024 10:14:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 125/130] KVM: TDX: Add methods to ignore virtual apic
- related operation
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <52300c655b1e7d6cc0a13727d977f1f02729a4bb.1708933498.git.isaku.yamahata@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <52300c655b1e7d6cc0a13727d977f1f02729a4bb.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <Zh2uFkfH8BA23lm0@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxjd76xyVmQNAAAA--.3779S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxJFW3JrW7CF1rCr4rGF1xWFX_yoW5XF1DpF
+	Wj9F1jyr4DJrWxAw1Iqa18AFySkFZ7GFWYgr1vqay5Aa98uF98Zr1UKrW3CF15uw4xKa42
+	vrW0qasxG3ZIyacCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUAVWU
+	twAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU2-VyUUUUU
 
 
 
-On 2/26/2024 4:27 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> TDX protects TDX guest APIC state from VMM.  Implement access methods of
-> TDX guest vAPIC state to ignore them or return zero.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/vmx/main.c    | 61 ++++++++++++++++++++++++++++++++++----
->   arch/x86/kvm/vmx/tdx.c     |  6 ++++
->   arch/x86/kvm/vmx/x86_ops.h |  3 ++
->   3 files changed, 64 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index fae5a3668361..c46c860be0f2 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -352,6 +352,14 @@ static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
->   	return vmx_apic_init_signal_blocked(vcpu);
->   }
->   
-> +static void vt_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return tdx_set_virtual_apic_mode(vcpu);
-Can open code this function...
+On 2024/4/16 上午6:45, Sean Christopherson wrote:
+> On Mon, Apr 15, 2024, Mingwei Zhang wrote:
+>> On Mon, Apr 15, 2024 at 10:38 AM Sean Christopherson <seanjc@google.com> wrote:
+>>> One my biggest complaints with the current vPMU code is that the roles and
+>>> responsibilities between KVM and perf are poorly defined, which leads to suboptimal
+>>> and hard to maintain code.
+>>>
+>>> Case in point, I'm pretty sure leaving guest values in PMCs _would_ leak guest
+>>> state to userspace processes that have RDPMC permissions, as the PMCs might not
+>>> be dirty from perf's perspective (see perf_clear_dirty_counters()).
+>>>
+>>> Blindly clearing PMCs in KVM "solves" that problem, but in doing so makes the
+>>> overall code brittle because it's not clear whether KVM _needs_ to clear PMCs,
+>>> or if KVM is just being paranoid.
+>>
+>> So once this rolls out, perf and vPMU are clients directly to PMU HW.
+> 
+> I don't think this is a statement we want to make, as it opens a discussion
+> that we won't win.  Nor do I think it's one we *need* to make.  KVM doesn't need
+> to be on equal footing with perf in terms of owning/managing PMU hardware, KVM
+> just needs a few APIs to allow faithfully and accurately virtualizing a guest PMU.
+> 
+>> Faithful cleaning (blind cleaning) has to be the baseline
+>> implementation, until both clients agree to a "deal" between them.
+>> Currently, there is no such deal, but I believe we could have one via
+>> future discussion.
+> 
+> What I am saying is that there needs to be a "deal" in place before this code
+> is merged.  It doesn't need to be anything fancy, e.g. perf can still pave over
+> PMCs it doesn't immediately load, as opposed to using cpu_hw_events.dirty to lazily
+> do the clearing.  But perf and KVM need to work together from the get go, ie. I
+> don't want KVM doing something without regard to what perf does, and vice versa.
+> 
+There is similar issue on LoongArch vPMU where vm can directly pmu 
+hardware and pmu hw is shard with guest and host. Besides context switch 
+there are other places where perf core will access pmu hw, such as tick 
+timer/hrtimer/ipi function call, and KVM can only intercept context switch.
 
-> +
-> +	return vmx_set_virtual_apic_mode(vcpu);
-> +}
-> +
-[...]
->   
-> +void tdx_set_virtual_apic_mode(struct kvm_vcpu *vcpu)
-> +{
-> +	/* Only x2APIC mode is supported for TD. */
-> +	WARN_ON_ONCE(kvm_get_apic_mode(vcpu) != LAPIC_MODE_X2APIC);
-> +}
-> +
+Can we add callback handler in structure kvm_guest_cbs?  just like this:
+@@ -6403,6 +6403,7 @@ static struct perf_guest_info_callbacks 
+kvm_guest_cbs = {
+         .state                  = kvm_guest_state,
+         .get_ip                 = kvm_guest_get_ip,
+         .handle_intel_pt_intr   = NULL,
++       .lose_pmu               = kvm_guest_lose_pmu,
+  };
+
+By the way, I do not know should the callback handler be triggered in 
+perf core or detailed pmu hw driver. From ARM pmu hw driver, it is 
+triggered in pmu hw driver such as function kvm_vcpu_pmu_resync_el0,
+but I think it will be better if it is done in perf core.
+
+Regards
+Bibo Mao
+
 
