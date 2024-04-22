@@ -1,313 +1,280 @@
-Return-Path: <kvm+bounces-15511-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15512-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA6428ACEB9
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:51:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C502A8ACECB
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:54:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08F8EB21369
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 13:51:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CC32281D0E
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 13:53:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4DE15099A;
-	Mon, 22 Apr 2024 13:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAC8B152168;
+	Mon, 22 Apr 2024 13:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Sk7zeE8u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IP4FZ1wO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E8A746E;
-	Mon, 22 Apr 2024 13:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458DB1514F9
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 13:52:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713793855; cv=none; b=ftHK+MseJs+KjQXsQ8cW97DLBcDlUAdGFgSGzxo6ZbyvrLLb+ttkEqb5Fm1sPo0p4aUFZIVTSARaf6wQKBOv23/+wrWLRA3NncMEhw0HQxyY+y7Ae2NtriWfVPleLEgyO8ZFwbxaLITGATpH2uDDbM0ttNtRzpSYv/MiBr21WCw=
+	t=1713793966; cv=none; b=RKWe0gJt8X5SSpOfhJdLX2BBChqWreduLuD+h/bkKyN3Fo4TDd9a+Lia6OXkkAp4oqQQFdCIszASTaN4n1ZrY8spN+Rimq6m6jcUfmzA1n5/9mPAHjcs9LCB+8wr8NISAEUpB/Rv6nOcvcM6omSZJADI/MDWqsUsXTBBMv32IZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713793855; c=relaxed/simple;
-	bh=l7NZ+omwoqFGQA6ZVUletLL7jzdRrPSXvdUUplAMI9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hG2dKjnWIBFH2hnMTyvIO26Z9GaXi73kB7m0xR6EhsNFK92a96F7pwbWGUMutAOrZQJFgyhTJNvDmv2UignzF3MhKP0NXfFRm2crTD/WB8mKLjNG6Uix+wx2ki6hMaL19GkbOVKdtpXBznEJ5rQOxnRue80T1Er65/zIZNQ/NNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Sk7zeE8u; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id B5D6840E0249;
-	Mon, 22 Apr 2024 13:50:50 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id YfbN5_RIe3gU; Mon, 22 Apr 2024 13:50:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1713793844; bh=gpEJcARwvlMysVUkfk6PN54ibTQNSj5iA5HxqAuFSBQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Sk7zeE8uc9dg1X2YAaDV+rODYwdDZa0GM4/M/T1ehvbzs558Ruy2drJieEgoGd7J4
-	 5wxURUeRAjub42Az2+1bk22A+ybRQUByyPDKez2JZhbORYHPmxiNw1Q35B322KFo+s
-	 OQDbyWtwa8Lskgym1rNv/dd8InOSyXdH+7nIaJ6FL7fZEh7AMvEQGgfJdQQuz9tWX6
-	 Iyry/SNcERHsIRyHsT8YG9Tybd+8q6ou8swAJ99hunSZjfNygC1Fsr20ecnGtpflCY
-	 JAYJOSze0EZVkpFKIdPY5hXxKcdTrzq1h2Es5dmCLX95fPH1EeT88KpeTCB/OToI5K
-	 DWz5X9kiSMLEJ6aB8Y4n6YsiKyFF02sBkmnDIquICE38yzAckn2Du1wmGhYEMoe9Lf
-	 rINPpb2KgI/j02nbMNzwkF/weUZtNZu+4JrojONAlAUlfnhOmqXWAWC2Gc8fJu6p0S
-	 ks0RWwYSMEGYANfMhJtDlzkwQBMh9YFv2o1GtE8ltqvmM5zIp9QDIphJMxC1vdCPdz
-	 1aRxhKjBD/guCxNbDnqG+8H9tsQG7A0N3TxId+cBawrvb6EIfDsvbHsaEdvUc4MTLG
-	 a0I2sQ2kIfp2jMA3e5wVArulBLaDnWkuG4j57qXju6DJxbg6SLEFRPOeClxaKN3X5S
-	 nZUN1INBqdPxeVJK5hJ4U3bs=
-Received: from nazgul.tnic (unknown [IPv6:2a02:3038:209:d596:9e4e:36ff:fe9e:77ac])
+	s=arc-20240116; t=1713793966; c=relaxed/simple;
+	bh=qzJZuKt6FC714sEnHXOwbk3xhesOq+y8pNdUUwhYNm0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ghlWmfnfrCgzxvtuKnNVesFUSvp0HL+aWYiAWSVeWUtV4COfquyeLi1OvBPSEA+VTEYqTmzBWZ9ZljUPsV21j1UihHP+iSAWHlxhW7GOUp9TowHwpto4qs4ydKXZjDYRaZRuFhJPh9HFz5Fc21VsvGbDNbIBEpk1fOvHel2eUK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IP4FZ1wO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713793963;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QmRbRu/3cSgah9VfTSsATRVA9ATWppHT1+RcbuEZpdE=;
+	b=IP4FZ1wO5pJCBnl1iLUAHAyOYbw9oeMQAF/GOOYPTdIf1pAT3Twml6nBOHFHtH2Bmu+3MH
+	mEFd4mbBoI0crUjU3nNLA/CGDXAkxv+pdXMJkc8hHPyhSipJDmyX+MTJ1SlOoqOvBMdyJW
+	e7Cx8F6dQsNrtW/BbxYCf5gE2UwK0TU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-33-aEDcwoNEPI-ZoEf8kCoiNQ-1; Mon, 22 Apr 2024 09:52:38 -0400
+X-MC-Unique: aEDcwoNEPI-ZoEf8kCoiNQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4B0AD40E016C;
-	Mon, 22 Apr 2024 13:50:32 +0000 (UTC)
-Date: Mon, 22 Apr 2024 15:50:19 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v8 10/16] x86/sev: Add Secure TSC support for SNP guests
-Message-ID: <20240422135019.GDZiZrG0sKpq0fXQ8d@fat_crate.local>
-References: <20240215113128.275608-1-nikunj@amd.com>
- <20240215113128.275608-11-nikunj@amd.com>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4AA7981B5AF;
+	Mon, 22 Apr 2024 13:52:33 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.247])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id EE567492BC6;
+	Mon, 22 Apr 2024 13:52:32 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id DEBF021E6811; Mon, 22 Apr 2024 15:52:31 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: <qemu-devel@nongnu.org>,  <kvm@vger.kernel.org>,  Tom Lendacky
+ <thomas.lendacky@amd.com>,  "Paolo Bonzini" <pbonzini@redhat.com>,  Daniel
+ P . =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>,  Pankaj Gupta
+ <pankaj.gupta@amd.com>,
+  Xiaoyao Li <xiaoyao.li@intel.com>,  Isaku Yamahata
+ <isaku.yamahata@linux.intel.com>,  Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v3 22/49] i386/sev: Introduce 'sev-snp-guest' object
+In-Reply-To: <20240320083945.991426-23-michael.roth@amd.com> (Michael Roth's
+	message of "Wed, 20 Mar 2024 03:39:18 -0500")
+References: <20240320083945.991426-1-michael.roth@amd.com>
+	<20240320083945.991426-23-michael.roth@amd.com>
+Date: Mon, 22 Apr 2024 15:52:31 +0200
+Message-ID: <871q6xec80.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240215113128.275608-11-nikunj@amd.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Thu, Feb 15, 2024 at 05:01:22PM +0530, Nikunj A Dadhania wrote:
-> Add support for Secure TSC in SNP enabled guests. Secure TSC allows
-> guest to securely use RDTSC/RDTSCP instructions as the parameters
-> being used cannot be changed by hypervisor once the guest is launched.
-> 
-> During the boot-up of the secondary cpus, SecureTSC enabled guests
+Michael Roth <michael.roth@amd.com> writes:
 
-"CPUs"
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> SEV-SNP support relies on a different set of properties/state than the
+> existing 'sev-guest' object. This patch introduces the 'sev-snp-guest'
+> object, which can be used to configure an SEV-SNP guest. For example,
+> a default-configured SEV-SNP guest with no additional information
+> passed in for use with attestation:
+>
+>   -object sev-snp-guest,id=sev0
+>
+> or a fully-specified SEV-SNP guest where all spec-defined binary
+> blobs are passed in as base64-encoded strings:
+>
+>   -object sev-snp-guest,id=sev0, \
+>     policy=0x30000, \
+>     init-flags=0, \
+>     id-block=YWFhYWFhYWFhYWFhYWFhCg==, \
+>     id-auth=CxHK/OKLkXGn/KpAC7Wl1FSiisWDbGTEKz..., \
+>     auth-key-enabled=on, \
+>     host-data=LNkCWBRC5CcdGXirbNUV1OrsR28s..., \
+>     guest-visible-workarounds=AA==, \
+>
+> See the QAPI schema updates included in this patch for more usage
+> details.
+>
+> In some cases these blobs may be up to 4096 characters, but this is
+> generally well below the default limit for linux hosts where
+> command-line sizes are defined by the sysconf-configurable ARG_MAX
+> value, which defaults to 2097152 characters for Ubuntu hosts, for
+> example.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Co-developed-by: Michael Roth <michael.roth@amd.com>
+> Acked-by: Markus Armbruster <armbru@redhat.com> (for QAPI schema)
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-> need to query TSC info from AMD Security Processor. This communication
-> channel is encrypted between the AMD Security Processor and the guest,
-> the hypervisor is just the conduit to deliver the guest messages to
-> the AMD Security Processor. Each message is protected with an
-> AEAD (AES-256 GCM). Use minimal AES GCM library to encrypt/decrypt SNP
-> Guest messages to communicate with the PSP.
-> 
-> Use the guest enc_init hook to fetch SNP TSC info from the AMD Security
-> Processor and initialize the snp_tsc_scale and snp_tsc_offset. During
-> secondary CPU initialization set VMSA fields GUEST_TSC_SCALE (offset 2F0h)
-> and GUEST_TSC_OFFSET(offset 2F8h) with snp_tsc_scale and snp_tsc_offset
-> respectively.
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Tested-by: Peter Gonda <pgonda@google.com>
-> ---
->  arch/x86/include/asm/sev-common.h |   1 +
->  arch/x86/include/asm/sev.h        |  23 +++++++
->  arch/x86/include/asm/svm.h        |   6 +-
->  arch/x86/kernel/sev.c             | 107 ++++++++++++++++++++++++++++--
->  arch/x86/mm/mem_encrypt_amd.c     |   6 ++
->  5 files changed, 134 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index b463fcbd4b90..6adc8e27feeb 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -159,6 +159,7 @@ struct snp_psc_desc {
->  #define GHCB_TERM_NOT_VMPL0		3	/* SNP guest is not running at VMPL-0 */
->  #define GHCB_TERM_CPUID			4	/* CPUID-validation failure */
->  #define GHCB_TERM_CPUID_HV		5	/* CPUID failure during hypervisor fallback */
-> +#define GHCB_TERM_SECURE_TSC		6	/* Secure TSC initialization failed */
+[...]
+
+> diff --git a/qapi/qom.json b/qapi/qom.json
+> index 66b5781ca6..b25a3043da 100644
+> --- a/qapi/qom.json
+> +++ b/qapi/qom.json
+> @@ -920,6 +920,55 @@
+>              '*handle': 'uint32',
+>              '*kernel-hashes': 'bool' } }
 >  
->  #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
->  
-> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-> index d950a3ac5694..16bf5afa7731 100644
-> --- a/arch/x86/include/asm/sev.h
-> +++ b/arch/x86/include/asm/sev.h
-> @@ -170,6 +170,8 @@ enum msg_type {
->  	SNP_MSG_ABSORB_RSP,
->  	SNP_MSG_VMRK_REQ,
->  	SNP_MSG_VMRK_RSP,
+> +##
+> +# @SevSnpGuestProperties:
+> +#
+> +# Properties for sev-snp-guest objects. Most of these are direct arguments
+> +# for the KVM_SNP_* interfaces documented in the linux kernel source
 
-<-- Pls leave an empty newline here to denote that there's a hole in the
-define numbers. Alternatively, you can add the missing ones too.
+"Linux", please.
 
-> +	SNP_MSG_TSC_INFO_REQ = 17,
-> +	SNP_MSG_TSC_INFO_RSP,
->  
->  	SNP_MSG_TYPE_MAX
->  };
-> @@ -214,6 +216,23 @@ struct sev_guest_platform_data {
->  	struct snp_req_data input;
->  };
->  
-> +#define SNP_TSC_INFO_REQ_SZ 128
+> +# under Documentation/virt/kvm/amd-memory-encryption.rst, which are in
+
+Does not seem to exist.  Do you mean
+Documentation/arch/x86/amd-memory-encryption.rst?
+
+> +# turn closely coupled with the SNP_INIT/SNP_LAUNCH_* firmware commands
+> +# documented in the SEV-SNP Firmware ABI Specification (Rev 0.9).
+
+docs/devel/qapi-code-gen.rst:
+
+    For legibility, wrap text paragraphs so every line is at most 70
+    characters long.
+
+    Separate sentences with two spaces.
+
+> +#
+> +# More usage information is also available in the QEMU source tree under
+> +# docs/amd-memory-encryption.
+> +#
+> +# @policy: the 'POLICY' parameter to the SNP_LAUNCH_START command, as
+> +#          defined in the SEV-SNP firmware ABI (default: 0x30000)
+
+docs/devel/qapi-code-gen.rst:
+
+    Descriptions start with '\@name:'.  The description text must be
+    indented like this::
+
+     # @name: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
+     #     do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+> +#
+> +# @guest-visible-workarounds: 16-byte, base64-encoded blob to report
+> +#                             hypervisor-defined workarounds, corresponding
+> +#                             to the 'GOSVW' parameter of the
+> +#                             SNP_LAUNCH_START command defined in the
+> +#                             SEV-SNP firmware ABI (default: all-zero)
+> +#
+> +# @id-block: 96-byte, base64-encoded blob to provide the 'ID Block'
+> +#            structure for the SNP_LAUNCH_FINISH command defined in the
+> +#            SEV-SNP firmware ABI (default: all-zero)
+> +#
+> +# @id-auth: 4096-byte, base64-encoded blob to provide the 'ID Authentication
+> +#           Information Structure' for the SNP_LAUNCH_FINISH command defined
+> +#           in the SEV-SNP firmware ABI (default: all-zero)
+> +#
+> +# @auth-key-enabled: true if 'id-auth' blob contains the 'AUTHOR_KEY' field
+> +#                    defined SEV-SNP firmware ABI (default: false)
+> +#
+> +# @host-data: 32-byte, base64-encoded, user-defined blob to provide to the
+> +#             guest, as documented for the 'HOST_DATA' parameter of the
+> +#             SNP_LAUNCH_FINISH command in the SEV-SNP firmware ABI
+> +#             (default: all-zero)
+> +#
+> +# Since: 7.2
+
+9.1
+
+> +##
+
+Together:
+
+    ##
+    # @SevSnpGuestProperties:
+    #
+    # Properties for sev-snp-guest objects.  Most of these are direct
+    # arguments for the KVM_SNP_* interfaces documented in the Linux
+    # kernel source under
+    # Documentation/arch/x86/amd-memory-encryption.rst, which are in turn
+    # closely coupled with the SNP_INIT/SNP_LAUNCH_* firmware commands
+    # documented in the SEV-SNP Firmware ABI Specification (Rev 0.9).
+    #
+    # More usage information is also available in the QEMU source tree
+    # under docs/amd-memory-encryption.
+    #
+    # @policy: the 'POLICY' parameter to the SNP_LAUNCH_START command, as
+    #     defined in the SEV-SNP firmware ABI (default: 0x30000)
+    #
+    # @guest-visible-workarounds: 16-byte, base64-encoded blob to report
+    #     hypervisor-defined workarounds, corresponding to the 'GOSVW'
+    #     parameter of the SNP_LAUNCH_START command defined in the SEV-SNP
+    #     firmware ABI (default: all-zero)
+    #
+    # @id-block: 96-byte, base64-encoded blob to provide the 'ID Block'
+    #     structure for the SNP_LAUNCH_FINISH command defined in the
+    #     SEV-SNP firmware ABI (default: all-zero)
+    #
+    # @id-auth: 4096-byte, base64-encoded blob to provide the 'ID
+    #     Authentication Information Structure' for the SNP_LAUNCH_FINISH
+    #     command defined in the SEV-SNP firmware ABI (default: all-zero)
+    #
+    # @auth-key-enabled: true if 'id-auth' blob contains the 'AUTHOR_KEY'
+    #     field defined SEV-SNP firmware ABI (default: false)
+    #
+    # @host-data: 32-byte, base64-encoded, user-defined blob to provide to
+    #     the guest, as documented for the 'HOST_DATA' parameter of the
+    #     SNP_LAUNCH_FINISH command in the SEV-SNP firmware ABI (default:
+    #     all-zero)
+    #
+    # @certs-path: path to certificate data that can be passed to guests
+    #     via SNP Extended Guest Requests.  File should be in the format
+    #     described in the GHCB specification.  (default: none)
+    #
+    # Since: 9.1
+    ##
+
+We generally prefer symbolic to numeric / binary encoding in QMP.  Can
+you explain briefly why you choose numeric and binary here?
+
+> +{ 'struct': 'SevSnpGuestProperties',
+> +  'base': 'SevCommonProperties',
+> +  'data': {
+> +            '*policy': 'uint64',
+> +            '*guest-visible-workarounds': 'str',
+> +            '*id-block': 'str',
+> +            '*id-auth': 'str',
+> +            '*auth-key-enabled': 'bool',
+> +            '*host-data': 'str' } }
 > +
-> +struct snp_tsc_info_req {
-> +	/* Must be zero filled */
+>  ##
+>  # @ThreadContextProperties:
+>  #
+> @@ -998,6 +1047,7 @@
+>      { 'name': 'secret_keyring',
+>        'if': 'CONFIG_SECRET_KEYRING' },
+>      'sev-guest',
+> +    'sev-snp-guest',
+>      'thread-context',
+>      's390-pv-guest',
+>      'throttle-group',
+> @@ -1068,6 +1118,7 @@
+>        'secret_keyring':             { 'type': 'SecretKeyringProperties',
+>                                        'if': 'CONFIG_SECRET_KEYRING' },
+>        'sev-guest':                  'SevGuestProperties',
+> +      'sev-snp-guest':              'SevSnpGuestProperties',
+>        'thread-context':             'ThreadContextProperties',
+>        'throttle-group':             'ThrottleGroupProperties',
+>        'tls-creds-anon':             'TlsCredsAnonProperties',
 
-Instead of adding a comment which people might very likely miss, add
-a check for that array to warn when it is not zeroed.
+[...]
 
-> +	u8 rsvd[SNP_TSC_INFO_REQ_SZ];
-> +} __packed;
-> +
-> +struct snp_tsc_info_resp {
-> +	/* Status of TSC_INFO message */
-
-The other struct members don't need a comment?
-
-> +	u32 status;
-> +	u32 rsvd1;
-> +	u64 tsc_scale;
-> +	u64 tsc_offset;
-> +	u32 tsc_factor;
-> +	u8 rsvd2[100];
-> +} __packed;
-> +
->  struct snp_guest_dev {
->  	struct device *dev;
->  	struct miscdevice misc;
-> @@ -233,6 +252,7 @@ struct snp_guest_dev {
->  		struct snp_report_req report;
->  		struct snp_derived_key_req derived_key;
->  		struct snp_ext_report_req ext_report;
-> +		struct snp_tsc_info_req tsc_info;
->  	} req;
->  	unsigned int vmpck_id;
->  };
-> @@ -370,6 +390,8 @@ static inline void *alloc_shared_pages(size_t sz)
->  
->  	return page_address(page);
->  }
-> +
-> +void __init snp_secure_tsc_prepare(void);
->  #else
->  static inline void sev_es_ist_enter(struct pt_regs *regs) { }
->  static inline void sev_es_ist_exit(void) { }
-> @@ -404,6 +426,7 @@ static inline int snp_send_guest_request(struct snp_guest_dev *dev, struct snp_g
->  					 struct snp_guest_request_ioctl *rio) { return 0; }
->  static inline void free_shared_pages(void *buf, size_t sz) { }
->  static inline void *alloc_shared_pages(size_t sz) { return NULL; }
-> +static inline void __init snp_secure_tsc_prepare(void) { }
->  #endif
->  
->  #ifdef CONFIG_KVM_AMD_SEV
-> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-> index 87a7b917d30e..3a8294bbd109 100644
-> --- a/arch/x86/include/asm/svm.h
-> +++ b/arch/x86/include/asm/svm.h
-> @@ -410,7 +410,9 @@ struct sev_es_save_area {
->  	u8 reserved_0x298[80];
->  	u32 pkru;
->  	u32 tsc_aux;
-> -	u8 reserved_0x2f0[24];
-> +	u64 tsc_scale;
-> +	u64 tsc_offset;
-> +	u8 reserved_0x300[8];
->  	u64 rcx;
->  	u64 rdx;
->  	u64 rbx;
-> @@ -542,7 +544,7 @@ static inline void __unused_size_checks(void)
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x1c0);
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x248);
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x298);
-> -	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x2f0);
-> +	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x300);
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x320);
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x380);
->  	BUILD_BUG_RESERVED_OFFSET(sev_es_save_area, 0x3f0);
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index a9c1efd6d4e3..20a1e50b7638 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -75,6 +75,10 @@ static u64 sev_hv_features __ro_after_init;
->  /* Secrets page physical address from the CC blob */
->  static u64 secrets_pa __ro_after_init;
->  
-> +/* Secure TSC values read using TSC_INFO SNP Guest request */
-> +static u64 snp_tsc_scale __ro_after_init;
-> +static u64 snp_tsc_offset __ro_after_init;
-> +
->  /* #VC handler runtime per-CPU data */
->  struct sev_es_runtime_data {
->  	struct ghcb ghcb_page;
-> @@ -956,6 +960,83 @@ void snp_guest_cmd_unlock(void)
->  }
->  EXPORT_SYMBOL_GPL(snp_guest_cmd_unlock);
->  
-> +static struct snp_guest_dev tsc_snp_dev __initdata;
-> +
-> +static int __snp_send_guest_request(struct snp_guest_dev *snp_dev, struct snp_guest_req *req,
-> +				    struct snp_guest_request_ioctl *rio);
-> +
-
-Pls design your code without the need for a forward declaration.
-
-> +static int __init snp_get_tsc_info(void)
-> +{
-> +	struct snp_tsc_info_req *tsc_req = &tsc_snp_dev.req.tsc_info;
-> +	static u8 buf[SNP_TSC_INFO_REQ_SZ + AUTHTAG_LEN];
-> +	struct snp_guest_request_ioctl rio;
-> +	struct snp_tsc_info_resp tsc_resp;
-> +	struct snp_guest_req req;
-> +	int rc, resp_len;
-> +
-> +	/*
-> +	 * The intermediate response buffer is used while decrypting the
-> +	 * response payload. Make sure that it has enough space to cover the
-> +	 * authtag.
-> +	 */
-> +	resp_len = sizeof(tsc_resp) + AUTHTAG_LEN;
-> +	if (sizeof(buf) < resp_len)
-> +		return -EINVAL;
-
-Huh, those both are static buffers. Such checks are done with
-BUILD_BUG_ON.
-
-> +	memset(tsc_req, 0, sizeof(*tsc_req));
-> +	memset(&req, 0, sizeof(req));
-> +	memset(&rio, 0, sizeof(rio));
-> +	memset(buf, 0, sizeof(buf));
-> +
-> +	if (!snp_assign_vmpck(&tsc_snp_dev, 0))
-> +		return -EINVAL;
-
-Do that before the memsetting.
-
-> +
-> +	/* Initialize the PSP channel to send snp messages */
-> +	rc = snp_setup_psp_messaging(&tsc_snp_dev);
-> +	if (rc)
-> +		return rc;
-> +
-> +	req.msg_version = MSG_HDR_VER;
-> +	req.msg_type = SNP_MSG_TSC_INFO_REQ;
-> +	req.vmpck_id = tsc_snp_dev.vmpck_id;
-> +	req.req_buf = tsc_req;
-> +	req.req_sz = sizeof(*tsc_req);
-> +	req.resp_buf = buf;
-> +	req.resp_sz = resp_len;
-> +	req.exit_code = SVM_VMGEXIT_GUEST_REQUEST;
-> +
-> +	rc = __snp_send_guest_request(&tsc_snp_dev, &req, &rio);
-
-The changes to *snp_send_guest_request are unrelated to the secure TSC
-enablement. Pls do them in a pre-patch.
-
-Ok, I'm going to stop here and give you a chance to work in all the
-review feedback and send a new revision.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
 
