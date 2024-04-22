@@ -1,101 +1,105 @@
-Return-Path: <kvm+bounces-15453-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15454-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCCD48AC343
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 05:57:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B7A28AC3A0
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 07:25:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A3E328156A
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 03:57:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B66BB211D0
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 05:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59EC17C6B;
-	Mon, 22 Apr 2024 03:57:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FB217C9E;
+	Mon, 22 Apr 2024 05:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="YdMwjjBK"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="QTcc38Hv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF32168BD
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 03:57:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DF318C38
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 05:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713758245; cv=none; b=TG5/zA+jrQECTmhLtidzdzbe0BNBcCPmKolQ5y4sDHN0z7s9EIvPnzY7Uayu0LMWS6WuIPEEbBzBSkWWLUBoGY+d/fT/U1s4TDSCELnPqOku4/nyXV8k6Y4PMfWC+ynBAIOrIEYr9syEVbwmHw7vWESOOdCA1vWmSQ3Az43W+HA=
+	t=1713763505; cv=none; b=ojcXcVKKyydpgJdUlYEPYzRfI4l2iQmpdvmMTuCzvhMOI335nFHFasmR5ZleHAe9hhcm7OL4VVrWPNE4ly8CgWLJuR5DQcDEofhXXfwdsDYtA1fTj9Oh41nNpf2cuqOSh10zcBIsMC8fnCsDefHEo4Mqmxu66eD1lBPPiAyK3s8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713758245; c=relaxed/simple;
-	bh=m78rjYqtH25kdm1i2u7R5d8dHFrvcmvFLpsxsDFRjuk=;
+	s=arc-20240116; t=1713763505; c=relaxed/simple;
+	bh=Ik9DM1QNpRlU+dZ0CiUmfKQUt5GK17SQR7pdunVTi1E=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rkjoj0RtfpbcVqPmLhmScfXJdvw9OIuJLMdUbOLeT12y7z5+refQsVvuNSo/bdErfYneoPJzlsNQOdhtAqDZ+SRmgKWtWZXFmqFyqNVzsJtb38Qj1v3t1iFYVTAvCZ/bVdiK2PgXVK2+3FUL/lAW5q0DtPDV5VwIy3DpD5pXgx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=YdMwjjBK; arc=none smtp.client-ip=209.85.166.176
+	 To:Cc:Content-Type; b=HM8OXm1XDeu40C6g8h7fNfrx2abK+cx0lMX5vza7bGutpKKKZbbYQIBkPWpTcCfRzrm07Xcb9A5lShgrRfHUnsfZhohqmDjSq6Vm7EHxEbaTBeQJfYwAEt1A/EWYpw9hpN3Qm/keusG1HiECdiqiVCeYqzv6u5zursdfChUlXSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=QTcc38Hv; arc=none smtp.client-ip=209.85.166.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-36b30909b01so17195265ab.2
-        for <kvm@vger.kernel.org>; Sun, 21 Apr 2024 20:57:24 -0700 (PDT)
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-36c0ef5f7ebso1263675ab.0
+        for <kvm@vger.kernel.org>; Sun, 21 Apr 2024 22:25:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1713758243; x=1714363043; darn=vger.kernel.org;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1713763503; x=1714368303; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4EFW9+m2geC2plcNu4ooEHsTuQPopye1HlQhXkbIiQ4=;
-        b=YdMwjjBKY1BHDUu7hLKF+k2iC0Qjj1xYlYyMcqpUXMiyyya0LbHUN2BQSVr9lG7I8P
-         mbYrABy2wPqDbqAJw7KPWbym9DyAo7dNaeY5vyMTlN80A1kIF6sQjsJubFfsj8E6x07U
-         eap7LzCk9Jb9XvFUS6WyT2xmiBKO/R0IXYTCbYr/lXxlL5m7YcNrC6xDQbcHERkAa1rB
-         EdQj2sx6J2xPZxC85XshOYbdo7tuKEh8jNUyBDvz96TgC/8xMcUQiSxZK1omn+F+tBGm
-         dU7kTYg1VbsjMdzIvURnQ3dd7JZgmoMfNvQYYNMHEIQUgWAz6WWZAw6tK0I5uTQHg9LS
-         DzwA==
+        bh=dF7iMXOY4VDDCKv5qNAPNo7XCDSpEYvkOWLnZnfiQso=;
+        b=QTcc38HvYi+gmcROXNRPsN2+ACsXYSft+1UQ15tpXXXGoGqZlrz19XifTGmH4TgnQY
+         Zof3ACGEUZ/cK87E0+XDCuiBkB+WplA5CAaxOwnxx2V6JthzB5/C3AmcataAjo6BWJSV
+         k1pmen2KHTwR3Y5Ygo9ScVSJySmr3kzaXiyX7NEEB/h1/u9sx00ZJxSuXeJO2lzqdAdw
+         c0eIU6EUtvTPi4STzxTw558iLQ7E7vV6VNAu/O3RWFC6vK1UjAK8KccfdVgeDNooDh6X
+         AgxwUxgEW9A1CiY4wFERXwV2cZoCBxCqzCRldZFr0WxJVeuOVubx6zV1g3e77iPEYgTL
+         NmAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713758243; x=1714363043;
+        d=1e100.net; s=20230601; t=1713763503; x=1714368303;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4EFW9+m2geC2plcNu4ooEHsTuQPopye1HlQhXkbIiQ4=;
-        b=KIBj3Ca4SdNATfklB4LTbSrOIjSjL/i3nNL5X1lOUXuiBtLhZnC2ib6Z3WUck5kXZs
-         yTjxY8zbWGPyI29vp/oY2ysZcyI8bYZun3gKekwyW8HebE130YaBXtZ5q51ew38ObPBK
-         Vq/+JEH1h8mmxTNM41dNpb7vYc/MrZ18IHD725eP4CB/d3nHAZRdeTyBqaYzVvXd4eUM
-         i8Kk6r0h/fWQYBB8ly1HdiDLVTa5LWhbIO2Zr+EdH+4F7BkEaz/ItOGNvaUWozMh/HAd
-         wLfLpZbR1he6dXkSpN7cHYILYrlRsfA51vbRXJIw7MShLKLjb7P9j319ciNSUlTrmbYz
-         WwHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjTgLMz+KaFBY5//grdQOGPytLfb6ZIGeRW/r5Api0pp3rJWcOHIo9BquXer0u+YGUOwq60SyFNFCHsEOTUx3nvNET
-X-Gm-Message-State: AOJu0YwdDX/lo2fYU+ogpQDFh3U8ErkqnOiA+W7INKaP2tGl3W01Mp5g
-	8QU5DFWFIcpCJ21mffZy+Fpvp5qTNCeNDH6tCmeah30ayf/sM56NMmVW1b3sRZaLqy4PNs09o3V
-	nYVHOe1IGZ88fT63/dmVtLg8bgABnNpuXDlp7ag==
-X-Google-Smtp-Source: AGHT+IGZzRb71Y0EGdw0Xd6AXtKJ8jm8+FBKvsdhUIBFBj/iamSZ6HZ9Y892uZ7oJdYMgnoSnZprLgbiXRIFLsXAgYE=
-X-Received: by 2002:a05:6e02:1d0a:b0:36a:3c07:9cdc with SMTP id
- i10-20020a056e021d0a00b0036a3c079cdcmr11903727ila.31.1713758243560; Sun, 21
- Apr 2024 20:57:23 -0700 (PDT)
+        bh=dF7iMXOY4VDDCKv5qNAPNo7XCDSpEYvkOWLnZnfiQso=;
+        b=iD0tuccN8nZtRJGKrpJfTKI/mEONLl3m0b1Od7MTCvwihixkh0Wwo0SfBjgj3JrcvM
+         V0qwe+oiNeP8pZQUqigkH6+dRZeJUo+oFn+bcgKt9MrDNsJp9Zsogs37h5ZzSiK+do1X
+         fENcLTSbZLe+eudWP/Or2KT5PfFH8uKaF07Dc1SjgY9aBTtzcW+SeX3QJS6uBcn1I7Bd
+         70EEe+X4xQS+Oui5na4P+bPD8HPoe9CF5Q3AHZSdYRI08tXmzufL9rUi3gTWs1mZ4+Zc
+         c+9SnysOft/B7alLGRnl6BQIsgQgz/2jADxhY6YPLaehd6Lq1yEBcPrHdu2LLdspdFH+
+         +fpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXV8HvbfPHc/fKvmTA3mK/DEceHTFufZxAK7Jg9CLjSu6aRs4WOffWEju5Nd3IWgnY18ezWeYKV5XpLgiLAAVjVH64N
+X-Gm-Message-State: AOJu0Yyi0TfgdCrAgXkpO89Dvm4vUz1oATHZ+ibawDJ4yXDf8p29LsN6
+	RiOmbanGyVnYveeE5JslsWyES+XAHijxJ1w2GzBOCdgdUrGNvl8JcWlTELgvBXbAUXhCcmPhsWk
+	onCtpWqauHE0XdbaFJ9/mMFd+ND4sIk3TlGw4/w==
+X-Google-Smtp-Source: AGHT+IHdn2npWqT6eXE8OXOJ8aeE+1uvyLE2k3jLpLR2kMrW4luyMtoF2cYuLh1aaMn2GPPBLemb20goD4jLZbNz7Kk=
+X-Received: by 2002:a05:6e02:152e:b0:36c:a46:e018 with SMTP id
+ i14-20020a056e02152e00b0036c0a46e018mr5159166ilu.24.1713763503545; Sun, 21
+ Apr 2024 22:25:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417074528.16506-1-yongxuan.wang@sifive.com> <20240417074528.16506-3-yongxuan.wang@sifive.com>
-In-Reply-To: <20240417074528.16506-3-yongxuan.wang@sifive.com>
+References: <20240420151741.962500-1-atishp@rivosinc.com> <20240420151741.962500-11-atishp@rivosinc.com>
+In-Reply-To: <20240420151741.962500-11-atishp@rivosinc.com>
 From: Anup Patel <anup@brainfault.org>
-Date: Mon, 22 Apr 2024 09:27:12 +0530
-Message-ID: <CAAhSdy2na-+4DrZm7W8ZD2zGMF7J3VVL235Wx2_QVPr1AfuFVg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] RISCV: KVM: Introduce vcpu->reset_cntx_lock
-To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
-	greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+Date: Mon, 22 Apr 2024 10:54:52 +0530
+Message-ID: <CAAhSdy34VhGY3v9h3cw167MafKHOF1dL6zqB7Wi6A9Z4fo7ZNg@mail.gmail.com>
+Subject: Re: [PATCH v8 10/24] RISC-V: KVM: Fix the initial sample period value
+To: Atish Patra <atishp@rivosinc.com>
+Cc: linux-kernel@vger.kernel.org, Andrew Jones <ajones@ventanamicro.com>, 
+	Ajay Kaher <ajay.kaher@broadcom.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Alexandre Ghiti <alexghiti@rivosinc.com>, samuel.holland@sifive.com, 
+	Conor Dooley <conor.dooley@microchip.com>, Juergen Gross <jgross@suse.com>, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	Mark Rutland <mark.rutland@arm.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
+	Will Deacon <will@kernel.org>, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2024 at 1:15=E2=80=AFPM Yong-Xuan Wang <yongxuan.wang@sifiv=
-e.com> wrote:
+On Sat, Apr 20, 2024 at 5:18=E2=80=AFAM Atish Patra <atishp@rivosinc.com> w=
+rote:
 >
-> Originally, the use of kvm->lock in SBI_EXT_HSM_HART_START also avoids
-> the simultaneous updates to the reset context of target VCPU. Since this
-> lock has been replace with vcpu->mp_state_lock, and this new lock also
-> protects the vcpu->mp_state. We have to add a separate lock for
-> vcpu->reset_cntx.
+> The initial sample period value when counter value is not assigned
+> should be set to maximum value supported by the counter width.
+> Otherwise, it may result in spurious interrupts.
 >
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
 
 LGTM.
 
@@ -104,82 +108,25 @@ Reviewed-by: Anup Patel <anup@brainfault.org>
 Regards,
 Anup
 
-
 > ---
->  arch/riscv/include/asm/kvm_host.h | 1 +
->  arch/riscv/kvm/vcpu.c             | 6 ++++++
->  arch/riscv/kvm/vcpu_sbi_hsm.c     | 3 +++
->  3 files changed, 10 insertions(+)
+>  arch/riscv/kvm/vcpu_pmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/k=
-vm_host.h
-> index 64d35a8c908c..664d1bb00368 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -211,6 +211,7 @@ struct kvm_vcpu_arch {
+> diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+> index 86391a5061dd..cee1b9ca4ec4 100644
+> --- a/arch/riscv/kvm/vcpu_pmu.c
+> +++ b/arch/riscv/kvm/vcpu_pmu.c
+> @@ -39,7 +39,7 @@ static u64 kvm_pmu_get_sample_period(struct kvm_pmc *pm=
+c)
+>         u64 sample_period;
 >
->         /* CPU context upon Guest VCPU reset */
->         struct kvm_cpu_context guest_reset_context;
-> +       spinlock_t reset_cntx_lock;
+>         if (!pmc->counter_val)
+> -               sample_period =3D counter_val_mask + 1;
+> +               sample_period =3D counter_val_mask;
+>         else
+>                 sample_period =3D (-pmc->counter_val) & counter_val_mask;
 >
->         /* CPU CSR context upon Guest VCPU reset */
->         struct kvm_vcpu_csr guest_reset_csr;
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 70937f71c3c4..1a2236e4c7f3 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -64,7 +64,9 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->
->         memcpy(csr, reset_csr, sizeof(*csr));
->
-> +       spin_lock(&vcpu->arch.reset_cntx_lock);
->         memcpy(cntx, reset_cntx, sizeof(*cntx));
-> +       spin_unlock(&vcpu->arch.reset_cntx_lock);
->
->         kvm_riscv_vcpu_fp_reset(vcpu);
->
-> @@ -121,12 +123,16 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->         spin_lock_init(&vcpu->arch.hfence_lock);
->
->         /* Setup reset state of shadow SSTATUS and HSTATUS CSRs */
-> +       spin_lock_init(&vcpu->arch.reset_cntx_lock);
-> +
-> +       spin_lock(&vcpu->arch.reset_cntx_lock);
->         cntx =3D &vcpu->arch.guest_reset_context;
->         cntx->sstatus =3D SR_SPP | SR_SPIE;
->         cntx->hstatus =3D 0;
->         cntx->hstatus |=3D HSTATUS_VTW;
->         cntx->hstatus |=3D HSTATUS_SPVP;
->         cntx->hstatus |=3D HSTATUS_SPV;
-> +       spin_unlock(&vcpu->arch.reset_cntx_lock);
->
->         if (kvm_riscv_vcpu_alloc_vector_context(vcpu, cntx))
->                 return -ENOMEM;
-> diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.=
-c
-> index 115a6c6525fd..cc5038b90e02 100644
-> --- a/arch/riscv/kvm/vcpu_sbi_hsm.c
-> +++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
-> @@ -31,6 +31,7 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu=
-)
->                 goto out;
->         }
->
-> +       spin_lock(&target_vcpu->arch.reset_cntx_lock);
->         reset_cntx =3D &target_vcpu->arch.guest_reset_context;
->         /* start address */
->         reset_cntx->sepc =3D cp->a1;
-> @@ -38,6 +39,8 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu=
-)
->         reset_cntx->a0 =3D target_vcpuid;
->         /* private data passed from kernel */
->         reset_cntx->a1 =3D cp->a2;
-> +       spin_unlock(&target_vcpu->arch.reset_cntx_lock);
-> +
->         kvm_make_request(KVM_REQ_VCPU_RESET, target_vcpu);
->
->         __kvm_riscv_vcpu_power_on(target_vcpu);
 > --
-> 2.17.1
+> 2.34.1
 >
 
