@@ -1,194 +1,124 @@
-Return-Path: <kvm+bounces-15576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362BE8AD711
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 00:03:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2543A8AD746
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 00:28:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DED07283C06
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:03:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB0121F21F59
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EAF1E4A0;
-	Mon, 22 Apr 2024 22:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62752335BA;
+	Mon, 22 Apr 2024 22:28:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PV7VWp2U"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lyg8Kl2L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7644A1C286;
-	Mon, 22 Apr 2024 22:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003F02E410;
+	Mon, 22 Apr 2024 22:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713823404; cv=none; b=G3eAzS69BoQBieMQng+YbcNPyWAqmXJk4wUtKnMh8ibd5UYbVpyRz4jJf8BDbpqX+6LTXYmuMSHIUhE0s8gp9Rj7YGgdOkKroryCLxYlGTlzNrOHM0SJTAWI40+ODoZodf8ODHPNutDOrR+F7I+ddlMX2BSV43Q8iIR2s4wKYlY=
+	t=1713824896; cv=none; b=mwoKYhxR5Qi4lbCaGT6sl+o0qVWsA+L+LQLmbFbeYrmu3PeF/WbDXH1K8iqCeNEYhQdQU6BRqVpHqOq5fZneNU++YK4PzM1pzLtfjDX1kW3Da7r7bpEuZ4E/TzmDkAjxvF88tVrVecrpUcQZK9glsA3gF7hRpZWF/L7+FEtAwsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713823404; c=relaxed/simple;
-	bh=GY0MXRD7EIQgOXVFSSvngeEgnL9PKDqVeT3TM0piVIs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VDYfpJ8sEQub4vD4DujYba8ZymS6dwERV4L4eZ1ju2RiitLCfvUCzBo4NMd4/xvCc3l3ZSGGwpGXnYo5tkFrn6/vJZLD4TtNNy7VKvaG+p5oSvuplOMMZ6g4mKyG/7Dt2Wl2jWoIlLzz2O2HWC1/VY2dMWiTZh4DoUk2F/XHITA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PV7VWp2U; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1713824896; c=relaxed/simple;
+	bh=LBIdcLeL+hwX+jq1w+Grr6K8OGAVBmubNTZAhnNesCc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o3AQcDFqloN0ObBruuL3XuPfphFCG55JqQjy1P4sWsPHImfqh6mlGVAJRhyTPzadGmJFlYH4hE0BuBlxCMJy/mn6pKQzoX7j4pjUGN8nyih7SJihRbyy31aSrn+HndE+8CAX4ug/BSDbE75OKcRFOW39XZmSaE2bY6uUChP5/mg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lyg8Kl2L; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713823403; x=1745359403;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GY0MXRD7EIQgOXVFSSvngeEgnL9PKDqVeT3TM0piVIs=;
-  b=PV7VWp2UI9VZ/Kj2cEIBvXpBBc2ET47RN+2P89JT1MjkNXz2q0Ilr//s
-   h1ItFJ3dhKTbj8f2rkH5NBFpc1RFPlwLkx4jCtFgN+7RMitScCKuSl/5b
-   5755i9+8w4anJptHWhuGNdwxv2Dkst1tAr9oZfsM6wd6VzZV6hQ/wd7eG
-   feUretYgn4903kH9763S1e1W1qPxeJGv+A6QmBPiR3nE4l1gD5aKTy1E7
-   tec50Pp7ajTAI9f24DO+JZ6Rjuy2oAo3oFaSgKf52Y83Ol9i7a7sIZM2L
-   GMK2QI2Nhu6lxfDVN/3HXVx4ao//rMIx3xS8Q1JE2SzzDjz1jEDRCOEG0
-   g==;
-X-CSE-ConnectionGUID: be4FNByxQ1CckZBPvbuu4Q==
-X-CSE-MsgGUID: G3nao+doTr2jLMyTRSe0fQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="31875700"
+  t=1713824895; x=1745360895;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LBIdcLeL+hwX+jq1w+Grr6K8OGAVBmubNTZAhnNesCc=;
+  b=lyg8Kl2LrAjDWVwCqqku2vrUGzJnd6u5G/DqkFYnuNRRNRuvKbGcrF2p
+   pM/cn49/aWPV4c77UkTXAu0tG7FXQ27efEcSucamuZaHfZP3v4jshV0fM
+   rFHrUgWKiePOd33fmH2tNCJtgUju8Ov2MLfLsWTIyKycAtJgXccUiNwKb
+   7SRx3tM0Nz9Y038G4+dgHwvh+u/mVtN4MQFpbJzISPWpDiOs6VTlHCe/g
+   DQqR1z5T/G6xLHBFtnrNfhSVut04vuzM5uY5L/gdE+3Rh7K69FAy2tSp7
+   158QAFUVsG9G03kessByudmuFl1BKb2yd51h/AMt4wpcEmwAnCxfV877T
+   A==;
+X-CSE-ConnectionGUID: 2cWVlGeqSa+DE5FMXrp93w==
+X-CSE-MsgGUID: ATsrUpmySm28GBu+rUI5qw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="13172313"
 X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
-   d="scan'208";a="31875700"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 15:02:52 -0700
-X-CSE-ConnectionGUID: G06rEvsPSBmK/RPfjndAuQ==
-X-CSE-MsgGUID: g//wDu7URXmaIJN9nPSsCA==
+   d="scan'208";a="13172313"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 15:28:14 -0700
+X-CSE-ConnectionGUID: 4GsBA0hISUKUrp2D78M5JQ==
+X-CSE-MsgGUID: g4pAQOoBQwCivuS3JEs+Pw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
-   d="scan'208";a="28813444"
-Received: from soc-cp83kr3.jf.intel.com (HELO [10.24.10.61]) ([10.24.10.61])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 15:02:51 -0700
-Message-ID: <71260288-3666-4419-8283-6565e91aaba4@intel.com>
-Date: Mon, 22 Apr 2024 15:02:50 -0700
+   d="scan'208";a="28971902"
+Received: from jacob-builder.jf.intel.com (HELO jacob-builder) ([10.54.39.125])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 15:28:14 -0700
+Date: Mon, 22 Apr 2024 15:32:50 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, LKML
+ <linux-kernel@vger.kernel.org>, X86 Kernel <x86@kernel.org>, Peter Zijlstra
+ <peterz@infradead.org>, iommu@lists.linux.dev, Lu Baolu
+ <baolu.lu@linux.intel.com>, kvm@vger.kernel.org, Dave Hansen
+ <dave.hansen@intel.com>, Joerg Roedel <joro@8bytes.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>, Ingo Molnar
+ <mingo@redhat.com>, Paul Luse <paul.e.luse@intel.com>, Dan Williams
+ <dan.j.williams@intel.com>, Jens Axboe <axboe@kernel.dk>, Raj Ashok
+ <ashok.raj@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
+ maz@kernel.org, seanjc@google.com, Robin Murphy <robin.murphy@arm.com>,
+ jim.harris@samsung.com, a.manzanares@samsung.com, Bjorn Helgaas
+ <helgaas@kernel.org>, guang.zeng@intel.com, robert.hoo.linux@gmail.com,
+ kan.liang@intel.com, "Kleen, Andi" <andi.kleen@intel.com>,
+ jacob.jun.pan@linux.intel.com
+Subject: Re: [PATCH v2 05/13] x86/irq: Reserve a per CPU IDT vector for
+ posted MSIs
+Message-ID: <20240422153250.07331f49@jacob-builder>
+In-Reply-To: <ZiLO9RUdMsNlCtI_@x1>
+References: <20240415134354.67c9d1d1@jacob-builder>
+	<87jzkuxaqv.ffs@tglx>
+	<ZiLO9RUdMsNlCtI_@x1>
+Organization: OTC
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] KVM: selftests: Add KVM/PV clock selftest to prove
- timer drift correction
-To: David Woodhouse <dwmw2@infradead.org>, Jack Allister
- <jalliste@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Sean Christopherson <seanjc@google.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Shuah Khan <shuah@kernel.org>
-Cc: Paul Durrant <paul@xen.org>, kvm@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20240408220705.7637-1-jalliste@amazon.com>
- <20240408220705.7637-3-jalliste@amazon.com>
- <3664e8ec-1fa1-48c0-a80d-546b7f6cd671@intel.com>
- <17F1A2E9-6BAD-40E7-ACDD-B110CFC124B3@infradead.org>
- <65FF4D51-05A8-42E0-9D07-6E42913CC75E@infradead.org>
- <6dca783b-6532-4fa7-9e04-1c0a382a00b0@intel.com>
- <c863ffcfd4edda9a1a46e3351766a655c5523f7d.camel@infradead.org>
-Content-Language: en-US
-From: "Chen, Zide" <zide.chen@intel.com>
-In-Reply-To: <c863ffcfd4edda9a1a46e3351766a655c5523f7d.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+Hi Arnaldo,
 
+On Fri, 19 Apr 2024 17:07:17 -0300, Arnaldo Carvalho de Melo
+<acme@kernel.org> wrote:
 
-On 4/20/2024 9:03 AM, David Woodhouse wrote:
-> On Fri, 2024-04-19 at 16:54 -0700, Chen, Zide wrote:
->>
->> However, the selftest hangs:
->>
->> [Apr19 16:15] kselftest: Running tests in kvm
->> [Apr19 16:16] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
->> [  +0.000628] rcu:      78-...0: (1 GPs behind) idle=3c8c/1/0x4000000000000000 softirq=5908/5913 fqs=14025
->> [  +0.000468] rcu:      (detected by 104, t=60003 jiffies, g=60073, q=3100 ncpus=128)
->> [  +0.000389] Sending NMI from CPU 104 to CPUs 78:
->> [  +0.000360] NMI backtrace for cpu 78
->> [  +0.000004] CPU: 78 PID: 33515 Comm: pvclock_test Tainted: G O       6.9.0-rc1zide-l0+ #194
->> [  +0.000003] Hardware name: Inspur NF5280M7/NF5280M7, BIOS 05.08.01 08/18/2023
->> [  +0.000002] RIP: 0010:pvclock_update_vm_gtod_copy+0xb5/0x200 [kvm]
+> > > On a second thought, if we make system IRQ vector determined at
+> > > compile time based on different CONFIG options, will it break
+> > > userspace tools such as perf? More importantly the rule of not
+> > > breaking userspace.  
 > 
-> Ah, kvm_get_time_scale() doesn't much like being asked to scale to zero.
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a07b60351894..45fb99986cf9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3046,7 +3046,8 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
->  		 * Copy from the field protected solely by ka->tsc_write_lock,
->  		 * to the field protected by the ka->pvclock_sc seqlock.
->  		 */
-> -		ka->master_tsc_scaling_ratio = ka->last_tsc_scaling_ratio;
-> +		ka->master_tsc_scaling_ratio = ka->last_tsc_scaling_ratio ? :
-> +			kvm_caps.default_tsc_scaling_ratio;
+> The rule for tools/perf is "don't impose _any requirement_ on the kernel
+> developers, they don't have to test if any change they do outside of
+> tools/ will break something inside tools/."
 >  
->  		/*
->  		 * Calculate the scaling factors precisely the same way
-> 		 * that kvm_guest_time_update() does.
->  		last_tsc_hz = kvm_scale_tsc(tsc_khz * 1000,
->                                           ka->last_tsc_scaling_ratio);
+> > tools/arch/x86/include/asm/irq_vectors.h is only used to generate the
+> > list of system vectors for pretty output. And your change already broke
+> > that.  
+> 
+> Yeah, I even moved that from tools/arch/x86/include/asm/irq_vectors.h
+> to tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h (for next
+> merge window).
 
-Should be ka->master_tsc_scaling_ratio?
+So I will not add anything to the tools directory for my next version.
+Just a heads-up for adding this new vector.
 
-If I restored the KVM_REQ_GLOBAL_CLOCK_UPDATE request from
-kvm_arch_vcpu_load(), the selftest works for me, and I ran the test for
-1000+ iterations, w/ or w/o TSC scaling, the TEST_ASSERT(delta_corrected
- <= ±1) never got hit. This is awesome!
+Thanks,
 
-However, without KVM_REQ_GLOBAL_CLOCK_UPDATE, it still fails on creating
-a VM. Maybe the init sequence sill needs some rework.
-
- BUG: unable to handle page fault for address: 005b29e3f221ccf0
- #PF: supervisor read access in kernel mode
- #PF: error_code(0x0000) - not-present page
- PGD 0
- Oops: 0000 [#1] PREEMPT SMP NOPTI
- CPU: 86 PID: 4118 Comm: pvclock_test Tainted
- Hardware name: Inspur NF5280M7/NF5280M7, BIOS 05.08.01 08/18/2023
- RIP: 0010:start_creating+0x80/0x190
- Code: ce ad 48 c7 c6 70 a1 ce ad 48 c7 c7 80 1c 9b ab e8 b5 10 d5 ff 4c
-63 e0 45 85 e4 0f 85 cd 00 00 00 48 85 db 0f 84 b5 00 00 00 <48> 8b 43
-30 48 8d b8 b8 >
- RSP: 0018:ff786eaacf3cfdd0 EFLAGS: 00010206
- RAX: 0000000000000000 RBX: 005b29e3f221ccc0 RCX: 0000000000000000
- RDX: 0000000000000001 RSI: ffffffffadcea170 RDI: 0000000000000000
- RBP: ffffffffc06ac8cf R08: ffffffffa6ea0fe0 R09: ffffffffc06a5940
- R10: ff786eaacf3cfe30 R11: 00000013a7b5feaa R12: 0000000000000000
- R13: 0000000000000124 R14: ff786eaacfa11000 R15: 00000000000081a4
- FS:  00007f0837c89740(0000) GS:ff4f44b6bfd80000(0000)
-knlGS:0000000000000000
- CS:  0010 DS: 0000 ES: 0000 CR0
- CR2: 005b29e3f221ccf0 CR3: 000000014bdf8002 CR4: 0000000000f73ef0
- DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
- DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
- PKRU: 55555554
- Call Trace:
-  <TASK>
-  ? __die+0x24/0x70
-  ? page_fault_oops+0x81/0x150
-  ? do_user_addr_fault+0x64/0x6c0
-  ? exc_page_fault+0x8a/0x1a0
-  ? asm_exc_page_fault+0x26/0x30
-  ? start_creating+0x80/0x190
-  __debugfs_create_file+0x43/0x1f0
-  kvm_create_vm_debugfs+0x28b/0x2d0 [kvm]
-  kvm_create_vm+0x457/0x650 [kvm]
-  kvm_dev_ioctl+0x88/0x180 [kvm]
-  __x64_sys_ioctl+0x8e/0xd0
-  do_syscall_64+0x5b/0x120
-  entry_SYSCALL_64_after_hwframe+0x71/0x79
- RIP: 0033:0x7f0837b1a94f
- Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89
-44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <41> 89 c0
-3d 00 f0 ff ff >
- RSP: 002b:00007ffe01be3fc0 EFLAGS: 00000246 ORIG_RAX
- RAX: ffffffffffffffda RBX: 0000000000434480 RCX: 00007f0837b1a94f
- RDX: 0000000000000000 RSI: 000000000000ae01 RDI: 0000000000000005
- RBP: 0000000000000009 R08: 000000000041b1a0 R09: 000000000041bfcf
- R10: 00007f0837bd8882 R11: 0000000000000246 R12: 0000000000434480
- R13: 000000000041e0f0 R14: 0000000000001000 R15: 0000000000000207
-  </TASK>
- Modules linked in: kvm_intel(O) kvm(O) [last unloaded: kvm(O)]
- CR2: 005b29e3f221ccf0
+Jacob
 
