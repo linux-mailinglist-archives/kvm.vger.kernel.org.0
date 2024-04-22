@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-15564-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15565-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3D588AD587
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:03:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 904068AD588
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:03:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2A01C20AD5
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:03:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4603B28370B
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:03:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F8E156897;
-	Mon, 22 Apr 2024 20:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D3515697A;
+	Mon, 22 Apr 2024 20:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rCD3pEQz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UECSjid5"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34095155731
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D9A156876
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713816153; cv=none; b=fNWs2QXVuuY4aro8EgHWKVeX0HL67U8TGAH3V+9XsYWTJp6hlQh2xD35ThotSCXyh8zryKwkeHReoFBN5vV4HdWF90ivftojwOGWhJHZTe0tsJJXTUk8qAuT8lOp+mS6mzOIaYhOq5JPXlFXr5+jbPtd4BygcnjPhg4w2e7ir/k=
+	t=1713816154; cv=none; b=txfDpm4dublA1F1pkbMktM+C/PX+6iYku32gStFklUjd/YksozDIa+YnwF57URqx4IHDlfYZTyUB/EHCrstEe4hUaPObfmBSmXPYRqElXF6WhMNa29hn6Ps8Hdu4qIwnuAxZjudR07ZmtLrbpagDLj1Q3di/kUj7HktHy3Wh1Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713816153; c=relaxed/simple;
-	bh=nGhzZ9GWTIjotPUyiZLVadvCJNmbAZhS6LCkfdZah58=;
+	s=arc-20240116; t=1713816154; c=relaxed/simple;
+	bh=SuI4fxsdPpu7RBL4gjUxe0Wb6CeSWwxc/FCW80mAiYo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=d0lAKt+3X9ZN3GyLmq3P4USrIKmjT6grJTSaZMgsU0x3Nq76nCq5RU5c8rzShY9olk+ltl0Ot6Q0anpd+H7eOcYd261Nl98ovNtVnHgWdd0y7SfmegxkGn3nbLhjKzqLwcSA7+4p0ULaclqUpf+9skZliNTlIf+cfJ4QeJVs5Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rCD3pEQz; arc=none smtp.client-ip=91.218.175.179
+	 MIME-Version; b=kkAaM/0C/hi1gVOlP6RcPCQ51Xpl/KSGjGycryWz/+DXhAPnjPQUNmzrJOG0V62Orz7VxyeaGIihLG86mnZROA/pAqULMVA6k1nBC+lR0yyZqVQJN/iG7fYA8USY9LAVMFLNsMojo01U0KCF2STlhYZQhaY2hE1TphWryDeHGi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UECSjid5; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713816149;
+	t=1713816151;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JGdk+14LQERtGFZqNrN+p4vCqZJLwBmxN0cPz/Q1hns=;
-	b=rCD3pEQzgdE5botKMtfP4DR1pDWwvYbR+1+tmb9iLnjAA7hB/Gqu1cyWJpQIJhE59IMKfn
-	9tSjV9GFMiHFE9BuFJEj6X0YspAyzMjofjOEr9s9k+rLCYr4J+Ah2v5NJXXTbGQRG0VXVz
-	uP/WvwCyd7DxM0S9R8cPVkeK+HTS5J4=
+	bh=qgtcLU3++/q2Ge4zJnuAcQCCP6r1NOlAwbU69hgH/YA=;
+	b=UECSjid5DXIAJ2sVnu8sI8GtMlL3aaqBzuulciy6E5a5rptLeczcJowMmFJ3az0+Vewr0J
+	4uQ31CJmCSzQ4Tnn9lA1sav5ODmINifxjl9jT/n8NDKGbUOJMTqyLM6XBtcz/0HfRNj+VT
+	aGRkowfipnWBwGZATYyDkCL19m93Pm0=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -51,9 +51,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 10/19] KVM: arm64: vgic-its: Use the per-ITS translation cache for injection
-Date: Mon, 22 Apr 2024 20:01:49 +0000
-Message-ID: <20240422200158.2606761-11-oliver.upton@linux.dev>
+Subject: [PATCH v3 11/19] KVM: arm64: vgic-its: Rip out the global translation cache
+Date: Mon, 22 Apr 2024 20:01:50 +0000
+Message-ID: <20240422200158.2606761-12-oliver.upton@linux.dev>
 In-Reply-To: <20240422200158.2606761-1-oliver.upton@linux.dev>
 References: <20240422200158.2606761-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -65,47 +65,151 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Everything is in place to switch to per-ITS translation caches. Start
-using the per-ITS cache to avoid the lock serialization related to the
-global translation cache. Explicitly check for out-of-range device and
-event IDs as the cache index is packed based on the range the ITS
-actually supports.
-
-Take the RCU read lock to protect against the returned descriptor being
-freed while trying to take a reference on it, as it is no longer
-necessary to acquire the lpi_list_lock.
+The MSI injection fast path has been transitioned away from the global
+translation cache. Rip it out.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 63 +++++++++-------------------------
- 1 file changed, 17 insertions(+), 46 deletions(-)
+ arch/arm64/kvm/vgic/vgic-init.c |   7 --
+ arch/arm64/kvm/vgic/vgic-its.c  | 121 ++------------------------------
+ arch/arm64/kvm/vgic/vgic.h      |   2 -
+ include/kvm/arm_vgic.h          |   3 -
+ 4 files changed, 4 insertions(+), 129 deletions(-)
 
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index f20941f83a07..6ee42f395253 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -53,7 +53,6 @@ void kvm_vgic_early_init(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
+ 
+-	INIT_LIST_HEAD(&dist->lpi_translation_cache);
+ 	raw_spin_lock_init(&dist->lpi_list_lock);
+ 	xa_init_flags(&dist->lpi_xa, XA_FLAGS_LOCK_IRQ);
+ }
+@@ -305,9 +304,6 @@ int vgic_init(struct kvm *kvm)
+ 		}
+ 	}
+ 
+-	if (vgic_has_its(kvm))
+-		vgic_lpi_translation_cache_init(kvm);
+-
+ 	/*
+ 	 * If we have GICv4.1 enabled, unconditionally request enable the
+ 	 * v4 support so that we get HW-accelerated vSGIs. Otherwise, only
+@@ -361,9 +357,6 @@ static void kvm_vgic_dist_destroy(struct kvm *kvm)
+ 		dist->vgic_cpu_base = VGIC_ADDR_UNDEF;
+ 	}
+ 
+-	if (vgic_has_its(kvm))
+-		vgic_lpi_translation_cache_destroy(kvm);
+-
+ 	if (vgic_supports_direct_msis(kvm))
+ 		vgic_v4_teardown(kvm);
+ 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 237e92016c1b..9a517faa43ae 100644
+index 9a517faa43ae..bb7f4fd35b2b 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -251,8 +251,10 @@ static struct its_ite *find_ite(struct vgic_its *its, u32 device_id,
+@@ -149,14 +149,6 @@ struct its_ite {
+ 	u32 event_id;
+ };
  
- #define GIC_LPI_OFFSET 8192
+-struct vgic_translation_cache_entry {
+-	struct list_head	entry;
+-	phys_addr_t		db;
+-	u32			devid;
+-	u32			eventid;
+-	struct vgic_irq		*irq;
+-};
+-
+ /**
+  * struct vgic_its_abi - ITS abi ops and settings
+  * @cte_esz: collection table entry size
+@@ -568,96 +560,34 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
+ 				       struct vgic_irq *irq)
+ {
+ 	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
+-	struct vgic_dist *dist = &kvm->arch.vgic;
+-	struct vgic_translation_cache_entry *cte;
+ 	struct vgic_irq *old;
+-	unsigned long flags;
+-	phys_addr_t db;
  
--#define VITS_TYPER_IDBITS 16
--#define VITS_TYPER_DEVBITS 16
-+#define VITS_TYPER_IDBITS		16
-+#define VITS_MAX_EVENTID		(BIT(VITS_TYPER_IDBITS) - 1)
-+#define VITS_TYPER_DEVBITS		16
-+#define VITS_MAX_DEVID			(BIT(VITS_TYPER_DEVBITS) - 1)
- #define VITS_DTE_MAX_DEVID_OFFSET	(BIT(14) - 1)
- #define VITS_ITE_MAX_EVENTID_OFFSET	(BIT(16) - 1)
+ 	/* Do not cache a directly injected interrupt */
+ 	if (irq->hw)
+ 		return;
  
-@@ -536,51 +538,27 @@ static unsigned long vgic_its_cache_key(u32 devid, u32 eventid)
+-	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
+-
+-	if (unlikely(list_empty(&dist->lpi_translation_cache)))
+-		goto out;
+-
+-	db = its->vgic_its_base + GITS_TRANSLATER;
+-
+-	/* Always reuse the last entry (LRU policy) */
+-	cte = list_last_entry(&dist->lpi_translation_cache,
+-			      typeof(*cte), entry);
+-
+-	/*
+-	 * Caching the translation implies having an extra reference
+-	 * to the interrupt, so drop the potential reference on what
+-	 * was in the cache, and increment it on the new interrupt.
+-	 */
+-	if (cte->irq)
+-		vgic_put_irq(kvm, cte->irq);
+-
+ 	/*
+ 	 * The irq refcount is guaranteed to be nonzero while holding the
+ 	 * its_lock, as the ITE (and the reference it holds) cannot be freed.
+ 	 */
+ 	lockdep_assert_held(&its->its_lock);
+-
+-	/*
+-	 * Yes, two references are necessary at the moment:
+-	 *  - One for the global LPI translation cache
+-	 *  - Another for the translation cache belonging to @its
+-	 *
+-	 * This will soon disappear.
+-	 */
+-	vgic_get_irq_kref(irq);
+ 	vgic_get_irq_kref(irq);
  
+-	cte->db		= db;
+-	cte->devid	= devid;
+-	cte->eventid	= eventid;
+-	cte->irq	= irq;
+-
+-	/* Move the new translation to the head of the list */
+-	list_move(&cte->entry, &dist->lpi_translation_cache);
+-	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
+-
+ 	/*
+-	 * The per-ITS cache is a perfect cache, so it may already have an
+-	 * identical translation even if it were missing from the global
+-	 * cache. Ensure we don't leak a reference if that is the case.
++	 * We could have raced with another CPU caching the same
++	 * translation behind our back, ensure we don't leak a
++	 * reference if that is the case.
+ 	 */
+ 	old = xa_store(&its->translation_cache, cache_key, irq, GFP_KERNEL_ACCOUNT);
+ 	if (old)
+ 		vgic_put_irq(kvm, old);
+-
+-out:
+-	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
  }
  
--static struct vgic_irq *__vgic_its_check_cache(struct vgic_dist *dist,
--					       phys_addr_t db,
--					       u32 devid, u32 eventid)
--{
+ static void vgic_its_invalidate_cache(struct vgic_its *its)
+ {
+ 	struct kvm *kvm = its->dev->kvm;
+-	struct vgic_dist *dist = &kvm->arch.vgic;
 -	struct vgic_translation_cache_entry *cte;
+-	unsigned long flags, idx;
+ 	struct vgic_irq *irq;
+-
+-	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
 -
 -	list_for_each_entry(cte, &dist->lpi_translation_cache, entry) {
 -		/*
@@ -115,76 +219,99 @@ index 237e92016c1b..9a517faa43ae 100644
 -		if (!cte->irq)
 -			break;
 -
--		if (cte->db != db || cte->devid != devid ||
--		    cte->eventid != eventid)
--			continue;
--
--		/*
--		 * Move this entry to the head, as it is the most
--		 * recently used.
--		 */
--		if (!list_is_first(&cte->entry, &dist->lpi_translation_cache))
--			list_move(&cte->entry, &dist->lpi_translation_cache);
--
--		return cte->irq;
+-		vgic_put_irq(kvm, cte->irq);
+-		cte->irq = NULL;
 -	}
 -
--	return NULL;
+-	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
++	unsigned long idx;
+ 
+ 	xa_for_each(&its->translation_cache, idx, irq) {
+ 		xa_erase(&its->translation_cache, idx);
+@@ -1880,47 +1810,6 @@ static int vgic_register_its_iodev(struct kvm *kvm, struct vgic_its *its,
+ 	return ret;
+ }
+ 
+-/* Default is 16 cached LPIs per vcpu */
+-#define LPI_DEFAULT_PCPU_CACHE_SIZE	16
+-
+-void vgic_lpi_translation_cache_init(struct kvm *kvm)
+-{
+-	struct vgic_dist *dist = &kvm->arch.vgic;
+-	unsigned int sz;
+-	int i;
+-
+-	if (!list_empty(&dist->lpi_translation_cache))
+-		return;
+-
+-	sz = atomic_read(&kvm->online_vcpus) * LPI_DEFAULT_PCPU_CACHE_SIZE;
+-
+-	for (i = 0; i < sz; i++) {
+-		struct vgic_translation_cache_entry *cte;
+-
+-		/* An allocation failure is not fatal */
+-		cte = kzalloc(sizeof(*cte), GFP_KERNEL_ACCOUNT);
+-		if (WARN_ON(!cte))
+-			break;
+-
+-		INIT_LIST_HEAD(&cte->entry);
+-		list_add(&cte->entry, &dist->lpi_translation_cache);
+-	}
 -}
 -
- static struct vgic_irq *vgic_its_check_cache(struct kvm *kvm, phys_addr_t db,
- 					     u32 devid, u32 eventid)
- {
+-void vgic_lpi_translation_cache_destroy(struct kvm *kvm)
+-{
 -	struct vgic_dist *dist = &kvm->arch.vgic;
-+	unsigned long cache_key = vgic_its_cache_key(devid, eventid);
-+	struct vgic_its *its;
- 	struct vgic_irq *irq;
--	unsigned long flags;
+-	struct vgic_translation_cache_entry *cte, *tmp;
+-
+-	vgic_its_invalidate_all_caches(kvm);
+-
+-	list_for_each_entry_safe(cte, tmp,
+-				 &dist->lpi_translation_cache, entry) {
+-		list_del(&cte->entry);
+-		kfree(cte);
+-	}
+-}
+-
+ #define INITIAL_BASER_VALUE						  \
+ 	(GIC_BASER_CACHEABILITY(GITS_BASER, INNER, RaWb)		| \
+ 	 GIC_BASER_CACHEABILITY(GITS_BASER, OUTER, SameAsInner)		| \
+@@ -1953,8 +1842,6 @@ static int vgic_its_create(struct kvm_device *dev, u32 type)
+ 			kfree(its);
+ 			return ret;
+ 		}
+-
+-		vgic_lpi_translation_cache_init(dev->kvm);
+ 	}
  
--	raw_spin_lock_irqsave(&dist->lpi_list_lock, flags);
-+	if (devid > VITS_MAX_DEVID || eventid > VITS_MAX_EVENTID)
-+		return NULL;
-+
-+	its = __vgic_doorbell_to_its(kvm, db);
-+	if (IS_ERR(its))
-+		return NULL;
+ 	mutex_init(&its->its_lock);
+diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
+index e5cda1eb4bcf..407640c24049 100644
+--- a/arch/arm64/kvm/vgic/vgic.h
++++ b/arch/arm64/kvm/vgic/vgic.h
+@@ -335,8 +335,6 @@ int vgic_its_resolve_lpi(struct kvm *kvm, struct vgic_its *its,
+ 			 u32 devid, u32 eventid, struct vgic_irq **irq);
+ struct vgic_its *vgic_msi_to_its(struct kvm *kvm, struct kvm_msi *msi);
+ int vgic_its_inject_cached_translation(struct kvm *kvm, struct kvm_msi *msi);
+-void vgic_lpi_translation_cache_init(struct kvm *kvm);
+-void vgic_lpi_translation_cache_destroy(struct kvm *kvm);
+ void vgic_its_invalidate_all_caches(struct kvm *kvm);
  
--	irq = __vgic_its_check_cache(dist, db, devid, eventid);
-+	rcu_read_lock();
-+
-+	irq = xa_load(&its->translation_cache, cache_key);
- 	if (!vgic_try_get_irq_kref(irq))
- 		irq = NULL;
+ /* GICv4.1 MMIO interface */
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index c15e7fcccb86..76ed097500c0 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -286,9 +286,6 @@ struct vgic_dist {
+ #define LPI_XA_MARK_DEBUG_ITER	XA_MARK_0
+ 	struct xarray		lpi_xa;
  
--	raw_spin_unlock_irqrestore(&dist->lpi_list_lock, flags);
-+	rcu_read_unlock();
+-	/* LPI translation cache */
+-	struct list_head	lpi_translation_cache;
+-
+ 	/* used by vgic-debug */
+ 	struct vgic_state_iter *iter;
  
- 	return irq;
- }
-@@ -605,14 +583,7 @@ static void vgic_its_cache_translation(struct kvm *kvm, struct vgic_its *its,
- 	if (unlikely(list_empty(&dist->lpi_translation_cache)))
- 		goto out;
- 
--	/*
--	 * We could have raced with another CPU caching the same
--	 * translation behind our back, so let's check it is not in
--	 * already
--	 */
- 	db = its->vgic_its_base + GITS_TRANSLATER;
--	if (__vgic_its_check_cache(dist, db, devid, eventid))
--		goto out;
- 
- 	/* Always reuse the last entry (LRU policy) */
- 	cte = list_last_entry(&dist->lpi_translation_cache,
-@@ -958,7 +929,7 @@ static bool vgic_its_check_id(struct vgic_its *its, u64 baser, u32 id,
- 
- 	switch (type) {
- 	case GITS_BASER_TYPE_DEVICE:
--		if (id >= BIT_ULL(VITS_TYPER_DEVBITS))
-+		if (id > VITS_MAX_DEVID)
- 			return false;
- 		break;
- 	case GITS_BASER_TYPE_COLLECTION:
 -- 
 2.44.0.769.g3c40516874-goog
 
