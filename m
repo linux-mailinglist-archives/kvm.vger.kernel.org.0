@@ -1,72 +1,90 @@
-Return-Path: <kvm+bounces-15481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15480-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E76B58ACB82
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 12:58:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE5B8ACB7A
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 12:57:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D97DB23D1C
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 10:58:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A32591F234CE
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 10:57:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9207B145FF0;
-	Mon, 22 Apr 2024 10:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3573E145FF1;
+	Mon, 22 Apr 2024 10:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ASXSqTH4"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KWdTjC+0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9061D482C1;
-	Mon, 22 Apr 2024 10:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8C9145FE9;
+	Mon, 22 Apr 2024 10:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713783506; cv=none; b=iGqdEPG8U0HLXvtI3JtnO7a38WAzrIsgDGsZbYolCm1BEXjiDO3L4Q4M6wJM6zdofFTxxJsM7WiEvVcOtwwegSdJusN1trWtoYCqjTFjWbvufDU3cxf6vK50MzcVLAj38ntlV7yjkW8VJjxnEqab0SPHnZ6WaMcV3ipQi8ZITyk=
+	t=1713783453; cv=none; b=clszFH6UrVqzMLd2AxqWpIdAcfmGeglo13UQt3LgZtqwJuXIqVJf7fXjjdzLumWgOTCdYeByT7hUYjRxMe+bVJfTjI9ISC8eztehfuV3s75/qVi0kdxmlzuattUbQH1EbJMniEzSH5ieeFnPvE34q7mh32IxlYX0SvWiISos6HQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713783506; c=relaxed/simple;
-	bh=lPATZdfC4lvu1dgYEE2BFqtfBxeTwRg2JFrdpCPXZMs=;
+	s=arc-20240116; t=1713783453; c=relaxed/simple;
+	bh=w1xzUgbJohFNYDJ47fkGDKBV6P/N+AsaTUPNxllhWDo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rUlS8RkBBRU762cIpp/jTxH6heOUB/X5oimK381yBnjEWYaFKV0kCXS4+OZ7E92r4VzGHUaTDlnQmMJkp14a4of4t0yvJ65D1zavWTo3crutxDIgThygRMxpC+Y51mq16CLZYmIi6sIxoxJLABntjJ8mwj5RSbxO5x+18hR/VFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ASXSqTH4; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713783504; x=1745319504;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=lPATZdfC4lvu1dgYEE2BFqtfBxeTwRg2JFrdpCPXZMs=;
-  b=ASXSqTH4jAXmykN3u03L8Arf+wT62uGC5n7SxrAZ6RMttYFzoHSDgqEF
-   LQvr/xnYurI7T1q8gdThfTD8jXZjOu/Nqr5zitV5i1T0PAYCN7t6+2qQt
-   7UC3EvNUsysGClSrbDLoa5SnhOQEgG521vnOoE/fiKUFCMkFICs5jdAo2
-   qgV1DGhWMQQtjir3jWVg772xY/19rCxWZmLShUUJRbsD3dY7DWBlNxRR/
-   xbeLYrJrY4Ts7PvjP4uKLJBXKx84EFJCKqJvvUFIe8xYj6sYB91NDq3pi
-   VS+d+AwmgKPTjNDf/5UZVb7PNASSTdWk5BftrBgqUUaxQDYoY7ZRNnqcK
-   A==;
-X-CSE-ConnectionGUID: Wm5bgdjzQVy1kUrOsJMJMg==
-X-CSE-MsgGUID: jnRm82qnSFC8qkjf7BYPaQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11051"; a="20453682"
-X-IronPort-AV: E=Sophos;i="6.07,220,1708416000"; 
-   d="scan'208";a="20453682"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 03:58:23 -0700
-X-CSE-ConnectionGUID: yrgtAYVYS1SH1HzMkvUDxQ==
-X-CSE-MsgGUID: fQWUNgQ4SXmCgHFcx2AAxw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,220,1708416000"; 
-   d="scan'208";a="24017009"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa010.fm.intel.com with ESMTP; 22 Apr 2024 03:58:21 -0700
-Date: Mon, 22 Apr 2024 18:53:02 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
-	michael.roth@amd.com, isaku.yamahata@intel.com
-Subject: Re: [PATCH 06/11] KVM: guest_memfd: Add hook for initializing memory
-Message-ID: <ZiZBjtQvUuuqqKNF@yilunxu-OptiPlex-7050>
-References: <20240404185034.3184582-1-pbonzini@redhat.com>
- <20240404185034.3184582-7-pbonzini@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PTsL8pT53a6/VUeCw6fCtR6ytWRlBNKawNh/lKEHAEBY9acpi4XhyPg9rcRGu0WjOZB6pmGvSfYyr9RrEfrg2peyXClKbv90iBVXVPqANVjgB3Dslj+UfTySKHaUbF61ZzId2Vnv4sA2A2qqJcGBdHXGauiT4szTFfPJucrXyLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KWdTjC+0; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43MAvOjx007414;
+	Mon, 22 Apr 2024 10:57:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=E2JjMnB+6XWiJTS20ld80YrCy2ZrbJKAL1QUTd1Wobs=;
+ b=KWdTjC+0r9HumlCcjrqHaAG36rSDAP5hVYRcIcNZujN+GxDsEKPko6jTjW8kNEiP/dXn
+ YeaCLzJB3LrlDj0jSksmjVZKzUWZw4iBvi3sF8T6e/fbat4FGIm5PP/xwrOz4bNUdSjR
+ +QfJSa0TC4JT9uRtsQ6VI8WfJ+lG/Erjs86Xqaypc/nHy5AYmcxBSb+h+G5kRf8P4xEl
+ yhhocuGffBqb7jpCJiEnOF+aRc3AM6KYPecg9/i00SrIoa4lGbjzS7m0d8Rmj/bMCJgw
+ Rh7an9+SELGDTsoTVOYQ7kquAdsnOTVnFbo9CdLOQ83op0V79FFMlt1IbM0puvEHeM+o Hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnpk9r01s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 10:57:28 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43MAvS0G007456;
+	Mon, 22 Apr 2024 10:57:28 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnpk9r01q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 10:57:28 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43M99tHZ029873;
+	Mon, 22 Apr 2024 10:57:27 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xmr1t7fa9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 10:57:27 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43MAvMUo48103686
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 22 Apr 2024 10:57:24 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5AE842004D;
+	Mon, 22 Apr 2024 10:57:22 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D1E5420040;
+	Mon, 22 Apr 2024 10:57:21 +0000 (GMT)
+Received: from osiris (unknown [9.171.64.210])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 22 Apr 2024 10:57:21 +0000 (GMT)
+Date: Mon, 22 Apr 2024 12:57:20 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Nico Boehr <nrb@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, nsg@linux.ibm.com
+Subject: Re: [kvm-unit-tests RFC 2/2] lib: s390x: css: Name inline assembly
+ arguments and clean them up
+Message-ID: <20240422105720.31205-A-hca@linux.ibm.com>
+References: <20240201142356.534783-1-frankja@linux.ibm.com>
+ <20240201142356.534783-3-frankja@linux.ibm.com>
+ <171377182433.14316.15188579220205837716@t14-nrb>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,245 +93,51 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240404185034.3184582-7-pbonzini@redhat.com>
+In-Reply-To: <171377182433.14316.15188579220205837716@t14-nrb>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 64M-261fymZT47P5BtbO2OBj7ptNXLQZ
+X-Proofpoint-GUID: i7qSE7pIYoGZLUyo2iGT_OQ8VBmQz28b
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-22_09,2024-04-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
+ adultscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 priorityscore=1501 mlxscore=0
+ mlxlogscore=600 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404220050
 
-On Thu, Apr 04, 2024 at 02:50:28PM -0400, Paolo Bonzini wrote:
-> guest_memfd pages are generally expected to be in some arch-defined
-> initial state prior to using them for guest memory. For SEV-SNP this
-> initial state is 'private', or 'guest-owned', and requires additional
-> operations to move these pages into a 'private' state by updating the
-> corresponding entries the RMP table.
+On Mon, Apr 22, 2024 at 09:43:44AM +0200, Nico Boehr wrote:
+> Quoting Janosch Frank (2024-02-01 15:23:56)
+> [...]
+> > diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> > index 504b3f14..e4311124 100644
+> > --- a/lib/s390x/css.h
+> > +++ b/lib/s390x/css.h
+> [...]
+> > @@ -167,11 +167,11 @@ static inline int msch(unsigned long schid, struct schib *addr)
+> >         int cc;
+> >  
+> >         asm volatile(
+> > -               "       msch    0(%3)\n"
+> > -               "       ipm     %0\n"
+> > -               "       srl     %0,28"
+> > -               : "=d" (cc)
+> > -               : "d" (reg1), "m" (*addr), "a" (addr)
+> > +               "       msch    0(%[addr])\n"
+> > +               "       ipm     %[cc]\n"
+> > +               "       srl     %[cc],28"
+> > +               : [cc] "=d" (cc)
+> > +               : "d" (reg1), [addr] "a" (addr)
 > 
-> Allow for an arch-defined hook to handle updates of this sort, and go
-> ahead and implement one for x86 so KVM implementations like AMD SVM can
-> register a kvm_x86_ops callback to handle these updates for SEV-SNP
-> guests.
-> 
-> The preparation callback is always called when allocating/grabbing
-> folios via gmem, and it is up to the architecture to keep track of
-> whether or not the pages are already in the expected state (e.g. the RMP
-> table in the case of SEV-SNP).
-> 
-> In some cases, it is necessary to defer the preparation of the pages to
-> handle things like in-place encryption of initial guest memory payloads
-> before marking these pages as 'private'/'guest-owned'.  Add an argument
-> (always true for now) to kvm_gmem_get_folio() that allows for the
-> preparation callback to be bypassed.  To detect possible issues in
+> I think there was a reason why the "m"(*addr) was here. Either add it back
+> or add a memory clobber.
 
-IIUC, we have 2 dedicated flows.
-1 kvm_gmem_get_pfn() or kvm_gmem_allocate()
-  a. kvm_gmem_get_folio()
-  b. gmem_prepare() for RMP
+It is there to tell the compiler that the memory contents at *addr are used
+as input. Without that, and only the "a" contraint, the compiler is free to
+discard any potential previous writes to *addr.
 
-2 in-place encryption or whatever
-  a. kvm_gmem_get_folio(FGP_CREAT_ONLY)
-  b. in-place encryption
-  c. gmem_prepare() for RMP
-
-Could we move gmem_prepare() out of kvm_gmem_get_folio(), then we could
-have straightforward flow for each case, and don't have to have an
-argument to pospone gmem_prepare().
-
-> the way userspace initializes memory, it is only possible to add an
-> unprepared page if it is not already included in the filemap.
-> 
-> Link: https://lore.kernel.org/lkml/ZLqVdvsF11Ddo7Dq@google.com/
-> Co-developed-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Message-Id: <20231230172351.574091-5-michael.roth@amd.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  1 +
->  arch/x86/include/asm/kvm_host.h    |  1 +
->  arch/x86/kvm/x86.c                 |  6 +++
->  include/linux/kvm_host.h           |  5 +++
->  virt/kvm/Kconfig                   |  4 ++
->  virt/kvm/guest_memfd.c             | 65 ++++++++++++++++++++++++++++--
->  6 files changed, 78 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 5187fcf4b610..d26fcad13e36 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -139,6 +139,7 @@ KVM_X86_OP(vcpu_deliver_sipi_vector)
->  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->  KVM_X86_OP_OPTIONAL(get_untagged_addr)
->  KVM_X86_OP_OPTIONAL(alloc_apic_backing_page)
-> +KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
->  
->  #undef KVM_X86_OP
->  #undef KVM_X86_OP_OPTIONAL
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 01c69840647e..f101fab0040e 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1809,6 +1809,7 @@ struct kvm_x86_ops {
->  
->  	gva_t (*get_untagged_addr)(struct kvm_vcpu *vcpu, gva_t gva, unsigned int flags);
->  	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
-> +	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
->  };
->  
->  struct kvm_x86_nested_ops {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2d2619d3eee4..972524ddcfdb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13598,6 +13598,12 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
->  }
->  EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
->  
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order)
-> +{
-> +	return static_call(kvm_x86_gmem_prepare)(kvm, pfn, gfn, max_order);
-> +}
-> +#endif
->  
->  int kvm_spec_ctrl_test_value(u64 value)
->  {
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 48f31dcd318a..33ed3b884a6b 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2445,4 +2445,9 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->  }
->  #endif /* CONFIG_KVM_PRIVATE_MEM */
->  
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
-> +bool kvm_arch_gmem_prepare_needed(struct kvm *kvm);
-> +#endif
-> +
->  #endif
-> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> index 29b73eedfe74..ca870157b2ed 100644
-> --- a/virt/kvm/Kconfig
-> +++ b/virt/kvm/Kconfig
-> @@ -109,3 +109,7 @@ config KVM_GENERIC_PRIVATE_MEM
->         select KVM_GENERIC_MEMORY_ATTRIBUTES
->         select KVM_PRIVATE_MEM
->         bool
-> +
-> +config HAVE_KVM_GMEM_PREPARE
-> +       bool
-> +       depends on KVM_PRIVATE_MEM
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index e5b3cd02b651..486748e65f36 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -13,12 +13,60 @@ struct kvm_gmem {
->  	struct list_head entry;
->  };
->  
-> -static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +bool __weak kvm_arch_gmem_prepare_needed(struct kvm *kvm)
-> +{
-> +	return false;
-> +}
-> +#endif
-
-In which case HAVE_KVM_GMEM_PREPARE is selected but
-gmem_prepare_needed() is never implemented?  Then all gmem_prepare stuff
-are actually dead code.  Maybe we don't need this weak stub?
-
-> +
-> +static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
-> +{
-> +#ifdef CONFIG_HAVE_KVM_GMEM_PREPARE
-> +	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
-> +	struct kvm_gmem *gmem;
-> +
-> +	list_for_each_entry(gmem, gmem_list, entry) {
-> +		struct kvm_memory_slot *slot;
-> +		struct kvm *kvm = gmem->kvm;
-> +		struct page *page;
-> +		kvm_pfn_t pfn;
-> +		gfn_t gfn;
-> +		int rc;
-> +
-> +		if (!kvm_arch_gmem_prepare_needed(kvm))
-> +			continue;
-> +
-> +		slot = xa_load(&gmem->bindings, index);
-> +		if (!slot)
-> +			continue;
-> +
-> +		page = folio_file_page(folio, index);
-> +		pfn = page_to_pfn(page);
-> +		gfn = slot->base_gfn + index - slot->gmem.pgoff;
-> +		rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, compound_order(compound_head(page)));
-> +		if (rc) {
-> +			pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx, error %d.\n",
-> +					    index, rc);
-> +			return rc;
-> +		}
-> +	}
-> +
-> +#endif
-> +	return 0;
-> +}
-> +
-> +static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool prepare)
->  {
->  	struct folio *folio;
-> +	fgf_t fgp_flags = FGP_LOCK | FGP_ACCESSED | FGP_CREAT;
-> +
-> +	if (!prepare)
-> +		fgp_flags |= FGP_CREAT_ONLY;
->  
->  	/* TODO: Support huge pages. */
-> -	folio = filemap_grab_folio(inode->i_mapping, index);
-> +	folio = __filemap_get_folio(inode->i_mapping, index, fgp_flags,
-> +				    mapping_gfp_mask(inode->i_mapping));
->  	if (IS_ERR_OR_NULL(folio))
->  		return folio;
->  
-> @@ -41,6 +89,15 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
->  		folio_mark_uptodate(folio);
->  	}
->  
-> +	if (prepare) {
-> +		int r =	kvm_gmem_prepare_folio(inode, index, folio);
-> +		if (r < 0) {
-> +			folio_unlock(folio);
-> +			folio_put(folio);
-> +			return ERR_PTR(r);
-> +		}
-> +	}
-> +
-
-Do we still need to prepare the page if it is hwpoisoned? I see the
-hwpoisoned check is outside, in kvm_gmem_get_pfn().
-
-Thanks,
-Yilun
-
->  	/*
->  	 * Ignore accessed, referenced, and dirty flags.  The memory is
->  	 * unevictable and there is no storage to write back to.
-> @@ -145,7 +202,7 @@ static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
->  			break;
->  		}
->  
-> -		folio = kvm_gmem_get_folio(inode, index);
-> +		folio = kvm_gmem_get_folio(inode, index, true);
->  		if (IS_ERR_OR_NULL(folio)) {
->  			r = folio ? PTR_ERR(folio) : -ENOMEM;
->  			break;
-> @@ -505,7 +562,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
->  		goto out_fput;
->  	}
->  
-> -	folio = kvm_gmem_get_folio(file_inode(file), index);
-> +	folio = kvm_gmem_get_folio(file_inode(file), index, true);
->  	if (!folio) {
->  		r = -ENOMEM;
->  		goto out_fput;
-> -- 
-> 2.43.0
-> 
-> 
-> 
+The best solution here would be to use the Q constraint (memory reference
+with short displacement and without index register) for the second operand
+address of msch. Or simply copy the current implementation from the kernel
+(drivers/s390/cio/ioasm.c).
 
