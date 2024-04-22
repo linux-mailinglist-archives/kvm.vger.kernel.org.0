@@ -1,74 +1,75 @@
-Return-Path: <kvm+bounces-15547-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15548-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD198AD392
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 19:55:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0E178AD39F
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B0F41F21DF1
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 17:55:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C4731C20F3E
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 18:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5E1154426;
-	Mon, 22 Apr 2024 17:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD230154431;
+	Mon, 22 Apr 2024 18:00:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fsBSt78+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dE1E80tn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8EC152197;
-	Mon, 22 Apr 2024 17:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F69C153BFB;
+	Mon, 22 Apr 2024 18:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713808541; cv=none; b=jRXdkFRRyxOaxX61+waQEvO47IX/vwclvDw0OcqnLAhL0cAVMfbdJBleVg+sP/LklN0WHvwecoBvHdiWrwq5EYAG7WRh42hQcYJyg/9oyNA6h7FQ5AEm2IOBhBO5PKNSTgdDVyiAb2SMtgGQIKdgMNr46OwUIG1YI4SRy8CrB6Q=
+	t=1713808845; cv=none; b=T8rY4kK/IlV9VyJKy3KydQGmpNUf+zD/nawzt9gMzBNt2/WPVsZvsJBv3xfkPRhT6X/qdR7itj+nrkeevw8HuZrRMubRm1qf8qZmPJfeAOpAOSDJqNM+UM8XD0w2vry7I+R59zyL2USlDE+znogP4o6y4rosRsyfwnxWc0+fNao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713808541; c=relaxed/simple;
-	bh=6Qrukdm+oftDRYXT1lb8r+vqv5iPHwTKX+hyL1P5koo=;
+	s=arc-20240116; t=1713808845; c=relaxed/simple;
+	bh=2sFZp7KsUWLMadv9vVGXyM+rqaCBHfPIhgyCbSModQM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vGsYQA887gn+N7/nMOistiEAxXIWekfwS/XfVOUEI/nouyMGqig/YhuC8q2qxHNnbkWPkT8+AQBQm2QWEvZOCMYrpI0FyiM2ETHuE5Gnvd0tURhu9uuZ6Gu50Tdmvq2TSCC0v7FFTDE5oEWGOezfpA3M3hBd19LRWJ+1/LeYRmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fsBSt78+; arc=none smtp.client-ip=192.198.163.7
+	 Content-Type:Content-Disposition:In-Reply-To; b=oQ6AVSBRAp1R3ksE4KFnepo3x1EHm2XR+hP4iqbLh4LjV6DiymNtCFcE1RGa/UPwiqW1gEPLVEn00kv4fBGIxTXO+3fQuytYL+n+iTQ4xcH7hZctwQNS+qsLxL5lWzLSJUlRJJ9YHcB3KwA1E1FGyL0Hf4SWSmV8/f/5eEV7hvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dE1E80tn; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713808539; x=1745344539;
+  t=1713808844; x=1745344844;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=6Qrukdm+oftDRYXT1lb8r+vqv5iPHwTKX+hyL1P5koo=;
-  b=fsBSt78+TdFklZwTV6UA61j6qHKVQJZVD0XoGGq6yQ5xkLx1Tmy/rOGq
-   eOEcWsbHDy3g/VH39/ouXuf3FonMUTr4MfFkffGwB0pK+d9mV0ZOY1gkt
-   BbtAv48Z/xvGiewOSZ5qOcvmSbMs2T5jygWeX1W1Y63vROD/qPIXNr2nW
-   mZ3VHkN53qNgSVLUOZO+2/hp/G8ISLSodSkvAtuPg7uV6umRdyFnCrdSr
-   BbMtyGaSS2xwRHxr8j88LWgFInhouqt5mcOYHbqsEMAZAygFb///9Z3hB
-   zZuXOr/RliGUPb/su2vff7WjcdpHnTXlAFy4c1fj4nlCn34d10EKjSSNb
-   A==;
-X-CSE-ConnectionGUID: FFGgRTrAT7eGPD/Ls+6WKw==
-X-CSE-MsgGUID: uVjK1Pg4Rm2nbCgDNNeXbg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="34759292"
+  bh=2sFZp7KsUWLMadv9vVGXyM+rqaCBHfPIhgyCbSModQM=;
+  b=dE1E80tnE8TTXggHD4NKfwAQRnEzjpqcAnuTLuiB0OcbCUiQJoEgt1l4
+   1jZe8aYUTX3FRY8EH+v2tDYebj9UdMU5XF5zMupA0J0h9FHwD+PZsy9T/
+   TsXXZ7awrRRe30bxzlPZXKUhdsSO2HJL63+SsSiYqgXxeqAwdh14vkgQx
+   G5RDTsTkZuAdzPWtb1u+O2TnjIepTaiuU92tXoaMCrcRfhzhn1FaBd0fA
+   pvDiBWxgHFdw2lBbtniwsfPW8y8w7qGjruuy+BbYEqCrwzbF0PSDdxhI7
+   GCeFCEuAhcwN4TXv9nWXqARlaNLJb1WPPQspz0Sh38LN4Ka6OihMLFRrF
+   w==;
+X-CSE-ConnectionGUID: hfFcTe3CSUaI34PU7TojFg==
+X-CSE-MsgGUID: +8X8XO5HTYidz2lVTxmFzQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="9529627"
 X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
-   d="scan'208";a="34759292"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 10:55:22 -0700
-X-CSE-ConnectionGUID: 1haqLAR8T+W8zDo3immlDA==
-X-CSE-MsgGUID: jlma1gcbQV2IpAEITMkNiA==
+   d="scan'208";a="9529627"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 11:00:43 -0700
+X-CSE-ConnectionGUID: ILyTiQNbTB27HrBws3+ufg==
+X-CSE-MsgGUID: 9cPlSe1dQpKbvQXOEJOnyg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,221,1708416000"; 
-   d="scan'208";a="24165434"
+   d="scan'208";a="24134496"
 Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 10:55:21 -0700
-Date: Mon, 22 Apr 2024 10:55:21 -0700
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 11:00:42 -0700
+Date: Mon, 22 Apr 2024 11:00:41 -0700
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 	isaku.yamahata@intel.com, xiaoyao.li@intel.com,
 	binbin.wu@linux.intel.com, seanjc@google.com,
 	rick.p.edgecombe@intel.com, isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH 1/6] KVM: Document KVM_PRE_FAULT_MEMORY ioctl
-Message-ID: <20240422175521.GM3596705@ls.amr.corp.intel.com>
+Subject: Re: [PATCH 2/6] KVM: Add KVM_PRE_FAULT_MEMORY vcpu ioctl to
+ pre-populate guest memory
+Message-ID: <20240422180041.GN3596705@ls.amr.corp.intel.com>
 References: <20240419085927.3648704-1-pbonzini@redhat.com>
- <20240419085927.3648704-2-pbonzini@redhat.com>
+ <20240419085927.3648704-3-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,111 +78,107 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240419085927.3648704-2-pbonzini@redhat.com>
+In-Reply-To: <20240419085927.3648704-3-pbonzini@redhat.com>
 
-On Fri, Apr 19, 2024 at 04:59:22AM -0400,
+On Fri, Apr 19, 2024 at 04:59:23AM -0400,
 Paolo Bonzini <pbonzini@redhat.com> wrote:
 
 > From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Adds documentation of KVM_PRE_FAULT_MEMORY ioctl. [1]
-> 
-> It populates guest memory.  It doesn't do extra operations on the
-> underlying technology-specific initialization [2].  For example,
-> CoCo-related operations won't be performed.  Concretely for TDX, this API
-> won't invoke TDH.MEM.PAGE.ADD() or TDH.MR.EXTEND().  Vendor-specific APIs
-> are required for such operations.
-> 
-> The key point is to adapt of vcpu ioctl instead of VM ioctl.  First,
-> populating guest memory requires vcpu.  If it is VM ioctl, we need to pick
-> one vcpu somehow.  Secondly, vcpu ioctl allows each vcpu to invoke this
-> ioctl in parallel.  It helps to scale regarding guest memory size, e.g.,
-> hundreds of GB.
-> 
-> [1] https://lore.kernel.org/kvm/Zbrj5WKVgMsUFDtb@google.com/
-> [2] https://lore.kernel.org/kvm/Ze-TJh0BBOWm9spT@google.com/
+> Add a new ioctl KVM_PRE_FAULT_MEMORY in the KVM common code. It iterates on the
+> memory range and calls the arch-specific function.  Add stub arch function
+> as a weak symbol.
 > 
 > Suggested-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Message-ID: <9a060293c9ad9a78f1d8994cfe1311e818e99257.1712785629.git.isaku.yamahata@intel.com>
+> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Message-ID: <819322b8f25971f2b9933bfa4506e618508ad782.1712785629.git.isaku.yamahata@intel.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  Documentation/virt/kvm/api.rst | 50 ++++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
+>  include/linux/kvm_host.h |  5 ++++
+>  include/uapi/linux/kvm.h | 10 +++++++
+>  virt/kvm/Kconfig         |  3 ++
+>  virt/kvm/kvm_main.c      | 63 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 81 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index f0b76ff5030d..bbcaa5d2b54b 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6352,6 +6352,56 @@ a single guest_memfd file, but the bound ranges must not overlap).
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 8dea11701ab2..9e9943e5e37c 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2478,4 +2478,9 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t gfn, void __user *src, long npages
+>  void kvm_arch_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
+>  #endif
 >  
->  See KVM_SET_USER_MEMORY_REGION2 for additional details.
+> +#ifdef CONFIG_KVM_GENERIC_PRE_FAULT_MEMORY
+> +long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> +				    struct kvm_pre_fault_memory *range);
+> +#endif
+> +
+>  #endif
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 2190adbe3002..917d2964947d 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -917,6 +917,7 @@ struct kvm_enable_cap {
+>  #define KVM_CAP_MEMORY_ATTRIBUTES 233
+>  #define KVM_CAP_GUEST_MEMFD 234
+>  #define KVM_CAP_VM_TYPES 235
+> +#define KVM_CAP_PRE_FAULT_MEMORY 236
 >  
-> +4.143 KVM_PRE_FAULT_MEMORY
-> +------------------------
+>  struct kvm_irq_routing_irqchip {
+>  	__u32 irqchip;
+> @@ -1548,4 +1549,13 @@ struct kvm_create_guest_memfd {
+>  	__u64 reserved[6];
+>  };
+>  
+> +#define KVM_PRE_FAULT_MEMORY	_IOWR(KVMIO, 0xd5, struct kvm_pre_fault_memory)
 > +
-> +:Capability: KVM_CAP_PRE_FAULT_MEMORY
-> +:Architectures: none
-> +:Type: vcpu ioctl
-> +:Parameters: struct kvm_pre_fault_memory (in/out)
-> +:Returns: 0 on success, < 0 on error
-> +
-> +Errors:
-> +
-> +  ========== ===============================================================
-> +  EINVAL     The specified `gpa` and `size` were invalid (e.g. not
-> +             page aligned).
-> +  ENOENT     The specified `gpa` is outside defined memslots.
-> +  EINTR      An unmasked signal is pending and no page was processed.
-> +  EFAULT     The parameter address was invalid.
-> +  EOPNOTSUPP Mapping memory for a GPA is unsupported by the
-> +             hypervisor, and/or for the current vCPU state/mode.
-
-     EIO        Unexpected error happened.
-
-> +  ========== ===============================================================
-> +
-> +::
-> +
-> +  struct kvm_pre_fault_memory {
-> +	/* in/out */
+> +struct kvm_pre_fault_memory {
 > +	__u64 gpa;
 > +	__u64 size;
-> +	/* in */
 > +	__u64 flags;
 > +	__u64 padding[5];
-> +  };
+> +};
 > +
-> +KVM_PRE_FAULT_MEMORY populates KVM's stage-2 page tables used to map memory
-> +for the current vCPU state.  KVM maps memory as if the vCPU generated a
-> +stage-2 read page fault, e.g. faults in memory as needed, but doesn't break
-> +CoW.  However, KVM does not mark any newly created stage-2 PTE as Accessed.
-> +
-> +In some cases, multiple vCPUs might share the page tables.  In this
-> +case, the ioctl can be called in parallel.
-> +
-> +Shadow page tables cannot support this ioctl because they
-> +are indexed by virtual address or nested guest physical address.
-> +Calling this ioctl when the guest is using shadow page tables (for
-> +example because it is running a nested guest with nested page tables)
-> +will fail with `EOPNOTSUPP` even if `KVM_CHECK_EXTENSION` reports
-> +the capability to be present.
-> +
-> +`flags` must currently be zero.
-
-`flags` and `padding`
-
-> +
-> +
->  5. The kvm_run structure
->  ========================
+>  #endif /* __LINUX_KVM_H */
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 754c6c923427..b14e14cdbfb9 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -67,6 +67,9 @@ config HAVE_KVM_INVALID_WAKEUPS
+>  config KVM_GENERIC_DIRTYLOG_READ_PROTECT
+>         bool
 >  
-> -- 
-> 2.43.0
-> 
-> 
-> 
+> +config KVM_GENERIC_PRE_FAULT_MEMORY
+> +       bool
+> +
+>  config KVM_COMPAT
+>         def_bool y
+>         depends on KVM && COMPAT && !(S390 || ARM64 || RISCV)
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 38b498669ef9..51d8dbe7e93b 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4379,6 +4379,55 @@ static int kvm_vcpu_ioctl_get_stats_fd(struct kvm_vcpu *vcpu)
+>  	return fd;
+>  }
+>  
+> +#ifdef CONFIG_KVM_GENERIC_PRE_FAULT_MEMORY
+> +static int kvm_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+> +				     struct kvm_pre_fault_memory *range)
+> +{
+> +	int idx;
+> +	long r;
+> +	u64 full_size;
+> +
+> +	if (range->flags)
+> +		return -EINVAL;
 
+To keep future extensively, check the padding are zero.
+Or will we be rely on flags?
+
+        if (!memchr_inv(range->padding, 0, sizeof(range->padding)))
+                return -EINVAL;
 -- 
 Isaku Yamahata <isaku.yamahata@intel.com>
 
