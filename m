@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-15556-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15557-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4E08AD57E
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:02:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F6218AD57F
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 22:02:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A2911F2124A
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:02:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11B21C20F52
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 20:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D870155754;
-	Mon, 22 Apr 2024 20:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B8415622F;
+	Mon, 22 Apr 2024 20:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ApDN2pWG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PnUSdiuw"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta0.migadu.com (out-181.mta0.migadu.com [91.218.175.181])
+Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84BC1553B2
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D611153BCC
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 20:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713816137; cv=none; b=CBhPCgQocoqjvYhcd5WawbKX7AScvr/o5jJk+oUiLlWOSrj0LRr4DKVxgydzNs3iCvkXs0BJpZi/AALppkLxUH5b4DKj+n7Rr9cjNkvW9GixFMF12bFVS7rBVyDPor5Ho5N87BqVoMAKNSIsFYiEoVesMNqeQTMkLUQ7evZ0oko=
+	t=1713816139; cv=none; b=i6POgPIyMshbzdUywaxm/sg2PDkwPw3g0Jh1DrgZ9rnfwnNAIDgGOxHIJ2yHXE1ZDOlmW5ePD32S60EprZregkxWMzPjczlfGNCCdrPsY2xcbfIF9UVxWsjBZdyzLz2FxKWr7GZGPPYl84dwqvXgIkBgvVNsEIOVzOYQFlKNqOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713816137; c=relaxed/simple;
-	bh=RK/yM6qsOPw3n0OH0gCLys55qhO8zYpWnFFNNWH/wDQ=;
+	s=arc-20240116; t=1713816139; c=relaxed/simple;
+	bh=aPJ8EsOmW+ShuVGwFxFojefQqgXUi3BYddMzeavuhgo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bj074FjpSiMolcx/kGouv+hS1joa4rw0PBujIzqdWbYZIuVrc2pivep4qy2FJwDRyIICy7+N7TINaa8aExflqQxnfRC1YzBGZZhwu4D+Quql9PBvLOms2P/GvTA2VTB8QyTvWPfSVT6xigDPWf7EcBXnO7wXJCAngrxp6qoNiB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ApDN2pWG; arc=none smtp.client-ip=91.218.175.181
+	 MIME-Version; b=L+sWZwxgwFteqvjOmCJsRIvV9rAkQnWU19jCi+oi4gyZYXSJ430Dw2+baYerpkFD4YMTmfEjNWpYkgnyorORDv9QM4H7+3JSyP05QxkHv8E+CyL1yKe1DiaJSoWgUMAeZ64TrC6V1rbG4ZYZqGMBHngkl3Gjg8+e+JWIDsPXhqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PnUSdiuw; arc=none smtp.client-ip=91.218.175.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713816134;
+	t=1713816136;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=iQTl/Amd80cS3RGpOqQqk/wdPqY6PhjicfoJOM1VxG4=;
-	b=ApDN2pWGW8vmGi+uCNyev+N1fHs/YaFPNGvJxAR5Py3bIpDzgf4J+5KHc2lCcXIeuNZO9U
-	A4G7d0A+59Dwb5DQ4iM7yDwlcRBeZGE4n47fnP4CubuE7Dt2pK+wvYuMm6KfB3s2N46Qhr
-	HRwJLw04ocSmYUpRmMS2JUEBgzSvVnk=
+	bh=FggNVBv5Qk/uiQWX9kyA7K+xN3CA6hkYXhcHr0dYksM=;
+	b=PnUSdiuwdTVzFCC2QS56E444YhhEnrFylOdsZdxUYj2IFPOThUZ87bz+25EV49hQPnfLJ3
+	G76DgfYviVVkxxTq3Ex2XBrbRD0pqAIVGMRkUQvFap0mybZNFzyJGqZ3iHoNqqpK7YzBPi
+	dbI4CuhczCa0ToUg9Lp9gghoRnPaolU=
 From: Oliver Upton <oliver.upton@linux.dev>
 To: kvmarm@lists.linux.dev
 Cc: Marc Zyngier <maz@kernel.org>,
@@ -51,9 +51,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Eric Auger <eric.auger@redhat.com>,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 02/19] KVM: arm64: vgic-its: Walk LPI xarray in its_sync_lpi_pending_table()
-Date: Mon, 22 Apr 2024 20:01:41 +0000
-Message-ID: <20240422200158.2606761-3-oliver.upton@linux.dev>
+Subject: [PATCH v3 03/19] KVM: arm64: vgic-its: Walk LPI xarray in vgic_its_invall()
+Date: Mon, 22 Apr 2024 20:01:42 +0000
+Message-ID: <20240422200158.2606761-4-oliver.upton@linux.dev>
 In-Reply-To: <20240422200158.2606761-1-oliver.upton@linux.dev>
 References: <20240422200158.2606761-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -68,76 +68,46 @@ X-Migadu-Flow: FLOW_OUT
 The new LPI xarray makes it possible to walk the VM's LPIs without
 holding a lock, meaning that vgic_copy_lpi_list() is no longer
 necessary. Prepare for the deletion by walking the LPI xarray directly
-in its_sync_lpi_pending_table().
+in vgic_its_invall().
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-its.c | 27 ++++++++++-----------------
- 1 file changed, 10 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
 
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index e85a495ada9c..bdb7718b923a 100644
+index bdb7718b923a..07706c5e996b 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -446,23 +446,18 @@ static u32 max_lpis_propbaser(u64 propbaser)
- static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
+@@ -1365,23 +1365,19 @@ static int vgic_its_cmd_handle_inv(struct kvm *kvm, struct vgic_its *its,
+ int vgic_its_invall(struct kvm_vcpu *vcpu)
  {
- 	gpa_t pendbase = GICR_PENDBASER_ADDRESS(vcpu->arch.vgic_cpu.pendbaser);
-+	struct vgic_dist *dist = &vcpu->kvm->arch.vgic;
-+	unsigned long intid, flags;
- 	struct vgic_irq *irq;
- 	int last_byte_offset = -1;
- 	int ret = 0;
+ 	struct kvm *kvm = vcpu->kvm;
+-	int irq_count, i = 0;
 -	u32 *intids;
--	int nr_irqs, i;
--	unsigned long flags;
- 	u8 pendmask;
- 
--	nr_irqs = vgic_copy_lpi_list(vcpu->kvm, vcpu, &intids);
--	if (nr_irqs < 0)
--		return nr_irqs;
 -
--	for (i = 0; i < nr_irqs; i++) {
+-	irq_count = vgic_copy_lpi_list(kvm, vcpu, &intids);
+-	if (irq_count < 0)
+-		return irq_count;
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	struct vgic_irq *irq;
++	unsigned long intid;
+ 
+-	for (i = 0; i < irq_count; i++) {
+-		struct vgic_irq *irq = vgic_get_irq(kvm, NULL, intids[i]);
 +	xa_for_each(&dist->lpi_xa, intid, irq) {
- 		int byte_offset, bit_nr;
- 
--		byte_offset = intids[i] / BITS_PER_BYTE;
--		bit_nr = intids[i] % BITS_PER_BYTE;
-+		byte_offset = intid / BITS_PER_BYTE;
-+		bit_nr = intid % BITS_PER_BYTE;
- 
- 		/*
- 		 * For contiguously allocated LPIs chances are we just read
-@@ -472,25 +467,23 @@ static int its_sync_lpi_pending_table(struct kvm_vcpu *vcpu)
- 			ret = kvm_read_guest_lock(vcpu->kvm,
- 						  pendbase + byte_offset,
- 						  &pendmask, 1);
--			if (ret) {
--				kfree(intids);
-+			if (ret)
- 				return ret;
--			}
-+
- 			last_byte_offset = byte_offset;
- 		}
- 
--		irq = vgic_get_irq(vcpu->kvm, NULL, intids[i]);
-+		irq = vgic_get_irq(vcpu->kvm, NULL, intid);
++		irq = vgic_get_irq(kvm, NULL, intid);
  		if (!irq)
  			continue;
- 
- 		raw_spin_lock_irqsave(&irq->irq_lock, flags);
--		irq->pending_latch = pendmask & (1U << bit_nr);
-+		if (irq->target_vcpu == vcpu)
-+			irq->pending_latch = pendmask & (1U << bit_nr);
- 		vgic_queue_irq_unlock(vcpu->kvm, irq, flags);
- 		vgic_put_irq(vcpu->kvm, irq);
++
+ 		update_lpi_config(kvm, irq, vcpu, false);
+ 		vgic_put_irq(kvm, irq);
  	}
  
 -	kfree(intids);
 -
- 	return ret;
- }
+ 	if (vcpu->arch.vgic_cpu.vgic_v3.its_vpe.its_vm)
+ 		its_invall_vpe(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe);
  
 -- 
 2.44.0.769.g3c40516874-goog
