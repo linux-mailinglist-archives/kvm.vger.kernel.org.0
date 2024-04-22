@@ -1,199 +1,122 @@
-Return-Path: <kvm+bounces-15492-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15494-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D0AC8ACC7E
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 14:09:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9498ACCBB
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 14:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7B111F2427E
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 12:09:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADDCD1C20C81
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 12:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B96211474CB;
-	Mon, 22 Apr 2024 12:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B3E147C82;
+	Mon, 22 Apr 2024 12:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgzgoQQz"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C3E524A0
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 12:09:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903BB4AEE0
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 12:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713787760; cv=none; b=WXkeuG7FNCwEfE2CDpBgHHM4J7VHFilgYOAs+oj2uIAvc5TRrGCXzx5UQmxoqkRooOf2BvrkzH4zKzHhIKMXrM6qwcNagR2dlO+2HL6xhczDlOrafcaLv44Eq9ahL6hFXoVH9DNVN6KJyR4dzvPeE7kdIcyXjaUtXwtVgxByNoY=
+	t=1713788591; cv=none; b=pP4I1jGDntATAm124HChyYAM1ODQS767UmfRhyN50bQrEoi09WZ+m5v7+p0Yeh+EeH+EjT7NkmdFZL3UvUxeRPytIdrZDyyxA3XPy4FvYhGks/bgsz7NZmYLrWlKOB30oql2kqwjuKf6j1q8Rfo+VL+bx47vlOKiTUEMbAU0T8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713787760; c=relaxed/simple;
-	bh=Nm0jhNQtvucxrWSMiBp/VOS8TRhsyQBDcL+sTS6Kj80=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZyMIhG9Q5Ea5W9qVn1MaBMMPw1gVzA7Kdv5k8lfTggxmG8Vx7cGAc8EuZxCrKOHtH1kZvEwwPoN+sx5UhcH+7Nqa28qrNEXc42wH8FdaBOLx7fEh03XJALYW45n7Rt5HUytbvt7JvQTcOSFz4AAEnMSL7tE8daE+rsXcCi7MsH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 51BB4339;
-	Mon, 22 Apr 2024 05:09:45 -0700 (PDT)
-Received: from [10.57.84.177] (unknown [10.57.84.177])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 551063F7BD;
-	Mon, 22 Apr 2024 05:09:15 -0700 (PDT)
-Message-ID: <f793a86c-2143-4db6-a2ae-a151c00a7b56@arm.com>
-Date: Mon, 22 Apr 2024 13:09:13 +0100
+	s=arc-20240116; t=1713788591; c=relaxed/simple;
+	bh=F7obnOZNB7/UePlmQ4/swyiJSlSeyZSBbGTCgkyWlp0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NbNBrYZV7Bz1KW72AyQ+2k8hoJ83laczkdZW/7vasQcBQqu1NSbqNQX2ATWCFJ8M1Cawk9L0UcoU/6VX2ozSZUhlKxjl4P1OO815B/VRpDlhQOkfAJzrnZH1ObkHW8ORZaH4+59b1QpBfMLC/iBAqBUXvhCvMHjfBwzhmYE6IZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RgzgoQQz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713788589;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A/ezKDbA2HN619P+c1weExzZDrmAB50w8fBX12Fo+H4=;
+	b=RgzgoQQzTMOZ7aVHY1hTqMOIbsOX7cPZUIEFkvzihFfkjBCNjmbFTyLnmReYBMVpkCRRoP
+	bDwQ30ek7plDHfzRqtNHga9w1bmm4wwuVVdvcndoIiuPuzB+tC4VZsq0WKBNXGg2aTL77O
+	+LSfHWrbmYTUkv9fO7zKpX8zkUr6Rck=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-261-3Y6SVK_HOVanjzPKvzOJWg-1; Mon, 22 Apr 2024 08:23:08 -0400
+X-MC-Unique: 3Y6SVK_HOVanjzPKvzOJWg-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-343ee356227so2852000f8f.2
+        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 05:23:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713788587; x=1714393387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A/ezKDbA2HN619P+c1weExzZDrmAB50w8fBX12Fo+H4=;
+        b=qMlf6WEfgIeDj9x1zNDd6FYVrO/L9+qrcyfKVxD6eU1nNGN/cwEJ283jXCACDnlrCf
+         pd2RigG8PBNqxMv58yTFdMaJJRacv2tCfkFbh3KJcEcp8JwsUhsEPm5P0hHOVy3BHJRi
+         Ee7INbd3kZaeEOaps95K+Rq1AAl40lddUZmBBFG/kSlUV0ZckWrbwzDMhhurvApN+C93
+         NMTewPPXLIv4O/+4DyJ0hC1mR8DJq5qcdOv/pFL/1toZozVnpIvEEhMiXrNXZmWR8zKQ
+         KtXWvPTWnm8w1XSeP7veaWmttL5UWBASw/AT+LJNzdBVT5DEWarCJ4aPyLrfhY/NsCJZ
+         1nlQ==
+X-Gm-Message-State: AOJu0YznJLRkI6ZpFCqhiYqkr2tImU9Y39IcZz11a10y3VQYi6gbgfWP
+	/qop0c+7iNla4r9Qvmv3GetdR0ddx28cGkvFHenSj6CaN6cJtzDece7MNLj30gTXc9SGUSlNK0x
+	xVdxF4r7/bszOSJ5/KSMjsg6nnSGHX1aalKCRO5BXyiY8j/AIt/eiNUYTFpJOn5HcitkRYvKsz6
+	4JwkidmhmH57GbZpwqXXlHziJK
+X-Received: by 2002:adf:e912:0:b0:34b:4d2e:47d4 with SMTP id f18-20020adfe912000000b0034b4d2e47d4mr500938wrm.24.1713788587150;
+        Mon, 22 Apr 2024 05:23:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF3h4OmL+jYFXwcCkMIHWemcojF5sGIioXy21Ag0m5VdsfhXioLRiKuxM9attN9d1n5rFQo9UJTzdn+57ydq+I=
+X-Received: by 2002:adf:e912:0:b0:34b:4d2e:47d4 with SMTP id
+ f18-20020adfe912000000b0034b4d2e47d4mr500928wrm.24.1713788586839; Mon, 22 Apr
+ 2024 05:23:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 08/33] arm: realm: Make uart available
- before MMU is enabled
-Content-Language: en-GB
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, maz@kernel.org, joey.gouly@arm.com,
- steven.price@arm.com, james.morse@arm.com, oliver.upton@linux.dev,
- yuzenghui@huawei.com, andrew.jones@linux.dev, eric.auger@redhat.com
-References: <20240412103408.2706058-1-suzuki.poulose@arm.com>
- <20240412103408.2706058-9-suzuki.poulose@arm.com> <ZiZQ8USVlxz0RFs3@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ZiZQ8USVlxz0RFs3@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240418193528.41780-1-dwmw2@infradead.org> <20240418193528.41780-3-dwmw2@infradead.org>
+In-Reply-To: <20240418193528.41780-3-dwmw2@infradead.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 22 Apr 2024 14:22:54 +0200
+Message-ID: <CABgObfa0j34iEh81hhd7-t7ZM1GKAsvJb5xP6EoD2-c-8TnPqQ@mail.gmail.com>
+Subject: Re: [PATCH 02/10] KVM: x86: Improve accuracy of KVM clock when TSC
+ scaling is in force
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: kvm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, 
+	Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, Shuah Khan <shuah@kernel.org>, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
+	Marcelo Tosatti <mtosatti@redhat.com>, jalliste@amazon.co.uk, sveith@amazon.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Alexandru
+On Thu, Apr 18, 2024 at 9:51=E2=80=AFPM David Woodhouse <dwmw2@infradead.or=
+g> wrote:
+>         gpa_t time;
+>         struct pvclock_vcpu_time_info hv_clock;
+> -       unsigned int hw_tsc_khz;
+> +       unsigned int hw_tsc_hz;
 
-On 22/04/2024 12:58, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Fri, Apr 12, 2024 at 11:33:43AM +0100, Suzuki K Poulose wrote:
->> From: Joey Gouly <joey.gouly@arm.com>
->>
->> A Realm must access any emulated I/O mappings with the PTE_NS_SHARED bit set.
->> This is modelled as a PTE attribute, but is actually part of the address.
->>
->> So, when MMU is disabled, the "physical address" must reflect this bit set. We
->> access the UART early before the MMU is enabled. So, make sure the UART is
->> accessed always with the bit set.
->>
->> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> ---
->>   lib/arm/asm/pgtable.h   |  5 +++++
->>   lib/arm/io.c            | 24 +++++++++++++++++++++++-
->>   lib/arm64/asm/pgtable.h |  5 +++++
->>   3 files changed, 33 insertions(+), 1 deletion(-)
->>
->> diff --git a/lib/arm/asm/pgtable.h b/lib/arm/asm/pgtable.h
->> index 350039ff..7e85e7c6 100644
->> --- a/lib/arm/asm/pgtable.h
->> +++ b/lib/arm/asm/pgtable.h
->> @@ -112,4 +112,9 @@ static inline pte_t *pte_alloc(pmd_t *pmd, unsigned long addr)
->>   	return pte_offset(pmd, addr);
->>   }
->>   
->> +static inline unsigned long arm_shared_phys_alias(void *x)
->> +{
->> +	return ((unsigned long)(x) | PTE_NS_SHARED);
->> +}
-> 
-> Is it allowed for a realm to run in aarch32 mode?
+Why not change this to u64? 4.3 GHz is scarily close to current
+processors, though I expect that it will break a lot more software
+than just KVM.
 
-No. Realm EL1 must be Aarch64.
+>  static int kvm_guest_time_update(struct kvm_vcpu *v)
+>  {
+> -       unsigned long flags, tgt_tsc_khz;
+> +       unsigned long flags;
+> +       uint64_t tgt_tsc_hz;
 
-> 
->> +
->>   #endif /* _ASMARM_PGTABLE_H_ */
->> diff --git a/lib/arm/io.c b/lib/arm/io.c
->> index 836fa854..127727e4 100644
->> --- a/lib/arm/io.c
->> +++ b/lib/arm/io.c
->> @@ -15,6 +15,8 @@
->>   #include <asm/psci.h>
->>   #include <asm/spinlock.h>
->>   #include <asm/io.h>
->> +#include <asm/mmu-api.h>
->> +#include <asm/pgtable.h>
->>   
->>   #include "io.h"
->>   
->> @@ -30,6 +32,24 @@ static struct spinlock uart_lock;
->>   static volatile u8 *uart0_base = UART_EARLY_BASE;
->>   bool is_pl011_uart;
->>   
->> +static inline volatile u8 *get_uart_base(void)
->> +{
->> +	/*
->> +	 * The address of the UART base may be different
->> +	 * based on whether we are running with/without
->> +	 * MMU enabled.
->> +	 *
->> +	 * For realms, we must force to use the shared physical
->> +	 * alias with MMU disabled, to make sure the I/O can
->> +	 * be emulated.
->> +	 * When the MMU is turned ON, the mappings are created
->> +	 * appropriately.
->> +	 */
->> +	if (mmu_enabled())
->> +		return uart0_base;
->> +	return (u8 *)arm_shared_phys_alias((void *)uart0_base);
->> +}
->> +
->>   static void uart0_init_fdt(void)
->>   {
->>   	/*
->> @@ -109,9 +129,11 @@ void io_init(void)
->>   
->>   void puts(const char *s)
->>   {
->> +	volatile u8 *uart_base = get_uart_base();
->> +
->>   	spin_lock(&uart_lock);
->>   	while (*s)
->> -		writeb(*s++, uart0_base);
->> +		writeb(*s++, uart_base);
->>   	spin_unlock(&uart_lock);
->>   }
->>   
->> diff --git a/lib/arm64/asm/pgtable.h b/lib/arm64/asm/pgtable.h
->> index 5b9f40b0..871c03e9 100644
->> --- a/lib/arm64/asm/pgtable.h
->> +++ b/lib/arm64/asm/pgtable.h
->> @@ -28,6 +28,11 @@ extern unsigned long prot_ns_shared;
->>   */
->>   #define PTE_NS_SHARED		(prot_ns_shared)
->>   
->> +static inline unsigned long arm_shared_phys_alias(void *addr)
->> +{
->> +	return ((unsigned long)addr | PTE_NS_SHARED);
->> +}
-> 
-> Have you considered specifying the correct UART address at compile time using
-> ./configure --earlycon?
+... especially considering that you did use a 64-bit integer here
+(though---please use u64 not uint64_t; and BTW if you want to add a
+patch to change kvm_get_time_scale() to u64, please do.
 
-Do you mean
+Thanks,
 
-./configure --earlycon=<NS-Alias-normal-UART-Address> for Realms ?
-
-If so, there are multiple issues with that :
-
-1. A payload could be run in a normal VM or a Realm VM. Having the above
-restricts using the same payload in different worlds. (e.g., comparison).
-
-2. The IPA width of the Realm and thus the PTE_NS_SHARED is dynamic
-and really depends on what the VMM decides to choose the IPA size.
-(Could be based on user input).
-
-If any of the above fails, and a wrong earlycon address could result
-in "Synchronouse External Abort" into the Realm (if it is in protected
-IPA).
-
-Suzuki
-> 
-> Thanks,
-> Alex
->> +
->>   /*
->>    * Highest possible physical address supported.
->>    */
->> -- 
->> 2.34.1
->>
+Paolo
 
 
