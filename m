@@ -1,94 +1,136 @@
-Return-Path: <kvm+bounces-15463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11F748AC558
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 09:23:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0084A8AC590
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 09:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B626E282777
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 07:23:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27B0B1C21C71
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 07:29:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDDA5029C;
-	Mon, 22 Apr 2024 07:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fj6WlN+y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FA54DA13;
+	Mon, 22 Apr 2024 07:27:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [195.130.132.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6608950289;
-	Mon, 22 Apr 2024 07:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0940C8F3
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 07:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713770363; cv=none; b=PvqBWvjHfdFl5lXm5s3+giL1tEqpxab2hvczOC3C7TyvVLSIzDXGjqVJBd6Wjvgdtsj488F/rnizQf56pBBe6QNRnIGpzujtw6uHv96HlQ6GCFv0LiImymq0L8OSMeXhjOF7VniIygSwGkOpaT9Gere1lrV8Fo0lo9RsfCHjcTs=
+	t=1713770870; cv=none; b=Z1uF6nYq6e04RNNevgjNbv1HhdpUFXcShWgVisRLhBEmQM8yU/GjhVBI8bnFWGQEvWKEiLAx5bqM2ercRLHcDcgllvPMutXqnlvT3Qr//ZdYvJixssAFqIB0PFlXgZsSyf3hx93upIbaR4abIr20mL9a8nHsal+EzUJ4PvmiO6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713770363; c=relaxed/simple;
-	bh=K5qc5KwmgiaYBZB47h7cAsEG6GuyX+Syw0Fptk1NJis=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W39ZgaR3xsKhssKH2YIimi2HYNg/JUfwWegtCq1g0InjmQBK3px7/q84UoeJb0buv1aKd2tgbt2djbVskI9ZJBOISnWj4akDJ/lUX7U/S7HeTYX3dKbd4rNNpLZSTr6ugOuRt+HSxQBJwjpeV/lok7wXXgYWedJKxuhtUKgDwKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fj6WlN+y; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713770362; x=1745306362;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=K5qc5KwmgiaYBZB47h7cAsEG6GuyX+Syw0Fptk1NJis=;
-  b=fj6WlN+yMXA5tj/El+E0wYHZ1MqhrQsVu7UF+rsBVK5w5ooWMlD34S8l
-   lQF7yC3eo2cX/+r+YCgWtLWMiNHsPgu9ZoLtXQN/iWJ9SWYnjzH3Fkhab
-   0kak6LaWl6PdLvLJ9Weu8p7lOWGUrgFALAVfweuzovvHlbpEfOwXHvSSs
-   ajKRdNslOJ5WaGoWC1kF5sdBcE344rvVaikMcVUKeYw9EMZMYxIO3EULq
-   rKTW+/CXdQi3/kb+GtltqesB/2F+xc+NttzkZhap8SP712G4mswzEbida
-   Qvi0SPtK/kdYTJBbeY+fJNxUMvD/UHoiCmoJK3REEG5TmGk5zheC9aw7M
-   A==;
-X-CSE-ConnectionGUID: JeIsJehlTEaoc3Dp6cVpMQ==
-X-CSE-MsgGUID: SSUa4L8sR9mxXmHU1DBeTQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11051"; a="9123028"
-X-IronPort-AV: E=Sophos;i="6.07,220,1708416000"; 
-   d="scan'208";a="9123028"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 00:19:22 -0700
-X-CSE-ConnectionGUID: y/nCEZqcTo68O969u14zvg==
-X-CSE-MsgGUID: vvnVggrHRZenlShJvHMRKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,220,1708416000"; 
-   d="scan'208";a="24371493"
-Received: from unknown (HELO [10.238.8.201]) ([10.238.8.201])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2024 00:19:19 -0700
-Message-ID: <b4bb3773-f7a6-46a2-9be2-6ac98bb2930c@linux.intel.com>
-Date: Mon, 22 Apr 2024 15:19:16 +0800
+	s=arc-20240116; t=1713770870; c=relaxed/simple;
+	bh=RWyYEIWJ8XsfZ071NpRMCzhHu+Pnox/bWNT0IZqhBNM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Ue4HvN7sikqFFYQWy4qS4EmX9hu99GLmfvKiUvr/OWhDV0d8GCJPh54fcgeoapJ4pgHtmTlNZMLi8snOhoj4FkKVebWLQwfvuP/lsOKS1gqLWUueGk/jyBAEIWIg1dhWI3qbAQf55Dy2bZ7WoqW/zqT3T4Khc5PixvvLd/Y+180=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:76d0:2bff:fec8:549])
+	by baptiste.telenet-ops.be with bizsmtp
+	id E7TJ2C0080SSLxL017TJcV; Mon, 22 Apr 2024 09:27:40 +0200
+Received: from geert (helo=localhost)
+	by ramsan.of.borg with local-esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1ryo58-001FLD-7g;
+	Mon, 22 Apr 2024 09:27:18 +0200
+Date: Mon, 22 Apr 2024 09:27:18 +0200 (CEST)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+cc: Anthony Krowiak <akrowiak@linux.ibm.com>, 
+    Alex Williamson <alex.williamson@redhat.com>, 
+    Bagas Sanjaya <bagasdotme@gmail.com>, Lu Baolu <baolu.lu@linux.intel.com>, 
+    Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
+    Cornelia Huck <cohuck@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+    Daniel Jordan <daniel.m.jordan@oracle.com>, 
+    David Gibson <david@gibson.dropbear.id.au>, 
+    Eric Auger <eric.auger@redhat.com>, Eric Farman <farman@linux.ibm.com>, 
+    iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>, 
+    Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+    Jason Herne <jjherne@linux.ibm.com>, 
+    Joao Martins <joao.m.martins@oracle.com>, 
+    Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
+    Lixiao Yang <lixiao.yang@intel.com>, 
+    Matthew Rosato <mjrosato@linux.ibm.com>, 
+    "Michael S. Tsirkin" <mst@redhat.com>, Nicolin Chen <nicolinc@nvidia.com>, 
+    Halil Pasic <pasic@linux.ibm.com>, 
+    Niklas Schnelle <schnelle@linux.ibm.com>, 
+    Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, 
+    Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>, 
+    Keqian Zhu <zhukeqian1@huawei.com>
+Subject: Re: [PATCH v6 16/19] iommufd: Add kernel support for testing
+ iommufd
+In-Reply-To: <16-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
+Message-ID: <6860aa59-3a8b-74ca-3c33-2f3ec936075@linux-m68k.org>
+References:  <16-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/6] KVM: Add KVM_PRE_FAULT_MEMORY vcpu ioctl to
- pre-populate guest memory
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- isaku.yamahata@intel.com, xiaoyao.li@intel.com, seanjc@google.com,
- rick.p.edgecombe@intel.com
-References: <20240419085927.3648704-1-pbonzini@redhat.com>
- <20240419085927.3648704-3-pbonzini@redhat.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240419085927.3648704-3-pbonzini@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
+ 	Hi Jason,
 
-
-On 4/19/2024 4:59 PM, Paolo Bonzini wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Tue, 29 Nov 2022, Jason Gunthorpe wrote:
+> Provide a mock kernel module for the iommu_domain that allows it to run
+> without any HW and the mocking provides a way to directly validate that
+> the PFNs loaded into the iommu_domain are correct. This exposes the access
+> kAPI toward userspace to allow userspace to explore the functionality of
+> pages.c and io_pagetable.c
 >
-> Add a new ioctl KVM_PRE_FAULT_MEMORY in the KVM common code. It iterates on the
-> memory range and calls the arch-specific function.  Add stub arch function
-> as a weak symbol.
+> The mock also simulates the rare case of PAGE_SIZE > iommu page size as
+> the mock will operate at a 2K iommu page size. This allows exercising all
+> of the calculations to support this mismatch.
+>
+> This is also intended to support syzkaller exploring the same space.
+>
+> However, it is an unusually invasive config option to enable all of
+> this. The config option should not be enabled in a production kernel.
+>
+> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com> # s390
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 
-The description is stale. The weak symbol was removed since v3.
+Replaying to and old email, after noticing commit 8541323285994528
+("iommufd: Add missing IOMMUFD_DRIVER kconfig for the selftest") in
+v6.9-rc5.
 
+> --- a/drivers/iommu/iommufd/Kconfig
+> +++ b/drivers/iommu/iommufd/Kconfig
+> @@ -10,3 +10,15 @@ config IOMMUFD
+> 	  it relates to managing IO page tables that point at user space memory.
+>
+> 	  If you don't know what to do here, say N.
+> +
+> +if IOMMUFD
+> +config IOMMUFD_TEST
+> +	bool "IOMMU Userspace API Test support"
+> +	depends on DEBUG_KERNEL
+> +	depends on FAULT_INJECTION
+> +	depends on RUNTIME_TESTING_MENU
+> +	default n
+> +	help
+> +	  This is dangerous, do not enable unless running
+> +	  tools/testing/selftests/iommu
+> +endif
+
+How dangerous is this?
+I.e. is it now unsafe to run an allyesconfig or allmodconfig kernel?
+
+Probably this symbol should be tristate?
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
 
