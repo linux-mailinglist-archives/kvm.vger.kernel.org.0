@@ -1,355 +1,308 @@
-Return-Path: <kvm+bounces-15526-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2676C8AD115
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 17:39:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D85038AD134
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 17:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9DAA1F231F1
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:39:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D1311F21881
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 15:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C62153519;
-	Mon, 22 Apr 2024 15:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5B5153563;
+	Mon, 22 Apr 2024 15:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqzijObR"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCCC152509;
-	Mon, 22 Apr 2024 15:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4911534F3;
+	Mon, 22 Apr 2024 15:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713800376; cv=none; b=bjU3Oa2Xvp2w9RUKQqe8efnIN0lQugsbPgD/nDqXhLsvLasA/FOIFmtTSHzuJDfXQOHFYIxJX6DhLjESefs5TWX1tk6SO9NHYbe/K1I0hwPT2p5o6DoZ4hquEgvcyjQ6ZoodVWAFyFLeoB59uc222wACaq0IMaQ6qat/L4sThqM=
+	t=1713800889; cv=none; b=EABxh2EwJk1S/Wgjb/kRypky4dcoLhnVaYyy5FJzsn4r68Qf0+RV8p8f0W5otd61STKoVJHb3Z2O8OHRZsqxvV5h8EUDkLOqqvJvYVVOTzICCzv3u2rpCKR0OJcl9oYMCrMvIRKiQKLJkZNvqfnEwo0ULFezmjD2351zboN41vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713800376; c=relaxed/simple;
-	bh=9kWRDlDUp1fbs+ibn7ve6at8EXhA8n8p/Aw1Tp1tINM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vi05D94F98fdbO1jnrepD4lNyKWdiPWbwuyQINEhJ7QVzNo2e3dBoE+Ea5o3HAKk2POH09U5WDzScYda2ftP48c5kGuacK+0/ULVXo2xgRMHwl9/ewZlSMiUN2eaFQ66jYt4FV9ajLZGFC/1fpjj8VfyhpyT3qJ/WShHqOmCFIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8B6AC339;
-	Mon, 22 Apr 2024 08:40:02 -0700 (PDT)
-Received: from [10.57.54.223] (unknown [10.57.54.223])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E0E533F73F;
-	Mon, 22 Apr 2024 08:39:30 -0700 (PDT)
-Message-ID: <dde9be17-eeb9-4819-93e0-21ed479187e2@arm.com>
-Date: Mon, 22 Apr 2024 16:39:32 +0100
+	s=arc-20240116; t=1713800889; c=relaxed/simple;
+	bh=TGkCC1wb/ipHHm0xz1HjzQqToV5Sfv84Bet9nt2x64E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YZoq94HMSZPRiteVYokdohvTcljQnl+435eRB4dXTIQoxZLS8PjXNxB9PlOoL8LtFjE4MU6JgkBKEiXkXJAwMNOAgXPhp7je7jTkBeylGfmli4N3Bi56LVgsfjQ7Hxe+vQy/VZwE7OcwvwtvY+qJ93yZHxvVMjnpWNxMJTjV6lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqzijObR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14060C113CC;
+	Mon, 22 Apr 2024 15:48:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713800888;
+	bh=TGkCC1wb/ipHHm0xz1HjzQqToV5Sfv84Bet9nt2x64E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eqzijObRUsJ59JAHcqlBP0SQl5L5rx9qT/7vnci9gVpigjDM4nbbwfpOoOTHizdQt
+	 eNvZISlygM5uYM0hosK0Vmom9czSy3J7P3Pj72vY1r5dZDVzppKwqbB0t9rvG78wPo
+	 Ocoo829L6rUzqT/8+eIU//ta/cAI+1pPrlUlaAL6EWoweY32E7S8ewcipGnVSRinCv
+	 R6zXwDoAC1cYV36MYmO0IOQq2YdqHhvWhNpyprxnUWCeCcIyjvZ/ngRRGD2rFMfqeW
+	 AkvrVN+vANtrmgGHLXyChEiTTbxac62koeGlwjWSDiCP/K34jP6KFMzL/GsMF3z+Z6
+	 3uSrzXaBvZQrA==
+Date: Mon, 22 Apr 2024 21:15:02 +0530
+From: Naveen N Rao <naveen@kernel.org>
+To: Gautam Menghani <gautam@linux.ibm.com>
+Cc: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu, 
+	aneesh.kumar@kernel.org, Vaibhav Jain <vaibhav@linux.ibm.com>, 
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v5 RESEND] arch/powerpc/kvm: Add support for reading VPA
+ counters for pseries guests
+Message-ID: <aauzmvtbpgxbr4aa3s4k33cdi7fljs5q4ifn5x2swncz7dtvam@gclohylavkpl>
+References: <20240402070656.28441-1-gautam@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/43] arm64: RME: Check for RME support at KVM init
-To: Suzuki K Poulose <suzuki.poulose@arm.com>, kvm@vger.kernel.org,
- kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-8-steven.price@arm.com>
- <37fa1ff5-9e94-4def-afd6-fb9ea9356977@arm.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <37fa1ff5-9e94-4def-afd6-fb9ea9356977@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240402070656.28441-1-gautam@linux.ibm.com>
 
-On 16/04/2024 14:30, Suzuki K Poulose wrote:
-> Hi Steven
+On Tue, Apr 02, 2024 at 12:36:54PM +0530, Gautam Menghani wrote:
+> PAPR hypervisor has introduced three new counters in the VPA area of
+> LPAR CPUs for KVM L2 guest (see [1] for terminology) observability - 2
+> for context switches from host to guest and vice versa, and 1 counter
+> for getting the total time spent inside the KVM guest. Add a tracepoint
+> that enables reading the counters for use by ftrace/perf. Note that this
+> tracepoint is only available for nestedv2 API (i.e, KVM on PowerVM).
 > 
-> On 12/04/2024 09:42, Steven Price wrote:
->> Query the RMI version number and check if it is a compatible version. A
->> static key is also provided to signal that a supported RMM is available.
->>
->> Functions are provided to query if a VM or VCPU is a realm (or rec)
->> which currently will always return false.
->>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/kvm_emulate.h | 18 +++++++++
->>   arch/arm64/include/asm/kvm_host.h    |  4 ++
->>   arch/arm64/include/asm/kvm_rme.h     | 56 ++++++++++++++++++++++++++++
->>   arch/arm64/include/asm/virt.h        |  1 +
->>   arch/arm64/kvm/Makefile              |  3 +-
->>   arch/arm64/kvm/arm.c                 |  9 +++++
->>   arch/arm64/kvm/rme.c                 | 52 ++++++++++++++++++++++++++
->>   7 files changed, 142 insertions(+), 1 deletion(-)
->>   create mode 100644 arch/arm64/include/asm/kvm_rme.h
->>   create mode 100644 arch/arm64/kvm/rme.c
->>
->> diff --git a/arch/arm64/include/asm/kvm_emulate.h
->> b/arch/arm64/include/asm/kvm_emulate.h
->> index 975af30af31f..6f08398537e2 100644
->> --- a/arch/arm64/include/asm/kvm_emulate.h
->> +++ b/arch/arm64/include/asm/kvm_emulate.h
->> @@ -611,4 +611,22 @@ static __always_inline void
->> kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
->>         kvm_write_cptr_el2(val);
->>   }
->> +
->> +static inline bool kvm_is_realm(struct kvm *kvm)
->> +{
->> +    if (static_branch_unlikely(&kvm_rme_is_available))
->> +        return kvm->arch.is_realm;
->> +    return false;
->> +}
->> +
->> +static inline enum realm_state kvm_realm_state(struct kvm *kvm)
->> +{
->> +    return READ_ONCE(kvm->arch.realm.state);
->> +}
->> +
->> +static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
->> +{
->> +    return false;
->> +}
->> +
->>   #endif /* __ARM64_KVM_EMULATE_H__ */
->> diff --git a/arch/arm64/include/asm/kvm_host.h
->> b/arch/arm64/include/asm/kvm_host.h
->> index 9e8a496fb284..63b68b85db3f 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -27,6 +27,7 @@
->>   #include <asm/fpsimd.h>
->>   #include <asm/kvm.h>
->>   #include <asm/kvm_asm.h>
->> +#include <asm/kvm_rme.h>
->>   #include <asm/vncr_mapping.h>
->>     #define __KVM_HAVE_ARCH_INTC_INITIALIZED
->> @@ -348,6 +349,9 @@ struct kvm_arch {
->>        * the associated pKVM instance in the hypervisor.
->>        */
->>       struct kvm_protected_vm pkvm;
->> +
->> +    bool is_realm;
->> +    struct realm realm;
->>   };
->>     struct kvm_vcpu_fault_info {
->> diff --git a/arch/arm64/include/asm/kvm_rme.h
->> b/arch/arm64/include/asm/kvm_rme.h
->> new file mode 100644
->> index 000000000000..922da3f47227
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/kvm_rme.h
->> @@ -0,0 +1,56 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_KVM_RME_H
->> +#define __ASM_KVM_RME_H
->> +
->> +/**
->> + * enum realm_state - State of a Realm
->> + */
->> +enum realm_state {
->> +    /**
->> +     * @REALM_STATE_NONE:
->> +     *      Realm has not yet been created. rmi_realm_create() may be
->> +     *      called to create the realm.
->> +     */
->> +    REALM_STATE_NONE,
->> +    /**
->> +     * @REALM_STATE_NEW:
->> +     *      Realm is under construction, not eligible for execution.
->> Pages
->> +     *      may be populated with rmi_data_create().
->> +     */
->> +    REALM_STATE_NEW,
->> +    /**
->> +     * @REALM_STATE_ACTIVE:
->> +     *      Realm has been created and is eligible for execution with
->> +     *      rmi_rec_enter(). Pages may no longer be populated with
->> +     *      rmi_data_create().
->> +     */
->> +    REALM_STATE_ACTIVE,
->> +    /**
->> +     * @REALM_STATE_DYING:
->> +     *      Realm is in the process of being destroyed or has already
->> been
->> +     *      destroyed.
->> +     */
->> +    REALM_STATE_DYING,
->> +    /**
->> +     * @REALM_STATE_DEAD:
->> +     *      Realm has been destroyed.
->> +     */
->> +    REALM_STATE_DEAD
->> +};
->> +
->> +/**
->> + * struct realm - Additional per VM data for a Realm
->> + *
->> + * @state: The lifetime state machine for the realm
->> + */
->> +struct realm {
->> +    enum realm_state state;
->> +};
->> +
->> +int kvm_init_rme(void);
->> +
->> +#endif
->> diff --git a/arch/arm64/include/asm/virt.h
->> b/arch/arm64/include/asm/virt.h
->> index 261d6e9df2e1..12cf36c38189 100644
->> --- a/arch/arm64/include/asm/virt.h
->> +++ b/arch/arm64/include/asm/virt.h
->> @@ -81,6 +81,7 @@ void __hyp_reset_vectors(void);
->>   bool is_kvm_arm_initialised(void);
->>     DECLARE_STATIC_KEY_FALSE(kvm_protected_mode_initialized);
->> +DECLARE_STATIC_KEY_FALSE(kvm_rme_is_available);
->>     /* Reports the availability of HYP mode */
->>   static inline bool is_hyp_mode_available(void)
->> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
->> index c0c050e53157..1c1d8cdf381f 100644
->> --- a/arch/arm64/kvm/Makefile
->> +++ b/arch/arm64/kvm/Makefile
->> @@ -20,7 +20,8 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o
->> pvtime.o \
->>        vgic/vgic-v3.o vgic/vgic-v4.o \
->>        vgic/vgic-mmio.o vgic/vgic-mmio-v2.o \
->>        vgic/vgic-mmio-v3.o vgic/vgic-kvm-device.o \
->> -     vgic/vgic-its.o vgic/vgic-debug.o
->> +     vgic/vgic-its.o vgic/vgic-debug.o \
->> +     rme.o
->>     kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
->>   diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 3dee5490eea9..2056c660c5ee 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -38,6 +38,7 @@
->>   #include <asm/kvm_mmu.h>
->>   #include <asm/kvm_nested.h>
->>   #include <asm/kvm_pkvm.h>
->> +#include <asm/kvm_rme.h>
->>   #include <asm/kvm_emulate.h>
->>   #include <asm/sections.h>
->>   @@ -47,6 +48,8 @@
->>     static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
->>   +DEFINE_STATIC_KEY_FALSE(kvm_rme_is_available);
->> +
->>   DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
->>     DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
->> @@ -2562,6 +2565,12 @@ static __init int kvm_arm_init(void)
->>         in_hyp_mode = is_kernel_in_hyp_mode();
->>   +    if (in_hyp_mode) {
->> +        err = kvm_init_rme();
->> +        if (err)
->> +            return err;
->> +    }
->> +
->>       if (cpus_have_final_cap(ARM64_WORKAROUND_DEVICE_LOAD_ACQUIRE) ||
->>           cpus_have_final_cap(ARM64_WORKAROUND_1508412))
->>           kvm_info("Guests without required CPU erratum workarounds
->> can deadlock system!\n" \
->> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
->> new file mode 100644
->> index 000000000000..3dbbf9d046bf
->> --- /dev/null
->> +++ b/arch/arm64/kvm/rme.c
->> @@ -0,0 +1,52 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#include <linux/kvm_host.h>
->> +
->> +#include <asm/rmi_cmds.h>
->> +#include <asm/virt.h>
->> +
->> +static int rmi_check_version(void)
->> +{
->> +    struct arm_smccc_res res;
->> +    int version_major, version_minor;
->> +    unsigned long host_version = RMI_ABI_VERSION(RMI_ABI_MAJOR_VERSION,
->> +                             RMI_ABI_MINOR_VERSION);
->> +
->> +    arm_smccc_1_1_invoke(SMC_RMI_VERSION, host_version, &res);
->> +
->> +    if (res.a0 == SMCCC_RET_NOT_SUPPORTED)
->> +        return -ENXIO;
->> +
->> +    version_major = RMI_ABI_VERSION_GET_MAJOR(res.a1);
->> +    version_minor = RMI_ABI_VERSION_GET_MINOR(res.a1);
->> +
+> Also maintain an aggregation of the context switch times in vcpu->arch.
+> This will be useful in getting the aggregate times with a pmu driver
+> which will be upstreamed in the near future.
+
+It would be better to add code to maintain aggregate times as part of 
+that pmu driver.
+
 > 
-> We don't seem to be using the res.a0 to determin if the RMM supports our
-> requested version. As per RMM spec, section B4.3.23 :
+> [1] Terminology:
+> a. L1 refers to the VM (LPAR) booted on top of PAPR hypervisor
+> b. L2 refers to the KVM guest booted on top of L1.
 > 
-> "
-> The status code and lower revision output values indicate which of the
-> following is true, in order of precedence:
->  a) The RMM supports an interface revision which is compatible with the
->     requested revision.
->      • The status code is RMI_SUCCESS.
->      • The lower revision is equal to the requested revision.
->  b) The RMM does not support an interface revision which is compatible
->     with the requested revision The RMM supports an interface revision
->     which is incompatible with and less than the requested revision.
->      • The status code is RMI_ERROR_INPUT.
->      • The lower revision is the highest interface revision which is
->        both less than the requested revision and supported by the RMM.
+> Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
+> ---
+> v5 RESEND: 
+> 1. Add the changelog
 > 
->  c) The RMM does not support an interface revision which is compatible
->     with the requested revision The RMM supports an interface revision
->     which is incompatible with and greater than the requested revision.
->      • The status code is RMI_ERROR_INPUT.
->      • The lower revision is equal to the higher revision.
+> v4 -> v5:
+> 1. Define helper functions for getting/setting the accumulation counter
+> in L2's VPA
 > 
-> So, we could simply check the res.a0 for RMI_SUCCESS and proceed with
-> marking RMM available.
-
-Good point - this didn't work in a previous version of the spec, but we
-should be able to rely on the return value now.
-
->> +    if (version_major != RMI_ABI_MAJOR_VERSION) {
->> +        kvm_err("Unsupported RMI ABI (v%d.%d) host supports v%d.%d\n",
->> +            version_major, version_minor,
->> +            RMI_ABI_MAJOR_VERSION,
->> +            RMI_ABI_MINOR_VERSION);
->> +        return -ENXIO;
->> +    }
->> +
->> +    kvm_info("RMI ABI version %d.%d\n", version_major, version_minor);
->> +
->> +    return 0;
->> +}
->> +
->> +int kvm_init_rme(void)
->> +{
->> +    if (PAGE_SIZE != SZ_4K)
->> +        /* Only 4k page size on the host is supported */
->> +        return 0;
->> +
->> +    if (rmi_check_version())
->> +        /* Continue without realm support */
->> +        return 0;
->> +
->> +    /* Future patch will enable static branch kvm_rme_is_available */
->> +
->> +    return 0;
+> v3 -> v4:
+> 1. After vcpu_run, check the VPA flag instead of checking for tracepoint
+> being enabled for disabling the cs time accumulation.
 > 
-> Do we ever expect this to fail the kvm initialisation ? Otherwise, we
-> could leave it as a void ?
+> v2 -> v3:
+> 1. Move the counter disabling and zeroing code to a different function.
+> 2. Move the get_lppaca() inside the tracepoint_enabled() branch.
+> 3. Add the aggregation logic to maintain total context switch time.
+> 
+> v1 -> v2:
+> 1. Fix the build error due to invalid struct member reference.
+> 
+>  arch/powerpc/include/asm/kvm_host.h |  5 ++++
+>  arch/powerpc/include/asm/lppaca.h   | 11 +++++---
+>  arch/powerpc/kvm/book3s_hv.c        | 40 +++++++++++++++++++++++++++++
+>  arch/powerpc/kvm/trace_hv.h         | 25 ++++++++++++++++++
+>  4 files changed, 78 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 8abac532146e..d953b32dd68a 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -847,6 +847,11 @@ struct kvm_vcpu_arch {
+>  	gpa_t nested_io_gpr;
+>  	/* For nested APIv2 guests*/
+>  	struct kvmhv_nestedv2_io nestedv2_io;
+> +
+> +	/* Aggregate context switch and guest run time info (in ns) */
+> +	u64 l1_to_l2_cs_agg;
+> +	u64 l2_to_l1_cs_agg;
+> +	u64 l2_runtime_agg;
 
-Technically in a later patch the return from rme_vmid_init() can cause
-such a failure. But it's not clear that it makes any sense to completely
-kill KVM because of that. So I'll change this to a void return.
+Can be dropped from this patch.
 
-Thanks,
+>  #endif
+>  
+>  #ifdef CONFIG_KVM_BOOK3S_HV_EXIT_TIMING
+> diff --git a/arch/powerpc/include/asm/lppaca.h b/arch/powerpc/include/asm/lppaca.h
+> index 61ec2447dabf..bda6b86b9f13 100644
+> --- a/arch/powerpc/include/asm/lppaca.h
+> +++ b/arch/powerpc/include/asm/lppaca.h
+> @@ -62,7 +62,8 @@ struct lppaca {
+>  	u8	donate_dedicated_cpu;	/* Donate dedicated CPU cycles */
+>  	u8	fpregs_in_use;
+>  	u8	pmcregs_in_use;
+> -	u8	reserved8[28];
+> +	u8	l2_accumul_cntrs_enable;  /* Enable usage of counters for KVM guest */
 
-Steve
+A simpler name - l2_counters_enable or such?
 
+> +	u8	reserved8[27];
+>  	__be64	wait_state_cycles;	/* Wait cycles for this proc */
+>  	u8	reserved9[28];
+>  	__be16	slb_count;		/* # of SLBs to maintain */
+> @@ -92,9 +93,13 @@ struct lppaca {
+>  	/* cacheline 4-5 */
+>  
+>  	__be32	page_ins;		/* CMO Hint - # page ins by OS */
+> -	u8	reserved12[148];
+> +	u8	reserved12[28];
+> +	volatile __be64 l1_to_l2_cs_tb;
+> +	volatile __be64 l2_to_l1_cs_tb;
+> +	volatile __be64 l2_runtime_tb;
+> +	u8 reserved13[96];
+>  	volatile __be64 dtl_idx;	/* Dispatch Trace Log head index */
+> -	u8	reserved13[96];
+> +	u8	reserved14[96];
+>  } ____cacheline_aligned;
+>  
+>  #define lppaca_of(cpu)	(*paca_ptrs[cpu]->lppaca_ptr)
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index 8e86eb577eb8..fea1c1429975 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -4108,6 +4108,37 @@ static void vcpu_vpa_increment_dispatch(struct kvm_vcpu *vcpu)
+>  	}
+>  }
+>  
+> +static inline int kvmhv_get_l2_accumul(void)
+> +{
+> +	return get_lppaca()->l2_accumul_cntrs_enable;
+> +}
+> +
+> +static inline void kvmhv_set_l2_accumul(int val)
+					   ^^^
+					   bool?
+
+> +{
+> +	get_lppaca()->l2_accumul_cntrs_enable = val;
+> +}
+> +
+> +static void do_trace_nested_cs_time(struct kvm_vcpu *vcpu)
+> +{
+> +	struct lppaca *lp = get_lppaca();
+> +	u64 l1_to_l2_ns, l2_to_l1_ns, l2_runtime_ns;
+> +
+> +	l1_to_l2_ns = tb_to_ns(be64_to_cpu(lp->l1_to_l2_cs_tb));
+> +	l2_to_l1_ns = tb_to_ns(be64_to_cpu(lp->l2_to_l1_cs_tb));
+> +	l2_runtime_ns = tb_to_ns(be64_to_cpu(lp->l2_runtime_tb));
+> +	trace_kvmppc_vcpu_exit_cs_time(vcpu, l1_to_l2_ns, l2_to_l1_ns,
+> +					l2_runtime_ns);
+> +	lp->l1_to_l2_cs_tb = 0;
+> +	lp->l2_to_l1_cs_tb = 0;
+> +	lp->l2_runtime_tb = 0;
+> +	kvmhv_set_l2_accumul(0);
+> +
+> +	// Maintain an aggregate of context switch times
+> +	vcpu->arch.l1_to_l2_cs_agg += l1_to_l2_ns;
+> +	vcpu->arch.l2_to_l1_cs_agg += l2_to_l1_ns;
+> +	vcpu->arch.l2_runtime_agg += l2_runtime_ns;
+> +}
+> +
+>  static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+>  				     unsigned long lpcr, u64 *tb)
+>  {
+> @@ -4130,6 +4161,11 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+>  	kvmppc_gse_put_u64(io->vcpu_run_input, KVMPPC_GSID_LPCR, lpcr);
+>  
+>  	accumulate_time(vcpu, &vcpu->arch.in_guest);
+> +
+> +	/* Enable the guest host context switch time tracking */
+> +	if (unlikely(trace_kvmppc_vcpu_exit_cs_time_enabled()))
+> +		kvmhv_set_l2_accumul(1);
+> +
+>  	rc = plpar_guest_run_vcpu(0, vcpu->kvm->arch.lpid, vcpu->vcpu_id,
+>  				  &trap, &i);
+>  
+> @@ -4156,6 +4192,10 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+>  
+>  	timer_rearm_host_dec(*tb);
+>  
+> +	/* Record context switch and guest_run_time data */
+> +	if (kvmhv_get_l2_accumul())
+> +		do_trace_nested_cs_time(vcpu);
+> +
+>  	return trap;
+>  }
+
+I'm assuming the counters in VPA are cumulative, since you are zero'ing 
+them out on exit. If so, I think a better way to implement this is to 
+use TRACE_EVENT_FN() and provide tracepoint registration and 
+unregistration functions. You can then enable the counters once during 
+registration and avoid repeated writes to the VPA area. With that, you 
+also won't need to do anything before vcpu entry. If you maintain 
+previous values, you can calculate the delta and emit the trace on vcpu 
+exit. The values in VPA area can then serve as the cumulative values.
+
+>  
+> diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
+> index 8d57c8428531..ab19977c91b4 100644
+> --- a/arch/powerpc/kvm/trace_hv.h
+> +++ b/arch/powerpc/kvm/trace_hv.h
+> @@ -491,6 +491,31 @@ TRACE_EVENT(kvmppc_run_vcpu_enter,
+>  	TP_printk("VCPU %d: tgid=%d", __entry->vcpu_id, __entry->tgid)
+>  );
+>  
+> +TRACE_EVENT(kvmppc_vcpu_exit_cs_time,
+
+Not sure what "exit" signifies in the tracepoint name. Can this be 
+simplified to kvmppc_vcpu_cs_time? Perhaps kvmppc_vcpu_stats, which will 
+allow more vcpu stats to be exposed in future as necessary?
+
+> +	TP_PROTO(struct kvm_vcpu *vcpu, u64 l1_to_l2_cs, u64 l2_to_l1_cs,
+> +		u64 l2_runtime),
+
+Can be on a single line, we no longer restrict lines to 80 columns. 100 
+or so is fine.
+
+> +
+> +	TP_ARGS(vcpu, l1_to_l2_cs, l2_to_l1_cs, l2_runtime),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(int,		vcpu_id)
+> +		__field(__u64,		l1_to_l2_cs_ns)
+> +		__field(__u64,		l2_to_l1_cs_ns)
+> +		__field(__u64,		l2_runtime_ns)
+
+Not sure there is a reason to use __u64 - just u64 should work.
+
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->vcpu_id  = vcpu->vcpu_id;
+> +		__entry->l1_to_l2_cs_ns = l1_to_l2_cs;
+> +		__entry->l2_to_l1_cs_ns = l2_to_l1_cs;
+> +		__entry->l2_runtime_ns = l2_runtime;
+> +	),
+> +
+> +	TP_printk("VCPU %d: l1_to_l2_cs_time=%llu-ns l2_to_l1_cs_time=%llu-ns l2_runtime=%llu-ns",
+						 ^^^
+You can drop the hyphen before "ns". Just put a space there.
+
+> +		__entry->vcpu_id,  __entry->l1_to_l2_cs_ns,
+> +		__entry->l2_to_l1_cs_ns, __entry->l2_runtime_ns)
+
+There is l1_to_l2_cs, l1_to_l2_cs_ns and l1_to_l2_cs_time - can you use 
+a single name for that?
+
+> +);
+> +
+
+As a minor nit, it will be good to put the new tracepoint after the 
+below vcpu exit tracepoint just so the entry/exit tracepoints are 
+together in the file.
+
+>  TRACE_EVENT(kvmppc_run_vcpu_exit,
+>  	TP_PROTO(struct kvm_vcpu *vcpu),
+>  
+> -- 
+> 2.43.2
+> 
+
+
+- Naveen
 
