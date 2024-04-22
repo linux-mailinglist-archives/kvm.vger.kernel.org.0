@@ -1,134 +1,147 @@
-Return-Path: <kvm+bounces-15465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15468-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D383D8AC5D7
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 09:45:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E7A98AC674
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 10:14:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DACB283257
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 07:45:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D0A51F216C8
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 08:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2EF4F5FA;
-	Mon, 22 Apr 2024 07:43:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mo12oYDq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CC1D51012;
+	Mon, 22 Apr 2024 08:13:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD324F20C;
-	Mon, 22 Apr 2024 07:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from zg8tmtyylji0my4xnjeumjiw.icoremail.net (zg8tmtyylji0my4xnjeumjiw.icoremail.net [162.243.161.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB704E1D1;
+	Mon, 22 Apr 2024 08:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.243.161.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713771835; cv=none; b=paGjAtOy/hR+8o9+uIfCrNfZSLAzeUjwcisqU/0qexPsR8r5tNKvBicdZGS61bzyu/CH1XvNR2EfK4fZeYWnLopRxUj9IlwEuh6EHdvjQWj0Sxp+TGHYByLzO1YMM9/M/aDyLErCSuMC61qmiYWZygYNXGBjACu/wvMUJEnBYOo=
+	t=1713773602; cv=none; b=EDd6eHYQj5NYvSHqxPPMc2hd/+I7yo99Yjk+2FbVYP/ojOCU1u68Ir0JCW3ICdSDdG67w0Oa4T8RiFcfA8b2TxMhwrjR8MW/BiftDvIgIM03khZRvKuP67cqBQTkbdLnop1gac0vABjBsIWKNTlxpQRVOF0nF8sZDzDCHPq+/B0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713771835; c=relaxed/simple;
-	bh=5WRrp2XlCBbaYWPMG2K05cHdvPj+ojQddV0PAVsqUck=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:From:Cc:Subject:
-	 To:Message-ID:Date; b=pXj2a4RUhhRHqkTKbBs7WIQJGM08oqDAyzgTW5cL91D8C0cIVSh/aBqiwLtS1oUiNHjNiQk31RHPaJl0DM92d2VhJdXnJ9Yqt6lAqMKS1MOOiYjm1tUPW+6Y5lV0UcKa03m/CI3a3TTJldFFwf1uSQUNYpimLMBncUNOHRc4hRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mo12oYDq; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43M6Y6xI006118;
-	Mon, 22 Apr 2024 07:43:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : cc : subject : to : message-id : date; s=pp1;
- bh=aScYhJOHOcLVhAWwC78J6jMDinp6nCGDxDPg3cyBaHY=;
- b=mo12oYDqlF5GBwP+RQclj7YSn+EbVP0QQcgXasYRa3izQO4ZQQEWxcyPhQtB84DK7FsI
- WlVAPTcjWTlWIBIlgq0UXjcWyCX9P2rnG7R+JGGqSr2XjaBcrCRZiBHbAb/ZtE0LGhSk
- zA2AAd1wgSWUxZbgrYm3FSBGB0XrhC7gRuU3VvqsupWjIOpNPtQYbu80dDLgKTiNkKsp
- +GvUiEEaFI1b0aAS1y7uLTGA0uAo3tjvD8mEr9k/YavVsNNVDdEqxT873rAh0y56HITm
- 5G0eiQH/yDlQjSzWQUaUJ4TfgGl73VJ9VxV3xSHtEIJkv0mPe8ZYA2KjeMWbwM+XL+y1 /w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnjq804pt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Apr 2024 07:43:52 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43M7hpXW024022;
-	Mon, 22 Apr 2024 07:43:51 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnjq804pn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Apr 2024 07:43:51 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43M6a6ud023012;
-	Mon, 22 Apr 2024 07:43:50 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xms1npdew-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Apr 2024 07:43:50 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43M7hi7R18088380
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Apr 2024 07:43:47 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DBC1E2004D;
-	Mon, 22 Apr 2024 07:43:44 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BBED220049;
-	Mon, 22 Apr 2024 07:43:44 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.40.163])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Apr 2024 07:43:44 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713773602; c=relaxed/simple;
+	bh=Yo3CdUYWhubx1dZ2fMPbosDHiR9hiTW8Sw+icVupxOk=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=W4VyK4Chx4WJYCNbaqj6zOzisTD68nPWjNIFEfmnxZRPPj02AWqEDtBqwEL4hJWUNlopnKq9r1e639aoLQ3qWM95nC+/WtKh2XsegRHXHWy8QG7/fgsNcsgBk/8SVUBj32Al03FgNfWCdp4JPzuXqFWWQ8REXVRrJknDUmpaUZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com; spf=pass smtp.mailfrom=eswincomputing.com; arc=none smtp.client-ip=162.243.161.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=eswincomputing.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=eswincomputing.com
+Received: from localhost.localdomain (unknown [10.12.130.31])
+	by app1 (Coremail) with SMTP id TAJkCgBH6OSeGyZmSBIIAA--.61881S4;
+	Mon, 22 Apr 2024 16:11:11 +0800 (CST)
+From: Shenlin Liang <liangshenlin@eswincomputing.com>
+To: anup@brainfault.org,
+	atishp@atishpatra.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	peterz@infradead.org,
+	mingo@redhat.com,
+	acme@kernel.org,
+	namhyung@kernel.org,
+	mark.rutland@arm.com,
+	alexander.shishkin@linux.intel.com,
+	jolsa@kernel.org,
+	irogers@google.com,
+	adrian.hunter@intel.com,
+	linux-perf-users@vger.kernel.org
+Cc: Shenlin Liang <liangshenlin@eswincomputing.com>
+Subject: [PATCH v3 0/2] perf kvm: Add kvm stat support on riscv
+Date: Mon, 22 Apr 2024 08:08:31 +0000
+Message-Id: <20240422080833.8745-1-liangshenlin@eswincomputing.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:TAJkCgBH6OSeGyZmSBIIAA--.61881S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxZr1fZF4ftF4fXF18Aw17trb_yoW5XryrpF
+	W2krn8Kw4rtFy3Kws3C3WDWrWrCw4xCry5tr1Iyryj93yj9ryDJ3Z7Kr9Fk398AF17tFWk
+	CFn8ur1rGrW3JF7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvm14x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1lc2xSY4AK6svPMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7VUbQVy7UUUUU==
+X-CM-SenderInfo: xold0whvkh0z1lq6v25zlqu0xpsx3x1qjou0bp/
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240201142356.534783-3-frankja@linux.ibm.com>
-References: <20240201142356.534783-1-frankja@linux.ibm.com> <20240201142356.534783-3-frankja@linux.ibm.com>
-From: Nico Boehr <nrb@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
-        david@redhat.com, nsg@linux.ibm.com
-Subject: Re: [kvm-unit-tests RFC 2/2] lib: s390x: css: Name inline assembly arguments and clean them up
-To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Message-ID: <171377182433.14316.15188579220205837716@t14-nrb>
-User-Agent: alot/0.8.1
-Date: Mon, 22 Apr 2024 09:43:44 +0200
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Zuf2ESIbACEZbowOvwK844F4A_dNpinX
-X-Proofpoint-ORIG-GUID: ZML52YoSLp85LC0Sl7VzlhAdaZqGa1w1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-22_04,2024-04-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0
- clxscore=1011 priorityscore=1501 suspectscore=0 spamscore=0
- mlxlogscore=887 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2404010000 definitions=main-2404220035
 
-Quoting Janosch Frank (2024-02-01 15:23:56)
-[...]
-> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
-> index 504b3f14..e4311124 100644
-> --- a/lib/s390x/css.h
-> +++ b/lib/s390x/css.h
-[...]
-> @@ -167,11 +167,11 @@ static inline int msch(unsigned long schid, struct =
-schib *addr)
->         int cc;
-> =20
->         asm volatile(
-> -               "       msch    0(%3)\n"
-> -               "       ipm     %0\n"
-> -               "       srl     %0,28"
-> -               : "=3Dd" (cc)
-> -               : "d" (reg1), "m" (*addr), "a" (addr)
-> +               "       msch    0(%[addr])\n"
-> +               "       ipm     %[cc]\n"
-> +               "       srl     %[cc],28"
-> +               : [cc] "=3Dd" (cc)
-> +               : "d" (reg1), [addr] "a" (addr)
+'perf kvm stat report/record' generates a statistical analysis of KVM
+events and can be used to analyze guest exit reasons. This patch tries
+to add stat support on riscv.
 
-I think there was a reason why the "m"(*addr) was here. Either add it back
-or add a memory clobber.
+Map the return value of trace_kvm_exit() to the specific cause of the 
+exception, and export it to userspace.
 
-I will only take the first patch of this series for now.
+It records on two available KVM tracepoints for riscv: "kvm:kvm_entry"
+and "kvm:kvm_exit", and reports statistical data which includes events
+handles time, samples, and so on.
+
+Cross compiling perf in X86 environment may encounter issues with missing
+libraries and tools. Suggest compiling nativly in RISC-V environment
+
+Simple tests go below:
+
+# ./perf kvm record -e "kvm:kvm_entry" -e "kvm:kvm_exit"
+Lowering default frequency rate from 4000 to 2500.
+Please consider tweaking /proc/sys/kernel/perf_event_max_sample_rate.
+[ perf record: Woken up 18 times to write data ]
+[ perf record: Captured and wrote 5.433 MB perf.data.guest (62519 samples) 
+
+# ./perf kvm report
+31K kvm:kvm_entry
+31K kvm:kvm_exit
+
+# ./perf kvm stat record -a
+[ perf record: Woken up 3 times to write data ]
+[ perf record: Captured and wrote 8.502 MB perf.data.guest (99338 samples) ]
+
+# ./perf kvm stat report --event=vmexit
+Event name                Samples   Sample%    Time (ns)     Time%   Max Time (ns)   Min Time (ns)  Mean Time (ns)
+STORE_GUEST_PAGE_FAULT     26968     54.00%    2003031800    40.00%     3361400         27600          74274
+LOAD_GUEST_PAGE_FAULT      17645     35.00%    1153338100    23.00%     2513400         30800          65363
+VIRTUAL_INST_FAULT         1247      2.00%     340820800     6.00%      1190800         43300          273312
+INST_GUEST_PAGE_FAULT      1128      2.00%     340645800     6.00%      2123200         30200          301990
+SUPERVISOR_SYSCALL         1019      2.00%     245989900     4.00%      1851500         29300          241403
+LOAD_ACCESS                986       1.00%     671556200     13.00%     4180200         100700         681091
+INST_ACCESS                655       1.00%     170054800     3.00%      1808300         54600          259625
+HYPERVISOR_SYSCALL         21        0.00%     4276400       0.00%      716500          116000         203638 
+
+Changes from v1->v2:
+- Rebased on Linux 6.9-rc3.
+
+Changes from v2->v3:
+- Add the missing assignment for 'vcpu_id_str' in patch 2.
+- Remove parentheses that cause compilation errors
+
+Shenlin Liang (2):
+  RISCV: KVM: add tracepoints for entry and exit events
+  perf kvm/riscv: Port perf kvm stat to RISC-V
+
+ arch/riscv/kvm/trace.h                        | 67 ++++++++++++++++
+ arch/riscv/kvm/vcpu.c                         |  7 ++
+ tools/perf/arch/riscv/Makefile                |  1 +
+ tools/perf/arch/riscv/util/Build              |  1 +
+ tools/perf/arch/riscv/util/kvm-stat.c         | 79 +++++++++++++++++++
+ .../arch/riscv/util/riscv_exception_types.h   | 35 ++++++++
+ 6 files changed, 190 insertions(+)
+ create mode 100644 arch/riscv/kvm/trace.h
+ create mode 100644 tools/perf/arch/riscv/util/kvm-stat.c
+ create mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
+
+-- 
+2.37.2
+
 
