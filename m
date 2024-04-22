@@ -1,176 +1,265 @@
-Return-Path: <kvm+bounces-15472-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15474-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5163A8AC816
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 10:55:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6071E8AC819
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 10:56:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D0F2283C03
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 08:55:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1540728356C
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 08:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5478537F0;
-	Mon, 22 Apr 2024 08:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0285548FF;
+	Mon, 22 Apr 2024 08:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S3HA438S"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="Zq86nSpI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26F5A433CF;
-	Mon, 22 Apr 2024 08:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F165C53E17
+	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 08:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713775963; cv=none; b=GevMO+V8MUzVEEQlPuIMtLhlEBvn4UgBH0ctugo/NIq2EGdr5YL4HA1wFSi2yLEju4BoF0i6uCC7q/Y9xAi37QspcloFi8fyiU/O6/8e9QhS06TrVMU7Q06dkFc6jYaT4KohLjWHu+EtLapkLlCdiRoTehfU5ixKjOz+S+F7RTc=
+	t=1713775989; cv=none; b=FfH3hVCDC57XBC188JPBrpTs01ZAqps84GorS89CjOvoyGveN6wlUO8M/xlPANefOwCaAcgLIoh0KMPJg0hzSSdJR7j7JU5stySLXnZ2z//7KRwFOM4/1abcig4yDtyFYSVuqwEbgjJDwdgydsJ09pbWF4uw7lZFwYXyhKBl1aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713775963; c=relaxed/simple;
-	bh=jg+ObMLwm83PXAH3tHWyCR4NF9VahyFZz1sLw/dO2Sk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cpBqrvaztBL+rw6qhUn11ezivXcHNfTIZarZPKFNV7bxyJ+O0WPOIR9FlSMQBmYTCmN3dshu/DxUWJwes59U83PWv+QbFN2pEvQA+gk+pSw/3WXkO1qwdD4DXkbd9WHEkUXmFfNZYJU7bFtfYyF10M+210iL+OfrRMLMy6LWbls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S3HA438S; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43M8SPWj028988;
-	Mon, 22 Apr 2024 08:52:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=nMsa6VKqmpu5xjZ/NfmY/IyEs0Lc/Ez4ENHPOvglI9w=;
- b=S3HA438S6CQcYyQjDFtgFOEQ2+ulg7NDlTo7FbL2MD4/sNWIsnGpTPfEwqyopPUU2jVF
- XEWvcaXLiVHoldd58161So9Dv29NdVT8RB7+aGK1RLs/5kDJ38Xl9fFQk9yVH0MEYmTo
- ENbstmTFzWyZ/iXlhFP0bfJ8dfidIs+eJvoTI47NuYfZOqLv3j1HIfHwBlBo5MoliUOy
- J+pUlLscwGRD7Wm58W03EhvXrLvE6A5rOzt8osDOlqa+N7iJu/sbYV1ksxJYT3Zh5jV9
- yxEkARygSfXrlfa/pD0F9iSbGyZCqwfxmv1zHiKIcUDNBPpLE9VA5WlnhH70HP4ou4re jg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnmd4r1h8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Apr 2024 08:52:39 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43M8qdOb001908;
-	Mon, 22 Apr 2024 08:52:39 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnmd4r1h7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Apr 2024 08:52:39 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43M81Z2f028763;
-	Mon, 22 Apr 2024 08:52:38 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xmtr268y9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 22 Apr 2024 08:52:38 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43M8qXwB50135468
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 22 Apr 2024 08:52:35 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 044702004B;
-	Mon, 22 Apr 2024 08:52:33 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CA19C2004F;
-	Mon, 22 Apr 2024 08:52:32 +0000 (GMT)
-Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 22 Apr 2024 08:52:32 +0000 (GMT)
-From: Nico Boehr <nrb@linux.ibm.com>
-To: frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v2 1/1] s390x: cmm: test no-translate bit after reset
-Date: Mon, 22 Apr 2024 10:51:50 +0200
-Message-ID: <20240422085232.21097-2-nrb@linux.ibm.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240422085232.21097-1-nrb@linux.ibm.com>
-References: <20240422085232.21097-1-nrb@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: r6F0sq20her3d1aBb-t8ynrWlntV7yy-
-X-Proofpoint-ORIG-GUID: lRnGWHsvPuLugKAPafpIe5XcvjpT4w3A
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1713775989; c=relaxed/simple;
+	bh=nleU09vurZd5AuLxgNnsP+QcvquS4B0Ob3oAXLFJzZc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fdyx4kEQlwHf3SPPrvpiSGG7fu6QhKsO1XWlSFzdx66ibfLimRCS8H00Iq2FRluwzN7skiIOJPQYTTYce/ZN7MpXAnMj2ikKPYD81RmE71tz6i7JM6D2b7hVxaVoRxKw6r8kUC8LFT2soF1FOGgStjN442bQ93eaZwWbyYX/wg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=Zq86nSpI; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-34b3f3764d3so30683f8f.3
+        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 01:53:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1713775986; x=1714380786; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+/fvR+HwOJPjnOfbOHG69UP92YiSjqkbM928Puj2/Go=;
+        b=Zq86nSpI55jjwJBRIYNddD+VzEJWuOhqk1Rm2LOKURki/miaj2WjRcgZrFyL/IRSAj
+         JfGEWF4V33MWATfv/PFv+mv9F8CjDCj+EfC4w2BxLGxkWh8+ZgDoA/o4OnEuSEG2fVWV
+         Id18sPk7FGHd1NQLtaQ8DJsUR5s/MLRNMTLBM5qyPf9UuKihYqJvT3UFBNoGmRWttFl1
+         POrkx1e2leTn1ELL6x0Jf8KNS5Mo8LWcar9E5RpqCv+V1ZbDJH6ngspMixoTYJClZsNa
+         OgZ3e23QXU7NipSQJ9HpWkIP85vMu22LTRo1VpzATES+Z7nmA8uCdbQKx765d/ZZhIH1
+         xjug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713775986; x=1714380786;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+/fvR+HwOJPjnOfbOHG69UP92YiSjqkbM928Puj2/Go=;
+        b=LGT6V+J5FVPLSUjSemVw8XMsoVSP8j4l31l4xwwOXPeCvMcU8EMLQz4pSVF2qfBFoe
+         6CdyEna5R25K6PwrUY1/u8WqbrjmoVLFQQTX8eJrFRM6y8Fc0tHs4hkBCFGZAilGQwVI
+         6veB9XQjX+or/Yh9YpRV4D4RT5+qao2K2yd6uxGkwL5hca+iQPwe0h9WNsI4Ya2QZY4s
+         /CSApROsFNtf2Z2CH3oqBXzDw9jFyAguXoCxyINDDopHIRdqijUtnRtk0tGoiCZgfXwj
+         2v/qQa5Ys8J9aakHXZMceWx3tttcv+e0RopHOwiR4gz05s3EZV7CpB96BNO/sG7KRWX9
+         ma2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVq7J4DGFZXj3tfldx2H+sVvi0ZqSyqKDN4oopFobYYj0w5gF8TWnGvkYi4fNYPheM9lE4HkD6ANXXfCGehWyiRQMMY
+X-Gm-Message-State: AOJu0Ywthdrfz0kPN8HLOfIdh9MxbX/UJw+cNfE5oPzNs5hw9GtvgC9v
+	57fRznnEk9sAWlpR/ipspt4ZPb4rUIFFLW7kvl0BWKEzPQco+lxevHT7CbrlTNI=
+X-Google-Smtp-Source: AGHT+IFE4R9zCUkzHMX1ToR2kyTpvZV9gQXHpyVa4BPp1ldGkiKbLmpz+4IIFAyNc6nOuO6PT/9Ayg==
+X-Received: by 2002:a05:600c:3baa:b0:418:1303:c3d1 with SMTP id n42-20020a05600c3baa00b004181303c3d1mr7145059wms.3.1713775986113;
+        Mon, 22 Apr 2024 01:53:06 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:999:a3a0:dc65:11af:998:225e? ([2a01:e0a:999:a3a0:dc65:11af:998:225e])
+        by smtp.gmail.com with ESMTPSA id g7-20020a05600c310700b0041a92bb0c10sm25826wmo.2.2024.04.22.01.53.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Apr 2024 01:53:05 -0700 (PDT)
+Message-ID: <f89c79f7-a09e-4fcf-8e16-0875202ade4a@rivosinc.com>
+Date: Mon, 22 Apr 2024 10:53:04 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-22_05,2024-04-19_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- mlxscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0 suspectscore=0
- priorityscore=1501 mlxlogscore=999 adultscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404220038
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 03/12] dt-bindings: riscv: add Zc* extension rules
+ implied by C extension
+To: Conor Dooley <conor@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+ Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+References: <20240418124300.1387978-1-cleger@rivosinc.com>
+ <20240418124300.1387978-4-cleger@rivosinc.com>
+ <20240419-blinked-timid-da722ec6ddc4@spud>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20240419-blinked-timid-da722ec6ddc4@spud>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-KVM did not properly reset the no-translate bit after reset, see
-https://lore.kernel.org/kvm/20231109123624.37314-1-imbrenda@linux.ibm.com/
 
-Add a test which performs a load normal reset (includes a subsystem
-reset) and verify that this clears the no-translate bit.
 
-Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- s390x/cmm.c | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+On 19/04/2024 17:49, Conor Dooley wrote:
+> On Thu, Apr 18, 2024 at 02:42:26PM +0200, Clément Léger wrote:
+>> As stated by Zc* spec:
+>>
+>> "As C defines the same instructions as Zca, Zcf and Zcd, the rule is that:
+>>  - C always implies Zca
+>>  - C+F implies Zcf (RV32 only)
+>>  - C+D implies Zcd"
+>>
+>> Add additionnal validation rules to enforce this in dts.
+> 
+> I'll get it out of the way: NAK, and the dts patch is the perfect
+> example of why. I don't want us to have to continually update
+> devicetrees. If these are implied due to being subsets of other
+> extensions, then software should be able to enable them when that
+> other extension is present.
 
-diff --git a/s390x/cmm.c b/s390x/cmm.c
-index af852838851e..ca6eb00bd663 100644
---- a/s390x/cmm.c
-+++ b/s390x/cmm.c
-@@ -9,6 +9,7 @@
-  */
- 
- #include <libcflat.h>
-+#include <bitops.h>
- #include <asm/asm-offsets.h>
- #include <asm/interrupt.h>
- #include <asm/page.h>
-@@ -16,6 +17,8 @@
- 
- static uint8_t pagebuf[PAGE_SIZE] __attribute__((aligned(PAGE_SIZE)));
- 
-+extern int diag308_load_reset(u64);
-+
- static void test_params(void)
- {
- 	report_prefix_push("invalid ORC 8");
-@@ -35,6 +38,26 @@ static void test_priv(void)
- 	report_prefix_pop();
- }
- 
-+static void test_reset_no_translate(void)
-+{
-+	const uint64_t mask_no_translate = BIT(63 - 58);
-+	unsigned long state;
-+
-+	report_prefix_push("reset no-translate");
-+	essa(ESSA_SET_STABLE_NODAT, (unsigned long)pagebuf);
-+
-+	state = essa(ESSA_GET_STATE, (unsigned long)pagebuf);
-+	report(state & mask_no_translate, "no-translate bit set before reset");
-+
-+	/* Load normal reset - includes subsystem reset */
-+	diag308_load_reset(1);
-+
-+	state = essa(ESSA_GET_STATE, (unsigned long)pagebuf);
-+	report(!(state & mask_no_translate), "no-translate bit unset after reset");
-+
-+	report_prefix_pop();
-+}
-+
- int main(void)
- {
- 	bool has_essa = check_essa_available();
-@@ -47,6 +70,7 @@ int main(void)
- 
- 	test_priv();
- 	test_params();
-+	test_reset_no_translate();
- done:
- 	report_prefix_pop();
- 	return report_summary();
--- 
-2.41.0
+Acked.
 
+> 
+> My fear is that, and a quick look at the "add probing" commit seemed to
+> confirm it, new subsets would require updates to the dts, even though
+> the existing extension is perfectly sufficient to determine presence.
+> 
+> I definitely want to avoid continual updates to the devicetree for churn
+> reasons whenever subsets are added, but not turning on the likes of Zca
+> when C is present because "the bindings were updated to enforce this"
+> is a complete blocker. I do concede that having two parents makes that
+> more difficult and will likely require some changes to how we probe - do
+> we need to have a "second round" type thing?
+
+Yeah, I understand. At first, I actually did the modifications in the
+ISA probing loop with some dependency probing (ie loop while we don't
+have a stable extension state). But I thought that it was not actually
+our problem but rather the ISA string provider. For instance, Qemu
+provides them.
+
+
+> Taking Zcf as an example, maybe something like making both of C and F into
+> "standard" supersets and adding a case to riscv_isa_extension_check()
+> that would mandate that Zca and F are enabled before enabling it, and we
+> would ensure that C implies Zca before it implies Zcf?
+
+I'm afraid that riscv_isa_extension_check() will become a rat nest so
+rather than going that way, I would be in favor of adding a validation
+callback for the extensions if needed.
+
+> 
+> Given we'd be relying on ordering, we have to perform the same implication
+> for both F and C and make sure that the "implies" struct has Zca before Zcf.
+> I don't really like that suggestion, hopefully there's a nicer way of doing
+> that, but I don't like the dt stuff here.
+
+I guess the "cleanest" way would be to have some "defered-like"
+mechanism in ISA probing which would allow to handle ordering as well as
+dependencies/implies for extensions. For Zca, Zcf, we actually do not
+have ordering problems but I think it would be a bit broken not to
+support that as well.
+
+I can actually revive the work mentioned above to handle that and see if
+it works ok.
+
+Clément
+
+> 
+> Thanks,
+> Conor.
+> 
+>>
+>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>> ---
+>>  .../devicetree/bindings/riscv/cpus.yaml       |  8 +++--
+>>  .../devicetree/bindings/riscv/extensions.yaml | 34 +++++++++++++++++++
+>>  2 files changed, 39 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/devicetree/bindings/riscv/cpus.yaml b/Documentation/devicetree/bindings/riscv/cpus.yaml
+>> index d87dd50f1a4b..c4e2c65437b1 100644
+>> --- a/Documentation/devicetree/bindings/riscv/cpus.yaml
+>> +++ b/Documentation/devicetree/bindings/riscv/cpus.yaml
+>> @@ -168,7 +168,7 @@ examples:
+>>                  i-cache-size = <16384>;
+>>                  reg = <0>;
+>>                  riscv,isa-base = "rv64i";
+>> -                riscv,isa-extensions = "i", "m", "a", "c";
+>> +                riscv,isa-extensions = "i", "m", "a", "c", "zca";
+>>  
+>>                  cpu_intc0: interrupt-controller {
+>>                          #interrupt-cells = <1>;
+>> @@ -194,7 +194,8 @@ examples:
+>>                  reg = <1>;
+>>                  tlb-split;
+>>                  riscv,isa-base = "rv64i";
+>> -                riscv,isa-extensions = "i", "m", "a", "f", "d", "c";
+>> +                riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zca",
+>> +                                       "zcd";
+>>  
+>>                  cpu_intc1: interrupt-controller {
+>>                          #interrupt-cells = <1>;
+>> @@ -215,7 +216,8 @@ examples:
+>>                  compatible = "riscv";
+>>                  mmu-type = "riscv,sv48";
+>>                  riscv,isa-base = "rv64i";
+>> -                riscv,isa-extensions = "i", "m", "a", "f", "d", "c";
+>> +                riscv,isa-extensions = "i", "m", "a", "f", "d", "c", "zca",
+>> +                                       "zcd";
+>>  
+>>                  interrupt-controller {
+>>                          #interrupt-cells = <1>;
+>> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
+>> index db7daf22b863..0172cbaa13ca 100644
+>> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+>> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+>> @@ -549,6 +549,23 @@ properties:
+>>                  const: zca
+>>              - contains:
+>>                  const: f
+>> +      # C extension implies Zca
+>> +      - if:
+>> +          contains:
+>> +            const: c
+>> +        then:
+>> +          contains:
+>> +            const: zca
+>> +      # C extension implies Zcd if d
+>> +      - if:
+>> +          allOf:
+>> +            - contains:
+>> +                const: c
+>> +            - contains:
+>> +                const: d
+>> +        then:
+>> +          contains:
+>> +            const: zcd
+>>  
+>>  allOf:
+>>    # Zcf extension does not exists on rv64
+>> @@ -566,6 +583,23 @@ allOf:
+>>            not:
+>>              contains:
+>>                const: zcf
+>> +  # C extension implies Zcf if f on rv32 only
+>> +  - if:
+>> +      properties:
+>> +        riscv,isa-extensions:
+>> +          allOf:
+>> +            - contains:
+>> +                const: c
+>> +            - contains:
+>> +                const: f
+>> +        riscv,isa-base:
+>> +          contains:
+>> +            const: rv32i
+>> +    then:
+>> +      properties:
+>> +        riscv,isa-extensions:
+>> +          contains:
+>> +            const: zcf
+>>  
+>>  additionalProperties: true
+>>  ...
+>> -- 
+>> 2.43.0
+>>
 
