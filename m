@@ -1,136 +1,134 @@
-Return-Path: <kvm+bounces-15464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0084A8AC590
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 09:29:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D383D8AC5D7
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 09:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27B0B1C21C71
-	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 07:29:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DACB283257
+	for <lists+kvm@lfdr.de>; Mon, 22 Apr 2024 07:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99FA54DA13;
-	Mon, 22 Apr 2024 07:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B2EF4F5FA;
+	Mon, 22 Apr 2024 07:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mo12oYDq"
 X-Original-To: kvm@vger.kernel.org
-Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [195.130.132.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0940C8F3
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 07:27:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CD324F20C;
+	Mon, 22 Apr 2024 07:43:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713770870; cv=none; b=Z1uF6nYq6e04RNNevgjNbv1HhdpUFXcShWgVisRLhBEmQM8yU/GjhVBI8bnFWGQEvWKEiLAx5bqM2ercRLHcDcgllvPMutXqnlvT3Qr//ZdYvJixssAFqIB0PFlXgZsSyf3hx93upIbaR4abIr20mL9a8nHsal+EzUJ4PvmiO6A=
+	t=1713771835; cv=none; b=paGjAtOy/hR+8o9+uIfCrNfZSLAzeUjwcisqU/0qexPsR8r5tNKvBicdZGS61bzyu/CH1XvNR2EfK4fZeYWnLopRxUj9IlwEuh6EHdvjQWj0Sxp+TGHYByLzO1YMM9/M/aDyLErCSuMC61qmiYWZygYNXGBjACu/wvMUJEnBYOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713770870; c=relaxed/simple;
-	bh=RWyYEIWJ8XsfZ071NpRMCzhHu+Pnox/bWNT0IZqhBNM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=Ue4HvN7sikqFFYQWy4qS4EmX9hu99GLmfvKiUvr/OWhDV0d8GCJPh54fcgeoapJ4pgHtmTlNZMLi8snOhoj4FkKVebWLQwfvuP/lsOKS1gqLWUueGk/jyBAEIWIg1dhWI3qbAQf55Dy2bZ7WoqW/zqT3T4Khc5PixvvLd/Y+180=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:76d0:2bff:fec8:549])
-	by baptiste.telenet-ops.be with bizsmtp
-	id E7TJ2C0080SSLxL017TJcV; Mon, 22 Apr 2024 09:27:40 +0200
-Received: from geert (helo=localhost)
-	by ramsan.of.borg with local-esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1ryo58-001FLD-7g;
-	Mon, 22 Apr 2024 09:27:18 +0200
-Date: Mon, 22 Apr 2024 09:27:18 +0200 (CEST)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-cc: Anthony Krowiak <akrowiak@linux.ibm.com>, 
-    Alex Williamson <alex.williamson@redhat.com>, 
-    Bagas Sanjaya <bagasdotme@gmail.com>, Lu Baolu <baolu.lu@linux.intel.com>, 
-    Chaitanya Kulkarni <chaitanyak@nvidia.com>, 
-    Cornelia Huck <cohuck@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-    Daniel Jordan <daniel.m.jordan@oracle.com>, 
-    David Gibson <david@gibson.dropbear.id.au>, 
-    Eric Auger <eric.auger@redhat.com>, Eric Farman <farman@linux.ibm.com>, 
-    iommu@lists.linux.dev, Jason Wang <jasowang@redhat.com>, 
-    Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-    Jason Herne <jjherne@linux.ibm.com>, 
-    Joao Martins <joao.m.martins@oracle.com>, 
-    Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-    Lixiao Yang <lixiao.yang@intel.com>, 
-    Matthew Rosato <mjrosato@linux.ibm.com>, 
-    "Michael S. Tsirkin" <mst@redhat.com>, Nicolin Chen <nicolinc@nvidia.com>, 
-    Halil Pasic <pasic@linux.ibm.com>, 
-    Niklas Schnelle <schnelle@linux.ibm.com>, 
-    Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, 
-    Yi Liu <yi.l.liu@intel.com>, Yu He <yu.he@intel.com>, 
-    Keqian Zhu <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v6 16/19] iommufd: Add kernel support for testing
- iommufd
-In-Reply-To: <16-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
-Message-ID: <6860aa59-3a8b-74ca-3c33-2f3ec936075@linux-m68k.org>
-References:  <16-v6-a196d26f289e+11787-iommufd_jgg@nvidia.com>
+	s=arc-20240116; t=1713771835; c=relaxed/simple;
+	bh=5WRrp2XlCBbaYWPMG2K05cHdvPj+ojQddV0PAVsqUck=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:From:Cc:Subject:
+	 To:Message-ID:Date; b=pXj2a4RUhhRHqkTKbBs7WIQJGM08oqDAyzgTW5cL91D8C0cIVSh/aBqiwLtS1oUiNHjNiQk31RHPaJl0DM92d2VhJdXnJ9Yqt6lAqMKS1MOOiYjm1tUPW+6Y5lV0UcKa03m/CI3a3TTJldFFwf1uSQUNYpimLMBncUNOHRc4hRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mo12oYDq; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43M6Y6xI006118;
+	Mon, 22 Apr 2024 07:43:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : content-transfer-encoding : in-reply-to : references : from
+ : cc : subject : to : message-id : date; s=pp1;
+ bh=aScYhJOHOcLVhAWwC78J6jMDinp6nCGDxDPg3cyBaHY=;
+ b=mo12oYDqlF5GBwP+RQclj7YSn+EbVP0QQcgXasYRa3izQO4ZQQEWxcyPhQtB84DK7FsI
+ WlVAPTcjWTlWIBIlgq0UXjcWyCX9P2rnG7R+JGGqSr2XjaBcrCRZiBHbAb/ZtE0LGhSk
+ zA2AAd1wgSWUxZbgrYm3FSBGB0XrhC7gRuU3VvqsupWjIOpNPtQYbu80dDLgKTiNkKsp
+ +GvUiEEaFI1b0aAS1y7uLTGA0uAo3tjvD8mEr9k/YavVsNNVDdEqxT873rAh0y56HITm
+ 5G0eiQH/yDlQjSzWQUaUJ4TfgGl73VJ9VxV3xSHtEIJkv0mPe8ZYA2KjeMWbwM+XL+y1 /w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnjq804pt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 07:43:52 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43M7hpXW024022;
+	Mon, 22 Apr 2024 07:43:51 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xnjq804pn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 07:43:51 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43M6a6ud023012;
+	Mon, 22 Apr 2024 07:43:50 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xms1npdew-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 22 Apr 2024 07:43:50 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43M7hi7R18088380
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 22 Apr 2024 07:43:47 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DBC1E2004D;
+	Mon, 22 Apr 2024 07:43:44 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BBED220049;
+	Mon, 22 Apr 2024 07:43:44 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.40.163])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 22 Apr 2024 07:43:44 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240201142356.534783-3-frankja@linux.ibm.com>
+References: <20240201142356.534783-1-frankja@linux.ibm.com> <20240201142356.534783-3-frankja@linux.ibm.com>
+From: Nico Boehr <nrb@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, thuth@redhat.com,
+        david@redhat.com, nsg@linux.ibm.com
+Subject: Re: [kvm-unit-tests RFC 2/2] lib: s390x: css: Name inline assembly arguments and clean them up
+To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Message-ID: <171377182433.14316.15188579220205837716@t14-nrb>
+User-Agent: alot/0.8.1
+Date: Mon, 22 Apr 2024 09:43:44 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Zuf2ESIbACEZbowOvwK844F4A_dNpinX
+X-Proofpoint-ORIG-GUID: ZML52YoSLp85LC0Sl7VzlhAdaZqGa1w1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-22_04,2024-04-19_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0
+ clxscore=1011 priorityscore=1501 suspectscore=0 spamscore=0
+ mlxlogscore=887 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2404010000 definitions=main-2404220035
 
- 	Hi Jason,
+Quoting Janosch Frank (2024-02-01 15:23:56)
+[...]
+> diff --git a/lib/s390x/css.h b/lib/s390x/css.h
+> index 504b3f14..e4311124 100644
+> --- a/lib/s390x/css.h
+> +++ b/lib/s390x/css.h
+[...]
+> @@ -167,11 +167,11 @@ static inline int msch(unsigned long schid, struct =
+schib *addr)
+>         int cc;
+> =20
+>         asm volatile(
+> -               "       msch    0(%3)\n"
+> -               "       ipm     %0\n"
+> -               "       srl     %0,28"
+> -               : "=3Dd" (cc)
+> -               : "d" (reg1), "m" (*addr), "a" (addr)
+> +               "       msch    0(%[addr])\n"
+> +               "       ipm     %[cc]\n"
+> +               "       srl     %[cc],28"
+> +               : [cc] "=3Dd" (cc)
+> +               : "d" (reg1), [addr] "a" (addr)
 
-On Tue, 29 Nov 2022, Jason Gunthorpe wrote:
-> Provide a mock kernel module for the iommu_domain that allows it to run
-> without any HW and the mocking provides a way to directly validate that
-> the PFNs loaded into the iommu_domain are correct. This exposes the access
-> kAPI toward userspace to allow userspace to explore the functionality of
-> pages.c and io_pagetable.c
->
-> The mock also simulates the rare case of PAGE_SIZE > iommu page size as
-> the mock will operate at a 2K iommu page size. This allows exercising all
-> of the calculations to support this mismatch.
->
-> This is also intended to support syzkaller exploring the same space.
->
-> However, it is an unusually invasive config option to enable all of
-> this. The config option should not be enabled in a production kernel.
->
-> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com> # s390
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+I think there was a reason why the "m"(*addr) was here. Either add it back
+or add a memory clobber.
 
-Replaying to and old email, after noticing commit 8541323285994528
-("iommufd: Add missing IOMMUFD_DRIVER kconfig for the selftest") in
-v6.9-rc5.
-
-> --- a/drivers/iommu/iommufd/Kconfig
-> +++ b/drivers/iommu/iommufd/Kconfig
-> @@ -10,3 +10,15 @@ config IOMMUFD
-> 	  it relates to managing IO page tables that point at user space memory.
->
-> 	  If you don't know what to do here, say N.
-> +
-> +if IOMMUFD
-> +config IOMMUFD_TEST
-> +	bool "IOMMU Userspace API Test support"
-> +	depends on DEBUG_KERNEL
-> +	depends on FAULT_INJECTION
-> +	depends on RUNTIME_TESTING_MENU
-> +	default n
-> +	help
-> +	  This is dangerous, do not enable unless running
-> +	  tools/testing/selftests/iommu
-> +endif
-
-How dangerous is this?
-I.e. is it now unsafe to run an allyesconfig or allmodconfig kernel?
-
-Probably this symbol should be tristate?
-
-Gr{oetje,eeting}s,
-
- 						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
- 							    -- Linus Torvalds
+I will only take the first patch of this series for now.
 
