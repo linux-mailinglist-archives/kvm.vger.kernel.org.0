@@ -1,177 +1,215 @@
-Return-Path: <kvm+bounces-15676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 868B28AF3BA
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 18:16:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D478AF3E3
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 18:25:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EF1A287D99
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 16:16:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F069E1F24E40
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 16:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32DF913CF8E;
-	Tue, 23 Apr 2024 16:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C7613D522;
+	Tue, 23 Apr 2024 16:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="iFNoFT0z"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Xhg5CJpY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2083.outbound.protection.outlook.com [40.107.220.83])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278E313D24A
-	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 16:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713888985; cv=none; b=ZTt8DkK+w/ObAVpvH2/+mr7vy9cpJj0h3WH+re5v0pVbTyaSl26kTKWyqOWmp7IwVw/Lx0LOILoh8Af55G5BFTnDGt2r5vG0v60FSVLTbZk48ewgC+VdtV6+yHLXJ2l4nrSog/MeqWERKSrvlzC6gsrHTuvWuDKaUX2dMyBeBQk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713888985; c=relaxed/simple;
-	bh=caNN/BDiP2pUMEFX/RYbMVfSz4poEg3B7Iv0IwQiV2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cBi3saokG3v3rjSZJutfaetOsB2tMW3ZYcKwjC2rXrgeWfzwlol/i4XyFcvr57Z+o1OElEREKk2tpPdUEf4Ghff0wjPv5Et1Gy4HC6Cw+T66SDyUTHNYFwAGjM81W3C/NwxYklGs0ik9l3T1ZifFZlvUUYH+mRkVcBK23n0JsbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=iFNoFT0z; arc=none smtp.client-ip=209.85.160.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2348a5d1584so2445524fac.2
-        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 09:16:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1713888982; x=1714493782; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Th5UesV32Qkq2eBnmkVMzF3pIRCuXeQw4LmG2UmnKGY=;
-        b=iFNoFT0zzm+yNrJC7FpTf+FXQ4MlD0+5B7btIITKMD7QefHu9NWQssmMUEWL5tMJKy
-         K8TvYZwx91T2FxKOQUIgpx+Z698L/a5sHqdE+ySCNc3HyuhgQ6RuPJmnJKmKdeRJ0bni
-         /NlSvskDbsWunFko8jEHbByuz4g+so8mkM1aQdlm8MnTkbEgnRqs9I2Vz+fVITSYuiuH
-         14q+l6hjO3I/G8aVSqOVh2w7KM4c1qYlLOmK4jpbjiD7JS6ZRoBM50+fIT17gMv+M+e/
-         5MEXbueu+7Bw7Q38D1L8RS6jUzj9QWBPq0YK5T8aKqaDcarJryBnIUI6OMktsp8IWdCk
-         e5Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713888982; x=1714493782;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Th5UesV32Qkq2eBnmkVMzF3pIRCuXeQw4LmG2UmnKGY=;
-        b=EP3k+3YiIOnH6Hp8LPHiSPlHvc7eDQ818S18uDg7kodUSc90Cauwj2iAtp9Aygl3jL
-         y7n9Zh2X6DFT8v2JsQFhDcMF3WYTcoiuzTXm07zwMlHbWUHhjKjs55Sck9DuxDqB30yf
-         bTvQyHfSXw7HgLyz2KD6KELDZvMXf+kxHbIsW6SOClSgnrxsrRyq0rnih9oOYJFVWX9o
-         +TACL/iKUI452mIEJ/Syrf+alN57Rd5uhVn8Ypt5LFVB1HAue58g1i9z4xSicJfolY+O
-         9jfTU7XDzyEaLUPA5bNKvyKubZiNH2YPZDcCfP6i2wuHhBV8N+hJCGRse/oNAAY/C3HQ
-         xyDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWWvd/hjBMFOx1bWAgRynYw2tZHm/i8LbHOxpe5ENJ8sGqNyc8FRyHQbx6GSco757reIrzOcwYQGI8YaBgj2+I4EGXq
-X-Gm-Message-State: AOJu0YxBjd5tTFXQVYBWE3XdjtSpLx5f8V+ce9hCsnF9OeYO6tX425UK
-	Fp0n/up7OuYdEHa+18xEpWf9zafbf1ivNDqNZdR7zlB3M1zwjFMGEtd0mxkNnF4=
-X-Google-Smtp-Source: AGHT+IE7zSimZxSEQfUXbYtEh0bkBhFSBu+ppGaC0ROHoLmW5kvBviH2Ox3G1rw9lZH4Y1pgy2feHQ==
-X-Received: by 2002:a05:6870:7087:b0:22e:75eb:9309 with SMTP id v7-20020a056870708700b0022e75eb9309mr16652676oae.54.1713888982021;
-        Tue, 23 Apr 2024 09:16:22 -0700 (PDT)
-Received: from ziepe.ca ([12.97.180.36])
-        by smtp.gmail.com with ESMTPSA id oz11-20020a056871788b00b0023a98276d93sm491702oac.36.2024.04.23.09.16.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Apr 2024 09:16:21 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rzIoe-003z4M-Br;
-	Tue, 23 Apr 2024 13:16:20 -0300
-Date: Tue, 23 Apr 2024 13:16:20 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>, kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org, Ankit Agrawal <ankita@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Julian Ruess <julianr@linux.ibm.com>,
-	Ben Segal <bpsegal@us.ibm.com>
-Subject: Re: [PATCH v2] vfio/pci: Support 8-byte PCI loads and stores
-Message-ID: <20240423161620.GE231144@ziepe.ca>
-References: <20240422153508.2355844-1-gbayer@linux.ibm.com>
- <20240422174305.GB231144@ziepe.ca>
- <20240422163353.24f937ce.alex.williamson@redhat.com>
- <311395d0817e9c2c6a0415b5ece97c68f4c4ba95.camel@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C4C13DDCB;
+	Tue, 23 Apr 2024 16:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713889435; cv=fail; b=s9fZzrTDo7oSPEs2mUd28C1/kzIis160LXbX59w0+cy6EOfFqiF5j+kvjclhxuvA3FVbaJPA5opLFjz/PcW9OYWAYB7HCMsCTA+F1CvWHsD8rMB1JkUbHILLw2Qimz1/gPh3R9Q7rUQRUpBHSBwddGqOiohEeM5qjWNu9JFn89o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713889435; c=relaxed/simple;
+	bh=OdTyCTLp5S1scrlfS6SsPoLNAcdeKotLZPehcAHzCIY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hS5T1cctqioFQDweo57o+pna1F+50InFgt5r2qk5geLYC1BxejHWepjsbbtv7N8X/08vLMGEI4OW2eYNcfIwmnlsdHBEPW26tiNRcESfnvCXYzsoQoAPMOMwgebhFyIs8XnJAyeMCd7qNzlKZOeDqvuIWMyu3veHA4MqjLFaBmc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Xhg5CJpY; arc=fail smtp.client-ip=40.107.220.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NbCr9Gb/gRKAYFxDyNXxzsWikQzcWcPOEkvFAlHYTKuQ37litzimRSdHcCZO1MuSz+beTGGYLyKhuhwbTxlbYgbMJUnc8qLwMuyr68ROH02VT3hJs3a1QL38p2/lP7fmfwTj/HuETEl7tAlYuXwK4DH1BlJb33pHJ/L7krWX/Qi6woHH/X3UNxHFeFZtqyiKrNVwec5+73WX7vN6Z5xvnw2DAQBj8d4Cen606gP7hB5uw0qprebw6H6bxHA/hgJmbejRkOC5bY/b0ecF+FpswmylJStc4Z0K4jDCdc5SsW7bQlNndz6Hyiu6nej68Xja/I4hWSWHWFksl71yaYXTpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ukt0dfh46WsP7kqfOQpXbL4+TBUFfUgpVFR7pGR/JeY=;
+ b=klEmjiaO5cFsupyE2wraZK6qVYu6atuKSBnfXfoLeaH0lXwWNUNpo6wMMIsAG7BFfU0jrvTUQfiZ7dpnd9+eWnRlkdDPfEdpfoVjhosApv+xh/2OJqDdur93UWQslrn773dj8KR3hrWlpXFNmDXJF3EcfmyfwZiTEUCQPZMwnmU7pfM6fNPPgPorifVrWeDYuuKWKa8H90yCiH3uZYIwGW6JQeVG06AfAy50hX+jwiwZL2hp2hPeBGZQkWVehFa67zDyefHHEOJ3jEoSAjM4dj72uDidMPlbn3ChVVHbdxmk22nz8qFcmxS+otTgvhhY1VPxgUj/HTQAuo1UmtjCnQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ukt0dfh46WsP7kqfOQpXbL4+TBUFfUgpVFR7pGR/JeY=;
+ b=Xhg5CJpY+rwam0zs5F0DtWoJ7yB4LDhAmzZsAm8D++I4i7GQKfXOciHlwByTlnI1Vle59Q+tafHc95Tk8ipNsZZaSLu7ONsJJYbR+OeVzEXP9D0IpEIjoSWQD4WNJjjqjb3QNepjXt376WleFsxEIgTcv1FlgFYPy2xZAXxH10E=
+Received: from DM6PR01CA0025.prod.exchangelabs.com (2603:10b6:5:296::30) by
+ LV8PR12MB9335.namprd12.prod.outlook.com (2603:10b6:408:1fc::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Tue, 23 Apr
+ 2024 16:23:50 +0000
+Received: from CH1PEPF0000AD81.namprd04.prod.outlook.com
+ (2603:10b6:5:296:cafe::80) by DM6PR01CA0025.outlook.office365.com
+ (2603:10b6:5:296::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22 via Frontend
+ Transport; Tue, 23 Apr 2024 16:23:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH1PEPF0000AD81.mail.protection.outlook.com (10.167.244.89) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7452.22 via Frontend Transport; Tue, 23 Apr 2024 16:23:49 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 23 Apr
+ 2024 11:23:49 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+	<ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: [PATCH v14 23/22] [SQUASH] KVM: SEV: Add support to handle GHCB GPA register VMGEXIT
+Date: Tue, 23 Apr 2024 11:21:38 -0500
+Message-ID: <20240423162144.1780159-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240421180122.1650812-1-michael.roth@amd.com>
+References: <20240421180122.1650812-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <311395d0817e9c2c6a0415b5ece97c68f4c4ba95.camel@linux.ibm.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD81:EE_|LV8PR12MB9335:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56a7b175-1353-4317-f9f2-08dc63b1c239
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?uFQyLsmnn3kfiH7YOz+EMM1mlUpUBgoxbW+pdJGm04Mn3eKQ63odTbFEidG7?=
+ =?us-ascii?Q?EN2sB+djnnKQNugWcZSdzFUlPmaXunCWwerrZZxgq4znghgHDNpk7bdxObZ6?=
+ =?us-ascii?Q?x9mexPmDb5VKxCXLYxYxkmA0Cy28ez+Id/oGvuCssaPm+IU45YHnbhgIBMby?=
+ =?us-ascii?Q?36MAvJj9U1CWm14GNAXITlkSYPwaqsOf9RTWgFCQM/x+APu2DJMfzgepZWND?=
+ =?us-ascii?Q?m9NPrN0MRjw/irGKbRWEhS3xQzbnOV9UITldpL5Jv+r2HqlkTsvYOBwHzPs6?=
+ =?us-ascii?Q?j9dz9E4xn6aibTK9gc6J5i2nRQdQIc6p5J5jHC4nFDkQLtMryQRNmPZ45bpk?=
+ =?us-ascii?Q?mNzXraLwWD0s36lCf7A5DPHRcAQPdjXbqUziehCL5qOEIPRJ85tM5jo9s9yA?=
+ =?us-ascii?Q?AXHic5VmzKzvo23PnNNI7DzYqbFENyPFJ4a9+lxDJb2e0J+orXglgExl34Rt?=
+ =?us-ascii?Q?6n1tnTJUhKMvmYgbuf5UlPGE76/9VX6hjT4Ciqotb6xx38+nHgfUKUDL4K4g?=
+ =?us-ascii?Q?VTExdaQeVtcEbz7NsCAMl/7SpOPpgbSh8Jd87FkuQwx4B4RB3hgbswMKT2Jb?=
+ =?us-ascii?Q?nL/TfYorKyuWf5nZUey9X9dTn7DtXCnsr2INcM7N6vJMNnphuNEXgZAyB7cl?=
+ =?us-ascii?Q?Wr8fdohygVyROenkS3cm9XobuYQu6L2QU20pB78SSvSpK7NjzfnZYFdd5tS0?=
+ =?us-ascii?Q?3gvYiSXF0/vMpTVDQIc4Sg9nP0JK2YUJtx8YjNdLTeRN6GaPprqjc5slgnyC?=
+ =?us-ascii?Q?RxhHFXFVq4GFhtRt+E4X0Z3J+Y18+ixJUdwZshLCpMyV7G+7LSkV/ZLP7P65?=
+ =?us-ascii?Q?cnfY2em4MlyBynL7LyTsJ2/Iyg9nNY12Or5qZD3ZTI1X2oRuAwDAbb9/FaAE?=
+ =?us-ascii?Q?x6NpQqdOktQewVhZC6Zp0Ch70iZGe1ogpM/KZr3l9axssJRQfwKmKBEIheT2?=
+ =?us-ascii?Q?rcSeAZB8Gc5fwm9Y8PZS/q6Tv+SBy3t/JQlTmgDD7slhT4Tzdxemz5iDmCmo?=
+ =?us-ascii?Q?GEVGlkfaH6K/ynXxF8suJcZZrs3GYlcpowF3EIfYJVA1dHEqouBpx1VOxkSs?=
+ =?us-ascii?Q?+BQq8dqs9aYGtbzV8dOYkcaPEEwaEmlqjM0MUfjwjh1IGoOnXMMdSw4yK4dt?=
+ =?us-ascii?Q?S+39+KVi5C9+mHCjQt+LAmPBl82Ms8jN4yG4d+PTz/JFRobwfWQ7QGzNnMr5?=
+ =?us-ascii?Q?eRPKEYLrN1MH+uq9kuUwK/sfW6r7brd47ZfDF9g3lGsLMF68shc1rTxCKiPL?=
+ =?us-ascii?Q?35uwkP4gIB9Fc1io3QqqBTJ42/88MsD6xtNtaQTb2z5tm8RiVb1/ZpoUY0id?=
+ =?us-ascii?Q?cv+7UEDaVcSuZbJw5G9SyQH6bxWk8zXCgH8xFRdQWqG5Oxve0wtUEINOcuDH?=
+ =?us-ascii?Q?b5U5IUh3W9FJudhAaQv5uyJoaxXS?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(82310400014)(7416005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 16:23:49.8083
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56a7b175-1353-4317-f9f2-08dc63b1c239
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD81.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9335
 
-On Tue, Apr 23, 2024 at 06:11:57PM +0200, Gerd Bayer wrote:
-> On Mon, 2024-04-22 at 16:33 -0600, Alex Williamson wrote:
-> > On Mon, 22 Apr 2024 14:43:05 -0300
-> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > 
-> > > On Mon, Apr 22, 2024 at 05:35:08PM +0200, Gerd Bayer wrote:
-> > > > From: Ben Segal <bpsegal@us.ibm.com>
-> > > > 
-> > > > Many PCI adapters can benefit or even require full 64bit read
-> > > > and write access to their registers. In order to enable work on
-> > > > user-space drivers for these devices add two new variations
-> > > > vfio_pci_core_io{read|write}64 of the existing access methods
-> > > > when the architecture supports 64-bit ioreads and iowrites.
-> > > > 
-> > > > Since these access methods are instantiated on 64bit
-> > > > architectures,
-> > > > only, their use in vfio_pci_core_do_io_rw() is restricted by
-> > > > conditional
-> > > > compiles to these architectures.
-> > > > 
-> > > > Signed-off-by: Ben Segal <bpsegal@us.ibm.com>
-> > > > Co-developed-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > > > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
-> > > > ---
-> > > > Hi all,
-> > > > 
-> > > > we've successfully used this patch with a user-mode driver for a
-> > > > PCI
-> > > > device that requires 64bit register read/writes on s390. A quick
-> > > > grep
-> > > > showed that there are several other drivers for PCI devices in
-> > > > the kernel
-> > > > that use readq/writeq and eventually could use this, too.
-> > > > So we decided to propose this for general inclusion.
-> > > > 
-> > > > Thank you,
-> > > > Gerd Bayer
-> > > > 
-> > > > Changes v1 -> v2:
-> > > > - On non 64bit architecture use at most 32bit accesses in
-> > > >   vfio_pci_core_do_io_rw and describe that in the commit message.
-> > > > - Drop the run-time error on 32bit architectures.
-> > > > - The #endif splitting the "else if" is not really fortunate, but
-> > > > I'm
-> > > >   open to suggestions.  
-> > > 
-> > > Provide a iowrite64() that does back to back writes for 32 bit?
-> > 
-> > I was curious what this looked like.  If we want to repeat the 4 byte
-> > access then I think we need to refactor all the read/write accesses
-> > into macros to avoid duplicating code, which results in something
-> > like [1] below.  But also once we refactor to macros, the #ifdef
-> > within the function as originally proposed gets a lot more bearable
-> > too [2].
-> > 
-> > I'd probably just go with something like [2] unless you want to
-> > further macro-ize these branches out of existence in the main
-> > function. Feel free to grab any of this you like, the VFIO_IORDWR
-> > macro should probably be it's own patch.  Thanks,
-> > 
-> > Alex
-> 
-> Hi Alex,
-> 
-> thanks for your suggestions, I like your VFIO_IORDWR macro in [1].
-> As I just explained to Jason, I don't think that the back-to-back 32bit
-> accesses are a safe emulation of 64bit accesses in general, though. So
-> I'd rather leave that out.
+Terminate if an non-SNP guest attempts to register a GHCB page; this
+is an SNP-only GHCB request.
 
-It is though, it is exactly what the code does now.
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
+ arch/x86/kvm/svm/sev.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
-This function is not 'do exactly XX byte store' it is actually 'memcpy
-to io' with some occasional support for making contiguous TLPs in
-common cases..
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 1cec466e593b..088eca85a6ac 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3970,6 +3970,9 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 				  GHCB_MSR_INFO_MASK, GHCB_MSR_INFO_POS);
+ 		break;
+ 	case GHCB_MSR_PREF_GPA_REQ:
++		if (!sev_snp_guest(vcpu->kvm))
++			goto out_terminate;
++
+ 		set_ghcb_msr_bits(svm, GHCB_MSR_PREF_GPA_NONE, GHCB_MSR_GPA_VALUE_MASK,
+ 				  GHCB_MSR_GPA_VALUE_POS);
+ 		set_ghcb_msr_bits(svm, GHCB_MSR_PREF_GPA_RESP, GHCB_MSR_INFO_MASK,
+@@ -3978,6 +3981,9 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 	case GHCB_MSR_REG_GPA_REQ: {
+ 		u64 gfn;
+ 
++		if (!sev_snp_guest(vcpu->kvm))
++			goto out_terminate;
++
+ 		gfn = get_ghcb_msr_bits(svm, GHCB_MSR_GPA_VALUE_MASK,
+ 					GHCB_MSR_GPA_VALUE_POS);
+ 
+@@ -4004,12 +4010,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
+ 			reason_set, reason_code);
+ 
+-		vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+-		vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM;
+-		vcpu->run->system_event.ndata = 1;
+-		vcpu->run->system_event.data[0] = control->ghcb_gpa;
+-
+-		return 0;
++		goto out_terminate;
+ 	}
+ 	default:
+ 		/* Error, keep GHCB MSR value as-is */
+@@ -4020,6 +4021,14 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+ 					    control->ghcb_gpa, ret);
+ 
+ 	return ret;
++
++out_terminate:
++	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
++	vcpu->run->system_event.type = KVM_SYSTEM_EVENT_SEV_TERM;
++	vcpu->run->system_event.ndata = 1;
++	vcpu->run->system_event.data[0] = control->ghcb_gpa;
++
++	return 0;
+ }
+ 
+ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+-- 
+2.25.1
 
-Jason
 
