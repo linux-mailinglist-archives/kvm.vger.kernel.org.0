@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-15597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15598-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F1F8ADC41
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 05:26:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6459D8ADC79
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 05:55:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C6191F22154
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 03:26:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0B58B215D8
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 03:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6590B1B962;
-	Tue, 23 Apr 2024 03:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923F31CAB3;
+	Tue, 23 Apr 2024 03:55:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88332F5E;
-	Tue, 23 Apr 2024 03:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB357EEA9;
+	Tue, 23 Apr 2024 03:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713842782; cv=none; b=Cpxl3V48KDRoUwLL3z1rWU18TwKd+RcztoMF2GmvPFYw9dWw0UEOPlfDNspjMTZiw1V1tDH3jAGGaaHuz4b0iNS6rI5IHiewU9O3m7+QK7xKPWOD7cASGXwevC2wTS9AudNPmeKfs24Sjod9Y1EEdetBCMn0M+S1DPauRB+rxXo=
+	t=1713844536; cv=none; b=qwzg5cZIskB1GkGMWGFHGSo7ZnnrPpQK3nnhUNlTPImNm+Hi0mESei9COijndmNwrMy/FV8WXdCtH3FLPMv2wAITWA9TeanM9W2a6fb2g291H4sEAgdmzDvS9rHiGYjo0/0t0O4m1KWu4Ko0VolawRg5v6V5KzQest/63548w3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713842782; c=relaxed/simple;
-	bh=CAJpcXGdqvr9FJJtpqAZjbO1UWsz5IjjJ1sxEz09kzM=;
+	s=arc-20240116; t=1713844536; c=relaxed/simple;
+	bh=QQGjfUKuzjHWsxJoAonicWcJZnKEHPsSwcorPLKtA2Y=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=iNbyx7vLjtfcF1p8txr8sVSriBK8eywDUo3pzX6o/wekpHUeVuLdlKQpDGGoInXcg1tYsdQvSbEoXuUeMs+NS1RdC9T80okywXGWlcfG2c7T7EH8VVfKjlAuBRsiKHJoBa8SPNLRkZ3ttquytaMXBruz4kqfjoSMOonjd9/frAE=
+	 In-Reply-To:Content-Type; b=AQA0pNJGy1FJh2ZDf7q3BXHYzziHX/QjUt1hVf12j7Z2xS4aWk8wA0qC7CXQDTzO1DYO9eXy7Quml35ISBk2F/wT3U/m07FnugBDyihw0Jb8hEp+6SJ6rdtXUZqSlKm5HbOEt6ajCkdWSad407+qaHwoLob8KGhPDxnxgIc06Sw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.20.42.173])
-	by gateway (Coremail) with SMTP id _____8CxJvBXKidmVyUBAA--.6777S3;
-	Tue, 23 Apr 2024 11:26:15 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8BxFvAyMSdmBScBAA--.6764S3;
+	Tue, 23 Apr 2024 11:55:30 +0800 (CST)
 Received: from [10.20.42.173] (unknown [10.20.42.173])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bxut1UKidmN_ABAA--.8069S3;
-	Tue, 23 Apr 2024 11:26:14 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxjd4uMSdmMfMBAA--.8493S3;
+	Tue, 23 Apr 2024 11:55:28 +0800 (CST)
 Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
  state for Intel CPU
 To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
@@ -60,8 +60,8 @@ References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
  <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
  <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com>
 From: maobibo <maobibo@loongson.cn>
-Message-ID: <5f27b793-b19e-d429-190c-1c20a6d1c649@loongson.cn>
-Date: Tue, 23 Apr 2024 11:26:12 +0800
+Message-ID: <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
+Date: Tue, 23 Apr 2024 11:55:26 +0800
 User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 Precedence: bulk
@@ -74,25 +74,25 @@ In-Reply-To: <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Bxut1UKidmN_ABAA--.8069S3
+X-CM-TRANSID:AQAAf8Cxjd4uMSdmMfMBAA--.8493S3
 X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Xr17XryfJFyUtFy3GryrXwc_yoWxZr17pF
-	WxAF4jkr4DJr10yw1Utw18JFyUtrWUJw1UXrn8tFyUA3909r1Fqr1UXryj9FyUWr48GF1j
-	qr4Ut347Zw1DAagCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoW3Xr17XryfJFyUtFy3GryrXwc_yoWxZw43pF
+	WxZa1jkr4DJr10yw1xtw18JFyUtrW7Jw1UXrn8JFyUA3yq9r1Fqr1UXrWY9F1Dur48Gr1j
+	qr4Ut347Zw1DAagCm3ZEXasCq-sJn29KB7ZKAUJUUUUJ529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
 	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
 	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
 	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_GFv_Wrylx2IqxVAqx4xG67
 	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14
 	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4qg4DU
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUSYiiDU
 	UUU
 
 
@@ -209,15 +209,19 @@ On 2024/4/23 上午11:13, Mi, Dapeng wrote:
 > 
 > I didn't fully get your point. When IPI or timer interrupt reach, a 
 > VM-exit is triggered to make CPU traps into host first and then the host 
+yes, it is.
+
 > interrupt handler is called. Or are you complaining the executing 
 > sequence of switching guest PMU MSRs and these interrupt handler?
-It is not necessary to save/restore PMU HW at every vm exit, it had 
-better be lately saved/restored, such as only when vcpu thread is 
-sched-out/sched-in, else the cost will be a little expensive.
+In our vPMU implementation, it is ok if vPMU is switched in vm exit 
+path, however there is problem if vPMU is switched during vcpu thread 
+sched-out/sched-in path since IPI/timer irq interrupt access pmu 
+register in host mode.
 
-I know little about perf core. However there is PMU HW access in 
-interrupt mode. That means PMU HW access should be irq disabled in 
-general mode, else there may be nested PMU HW access. Is that true?
+In general it will be better if the switch is done in vcpu thread 
+sched-out/sched-in, else there is requirement to profile kvm 
+hypervisor.Even there is such requirement, it is only one option. In 
+most conditions, it will better if time of VM context exit is small.
 
 > 
 > 
