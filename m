@@ -1,246 +1,323 @@
-Return-Path: <kvm+bounces-15735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15736-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D498D8AFCDF
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 01:50:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E7E8AFCE1
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 01:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 036A71C22792
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 23:50:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CC01F23FE9
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 23:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9AA4597F;
-	Tue, 23 Apr 2024 23:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3CC41746;
+	Tue, 23 Apr 2024 23:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mc3JIgMz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5cdYMNi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2D644384;
-	Tue, 23 Apr 2024 23:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2342537E3
+	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 23:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713916217; cv=none; b=KqlzQis3wEceS+MXA8nplCjofe+jQbv5/xqhFhQM+lmT+3CEaRfED2KUTUuvwqZU8Umou3fGB5JXSdE0LHc1wAEkhfdvrLXDGZjELLv/Orf1Yibbkd2jbV9y2dQ+oPJrlM++/paiAvSoBlCofHClj/2g6jlT9EfEO2A8xEWxke0=
+	t=1713916222; cv=none; b=kAeq64wQeZohyC8p9x//of4Z/fYt4S8cbVimhliJbYw5msARFZmodljAG3Ujj+R1dzl4TAt4CU5xzLTiqGa+BTP4g3LPxEH9eTKIMHfZI+zAE3sOtn1CxBOBpCfeTuiSQRWBZsEpY0ivBzoimRt34OAwC7LpZVPSVv+fksSR7cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713916217; c=relaxed/simple;
-	bh=+WPlueIv66ky5YK9PKL2xzG7cIJjxnQn5CQCbAettMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZnXVjCuVDw+RriuVbscegND6/s9/YVJrvhY8YFPnBi7MbK4rUay2KnWn5P5CmkuzCosm0KOTtoXTWpobGz2WtF4dRZBPyODvZ/mLuqo9zEYpINO3PYwtd6nCQ7V6BVF7L/TCy9Y2YnrX9Fmv3wsWZyJKLreM3vAgN/0JaJSF13g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mc3JIgMz; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713916214; x=1745452214;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+WPlueIv66ky5YK9PKL2xzG7cIJjxnQn5CQCbAettMs=;
-  b=Mc3JIgMz3zXRegaWwGpo36upHvpafoq8eMHRjoTqhDYiVJBMYibZcWZ/
-   z63+OYlvLyeAChC0xkUz5FeBv4wdAGMbohtQnjcqD2IOPaWZkLk/aFahp
-   OULPly+0IjFja3zCcLEYo1n88QpcyzjsqnzCiUPe/GaGHYwt7rlvFDVDl
-   8O3tETFDvkol7zigbeIXXdj2hI0OXOl4X0tUTt5btyCX76T9IWTCu2yrn
-   SCJcNVIHU+cI/cznAH87VapDozNv8J5z8j+9diMzEhAVctrnCqZ110Bt4
-   KNYdxwykTjMv1tzZr1LhUzQKzEE3V+holCaehy8tmqo+guzUnU5HRw07G
-   A==;
-X-CSE-ConnectionGUID: z9qwDTKtRqS0512Afekf0w==
-X-CSE-MsgGUID: IMlaakHDSC+ZTmMXSS4vww==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="12461264"
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="12461264"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 16:50:13 -0700
-X-CSE-ConnectionGUID: h0ovcEApQ5Kg+fFpK7RJAQ==
-X-CSE-MsgGUID: Pc+YW/6sRJ6YhPysYev4gA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="29325113"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 16:50:14 -0700
-Date: Tue, 23 Apr 2024 16:50:13 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, seanjc@google.com,
-	michael.roth@amd.com, isaku.yamahata@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH 09/11] KVM: guest_memfd: Add interface for populating
- gmem pages with user data
-Message-ID: <20240423235013.GO3596705@ls.amr.corp.intel.com>
-References: <20240404185034.3184582-1-pbonzini@redhat.com>
- <20240404185034.3184582-10-pbonzini@redhat.com>
+	s=arc-20240116; t=1713916222; c=relaxed/simple;
+	bh=I2QIzgpb/mSP4CG+9bGvMJ9ef//nb7Nd1NdK/yAqP+o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YOmaizY1agiHrhHXQib62bNgAHfITUqUGZofGM14EzCIXUaUUeSE+FAqeohlF8U0APRL+to76Hrs3VNTNwtdPZmkcbhcyrOjWFhqILY4V2GMPDCfnzrS8SLi918yHdBo5PWEFMAUsp0Kd/ZTgsbx+C8UVM6OqytNom/GOkoiITI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5cdYMNi; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ecec819962so7539931b3a.2
+        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 16:50:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713916220; x=1714521020; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S0XgZKcpp0Rc9lwkgVkwCs//I4YyNrUEqhi1oEZOUlk=;
+        b=e5cdYMNifn+b/6IfY9LI0VxitVnxys7/K5a6RB+sKyocuSUN0upyXhMKYyYxhQJ5kd
+         fVLup5BWI7w5RB0Z4iAzcCBeoubMRyMS2dS9sTuLe098hXMWdehC7Hk5bOUs+3epm+9W
+         5cFK5MEV1CgWZOMLMr0fjLVZMqbr/XDLXOweZ15iWOZvD85v/AwTSX/2nZxidhZ4JhVS
+         LUCdaZE34/wMWaoY065BDGmh+f7G4Rm9BWYcuU4tbUjDpsvQnwDg4jmpsUZYGA0eOknj
+         DmhTGriflCtOezLY3gwloOo8WQXLTPg/mxdaMrc1bNliMvFEvDXViiaVdjI1TE8ayADe
+         tC4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713916220; x=1714521020;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S0XgZKcpp0Rc9lwkgVkwCs//I4YyNrUEqhi1oEZOUlk=;
+        b=Ro01lKOqGdQ7voppuRPybMT9tkD4zuz17QCH8V3kvuWKiGM/25c7OV41r/GajFxKKG
+         siXs+fXWgLmt3EwiaW/MQwqlC/2INHYA0o+eJwjPPI0dj3AwMmwYnICky9j9XhE71eXZ
+         sGoKtQSYlkv+goFSPWG6qMgLXeol78bluWXFSOFez/bTf4VXk//rJlZ75VSpyBk8zis8
+         jaU0J5k3MS7SO+gfHr3FJOyRlEv1x+vRHigdtKnNGNDfInsYQ0Xwk0icHu9/7C836OBn
+         QTm2TaaYABWwcXcKtOqTH0mANjT/nWKpLwfJYmBISdFl6iWBMThu+iKyOqlbue3lkBsI
+         iz8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVIFJ0Gz9FnmahRVz5nLRlcr3ioUTnrZc/IxdBQbwluwZCC7R75HeD0Z0x9zLutOXtPtTHbqxAZMXG790x3SKP1I5v7
+X-Gm-Message-State: AOJu0YzmVXq+S35KCL78OUtnpwjJ89wwRf6ZWj6jXMGekJ/YJr9qQPqK
+	O7p7i6CEO3qAwJi0FDgfw5ZGUgCd56vP6DT1VTjVZqDi+hDgWOURZyMQtK+j8Cezm+Q0gG2ZVof
+	zLw==
+X-Google-Smtp-Source: AGHT+IHXAum89R+L84ez8ZLdeYXwHg5utst71NXVdIMIUYfKYaITD4P0qipj/L5juka0M2ylpFOroAjDd0c=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3cc1:b0:6ea:c43c:a666 with SMTP id
+ ln1-20020a056a003cc100b006eac43ca666mr112162pfb.6.1713916220080; Tue, 23 Apr
+ 2024 16:50:20 -0700 (PDT)
+Date: Tue, 23 Apr 2024 16:50:18 -0700
+In-Reply-To: <20240409133959.2888018-7-pgonda@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240404185034.3184582-10-pbonzini@redhat.com>
+Mime-Version: 1.0
+References: <20240409133959.2888018-1-pgonda@google.com> <20240409133959.2888018-7-pgonda@google.com>
+Message-ID: <ZihJOorvMU8GpUBN@google.com>
+Subject: Re: [PATCH 6/6] Add ability for SEV-ES guests to use ucalls via GHCB
+From: Sean Christopherson <seanjc@google.com>
+To: Peter Gonda <pgonda@google.com>
+Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>, 
+	Ackerley Tng <ackerleytng@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Carlos Bilbao <carlos.bilbao@amd.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Apr 04, 2024 at 02:50:31PM -0400,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Tue, Apr 09, 2024, Peter Gonda wrote:
+> Modifies ucall handling for SEV-ES VMs. 
 
-> During guest run-time, kvm_arch_gmem_prepare() is issued as needed to
-> prepare newly-allocated gmem pages prior to mapping them into the guest.
-> In the case of SEV-SNP, this mainly involves setting the pages to
-> private in the RMP table.
+Please follow the preferred changelog style as described in
+Documentation/process/maintainer-kvm-x86.rst
+
+> Instead of using an out instruction and storing the ucall pointer in RDI,
+> SEV-ES guests use a outsb VMGEXIT to move the ucall pointer as the data.
+
+Explain _why_.  After poking around, I think I agree that string I/O is the least
+awful choice, but string I/O is generally unpleasant.  E.g. my initial reaction
+to this
+		addr = *(uint64_t *)((uint8_t *)(run) + run->io.data_offset);
+
+was quite literally, "LOL, what?".
+
+We could use MMIO, because there is no *real* instruction in the guest, it's all
+make believe, i.e. there doesn't actually need to be MMIO anywhere.  But then we
+need to define an address; it could simply be the ucall address, but then SEV-ES
+ends up with a completely different flow then the regular magic I/O port.
+
+The changelog should capture explain why string I/O was chosen over the "obvious"
+alternatives so that readers and reviewers aren't left wondering why on earth
+we *chose* to use string I/O.
+
+> Allows for SEV-ES to use ucalls instead of relying the SEV-ES MSR based
+> termination protocol.
 > 
-> However, for the GPA ranges comprising the initial guest payload, which
-> are encrypted/measured prior to starting the guest, the gmem pages need
-> to be accessed prior to setting them to private in the RMP table so they
-> can be initialized with the userspace-provided data. Additionally, an
-> SNP firmware call is needed afterward to encrypt them in-place and
-> measure the contents into the guest's launch digest.
+> Cc: Vishal Annapurve <vannapurve@google.com>
+> Cc: Ackerley Tng <ackerleytng@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Carlos Bilbao <carlos.bilbao@amd.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Michael Roth <michael.roth@amd.com>
+> Cc: kvm@vger.kernel.org
+> Cc: linux-kselftest@vger.kernel.org
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> ---
+>  .../selftests/kvm/include/x86_64/sev.h        |  2 +
+>  tools/testing/selftests/kvm/lib/x86_64/sev.c  | 67 ++++++++++++++++++-
+>  .../testing/selftests/kvm/lib/x86_64/ucall.c  | 17 +++++
+>  .../selftests/kvm/x86_64/sev_smoke_test.c     | 17 +----
+>  4 files changed, 84 insertions(+), 19 deletions(-)
 > 
-> While it is possible to bypass the kvm_arch_gmem_prepare() hooks so that
-> this handling can be done in an open-coded/vendor-specific manner, this
-> may expose more gmem-internal state/dependencies to external callers
-> than necessary. Try to avoid this by implementing an interface that
-> tries to handle as much of the common functionality inside gmem as
-> possible, while also making it generic enough to potentially be
-> usable/extensible for TDX as well.
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
+> index 691dc005e2a1..26447caccd40 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/sev.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
+> @@ -109,4 +109,6 @@ static inline void sev_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
+>  bool is_sev_enabled(void);
+>  bool is_sev_es_enabled(void);
+>  
+> +void sev_es_ucall_port_write(uint32_t port, uint64_t data);
+> +
+>  #endif /* SELFTEST_KVM_SEV_H */
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
+> index 5b3f0a8a931a..276477f2c2cf 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
+> @@ -8,11 +8,18 @@
+>  #include "svm.h"
+>  #include "svm_util.h"
+>  
+> +#define IOIO_TYPE_STR (1 << 2)
+> +#define IOIO_SEG_DS (1 << 11 | 1 << 10)
+> +#define IOIO_DATA_8 (1 << 4)
+> +#define IOIO_REP (1 << 3)
+> +
+> +#define SW_EXIT_CODE_IOIO 0x7b
+> +
+>  struct ghcb_entry {
+>  	struct ghcb ghcb;
+>  
+>  	/* Guest physical address of this GHCB. */
+> -	void *gpa;
+> +	uint64_t gpa;
+>  
+>  	/* Host virtual address of this struct. */
+>  	struct ghcb_entry *hva;
+> @@ -45,16 +52,22 @@ void ghcb_init(struct kvm_vm *vm)
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>  		entry = &hdr->ghcbs[i];
+>  		entry->hva = entry;
+> -		entry->gpa = addr_hva2gpa(vm, &entry->ghcb);
+> +		entry->gpa = (uint64_t)addr_hva2gpa(vm, &entry->ghcb);
+>  	}
+>  
+>  	write_guest_global(vm, ghcb_pool, (struct ghcb_header *)vaddr);
+>  }
+>  
+> +static void sev_es_terminate(void)
+> +{
+> +	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
+> +}
+> +
+>  static struct ghcb_entry *ghcb_alloc(void)
+>  {
+>  	return &ghcb_pool->ghcbs[0];
+>  	struct ghcb_entry *entry;
+> +	struct ghcb *ghcb;
+>  	int i;
+>  
+>  	if (!ghcb_pool)
+> @@ -63,12 +76,18 @@ static struct ghcb_entry *ghcb_alloc(void)
+>  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
+>  		if (!test_and_set_bit(i, ghcb_pool->in_use)) {
+>  			entry = &ghcb_pool->ghcbs[i];
+> -			memset(&entry->ghcb, 0, sizeof(entry->ghcb));
+> +			ghcb = &entry->ghcb;
+> +
+> +			memset(&ghcb, 0, sizeof(*ghcb));
+> +			ghcb->ghcb_usage = 0;
+> +			ghcb->protocol_version = 1;
+> +
+>  			return entry;
+>  		}
+>  	}
+>  
+>  ucall_failed:
+> +	sev_es_terminate();
+>  	return NULL;
+>  }
+>  
+> @@ -200,3 +219,45 @@ bool is_sev_es_enabled(void)
+>  	return is_sev_enabled() &&
+>  	       rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ES_ENABLED;
+>  }
+> +
+> +static uint64_t setup_exitinfo1_portio(uint32_t port)
+> +{
+> +	uint64_t exitinfo1 = 0;
+> +
+> +	exitinfo1 |= IOIO_TYPE_STR;
+> +	exitinfo1 |= ((port & 0xffff) << 16);
+> +	exitinfo1 |= IOIO_SEG_DS;
+> +	exitinfo1 |= IOIO_DATA_8;
+> +	exitinfo1 |= IOIO_REP;
+> +
+> +	return exitinfo1;
+> +}
+> +
+> +static void do_vmg_exit(uint64_t ghcb_gpa)
+> +{
+> +	wrmsr(MSR_AMD64_SEV_ES_GHCB, ghcb_gpa);
+> +	__asm__ __volatile__("rep; vmmcall");
+> +}
+> +
+> +void sev_es_ucall_port_write(uint32_t port, uint64_t data)
+> +{
+> +	struct ghcb_entry *entry;
+> +	struct ghcb *ghcb;
+> +	const uint64_t exitinfo1 = setup_exitinfo1_portio(port);
+> +
+> +	entry = ghcb_alloc();
+> +	ghcb = &entry->ghcb;
+> +
+> +	ghcb_set_sw_exit_code(ghcb, SW_EXIT_CODE_IOIO);
+> +	ghcb_set_sw_exit_info_1(ghcb, exitinfo1);
+> +	ghcb_set_sw_exit_info_2(ghcb, sizeof(data));
+> +
+> +	// Setup the SW Stratch buffer pointer.
+> +	ghcb_set_sw_scratch(ghcb,
+> +			    entry->gpa + offsetof(struct ghcb, shared_buffer));
+> +	memcpy(&ghcb->shared_buffer, &data, sizeof(data));
+> +
+> +	do_vmg_exit(entry->gpa);
+> +
+> +	ghcb_free(entry);
+> +}
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> index 1265cecc7dd1..24da2f4316d8 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
+> @@ -5,6 +5,8 @@
+>   * Copyright (C) 2018, Red Hat, Inc.
+>   */
+>  #include "kvm_util.h"
+> +#include "processor.h"
+> +#include "sev.h"
+>  
+>  #define UCALL_PIO_PORT ((uint16_t)0x1000)
+>  
+> @@ -21,6 +23,10 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
+>  #define HORRIFIC_L2_UCALL_CLOBBER_HACK	\
+>  	"rcx", "rsi", "r8", "r9", "r10", "r11"
+>  
+> +	if (is_sev_es_enabled()) {
 
-I explored how TDX will use this hook.  However, it resulted in not using this
-hook, and instead used kvm_tdp_mmu_get_walk() with a twist.  The patch is below.
+No curly braces needed.
 
-Because SEV-SNP manages the RMP that is not tied to NPT directly, SEV-SNP can
-ignore TDP MMU page tables when updating RMP.
-On the other hand, TDX essentially updates Secure-EPT when it adds a page to
-the guest by TDH.MEM.PAGE.ADD().  It needs to protect KVM TDP MMU page tables
-with mmu_lock, not guest memfd file mapping with invalidate_lock.  The hook
-doesn't apply to TDX well.  The resulted KVM_TDX_INIT_MEM_REGION logic is as
-follows.
+> +		sev_es_ucall_port_write(UCALL_PIO_PORT, uc);
+> +	}
 
-  get_user_pages_fast(source addr)
-  read_lock(mmu_lock)
-  kvm_tdp_mmu_get_walk_private_pfn(vcpu, gpa, &pfn);
-  if the page table doesn't map gpa, error.
-  TDH.MEM.PAGE.ADD()
-  TDH.MR.EXTEND()
-  read_unlock(mmu_lock)
-  put_page()
+This will clearly fall through to the standard IN, which I suspect is wrong and
+only "works" because the only usage is a single GUEST_DONE(), i.e. no test
+actually resumes to this point.
+
+> +
+>  	asm volatile("push %%rbp\n\t"
+>  		     "push %%r15\n\t"
+>  		     "push %%r14\n\t"
+> @@ -48,8 +54,19 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
+>  
+>  	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
+>  		struct kvm_regs regs;
+> +		uint64_t addr;
+> +
+> +		if (vcpu->vm->subtype == VM_SUBTYPE_SEV_ES) {
+> +			TEST_ASSERT(
+
+No Google3 style please.  I'm going to start charging folks for these violations.
+I don't know _how_, but darn it, I'll find a way :-)
+
+> +				run->io.count == 8 && run->io.size == 1,
+> +				"SEV-ES ucall exit requires 8 byte string out\n");
+> +
+> +			addr = *(uint64_t *)((uint8_t *)(run) + run->io.data_offset);
+
+Rather than this amazing bit of casting, I'm tempted to say we should add
+kvm_vcpu_arch{} and then map the PIO page in vm_arch_vcpu_add().  Then this
+is more sanely:
+
+			return *(uint64_t *)vcpu->arch.pio);
+
+where vcpu->arch.pio is a "void *".  At least, I think that would work?
 
 
-From 7d4024049b51969a2431805c2117992fc7ec0981 Mon Sep 17 00:00:00 2001
-Message-ID: <7d4024049b51969a2431805c2117992fc7ec0981.1713913379.git.isaku.yamahata@intel.com>
-In-Reply-To: <cover.1713913379.git.isaku.yamahata@intel.com>
-References: <cover.1713913379.git.isaku.yamahata@intel.com>
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-Date: Tue, 23 Apr 2024 11:33:44 -0700
-Subject: [PATCH] KVM: x86/tdp_mmu: Add a helper function to walk down the TDP MMU
+> +			return (void *)addr;
+> +		}
+>  
+>  		vcpu_regs_get(vcpu, &regs);
+> +
 
-KVM_TDX_INIT_MEM_REGION needs to check if the given GFN is already
-populated.  Add wrapping logic to kvm_tdp_mmu_get_walk() to export it.
-
-Alternatives are as follows.  Choose the approach of this patch as the
-least intrusive change.
-- Refactor kvm page fault handler.  Populating part and unlock function.
-  The page fault handler to populate with keeping lock, TDH.MEM.PAGE.ADD(),
-  unlock.
-- Add a callback function to struct kvm_page_fault and call it
-  after the page fault handler before unlocking mmu_lock and releasing PFN.
-
-Based on the feedback of
-https://lore.kernel.org/kvm/ZfBkle1eZFfjPI8l@google.com/
-https://lore.kernel.org/kvm/Zh8DHbb8FzoVErgX@google.com/
-
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- arch/x86/kvm/mmu.h         |  3 +++
- arch/x86/kvm/mmu/tdp_mmu.c | 44 ++++++++++++++++++++++++++++++++------
- 2 files changed, 40 insertions(+), 7 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 712e9408f634..4f61f4b9fd64 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -287,6 +287,9 @@ extern bool tdp_mmu_enabled;
- #define tdp_mmu_enabled false
- #endif
- 
-+int kvm_tdp_mmu_get_walk_private_pfn(struct kvm_vcpu *vcpu, u64 gpa,
-+				     kvm_pfn_t *pfn);
-+
- static inline bool kvm_memslots_have_rmaps(struct kvm *kvm)
- {
- 	return !tdp_mmu_enabled || kvm_shadow_root_allocated(kvm);
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 3592ae4e485f..bafcd8aeb3b3 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -2035,14 +2035,25 @@ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
-  *
-  * Must be called between kvm_tdp_mmu_walk_lockless_{begin,end}.
-  */
--int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
--			 int *root_level)
-+static int __kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
-+				  bool is_private)
- {
- 	struct tdp_iter iter;
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	gfn_t gfn = addr >> PAGE_SHIFT;
- 	int leaf = -1;
- 
-+	tdp_mmu_for_each_pte(iter, mmu, is_private, gfn, gfn + 1) {
-+		leaf = iter.level;
-+		sptes[leaf] = iter.old_spte;
-+	}
-+
-+	return leaf;
-+}
-+
-+int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
-+			 int *root_level)
-+{
- 	*root_level = vcpu->arch.mmu->root_role.level;
- 
- 	/*
-@@ -2050,15 +2061,34 @@ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
- 	 * instructions in protected guest memory can't be parsed by VMM.
- 	 */
- 	if (WARN_ON_ONCE(kvm_gfn_shared_mask(vcpu->kvm)))
--		return leaf;
-+		return -1;
- 
--	tdp_mmu_for_each_pte(iter, mmu, false, gfn, gfn + 1) {
--		leaf = iter.level;
--		sptes[leaf] = iter.old_spte;
-+	return __kvm_tdp_mmu_get_walk(vcpu, addr, sptes, false);
-+}
-+
-+int kvm_tdp_mmu_get_walk_private_pfn(struct kvm_vcpu *vcpu, u64 gpa,
-+				     kvm_pfn_t *pfn)
-+{
-+	u64 sptes[PT64_ROOT_MAX_LEVEL + 1], spte;
-+	int leaf;
-+
-+	lockdep_assert_held(&vcpu->kvm->mmu_lock);
-+
-+	kvm_tdp_mmu_walk_lockless_begin();
-+	leaf = __kvm_tdp_mmu_get_walk(vcpu, gpa, sptes, true);
-+	kvm_tdp_mmu_walk_lockless_end();
-+	if (leaf < 0)
-+		return -ENOENT;
-+
-+	spte = sptes[leaf];
-+	if (is_shadow_present_pte(spte) && is_last_spte(spte, leaf)) {
-+		*pfn = spte_to_pfn(spte);
-+		return leaf;
- 	}
- 
--	return leaf;
-+	return -ENOENT;
- }
-+EXPORT_SYMBOL_GPL(kvm_tdp_mmu_get_walk_private_pfn);
- 
- /*
-  * Returns the last level spte pointer of the shadow page walk for the given
--- 
-2.43.2
-
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Spurious whitespace.
 
