@@ -1,129 +1,507 @@
-Return-Path: <kvm+bounces-15694-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15695-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D4CC8AF4DB
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 19:03:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E656C8AF594
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 19:36:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54AED286E03
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 17:03:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 148421C23DCD
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 17:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6035C13DBA7;
-	Tue, 23 Apr 2024 17:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EE613E029;
+	Tue, 23 Apr 2024 17:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F9A9Z/82"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ny/B0DKK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246FF13D8BA
-	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 17:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DF813DDA5;
+	Tue, 23 Apr 2024 17:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713891816; cv=none; b=cZXq5tqcdqhuJ9i2luC1IJjbkRasNHtjpEyndyWzQNmm2RJKJK7DIqLgROLK10r6bkXCfPQmqk40a0s1WdpPE4Nph144bauwpsBaPRRpxZb9JJkSRvM/JKJyQGGHAHalJ8q4/eWxe6wDLsX1NH6iyX+vh9Vop30HJ4hgMf9kmIU=
+	t=1713893802; cv=none; b=fWZPdaIhavwJAzln41dZqlDHAI+ydodHfN0zn63zX11VYWS8SGRHLrJIK9B2W86SI69D9sijFFVrC0X7XX6IR1SQzN+j313a8kwZxCDrWh+i4QNBiP7XCgtMh9CdiALZdjZlWblWicvAHhAnUEaC/mgfyLjt+qREtB6rKKHFWVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713891816; c=relaxed/simple;
-	bh=o9xoixdzamHVwV+JAQwhz22rzk+JkW3wBRWHkz/cgYY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DBRroVd9rp6ZKMrzlQzRlPDInROUu5w13y8i6/svRUv6EIxwaf0KrZK+xBSGY4RPZwAwy9XkK5e6eJw3sn6DgbYc0M69giXGQ1bdelr5XwPIe/9CnSe4meGLB4pyoFpPFvZwU1xT8NDehSz38LAeOOBbGGlqkPQs3K7No53oU9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F9A9Z/82; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3499f1bed15so28475f8f.1
-        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 10:03:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713891813; x=1714496613; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=o9xoixdzamHVwV+JAQwhz22rzk+JkW3wBRWHkz/cgYY=;
-        b=F9A9Z/82E+grWEq1Nbf+8OMZjwQPTDJz/AYZNtK+RcIGQn5NWlKChbu/dP+1y0MDCA
-         09n1XTTjTKQHJ7XWfhG0MQN2HcCXwZZVtudRzNUQ/VWrBLoIMGY3n9sCYTZ+/HoBf9t7
-         NsZbJcaD9ze4giTdDqgikcFjMZxAOXRvtcsNb81WEQJO/3dipBhwTOh0jBTMK/hj6lBH
-         A6Ipe9F2hBtepfYsG5MCoCjSRONxPkTz5eeT7QTC1RyyGtCigStC2wMcnw4gnxm6KJuf
-         oV5nOXK1TpSf/7svQ5y3cpA5ZD2H4N9qPfAUNv5+FDX13IWLbUIn+rx52FBIJm1TRvpg
-         kOYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713891813; x=1714496613;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=o9xoixdzamHVwV+JAQwhz22rzk+JkW3wBRWHkz/cgYY=;
-        b=XKazWsTj8/uU0GmrVBGW/cRlYUutwWF3wlwkhy0jnRrE5JKoV4O8Qh89cTi/QR3jzE
-         bZAFj+pWsgI7NYHyW7m48p/eECHkzBV95ENk5Te/UCHKtZKc8EhsSSkg7m7IfaOzR4PF
-         lOgikfzFCec7cEN6Adzw2hs9O6I3wUMlHkCaG5uVxI8SYe8ACAi/tlT+UNm6g5bEKzB6
-         nu1xAGhj5Vc4VKY+LU8ZWhLhNbbbWmZieVgP+hA9tb0ucI9Td3dwFbIYO89hV1oR8Zag
-         Rqc11CTm158n0d0HfV6n7bwj3oNOqLx2BXIwXSfdcoZbCTDCvTn32cumCqWVf7jnfzT6
-         6BEw==
-X-Forwarded-Encrypted: i=1; AJvYcCWbUSMR3ajhmRhXolOEF5p7VI0vNtcau3PQ/XKrzQQ7iIzSJ6esHa8c/+y1SNcJh23PzS5yofUuyCvpk7iGNELRZDzP
-X-Gm-Message-State: AOJu0YwlgVVDiZuAAlN50VYR7KEQfq0vRCkx6GqK4+MrDzsLZpJUipu2
-	m4pNYJQUYd1pFvFIAlzRAjBVngLfBvw3kayuN3BcwvS2KQUdek0mGfTIRbP+jxx/toWcUtvcnmJ
-	mlXzglFjRhpHTC+En/g2PP/k3e9YUVUqQ8MRl
-X-Google-Smtp-Source: AGHT+IHkNk+eRVsCXG1cexWzRfPbNYzRNhOHlM1lYyYp2XznI9Zqbvc/UpodHOa8Ojb+grhpOphL2W5/WWE9y6NnIyA=
-X-Received: by 2002:a5d:5188:0:b0:34b:3e51:fe38 with SMTP id
- k8-20020a5d5188000000b0034b3e51fe38mr33455wrv.23.1713891813220; Tue, 23 Apr
- 2024 10:03:33 -0700 (PDT)
+	s=arc-20240116; t=1713893802; c=relaxed/simple;
+	bh=Zx0864oyy3Ph86YyiP02gUe1pWKml50HSLPFun4xJAk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ghVG4yc0tDNpmaDjrJuYy0VVy6Jfsi+qhXJgWtco1fGp5I5OsY8NwyMvoWyVh46ep/1FPMPCPrQA6cnwB2XLMqDTUeTm1l80jQbw4eC9dj0juxjHYAvsbrzNWwKATx8J5nByLMN/IUtKKVqlTTZN/5a5PhuG/Nig3GzulOPZdjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ny/B0DKK; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713893800; x=1745429800;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Zx0864oyy3Ph86YyiP02gUe1pWKml50HSLPFun4xJAk=;
+  b=Ny/B0DKKexOZBPKkYqP6OrFYd2v8xE8Y/ndMYbve1MJP80UsYFDMcKig
+   zY3dn735EWmtdh23smI8O9Dj9ukz4CWD5utSRjQVZNsW0BDLe3fmvhoYa
+   JN8Tr/XeCczZsbFzzyt0+shBRcS++soJMIasfK6BHTU0CWiXYRQ/hJOZZ
+   hKLYWCLpq8FvFthtLZjWXvNQF7zO0Z245notvJFqbnz0qSlhl7ymFkO0K
+   ReIYX6Pm+Yi3D/pGk3Rl7xRQjvHU6wCEfV4dvaOUNzZwZg2e+Mmfa8GYc
+   WiWVqAhatZkv/Y5Icp0V7AAVLcOl2VTmiNHKN9lyukGBg0Z3IDYBAwHMB
+   Q==;
+X-CSE-ConnectionGUID: hR/Kk6gOSUm9QsyRJ9y6ww==
+X-CSE-MsgGUID: XDxeUURKRz69Sb+LqQXOew==
+X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="9712272"
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="9712272"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 10:36:39 -0700
+X-CSE-ConnectionGUID: ZzQnyCgMSyqamAXpFjQtrw==
+X-CSE-MsgGUID: yftLS/cVSKa8bY/oD9uhTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
+   d="scan'208";a="29097348"
+Received: from jacob-builder.jf.intel.com ([10.54.39.125])
+  by fmviesa004.fm.intel.com with ESMTP; 23 Apr 2024 10:36:38 -0700
+From: Jacob Pan <jacob.jun.pan@linux.intel.com>
+To: LKML <linux-kernel@vger.kernel.org>,
+	X86 Kernel <x86@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	iommu@lists.linux.dev,
+	Thomas Gleixner <tglx@linutronix.de>,
+	"Lu Baolu" <baolu.lu@linux.intel.com>,
+	kvm@vger.kernel.org,
+	Dave Hansen <dave.hansen@intel.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	"Borislav Petkov" <bp@alien8.de>,
+	"Ingo Molnar" <mingo@redhat.com>
+Cc: Paul Luse <paul.e.luse@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Jens Axboe <axboe@kernel.dk>,
+	Raj Ashok <ashok.raj@intel.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	maz@kernel.org,
+	seanjc@google.com,
+	"Robin Murphy" <robin.murphy@arm.com>,
+	jim.harris@samsung.com,
+	a.manzanares@samsung.com,
+	"Bjorn Helgaas" <helgaas@kernel.org>,
+	guang.zeng@intel.com,
+	robert.hoo.linux@gmail.com,
+	oliver.sang@intel.com,
+	acme@kernel.org,
+	Jacob Pan <jacob.jun.pan@linux.intel.com>
+Subject: [PATCH v3  00/12] Coalesced Interrupt Delivery with posted MSI
+Date: Tue, 23 Apr 2024 10:41:02 -0700
+Message-Id: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
- <Zhn9TGOiXxcV5Epx@google.com> <4c47b975-ad30-4be9-a0a9-f0989d1fa395@linux.intel.com>
- <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
- <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com> <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
- <Zh1mKoHJcj22rKy8@google.com> <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
- <Zh2uFkfH8BA23lm0@google.com> <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
- <ZiaX3H3YfrVh50cs@google.com> <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
- <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com> <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
- <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com> <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
- <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com> <b3868bf5-4e16-3435-c807-f484821fccc6@loongson.cn>
-In-Reply-To: <b3868bf5-4e16-3435-c807-f484821fccc6@loongson.cn>
-From: Mingwei Zhang <mizhang@google.com>
-Date: Tue, 23 Apr 2024 10:02:55 -0700
-Message-ID: <CAL715W++maAt2Ujfvmu1pZKS4R5EmAPebTU_h9AB8aFbdLFrTQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
- state for Intel CPU
-To: maobibo <maobibo@loongson.cn>
-Cc: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, peterz@infradead.org, 
-	kan.liang@intel.com, zhenyuw@linux.intel.com, jmattson@google.com, 
-	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
-	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-> >
-> > Maybe, (just maybe), it is possible to do PMU context switch at vcpu
-> > boundary normally, but doing it at VM Enter/Exit boundary when host is
-> > profiling KVM kernel module. So, dynamically adjusting PMU context
-> > switch location could be an option.
-> If there are two VMs with pmu enabled both, however host PMU is not
-> enabled. PMU context switch should be done in vcpu thread sched-out path.
->
-> If host pmu is used also, we can choose whether PMU switch should be
-> done in vm exit path or vcpu thread sched-out path.
->
+Hi Thomas and all,
 
-host PMU is always enabled, ie., Linux currently does not support KVM
-PMU running standalone. I guess what you mean is there are no active
-perf_events on the host side. Allowing a PMU context switch drifting
-from vm-enter/exit boundary to vcpu loop boundary by checking host
-side events might be a good option. We can keep the discussion, but I
-won't propose that in v2.
+This patch set is aimed to improve IRQ throughput on Intel Xeon by making use of
+posted interrupts.
 
-I guess we are off topic. Sean's suggestion is that we should put
-"perf" and "kvm" together while doing the context switch. I think this
-is quite reasonable regardless of the PMU context switch location.
+There is a session at LPC2023 IOMMU/VFIO/PCI MC where I have presented this
+topic.
 
-To execute this, I am thinking about adding a parameter or return
-value to perf_guest_enter() so that once it returns back to KVM, KVM
-gets to know which counters are active/inactive/cleared from the host
-side. Knowing that, KVM can do the context switch more efficiently.
+https://lpc.events/event/17/sessions/172/#20231115
 
-Thanks.
--Mingwei
+Background
+==========
+On modern x86 server SoCs, interrupt remapping (IR) is required and turned
+on by default to support X2APIC. Two interrupt remapping modes can be supported
+by IOMMU/VT-d:
+
+- Remappable 	(host)
+- Posted	(guest only so far)
+
+With remappable mode, the device MSI to CPU process is a HW flow without system
+software touch points, it roughly goes as follows:
+
+1.	Devices issue interrupt requests with writes to 0xFEEx_xxxx
+2.	The system agent accepts and remaps/translates the IRQ
+3.	Upon receiving the translation response, the system agent notifies the
+	destination CPU with the translated MSI
+4.	CPU's local APIC accepts interrupts into its IRR/ISR registers
+5.	Interrupt delivered through IDT (MSI vector)
+
+The above process can be inefficient under high IRQ rates. The notifications in
+step #3 are often unnecessary when the destination CPU is already overwhelmed
+with handling bursts of IRQs. On some architectures, such as Intel Xeon, step #3
+is also expensive and requires strong ordering w.r.t DMA. As a result, slower
+IRQ rates can become a limiting factor for DMA I/O performance.
+
+For example, on Intel Xeon Sapphire Rapids SoC, as more NVMe disks are attached
+to the same socket, FIO (libaio engine) 4K block random read performance
+per-disk drops quickly.
+
+# of disks  	2  	4  	8
+-------------------------------------
+IOPS(million)  	1.991	1.136  	0.834
+(NVMe Gen 5 Samsung PM174x)
+
+With posted mode enabled in interrupt remapping, the interrupt flow is divided
+into two parts: posting (storing pending IRQ vector information in memory) and
+CPU notification.
+
+The above remappable IRQ flow becomes the following (1 and 2 unchanged):
+3.	Notifies the destination CPU with a notification vector
+	- IOMMU suppresses CPU notification
+	- IOMMU atomic swap/store IRQ status to memory-resident posted interrupt
+	descriptor (PID)
+4.	CPU's local APIC accepts the notification interrupt into its IRR/ISR
+	registers
+5.	Interrupt delivered through IDT (notification vector handler)
+	System SW allows new notifications by clearing outstanding notification
+	(ON) bit in PID.
+(The above flow is not in Linux today since we only use posted mode for VM)
+
+Note that the system software can now suppress CPU notifications at runtime as
+needed. This allows the system software to coalesce the expensive CPU
+notifications and in turn, improve IRQ throughput and DMA performance.
+
+Consider the following scenario when MSIs arrive at a CPU in high-frequency
+bursts:
+
+Time ----------------------------------------------------------------------->
+    	^ ^ ^       	^ ^ ^ ^     	^   	^
+MSIs	A B C       	D E F G     	H   	I
+
+RI  	N  N'  N'     	N  N'  N'  N'  	N   	N
+
+PI  	N           	N           	N   	N
+
+RI: remappable interrupt;  PI:  posted interrupt;
+N: interrupt notification, N': superfluous interrupt notification
+
+With remappable interrupt (row titled RI), every MSI generates a notification
+event to the CPU.
+
+With posted interrupts enabled in this patch set (row titled PI), CPU
+notifications are coalesced during IRQ bursts. N's are eliminated in the flow
+above. We refer to this mechanism Coalesced Interrupt Delivery (CID).
+
+Post interrupts have existed for a long time, they have been used for
+virtualization where MSIs from directly assigned devices can be delivered to
+the guest kernel without VMM intervention. On x86 Intel platforms, posted
+interrupts can be used on the host as well. Only host physical address of
+Posted interrupt descriptor (PID) is used.
+
+This patch set enables a new usage of posted interrupts on existing (and
+new hardware) for host kernel device MSIs. It is referred to as Posted MSIs
+throughout this patch set.
+
+Performance (with this patch set):
+==================================
+Test #1. NVMe FIO
+
+FIO libaio (million IOPS/sec/disk) Gen 5 NVMe Samsung PM174x disks on a single
+socket, Intel Xeon Sapphire Rapids. Random read with 4k block size. NVMe IRQ
+affinity is managed by the kernel with one vector per CPU.
+
+#disks	Before		After		%Gain
+---------------------------------------------
+8	0.834		1.943		132%
+4	1.136		2.023		78%
+
+Other observations:
+- Increased block sizes shows diminishing benefits, e.g. with 4 NVME disks on
+one x16 PCIe slot, the combined IOPS looks like:
+
+    Block Size	Baseline	PostedMSI
+    -------------------------------------
+    4K		6475		8778
+    8K		5727		5896
+    16k		2864		2900
+    32k		1546		1520
+    128k	397		398
+
+- Submission/Completion latency (usec) also improved at 4K block size only
+  FIO report SLAT
+  ---------------------------------------
+  Block Size	Baseline	postedMSI
+  4k		2177		2282
+  8k		4416		3967
+  16k		2950		3053
+  32k		3453		3505
+  128k		5911		5801
+
+  FIO report CLAT
+  ---------------------------------------
+  Block Size	Baseline	postedMSI
+  4k		313		230
+  8k		352		343
+  16k		711		702
+  32k		1320		1343
+  128k		5146		5137
+
+
+Test #2. Intel Data Streaming Accelerator
+
+Two dedicated workqueues from two PCI root complex integrated endpoint
+(RCIEP) devices, pin IRQ affinity of the two interrupts to a single CPU.
+
+				Before		After		%Gain
+				-------------------------------------
+DSA memfill (mil IRQs/sec)	5.157		8.987		74%
+
+DMA throughput has similar improvements.
+
+At lower IRQ rate (< 1 million/second), no performance benefits nor regression
+observed so far.
+
+No harm tests also performed to ensure no performance regression on workloads
+that do not have high interrupt rate. These tests include:
+- kernel compile time
+- file copy
+- FIO NVME random writes
+
+Implementation choices:
+======================
+- Transparent to the device drivers
+
+- System-wide option instead of per-device or per-IRQ opt-in, i.e. once enabled
+  all device MSIs are posted. The benefit is that we only need to change IR
+  irq_chip and domain layer. No change to PCI MSI.
+  Exceptions are: IOAPIC, HPET, and VT-d's own IRQs
+
+- Limit the number of polling/demuxing loops per CPU notification event
+
+- Only change Intel-IR in IRQ domain hierarchy VECTOR->INTEL-IR->PCI-MSI,
+
+- X86 Intel only so far, can be extended to other architectures with posted
+  interrupt support (ARM and AMD), RFC.
+
+- Bare metal only, no posted interrupt capable virtual IOMMU.
+
+
+Changes and implications (moving from remappable to posted mode)
+===============================
+1. All MSI vectors are multiplexed into a single notification vector for each
+CPU MSI vectors are then de-multiplexed by SW, no IDT delivery for MSIs
+
+2. Losing the following features compared to the remappable mode (AFAIK, none of
+the below matters for device MSIs)
+- Control of delivery mode, e.g. NMI for MSIs
+- No logical destinations, posted interrupt destination is x2APIC
+  physical APIC ID
+- No per vector stack, since all MSI vectors are multiplexed into one
+
+
+Runtime changes
+===============
+The IRQ runtime behavior has changed with this patch, here is a pseudo trace
+comparison for 3 MSIs of different vectors arriving in a burst on the same CPU.
+A system vector interrupt (e.g. timer) arrives randomly.
+
+BEFORE:
+interrupt(MSI)
+    irq_enter()
+    handler() /* EOI */
+    irq_exit()
+        process_softirq()
+
+interrupt(timer)
+
+interrupt(MSI)
+    irq_enter()
+    handler() /* EOI */
+    irq_exit()
+        process_softirq()
+
+interrupt(MSI)
+    irq_enter()
+    handler() /* EOI */
+    irq_exit()
+        process_softirq()
+
+
+AFTER:
+interrupt /* Posted MSI notification vector */
+    irq_enter()
+	atomic_xchg(PIR)
+	handler()
+	handler()
+	handler()
+	pi_clear_on()
+    apic_eoi()
+    irq_exit()
+interrupt(timer)
+        process_softirq()
+
+With posted MSI (as pointed out by Thomas Gleixner), both high-priority
+interrupts (system interrupt vectors) and softIRQs are blocked during MSI vector
+demux loop. Some can be timing sensitive.
+
+Here are the options I have attempted or still working on:
+
+1. Use self-IPI to invoke MSI vector handler but that took away the majority of
+the performance benefits.
+
+2. Limit the # of demuxing loops, this is implemented in this patch. Note that
+today, we already allow one low priority MSI to block system interrupts. System
+vector can preempt MSI vectors without waiting for EOI but we have IRQ disabled
+in the ISR.
+
+Performance data (on DSA with MEMFILL) also shows that coalescing more than 3
+loops yields diminishing benefits. Therefore, the max loops for coalescing is
+set to 3 in this patch.
+	MaxLoop		IRQ/sec		bandwidth Mbps
+-------------------------------------------------------------------------
+	2		6157107 		25219
+	3		6226611 		25504
+	4		6557081 		26857
+	5		6629683 		27155
+	6		6662425 		27289
+
+3. limit the time that system interrupts can be blocked (WIP).
+
+In addition, posted MSI uses atomic xchg from both CPU and IOMMU. Compared to
+remappable mode, there may be additional cache line ownership contention over
+PID. However, we have not observed performance regression at lower IRQ rates.
+At high interrupt rate, posted mode always wins.
+
+Testing:
+========
+
+The following tests have been performed and continue to be evaluated.
+- IRQ affinity change, migration
+- CPU offlining
+- Multi vector coalescing
+- Low IRQ rate, general no-harm test
+- VM device assignment via VFIO
+- General no harm test, performance regressions have not been observed for low
+IRQ rate workload.
+
+
+With the patch, a new entry in /proc/interrupts is added.
+cat /proc/interrupts | grep PMN
+PMN:         13868907 Posted MSI notification event
+
+No change to the device MSI accounting.
+
+A new INTEL-IR-POST irq_chip is visible at IRQ debugfs, e.g.
+domain:  IR-PCI-MSIX-0000:6f:01.0-12
+ hwirq:   0x8
+ chip:    IR-PCI-MSIX-0000:6f:01.0
+  flags:   0x430
+             IRQCHIP_SKIP_SET_WAKE
+             IRQCHIP_ONESHOT_SAFE
+ parent:
+    domain:  INTEL-IR-12-13
+     hwirq:   0x90000
+     chip:    INTEL-IR-POST /* For posted MSIs */
+      flags:   0x0
+     parent:
+        domain:  VECTOR
+         hwirq:   0x65
+         chip:    APIC
+
+
+Acknowledgment
+==============
+
+- Rajesh Sankaran and Ashok Raj for the original idea
+
+- Thomas Gleixner for reviewing and guiding the upstream direction of PoC
+patches. Help correct my many misunderstandings of the IRQ subsystem.
+
+- Jie J Yan(Jeff), Sebastien Lemarie, and Dan Liang for performance evaluation
+with NVMe and network workload
+
+- Bernice Zhang and Scott Morris for functional validation
+
+- Michael Prinke helped me understand how VT-d HW works
+
+- Sanjay Kumar for providing the DSA IRQ test suite
+
+
+Changelogs (details in each patch):
+V3:
+- Add Intel flexible return and event delivery (FRED) support
+- Fix potential double EOI bug
+- Fix a bug in removing posted interrupt descriptor bitfields
+
+V2:
+- Code change logs are in individual patches.
+- Use "Originally-by" and "Suggested-by" tags to clarify
+  credits/responsibilities.
+- More performance evaluation done on FIO
+4K rand read test. Four Samsung PM174x NVMe drives on a single x16 PCIe gen5
+lane. Fixed CPU frequency at 2.7GHz (p1, highest non-turbo).
+
+      	    	IOPS*	CPU%	sys%	 user%	Ints/sec	IOPS/CPU	LAT**
+AIO (before)	6231	55.5	39.7	 15.8	5714721		112.2702703	328
+AIO (after)	8936	71.5	51.5	 20	7397543		124.979021	229
+
+IOURING(before)	6880	43.7	30.3	13.4	6512402		157.4370709	149
+IOURING(after)	8688	58.3	41.3	17	7625158		149.0222985	118
+
+IOURING POLLEDQ	13100	100	85.1	14.9	8000		131		156
+
+* x1000 4 drives combined
+** 95% usec.
+
+This patchset improves IOPS, IRQ throughput, and reduces latency for non-polled
+queues.
+
+V1 (since RFC)
+   - Removed mentioning of wishful features, IRQ preemption, separate and
+     full MSI vector space
+   - Refined MSI handler de-multiplexing loop based on suggestions from
+     Peter and Thomas. Reduced xchg() usage and code duplication
+   - Assign the new posted IR irq_chip only to device MSI/x, avoid changing
+     IO-APIC code
+   - Extract and use common code for preventing lost interrupt during
+     affinity change
+   - Added more test results to the cover letter
+
+
+
+Thanks,
+
+Jacob
+
+
+Jacob Pan (12):
+  KVM: VMX: Move posted interrupt descriptor out of vmx code
+  x86/irq: Unionize PID.PIR for 64bit access w/o casting
+  x86/irq: Remove bitfields in posted interrupt descriptor
+  x86/irq: Add a Kconfig option for posted MSI
+  x86/irq: Reserve a per CPU IDT vector for posted MSIs
+  x86/irq: Set up per host CPU posted interrupt descriptors
+  x86/irq: Factor out calling ISR from common_interrupt
+  x86/irq: Install posted MSI notification handler
+  x86/irq: Factor out common code for checking pending interrupts
+  x86/irq: Extend checks for pending vectors to posted interrupts
+  iommu/vt-d: Make posted MSI an opt-in cmdline option
+  iommu/vt-d: Enable posted mode for device MSIs
+
+ .../admin-guide/kernel-parameters.txt         |   1 +
+ arch/x86/Kconfig                              |  11 ++
+ arch/x86/entry/entry_fred.c                   |   2 +
+ arch/x86/include/asm/apic.h                   |  12 ++
+ arch/x86/include/asm/hardirq.h                |   6 +
+ arch/x86/include/asm/idtentry.h               |   6 +
+ arch/x86/include/asm/irq_remapping.h          |  11 ++
+ arch/x86/include/asm/irq_vectors.h            |   8 +-
+ arch/x86/include/asm/posted_intr.h            | 118 ++++++++++++
+ arch/x86/kernel/apic/vector.c                 |   5 +-
+ arch/x86/kernel/cpu/common.c                  |   3 +
+ arch/x86/kernel/idt.c                         |   3 +
+ arch/x86/kernel/irq.c                         | 172 ++++++++++++++++--
+ arch/x86/kvm/vmx/posted_intr.c                |   4 +-
+ arch/x86/kvm/vmx/posted_intr.h                |  93 +---------
+ arch/x86/kvm/vmx/vmx.c                        |   3 +-
+ arch/x86/kvm/vmx/vmx.h                        |   2 +-
+ drivers/iommu/intel/irq_remapping.c           | 113 +++++++++++-
+ drivers/iommu/irq_remapping.c                 |   9 +-
+ 19 files changed, 463 insertions(+), 119 deletions(-)
+ create mode 100644 arch/x86/include/asm/posted_intr.h
+
+-- 
+2.25.1
+
 
