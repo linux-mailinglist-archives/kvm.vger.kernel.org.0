@@ -1,121 +1,120 @@
-Return-Path: <kvm+bounces-15630-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15632-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 881238AE22E
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 12:29:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8BF8AE250
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 12:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6311F25CB8
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 10:29:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07AED283A95
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 10:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E23B65189;
-	Tue, 23 Apr 2024 10:28:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E60E626DF;
+	Tue, 23 Apr 2024 10:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Z3FH4zLE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="n7bpQhsf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFEE57303;
-	Tue, 23 Apr 2024 10:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D9A366;
+	Tue, 23 Apr 2024 10:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713868135; cv=none; b=i6/NpzemV+3kGA8lqW/YjAv3dj+jm3ylgC6q/jQusXuYIkjXo1S8vf6rQTC/+bCtOn65op/3xmGYsGBkfxuLs3GLfLQYhKPtP0lSxRqkoUf9K5xzEBTT7YKgceR6RVhFnVedQzc7VLZuH7aazPwRzdKkHJaHzPvuofFU8QhRy3A=
+	t=1713868540; cv=none; b=OWC9WZUMkhTGaStExwwnQDN2LoXe7SHbubJPrNVO3Kg+tcQS/AHTOofHzb8qsBi3g08NctbcoKHQTn9tlTvk3QphjPUgNhuSqJGRHjxSeBA9M5x6Hy/XvxCppVfBdRdCmI9rR7w3adcNvygJvGY98/xYFwtrK0Ynnbt2W3f9cBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713868135; c=relaxed/simple;
-	bh=uh3qowr3m7iMpEAznogEW2Z/W4vdpFPZBLkqnX3kXJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dQ/Fgl0byPTY0F4ZemaUcRx5dN+jdpKcW9+VTy83E6EP3dwZxhBtygcKGo8qeMbbi0/U71tQ7bwElKHY5UjrV2USI0+plGWlR2Hg/bYz2x5kaJdOKsJiuPsWa/+XEMhBuQba3YAofjP/7dN6IwbljWjFj34msFNG39vCH0gUI5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Z3FH4zLE; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C8C2540E0192;
-	Tue, 23 Apr 2024 10:28:50 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id K4TEGVbBZaV8; Tue, 23 Apr 2024 10:28:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1713868126; bh=c06iWq/U5QU79LoYabk6NNZS2MWKKgb0Cpqli/6PTJs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z3FH4zLEd5fO/jmwUKzXZVRNHTIcKRObRRp8a5M6PtmwkQjZ1og+lDQ0PUNGjvFZw
-	 5u34wtAYTjZTphebOJxFn9rcKnGTLn9Wr+a4EZbCe50NBnVxUQtX23qQabMWrrXkMx
-	 GZjVmxcn3LfHe4QWHKuGOkzGcCJ5feIXugB5CbtPuC02aAAEGTQJ8mzje4fAA7aesI
-	 m7NvwXgkE1IXo4MoB0JliP5XKJEgM041bjaapWGKi1ItjJrh+Nst1BYfmuIaVTdY8d
-	 XOGbfhKiaqHL90wTM/b5zdFD2TYm3wssUTcp0tCKpKT3O1nE74olmgY5csqVV4ZgwZ
-	 HhIm/jsSf1+LqoPQAI6bN9lyBQ8vtCFO70rPEFVuncQuYTk7K9i7RHsmZiPWYAwkuk
-	 A7XxLKJZSypuGSmpzEdMMWLi1mZbvn8mIOI/KK5mKhb6rxj9mOJEZhIrOhAdKyWcyG
-	 ssJ5sMKTUkZjhVy/vCtvLAEtSP/zG/ed17/wjodJY7zgGfr9FPIDH4WdwUA1X/hAks
-	 8eAKWWZrSbAMBU+Tl4ulBjxa8e4OeoSYxA5j1eW5l91WLGR1w87mZJMgXeCZWj5vYi
-	 DRsa5rfNkY9JuYyRzPHv0ECfD/f+LS1syX6eLLmwcW3iQofSQHZXTt5DMRjSx2UxrF
-	 pwlNX+kwDM0CujqWneLZSfUo=
-Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7939040E00B2;
-	Tue, 23 Apr 2024 10:28:35 +0000 (UTC)
-Date: Tue, 23 Apr 2024 12:28:29 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v8 06/16] virt: sev-guest: Move SNP Guest command mutex
-Message-ID: <20240423102829.GCZieNTcHyuAYMcRf5@fat_crate.local>
-References: <20240215113128.275608-1-nikunj@amd.com>
- <20240215113128.275608-7-nikunj@amd.com>
- <20240422130012.GAZiZfXM5Z2yRvw7Cx@fat_crate.local>
- <6a7a8892-bb8d-4f03-a802-d7eee48045b5@amd.com>
+	s=arc-20240116; t=1713868540; c=relaxed/simple;
+	bh=btRVjF9EZJO72pyvfqReK15CD7G/8b0lMxgTKU7v25Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y0Qtv1fvc8rtRtVjaevGlw3B3loB8XnHwYEEhJ1wN5l7qKt2Fn0cBCQ70hQ5Q85j2gyHtZi9cm+vOfQxrTHinmtfVAuXftTQoISREivOgSM14CRRj+uyX/1MbHTjUw4W7/TtrkP/wE2dfCxxuUFlNwI5fOFDgihpF+SfepAHF3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=n7bpQhsf; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43NAVIrG017974;
+	Tue, 23 Apr 2024 10:35:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=RLidVQvklFP/Wc6vuXQ/xuFQO3M7Y6qaT9nYLcfp+qg=;
+ b=n7bpQhsfyBZReAZDIl5T3sJ1c6+jVw4+mP1eF/JmkPqZ2GaaHdEb6BGCfjPg+DXeFlAs
+ 9HcBOVZb4WtnqA8Retd8cRq+M55Jj6QTD9sbWAMVdp4j/tb5g0f8YRlwTp4zTZh2Issi
+ BadsdLUtBhNDVXzSrJb9WEb2DyPNROpFQL6VnYoS1LA3cO7DMpzg5uBc2Dpl58z1mTkp
+ QFYyzPV2hlW1RGd1mxFud4VTXdeXb4XiklBKSH9DHbGWKxBlWXqFW56xYzYkgO2n7MaX
+ qbtMhiV5/yZZK+WukdiWl+SlpBtvPs6PSPFwGHX74KHjs4mJCHyXSPrI3HqmgCOmnuZQ uw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xp6d10nkt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Apr 2024 10:35:37 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43NAZapx026458;
+	Tue, 23 Apr 2024 10:35:36 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xp6d10nks-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Apr 2024 10:35:36 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43N96GcC028319;
+	Tue, 23 Apr 2024 10:35:35 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xmtr2ckkb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Apr 2024 10:35:35 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43NAZULx28639816
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Apr 2024 10:35:32 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 285612004E;
+	Tue, 23 Apr 2024 10:35:30 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AB44A2004B;
+	Tue, 23 Apr 2024 10:35:29 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 23 Apr 2024 10:35:29 +0000 (GMT)
+From: Nico Boehr <nrb@linux.ibm.com>
+To: frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [kvm-unit-tests PATCH v3 0/1] s390x: cmm: test no-translate bit after reset
+Date: Tue, 23 Apr 2024 12:34:58 +0200
+Message-ID: <20240423103529.313782-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <6a7a8892-bb8d-4f03-a802-d7eee48045b5@amd.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Dt_qoksTgtvdRRGAl51S44_cYpnme4QK
+X-Proofpoint-ORIG-GUID: IHoCCIuMy2z0MN-n-pfNMsXKC_Ijad0T
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-23_09,2024-04-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ suspectscore=0 adultscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
+ impostorscore=0 mlxlogscore=999 clxscore=1015 priorityscore=1501
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404230028
 
-On Tue, Apr 23, 2024 at 09:52:41AM +0530, Nikunj A. Dadhania wrote:
-> SNP guest messaging will be moving as part of sev.c, and Secure TSC code
-> will use this mutex.
+v3:
+---
+* fix specification exception when ESSA no-dat is not available
 
-No, this is all backwards.
+v2:
+---
+* fix reverse christmas tree
 
-You have a *static* function in sev-guest - snp_guest_ioctl- which takes
-an exported lock - snp_guest_cmd_lock - in order to synchronize with
-other callers which are only in that same sev-guest driver.
 
-Why do you even need the guest messaging in sev.c?
 
-I guess this: "Many of the required functions are implemented in the
-sev-guest driver and therefore not available at early boot."
+Nico Boehr (1):
+  s390x: cmm: test no-translate bit after reset
 
-But then your API is misdesigned: the lock should be private to sev.c
-and none of the callers should pay attention to grabbing it - the
-callers simply call the functions and underneath the locking works
-automatically for them - they don't care. Just like any other shared
-resource, users see only the API they call and the actual
-synchronization is done behind the scenes.
-
-Sounds like you need to go back to the drawing board and think how this
-thing should look like.
-
-And when you have it, make sure to explain the commit messages *why* it
-is done this way.
-
-Thx.
+ s390x/cmm.c | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
 -- 
-Regards/Gruss,
-    Boris.
+2.41.0
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
