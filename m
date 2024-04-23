@@ -1,203 +1,315 @@
-Return-Path: <kvm+bounces-15600-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15601-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325068ADCC7
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 06:23:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E08E8ADCCC
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 06:24:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 561CE1C2185D
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 04:23:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60E821C21B5D
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 04:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B351CFA8;
-	Tue, 23 Apr 2024 04:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994DE1F941;
+	Tue, 23 Apr 2024 04:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="cmMOyS3n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4D4xuL6R"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2048.outbound.protection.outlook.com [40.107.237.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A83D3208CB;
-	Tue, 23 Apr 2024 04:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.48
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713846176; cv=fail; b=CIVzdwM7BTX+ENHcV3TauxhIe4uEcHXq1iv9A961qMKIsI7DAiXVD4NcmbBQWYkOOs8UBfeDLPjZ45aRRblghoK/7UPaQjhvlgv52OWMOin2BVZdr0xLqHbprPj0EgGypgISZvP2EWGpiXHneUDKQL7SbbnhOCsKUVCjAP9tM6Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713846176; c=relaxed/simple;
-	bh=fx8DZOfd05GU/BIf+sOfLx+QLRR+BHL5NkB+SFrPzEE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IZkMWmgX5TPpCB16R4bTpwTxSC1dXgHZw00u7195TVgtkmpELuZZuiOOq3G8MRKb/0uo2u0m1ao6KIaPjOmoXCwi+Q5OHe0KChsm0VOHL6ozhgRFZPEuzymo7l852zgoYMYxHyQLpUgk01iCoeoEtrd28dgBLso9Ehlva8M8G1U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=cmMOyS3n; arc=fail smtp.client-ip=40.107.237.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qel6dRb+tuxyrQoVwD1lacrVnIPBy6LE5gTI3gVdeQRouWr8F/1hMK5Fa/VOQOX1c7MZAzYNd2RYM9nDbDLenDGzoX0/+o+d2Xl/2RXTswGRdYgVQayO0W+4LcRzcVvm5IB0N59BJDOLwvjVQ3SIpSR4XfC8ab2bfF/GqYkbxTHkA85EpeUwAdqny4U2KxVj8YxHBKb/kSubTDDitCzNr3z1Qt4HynQEOR+5+z9bL98jGrKtup3LaDYHIQA6tBM+ZkOQ8rMcZRzujKD64IWJ9PZKjIbQ6RpLQoN5ZDQ12v/TiEio141DONNsF7Har7PR+bIqQG7BQRHYfU/zay+HwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+N3x/H4IyIDfmFY8YBT2TdrNvENfKGnRAck4h8lVOaQ=;
- b=c5NtxgBH/OaPQxeDjTobRsjAfbhOocpceKYc0Y0+BSFScs7v31auhk6nF3qarDgIwgwvB0WZ+n45OMLIpHkGqgkjrHtrsBNbDqL3jsUWK6Hb/HYVsn6+m+jMOcj+cHQC3pICjcAxKQcB4fo/hb+W/qkE0feky7AvAs+14qr4/pQl7Mlclx6mkD7Xk9rePcppuXheMbpObRgg7fmZLozhRft0ztprlkgJT7WuJn49cOXEAdN8foi8FODwl4uM2ldS9/+pm0DvXOyjm16jVHdLjHKDSzLOTGKAVg0BQNzoqagi4gIpVocejMdJf6vrw/dahQA5jFQSN8VcaTavvO7mqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+N3x/H4IyIDfmFY8YBT2TdrNvENfKGnRAck4h8lVOaQ=;
- b=cmMOyS3nwF/n3UdbkxI20N0cbYXuAR8YwHMFvvqNBlH0Jgj7Sa1TRGn76g1iz+FDFEYAAQ8jx04sG9VuQdKkumOpLdh56nu1H56EWTaqznXJpEbmGv2iPQWkhN0tmA4fRjgqUcIHcjGutEdHOTPmDVorxAAUS+iyfKKZAAR4L4A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- DS0PR12MB8766.namprd12.prod.outlook.com (2603:10b6:8:14e::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.44; Tue, 23 Apr 2024 04:22:52 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec%4]) with mapi id 15.20.7472.044; Tue, 23 Apr 2024
- 04:22:52 +0000
-Message-ID: <6a7a8892-bb8d-4f03-a802-d7eee48045b5@amd.com>
-Date: Tue, 23 Apr 2024 09:52:41 +0530
-User-Agent: Mozilla Thunderbird
-Reply-To: nikunj@amd.com
-Subject: Re: [PATCH v8 06/16] virt: sev-guest: Move SNP Guest command mutex
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
- kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
- pbonzini@redhat.com
-References: <20240215113128.275608-1-nikunj@amd.com>
- <20240215113128.275608-7-nikunj@amd.com>
- <20240422130012.GAZiZfXM5Z2yRvw7Cx@fat_crate.local>
-Content-Language: en-US
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <20240422130012.GAZiZfXM5Z2yRvw7Cx@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0171.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:de::14) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E9C1CAA2
+	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 04:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713846256; cv=none; b=WU6y8vlNILvooUw6K+RwTZiAuBVP1+IwzYHsWSU+KxzUajbrKaIXaLzqJIgxNTK9IwLrGpCjaJG3kVMyoEsajndddffzKvOzmOF1JGdrNn5T9lvCDeF9MusmRtsETE1Iq20Ue6IW+BZi6OyKJ3hFMfhPLcDWhH0F+nxTP8BNAuc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713846256; c=relaxed/simple;
+	bh=d5MJ4e2a30eG+jDYKNT7mG9Gc/6eaI9RNoBEMPFEkhI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bp/s/QfFGBnxzB72GJEefy+WeZRAPQnwijZPFZrlRqbPez/SbPQFnNjzHbIo8Y/iZAG0SkFTzDqapzp89HER282hy7FTbLT6aiI9TLq7Ti5wIf7+77zpMlHMvlb9+H/xtpsPeSxLpUtZxBLGcaH6I9oRYwBC1M2abvBm+7CXlbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4D4xuL6R; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a5872419e31so110726666b.3
+        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 21:24:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713846253; x=1714451053; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5buiYtGazihCB3jxFyzdy4lm+my6nJSrcsNRV34lvg0=;
+        b=4D4xuL6RrYLKJ57dqdUwtENAhUfshdUvkani8En8wSqDPC0KoCmvI5pbPdReqeO/Y3
+         L6ugBUuH4yXYkeV1WTasxv6Hu5CwdabCypnv+rKWRAjDmMysqpMTZxn2gTUQqRP0Nb5F
+         frSFwcJcPwXYztG9qaV8PCcxT+ipd4wJea9rn6bMQMiWAvQXXugrQ0NSkyWsv6sPlHq6
+         2hgI4NpVDGo3iDRfvWHBmus/5V79Agsd1lTPQ0GUgCzQsQHoHcbuKSpeKqJOTouohybv
+         mu/5cto2ZZmiuufZNCSdnPaItJgr5t73FZ7mHE/FSxg8xDYG0Y1kDyTdkoWMzVZifzZq
+         4riQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713846253; x=1714451053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5buiYtGazihCB3jxFyzdy4lm+my6nJSrcsNRV34lvg0=;
+        b=wM4yPVdCwDdm2vN8r+U8YewOj1cmzn2gV9LigNrmn7bVWlaaszf291fJ0HECxSFTVH
+         F9kg+XxCQjQDT0EBk/dQRKqOCh9U3YACA/t7UtDu0/+ZNUuRYU6keEpJ5LKR5Vks11cl
+         qx6/jp9QS2/1p/nehxAujeF0/2eSGLkczd+gx3FvFzLfl5DpP/k6zRQ/qpX3qGcTjSbT
+         CKgSogmd7Wk/Pn9S7wCR4hRj8avc74TUxl0wkua0ceNXyTviDF5RpWLWYhKXr2CBkumO
+         JZMHtSha2DVyBjkUUEgHvVz/fubKetqJrj8kBXujHDuVXqix3ZBxg4W3qCbXBtDCSoVz
+         PTsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6w38Exba2Tl6x23PLeMJhpmfwddON4n53Xgg5Ni8zg8nEjHSovJar7Sq5b3+tN2Oe21fxOHnxuv4/wsIQoUpdWJ/X
+X-Gm-Message-State: AOJu0YyzzZxDOFXM3XmNtPfLJ1O/d86DStsStBV+XUN6LWbJWHNo31e8
+	cyTdeAyGtnVgvmO2y3O0BAnk6LuDlpKj5tCXZ/1HOruvp12wDmQbZR4v93/U9cgaWoS1hSrnCZm
+	fX1rEjZSXDvjsXLgVOzpWxEkqhliKuKx+Os4P
+X-Google-Smtp-Source: AGHT+IHdQXEwcHFSFhDGbTnONtQWhrAzJUB2mFSVSfODjnpVeSXfLG85RA6SDmD2hbWEVfwX2h852zzj28HGLIv+UH0=
+X-Received: by 2002:a17:906:4e82:b0:a55:b67a:c3ad with SMTP id
+ v2-20020a1709064e8200b00a55b67ac3admr2904085eju.73.1713846252447; Mon, 22 Apr
+ 2024 21:24:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|DS0PR12MB8766:EE_
-X-MS-Office365-Filtering-Correlation-Id: c03c2982-f3db-4210-d100-08dc634d0a74
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?VTN0S2xoNCtSSnNrTXBiYTBJR1BoK1A4a1FRUmFsQzNvZDJmcU5kakR1OWZC?=
- =?utf-8?B?cENDdEw2c2poTWNsMy9zSm55UkV6QUpoekNobXJFU0lpKytER05GTzc4VzlB?=
- =?utf-8?B?WGJTaFNuNVA2V3FtUnBxcXFGVzdBVEE2NWdjNUJ2LzM5Vml4NldBTE56alBJ?=
- =?utf-8?B?Q1BmcnpoNllHTy9xd04yVWxCRnJHQ1JCVEFGSEJCSWxrY2p3M1JMSXZNZGZh?=
- =?utf-8?B?K01CM0tiV0Y3SG42cnd4NEgzVnVvZ0pKZGFlWWZJakh0M3lJK0I0OW0xQ2JT?=
- =?utf-8?B?OFFmNzJWMTQrWkFiVCtKa3NhRjRZUU9FNFNiV1F6VG01NHBtYno2UkJMSk01?=
- =?utf-8?B?SGJhSzU2eFlySGtjeFNHQXIySTdYOHl1QWxyQnBtcmQ4SnF2d1c1TWNaWXJV?=
- =?utf-8?B?N3lVUzQ3Y0Y3cytQUkdaN1F0dVlKRTQwUHFPR1JpaDBxNUNGYTFlMmNzb0hT?=
- =?utf-8?B?TW1LSlh3R3dkOVFKSUZTWHZoOUxZZ0JPL2VzZ2RQUDlpQ2dxVEVZOVhuZXVT?=
- =?utf-8?B?bXJic0krRzlRZDZOT2NKMjcyTnhNZnFMTmh6bm9vNUZZd0NITEtMTTNxU25K?=
- =?utf-8?B?b2VpNld1K2NpZkMrOE5hQmlBZGE2QndTbGM5TzdMbnY5anFZSWhveG1naFZ2?=
- =?utf-8?B?dU1SVkFLeEpncWV1TTNjTi9BTnl4ckV4cWl6MlhzNzdJUC9zS1VtSGxvRHZB?=
- =?utf-8?B?MlZOakE4aEpPSlBvakFQTkJIZDFMV0tNb3JGdHQvanpRNUxCbVZSL2FuQ3lH?=
- =?utf-8?B?S1UxUGM1bkFHUit2UlA0M0tORHQ3QXhRWjRoUml0cVNqQzc3azFEc1lscm1j?=
- =?utf-8?B?U09MQXM2Qnh2b3lsaEhobWU1OWlyRXhablhsNU5YVWFweXF5YzRVcW9YTzJQ?=
- =?utf-8?B?eWNjQ2s4K3Z2N1JVRWNoRmtlbVAvNEtFWE5FWXk4dFp2ajNzRFpLNkt6TlBW?=
- =?utf-8?B?aThWbzBjemZjYmRrTFpRdm8rRDBlQ0dEKzlPU0k0U1licEdjamRiQVk0T3Va?=
- =?utf-8?B?S0Q2cHhqZE9HdGFLdmtjems2c3pYV21vVTU4R2FXK3hhNmV4TFEzR0hIeXNP?=
- =?utf-8?B?VDlFNXRNZ0RPVFBBYitJVVRBdTNNclM4aGdzeWxJcWJ1VEJ0L1U2STRrS0hI?=
- =?utf-8?B?UEYwNThJVHdqYXh6NHB6ZEZIR3dXczBDenhWM2RrUHJwWHRGTStmcWQzMzNW?=
- =?utf-8?B?ZW0zN3p6S2NDQXN5dEY3OHFwNTNOZDBYcGtPTWp3RWdRMmw4NmkvSGVhU3V3?=
- =?utf-8?B?QXJINlkvejA0Ull6SEdGQy9XRkNYRjBocUp1WWhuQzRJTDF4SElzSzZCVUVS?=
- =?utf-8?B?bVVlUjU4V3VKWURnUko2eGNiOWlRWkcvS3Q4WlVuOGVBcFp6K3ZEa1h1a3cy?=
- =?utf-8?B?Si94ZlJEYkRGMFVycVlWY01LTkU3SW9jOWVuQ25MWHVjZkttMTdTWVl4Nldu?=
- =?utf-8?B?a3NFMXdacjNLRzd6UGxUNUE0NXRrUDZjeHp6em1aeEJEYU5lUnVQTDR1V0ZN?=
- =?utf-8?B?SFFLSU1raTdrSEJXOCs4UUVPR1hRalRLRTJSMGQvam9KTDVlNlpzNGM5TGdY?=
- =?utf-8?B?ejQ4S3YwVTJVcVFUNFFwcW4vKzRBR0RmMzhySDBwa1RXVUtVMXU4NkY5T2k0?=
- =?utf-8?B?TlBVcUV0R1pMZFdNcVlGc2R3REZhbTdReG4vVGxMNUhXTjVwMjlXdnNkMW9N?=
- =?utf-8?B?RjQzSS9VMHFDY1lYWnovak9MbXM5bUNOWnB2MW44OVg2ME1oUE5vcERnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(7416005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QURVRExZNkRpNmlGK1JjOERIUyt6NjdCUkk1b1JydmZTN3cyZkhFbWhNNWdP?=
- =?utf-8?B?VEdLbWZkdkE5QnFuNUFoUzh5NXNpN2ZGMnVLR3pQZmlWdkJNT1FXM0h3Qm94?=
- =?utf-8?B?SVJ3VjB6VXlIV1NYNnBzSnlCbGN2VmJlSlEwUml6aGFTVXRZNmNMWFNMRUps?=
- =?utf-8?B?U2diMHRDeklWWm1HZHIrVjRONTA0V2VIaVVldnBpK29XNkxNbDJ1NnZYYUcr?=
- =?utf-8?B?SnRNclQ1Y3E3N2p0alhGUHhkRmlGN2QySHpnV09HdTVBbTRsZFl0NDROaUdW?=
- =?utf-8?B?M2QwYjk5Vm9oeERZbGo2ajNkdThCdVUzdEluRFczUmhDQkFpWDBROVRiUG0r?=
- =?utf-8?B?eHNVQmx2TzNFSWRmei9RODdWd1pTQ2d1UUozbE9YMFMveWpUWUtTcndacG9E?=
- =?utf-8?B?VzZuSFd0cFAyVjhoL1dETjhtUHdPazZyV1lNRTlFZlo5V2YvWW8rUFRENzho?=
- =?utf-8?B?T3J4ZkwxZnVHZlJDTFVNVmtNcE5PRzBTandLRWI0dU1BaDIyc3BTcmhQdjli?=
- =?utf-8?B?dGJKVlVmWWFSZC9zUFBpMFNZRjAzVFNRSVZMRFNKVU9PWmNkdThBYWcwU25v?=
- =?utf-8?B?SkR4Qm13M2FvOFl3a0FHK0lNWUFnMENxZTdYTVFvRWlqSGN4ODlaTENSazB0?=
- =?utf-8?B?YmxMb3Vad0wxbnJSMXJXY3Qrc3pKZHdTVE1qQ1ZjaVVsSkpXc2Z6UFVnZmls?=
- =?utf-8?B?YUxabll3dXNhZ1lqa0pOQi91Zy8xenpOQXprcHFIaTVMWHV1RWZyQXZ6NDZi?=
- =?utf-8?B?RUpPSTFOdWVDVWRjWHpPY3grYnRmbUZKZk9IanN6N1FVMnBmVjJwYTBHbWN0?=
- =?utf-8?B?YkVmWERUN1V1Z2wxWHVIam8zOVlEeC9qaUtob0pQMjFmQjNEclJaeVU4cVBL?=
- =?utf-8?B?Rm9qRTJBcUZnRGhWd1Bxd2gxTi8xb0Y4Uy8wNkhka3Vmc0VvbHFxZWxLNnVQ?=
- =?utf-8?B?NFVOOXdvNGR6MmtwbXpoRTU5ZW4wcFRkc0QrYjRJdTFPMUIrVUwrbzQ4VGR6?=
- =?utf-8?B?eWMvclRLNzlmeHVuZTAwdEx1MXV6TEJXOHhrTWl4b3plcTdsbzh4T0thYSs4?=
- =?utf-8?B?NkdaYytkUER3Y2h4VkVDL21aUWFFZmhIdDhDWDBPejRwZXVRQ1NHd3V4VnJZ?=
- =?utf-8?B?a09ZWEFrSTBnZlVmVXpEMWF5ZTRzWlV3M2tpaWpwMVFtZ1AzSnB2ODdIbnlT?=
- =?utf-8?B?R2J2WGxmeVo5WGhxcW44OGNaekdKYlN5YkRQbWk5QlVIby9nQ1R0eUZoM3Nk?=
- =?utf-8?B?V0xMVnJnbUg1MFpHWXdoYzFBaTZWNzJlWlBDSURBbzJwSkFjYzlsR095S01v?=
- =?utf-8?B?SXVoS0prTGU3YVZBSlBaME9FQ3ZDNFo4SXZDQUFoN24zMGw3bTRtL1VVQ1Ur?=
- =?utf-8?B?L0NPbDNFZFJIcWdUWmtnN2VPYmJEZ3NhcGtMSllLdGlIM1c1UVI4eDFwNUNI?=
- =?utf-8?B?cDZpc3k5Wkh1cFdjMUZJb1BZUUxVZHQ4cCt1QXRQeFJHcFFOL3RUVy8zTzRl?=
- =?utf-8?B?c2kvOU02Z1hzekRvcmpuWGdPR2kybFJHQlF2LzRDcUxLNzZpV0xUcFJoOUxy?=
- =?utf-8?B?Q0F6dUdFOXc1c2JpMHpSWkVaQ3lOZFlTdkpvSVVJYjAyTmg5a0tvWW5tVjJG?=
- =?utf-8?B?UFJoSzZoYUQvL1VkZ2RKYzJXS0E0T245RnJpSTFXOXBCYzRmc3N4bGg1OW0x?=
- =?utf-8?B?U1ZrQzVVSk1iakluRUN0SnI3QkJQdU1jOEtOdGdEbXhtWkI2TFdYMWIvRERS?=
- =?utf-8?B?VFVzRXN1M0ZoRis5VXY0VytTU1dQZjJWbVM4THBpdXZ6cUluYmxNYTZOSlZr?=
- =?utf-8?B?aEVhTWRUUDhxMW5WTWJiSXpkeUZXMVhTLzZHbThack4yb2NFQnJueEM1TERC?=
- =?utf-8?B?WjdlaURrYzkvTHFRNEtGSUEzazk3a0l2L2FRQzJVU0xHWVgrMUkwak5mYXlk?=
- =?utf-8?B?L3piTFZKOWJhZDN2aHhJM2c5T0NtMDdiWWd5Sm5yN0tIWElFcGUvQytCNGxo?=
- =?utf-8?B?SGxiVGJONmtYQjVtK1Q5eFN3Rm5vV3RacVFBZGJHdUR2b040bzcyQ0xJWTR0?=
- =?utf-8?B?M0dHbjNBVXJHTS9zQnZwZ01wQUpSaWNpL3k0RTBmMy9kQW4yVlJXOTMxdm1r?=
- =?utf-8?Q?o1pUohlJIbMXjM/SigaKFCdOp?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c03c2982-f3db-4210-d100-08dc634d0a74
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 04:22:52.2341
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: d5VLk8TJzo0KtS0m1Bs6Oa5iC/PguNz6uOxH2AEFELlaIkIn6imwCjZhEZGmJEeT9kl9CM8CMDQE6NIMpOEblg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8766
+References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <Zhn9TGOiXxcV5Epx@google.com> <4c47b975-ad30-4be9-a0a9-f0989d1fa395@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com> <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com> <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
+ <Zh2uFkfH8BA23lm0@google.com> <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
+ <ZiaX3H3YfrVh50cs@google.com> <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
+ <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com> <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
+ <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com> <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
+In-Reply-To: <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
+From: Mingwei Zhang <mizhang@google.com>
+Date: Mon, 22 Apr 2024 21:23:35 -0700
+Message-ID: <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: maobibo <maobibo@loongson.cn>
+Cc: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, peterz@infradead.org, 
+	kan.liang@intel.com, zhenyuw@linux.intel.com, jmattson@google.com, 
+	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/22/2024 6:30 PM, Borislav Petkov wrote:
-> On Thu, Feb 15, 2024 at 05:01:18PM +0530, Nikunj A Dadhania wrote:
->> SNP command mutex is used to serialize the shared buffer access, command
->> handling and message sequence number races. Move the SNP guest command
->> mutex out of the sev guest driver and provide accessors to sev-guest
-> 
-> And why in the hell are we doing this?
+On Mon, Apr 22, 2024 at 8:55=E2=80=AFPM maobibo <maobibo@loongson.cn> wrote=
+:
+>
+>
+>
+> On 2024/4/23 =E4=B8=8A=E5=8D=8811:13, Mi, Dapeng wrote:
+> >
+> > On 4/23/2024 10:53 AM, maobibo wrote:
+> >>
+> >>
+> >> On 2024/4/23 =E4=B8=8A=E5=8D=8810:44, Mi, Dapeng wrote:
+> >>>
+> >>> On 4/23/2024 9:01 AM, maobibo wrote:
+> >>>>
+> >>>>
+> >>>> On 2024/4/23 =E4=B8=8A=E5=8D=881:01, Sean Christopherson wrote:
+> >>>>> On Mon, Apr 22, 2024, maobibo wrote:
+> >>>>>> On 2024/4/16 =E4=B8=8A=E5=8D=886:45, Sean Christopherson wrote:
+> >>>>>>> On Mon, Apr 15, 2024, Mingwei Zhang wrote:
+> >>>>>>>> On Mon, Apr 15, 2024 at 10:38=E2=80=AFAM Sean Christopherson
+> >>>>>>>> <seanjc@google.com> wrote:
+> >>>>>>>>> One my biggest complaints with the current vPMU code is that
+> >>>>>>>>> the roles and
+> >>>>>>>>> responsibilities between KVM and perf are poorly defined, which
+> >>>>>>>>> leads to suboptimal
+> >>>>>>>>> and hard to maintain code.
+> >>>>>>>>>
+> >>>>>>>>> Case in point, I'm pretty sure leaving guest values in PMCs
+> >>>>>>>>> _would_ leak guest
+> >>>>>>>>> state to userspace processes that have RDPMC permissions, as
+> >>>>>>>>> the PMCs might not
+> >>>>>>>>> be dirty from perf's perspective (see
+> >>>>>>>>> perf_clear_dirty_counters()).
+> >>>>>>>>>
+> >>>>>>>>> Blindly clearing PMCs in KVM "solves" that problem, but in
+> >>>>>>>>> doing so makes the
+> >>>>>>>>> overall code brittle because it's not clear whether KVM _needs_
+> >>>>>>>>> to clear PMCs,
+> >>>>>>>>> or if KVM is just being paranoid.
+> >>>>>>>>
+> >>>>>>>> So once this rolls out, perf and vPMU are clients directly to
+> >>>>>>>> PMU HW.
+> >>>>>>>
+> >>>>>>> I don't think this is a statement we want to make, as it opens a
+> >>>>>>> discussion
+> >>>>>>> that we won't win.  Nor do I think it's one we *need* to make.
+> >>>>>>> KVM doesn't need
+> >>>>>>> to be on equal footing with perf in terms of owning/managing PMU
+> >>>>>>> hardware, KVM
+> >>>>>>> just needs a few APIs to allow faithfully and accurately
+> >>>>>>> virtualizing a guest PMU.
+> >>>>>>>
+> >>>>>>>> Faithful cleaning (blind cleaning) has to be the baseline
+> >>>>>>>> implementation, until both clients agree to a "deal" between the=
+m.
+> >>>>>>>> Currently, there is no such deal, but I believe we could have
+> >>>>>>>> one via
+> >>>>>>>> future discussion.
+> >>>>>>>
+> >>>>>>> What I am saying is that there needs to be a "deal" in place
+> >>>>>>> before this code
+> >>>>>>> is merged.  It doesn't need to be anything fancy, e.g. perf can
+> >>>>>>> still pave over
+> >>>>>>> PMCs it doesn't immediately load, as opposed to using
+> >>>>>>> cpu_hw_events.dirty to lazily
+> >>>>>>> do the clearing.  But perf and KVM need to work together from the
+> >>>>>>> get go, ie. I
+> >>>>>>> don't want KVM doing something without regard to what perf does,
+> >>>>>>> and vice versa.
+> >>>>>>>
+> >>>>>> There is similar issue on LoongArch vPMU where vm can directly pmu
+> >>>>>> hardware
+> >>>>>> and pmu hw is shard with guest and host. Besides context switch
+> >>>>>> there are
+> >>>>>> other places where perf core will access pmu hw, such as tick
+> >>>>>> timer/hrtimer/ipi function call, and KVM can only intercept
+> >>>>>> context switch.
+> >>>>>
+> >>>>> Two questions:
+> >>>>>
+> >>>>>   1) Can KVM prevent the guest from accessing the PMU?
+> >>>>>
+> >>>>>   2) If so, KVM can grant partial access to the PMU, or is it all
+> >>>>> or nothing?
+> >>>>>
+> >>>>> If the answer to both questions is "yes", then it sounds like
+> >>>>> LoongArch *requires*
+> >>>>> mediated/passthrough support in order to virtualize its PMU.
+> >>>>
+> >>>> Hi Sean,
+> >>>>
+> >>>> Thank for your quick response.
+> >>>>
+> >>>> yes, kvm can prevent guest from accessing the PMU and grant partial
+> >>>> or all to access to the PMU. Only that if one pmu event is granted
+> >>>> to VM, host can not access this pmu event again. There must be pmu
+> >>>> event switch if host want to.
+> >>>
+> >>> PMU event is a software entity which won't be shared. did you mean if
+> >>> a PMU HW counter is granted to VM, then Host can't access the PMU HW
+> >>> counter, right?
+> >> yes, if PMU HW counter/control is granted to VM. The value comes from
+> >> guest, and is not meaningful for host.  Host pmu core does not know
+> >> that it is granted to VM, host still think that it owns pmu.
+> >
+> > That's one issue this patchset tries to solve. Current new mediated x86
+> > vPMU framework doesn't allow Host or Guest own the PMU HW resource
+> > simultaneously. Only when there is no !exclude_guest event on host,
+> > guest is allowed to exclusively own the PMU HW resource.
+> >
+> >
+> >>
+> >> Just like FPU register, it is shared by VM and host during different
+> >> time and it is lately switched. But if IPI or timer interrupt uses FPU
+> >> register on host, there will be the same issue.
+> >
+> > I didn't fully get your point. When IPI or timer interrupt reach, a
+> > VM-exit is triggered to make CPU traps into host first and then the hos=
+t
+> yes, it is.
 
-SNP guest messaging will be moving as part of sev.c, and Secure TSC code
-will use this mutex.
- 
-> Always, *ALWAYS* make sure a patch's commit message answers *why*
-> a change is done. This doesn't explain why so I'm reading "just because"
-> and "just because" doesn't fly.
+This is correct. And this is one of the points that we had debated
+internally whether we should do PMU context switch at vcpu loop
+boundary or VM Enter/exit boundary. (host-level) timer interrupt can
+force VM Exit, which I think happens every 4ms or 1ms, depending on
+configuration.
 
-Sure, will change.
+One of the key reasons we currently propose this is because it is the
+same boundary as the legacy PMU, i.e., it would be simple to propose
+from the perf subsystem perspective.
 
-> 
->> driver. Remove multiple lockdep check in sev-guest driver, next patch adds
->> a single lockdep check in snp_send_guest_request().
-> 
-> The concept of "next patch" is meaningless once the patch is in git.
+Performance wise, doing PMU context switch at vcpu boundary would be
+way better in general. But the downside is that perf sub-system lose
+the capability to profile majority of the KVM code (functions) when
+guest PMU is enabled.
 
-Sure. As direct access to the mutex was not available now, I had removed lockdep
-check here and documented that lockdep gets added at later point.
+>
+> > interrupt handler is called. Or are you complaining the executing
+> > sequence of switching guest PMU MSRs and these interrupt handler?
+> In our vPMU implementation, it is ok if vPMU is switched in vm exit
+> path, however there is problem if vPMU is switched during vcpu thread
+> sched-out/sched-in path since IPI/timer irq interrupt access pmu
+> register in host mode.
 
-Regards
-Nikunj
- 
+Oh, the IPI/timer irq handler will access PMU registers? I thought
+only the host-level NMI handler will access the PMU MSRs since PMI is
+registered under NMI.
 
+In that case, you should disable  IRQ during vcpu context switch. For
+NMI, we prevent its handler from accessing the PMU registers. In
+particular, we use a per-cpu variable to guard that. So, the
+host-level PMI handler for perf sub-system will check the variable
+before proceeding.
+
+>
+> In general it will be better if the switch is done in vcpu thread
+> sched-out/sched-in, else there is requirement to profile kvm
+> hypervisor.Even there is such requirement, it is only one option. In
+> most conditions, it will better if time of VM context exit is small.
+>
+Performance wise, agree, but there will be debate on perf
+functionality loss at the host level.
+
+Maybe, (just maybe), it is possible to do PMU context switch at vcpu
+boundary normally, but doing it at VM Enter/Exit boundary when host is
+profiling KVM kernel module. So, dynamically adjusting PMU context
+switch location could be an option.
+
+> >
+> >
+> >>
+> >> Regards
+> >> Bibo Mao
+> >>>
+> >>>
+> >>>>
+> >>>>>
+> >>>>>> Can we add callback handler in structure kvm_guest_cbs?  just like
+> >>>>>> this:
+> >>>>>> @@ -6403,6 +6403,7 @@ static struct perf_guest_info_callbacks
+> >>>>>> kvm_guest_cbs
+> >>>>>> =3D {
+> >>>>>>          .state                  =3D kvm_guest_state,
+> >>>>>>          .get_ip                 =3D kvm_guest_get_ip,
+> >>>>>>          .handle_intel_pt_intr   =3D NULL,
+> >>>>>> +       .lose_pmu               =3D kvm_guest_lose_pmu,
+> >>>>>>   };
+> >>>>>>
+> >>>>>> By the way, I do not know should the callback handler be triggered
+> >>>>>> in perf
+> >>>>>> core or detailed pmu hw driver. From ARM pmu hw driver, it is
+> >>>>>> triggered in
+> >>>>>> pmu hw driver such as function kvm_vcpu_pmu_resync_el0,
+> >>>>>> but I think it will be better if it is done in perf core.
+> >>>>>
+> >>>>> I don't think we want to take the approach of perf and KVM guests
+> >>>>> "fighting" over
+> >>>>> the PMU.  That's effectively what we have today, and it's a mess
+> >>>>> for KVM because
+> >>>>> it's impossible to provide consistent, deterministic behavior for
+> >>>>> the guest.  And
+> >>>>> it's just as messy for perf, which ends up having wierd, cumbersome
+> >>>>> flows that
+> >>>>> exists purely to try to play nice with KVM.
+> >>>> With existing pmu core code, in tick timer interrupt or IPI function
+> >>>> call interrupt pmu hw may be accessed by host when VM is running and
+> >>>> pmu is already granted to guest. KVM can not intercept host
+> >>>> IPI/timer interrupt, there is no pmu context switch, there will be
+> >>>> problem.
+> >>>>
+> >>>> Regards
+> >>>> Bibo Mao
+> >>>>
+> >>
+>
 
