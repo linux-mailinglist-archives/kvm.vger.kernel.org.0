@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-15717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C4848AF722
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 21:17:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 173548AF760
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 21:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E8681C2503E
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 19:17:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 693E128E512
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 19:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92D01411F4;
-	Tue, 23 Apr 2024 19:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9165A1420A2;
+	Tue, 23 Apr 2024 19:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cnyJSpdt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bejwwv9B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F77B13F452
-	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 19:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBD628DC9
+	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 19:31:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713899814; cv=none; b=DRKgTRBw36sg0/hgg3QHllAg/VaT0RvmVRoIQT61R8HO4g41k+GrXup8g5Laqubf6ytUDWkr25OCEd4b1IIm36awk/12TusSiGTIIK0VJTuXrOkqlym89mHL4aNRFdevWZpeTCyVGYwd4WMQhdkTUgDsJG9qqEy3SttWhObUcXk=
+	t=1713900678; cv=none; b=V+toVII5afWvESNR/AEMVAD+6GMnZ1PPitWqlZa0pehiYOKwXfYQcDqy6YBohqZgEMlnW+89/ZolbY7ldVvDybSpWvykA1OHXtgcx+nnyNXz/rSmSgoVPv00346CALAgaNDiFYGMlAdvFED4BhteRoAYl7mPkyPKQ5qF+bqzWcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713899814; c=relaxed/simple;
-	bh=rKJ3l5PngsMhhUsgGiBJulPEoC22NhzF9omTbh59/TI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GzYqkS//kF5bk/Wl9KC9n2wL2Bm0/4+9Mfdf/jQnktm1JVvuTUnezAnMC+IbZePXcxM7twrxmcALW4pV/VboOg6b8oC655INPLkM1uxsCEWEegSF8WAXtUroPzTDrYldhotK7HqKHNnR0hWGuDzwK8K3wp9RGokMT0xTVdiMAQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cnyJSpdt; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1713900678; c=relaxed/simple;
+	bh=pX57Y6XlFKZYwd03wMkqJ+QIFxH0zXzVOyC6BvIPIOg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TBdT4eXq9yBDWbx4rlINRk2qFmA4Bf2H8EQKQAHvCj+06vwhDFyjKdsrqLKS48M5TSFc9WBCPwt5IhjrdsehtRnxZY+I2mCp9xQP/yqx/cRummRDw4SxwO+MN21nlSQVm7VqkgCBWy0VR93cJxTfPwuwFWrAQSmCDKPcPHsbvTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bejwwv9B; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ac3403b27eso6530162a91.0
-        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 12:16:52 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso140305a12.0
+        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 12:31:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713899812; x=1714504612; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713900677; x=1714505477; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8B8BJDQiGUAbI0tZGCCPFyop6LA8Xy8bkwpS740fWe0=;
-        b=cnyJSpdtTy358I3qXwRZOR0UkyGFGx7akqv6eOLaC4uZZgfLJ6vdUg6NKbsrU/hmgE
-         3oRc87Nls3lX5EXG/tMfHyRrZ2PASYUXnwMXX48jTeYkzl2EGifKYzv+0T+BVnWpUIWX
-         ikuqSatc4QLoPC5nsoo8ygJru5Cs6YquwMs0hQsEtt5UEC9DvdLgPZU6//0cSqbUn/X2
-         C+g3sb5CUjC2CsYPpTYeVn9aoW2Jeb5rRq27m1tU0Fd1NpOuUp1taAjHYD6ApByS22zF
-         E/CTHYuuvWPN7itfVNtwnK8OVN6UBh/K1AHpo1TYouPulANPreXtfm4LCs7sW8XgzhI3
-         Iy4g==
+        bh=33HaUK27eQEsf0SwhUwMOu7mNxxUSSq/moN8WNrpJ54=;
+        b=Bejwwv9BznF5OtcvXaZQuWkDtQV13RMrI0azYPJrNNfP+07DWv0M/sixTj+qSIuvE/
+         IkJHNe74EanEiIPIs2VmcpnEfMwnfH/FM1PwK83Dwrmz1tuNlYlCZdaquwP21oBCRmFL
+         KGwxKw5dFct6k9nikF1aox3GUVPa7ponAqb7DZG/S0V0rHRcEzHgH8rkJ6+giWUoG78q
+         d1Ub8kbdfoqrVwohWP7PG0dGhsir0Xl1Q6+NklFrebVvxdPtvxz7LgLoNdbYPWQ0UIww
+         OqL/2F2RlR220F3w37r0RU52V8aPKhpBl2Un9QKkvQs3+dkndxLMk8cy4tLucQlYxNGo
+         gWXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713899812; x=1714504612;
+        d=1e100.net; s=20230601; t=1713900677; x=1714505477;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8B8BJDQiGUAbI0tZGCCPFyop6LA8Xy8bkwpS740fWe0=;
-        b=UT5CMHl8E4rXflkQdreBI6eDdbLHSL82kf33ScpzEISc78qNL4mkD0apRbQQ9qDVbj
-         2n3CUDz+FMtOLpIggle1AzfB22hNI4CiDPtiAKTjRxgzZ9SH6b3xW24it/Pdoe3pBBoU
-         9AYlKAR1mbyigZiqwm5eT6a9lIJHFdzKqLBqvRiHLx0+6LhWGQqfosXrMuRgdZoCPK7L
-         5rO15L98beKSlcnF+K4Ydpol1e1r6zTebYKL3vsyzeoM9rmkOEFrLL7uuK15uRfyOlAc
-         9EjwMHLr07rFbXFWTY7542HFdPdrMGWJgkYkYDt615zDmdFo6fohYtHC8XfdnYdGL74N
-         cwQQ==
-X-Gm-Message-State: AOJu0YwgBlBuJagMdyC00M6BqgzVd/EcnWMdFKtsQu1FajsudbbwuYAL
-	ktD98L4v4qDAeIFy06sOVIovqSfpw4lzAEgjDfMnA5609Jn5QckyoaCQ9s9Jg7uNy87flbmeFE0
-	l1g==
-X-Google-Smtp-Source: AGHT+IHc2Pkewcf/fjEyx1Ej8IWpt/3GzaBNYp2bJhAmBKboXze10z/yAFFif1JOzokxw7TZwp+xbvaMBRk=
+        bh=33HaUK27eQEsf0SwhUwMOu7mNxxUSSq/moN8WNrpJ54=;
+        b=wiP02anqau9dSTo0NmtG1w0/HwVTqEksFIqJtJHXVBMPWVtdQQNq+jXyyImBvEx5i0
+         OYZgizslH7dJPVMXyHBt+aXlGN3Ds8PwqppDoB2bRB8jWxUpAs6wpl6LNtRMSe5Yaw++
+         bevq9rijRpf1tmcUtinsEFj09jHHUhRwwhGX32xNaWvQGjB0YaTkFsY2R0qe/QJisnR4
+         wa9Sv5GUlpMzQMzuKPX7uLJWRlYgazLOChkZ8nr8O6Cey5rzvMGzfa8rsR0wtcoTndJC
+         qgfq/9v3yMnJ3oWlEqIzgvhwPrbXgochHd9eMUGh5FEIvFBY+aQT5V6Mb6eiGxwyq0jV
+         QN1w==
+X-Gm-Message-State: AOJu0Yz7VRdlwpGn5y1HfyzT/DaFKlDX5YQnkhx0D5uVNKEdN/QgVEZo
+	xOtQcZ/Oqd1CjjMGkkC9dIeP2oky0+jVYksJvc1KrOsunxXdYZAeNhnijTp2Lm4FHnc/LhAcFu2
+	eNg==
+X-Google-Smtp-Source: AGHT+IGajo1z1hyCxrLAaW0IAfe0Kram4cyrHU/I1JCRjlYjK5WQaguvtSBAlhl2K75/G/JqNjnZUC7hBMg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:8a95:b0:2a2:ff01:dd7c with SMTP id
- x21-20020a17090a8a9500b002a2ff01dd7cmr1330pjn.8.1713899811718; Tue, 23 Apr
- 2024 12:16:51 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:fd8:b0:5dc:8880:57cb with SMTP id
+ dr24-20020a056a020fd800b005dc888057cbmr2068pgb.3.1713900676660; Tue, 23 Apr
+ 2024 12:31:16 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 23 Apr 2024 12:16:49 -0700
+Date: Tue, 23 Apr 2024 12:31:14 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,86 +71,140 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240423191649.2885257-1-seanjc@google.com>
-Subject: [PATCH] Revert "KVM: async_pf: avoid recursive flushing of work items"
+Message-ID: <20240423193114.2887673-1-seanjc@google.com>
+Subject: [PATCH v3] KVM: x86/mmu: Fix a largely theoretical race in kvm_mmu_track_write()
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Xu Yilun <yilun.xu@linux.intel.com>, Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Now that KVM does NOT gift async #PF workers a "struct kvm" reference,
-don't bother skipping "done" workers when flushing/canceling queued
-workers, as the deadlock that was being fudged around can no longer occur.
-When workers, i.e. async_pf_execute(), were gifted a referenced, it was
-possible for a worker to put the last reference and trigger VM destruction,
-i.e. trigger flushing of a workqueue from a worker in said workqueue.
+Add full memory barriers in kvm_mmu_track_write() and account_shadowed()
+to plug a (very, very theoretical) race where kvm_mmu_track_write() could
+miss a 0->1 transition of indirect_shadow_pages and fail to zap relevant,
+*stale* SPTEs.
 
-Note, there is no actual lock, the deadlock was that a worker will be
-stuck waiting for itself (the workqueue code simulates a lock/unlock via
-lock_map_{acquire,release}()).
+Without the barriers, because modern x86 CPUs allow (per the SDM):
 
-Skipping "done" workers isn't problematic per se, but using work->vcpu as
-a "done" flag is confusing, e.g. it's not clear that async_pf.lock is
-acquired to protect the work->vcpu, NOT the processing of async_pf.queue
-(which is protected by vcpu->mutex).
+  Reads may be reordered with older writes to different locations but not
+  with older writes to the same location.
 
-This reverts commit 22583f0d9c85e60c9860bc8a0ebff59fe08be6d7.
+it's possible that the following could happen (terms of values being
+visible/resolved):
 
-Suggested-by: Xu Yilun <yilun.xu@linux.intel.com>
+ CPU0                          CPU1
+ read memory[gfn] (=Y)
+                               memory[gfn] Y=>X
+                               read indirect_shadow_pages (=0)
+ indirect_shadow_pages 0=>1
+
+or conversely:
+
+ CPU0                          CPU1
+ indirect_shadow_pages 0=>1
+                               read indirect_shadow_pages (=0)
+ read memory[gfn] (=Y)
+                               memory[gfn] Y=>X
+
+E.g. in the below scenario, CPU0 could fail to zap SPTEs, and CPU1 could
+fail to retry the faulting instruction, resulting in a KVM entering the
+guest with a stale SPTE (map PTE=X instead of PTE=Y).
+
+PTE = X;
+
+CPU0:
+    emulator_write_phys()
+    PTE = Y
+    kvm_page_track_write()
+      kvm_mmu_track_write()
+      // memory barrier missing here
+      if (indirect_shadow_pages)
+          zap();
+
+CPU1:
+   FNAME(page_fault)
+     FNAME(walk_addr)
+       FNAME(walk_addr_generic)
+         gw->pte = PTE; // X
+
+     FNAME(fetch)
+       kvm_mmu_get_child_sp
+         kvm_mmu_get_shadow_page
+           __kvm_mmu_get_shadow_page
+             kvm_mmu_alloc_shadow_page
+               account_shadowed
+                 indirect_shadow_pages++
+                 // memory barrier missing here
+       if (FNAME(gpte_changed)) // if (PTE == X)
+           return RET_PF_RETRY;
+
+In practice, this bug likely cannot be observed as both the 0=>1
+transition and reordering of this scope are extremely rare occurrences.
+
+Note, if the cost of the barrier (which is simply a locked ADD, see commit
+450cbdd0125c ("locking/x86: Use LOCK ADD for smp_mb() instead of MFENCE")),
+is problematic, KVM could avoid the barrier by bailing earlier if checking
+kvm_memslots_have_rmaps() is false.  But the odds of the barrier being
+problematic is extremely low, *and* the odds of the extra checks being
+meaningfully faster overall is also low.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- virt/kvm/async_pf.c | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/virt/kvm/async_pf.c b/virt/kvm/async_pf.c
-index 99a63bad0306..0ee4816b079a 100644
---- a/virt/kvm/async_pf.c
-+++ b/virt/kvm/async_pf.c
-@@ -80,7 +80,6 @@ static void async_pf_execute(struct work_struct *work)
- 	spin_lock(&vcpu->async_pf.lock);
- 	first = list_empty(&vcpu->async_pf.done);
- 	list_add_tail(&apf->link, &vcpu->async_pf.done);
--	apf->vcpu = NULL;
- 	spin_unlock(&vcpu->async_pf.lock);
+v3:
+ - More explicitly show the race in code. [Paolo]
+ - Insert the barrier *after* elevating indirect_shadow_pages. [Paolo]
+ - More confidently state that there is indeed a race. [Paolo]
+
+v2:
+ - This patch was new in v2 (the other 3 got merged already).
+ - https://lore.kernel.org/all/20240203002343.383056-5-seanjc@google.com
+
+v1: https://lore.kernel.org/all/20230605004334.1930091-1-mizhang@google.com
+
+ arch/x86/kvm/mmu/mmu.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 67331ce6454f..fea623e75cd1 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -831,6 +831,15 @@ static void account_shadowed(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	gfn_t gfn;
+ 
+ 	kvm->arch.indirect_shadow_pages++;
++	/*
++	 * Ensure indirect_shadow_pages is elevated prior to re-reading guest
++	 * child PTEs in FNAME(gpte_changed), i.e. guarantee either in-flight
++	 * emulated writes are visible before re-reading guest PTEs, or that
++	 * an emulated write will see the elevated count and acquire mmu_lock
++	 * to update SPTEs.  Pairs with the smp_mb() in kvm_mmu_track_write().
++	 */
++	smp_mb();
++
+ 	gfn = sp->gfn;
+ 	slots = kvm_memslots_for_spte_role(kvm, sp->role);
+ 	slot = __gfn_to_memslot(slots, gfn);
+@@ -5807,10 +5816,15 @@ void kvm_mmu_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 	bool flush = false;
  
  	/*
-@@ -120,8 +119,6 @@ static void kvm_flush_and_free_async_pf_work(struct kvm_async_pf *work)
+-	 * If we don't have indirect shadow pages, it means no page is
+-	 * write-protected, so we can exit simply.
++	 * When emulating guest writes, ensure the written value is visible to
++	 * any task that is handling page faults before checking whether or not
++	 * KVM is shadowing a guest PTE.  This ensures either KVM will create
++	 * the correct SPTE in the page fault handler, or this task will see
++	 * a non-zero indirect_shadow_pages.  Pairs with the smp_mb() in
++	 * account_shadowed().
+ 	 */
+-	if (!READ_ONCE(vcpu->kvm->arch.indirect_shadow_pages))
++	smp_mb();
++	if (!vcpu->kvm->arch.indirect_shadow_pages)
+ 		return;
  
- void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
- {
--	spin_lock(&vcpu->async_pf.lock);
--
- 	/* cancel outstanding work queue item */
- 	while (!list_empty(&vcpu->async_pf.queue)) {
- 		struct kvm_async_pf *work =
-@@ -129,23 +126,15 @@ void kvm_clear_async_pf_completion_queue(struct kvm_vcpu *vcpu)
- 					 typeof(*work), queue);
- 		list_del(&work->queue);
- 
--		/*
--		 * We know it's present in vcpu->async_pf.done, do
--		 * nothing here.
--		 */
--		if (!work->vcpu)
--			continue;
--
--		spin_unlock(&vcpu->async_pf.lock);
- #ifdef CONFIG_KVM_ASYNC_PF_SYNC
- 		flush_work(&work->work);
- #else
- 		if (cancel_work_sync(&work->work))
- 			kmem_cache_free(async_pf_cache, work);
- #endif
--		spin_lock(&vcpu->async_pf.lock);
- 	}
- 
-+	spin_lock(&vcpu->async_pf.lock);
- 	while (!list_empty(&vcpu->async_pf.done)) {
- 		struct kvm_async_pf *work =
- 			list_first_entry(&vcpu->async_pf.done,
+ 	write_lock(&vcpu->kvm->mmu_lock);
 
-base-commit: d2ea9fd98cca88b4724b4515cd4d40452f78caa8
+base-commit: f10f3621ad80f008c218dbbc13a05c893766a7d2
 -- 
 2.44.0.769.g3c40516874-goog
 
