@@ -1,105 +1,121 @@
-Return-Path: <kvm+bounces-15629-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15630-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C9378AE12A
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 11:40:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 881238AE22E
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 12:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0127C1F228D5
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 09:40:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B6311F25CB8
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 10:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FED75A11F;
-	Tue, 23 Apr 2024 09:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E23B65189;
+	Tue, 23 Apr 2024 10:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Z3FH4zLE"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 601781E863;
-	Tue, 23 Apr 2024 09:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFEE57303;
+	Tue, 23 Apr 2024 10:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713865232; cv=none; b=C1c5QOJzl37amBvpU3Cgf6giRFe1hiVC5t7UQLKmPwj8gzvnsYxb7Sy6/OfS8fiK9/SGbG5H1q/gyyMy5jL1U9vnZFFhaOQgs37HMvhgj9I8XtbfHVLgseN8yHnCOQq/0nJD9iEicSZctvvLwZqRxbDUhpLHi63pZpcTdvvY10c=
+	t=1713868135; cv=none; b=i6/NpzemV+3kGA8lqW/YjAv3dj+jm3ylgC6q/jQusXuYIkjXo1S8vf6rQTC/+bCtOn65op/3xmGYsGBkfxuLs3GLfLQYhKPtP0lSxRqkoUf9K5xzEBTT7YKgceR6RVhFnVedQzc7VLZuH7aazPwRzdKkHJaHzPvuofFU8QhRy3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713865232; c=relaxed/simple;
-	bh=WSHzthjZepAMvwfbEx8NcTiLoGKmflWyRDbqNIWM2rE=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=btXoDEvjr+Pl0+ziyQGir00tXIAv0jZU5NH5TPCzV6xAls9eqCe4jWup7tSI7wHXV1xd3hHuGBG8KnaJUQAbosGp5+H2ztUu2qhdATeqaRkbvqMA1D5kYDBeGADXaU07gq/ZhBoZHMvjSvBUHcRrl4K7UHIw+FPlwA8ssEuCb4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VNxq31Cy8zwTVG;
-	Tue, 23 Apr 2024 17:37:19 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id C3AB31403D4;
-	Tue, 23 Apr 2024 17:40:28 +0800 (CST)
-Received: from [10.174.185.179] (10.174.185.179) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 23 Apr 2024 17:40:27 +0800
-Subject: Re: [PATCH v4 12/15] KVM: arm64: nv: Add emulation for ERETAx
- instructions
-To: Jon Hunter <jonathanh@nvidia.com>
-CC: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>, James Morse
-	<james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, Oliver
- Upton <oliver.upton@linux.dev>, Joey Gouly <joey.gouly@arm.com>, Fuad Tabba
-	<tabba@google.com>, Mostafa Saleh <smostafa@google.com>, Will Deacon
-	<will@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <20240419102935.1935571-1-maz@kernel.org>
- <20240419102935.1935571-13-maz@kernel.org>
- <14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
-From: Zenghui Yu <yuzenghui@huawei.com>
-Message-ID: <4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
-Date: Tue, 23 Apr 2024 17:40:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.9.0
+	s=arc-20240116; t=1713868135; c=relaxed/simple;
+	bh=uh3qowr3m7iMpEAznogEW2Z/W4vdpFPZBLkqnX3kXJk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dQ/Fgl0byPTY0F4ZemaUcRx5dN+jdpKcW9+VTy83E6EP3dwZxhBtygcKGo8qeMbbi0/U71tQ7bwElKHY5UjrV2USI0+plGWlR2Hg/bYz2x5kaJdOKsJiuPsWa/+XEMhBuQba3YAofjP/7dN6IwbljWjFj34msFNG39vCH0gUI5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Z3FH4zLE; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C8C2540E0192;
+	Tue, 23 Apr 2024 10:28:50 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id K4TEGVbBZaV8; Tue, 23 Apr 2024 10:28:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1713868126; bh=c06iWq/U5QU79LoYabk6NNZS2MWKKgb0Cpqli/6PTJs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Z3FH4zLEd5fO/jmwUKzXZVRNHTIcKRObRRp8a5M6PtmwkQjZ1og+lDQ0PUNGjvFZw
+	 5u34wtAYTjZTphebOJxFn9rcKnGTLn9Wr+a4EZbCe50NBnVxUQtX23qQabMWrrXkMx
+	 GZjVmxcn3LfHe4QWHKuGOkzGcCJ5feIXugB5CbtPuC02aAAEGTQJ8mzje4fAA7aesI
+	 m7NvwXgkE1IXo4MoB0JliP5XKJEgM041bjaapWGKi1ItjJrh+Nst1BYfmuIaVTdY8d
+	 XOGbfhKiaqHL90wTM/b5zdFD2TYm3wssUTcp0tCKpKT3O1nE74olmgY5csqVV4ZgwZ
+	 HhIm/jsSf1+LqoPQAI6bN9lyBQ8vtCFO70rPEFVuncQuYTk7K9i7RHsmZiPWYAwkuk
+	 A7XxLKJZSypuGSmpzEdMMWLi1mZbvn8mIOI/KK5mKhb6rxj9mOJEZhIrOhAdKyWcyG
+	 ssJ5sMKTUkZjhVy/vCtvLAEtSP/zG/ed17/wjodJY7zgGfr9FPIDH4WdwUA1X/hAks
+	 8eAKWWZrSbAMBU+Tl4ulBjxa8e4OeoSYxA5j1eW5l91WLGR1w87mZJMgXeCZWj5vYi
+	 DRsa5rfNkY9JuYyRzPHv0ECfD/f+LS1syX6eLLmwcW3iQofSQHZXTt5DMRjSx2UxrF
+	 pwlNX+kwDM0CujqWneLZSfUo=
+Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7939040E00B2;
+	Tue, 23 Apr 2024 10:28:35 +0000 (UTC)
+Date: Tue, 23 Apr 2024 12:28:29 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v8 06/16] virt: sev-guest: Move SNP Guest command mutex
+Message-ID: <20240423102829.GCZieNTcHyuAYMcRf5@fat_crate.local>
+References: <20240215113128.275608-1-nikunj@amd.com>
+ <20240215113128.275608-7-nikunj@amd.com>
+ <20240422130012.GAZiZfXM5Z2yRvw7Cx@fat_crate.local>
+ <6a7a8892-bb8d-4f03-a802-d7eee48045b5@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6a7a8892-bb8d-4f03-a802-d7eee48045b5@amd.com>
 
-On 2024/4/23 17:22, Jon Hunter wrote:
-> 
-> Some of our builders currently have an older version of GCC (v6) and
-> after this change I am seeing ...
-> 
->    CC      arch/arm64/kvm/pauth.o
-> /tmp/ccohst0v.s: Assembler messages:
-> /tmp/ccohst0v.s:1177: Error: unknown architectural extension `pauth'
-> /tmp/ccohst0v.s:1177: Error: unknown mnemonic `pacga' -- `pacga x21,x22,x0'
-> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:244: 
-> recipe for target 'arch/arm64/kvm/pauth.o' failed
-> make[5]: *** [arch/arm64/kvm/pauth.o] Error 1
-> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: 
-> recipe for target 'arch/arm64/kvm' failed
-> make[4]: *** [arch/arm64/kvm] Error 2
-> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: 
-> recipe for target 'arch/arm64' failed
-> make[3]: *** [arch/arm64] Error 2
-> 
-> 
-> I know this is pretty old now and I am trying to get these builders
-> updated. However, the kernel docs still show that GCC v5.1 is
-> supported [0].
+On Tue, Apr 23, 2024 at 09:52:41AM +0530, Nikunj A. Dadhania wrote:
+> SNP guest messaging will be moving as part of sev.c, and Secure TSC code
+> will use this mutex.
 
-Was just looking at the discussion [1] ;-) . FYI there is already a
-patch on the list [2] which should be merged soon.
+No, this is all backwards.
 
-[1] 
-https://lore.kernel.org/r/CA+G9fYsCL5j-9JzqNH5X03kikL=O+BaCQQ8Ao3ADQvxDuZvqcg@mail.gmail.com
-[2] https://lore.kernel.org/r/20240422224849.2238222-1-maz@kernel.org
+You have a *static* function in sev-guest - snp_guest_ioctl- which takes
+an exported lock - snp_guest_cmd_lock - in order to synchronize with
+other callers which are only in that same sev-guest driver.
 
-Zenghui
+Why do you even need the guest messaging in sev.c?
+
+I guess this: "Many of the required functions are implemented in the
+sev-guest driver and therefore not available at early boot."
+
+But then your API is misdesigned: the lock should be private to sev.c
+and none of the callers should pay attention to grabbing it - the
+callers simply call the functions and underneath the locking works
+automatically for them - they don't care. Just like any other shared
+resource, users see only the API they call and the actual
+synchronization is done behind the scenes.
+
+Sounds like you need to go back to the drawing board and think how this
+thing should look like.
+
+And when you have it, make sure to explain the commit messages *why* it
+is done this way.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
