@@ -1,133 +1,185 @@
-Return-Path: <kvm+bounces-15723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 435CB8AF8B4
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 23:03:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 633188AF8BE
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 23:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3BAE28E13E
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 21:03:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 955051C23813
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 21:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F3B8143873;
-	Tue, 23 Apr 2024 21:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030A4143878;
+	Tue, 23 Apr 2024 21:09:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="glaQdr8G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bUzaaSqc"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A2C20B3E;
-	Tue, 23 Apr 2024 21:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E13142E85
+	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 21:09:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713906207; cv=none; b=kB/P2xCUmpnd9JQ2tIP5PzsS7525yQIjebJ2P0zfHyQDAJ4hyk7fWyvug/NGvEipw6W3Tosxb/zJPzPKz+PAUSUetWprXa+eyBdcZ3IwIpYITLdYDyMTmiDaw4FsLyfb6h5ITqfPluoPuGMxR8AWKOTFPeHPHigHB/+7+VNDX6c=
+	t=1713906568; cv=none; b=Envf+bLwWlPLIv7vcE0Q3ciZIMXkZmspnXwO6bVgaTOEJsVatuMSbCrsF8yFlJKcKZweXfObSHu1iTMbt2cLR09sfbyeolj8tbz+cJZQh+6rzHkKEewPDWWWo7OjnI79FLk86jwG6j8uu/srWH3j1bDw7TrknfpIHgdhPmqHiGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713906207; c=relaxed/simple;
-	bh=LWHJaT9ULgmFemasW8hgm+EMXbfzWFdJb6VuWLCVjcA=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=h+2pAz6e1269wHiDNcWEGbL+Awpq009zSTxjnGklA0hPDmwbbVXZaFi4rMbf6Yom1MfKnN7oGLzEFx4m87S0xC0JEsHyRPlr+bH10/llK1nbZP2JjegmZEOVWPi8T1GGqNmergEOqrjSEiu/A993N1oDPw3fxNGJhUKq+RqIQpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=glaQdr8G; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=tm6Oa9JrF8vq5JJCyPEdQCE1KB7eUtQwFdacLQMRUU4=; b=glaQdr8GIBbuFASx3fr/TrxaAR
-	kIOAFOr2dmnrg0LXJ1uopS2+bQiNO4/ejMmf+KQQ3EFvS150PyqGycOl1fr89QK0vrR02vl/SZA+2
-	RywBqYpUXeIahUWsNTeeaZ7fV1ICmNHzcm/ehJ6+o7VLFPyd7Gvl5UqevLVu1crxX1CCBk5FNMOC6
-	XuYdUufhzLGRAIRq7sEll2u2TBBC1hiWCpaNgSln9xrB4VT9g0hhtVcfOpFkQZ6S6qJhmGR357L7l
-	0VmBfNFwnSM72UFXfu6YQNG40DPz4U1GEze6G0BFIdevFkDupHrTiQCSKSiLqrvx3wVPzVccIT++W
-	WpzvdZTw==;
-Received: from [2001:8b0:10b:5:2012:a1ec:9b77:d880] (helo=[IPv6:::1])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rzNHj-0000000EA4L-37FM;
-	Tue, 23 Apr 2024 21:02:41 +0000
-Date: Tue, 23 Apr 2024 22:02:40 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: "Chen, Zide" <zide.chen@intel.com>, Jack Allister <jalliste@amazon.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Sean Christopherson <seanjc@google.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Shuah Khan <shuah@kernel.org>
-CC: Paul Durrant <paul@xen.org>, kvm@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_2/2=5D_KVM=3A_selftests=3A_Add_KVM/PV_c?=
- =?US-ASCII?Q?lock_selftest_to_prove_timer_drift_correction?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <cdc6c880-c666-4ff2-99f3-56c6b4f7576d@intel.com>
-References: <20240408220705.7637-1-jalliste@amazon.com> <20240408220705.7637-3-jalliste@amazon.com> <3664e8ec-1fa1-48c0-a80d-546b7f6cd671@intel.com> <17F1A2E9-6BAD-40E7-ACDD-B110CFC124B3@infradead.org> <65FF4D51-05A8-42E0-9D07-6E42913CC75E@infradead.org> <6dca783b-6532-4fa7-9e04-1c0a382a00b0@intel.com> <c863ffcfd4edda9a1a46e3351766a655c5523f7d.camel@infradead.org> <71260288-3666-4419-8283-6565e91aaba4@intel.com> <06864883c53cc4042e1939c04ecbd5ef0f8acf3b.camel@infradead.org> <cdc6c880-c666-4ff2-99f3-56c6b4f7576d@intel.com>
-Message-ID: <D71A6400-F236-4FC4-8D0F-0EA9EA92D48E@infradead.org>
+	s=arc-20240116; t=1713906568; c=relaxed/simple;
+	bh=kgbIHXr2bi9p5muvD86p6UwpsFB1QKcNggyDv0it32c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NIUMi3gmmJ+W+6IuOt8U+vNfqZ2k2/YWIRdBiGNMPt13RbHwA5O+rKxRJk8sjn312HtFC222vngQvQAVoPZnR5r/rjblPp6bmjQnuqeCECq0we2Dh3yTt3ZHaVO1p6wZgkucT/uzE2+DGwJQNFOPuoF8XMC9FORO1kLwdtpMt1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bUzaaSqc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713906565;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iMgVwJPIk+SrJO1aUq+M0EnJvfj+z9S9X/zT3E0x9q4=;
+	b=bUzaaSqcm72j/xoKVEden0YkUyDi50uJqvjTIJ8iY/z61aWKMoYeEWh6524fLzKVkHkyqN
+	ezCeTZOCg0lSLHmu9QledK0koOAR8XzotFumU2NxwgYvjF8cq5MRebRCg31NrB+bziv+MD
+	2+1rUA0SUhQnNtVYK1p3ZQP+D5dgGxk=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-551-6NcyiZgnPlepiNhrls5kmQ-1; Tue, 23 Apr 2024 17:09:23 -0400
+X-MC-Unique: 6NcyiZgnPlepiNhrls5kmQ-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7da52a99cbdso515340839f.1
+        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 14:09:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713906562; x=1714511362;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iMgVwJPIk+SrJO1aUq+M0EnJvfj+z9S9X/zT3E0x9q4=;
+        b=f+K55x1AozpGsdRaASM8JMyuloWkhGQ+5guDsisEECnfPzkHI60HvY76fDGGCucSuO
+         kDgs/li+Akm7nJTWfaYY52JjcnN/ZlraxrUIIpMDPwOZBt3dOvv/QQ3cjeSaAZ89BOB3
+         idnsXnCkYpKtlzED58EZkap4p03eB3NRki4GW7Lc5Y3dsYUe6K2KCk8SHyWX6j068JbZ
+         plNQeQaItXFdhUm2Dlk4XQF41BKXAO6649MNGK7K/+HucYxzIEYKlkPl3s+656INq1ZT
+         6sKZv0gIE+EHreYAIYbIWgoIgnp/szDvjr6IC4jfref2QLxA3PH10gDLfU1ettPEYnEF
+         M2Rw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRNiqsIlQ3HWSiBgNstbQNX84f0CaJliuImRpAuHSyDY3ZtW7OFt3wG4X7IEQzuUf6ohwhTYm53hjWlxhz3+ALnc+9
+X-Gm-Message-State: AOJu0YwIiNEBt7uFu3fe3YY1LBYQF4AQpHA+vJKaI1DXnIjHKPDrfQGg
+	AVu6YnkUY2t1DK5u3sXoS65Dp2gPSVpxfAVOaBjBHUza7zDHNSS/qDkBQ9DSREkX6DYcNViK5H7
+	DGnQguzs3MUDoXbOTJvvoQ0en7m+/kK+76KTRIS1vuFDZtS2Mug==
+X-Received: by 2002:a6b:f305:0:b0:7d0:8cff:cff3 with SMTP id m5-20020a6bf305000000b007d08cffcff3mr796376ioh.8.1713906562662;
+        Tue, 23 Apr 2024 14:09:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEhZfKzdE79LNT40MJ4hobam5s8cfCvXR012CG0rzXeCrsxEVa+wKgAJcyxg+paPh2DT1g9lQ==
+X-Received: by 2002:a6b:f305:0:b0:7d0:8cff:cff3 with SMTP id m5-20020a6bf305000000b007d08cffcff3mr796364ioh.8.1713906562382;
+        Tue, 23 Apr 2024 14:09:22 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id x5-20020a056638160500b00484f72550ccsm2560741jas.174.2024.04.23.14.09.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Apr 2024 14:09:21 -0700 (PDT)
+Date: Tue, 23 Apr 2024 15:09:20 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Nipun Gupta <nipun.gupta@amd.com>
+Cc: <tglx@linutronix.de>, <gregkh@linuxfoundation.org>,
+ <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <maz@kernel.org>,
+ <git@amd.com>, <harpreet.anand@amd.com>,
+ <pieter.jansen-van-vuuren@amd.com>, <nikhil.agarwal@amd.com>,
+ <michal.simek@amd.com>, <abhijit.gangurde@amd.com>,
+ <srivatsa@csail.mit.edu>
+Subject: Re: [PATCH v6 1/2] genirq/msi: add wrapper msi allocation API and
+ export msi functions
+Message-ID: <20240423150920.12fe4a3e.alex.williamson@redhat.com>
+In-Reply-To: <20240423111021.1686144-1-nipun.gupta@amd.com>
+References: <20240423111021.1686144-1-nipun.gupta@amd.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 23 April 2024 18:59:21 BST, "Chen, Zide" <zide=2Echen@intel=2Ecom> wrote=
-:
->
->
->On 4/23/2024 12:49 AM, David Woodhouse wrote:
->>> If I restored the KVM_REQ_GLOBAL_CLOCK_UPDATE request from
->>> kvm_arch_vcpu_load(), the selftest works for me, and I ran the test fo=
-r
->>> 1000+ iterations, w/ or w/o TSC scaling, the TEST_ASSERT(delta_correct=
-ed
->>> =C2=A0<=3D =C2=B11) never got hit=2E This is awesome!
->>>
->>> However, without KVM_REQ_GLOBAL_CLOCK_UPDATE, it still fails on creati=
-ng
->>> a VM=2E Maybe the init sequence sill needs some rework=2E
->>=20
->> That one confuses me=2E The crash is actually in debugfs, as it's
->> registering the per-vm or per-vcpu stats=2E I can't imagine *how* that'=
-s
->> occurring=2E Or see why the availability of TSC scaling would cause it =
-to
->> show up for you and not me=2E Can I have your =2Econfig please?
->>=20
->> First thought would be that there's some change in the KVM structures
->> and you have some stale object files using the old struct, but then I
->> realise I forgot to actually *remove* the now-unused
->> kvmclock_update_work from x86's struct kvm_arch anyway=2E
->>=20
->> I'll try to reproduce, as I think I want to *know* what's going on
->> here, even if I am going to drop that patch as mentioned in=C2=A0
->> https://lore=2Ekernel=2Eorg/kvm/a6723ac9e0169839cb33e8022a47c2de213866a=
-c=2Ecamel@infradead=2Eorg
->>=20
->> Are you able to load that vmlinux in gdb and
->> (gdb) list *start_creating+0x80
->> (gdb) list *kvm_create_vm_debugfs+0x28b
->>=20
->> Thanks again=2E
->
->My apologies, it turns out the KVM_REQ_GLOBAL_CLOCK_UPDATE is not
->needed=2E Today I can't reproduce the issue after removing it=2E  Yesterd=
-ay
->I thought it may miss something related to pfncache=2E
->
->To be clear, with the above mentioned change to
->kvm_scale_tsc(master_tsc_scaling_ratio), the selftest runs reliably
->regardless TSC scaling is enabled or not=2E
+On Tue, 23 Apr 2024 16:40:20 +0530
+Nipun Gupta <nipun.gupta@amd.com> wrote:
 
-Thanks=2E That version is now in my git tree and I have tested it myself o=
-n Skylake=2E Then I got distracted by reverse-engineering kvm_get_time_scal=
-e() so I could actually add some comments to it=2E
+> SI functions for allocation and free can be directly used by
 
-I'm still going to have to put the clock updates back though, for the non-=
-masterclock case=2E
+We lost the ^M in this version.
 
-While I'm ripping all this up I guess I ought to rename it to "reference c=
-lock" too?
+> the device drivers without any wrapper provided by bus drivers.
+> So export these MSI functions.
+> 
+> Also, add a wrapper API to allocate MSIs providing only the 
+> number of interrupts rather than range for simpler driver usage.
+> 
+> Signed-off-by: Nipun Gupta <nipun.gupta@amd.com>
+> Reviewed-by: Thomas Gleixner <tglx@linutronix.de>
+> ---
+> 
+> No change in v5->v6
+> 
+> Changes in v4->v5:
+> - updated commit description as per the comments.
+
+I see in https://lore.kernel.org/all/87edbyfj0d.ffs@tglx/ that Thomas
+also suggested a new subject:
+
+    genirq/msi: Add MSI allocation helper and export MSI functions
+
+I'll address both of these on commit if there are no objections or
+further comments.  Patch 2/ looks ok to me now as well.  Thanks,
+
+Alex
+
+> - Rebased on 6.9-rc1
+> 
+> Changes in v3->v4:
+> - No change
+> 
+> Changes in v3: 
+> - New in this patch series. VFIO-CDX uses the new wrapper API 
+>   msi_domain_alloc_irqs and exported APIs. (This patch is moved
+>   from CDX interrupt support to vfio-cdx patch, where these APIs
+>   are used).
+> 
+>  include/linux/msi.h | 6 ++++++
+>  kernel/irq/msi.c    | 2 ++
+>  2 files changed, 8 insertions(+)
+> 
+> diff --git a/include/linux/msi.h b/include/linux/msi.h
+> index 84859a9aa091..dc27cf3903d5 100644
+> --- a/include/linux/msi.h
+> +++ b/include/linux/msi.h
+> @@ -674,6 +674,12 @@ int platform_device_msi_init_and_alloc_irqs(struct device *dev, unsigned int nve
+>  void platform_device_msi_free_irqs_all(struct device *dev);
+>  
+>  bool msi_device_has_isolated_msi(struct device *dev);
+> +
+> +static inline int msi_domain_alloc_irqs(struct device *dev, unsigned int domid, int nirqs)
+> +{
+> +	return msi_domain_alloc_irqs_range(dev, domid, 0, nirqs - 1);
+> +}
+> +
+>  #else /* CONFIG_GENERIC_MSI_IRQ */
+>  static inline bool msi_device_has_isolated_msi(struct device *dev)
+>  {
+> diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+> index f90952ebc494..2024f89baea4 100644
+> --- a/kernel/irq/msi.c
+> +++ b/kernel/irq/msi.c
+> @@ -1434,6 +1434,7 @@ int msi_domain_alloc_irqs_range(struct device *dev, unsigned int domid,
+>  	msi_unlock_descs(dev);
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(msi_domain_alloc_irqs_range);
+>  
+>  /**
+>   * msi_domain_alloc_irqs_all_locked - Allocate all interrupts from a MSI interrupt domain
+> @@ -1680,6 +1681,7 @@ void msi_domain_free_irqs_range(struct device *dev, unsigned int domid,
+>  	msi_domain_free_irqs_range_locked(dev, domid, first, last);
+>  	msi_unlock_descs(dev);
+>  }
+> +EXPORT_SYMBOL_GPL(msi_domain_free_irqs_all);
+>  
+>  /**
+>   * msi_domain_free_irqs_all_locked - Free all interrupts from a MSI interrupt domain
+
 
