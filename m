@@ -1,152 +1,235 @@
-Return-Path: <kvm+bounces-15595-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC8778ADC2C
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 05:19:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65EFE8ADC0B
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 04:54:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63D451F21E44
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 03:19:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E75501F22A5B
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 02:54:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233101B952;
-	Tue, 23 Apr 2024 03:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="onctW1bg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA931BDDB;
+	Tue, 23 Apr 2024 02:53:48 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00364e01.pphosted.com (mx0a-00364e01.pphosted.com [148.163.135.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18ED718E1D
-	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 03:18:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.135.74
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE793FF4;
+	Tue, 23 Apr 2024 02:53:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713842330; cv=none; b=jhs3FP6LVyhOZydf7xg8PmAReuywnU1QJNKrEc0CfWdBjtmJN4n0IANmWa8JcGD2UFrQcoo6bICuMQFZkRQJm83hZcpnvnFNFaxAlDi1ZAqa5dj4a1cXBdR90AJX9MEPpKb7u0UZPsoJY2Mi8P27Wk8+QPhQvPJlDF43H2YF8Es=
+	t=1713840828; cv=none; b=Q6gmpx8CM00aG1c4Bo4mFn3RrZ4A2A9vK/k+SlH3ItRdtMJXMrTRlNR/Wae/8OH8lVvFYlZmHQ4xLzMUtqW8XsrLsIg+fXDjO7UjCWv8QxKFkPit82S+CiJRBBwzqRF8t6riMBN8646bwWPjQeUU0Qimm0biNwA3OtTJ3i6Gs4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713842330; c=relaxed/simple;
-	bh=5hPF9z8vVp0Tex9XM09IQgMiimVbCDBKFyzEcXAlE9A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IT2kLNJ4CcrTkkmSSShA248goIKBCLVs1YBu9b81PrpNH+EDFl00Wm095aE4ec4uz3SzeZevv0eBG7F24GjcIlpP2lr3VS6iNhA7WRoQvmM9sMoFvxYvswTyf3EZMUhnBtCaNHG6feS3mrd1Nkkat0hQ7cxOnk6/OmWKTLf3bD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=onctW1bg; arc=none smtp.client-ip=148.163.135.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
-Received: from pps.filterd (m0167070.ppops.net [127.0.0.1])
-	by mx0a-00364e01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43N2TeoG029955
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 22:50:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=pps01; bh=s/xhC0JeXfcELFVQ8yl/dQZx5wxcMGQHNNepZEFzy74=;
- b=onctW1bgNuvGvn/KU3pey0Mni9X0C5t8azRCrrYA/Z7MV9PF2dlKOgzqGzVdfq0WbggW
- t/nUdnHZj6TiWJgOn9I/PlxPmfx2ANh429ovWg63ER3UldOSoTEJOmYhHIZcJABhAQ3a
- wK06nhTB6O7Fam08gzqKBxGzezKTWLz28lkfO3bQVhy4J4kp7rKD3MJlBq4RaF3vuC5R
- NUlWG4ImELgj6cKYx+JPO9HyV+WcvCLaWMmJYghPaFG+EUDoRl11Qu2DD9133SSFAiFk
- xT5zF2dz1Y9MKHS2wlDyj+w/UybZy0NjVSbN7rveJlvkVrY6FeLjnv09yNLpEA+ZyH0T xQ== 
-Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com [209.85.161.69])
-	by mx0a-00364e01.pphosted.com (PPS) with ESMTPS id 3xm9s5tafg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 22:50:22 -0400
-Received: by mail-oo1-f69.google.com with SMTP id 006d021491bc7-5aa3afc55c6so1712202eaf.0
-        for <kvm@vger.kernel.org>; Mon, 22 Apr 2024 19:50:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713840591; x=1714445391;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s/xhC0JeXfcELFVQ8yl/dQZx5wxcMGQHNNepZEFzy74=;
-        b=UleWdoEeeZy66lVtFMafXCeoUuEcXhMnhIHdCI6RJubz5bdd0Fyfi8bQweVWA6ojaT
-         WJMDaLGgPqbDJ7weRczAA9bmXY9Tfda0RVxbasxIXn1LFxIeI+FiIqhNfmSvDj67/vZ2
-         2r9qnaO3JN8NhUeefs5y4IsmO4r7AvZbpw3Kr3a1fK51HeDcRKugeNahN+WgUDFRDlyD
-         mr2pe3HT7/VsKR7Sm3OXZdbXFFFeNk+vWOgBbD+1xPvQ7QuSpyCfVJSwx8U59whwE3AE
-         5Fu8vIsFPYvvyhaMI7myyD99ubBeU5alMYY+G2G8Y6iRpB7NmEeArcp0LGpaAF/Jiph1
-         DGgA==
-X-Gm-Message-State: AOJu0YwruC558A6t4kq1yNQBQa+6led0fmiHj1uBmlZGq/ZMxwcbczUj
-	zla+lXl/w9FW9LacqhY6hvofnfycdH1q/Q+4G7tZTOvOWVapCyxkjHbSlku2nQxfEmh2MHgiDy2
-	vY3uDaZ3iOm+qgJhpuYwOQulCJufyu4hEaE7nMWfnrdOWW2gngIY/HA==
-X-Received: by 2002:a05:6359:4591:b0:186:4564:8395 with SMTP id no17-20020a056359459100b0018645648395mr13667952rwb.2.1713840591511;
-        Mon, 22 Apr 2024 19:49:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFl3MunUJbYxu+yRVEDlj6Hrex5h/qk4UWtRcvcfDlsM4UzZHXXKsSxugMr7V2r6VI2j0D47g==
-X-Received: by 2002:a05:6359:4591:b0:186:4564:8395 with SMTP id no17-20020a056359459100b0018645648395mr13667917rwb.2.1713840591096;
-        Mon, 22 Apr 2024 19:49:51 -0700 (PDT)
-Received: from rivalak.cs.columbia.edu (kele.cs.columbia.edu. [128.59.19.81])
-        by smtp.gmail.com with ESMTPSA id d12-20020ac851cc000000b00438527a4eb5sm3547732qtn.10.2024.04.22.19.49.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Apr 2024 19:49:50 -0700 (PDT)
-From: Kele Huang <kele@cs.columbia.edu>
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org, Kele Huang <kele@cs.columbia.edu>
-Subject: [1/1] KVM: restrict kvm_gfn_to_hva_cache_init() to only accept address ranges within one page
-Date: Mon, 22 Apr 2024 22:49:33 -0400
-Message-ID: <20240423024933.80143-1-kele@cs.columbia.edu>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1713840828; c=relaxed/simple;
+	bh=Xgc3UpBpY/d/jOHbu9jYVmVyIEPIskPgk+73s7PtUoE=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=IoCFj5dPMkLOPmzGTu0n+lGmLXYge4q90FNX+qzXh4HFE3RLesR778Xe46mu2Q5/yKuaB9zJW0sh4zOD2fVsgbnjoFSEEnne+laQ0e3OwsC50WJqo+ULY/YkLkVCirJ2ztL5kAtiTEBXRcPUIr+wVnhwBYkC0fgELm1F/iv46fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8AxTeu1IidmrCIBAA--.41S3;
+	Tue, 23 Apr 2024 10:53:41 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Dx2t2yIidmVesBAA--.7965S3;
+	Tue, 23 Apr 2024 10:53:40 +0800 (CST)
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Mingwei Zhang <mizhang@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <Zhn9TGOiXxcV5Epx@google.com>
+ <4c47b975-ad30-4be9-a0a9-f0989d1fa395@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com>
+ <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com>
+ <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
+ <Zh2uFkfH8BA23lm0@google.com>
+ <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
+ <ZiaX3H3YfrVh50cs@google.com>
+ <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
+ <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
+Date: Tue, 23 Apr 2024 10:53:38 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: fUAHMxAtrFb5X68sCaDnYis0yhG-JcYZ
-X-Proofpoint-ORIG-GUID: fUAHMxAtrFb5X68sCaDnYis0yhG-JcYZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-23_02,2024-04-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- bulkscore=10 phishscore=0 spamscore=0 impostorscore=0 malwarescore=0
- lowpriorityscore=10 priorityscore=1501 clxscore=1011 suspectscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404230007
+X-CM-TRANSID:AQAAf8Dx2t2yIidmVesBAA--.7965S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Xr17XryDZw4rJw1kXF45twc_yoW7AF18pF
+	WxAF4jkrWDJr1Iyw1Iqw18AFy3trW7J34DXr1ktFyUA3909r1Fqr4jqrWj9F1DWr4xGa4j
+	vr4jq347u3Z0yagCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4qg4DU
+	UUU
 
-Function kvm_gfn_to_hva_cache_init() is exported and used to init
-gfn to hva cache at various places, such as called in function
-kvm_pv_enable_async_pf().  However, this function directly tail
-calls function __kvm_gfn_to_hva_cache_init(), which assigns
-ghc->memslot to NULL and returns 0 for cache initialization of
-cross pages cache.  This is unsafe as 0 typically means a successful
-return, but it actually fails to return a valid ghc->memslot.
-The functions call kvm_gfn_to_hva_cache_init(), such as
-kvm_lapic_set_vapicz_addr() do not make future checking on the
-ghc->memslot if kvm_gfn_to_hva_cache_init() returns a 0.  Moreover,
-other developers may try to initialize a cache across pages by
-calling this function but fail with a success return value.
 
-This patch fixes this issue by explicitly restricting function
-kvm_gfn_to_hva_cache_init() to only accept address ranges within
-one page and adding comments to the function accordingly.
 
-Signed-off-by: Kele Huang <kele@cs.columbia.edu>
----
- virt/kvm/kvm_main.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+On 2024/4/23 上午10:44, Mi, Dapeng wrote:
+> 
+> On 4/23/2024 9:01 AM, maobibo wrote:
+>>
+>>
+>> On 2024/4/23 上午1:01, Sean Christopherson wrote:
+>>> On Mon, Apr 22, 2024, maobibo wrote:
+>>>> On 2024/4/16 上午6:45, Sean Christopherson wrote:
+>>>>> On Mon, Apr 15, 2024, Mingwei Zhang wrote:
+>>>>>> On Mon, Apr 15, 2024 at 10:38 AM Sean Christopherson 
+>>>>>> <seanjc@google.com> wrote:
+>>>>>>> One my biggest complaints with the current vPMU code is that the 
+>>>>>>> roles and
+>>>>>>> responsibilities between KVM and perf are poorly defined, which 
+>>>>>>> leads to suboptimal
+>>>>>>> and hard to maintain code.
+>>>>>>>
+>>>>>>> Case in point, I'm pretty sure leaving guest values in PMCs 
+>>>>>>> _would_ leak guest
+>>>>>>> state to userspace processes that have RDPMC permissions, as the 
+>>>>>>> PMCs might not
+>>>>>>> be dirty from perf's perspective (see perf_clear_dirty_counters()).
+>>>>>>>
+>>>>>>> Blindly clearing PMCs in KVM "solves" that problem, but in doing 
+>>>>>>> so makes the
+>>>>>>> overall code brittle because it's not clear whether KVM _needs_ 
+>>>>>>> to clear PMCs,
+>>>>>>> or if KVM is just being paranoid.
+>>>>>>
+>>>>>> So once this rolls out, perf and vPMU are clients directly to PMU HW.
+>>>>>
+>>>>> I don't think this is a statement we want to make, as it opens a 
+>>>>> discussion
+>>>>> that we won't win.  Nor do I think it's one we *need* to make.  KVM 
+>>>>> doesn't need
+>>>>> to be on equal footing with perf in terms of owning/managing PMU 
+>>>>> hardware, KVM
+>>>>> just needs a few APIs to allow faithfully and accurately 
+>>>>> virtualizing a guest PMU.
+>>>>>
+>>>>>> Faithful cleaning (blind cleaning) has to be the baseline
+>>>>>> implementation, until both clients agree to a "deal" between them.
+>>>>>> Currently, there is no such deal, but I believe we could have one via
+>>>>>> future discussion.
+>>>>>
+>>>>> What I am saying is that there needs to be a "deal" in place before 
+>>>>> this code
+>>>>> is merged.  It doesn't need to be anything fancy, e.g. perf can 
+>>>>> still pave over
+>>>>> PMCs it doesn't immediately load, as opposed to using 
+>>>>> cpu_hw_events.dirty to lazily
+>>>>> do the clearing.  But perf and KVM need to work together from the 
+>>>>> get go, ie. I
+>>>>> don't want KVM doing something without regard to what perf does, 
+>>>>> and vice versa.
+>>>>>
+>>>> There is similar issue on LoongArch vPMU where vm can directly pmu 
+>>>> hardware
+>>>> and pmu hw is shard with guest and host. Besides context switch 
+>>>> there are
+>>>> other places where perf core will access pmu hw, such as tick
+>>>> timer/hrtimer/ipi function call, and KVM can only intercept context 
+>>>> switch.
+>>>
+>>> Two questions:
+>>>
+>>>   1) Can KVM prevent the guest from accessing the PMU?
+>>>
+>>>   2) If so, KVM can grant partial access to the PMU, or is it all or 
+>>> nothing?
+>>>
+>>> If the answer to both questions is "yes", then it sounds like 
+>>> LoongArch *requires*
+>>> mediated/passthrough support in order to virtualize its PMU.
+>>
+>> Hi Sean,
+>>
+>> Thank for your quick response.
+>>
+>> yes, kvm can prevent guest from accessing the PMU and grant partial or 
+>> all to access to the PMU. Only that if one pmu event is granted to VM, 
+>> host can not access this pmu event again. There must be pmu event 
+>> switch if host want to.
+> 
+> PMU event is a software entity which won't be shared. did you mean if a 
+> PMU HW counter is granted to VM, then Host can't access the PMU HW 
+> counter, right?
+yes, if PMU HW counter/control is granted to VM. The value comes from 
+guest, and is not meaningful for host.  Host pmu core does not know that 
+it is granted to VM, host still think that it owns pmu.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9230ebe1753f..6efe579f6b5f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3476,11 +3476,22 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
- 	return 0;
- }
- 
-+/*
-+ * Please note that this function only supports gfn_to_hva_cache
-+ * initialization within a single page.
-+ */
- int kvm_gfn_to_hva_cache_init(struct kvm *kvm, struct gfn_to_hva_cache *ghc,
- 			      gpa_t gpa, unsigned long len)
- {
- 	struct kvm_memslots *slots = kvm_memslots(kvm);
--	return __kvm_gfn_to_hva_cache_init(slots, ghc, gpa, len);
-+	gfn_t start_gfn = gpa >> PAGE_SHIFT;
-+	gfn_t end_gfn = (gpa + len - 1) >> PAGE_SHIFT;
-+	gfn_t nr_pages_needed = end_gfn - start_gfn + 1;
-+
-+	if (likely(nr_pages_needed == 1))
-+		return __kvm_gfn_to_hva_cache_init(slots, ghc, gpa, len);
-+	else
-+		return -EINVAL;
- }
- EXPORT_SYMBOL_GPL(kvm_gfn_to_hva_cache_init);
- 
--- 
-2.44.0
+Just like FPU register, it is shared by VM and host during different 
+time and it is lately switched. But if IPI or timer interrupt uses FPU 
+register on host, there will be the same issue.
+
+Regards
+Bibo Mao
+> 
+> 
+>>
+>>>
+>>>> Can we add callback handler in structure kvm_guest_cbs?  just like 
+>>>> this:
+>>>> @@ -6403,6 +6403,7 @@ static struct perf_guest_info_callbacks 
+>>>> kvm_guest_cbs
+>>>> = {
+>>>>          .state                  = kvm_guest_state,
+>>>>          .get_ip                 = kvm_guest_get_ip,
+>>>>          .handle_intel_pt_intr   = NULL,
+>>>> +       .lose_pmu               = kvm_guest_lose_pmu,
+>>>>   };
+>>>>
+>>>> By the way, I do not know should the callback handler be triggered 
+>>>> in perf
+>>>> core or detailed pmu hw driver. From ARM pmu hw driver, it is 
+>>>> triggered in
+>>>> pmu hw driver such as function kvm_vcpu_pmu_resync_el0,
+>>>> but I think it will be better if it is done in perf core.
+>>>
+>>> I don't think we want to take the approach of perf and KVM guests 
+>>> "fighting" over
+>>> the PMU.  That's effectively what we have today, and it's a mess for 
+>>> KVM because
+>>> it's impossible to provide consistent, deterministic behavior for the 
+>>> guest.  And
+>>> it's just as messy for perf, which ends up having wierd, cumbersome 
+>>> flows that
+>>> exists purely to try to play nice with KVM.
+>> With existing pmu core code, in tick timer interrupt or IPI function 
+>> call interrupt pmu hw may be accessed by host when VM is running and 
+>> pmu is already granted to guest. KVM can not intercept host IPI/timer 
+>> interrupt, there is no pmu context switch, there will be problem.
+>>
+>> Regards
+>> Bibo Mao
+>>
 
 
