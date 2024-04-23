@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-15697-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15696-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 818028AF59E
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 19:37:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A65608AF59C
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 19:37:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4AF91C23F5C
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 17:37:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BC1E1F2554E
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 17:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B2613E8B5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F02D13E02B;
 	Tue, 23 Apr 2024 17:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WvqMozAW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CwVaoooG"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 849E213DDDE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3C613DDD4;
 	Tue, 23 Apr 2024 17:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713893804; cv=none; b=jAV+YqSO+xzbPySUgKrXk2dTVtfxNCsTQHIvRRA5sIWMbaHCupcFzTDKVT2NJAwgXnTSG6LfTxQRWm4x5DflyeCKdfydWhWW94mQOWNp8erI8dyI0CVNxtY2h+EDZM5rMqYmodKZXOZ/JdxPPKqDyG8HKWYBEdT/wooFjfIzfGs=
+	t=1713893803; cv=none; b=oS+6z86IBYDZetqhhWx1TkhF86MwX0KqHK8GbVG9zFjZjiDVviBkKzT6miK0dnG4VpAC7EiwI5XIe0cV1OawwgutUw2UY7tR2yhbDtHht/CSVbAgaUL1taY6F1gEdVZhJMg3GP16ghWbBiQNA8WI71b+a5qsCM2Cgos6XhKRfKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713893804; c=relaxed/simple;
-	bh=I+J4qe71Mhah5FbNMvTzc8voWMvbCweR1e53QS6GvLE=;
+	s=arc-20240116; t=1713893803; c=relaxed/simple;
+	bh=0GX8HhoSt+Bowm5iZvkwyHIzLD8tLG+XNrU90AlqK/Q=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Oz6Qnjwp+IZG++dzqK4MU8imCFGltZggyuioFelSx2EC0RAq3tW4BVxrqbVmbi0z6IZ+Pg1yzGvSkAoNTKwonznIfJyEk4aKQn/yZI7+TFg85+lhvWb/VDw9fY1CTPJ7HWPjbuLr8uq5Jcm/scLa5y3t9EffLoJA0qwR6hiPuvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WvqMozAW; arc=none smtp.client-ip=192.198.163.14
+	 MIME-Version; b=CuWon4luK7JRiOgqo/uYhfgHRqZPnPAjMJahjvSSCGc3Px6+QWTb5EMlv/Ir69CKVnqYeTm3rJPQyuk+M4YK978XbGAU5K/gGK6bZmJscPYTXqZgcSR1Mui+xCw0pm2w9Cd5hCM5XY76BBCAx4R7hWsrNJI+UntU9S/If15h1EM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CwVaoooG; arc=none smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1713893803; x=1745429803;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=I+J4qe71Mhah5FbNMvTzc8voWMvbCweR1e53QS6GvLE=;
-  b=WvqMozAW7TV9QyEME0KyJFFp6okHvT9EHSma5WsEknIijrjQ1qNQ3npN
-   KpmGaaXTCe+Eq3CT8hoHb+nccz6wst6mlviBQ3crHiqTEy6GBx6/GIq2h
-   6M8CNXZ2w//l3o22LgdK8OMV/ZDYAnubeovAqrjOTDsaiiRcWBHGClHN7
-   uMfP1FP0wDaBMGSo8qnElbhMEbsUGvxd+m2OWIlC7cicwfVGDvhklLXiE
-   tYDdjGuIvEy/Kt8DQcDdB91ca5lelmvjE9Lwkj1gA3wkYDshFnR1pxZQF
-   iPhH3sJxl7COtiQ73L9AxTG5Ow055uA8VCn4CcMRRhy9Ui3hE3bBGa6OW
+  bh=0GX8HhoSt+Bowm5iZvkwyHIzLD8tLG+XNrU90AlqK/Q=;
+  b=CwVaoooG56FuJnEgd2lSdWMHHkjj3UTX48xCzVZlI+bqqXLy25QBlHJ+
+   yDj3n9c3bQrqkGVovTFZGFZ0Nph7kk/f15cB3YGUNP7eYqlbdTjNdv5lb
+   /ogse5j+dV4vDsCCjCh/+s6NznEbGJNOMo8PCPmyOMn40jzu0NY3W45HR
+   agH6vblLeb2g8Dk5cQgpGoitUPbwgkwzOKehCBos6uFaFuSxljNbvvuA7
+   oe3AoJxh1fL4LSltz0Aq4JA5tx/pkZQD69qmyP4uOCJuSIdH7gBID/WkN
+   Se0VNl+6x6mxvUWgjxSYeTSL2txs5oQpt6pdGW4EpevYSCxMfKKlCLs++
    Q==;
-X-CSE-ConnectionGUID: yu6poW2yQHSnfz3khlB12w==
-X-CSE-MsgGUID: zvAyEgsaRd25dsNOTDZMTw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="9712289"
+X-CSE-ConnectionGUID: lJp+rtJURkWP1Ry4MqOeJw==
+X-CSE-MsgGUID: vE9bghDSQ+aGbFrI3lS/4A==
+X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="9712310"
 X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="9712289"
+   d="scan'208";a="9712310"
 Received: from fmviesa004.fm.intel.com ([10.60.135.144])
   by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 10:36:40 -0700
-X-CSE-ConnectionGUID: Cg1VolOyR2ei29+5CuuRCQ==
-X-CSE-MsgGUID: CaTNUXAdQLyr7DneB791Bg==
+X-CSE-ConnectionGUID: 1XBh1OYvTD60c3BFWsG2bA==
+X-CSE-MsgGUID: hdr0CBwaTRaCrNAxFNyDQA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="29097366"
+   d="scan'208";a="29097381"
 Received: from jacob-builder.jf.intel.com ([10.54.39.125])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Apr 2024 10:36:38 -0700
+  by fmviesa004.fm.intel.com with ESMTP; 23 Apr 2024 10:36:39 -0700
 From: Jacob Pan <jacob.jun.pan@linux.intel.com>
 To: LKML <linux-kernel@vger.kernel.org>,
 	X86 Kernel <x86@kernel.org>,
@@ -87,9 +87,9 @@ Cc: Paul Luse <paul.e.luse@intel.com>,
 	oliver.sang@intel.com,
 	acme@kernel.org,
 	Jacob Pan <jacob.jun.pan@linux.intel.com>
-Subject: [PATCH v3  01/12] KVM: VMX: Move posted interrupt descriptor out of vmx code
-Date: Tue, 23 Apr 2024 10:41:03 -0700
-Message-Id: <20240423174114.526704-2-jacob.jun.pan@linux.intel.com>
+Subject: [PATCH v3  02/12] x86/irq: Unionize PID.PIR for 64bit access w/o casting
+Date: Tue, 23 Apr 2024 10:41:04 -0700
+Message-Id: <20240423174114.526704-3-jacob.jun.pan@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
 References: <20240423174114.526704-1-jacob.jun.pan@linux.intel.com>
@@ -101,245 +101,31 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To prepare native usage of posted interrupt, move PID declaration out of
-VMX code such that they can be shared.
+Make PIR field into u64 such that atomic xchg64 can be used without ugly
+casting.
 
-Acked-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 ---
- arch/x86/include/asm/posted_intr.h | 88 ++++++++++++++++++++++++++++
- arch/x86/kvm/vmx/posted_intr.h     | 93 +-----------------------------
- arch/x86/kvm/vmx/vmx.c             |  1 +
- arch/x86/kvm/vmx/vmx.h             |  2 +-
- 4 files changed, 91 insertions(+), 93 deletions(-)
- create mode 100644 arch/x86/include/asm/posted_intr.h
+ arch/x86/include/asm/posted_intr.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/include/asm/posted_intr.h b/arch/x86/include/asm/posted_intr.h
-new file mode 100644
-index 000000000000..f0324c56f7af
---- /dev/null
+index f0324c56f7af..acf237b2882e 100644
+--- a/arch/x86/include/asm/posted_intr.h
 +++ b/arch/x86/include/asm/posted_intr.h
-@@ -0,0 +1,88 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef _X86_POSTED_INTR_H
-+#define _X86_POSTED_INTR_H
-+
-+#define POSTED_INTR_ON  0
-+#define POSTED_INTR_SN  1
-+
-+#define PID_TABLE_ENTRY_VALID 1
-+
-+/* Posted-Interrupt Descriptor */
-+struct pi_desc {
-+	u32 pir[8];     /* Posted interrupt requested */
-+	union {
-+		struct {
-+				/* bit 256 - Outstanding Notification */
-+			u16	on	: 1,
-+				/* bit 257 - Suppress Notification */
-+				sn	: 1,
-+				/* bit 271:258 - Reserved */
-+				rsvd_1	: 14;
-+				/* bit 279:272 - Notification Vector */
-+			u8	nv;
-+				/* bit 287:280 - Reserved */
-+			u8	rsvd_2;
-+				/* bit 319:288 - Notification Destination */
-+			u32	ndst;
-+		};
-+		u64 control;
-+	};
-+	u32 rsvd[6];
-+} __aligned(64);
-+
-+static inline bool pi_test_and_set_on(struct pi_desc *pi_desc)
-+{
-+	return test_and_set_bit(POSTED_INTR_ON, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline bool pi_test_and_clear_on(struct pi_desc *pi_desc)
-+{
-+	return test_and_clear_bit(POSTED_INTR_ON, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline bool pi_test_and_clear_sn(struct pi_desc *pi_desc)
-+{
-+	return test_and_clear_bit(POSTED_INTR_SN, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline bool pi_test_and_set_pir(int vector, struct pi_desc *pi_desc)
-+{
-+	return test_and_set_bit(vector, (unsigned long *)pi_desc->pir);
-+}
-+
-+static inline bool pi_is_pir_empty(struct pi_desc *pi_desc)
-+{
-+	return bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS);
-+}
-+
-+static inline void pi_set_sn(struct pi_desc *pi_desc)
-+{
-+	set_bit(POSTED_INTR_SN, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline void pi_set_on(struct pi_desc *pi_desc)
-+{
-+	set_bit(POSTED_INTR_ON, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline void pi_clear_on(struct pi_desc *pi_desc)
-+{
-+	clear_bit(POSTED_INTR_ON, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline void pi_clear_sn(struct pi_desc *pi_desc)
-+{
-+	clear_bit(POSTED_INTR_SN, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline bool pi_test_on(struct pi_desc *pi_desc)
-+{
-+	return test_bit(POSTED_INTR_ON, (unsigned long *)&pi_desc->control);
-+}
-+
-+static inline bool pi_test_sn(struct pi_desc *pi_desc)
-+{
-+	return test_bit(POSTED_INTR_SN, (unsigned long *)&pi_desc->control);
-+}
-+
-+#endif /* _X86_POSTED_INTR_H */
-diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-index 26992076552e..6b2a0226257e 100644
---- a/arch/x86/kvm/vmx/posted_intr.h
-+++ b/arch/x86/kvm/vmx/posted_intr.h
-@@ -1,98 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #ifndef __KVM_X86_VMX_POSTED_INTR_H
- #define __KVM_X86_VMX_POSTED_INTR_H
--
--#define POSTED_INTR_ON  0
--#define POSTED_INTR_SN  1
--
--#define PID_TABLE_ENTRY_VALID 1
--
--/* Posted-Interrupt Descriptor */
--struct pi_desc {
+@@ -9,7 +9,10 @@
+ 
+ /* Posted-Interrupt Descriptor */
+ struct pi_desc {
 -	u32 pir[8];     /* Posted interrupt requested */
--	union {
--		struct {
--				/* bit 256 - Outstanding Notification */
--			u16	on	: 1,
--				/* bit 257 - Suppress Notification */
--				sn	: 1,
--				/* bit 271:258 - Reserved */
--				rsvd_1	: 14;
--				/* bit 279:272 - Notification Vector */
--			u8	nv;
--				/* bit 287:280 - Reserved */
--			u8	rsvd_2;
--				/* bit 319:288 - Notification Destination */
--			u32	ndst;
--		};
--		u64 control;
--	};
--	u32 rsvd[6];
--} __aligned(64);
--
--static inline bool pi_test_and_set_on(struct pi_desc *pi_desc)
--{
--	return test_and_set_bit(POSTED_INTR_ON,
--			(unsigned long *)&pi_desc->control);
--}
--
--static inline bool pi_test_and_clear_on(struct pi_desc *pi_desc)
--{
--	return test_and_clear_bit(POSTED_INTR_ON,
--			(unsigned long *)&pi_desc->control);
--}
--
--static inline bool pi_test_and_clear_sn(struct pi_desc *pi_desc)
--{
--	return test_and_clear_bit(POSTED_INTR_SN,
--			(unsigned long *)&pi_desc->control);
--}
--
--static inline bool pi_test_and_set_pir(int vector, struct pi_desc *pi_desc)
--{
--	return test_and_set_bit(vector, (unsigned long *)pi_desc->pir);
--}
--
--static inline bool pi_is_pir_empty(struct pi_desc *pi_desc)
--{
--	return bitmap_empty((unsigned long *)pi_desc->pir, NR_VECTORS);
--}
--
--static inline void pi_set_sn(struct pi_desc *pi_desc)
--{
--	set_bit(POSTED_INTR_SN,
--		(unsigned long *)&pi_desc->control);
--}
--
--static inline void pi_set_on(struct pi_desc *pi_desc)
--{
--	set_bit(POSTED_INTR_ON,
--		(unsigned long *)&pi_desc->control);
--}
--
--static inline void pi_clear_on(struct pi_desc *pi_desc)
--{
--	clear_bit(POSTED_INTR_ON,
--		(unsigned long *)&pi_desc->control);
--}
--
--static inline void pi_clear_sn(struct pi_desc *pi_desc)
--{
--	clear_bit(POSTED_INTR_SN,
--		(unsigned long *)&pi_desc->control);
--}
--
--static inline bool pi_test_on(struct pi_desc *pi_desc)
--{
--	return test_bit(POSTED_INTR_ON,
--			(unsigned long *)&pi_desc->control);
--}
--
--static inline bool pi_test_sn(struct pi_desc *pi_desc)
--{
--	return test_bit(POSTED_INTR_SN,
--			(unsigned long *)&pi_desc->control);
--}
-+#include <asm/posted_intr.h>
- 
- void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu);
- void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c37a89eda90f..d94bb069bac9 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -70,6 +70,7 @@
- #include "x86.h"
- #include "smm.h"
- #include "vmx_onhyperv.h"
-+#include "posted_intr.h"
- 
- MODULE_AUTHOR("Qumranet");
- MODULE_LICENSE("GPL");
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 65786dbe7d60..e133e8077e6d 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -7,10 +7,10 @@
- #include <asm/kvm.h>
- #include <asm/intel_pt.h>
- #include <asm/perf_event.h>
-+#include <asm/posted_intr.h>
- 
- #include "capabilities.h"
- #include "../kvm_cache_regs.h"
--#include "posted_intr.h"
- #include "vmcs.h"
- #include "vmx_ops.h"
- #include "../cpuid.h"
++	union {
++		u32 pir[8];     /* Posted interrupt requested */
++		u64 pir64[4];
++	};
+ 	union {
+ 		struct {
+ 				/* bit 256 - Outstanding Notification */
 -- 
 2.25.1
 
