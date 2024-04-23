@@ -1,224 +1,322 @@
-Return-Path: <kvm+bounces-15643-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15644-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB38F8AE5A1
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 14:09:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB59F8AE5B5
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 14:12:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBBFD1C22F29
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 12:09:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73BD9282BE6
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 12:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3F384FAC;
-	Tue, 23 Apr 2024 12:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lkrjEGQt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3685D85C77;
+	Tue, 23 Apr 2024 12:12:24 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2064.outbound.protection.outlook.com [40.107.102.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489E08405D;
-	Tue, 23 Apr 2024 12:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713874179; cv=fail; b=b8lRWEZn/qcwW9bUQYTimM34XKFcwaFXX9gBwXvzOweb+r0xxcdie9tiLomjUmTCfqU0LbhwmJgXTblhRDqgGQMl2YmqZxz9wkj0SKayFwWPJ8NfMJEAx3M/ldjVCx8AKLXmJaIVqhbhc6b9RKaLOCJLtIUH6adWPDrXhJ+d8OA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713874179; c=relaxed/simple;
-	bh=rJs7QfwhumoQOo+M67VQRMWz+WaG/VO7BRHYssTudrc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XO+fwI0j5e/O49ahKtCxjE7h0eoJDDD0Llm+VLeHrAttV0bwi1kKaO3UWEg0B2NaEsDRQ2Sidp0AjXRkJeUE2APuAvVVXRI+bkxxIsFQVlXJpyPiwpNobhkAUWxAZVrQ5ZlznhXvEAKCb/+Un+FsPk3Cmpp7nmUgieAHMCgbNhY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lkrjEGQt; arc=fail smtp.client-ip=40.107.102.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TRB1NPXwmR9iUofNheq3aMQN3Ei5Hr8PCHGlmiYBiLf0w+TYsaYmv0Y4gupz8q6BLmtCsbEArM0SkFrrIXpgzLsRL6HdfXR5IQlG6YpfwbNAn26M2jN2tJmOB10ABJsqopI31on2zQgo2zVflOqKtN4aqqoAE+bD12fss/H+rrjeGQRsz3tT5afWxcqxGLWLnjUMvttkCdu+Fm2s5X2FtnTFE7sacL+3wbRzKmt6xKOyWoJRdV/BHe57k0q8TEgLXbUfqmNOf6gpxVBVo34XM0j1DIEc+DgMwFNj9DpzIo1+yzSXdLuilwlRnf3+CaXcDkzjHL6O5Nhhtin3j0Ydbg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z4L8t9gYgor0m6EFAgFvppv+PPdvWIoatSfgnOocDKg=;
- b=AQzfzKfv00jWIFwPU8CpR/mvk3jyhykO8LTuudGiX4aAom3UpTJVtOhdEZm5jVfsw8DxPSPFV9p3WCtP4lmjqxvbbh+Q/Eed+vRExJzQBz9zeMz14CWkmW0Y9N6gjFSzMyFKVe52GrPJY+H2JgHm97BRj673K/MSyqQqEbhwUB4MK7SSSlE9ucaT31RsDyKkPib0YbqaVFIc3mMvpUHeUhCBeBs5Z50WsRUn7pEI0P6tu+1/io40mN1SXkqNkPePujeu+Kpswl9rKDJjcd5FQZK4zzM7GFklKQ5sFNy2G+YAnKweOCM+eN0uUwmRSBAC1Y+kYDG6idYQ0SJDoZMBGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z4L8t9gYgor0m6EFAgFvppv+PPdvWIoatSfgnOocDKg=;
- b=lkrjEGQtTmTKDJTf4FFQf9u7Rqru92LpdxoxPqITkvq7Frm37tMFvT4l7IV0EBycno6l2dZiDWF6JaQFQjnrT73CrAZ977y9qL4htW8D3+eAh2pHZAFiiCTit4SDTR8rHsHbCpM7OdoBHCDXclk76aT/VAMNJQa5haifRACG7+OKW776Xg/lvqqiC5Aq15EaFPxq+3CU3NtJr1qxjX82iaCvVNWIDKADQr7Tu2l4b/ZEoXji2YPMV9HMzn3XPY2xcS6aXaEjxQHRdDgCd1Nmbbmjgd6pOSi3dH9ftowbbcRjOrUQy8mvixH9kkMBKhWuQ1eG6bEdAYXAkWzd5hcCHg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com (2603:10b6:5:35e::8) by
- CH3PR12MB7546.namprd12.prod.outlook.com (2603:10b6:610:149::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Tue, 23 Apr
- 2024 12:09:33 +0000
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3]) by CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3%5]) with mapi id 15.20.7472.044; Tue, 23 Apr 2024
- 12:09:33 +0000
-Message-ID: <76db8302-e1c9-4de5-8bde-e1d89e225b9d@nvidia.com>
-Date: Tue, 23 Apr 2024 13:09:26 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 12/15] KVM: arm64: nv: Add emulation for ERETAx
- instructions
-To: Zenghui Yu <yuzenghui@huawei.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- James Morse <james.morse@arm.com>, Suzuki K Poulose
- <suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Joey Gouly <joey.gouly@arm.com>, Fuad Tabba <tabba@google.com>,
- Mostafa Saleh <smostafa@google.com>, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <20240419102935.1935571-1-maz@kernel.org>
- <20240419102935.1935571-13-maz@kernel.org>
- <14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
- <4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
-From: Jon Hunter <jonathanh@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <4c2fd210-fa36-8462-8a4d-70135cc2f040@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO6P123CA0016.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:313::6) To CO6PR12MB5444.namprd12.prod.outlook.com
- (2603:10b6:5:35e::8)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E740D82865;
+	Tue, 23 Apr 2024 12:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713874343; cv=none; b=EFIUwVnEERQY2uYAKCBMsSZkd3Y5MfZ6xu36eVzRzEectfCXqBfc+MMTcVL867TxM41q5hgyVSmLfXIa/T66+WraBclUfhgOWeBlbGttsmc6u4qfJb1Nhx9uk2RQBiOOs/gLm54StXVHv85bQ/48q/G4IlVIepjfOkVD/VWhtVw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713874343; c=relaxed/simple;
+	bh=fDaZLskB3L9JUVU2fGuLas5jK1PDPhmJkCOPz4/+Xrc=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=eH9bhpB7Usy1riftTpQEr5qNfShkyL0EyTrouL5dWgvwrxZz83FLNQUZkpXhNf+9EB70ReCyez3VILxrliI9QSf2NBTv8t092DP4qLiI51BVT9J3GoMkpycw321sT6TtwgWFuzuVTgC90tOhtl0PgIHf5ARIPavV2BQhp/o+Q5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8BxnuuhpSdmd1wBAA--.6689S3;
+	Tue, 23 Apr 2024 20:12:17 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxyt2epSdmOFQCAA--.9706S3;
+	Tue, 23 Apr 2024 20:12:16 +0800 (CST)
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Mingwei Zhang <mizhang@google.com>
+Cc: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <Zhn9TGOiXxcV5Epx@google.com>
+ <4c47b975-ad30-4be9-a0a9-f0989d1fa395@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com>
+ <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com>
+ <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
+ <Zh2uFkfH8BA23lm0@google.com>
+ <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
+ <ZiaX3H3YfrVh50cs@google.com>
+ <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
+ <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com>
+ <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
+ <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com>
+ <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
+ <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <b3868bf5-4e16-3435-c807-f484821fccc6@loongson.cn>
+Date: Tue, 23 Apr 2024 20:12:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5444:EE_|CH3PR12MB7546:EE_
-X-MS-Office365-Filtering-Correlation-Id: 462e3ab1-c18a-4506-bfe0-08dc638e3caa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UDZKWmdDSjRNQ2lqRXlmSUc0dkxpZEhBdjlDM2thYVdBUThNZ1BsYmEwYlk0?=
- =?utf-8?B?NzFSN1ZXL0tOcWRSR1E5bVRhNEt0dnRic0s5YU1qa1ZMWGFjN0ZmKzl1VnVX?=
- =?utf-8?B?Y3E0dmtIWjhrbnRuNnlQRHJ5OGFxTGxiNzRXNVpBbGU3UkgzdmJvd0dCaEpz?=
- =?utf-8?B?NU5kbWt1d0wvOHgyY1Jad0Z3VnNqZzIzekhpb3hLeE9JckFiQjVINFhicGRQ?=
- =?utf-8?B?RWhsVXJmTDZrZDRDak82anZ3d2pBL1BPNmNBUjU1U2lFV3YxRU5VOE1od2Nh?=
- =?utf-8?B?bDY5K2FIVk5CY3RJejRjM3Nuc1VERmh1TnpiM3p1VENqUlJVVVJPcEpqaTB3?=
- =?utf-8?B?bEMxNXk2WTFpY2JZSVpGa29LR3NNcDVVSHR4bkN1MnptYXpHK0hPa3NJcUlV?=
- =?utf-8?B?YnZhclUrbWprNTdBVVNVWlVIUDJaaGtPOVJtL1p6WHFSblJ0SGxtaU02Y29D?=
- =?utf-8?B?MHJ4ZlRBVk96V2ZiTURXT3NiNFFTRDhRbE9aK1FKSzNwUGlpRm16ZjBPSjZS?=
- =?utf-8?B?QzVBWWwycVFFRlcxb0k2VmppSlE4a2pVUERuS0JxQ1g1RVcxRlFWTkc3OUFp?=
- =?utf-8?B?ZWpIV3N3SDlnZ2YwWTBYckRvSlNmVHBQUnBuT05TZGluWDhIV1BJdkd4ak9w?=
- =?utf-8?B?V0lMY0pmQ1Z6cnlOZUNjK0NmREdXS082K3ZVT0dlZno3MG9hSVJjY2QrWWRo?=
- =?utf-8?B?bTdZSElZYUdCUFNqaUNLbWZsMzVHUDNSM1QzaUxxU1l1bnpzdlNNbzFQWXhs?=
- =?utf-8?B?L0FwMGw4KzVWd3ZwTHoyaDhjbTVhdDBVcVpBNmYrS2xqaWR2WEc0cE1yM1ZY?=
- =?utf-8?B?ZXhaRWlsZWQvR2ZnUmxvUGE5Zk9DQ0RvYkN2Z0MyMUJVSmtZdlkvQmNXZS9s?=
- =?utf-8?B?Z3FJR2lobFJnQ3R6emdWRDBZek12NXVOcjlzd216WEZDZFpPTEpzZGp4aCt0?=
- =?utf-8?B?U1RjVWlKMjBXdGphaGtERTFNTVdweG1WNXM3Mytvd1B5UXhXb3R5QUdhYmox?=
- =?utf-8?B?cklDaEZ1WmRucVhqeW5zcEhNM1JmRytFdk1HOW5XT2RqajNyY1orMmF4UE5K?=
- =?utf-8?B?b1NvdSt5bUp1TkF5di92ZTE2eHc5TWt3eVA0Yk96YVAyVXN6SW5oOE8weW40?=
- =?utf-8?B?R3VPWm1VTFg4VElPak4vOUtvdldLNGRxeUFpWkw5QVVyRGNkR2ROYmY3MU5F?=
- =?utf-8?B?dFJkVy83ZnNzNFM0UzlubmdlK3Iva2ExNVVoMDU1Wmh0b2xsU0JLUzU4Ny83?=
- =?utf-8?B?ZmlvY3BDbnQrL20vRGlXSVJ5M2hYajVNYlp1TTJYWSszRmVzM09tbUp6M1Z3?=
- =?utf-8?B?WVFrNGZJajJxTTg2dEc1b1B4Zk1YRWpSWnlwbEJtQ0hNVE9RbnhLck1qNlh3?=
- =?utf-8?B?bmtZcXJicWRjcnBHak5sZVZab01JNzFzQkdUbmwveHNpSlgzTERQK2hhdDZy?=
- =?utf-8?B?NGZGTDJrc0IvSXZKemxsNEMyYlVsTWdOeGNEVVg3WlRzeGxINldnaGNmam9M?=
- =?utf-8?B?Mnc4amhrZjlLVy9jVlRkQ2tiRUgwOTI2cUlWc0gzQzhkQW82S2h6c2svU2lP?=
- =?utf-8?B?TkJZUmpzcDlZZFBTbStrMW40b0doRFpIeVJ3VFdHTFVMWTVtQzY3ekFYQ0Ji?=
- =?utf-8?B?UkJ3MFo4N1pBM2hvSkY5dmdVcjl4QlplNTQwMnZoMVl2TFAxM1FXbDVreGVw?=
- =?utf-8?B?OW5DK0xrZ2YzK1VEcjVYYUtpWGI1MVhtek5LR0RWMFoxWDc4WWR3V3NBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5444.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bThjYk9FN0NCcEo5WlhqbHVKdVpEN1RQN0RldGJSUTBRaXpvR0xpd2RaQnFK?=
- =?utf-8?B?d1NBdGdvQ0NuNTlpOHZkZXFLRHQ5Z1pNUVlQSUZra3pMWlhUZVJtNjFnMy9K?=
- =?utf-8?B?TEJXSUVJYnBJengrUWpQQk9nd05hWUVYZXIzK2ZUdlRjTEhBRE1uVVVDaTZx?=
- =?utf-8?B?TUUyN0JQQ212cFZpc1JKM2QrajdoR2tnc1B2V1MyZXJ6WXpVMFBqRU16U1ZO?=
- =?utf-8?B?SUYvN2psSTFhTkl2NnJvYzlCRUYwaTArYVgwR3JRcGwyR25SVWJuaFkwYWZK?=
- =?utf-8?B?U08vbkJ3eXVaT1ZUZHJsWnQyVTQzMzVDbnhpYlI0UVFoSWhKNWRZbUl4alNi?=
- =?utf-8?B?N2taTzhJcWUyWEFsSTV2KzNTL2RDVlJxWk5OVCtNMDlGQmhIWUFzZkY5blcw?=
- =?utf-8?B?aVVQQTJjOWgwWVZiazY0c2lFYzU3T0pTWG5KbTd5OEtDanFRQ2k2SGdXMkdu?=
- =?utf-8?B?VnI4blo2THIyOTYvRHcyOVNSWHo3eTFmUXNJZ1MrQmRCOVpQUFZ1Wi96czln?=
- =?utf-8?B?OHc0R3V2UnV5ZmJSbWNvM2J4U2xDNjI5V1I2ZkpoRE9OblVyc0xMMHYzN0Z3?=
- =?utf-8?B?cGhMdFlBM1ZTTUtyczBiUitZZjFUQ2RJWEZPamJNYnBVNmc1cU0zclI1Ukhx?=
- =?utf-8?B?T25ucllBWHdhaWFzVEk2RUZPbndBV3dLRzBRMVRVenpOY0FNRHYxaHR1bGlu?=
- =?utf-8?B?QS9SMmJ6WHdHWTZaZm1uQ2NYZUoranl0dmM0M3RTbHM2Ty8rVGY0UVJrc2VH?=
- =?utf-8?B?STgvMHNNSjV2STkwcGdaa2NvMWtVd010em1NRUgrUlRxUzhRQWVFOWd0Wm0y?=
- =?utf-8?B?TEhJclkweGE1OHU1aklJaktrUk1yeTN1cGp4TVl2NkV0NXo3WFBFeldxUS9V?=
- =?utf-8?B?Z2ZFbGpYa1Brc0hFZk5xQWFiakVaMTMvZFN0Y2k0UFlVbTF0MWpSTFdhbXBp?=
- =?utf-8?B?c2JkYW4wMkVvZGx4b2I5bUVPTnRLZExpTUl4T2kxUFlKZm81T2NKT1JvK01N?=
- =?utf-8?B?QndiaytyM1lZN3lWc20zb1ZSblVHVjBDc3RvNGIyZ2R6Wk95ekJIUzVrb0Zr?=
- =?utf-8?B?RXNSRyt2U05tblZwNzhkRTUrcTJ2NGtXcWROd0c5UkpIVzNtZUZudkpSR0xY?=
- =?utf-8?B?RWhaNUhkYUd0UFRXUVMyNGFKVC9yVU5wNTlVSU9WNktkclExcGdjQzc5aU1P?=
- =?utf-8?B?SmZTb1VVMWJmRlFkS3J0eUt2cFBIZTFFRzBVdW1YQS9KcVRieDBCSXJyRkNV?=
- =?utf-8?B?bHE5TjE4ODk1Y2tCd0FPWE96N1BZRmZ6Um5pZ1hyZWNZR0llSHdHMTNsUGxI?=
- =?utf-8?B?TXFjeno4dHl1Y0Uvd3R5K1I0NzFuVXNQcGx0VWlhZDcwc2RZNjRzMFlwbEs5?=
- =?utf-8?B?M1FjSmZBQjFpYlZtRUoyRE9kTTRaNVl0VTNIU0Rpc0cyV2JTMng1QXhRbWtL?=
- =?utf-8?B?QTc0WUh6RjhkZTgxREMxZFA5THMxYUF2WTEzZytGZ2hWU2J4c2trRkhSZmhC?=
- =?utf-8?B?SUNlSHJvZGZ6ZSt6N0pLTDNWUE4zMmxIVjVndFRoQUVCOVZmaWljeThmdEFG?=
- =?utf-8?B?YUc2N3E4cU5QRWV4c0RWRGtoMkd4UUZQTG4vL2t6M0FVemFwcDBFNlhZMThR?=
- =?utf-8?B?MlZWanpma1EweGcvWHBaZXJYZDJyeWtBdnMzaEJFSTllYWFvOU5zZndNeGtK?=
- =?utf-8?B?blBJYjJKUFM1L2VOdFIwMEhiL0JYSkh4ekN3N2xjVHZUa1hiV3QyT0Jld3Qw?=
- =?utf-8?B?cFBIRXo2TGFjK1pvMUxqc1hRWHlLZDgyZTJHQWJnWFp0N09jTk5Dcmcvbm9C?=
- =?utf-8?B?aVZIamF2SDlXME1MWk1YbzZUVm5DVGJGQzBOdU9ZTE9URU0xNXVWTUh3QjBr?=
- =?utf-8?B?eXJHbXA3dEFGbU5aR1MrVndiNjhnMFgyQWhPSnE4Smd0SU5YMlpLTHJpaGsv?=
- =?utf-8?B?VWlmUXFzVDJBNmw4aXVsSEZkRzRlTmZHTkFjYzNFUDJSMVlqSjBsWnJvSDJ6?=
- =?utf-8?B?QU9sMDV4VXpPcW11MFh6aTVnTDZyUEdCMTllUk1vcmV3cEpKN2R4VTdGZHJR?=
- =?utf-8?B?eVhmQ0oyY0hLN1ZBSlJGbWJsTmo4RmNUTlppTzdadE91dmIwRTU1ZlR1Z0VE?=
- =?utf-8?B?T2ZjQU9kTTV2Z3pmKy83bkZBajRrZUZaWkVidm0zdWRWK09wNzFZcUplU0hG?=
- =?utf-8?B?SjdTV0pLbGViK2sxbEYrNUVRNXRwYVdnMGpaTmpOUlFnOHJ0a0JBbk1yZURw?=
- =?utf-8?B?SHpLdHhyQ0hUNU9KT203YnAyeDRnPT0=?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 462e3ab1-c18a-4506-bfe0-08dc638e3caa
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR12MB5444.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 12:09:33.6294
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ivzOy8ldLz0f5DIl0uN6/+i2pCQgirnVaMpPExdTl5IWh5TJTamIWPWFu7zORQLPa+zAFeNDi64p4iKHM+FxDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB7546
+In-Reply-To: <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxyt2epSdmOFQCAA--.9706S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Ww1UCF4xKw4DXrWfKrWxGrX_yoWfAF1UpF
+	W7Aa1jkr4DJr1jyw1Utw18JFy5trW7Jr1UXrn8JryUA3s09r1rJr1UtrW5CF1Uur1xGr1j
+	qr4Ut347Zw1UA3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVWxJr0_GcWln4kS14v26r1Y6r17M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
+	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
+	6r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
+	1lc7I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUtVW8ZwCF04k20xvY0x0EwIxG
+	rwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUXVWUAwC20s026c02F40E14
+	v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkG
+	c2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4U
+	MIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxU4qg4DU
+	UUU
 
 
-On 23/04/2024 10:40, Zenghui Yu wrote:
-> On 2024/4/23 17:22, Jon Hunter wrote:
->>
->> Some of our builders currently have an older version of GCC (v6) and
->> after this change I am seeing ...
->>
->>    CC      arch/arm64/kvm/pauth.o
->> /tmp/ccohst0v.s: Assembler messages:
->> /tmp/ccohst0v.s:1177: Error: unknown architectural extension `pauth'
->> /tmp/ccohst0v.s:1177: Error: unknown mnemonic `pacga' -- `pacga 
->> x21,x22,x0'
->> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:244: 
->> recipe for target 'arch/arm64/kvm/pauth.o' failed
->> make[5]: *** [arch/arm64/kvm/pauth.o] Error 1
->> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: 
->> recipe for target 'arch/arm64/kvm' failed
->> make[4]: *** [arch/arm64/kvm] Error 2
->> /local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: 
->> recipe for target 'arch/arm64' failed
->> make[3]: *** [arch/arm64] Error 2
+
+On 2024/4/23 下午12:23, Mingwei Zhang wrote:
+> On Mon, Apr 22, 2024 at 8:55 PM maobibo <maobibo@loongson.cn> wrote:
 >>
 >>
->> I know this is pretty old now and I am trying to get these builders
->> updated. However, the kernel docs still show that GCC v5.1 is
->> supported [0].
+>>
+>> On 2024/4/23 上午11:13, Mi, Dapeng wrote:
+>>>
+>>> On 4/23/2024 10:53 AM, maobibo wrote:
+>>>>
+>>>>
+>>>> On 2024/4/23 上午10:44, Mi, Dapeng wrote:
+>>>>>
+>>>>> On 4/23/2024 9:01 AM, maobibo wrote:
+>>>>>>
+>>>>>>
+>>>>>> On 2024/4/23 上午1:01, Sean Christopherson wrote:
+>>>>>>> On Mon, Apr 22, 2024, maobibo wrote:
+>>>>>>>> On 2024/4/16 上午6:45, Sean Christopherson wrote:
+>>>>>>>>> On Mon, Apr 15, 2024, Mingwei Zhang wrote:
+>>>>>>>>>> On Mon, Apr 15, 2024 at 10:38 AM Sean Christopherson
+>>>>>>>>>> <seanjc@google.com> wrote:
+>>>>>>>>>>> One my biggest complaints with the current vPMU code is that
+>>>>>>>>>>> the roles and
+>>>>>>>>>>> responsibilities between KVM and perf are poorly defined, which
+>>>>>>>>>>> leads to suboptimal
+>>>>>>>>>>> and hard to maintain code.
+>>>>>>>>>>>
+>>>>>>>>>>> Case in point, I'm pretty sure leaving guest values in PMCs
+>>>>>>>>>>> _would_ leak guest
+>>>>>>>>>>> state to userspace processes that have RDPMC permissions, as
+>>>>>>>>>>> the PMCs might not
+>>>>>>>>>>> be dirty from perf's perspective (see
+>>>>>>>>>>> perf_clear_dirty_counters()).
+>>>>>>>>>>>
+>>>>>>>>>>> Blindly clearing PMCs in KVM "solves" that problem, but in
+>>>>>>>>>>> doing so makes the
+>>>>>>>>>>> overall code brittle because it's not clear whether KVM _needs_
+>>>>>>>>>>> to clear PMCs,
+>>>>>>>>>>> or if KVM is just being paranoid.
+>>>>>>>>>>
+>>>>>>>>>> So once this rolls out, perf and vPMU are clients directly to
+>>>>>>>>>> PMU HW.
+>>>>>>>>>
+>>>>>>>>> I don't think this is a statement we want to make, as it opens a
+>>>>>>>>> discussion
+>>>>>>>>> that we won't win.  Nor do I think it's one we *need* to make.
+>>>>>>>>> KVM doesn't need
+>>>>>>>>> to be on equal footing with perf in terms of owning/managing PMU
+>>>>>>>>> hardware, KVM
+>>>>>>>>> just needs a few APIs to allow faithfully and accurately
+>>>>>>>>> virtualizing a guest PMU.
+>>>>>>>>>
+>>>>>>>>>> Faithful cleaning (blind cleaning) has to be the baseline
+>>>>>>>>>> implementation, until both clients agree to a "deal" between them.
+>>>>>>>>>> Currently, there is no such deal, but I believe we could have
+>>>>>>>>>> one via
+>>>>>>>>>> future discussion.
+>>>>>>>>>
+>>>>>>>>> What I am saying is that there needs to be a "deal" in place
+>>>>>>>>> before this code
+>>>>>>>>> is merged.  It doesn't need to be anything fancy, e.g. perf can
+>>>>>>>>> still pave over
+>>>>>>>>> PMCs it doesn't immediately load, as opposed to using
+>>>>>>>>> cpu_hw_events.dirty to lazily
+>>>>>>>>> do the clearing.  But perf and KVM need to work together from the
+>>>>>>>>> get go, ie. I
+>>>>>>>>> don't want KVM doing something without regard to what perf does,
+>>>>>>>>> and vice versa.
+>>>>>>>>>
+>>>>>>>> There is similar issue on LoongArch vPMU where vm can directly pmu
+>>>>>>>> hardware
+>>>>>>>> and pmu hw is shard with guest and host. Besides context switch
+>>>>>>>> there are
+>>>>>>>> other places where perf core will access pmu hw, such as tick
+>>>>>>>> timer/hrtimer/ipi function call, and KVM can only intercept
+>>>>>>>> context switch.
+>>>>>>>
+>>>>>>> Two questions:
+>>>>>>>
+>>>>>>>    1) Can KVM prevent the guest from accessing the PMU?
+>>>>>>>
+>>>>>>>    2) If so, KVM can grant partial access to the PMU, or is it all
+>>>>>>> or nothing?
+>>>>>>>
+>>>>>>> If the answer to both questions is "yes", then it sounds like
+>>>>>>> LoongArch *requires*
+>>>>>>> mediated/passthrough support in order to virtualize its PMU.
+>>>>>>
+>>>>>> Hi Sean,
+>>>>>>
+>>>>>> Thank for your quick response.
+>>>>>>
+>>>>>> yes, kvm can prevent guest from accessing the PMU and grant partial
+>>>>>> or all to access to the PMU. Only that if one pmu event is granted
+>>>>>> to VM, host can not access this pmu event again. There must be pmu
+>>>>>> event switch if host want to.
+>>>>>
+>>>>> PMU event is a software entity which won't be shared. did you mean if
+>>>>> a PMU HW counter is granted to VM, then Host can't access the PMU HW
+>>>>> counter, right?
+>>>> yes, if PMU HW counter/control is granted to VM. The value comes from
+>>>> guest, and is not meaningful for host.  Host pmu core does not know
+>>>> that it is granted to VM, host still think that it owns pmu.
+>>>
+>>> That's one issue this patchset tries to solve. Current new mediated x86
+>>> vPMU framework doesn't allow Host or Guest own the PMU HW resource
+>>> simultaneously. Only when there is no !exclude_guest event on host,
+>>> guest is allowed to exclusively own the PMU HW resource.
+>>>
+>>>
+>>>>
+>>>> Just like FPU register, it is shared by VM and host during different
+>>>> time and it is lately switched. But if IPI or timer interrupt uses FPU
+>>>> register on host, there will be the same issue.
+>>>
+>>> I didn't fully get your point. When IPI or timer interrupt reach, a
+>>> VM-exit is triggered to make CPU traps into host first and then the host
+>> yes, it is.
 > 
-> Was just looking at the discussion [1] ;-) . FYI there is already a
-> patch on the list [2] which should be merged soon.
+> This is correct. And this is one of the points that we had debated
+> internally whether we should do PMU context switch at vcpu loop
+> boundary or VM Enter/exit boundary. (host-level) timer interrupt can
+> force VM Exit, which I think happens every 4ms or 1ms, depending on
+> configuration.
 > 
-> [1] 
-> https://lore.kernel.org/r/CA+G9fYsCL5j-9JzqNH5X03kikL=O+BaCQQ8Ao3ADQvxDuZvqcg@mail.gmail.com
-> [2] https://lore.kernel.org/r/20240422224849.2238222-1-maz@kernel.org
+> One of the key reasons we currently propose this is because it is the
+> same boundary as the legacy PMU, i.e., it would be simple to propose
+> from the perf subsystem perspective.
+> 
+> Performance wise, doing PMU context switch at vcpu boundary would be
+> way better in general. But the downside is that perf sub-system lose
+> the capability to profile majority of the KVM code (functions) when
+> guest PMU is enabled.
+> 
+>>
+>>> interrupt handler is called. Or are you complaining the executing
+>>> sequence of switching guest PMU MSRs and these interrupt handler?
+>> In our vPMU implementation, it is ok if vPMU is switched in vm exit
+>> path, however there is problem if vPMU is switched during vcpu thread
+>> sched-out/sched-in path since IPI/timer irq interrupt access pmu
+>> register in host mode.
+> 
+> Oh, the IPI/timer irq handler will access PMU registers? I thought
+> only the host-level NMI handler will access the PMU MSRs since PMI is
+> registered under NMI.
+> 
+> In that case, you should disable  IRQ during vcpu context switch. For
+> NMI, we prevent its handler from accessing the PMU registers. In
+> particular, we use a per-cpu variable to guard that. So, the
+> host-level PMI handler for perf sub-system will check the variable
+> before proceeding.
+> 
+>>
+>> In general it will be better if the switch is done in vcpu thread
+>> sched-out/sched-in, else there is requirement to profile kvm
+>> hypervisor.Even there is such requirement, it is only one option. In
+>> most conditions, it will better if time of VM context exit is small.
+>>
+> Performance wise, agree, but there will be debate on perf
+> functionality loss at the host level.
+> 
+> Maybe, (just maybe), it is possible to do PMU context switch at vcpu
+> boundary normally, but doing it at VM Enter/Exit boundary when host is
+> profiling KVM kernel module. So, dynamically adjusting PMU context
+> switch location could be an option.
+If there are two VMs with pmu enabled both, however host PMU is not 
+enabled. PMU context switch should be done in vcpu thread sched-out path.
 
+If host pmu is used also, we can choose whether PMU switch should be 
+done in vm exit path or vcpu thread sched-out path.
 
-Thanks for sharing! That does work for me.
+> 
+>>>
+>>>
+>>>>
+>>>> Regards
+>>>> Bibo Mao
+>>>>>
+>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>>> Can we add callback handler in structure kvm_guest_cbs?  just like
+>>>>>>>> this:
+>>>>>>>> @@ -6403,6 +6403,7 @@ static struct perf_guest_info_callbacks
+>>>>>>>> kvm_guest_cbs
+>>>>>>>> = {
+>>>>>>>>           .state                  = kvm_guest_state,
+>>>>>>>>           .get_ip                 = kvm_guest_get_ip,
+>>>>>>>>           .handle_intel_pt_intr   = NULL,
+>>>>>>>> +       .lose_pmu               = kvm_guest_lose_pmu,
+>>>>>>>>    };
+>>>>>>>>
+>>>>>>>> By the way, I do not know should the callback handler be triggered
+>>>>>>>> in perf
+>>>>>>>> core or detailed pmu hw driver. From ARM pmu hw driver, it is
+>>>>>>>> triggered in
+>>>>>>>> pmu hw driver such as function kvm_vcpu_pmu_resync_el0,
+>>>>>>>> but I think it will be better if it is done in perf core.
+>>>>>>>
+>>>>>>> I don't think we want to take the approach of perf and KVM guests
+>>>>>>> "fighting" over
+>>>>>>> the PMU.  That's effectively what we have today, and it's a mess
+>>>>>>> for KVM because
+>>>>>>> it's impossible to provide consistent, deterministic behavior for
+>>>>>>> the guest.  And
+>>>>>>> it's just as messy for perf, which ends up having wierd, cumbersome
+>>>>>>> flows that
+>>>>>>> exists purely to try to play nice with KVM.
+>>>>>> With existing pmu core code, in tick timer interrupt or IPI function
+>>>>>> call interrupt pmu hw may be accessed by host when VM is running and
+>>>>>> pmu is already granted to guest. KVM can not intercept host
+>>>>>> IPI/timer interrupt, there is no pmu context switch, there will be
+>>>>>> problem.
+>>>>>>
+>>>>>> Regards
+>>>>>> Bibo Mao
+>>>>>>
+>>>>
+>>
 
-Cheers
-Jon
-
--- 
-nvpublic
 
