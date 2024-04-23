@@ -1,324 +1,260 @@
-Return-Path: <kvm+bounces-15627-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15628-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D81C8AE0EE
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 11:23:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B518AE0F1
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 11:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A934B1C21852
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 09:23:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CE092812CA
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 09:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8BDB5F860;
-	Tue, 23 Apr 2024 09:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253995FB9A;
+	Tue, 23 Apr 2024 09:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OMQmap5M"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PJXqVG7W"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2085.outbound.protection.outlook.com [40.107.101.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3339E56B69;
-	Tue, 23 Apr 2024 09:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713864139; cv=fail; b=m9s4qfrfYwosaRdLG1LN+JZOq7wnCfkz0yWd6KQ3UA3GD69XU9h4RoLaNTWqAYygOn8B6AnKivzH7geWcvWrE6DvZg6g0tnM7E/ttI68LNjIGKKcmqYBpIugpVsnQ6qCq/SbbTwZg+s/gMVXgmlKvXxc4JQREltBhortE5WVp7Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713864139; c=relaxed/simple;
-	bh=xuHHbZQicq49oRqlj5RlUa7C3W7KJOM2x4iMCuGUChM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qEf3WFgM1dBkQoruf8eyvChkQOr3eMe5+7kEsBiDCsYXC4316aMXAIQ9IKKhJILgNwj0VWd+62GqClBLhAncjJ49OCS+0ycB2wrX+AB8saPpXBuTm8OrLuPng3ZWxUPmSZlWfKMxYu/ZN53qqw/kxbuxwSjZyuXXjgs0JG9Y5+U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OMQmap5M; arc=fail smtp.client-ip=40.107.101.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RNta1l1MBX853nKn4a8Myi1Phay3N7Xq/bkX/ELmxqBU6rpFFt5Gc7oEF3blXsmMulD7G8zKUI9Rwl7YWAJHKybYA9QJ8LKLU5B7d6MlPiR61U4u8p9e62dJ+HBnGSxCwwaeVCzj1DL2EdIrzZtTApEzVwKKX7yKnnwHKSI20SNWZUH478JeBo54//0PIjbZzR9MeA6BYOsQstruf+jtLyidHp6iSRL+ETSU1AUi49D1GfPuKYh5fRPyWG1kRHVshYkWo37/ksscPQHuMRzEXeCJlJoH02qHJ5kAHE+qlu7URTRvGmZSm1zsc8OP4wsdSEygQQwjHwLVU3Ni1ndISA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wvS1IVOIAmGYUK5NNha0vugtIUp6xOPG15BbmlMCcaw=;
- b=hQLflVwNdA3eJ1lPzGcsZ43DTU5HlxBAiqCcK3ALVtg8VXfiU7tBCoArKpT5j5rlMWwR3ecdR4xlo72LVTwRhUzvfXZol53ka2L7wozPhsS2494eN87mVE3S10UJnnGBKRPoKqHAOV/rx/hVAiBuH8ATSI08l45lykrmYDCNrs87rh0mT0gF+vcpHtwjLdxQDjl+WjGfkUJbLhY5PzXLc7jIRy2Idhnva2lSWQqfKQ289QkAR+dS5fa7P+ICE1zZ+b7wePMvIoSALZZPEKjUXcorjxvl7VtFsZ/cYHc25zSKMaXbJKaSUo4vOn+gYlP4vC0rADlLRAW29CwjqOiNfg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wvS1IVOIAmGYUK5NNha0vugtIUp6xOPG15BbmlMCcaw=;
- b=OMQmap5MqitQyTPUSJwRyq3qgVW9nJ/MgRK+A8hQsqe3Z+r8fBTDmlj/Uuh3KBQn4naNRgaz1BqaUGfjBUjV52pO3LjhwZbVFQqysli1qvASYVDXWD7jsct4PFVP6l0U9g6ObX5pGowaHT7UWujZn0d6qalHFTA4rJOhecdA/FFyjcKJCwArD3lAbHsKCbceoL+dsJSEqllwmViiklT38VPNjEcdVqsjYzmU9BSFzwrKaDo2k/ekGg4sWJ9a5Nt09QO2FlLhWgt9O0VusUt9SHTNo9YI2WTEzDj7sVHZuZRXWSymvbL4L8rx8+/fTlcsScee6md75NZmDr1iHUCgJA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com (2603:10b6:5:35e::8) by
- CH2PR12MB4056.namprd12.prod.outlook.com (2603:10b6:610:a5::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.44; Tue, 23 Apr 2024 09:22:15 +0000
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3]) by CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::ae68:3461:c09b:e6e3%5]) with mapi id 15.20.7472.044; Tue, 23 Apr 2024
- 09:22:15 +0000
-Message-ID: <14667111-4ad6-48d2-93ee-742c5075f407@nvidia.com>
-Date: Tue, 23 Apr 2024 10:22:08 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 12/15] KVM: arm64: nv: Add emulation for ERETAx
- instructions
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Joey Gouly <joey.gouly@arm.com>, Fuad Tabba <tabba@google.com>,
- Mostafa Saleh <smostafa@google.com>, Will Deacon <will@kernel.org>,
- Catalin Marinas <catalin.marinas@arm.com>,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <20240419102935.1935571-1-maz@kernel.org>
- <20240419102935.1935571-13-maz@kernel.org>
-From: Jon Hunter <jonathanh@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20240419102935.1935571-13-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: LNXP265CA0094.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:76::34) To CO6PR12MB5444.namprd12.prod.outlook.com
- (2603:10b6:5:35e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B895730D
+	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 09:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713864161; cv=none; b=Zr+VWo94+C9usbXj3aVTlGwQnkLBzClW1zLD5oBotgpyFD5jKT2s8jRDdQnz0F0IXUW5YnBogn8sy79MfkXX9htaJC2EM4cMbglEa42vkTB8DXudkhma/2Wm2/VVcoB4gKD5m7t/foSdfLUydCexZH+FDgwM10QiTVf/H96oqDo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713864161; c=relaxed/simple;
+	bh=0R5dY0of94s4zSRn+TTI/7ZJqS7UTIbX+2UQgcqISX0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CKr5U3wAjmA9SihhBkSBlkfaFqNvd1GodiYf/S4X9YxRKNKMTAv7o59F4Sp1A1yx40qG9XaBvhiL+FJ/nbT3mglDlJwGVkDkuHivH44RM6es6S6Be9nTcN+XYo0hleVv66AITBX1AFuUC5Ok9TLTDH0tmgIVkJjw8H1p/W5aq/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PJXqVG7W; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-439b1c72676so301051cf.1
+        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 02:22:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713864158; x=1714468958; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UIVUSLEdYKECislLxPvPqDFYm4EAX07s7N4pba7T9xw=;
+        b=PJXqVG7W5Ywt6NQQqIS9ARlkn1CDt3ahHrD2WUuc+WUHhvvYlt22jyI2vDTozL8DG8
+         neA94oT4RG9y93oG+ykkwqnKOb5xGSRIs2+ZQE9bFCGSeNFL4D88kTGeHrReXAk2xbTp
+         1z/cHUXC5v5v/1PFe1uZKpCNEif3oPTBVcheZ719R2G31YbMdapTUd/P54mwst2WdXpi
+         hXIG8lxUAlW7EHO1AsBX3kdaCyAIw7i8mT7bOSOVkwAmQqGT7M7C7JhiiXFOiCy/nPNZ
+         KSESBUB1mD0fLMd1baW4uRHEqiNus3GWhceN8EI9OlhENoQQIV9DNLlxKELIP0g1t8eP
+         iorw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713864158; x=1714468958;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UIVUSLEdYKECislLxPvPqDFYm4EAX07s7N4pba7T9xw=;
+        b=fAFFVN7utGZMJ+cKEzsejAINciCRRAwrlo6kqPDHN/lD5tZPJoy6aCodVBcz7yUuwf
+         wntLi/7/1/fYQ9gIomHWpxNHPDGawRggzoMunQphmZElqbf0dzd86wazIOg3+i/6hSn6
+         XVQkhpcIWq6ZO11Tx9g8T0R+pADRt1rhsT+fJhiMbRCqsiUAg+crPnGylqhct9GE1sKk
+         Eh9kAGNB1J4QshSFHa0XM4EA6wyqXWgXbnzL0DNcxfFE6Ni/rZd7awSqv2sliQTBCN2G
+         +lJPUwQgLdeE0fvj0H3cfy+22WTzNAabmFw16mvqFLBxXMlHMJwFG+FZha5/ERYkdaxd
+         K1bg==
+X-Forwarded-Encrypted: i=1; AJvYcCXzlINgZEqeYmvnHe+Tx0HG9IBpHVPJPNoJ3bPDzSmaz4T90FCrYX4wpsv8XLV4WtwjPZNaEG4gkKJEIhOhCWd6XSri
+X-Gm-Message-State: AOJu0Yzarqe7fne+BU6vokSu2Z2XCkkfVdLqoi3xMxXAGZr/gUgv7MGG
+	8tRPsCoc91B82S6EC/Zw7g/F2jZrHh/qxx0813sxLgXmyQ2R4k5HvjmQBknG4Y3Cs5JiPSBnq1m
+	CWkYgCVb6/pcvrstjFVC0uD2dyI4BKI3t1nTj
+X-Google-Smtp-Source: AGHT+IHUVImZr46KE7NjLsb4voeWSuhmpLmq8uDA7LeYXKhI00U6dSCZBVehDUFO7fu/ApIxReC1GPQBk/y0xeNhlH0=
+X-Received: by 2002:ac8:6682:0:b0:439:891f:bbd2 with SMTP id
+ d2-20020ac86682000000b00439891fbbd2mr232880qtp.28.1713864158511; Tue, 23 Apr
+ 2024 02:22:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5444:EE_|CH2PR12MB4056:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b59f069-d97a-42a6-52ad-08dc6376dd40
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dXhiTmtwdFpJWW9pL3JTaUtFNi8wMTRzNjhDNWhsdG1paDFZMFMrV3RENHRO?=
- =?utf-8?B?eTVPcnFMdkswWHhrUWNubkpjelJOWitjVk02aUZvQjV4TmVQb2xMOHAzZlhI?=
- =?utf-8?B?RWxENFpLSStCMmxsbWNZdVRqRGdzRXN3VHlHMHkyNFgwYmt2MXRmQk9CZGVM?=
- =?utf-8?B?WTNnMG5lbzM0czFqTDBQZE8wVFRxVlYrdXg3elJDWTBMRTh0RGV0SEJkb2ZV?=
- =?utf-8?B?MkJicGdPTzNZZVdNak82T2pTdjQ0eGZVQ3NuTFZFaGY2OENRVjR4UnBiZWtt?=
- =?utf-8?B?VkFMVWdsQkI4M08zV3NTOWE0SGxJSVZSR1FUcUd4ak1UM2l3OHkvVlE2VUdH?=
- =?utf-8?B?dGxQRWVUdHhqVTEwWjV0cFhUQjY1OTdjZjFEWnRiZTM5bkRtb2svOE9sSUln?=
- =?utf-8?B?Rk0xZWtEV2VJOGlrZzdVWkVJTmJrOU9oTmVISjdPSVRtWVljbEtRTTRETGZs?=
- =?utf-8?B?dmh2YTg3dnN2VTg0YnR0QlRHZXhhSzRjMkprWGVsZm5jRUgvTlllcWlrSFF6?=
- =?utf-8?B?b0tHR3BNU0JSUUxhZy8rQjFCR3VXa3RvRVZ5dzdvdFE4eUtwNitQY3FmdXF6?=
- =?utf-8?B?czVHREl3S3Zrd0twTHBnUG1QMk1LSDIyTFZvcHNGdXhDQkJKRG5JUjlKRVB3?=
- =?utf-8?B?UHlNd2ZjYm9ZenArUmh5NmN1ZXJjSnRXemJXRTIrWmtldHhadzNnV29SVW5a?=
- =?utf-8?B?N3hoK1R5R3E4aEdJV2NpUWZlcm5FVmV4NjdsOHorbkc3Q2kvbERXQmwvaTIx?=
- =?utf-8?B?MUNUWWo1a1Rody83YytIU3dMUzFsUGhlcFYzZUh5dFI2dEFuN1ZORFlRcHFU?=
- =?utf-8?B?UkNqSkJlQWV2RFJsREhTU296aVFnbC9DU3hTRkRJSDNwb0lTTmxsUFpmUUpa?=
- =?utf-8?B?dkw4U0pKd05ldkVWL3B2TkkxbWZyQVhGV1BQWFVYOXVEQXE2OWxHUG02b0xS?=
- =?utf-8?B?WkswK3lmb1BRZTRZMXZpZTdnVmhLUkZCTGdKUmlleUVYVGVjNlJQMHdUOWxO?=
- =?utf-8?B?TmZmRkNnMHBSeGJadHdqWFFyVDRGcVc2Y0dJa1RMSXRBSmdJM0dRVzh1bXlt?=
- =?utf-8?B?Qjl0YzRpTVBFSURkdkFSak1DeUp0RTJVS01IU2VrQVFmb3pBcUNJWkdJandC?=
- =?utf-8?B?UEh1ZDJVMzlUamNFOUZrcTJlV1JTQ2RGM1ZkUk04OHZaNzNCeEpER0lNSVpB?=
- =?utf-8?B?V1lEWVFHS1BRTWpWZnNyYzhTRGlWeVBLZS80TFlwYUw2WjZETndHcmdoNHRN?=
- =?utf-8?B?eVhxTVJEMVRvNWtPZHJDazVKL1MvZysyblBaTkdqK0FvR1N3Sk9aNkJuV0VZ?=
- =?utf-8?B?NVZna1VtaGtBVHM2UWtyek9STTMyZXc0SngzcU1JRmN4SXV6dzFqWFdkZzZ5?=
- =?utf-8?B?SzU1Qm5aZElvWXNteFJidGlXNXpLQjJaSVlkVGNnenZrWURYbXN6aHpGTkF5?=
- =?utf-8?B?NHJVR2dPZkM4eGs4ekJsTjFENWpVS01XQzdWSGVOL09aVkxzSWxmckZ4OCt1?=
- =?utf-8?B?NlU2UDh5RUhhdVpoVmFiZzJ0QlVCNWhTMm5uMGlrYzZwTWJEN1lZQjNDRWdI?=
- =?utf-8?B?NStYcElVYW1YenZNd2F6b2VaS1Bqd2VSVVBWeHFkMjlwVXFxa1YxVTZ0SGJH?=
- =?utf-8?B?R2pvRWk4eko1ZFVZa2JsdUpUL1RVdnVHb0RONWVIcHVNcURzUEp3VHFpV2tH?=
- =?utf-8?B?ZjZEMVFrVHVUdTJ0K3o4cFgrU1lpNk5wWktTcm1xdVlTb2RFUWNUQTlnPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5444.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UGNqYVhXQ0pGRTA3ZWVLUXp6Vm1tRW1lWkxWK2xUdGlBUU00V3IxeVAwRFVw?=
- =?utf-8?B?UWpJR1lOdWdqeFNWeHcxdUxYamw2VVBMa2EyMjJzdFpwWUpIWmxIT25jSmp0?=
- =?utf-8?B?RGRwMFRXQS9NblRCVG94Vk5vc3pLcnYrK3dTQlphYTEzdFlES0tCLzJmWEpJ?=
- =?utf-8?B?MWZFUFNUUHcvMjU4Q0tVU0QyaEZ1TFZVKzA4NUpvS2F0bEJQSjV2M1ZvOVRB?=
- =?utf-8?B?cmVHRmJBdXZIUVZTNW9CWVArLzNua2Zick1hRkJJOU5aVGJpOCszVUcybmpu?=
- =?utf-8?B?SkowTHYvQnQwWjY0NXFsb3lMYkZFUTZPVndwd3lRZzFKSGJBR0srdlBBaWFX?=
- =?utf-8?B?T0M2Wk1IRkZFRGI4WFhkQVh6cmF5TzhDOU1HYWZXMElLblZvZVdFVU15bW9w?=
- =?utf-8?B?RmFScms0ZEFGWGZwYzRMUVJ2Y1ErWWZaaW0wRXpWdmEvMU5tOERkcjFoOVFI?=
- =?utf-8?B?UmFjMWQrUC9KWk9BT09mMTlmUTRtZVNDT25hT2ZMMHk5MnJxS2RoK2F6dEx3?=
- =?utf-8?B?U2VhQUpUNXc0Q1d0TkxYL2N5VGc1Q2gzTGVKRTRtNHlGWGEvZlVNS1dxemNZ?=
- =?utf-8?B?Tnc5OGpFbTZ2cHIyZmdFYVl1OUYzL3RPWUsrSHBDcGl1L0NVaXdqeU1mdVpv?=
- =?utf-8?B?L2lrOFFjYksySUtsaERRWE9HT0p2ZnJwalcwcUxmL1hmdzJUMWlST3pPcnVE?=
- =?utf-8?B?QnNueUNQbFNwMnlxV1dncW1hOGlZbUt5NUpuakFvZWF0RW5EYTVWOWZPU094?=
- =?utf-8?B?aUt1SjF2Smh2ZkV6NlNjVElMOXk1Vy9UZXI5SzVRKytUSE4rVW0yT2tibmxy?=
- =?utf-8?B?bmxlRU0yZnN2L3hMRzVYVVpUUHR2cHRaWkdZUFpicUo1ZHFYMHpudHl5N0xl?=
- =?utf-8?B?a2FRNElLQnpsNndkSkZSdTlCNTlrKzZQWXFmTHQ1UVF5U05XaDBNeUFUT2Fm?=
- =?utf-8?B?SEY4QzJtaEhxWE8vWXlla2dLek1BU0tXRytNUWdlME1GR1V4YWsxTndaTk5a?=
- =?utf-8?B?Ulc2OSt0cjNVcjZqeWRkZVlZaVNRRmdFSG9Fd3M4RnJqOUNmbjNIZHN1aDZJ?=
- =?utf-8?B?a2pZZ3R5Y0FZeWtZeTZTWU5HbVhOcGptSjE1d1djTFYxa3RSalpoYUUxN0Q2?=
- =?utf-8?B?YTBYZEJwT0tLaDQ0SnVjN2t1TUthN0dadHcvS21valJuaXY1U28xZWlUSWU2?=
- =?utf-8?B?QWlxQjRBTE1SeXZCMkNsalk5YXcvalQ3NndrR2NCYnpzaDcrM1FWeWxRMTNl?=
- =?utf-8?B?ODFyWmdmcUdaZXZPMVZwTDdOZ01mYVJ4R1R4dDlBMU8xQmt6VmQ5bnFZRG9K?=
- =?utf-8?B?LytXcHJnN2toMkJNRXMzQzN3N0dUanpEOExtNUtpZXpLS0crd255OHg5MmI1?=
- =?utf-8?B?ZVlSN3NicVZUVWxtYXFzeXBlRy9RMFpyV0JFaWR1dnZvMU56Y0kwMk1VS0NX?=
- =?utf-8?B?VlFoOFY4T1EraktZdDdNWlhQdUJSTklYVFNZWkE1ZHlCbWtzMWdWYzN1Y2ZT?=
- =?utf-8?B?cC9JWWc3RkxuUVUyWTZPSWFWWFVabmN4WHVkU0lSTkFTNFRpYjIyWWxPSm83?=
- =?utf-8?B?S2NJUjdxOU45aUJnOFYyYVZBcnFnbkxZWWNIVDN4eU44eDFUeFJCR09OaWNY?=
- =?utf-8?B?bXFsYStpRmdmM2FKTUJwNmlLUTVqOTFsaWxwV3NzNlE5d1VvMFpvcXhBSTJn?=
- =?utf-8?B?NGE3Y0JRQ3pmbG9yNHZSUWVNSm9NRi82bjhuQ3F1N29hSXNUaTd1LzFvZlBB?=
- =?utf-8?B?NFJ6L24xQmZNbytRaC9qb3JnUU0vb20zdm5yajBWTjR2MEprVlBhcnpFdFJJ?=
- =?utf-8?B?MHpHT2lqWVNnVGdpSm8rVytkZUp2NDVDS2lveFUvallhcGJPc0R1L2g4RmEx?=
- =?utf-8?B?aUZzL1FIU2ZmUWpYM0dQTjhzQS9YMFcwcHpaSXAweGNNQUExY1lFSTAza0pS?=
- =?utf-8?B?b0YrdC9zY1A3eWxxcUd6cTlnaG1acUt0WHlnMkdRcnJiTTFEUkFtTGJMdUpS?=
- =?utf-8?B?TmYrU3hZWUw2Ny96ZzV2NC90cGdSb25PNmRKOHUyUmlReU1wTmJQNTlhNHlU?=
- =?utf-8?B?eUd1d2RuZkROMjR6QTlicUMvZmo1VHMrR2xnMkpUbVM2SmljUnVseE5wRDhM?=
- =?utf-8?B?amhUZWoyRTJCSGNubVlpcXZWa0l6di9tSGh0WWRZa3E0RFNINWRFNlpXbHIy?=
- =?utf-8?B?amRmME5HdzBZdW1NblY5ZVIvZFFnVXFhbFNDNWFwNVlaRzNqdk8zMEVsT1hj?=
- =?utf-8?B?SG9va3ZTVkFBY3A3NThqeFk5RVh3PT0=?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b59f069-d97a-42a6-52ad-08dc6376dd40
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR12MB5444.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 09:22:15.1593
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XbbKxcvTbrWwUXXEKfiDGSaqFE2/Nq5LxhvT8GRuMOhYt4T61va6V0yPdz99XysjHEK0q0AYQPd6s3ZdKFoG8A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4056
+References: <20240319104857.70783-1-mic@digikod.net> <20240319104857.70783-8-mic@digikod.net>
+ <928249cc-e027-4f7f-b43f-502f99a1ea63@roeck-us.net> <b70332b0-3e55-4375-935f-35ef3167a151@roeck-us.net>
+ <20240422.thesh7quoo0U@digikod.net> <a0179848-99a2-4169-b7b2-1a8cddb27615@roeck-us.net>
+In-Reply-To: <a0179848-99a2-4169-b7b2-1a8cddb27615@roeck-us.net>
+From: David Gow <davidgow@google.com>
+Date: Tue, 23 Apr 2024 17:22:24 +0800
+Message-ID: <CABVgOS=MOaWhUwVb2Rp2JDTK9=qX_p2SDZp7ZAj+03isZps9iA@mail.gmail.com>
+Subject: Re: [PATCH v3 7/7] kunit: Add tests for fault
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Brendan Higgins <brendanhiggins@google.com>, Rae Moar <rmoar@google.com>, 
+	Shuah Khan <skhan@linuxfoundation.org>, Alan Maguire <alan.maguire@oracle.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
+	James Morris <jamorris@linux.microsoft.com>, Kees Cook <keescook@chromium.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, 
+	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marco Pagani <marpagan@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Thara Gopinath <tgopinath@microsoft.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
+	Zahra Tarkhani <ztarkhani@microsoft.com>, kvm@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-um@lists.infradead.org, x86@kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000062f11b0616c01822"
 
-Hi Marc,
+--00000000000062f11b0616c01822
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 19/04/2024 11:29, Marc Zyngier wrote:
-> FEAT_NV has the interesting property of relying on ERET being
-> trapped. An added complexity is that it also traps ERETAA and
-> ERETAB, meaning that the Pointer Authentication aspect of these
-> instruction must be emulated.
-> 
-> Add an emulation of Pointer Authentication, limited to ERETAx
-> (always using SP_EL2 as the modifier and ELR_EL2 as the pointer),
-> using the Generic Authentication instructions.
-> 
-> The emulation, however small, is placed in its own compilation
-> unit so that it can be avoided if the configuration doesn't
-> include it (or the toolchan in not up to the task).
-> 
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->   arch/arm64/include/asm/kvm_nested.h    |  12 ++
->   arch/arm64/include/asm/pgtable-hwdef.h |   1 +
->   arch/arm64/kvm/Makefile                |   1 +
->   arch/arm64/kvm/pauth.c                 | 196 +++++++++++++++++++++++++
->   4 files changed, 210 insertions(+)
->   create mode 100644 arch/arm64/kvm/pauth.c
-> 
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index dbc4e3a67356..5e0ab0596246 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -64,4 +64,16 @@ extern bool forward_smc_trap(struct kvm_vcpu *vcpu);
->   
->   int kvm_init_nv_sysregs(struct kvm *kvm);
->   
-> +#ifdef CONFIG_ARM64_PTR_AUTH
-> +bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr);
-> +#else
-> +static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> +{
-> +	/* We really should never execute this... */
-> +	WARN_ON_ONCE(1);
-> +	*elr = 0xbad9acc0debadbad;
-> +	return false;
-> +}
-> +#endif
-> +
->   #endif /* __ARM64_KVM_NESTED_H */
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index ef207a0d4f0d..9943ff0af4c9 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -297,6 +297,7 @@
->   #define TCR_TBI1		(UL(1) << 38)
->   #define TCR_HA			(UL(1) << 39)
->   #define TCR_HD			(UL(1) << 40)
-> +#define TCR_TBID0		(UL(1) << 51)
->   #define TCR_TBID1		(UL(1) << 52)
->   #define TCR_NFD0		(UL(1) << 53)
->   #define TCR_NFD1		(UL(1) << 54)
-> diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-> index c0c050e53157..04882b577575 100644
-> --- a/arch/arm64/kvm/Makefile
-> +++ b/arch/arm64/kvm/Makefile
-> @@ -23,6 +23,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
->   	 vgic/vgic-its.o vgic/vgic-debug.o
->   
->   kvm-$(CONFIG_HW_PERF_EVENTS)  += pmu-emul.o pmu.o
-> +kvm-$(CONFIG_ARM64_PTR_AUTH)  += pauth.o
->   
->   always-y := hyp_constants.h hyp-constants.s
->   
-> diff --git a/arch/arm64/kvm/pauth.c b/arch/arm64/kvm/pauth.c
-> new file mode 100644
-> index 000000000000..a3a5c404375b
-> --- /dev/null
-> +++ b/arch/arm64/kvm/pauth.c
-> @@ -0,0 +1,196 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Copyright (C) 2024 - Google LLC
-> + * Author: Marc Zyngier <maz@kernel.org>
-> + *
-> + * Primitive PAuth emulation for ERETAA/ERETAB.
-> + *
-> + * This code assumes that is is run from EL2, and that it is part of
-> + * the emulation of ERETAx for a guest hypervisor. That's a lot of
-> + * baked-in assumptions and shortcuts.
-> + *
-> + * Do no reuse for anything else!
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/kvm_emulate.h>
-> +#include <asm/pointer_auth.h>
-> +
-> +static u64 compute_pac(struct kvm_vcpu *vcpu, u64 ptr,
-> +		       struct ptrauth_key ikey)
-> +{
-> +	struct ptrauth_key gkey;
-> +	u64 mod, pac = 0;
-> +
-> +	preempt_disable();
-> +
-> +	if (!vcpu_get_flag(vcpu, SYSREGS_ON_CPU))
-> +		mod = __vcpu_sys_reg(vcpu, SP_EL2);
-> +	else
-> +		mod = read_sysreg(sp_el1);
-> +
-> +	gkey.lo = read_sysreg_s(SYS_APGAKEYLO_EL1);
-> +	gkey.hi = read_sysreg_s(SYS_APGAKEYHI_EL1);
-> +
-> +	__ptrauth_key_install_nosync(APGA, ikey);
-> +	isb();
-> +
-> +	asm volatile(ARM64_ASM_PREAMBLE ".arch_extension pauth\n"
-> +		     "pacga %0, %1, %2" : "=r" (pac) : "r" (ptr), "r" (mod));
-> +	isb();
+On Mon, 22 Apr 2024 at 21:36, Guenter Roeck <linux@roeck-us.net> wrote:
+>
+> On 4/22/24 06:08, Micka=C3=ABl Sala=C3=BCn wrote:
+> > On Fri, Apr 19, 2024 at 04:38:01PM -0700, Guenter Roeck wrote:
+> >> On Fri, Apr 19, 2024 at 03:33:49PM -0700, Guenter Roeck wrote:
+> >>> Hi,
+> >>>
+> >>> On Tue, Mar 19, 2024 at 11:48:57AM +0100, Micka=C3=ABl Sala=C3=BCn wr=
+ote:
+> >>>> Add a test case to check NULL pointer dereference and make sure it w=
+ould
+> >>>> result as a failed test.
+> >>>>
+> >>>> The full kunit_fault test suite is marked as skipped when run on UML
+> >>>> because it would result to a kernel panic.
+> >>>>
+> >>>> Tested with:
+> >>>> ./tools/testing/kunit/kunit.py run --arch x86_64 kunit_fault
+> >>>> ./tools/testing/kunit/kunit.py run --arch arm64 \
+> >>>>    --cross_compile=3Daarch64-linux-gnu- kunit_fault
+> >>>>
+> >>>
+> >>> What is the rationale for adding those tests unconditionally whenever
+> >>> CONFIG_KUNIT_TEST is enabled ? This completely messes up my test syst=
+em
+> >>> because it concludes that it is pointless to continue testing
+> >>> after the "Unable to handle kernel NULL pointer dereference" backtrac=
+e.
+> >>> At the same time, it is all or nothing, meaning I can not disable
+> >>> it but still run other kunit tests.
+> >>>
+> >
+> > CONFIG_KUNIT_TEST is to test KUnit itself.  Why does this messes up you=
+r
+> > test system, and what is your test system?  Is it related to the kernel
+> > warning and then the message you previously sent?
+>
+> It is not a warning, it is a BUG which terminates the affected kernel thr=
+ead.
+> NULL pointer dereferences are normally fatal, which is why I abort tests
+> if one is encountered. I am not going to start introducing code into my
+> scripts to ignore such warnings (or BUG messages) on a case by case basis=
+;
+> this would be unmaintainable.
+>
+> > https://lore.kernel.org/r/fd604ae0-5630-4745-acf2-1e51c69cf0c0@roeck-us=
+.net
+> > It seems David has a solution to suppress such warning.
+> >
+>
+> I don't think so. My series tried to suppress warning backtraces, not BUG
+> messages. BUG messages can not easily be suppressed since the reaction is
+> architecture specific and typically fatal.
+>
+> As I said below, never mind, I just disabled CONFIG_KUNIT_TEST in my test=
+ing.
+>
+> Guenter
+>
 
+I think it probably makes sense to permit disabling the fault tests
+independently, at least until we have a way of suppressing the
+warnings.
 
-Some of our builders currently have an older version of GCC (v6) and
-after this change I am seeing ...
+I've sent out a patch to add a CONFIG_KUNIT_FAULT_TEST option to
+disable these tests. Would that help?
+https://lore.kernel.org/linux-kselftest/20240423090808.242389-1-davidgow@go=
+ogle.com/
 
-   CC      arch/arm64/kvm/pauth.o
-/tmp/ccohst0v.s: Assembler messages:
-/tmp/ccohst0v.s:1177: Error: unknown architectural extension `pauth'
-/tmp/ccohst0v.s:1177: Error: unknown mnemonic `pacga' -- `pacga x21,x22,x0'
-/local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:244: recipe for target 'arch/arm64/kvm/pauth.o' failed
-make[5]: *** [arch/arm64/kvm/pauth.o] Error 1
-/local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: recipe for target 'arch/arm64/kvm' failed
-make[4]: *** [arch/arm64/kvm] Error 2
-/local/workdir/tegra/mlt-linux_next/kernel/scripts/Makefile.build:485: recipe for target 'arch/arm64' failed
-make[3]: *** [arch/arm64] Error 2
+(The other option is to split the tests out into a totally separate
+file / module. I think that's an option (and would make the config
+option more consistent with other test options) but since they're
+otherwise part of the KUnit tests, I think I prefer to keep them
+together.)
 
+Cheers,
+-- David
 
-I know this is pretty old now and I am trying to get these builders
-updated. However, the kernel docs still show that GCC v5.1 is
-supported [0].
+--00000000000062f11b0616c01822
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Jon
-
-
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/tree/Documentation/process/changes.rst
--- 
-nvpublic
+MIIPqgYJKoZIhvcNAQcCoIIPmzCCD5cCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg0EMIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
+IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
+dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
+6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
+c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
+I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
+AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
+BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
+CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
+AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
+MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
+My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
+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
+7xDrOPfX3COqq162RFg/MFcGA1UdIARQME4wCQYHZ4EMAQUBATBBBgkrBgEEAaAyASgwNDAyBggr
+BgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wDAYDVR0TAQH/
+BAIwADCBmgYIKwYBBQUHAQEEgY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNp
+Z24uY29tL2NhL2dzYXRsYXNyM3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJl
+Lmdsb2JhbHNpZ24uY29tL2NhY2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgw
+FoAUfMwKaNei6x4schvRzV2Vb4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9i
+YWxzaWduLmNvbS9jYS9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEB
+AK0lDd6/eSh3qHmXaw1YUfIFy07B25BEcTvWgOdla99gF1O7sOsdYaTz/DFkZI5ghjgaPJCovgla
+mRMfNcxZCfoBtsB7mAS6iOYjuwFOZxi9cv6jhfiON6b89QWdMaPeDddg/F2Q0bxZ9Z2ZEBxyT34G
+wlDp+1p6RAqlDpHifQJW16h5jWIIwYisvm5QyfxQEVc+XH1lt+taSzCfiBT0ZLgjB9Sg+zAo8ys6
+5PHxFaT2a5Td/fj5yJ5hRSrqy/nj/hjT14w3/ZdX5uWg+cus6VjiiR/5qGSZRjHt8JoApD6t6/tg
+ITv8ZEy6ByumbU23nkHTMOzzQSxczHkT+0q10/MxggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJF
+MRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIz
+IFNNSU1FIENBIDIwMjACEAHS+TgZvH/tCq5FcDC0n9IwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZI
+hvcNAQkEMSIEICOgtZbnjNPnp0XK9jkyAuFSQkAiQFiPF/waq0dMweU1MBgGCSqGSIb3DQEJAzEL
+BgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQyMzA5MjIzOFowaQYJKoZIhvcNAQkPMVww
+WjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkq
+hkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCLzff9
+FDeDetOWvy6uoOdJnlb25fbO6q5RHkefp+asUsi42FPODqn3EfHQdwwl4+C+keK704m9Y6zGgg4T
+0vxixRA/BtSXwbM8Fl6Df200ElutWw3ljz5zva1NfMfAx2CNpDgHNtbAmEOhYUYd+VGOxVVlCOOk
+0gsqxi6xHO2Yxbyf0Wkz6fPhz3TyElZQUrHt/Jim/6rNIaDHAlKzp34cdFdWdsIu9R+eJSazQHy0
+ruGHCF3+zW0TxdeWINQJE/W2WKrLUAUhBQgatT1cAY5aMozV35d8JLYMiZ1m/Ft57btFmiR78bxn
+aX+P2Imbjr5ryox6Ves599tT+j+e7/kq
+--00000000000062f11b0616c01822--
 
