@@ -1,133 +1,118 @@
-Return-Path: <kvm+bounces-15688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C1B8AF495
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 18:48:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB2148AF4A4
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 18:51:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 253121C23D91
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 16:48:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59C931F25464
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 16:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B998513D635;
-	Tue, 23 Apr 2024 16:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D0013D63B;
+	Tue, 23 Apr 2024 16:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H0N9z2Dp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FpPhimtb"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCEB813D510;
-	Tue, 23 Apr 2024 16:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1C786256
+	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 16:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713890910; cv=none; b=j7Q+Eb3zQSDitVcUFmYzR/VWc6/pdxCdWDPqj/DuEdLJVGAOYxve1ghcx6d+zD7EQyJqq5P58YnP2B9AZ3iyZZaEo471kY/3HyDHaArPPXlKHWDYS8grTHWs/Ybkm3IUSDYKZTQh4o8wTFAcaqoH1Ds4UgpLPG4SH04+v4ayd0Q=
+	t=1713891086; cv=none; b=p5ob54WyhwFoXHU8FVCeKjqbob0F1iqsC2P6hv6xT+6nWHaLIAfAxm4/zTk7gCxJmAyUerwSczqJVEMlpGHvhhvIA616nRAqEoFPwcMYFqV1XQ9KggDv2lOybHr7eOmXSbMRQQIxEjmgzrRf9IfZ0BdfZKbWXPotVDnlyLuoV3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713890910; c=relaxed/simple;
-	bh=dDcEPFI4Ualc1uLvugD6+grOLhPWeZRyR8kTPMNYs3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sZ0RyWF7U4pcH4NthuPhKLWiJgBBfS/olC0LqhwXeWekkRhoit+MDbjFS4Wu6YFVP1g6vooL15JVo5cX0kyFhnlJpyPfB1z2xyoC2RgBVQW5vmowOMWRoPtLQ9AIY8GC4CTFiT05F9EQXR7dtM/5Lkm8xqVnPSrtk20lFYdDMT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H0N9z2Dp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2099AC116B1;
-	Tue, 23 Apr 2024 16:48:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713890909;
-	bh=dDcEPFI4Ualc1uLvugD6+grOLhPWeZRyR8kTPMNYs3s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=H0N9z2Dpb8WrHvqNLiT000UhV8Y+9krxRJtMDjYhIaBZP1030Bof/Sp/hOK16Vnyt
-	 pbVCxC1D1O5/vA65C3BsscHOwlAvYg1UpOpQ3EVxyzDTLUE1ZM+lZ8cmZu3/NkS3Tw
-	 xVOk1gKZBGsmyD84IVNwPtg+ESwZW+XFy+bMdvO5bjU1uLsENudLBOWWYEhZMMT8Fa
-	 vyNNR8+roNhWc/HCa+cWfetSA9UjIquzJOhYsoF6WnUMrvgZez9qPfpY5616SRkjrl
-	 L6wHTtaUP4o+WnWmTSYwHJWDswPA3+5pzcdxtnlLflvYjbQiJdjWqAwg5QkWxRyxD2
-	 yBGwCrlwvy10w==
-Date: Tue, 23 Apr 2024 17:48:24 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
-	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 2/5] riscv: add ISA extension parsing for Zimop
-Message-ID: <20240423-juiciness-unethical-90ec18e4fabe@spud>
-References: <20240404103254.1752834-1-cleger@rivosinc.com>
- <20240404103254.1752834-3-cleger@rivosinc.com>
+	s=arc-20240116; t=1713891086; c=relaxed/simple;
+	bh=2l+5UdzN7ZbavXU6zUsRnpsRb/FYFC3ss2jaeR0uYUU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ah68MZduEdqMEsgM2LraT1r97wwqxDvi1gAfqmpATK48GCi+oWdW3sf7o8qI18nr84Vt1LIjZOGCl9XhL3xxbaOEYVwWxZ4XQnWA/oY1lSivdmwcpLzQttTpy/2QKM2AY6sNJqXnVZOEYmg6sS11Y3bGjMLSshA7cXkrDFjIQcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FpPhimtb; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a557044f2ddso656242066b.2
+        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 09:51:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713891083; x=1714495883; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2l+5UdzN7ZbavXU6zUsRnpsRb/FYFC3ss2jaeR0uYUU=;
+        b=FpPhimtbwTbG8zHDLO7JzciMv2Nwo2AywCncPzBYhjcRP//m55sLeIZQhJFW2AhZgc
+         nXZdl2xoAbKSOgNO8Eqc3hiHMT9D+YFkvFx43YNLrGiC3cXP84LszpQisEETTLBAp8cl
+         TZpXXvalNbMT8hSXXhXV3NjYUl15tHE3nhTBcLdbJ4CK09nkeU6Hy8i+PCXvcMmRKrzm
+         Wwv2qPk7//H2lOmm/M5dq665zAAqEp2POy3S2nwzg6HBKT6OO8r7yDqehHSmFYTQ4pre
+         eagIovl1F4WXt12lSuMJaighnAKAvbfHTHdq3TmWySkYkf/fKA7RBpcVf88owckqXt+k
+         mCHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713891083; x=1714495883;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2l+5UdzN7ZbavXU6zUsRnpsRb/FYFC3ss2jaeR0uYUU=;
+        b=LcNcmDx8RB8k7vpvi+OyBvFmkiAcCyEVpO0RvsNxu8488Vj7OlnLHI50MLDEFuvRQP
+         E0/CkrPDosegmxFVxXlrJrtXXTfKMdlYcRrPI/xev6xbc93h8F2w3O3GR8xDPU9N5C0C
+         O2p+Bdi7BV3rUF/M5Jo/eiOSgtXNAj8BrojT1+kBcNStTU/supjJUfHRXX4JPOhuR/7p
+         k+8j9jBasUiW6hDkdGRRA0ob3lIh9wWhmAROGK9XrxgbmNIsp5W7FGBHdU8fOBahg//q
+         iW/Y+JCkRoqg9ZWCq04Hh6gajJss7E4/oyx8F1vmU7RCfJ2CHheIghb45VwzpBFyZZiB
+         nYxg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+Gd0k/ol6/Ukg5P+aQYO4mfTYlF+ED6hl1XOTCLBHWGH2ti9YaL+VdqtTjh0ERiCA+MxdWj1lYpYS9wBjxv4nDpAj
+X-Gm-Message-State: AOJu0YzldH+yOEV6NP1UIbG7sc4QlLrb1KM+Vsnh4xV97ze8UFpNjf/5
+	YBm3xomdagR2m8fwzlptCh93pva1WNqG9Y0dNi5vhLxfuKmX+RT6urCxDbi8Yh63IsA1N3z0xZA
+	CAi/u8VcgZG2UqwnYfVEBCzfe2qQ54IrEV/6S
+X-Google-Smtp-Source: AGHT+IEUYXbroPWIegwIe9uOSMKwRDxhQ+zZsIaEyJugWTF5WG0C5K8peKi60BHk1tv+7Q4IawZ95Nmnfs8+lJ+y+Pc=
+X-Received: by 2002:a17:906:615:b0:a52:3623:f498 with SMTP id
+ s21-20020a170906061500b00a523623f498mr10162882ejb.31.1713891083421; Tue, 23
+ Apr 2024 09:51:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Zc1JrpErq69EY9Ys"
-Content-Disposition: inline
-In-Reply-To: <20240404103254.1752834-3-cleger@rivosinc.com>
+References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com> <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com> <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
+ <Zh2uFkfH8BA23lm0@google.com> <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
+ <ZiaX3H3YfrVh50cs@google.com> <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
+ <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com> <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
+ <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com> <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
+ <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
+ <86d1f6d1-197a-ecd9-3349-a64da9ea9789@loongson.cn> <729c4b30-163c-4115-a380-14ece533a8b9@linux.intel.com>
+ <CAL715W+BpyX3EeKr=3ipMH8W30wmhMkxg2Fx2OET9cvQ480cgg@mail.gmail.com> <46a889c4-b104-487e-be3e-7f4b57c0b339@linux.intel.com>
+In-Reply-To: <46a889c4-b104-487e-be3e-7f4b57c0b339@linux.intel.com>
+From: Mingwei Zhang <mizhang@google.com>
+Date: Tue, 23 Apr 2024 09:50:47 -0700
+Message-ID: <CAL715WK60PeB5kmStfKq9pFb4CMf6DL5hjM5kMXEe+5yE_e_gw@mail.gmail.com>
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: maobibo <maobibo@loongson.cn>, Sean Christopherson <seanjc@google.com>, 
+	Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, peterz@infradead.org, 
+	kan.liang@intel.com, zhenyuw@linux.intel.com, jmattson@google.com, 
+	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="UTF-8"
 
+> > Is there any event in the host still having PERF_EVENT_STATE_ACTIVE?
+> > If so, hmm, it will reach perf_pmu_disable(event->pmu), which will
+> > access the global ctrl MSR.
+>
+> I don't think there is any event with PERF_EVENT_STATE_ACTIVE state on
+> host when guest owns the PMU HW resource.
+>
+> In current solution, VM would fail to create if there is any system-wide
+> event without exclude_guest attribute. If VM is created successfully and
+> when vm-entry happens, the helper perf_guest_enter() would put all host
+> events with exclude_guest attribute into PERF_EVENT_STATE_INACTIVE state
+> and block host to create system-wide events without exclude_guest attribute.
+>
 
---Zc1JrpErq69EY9Ys
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yeah, that's perfect.
 
-On Thu, Apr 04, 2024 at 12:32:48PM +0200, Cl=E9ment L=E9ger wrote:
-> Add parsing for Zimop ISA extension which was ratified in commit
-> 58220614a5f of the riscv-isa-manual.
->=20
-> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
-
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-> ---
->  arch/riscv/include/asm/hwcap.h | 1 +
->  arch/riscv/kernel/cpufeature.c | 1 +
->  2 files changed, 2 insertions(+)
->=20
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwca=
-p.h
-> index e17d0078a651..543e3ea2da0e 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -81,6 +81,7 @@
->  #define RISCV_ISA_EXT_ZTSO		72
->  #define RISCV_ISA_EXT_ZACAS		73
->  #define RISCV_ISA_EXT_XANDESPMU		74
-> +#define RISCV_ISA_EXT_ZIMOP		75
-> =20
->  #define RISCV_ISA_EXT_XLINUXENVCFG	127
-> =20
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeatur=
-e.c
-> index 3ed2359eae35..115ba001f1bc 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -256,6 +256,7 @@ const struct riscv_isa_ext_data riscv_isa_ext[] =3D {
->  	__RISCV_ISA_EXT_DATA(zihintntl, RISCV_ISA_EXT_ZIHINTNTL),
->  	__RISCV_ISA_EXT_DATA(zihintpause, RISCV_ISA_EXT_ZIHINTPAUSE),
->  	__RISCV_ISA_EXT_DATA(zihpm, RISCV_ISA_EXT_ZIHPM),
-> +	__RISCV_ISA_EXT_DATA(zimop, RISCV_ISA_EXT_ZIMOP),
->  	__RISCV_ISA_EXT_DATA(zacas, RISCV_ISA_EXT_ZACAS),
->  	__RISCV_ISA_EXT_DATA(zfa, RISCV_ISA_EXT_ZFA),
->  	__RISCV_ISA_EXT_DATA(zfh, RISCV_ISA_EXT_ZFH),
-> --=20
-> 2.43.0
->=20
-
---Zc1JrpErq69EY9Ys
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZifmVwAKCRB4tDGHoIJi
-0rtUAQCfFhskrVJaQGT4zQgAGIaJX6eQRM8RECwtSJ2o0cGu0gD+IKq0dbK1gZnO
-+otlDf1x+J0DKBOQ9YLeg8J2xFWRTAk=
-=AiuW
------END PGP SIGNATURE-----
-
---Zc1JrpErq69EY9Ys--
+Thanks.
+-Mingwei
 
