@@ -1,87 +1,109 @@
-Return-Path: <kvm+bounces-15721-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15722-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67B6A8AF818
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 22:38:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A288AF821
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 22:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D337A1F232F2
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 20:38:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47C601C220C2
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 20:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47828142E79;
-	Tue, 23 Apr 2024 20:38:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B6E142E8A;
+	Tue, 23 Apr 2024 20:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OXg9+W/g"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZnckUDGD";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="BfVb5/hH"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6AF142627
-	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 20:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C751313E02C;
+	Tue, 23 Apr 2024 20:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713904686; cv=fail; b=eS+2OkzE0wb7uwfTi6KY7I6Qc8OP+7tqkT9G7K8IxxWcR1+8babq4v7/SaRW0X6M0fn4OkqBirSzP0xLXznGyH80AX/XynqSBPqw06p/8DM6VJfZ4YrXvV8IVRwSQaAr8ItxaE49JKv5GfxD0R92b6DczIczgc45+WZuolRQBM4=
+	t=1713905047; cv=fail; b=em1v8A8biTprCkamri+4MI6Xz5ZSFb6CLe4UdBYh88GaRMcOY6JZDGwDKpKRfKVx4CFh1hc4vvQRIEC5kY6tLEoh47o4Xr2jAZ46X1I0Z7zm22sq/rAsPP2SBzmPbRvlA0Dh0RM9mTIr0TnLhPQG0IBsifutQmRVoLETmCK/xcI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713904686; c=relaxed/simple;
-	bh=50X2pBa9Kiu83oZagyhM6XQkknlCIdnK0XfhMO0MO+M=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=jrx4hQhu2QT6QXzDMfTjPBSAx8m/8hRBS7iLm6pBt0m+JQ1cbj2cL0Cmhc/JJykaPXIb0wCPwwUJdOSsvHKCN0AwjCPD2+mjhkWMKZHS3q4CtXh2QpNiK6DPrK09YdZE+XaievuZn4m1YyKn/ySp65bGQ+ALLLwWQq72y7OJEyI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OXg9+W/g; arc=fail smtp.client-ip=40.107.243.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1713905047; c=relaxed/simple;
+	bh=CA687IsR+MFjSwh3aZnQ+p01WrLm1ZMMcdcACOjsjJg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KSXXIDLl3mXcpMFILOL6oxXnzp7lC3bKxEdtr2seiOizJ7E27prVZBIoYr80hMLZCNTBfb3oEtHYCbheGIHyQu0qE7FEJLa0noXAY5ZuYmePMMOrA0QuDFq6VPuWfPMdxemHqxCVcn5FKmTFdPTJdPuSOxDZa8Lf+0GvuSeEAX4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ZnckUDGD; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=BfVb5/hH; arc=fail smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43NJd52v019325;
+	Tue, 23 Apr 2024 20:43:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=U2WtTRWTo1N7s6FIEfEm1M9gG/0oo9W/j4eE1+PfG4A=;
+ b=ZnckUDGDpOiKshd4tStho+kJsfttC+sw7g+/GN8beYSxcwstUEY7OdnFJeMgDKMxe1PV
+ qTKi9sz68JsQeYldNjnlZy4xIU5Ew8KHmxRVqfjR9A1hM16/itgBJPOD8emtZanfyuLs
+ wOtwxGrr7cbFv5mxgBjgwTz+wAEnZ6CJmjuItmyk062nnU7c4X3KRXKwlfXdsnRcyNrZ
+ nJRFDvEWVZinM2cZDZEemg8MAZmg1TypJ+xziEXUxvOnHi3rvSNn0MOWDfMAWeqeljn2
+ 33PBTtB+PZP7TOzZZbt9oLdI8+Zo1bHSeaAgoKLjG8QsUG0ck08008AlExRLgibbup02 qg== 
+Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xm68vexku-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Apr 2024 20:43:58 +0000
+Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43NJhaUv025412;
+	Tue, 23 Apr 2024 20:43:56 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2173.outbound.protection.outlook.com [104.47.58.173])
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3xm45e4cj6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Apr 2024 20:43:56 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YZu27l1RDD6m9xmCuLMl5meyjKWcraPhZ/CpqY7h899TsdHbvJ4sICLgQOF+dPLFu8CSIp0+0jtODGi+u0Wtm3CGALlzfKKZ+OMU6PDxzZ2cjUdZsHR8coGqNpK85nf4ETp5t5jHz5GyzXN0rrq3qdNTYS9RRZLk5E154B1/Xtsq1Uzi/ABo4tPWqLO7EKXmWnndfK7ya7fhbXIg2NlPtNPRUQbT/qmvl8Nm3QqGWhpTWifjv9VjOmNDhlxZ7IUsCccNQMRxKHHq8/0QiT5Dl4t2fDSvPYz6OuqgYICDmd0iCL+lBDj1LyN7gDfYg2PnlogqfezGunNc4n+Q9n4gYQ==
+ b=Dic2jSco+avYWmttKFSScSgkWGy87xSPRqMhV/SwlAvtsKWRYHGjjaZ4cYfBjIsnZmzCA5t4RasFpwU7GbKnLGWZCFQLeOSx8najEch4UJUcGSTvZWw6SVh/6176WqF1BUcHrRuMSf8ay9iL6fpXthGo4LP73Swy49xgjxaYKQatB8PfKrWaQrP1iG23l8fpuZfVotFX+NAOpv8KPgEJGb0AQmhxkxf1o+OJHkR3Hn40kMSgq3r033NRqy5I2BNDKSV903tjq9eccsqdehoD0o82hvd2CmsS1pEP+kRGlaIWuOOnSIlrHOAtwvdvz0mH26qz1XbfwXTcIg6KzUDSfA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EVExMMSees/urNt8zV28Sbc7odgLHWuINw1XDMR8Oao=;
- b=iCIdFYrFJJBAzFCrX70OzJqUW1bLHoMQkzyUzIasMKG29Dv0TPMRG13Exno6tkaEhHpZySNXphqNpErGo+cKgC7dggIQM2cvfkfTwbPMC6teixxkpClu+N6LgngooMfbo9fnRp+tNrfo40Q3z3VrO6yY3IJsWNIwWyzi0zA+eLO4BYl8XYrzBaD7tpXgmnFVtNj+EkGqCznQz3LCgV/E7OsrAYvNw+Za5wmeuT87pvVEcS1ua7EZ7i5V02j79VoMxANTBXR7AiOKyl86TqSAVZH4ALhcicQbunqLaIQ6pkXAjbj1Owwl7odsL//Ot53wmv6q+eLm3MMRnqSE0cXUYA==
+ bh=U2WtTRWTo1N7s6FIEfEm1M9gG/0oo9W/j4eE1+PfG4A=;
+ b=i1ZO4uJBmv2DBZnVmU/ZceDdHVCZwR4ttUzx8pI1fhxGNiJPHnNzOfG2QirEDciYpV7SPvYlem301wKFxNNyNqweXGDHObw2hQRoKkPXOd6q2f+vtjwBgNCzO5TKZvnbpVu07sVcfWKH/QdWy4Tb3QLLZD2xaOFgUuqz/ajwlul7pRr/z0Jt17gWYu0NYhcrqFJNcs6s+vOKGYPq3Msn1503kdNd25OtVyAa7iNqAKKy90UnSjiRuZqKP43LBWexOzOOf/MTGeaYKkVhWZa0ScDufZgVxh0wo0hAx8lSypDebZBnlqG2lwgtoczoAt/kZiPjlmfmBExwoRJYltcxNA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EVExMMSees/urNt8zV28Sbc7odgLHWuINw1XDMR8Oao=;
- b=OXg9+W/gp939ECksGRG8ZnQDC0NR/me2zuAfipGZgnVVVf0mhGvNbCumZEDS6MByMQ8R2II9GBMO2x8Sud0Q0j1SX3UkLg1SXHHbApJyRZtSNOhSmRntn2qb51TRaFqvTVmKKyewfm9XKQpXCpkM7kihv4QywiYEN/6zAC85Nu0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
- by MN2PR12MB4358.namprd12.prod.outlook.com (2603:10b6:208:24f::12) with
+ bh=U2WtTRWTo1N7s6FIEfEm1M9gG/0oo9W/j4eE1+PfG4A=;
+ b=BfVb5/hHEojtHFFAu3P8Fy+ttIHnbg6Oq+jCwcxmocxi45zW1C+NVqsfbMqnN2rR9x5ZwaZtrmdE08ZGbHqnn1AsP65FAfKroFzvtHDU06uIHXT3vJrgu/j6tTC/cHZ/aWq0jVjb0hs7tzu4TUdvlYGSMDT21/z07zD0QOGh3Y8=
+Received: from DS7PR10MB5280.namprd10.prod.outlook.com (2603:10b6:5:3a7::5) by
+ IA0PR10MB7372.namprd10.prod.outlook.com (2603:10b6:208:40f::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Tue, 23 Apr
- 2024 20:38:02 +0000
-Received: from BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::bf0:d462:345b:dc52]) by BL1PR12MB5732.namprd12.prod.outlook.com
- ([fe80::bf0:d462:345b:dc52%7]) with mapi id 15.20.7472.044; Tue, 23 Apr 2024
- 20:38:02 +0000
-Message-ID: <ba2c1d9e-ad14-4e68-20b9-6aac97f09925@amd.com>
-Date: Tue, 23 Apr 2024 15:38:00 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
+ 2024 20:43:54 +0000
+Received: from DS7PR10MB5280.namprd10.prod.outlook.com
+ ([fe80::c7cc:f6b7:386e:fd5d]) by DS7PR10MB5280.namprd10.prod.outlook.com
+ ([fe80::c7cc:f6b7:386e:fd5d%6]) with mapi id 15.20.7472.045; Tue, 23 Apr 2024
+ 20:43:52 +0000
+Message-ID: <0c7f0f31-9824-4123-81e6-d7597c545026@oracle.com>
+Date: Tue, 23 Apr 2024 16:43:50 -0400
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 0/3] Export APICv-related state via binary stats interface
+To: Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
+        mark.kanda@oracle.com, suravee.suthikulpanit@amd.com,
+        mlevitsk@redhat.com, Chao Gao <chao.gao@intel.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        Vasant Hegde <vashegde@amd.com>
+References: <20240215160136.1256084-1-alejandro.j.jimenez@oracle.com>
+ <Zh6-h0lBCpYBahw7@google.com>
+ <CABgObfZ4kqaXLaOAOj4aGB5GAe9GxOmJmOP+7kdke6OqA35HzA@mail.gmail.com>
+ <Zh79D2BdtS0jKO6W@google.com>
+ <CABgObfaSTa7pC0FBhx45NVGyLtBGceZJCZbjjko-tA-J8a1tiA@mail.gmail.com>
 Content-Language: en-US
-To: Yosry Ahmed <yosryahmed@google.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: Peter Gonda <pgonda@google.com>, Li RongQing <lirongqing@baidu.com>,
- pbonzini@redhat.com, kvm@vger.kernel.org, Michael Roth
- <michael.roth@amd.com>, David Rientjes <rientjes@google.com>
-References: <20240418030703.38628-1-lirongqing@baidu.com>
- <ZicA3732THkl-B1u@google.com>
- <CAMkAt6oP2CM+EtSNtCw7+V72UsPTHRZ04t7d21j0jQsj8wkW8w@mail.gmail.com>
- <CAJD7tkZzHQUOH3EiJ_Zn33dya+pumnohoKA7AnnVm4GE+WcOhg@mail.gmail.com>
- <ZigBYpHubg00BnAT@google.com>
- <CAJD7tkafCAP=qx2H=U2taxPL-5eqrVTqPuSUxQZKSPA-qAjyvg@mail.gmail.com>
- <ZigFQPCL7S_VtxFs@google.com>
- <CAJD7tkZJQLHN5vK_3LpUy-dFHtH3c4sJ3JHFwyfdVOUn=WJW3A@mail.gmail.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH] KVM: SVM: Consider NUMA affinity when allocating per-CPU
- save_area
-In-Reply-To: <CAJD7tkZJQLHN5vK_3LpUy-dFHtH3c4sJ3JHFwyfdVOUn=WJW3A@mail.gmail.com>
+From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+In-Reply-To: <CABgObfaSTa7pC0FBhx45NVGyLtBGceZJCZbjjko-tA-J8a1tiA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN6PR01CA0031.prod.exchangelabs.com (2603:10b6:805:b6::44)
- To BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+X-ClientProxiedBy: BL6PEPF00016417.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1004:0:5) To DS7PR10MB5280.namprd10.prod.outlook.com
+ (2603:10b6:5:3a7::5)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,134 +111,276 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|MN2PR12MB4358:EE_
-X-MS-Office365-Filtering-Correlation-Id: eea29e6e-d59e-45bb-c3f4-08dc63d54577
+X-MS-TrafficTypeDiagnostic: DS7PR10MB5280:EE_|IA0PR10MB7372:EE_
+X-MS-Office365-Filtering-Correlation-Id: d26a404e-77c0-451b-e501-08dc63d61620
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dlB4LyszMWFIaFg3VExqYlhWKzdwR1VpcUJ6TEFlZ0VoQ3cyVXB2TzdpTnZl?=
- =?utf-8?B?K2xOUW5Hb0FjVFFjS2IvVlNJWW1rVVovR0hNTFlRNHBLWU14NVhGNTVRM1lK?=
- =?utf-8?B?Q1JqR3YwUkl1NVRWOFdWb0JjU1VRUkpLVXJ4Q3poN0x3WjIzVlQ0eWJrdVhU?=
- =?utf-8?B?QWZuUENnQ3ZYcWViSDg4UmxrdjhycUtOTks2bFlGcWs0RjFZTFNheUdWT2Zs?=
- =?utf-8?B?VUFmejJFYWxuTzJpOG5MbjZXaXpnSVh3c2w5SlJoUCtSdEN5WmQwV2lJcHVZ?=
- =?utf-8?B?a081dVg2Wmx6UlU2QXN1QUNyYU1jRytoZldjR3F4MmdmWFkvL3BNVVhNSkFp?=
- =?utf-8?B?cDNUcmx5UWZiY3lZR3l3UUFHMXAvZWVRa1BZT1NORWR1c1Rvc3NiNVQyZUFl?=
- =?utf-8?B?cEsxOEpTMVF1ZmRZd21tbEZzdnUvWkxPQml2NU5DSFRNcS9WNktWVHdHeE5C?=
- =?utf-8?B?RzRuTTRBVE9peG9GQ2JwQldOU1F1ZEpSMWlIN2Y4aitVR1F5c2Rzb2RBR0sv?=
- =?utf-8?B?WE1Ha0ppUUcyakp1Q3d5U0FGTm9LcDB0Ykc4NXBWOWlKRFc2cEg1Njl2aERy?=
- =?utf-8?B?ZzgvNy9BSUNJdU1nZHVCRGxqWWlicTdrc0FzOTVET0ZLQVF4TXlhVklscXU1?=
- =?utf-8?B?YUpyY092cVZ0bVVpU0tKSHNhbWd0YWxIOTFCZ1daQ3dFYy9yN1RuNVFxU3dI?=
- =?utf-8?B?QjJNY29aWEJ3M2xsaDRlT0M3SnVuSUtLSDZtSXMvME9mTFFLSWZmZHJ2VzRy?=
- =?utf-8?B?Y1ExUzRRRkVpTFdqZjRxTU1oUUZ0bUlySmNwemRNSjF2RzBxS3NLdFJnNnpU?=
- =?utf-8?B?NFJ6NFo2RmpLVWdyYTFuWkFtNys2alNlVFZ4WlU5MjdOaHFhUlljalA3UGlt?=
- =?utf-8?B?ZW9GbHluZUg1bWdneWFDVXV6ZFI2SmE1UXE5cm8yL3FyNjFLcTc1azdTRDBP?=
- =?utf-8?B?cGYzbnAxSjlyYTZJSTU5L2R3Y3VSUlN4QlJWVjZHd0NWQlVOR2Y5eDZ0NGdW?=
- =?utf-8?B?QUhvNmZQUEdSTGpiaUVxSVhqMHMySG1tWVFHKzdNWHZUdGlENHNrMkNBS1dn?=
- =?utf-8?B?cmgyYmJSdWhRZjQzaURwMW5SOVBKSXlGVzkvZ2xTMUtPS3c5ZG42VC96UkRL?=
- =?utf-8?B?MTFoTVZYR2Z3UUFMNUxkdnAvanVjS0NZVFFBSExybG5Pd2R2am9VbVBxNkdQ?=
- =?utf-8?B?S2ZpSHUyRURQSU55bzJaVFp6NGswNjhOV3BZK1VKU2FWbGs2RU5VVmRQMmJv?=
- =?utf-8?B?aXdXUmJxUVRDbFFvMmtpQjBZQ3J5NEo0bUVtUWNLczZGSlhhR09LUms0aTRw?=
- =?utf-8?B?UWg3cG1vTnBiUWR0WVNRV244MzJpYjF5bHYramo1RU5hSnA3Y1BDbjlQcXRK?=
- =?utf-8?B?Vzdtc3NMdUU0WmhYK3BNTzhOanRuM2xzcVQrZWF3VUZ1MUxlSnFlNE9ZQzUw?=
- =?utf-8?B?SVhsVVBING5wL2xPL0ExUEc0TnRlQVY0Tlk5bnFCeFpJaFNoNnhGQ0dPSTNQ?=
- =?utf-8?B?YStoK3hiZTV3ZG45RmNwK2ZzZFZNWGhMeXJnMGVUVVo4cnlKR3UvUEQvRHdD?=
- =?utf-8?B?SVRhSDlxU1pYdFhoSGRpaC9wVThSS0w4cjFUVkVlN3NGeFF0Z3NQYmlmZ1Bt?=
- =?utf-8?B?R3RyYkpodWxKTXRlcjFNblZ0VmtlSXc5M21JbVhsN01lbVpuWnQ4eVFKOFB3?=
- =?utf-8?B?NDR6UkFmUE5JY0JqUTgrT0s2UklQQ3JuOWM3Rnd5Q1RPUE1HeHlkQzdBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 
+	=?utf-8?B?MGVZMkphWUpqekIrMzVGaUhPaFZTRUhVNkhkQ1dCandZaUdXQ056V0xDZDZZ?=
+ =?utf-8?B?T3RlR2NFMy9lV1B0d3ZyUFNWN3VTS2FlaFI1cUFjaEpPSm9mZjNDdVZWTzRw?=
+ =?utf-8?B?M2R1WU9wTU8vWEs5eXNPRnplaTlwYVRxd3Jabks0WE5QS3F0N2xERVhXMlo1?=
+ =?utf-8?B?TERvNVpWa0UySkg3dGlSejZhWmY2bXZZbFdITXBrWTV0TGxBclpydVh3em5u?=
+ =?utf-8?B?TWtSeXhYZHpia1kzY1UxV3pZdzZJMVJKbDB6OW8wVnBXSEVJRUJQZFY3cTdS?=
+ =?utf-8?B?ZEJ2cUFlMHFDcTI1MkVxdEpJeWVTc3pwZXNYYXdVZWF4YlQ4SlMwRFNMeVJU?=
+ =?utf-8?B?UWRHdkluY0dJb1VZR2l1R0ZIQm9uSHU1L1g5cEFiK1RlckVOYXZibW9LT085?=
+ =?utf-8?B?WHhTQVF0SHhJM0pnR0hrRlhjL2x4MExiREZFTFZXdGtMVGRqSnl4Q0NscjJQ?=
+ =?utf-8?B?Tm03N0JwY3VNOFB4R3NGSEVGZGRZRFFtMDB2VFlBcmpWMHpaNVlDL0ZUcmty?=
+ =?utf-8?B?TVFRNjlMa3F3K2hZYitmSmFzK00yNzNQMUtkNHlTRG9EUEhkc3dkUEZ3Nm1h?=
+ =?utf-8?B?eGpmK2hoOGpIY0w1WGorSDNyMmwvNVpkZ2NQZUN3Z0N5Z3BlQmVaOHoxZDk4?=
+ =?utf-8?B?MUFOcmxETU01RnB6elhVbEw3dkZTTFhndWdnNXJBSHNCaFhNTWxraEgzV3A0?=
+ =?utf-8?B?emRpOFhpVVNlazJUd3huUUlWak51SlVMeUhQM2hPb3ZjVGwzUEZTek1EaXdz?=
+ =?utf-8?B?bVNkVGpPczB5MFpiaVdMeDlBenpteWpYci82b0d3UlF1UXI3K2xiRjZvNDU5?=
+ =?utf-8?B?Nk02OUdLbTA5S1E0QUUxazd2VlRPTGdSekJqZXlveDFYR3NDRnhPbEpzc2xk?=
+ =?utf-8?B?OHlSTk52SDJpemVtd0k2bG5IUG5QVzVqN0h0ZVBxeGxzYzkxT0Q1ejc4S0lP?=
+ =?utf-8?B?Q0JhUnZKd0VWc1NITDYxakpyR0dxdTZZTmc1d2phUzY5NjdDWDYvcWcvRjFo?=
+ =?utf-8?B?eG04OUI5QXJnTWtEVTFtRjBRNU5WWnZkRTRLYWVFTUY3K29NcThtWGtPU1Yy?=
+ =?utf-8?B?dWlVTWpBc3I5VGFFcE1EU3p5K25pdkNKREdkeWVEUWZ4eEtEdldIOER4T3h5?=
+ =?utf-8?B?SHVKU1VmY1FISlBxeHpWWnZjRU8vRzltVmt6NFU4NHF2dmZhVTk2Y1p3QnRr?=
+ =?utf-8?B?SmM0bUpvbWtsejZrcW90aE1pQ2NCU2dwa3JEWUpwYVRYajUxcnRiZ1lWOGs1?=
+ =?utf-8?B?N1ljQ2h6VkoxVkJuZTB4TFpUSHEzOE52NEJRK1dZRno1dklXaHNwdEo4bGVY?=
+ =?utf-8?B?L085bHFCb2NKcEVreG9QYnR5eGQ5Zm8rLy81SUkzZHIwNUVaL0ZUTDZxT0U5?=
+ =?utf-8?B?VGRXcktsVkNlbnViSjJoajVacDlGK0p3MEt6NzRDQTd1ODF1VXg1ZDBBWmdT?=
+ =?utf-8?B?cVA4N1ozSVBoRUZCK210L2lXTS9tZXhJVTlqZndTaUFmZG9IYlByOVpZS2N0?=
+ =?utf-8?B?VER0NkRuNFU5TEU0c0JRZ2k2c2FYWXh5Y0NnbG8xbGhUdmp1S3FWTTJpcjlM?=
+ =?utf-8?B?aXZrNmc0SGMyWmx4SEZXUHNod1NaQ0VLeU51USs0cUpPb05XaFF4amtQWjJR?=
+ =?utf-8?Q?xGp73+92q2RpJMnz0Xzl7u87mR5TZlTyAnHubWHHFIsQ=3D?=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR10MB5280.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?L3F0czFhNE4wSkdqdUJkd3ZYa3p3aDVIWFlaRlhpakdTZGpZeFdGMnQ1L21a?=
- =?utf-8?B?c3dRMWN1Q0w5c2NFK1lJZ2cvdGY2N2c1bC9teDNJRUxMNk1Db0NNT2J2dCtB?=
- =?utf-8?B?cWRRODhQNWROWGJrcmJPak1XK1l5RXZYNTRsR3c1SVVtamVha0M2ZVBRbHgr?=
- =?utf-8?B?NytyQlQxeVYrcFM4SEE2VWc5Y1l2YW9YU3MwRE9Rbk9JdjdtYk5wOVQ2KzFO?=
- =?utf-8?B?RTdMT1dNc1AybUppTlIwbWFNd0tPTmFQaW0zSGNBWStkMUZObFNsM3lhTHpr?=
- =?utf-8?B?TlRIRTRoZzB6S2tvWjR0Q2QrM0d4ankwcEkwZG5Deko2cnJwR29jZUQ2WCto?=
- =?utf-8?B?ZUFLMklITzVRLzJBL0M4VERyRi9sRndmMUVia2VjS3F0b0lubXpLMzhXdkxD?=
- =?utf-8?B?Z09VSmgxd0wxQ2dDR1daSVNWNnR0aUY1TFRnY3Q0MXdRRUtGT1lodjh3aUs5?=
- =?utf-8?B?TzBHa3FUZnlyOVo3QUVYTHVIZCtqVWdRQ0JQQldVVXkwWVI1MWExUCtXUzJR?=
- =?utf-8?B?cCtjMWlzaHhQRzV1NEtZU05oOWtRVXZDQk9lYWdzUzlkK3NOd1AveGhLQVhJ?=
- =?utf-8?B?YUx1cjdka3B2RlZoTytvMzZpSldMRG4xVzdzZ1VLT1A1NGh3aWVtaTdla1E1?=
- =?utf-8?B?M05pOWk3SE9heVMrVXZvUlZ5UjFFYktUTGlYc2tJMlJXZEJQbm5OVVB2SUMv?=
- =?utf-8?B?OGhJQWpjMTg5Y0I1dmFQTDhPdkF3a1NVbTdWaFk5d2FzeUVldWpZa1k4R2FO?=
- =?utf-8?B?a3hOUlNhdC9SKzI1cWZTT1hhSjY1NmthdVhSNXdFQldCVVNBamRXVTd3YkhG?=
- =?utf-8?B?eVJQQ0FHK2dxWnZLazhrU054RFU5WnJhY2ErLzlmVTI2ZGZ3bkEyRGQ0WkNN?=
- =?utf-8?B?WnB1cWpBM09aV3U2cUMxSFltQUFCVlF1eVJMaklJcDk0SjNJREQ3Y3B1ZVQz?=
- =?utf-8?B?amVwQU9XdnA2MEdWQmNoU1VyY3I3ZDJWZDlYY05pUGk3U0FwcVczWGZyeXJi?=
- =?utf-8?B?V3VPVElEYnQ0QzJRbGI5NEk0TUUwenhxSW9xMUlZaHlXekgwcFNMTDFuZXIy?=
- =?utf-8?B?QUt4TGd2bFp3TFZWUjcyclpnNGdwWkd0NzI1QlRtNUxUbGVMa0dBUkJqMjRW?=
- =?utf-8?B?eWM2TjIrT3k4Y0pkSDFLMXNhNElFVjJnZEFBUEZLeHF1UUhSQnFGbWp0QW1N?=
- =?utf-8?B?VG84TVRkbW96MkxHeGdPeXpwcHNIUXJ4cUR4MXY1aVF5Q291Ylh6cFBnWE14?=
- =?utf-8?B?cUUrcmNpUEtzbEM0SlpsL1N0dXhmRUxjc2hPNEkzQnVBSkxCS01lNzVqZjZ6?=
- =?utf-8?B?T0pveENsd3N1aW9XTmZXZGJiOWUwcDJZQnVXcXR2M2dFVnljY0ZuUWNST0ln?=
- =?utf-8?B?VUFUMUtKWlUvc0l0UE1BNWZTV3Z6T0hvcWhZeVE0ODZkb2VxTXdPUERPdmho?=
- =?utf-8?B?aWVGd2YyWC9SYVpDcVYzQ1c0d044M24zM0svWGp6dmxHTGZHVWR4aXhjVXZv?=
- =?utf-8?B?V0FYMlBWakp2c2Q2Z0VicUp6RmpxUUtZdHdOS1kwcCtleStYaHcrNVR1NmlF?=
- =?utf-8?B?UzlNRExzc25CU0ozTHpOdTNmK01SUHd4OFpHOXVSREkzdUxQQVowOTlMd1pm?=
- =?utf-8?B?WFVubjhnQm43Vis2WDRxU0QrMm41TzJ6WGZxV09xQWV2Ny93SlRWSkJmSzBV?=
- =?utf-8?B?R0RNeXQ4SE9wQmkrRVFBVDFrZU4vZ0VWT0w4QmVSWTNmZHFwTE9VMEtJbFA4?=
- =?utf-8?B?WXEyT1hLUlArdG1zenFtemd3R2wwdWdGcDhFZnhtbjI5QkxHampla0N5U3hC?=
- =?utf-8?B?Wi90YnZSZjRXdnJQREVCdG0yZnE5YjN2d3dLZE9yeGdQQ2RqVFNCakNNNlVr?=
- =?utf-8?B?MFdkRFZXalpkNG56bTVwaldQN1F2eno2RGp1ZEJuMWVHdUlWaDdTWktnWXlr?=
- =?utf-8?B?WkdUUXdDOE1Db0FkNjJhMkxMdUVEQ0ZiZ1JFVWN6K0RHS2EzcnIrdmxwdWYr?=
- =?utf-8?B?V3RGZGp2ODhRMzRIZG9XdU9VeXc0VERkZGw5dVdvOTRHcVlQMzlMM3RuOGlV?=
- =?utf-8?B?d2dUVG1mWm5Uc3lmSkVTOEZLaTlEUStIdGo0ZkU2RllZMmRKQ1hLbGVEM09I?=
- =?utf-8?Q?RAwhJ0IABq73gHY8xIdfxpzyL?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eea29e6e-d59e-45bb-c3f4-08dc63d54577
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?NHAzRmtHVkRGTWdyTWJ4RTZhSmJEd1kyL0UwRnVnVEpIU25SS2RxU0NvL2s0?=
+ =?utf-8?B?NGFpNzk1L3VabWN5SUJIQ2t5U1hDU3hkUGlFTHRDUGMwSUxmV3ZsQU91dFYz?=
+ =?utf-8?B?Ym1rVDRtUFZlT09idUhXS1JnaTRPUEZNUHBjaUh3M1dTVkh4NzJIZDV5Z2FJ?=
+ =?utf-8?B?NFcwMFBkbm0wWUdIM0FnRDZneTFKRzRPQzR5YWg4TVFpUWh0dStlMHkzcDE1?=
+ =?utf-8?B?SlFMUkdmWDNzWUNPcDRPdUNrSUl0dFMvSEJGbllhQjVpWlhiY1hGZU9udTVF?=
+ =?utf-8?B?OW1Pck5EYlF0T0c4cTlLV2V2Sm5qOVZ1RkpSNjRzL1hRRWt1ME5pUjFqTWNF?=
+ =?utf-8?B?UmVhZUdib0UyZWZSNkJVT1ZYL2g0Vk05bE5SSnlWQ3V5bXRxblV6UUdTaVdt?=
+ =?utf-8?B?NHQ0bk55Vjg1RjJ3ektZZ0s2cHRHVzNUalI4clk3RkJCRUkrV1JQRTUzZVFE?=
+ =?utf-8?B?K0R0bjJwU1ZPdW8xTllGa1RSVzlpMHgyTUpEM0xHWkhWZnhGbzNFRGxXOU1r?=
+ =?utf-8?B?QlRvUitxczJjUTU2T0djS1VyVXZxN2NPbUtMdGFUR3RqTThGZm4yaytJd0Ry?=
+ =?utf-8?B?TmdVTk42OXpZb2lSdVRnZTdIdXJnRzRKTVdaRjE1UDRJZGVXdjdFQ2RwSnY3?=
+ =?utf-8?B?RENrL0YyaFpJa25pc2RnZHJlWGszMENuVWI2eW13NnBwVUdyVzlQaEJhbGt4?=
+ =?utf-8?B?M1EzZjREKy9RRlZ6V1I0VGU0b0RKd0IvWG9nbWpHL0FlWm1od2dZeWM0eG0v?=
+ =?utf-8?B?RkRzQ0lUck42Z0FjeGR1Z2IvcW9FV0lqVmc2d2RnYU8ybEhBZS90ekJybVFx?=
+ =?utf-8?B?azlhUko2dVZYYnZSNFhOYUpZSkl5WGhTOUIvK0xUT1FBc1NwbGZVdHVzakdD?=
+ =?utf-8?B?RVU0N1NhalJxYi9IUmhyeDEybXU3U0FDVGcvTjRwT1hwWEdvYzE0M2szdkZR?=
+ =?utf-8?B?NndiQ3g0MHBtOVZTeHNkUlYyZURmSWJDYTRMeG5LUjF4S1ZjUlEwR0xudDJz?=
+ =?utf-8?B?Vnp1Z2x1bTdKT2dTZ3NsL3B0WXEyUHhUdFBVT0lpYzZFOUVHeEhtWWRVOGV1?=
+ =?utf-8?B?QW9hWElBSlFaeDFRNjRuQTIwblRqckVQM0pLN3FwdWE5ZTNKd1RYYkNJZzJz?=
+ =?utf-8?B?SUNxMm1qUVdDTEQ4bVpLelE3NGhERlh1OTg1NmRzTjJ0cWoyMVVHU1Y4cHh3?=
+ =?utf-8?B?QllRUHdYcEt4WWYwZUhjalExcE5SS1hSM0pBbFhaTUl1ZnFjcXhjZ1NCaXla?=
+ =?utf-8?B?cFZDZ2VTd1lyRE1Db1NPZC9VNGNsQ0pRdEc4VHU5dWd4eHRkeXgrMHYweEp3?=
+ =?utf-8?B?UzVUQzlOTlEwaStBRG5YekhibGI0MmM1WkhNTUhndm9oZEd3b1lQNFVIQ0VN?=
+ =?utf-8?B?bWNmLzR3dnpVWmI1cGpwRmNxbVk0TlBodEFqaDh6ZDJPb2drcnByTnFRR21C?=
+ =?utf-8?B?QjQzTFAxQjdMSWhNL2EyRDJuek5EYTRuLy9TWFVPWWt2eERvcFNDUmVkSDMr?=
+ =?utf-8?B?SmlDNEZKNHI5Q0JWUW5xZlpuY0RxR0dMWWQ5eVVteGpsbmY4ZTExYWlzUzF6?=
+ =?utf-8?B?Z0ZGaFJ5ZzFwSS92dlM5WjNLc1p3QVQ2eThsV0w2eFZkWVZhek8ydXdVd2Zu?=
+ =?utf-8?B?ZHRHQW9LSU9aYjNRWStDOTM4bmJ2eDdpd09oSGI1bTZGczNnbnFNMGd4SHpQ?=
+ =?utf-8?B?Ym9UWXc5N1RiOEVEdTFUZ1ZWcCt1NlFsMzZxWGxZcmlPeEVTWVFUVFFTbUxz?=
+ =?utf-8?B?Zk1xQzU3ZU9NSWptUkRsK2hKRVM1NXhkWGhic2ljNU82alpteU9Sc21ScXll?=
+ =?utf-8?B?STBaOGhWYTBFS3l3RTd0Z0FzWVZJa2tvNnFhc2FPbXgrOXlWYTNnc2tLbExS?=
+ =?utf-8?B?T21INE9zSUhvZkFTSEtvbmFDRmVQUGtXdGpVTzRqeHYrTGd4VVdCRzJRd0J0?=
+ =?utf-8?B?ek9TZ0VhQjN1MGtvWnB3UENjQ1l5emd2Lzk2WTV3Sk1mQXMybFVwallIMjdL?=
+ =?utf-8?B?Vy9GcDJTQ0RjWkthWDdsQWtqSWJUYVd1VU9uUVJMVncvRE9JZ1pmVVcvNWwy?=
+ =?utf-8?B?eU1QUnl2clVBZ2FLRnMwNUtXTVh5cHVtZnlqM3BvWExVbXRRSTZ0OEoxd25E?=
+ =?utf-8?B?ZWlCclZOY1M3dGVwTCtCSTNRTkVUK3lSeHpzR1J5bUZkSTlFbmtZdHE5c1Ju?=
+ =?utf-8?B?aUE9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	j9Crs9HZ2EnpUp+53KjyrAEMr+m4CgsPihgSix3Ds7PYWh6j7cQ86cxqN6PeV2j6NgtfH/05C0y5pJlUJcA5EEkAaZ0fF1v9tIHJa0CloH5SZLdZ2XXnn/j+rv7FSH0XnuM9SE2fcw7ryiSO87KeAFQGcAjEDJmCf5gYvklCHjPL3rBTP4nZXNv1Nb72vWUTvGpXafYXlLItrjHV5eQWvvX8xYctf2CCcXbXtoXIDPu03GHhkAQu69nYNmxIJM3whXsp04nMj6LzE/Kd5BXPWUQjdpb3JQ730QgVb3ZzTgCFedicHfsLfvorBA3RV5xStAIs/CAQAek61PkFmC2MbGNZNmXBEE+y7z6fAbpnonU3aqJZm1+D0QXnuQfXPMc8nRCstLb16BQi3srxfmsoQgPjFpqkxhT2d+7Cdai/VUy80XABEBfkN5fsDS//vcybdYyChxIWdDAvxSY0QVE+7dx901k8D3f7ccNFkywHntGUpKjmFBhdVeLpDM/cwrgTZGHICBzm4+rhw9h620aUwXQsQ0+k7OC365l2CTKGM3ZRVlH6YVCOkvd9o6NRCGgW+Tj7VdYD2HvdU3WafaRxJgIiYOpT2nlC7TKDXf/v3Ws=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d26a404e-77c0-451b-e501-08dc63d61620
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR10MB5280.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 20:38:02.6046
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 20:43:52.6655
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1yvYsQQmLyXh/z9IrDRkqneOHWtxePROTm9CeehVX70BLShha+A5CNllWQ8mpbZwzuBrLmT01rAjfgB5adXp2Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4358
+X-MS-Exchange-CrossTenant-UserPrincipalName: ClFwSqHgr2ozL9+FWA2C6TgZPoK+r7ASJqxA5C3qWwCkhMdLWUn+PuXvBpDYF0TUpeW6T8D6pb4SPtZT4O95K3jo/skmdI/eAvdmAU9Xttw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR10MB7372
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-23_16,2024-04-23_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxlogscore=999
+ mlxscore=0 phishscore=0 spamscore=0 malwarescore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404230050
+X-Proofpoint-GUID: qBisNWD1MC5wgAgoQ26Rjag1SLpU0BVr
+X-Proofpoint-ORIG-GUID: qBisNWD1MC5wgAgoQ26Rjag1SLpU0BVr
 
-On 4/23/24 14:08, Yosry Ahmed wrote:
-> On Tue, Apr 23, 2024 at 12:00 PM Sean Christopherson <seanjc@google.com> wrote:
->> On Tue, Apr 23, 2024, Yosry Ahmed wrote:
->>> On Tue, Apr 23, 2024 at 11:43 AM Sean Christopherson <seanjc@google.com> wrote:
->>>> But snp_safe_alloc_page() should again flow alloc_pages() and pass numa_node_id(),
->>>> not NUMA_NO_NODE.
+
+
+On 4/17/24 05:48, Paolo Bonzini wrote:
+> On Wed, Apr 17, 2024 at 12:35 AM Sean Christopherson <seanjc@google.com> wrote:
+>>>> The hiccup with stats are that they are ABI, e.g. we can't (easily) ditch stats
+>>>> once they're added, and KVM needs to maintain the exact behavior.
 >>>
->>> alloc_pages_node() will use numa_node_id() if you pass in NUMA_NO_NODE.
+>>> Stats are not ABI---why would they be?
 >>
->> The code uses numa_mem_id()
->>
->>          if (nid == NUMA_NO_NODE)
->>                  nid = numa_mem_id();
->>
->> which is presumably the exact same thing as numa_node_id() on x86.  But I don't
->> want to have to think that hard :-)
+>> Because they exposed through an ioctl(), and userspace can and will use stats for
+>> functional purposes?  Maybe I just had the wrong takeaway from an old thread about
+>> adding a big pile of stats[1], where unfortunately (for me) you weighed in on
+>> whether or not tracepoints are ABI, but not stats.
 > 
-> Uh yes, I missed numa_node_id() vs numa_mem_id(). Anyway, using
-> NUMA_NO_NODE with alloc_pages_node() is intended as an abstraction
-> such that you don't need to think about it :P
+> I think we can agree that:
+> - you don't want hundreds of stats (Marc's point)
+> - a large part of the stats are very stable, but just as many (while
+> useful) depend on details which are very much implementation dependent
+> - a subset of stats is pretty close to being ABI (e.g. guest_mode),
+> but others can change meaning depending on processor model, guest
+> configuration and/or guest type (e.g. all of them affect
+> interrupt-related stats due to APICv inhibits).
 > 
->>
->> In other words, all I'm saying is that if we want to mirror alloc_pages() and
->> alloc_pages_node(), then we should mirror them exactly.
+> While there are exceptions, the main consumer of stats (but indeed not
+> the only one) is intended to be the user, not a program. This is the
+> same as tracepoints, and it's why the introspection bits exist.
+> (User-friendliness also means that bitmask stats are "ouch"; I guess
+> we could add support for bit-sized boolean stats is things get out of
+> control).
 > 
-> It's different though, these functions are core MM APIs used by the
-> entire kernel. snp_safe_alloc_page() is just a helper here wrapping
-> those core MM APIs rather than mirroring them.
-> 
-> In this case snp_safe_alloc_page() would wrap
-> snp_safe_alloc_page_node() which would wrap alloc_pages_node(). So it
-> should use alloc_pages_node() as intended: pass in a node id or
-> NUMA_NO_NODE if you just want the closest node.
-> 
-> Just my 2c, not that it will make a difference in practice.
+> For many stats, using them for functional purposes would be
+> wrong/dumb. You have to be ready for the exact behavior to change even
+> if the stats remain the same. If userspace doesn't, it's being dumb.
+> KVM can't be blocked from supporting new features just because they
+> "break" stats, and shouldn't be blocked from adding useful debugging
+> stats just because userspace could be dumb.
 
-Pretty much agree with everything everyone has said. The per-CPU 
-shouldn't be GFP_KERNEL_ACCOUNT and having a snp_safe_alloc_page() that 
-wraps snp_safe_alloc_page_node() which then calls alloc_pages_node() 
-seems the best way to me.
+[ trim ]
 
-Thanks,
-Tom
+> 
+>> That said, I'm definitely not opposed to stats _not_ being ABI, because that would
+>> give us a ton of flexibility.  E.g. we have a non-trivial number of internal stats
+>> that are super useful _for us_, but are rather heavy and might not be desirable
+>> for most environments.  If stats aren't considered ABI, then I'm pretty sure we
+>> could land some of the more generally useful ones upstream, but off-by-default
+>> and guarded by a Kconfig.  E.g. we have a pile of stats related to mmu_lock that
+>> are very helpful in identifying performance issues, but they aren't things I would
+>> want enabled by default.
+> 
+> That would be great indeed.
+> 
+>>> Not everything makes a good stat but, if in doubt and it's cheap
+>>> enough to collect it, go ahead and add it.
+>>
+>> Marc raised the (IMO) valid concern that "if it's cheap, add it" will lead to
+>> death by a thousand cuts.  E.g. add a few hundred vCPU stats and suddenly vCPUs
+>> consumes an extra KiB or three of memory.
+>>
+>> A few APIC stats obviously aren't going to move the needle much, I'm just pointing
+>> out that not everyone agrees that KVM should be hyper permissive when it comes to
+>> adding new stats.
+> 
+> Yeah, that's why I made it conditional to "if in doubt". "Stats are
+> not ABI" is not a free pass to add anything, also because the truth is
+> closer than "Stats are generally not ABI but keeping them stable is a
+> good idea". Many more stats are obviously bad to have upstream, than
+> there are good ones; and when adding stats it makes sense to consider
+> their stability but without making it an absolute criterion for
+> inclusion.
+> 
+> So for this patch, I would weigh advantages to be substantial:
+> + APICv inhibits at this point are relatively stable
+> + the performance impact is large enough that APICv/AVIC stats _can_
+> be useful, both boolean and cumulative ones; so for example I'd add an
+> interrupt_injections stat for unaccelerated injections causing a
+> vmexit or otherwise hitting lapic.c.
+
+So far it seems there is support for using the stats interface to expose:
+
+- APICv status: (apicv_enabled, boolean, per-vCPU)
+- Windows guest using SynIC's AutoEOI: (synic_auto_eoi_used, boolean, per-VM)
+- KVM PIT in reinject mode inhibits AVIC: (pit_reinject_mode, boolean, per-VM)
+- APICv unaccelerated injections causing a vmexit (i.e. AVIC_INCOMPLETE_IPI,
+   AVIC_UNACCELERATED_ACCESS, APIC_WRITE): (apicv_unaccelerated_inj, counter,
+   per-vCPU)
+
+You'll noticed that I framed the AutoEOI usage and PIT reinject mode as their
+own stats, as opposed to linking them to APICv inhibits, so it requires a
+certain level of knowledge about the APICv limitations to make the connection.
+Is this the preferred approach or would we want to associate them more
+explicitly to APICv inhibitions?
+
+Alternatively...
+
+> 
+> But absolutely would not go with a raw bitmask because:
+> - the exact set of inhibits is subject to change
+> - super high detail into niche APICv inhibits is unlikely to be useful
+> - many if not most inhibits are trivially derived from VM configuration
+
+
+I wasn't able to fully make my case during the last PUCK meeting, so I'll try
+here again. I'd like to insist on the opportunity to provide visibility into
+APICv state with minimal change by exposing the current inhibit reasons. I am
+aware that Sean and Paolo have expressed opposition to it, so I'll only insist
+one more time:
+
+Putting aside valid concerns about setting a precedent for exposing a bitmask
+via stats, I'd argue in this case the apicv_inhibit_reasons is essentially a
+tri-state variable. i.e. we can have a per-vCPU stat with possible values:
+
+0	--> APICv is enabled and active
+1	--> APICv is disabled (either by module parameter or lack of HW support)
+>1	--> APICv is disabled due to other reason(s)
+
+The >1 values must be decoded using the kvm_host.h header, same as we are forced
+to do for tracepoints until (shameless plug):
+https://lore.kernel.org/all/20240214223554.1033154-1-alejandro.j.jimenez@oracle.com/
+is hopefully merged.
+
+So as long as the method for decoding is documented in KVM docs (which would I
+add as a patch in the series), a single stat can fully expose the APICv state
+and be useful for debugging too. It could replace three of the stats proposed:
+apicv_enabled, synic_auto_eoi_used, pit_reinject_mode.
+
+Cons:
+- The exact set of inhibits is subject ot change / detail into niche APICv
+   inhibits is unlikely to be useful.
+
+The state described by 0 and 1 values of the stat are unlikely to change, and it
+costs nothing to provide additional meaning in the remaining bits. The fact that
+inhibits are likely to change/grow makes this approach better, since we avoid
+creating stats to describe scenarios that become obsolete e.g. Synic AutoEOI is
+fully deprecated, or split irqchip becomes the default..
+
+- many if not most inhibits are trivially derived from VM configuration
+
+This assumes non-trivial and implementation specific knowledge about VMM/guest
+defaults, and limitations of the AVIC/APICv host hardware, which have also been
+known to change e.g. Milan (unofficially) supports AVIC, but not x2AVIC.
+
+Some inhibits will be set by default currently e.g. QEMU uses in-kernel irqchip
+by default since pc-q35-4.0.1, and KVM defaults to reinject mode when creating a
+PIT.
+
+ExtINT can be inferred via IRQ window exits which are rare, but on the reverse,
+noticing that AVIC is inhibited due to an IRQ window request can draw attention
+to problems in that unlikely code path, as I recently found while debugging an
+issue on OVMF + Secure Boot. (anecdotal)
+
+VMMs other than QEMU and/or guests other than Linux can be inhibited due to
+"less common" reasons than the ones we see today. (hypothetical)
+
+--
+
+I understand concerns about overloading the stats interface, but seems a lost
+opportunity and a handicap to usability if we provide a boolean for APICv,
+but no information about the reasons why it was not be enabled, specially
+since in some real scenarios (e.g. hosts enabling kernel lockdown in
+confidentiality mode, normally paired with Secure Boot) that information will
+not be accessible via other mechanisms like tracepoints or BPF.
+
+If the idea of exposing the inhibit reasons is still a NACK, then please let me
+know if you agree with the 4 proposed stats mentioned at the beginning and I'll
+send a v2 that implements them.
+
+Thank you,
+Alejandro
+
+
+> 
+> Paolo
+> 
 
