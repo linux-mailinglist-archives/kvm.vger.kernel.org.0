@@ -1,134 +1,109 @@
-Return-Path: <kvm+bounces-15663-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15664-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F03C8AE7DD
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 15:20:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FD768AE802
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 15:23:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEFBF28DDFF
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 13:20:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C36A1C21F5F
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 13:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6FD135A4A;
-	Tue, 23 Apr 2024 13:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49FA136E01;
+	Tue, 23 Apr 2024 13:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kIl1Rd2w"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="ZBHlAvAk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBAE745E2;
-	Tue, 23 Apr 2024 13:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D82C135A78;
+	Tue, 23 Apr 2024 13:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713878410; cv=none; b=j4vKS+PzhxPhx6JwKB898hXPRWu4pyCJDOx4pMhY3h7z5ouCQjwDL0xinN+Bg66fU3YErVOGbX16cEX9jAiNTV3B7yhY66T3uH0hcpvmMz0E5+yBXQvvYWIMiobLQEzKOZ4Yeu819joyqWt+rSv4/D5Bb9p1Sva4FISQArmWkIk=
+	t=1713878592; cv=none; b=SDaSYZYM+KtMKbTpq0kAA1+F/plYKmTiuhDzZPhccIiEEatPlbUcr/1ea+9RHOcZDFxScPIzIoGQzz9N2lKYVjGSQ2VfkdxHQGlWqk802Kw9D/7GzjS5II4bCHUtBJr9rnM933Z6B5q6lORU9M/hOM+aWZ55DMjnk/qA3mW4u2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713878410; c=relaxed/simple;
-	bh=TFx9xfvwbclzPPajH46kI/lyaHseaDkHlbeFy9Vg4RM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hnux5cArT6/HORT/+txUlWlCPelZh3JWz0T2bBZiU5C3Ana+n1oZR6QNkiJFzCfkfTYowGiqpBJkYVjWPRBJF498j3+4JHhyFOOrpcJAmw2N2TfNfApoHuGXvy8HRCl2thrf6vQUT92KGIBXnTZtdiYEnL6JgWhjgqYE+wCd6kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kIl1Rd2w; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713878410; x=1745414410;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TFx9xfvwbclzPPajH46kI/lyaHseaDkHlbeFy9Vg4RM=;
-  b=kIl1Rd2wVyI1G0VgV1nQ9WxvT3S/VVROX2t7e0BIXwjplv+9yuXY5mm1
-   ZEBK3EkH7X+9EryRZyy4TS8TeCy5MJBBB9tPljknZgkI24Tg64BgrPbSq
-   9xEXgbP7FaQBs7ZFfIOVCb/TIxhQidIZagJ9ipWnWU9Z49YVVfo6dO1eu
-   KOfhxeXEx9w4wuXA0yTdX2EOaVU7ezSiaYfFyE4iYueexLCYnsuJUjOK3
-   JNqJErCojqDjDxAd5AkVFXAICeVlC+pEWgIcCF6Fq8x+vsW7YQNEvVI5b
-   QVdULJ/hbH2uqDWwEpKRbavRXwECiVb4AXT8oDgOnUMvgpxAvs1jXcQFz
-   A==;
-X-CSE-ConnectionGUID: tt8teK9dTemw9GwhYJwodA==
-X-CSE-MsgGUID: 6fsiG6ArSsimauSw/wIvcA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="31953602"
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="31953602"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 06:15:40 -0700
-X-CSE-ConnectionGUID: M86h0au6SiOVuxovR2hrAQ==
-X-CSE-MsgGUID: fwqwAFHYRrOEtC6/GVhW/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="28864245"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.225.183]) ([10.124.225.183])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 06:15:36 -0700
-Message-ID: <fe9cec78-36ee-4a20-81df-ec837a45f69f@linux.intel.com>
-Date: Tue, 23 Apr 2024 21:15:34 +0800
+	s=arc-20240116; t=1713878592; c=relaxed/simple;
+	bh=MpB1vGpcm8vPdDQxwuDpXFCLiB9Rpr/rHRL0DsgP2jY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QXaTtTF5JA4X6obVmaV8Dv9Rx4rXfbZQTKYSC67TdNv/217fl0ZPxspnGkAW/mUsFbtd0lzNTWpH3laerv4QtaV3rLrTuzgqHw80mSblxMqfX06BX36n9kyFTiloZRpTZlFZ3j1/b2hWL3sV7MjAfqzCAZIixLBDUS2oArtKpPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=ZBHlAvAk; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id AE62440E0192;
+	Tue, 23 Apr 2024 13:23:08 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id oWWHdYJ-hwo5; Tue, 23 Apr 2024 13:23:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1713878585; bh=/hW7sIjmt3vV+F8wtAYDHFfbBByCE0rEdpHRFcL6KBg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZBHlAvAk3/n1/l5FQAePQDZqz4DRvfyt2+Ikz3kv3NCRkRVFco4zetzFiHlang6re
+	 dhNEu0xh5pxXB5I1lGLlv0Ji+z733bzTGFXrbMvAWbE0wb4qKklcNYVZN7muzgBk0B
+	 b5Ho6T/x01nm80Ekei4un+kTNPKfp3BkExe/lzczqB3/uZ7pIGQudpQxEDinKARi/P
+	 8LsesHMKHhzkXzSVMxRlpOd5NoFVrBft5G7fgFmvouLJOKOuBuLVC+dRrX+D9Rs9KL
+	 M8rTZy37epXhiUcKlQXPlNU2R8PpSRRjV+mJ3Fc8OjjAL8XC8RyYXxh+sK6QWyYphn
+	 8r4xV92ZtK7AguUpAoTn3vLysNv5PrRspz1z9KOEUvsbMdNegsJ3Rm5e+rgu7jGqQg
+	 tqFacbucPpakAsXkaTcmmRBhI62x5Gr7SquK4NH4X9omGTYzyfXyht5uG6QhVcBNZn
+	 cLD3NkSBJmUPQWMlwI73AwgD09Cz+3icRUKQB4xTEmp7T20OeXOxx3GgXNkbAT6qF/
+	 W0vfYJphE/fYwYRpj9YDhuUv7NQDGPENPsLM+89EVvRxlYRS1RRkTfEZN+XDKnhHvd
+	 idixrL5iNFwuXsWyijKOly15AvrFJuxQsBsG61W9ia4a0exdNe12/WqBZXwL4wvaI1
+	 rxvOR9fG64aM2OVw+6ZBAFJY=
+Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C70A840E00B2;
+	Tue, 23 Apr 2024 13:22:53 +0000 (UTC)
+Date: Tue, 23 Apr 2024 15:22:52 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v8 07/16] x86/sev: Move and reorganize sev guest request
+ api
+Message-ID: <20240423132252.GJZie2LGgVszU_XejZ@fat_crate.local>
+References: <20240215113128.275608-1-nikunj@amd.com>
+ <20240215113128.275608-8-nikunj@amd.com>
+ <20240422131459.GAZiZi0wUtpx2r0M6-@fat_crate.local>
+ <eadcab6f-b533-49e3-9aec-dc06036327f5@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 085/130] KVM: TDX: Complete interrupts after tdexit
-To: Reinette Chatre <reinette.chatre@intel.com>, isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <aa6a927214a5d29d5591a0079f4374b05a82a03f.1708933498.git.isaku.yamahata@intel.com>
- <7d19f693-d8e9-4a9d-8cfa-3ec9c388622f@intel.com>
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <7d19f693-d8e9-4a9d-8cfa-3ec9c388622f@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <eadcab6f-b533-49e3-9aec-dc06036327f5@amd.com>
 
+On Tue, Apr 23, 2024 at 09:56:38AM +0530, Nikunj A. Dadhania wrote:
+> Yes, I had tried that compilation/guest boot does not break at this
+> stage.  That was the reason for intermixing movement and code change.
+>
+> Let me give a second stab at this and I will try just to make sure
+> compilation does not break.
 
+Yes, you can also do preparatory changes which get removed later, if
+that helps.
 
-On 4/17/2024 2:23 AM, Reinette Chatre wrote:
-> Hi Isaku,
->
-> (In shortlog "tdexit" can be "TD exit" to be consistent with
-> documentation.)
->
-> On 2/26/2024 12:26 AM, isaku.yamahata@intel.com wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> This corresponds to VMX __vmx_complete_interrupts().  Because TDX
->> virtualize vAPIC, KVM only needs to care NMI injection.
-> This seems to be the first appearance of NMI and the changelog
-> is very brief. How about expending it with:
->
-> "This corresponds to VMX __vmx_complete_interrupts().  Because TDX
->   virtualize vAPIC, KVM only needs to care about NMI injection.
-   ^
-   virtualizes
+It is perfectly fine to have a couple more patches preparing and doing
+the move which are trivial to review and verify vs one combo patch which
+makes you stare at it a long time and you're still not sure it doesn't
+change something...
 
-Also, does it need to mention that non-NMI interrupts are handled by 
-posted-interrupt mechanism?
+Thx.
 
-For example:
+-- 
+Regards/Gruss,
+    Boris.
 
-"This corresponds to VMX __vmx_complete_interrupts().  Because TDX
-  virtualizes vAPIC, and non-NMI interrupts are delivered using 
-posted-interrupt
-  mechanism, KVM only needs to care about NMI injection.
-...
-"
-
->
->   KVM can request TDX to inject an NMI into a guest TD vCPU when the
->   vCPU is not active. TDX will attempt to inject an NMI as soon as
->   possible on TD entry. NMI injection is managed by writing to (to
->   inject NMI) and reading from (to get status of NMI injection)
->   the PEND_NMI field within the TDX vCPU scope metadata (Trust
->   Domain Virtual Processor State (TDVPS)).
->
->   Update KVM's NMI status on TD exit by checking whether a requested
->   NMI has been injected into the TD. Reading the metadata via SEAMCALL
->   is expensive so only perform the check if an NMI was injected.
->
->   This is the first need to access vCPU scope metadata in the
->   "management" class. Ensure that needed accessor is available.
-> "
->
+https://people.kernel.org/tglx/notes-about-netiquette
 
