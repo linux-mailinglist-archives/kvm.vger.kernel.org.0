@@ -1,302 +1,282 @@
-Return-Path: <kvm+bounces-15614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AACB8ADEA5
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 09:55:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D8F8ADFA9
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 10:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A312B228FC
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 07:55:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDA88289189
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 08:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8034AED7;
-	Tue, 23 Apr 2024 07:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6099F524BA;
+	Tue, 23 Apr 2024 08:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V/RgGpfr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V+ttkDps"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F22481B8
-	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 07:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713858912; cv=fail; b=lRcic+60EdvB3a/MmQpaHRVc9iZ7aZ26WO9tiW58iqZLzwGk4rVXetQMN1pdVt7NRtHwSyaE3uxBEqlgBA4ywvzd4wPINXZWYy44u7Cv4nkoM+bmHXIDZFGlM+0tAEXNzhswwwRUxkrbhxNihm7UFx4bjuAtb7Q7p8194ztiO0s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713858912; c=relaxed/simple;
-	bh=jx9Up8TsNYuujNbAkaCZ6YTKJNPoRWeBspiV06s1QOk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ACpsmX+FYDB7LYdUkO7TwyetpJFEle/496UWwtA4sAPl1NaRK3c+hAd+pfli1AOU7x0KjnGLCHBwVZiPRhj/xYeggTuK9Kh0/O1Ewd9r3Z/vOFCKZNYsDoNrQxSu5/SykjnKbQUZOBQRI6nb6NJ1pwxqe10qxIpHImXPqDlFxaQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V/RgGpfr; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8238F2B9CA;
+	Tue, 23 Apr 2024 08:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713860695; cv=none; b=p25+vfJT1QkcX2ME7Ms8EBVr5VNUyzYP9W2KE4vvrAcv2zSUT0h8vuicJiPg2XQtoQzvyEbI5SMFOKh9P3LcF0Au8fuS5BHRUlrhOzO7/TCDZPHkuTjrW0q8dPyPwdFtEezWbgHzAd6cywrraF/r4Hy5x8/58n5ktWefzwIS2AM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713860695; c=relaxed/simple;
+	bh=xjoZLJ+fPlF5s7MSJCl/qCPNQIMwbAuVdPHDe7WD+KQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nx0FpJMabvnHkM62bi9O0BipOlEOAmynlQPpijf3BIsuPnXT2DyTbHMAhXaUJxTRi8fUb9NzFuGU8Ohf4Wx/jFgHgbTIQBhVikjlxUL1ElfGMONe4X1WUdQHvPOkwYqDYaGMvirCYACCJnSpsdCJ/jmml781QG1N/uD/zpzBprE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V+ttkDps; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713858911; x=1745394911;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jx9Up8TsNYuujNbAkaCZ6YTKJNPoRWeBspiV06s1QOk=;
-  b=V/RgGpfrgOrTL1bGR4ETiSVxyrL9zUGLs8NdqQ8T7ywvyp9AUgYdYcEu
-   IytNeKkqfP7kSSPI8Yqt3LrWDhfxnoiXVNXgJEuDFtBZZsUVWLmD5Eq98
-   Llbl3c+ATnZRdvfPPzJU2pRjO/vZzZW78e1uEVdzafTtivxzzf6vNYCRQ
-   ieC1CxnUgqxmZ1Vaimem3ASw0anicKQ1iW9xyO4uWJM9SNYDUgEmdePKx
-   Kv9y5sgYDAkMeFHMgbFvsNrRlWNpviORogZiWpooVxYCP2Bwt3Z8lo8j+
-   b4EWHbR+EG5qrxP9rj9Muf8KrRn2kPN26VjSdlnVTq9bWHc7dvGO1H/Xj
-   A==;
-X-CSE-ConnectionGUID: mEO9zmOuT0OFQEeVUwR0cQ==
-X-CSE-MsgGUID: lbEwJYU+RAy0nfECAMK6+A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="9261397"
+  t=1713860693; x=1745396693;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xjoZLJ+fPlF5s7MSJCl/qCPNQIMwbAuVdPHDe7WD+KQ=;
+  b=V+ttkDpsqYhLm2w6pu2Oi74FLmAnEYDCYX+JVYQpNQntgcp4je9c4if8
+   /OKyfZe3AacIfp+CF7ik81ziSt+VSKPvFzqcPAVAY0Dncqq2qNrnbpFxQ
+   /pbpsTWVw3qDlp626YtwG6yUZ3WKmKNMabcMdEdyzvPVVY2KcxKVNwSPB
+   afzORUC1rfcEPRtfW5hYfRljTPYap7SXfpDl+lpvO7DUTjA51IIR1bfMx
+   mWtRmDjz5mEjuSNwHgpU3oXjLZ6O8G59VwceRIOfXlHFVqh9OgqOnha5+
+   BO/b/60UP8lmsoHTus5NXY/jNJqg6TV2b5xow7rLoXuuGxmum9IzH+Yr6
+   g==;
+X-CSE-ConnectionGUID: 6Nz/yhC9Q623h4yiP0RvTA==
+X-CSE-MsgGUID: iPwXVWm0TKSjgg9iDFkEzQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11052"; a="9301581"
 X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="9261397"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 00:54:55 -0700
-X-CSE-ConnectionGUID: I/cLadzyTdyd7CBl5pTYVA==
-X-CSE-MsgGUID: rUVpjnqrSLq/eFHiG+OYTQ==
+   d="scan'208";a="9301581"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 01:24:52 -0700
+X-CSE-ConnectionGUID: k9MzM8gBRcyY2ki7HhLYQA==
+X-CSE-MsgGUID: /vJeddWKRyOTw1VsufK2YA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,222,1708416000"; 
-   d="scan'208";a="28943470"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Apr 2024 00:54:50 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 23 Apr 2024 00:54:48 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 23 Apr 2024 00:54:48 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 23 Apr 2024 00:54:47 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=m0axK9w9DvWO1OtKgDycdbFG0fQajyh0nRjUos8tpUSvSMjgp2iod9m0it4GU2ChxHw1YoTm4Os1t3lUkBS5nAiAgiquf7qVFDuSzaqm5EsZGgOd/ih/4mLj0PlCONQjQ6isYwooFym7FowC5TlbUVJ1CTApoYJb4i9VRws0FlfRueBGvUk0I6CxBGmHmQrR9bOg5y5YCs+CNshWEPqJL24R0CIsC+5MhcFhxEJi302ZXaNlCOQyDzOtOZGPwvTrI1Dhgb19+qsCsN3fA9KjKMUrED2whHqWnhPEVvFO3fzKSSjViAWps1w8llfHUKz1b2vjpX+rfqkiYnqHLCzeUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vVSfgWXW1680yR7p+QeF00ZWgHpNr62kNOMxO1LxbHI=;
- b=oGo2cnFahW/doI0/qM/Jy6UODlRwuhjGH23KQE9S9zvJBMgkWrOKxcvLo7WUp+uTa0uoX/wDcOSv2fSWnZqJjStcQ5f8inTnhfvIsMxNgwNpaZRJhxQfphoKFPGIIOHLhcWsmWlmdfs6F/swr8JCOU+hiXf/PuMjn048s1kDooy+x1XKiAF2fmjaB+nyN5jusf9kkV90d0//Mq75raQ+GeAbxMGWVq7pY6E8+/qjDZRu6n6FDWJfVZzwnnXe3xam1iwU5FgumfWMA44MGSMw4+CGGPa6fEdjhOYJ1q1BOaOwvm9ROZ2vldGjmvWZeG8m3GPTJlnNabtiZCJcyAD5QQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by CH3PR11MB8546.namprd11.prod.outlook.com (2603:10b6:610:1ae::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22; Tue, 23 Apr
- 2024 07:54:45 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a%7]) with mapi id 15.20.7519.021; Tue, 23 Apr 2024
- 07:54:45 +0000
-Message-ID: <8e372b68-90b5-4fa6-88a5-79ee0cb4c41f@intel.com>
-Date: Tue, 23 Apr 2024 15:58:17 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@nvidia.com>, Alex Williamson
-	<alex.williamson@redhat.com>
-CC: "Tian, Kevin" <kevin.tian@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>, "eric.auger@redhat.com"
-	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
-	<baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"Pan, Jacob jun" <jacob.jun.pan@intel.com>
-References: <20240412082121.33382-1-yi.l.liu@intel.com>
- <BN9PR11MB5276318EF2CD66BEF826F59A8C082@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240416175018.GJ3637727@nvidia.com>
- <BN9PR11MB5276E6975F78AE96F8DEC66D8C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240417122051.GN3637727@nvidia.com>
- <20240417170216.1db4334a.alex.williamson@redhat.com>
- <BN9PR11MB52765314C4E965D4CEADA2178C0E2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <4037d5f4-ae6b-4c17-97d8-e0f7812d5a6d@intel.com>
- <20240418143747.28b36750.alex.williamson@redhat.com>
- <20240419135925.GE3050601@nvidia.com>
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <20240419135925.GE3050601@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2PR01CA0025.apcprd01.prod.exchangelabs.com
- (2603:1096:4:192::10) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+   d="scan'208";a="29095566"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.245.127]) ([10.124.245.127])
+  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Apr 2024 01:24:48 -0700
+Message-ID: <46a889c4-b104-487e-be3e-7f4b57c0b339@linux.intel.com>
+Date: Tue, 23 Apr 2024 16:24:45 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|CH3PR11MB8546:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0cf756a3-b1e8-440f-e983-08dc636aa428
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005|7416005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WnBUNzZESitJWEs2THRuN0E3QlR1QXAxN3ZZMVIwMWY5UERjRHFCN0NmUkFy?=
- =?utf-8?B?WW1GVGdGL1NjY0JOMzgvb3NtVWpGbEowb3Y0YWUxa1lXaDZZY0d6RlBscGdi?=
- =?utf-8?B?b21mTUdtNVlkZG12VXNpbFhlRmRNeGtLbzBTQ09TNlNJaUZyZmt3ZCt3cHNo?=
- =?utf-8?B?OElCU2I4R3NYTy91aEJaUVNrRGR4VU9IZ0wvQ0FiYmtnMHBtbFhaNy9vRVZU?=
- =?utf-8?B?em5xSzhqaXVaL2tjdC9UenY1ZGZLY1lLalg0d2RpWnVDTXFFa1lTcDRMd1pX?=
- =?utf-8?B?MDBNeEZtRmprWU1uUDYxZFlISXlvZ1pHcWpGVnNONjFWRUNnV1VhSDdYTTlT?=
- =?utf-8?B?dE5ab1IzREluaXM5QVVFd25ZQzVSaS9DMEZ6bzJGK3FWNmJSS2pYRVN3TDBE?=
- =?utf-8?B?MlJZL1BINlpYOWVNdEpsVXRDTlh3SDJGcEdoOTBiNTV5SXVWR3A4M3JLOEN1?=
- =?utf-8?B?MlRBZ25pZHFxNUdPb2p6STlmUDkzTzJydkZCS21OZUEzWGNQMk9SZWtlK2tq?=
- =?utf-8?B?aWJVTHNSR2J5cmIxRlplTHhNVThqMVNtaDZsUFk4cGl3dDJLV2JvUHlrMHF5?=
- =?utf-8?B?bjlDWTFxRVFIOU5lNytoTDdaKzZVVzY0K3M1ZnJ3V0lrdUozL3ZJeEU5bTVX?=
- =?utf-8?B?SWo4U0ZLVFJDWWk0OTE4M1FZaWxaeGtHREQ3bzdQYVBtQVR6QTlkWnZ5dHdK?=
- =?utf-8?B?R3BJVTd4SElQWnV1NnNFc2lqaVRiN0hMQ3BDcUYrb1lobkR6OGsvcXFjTVpG?=
- =?utf-8?B?Nll0V29UL1M2NjIvZDd6VHB0ekpzTEE4bWk3b0YwN1MvMEl5SDRYY2YzUG5L?=
- =?utf-8?B?Si9WZU5sOW1TLzFVY0JUVHF1V1hyb1Y3bFNCcjB2N1J3OGt6dWZaY21zdmNu?=
- =?utf-8?B?VTYxUDNBOEVOVEhrZDNMa1lBZEhDNjloYzJGM1kwU1JRVjgrMUF6ZldZVXU1?=
- =?utf-8?B?aGtXSUNobklCaVdueVJDa0tZYkNlZlNGQWNkZDNVVENGZzBQM0k0WlAzcjVL?=
- =?utf-8?B?alhic0JQYkV5ODhjOVcvTVRBVHRUYlpaQm5MM3ZiM1o1cForZlFDNFBQMXZw?=
- =?utf-8?B?QVJseGFkV2lVYUdPYUJzc1BMV1Fsckg0V3Fuc0NIVnpjRGNkczFjRWNFUE01?=
- =?utf-8?B?cEpwZlN5UlJEaU82anFhN2FNYzVTcXdXaTFKZHFpT3BwUVRLWDBvZ0t0Qk1E?=
- =?utf-8?B?d2xFZHVVZzNYUUVtaHlpakhPRkZKbmdOSHlQeXZCL2Vhd25FK2w0Qk52TTZK?=
- =?utf-8?B?Z09VTnF0aEdNRDR2Rm1SY2tRdHFNZUtuMmdDTXE3OFFpRmlXZlRyVWw1QWlD?=
- =?utf-8?B?UDRSbE50Y3dYNGJVdHlRQVpOUmFROWxnYWVMRTFrOFBhS1ZRTTZvdFpScHJQ?=
- =?utf-8?B?WmNQbVY1M1hTbEdoT3U5RCtiR1JQaE1CKzlDSU5JdUp3NnUza3V4ZmNBWE1E?=
- =?utf-8?B?b1RVK2xzOThYOE9oaU03MlBYdWlydEtEb0dMVmZIcmhGbWM5VlhhTVRCdjBN?=
- =?utf-8?B?K0xKVUVHQUdLbUJxSlBpaWY1QytYeGdPMUtINkJ0QTRXOG83aVh3d3RJVUhV?=
- =?utf-8?B?TjlRVU1jSzZwOXhScFFKMjVsTzN0cjRBODVaOU9DWVJnckdrSjI4ME1JZVRX?=
- =?utf-8?B?T0tGZHFxTXBIODVpa1BHcWFrSGNVcTFTb0lBSytSbnNtM2xTR3B4QUpGTHlX?=
- =?utf-8?B?YUxSa3UxcFpBdGxYZ3NmdVlIWHZ3cmRzU0VqcTZOMnJsdWdJZGt5ejJRPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TzVkcHdlSjBTRUpUUEltSHhob2JSSGZ3a1MwTXVHcFkvMWEyL0EwdWlBUUlo?=
- =?utf-8?B?aDFTT2JOWFlzNVRmSkNzdndqWWpSWXNnR0RXNFlqeG1BZ2tCVjlSUTYyNU1M?=
- =?utf-8?B?NDJOYmllRGtEUE44Q2VnRGVCKzFpWUwyTjllM3E4WFV4eUtwV2VEY05jZERJ?=
- =?utf-8?B?YzN2ckp0YVVuNFZZSTF0bGUyRTVCbHhNdmxBbkNMODRSR3RzVGNVZ0xSbkNW?=
- =?utf-8?B?eDFjM0Z1cDd3d1BQbjZyZkNDNXc0Qm9OMnJzOWZxMGZaaW0xUDNsZXlrWXVo?=
- =?utf-8?B?ZXU2a1R0eWpGejZVaGV0ZFlzbTIrT0h1L2dBV01JMUlSbFJ3OTcxZkxXWXlS?=
- =?utf-8?B?dlNWSkQzZ2tVQjJHY2dNRmJxa0hIU0VwWmwzN20zTi9yNWk3SUoxSXlFSXMv?=
- =?utf-8?B?cGlYSFV2VklIM2RvQ3poMkZtL2VUMVZjeFR1ck94RnVEVEJxTmYyNnBxRVUx?=
- =?utf-8?B?S2QzOXhxbWpxS1ZSUkxkNTNDSzd5dHU4T3VQZG9DSWlYWXlZaTg1UTBiRXQw?=
- =?utf-8?B?YVJsaEc3YWFBTS9TaFhIcmQ0akplQjBLU1IwL1hYcTlTekcwU3VOQXJrK0Rv?=
- =?utf-8?B?YlFheTBWVkEzYmlSVjVUcURZbzl3U2JqcTg1YkliQWt1S0Rhc2twTGtsSWNO?=
- =?utf-8?B?V2NWUHE0VUVpQ201cVlzUmxheEJ5U2RDVk96aEZpcUI2M2EwRWwzbnRUR2xj?=
- =?utf-8?B?VTIxdUlSTDhoV0FTcTJSeERsT3JDVHdIZFd5TllDdmxvQk94c1lCWGM3KzZw?=
- =?utf-8?B?Mm9HdVQ0b0kzUTVtMUtOZDlvNm5Nd3dGNlFoSk4ycUgrL09wSUhSZW93TDNo?=
- =?utf-8?B?MUhrRkxDOHpOUlVFVzBBSGpYSHQxWnpsMURuUWhndU04R0ZIQlIrNzZPUFlS?=
- =?utf-8?B?QktseUJld3FFNSs0OUUrTmg3VXZZaHpsVGpxbTZUeEp0aXpNamdGN0pQLzZx?=
- =?utf-8?B?SUQvZituQzNYTitpc0V4cEY4c2Z5SE1HNGV3MlYyeWlGMXVZS0l1NCsxbDZX?=
- =?utf-8?B?SU9DTXJzdVlscEd1MXNaQnBtck13eEFvOUV2c2huWlcwQm9zOVJyaWtvekJh?=
- =?utf-8?B?eGlSbnRhdmczY01CSHYxc3RDK0lKWVovVWpNQ1dSWU9iSUhyajN4S2JWaGVq?=
- =?utf-8?B?OFRMcVhUajYwV29yUjdxcjQxUUVPdWdxRU56L2Z3anJIUjIxKzROZER2UTRN?=
- =?utf-8?B?OHMvYjFueUVqbHdURXBtUDMrbHJhZ2ZMWlVyS3VJU3VyVXFrSTdQYU1vZ3Ay?=
- =?utf-8?B?WjlTZVNtWW5BbWNQNk5SSzNhM2YwWWY0UzRPaEJQeitSSWxpL3M1R2xWSUhx?=
- =?utf-8?B?Rno4a2p5dEMrSmpucG1wZnlwcjJUOEowZmdqM0NJTkl5ZW5mREs5V1pmMFUw?=
- =?utf-8?B?cU5NSlE4RjR6UllZKytHTm9UZ3Jrc1BldDJ0cnR5OTgwRTZESmpHYmFUcnBh?=
- =?utf-8?B?cE50TU9CaHZLZ2ZkazI3RGlOc2VlY1hOUjErKzQycHlUM2Z5amZvdVlZbXpK?=
- =?utf-8?B?U1NkMmZjVG8ySXdpLzB1RkVSUVBLd2VCdEFJTmpScXloeFlSb0p3YkdTZUgy?=
- =?utf-8?B?Sm9tQUVoN0lkT000eU83RDhlWW9UQ1o4cWdVYTFvSFQvdU5FemdmQmpXV1RZ?=
- =?utf-8?B?N3o1b0swY3hjQ2pPWWNjR0dKc21BS1doMEVWejZzL2U2WFRXUXZ3cktyOG95?=
- =?utf-8?B?eldCN3QxcTBBTlYwaUZpckZveWZ0REJTNGtjWlNLdWV0dHNMWmhoc0oxakpL?=
- =?utf-8?B?MEo0OEliUzhRRXJ3c0x5M01mTW9XRWtlQVBzRGNXL3NnQmxGeVV6RUFyRmZT?=
- =?utf-8?B?ZmZvNWcrU1UvckpQbGltb01zNndVVlA0dngyUlRidzhwRVpXSHNtK3Bua0t4?=
- =?utf-8?B?aUlpTkowTitlZ2NhcUMwd21iSS8xRDM2Sk4zZjc3SDRHUis1enIza3l0cDVs?=
- =?utf-8?B?VExLNCtRaFRrZHVENFljMzIvZ3hnQUpUWVRkRG1CNnUydCtMVXVzaWYxT1o2?=
- =?utf-8?B?ZHVGNHA4WU9pMDdZOUJaQjRxRUg4YlJ0NFlBcStmdjB0NnRkOE8rbVJGWnZS?=
- =?utf-8?B?OVl0dnFBVzJEbVZKOVlLcndBTGZnTzJCd3AxWUxibUJmY0FqeEQ0UFlqWFNy?=
- =?utf-8?Q?KXMWUCiabn8xhdH0ED2lx6OIf?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0cf756a3-b1e8-440f-e983-08dc636aa428
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Apr 2024 07:54:45.4702
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ThuFNIDPsOxRRgJ5z0qWWlmXwnWEH/dyF19pMUmYu3V9mHa1BzeEmGV9OuE+AORiwR4a+y8FgadmIjv6pEX9kg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8546
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Mingwei Zhang <mizhang@google.com>
+Cc: maobibo <maobibo@loongson.cn>, Sean Christopherson <seanjc@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com>
+ <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com>
+ <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
+ <Zh2uFkfH8BA23lm0@google.com>
+ <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
+ <ZiaX3H3YfrVh50cs@google.com>
+ <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
+ <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com>
+ <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
+ <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com>
+ <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
+ <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
+ <86d1f6d1-197a-ecd9-3349-a64da9ea9789@loongson.cn>
+ <729c4b30-163c-4115-a380-14ece533a8b9@linux.intel.com>
+ <CAL715W+BpyX3EeKr=3ipMH8W30wmhMkxg2Fx2OET9cvQ480cgg@mail.gmail.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <CAL715W+BpyX3EeKr=3ipMH8W30wmhMkxg2Fx2OET9cvQ480cgg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2024/4/19 21:59, Jason Gunthorpe wrote:
-> On Thu, Apr 18, 2024 at 02:37:47PM -0600, Alex Williamson wrote:
-> 
->> Some degree of inconsistency is likely tolerated, the guest is unlikely
->> to check that a RW bit was set or cleared.  How would we virtualize the
->> control registers for a VF and are they similarly virtualized for a PF
->> or would we allow the guest to manipulate the physical PASID control
->> registers?
-> 
-> No, the OS owns the physical PASID control. If the platform IOMMU
-> knows how to parse PASID then PASID support is turned on and left on
-> at boot time.
 
-I think you mean host os. right?
-
-> There should be no guest visible difference to not supporting global
-> PASID disable, and we can't even implement it for VFs anyhow.
-> 
-> Same sort of argument for ATS/etc
-> 
->>> If kernel exposes pasid cap for PF same as other caps, and in the meantime
->>> the variant driver chooses to emulate a DVSEC cap, then userspace follows
->>> the below steps to expose pasid cap to VM.
+On 4/23/2024 3:10 PM, Mingwei Zhang wrote:
+> On Mon, Apr 22, 2024 at 11:45 PM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
 >>
->> If we have a variant driver, why wouldn't it expose an emulated PASID
->> capability rather than a DVSEC if we're choosing to expose PASID for
->> PFs?
-> 
-> Indeed, also an option. Supplying the DVSEC is probably simpler and
-> addresses other synthesized capability blocks in future. VMM is a
-> better place to build various synthetic blocks in general, IMHO.
-> 
-> New VMM's could parse the PF PASID cap and add it to its list of "free
-> space"
-> 
-> We may also be overdoing it here..
-> 
-> Maybe if the VMM wants to enable PASID we should flip the logic and
-> the VMM should assume that unused config space is safe to use. Only
-> devices that violate that rule need to join an ID list and provide a
-> DVSEC/free space list/etc.
-
-So, if the kernel decides to hide a specific physical capability, the
-space of this capability would be considered as free to use as well.
-is it?
-
-> I'm guessing that list will be pretty small and hopefully will not
-> grow.
-
-any channel to collect this kind of info? :)
-
-> It is easy and better for future devices to wrap their hidden
-> registers in a private DVSEC.
-
-hmmm, do you mean include the registers a DVSEC hence userspace can
-work out the free space by iterating the cap chain? or still mean
-indicating the free spaces by DVSEC? I guess the prior one.
-
-> Then I'd suggest just writing the special list in a text file and
-> leaving it in the VMM side.. Users can adjust the text file right away
-> if they have old and troublesome devices and all VMMs can share it.
-
-So for the existing devices that have both pasid cap and hidden registers,
-userspace should add them in the special list, and work out the free space
-by referring the file. While for the devices that only have pasid cap, or
-have the hidden register in a DVSEC, userspace finds a free space by
-iterating the cap chain. This seems to be general for today and future.
-
->>> 1) Check if a pasid cap is already present in the virtual config space
->>>      read from kernel. If no, but user wants pasid, then goto step 2).
->>> 2) Userspace invokes VFIO_DEVICE_FETURE to check if the device support
->>>      pasid cap. If yes, goto step 3).
+>> On 4/23/2024 2:08 PM, maobibo wrote:
+>>>
+>>> On 2024/4/23 下午12:23, Mingwei Zhang wrote:
+>>>> On Mon, Apr 22, 2024 at 8:55 PM maobibo <maobibo@loongson.cn> wrote:
+>>>>>
+>>>>>
+>>>>> On 2024/4/23 上午11:13, Mi, Dapeng wrote:
+>>>>>> On 4/23/2024 10:53 AM, maobibo wrote:
+>>>>>>>
+>>>>>>> On 2024/4/23 上午10:44, Mi, Dapeng wrote:
+>>>>>>>> On 4/23/2024 9:01 AM, maobibo wrote:
+>>>>>>>>>
+>>>>>>>>> On 2024/4/23 上午1:01, Sean Christopherson wrote:
+>>>>>>>>>> On Mon, Apr 22, 2024, maobibo wrote:
+>>>>>>>>>>> On 2024/4/16 上午6:45, Sean Christopherson wrote:
+>>>>>>>>>>>> On Mon, Apr 15, 2024, Mingwei Zhang wrote:
+>>>>>>>>>>>>> On Mon, Apr 15, 2024 at 10:38 AM Sean Christopherson
+>>>>>>>>>>>>> <seanjc@google.com> wrote:
+>>>>>>>>>>>>>> One my biggest complaints with the current vPMU code is that
+>>>>>>>>>>>>>> the roles and
+>>>>>>>>>>>>>> responsibilities between KVM and perf are poorly defined,
+>>>>>>>>>>>>>> which
+>>>>>>>>>>>>>> leads to suboptimal
+>>>>>>>>>>>>>> and hard to maintain code.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Case in point, I'm pretty sure leaving guest values in PMCs
+>>>>>>>>>>>>>> _would_ leak guest
+>>>>>>>>>>>>>> state to userspace processes that have RDPMC permissions, as
+>>>>>>>>>>>>>> the PMCs might not
+>>>>>>>>>>>>>> be dirty from perf's perspective (see
+>>>>>>>>>>>>>> perf_clear_dirty_counters()).
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Blindly clearing PMCs in KVM "solves" that problem, but in
+>>>>>>>>>>>>>> doing so makes the
+>>>>>>>>>>>>>> overall code brittle because it's not clear whether KVM
+>>>>>>>>>>>>>> _needs_
+>>>>>>>>>>>>>> to clear PMCs,
+>>>>>>>>>>>>>> or if KVM is just being paranoid.
+>>>>>>>>>>>>> So once this rolls out, perf and vPMU are clients directly to
+>>>>>>>>>>>>> PMU HW.
+>>>>>>>>>>>> I don't think this is a statement we want to make, as it opens a
+>>>>>>>>>>>> discussion
+>>>>>>>>>>>> that we won't win.  Nor do I think it's one we *need* to make.
+>>>>>>>>>>>> KVM doesn't need
+>>>>>>>>>>>> to be on equal footing with perf in terms of owning/managing PMU
+>>>>>>>>>>>> hardware, KVM
+>>>>>>>>>>>> just needs a few APIs to allow faithfully and accurately
+>>>>>>>>>>>> virtualizing a guest PMU.
+>>>>>>>>>>>>
+>>>>>>>>>>>>> Faithful cleaning (blind cleaning) has to be the baseline
+>>>>>>>>>>>>> implementation, until both clients agree to a "deal" between
+>>>>>>>>>>>>> them.
+>>>>>>>>>>>>> Currently, there is no such deal, but I believe we could have
+>>>>>>>>>>>>> one via
+>>>>>>>>>>>>> future discussion.
+>>>>>>>>>>>> What I am saying is that there needs to be a "deal" in place
+>>>>>>>>>>>> before this code
+>>>>>>>>>>>> is merged.  It doesn't need to be anything fancy, e.g. perf can
+>>>>>>>>>>>> still pave over
+>>>>>>>>>>>> PMCs it doesn't immediately load, as opposed to using
+>>>>>>>>>>>> cpu_hw_events.dirty to lazily
+>>>>>>>>>>>> do the clearing.  But perf and KVM need to work together from
+>>>>>>>>>>>> the
+>>>>>>>>>>>> get go, ie. I
+>>>>>>>>>>>> don't want KVM doing something without regard to what perf does,
+>>>>>>>>>>>> and vice versa.
+>>>>>>>>>>>>
+>>>>>>>>>>> There is similar issue on LoongArch vPMU where vm can directly
+>>>>>>>>>>> pmu
+>>>>>>>>>>> hardware
+>>>>>>>>>>> and pmu hw is shard with guest and host. Besides context switch
+>>>>>>>>>>> there are
+>>>>>>>>>>> other places where perf core will access pmu hw, such as tick
+>>>>>>>>>>> timer/hrtimer/ipi function call, and KVM can only intercept
+>>>>>>>>>>> context switch.
+>>>>>>>>>> Two questions:
+>>>>>>>>>>
+>>>>>>>>>>     1) Can KVM prevent the guest from accessing the PMU?
+>>>>>>>>>>
+>>>>>>>>>>     2) If so, KVM can grant partial access to the PMU, or is it all
+>>>>>>>>>> or nothing?
+>>>>>>>>>>
+>>>>>>>>>> If the answer to both questions is "yes", then it sounds like
+>>>>>>>>>> LoongArch *requires*
+>>>>>>>>>> mediated/passthrough support in order to virtualize its PMU.
+>>>>>>>>> Hi Sean,
+>>>>>>>>>
+>>>>>>>>> Thank for your quick response.
+>>>>>>>>>
+>>>>>>>>> yes, kvm can prevent guest from accessing the PMU and grant partial
+>>>>>>>>> or all to access to the PMU. Only that if one pmu event is granted
+>>>>>>>>> to VM, host can not access this pmu event again. There must be pmu
+>>>>>>>>> event switch if host want to.
+>>>>>>>> PMU event is a software entity which won't be shared. did you
+>>>>>>>> mean if
+>>>>>>>> a PMU HW counter is granted to VM, then Host can't access the PMU HW
+>>>>>>>> counter, right?
+>>>>>>> yes, if PMU HW counter/control is granted to VM. The value comes from
+>>>>>>> guest, and is not meaningful for host.  Host pmu core does not know
+>>>>>>> that it is granted to VM, host still think that it owns pmu.
+>>>>>> That's one issue this patchset tries to solve. Current new mediated
+>>>>>> x86
+>>>>>> vPMU framework doesn't allow Host or Guest own the PMU HW resource
+>>>>>> simultaneously. Only when there is no !exclude_guest event on host,
+>>>>>> guest is allowed to exclusively own the PMU HW resource.
+>>>>>>
+>>>>>>
+>>>>>>> Just like FPU register, it is shared by VM and host during different
+>>>>>>> time and it is lately switched. But if IPI or timer interrupt uses
+>>>>>>> FPU
+>>>>>>> register on host, there will be the same issue.
+>>>>>> I didn't fully get your point. When IPI or timer interrupt reach, a
+>>>>>> VM-exit is triggered to make CPU traps into host first and then the
+>>>>>> host
+>>>>> yes, it is.
+>>>> This is correct. And this is one of the points that we had debated
+>>>> internally whether we should do PMU context switch at vcpu loop
+>>>> boundary or VM Enter/exit boundary. (host-level) timer interrupt can
+>>>> force VM Exit, which I think happens every 4ms or 1ms, depending on
+>>>> configuration.
+>>>>
+>>>> One of the key reasons we currently propose this is because it is the
+>>>> same boundary as the legacy PMU, i.e., it would be simple to propose
+>>>> from the perf subsystem perspective.
+>>>>
+>>>> Performance wise, doing PMU context switch at vcpu boundary would be
+>>>> way better in general. But the downside is that perf sub-system lose
+>>>> the capability to profile majority of the KVM code (functions) when
+>>>> guest PMU is enabled.
+>>>>
+>>>>>> interrupt handler is called. Or are you complaining the executing
+>>>>>> sequence of switching guest PMU MSRs and these interrupt handler?
+>>>>> In our vPMU implementation, it is ok if vPMU is switched in vm exit
+>>>>> path, however there is problem if vPMU is switched during vcpu thread
+>>>>> sched-out/sched-in path since IPI/timer irq interrupt access pmu
+>>>>> register in host mode.
+>>>> Oh, the IPI/timer irq handler will access PMU registers? I thought
+>>>> only the host-level NMI handler will access the PMU MSRs since PMI is
+>>>> registered under NMI.
+>>>>
+>>>> In that case, you should disable  IRQ during vcpu context switch. For
+>>>> NMI, we prevent its handler from accessing the PMU registers. In
+>>>> particular, we use a per-cpu variable to guard that. So, the
+>>>> host-level PMI handler for perf sub-system will check the variable
+>>>> before proceeding.
+>>> perf core will access pmu hw in tick timer/hrtimer/ipi function call,
+>>> such as function perf_event_task_tick() is called in tick timer, there
+>>> are  event_function_call(event, __perf_event_xxx, &value) in file
+>>> kernel/events/core.c.
+>>>
+>>> https://lore.kernel.org/lkml/20240417065236.500011-1-gaosong@loongson.cn/T/#m15aeb79fdc9ce72dd5b374edd6acdcf7a9dafcf4
+>>>
+>> Just go through functions (not sure if all),  whether
+>> perf_event_task_tick() or the callbacks of event_function_call() would
+>> check the event->state first, if the event is in
+>> PERF_EVENT_STATE_INACTIVE, the PMU HW MSRs would not be touched really.
+>> In this new proposal, all host events with exclude_guest attribute would
+>> be put on PERF_EVENT_STATE_INACTIVE sate if guest own the PMU HW
+>> resource. So I think it's fine.
 >>
->> Why do we need the vfio feature interface if a physical or virtual PASID
->> capability on the device exposes the same info?
-> 
-> Still need to check if the platform, os, iommu, etc are all OK with
-> enabling PASID support before the viommu advertises it.
+> Is there any event in the host still having PERF_EVENT_STATE_ACTIVE?
+> If so, hmm, it will reach perf_pmu_disable(event->pmu), which will
+> access the global ctrl MSR.
 
-This means we don't expose physical or virtual PASID cap, is it? Otherwise,
-host kernel could check if pasid is enabled before exposing the PASID cap.
+I don't think there is any event with PERF_EVENT_STATE_ACTIVE state on 
+host when guest owns the PMU HW resource.
 
--- 
-Regards,
-Yi Liu
+In current solution, VM would fail to create if there is any system-wide 
+event without exclude_guest attribute. If VM is created successfully and 
+when vm-entry happens, the helper perf_guest_enter() would put all host 
+events with exclude_guest attribute into PERF_EVENT_STATE_INACTIVE state 
+and block host to create system-wide events without exclude_guest attribute.
+
+
 
