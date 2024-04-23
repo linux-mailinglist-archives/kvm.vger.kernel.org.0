@@ -1,116 +1,108 @@
-Return-Path: <kvm+bounces-15638-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15639-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 340FB8AE395
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 13:12:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 243288AE3BE
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 13:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4AD31F2337A
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 11:12:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4001285A93
+	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 11:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9488593A;
-	Tue, 23 Apr 2024 11:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFD0824AC;
+	Tue, 23 Apr 2024 11:21:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ZTwkbU5H"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="GAU+fzu5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6BF4823D9;
-	Tue, 23 Apr 2024 11:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD207BB0C;
+	Tue, 23 Apr 2024 11:21:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713870685; cv=none; b=nK/Tt1xSTDc1T8zYSaiYn5hXw9tavHmvr8CC72nGiCaZm/vC9B6d/G9e5ptMLuRhlgFDsK9B7tG/4seNDI2WA4s7hsA1+M5oqhV2+vC7U9uNiz8m/Zw0Wi5Aa9OiALLHk+tQgWZCUs+t9GxGV31MUsoPzIKWfEYJxJAJm7tuXLc=
+	t=1713871312; cv=none; b=myMKONLWcYDF7novtTZ2riUJflca0CWmKZUvB6KKPA663tus+3K6uOhdTg2BwgzVJonqPLjFdwj8mTEcmIj9AeA7APNSrhKIHeSjlcgHzFcdIZ0EyUIuoKUOXSC3XCbf9i5szKsDPVqufoi84MH76LSyzS1ChdedkBaWSu+53Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713870685; c=relaxed/simple;
-	bh=UDo4ttePVrWsxEKCfdj9YbfYm7P0gTSM0kHtg8yETyA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=dCEJJefOyTxWszdGBAiJul96LBZb1DjFQ+z5HRFHKjJwhu1o0RqqA/IFY1fuxbJdnGmOCibHdwbct9XsZLnhRvTIUYzZ9nPJ5tWmuBloCNmBbFTKBboLsiiKqB+sbGx8l5eABf2P1jT//EQTCzfaFWO9PDvLrINRxiLerUI5+Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ZTwkbU5H; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1713870662; x=1714475462; i=markus.elfring@web.de;
-	bh=bf3YKUE5/YWw3/wAqQRtyDRSqezcCOIeyAX/DQ1RA2k=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=ZTwkbU5HVxfSh/PuYC7rMfmzvhOfGYbYwyBJG70I2KNCyB8eZOXThrC5mwsJ6sFh
-	 h5m83a1gynykRAPXphMDy9H5Ln0/4rHfQxZ9G8NUc8hCD0kiOYrPKi66sqFO+XF1v
-	 LL5cT00iEpTaH02rG8ErBcLDF9+OTVeUx0Kr50yKgPYui5leYvNFFmpD8b3P5VZ/q
-	 K/VRdM84RLnKcUVND9u4q7MAWOavHtYggGJNk8d/MTbamQQUbZXFoPKdOWbk7xTiA
-	 gAzL/lEayxWkEHrXt9kaqei6WU6P3qB/spZpkhJ8K/7Bjur8SjnuXWtc0R/7cKj5v
-	 VH+jqwKNBQPgjEXMzQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Myf3x-1svAGR0unV-012Tcc; Tue, 23
- Apr 2024 13:11:02 +0200
-Message-ID: <5750611d-4c41-449a-ab37-9b234360929d@web.de>
-Date: Tue, 23 Apr 2024 13:10:57 +0200
+	s=arc-20240116; t=1713871312; c=relaxed/simple;
+	bh=I/yn2f9dZbjw4OOqQPgtSPROIMMwqdF9qGkxsLuYvXE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=czIVZ3c7ZKRkdzTmoHCG7Iod2nt58bfCVV1hYVN9J+Rr+CCP8PRg9EMuM7gW4HfiWdZ6Py8PwJqJQmzy3D5gKA6XuI31uW92X3HAXeFa0AYTlZw0/XTA7lSC9/ywrFQ0gDoet2avMivGtLgTL5NEQEgTfvuvqFwPstnlOobNFPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=GAU+fzu5; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id E7BD540E0192;
+	Tue, 23 Apr 2024 11:21:48 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id HDbFvtKgaTYj; Tue, 23 Apr 2024 11:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1713871304; bh=tHSmuxJux2alopCnOxYrmJ14nmb6gg9cT23R1aEXklM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GAU+fzu5158JAZFEgI3tUFZcQsnCyOaWCx5IcGmApelqqcOhCW0//CGtwzW8tZRUq
+	 m2Qbt2aIO8LT4As9N0gA5GLF2YtBlteksvBWkKzOsf22K4yWt0Tj4XVAk5J3OA1jTM
+	 NBTEKr95ErFoS96aWfgN50JFpvhs2YUrXfqXg4CU2trVXiKnp/nf62apliT8nARfW4
+	 4UGT8M3SubzJXvznwyF1n8HtgvsQjw/Jqx+WgK3RjJSiG6ag0FOi4Pzd7pAy+6hsfW
+	 Gt1Kue8yrXp6xnGyH78DTj3Z4irQYyoFE2fCzro6bbnaBRZTUprut7w8nWU9kbGiOX
+	 J2RVBRHiTex+RDJ+ZnU8CfNKFxSS1fIybEZXp942FpWBc+7pMXffFNs4hJ8KF5zmhv
+	 6W7cTDQ4+wHtNYa+igRo7s1VcCRsSB+T311yP+M3+XykFcfsbIokv1om3LRb1gNN03
+	 ugcr4PqVbnRaIn7PgbDePKFlGDgrmAlNvP4xxUnfJQpJ+83YlSy5J9b8BcueqcIm4U
+	 AZLjRFdHRjfA6t62MUyVtkigP7GiD9mWxE4lCAUINgNFJ78fzI2vVGOh+OqfHSRXXk
+	 n5/k9rn9g27/YI1mi/q/pNXJ179dlUXewhmw+gQssNCB+0mkHey0SOKJbV1clHTLSv
+	 25MczdI9wEgUpnW0SfmKQ/qw=
+Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 90EA140E00B2;
+	Tue, 23 Apr 2024 11:21:33 +0000 (UTC)
+Date: Tue, 23 Apr 2024 13:21:28 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v8 06/16] virt: sev-guest: Move SNP Guest command mutex
+Message-ID: <20240423112128.GDZieZuKw8Ca2jiXw9@fat_crate.local>
+References: <20240215113128.275608-1-nikunj@amd.com>
+ <20240215113128.275608-7-nikunj@amd.com>
+ <20240422130012.GAZiZfXM5Z2yRvw7Cx@fat_crate.local>
+ <6a7a8892-bb8d-4f03-a802-d7eee48045b5@amd.com>
+ <20240423102829.GCZieNTcHyuAYMcRf5@fat_crate.local>
+ <f8dbd58c-78da-4b3f-a79b-6693c04fb104@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Kunwu Chan <chentao@kylinos.cn>, linux-kselftest@vger.kernel.org,
- kvm@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Muhammad Usama Anjum <usama.anjum@collabora.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Kunwu Chan <kunwu.chan@hotmail.com>
-References: <20240423073721.2001016-1-chentao@kylinos.cn>
-Subject: Re: [PATCH] KVM: selftests: Add 'malloc' failure check in config_name
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240423073721.2001016-1-chentao@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:l7n+uNb7WPk8WMmPsKcv3FItmU8s3wBeJuQKloutvOu88sqOFek
- ma6yKedgGQjTUdyQWtjy8BF1xDicIjkFcatqrZezmShYJtLNxhgYTjzxfe3ySgCb3ZGlWuD
- bm50wV9+4wM1VFiu2dB7Ar6T23rUC3ubw2/Fb5davcs/2oXMuMaI7KQZV+ybC7JQGuqzMQf
- 0Rkx944rQwEadYHfTJdVw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:DN1wGof/WPs=;nJ1KDJsPeLt79srODva1rkmJKI4
- 7lse3jXCi6+hORSlFZ3FSnlF3FBXPgXmDBN5BPROgVhIkrVcSz7+keFYRREDdVN9HhpG9ewoL
- 2DBzjm6dRZNijkypsvt+1T3Yx/e8JKHv+XJz1kwmQ0rrjuVw+/k6nPNPMKhKhHwDAajVVJJ/m
- iJ6EL/fkgir9DzN6cL2VgFg0r3D592gpjcx8cIlED+l7y7z2T0K3mmnSjBQ0FNfQt/ZjFyRfS
- 2LcViB6rB0Tw5YHuYneUSXDAXsJjhGu27QczqfhCKuOSyE03c/1OeW94ZjbaFkV/ZPRhd7ePf
- 7JpTbexWeIem+3+0W0C4SilGskqCyK5PEFEu4PlnsCyUBwhCXoyGHZcvYNJjk1ut8WYnqARgL
- PPHDM0ZS89kyf3khFzCNDG64e7GvtDVRxA34oHyVULX4Er9BHLgl8JMnbc7hpEcPb0f12vUGO
- azyADWcheuk0wPzj1jhNBYbDpwh/CHwXyVcOZ/TCQI+E7NinKAFbydeARoLet8ob4jSb4Nz/h
- amJbqiU5N8f4B6Y5nkGxO1kbUL9AeJ1or10F4E7bB1vudHU1tF4y/nRxATli7rNB8rhnDzA2l
- UfUdcHwRvxQCSqcHA6dlZqYGoVAQlSyLoEfQOG8Rw9VJSKmguGkWz+ngw0y/ZPEhqgpXD8SpA
- hbyzuHXwAc9/ig+C4xCOSCdHsZrFYG0yHW1akuR/tHuJ8HRYlMHj8anZ70K+/hxbPYGPkSnmz
- VqFBbvVVVcOS0gm+Zuey37IgOJcWJEjXQWnUSlL1Bm5bKwX98r49qID8q7x4I0nGH4IvbNo+b
- lRqVOneO7oQlLXwhxqYXmeLNe7dRHXzkMxiXM0afvorbA=
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <f8dbd58c-78da-4b3f-a79b-6693c04fb104@amd.com>
 
-=E2=80=A6
-> This patch will add the malloc failure checking
-=E2=80=A6
+On Tue, Apr 23, 2024 at 04:12:00PM +0530, Nikunj A. Dadhania wrote:
+> Something like below ?
+> 
+> snp_guest_ioctl()
+> -> get_report()/get_derived_key()/get_ext_report()
+>   -> snp_send_guest_request()
+>        snp_guest_cmd_lock();
+>        ...
+>        snp_guest_cmd_lock();
+> 
+> With this the cmd_lock will be private to sev.c and lock/unlock function
+> doesn't need to be exported.
 
-* Please use a corresponding imperative wording for the change description=
-.
+Yes, something like that.
 
-* Would you like to add the tag =E2=80=9CFixes=E2=80=9D accordingly?
+-- 
+Regards/Gruss,
+    Boris.
 
-
-=E2=80=A6
-> +++ b/tools/testing/selftests/kvm/get-reg-list.c
-> @@ -66,6 +66,7 @@ static const char *config_name(struct vcpu_reg_list *c=
-)
->  		len +=3D strlen(s->name) + 1;
->
->  	c->name =3D malloc(len);
-> +	TEST_ASSERT(c->name, "-ENOMEM when allocating config name");
-=E2=80=A6
-
-Can =E2=80=9Cerrno=E2=80=9D be relevant for the error message construction=
-?
-
-Regards,
-Markus
+https://people.kernel.org/tglx/notes-about-netiquette
 
