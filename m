@@ -1,164 +1,171 @@
-Return-Path: <kvm+bounces-15781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15779-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97608B076F
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 12:34:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A20278B0720
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 12:19:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA9FE1C2213E
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 10:34:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE0E7B21EC2
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 10:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5616159580;
-	Wed, 24 Apr 2024 10:34:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22835159565;
+	Wed, 24 Apr 2024 10:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z7L7Vv2W";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7ntG99+Z";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Z7L7Vv2W";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="7ntG99+Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TiLG0YZ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480A413DBB2;
-	Wed, 24 Apr 2024 10:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509A1158D9A
+	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 10:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713954873; cv=none; b=rijDjOMpuZXEzoLQft0F1bVAlz3FXXqwaRU7FHaD2xZIsq2+H9dpxX9AlDdtnI2YQl149X3SPACuG1dvg/7tu7xc4yM0NDW3l0H+HeBSggEePf5UuDoEhqJDhqrKyuoZx+4Gfx6jLZ2/MzXiO03ltzJoHM3716nmpkvQD/xO7rQ=
+	t=1713953982; cv=none; b=nAWDGDEj0hTuqiR3R/kXaI9TRUzteahmBCc9qdBq4xFMchdJPl5btdL0Jijzu6Xv9xVO+eKdsC+T1u0rt06YJRUbI/ZZ07FPkuH5ivjPEtDzukYH1hDW51iQ7jw5uWHSlFS2P3Ee5Mmkj4aIG0e7p2wdQx/wyuQQSwWDgXJFBmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713954873; c=relaxed/simple;
-	bh=kcJ56fsa/PMFsPSqACtQFZlurMUAdbmI1ttj5bfikVM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=fEOfXEYeU6s6zT1L9kWdUwwsYZpq23o/5P0J0QDctVd8CE50KWSnkWLfcNrBsKFjC+n6T2korISLL91FpTTIM14AkiZwVbpLWyAI7PMePYFwyTXUrobiBKKs+LmnJcB0Nq6/jlO4N6kTyWbOI3V0neaXKQOIAFBnoV8OISnaEy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z7L7Vv2W; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7ntG99+Z; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Z7L7Vv2W; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=7ntG99+Z; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 767C3613F2;
-	Wed, 24 Apr 2024 10:34:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1713954870; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lClhB2Lx5EF0SugdSw87bUnROejaSI8p6PH1P+TqX3s=;
-	b=Z7L7Vv2W7CLL9VMxKrr1on+J8hyAT76nbbvz35Dw5Jorq6mpHanLXSh1c9aBsRI16Hvbrw
-	nTsAR22V3fSWsadfnRYFwLHJc6NmSHMYywNCXiA7YuaXWISHxU+UV8qU0uiCRqYRTnjfOF
-	kcN+JXj5uCcbpMFL/19nl+OO8Ao5u8Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1713954870;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lClhB2Lx5EF0SugdSw87bUnROejaSI8p6PH1P+TqX3s=;
-	b=7ntG99+Zuc6fCcwdsPn+3q3HFP/MOJMDX5B93jon/FP3EBHZm89pXT5UDw/T5hPewoQEtw
-	nH6f/Q75Dd3SAFCw==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Z7L7Vv2W;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=7ntG99+Z
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1713954870; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lClhB2Lx5EF0SugdSw87bUnROejaSI8p6PH1P+TqX3s=;
-	b=Z7L7Vv2W7CLL9VMxKrr1on+J8hyAT76nbbvz35Dw5Jorq6mpHanLXSh1c9aBsRI16Hvbrw
-	nTsAR22V3fSWsadfnRYFwLHJc6NmSHMYywNCXiA7YuaXWISHxU+UV8qU0uiCRqYRTnjfOF
-	kcN+JXj5uCcbpMFL/19nl+OO8Ao5u8Y=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1713954870;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lClhB2Lx5EF0SugdSw87bUnROejaSI8p6PH1P+TqX3s=;
-	b=7ntG99+Zuc6fCcwdsPn+3q3HFP/MOJMDX5B93jon/FP3EBHZm89pXT5UDw/T5hPewoQEtw
-	nH6f/Q75Dd3SAFCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EB61D1393C;
-	Wed, 24 Apr 2024 10:34:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +ZsKNjXgKGauTAAAD6G6ig
-	(envelope-from <clopez@suse.de>); Wed, 24 Apr 2024 10:34:29 +0000
-From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Cc: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH] KVM: fix documentation for KVM_CREATE_GUEST_MEMFD
-Date: Wed, 24 Apr 2024 12:33:16 +0200
-Message-Id: <20240424103317.28522-1-clopez@suse.de>
-X-Mailer: git-send-email 2.35.3
+	s=arc-20240116; t=1713953982; c=relaxed/simple;
+	bh=Ro8LJdgZqyCdBFIoBx/EtjaSCPEmCl/nrm9NUdz+RfE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GSo8yCEt7srB9FkNrVS0satuD5PV0V7+xdWQuj8KheM4/BnoAHH1nhu5TYrABDHVDBmdrib3pTFU8e+zh5aYAZrrPxb7qI/LSicsCsBiTAdjmXkhTYu/0C8ThjMnLL3rrUV1qiaHGdYm8rieGNHULxpAeh2z2+zc4FwSG/fWjwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TiLG0YZ7; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713953981; x=1745489981;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Ro8LJdgZqyCdBFIoBx/EtjaSCPEmCl/nrm9NUdz+RfE=;
+  b=TiLG0YZ7dhOkLh4xRMM6wAFb8JOd+x8ptnDDhP6uCIzxUCKPtSCJGs1y
+   KjUiK3SDZz9wuocqES2X4ZPWt9ji1t5N5sEEwkT3MJ0YArLJKwDQS0+RT
+   IPeNY1PWfVvuBP3IiUIdTu11vldH3dDlsq77B+Kjv+bQ1NPVcTeDVqVqo
+   d29nC1mtZSjHfYH4DqL/+OpL81rgpQ8ByWwtdm/klPzFPO7ZZYlcU7Dbc
+   j+mrZn2kuAGVIr6iO6oXmllcwfZUpc64Qz0xkWmSALg4zyKT2J9YCNUka
+   eIRalrVbq60j0ppI9QvFpN3wL4ICEDC8EVHwlNUw+nB3xi08mt1ZvT3Gm
+   g==;
+X-CSE-ConnectionGUID: L4JbNS1aToO95dJQl44Gbg==
+X-CSE-MsgGUID: mnQFbGwISoqlY+q9HUvqYg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="27032261"
+X-IronPort-AV: E=Sophos;i="6.07,225,1708416000"; 
+   d="scan'208";a="27032261"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 03:19:40 -0700
+X-CSE-ConnectionGUID: cNB1Y3tgQZC1OhIlSs1w6A==
+X-CSE-MsgGUID: 7qPVLuibTjOUwVDbsuRCJw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,225,1708416000"; 
+   d="scan'208";a="29305819"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa003.jf.intel.com with ESMTP; 24 Apr 2024 03:19:37 -0700
+Date: Wed, 24 Apr 2024 18:33:43 +0800
+From: Zhao Liu <zhao1.liu@linux.intel.com>
+To: Zhao Liu <zhao1.liu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Igor Mammedov <imammedo@redhat.com>,
+	Tim Wiederhake <twiederh@redhat.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH for-9.1 0/7] target/i386/kvm: Cleanup the kvmclock
+ feature name
+Message-ID: <ZijgB1Aocksr+ec9@intel.com>
+References: <20240329101954.3954987-1-zhao1.liu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: NO
-X-Spam-Score: -1.95
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: 767C3613F2
-X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-1.95 / 50.00];
-	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MIXED_CHARSET(0.56)[subject];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240329101954.3954987-1-zhao1.liu@linux.intel.com>
 
-The KVM_CREATE_GUEST_MEMFD ioctl returns a file descriptor, and is
-documented as such in the description. However, the "Returns" field
-in the documentation states that the ioctl returns 0 on success.
-Update this to match the description.
+Hi maintainers,
 
-Signed-off-by: Carlos López <clopez@suse.de>
----
- Documentation/virt/kvm/api.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ping. Do you like this diea?
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 0b5a33ee71ee..57bd2b2b1532 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6316,7 +6316,7 @@ The "flags" field is reserved for future extensions and must be '0'.
- :Architectures: none
- :Type: vm ioctl
- :Parameters: struct kvm_create_guest_memfd(in)
--:Returns: 0 on success, <0 on error
-+:Returns: A file descriptor on success, <0 on error
- 
- KVM_CREATE_GUEST_MEMFD creates an anonymous file and returns a file descriptor
- that refers to it.  guest_memfd files are roughly analogous to files created
--- 
-2.35.3
+Thanks,
+Zhao
 
+On Fri, Mar 29, 2024 at 06:19:47PM +0800, Zhao Liu wrote:
+> Date: Fri, 29 Mar 2024 18:19:47 +0800
+> From: Zhao Liu <zhao1.liu@linux.intel.com>
+> Subject: [PATCH for-9.1 0/7] target/i386/kvm: Cleanup the kvmclock feature
+>  name
+> X-Mailer: git-send-email 2.34.1
+> 
+> From: Zhao Liu <zhao1.liu@intel.com>
+> 
+> Hi list,
+> 
+> This series is based on Paolo's guest_phys_bits patchset [1].
+> 
+> Currently, the old and new kvmclocks have the same feature name
+> "kvmclock" in FeatureWordInfo[FEAT_KVM].
+> 
+> When I tried to dig into the history of this unusual naming and fix it,
+> I realized that Tim was already trying to rename it, so I picked up his
+> renaming patch [2] (with a new commit message and other minor changes).
+> 
+> 13 years age, the same name was introduced in [3], and its main purpose
+> is to make it easy for users to enable/disable 2 kvmclocks. Then, in
+> 2012, Don tried to rename the new kvmclock, but the follow-up did not
+> address Igor and Eduardo's comments about compatibility.
+> 
+> Tim [2], not long ago, and I just now, were both puzzled by the naming
+> one after the other.
+> 
+> So, this series is to push for renaming the new kvmclock feature to
+> "kvmclock2" and adding compatibility support for older machines (PC 9.0
+> and older).
+> 
+> Finally, let's put an end to decades of doubt about this name.
+> 
+> 
+> Next Step
+> =========
+> 
+> This series just separates the two kvmclocks from the naming, and in
+> subsequent patches I plan to stop setting kvmclock(old kcmclock) by
+> default as long as KVM supports kvmclock2 (new kvmclock).
+> 
+> Also, try to deprecate the old kvmclock in KVM side.
+> 
+> [1]: https://lore.kernel.org/qemu-devel/20240325141422.1380087-1-pbonzini@redhat.com/
+> [2]: https://lore.kernel.org/qemu-devel/20230908124534.25027-4-twiederh@redhat.com/
+> [3]: https://lore.kernel.org/qemu-devel/1300401727-5235-3-git-send-email-glommer@redhat.com/
+> [4]: https://lore.kernel.org/qemu-devel/1348171412-23669-3-git-send-email-Don@CloudSwitch.com/
+> 
+> Thanks and Best Regards,
+> Zhao
+> 
+> ---
+> Tim Wiederhake (1):
+>   target/i386: Fix duplicated kvmclock name in FEAT_KVM
+> 
+> Zhao Liu (6):
+>   target/i386/kvm: Add feature bit definitions for KVM CPUID
+>   target/i386/kvm: Remove local MSR_KVM_WALL_CLOCK and
+>     MSR_KVM_SYSTEM_TIME definitions
+>   target/i386/kvm: Only Save/load kvmclock MSRs when kvmclock enabled
+>   target/i386/kvm: Save/load MSRs of new kvmclock
+>     (KVM_FEATURE_CLOCKSOURCE2)
+>   target/i386/kvm: Add legacy_kvmclock cpu property
+>   target/i386/kvm: Update comment in kvm_cpu_realizefn()
+> 
+>  hw/i386/kvm/clock.c       |  5 ++--
+>  hw/i386/pc.c              |  1 +
+>  target/i386/cpu.c         |  3 +-
+>  target/i386/cpu.h         | 32 +++++++++++++++++++++
+>  target/i386/kvm/kvm-cpu.c | 25 ++++++++++++++++-
+>  target/i386/kvm/kvm.c     | 59 +++++++++++++++++++++++++--------------
+>  6 files changed, 99 insertions(+), 26 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
 
