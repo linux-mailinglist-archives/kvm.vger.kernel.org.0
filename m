@@ -1,169 +1,168 @@
-Return-Path: <kvm+bounces-15841-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15842-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14D2F8B0F45
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 17:59:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05A778B0F5C
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 18:06:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3180FB2E915
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 15:57:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 118901C20AE9
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 16:06:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3EC1607A7;
-	Wed, 24 Apr 2024 15:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C288161310;
+	Wed, 24 Apr 2024 16:06:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WsJwcaBg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIglwk3K"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC98B15F406
-	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 15:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C0315E1E3
+	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 16:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713974239; cv=none; b=iBp2HchUOZ5oVtSDHPdPja9UmGCf7nWk+lKo8ItH9xMf+KTc3YFpgKeP2/RNb67FbdJY4/zbtEMlqp/hJiABJfPTCCeOIcILC7Kdv6PJCyPaRc+A4CyEn1oY1W+T/3CvyQk1XjHbN6zlQs9QmrX3jnF2qWGxJgestFjLuwbGApQ=
+	t=1713974774; cv=none; b=XyDSiu7ne4QrGzwCGG143lZagOIFNkNCyyiaErtoxvltkF+S/B32ZcMUkGEeH3ujBsteK0LSCEMbPrBfv4/1/Y40y0BpLLqYAJ/oxx/mb9aP70ej2EwiaCVPSm2vJGnxLSX9+Yqw2IffdcreR1YXcdZoM0GIL63RjtJqYf6iySU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713974239; c=relaxed/simple;
-	bh=szSvnPPOZogSbQg2l5FImdE9D+W2Mso6/U/ehpDLjtg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W51YC3S9HppePGP8QYHs91vR3QvtyGuxkJy8emw8FfAhj2+Z68aiBspuUpcvyYEemknAK93O8yQrVM97vUIe7lPvlF1e8Ex6PlgkGzm7Eun6SXrpRcGRPLVhLIpyVJCaS+nL3UgmPHKLivs0qViHwi+WpLMimtS9011QfCLqVVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WsJwcaBg; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713974237; x=1745510237;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=szSvnPPOZogSbQg2l5FImdE9D+W2Mso6/U/ehpDLjtg=;
-  b=WsJwcaBgJd9tLP2x3lfQa9L+ndOg/W1C3nWi+XfFQpALwYMTJsdWWolb
-   3lKoGne2cwstsrSLwOZzvWJMj5Bt9C88EtLA/OiSZGLsOfPpKFwVdLzrU
-   8WEscwtU1ZvCfwspDVMvYWkqyqx6KSbfSseamFzDWrSj8ONMy23i0v9rP
-   WOKqz6dlwiIRrVfPTsa8GywGPjthDFAxF3yRvaksrotCrMY4earNza2Gd
-   Tu9kDDlchPRfBvvJXjGFam7zOSS4yAMXkOMz9Wa+fvfmGCOulnMb01cGc
-   pqMAZlFYEwULcCFDKPpu2CViUa1vk49uwxF1r52+/pjH6hOFjs8muvI1o
-   w==;
-X-CSE-ConnectionGUID: fXxkeUG4Qqim+AmXINAZlQ==
-X-CSE-MsgGUID: Pi0D248PQKiwJt9zOMnmpQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9776171"
-X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="9776171"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 08:57:17 -0700
-X-CSE-ConnectionGUID: sPs8qcndRmmnxNGDQsUxSw==
-X-CSE-MsgGUID: DrAM4+fPRKKgQpa+TloHrg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="24770849"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 08:57:14 -0700
-Message-ID: <fb252e78-2e71-4422-9499-9eac69102eec@intel.com>
-Date: Wed, 24 Apr 2024 23:57:11 +0800
+	s=arc-20240116; t=1713974774; c=relaxed/simple;
+	bh=yVhTaSI0IN9x1hSEq/c6WtpXjjzz5sgC1B4mc1Aq4Vg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aGxz+r70mZusoSVn9458/OgsQpXgvwZkGnH3z/xxuoZJrlqiQhQ/Ep1naHMeZ3w3I6Ks3v2KZtX/fLnA1vrdwj8uhAP6YnSf/8AF7wNzcWh8tcVI0c9a/2w+EC+OSneBtuhVASDsw10yBXVAvCaF9/rlVGgk6dnzNy1TWIe6zEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DIglwk3K; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713974771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oA2yVR/0LIk/2yMOm6WFAwy5uxXi3mXUTspZx4CPJrQ=;
+	b=DIglwk3KaOMPKLBl1JfW8Sjqb+tr0C0HLwlRooXd9NL4AWhWM/22SKin9QUpn6y5WpnWdm
+	PjCcOyo/HtxPanzW2OVIIs6iruLMrqae/VHPum1TS7ER+gXxjQOnMSTlJju2UcMvwVuy2f
+	Az2W2iJyjFianh2K2A8Zqbp3PJFBoV0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-223-HfrQNEsHPY6U-yzVmxVxng-1; Wed, 24 Apr 2024 12:06:10 -0400
+X-MC-Unique: HfrQNEsHPY6U-yzVmxVxng-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-343c6a990dbso26190f8f.1
+        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 09:06:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713974769; x=1714579569;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oA2yVR/0LIk/2yMOm6WFAwy5uxXi3mXUTspZx4CPJrQ=;
+        b=iR7thUQM2FCrznHIMLoXCtIayQ6SNplXHeoZRCbyVoCyRrugaTD25pk5l8a9y+4VYT
+         w11cat955rVGL8KAVcsgasQBWRJAXEe2GAuytVgg2Ele4RW/wmVV2xw0eZV+Rr59wAM/
+         sK4DthSPuA4H41ilIVcfVDjJEwREVsGzwFmq+thWKkok8ch2rURsrjhjRCi9yXHVt3Vo
+         21xSzXiIiwj7JozRQUk6oY2biYXyBTsKRN9/wFwqDNpBBVU0tD1EN9ayEJHIDLf8Lkly
+         HIHR4z/Cfzx4TO2lOh/PLRr+OOFicphsXg9uGRUwpdXw50YyVoEknq1n+PiZwGGRRF/q
+         TdIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVbrCsVx/iovij62zK3q5kFJWPt8I/mLGRMIzRlJ+63BCRA4trTUTOOaG3oWjdf07ObpcqwLGuQz6LLeWkhP4CLO5GY
+X-Gm-Message-State: AOJu0Yxszzks8go4E+sjoZYjEIaDEWS7Pa8Oxou78osYdUdD1PvjhCSZ
+	V7Y1DllTUsw26AlxwwCKgUvsCPTEtIlrrvCbjC5byoSUn8KcwdkreEOjGktT5JDFrhhGbUNlyur
+	jpzvVzNZDG3kRSDPF6POYyzCTqaKjzcxsoDaQPm1qJh2ZR9Fgt7HoiEIsZkQyF+HmI6J+uqQmDc
+	1j3M1mCI4+lezmJyanvNUuc2Yy
+X-Received: by 2002:adf:f451:0:b0:348:7e75:4d75 with SMTP id f17-20020adff451000000b003487e754d75mr80672wrp.22.1713974769369;
+        Wed, 24 Apr 2024 09:06:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFetSybQAphKK1G77Kg0f223/o7zJ35zY1t5heqCwOVkh5YZgj4h8hG3maYM68P0r0G2V3JT9rVm9GqhLJehWo=
+X-Received: by 2002:adf:f451:0:b0:348:7e75:4d75 with SMTP id
+ f17-20020adff451000000b003487e754d75mr80653wrp.22.1713974769028; Wed, 24 Apr
+ 2024 09:06:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-9.1 0/7] target/i386/kvm: Cleanup the kvmclock feature
- name
-To: Zhao Liu <zhao1.liu@linux.intel.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <eduardo@habkost.net>, "Michael S . Tsirkin"
- <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Tim Wiederhake <twiederh@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Zhao Liu <zhao1.liu@intel.com>
-References: <20240329101954.3954987-1-zhao1.liu@linux.intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20240329101954.3954987-1-zhao1.liu@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240419085927.3648704-1-pbonzini@redhat.com> <20240419085927.3648704-3-pbonzini@redhat.com>
+ <eb7c7982-2445-4968-892c-c36f5b38fabe@linux.intel.com>
+In-Reply-To: <eb7c7982-2445-4968-892c-c36f5b38fabe@linux.intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 24 Apr 2024 18:05:57 +0200
+Message-ID: <CABgObfYrxwdy-LqcWiCSfHhOihi9qJT2a3PzhSRHzkFgiJurNQ@mail.gmail.com>
+Subject: Re: [PATCH 2/6] KVM: Add KVM_PRE_FAULT_MEMORY vcpu ioctl to
+ pre-populate guest memory
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	isaku.yamahata@intel.com, xiaoyao.li@intel.com, seanjc@google.com, 
+	rick.p.edgecombe@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/29/2024 6:19 PM, Zhao Liu wrote:
-> From: Zhao Liu <zhao1.liu@intel.com>
-> 
-> Hi list,
-> 
-> This series is based on Paolo's guest_phys_bits patchset [1].
-> 
-> Currently, the old and new kvmclocks have the same feature name
-> "kvmclock" in FeatureWordInfo[FEAT_KVM].
-> 
-> When I tried to dig into the history of this unusual naming and fix it,
-> I realized that Tim was already trying to rename it, so I picked up his
-> renaming patch [2] (with a new commit message and other minor changes).
-> 
-> 13 years age, the same name was introduced in [3], and its main purpose
-> is to make it easy for users to enable/disable 2 kvmclocks. Then, in
-> 2012, Don tried to rename the new kvmclock, but the follow-up did not
-> address Igor and Eduardo's comments about compatibility.
-> 
-> Tim [2], not long ago, and I just now, were both puzzled by the naming
-> one after the other.
+On Mon, Apr 22, 2024 at 7:39=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.co=
+m> wrote:
+> range->size equals 0 can be covered by "range->gpa + range->size <=3D
+> range->gpa"
+>
+> If we want to return success when size is 0 (, though I am not sure it's
+> needed),
+> we need to use "range->gpa + range->size < range->gpa" instead.
 
-The commit message of [3] said the reason clearly:
+I think it's not needed because it could cause an infinite loop in
+(buggy) userspace. Better return -EINVAL.
 
-   When we tweak flags involving this value - specially when we use "-",
-   we have to act on both.
+Paolo
 
-So you are trying to change it to "when people want to disable kvmclock, 
-they need to use '-kvmclock,-kvmclock2' instead of '-kvmclock'"
-
-IMHO, I prefer existing code and I don't see much value of 
-differentiating them. If the current code puzzles you, then we can add 
-comment to explain.
-
-> So, this series is to push for renaming the new kvmclock feature to
-> "kvmclock2" and adding compatibility support for older machines (PC 9.0
-> and older).
-> 
-> Finally, let's put an end to decades of doubt about this name.
-> 
-> 
-> Next Step
-> =========
-> 
-> This series just separates the two kvmclocks from the naming, and in
-> subsequent patches I plan to stop setting kvmclock(old kcmclock) by
-> default as long as KVM supports kvmclock2 (new kvmclock).
-
-No. It will break existing guests that use KVM_FEATURE_CLOCKSOURCE.
-
-> Also, try to deprecate the old kvmclock in KVM side.
-> 
-> [1]: https://lore.kernel.org/qemu-devel/20240325141422.1380087-1-pbonzini@redhat.com/
-> [2]: https://lore.kernel.org/qemu-devel/20230908124534.25027-4-twiederh@redhat.com/
-> [3]: https://lore.kernel.org/qemu-devel/1300401727-5235-3-git-send-email-glommer@redhat.com/
-> [4]: https://lore.kernel.org/qemu-devel/1348171412-23669-3-git-send-email-Don@CloudSwitch.com/
-> 
-> Thanks and Best Regards,
-> Zhao
-> 
-> ---
-> Tim Wiederhake (1):
->    target/i386: Fix duplicated kvmclock name in FEAT_KVM
-> 
-> Zhao Liu (6):
->    target/i386/kvm: Add feature bit definitions for KVM CPUID
->    target/i386/kvm: Remove local MSR_KVM_WALL_CLOCK and
->      MSR_KVM_SYSTEM_TIME definitions
->    target/i386/kvm: Only Save/load kvmclock MSRs when kvmclock enabled
->    target/i386/kvm: Save/load MSRs of new kvmclock
->      (KVM_FEATURE_CLOCKSOURCE2)
->    target/i386/kvm: Add legacy_kvmclock cpu property
->    target/i386/kvm: Update comment in kvm_cpu_realizefn()
-> 
->   hw/i386/kvm/clock.c       |  5 ++--
->   hw/i386/pc.c              |  1 +
->   target/i386/cpu.c         |  3 +-
->   target/i386/cpu.h         | 32 +++++++++++++++++++++
->   target/i386/kvm/kvm-cpu.c | 25 ++++++++++++++++-
->   target/i386/kvm/kvm.c     | 59 +++++++++++++++++++++++++--------------
->   6 files changed, 99 insertions(+), 26 deletions(-)
-> 
+>
+> > +
+> > +     vcpu_load(vcpu);
+> > +     idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+> > +
+> > +     full_size =3D range->size;
+> > +     do {
+> > +             if (signal_pending(current)) {
+> > +                     r =3D -EINTR;
+> > +                     break;
+> > +             }
+> > +
+> > +             r =3D kvm_arch_vcpu_pre_fault_memory(vcpu, range);
+> > +             if (r < 0)
+> > +                     break;
+> > +
+> > +             if (WARN_ON_ONCE(r =3D=3D 0))
+> > +                     break;
+> > +
+> > +             range->size -=3D r;
+> > +             range->gpa +=3D r;
+> > +             cond_resched();
+> > +     } while (range->size);
+> > +
+> > +     srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > +     vcpu_put(vcpu);
+> > +
+> > +     /* Return success if at least one page was mapped successfully.  =
+*/
+> > +     return full_size =3D=3D range->size ? r : 0;
+> > +}
+> > +#endif
+> > +
+> >   static long kvm_vcpu_ioctl(struct file *filp,
+> >                          unsigned int ioctl, unsigned long arg)
+> >   {
+> > @@ -4580,6 +4629,20 @@ static long kvm_vcpu_ioctl(struct file *filp,
+> >               r =3D kvm_vcpu_ioctl_get_stats_fd(vcpu);
+> >               break;
+> >       }
+> > +#ifdef CONFIG_KVM_GENERIC_PRE_FAULT_MEMORY
+> > +     case KVM_PRE_FAULT_MEMORY: {
+> > +             struct kvm_pre_fault_memory range;
+> > +
+> > +             r =3D -EFAULT;
+> > +             if (copy_from_user(&range, argp, sizeof(range)))
+> > +                     break;
+> > +             r =3D kvm_vcpu_pre_fault_memory(vcpu, &range);
+> > +             /* Pass back leftover range. */
+> > +             if (copy_to_user(argp, &range, sizeof(range)))
+> > +                     r =3D -EFAULT;
+> > +             break;
+> > +     }
+> > +#endif
+> >       default:
+> >               r =3D kvm_arch_vcpu_ioctl(filp, ioctl, arg);
+> >       }
+>
 
 
