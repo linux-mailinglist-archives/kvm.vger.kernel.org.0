@@ -1,102 +1,110 @@
-Return-Path: <kvm+bounces-15864-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959348B13AF
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 21:40:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79BB8B13DB
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 21:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51FD4284462
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 19:40:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7647F1F2438A
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 19:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0792378C8C;
-	Wed, 24 Apr 2024 19:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85AB13BC3C;
+	Wed, 24 Apr 2024 19:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Icj8gA8i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xdlI8AQz"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D091CD23
-	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 19:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41C81848
+	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 19:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713987599; cv=none; b=C/zIBxkxRAGYfaiJUYQTV8BsIq51bTz4J7v8f0fPA/wpYqER/nBRkmwCgorPmJ9la4fbnLkeGdQ1UuU2C2BE0XMPMEyhGJ6GbcSL4L0uiG/z4xlH7xuWpYypJXmwPHylZirO5Si1iIfU1vp1/2rKTi/zPSvtI5LikhBN9WVma0s=
+	t=1713988667; cv=none; b=e0ODE9dE2O/fsxdGdwtrn196yCRXuQKHjtxNmB3qLEdfzgdJHNMvrvQDiNVx+H50YX8yXVuGN9oVg0JSYQ91Aa2Nur/dULJqXqkbfx0V6yi20UOOTdW4ywYtqaQooGO2p08KuHyjz9XSlhnecvyKR4atmGPdKZncz2e/WoqxCo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713987599; c=relaxed/simple;
-	bh=q7Pkz/P5Q1r9S/MSK+iYJj9CNTw0dzw9TJVCoC1wWDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=SBPGc4uZOpksCq2QmkvT5uZz+vPMlMjwCfoFOoZeOAv4byL8wxW7kmVjYz8/MH/zyPIxLIZKtcT994PIblZgZXdKw+BCj34h5qR7eArEWePFU7AZrkIpN45nMR2dLoII51wcbfu9nDxCQQ2DuFGA7nEw7P6rUz/1+PrHA6iPQd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Icj8gA8i; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 24 Apr 2024 12:39:46 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713987595;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=cnPjgTMvR9FofAPW9yyaIH0hPQvBC2RXg4lyU2FvoVE=;
-	b=Icj8gA8i13X0T1evVK/wfxqWP6zSZZQozIiD6J9Qo7jPnDMvHGpeVJAFTK1wM7wiNQGbX7
-	px9sJWpr5n6CpDcp67NgRCzDtv0nIPBMH1VdQPmsvqH349cpE7E9sRu8noljYBlHR5Gdr/
-	LnknUHHxcWwtlWXTDg+0gKTs+1O6KBI=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Zenghui Yu <yuzenghui@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	James Morse <james.morse@arm.com>,
-	Alexander Potapenko <glider@google.com>
-Subject: [GIT PULL] KVM/arm64 fixes for 6.9, part #2
-Message-ID: <ZilgAmeusaMd_UeZ@linux.dev>
+	s=arc-20240116; t=1713988667; c=relaxed/simple;
+	bh=Ezf8HcOmGibT6Ls3EvM1xGDK2E4Z50zZWeh+sz0kp6A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rjo+a26Pl7E0kyb1U0ef0leoJnVOaFBh43WehKH+p8P2msvFCZry/DA2zUDg3gcqjlzCTWeaFiPEi2nngGIl4h+xUc4hghiWYjfGGGC2Wb6RY04qAJ2pEsIpO3O/7O30avPjWTzA6sy23y5dqj/Ju96CUzreIRr9rdBlD5DHXxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xdlI8AQz; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6183c4a6d18so3872967b3.3
+        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 12:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713988665; x=1714593465; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+FjCbTQKQdYpMLda6Jiyq7iBjTjuhXyZh4wh3ChdsfU=;
+        b=xdlI8AQzarmXF9PJauLE+TL7w4k0wKS9mfgmykURAMH1UC4r4weXICM4V97W52O0sy
+         /4bWrkS2gBeji58c/J721ZeJ4tswHyQSDJtlx8vIgtXt0ri0dJ3R6TdP1XWVF+EoEOFf
+         313G6j50kWugLmN6ICsPH4Qb5Ybgf4MJTXoQDeurtHZo79U0Bul8Q2exvU0p/g2iHh5z
+         VEzykE1/4alSzVvsCxFtVeHJ4V6gsKddofdM73SqWuNiR+cSQACfwT7o8QSwnWhNVhhr
+         CK7QjCtsXYLMwZdXEGIW0X6FGCzrDt8patxBxOPvr74HEojphv1MWJeRR+R8WaEY6+DV
+         Hphg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713988665; x=1714593465;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+FjCbTQKQdYpMLda6Jiyq7iBjTjuhXyZh4wh3ChdsfU=;
+        b=fuqhAJEQSt6VbT5KJE97Uzrh1Wg82tSnv8SB6gKa0IUZNDEKztTem2ULKVOQBriD6W
+         wOmaA3MWQu0r5hChmzmgIOABRERasX53Eg3K0aAv5MiOYI79qDqh79N2JWhhPBGOqN0T
+         FQzAt3RS5LlB3n/00Kd7BGaDQEc0DcgPTSDKMDVEojWz3MC6ySyHqkFCU1mgDzDN9Tqp
+         r0cb8N/CI43UMoLl8ayf+H96PUEWLaPgP4q4Mk/wybwZuN9unSa8e/rs922bW269qjNr
+         CZlV5rnvCc11/fC6ER3nuywRhLq4VQU+0VUGKtGEmunCbta19QhMswiI40ZQz4jJdfdy
+         vsRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVExgfdRvl2k/LsQ1NLAe3/aCsPAC2eckhMjjSwwLfJBU4auEeVm5QCN9dM29BT0Y4eobavYwaLZ9GWvLrQ74YtYOh4
+X-Gm-Message-State: AOJu0YwASolk7BHpJpRfmcwuH7xoTw/BvOockFabvCeSY9RtrwGApBi6
+	Fz4DCvMs4pipxrrFfkoIu/Mq+AWG6n1z3e0Jn9bPNcMjqrrVVrsCuYovRbqdVVqBWmHp87Pn0VO
+	t2A==
+X-Google-Smtp-Source: AGHT+IHoeI+J4/hNST2TgTwDm1q0K7qJ4IBd7czAr+qCHxvrmSquvkLDEnz4XoEATY2E4+JArBcZjoc1+l8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:ce81:0:b0:de5:5304:3206 with SMTP id
+ x123-20020a25ce81000000b00de553043206mr373600ybe.11.1713988664900; Wed, 24
+ Apr 2024 12:57:44 -0700 (PDT)
+Date: Wed, 24 Apr 2024 12:57:43 -0700
+In-Reply-To: <6f476d85cdb9dfdc0893e9eb762dca08f0f5f19b.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <cover.1711035400.git.reinette.chatre@intel.com>
+ <6fae9b07de98d7f56b903031be4490490042ff90.camel@intel.com>
+ <Ziku9m_1hQhJgm_m@google.com> <26073e608fc450c6c0dcfe1f5cb1590f14c71e96.camel@intel.com>
+ <ZilAEhUS-mmgjBK8@google.com> <6f476d85cdb9dfdc0893e9eb762dca08f0f5f19b.camel@intel.com>
+Message-ID: <ZilaWM4AmrbeSEy0@google.com>
+Subject: Re: [PATCH V4 0/4] KVM: x86: Make bus clock frequency for vAPIC timer configurable
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: "jmattson@google.com" <jmattson@google.com>, Chao Gao <chao.gao@intel.com>, 
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, Vishal Annapurve <vannapurve@google.com>, 
+	Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Vishal L Verma <vishal.l.verma@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Erdem Aktas <erdemaktas@google.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Paolo,
+On Wed, Apr 24, 2024, Rick P Edgecombe wrote:
+> Long term though, I have been wondering about how to prevent TDX regressions
+> especially on the MMU pieces. It is one thing to have the TDX setups available
+> for maintainers, but most normal developers will likely not have access to TDX
+> HW for a bit. Just a problem without a solution.
 
-Single fix this time around for a rather straightforward NULL
-dereference in one of the vgic ioctls, along with a reproducer I've
-added as a testcase in selftests.
+I wouldn't worry too much about hardware availability.  As you said, it's not
+a problem we can really solve, and we already have to be concious of the fact
+that not all developers have comparable hardware.  E.g. most people don't have
+a 4-sock, multi-hundred CPU system with TiBs of RAM.  Not being able to test at
+all is obviously a little different, but it's not entirely new.
 
-Please pull.
-
--- 
-Thanks,
-Oliver
-
-The following changes since commit fec50db7033ea478773b159e0e2efb135270e3b7:
-
-  Linux 6.9-rc3 (2024-04-07 13:22:46 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-6.9-2
-
-for you to fetch changes up to 160933e330f4c5a13931d725a4d952a4b9aefa71:
-
-  KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF (2024-04-24 19:09:36 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 6.9, part #2
-
-- Fix + test for a NULL dereference resulting from unsanitised user
-  input in the vgic-v2 device attribute accessors
-
-----------------------------------------------------------------
-Oliver Upton (2):
-      KVM: arm64: vgic-v2: Check for non-NULL vCPU in vgic_v2_parse_attr()
-      KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
-
- arch/arm64/kvm/vgic/vgic-kvm-device.c           |  8 ++--
- tools/testing/selftests/kvm/aarch64/vgic_init.c | 49 +++++++++++++++++++++++++
- 2 files changed, 53 insertions(+), 4 deletions(-)
+Instead, I would encourage spending time and effort (after things have settled
+down patch wise) to build out selftests.   I tried to run a "real" SEV-ES VM
+and gave up because I needed the "right" OVMF build, blah blah blah.  At some
+point I'll probably bite the bullet and get a "full" CoCo setup working, but it's
+not exactly at the top of my todo list, in no small part because the triage and
+debug experience when things go wrong is miles and miles better in selftests.
 
