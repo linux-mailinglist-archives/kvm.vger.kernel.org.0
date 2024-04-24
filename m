@@ -1,65 +1,80 @@
-Return-Path: <kvm+bounces-15800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15801-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A848B0843
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 13:25:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96DE78B085F
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 13:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFCA0B2197A
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 11:25:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA7701C22831
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 11:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E609315A497;
-	Wed, 24 Apr 2024 11:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9F815A4B6;
+	Wed, 24 Apr 2024 11:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Avt7DtfI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hCRK0G0D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CBA159913
-	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 11:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD87A15AAAF
+	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 11:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713957929; cv=none; b=Si1yKnj13N0VxoewqZ8b7RQpkrj34X/ROkK1tsiYQEGMXhG8XCc0PWPSVXzQ7xfxNlhs86KKkbXSivZBIF0H5j8iJZW+GwRTVVugfLtvwCkHYczckZqBxbOOd0g8asrZYGsup9ciWjWchWcmBws2d3bBGeqy23AdVp02B23RiXQ=
+	t=1713958376; cv=none; b=eyUcZUWyjdQKxYnJeun9cuoFr/mYN1noEmY5zJAs65Nf2E6winqVA1c4oxJGWbNWQMxDLr9c02bXzfNWXGsR4kEIT8dt89PYZb8nMLUe7z7H/8xUtpoK8eMeFLySuo7rUgpaZbmy9RZW9B5U/FR3SuCqroxepzrbfHvy/g1tDC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713957929; c=relaxed/simple;
-	bh=cz/dURFluKwGMZXjMxDdBntuez0U0bvZ+fpHCncB8GA=;
+	s=arc-20240116; t=1713958376; c=relaxed/simple;
+	bh=2QYPMI8AePvbfkGI8HsO91enimz+VSXJ9ZfWUH0bce8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ghu4owFdBYdzf6vFoifT8qgQ+RUaSd3oaaONiJcjVub+xMlY3xHkvjMwPjfzvCCnEPnLuE3u3VRbFJpw+6I7Ma5p+VSarVMCdNIDtguKZpzIzybh2UFHGHe3jhCU8c/0X0j+u5tu4qna4GWH5fFq1EdyyKi7oK3yuB3frGSfTyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Avt7DtfI; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713957927; x=1745493927;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=cz/dURFluKwGMZXjMxDdBntuez0U0bvZ+fpHCncB8GA=;
-  b=Avt7DtfIgMuIAfAIkSkKNmGd9MkAYb2L9o0EIKAvrc47hKTUWPUtz9wC
-   8fJ7yCLlD8/Aflw3vvSBYB3VaLID0iQHOiIYTCvpsv90OAOSC4W6aDw+r
-   FW5QdRIYu+g0tUKxgMJIVUQ8OJ7yRofVx1XNn3rhWHxjvKR83/xcqWw1x
-   CoQJrc3kK62GoHDypAeSKFHTXgQNxV7OhO5zsCDImyryJfhpWOjFL+0V3
-   JH3X9+eDfkWsKU35NzAG35ILA21TKI0d1Nf62y3X6pz+ga/1npy0my9kL
-   QCvzleiugrP4mCFQ7crD8RZSPoPKXWnaKLMOUeOzVYfUnHHD4Djax0IMY
-   g==;
-X-CSE-ConnectionGUID: tktg6S4QSuK3MRrkfWCLNQ==
-X-CSE-MsgGUID: 86Bh6QDlRbWvI08rqtQ1iQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11053"; a="20277911"
-X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="20277911"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 04:25:26 -0700
-X-CSE-ConnectionGUID: A1HlO/p5Rzy5isTOYGkguQ==
-X-CSE-MsgGUID: 1CurQVV5QmO0dBuaqQk7ag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,226,1708416000"; 
-   d="scan'208";a="29501052"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Apr 2024 04:25:23 -0700
-Message-ID: <1d81395a-93b4-4c63-b73d-7701f3e30666@intel.com>
-Date: Wed, 24 Apr 2024 19:25:19 +0800
+	 In-Reply-To:Content-Type; b=rtDuZwgePfG69eDUcc4Y4hgX6sPXV+KjbU1Re3XoxOBUlKv8s6ttCRRVWomjydokChlwMyEfBmRxu3f/xwzrzCbKD7On3mrPtfZYGDg8Dj5gl5MaFhNwVJuHMl4Jv1yb58LDjHwsH9lSel71oBUQeDiJ3ppF+WvAT676WbavJRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hCRK0G0D; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713958373;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=lF6aa3Qe28Gh13RTVX5fcWmJZIuQko+JwvFAb+pljTQ=;
+	b=hCRK0G0D7xWhEvv+aJhPfE+gcdbAP574WRbrem5qNNiwuk72HOIDAXuV9EP1s4F5ERc6qD
+	P1aGAKGhkol6FXc3z39yKwcUlHqSehUy9cAIegUd86qLIipvJaO8067nEwst+O/7/X7/CZ
+	9imVGGe1azq0Vgdej9TeTKzWkI5RNVg=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-328-1qA0LD_SM6q95VgaWfQAeA-1; Wed, 24 Apr 2024 07:32:52 -0400
+X-MC-Unique: 1qA0LD_SM6q95VgaWfQAeA-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4364a84f771so71693301cf.1
+        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 04:32:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713958371; x=1714563171;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lF6aa3Qe28Gh13RTVX5fcWmJZIuQko+JwvFAb+pljTQ=;
+        b=A9xnFdSHUBUWjh9VRqC0jvGxK24HrVbefVE7JkQQrTAghqv60/AJr24mpA2wsMXQ0s
+         pd8ZIzQz+tordBnnzlx60nZ5zcKnIrHmZSEMdZpG8JIzjk3tg4S8672pbDnVicuNUP4R
+         R8nYlP/u8nfQzydI9umKWrxHq8GDpl/NAhIBPemhl6mR+YFoykhJMc1U9mvUGAlMEcaZ
+         iUvcStstbuEUKtsTYpmR12anKip8MC3Z6Rtc4do906eC1MP80V9k0PjxPSja8vbV1VxU
+         HG1m9bQ2sv79BMk7Cfsq0wXPl7pD8a/5hh5FL9JPoB1WBbReH2baMCSSwocIJLdAo+p0
+         TVDw==
+X-Gm-Message-State: AOJu0Yx03WHzL2cM8v4OeLLBqDgLSrnLBMJqGpcJMKBH4YDiOd9aglh5
+	1RA0jc0RGTBVXzXZTrzBGFIiCEd6aDz2Frfup2R1Uey8c0KUY/zG1mxaqxnvjmRnkueAvG98dHB
+	Kqh9BKT9GvDwtMxFkBnllqPa740KbCQpT2BeUR3HrJ2GJJzUw3A==
+X-Received: by 2002:ac8:5a88:0:b0:439:884b:859a with SMTP id c8-20020ac85a88000000b00439884b859amr1992175qtc.21.1713958371578;
+        Wed, 24 Apr 2024 04:32:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFJy7XM56nDr2FWB9b6co13dKlWDt2/s1ybd9lSoSPOjnQXviXy8wLafbLt4kuQjAT2Dokbw==
+X-Received: by 2002:ac8:5a88:0:b0:439:884b:859a with SMTP id c8-20020ac85a88000000b00439884b859amr1992162qtc.21.1713958371259;
+        Wed, 24 Apr 2024 04:32:51 -0700 (PDT)
+Received: from [192.168.0.9] (ip-109-43-177-130.web.vodafone.de. [109.43.177.130])
+        by smtp.gmail.com with ESMTPSA id x17-20020ac85391000000b0043770fd3629sm5983928qtp.75.2024.04.24.04.32.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 04:32:51 -0700 (PDT)
+Message-ID: <71dfa65d-9f9e-4a8e-b4e8-44ab557cb2a8@redhat.com>
+Date: Wed, 24 Apr 2024 13:32:47 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,186 +82,132 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH for-9.1 1/7] target/i386/kvm: Add feature bit definitions
- for KVM CPUID
-To: Zhao Liu <zhao1.liu@linux.intel.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Richard Henderson <richard.henderson@linaro.org>,
- Eduardo Habkost <eduardo@habkost.net>, "Michael S . Tsirkin"
- <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Tim Wiederhake <twiederh@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, Zhao Liu <zhao1.liu@intel.com>
-References: <20240329101954.3954987-1-zhao1.liu@linux.intel.com>
- <20240329101954.3954987-2-zhao1.liu@linux.intel.com>
+Subject: Re: [kvm-unit-tests GIT PULL 00/13] s390x: Improvement of CMM test,
+ lot of small bugfixes and two refactorings
+To: Nico Boehr <nrb@linux.ibm.com>, pbonzini@redhat.com,
+ andrew.jones@linux.dev
+Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
+References: <20240424105935.184138-1-nrb@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20240329101954.3954987-2-zhao1.liu@linux.intel.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240424105935.184138-1-nrb@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 3/29/2024 6:19 PM, Zhao Liu wrote:
-> From: Zhao Liu <zhao1.liu@intel.com>
+On 24/04/2024 12.59, Nico Boehr wrote:
+> Hi Paolo and/or Thomas,
 > 
-> Add feature definiations for KVM_CPUID_FEATURES in CPUID (
-> CPUID[4000_0001].EAX and CPUID[4000_0001].EDX), to get rid of lots of
-> offset calculations.
+> not much has happened, but a few smaller things have accumulated, so time for a
+> PR.
 > 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> ---
->   hw/i386/kvm/clock.c   |  5 ++---
->   target/i386/cpu.h     | 23 +++++++++++++++++++++++
->   target/i386/kvm/kvm.c | 28 ++++++++++++++--------------
->   3 files changed, 39 insertions(+), 17 deletions(-)
+> Changes in this pull request:
 > 
-> diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-> index 40aa9a32c32c..7c9752d5036f 100644
-> --- a/hw/i386/kvm/clock.c
-> +++ b/hw/i386/kvm/clock.c
-> @@ -27,7 +27,6 @@
->   #include "qapi/error.h"
->   
->   #include <linux/kvm.h>
-> -#include "standard-headers/asm-x86/kvm_para.h"
->   #include "qom/object.h"
->   
->   #define TYPE_KVM_CLOCK "kvmclock"
-> @@ -334,8 +333,8 @@ void kvmclock_create(bool create_always)
->   
->       assert(kvm_enabled());
->       if (create_always ||
-> -        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
-> -                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
-> +        cpu->env.features[FEAT_KVM] & (CPUID_FEAT_KVM_CLOCK |
-> +                                       CPUID_FEAT_KVM_CLOCK2)) {
->           sysbus_create_simple(TYPE_KVM_CLOCK, -1, NULL);
->       }
->   }
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 83e473584517..b1b8d11cb0fe 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -27,6 +27,7 @@
->   #include "qapi/qapi-types-common.h"
->   #include "qemu/cpu-float.h"
->   #include "qemu/timer.h"
-> +#include "standard-headers/asm-x86/kvm_para.h"
->   
->   #define XEN_NR_VIRQS 24
->   
-> @@ -951,6 +952,28 @@ uint64_t x86_cpu_get_supported_feature_word(FeatureWord w,
->   /* Packets which contain IP payload have LIP values */
->   #define CPUID_14_0_ECX_LIP              (1U << 31)
->   
-> +/* (Old) KVM paravirtualized clocksource */
-> +#define CPUID_FEAT_KVM_CLOCK            (1U << KVM_FEATURE_CLOCKSOURCE)
+> Just a single new test:
+> * test CMM no-translate bit after reset
+> 
+> A lot of smaller fixes:
+> * fix for secure guest size by Claudio
+> * fixes for shell script issues by Nicholas
+> * fix in error path of emulator test by Christian
+> * dirty condition code fixes by Janosch
+> * pv-attest missing from unittests.cfg
+> 
+> And, last but not least, two refactorings:
+> * simplification of secure boot image creation by Marc
+> * name inline assembly arguments in sigp lib by Janosch
+> 
+> Thanks
+> Nico
+> 
+> MERGE: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/58
+> 
+> PIPELINE: https://gitlab.com/Nico-Boehr/kvm-unit-tests/-/pipelines/1264518225
+> 
+> PULL: https://gitlab.com/Nico-Boehr/kvm-unit-tests.git pr-2024-04-22
+> ----
+> The following changes since commit 69ee03b0598ee49f75ebab5cd0fe39bf18c1146e:
+> 
+>    Merge branch 'arm/queue' into 'master' (2024-04-19 10:41:39 +0000)
+> 
+> are available in the Git repository at:
+> 
+>    https://gitlab.com/Nico-Boehr/kvm-unit-tests.git pr-2024-04-22
+> 
+> for you to fetch changes up to 7315fc8a182e50e5c2f387812cd178b433a40cea:
+> 
+>    s390x: cmm: test no-translate bit after reset (2024-04-23 15:10:35 +0200)
+> 
+> ----------------------------------------------------------------
+> Christian Borntraeger (1):
+>        s390x: emulator: Fix error path of invalid function code
+> 
+> Claudio Imbrenda (1):
+>        lib: s390: fix guest length in uv_create_guest()
+> 
+> Janosch Frank (6):
+>        lib: s390x: sigp: Dirty CC before sigp execution
+>        lib: s390x: uv: Dirty CC before uvc execution
+>        lib: s390x: css: Dirty CC before css instructions
+>        s390x: mvpg: Dirty CC before mvpg execution
+>        s390x: sclp: Dirty CC before sclp execution
+>        lib: s390x: sigp: Name inline assembly arguments
+> 
+> Marc Hartmayer (1):
+>        s390x/Makefile: simplify Secure Execution boot image generation
+> 
+> Nicholas Piggin (2):
+>        s390x: Fix is_pv check in run script
+>        s390x: Use local accel variable in arch_cmd_s390x
+> 
+> Nico Boehr (2):
+>        s390x: add pv-attest to unittests.cfg
+>        s390x: cmm: test no-translate bit after reset
 
-we can drop the _FEAT_, just name it as
+Thanks, applied!
 
-CPUID_KVM_CLOCK
+  Thomas
 
-> +/* (New) KVM specific paravirtualized clocksource */
-> +#define CPUID_FEAT_KVM_CLOCK2           (1U << KVM_FEATURE_CLOCKSOURCE2)
-> +/* KVM asynchronous page fault */
-> +#define CPUID_FEAT_KVM_ASYNCPF          (1U << KVM_FEATURE_ASYNC_PF)
-> +/* KVM stolen (when guest vCPU is not running) time accounting */
-> +#define CPUID_FEAT_KVM_STEAL_TIME       (1U << KVM_FEATURE_STEAL_TIME)
-> +/* KVM paravirtualized end-of-interrupt signaling */
-> +#define CPUID_FEAT_KVM_PV_EOI           (1U << KVM_FEATURE_PV_EOI)
-> +/* KVM paravirtualized spinlocks support */
-> +#define CPUID_FEAT_KVM_PV_UNHALT        (1U << KVM_FEATURE_PV_UNHALT)
-> +/* KVM host-side polling on HLT control from the guest */
-> +#define CPUID_FEAT_KVM_POLL_CONTROL     (1U << KVM_FEATURE_POLL_CONTROL)
-> +/* KVM interrupt based asynchronous page fault*/
-> +#define CPUID_FEAT_KVM_ASYNCPF_INT      (1U << KVM_FEATURE_ASYNC_PF_INT)
-> +/* KVM 'Extended Destination ID' support for external interrupts */
-> +#define CPUID_FEAT_KVM_MSI_EXT_DEST_ID  (1U << KVM_FEATURE_MSI_EXT_DEST_ID)
-> +
-> +/* Hint to KVM that vCPUs expect never preempted for an unlimited time */
-> +#define CPUID_FEAT_KVM_HINTS_REALTIME    (1U << KVM_HINTS_REALTIME)
-> +
->   /* CLZERO instruction */
->   #define CPUID_8000_0008_EBX_CLZERO      (1U << 0)
->   /* Always save/restore FP error pointers */
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index e68cbe929302..2f3c8bc3a4ed 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -481,13 +481,13 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
->            * be enabled without the in-kernel irqchip
->            */
->           if (!kvm_irqchip_in_kernel()) {
-> -            ret &= ~(1U << KVM_FEATURE_PV_UNHALT);
-> +            ret &= ~CPUID_FEAT_KVM_PV_UNHALT;
->           }
->           if (kvm_irqchip_is_split()) {
-> -            ret |= 1U << KVM_FEATURE_MSI_EXT_DEST_ID;
-> +            ret |= CPUID_FEAT_KVM_MSI_EXT_DEST_ID;
->           }
->       } else if (function == KVM_CPUID_FEATURES && reg == R_EDX) {
-> -        ret |= 1U << KVM_HINTS_REALTIME;
-> +        ret |= CPUID_FEAT_KVM_HINTS_REALTIME;
->       }
->   
->       return ret;
-> @@ -3324,20 +3324,20 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
->           kvm_msr_entry_add(cpu, MSR_IA32_TSC, env->tsc);
->           kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME, env->system_time_msr);
->           kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK, env->wall_clock_msr);
-> -        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF_INT)) {
-> +        if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_ASYNCPF_INT) {
->               kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_INT, env->async_pf_int_msr);
->           }
-> -        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF)) {
-> +        if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_ASYNCPF) {
->               kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_EN, env->async_pf_en_msr);
->           }
-> -        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_PV_EOI)) {
-> +        if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_PV_EOI) {
->               kvm_msr_entry_add(cpu, MSR_KVM_PV_EOI_EN, env->pv_eoi_en_msr);
->           }
-> -        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
-> +        if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_STEAL_TIME) {
->               kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, env->steal_time_msr);
->           }
->   
-> -        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_POLL_CONTROL)) {
-> +        if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_POLL_CONTROL) {
->               kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, env->poll_control_msr);
->           }
->   
-> @@ -3789,19 +3789,19 @@ static int kvm_get_msrs(X86CPU *cpu)
->   #endif
->       kvm_msr_entry_add(cpu, MSR_KVM_SYSTEM_TIME, 0);
->       kvm_msr_entry_add(cpu, MSR_KVM_WALL_CLOCK, 0);
-> -    if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF_INT)) {
-> +    if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_ASYNCPF_INT) {
->           kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_INT, 0);
->       }
-> -    if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF)) {
-> +    if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_ASYNCPF) {
->           kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_EN, 0);
->       }
-> -    if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_PV_EOI)) {
-> +    if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_PV_EOI) {
->           kvm_msr_entry_add(cpu, MSR_KVM_PV_EOI_EN, 0);
->       }
-> -    if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_STEAL_TIME)) {
-> +    if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_STEAL_TIME) {
->           kvm_msr_entry_add(cpu, MSR_KVM_STEAL_TIME, 0);
->       }
-> -    if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_POLL_CONTROL)) {
-> +    if (env->features[FEAT_KVM] & CPUID_FEAT_KVM_POLL_CONTROL) {
->           kvm_msr_entry_add(cpu, MSR_KVM_POLL_CONTROL, 1);
->       }
->       if (has_architectural_pmu_version > 0) {
-> @@ -5434,7 +5434,7 @@ uint64_t kvm_swizzle_msi_ext_dest_id(uint64_t address)
->           return address;
->       }
->       env = &X86_CPU(first_cpu)->env;
-> -    if (!(env->features[FEAT_KVM] & (1 << KVM_FEATURE_MSI_EXT_DEST_ID))) {
-> +    if (!(env->features[FEAT_KVM] & CPUID_FEAT_KVM_MSI_EXT_DEST_ID)) {
->           return address;
->       }
->   
 
 
