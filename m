@@ -1,142 +1,110 @@
-Return-Path: <kvm+bounces-15759-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46CCD8B0350
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 09:40:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C24348B037B
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 09:50:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 879861F21A88
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 07:40:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E32E52842F6
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 07:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D08B11581F5;
-	Wed, 24 Apr 2024 07:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 660A01586C1;
+	Wed, 24 Apr 2024 07:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C01cGJHa"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Hptc5V2+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF9723CB;
-	Wed, 24 Apr 2024 07:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418A71581F2
+	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 07:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713944414; cv=none; b=MO2P0Mt0zoJmw0B59rqFRQ0Roj3HcpQpC9XfMwUIPD0UBY44AVNFguQlsH+MBh/KBQDz8zeVdOR8P0Zxp4vy/q9QmPHlRlR/pk/Xbhqy2Gn/M4pgmDqpHmk0WD48n/NP4gEGT0QcO5xCdwoS+8tKqH1TIkwrhunerAwV4nlkIwI=
+	t=1713945032; cv=none; b=gbS+qp4aZegfpxKr5x5EAWPKD3gAAlE2RdwKhJLPrXKWUBHcIaMHP8Xk8fiFxURnllpD8fGHbbeVjvf2g229C/GvIqIaalfLNg51vmQJmfb4s320PnCQvaN9aKLjzK+UQeiO2beu5jd8yL41Zltq8kH4AQfXtVFuYnx4bmEHqco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713944414; c=relaxed/simple;
-	bh=3HsOuSJtJ1IhE61NoIAbOBMWZ2YnkKaqYDMmNhQXJwc=;
+	s=arc-20240116; t=1713945032; c=relaxed/simple;
+	bh=g/Er6GYXVGaNH7JDBFXh3LSSvzcGk3gWsJG0AOM4CTw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IioKsgszjWSowr3INlGS4iT10HISIiy5VzqDa3Q8q/Ip3alNLcPwC+hY4UW5zZnnjKz0o7wevmzo9lyITAir3suK0LPxCa/cJcAvyxtBZkZNVe7KyJ4tgyOCvWdoje3jFauuTwIS2W6PvyMo26TBIY5NK84oJ+gp3x1CmsF7ezs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C01cGJHa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC58FC113CE;
-	Wed, 24 Apr 2024 07:40:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713944413;
-	bh=3HsOuSJtJ1IhE61NoIAbOBMWZ2YnkKaqYDMmNhQXJwc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C01cGJHaEbj4jAXPEmGr9XRdc9//r7NyYG9h0HHh0P2Gls9cq5hhbzvB6h9B8DvjO
-	 ZibdC8Jcg/THVBIjizJaXZc4UZiUqi9Lk3zil83977KEmEnW74mvGHqYdnssAacJC3
-	 4ByD9P+tI8VdtLHvmil0oTineLS9/01Tgj3lfCP6bgffEzLpLoRDk9GtqYJ44UXIzP
-	 /Yi/stzmzEJNPQIcoAT1yzE1U+POy1eSfYfxpMABGRKGg/lY8gMqk5RV5f+O22Y0/o
-	 hUq60Vg8VgsekAm5vJN+cnOm/ODkThHbfCm4zggIxZoUjzY7ahGGo6+NKoaBJPN3Qk
-	 ucpDjJ0lH0O/Q==
-Date: Wed, 24 Apr 2024 08:40:08 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Cc: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, Ved Shanbhogue <ved@rivosinc.com>
-Subject: Re: [RFC PATCH 2/7] dt-bindings: riscv: add Ssdbltrp ISA extension
- description
-Message-ID: <20240424-rehydrate-sloppy-62132c72fe18@spud>
-References: <20240418142701.1493091-1-cleger@rivosinc.com>
- <20240418142701.1493091-3-cleger@rivosinc.com>
- <20240423-poser-splashed-56ab5340af48@spud>
- <e39f2fea-868a-4a79-b7a5-bef8f15de688@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QfrNygCd0ZH/C9V1uc5wNVRlYofp+IAXHVvGbL7RTY8k6eIsULmh+J5z4mJEKrLrRuqI50iY7puVs4D20ZT4usXckCHx7vSL3cxp8Zg3SkDPZL3QSGC1O4Emi7mzZtOQEfY/z/bpuCwlBvvnts6FK197a+LSN4k4TKhV/VUtPAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Hptc5V2+; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-5176f217b7bso11016298e87.0
+        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 00:50:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1713945029; x=1714549829; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=g/Er6GYXVGaNH7JDBFXh3LSSvzcGk3gWsJG0AOM4CTw=;
+        b=Hptc5V2+rnXXJTqWm5x2+cw4imBiLFVePvUqflhfHQ8cZF1sfv395V+XBa/xs7y3kg
+         v+7r8jKZXa/hoyWrRl+ROXH9O6LWDyCtWBnKlIBSVJ0gv4VxlPuxf/g/xHoUXOEgX3iT
+         y2wqeV74cy0r/R8GD5JSO4qHrwoIMWsYv032SHQwkahIXm9mMf9aoFcvzmXI6QmglkZP
+         EHTsTrQnqxKFdbXj3AJmv2kboJUQlPkb6t5c5GHQ7OgZsb1d45HdAlLcjRVMVhiZqvgl
+         NK1sJTr/yYf6K0Xn+GpyY/07ebCkkurUSMkF5GQd38vS8FPC/oUzOCQFuTPaza+Qto+v
+         znOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713945029; x=1714549829;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g/Er6GYXVGaNH7JDBFXh3LSSvzcGk3gWsJG0AOM4CTw=;
+        b=vDv8HoAr7wM1aI7YEaWdSYxGwmXfqLOn7Bjsr0ktp0h9g27Ba2nDJgCfszooEXJcaQ
+         GmjpnVF0GGq5uJgvAlx1DFmiernS/dfLCP3kQEBx9pbp7IJlOozwKqev/gAWMSwtLo2I
+         pEoqwd/WlVVrxqT4QBUEvUugze0F6JDD/PNh6SYPDtXEHDjRsj56/woKOLI6IlhOfTh/
+         5vx61THe0/VYxrNIfYub8RTD7OvWIQ+quu8Ocw+pet138tZeQInBH+jr0GdUkiNtzr2k
+         xw2P4L7k6D9GamqOL2V8AdRby5WPTDEe+MpfWlYYJn5CMRN08NBif/t2JYxIp9rbR+Sq
+         n5NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWB4I2YweLxldBeADpwln9TpwJWSY/RELRnwt04twY/tY1YIKBGYPQm0e0VoWLzMgbKRzMvRAp5HZGaFCcqQeYZaZXg
+X-Gm-Message-State: AOJu0YxWyvNSo3QbvARKeQGP5ucjUv6Dk4HpYJRBc1/X3sfGQwe/PTBz
+	qmKHMfK9R2VIhG3yr930LnIUDH94Ind2d1AjGs9M6maoIU/hLbuCPIFbp6t8X2A=
+X-Google-Smtp-Source: AGHT+IHIgFIs/HtMioD9CZgIp71sOpN4oVb9nF69ng3WYESdlcm1/4O4CiXzS4QWI0WKmvheznXTlQ==
+X-Received: by 2002:a19:7413:0:b0:516:d09b:cbe4 with SMTP id v19-20020a197413000000b00516d09bcbe4mr1517679lfe.53.1713945029369;
+        Wed, 24 Apr 2024 00:50:29 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id q26-20020a1709066b1a00b00a53c746b499sm7957520ejr.137.2024.04.24.00.50.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Apr 2024 00:50:28 -0700 (PDT)
+Date: Wed, 24 Apr 2024 09:50:28 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Markus Elfring <Markus.Elfring@web.de>, 
+	Kunwu Chan <chentao@kylinos.cn>, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org, Muhammad Usama Anjum <usama.anjum@collabora.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Kunwu Chan <kunwu.chan@hotmail.com>, 
+	Anup Patel <anup@brainfault.org>, Thomas Huth <thuth@redhat.com>, 
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: Re: [PATCH] KVM: selftests: Add 'malloc' failure check in
+ test_vmx_nested_state
+Message-ID: <20240424-e31c64bda7872b0be52e4c16@orel>
+References: <20240423073952.2001989-1-chentao@kylinos.cn>
+ <878bf83c-cd5b-48d0-8b4e-77223f1806dc@web.de>
+ <ZifMAWn32tZBQHs0@google.com>
+ <20240423-0db9024011213dcffe815c5c@orel>
+ <ZigI48_cI7Twb9gD@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="SiSSfUusYQSVZJqq"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e39f2fea-868a-4a79-b7a5-bef8f15de688@rivosinc.com>
+In-Reply-To: <ZigI48_cI7Twb9gD@google.com>
 
+On Tue, Apr 23, 2024 at 12:15:47PM -0700, Sean Christopherson wrote:
+...
+> I almost wonder if we should just pick a prefix that's less obviously connected
+> to KVM and/or selftests, but unique and short.
+>
 
---SiSSfUusYQSVZJqq
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+How about kvmsft_ ? It's based on the ksft_ prefix of kselftest.h. Maybe
+it's too close to ksft though and would be confusing when using both in
+the same test? I'm not a huge fan of capital letters, but we could also
+do something like MALLOC()/CALLOC(). Eh, I don't know. Naming is hard.
 
-On Wed, Apr 24, 2024 at 09:20:35AM +0200, Cl=E9ment L=E9ger wrote:
->=20
->=20
-> On 23/04/2024 18:30, Conor Dooley wrote:
-> > On Thu, Apr 18, 2024 at 04:26:41PM +0200, Cl=E9ment L=E9ger wrote:
-> >> Add description for the Ssdbltrp ISA extension which is not yet
-> >> ratified.
-> >>
-> >> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
-> >> ---
-> >>  Documentation/devicetree/bindings/riscv/extensions.yaml | 6 ++++++
-> >>  1 file changed, 6 insertions(+)
-> >>
-> >> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b=
-/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >> index 63d81dc895e5..ce7021dbb556 100644
-> >> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >> @@ -147,6 +147,12 @@ properties:
-> >>              and mode-based filtering as ratified at commit 01d1df0 ("=
-Add ability
-> >>              to manually trigger workflow. (#2)") of riscv-count-overf=
-low.
-> >> =20
-> >> +        - const: ssdbltrp
-> >> +          description: |
-> >> +            The standard Ssdbltrp supervisor-level extension for doub=
-le trap
-> >> +            handling as currently defined by commit e85847b ("Merge p=
-ull request
-> >> +            #32 from ved-rivos/0415_1 ") of riscv-double-trap.
-> >=20
-> > I see the proposed ratification for this is Sept 2024, and is marked as
-> > "Freeze Approved". Do you know when it is going to be frozen? Until
-> > this, I can't ack this patch. I had a look in the RVI JIRA
-> > https://jira.riscv.org/browse/RVS-2291?src=3Dconfmacro
-> > and it looks imminent, but it's unclear to me whether it actually has
-> > been or not.
->=20
-> Hi Conor,
->=20
-> Yeah, this series is a RFC since the spec is not yet ratified nor frozen
-> and its purpose is actually to get to a frozen state. As to when this
-> will be ratified, I guess Ved can probably answer that.
-
-Usually I'd just not ack the RFC patches, but I do at least check how
-far they might be from frozen before I move on, The jira for this one
-says "Actual ARC Freeze Approval:	18/Apr/24", which made me think
-a freeze was gonna happen soon.
-
---SiSSfUusYQSVZJqq
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZii3WAAKCRB4tDGHoIJi
-0sIAAQDIxpw/HuOo9/JqvyU+02o1E9Ih6d0pVx2mM9tf0Irq2gD/W+zFzb+/rTjf
-GqZYpJl93UvUWXVzUj0PqNxDnSWcEQo=
-=7cO9
------END PGP SIGNATURE-----
-
---SiSSfUusYQSVZJqq--
+Thanks,
+drew
 
