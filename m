@@ -1,221 +1,183 @@
-Return-Path: <kvm+bounces-15783-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15788-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19808B07D4
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 12:58:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB3F8B07E2
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 13:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0025B1C2132F
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 10:58:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97CD62823A1
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 11:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9DE915991A;
-	Wed, 24 Apr 2024 10:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A2815ADA4;
+	Wed, 24 Apr 2024 10:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YUy1Mr1J";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J/cQvrL5";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YUy1Mr1J";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="J/cQvrL5"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NfADR42o"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A4313DBB6;
-	Wed, 24 Apr 2024 10:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04A715991C
+	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 10:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713956281; cv=none; b=YeSWrLmRjAFVEVbZrKbBkihhSkmTuq8J2Cmoek3XkhOsPWjSF7XVFyuc00cfazLkCtfKliyB0Bn/WfO7j5XjSoTt/CPTqMef7IGeVtzKv6JzqfRogokoVP4G3EjmNrs9pD5XOp1OpzjOZRWLDGgChBwrlS7UpzPUqwL/EoXu0ZI=
+	t=1713956394; cv=none; b=J4yUHsj2kNyHPYajY2lJKJzwsCx2hhFdcD6zpWXSY51xpKzzSJzB7ck0rPpAxoQaZ/XufghoLVp9kPHdSP1Ulyr3YFFzq3KcM4LpusTn9sRddhHJXmj9ho5780B9MjEZV0mBVhYtOkG1lgZGVD2ew4jmFGyLg2J/YKCY/7ezTSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713956281; c=relaxed/simple;
-	bh=tRS2Dc6k4cHvFQvqwEyy6MnuweR/Dsimsz7u5sHttWQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R6TAr+mpUMTlT+sepVyt2QliRnw4TO9y2xuP3kD7HIvwy25yJFQvPAS0l58NFqWWJbmfXVcJ040Cfa6c7lWAffK3TLs1NY9pqstwtX/PfYknEfBlWghAny/STRVPiObXNcli9rXZjsLN/tMNF2UW163V08SWG/IQAvtah87Ou2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YUy1Mr1J; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J/cQvrL5; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YUy1Mr1J; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=J/cQvrL5; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 286216144C;
-	Wed, 24 Apr 2024 10:57:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1713956278; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zepJMi+/FmAphXDQSDExadHqtRjvIFiQoMCvNpYvve8=;
-	b=YUy1Mr1JRvB2R7AR3ds8ByBJDyF+FV0oRRvwl7d1HhfNOTk7mRICDX83XeVD+0a+7jT3Ka
-	uzvaIZYBtWtu4yjYvhyQ/jfY3D4mlMbZWbfkwi5BElrYbEfa2iWCo5Xy3TE8ovMZkB61e9
-	3tKqjS2MklBlR/Ws/B44uzqq/axYiqU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1713956278;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zepJMi+/FmAphXDQSDExadHqtRjvIFiQoMCvNpYvve8=;
-	b=J/cQvrL5Q5gRvCcb0IN9BRmKlbN9EwB0hEysYf72sKbbHcxMMJVXuWGXk0qzN7pTIgH4xC
-	GwJ1Q8YrxLdlp7Cw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1713956278; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zepJMi+/FmAphXDQSDExadHqtRjvIFiQoMCvNpYvve8=;
-	b=YUy1Mr1JRvB2R7AR3ds8ByBJDyF+FV0oRRvwl7d1HhfNOTk7mRICDX83XeVD+0a+7jT3Ka
-	uzvaIZYBtWtu4yjYvhyQ/jfY3D4mlMbZWbfkwi5BElrYbEfa2iWCo5Xy3TE8ovMZkB61e9
-	3tKqjS2MklBlR/Ws/B44uzqq/axYiqU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1713956278;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zepJMi+/FmAphXDQSDExadHqtRjvIFiQoMCvNpYvve8=;
-	b=J/cQvrL5Q5gRvCcb0IN9BRmKlbN9EwB0hEysYf72sKbbHcxMMJVXuWGXk0qzN7pTIgH4xC
-	GwJ1Q8YrxLdlp7Cw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9AE6D13690;
-	Wed, 24 Apr 2024 10:57:57 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id sWGSIrXlKGYiUwAAD6G6ig
-	(envelope-from <clopez@suse.de>); Wed, 24 Apr 2024 10:57:57 +0000
-From: =?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Cc: seanjc@google.com,
-	=?UTF-8?q?Carlos=20L=C3=B3pez?= <clopez@suse.de>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: [PATCH v3] KVM: X86: improve documentation for KVM_CAP_X86_BUS_LOCK_EXIT
-Date: Wed, 24 Apr 2024 12:56:18 +0200
-Message-Id: <20240424105616.29596-1-clopez@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20231116133628.5976-1-clopez@suse.de>
-References: <20231116133628.5976-1-clopez@suse.de>
+	s=arc-20240116; t=1713956394; c=relaxed/simple;
+	bh=iErB9LOQ3smJIJRJkL/lRaBW7P2QniQb2c46P12fiTQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ezFLFxVwTpxgE2cTFP5dnzZNGgOB3ObAvLmD953LZ7baZ+4BNogBkNUzbv/TsSV61SPkZa1o9hK4Jo0IrBOw0I8tRYNiCKIDbba8TBGLt4jgb93iqq/pq6UemDoMQ3M6gsTQBU2UZZMz9ytclNhXyc100To7iLYj4hIBuPjoq+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NfADR42o; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43OAOvCG012285;
+	Wed, 24 Apr 2024 10:59:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=3LfDvLG+E7Fqd0bL5pwZgct08Zr1Sg2osbRZCQ4G6/I=;
+ b=NfADR42ohHpvC07tb9VMdVNULWgbcl5YQq10GMB60nXTMW2Q8XAPecp2J+cTFqpPr6+l
+ XXeWb+TWzkkwwUZ4cxxZf9LKLVWg5gh4eXEdl/Q5yunhGn/7RVdqrhFyiFZ5xIepgfBX
+ kPymdp8z87q9wbJf71uJEa6h+IBH/ThzBwhcpChMGuqXpkDcmSi3SS4FAnhviONOgD/y
+ OBGNkIBc38Keh5Mzlk+YRdA5lTG5Q9oL6TXk9xNNPgi9twcFNQPuwCSFq7Gc3TUBsD6B
+ j2VGeNR9jxs1XbIiV4AIMvoIvDnO09FBULdVNc4qFe7HdPz99tEHqHmBWkOxV9+PlMzI fQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xpyry842v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 10:59:46 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43OAxjeY031245;
+	Wed, 24 Apr 2024 10:59:45 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xpyry842q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 10:59:45 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43O81EbQ023051;
+	Wed, 24 Apr 2024 10:59:45 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xms1p36vg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Apr 2024 10:59:45 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43OAxcED33882458
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Apr 2024 10:59:40 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7BB0A2004D;
+	Wed, 24 Apr 2024 10:59:38 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 55B0820043;
+	Wed, 24 Apr 2024 10:59:38 +0000 (GMT)
+Received: from t14-nrb.boeblingen.de.ibm.com (unknown [9.152.224.21])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 24 Apr 2024 10:59:38 +0000 (GMT)
+From: Nico Boehr <nrb@linux.ibm.com>
+To: thuth@redhat.com, pbonzini@redhat.com, andrew.jones@linux.dev
+Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests GIT PULL 00/13] s390x: Improvement of CMM test, lot of small bugfixes and two refactorings
+Date: Wed, 24 Apr 2024 12:59:19 +0200
+Message-ID: <20240424105935.184138-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: uICI67LW-rS5JkA41VBG4dsncu-Kie48
+X-Proofpoint-ORIG-GUID: u88s8ugLBgRrgQ1s2MX_NvD_HmDAQOEz
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-3.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email]
-X-Spam-Score: -3.30
-X-Spam-Flag: NO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-24_08,2024-04-23_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ clxscore=1015 priorityscore=1501 mlxscore=0 impostorscore=0 phishscore=0
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=999 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404240045
 
-Improve the description for the KVM_CAP_X86_BUS_LOCK_EXIT capability,
-fixing a few typos, grammarm and clarifying the purpose of the ioctl.
+Hi Paolo and/or Thomas,
 
-Signed-off-by: Carlos López <clopez@suse.de>
----
-v3: Added Sean Christopherson's suggestions
-v2: Corrected the name of the KVM_RUN_X86_BUS_LOCK flag
+not much has happened, but a few smaller things have accumulated, so time for a
+PR.
 
- Documentation/virt/kvm/api.rst | 52 ++++++++++++++++++----------------
- 1 file changed, 27 insertions(+), 25 deletions(-)
+Changes in this pull request:
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 0b5a33ee71ee..a1d78e06a1ad 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -6416,9 +6416,9 @@ More architecture-specific flags detailing state of the VCPU that may
- affect the device's behavior. Current defined flags::
- 
-   /* x86, set if the VCPU is in system management mode */
--  #define KVM_RUN_X86_SMM     (1 << 0)
-+  #define KVM_RUN_X86_SMM          (1 << 0)
-   /* x86, set if bus lock detected in VM */
--  #define KVM_RUN_BUS_LOCK    (1 << 1)
-+  #define KVM_RUN_X86_BUS_LOCK     (1 << 1)
-   /* arm64, set for KVM_EXIT_DEBUG */
-   #define KVM_DEBUG_ARCH_HSR_HIGH_VALID  (1 << 0)
- 
-@@ -7757,29 +7757,31 @@ Valid bits in args[0] are::
-   #define KVM_BUS_LOCK_DETECTION_OFF      (1 << 0)
-   #define KVM_BUS_LOCK_DETECTION_EXIT     (1 << 1)
- 
--Enabling this capability on a VM provides userspace with a way to select
--a policy to handle the bus locks detected in guest. Userspace can obtain
--the supported modes from the result of KVM_CHECK_EXTENSION and define it
--through the KVM_ENABLE_CAP.
--
--KVM_BUS_LOCK_DETECTION_OFF and KVM_BUS_LOCK_DETECTION_EXIT are supported
--currently and mutually exclusive with each other. More bits can be added in
--the future.
--
--With KVM_BUS_LOCK_DETECTION_OFF set, bus locks in guest will not cause vm exits
--so that no additional actions are needed. This is the default mode.
--
--With KVM_BUS_LOCK_DETECTION_EXIT set, vm exits happen when bus lock detected
--in VM. KVM just exits to userspace when handling them. Userspace can enforce
--its own throttling or other policy based mitigations.
--
--This capability is aimed to address the thread that VM can exploit bus locks to
--degree the performance of the whole system. Once the userspace enable this
--capability and select the KVM_BUS_LOCK_DETECTION_EXIT mode, KVM will set the
--KVM_RUN_BUS_LOCK flag in vcpu-run->flags field and exit to userspace. Concerning
--the bus lock vm exit can be preempted by a higher priority VM exit, the exit
--notifications to userspace can be KVM_EXIT_BUS_LOCK or other reasons.
--KVM_RUN_BUS_LOCK flag is used to distinguish between them.
-+Enabling this capability on a VM provides userspace with a way to select a
-+policy to handle the bus locks detected in guest. Userspace can obtain the
-+supported modes from the result of KVM_CHECK_EXTENSION and define it through
-+the KVM_ENABLE_CAP. The supported modes are mutually-exclusive.
-+
-+This capability allows userspace to force VM exits on bus locks detected in the
-+guest, irrespective whether or not the host has enabled split-lock detection
-+(which triggers an #AC exception that KVM intercepts). This capability is
-+intended to mitigate attacks where a malicious/buggy guest can exploit bus
-+locks to degrade the performance of the whole system.
-+
-+If KVM_BUS_LOCK_DETECTION_OFF is set, KVM doesn't force guest bus locks to VM
-+exit, although the host kernel's split-lock #AC detection still applies, if
-+enabled.
-+
-+If KVM_BUS_LOCK_DETECTION_EXIT is set, KVM enables a CPU feature that ensures
-+bus locks in the guest trigger a VM exit, and KVM exits to userspace for all
-+such VM exits, e.g. to allow userspace to throttle the offending guest and/or
-+apply some other policy-based mitigation. When exiting to userspace, KVM sets
-+KVM_RUN_X86_BUS_LOCK in vcpu-run->flags, and conditionally sets the exit_reason
-+to KVM_EXIT_X86_BUS_LOCK.
-+
-+Note! Detected bus locks may be coincident with other exits to userspace, i.e.
-+KVM_RUN_X86_BUS_LOCK should be checked regardless of the primary exit reason if
-+userspace wants to take action on all detected bus locks.
- 
- 7.23 KVM_CAP_PPC_DAWR1
- ----------------------
--- 
-2.35.3
+Just a single new test:
+* test CMM no-translate bit after reset
 
+A lot of smaller fixes:
+* fix for secure guest size by Claudio
+* fixes for shell script issues by Nicholas
+* fix in error path of emulator test by Christian
+* dirty condition code fixes by Janosch
+* pv-attest missing from unittests.cfg
+
+And, last but not least, two refactorings:
+* simplification of secure boot image creation by Marc
+* name inline assembly arguments in sigp lib by Janosch
+
+Thanks
+Nico
+
+MERGE: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/merge_requests/58
+
+PIPELINE: https://gitlab.com/Nico-Boehr/kvm-unit-tests/-/pipelines/1264518225
+
+PULL: https://gitlab.com/Nico-Boehr/kvm-unit-tests.git pr-2024-04-22
+----
+The following changes since commit 69ee03b0598ee49f75ebab5cd0fe39bf18c1146e:
+
+  Merge branch 'arm/queue' into 'master' (2024-04-19 10:41:39 +0000)
+
+are available in the Git repository at:
+
+  https://gitlab.com/Nico-Boehr/kvm-unit-tests.git pr-2024-04-22
+
+for you to fetch changes up to 7315fc8a182e50e5c2f387812cd178b433a40cea:
+
+  s390x: cmm: test no-translate bit after reset (2024-04-23 15:10:35 +0200)
+
+----------------------------------------------------------------
+Christian Borntraeger (1):
+      s390x: emulator: Fix error path of invalid function code
+
+Claudio Imbrenda (1):
+      lib: s390: fix guest length in uv_create_guest()
+
+Janosch Frank (6):
+      lib: s390x: sigp: Dirty CC before sigp execution
+      lib: s390x: uv: Dirty CC before uvc execution
+      lib: s390x: css: Dirty CC before css instructions
+      s390x: mvpg: Dirty CC before mvpg execution
+      s390x: sclp: Dirty CC before sclp execution
+      lib: s390x: sigp: Name inline assembly arguments
+
+Marc Hartmayer (1):
+      s390x/Makefile: simplify Secure Execution boot image generation
+
+Nicholas Piggin (2):
+      s390x: Fix is_pv check in run script
+      s390x: Use local accel variable in arch_cmd_s390x
+
+Nico Boehr (2):
+      s390x: add pv-attest to unittests.cfg
+      s390x: cmm: test no-translate bit after reset
+
+ lib/s390x/asm/sigp.h    | 12 ++++++++----
+ lib/s390x/asm/uv.h      |  4 +++-
+ lib/s390x/css.h         | 16 ++++++++++++----
+ lib/s390x/uv.c          |  2 +-
+ s390x/Makefile          | 36 +++++++++++++++---------------------
+ s390x/cmm.c             | 34 ++++++++++++++++++++++++++++++++++
+ s390x/emulator.c        |  2 +-
+ s390x/mvpg.c            |  6 ++++--
+ s390x/run               |  8 ++++----
+ s390x/sclp.c            |  5 ++++-
+ s390x/unittests.cfg     |  3 +++
+ scripts/s390x/func.bash |  2 +-
+ 12 files changed, 90 insertions(+), 40 deletions(-)
 
