@@ -1,323 +1,272 @@
-Return-Path: <kvm+bounces-15736-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15737-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E7E8AFCE1
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 01:50:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D23FB8AFD2C
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 02:09:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CC01F23FE9
-	for <lists+kvm@lfdr.de>; Tue, 23 Apr 2024 23:50:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BBB41F22D3A
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 00:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3CC41746;
-	Tue, 23 Apr 2024 23:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EF65BE4F;
+	Wed, 24 Apr 2024 00:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5cdYMNi"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xIieUONv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2342537E3
-	for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 23:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713916222; cv=none; b=kAeq64wQeZohyC8p9x//of4Z/fYt4S8cbVimhliJbYw5msARFZmodljAG3Ujj+R1dzl4TAt4CU5xzLTiqGa+BTP4g3LPxEH9eTKIMHfZI+zAE3sOtn1CxBOBpCfeTuiSQRWBZsEpY0ivBzoimRt34OAwC7LpZVPSVv+fksSR7cY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713916222; c=relaxed/simple;
-	bh=I2QIzgpb/mSP4CG+9bGvMJ9ef//nb7Nd1NdK/yAqP+o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YOmaizY1agiHrhHXQib62bNgAHfITUqUGZofGM14EzCIXUaUUeSE+FAqeohlF8U0APRL+to76Hrs3VNTNwtdPZmkcbhcyrOjWFhqILY4V2GMPDCfnzrS8SLi918yHdBo5PWEFMAUsp0Kd/ZTgsbx+C8UVM6OqytNom/GOkoiITI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5cdYMNi; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6ecec819962so7539931b3a.2
-        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 16:50:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713916220; x=1714521020; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S0XgZKcpp0Rc9lwkgVkwCs//I4YyNrUEqhi1oEZOUlk=;
-        b=e5cdYMNifn+b/6IfY9LI0VxitVnxys7/K5a6RB+sKyocuSUN0upyXhMKYyYxhQJ5kd
-         fVLup5BWI7w5RB0Z4iAzcCBeoubMRyMS2dS9sTuLe098hXMWdehC7Hk5bOUs+3epm+9W
-         5cFK5MEV1CgWZOMLMr0fjLVZMqbr/XDLXOweZ15iWOZvD85v/AwTSX/2nZxidhZ4JhVS
-         LUCdaZE34/wMWaoY065BDGmh+f7G4Rm9BWYcuU4tbUjDpsvQnwDg4jmpsUZYGA0eOknj
-         DmhTGriflCtOezLY3gwloOo8WQXLTPg/mxdaMrc1bNliMvFEvDXViiaVdjI1TE8ayADe
-         tC4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713916220; x=1714521020;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S0XgZKcpp0Rc9lwkgVkwCs//I4YyNrUEqhi1oEZOUlk=;
-        b=Ro01lKOqGdQ7voppuRPybMT9tkD4zuz17QCH8V3kvuWKiGM/25c7OV41r/GajFxKKG
-         siXs+fXWgLmt3EwiaW/MQwqlC/2INHYA0o+eJwjPPI0dj3AwMmwYnICky9j9XhE71eXZ
-         sGoKtQSYlkv+goFSPWG6qMgLXeol78bluWXFSOFez/bTf4VXk//rJlZ75VSpyBk8zis8
-         jaU0J5k3MS7SO+gfHr3FJOyRlEv1x+vRHigdtKnNGNDfInsYQ0Xwk0icHu9/7C836OBn
-         QTm2TaaYABWwcXcKtOqTH0mANjT/nWKpLwfJYmBISdFl6iWBMThu+iKyOqlbue3lkBsI
-         iz8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVIFJ0Gz9FnmahRVz5nLRlcr3ioUTnrZc/IxdBQbwluwZCC7R75HeD0Z0x9zLutOXtPtTHbqxAZMXG790x3SKP1I5v7
-X-Gm-Message-State: AOJu0YzmVXq+S35KCL78OUtnpwjJ89wwRf6ZWj6jXMGekJ/YJr9qQPqK
-	O7p7i6CEO3qAwJi0FDgfw5ZGUgCd56vP6DT1VTjVZqDi+hDgWOURZyMQtK+j8Cezm+Q0gG2ZVof
-	zLw==
-X-Google-Smtp-Source: AGHT+IHXAum89R+L84ez8ZLdeYXwHg5utst71NXVdIMIUYfKYaITD4P0qipj/L5juka0M2ylpFOroAjDd0c=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:3cc1:b0:6ea:c43c:a666 with SMTP id
- ln1-20020a056a003cc100b006eac43ca666mr112162pfb.6.1713916220080; Tue, 23 Apr
- 2024 16:50:20 -0700 (PDT)
-Date: Tue, 23 Apr 2024 16:50:18 -0700
-In-Reply-To: <20240409133959.2888018-7-pgonda@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7127C8C05
+	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 00:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713917347; cv=fail; b=HSUld4f0ldBncRotXEA+5aw8CcO4R4j+GM2pyBm2VR0Bbi+tz3mX4DkI+37v2OrASIgFYwbdk0VPUBHV4Cuju1A+soscz32waRNOMeScmQ76GxuifupjGeDCSzh5Y02zdOXaA1kkK1rb9xzBzhXme7f0lrWXx4sl82UTzqc+d3s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713917347; c=relaxed/simple;
+	bh=C+PDYDxke+s6y6zexkvYvH2KdexhFKbuTBhzdttdLgQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FnK9JS8lQJkNXg1026X182dOIC12cWbis71y9qgFdXo8dnGMB8q7ICUxfLK1tgrb64G7Y/4ZZ3VXQfTrQKL5yN8ubXDAtxcviPRD1opJCu0sVfgq/qYCBBmFPjBUa7+xcfnwdumZl9PKJ49kNfSol12iFGnGIJLtKZYwM1tOzUs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xIieUONv; arc=fail smtp.client-ip=40.107.243.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gP7PUEE+mCGXW8GCFZ/FjKR5qFKosUbQyzGk6txKadQpVMNgtTc3/gDJuTJaSLkpXlq1urbYYH5zYo/nYdPXzsuwotWq1EJppH7v04SoWatuBT10nIPvVwVP7Uwbc31D5rxRRSK3Ko/utQwJsKBnOTqw2RgwHR3O1QgVfFNorNJGq8gPfC2kLApgocFPftrlCFEIPz8RxyH1SlyYAl+XDisbFSC5uSwJZwHlK30uWeIGeW9sTmeMi+pQEb0pRjcabRVm0EMg76V+9qTzGBD69ktgJPvHJLArma6VknNdUB9gd4MTDrZ4H0T4d9+jil6sj7940cnD5qdc3yXZQykZvQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SFj4VLXpPGAxeno9p5TXvZBa1bZ69tJHoOuMFF09Igg=;
+ b=RXtvaxm8RC08uorjgn+w6qInFm0dHJiqhXtblXYLClhIWqKiz3Umky1gXMIEAzDGZ4KX/MgZBxi4fqN0XoyVb8r7c9ZpsJLEmRTA8fkTd6oCcrOMmKEY4kYNNex2Sll4Zr0ZNWDqpV8RdGAOu4n8W2jN4JT58AUGS79h1PqZPHxi+3HxMu+RC0H+xSt8j10aAxWPYOmswkyxeaQMQDieuwFRYZKr2bZExC5ofgoyAKR+giVHHeKkVltQwTkzmfQGJAbowyMGwgMMvycZNBfUzV2Fr7va1UeJqVwlBj0NDhduuVE5H/qL2SeQA5BjQCQf6quyJ2aT2yxWtFTsNbYM4g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SFj4VLXpPGAxeno9p5TXvZBa1bZ69tJHoOuMFF09Igg=;
+ b=xIieUONvv8wGODQSJaQEnexTErGfT58WbEyw3s7Q5GmDHRgDCYyXpm8THRH437tH08WGKA3dRyAAKJdcbKF89XUJ+lvL+5qAXHgDfr4l21sYpnkGHwNsSmIB9K+Jo5IOA55TwUoKmn1+CTRnOVsqwl373cBX7A4Tw1Shy5saZwg=
+Received: from DM6PR11CA0065.namprd11.prod.outlook.com (2603:10b6:5:14c::42)
+ by LV3PR12MB9355.namprd12.prod.outlook.com (2603:10b6:408:216::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.44; Wed, 24 Apr
+ 2024 00:09:01 +0000
+Received: from DS3PEPF0000C37E.namprd04.prod.outlook.com
+ (2603:10b6:5:14c:cafe::50) by DM6PR11CA0065.outlook.office365.com
+ (2603:10b6:5:14c::42) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.34 via Frontend
+ Transport; Wed, 24 Apr 2024 00:09:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DS3PEPF0000C37E.mail.protection.outlook.com (10.167.23.8) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7519.19 via Frontend Transport; Wed, 24 Apr 2024 00:09:01 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 23 Apr
+ 2024 19:08:52 -0500
+Date: Tue, 23 Apr 2024 19:08:38 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+CC: Isaku Yamahata <isaku.yamahata@intel.com>, <qemu-devel@nongnu.org>,
+	<kvm@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>, Paolo Bonzini
+	<pbonzini@redhat.com>, Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?=
+	<berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>, Pankaj Gupta
+	<pankaj.gupta@amd.com>, Isaku Yamahata <isaku.yamahata@linux.intel.com>
+Subject: Re: [PATCH v3 48/49] hw/i386/sev: Use guest_memfd for legacy ROMs
+Message-ID: <20240424000838.menxh32bnvnyvfz4@amd.com>
+References: <20240320083945.991426-1-michael.roth@amd.com>
+ <20240320083945.991426-49-michael.roth@amd.com>
+ <20240320181223.GG1994522@ls.amr.corp.intel.com>
+ <61462f83-1406-48ea-8f1a-fae848ff1443@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240409133959.2888018-1-pgonda@google.com> <20240409133959.2888018-7-pgonda@google.com>
-Message-ID: <ZihJOorvMU8GpUBN@google.com>
-Subject: Re: [PATCH 6/6] Add ability for SEV-ES guests to use ucalls via GHCB
-From: Sean Christopherson <seanjc@google.com>
-To: Peter Gonda <pgonda@google.com>
-Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Carlos Bilbao <carlos.bilbao@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <61462f83-1406-48ea-8f1a-fae848ff1443@intel.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37E:EE_|LV3PR12MB9355:EE_
+X-MS-Office365-Filtering-Correlation-Id: 53312bda-ed0b-41f3-93dd-08dc63f2beed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?T2oFQbR+HA6sTXibzfJrb9Fn8FkVVPDXPcjAm4C1poYi8InzzGtb3uXC40+4?=
+ =?us-ascii?Q?VgsyeevypAaMIeVEXSgXLWzTp2BTL+RXkhm125hApogWMiTzB0cHjrpAaIhy?=
+ =?us-ascii?Q?ftzEBVyV4aXynhNROS2bK9jnJNkPTZ+mFfJojQSlcm5V+YPWUyXCcF53+WsO?=
+ =?us-ascii?Q?lPSKSf6umoqQD2EoAEY/glNntReEbq9im+bsffb5zI22xaXfnXJ0zQEQta5r?=
+ =?us-ascii?Q?qcF6jnuRj4GX8tIncJUHjliXEl0sfR33oEaFUjRbWaKd4TFTzY4pkq7YrUFI?=
+ =?us-ascii?Q?WbC/ZFLQXEH0tqU2NNHrVmTYjATu/a7eHRQbO2SUoj2ga2R3Ll2u2AmOn6eX?=
+ =?us-ascii?Q?jyEt0CzyuJTPNdBPMXxgPI/lua3FRFSW/tpsw5zQVCMKLX6RdPSqv7n9hZ+5?=
+ =?us-ascii?Q?cBUIwsyZx5WfaUqfmXPuHfwhfZxIKcEJzY1dPjTsakJkLX14SvOgXa4aB1GB?=
+ =?us-ascii?Q?SFwMptuGCs9ES5iBDGGQia3h4QcMpT0R280R10I1/pd1ZtI6mfmH0SkN8njY?=
+ =?us-ascii?Q?9oyWWvVEaq6bzDuvw/D/AZqqSp5mzsBNrCA1GBqInmQgOAneq2HkgqwfJJaE?=
+ =?us-ascii?Q?mbs0yIweqTwAxh7VAxaEc5d5c77NsRWUsU4mlC9YxNpOmuc/DbL+vdKdmonZ?=
+ =?us-ascii?Q?cT4z9VK3fWfLnx2Icd9vyhn/PY5pGwpTMYJUNVLg3J1ke4L+9FSdtA0R7SDV?=
+ =?us-ascii?Q?vL4vaxklAYS4R9R8AvT0aY3zuOtCBkGyB55LUlspXW779dzNEzdUdhMmLMg7?=
+ =?us-ascii?Q?36q2nF9vB7heuepF11cFl1jNlFly/CAEXI1JjnLDLQlvxRLxRTZvGnxGUV7N?=
+ =?us-ascii?Q?E8FRCnfvjkD12b6j3GjtvHR9B3zcreJncGD5joBIm8gMzssYuLeO+L5yQ9HC?=
+ =?us-ascii?Q?s/3dp6BvWhpL7S5GaSUkkihd3i88AeM28/RY4cRdUdQYPZlIGB8Trf5V3aWm?=
+ =?us-ascii?Q?dKT/nq4tqQ89V5ICiVb6MyPqU52Fk5OHUyClgZgdcXNV6zioPZwCgaPWgoey?=
+ =?us-ascii?Q?GkL8AaT+p6H9Wb6tfUTxLkx2k7nik9VGlopJ42QutmieFNJwUawo+FgiPWvG?=
+ =?us-ascii?Q?JJYR7FEsWSUaoe1WR05J9WERg8q8TaefvGQnJpQfNYK9FBWixZPyzhe7h3L5?=
+ =?us-ascii?Q?6RLzWMs9hA5ugdbv1altwgkuI3rR08AAVfFdKvVSyuqXFyzjzGGk1OUxsL+q?=
+ =?us-ascii?Q?wwRxWorq6ht758wQiVPYlKufLjSCLmtI9XQ25Xe+UsL3Z7q/sdDvP/mQSR7u?=
+ =?us-ascii?Q?5+CZUD+OQEMMHd344kIPd0LpRLjgTc36Z09/+EoRT9hbLoKBxXi0QUmpnDDz?=
+ =?us-ascii?Q?Q35pauBxMetDJwJ9mqyMxIGb?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(1800799015)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Apr 2024 00:09:01.4994
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 53312bda-ed0b-41f3-93dd-08dc63f2beed
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DS3PEPF0000C37E.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9355
 
-On Tue, Apr 09, 2024, Peter Gonda wrote:
-> Modifies ucall handling for SEV-ES VMs. 
-
-Please follow the preferred changelog style as described in
-Documentation/process/maintainer-kvm-x86.rst
-
-> Instead of using an out instruction and storing the ucall pointer in RDI,
-> SEV-ES guests use a outsb VMGEXIT to move the ucall pointer as the data.
-
-Explain _why_.  After poking around, I think I agree that string I/O is the least
-awful choice, but string I/O is generally unpleasant.  E.g. my initial reaction
-to this
-		addr = *(uint64_t *)((uint8_t *)(run) + run->io.data_offset);
-
-was quite literally, "LOL, what?".
-
-We could use MMIO, because there is no *real* instruction in the guest, it's all
-make believe, i.e. there doesn't actually need to be MMIO anywhere.  But then we
-need to define an address; it could simply be the ucall address, but then SEV-ES
-ends up with a completely different flow then the regular magic I/O port.
-
-The changelog should capture explain why string I/O was chosen over the "obvious"
-alternatives so that readers and reviewers aren't left wondering why on earth
-we *chose* to use string I/O.
-
-> Allows for SEV-ES to use ucalls instead of relying the SEV-ES MSR based
-> termination protocol.
+On Thu, Mar 28, 2024 at 08:45:03AM +0800, Xiaoyao Li wrote:
+> On 3/21/2024 2:12 AM, Isaku Yamahata wrote:
+> > On Wed, Mar 20, 2024 at 03:39:44AM -0500,
+> > Michael Roth <michael.roth@amd.com> wrote:
+> > 
+> > > TODO: make this SNP-specific if TDX disables legacy ROMs in general
+> > 
+> > TDX disables pc.rom, not disable isa-bios. IIRC, TDX doesn't need pc pflash.
 > 
-> Cc: Vishal Annapurve <vannapurve@google.com>
-> Cc: Ackerley Tng <ackerleytng@google.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Carlos Bilbao <carlos.bilbao@amd.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Michael Roth <michael.roth@amd.com>
-> Cc: kvm@vger.kernel.org
-> Cc: linux-kselftest@vger.kernel.org
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> ---
->  .../selftests/kvm/include/x86_64/sev.h        |  2 +
->  tools/testing/selftests/kvm/lib/x86_64/sev.c  | 67 ++++++++++++++++++-
->  .../testing/selftests/kvm/lib/x86_64/ucall.c  | 17 +++++
->  .../selftests/kvm/x86_64/sev_smoke_test.c     | 17 +----
->  4 files changed, 84 insertions(+), 19 deletions(-)
+> Not TDX doesn't need pc pflash, but TDX cannot support pflash.
 > 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
-> index 691dc005e2a1..26447caccd40 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/sev.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
-> @@ -109,4 +109,6 @@ static inline void sev_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
->  bool is_sev_enabled(void);
->  bool is_sev_es_enabled(void);
->  
-> +void sev_es_ucall_port_write(uint32_t port, uint64_t data);
-> +
->  #endif /* SELFTEST_KVM_SEV_H */
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/sev.c b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-> index 5b3f0a8a931a..276477f2c2cf 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/sev.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/sev.c
-> @@ -8,11 +8,18 @@
->  #include "svm.h"
->  #include "svm_util.h"
->  
-> +#define IOIO_TYPE_STR (1 << 2)
-> +#define IOIO_SEG_DS (1 << 11 | 1 << 10)
-> +#define IOIO_DATA_8 (1 << 4)
-> +#define IOIO_REP (1 << 3)
-> +
-> +#define SW_EXIT_CODE_IOIO 0x7b
-> +
->  struct ghcb_entry {
->  	struct ghcb ghcb;
->  
->  	/* Guest physical address of this GHCB. */
-> -	void *gpa;
-> +	uint64_t gpa;
->  
->  	/* Host virtual address of this struct. */
->  	struct ghcb_entry *hva;
-> @@ -45,16 +52,22 @@ void ghcb_init(struct kvm_vm *vm)
->  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
->  		entry = &hdr->ghcbs[i];
->  		entry->hva = entry;
-> -		entry->gpa = addr_hva2gpa(vm, &entry->ghcb);
-> +		entry->gpa = (uint64_t)addr_hva2gpa(vm, &entry->ghcb);
->  	}
->  
->  	write_guest_global(vm, ghcb_pool, (struct ghcb_header *)vaddr);
->  }
->  
-> +static void sev_es_terminate(void)
-> +{
-> +	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
-> +}
-> +
->  static struct ghcb_entry *ghcb_alloc(void)
->  {
->  	return &ghcb_pool->ghcbs[0];
->  	struct ghcb_entry *entry;
-> +	struct ghcb *ghcb;
->  	int i;
->  
->  	if (!ghcb_pool)
-> @@ -63,12 +76,18 @@ static struct ghcb_entry *ghcb_alloc(void)
->  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
->  		if (!test_and_set_bit(i, ghcb_pool->in_use)) {
->  			entry = &ghcb_pool->ghcbs[i];
-> -			memset(&entry->ghcb, 0, sizeof(entry->ghcb));
-> +			ghcb = &entry->ghcb;
-> +
-> +			memset(&ghcb, 0, sizeof(*ghcb));
-> +			ghcb->ghcb_usage = 0;
-> +			ghcb->protocol_version = 1;
-> +
->  			return entry;
->  		}
->  	}
->  
->  ucall_failed:
-> +	sev_es_terminate();
->  	return NULL;
->  }
->  
-> @@ -200,3 +219,45 @@ bool is_sev_es_enabled(void)
->  	return is_sev_enabled() &&
->  	       rdmsr(MSR_AMD64_SEV) & MSR_AMD64_SEV_ES_ENABLED;
->  }
-> +
-> +static uint64_t setup_exitinfo1_portio(uint32_t port)
-> +{
-> +	uint64_t exitinfo1 = 0;
-> +
-> +	exitinfo1 |= IOIO_TYPE_STR;
-> +	exitinfo1 |= ((port & 0xffff) << 16);
-> +	exitinfo1 |= IOIO_SEG_DS;
-> +	exitinfo1 |= IOIO_DATA_8;
-> +	exitinfo1 |= IOIO_REP;
-> +
-> +	return exitinfo1;
-> +}
-> +
-> +static void do_vmg_exit(uint64_t ghcb_gpa)
-> +{
-> +	wrmsr(MSR_AMD64_SEV_ES_GHCB, ghcb_gpa);
-> +	__asm__ __volatile__("rep; vmmcall");
-> +}
-> +
-> +void sev_es_ucall_port_write(uint32_t port, uint64_t data)
-> +{
-> +	struct ghcb_entry *entry;
-> +	struct ghcb *ghcb;
-> +	const uint64_t exitinfo1 = setup_exitinfo1_portio(port);
-> +
-> +	entry = ghcb_alloc();
-> +	ghcb = &entry->ghcb;
-> +
-> +	ghcb_set_sw_exit_code(ghcb, SW_EXIT_CODE_IOIO);
-> +	ghcb_set_sw_exit_info_1(ghcb, exitinfo1);
-> +	ghcb_set_sw_exit_info_2(ghcb, sizeof(data));
-> +
-> +	// Setup the SW Stratch buffer pointer.
-> +	ghcb_set_sw_scratch(ghcb,
-> +			    entry->gpa + offsetof(struct ghcb, shared_buffer));
-> +	memcpy(&ghcb->shared_buffer, &data, sizeof(data));
-> +
-> +	do_vmg_exit(entry->gpa);
-> +
-> +	ghcb_free(entry);
-> +}
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/ucall.c b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> index 1265cecc7dd1..24da2f4316d8 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/ucall.c
-> @@ -5,6 +5,8 @@
->   * Copyright (C) 2018, Red Hat, Inc.
->   */
->  #include "kvm_util.h"
-> +#include "processor.h"
-> +#include "sev.h"
->  
->  #define UCALL_PIO_PORT ((uint16_t)0x1000)
->  
-> @@ -21,6 +23,10 @@ void ucall_arch_do_ucall(vm_vaddr_t uc)
->  #define HORRIFIC_L2_UCALL_CLOBBER_HACK	\
->  	"rcx", "rsi", "r8", "r9", "r10", "r11"
->  
-> +	if (is_sev_es_enabled()) {
+> Can SNP support the behavior of pflash? That what's got changed will be
+> synced back to OVMF file?
 
-No curly braces needed.
+For split OVMF files (separate FD for CODE vs. VARS) it can, but it
+requires special handling in OVMF to handle MMIO to the VARS area using
+direct MMIO hypercalls rather than relying on MMIO emulation. Here's the
+relevant OVMF commit:
 
-> +		sev_es_ucall_port_write(UCALL_PIO_PORT, uc);
-> +	}
+  commit 437eb3f7a8db7681afe0e6064d3a8edb12abb766
+  Author: Tom Lendacky <thomas.lendacky@amd.com>
+  Date:   Wed Aug 12 15:21:42 2020 -0500
 
-This will clearly fall through to the standard IN, which I suspect is wrong and
-only "works" because the only usage is a single GUEST_DONE(), i.e. no test
-actually resumes to this point.
+      OvmfPkg/QemuFlashFvbServicesRuntimeDxe: Bypass flash detection with SEV-ES
 
-> +
->  	asm volatile("push %%rbp\n\t"
->  		     "push %%r15\n\t"
->  		     "push %%r14\n\t"
-> @@ -48,8 +54,19 @@ void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->  
->  	if (run->exit_reason == KVM_EXIT_IO && run->io.port == UCALL_PIO_PORT) {
->  		struct kvm_regs regs;
-> +		uint64_t addr;
-> +
-> +		if (vcpu->vm->subtype == VM_SUBTYPE_SEV_ES) {
-> +			TEST_ASSERT(
+      BZ: https://bugzilla.tianocore.org/show_bug.cgi?id=2198
 
-No Google3 style please.  I'm going to start charging folks for these violations.
-I don't know _how_, but darn it, I'll find a way :-)
+For SNP, the plan is to continue to use -bios to handle the actual
+CODE/BIOS FD, but to allow the use of pflash,unit=0 to handle the VARS
+fd if a separate/persistent store is desired. This allows us to continue
+using read-only memslots on the VARS/pflash side without being at odds
+with the fact that read-only memslots are no longer supported for private
+memslots (since VARS doesn't need to be measured/mapped as private), and
+limiting the special handling to -bios where TDX/SNP both need private
+memslots.
 
-> +				run->io.count == 8 && run->io.size == 1,
-> +				"SEV-ES ucall exit requires 8 byte string out\n");
-> +
-> +			addr = *(uint64_t *)((uint8_t *)(run) + run->io.data_offset);
+This is roughly how things will look with v4 of this series:
 
-Rather than this amazing bit of casting, I'm tempted to say we should add
-kvm_vcpu_arch{} and then map the PIO page in vm_arch_vcpu_add().  Then this
-is more sanely:
+  https://github.com/AMDESE/qemu/commit/21fff075372ad25b2d09c5e416349c2b353fdb4c
 
-			return *(uint64_t *)vcpu->arch.pio);
+I think (if needed) TDX could in theory take a similar approach with
+similar modifications to OVMF and providing an option for a split CODE/VARS
+variant.
 
-where vcpu->arch.pio is a "void *".  At least, I think that would work?
+-Mike
 
-
-> +			return (void *)addr;
-> +		}
->  
->  		vcpu_regs_get(vcpu, &regs);
-> +
-
-Spurious whitespace.
+> 
+> > Xiaoyao can chime in.
+> > 
+> > Thanks,
+> > 
+> > > 
+> > > Current SNP guest kernels will attempt to access these regions with
+> > > with C-bit set, so guest_memfd is needed to handle that. Otherwise,
+> > > kvm_convert_memory() will fail when the guest kernel tries to access it
+> > > and QEMU attempts to call KVM_SET_MEMORY_ATTRIBUTES to set these ranges
+> > > to private.
+> > > 
+> > > Whether guests should actually try to access ROM regions in this way (or
+> > > need to deal with legacy ROM regions at all), is a separate issue to be
+> > > addressed on kernel side, but current SNP guest kernels will exhibit
+> > > this behavior and so this handling is needed to allow QEMU to continue
+> > > running existing SNP guest kernels.
+> > > 
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >   hw/i386/pc.c       | 13 +++++++++----
+> > >   hw/i386/pc_sysfw.c | 13 ++++++++++---
+> > >   2 files changed, 19 insertions(+), 7 deletions(-)
+> > > 
+> > > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > > index feb7a93083..5feaeb43ee 100644
+> > > --- a/hw/i386/pc.c
+> > > +++ b/hw/i386/pc.c
+> > > @@ -1011,10 +1011,15 @@ void pc_memory_init(PCMachineState *pcms,
+> > >       pc_system_firmware_init(pcms, rom_memory);
+> > >       option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+> > > -    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+> > > -                           &error_fatal);
+> > > -    if (pcmc->pci_enabled) {
+> > > -        memory_region_set_readonly(option_rom_mr, true);
+> > > +    if (machine_require_guest_memfd(machine)) {
+> > > +        memory_region_init_ram_guest_memfd(option_rom_mr, NULL, "pc.rom",
+> > > +                                           PC_ROM_SIZE, &error_fatal);
+> > > +    } else {
+> > > +        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+> > > +                               &error_fatal);
+> > > +        if (pcmc->pci_enabled) {
+> > > +            memory_region_set_readonly(option_rom_mr, true);
+> > > +        }
+> > >       }
+> > >       memory_region_add_subregion_overlap(rom_memory,
+> > >                                           PC_ROM_MIN_VGA,
+> > > diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+> > > index 9dbb3f7337..850f86edd4 100644
+> > > --- a/hw/i386/pc_sysfw.c
+> > > +++ b/hw/i386/pc_sysfw.c
+> > > @@ -54,8 +54,13 @@ static void pc_isa_bios_init(MemoryRegion *rom_memory,
+> > >       /* map the last 128KB of the BIOS in ISA space */
+> > >       isa_bios_size = MIN(flash_size, 128 * KiB);
+> > >       isa_bios = g_malloc(sizeof(*isa_bios));
+> > > -    memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
+> > > -                           &error_fatal);
+> > > +    if (machine_require_guest_memfd(current_machine)) {
+> > > +        memory_region_init_ram_guest_memfd(isa_bios, NULL, "isa-bios",
+> > > +                                           isa_bios_size, &error_fatal);
+> > > +    } else {
+> > > +        memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
+> > > +                               &error_fatal);
+> > > +    }
+> > >       memory_region_add_subregion_overlap(rom_memory,
+> > >                                           0x100000 - isa_bios_size,
+> > >                                           isa_bios,
+> > > @@ -68,7 +73,9 @@ static void pc_isa_bios_init(MemoryRegion *rom_memory,
+> > >              ((uint8_t*)flash_ptr) + (flash_size - isa_bios_size),
+> > >              isa_bios_size);
+> > > -    memory_region_set_readonly(isa_bios, true);
+> > > +    if (!machine_require_guest_memfd(current_machine)) {
+> > > +        memory_region_set_readonly(isa_bios, true);
+> > > +    }
+> > >   }
+> > >   static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
+> > > -- 
+> > > 2.25.1
+> > > 
+> > > 
+> > 
+> 
+> 
 
