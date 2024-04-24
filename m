@@ -1,186 +1,141 @@
-Return-Path: <kvm+bounces-15743-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15744-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 564108AFD83
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 02:58:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9633B8AFD90
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 03:07:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA4ED1F239A9
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 00:58:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2CFCB22444
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 01:07:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B8E4C9F;
-	Wed, 24 Apr 2024 00:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lPM3EqdX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6EAB538A;
+	Wed, 24 Apr 2024 01:07:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EEE947E
-	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 00:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D572F4405;
+	Wed, 24 Apr 2024 01:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713920320; cv=none; b=qmIsSv/0pDldlYAmPjRpUHPPdOfUx1tIxNhOWinOwZl8a5V/zoDE7YJRNpy9XLRfzJjFZaFtMt3oIcfFfY6zG0Sz+kOAhBYeLWtOTRiddBY2cx1KagO8r+7WWYb2jyOU+unMQuOJgqX/yLHpY3lqdtWpo5avH+Lge3ju8Mrj32o=
+	t=1713920831; cv=none; b=Lmu2eDHs7veRuUbqD0ag+kTR33XgaupjYXpa6W1ca0Xz47G/ffk+aSTui3fqxFcqMANWcJAysQ2zgB+faQYVUrgjc2Yt2OyaAoDgYXvgOrYWZqgaVuTGM7eoLHx6BZEVRMxAP4rqdhU3bng5Mefb+Bg+Zlw0FhhyfCSTA43+9WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713920320; c=relaxed/simple;
-	bh=mmJKzpn56Y05MfN/M7Ttwvc9Q1m+oN3OU+dsYQVNYzc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EgPOeJi8jpBcdiESeLSkiNjlBGbI7Ctjc+iyKE2zhK/N8HR6FG9h/nFfS1HclAwPeU/cq2vsiGhSnC6NCbkHK3Fj8OwSxRzSG001Ew2r8uyXGtewx2QCbpzPa5OBy4nMRKebgXfNQ7u+R8M/r3NWnGORfQzKkR4rIxoAeWB5//M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lPM3EqdX; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcc0bcf9256so9965011276.3
-        for <kvm@vger.kernel.org>; Tue, 23 Apr 2024 17:58:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713920317; x=1714525117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TnFfv2/q8HD4zI2T3k05GE/1OzMTYZ/cFvDzD1pFbjs=;
-        b=lPM3EqdX9usy5i4BxZs60X0T1U1uzOBVuHsbEiL1Ef6R6q70HUNdU5AYUGvEKhdC+J
-         sEdIKWkNBhsACpEeNWzM4hY3VzkNHUFJxxw/tNRJq2Z4BO6rLSkNK9S5F5VH7KBLsMmz
-         IaFshJMY/BT94Folc61L31lkOO5g2J7ak4a0LhMhKWMyB5z5txP+1YHGsLeAcTdIScjj
-         Wn9IKuiCyDogZv3NA9Nm2JoegRpK0If5gFFTFT7VVI+C9f4tApXsMZRPj61EmBRl8UtK
-         VW1b4dnLnQ9O7gIVovlGj/ElQMZlKK7EAjQwaIIQ26PyZAHVtrGv9AWTNVsGts6gOZiQ
-         sr4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713920317; x=1714525117;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TnFfv2/q8HD4zI2T3k05GE/1OzMTYZ/cFvDzD1pFbjs=;
-        b=OoByYzqUrdeoUqvbiGR+z1cx/o/3OdwXeU7Kl3Ltnw96MOCcJ3WD2XbWD5MCNKYeIS
-         3BNiAkbCyL5zr+zt7qKSflr3EIJtzu/6xFzII1ju7gYqZ39GC6xms8J38yu/Hkyo+pAI
-         S0kU/arBz/L13/M+GlhZsmo7IP3riNUYkeh8JXM/0pp6lk4N+hA+HMSTOPctu2IJ5QC0
-         8QcKxrSbdO4MC6VCXILBv1UVdUejFExan/GPvfdrGemPbDhW8GDnGUKcbt5jbwoev9c3
-         Gg3rN+UAagVZz/jR88lapdNHWFI1M65DCzGey2x8vVTt6i5K9I4fFWyr809Ksgq17JHy
-         2QdA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/L9iu8rXqVGyIdtzEdXg+51g1trid79zaov1GEZLhQ1hpNeCPhD4lweRAAVKzHUzvgwWY67NsF8SSyaKkS6DTPrtX
-X-Gm-Message-State: AOJu0YwHsF+N5I1vKB1Gi0KTo+MLsQ360m50BtQeIvJtMvrRE8PKU8kG
-	iczKdMR3wgO00PyjJWs6pxuUipEJ+bO8vIn2XBUVJQHEplwYC71DR8onFQ/5vmvDpdxZm9q1p82
-	EJQ==
-X-Google-Smtp-Source: AGHT+IEvNw3J6I/yHHAfvdURbb8jj1wTGZNW3lbpolt8uCEne9ZqLnMsHy6ndjJrs5y4tOm7Z4sHLAK8DkM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ab2b:0:b0:dcc:8927:7496 with SMTP id
- u40-20020a25ab2b000000b00dcc89277496mr138421ybi.5.1713920317559; Tue, 23 Apr
- 2024 17:58:37 -0700 (PDT)
-Date: Tue, 23 Apr 2024 17:58:35 -0700
-In-Reply-To: <20240409133959.2888018-5-pgonda@google.com>
+	s=arc-20240116; t=1713920831; c=relaxed/simple;
+	bh=XfXXMQt8Cl+rmsVBbFAJBYBZoxRvVkARuTYt10dpAPI=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=BKZqkqPnEwNGujFqBy9uk4qJfFKioEQTbDGkz4f3sA5LfDyIuqOAerpzpCR1pP0qtkjfgV3G+Erlrd31ryI3imUZTihucyi42xvJhWNYyqftJBGISn0EXbnsifqgXoYysofoskWt9g2AsuKnnESy+tN4BsXUnPLGdLVO3kSIQNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8BxmPA4Wyhm37EBAA--.9705S3;
+	Wed, 24 Apr 2024 09:07:04 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxjd41Wyhm_tkCAA--.12211S3;
+	Wed, 24 Apr 2024 09:07:04 +0800 (CST)
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Mingwei Zhang <mizhang@google.com>
+Cc: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
+ Sean Christopherson <seanjc@google.com>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <18b19dd4-6d76-4ed8-b784-32436ab93d06@linux.intel.com>
+ <4c47b975-ad30-4be9-a0a9-f0989d1fa395@linux.intel.com>
+ <CAL715WJXWQgfzgh8KqL+pAzeqL+dkF6imfRM37nQ6PkZd09mhQ@mail.gmail.com>
+ <737f0c66-2237-4ed3-8999-19fe9cca9ecc@linux.intel.com>
+ <CAL715W+RKCLsByfM3-0uKBWdbYgyk_hou9oC+mC9H61yR_9tyw@mail.gmail.com>
+ <Zh1mKoHJcj22rKy8@google.com>
+ <CAL715WJf6RdM3DQt995y4skw8LzTMk36Q2hDE34n3tVkkdtMMw@mail.gmail.com>
+ <Zh2uFkfH8BA23lm0@google.com>
+ <4d60384a-11e0-2f2b-a568-517b40c91b25@loongson.cn>
+ <ZiaX3H3YfrVh50cs@google.com>
+ <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
+ <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com>
+ <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
+ <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com>
+ <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
+ <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
+ <b3868bf5-4e16-3435-c807-f484821fccc6@loongson.cn>
+ <CAL715W++maAt2Ujfvmu1pZKS4R5EmAPebTU_h9AB8aFbdLFrTQ@mail.gmail.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <cd8a4fbb-a8a6-785d-f6e4-cc0f811fef84@loongson.cn>
+Date: Wed, 24 Apr 2024 09:07:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240409133959.2888018-1-pgonda@google.com> <20240409133959.2888018-5-pgonda@google.com>
-Message-ID: <ZihZOygvuDs1wIrh@google.com>
-Subject: Re: [PATCH 4/6] Add GHCB allocations and helpers
-From: Sean Christopherson <seanjc@google.com>
-To: Peter Gonda <pgonda@google.com>
-Cc: linux-kernel@vger.kernel.org, Vishal Annapurve <vannapurve@google.com>, 
-	Ackerley Tng <ackerleytng@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Carlos Bilbao <carlos.bilbao@amd.com>, 
-	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+In-Reply-To: <CAL715W++maAt2Ujfvmu1pZKS4R5EmAPebTU_h9AB8aFbdLFrTQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cxjd41Wyhm_tkCAA--.12211S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7WF4xZw1UAw18Jr15AF4rCrX_yoW8XFyxpF
+	WjqFyrur4kAa1UAw4I9a1rXFWYkrWxJw43WasruFWUGws8Wr9agF18KFyYkFy3ursxt340
+	qF4DtayxAa45XacCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CYjI0SjxkI62AI1cAE67vIY487MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48J
+	MxC20s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	W8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8qXdUUUUU
+	U==
 
-On Tue, Apr 09, 2024, Peter Gonda wrote:
-> Add GHCB management functionality similar to the ucall management.
-> Allows for selftest vCPUs to acquire GHCBs for their usage.
 
-Do we actually need a dedicated pool of GHCBs?  The conundrum with ucalls i=
-s that
-we have no place in the guest to store the pointer on all architectures.  O=
-r rather,
-we were too lazy to find one. :-)
 
-But for SEV-ES, we have MSR_AMD64_SEV_ES_GHCB, and any test that clobbers t=
-hat
-obviously can't use ucalls anyways.  Argh, but we can't get a value in that=
- MSR
-from the host.
+On 2024/4/24 上午1:02, Mingwei Zhang wrote:
+>>>
+>>> Maybe, (just maybe), it is possible to do PMU context switch at vcpu
+>>> boundary normally, but doing it at VM Enter/Exit boundary when host is
+>>> profiling KVM kernel module. So, dynamically adjusting PMU context
+>>> switch location could be an option.
+>> If there are two VMs with pmu enabled both, however host PMU is not
+>> enabled. PMU context switch should be done in vcpu thread sched-out path.
+>>
+>> If host pmu is used also, we can choose whether PMU switch should be
+>> done in vm exit path or vcpu thread sched-out path.
+>>
+> 
+> host PMU is always enabled, ie., Linux currently does not support KVM
+> PMU running standalone. I guess what you mean is there are no active
+> perf_events on the host side. Allowing a PMU context switch drifting
+> from vm-enter/exit boundary to vcpu loop boundary by checking host
+> side events might be a good option. We can keep the discussion, but I
+> won't propose that in v2.
+> 
+> I guess we are off topic. Sean's suggestion is that we should put
+> "perf" and "kvm" together while doing the context switch. I think this
+> is quite reasonable regardless of the PMU context switch location.
+> 
+> To execute this, I am thinking about adding a parameter or return
+> value to perf_guest_enter() so that once it returns back to KVM, KVM
+> gets to know which counters are active/inactive/cleared from the host
+> side. Knowing that, KVM can do the context switch more efficiently.
+yeap, that sounds great.
 
-Hmm, that seems like a KVM flaw.  KVM should advertise its supported GHCB p=
-rotocol
-to *userspace*, but userspace should control the actual information exposed=
- to
-the guest.
+Regards
+Bibo Mao
 
-Oof, and doesn't SNP support effectively *require* version 2?  I.e. shouldn=
-'t
-the KVM patch[*] that adds support for the AP reset MSR protocol bump the v=
-ersion?
-The GHCB spec very cleary states that that's v2+.
+> 
+> Thanks.
+> -Mingwei
+> 
 
-And what if userspace wants to advertise v2 to an SEV-ES guest?  KVM should=
-n't
-switch *all* SEV-ES guests to v2, without a way back.  And the GHCB spec cl=
-early
-states that some of the features are in scope for SEV-ES, e.g.
-
-  In addition to hypervisor feature advertisement, version 2 provides:
-
-  SEV-ES enhancements:
-     o GHCB Format Version 2:
-        =E2=96=AA The addition of the XSS MSR value (if supported) when CPU=
-ID 0xD is
-          requested.
-        =E2=96=AA The shared area specified in the GHCB SW_SCRATCH field mu=
-st reside in the
-          GHCB SharedBuffer area of the GHCB.
-     o MSR protocol support for AP reset hold.
-
-So I'm pretty sure KVM needs to let userspace set the initial value for
-MSR_AMD64_SEV_ES_GHCB.  I suppose we could do that indirectly, e.g. through=
- a
-capability.  Hrm, but even if userspace can set the initial value, KVM woul=
-d need
-to parse the min/max version so that KVM knows what *it* should support, wh=
-ich
-means that throwing in a GPA for selftests would screw things up.
-
-Blech.  Why do CPU folks insist on using ascending version numbers to bundl=
-e
-features?
-
-Anyways, back to selftests.  Since we apparently can't stuff MSR_AMD64_SEV_=
-ES_GHCB
-from host userspace, what if we instead use a trampoline?  Instead having
-vcpu_arch_set_entry_point() point directly at guest_code, point it at a tra=
-mpoline
-for SEV-ES guests, and then have the trampoline set MSR_AMD64_SEV_ES_GHCB t=
-o
-the vCPU-specific GHCB before invoking guest_code().
-
-Then we just need a register to stuff the GHCB into.  Ah, and the actual gu=
-est=20
-entry point.  GPRs are already part of selftest's "ABI", since they're set =
-by
-vcpu_args_set().  And this is all 64-bit only, so we can use r10+.
-
-Ugh, the complication is that the trampoline would need to save/restore RAX=
-, RCX,
-and RDX in order to preserve the values from vcpu_args_set(), but that's ju=
-st
-annoying, not hard.  And I think it'd be less painful overall than
-having to create a GHCB pool?
-
-In rough pseudo-asm, something like this?
-
-static void vcpu_sev_es_guest_trampoline(void)
-{
-	asm volatile(<save rax, rcx, rdx>
-		     "mov %%r15d, %%eax\n\t"
-		     "shr %%r15, $32\n\t"
-		     "mov %%r15d, %%eax\n\t"
-		     "mov $MSR_AMD64_SEV_ES_GHCB, %%ecx\n\t"
-		     <restore rax, rcx, rdx>
-		     "jmp %%r14")
-}
-
-[*] https://lore.kernel.org/all/20240421180122.1650812-3-michael.roth@amd.c=
-om
 
