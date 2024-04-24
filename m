@@ -1,114 +1,86 @@
-Return-Path: <kvm+bounces-15848-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15849-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACF528B10CA
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 19:19:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 002208B10DB
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 19:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 696F0286ACF
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 17:19:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16000B2AC72
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 17:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6174D16D9A5;
-	Wed, 24 Apr 2024 17:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D5816D4C3;
+	Wed, 24 Apr 2024 17:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PsCtRx8a"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VDJ1ZkhP";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6ivm7y17"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABBFB16D4CA;
-	Wed, 24 Apr 2024 17:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C35B815E7E9;
+	Wed, 24 Apr 2024 17:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713979147; cv=none; b=M+iyT5AAeA9j3LtBL9/Uq5isQrkJKW9A6ReUbJrJ/qPeGpXaNTGt8lESbr02vsScFVcbDYZ/AYte/4ai+AWW5YM1mphgKVXKd8TNrUJRJyLWQcj4ZeY6edZbbVDCOJvs0DKbaGcL7WvBl5xXJVnoC6Mh0hscQOFeSeovolLpsfw=
+	t=1713979308; cv=none; b=RKicyyrbbIai1k3toMXi26hMp8f1x/Iq++jodRf+ybFxuCtGXjIUHP1nMBiNR0Gdj1QU+C9kV/c8Yoz4XIJbMBIaEaPIEpJ4OTQhZ08SVUTPRiWq2ghYXiZh7ae7FiE7jOfgpYI1uxkOB0ZqSprftsxad5gzms+wXZ9SKVacY4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713979147; c=relaxed/simple;
-	bh=fzUP5jXS3/ennNTINiF3XeycfhJxeMlYoYeWebVYLrE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r5a4fP3jJK9hCxixgif+EoRnH5TXVDP1vN8c2pWbJ4d+ABDVEFUU/u9GUKzMQdVZ9kTHOEw/8Sp51TuHytdIQsUH6+J8vzYBMQhdtsSH1V+fR+8Cb3jDQE+2hPK7pTW7rEynjLX5HakiOm4c3F2X3i7iCVNj9zlbfsGAqFKx/nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PsCtRx8a; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 24 Apr 2024 10:18:57 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713979143;
+	s=arc-20240116; t=1713979308; c=relaxed/simple;
+	bh=yWhj0o+HpJVDI3YWH2WAC02pq8ek+737Xwj6ZX/cwIk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kUKQduk3TpCjY5x6zavPc+ypkmsFShAQXxnVa4JlmAT+xOk7dzb0z2d/BS0oogWUvz4AdL9SiA+FTLrPqJZwI8Abymwr2piNCA5TPY37RFtKY3dk81I9VO4cTPiBehzeXZ7jmZzWeURZ/pj7jX45oFpf5TX/QiqyOi7uF2srjN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VDJ1ZkhP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6ivm7y17; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1713979304;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MPnSCqBZNeTYi6Yq+K5T2lPK1pkupPn4Yzg+HFxV4RA=;
-	b=PsCtRx8aCSAoweOsm30ih69vNYVTRPodlMVcmiUBkctOGzu3pRGbw1sE5GGh7nsoNHVM5h
-	5QOF1Z7R8cBa1l8TH1edsuJdhO/kJb3MMCiOmD1nDIQZWbQLOr280pl0WKUUtvCtbe/b/D
-	kbfVKJFn8471rDFj+eFGUfHVrQqeYr8=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Andrew Jones <ajones@ventanamicro.com>,
-	Markus Elfring <Markus.Elfring@web.de>,
-	Kunwu Chan <chentao@kylinos.cn>, linux-kselftest@vger.kernel.org,
-	kvm@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Kunwu Chan <kunwu.chan@hotmail.com>,
-	Anup Patel <anup@brainfault.org>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] KVM: selftests: Add 'malloc' failure check in
- test_vmx_nested_state
-Message-ID: <Zik_Aat5JJtWk0AM@linux.dev>
-References: <20240423073952.2001989-1-chentao@kylinos.cn>
- <878bf83c-cd5b-48d0-8b4e-77223f1806dc@web.de>
- <ZifMAWn32tZBQHs0@google.com>
- <20240423-0db9024011213dcffe815c5c@orel>
- <ZigI48_cI7Twb9gD@google.com>
- <20240424-e31c64bda7872b0be52e4c16@orel>
- <ZikcgIhyRbz5APPZ@google.com>
+	bh=GxtJ8OShK36uXTc4XHgLpeP8rPXbYQataNV1BNHE+3U=;
+	b=VDJ1ZkhPCbolPa6U0BU7/iQfGsvWyWHQTFALWjSUIRFAhDjYdt7++U3sy1e2tzXlzTqd3h
+	xoHq0AOfcOrCOqp/hiVhnK8NKJpWezD7EgZzG/h7XxmrPt7gBFTsCKsZaLo3jmz1GU4u39
+	X+PEh0h41PyAlwVSnzYxICLEBTd0ltJXPSXm+SxoVLFw+d+8L7Oxqwim62lKY0/QGapWaz
+	gp94+cJts2jGJGEF5a83gL5fspWe732POGUBzc+IuXWv7O8AAiyEqZ0hsT9x0XSbnW1mjz
+	RT2bodwaKz29Po54qnuLdxqM8Y5NavCYY+m7O/kcTzmGaLasjF4Skv5mnPC8tg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1713979304;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GxtJ8OShK36uXTc4XHgLpeP8rPXbYQataNV1BNHE+3U=;
+	b=6ivm7y17CYzedN6WQ/3cjqsWR3bQhEbybD9eoP/9H813uVV+BZ5tdLljKX3+nrHf+8kSVq
+	1IDi4EGo59BBVpCw==
+To: Alex Williamson <alex.williamson@redhat.com>, Nipun Gupta
+ <nipun.gupta@amd.com>
+Cc: gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, maz@kernel.org, git@amd.com, harpreet.anand@amd.com,
+ pieter.jansen-van-vuuren@amd.com, nikhil.agarwal@amd.com,
+ michal.simek@amd.com, abhijit.gangurde@amd.com, srivatsa@csail.mit.edu
+Subject: Re: [PATCH v6 1/2] genirq/msi: add wrapper msi allocation API and
+ export msi functions
+In-Reply-To: <20240423150920.12fe4a3e.alex.williamson@redhat.com>
+References: <20240423111021.1686144-1-nipun.gupta@amd.com>
+ <20240423150920.12fe4a3e.alex.williamson@redhat.com>
+Date: Wed, 24 Apr 2024 19:21:23 +0200
+Message-ID: <87jzkmu164.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZikcgIhyRbz5APPZ@google.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-Hey,
+On Tue, Apr 23 2024 at 15:09, Alex Williamson wrote:
+> I see in https://lore.kernel.org/all/87edbyfj0d.ffs@tglx/ that Thomas
+> also suggested a new subject:
+>
+>     genirq/msi: Add MSI allocation helper and export MSI functions
+>
+> I'll address both of these on commit if there are no objections or
+> further comments.  Patch 2/ looks ok to me now as well.  Thanks,
 
-On Wed, Apr 24, 2024 at 07:51:44AM -0700, Sean Christopherson wrote:
-> On Wed, Apr 24, 2024, Andrew Jones wrote:
-> > On Tue, Apr 23, 2024 at 12:15:47PM -0700, Sean Christopherson wrote:
-> > ...
-> > > I almost wonder if we should just pick a prefix that's less obviously connected
-> > > to KVM and/or selftests, but unique and short.
-> > >
-> > 
-> > How about kvmsft_ ? It's based on the ksft_ prefix of kselftest.h. Maybe
-> > it's too close to ksft though and would be confusing when using both in
-> > the same test?
-> 
-> I would prefer something short, and for whatever reason I have a mental block
-> with ksft.  I always read it as "k soft", which is completely nonsensical :-)
-
-I despise brevity in tests, so my strong preference is to use some form
-of 'namespaced' helper. Perhaps others have better memory than
-I do, but I'm quick to forget the selftests library and find the more
-verbose / obvious function names helpful for jogging my memory.
-
-> > I'm not a huge fan of capital letters, but we could also do something like
-> > MALLOC()/CALLOC().
-> 
-> Hmm, I'm not usually a fan either, but that could actually work quite well in this
-> case.  It would be quite intuitive, easy to visually parse whereas tmalloc() vs
-> malloc() kinda looks like a typo, and would more clearly communicate that they're
-> macros.
-
-Ooo, don't leave me out on the bikeshedding! How about TEST_MALLOC() /
-TEST_CALLOC(). It is vaguely similar to TEST_ASSERT(), which I'd hope
-would give the impression that an assertion is lurking below.
-
--- 
-Thanks,
-Oliver
+No objections from my side.
 
