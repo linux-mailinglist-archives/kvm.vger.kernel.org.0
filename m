@@ -1,159 +1,110 @@
-Return-Path: <kvm+bounces-15853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 680408B1150
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 19:40:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B728B11B1
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 20:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47BDEB254C5
-	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 17:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D612D2872D0
+	for <lists+kvm@lfdr.de>; Wed, 24 Apr 2024 18:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F66216D304;
-	Wed, 24 Apr 2024 17:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3FC16D9B9;
+	Wed, 24 Apr 2024 18:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KSR/cdr+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TVwzs5d3"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE0216D4F1
-	for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 17:40:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32EE16D9A3;
+	Wed, 24 Apr 2024 18:06:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713980417; cv=none; b=X8KhOHewpFesH5JqQ7H85tiDWMn7vnJGSP5Z+/eT9jvuDASz5d/PYVCNGMjRz7zZ3p18gntWAcBP5y6OpFRerJCfK/m4l5O/rdg0pSs/Hg9DELJi3Fyd4WlJO6gA80JgdAd07Vs4sdCchE+4s1x/xqNO9gm7eptcAjpu/KdUcD4=
+	t=1713982005; cv=none; b=DPkTcDqWc+PR4nLPEfM0kDNN3yGpIouKxHw9w/BJKFy3RWTG9e39svdeGU+A8pkYDbXfUwGg9ox//f50OV7tnboI6IPmh8HlD6sny10XwUwUriL/7GmtR9SjpMl87pudvjv3CUGFgqP8iKMD0j9rO0/XZsw0iem7Ky2wDlYNUfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713980417; c=relaxed/simple;
-	bh=XgLH8kWSTkA+WtHqtY6ncvyiTFlCFYIhHap1Lps/lNc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H7/Du3/Xk3gU90G3gXcRZ/oBOGZ4YQLVnrGaYcBDjf9DYGgX6RjbF/tbeykjktDMXHZVX2J9cbdqR78oh3NSkB0n7omx30mx1SprooOT0Nh+2LcgU40PbyVBz79ELCcBLjwo/0ulCNm/Btvai1ZJEwI4NOVBwZBTRhbbZRr9X7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KSR/cdr+; arc=none smtp.client-ip=95.215.58.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713980413;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gtZdgbigg758bNTMCp0fzU9LG1Z3TPEX6lsyoV+Ixoc=;
-	b=KSR/cdr+knbDDYlRlbKFF6Yn6JrRsFW64+j+11vKJjdd1K10z3+EdnndG0tGUedJTo9hGy
-	mnquDDGuywYFrPAW53ONCzmbvenYfO1XQDbJHnIOEfrtBZPWHfZ+w/+09nTSuzzQpBRf0G
-	pwMzHSLbcQ28R6JqZZTtc955jKdhgM8=
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
+	s=arc-20240116; t=1713982005; c=relaxed/simple;
+	bh=VPxcY4sWWUZ8OJxHmMechdqb+xtnIvwGDGmQSOr6naU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LpgL3TIVvAvi3S6ncBNaYp9irKqUZ2gH47E2N6fhCmmGRIrx//l8m/sDIOJk2ygLnMzbQaVnud7L+Bti1Df64uZ3C0ebQP5sNPAA3PNy9281SO0lOyEOZ6NzBgs5eWRnxrczodiOBzx3yfZr2CiKgPZw/pOaap3ivoLJxAD+R9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TVwzs5d3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F024C113CD;
+	Wed, 24 Apr 2024 18:06:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713982005;
+	bh=VPxcY4sWWUZ8OJxHmMechdqb+xtnIvwGDGmQSOr6naU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TVwzs5d3vyxmCXrYocdQt2HmNQodz8zWkX7q1xtr+P5SeYAM2gFdhZGGyfsGguIRl
+	 TInubB8Xad3lkZneHIbkr0ghRbhHheO1vYEID6IqOr4DxefiktDs5oGV8Y5re0v11V
+	 EXu2k7xUC5cRFY3NB5R1Lrjhyxwjy9vspP8/z9Rpy9Lw6gAG36u9+kXfIfiJHjLGPB
+	 DSmeA4KzpabFXvB4pOAnvOw1y062Duqv0GnF1Jtft8gHDYkQBL9mOMCqhJ8TxnVJNx
+	 Y3MAZKWt3+qLutCPnu/Kua3Nmmo3bWAfCWzNCkPmapDmz7OSwPt+3qT+W2zcM+m6Zl
+	 0hG2sooqXnjuQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1rzh11-007dMp-21;
+	Wed, 24 Apr 2024 19:06:43 +0100
+Date: Wed, 24 Apr 2024 19:06:42 +0100
+Message-ID: <86h6fqr5xp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	kvm@vger.kernel.org,
 	Alexander Potapenko <glider@google.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 2/2] KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
-Date: Wed, 24 Apr 2024 17:39:59 +0000
-Message-ID: <20240424173959.3776798-3-oliver.upton@linux.dev>
+	Dmitry Vyukov <dvyukov@google.com>
+Subject: Re: [PATCH 0/2] KVM: arm64: Avoid NULL dereference in vgic-v2 device attr accessors
 In-Reply-To: <20240424173959.3776798-1-oliver.upton@linux.dev>
 References: <20240424173959.3776798-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, glider@google.com, dvyukov@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Assert that accesses to a non-existent vgic-v2 CPU interface
-consistently fail across the various KVM device attr ioctls. This also
-serves as a regression test for a bug wherein KVM hits a NULL
-dereference when the CPUID specified in the ioctl is invalid.
+On Wed, 24 Apr 2024 18:39:57 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Alex reports that it is possible to trigger a NULL dereference via the
+> vgic-v2 device attribute accessors, stemming from a lack of sanitization
+> of user input...
+> 
+> Here's a fix + regression test for the bug. Obviously, I intend to take
+> these as a fix ASAP.
+> 
+> Oliver Upton (2):
+>   KVM: arm64: vgic-v2: Check for non-NULL vCPU in vgic_v2_parse_attr()
+>   KVM: selftests: Add test for uaccesses to non-existent vgic-v2 CPUIF
+> 
+>  arch/arm64/kvm/vgic/vgic-kvm-device.c         |  8 +--
+>  .../testing/selftests/kvm/aarch64/vgic_init.c | 49 +++++++++++++++++++
+>  2 files changed, 53 insertions(+), 4 deletions(-)
+> 
+> 
+> base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
 
-Note that there is no need to print the observed errno, as TEST_ASSERT()
-will take care of it.
+Thanks Alex for the heads up!
 
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- .../testing/selftests/kvm/aarch64/vgic_init.c | 49 +++++++++++++++++++
- 1 file changed, 49 insertions(+)
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-index eef816b80993..ca917c71ff60 100644
---- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
-+++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
-@@ -84,6 +84,18 @@ static struct vm_gic vm_gic_create_with_vcpus(uint32_t gic_dev_type,
- 	return v;
- }
- 
-+static struct vm_gic vm_gic_create_barebones(uint32_t gic_dev_type)
-+{
-+	struct vm_gic v;
-+
-+	v.gic_dev_type = gic_dev_type;
-+	v.vm = vm_create_barebones();
-+	v.gic_fd = kvm_create_device(v.vm, gic_dev_type);
-+
-+	return v;
-+}
-+
-+
- static void vm_gic_destroy(struct vm_gic *v)
- {
- 	close(v->gic_fd);
-@@ -357,6 +369,40 @@ static void test_vcpus_then_vgic(uint32_t gic_dev_type)
- 	vm_gic_destroy(&v);
- }
- 
-+#define KVM_VGIC_V2_ATTR(offset, cpu) \
-+	(FIELD_PREP(KVM_DEV_ARM_VGIC_OFFSET_MASK, offset) | \
-+	 FIELD_PREP(KVM_DEV_ARM_VGIC_CPUID_MASK, cpu))
-+
-+#define GIC_CPU_CTRL	0x00
-+
-+static void test_v2_uaccess_cpuif_no_vcpus(void)
-+{
-+	struct vm_gic v;
-+	u64 val = 0;
-+	int ret;
-+
-+	v = vm_gic_create_barebones(KVM_DEV_TYPE_ARM_VGIC_V2);
-+	subtest_dist_rdist(&v);
-+
-+	ret = __kvm_has_device_attr(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CPU_REGS,
-+				    KVM_VGIC_V2_ATTR(GIC_CPU_CTRL, 0));
-+	TEST_ASSERT(ret && errno == EINVAL,
-+		    "accessed non-existent CPU interface, want errno: %i",
-+		    EINVAL);
-+	ret = __kvm_device_attr_get(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CPU_REGS,
-+				    KVM_VGIC_V2_ATTR(GIC_CPU_CTRL, 0), &val);
-+	TEST_ASSERT(ret && errno == EINVAL,
-+		    "accessed non-existent CPU interface, want errno: %i",
-+		    EINVAL);
-+	ret = __kvm_device_attr_set(v.gic_fd, KVM_DEV_ARM_VGIC_GRP_CPU_REGS,
-+				    KVM_VGIC_V2_ATTR(GIC_CPU_CTRL, 0), &val);
-+	TEST_ASSERT(ret && errno == EINVAL,
-+		    "accessed non-existent CPU interface, want errno: %i",
-+		    EINVAL);
-+
-+	vm_gic_destroy(&v);
-+}
-+
- static void test_v3_new_redist_regions(void)
- {
- 	struct kvm_vcpu *vcpus[NR_VCPUS];
-@@ -675,6 +721,9 @@ void run_tests(uint32_t gic_dev_type)
- 	test_vcpus_then_vgic(gic_dev_type);
- 	test_vgic_then_vcpus(gic_dev_type);
- 
-+	if (VGIC_DEV_IS_V2(gic_dev_type))
-+		test_v2_uaccess_cpuif_no_vcpus();
-+
- 	if (VGIC_DEV_IS_V3(gic_dev_type)) {
- 		test_v3_new_redist_regions();
- 		test_v3_typer_accesses();
+Please queue this at your earliest convenience.
+
+	M.
+
 -- 
-2.44.0.769.g3c40516874-goog
-
+Without deviation from the norm, progress is not possible.
 
