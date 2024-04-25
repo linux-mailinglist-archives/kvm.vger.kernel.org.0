@@ -1,262 +1,224 @@
-Return-Path: <kvm+bounces-15971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 231338B2A07
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 22:44:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A64AD8B2A0E
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 22:45:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FCC0B24D89
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 20:44:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7A91F24458
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 20:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C826714F9EE;
-	Thu, 25 Apr 2024 20:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E93A915573C;
+	Thu, 25 Apr 2024 20:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fDAKMudm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0r38qx1J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307CF153834;
-	Thu, 25 Apr 2024 20:43:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40A0153814
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 20:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714077826; cv=none; b=U0QtVxCfQap6iiy/HTonUDCE02cnCwhkBSrLh9oR2cusYQ/h1s2lUyY2JpCv9IvN0WakvkVN1JBHl2WOVkP3TClRuRcvu2hvF3Ebu84HmuSTwsf4zevlZkdOhBLDDLl/az5lQIzhsOeqaqyOLyf/juMUe9HGXiKjlcPxU4RL7jY=
+	t=1714077881; cv=none; b=lxcEEkeP8ObQrzHmuZrvZEFdSLeRRZ+lVy53PIjrC88oc9L71drwLnAgI3ewmzzG7Q3Fml7WSZYadeNOgVPvKLU3lAhgR1d/ME2mwzZ5GYGWjV1Qi4CkGNoZEPxKoMfk+6UJPwpTHdg8AeVxA1z9dlQ/SY/+q31yims14X0EcYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714077826; c=relaxed/simple;
-	bh=/Bry/LrWz5s3cSAoG/NRli3XyUXM2aR+pdRh6BaisJI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cgKIwssdIe+aI454K/EGysOjJcM8DE0QIrw0q7QgKn4rx1DwTMBxhu5Nda+UDBAbw3DSoI71b0zflqIiF2dZzqH2M7xtyGPk09G5/0v2POD6e+QtAdufYEh2i4uyXUsdnn7ZTMbLjdWTZIovCjVVgurA/QEfkCvseTvBu8FhCjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fDAKMudm; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714077824; x=1745613824;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/Bry/LrWz5s3cSAoG/NRli3XyUXM2aR+pdRh6BaisJI=;
-  b=fDAKMudml7s8S6cbiBZM3eQJ6rPz4KH+enecXg4i1ooepCevzeOjdkql
-   jGFXq78l6AbvHhNWSUXdrFEPyp6VG9uXwxGrcDeafs9dEL246heZjVX7Q
-   nVhcuvAVMCjD8jILYwxz00/yYk0CKnLRVuQD4Nid8xXrxM2Of7k74nhLI
-   Dq8ZNV94FCInvtqHOvu+KJhQ66nKKMQE1fPdtbgwBzNt0czRUMSP3UJ92
-   dwIyuMOnDqP1GhTCKdpTFEk7wXRgxk2otudArTTM3YBAJ+vYYUxGC0+CW
-   s+kUnWDIFY3jqkzm8NtXsS5fWy3Qliy0kef8UOEyg8iJkjaqUBhtpa/rs
-   g==;
-X-CSE-ConnectionGUID: +9cD1Oj7S/CzpudElRlSXA==
-X-CSE-MsgGUID: HdguReztRk+01jG1fIOD+g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="12732535"
-X-IronPort-AV: E=Sophos;i="6.07,230,1708416000"; 
-   d="scan'208";a="12732535"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 13:43:43 -0700
-X-CSE-ConnectionGUID: 7KgeubM6TomVXo4FwsgdrA==
-X-CSE-MsgGUID: HalkeOTpSIGqjCfc+OhXKQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,230,1708416000"; 
-   d="scan'208";a="25609924"
-Received: from linux.intel.com ([10.54.29.200])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 13:43:44 -0700
-Received: from [10.212.96.44] (kliang2-mobl1.ccr.corp.intel.com [10.212.96.44])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id 1266C206DFCE;
-	Thu, 25 Apr 2024 13:43:40 -0700 (PDT)
-Message-ID: <42acf1fc-1603-4ac5-8a09-edae2d85963d@linux.intel.com>
-Date: Thu, 25 Apr 2024 16:43:39 -0400
+	s=arc-20240116; t=1714077881; c=relaxed/simple;
+	bh=pNAc4xx6x/Pk8Z2YHbQgt41qHlf9rLihZxwdYu91K1A=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=OeKSQ1c4bz5ifg9equpO/e3DDQa4Y6TN9p+THc9Szb46dqOynAhY5wNbwlC+/pyym+84MUhM/69TOn5+296bW0e9i92G83U9EyDlrlZZ7yuSPd30tA508x0OkrPBbrcCnc9D34r11+9IKiG9zBqm+n3WiiRrgVCQd0Ez8t9g4JI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0r38qx1J; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso2752091276.0
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 13:44:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714077879; x=1714682679; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=7EPo+zEkHEFx1G3/t3IphIU996vlKHE8W7j3UdO+nD0=;
+        b=0r38qx1J4EOdXUJ9q7PK2v28aQImNptnjHeuac1bvRHl0J3juashU1Y4sWo1JpAtS1
+         349ydjgZiqFk6FsrZvocXrSdhqlcYiBbAru+FpBBwxxrE8emqz1cM7A8AGMb1Gca2gKg
+         GW2RUNtHG5XtsqCi/YO2+IyRK74qyU89a9gW7fLhidQ/tbWVR8rIRvDMK7V1Kuad31Af
+         spY7GHuqAZFhT6SLC+8xclF3fGd/rvoB8UHStNfS7J0irPuscRFseoaDkYDlmh70tAl8
+         b82Py3/R8hkgjf207I2AfhAblB9CtglfbTp+XOEOSR7UKi9uysais/NNyVWFy6nYLV+G
+         OYbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714077879; x=1714682679;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7EPo+zEkHEFx1G3/t3IphIU996vlKHE8W7j3UdO+nD0=;
+        b=mUG7mad7SMJN4XpezPoxKpu6KI7kiLRe0E6906hykyeYf+NAZHT1YhT8LR6UOYvMT4
+         OGeZd352qrmD9Ad9irlLnRWhlhktxZJhejHHDyM6tcsnO+l260jNe/cQWi0AJc0YKdpr
+         tPlhRtJ8fRrFR80HuLpAuV4YTK4zvus8mM1oDIW2NPoLWXLAVujqnjutWnaP/wRCOIxv
+         tR4rH6/Rzs4/T9x95ynq9liSMcuumhNzRAt6B02Z6QQBRtkowk0Uv/190pabwX41w3/x
+         0eIx3qrbP4gEv3VMh/Y/gZxz2//4nfLJVoevEXKixjR++ed7wE0BR8lanPsmrul733Qp
+         tYMQ==
+X-Gm-Message-State: AOJu0Ywbx/5blevRD6yqGaIli+407I+gvFWwCtBqPqa6MYZwKGSf5FTR
+	0TumuJ3py1mezsSKHaX1bgVRoewl2xjGxwkKVNz+qY8lJLG3H9rCZuAZDdSj8dWZFY6OD09h87G
+	IbSG5YeRaZXZBTQpkpf2wSg==
+X-Google-Smtp-Source: AGHT+IGAB6QOB7oBGzpObLQHA1ClHYJKANOvXwLDW//pW389wqrc02vbLvB6xtOYSun/X1gLD+tgNqvwAvZ/M4BCYw==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:10c3:b0:de5:c2b:389b with
+ SMTP id w3-20020a05690210c300b00de50c2b389bmr100094ybu.5.1714077878658; Thu,
+ 25 Apr 2024 13:44:38 -0700 (PDT)
+Date: Thu, 25 Apr 2024 20:44:37 +0000
+In-Reply-To: <ZibaBKCFMz-dJNM4@linux.dev> (message from Oliver Upton on Mon,
+ 22 Apr 2024 14:43:32 -0700)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
- state for Intel CPU
-To: Mingwei Zhang <mizhang@google.com>
-Cc: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>, maobibo <maobibo@loongson.cn>,
- Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
- peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
- jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
- irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
- chao.gao@intel.com
-References: <ZiaX3H3YfrVh50cs@google.com>
- <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
- <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com>
- <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
- <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com>
- <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
- <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
- <b3868bf5-4e16-3435-c807-f484821fccc6@loongson.cn>
- <CAL715W++maAt2Ujfvmu1pZKS4R5EmAPebTU_h9AB8aFbdLFrTQ@mail.gmail.com>
- <f843298c-db08-4fde-9887-13de18d960ac@linux.intel.com>
- <Zikeh2eGjwzDbytu@google.com>
- <7834a811-4764-42aa-8198-55c4556d947b@linux.intel.com>
- <CAL715WKh8VBJ-O50oqSnCqKPQo4Bor_aMnRZeS_TzJP3ja8-YQ@mail.gmail.com>
- <6af2da05-cb47-46f7-b129-08463bc9469b@linux.intel.com>
- <CAL715W+zeqKenPLP2Fm9u_BkGRKAk-mncsOxrg=EKs74qK5f1Q@mail.gmail.com>
-Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <CAL715W+zeqKenPLP2Fm9u_BkGRKAk-mncsOxrg=EKs74qK5f1Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Message-ID: <gsntedat9npm.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH v4] KVM: arm64: Add early_param to control WFx trapping
+From: Colton Lewis <coltonlewis@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvm@vger.kernel.org, corbet@lwn.net, maz@kernel.org, james.morse@arm.com, 
+	suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, 
+	will@kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
+Oliver Upton <oliver.upton@linux.dev> writes:
 
+> Hi Colton,
 
-On 2024-04-25 4:16 p.m., Mingwei Zhang wrote:
-> On Thu, Apr 25, 2024 at 9:13 AM Liang, Kan <kan.liang@linux.intel.com> wrote:
->>
->>
->>
->> On 2024-04-25 12:24 a.m., Mingwei Zhang wrote:
->>> On Wed, Apr 24, 2024 at 8:56 PM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
->>>>
->>>>
->>>> On 4/24/2024 11:00 PM, Sean Christopherson wrote:
->>>>> On Wed, Apr 24, 2024, Dapeng Mi wrote:
->>>>>> On 4/24/2024 1:02 AM, Mingwei Zhang wrote:
->>>>>>>>> Maybe, (just maybe), it is possible to do PMU context switch at vcpu
->>>>>>>>> boundary normally, but doing it at VM Enter/Exit boundary when host is
->>>>>>>>> profiling KVM kernel module. So, dynamically adjusting PMU context
->>>>>>>>> switch location could be an option.
->>>>>>>> If there are two VMs with pmu enabled both, however host PMU is not
->>>>>>>> enabled. PMU context switch should be done in vcpu thread sched-out path.
->>>>>>>>
->>>>>>>> If host pmu is used also, we can choose whether PMU switch should be
->>>>>>>> done in vm exit path or vcpu thread sched-out path.
->>>>>>>>
->>>>>>> host PMU is always enabled, ie., Linux currently does not support KVM
->>>>>>> PMU running standalone. I guess what you mean is there are no active
->>>>>>> perf_events on the host side. Allowing a PMU context switch drifting
->>>>>>> from vm-enter/exit boundary to vcpu loop boundary by checking host
->>>>>>> side events might be a good option. We can keep the discussion, but I
->>>>>>> won't propose that in v2.
->>>>>> I suspect if it's really doable to do this deferring. This still makes host
->>>>>> lose the most of capability to profile KVM. Per my understanding, most of
->>>>>> KVM overhead happens in the vcpu loop, exactly speaking in VM-exit handling.
->>>>>> We have no idea when host want to create perf event to profile KVM, it could
->>>>>> be at any time.
->>>>> No, the idea is that KVM will load host PMU state asap, but only when host PMU
->>>>> state actually needs to be loaded, i.e. only when there are relevant host events.
->>>>>
->>>>> If there are no host perf events, KVM keeps guest PMU state loaded for the entire
->>>>> KVM_RUN loop, i.e. provides optimal behavior for the guest.  But if a host perf
->>>>> events exists (or comes along), the KVM context switches PMU at VM-Enter/VM-Exit,
->>>>> i.e. lets the host profile almost all of KVM, at the cost of a degraded experience
->>>>> for the guest while host perf events are active.
->>>>
->>>> I see. So KVM needs to provide a callback which needs to be called in
->>>> the IPI handler. The KVM callback needs to be called to switch PMU state
->>>> before perf really enabling host event and touching PMU MSRs. And only
->>>> the perf event with exclude_guest attribute is allowed to create on
->>>> host. Thanks.
->>>
->>> Do we really need a KVM callback? I think that is one option.
->>>
->>> Immediately after VMEXIT, KVM will check whether there are "host perf
->>> events". If so, do the PMU context switch immediately. Otherwise, keep
->>> deferring the context switch to the end of vPMU loop.
->>>
->>> Detecting if there are "host perf events" would be interesting. The
->>> "host perf events" refer to the perf_events on the host that are
->>> active and assigned with HW counters and that are saved when context
->>> switching to the guest PMU. I think getting those events could be done
->>> by fetching the bitmaps in cpuc.
->>
->> The cpuc is ARCH specific structure. I don't think it can be get in the
->> generic code. You probably have to implement ARCH specific functions to
->> fetch the bitmaps. It probably won't worth it.
->>
->> You may check the pinned_groups and flexible_groups to understand if
->> there are host perf events which may be scheduled when VM-exit. But it
->> will not tell the idx of the counters which can only be got when the
->> host event is really scheduled.
->>
->>> I have to look into the details. But
->>> at the time of VMEXIT, kvm should already have that information, so it
->>> can immediately decide whether to do the PMU context switch or not.
->>>
->>> oh, but when the control is executing within the run loop, a
->>> host-level profiling starts, say 'perf record -a ...', it will
->>> generate an IPI to all CPUs. Maybe that's when we need a callback so
->>> the KVM guest PMU context gets preempted for the host-level profiling.
->>> Gah..
->>>
->>> hmm, not a fan of that. That means the host can poke the guest PMU
->>> context at any time and cause higher overhead. But I admit it is much
->>> better than the current approach.
->>>
->>> The only thing is that: any command like 'perf record/stat -a' shot in
->>> dark corners of the host can preempt guest PMUs of _all_ running VMs.
->>> So, to alleviate that, maybe a module parameter that disables this
->>> "preemption" is possible? This should fit scenarios where we don't
->>> want guest PMU to be preempted outside of the vCPU loop?
->>>
->>
->> It should not happen. For the current implementation, perf rejects all
->> the !exclude_guest system-wide event creation if a guest with the vPMU
->> is running.
->> However, it's possible to create an exclude_guest system-wide event at
->> any time. KVM cannot use the information from the VM-entry to decide if
->> there will be active perf events in the VM-exit.
-> 
-> Hmm, why not? If there is any exclude_guest system-wide event,
-> perf_guest_enter() can return something to tell KVM "hey, some active
-> host events are swapped out. they are originally in counter #2 and
-> #3". If so, at the time when perf_guest_enter() returns, KVM will ack
-> that and keep it in its pmu data structure.
+> On Mon, Apr 22, 2024 at 06:17:16PM +0000, Colton Lewis wrote:
+>> @@ -2653,6 +2653,27 @@
+>>   			[KVM,ARM] Allow use of GICv4 for direct injection of
+>>   			LPIs.
 
-I think it's possible that someone creates !exclude_guest event after
-the perf_guest_enter(). The stale information is saved in the KVM. Perf
-will schedule the event in the next perf_guest_exit(). KVM will not know it.
+>> +	kvm-arm.wfe_trap_policy=
+>> +			[KVM,ARM] Control when to set wfe instruction trap.
 
-> 
-> Now, when doing context switching back to host at just VMEXIT, KVM
-> will check this data and see if host perf context has something active
-> (of course, they are all exclude_guest events). If not, deferring the
-> context switch to vcpu boundary. Otherwise, do the proper PMU context
-> switching by respecting the occupied counter positions on the host
-> side, i.e., avoid doubling the work on the KVM side.
-> 
-> Kan, any suggestion on the above approach? 
+> nitpick: when referring to the instruction, please capitalize it.
 
-I think we can only know the accurate event list at perf_guest_exit().
-You may check the pinned_groups and flexible_groups, which tell if there
-are candidate events.
+> Also, it doesn't hurt to be verbose here and say this cmdline option
+> "Controls the WFE instruction trap behavior for KVM VMs"
 
-> Totally understand that
-> there might be some difficulty, since perf subsystem works in several
-> layers and obviously fetching low-level mapping is arch specific work.
-> If that is difficult, we can split the work in two phases: 1) phase
-> #1, just ask perf to tell kvm if there are active exclude_guest events
-> swapped out; 2) phase #2, ask perf to tell their (low-level) counter
-> indices.
->
+> I say this because there is a separate set of trap controls that allow
+> WFE or WFI to execute in EL0 (i.e. host userspace).
 
-If you want an accurate counter mask, the changes in the arch specific
-code is required. Two phases sound good to me.
+Will do.
 
-Besides perf changes, I think the KVM should also track which counters
-need to be saved/restored. The information can be get from the EventSel
-interception.
+>> +			trap: set wfe instruction trap
+>> +
+>> +			notrap: clear wfe instruction trap
+>> +
+>> +			default: set wfe instruction trap only if multiple
+>> +				 tasks are running on the CPU
 
-Thanks,
-Kan
->>
->> The perf_guest_exit() will reload the host state. It's impossible to
->> save the guest state after that. We may need a KVM callback. So perf can
->> tell KVM whether to save the guest state before perf reloads the host state.
->>
->> Thanks,
->> Kan
->>>>
->>>>
->>>>>
->>>>> My original sketch: https://lore.kernel.org/all/ZR3eNtP5IVAHeFNC@googlecom
->>>
-> 
+> I would strongly prefer we not make any default behavior user-visible.
+> The default KVM behavior can (and will) change in the future.
+
+> Only the absence of an explicit trap / notrap policy should fall back to
+> KVM's default heuristics.
+
+Makes sense to me. Will do.
+
+>> -static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+>> +static inline void vcpu_clear_wfe_trap(struct kvm_vcpu *vcpu)
+>>   {
+>>   	vcpu->arch.hcr_el2 &= ~HCR_TWE;
+>> +}
+>> +
+>> +static inline void vcpu_clear_wfi_trap(struct kvm_vcpu *vcpu)
+>> +{
+>>   	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
+>>   	    vcpu->kvm->arch.vgic.nassgireq)
+>>   		vcpu->arch.hcr_el2 &= ~HCR_TWI;
+>> @@ -119,12 +123,28 @@ static inline void vcpu_clear_wfx_traps(struct  
+>> kvm_vcpu *vcpu)
+>>   		vcpu->arch.hcr_el2 |= HCR_TWI;
+>>   }
+
+> This helper definitely does not do as it says on the tin. It ignores the
+> policy requested on the command line and conditionally *sets* TWI. If
+> the operator believes they know best and ask for a particular trap policy
+> KVM should uphold it unconditionally. Even if they've managed to shoot
+> themselves in the foot.
+
+Will do. I was only splitting up what the existing helper did here.
+
+>> @@ -423,6 +425,12 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+
+>>   }
+
+>> +static bool kvm_should_clear_wfx_trap(enum kvm_wfx_trap_policy p)
+>> +{
+>> +	return (p == KVM_WFX_NOTRAP && kvm_vgic_global_state.has_gicv4)
+>> +		|| (p == KVM_WFX_NOTRAP_SINGLE_TASK && single_task_running());
+>> +}
+
+> style nitpick: operators should always go on the preceding line for a
+> multi-line statement.
+
+Will do.
+
+>>   void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>>   {
+>>   	struct kvm_s2_mmu *mmu;
+>> @@ -456,10 +464,15 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int  
+>> cpu)
+>>   	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+>>   		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+
+>> -	if (single_task_running())
+>> -		vcpu_clear_wfx_traps(vcpu);
+>> +	if (kvm_should_clear_wfx_trap(kvm_wfi_trap_policy))
+>> +		vcpu_clear_wfi_trap(vcpu);
+>>   	else
+>> -		vcpu_set_wfx_traps(vcpu);
+>> +		vcpu_set_wfi_trap(vcpu);
+>> +
+>> +	if (kvm_should_clear_wfx_trap(kvm_wfe_trap_policy))
+>> +		vcpu_clear_wfe_trap(vcpu);
+>> +	else
+>> +		vcpu_set_wfe_trap(vcpu);
+
+>>   	if (vcpu_has_ptrauth(vcpu))
+>>   		vcpu_ptrauth_disable(vcpu);
+
+> I find all of the layering rather hard to follow; we don't need
+> accessors for doing simple bit manipulation.
+
+> Rough sketch:
+
+> static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
+> {
+> 	if (unlikely(kvm_wfi_trap != KVM_WFX_DEFAULT))
+> 		return kvm_wfi_trap == KVM_WFX_NOTRAP;
+
+> 	return single_task_running() &&
+> 	       (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
+> 	        vcpu->kvm->arch.vgic.nassgireq);
+> }
+
+> static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
+> {
+> 	if (unlikely(kvm_wfe_trap != KVM_WFX_DEFAULT))
+> 		return kvm_wfe_trap == KVM_WFX_NOTRAP;
+
+> 	return single_task_running();
+> }
+
+> static void kvm_vcpu_load_compute_hcr(struct kvm_vcpu *vcpu)
+> {
+> 	vcpu->arch.hcr_el2 |= HCR_TWE | HCR_TWI;
+
+> 	if (kvm_vcpu_should_clear_twe(vcpu))
+> 		vcpu->arch.hcr_el2 &= ~HCR_TWE;
+> 	if (kvm_vcpu_should_clear_twi(vcpu))
+> 		vcpu->arch.hcr_el2 &= ~HCR_TWI;
+> }
+
+Will do.
+
+> And if we really wanted to, the non-default trap configuration could be
+> moved to vcpu_reset_hcr() if we cared.
+
+Might as well.
 
