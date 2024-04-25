@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-15965-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3667D8B280A
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 20:17:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88E378B280E
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 20:17:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57C35B22302
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:17:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 294C91F21A20
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFF815665E;
-	Thu, 25 Apr 2024 18:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FD615699D;
+	Thu, 25 Apr 2024 18:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GUjHHqXX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f6jRa0OD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098B115575E
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 18:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CC215665B
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 18:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714068887; cv=none; b=SeE07NONWP6HR9axTrQPkkIRqZAg+e7uDt15Ts+8zvn6LC/d8slY9ybbbNNFNh+/9KWXsLPH6iiiCNJyFDZ0ZNbQXXr0WozDm+qzee878lW3FB9x+MUU2hnylM0grXza5NjoHlaOGskuV/BEF0XV6G/1mIeIOtYoebH8Y0t2dqk=
+	t=1714068889; cv=none; b=JsO4X7RNYutxhp8vcxBAqqdFufcrDj5sTQ/8YYxMgKfgSiK5syBSOH7r6Vc8xv48Rw/JMV99Xi768Ha6X2kCowkCZ+t12ZpdfgfQO9Nr/qXdLkBHgOvS8F0IQAE8+uMNeEnlnK6OBDH02EsAkwVW01IluZzJWG0nRzBCK2wUVqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714068887; c=relaxed/simple;
-	bh=247P5YIdaIT018imI0/FIsolw28zSgLr6OXAMGjYu4k=;
+	s=arc-20240116; t=1714068889; c=relaxed/simple;
+	bh=h3nH2RXwDRleABI7UvTpJNwiSjFJO/iubybYunLFYQY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iG9zELxCBJi3dqpTCLiOx14YF2Eay2veBIVoDIasJylXG6I5cT1uMwd97+kfxZZZHv/1IflJbChFxh/7kFH34M2igCV0Tv7EVpMBAOAQQvYkMtURdPE6MHAFUxNk8HgCRmwIuiAi00OORDkVMv82ZwPzVLTTuQmZ6v8sEHkVCLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GUjHHqXX; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=M5xB7pIkVNNr+fuOSDnv4X7FGFhvpshf35sf7lPZirrO7XiaRV55FXEXR/+9f9/NWY7/sFzkpiswKqIdAnVfccqGy7c2ueSWvIUvQ09vro67UXUmLnrWBo/BgIPJAL0+HpmHPlRzP8+3jiod9c10E0KXuVA5C/gt9W8Fgs97D0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f6jRa0OD; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5e4f312a995so1129386a12.2
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 11:14:45 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-618596c23b4so22241297b3.0
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 11:14:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714068885; x=1714673685; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714068887; x=1714673687; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=aNpP1eW5DP+TAfE/NjGLi9NUaYZsZjI/uTGRPzZPo4M=;
-        b=GUjHHqXX8gP+CwPGBOYzK9I7kFPOLFy8gUhL3rM4BtNb1lfCnrBlpJrtXf8OBq+Yvi
-         zXHtNofv/WBOwl+YHZMo8chv2MN1MNk8HyKm94WNmlPqXzg/Hf1hOF0wd+QUQeJrHKaA
-         ycKSohc0mAL5x8Srj8oTC4JYa3pXlA76W9gIdU4bZoRtKXLEPlh7oEYNKoYsl29j83Qj
-         T+WhOcOldOviG7QLjtjvIVPEq6zJ/mh0v5F5JLqSqVjwZcHLSeGsO0L6V3xDCpnzcD8p
-         c2rhKGOskRFAu1OFj7ORkG+tX1n19O+npMSNl3cejrl4JH2OFb9mqbt5x8Z/1mPG7a2/
-         aJ7g==
+        bh=7x2xDm7ORIVYu8+DJIH/haFx3NIITex91VRf9yc3OHU=;
+        b=f6jRa0ODT67ORWX27GVK/+mTZ31jdHbXp/6k3hpIfU/jHbO8lCsZAAGv8q6TDhrwnt
+         iGlQdIiqywZdu8dD5gZSdyqYjXuGKkJhCy5DuFfcf8ZCG3gNuSJpTz6a5SZGZIJUrLnB
+         XUHPvzcNBNIqNru0lO1hPsf02GKQrU7y9s4eXm7swjbYswE+UOp5jWWTtBkFRulndO7f
+         F5hQbSwxevLP4xxsPF3U1N35v9yyPGyHDL0IU5+3p2BZdthJ7ZDDTaH7MMkg6SgQ81Xf
+         9jqp3FZQo43e5Je8X6t32xRuPg1MSz9Qm/vgRi2EECB1PUJ/TzJA58TdDk0ONWNB2Scm
+         g8Lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714068885; x=1714673685;
+        d=1e100.net; s=20230601; t=1714068887; x=1714673687;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=aNpP1eW5DP+TAfE/NjGLi9NUaYZsZjI/uTGRPzZPo4M=;
-        b=L8f3qkj2sab9cBbnvtNQPyOyHXImrKvLFh+ctTpV83DpnuYS758cgH4vybt2cHYFyy
-         6qQHhwmPwgARxIeoOMtk8WLn/ro+gmSd3N8YPQ3CSwL+ixqayEPxU8mB4yJjoZB7FXI2
-         qzfXBE4dqAildHVg8hUwQzC2h8fhqCXdlUjgVKrgi4JWtSIKK1d1fNMaqyrPuOCoeZsc
-         ZXvvz+t1+bCfSH+GkLGzuaW0NNneeaEF7y5rw8U3+XcW4j4LhTAAL/ohNqV9qR7dfmJq
-         T/H5jNHGMdlHzB/e27t/fZmI4GsjYeXXIgV6Lv0x8leUHMVIzYY6LSiVNhmgyG8Wk9qU
-         Xmfw==
-X-Gm-Message-State: AOJu0YztmWmqTZbBoCDGIEEYE59tVNbc4c66mRd5HR2gZ9UKDzUYBcdD
-	COR+igrfbwU5XNQ6OdjqnyiiuO2390Kao8mV/VFAuicdsTpmCc7LQQ6QNX+5jJjRYgpWZCQMB3g
-	7zg==
-X-Google-Smtp-Source: AGHT+IF+pktbKA5ERhhI9ACh0DvxCWS2IxmYMfxElb+yYd48b/kvPmDGRCometGGY/kYmjTT7Oe1ih0b4Y0=
+        bh=7x2xDm7ORIVYu8+DJIH/haFx3NIITex91VRf9yc3OHU=;
+        b=HF3RxVphTeR2yAw1GYpqg94IpPL+rKkqsbTVLo4flNMBLS/8BFq6rwDA+BrLCR1ehN
+         m4R2FH6ILMxAuUJVcFZnirCtELW23e/FwZGMHgxdnRd859mnNhp934LTA1Gfy1pDXhle
+         gJYANealWfsK9EPFVjwejZqCRbUpVQ65/0ZP8gzYzJKPrRKD9KhOQhvEQhISmcVq1EK7
+         +SvqZfmysx5RL/y2PNODWozDrRExt2sLactJjddQiJVj9MbyK6PZ18+vMrr4XglAsyMs
+         XHnr4nONWk06CMkRrT7p9QzoM9cTYnFD4Jlq3BrKglPuyPVhqv6zrcOgFTgaUpEnJH+3
+         4xdQ==
+X-Gm-Message-State: AOJu0YxSWjODKhJa3O/fl2SWGNGVb348W3llFzBvaONdE6V3pi9FMA4N
+	F+ji8BQ6Q0q1UUIvzZ3v/dt8kxvO0uuNa/lfG8gPtk0YKkryKHHaLfy3jfHGMg3p/qdf40nY32M
+	RJQ==
+X-Google-Smtp-Source: AGHT+IHGxfcO/CIV3+AB7r4yk31j4bBnsDca+v9/E+BSPM3jBz9ZdrHoD7SFSvI0zaKSkrDLyCCPkzvrZLU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6556:0:b0:5dc:1b0a:48e1 with SMTP id
- a22-20020a656556000000b005dc1b0a48e1mr1095pgw.1.1714068885143; Thu, 25 Apr
- 2024 11:14:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:a106:0:b0:61a:d016:60ff with SMTP id
+ y6-20020a81a106000000b0061ad01660ffmr36102ywg.2.1714068887134; Thu, 25 Apr
+ 2024 11:14:47 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 25 Apr 2024 11:14:21 -0700
+Date: Thu, 25 Apr 2024 11:14:22 -0700
 In-Reply-To: <20240425181422.3250947-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,91 +75,64 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240425181422.3250947-1-seanjc@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240425181422.3250947-10-seanjc@google.com>
-Subject: [PATCH 09/10] KVM: x86: Suppress failures on userspace access to
- advertised, unsupported MSRs
+Message-ID: <20240425181422.3250947-11-seanjc@google.com>
+Subject: [PATCH 10/10] KVM: x86: Suppress userspace access failures on
+ unsupported, "emulated" MSRs
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Tom Lendacky <thomas.lendacky@amd.com>, Weijiang Yang <weijiang.yang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Extend KVM's suppression of failures due to a userspace access to an
-unsupported, but advertised as a "to save" MSR to all MSRs, not just those
-that happen to reach the default case statements in kvm_get_msr_common()
-and kvm_set_msr_common().  KVM's soon-to-be-established ABI is that if an
-MSR is advertised to userspace, then userspace is allowed to read the MSR,
-and write back the value that was read, i.e. why an MSR is unsupported
-doesn't change KVM's ABI.
+Extend KVM's suppression of userspace MSR access failures to MSRs that KVM
+reports as emulated, but are ultimately unsupported, e.g. if the VMX MSRs
+are emulated by KVM, but are unsupported given the vCPU model.
 
-Practically speaking, this is very nearly a nop, as the only other paths
-that return KVM_MSR_RET_UNSUPPORTED are {svm,vmx}_get_feature_msr(), and
-it's unlikely, though not impossible, that userspace is using KVM_GET_MSRS
-on unsupported MSRs.
-
-The primary goal of moving the suppression to common code is to allow
-returning KVM_MSR_RET_UNSUPPORTED as appropriate throughout KVM, without
-having to manually handle the "is userspace accessing an advertised"
-waiver.  I.e. this will allow formalizing KVM's ABI without incurring a
-high maintenance cost.
-
+Suggested-by: Weijiang Yang <weijiang.yang@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 27 +++++++++------------------
- 1 file changed, 9 insertions(+), 18 deletions(-)
+ arch/x86/kvm/x86.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 04a5ae853774..4c91189342ff 100644
+index 4c91189342ff..14cfa25ef0e7 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -527,6 +527,15 @@ static __always_inline int kvm_do_msr_access(struct kvm_vcpu *vcpu, u32 msr,
- 	if (ret != KVM_MSR_RET_UNSUPPORTED)
- 		return ret;
+@@ -491,7 +491,7 @@ static bool kvm_is_immutable_feature_msr(u32 msr)
+ 	return false;
+ }
  
-+	/*
-+	 * Userspace is allowed to read MSRs, and write '0' to MSRs, that KVM
-+	 * reports as to-be-saved, even if an MSR isn't fully supported.
-+	 * Simply check that @data is '0', which covers both the write '0' case
-+	 * and all reads (in which case @data is zeroed on failure; see above).
-+	 */
-+	if (host_initiated && !*data && kvm_is_msr_to_save(msr))
-+		return 0;
+-static bool kvm_is_msr_to_save(u32 msr_index)
++static bool kvm_is_advertised_msr(u32 msr_index)
+ {
+ 	unsigned int i;
+ 
+@@ -500,6 +500,11 @@ static bool kvm_is_msr_to_save(u32 msr_index)
+ 			return true;
+ 	}
+ 
++	for (i = 0; i < num_emulated_msrs; i++) {
++		if (emulated_msrs[i] == msr_index)
++			return true;
++	}
 +
+ 	return false;
+ }
+ 
+@@ -529,11 +534,11 @@ static __always_inline int kvm_do_msr_access(struct kvm_vcpu *vcpu, u32 msr,
+ 
+ 	/*
+ 	 * Userspace is allowed to read MSRs, and write '0' to MSRs, that KVM
+-	 * reports as to-be-saved, even if an MSR isn't fully supported.
++	 * advertises to userspace, even if an MSR isn't fully supported.
+ 	 * Simply check that @data is '0', which covers both the write '0' case
+ 	 * and all reads (in which case @data is zeroed on failure; see above).
+ 	 */
+-	if (host_initiated && !*data && kvm_is_msr_to_save(msr))
++	if (host_initiated && !*data && kvm_is_advertised_msr(msr))
+ 		return 0;
+ 
  	if (!ignore_msrs) {
- 		kvm_debug_ratelimited("unhandled %s: 0x%x data 0x%llx\n",
- 				      op, msr, *data);
-@@ -4163,14 +4172,6 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (kvm_pmu_is_valid_msr(vcpu, msr))
- 			return kvm_pmu_set_msr(vcpu, msr_info);
- 
--		/*
--		 * Userspace is allowed to write '0' to MSRs that KVM reports
--		 * as to-be-saved, even if an MSRs isn't fully supported.
--		 */
--		if (msr_info->host_initiated && !data &&
--		    kvm_is_msr_to_save(msr))
--			break;
--
- 		return KVM_MSR_RET_UNSUPPORTED;
- 	}
- 	return 0;
-@@ -4522,16 +4523,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
- 			return kvm_pmu_get_msr(vcpu, msr_info);
- 
--		/*
--		 * Userspace is allowed to read MSRs that KVM reports as
--		 * to-be-saved, even if an MSR isn't fully supported.
--		 */
--		if (msr_info->host_initiated &&
--		    kvm_is_msr_to_save(msr_info->index)) {
--			msr_info->data = 0;
--			break;
--		}
--
- 		return KVM_MSR_RET_UNSUPPORTED;
- 	}
- 	return 0;
 -- 
 2.44.0.769.g3c40516874-goog
 
