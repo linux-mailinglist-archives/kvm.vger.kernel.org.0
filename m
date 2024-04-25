@@ -1,198 +1,144 @@
-Return-Path: <kvm+bounces-15942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE308B2651
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:23:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99FF58B2660
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:26:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2035D28778C
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:23:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52C03282815
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4442F14E2CD;
-	Thu, 25 Apr 2024 16:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74E3C14D451;
+	Thu, 25 Apr 2024 16:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bTW2y76Y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j934Hiki"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDC014D6E9
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 16:22:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F4B814D29A
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 16:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714062151; cv=none; b=mDs3jOjxMmsYivexDXnB2ParqBnBVWaVCisKUE8x/HpYTB6NNG9GxMS3XqjyKkRmvLCc/q8vSbOQuiZIX8TuAtnLGX7AkCgofShCLOlXOgjbHOcWokH1L/KTIlv0Do6NSGplYV715NhN0Bj1Q+dFmHnAoDtFQ6nEJS+t/ueT9ug=
+	t=1714062362; cv=none; b=TXwcjVJKNNkAV1gbb0cZTocBYferVGtYLK0kdK03Sg5S9icqiE9BXVxHsZ06jyX3R4QqMRdcjqoL/MMXFEfXZerO9Vr3agvQ+a6tZyu86OrYviBg25G9dfZoC4gWr2bkGhstuiBTiYAe/zZdi+e1XgvrV1mv9VtOH2/X+RCt4gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714062151; c=relaxed/simple;
-	bh=MDAUkdPnGzKG6chVud66+86ptfSgJ9KB44HVfsQFna8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KaCbqEpv9fV95wCHvyqu3dxiR3sV6B/Ci+3BfNM28xIYz2KqZDfcJgMN22733n6mta2T0Z/WcgPAamix7EfyvNYRg0yuHGnqeo5YYxLwYEgf/KS1cWltOIarVK1mCqz/eiR2WsXLiS57CDdUyONfuVXSN6ZXCwR4IehSHoTmSo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bTW2y76Y; arc=none smtp.client-ip=209.85.166.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7d9c78d7f97so9337839f.3
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 09:22:28 -0700 (PDT)
+	s=arc-20240116; t=1714062362; c=relaxed/simple;
+	bh=Wrp02xIa5F+jofcD0a3nI2LJ5ugmaidOo1ZiG5tjSKQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YzJt+WNDeml/thZrmELP5MwAPkjRbXBeM+rdce2pvvIZeonQrVlXxX/JlZtVOKV/D/jyIG96ohmaGkfxwrFQ8dAH5fzytlrE0rJegyud5cWnjD78OfD8g/bRhCt04USTy36bNBLwvpBWOeNA0qC+QadAhhi23oNX7sAxlrCk9WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j934Hiki; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-ddaf2f115f2so1955767276.3
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 09:26:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1714062148; x=1714666948; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tZwpXS/k0DYed9wD5OBUEJ5ypdpSnZbheBH2rdFMtPA=;
-        b=bTW2y76YgHaHc6KB1MhvC43eovk1JFB7R42GEEGwApT83OWEkcKfjVabJ7hyn1Ynp4
-         qJ7pNAz8/i958EUH0F77Z/ph+LeZvTa6ubMMyFG1THOi28/zeaGWwtAPDfz1DiGvDTg8
-         23QFIGZ8H8MnIu9Q6nTps/dMHb/bierZgVkYE=
+        d=google.com; s=20230601; t=1714062360; x=1714667160; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EDuopDjXfunZvdvHof7XCisSrwKL98dOKzOYyljZ3x4=;
+        b=j934HikiskWI9FzAuCV0l4fRFCKeEc8A44gBigsUOWIZBXl8drAZZ1jdnQhLX6GWMH
+         xI74oB1ConEdZp33R79AlkXf56kqVFZS7oJozQklwFosSMqMYLtiMJIQdWouxmHks4QN
+         LP2xf9pT/uD8ug6pg15BH9+RWQ2O9xI28VNHCetLqM1/MzsqORAuuoznA/T3HgJ3sITs
+         fHg9t6dOuiVfmzDiYvrhfKL0z1hoIBkghUkFY5SHX6Yp801eRvNxRNfls6Kusqjk7x62
+         64qb7p8dTLInqSJrNncX2cGGudC6TGv3i5zkQjMLnBMhV0ENCr12sI5eotAIZVfoKZL2
+         7IeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714062148; x=1714666948;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tZwpXS/k0DYed9wD5OBUEJ5ypdpSnZbheBH2rdFMtPA=;
-        b=YR9IUtbfKzS1lVi9JUNOFz61KstxIfjam/fepiq3e57fsmNHSZZkg/ob5JtwgP2iHa
-         1aCwSDGyb7d4ebGYvdehD8IihPuic4cwvibeIEWRKqsuqr72HmiphXf5/1UgzWrWo5v5
-         OKvS6Wru3FHpijGmTIEojFlv5Ka6o5G7yoiOi0SfnfsbKNV5WbGIi+lDpnVr0b1Ijedi
-         7cO/WBRXDmpgl8T9nFFRlJVUN5QZWZAJyXrvN4x9SaTU5sLG8te60/jRHkPumx1eaLdF
-         hebpF28SclMzx49r9F3+kMWEtkj5C4mkRrnalatAE93BeQtBu1EA/TGAklmbMMYlmy1s
-         /hyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUgcaOuGMnjAja4hiLYbgtTtqRdaJwngRRTq3Q1EWzG1frfNvg4nH/452HX17WFdrMzqBtRCtVdVqkW+ewav5/tbghL
-X-Gm-Message-State: AOJu0YziEhd70Aq2V0bgR7JNZitM/RAm0D5d5+E4Ng6UYH+0t6ks1Ado
-	Uw2VFinjkeiuCNdztekOhXzChq6Ndnk7QK3BbBchuMqM64Hq8ioiKinoWmSR9Rk=
-X-Google-Smtp-Source: AGHT+IFwsbdYoXOctiJAidygEpyjdbBI6reVPMMOFHtDCREzxeaCqAED6LqVik99m0cV8ef76M2rcQ==
-X-Received: by 2002:a6b:ea07:0:b0:7da:cdf3:7bec with SMTP id m7-20020a6bea07000000b007dacdf37becmr160971ioc.1.1714062147803;
-        Thu, 25 Apr 2024 09:22:27 -0700 (PDT)
-Received: from [192.168.43.82] ([223.185.79.208])
-        by smtp.gmail.com with ESMTPSA id m2-20020a638c02000000b005e857e39b10sm13196097pgd.56.2024.04.25.09.22.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Apr 2024 09:22:27 -0700 (PDT)
-Message-ID: <763ee03a-817d-4833-b42f-e5b4bd25dc7f@linuxfoundation.org>
-Date: Thu, 25 Apr 2024 10:22:11 -0600
+        d=1e100.net; s=20230601; t=1714062360; x=1714667160;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EDuopDjXfunZvdvHof7XCisSrwKL98dOKzOYyljZ3x4=;
+        b=ecGo8GZxk6GW72zS2MAf7/iVZQi+P2347hfCFUIdBEtTI4r2fDLvjJ6F1RzHEtb8b7
+         FkYBMuTgPSXv1JKveWhAAi29UfUO2NdWwyj9I40CsXHSUh/MMgYOUVqGDOZGxRTtkev3
+         IV7GmgJpMChu08a9b1noH9L+4S6YOzSUsmLiNqN/Yo4Y6MYSfbRWwKX8aQxqoMrdTxQe
+         nuiN0g6bGrtNpy6jsL/26Tc2Spf+zx+pEyak2FCbYKvcUKmv7DnjHk4L/4EINeY3lleC
+         C8yzPOOe/VBSV31N2va9DeQuDJOiV9dJeHWDEXU8LTaJfLtdOAoopqd3NYuNG0Grmeof
+         Vv4g==
+X-Forwarded-Encrypted: i=1; AJvYcCX4woDPu4pIyW2pEadOzulA89WSUthKchgsVHQxMKwU3ki9nU+WY2IqJ0KtWkX61sdguFx5LCbAgUBVFfm348u2wRZz
+X-Gm-Message-State: AOJu0YxVNMj/+Qu6eMaGwaaUOrfFIFmW+jwVs3nSgzEEa8V5YAANUCaf
+	XrYnH7xpxMyHfPQw0+/U3svht7Iy9nPStA2LN7RsVz1JVcGHR1Y0QtBsDeejtfNK9xgGf/KQSQN
+	9sQ==
+X-Google-Smtp-Source: AGHT+IEedOG1ITFc/zgbrJigM9ClcijuGO4cXZcDhUXtjDilAJ+Dx8WyZUgqdGJWoCWT3uPPGbY93RgXIEE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:8052:0:b0:de1:d49:7ff6 with SMTP id
+ a18-20020a258052000000b00de10d497ff6mr4364ybn.7.1714062360352; Thu, 25 Apr
+ 2024 09:26:00 -0700 (PDT)
+Date: Thu, 25 Apr 2024 09:25:58 -0700
+In-Reply-To: <Zik_Aat5JJtWk0AM@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to
- KVM_SET_USER_MEMORY_REGION2
-To: Sean Christopherson <seanjc@google.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, Shuah Khan <shuah@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Alexander Viro <viro@zeniv.linux.org.uk>,
- Christian Brauner <brauner@kernel.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
- Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>,
- Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
- Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>,
- Yu Zhang <yu.c.zhang@linux.intel.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
- =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
- Vishal Annapurve <vannapurve@google.com>,
- Ackerley Tng <ackerleytng@google.com>,
- Maciej Szmigiero <mail@maciej.szmigiero.name>,
- David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
- Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
- Liam Merwick <liam.merwick@oracle.com>,
- Isaku Yamahata <isaku.yamahata@gmail.com>,
- "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
- Naresh Kamboju <naresh.kamboju@linaro.org>,
- Anders Roxell <anders.roxell@linaro.org>,
- Benjamin Copeland <ben.copeland@linaro.org>,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20231027182217.3615211-1-seanjc@google.com>
- <20231027182217.3615211-26-seanjc@google.com>
- <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain>
- <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
- <ZipyPYR8Nv_usoU4@google.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <ZipyPYR8Nv_usoU4@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240423073952.2001989-1-chentao@kylinos.cn> <878bf83c-cd5b-48d0-8b4e-77223f1806dc@web.de>
+ <ZifMAWn32tZBQHs0@google.com> <20240423-0db9024011213dcffe815c5c@orel>
+ <ZigI48_cI7Twb9gD@google.com> <20240424-e31c64bda7872b0be52e4c16@orel>
+ <ZikcgIhyRbz5APPZ@google.com> <Zik_Aat5JJtWk0AM@linux.dev>
+Message-ID: <ZiqEFqomGLmDR7dg@google.com>
+Subject: Re: [PATCH] KVM: selftests: Add 'malloc' failure check in test_vmx_nested_state
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Andrew Jones <ajones@ventanamicro.com>, Markus Elfring <Markus.Elfring@web.de>, 
+	Kunwu Chan <chentao@kylinos.cn>, linux-kselftest@vger.kernel.org, kvm@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Kunwu Chan <kunwu.chan@hotmail.com>, Anup Patel <anup@brainfault.org>, 
+	Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 4/25/24 09:09, Sean Christopherson wrote:
-> On Thu, Apr 25, 2024, Shuah Khan wrote:
->> On 4/25/24 08:12, Dan Carpenter wrote:
->>> On Fri, Oct 27, 2023 at 11:22:07AM -0700, Sean Christopherson wrote:
->>>> Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so that
->>>> support for guest private memory can be added without needing an entirely
->>>> separate set of helpers.
->>>>
->>>> Note, this obviously makes selftests backwards-incompatible with older KVM
->>>     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>>> versions from this point forward.
->>>     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>>
->>> Is there a way we could disable the tests on older kernels instead of
->>> making them fail?  Check uname or something?  There is probably a
->>> standard way to do this...  It's these tests which fail.
->>
->> They shouldn't fail - the tests should be skipped on older kernels.
+On Wed, Apr 24, 2024, Oliver Upton wrote:
+> Hey,
 > 
-> Ah, that makes sense.  Except for a few outliers that aren't all that interesting,
-> all KVM selftests create memslots, so I'm tempted to just make it a hard requirement
-> to spare us headache, e.g.
+> On Wed, Apr 24, 2024 at 07:51:44AM -0700, Sean Christopherson wrote:
+> > On Wed, Apr 24, 2024, Andrew Jones wrote:
+> > > On Tue, Apr 23, 2024 at 12:15:47PM -0700, Sean Christopherson wrote:
+> > > ...
+> > > > I almost wonder if we should just pick a prefix that's less obviously connected
+> > > > to KVM and/or selftests, but unique and short.
+> > > >
+> > > 
+> > > How about kvmsft_ ? It's based on the ksft_ prefix of kselftest.h. Maybe
+> > > it's too close to ksft though and would be confusing when using both in
+> > > the same test?
+> > 
+> > I would prefer something short, and for whatever reason I have a mental block
+> > with ksft.  I always read it as "k soft", which is completely nonsensical :-)
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index b2262b5fad9e..4b2038b1f11f 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -2306,6 +2306,9 @@ void __attribute((constructor)) kvm_selftest_init(void)
->          /* Tell stdout not to buffer its content. */
->          setbuf(stdout, NULL);
->   
-> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
-> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
-> +
->          kvm_selftest_arch_init();
->   }
-> 
-> --
-> 
-> but it's also easy enough to be more precise and skip only those that actually
-> create memslots.
+> I despise brevity in tests, so my strong preference is to use some form
+> of 'namespaced' helper. Perhaps others have better memory than
+> I do, but I'm quick to forget the selftests library and find the more
+> verbose / obvious function names helpful for jogging my memory.
 
-This is approach is what is recommended in kselfest document. Rubn as many tests
-as possible and skip the ones that can't be run due to unmet dependencies.
+Hmm, I generally agree, but in this case I think there's value in having the
+names *not* stand out, because they really are uninteresting and would ideally
+blend in.  I can't envision a scenario where we don't want to assert on an OOM,
+i.e. there should never be a need to use a raw malloc(), and so I don't see much
+value in making it obvious that the call sites are doing something special.
 
+> > > I'm not a huge fan of capital letters, but we could also do something like
+> > > MALLOC()/CALLOC().
+> > 
+> > Hmm, I'm not usually a fan either, but that could actually work quite well in this
+> > case.  It would be quite intuitive, easy to visually parse whereas tmalloc() vs
+> > malloc() kinda looks like a typo, and would more clearly communicate that they're
+> > macros.
 > 
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index b2262b5fad9e..b21152adf448 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -944,6 +944,9 @@ int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flag
->                  .guest_memfd_offset = guest_memfd_offset,
->          };
->   
-> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
-> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
-> +
->          return ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION2, &region);
->   }
->   
-> @@ -970,6 +973,9 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
->          size_t mem_size = npages * vm->page_size;
->          size_t alignment;
->   
-> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
-> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
-> +
->          TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages,
->                  "Number of guest pages is not compatible with the host. "
->                  "Try npages=%d", vm_adjust_num_guest_pages(vm->mode, npages));
-> --
+> Ooo, don't leave me out on the bikeshedding! How about TEST_MALLOC() /
+> TEST_CALLOC(). It is vaguely similar to TEST_ASSERT(), which I'd hope
+> would give the impression that an assertion is lurking below.
 
-thanks,
--- Shuah
+Yeah, but it could also give the false impression that the macro does something
+fancier, e.g. this makes me want to peek at TEST_MALLOC() to see what it's doing
+
+	cpuid = TEST_MALLOC(kvm_cpuid2_size(nr_entries));
+
+whereas this isn't quite enough to pique my curiosity.
+
+	cpuid = MALLOC(kvm_cpuid2_size(nr_entries));
+
+So I have a slight preference for just MALLOC()/CALLOC(), but I'm also ok with a
+TEST_ prefix, my brain can adapt.  One of those two flavors has my vote.
 
