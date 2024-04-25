@@ -1,193 +1,176 @@
-Return-Path: <kvm+bounces-15952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD978B26EC
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:56:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CA758B26FA
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:59:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F4241C21F5F
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:56:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFD801C20D3F
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BB414D710;
-	Thu, 25 Apr 2024 16:56:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C2914D6E5;
+	Thu, 25 Apr 2024 16:59:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FvekvzNY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3llwT5X9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE7714D439;
-	Thu, 25 Apr 2024 16:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD7E131746
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 16:59:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714064179; cv=none; b=bjBj3vtsbqZkycS2R6AiME5U9eYrWDGIt/Lg7DOFHxymxzinHLXi6SoOgt465LA6KbJ8yn4hd/ctb6WlDqse6SyYnN6/h2bK0WuL8w9nY8xqNxgXk35lbFi0o3dUMyJ4vsMoizqEv4/krqsvRZvTwXgp17NjU77c9eg8s3GuYWo=
+	t=1714064356; cv=none; b=jtdHcQqk7WpfSzqkjJIKc0SRZC6LfvNuZB5Nkj/NYie9x6bNupUAMHKUyDR4bFDMNDC+/zoJJlml94WaGnss9e7iVT2wMxqip5oK4MADQd7rJto+F2L33//rvfEhvn8kMNUyqqRB1T80QSrH/Z6VpEZRwzM6rAtAoPBj9pwunAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714064179; c=relaxed/simple;
-	bh=aQopQx6OxXFwMj0TdW4oGFIjbPRA8+TCpMM18HBNXxw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UW+kjVbUzwg5/uc1Lo3vwTxW0qf8oWWc1oKCPTz6bLR7lYpAsJtxOqBYiPhASOMYCqYwv7TBrV7arrw9hCC15wzewngSQ4r1FRVRAB0OB6rmgfJGB4yOsJA1ZAyb4hoONGNxftHeaDierDrfSa+fLw3+OrV4p0WV6GszzHQWEmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FvekvzNY; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43PGgvWm030332;
-	Thu, 25 Apr 2024 16:56:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=Y8BJn3oGmuQTUDxwDR4DcRIKWQiKOWhEiZWZAO/4kmY=;
- b=FvekvzNYXxN+t3plpM6/z9COy07RNhLez6Rg7I5JJd7rlJNS+WOMBqKUvle+gpBg//CP
- SJQy/XUTlwljuAS20cGfYZCGBLNvh3SeWW5X3JeSCp46W+oQguoVC1zLgr991OoRs6f7
- pdWwS6OvT0hv6FpdmMIqh8wPV4AfFkj55gK7Wd8fPlvNFJyTRnK580lZKXT+CEF8FO/j
- gpzhi1peGnYScZAqtD8my7w7ZAYwlDFxAX0cR3bEKK5MXQJiEaCCUU00rWLqTublz1dc
- im6pQg+U008r14CCQACO45hYDWxsZ3Rdrm4SShTF7/lxScD0NkLEy+P4phemBpc9xphD wg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xqtxf01g8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 16:56:14 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43PGuDEa021044;
-	Thu, 25 Apr 2024 16:56:13 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xqtxf01g3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 16:56:13 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43PGAcbf015302;
-	Thu, 25 Apr 2024 16:56:13 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xmshmjq6p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Apr 2024 16:56:12 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43PGu7I450201004
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 25 Apr 2024 16:56:09 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 536002004D;
-	Thu, 25 Apr 2024 16:56:07 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2F5AC20065;
-	Thu, 25 Apr 2024 16:56:07 +0000 (GMT)
-Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.152.212.201])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 25 Apr 2024 16:56:07 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Julian Ruess <julianr@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH v3 3/3] vfio/pci: Continue to refactor vfio_pci_core_do_io_rw
-Date: Thu, 25 Apr 2024 18:56:04 +0200
-Message-ID: <20240425165604.899447-4-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240425165604.899447-1-gbayer@linux.ibm.com>
-References: <20240425165604.899447-1-gbayer@linux.ibm.com>
+	s=arc-20240116; t=1714064356; c=relaxed/simple;
+	bh=k9YshUQgCbTLWcIZ9NTqZp6bDZiJRu6BIqHMSvdfKn8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=jf3+iGgwZQjCGTpBY9+caeK8uGfj3Yul4IEo5kmhHvnACyF6ZbDIY6gtItdrfuaploZURtUpD5m3aP0mBKtQZIsKPaOTC1ULpbOTdLbbbbB11v0cyMxr1jePi0pjYDIq6BBGKXz1Q42+d5Js4039i+H/eKRb2j04jUQrncrLj0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3llwT5X9; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de54be7066bso2252969276.0
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 09:59:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714064354; x=1714669154; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1hXeo96+/vb09V/VI5ziQ0e9n0cZLQ/jDx95y8eWPXw=;
+        b=3llwT5X9I+b1AaO5pq4EkTyLD6VrqUUG7olGzQv2wMkxL5+AtK8napDfLXzfIov8Iu
+         vjv8S9P9yxvqVd/BIG2VYUOd4Ahp3+xfj5SCzpy3w3xwUjapFD5u8RdXu24/55yIRWB/
+         pxaaF3bcUwUXFN1ZqC/reHTMdSmx2jDq5XunD2K0yMenTcSJJpBOOPbpI5PPyngCR7wT
+         HzSZCLMiomytW3c9VazqGHQSxE76gU/mTe8rJVnLYMiVopFbLnuUFXhtVAlfjBpbwB2m
+         eJdxSvEpJ6i9Beoy5dIPBMtUye8yibJP7AyrHDL5DZzeMzU8afLOM5o6RH3Jf0hfrIIg
+         ZBOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714064354; x=1714669154;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1hXeo96+/vb09V/VI5ziQ0e9n0cZLQ/jDx95y8eWPXw=;
+        b=bfc0djTYedgFbTENERv9sgnuK8hWkPrIQpm00l7Zlv+sNmy+akWxxzfgegcfkl50UW
+         3aVOrDLoKNaGX3oP1CHPVN1BLbahexKMAssqhybhhE18TYfDAPZ73AZX72qJNH/g96oz
+         6cd1cYK8mHvvkX0+kx2b7WTs5WrQg5AQ5OTchQdYeGkgCLWdhobje6UKgP9ExKKlxkOL
+         r2lldMQaMzbrIDlWM7Yz2qa5ce7cQTt+h6XAxePFaZhOpAW0SeZbFUfPhHkenKx8UeYJ
+         KOBHaNnnIBDeeihId034ZB1oDW8OvI7WwJsK3bMpX25XWZBwT0GvLCr/5DTfMe/Tz+SN
+         Kbcw==
+X-Forwarded-Encrypted: i=1; AJvYcCXzvUEojUqhww9GmXh53/U2TzuvrcaqI8rOJCm/bWoXEx9i1Iz7bSLxqAqEXKkQVN0MgKdNKCIDxrjVVOjx2SiXsmcr
+X-Gm-Message-State: AOJu0Yyput2/50vyyciBOm9K3/EAiZcc63U/514gmULlhyzoRReURTmX
+	MKdtOof0pU4vjsErmIMfyJR8ZgVU+ZtDIdNHSHewcwsAMB2M4H2/Ax39ipHuLTaFxU5QJOjGH7a
+	F6Q==
+X-Google-Smtp-Source: AGHT+IHSzYLKg5XZ9oMM7Ds74tfJOzPyZMvU7nuQbF+0tX6pcWmAiKJDRJ/DGHMVDRbZA5M2Z3a9vozg/zs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:6884:0:b0:dcc:6065:2b3d with SMTP id
+ d126-20020a256884000000b00dcc60652b3dmr41398ybc.8.1714064354095; Thu, 25 Apr
+ 2024 09:59:14 -0700 (PDT)
+Date: Thu, 25 Apr 2024 09:59:12 -0700
+In-Reply-To: <bd6a294eaa0e39c2c5749657e0d98f07320b9159.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4Z--wod7-PxpjBnLTQGw51X6rFLyhLvl
-X-Proofpoint-ORIG-GUID: s8Lq3pCM98slF7tCqobbZAcagwL264wl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-25_16,2024-04-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 adultscore=0 clxscore=1015 mlxscore=0 impostorscore=0
- malwarescore=0 suspectscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=830 spamscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2404010000 definitions=main-2404250123
+Mime-Version: 1.0
+References: <f9f1da5dc94ad6b776490008dceee5963b451cda.camel@intel.com>
+ <baec691c-cb3f-4b0b-96d2-cbbe82276ccb@intel.com> <bd6a294eaa0e39c2c5749657e0d98f07320b9159.camel@intel.com>
+Message-ID: <ZiqL4G-d8fk0Rb-c@google.com>
+Subject: Re: [RFC] TDX module configurability of 0x80000008
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Convert if-elseif-chain into switch-case.
-Separate out and generalize the code from the if-clauses so the result
-can be used in the switch statement.
+On Thu, Apr 25, 2024, Rick P Edgecombe wrote:
+> On Thu, 2024-04-25 at 23:09 +0800, Xiaoyao Li wrote:
+> > > The idea is that TDX module could add the capability to configure the=
+se
+> > > bits as well, so that TDs could match normal VMs for cases where ther=
+e is
+> > > a desire for the guests MAXPA to be smaller than the hosts. The
+> > > requirements would be,
+> > > roughly:
+> > > =C2=A0=C2=A0 - The VMM specifies the=E2=80=AF0x80000008.EAX[23:16] wh=
+en creating a TD.
+> > > =C2=A0=C2=A0 - The TDX module does sanity checking.=E2=80=AF
+> > > =C2=A0=C2=A0 - The 0x80000008.EAX[23:16] field is used to communicate=
+ the max
+> > > addressable
+> > > =C2=A0=C2=A0 GPA to=E2=80=AF the guest. It will be used by the guest =
+firmware to make sure
+> > > =C2=A0=C2=A0 resources like PCI bars are mapped into the addressable =
+GPA.
+> > > =C2=A0=C2=A0 - If the guest attempts to access memory beyond the max =
+addressable GPA,
+> > > then
+> > > =C2=A0=C2=A0 the TDX module generates EPT violation to the VMM. For t=
+he VMM, this case
+> > > =C2=A0=C2=A0 means that the guest attempted to access "invalid" (I/O)=
+ memory.
+> > > =C2=A0=C2=A0 - The VMM will be expected to terminate the TD guest. Th=
+e VMM may send
+> > > =C2=A0=C2=A0 a notification, but the TDX module doesn't necessarily n=
+eed to know how.
+> >=20
+> > This is not the same as how it works for normal (non-TDX) VMs.
+> >=20
+> > For normal VMs, when userspace configures a smaller one than what=20
+> > hardware EPT/NPT supports, it doesn't cause any issue if guest accesses=
+=20
+> > GPA beyond [23:16] but within hardware EPT/NTP capability.
+> >=20
+> > It's more a hint to guest that KVM doesn't enforce the semantics of it.=
+=20
+> > However, for TDX case, you are proposing to make it a hard rule.
+>=20
+> If we limit ourselves to worrying about valid configurations,
 
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
- drivers/vfio/pci/vfio_pci_rdwr.c | 30 ++++++++++++++++++++++++------
- 1 file changed, 24 insertions(+), 6 deletions(-)
+Define "valid configurations". =20
 
-diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
-index 8ed06edaee23..634c00b03c71 100644
---- a/drivers/vfio/pci/vfio_pci_rdwr.c
-+++ b/drivers/vfio/pci/vfio_pci_rdwr.c
-@@ -131,6 +131,20 @@ VFIO_IORDWR(32)
- VFIO_IORDWR(64)
- #endif
- 
-+static int fill_size(size_t fillable, loff_t off)
-+{
-+	unsigned int fill_size;
-+#if defined(ioread64) && defined(iowrite64)
-+	for (fill_size = 8; fill_size >= 0; fill_size /= 2) {
-+#else
-+	for (fill_size = 4; fill_size >= 0; fill_size /= 2) {
-+#endif /* defined(ioread64) && defined(iowrite64) */
-+		if (fillable >= fill_size && !(off % fill_size))
-+			return fill_size;
-+	}
-+	return -1;
-+}
-+
- /*
-  * Read or write from an __iomem region (MMIO or I/O port) with an excluded
-  * range which is inaccessible.  The excluded range drops writes and fills
-@@ -155,34 +169,38 @@ ssize_t vfio_pci_core_do_io_rw(struct vfio_pci_core_device *vdev, bool test_mem,
- 		else
- 			fillable = 0;
- 
-+		switch (fill_size(fillable, off)) {
- #if defined(ioread64) && defined(iowrite64)
--		if (fillable >= 8 && !(off % 8)) {
-+		case 8:
- 			ret = vfio_pci_core_iordwr64(vdev, iswrite, test_mem,
- 						     io, buf, off, &filled);
- 			if (ret)
- 				return ret;
-+			break;
- 
--		} else
- #endif /* defined(ioread64) && defined(iowrite64) */
--		if (fillable >= 4 && !(off % 4)) {
-+		case 4:
- 			ret = vfio_pci_core_iordwr32(vdev, iswrite, test_mem,
- 						     io, buf, off, &filled);
- 			if (ret)
- 				return ret;
-+			break;
- 
--		} else if (fillable >= 2 && !(off % 2)) {
-+		case 2:
- 			ret = vfio_pci_core_iordwr16(vdev, iswrite, test_mem,
- 						     io, buf, off, &filled);
- 			if (ret)
- 				return ret;
-+			break;
- 
--		} else if (fillable) {
-+		case 1:
- 			ret = vfio_pci_core_iordwr8(vdev, iswrite, test_mem,
- 						    io, buf, off, &filled);
- 			if (ret)
- 				return ret;
-+			break;
- 
--		} else {
-+		default:
- 			/* Fill reads with -1, drop writes */
- 			filled = min(count, (size_t)(x_end - off));
- 			if (!iswrite) {
--- 
-2.44.0
+> accessing a GPA beyond [23:16] is similar to accessing a GPA with no mems=
+lot.
 
+No, it's not.  A GPA without a memslot has *very* well-defined semantics in=
+ KVM,
+and KVM can provide those semantics for all guest-legal GPAs regardless of
+hardware EPT/NPT support.
+
+> Like you say, [23:16] is a hint, so there is really no change from KVM's
+> perspective. It behaves like normal based on the [7:0] MAXPA.
+>=20
+> What do you think should happen in the case a TD accesses a GPA with no m=
+emslot?
+=20
+Synthesize a #VE into the guest.  The GPA isn't a violation of the "real" M=
+AXPHYADDR,
+so killing the guest isn't warranted.  And that also means the VMM could le=
+gitimately
+want to put emulated MMIO above the max addressable GPA.  Synthesizing a #V=
+E is
+also aligned with KVM's non-memslot behavior for TDX (configured to trigger=
+ #VE).
+
+And most importantly, as you note above, the VMM *can't* resolve the proble=
+m.  On
+the other hand, the guest *might* be able to resolve the issue, e.g. it cou=
+ld
+request MMIO, which may or may not succeed.  Even if the guest panics, that=
+'s
+far better than it being terminated by the host as it gives the guest a cha=
+nce
+to capture what led to the panic/crash.
+
+The only downside is that the VMM doesn't have a chance to "bless" the #VE,=
+ but
+since the VMM literally cannot handle the "bad" access in any other than ki=
+lling
+the guest, I don't see that as a major problem.
+
+> KVM/QEMU don't have a lot of options to recover. So are the differences h=
+ere
+> just the existing differences between normal VMs and TDX?
 
