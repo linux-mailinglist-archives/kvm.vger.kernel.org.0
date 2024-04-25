@@ -1,143 +1,164 @@
-Return-Path: <kvm+bounces-15925-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15926-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2CDC8B2392
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:10:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C543B8B239F
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:12:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB1C28B8D6
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 14:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BFC4282CFD
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 14:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBAA6149E0C;
-	Thu, 25 Apr 2024 14:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D99014A09A;
+	Thu, 25 Apr 2024 14:12:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uzpqxT4t"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qkxol9Yc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98493149E0E
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 14:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B05149DF6
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 14:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714054217; cv=none; b=A/MhebWxZy6GXfLpWnh9uoBbrZ7bEj1IYWXPKTZ2C5uROEv6zHiTHWMNet33C6TzyNI2e9SWlmVQZwNctb0KWkFdZQgoAlPmVsJqLNO6SKaPZloUcZmuR/660C1aVgBeJKS3PadxQNdHl7J0SN5zgWeu583FctsCRmdhhlwwF0o=
+	t=1714054359; cv=none; b=WhQe6f8MYgQ9B5KEJFCWbJQoeCn6cdRP91u6WhPB7fLc1CQemz1jD4dspwz25u27EDXS3vBTRbmpDCeuA/9aYEETPYkD0XdidhjVgJbvHD34xZpVBzpB3Tl+npvvpfqwUNxOjzhZYMdnYiIYaPKP0kRIIkOI1PScQZMwbZfRYHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714054217; c=relaxed/simple;
-	bh=BItV8R6H9q+R+pZ30mC6aRJAXYs4oMTWPeQORV5rSpA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CeZQpDQOo0GR17nFAjr09pGwdzpGFkbvygAI+6NrkMCYkjYxjMuGbc/t9lSmGUlYdlssCtpNNanYsQwWljDKc8ugniWGTuv67idG3HCuMNpDymsl0A1u6vOgCKfgw+wI1KW94Oi//cUvJ1xM2k8HWwQZ3WMJ7keQY52ts89Lsuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uzpqxT4t; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6183c4a6d18so18689987b3.3
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 07:10:15 -0700 (PDT)
+	s=arc-20240116; t=1714054359; c=relaxed/simple;
+	bh=OXlcNY8pu8S/MyjEy2GLENjCN5qdRSRqTym8qU2je0I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PAoZ6etRyOdKaRfOeFX3oIkxDHO6oo+ZwwJOpAd2UbgWr3CUm4yCS2U1UHxG0Jr9OvrqHpT8HSSYA9t69ij19B5tmpvKTpP2gKbhdU0+7PVyUKmCzgB5N66JOVQ4IJUW+JaE0c/eN0QHQg5AL4uM7Rj0mELSMRvDXIIx3mT3IkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qkxol9Yc; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2d895e2c6efso15255921fa.0
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 07:12:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714054214; x=1714659014; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ny6k5In1yh/dXdoAix2kKCvHY5SPtsFGuRUZpDcPe/0=;
-        b=uzpqxT4tJtpGc8OCKCA894g0fUkvcbHhG50Kz2J34kc4Pq8Rycd9yo1u3hc8r+p8iY
-         dhMrAoc1UcoXSZgnOGFvPBrqBwl/z2t/+4A5H2p27WioEcHIV9W9RG6ALzxwqBazrc2q
-         Ed0oQNQH80LFsDBriaWbYzXlwiKIoDWm5+JwuqZFMRZ4Jb+X6iJwGs2V1Lxf7B5Y63N4
-         0TMZS2LG+GXpcA5BGNqF7pErHgwuv2GYNky/FSTc70cKNHJUNhmUTnsHq9fMLre2gs+5
-         LLcCSysOsHuRi1pucIPMc7GBj6EM3zH84kXruHb4rRr9hPu2X6JDzYFChQ3UYBWGwVNy
-         PQWA==
+        d=linaro.org; s=google; t=1714054356; x=1714659156; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zgj3m/Cw0cxG7wHpYlRihQfjnwxhhxsXHcabhCA3Erw=;
+        b=qkxol9YcHy4N7TFJyEYLH7LFZlNrVSlQMe/1FAbMvE53CxVwyFKPhnJgjgr4SSRS62
+         ond/Iujmcy9zTgDJuDTZpPbK1wI6b0sTqyenMmvo+5VQ4nwOrLJUjv7myToPU52MULoN
+         d+Z4X6AS/W0n9EgbNifYU/HmsVElp/3mEdUdwHw6Qg4db0dEkr20kwe6LcO2VmUNy0MD
+         na+5YVJJChBvnTU7TQ7Hb0+aJtctizCnR0WoDgKG1cy7sG+Hu7u49n7rGCEhxtXqSZ8s
+         /+67fViRi42PttiDXYYEjgHFJwu4hNeTEkjtw82VzqxD2Pp6ZjFE0A5cVeQ7+OsBKMZP
+         xpAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714054214; x=1714659014;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ny6k5In1yh/dXdoAix2kKCvHY5SPtsFGuRUZpDcPe/0=;
-        b=mF9mUrGe6/Yw3RQVUip53kFtBbP/ssO6aOGVYVyFjji9q2Ck6DhMl5Vnv5JmED3TVP
-         4S0kOmdZHbcwnT+I8N3XwAnhCyDL+gbCVkSzXx27GelszlSz/1P41m16zssobagXqZxx
-         qO9xVFgMq3QiY2vA8OXhdvmtM6ks3JIOI6UWn8RRSv+NgZWa9PwrbyxWQKbVs0L9RKb9
-         A4ZWjVWSBa3gEN2CweAu80HZ0JKFnk/UNkA/FVzr+TXhVTc7DdajaPHFYumUucSq+MP1
-         r0Y4qktIiH8h8dVcw0Wmkjl/ToYi23Z5uXhQlPCD8FbgHrDZqj0GnMV1ZhtqF0wuCruy
-         4Y0w==
-X-Forwarded-Encrypted: i=1; AJvYcCWl6tOwwAJMVrHaulmGxFouTrXngZkNtSRU69ryu07hBAKzyWcLREmTJ8u7zSFMny/sRm0aXkr7x+wkw4mqmy0B88oE
-X-Gm-Message-State: AOJu0Yx2XfgMcEk4LCvCQvDyp+6zkY0LXQh+z8hjWZ0QtizE+/aiEwSu
-	k3d0b+5OmndG3B2T0Jecnk4QyqwdMTjp7JywwGpOKEEHLHn/pTKdqwZZGRdNQWYa2CSnL0Jaszy
-	IiA==
-X-Google-Smtp-Source: AGHT+IFL9wPrQFDopC/chIeNLVS3VPuSmUroG6L2BUybtR2TPtd/K09nmBBgvgCzzy630jRdsmnmqufyNAM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:bb4f:0:b0:614:428:e4f9 with SMTP id
- a15-20020a81bb4f000000b006140428e4f9mr1132555ywl.6.1714054214658; Thu, 25 Apr
- 2024 07:10:14 -0700 (PDT)
-Date: Thu, 25 Apr 2024 07:10:13 -0700
-In-Reply-To: <DS0PR11MB6373B95FF222DD6939CFEFC6DC172@DS0PR11MB6373.namprd11.prod.outlook.com>
+        d=1e100.net; s=20230601; t=1714054356; x=1714659156;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zgj3m/Cw0cxG7wHpYlRihQfjnwxhhxsXHcabhCA3Erw=;
+        b=evDf0UScq1HPhlCPyHeSF2qnK0D9mJTibGhN+1k4VZw4ORdyPPgdPcqoTlMdX7T+nv
+         G2TSGM5Thy7k9M2yFV4vdg8rJyDBC2VjTxPRj7VEeFoxC2mzOmSimmkPLZIOc1RcEwjx
+         JzXlyRrdwHJUboPnlDJJEFXC/p4Mm+aQCgaFlRZwDtg6aE92CHT6I/InHHiPCE3F4SKg
+         RR3oYwElinxcQmAUyGzSHQNJRHRqMNuCRLLqAfnteTebhS9h74H+tgGrOZDslmF2lxy4
+         RDzH3PyYbvdJjRMeEjTBrfvV+ZqXCqS/r/GftBowNK+dbIC2YoVBjJS6uNkVVno+PTA/
+         jgtA==
+X-Forwarded-Encrypted: i=1; AJvYcCXLnbDzugyqqdyfAN06wvs2fU6Dck9ojVy5aRu2PdVhtgt0+EM4682WTg+u25ntw9UN+APuvsrCxDbF/CWehgeFeulG
+X-Gm-Message-State: AOJu0YzaenlCNOxxLZHLI4G3cHbxHIlOu+1dgCWTJJRkHkCBUZ5BJuTA
+	O4XjFXV3vIvECzxNpJZ9lTAuwFra6Aoaty6q+FTA6avbqqc5RCJTGrjxOgfKrqQ=
+X-Google-Smtp-Source: AGHT+IG4h73e/VD0OiMdGC2ljHdBFoL8+iSdydmC9vOMTBe1nYjTZzgcSwjFqh+dbSJpqsAZN+aRMQ==
+X-Received: by 2002:a2e:818a:0:b0:2de:4b8d:ee31 with SMTP id e10-20020a2e818a000000b002de4b8dee31mr3860645ljg.37.1714054356205;
+        Thu, 25 Apr 2024 07:12:36 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id hg16-20020a05600c539000b0041aa8ad46d6sm10244618wmb.16.2024.04.25.07.12.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 07:12:35 -0700 (PDT)
+Date: Thu, 25 Apr 2024 17:12:31 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Chao Peng <chao.p.peng@linux.intel.com>,
+	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+	Anish Moorthy <amoorthy@google.com>,
+	David Matlack <dmatlack@google.com>,
+	Yu Zhang <yu.c.zhang@linux.intel.com>,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerley Tng <ackerleytng@google.com>,
+	Maciej Szmigiero <mail@maciej.szmigiero.name>,
+	David Hildenbrand <david@redhat.com>,
+	Quentin Perret <qperret@google.com>,
+	Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+	Liam Merwick <liam.merwick@oracle.com>,
+	Isaku Yamahata <isaku.yamahata@gmail.com>,
+	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Benjamin Copeland <ben.copeland@linaro.org>
+Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to
+ KVM_SET_USER_MEMORY_REGION2
+Message-ID: <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-26-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240423221521.2923759-1-seanjc@google.com> <20240423221521.2923759-2-seanjc@google.com>
- <DS0PR11MB6373B95FF222DD6939CFEFC6DC172@DS0PR11MB6373.namprd11.prod.outlook.com>
-Message-ID: <ZipjhYUIAQMMkXci@google.com>
-Subject: Re: [PATCH 1/4] KVM: x86: Add a struct to consolidate host values,
- e.g. EFER, XCR0, etc...
-From: Sean Christopherson <seanjc@google.com>
-To: Wei W Wang <wei.w.wang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231027182217.3615211-26-seanjc@google.com>
 
-On Thu, Apr 25, 2024, Wei W Wang wrote:
-> On Wednesday, April 24, 2024 6:15 AM, Sean Christopherson wrote:
-> > @@ -403,7 +403,7 @@ static void vmx_update_fb_clear_dis(struct kvm_vcpu
-> > *vcpu, struct vcpu_vmx *vmx)
-> >  	 * and VM-Exit.
-> >  	 */
-> >  	vmx->disable_fb_clear
-> > = !cpu_feature_enabled(X86_FEATURE_CLEAR_CPU_BUF) &&
-> > -				(host_arch_capabilities &
-> > ARCH_CAP_FB_CLEAR_CTRL) &&
-> > +				(kvm_host.arch_capabilities &
-> > ARCH_CAP_FB_CLEAR_CTRL) &&
+On Fri, Oct 27, 2023 at 11:22:07AM -0700, Sean Christopherson wrote:
+> Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so that
+> support for guest private memory can be added without needing an entirely
+> separate set of helpers.
 > 
-> The line of code appears to be lengthy. It would be preferable to limit it to under
-> 80 columns per line.
+> Note, this obviously makes selftests backwards-incompatible with older KVM
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> versions from this point forward.
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-I agree that staying under 80 is generally preferred, but I find this
+Is there a way we could disable the tests on older kernels instead of
+making them fail?  Check uname or something?  There is probably a
+standard way to do this...  It's these tests which fail.
 
-	vmx->disable_fb_clear = (kvm_host.arch_capabilities & ARCH_CAP_FB_CLEAR_CTRL) &&
-				!boot_cpu_has_bug(X86_BUG_MDS) &&
-				!boot_cpu_has_bug(X86_BUG_TAA);
+ kvm_aarch32_id_regs
+ kvm_access_tracking_perf_test
+ kvm_arch_timer
+ kvm_debug-exceptions
+ kvm_demand_paging_test
+ kvm_dirty_log_perf_test
+ kvm_dirty_log_test
+ kvm_guest_print_test
+ kvm_hypercalls
+ kvm_kvm_page_table_test
+ kvm_memslot_modification_stress_test
+ kvm_memslot_perf_test
+ kvm_page_fault_test
+ kvm_psci_test
+ kvm_rseq_test
+ kvm_smccc_filter
+ kvm_steal_time
+ kvm_vgic_init
+ kvm_vgic_irq
+ kvm_vpmu_counter_access
 
-much more readable than this
+regards,
+dan carpenter
 
-	vmx->disable_fb_clear = (kvm_host.arch_capabilities &
-			 	 ARCH_CAP_FB_CLEAR_CTRL) &&
-				!boot_cpu_has_bug(X86_BUG_MDS) &&
-				!boot_cpu_has_bug(X86_BUG_TAA);
-
-We should shorten the name to arch_caps, but I don't think that's a net positive,
-e.g. unless we do a bulk rename, it'd diverge from several other functions/variables,
-and IMO it would be less obvious that the field holds MSR_IA32_ARCH_CAPABILITIES.
-
-> >  				!boot_cpu_has_bug(X86_BUG_MDS) &&
-> >  				!boot_cpu_has_bug(X86_BUG_TAA);
-> > 
-
-> > @@ -325,11 +332,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu,
-> > gpa_t cr2_or_gpa,
-> >  			    int emulation_type, void *insn, int insn_len);
-> > fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu);
-> > 
-> > -extern u64 host_xcr0;
-> > -extern u64 host_xss;
-> > -extern u64 host_arch_capabilities;
-> > -
-> >  extern struct kvm_caps kvm_caps;
-> > +extern struct kvm_host_values kvm_host;
-> 
-> Have you considered merging the kvm_host_values and kvm_caps into one unified
-> structure?
-
-No really.  I don't see any benefit, only the downside of having to come up with
-a name that is intuitive when reading code related to both.
-
-> (If the concern is about naming, we could brainstorm a more encompassing term
-> for them)
 
