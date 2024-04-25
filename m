@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-15891-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB3188B1A78
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 07:56:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 752F28B1A88
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 08:01:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5FB9B217E5
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 05:56:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BE74B22A4D
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 06:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3513C467;
-	Thu, 25 Apr 2024 05:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510F63CF51;
+	Thu, 25 Apr 2024 06:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WMhz0GFW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQGwWhA3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B073A1AC
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 05:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4833BBEA
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 06:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714024601; cv=none; b=kb0Yy0DQvIu96jJek2WGu4mpWhRENPkctc2iL5tPZtd24ZDzy0CCC7nIjh01mCYIFdQVijwHqTqRDNoKTs9gmL1ltE2v+unmEaWVEU0I2a9rTc7P6W/P3I6KCLyCXSqeU37OGX2yksKjh7pQYNvrfeOlVTyD5/PieEhTisCxxOM=
+	t=1714024903; cv=none; b=YDZy6+Q3Rq5W/i7xsOGcPG6KLAFqXdsTNdFtjhPesZLpUek25Ef5vzU2WNSGjo8DiFKoOxXqtgww02dftJJmP+CSXVG/FvmqThYiBFa8B1B83HpSSyzkrg7ogPJF+THB//2T1IKzTG8UP5wweRWutSwwVXeSOrD7wPWMe6MBUoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714024601; c=relaxed/simple;
-	bh=O4CznqeG8T+JWseL09yaa78FtOWwIBAlH8a0Gt7nzEs=;
+	s=arc-20240116; t=1714024903; c=relaxed/simple;
+	bh=Rv79jL1MsnYC4D3TlOenNz3Jb7GaCxBx+ZWVUlVUxAM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uREz7vVu9eFHtNkFwQLdzrCFZDLZCagw1a9wtlTqYUKkqaYyPNkmLEfXgsAnpUlMM3j7ED8LfO+giFns9vHXWwCkyc60HYCsMFwXXf+6cOez1q3j/9c5auwpOOiVG/MKXSclI+5GPDrdqsZon5WrdHjTmG8S3pKTeyCK7//3kd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WMhz0GFW; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=Y7ICrx1FaOMevAmXr7d9UPZVhJst2+QP8Yez82SU2eWRyN2xnuX15mfKRPAsK9TmIILs1FKfuEGQMlyfQWByaIgJpYFUn7Zo3vbBsNNiJeZ9dseZaB3cQO4ELGlpwk8zylRQFf9HS/JgP82I9Td7yfDvpROWykbidNqL2KEBNnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EQGwWhA3; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714024599;
+	s=mimecast20190719; t=1714024900;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=exOCW1wmcScF7uY7sXoI9wagJW8drQNtgczHEogNU4E=;
-	b=WMhz0GFWSLp6xEtX98wV/ODboHM3kiRw/kIJ4mUcX10RYwX1kMBCnlYAoQ0wlNCu0EoHAL
-	KZILd/d2AEI3VwkczOgQi4YZ/+EJb6P+U/cQ13BeIiKrwdOgnDITFh3yEp6IIIRB1hc6fm
-	s2EkhylBVKPO9xhfUglh7dCos5iYI+Y=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ZQ/7vfDjCQVJqJUXQ1xYndqEQtRQGewhmh+Bgyn7BAY=;
+	b=EQGwWhA3alBfm4oIfL82mlx6UhCInRp9CmA6Ya+CGR4I3ioAu0JkaU/iOR1UdW9lhLE+6n
+	cD4Z7MbpTnGP4ZtU/XXU/+WRCFy/UiKZ/kwymJ9UQkYYQ7Cysk6/3CM6MswgZTmE4KLcgc
+	T2P0bXWLg3DZ2C/GbBUX6mL00mJukCI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-y5ku_KHcNNmzOgggQT5NeQ-1; Thu, 25 Apr 2024 01:56:37 -0400
-X-MC-Unique: y5ku_KHcNNmzOgggQT5NeQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-343e46df264so382963f8f.1
-        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 22:56:37 -0700 (PDT)
+ us-mta-596-QWQNYt1JPdKUeP3RpDZ_IQ-1; Thu, 25 Apr 2024 02:01:38 -0400
+X-MC-Unique: QWQNYt1JPdKUeP3RpDZ_IQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4165339d3a5so3092785e9.3
+        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 23:01:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714024596; x=1714629396;
+        d=1e100.net; s=20230601; t=1714024897; x=1714629697;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=exOCW1wmcScF7uY7sXoI9wagJW8drQNtgczHEogNU4E=;
-        b=WJm4XY5p5XVu2poSh0Amg97Z7orT5xP/e6OHASzo8BEbMt4GKSe45T6ABUAJqSdC4Q
-         bmZISfHQrtHOQUGAg49nUNswWx4BC1gauZQt12dqKCuqLLES/rs2033FQdikGxKJQmVO
-         /KS40KpuILsWCZQ0BWgTWb4/XtL8wvZBMGcuhFCymE9A2W2MBp6oAZyLYgPlipsbNMaD
-         29t4Asb5NK0VGYR2VxW5orDRCo/a6SBdeuOK8Fsby/kMWjfV4l1zGttyavN2MVKNW8ik
-         +9z5UKMrk0zTo9+FyXqxe6C58En440IoNglAMFR5C60czokUtc8J39mbt8bOQR527q+d
-         9Y/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWCxogBJvfCMUlMR8hBHLlaJMqeIVQsjnRIZ15/twbOt/G7Ygc/Mf6GQfRyliabTvTLUM6lZF7VxBl+/vB8yA3E9u9q
-X-Gm-Message-State: AOJu0YwClp/JEuXY4pI8bGom6mMmEo1Z9i+8NDw/DkAoucmwEcepYae2
-	bUGDnoK6qepB6F9zW5wySpx3WeEdiMf8X9ovw/Hgk0B0vpKCBHPWLMZrbHOf+i22w6U/5WRPyyn
-	0EgIF+rIE6CfGOjBRZMb6jN//kVpRBS8OE9V3B3d2kDi1KNEV7W8GuIA7oMp0dORYrCQPe8TeUg
-	bWND0M3grEdyxAEqww2nvL/IJm
-X-Received: by 2002:a05:6000:18c2:b0:341:ce05:dba5 with SMTP id w2-20020a05600018c200b00341ce05dba5mr3252464wrq.30.1714024596258;
-        Wed, 24 Apr 2024 22:56:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQMN4AK15f2j3BmYvEcbraA8vxJgm5FQOQBHc0h7FbM4crcHaNHD/tT0WZx2+vXC7+1vOLMupG25xmdYYeTI4=
-X-Received: by 2002:a05:6000:18c2:b0:341:ce05:dba5 with SMTP id
- w2-20020a05600018c200b00341ce05dba5mr3252456wrq.30.1714024595937; Wed, 24 Apr
- 2024 22:56:35 -0700 (PDT)
+        bh=ZQ/7vfDjCQVJqJUXQ1xYndqEQtRQGewhmh+Bgyn7BAY=;
+        b=uc/U9ThGap69TYnk+MjqvtTM13wtQ8nPnsrO1gDyPTWgUhuDu/OCyiE+MozO1cj1PR
+         DdSRSAUNqP/moG8BYrZFU1Un0tmE2D7qPY0L7EfGoCFhsUWiqQCV0j0SPuPjfzhHLLM0
+         7kZOUKiBwFQPJzmOilXJByZhqqWtS9dmHaK8yefUes6Z2cALRB852j0QDW75VVOWSSaJ
+         Ka8rR7R6Zca61mh9WXOvHcN6rPOPhMmuVku8jLVaORQd8L6Qd8v/XaDsfskdnBv8am6Y
+         kG80k/0F1spfv/ZS87pwMtygxfr9TUWQxBAJGIutWG0rZE0uGFJPmdO+6NHW0obuMx9y
+         IH4g==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ3TRqiTXyWR7KFQO8Ya7w7EqnvXV66uuVzfPlHrxPDxrr+JhjKzUewtAZVYqCPPVc2nGut0yZ37+DSk8Hr+vNPojy
+X-Gm-Message-State: AOJu0YyMbXCuu0VQ0G2xwSBOJI2IwcfUnbt71BCMLvvB8CzZNfLacB7r
+	w4OzbyTfOL1rHlJPAv/TD7FhUH2wfBhWREqREQjPJt9xgvaY8AI5MccT+XDMegia+NEmqJRk7hj
+	3y1Un7jNaV+3JUxSE5+sSHWKfbWyNPxcvTUekOeIU/leq6UTuEYS7r1SCFk2Oe/k09Nqy5p1mVB
+	bLJ12gxiVrhOGkASbTXmjY1MUPwtU3+UrXdeI=
+X-Received: by 2002:a05:600c:4ec7:b0:418:ef3:6cfb with SMTP id g7-20020a05600c4ec700b004180ef36cfbmr3539685wmq.26.1714024896979;
+        Wed, 24 Apr 2024 23:01:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGZSfuRrRECutOe8DB7H4JRMQ4nFhrjtfWN31viYcrRC965AhFymJAr17XZwxL32uDuMyRuTKRi1v3RAzK9TNo=
+X-Received: by 2002:a05:600c:4ec7:b0:418:ef3:6cfb with SMTP id
+ g7-20020a05600c4ec700b004180ef36cfbmr3539659wmq.26.1714024896559; Wed, 24 Apr
+ 2024 23:01:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -78,94 +78,65 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240404185034.3184582-1-pbonzini@redhat.com> <20240404185034.3184582-10-pbonzini@redhat.com>
- <ZimIfFUMPmF_dV-V@google.com>
-In-Reply-To: <ZimIfFUMPmF_dV-V@google.com>
+ <20240423235013.GO3596705@ls.amr.corp.intel.com> <ZimGulY6qyxt6ylO@google.com>
+ <20240425011248.GP3596705@ls.amr.corp.intel.com>
+In-Reply-To: <20240425011248.GP3596705@ls.amr.corp.intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 25 Apr 2024 07:56:24 +0200
-Message-ID: <CABgObfYgmuBbzQP+ZQhpm7BEgiwLTz6W0g7=EK-xwd9=CWUCOw@mail.gmail.com>
+Date: Thu, 25 Apr 2024 08:01:25 +0200
+Message-ID: <CABgObfY2TOb6cJnFkpxWjkAmbYSRGkXGx=+-241tRx=OG-yAZQ@mail.gmail.com>
 Subject: Re: [PATCH 09/11] KVM: guest_memfd: Add interface for populating gmem
  pages with user data
-To: Sean Christopherson <seanjc@google.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, michael.roth@amd.com, 
-	isaku.yamahata@intel.com
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	michael.roth@amd.com, isaku.yamahata@linux.intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024 at 12:32=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Thu, Apr 04, 2024, Paolo Bonzini wrote:
-> > +long kvm_gmem_populate(struct kvm *kvm, gfn_t gfn, void __user *src, l=
-ong npages,
-> > +                    int (*post_populate)(struct kvm *kvm, gfn_t gfn, k=
-vm_pfn_t pfn,
-> > +                                         void __user *src, int order, =
-void *opaque),
->
-> Add a typedef for callback?  If only to make this prototype readable.
->
-> > +long kvm_gmem_populate(struct kvm *kvm, gfn_t gfn, void __user *src, l=
-ong npages,
-> > +                    int (*post_populate)(struct kvm *kvm, gfn_t gfn, k=
-vm_pfn_t pfn,
-> > +                                         void __user *src, int order, =
-void *opaque),
-> > +                    void *opaque)
-> > +{
-> > +     struct file *file;
-> > +     struct kvm_memory_slot *slot;
-> > +
-> > +     int ret =3D 0, max_order;
-> > +     long i;
-> > +
-> > +     lockdep_assert_held(&kvm->slots_lock);
-> > +     if (npages < 0)
-> > +             return -EINVAL;
-> > +
-> > +     slot =3D gfn_to_memslot(kvm, gfn);
-> > +     if (!kvm_slot_can_be_private(slot))
-> > +             return -EINVAL;
-> > +
-> > +     file =3D kvm_gmem_get_file(slot);
-> > +     if (!file)
-> > +             return -EFAULT;
-> > +
-> > +     filemap_invalidate_lock(file->f_mapping);
-> > +
-> > +     npages =3D min_t(ulong, slot->npages - (gfn - slot->base_gfn), np=
-ages);
-> > +     for (i =3D 0; i < npages; i +=3D (1 << max_order)) {
-> > +             gfn_t this_gfn =3D gfn + i;
->
-> KVM usually does something like "start_gfn" or "base_gfn", and then uses =
-"gfn"
-> for the one gfn that's being processed.  And IMO that's much better becau=
-se the
-> propotype for kvm_gmem_populate() does not make it obvious that @gfn is t=
-he base
-> of a range, not a singular gfn to process.
->
->
-> > +             kvm_pfn_t pfn;
-> > +
-> > +             ret =3D __kvm_gmem_get_pfn(file, slot, this_gfn, &pfn, &m=
-ax_order, false);
-> > +             if (ret)
-> > +                     break;
-> > +
-> > +             if (!IS_ALIGNED(this_gfn, (1 << max_order)) ||
-> > +                 (npages - i) < (1 << max_order))
-> > +                     max_order =3D 0;
-> > +
-> > +             if (post_populate) {
->
-> Is there any use for this without @post_populate?  I.e. why make this opt=
-ional?
+On Thu, Apr 25, 2024 at 3:12=E2=80=AFAM Isaku Yamahata <isaku.yamahata@inte=
+l.com> wrote:
+> > >   get_user_pages_fast(source addr)
+> > >   read_lock(mmu_lock)
+> > >   kvm_tdp_mmu_get_walk_private_pfn(vcpu, gpa, &pfn);
+> > >   if the page table doesn't map gpa, error.
+> > >   TDH.MEM.PAGE.ADD()
+> > >   TDH.MR.EXTEND()
+> > >   read_unlock(mmu_lock)
+> > >   put_page()
+> >
+> > Hmm, KVM doesn't _need_ to use invalidate_lock to protect against guest=
+_memfd
+> > invalidation, but I also don't see why it would cause problems.
 
-Yeah, it probably does not need to be optional (before, the
-copy_from_user was optionally done from kvm_gmem_populate, but not
-anymore).
+The invalidate_lock is only needed to operate on the guest_memfd, but
+it's a rwsem so there are no risks of lock inversion.
+
+> > I.e. why not
+> > take mmu_lock() in TDX's post_populate() implementation?
+>
+> We can take the lock.  Because we have already populated the GFN of guest=
+_memfd,
+> we need to make kvm_gmem_populate() not pass FGP_CREAT_ONLY.  Otherwise w=
+e'll
+> get -EEXIST.
+
+I don't understand why TDH.MEM.PAGE.ADD() cannot be called from the
+post-populate hook. Can the code for TDH.MEM.PAGE.ADD be shared
+between the memory initialization ioctl and the page fault hook in
+kvm_x86_ops?
 
 Paolo
+
+>
+> > That would allow having
+> > a sanity check that the PFN that guest_memfd() has is indeed the PFN th=
+at KVM's
+> > S-EPT mirror has, i.e. the PFN that KVM is going to PAGE.ADD.
+>
+> Because we have PFN from the mirrored EPT, I thought it's duplicate to ge=
+t PFN
+> again via guest memfd.  We can check if two PFN matches.
+> --
+> Isaku Yamahata <isaku.yamahata@intel.com>
+>
 
 
