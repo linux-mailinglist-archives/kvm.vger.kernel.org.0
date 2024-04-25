@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-15883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F4518B17D5
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 02:11:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6628B17E4
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 02:15:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 363B1286E21
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 00:11:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B19851C22ADE
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 00:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9C8A946;
-	Thu, 25 Apr 2024 00:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BD31849;
+	Thu, 25 Apr 2024 00:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z8UT9TB/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b8iV3JsO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DE67483
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 00:10:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7325B631
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 00:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714003837; cv=none; b=P6FA3EZJmejEX6ltpI4FJL3rSSc0jphA5TbQQ8sq1KgmQmJ1M+9xd7M7AVQsX5HlxgjRWK9NNBsaWb9DSGytAzMvhrzezDl8jM7RR9X6MHlFYoWcCz+ergUb1L+0NlXu7LdsE7U28fucaso2xrrAh2V60nfWJWVV8ieOmEmlBxY=
+	t=1714004143; cv=none; b=ZwfvxOBPE+Hr9yAArTlLT/+06xR0xio12fqllfzovYHz6TEa9ud1sRRkcmRPm1lUE7gFFKK4jWdNm1SyDv6/6SHJa7qzrdAk88jUfDHsj8F8tuvVEUO95pN/6Dr+NtyY6NFbovIbMm2qbBUgiXhKjznxFulB9vx8BfYpxzJubrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714003837; c=relaxed/simple;
-	bh=4olyWBhbURGb211ubhYVBSsTHwRpqR+5x91FGXsu6m0=;
+	s=arc-20240116; t=1714004143; c=relaxed/simple;
+	bh=AoCc2xRVw+eeSuN5RnnkMfbAOu6Mq8awkjYkscN3FUE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DaEhnrD9B7LYXXREmo2kvvgAV/YMStP8nl/gZQymtsnAvgWnmoLSU/NBP890Q0oqOFqDmirGVXFg0EFCB4K2VaGvFhHkqlAfodUw5RuWK/PK55LPNqVsvzfldMWv29OVnln6qp4eRAhFbGMOUQkRo7t91GH/oVgdDHc6hERfFCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z8UT9TB/; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=OuVIwZwvVT1kYGEKWzRzMN48n9XEsSJiysm0OCkkoHAdOWyt9pBE/xR7CP/eYL0qW0ATzua4V3hl1UQRP10ILpXX+U65irdAQ2d631VfBRW9qm7BBe08qL5NxMTRnn8BmYRQeq80w1KQ4A/JTGTrNCZIfrvYiD3N1TUBhF/lCLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b8iV3JsO; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-60361c6fa70so453622a12.3
-        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 17:10:35 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5cec090b2bdso390227a12.0
+        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 17:15:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714003834; x=1714608634; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714004142; x=1714608942; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5N7e8KrpK+QWo2qlcDE/Q43TLjk+9JOMfjvUXwfuODw=;
-        b=z8UT9TB/0GluAFz6GeyaCatIzLaU9xm5Yxa27BPMZelJwQAtFs8aDoDViev1Fi+pwd
-         1ppwdrKH4eetcw+UW9SHfwcDKm/FkphLf801wLMferEQXiT6s8B2jSHpQO+4aGmVarvp
-         YJxJANh4EE1b+p1zGTQ1tZWXG66dnoBHe88v4Hp4OuYSWUmkKAPTjb5fGOC8g3uINHbC
-         6ZYTAsUtUfzL3w9yLpiPRl8wM15tXEsPXMpTCuNIBgRhA2V1RQV9uljvTnC/tp4n25u6
-         GBEzzqvHssWTTveg3+M0rfb0U/MmLt7TdkACFUmo48JN+GjzbidFtmyek74Ih+CowlRx
-         UwXw==
+        bh=phUjQDDq8M6U9JQBTiJHu0B69Sr2zO6j83b67DrRLu8=;
+        b=b8iV3JsOo0klDrNZU5qb1QgovGMlzIQB5Q8uilkHT4W+TvluZxT+EsFReE0eqVhg1i
+         BjARfdm4YXnzw77zvf7gvEnLuBZLGKr6XxyPM62sjjHmeRGo+5ywBeRw7My8TiLsUxnV
+         VtA2Qki3Pkr390x9ByLdtVmugiyVsi6H4zZtBCeCiMr1KJ8/3azIDRHJM/I8MdTUSadV
+         K6QpXXedlohXH/8Dstxq4/BHgNLST/iPdl7kP6njogguXiTntEtJI7gDelEZYzpoxu6T
+         KjY/GLTkZIRG+LSfHeSoChu6oFr+XIkQUll7XWXzQJbUKpWSTa7GwJM6tVza5Vd63E8h
+         IaWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714003834; x=1714608634;
+        d=1e100.net; s=20230601; t=1714004142; x=1714608942;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5N7e8KrpK+QWo2qlcDE/Q43TLjk+9JOMfjvUXwfuODw=;
-        b=pwNEArO9pqlyv6NFLgpe91NNJ0jdEhlLUqjEsE6W1sCL12OjMvOJa+BJ17L59IYdt6
-         LwoL7HtT5JphokfGMwZ9pMEFSrLxQpuuUzFlIDp7fbVknS+Wx6FKpKZVTB1ao0jbJ9qS
-         AmbgcrMPWKNMz6MxBMePuKsOk5dspnGR/oefmLQLNkmsB0NyDehZlnkeMuY6DqGuHW8T
-         6zj+Uwxska2BxN3tE5HAFFGkr6QH+CcOpoVnBeur3HXMVYic0WBg3Nh14Qns/PUbmfbL
-         D21HNywVihdVIEY3KK6K4mAuQ54jC8VbI9swLhdy+r13wTAB53COfsdbAw8m11iCzB8C
-         bF5Q==
-X-Gm-Message-State: AOJu0YzxcKvxUwRodqYDjhR/ve/4Dugv4H+sxhVFr75MgrJ+LNla0yHM
-	B62ldSe7bQTzoScFIbjk0jsCBJxJYP3fw2K37Hh0HXs/Yi6THYkYs23+NhLYdVUHvR5S+DUxld2
-	CPw==
-X-Google-Smtp-Source: AGHT+IFH7YJejg8aWF910482kJMDW7kl7X1aXoPxYZwY3TSrYpuIPMQ5VJ886sB92FreyvdaA+vS2YP1euA=
+        bh=phUjQDDq8M6U9JQBTiJHu0B69Sr2zO6j83b67DrRLu8=;
+        b=ZBPM4lx57Veafp5MGmoRx33V2ECt+nxC/5Nt8FnzrV027QqS/n7HWA3xxYuv1gel8c
+         DDAPkIFfJK0esJiWBG3HsAtxHM9gDajpftotUVLiUbv5TS+vKdmsNtcogfyHUJasobB/
+         9SVCvp02Jz7YzlRkqVtAUU5AHhKCzrq2H7L8BElyyv7hrUry7zsmyn+rdI/Fk7Qhv8f/
+         mNEu0S9oF4F2+Hxu+yuBVp/lYM4ISuZaa4Js8LTJ91vKatJW3+8+M+clvycrz+Fl+LnY
+         +O9BmkISawAOqqZekevwj9hO4jemY85w41y3ubdkFwVhKP0LDvM7RS0RZNBJfWMiMqcy
+         ECqQ==
+X-Gm-Message-State: AOJu0Yx8d2SeBs2bpK/IBeSVHNCZd3q5So/0NVWwg8D6SwGzB4IDbopK
+	angjnn8tX+Lj3ZGJTsP/N1F23l9m5Q2CT2Z1fktVcPS+RGiP2QIdDw02O6Kp9WUJohgoCgr3mjb
+	NmA==
+X-Google-Smtp-Source: AGHT+IFpMCiw3G/yjKQSya55GEaNi7BT0tDLkwsfoAUywNRODVW0WdG85voz0VSIDV0w8EcxGv/B7fSOJOw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:1d2:0:b0:5dc:8f95:3d with SMTP id
- 201-20020a6301d2000000b005dc8f95003dmr31874pgb.2.1714003833568; Wed, 24 Apr
- 2024 17:10:33 -0700 (PDT)
-Date: Wed, 24 Apr 2024 17:10:31 -0700
-In-Reply-To: <20240421180122.1650812-23-michael.roth@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a65:674d:0:b0:5cd:9ea4:c99 with SMTP id
+ c13-20020a65674d000000b005cd9ea40c99mr16727pgu.6.1714004141606; Wed, 24 Apr
+ 2024 17:15:41 -0700 (PDT)
+Date: Wed, 24 Apr 2024 17:15:40 -0700
+In-Reply-To: <20240421180122.1650812-22-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-23-michael.roth@amd.com>
-Message-ID: <Zimfdyhq3U2HVX0N@google.com>
-Subject: Re: [PATCH v14 22/22] KVM: SEV: Provide support for
- SNP_EXTENDED_GUEST_REQUEST NAE event
+References: <20240421180122.1650812-1-michael.roth@amd.com> <20240421180122.1650812-22-michael.roth@amd.com>
+Message-ID: <ZimgrDQ_j2QTM6s5@google.com>
+Subject: Re: [PATCH v14 21/22] crypto: ccp: Add the SNP_{PAUSE,RESUME}_ATTESTATION
+ commands
 From: Sean Christopherson <seanjc@google.com>
 To: Michael Roth <michael.roth@amd.com>
 Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
@@ -92,101 +92,18 @@ Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Sun, Apr 21, 2024, Michael Roth wrote:
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 85099198a10f..6cf186ed8f66 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7066,6 +7066,7 @@ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
->  		struct kvm_user_vmgexit {
->  		#define KVM_USER_VMGEXIT_PSC_MSR	1
->  		#define KVM_USER_VMGEXIT_PSC		2
-> +		#define KVM_USER_VMGEXIT_EXT_GUEST_REQ	3
+> These commands can be used to pause servicing of guest attestation
+> requests. This useful when updating the reported TCB or signing key with
+> commands such as SNP_SET_CONFIG/SNP_COMMIT/SNP_VLEK_LOAD, since they may
+> in turn require updates to userspace-supplied certificates, and if an
+> attestation request happens to be in-flight at the time those updates
+> are occurring there is potential for a guest to receive a certificate
+> blob that is out of sync with the effective signing key for the
+> attestation report.
+> 
+> These interfaces also provide some versatility with how similar
+> firmware/certificate update activities can be handled in the future.
 
-Assuming we can't get massage this into a vendor agnostic exit, there's gotta be
-a better name than EXT_GUEST_REQ, which is completely meaningless to me and probably
-most other people that aren't intimately familar with the specs.  Request what?
-
->  			__u32 type; /* KVM_USER_VMGEXIT_* type */
->  			union {
->  				struct {
-> @@ -3812,6 +3813,84 @@ static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp
->  	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
->  }
->  
-> +static int snp_complete_ext_guest_req(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct vmcb_control_area *control;
-> +	struct kvm *kvm = vcpu->kvm;
-> +	sev_ret_code fw_err = 0;
-> +	int vmm_ret;
-> +
-> +	vmm_ret = vcpu->run->vmgexit.ext_guest_req.ret;
-> +	if (vmm_ret) {
-> +		if (vmm_ret == SNP_GUEST_VMM_ERR_INVALID_LEN)
-> +			vcpu->arch.regs[VCPU_REGS_RBX] =
-> +				vcpu->run->vmgexit.ext_guest_req.data_npages;
-> +		goto abort_request;
-> +	}
-> +
-> +	control = &svm->vmcb->control;
-> +
-> +	/*
-> +	 * To avoid the message sequence number getting out of sync between the
-> +	 * actual value seen by firmware verses the value expected by the guest,
-> +	 * make sure attestations can't get paused on the write-side at this
-> +	 * point by holding the lock for the entire duration of the firmware
-> +	 * request so that there is no situation where SNP_GUEST_VMM_ERR_BUSY
-> +	 * would need to be returned after firmware sees the request.
-> +	 */
-> +	mutex_lock(&snp_pause_attestation_lock);
-
-Why is this in KVM?  IIUC, KVM only needs to get involved to translate GFNs to
-PFNs, the rest can go in the sev-dev driver, no?  The whole split is weird,
-seemingly due to KVM "needing" to take this lock.  E.g. why is core kernel code
-in arch/x86/virt/svm/sev.c at all dealing with attestation goo, when pretty much
-all of the actual usage is (or can be) in sev-dev.c
-
-> +
-> +	if (__snp_transaction_is_stale(svm->snp_transaction_id))
-> +		vmm_ret = SNP_GUEST_VMM_ERR_BUSY;
-> +	else if (!__snp_handle_guest_req(kvm, control->exit_info_1,
-> +					 control->exit_info_2, &fw_err))
-> +		vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
-> +
-> +	mutex_unlock(&snp_pause_attestation_lock);
-> +
-> +abort_request:
-> +	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
-> +
-> +	return 1; /* resume guest */
-> +}
-> +
-> +static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
-> +{
-> +	int vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	unsigned long data_npages;
-> +	sev_ret_code fw_err;
-> +	gpa_t data_gpa;
-> +
-> +	if (!sev_snp_guest(vcpu->kvm))
-> +		goto abort_request;
-> +
-> +	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
-> +	data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
-> +
-> +	if (!IS_ALIGNED(data_gpa, PAGE_SIZE))
-> +		goto abort_request;
-> +
-> +	svm->snp_transaction_id = snp_transaction_get_id();
-> +	if (snp_transaction_is_stale(svm->snp_transaction_id)) {
-
-Why bother?  I assume this is rare, so why not handle it on the backend, i.e.
-after userspace does its thing?  Then KVM doesn't even have to care about
-checking for stale IDs, I think?
-
-None of this makes much sense to my eyes, e.g. AFAICT, the only thing that can
-pause attestation is userspace, yet the kernel is responsible for tracking whether
-or not a transaction is fresh?
+Wait, IIUC, this is using the kernel to get two userspace components to not
+stomp over each other.   Why is this the kernel's problem to solve?
 
