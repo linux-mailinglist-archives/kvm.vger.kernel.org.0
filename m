@@ -1,174 +1,134 @@
-Return-Path: <kvm+bounces-15935-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4E728B24B7
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 17:10:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EEED8B25B9
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 17:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E892C1C21CD0
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 15:10:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D811EB22805
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 15:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1072114A4C7;
-	Thu, 25 Apr 2024 15:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AeaEXTjc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7468714C585;
+	Thu, 25 Apr 2024 15:53:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E9C149E01
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 15:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8441512B156;
+	Thu, 25 Apr 2024 15:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714057793; cv=none; b=BTmUbMIlx0l8160NLmRvxq8Uqa4crM02hNEZMu1opJ445YD4myfnLz/P3tc578pfyU4RBcZJZhYxHWrUc0Yc4Y18jH2Mxw0H3OB4mkDPCC8LJ3REqi5c1lWEIV7ZmQgEbYVBjzuA18IpInmtFGdq0htxsfLE114giEO6hA4ZqJs=
+	t=1714060384; cv=none; b=q24j9OylZeA+bSaXo3f/+w9AMOhMXvCuAYqFNabuqhFAAFUt+Y/qxmA4uSlWb3G95GHftMCUuoTQ4MomRdp31/bjaXN6GOTHFYbjGdHk5ndWprPEhCUC2SdQgTdJfEFyLoyHq/DFP5qK8SnC+z+pVAaFYloF9zHBtkzOUThtxm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714057793; c=relaxed/simple;
-	bh=14ynkVWPzNhCtgD+Z9x14gnpSJO5GRO1ma5/65Lnzr4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Y2dlu+z0bomQl+HC6kyTdYvtlJXDf3EU7uQSCGnZnHWK8ZZGp2KrurVTmDWBtEzBlvmgiCGXJfhKHe/hdnyWC9olewO3KPHsKUcc1qmXys4b9O64dC3U7ssC/ykgP7Wfz0aumovo+/oiJavFsIRZsy9owh6IaulIMY+fJnCyyqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AeaEXTjc; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de59d580f61so472194276.3
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 08:09:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714057791; x=1714662591; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1qzGW4ycfJBkwOtQag42BpB9F1dgLw6AsC1TpSQ/BE=;
-        b=AeaEXTjc9NqG4OPHqdShhUsB5Dv2YbD7XkbuvhMgFbjCnfW8WmGN2xW3YNFm3zke2g
-         Ia2R4Ihx8p+uRLU89m5yroYv8d72JXjJT+KrkDQlqRF2li1V3wuyRTvlorp46U6I2JRt
-         KEoo3WEtCaowgbItpK8UATwiqev4BM9ljHyWgwA3v4BK5ZEHbXA6LLq+8V6AG/poINPB
-         O+i11/hGHtDz+pdoSEAw4NclpukoKQjhTV4Xtf+nsZlBTa2zmRtQtd5BjwgnU3n2R9/Z
-         M/on9AGjeHNra0FJq3gFcRq4VzWH/tSllxGvPeuXyiUMbqxshWz14trlzSdGCMfY+u41
-         UjMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714057791; x=1714662591;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1qzGW4ycfJBkwOtQag42BpB9F1dgLw6AsC1TpSQ/BE=;
-        b=NSzx0Cq5FnM9G3E3ajChFAsj9yt/Y/CsC2m8aKnyLrbLHHzk3LTZ9BYkcnf63RAbQM
-         wL45PoVgxkHylxMEdaAlC7msPyHE5sXTd0lY+sMZ9QJasDa0Coz7g4qRIAFBNJ7L2+y1
-         rbYPCMqMc5pNrqr2q5RSn0TMIMtqaVsEtrxzzM1G0GAh5mK7P7XCFo3/mfZMEnlyr6KO
-         w63iRLY5vueEh1+ZhzqDcmO+9OILQR2tqatTDb4AacJfVqWBsUHuTub3rDUeTnQlwfdu
-         NRWm82gGIBrC16IyEgwZk+uDzUIatYCKg8hdbfl0kWdAHleYCDBTiAqgy/Vw9p7vbRfT
-         Pb/w==
-X-Forwarded-Encrypted: i=1; AJvYcCXF18G9C+thMg+MLtD06jJfoAARGzbCqepbUxWoEjwPzGd14xZfUz9jzUPM7tWdCmvHk+gd5VxZsyjeWr3yt/2OCiod
-X-Gm-Message-State: AOJu0YyrzwS4sWIFfWk2iarvrhVn+nX8c4mN76TgMIxM1pQG69uUIn0F
-	p9unSiiihTjZywHWmJwtXZxwyjA+aePtRYIDOMfFF3NRsRnI9/QcJeA3AEdihc/u093TSqTXPYe
-	PoA==
-X-Google-Smtp-Source: AGHT+IESJpACVh541xxXAQ9OLoBU3w6/mlBcJ1Y0e41i9MN7u+mraz/pMXzsHrFUz1aVf7/+mBldg/ztHFs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:698a:0:b0:de4:c2d4:e14f with SMTP id
- e132-20020a25698a000000b00de4c2d4e14fmr1617703ybc.11.1714057790783; Thu, 25
- Apr 2024 08:09:50 -0700 (PDT)
-Date: Thu, 25 Apr 2024 08:09:49 -0700
-In-Reply-To: <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
+	s=arc-20240116; t=1714060384; c=relaxed/simple;
+	bh=wpvhhW2gIm86VfAGnDMuFuxo/RtovAFc2eHB/QgqRRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PE4SO/jmfRGzjG0fD8FZyMSQO+dqoj6o2XEvm6mmqhEahHTlRZNPzOZ2S85iv9OZ1FulZbMB9rgxhzelFiFJnMHEGoz3R3F+wPucpG7koLfrL9IO4HW6hjmkqj6sAgi9a/SDR13hl0sGiD15URD09XrJRtj8eb7bMr653I1CCyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E112D1007;
+	Thu, 25 Apr 2024 08:53:27 -0700 (PDT)
+Received: from [10.57.56.40] (unknown [10.57.56.40])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AF7D83F73F;
+	Thu, 25 Apr 2024 08:52:55 -0700 (PDT)
+Message-ID: <c3424195-6d9b-4d15-b5c0-f4ef1fdbf160@arm.com>
+Date: Thu, 25 Apr 2024 16:52:54 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20231027182217.3615211-1-seanjc@google.com> <20231027182217.3615211-26-seanjc@google.com>
- <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain> <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
-Message-ID: <ZipyPYR8Nv_usoU4@google.com>
-Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to KVM_SET_USER_MEMORY_REGION2
-From: Sean Christopherson <seanjc@google.com>
-To: Shuah Khan <skhan@linuxfoundation.org>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>, Shuah Khan <shuah@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>, 
-	Vishal Annapurve <vannapurve@google.com>, Ackerley Tng <ackerleytng@google.com>, 
-	Maciej Szmigiero <mail@maciej.szmigiero.name>, David Hildenbrand <david@redhat.com>, 
-	Quentin Perret <qperret@google.com>, Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>, 
-	Liam Merwick <liam.merwick@oracle.com>, Isaku Yamahata <isaku.yamahata@gmail.com>, 
-	"Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>, 
-	Naresh Kamboju <naresh.kamboju@linaro.org>, Anders Roxell <anders.roxell@linaro.org>, 
-	Benjamin Copeland <ben.copeland@linaro.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
+To: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ kernel test robot <lkp@intel.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+ Emanuele.Rocca@arm.com
+References: <20240412084213.1733764-10-steven.price@arm.com>
+ <202404151003.vkNApJiS-lkp@intel.com>
+ <f11e6d5d-d2b9-400e-96c3-5d1ded827720@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <f11e6d5d-d2b9-400e-96c3-5d1ded827720@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 25, 2024, Shuah Khan wrote:
-> On 4/25/24 08:12, Dan Carpenter wrote:
-> > On Fri, Oct 27, 2023 at 11:22:07AM -0700, Sean Christopherson wrote:
-> > > Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so that
-> > > support for guest private memory can be added without needing an entirely
-> > > separate set of helpers.
-> > > 
-> > > Note, this obviously makes selftests backwards-incompatible with older KVM
-> >    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > > versions from this point forward.
-> >    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > 
-> > Is there a way we could disable the tests on older kernels instead of
-> > making them fail?  Check uname or something?  There is probably a
-> > standard way to do this...  It's these tests which fail.
+On 25/04/2024 14:42, Suzuki K Poulose wrote:
+> On 15/04/2024 04:13, kernel test robot wrote:
+>> Hi Steven,
+>>
+>> kernel test robot noticed the following build errors:
+>>
+
+<snip>
+
+>>>> drivers/hv/channel.c:442:8: error: call to undeclared function
+>>>> 'set_memory_decrypted'; ISO C99 and later do not support implicit
+>>>> function declarations [-Wimplicit-function-declaration]
+>>       442 |         ret = set_memory_decrypted((unsigned long)kbuffer,
+>>           |               ^
+>>>> drivers/hv/channel.c:531:3: error: call to undeclared function
+>>>> 'set_memory_encrypted'; ISO C99 and later do not support implicit
+>>>> function declarations [-Wimplicit-function-declaration]
+>>       531 |                 set_memory_encrypted((unsigned long)kbuffer,
+>>           |                 ^
+>>     drivers/hv/channel.c:848:8: error: call to undeclared function
+>> 'set_memory_encrypted'; ISO C99 and later do not support implicit
+>> function declarations [-Wimplicit-function-declaration]
+>>       848 |         ret = set_memory_encrypted((unsigned
+>> long)gpadl->buffer,
+>>           |               ^
+>>     5 warnings and 3 errors generated.
 > 
-> They shouldn't fail - the tests should be skipped on older kernels.
+> Thats my mistake. The correct place for declaring set_memory_*crypted()
+> is asm/set_memory.h not asm/mem_encrypt.h.
+> 
+> Steven, please could you fold this patch below :
 
-Ah, that makes sense.  Except for a few outliers that aren't all that interesting,
-all KVM selftests create memslots, so I'm tempted to just make it a hard requirement
-to spare us headache, e.g.
+Sure, I've folded into my local branch. Thanks for looking into the error.
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index b2262b5fad9e..4b2038b1f11f 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -2306,6 +2306,9 @@ void __attribute((constructor)) kvm_selftest_init(void)
-        /* Tell stdout not to buffer its content. */
-        setbuf(stdout, NULL);
- 
-+       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
-+                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
-+
-        kvm_selftest_arch_init();
- }
+Steve
 
---
+> 
+> diff --git a/arch/arm64/include/asm/mem_encrypt.h
+> b/arch/arm64/include/asm/mem_encrypt.h
+> index 7381f9585321..e47265cd180a 100644
+> --- a/arch/arm64/include/asm/mem_encrypt.h
+> +++ b/arch/arm64/include/asm/mem_encrypt.h
+> @@ -14,6 +14,4 @@ static inline bool force_dma_unencrypted(struct device
+> *dev)
+>         return is_realm_world();
+>  }
+> 
+> -int set_memory_encrypted(unsigned long addr, int numpages);
+> -int set_memory_decrypted(unsigned long addr, int numpages);
+>  #endif
+> diff --git a/arch/arm64/include/asm/set_memory.h
+> b/arch/arm64/include/asm/set_memory.h
+> index 0f740b781187..9561b90fb43c 100644
+> --- a/arch/arm64/include/asm/set_memory.h
+> +++ b/arch/arm64/include/asm/set_memory.h
+> @@ -14,4 +14,6 @@ int set_direct_map_invalid_noflush(struct page *page);
+>  int set_direct_map_default_noflush(struct page *page);
+>  bool kernel_page_present(struct page *page);
+> 
+> +int set_memory_encrypted(unsigned long addr, int numpages);
+> +int set_memory_decrypted(unsigned long addr, int numpages);
+> 
+> 
+> 
+> Suzuki
 
-but it's also easy enough to be more precise and skip only those that actually
-create memslots.
-
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index b2262b5fad9e..b21152adf448 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -944,6 +944,9 @@ int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flag
-                .guest_memfd_offset = guest_memfd_offset,
-        };
- 
-+       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
-+                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
-+
-        return ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION2, &region);
- }
- 
-@@ -970,6 +973,9 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
-        size_t mem_size = npages * vm->page_size;
-        size_t alignment;
- 
-+       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
-+                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
-+
-        TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages,
-                "Number of guest pages is not compatible with the host. "
-                "Try npages=%d", vm_adjust_num_guest_pages(vm->mode, npages));
---
 
