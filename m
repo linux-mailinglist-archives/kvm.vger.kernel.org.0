@@ -1,194 +1,214 @@
-Return-Path: <kvm+bounces-15889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F02158B19E7
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 06:25:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F8238B1A73
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 07:53:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74ED0284C8C
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 04:25:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FF0E2815C3
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 05:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A81F376EC;
-	Thu, 25 Apr 2024 04:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7AE53C467;
+	Thu, 25 Apr 2024 05:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wtJ1cnIq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J6r7RDj/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C2E2C697
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 04:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46BB83A1AC
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 05:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714019092; cv=none; b=O11U99v50insLtkT5i4bGETwA9iHZ9f965CyIyp8+/SVwmE707qRwnZUJBDyg4WntRT9Bd4WbDFIfLW6Txthg5BWzxrqG+1hXUbjAosnOYb+ho5AygvjgPcUT8/Wyn2cXgR7XGPLxaDo9SOQ/K/1e5ZaIB0u2mjBqj1D5tFyBww=
+	t=1714024381; cv=none; b=umRz6mvQ5EhEiyP77Jtbw0rm7akpdlYxD6bG866Qv27s6mwXxlAYXobciGfbDD1p1Lwe01tzJklpYJei4Hjmk56aVpxTN83iTR+llLBO+zn1SbFzkZsSYm3FyZGTYu52ZJu+YtCQJaJXMSEqrJUxZXsEh9tuC1RfadKCjEPw7ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714019092; c=relaxed/simple;
-	bh=vizLPpDz77XHtZLteOOI1a/fr6BKUXFJsNe42QhGao4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rGCHo5mrv4FKbpJXsXQ97HmiU1vbmsbLCj6EZxpqOONrMeCXnJDsaA8uHMHms9ilmuUB9UN262AcqcwjUvvcEkafl9LFsKq1/5vEdTYT3Z1hEaGkLEDwZWa6fIMv2Qg4g3bxuUqxPT/fpZ+lUoUQDZ5fjvtUBNvzevWmYT2dgpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wtJ1cnIq; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-51bab51e963so633033e87.1
-        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 21:24:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714019089; x=1714623889; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7IrvuwiS3D7ejDmTROQaAmlrQLvgYgyzhfvA7OnGDQQ=;
-        b=wtJ1cnIqZcZ8WGxSMYDjNj8LyZciAEihxRh9DEHmyGnPncStbcRCicxPbFckXlPOlq
-         OyrkbZiWl3+7G5uy9hYnL2m/9lXMoe8QyNTVSdZZz5GoQUOJiZH3SltF1T3mAPDwZXVD
-         m7T0A0f1Kj1RGjXMzPTRF8/DBH0/r/dY3gTruv65ylO/lJW1kcisbmo3SRR5Cwf604pH
-         87AyI9/dwsMG/3IY9McxaM8Xxwg/yGjnCxgnY65menyt7FwZ80stwzNiEsPcezH1DbVt
-         dD9MfmXhZYG2mx5Ku3cDQwU/9P5/Wb/1fJKBBhj6yTwuuirePsrVMEYfPaNltvOGD+cY
-         v0cw==
+	s=arc-20240116; t=1714024381; c=relaxed/simple;
+	bh=0u82w9dolSvFU8Uwn8LV3m70Xn2FRnCiM4BxMwYdWf0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IA+0y8rUIN9+35Zj7FG7zH9GU4d98sR/WGP6iBrP8FgpCG2hlq2EUjLamf0GP6E+vkh8bg//XRA8/Ov1+v5KF7RXVrLlvtfaUlJM2qUeZMZBkxUpZ05zawhW/W/xBHOTZhqpDFDt9Av+vl4Ml72l0+LirpbkIR2pSvv4R2JaKuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J6r7RDj/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714024378;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=dI7dijdI2QDdzkWi+eYKfMeHQJXKvryugjHN3nteeaY=;
+	b=J6r7RDj/tyl1BSJDGTF9N/Jhkz0hc8JApvO39oLXORemWUXKhO4WUQl3yh04Dz4j/Zz1JU
+	s1PKp7vCtQELuZy1/EXEsLbXoe6ABnDnqoAQ8z81V6NfgtKBJk8MVs8VrTbbQgIyasrCgS
+	HOmJcpN7MM3YVvTtuysXHOhshKKEkeY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-117-kNHBUNSCMGeLw1RDGzJbkA-1; Thu, 25 Apr 2024 01:52:56 -0400
+X-MC-Unique: kNHBUNSCMGeLw1RDGzJbkA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a559bc02601so36335566b.0
+        for <kvm@vger.kernel.org>; Wed, 24 Apr 2024 22:52:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714019089; x=1714623889;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7IrvuwiS3D7ejDmTROQaAmlrQLvgYgyzhfvA7OnGDQQ=;
-        b=XUjeS6kU5Q0KbPR4yWxLmHzvVaJF8BjA57FEVV1AMP369uInZMbm5MPP+GtF/CpD2J
-         9zTcDzOezdBRZ4tzDmPUVwNb5cmJHDeTWfY9c/32LS0PZj8C3EcuopuTz4YQPlm/clrN
-         OxH2vmKUM8SxIsZWaueMYWMSn67/4runON7JvIdSL+FrNbiskj636DFognI633CIKhS9
-         KVk/pVJ2gaMd1Ph2Ee/0OeeaEu6vaJxam4HscY/XrdHzdRL7f63fGZD6sqxetsZgfbbd
-         S9O+VoMaiXtPXo6ruSoG2L0bSX/3R2x+7iikaaxBkklJXKa2yz6G+Bo48SnWnI3hXHIm
-         SqvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW+GOngP9fyFhZFrp6CmyItno1Da2DXi8xhMQv8FJ7CknJ5FEA6Pqv4cXq+cqLNamCnZFuqRJeS24dZdcO1qlAt9Grr
-X-Gm-Message-State: AOJu0Ywvie922Krn7hLQpoqpi7HipDRaetY27zUAUujlWNlIbUawxxcH
-	W63oXAV9uf9k9kUzH9l4gz1MqsLZByPmumnXdOMy1qvstiwSmID4TXDJERdw3iCq96jqw8MFad8
-	tRow2FcK5P4Myct8amLbwvCvrNZ8RDsWdBeSO
-X-Google-Smtp-Source: AGHT+IEfUvui+52+qEcBDxTr1I+atQ6NoQjh90cU28I8b/8zvD7XHdTLRCq77QQHNVeBNssifFW7F7FKpHuLBaL/bns=
-X-Received: by 2002:ac2:4841:0:b0:51a:cfca:ca3f with SMTP id
- 1-20020ac24841000000b0051acfcaca3fmr2858795lfy.36.1714019088770; Wed, 24 Apr
- 2024 21:24:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714024375; x=1714629175;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dI7dijdI2QDdzkWi+eYKfMeHQJXKvryugjHN3nteeaY=;
+        b=HSvBv2ETkF2L/E+DjLjBHCD/I3K9iWqaNoOf/FKZzDlZnWhY8YtHTbR1bGD46b11Sg
+         FkNlHuLELiqOYK7vhXF7zFUyUc37Xl6ndtFvRa2MfyIX7wJNVImYgqV/MP9HOvGwKkbd
+         XK0qDDaqYVVqTrPAHVOwpRhuzd004ZnqtvDjQeDyTbYZA/1OxxmB883tGkYstVDe7uCO
+         T3X5SAC7uY68UnO1kfDREKreQ1ixX0OyjUvmdz0FMSMbCEFBbBdGCygsIyWyq9K4uFJ2
+         PCy/deSER32qSq52SAp7KLuP059KaZXP+nw4/xQgs4yjOY52XORE/5Ms5D8RjsXIZQqG
+         QUlw==
+X-Forwarded-Encrypted: i=1; AJvYcCXoIqR5qy+9QTGXIWbP8MYLo4MU66OKkJtoAalnoAtoIauG4UvaCQQS0IomtI/p40OGhqlHwHwUir3u91Wzoo8SkYRj
+X-Gm-Message-State: AOJu0YzfFdPjwVyeEjhUEqJbD5VXjp33ecgKWdNODUGllBF17EaFfQK3
+	jFUOMPmU+2g4IxIz/9RrTN7d2bZZ634sXxDq5pYs2TOsclNWRfVVNlKx+vQUyigjtDtZFSf52IC
+	0OSdjgNfR3PObJzmYvJKRDyMoFiI1bEjwBnDFoobBvh93LFkXlg==
+X-Received: by 2002:a17:906:24d5:b0:a55:5b50:847f with SMTP id f21-20020a17090624d500b00a555b50847fmr2947393ejb.22.1714024375292;
+        Wed, 24 Apr 2024 22:52:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG23ABnMxk4+XVx922H/ggA8ZeIwiF3utlZB7UPIYbYKuXtJb/8LuC3GBJPxkNizcFpIOHBtA==
+X-Received: by 2002:a17:906:24d5:b0:a55:5b50:847f with SMTP id f21-20020a17090624d500b00a555b50847fmr2947377ejb.22.1714024374862;
+        Wed, 24 Apr 2024 22:52:54 -0700 (PDT)
+Received: from [192.168.10.48] ([151.81.119.75])
+        by smtp.googlemail.com with ESMTPSA id ig13-20020a1709072e0d00b00a5886d91099sm2252346ejc.189.2024.04.24.22.52.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 24 Apr 2024 22:52:53 -0700 (PDT)
+Message-ID: <a4a38f76-d012-4ff4-a2a3-40af9a9a7052@redhat.com>
+Date: Thu, 25 Apr 2024 07:52:52 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZiaX3H3YfrVh50cs@google.com> <d8f3497b-9f63-e30e-0c63-253908d40ac2@loongson.cn>
- <d980dd10-e4c4-4774-b107-77b320cec9f9@linux.intel.com> <b5e97aa1-7683-4eff-e1e3-58ac98a8d719@loongson.cn>
- <1ec7a21c-71d0-4f3e-9fa3-3de8ca0f7315@linux.intel.com> <5279eabc-ca46-ee1b-b80d-9a511ba90a36@loongson.cn>
- <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
- <b3868bf5-4e16-3435-c807-f484821fccc6@loongson.cn> <CAL715W++maAt2Ujfvmu1pZKS4R5EmAPebTU_h9AB8aFbdLFrTQ@mail.gmail.com>
- <f843298c-db08-4fde-9887-13de18d960ac@linux.intel.com> <Zikeh2eGjwzDbytu@google.com>
- <7834a811-4764-42aa-8198-55c4556d947b@linux.intel.com>
-In-Reply-To: <7834a811-4764-42aa-8198-55c4556d947b@linux.intel.com>
-From: Mingwei Zhang <mizhang@google.com>
-Date: Wed, 24 Apr 2024 21:24:12 -0700
-Message-ID: <CAL715WKh8VBJ-O50oqSnCqKPQo4Bor_aMnRZeS_TzJP3ja8-YQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
- state for Intel CPU
-To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, maobibo <maobibo@loongson.cn>, 
-	Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, peterz@infradead.org, 
-	kan.liang@intel.com, zhenyuw@linux.intel.com, jmattson@google.com, 
-	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
-	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/11] filemap: add FGP_CREAT_ONLY
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ Matthew Wilcox <willy@infradead.org>, Vlastimil Babka <vbabka@suse.cz>
+Cc: seanjc@google.com, michael.roth@amd.com, isaku.yamahata@intel.com,
+ Yosry Ahmed <yosryahmed@google.com>
+References: <20240404185034.3184582-1-pbonzini@redhat.com>
+ <20240404185034.3184582-5-pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20240404185034.3184582-5-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 24, 2024 at 8:56=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.intel.=
-com> wrote:
->
->
-> On 4/24/2024 11:00 PM, Sean Christopherson wrote:
-> > On Wed, Apr 24, 2024, Dapeng Mi wrote:
-> >> On 4/24/2024 1:02 AM, Mingwei Zhang wrote:
-> >>>>> Maybe, (just maybe), it is possible to do PMU context switch at vcp=
-u
-> >>>>> boundary normally, but doing it at VM Enter/Exit boundary when host=
- is
-> >>>>> profiling KVM kernel module. So, dynamically adjusting PMU context
-> >>>>> switch location could be an option.
-> >>>> If there are two VMs with pmu enabled both, however host PMU is not
-> >>>> enabled. PMU context switch should be done in vcpu thread sched-out =
-path.
-> >>>>
-> >>>> If host pmu is used also, we can choose whether PMU switch should be
-> >>>> done in vm exit path or vcpu thread sched-out path.
-> >>>>
-> >>> host PMU is always enabled, ie., Linux currently does not support KVM
-> >>> PMU running standalone. I guess what you mean is there are no active
-> >>> perf_events on the host side. Allowing a PMU context switch drifting
-> >>> from vm-enter/exit boundary to vcpu loop boundary by checking host
-> >>> side events might be a good option. We can keep the discussion, but I
-> >>> won't propose that in v2.
-> >> I suspect if it's really doable to do this deferring. This still makes=
- host
-> >> lose the most of capability to profile KVM. Per my understanding, most=
- of
-> >> KVM overhead happens in the vcpu loop, exactly speaking in VM-exit han=
-dling.
-> >> We have no idea when host want to create perf event to profile KVM, it=
- could
-> >> be at any time.
-> > No, the idea is that KVM will load host PMU state asap, but only when h=
-ost PMU
-> > state actually needs to be loaded, i.e. only when there are relevant ho=
-st events.
-> >
-> > If there are no host perf events, KVM keeps guest PMU state loaded for =
-the entire
-> > KVM_RUN loop, i.e. provides optimal behavior for the guest.  But if a h=
-ost perf
-> > events exists (or comes along), the KVM context switches PMU at VM-Ente=
-r/VM-Exit,
-> > i.e. lets the host profile almost all of KVM, at the cost of a degraded=
- experience
-> > for the guest while host perf events are active.
->
-> I see. So KVM needs to provide a callback which needs to be called in
-> the IPI handler. The KVM callback needs to be called to switch PMU state
-> before perf really enabling host event and touching PMU MSRs. And only
-> the perf event with exclude_guest attribute is allowed to create on
-> host. Thanks.
+On 4/4/24 20:50, Paolo Bonzini wrote:
+> KVM would like to add a ioctl to encrypt and install a page into private
+> memory (i.e. into a guest_memfd), in preparation for launching an
+> encrypted guest.
+> 
+> This API should be used only once per page (unless there are failures),
+> so we want to rule out the possibility of operating on a page that is
+> already in the guest_memfd's filemap.  Overwriting the page is almost
+> certainly a sign of a bug, so we might as well forbid it.
+> 
+> Therefore, introduce a new flag for __filemap_get_folio (to be passed
+> together with FGP_CREAT) that allows *adding* a new page to the filemap
+> but not returning an existing one.
+> 
+> An alternative possibility would be to force KVM users to initialize
+> the whole filemap in one go, but that is complicated by the fact that
+> the filemap includes pages of different kinds, including some that are
+> per-vCPU rather than per-VM.  Basically the result would be closer to
+> a system call that multiplexes multiple ioctls, than to something
+> cleaner like readv/writev.
+> 
+> Races between callers that pass FGP_CREAT_ONLY are uninteresting to
+> the filemap code: one of the racers wins and one fails with EEXIST,
+> similar to calling open(2) with O_CREAT|O_EXCL.  It doesn't matter to
+> filemap.c if the missing synchronization is in the kernel or in userspace,
+> and in fact it could even be intentional.  (In the case of KVM it turns
+> out that a mutex is taken around these calls for unrelated reasons,
+> so there can be no races.)
+> 
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: Yosry Ahmed <yosryahmed@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Do we really need a KVM callback? I think that is one option.
+Matthew, are your objections still valid or could I have your ack?
 
-Immediately after VMEXIT, KVM will check whether there are "host perf
-events". If so, do the PMU context switch immediately. Otherwise, keep
-deferring the context switch to the end of vPMU loop.
+Thanks,
 
-Detecting if there are "host perf events" would be interesting. The
-"host perf events" refer to the perf_events on the host that are
-active and assigned with HW counters and that are saved when context
-switching to the guest PMU. I think getting those events could be done
-by fetching the bitmaps in cpuc. I have to look into the details. But
-at the time of VMEXIT, kvm should already have that information, so it
-can immediately decide whether to do the PMU context switch or not.
+Paolo
 
-oh, but when the control is executing within the run loop, a
-host-level profiling starts, say 'perf record -a ...', it will
-generate an IPI to all CPUs. Maybe that's when we need a callback so
-the KVM guest PMU context gets preempted for the host-level profiling.
-Gah..
+> ---
+>   include/linux/pagemap.h | 2 ++
+>   mm/filemap.c            | 4 ++++
+>   2 files changed, 6 insertions(+)
+> 
+> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> index f879c1d54da7..a8c0685e8c08 100644
+> --- a/include/linux/pagemap.h
+> +++ b/include/linux/pagemap.h
+> @@ -587,6 +587,7 @@ pgoff_t page_cache_prev_miss(struct address_space *mapping,
+>    * * %FGP_CREAT - If no folio is present then a new folio is allocated,
+>    *   added to the page cache and the VM's LRU list.  The folio is
+>    *   returned locked.
+> + * * %FGP_CREAT_ONLY - Fail if a folio is present
+>    * * %FGP_FOR_MMAP - The caller wants to do its own locking dance if the
+>    *   folio is already in cache.  If the folio was allocated, unlock it
+>    *   before returning so the caller can do the same dance.
+> @@ -607,6 +608,7 @@ typedef unsigned int __bitwise fgf_t;
+>   #define FGP_NOWAIT		((__force fgf_t)0x00000020)
+>   #define FGP_FOR_MMAP		((__force fgf_t)0x00000040)
+>   #define FGP_STABLE		((__force fgf_t)0x00000080)
+> +#define FGP_CREAT_ONLY		((__force fgf_t)0x00000100)
+>   #define FGF_GET_ORDER(fgf)	(((__force unsigned)fgf) >> 26)	/* top 6 bits */
+>   
+>   #define FGP_WRITEBEGIN		(FGP_LOCK | FGP_WRITE | FGP_CREAT | FGP_STABLE)
+> diff --git a/mm/filemap.c b/mm/filemap.c
+> index 7437b2bd75c1..e7440e189ebd 100644
+> --- a/mm/filemap.c
+> +++ b/mm/filemap.c
+> @@ -1863,6 +1863,10 @@ struct folio *__filemap_get_folio(struct address_space *mapping, pgoff_t index,
+>   		folio = NULL;
+>   	if (!folio)
+>   		goto no_page;
+> +	if (fgp_flags & FGP_CREAT_ONLY) {
+> +		folio_put(folio);
+> +		return ERR_PTR(-EEXIST);
+> +	}
+>   
+>   	if (fgp_flags & FGP_LOCK) {
+>   		if (fgp_flags & FGP_NOWAIT) {
 
-hmm, not a fan of that. That means the host can poke the guest PMU
-context at any time and cause higher overhead. But I admit it is much
-better than the current approach.
-
-The only thing is that: any command like 'perf record/stat -a' shot in
-dark corners of the host can preempt guest PMUs of _all_ running VMs.
-So, to alleviate that, maybe a module parameter that disables this
-"preemption" is possible? This should fit scenarios where we don't
-want guest PMU to be preempted outside of the vCPU loop?
-
-Thanks. Regards
--Mingwei
-
--Mingwei
-
->
->
-> >
-> > My original sketch: https://lore.kernel.org/all/ZR3eNtP5IVAHeFNC@google=
-.com
 
