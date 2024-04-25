@@ -1,100 +1,79 @@
-Return-Path: <kvm+bounces-15992-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15993-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BC18B2D34
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 00:41:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B3AF8B2D3A
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 00:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27D93B217A9
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 22:41:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E5771C215AC
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 22:43:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8461115623B;
-	Thu, 25 Apr 2024 22:41:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3BA156230;
+	Thu, 25 Apr 2024 22:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="flIG79Ky"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bvAUAiqd"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B361F745CB
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 22:41:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492D03EA9B;
+	Thu, 25 Apr 2024 22:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714084904; cv=none; b=FtvlpfJqLporEwX2TuzQ+ernbeSUQfJC1x47s8AeqZOKQlLAve5/5eLnVobD0pXCldFglkVE35tZKagwdFiyR6x69Hinu8fDAy/ZL4qEGhRFQIMSEcgLSdL3sPL5g5sEOCbRs92m6ny5kggqzWkJ8SofPOSAwlwzHe8MBndcLVU=
+	t=1714085003; cv=none; b=Hio27kiGApfrLad5RFjIln952M3s+X4Be9GzcWLrgtlAJUmAqpKmAvQ4xvJpq/sOtGU6aYtB/x9H/zRF32PRZD/oq+v/6AT+ZqsBzM5UogSkTStk/t0ei1YK3IWUrNtEr6bDO3AWRPIlFFq/YZRSofYfx0lXOTGkyXJK63djitg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714084904; c=relaxed/simple;
-	bh=oIbf+AzJRKngb2p73mGFU+CuiAIWLnjaDZekQY9OMek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WLXglLS2HxjJWPijKwuowupM+w/UOOq40XsHCS13iaEaE/xY4CgWJsUbdYMkuMdlHbCCEG7h2x7ILLMinxbta8S7U0LYJk7NTmU9oIo0Ajp3oF3nbnwKoea+JRcaR6H8yT15cTRr8sTLNFi8VNJteZRAoYM8LJ5G9gjxTsmEgaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=flIG79Ky; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 25 Apr 2024 22:41:32 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714084898;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GCaJfAPaJTJk4qPysJNwA1mMKwjvwJd7/RjWgxHGHyY=;
-	b=flIG79Ky9avijT6lxv6ruTzaWrjTez3ao65sse6mEFWL42L71Fy+HwoaFDVgbhqSQc8Plc
-	2zVls0Jn+yPxfrWHmLf2RsKd04+qj9yHIh5kAk1zeFvGngWMAknB7HIf4j1elRNjy/VQeD
-	3uDkbrZxw2MMlKn7IbsrZ3Do8tWuOuc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
-Subject: Re: [PATCH] KVM: selftest: Define _GNU_SOURCE for all selftests code
-Message-ID: <ZircHEd4GZPApm21@linux.dev>
-References: <20240423190308.2883084-1-seanjc@google.com>
+	s=arc-20240116; t=1714085003; c=relaxed/simple;
+	bh=zdLuVH84OGqw7RgBSDevcy3yPUi7yV0lCoRUme7EejI=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jXREna2jfw4VqjuuBRS2wm1oaLpR4Hs78BR18Nj7nriq6nmESL5FuJGp+1ib0GccHYYRaV1UGvv029sh4raWtpbIQy1vVOlUR3W/oc27ZXLfVFNJGV+XPjOiYjYKdndrbTBLB4SSjfFnRTB8oadNk92MPV0B8ktRPyfR1gPO2SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bvAUAiqd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C3742C113CC;
+	Thu, 25 Apr 2024 22:43:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714085002;
+	bh=zdLuVH84OGqw7RgBSDevcy3yPUi7yV0lCoRUme7EejI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=bvAUAiqdnVhUoT90KfLZoWMIloxHKzb83Ho6Ug5u3u4adNoK98VmNcbreqHLpVLxI
+	 wWAOF9gnHljJyfDMX66bL/iG4rY8JT+AtpyhrLchQvZtd8tSQAfR0hk4tFEF5RfqCn
+	 wXX2IwopietaS1EZQUVdiMswdkmbTKj625nvueY9RyJ2Czom69c0qrs5tjXThrcb0+
+	 +3w1enj398oY/YVU7oFeoBQ4MYxctgOV9KjZ/zo+FuSgm+BDO8/PhtMhzaGDgzQxMi
+	 Ms4s48fxQRLyLQP2xCgsbU6hxP6glFC/QDKKfs5YN2rtlhN33RUGmmB4HngCh+0xNv
+	 oKRoDTXIWpvtg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BAC5DC43614;
+	Thu, 25 Apr 2024 22:43:22 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio: bugfix
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240425180106-mutt-send-email-mst@kernel.org>
+References: <20240425180106-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240425180106-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 98a821546b3919a10a58faa12ebe5e9a55cd638e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: c942a0cd3603e34dd2d7237e064d9318cb7f9654
+Message-Id: <171408500275.32202.9237906041561329048.pr-tracker-bot@kernel.org>
+Date: Thu, 25 Apr 2024 22:43:22 +0000
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, lingshan.zhu@intel.com, mst@redhat.com
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240423190308.2883084-1-seanjc@google.com>
-X-Migadu-Flow: FLOW_OUT
 
-On Tue, Apr 23, 2024 at 12:03:08PM -0700, Sean Christopherson wrote:
-> Define _GNU_SOURCE is the base CFLAGS instead of relying on selftests to
-> manually #define _GNU_SOURCE, which is repetitive and error prone.  E.g.
-> kselftest_harness.h requires _GNU_SOURCE for asprintf(), but if a selftest
-> includes kvm_test_harness.h after stdio.h, the include guards result in
-> the effective version of stdio.h consumed by kvm_test_harness.h not
-> defining asprintf():
-> 
->   In file included from x86_64/fix_hypercall_test.c:12:
->   In file included from include/kvm_test_harness.h:11:
->  ../kselftest_harness.h:1169:2: error: call to undeclared function
->   'asprintf'; ISO C99 and later do not support implicit function declarations
->   [-Wimplicit-function-declaration]
->    1169 |         asprintf(&test_name, "%s%s%s.%s", f->name,
->         |         ^
-> 
-> When including the rseq selftest's "library" code, #undef _GNU_SOURCE so
-> that rseq.c controls whether or not it wants to build with _GNU_SOURCE.
-> 
-> Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+The pull request you sent on Thu, 25 Apr 2024 18:01:06 -0400:
 
-Acked-by: Oliver Upton <oliver.upton@linux.dev>
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c942a0cd3603e34dd2d7237e064d9318cb7f9654
+
+Thank you!
 
 -- 
-Thanks,
-Oliver
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
