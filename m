@@ -1,176 +1,152 @@
-Return-Path: <kvm+bounces-15955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA758B26FA
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:59:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286D68B27F4
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 20:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFD801C20D3F
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:59:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB3DC282566
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C2914D6E5;
-	Thu, 25 Apr 2024 16:59:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89FC01514F8;
+	Thu, 25 Apr 2024 18:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3llwT5X9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TM46+MNp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD7E131746
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 16:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1238214F13A
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 18:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714064356; cv=none; b=jtdHcQqk7WpfSzqkjJIKc0SRZC6LfvNuZB5Nkj/NYie9x6bNupUAMHKUyDR4bFDMNDC+/zoJJlml94WaGnss9e7iVT2wMxqip5oK4MADQd7rJto+F2L33//rvfEhvn8kMNUyqqRB1T80QSrH/Z6VpEZRwzM6rAtAoPBj9pwunAk=
+	t=1714068869; cv=none; b=DgJV3Yzj1TL9qMNAHUMTEm4vbnB8lkXzlKFkHISuGOmA4tuiPS4i7CeBc0jSos9Ao7kbMUUWGAJ5E+YHiupBwII+0JxPnjrjhQ2Twaw/Ini71crCdoawlqXE3SibrMTfsYsfwzEngHXN2s4/SIa4vopf+1ynVjH8ROiEbIuuxvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714064356; c=relaxed/simple;
-	bh=k9YshUQgCbTLWcIZ9NTqZp6bDZiJRu6BIqHMSvdfKn8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jf3+iGgwZQjCGTpBY9+caeK8uGfj3Yul4IEo5kmhHvnACyF6ZbDIY6gtItdrfuaploZURtUpD5m3aP0mBKtQZIsKPaOTC1ULpbOTdLbbbbB11v0cyMxr1jePi0pjYDIq6BBGKXz1Q42+d5Js4039i+H/eKRb2j04jUQrncrLj0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3llwT5X9; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1714068869; c=relaxed/simple;
+	bh=4qtbHwEvCmU4KkXm39uticydjRyT5zPpSXFReESlu/k=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=C/ErCaDCBaE+u7pfOvUz8Gg6U0G8m39SW7gWLSkGT8qv3qE4p9OMKR15sWy5Oo6UiE+accCkeWIShNxsccI39fu9dYiwCn0TrITOjwnoO08l7LAvbsRYKzPeYExPlRSa/ZvpNxu7/ZZ41EFqaFJmZ0SZLqwNmkGG3JB2ofwoFqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TM46+MNp; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de54be7066bso2252969276.0
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 09:59:14 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ef9edf9910so1749695b3a.1
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 11:14:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714064354; x=1714669154; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1hXeo96+/vb09V/VI5ziQ0e9n0cZLQ/jDx95y8eWPXw=;
-        b=3llwT5X9I+b1AaO5pq4EkTyLD6VrqUUG7olGzQv2wMkxL5+AtK8napDfLXzfIov8Iu
-         vjv8S9P9yxvqVd/BIG2VYUOd4Ahp3+xfj5SCzpy3w3xwUjapFD5u8RdXu24/55yIRWB/
-         pxaaF3bcUwUXFN1ZqC/reHTMdSmx2jDq5XunD2K0yMenTcSJJpBOOPbpI5PPyngCR7wT
-         HzSZCLMiomytW3c9VazqGHQSxE76gU/mTe8rJVnLYMiVopFbLnuUFXhtVAlfjBpbwB2m
-         eJdxSvEpJ6i9Beoy5dIPBMtUye8yibJP7AyrHDL5DZzeMzU8afLOM5o6RH3Jf0hfrIIg
-         ZBOQ==
+        d=google.com; s=20230601; t=1714068866; x=1714673666; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DHW/shiisjaeVIVVFJxFalhvGV979k2DmH/wFoxACZs=;
+        b=TM46+MNpAnpXiVgLYvj4SsZmCpU9JzAHeNCY1OiaBDeCqK5vWveQ7mB+I7GfsEiF1H
+         LIYIjrFuDttoMeaNe7Bu32xqkZvvLI2JmCtB4c1nQeX6kswdL8kNmlQYZ55Ejh63KbuA
+         plEV7kCmmYuLqEmUv+6sueCNVe0aRLd7ot4ZqjvbmOduOPLeSsbL3t7bUfDfBnZWGl2g
+         eog/eG0XaYLrR5WQODjt9pYdFaY53+UJi8hH7+IUbl9SWH5I24ebMuVEpOv0xv9Sgkm/
+         rHbrmkZIoh793GiY6vAo7HHeg0NWhERdpAtOrtaQ3cuXk+Qs/BRk7AQXhq5+sHUubEah
+         WCnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714064354; x=1714669154;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1hXeo96+/vb09V/VI5ziQ0e9n0cZLQ/jDx95y8eWPXw=;
-        b=bfc0djTYedgFbTENERv9sgnuK8hWkPrIQpm00l7Zlv+sNmy+akWxxzfgegcfkl50UW
-         3aVOrDLoKNaGX3oP1CHPVN1BLbahexKMAssqhybhhE18TYfDAPZ73AZX72qJNH/g96oz
-         6cd1cYK8mHvvkX0+kx2b7WTs5WrQg5AQ5OTchQdYeGkgCLWdhobje6UKgP9ExKKlxkOL
-         r2lldMQaMzbrIDlWM7Yz2qa5ce7cQTt+h6XAxePFaZhOpAW0SeZbFUfPhHkenKx8UeYJ
-         KOBHaNnnIBDeeihId034ZB1oDW8OvI7WwJsK3bMpX25XWZBwT0GvLCr/5DTfMe/Tz+SN
-         Kbcw==
-X-Forwarded-Encrypted: i=1; AJvYcCXzvUEojUqhww9GmXh53/U2TzuvrcaqI8rOJCm/bWoXEx9i1Iz7bSLxqAqEXKkQVN0MgKdNKCIDxrjVVOjx2SiXsmcr
-X-Gm-Message-State: AOJu0Yyput2/50vyyciBOm9K3/EAiZcc63U/514gmULlhyzoRReURTmX
-	MKdtOof0pU4vjsErmIMfyJR8ZgVU+ZtDIdNHSHewcwsAMB2M4H2/Ax39ipHuLTaFxU5QJOjGH7a
-	F6Q==
-X-Google-Smtp-Source: AGHT+IHSzYLKg5XZ9oMM7Ds74tfJOzPyZMvU7nuQbF+0tX6pcWmAiKJDRJ/DGHMVDRbZA5M2Z3a9vozg/zs=
+        d=1e100.net; s=20230601; t=1714068866; x=1714673666;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DHW/shiisjaeVIVVFJxFalhvGV979k2DmH/wFoxACZs=;
+        b=SFCXM3o1N7Czb+R6V13wmCHOip42t0b3vHT27lxNtXolv2FeUiUIg34eZW2wCNs4an
+         C7+szuce8Oi3N90bibV6D9GQ+1MjBMzIe3BwJgPe0Ukzgus4iO1pQBSwEB91fNxU00RT
+         dRZOum5VR8LdBBCpVOi7OqNdmZIoXeRovRyKxTzgaMKZq4yahKQcoDaU/uS2LoECjhlV
+         zBsm0M06Wu/1S8wzw3jTjRBr9W3c8P0IbRC8l4ahlBOZcmdEzzW3Tue4uYi9f/D3DIEw
+         JANvcOKaW4AxsFUAQczX/Rhi8gSPPrGnsz/srgogw0JzgwkUYN49IHBxDcuM9fTQBfAk
+         i65g==
+X-Gm-Message-State: AOJu0YwFpTL+A0nYs+e16WJr768+yxOE9eG09yvGfJCviUUdk3K8M2Zw
+	hYGf+qj4Zjiy733Avr14Syf1/KdvvNK252SfyXh+23XuKACJ4dQtesb8Vdye446cI6dF9UwbST8
+	+8g==
+X-Google-Smtp-Source: AGHT+IHE5EcGnk8IXdZtyOff6mZZ63PsD7aMB2zzV5XGAgckt0XbMFHsOyJIBfcIZEyFT3yCJTGXNP4sex8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:6884:0:b0:dcc:6065:2b3d with SMTP id
- d126-20020a256884000000b00dcc60652b3dmr41398ybc.8.1714064354095; Thu, 25 Apr
- 2024 09:59:14 -0700 (PDT)
-Date: Thu, 25 Apr 2024 09:59:12 -0700
-In-Reply-To: <bd6a294eaa0e39c2c5749657e0d98f07320b9159.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:9286:b0:6ea:be7b:2eda with SMTP id
+ jw6-20020a056a00928600b006eabe7b2edamr53555pfb.6.1714068866319; Thu, 25 Apr
+ 2024 11:14:26 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 25 Apr 2024 11:14:12 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <f9f1da5dc94ad6b776490008dceee5963b451cda.camel@intel.com>
- <baec691c-cb3f-4b0b-96d2-cbbe82276ccb@intel.com> <bd6a294eaa0e39c2c5749657e0d98f07320b9159.camel@intel.com>
-Message-ID: <ZiqL4G-d8fk0Rb-c@google.com>
-Subject: Re: [RFC] TDX module configurability of 0x80000008
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240425181422.3250947-1-seanjc@google.com>
+Subject: [PATCH 00/10] KVM: x86: Clean up MSR access/failure handling
 From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Weijiang Yang <weijiang.yang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Apr 25, 2024, Rick P Edgecombe wrote:
-> On Thu, 2024-04-25 at 23:09 +0800, Xiaoyao Li wrote:
-> > > The idea is that TDX module could add the capability to configure the=
-se
-> > > bits as well, so that TDs could match normal VMs for cases where ther=
-e is
-> > > a desire for the guests MAXPA to be smaller than the hosts. The
-> > > requirements would be,
-> > > roughly:
-> > > =C2=A0=C2=A0 - The VMM specifies the=E2=80=AF0x80000008.EAX[23:16] wh=
-en creating a TD.
-> > > =C2=A0=C2=A0 - The TDX module does sanity checking.=E2=80=AF
-> > > =C2=A0=C2=A0 - The 0x80000008.EAX[23:16] field is used to communicate=
- the max
-> > > addressable
-> > > =C2=A0=C2=A0 GPA to=E2=80=AF the guest. It will be used by the guest =
-firmware to make sure
-> > > =C2=A0=C2=A0 resources like PCI bars are mapped into the addressable =
-GPA.
-> > > =C2=A0=C2=A0 - If the guest attempts to access memory beyond the max =
-addressable GPA,
-> > > then
-> > > =C2=A0=C2=A0 the TDX module generates EPT violation to the VMM. For t=
-he VMM, this case
-> > > =C2=A0=C2=A0 means that the guest attempted to access "invalid" (I/O)=
- memory.
-> > > =C2=A0=C2=A0 - The VMM will be expected to terminate the TD guest. Th=
-e VMM may send
-> > > =C2=A0=C2=A0 a notification, but the TDX module doesn't necessarily n=
-eed to know how.
-> >=20
-> > This is not the same as how it works for normal (non-TDX) VMs.
-> >=20
-> > For normal VMs, when userspace configures a smaller one than what=20
-> > hardware EPT/NPT supports, it doesn't cause any issue if guest accesses=
-=20
-> > GPA beyond [23:16] but within hardware EPT/NTP capability.
-> >=20
-> > It's more a hint to guest that KVM doesn't enforce the semantics of it.=
-=20
-> > However, for TDX case, you are proposing to make it a hard rule.
->=20
-> If we limit ourselves to worrying about valid configurations,
+Rework KVM's MSR access handling, and more specific the handling of failures,
+to begin the march towards removing host_initiated exemptions for CPUID
+checks, e.g. to eventually turn code like this:
 
-Define "valid configurations". =20
+		if (!msr_info->host_initiated &&
+		    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
+			return 1;
 
-> accessing a GPA beyond [23:16] is similar to accessing a GPA with no mems=
-lot.
+into
 
-No, it's not.  A GPA without a memslot has *very* well-defined semantics in=
- KVM,
-and KVM can provide those semantics for all guest-legal GPAs regardless of
-hardware EPT/NPT support.
+		if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
+			return KVM_MSR_RET_UNSUPPORTED;
 
-> Like you say, [23:16] is a hint, so there is really no change from KVM's
-> perspective. It behaves like normal based on the [7:0] MAXPA.
->=20
-> What do you think should happen in the case a TD accesses a GPA with no m=
-emslot?
-=20
-Synthesize a #VE into the guest.  The GPA isn't a violation of the "real" M=
-AXPHYADDR,
-so killing the guest isn't warranted.  And that also means the VMM could le=
-gitimately
-want to put emulated MMIO above the max addressable GPA.  Synthesizing a #V=
-E is
-also aligned with KVM's non-memslot behavior for TDX (configured to trigger=
- #VE).
+For all intents and purposes, KVM already requires setting guest CPUID before
+setting MSRs, as there are multiple MSR flows that simply cannot work if CPUID
+isn't in place.
 
-And most importantly, as you note above, the VMM *can't* resolve the proble=
-m.  On
-the other hand, the guest *might* be able to resolve the issue, e.g. it cou=
-ld
-request MMIO, which may or may not succeed.  Even if the guest panics, that=
-'s
-far better than it being terminated by the host as it gives the guest a cha=
-nce
-to capture what led to the panic/crash.
+But because KVM's ABI is that userspace is allowed to save/restore MSRs that
+are advertised to usersepace regardless of the vCPU CPUID model, KVM has ended
+up with code like the above where KVM unconditionally allows host accesses.
 
-The only downside is that the VMM doesn't have a chance to "bless" the #VE,=
- but
-since the VMM literally cannot handle the "bad" access in any other than ki=
-lling
-the guest, I don't see that as a major problem.
+The idea here is to funnel all MSR accesses through a single helper so that
+KVM can make the "host_initiated" exception in a single location based on
+KVM_MSR_RET_UNSUPPORTED, i.e. so that KVM doesn't need one-off checks for every
+MSR, which is especially problematic for CET where a Venn diagram is needed to
+map CET MSR existence to CPUID feature bits.
 
-> KVM/QEMU don't have a lot of options to recover. So are the differences h=
-ere
-> just the existing differences between normal VMs and TDX?
+This series doesn't actually remove the existing host_initiated checks.  I
+*really* wanted to do that here, but removing all the existing checks is
+non-trivial and has a high chance of subtly breaking userspace.  I still want
+to eventually get there, but it needs to be a slower, more thoughtful process.
+
+For now, the goal is to allow new features to omit the host_initiated checks
+without creating a weird userspace ABI, e.g to simplify the aforementioned CET
+support.
+
+Sean Christopherson (10):
+  KVM: SVM: Disallow guest from changing userspace's MSR_AMD64_DE_CFG
+    value
+  KVM: x86: Move MSR_TYPE_{R,W,RW} values from VMX to x86, as enums
+  KVM: x86: Rename KVM_MSR_RET_INVALID to KVM_MSR_RET_UNSUPPORTED
+  KVM: x86: Refactor kvm_x86_ops.get_msr_feature() to avoid
+    kvm_msr_entry
+  KVM: x86: Rename get_msr_feature() APIs to get_feature_msr()
+  KVM: x86: Refactor kvm_get_feature_msr() to avoid struct kvm_msr_entry
+  KVM: x86: Funnel all fancy MSR return value handling into a common
+    helper
+  KVM: x86: Hoist x86.c's global msr_* variables up above
+    kvm_do_msr_access()
+  KVM: x86: Suppress failures on userspace access to advertised,
+    unsupported MSRs
+  KVM: x86: Suppress userspace access failures on unsupported,
+    "emulated" MSRs
+
+ arch/x86/include/asm/kvm-x86-ops.h |   2 +-
+ arch/x86/include/asm/kvm_host.h    |   2 +-
+ arch/x86/kvm/svm/svm.c             |  29 +-
+ arch/x86/kvm/vmx/main.c            |   2 +-
+ arch/x86/kvm/vmx/vmx.c             |   8 +-
+ arch/x86/kvm/vmx/vmx.h             |   4 -
+ arch/x86/kvm/vmx/x86_ops.h         |   2 +-
+ arch/x86/kvm/x86.c                 | 513 ++++++++++++++---------------
+ arch/x86/kvm/x86.h                 |  21 +-
+ 9 files changed, 294 insertions(+), 289 deletions(-)
+
+
+base-commit: 7b076c6a308ec5bce9fc96e2935443ed228b9148
+-- 
+2.44.0.769.g3c40516874-goog
+
 
