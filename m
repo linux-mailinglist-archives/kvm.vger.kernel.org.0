@@ -1,215 +1,143 @@
-Return-Path: <kvm+bounces-15932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55D18B2446
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:44:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3284B8B244E
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 315EF1F23A9E
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 14:44:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C79DB26769
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 14:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EA414A0BF;
-	Thu, 25 Apr 2024 14:44:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD9514A623;
+	Thu, 25 Apr 2024 14:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VJ1qky3h"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="hO8QjXa9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799B114A4CC
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 14:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5258A14A4EA
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 14:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714056286; cv=none; b=eP/82XLNfmRqVKyGd0csK0VQiF5v5SCvoAPSu9PBv5sf4CTfUIZq299qCIhnK6GR7GHD693aSDPB1nZ7CqV4/pIXGnWH40zJZjwAwG2aFgCKHKTv+RCrlBQdKyiaxcPa/l1dBp8xw5gY2RBUGoXqdPI7PHI5gd1RWJ0iBckOU9U=
+	t=1714056329; cv=none; b=oWYHnTKKEMWB9q3t2vvY9nDJb+MWBkT00zXIi2Z6rtQwcUfE7VLtjMn+Ow8THeav2bmv8t3Jtwufl854n1YWJKSNe8rvcSsavxjjIPTRPiM4in+LcPbcRHdqsi0/biPp56jxAtl2mPCmfu+8AKC+/Gzoo1Xw2mknDSeYF5XuxV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714056286; c=relaxed/simple;
-	bh=1Vynxfx2D6956dodx3vvYuxa6Pa4BDwN4tyUYPevkxc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=syCAghAbnjEuKPk0QfPhLu9ciqF6BR3vmRWb0MvQr0ZCBhGGc28zKtBG3uLCvfbghTzfcGnTeOiYHiMFU1n//GZWusq/BtBKE1LKAkWt1bkn6FUK2G5Ne2pdycN9RO6g7vptT6xwlUwx2e5SRN/GdI7C1+YgZlIbl8OoeyItmps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VJ1qky3h; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-617d25b2bc4so11317247b3.2
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 07:44:45 -0700 (PDT)
+	s=arc-20240116; t=1714056329; c=relaxed/simple;
+	bh=IJ3J9+qMMc5AcpPKGPwrAuPLaO9e0GfSfZ8R0+bwFng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mJ3WKU3Ky3+oXatjWqhhmnzONbf8899kFYgz267hBNJsptB55Eim8ocrlfTN+xVXcydb5plu/yVSVoxfrMIMghQEtgN6gXW6vDiQjatTTbN9l6wcWvmvl40aYZlqiClWVnJCUmrj8wfRUnuWJDCzdF+3qQnOrg+xCmjup+gJ/RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=hO8QjXa9; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ecf1d22d78so66951b3a.0
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 07:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714056284; x=1714661084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4XHxss7Od+OfkSKxerbEin0D4Y8XCvJwoXzpIRakjY4=;
-        b=VJ1qky3h1hb7Qmq1/+wl5GfYGdF6oJPGsflcUutkn5UXfZEEagqpnDm9pMUTqNx3o9
-         TXFN79QM61rXvNmvEd2t/76mHNytCyKtpy92bzQEUbT4i+l60gmqRdc9OWulTU+YwXk2
-         2G9FfGQ7gvxr5AziX3E2GOn+WdBDJtuOGnaBYLqy5wyRwMXY/FtBHMxDMWyTujhQ0YPN
-         Tg3xHZPeT1EzVS2h8cNmUh5lkrvcki3ogW3+TZY5nNXUjK+brsRk1PT+fSrU2cSCDa/x
-         qxxpdDjvQBVZ9ZkLrUhIkwhZz34Daf9nYaxL6i8trZGAM63VWiqifbOWkSfDfZu7J2Ln
-         7o0A==
+        d=linuxfoundation.org; s=google; t=1714056328; x=1714661128; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Upe9hXc85SfykUK8OSJyDQtUplWhtMiTd1jA3tMRXuo=;
+        b=hO8QjXa9lALXbwUsKXaff/iSO59Zbkn009rIlqZSCTTs5fi3iWw7w0869tbnDvi0rr
+         uVk4tKOMW8eURFiwROT9wn9tu1s/k4yyjGRr4TfEno57Ab9msTY+G7tLLBikp7Djbv0K
+         VEmmMQ1Ob3RkrKeZUGT3O07/ag/h4VifsNM+E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714056284; x=1714661084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4XHxss7Od+OfkSKxerbEin0D4Y8XCvJwoXzpIRakjY4=;
-        b=LZiq1UcWff9pMbbH5JeuOaS1z+N70KUv4oDBTYVFhwbo1k4Bnsp8qhX6ES7Ipfa4p8
-         HsZGvubzAOoIVG2xvq7cTz1fvQpz54HbMzi8anWWPe0Hg3RnAEO/+Z7rGDQooBYS2m2M
-         PNZQl119YaU0B+5ji9i839mKPNmHCx88toYvxXeT5VjOek7EHLSgodXvLfOHhw9+gXy7
-         Utnz7lYDyvxdRQnjLTdR7Ft8IOyMgXh+5Cpyv7AmBK9atG/UTPScvwZnH1W43xaFOKWc
-         j5rtKBklNYGQXtlFRRbeHTlOReGYB+NgDXtb4W/82pHnH7JChIWbw+UVmNlvcZRHlBVo
-         1Ohg==
-X-Gm-Message-State: AOJu0YyntW/yQvK4kLmZ9ixYQOzqyg4E4LZMZ7BTqqrDNlL/e10MfOyl
-	cu80jsk8o4vdQcLiphQ87SAG7TeGAHk2HBwdQXoYTa0cFB2eo2SJ/ynmc2luOQVRj8IHAI83XNA
-	+Rcn/RGMdtLf9/1PRNXV1Ygn68QjDleJyVbN6
-X-Google-Smtp-Source: AGHT+IHcmWwxfbEJpizD95GcdNN5E+9J6MenReSgJkZTNHD/sQZ17A8KpqOihrS1Id2Tb8PVty4NllCeLHZvLqz87Cw=
-X-Received: by 2002:a05:690c:600a:b0:618:92bd:9334 with SMTP id
- hf10-20020a05690c600a00b0061892bd9334mr6616886ywb.43.1714056284262; Thu, 25
- Apr 2024 07:44:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714056328; x=1714661128;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Upe9hXc85SfykUK8OSJyDQtUplWhtMiTd1jA3tMRXuo=;
+        b=PhDSynOxP1lEmOge4uCgRZsV/LGWVgTv4Q5mz02IlYY8doAEvgWF2BU0RQQDHHJGH2
+         Vh1AqmZv2pze2yahn5e8FmrTECVnxFFI9G5rZA3G/jH1V+gE4iAPimAjq6sTQPfGgxH4
+         nBVkNw+9gj2NuCv52C3bMvH+TSNzwDnU298dPeghwGYp13F9oHTKjv0n6YQPtkFq8grR
+         ud64yh3VPtaOzNJt7emn/w7fyMC0qqdkDtZvIfZa1EyOOLOb3QHn22InJ7B6+Byyrnrr
+         zLqb/kr/wWp0EqzU2bZahr9HKxlyGEUHiqpYTfdFa6VqrntdAyioKhQPdILFOO9bcv0w
+         I1xA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPBEqQc6J3G+5yhFIwDbt9A0Upp0nU3bU+CQt/uVNegOBrr5gYu+sFMO5DV3VzVIiyJTDfL9oEhMRWqz+HVWl1nDao
+X-Gm-Message-State: AOJu0YwKgEsH1v33IDnJTjeswowiolyxb/nSS+XiwafvmPr5SIR/MchV
+	bdL1yV1I5GSLb4KqHTdQ7gWtCQQMBqDlbuqJi7M7ZLjxE+vyxL6v3qlMsKxWfX0=
+X-Google-Smtp-Source: AGHT+IH2ZWIxVnWGlxZ14mWcvRqLtKyE6u0gRzo1WyBlfFhqv5treC26C0VPwnpQrTOD05hYIY1E7A==
+X-Received: by 2002:a05:6a00:731:b0:6ea:ba47:a63b with SMTP id 17-20020a056a00073100b006eaba47a63bmr6568081pfm.0.1714056327589;
+        Thu, 25 Apr 2024 07:45:27 -0700 (PDT)
+Received: from [192.168.43.82] ([223.185.79.208])
+        by smtp.gmail.com with ESMTPSA id k124-20020a633d82000000b005f7d61ec8afsm11351461pga.91.2024.04.25.07.45.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Apr 2024 07:45:27 -0700 (PDT)
+Message-ID: <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
+Date: Thu, 25 Apr 2024 08:45:07 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com> <20240412084309.1733783-43-steven.price@arm.com>
-In-Reply-To: <20240412084309.1733783-43-steven.price@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 25 Apr 2024 15:44:07 +0100
-Message-ID: <CA+EHjTyGcO=-EdFE75g5DwBKosKWUdmg7CB8VAr1w78C=2PCww@mail.gmail.com>
-Subject: Re: [PATCH v2 42/43] arm64: kvm: Expose support for private memory
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to
+ KVM_SET_USER_MEMORY_REGION2
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>,
+ Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+ Naresh Kamboju <naresh.kamboju@linaro.org>,
+ Anders Roxell <anders.roxell@linaro.org>,
+ Benjamin Copeland <ben.copeland@linaro.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-26-seanjc@google.com>
+ <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 4/25/24 08:12, Dan Carpenter wrote:
+> On Fri, Oct 27, 2023 at 11:22:07AM -0700, Sean Christopherson wrote:
+>> Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so that
+>> support for guest private memory can be added without needing an entirely
+>> separate set of helpers.
+>>
+>> Note, this obviously makes selftests backwards-incompatible with older KVM
+>    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>> versions from this point forward.
+>    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> Is there a way we could disable the tests on older kernels instead of
+> making them fail?  Check uname or something?  There is probably a
+> standard way to do this...  It's these tests which fail.
 
-On Fri, Apr 12, 2024 at 9:44=E2=80=AFAM Steven Price <steven.price@arm.com>=
- wrote:
->
-> Select KVM_GENERIC_PRIVATE_MEM and provide the necessary support
-> functions.
->
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  4 ++++
->  arch/arm64/kvm/Kconfig            |  1 +
->  arch/arm64/kvm/arm.c              |  5 +++++
->  arch/arm64/kvm/mmu.c              | 19 +++++++++++++++++++
->  4 files changed, 29 insertions(+)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
-vm_host.h
-> index 902923402f6e..93de7f5009fe 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1259,6 +1259,10 @@ static inline bool kvm_vm_is_protected(struct kvm =
-*kvm)
->         return false;
->  }
->
-> +#ifdef CONFIG_KVM_PRIVATE_MEM
-> +bool kvm_arch_has_private_mem(struct kvm *kvm);
-> +#endif
-> +
+They shouldn't fail - the tests should be skipped on older kernels.
+If it is absolutely necessary to dd uname to check kernel version,
+refer to zram/zram_lib.sh for an example.
 
-I think it might be better to define kvm_arch_has_private_mem() for
-both cases, whether KVM_PRIVATE_MEM is enabled or not, similar to the
-way it's defined in arch/x86/include/asm/kvm_host.h
-
->  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
->  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
->
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 58f09370d17e..8da57e74c86a 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -37,6 +37,7 @@ menuconfig KVM
->         select HAVE_KVM_VCPU_RUN_PID_CHANGE
->         select SCHED_INFO
->         select GUEST_PERF_EVENTS if PERF_EVENTS
-> +       select KVM_GENERIC_PRIVATE_MEM
-
-I don't think this should be enabled by default, but should depend on
-whether RME is configured. That said, I can't find the config option
-for RME...
-
->         help
->           Support hosting virtualized guest machines.
->
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index 2dd014d3c366..a66d0a6eb4fa 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -89,6 +89,11 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
->         return kvm_vcpu_exiting_guest_mode(vcpu) =3D=3D IN_GUEST_MODE;
->  }
->
-> +bool kvm_arch_has_private_mem(struct kvm *kvm)
-> +{
-> +       return kvm_is_realm(kvm);
-> +}
-> +
-
-Related to my earlier comment on kvm_arch_has_private_mem(), and
-considering how often this function is called, wouldn't it be better
-to define this in a way similar to arch/x86/include/asm/kvm_host.h ?
-
-
->  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->                             struct kvm_enable_cap *cap)
->  {
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 48c957e21c83..808bceebad4d 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -2171,6 +2171,25 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm=
-,
->         return ret;
->  }
-
-The following two functions should be gated by
-
-#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
-
-
-> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
-> +                                       struct kvm_gfn_range *range)
-> +{
-> +       WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
-> +       return false;
-> +}
-> +
-> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
-> +                                        struct kvm_gfn_range *range)
-> +{
-> +       WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
-
-I think this should return here, not just warn.
-
-Cheers,
-/fuad
-
-> +
-> +       if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
-> +               range->only_shared =3D true;
-> +       kvm_unmap_gfn_range(kvm, range);
-> +
-> +       return false;
-> +}
-> +
->  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot=
-)
->  {
->  }
-> --
-> 2.34.1
->
+thanks,
+-- Shuah
 
