@@ -1,162 +1,215 @@
-Return-Path: <kvm+bounces-15931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15932-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FF468B243E
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:42:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A55D18B2446
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:44:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D493DB25272
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 14:42:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 315EF1F23A9E
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 14:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CB714A604;
-	Thu, 25 Apr 2024 14:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EA414A0BF;
+	Thu, 25 Apr 2024 14:44:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x4Wwt5C6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VJ1qky3h"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40DF61494BB
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 14:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799B114A4CC
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 14:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714056127; cv=none; b=DuYhZvtjZ4xGG5JicH+osOUF4aJzjCv66YQRNwtFvrYuivIbaFUwsMAjx9ffbQjnk265ltjzsD3hVTCfA63f1+6YhCcW3qiVjDYWPAoYpSsdkAsf7K/XwPjEmYkAO1TU7RxKcd56gNh500IK0qi3qwzaKXIDFYN2KhczNB+MEoo=
+	t=1714056286; cv=none; b=eP/82XLNfmRqVKyGd0csK0VQiF5v5SCvoAPSu9PBv5sf4CTfUIZq299qCIhnK6GR7GHD693aSDPB1nZ7CqV4/pIXGnWH40zJZjwAwG2aFgCKHKTv+RCrlBQdKyiaxcPa/l1dBp8xw5gY2RBUGoXqdPI7PHI5gd1RWJ0iBckOU9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714056127; c=relaxed/simple;
-	bh=2HTb1/D2zJKsTz0x8dg2JPZ7AoAiGX0TfTBOVZ7lUok=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PzN+LZUWT6kBj0oT+4VPb6IC7WiftppBpHDl4as3l8GH58c6Z7q/Es++6e2NANXiXv6C3oANUafEELUk+Jg6pLmA13xmURJS8PGK6brgBpiUwcqU7acxu7c+zTFdlTi0ty35ro6d8bSygn1J5k2H42rQI+pqoREPLlz05WACpaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x4Wwt5C6; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1714056286; c=relaxed/simple;
+	bh=1Vynxfx2D6956dodx3vvYuxa6Pa4BDwN4tyUYPevkxc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=syCAghAbnjEuKPk0QfPhLu9ciqF6BR3vmRWb0MvQr0ZCBhGGc28zKtBG3uLCvfbghTzfcGnTeOiYHiMFU1n//GZWusq/BtBKE1LKAkWt1bkn6FUK2G5Ne2pdycN9RO6g7vptT6xwlUwx2e5SRN/GdI7C1+YgZlIbl8OoeyItmps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VJ1qky3h; arc=none smtp.client-ip=209.85.128.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de5823bd7eeso2353028276.0
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 07:42:06 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-617d25b2bc4so11317247b3.2
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 07:44:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714056125; x=1714660925; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lDWCaTYULwF8F3zi592tmuoj8LcUAihXwO8QYVH28dw=;
-        b=x4Wwt5C6hHRlcYDRs995liII8ZAoKfJ/K+N8bnJmVXX2igKQ7cMdCugkF51lNBM9Op
-         P6hjJKUzNHAb9hkUtPhOWcFZHYjm97E3EZ+J6bJrLpKmgg4mQ5uJrHN4IQwHGbNpvxEP
-         S2JwivEI1xD1IuUD422B+FRmrHvRpNFUWuWK03UBJA1l70O9wYS+WByYZGStRykVZh2/
-         9EzKxkpElQH1Qd367hEAjELuWkofggcE7SgC6WEeQZGMK9d3fIRJBT+tT2xfSpeVj1aA
-         FDmQ9TN2CzewaSN/aAzpySL4zYwCk+KlJpscn6sbBp2Mi8qR9u1KuOWCmi+u2OsSuM7I
-         Gx3Q==
+        d=google.com; s=20230601; t=1714056284; x=1714661084; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4XHxss7Od+OfkSKxerbEin0D4Y8XCvJwoXzpIRakjY4=;
+        b=VJ1qky3h1hb7Qmq1/+wl5GfYGdF6oJPGsflcUutkn5UXfZEEagqpnDm9pMUTqNx3o9
+         TXFN79QM61rXvNmvEd2t/76mHNytCyKtpy92bzQEUbT4i+l60gmqRdc9OWulTU+YwXk2
+         2G9FfGQ7gvxr5AziX3E2GOn+WdBDJtuOGnaBYLqy5wyRwMXY/FtBHMxDMWyTujhQ0YPN
+         Tg3xHZPeT1EzVS2h8cNmUh5lkrvcki3ogW3+TZY5nNXUjK+brsRk1PT+fSrU2cSCDa/x
+         qxxpdDjvQBVZ9ZkLrUhIkwhZz34Daf9nYaxL6i8trZGAM63VWiqifbOWkSfDfZu7J2Ln
+         7o0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714056125; x=1714660925;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lDWCaTYULwF8F3zi592tmuoj8LcUAihXwO8QYVH28dw=;
-        b=Z5M8cHTLa7OZ/f6yBz+IipIYsoexH3yjzGhTWMpG2/g/7BwUvDUzlYHKS0/79cwCUB
-         FeJPNHHC30SB8DvpR/B6X9DTRCXfEA7JpAnKc3KqHrNtbNodw+cx9bpzZ/kSqiFN15sx
-         SeeYy8KTWqMwUV8SOmZrj83oswGYms8OLlRv4p4T9DcjgZWSsSiL2oEKt8qpBjt7aDuW
-         vEImDmTNhtbgEYZBPH4wi+3YardZc0R7pSXsHzGb/dAFEGslSeIAH9ln0SwtjS4TtTVK
-         DiE1bwb948O6LqzWgWExqM7tbzMFTjLGYUEhgkh+s6lQ2z9H74+HzLO9Io8dY2YuSQAc
-         9m3g==
-X-Forwarded-Encrypted: i=1; AJvYcCU5aqxxij4ebEkeLiG9AAZFk50LGKC9QxxaM/GalxoxI2jCkH5aKfgHXQC+uQHDk1xlgLSxXT2hp/zKEB8M4HzGmUwf
-X-Gm-Message-State: AOJu0YwGUWy//y68x1PjTVrNa2HqbO9dnwQXhFJ1E4lIdTBKRDrRx+wN
-	5P7lOMgqFm9+N9nz1i7KEKv8RILHwpyt5i802RJmbTiFo1fSFe891wXrXV7m8x6leUlAJNHq+dk
-	toA==
-X-Google-Smtp-Source: AGHT+IF/g7wUX2d++6yDgZVRNlO+BsKqxODd8ENXt8KXPp295gAemRTfNn6a6plk1Xwk4cOuJTp3H44r+mI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:c12:b0:de4:6624:b763 with SMTP id
- fs18-20020a0569020c1200b00de46624b763mr945449ybb.0.1714056125345; Thu, 25 Apr
- 2024 07:42:05 -0700 (PDT)
-Date: Thu, 25 Apr 2024 07:42:03 -0700
-In-Reply-To: <64cc46778ccc93e28ec8d39b3b4e31842154f382.camel@intel.com>
+        d=1e100.net; s=20230601; t=1714056284; x=1714661084;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4XHxss7Od+OfkSKxerbEin0D4Y8XCvJwoXzpIRakjY4=;
+        b=LZiq1UcWff9pMbbH5JeuOaS1z+N70KUv4oDBTYVFhwbo1k4Bnsp8qhX6ES7Ipfa4p8
+         HsZGvubzAOoIVG2xvq7cTz1fvQpz54HbMzi8anWWPe0Hg3RnAEO/+Z7rGDQooBYS2m2M
+         PNZQl119YaU0B+5ji9i839mKPNmHCx88toYvxXeT5VjOek7EHLSgodXvLfOHhw9+gXy7
+         Utnz7lYDyvxdRQnjLTdR7Ft8IOyMgXh+5Cpyv7AmBK9atG/UTPScvwZnH1W43xaFOKWc
+         j5rtKBklNYGQXtlFRRbeHTlOReGYB+NgDXtb4W/82pHnH7JChIWbw+UVmNlvcZRHlBVo
+         1Ohg==
+X-Gm-Message-State: AOJu0YyntW/yQvK4kLmZ9ixYQOzqyg4E4LZMZ7BTqqrDNlL/e10MfOyl
+	cu80jsk8o4vdQcLiphQ87SAG7TeGAHk2HBwdQXoYTa0cFB2eo2SJ/ynmc2luOQVRj8IHAI83XNA
+	+Rcn/RGMdtLf9/1PRNXV1Ygn68QjDleJyVbN6
+X-Google-Smtp-Source: AGHT+IHcmWwxfbEJpizD95GcdNN5E+9J6MenReSgJkZTNHD/sQZ17A8KpqOihrS1Id2Tb8PVty4NllCeLHZvLqz87Cw=
+X-Received: by 2002:a05:690c:600a:b0:618:92bd:9334 with SMTP id
+ hf10-20020a05690c600a00b0061892bd9334mr6616886ywb.43.1714056284262; Thu, 25
+ Apr 2024 07:44:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240309012725.1409949-1-seanjc@google.com> <20240309012725.1409949-9-seanjc@google.com>
- <ZfRtSKcXTI/lAQxE@intel.com> <ZfSLRrf1CtJEGZw2@google.com>
- <1e063b73-0f9a-4956-9634-2552e6e63ee1@intel.com> <ZgyBckwbrijACeB1@google.com>
- <ZilmVN0gbFlpnHO9@google.com> <64cc46778ccc93e28ec8d39b3b4e31842154f382.camel@intel.com>
-Message-ID: <Zipru9eB9oDOOuxf@google.com>
-Subject: Re: [PATCH v6 8/9] KVM: VMX: Open code VMX preemption timer rate mask
- in its accessor
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, "luto@kernel.org" <luto@kernel.org>, Xin3 Li <xin3.li@intel.com>, 
-	"x86@kernel.org" <x86@kernel.org>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "peterz@infradead.org" <peterz@infradead.org>, 
-	Zhao1 Liu <zhao1.liu@intel.com>, "mingo@redhat.com" <mingo@redhat.com>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "bp@alien8.de" <bp@alien8.de>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Shan Kang <shan.kang@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <20240412084309.1733783-1-steven.price@arm.com> <20240412084309.1733783-43-steven.price@arm.com>
+In-Reply-To: <20240412084309.1733783-43-steven.price@arm.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Thu, 25 Apr 2024 15:44:07 +0100
+Message-ID: <CA+EHjTyGcO=-EdFE75g5DwBKosKWUdmg7CB8VAr1w78C=2PCww@mail.gmail.com>
+Subject: Re: [PATCH v2 42/43] arm64: kvm: Expose support for private memory
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024, Kai Huang wrote:
-> On Wed, 2024-04-24 at 13:06 -0700, Sean Christopherson wrote:
-> > > > static inline u32 vmx_basic_vmcs_mem_type(u64 vmx_basic)
-> > > > {
-> > > > 	return (vmx_basic & GENMASK_ULL(53, 50)) >>
-> > > > 		VMX_BASIC_MEM_TYPE_SHIFT;
-> > > > }
-> > > > 
-> > > > looks not intuitive than original patch.
-> > > 
-> > > Yeah, agreed, that's taking the worst of both worlds.  I'll update patch 5 to drop
-> > > VMX_BASIC_MEM_TYPE_SHIFT when effectively "moving" it into vmx_basic_vmcs_mem_type().
-> > 
-> > Drat.  Finally getting back to this, dropping VMX_BASIC_MEM_TYPE_SHIFT doesn't
-> > work because it's used by nested_vmx_setup_basic(), as is VMX_BASIC_VMCS_SIZE_SHIFT,
-> > which is presumably why past me kept them around.
-> > 
-> > I'm leaning towards keeping things as proposed in this series.  I don't see us
-> > gaining a third copy, or even a third user, i.e. I don't think we are creating a
-> > future problem by open coding the shift in vmx_basic_vmcs_mem_type().  And IMO
-> > code like this
-> > 
-> > 	return (vmx_basic & VMX_BASIC_MEM_TYPE_MASK) >>
-> > 	       VMX_BASIC_MEM_TYPE_SHIFT;
-> > 
-> > is an unnecessary obfuscation when there is literally one user (the accessor).
-> > 
-> > Another idea would be to delete VMX_BASIC_MEM_TYPE_SHIFT and VMX_BASIC_VMCS_SIZE_SHIFT,
-> > and either open code the values or use local const variables, but that also seems
-> > like a net negative, e.g. splits the effective definitions over too many locations.
-> 
-> Alternatively, we can add macros like below to <asm/vmx.h> close to
-> vmx_basic_vmcs_size() etc, so it's straightforward to see.
-> 
-> +#define VMX_BSAIC_VMCS12_SIZE	((u64)VMCS12_SIZE << 32)
-> +#define VMX_BASIC_MEM_TYPE_WB	(MEM_TYPE_WB << 50)
+Hi,
 
-Hmm, it's a bit hard to see it's specifically VMCS12 size, and given that prior
-to this series, VMX_BASIC_MEM_TYPE_WB = 6, I'm hesitant to re-introduce/redefine
-that macro with a different value.
+On Fri, Apr 12, 2024 at 9:44=E2=80=AFAM Steven Price <steven.price@arm.com>=
+ wrote:
+>
+> Select KVM_GENERIC_PRIVATE_MEM and provide the necessary support
+> functions.
+>
+> Signed-off-by: Steven Price <steven.price@arm.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h |  4 ++++
+>  arch/arm64/kvm/Kconfig            |  1 +
+>  arch/arm64/kvm/arm.c              |  5 +++++
+>  arch/arm64/kvm/mmu.c              | 19 +++++++++++++++++++
+>  4 files changed, 29 insertions(+)
+>
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
+vm_host.h
+> index 902923402f6e..93de7f5009fe 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1259,6 +1259,10 @@ static inline bool kvm_vm_is_protected(struct kvm =
+*kvm)
+>         return false;
+>  }
+>
+> +#ifdef CONFIG_KVM_PRIVATE_MEM
+> +bool kvm_arch_has_private_mem(struct kvm *kvm);
+> +#endif
+> +
 
-What if we add a helper in vmx.h to encode the VMCS info?  Then the #defines for
-the shifts can go away because the open coded shifts are colocated and more
-obviously related.  E.g.
+I think it might be better to define kvm_arch_has_private_mem() for
+both cases, whether KVM_PRIVATE_MEM is enabled or not, similar to the
+way it's defined in arch/x86/include/asm/kvm_host.h
 
-  static inline u64 vmx_basic_encode_vmcs_info(u32 revision, u16 size, u8 memtype)
-  {
-	return revision | ((u64)size << 32) | ((u64)memtype << 50);
-  }
+>  int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature);
+>  bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu);
+>
+> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
+> index 58f09370d17e..8da57e74c86a 100644
+> --- a/arch/arm64/kvm/Kconfig
+> +++ b/arch/arm64/kvm/Kconfig
+> @@ -37,6 +37,7 @@ menuconfig KVM
+>         select HAVE_KVM_VCPU_RUN_PID_CHANGE
+>         select SCHED_INFO
+>         select GUEST_PERF_EVENTS if PERF_EVENTS
+> +       select KVM_GENERIC_PRIVATE_MEM
+
+I don't think this should be enabled by default, but should depend on
+whether RME is configured. That said, I can't find the config option
+for RME...
+
+>         help
+>           Support hosting virtualized guest machines.
+>
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index 2dd014d3c366..a66d0a6eb4fa 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -89,6 +89,11 @@ int kvm_arch_vcpu_should_kick(struct kvm_vcpu *vcpu)
+>         return kvm_vcpu_exiting_guest_mode(vcpu) =3D=3D IN_GUEST_MODE;
+>  }
+>
+> +bool kvm_arch_has_private_mem(struct kvm *kvm)
+> +{
+> +       return kvm_is_realm(kvm);
+> +}
+> +
+
+Related to my earlier comment on kvm_arch_has_private_mem(), and
+considering how often this function is called, wouldn't it be better
+to define this in a way similar to arch/x86/include/asm/kvm_host.h ?
 
 
-and
+>  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>                             struct kvm_enable_cap *cap)
+>  {
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 48c957e21c83..808bceebad4d 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -2171,6 +2171,25 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm=
+,
+>         return ret;
+>  }
 
-  static void nested_vmx_setup_basic(struct nested_vmx_msrs *msrs)
-  {
-	/*
-	 * This MSR reports some information about VMX support. We
-	 * should return information about the VMX we emulate for the
-	 * guest, and the VMCS structure we give it - not about the
-	 * VMX support of the underlying hardware.
-	 */
-	msrs->basic = vmx_basic_encode_vmcs_info(VMCS12_REVISION, VMCS12_SIZE,
-						 X86_MEMTYPE_WB);
+The following two functions should be gated by
 
-	msrs->basic |= VMX_BASIC_TRUE_CTLS
-	if (cpu_has_vmx_basic_inout())
-		msrs->basic |= VMX_BASIC_INOUT;
-  }
+#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+
+
+> +bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+> +                                       struct kvm_gfn_range *range)
+> +{
+> +       WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
+> +       return false;
+> +}
+> +
+> +bool kvm_arch_post_set_memory_attributes(struct kvm *kvm,
+> +                                        struct kvm_gfn_range *range)
+> +{
+> +       WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm));
+
+I think this should return here, not just warn.
+
+Cheers,
+/fuad
+
+> +
+> +       if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
+> +               range->only_shared =3D true;
+> +       kvm_unmap_gfn_range(kvm, range);
+> +
+> +       return false;
+> +}
+> +
+>  void kvm_arch_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot=
+)
+>  {
+>  }
+> --
+> 2.34.1
+>
 
