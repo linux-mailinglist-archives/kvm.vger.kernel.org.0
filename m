@@ -1,103 +1,198 @@
-Return-Path: <kvm+bounces-15941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE95C8B2623
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:17:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE308B2651
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 18:23:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 416D1B22F71
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:17:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2035D28778C
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 16:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1266B14D2A2;
-	Thu, 25 Apr 2024 16:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4442F14E2CD;
+	Thu, 25 Apr 2024 16:22:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MFFd6I6e"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="bTW2y76Y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D322C14C59B
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 16:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDC014D6E9
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 16:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714061838; cv=none; b=SMM+S/+fNZuBqo1MRsdaYn028JC82dhY9JZ/oSRReVcJI7zG4KW7s+1nFjNqTBheGLSblqpH1Gv73emFBuhQ+jq5tSHNWqVMKghaeADUQ+20VBVKEu60RbPvdO2CPqP7e0eW9Zh6fo760JyLsxjY59kFEXTaJenaaax2oBp9Hb4=
+	t=1714062151; cv=none; b=mDs3jOjxMmsYivexDXnB2ParqBnBVWaVCisKUE8x/HpYTB6NNG9GxMS3XqjyKkRmvLCc/q8vSbOQuiZIX8TuAtnLGX7AkCgofShCLOlXOgjbHOcWokH1L/KTIlv0Do6NSGplYV715NhN0Bj1Q+dFmHnAoDtFQ6nEJS+t/ueT9ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714061838; c=relaxed/simple;
-	bh=GV4FXuGcsXUscg6v8KLdZXyTdNFxTvzqhdjBQx4V3/w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PsLDU3g+eVdwXEmL220WXGc/n2CIVreceQiLbH39rGBtHilDDaRxnh6dSP+d6LUdXpnCkP5GOs9Nm5cBkCIA117sa7035zJSfvjG3ar1xU/bcE3wnnLvAP9cvwpuIgS/RZyR9/XNJyim/WNI2Hd7HumWxxx42/nGgKyyNXNtXhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MFFd6I6e; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6f391017e0fso856914b3a.1
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 09:17:16 -0700 (PDT)
+	s=arc-20240116; t=1714062151; c=relaxed/simple;
+	bh=MDAUkdPnGzKG6chVud66+86ptfSgJ9KB44HVfsQFna8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KaCbqEpv9fV95wCHvyqu3dxiR3sV6B/Ci+3BfNM28xIYz2KqZDfcJgMN22733n6mta2T0Z/WcgPAamix7EfyvNYRg0yuHGnqeo5YYxLwYEgf/KS1cWltOIarVK1mCqz/eiR2WsXLiS57CDdUyONfuVXSN6ZXCwR4IehSHoTmSo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=bTW2y76Y; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7d9c78d7f97so9337839f.3
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 09:22:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714061836; x=1714666636; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ugMpRYVYPzcA74XJBgKj/Xa2Cvtj2B5SD6ewAh4zjY0=;
-        b=MFFd6I6e/jrf5hmB/xEurh/+7QNhVPxi4fueUhDAqACJbqdnIm5ghrdYInYceN1bMv
-         nl0uJ63Q65X8MgAxM5mvm3REZlVv6xnTdjl/ef3A8JzNoEPILW0ZJ3AgW8hFP+TX+H9L
-         jQ90E4vynYJM6/Brw6Bkk6RUb46WGM1Xf33z1O6rW8XKAdt9Qh+AGMgHU0eMK/pUvA3K
-         d0CI8odu4v7iRu+03MmqjUrk1Q8qxDrakW+9PK8+ehlU0GqlAbYOxHvsk8IO1Uz0h6qN
-         efe+7XSnIeoZJy+0L0ePM7YKJheqFbjya9lf5R8yk/Bo9NiE01A7hf5IYe8QpyYqtAXf
-         sENw==
+        d=linuxfoundation.org; s=google; t=1714062148; x=1714666948; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tZwpXS/k0DYed9wD5OBUEJ5ypdpSnZbheBH2rdFMtPA=;
+        b=bTW2y76YgHaHc6KB1MhvC43eovk1JFB7R42GEEGwApT83OWEkcKfjVabJ7hyn1Ynp4
+         qJ7pNAz8/i958EUH0F77Z/ph+LeZvTa6ubMMyFG1THOi28/zeaGWwtAPDfz1DiGvDTg8
+         23QFIGZ8H8MnIu9Q6nTps/dMHb/bierZgVkYE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714061836; x=1714666636;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ugMpRYVYPzcA74XJBgKj/Xa2Cvtj2B5SD6ewAh4zjY0=;
-        b=b9UR1B/kDP2KLDemagTwwO6e5KcIMfDkOu6jFVYtZ9NOjCfgMbB7OcT7RrJXK8lNwJ
-         Hm9zOPc+/Tmla9BeAxBrPOZZ97RtXz/cCxMANn1mEs4SChUdDWHu+2VQPmrpM2cgmq4l
-         ITgoAGl91qkkSRgcPCke6zJ3pB2qCgA1u9lPWRh7U2T5OHaIIM7df11z4YqnOpNo9kpH
-         NY2AyxRh/tSPCU1O5PDVI+4hVtoCvW/+H5F28lJ1DBPE4Sov+cmYbpnM5BUCAZmEHaNK
-         jJ++044rI352PYGny8uXZByLpbdBuiIpalb6hEanKXy/v8BiTBWrnRcVs1dqWs+CaTQu
-         5MDA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+Vb5HHQffRqgIm0aZqUrM1YsUqVjd8Yf1SPmjMYVc/XJa/jSh/7T5m33CwgTLBNvg3GS/I4mknFFzvfjspYiJrnOh
-X-Gm-Message-State: AOJu0Yw2mXCE03LOGlXdGb6ED73GmGeQWBLye6ImBNyMtNLcjHfA7F10
-	eufiw/V4sGDUw3l7+LXuSAbTBIVwLhLLW+oYabnfUWIWzuyeThH3CGATBayoUPayMYeG3Q8EAvj
-	UWw==
-X-Google-Smtp-Source: AGHT+IEb1nuGz+6fxj/3DxHpg62zrmaNOXu6Kzmf2j0vCLYWLB27deyGnTJfaXe3ZmIVCWz59/NEjvLJwiw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:93a5:b0:6ec:f18a:2771 with SMTP id
- ka37-20020a056a0093a500b006ecf18a2771mr4877pfb.5.1714061835911; Thu, 25 Apr
- 2024 09:17:15 -0700 (PDT)
-Date: Thu, 25 Apr 2024 09:17:14 -0700
-In-Reply-To: <ad48dd75-3d14-461c-91e4-bad41c325ae7@intel.com>
+        d=1e100.net; s=20230601; t=1714062148; x=1714666948;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tZwpXS/k0DYed9wD5OBUEJ5ypdpSnZbheBH2rdFMtPA=;
+        b=YR9IUtbfKzS1lVi9JUNOFz61KstxIfjam/fepiq3e57fsmNHSZZkg/ob5JtwgP2iHa
+         1aCwSDGyb7d4ebGYvdehD8IihPuic4cwvibeIEWRKqsuqr72HmiphXf5/1UgzWrWo5v5
+         OKvS6Wru3FHpijGmTIEojFlv5Ka6o5G7yoiOi0SfnfsbKNV5WbGIi+lDpnVr0b1Ijedi
+         7cO/WBRXDmpgl8T9nFFRlJVUN5QZWZAJyXrvN4x9SaTU5sLG8te60/jRHkPumx1eaLdF
+         hebpF28SclMzx49r9F3+kMWEtkj5C4mkRrnalatAE93BeQtBu1EA/TGAklmbMMYlmy1s
+         /hyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgcaOuGMnjAja4hiLYbgtTtqRdaJwngRRTq3Q1EWzG1frfNvg4nH/452HX17WFdrMzqBtRCtVdVqkW+ewav5/tbghL
+X-Gm-Message-State: AOJu0YziEhd70Aq2V0bgR7JNZitM/RAm0D5d5+E4Ng6UYH+0t6ks1Ado
+	Uw2VFinjkeiuCNdztekOhXzChq6Ndnk7QK3BbBchuMqM64Hq8ioiKinoWmSR9Rk=
+X-Google-Smtp-Source: AGHT+IFwsbdYoXOctiJAidygEpyjdbBI6reVPMMOFHtDCREzxeaCqAED6LqVik99m0cV8ef76M2rcQ==
+X-Received: by 2002:a6b:ea07:0:b0:7da:cdf3:7bec with SMTP id m7-20020a6bea07000000b007dacdf37becmr160971ioc.1.1714062147803;
+        Thu, 25 Apr 2024 09:22:27 -0700 (PDT)
+Received: from [192.168.43.82] ([223.185.79.208])
+        by smtp.gmail.com with ESMTPSA id m2-20020a638c02000000b005e857e39b10sm13196097pgd.56.2024.04.25.09.22.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 25 Apr 2024 09:22:27 -0700 (PDT)
+Message-ID: <763ee03a-817d-4833-b42f-e5b4bd25dc7f@linuxfoundation.org>
+Date: Thu, 25 Apr 2024 10:22:11 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1711035400.git.reinette.chatre@intel.com>
- <6fae9b07de98d7f56b903031be4490490042ff90.camel@intel.com>
- <Ziku9m_1hQhJgm_m@google.com> <26073e608fc450c6c0dcfe1f5cb1590f14c71e96.camel@intel.com>
- <ZilAEhUS-mmgjBK8@google.com> <ad48dd75-3d14-461c-91e4-bad41c325ae7@intel.com>
-Message-ID: <ZiqCCo9WipMgWy8K@google.com>
-Subject: Re: [PATCH V4 0/4] KVM: x86: Make bus clock frequency for vAPIC timer configurable
-From: Sean Christopherson <seanjc@google.com>
-To: Reinette Chatre <reinette.chatre@intel.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "jmattson@google.com" <jmattson@google.com>, 
-	Chao Gao <chao.gao@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "vkuznets@redhat.com" <vkuznets@redhat.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	Erdem Aktas <erdemaktas@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 25/35] KVM: selftests: Convert lib's mem regions to
+ KVM_SET_USER_MEMORY_REGION2
+To: Sean Christopherson <seanjc@google.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>, Shuah Khan <shuah@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Andrew Morton <akpm@linux-foundation.org>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Xiaoyao Li <xiaoyao.li@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>,
+ Fuad Tabba <tabba@google.com>, Jarkko Sakkinen <jarkko@kernel.org>,
+ Anish Moorthy <amoorthy@google.com>, David Matlack <dmatlack@google.com>,
+ Yu Zhang <yu.c.zhang@linux.intel.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8?=
+ =?UTF-8?Q?n?= <mic@digikod.net>, Vlastimil Babka <vbabka@suse.cz>,
+ Vishal Annapurve <vannapurve@google.com>,
+ Ackerley Tng <ackerleytng@google.com>,
+ Maciej Szmigiero <mail@maciej.szmigiero.name>,
+ David Hildenbrand <david@redhat.com>, Quentin Perret <qperret@google.com>,
+ Michael Roth <michael.roth@amd.com>, Wang <wei.w.wang@intel.com>,
+ Liam Merwick <liam.merwick@oracle.com>,
+ Isaku Yamahata <isaku.yamahata@gmail.com>,
+ "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+ Naresh Kamboju <naresh.kamboju@linaro.org>,
+ Anders Roxell <anders.roxell@linaro.org>,
+ Benjamin Copeland <ben.copeland@linaro.org>,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20231027182217.3615211-1-seanjc@google.com>
+ <20231027182217.3615211-26-seanjc@google.com>
+ <69ae0694-8ca3-402c-b864-99b500b24f5d@moroto.mountain>
+ <3848a9ad-07aa-48da-a2b7-264c4a990b5b@linuxfoundation.org>
+ <ZipyPYR8Nv_usoU4@google.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <ZipyPYR8Nv_usoU4@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 24, 2024, Reinette Chatre wrote:
-> There was one vote for the capability name to rather be KVM_CAP_X86_APIC_BUS_CYCLES_NS [1] 
+On 4/25/24 09:09, Sean Christopherson wrote:
+> On Thu, Apr 25, 2024, Shuah Khan wrote:
+>> On 4/25/24 08:12, Dan Carpenter wrote:
+>>> On Fri, Oct 27, 2023 at 11:22:07AM -0700, Sean Christopherson wrote:
+>>>> Use KVM_SET_USER_MEMORY_REGION2 throughout KVM's selftests library so that
+>>>> support for guest private memory can be added without needing an entirely
+>>>> separate set of helpers.
+>>>>
+>>>> Note, this obviously makes selftests backwards-incompatible with older KVM
+>>>     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>>> versions from this point forward.
+>>>     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>>>
+>>> Is there a way we could disable the tests on older kernels instead of
+>>> making them fail?  Check uname or something?  There is probably a
+>>> standard way to do this...  It's these tests which fail.
+>>
+>> They shouldn't fail - the tests should be skipped on older kernels.
 > 
-> I'd be happy to resubmit with the name changed but after reading your
-> statement above it is not clear to me what name is preferred:
-> KVM_CAP_X86_APIC_BUS_FREQUENCY as used in this series that seem to meet your
-> approval or KVM_CAP_X86_APIC_BUS_CYCLES_NS.
+> Ah, that makes sense.  Except for a few outliers that aren't all that interesting,
+> all KVM selftests create memslots, so I'm tempted to just make it a hard requirement
+> to spare us headache, e.g.
 > 
-> Please let me know what you prefer.
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index b2262b5fad9e..4b2038b1f11f 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -2306,6 +2306,9 @@ void __attribute((constructor)) kvm_selftest_init(void)
+>          /* Tell stdout not to buffer its content. */
+>          setbuf(stdout, NULL);
+>   
+> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
+> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
+> +
+>          kvm_selftest_arch_init();
+>   }
+> 
+> --
+> 
+> but it's also easy enough to be more precise and skip only those that actually
+> create memslots.
 
-Both work for me, I don't have a strong preference.
+This is approach is what is recommended in kselfest document. Rubn as many tests
+as possible and skip the ones that can't be run due to unmet dependencies.
+
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index b2262b5fad9e..b21152adf448 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -944,6 +944,9 @@ int __vm_set_user_memory_region2(struct kvm_vm *vm, uint32_t slot, uint32_t flag
+>                  .guest_memfd_offset = guest_memfd_offset,
+>          };
+>   
+> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
+> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
+> +
+>          return ioctl(vm->fd, KVM_SET_USER_MEMORY_REGION2, &region);
+>   }
+>   
+> @@ -970,6 +973,9 @@ void vm_mem_add(struct kvm_vm *vm, enum vm_mem_backing_src_type src_type,
+>          size_t mem_size = npages * vm->page_size;
+>          size_t alignment;
+>   
+> +       __TEST_REQUIRE(kvm_has_cap(KVM_CAP_USER_MEMORY2),
+> +                      "KVM selftests from v6.8+ require KVM_SET_USER_MEMORY_REGION2");
+> +
+>          TEST_ASSERT(vm_adjust_num_guest_pages(vm->mode, npages) == npages,
+>                  "Number of guest pages is not compatible with the host. "
+>                  "Try npages=%d", vm_adjust_num_guest_pages(vm->mode, npages));
+> --
+
+thanks,
+-- Shuah
 
