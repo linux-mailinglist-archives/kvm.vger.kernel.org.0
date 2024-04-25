@@ -1,170 +1,143 @@
-Return-Path: <kvm+bounces-15995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15996-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D6B38B2D49
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 00:53:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D1E08B2D4D
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 00:56:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 115041F21F10
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 22:53:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2FE91F226A3
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 22:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5A2155A43;
-	Thu, 25 Apr 2024 22:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD121155A39;
+	Thu, 25 Apr 2024 22:56:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PqsFt8yq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t5vApXQj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29A9920315
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 22:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8387B155A43
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 22:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714085597; cv=none; b=T1pmDx/5dJLbsJDc1LJNGbSqcGvEy86l+P/le1rvS+gqBo9ukKddcggUrnOBaqMtByR1MoyLZHzNjNT28wY7Dz6k0rZQnCa9XJzmrdgULPrhqXr8lxXpqOOIj32euhHJD/RKd8QI5i6ymmkGIcY/zRNi8ad1wO1lbzY8afyjEF0=
+	t=1714085793; cv=none; b=Yq3cBpdjGXkNjbEVHXQkE2UPup+ystUPUv4vNDZcpjkqQEMJrsxlvbQ2CVECDAzMXaWihS6U8EeHQsppaDAvynlsk4P4jF0GhY+onz8wZ6wVryHqP4m4YnScZ+0ruNo2kZpNWC76rWV2WDgN726tr7uv3Hf9SNr2/VXvXSj1rns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714085597; c=relaxed/simple;
-	bh=0qEnKzNWHJcEIaoKmJDY/qGRcRmSBpmNsHxGlNysR1E=;
+	s=arc-20240116; t=1714085793; c=relaxed/simple;
+	bh=KYtF1y9QVO5lRyrlFu3LypLQR8DFwKeNUbD5+t8eWAo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bQP9rqg5Z73BtWgeeGrH78sB/4oT5mRDmuNuexIMtgETxHNKZKgqYpA/nifevc7yj3GyOB6qmUa/+8atLcUFExLmb6MiJoIBEwpNgVIWJAh4W385rAZMkR6augCbC+0MG1T4POpHe3G8lVapuJ6sCBQiMq4l/gVts4bJiIWBlX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PqsFt8yq; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=IrDzwmo5MD6W9APfZDpA2cVXSWVXaY7Wr3Af03wLrxAvabSfoMUYNuQqMJRJkW5k5b9YfdkekWw56UdVGzabiScWUrONRYQIVD8nwVmqioAgeOrglTMzt/CiWgmbFIAYxCB/v/F/prIVvRqzGfo5L2TVncGg+bhBoThjF6YYxp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t5vApXQj; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de45d0b7ffaso3130353276.2
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 15:53:15 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61b2abd30fdso28507277b3.2
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 15:56:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714085595; x=1714690395; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714085790; x=1714690590; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=00KgqiWT/087c0mlwmHa+NPrJGAP63yURtt2wxC0jsI=;
-        b=PqsFt8yqi5dTOZVBRlfi2m1wjP35Bu50X67axys9UPLwe26aHIE81uBGyU6Reogd1w
-         p/Q1D28t2D0+rKLciassHqwPE5aGguwLrFNTqyachCWfoJz9vHCR9MNjKRq1q2ou8Miu
-         oLo0JweflDZ3GRwqygDFoA9Ye8SSzXQbOlL74d1N+qah4zHWJealpR+TJ1X0ylObqXS5
-         DhTiIKPyp8A/dOCGMCSlniqbv/LfTlVjNctWGJvaamLwaDDqwEryCrZjdJ1GFfCJOQWV
-         vWN3W5J30FxBMdpxN2bQMUSm/xbEo2gZ5tKbM22gafCKfVaNPBD3Y7wJW4yYik+ffMd1
-         V8AQ==
+        bh=kkB0Oe3ETNpX0Q3btEZQH9RDe4KISQYsNCkxgD0xRNI=;
+        b=t5vApXQj+HlsAVwouSNLkjD55s92sAE0x9Hx/6jIOoG7BURTbLdTbFKkVUSm4X/Wr6
+         7GcwrOVdagftITNEQO7s9IWVtBSc9pigDktf4TIay8KKPK9tkJLuWtiAeVsNXAqJ4KMd
+         yz+QoLXGsELnta+HaJZ6DzvNkDMVENKFx9i4yBghUyToYUZQoN6KbI4IeN4hk5LstTHW
+         f3pqZAep21f8Agz+Hr1rQ/jlwJ4KXcCZey9ZCNgmZL/61munn9Hx+BZokU0TxHqRqM6V
+         /zL+Vgqn6aTRrQ7L6Lg0soQTvqVKxNBEt6TsUqbCv4aEFpB0TogbFp2l40uw0D59LIoc
+         SIsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714085595; x=1714690395;
+        d=1e100.net; s=20230601; t=1714085790; x=1714690590;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=00KgqiWT/087c0mlwmHa+NPrJGAP63yURtt2wxC0jsI=;
-        b=pS9M9Z01IvwamFKdwqLlq+mTYtqwx76/M2SgaA3E/Y57cHtc6V6Yz5uXnOXPBXsdOa
-         2VUNNxsVDfhsMd8+ux3OLKDQOej0e7JYaQ35+IhUoNUsbW+tYsPzLezS0mOAUqLv11Z4
-         fT9qjKiB4BFPwo+D/AHvS5hyi2T6hfOhwNZ/hUaaxVBWy2HqTJM8UOrvCdsKAjEdOkRJ
-         2TIhgjBQR3Z3xKHrBH2LIzmi31VbpA0kPLbCSQSwF9ryrBeLqPRsI9DhCMrHBgcFuPsC
-         HyrDrU2ORcQ4U/rgGgNCi4wNORTp3rxlfNFY7clRS/FuTAfcczDntYyHYWOl/V68OttL
-         TTWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrNT0iFzgHqgWfJrhaZg8No0TZDlB77ySiY6Adc47tlW3UA1XMa1RrZ2Jb47lykDD7fbcjQxkBQBoE12zBi/naXQVH
-X-Gm-Message-State: AOJu0YwC5jWU14Go3CzdPZ8Np7H93OIlF1TQkF0KziF6rIvMZHCDtKK4
-	2WTnlTM3yKPkS7eI07lHyuBg8PJGfkzUADUy0VNjTAGPD/KvKd8BZpqjGa2tfga4AdhMip9cHtd
-	k+g==
-X-Google-Smtp-Source: AGHT+IGOMiS1k5HK+cV9oyeTNccaLQ+DagjPu7jILD1bHLJwTZUihKZ1APqEkaP38iQ7pz1cJZfqn+zDjHc=
+        bh=kkB0Oe3ETNpX0Q3btEZQH9RDe4KISQYsNCkxgD0xRNI=;
+        b=g0is8FL3wukAAO8c6ln0fApDiNldbvBqDC37qtht/ThtM9TMK6qsKwJ5EZbX4yiUp2
+         7UMNTX6Y+oM/l497/fJPYCa0BoUyAY4i+jy2URtvByZeWg6B4CwLwjBhgXlp//6YxWdc
+         ZFyTGi3iQ9t4+r9FE9i6x1DDVSimYmAUcwKdIg3xcJS1J7t4TxBRe3u1O2GsE272/4gf
+         aJ7/taybuTSc9sFpx3olmVUb4Plchm1cQGJQWZOBrFCacqdOBSR9UrlipIyZXtAaMvD2
+         O7VXEtvPo3UVIqERCFp/bNHKlfLJ7z9P/wCbuvYnNn+fJbsQpGY5XEvxkZyhib+x3f7B
+         Tgrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVtjc+hFl7iWBhu+9zW0Il049bBt5xkh6KNsw+1SjqauXzJ3X9SBOAFL7RDu6lbblnQdoIf4/CWjVncVJ+ZO6kFleJ9
+X-Gm-Message-State: AOJu0YwQGadGqzcj/qBtaLeaKa7CYeJgnRxA9aX87Y7JZL7cZesodtpA
+	d4c4CiM559cGvENuYRG65EpQ/bWzwE1hjExjsh9GfjU0IsjRAcTFFOU6C7EZD5uWexTeYBSJ8Mn
+	LTA==
+X-Google-Smtp-Source: AGHT+IFK9QispM2ICO/aS/Bc4lsJTNQ0CRIQjWqhFAfzup1zpNtFb4vtBZLcBygyOTGdpJexadd4ZWJU6fQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:154b:b0:de4:7a4b:903 with SMTP id
- r11-20020a056902154b00b00de47a4b0903mr125184ybu.3.1714085595137; Thu, 25 Apr
- 2024 15:53:15 -0700 (PDT)
-Date: Thu, 25 Apr 2024 15:53:13 -0700
-In-Reply-To: <5bde4c96c26c6af1699f1922ea176daac61ab279.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:15:b0:61a:b2d4:a3fb with SMTP id
+ bc21-20020a05690c001500b0061ab2d4a3fbmr220432ywb.8.1714085790530; Thu, 25 Apr
+ 2024 15:56:30 -0700 (PDT)
+Date: Thu, 25 Apr 2024 15:56:28 -0700
+In-Reply-To: <4195a811-7084-42fe-ad10-27d898fb3196@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <f9f1da5dc94ad6b776490008dceee5963b451cda.camel@intel.com>
- <baec691c-cb3f-4b0b-96d2-cbbe82276ccb@intel.com> <bd6a294eaa0e39c2c5749657e0d98f07320b9159.camel@intel.com>
- <ZiqL4G-d8fk0Rb-c@google.com> <7856925dde37b841568619e41070ea6fd2ff1bbb.camel@intel.com>
- <ZirNfel6-9RcusQC@google.com> <5bde4c96c26c6af1699f1922ea176daac61ab279.camel@intel.com>
-Message-ID: <Zire2UuF9lR2cmnQ@google.com>
-Subject: Re: [RFC] TDX module configurability of 0x80000008
+References: <20240412084056.1733704-1-steven.price@arm.com>
+ <20240412084309.1733783-1-steven.price@arm.com> <20240412084309.1733783-2-steven.price@arm.com>
+ <CA+EHjTwDaP6qULmjEGH=Eye=vjFikr9iJHEyzzX+cr_sH57vcA@mail.gmail.com> <4195a811-7084-42fe-ad10-27d898fb3196@arm.com>
+Message-ID: <ZirfnPFPo1cMwFQc@google.com>
+Subject: Re: [PATCH v2 01/43] KVM: Prepare for handling only shared mappings
+ in mmu_notifier events
 From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Steven Price <steven.price@arm.com>
+Cc: Fuad Tabba <tabba@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
+	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
+	Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev, 
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024, Rick P Edgecombe wrote:
-> On Thu, 2024-04-25 at 14:39 -0700, Sean Christopherson wrote:
-> > On Thu, Apr 25, 2024, Rick P Edgecombe wrote:
-> > > On Thu, 2024-04-25 at 09:59 -0700, Sean Christopherson wrote:
-> > > > > accessing a GPA beyond [23:16] is similar to accessing a GPA with=
- no
-> > > > > memslot.
-> > > >=20
-> > > > No, it's not.=C2=A0 A GPA without a memslot has *very* well-defined
-> > > > semantics in KVM, and KVM can provide those semantics for all
-> > > > guest-legal GPAs regardless of hardware EPT/NPT support.
-> > >=20
-> > > Sorry, not following. Are we expecting there to be memslots above the=
- guest
-> > > maxpa 23:16? If there are no memslots in that region, it seems exactl=
-y like
-> > > accessing a GPA with no memslots. What is the difference between befo=
-re and
-> > > after the introduction of guest MAXPA? (there will be normal VMs and =
-TDX
-> > > differences of course).
+On Thu, Apr 25, 2024, Steven Price wrote:
+> On 25/04/2024 10:48, Fuad Tabba wrote:
+> > On Fri, Apr 12, 2024 at 9:43=E2=80=AFAM Steven Price <steven.price@arm.=
+com> wrote:
+> >>  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range=
+);
+> >> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> >> index fb49c2a60200..3486ceef6f4e 100644
+> >> --- a/virt/kvm/kvm_main.c
+> >> +++ b/virt/kvm/kvm_main.c
+> >> @@ -633,6 +633,13 @@ static __always_inline kvm_mn_ret_t __kvm_handle_=
+hva_range(struct kvm *kvm,
+> >>                          * the second or later invocation of the handl=
+er).
+> >>                          */
+> >>                         gfn_range.arg =3D range->arg;
+> >> +
+> >> +                       /*
+> >> +                        * HVA-based notifications aren't relevant to =
+private
+> >> +                        * mappings as they don't have a userspace map=
+ping.
+> >> +                        */
+> >> +                       gfn_range.only_private =3D false;
+> >> +                       gfn_range.only_shared =3D true;
+> >>                         gfn_range.may_block =3D range->may_block;
 > >=20
-> > If there are no memslots, nothing from a functional perspectives, just =
-a
-> > very slight increase in latency.=C2=A0 Pre-TDX, KVM can always emulate =
-in
-> > reponse to an EPT violation on an unmappable GPA.=C2=A0 I.e. as long as=
- there is
-> > no memslot, KVM doesn't *need* to create SPTEs, and so whether or not a=
- GPA
-> > is mappable is completely irrelevant.
+> > I'd discussed this with Sean when he posted this earlier. Having two
+> > booleans to encode three valid states could be confusing. In response,
+> > Sean suggested using an enum instead:
+> > https://lore.kernel.org/all/ZUO1Giju0GkUdF0o@google.com/
 >=20
-> Right, although there are gaps in emulation that could fail. If the emula=
-tion
-> succeeds and there is an MMIO exit targeting a totally unknown GPA, then =
-I guess
-> it's up to userspace to decide what to do.
->=20
-> KVM's done its job.
+> That would work fine too! Unless I've missed it Sean hasn't posted an
+> updated patch. My assumption is that this will get merged (in whatever
+> form) before the rest of the series as part of that other series. It
+> shouldn't be too hard to adapt.
 
-Yep.
+Yeah, there's no updated patch.
 
-> But userspace still has to handle it. It can, but I was under the impress=
-ion
-> it didn't (maybe bad assumption).
+Fuad, if you have a strong preference, I recommend chiming in on the TDX se=
+ries[*],
+as that is the series that's likely going to be the first user, and I don't=
+ have
+a strong preference on bools versus an enum.
 
-I'm pretty sure QEMU handles accesses to non-existent MMIO with PCI abort s=
-emantics,
-i.e. ignores writes and returns all FFs for reads.
-
-> > > Also, it adds complexity for cases where KVM maps GPAs above guest ma=
-xpa
-> > > anyway.
-> >=20
-> > That should be disallowed.=C2=A0 If KVM tries to map an address that it=
- told the
-> > guest was impossible to map, then the TDX module should throw an error.
->=20
-> Hmm. I'll mention this, but I don't see why KVM needs the TDX module to f=
-ilter
-> it. It seems in the range of userspace being allowed to create nonsense
-> configurations that only hurt its own guest.
-
-Because the whole point of TDX is to protect the guest from the bad, naught=
-y host?
-
-> If we think the TDX module should do it, then maybe we should have KVM sa=
-nity
-> filter these out today in preparation.
-
-Nope.  KVM isn't in the guest's TCB, TDX is.  KVM's stance is that userspac=
-e is
-responsible for providing a sane vCPU model, because defining what is "sane=
-" is
-extremely difficult unless the definition is super prescriptive, a la TDX.=
-=20
-
-E.g. letting the host map something that TDX's spec says will cause #VE wou=
-ld
-create a novel attack surface.
+[*] https://lore.kernel.org/all/e324ff5e47e07505648c0092a5370ac9ddd72f0b.17=
+08933498.git.isaku.yamahata@intel.com
 
