@@ -1,74 +1,65 @@
-Return-Path: <kvm+bounces-15894-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15895-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A8C8B1C6E
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 10:06:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBFC48B1CF0
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 10:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E84B61C21392
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 08:06:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5885A1F233DB
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 08:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C556EB5B;
-	Thu, 25 Apr 2024 08:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9D07FBA8;
+	Thu, 25 Apr 2024 08:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sjvE5gwy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lG5R9E/l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E9851EB48
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 08:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918647E59F
+	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 08:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714032379; cv=none; b=kFoVLBQ2WMXK3Q1V3VSVH8hU1PHsq6zlnvDNCrxINgNgNMBbd+mP5evef9RcBYcaWMwaDcf9kA9J8PPQUc/YHzeJtBil7zpbunRN6ljOBfcncOqVYNoNXt8bthDAWiSvI7SlikZmMVqdVN2q/vkxjGWe8zZbaAn9IWcm2EPtlno=
+	t=1714034418; cv=none; b=a5K4HU9fE5SXJwa1qtoLB8R0zK46qvoOpZXOZsj9WskjOBmtrDIIonIBogXwFRBSEtj2HAcmvvSgpOn/W0aAVt9DXtQ8c4rztSCHS1sQC+ZBAvd6mgXW815ZbPaofnI53tsYOzxcoFMxCgp57MIGM7Q1Zw7PokLi8DLdz5jMRmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714032379; c=relaxed/simple;
-	bh=XnVkaeXi6jkA3Q8JMwm3VIBeCahgb1HJbV0MMahy1fA=;
+	s=arc-20240116; t=1714034418; c=relaxed/simple;
+	bh=K/Cg5XtNto2C/13YZaMoG170H77iS2HAQOjxL3QuFD8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r1x8TKgkl6fMBS77lH5VDG0ug7uBJfxl2MIGx+5lSM9wziaRAHHtGtvmCaMjkd56GQsLEqmh60sl61sLQnFC3Jm9yiJ4YZsWd+RtMx17hQsU9sah2evvGEwam9L5JNakn0jLUk4lJ6l1/25B+uANV1Tq2S6ZxHVl5jrB29AGefo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sjvE5gwy; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2db101c11beso7156781fa.0
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 01:06:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714032375; x=1714637175; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iCdKGBl8MCWSdClEAgreA+ZkX6CtItXZ5VVpZBsUrJY=;
-        b=sjvE5gwyh5tMJgvGNkrbfYZoAAiqEgzV+Nm41Yylkiu2Oy/pJaTJs77vcrdJylr7z0
-         B5dSi2Z9wF4DyG55VawMsNy359Ng2XaaD1VpN+W/8bp2/Q/76dMMCPEJX3bOFfYCYRKb
-         kRN705KI6x2aqtNTJWRM3gSHrKSJyLM4npHDr7edeJlyUz9Q6OOd9pGXwItHLX0Y2quB
-         Vko+LUoJaE9cYzZYZT24Ohy5brvQEN+bUDYapmVIy1fHR6VDIhlfOdXSzcEnaCsfAjF3
-         URxozzkjGFY/YxNEPy6wr5rVzxuMhCk2XRzR4+cWrvDk4eeP9n57vVVlHNnP2THCMrWv
-         cHZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714032375; x=1714637175;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iCdKGBl8MCWSdClEAgreA+ZkX6CtItXZ5VVpZBsUrJY=;
-        b=SpbeyfANEetulgY0kmd4BY7FaHdgZ9dNbcXJMsQPkkqzaU6FI1ARvDUDqyCipvUMlW
-         32hLlzar+kuz3kUoMaIygg2xnPLOOG1ZaE0hBepOdY6CqNLGeVqKUK5XFE3FCo5V06Tt
-         9aXtUPrg4aa1JWU+a9o+a4sJaUggrPYKXbLXvZVRlGvU9kLWAOs1EFCHOEq8FBpeHmdW
-         KELjdIiDSZkTr7xNcLvXle5d5774yD15ZHWY++FkYLn9VPpDUzugC4eObzWvAcwVbnqQ
-         edemRTIHJIymk1p4OZXDFcFgVAycyiDXRoJMAqYM2lhY81/a+L8V4GXBtI3Ce9TrShAb
-         tL/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXCQv2kjcdHUCuiqcRCHvu0uxTthsYeyjuZLtZqHvAc8dvubK/Zm+q3310kBPfWo0Pi/b6NQ6mdKS3PsWb3TCilnmhK
-X-Gm-Message-State: AOJu0YwGz4hjKsoPruOTudXu8B624Xy4a9v/Ahm6C1z0jGfIET5hW1jc
-	4IqGEb7DP8eNKOUe3nlbnK+5pJvF/BdfnWKXAZcyuw1bGV80TLqe12kemC2XmLc=
-X-Google-Smtp-Source: AGHT+IEb4+fND5ZU/0fnVUcIFg/IIv1B6MFauRzoNd2D1aWZh7NEqWTW+bH4oFShfqLEyzeM1ITtrQ==
-X-Received: by 2002:a2e:9c45:0:b0:2d8:7363:ff36 with SMTP id t5-20020a2e9c45000000b002d87363ff36mr2950018ljj.37.1714032375510;
-        Thu, 25 Apr 2024 01:06:15 -0700 (PDT)
-Received: from [192.168.69.100] ([176.187.197.201])
-        by smtp.gmail.com with ESMTPSA id w20-20020adfe054000000b0034a366f26b0sm17489992wrh.87.2024.04.25.01.06.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Apr 2024 01:06:15 -0700 (PDT)
-Message-ID: <a76a987f-3ea2-4c48-bc02-74ab42fd3c01@linaro.org>
-Date: Thu, 25 Apr 2024 10:06:11 +0200
+	 In-Reply-To:Content-Type; b=ky/mJjTvar/YuCBQoir/JYETkr1PX2bWosxbnTQ5aVQ3WDBnuuwMfWnlUKkRXIoIDd07BjKrVXvjq6hb/VBk7tnYMY8w/4SWUi039AUp0RqkO4+uKDxPOhot7qCBNMrELvKnARBxy6z5oUChcYYjXWV8M2yvtSdKyN1zcf5jrXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lG5R9E/l; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714034417; x=1745570417;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=K/Cg5XtNto2C/13YZaMoG170H77iS2HAQOjxL3QuFD8=;
+  b=lG5R9E/lKd7syn6uSZ/v9xIo2Txp/KhHSkdZXFS4yRJy86K8pTsvdqlM
+   VIBxJE6vV7y5XUItjMNl7M6kLUlbi9F0PI32fdNBGYPHnPNBvP4KOl7Ut
+   RtxhAWm40XslbGjBAWkfzdrgHtOYvImJT6T/P8MaAjtmNW5yOPkOVv0x+
+   3vNoQ1IQg6fi9QJuDaw5rypwOfcCXwv8sBsdooq5Kx7joLY+Kf2s0RUUI
+   2wfiphPyY6fq7H9hFo9K6G94z7E+b9RMNQYISG8pa/mOADojzcv0GJqzb
+   gyt7SgbKSgQf7LjWXJ9odbJGDKiGsAiVxjFmHgvqeI7bwLCeT/QXcJNZp
+   A==;
+X-CSE-ConnectionGUID: w0GTRqZ4QZK1P2zPsXiZYw==
+X-CSE-MsgGUID: MxM/utbWTOuJqB4JJrx8Fw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="9570767"
+X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
+   d="scan'208";a="9570767"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 01:40:16 -0700
+X-CSE-ConnectionGUID: BY6rdOebSoCkhZNBuGSy/g==
+X-CSE-MsgGUID: BavTUoOpSpK1M8a6krZjOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,228,1708416000"; 
+   d="scan'208";a="29630606"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 01:40:12 -0700
+Message-ID: <eb5cfa25-6490-4b8d-8552-4be2662d15d2@intel.com>
+Date: Thu, 25 Apr 2024 16:40:10 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,43 +67,127 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v11 00/21] i386: Introduce smp.modules and clean up cache
- topology
-To: Zhao Liu <zhao1.liu@intel.com>, Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+Subject: Re: [PATCH for-9.1 0/7] target/i386/kvm: Cleanup the kvmclock feature
+ name
+To: Zhao Liu <zhao1.liu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?=
- <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
- Zhenyu Wang <zhenyu.z.wang@intel.com>,
- Zhuocheng Ding <zhuocheng.ding@intel.com>, Babu Moger <babu.moger@amd.com>,
- Xiaoyao Li <xiaoyao.li@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>,
- Yongwei Ma <yongwei.ma@intel.com>
-References: <20240424154929.1487382-1-zhao1.liu@intel.com>
+ Eduardo Habkost <eduardo@habkost.net>, "Michael S . Tsirkin"
+ <mst@redhat.com>, Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Tim Wiederhake <twiederh@redhat.com>, qemu-devel@nongnu.org,
+ kvm@vger.kernel.org, Zhao Liu <zhao1.liu@intel.com>
+References: <20240329101954.3954987-1-zhao1.liu@linux.intel.com>
+ <fb252e78-2e71-4422-9499-9eac69102eec@intel.com> <ZioDhpYUOEdGbWgE@intel.com>
 Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20240424154929.1487382-1-zhao1.liu@intel.com>
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <ZioDhpYUOEdGbWgE@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Zhao,
+On 4/25/2024 3:17 PM, Zhao Liu wrote:
+> Hi Xiaoyao,
+> 
+> On Wed, Apr 24, 2024 at 11:57:11PM +0800, Xiaoyao Li wrote:
+>> Date: Wed, 24 Apr 2024 23:57:11 +0800
+>> From: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Subject: Re: [PATCH for-9.1 0/7] target/i386/kvm: Cleanup the kvmclock
+>>   feature name
+>>
+>> On 3/29/2024 6:19 PM, Zhao Liu wrote:
+>>> From: Zhao Liu <zhao1.liu@intel.com>
+>>>
+>>> Hi list,
+>>>
+>>> This series is based on Paolo's guest_phys_bits patchset [1].
+>>>
+>>> Currently, the old and new kvmclocks have the same feature name
+>>> "kvmclock" in FeatureWordInfo[FEAT_KVM].
+>>>
+>>> When I tried to dig into the history of this unusual naming and fix it,
+>>> I realized that Tim was already trying to rename it, so I picked up his
+>>> renaming patch [2] (with a new commit message and other minor changes).
+>>>
+>>> 13 years age, the same name was introduced in [3], and its main purpose
+>>> is to make it easy for users to enable/disable 2 kvmclocks. Then, in
+>>> 2012, Don tried to rename the new kvmclock, but the follow-up did not
+>>> address Igor and Eduardo's comments about compatibility.
+>>>
+>>> Tim [2], not long ago, and I just now, were both puzzled by the naming
+>>> one after the other.
+>>
+>> The commit message of [3] said the reason clearly:
+>>
+>>    When we tweak flags involving this value - specially when we use "-",
+>>    we have to act on both.
+>>
+>> So you are trying to change it to "when people want to disable kvmclock,
+>> they need to use '-kvmclock,-kvmclock2' instead of '-kvmclock'"
+>>
+>> IMHO, I prefer existing code and I don't see much value of differentiating
+>> them. If the current code puzzles you, then we can add comment to explain.
+> 
+> It's enough to just enable kvmclock2 for Guest; kvmclock (old) is
+> redundant in the presence of kvmclock2.
+> 
+> So operating both feature bits at the same time is not a reasonable
+> choice, we should only keep kvmclock2 for Guest. It's possible because
+> the oldest linux (v4.5) which QEMU i386 supports has kvmclock2.
 
-On 24/4/24 17:49, Zhao Liu wrote:
+who said the oldest Linux QEMU supports is from 4.5? what about 2.x kernel?
 
-> ---
-> Zhao Liu (20):
->    hw/core/machine: Introduce the module as a CPU topology level
->    hw/core/machine: Support modules in -smp
->    hw/core: Introduce module-id as the topology subindex
->    hw/core: Support module-id in numa configuration
+Besides, not only the Linux guest, whatever guest OS is, it will be 
+broken if the guest is using kvmclock and QEMU starts to drop support of 
+kvmclock.
 
-To reduce this series size, I'm taking these 4 patches to via
-my hw-misc tree.
+So, again, hard NAK to drop the support of kvmclock. It breaks existing 
+guests that use kvmclock. You cannot force people to upgrade their 
+existing VMs to use kvmclock2 instead of kvmclock.
 
-Regards,
+> Pls see:
+> https://elixir.bootlin.com/linux/v4.5/source/arch/x86/include/uapi/asm/kvm_para.h#L22
+> 
+> With this in mind, I'm trying to implement a silky smooth transition to
+> "only kcmclock2 support".
+> 
+> This series is now separating kvmclock and kvmclock2, and then I plan to
+> go to the KVM side and deprecate kvmclock2, and then finally remove
+> kvmclock (old) in QEMU. Separating the two features makes the process
+> clearer.
+> 
+> Continuing to use the same name equally would have silently caused the
+> CPUID to change on the Guest side, which would have hurt compatibility
+> as well.
+> 
+>>> So, this series is to push for renaming the new kvmclock feature to
+>>> "kvmclock2" and adding compatibility support for older machines (PC 9.0
+>>> and older).
+>>>
+>>> Finally, let's put an end to decades of doubt about this name.
+>>>
+>>>
+>>> Next Step
+>>> =========
+>>>
+>>> This series just separates the two kvmclocks from the naming, and in
+>>> subsequent patches I plan to stop setting kvmclock(old kcmclock) by
+>>> default as long as KVM supports kvmclock2 (new kvmclock).
+>>
+>> No. It will break existing guests that use KVM_FEATURE_CLOCKSOURCE.
+> 
+> Please refer to my elaboration on v4.5 above, where kvmclock2 is
+> available, it should be used in priority.
+> 
+>>> Also, try to deprecate the old kvmclock in KVM side.
+>>>
+>>> [1]: https://lore.kernel.org/qemu-devel/20240325141422.1380087-1-pbonzini@redhat.com/
+>>> [2]: https://lore.kernel.org/qemu-devel/20230908124534.25027-4-twiederh@redhat.com/
+>>> [3]: https://lore.kernel.org/qemu-devel/1300401727-5235-3-git-send-email-glommer@redhat.com/
+>>> [4]: https://lore.kernel.org/qemu-devel/1348171412-23669-3-git-send-email-Don@CloudSwitch.com/
+> 
+> Thanks,
+> Zhao
+> 
+> 
 
-Phil.
 
