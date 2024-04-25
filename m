@@ -1,674 +1,293 @@
-Return-Path: <kvm+bounces-15899-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-15900-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F8D18B1E84
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 11:54:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 347348B1EC6
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 12:07:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2C771C24A1E
-	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 09:54:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 585DC1C20AC0
+	for <lists+kvm@lfdr.de>; Thu, 25 Apr 2024 10:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1C085953;
-	Thu, 25 Apr 2024 09:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C198665A;
+	Thu, 25 Apr 2024 10:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1ZcmB1/X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PrHQQOK+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f42.google.com (mail-vs1-f42.google.com [209.85.217.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5538526C
-	for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 09:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714038843; cv=none; b=qdRWHVm4AYEXaWvYpbTF4IOo4JA7DSZBhYb8gMd75xPkI1ilNcd4Q3XhN7vD51I430QBf9wGYW6HrKUBG50YUpq9tWTZHt4K3xZEzu2LMCIcA2djR8b+U7ajX7E13YBAOptxX27obWmHx8oxHQMC0ig5iTNYGDVHKH/zmSDjy10=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714038843; c=relaxed/simple;
-	bh=n8vlU+XM8z3wB/fXZKSaZJArUMjegdv2NMyY9ymyFkY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AGaFTQ91rvFynMzNfqekWgmx7WRZx6FgWU9zcXtASYozb2B7VbiOkTATjV5eLHS62xsjSbJWMdS0suU9u61eTe0kKow8CNEDXkPWoav0+XKFv17qBxjGYgjtwOYijovpBFlRPu69cXsUMJo0o55s3hqT9LdcapJf85WPYdxzJ7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1ZcmB1/X; arc=none smtp.client-ip=209.85.217.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f42.google.com with SMTP id ada2fe7eead31-479c0e8b1c5so264644137.1
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 02:54:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714038839; x=1714643639; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2S4ZtYAwV4UTFyGGvlfOuiO1B8y2ezWGPKFTIKxi00o=;
-        b=1ZcmB1/XXfTiNS1S4siWi7XthJMkonIzHT7ZlFJe+P4oOzbUb6nngQbDAWhojLPmR1
-         tlte1zqbus68Bt7M9HN5j3XRVeGLPvhuYqbu4vIcuS+jjcg4OWDpOBSMMClLlsbiIev9
-         Cm7m0zCc2dwJYbhkaOMbhmI2r1nnDczzs0dsLqay/Fxr7fbvUApuFYnviCHkmBknEcBP
-         7T7fDgZw2rXvEbI5sm8khOI7oLpqae7T08u5qkp0CohjPaNe0DtoKMfiGcZbm5L9aLxf
-         WrNcl7AnYhaz9eu7Ob/rDFbJt0l/m7JbdqT6/0gmCXL1XT/nv8ia/CB598Tiv/svgq3H
-         CJmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714038839; x=1714643639;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2S4ZtYAwV4UTFyGGvlfOuiO1B8y2ezWGPKFTIKxi00o=;
-        b=FGpMxNqUSaAuwBqE9LHOAM/yjLtRjx8Rx3ZpeHqRHvq5U/gNFUaAh7w6PAG8cQZ5Ah
-         tW5UnZ2/5wyuBpGjhyuUKDYioTTtsx5Pg8xbrdRivfVNXB2GPpEbXe6U3hlNCL5PaY5o
-         VYqiTEmJfDOnpaxibJuf0NaZucRorqTttsmniINRp04qUp1js8fYP0dy2RJGTYOJTxoH
-         E1T0c87YmaHoO55cYnKjRb3IEacgP9DbydYJmCsST9eni7fmkMxiVDSkibPXWf3jvH2n
-         NvesBlz+0HE3fcH/vu9e1qPsW4p0A6S1ezDvV++Trmrqeb8efVybkKydY2qBvzWCuBpB
-         Jgtw==
-X-Gm-Message-State: AOJu0Yz09MoZIqS5XfQTThijzQVUN4Ts0c/SbB0DAlXV4JXPjecXTCAJ
-	/DKykJ/mq+Kyz1mvR5ROjPcbo9HAHpg9oLQbaZ83y9vNvYCGm3jGSC9wBmsNmEX7iy8hjvdv9QF
-	bgbYWq+sq/WdgU9rJRWhEf4W8lnTdt+hb5F5e
-X-Google-Smtp-Source: AGHT+IFCf96b/8rN1I/j0zet+Ph8wQszLYqyZmPfsby4JB1xvMf0BWiQIrmpfRGoF/fvks0lP7Tj4Xe4rXCwOjelin0=
-X-Received: by 2002:a05:6102:162a:b0:47c:1f69:f132 with SMTP id
- cu42-20020a056102162a00b0047c1f69f132mr189601vsb.34.1714038838785; Thu, 25
- Apr 2024 02:53:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E52485624;
+	Thu, 25 Apr 2024 10:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714039531; cv=fail; b=BH/ajev64kBo//25OyDhYawChZZREPa81mbruVqV0ErrPesrzOy1Bgnkyz5x1MYxrigTi3YpjnYIjFVeR8U1ZJoYstQ7JabfXxxZD7xKZ/ywHYvAYKVx8MYQ0HcAKGyTRrvUe/2g3spDmcLjrBGXvM91VDVEzMXnLLlUFS/vGJ0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714039531; c=relaxed/simple;
+	bh=CPZqHU1+u93MTOkoM00iAfd18B9hh/iMjek87t2mtuo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ns/GgUrFId+TTQcYwr0HgJM3VJnjABGJKjtvuTO8+zo9P2Odptr4VjCO3DRRevbkQgM8BilxU9vq0+QrbcTLXFcCilhW0eWmtxXomB0T5j08Lh+gqRgUG50vu/OgB0ypu8n8Etv+VuChkFVPjnUgXMp7od/Xlw+I72PNXHfNDR0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PrHQQOK+; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714039529; x=1745575529;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=CPZqHU1+u93MTOkoM00iAfd18B9hh/iMjek87t2mtuo=;
+  b=PrHQQOK+p8JV0zui5VbzvtsHoaUcKXOHuT4OUC6z3PZMrJTs2y3VnaJo
+   9aGB2SY4kCO0ub6/z1OqQ/T+d4IHnI+Z/Wn/z/S0Nln2pH/0zKdx86T6g
+   MR02O3FpZGg6tkSgDdzSD/UaaPp16+wT2nRMT0bbPvGET6NkhT/M8G4UA
+   YjABAxL1hnrzT9AIxnishMlkXSlm9FO1F5q22qpLNKj/4u1dAo4hoD72y
+   dAgV3N7ukR84tpugOr5IpRrodlu8Sc4EUDeLTlyLVrLxQT/81vytIeGPm
+   udGrm3pAlHNASEWNIvKqzhB2MbLfgi4Dk1yj4EZDAteECrwAkk+h4h4Rd
+   A==;
+X-CSE-ConnectionGUID: z/VYG7XKQxacGXusAZbHsg==
+X-CSE-MsgGUID: 6VUvAz88SjmQQ4VQDZKoAg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11054"; a="13548494"
+X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
+   d="scan'208";a="13548494"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 03:05:28 -0700
+X-CSE-ConnectionGUID: rhz8qrc+S7SDpVQNZJQM5w==
+X-CSE-MsgGUID: WRAghiiBTHuIwL0NGp9ARQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,229,1708416000"; 
+   d="scan'208";a="25094439"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Apr 2024 03:05:26 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 03:05:25 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 25 Apr 2024 03:05:25 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 25 Apr 2024 03:05:25 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QQW3iyPBxFbFF7vcIrsugJNd4tHdMrJpngb3pqMuK9Q8GrhKsjPyy9aEpzUhUF/QcPDa0heOallMVRlEqYEh/4dwxhssvMc55vOKh3T+Xmc6peMX2TG0g6Dx6u2unqDKONW/PJtYFtwjtb4dM9sU4w+8ip+FaRl7BRAkWDkQ6vAZSm9O82z7QLgjkj4xKcbNqduoJ8o6K0bKnzeU8zBykECgk4JOQ2ZmcbEp7TbAIdFcD0aI4Dd1+FhNKpDMih8LG/0OrkAOQYFAlzRkJ0m77TDTHkPW01bWePtqsg8BHqLwXe9nGuJBKcxc+zXRnDHEUQrsm3N0qVpnsx3nGdQulg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CPZqHU1+u93MTOkoM00iAfd18B9hh/iMjek87t2mtuo=;
+ b=ceekKgjOeKyIO33Gi/b6k/3r3OT2rF7FZXPOWQ/sev0/dnXRjixGMW1TqnyI3M+6lbMWpm0cDAXdPg1zRAXiOk71TEX8hEOLe1Afpt6MX/xIfxkMKsL0wfLLtH3I+2bUJwn0OEYOhTozdGqamprlgrDxJnhjSn6ZQfBQdqx1rpYw23GdMcbIfU0gcY1eH3tTWAOHhsyguv5Pgv9NtiPZcILpYRVdhkXF8qpRk5osMXNtCGmdAe5AJDz4dWxKdfSMU3goT8Y7f+FKJTk87yjIGdvVs3mQeSlDSAsPr0E7mteSuLzTo8icagsVgDqqRIG4+zHzeuIT+g+3Xx9OVcoz0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by IA0PR11MB7306.namprd11.prod.outlook.com (2603:10b6:208:438::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.23; Thu, 25 Apr
+ 2024 10:05:18 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::ef2c:d500:3461:9b92%4]) with mapi id 15.20.7519.021; Thu, 25 Apr 2024
+ 10:05:18 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "Li, Xiaoyao" <xiaoyao.li@intel.com>, "seanjc@google.com"
+	<seanjc@google.com>
+CC: "luto@kernel.org" <luto@kernel.org>, "Li, Xin3" <xin3.li@intel.com>,
+	"x86@kernel.org" <x86@kernel.org>, "dave.hansen@linux.intel.com"
+	<dave.hansen@linux.intel.com>, "peterz@infradead.org" <peterz@infradead.org>,
+	"Liu, Zhao1" <zhao1.liu@intel.com>, "mingo@redhat.com" <mingo@redhat.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "bp@alien8.de" <bp@alien8.de>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "Kang, Shan" <shan.kang@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v6 8/9] KVM: VMX: Open code VMX preemption timer rate mask
+ in its accessor
+Thread-Topic: [PATCH v6 8/9] KVM: VMX: Open code VMX preemption timer rate
+ mask in its accessor
+Thread-Index: AQHaccEFvtQhH+vFrkOHoBYSjiDforE4/FIAgAAjwQCAGgLcgIACjaUAgCJxxQCAAOpDgA==
+Date: Thu, 25 Apr 2024 10:05:18 +0000
+Message-ID: <64cc46778ccc93e28ec8d39b3b4e31842154f382.camel@intel.com>
+References: <20240309012725.1409949-1-seanjc@google.com>
+	 <20240309012725.1409949-9-seanjc@google.com> <ZfRtSKcXTI/lAQxE@intel.com>
+	 <ZfSLRrf1CtJEGZw2@google.com>
+	 <1e063b73-0f9a-4956-9634-2552e6e63ee1@intel.com>
+	 <ZgyBckwbrijACeB1@google.com> <ZilmVN0gbFlpnHO9@google.com>
+In-Reply-To: <ZilmVN0gbFlpnHO9@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|IA0PR11MB7306:EE_
+x-ms-office365-filtering-correlation-id: 291429af-95ff-45bc-df16-08dc650f35c2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|7416005|1800799015|366007|38070700009;
+x-microsoft-antispam-message-info: =?utf-8?B?SXJWMnpvbzdsV29zY1ZMRk1KL0RnZExEcnF6UlNWdVlWZ2kwS3ByUnFKNVgv?=
+ =?utf-8?B?bXpRcXNkdE94bXhxQlJROENlNGVqaldYcVJtY1R1VnZNa1dVN0pJRTdPWC9B?=
+ =?utf-8?B?M1BsNVd3dXY1dm9MMG1SSWdMNCtDdEczQ0VWQ0lBcGlqWFRYTDVLL0htOEl6?=
+ =?utf-8?B?L3ZMc1hkSjJURG4vTWIybld4dWpldFZUSzdIbXNSNFRvbkZKNHVPaXViN3hW?=
+ =?utf-8?B?cnFDODlVeFJ0QnNuYlVhZW5BcXFjcFBCbkFYOXJ2VGFqSHNwZkRLS0lyR3dJ?=
+ =?utf-8?B?L3ZYczJ5ZzJkTWhSaUkxVWczTHJObHYzdHpzWFRIVkZqT3N2TnIzMjdvU3o5?=
+ =?utf-8?B?Z21xdnFZcDV6bURMZDZXQnFjZ0VWZmRQbkE3QU50ci9rU0tscmpCbG1nbzl3?=
+ =?utf-8?B?Y0tZdzdFU1MvczZFSXd3Z0lMK0tEQ2FGZVArWGFhb1l4SUhmeEV4bExrdFdh?=
+ =?utf-8?B?QmJyc21HQWdSVlF1S0E5VUk3R2lnNG1OdkxvL0lPOHhlbzllUWpGNkdiK0kr?=
+ =?utf-8?B?ODJKVW05b0FtbURvOG8zOVBYQjlPU0thc3llMHY3b2QxcytzWmNMclhnRDZL?=
+ =?utf-8?B?Yzh4VElZb3NENUZyTjlac0lnMlUrNTdzRndoODRiWlR3b1V0RnI5QmJKS1Vq?=
+ =?utf-8?B?MlVlNHdmRDQxcUxkdjVwL2NVRHB3U3RnYWt3cDZNYW9KNyttazA1RURabVZ2?=
+ =?utf-8?B?djFVeGJXbWhVNnBnTGtCY0JKcng3N09YYStodUM4YU55ZmJ5bkJmU2czQ0d6?=
+ =?utf-8?B?dGEzcFRUQUtlSERqcWZMMG1TMVc0dFdsZk02ZHVySVRta3UxV1BGU0dIODhz?=
+ =?utf-8?B?VHRoMUhLL0NPOGtSbVQzR2NtOEQwNUhZUVU1SDRsUHBMcldQUkZUdnp3SnFB?=
+ =?utf-8?B?M3NsZlpveEJRNnBRYWIyQzlzMUNVT001V0NjOFNaeHQ0N3g2VHlob1RFaE9k?=
+ =?utf-8?B?ZlM1Q2pVelU4RXVXckdrTGJsOGErYW1qNUYxbHVqc1NzbGo5WExmVDRkam1I?=
+ =?utf-8?B?MmFjZk5lVWFSamhCb003dkE1NlZ2VDFpdXhtZU5sODZRU1ZDMkY5aEVhckh2?=
+ =?utf-8?B?TlR4T3k5NWRBc1pNeXE2TjRxY2V3em13cjFsK1BwMTJLS1FCcnVyUGg2b2pr?=
+ =?utf-8?B?YzMwbEJnalhVR1VkUGlXOWNsWDNvaWt6VFdjOG5aZldoeXcvaWl0ZUtJdkhT?=
+ =?utf-8?B?RGZtKzUvTW54UHkxYnUzMTdBNVZnMHhBZVZ5NXpTMHFmdW5FVGdsM1BtYUx1?=
+ =?utf-8?B?OHZiZTJlWlQ2c3VDaHlUN1dFSlBRUUgzb3NNWGl2SUswbjMwcmxBV1NTd1Rp?=
+ =?utf-8?B?UzBMQy9xNW05UFZOUU5RZi9FdWpGVWhsVWgyU0xpSkY2WnF2ZWNYSmNETVMv?=
+ =?utf-8?B?K3JCbDNmU0FScDFzbnBvdWo3U2RoVWV3UFRUNGNyLy8vbjZLSkFwcHNrbU91?=
+ =?utf-8?B?YlBhbW5Rd2tHdnB0UTdpMGNCTXppYS9DdlI3enJlVFJtajUzaSttN0VOVHQy?=
+ =?utf-8?B?T2ppZFo2bDZNN2krYmx0MDV6ZHJudTQ4OTg4VlVUZFN1V2dVRTZWdXpHd040?=
+ =?utf-8?B?VURMMWZPbWxiNTFGcCtkT3h2UGRYWmtTd3pPMW5UOFRJMDBrM0xZSk5JS0tC?=
+ =?utf-8?B?VTJseGYzOVY3bU1VSzNCL0YwWVFsbGYvdTE2TU8rcE82OWEyemRzUWM4dHR5?=
+ =?utf-8?B?dkxBa094NjlDSGtFVDQrSUIrNktZVkZsTFJsVEtHbDYwNWltcFV0UUpnbU55?=
+ =?utf-8?B?K01NaGRKTW5wWWJvSTVvMCtvZno3S05vRkdyMlkxZittN2p5dTc0NU0rRENH?=
+ =?utf-8?B?RS90ai9ROEFEYzJ4Zk5tZz09?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?aFo4N3IzNlFWcFVvSVk2QUE1eUdkYmNvTTVEOENpbm5pZnIrMTdaQkc1MXhx?=
+ =?utf-8?B?ODdPcllTVjFCbFRQcUtoc25RdzFRWWNmL01oZERRZ2d3K0o0aEo1MW4rNy9s?=
+ =?utf-8?B?NEdUc3VZbFl6UmdhaWtjRm1RWEJjUE9vMXlkU2FyRG5URHZTK1dMZ0c0bFNm?=
+ =?utf-8?B?a09KSEVNRzhlajd6UkRTN3JvTGRHdFg4dmozU2hGNzU0WnduVkVjaXlERlk4?=
+ =?utf-8?B?TE9ISVRITUNwcE1nU1hXQURpSDZZck9OcVkxUmlZQVdFSGZXUkVRRXNjbFRz?=
+ =?utf-8?B?aDZGbDVSSHRhWGczc2hXcUFNeHdIRldtYWZMMktOZElUUjVuMDBKVEdITFVM?=
+ =?utf-8?B?ZHgzaFIvc2hUbDMvU091cGJMRFUveTVrZmZKb2lBNTdyWjFtTitncGFHOTVX?=
+ =?utf-8?B?R1NJcUhmaytoMEhaajJFNmFEMjBENUVwMER1M3U3Q3NkTTk2Tms1eWZ3ZUIw?=
+ =?utf-8?B?bDZDeUhrbE9MdGZWelBUcW92djNaVFFxRFJSTUhCNWZtWDhvOUMzbWs1RVlR?=
+ =?utf-8?B?aWhrNllkaURIbDRJN215bzZUR3FIU3IxVmdnUGxmZjRnZkQ0ZEx5YlAzL3Jh?=
+ =?utf-8?B?Vk5POUQvYmp0cjl0VUlHVHlQS2RpaWRXNGZ5YXZ5NWRBUEVYamJWYjNraEJi?=
+ =?utf-8?B?TWN6SGVpZHEwSUI1cTRZRWpxemxselM4b0xJSUtsMEFQNmVSQWw3OGV0ZWNJ?=
+ =?utf-8?B?N3h3aTV2YnNYWGZrMHE4Sm4xS1NkWU1CRzBBME1xcXJPK2gyck9FTkVOZjll?=
+ =?utf-8?B?dFpoMlpZMVhka243bmhVNUtyUmUrK05XcXpsRG93dThmcHVVK2hXWEUvcy9o?=
+ =?utf-8?B?QmlMNnhCNFBRN2d6N2p4RDlic0hXNXphWlZaOERDSmVyU2ZnSVNKYnVmbThh?=
+ =?utf-8?B?WWkwajArendBclBaajVtRVpOQnNsaGg2aCtYNFpmeVVqMXRiUCt0T204Uklt?=
+ =?utf-8?B?L2FxSzZ5MURpYndiTXoxU1dlcGZ4RW5FdWcvSEhBZFoxNkg2bEYwUDVzamdV?=
+ =?utf-8?B?L0hRVitRV1JFWFVoTThyK2pleG9tMktPMmZXb3pDWFpKN3dkeExEZEpHZGRF?=
+ =?utf-8?B?a2RYN3NJTjJsOW1UVjhoNlY5MEU1ZUtFV2VHaHpCekNQMXdSeFVxcXRpKzYz?=
+ =?utf-8?B?WElKRXd5OHZrb3JZZGhyZkppMlhEYmJzMlJTSTEvUDk5UFRaNi95eHVNSTRr?=
+ =?utf-8?B?SXp5dkJUWk5NSlVmOWtESmRwOVMramdyTVVLUnNUa2F0UVVMbTJuemVEaWwv?=
+ =?utf-8?B?YTNmL3B0bUVtNng4VWVCUkhzcndBcGdhbkxtMVJBaGZqZzdkRUpZR2lwWnN0?=
+ =?utf-8?B?SWJvaEJkdGVodnJRNTAvSFp5NTRLRnU5SmhRWVplbFBqL3dIc3ppQ0FTQVE3?=
+ =?utf-8?B?VjcrcEtUbzhzclBGRVJpQjIreGp2eHdOL0ZzUnBkcWZWSWFwRzlrVWtnSzlG?=
+ =?utf-8?B?Ylh2eXk3NXdCajVkdlRiQS9NVHZDdFZyZGsyNGkwR0IzNThzVzhsVmovUXlm?=
+ =?utf-8?B?Y3JNR3RCcVR2bkhkZlpVckI1TjQ3eDJHT0U5aTIrOTFyN0o4TFpLekhzUWpM?=
+ =?utf-8?B?OXdRMVU1UEtTanFoOGM1YStsQ2dyeUdpN0crQ0JUdDAvSUs2RmhKVnhIakNB?=
+ =?utf-8?B?L2E1MmlVUy9nQWUyTlovQ05oaVBOUnNGVVMrbDRGUXlrMXlHMmtYZjhNdnNk?=
+ =?utf-8?B?Q0w0L01zQmxKNEphYTZmZFJKYzd3alVZaW9UMFE4RjdtcG80MVBsbVlOelMv?=
+ =?utf-8?B?LzJVbTRQQXZxMW90VkJlWTBTMW9sSFMvcmxIRzYrUFVSY3BwdXluaCtRWjJR?=
+ =?utf-8?B?czYrM3dqTHNFU01NUzdSSFN6dm5RcTdCTDZWaFF5QmxQVkZWZFRRdHAxVDhD?=
+ =?utf-8?B?NTd0ZFRuTDFZaGphZDNKNytkc1g3Mm5xUW5LSk1VQUFvdHdqOWtLOTRsZVZx?=
+ =?utf-8?B?MTA0RW91cytUUnl1T0YwbEZGZVYwcFhaMStVRzdkNUdkT2JMNTNJTkhwRVB1?=
+ =?utf-8?B?eWRhbE4xUlRIWW5GQmlHWUx5dHpxRHUwRHgxczRWQXRvdGo1R285WUNZL0VF?=
+ =?utf-8?B?Njk1NEtWUFpONmxpSjN2Szh0eWpZT2R4bm5heFBtOVFOeTlLeWRxMjBxVUds?=
+ =?utf-8?Q?mYYTIhp5hA4D0CxIthJMmITk0?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F5BDA7D44813A04E8E76D376623030E8@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com> <20240412084309.1733783-18-steven.price@arm.com>
-In-Reply-To: <20240412084309.1733783-18-steven.price@arm.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 25 Apr 2024 10:53:22 +0100
-Message-ID: <CA+EHjTzHJjtp4uMXN8RN4j=J-j2VdMQUhPr607EPzxTYUhMURQ@mail.gmail.com>
-Subject: Re: [PATCH v2 17/43] arm64: RME: Allow VMM to set RIPAS
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, 
-	James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev, 
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 291429af-95ff-45bc-df16-08dc650f35c2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Apr 2024 10:05:18.0248
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hXAFnuuqBP5LZ2zD5LBSxQ0rjKrVowesz/VGhNsI2Zqj+StYzUNfZxeu6nNPvJr1vj8/NQoia2Pix5s72mjlSw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7306
+X-OriginatorOrg: intel.com
 
-Hi,
-
-On Fri, Apr 12, 2024 at 9:43=E2=80=AFAM Steven Price <steven.price@arm.com>=
- wrote:
->
-> Each page within the protected region of the realm guest can be marked
-> as either RAM or EMPTY. Allow the VMM to control this before the guest
-> has started and provide the equivalent functions to change this (with
-> the guest's approval) at runtime.
->
-> When transitioning from RIPAS RAM (1) to RIPAS EMPTY (0) the memory is
-> unmapped from the guest and undelegated allowing the memory to be reused
-> by the host. When transitioning to RIPAS RAM the actual population of
-> the leaf RTTs is done later on stage 2 fault, however it may be
-> necessary to allocate additional RTTs to represent the range requested.
->
-> When freeing a block mapping it is necessary to temporarily unfold the
-> RTT which requires delegating an extra page to the RMM, this page can
-> then be recovered once the contents of the block mapping have been
-> freed. A spare, delegated page (spare_page) is used for this purpose.
->
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  arch/arm64/include/asm/kvm_rme.h |  16 ++
->  arch/arm64/kvm/mmu.c             |   8 +-
->  arch/arm64/kvm/rme.c             | 390 +++++++++++++++++++++++++++++++
->  3 files changed, 411 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kv=
-m_rme.h
-> index 915e76068b00..cc8f81cfc3c0 100644
-> --- a/arch/arm64/include/asm/kvm_rme.h
-> +++ b/arch/arm64/include/asm/kvm_rme.h
-> @@ -96,6 +96,14 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia_bi=
-ts);
->  int kvm_create_rec(struct kvm_vcpu *vcpu);
->  void kvm_destroy_rec(struct kvm_vcpu *vcpu);
->
-> +void kvm_realm_unmap_range(struct kvm *kvm,
-> +                          unsigned long ipa,
-> +                          u64 size,
-> +                          bool unmap_private);
-> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
-> +                       unsigned long addr, unsigned long end,
-> +                       unsigned long ripas);
-> +
->  #define RME_RTT_BLOCK_LEVEL    2
->  #define RME_RTT_MAX_LEVEL      3
->
-> @@ -114,4 +122,12 @@ static inline unsigned long rme_rtt_level_mapsize(in=
-t level)
->         return (1UL << RME_RTT_LEVEL_SHIFT(level));
->  }
->
-> +static inline bool realm_is_addr_protected(struct realm *realm,
-> +                                          unsigned long addr)
-> +{
-> +       unsigned int ia_bits =3D realm->ia_bits;
-> +
-> +       return !(addr & ~(BIT(ia_bits - 1) - 1));
-> +}
-> +
->  #endif
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 46f0c4e80ace..8a7b5449697f 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -310,6 +310,7 @@ static void invalidate_icache_guest_page(void *va, si=
-ze_t size)
->   * @start: The intermediate physical base address of the range to unmap
->   * @size:  The size of the area to unmap
->   * @may_block: Whether or not we are permitted to block
-> + * @only_shared: If true then protected mappings should not be unmapped
->   *
->   * Clear a range of stage-2 mappings, lowering the various ref-counts.  =
-Must
->   * be called while holding mmu_lock (unless for freeing the stage2 pgd b=
-efore
-> @@ -317,7 +318,7 @@ static void invalidate_icache_guest_page(void *va, si=
-ze_t size)
->   * with things behind our backs.
->   */
->  static void __unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t sta=
-rt, u64 size,
-> -                                bool may_block)
-> +                                bool may_block, bool only_shared)
-
-I found the new added only_shared  parameter to be a bit confusing,
-since this patch also introduces kvm_realm_unmap_range(..., bool
-unmap_private), where unmap_private has a different meaning, which I
-think is really unmap_all.. It might be better if the parameter meant
-the same thing everywhere.  Having helpers to sort this out, similar
-to what you have with realm_unmap_range_*() might be even clearer.
-
-Thanks,
-/fuad
-
->  {
->         struct kvm *kvm =3D kvm_s2_mmu_to_kvm(mmu);
->         phys_addr_t end =3D start + size;
-> @@ -330,7 +331,7 @@ static void __unmap_stage2_range(struct kvm_s2_mmu *m=
-mu, phys_addr_t start, u64
->
->  static void unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start=
-, u64 size)
->  {
-> -       __unmap_stage2_range(mmu, start, size, true);
-> +       __unmap_stage2_range(mmu, start, size, true, false);
->  }
->
->  static void stage2_flush_memslot(struct kvm *kvm,
-> @@ -1771,7 +1772,8 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kv=
-m_gfn_range *range)
->
->         __unmap_stage2_range(&kvm->arch.mmu, range->start << PAGE_SHIFT,
->                              (range->end - range->start) << PAGE_SHIFT,
-> -                            range->may_block);
-> +                            range->may_block,
-> +                            range->only_shared);
->
->         return false;
->  }
-> diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-> index 629a095bea61..9e5983c51393 100644
-> --- a/arch/arm64/kvm/rme.c
-> +++ b/arch/arm64/kvm/rme.c
-> @@ -79,6 +79,12 @@ static phys_addr_t __alloc_delegated_page(struct realm=
- *realm,
->         return phys;
->  }
->
-> +static phys_addr_t alloc_delegated_page(struct realm *realm,
-> +                                       struct kvm_mmu_memory_cache *mc)
-> +{
-> +       return __alloc_delegated_page(realm, mc, GFP_KERNEL);
-> +}
-> +
->  static void free_delegated_page(struct realm *realm, phys_addr_t phys)
->  {
->         if (realm->spare_page =3D=3D PHYS_ADDR_MAX) {
-> @@ -94,6 +100,151 @@ static void free_delegated_page(struct realm *realm,=
- phys_addr_t phys)
->         free_page((unsigned long)phys_to_virt(phys));
->  }
->
-> +static int realm_rtt_create(struct realm *realm,
-> +                           unsigned long addr,
-> +                           int level,
-> +                           phys_addr_t phys)
-> +{
-> +       addr =3D ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
-> +       return rmi_rtt_create(virt_to_phys(realm->rd), phys, addr, level)=
-;
-> +}
-> +
-> +static int realm_rtt_fold(struct realm *realm,
-> +                         unsigned long addr,
-> +                         int level,
-> +                         phys_addr_t *rtt_granule)
-> +{
-> +       unsigned long out_rtt;
-> +       int ret;
-> +
-> +       ret =3D rmi_rtt_fold(virt_to_phys(realm->rd), addr, level, &out_r=
-tt);
-> +
-> +       if (RMI_RETURN_STATUS(ret) =3D=3D RMI_SUCCESS && rtt_granule)
-> +               *rtt_granule =3D out_rtt;
-> +
-> +       return ret;
-> +}
-> +
-> +static int realm_destroy_protected(struct realm *realm,
-> +                                  unsigned long ipa,
-> +                                  unsigned long *next_addr)
-> +{
-> +       unsigned long rd =3D virt_to_phys(realm->rd);
-> +       unsigned long addr;
-> +       phys_addr_t rtt;
-> +       int ret;
-> +
-> +loop:
-> +       ret =3D rmi_data_destroy(rd, ipa, &addr, next_addr);
-> +       if (RMI_RETURN_STATUS(ret) =3D=3D RMI_ERROR_RTT) {
-> +               if (*next_addr > ipa)
-> +                       return 0; /* UNASSIGNED */
-> +               rtt =3D alloc_delegated_page(realm, NULL);
-> +               if (WARN_ON(rtt =3D=3D PHYS_ADDR_MAX))
-> +                       return -1;
-> +               /* ASSIGNED - ipa is mapped as a block, so split */
-> +               ret =3D realm_rtt_create(realm, ipa,
-> +                                      RMI_RETURN_INDEX(ret) + 1, rtt);
-> +               if (WARN_ON(ret)) {
-> +                       free_delegated_page(realm, rtt);
-> +                       return -1;
-> +               }
-> +               /* retry */
-> +               goto loop;
-> +       } else if (WARN_ON(ret)) {
-> +               return -1;
-> +       }
-> +       ret =3D rmi_granule_undelegate(addr);
-> +
-> +       /*
-> +        * If the undelegate fails then something has gone seriously
-> +        * wrong: take an extra reference to just leak the page
-> +        */
-> +       if (WARN_ON(ret))
-> +               get_page(phys_to_page(addr));
-> +
-> +       return 0;
-> +}
-> +
-> +static void realm_unmap_range_shared(struct kvm *kvm,
-> +                                    int level,
-> +                                    unsigned long start,
-> +                                    unsigned long end)
-> +{
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +       unsigned long rd =3D virt_to_phys(realm->rd);
-> +       ssize_t map_size =3D rme_rtt_level_mapsize(level);
-> +       unsigned long next_addr, addr;
-> +       unsigned long shared_bit =3D BIT(realm->ia_bits - 1);
-> +
-> +       if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +               return;
-> +
-> +       start |=3D shared_bit;
-> +       end |=3D shared_bit;
-> +
-> +       for (addr =3D start; addr < end; addr =3D next_addr) {
-> +               unsigned long align_addr =3D ALIGN(addr, map_size);
-> +               int ret;
-> +
-> +               next_addr =3D ALIGN(addr + 1, map_size);
-> +
-> +               if (align_addr !=3D addr || next_addr > end) {
-> +                       /* Need to recurse deeper */
-> +                       if (addr < align_addr)
-> +                               next_addr =3D align_addr;
-> +                       realm_unmap_range_shared(kvm, level + 1, addr,
-> +                                                min(next_addr, end));
-> +                       continue;
-> +               }
-> +
-> +               ret =3D rmi_rtt_unmap_unprotected(rd, addr, level, &next_=
-addr);
-> +               switch (RMI_RETURN_STATUS(ret)) {
-> +               case RMI_SUCCESS:
-> +                       break;
-> +               case RMI_ERROR_RTT:
-> +                       if (next_addr =3D=3D addr) {
-> +                               next_addr =3D ALIGN(addr + 1, map_size);
-> +                               realm_unmap_range_shared(kvm, level + 1, =
-addr,
-> +                                                        next_addr);
-> +                       }
-> +                       break;
-> +               default:
-> +                       WARN_ON(1);
-> +               }
-> +       }
-> +}
-> +
-> +static void realm_unmap_range_private(struct kvm *kvm,
-> +                                     unsigned long start,
-> +                                     unsigned long end)
-> +{
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +       ssize_t map_size =3D RME_PAGE_SIZE;
-> +       unsigned long next_addr, addr;
-> +
-> +       for (addr =3D start; addr < end; addr =3D next_addr) {
-> +               int ret;
-> +
-> +               next_addr =3D ALIGN(addr + 1, map_size);
-> +
-> +               ret =3D realm_destroy_protected(realm, addr, &next_addr);
-> +
-> +               if (WARN_ON(ret))
-> +                       break;
-> +       }
-> +}
-> +
-> +static void realm_unmap_range(struct kvm *kvm,
-> +                             unsigned long start,
-> +                             unsigned long end,
-> +                             bool unmap_private)
-> +{
-> +       realm_unmap_range_shared(kvm, RME_RTT_MAX_LEVEL - 1, start, end);
-> +       if (unmap_private)
-> +               realm_unmap_range_private(kvm, start, end);
-> +}
-> +
->  u32 kvm_realm_ipa_limit(void)
->  {
->         return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
-> @@ -190,6 +341,30 @@ static int realm_rtt_destroy(struct realm *realm, un=
-signed long addr,
->         return ret;
->  }
->
-> +static int realm_create_rtt_levels(struct realm *realm,
-> +                                  unsigned long ipa,
-> +                                  int level,
-> +                                  int max_level,
-> +                                  struct kvm_mmu_memory_cache *mc)
-> +{
-> +       if (WARN_ON(level =3D=3D max_level))
-> +               return 0;
-> +
-> +       while (level++ < max_level) {
-> +               phys_addr_t rtt =3D alloc_delegated_page(realm, mc);
-> +
-> +               if (rtt =3D=3D PHYS_ADDR_MAX)
-> +                       return -ENOMEM;
-> +
-> +               if (realm_rtt_create(realm, ipa, level, rtt)) {
-> +                       free_delegated_page(realm, rtt);
-> +                       return -ENXIO;
-> +               }
-> +       }
-> +
-> +       return 0;
-> +}
-> +
->  static int realm_tear_down_rtt_level(struct realm *realm, int level,
->                                      unsigned long start, unsigned long e=
-nd)
->  {
-> @@ -265,6 +440,68 @@ static int realm_tear_down_rtt_range(struct realm *r=
-ealm,
->                                          start, end);
->  }
->
-> +/*
-> + * Returns 0 on successful fold, a negative value on error, a positive v=
-alue if
-> + * we were not able to fold all tables at this level.
-> + */
-> +static int realm_fold_rtt_level(struct realm *realm, int level,
-> +                               unsigned long start, unsigned long end)
-> +{
-> +       int not_folded =3D 0;
-> +       ssize_t map_size;
-> +       unsigned long addr, next_addr;
-> +
-> +       if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +               return -EINVAL;
-> +
-> +       map_size =3D rme_rtt_level_mapsize(level - 1);
-> +
-> +       for (addr =3D start; addr < end; addr =3D next_addr) {
-> +               phys_addr_t rtt_granule;
-> +               int ret;
-> +               unsigned long align_addr =3D ALIGN(addr, map_size);
-> +
-> +               next_addr =3D ALIGN(addr + 1, map_size);
-> +
-> +               ret =3D realm_rtt_fold(realm, align_addr, level, &rtt_gra=
-nule);
-> +
-> +               switch (RMI_RETURN_STATUS(ret)) {
-> +               case RMI_SUCCESS:
-> +                       if (!WARN_ON(rmi_granule_undelegate(rtt_granule))=
-)
-> +                               free_page((unsigned long)phys_to_virt(rtt=
-_granule));
-> +                       break;
-> +               case RMI_ERROR_RTT:
-> +                       if (level =3D=3D RME_RTT_MAX_LEVEL ||
-> +                           RMI_RETURN_INDEX(ret) < level) {
-> +                               not_folded++;
-> +                               break;
-> +                       }
-> +                       /* Recurse a level deeper */
-> +                       ret =3D realm_fold_rtt_level(realm,
-> +                                                  level + 1,
-> +                                                  addr,
-> +                                                  next_addr);
-> +                       if (ret < 0)
-> +                               return ret;
-> +                       else if (ret =3D=3D 0)
-> +                               /* Try again at this level */
-> +                               next_addr =3D addr;
-> +                       break;
-> +               default:
-> +                       return -ENXIO;
-> +               }
-> +       }
-> +
-> +       return not_folded;
-> +}
-> +
-> +static int realm_fold_rtt_range(struct realm *realm,
-> +                               unsigned long start, unsigned long end)
-> +{
-> +       return realm_fold_rtt_level(realm, get_start_level(realm) + 1,
-> +                                   start, end);
-> +}
-> +
->  static void ensure_spare_page(struct realm *realm)
->  {
->         phys_addr_t tmp_rtt;
-> @@ -295,6 +532,147 @@ void kvm_realm_destroy_rtts(struct kvm *kvm, u32 ia=
-_bits)
->         WARN_ON(realm_tear_down_rtt_range(realm, 0, (1UL << ia_bits)));
->  }
->
-> +void kvm_realm_unmap_range(struct kvm *kvm, unsigned long ipa, u64 size,
-> +                          bool unmap_private)
-> +{
-> +       unsigned long end =3D ipa + size;
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +
-> +       end =3D min(BIT(realm->ia_bits - 1), end);
-> +
-> +       ensure_spare_page(realm);
-> +
-> +       realm_unmap_range(kvm, ipa, end, unmap_private);
-> +
-> +       realm_fold_rtt_range(realm, ipa, end);
-> +}
-> +
-> +static int find_map_level(struct realm *realm,
-> +                         unsigned long start,
-> +                         unsigned long end)
-> +{
-> +       int level =3D RME_RTT_MAX_LEVEL;
-> +
-> +       while (level > get_start_level(realm)) {
-> +               unsigned long map_size =3D rme_rtt_level_mapsize(level - =
-1);
-> +
-> +               if (!IS_ALIGNED(start, map_size) ||
-> +                   (start + map_size) > end)
-> +                       break;
-> +
-> +               level--;
-> +       }
-> +
-> +       return level;
-> +}
-> +
-> +int realm_set_ipa_state(struct kvm_vcpu *vcpu,
-> +                       unsigned long start,
-> +                       unsigned long end,
-> +                       unsigned long ripas)
-> +{
-> +       struct kvm *kvm =3D vcpu->kvm;
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +       struct realm_rec *rec =3D &vcpu->arch.rec;
-> +       phys_addr_t rd_phys =3D virt_to_phys(realm->rd);
-> +       phys_addr_t rec_phys =3D virt_to_phys(rec->rec_page);
-> +       struct kvm_mmu_memory_cache *memcache =3D &vcpu->arch.mmu_page_ca=
-che;
-> +       unsigned long ipa =3D start;
-> +       int ret =3D 0;
-> +
-> +       while (ipa < end) {
-> +               unsigned long next;
-> +
-> +               ret =3D rmi_rtt_set_ripas(rd_phys, rec_phys, ipa, end, &n=
-ext);
-> +
-> +               if (RMI_RETURN_STATUS(ret) =3D=3D RMI_ERROR_RTT) {
-> +                       int walk_level =3D RMI_RETURN_INDEX(ret);
-> +                       int level =3D find_map_level(realm, ipa, end);
-> +
-> +                       if (walk_level < level) {
-> +                               ret =3D realm_create_rtt_levels(realm, ip=
-a,
-> +                                                             walk_level,
-> +                                                             level,
-> +                                                             memcache);
-> +                               if (!ret)
-> +                                       continue;
-> +                       } else {
-> +                               ret =3D -EINVAL;
-> +                       }
-> +
-> +                       break;
-> +               } else if (RMI_RETURN_STATUS(ret) !=3D RMI_SUCCESS) {
-> +                       WARN(1, "Unexpected error in %s: %#x\n", __func__=
-,
-> +                            ret);
-> +                       ret =3D -EINVAL;
-> +                       break;
-> +               }
-> +               ipa =3D next;
-> +       }
-> +
-> +       if (ripas =3D=3D RMI_EMPTY && ipa !=3D start)
-> +               kvm_realm_unmap_range(kvm, start, ipa - start, true);
-> +
-> +       return ret;
-> +}
-> +
-> +static int realm_init_ipa_state(struct realm *realm,
-> +                               unsigned long ipa,
-> +                               unsigned long end)
-> +{
-> +       phys_addr_t rd_phys =3D virt_to_phys(realm->rd);
-> +       int ret;
-> +
-> +       while (ipa < end) {
-> +               unsigned long next;
-> +
-> +               ret =3D rmi_rtt_init_ripas(rd_phys, ipa, end, &next);
-> +
-> +               if (RMI_RETURN_STATUS(ret) =3D=3D RMI_ERROR_RTT) {
-> +                       int err_level =3D RMI_RETURN_INDEX(ret);
-> +                       int level =3D find_map_level(realm, ipa, end);
-> +
-> +                       if (WARN_ON(err_level >=3D level))
-> +                               return -ENXIO;
-> +
-> +                       ret =3D realm_create_rtt_levels(realm, ipa,
-> +                                                     err_level,
-> +                                                     level, NULL);
-> +                       if (ret)
-> +                               return ret;
-> +                       /* Retry with the RTT levels in place */
-> +                       continue;
-> +               } else if (WARN_ON(ret)) {
-> +                       return -ENXIO;
-> +               }
-> +
-> +               ipa =3D next;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_init_ipa_range_realm(struct kvm *kvm,
-> +                                   struct kvm_cap_arm_rme_init_ipa_args =
-*args)
-> +{
-> +       int ret =3D 0;
-> +       gpa_t addr, end;
-> +       struct realm *realm =3D &kvm->arch.realm;
-> +
-> +       addr =3D args->init_ipa_base;
-> +       end =3D addr + args->init_ipa_size;
-> +
-> +       if (end < addr)
-> +               return -EINVAL;
-> +
-> +       if (kvm_realm_state(kvm) !=3D REALM_STATE_NEW)
-> +               return -EINVAL;
-> +
-> +       ret =3D realm_init_ipa_state(realm, addr, end);
-> +
-> +       return ret;
-> +}
-> +
->  /* Protects access to rme_vmid_bitmap */
->  static DEFINE_SPINLOCK(rme_vmid_lock);
->  static unsigned long *rme_vmid_bitmap;
-> @@ -418,6 +796,18 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm=
-_enable_cap *cap)
->         case KVM_CAP_ARM_RME_CREATE_RD:
->                 r =3D kvm_create_realm(kvm);
->                 break;
-> +       case KVM_CAP_ARM_RME_INIT_IPA_REALM: {
-> +               struct kvm_cap_arm_rme_init_ipa_args args;
-> +               void __user *argp =3D u64_to_user_ptr(cap->args[1]);
-> +
-> +               if (copy_from_user(&args, argp, sizeof(args))) {
-> +                       r =3D -EFAULT;
-> +                       break;
-> +               }
-> +
-> +               r =3D kvm_init_ipa_range_realm(kvm, &args);
-> +               break;
-> +       }
->         default:
->                 r =3D -EINVAL;
->                 break;
-> --
-> 2.34.1
->
+T24gV2VkLCAyMDI0LTA0LTI0IGF0IDEzOjA2IC0wNzAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
+b3RlOg0KPiBPbiBUdWUsIEFwciAwMiwgMjAyNCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToN
+Cj4gPiBPbiBNb24sIEFwciAwMSwgMjAyNCwgWGlhb3lhbyBMaSB3cm90ZToNCj4gPiA+IE9uIDMv
+MTYvMjAyNCAxOjU0IEFNLCBTZWFuIENocmlzdG9waGVyc29uIHdyb3RlOg0KPiA+ID4gPiBPbiBG
+cmksIE1hciAxNSwgMjAyNCwgWmhhbyBMaXUgd3JvdGU6DQo+ID4gPiA+ID4gT24gRnJpLCBNYXIg
+MDgsIDIwMjQgYXQgMDU6Mjc6MjRQTSAtMDgwMCwgU2VhbiBDaHJpc3RvcGhlcnNvbiB3cm90ZToN
+Cj4gPiA+ID4gPiA+IFVzZSB2bXhfbWlzY19wcmVlbXB0aW9uX3RpbWVyX3JhdGUoKSB0byBnZXQg
+dGhlIHJhdGUgaW4gaGFyZHdhcmVfc2V0dXAoKSwNCj4gPiA+ID4gPiA+IGFuZCBvcGVuIGNvZGUg
+dGhlIHJhdGUncyBiaXRtYXNrIGluIHZteF9taXNjX3ByZWVtcHRpb25fdGltZXJfcmF0ZSgpIHNv
+DQo+ID4gPiA+ID4gPiB0aGF0IHRoZSBmdW5jdGlvbiBsb29rcyBsaWtlIGFsbCB0aGUgaGVscGVy
+cyB0aGF0IGdyYWIgdmFsdWVzIGZyb20NCj4gPiA+ID4gPiA+IFZNWF9CQVNJQyBhbmQgVk1YX01J
+U0MgTVNSIHZhbHVlcy4NCj4gPiA+ID4gDQo+ID4gPiA+IC4uLg0KPiA+ID4gPiANCj4gPiA+ID4g
+PiA+IC0jZGVmaW5lIFZNWF9NSVNDX1BSRUVNUFRJT05fVElNRVJfUkFURV9NQVNLCUdFTk1BU0tf
+VUxMKDQsIDApDQo+ID4gPiA+ID4gPiAgICNkZWZpbmUgVk1YX01JU0NfU0FWRV9FRkVSX0xNQQkJ
+CUJJVF9VTEwoNSkNCj4gPiA+ID4gPiA+ICAgI2RlZmluZSBWTVhfTUlTQ19BQ1RJVklUWV9ITFQJ
+CQlCSVRfVUxMKDYpDQo+ID4gPiA+ID4gPiAgICNkZWZpbmUgVk1YX01JU0NfQUNUSVZJVFlfU0hV
+VERPV04JCUJJVF9VTEwoNykNCj4gPiA+ID4gPiA+IEBAIC0xNjIsNyArMTYxLDcgQEAgc3RhdGlj
+IGlubGluZSB1MzIgdm14X2Jhc2ljX3ZtY3NfbWVtX3R5cGUodTY0IHZteF9iYXNpYykNCj4gPiA+
+ID4gPiA+ICAgc3RhdGljIGlubGluZSBpbnQgdm14X21pc2NfcHJlZW1wdGlvbl90aW1lcl9yYXRl
+KHU2NCB2bXhfbWlzYykNCj4gPiA+ID4gPiA+ICAgew0KPiA+ID4gPiA+ID4gLQlyZXR1cm4gdm14
+X21pc2MgJiBWTVhfTUlTQ19QUkVFTVBUSU9OX1RJTUVSX1JBVEVfTUFTSzsNCj4gPiA+ID4gPiA+
+ICsJcmV0dXJuIHZteF9taXNjICYgR0VOTUFTS19VTEwoNCwgMCk7DQo+ID4gPiA+ID4gPiAgIH0N
+Cj4gPiA+ID4gPiANCj4gPiA+ID4gPiBJIGZlZWwga2VlcGluZyBWTVhfTUlTQ19QUkVFTVBUSU9O
+X1RJTUVSX1JBVEVfTUFTSyBpcyBjbGVhcmVyIHRoYW4NCj4gPiA+ID4gPiBHRU5NQVNLX1VMTCg0
+LCAwKSwgYW5kIHRoZSBmb3JtZXIgaW1wcm92ZXMgY29kZSByZWFkYWJpbGl0eS4NCj4gPiA+ID4g
+PiANCj4gPiA+ID4gPiBNYXkgbm90IG5lZWQgdG8gZHJvcCBWTVhfTUlTQ19QUkVFTVBUSU9OX1RJ
+TUVSX1JBVEVfTUFTSz8NCj4gPiA+ID4gDQo+ID4gPiA+IEkgZG9uJ3QgbmVjZXNzYXJpbHkgZGlz
+YWdyZWUsIGJ1dCBpbiB0aGlzIGNhc2UgSSB2YWx1ZSBjb25zaXN0ZW5jeSBvdmVyIG9uZQ0KPiA+
+ID4gPiBpbmRpdmlkdWFsIGNhc2UuICBBcyBjYWxsZWQgb3V0IGluIHRoZSBjaGFuZ2Vsb2csIHRo
+ZSBtb3RpdmF0aW9uIGlzIHRvIG1ha2UNCj4gPiA+ID4gdm14X21pc2NfcHJlZW1wdGlvbl90aW1l
+cl9yYXRlKCkgbG9vayBsaWtlIGFsbCB0aGUgc3Vycm91bmRpbmcgaGVscGVycy4NCj4gPiA+ID4g
+DQo+ID4gPiA+IF9JZl8gd2Ugd2FudCB0byBwcmVzZXJ2ZSB0aGUgbWFzaywgdGhlbiB3ZSBzaG91
+bGQgYWRkICNkZWZpbmVzIGZvciB2bXhfbWlzY19jcjNfY291bnQoKSwNCj4gPiA+ID4gdm14X21p
+c2NfbWF4X21zcigpLCBldGMuDQo+ID4gPiA+IA0KPiA+ID4gPiBJIGRvbid0IGhhdmUgYSBzdXBl
+ciBzdHJvbmcgcHJlZmVyZW5jZSwgdGhvdWdoIEkgdGhpbmsgbXkgdm90ZSB3b3VsZCBiZSB0byBu
+b3QNCj4gPiA+ID4gYWRkIHRoZSBtYXNrcyBhbmQgZ28gd2l0aCB0aGlzIHBhdGNoLiAgVGhlc2Ug
+aGVscGVycyBhcmUgaW50ZW5kZWQgdG8gYmUgdGhlIF9vbmx5Xw0KPiA+ID4gPiB3YXkgdG8gYWNj
+ZXNzIHRoZSBmaWVsZHMsIGkuZS4gdGhleSBlZmZlY3RpdmVseSBfYXJlXyB0aGUgbWFzayBtYWNy
+b3MsIGp1c3QgaW4NCj4gPiA+ID4gZnVuY3Rpb24gZm9ybS4NCj4gPiA+ID4gDQo+ID4gPiANCj4g
+PiA+ICsxLg0KPiA+ID4gDQo+ID4gPiBIb3dldmVyLCBpdCBzZWVtcyBkaWZmZXJlbnQgZm9yIHZt
+eF9iYXNpY192bWNzX21lbV90eXBlKCkgaW4gcGF0Y2ggNSwgdGhhdCBJDQo+ID4gPiBqdXN0IHJl
+Y29tbWVuZGVkIHRvIGRlZmluZSB0aGUgTUFTSy4NCj4gPiA+IA0KPiA+ID4gQmVjYXVzZSB3ZSBh
+bHJlYWR5IGhhdmUNCj4gPiA+IA0KPiA+ID4gCSNkZWZpbmUgVk1YX0JBU0lDX01FTV9UWVBFX1NI
+SUZUCTUwDQo+ID4gPiANCj4gPiA+IGFuZCBpdCBoYXMgYmVlbiB1c2VkIGluIHZteC9uZXN0ZWQu
+YywNCj4gPiA+IA0KPiA+ID4gc3RhdGljIGlubGluZSB1MzIgdm14X2Jhc2ljX3ZtY3NfbWVtX3R5
+cGUodTY0IHZteF9iYXNpYykNCj4gPiA+IHsNCj4gPiA+IAlyZXR1cm4gKHZteF9iYXNpYyAmIEdF
+Tk1BU0tfVUxMKDUzLCA1MCkpID4+DQo+ID4gPiAJCVZNWF9CQVNJQ19NRU1fVFlQRV9TSElGVDsN
+Cj4gPiA+IH0NCj4gPiA+IA0KPiA+ID4gbG9va3Mgbm90IGludHVpdGl2ZSB0aGFuIG9yaWdpbmFs
+IHBhdGNoLg0KPiA+IA0KPiA+IFllYWgsIGFncmVlZCwgdGhhdCdzIHRha2luZyB0aGUgd29yc3Qg
+b2YgYm90aCB3b3JsZHMuICBJJ2xsIHVwZGF0ZSBwYXRjaCA1IHRvIGRyb3ANCj4gPiBWTVhfQkFT
+SUNfTUVNX1RZUEVfU0hJRlQgd2hlbiBlZmZlY3RpdmVseSAibW92aW5nIiBpdCBpbnRvIHZteF9i
+YXNpY192bWNzX21lbV90eXBlKCkuDQo+IA0KPiBEcmF0LiAgRmluYWxseSBnZXR0aW5nIGJhY2sg
+dG8gdGhpcywgZHJvcHBpbmcgVk1YX0JBU0lDX01FTV9UWVBFX1NISUZUIGRvZXNuJ3QNCj4gd29y
+ayBiZWNhdXNlIGl0J3MgdXNlZCBieSBuZXN0ZWRfdm14X3NldHVwX2Jhc2ljKCksIGFzIGlzIFZN
+WF9CQVNJQ19WTUNTX1NJWkVfU0hJRlQsDQo+IHdoaWNoIGlzIHByZXN1bWFibHkgd2h5IHBhc3Qg
+bWUga2VwdCB0aGVtIGFyb3VuZC4NCj4gDQo+IEknbSBsZWFuaW5nIHRvd2FyZHMga2VlcGluZyB0
+aGluZ3MgYXMgcHJvcG9zZWQgaW4gdGhpcyBzZXJpZXMuICBJIGRvbid0IHNlZSB1cw0KPiBnYWlu
+aW5nIGEgdGhpcmQgY29weSwgb3IgZXZlbiBhIHRoaXJkIHVzZXIsIGkuZS4gSSBkb24ndCB0aGlu
+ayB3ZSBhcmUgY3JlYXRpbmcgYQ0KPiBmdXR1cmUgcHJvYmxlbSBieSBvcGVuIGNvZGluZyB0aGUg
+c2hpZnQgaW4gdm14X2Jhc2ljX3ZtY3NfbWVtX3R5cGUoKS4gIEFuZCBJTU8NCj4gY29kZSBsaWtl
+IHRoaXMNCj4gDQo+IAlyZXR1cm4gKHZteF9iYXNpYyAmIFZNWF9CQVNJQ19NRU1fVFlQRV9NQVNL
+KSA+Pg0KPiAJICAgICAgIFZNWF9CQVNJQ19NRU1fVFlQRV9TSElGVDsNCj4gDQo+IGlzIGFuIHVu
+bmVjZXNzYXJ5IG9iZnVzY2F0aW9uIHdoZW4gdGhlcmUgaXMgbGl0ZXJhbGx5IG9uZSB1c2VyICh0
+aGUgYWNjZXNzb3IpLg0KPiANCj4gQW5vdGhlciBpZGVhIHdvdWxkIGJlIHRvIGRlbGV0ZSBWTVhf
+QkFTSUNfTUVNX1RZUEVfU0hJRlQgYW5kIFZNWF9CQVNJQ19WTUNTX1NJWkVfU0hJRlQsDQo+IGFu
+ZCBlaXRoZXIgb3BlbiBjb2RlIHRoZSB2YWx1ZXMgb3IgdXNlIGxvY2FsIGNvbnN0IHZhcmlhYmxl
+cywgYnV0IHRoYXQgYWxzbyBzZWVtcw0KPiBsaWtlIGEgbmV0IG5lZ2F0aXZlLCBlLmcuIHNwbGl0
+cyB0aGUgZWZmZWN0aXZlIGRlZmluaXRpb25zIG92ZXIgdG9vIG1hbnkgbG9jYXRpb25zLg0KDQpB
+bHRlcm5hdGl2ZWx5LCB3ZSBjYW4gYWRkIG1hY3JvcyBsaWtlIGJlbG93IHRvIDxhc20vdm14Lmg+
+IGNsb3NlIHRvDQp2bXhfYmFzaWNfdm1jc19zaXplKCkgZXRjLCBzbyBpdCdzIHN0cmFpZ2h0Zm9y
+d2FyZCB0byBzZWUuDQoNCisjZGVmaW5lIFZNWF9CU0FJQ19WTUNTMTJfU0laRQkoKHU2NClWTUNT
+MTJfU0laRSA8PCAzMikNCisjZGVmaW5lIFZNWF9CQVNJQ19NRU1fVFlQRV9XQgkoTUVNX1RZUEVf
+V0IgPDwgNTApDQo=
 
