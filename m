@@ -1,138 +1,131 @@
-Return-Path: <kvm+bounces-16059-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 579AA8B3B68
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 17:28:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B5928B3C07
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 17:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 858461C20E0F
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 15:28:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47EC8282D79
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 15:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00889149011;
-	Fri, 26 Apr 2024 15:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE811514CC;
+	Fri, 26 Apr 2024 15:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PJv+/VHk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p50eQb72"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004861DFFC
-	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 15:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26863149C7F
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 15:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714145307; cv=none; b=irurl+h7RHnHVnOiijnrFo+0PJsD79Io8iN+MigcAX+C53xzl/xL1Y7/fkee7faYB2oTEYI/rPW8KtOEzVMzFhN3Z/L2oCAyuCJhpY8jpmQupFj8gm3jzCrHwrhjdsssfTJw9s31S+h1s8PHexRACVBS07/FztBtDzPXqjsqO5o=
+	t=1714146452; cv=none; b=iB9KBrHGIdEtcC8SFkeb7eoIeIRhu4heuYgyHbZV++vU88ZSKLr4S3zom7wF/uJ7V5SP/vkMlzliDi/hFtOfOPc5FW4l2iddSAzRsQTxyZM0GLSYqf43vKJ6gyGNSRBp+yF5g85uuQzbLYe7dqifmgn4bHwB/Ck+3i2uJADB5g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714145307; c=relaxed/simple;
-	bh=4VyWsxlGEIu53oKuIILv9zWJlbPO/mHfes72GPHmjG4=;
+	s=arc-20240116; t=1714146452; c=relaxed/simple;
+	bh=3kv3W8HCdfkaWDUxqPPBqvTTgtgtiGVVw92b0grhvFY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DmHfyN2dhMPMzmkiuCfwiS53vZ51oZ7QwE/PpOFGHxmjxMmLiF1evKI1D05L6UTRvO/Mejp7LXJM5jCmbkY0f2aDJ/zw6DHPYR0r2fJb2L0r2a+nIWnfgc45V1WXtcPLUh8rYbn4XOBT7Ww2B76n+zDiXyZJZGlYv1Wxkf3erws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PJv+/VHk; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=Ep2ZR1DaqaDXNYaKm1tffaazOO6l/PtlvkQezIh5gFxOLqr1VpzgdqB13EDFYHH1g02/JqZ0LQQ20V428+MHdmWj9U9CrKSuz81SmqjZReaxYSbqp9iGb+rcBLkv31bPZKmQzDgmoiDmdY8EQPGbqXMFhslqQ/iWy7/acn/ZTEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p50eQb72; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1eb1471c7dbso5510995ad.1
-        for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 08:28:25 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6188040f3d2so45191127b3.1
+        for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 08:47:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714145305; x=1714750105; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D+UDqDG3emdl+nwdFJP3bYWMhdA98juEbDMYnX+rP1E=;
-        b=PJv+/VHk4jnQZImQ0D+scqckc/10xbjLetAvmjZrZ0y+lZ+HZWkNuTMDdJB91clNTz
-         ndj7QlYwg4o7ZQPXtDchSF2+0x5l113ZV7g5G9+w2k9YxjdM+XAJNiVMZSZWaXSAmcJa
-         FaCPyn1IUfA6dPEPMbW65EXH3A2cMrrbkGIgFqbW2FQY037IVrwI6e2PxFs+NWl7Odt/
-         DUO/W/MI8RNlcgmwITnLcJj54YmUPmkhOF8R4bZeBYRF6JDSrrFBa7tOfaH7parJZSN/
-         ReR1JRA/KhuyOEr6NOthWdcKXp7vi5AIDcWPfYAvvnwYx/nMduieh4qHeVGqIZkcgSKS
-         gCow==
+        d=google.com; s=20230601; t=1714146450; x=1714751250; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2E9JoSWwd8nVZWjHSk8NyMAJBnorcWNH5AMDyGnL6Dw=;
+        b=p50eQb72zDQe3QRayW0+C1Ticmi/NdxCzcJCY5/hrodEeFBl+nZhLXVr8EfXMxEcMv
+         EY+AlQiLXXmKysYjTli68C8Nwhbi3prP4ROIL494mOWr3xBCAnr+oT12gvy1JJUipSjH
+         3Z+9aBX7LlUKhk0+29mcJPhjbZEOXAjOGHkaRi4TfmOtRU7GH+1XTG6AnQx48Na0QkDk
+         FEt1LhyRyCQkuNIEbE3Ql49UpO0bCSVYrA0UW/JOjtoTdx2exTmcVA7CGoD6Ok/QSDtH
+         GHg84hbm+Pjv+fmWtiBXAVokL+tPNCXPIMZ+Sjnfqv/y6muuJlTxVOfuE9iMnazqmrR5
+         a9Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714145305; x=1714750105;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D+UDqDG3emdl+nwdFJP3bYWMhdA98juEbDMYnX+rP1E=;
-        b=OpLSnU7EV3n2OYSG/MUztLUZhGEPkbFHzY3F5wpffFdyjtMriqVp8k91iYct5Ik3Bb
-         lcaPgm3ipPP18GcBcaC1B6VMKGM+L69gc8tRYXLQ/e8bTGMz8mFoGTOuPVkr+cmhEJj8
-         BoXq9VOdVE/m99MP7pO/2lD4IWaueTlFR5J81yyGHFNuXbUn4gnugYWtwV64XDjkUPh7
-         UrIaM42N/PYEiNPrQNKHzRkrFKusCLET5qo6SWYrSDcjW+NzHcC6FB8G3VQLZ15DhAio
-         zvUAYMrzNblAsdO645P+JEX+wrCr7VHc1Twe2We2zl5+n7WD+1sHmGdzqb3GMPrNF5bI
-         GQPw==
-X-Forwarded-Encrypted: i=1; AJvYcCUY45qXKi4H/OpmEEracZT95FWep/HYzGoWRLl3LdTKbCU3cA/lULwV8LJpVVKbQDryvQhT7I/08EJXF0VYCDrIl4Qq
-X-Gm-Message-State: AOJu0YxK24b56hHuqRHY6PqIKUWGMnaVg8eUDbc6jTOSg/J1nDHLSdEM
-	R4At19LOHikQrNFlZSeTvrH++lJspPQ7sDIZ31ub27HM05xndSgKB8GnBcOVWbgulzZZsyxpKJY
-	OSA==
-X-Google-Smtp-Source: AGHT+IEKAOJy9LE0IASl5+cq5pyOm1jFXSWEx8qeF7jYZYv+R0oJ4OP+XQggJcMl7v+26T8Uy0nO92maOOc=
+        d=1e100.net; s=20230601; t=1714146450; x=1714751250;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2E9JoSWwd8nVZWjHSk8NyMAJBnorcWNH5AMDyGnL6Dw=;
+        b=rYrD79ae0PVz7xDQJxMvHQIguWChRvpiB2K26J3TPLxn6XDs+DhrLwDKGEHqx1vQS7
+         706ZEq7Orhsh8wfc7wKuLQGYE2UtzmQWobnuCv2j1Mz+cuovcS39Yc9mq68bnOCcN2uR
+         KvatnIxsK3I8VzYbEWrwzXQjTkzEIimQlknFVyH8HwQzV63+XqXdko+reLlQH3EknGtE
+         UqxKkH0vpRC1uLSV8G9TP1sbPg0LERiswsBjqrmWVpR3n7VnEoLi7218vKaTuMn227NN
+         Z/w7ylp/mh/Uw1/3ABT/YqyXHHGw3/Gf5fadDkVoFAQOjXaWEBSYeL/dunvuuO3tnf0F
+         azpA==
+X-Forwarded-Encrypted: i=1; AJvYcCXl0LJPMBFy7jk1ZhMTjJDUOuwSHsNhMS3YCltu+p2c2KMe/4grixkB3V6KpEFxePR1wru0xvcCTClQ3xlwrpDxbqZL
+X-Gm-Message-State: AOJu0Yz3R2fCW0X+MR/O1wjcGF+47Rrg2gh59+mF8k9Y23QkDwbpRCWl
+	BRYJtx4FZu1POxIkVfa9gAmmWXgDElGeTMsI5IJiLJ7qnkmtsv2QYxTnmCfbsa1fPDPreOHF1zf
+	ylg==
+X-Google-Smtp-Source: AGHT+IF3FSBZIrw+Ee5KLhA7Zd1dn/48qyZF8Ne2lnAcIov1+3/MDN/HY98TTWsNvj3V2JUe1s1WrbhQb1M=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:41c2:b0:1e6:624c:f1b8 with SMTP id
- u2-20020a17090341c200b001e6624cf1b8mr815ple.0.1714145305134; Fri, 26 Apr 2024
- 08:28:25 -0700 (PDT)
-Date: Fri, 26 Apr 2024 08:28:23 -0700
-In-Reply-To: <970c8891af05d0cb3ccb6eab2d67a7def3d45f74.camel@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a0d:df44:0:b0:615:e53:1c1 with SMTP id
+ i65-20020a0ddf44000000b006150e5301c1mr675860ywe.7.1714146450107; Fri, 26 Apr
+ 2024 08:47:30 -0700 (PDT)
+Date: Fri, 26 Apr 2024 08:47:28 -0700
+In-Reply-To: <7f3001de041334b5c196b5436680473786a21816.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <e324ff5e47e07505648c0092a5370ac9ddd72f0b.1708933498.git.isaku.yamahata@intel.com>
- <2daf03ae-6b5a-44ae-806e-76d09fb5273b@linux.intel.com> <20240313171428.GK935089@ls.amr.corp.intel.com>
- <52bc2c174c06f94a44e3b8b455c0830be9965cdf.camel@intel.com>
- <1d1da229d4bd56acabafd2087a5fabca9f48c6fc.camel@intel.com>
- <20240319215015.GA1994522@ls.amr.corp.intel.com> <CA+EHjTxFZ3kzcMCeqgCv6+UsetAUUH4uSY_V02J1TqakM=HKKQ@mail.gmail.com>
- <970c8891af05d0cb3ccb6eab2d67a7def3d45f74.camel@intel.com>
-Message-ID: <ZivIF9vjKcuGie3s@google.com>
-Subject: Re: [PATCH v19 011/130] KVM: Add new members to struct kvm_gfn_range
- to operate on
+References: <20240423165328.2853870-1-seanjc@google.com> <4a66f882-12bf-4a07-a80a-a1600e89a103@intel.com>
+ <ZippEkpjrEsGh5mj@google.com> <7f3001de041334b5c196b5436680473786a21816.camel@intel.com>
+Message-ID: <ZivMkK5PJbCQXnw2@google.com>
+Subject: Re: [PATCH 0/3] KVM: x86: Fix supported VM_TYPES caps
 From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "tabba@google.com" <tabba@google.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
-	Tina Zhang <tina.zhang@intel.com>, Kai Huang <kai.huang@intel.com>, 
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, Bo2 Chen <chen.bo@intel.com>, 
-	"sagis@google.com" <sagis@google.com>, 
-	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, Erdem Aktas <erdemaktas@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	Hang Yuan <hang.yuan@intel.com>, 
+To: Kai Huang <kai.huang@intel.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
 	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 26, 2024, Rick P Edgecombe wrote:
-> On Fri, 2024-04-26 at 08:39 +0100, Fuad Tabba wrote:
-> > > I'm fine with those names. Anyway, I'm fine with wither way, two bools or
-> > > enum.
-> > 
-> > I don't have a strong opinion, but I'd brought it up in a previous
-> > patch series. I think that having two bools to encode three states is
-> > less intuitive and potentially more bug prone, more so than the naming
-> > itself (i.e., _only):
+On Fri, Apr 26, 2024, Kai Huang wrote:
+> On Thu, 2024-04-25 at 07:30 -0700, Sean Christopherson wrote:
+> > On Thu, Apr 25, 2024, Xiaoyao Li wrote:
+> > > On 4/24/2024 12:53 AM, Sean Christopherson wrote:
+> > > > Fix a goof where KVM fails to re-initialize the set of supported VM=
+ types,
+> > > > resulting in KVM overreporting the set of supported types when a ve=
+ndor
+> > > > module is reloaded with incompatible settings.  E.g. unload kvm-int=
+el.ko,
+> > > > reload with ept=3D0, and KVM will incorrectly treat SW_PROTECTED_VM=
+ as
+> > > > supported.
+> > >=20
+> > > Hah, this reminds me of the bug of msrs_to_save[] and etc.
+> > >=20
+> > >    7a5ee6edb42e ("KVM: X86: Fix initialization of MSR lists")
+> >=20
+> > Yeah, and we had the same bug with allow_smaller_maxphyaddr
+> >=20
+> >   88213da23514 ("kvm: x86: disable the narrow guest module parameter on=
+ unload")
+> >=20
+> > If the side effects of linking kvm.ko into kvm-{amd,intel}.ko weren't s=
+o painful
+> > for userspace,=C2=A0
+> >=20
+>=20
+> Do we have any real side effects for _userspace_ here?
 
-Hmm, yeah, I buy that argument.  We could even harded further by poisoning '0'
-to force KVM to explicitly.  Aha!  And maybe use a bitmap?
+kvm.ko ceasing to exist, and "everything" being tied to the vendor module i=
+s the
+big problem.  E.g. params from the kernel command line for kvm.??? will bec=
+ome
+ineffective, etc.  Some of that can be handled in the kernel, e.g. KVM can =
+create
+a sysfs symlink so that the accesses through sysfs continue to work, but AF=
+AIK
+params don't supporting such aliasing/links.
 
-	enum {
-		BUGGY_KVM_INVALIDATION		= 0,
-		PROCESS_SHARED			= BIT(0),
-		PROCESS_PRIVATE			= BIT(1),
-		PROCESS_PRIVATE_AND_SHARED	= PROCESS_SHARED | PROCESS_PRIVATE,
-	};
-
-> > https://lore.kernel.org/all/ZUO1Giju0GkUdF0o@google.com/
-> 
-> Currently in our internal branch we switched to:
-> exclude_private
-> exclude_shared
-> 
-> It came together bettter in the code that uses it.
-
-If the choice is between an enum and exclude_*, I would strongly prefer the enum.
-Using exclude_* results in inverted polarity for the code that triggers invalidations.
-
-> But I started to wonder if we actually really need exclude_shared. For TDX
-> zapping private memory has to be done with more care, because it cannot be re-
-> populated without guest coordination. But for shared memory if we are zapping a
-> range that includes both private and shared memory, I don't think it should hurt
-> to zap the shared memory.
-
-Hell no, I am not risking taking on more baggage in KVM where userspace or some
-other subsystem comes to rely on KVM spuriously zapping SPTEs in response to an
-unrelated userspace action.  
+I don't think there are any deal breakers, but I don't expect it to Just Wo=
+rk either.
 
