@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-16038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28A848B348D
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 11:53:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA508B348E
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 11:53:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95825B21293
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 09:53:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88481281CD4
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 09:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA10113C915;
-	Fri, 26 Apr 2024 09:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95FEC142621;
+	Fri, 26 Apr 2024 09:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BIc1LP9a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X1nFc0RT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B547B1422AD
-	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 09:53:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0141422C6
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 09:53:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714125205; cv=none; b=SusTgStZUGAkMMDMfK1T7t17wQZu5S1s8la5qDE+BpCkfitRea+osM/PCLTGACGTwjU+uYpIhrRb/XoqpQ5iMEjhpNI2OOH7YJW7mMkV+KbjUhkJafWGs1a5e0AJ8HccO8PQKyuTB/Z7mQcKQ/d5gGe+5CwcMhsoucVm2mBMp2E=
+	t=1714125207; cv=none; b=IpwUNxPGsIAjYfhVJ1F128ahQQ3cEU3XxkEuMPgvsMCUo24GXV/OZEYZPycrrbXnrFqxmqkMZLP1PjiPJpnxjitiS9+sU62A1ko1v+RI9YTyzbx7OM7MfNPpzY+MPsH715GXKR53bDWFs4GX2ZPWEZIZLiH3n69bpKF4OOUncEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714125205; c=relaxed/simple;
-	bh=CJCjIn995ERePGEjyznO054D4bBaArW8Nv06Nwjgbv8=;
+	s=arc-20240116; t=1714125207; c=relaxed/simple;
+	bh=b/2fbk4NjCLRbPp4FCHnEpCvn097YoF5sMd0TPtoTpc=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Z/kK7EUJf8nz7rsKGJF70K4dGZ6FQ8tnZfKBC4ttJi0Tyt7tjiBX7OsGQK7DTRzSDFo3FTMeN4P79HIC81VL9Vpu2eeYS8jHR7C6YwSc6ZwDVKO9K9H8LO0N4X1qDN5aSULPFppfpYA+oV/yhKQGys15yJulyuAigIFJH6MT200=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BIc1LP9a; arc=none smtp.client-ip=192.198.163.18
+	 MIME-Version; b=iTev2KyF02EnctrAFyG7crndz4kSPukAftcU07JpVGwP5dWOJ+ANRUA9XiR+VvBnRohI5t/NONmEQMD99tMF7H7Wdh/hEuwUm/p0LMDmubGLHSO6ZuNRAJ8EsrL5wSB6BwYanUnzr8v6u7pD8O1/Pme99MghLOEWCVlNgLCEnBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X1nFc0RT; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714125204; x=1745661204;
+  t=1714125207; x=1745661207;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=CJCjIn995ERePGEjyznO054D4bBaArW8Nv06Nwjgbv8=;
-  b=BIc1LP9aZOldKZNUDkbnoIyLh1a0xip8ZsBPIgL6/1GC/emvXcvWOTWR
-   VZiMpKk2fKxJe3waQkWXNhMnVDSioAA9/5efYp/eTglXK7PkO2KcEcgKm
-   oybypHneLRmzvTOm28nCkhCuvPG8Dtq3ShYk7ls+FLRohx3uS2TnQNtA1
-   dyCxbwVZ7vboBxSGn8hdrKQrkqTir7o6BKBVACRCkBZSYd6xSIvBF7P3X
-   7Y17IXvY1UrQl0DSqJJ2O1F5dejBNZqMti0th7yJXeLy2crob/i09aEgc
-   PaAobXJVirEer0rtARGYwUR2016UDoUQexEA4jezAX0P1DjcMd4sUPVuK
-   Q==;
-X-CSE-ConnectionGUID: AL2vtSOfS2yDLonwjVquMw==
-X-CSE-MsgGUID: Q8PcoKusTU2w87KOKnQogw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="9707422"
+  bh=b/2fbk4NjCLRbPp4FCHnEpCvn097YoF5sMd0TPtoTpc=;
+  b=X1nFc0RTDxshiC7Qd2lVL6qgRf/vwrpb1a6jQMErM+e9Ly183XFTDonJ
+   EOBqZM7gfUSUIQ0Dkp+85l1g3IE/VPQAm7rM90Pf5yF8k2OBaoPPyfjC+
+   WIgdA/CgiITCubVC+FX8Xg7qkgMzzOA+Zv5sO5/LgMyfJVrQxD11Ute+e
+   z0zgUAu9IEoKPq2AAfGNikxxLWrgXjBWSJV1aXvj1n96sfphjrDvxcYyM
+   yhSFehSukvLG44u7jT9I4YtXo6OROoHxmK5CbPjwCWqPJzAA6UZ11vGww
+   2yZAybiCJfWvdL4V6W8n9i52rIljmcoRZxBCS/bqLJZ0faz4W8zZl4Cci
+   A==;
+X-CSE-ConnectionGUID: Pikwjt23QDSS3z3cW/cJdA==
+X-CSE-MsgGUID: 5fYqd0v9RrajoBfu9QfM8g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="9707426"
 X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="9707422"
+   d="scan'208";a="9707426"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 02:53:24 -0700
-X-CSE-ConnectionGUID: yIaVMozBTI+1NCMzCDPbgA==
-X-CSE-MsgGUID: rebo7PEXQMidROztM079Zg==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 02:53:26 -0700
+X-CSE-ConnectionGUID: bMUxhFVuRu2k6Qf4yuqELw==
+X-CSE-MsgGUID: rkzpwcHwTVeT3V9LySYMlQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="25412329"
+   d="scan'208";a="25412335"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa008.fm.intel.com with ESMTP; 26 Apr 2024 02:53:21 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 26 Apr 2024 02:53:24 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
@@ -69,9 +69,9 @@ Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
 	qemu-devel@nongnu.org,
 	kvm@vger.kernel.org,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH 4/6] target/i386/kvm: Save/load MSRs of kvmclock2 (KVM_FEATURE_CLOCKSOURCE2)
-Date: Fri, 26 Apr 2024 18:07:13 +0800
-Message-Id: <20240426100716.2111688-5-zhao1.liu@intel.com>
+Subject: [PATCH 4/6] target/i386/kvm: Save/load MSRs of new kvmclock (KVM_FEATURE_CLOCKSOURCE2)
+Date: Fri, 26 Apr 2024 18:07:14 +0800
+Message-Id: <20240426100716.2111688-6-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240426100716.2111688-1-zhao1.liu@intel.com>
 References: <20240426100716.2111688-1-zhao1.liu@intel.com>
@@ -83,10 +83,10 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-MSR_KVM_SYSTEM_TIME_NEW and MSR_KVM_WALL_CLOCK_NEW are bound to
-kvmclock2 (KVM_FEATURE_CLOCKSOURCE2).
+MSR_KVM_SYSTEM_TIME_NEW and MSR_KVM_WALL_CLOCK_NEW are bound to new
+kvmclock (KVM_FEATURE_CLOCKSOURCE2).
 
-Add the save/load support for these 2 MSR just like kvmclock MSRs.
+Add the save/load support for these 2 MSRs.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
