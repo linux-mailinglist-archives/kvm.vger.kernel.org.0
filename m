@@ -1,244 +1,273 @@
-Return-Path: <kvm+bounces-16030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D73F98B3359
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 10:52:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84A168B3365
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 10:56:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63D181F22EBD
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 08:52:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A715B1C21EEF
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 08:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7210213C9DE;
-	Fri, 26 Apr 2024 08:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3684213CAB7;
+	Fri, 26 Apr 2024 08:56:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kKiz7J6J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q3sG2FVQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E232AF02;
-	Fri, 26 Apr 2024 08:52:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714121535; cv=fail; b=ClCXR3rL+LUB68rHjcg5BgyjTXHTTNUXpDI1LlTqHlyrSG4PcY2NG83dGej1tHWYb/Fa1f+GwnckdP4gQbSVz5aClTwVNia+Vcn665L2G7TXo9ockV43DhMjatZzGH04pYUp6ayrdnXP9fS4zN/ZbGxGolNdZFsD2rSk5orSoxs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714121535; c=relaxed/simple;
-	bh=xgHUUbrdOCR9lT1e2NzNbK3bMQ2blYmmGiM3uboIr5Y=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=FkuvLwSSu5+lJ9bq0ptgnZere6+dd5CPgE5oubIsO14MkN9wFw57ZzHOTBB0UFUS43LxHDiwgqcWxLhJ9ZZp0RWrpE/9gI/NUDK8xeqKu7ERK3wQVHJlmVwy92x78YCb/TdnDoE81PDFiFv0am5vTbi5v+cuU5XIsEH0Eth7Nng=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kKiz7J6J; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714121534; x=1745657534;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=xgHUUbrdOCR9lT1e2NzNbK3bMQ2blYmmGiM3uboIr5Y=;
-  b=kKiz7J6JLXhQ3tXh9NLaVBLx8Wl9e6DqbDGfHCba6fxLQe5UtHcsPpwA
-   i45h/7crF7+bpcpP+kJ34N+tCAB4iIPkf/7r4idlZrfne1YvBipIxmfzL
-   LzbOiMKHDCgB7JfgZuXQwywPwEf0DvqY7k7z6he2OuXShWuXYIhNRz/o3
-   SCou/pbt3cJtBQcYYCOrECHl6LUzUAhNekkfMl9Dab3GoimIM1XxOs7Kx
-   oAzaJfVxtzFCaLUcR3pPjD2z9lr6k0YaEIGJTvptfzms9H5gu88v7jusf
-   vflYHLcPUE4BZY1uMFV78qGJhXTIsSaPz7Cm1//5GHMhFosK/MZUBVcr/
-   Q==;
-X-CSE-ConnectionGUID: 58L4fXj2R92wiAMjmXogNQ==
-X-CSE-MsgGUID: gtkO9f18RTKgSDLh6xc9rw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="10065085"
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="10065085"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 01:52:13 -0700
-X-CSE-ConnectionGUID: oxPQXM1oQ+eMfZMsRUx6JA==
-X-CSE-MsgGUID: rNlIp1jdSQaf6HOG2zTWRw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="25364995"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Apr 2024 01:52:13 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 01:52:12 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 01:52:12 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 01:52:12 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 26 Apr 2024 01:52:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gYsgee1k6Mz/87jHi63FRAJWIV0JAcsNRL6BVaFnDPchx5sfGaVrWoa9g79USdclaqQpxN4BKpoPX2TCu8qK46eQiWQj5d14oL7O9Oc+piGmBb3jZczae3TeYTzYpnQTc2XejGdHoe+luXvamV/JrUwnWlTDzZKa7rqIJW9w7Fwo6ERKyv9djDCYaaclQBb/jwnTvRs9hv7IvT4niHmmD6d2GWV4dYYgWBO8bFDvYE6l7p2AkcoKdY3wSXF1mHSpYMV8A5IAgSv4fiIR32x4gmyr8BBobx3265aTF8V2Y0J0WXj7EmLG6YAeJGt+nteUQYnrpJdR0AYqvI92Xlp0AA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PENDNBNTYCzPWhj3+btT4LKBoY0znxC4kUtThYKufsE=;
- b=PtA2gGg3r7Sh+inAvc/goRRsD908JZcfQauK+cT+ujTWHtyq9GVUTHITbxDvRwR8Yk3ErDsAgNiVQotYkGI9EyUXKGH8RrqWWjJDEuJ12B4pJ/3+OsYpAJASvhdQNdYO2fh7SMUZAZZv2O24Pi+triCogEigy3hUHo4bZ6DqP+fcZDDozKkrKbzc0XpDwteWIcvOvSTrIyP8PFpM4XGyriNY7yjCRB1gJYTTA6+q6rErX+NqEduFS9ZEkwCiNHxfeQ8jlfWHF1qeIgz3cc1H/Ct8f1sApLl90QMcixh5/trftzqbXngoPy/rBYC92UReTTT2UTnB+2L7x+1qChgLrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
- by MW5PR11MB5787.namprd11.prod.outlook.com (2603:10b6:303:192::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22; Fri, 26 Apr
- 2024 08:52:07 +0000
-Received: from CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e]) by CH3PR11MB8660.namprd11.prod.outlook.com
- ([fe80::5135:2255:52ba:c64e%4]) with mapi id 15.20.7519.030; Fri, 26 Apr 2024
- 08:52:07 +0000
-Date: Fri, 26 Apr 2024 16:52:00 +0800
-From: Chao Gao <chao.gao@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/4] KVM: x86: Register emergency virt callback in common
- code, via kvm_x86_ops
-Message-ID: <ZitrMAplXSCKrypD@chao-email>
-References: <20240425233951.3344485-1-seanjc@google.com>
- <20240425233951.3344485-3-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240425233951.3344485-3-seanjc@google.com>
-X-ClientProxiedBy: SI2P153CA0012.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::15) To CH3PR11MB8660.namprd11.prod.outlook.com
- (2603:10b6:610:1ce::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE4A13CF96
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 08:56:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714121766; cv=none; b=RFJb7DH/w9dHEYHqyWv5v8pe4JdbBz74Goq4fn+lV+Y4V75bEAE0KO0Hsu88j+MMtYl6kAkrjdBjRmDNsJTn3BoI0ZTsCpCvGfECXyuRwYedri18PNn4ljgp9F3lCDkm4De50NImY6FPzgM8saZ3/wrGPEeLm5nP0YiIbxoHY1s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714121766; c=relaxed/simple;
+	bh=GlZ1B8v/0cLbLEAY4J2NVInrTG/rSDZ7UA9AoUhONts=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hslmH5vG/KzEd4hm4bbIMy8LSn4GFSvEgu17O9zSBp+5oKJlgkJh2jxVPjI2/X/80zz4LihUvLTVZbEgHsi/3AaxfQHm4Im1IP0OCUjWqLR6r6B1WSnR51/NFEN7gFj0PkleYdIoojIwXh/VR7MZHcg/AJtH1JecCkVyIMXNuiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q3sG2FVQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714121763;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=n8zGemF1SfCYbNk1FEg//7LYlxlOkILXpP9ensiSsiY=;
+	b=Q3sG2FVQjDMnE5snz3u0a/Sx7hdMisNNdhLegHkZfTHA0OC9PdGtOPKla5ExO6Edp3kxDj
+	kPdNzaznklLZMY1VO7xNRk4gLkOyUKKOxxZxanDH25uMDkPdaFHNughFb9rnnVFuNinH33
+	dX6vFEPtcWxH3AcvHMnidMv+empXGZM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-138-l2vb6lE1Pl21g1mYn_e7vA-1; Fri, 26 Apr 2024 04:56:00 -0400
+X-MC-Unique: l2vb6lE1Pl21g1mYn_e7vA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 81D1F18065AA;
+	Fri, 26 Apr 2024 08:55:59 +0000 (UTC)
+Received: from thuth-p1g4.redhat.com (unknown [10.39.194.59])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8A3CA1121312;
+	Fri, 26 Apr 2024 08:55:57 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>
+Cc: linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>
+Subject: [PATCH] KVM: selftests: Use TAP interface in the set_memory_region test
+Date: Fri, 26 Apr 2024 10:55:56 +0200
+Message-ID: <20240426085556.619731-1-thuth@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|MW5PR11MB5787:EE_
-X-MS-Office365-Filtering-Correlation-Id: cb71c5bd-e8c5-42a1-5774-08dc65ce2730
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?2GcPvLk6OvRdIXQP3h07txmwHizSBoI56ZMlxjqCD9owyLgumepgBySMgUlw?=
- =?us-ascii?Q?EBGQN7pOsE0k6hnzZDRwsUZBLVXyrshSrOEkKlgxvEbYz8gvRWBEF2+6G4iJ?=
- =?us-ascii?Q?zFjOcvE7/kSLe3qy+X4PnAB36sSnu2lVonQlVpKRe9xZSnoQrYDcplIJTFLB?=
- =?us-ascii?Q?dCxaX/XthlooD/rKQwkGTLMesGsiS8eaVZVnoYK1uxwoP7IFgdXY36fcgaEi?=
- =?us-ascii?Q?L3f3PFjaPaI145WjBftxth62e5KvdQ/sTygOCRgnT1AyBzg5aRjxvL0Tywm4?=
- =?us-ascii?Q?uaPktwS0xxUWBHcAH0lBHdopuuBhYg699p4nJ4OyFg/jD+T4JZZcRpuP4WLm?=
- =?us-ascii?Q?RDlJCrWyYfu6f2V3nKfaaIGYriZmh9Dq70o9LdRCtDw+7fCXCEcKWW9lSCCb?=
- =?us-ascii?Q?0Cr/9/Dl4bZfpz8MSsdClOU/JPFmdlrCiKaTmnDXVTby6yrjPom456efLGFR?=
- =?us-ascii?Q?L18Jd1fGj58t9J4eCsoZNn+FRvuml50OTaOdC4nku+UTQ84DvFd8XxBofBlG?=
- =?us-ascii?Q?LoPLWOaV3x1a/iaJ+a/TYeJK/c/UrrQZVn5hsjuCK6MruhXtpmz+8aCyLWW/?=
- =?us-ascii?Q?I+QQglmkrMRDGQdOEtX7Pdwv4cozRB4eDXNHF9w/GlroWvjmkAih15gsc/sV?=
- =?us-ascii?Q?AS5IE8b72PaxntA9pgo+BD44Z4ZAZeUFWRRy2XNCmVuPe8aPuKYWetwp/cKj?=
- =?us-ascii?Q?7cQALhtaVuBD4rcDtu+KGumtPa7WsWKTYzd5HzYz+274q0TALrdqi6Vrw30s?=
- =?us-ascii?Q?n7/bxEu5d8H2/5+EddrpwA05yuKQNVbQuzOr5LkCo9S6e9TfQDkeCWEi0zLW?=
- =?us-ascii?Q?oCQr76FInnZlqTWR1qiw0th9xx8jlsY8l4g6yaB5es2dU1XURHWgI9UJWreG?=
- =?us-ascii?Q?ur2W614jOyPnax5MqG0Vc2TnqRe77RjotBN2A/OREh6+Lia4wVCjuen153/2?=
- =?us-ascii?Q?vgQO7FX0eO/ybIMe7fUVXEwCh37yp+C1k6ehpSiY9h+PuM6pcV7NV6JuIlM6?=
- =?us-ascii?Q?6dt+ZDP5tnQZM6CuOE1eajUf63Df5jMscdxP2BbQpmHA4oakSHk5jFxFUMdD?=
- =?us-ascii?Q?CZTYuvx+4qT60m5go+1QQI+NUPLxks+66eylztlAZY+mfGCHEZAyOHvqsjsC?=
- =?us-ascii?Q?aBGfJhusmwg62YNcXte5I8PWOsy07YRP3boUxuFouk70rLX+WOV6QWdHOWe9?=
- =?us-ascii?Q?MiIPLBifBe31ZDEGTO5HRgjT18e3v3zUim62umFzt+8lsMpXwkpJKsFalAI?=
- =?us-ascii?Q?=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MR5iYfpn7PRec/lFI0qQPNANHPENa+h2kexeMNLptiDg+qajehqQpUVWNqan?=
- =?us-ascii?Q?lCVie+2HCy/m8oEmOnJMP2F0cWLDLEhDbvhbtWQbGGYZl4KgAWMOvaxd91DX?=
- =?us-ascii?Q?h2QcV9gc7h/9zrByvskuYFuUryp3MG9lOfmsGeIRSaq1CTPI9TDSS/mzJLoZ?=
- =?us-ascii?Q?uIDPrZsijxiOV79tRY3ywD1pUGQaBrA9uszifrEyZuOXMu/OyA/mCDGhK3GG?=
- =?us-ascii?Q?kNFKVg2ow3nzxAPTH9UaGu1AdaLFL8e9Y/3LhJ0lVGB7WhDUajEvXPagcKgX?=
- =?us-ascii?Q?KYYQNMm8EhXUPAzKKapvI1SXnRH981MV/wdYzbkAx60XGyv7pkua51R0pK90?=
- =?us-ascii?Q?k0YgC04Yxk6JwI8ZAcDaqJZt1S6lsmeNDfa1IEsrl3V9Qu3Y1duOc8/0VCFa?=
- =?us-ascii?Q?AvjUOUkdnnHwGbLzDn0V0aLWrYDSCSwiCQ2A9z82RXq1o8BYs3FmBQfhMwOi?=
- =?us-ascii?Q?VmINlv6pLNY/tRzSO2FONar4C+cmS4PnVK8HZMEwYnP9txywbKDnwg4NE1bH?=
- =?us-ascii?Q?M4ltsqHB/XI6vbj76PVTXm6n4cDt2f36b3ae3NT7qAPAVxqmFpNLGuv5S9E2?=
- =?us-ascii?Q?5PhRPcixf4IJBruAAHddCO5TiGcl8ncoJauECOnYPZ8B/YeRUH0CkJAsD2LK?=
- =?us-ascii?Q?7ykVFWj/2tSUWLH6CZcZc0XPsmU2LU4hpphk0jFIFQlEI19PeKYMG52uxa12?=
- =?us-ascii?Q?4kb84n477lglWsI54qdoh8jGyco/jmPjnmKI96GN80k0wP0tenpP0vwknpjF?=
- =?us-ascii?Q?YiySKZGfO+oYBFQC4Z1Qs71TrUpHTvWTjYSuqqQpsBAX4Brk7UJeB6IHoGCE?=
- =?us-ascii?Q?hiRdvQIqh9i4C+LD3d3LYDhmhpPtCukmEkqe1MnanvgrU19T/gzYYoopVM02?=
- =?us-ascii?Q?y58p9Vb1bm7E3seav5ORmwWJPb+R6VsdxW17ecrmhzk0NHysUH77NY/Tc+Pl?=
- =?us-ascii?Q?jiEA/wgRE6O9EU2yhcG+h44I2hmS8i5SS8LcBn68LizX+2/Jr/46bNCgj2+e?=
- =?us-ascii?Q?1SN1di6qJi8o4DC79jmlHPLjjR4RgctetV+GdKM5uLZt3mXiBdkT1vGM6cgt?=
- =?us-ascii?Q?7dkwmLrzietkjsMJnoC7gZUZDXE1BKXbWY6MLLPwIPAD7idVpp+MmcUWFoXG?=
- =?us-ascii?Q?4dJ5pqM9N49aoKePYKgT5mk9W/kmy8sdu/O4r/ln+2r2PVFELnoOi2WzsH7D?=
- =?us-ascii?Q?KpRQYPKQ7Wo2/jkS5HtY6u55jm0KLAZXmeXD955V4z68l5DZlopFPv2Hrq11?=
- =?us-ascii?Q?iMMUOTn9nYXLzd+3fvfpxhkkYw/yAN0yfDvRAUsVvXkfXdSkvmaY6uaVjFgY?=
- =?us-ascii?Q?+Mlx9dMsX97yWsrW/I3+UxuEmGfdgXtKFs9emzbbJ3MSPVF8hqbW1JS7o7nt?=
- =?us-ascii?Q?mvWOhuhLT3+qgRrt5pBU+eMDUIBnNjr/4rZMnR/glTOtXkycxkXtmpaWO7Fx?=
- =?us-ascii?Q?vNz9XuC5p87HaMIyMi/sm86O/fN3ZqgBYzShO4t017FSU6e6ac73jaHLscRU?=
- =?us-ascii?Q?ALo2OJCVhNGOByfzyQ8zcgALbCs5LPZsljJFO3CKMVZ4NtTv3+B9oTi08Kk4?=
- =?us-ascii?Q?0jjx0QUH5LCm9hD5eF9aXThWFvEpnoei2VwHgWKd?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: cb71c5bd-e8c5-42a1-5774-08dc65ce2730
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 08:52:07.5724
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yWk6tLUQt/3p93qqvbFEUVgK0vafvQMmeCRmOhkZrsax0CqLO8h9tui0IMbHPBXyTlQ6qeYowTVO4ry3GTk2Eg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5787
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
->diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
->index 502704596c83..afddfe3747dd 100644
->--- a/arch/x86/kvm/vmx/x86_ops.h
->+++ b/arch/x86/kvm/vmx/x86_ops.h
->@@ -15,6 +15,7 @@ void vmx_hardware_unsetup(void);
-> int vmx_check_processor_compat(void);
-> int vmx_hardware_enable(void);
-> void vmx_hardware_disable(void);
->+void vmx_emergency_disable(void);
-> int vmx_vm_init(struct kvm *kvm);
-> void vmx_vm_destroy(struct kvm *kvm);
-> int vmx_vcpu_precreate(struct kvm *kvm);
->diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->index e9ef1fa4b90b..12e88aa2cca2 100644
->--- a/arch/x86/kvm/x86.c
->+++ b/arch/x86/kvm/x86.c
->@@ -9797,6 +9797,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> 
-> 	kvm_ops_update(ops);
-> 
->+	cpu_emergency_register_virt_callback(kvm_x86_ops.emergency_disable);
->+
+Use the kselftest_harness.h interface in this test to get TAP
+output, so that it is easier for the user to see what the test
+is doing. (Note: We are not using the KVM_ONE_VCPU_TEST_SUITE()
+macro here since these tests are creating their VMs with the
+vm_create_barebones() function, not with vm_create_with_one_vcpu())
 
-vmx_emergency_disable() accesses loaded_vmcss_on_cpu but now it may be called
-before loaded_vmcss_on_cpu is initialized. This may be not a problem for now
-given the check for X86_CR4_VMXE  in vmx_emergency_disable(). But relying on
-that check is fragile. I think it is better to apply the patch below from Isaku
-before this patch.
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .../selftests/kvm/set_memory_region_test.c    | 86 +++++++++----------
+ 1 file changed, 42 insertions(+), 44 deletions(-)
 
-https://lore.kernel.org/kvm/c1b7f0e5c2476f9f565acda5c1e746b8d181499b.1708933498.git.isaku.yamahata@intel.com/
+diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+index bd57d991e27d..4db6a66a3001 100644
+--- a/tools/testing/selftests/kvm/set_memory_region_test.c
++++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+@@ -16,6 +16,7 @@
+ #include <test_util.h>
+ #include <kvm_util.h>
+ #include <processor.h>
++#include "kselftest_harness.h"
+ 
+ /*
+  * s390x needs at least 1MB alignment, and the x86_64 MOVE/DELETE tests need a
+@@ -38,6 +39,8 @@ extern const uint64_t final_rip_end;
+ 
+ static sem_t vcpu_ready;
+ 
++int loops;
++
+ static inline uint64_t guest_spin_on_val(uint64_t spin_val)
+ {
+ 	uint64_t val;
+@@ -219,6 +222,13 @@ static void test_move_memory_region(void)
+ 	kvm_vm_free(vm);
+ }
+ 
++TEST(move_in_use_region)
++{
++	ksft_print_msg("Testing MOVE of in-use region, %d loops\n", loops);
++	for (int i = 0; i < loops; i++)
++		test_move_memory_region();
++}
++
+ static void guest_code_delete_memory_region(void)
+ {
+ 	uint64_t val;
+@@ -308,12 +318,19 @@ static void test_delete_memory_region(void)
+ 	kvm_vm_free(vm);
+ }
+ 
+-static void test_zero_memory_regions(void)
++TEST(delete_in_use_region)
++{
++	ksft_print_msg("Testing DELETE of in-use region, %d loops\n", loops);
++	for (int i = 0; i < loops; i++)
++		test_delete_memory_region();
++}
++
++TEST(zero_memory_regions)
+ {
+ 	struct kvm_vcpu *vcpu;
+ 	struct kvm_vm *vm;
+ 
+-	pr_info("Testing KVM_RUN with zero added memory regions\n");
++	ksft_print_msg("Testing KVM_RUN with zero added memory regions\n");
+ 
+ 	vm = vm_create_barebones();
+ 	vcpu = __vm_vcpu_add(vm, 0);
+@@ -326,7 +343,7 @@ static void test_zero_memory_regions(void)
+ }
+ #endif /* __x86_64__ */
+ 
+-static void test_invalid_memory_region_flags(void)
++TEST(invalid_memory_region_flags)
+ {
+ 	uint32_t supported_flags = KVM_MEM_LOG_DIRTY_PAGES;
+ 	const uint32_t v2_only_flags = KVM_MEM_GUEST_MEMFD;
+@@ -389,7 +406,7 @@ static void test_invalid_memory_region_flags(void)
+  * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+  * tentative to add further slots should fail.
+  */
+-static void test_add_max_memory_regions(void)
++TEST(add_max_memory_regions)
+ {
+ 	int ret;
+ 	struct kvm_vm *vm;
+@@ -408,13 +425,13 @@ static void test_add_max_memory_regions(void)
+ 	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+ 	TEST_ASSERT(max_mem_slots > 0,
+ 		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
+-	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
++	ksft_print_msg("Allowed number of memory slots: %i\n", max_mem_slots);
+ 
+ 	vm = vm_create_barebones();
+ 
+ 	/* Check it can be added memory slots up to the maximum allowed */
+-	pr_info("Adding slots 0..%i, each memory region with %dK size\n",
+-		(max_mem_slots - 1), MEM_REGION_SIZE >> 10);
++	ksft_print_msg("Adding slots 0..%i, each memory region with %dK size\n",
++		       (max_mem_slots - 1), MEM_REGION_SIZE >> 10);
+ 
+ 	mem = mmap(NULL, (size_t)max_mem_slots * MEM_REGION_SIZE + alignment,
+ 		   PROT_READ | PROT_WRITE,
+@@ -455,12 +472,21 @@ static void test_invalid_guest_memfd(struct kvm_vm *vm, int memfd,
+ 	TEST_ASSERT(r == -1 && errno == EINVAL, "%s", msg);
+ }
+ 
+-static void test_add_private_memory_region(void)
++static bool has_cap_guest_memfd(void)
++{
++	return kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
++	       (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM));
++}
++
++TEST(add_private_memory_region)
+ {
+ 	struct kvm_vm *vm, *vm2;
+ 	int memfd, i;
+ 
+-	pr_info("Testing ADD of KVM_MEM_GUEST_MEMFD memory regions\n");
++	if (!has_cap_guest_memfd())
++		SKIP(return, "Missing KVM_MEM_GUEST_MEMFD / KVM_X86_SW_PROTECTED_VM");
++
++	ksft_print_msg("Testing ADD of KVM_MEM_GUEST_MEMFD memory regions\n");
+ 
+ 	vm = vm_create_barebones_protected_vm();
+ 
+@@ -491,13 +517,16 @@ static void test_add_private_memory_region(void)
+ 	kvm_vm_free(vm);
+ }
+ 
+-static void test_add_overlapping_private_memory_regions(void)
++TEST(add_overlapping_private_memory_regions)
+ {
+ 	struct kvm_vm *vm;
+ 	int memfd;
+ 	int r;
+ 
+-	pr_info("Testing ADD of overlapping KVM_MEM_GUEST_MEMFD memory regions\n");
++	if (!has_cap_guest_memfd())
++		SKIP(return, "Missing KVM_MEM_GUEST_MEMFD / KVM_X86_SW_PROTECTED_VM");
++
++	ksft_print_msg("Testing ADD of overlapping KVM_MEM_GUEST_MEMFD memory regions\n");
+ 
+ 	vm = vm_create_barebones_protected_vm();
+ 
+@@ -536,46 +565,15 @@ static void test_add_overlapping_private_memory_regions(void)
+ 	close(memfd);
+ 	kvm_vm_free(vm);
+ }
++
+ #endif
+ 
+ int main(int argc, char *argv[])
+ {
+-#ifdef __x86_64__
+-	int i, loops;
+-
+-	/*
+-	 * FIXME: the zero-memslot test fails on aarch64 and s390x because
+-	 * KVM_RUN fails with ENOEXEC or EFAULT.
+-	 */
+-	test_zero_memory_regions();
+-#endif
+-
+-	test_invalid_memory_region_flags();
+-
+-	test_add_max_memory_regions();
+-
+-#ifdef __x86_64__
+-	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
+-	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
+-		test_add_private_memory_region();
+-		test_add_overlapping_private_memory_regions();
+-	} else {
+-		pr_info("Skipping tests for KVM_MEM_GUEST_MEMFD memory regions\n");
+-	}
+-
+ 	if (argc > 1)
+ 		loops = atoi_positive("Number of iterations", argv[1]);
+ 	else
+ 		loops = 10;
+ 
+-	pr_info("Testing MOVE of in-use region, %d loops\n", loops);
+-	for (i = 0; i < loops; i++)
+-		test_move_memory_region();
+-
+-	pr_info("Testing DELETE of in-use region, %d loops\n", loops);
+-	for (i = 0; i < loops; i++)
+-		test_delete_memory_region();
+-#endif
+-
+-	return 0;
++	return test_harness_run(argc, argv);
+ }
+-- 
+2.44.0
 
-> 	for_each_online_cpu(cpu) {
-> 		smp_call_function_single(cpu, kvm_x86_check_cpu_compat, &r, 1);
-> 		if (r < 0)
->@@ -9847,6 +9849,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
-> 	return 0;
-> 
-> out_unwind_ops:
->+	cpu_emergency_unregister_virt_callback(kvm_x86_ops.emergency_disable);
-> 	kvm_x86_ops.hardware_enable = NULL;
-> 	static_call(kvm_x86_hardware_unsetup)();
-> out_mmu_exit:
->@@ -9887,6 +9890,8 @@ void kvm_x86_vendor_exit(void)
-> 	static_key_deferred_flush(&kvm_xen_enabled);
-> 	WARN_ON(static_branch_unlikely(&kvm_xen_enabled.key));
-> #endif
->+	cpu_emergency_unregister_virt_callback(kvm_x86_ops.emergency_disable);
->+
-> 	mutex_lock(&vendor_module_lock);
-> 	kvm_x86_ops.hardware_enable = NULL;
-> 	mutex_unlock(&vendor_module_lock);
->-- 
->2.44.0.769.g3c40516874-goog
->
->
 
