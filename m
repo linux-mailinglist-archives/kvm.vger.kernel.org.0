@@ -1,266 +1,148 @@
-Return-Path: <kvm+bounces-16020-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16021-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE3A38B2F85
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 06:47:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18CCB8B2FCB
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 07:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2484B1F22A2D
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 04:47:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD2991F227E5
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 05:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3537213A245;
-	Fri, 26 Apr 2024 04:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E167613A3F7;
+	Fri, 26 Apr 2024 05:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aYbejN4G"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KHiJhpUQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F7C79C8
-	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 04:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ABEEBE
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 05:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714106848; cv=none; b=mDzBwQVREblrezrjeMRLdzTvTSFIoExepgn7vAcTxUThQZ6HVnIgncG2FzwQRRhpPrhY9I9kXhzo9taj7StOnG3phfVgrtyYiDgCV3oTQEX5siVuuDW4c3xESbbi0RDUiEc2C4c+ctGBhG1+T7HLQa8Igyf1u2dDZ44y0H3D7QI=
+	t=1714110120; cv=none; b=iQzCnRKq1ea2Luxsb/jbCoYc3IewBu1LK3/BiEYBhV8f81PNECF/T+nOq9es/rwI/kL9A9yxBC0K7ZMgp5Vf2ZPjtm4g8dW+EGFKoRoscdf2/dS1zpuwusO7BaFFbcg+yt9kj6+hFRkkDoMyN59DmEEuQWTnYrgdV1B1Ymf4g6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714106848; c=relaxed/simple;
-	bh=qFZS8Xx/TeXHzdjwyYI3GI/SHkQZTua5k7xNUURsfIA=;
+	s=arc-20240116; t=1714110120; c=relaxed/simple;
+	bh=/gZZY4I/cg5zoFsdRttZGXKzRfhZ+C59J72YZ3qTXWo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lAnKYEHnw82/+pN0xEzI6vE4RtR/E/of0h/JwbYki9JfCkvFZdgfizgAVHHXzhO9PlfLr1+z8whf4lHKrgPi0edjJ6EslGCdPJ9swjxpLFZ90x4istR4JMcBgvXnfrLaiAaU30pxB+V5jr4UcdLF7oLM/TbJ0azp+qXirQ81H/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aYbejN4G; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-51ca95db667so460920e87.0
-        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 21:47:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714106845; x=1714711645; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6xNG5kAKIWrMQdy9hX6H8VEwA1kEtA0fkEb+j2LDJiI=;
-        b=aYbejN4GSimBgOGSCDV3tXlil7RneVumwSceogVecCaXklAN0L+dp4JXHkJAQkSB2W
-         JJNEviE2wWw9doh9Y0GYNL1yubEM+fD1VwCkMn1huMqYaevQrThGjqc+6ExnCxDQw/pK
-         WZ0JR8jC1HdSITH2Q/Wm54DMCF6Te1/51YVXV/hYv2UhXL/AQT60JL/t8ihomxGI4is+
-         wg+EspKtKWBENBTBnql+UWKkkXHBjFjJfNDGahosuoI+hEK63pwJ6EVj/HwvYsqyeD9C
-         A5gjcDHXzSJg4WZbjJHJ7tqUjLY9EzkmvgfFik78dXlxWmNZJ3Wf0X4t1vm5ooXbjkuE
-         vyIg==
+	 To:Cc:Content-Type; b=WbMLHg8U+0yMoMtRYciDmJ3mZUqfQGgQzageZV+KCaD2bLqulctE0ep3LXwjlJvFjD+BjaK9JiKxH/2iH+6keviFmM9hOv+8a615p3rOwySt9thbBqFTDQDUF+yy2429ibgxPqlvXM/NGAT6i3KPLGX7ykfsYzByvG5qEbscYy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KHiJhpUQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714110117;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vyfGtTjL0/4BOGlGkObqvS2M4nitmPhPC2paKUGfC20=;
+	b=KHiJhpUQAkEbFtkF3F2ddHLthl+2mA3a9w/KRs/43VOEaS/LesYdopdYo63TtVrX3UQysM
+	5JcOqyPL6PyhHLsqkQfzJZkEbpQ9RNnr2VYftttk+9lUcqYdDIfgt8lcap+wD9f1o7dmeS
+	wGh1pHw3X5jiSeoXjNf2SorBxLMhVIw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-68-8Hms6SQCNh2J3VSO0jGuoA-1; Fri, 26 Apr 2024 01:41:54 -0400
+X-MC-Unique: 8Hms6SQCNh2J3VSO0jGuoA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34a4ded7d49so1696406f8f.1
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 22:41:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714106845; x=1714711645;
+        d=1e100.net; s=20230601; t=1714110114; x=1714714914;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6xNG5kAKIWrMQdy9hX6H8VEwA1kEtA0fkEb+j2LDJiI=;
-        b=UJmLrel/2PC3vpj79Q51G93HA0bgxBAY+eFV6r7Xana9nGD8jPRwHfXAY4kOHFxmFf
-         zLeTXnUUD9hUqihni74t0EekCMZgkzqbgwRt8P8roE407OFatPErl9v98w8vVvvojFHg
-         ZHhyHC4BrZjKYoyH5jXhAp3ymE+oC6ZnpMhSLpZN6x9I4vAVjHif/v42Db4eq/Mfcuf5
-         CgW9WY2qzvZ94AL7Sh/7GhRck236oPu3Th7sqzcGYiAcPOzydI5EPkE+Iv/yZ/o34q6N
-         DlTyqTgWAq4aWpCEE0yk8c+o7xPNaLB4Cjt/yWWfMdTL2bbLmhQqEhaZd3HzeNOCpN0p
-         tIdA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3m+uEf0zjeVEace7tfpd/Yc/LFjqukEIElvxRjSKlnf2TTug7PJUUoQA9NNfMBV0DRkP5mnlhLbcVaOmkLPhcc+pk
-X-Gm-Message-State: AOJu0YxwVGnxoN9Mup4taHTzWe9d1U/HhMPekMBpg9klwq1ws5GP9qDM
-	cIeO6VkV5i/ZAxZb8JStPuRF89h7eci675UALyuWdLttd3uZam8rM6VSZ6l5m6Andi528kBUG/U
-	sbDVbYmrANb5FoMlelY5sqygAJZcMNJRLFMJ0
-X-Google-Smtp-Source: AGHT+IHYLcM0oC3rvLhAw7AimABtScQQcJz6qsvPoydJB6AXdW25Yrj/AhfnCgHMDKCFE5Uns7HbM1d7zzklSQS1Fbw=
-X-Received: by 2002:a05:6512:ac1:b0:51c:cc1b:a8f6 with SMTP id
- n1-20020a0565120ac100b0051ccc1ba8f6mr118103lfu.20.1714106844513; Thu, 25 Apr
- 2024 21:47:24 -0700 (PDT)
+        bh=vyfGtTjL0/4BOGlGkObqvS2M4nitmPhPC2paKUGfC20=;
+        b=u3ydzJ4Pszkwh8dYIejkRD3SH2Mmvs6LzsMmHagb6ZvleWAy4rNf3ctPhkBFNbfD09
+         hcPUa7fvERopLp2idHwOmvk9Dg0X4QR+Ix2JdSAwIHe1cug9Bs6I++uTfIK4BwBRrZyj
+         oAT52VWk0eEt5SI74/xmodBj8af3prSKGeZBjVj5YG+vs3V/hwmO37vLmJpRASU/I0ay
+         nKPAqJ2lbhHbxbs3JH/FpEVELUDUWlFerTt1wlCSU8dUi37H6Dg9CjHzXw/Z5iZs8tF0
+         Ft32r9Xb8D6222Dq7Ho5Cl8XJsk5n63VWw3089JKy21KWmS891gCMHQcm+rNXbV2wJvW
+         vZog==
+X-Forwarded-Encrypted: i=1; AJvYcCU1CaYfFOkJ8dylewto5tgGdnqyRn4726Dfc88vmF9ke92Alrgxy+g95wCEuzXHGj8PbFFqYVDx/IBK7sc2IABULUxJ
+X-Gm-Message-State: AOJu0YzCqLcoqeRBAN4HVZKKD9qC9kCjl6SdUzxaksUSF15EAIJEKVyf
+	1aKVh1t1hC/p8s3d+Gn6kqZTyTLwl3XJmG484PdItfRaBjOcOrgC3B8rjESY0q/mgfV14BHTcbf
+	5TTGmqoXiH9ZtVBuyr10q9HcLxg8rfd/r2Ud9XKc88q1I9WcueYdLDeuoBh2wokv32ig/7v+4hM
+	47B9HlNq290yaZGa8i/jkoulbN
+X-Received: by 2002:a5d:59a8:0:b0:343:f2e0:d507 with SMTP id p8-20020a5d59a8000000b00343f2e0d507mr1239526wrr.41.1714110113853;
+        Thu, 25 Apr 2024 22:41:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHBIXyOHDQf5t1J7hEF66tvZIMi3zbHy9WKGQ4R/jeeL+FyjVcaBJV1zMFGs9QljcxrM29xfti0U+Sza+E6tq4=
+X-Received: by 2002:a5d:59a8:0:b0:343:f2e0:d507 with SMTP id
+ p8-20020a5d59a8000000b00343f2e0d507mr1239519wrr.41.1714110113499; Thu, 25 Apr
+ 2024 22:41:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAL715WJK893gQd1m9CCAjz5OkxsRc5C4ZR7yJWJXbaGvCeZxQA@mail.gmail.com>
- <b3868bf5-4e16-3435-c807-f484821fccc6@loongson.cn> <CAL715W++maAt2Ujfvmu1pZKS4R5EmAPebTU_h9AB8aFbdLFrTQ@mail.gmail.com>
- <f843298c-db08-4fde-9887-13de18d960ac@linux.intel.com> <Zikeh2eGjwzDbytu@google.com>
- <7834a811-4764-42aa-8198-55c4556d947b@linux.intel.com> <CAL715WKh8VBJ-O50oqSnCqKPQo4Bor_aMnRZeS_TzJP3ja8-YQ@mail.gmail.com>
- <6af2da05-cb47-46f7-b129-08463bc9469b@linux.intel.com> <CAL715W+zeqKenPLP2Fm9u_BkGRKAk-mncsOxrg=EKs74qK5f1Q@mail.gmail.com>
- <42acf1fc-1603-4ac5-8a09-edae2d85963d@linux.intel.com> <ZirPGnSDUzD-iWwc@google.com>
- <77913327-2115-42b5-850a-04ef0581faa7@linux.intel.com> <CAL715WJCHJD_wcJ+r4TyWfvmk9uNT_kPy7Pt=CHkB-Sf0D4Rqw@mail.gmail.com>
- <c96330d1-9750-4b65-8465-1b6f46bc11ba@linux.intel.com>
-In-Reply-To: <c96330d1-9750-4b65-8465-1b6f46bc11ba@linux.intel.com>
-From: Mingwei Zhang <mizhang@google.com>
-Date: Thu, 25 Apr 2024 21:46:47 -0700
-Message-ID: <CAL715WKOPBG+G-hTDNw7S12uRMOP=3JgcYcys2xbKWrQVrXyDQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
- state for Intel CPU
-To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-Cc: Sean Christopherson <seanjc@google.com>, Kan Liang <kan.liang@linux.intel.com>, 
-	maobibo <maobibo@loongson.cn>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, 
-	peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com, 
-	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
-	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
-	chao.gao@intel.com
+References: <20240404185034.3184582-1-pbonzini@redhat.com> <20240404185034.3184582-10-pbonzini@redhat.com>
+ <20240423235013.GO3596705@ls.amr.corp.intel.com> <ZimGulY6qyxt6ylO@google.com>
+ <20240425011248.GP3596705@ls.amr.corp.intel.com> <CABgObfY2TOb6cJnFkpxWjkAmbYSRGkXGx=+-241tRx=OG-yAZQ@mail.gmail.com>
+ <Zip-JsAB5TIRDJVl@google.com>
+In-Reply-To: <Zip-JsAB5TIRDJVl@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 26 Apr 2024 07:41:42 +0200
+Message-ID: <CABgObfaxAd_J5ufr+rOcND=-NWrOzVsvavoaXuFw_cwDd+e9aA@mail.gmail.com>
+Subject: Re: [PATCH 09/11] KVM: guest_memfd: Add interface for populating gmem
+ pages with user data
+To: Sean Christopherson <seanjc@google.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, michael.roth@amd.com, isaku.yamahata@linux.intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 25, 2024 at 9:03=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.intel.=
+On Thu, Apr 25, 2024 at 6:00=E2=80=AFPM Sean Christopherson <seanjc@google.=
 com> wrote:
 >
->
-> On 4/26/2024 11:12 AM, Mingwei Zhang wrote:
-> > On Thu, Apr 25, 2024 at 6:46=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.in=
-tel.com> wrote:
-> >>
-> >> On 4/26/2024 5:46 AM, Sean Christopherson wrote:
-> >>> On Thu, Apr 25, 2024, Kan Liang wrote:
-> >>>> On 2024-04-25 4:16 p.m., Mingwei Zhang wrote:
-> >>>>> On Thu, Apr 25, 2024 at 9:13=E2=80=AFAM Liang, Kan <kan.liang@linux=
-.intel.com> wrote:
-> >>>>>> It should not happen. For the current implementation, perf rejects=
- all
-> >>>>>> the !exclude_guest system-wide event creation if a guest with the =
-vPMU
-> >>>>>> is running.
-> >>>>>> However, it's possible to create an exclude_guest system-wide even=
-t at
-> >>>>>> any time. KVM cannot use the information from the VM-entry to deci=
-de if
-> >>>>>> there will be active perf events in the VM-exit.
-> >>>>> Hmm, why not? If there is any exclude_guest system-wide event,
-> >>>>> perf_guest_enter() can return something to tell KVM "hey, some acti=
-ve
-> >>>>> host events are swapped out. they are originally in counter #2 and
-> >>>>> #3". If so, at the time when perf_guest_enter() returns, KVM will a=
-ck
-> >>>>> that and keep it in its pmu data structure.
-> >>>> I think it's possible that someone creates !exclude_guest event afte=
-r
-> >>> I assume you mean an exclude_guest=3D1 event?  Because perf should be=
- in a state
-> >>> where it rejects exclude_guest=3D0 events.
-> >> Suppose should be exclude_guest=3D1 event, the perf event without
-> >> exclude_guest attribute would be blocked to create in the v2 patches
-> >> which we are working on.
-> >>
-> >>
-> >>>> the perf_guest_enter(). The stale information is saved in the KVM. P=
-erf
-> >>>> will schedule the event in the next perf_guest_exit(). KVM will not =
-know it.
-> >>> Ya, the creation of an event on a CPU that currently has guest PMU st=
-ate loaded
-> >>> is what I had in mind when I suggested a callback in my sketch:
-> >>>
-> >>>    :  D. Add a perf callback that is invoked from IRQ context when pe=
-rf wants to
-> >>>    :     configure a new PMU-based events, *before* actually programm=
-ing the MSRs,
-> >>>    :     and have KVM's callback put the guest PMU state
-> >>
-> >> when host creates a perf event with exclude_guest attribute which is
-> >> used to profile KVM/VMM user space, the vCPU process could work at thr=
-ee
-> >> places.
-> >>
-> >> 1. in guest state (non-root mode)
-> >>
-> >> 2. inside vcpu-loop
-> >>
-> >> 3. outside vcpu-loop
-> >>
-> >> Since the PMU state has already been switched to host state, we don't
-> >> need to consider the case 3 and only care about cases 1 and 2.
-> >>
-> >> when host creates a perf event with exclude_guest attribute to profile
-> >> KVM/VMM user space,  an IPI is triggered to enable the perf event
-> >> eventually like the following code shows.
-> >>
-> >> event_function_call(event, __perf_event_enable, NULL);
-> >>
-> >> For case 1,  a vm-exit is triggered and KVM starts to process the
-> >> vm-exit and then run IPI irq handler, exactly speaking
-> >> __perf_event_enable() to enable the perf event.
-> >>
-> >> For case 2, the IPI irq handler would preempt the vcpu-loop and call
-> >> __perf_event_enable() to enable the perf event.
-> >>
-> >> So IMO KVM just needs to provide a callback to switch guest/host PMU
-> >> state, and __perf_event_enable() calls this callback before really
-> >> touching PMU MSRs.
-> > ok, in this case, do we still need KVM to query perf if there are
-> > active exclude_guest events? yes? Because there is an ordering issue.
-> > The above suggests that the host-level perf profiling comes when a VM
-> > is already running, there is an IPI that can invoke the callback and
-> > trigger preemption. In this case, KVM should switch the context from
-> > guest to host. What if it is the other way around, ie., host-level
-> > profiling runs first and then VM runs?
+> On Thu, Apr 25, 2024, Paolo Bonzini wrote:
+> > On Thu, Apr 25, 2024 at 3:12=E2=80=AFAM Isaku Yamahata <isaku.yamahata@=
+intel.com> wrote:
+> > > > >   get_user_pages_fast(source addr)
+> > > > >   read_lock(mmu_lock)
+> > > > >   kvm_tdp_mmu_get_walk_private_pfn(vcpu, gpa, &pfn);
+> > > > >   if the page table doesn't map gpa, error.
+> > > > >   TDH.MEM.PAGE.ADD()
+> > > > >   TDH.MR.EXTEND()
+> > > > >   read_unlock(mmu_lock)
+> > > > >   put_page()
+> > > >
+> > > > Hmm, KVM doesn't _need_ to use invalidate_lock to protect against g=
+uest_memfd
+> > > > invalidation, but I also don't see why it would cause problems.
 > >
-> > In this case, just before entering the vcpu loop, kvm should check
-> > whether there is an active host event and save that into a pmu data
-> > structure. If none, do the context switch early (so that KVM saves a
-> > huge amount of unnecessary PMU context switches in the future).
-> > Otherwise, keep the host PMU context until vm-enter. At the time of
-> > vm-exit, do the check again using the data stored in pmu structure. If
-> > there is an active event do the context switch to the host PMU,
-> > otherwise defer that until exiting the vcpu loop. Of course, in the
-> > meantime, if there is any perf profiling started causing the IPI, the
-> > irq handler calls the callback, preempting the guest PMU context. If
-> > that happens, at the time of exiting the vcpu boundary, PMU context
-> > switch is skipped since it is already done. Of course, note that the
-> > irq could come at any time, so the PMU context switch in all 4
-> > locations need to check the state flag (and skip the context switch if
-> > needed).
+> > The invalidate_lock is only needed to operate on the guest_memfd, but
+> > it's a rwsem so there are no risks of lock inversion.
 > >
-> > So this requires vcpu->pmu has two pieces of state information: 1) the
-> > flag similar to TIF_NEED_FPU_LOAD; 2) host perf context info (phase #1
-> > just a boolean; phase #2, bitmap of occupied counters).
->
-> I still had no chance to look at the details about vFPU implementation,
-> currently I have no idea what we need exactly on vPMU side, a flag or a
-> callback. Anyway, that's just implementation details, we can look at it
-> when starting to implement it.
-
-I think both. The flag helps to decide whether the context switch has
-already been done. The callback will always trigger the context
-switch, but the context switch code should always check if the switch
-has already been done.
-
-FPU context switch is similar but slightly different. That is done at
-the host-level context switch boundary and even crossing that boundary
-as long as the next process/thread is not using FPU and/or not going
-back to userspace. I don't think we want to defer it that far.
-Instead, the PMU context switch should still happen within the range
-of KVM.
-
->
+> > > > I.e. why not
+> > > > take mmu_lock() in TDX's post_populate() implementation?
+> > >
+> > > We can take the lock.  Because we have already populated the GFN of g=
+uest_memfd,
+> > > we need to make kvm_gmem_populate() not pass FGP_CREAT_ONLY.  Otherwi=
+se we'll
+> > > get -EEXIST.
 > >
-> > This is a non-trivial optimization on the PMU context switch. I am
-> > thinking about splitting them into the following phases:
-> >
-> > 1) lazy PMU context switch, i.e., wait until the guest touches PMU MSR
-> > for the 1st time.
-> > 2) fast PMU context switch on KVM side, i.e., KVM checking event
-> > selector value (enable/disable) and selectively switch PMU state
-> > (reducing rd/wr msrs)
-> > 3) dynamic PMU context boundary, ie., KVM can dynamically choose PMU
-> > context switch boundary depending on existing active host-level
-> > events.
-> > 3.1) more accurate dynamic PMU context switch, ie., KVM checking
-> > host-level counter position and further reduces the number of msr
-> > accesses.
-> > 4) guest PMU context preemption, i.e., any new host-level perf
-> > profiling can immediately preempt the guest PMU in the vcpu loop
-> > (instead of waiting for the next PMU context switch in KVM).
+> > I don't understand why TDH.MEM.PAGE.ADD() cannot be called from the
+> > post-populate hook. Can the code for TDH.MEM.PAGE.ADD be shared
+> > between the memory initialization ioctl and the page fault hook in
+> > kvm_x86_ops?
 >
-> Great! we have a whole clear picture about the optimization right now.
-> BTW, the optimization 1 and 2 are already on our original to-do list. We
-> plan to do it after RFC v2 is ready.
+> Ah, because TDX is required to pre-fault the memory to establish the S-EP=
+T walk,
+> and pre-faulting means guest_memfd()
 >
+> Requiring that guest_memfd not have a page when initializing the guest im=
+age
+> seems wrong, i.e. I don't think we want FGP_CREAT_ONLY.  And not just bec=
+ause I
+> am a fan of pre-faulting, I think the semantics are bad.
 
-I am going to summarize that into a design doc. It has been 50 emails
-in this thread. I am sure no one has the patience to read our garbage
-unless they are involved at the very beginning :)
+Ok, fair enough. I wanted to do the once-only test in common code but
+since SEV code checks for the RMP I can remove that. One less
+headache.
 
-Any of the implementations are very welcome. 1) and 2) are low hanging
-fruit and we can finish that quickly after v2. 3-4 is error prone and
-needs further discussions so let's not rush for that.
+Paolo
 
-On the other hand, how do we test this is the question we need to think abo=
-ut.
-
-Thanks.
--Mingwei
 
