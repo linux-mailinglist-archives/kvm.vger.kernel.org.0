@@ -1,252 +1,184 @@
-Return-Path: <kvm+bounces-16080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D26C8B40B4
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 22:14:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4877B8B40B6
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 22:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 410211C225E7
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 20:14:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D3B81C226DD
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 20:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 785FA22334;
-	Fri, 26 Apr 2024 20:14:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF92A23776;
+	Fri, 26 Apr 2024 20:14:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eN28gmFK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mdB8yNO5"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2780E2032A
-	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 20:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E06C2263E
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 20:14:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714162443; cv=none; b=CxrH2uez5S4HutUa5nRXJTFe8YvQbm1FyVargVXIJrtcOFuCONWXQ2j4USLzafnQYdXMoKtbue9gvAAC9hAZ3zgZqdjmpOyvW5SEjbNILhplC/x8Q9DoQhQGMQn5TXeRqLLbMn6qF/MRIJRadyVL7Ns9gHO6EhmgvysRumFtgtU=
+	t=1714162475; cv=none; b=AKSZYqJw5eGJrg0GXNTG5fEsNeW9NrcVkp0USNHSZg9WAbM0xp/vJtambju8kBhZAnHRHTEKk8PU1TE9/xl7DAv4NwF+drdLvcO+b1AleahIM6SqlJmXpnxGL5FQC9A7IXV6oGRJZ4QbLKo15QOsq2Ndt3eTKriX0raxZ2EZW2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714162443; c=relaxed/simple;
-	bh=9SiXKJV+UYlxQscyR6k1hUddQILrJmGCwSLQDNAju70=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SNPyCbqoUDwzPvWLm79lhxN/KpChRfLiAZMMKZjM82hqfkUT1B1XrNSVyrmq5aHQ+C2LETUtrAiHw4Bzw4yK6XKJnvq3nozCyBRHRJYQIyJETgnI6y9zwfDGJT1l2cpUKoVolxOubdEkRHo2eLcET5RJeIccz6Jis8q02lqc4cU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eN28gmFK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714162441;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8kKazOc9qk6A4uGx0ir5JoFPS0z17L0g4Jjhk7nh8W8=;
-	b=eN28gmFKHj7tXhCGQSdAxcRTlpN4of3C04lfDFBIdV8w0NLu3gHkEMefqHltoJqpAGnw/W
-	lvdH4XpYcfMRs94ummqOSDJFgpD6aPSfjKfTJrDtjHXjv1r6aE6w2CxG4PNmpEEBkqlDen
-	+oUcMGCakxbId2H06PQh5rIkUmwKGZM=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-628-2qecwQA_PT6malKIyYA0Lg-1; Fri, 26 Apr 2024 16:13:59 -0400
-X-MC-Unique: 2qecwQA_PT6malKIyYA0Lg-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-36b34b3a5fdso24079595ab.0
-        for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 13:13:59 -0700 (PDT)
+	s=arc-20240116; t=1714162475; c=relaxed/simple;
+	bh=Z2Hmk9m0Llx/IUQH/S7TpxHTL0emnGLH/LAZ4N5+s1c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=DAqRKJBybo+9fmPTBUvgXOWvI1+zISYQLwBgK43+yXzqdnfhZsvAflrcasvRNtwyb+ODGtbC9ylGWTYHzUwCXUwxQPXiOaSVZ698uUI0woSyJzYE5DzH0pf3wJeGbe2Crgi+zPIQLJlQY1cFviVKtr0erRwfY6kHNEqNQSrx8+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mdB8yNO5; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e2b1b90148so25067825ad.2
+        for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 13:14:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714162474; x=1714767274; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=p6QNNeN/iKbfPmZLz+NRuv/dqoduuTvyudHMEjnn2zM=;
+        b=mdB8yNO5CKZoFfpuHGsyAXXxlHmhbGvcBuxKSId/PUs/VSVC47LQQsRqiR37a/zCmn
+         0RuraAUYS595hgXjw5eCK43FHfXcyVMeobuKz2YO/HQCwY1UfCACZNLDMg04uuUE2swp
+         qQHRwvdfvSqA4ZfwWGpjO2DcM9vZ8tKcgFGi6J85lF1bqr5SRg6a/+PJTo51YRyC28Yn
+         KGm7/quFaVQzWLNU/61vsO8kIrnptf7fY9K7YqIQivCt+roiT4nKafn3i8+7RMZaEOTi
+         OoeXU251K9RNQxo3QvGxSAVMm36yakj+efhidMsI9qp0AFyvlHVFRxqJKbYN2rzBxmc6
+         657w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714162439; x=1714767239;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8kKazOc9qk6A4uGx0ir5JoFPS0z17L0g4Jjhk7nh8W8=;
-        b=fSXjLGRiNnqvBX/InhtMkqsFQ+SsNF5elPlXfgrkw+WqDDxQdNarFNix5PKm7AjeVm
-         dfmm9tv+eAAfrZTA/E6hldSOCTIUov/WXsHPlHrL90UglQvnLX6g6EL8Y3F1Ah+qzZhJ
-         DovRQiyY35HPi4GJTQp7g7vCrJn1uSw4PBK9wyO0FA1DLA1INDZg0GzDFax8qh7BiZfo
-         nv3pSccBlZrwOn7c+46MaHEKru50KAcPYyRzXLIQa3BssdSR9V2xBschzk488m9Ecaaz
-         PH1cwKu8g7ISLu6E55YQrsABL+ITra7etkYe86RisqP508p5n5BmCulOk0tyqxvT840V
-         ToaA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzdwo3rLAs+/L1iF5XcUhRO+r3GjQeVWEFAmxddfzitoKt6xqUfWNUVuzG7Q92Qsp3Cdp/Qeqa1I2foOYabk0JwNsw
-X-Gm-Message-State: AOJu0YxGVkQb31xqTU833xx8EulrLh66X5lC+CcGCNvwDxD8VkPEh5jo
-	XRqfSrrWVPXK8d9v8ZsGdHvjJbnhJEaDlDLq2tWFEk0xxG7bifb1aLDNzKrZj+AYdWm1xIDflM6
-	/hz90tV00KBD2rDTc7tEbaGr7ZpRqVtpKwbOJrurgN1aG4hkgMQ==
-X-Received: by 2002:a05:6e02:1b08:b0:369:c0a3:2ad7 with SMTP id i8-20020a056e021b0800b00369c0a32ad7mr4559137ilv.12.1714162438857;
-        Fri, 26 Apr 2024 13:13:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF/bOY8zg1Sw4uTwmZH3nmuvKbetISUmtPVe+7fTuKUiyq1sJnjYVdwfQl6dYscmLxPP4OYsQ==
-X-Received: by 2002:a05:6e02:1b08:b0:369:c0a3:2ad7 with SMTP id i8-20020a056e021b0800b00369c0a32ad7mr4559094ilv.12.1714162438359;
-        Fri, 26 Apr 2024 13:13:58 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id fh35-20020a05663862a300b004875cda091esm169252jab.85.2024.04.26.13.13.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Apr 2024 13:13:57 -0700 (PDT)
-Date: Fri, 26 Apr 2024 14:13:54 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
- <robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
- <chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
- <baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "Pan, Jacob jun" <jacob.jun.pan@intel.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le
- Goater <clg@redhat.com>
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-Message-ID: <20240426141354.1f003b5f.alex.williamson@redhat.com>
-In-Reply-To: <20240426141117.GY941030@nvidia.com>
-References: <20240418143747.28b36750.alex.williamson@redhat.com>
-	<BN9PR11MB5276819C9596480DB4C172228C0D2@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20240419103550.71b6a616.alex.williamson@redhat.com>
-	<BN9PR11MB52766862E17DF94F848575248C112@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20240423120139.GD194812@nvidia.com>
-	<BN9PR11MB5276B3F627368E869ED828558C112@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20240424001221.GF941030@nvidia.com>
-	<20240424122437.24113510.alex.williamson@redhat.com>
-	<20240424183626.GT941030@nvidia.com>
-	<20240424141349.376bdbf9.alex.williamson@redhat.com>
-	<20240426141117.GY941030@nvidia.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1714162474; x=1714767274;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p6QNNeN/iKbfPmZLz+NRuv/dqoduuTvyudHMEjnn2zM=;
+        b=YZYOD/a3Pgkiz/o+zHqmNsXJ+/4vsd6RXN0+idk0bMqoqL/DL02Z5FELh99f21+Lnu
+         R3UYzXX0twxzUE3r5yE0GJrQT4xfJJ/0U7wR5ThIyD6uhJMJYKmr6etHWsLvqs2FfbMM
+         Jg4utnefM5tS7gY+YFbA49/njKs6hopyukpPVfj+Vr4jb1Aajr4OFaW1hJ71so570IiT
+         BZVxWR9mdXnK5fIBDgTUaNG/fNDe5WlxZspyicL47GFm6jS6KIT4bd1VFpsZTEg9sRMo
+         Rjn9C3yuVIUoeLBvf9KRLILgCZadcunlaGVkuwFMK9iazNHAR5JCC0FNez8HAEi+DQki
+         lcAA==
+X-Gm-Message-State: AOJu0YxBSgtVQyyWRJdxuwpgk9xcnmeIHhyLohbKjLbzuaaY1mDLuK18
+	9/te9xSgnncU6jZM0pMQsb3bhn4mUfs406NW+k+i3hSt3JzubYgJHEwzE1OXVmMG4jjsdOS6fVZ
+	6Iw==
+X-Google-Smtp-Source: AGHT+IHm+XgF6B2SsiuKWzSl3HesgNNUnTRITMzai0EsO8nj/1UyX71FX031Lz6TZHENt4ygoNWm2wDt2xQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:124a:b0:1e2:8bce:b334 with SMTP id
+ u10-20020a170903124a00b001e28bceb334mr11581plh.9.1714162473746; Fri, 26 Apr
+ 2024 13:14:33 -0700 (PDT)
+Date: Fri, 26 Apr 2024 13:14:32 -0700
+In-Reply-To: <20240426171644.r6dvvfvduzvlrv5c@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240421180122.1650812-1-michael.roth@amd.com>
+ <20240421180122.1650812-10-michael.roth@amd.com> <ZilyxFnJvaWUJOkc@google.com>
+ <20240425220008.boxnurujlxbx62pg@amd.com> <ZirVlF-zQPNOOahU@google.com> <20240426171644.r6dvvfvduzvlrv5c@amd.com>
+Message-ID: <ZiwLKI_xtZk3BG_B@google.com>
+Subject: Re: [PATCH v14 09/22] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+From: Sean Christopherson <seanjc@google.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de, 
+	thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, pbonzini@redhat.com, 
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 26 Apr 2024 11:11:17 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Wed, Apr 24, 2024 at 02:13:49PM -0600, Alex Williamson wrote:
-> 
-> > This is kind of an absurd example to portray as a ubiquitous problem.
-> > Typically the config space layout is a reflection of hardware whether
-> > the device supports migration or not.  
-> 
-> Er, all our HW has FW constructed config space. It changes with FW
-> upgrades. We change it during the life of the product. This has to be
-> considered..
-
-So as I understand it, the concern is that you have firmware that
-supports migration, but it also openly hostile to the fundamental
-aspects of exposing a stable device ABI in support of migration.
-
-> > If a driver were to insert a
-> > virtual capability, then yes it would want to be consistent about it if
-> > it also cares about migration.  If the driver needs to change the
-> > location of a virtual capability, problems will arise, but that's also
-> > not something that every driver needs to do.  
-> 
-> Well, mlx5 has to cope with this. It supports so many devices with so
-> many config space layouts :( I don't know if we can just hard wire an
-> offset to stick in a PASID cap and expect that to work...
-> 
-> > Also, how exactly does emulating the capability in the VMM solve this
-> > problem?  Currently QEMU migration simply applies state to an identical
-> > VM on the target.  QEMU doesn't modify the target VM to conform to the
-> > data stream.  So in either case, the problem might be more along the
-> > lines of how to make a V1 device from a V2 driver, which is more the
-> > device type/flavor/persona problem.  
-> 
-> Yes, it doesn't solve anything, it just puts the responsibility for
-> something that is very complicated in userspace where there are more
-> options to configure and customize it to the environment.
-> 
-> > Currently QEMU replies on determinism that a given command line results
-> > in an identical machine configuration and identical devices.  State of
-> > that target VM is then populated, not defined by, the migration stream.  
-> 
-> But that won't be true if the kernel is making decisions. The config
-> space layout depends now on the kernel driver version too.
-
-But in the cases where we support migration there's a device specific
-variant driver that supports that migration.  It's the job of that
-variant driver to not only export and import the device state, but also
-to provide a consistent ABI to the user, which includes the config
-space layout.  I don't understand why we'd say the device programming
-ABI itself falls within the purview of the device/variant driver, but
-PCI config space is defined by device specific code at a higher level.
-
-> > > I think we need to decide, either only the VMM or only the kernel
-> > > should do this.  
+On Fri, Apr 26, 2024, Michael Roth wrote:
+> On Thu, Apr 25, 2024 at 03:13:40PM -0700, Sean Christopherson wrote:
+> > On Thu, Apr 25, 2024, Michael Roth wrote:
+> > > On Wed, Apr 24, 2024 at 01:59:48PM -0700, Sean Christopherson wrote:
+> > > > On Sun, Apr 21, 2024, Michael Roth wrote:
+> > > > > +static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
+> > > > > +{
+> > > > > +	u64 gpa = gfn_to_gpa(GHCB_MSR_PSC_REQ_TO_GFN(ghcb_msr));
+> > > > > +	u8 op = GHCB_MSR_PSC_REQ_TO_OP(ghcb_msr);
+> > > > > +	struct vcpu_svm *svm = to_svm(vcpu);
+> > > > > +
+> > > > > +	if (op != SNP_PAGE_STATE_PRIVATE && op != SNP_PAGE_STATE_SHARED) {
+> > > > > +		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
+> > > > > +		return 1; /* resume guest */
+> > > > > +	}
+> > > > > +
+> > > > > +	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
+> > > > > +	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC_MSR;
+> > > > > +	vcpu->run->vmgexit.psc_msr.gpa = gpa;
+> > > > > +	vcpu->run->vmgexit.psc_msr.op = op;
+> > > > 
+> > > > Argh, no.
+> > > > 
+> > > > This is the same crud that TDX tried to push[*].  Use KVM's existing user exits,
+> > > > and extend as *needed*.  There is no good reason page state change requests need
+> > > > *two* exit reasons.  The *only* thing KVM supports right now is private<=>shared
+> > > > conversions, and that can be handled with either KVM_HC_MAP_GPA_RANGE or
+> > > > KVM_EXIT_MEMORY_FAULT.
+> > > > 
+> > > > The non-MSR flavor can batch requests, but I'm willing to bet that the overwhelming
+> > > > majority of requests are contiguous, i.e. can be combined into a range by KVM,
+> > > > and that handling any outliers by performing multiple exits to userspace will
+> > > > provide sufficient performance.
+> > > 
+> > > That does tend to be the case. We won't have as much granularity with
+> > > the per-entry error codes, but KVM_SET_MEMORY_ATTRIBUTES would be
+> > > expected to be for the entire range anyway, and if that fails for
+> > > whatever reason then we KVM_BUG_ON() anyway. We do have to have handling
+> > > for cases where the entries aren't contiguous however, which would
+> > > involve multiple KVM_EXIT_HYPERCALLs until everything is satisfied. But
+> > > not a huge deal since it doesn't seem to be a common case.
 > > 
-> > What are you actually proposing?  
+> > If it was less complex overall, I wouldn't be opposed to KVM marshalling everything
+> > into a buffer, but I suspect it will be simpler to just have KVM loop until the
+> > PSC request is complete.
 > 
-> Okay, what I'm thinking about is a text file that describes the vPCI
-> function configuration space to create. The community will standardize
-> this and VMMs will have to implement to get PASID/etc. Maybe the
-> community will provide a BSD licensed library to do this job.
-> 
-> The text file allows the operator to specify exactly the configuration
-> space the VFIO function should have. It would not be derived
-> automatically from physical. AFAIK qemu does not have this capability
-> currently.
-> 
-> This reflects my observation and discussions around the live migration
-> standardization. I belive we are fast reaching a point where this is
-> required.
-> 
-> Consider standards based migration between wildly different
-> devices. The devices will not standardize their physical config space,
-> but an operator could generate a consistent vPCI config space that
-> works with all the devices in their fleet.
-> 
-> Consider the usual working model of the large operators - they define
-> instance types with some regularity. But an instance type is fixed in
-> concrete once it is specified, things like the vPCI config space are
-> fixed.
-> 
-> Running Instance A on newer hardware with a changed physical config
-> space should continue to present Instance A's vPCI config layout
-> regardless. Ie Instance A might not support PASID but Instance B can
-> run on newer HW that does. The config space layout depends on the
-> requested Instance Type, not the physical layout.
-> 
-> The auto-configuration of the config layout from physical is a nice
-> feature and is excellent for development/small scale, but it shouldn't
-> be the only way to work.
-> 
-> So - if we accept that text file configuration should be something the
-> VMM supports then let's reconsider how to solve the PASID problem.
-> 
-> I'd say the way to solve it should be via a text file specifying a
-> full config space layout that includes the PASID cap. From the VMM
-> perspective this works fine, and it ports to every VMM directly via
-> processing the text file.
-> 
-> The autoconfiguration use case can be done by making a tool build the
-> text file by deriving it from physical, much like today. The single
-> instance of that tool could have device specific knowledge to avoid
-> quirks. This way the smarts can still be shared by all the VMMs
-> without going into the kernel. Special devices with hidden config
-> space could get special quirks or special reference text files into
-> the tool repo.
-> 
-> Serious operators doing production SRIOV/etc would negotiate the text
-> file with the HW vendors when they define their Instance Type. Ideally
-> these reference text files would be contributed to the tool repo
-> above. I think there would be some nice idea to define fully open
-> source Instance Types that include VFIO devices too.
+> Agreed. But *if* we decided to introduce a buffer, where would you
+> suggest adding it? The kvm_run union fields are set to 256 bytes, and
+> we'd need close to 4K to handle a full GHCB PSC buffer in 1 go. Would
+> additional storage at the end of struct kvm_run be acceptable?
 
-Regarding "if we accept that text file configuration should be
-something the VMM supports", I'm not on board with this yet, so
-applying it to PASID discussion seems premature.
+Don't even need more memory, just use vcpu->arch.pio_data, which is always
+allocated and is mmap()able by userspace via KVM_PIO_PAGE_OFFSET.
 
-We've developed variant drivers specifically to host the device specific
-aspects of migration support.  The requirement of a consistent config
-space layout is a problem that only exists relative to migration.  This
-is an issue that I would have considered the responsibility of the
-variant driver, which would likely expect a consistent interface from
-the hardware/firmware.  Why does hostile firmware suddenly make it the
-VMM's problem to provide a consistent ABI to the config space of the
-device rather than the variant driver?
+> > > KVM_HC_MAP_GPA_RANGE seems like a nice option because we'd also have the
+> > > flexibility to just issue that directly within a guest rather than
+> > > relying on SNP/TDX specific hcalls. I don't know if that approach is
+> > > practical for a real guest, but it could be useful for having re-usable
+> > > guest code in KVM selftests that "just works" for all variants of
+> > > SNP/TDX/sw-protected. (though we'd still want stuff that exercises
+> > > SNP/TDX->KVM_HC_MAP_GPA_RANGE translation).
+> > > 
+> > > I think we'd there is some potential baggage there with the previous SEV
+> > > live migration use cases. There's some potential that existing guest kernels
+> > > will use it once it gets advertised and issue them alongside GHCB-based
+> > > page-state changes. It might make sense to use one of the reserved bits
+> > > to denote this flavor of KVM_HC_MAP_GPA_RANGE as being for
+> > > hardware/software-protected VMs and not interchangeable with calls that
+> > > were used for SEV live migration stuff.
+> > 
+> > I don't think I follow, what exactly wouldn't be interchangeable, and why?
+> 
+> For instance, if KVM_FEATURE_MIGRATION_CONTROL is advertised, then when
+> amd_enc_status_change_finish() is triggered as a result of
+> set_memory_encrypted(), we'd see
+> 
+>   1) a GHCB PSC for SNP, which will get forwarded to userspace via
+>      KVM_HC_MAP_GPA_RANGE
+>   2) KVM_HC_MAP_GPA_RANGE issued directly by the guest.
+> 
+> In that case, we'd be duplicating PSCs but it wouldn't necessarily hurt
+> anything. But ideally we'd be able to distinguish the 2 cases so we
+> could rightly treat 1) as only being expected for SNP, and 2) as only
+> being expected for SEV/SEV-ES.
 
-Obviously config maps are something that a VMM could do, but it also
-seems to impose a non-trivial burden that every VMM requires an
-implementation of a config space map and integration for each device
-rather than simply expecting the exposed config space of the device to
-be part of the migration ABI.  Also this solution specifically only
-addresses config space compatibility without considering the more
-generic issue that a variant driver can expose different device
-personas.  A versioned persona and config space virtualization in the
-variant driver is a much more flexible solution.  Thanks,
-
-Alex
-
+Why would the guest issue both?  That's a guest bug.  Or if supressing the second
+hypercall is an issue, simply don't enumerate MIGRATION_CONTROL for SNP guests.
 
