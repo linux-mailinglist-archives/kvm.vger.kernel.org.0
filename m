@@ -1,264 +1,205 @@
-Return-Path: <kvm+bounces-16088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E2638B42BF
-	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 01:26:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5A1E8B42CC
+	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 01:45:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 902B21C219E8
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 23:26:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30E301F228E1
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 23:45:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FC53BBF7;
-	Fri, 26 Apr 2024 23:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EB53C46B;
+	Fri, 26 Apr 2024 23:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f3TkF8V0"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="PO/Qiv9b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 290113BBCA;
-	Fri, 26 Apr 2024 23:26:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714174002; cv=fail; b=HPtgBOdyIF2zddAPUbLz73HXFgjW5aenS5PCdvrSRJviFXlN5VI2ej0qdjR2LFjjzwpZ55UlKUUpjlRZE1eobHeERkejKrplJ58TUhbOwxwq+aR7aqHsljNALnZ1OBN2KTNcXW3yfR99DPwayyzUfqD6ab1O91kF4M9LmVQexvY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714174002; c=relaxed/simple;
-	bh=oj9VppidYKTEMXWldgtl7N1XjiIieUwuL0Qu9Mk4Fo0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lAi5M7EZFdzLTlTvlfNuYFe+EpbAbnKi2yF979SxRYlS+H+fRO2Ga2ckwPa9G4iR40UXigcoLhXcxBBA6XoIk+nnFL6Beij9QXlBHzF0tn70ZYwqo9/YLOVji7W94iXVvvttfEYIhyKpFx52kEtQypgBVaMMjT5zVnOkD27qwsg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f3TkF8V0; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714174001; x=1745710001;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=oj9VppidYKTEMXWldgtl7N1XjiIieUwuL0Qu9Mk4Fo0=;
-  b=f3TkF8V0V22iUIc9jSIRw8Esi8CSYfAiyc6Ya/RueZKh1xwJCPn63Rhv
-   aCbFBMcF1Ygrb+s8xYRjXwLuIxSJWSHF/m/nEDEauahW7Z4mb4GAt8Z27
-   PEzXErOEhctHTSF6hMPNZdiWgljUPDc2I03k9rxajMJ9GxsMfCzjJ5FfC
-   yObc0uEEb2OF8WtMchWHI90HrmN00qI8+M470mdA+tS+RgkZFETVU7WRN
-   6tnvoAgazpgZjl28F3Z4jS+mpr7Q+Lv8nviLvBzdmxcfXH8JhAsoV4zyF
-   bWK6H8FU480qnSZRT4XnkgOQlOjqUehtZqsRabOsGGd+QRZ9a6exHNpru
-   Q==;
-X-CSE-ConnectionGUID: VLqNr4GdTs20XBLl+PAcJA==
-X-CSE-MsgGUID: q0sVwYImSIqcB/e1ZbDjWA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="27378243"
-X-IronPort-AV: E=Sophos;i="6.07,234,1708416000"; 
-   d="scan'208";a="27378243"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 16:26:38 -0700
-X-CSE-ConnectionGUID: Ai2BulaSR364IXvu6elvEA==
-X-CSE-MsgGUID: cSxmr6JWTr6UKX13gkv6Ag==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,234,1708416000"; 
-   d="scan'208";a="30362050"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Apr 2024 16:26:36 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 26 Apr 2024 16:26:35 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 26 Apr 2024 16:26:35 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 26 Apr 2024 16:26:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=d59u9ilS2sNW/J+YdtMzpaTaDDFENdch7aM2GD0OSYySG3TYkW/XzmHznpYIab2dVOZ9Wp/5x2shhm2TXSuzSy2voJpqMeSqUhLME8l3yNH8gQuO8brrlKTWecdnK3jElgrXdjMLHMH9/idzEFzBLFziIz2xIfOa1AJl74B1e4U6nJ+SPiFEqs1pd2Y3DOGj+4jDG//mWUYaPzyX+6gbmR/LI+VNFfBm+Viyjc0SJ89Cu+pcChK4d3Lrr083JQ9wCZkPC89EB+hy24f5P2y1qHi77KPm2EKN8t4J8SIdC5cT4+oiQXnbTSNoehL3VN5Ho/1gsxMnBcsFrf3gLpU2pg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZVU3bf7pgLMETDcAZ976DhdHiq6cpe0Jtt6/e5PaP3I=;
- b=EGaSe8unAgC0qOdrkKcKQuB3OY856YlyDbkVlEEbQ7w7aTAYOm4n4GRTYTG9cAujNhJ5iIHBQf/uy5Eg/rFYl9E49GpdG/NtHPS/lSkz7bcPaZEnP2NJ6cZi1mOihxEIGOtBpZKbzdj1yseww6YMF93f+9i00aCMM8JcPTOZLUVhoxxIB9Hn0PiMQvI4E/56NuAOEtLnMQFtzB5MhNSh7P0IT8akYtOzrPv9JY4E9ZS0oV6q3lydvyz4+Hbd7il5DpXcTeI4uT0M6t9GoH3jX7hmLTD6niPcrcBychMl69kpUz29lrWGJ0+G52JGdwvoH4BE1RfeFVHoc9Bbn4hQMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
- by DS7PR11MB7908.namprd11.prod.outlook.com (2603:10b6:8:ea::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7519.22; Fri, 26 Apr 2024 23:26:27 +0000
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::d610:9c43:6085:9e68]) by SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::d610:9c43:6085:9e68%7]) with mapi id 15.20.7519.023; Fri, 26 Apr 2024
- 23:26:26 +0000
-Message-ID: <12445519-efd9-42e9-a226-60cfa9d2a880@intel.com>
-Date: Fri, 26 Apr 2024 16:26:23 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 4/4] KVM: selftests: Add test for configure of x86 APIC
- bus frequency
-To: "Chen, Zide" <zide.chen@intel.com>, <isaku.yamahata@intel.com>,
-	<pbonzini@redhat.com>, <erdemaktas@google.com>, <vkuznets@redhat.com>,
-	<seanjc@google.com>, <vannapurve@google.com>, <jmattson@google.com>,
-	<mlevitsk@redhat.com>, <xiaoyao.li@intel.com>, <chao.gao@intel.com>,
-	<rick.p.edgecombe@intel.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <cover.1714081725.git.reinette.chatre@intel.com>
- <eac8c5e0431529282e7887aad0ba66506df28e9e.1714081726.git.reinette.chatre@intel.com>
- <f5a80896-e1aa-4f23-a739-5835f7430f78@intel.com>
-Content-Language: en-US
-From: Reinette Chatre <reinette.chatre@intel.com>
-In-Reply-To: <f5a80896-e1aa-4f23-a739-5835f7430f78@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0341.namprd04.prod.outlook.com
- (2603:10b6:303:8a::16) To SJ2PR11MB7573.namprd11.prod.outlook.com
- (2603:10b6:a03:4d2::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644F23A1CD
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 23:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714175096; cv=none; b=EY7epsBhanqY0Ca521gOCI2FDxxyyTz/e3+kyyG/Zhx1XI73UO/Wa3Ptn+Bsay4lpIfaCMTphW1knfWBrGYLkU32tS+4fNhhiVUG3dGJvwBaXeUxSVcGYm7sbYxkHTFtAW4jv4y3ZYzfr4OVEhV8FTpHJRc+M94QmOZl4mmOzL4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714175096; c=relaxed/simple;
+	bh=gcUr6BaeH4uUeyuBp+5tRaGd5nRW7ROYgouV/rLG4eg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wk9Q4XdPn2D25eLL/2KnoXDIpVBrjTimobeanoadtbnv0aMN6zt7NHZnCN4Vh34bq1Gon5IC34hcFDd9q+d+LEDor+Woksjzj6TuP8F6XAjcHJgG6XER0Y/ZR/YxIdDcpqL28x5neruOK7U2TUlNIDVg5jaCJLuone/gQRGqFLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=PO/Qiv9b; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1eab16c8d83so21536015ad.3
+        for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 16:44:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1714175094; x=1714779894; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=10+kG8+suMw5wf1kQMOtM4ixrtygd87W4O6yWN3oIlc=;
+        b=PO/Qiv9bwBUvFKxHCEtO+Iy+D0mGPiZiWoprLwaU8ihyHVkQNyt9N5rYPpuEeK8LP8
+         Su4QEJPfJnS/jO3VuDP4/bVWZTnoIPOGp9Kx44CR60mF4+++jUjPDEOm2SH5vQ3Vjfgu
+         xhpzgar4b8pwG8UadHXQTUiGfpGGNYWLXhMNSQfk1G2XHcfdZihB8udqBb9TECnvInKW
+         jGTyl3b6uuG46I6FFI/hIJdjt2ScGh6M/YE5Kdb8A3haWOQM9UVq7VI/lmM0zpOWAzRI
+         VRoElsgwj0kn7bkpIn/WNwKsB4+V+dzthZVJS3Nu06DtDiCFdr2t3ReyZPC8e41rJoF8
+         8GnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714175094; x=1714779894;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=10+kG8+suMw5wf1kQMOtM4ixrtygd87W4O6yWN3oIlc=;
+        b=obO8ma5Ux8tL/Y2mGkLDGfA51sJ24NT3kMIsWlQ8WJVZhME9YLuFPn5WtXGYt3dMY+
+         eS4DjQY7ul9B9mtt3kJPijPn4ADS4Xvg94Txun+WBk0qUcLgrtEiohi8HqDcWKHDgb4b
+         cbvdFbF6YohT0lQt3bgwdLN7nsGdHvD5jkXbD0S9y42uW6R6Kc9lgA0hljLHBJlPWZLE
+         g3efz08NEtOzZxC3Q/6QLtKx/r+QZEVDp6/gCcFNdN76/S3RvZx40Kie4ONNGdaURwnW
+         N4DR8wDL5ZqZIRc6ZgvXCJv0ivEfxdUoT2sVClDjQU30r7OoTXnj8DJMMTg9SKQM6kud
+         PLww==
+X-Forwarded-Encrypted: i=1; AJvYcCWz3yIF/dpTEciHpBv7f8E9dgwe6+X00PB4mpEEwZmj2V5OfIWv/mcstmH7sIF6MNgrPktuwmhI7B2UhuDXEVYOUq+g
+X-Gm-Message-State: AOJu0YxcGYesFGPGuKsWiZ6k4ecOus7ld+z+zkH4S9XEtVBRX+bV1vWC
+	OmUncRNdwjJ7Q/FC6cnBzLqrivfHTYc4JHGuVB5294fQx6nD+NK06yKl9HsZPsQ=
+X-Google-Smtp-Source: AGHT+IGcvjzu0bt6XA9PeX/VVTLN2fLbx6JeHHs9deVeeSpREMfxgrHF5aU2rl341rHMT2bBZ2wf2g==
+X-Received: by 2002:a17:902:7b93:b0:1e3:cce4:bfe8 with SMTP id w19-20020a1709027b9300b001e3cce4bfe8mr3587190pll.65.1714175094555;
+        Fri, 26 Apr 2024 16:44:54 -0700 (PDT)
+Received: from debug.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id c14-20020a170902b68e00b001e97772524asm10657366pls.234.2024.04.26.16.44.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Apr 2024 16:44:54 -0700 (PDT)
+Date: Fri, 26 Apr 2024 16:44:51 -0700
+From: Deepak Gupta <debug@rivosinc.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, Ved Shanbhogue <ved@rivosinc.com>
+Subject: Re: [RFC PATCH 1/7] riscv: kvm: add support for FWFT SBI extension
+Message-ID: <Ziw8c0X0K3mXjJWK@debug.ba.rivosinc.com>
+References: <20240418142701.1493091-1-cleger@rivosinc.com>
+ <20240418142701.1493091-2-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|DS7PR11MB7908:EE_
-X-MS-Office365-Filtering-Correlation-Id: f8b5889b-ba5f-41db-2eef-08dc66484b33
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007|921011;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?T0FSRENvejdGNDVqZ3M2MGJ0c0M2MzF3Z0llb3RhVERVbWQrWVBhbTEyRHRP?=
- =?utf-8?B?MlQ2T3RCZWs3K1FCd29TeHdEMjBsemtic1lhc2pPSUp2R0YrZENRZk56STRQ?=
- =?utf-8?B?cFNEWXQyb0ppbFhzVjE1NkxYM3ZZRW92YzRSa2N3S1RYWG1NS1F3eXJ1M3Ev?=
- =?utf-8?B?U2pDUlBzZ3B0Rzd4M1I1cXNxN2ppem92eStUNDU5WklkSmR6VkgzRmJOWlFT?=
- =?utf-8?B?Q0o1UUVVZ2FibjN3aWxKSW1DR3M2dW8xaXlaVlZXcWtqRUUzT3RIdXVCVjBx?=
- =?utf-8?B?MkwybkhEVHFtbml4WTdXcXNFYitlKzlJNTVIbldlelYxUVBXSWNnK04vclJT?=
- =?utf-8?B?ckxUZE1ZeWRuWEExcW5LV0VLNjJRbmJUallybDlZNEJrWFBMSy9JRkZOdnFG?=
- =?utf-8?B?OHd1TjFoN2FXYTBWZVJYNVltWThEU0NReWpJVnliNDc0b3pzSy9SdG1zNDF2?=
- =?utf-8?B?c3hHWUVuMkVPSDBKUk1CVjk5V09pWnpraUVncEwvTHNBZTVVOVJzZHNBZ1ZJ?=
- =?utf-8?B?VVlEYml3UldLejB1QldWUmJNNjh4M3hhK28rSGhTSjFNVEhBcE0vQlVkaWhj?=
- =?utf-8?B?N2RxVVA5WGhzbGpia2EyUk5ZZU15NXAzMy8vK1pmMjFia3VIaEIzQytRNmti?=
- =?utf-8?B?TjRYdFdkQWtuUDMwSm9mWFVyQ1VwUFEvQ2xUWXZseTZxaUY0TWZYVE80VDR5?=
- =?utf-8?B?U1RhVzdybWFseFdiYkhweE8zRmcxd2huMUF2UitvRThBaWh4cVV4YUZRTXRR?=
- =?utf-8?B?bWlJeVlUcGViQVV1N091aUtLbzdFYUN2RmJpaUt4Rk82MTR4aXp0eHhUY0Jy?=
- =?utf-8?B?bmp1bC9LVVRyYUZJL1hST1RsaEJQUkJjcUFqMndKeWFqQ0ZrRlpOdnVvK3do?=
- =?utf-8?B?RVluM0J4enNhN2R1UDdPZnN4TnZwZWY0dTk5UXVXQ0liOE1zbFFYeldlSFBl?=
- =?utf-8?B?VFlENEtQVk5rTjVqZlJqWXdVM3QxZVd3TGw5WkphaGk2SU4zY3RwcForb2VW?=
- =?utf-8?B?dGVYdmg5dDVta0V4Q1QwUzVUNytleUtVb2FrbTNBVHBJdGRKbHBmdVhxSWQ2?=
- =?utf-8?B?OEx0dHdUR29jTVkzTW9VQ2dKRzJPaDRhdDF6VW8rdW5pN3NJU3pEeDRRRVE4?=
- =?utf-8?B?cUkyeWhJQllQcmc2bm5PV0E4STExcmRsaUJKU1dydGI4K2k0S2N5enRKdEtR?=
- =?utf-8?B?bmlER1crTzJZS2svdVVxV2hYSDBUQlFqU1E4VVZReHBKSTVSL29xSm04elZK?=
- =?utf-8?B?cVNTWEtYZXR1ZC9tK0ZwRjlKVkx4K3BHb2pTVThoSUdyNHIyNGJuUVlTSHNX?=
- =?utf-8?B?V3lRWmRQeml1cytvaWIzUGRkSEk0a2FhNnRXOHBMZWtQTXZjNXJMU0k2OGdV?=
- =?utf-8?B?ZE40K3NJMVRSaXZtc3ZTampNblFSWkw3OWwxMHVpdnlPVXNtaHp1Tm0ybWs0?=
- =?utf-8?B?RlpFNjg2dnZiaFF2QW5xM2NTcDFqdUg3bzVHSnRDeXVQQ3NKeURvOFllUWN3?=
- =?utf-8?B?b3c3MERobDdZbjBnMThaRUFaSXpVOEREY2VEbmZKOVNHL2l0Y3ZJSTRDU3lk?=
- =?utf-8?B?TGYySEgrNzRSaWUxL1BIYzIrVEVFNmc2OFIyc1l2V1RSVU9JeXBZeDU2UjYw?=
- =?utf-8?B?VzhDK2wxeDgyUWZYeGpIbDA4VEhRdk1yZWNqaWZQUWpuL280QjJaakpZYURt?=
- =?utf-8?B?Mzl6Zml3SDBpcHlQS1NPSm9VYzluUjRoS3FaQkUycWRzVGR2TW9jbk9VbXJ3?=
- =?utf-8?Q?pJ61XcdY1cBK1h/TkzVkyg2XU8N2EYW4X+DX0GU?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(921011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bjVjZHV3aldqYXJtYk43d0wrdFMwOUFrdWtEem80STBEaEJhMU5WMkVNRVVZ?=
- =?utf-8?B?cThFTFB3SC9OcGJyeFp2ZTJjdmRTR3dsNFFkbklJYnQrSU4xTHk1N1FmRjVC?=
- =?utf-8?B?c3Vma0lTbnI3am82YTdmc1VkTW5GRmVhWHhEanc0b0xaYzNlZ1BYZ1docHNE?=
- =?utf-8?B?VG9sRURZOFRkNloybEw1bW5Mc2RKMjh5L3pNbm1xdHMra0hlRGdtU3QyZ0kr?=
- =?utf-8?B?bng3aW9UKzdhYnFra0I2MjFDYTExWTZXMktMS0dCUHBqcW0yelQzcXNDNFZL?=
- =?utf-8?B?VnRrT0M4MFE4N3E0dUJVWWJhT1g4bCtYcC9aSWJUaXlJMHlxODljNUFYaDRU?=
- =?utf-8?B?NTFQZmNEdTVDVVR6TGJlaHdSR1MxWjZSTWQxVXNrNW5LWnBlS3duN1FZbWF6?=
- =?utf-8?B?enI1b0U4YWhoWVk3OTdVRGdXMFZ0d2tXRnBxSGlCQS9Hc0VVYWdBM2hMcTV6?=
- =?utf-8?B?RzkrRG1nazRKU3YvdFNkajI0Mmw1UlIxS1M0SG5EMnQyQzdLYmdnQnBwM1hF?=
- =?utf-8?B?MDN0SWJRNmh6Zm1SeTU1S1lXY0hxVVB2aklGN3k0TFZSL2JRMXIyU2dVaVNR?=
- =?utf-8?B?UlRRSFkzOU1lVGJXcXJicVRRbnhkUjArNkVNYks3RDQvSVRRR3FMemsyZDRZ?=
- =?utf-8?B?Q1BwbHQ1VW1kS1VyUTIyTXdtdFRNeU1qS2E5L1AyTDE2NHR5aFFPL0tjUkdu?=
- =?utf-8?B?TTVybU83eThPcGRxVGJ1L29PaVJFT3JSNjVlNGwzNm9udmxUVlpDcEVzZ3ht?=
- =?utf-8?B?Qll5NVFNNHFXazNXYjMrWTJCY1dKbUpTZ04wRU13Qi85MG9wb2NSQXhXWHdD?=
- =?utf-8?B?SDljaGRQVFIvMmllQld2OUZCRjJ2clpFK2RhZXlWUlVPbmNVY3YvSUM0dC9Y?=
- =?utf-8?B?L2JGYXVWV1FGMCtBWldJQ1FKc1YrZm1uQXlldnpPaXhjTndneVVmdkFDVm5r?=
- =?utf-8?B?eWkxbkMzcG1HaG5LV2xmSDE0S3dEQUMzckt3RU5zcm1vQm5nN1JNanVBSDFL?=
- =?utf-8?B?MnlYWGpOWFlpOXF4TUNaUS83QXUxMjE5NHhaOXJmcExKeFFoUncvcFdmYVg0?=
- =?utf-8?B?L1ZacHpockZ6VW5JY3lOb25rWVhmQ2FRS1NSVXRSV3dhY2pIbmtLWVlua1gx?=
- =?utf-8?B?YUhMNTNtaWZ2WEdEdzVXRUpkZXBkenM2RTFZcXk5NTdKNVcxek9xUWRCRVkv?=
- =?utf-8?B?ekhUL283VkpCSEgwajVnODJCejJTZDcvRTJDRUtuOWJFYUFWejYvMTQ1eXZa?=
- =?utf-8?B?QnE4WXRNT1BTcE0zRFdXV0lFbUlGS1pkTERCMGowcG5kVTBQd2dCWEt4d1JG?=
- =?utf-8?B?V3ovVDBkM1pkWlV0UnAvOHRscVhXVDZHTTFCZ05IQzF0dFZDZ2J6b2dLT28w?=
- =?utf-8?B?ajRORnJ4dm5vQ0tEREdVR2QvQWJtNnE1aFcxUzVka09qSWthWnN1YkVqZUUr?=
- =?utf-8?B?UTJYRE1ZS3lFNXpWUzJNSnVPT0ZQZ2pQTFM0Qlhzc2xNRmxid3pic1VhSWpr?=
- =?utf-8?B?bDI1RUcrRi9ZWDZUSlFSbXpVYVJod1VGMCtDbmU3U1pJZ3huL1FrUWN4TFpS?=
- =?utf-8?B?Z1A4U3N6YTcwWUlzUGlFYytvNWcxdWVMb1kreVdzakR1VWl4YVZOY0RTcUU2?=
- =?utf-8?B?OWd3L0pGd2VTVzhrUXhPZ1NreG44K1hKVlRETm1IVU54K202aEw1Tysza2p3?=
- =?utf-8?B?LzQzRUdOZWw1QmR6ZWZqZ2xHSHBwT0pNbHZJa2IvaC9LN2pvb1A2QzNlSS9I?=
- =?utf-8?B?S25URVdNdW1ua3lmNzNtVnhVb2d0ZDZaVnJJWmFnYytjQWdadUdZUnByWlpS?=
- =?utf-8?B?WWV3MzBuYzhxYnFoT0RjUEROVC8vOTJpcEFwek4xTWd2LzhoNFpSam1EN2N0?=
- =?utf-8?B?dldwTEVHWUVlOUNQNWZ3UXlJcEFkMktlT3J2T0V1TFZoTnFkcXMxRll2dVpu?=
- =?utf-8?B?TE8xU0F2SWhMUFpwMXhNcExLWGRGbHN6MzFYWDJJNzlDWU0zZHRrdmRmTHNt?=
- =?utf-8?B?TWtRWFNrdnNvNUtuWkI2dzJWYWd2UTNjQzFTUWREa2xRUUNVUk1QRGs5TWhD?=
- =?utf-8?B?ZCtMVFNpQm9zNzF4aXpvTDBxNVVwbTZnRW5scGpwaFZEbUhmRmRWUVR6bkRP?=
- =?utf-8?B?bFI4SWJ6dEw2YmFRT1ZqcW9Oc0prSWdCWS9SNDFnSG81WEVOTVNVVCsyUHI2?=
- =?utf-8?B?QXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8b5889b-ba5f-41db-2eef-08dc66484b33
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 23:26:26.6324
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FVKBk5MlM/rSx3pktmbOt8TGHcf/6lGpB/sRci+jv1r8u0Zny7SyXIMWzN/nDbnMH82k5gpf8Mb8GOeLk4IulMiGdjCfoOkq59818SM7RHE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7908
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240418142701.1493091-2-cleger@rivosinc.com>
 
-Hi Zide,
+On Thu, Apr 18, 2024 at 04:26:40PM +0200, Clément Léger wrote:
+>Add support for FWFT extension in KVM
+>
+>Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>---
+> arch/riscv/include/asm/kvm_host.h          |   5 +
+> arch/riscv/include/asm/kvm_vcpu_sbi.h      |   1 +
+> arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  37 ++++++
+> arch/riscv/include/uapi/asm/kvm.h          |   1 +
+> arch/riscv/kvm/Makefile                    |   1 +
+> arch/riscv/kvm/vcpu.c                      |   5 +
+> arch/riscv/kvm/vcpu_sbi.c                  |   4 +
+> arch/riscv/kvm/vcpu_sbi_fwft.c             | 136 +++++++++++++++++++++
+> 8 files changed, 190 insertions(+)
+> create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+> create mode 100644 arch/riscv/kvm/vcpu_sbi_fwft.c
+>
+>diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+>index 484d04a92fa6..be60aaa07f57 100644
+>--- a/arch/riscv/include/asm/kvm_host.h
+>+++ b/arch/riscv/include/asm/kvm_host.h
+>@@ -19,6 +19,7 @@
+> #include <asm/kvm_vcpu_fp.h>
+> #include <asm/kvm_vcpu_insn.h>
+> #include <asm/kvm_vcpu_sbi.h>
+>+#include <asm/kvm_vcpu_sbi_fwft.h>
+> #include <asm/kvm_vcpu_timer.h>
+> #include <asm/kvm_vcpu_pmu.h>
+>
+>@@ -169,6 +170,7 @@ struct kvm_vcpu_csr {
+> struct kvm_vcpu_config {
+> 	u64 henvcfg;
+> 	u64 hstateen0;
+>+	u64 hedeleg;
+> };
+>
+> struct kvm_vcpu_smstateen_csr {
+>@@ -261,6 +263,9 @@ struct kvm_vcpu_arch {
+> 	/* Performance monitoring context */
+> 	struct kvm_pmu pmu_context;
+>
+>+	/* Firmware feature SBI extension context */
+>+	struct kvm_sbi_fwft fwft_context;
+>+
+> 	/* 'static' configurations which are set only once */
+> 	struct kvm_vcpu_config cfg;
+>
+>diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>index b96705258cf9..3a33bbacc233 100644
+>--- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>+++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+>@@ -86,6 +86,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_srst;
+> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
+> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_dbcn;
+> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_sta;
+>+extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_fwft;
+> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_experimental;
+> extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_vendor;
+>
+>diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>new file mode 100644
+>index 000000000000..7dc1b80c7e6c
+>--- /dev/null
+>+++ b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>@@ -0,0 +1,37 @@
+>+/* SPDX-License-Identifier: GPL-2.0-only */
+>+/*
+>+ * Copyright (c) 2023 Rivos Inc
+>+ *
+>+ * Authors:
+>+ *     Atish Patra <atishp@rivosinc.com>
 
-On 4/26/2024 4:06 PM, Chen, Zide wrote:
-> 
-> 
-> On 4/25/2024 3:07 PM, Reinette Chatre wrote:
->> diff --git a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
->> new file mode 100644
->> index 000000000000..5100b28228af
->> --- /dev/null
->> +++ b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
->> @@ -0,0 +1,166 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Test configure of APIC bus frequency.
->> + *
->> + * Copyright (c) 2024 Intel Corporation
->> + *
->> + * To verify if the APIC bus frequency can be configured this test starts
-> 
-> Nit: some typos here?
+nit: probably need to fix Copyright year and Authors here :-)
+Same in all new files being introduced.
 
-Apologies but this is not obvious to me. Could you please help
-by pointing out all those typos to me?
+>+ */
+>+
+>+#ifndef __KVM_VCPU_RISCV_FWFT_H
+>+#define __KVM_VCPU_RISCV_FWFT_H
+>+
+>+#include <asm/sbi.h>
+>+
+>+#define KVM_SBI_FWFT_FEATURE_COUNT	1
+>+
+>+static int kvm_sbi_fwft_set(struct kvm_vcpu *vcpu,
+>+			    enum sbi_fwft_feature_t feature,
+>+			    unsigned long value, unsigned long flags)
+>+{
+>+	struct kvm_sbi_fwft_config *conf = kvm_sbi_fwft_get_config(vcpu,
+>+								   feature);
+>+	if (!conf)
+>+		return SBI_ERR_DENIED;
 
-> 
->> +int main(int argc, char *argv[])
->> +{
->> +	struct kvm_vcpu *vcpu;
->> +	struct kvm_vm *vm;
->> +
->> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_APIC_BUS_CYCLES_NS));
->> +
->> +	vm = __vm_create(VM_SHAPE_DEFAULT, 1, 0);
-> 
-> Use vm_create() instead?
+Curious,
+Why denied and not something like NOT_SUPPORTED NOT_AVAILABLE here?
 
-Sure. This is easier on the eye while generating exactly the same code.
-
-diff --git a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-index 5100b28228af..6ed253875971 100644
---- a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
-@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_APIC_BUS_CYCLES_NS));
- 
--	vm = __vm_create(VM_SHAPE_DEFAULT, 1, 0);
-+	vm = vm_create(1);
- 	vm_ioctl(vm, KVM_SET_TSC_KHZ, (void *)(TSC_HZ / 1000));
- 	/*
- 	 * KVM_CAP_X86_APIC_BUS_CYCLES_NS expects APIC bus clock rate in
-
-
-Reinette
+>+
+>+	if ((flags & ~SBI_FWFT_SET_FLAG_LOCK) != 0)
+>+		return SBI_ERR_INVALID_PARAM;
+>+
+>+	if (conf->flags & SBI_FWFT_SET_FLAG_LOCK)
+>+		return SBI_ERR_DENIED;
+>+
+>+	conf->flags = flags;
+>+
+>+	return conf->feature->set(vcpu, conf, value);
+>+}
+>+
 
