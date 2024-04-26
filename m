@@ -1,894 +1,381 @@
-Return-Path: <kvm+bounces-16024-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16025-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 563CE8B30BA
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 08:50:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D6DD8B30EA
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 08:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BCB52872B7
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 06:50:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54A46285FE1
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 06:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B9D13A88A;
-	Fri, 26 Apr 2024 06:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D833113AD25;
+	Fri, 26 Apr 2024 06:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ob6MlWde"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="a3FmnFB4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FB117C8B;
-	Fri, 26 Apr 2024 06:50:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714114221; cv=none; b=JZv9MZHjjjV6pHDlqIhTzILGmJJoLXy81R3Yc8nWk6w+5pZy7oTAuvq7ZStgwT4ErmUJwZJRsN2QOtMcXexk0uhfENG0bRp4JykkeNTRdF8XmCopNFnhOGXdywkcLd3U8YtSsK0jVAejiyMjDlonDOPDxV06RjyMWZ8CYQY9jGE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714114221; c=relaxed/simple;
-	bh=VSOrC4tr7h1+oQf1/uPoxZ2kN8jqKAXNTbP7qAvffoM=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=FLCmsY8bJ69P3lTP4abSrggXft+0pjZmK8hNSFU7JNCsdhYSRloFKPno0ZtKafjr3CpSPxEmTZsptTjhH20HLLdfnBM2lHuLjGTRj2RNc/LCSpt01+mozah8aARLcAkXq8e+YF/D8I9zEqTs3qLkBT7jxDZ1PW4M+5yXesXSt+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ob6MlWde; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405C6567F;
+	Fri, 26 Apr 2024 06:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714114727; cv=fail; b=FEcqqalwnaWL4m6yMDE9DRpH0l7J6UsZUCjSk6mcjnKqb2u95F572XFREjFPGrDQ7ayG1HcurF0RzX95x9qSs9e7z98RCys1KBRE/purwS0BIhNnKiFEc+FqMNJlk5A18vS7rCNHKgqlxSSZb1q7XYdGfLt211n/QadGR5AErrc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714114727; c=relaxed/simple;
+	bh=+upyL3YbN/uj6mlUjGvgtdwvYgO/8k6boH1DBmHJ2M0=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=q5sV4g9G7GCowh5UGlC9aVB2n96Bt3nNF2Drq9SLVrUKxmAufW6xVYspplMqHwHCmD9dsa2m1dLYcmu2SywnLmonqSCQC7RugkPaR7Y1TafmFMkqLDghRtKERLdN94+QW6HxBKCVUvk1c8deIUSdLFa/BL3zo8OQPxCidOPD45w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=a3FmnFB4; arc=fail smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714114218; x=1745650218;
-  h=from:to:cc:subject:date:message-id;
-  bh=VSOrC4tr7h1+oQf1/uPoxZ2kN8jqKAXNTbP7qAvffoM=;
-  b=Ob6MlWdeTg/LtSeLPubtnZ1NjDWrw93LyIdtB+lCVufVNpx5HZp6QcJh
-   Y63XnOdJGnTA+csNTA9udrJ06YSUzkTdGznBMQJq5rDvfMYgbFVn9VheX
-   arfwjywaPqARIxAH+VAZ9XZ6xlibYMagJsHYi0L9N9kivTYjpaMjzk+9C
-   dam/M3HH6r1JafiAOF3XYO9mdqkOnbA9kfxUTiBCYmBFCA+QdL/huiX+4
-   8dpU/Lq04pKI+f4oOMa8CkEVuMDNpt+UCLwAsIFws3CAmPBEiLlJJkKaU
-   ZNC5KPkWJdojiT8m6ig+zZPeeYZNwqeMTlDTyMNVxY3KhWaZ8amomxcgV
-   g==;
-X-CSE-ConnectionGUID: /6QwCYqVR5i1sLx+Kd2nNg==
-X-CSE-MsgGUID: 3YOv2puoSoS1XxYYR5sMrg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="9693202"
+  t=1714114725; x=1745650725;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=+upyL3YbN/uj6mlUjGvgtdwvYgO/8k6boH1DBmHJ2M0=;
+  b=a3FmnFB4EqkldWd1mMXciu3WbqX5QBZYSwF86EOb9sbNdY8rVyBw/l1Y
+   RC0Q/xa+rLBX3cvSSd3YCfH5WxxWzMzchWJd+NhXl71wInaT5Bhf+hwVS
+   8Qx7gOLUb2DRNQtfbLAdU4i9xsOdmfIfY3r+XqJ6JMUiuct7tKehWksoA
+   64vhCA57JASCNpNympP3adMMw/U3l8f23q+SXXF0QdyMUUEt/tZs/fs3h
+   m54udgRcS1wJ7MAy1LhOdnpBtZ4YYLvstF+I1oyRpXfMuFph3nnA3lIz2
+   Dx/PvUvtAF1KgF9gR8g7OSpoxLNSbDLlDChcxzexlGPLn2eeNMAbmyzqb
+   w==;
+X-CSE-ConnectionGUID: 7xlK969ERtqTecKVSJmMpg==
+X-CSE-MsgGUID: RrceLipyStuoxkIG5b9lNw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="20453920"
 X-IronPort-AV: E=Sophos;i="6.07,231,1708416000"; 
-   d="scan'208";a="9693202"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 23:50:17 -0700
-X-CSE-ConnectionGUID: T0ey5HgHSlKpT5CsUJK6ZQ==
-X-CSE-MsgGUID: NXSc3eyAReC2perwcWSP+g==
+   d="scan'208";a="20453920"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 23:58:44 -0700
+X-CSE-ConnectionGUID: VMdvEE1lQTul1Db2rNWhtA==
+X-CSE-MsgGUID: RuNXjP1aRf2iVVA39Mr17A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,231,1708416000"; 
-   d="scan'208";a="29774547"
-Received: from qat-server-archercity1.sh.intel.com ([10.67.111.115])
-  by fmviesa005.fm.intel.com with ESMTP; 25 Apr 2024 23:50:14 -0700
-From: Xin Zeng <xin.zeng@intel.com>
-To: herbert@gondor.apana.org.au,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com
-Cc: linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org,
-	qat-linux@intel.com,
-	Xin Zeng <xin.zeng@intel.com>,
-	Yahui Cao <yahui.cao@intel.com>
-Subject: [PATCH v7] vfio/qat: Add vfio_pci driver for Intel QAT SR-IOV VF devices
-Date: Fri, 26 Apr 2024 14:40:51 +0800
-Message-Id: <20240426064051.2859652-1-xin.zeng@intel.com>
-X-Mailer: git-send-email 2.18.2
+   d="scan'208";a="25746430"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Apr 2024 23:58:44 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 23:58:43 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 25 Apr 2024 23:58:43 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 25 Apr 2024 23:58:43 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 25 Apr 2024 23:58:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FzviK5ewKcvmkzyJrHIO9lY3+Ax4rHdezuq67pd3sOOJ94++/ntzpxGXx+rQbT6bwNKyTpEJ093uLnsETfgSJexrjKkzI4nhHOinLvFGO7rYeyfeHtc/zdhDGCMRjyw/w45zAq3vVbVYQY74Yb75L9E5BNv/kSaxZgVTmHPxiIxXJataHWmdam2UxRNZwUjbac7r9Nd6UdS9HccaOFFODRgQlCgu3oZJ0QOtsX4vqmBnguoNxtReZ+rsy3yr7X7cZ4clC7uF6MUd2M0j2rjWt4DG8AHJ4NnrTCrBg7K4OgbadX+9oeFdXZa0xZiu7IG3Bn1Gtkm0EcnkEYrFk0iTiA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vKmXEq6UXPPNMs9N5mnqdj1wq9UCJUkCUxZ+qyAhhZU=;
+ b=eW7Tq3v+3zMHqSpQTuEwjFTPyJmoYpYQKQaNEYgl2A2SV8h1kuKMwmAredY3s+Z9V1+T1DkCP1uSWFzM7ZbKpdar+8H56yd3fX6s/zQ+5/VdWOgZSUHVvFZNryg6MBty6ZJyTnD9/MHvf5Byxbq6XRbfv+UlYBlOvRQORn8LW9wSWsq5YPafRiLJiMCc00zJGq2RDC91f0CZ6uHtyjkij7/ePKKVagRQqfhp454qSnM0bLdfu3FB9+BKoXGqq2p/SJBez6h8f5VawGBAILwRcN23nn5RMuIjfxitD1yN/wOqBewcqvDoJDfm68sY5AciV09gxMBPKOblhDdEzBsdzw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
+ by DM6PR11MB4628.namprd11.prod.outlook.com (2603:10b6:5:28f::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.22; Fri, 26 Apr
+ 2024 06:58:39 +0000
+Received: from PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::3e4d:bb33:667c:ecff]) by PH0PR11MB4965.namprd11.prod.outlook.com
+ ([fe80::3e4d:bb33:667c:ecff%5]) with mapi id 15.20.7519.021; Fri, 26 Apr 2024
+ 06:58:39 +0000
+Message-ID: <ed625666-7934-4a7e-9b6c-f434ee0ae094@intel.com>
+Date: Fri, 26 Apr 2024 14:58:30 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 05/10] KVM: x86: Rename get_msr_feature() APIs to
+ get_feature_msr()
+To: Sean Christopherson <seanjc@google.com>
+CC: Paolo Bonzini <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>
+References: <20240425181422.3250947-1-seanjc@google.com>
+ <20240425181422.3250947-6-seanjc@google.com>
+Content-Language: en-US
+From: "Yang, Weijiang" <weijiang.yang@intel.com>
+In-Reply-To: <20240425181422.3250947-6-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SI2PR01CA0013.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:191::9) To PH0PR11MB4965.namprd11.prod.outlook.com
+ (2603:10b6:510:34::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|DM6PR11MB4628:EE_
+X-MS-Office365-Filtering-Correlation-Id: e01f0a49-006f-4dfa-838e-08dc65be4d32
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|1800799015;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?TDdFSXF5RmUrTzZvLzBXUFluVTZuMGQxMm5mdjltRWFYaytNVEc2alZsbWhu?=
+ =?utf-8?B?Qlo4Mm5pMThIRndZVXMrb1pkOTZ3ZElLKzA1R1VNVzVzQWFNREMyc1VUZTdy?=
+ =?utf-8?B?OVJFODhtZDR1MmZpR29CUDR1UXJBU2hldHpVMGdIQ3QrMDVVdC9yRFhTNjZ0?=
+ =?utf-8?B?SE9wQ1ZzUnBBRU5iS0dPMW5aSHRCK0tCSGRxQ1pmSWVHVnJhVE12dTdWZCtk?=
+ =?utf-8?B?akl5ZzBHY05uN2JyMHJic1E4M1FWQTE4b2RnTG4rSGtRdTcyc3ZodXUzSTht?=
+ =?utf-8?B?LzhvMzkyUGhzbm9kaDVMNmlTeUtBV2R1TlUzSXpKeThmOGF6ZGZYOVF5U0Vu?=
+ =?utf-8?B?elM4VmQ5aFpEME5SSEUrVHVHRGFiRHVrT3Z1YmxMNnR4Q3FzU0doaUNLRzdP?=
+ =?utf-8?B?VldYaWl6Ulc5Q1c3YkNKY0hJVzc1K2JSUU0yanEvNGl5MFUzb2lvVmd5YlNF?=
+ =?utf-8?B?U25uNnUwYVprek03UmpSL1RtREg5bG5tOWZXdUVWb2xSR1NLTEpERDF0bmto?=
+ =?utf-8?B?TExySTFJOWdYQmlyZkwzVjQ3clQ3NUxXQnVIWko5cnZsK1k4MkRTZ0NXU1V1?=
+ =?utf-8?B?SEFBek4zTGZwclM4WmVBc1AwandRZU5mUDZHazdNaWwxdVp4T3QvYW03U3RV?=
+ =?utf-8?B?LzN3R2RoVFJ1VGtXNzNPQVpHWlNSSy9VcEo1OUo4WnMxMWhCd0hCd2J1SC9K?=
+ =?utf-8?B?blhDUHVucklXcnVsRTNGS08wVmd0Q0JERHBVNWUxKzFrZ0xXWlRVRndHRGFv?=
+ =?utf-8?B?azNCaVlrOEVzSk5vZXJaRE9aSjZXVVdjQXlqY0I3MHEwYTJ2eWFQZFRWbktn?=
+ =?utf-8?B?QVl2ekZjd2ZMYkRLRGMrK1ZWRGk3SjFFTlNwMUpsL2R5bHVUMzFNZFFaSVg5?=
+ =?utf-8?B?UjRHbzZkUHpSNStVTFhYRnhRSy9QQ1BSeFpsRjA4cU1TUTRPL3laZllsVVdt?=
+ =?utf-8?B?Z2VhTFBnTnQreWlqUHNVSXlxVFU5RmpURUFPeFlWdXdTS2dWYnpKYnVvekp6?=
+ =?utf-8?B?OEdjOEZVUGVQcE1mUTZZZDMyT2JQVEwrcmMzcm9FYTBlOVpYK3JDRFhXd29S?=
+ =?utf-8?B?amhBcTRSNkZUU3JEeDJlV0U0c1VQd3RrMUVNd1Fjb0grVWVQaHFUUEsycW5k?=
+ =?utf-8?B?MnlCYkEzMXBDdWgxbmgrQ0FnOTlUOEQxTGNlTWt5U2JRRFhCU3ZEaDhLbUE3?=
+ =?utf-8?B?SERXZ0JIMDVvOVJOam1VWFZnR3BZeXdpcWlMWm45V054MWozUTdCTXFlenZP?=
+ =?utf-8?B?UkxzWk1tRFY5MTJZQUFQRUx6WHRQdUo4OEJ5VVJMdyticW1oeWErWEl0eThK?=
+ =?utf-8?B?VklhbW9DL0R5YkI3QndZVXo4NnFUcjVYdnN4SVdSeE5PMmdEMGlMYkVsVlpV?=
+ =?utf-8?B?dzZUVjJXdjFUU1FQSzJyTEZQcVBOd2tjWVZCTmFjbUs0ekZSaE9rTmJXaXdL?=
+ =?utf-8?B?ckpHV01xMGZYaGNWaTB0NThDa3RzVXdJUjJJVkhIVDR5aU9uS0R2Tlc4Zzgy?=
+ =?utf-8?B?cnFhSWVERGZDVDlVbFZZQ0FiZ0ZmVys4RkFYRHNmcjBiS2F0K09PaHk2c1RC?=
+ =?utf-8?B?NGJyRXk4RUszcXF1S1U2TlBTL2xpSXdqeThVTnh5aVNiQkpCVFVZQkM4dURI?=
+ =?utf-8?B?Q1d3SmVLOVBhSkhUVFN1U1h1Vms4SHE1Vjlpd0x3d1ZBUkI4ZEgrcFdyV3JZ?=
+ =?utf-8?B?NjZlWVA1TzdINlRTbXZyNGt3Z0ZIdkkydGpGc2IrYjVrbkR5R1hUOC93PT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WnFEMHZTVGx1QTNhbS9DMDVCYVRCYmUzNm5KakR6M2lFZUt5UE1KazFiNWNE?=
+ =?utf-8?B?N2JNb2tqL0h3MXFhMlFwVG5IZ21VNi9VWDd0MnN2Z2Q5ZUhHenFmTkhXeEVk?=
+ =?utf-8?B?NFdkcThqS3FoNm9EanlkSEd4TytRVlhUMndHNHpPMDBUWVprcjBFc1lSL3ZR?=
+ =?utf-8?B?TDRPeUpaWU1lbjVSWXc1and5TjN0NnJQVzBhYms5cXRWWm03NGtaNy9LVXVM?=
+ =?utf-8?B?Vm9iMVBvT0xWN1FKL2JSYXdQOW82M2o2aGVOSDVIb0RrSXdjellha2Rtd1hu?=
+ =?utf-8?B?bjRFNnh2TysrTFJtRi93akFBRGo2Mk5kN013WDdOajR0ZHVGRnRETkZGTkhi?=
+ =?utf-8?B?M2laYnhQRU5uYzNNUnVnOW05UmtzUjkyUGdPSHAwaExpeElkSVh6blY1dkty?=
+ =?utf-8?B?cjBWTitzNEIxeVYzSncvbTNkeG5Ec05zbmdnbk51OFpWSUgxQ250dERDOUM5?=
+ =?utf-8?B?TzYyNjVCMjJDbHdQSTJQTnpxTjVGT3BJYjVoL2lNTmNDbk5Fazg0UzFNNURJ?=
+ =?utf-8?B?MEJlVUh4TVFyb3g1c1NyQkE5aGF3ZEZCQjRhbkNSaHJMSXlIWUdrUTVYQWhX?=
+ =?utf-8?B?QkdyMENKbnVTcjd6bEp1K2VqU29KWW40eENvRk04UDQ0ZGd4S21yYXBpNGQv?=
+ =?utf-8?B?NWsxMFUwakpacXdSMEQxVnY5NVV6Rk0rQ0tydjQrUGkrazVoVTgwT0dTUk9E?=
+ =?utf-8?B?enZaUzVtWHRIRUlSU2lWMnlvd2hQT25vd1p0L2VxTE5TRnRjQ2JJaFJudUxN?=
+ =?utf-8?B?SllnQjVScDN1c0VZSmMvQWQ3R2JJaGRxdGlyTnRTSEMySHRHMEtPNWtLTmF6?=
+ =?utf-8?B?ODFCb3ZwTE1oc3puT2R4WTB3VzFFSVpNTHJXWVhDUjUwVldCNitFa0QrdUlI?=
+ =?utf-8?B?d3E4R0N5U1JlL1lZYytIMDdvMEIyWnBIdEsyN0tJVXJUVjlTVVFLQjRneG1p?=
+ =?utf-8?B?Y0g3SFdlRE82RUsyTnVyK000UWtCNENZVkNWMWc1Skg1dC9qZ2VNU1gwNkRk?=
+ =?utf-8?B?eGY5VytFVm80QTdsVUFCQlQyQmk1eEpjUFptOXBhWGc1bVJ6Sk95OGF4WThs?=
+ =?utf-8?B?cXFmZ2RqcEdzeHlIN0U1YXZZZHdlOVdlaW15T2JPSTBXMldRM0ROeXdHYmlX?=
+ =?utf-8?B?MVRjNC9TQ2JHVlFmVklHQ0I3U0cwWTNHWC9Id0VHVEo1Qk9TdmJPYU5QWXNQ?=
+ =?utf-8?B?Y3BYaFRnRmFwNlczZWZTL0l3bmoxUElSaXB4VWpWMVFlV3ZkVjFWNGNISXVS?=
+ =?utf-8?B?ZkdrQUgyS1dIc0VLeUJpRjBITzhvdmtMbW1mbkVvK0Qwb2l6VTNFMHJuMDZY?=
+ =?utf-8?B?aHVJWTIxTUMwcmtobHJnUm9JanpUSDZWZkFQbmhRQVZ0VFlBZUxWVFRkcys0?=
+ =?utf-8?B?a2NBam9PekowVElpanRGbmlIUjlTVzV0dUw0cTBHYnFTaHBLQWV5MTBRcDZS?=
+ =?utf-8?B?R1ZxMjliVll4WnZtdWdjYVFmWERlVFNKT2U4WTRrMlNkdzRhQmZieUozQ0M2?=
+ =?utf-8?B?SkVWRlE2OUVHT25YYUMzZWQ4bnFlREIwVnJZVTlNZFgxYzl3V2t1MEpCS1lv?=
+ =?utf-8?B?R0Nnc0JYSFN5Uk1ENlY3WjdzdFVVaGhXbmNRR3dybjJHUElMSkxONVRDd1dh?=
+ =?utf-8?B?N0RlTTh0VjI2TEI2aUVCQWt5QkJ2d2ZCOGt0cHBOV3ZYbGlNMWxlK3JDL0Ja?=
+ =?utf-8?B?QXBOcHVoNlRaT1hTVkpsOHgzK2Q5TkZ3NnFNWCtNTm11dnhlUTVyVEJLUDlG?=
+ =?utf-8?B?aXFPWGQ1VXhBaXFiMjZiaXF5Uityb0YydnFFa1ViOGdBL0p5Wk5RVy9HT1pR?=
+ =?utf-8?B?WkNFTnMvWlY3aTVxTHNtR0k5QXc3WEg4SGxTaUE1ZktyRVdObGRqR2s4V01l?=
+ =?utf-8?B?Ymp1NW5WNU9jQlhqNjYvQTJhTzNqQUVQdHYybmpFNTRIcXFPaHR1N1hrUmdZ?=
+ =?utf-8?B?OEEwVUN1QS9GZUc0bllxSnkreUVQMzAyeGpMS0dVMHdBU0YwTjE0T0VMNzdK?=
+ =?utf-8?B?bGNUSFh3dmN6T2NpY1ZLd3VPS2crZ3R4WHEwZkVGRWd6c3ZUV091QlFJeEFW?=
+ =?utf-8?B?SnJQMWhEMVhrSDE5MEZjOEpvNG80SG5MREVtZHpNOHFMNWEvdU1TUndIV0Jl?=
+ =?utf-8?B?NVlzRkV5L1VBbSs3QmxlcHc4V1ZURzMxWnkrVlNyNHdaWVJnV3pXRFZ3Nml6?=
+ =?utf-8?B?K2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e01f0a49-006f-4dfa-838e-08dc65be4d32
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 06:58:39.6670
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HKfL/Zg3P9BY6QJaXrpZU7vupIBBTKDbchLeIAk4laJKcGOs4WaPS2ZBL142+hiqqmOWaZX4dS4MjoO+6BOASA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4628
+X-OriginatorOrg: intel.com
 
-Add vfio pci variant driver for Intel QAT SR-IOV VF devices. This driver
-registers to the vfio subsystem through the interfaces exposed by the
-susbsystem. It follows the live migration protocol v2 defined in
-uapi/linux/vfio.h and interacts with Intel QAT PF driver through a set
-of interfaces defined in qat/qat_mig_dev.h to support live migration of
-Intel QAT VF devices.
+On 4/26/2024 2:14 AM, Sean Christopherson wrote:
+> Rename all APIs related to feature MSRs from get_feature_msr() to
 
-This version only covers migration for Intel QAT GEN4 VF devices.
-
-Co-developed-by: Yahui Cao <yahui.cao@intel.com>
-Signed-off-by: Yahui Cao <yahui.cao@intel.com>
-Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
----
-Changes in v7:
-- Move some device specific details from the commit message into driver
-  and add more comments around the P2P state handler (Alex)
-
-V6:
-https://lore.kernel.org/kvm/20240417143141.1909824-1-xin.zeng@intel.com
----
- MAINTAINERS                   |   8 +
- drivers/vfio/pci/Kconfig      |   2 +
- drivers/vfio/pci/Makefile     |   2 +
- drivers/vfio/pci/qat/Kconfig  |  12 +
- drivers/vfio/pci/qat/Makefile |   3 +
- drivers/vfio/pci/qat/main.c   | 702 ++++++++++++++++++++++++++++++++++
- 6 files changed, 729 insertions(+)
- create mode 100644 drivers/vfio/pci/qat/Kconfig
- create mode 100644 drivers/vfio/pci/qat/Makefile
- create mode 100644 drivers/vfio/pci/qat/main.c
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index aa3b947fb080..929cf84ff852 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23241,6 +23241,14 @@ L:	kvm@vger.kernel.org
- S:	Maintained
- F:	drivers/vfio/platform/
- 
-+VFIO QAT PCI DRIVER
-+M:	Xin Zeng <xin.zeng@intel.com>
-+M:	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-+L:	kvm@vger.kernel.org
-+L:	qat-linux@intel.com
-+S:	Supported
-+F:	drivers/vfio/pci/qat/
-+
- VFIO VIRTIO PCI DRIVER
- M:	Yishai Hadas <yishaih@nvidia.com>
- L:	kvm@vger.kernel.org
-diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-index 15821a2d77d2..bf50ffa10bde 100644
---- a/drivers/vfio/pci/Kconfig
-+++ b/drivers/vfio/pci/Kconfig
-@@ -69,4 +69,6 @@ source "drivers/vfio/pci/virtio/Kconfig"
- 
- source "drivers/vfio/pci/nvgrace-gpu/Kconfig"
- 
-+source "drivers/vfio/pci/qat/Kconfig"
-+
- endmenu
-diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-index ce7a61f1d912..cf00c0a7e55c 100644
---- a/drivers/vfio/pci/Makefile
-+++ b/drivers/vfio/pci/Makefile
-@@ -17,3 +17,5 @@ obj-$(CONFIG_PDS_VFIO_PCI) += pds/
- obj-$(CONFIG_VIRTIO_VFIO_PCI) += virtio/
- 
- obj-$(CONFIG_NVGRACE_GPU_VFIO_PCI) += nvgrace-gpu/
-+
-+obj-$(CONFIG_QAT_VFIO_PCI) += qat/
-diff --git a/drivers/vfio/pci/qat/Kconfig b/drivers/vfio/pci/qat/Kconfig
-new file mode 100644
-index 000000000000..bf52cfa4b595
---- /dev/null
-+++ b/drivers/vfio/pci/qat/Kconfig
-@@ -0,0 +1,12 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config QAT_VFIO_PCI
-+	tristate "VFIO support for QAT VF PCI devices"
-+	select VFIO_PCI_CORE
-+	depends on CRYPTO_DEV_QAT_4XXX
-+	help
-+	  This provides migration support for Intel(R) QAT Virtual Function
-+	  using the VFIO framework.
-+
-+	  To compile this as a module, choose M here: the module
-+	  will be called qat_vfio_pci. If you don't know what to do here,
-+	  say N.
-diff --git a/drivers/vfio/pci/qat/Makefile b/drivers/vfio/pci/qat/Makefile
-new file mode 100644
-index 000000000000..5fe5c4ec19d3
---- /dev/null
-+++ b/drivers/vfio/pci/qat/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_QAT_VFIO_PCI) += qat_vfio_pci.o
-+qat_vfio_pci-y := main.o
-diff --git a/drivers/vfio/pci/qat/main.c b/drivers/vfio/pci/qat/main.c
-new file mode 100644
-index 000000000000..e36740a282e7
---- /dev/null
-+++ b/drivers/vfio/pci/qat/main.c
-@@ -0,0 +1,702 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/* Copyright(c) 2024 Intel Corporation */
-+
-+#include <linux/anon_inodes.h>
-+#include <linux/container_of.h>
-+#include <linux/device.h>
-+#include <linux/file.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/pci.h>
-+#include <linux/sizes.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+#include <linux/vfio_pci_core.h>
-+#include <linux/qat/qat_mig_dev.h>
-+
-+/*
-+ * The migration data of each Intel QAT VF device is encapsulated into a
-+ * 4096 bytes block. The data consists of two parts.
-+ * The first is a pre-configured set of attributes of the VF being migrated,
-+ * which are only set when it is created. This can be migrated during pre-copy
-+ * stage and used for a device compatibility check.
-+ * The second is the VF state. This includes the required MMIO regions and
-+ * the shadow states maintained by the QAT PF driver. This part can only be
-+ * saved when the VF is fully quiesced and be migrated during stop-copy stage.
-+ * Both these 2 parts of data are saved in hierarchical structures including
-+ * a preamble section and several raw state sections.
-+ * When the pre-configured part of the migration data is fully retrieved from
-+ * user space, the preamble section are used to validate the correctness of
-+ * the data blocks and check the version compatibility. The raw state sections
-+ * are then used to do a device compatibility check.
-+ * When the device transits from RESUMING state, the VF states are extracted
-+ * from the raw state sections of the VF state part of the migration data and
-+ * then loaded into the device.
-+ */
-+
-+struct qat_vf_migration_file {
-+	struct file *filp;
-+	/* protects migration region context */
-+	struct mutex lock;
-+	bool disabled;
-+	struct qat_vf_core_device *qat_vdev;
-+	ssize_t filled_size;
-+};
-+
-+struct qat_vf_core_device {
-+	struct vfio_pci_core_device core_device;
-+	struct qat_mig_dev *mdev;
-+	/* protects migration state */
-+	struct mutex state_mutex;
-+	enum vfio_device_mig_state mig_state;
-+	struct qat_vf_migration_file *resuming_migf;
-+	struct qat_vf_migration_file *saving_migf;
-+};
-+
-+static int qat_vf_pci_open_device(struct vfio_device *core_vdev)
-+{
-+	struct qat_vf_core_device *qat_vdev =
-+		container_of(core_vdev, struct qat_vf_core_device,
-+			     core_device.vdev);
-+	struct vfio_pci_core_device *vdev = &qat_vdev->core_device;
-+	int ret;
-+
-+	ret = vfio_pci_core_enable(vdev);
-+	if (ret)
-+		return ret;
-+
-+	ret = qat_vfmig_open(qat_vdev->mdev);
-+	if (ret) {
-+		vfio_pci_core_disable(vdev);
-+		return ret;
-+	}
-+	qat_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+
-+	vfio_pci_core_finish_enable(vdev);
-+
-+	return 0;
-+}
-+
-+static void qat_vf_disable_fd(struct qat_vf_migration_file *migf)
-+{
-+	mutex_lock(&migf->lock);
-+	migf->disabled = true;
-+	migf->filp->f_pos = 0;
-+	migf->filled_size = 0;
-+	mutex_unlock(&migf->lock);
-+}
-+
-+static void qat_vf_disable_fds(struct qat_vf_core_device *qat_vdev)
-+{
-+	if (qat_vdev->resuming_migf) {
-+		qat_vf_disable_fd(qat_vdev->resuming_migf);
-+		fput(qat_vdev->resuming_migf->filp);
-+		qat_vdev->resuming_migf = NULL;
-+	}
-+
-+	if (qat_vdev->saving_migf) {
-+		qat_vf_disable_fd(qat_vdev->saving_migf);
-+		fput(qat_vdev->saving_migf->filp);
-+		qat_vdev->saving_migf = NULL;
-+	}
-+}
-+
-+static void qat_vf_pci_close_device(struct vfio_device *core_vdev)
-+{
-+	struct qat_vf_core_device *qat_vdev = container_of(core_vdev,
-+			struct qat_vf_core_device, core_device.vdev);
-+
-+	qat_vfmig_close(qat_vdev->mdev);
-+	qat_vf_disable_fds(qat_vdev);
-+	vfio_pci_core_close_device(core_vdev);
-+}
-+
-+static long qat_vf_precopy_ioctl(struct file *filp, unsigned int cmd,
-+				 unsigned long arg)
-+{
-+	struct qat_vf_migration_file *migf = filp->private_data;
-+	struct qat_vf_core_device *qat_vdev = migf->qat_vdev;
-+	struct qat_mig_dev *mig_dev = qat_vdev->mdev;
-+	struct vfio_precopy_info info;
-+	loff_t *pos = &filp->f_pos;
-+	unsigned long minsz;
-+	int ret = 0;
-+
-+	if (cmd != VFIO_MIG_GET_PRECOPY_INFO)
-+		return -ENOTTY;
-+
-+	minsz = offsetofend(struct vfio_precopy_info, dirty_bytes);
-+
-+	if (copy_from_user(&info, (void __user *)arg, minsz))
-+		return -EFAULT;
-+	if (info.argsz < minsz)
-+		return -EINVAL;
-+
-+	mutex_lock(&qat_vdev->state_mutex);
-+	if (qat_vdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY &&
-+	    qat_vdev->mig_state != VFIO_DEVICE_STATE_PRE_COPY_P2P) {
-+		mutex_unlock(&qat_vdev->state_mutex);
-+		return -EINVAL;
-+	}
-+
-+	mutex_lock(&migf->lock);
-+	if (migf->disabled) {
-+		ret = -ENODEV;
-+		goto out;
-+	}
-+
-+	if (*pos > mig_dev->setup_size) {
-+		ret = -EINVAL;
-+		goto out;
-+	}
-+
-+	info.dirty_bytes = 0;
-+	info.initial_bytes = mig_dev->setup_size - *pos;
-+
-+out:
-+	mutex_unlock(&migf->lock);
-+	mutex_unlock(&qat_vdev->state_mutex);
-+	if (ret)
-+		return ret;
-+	return copy_to_user((void __user *)arg, &info, minsz) ? -EFAULT : 0;
-+}
-+
-+static ssize_t qat_vf_save_read(struct file *filp, char __user *buf,
-+				size_t len, loff_t *pos)
-+{
-+	struct qat_vf_migration_file *migf = filp->private_data;
-+	struct qat_mig_dev *mig_dev = migf->qat_vdev->mdev;
-+	ssize_t done = 0;
-+	loff_t *offs;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+	offs = &filp->f_pos;
-+
-+	mutex_lock(&migf->lock);
-+	if (*offs > migf->filled_size || *offs < 0) {
-+		done = -EINVAL;
-+		goto out_unlock;
-+	}
-+
-+	if (migf->disabled) {
-+		done = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	len = min_t(size_t, migf->filled_size - *offs, len);
-+	if (len) {
-+		ret = copy_to_user(buf, mig_dev->state + *offs, len);
-+		if (ret) {
-+			done = -EFAULT;
-+			goto out_unlock;
-+		}
-+		*offs += len;
-+		done = len;
-+	}
-+
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static int qat_vf_release_file(struct inode *inode, struct file *filp)
-+{
-+	struct qat_vf_migration_file *migf = filp->private_data;
-+
-+	qat_vf_disable_fd(migf);
-+	mutex_destroy(&migf->lock);
-+	kfree(migf);
-+
-+	return 0;
-+}
-+
-+static const struct file_operations qat_vf_save_fops = {
-+	.owner = THIS_MODULE,
-+	.read = qat_vf_save_read,
-+	.unlocked_ioctl = qat_vf_precopy_ioctl,
-+	.compat_ioctl = compat_ptr_ioctl,
-+	.release = qat_vf_release_file,
-+	.llseek = no_llseek,
-+};
-+
-+static int qat_vf_save_state(struct qat_vf_core_device *qat_vdev,
-+			     struct qat_vf_migration_file *migf)
-+{
-+	int ret;
-+
-+	ret = qat_vfmig_save_state(qat_vdev->mdev);
-+	if (ret)
-+		return ret;
-+	migf->filled_size = qat_vdev->mdev->state_size;
-+
-+	return 0;
-+}
-+
-+static int qat_vf_save_setup(struct qat_vf_core_device *qat_vdev,
-+			     struct qat_vf_migration_file *migf)
-+{
-+	int ret;
-+
-+	ret = qat_vfmig_save_setup(qat_vdev->mdev);
-+	if (ret)
-+		return ret;
-+	migf->filled_size = qat_vdev->mdev->setup_size;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Allocate a file handler for user space and then save the migration data for
-+ * the device being migrated. If this is called in the pre-copy stage, save the
-+ * pre-configured device data. Otherwise, if this is called in the stop-copy
-+ * stage, save the device state. In both cases, update the data size which can
-+ * then be read from user space.
-+ */
-+static struct qat_vf_migration_file *
-+qat_vf_save_device_data(struct qat_vf_core_device *qat_vdev, bool pre_copy)
-+{
-+	struct qat_vf_migration_file *migf;
-+	int ret;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("qat_vf_mig", &qat_vf_save_fops,
-+					migf, O_RDONLY);
-+	ret = PTR_ERR_OR_ZERO(migf->filp);
-+	if (ret) {
-+		kfree(migf);
-+		return ERR_PTR(ret);
-+	}
-+
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+
-+	if (pre_copy)
-+		ret = qat_vf_save_setup(qat_vdev, migf);
-+	else
-+		ret = qat_vf_save_state(qat_vdev, migf);
-+	if (ret) {
-+		fput(migf->filp);
-+		return ERR_PTR(ret);
-+	}
-+
-+	migf->qat_vdev = qat_vdev;
-+
-+	return migf;
-+}
-+
-+static ssize_t qat_vf_resume_write(struct file *filp, const char __user *buf,
-+				   size_t len, loff_t *pos)
-+{
-+	struct qat_vf_migration_file *migf = filp->private_data;
-+	struct qat_mig_dev *mig_dev = migf->qat_vdev->mdev;
-+	loff_t end, *offs;
-+	ssize_t done = 0;
-+	int ret;
-+
-+	if (pos)
-+		return -ESPIPE;
-+	offs = &filp->f_pos;
-+
-+	if (*offs < 0 ||
-+	    check_add_overflow((loff_t)len, *offs, &end))
-+		return -EOVERFLOW;
-+
-+	if (end > mig_dev->state_size)
-+		return -ENOMEM;
-+
-+	mutex_lock(&migf->lock);
-+	if (migf->disabled) {
-+		done = -ENODEV;
-+		goto out_unlock;
-+	}
-+
-+	ret = copy_from_user(mig_dev->state + *offs, buf, len);
-+	if (ret) {
-+		done = -EFAULT;
-+		goto out_unlock;
-+	}
-+	*offs += len;
-+	migf->filled_size += len;
-+
-+	/*
-+	 * Load the pre-configured device data first to check if the target
-+	 * device is compatible with the source device.
-+	 */
-+	ret = qat_vfmig_load_setup(mig_dev, migf->filled_size);
-+	if (ret && ret != -EAGAIN) {
-+		done = ret;
-+		goto out_unlock;
-+	}
-+	done = len;
-+
-+out_unlock:
-+	mutex_unlock(&migf->lock);
-+	return done;
-+}
-+
-+static const struct file_operations qat_vf_resume_fops = {
-+	.owner = THIS_MODULE,
-+	.write = qat_vf_resume_write,
-+	.release = qat_vf_release_file,
-+	.llseek = no_llseek,
-+};
-+
-+static struct qat_vf_migration_file *
-+qat_vf_resume_device_data(struct qat_vf_core_device *qat_vdev)
-+{
-+	struct qat_vf_migration_file *migf;
-+	int ret;
-+
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	if (!migf)
-+		return ERR_PTR(-ENOMEM);
-+
-+	migf->filp = anon_inode_getfile("qat_vf_mig", &qat_vf_resume_fops, migf, O_WRONLY);
-+	ret = PTR_ERR_OR_ZERO(migf->filp);
-+	if (ret) {
-+		kfree(migf);
-+		return ERR_PTR(ret);
-+	}
-+
-+	migf->qat_vdev = qat_vdev;
-+	migf->filled_size = 0;
-+	stream_open(migf->filp->f_inode, migf->filp);
-+	mutex_init(&migf->lock);
-+
-+	return migf;
-+}
-+
-+static int qat_vf_load_device_data(struct qat_vf_core_device *qat_vdev)
-+{
-+	return qat_vfmig_load_state(qat_vdev->mdev);
-+}
-+
-+static struct file *qat_vf_pci_step_device_state(struct qat_vf_core_device *qat_vdev, u32 new)
-+{
-+	u32 cur = qat_vdev->mig_state;
-+	int ret;
-+
-+	/*
-+	 * As the device is not capable of just stopping P2P DMAs, suspend the
-+	 * device completely once any of the P2P states are reached.
-+	 * When it is suspended, all its MMIO registers can still be operated
-+	 * correctly, jobs submitted through ring are queued while no jobs are
-+	 * processed by the device. The MMIO states can be safely migrated to
-+	 * the target VF during stop-copy stage and restored correctly in the
-+	 * target VF. All queued jobs can be resumed then.
-+	 */
-+	if ((cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_RUNNING_P2P) ||
-+	    (cur == VFIO_DEVICE_STATE_PRE_COPY && new == VFIO_DEVICE_STATE_PRE_COPY_P2P)) {
-+		ret = qat_vfmig_suspend(qat_vdev->mdev);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		return NULL;
-+	}
-+
-+	if ((cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_RUNNING) ||
-+	    (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P && new == VFIO_DEVICE_STATE_PRE_COPY)) {
-+		qat_vfmig_resume(qat_vdev->mdev);
-+		return NULL;
-+	}
-+
-+	if ((cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_STOP) ||
-+	    (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RUNNING_P2P))
-+		return NULL;
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_STOP_COPY) {
-+		struct qat_vf_migration_file *migf;
-+
-+		migf = qat_vf_save_device_data(qat_vdev, false);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		qat_vdev->saving_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_STOP && new == VFIO_DEVICE_STATE_RESUMING) {
-+		struct qat_vf_migration_file *migf;
-+
-+		migf = qat_vf_resume_device_data(qat_vdev);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		qat_vdev->resuming_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if ((cur == VFIO_DEVICE_STATE_STOP_COPY && new == VFIO_DEVICE_STATE_STOP) ||
-+	    (cur == VFIO_DEVICE_STATE_PRE_COPY && new == VFIO_DEVICE_STATE_RUNNING) ||
-+	    (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P && new == VFIO_DEVICE_STATE_RUNNING_P2P)) {
-+		qat_vf_disable_fds(qat_vdev);
-+		return NULL;
-+	}
-+
-+	if ((cur == VFIO_DEVICE_STATE_RUNNING && new == VFIO_DEVICE_STATE_PRE_COPY) ||
-+	    (cur == VFIO_DEVICE_STATE_RUNNING_P2P && new == VFIO_DEVICE_STATE_PRE_COPY_P2P)) {
-+		struct qat_vf_migration_file *migf;
-+
-+		migf = qat_vf_save_device_data(qat_vdev, true);
-+		if (IS_ERR(migf))
-+			return ERR_CAST(migf);
-+		get_file(migf->filp);
-+		qat_vdev->saving_migf = migf;
-+		return migf->filp;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_PRE_COPY_P2P && new == VFIO_DEVICE_STATE_STOP_COPY) {
-+		struct qat_vf_migration_file *migf = qat_vdev->saving_migf;
-+
-+		if (!migf)
-+			return ERR_PTR(-EINVAL);
-+		ret = qat_vf_save_state(qat_vdev, migf);
-+		if (ret)
-+			return ERR_PTR(ret);
-+		return NULL;
-+	}
-+
-+	if (cur == VFIO_DEVICE_STATE_RESUMING && new == VFIO_DEVICE_STATE_STOP) {
-+		ret = qat_vf_load_device_data(qat_vdev);
-+		if (ret)
-+			return ERR_PTR(ret);
-+
-+		qat_vf_disable_fds(qat_vdev);
-+		return NULL;
-+	}
-+
-+	/* vfio_mig_get_next_state() does not use arcs other than the above */
-+	WARN_ON(true);
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+static void qat_vf_reset_done(struct qat_vf_core_device *qat_vdev)
-+{
-+	qat_vdev->mig_state = VFIO_DEVICE_STATE_RUNNING;
-+	qat_vfmig_reset(qat_vdev->mdev);
-+	qat_vf_disable_fds(qat_vdev);
-+}
-+
-+static struct file *qat_vf_pci_set_device_state(struct vfio_device *vdev,
-+						enum vfio_device_mig_state new_state)
-+{
-+	struct qat_vf_core_device *qat_vdev = container_of(vdev,
-+			struct qat_vf_core_device, core_device.vdev);
-+	enum vfio_device_mig_state next_state;
-+	struct file *res = NULL;
-+	int ret;
-+
-+	mutex_lock(&qat_vdev->state_mutex);
-+	while (new_state != qat_vdev->mig_state) {
-+		ret = vfio_mig_get_next_state(vdev, qat_vdev->mig_state,
-+					      new_state, &next_state);
-+		if (ret) {
-+			res = ERR_PTR(ret);
-+			break;
-+		}
-+		res = qat_vf_pci_step_device_state(qat_vdev, next_state);
-+		if (IS_ERR(res))
-+			break;
-+		qat_vdev->mig_state = next_state;
-+		if (WARN_ON(res && new_state != qat_vdev->mig_state)) {
-+			fput(res);
-+			res = ERR_PTR(-EINVAL);
-+			break;
-+		}
-+	}
-+	mutex_unlock(&qat_vdev->state_mutex);
-+
-+	return res;
-+}
-+
-+static int qat_vf_pci_get_device_state(struct vfio_device *vdev,
-+				       enum vfio_device_mig_state *curr_state)
-+{
-+	struct qat_vf_core_device *qat_vdev = container_of(vdev,
-+			struct qat_vf_core_device, core_device.vdev);
-+
-+	mutex_lock(&qat_vdev->state_mutex);
-+	*curr_state = qat_vdev->mig_state;
-+	mutex_unlock(&qat_vdev->state_mutex);
-+
-+	return 0;
-+}
-+
-+static int qat_vf_pci_get_data_size(struct vfio_device *vdev,
-+				    unsigned long *stop_copy_length)
-+{
-+	struct qat_vf_core_device *qat_vdev = container_of(vdev,
-+			struct qat_vf_core_device, core_device.vdev);
-+
-+	mutex_lock(&qat_vdev->state_mutex);
-+	*stop_copy_length = qat_vdev->mdev->state_size;
-+	mutex_unlock(&qat_vdev->state_mutex);
-+
-+	return 0;
-+}
-+
-+static const struct vfio_migration_ops qat_vf_pci_mig_ops = {
-+	.migration_set_state = qat_vf_pci_set_device_state,
-+	.migration_get_state = qat_vf_pci_get_device_state,
-+	.migration_get_data_size = qat_vf_pci_get_data_size,
-+};
-+
-+static void qat_vf_pci_release_dev(struct vfio_device *core_vdev)
-+{
-+	struct qat_vf_core_device *qat_vdev = container_of(core_vdev,
-+			struct qat_vf_core_device, core_device.vdev);
-+
-+	qat_vfmig_cleanup(qat_vdev->mdev);
-+	qat_vfmig_destroy(qat_vdev->mdev);
-+	mutex_destroy(&qat_vdev->state_mutex);
-+	vfio_pci_core_release_dev(core_vdev);
-+}
-+
-+static int qat_vf_pci_init_dev(struct vfio_device *core_vdev)
-+{
-+	struct qat_vf_core_device *qat_vdev = container_of(core_vdev,
-+			struct qat_vf_core_device, core_device.vdev);
-+	struct qat_mig_dev *mdev;
-+	struct pci_dev *parent;
-+	int ret, vf_id;
-+
-+	core_vdev->migration_flags = VFIO_MIGRATION_STOP_COPY | VFIO_MIGRATION_P2P |
-+				     VFIO_MIGRATION_PRE_COPY;
-+	core_vdev->mig_ops = &qat_vf_pci_mig_ops;
-+
-+	ret = vfio_pci_core_init_dev(core_vdev);
-+	if (ret)
-+		return ret;
-+
-+	mutex_init(&qat_vdev->state_mutex);
-+
-+	parent = pci_physfn(qat_vdev->core_device.pdev);
-+	vf_id = pci_iov_vf_id(qat_vdev->core_device.pdev);
-+	if (vf_id < 0) {
-+		ret = -ENODEV;
-+		goto err_rel;
-+	}
-+
-+	mdev = qat_vfmig_create(parent, vf_id);
-+	if (IS_ERR(mdev)) {
-+		ret = PTR_ERR(mdev);
-+		goto err_rel;
-+	}
-+
-+	ret = qat_vfmig_init(mdev);
-+	if (ret)
-+		goto err_destroy;
-+
-+	qat_vdev->mdev = mdev;
-+
-+	return 0;
-+
-+err_destroy:
-+	qat_vfmig_destroy(mdev);
-+err_rel:
-+	vfio_pci_core_release_dev(core_vdev);
-+	return ret;
-+}
-+
-+static const struct vfio_device_ops qat_vf_pci_ops = {
-+	.name = "qat-vf-vfio-pci",
-+	.init = qat_vf_pci_init_dev,
-+	.release = qat_vf_pci_release_dev,
-+	.open_device = qat_vf_pci_open_device,
-+	.close_device = qat_vf_pci_close_device,
-+	.ioctl = vfio_pci_core_ioctl,
-+	.read = vfio_pci_core_read,
-+	.write = vfio_pci_core_write,
-+	.mmap = vfio_pci_core_mmap,
-+	.request = vfio_pci_core_request,
-+	.match = vfio_pci_core_match,
-+	.bind_iommufd = vfio_iommufd_physical_bind,
-+	.unbind_iommufd = vfio_iommufd_physical_unbind,
-+	.attach_ioas = vfio_iommufd_physical_attach_ioas,
-+	.detach_ioas = vfio_iommufd_physical_detach_ioas,
-+};
-+
-+static struct qat_vf_core_device *qat_vf_drvdata(struct pci_dev *pdev)
-+{
-+	struct vfio_pci_core_device *core_device = pci_get_drvdata(pdev);
-+
-+	return container_of(core_device, struct qat_vf_core_device, core_device);
-+}
-+
-+static void qat_vf_pci_aer_reset_done(struct pci_dev *pdev)
-+{
-+	struct qat_vf_core_device *qat_vdev = qat_vf_drvdata(pdev);
-+
-+	if (!qat_vdev->mdev)
-+		return;
-+
-+	mutex_lock(&qat_vdev->state_mutex);
-+	qat_vf_reset_done(qat_vdev);
-+	mutex_unlock(&qat_vdev->state_mutex);
-+}
-+
-+static int
-+qat_vf_vfio_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct qat_vf_core_device *qat_vdev;
-+	int ret;
-+
-+	qat_vdev = vfio_alloc_device(qat_vf_core_device, core_device.vdev, dev, &qat_vf_pci_ops);
-+	if (IS_ERR(qat_vdev))
-+		return PTR_ERR(qat_vdev);
-+
-+	pci_set_drvdata(pdev, &qat_vdev->core_device);
-+	ret = vfio_pci_core_register_device(&qat_vdev->core_device);
-+	if (ret)
-+		goto out_put_device;
-+
-+	return 0;
-+
-+out_put_device:
-+	vfio_put_device(&qat_vdev->core_device.vdev);
-+	return ret;
-+}
-+
-+static void qat_vf_vfio_pci_remove(struct pci_dev *pdev)
-+{
-+	struct qat_vf_core_device *qat_vdev = qat_vf_drvdata(pdev);
-+
-+	vfio_pci_core_unregister_device(&qat_vdev->core_device);
-+	vfio_put_device(&qat_vdev->core_device.vdev);
-+}
-+
-+static const struct pci_device_id qat_vf_vfio_pci_table[] = {
-+	/* Intel QAT GEN4 4xxx VF device */
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4941) },
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4943) },
-+	{ PCI_DRIVER_OVERRIDE_DEVICE_VFIO(PCI_VENDOR_ID_INTEL, 0x4945) },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(pci, qat_vf_vfio_pci_table);
-+
-+static const struct pci_error_handlers qat_vf_err_handlers = {
-+	.reset_done = qat_vf_pci_aer_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
-+static struct pci_driver qat_vf_vfio_pci_driver = {
-+	.name = "qat_vfio_pci",
-+	.id_table = qat_vf_vfio_pci_table,
-+	.probe = qat_vf_vfio_pci_probe,
-+	.remove = qat_vf_vfio_pci_remove,
-+	.err_handler = &qat_vf_err_handlers,
-+	.driver_managed_dma = true,
-+};
-+module_pci_driver(qat_vf_vfio_pci_driver);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Xin Zeng <xin.zeng@intel.com>");
-+MODULE_DESCRIPTION("QAT VFIO PCI - VFIO PCI driver with live migration support for Intel(R) QAT GEN4 device family");
-+MODULE_IMPORT_NS(CRYPTO_QAT);
-
-base-commit: f0bbfc391aa7eaa796f09ee40dd1cd78c6c81960
--- 
-2.18.2
+s /get_feature_msr()/get_msr_feature()
+> get_feature_msr().  The APIs get "feature MSRs", not "MSR features".
+> And unlike kvm_{g,s}et_msr_common(), the "feature" adjective doesn't
+> describe the helper itself.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/include/asm/kvm-x86-ops.h |  2 +-
+>   arch/x86/include/asm/kvm_host.h    |  2 +-
+>   arch/x86/kvm/svm/svm.c             |  6 +++---
+>   arch/x86/kvm/vmx/main.c            |  2 +-
+>   arch/x86/kvm/vmx/vmx.c             |  2 +-
+>   arch/x86/kvm/vmx/x86_ops.h         |  2 +-
+>   arch/x86/kvm/x86.c                 | 12 ++++++------
+>   7 files changed, 14 insertions(+), 14 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 5187fcf4b610..9f25b4a49d6b 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -128,7 +128,7 @@ KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
+>   KVM_X86_OP_OPTIONAL(vm_copy_enc_context_from)
+>   KVM_X86_OP_OPTIONAL(vm_move_enc_context_from)
+>   KVM_X86_OP_OPTIONAL(guest_memory_reclaimed)
+> -KVM_X86_OP(get_msr_feature)
+> +KVM_X86_OP(get_feature_msr)
+>   KVM_X86_OP(check_emulate_instruction)
+>   KVM_X86_OP(apic_init_signal_blocked)
+>   KVM_X86_OP_OPTIONAL(enable_l2_tlb_flush)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 7d56e5a52ae3..cc04ab0c234e 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1785,7 +1785,7 @@ struct kvm_x86_ops {
+>   	int (*vm_move_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
+>   	void (*guest_memory_reclaimed)(struct kvm *kvm);
+>   
+> -	int (*get_msr_feature)(u32 msr, u64 *data);
+> +	int (*get_feature_msr)(u32 msr, u64 *data);
+>   
+>   	int (*check_emulate_instruction)(struct kvm_vcpu *vcpu, int emul_type,
+>   					 void *insn, int insn_len);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 15422b7d9149..d95cd230540d 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2796,7 +2796,7 @@ static int efer_trap(struct kvm_vcpu *vcpu)
+>   	return kvm_complete_insn_gp(vcpu, ret);
+>   }
+>   
+> -static int svm_get_msr_feature(u32 msr, u64 *data)
+> +static int svm_get_feature_msr(u32 msr, u64 *data)
+>   {
+>   	*data = 0;
+>   
+> @@ -3134,7 +3134,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>   	case MSR_AMD64_DE_CFG: {
+>   		u64 supported_de_cfg;
+>   
+> -		if (svm_get_msr_feature(ecx, &supported_de_cfg))
+> +		if (svm_get_feature_msr(ecx, &supported_de_cfg))
+>   			return 1;
+>   
+>   		if (data & ~supported_de_cfg)
+> @@ -4944,7 +4944,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>   	.vcpu_unblocking = avic_vcpu_unblocking,
+>   
+>   	.update_exception_bitmap = svm_update_exception_bitmap,
+> -	.get_msr_feature = svm_get_msr_feature,
+> +	.get_feature_msr = svm_get_feature_msr,
+>   	.get_msr = svm_get_msr,
+>   	.set_msr = svm_set_msr,
+>   	.get_segment_base = svm_get_segment_base,
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 7c546ad3e4c9..c670f4cf6d94 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -40,7 +40,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>   	.vcpu_put = vmx_vcpu_put,
+>   
+>   	.update_exception_bitmap = vmx_update_exception_bitmap,
+> -	.get_msr_feature = vmx_get_msr_feature,
+> +	.get_feature_msr = vmx_get_feature_msr,
+>   	.get_msr = vmx_get_msr,
+>   	.set_msr = vmx_set_msr,
+>   	.get_segment_base = vmx_get_segment_base,
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 25b0a838abd6..fe2bf8f31d7c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1955,7 +1955,7 @@ static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
+>   	return !(msr->data & ~valid_bits);
+>   }
+>   
+> -int vmx_get_msr_feature(u32 msr, u64 *data)
+> +int vmx_get_feature_msr(u32 msr, u64 *data)
+>   {
+>   	switch (msr) {
+>   	case KVM_FIRST_EMULATED_VMX_MSR ... KVM_LAST_EMULATED_VMX_MSR:
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 504d56d6837d..4b81c85e9357 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -58,7 +58,7 @@ bool vmx_has_emulated_msr(struct kvm *kvm, u32 index);
+>   void vmx_msr_filter_changed(struct kvm_vcpu *vcpu);
+>   void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
+>   void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu);
+> -int vmx_get_msr_feature(u32 msr, u64 *data);
+> +int vmx_get_feature_msr(u32 msr, u64 *data);
+>   int vmx_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+>   u64 vmx_get_segment_base(struct kvm_vcpu *vcpu, int seg);
+>   void vmx_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 03e50812ab33..8f58181f2b6d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1682,7 +1682,7 @@ static u64 kvm_get_arch_capabilities(void)
+>   	return data;
+>   }
+>   
+> -static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
+> +static int kvm_get_feature_msr(struct kvm_msr_entry *msr)
+>   {
+>   	switch (msr->index) {
+>   	case MSR_IA32_ARCH_CAPABILITIES:
+> @@ -1695,12 +1695,12 @@ static int kvm_get_msr_feature(struct kvm_msr_entry *msr)
+>   		rdmsrl_safe(msr->index, &msr->data);
+>   		break;
+>   	default:
+> -		return static_call(kvm_x86_get_msr_feature)(msr->index, &msr->data);
+> +		return static_call(kvm_x86_get_feature_msr)(msr->index, &msr->data);
+>   	}
+>   	return 0;
+>   }
+>   
+> -static int do_get_msr_feature(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+> +static int do_get_feature_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+>   {
+>   	struct kvm_msr_entry msr;
+>   	int r;
+> @@ -1708,7 +1708,7 @@ static int do_get_msr_feature(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
+>   	/* Unconditionally clear the output for simplicity */
+>   	msr.data = 0;
+>   	msr.index = index;
+> -	r = kvm_get_msr_feature(&msr);
+> +	r = kvm_get_feature_msr(&msr);
+>   
+>   	if (r == KVM_MSR_RET_UNSUPPORTED && kvm_msr_ignored_check(index, 0, false))
+>   		r = 0;
+> @@ -4962,7 +4962,7 @@ long kvm_arch_dev_ioctl(struct file *filp,
+>   		break;
+>   	}
+>   	case KVM_GET_MSRS:
+> -		r = msr_io(NULL, argp, do_get_msr_feature, 1);
+> +		r = msr_io(NULL, argp, do_get_feature_msr, 1);
+>   		break;
+>   #ifdef CONFIG_KVM_HYPERV
+>   	case KVM_GET_SUPPORTED_HV_CPUID:
+> @@ -7367,7 +7367,7 @@ static void kvm_probe_feature_msr(u32 msr_index)
+>   		.index = msr_index,
+>   	};
+>   
+> -	if (kvm_get_msr_feature(&msr))
+> +	if (kvm_get_feature_msr(&msr))
+>   		return;
+>   
+>   	msr_based_features[num_msr_based_features++] = msr_index;
 
 
