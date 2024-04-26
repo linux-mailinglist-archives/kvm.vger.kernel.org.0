@@ -1,140 +1,193 @@
-Return-Path: <kvm+bounces-16018-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16019-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 022C88B2F62
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 06:17:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AFE68B2F79
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 06:36:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 959931F21020
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 04:17:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70E49B21BB9
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 04:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8D584A4E;
-	Fri, 26 Apr 2024 04:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B12E139CFE;
+	Fri, 26 Apr 2024 04:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fh6Ntgu0"
+	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="qcLW23pr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1888683CBA;
-	Fri, 26 Apr 2024 04:16:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A506F1849
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 04:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714105004; cv=none; b=aMEpjfT/jEYryWhsye9F5VOKbAGi1nnsC+7xm/b020g35Zmi/et5/yzd0/GolzbOWttH4dmmiLY+3vTY8Kwb00UoAWbTp80yGktkSEI4SA8NJQ0/6dADtHWO+jQYohfMtxPwJVJyEDe9om9K+mkf1ytRi+p6xDlcGWiRFht9ucY=
+	t=1714106185; cv=none; b=FLdEGS1Z8OKyDf9T72sw+aDuEj659atYdypfEcHPaSXRQV4sJby6JOcutmfBuj/xNTz5nP0EmbIGVgm4r80rjlIxstri0ff+YSnKgwdXKZJ27sHVdDNcqCHFgIqeP1TqQpWY+8vPtwHWGmitiPQybN2IPa351FV7sjL9y6lXQH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714105004; c=relaxed/simple;
-	bh=hbWQ3Mur+/ECvEanbvX6901lMYP+yzm6OHJl+SocuvU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=R0NR49qkNjVvbolw2RLBj1LIntp+CeS/ky37Bt0k0rmcjRvQGN5F7Cr9CZzahDvQMyD7Js1Pwv3FOasLVWoKmMG48F7mQJMkJvmCNEsLT7ZKEa3i8NKZyaCEtqCWMwmXQ1M8HOayyUdFmkYlUwgiMBvOpzE6NTz2bl7JKpQyPFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fh6Ntgu0; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1e3ca4fe4cfso13025455ad.2;
-        Thu, 25 Apr 2024 21:16:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714105002; x=1714709802; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=31KekFIOIpF99+poRc8QNtBNYMF8yQuGd++gmF2U7xs=;
-        b=Fh6Ntgu0iT27SZQZ+PLIYQpl9uOoyqSQGnRfm6zRB9ICftihTXNT8xyElhOvb45/JQ
-         ul7iLVOpcsqh3m8KEnx8U1kqN59ykfKIMLM9IV9IVQKbcb/rmZ7kvJy+nJmbkRNAGwiX
-         gylOb+JH0g24URvmhD90LBDvfWA6W+nBGvo561m3ONNRsomakDzqLGDToskj5oy6XEyu
-         HqzXMrLMgAKtFZcsrUqyHDKee66R4F3bCadpbW9i6o9tOYPL39qF2v4R92vv6CQs/wMO
-         FpCbzKcMPE3KyvMjHnSCZ8rSR5eBPCWIWHudoIH+znXcixI41uXA/ztHwTjHYO8O0NRQ
-         eKMQ==
+	s=arc-20240116; t=1714106185; c=relaxed/simple;
+	bh=7keaL7YVJWP05k4nk4BE2S1AHpuGUcCrD+sEPoCFgVc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y8EHsqy+Kdjnyh5L1XUEOSrHzEFGhdjjHqmHISaF8r8B/7m3pjzGVAhwxlmLpKUlgVcEv2ZkdfvQFFiUkDeyEFm5CEYYxupEvgXwH2k2nC9QAPxwOc1PKP1qDJn+dYM8FIykTfGX5sYxvD0kabU2jL/0+uzpmMliAgo4BD4neHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=qcLW23pr; arc=none smtp.client-ip=148.163.139.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
+Received: from pps.filterd (m0167073.ppops.net [127.0.0.1])
+	by mx0b-00364e01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43Q406Yt026269
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 00:18:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=mime-version :
+ references : in-reply-to : from : date : message-id : subject : to : cc :
+ content-type : content-transfer-encoding; s=pps01;
+ bh=G88B4FCXOWJlCV1Zgxmcc8QeTpgCRXs4kSbZUzx+VkI=;
+ b=qcLW23pr/W0L549fzl9r/sTVzbmJnd6HQW2QGWVCn8afaB3AJDzzV7gi+hlJFNEmhr3z
+ OCcCNRkzd/uCU2hMApVBhXwHLdzaSTXxg44ZGiJbcVwKiK2T3mPrKOEy7Z/uQRd0286N
+ ZLknDuGkj/iHCp7f0PAg1CCpYnx7T6nvlZQhEwMUboM735gy5RCCLc+yVRs48sFzGdEe
+ HcE8+fai7UY4+yetJguf+QPwiU54dAg7Iy3PaAIqr/nXSpt1R0b5gzQ09+EepgmOpCdc
+ lygzbUo9O+eyL/ygAMvPsC31dpYhrKeCRQGIE/m9mGmJmYD9Pimo2urkX0E6tN4iHZbO BA== 
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 3xm9khpb24-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 00:18:22 -0400
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7de914f3fc2so38651339f.2
+        for <kvm@vger.kernel.org>; Thu, 25 Apr 2024 21:18:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714105002; x=1714709802;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1714105101; x=1714709901;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=31KekFIOIpF99+poRc8QNtBNYMF8yQuGd++gmF2U7xs=;
-        b=KEwd6SGBgFcNIUoKtxY5M/ZBstLb3Bau8mj3cdXvOFhbln1P8jb4PMOgkIyLOCuKnN
-         zFsxALz5Z98E/V8Z900VZbdKUqsIm5inIq22nLHeE0tpxtyV2YNVhz0/ahS//71cVQTl
-         ryZLe2fbllKoFX2KoteDFr7mqnT1A5FYnH/M8RRiQlaOcaI0ZwHCX2WKpRk2lggtEh/G
-         kiSJLs0Y7GROHOw0ew5yuud7XZh4X8nX9jByH6+W1xY3c89JkvgNvoOAlCdMgmdzjjAD
-         YSuJ2cn0ktfJ+M3E3GnmtQ/7AkZxQAWh6aXincruPbkop0H7GEw1dB7WL3WZ+6GVVZV0
-         l9vg==
-X-Forwarded-Encrypted: i=1; AJvYcCWW/G6AK1t716rVNEVGt9R66h5aPELCReV2xqYdzGVh0Hd4ZMqS8GkludyykxUAN44GenxWHvzkRqdwVIynQ3krrsPlPfSMSdSk+DyV6HEEmp/Q0jGPasIcujqti1a5fP/M
-X-Gm-Message-State: AOJu0Ywm0wbXHmGH76FzJ2kml8ppdjHRzqq9hF/FPzmPKLcQP4keYLHs
-	QBc98oMwzwZz5FxK/kXFupQrV9+Ln3fb0yKmgUazoj9YgbFkKu7S
-X-Google-Smtp-Source: AGHT+IF2R6ZxZ7uWv/ssydB7/h/Ru3mALSufbWP9vudXmlWAUmpZgQkyyDbCqHwK1+c9dIHVZxCUyg==
-X-Received: by 2002:a17:902:6bc4:b0:1dd:878d:9dca with SMTP id m4-20020a1709026bc400b001dd878d9dcamr1369903plt.48.1714105002418;
-        Thu, 25 Apr 2024 21:16:42 -0700 (PDT)
-Received: from localhost.localdomain ([43.132.141.8])
-        by smtp.gmail.com with ESMTPSA id x13-20020a170902ec8d00b001e9684b0e07sm9426780plg.173.2024.04.25.21.16.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Apr 2024 21:16:42 -0700 (PDT)
-From: Yi Wang <up2wing@gmail.com>
-X-Google-Original-From: Yi Wang <foxywang@tencent.com>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	wanpengli@tencent.com,
-	foxywang@tencent.com,
-	oliver.upton@linux.dev,
-	maz@kernel.org,
-	anup@brainfault.org,
-	atishp@atishpatra.org,
-	borntraeger@linux.ibm.com,
-	frankja@linux.ibm.com,
-	imbrenda@linux.ibm.com,
-	weijiang.yang@intel.com
-Cc: up2wing@gmail.com
-Subject: [v4 RESEND 3/3] KVM: s390: don't setup dummy routing when KVM_CREATE_IRQCHIP
-Date: Fri, 26 Apr 2024 12:15:59 +0800
-Message-Id: <20240426041559.3717884-4-foxywang@tencent.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240426041559.3717884-1-foxywang@tencent.com>
-References: <20240426041559.3717884-1-foxywang@tencent.com>
+        bh=G88B4FCXOWJlCV1Zgxmcc8QeTpgCRXs4kSbZUzx+VkI=;
+        b=jA8lHGu3nTN5cdDzr4hIno+c/TR3Ou0BrJJSAlIFFtpXBZZ250yClz3FEZe19oeEvH
+         x0y5UCx5/7foqQvC9ecQg3OBbYtv+N8T9NUuitR6xqm3/3etUwCp0QFrnxIH8k5zqVSR
+         jJQBYcmSG4ppGPRDjRSvw5AfbH7EW+2RPt2aRKU/Dofk9ZEAzS0JKdL0oUT8WvHfhoGU
+         5k3vKXml16QgCqhuwebwPcpRNA0vNlbkCOEuWF3HwAPp2bV8MA8W+on1CFD+L+NJ6oD4
+         1kgArprDA8HOaaUG8+DPRdR//7dcXR0SEWptVeVmeWNqhdk/t2XRaiYm2eSX6ZQ10wf7
+         Bljw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVv80C51M7SyZQSrTFsJ7tOiZ0GwhVOSFCuD07fQtikv144ROqamzZUpaBo65vJXHkOCm97mxCtBOA9uktrfG0QhPB
+X-Gm-Message-State: AOJu0YzsZMBQ4L0qvI3U7wMdLG2MWb31OSKWneb3ppimd3ptvjeWft4g
+	WpeCpHbB48l7rp9tF7XQ6QG4DlhUq3vobsN1HQ1Ex73blaBkkl8JhdH64R9ZZI/0YJzOx8dtrW7
+	zt5el6fq/WbZrjdqt5RJHC/0eqNB690A+tWpqkNDmTbItJ918crpUJDsxpkeRyTgy8sC+uU+bv3
+	vjlzpLXqliyGZdaf9I8nuYvYFTxBSdH64=
+X-Received: by 2002:a05:6e02:1d9d:b0:36b:2ff9:9275 with SMTP id h29-20020a056e021d9d00b0036b2ff99275mr2289869ila.2.1714105101057;
+        Thu, 25 Apr 2024 21:18:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEYYqkIK/4iFximYCX6FwUlLfYjRHZuPLiEM/EPRsZhJPl4TSF1MHqh4vFeg9jtOAvS9k0+w5+fXugtICExHXw=
+X-Received: by 2002:a05:6e02:1d9d:b0:36b:2ff9:9275 with SMTP id
+ h29-20020a056e021d9d00b0036b2ff99275mr2289863ila.2.1714105100785; Thu, 25 Apr
+ 2024 21:18:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240423024933.80143-1-kele@cs.columbia.edu> <de0096bf-08a8-4ee4-94d7-6e5854b056b4@intel.com>
+ <CAOfLF_L2UgSUyUsbiBDhLPskt2xLWujy1GBAhpcWzi2i3brAww@mail.gmail.com>
+In-Reply-To: <CAOfLF_L2UgSUyUsbiBDhLPskt2xLWujy1GBAhpcWzi2i3brAww@mail.gmail.com>
+From: Kele Huang <kele@cs.columbia.edu>
+Date: Fri, 26 Apr 2024 00:18:09 -0400
+Message-ID: <CAOfLF_+ZP-X8yT7qDb0t57ZZu7RNhdOGyCNfR2fheZG+h_jZ7w@mail.gmail.com>
+Subject: Re: [1/1] KVM: restrict kvm_gfn_to_hva_cache_init() to only accept
+ address ranges within one page
+To: "Chen, Zide" <zide.chen@intel.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: Ipohyn0gFPh6_IgLsC0jFls95cwuqacp
+X-Proofpoint-GUID: Ipohyn0gFPh6_IgLsC0jFls95cwuqacp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-26_04,2024-04-25_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
+ clxscore=1015 spamscore=0 impostorscore=0 bulkscore=10 malwarescore=0
+ phishscore=0 priorityscore=1501 adultscore=0 lowpriorityscore=10
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404260025
 
-From: Yi Wang <foxywang@tencent.com>
+Thanks for the feedback!  Yes, callers including kvm_read_guest_offset_cach=
+ed()
+and kvm_write_guest_offset_cached() checked if the read or write should fol=
+low
+the slow path for the guest memory read/write by checking if
+ghc->memslot is nullified.
+However, please note that they are calling the static function
+`__kvm_gfn_to_hva_cache_init()` instead of the exported function
+`kvm_gfn_to_hva_cache_init()`.
 
-As we have setup empty irq routing in kvm_create_vm(), there's
-no need to setup dummy routing when KVM_CREATE_IRQCHIP.
+Although `__kvm_gfn_to_hva_cache_init()` has detailed comments about using
+a slow path for cross page but actually the "slow path" is to read/write gu=
+est
+memory instead of for setting up a cross page cache.  The difference here
+I think is that `kvm_gfn_to_hva_cache_init()` is an exported function and
+its name indicates it is used for gfn to hva cache init, while the
+return value 0
+does not really guarantee the cache is initialized when the address range
+crosses pages.  For example, function kvm_lapic_set_vapicz_addr()
+called `kvm_gfn_to_hva_cache_init()` and simply assumes the cache is
+successfully initialized by checking the return value.
 
-Signed-off-by: Yi Wang <foxywang@tencent.com>
----
- arch/s390/kvm/kvm-s390.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+My thought is there probably should be another function to provide correct
+cross page cache initialization but I am not sure if this is really needed.
+Nevertheless, I think we could at least make the existing function
+more accurate?
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 5147b943a864..ba7fd39bcbf4 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -2998,14 +2998,7 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- 		break;
- 	}
- 	case KVM_CREATE_IRQCHIP: {
--		struct kvm_irq_routing_entry routing;
--
--		r = -EINVAL;
--		if (kvm->arch.use_irqchip) {
--			/* Set up dummy routing. */
--			memset(&routing, 0, sizeof(routing));
--			r = kvm_set_irq_routing(kvm, &routing, 0, 0);
--		}
-+		r = 0;
- 		break;
- 	}
- 	case KVM_SET_DEVICE_ATTR: {
--- 
-2.39.3
+-- Kele
 
+
+On Fri, Apr 26, 2024 at 12:14=E2=80=AFAM Kele Huang <kele@cs.columbia.edu> =
+wrote:
+>
+> Thanks for the feedback!  Yes, callers including kvm_read_guest_offset_ca=
+ched() and kvm_write_guest_offset_cached() checked if the read or write sho=
+uld follow the slow path for the guest memory read/write by checking if ghc=
+->memslot is nullified.  However, please note that they are calling the sta=
+tic function `__kvm_gfn_to_hva_cache_init()` instead of the exported functi=
+on `kvm_gfn_to_hva_cache_init()`.
+>
+> Although `__kvm_gfn_to_hva_cache_init()` has detailed comments about usin=
+g a slow path for cross page but actually the "slow path" is to read/write =
+guest memory instead of for setting up a cross page cache.  The difference =
+here I think is that `kvm_gfn_to_hva_cache_init()` is an exported function =
+and its name indicates it is used for gfn to hva cache init, while the retu=
+rn value 0 does not really guarantee the cache is initialized when the addr=
+ess range crosses pages.  For example, function kvm_lapic_set_vapicz_addr()=
+ called `kvm_gfn_to_hva_cache_init()` and simply assumes the cache is succe=
+ssfully initialized by checking the return value.
+>
+> My thought is there probably should be another function to provide correc=
+t cross page cache initialization but I am not sure if this is really neede=
+d.  Nevertheless, I think we could at least make the existing function more=
+ accurate?
+>
+> -- Kele
+>
+> On Thu, Apr 25, 2024 at 9:16=E2=80=AFPM Chen, Zide <zide.chen@intel.com> =
+wrote:
+>>
+>>
+>>
+>> On 4/22/2024 7:49 PM, Kele Huang wrote:
+>> > Function kvm_gfn_to_hva_cache_init() is exported and used to init
+>> > gfn to hva cache at various places, such as called in function
+>> > kvm_pv_enable_async_pf().  However, this function directly tail
+>> > calls function __kvm_gfn_to_hva_cache_init(), which assigns
+>> > ghc->memslot to NULL and returns 0 for cache initialization of
+>> > cross pages cache.  This is unsafe as 0 typically means a successful
+>> > return, but it actually fails to return a valid ghc->memslot.
+>> > The functions call kvm_gfn_to_hva_cache_init(), such as
+>> > kvm_lapic_set_vapicz_addr() do not make future checking on the
+>> > ghc->memslot if kvm_gfn_to_hva_cache_init() returns a 0.  Moreover,
+>> > other developers may try to initialize a cache across pages by
+>> > calling this function but fail with a success return value.
+>> >
+>> > This patch fixes this issue by explicitly restricting function
+>> > kvm_gfn_to_hva_cache_init() to only accept address ranges within
+>> > one page and adding comments to the function accordingly.
+>> >
+>>
+>> For cross page cache, returning a zero is not really a mistake, since it
+>> verifies the entire region against the memslot and does initialize ghc.
+>>
+>> The nullified memslot is to indicate that the read or write should
+>> follow the slow path, and it's the caller's responsibility to check
+>> ghc->memslot if needed.  e.g., kvm_read_guest_offset_cached() and
+>> kvm_write_guest_offset_cached().  Please refer to commit fcfbc617547f
+>> ("KVM: Check for a bad hva before dropping into the ghc slow path")
 
