@@ -1,111 +1,276 @@
-Return-Path: <kvm+bounces-16041-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16042-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E6178B3491
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 11:53:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFEF8B34EA
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 12:07:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05C611F223AF
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 09:53:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36B43288FCD
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 10:07:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808F01428EE;
-	Fri, 26 Apr 2024 09:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EDC31428F3;
+	Fri, 26 Apr 2024 10:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="auqREDhS"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="V7O9TQ3c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64FA714265F
-	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 09:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F0E13F42F;
+	Fri, 26 Apr 2024 10:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714125212; cv=none; b=FXJoYh0YhYowavj+SNcgua+ytaeMckKaUf2riNl8g5RUZu04233lyQIcoKRsSZdAKsYJlz76u/rweqXeBi9GO+wDpxiALyP7ikpuPnU6SxIixYUHhbrXX2x36Accr4zNDo1BLbMWNvFLAsLyNyOLwys7/clofFRfNQmAEUyXJfg=
+	t=1714126041; cv=none; b=bPDaR2KrPh9jOih8/jlc1yziY/Y/dKAtSPRma/w6Gbrwk9vo4Aq4bi5uv9ITH9uIYHG3giFgLLNbfhar5wqkqklKbFpgqwSYvT13sdIpH/73rganw2gtNCqZ4EAcGQFjCPw6BTudncx2QPAz2VxI+3YLzSThkGGNLN6k6+2lMdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714125212; c=relaxed/simple;
-	bh=7R08FKECIPjQbStAmaj758BPN/jbNEye6fo49Yfk9yA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HAqIPer7182cFjcbgFa2IwNq/B32KAjdNYAUNC3/3b1lY2HlD3LCwWPT7G/M8Kus7xZCm1byk1JICeM/Zd518Ou25mZRMKRA5/1XdP8VKVH9SvE9scR4iAJGM+fyysE4nhpuD0ThyGjo5DzG8njT7yOrdaVCwfeC3uMaWWmyAZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=auqREDhS; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714125211; x=1745661211;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7R08FKECIPjQbStAmaj758BPN/jbNEye6fo49Yfk9yA=;
-  b=auqREDhSN25/AWVoN3sN5Hfz3jKFXRQyCFpUkXkGX7otlTis5+KDca+E
-   CovsNmBVup1Kpb9m+BJPcUmZNxzjjqia6KThvv2sTtHCQgzXyNUQPtMsr
-   jmEB9bJzN/TiaMBkL0f3cWbA3TbzDXC6JmM12IlEvFOb7lflUDUxlB9y1
-   y5fCHCtIJ+D64sQCJoPMYR3Pk968cTebo+8d+Vy3tDYr3Z80n4VDpt9hp
-   3q0HxPF1DgzcTSUamUH0RtvgbBkzQ60Hb1QNHw2Ir7fTnangRBO41CWDM
-   hqn6u69UrQMbQcXaMvlG78GgaY+37KJ+YDDpaS8N28uAd0vwAfnEK61Oa
-   Q==;
-X-CSE-ConnectionGUID: H36GkS2FSca58cMa52OwDw==
-X-CSE-MsgGUID: 75ZwLD/JRo6EXsa/lcq+AA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="9707446"
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="9707446"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 02:53:31 -0700
-X-CSE-ConnectionGUID: mKE73GDjSNKXvKTYLA0w8g==
-X-CSE-MsgGUID: bjFA5tHjQ9yU0UwwawPoHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,232,1708416000"; 
-   d="scan'208";a="25412346"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa008.fm.intel.com with ESMTP; 26 Apr 2024 02:53:29 -0700
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH 6/6] target/i386/confidential-guest: Fix comment of x86_confidential_guest_kvm_type()
-Date: Fri, 26 Apr 2024 18:07:16 +0800
-Message-Id: <20240426100716.2111688-8-zhao1.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240426100716.2111688-1-zhao1.liu@intel.com>
-References: <20240426100716.2111688-1-zhao1.liu@intel.com>
+	s=arc-20240116; t=1714126041; c=relaxed/simple;
+	bh=TFB+DqJ0O72/lmKUerSCxOZChv+hpSK+WLOY6t363cY=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rGMQEA728vD4jplcCn7T3mD0pqBYk2lDM9xDN1SI/rH475H/o4iEplPzk6Ga+OOMyLKl0UnN514rSJCJnRT8JKFA6Xk72Xiw0TENsqWHy6gYwUTyzi+txBZSUO6Wkv4QAal9aY8q1qMHpz/Ysb0qXQtkyb+GJfNTRepK5IILfI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=V7O9TQ3c; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1714126036;
+	bh=TFB+DqJ0O72/lmKUerSCxOZChv+hpSK+WLOY6t363cY=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=V7O9TQ3cmcZnFAfFjm5p2s6Rq5l9GZrz2xXJSJdl+AqotqRkT2YFC/9UBaEvDTLK4
+	 +xDBPXlCJvJzDnc+f10AfN1LKHS74sr4FkVB+g9QFoMKpFn3sFkVEABzmKex4AUrxa
+	 P/Wksn7d5iB+wWn30gXAMqyQt8xadg5OJg2iITF93jedHMPNmkDhPSWrRwnAlFevu0
+	 bEttLU2IpvfuTb5p9042Rfy6QSgFKPrddseG9oR4SLk1yg/1Upk/DGT6x2Nc0CQP9w
+	 sT6ikfHlxNcSRf53enJNkA7C1kNvykISmtvI8bIIQOtnuVdREo+iEgDNo74Y2Qo2my
+	 hIbbgXYs2AlAw==
+Received: from [100.113.15.66] (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id E4ABA3780629;
+	Fri, 26 Apr 2024 10:07:12 +0000 (UTC)
+Message-ID: <26993de8-0e4f-4d08-9009-730d674b16c7@collabora.com>
+Date: Fri, 26 Apr 2024 15:07:43 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH] KVM: selftests: Use TAP interface in the
+ set_memory_region test
+To: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+References: <20240426085556.619731-1-thuth@redhat.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <20240426085556.619731-1-thuth@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Update the comment to match the X86ConfidentialGuestClass
-implementation.
+On 4/26/24 1:55 PM, Thomas Huth wrote:
+> Use the kselftest_harness.h interface in this test to get TAP
+> output, so that it is easier for the user to see what the test
+> is doing. (Note: We are not using the KVM_ONE_VCPU_TEST_SUITE()
+> macro here since these tests are creating their VMs with the
+> vm_create_barebones() function, not with vm_create_with_one_vcpu())
+Thank you for the patch. I'm unable to apply the patch on next-20240426.
 
-Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
----
- target/i386/confidential-guest.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .../selftests/kvm/set_memory_region_test.c    | 86 +++++++++----------
+>  1 file changed, 42 insertions(+), 44 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+> index bd57d991e27d..4db6a66a3001 100644
+> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
+> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+> @@ -16,6 +16,7 @@
+>  #include <test_util.h>
+>  #include <kvm_util.h>
+>  #include <processor.h>
+> +#include "kselftest_harness.h"
+>  
+>  /*
+>   * s390x needs at least 1MB alignment, and the x86_64 MOVE/DELETE tests need a
+> @@ -38,6 +39,8 @@ extern const uint64_t final_rip_end;
+>  
+>  static sem_t vcpu_ready;
+>  
+> +int loops;
+> +
+>  static inline uint64_t guest_spin_on_val(uint64_t spin_val)
+>  {
+>  	uint64_t val;
+> @@ -219,6 +222,13 @@ static void test_move_memory_region(void)
+>  	kvm_vm_free(vm);
+>  }
+>  
+> +TEST(move_in_use_region)
+> +{
+> +	ksft_print_msg("Testing MOVE of in-use region, %d loops\n", loops);
+> +	for (int i = 0; i < loops; i++)
+> +		test_move_memory_region();
+> +}
+> +
+>  static void guest_code_delete_memory_region(void)
+>  {
+>  	uint64_t val;
+> @@ -308,12 +318,19 @@ static void test_delete_memory_region(void)
+>  	kvm_vm_free(vm);
+>  }
+>  
+> -static void test_zero_memory_regions(void)
+> +TEST(delete_in_use_region)
+> +{
+> +	ksft_print_msg("Testing DELETE of in-use region, %d loops\n", loops);
+> +	for (int i = 0; i < loops; i++)
+> +		test_delete_memory_region();
+> +}
+> +
+> +TEST(zero_memory_regions)
+>  {
+>  	struct kvm_vcpu *vcpu;
+>  	struct kvm_vm *vm;
+>  
+> -	pr_info("Testing KVM_RUN with zero added memory regions\n");
+> +	ksft_print_msg("Testing KVM_RUN with zero added memory regions\n");
+>  
+>  	vm = vm_create_barebones();
+>  	vcpu = __vm_vcpu_add(vm, 0);
+> @@ -326,7 +343,7 @@ static void test_zero_memory_regions(void)
+>  }
+>  #endif /* __x86_64__ */
+>  
+> -static void test_invalid_memory_region_flags(void)
+> +TEST(invalid_memory_region_flags)
+>  {
+>  	uint32_t supported_flags = KVM_MEM_LOG_DIRTY_PAGES;
+>  	const uint32_t v2_only_flags = KVM_MEM_GUEST_MEMFD;
+> @@ -389,7 +406,7 @@ static void test_invalid_memory_region_flags(void)
+>   * Test it can be added memory slots up to KVM_CAP_NR_MEMSLOTS, then any
+>   * tentative to add further slots should fail.
+>   */
+> -static void test_add_max_memory_regions(void)
+> +TEST(add_max_memory_regions)
+>  {
+>  	int ret;
+>  	struct kvm_vm *vm;
+> @@ -408,13 +425,13 @@ static void test_add_max_memory_regions(void)
+>  	max_mem_slots = kvm_check_cap(KVM_CAP_NR_MEMSLOTS);
+>  	TEST_ASSERT(max_mem_slots > 0,
+>  		    "KVM_CAP_NR_MEMSLOTS should be greater than 0");
+> -	pr_info("Allowed number of memory slots: %i\n", max_mem_slots);
+> +	ksft_print_msg("Allowed number of memory slots: %i\n", max_mem_slots);
+>  
+>  	vm = vm_create_barebones();
+>  
+>  	/* Check it can be added memory slots up to the maximum allowed */
+> -	pr_info("Adding slots 0..%i, each memory region with %dK size\n",
+> -		(max_mem_slots - 1), MEM_REGION_SIZE >> 10);
+> +	ksft_print_msg("Adding slots 0..%i, each memory region with %dK size\n",
+> +		       (max_mem_slots - 1), MEM_REGION_SIZE >> 10);
+>  
+>  	mem = mmap(NULL, (size_t)max_mem_slots * MEM_REGION_SIZE + alignment,
+>  		   PROT_READ | PROT_WRITE,
+> @@ -455,12 +472,21 @@ static void test_invalid_guest_memfd(struct kvm_vm *vm, int memfd,
+>  	TEST_ASSERT(r == -1 && errno == EINVAL, "%s", msg);
+>  }
+>  
+> -static void test_add_private_memory_region(void)
+> +static bool has_cap_guest_memfd(void)
+> +{
+> +	return kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
+> +	       (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM));
+> +}
+> +
+> +TEST(add_private_memory_region)
+>  {
+>  	struct kvm_vm *vm, *vm2;
+>  	int memfd, i;
+>  
+> -	pr_info("Testing ADD of KVM_MEM_GUEST_MEMFD memory regions\n");
+> +	if (!has_cap_guest_memfd())
+> +		SKIP(return, "Missing KVM_MEM_GUEST_MEMFD / KVM_X86_SW_PROTECTED_VM");
+> +
+> +	ksft_print_msg("Testing ADD of KVM_MEM_GUEST_MEMFD memory regions\n");
+>  
+>  	vm = vm_create_barebones_protected_vm();
+>  
+> @@ -491,13 +517,16 @@ static void test_add_private_memory_region(void)
+>  	kvm_vm_free(vm);
+>  }
+>  
+> -static void test_add_overlapping_private_memory_regions(void)
+> +TEST(add_overlapping_private_memory_regions)
+>  {
+>  	struct kvm_vm *vm;
+>  	int memfd;
+>  	int r;
+>  
+> -	pr_info("Testing ADD of overlapping KVM_MEM_GUEST_MEMFD memory regions\n");
+> +	if (!has_cap_guest_memfd())
+> +		SKIP(return, "Missing KVM_MEM_GUEST_MEMFD / KVM_X86_SW_PROTECTED_VM");
+> +
+> +	ksft_print_msg("Testing ADD of overlapping KVM_MEM_GUEST_MEMFD memory regions\n");
+>  
+>  	vm = vm_create_barebones_protected_vm();
+>  
+> @@ -536,46 +565,15 @@ static void test_add_overlapping_private_memory_regions(void)
+>  	close(memfd);
+>  	kvm_vm_free(vm);
+>  }
+> +
+>  #endif
+>  
+>  int main(int argc, char *argv[])
+>  {
+> -#ifdef __x86_64__
+> -	int i, loops;
+> -
+> -	/*
+> -	 * FIXME: the zero-memslot test fails on aarch64 and s390x because
+> -	 * KVM_RUN fails with ENOEXEC or EFAULT.
+> -	 */
+> -	test_zero_memory_regions();
+> -#endif
+> -
+> -	test_invalid_memory_region_flags();
+> -
+> -	test_add_max_memory_regions();
+> -
+> -#ifdef __x86_64__
+> -	if (kvm_has_cap(KVM_CAP_GUEST_MEMFD) &&
+> -	    (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))) {
+> -		test_add_private_memory_region();
+> -		test_add_overlapping_private_memory_regions();
+> -	} else {
+> -		pr_info("Skipping tests for KVM_MEM_GUEST_MEMFD memory regions\n");
+> -	}
+> -
+>  	if (argc > 1)
+>  		loops = atoi_positive("Number of iterations", argv[1]);
+>  	else
+>  		loops = 10;
+>  
+> -	pr_info("Testing MOVE of in-use region, %d loops\n", loops);
+> -	for (i = 0; i < loops; i++)
+> -		test_move_memory_region();
+> -
+> -	pr_info("Testing DELETE of in-use region, %d loops\n", loops);
+> -	for (i = 0; i < loops; i++)
+> -		test_delete_memory_region();
+> -#endif
+> -
+> -	return 0;
+> +	return test_harness_run(argc, argv);
+>  }
 
-diff --git a/target/i386/confidential-guest.h b/target/i386/confidential-guest.h
-index 532e172a60b6..06d54a120227 100644
---- a/target/i386/confidential-guest.h
-+++ b/target/i386/confidential-guest.h
-@@ -44,7 +44,7 @@ struct X86ConfidentialGuestClass {
- /**
-  * x86_confidential_guest_kvm_type:
-  *
-- * Calls #X86ConfidentialGuestClass.unplug callback of @plug_handler.
-+ * Calls #X86ConfidentialGuestClass.kvm_type() callback.
-  */
- static inline int x86_confidential_guest_kvm_type(X86ConfidentialGuest *cg)
- {
 -- 
-2.34.1
-
+BR,
+Muhammad Usama Anjum
 
