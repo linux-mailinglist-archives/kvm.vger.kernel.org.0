@@ -1,60 +1,60 @@
-Return-Path: <kvm+bounces-16083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B368B4187
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 23:54:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C2B8B4222
+	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 00:25:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E38F4B222EE
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 21:54:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80B671F23345
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 22:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B47376E7;
-	Fri, 26 Apr 2024 21:54:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8D738F82;
+	Fri, 26 Apr 2024 22:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pVMyzeWK"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Dv8sWoXE"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3360238396;
-	Fri, 26 Apr 2024 21:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.82
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FCE2C1B9;
+	Fri, 26 Apr 2024 22:25:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714168449; cv=fail; b=cywefEWdraNsQ3gHNxltpH6iM6/83ZquA5FNmy6pMEIqA2AO8W/D4pbs+aPW1RfCyRxr2UuNrtWKXLj69Ea+LnHXMKKY+7oroFQSyz/EzcSiUdbPMCTvgsIYYmup3KGKOxhHAUJl6z7sd5UPOwLXySppd07qqQnbBjMwyeiQC2A=
+	t=1714170318; cv=fail; b=MLeKFx/Rs3kAeNKKP08M9Coj37rNzT4ts8Y/E20Hgu9PAiE4oPG8WioMfluCqFrdJH9uh0XjRNoKV7jdufuScAcj43ksRid3sQLIHD+oH+PI+t9o1bTqYPQBd7ydYbRoTB1ZmRPCOS/Sz4qMHBxBPhvM0RFVO2jJZDeXN9XNBxw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714168449; c=relaxed/simple;
-	bh=gzt3VHJEhs3XMcLynoGCu5LrX+3oEacqgb0HNWIQT5w=;
+	s=arc-20240116; t=1714170318; c=relaxed/simple;
+	bh=gAABwnblJkv/7+4mOBba10/6l7+GNsX1u1ddSDkQHgk=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RSrlay8xRk+mX+zpjWXYinAAkfRBqHf8YlmFithRpqAdiJiZ8UkpALbHLevMl2EVc8OaqGtfSJFuwiv1qysJguO5p4K2tiM8OeyX+Ceta6blbCuBTlDMwHuN2w10cPIf3Rj9FR2KJvIo7bjfJw5k9JmZwR0mSy9/mzKNwA89WVQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pVMyzeWK; arc=fail smtp.client-ip=40.107.93.82
+	 Content-Type:Content-Disposition:In-Reply-To; b=m9SXglH6aGMiwPmAcvxJ3zEteaVgcrpgxi8+L1uZ31LpN8YKpUbSxBKdluJZO2DRhf89l+P9KKTbywM7i74/MoRn/EhlTu4zr7h00BfUUyp0NjVUdu2wljKPEG4AdqtjsDRZ2ik3j6w+9MF40N+MDyytb/bBeDpUXAYpQH3WTso=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Dv8sWoXE; arc=fail smtp.client-ip=40.107.244.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Asnt5NpwX4svE4CI+fC4nbtQf9MokYeBxlj/eXrRhf+GJzrBueHMJK3in8HjAu/nPm5tOw50S00JWcU0INErzZRCTU1UDjQh4RIWNq4yi6+4BxOQHC6R2cvOsjD7WS5Y8dUM1Z5Fds+Wz7CtXisvEd56MYjG0TdSpVUSXH1qBSBPo5v0INwhQZu5fVKGKRhtkYP1O3Z+eO+tlkhPrNaR8mdNMShpCvCBcZkLp0hdw0Pvt2iLrqRfWj1bIF0+5koEYYw56UG1JJOckwj3X+XIOjzuAUUKp8DkGLI5oRgFs2bgO/RXqz4Var2hdK024QHnW2zNRRoM7s7rWIckC4VxEw==
+ b=eSoM1Y7w10E+YQ6zlU/WObs9GY2br1wm+/6LilJJ0dJjeQAqvN4BEZP8oHNWtcBFCmTCcOEufUtk95HI1WUwnvW06w31XRyJSEfayuG6bgUK+t/dj9DMJZFnwTUT20Zj4U6pHgs6LjmNqcUCHnkJqCBFOKFf56yafNhipI81u8D+mwiwh1vgeMxGVPrRR9jgwPagM6VRgEalEhN7x+ASJKcIXgTGENr8a9YHQRRoCuqsAlqCDkxRDEvfzcVECiz58Y94hTg6fvMcUAiK8/ldmoUY14xFrszn/2HMJpoVohGlMAvSXad41PL4H1J2xc4RMZ02rKQFR0WWKv0evkIxNw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=24FoQDV6vqYKAefmG8C3h1XdtlmyVqapga9w7WJzGJM=;
- b=cyuTuuk7rMiDy5vfk5OrD0g9X5X/TGkn0YYN4UJXb5DN6YWaB4Fo1A8EyVbcdTH7/t8N0wSOvpWPf/D0KfxbUZQNMC/2fyhWMVMlP9UcMe2StGfaylnKkoSje8OOY8+geZ7imukMDWz8M0oHbpzaUQ8AIYRtwdaTTrzERxVgzcg7aBqNNVV8oce3W5BpwH7D0pY+fBr2sWPH1iXdwSt4BMGY4Pop8fgNqTSk5RsV4ZsUt+ufRsvP0rVmgf50CRv2UlGKYyYCvLloAi3IcqYyU3lj+ESNmuToak6klUJ97+7cYN0VLplFFgKwh0qQ/O9n2dkcLoRApFn+b3z5oAsQXQ==
+ bh=Uo/rcYMiAqlLOAfMQoYK2o7sIQzc0lr+8zZ+ExATrOw=;
+ b=Awr5uUucyyZ13IF/alkMos2ZOt3tolrGOAc9y/3Qk3nuKLt0/PLHdRWBVyE2NJ8Y7EGwQgUxZlTs8kIDXzHGIkABhGeEjKPqWpyFl3Md9yoW5XTOQ7kgcM0YaNn6aQQJ4yiiPOo4+xZERnCxX++bbBgggXfOtPqJAnu4zghFCsHJH/D9SwM7PnwparEOuYlkBpRxIETMfpf7V2a3csRWBAzW+q8b6QzjJgOp2ysPccIUOBlLnuaPu5ZBwHSCtty4FSUTBqh7pd1ZnBxql88jDOEGVHgBULRwASfMZJoVEQXQeX2Q5QpNjRcqQU1AfWANvykcbs4Od/GXCYT4eRTsqg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=24FoQDV6vqYKAefmG8C3h1XdtlmyVqapga9w7WJzGJM=;
- b=pVMyzeWKlpN4nxERgjbfQOy+uPvLzxuRN6h/CYGELDvKM0RR4hTaNqX2Iu24zAdh9gmkZ+OIQ+Umuexd+vX8Q3hy4jrqu+Y0Cvzot10Hk1bTPxnMCzafX7cfLUAi4jAA2Xi9fipHHQGIClnjWqpJtFh7/tiE8/F8nkOdA1svoBU=
-Received: from BL0PR0102CA0025.prod.exchangelabs.com (2603:10b6:207:18::38) by
- SN7PR12MB6911.namprd12.prod.outlook.com (2603:10b6:806:261::8) with Microsoft
+ bh=Uo/rcYMiAqlLOAfMQoYK2o7sIQzc0lr+8zZ+ExATrOw=;
+ b=Dv8sWoXEX5QHHx6WkF+/a14IAKLYGs7QMgUaesQ8qnBxky2OQuk9grDB8yKbxeyEJvWzJP8wpmXwdLoYAEoKspn8S8XnGsKfxWwFkQXGK4HiPSsGibazHl/gj/AUcNFLoFVVPH4ni8o+Mfb6AW3ECFg2z1fCDev/QaMt9BeLKes=
+Received: from CH0PR03CA0406.namprd03.prod.outlook.com (2603:10b6:610:11b::14)
+ by DS7PR12MB6336.namprd12.prod.outlook.com (2603:10b6:8:93::8) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.46; Fri, 26 Apr 2024 21:54:02 +0000
-Received: from BL02EPF0001A0FC.namprd03.prod.outlook.com
- (2603:10b6:207:18:cafe::3f) by BL0PR0102CA0025.outlook.office365.com
- (2603:10b6:207:18::38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.35 via Frontend
- Transport; Fri, 26 Apr 2024 21:54:02 +0000
+ 15.20.7472.46; Fri, 26 Apr 2024 22:25:12 +0000
+Received: from CH1PEPF0000A347.namprd04.prod.outlook.com
+ (2603:10b6:610:11b:cafe::77) by CH0PR03CA0406.outlook.office365.com
+ (2603:10b6:610:11b::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.29 via Frontend
+ Transport; Fri, 26 Apr 2024 22:25:11 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,14 +62,14 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0001A0FC.mail.protection.outlook.com (10.167.242.103) with Microsoft
+ CH1PEPF0000A347.mail.protection.outlook.com (10.167.244.7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7519.19 via Frontend Transport; Fri, 26 Apr 2024 21:54:02 +0000
+ 15.20.7519.19 via Frontend Transport; Fri, 26 Apr 2024 22:25:11 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 26 Apr
- 2024 16:54:01 -0500
-Date: Fri, 26 Apr 2024 16:46:33 -0500
+ 2024 17:25:10 -0500
+Date: Fri, 26 Apr 2024 17:24:57 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: Sean Christopherson <seanjc@google.com>
 CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -84,15 +84,18 @@ CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
 	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
 	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
 	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <Larry.Dewey@amd.com>
-Subject: Re: [PATCH v14 21/22] crypto: ccp: Add the
- SNP_{PAUSE,RESUME}_ATTESTATION commands
-Message-ID: <20240426214633.myecxgh6ci3qshmi@amd.com>
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, Brijesh Singh
+	<brijesh.singh@amd.com>
+Subject: Re: [PATCH v14 09/22] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+Message-ID: <20240426222457.7yn66athor2jxsrj@amd.com>
 References: <20240421180122.1650812-1-michael.roth@amd.com>
- <20240421180122.1650812-22-michael.roth@amd.com>
- <ZimgrDQ_j2QTM6s5@google.com>
- <20240426173515.6pio42iqvjj2aeac@amd.com>
- <ZiwHFMfExfXvqDIr@google.com>
+ <20240421180122.1650812-10-michael.roth@amd.com>
+ <ZilyxFnJvaWUJOkc@google.com>
+ <20240425220008.boxnurujlxbx62pg@amd.com>
+ <ZirVlF-zQPNOOahU@google.com>
+ <20240426171644.r6dvvfvduzvlrv5c@amd.com>
+ <ZiwLKI_xtZk3BG_B@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -101,158 +104,176 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <ZiwHFMfExfXvqDIr@google.com>
+In-Reply-To: <ZiwLKI_xtZk3BG_B@google.com>
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FC:EE_|SN7PR12MB6911:EE_
-X-MS-Office365-Filtering-Correlation-Id: f5f5e0cc-aaa0-4847-e408-08dc663b62c5
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A347:EE_|DS7PR12MB6336:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c88abb9-92f5-4003-f830-08dc663fbcfb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HRVovK5l0MvoNkVlQwjriTbugBczjqnWL+RPD0JuEmziE7tM5lm5wvcMWrJS?=
- =?us-ascii?Q?O1Ui1TqtbKvUi0cKaqLZ5P1waYUOG/lIFrB15GQ2+epZLTduPftTm7S7V+R7?=
- =?us-ascii?Q?MX2r5e+23SS88A8hjmc2zIdCT78lmh+5Tnx2V2xVzUfZ0i0K5VF2MhWJclWH?=
- =?us-ascii?Q?L8P0WdGwSUHWlVyWGdMqQ+LBuc84rAKei7x3lwLRw8ZmtrN9dgoU8h5ELHL1?=
- =?us-ascii?Q?NUd1fIlbjJGz44mtHGGLau7O8n3H+hmN/7w1dk5FN+JAnzE0f7+6YbLLW/zj?=
- =?us-ascii?Q?5t8H+SPIVnUMzz7OnjRKvcJ/Owoq/+Hkb625TsqO7mXwZ+bJTNl9Pa0hJ43B?=
- =?us-ascii?Q?jW9BqPfUq5T1lUHcZcf1RX/emYhnw5Nhud22tA0WbwR2oZzFASEBJl37vT2R?=
- =?us-ascii?Q?IVjSzGBpDFPXuexOFMLBNccjGw2F9xw6cB/s+T5eGHsy6XLdCMjC2OzXlz9s?=
- =?us-ascii?Q?WG787Y1XMF8XIPR515woDtVmXvKv6dHAxTOl3/onhQHpdsapj9fPA4hkzmIA?=
- =?us-ascii?Q?7CBlWVh3edFPzuI1VepW3fAXlPdn/AnM1kxHeye9BHkTE00fOmaLnKedzsgf?=
- =?us-ascii?Q?5NKmuqBVXnJshPR7G7mElamB2s0U+7fg1fY57H70mgsbiDzim9sqwqk/dshq?=
- =?us-ascii?Q?r+r1s+te/SVUBSd42MUWeNCP2cQOPaNMx3oK2VJzAL7ur+ZWZdJIT8KoH5lQ?=
- =?us-ascii?Q?rKPfqQFzXWbvzU2S2F+CrFMBlvR8f9msAd0exmw4JYVabVVqbX1i5tWuidVn?=
- =?us-ascii?Q?kggRK813//UB/AsBZoTM86h+DXMarPA5HDo3oJFvE+lN5uukOiX2Rphr5TEM?=
- =?us-ascii?Q?KCmKt1609l2HekonjccAgPG1z2fgafp2UCYkeg/GETjANoIhtU53+A49lhEL?=
- =?us-ascii?Q?QIDaoAzzN56tqJbTGJIh6dLx0msKvppHx6KsPFqEEcvs/LzRCpTv7/GtXnyg?=
- =?us-ascii?Q?Q4epXNFBriFmf0Nc2DC7f1FLZ2JYdVlphxTPnWo1A9JNXmNcn9F4JXhSgFiP?=
- =?us-ascii?Q?7BVZ/KmFelRdukA0WG+1zTSC0VzKT7DHwlBaXaqZaEb8EtEwg51IURSe+w95?=
- =?us-ascii?Q?coQmasOBmVPiAkhc5I0fziWqO8Yjb202sAb1RX+/zh+BfD2sp2UPKOGfRSj9?=
- =?us-ascii?Q?Uhh85orRitGk91PqbiZVZgeD8LNZlXbHNqE9lw3LEuD6Zscj7HGlqjF7bO8j?=
- =?us-ascii?Q?WN3ZRFdYyBy+PMu7ucZQ4hIk96JaFlJ4nMaWWose1PkrKVgbqP6aCrwnxuDy?=
- =?us-ascii?Q?uSJsuzMHlC5epBA4vVNUCAEYajnZmYPvvZjfId7y6Yzjcwxw5eTqeiuuP/9+?=
- =?us-ascii?Q?daqbXUL9c/xbx6uLS19vUhPOQKUmraNVamlTyZRcihspYym+hpw0BXSDNdQf?=
- =?us-ascii?Q?swEznjO6itr1O7HlgPbLMG/BBok0?=
+	=?us-ascii?Q?ug+GTrgVwoFcfEQ+S1njCsuZcJp7w4aTjim5krz+1yHO8cI5lw0oAv82VIY/?=
+ =?us-ascii?Q?VYMkd/wjo2fXCQej61bCJVkRJ7feMPdiJzuoxR+y4XBilo9WhEBUK9EBdVSM?=
+ =?us-ascii?Q?h4nXQGr3RF1Okffcc36yfpV71gbmVmr8WEPk3SvlNgWlHK+SVCuwSOoxzPVK?=
+ =?us-ascii?Q?ShggUQr6ZxjcumyVxdZRwQMFPoCl1TsbqLJHcJ+XoEqJTPF1l1/ZlNH/WxBb?=
+ =?us-ascii?Q?YYZ6YXMSFeDeFCmk+8u0e8+X1dQDZN7V6DTKAuJCLuPZ1Oyvz6HXg9gUamPM?=
+ =?us-ascii?Q?2xDiWZAPhlnDXqLUovtbm4dgGEt3IxswovofS/MkiTEfNuHHbqIVgyfamcYw?=
+ =?us-ascii?Q?u7kS5CFDbfWc0ZZ+qoGuX0ZJtgCTN7shubLXgCictbqWbgIwUrcdNcLc59n6?=
+ =?us-ascii?Q?yp6Q9quyQncTWTWMWHiWQO29u8kofBrCVAahgQ4vZXEs76h+cltIZq8U8sXI?=
+ =?us-ascii?Q?0w02CW7SIf6YfxzcNxAqytWS41LGsOrc3V+tmdY4Hhv2hxglk2hWizh132g5?=
+ =?us-ascii?Q?W5n3tgpCWIZz1eDzyPqBph6sxxJ/ZJmnXkER7ExDgdukivpz4/kWZjWA/Sbc?=
+ =?us-ascii?Q?xSRBb7CGZui4/G7rhexF0UfoekM2jAkh38Hbo0kaB9XA0Vx5gNb/Gt8P24Ps?=
+ =?us-ascii?Q?r2lGCZJbIO86pTwLd8aEBcSirI/O/GooPheB8CNZu1o687Ykxsh2he+R3Yjv?=
+ =?us-ascii?Q?p9ABli+E+CTm2LqnYEzbLDL5xHwCycrT4w+QrgsmhA0h28TbKXYLzESXidGE?=
+ =?us-ascii?Q?KcXgjBSuWy+eOexAyy26smol8+jX4bYj55lckrDmpYbaXzp2zl3VdmRr+EHr?=
+ =?us-ascii?Q?tmd5Pws7k9mau5nOKhum5BqSdgNQxwvqoWZOEP7AwC/KmmxR9VOgzlO3+pGu?=
+ =?us-ascii?Q?thyroQGXGzPiXMr7aS7y8Z4DDzeApHgFA/9ZiMoJwLlCqPa9FKNnrdbkHbiq?=
+ =?us-ascii?Q?zdPYj22GLH0wHd2i1JMIY3y0aeiKgzbCCI7oxP4N9i7+Z67N4y6nGNGRmD78?=
+ =?us-ascii?Q?BTDPuUXVsnpRFCx+4KjhliqY0ChJSMtZc55Ddy5hAKFsO/k6zLYR99YG8yDh?=
+ =?us-ascii?Q?4yIdzYu1cqFRCX2lbLO6GElt3fQ7BehrjBKGK3OCZb8j7pEKN7/ktgmuilAr?=
+ =?us-ascii?Q?JVCYV9Bt0sycAaeFCkaaAWn8RQRh5C6zRIivJGsLqoIRMa2aYypiTQiY/B7q?=
+ =?us-ascii?Q?kqwOtOkpKQ1aCXhvKBhENpPqOXyv7WLRGDY0vBYGPqsdy6+xUFs3rSJSnMQJ?=
+ =?us-ascii?Q?/o7V+O1pVbUtmsbUiDBpqq/cXaYsVGvZoqSkF9oXzTfJlvs5v7iwvYyScO1W?=
+ =?us-ascii?Q?eSQAeyM7GsU0evoQ4xj06x87HTnJs0uapfwBHXXg3X/szVp88fKvzKDHO0Gf?=
+ =?us-ascii?Q?KOrhKIKTEpHk2Qcyo9vcUf9NlZEv?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(82310400014)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(7416005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 21:54:02.4913
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 22:25:11.8745
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f5f5e0cc-aaa0-4847-e408-08dc663b62c5
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c88abb9-92f5-4003-f830-08dc663fbcfb
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A0FC.namprd03.prod.outlook.com
+	CH1PEPF0000A347.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6911
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6336
 
-On Fri, Apr 26, 2024 at 12:57:08PM -0700, Sean Christopherson wrote:
+On Fri, Apr 26, 2024 at 01:14:32PM -0700, Sean Christopherson wrote:
 > On Fri, Apr 26, 2024, Michael Roth wrote:
-> > On Wed, Apr 24, 2024 at 05:15:40PM -0700, Sean Christopherson wrote:
-> > > On Sun, Apr 21, 2024, Michael Roth wrote:
-> > > > These commands can be used to pause servicing of guest attestation
-> > > > requests. This useful when updating the reported TCB or signing key with
-> > > > commands such as SNP_SET_CONFIG/SNP_COMMIT/SNP_VLEK_LOAD, since they may
-> > > > in turn require updates to userspace-supplied certificates, and if an
-> > > > attestation request happens to be in-flight at the time those updates
-> > > > are occurring there is potential for a guest to receive a certificate
-> > > > blob that is out of sync with the effective signing key for the
-> > > > attestation report.
+> > On Thu, Apr 25, 2024 at 03:13:40PM -0700, Sean Christopherson wrote:
+> > > On Thu, Apr 25, 2024, Michael Roth wrote:
+> > > > On Wed, Apr 24, 2024 at 01:59:48PM -0700, Sean Christopherson wrote:
+> > > > > On Sun, Apr 21, 2024, Michael Roth wrote:
+> > > > > > +static int snp_begin_psc_msr(struct kvm_vcpu *vcpu, u64 ghcb_msr)
+> > > > > > +{
+> > > > > > +	u64 gpa = gfn_to_gpa(GHCB_MSR_PSC_REQ_TO_GFN(ghcb_msr));
+> > > > > > +	u8 op = GHCB_MSR_PSC_REQ_TO_OP(ghcb_msr);
+> > > > > > +	struct vcpu_svm *svm = to_svm(vcpu);
+> > > > > > +
+> > > > > > +	if (op != SNP_PAGE_STATE_PRIVATE && op != SNP_PAGE_STATE_SHARED) {
+> > > > > > +		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
+> > > > > > +		return 1; /* resume guest */
+> > > > > > +	}
+> > > > > > +
+> > > > > > +	vcpu->run->exit_reason = KVM_EXIT_VMGEXIT;
+> > > > > > +	vcpu->run->vmgexit.type = KVM_USER_VMGEXIT_PSC_MSR;
+> > > > > > +	vcpu->run->vmgexit.psc_msr.gpa = gpa;
+> > > > > > +	vcpu->run->vmgexit.psc_msr.op = op;
+> > > > > 
+> > > > > Argh, no.
+> > > > > 
+> > > > > This is the same crud that TDX tried to push[*].  Use KVM's existing user exits,
+> > > > > and extend as *needed*.  There is no good reason page state change requests need
+> > > > > *two* exit reasons.  The *only* thing KVM supports right now is private<=>shared
+> > > > > conversions, and that can be handled with either KVM_HC_MAP_GPA_RANGE or
+> > > > > KVM_EXIT_MEMORY_FAULT.
+> > > > > 
+> > > > > The non-MSR flavor can batch requests, but I'm willing to bet that the overwhelming
+> > > > > majority of requests are contiguous, i.e. can be combined into a range by KVM,
+> > > > > and that handling any outliers by performing multiple exits to userspace will
+> > > > > provide sufficient performance.
 > > > > 
-> > > > These interfaces also provide some versatility with how similar
-> > > > firmware/certificate update activities can be handled in the future.
+> > > > That does tend to be the case. We won't have as much granularity with
+> > > > the per-entry error codes, but KVM_SET_MEMORY_ATTRIBUTES would be
+> > > > expected to be for the entire range anyway, and if that fails for
+> > > > whatever reason then we KVM_BUG_ON() anyway. We do have to have handling
+> > > > for cases where the entries aren't contiguous however, which would
+> > > > involve multiple KVM_EXIT_HYPERCALLs until everything is satisfied. But
+> > > > not a huge deal since it doesn't seem to be a common case.
 > > > 
-> > > Wait, IIUC, this is using the kernel to get two userspace components to not
-> > > stomp over each other.   Why is this the kernel's problem to solve?
+> > > If it was less complex overall, I wouldn't be opposed to KVM marshalling everything
+> > > into a buffer, but I suspect it will be simpler to just have KVM loop until the
+> > > PSC request is complete.
 > > 
-> > It's not that they are stepping on each other, but that kernel and
-> > userspace need to coordinate on updating 2 components whose updates need
-> > to be atomic from a guest perspective. Take an update to VLEK key for
-> > instance:
-> > 
-> >  1) management gets a new VLEK endorsement key from KDS along with
+> > Agreed. But *if* we decided to introduce a buffer, where would you
+> > suggest adding it? The kvm_run union fields are set to 256 bytes, and
+> > we'd need close to 4K to handle a full GHCB PSC buffer in 1 go. Would
+> > additional storage at the end of struct kvm_run be acceptable?
 > 
-> What is "management"?  I assume its some userspace daemon?
+> Don't even need more memory, just use vcpu->arch.pio_data, which is always
+> allocated and is mmap()able by userspace via KVM_PIO_PAGE_OFFSET.
 
-It could be a daemon depending on cloud provider, but the main example
-we have in mind is something more basic like virtee[1] being used to
-interactively perform an update at the command-line. E.g. you point it
-at the new VLEK, the new cert, and it will handle updating the certs at
-some known location and issuing the SNP_LOAD_VLEK command. With this
-interface, it can take the additional step of PAUSE'ing attestations
-before performing either update to keep the 2 actions in sync with the
-guest view.
-
-[1] https://github.com/virtee/snphost
+Nice, that seems like a good option if needed.
 
 > 
-> >     associated certificate chain
-> >  2) management uses SNP_VLEK_LOAD to update key
-> >  3) management updates the certs at the path VMM will grab them
-> >     from when the EXT_GUEST_REQUEST userspace exit is issued
+> > > > KVM_HC_MAP_GPA_RANGE seems like a nice option because we'd also have the
+> > > > flexibility to just issue that directly within a guest rather than
+> > > > relying on SNP/TDX specific hcalls. I don't know if that approach is
+> > > > practical for a real guest, but it could be useful for having re-usable
+> > > > guest code in KVM selftests that "just works" for all variants of
+> > > > SNP/TDX/sw-protected. (though we'd still want stuff that exercises
+> > > > SNP/TDX->KVM_HC_MAP_GPA_RANGE translation).
+> > > > 
+> > > > I think we'd there is some potential baggage there with the previous SEV
+> > > > live migration use cases. There's some potential that existing guest kernels
+> > > > will use it once it gets advertised and issue them alongside GHCB-based
+> > > > page-state changes. It might make sense to use one of the reserved bits
+> > > > to denote this flavor of KVM_HC_MAP_GPA_RANGE as being for
+> > > > hardware/software-protected VMs and not interchangeable with calls that
+> > > > were used for SEV live migration stuff.
+> > > 
+> > > I don't think I follow, what exactly wouldn't be interchangeable, and why?
 > > 
-> > If an attestation request comes in after 2), but before 3), then the
-> > guest sees an attestation report signed with the new key, but still
-> > gets the old certificate.
+> > For instance, if KVM_FEATURE_MIGRATION_CONTROL is advertised, then when
+> > amd_enc_status_change_finish() is triggered as a result of
+> > set_memory_encrypted(), we'd see
 > > 
-> > If you reverse the ordering:
+> >   1) a GHCB PSC for SNP, which will get forwarded to userspace via
+> >      KVM_HC_MAP_GPA_RANGE
+> >   2) KVM_HC_MAP_GPA_RANGE issued directly by the guest.
 > > 
-> >  1) management gets a new VLEK endorsement key from KDS along with
-> >     associated certificate chain
-> >  2) management updates the certs at the path VMM will grab them
-> >     from when the EXT_GUEST_REQUEST userspace exit is issued
-> >  3) management uses SNP_VLEK_LOAD to update key
-> > 
-> > then an attestation request between 2) and 3) will result in the guest
-> > getting the new cert, but getting an attestation report signed with an old
-> > endorsement key.
-> > 
-> > Providing a way to pause guest attestation requests prior to 2), and
-> > resume after 3), provides a straightforward way to make those updates
-> > atomic to the guest.
+> > In that case, we'd be duplicating PSCs but it wouldn't necessarily hurt
+> > anything. But ideally we'd be able to distinguish the 2 cases so we
+> > could rightly treat 1) as only being expected for SNP, and 2) as only
+> > being expected for SEV/SEV-ES.
 > 
-> Assuming "management" is a userspace component, I still don't see why this
-> requires kernel involvement.  "management" can tell VMMs to pause attestation
-> without having to bounce through the kernel.  It doesn't even require a push
+> Why would the guest issue both?  That's a guest bug.  Or if supressing the second
+> hypercall is an issue, simply don't enumerate MIGRATION_CONTROL for SNP guests.
 
-That would mean a tool like virtee above would need to issue kernel
-commands like SNP_LOAD_VLEK to handle key update, then implement some
-VMM-specific hook to pause servicing of EXT_GUEST_REQ (or whatever we
-end up calling it). QEMU could define events for this, and libvirt could
-implement them, and virtee could interact with libvirt to issue them in
-place of the PAUSE/RESUME approach here.
+At the time of its inception, KVM_HC_MAP_GPA_RANGE was simply
+KVM_HC_PAGE_ENC_STATUS and got a more generic name over the course of
+development. But its purpose never changed: to inform the hypervisor of
+the current encryption status of a GPA range so VMMs could build up a
+list of shared guest regions that don't need to go through firmware for
+migration.. And it was and still is asynchronous to a degree, since the
+the migration control MSRs signals when that list of shared pages is
+usable.
 
-But SNP libvirt support is a ways out, QEMU event mechanism for this
-will be a pain to use directly because you'd need some custom way to
-enumerate all guests, to issue them. But then maybe the provider doesn't
-even use QEMU and has to invent something else. Or they just decide to
-pause all guests before performing updates but that still a potential
-significant amount of downtime.
+These are very different semantics the proposal to use KVM_HC_MAP_GPA_RANGE
+as a means to set memory attributes via KVM_SET_MEMORY_ATTRIBUTES, and
+the 2 purposes aren't necessarily mutually exclusive to one another. It
+only really becomes a bug if we begin to interpret the original use-case
+as something other than it's initial intent in the case of SNP.
 
-> without having to bounce through the kernel.  It doesn't even require a push
-> model, e.g. wrap/redirect the certs with a file that has a "pause" flag and a
-> sequence counter.
+But at the same time, it's hard to imagine this older SEV live migration
+use-case being useful for SNP, since userspace will necessarily have all
+the information it needs to determine what is/isn't shared with relying
+on an additional hypercall.
 
-We could do something like flag the certificate file itself, it does
-sounds less painful than the above. But what defines that spec? GHCB
-completely defines the current format of the certs blob, so if we wrap
-that in another layer we need to extend the GHCB or have something else
-be the authority on what that wrapper looks like and tools like virtee
-would need to be very selective about what VMMs it can claim to support
-based on what file format they support... it just seems like a
-significant and unecessary pain that every userspace implementation
-will need to go through to achieve the same basic functionality.
-
-With PAUSE/RESUME, tools like virtee can be completely VMM-agnostic, and
-more highly-integrated daemon-based approaches can still benefit from a
-common mechanism that doesn't require signficant coordination with VMM
-processes. For something as important and basic as updating endorsement
-keys while guests are running it seems worthwhile to expose this minimal
-level of control to userspace.
+So treating the older use case as specific to non-SNP and disallowing the
+use of MIGRATION_CONTROL does seems reasonable. But it's really the CPUID
+bit that advertises it, SEV just happens to only use it for when
+MIGRATION_CONTROL is also advertised. So we could disable that as well,
+but I did like the idea of being able to handle guest-issued
+KVM_HC_MAP_GPA_RANGE calls even with SNP/TDX enabled, which is less of an
+option if we can't advertised KVM_HC_MAP_GPA_RANGE via cpuid. But I
+suppose we could do that with KVM selftests which is probably where
+that's more likely to be useful.
 
 -Mike
 
