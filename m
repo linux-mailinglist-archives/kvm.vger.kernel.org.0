@@ -1,188 +1,156 @@
-Return-Path: <kvm+bounces-16014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2CD8B2F51
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 06:10:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2758B2F58
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 06:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BCF7282B3E
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 04:10:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB46CB22165
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 04:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07547824B0;
-	Fri, 26 Apr 2024 04:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3CC824AF;
+	Fri, 26 Apr 2024 04:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NeG+3NwX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RV6jnpJ8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85445823DC;
-	Fri, 26 Apr 2024 04:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 528BBEACD;
+	Fri, 26 Apr 2024 04:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714104598; cv=none; b=ILBy9ErUi4lb8Z/K4jUcpyv6KVt4uNJ7aWiORGndyRsM75k2lYfnyiVnkLpInU/DdAQFaNsNzWEjcwwQeP1gwzfnsLqKn49Pd9CWa1/xQhJghPjIju1Ob77J6BCSjviQrNnsSePshzCI5V6KRcsJdjmK+GYhT0s+SqoQoJ3O0fQ=
+	t=1714104988; cv=none; b=gobzSDkvYJVmPmRHxjvQVpdXh6hBW9UFt1hmeQIU01FsDpLDWCcrk2jqVVQjp8+9dmhEV5sm1U8N+573dCQ3Pew15Yrc9Hl1qrT/DAmHL72+t+pwrjD77bfh2REVMM6ulJhw4QoSCh+XnQ+hjJ1MfJtKAjSZ2MOpmVTBBqmL7cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714104598; c=relaxed/simple;
-	bh=HoKx09rdRxN0ZIAbUYC7LzWiGNN0kAzLltW3ZSNTTmQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lmDJh06pYjL06FpxqkHce1kS+j3oOChvV210CNob8fahtL4wqw/Ae+ecTbLVmQ+vCg6wz5chHrKFuyv2IrCHwrplsznENX0NDLoAZs3aIKqh/CcUJ8bfbdUZ0OcSckVjNSaR28vvf9Muj0OjuGUIw/JXwh7USF5aFgoAHBUVgeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NeG+3NwX; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714104596; x=1745640596;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HoKx09rdRxN0ZIAbUYC7LzWiGNN0kAzLltW3ZSNTTmQ=;
-  b=NeG+3NwXaL5QgOX6MQtQOF+pYR2I3VmO/DqgKLHdr7ruV5cNxfjdZHuO
-   8zJNa6K01FrWzYdiXyZCuBlAEiCumFChgi8G0I0C/QbxICTKRwRPqH5Yq
-   FoAYEgDk2xkaz3U/Q/9ka0t41RkCiqsKDcJXy5RMRVsMpXABsSmdrYSVc
-   9NlrHqijj/2oEXIYuHOdqXAipCaTZeyyPrB3TdLQprZYOwCneCyR+guqh
-   IkF/dBaAOGlDNQ4eot4wGjgMU42bE2HWzoRpLNZliDZ73LL7KUMN/CKg5
-   6B89TZk2cFFzu5poDG5txGCLQ4W/mnqwRXAWO93dDSeZWtpiEtE0tWsCs
-   g==;
-X-CSE-ConnectionGUID: f2X5DvzTQtmjzKVig14RPA==
-X-CSE-MsgGUID: vUjk0fFoTl6C8F+01+g8yQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11055"; a="13665062"
-X-IronPort-AV: E=Sophos;i="6.07,231,1708416000"; 
-   d="scan'208";a="13665062"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 21:09:56 -0700
-X-CSE-ConnectionGUID: m6D5xHUyRX6/nMLIVjw3xQ==
-X-CSE-MsgGUID: RP5RRLT7Sn2Wjn72m1/kUg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,231,1708416000"; 
-   d="scan'208";a="25175174"
-Received: from xiongzha-mobl1.ccr.corp.intel.com (HELO [10.124.225.233]) ([10.124.225.233])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2024 21:09:52 -0700
-Message-ID: <f8a525e0-6364-4565-bd34-605846dc367c@linux.intel.com>
-Date: Fri, 26 Apr 2024 12:09:48 +0800
+	s=arc-20240116; t=1714104988; c=relaxed/simple;
+	bh=5BrCRh28BJUr6J5THiQ7LAX6u8wTo67DMh4LQ2zpXic=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=d0NmpmhtLnTX2MR3V0yyF75Bq0q2aBPm7cpXlrhk6nK7kvJp/b7EuP8woiYs7qR+RzNanEOhUiEKCKS+dULTm5666zd+P/PACKaWy2Kod7e5HJsTKAWXAcEES9NmvdSu/b3V2cTc76o94gIZ0KTdAzfPjvYTZNYxEohrXHEQfTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RV6jnpJ8; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2a2d248a2e1so2096927a91.0;
+        Thu, 25 Apr 2024 21:16:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1714104986; x=1714709786; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nPxarOGHNi8/phOxHc8/TqNc9y5wB5j9HDUxvMf3rik=;
+        b=RV6jnpJ81/eQdWhhBcVB4VfagUzEXzxY5MYSgRaWJam4yPJoANyr5y/SCy6hnuOYjf
+         TWqvEF3AByH2jI8YlP1uKpJcu4K3Zf78lHEpvMnAQS2On3Q1ix2OcXpJPucWVw2sgRAC
+         +tC3IYsQ9Dg+VzOFSQHCgFHRvm/UNdW/yv4j8tKnF6nRfTvx5WA5zC8eZfZcQacmdeKo
+         HCV2n/T2W0/ALwJGUYUSZrFpvW/UI0Zow8At1tHWCfeFeF39tq/Cgr6zHY2cVFj3LhLC
+         itjfc/BWhOQ7YgxF6kMy9iO449K55lcfdIVK16pNsXxNuX45yYWeQOHOkVhGfDpbj02M
+         xf7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714104986; x=1714709786;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nPxarOGHNi8/phOxHc8/TqNc9y5wB5j9HDUxvMf3rik=;
+        b=oco3k7ztdMGMrbuIF002Du9s/d2+jxwBzAn83pUeDRcrEacqcf5OHGSx5KA75OTifX
+         uv/3NyebvQ815OiENOXlyWudFr3P6W1C/FW5NafpEd3yv8RoJeYSOToYhw5GmChxeSm1
+         2/9jEKMfuk+agzrx8kmzH6sAWlXc6ZOOjCcKE2PSGv9Xp1VsTpY/fmvdTTq7qPCxBs2K
+         w9saEujYn3TafUmQYooR1f5QIWpFXZ1IertmRIbTbVIyAPZGKzyQygrRcSz5O6utyGVl
+         8VdeSqBoXYKVI1Vd4b5KN7nTivdYkIYKyd8H76LPgHaTQ6tFRChbk79FQ6oTdwmL2gfn
+         V72w==
+X-Forwarded-Encrypted: i=1; AJvYcCWMvWOtviYst0QjASznrwySqQA9J+t7JkjRdk7QJXAVz0APw/UCYtD0ag3GsDFgKCEv6SxlC2DsbfGWgySK4zqpjun1qVvjgSVNoEXzA73rH6Mb6810NX7/aXlbkBAA80Sm
+X-Gm-Message-State: AOJu0YxWN6M6ZRSvIT8iN3XpMJoPOm8Hqm2DKgysG4q3yEBwBh6akCQK
+	1MCTfk0Pxr+A6vpXgvTPvv2Y7jLK2sH7a5FEBP56O82fyDssZkbQ
+X-Google-Smtp-Source: AGHT+IHeG8VpdY6v+rRn/4gP6YO95Bc/nPm6EgDbGfMIbAFq60wqlLb284jt5mRC/V16Pq/FkgWw9Q==
+X-Received: by 2002:a17:90a:6fe2:b0:2a4:6ce7:37ad with SMTP id e89-20020a17090a6fe200b002a46ce737admr2778411pjk.5.1714104986454;
+        Thu, 25 Apr 2024 21:16:26 -0700 (PDT)
+Received: from localhost.localdomain ([43.132.141.8])
+        by smtp.gmail.com with ESMTPSA id x13-20020a170902ec8d00b001e9684b0e07sm9426780plg.173.2024.04.25.21.16.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Apr 2024 21:16:26 -0700 (PDT)
+From: Yi Wang <up2wing@gmail.com>
+X-Google-Original-From: Yi Wang <foxywang@tencent.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wanpengli@tencent.com,
+	foxywang@tencent.com,
+	oliver.upton@linux.dev,
+	maz@kernel.org,
+	anup@brainfault.org,
+	atishp@atishpatra.org,
+	borntraeger@linux.ibm.com,
+	frankja@linux.ibm.com,
+	imbrenda@linux.ibm.com,
+	weijiang.yang@intel.com
+Cc: up2wing@gmail.com
+Subject: [v4 RESEND 0/3] KVM: irqchip: synchronize srcu only if needed
+Date: Fri, 26 Apr 2024 12:15:56 +0800
+Message-Id: <20240426041559.3717884-1-foxywang@tencent.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 02/41] perf: Support guest enter/exit interfaces
-To: "Liang, Kan" <kan.liang@linux.intel.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, peterz@infradead.org, mizhang@google.com,
- kan.liang@intel.com, zhenyuw@linux.intel.com, dapeng1.mi@linux.intel.com,
- jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
- linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
- irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
- chao.gao@intel.com
-References: <20240126085444.324918-1-xiong.y.zhang@linux.intel.com>
- <20240126085444.324918-3-xiong.y.zhang@linux.intel.com>
- <ZhgmrczGpccfU-cI@google.com>
- <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com>
-Content-Language: en-US
-From: "Zhang, Xiong Y" <xiong.y.zhang@linux.intel.com>
-In-Reply-To: <23af8648-ca9f-41d2-8782-f2ffc3c11e9e@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+
+From: Yi Wang <foxywang@tencent.com>
+
+We found that it may cost more than 20 milliseconds very accidentally
+to enable cap of KVM_CAP_SPLIT_IRQCHIP on a host which has many vms
+already.
+
+The reason is that when vmm(qemu/CloudHypervisor) invokes
+KVM_CAP_SPLIT_IRQCHIP kvm will call synchronize_srcu_expedited() and
+might_sleep and kworker of srcu may cost some delay during this period.
+One way makes sence is setup empty irq routing when creating vm and
+so that x86/s390 don't need to setup empty/dummy irq routing.
+
+Note: I have no s390 machine so this patch has not been tested
+thoroughly on s390 platform. Thanks to Christian for a quick test on
+s390 and it still seems to work[1].
+
+Changelog:
+----------
+v4:
+  - replace loop with memset when setup empty irq routing table.
+
+v3:
+  - squash setup empty routing function and use of that into one commit
+  - drop the comment in s390 part
+
+v2:
+  - setup empty irq routing in kvm_create_vm
+  - don't setup irq routing in x86 KVM_CAP_SPLIT_IRQCHIP
+  - don't setup irq routing in s390 KVM_CREATE_IRQCHIP
+
+v1:
+  https://lore.kernel.org/kvm/20240112091128.3868059-1-foxywang@tencent.com/
+
+1. https://lore.kernel.org/lkml/f898e36f-ba02-4c52-a3be-06caac13323e@linux.ibm.com/
 
 
->>> +static inline int perf_force_exclude_guest_check(struct perf_event *event,
->>> +						 int cpu, struct task_struct *task)
->>> +{
->>> +	bool *force_exclude_guest = NULL;
->>> +
->>> +	if (!has_vpmu_passthrough_cap(event->pmu))
->>> +		return 0;
->>> +
->>> +	if (event->attr.exclude_guest)
->>> +		return 0;
->>> +
->>> +	if (cpu != -1) {
->>> +		force_exclude_guest = per_cpu_ptr(&__perf_force_exclude_guest, cpu);
->>> +	} else if (task && (task->flags & PF_VCPU)) {
->>> +		/*
->>> +		 * Just need to check the running CPU in the event creation. If the
->>> +		 * task is moved to another CPU which supports the force_exclude_guest.
->>> +		 * The event will filtered out and be moved to the error stage. See
->>> +		 * merge_sched_in().
->>> +		 */
->>> +		force_exclude_guest = per_cpu_ptr(&__perf_force_exclude_guest, task_cpu(task));
->>> +	}
->>
->> These checks are extremely racy, I don't see how this can possibly do the
->> right thing.  PF_VCPU isn't a "this is a vCPU task", it's a "this task is about
->> to do VM-Enter, or just took a VM-Exit" (the "I'm a virtual CPU" comment in
->> include/linux/sched.h is wildly misleading, as it's _only_ valid when accounting
->> time slices).
->>
-> 
-> This is to reject an !exclude_guest event creation for a running
-> "passthrough" guest from host perf tool.
-> Could you please suggest a way to detect it via the struct task_struct?
-Here PF_VCPU is used to distinguish a perf event profiling userspace VMM
-process, like perf record -e {} -p $QEMU_PID. A lot of emails have
-discussed how to handle system wide perf event which has
-perf_event.attr.task == NULL. But perf event for user space VMM should be
-handled the same as system wide perf event, perf need a method to identify
-a process perf event is for user space VMM. PF_VCPU isn't the right one,
-then an open how to handle this ?
+Yi Wang (3):
+  KVM: setup empty irq routing when create vm
+  KVM: x86: don't setup empty irq routing when KVM_CAP_SPLIT_IRQCHIP
+  KVM: s390: don't setup dummy routing when KVM_CREATE_IRQCHIP
 
-thanks
-> 
-> 
->> Digging deeper, I think __perf_force_exclude_guest has similar problems, e.g.
->> perf_event_create_kernel_counter() calls perf_event_alloc() before acquiring the
->> per-CPU context mutex.
-> 
-> Do you mean that the perf_guest_enter() check could be happened right
-> after the perf_force_exclude_guest_check()?
-> It's possible. For this case, the event can still be created. It will be
-> treated as an existing event and handled in merge_sched_in(). It will
-> never be scheduled when a guest is running.
-> 
-> The perf_force_exclude_guest_check() is to make sure most of the cases
-> can be rejected at the creation place. For the corner cases, they will
-> be rejected in the schedule stage.
-> 
->>
->>> +	if (force_exclude_guest && *force_exclude_guest)
->>> +		return -EBUSY;
->>> +	return 0;
->>> +}
->>> +
->>>  /*
->>>   * Holding the top-level event's child_mutex means that any
->>>   * descendant process that has inherited this event will block
->>> @@ -11973,6 +12142,11 @@ perf_event_alloc(struct perf_event_attr *attr, int cpu,
->>>  		goto err_ns;
->>>  	}
->>>  
->>> +	if (perf_force_exclude_guest_check(event, cpu, task)) {
->>
->> This should be:
->>
->> 	err = perf_force_exclude_guest_check(event, cpu, task);
->> 	if (err)
->> 		goto err_pmu;
->>
->> i.e. shouldn't effectively ignore/override the return result.
->>
-> 
-> Sure.
-> 
-> Thanks,
-> Kan
-> 
->>> +		err = -EBUSY;
->>> +		goto err_pmu;
->>> +	}
->>> +
->>>  	/*
->>>  	 * Disallow uncore-task events. Similarly, disallow uncore-cgroup
->>>  	 * events (they don't make sense as the cgroup will be different
->>> -- 
->>> 2.34.1
->>>
-> 
+ arch/s390/kvm/kvm-s390.c |  9 +--------
+ arch/x86/kvm/irq.h       |  1 -
+ arch/x86/kvm/irq_comm.c  |  5 -----
+ arch/x86/kvm/x86.c       |  3 ---
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/irqchip.c       | 19 +++++++++++++++++++
+ virt/kvm/kvm_main.c      |  4 ++++
+ 7 files changed, 25 insertions(+), 17 deletions(-)
+
+-- 
+2.39.3
+
 
