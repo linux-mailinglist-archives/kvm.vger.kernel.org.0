@@ -1,244 +1,258 @@
-Return-Path: <kvm+bounces-16082-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16083-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2C38B4101
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 23:01:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0B368B4187
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 23:54:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F819B21F51
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 21:01:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E38F4B222EE
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 21:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFB32C84F;
-	Fri, 26 Apr 2024 21:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B47376E7;
+	Fri, 26 Apr 2024 21:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TIUMIXbY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pVMyzeWK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36DE13AF2
-	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 21:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714165279; cv=none; b=KXNlPMomtLle0A88wtF+AYujK1qK822yL6z5p+f/2YwGrGAKd0h+ozAx0c+cqBrmweg2ifZHqdGHjqXEii2UWxsa6zcY2x45wjbAqju6QNNTCmko+v0r8zZlPaGU9vLkCBhEZY5n/kSvyCyLgiygjVvcr3YDdlf7wUelwhjpicQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714165279; c=relaxed/simple;
-	bh=Epgqxdq6VeKfWm6FHSwQentwf1ljWjufcF9ZlxxH/zs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Rj2r5OzPLNLzOzs9Lhx5M4Z9J6ALJlGRcfQwCLknQ8YEHCjaAGTSv17560/BKI0qU43wI3y4c1sbkWQWLSB82LOha3bbk18v4Qw5S06MZcPdztXYuV9EXnFx2sB+NkaB4PnA2GzSMj5MId0IwvYer3F8AAE3KqWzKTulG4dwd1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TIUMIXbY; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6ceade361so6228936276.0
-        for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 14:01:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714165277; x=1714770077; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rX0i2xw++nNStPTG6piEEy7HbW3SzcjMZwsGSn414eg=;
-        b=TIUMIXbYRCVflBm7/+ULBgjacgak6chXRNPWD3qG3Z1b2/u//1QgVq8Y9mSJD4aJJD
-         7i/k7HRByOFNgIw6ldaJ4XWbfqplJauY1T4TyDuevjctno/mbEEuVz/veLIHMkmP201w
-         2hQMIyAWurT/uUWVZfkxOdYC+n/7oyRJu7yIgfrFKor2gWkDVoHLK+EuR2ihDi2sPNqO
-         qKqJPsbpj5+wb+KugWzJ8r/B+jAT2zDHeUuFN/DUdUZPmw2HZhu4nmn51rDIkzFMHSXt
-         rDxpkOdjqzwS5PceHt2p6pB+002H+WXE3D/BetVhlN1JKKfD9WfpQUh3srqHRuBzJsXi
-         ZhWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714165277; x=1714770077;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rX0i2xw++nNStPTG6piEEy7HbW3SzcjMZwsGSn414eg=;
-        b=u1OUWfHMyN6hrBGoYCmjqOko0IeuU0g5DXc54Wf/4HJD2VdRK/CTu0f+pFn+EVr6yL
-         qzoaFntmGOkaARA8hqTYTzbs8Relkeyl1NGEG5OInJe9Ykiokt0lTbKroKvgQcItc573
-         NImH8Bg0s433bUFkDdhxR6r6JExDrpUMlwvhMdc+l3QwhW4j4AsREZsqeCidiz/pMFDV
-         LyKbx8usgBoUbRzS6dP+54K5gw2eOpWw6IGmtbAiWSRCT8XFii4oh3rWI3rxm2eT/Jf8
-         /rDL0l0rLWKrxd37aBYMLBL1NnN5cp3YUWLGeD+gPqc1971rddqzytRPbshaj42r9rxs
-         ysqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWg/WiDC2dNJaNO/z4MzZ4BMpAtrN68noEelKK/RFkGSEVKybAcRjjT5GV59S8YNc2TKVyKOtFnTY/gFle4VAf3nAbi
-X-Gm-Message-State: AOJu0YxVe+gQAPwHLR7U8GbXCDOsSqexozSJBy6o6bJj9aP/OMaSgj0J
-	DqOWg0re+lDLyGCcO+xLm0vIXKRtYepf5N5Xk2Qzls741NWLjpfosgyRs52skdrMxcylJ9asokK
-	r3g==
-X-Google-Smtp-Source: AGHT+IHZ7zlgATaoEjItXpt0+lPhLVgOPB/c7agI1QcpZna9x6zfw+NEeQKeuz1kND81TiK/MoMeDXdYc/0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:154b:b0:dc7:68b5:4f21 with SMTP id
- r11-20020a056902154b00b00dc768b54f21mr1113542ybu.9.1714165276709; Fri, 26 Apr
- 2024 14:01:16 -0700 (PDT)
-Date: Fri, 26 Apr 2024 14:01:15 -0700
-In-Reply-To: <20240307163541.92138-1-dmatlack@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3360238396;
+	Fri, 26 Apr 2024 21:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.82
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714168449; cv=fail; b=cywefEWdraNsQ3gHNxltpH6iM6/83ZquA5FNmy6pMEIqA2AO8W/D4pbs+aPW1RfCyRxr2UuNrtWKXLj69Ea+LnHXMKKY+7oroFQSyz/EzcSiUdbPMCTvgsIYYmup3KGKOxhHAUJl6z7sd5UPOwLXySppd07qqQnbBjMwyeiQC2A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714168449; c=relaxed/simple;
+	bh=gzt3VHJEhs3XMcLynoGCu5LrX+3oEacqgb0HNWIQT5w=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RSrlay8xRk+mX+zpjWXYinAAkfRBqHf8YlmFithRpqAdiJiZ8UkpALbHLevMl2EVc8OaqGtfSJFuwiv1qysJguO5p4K2tiM8OeyX+Ceta6blbCuBTlDMwHuN2w10cPIf3Rj9FR2KJvIo7bjfJw5k9JmZwR0mSy9/mzKNwA89WVQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pVMyzeWK; arc=fail smtp.client-ip=40.107.93.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Asnt5NpwX4svE4CI+fC4nbtQf9MokYeBxlj/eXrRhf+GJzrBueHMJK3in8HjAu/nPm5tOw50S00JWcU0INErzZRCTU1UDjQh4RIWNq4yi6+4BxOQHC6R2cvOsjD7WS5Y8dUM1Z5Fds+Wz7CtXisvEd56MYjG0TdSpVUSXH1qBSBPo5v0INwhQZu5fVKGKRhtkYP1O3Z+eO+tlkhPrNaR8mdNMShpCvCBcZkLp0hdw0Pvt2iLrqRfWj1bIF0+5koEYYw56UG1JJOckwj3X+XIOjzuAUUKp8DkGLI5oRgFs2bgO/RXqz4Var2hdK024QHnW2zNRRoM7s7rWIckC4VxEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=24FoQDV6vqYKAefmG8C3h1XdtlmyVqapga9w7WJzGJM=;
+ b=cyuTuuk7rMiDy5vfk5OrD0g9X5X/TGkn0YYN4UJXb5DN6YWaB4Fo1A8EyVbcdTH7/t8N0wSOvpWPf/D0KfxbUZQNMC/2fyhWMVMlP9UcMe2StGfaylnKkoSje8OOY8+geZ7imukMDWz8M0oHbpzaUQ8AIYRtwdaTTrzERxVgzcg7aBqNNVV8oce3W5BpwH7D0pY+fBr2sWPH1iXdwSt4BMGY4Pop8fgNqTSk5RsV4ZsUt+ufRsvP0rVmgf50CRv2UlGKYyYCvLloAi3IcqYyU3lj+ESNmuToak6klUJ97+7cYN0VLplFFgKwh0qQ/O9n2dkcLoRApFn+b3z5oAsQXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=24FoQDV6vqYKAefmG8C3h1XdtlmyVqapga9w7WJzGJM=;
+ b=pVMyzeWKlpN4nxERgjbfQOy+uPvLzxuRN6h/CYGELDvKM0RR4hTaNqX2Iu24zAdh9gmkZ+OIQ+Umuexd+vX8Q3hy4jrqu+Y0Cvzot10Hk1bTPxnMCzafX7cfLUAi4jAA2Xi9fipHHQGIClnjWqpJtFh7/tiE8/F8nkOdA1svoBU=
+Received: from BL0PR0102CA0025.prod.exchangelabs.com (2603:10b6:207:18::38) by
+ SN7PR12MB6911.namprd12.prod.outlook.com (2603:10b6:806:261::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7472.46; Fri, 26 Apr 2024 21:54:02 +0000
+Received: from BL02EPF0001A0FC.namprd03.prod.outlook.com
+ (2603:10b6:207:18:cafe::3f) by BL0PR0102CA0025.outlook.office365.com
+ (2603:10b6:207:18::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.35 via Frontend
+ Transport; Fri, 26 Apr 2024 21:54:02 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF0001A0FC.mail.protection.outlook.com (10.167.242.103) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7519.19 via Frontend Transport; Fri, 26 Apr 2024 21:54:02 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 26 Apr
+ 2024 16:54:01 -0500
+Date: Fri, 26 Apr 2024 16:46:33 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <Larry.Dewey@amd.com>
+Subject: Re: [PATCH v14 21/22] crypto: ccp: Add the
+ SNP_{PAUSE,RESUME}_ATTESTATION commands
+Message-ID: <20240426214633.myecxgh6ci3qshmi@amd.com>
+References: <20240421180122.1650812-1-michael.roth@amd.com>
+ <20240421180122.1650812-22-michael.roth@amd.com>
+ <ZimgrDQ_j2QTM6s5@google.com>
+ <20240426173515.6pio42iqvjj2aeac@amd.com>
+ <ZiwHFMfExfXvqDIr@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240307163541.92138-1-dmatlack@google.com>
-Message-ID: <ZiwWG4iHQYREwFP2@google.com>
-Subject: Re: [PATCH v2] KVM: Mark a vCPU as preempted/ready iff it's scheduled
- out while running
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZiwHFMfExfXvqDIr@google.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FC:EE_|SN7PR12MB6911:EE_
+X-MS-Office365-Filtering-Correlation-Id: f5f5e0cc-aaa0-4847-e408-08dc663b62c5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HRVovK5l0MvoNkVlQwjriTbugBczjqnWL+RPD0JuEmziE7tM5lm5wvcMWrJS?=
+ =?us-ascii?Q?O1Ui1TqtbKvUi0cKaqLZ5P1waYUOG/lIFrB15GQ2+epZLTduPftTm7S7V+R7?=
+ =?us-ascii?Q?MX2r5e+23SS88A8hjmc2zIdCT78lmh+5Tnx2V2xVzUfZ0i0K5VF2MhWJclWH?=
+ =?us-ascii?Q?L8P0WdGwSUHWlVyWGdMqQ+LBuc84rAKei7x3lwLRw8ZmtrN9dgoU8h5ELHL1?=
+ =?us-ascii?Q?NUd1fIlbjJGz44mtHGGLau7O8n3H+hmN/7w1dk5FN+JAnzE0f7+6YbLLW/zj?=
+ =?us-ascii?Q?5t8H+SPIVnUMzz7OnjRKvcJ/Owoq/+Hkb625TsqO7mXwZ+bJTNl9Pa0hJ43B?=
+ =?us-ascii?Q?jW9BqPfUq5T1lUHcZcf1RX/emYhnw5Nhud22tA0WbwR2oZzFASEBJl37vT2R?=
+ =?us-ascii?Q?IVjSzGBpDFPXuexOFMLBNccjGw2F9xw6cB/s+T5eGHsy6XLdCMjC2OzXlz9s?=
+ =?us-ascii?Q?WG787Y1XMF8XIPR515woDtVmXvKv6dHAxTOl3/onhQHpdsapj9fPA4hkzmIA?=
+ =?us-ascii?Q?7CBlWVh3edFPzuI1VepW3fAXlPdn/AnM1kxHeye9BHkTE00fOmaLnKedzsgf?=
+ =?us-ascii?Q?5NKmuqBVXnJshPR7G7mElamB2s0U+7fg1fY57H70mgsbiDzim9sqwqk/dshq?=
+ =?us-ascii?Q?r+r1s+te/SVUBSd42MUWeNCP2cQOPaNMx3oK2VJzAL7ur+ZWZdJIT8KoH5lQ?=
+ =?us-ascii?Q?rKPfqQFzXWbvzU2S2F+CrFMBlvR8f9msAd0exmw4JYVabVVqbX1i5tWuidVn?=
+ =?us-ascii?Q?kggRK813//UB/AsBZoTM86h+DXMarPA5HDo3oJFvE+lN5uukOiX2Rphr5TEM?=
+ =?us-ascii?Q?KCmKt1609l2HekonjccAgPG1z2fgafp2UCYkeg/GETjANoIhtU53+A49lhEL?=
+ =?us-ascii?Q?QIDaoAzzN56tqJbTGJIh6dLx0msKvppHx6KsPFqEEcvs/LzRCpTv7/GtXnyg?=
+ =?us-ascii?Q?Q4epXNFBriFmf0Nc2DC7f1FLZ2JYdVlphxTPnWo1A9JNXmNcn9F4JXhSgFiP?=
+ =?us-ascii?Q?7BVZ/KmFelRdukA0WG+1zTSC0VzKT7DHwlBaXaqZaEb8EtEwg51IURSe+w95?=
+ =?us-ascii?Q?coQmasOBmVPiAkhc5I0fziWqO8Yjb202sAb1RX+/zh+BfD2sp2UPKOGfRSj9?=
+ =?us-ascii?Q?Uhh85orRitGk91PqbiZVZgeD8LNZlXbHNqE9lw3LEuD6Zscj7HGlqjF7bO8j?=
+ =?us-ascii?Q?WN3ZRFdYyBy+PMu7ucZQ4hIk96JaFlJ4nMaWWose1PkrKVgbqP6aCrwnxuDy?=
+ =?us-ascii?Q?uSJsuzMHlC5epBA4vVNUCAEYajnZmYPvvZjfId7y6Yzjcwxw5eTqeiuuP/9+?=
+ =?us-ascii?Q?daqbXUL9c/xbx6uLS19vUhPOQKUmraNVamlTyZRcihspYym+hpw0BXSDNdQf?=
+ =?us-ascii?Q?swEznjO6itr1O7HlgPbLMG/BBok0?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(82310400014)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 21:54:02.4913
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f5f5e0cc-aaa0-4847-e408-08dc663b62c5
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A0FC.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6911
 
-On Thu, Mar 07, 2024, David Matlack wrote:
-> Mark a vCPU as preempted/ready if-and-only-if it's scheduled out while
-> running. i.e. Do not mark a vCPU preempted/ready if it's scheduled out
-> during a non-KVM_RUN ioctl() or when userspace is doing KVM_RUN with
-> immediate_exit.
+On Fri, Apr 26, 2024 at 12:57:08PM -0700, Sean Christopherson wrote:
+> On Fri, Apr 26, 2024, Michael Roth wrote:
+> > On Wed, Apr 24, 2024 at 05:15:40PM -0700, Sean Christopherson wrote:
+> > > On Sun, Apr 21, 2024, Michael Roth wrote:
+> > > > These commands can be used to pause servicing of guest attestation
+> > > > requests. This useful when updating the reported TCB or signing key with
+> > > > commands such as SNP_SET_CONFIG/SNP_COMMIT/SNP_VLEK_LOAD, since they may
+> > > > in turn require updates to userspace-supplied certificates, and if an
+> > > > attestation request happens to be in-flight at the time those updates
+> > > > are occurring there is potential for a guest to receive a certificate
+> > > > blob that is out of sync with the effective signing key for the
+> > > > attestation report.
+> > > > 
+> > > > These interfaces also provide some versatility with how similar
+> > > > firmware/certificate update activities can be handled in the future.
+> > > 
+> > > Wait, IIUC, this is using the kernel to get two userspace components to not
+> > > stomp over each other.   Why is this the kernel's problem to solve?
+> > 
+> > It's not that they are stepping on each other, but that kernel and
+> > userspace need to coordinate on updating 2 components whose updates need
+> > to be atomic from a guest perspective. Take an update to VLEK key for
+> > instance:
+> > 
+> >  1) management gets a new VLEK endorsement key from KDS along with
 > 
-> Commit 54aa83c90198 ("KVM: x86: do not set st->preempted when going back
-> to user space") stopped marking a vCPU as preempted when returning to
-> userspace, but if userspace then invokes a KVM vCPU ioctl() that gets
-> preempted, the vCPU will be marked preempted/ready. This is arguably
-> incorrect behavior since the vCPU was not actually preempted while the
-> guest was running, it was preempted while doing something on behalf of
-> userspace.
+> What is "management"?  I assume its some userspace daemon?
+
+It could be a daemon depending on cloud provider, but the main example
+we have in mind is something more basic like virtee[1] being used to
+interactively perform an update at the command-line. E.g. you point it
+at the new VLEK, the new cert, and it will handle updating the certs at
+some known location and issuing the SNP_LOAD_VLEK command. With this
+interface, it can take the additional step of PAUSE'ing attestations
+before performing either update to keep the 2 actions in sync with the
+guest view.
+
+[1] https://github.com/virtee/snphost
+
 > 
-> This commit also avoids KVM dirtying guest memory after userspace has
-> paused vCPUs, e.g. for Live Migration, which allows userspace to collect
-> the final dirty bitmap before or in parallel with saving vCPU state
-> without having to worry about saving vCPU state triggering writes to
-> guest memory.
+> >     associated certificate chain
+> >  2) management uses SNP_VLEK_LOAD to update key
+> >  3) management updates the certs at the path VMM will grab them
+> >     from when the EXT_GUEST_REQUEST userspace exit is issued
+> > 
+> > If an attestation request comes in after 2), but before 3), then the
+> > guest sees an attestation report signed with the new key, but still
+> > gets the old certificate.
+> > 
+> > If you reverse the ordering:
+> > 
+> >  1) management gets a new VLEK endorsement key from KDS along with
+> >     associated certificate chain
+> >  2) management updates the certs at the path VMM will grab them
+> >     from when the EXT_GUEST_REQUEST userspace exit is issued
+> >  3) management uses SNP_VLEK_LOAD to update key
+> > 
+> > then an attestation request between 2) and 3) will result in the guest
+> > getting the new cert, but getting an attestation report signed with an old
+> > endorsement key.
+> > 
+> > Providing a way to pause guest attestation requests prior to 2), and
+> > resume after 3), provides a straightforward way to make those updates
+> > atomic to the guest.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
-> v2:
->  - Drop Google-specific "PRODKERNEL: " shortlog prefix
-> 
-> v1: https://lore.kernel.org/kvm/20231218185850.1659570-1-dmatlack@google.com/
-> 
->  include/linux/kvm_host.h | 1 +
->  virt/kvm/kvm_main.c      | 5 ++++-
->  2 files changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 7e7fd25b09b3..5b2300614d22 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -378,6 +378,7 @@ struct kvm_vcpu {
->  		bool dy_eligible;
->  	} spin_loop;
->  #endif
-> +	bool wants_to_run;
->  	bool preempted;
->  	bool ready;
->  	struct kvm_vcpu_arch arch;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index ff588677beb7..3da1b2e3785d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4438,7 +4438,10 @@ static long kvm_vcpu_ioctl(struct file *filp,
->  				synchronize_rcu();
->  			put_pid(oldpid);
->  		}
-> +		vcpu->wants_to_run = !vcpu->run->immediate_exit;
+> Assuming "management" is a userspace component, I still don't see why this
+> requires kernel involvement.  "management" can tell VMMs to pause attestation
+> without having to bounce through the kernel.  It doesn't even require a push
 
->  		r = kvm_arch_vcpu_ioctl_run(vcpu);
-> +		vcpu->wants_to_run = false;
-> +
->  		trace_kvm_userspace_exit(vcpu->run->exit_reason, r);
->  		break;
->  	}
-> @@ -6312,7 +6315,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
->  {
->  	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
->  
-> -	if (current->on_rq) {
-> +	if (current->on_rq && vcpu->wants_to_run) {
->  		WRITE_ONCE(vcpu->preempted, true);
->  		WRITE_ONCE(vcpu->ready, true);
->  	}
-> 
-> base-commit: 687d8f4c3dea0758afd748968d91288220bbe7e3
+That would mean a tool like virtee above would need to issue kernel
+commands like SNP_LOAD_VLEK to handle key update, then implement some
+VMM-specific hook to pause servicing of EXT_GUEST_REQ (or whatever we
+end up calling it). QEMU could define events for this, and libvirt could
+implement them, and virtee could interact with libvirt to issue them in
+place of the PAUSE/RESUME approach here.
 
-Long story short, I was playing around with wants_to_run for a few hairbrained
-ideas, and realized that there's a TOCTOU bug here.  Userspace can toggle
-run->immediate_exit at will, e.g. can clear it after the kernel loads it to
-compute vcpu->wants_to_run.
+But SNP libvirt support is a ways out, QEMU event mechanism for this
+will be a pain to use directly because you'd need some custom way to
+enumerate all guests, to issue them. But then maybe the provider doesn't
+even use QEMU and has to invent something else. Or they just decide to
+pause all guests before performing updates but that still a potential
+significant amount of downtime.
 
-That's not fatal for this use case, since userspace would only be shooting itself
-in the foot, but it leaves a very dangerous landmine, e.g. if something else in
-KVM keys off of vcpu->wants_to_run to detect that KVM is in its run loop, i.e.
-relies on wants_to_run being set if KVM is in its core run loop.
+> without having to bounce through the kernel.  It doesn't even require a push
+> model, e.g. wrap/redirect the certs with a file that has a "pause" flag and a
+> sequence counter.
 
-To address that, I think we should have all architectures check wants_to_run, not
-immediate_exit.  And loading immediate_exit needs to be done with READ_ONCE().
+We could do something like flag the certificate file itself, it does
+sounds less painful than the above. But what defines that spec? GHCB
+completely defines the current format of the certs blob, so if we wrap
+that in another layer we need to extend the GHCB or have something else
+be the authority on what that wrapper looks like and tools like virtee
+would need to be very selective about what VMMs it can claim to support
+based on what file format they support... it just seems like a
+significant and unecessary pain that every userspace implementation
+will need to go through to achieve the same basic functionality.
 
-E.g. for x86 (every other arch has similar code)
+With PAUSE/RESUME, tools like virtee can be completely VMM-agnostic, and
+more highly-integrated daemon-based approaches can still benefit from a
+common mechanism that doesn't require signficant coordination with VMM
+processes. For something as important and basic as updating endorsement
+keys while guests are running it seems worthwhile to expose this minimal
+level of control to userspace.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e9ef1fa4b90b..1a2f6bf14fb2 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11396,7 +11396,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 
-        kvm_vcpu_srcu_read_lock(vcpu);
-        if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
--               if (kvm_run->immediate_exit) {
-+               if (!vcpu->wants_to_run) {
-                        r = -EINTR;
-                        goto out;
-                }
-@@ -11474,7 +11474,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
-                WARN_ON_ONCE(vcpu->mmio_needed);
-        }
- 
--       if (kvm_run->immediate_exit) {
-+       if (!vcpu->wants_to_run) {
-                r = -EINTR;
-                goto out;
-        }
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f9b9ce0c3cd9..0c0aae224000 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1497,9 +1497,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
-                                        struct kvm_guest_debug *dbg);
- int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu);
- 
--void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu);
--
--void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
-+void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu, bool sched_in);
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu);
- int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id);
- int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 9501fbd5dfd2..4384bbdba65c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4410,7 +4410,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-                                synchronize_rcu();
-                        put_pid(oldpid);
-                }
--               vcpu->wants_to_run = !vcpu->run->immediate_exit;
-+               vcpu->wants_to_run = !READ_ONCE(vcpu->run->immediate_exit);
-                r = kvm_arch_vcpu_ioctl_run(vcpu);
-                vcpu->wants_to_run = false;
-
-
----
-
-Hmm, and we should probably go a step further and actively prevent using
-immediate_exit from the kernel, e.g. rename it to something scary like:
-
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2190adbe3002..9c5fe1dae744 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -196,7 +196,11 @@ struct kvm_xen_exit {
- struct kvm_run {
-        /* in */
-        __u8 request_interrupt_window;
-+#ifndef __KERNEL__
-        __u8 immediate_exit;
-+#else
-+       __u8 hidden_do_not_touch;
-+#endif
-        __u8 padding1[6];
- 
-        /* out */
-
+-Mike
 
