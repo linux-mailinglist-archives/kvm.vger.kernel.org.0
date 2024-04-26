@@ -1,272 +1,505 @@
-Return-Path: <kvm+bounces-16055-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8EB8B3988
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 16:11:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EDE68B39D0
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 16:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF5BB1F23C83
-	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 14:11:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2A431F22C45
+	for <lists+kvm@lfdr.de>; Fri, 26 Apr 2024 14:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42320148831;
-	Fri, 26 Apr 2024 14:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C14148844;
+	Fri, 26 Apr 2024 14:23:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hgi42lR0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/y9jvwZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2066.outbound.protection.outlook.com [40.107.102.66])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822A61465A1
-	for <kvm@vger.kernel.org>; Fri, 26 Apr 2024 14:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714140683; cv=fail; b=aCejLiMC13OEjkVIyTMyhUgOp5DGwnbp+0t2iegtMOrsv0v/wZX+SRUS91pmdwtRBVk6OuPQJU1Iz25IsiPK80X6iS4dVn9uUvQ0n1fluRXFxkMMKP4v9JVHE/pgSE9Rl6CKwGBGL4AMnA0p5nisd6WBwlBaJErteO+Do3UKTr4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714140683; c=relaxed/simple;
-	bh=XSxcp3x85LUzNrcjFke397TcbP92309xH9hTN7PkdwQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=QT04A/vnB5oyoBRHcA7w3CrL8Z1hf/BpvG/5HEe2n/oksKL+EbRvFC3nzfIVsA1r5FnNMmXZfkmO8lHyPjqF4/Qvr7F1MU2Ix14nO6zzH0LeaQRITNLBWlFwhl5bo+oTI9mAJxFU+5h299fw6URdEZvZ9UBkaIWSJqfIp8wG0FA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hgi42lR0; arc=fail smtp.client-ip=40.107.102.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kcQsG+JgJyUG3flFTWMZ8CuIdM48ibX9WbODpPH4Z0GPFvgB895y+TOBqzI46OJS0BZLMF1WoFdDGrkDzohi1xfroXebVM6cl2jM1BCvjCmW144lyC9Ccc7JZt2p6LdON77xhY2SzneutZr1Abu+7LxfcoW9rFxckLOx0z5DoZ4aceabuhb0fnACyLYx7jx23x66EPSBGsFEcF7TOwuBMjHQYHpwn7uLkr2rvimbOZ2wqexp/dH7fn7n0QxTs6qyPACaUZY//Eyh44TuLkk2SGpcd3WY2nTnT6N83kA4T8p7Ij1WcaMo4/EwkmzFvzlqMBi2Se2Luv2LSMyBNwkpeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NdkM9BTEo6pjMoXqpWHn2lg8qCWYSw607nSpyG8frNs=;
- b=hguKZlmEYMnISqpCJqaHeWn/zKEpx0D59LQIjcZ5JTcnMrlyx65Qt6VXgo1Tt1bbclF7P/DNicuwDKQcun7xO0kRTNSDWEztS/9bJ8X9mQPHSGgC0+VmyQjNbVfhpiy1UYmDjvyN0Cd/5uZDhCHc9e/Y3Sdxs5Zh1rGfGRaZy/BpgKCZduW37PF2KbvcvqRE0itrOzwyn8Uxys84NjeM8SqdhSxfpLzRSZlCK3xzNMQ/mkKEomqoGF201bLI07V0tyiQmPW+dwDHr+5tIzMdhFIJGS09wLtkWQmpXupi55IoJQk4cjIwQDKXzXuS8KivbYd54MgRdqpvI33IVR33Ww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NdkM9BTEo6pjMoXqpWHn2lg8qCWYSw607nSpyG8frNs=;
- b=hgi42lR0Efj/dQ+ommZ2o9yaVmF9LQs674g/+vPyPg7yfXOzdzeH8uiaKTjClOYC7JIPY9ONUhJrOjAPF2QCQTDdxre2SGOITnHWgZpIgTeSmoaxcwMp4R6IuGgWrRVJsNEhqHiSU7cVGDhPStwQsLxJ3yPGpeZSFCg0jNGsyLr+1UWGbb0mE7zqsLUXEVMNEgzEV0TFeqk0+cTMt3zFMn/iDX03eIXNiVXBUZZ5peoD6EYcpcpdW9UZUUGIxuJc/E4oSyYFmB0U5CojEZE59bPnA8RUizsNqVpyK7jYAPJzUnv0isLDVBxu/IlJCiZkCCzZ1SQ6KDJaWXq0k+aSEg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by DM4PR12MB6544.namprd12.prod.outlook.com (2603:10b6:8:8d::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.44; Fri, 26 Apr 2024 14:11:18 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%3]) with mapi id 15.20.7519.021; Fri, 26 Apr 2024
- 14:11:18 +0000
-Date: Fri, 26 Apr 2024 11:11:17 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@redhat.com>
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-Message-ID: <20240426141117.GY941030@nvidia.com>
-References: <20240418143747.28b36750.alex.williamson@redhat.com>
- <BN9PR11MB5276819C9596480DB4C172228C0D2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240419103550.71b6a616.alex.williamson@redhat.com>
- <BN9PR11MB52766862E17DF94F848575248C112@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240423120139.GD194812@nvidia.com>
- <BN9PR11MB5276B3F627368E869ED828558C112@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240424001221.GF941030@nvidia.com>
- <20240424122437.24113510.alex.williamson@redhat.com>
- <20240424183626.GT941030@nvidia.com>
- <20240424141349.376bdbf9.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240424141349.376bdbf9.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR20CA0031.namprd20.prod.outlook.com
- (2603:10b6:208:e8::44) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFB9D1487E6;
+	Fri, 26 Apr 2024 14:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714141430; cv=none; b=ulGJJEgWCfyAMotaU6c1RqIbpwj35v+XqD3n5+KlDXvKtu94Db04UBV6xojNXFGqOH53ZVt70g9yIPP2vFHqvvvH/ki8i5Wru8VqGQkJ25hf/dgTmvj1hvnqOGUDjCiO0upLoBxlhjS6sP4ybYga2kFMi/g/DVDDoASisQ7KAgc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714141430; c=relaxed/simple;
+	bh=KcOQVw4toYyZmh0/fqK13hVlrfokyhULnWn7otxxxvc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V2RyKX9ak02NpczThlFR90TKGrpru9yAQQqV+klqbtW1xIikSvRZCL4NL88Pud710+QqYIEPJBwIq8bdT6NWhIG4FXm63OnXaoMDn3HeqFYQqcmtgEl6tal1U+pefvQo/Y3eb0FUIEM2F5p0l3nuGtJ8lEzUc/HRc9/rXYKdNYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/y9jvwZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28CF2C113CD;
+	Fri, 26 Apr 2024 14:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714141430;
+	bh=KcOQVw4toYyZmh0/fqK13hVlrfokyhULnWn7otxxxvc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F/y9jvwZElxt09BJcHPYl9fsX/1p8mGrTEnqsRkjwfcxuuEDq0cHEDyzyel4twUFC
+	 pdNC91Q5eJKr5jn4huhS4UZqX89vPe3DydfHv/gxfgI0Y0CRzjq8a97GFts+WKZpTa
+	 l/lMl2olDU/jWr9whwmODTPeCwuJ3JL69zky7IQXdUEg49JnfcKONRbHaJXSGWhuBY
+	 lFEmpw5QUqi6vqUQ4VEy0i1ogSDy24kzeovD3buyuekSjELVeN5qejFn0Fre5ltuMY
+	 KnMdfupbCNki4e3fIu4h5KRU/fKmnAlIxXnjxYL00as2ca0ksB209L4Rieph4b/cB+
+	 ul8WnSEx5kr2g==
+Date: Fri, 26 Apr 2024 15:23:45 +0100
+From: Conor Dooley <conor@kernel.org>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v3 02/11] riscv: add ISA extensions validation
+Message-ID: <20240426-smugly-jury-e933a4ef035c@spud>
+References: <20240423124326.2532796-1-cleger@rivosinc.com>
+ <20240423124326.2532796-3-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|DM4PR12MB6544:EE_
-X-MS-Office365-Filtering-Correlation-Id: fef6e622-ddbd-41d3-3d5b-08dc65fabe00
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?5fMiwEAxlrFKES/LRe3NlTImMwTOF78kUj3FP6ZjipSRSnlOgYhjKioXrP1h?=
- =?us-ascii?Q?yeygDFGIb52eVlJkMgT1q5rByDLcHZxDvJG2ItrTE+QqU0jQY9hYgUEih54c?=
- =?us-ascii?Q?PpdksXFZHZl+dv0bsIuxiBD4v84AWBDmnV9LuHtkI97RMm3osxKnVFJ1R+YB?=
- =?us-ascii?Q?IpQGMAOmoDv8rlvN31ByPykVVV043ADWWQwAihJ7On+6kqAZlBHjV+CcY7wI?=
- =?us-ascii?Q?B2X3TCvZNAfDD9YNHlFwIkRvnSqW7WGbNtCenBSOfADIEccitTt2ObvxTj2V?=
- =?us-ascii?Q?tgJMchCVk0WPrIkBM8eAxxW74EJHyu/3PRFRjLXaSf+E41xyTyUoUAjHHlpt?=
- =?us-ascii?Q?Fn+eUGXWvBryRGLuULXHSwM+VRlyaW/VhGzcKEliUkJczKU/kNDrprBOW/Iu?=
- =?us-ascii?Q?FO7bnk364GTDgrdlguUxC8AVfRubKIwUTcD54W4dKqOh2tZzpK0FGT8fbjNs?=
- =?us-ascii?Q?uoBnFKXCkSETrK0ImYDMdF5Irc7OiExjT7GmufhdSnJ/bOpocnKb+CPGpoIA?=
- =?us-ascii?Q?8KrXMU7v0Dntyfhobet5HnxvB7UDmWX0ea7YBzrburNmWE90fZzVEDMSjWuE?=
- =?us-ascii?Q?Ibs4/92wei3yrEzNl3kAgn+3jWb60G+3N75lh5Z+rQIp5UgJmZyY+aDU42wD?=
- =?us-ascii?Q?6e7EJzNo/k3E9HceL55yOEJZusFSs4+cPEGn9x8Jen8lV4A6mHimRcDaGwAk?=
- =?us-ascii?Q?5S24TbjcNpAHM1VsNUOTpQXaZhCfAGD4As9NqVFnndFShMk9+Jyoinlkismw?=
- =?us-ascii?Q?IMPSgOPPByU5reqdCiINU2Dvmmlbk+3Fd8/DYu8yKyjrdPD7+iUGxKmZ8s/z?=
- =?us-ascii?Q?etdNh6n/f9NvIXWKMH6iUxhECC8Pu1SDiJDR3J4ad/aPcyJIidiEbh05t/O/?=
- =?us-ascii?Q?iQ/L0QgyRj+1Oyq410odaYuXtKC1Cs3vSHbgJfwsz8USwPaYlbg9KnrF0BIM?=
- =?us-ascii?Q?qqtmBovVko7TGi5m4A9Au2VYCf2aEmyFXkp0NDf3xxXTwMOVux4dwi61lG+/?=
- =?us-ascii?Q?svpcgxQILNSdcDQ0X1SY9ftzKT3ckfAsbzAHRgJHOaTolktx7Qnd6ZyY5b1w?=
- =?us-ascii?Q?/LgZe+joxfZIakfPlUBCjSkFU9W6DtrJiQw/XTcvRKtdHbNQyIyHPwygu8KL?=
- =?us-ascii?Q?zOVa3Q/Q3fm7LtNUWiTy1mgMUUoXuuqbTZl6zEpSKhW+zOej+kIcJwaeJqjV?=
- =?us-ascii?Q?zrRaKD0sIaL9/B19bD/N7V6LlfLrjwk+5lAbTBnHYnCvIW8Phk3WZsECHBiH?=
- =?us-ascii?Q?XxMVh0NKi/ktgza6HA3Q4W9DBTg3NrgB/qEuiQY8og=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?AMIiTp2FzMOYjyB+48tjhgFKSM1WsvAIyg64qTxcT0fltqvi0LvYYpvrvgPd?=
- =?us-ascii?Q?SjT7N/wLwZcQkKYSuAgylEnc1LD90RaMPI1rfCdKRF/nO79DOG3S7MT78rxW?=
- =?us-ascii?Q?Xg8zZtcdj7uANHQdDE1Q/aT58vRiEpD8FWpg50Ggmtu4N7YpsjJfglu/mEgi?=
- =?us-ascii?Q?4tUhl8B3mDMCGVKMjPIgwYtkooVDpk2C4EaIFe5ZA0HHLRa4H6KcUa/Czq39?=
- =?us-ascii?Q?wPvmmtq7vS/zr3WeVKvj7F5vuCo0DtwoFrpcL2S6l1QRkmk2qB71JpT/+vMC?=
- =?us-ascii?Q?cTOhoXZMSzo3WmNYgPRG71LEMm4FnK1JiPYC8RBMBJI7VjA0EguBkPPu8rRi?=
- =?us-ascii?Q?L8SJZMSSAZkd6L0Yp9KjT5SdxraZ+IF2UHZgSYByOzesZ1my1dX+a9pqkce5?=
- =?us-ascii?Q?/tf7Lqbayl7op8oihH5Dz3xV0S2dyLpVp7nW0DFhEgPONn8I61QEfPhMmyzH?=
- =?us-ascii?Q?jl+912NEI9tohHQxnDFyW3CN0r6u/Sh8STboSFHrOXzgykrr90+hkf/veF9X?=
- =?us-ascii?Q?6SjNd6cDcsmmQuCb75/GAVlhaaxjZ5dd0vmc0/x6yS/fH1iceJZ/sqCjbMeq?=
- =?us-ascii?Q?pYlV0Fgsqti04uGyrNDN1KxpcHWsRaTGqWMuASKXBJqdxN2CxF+nG9jiO50x?=
- =?us-ascii?Q?yZc9LNoeE3lG20Ma0W5yrwpsfyLAlvIRZAO6FFusW5dp2oEAImpNyJH0u5h6?=
- =?us-ascii?Q?PGj/hOwRjHJf8xgPUg5NKTwXulpSP62dUjtxkEBGySf89vJlJXFC4KL2UZYI?=
- =?us-ascii?Q?jJn1wnIPySxsITFbjWBQeFW+gMJuTxVQQxYJ0fBGfpn398cKzrH7OrkvE+ar?=
- =?us-ascii?Q?5jpO+K0GnzGFPWkctVYZAodkuSA1EVksMLtb857HHki0nk1RyAJ98PNH9mQo?=
- =?us-ascii?Q?umI7GlnbWn2/7GqQHSzguHEFVDBG6yM3w9aKlX4P9REeEJBY9kS/Q53m2U4P?=
- =?us-ascii?Q?GaRodolYBKrsU3IQ/+8/grcowd7KYUi1fEJpodEzBqOVtusIeqBWu9VMvwjl?=
- =?us-ascii?Q?xRlpsVHNBKUhl13sV0lemxiFBzAG5ZjasQgD6MpHBm+BnKtkJRKrmSpMwaRU?=
- =?us-ascii?Q?mtDbsKiMeHfWyJ3OZJi3YqRU+9v+TFy6H7y5mrJC3F6CXNNagENKQOQqK4Rz?=
- =?us-ascii?Q?ba6NJ86ZgyCDNF4sh9dlD8RssOwZ9q+yHy66gJovcbCqWutHAE1pOQyKvFA+?=
- =?us-ascii?Q?DRYZHUlWJsHUWjMnoQpED4/ITUWM645zMhGxpFZ58quyM/82ue4mb9QrjPfB?=
- =?us-ascii?Q?fmSHI0C8ixrPWUHa/ZgMlv1wGVWKtOGewc5eqKjHlOKRegHQnfyd/2YYYtNz?=
- =?us-ascii?Q?LOxlh6Co0Yf5xUt+v2mMcdQE76C9miRGf77XoeLgFv0PpC7XtMdsb2CwTMHb?=
- =?us-ascii?Q?tuK94uLcT3PfbSuRKPX1lsKc6TIUbzUUsLs8rmwM0JwFpnOJ+PqtwHTeiqz1?=
- =?us-ascii?Q?u8im6/QR9FDDFCSnnwHBURo6ZFI6AbnwheYM952oqQidYhNuVLzfTIBjjcaf?=
- =?us-ascii?Q?fzwPYsb6Fvjzi/rkTSYstU/8FQnUYj7TCeFBj6D0Jfe5LiGNdqgyxHTAx/nD?=
- =?us-ascii?Q?XQ7E2pI6Qm5AHowzu1k=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fef6e622-ddbd-41d3-3d5b-08dc65fabe00
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2024 14:11:18.5251
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pfMRoasEhzTkNu6CpWti16TGZ45eJXVvMCde0AlB5gQ9oYugAaOGEq+EHzP0exoO
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6544
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="aM+tyKD3rsXBnYjy"
+Content-Disposition: inline
+In-Reply-To: <20240423124326.2532796-3-cleger@rivosinc.com>
 
-On Wed, Apr 24, 2024 at 02:13:49PM -0600, Alex Williamson wrote:
 
-> This is kind of an absurd example to portray as a ubiquitous problem.
-> Typically the config space layout is a reflection of hardware whether
-> the device supports migration or not.
+--aM+tyKD3rsXBnYjy
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Er, all our HW has FW constructed config space. It changes with FW
-upgrades. We change it during the life of the product. This has to be
-considered..
+On Tue, Apr 23, 2024 at 02:43:16PM +0200, Cl=E9ment L=E9ger wrote:
+> Since a few extensions (Zicbom/Zicboz) already needs validation and
+> future ones will need it as well (Zc*) add a validate() callback to
+> struct riscv_isa_ext_data. This require to rework the way extensions are
+> parsed and split it in two phases. First phase is isa string or isa
+> extension list parsing and consists in enabling all the extensions in a
+> temporary bitmask without any validation. The second step "resolves" the
+> final isa bitmap, handling potential missing dependencies. The mechanism
+> is quite simple and simply validate each extension described in the
+> temporary bitmap before enabling it in the final isa bitmap. This
+> process takes place until the final isa bitmap reaches a stable state.
+> In order to avoid any potential infinite looping, allow looping a
+> maximum of the number of extension we handle. Zicboz and Zicbom
+> extensions are modified to use this validation mechanism.
 
-> If a driver were to insert a
-> virtual capability, then yes it would want to be consistent about it if
-> it also cares about migration.  If the driver needs to change the
-> location of a virtual capability, problems will arise, but that's also
-> not something that every driver needs to do.
+Yaknow, seeing the implemtation I'm having second thoughts. I think
+there's two pretty separate actions going on here - the first is things
+like Zicbom or Zicboz where we are looking at the DT to find some extra
+properties which we can do exactly once. The other is the Zc* case,
+where we are making sure that extensions they depend on are enabled.
+I understand that the latter may need to loop, but I don't think there's
+a reason to loop in the Zicbom or Zicboz case.
 
-Well, mlx5 has to cope with this. It supports so many devices with so
-many config space layouts :( I don't know if we can just hard wire an
-offset to stick in a PASID cap and expect that to work...
+That said, I do actually like the idea of having specific callbacks for
+extensions that require them, rather than calling extension_check()
+unconditionally.
 
-> Also, how exactly does emulating the capability in the VMM solve this
-> problem?  Currently QEMU migration simply applies state to an identical
-> VM on the target.  QEMU doesn't modify the target VM to conform to the
-> data stream.  So in either case, the problem might be more along the
-> lines of how to make a V1 device from a V2 driver, which is more the
-> device type/flavor/persona problem.
+I've not reviewed the actual code here FWIW, just spent some time
+thinking about the idea. I might do that later on this revision, or on
+another, depending on what you think of splitting the Zicbom and Zicboz
+type extra prop checking from dependency related stuff like Zc*.
 
-Yes, it doesn't solve anything, it just puts the responsibility for
-something that is very complicated in userspace where there are more
-options to configure and customize it to the environment.
+Cheers,
+Conor.
 
-> Currently QEMU replies on determinism that a given command line results
-> in an identical machine configuration and identical devices.  State of
-> that target VM is then populated, not defined by, the migration stream.
+>=20
+> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
+> ---
+>  arch/riscv/include/asm/cpufeature.h |   1 +
+>  arch/riscv/kernel/cpufeature.c      | 201 ++++++++++++++++------------
+>  2 files changed, 118 insertions(+), 84 deletions(-)
+>=20
+> diff --git a/arch/riscv/include/asm/cpufeature.h b/arch/riscv/include/asm=
+/cpufeature.h
+> index 347805446151..328f895f6b8f 100644
+> --- a/arch/riscv/include/asm/cpufeature.h
+> +++ b/arch/riscv/include/asm/cpufeature.h
+> @@ -70,6 +70,7 @@ struct riscv_isa_ext_data {
+>  	const char *property;
+>  	const unsigned int *subset_ext_ids;
+>  	const unsigned int subset_ext_size;
+> +	bool (*validate)(const struct riscv_isa_ext_data *data, const unsigned =
+long *isa_bitmap);
+>  };
+> =20
+>  extern const struct riscv_isa_ext_data riscv_isa_ext[];
+> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeatur=
+e.c
+> index 115ba001f1bc..6d238c8dbccf 100644
+> --- a/arch/riscv/kernel/cpufeature.c
+> +++ b/arch/riscv/kernel/cpufeature.c
+> @@ -72,51 +72,62 @@ bool __riscv_isa_extension_available(const unsigned l=
+ong *isa_bitmap, unsigned i
+>  }
+>  EXPORT_SYMBOL_GPL(__riscv_isa_extension_available);
+> =20
+> -static bool riscv_isa_extension_check(int id)
+> +static bool riscv_isa_extension_valid(int id)
+>  {
+> -	switch (id) {
+> -	case RISCV_ISA_EXT_ZICBOM:
+> -		if (!riscv_cbom_block_size) {
+> -			pr_err("Zicbom detected in ISA string, disabling as no cbom-block-siz=
+e found\n");
+> -			return false;
+> -		} else if (!is_power_of_2(riscv_cbom_block_size)) {
+> -			pr_err("Zicbom disabled as cbom-block-size present, but is not a powe=
+r-of-2\n");
+> -			return false;
+> -		}
+> -		return true;
+> -	case RISCV_ISA_EXT_ZICBOZ:
+> -		if (!riscv_cboz_block_size) {
+> -			pr_err("Zicboz detected in ISA string, disabling as no cboz-block-siz=
+e found\n");
+> -			return false;
+> -		} else if (!is_power_of_2(riscv_cboz_block_size)) {
+> -			pr_err("Zicboz disabled as cboz-block-size present, but is not a powe=
+r-of-2\n");
+> -			return false;
+> -		}
+> -		return true;
+> -	case RISCV_ISA_EXT_INVALID:
+> +	return id !=3D RISCV_ISA_EXT_INVALID;
+> +}
+> +
+> +static bool riscv_ext_zicbom_validate(const struct riscv_isa_ext_data *d=
+ata,
+> +				      const unsigned long *isa_bitmap)
+> +{
+> +	if (!riscv_cbom_block_size) {
+> +		pr_err_once("Zicbom detected in ISA string,"
+> +			    "disabling as no cbom-block-size found\n");
+> +		return false;
+> +	} else if (!is_power_of_2(riscv_cbom_block_size)) {
+> +		pr_err_once("Zicbom disabled as cbom-block-size present,"
+> +			    "but is not a power-of-2\n");
+>  		return false;
+>  	}
+> +	return true;
+> +}
+> =20
+> +static bool riscv_ext_zicboz_validate(const struct riscv_isa_ext_data *d=
+ata,
+> +				      const unsigned long *isa_bitmap)
+> +{
+> +	if (!riscv_cboz_block_size) {
+> +		pr_err_once("Zicboz detected in ISA string,"
+> +			    "disabling as no cboz-block-size found\n");
+> +		return false;
+> +	} else if (!is_power_of_2(riscv_cboz_block_size)) {
+> +		pr_err_once("Zicboz disabled as cboz-block-size present,"
+> +			    "but is not a power-of-2\n");
+> +		return false;
+> +	}
+>  	return true;
+>  }
+> =20
+> -#define _RISCV_ISA_EXT_DATA(_name, _id, _subset_exts, _subset_exts_size)=
+ {	\
+> -	.name =3D #_name,								\
+> -	.property =3D #_name,							\
+> -	.id =3D _id,								\
+> -	.subset_ext_ids =3D _subset_exts,						\
+> -	.subset_ext_size =3D _subset_exts_size					\
+> +#define _RISCV_ISA_EXT_DATA(_name, _id, _subset_exts, _subset_exts_size,=
+ _validate) {	\
+> +	.name =3D #_name,									\
+> +	.property =3D #_name,								\
+> +	.id =3D _id,									\
+> +	.subset_ext_ids =3D _subset_exts,							\
+> +	.subset_ext_size =3D _subset_exts_size,						\
+> +	.validate =3D _validate								\
+>  }
+> =20
+> -#define __RISCV_ISA_EXT_DATA(_name, _id) _RISCV_ISA_EXT_DATA(_name, _id,=
+ NULL, 0)
+> +#define __RISCV_ISA_EXT_DATA(_name, _id) _RISCV_ISA_EXT_DATA(_name, _id,=
+ NULL, 0, NULL)
+> =20
+>  /* Used to declare pure "lasso" extension (Zk for instance) */
+>  #define __RISCV_ISA_EXT_BUNDLE(_name, _bundled_exts) \
+> -	_RISCV_ISA_EXT_DATA(_name, RISCV_ISA_EXT_INVALID, _bundled_exts, ARRAY_=
+SIZE(_bundled_exts))
+> +	_RISCV_ISA_EXT_DATA(_name, RISCV_ISA_EXT_INVALID, _bundled_exts, \
+> +			    ARRAY_SIZE(_bundled_exts), NULL)
+> =20
+>  /* Used to declare extensions that are a superset of other extensions (Z=
+vbb for instance) */
+>  #define __RISCV_ISA_EXT_SUPERSET(_name, _id, _sub_exts) \
+> -	_RISCV_ISA_EXT_DATA(_name, _id, _sub_exts, ARRAY_SIZE(_sub_exts))
+> +	_RISCV_ISA_EXT_DATA(_name, _id, _sub_exts, ARRAY_SIZE(_sub_exts), NULL)
+> +#define __RISCV_ISA_EXT_SUPERSET_VALIDATE(_name, _id, _sub_exts, _valida=
+te) \
+> +	_RISCV_ISA_EXT_DATA(_name, _id, _sub_exts, ARRAY_SIZE(_sub_exts), _vali=
+date)
+> =20
+>  static const unsigned int riscv_zk_bundled_exts[] =3D {
+>  	RISCV_ISA_EXT_ZBKB,
+> @@ -247,8 +258,10 @@ const struct riscv_isa_ext_data riscv_isa_ext[] =3D {
+>  	__RISCV_ISA_EXT_DATA(c, RISCV_ISA_EXT_c),
+>  	__RISCV_ISA_EXT_DATA(v, RISCV_ISA_EXT_v),
+>  	__RISCV_ISA_EXT_DATA(h, RISCV_ISA_EXT_h),
+> -	__RISCV_ISA_EXT_SUPERSET(zicbom, RISCV_ISA_EXT_ZICBOM, riscv_xlinuxenvc=
+fg_exts),
+> -	__RISCV_ISA_EXT_SUPERSET(zicboz, RISCV_ISA_EXT_ZICBOZ, riscv_xlinuxenvc=
+fg_exts),
+> +	__RISCV_ISA_EXT_SUPERSET_VALIDATE(zicbom, RISCV_ISA_EXT_ZICBOM, riscv_x=
+linuxenvcfg_exts,
+> +					  riscv_ext_zicbom_validate),
+> +	__RISCV_ISA_EXT_SUPERSET_VALIDATE(zicboz, RISCV_ISA_EXT_ZICBOZ, riscv_x=
+linuxenvcfg_exts,
+> +					  riscv_ext_zicboz_validate),
+>  	__RISCV_ISA_EXT_DATA(zicntr, RISCV_ISA_EXT_ZICNTR),
+>  	__RISCV_ISA_EXT_DATA(zicond, RISCV_ISA_EXT_ZICOND),
+>  	__RISCV_ISA_EXT_DATA(zicsr, RISCV_ISA_EXT_ZICSR),
+> @@ -310,33 +323,70 @@ const struct riscv_isa_ext_data riscv_isa_ext[] =3D=
+ {
+> =20
+>  const size_t riscv_isa_ext_count =3D ARRAY_SIZE(riscv_isa_ext);
+> =20
+> -static void __init match_isa_ext(const struct riscv_isa_ext_data *ext, c=
+onst char *name,
+> -				 const char *name_end, struct riscv_isainfo *isainfo)
+> +static void riscv_isa_set_ext(const struct riscv_isa_ext_data *ext, unsi=
+gned long *bitmap)
+>  {
+> -	if ((name_end - name =3D=3D strlen(ext->name)) &&
+> -	     !strncasecmp(name, ext->name, name_end - name)) {
+> -		/*
+> -		 * If this is a bundle, enable all the ISA extensions that
+> -		 * comprise the bundle.
+> -		 */
+> -		if (ext->subset_ext_size) {
+> -			for (int i =3D 0; i < ext->subset_ext_size; i++) {
+> -				if (riscv_isa_extension_check(ext->subset_ext_ids[i]))
+> -					set_bit(ext->subset_ext_ids[i], isainfo->isa);
+> -			}
+> +	/*
+> +	 * This is valid even for bundle extensions which uses the RISCV_ISA_EX=
+T_INVALID id
+> +	 * (rejected by riscv_isa_extension_valid()).
+> +	 */
+> +	if (riscv_isa_extension_valid(ext->id))
+> +		set_bit(ext->id, bitmap);
+> +
+> +	for (int i =3D 0; i < ext->subset_ext_size; i++) {
+> +		if (riscv_isa_extension_valid(ext->subset_ext_ids[i]))
+> +			set_bit(ext->subset_ext_ids[i], bitmap);
+> +	}
+> +}
+> +
+> +static void __init riscv_resolve_isa(const unsigned long *isa_bitmap, st=
+ruct riscv_isainfo *isainfo,
+> +				     unsigned long *this_hwcap, unsigned long *isa2hwcap)
+> +{
+> +	const struct riscv_isa_ext_data *ext;
+> +	DECLARE_BITMAP(prev_bitmap, RISCV_ISA_EXT_MAX);
+> +	int max_loop_count =3D riscv_isa_ext_count + 1;
+> +
+> +	do {
+> +		if (max_loop_count-- < 0) {
+> +			pr_err("Failed to reach a stable ISA state\n");
+> +			return;
+>  		}
+> +		memcpy(prev_bitmap, isainfo->isa, sizeof(prev_bitmap));
+> +		for (int i =3D 0; i < riscv_isa_ext_count; i++) {
+> +			ext =3D &riscv_isa_ext[i];
+> +
+> +			/* Bundle extensions ids are invalid*/
+> +			if (!riscv_isa_extension_valid(ext->id))
+> +				continue;
+> +
+> +			if (!test_bit(ext->id, isa_bitmap) || test_bit(ext->id, isainfo->isa))
+> +				continue;
+> +
+> +			if (ext->validate && !ext->validate(ext, isainfo->isa))
+> +				continue;
+> =20
+> -		/*
+> -		 * This is valid even for bundle extensions which uses the RISCV_ISA_E=
+XT_INVALID id
+> -		 * (rejected by riscv_isa_extension_check()).
+> -		 */
+> -		if (riscv_isa_extension_check(ext->id))
+>  			set_bit(ext->id, isainfo->isa);
+> +
+> +			/* Only single letter extensions get set in hwcap */
+> +			if (ext->id < RISCV_ISA_EXT_BASE)
+> +				*this_hwcap |=3D isa2hwcap[ext->id];
+> +		}
+> +	} while (memcmp(prev_bitmap, isainfo->isa, sizeof(prev_bitmap)));
+> +}
+> +
+> +static void __init match_isa_ext(const char *name, const char *name_end,=
+ unsigned long *bitmap)
+> +{
+> +	for (int i =3D 0; i < riscv_isa_ext_count; i++) {
+> +		const struct riscv_isa_ext_data *ext =3D &riscv_isa_ext[i];
+> +
+> +		if ((name_end - name =3D=3D strlen(ext->name)) &&
+> +		    !strncasecmp(name, ext->name, name_end - name)) {
+> +			riscv_isa_set_ext(ext, bitmap);
+> +			break;
+> +		}
+>  	}
+>  }
+> =20
+> -static void __init riscv_parse_isa_string(unsigned long *this_hwcap, str=
+uct riscv_isainfo *isainfo,
+> -					  unsigned long *isa2hwcap, const char *isa)
+> +static void __init riscv_resolve_isa_string(const char *isa, unsigned lo=
+ng *bitmap)
+>  {
+>  	/*
+>  	 * For all possible cpus, we have already validated in
+> @@ -349,7 +399,7 @@ static void __init riscv_parse_isa_string(unsigned lo=
+ng *this_hwcap, struct risc
+>  	while (*isa) {
+>  		const char *ext =3D isa++;
+>  		const char *ext_end =3D isa;
+> -		bool ext_long =3D false, ext_err =3D false;
+> +		bool ext_err =3D false;
+> =20
+>  		switch (*ext) {
+>  		case 's':
+> @@ -389,7 +439,6 @@ static void __init riscv_parse_isa_string(unsigned lo=
+ng *this_hwcap, struct risc
+>  			 * character itself while eliminating the extensions version number.
+>  			 * A simple re-increment solves this problem.
+>  			 */
+> -			ext_long =3D true;
+>  			for (; *isa && *isa !=3D '_'; ++isa)
+>  				if (unlikely(!isalnum(*isa)))
+>  					ext_err =3D true;
+> @@ -469,17 +518,8 @@ static void __init riscv_parse_isa_string(unsigned l=
+ong *this_hwcap, struct risc
+> =20
+>  		if (unlikely(ext_err))
+>  			continue;
+> -		if (!ext_long) {
+> -			int nr =3D tolower(*ext) - 'a';
+> =20
+> -			if (riscv_isa_extension_check(nr)) {
+> -				*this_hwcap |=3D isa2hwcap[nr];
+> -				set_bit(nr, isainfo->isa);
+> -			}
+> -		} else {
+> -			for (int i =3D 0; i < riscv_isa_ext_count; i++)
+> -				match_isa_ext(&riscv_isa_ext[i], ext, ext_end, isainfo);
+> -		}
+> +		match_isa_ext(ext, ext_end, bitmap);
+>  	}
+>  }
+> =20
+> @@ -501,6 +541,7 @@ static void __init riscv_fill_hwcap_from_isa_string(u=
+nsigned long *isa2hwcap)
+>  	for_each_possible_cpu(cpu) {
+>  		struct riscv_isainfo *isainfo =3D &hart_isa[cpu];
+>  		unsigned long this_hwcap =3D 0;
+> +		DECLARE_BITMAP(isa_bitmap, RISCV_ISA_EXT_MAX) =3D { 0 };
+> =20
+>  		if (acpi_disabled) {
+>  			node =3D of_cpu_device_node_get(cpu);
+> @@ -523,7 +564,7 @@ static void __init riscv_fill_hwcap_from_isa_string(u=
+nsigned long *isa2hwcap)
+>  			}
+>  		}
+> =20
+> -		riscv_parse_isa_string(&this_hwcap, isainfo, isa2hwcap, isa);
+> +		riscv_resolve_isa_string(isa, isa_bitmap);
+> =20
+>  		/*
+>  		 * These ones were as they were part of the base ISA when the
+> @@ -531,10 +572,10 @@ static void __init riscv_fill_hwcap_from_isa_string=
+(unsigned long *isa2hwcap)
+>  		 * unconditionally where `i` is in riscv,isa on DT systems.
+>  		 */
+>  		if (acpi_disabled) {
+> -			set_bit(RISCV_ISA_EXT_ZICSR, isainfo->isa);
+> -			set_bit(RISCV_ISA_EXT_ZIFENCEI, isainfo->isa);
+> -			set_bit(RISCV_ISA_EXT_ZICNTR, isainfo->isa);
+> -			set_bit(RISCV_ISA_EXT_ZIHPM, isainfo->isa);
+> +			set_bit(RISCV_ISA_EXT_ZICSR, isa_bitmap);
+> +			set_bit(RISCV_ISA_EXT_ZIFENCEI, isa_bitmap);
+> +			set_bit(RISCV_ISA_EXT_ZICNTR, isa_bitmap);
+> +			set_bit(RISCV_ISA_EXT_ZIHPM, isa_bitmap);
+>  		}
+> =20
+>  		/*
+> @@ -548,9 +589,11 @@ static void __init riscv_fill_hwcap_from_isa_string(=
+unsigned long *isa2hwcap)
+>  		if (acpi_disabled && riscv_cached_mvendorid(cpu) =3D=3D THEAD_VENDOR_I=
+D &&
+>  		    riscv_cached_marchid(cpu) =3D=3D 0x0) {
+>  			this_hwcap &=3D ~isa2hwcap[RISCV_ISA_EXT_v];
+> -			clear_bit(RISCV_ISA_EXT_v, isainfo->isa);
+> +			clear_bit(RISCV_ISA_EXT_v, isa_bitmap);
+>  		}
+> =20
+> +		riscv_resolve_isa(isa_bitmap, isainfo, &this_hwcap, isa2hwcap);
+> +
+>  		/*
+>  		 * All "okay" hart should have same isa. Set HWCAP based on
+>  		 * common capabilities of every "okay" hart, in case they don't
+> @@ -579,6 +622,7 @@ static int __init riscv_fill_hwcap_from_ext_list(unsi=
+gned long *isa2hwcap)
+>  		unsigned long this_hwcap =3D 0;
+>  		struct device_node *cpu_node;
+>  		struct riscv_isainfo *isainfo =3D &hart_isa[cpu];
+> +		DECLARE_BITMAP(isa_bitmap, RISCV_ISA_EXT_MAX) =3D { 0 };
+> =20
+>  		cpu_node =3D of_cpu_device_node_get(cpu);
+>  		if (!cpu_node) {
+> @@ -598,22 +642,11 @@ static int __init riscv_fill_hwcap_from_ext_list(un=
+signed long *isa2hwcap)
+>  						     ext->property) < 0)
+>  				continue;
+> =20
+> -			if (ext->subset_ext_size) {
+> -				for (int j =3D 0; j < ext->subset_ext_size; j++) {
+> -					if (riscv_isa_extension_check(ext->subset_ext_ids[i]))
+> -						set_bit(ext->subset_ext_ids[j], isainfo->isa);
+> -				}
+> -			}
+> -
+> -			if (riscv_isa_extension_check(ext->id)) {
+> -				set_bit(ext->id, isainfo->isa);
+> -
+> -				/* Only single letter extensions get set in hwcap */
+> -				if (strnlen(riscv_isa_ext[i].name, 2) =3D=3D 1)
+> -					this_hwcap |=3D isa2hwcap[riscv_isa_ext[i].id];
+> -			}
+> +			riscv_isa_set_ext(ext, isa_bitmap);
+>  		}
+> =20
+> +		riscv_resolve_isa(isa_bitmap, isainfo, &this_hwcap, isa2hwcap);
+> +
+>  		of_node_put(cpu_node);
+> =20
+>  		/*
+> --=20
+> 2.43.0
+>=20
 
-But that won't be true if the kernel is making decisions. The config
-space layout depends now on the kernel driver version too.
+--aM+tyKD3rsXBnYjy
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> > I think we need to decide, either only the VMM or only the kernel
-> > should do this.
-> 
-> What are you actually proposing?
+-----BEGIN PGP SIGNATURE-----
 
-Okay, what I'm thinking about is a text file that describes the vPCI
-function configuration space to create. The community will standardize
-this and VMMs will have to implement to get PASID/etc. Maybe the
-community will provide a BSD licensed library to do this job.
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZiu41wAKCRB4tDGHoIJi
+0nW3AP4msPLVtiGtPfN8mDJFJsEa8wFhRJ4tUnN5L/FSrB51kwD/fHhafPegS1qZ
+bNRZntFFXMFZdDM3qzyM8Ia2LWHXpwE=
+=CKip
+-----END PGP SIGNATURE-----
 
-The text file allows the operator to specify exactly the configuration
-space the VFIO function should have. It would not be derived
-automatically from physical. AFAIK qemu does not have this capability
-currently.
-
-This reflects my observation and discussions around the live migration
-standardization. I belive we are fast reaching a point where this is
-required.
-
-Consider standards based migration between wildly different
-devices. The devices will not standardize their physical config space,
-but an operator could generate a consistent vPCI config space that
-works with all the devices in their fleet.
-
-Consider the usual working model of the large operators - they define
-instance types with some regularity. But an instance type is fixed in
-concrete once it is specified, things like the vPCI config space are
-fixed.
-
-Running Instance A on newer hardware with a changed physical config
-space should continue to present Instance A's vPCI config layout
-regardless. Ie Instance A might not support PASID but Instance B can
-run on newer HW that does. The config space layout depends on the
-requested Instance Type, not the physical layout.
-
-The auto-configuration of the config layout from physical is a nice
-feature and is excellent for development/small scale, but it shouldn't
-be the only way to work.
-
-So - if we accept that text file configuration should be something the
-VMM supports then let's reconsider how to solve the PASID problem.
-
-I'd say the way to solve it should be via a text file specifying a
-full config space layout that includes the PASID cap. From the VMM
-perspective this works fine, and it ports to every VMM directly via
-processing the text file.
-
-The autoconfiguration use case can be done by making a tool build the
-text file by deriving it from physical, much like today. The single
-instance of that tool could have device specific knowledge to avoid
-quirks. This way the smarts can still be shared by all the VMMs
-without going into the kernel. Special devices with hidden config
-space could get special quirks or special reference text files into
-the tool repo.
-
-Serious operators doing production SRIOV/etc would negotiate the text
-file with the HW vendors when they define their Instance Type. Ideally
-these reference text files would be contributed to the tool repo
-above. I think there would be some nice idea to define fully open
-source Instance Types that include VFIO devices too.
-
-Is it too much of a fantasy?
-
-Jason
+--aM+tyKD3rsXBnYjy--
 
