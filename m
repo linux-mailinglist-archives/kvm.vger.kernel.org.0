@@ -1,101 +1,121 @@
-Return-Path: <kvm+bounces-16098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1C1B8B4437
-	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 07:05:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF6B8B446B
+	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 07:39:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 594441F232EF
-	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 05:05:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24373282F95
+	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 05:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222D23DBB3;
-	Sat, 27 Apr 2024 05:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2A340853;
+	Sat, 27 Apr 2024 05:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="t1Fx/saU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WsULUO2u"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7B33D984;
-	Sat, 27 Apr 2024 05:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F292381C7;
+	Sat, 27 Apr 2024 05:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714194346; cv=none; b=MpK0DMQmiwAdXPSKaqcb+QGO/vB2C54MkteY1dygrFEQoCCufCJje8TlT7Ckp5Q9vigKqHA6y9lkykXWHnp5Ebkswu7vXJFAVB+npvSamajJjXCGTJbyyG7pn/1AyX3+1C9N3PwFj9ydYois6z+jUzwIzJNmCc2Wq0dUTxMgf80=
+	t=1714196333; cv=none; b=tapBpXwNDoQZ5s8nG16Q/wIYOSlnVtfDT4qq/RUaRhc7teBYjNyv7OWXPOdRw/wUUo8l2Ubh5GkG7crdBS4gCuDcMda+TDoW8XJzANQHdF2gUiVveRmv+Ljxe25B5IoVSm48RlWM7UdI0X1XfTi8U3jzHB4pVGIlUbIH/bDmWh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714194346; c=relaxed/simple;
-	bh=aV03/J5L6wRTVpqXzZpjogDL29eKpBpFKjBKzlh6DQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qpLktUfKBFNTSPXXVhxBTW/9UFlZUkj40HfpTEJ7ac9XsnM3QXkB3K9f+yTfF3Q/tsJykl/P2q2Ih92XdxSVp6tBIxNSfQssdZHZq70+t1CmM+DosV8WfSzeJkDwC5virM91JtdyXvS0/SBgCk2rw7BIDlANx8XT36YPmdmC2/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=t1Fx/saU; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=yj0ibZWO6upsf0Ur4Wa4n3wfBYe9wyP854L58KpwsgQ=; b=t1Fx/saUGWRhzioT0ZIHnAbE+T
-	RpbewQHZ8zke+qwBeFJwU4FBsp2FPOpaGAVu6BstX2gvaLMAz1FoufoEeHvPJLzm3Hr5C96ibKVeF
-	HXPkdDAECCeRZlx9GHbIGJ2MukGGCjSKvGwWH8NG/q6xB9j92Eo/mH/UkH+P8hOlfB48e8eFoJkGH
-	r48pSy4DFQMImmW7mVicxnq4InVDISnuJS3Qa/w9vAh/P2aIhtoJE0VAeIxzSRvEfRil1cb57B6Jr
-	gTKDeOY584LGFUz5egNYjPWreUrN7YiYm1SKN5JshqdlqRe4v/Cg00I5d5aebaPjwAPxBQ7ZrGCYo
-	WNunu5PA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s0aFk-0000000EqQf-2NHi;
-	Sat, 27 Apr 2024 05:05:36 +0000
-Date: Fri, 26 Apr 2024 22:05:36 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	"Tian, Kevin" <kevin.tian@intel.com>,
-	"Liu, Yi L" <yi.l.liu@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-	=?iso-8859-1?Q?C=E9dric?= Le Goater <clg@redhat.com>
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-Message-ID: <ZiyHoFGpHppLRW2e@infradead.org>
-References: <BN9PR11MB5276819C9596480DB4C172228C0D2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240419103550.71b6a616.alex.williamson@redhat.com>
- <BN9PR11MB52766862E17DF94F848575248C112@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240423120139.GD194812@nvidia.com>
- <BN9PR11MB5276B3F627368E869ED828558C112@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240424001221.GF941030@nvidia.com>
- <20240424122437.24113510.alex.williamson@redhat.com>
- <20240424183626.GT941030@nvidia.com>
- <20240424141349.376bdbf9.alex.williamson@redhat.com>
- <20240426141117.GY941030@nvidia.com>
+	s=arc-20240116; t=1714196333; c=relaxed/simple;
+	bh=K4EbgByRT7TtstqD4HXOVYBvbr60newEfJFOinghURg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PH3XwcG5QFw08RegimstVu8lgBsrzompxOGpNaT9PWYCS/N/v9UwYREQyVixLDX0qg3x1hJEQt0dPCO+fw7pKcIhYOHKyUNwjOyK5ZygBWrCTFcoFzwjP1m2awkUVlSu+6Ol7Dc5jHXYklQRXfwmfS47oBrjm/RIbBslEgA+/jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WsULUO2u; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714196331; x=1745732331;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=K4EbgByRT7TtstqD4HXOVYBvbr60newEfJFOinghURg=;
+  b=WsULUO2u9s6Xa1/9ZIYCeVyeZGeWzGYFd7FTqSREUsBUkyq4VHqdlenE
+   vKzB0EfHhJ/BFye6kh/Q1VCVT0m2RYYDA23t9TeUkVgR2yR0oy4mK4fI+
+   p5B3Kp0+/5anBdtrUlnFGuLzDO4C4rUBe4XzaNkB5tjWbCqgWaRROKTAS
+   4mKq/p7j/bb6zXg+49qyjMcZtgzajp2DZkZrgFyFZLscbV655wQAEK/jG
+   Fyy+CeBOsnNpLyNlvLCW8zwgzMB7JCW90ObeDnNkD2pJy9eXJRDYtc1WE
+   CwPWtgy+L7hV2KtZn/yj+oepjwMJFiegDD2o3mXIhyr4Lj2IwI8adkKSY
+   Q==;
+X-CSE-ConnectionGUID: bemiSHTFSsuIXRdzsYhDRw==
+X-CSE-MsgGUID: 0MuWYMa2QNSUuMiDdzICEQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11056"; a="32437623"
+X-IronPort-AV: E=Sophos;i="6.07,234,1708416000"; 
+   d="scan'208";a="32437623"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 22:38:51 -0700
+X-CSE-ConnectionGUID: 0FfLCUrISlq89yEGnkD66w==
+X-CSE-MsgGUID: 6Edd325aRAGxni0rsDbMoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,234,1708416000"; 
+   d="scan'208";a="56530661"
+Received: from akalapal-mobl.amr.corp.intel.com (HELO [10.124.149.167]) ([10.124.149.167])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2024 22:38:50 -0700
+Message-ID: <002340b7-86e2-4be3-8468-71d59233c32e@intel.com>
+Date: Fri, 26 Apr 2024 22:38:49 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240426141117.GY941030@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V5 4/4] KVM: selftests: Add test for configure of x86 APIC
+ bus frequency
+To: Reinette Chatre <reinette.chatre@intel.com>, isaku.yamahata@intel.com,
+ pbonzini@redhat.com, erdemaktas@google.com, vkuznets@redhat.com,
+ seanjc@google.com, vannapurve@google.com, jmattson@google.com,
+ mlevitsk@redhat.com, xiaoyao.li@intel.com, chao.gao@intel.com,
+ rick.p.edgecombe@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1714081725.git.reinette.chatre@intel.com>
+ <eac8c5e0431529282e7887aad0ba66506df28e9e.1714081726.git.reinette.chatre@intel.com>
+ <f5a80896-e1aa-4f23-a739-5835f7430f78@intel.com>
+ <12445519-efd9-42e9-a226-60cfa9d2a880@intel.com>
+Content-Language: en-US
+From: "Chen, Zide" <zide.chen@intel.com>
+In-Reply-To: <12445519-efd9-42e9-a226-60cfa9d2a880@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 26, 2024 at 11:11:17AM -0300, Jason Gunthorpe wrote:
-> On Wed, Apr 24, 2024 at 02:13:49PM -0600, Alex Williamson wrote:
+
+
+On 4/26/2024 4:26 PM, Reinette Chatre wrote:
+> Hi Zide,
 > 
-> > This is kind of an absurd example to portray as a ubiquitous problem.
-> > Typically the config space layout is a reflection of hardware whether
-> > the device supports migration or not.
+> On 4/26/2024 4:06 PM, Chen, Zide wrote:
+>>
+>>
+>> On 4/25/2024 3:07 PM, Reinette Chatre wrote:
+>>> diff --git a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
+>>> new file mode 100644
+>>> index 000000000000..5100b28228af
+>>> --- /dev/null
+>>> +++ b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
+>>> @@ -0,0 +1,166 @@
+>>> +// SPDX-License-Identifier: GPL-2.0-only
+>>> +/*
+>>> + * Test configure of APIC bus frequency.
+>>> + *
+>>> + * Copyright (c) 2024 Intel Corporation
+>>> + *
+>>> + * To verify if the APIC bus frequency can be configured this test starts
+>>
+>> Nit: some typos here?
 > 
-> Er, all our HW has FW constructed config space. It changes with FW
-> upgrades. We change it during the life of the product. This has to be
-> considered..
+> Apologies but this is not obvious to me. Could you please help
+> by pointing out all those typos to me?
 
-FYI, the same is true for just about any storage device I know.  Maybe
-not all of the config space, but definitely parts of it.
+Do you think it's more readable to add a ","?
 
+- * To verify if the APIC bus frequency can be configured this test starts
++ * To verify if the APIC bus frequency can be configured, this test starts
+  * by setting the TSC frequency in KVM, and then:
 
