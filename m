@@ -1,162 +1,183 @@
-Return-Path: <kvm+bounces-16112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16116-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F0258B460D
-	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 13:23:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FE7D8B46DF
+	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 17:36:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50B741C22F99
-	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 11:23:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2C9A1C20D35
+	for <lists+kvm@lfdr.de>; Sat, 27 Apr 2024 15:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142DA52F89;
-	Sat, 27 Apr 2024 11:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0751A125D6;
+	Sat, 27 Apr 2024 15:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="C/3S/7g2"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="Ybhgi47L"
 X-Original-To: kvm@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177F54D9F9;
-	Sat, 27 Apr 2024 11:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94445660
+	for <kvm@vger.kernel.org>; Sat, 27 Apr 2024 15:36:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714216889; cv=none; b=hfhi39zbpOnaNSvTXLSs83uyrsNDGXeN+ETMzmXerOgwE5iZUehRO0nuy7/gAoX1mi6hZlwfH+ZP1o3YJKiayItWCfs+wrBkiAATJRsOI+EO8UYp88BCypQkYSKQWvQtnYhLnccMmSEN0yqhwd3NdXzR+hmloCTUDXaDYDxzZXI=
+	t=1714232169; cv=none; b=XLq8kwlVfcYkTd9AJnt/Bk9uk065B8YeEcuwP3wS+J6vSYTENOiFLfr92BSYevUUnKyh7QNVwtf03m7qcb1fAic44XZwugrlD6NYblArKdlNa5JHSZZsau31ytstoLUwXAi1TIwxJtwhPDN3rPfd39lhDVWpLzEmrI/UFOCFU5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714216889; c=relaxed/simple;
-	bh=zr1wUci8Xcm3SBmkDautJw+akuAPWZdTnl8cPxx2GoY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BFxhoiU6CXo+zp2/hn9HqES5PpkMogX7TwgH9rEQloZ5Pipwy5RMx+RaDC+13DPtj/WHAKAs0P7mDnyrJrGBWLJzq/4pQIMkGuzyJnoMZC3K2CvQKxCtDMrUMaPR9S+Eopr4sDALn2grDF/jz5w2oFzdRDxSuz+3IH6kbAJV5ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=C/3S/7g2; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-	Reply-To:Content-Type:Content-ID:Content-Description;
-	bh=5S2tW55GgDiFyBbw9lOzLrSN36Zzgu35eCfjV6r8WLE=; b=C/3S/7g2ZpEyQRx09JvWZeaGRy
-	MstfydVMSKmDzDiNWQsVmHHabx9OQfnIVGuuynHfWhe7zBkqZrWPjQes73h15FdkhnTrE6PNu9LBi
-	b14a6T+iiBXVFXYMoIITDFCnXOq/qlapJsNYPQ6D5yagLsv8JVtf0F1dfuAFc8dvnkGYjNQq558Pj
-	BG4m/Ka0KD//ict8yEwYLWcCwuAqOybLY5jafWitwsG68L44u03utA67Qq97DkEKxNombNr+q3Vo7
-	RdniFSrdGS2PzHBGd0tvRjFWa3WUuvJ++CudOpdwkUgDJ0giXjFwnSRrz/nUKPm/lyjRzdmhy4hhM
-	dyxiJD2w==;
-Received: from [2001:8b0:10b:1::ebe] (helo=i7.infradead.org)
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s0g5i-0000000FeZk-0pka;
-	Sat, 27 Apr 2024 11:19:46 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1s0g5g-000000002bx-2nxs;
-	Sat, 27 Apr 2024 12:19:36 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Paul Durrant <paul@xen.org>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	jalliste@amazon.co.uk,
-	sveith@amazon.de,
-	zide.chen@intel.com,
-	Dongli Zhang <dongli.zhang@oracle.com>
-Subject: [PATCH v2 15/15] KVM: x86: Factor out kvm_use_master_clock()
-Date: Sat, 27 Apr 2024 12:05:12 +0100
-Message-ID: <20240427111929.9600-16-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240427111929.9600-1-dwmw2@infradead.org>
-References: <20240427111929.9600-1-dwmw2@infradead.org>
+	s=arc-20240116; t=1714232169; c=relaxed/simple;
+	bh=XpAmTcqGbFNcfVbx6nwYPgUEFZ1UPcnzA08aPj4a1mc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k03XF5QBqEYYOjG6M1BPwZkHg6wketyk9Lzr+ez93MoOFC3K4e9udZt93kECVqB0oxXjulMCD50IIhMTWXgSDrDal+Zc9cViSItbxGf0EQbeXeBwiS+ITJZg2EHpQLWnBETMC5+NEX7irtEZFWGqOkhtIkQIvt0h/4im8heQ6Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=Ybhgi47L; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2a2d0ca3c92so2258570a91.0
+        for <kvm@vger.kernel.org>; Sat, 27 Apr 2024 08:36:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1714232167; x=1714836967; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zTJw2A6adNJVmUl2COe/T/6PCi87dKKLBY/6yf/6PZY=;
+        b=Ybhgi47LCZelfTXohltLiFSy02ew48EaZ4am4Vm77HDYBbUkkpXUNfkKcaYUQzzbue
+         9wFcK3gVtjRdUyRKQlD0n9208ZSL12U/jiVelDg9iTBiHPxLqEv+Ua0t17Cjrd/NofFc
+         qC6RyDyA3SZFa8dmNts5DtRYFbxlrXK3TrP9kn87qRWvu3PKtmvHrV12Q5NmRarYMdUP
+         61/Vo+AL7URqfmGMPnoLPGcaR6X7BZqFIR50P9kPw4ZOc0nbLZNzHIu1GzeNLkWnXpHi
+         DPT0n8o+A/4agnTQJ618ti4E8cuHeFtj6EcjJU58FtVseufIkFYjFaqmCrhjo/tBeU8V
+         GbpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714232167; x=1714836967;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zTJw2A6adNJVmUl2COe/T/6PCi87dKKLBY/6yf/6PZY=;
+        b=Oq/Hznby+lP/Bf4ZcJurrDIxxCaSsTMNAJqvnIy60DjzRZ4A+vM9tvDQXp1LXPyw1v
+         WDeI2JR8UEHrsf/cEIpGx6Mzx1P/EqirpkAFB2+KPyKVHu370qwR8eV3lU1E9SaKmDDh
+         RfxmCbUqwz22Qqtmpe7gPtABr8rl73l2lWa8EX8hQxzzq76mnWob2GgYjx8o8KK2L8ym
+         vFTaWI4sz1hjI7QXR8Rn3JCG5UkncNg4FyuMl8iqwS3j9yMLnQXxzIRpMWT7Ov1GwbHA
+         EUcQD6JUfcmg04Y6wZTIW86V0pzc+CwfL4zOiYehIDgePUdnqz/jYaceAUS1lx2a1tqH
+         yjFg==
+X-Forwarded-Encrypted: i=1; AJvYcCWnLXdgUGslWtuUfNKEryAkc2SEoyjjbiOsiquxsYEMOYPn4oda6qCrg6LiFHtgDwlbZMuG7Hf6V0mBpdLR8v9V2O6l
+X-Gm-Message-State: AOJu0YxN6mMV7WBRWFHInDu90jSuk1X9caJQwwNljowsIxr1oxxPAmHm
+	HnQw+Rh66Ht6diHMssv3Hwq+toWcmd5Ui4kPae7WYONRBFo3ORE7nwWLh1Cv8Ho=
+X-Google-Smtp-Source: AGHT+IF6xNtPoqawhIMLLPfVYL8r6zdUx0EVLZnU+vKFPxJUtAEJkdQ96JtmkdV5ZJvwpBa+CNpRDw==
+X-Received: by 2002:a17:90a:4610:b0:2a7:329c:7976 with SMTP id w16-20020a17090a461000b002a7329c7976mr7869349pjg.8.1714232166957;
+        Sat, 27 Apr 2024 08:36:06 -0700 (PDT)
+Received: from debug.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id r6-20020a17090a5c8600b002ade3490b4asm10494669pji.22.2024.04.27.08.36.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 27 Apr 2024 08:36:06 -0700 (PDT)
+Date: Sat, 27 Apr 2024 08:36:04 -0700
+From: Deepak Gupta <debug@rivosinc.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, Ved Shanbhogue <ved@rivosinc.com>
+Subject: Re: [RFC PATCH 6/7] riscv: kvm: add SBI FWFT support for
+ SBI_FWFT_DOUBLE_TRAP_ENABLE
+Message-ID: <Zi0bZPoNIYbanIfO@debug.ba.rivosinc.com>
+References: <20240418142701.1493091-1-cleger@rivosinc.com>
+ <20240418142701.1493091-7-cleger@rivosinc.com>
+ <ZixSFLZYZaf8BKHP@debug.ba.rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <ZixSFLZYZaf8BKHP@debug.ba.rivosinc.com>
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Fri, Apr 26, 2024 at 06:17:08PM -0700, Deepak Gupta wrote:
+>On Thu, Apr 18, 2024 at 04:26:45PM +0200, Clément Léger wrote:
+>>Add support in KVM SBI FWFT extension to allow VS-mode to request double
+>>trap enabling. Double traps can then be generated by VS-mode, allowing
+>>M-mode to redirect them to S-mode.
+>>
+>>Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>>---
+>>arch/riscv/include/asm/csr.h               |  1 +
+>>arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  2 +-
+>>arch/riscv/kvm/vcpu_sbi_fwft.c             | 41 ++++++++++++++++++++++
+>>3 files changed, 43 insertions(+), 1 deletion(-)
+>>
+>>diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+>>index 905cdf894a57..ee1b73655bec 100644
+>>--- a/arch/riscv/include/asm/csr.h
+>>+++ b/arch/riscv/include/asm/csr.h
+>>@@ -196,6 +196,7 @@
+>>/* xENVCFG flags */
+>>#define ENVCFG_STCE			(_AC(1, ULL) << 63)
+>>#define ENVCFG_PBMTE			(_AC(1, ULL) << 62)
+>>+#define ENVCFG_DTE			(_AC(1, ULL) << 59)
+>>#define ENVCFG_CBZE			(_AC(1, UL) << 7)
+>>#define ENVCFG_CBCFE			(_AC(1, UL) << 6)
+>>#define ENVCFG_CBIE_SHIFT		4
+>>diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>>index 7dc1b80c7e6c..a9e20d655126 100644
+>>--- a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>>+++ b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>>@@ -11,7 +11,7 @@
+>>
+>>#include <asm/sbi.h>
+>>
+>>-#define KVM_SBI_FWFT_FEATURE_COUNT	1
+>>+#define KVM_SBI_FWFT_FEATURE_COUNT	2
+>>
+>>struct kvm_sbi_fwft_config;
+>>struct kvm_vcpu;
+>>diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c b/arch/riscv/kvm/vcpu_sbi_fwft.c
+>>index b9b7f8fa6d22..9e8e397eb02f 100644
+>>--- a/arch/riscv/kvm/vcpu_sbi_fwft.c
+>>+++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
+>>@@ -9,10 +9,19 @@
+>>#include <linux/errno.h>
+>>#include <linux/err.h>
+>>#include <linux/kvm_host.h>
+>>+#include <linux/riscv_dbltrp.h>
+>>#include <asm/sbi.h>
+>>#include <asm/kvm_vcpu_sbi.h>
+>>#include <asm/kvm_vcpu_sbi_fwft.h>
+>>
+>>+#ifdef CONFIG_32BIT
+>>+# define CSR_HENVCFG_DBLTRP	CSR_HENVCFGH
+>>+# define DBLTRP_DTE	(ENVCFG_DTE >> 32)
+>>+#else
+>>+# define CSR_HENVCFG_DBLTRP	CSR_HENVCFG
+>>+# define DBLTRP_DTE	ENVCFG_DTE
+>>+#endif
+>>+
+>>#define MIS_DELEG (1UL << EXC_LOAD_MISALIGNED | 1UL << EXC_STORE_MISALIGNED)
+>>
+>>static int kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
+>>@@ -36,6 +45,33 @@ static int kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
+>>	return SBI_SUCCESS;
+>>}
+>>
+>>+static int kvm_sbi_fwft_set_double_trap(struct kvm_vcpu *vcpu,
+>>+					struct kvm_sbi_fwft_config *conf,
+>>+					unsigned long value)
+>>+{
+>>+	if (!riscv_double_trap_enabled())
+>>+		return SBI_ERR_NOT_SUPPORTED;
+>
+>Why its required to check whether host has enabled double trap for itself ?
+>It's orthogonal to guest asking hypervisor to enable double trap.
+>
+>Probably you need a check here whether underlying FW supports handling double
+>trap.
+>
+>Am I missing something here?
+>
 
-Both kvm_track_tsc_matching() and pvclock_update_vm_gtod_copy() make a
-decision about whether the KVM clock should be in master clock mode.
-
-They use *different* criteria for the decision though. This isn't really
-a problem; it only has the potential to cause unnecessary invocations of
-KVM_REQ_MASTERCLOCK_UPDATE if the masterclock was disabled due to TSC
-going backwards, or the guest using the old MSR. But it isn't pretty.
-
-Factor the decision out to a single function. And document the historical
-reason why it's disabled for guests that use the old MSR_KVM_SYSTEM_TIME.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/kvm/x86.c | 27 +++++++++++++++++++++++----
- 1 file changed, 23 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d6e4469f531a..680b39f17851 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2518,6 +2518,27 @@ static inline bool gtod_is_based_on_tsc(int mode)
- }
- #endif
- 
-+static bool kvm_use_master_clock(strut kvm *kvm)
-+{
-+	struct kvm_arch *ka = &kvm->arch;
-+
-+	/*
-+	 * The 'old kvmclock' check is a workaround (from 2015) for a
-+	 * SUSE 2.6.16 kernel that didn't boot if the system_time in
-+	 * its kvmclock was too far behind the current time. So the
-+	 * mode of just setting the reference point and allowing time
-+	 * to proceed linearly from there makes it fail to boot.
-+	 * Despite that being kind of the *point* of the way the clock
-+	 * is exposed to the guest. By coincidence, the offending
-+	 * kernels used the old MSR_KVM_SYSTEM_TIME, which was moved
-+	 * only because it resided in the wrong number range. So the
-+	 * workaround is activated for *all* guests using the old MSR.
-+	 */
-+	return ka->all_vcpus_matched_tsc &&
-+		!ka->backwards_tsc_observed &&
-+		!ka->boot_vcpu_runs_old_kvmclock;
-+}
-+
- static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
- {
- #ifdef CONFIG_X86_64
-@@ -2550,7 +2571,7 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
- 	 * To use the masterclock, the host clocksource must be based on TSC
- 	 * and all vCPUs must have matching TSC frequencies.
- 	 */
--	bool use_master_clock = ka->all_vcpus_matched_tsc &&
-+	bool use_master_clock = kvm_use_master_clock(kvm) &&
- 				gtod_is_based_on_tsc(gtod->clock.vclock_mode);
- 
- 	/*
-@@ -3089,9 +3110,7 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
- 					&ka->master_cycle_now);
- 
- 	ka->use_master_clock = host_tsc_clocksource
--				&& ka->all_vcpus_matched_tsc
--				&& !ka->backwards_tsc_observed
--				&& !ka->boot_vcpu_runs_old_kvmclock;
-+				&& kvm_use_master_clock(kvm);
- 
- 	/*
- 	 * When TSC scaling is in use (which can thankfully only happen
--- 
-2.44.0
-
+On this I am indeed missing that menvcfg.DTE has to be 1 for any less priv.
+So, nevermind on this comment. Sorry about that.
 
