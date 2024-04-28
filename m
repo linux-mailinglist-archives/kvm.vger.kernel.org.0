@@ -1,123 +1,177 @@
-Return-Path: <kvm+bounces-16118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7B648B4936
-	for <lists+kvm@lfdr.de>; Sun, 28 Apr 2024 04:29:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 325288B49DF
+	for <lists+kvm@lfdr.de>; Sun, 28 Apr 2024 08:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4314F1F21955
-	for <lists+kvm@lfdr.de>; Sun, 28 Apr 2024 02:29:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6C59EB21899
+	for <lists+kvm@lfdr.de>; Sun, 28 Apr 2024 06:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A642810FF;
-	Sun, 28 Apr 2024 02:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968BEAD52;
+	Sun, 28 Apr 2024 06:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bDD+i5Tc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DiEC0bC4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5778D65C
-	for <kvm@vger.kernel.org>; Sun, 28 Apr 2024 02:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37EFE79E1
+	for <kvm@vger.kernel.org>; Sun, 28 Apr 2024 06:02:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714271365; cv=none; b=rQqwl7uAfNDsV/eAxKvJhveD9EqewM/+25sqHTNaXenoucuQq7KpDQ0b1pgQJdcx8hDynuhBkZqt1d4oBQSkikveRD5tNHC/s9JrGBvc2ByOE6pjof9Tqg+vt8JuTqjsWdOcd4j1mDsDoqm2fRLz3EaAJ4ciAikWqdj0WdJZd9A=
+	t=1714284141; cv=none; b=fh4Z7sq+tohxHguoH+3lYhHSBTr7TloVVN+TZsCIubvRspAGf7i58r2Ao8IfCdlPcpSxbJxM8XKFLcOcXAz4p1k3lUfPZalwQCA4A4R9ZhZ5heRcmW4c7tbpHA6zE5tQAbET1bH5Np5F+kRem713qKNuhVOMq7l63MJhs+vlQzw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714271365; c=relaxed/simple;
-	bh=12dyaC4UZmyX/i1r3m+SiwpIZlk37zcFPT/a3X1IcKo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=CMNkm5J92eUR6lWP3qo7/O9FXC31IOZm2Xdl3uQixtJ95yiqgAXeO7cjThUqPzzzE4Bnu+hsQ1PfdZ0S39bKSxD7jvM2v4CJfZ9SowsE8ffF7h5FEOjd5F4q7J/LvAoOEuDuVw8jBB3HuWJCMpWRmGtQMcXzLmxUdzWDDfQpfzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bDD+i5Tc; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714271364; x=1745807364;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=12dyaC4UZmyX/i1r3m+SiwpIZlk37zcFPT/a3X1IcKo=;
-  b=bDD+i5TcOFkzHtKMxb43QwJUqfcsJJgoODgUpPgZYKWD7ljnrwrkH1+u
-   8w417zFLGiL5x1ofTGMG2U8kvaP7Bl7Wbl4w2VJ9JUbjqnY/Wnq1rTbfN
-   Iuj989umzlKWZdJgmSpC53Rer/rLmgLXn5CxqTuDDXV2evRm517fHHYJg
-   YE1/agooufMoMaWkrFNHQMEICxGUJiApH85aiEqDAIRUCeocDxdWFAyUP
-   53TxQoKOYTfpHHlDq+W99YRp1JzHfAcnixoORDoS41H0TZVeSE4dTSfWH
-   rRp+XUE8ewzrpe735qjM42xjjXxXPLhWDkTzhgT8zu8RxgJeAZCr8y/TG
-   A==;
-X-CSE-ConnectionGUID: 2eo+zqoAR1SF1GlKYHuHeA==
-X-CSE-MsgGUID: b9RZQbMqQXy/t8O7GKIj+g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11057"; a="21376171"
-X-IronPort-AV: E=Sophos;i="6.07,236,1708416000"; 
-   d="scan'208";a="21376171"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2024 19:29:23 -0700
-X-CSE-ConnectionGUID: Yj2s/KwYRjGz+MKH/3PUFg==
-X-CSE-MsgGUID: 8YIbgK+PQ9+XkCO/gmXgjA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,236,1708416000"; 
-   d="scan'208";a="25653674"
-Received: from sqa-gate.sh.intel.com (HELO spr-2s3.tsp.org) ([10.239.48.212])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Apr 2024 19:29:21 -0700
-From: Yao Yuan <yuan.yao@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Peter Xu <peterx@redhat.com>,
-	=?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>
-Cc: kvm@vger.kernel.org,
-	yuan.yao@linux.intel.com,
-	yuan.yao@intel.com
-Subject: [kvm-unit-tests PATCH 1/1] x86/apic: Fix test_apic_timer_one_shot() random failure
-Date: Sun, 28 Apr 2024 10:29:06 +0800
-Message-Id: <20240428022906.373130-1-yuan.yao@intel.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1714284141; c=relaxed/simple;
+	bh=v1ykSlXkUuARj6rBHWUVxaWShXC8PoWCDT7RtdU0yEM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pXVawdcHHpfPRtz/ihXHZGPUCMoNwJEev03tRF0zKjOD+aCuKm4AAqCeOPzIULjqnQsr3fapqxt27v36yMNsuVIEw+fuLVZ+WXaB7+w3H57jmn91Tki7Dgv6YpPJGbB6vHdPMTWfYJmCaNK5vfFqGFvakabXYh3mItiZ5yOOsFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DiEC0bC4; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56e48d0a632so5141875a12.2
+        for <kvm@vger.kernel.org>; Sat, 27 Apr 2024 23:02:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714284138; x=1714888938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rgsoPFEC7W7J0TMXTM5BpT6yoz5kG4yvWQxhG7FX1K4=;
+        b=DiEC0bC4td7LWl4ibWYgPZBY7+WgaxfhcDcqW6jpIivYNJ1yK9i2ZQhmyAdn4tmgwG
+         fIeyNhG1ZUTuyMVBZREqc3ZnWmGrPrX1KdWtlfmuooHXR2t0harW6Zv1eHE6fz8XpC4m
+         3mnEeOuOl70sQTKq98nFGc5pKXZBCnOzRlYdU6gY4ZlIKwHAOU85eh29dWnuxufL0mfm
+         wf0FxgvbJYf/czoSshtvMnAPgfbFGJeTNU2ASKdhwVtH0fpx5oXNmI2sl5MWG+KUVuhd
+         dpUtmgvr919jGNnkz61jRW4mm+Q86MjsnuAOgPUxyKGOANvVz1wxecX+2QXOkC5Zx17g
+         TkZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714284138; x=1714888938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rgsoPFEC7W7J0TMXTM5BpT6yoz5kG4yvWQxhG7FX1K4=;
+        b=bbtwpyvEQtxbwXFLN9dM+kB8rR+2QOIQSO0fwatzEpwYpd0QbPjv0GIk8e/1z9TuS6
+         0iPNI2nWMH1mzKCI+8iF+dYXCnlUM4BuPlWJQ1WKdDxNao3GoQoZeZwd3s6nw9efK6eq
+         AvEgCghqm1GDhsNCsynhjgPhJEy9pkJqPrtl/fRdKXnWmT+lg4jQ0jvEHQE9+47VPj55
+         qtddFuHxEnesGk1bD1ABrlOeyCFM3652nYCVz93QDy9baYvW4RaPSYrUoFJZ/hqEbsWg
+         YbACfys5RzV0Vp92456quhXqucJAEriEVZx8rEg1fUPLskZqrLBnwJDZrShJCCyCL8OF
+         iw4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXJVHrLhUYfulYGc9j9/kDGIHYSerH1GA+Z1rCWkePi/wqTnSjNN80h2ZxB5o6wAWSmBUTi+nw9TOgzZi7CfRq5orz/
+X-Gm-Message-State: AOJu0Yz62aibiEdG6HIeN+OEz1Rq/95AP19cutSTBqiIn1Y0RUtWiRcR
+	+KKD0+4nl812W/jUcWFdqHPD0LQLuyPo4WYAzW/DRQWuxj44TfT7Mz/sOwgQbzzDgXE5W3jYBij
+	6icd0VBsIkaDw3w1GC7m3ZkeqBQ2zbZwQ0B6m
+X-Google-Smtp-Source: AGHT+IGoXq8kgnePnz5/Du5SvupzIZeOONX/IwUCQgIn8Ix+x7KM8LRHeC9lMqZRrm3lpCHrTHYOSzRj0xV7QOJ9bos=
+X-Received: by 2002:a17:906:f9d9:b0:a58:7c50:84e4 with SMTP id
+ lj25-20020a170906f9d900b00a587c5084e4mr6105402ejb.2.1714284138056; Sat, 27
+ Apr 2024 23:02:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAL715WKh8VBJ-O50oqSnCqKPQo4Bor_aMnRZeS_TzJP3ja8-YQ@mail.gmail.com>
+ <6af2da05-cb47-46f7-b129-08463bc9469b@linux.intel.com> <CAL715W+zeqKenPLP2Fm9u_BkGRKAk-mncsOxrg=EKs74qK5f1Q@mail.gmail.com>
+ <42acf1fc-1603-4ac5-8a09-edae2d85963d@linux.intel.com> <ZirPGnSDUzD-iWwc@google.com>
+ <77913327-2115-42b5-850a-04ef0581faa7@linux.intel.com> <CAL715WJCHJD_wcJ+r4TyWfvmk9uNT_kPy7Pt=CHkB-Sf0D4Rqw@mail.gmail.com>
+ <ff4a4229-04ac-4cbf-8aea-c84ccfa96e0b@linux.intel.com> <CAL715WJKL5__8RU0xxUf0HifNVQBDRODE54O2bwOx45w67TQTQ@mail.gmail.com>
+ <5f5bcbc0-e2ef-4232-a56a-fda93c6a569e@linux.intel.com> <ZiwEoZDIg8l7-uid@google.com>
+ <CAL715WJ4jHmto3ci=Fz5Bwx2Y=Hiy1MoFCpcUhz-C8aPMqYskw@mail.gmail.com> <b9095b0d-72f0-4e54-8d2e-f965ddff06bb@linux.intel.com>
+In-Reply-To: <b9095b0d-72f0-4e54-8d2e-f965ddff06bb@linux.intel.com>
+From: Mingwei Zhang <mizhang@google.com>
+Date: Sat, 27 Apr 2024 23:01:41 -0700
+Message-ID: <CAL715WKm0X9NJxq8SNGD5EJomzY4DDSiwLb1wMMgcgHqeZ64BA@mail.gmail.com>
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Kan Liang <kan.liang@linux.intel.com>, 
+	maobibo <maobibo@loongson.cn>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, 
+	peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com, 
+	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
+	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
+	chao.gao@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Explicitly clear TMICT to avoid test_apic_timer_one_shot()
-negative failure.
+On Sat, Apr 27, 2024 at 5:59=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.intel.=
+com> wrote:
+>
+>
+> On 4/27/2024 11:04 AM, Mingwei Zhang wrote:
+> > On Fri, Apr 26, 2024 at 12:46=E2=80=AFPM Sean Christopherson <seanjc@go=
+ogle.com> wrote:
+> >> On Fri, Apr 26, 2024, Kan Liang wrote:
+> >>>> Optimization 4
+> >>>> allows the host side to immediately profiling this part instead of
+> >>>> waiting for vcpu to reach to PMU context switch locations. Doing so
+> >>>> will generate more accurate results.
+> >>> If so, I think the 4 is a must to have. Otherwise, it wouldn't honer =
+the
+> >>> definition of the exclude_guest. Without 4, it brings some random bli=
+nd
+> >>> spots, right?
+> >> +1, I view it as a hard requirement.  It's not an optimization, it's a=
+bout
+> >> accuracy and functional correctness.
+> > Well. Does it have to be a _hard_ requirement? no? The irq handler
+> > triggered by "perf record -a" could just inject a "state". Instead of
+> > immediately preempting the guest PMU context, perf subsystem could
+> > allow KVM defer the context switch when it reaches the next PMU
+> > context switch location.
+> >
+> > This is the same as the preemption kernel logic. Do you want me to
+> > stop the work immediately? Yes (if you enable preemption), or No, let
+> > me finish my job and get to the scheduling point.
+> >
+> > Implementing this might be more difficult to debug. That's my real
+> > concern. If we do not enable preemption, the PMU context switch will
+> > only happen at the 2 pairs of locations. If we enable preemption, it
+> > could happen at any time.
+>
+> IMO I don't prefer to add a switch to enable/disable the preemption. I
+> think current implementation is already complicated enough and
+> unnecessary to introduce an new parameter to confuse users. Furthermore,
+> the switch could introduce an uncertainty and may mislead the perf user
+> to read the perf stats incorrectly.  As for debug, it won't bring any
+> difference as long as no host event is created.
+>
+That's ok. It is about opinions and brainstorming. Adding a parameter
+to disable preemption is from the cloud usage perspective. The
+conflict of opinions is which one you prioritize: guest PMU or the
+host PMU? If you stand on the guest vPMU usage perspective, do you
+want anyone on the host to shoot a profiling command and generate
+turbulence? no. If you stand on the host PMU perspective and you want
+to profile VMM/KVM, you definitely want accuracy and no delay at all.
 
-Clear TMICT to disable any enabled but masked local timer.
-Otherwise timer interrupt may occur after lvtt_handler() is
-set as handler and **before** TDCR or TIMCT is set to new
-value, lead this test failure. Log comes from UEFI mode:
-
-PASS: PV IPIs testing
-PASS: pending nmi
-Got local timer intr before write to TDCR / TMICT
-old tmict:0x989680 old lvtt:0x30020 tsc2 - tsc1 = 0xb68
-          ^^^^^^^^          ^^^^^^^
-FAIL: APIC LVT timer one shot
-
-Fixes: 9f815b293961 ("x86: apic: add LVT timer test")
-Signed-off-by: Yao Yuan <yuan.yao@intel.com>
----
- x86/apic.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/x86/apic.c b/x86/apic.c
-index dd7e7834..2052e864 100644
---- a/x86/apic.c
-+++ b/x86/apic.c
-@@ -480,6 +480,13 @@ static void test_apic_timer_one_shot(void)
- 	uint64_t tsc1, tsc2;
- 	static const uint32_t interval = 0x10000;
- 
-+	/*
-+	 * clear TMICT to disable any enabled but masked local timer.
-+	 * Otherwise timer interrupt may occur after lvtt_handler() is
-+	 * set as handler and **before** TDCR or TIMCT is set to new value,
-+	 * lead this test failure.
-+	 */
-+	apic_write(APIC_TMICT, 0);
- #define APIC_LVT_TIMER_VECTOR    (0xee)
- 
- 	handle_irq(APIC_LVT_TIMER_VECTOR, lvtt_handler);
-
-base-commit: 9cab58249f98adc451933530fd7e618e1856eb94
--- 
-2.27.0
-
+Thanks.
+-Mingwei
+>
+> >
+> >> What _is_ an optimization is keeping guest state loaded while KVM is i=
+n its
+> >> run loop, i.e. initial mediated/passthrough PMU support could land ups=
+tream with
+> >> unconditional switches at entry/exit.  The performance of KVM would li=
+kely be
+> >> unacceptable for any production use cases, but that would give us moti=
+vation to
+> >> finish the job, and it doesn't result in random, hard to diagnose issu=
+es for
+> >> userspace.
+> > That's true. I agree with that.
+> >
+> >>>> Do we want to preempt that? I think it depends. For regular cloud
+> >>>> usage, we don't. But for any other usages where we want to prioritiz=
+e
+> >>>> KVM/VMM profiling over guest vPMU, it is useful.
+> >>>>
+> >>>> My current opinion is that optimization 4 is something nice to have.
+> >>>> But we should allow people to turn it off just like we could choose =
+to
+> >>>> disable preempt kernel.
+> >>> The exclude_guest means everything but the guest. I don't see a reaso=
+n
+> >>> why people want to turn it off and get some random blind spots.
 
