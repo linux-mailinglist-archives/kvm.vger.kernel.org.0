@@ -1,60 +1,61 @@
-Return-Path: <kvm+bounces-16135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E42DA8B50F7
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 08:07:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38DD28B50FA
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 08:08:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECD38B216D0
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 06:07:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4287281C63
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 06:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CF1111A5;
-	Mon, 29 Apr 2024 06:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B4B14273;
+	Mon, 29 Apr 2024 06:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AWr+lnqo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AZ037UzQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2046.outbound.protection.outlook.com [40.107.243.46])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2048.outbound.protection.outlook.com [40.107.94.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64881118E;
-	Mon, 29 Apr 2024 06:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8668413FE7;
+	Mon, 29 Apr 2024 06:07:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.48
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714370832; cv=fail; b=LZQBI3XBWvRNEy8l2Q9B6/BB1FT0m2AGuJSbJpWm9iKFssRWhMxN3ZLWeffoBD8tYpIyCzhyh0Nco54p2b595J5TfRJgIIdA3S57Gdvfyixz/VMsYgpeLR8+uLDwkMV4rY0WFrIXUOxpT6/ggQO7Stnn+jBzGjszqumIME5VFHk=
+	t=1714370842; cv=fail; b=H5M/cDsRLPBVFwtdYz9XSL/dxAMqLPniDhWwa+ZESqKkQlT9u6DDGsotX+i2wtm1B2nfot1GfOc0i0ZUcbmCKVYjEDsmGbfRpMbHsMOIjFCvchHvjHOla4CIDa2x8zuEvcORgLT2QrnQuomCJ18P6G6cSM925Qvbp0VvSejpqqg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714370832; c=relaxed/simple;
-	bh=+zOTj0NEnYB/z5AGERqCslJaBpgdpwL7oSfWRuUYLUQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Url8jdllYr98F15+geE2Ec3tqKyBmbqAcszyEscFpCWuul/KnXE7G/9/GEkKYO2YOsJxOUyueFshG5rl7FhkxiFV/3Ln3nIPfljEmwORTejMSDN9UkF2YYhaEK+e1maT6cABA+U2kB+S8veAaTJm6TC2kKfgghPggEOoemEUS/0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AWr+lnqo; arc=fail smtp.client-ip=40.107.243.46
+	s=arc-20240116; t=1714370842; c=relaxed/simple;
+	bh=rgzbCeAEq+vsUY/E7Y2cQ4c87iMIrqALI/G72LtCASg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Cl5hapgt7mWqx7qoiBktU0567++xPWzfBdAP5JFYLjLpv1OhoXNt5tcTNmnwH9KOoFVfHvd0pHP55S4ybbbTGNgxEOm001j8T6D2ChHtE9oN5KJtvcmVcAP6He7Y0mBdPDF8JboBN1uO2Fa3nwxZ5FQS0H4foy8Z+O4jmHReuFs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AZ037UzQ; arc=fail smtp.client-ip=40.107.94.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G1luz2VNwHTGp3aAwD0n5Sd+hTWrWAaZJdViH9dPdDSorCBQFFLkzDCueREFDOk3R872A/bsaWwowY4mmzZViQMxKidOD8qQ+SS616UuWeyGTJeastQnF9Zdlx6JcAlNyTIOwE3fmy1IPFXE8yxQZngyaaBfBDvtQi4dzpeUPbWhgbJnITXNTjhKzhI244n3FsH5c756mo2nRtyE7/BtJedXU6s4PpuYD+APCjlc/uDYkQOB0xJ7Hp3QcNS41YxH0fhlPr/SLul4ow0addsWHClVNYj77MUnP5QvG7LHtaY/6CVGnh2P9vta3TzPuSWGi9ucXe8LbQObtKKSCyRrNA==
+ b=UFVatkt+KZHaF/5KG209V+CITV2iGIB10UarxBvim7sqnWcqHPXMLQt8pFFQqQxPDhsv8K6jdua6EolLRP5go5YvU2QNFrTpErjLtZQRB3rtnB6GlwJjz61drWomXy3w5nGqsSs5lGN1utt06jq0ny5f3drvLSFe5lTSWQjoTyp/Rwfxwjvg8YZE5uIhNTldeV1kXg381ojUZT1UoONhlZCYa7ZodrRTfkprjcrLAmKTcDSk/Nis1taJlttisindU0VktQ/ekIu6/R5URsVYpamf/8YPFL4ue2L4MYYCqOkyAxZ2J80ZmIjTGgNZ5oXz+9pzPO664nk8mE49/dKOpg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JGIZWMNHfQBigxUt6Q67X+tErMKpYpAJE1kKOlS9iFE=;
- b=a6COBK6dfckYWvbnMFvm3amqlR9wDB4A3i/zqfdliW+qXI/Z+DfTnXm5v2HIOdGDz9x1pRFyocxROkOy3smMtKiEoOgxtWcQHWe5Uww44ZueiBWlQrA7/y1JvAFY5S6ePKzHbiW81Kcr7G0OFTmH5chv9IW6MxPuDTVpuATRtZ+cTgOXyYLyp40Dhx8e+1yf1Mzo7HuEE9d1cKbwJ7IPu2+yLqkwoYjI5GsD1p3MeWTpbC2A14AiPYRZaSTfrIB+mwF2RKo3FZwOAA5vEWx+xunTeSzqiN7K0hVCqHRHNyrrTwQ+bWZFCP2kUXTMi2SAL2o51ELQGqKZc+lZ7GGHvQ==
+ bh=UosfrT/MMsgBkujPmt6chExeQ8VyvgyVXq4a2Dpg9A8=;
+ b=FWvQ3Mbe0PPKerCUSrxYqzpPjTnyqmlz74p8EiSsf+jR8oY7zBrVjXUpmAHR5ehfmIIOS7COxaesfw2a2zje/IiU8wQJurOwK02Fz/KpmJtGJTbfmKHT0NnutDwSHrsQ/X89MUukJWScUFYw6IkRGV2olRqy2tG0sZeG9anv2wEHJMv7QXfHZ9dtl/B8NJdEzZT8/u2vc0/uaz9w/eNqN38S2wLopaTIaG7l47FLtIE7rvLqMVAPk9qtQrHyqGBxY5Xe+lNmGE0hIbZ0/j6z68Wo9ZbYqCzdrNFLglUWQEiAoDjl8gux97ninm3/8pBA9nK+wA7hsp+oucLTeGyJWA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JGIZWMNHfQBigxUt6Q67X+tErMKpYpAJE1kKOlS9iFE=;
- b=AWr+lnqotNmc19dx+MuTDn///u0P12nQyBnaZwKfkA86R1HkAzWuYbRWY4LW4F7jF+WH8XmkJlDEB2lX5Nswx4GLyPHHyeHLV3MQ3r7uMQ/FcXkj0f2L7G5RxvENGGk8jPlgJb67NuhFCpcdq+H/wHNIVZj82rxJ7dWjWDzCeMQ=
-Received: from CH2PR14CA0046.namprd14.prod.outlook.com (2603:10b6:610:56::26)
- by LV2PR12MB5824.namprd12.prod.outlook.com (2603:10b6:408:176::19) with
+ bh=UosfrT/MMsgBkujPmt6chExeQ8VyvgyVXq4a2Dpg9A8=;
+ b=AZ037UzQnFxPWKkcxq4nzEoYR6PZs3xaV4bfdjZaCj1aDJHgy69ZD3LEDtkxbYh0EIDL4oYSNnjJfo+hvreR4PegDaOqTgrqCIX+FfURWX0RDAbx6ov1EIGU79qcAy2lbJ7VEEN1UXQAZPd5ZYwzd5pEgAjz0/KCRTAGJSZfviE=
+Received: from CH2PR15CA0006.namprd15.prod.outlook.com (2603:10b6:610:51::16)
+ by SA1PR12MB6823.namprd12.prod.outlook.com (2603:10b6:806:25e::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Mon, 29 Apr
- 2024 06:07:08 +0000
-Received: from CH2PEPF00000148.namprd02.prod.outlook.com
- (2603:10b6:610:56:cafe::f0) by CH2PR14CA0046.outlook.office365.com
- (2603:10b6:610:56::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38 via Frontend
- Transport; Mon, 29 Apr 2024 06:07:08 +0000
+ 2024 06:07:17 +0000
+Received: from CH2PEPF00000143.namprd02.prod.outlook.com
+ (2603:10b6:610:51:cafe::2b) by CH2PR15CA0006.outlook.office365.com
+ (2603:10b6:610:51::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34 via Frontend
+ Transport; Mon, 29 Apr 2024 06:07:17 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF00000148.mail.protection.outlook.com (10.167.244.105) with Microsoft
+ CH2PEPF00000143.mail.protection.outlook.com (10.167.244.100) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7544.18 via Frontend Transport; Mon, 29 Apr 2024 06:07:08 +0000
+ 15.20.7544.18 via Frontend Transport; Mon, 29 Apr 2024 06:07:17 +0000
 Received: from BLR-5CG113396H.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 29 Apr
- 2024 01:06:57 -0500
+ 2024 01:07:06 -0500
 From: Ravi Bangoria <ravi.bangoria@amd.com>
 To: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
 	<dave.hansen@linux.intel.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
@@ -80,10 +81,12 @@ CC: <ravi.bangoria@amd.com>, <hpa@zytor.com>, <rmk+kernel@armlinux.org.uk>,
 	<babu.moger@amd.com>, <x86@kernel.org>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <santosh.shukla@amd.com>,
 	<ananth.narayan@amd.com>, <sandipan.das@amd.com>
-Subject: [PATCH 0/3] x86/cpu: Add Bus Lock Detect support for AMD
-Date: Mon, 29 Apr 2024 11:36:40 +0530
-Message-ID: <20240429060643.211-1-ravi.bangoria@amd.com>
+Subject: [PATCH 1/3] x86/split_lock: Move Split and Bus lock code to a dedicated file
+Date: Mon, 29 Apr 2024 11:36:41 +0530
+Message-ID: <20240429060643.211-2-ravi.bangoria@amd.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240429060643.211-1-ravi.bangoria@amd.com>
+References: <20240429060643.211-1-ravi.bangoria@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,81 +99,953 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000148:EE_|LV2PR12MB5824:EE_
-X-MS-Office365-Filtering-Correlation-Id: 573c6836-eb55-4b2e-1362-08dc68129a01
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000143:EE_|SA1PR12MB6823:EE_
+X-MS-Office365-Filtering-Correlation-Id: 76d8ac76-6367-4190-f49e-08dc68129f62
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230031|376005|7416005|1800799015|82310400014|36860700004;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?F4wnNPMA+7LOwlD1VggdBPg0UtxxbdHpNzLuZegwK+kccNM+YGdCgpa+8z17?=
- =?us-ascii?Q?EOnNEV8JJwec8B1z8pcyAO9E4HNUkk0vkWrm4rHvX+GoDrOTGU+nfH8Jui0d?=
- =?us-ascii?Q?vaNnbojh2wkbaQy1JRfpyEQfe1V5o/CjHrd8AZLgxycrca0TLaPaRW3LUhGI?=
- =?us-ascii?Q?88jcBpD/Q5SpJxirEerW9jdYu9SRTtO60NVnmvhlDLpmhqFuaPNFKfzmiE2L?=
- =?us-ascii?Q?YPvYK8k1cThwutKlDND3OsPhBbZzJG3i2Jv/ktb4X3HTWaww8e7ywkVUpQRQ?=
- =?us-ascii?Q?5whHGp0dNPUFU9BcSDrBubmj6T1R1L0io7siqtzRJEe1B50uXDyxeWdiA4EA?=
- =?us-ascii?Q?BgqOfCFHRcl43xIgv5llEiPY1s2DITjzzxn+pePm28TUEQvKRrEedbOmPf10?=
- =?us-ascii?Q?LReJATBs4TKv1a7Z7WcCL6Xq9qFj43CBUqg0n+l4OmhTGQUKC18ADAa4hOqX?=
- =?us-ascii?Q?naO/QkflI3FbPFH2abjk57I2keUrkRTAsmvsli7g8MtP/O+8z2Dl9zcwmaFR?=
- =?us-ascii?Q?t+1eP3l5BEw7A2u/PYMJZnxlG6qbHt5q3RXtUd8oMAB1u8NnUD/+BE+XEWsC?=
- =?us-ascii?Q?zTJs3ThK4gnZntj9J3pnTNEjXqnHJtgQ/Pbdvn8b2u0zIthPcDvlGCvggGj6?=
- =?us-ascii?Q?aYOAX3GOt48/O1OU+tizR9YsMmKUPLnwmxylcd9QTbaFmbPkrr5OBcR0Rjv1?=
- =?us-ascii?Q?A8ZExAm00/mOUfXm33R9qfZJdmWcmGBbCl4bw0WZmm4NHroIBYevP5KLoc1d?=
- =?us-ascii?Q?42zIbEwGEhxyEzwrbaExq+3aEcxa2I+bolScY4AFJ+kni3gND38iyctFkBNb?=
- =?us-ascii?Q?+anZ04Iy6SvNHTbetdokuSPhaQ3H0YnrtaiN8TH4x6rqjF4lR6vsTTrbxCOP?=
- =?us-ascii?Q?3otXtwDGbaCN2xoZgT82sBDCYUcS/1x3QC/Im4bKTh06XWfdhBT8YgjX3ayB?=
- =?us-ascii?Q?6OKMZDprMivAUAEVAmleOlBh6Z70okDpB1izyIGdSQ2HvJ62aYWOIIjkOF0v?=
- =?us-ascii?Q?KzcbJ+3I3lexMp0zj+s70Q3pTB3EPIfOfZQD2ilV+VeC1xlN1OFj4BxXMypK?=
- =?us-ascii?Q?AWQVGXi1qYycjDQAmctnxH302yYcGgeEkLFEcFHashLj9YwVY+u0yt9y2W6e?=
- =?us-ascii?Q?Gs+f0jQTMO1wKDWB+sgeRKt0HOwm07mz6eNVy4Dv2oqBnPaQ28bGPN/Qqva8?=
- =?us-ascii?Q?waDbvQiZOxQH5tqwmcCbBofPcmTDndrCpjYvF/8XTcWHSipgxTe/o4JLuDgy?=
- =?us-ascii?Q?wJIHsxus+xMF5vBrBJ1oiP0xwD+bRuH++1IbczwY/cjzjaQvAIph+D06cARj?=
- =?us-ascii?Q?Tvwc55evAcvP2k9pSJsU6MjOwL5ZwHKLP8JL5qBru9k5JQ=3D=3D?=
+	=?us-ascii?Q?0nIq/5aHrtxnuC00ou8JZ+OsXIpxzPiqSQUVqAffhSlmOcb1gSw+EU8jFvMS?=
+ =?us-ascii?Q?esNbAZ40Y0s0jMO73uBe5mHwYR6+Hxdxk4BFnXoOVcwuDt4xqvmYLA/NAqr/?=
+ =?us-ascii?Q?mNaAGBduFFujrniiQTu3r5ad71Rpa2pcRdEEc6IxDjgi9T1jc0mJAlBosiJl?=
+ =?us-ascii?Q?ZSW0R6FJs8UfziX9/a7rF3nh4+mTPV3qRgeMHyM+7GdHduAdl5WRvFoLlNLq?=
+ =?us-ascii?Q?A+ybrkHHb9mZgHie8HVLOFUKCmZygqWfhT6wFirTWM4HdtBvvkCv25o7f7NB?=
+ =?us-ascii?Q?sWoh115EPXeocndxBUkZQK5GIlxZarOHLGazNxZ/CaK/Yiaf0kszK05B6McC?=
+ =?us-ascii?Q?YJ+Pqf4yuaOo6kG7niWChL8KYiPlZ29CxFNA+JSx8XYE0B4RaSAI2/Da9Oyt?=
+ =?us-ascii?Q?BKw5TtcZIrXKuqJLS3Md/CKuMm5uIFwdRfy56m1k2MfwlTxRvUeGv8dI6pVn?=
+ =?us-ascii?Q?4nbKmLD8YoRubc9wYUmJ045HmssEySCSQOawcYjAc16nj7PRhThZjB1sGd8X?=
+ =?us-ascii?Q?EI84sZgNpfVdKWc1medbOaLkyAkjwzR1W3ujm9vTCiJyI98MTXkxBCKmxdut?=
+ =?us-ascii?Q?uUsgF3ea7qOIZ58dYjUhqZGxF2KWiyIMKLJCMLXT7+AKOOwjr4/rfOrGebsp?=
+ =?us-ascii?Q?SQpjEHvn1ZL99vN5MlhysqaQ+dUIOW5htuPEUpc7rpxATxooHaKqDwUwDe4I?=
+ =?us-ascii?Q?7RQhdLZ6Tc+4Nkw3PtnQjmmowsUJs6R25yDToWAP4/hsnwgR34M86RHMMCs1?=
+ =?us-ascii?Q?rW1a+jLnYeT/G1Va4PmKLWLmqeGQ3HQ4fk0ZSVlv28p3Nlb4cl90VhhCdPBz?=
+ =?us-ascii?Q?qoj5ukE83lMwVc3cwe8Y3YQRYTdW2Cil+l6pmP+uUkVXWTY7lV7yJnKrOyJx?=
+ =?us-ascii?Q?Xe8mEw6mKFcb9am+vKLsoQbYJSqVCtqhjsy2nkllXPZLLRnTa0nfIYiYoBOm?=
+ =?us-ascii?Q?cdK7d3NH/YncOZ4pamiMZx6gJE57RdF6LwWTUJKLWKuLJ8ZVQKCw+o5YL4gB?=
+ =?us-ascii?Q?TEO98Ec0IFbfJBePTLKNnnHHwIRD/TZmDwGB5GtLTY4XoZPHAPpIrF+yQzAC?=
+ =?us-ascii?Q?NZpQ2PTmcOi8MU+FX44kvkikPh03iyY2AeJ65Kt5iJja97tCFHvzoxowt58d?=
+ =?us-ascii?Q?ozvaAnXKMvIMoVOzRtsG6iL+Hxp7lOOvr8CUAQmmMvhiWwTLwu5xCrhXEMgj?=
+ =?us-ascii?Q?rTBMlnfWm91kWrbBLeLe2SLjCQuI3qO7EWjQdugssQ6m/5F8mDzAGOzZp1b5?=
+ =?us-ascii?Q?p1etAH0q3VGctqcjvxW1IxjLabM6i6Xewcxq4LK5B/T6ZaK36PqGN8A0XOav?=
+ =?us-ascii?Q?9kONR2WzI0crXl8MS2PXD0ZHbITaFVJfhNpQLtp5EpFJxJ/66XUfgR9S7Pkj?=
+ =?us-ascii?Q?TC75oj7aTMUzeOC/X73t3VTFoOgH?=
 X-Forefront-Antispam-Report:
 	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(82310400014)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2024 06:07:08.1604
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2024 06:07:17.1749
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 573c6836-eb55-4b2e-1362-08dc68129a01
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76d8ac76-6367-4190-f49e-08dc68129f62
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000148.namprd02.prod.outlook.com
+	CH2PEPF00000143.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5824
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6823
 
-Upcoming AMD uarch will support Bus Lock Detect (called Bus Lock Trap
-in AMD docs). Add support for the same in Linux. Bus Lock Detect is
-enumerated with cpuid CPUID Fn0000_0007_ECX_x0 bit [24 / BUSLOCKTRAP].
-It can be enabled through MSR_IA32_DEBUGCTLMSR. When enabled, hardware
-clears DR6[11] and raises a #DB exception on occurrence of Bus Lock if
-CPL > 0. More detail about the feature can be found in AMD APM[1].
+Upcoming AMD uarch will support Bus Lock Detect, which functionally works
+identical to Intel. Move split_lock and bus_lock specific code from
+intel.c to a dedicated file so that it can be compiled and supported on
+non-intel platforms.
 
-Patches are prepared on tip/x86/cpu (e063b531d4e8)
-
-Patch #3 depends on SEV-ES LBRV fix:
-https://lore.kernel.org/r/20240416050338.517-1-ravi.bangoria@amd.com
-
-[1]: AMD64 Architecture Programmer's Manual Pub. 40332, Rev. 4.07 - June
-     2023, Vol 2, 13.1.3.6 Bus Lock Trap
-     https://bugzilla.kernel.org/attachment.cgi?id=304653
-
-Ravi Bangoria (3):
-  x86/split_lock: Move Split and Bus lock code to a dedicated file
-  x86/bus_lock: Add support for AMD
-  KVM SVM: Add Bus Lock Detect support
-
+Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
+---
  arch/x86/include/asm/cpu.h           |   4 +
  arch/x86/kernel/cpu/Makefile         |   1 +
- arch/x86/kernel/cpu/amd.c            |   2 +
  arch/x86/kernel/cpu/intel.c          | 407 ---------------------------
  arch/x86/kernel/cpu/split-bus-lock.c | 406 ++++++++++++++++++++++++++
- arch/x86/kvm/svm/nested.c            |   3 +-
- arch/x86/kvm/svm/svm.c               |  16 +-
- 7 files changed, 430 insertions(+), 409 deletions(-)
+ 4 files changed, 411 insertions(+), 407 deletions(-)
  create mode 100644 arch/x86/kernel/cpu/split-bus-lock.c
 
+diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
+index aa30fd8cad7f..4b5c31dc8112 100644
+--- a/arch/x86/include/asm/cpu.h
++++ b/arch/x86/include/asm/cpu.h
+@@ -51,6 +51,10 @@ static inline u8 get_this_hybrid_cpu_type(void)
+ 	return 0;
+ }
+ #endif
++
++void split_lock_init(void);
++void bus_lock_init(void);
++
+ #ifdef CONFIG_IA32_FEAT_CTL
+ void init_ia32_feat_ctl(struct cpuinfo_x86 *c);
+ #else
+diff --git a/arch/x86/kernel/cpu/Makefile b/arch/x86/kernel/cpu/Makefile
+index eb4dbcdf41f1..86a10472ad1d 100644
+--- a/arch/x86/kernel/cpu/Makefile
++++ b/arch/x86/kernel/cpu/Makefile
+@@ -27,6 +27,7 @@ obj-y			+= aperfmperf.o
+ obj-y			+= cpuid-deps.o
+ obj-y			+= umwait.o
+ obj-y 			+= capflags.o powerflags.o
++obj-y 			+= split-bus-lock.o
+ 
+ obj-$(CONFIG_X86_LOCAL_APIC)		+= topology.o
+ 
+diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
+index 3c3e7e5695ba..730d7a065b8a 100644
+--- a/arch/x86/kernel/cpu/intel.c
++++ b/arch/x86/kernel/cpu/intel.c
+@@ -7,13 +7,9 @@
+ #include <linux/smp.h>
+ #include <linux/sched.h>
+ #include <linux/sched/clock.h>
+-#include <linux/semaphore.h>
+ #include <linux/thread_info.h>
+ #include <linux/init.h>
+ #include <linux/uaccess.h>
+-#include <linux/workqueue.h>
+-#include <linux/delay.h>
+-#include <linux/cpuhotplug.h>
+ 
+ #include <asm/cpufeature.h>
+ #include <asm/msr.h>
+@@ -23,9 +19,6 @@
+ #include <asm/microcode.h>
+ #include <asm/hwcap2.h>
+ #include <asm/elf.h>
+-#include <asm/cpu_device_id.h>
+-#include <asm/cmdline.h>
+-#include <asm/traps.h>
+ #include <asm/resctrl.h>
+ #include <asm/numa.h>
+ #include <asm/thermal.h>
+@@ -41,28 +34,6 @@
+ #include <asm/apic.h>
+ #endif
+ 
+-enum split_lock_detect_state {
+-	sld_off = 0,
+-	sld_warn,
+-	sld_fatal,
+-	sld_ratelimit,
+-};
+-
+-/*
+- * Default to sld_off because most systems do not support split lock detection.
+- * sld_state_setup() will switch this to sld_warn on systems that support
+- * split lock/bus lock detect, unless there is a command line override.
+- */
+-static enum split_lock_detect_state sld_state __ro_after_init = sld_off;
+-static u64 msr_test_ctrl_cache __ro_after_init;
+-
+-/*
+- * With a name like MSR_TEST_CTL it should go without saying, but don't touch
+- * MSR_TEST_CTL unless the CPU is one of the whitelisted models.  Writing it
+- * on CPUs that do not support SLD can cause fireworks, even when writing '0'.
+- */
+-static bool cpu_model_supports_sld __ro_after_init;
+-
+ /*
+  * Processors which have self-snooping capability can handle conflicting
+  * memory type across CPUs by snooping its own cache. However, there exists
+@@ -595,9 +566,6 @@ static void init_intel_misc_features(struct cpuinfo_x86 *c)
+ 	wrmsrl(MSR_MISC_FEATURES_ENABLES, msr);
+ }
+ 
+-static void split_lock_init(void);
+-static void bus_lock_init(void);
+-
+ static void init_intel(struct cpuinfo_x86 *c)
+ {
+ 	early_init_intel(c);
+@@ -954,381 +922,6 @@ static const struct cpu_dev intel_cpu_dev = {
+ 
+ cpu_dev_register(intel_cpu_dev);
+ 
+-#undef pr_fmt
+-#define pr_fmt(fmt) "x86/split lock detection: " fmt
+-
+-static const struct {
+-	const char			*option;
+-	enum split_lock_detect_state	state;
+-} sld_options[] __initconst = {
+-	{ "off",	sld_off   },
+-	{ "warn",	sld_warn  },
+-	{ "fatal",	sld_fatal },
+-	{ "ratelimit:", sld_ratelimit },
+-};
+-
+-static struct ratelimit_state bld_ratelimit;
+-
+-static unsigned int sysctl_sld_mitigate = 1;
+-static DEFINE_SEMAPHORE(buslock_sem, 1);
+-
+-#ifdef CONFIG_PROC_SYSCTL
+-static struct ctl_table sld_sysctls[] = {
+-	{
+-		.procname       = "split_lock_mitigate",
+-		.data           = &sysctl_sld_mitigate,
+-		.maxlen         = sizeof(unsigned int),
+-		.mode           = 0644,
+-		.proc_handler	= proc_douintvec_minmax,
+-		.extra1         = SYSCTL_ZERO,
+-		.extra2         = SYSCTL_ONE,
+-	},
+-};
+-
+-static int __init sld_mitigate_sysctl_init(void)
+-{
+-	register_sysctl_init("kernel", sld_sysctls);
+-	return 0;
+-}
+-
+-late_initcall(sld_mitigate_sysctl_init);
+-#endif
+-
+-static inline bool match_option(const char *arg, int arglen, const char *opt)
+-{
+-	int len = strlen(opt), ratelimit;
+-
+-	if (strncmp(arg, opt, len))
+-		return false;
+-
+-	/*
+-	 * Min ratelimit is 1 bus lock/sec.
+-	 * Max ratelimit is 1000 bus locks/sec.
+-	 */
+-	if (sscanf(arg, "ratelimit:%d", &ratelimit) == 1 &&
+-	    ratelimit > 0 && ratelimit <= 1000) {
+-		ratelimit_state_init(&bld_ratelimit, HZ, ratelimit);
+-		ratelimit_set_flags(&bld_ratelimit, RATELIMIT_MSG_ON_RELEASE);
+-		return true;
+-	}
+-
+-	return len == arglen;
+-}
+-
+-static bool split_lock_verify_msr(bool on)
+-{
+-	u64 ctrl, tmp;
+-
+-	if (rdmsrl_safe(MSR_TEST_CTRL, &ctrl))
+-		return false;
+-	if (on)
+-		ctrl |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+-	else
+-		ctrl &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+-	if (wrmsrl_safe(MSR_TEST_CTRL, ctrl))
+-		return false;
+-	rdmsrl(MSR_TEST_CTRL, tmp);
+-	return ctrl == tmp;
+-}
+-
+-static void __init sld_state_setup(void)
+-{
+-	enum split_lock_detect_state state = sld_warn;
+-	char arg[20];
+-	int i, ret;
+-
+-	if (!boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
+-	    !boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT))
+-		return;
+-
+-	ret = cmdline_find_option(boot_command_line, "split_lock_detect",
+-				  arg, sizeof(arg));
+-	if (ret >= 0) {
+-		for (i = 0; i < ARRAY_SIZE(sld_options); i++) {
+-			if (match_option(arg, ret, sld_options[i].option)) {
+-				state = sld_options[i].state;
+-				break;
+-			}
+-		}
+-	}
+-	sld_state = state;
+-}
+-
+-static void __init __split_lock_setup(void)
+-{
+-	if (!split_lock_verify_msr(false)) {
+-		pr_info("MSR access failed: Disabled\n");
+-		return;
+-	}
+-
+-	rdmsrl(MSR_TEST_CTRL, msr_test_ctrl_cache);
+-
+-	if (!split_lock_verify_msr(true)) {
+-		pr_info("MSR access failed: Disabled\n");
+-		return;
+-	}
+-
+-	/* Restore the MSR to its cached value. */
+-	wrmsrl(MSR_TEST_CTRL, msr_test_ctrl_cache);
+-
+-	setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
+-}
+-
+-/*
+- * MSR_TEST_CTRL is per core, but we treat it like a per CPU MSR. Locking
+- * is not implemented as one thread could undo the setting of the other
+- * thread immediately after dropping the lock anyway.
+- */
+-static void sld_update_msr(bool on)
+-{
+-	u64 test_ctrl_val = msr_test_ctrl_cache;
+-
+-	if (on)
+-		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
+-
+-	wrmsrl(MSR_TEST_CTRL, test_ctrl_val);
+-}
+-
+-static void split_lock_init(void)
+-{
+-	/*
+-	 * #DB for bus lock handles ratelimit and #AC for split lock is
+-	 * disabled.
+-	 */
+-	if (sld_state == sld_ratelimit) {
+-		split_lock_verify_msr(false);
+-		return;
+-	}
+-
+-	if (cpu_model_supports_sld)
+-		split_lock_verify_msr(sld_state != sld_off);
+-}
+-
+-static void __split_lock_reenable_unlock(struct work_struct *work)
+-{
+-	sld_update_msr(true);
+-	up(&buslock_sem);
+-}
+-
+-static DECLARE_DELAYED_WORK(sl_reenable_unlock, __split_lock_reenable_unlock);
+-
+-static void __split_lock_reenable(struct work_struct *work)
+-{
+-	sld_update_msr(true);
+-}
+-static DECLARE_DELAYED_WORK(sl_reenable, __split_lock_reenable);
+-
+-/*
+- * If a CPU goes offline with pending delayed work to re-enable split lock
+- * detection then the delayed work will be executed on some other CPU. That
+- * handles releasing the buslock_sem, but because it executes on a
+- * different CPU probably won't re-enable split lock detection. This is a
+- * problem on HT systems since the sibling CPU on the same core may then be
+- * left running with split lock detection disabled.
+- *
+- * Unconditionally re-enable detection here.
+- */
+-static int splitlock_cpu_offline(unsigned int cpu)
+-{
+-	sld_update_msr(true);
+-
+-	return 0;
+-}
+-
+-static void split_lock_warn(unsigned long ip)
+-{
+-	struct delayed_work *work;
+-	int cpu;
+-
+-	if (!current->reported_split_lock)
+-		pr_warn_ratelimited("#AC: %s/%d took a split_lock trap at address: 0x%lx\n",
+-				    current->comm, current->pid, ip);
+-	current->reported_split_lock = 1;
+-
+-	if (sysctl_sld_mitigate) {
+-		/*
+-		 * misery factor #1:
+-		 * sleep 10ms before trying to execute split lock.
+-		 */
+-		if (msleep_interruptible(10) > 0)
+-			return;
+-		/*
+-		 * Misery factor #2:
+-		 * only allow one buslocked disabled core at a time.
+-		 */
+-		if (down_interruptible(&buslock_sem) == -EINTR)
+-			return;
+-		work = &sl_reenable_unlock;
+-	} else {
+-		work = &sl_reenable;
+-	}
+-
+-	cpu = get_cpu();
+-	schedule_delayed_work_on(cpu, work, 2);
+-
+-	/* Disable split lock detection on this CPU to make progress */
+-	sld_update_msr(false);
+-	put_cpu();
+-}
+-
+-bool handle_guest_split_lock(unsigned long ip)
+-{
+-	if (sld_state == sld_warn) {
+-		split_lock_warn(ip);
+-		return true;
+-	}
+-
+-	pr_warn_once("#AC: %s/%d %s split_lock trap at address: 0x%lx\n",
+-		     current->comm, current->pid,
+-		     sld_state == sld_fatal ? "fatal" : "bogus", ip);
+-
+-	current->thread.error_code = 0;
+-	current->thread.trap_nr = X86_TRAP_AC;
+-	force_sig_fault(SIGBUS, BUS_ADRALN, NULL);
+-	return false;
+-}
+-EXPORT_SYMBOL_GPL(handle_guest_split_lock);
+-
+-static void bus_lock_init(void)
+-{
+-	u64 val;
+-
+-	if (!boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT))
+-		return;
+-
+-	rdmsrl(MSR_IA32_DEBUGCTLMSR, val);
+-
+-	if ((boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
+-	    (sld_state == sld_warn || sld_state == sld_fatal)) ||
+-	    sld_state == sld_off) {
+-		/*
+-		 * Warn and fatal are handled by #AC for split lock if #AC for
+-		 * split lock is supported.
+-		 */
+-		val &= ~DEBUGCTLMSR_BUS_LOCK_DETECT;
+-	} else {
+-		val |= DEBUGCTLMSR_BUS_LOCK_DETECT;
+-	}
+-
+-	wrmsrl(MSR_IA32_DEBUGCTLMSR, val);
+-}
+-
+-bool handle_user_split_lock(struct pt_regs *regs, long error_code)
+-{
+-	if ((regs->flags & X86_EFLAGS_AC) || sld_state == sld_fatal)
+-		return false;
+-	split_lock_warn(regs->ip);
+-	return true;
+-}
+-
+-void handle_bus_lock(struct pt_regs *regs)
+-{
+-	switch (sld_state) {
+-	case sld_off:
+-		break;
+-	case sld_ratelimit:
+-		/* Enforce no more than bld_ratelimit bus locks/sec. */
+-		while (!__ratelimit(&bld_ratelimit))
+-			msleep(20);
+-		/* Warn on the bus lock. */
+-		fallthrough;
+-	case sld_warn:
+-		pr_warn_ratelimited("#DB: %s/%d took a bus_lock trap at address: 0x%lx\n",
+-				    current->comm, current->pid, regs->ip);
+-		break;
+-	case sld_fatal:
+-		force_sig_fault(SIGBUS, BUS_ADRALN, NULL);
+-		break;
+-	}
+-}
+-
+-/*
+- * CPU models that are known to have the per-core split-lock detection
+- * feature even though they do not enumerate IA32_CORE_CAPABILITIES.
+- */
+-static const struct x86_cpu_id split_lock_cpu_ids[] __initconst = {
+-	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X,	0),
+-	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_L,	0),
+-	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D,	0),
+-	{}
+-};
+-
+-static void __init split_lock_setup(struct cpuinfo_x86 *c)
+-{
+-	const struct x86_cpu_id *m;
+-	u64 ia32_core_caps;
+-
+-	if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
+-		return;
+-
+-	/* Check for CPUs that have support but do not enumerate it: */
+-	m = x86_match_cpu(split_lock_cpu_ids);
+-	if (m)
+-		goto supported;
+-
+-	if (!cpu_has(c, X86_FEATURE_CORE_CAPABILITIES))
+-		return;
+-
+-	/*
+-	 * Not all bits in MSR_IA32_CORE_CAPS are architectural, but
+-	 * MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT is.  All CPUs that set
+-	 * it have split lock detection.
+-	 */
+-	rdmsrl(MSR_IA32_CORE_CAPS, ia32_core_caps);
+-	if (ia32_core_caps & MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT)
+-		goto supported;
+-
+-	/* CPU is not in the model list and does not have the MSR bit: */
+-	return;
+-
+-supported:
+-	cpu_model_supports_sld = true;
+-	__split_lock_setup();
+-}
+-
+-static void sld_state_show(void)
+-{
+-	if (!boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT) &&
+-	    !boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
+-		return;
+-
+-	switch (sld_state) {
+-	case sld_off:
+-		pr_info("disabled\n");
+-		break;
+-	case sld_warn:
+-		if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
+-			pr_info("#AC: crashing the kernel on kernel split_locks and warning on user-space split_locks\n");
+-			if (cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
+-					      "x86/splitlock", NULL, splitlock_cpu_offline) < 0)
+-				pr_warn("No splitlock CPU offline handler\n");
+-		} else if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT)) {
+-			pr_info("#DB: warning on user-space bus_locks\n");
+-		}
+-		break;
+-	case sld_fatal:
+-		if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
+-			pr_info("#AC: crashing the kernel on kernel split_locks and sending SIGBUS on user-space split_locks\n");
+-		} else if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT)) {
+-			pr_info("#DB: sending SIGBUS on user-space bus_locks%s\n",
+-				boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) ?
+-				" from non-WB" : "");
+-		}
+-		break;
+-	case sld_ratelimit:
+-		if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT))
+-			pr_info("#DB: setting system wide bus lock rate limit to %u/sec\n", bld_ratelimit.burst);
+-		break;
+-	}
+-}
+-
+-void __init sld_setup(struct cpuinfo_x86 *c)
+-{
+-	split_lock_setup(c);
+-	sld_state_setup();
+-	sld_state_show();
+-}
+-
+ #define X86_HYBRID_CPU_TYPE_ID_SHIFT	24
+ 
+ /**
+diff --git a/arch/x86/kernel/cpu/split-bus-lock.c b/arch/x86/kernel/cpu/split-bus-lock.c
+new file mode 100644
+index 000000000000..6ba04dc8ea64
+--- /dev/null
++++ b/arch/x86/kernel/cpu/split-bus-lock.c
+@@ -0,0 +1,406 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#define pr_fmt(fmt) "x86/split lock detection: " fmt
++
++#include <linux/semaphore.h>
++#include <linux/workqueue.h>
++#include <linux/delay.h>
++#include <linux/cpuhotplug.h>
++#include <asm/cpu_device_id.h>
++#include <asm/cmdline.h>
++#include <asm/traps.h>
++#include <asm/cpu.h>
++
++enum split_lock_detect_state {
++	sld_off = 0,
++	sld_warn,
++	sld_fatal,
++	sld_ratelimit,
++};
++
++/*
++ * Default to sld_off because most systems do not support split lock detection.
++ * sld_state_setup() will switch this to sld_warn on systems that support
++ * split lock/bus lock detect, unless there is a command line override.
++ */
++static enum split_lock_detect_state sld_state __ro_after_init = sld_off;
++static u64 msr_test_ctrl_cache __ro_after_init;
++
++/*
++ * With a name like MSR_TEST_CTL it should go without saying, but don't touch
++ * MSR_TEST_CTL unless the CPU is one of the whitelisted models.  Writing it
++ * on CPUs that do not support SLD can cause fireworks, even when writing '0'.
++ */
++static bool cpu_model_supports_sld __ro_after_init;
++
++static const struct {
++	const char			*option;
++	enum split_lock_detect_state	state;
++} sld_options[] __initconst = {
++	{ "off",	sld_off   },
++	{ "warn",	sld_warn  },
++	{ "fatal",	sld_fatal },
++	{ "ratelimit:", sld_ratelimit },
++};
++
++static struct ratelimit_state bld_ratelimit;
++
++static unsigned int sysctl_sld_mitigate = 1;
++static DEFINE_SEMAPHORE(buslock_sem, 1);
++
++#ifdef CONFIG_PROC_SYSCTL
++static struct ctl_table sld_sysctls[] = {
++	{
++		.procname       = "split_lock_mitigate",
++		.data           = &sysctl_sld_mitigate,
++		.maxlen         = sizeof(unsigned int),
++		.mode           = 0644,
++		.proc_handler	= proc_douintvec_minmax,
++		.extra1         = SYSCTL_ZERO,
++		.extra2         = SYSCTL_ONE,
++	},
++};
++
++static int __init sld_mitigate_sysctl_init(void)
++{
++	register_sysctl_init("kernel", sld_sysctls);
++	return 0;
++}
++
++late_initcall(sld_mitigate_sysctl_init);
++#endif
++
++static inline bool match_option(const char *arg, int arglen, const char *opt)
++{
++	int len = strlen(opt), ratelimit;
++
++	if (strncmp(arg, opt, len))
++		return false;
++
++	/*
++	 * Min ratelimit is 1 bus lock/sec.
++	 * Max ratelimit is 1000 bus locks/sec.
++	 */
++	if (sscanf(arg, "ratelimit:%d", &ratelimit) == 1 &&
++	    ratelimit > 0 && ratelimit <= 1000) {
++		ratelimit_state_init(&bld_ratelimit, HZ, ratelimit);
++		ratelimit_set_flags(&bld_ratelimit, RATELIMIT_MSG_ON_RELEASE);
++		return true;
++	}
++
++	return len == arglen;
++}
++
++static bool split_lock_verify_msr(bool on)
++{
++	u64 ctrl, tmp;
++
++	if (rdmsrl_safe(MSR_TEST_CTRL, &ctrl))
++		return false;
++	if (on)
++		ctrl |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
++	else
++		ctrl &= ~MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
++	if (wrmsrl_safe(MSR_TEST_CTRL, ctrl))
++		return false;
++	rdmsrl(MSR_TEST_CTRL, tmp);
++	return ctrl == tmp;
++}
++
++static void __init sld_state_setup(void)
++{
++	enum split_lock_detect_state state = sld_warn;
++	char arg[20];
++	int i, ret;
++
++	if (!boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
++	    !boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT))
++		return;
++
++	ret = cmdline_find_option(boot_command_line, "split_lock_detect",
++				  arg, sizeof(arg));
++	if (ret >= 0) {
++		for (i = 0; i < ARRAY_SIZE(sld_options); i++) {
++			if (match_option(arg, ret, sld_options[i].option)) {
++				state = sld_options[i].state;
++				break;
++			}
++		}
++	}
++	sld_state = state;
++}
++
++static void __init __split_lock_setup(void)
++{
++	if (!split_lock_verify_msr(false)) {
++		pr_info("MSR access failed: Disabled\n");
++		return;
++	}
++
++	rdmsrl(MSR_TEST_CTRL, msr_test_ctrl_cache);
++
++	if (!split_lock_verify_msr(true)) {
++		pr_info("MSR access failed: Disabled\n");
++		return;
++	}
++
++	/* Restore the MSR to its cached value. */
++	wrmsrl(MSR_TEST_CTRL, msr_test_ctrl_cache);
++
++	setup_force_cpu_cap(X86_FEATURE_SPLIT_LOCK_DETECT);
++}
++
++/*
++ * MSR_TEST_CTRL is per core, but we treat it like a per CPU MSR. Locking
++ * is not implemented as one thread could undo the setting of the other
++ * thread immediately after dropping the lock anyway.
++ */
++static void sld_update_msr(bool on)
++{
++	u64 test_ctrl_val = msr_test_ctrl_cache;
++
++	if (on)
++		test_ctrl_val |= MSR_TEST_CTRL_SPLIT_LOCK_DETECT;
++
++	wrmsrl(MSR_TEST_CTRL, test_ctrl_val);
++}
++
++void split_lock_init(void)
++{
++	/*
++	 * #DB for bus lock handles ratelimit and #AC for split lock is
++	 * disabled.
++	 */
++	if (sld_state == sld_ratelimit) {
++		split_lock_verify_msr(false);
++		return;
++	}
++
++	if (cpu_model_supports_sld)
++		split_lock_verify_msr(sld_state != sld_off);
++}
++
++static void __split_lock_reenable_unlock(struct work_struct *work)
++{
++	sld_update_msr(true);
++	up(&buslock_sem);
++}
++
++static DECLARE_DELAYED_WORK(sl_reenable_unlock, __split_lock_reenable_unlock);
++
++static void __split_lock_reenable(struct work_struct *work)
++{
++	sld_update_msr(true);
++}
++static DECLARE_DELAYED_WORK(sl_reenable, __split_lock_reenable);
++
++/*
++ * If a CPU goes offline with pending delayed work to re-enable split lock
++ * detection then the delayed work will be executed on some other CPU. That
++ * handles releasing the buslock_sem, but because it executes on a
++ * different CPU probably won't re-enable split lock detection. This is a
++ * problem on HT systems since the sibling CPU on the same core may then be
++ * left running with split lock detection disabled.
++ *
++ * Unconditionally re-enable detection here.
++ */
++static int splitlock_cpu_offline(unsigned int cpu)
++{
++	sld_update_msr(true);
++
++	return 0;
++}
++
++static void split_lock_warn(unsigned long ip)
++{
++	struct delayed_work *work;
++	int cpu;
++
++	if (!current->reported_split_lock)
++		pr_warn_ratelimited("#AC: %s/%d took a split_lock trap at address: 0x%lx\n",
++				    current->comm, current->pid, ip);
++	current->reported_split_lock = 1;
++
++	if (sysctl_sld_mitigate) {
++		/*
++		 * misery factor #1:
++		 * sleep 10ms before trying to execute split lock.
++		 */
++		if (msleep_interruptible(10) > 0)
++			return;
++		/*
++		 * Misery factor #2:
++		 * only allow one buslocked disabled core at a time.
++		 */
++		if (down_interruptible(&buslock_sem) == -EINTR)
++			return;
++		work = &sl_reenable_unlock;
++	} else {
++		work = &sl_reenable;
++	}
++
++	cpu = get_cpu();
++	schedule_delayed_work_on(cpu, work, 2);
++
++	/* Disable split lock detection on this CPU to make progress */
++	sld_update_msr(false);
++	put_cpu();
++}
++
++bool handle_guest_split_lock(unsigned long ip)
++{
++	if (sld_state == sld_warn) {
++		split_lock_warn(ip);
++		return true;
++	}
++
++	pr_warn_once("#AC: %s/%d %s split_lock trap at address: 0x%lx\n",
++		     current->comm, current->pid,
++		     sld_state == sld_fatal ? "fatal" : "bogus", ip);
++
++	current->thread.error_code = 0;
++	current->thread.trap_nr = X86_TRAP_AC;
++	force_sig_fault(SIGBUS, BUS_ADRALN, NULL);
++	return false;
++}
++EXPORT_SYMBOL_GPL(handle_guest_split_lock);
++
++void bus_lock_init(void)
++{
++	u64 val;
++
++	if (!boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT))
++		return;
++
++	rdmsrl(MSR_IA32_DEBUGCTLMSR, val);
++
++	if ((boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) &&
++	    (sld_state == sld_warn || sld_state == sld_fatal)) ||
++	    sld_state == sld_off) {
++		/*
++		 * Warn and fatal are handled by #AC for split lock if #AC for
++		 * split lock is supported.
++		 */
++		val &= ~DEBUGCTLMSR_BUS_LOCK_DETECT;
++	} else {
++		val |= DEBUGCTLMSR_BUS_LOCK_DETECT;
++	}
++
++	wrmsrl(MSR_IA32_DEBUGCTLMSR, val);
++}
++
++bool handle_user_split_lock(struct pt_regs *regs, long error_code)
++{
++	if ((regs->flags & X86_EFLAGS_AC) || sld_state == sld_fatal)
++		return false;
++	split_lock_warn(regs->ip);
++	return true;
++}
++
++void handle_bus_lock(struct pt_regs *regs)
++{
++	switch (sld_state) {
++	case sld_off:
++		break;
++	case sld_ratelimit:
++		/* Enforce no more than bld_ratelimit bus locks/sec. */
++		while (!__ratelimit(&bld_ratelimit))
++			msleep(20);
++		/* Warn on the bus lock. */
++		fallthrough;
++	case sld_warn:
++		pr_warn_ratelimited("#DB: %s/%d took a bus_lock trap at address: 0x%lx\n",
++				    current->comm, current->pid, regs->ip);
++		break;
++	case sld_fatal:
++		force_sig_fault(SIGBUS, BUS_ADRALN, NULL);
++		break;
++	}
++}
++
++/*
++ * CPU models that are known to have the per-core split-lock detection
++ * feature even though they do not enumerate IA32_CORE_CAPABILITIES.
++ */
++static const struct x86_cpu_id split_lock_cpu_ids[] __initconst = {
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_X,	0),
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_L,	0),
++	X86_MATCH_INTEL_FAM6_MODEL(ICELAKE_D,	0),
++	{}
++};
++
++static void __init split_lock_setup(struct cpuinfo_x86 *c)
++{
++	const struct x86_cpu_id *m;
++	u64 ia32_core_caps;
++
++	if (boot_cpu_has(X86_FEATURE_HYPERVISOR))
++		return;
++
++	/* Check for CPUs that have support but do not enumerate it: */
++	m = x86_match_cpu(split_lock_cpu_ids);
++	if (m)
++		goto supported;
++
++	if (!cpu_has(c, X86_FEATURE_CORE_CAPABILITIES))
++		return;
++
++	/*
++	 * Not all bits in MSR_IA32_CORE_CAPS are architectural, but
++	 * MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT is.  All CPUs that set
++	 * it have split lock detection.
++	 */
++	rdmsrl(MSR_IA32_CORE_CAPS, ia32_core_caps);
++	if (ia32_core_caps & MSR_IA32_CORE_CAPS_SPLIT_LOCK_DETECT)
++		goto supported;
++
++	/* CPU is not in the model list and does not have the MSR bit: */
++	return;
++
++supported:
++	cpu_model_supports_sld = true;
++	__split_lock_setup();
++}
++
++static void sld_state_show(void)
++{
++	if (!boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT) &&
++	    !boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
++		return;
++
++	switch (sld_state) {
++	case sld_off:
++		pr_info("disabled\n");
++		break;
++	case sld_warn:
++		if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
++			pr_info("#AC: crashing the kernel on kernel split_locks and warning on user-space split_locks\n");
++			if (cpuhp_setup_state(CPUHP_AP_ONLINE_DYN,
++					      "x86/splitlock", NULL, splitlock_cpu_offline) < 0)
++				pr_warn("No splitlock CPU offline handler\n");
++		} else if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT)) {
++			pr_info("#DB: warning on user-space bus_locks\n");
++		}
++		break;
++	case sld_fatal:
++		if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT)) {
++			pr_info("#AC: crashing the kernel on kernel split_locks and sending SIGBUS on user-space split_locks\n");
++		} else if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT)) {
++			pr_info("#DB: sending SIGBUS on user-space bus_locks%s\n",
++				boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT) ?
++				" from non-WB" : "");
++		}
++		break;
++	case sld_ratelimit:
++		if (boot_cpu_has(X86_FEATURE_BUS_LOCK_DETECT))
++			pr_info("#DB: setting system wide bus lock rate limit to %u/sec\n", bld_ratelimit.burst);
++		break;
++	}
++}
++
++void __init sld_setup(struct cpuinfo_x86 *c)
++{
++	split_lock_setup(c);
++	sld_state_setup();
++	sld_state_show();
++}
 -- 
 2.44.0
 
