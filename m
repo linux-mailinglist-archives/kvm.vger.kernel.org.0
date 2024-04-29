@@ -1,141 +1,241 @@
-Return-Path: <kvm+bounces-16190-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16191-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC0F28B6334
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 22:07:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A1318B633B
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 22:09:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8658D2816BF
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 20:07:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 350541C212D4
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 20:09:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4BA1411F0;
-	Mon, 29 Apr 2024 20:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E431411D8;
+	Mon, 29 Apr 2024 20:09:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B4M3XXzP"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mNXiMw6s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE751411C9
-	for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 20:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A9D13DB9F
+	for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 20:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714421216; cv=none; b=EcVwXaxGTfIYeEBw7j4Ed3jvBStBXZlNgAYWmMx2rjhqdytRbem4Fnh/wIyWkBOXrc+EpGER1dIVB4VqQow/RRNiQNFlRoiIwvbuNPEBWBzzBT534MgnXuNZBEbbzH4HdrIdKTemb28mYawBcsM9eaYoAbb+oXXxdRDbFshPiZk=
+	t=1714421355; cv=none; b=HnaaLfizy84QnLzqmp0giEE2XYKA6znlCPbcHnt4pafp1ejcJAZ+pLZ3GddLXMSQN3FCbT/QP2TtLYhN3pNWLGz9i6hMP4BcqfRuIk0fbcMt78gNia4xwCr8zDzynYMYC+S41w7nSRSsusBQg1YP53zMuEmDq1An2BLOiOIDM/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714421216; c=relaxed/simple;
-	bh=ZQkpSdpmt4mYDJwdDVa8RfLmPSrJrAufaXCOysNf5gk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UBR/DCrYqEFPeW+Ptoqg6f1YRxGQTJswX1uswlsreRA0AhMSUuBbAMlAbwHSEfHmf7Qe5Kva+BHURRWSyKzPYhg9L3AgZF0hdckC8vgo/N70JBjdDkMdLABrm7rEXupuQKVvzMbyjssNngmaM+WxIs6lPm0a7ke5Z/KtwQ5fgMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B4M3XXzP; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de604d35ec0so1287516276.3
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 13:06:55 -0700 (PDT)
+	s=arc-20240116; t=1714421355; c=relaxed/simple;
+	bh=u3uInMv3GovLySt6hNXkxVXG4iYHsM1cHCrDPmXBXh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HTZR9Ec79kT4vB9XofBCIe8Hd/Dn8/HmCydt+lL+C5InupemXxRrsX01DwECJt6EfClqPZmXE+l3+5ReJx6vg9MJUbanWjMoxhtGHrTTSEEGyljydCB5QjsejE+mxZqoX0Vf+RA8h9dGkLwWU7vSGW9eXv3eIrLdqRKYoXkPZF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mNXiMw6s; arc=none smtp.client-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-479ef9db155so1371538137.1
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 13:09:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714421214; x=1715026014; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X5r9jrj7lJ8K2c/A/X813S+F4evPMkrfmwuk9AJ2VgE=;
-        b=B4M3XXzP2iQXxgSV+N1tdLcL/ldPIxZodk+z9Ek9SwtVBjUFW6+VNMRyK1R/LKqYhR
-         6/KTDP0RvVxXm1MLemFV9ktyTwvBaJagz6twaL7B8IowpxNlqe8brVePneBxgasLYX40
-         +ME6R8X+skT3ZKPKXSiXtP5euoxxmHFDh/z2GxT1TSm07Il3k7j4MPKg7HPv5hsQNBry
-         TU3LsxD4EpXtD61LEo2KGE6DXCORI89Iu1U0pSBthH1nSTaYkC9C/w8M6sjDpKr8Foe5
-         Nv+VE6G99Ly9aY0PFYRaTF8JiRkFBLgnXn2AUKQ8Y1GxB+eQgiAyWc5MN3O/ZzqV8ahQ
-         5+rQ==
+        d=ziepe.ca; s=google; t=1714421352; x=1715026152; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6uD+v0Myecvi4JLGVtz2H/p0vC9IC2MSMPkRl0WDjKA=;
+        b=mNXiMw6sPelScyuE1lviE/XN7CzkkOvJ5afenaJwdAESOYa7VAnXYjBsp+EuTl/eQn
+         tyXpgE1KWtzC8pvNQZEief/mIUdoX95A1FG34PjAVpF4vUkk2a/u0NBTbXUCwiQHlYr+
+         UkPpUDsIILxppQ4VcCyztogW5pfmusi7k4ZwchU+KDcoxEW1ch+5uiHak6XZo44lKlLD
+         fM80o1yV2KemG+DY5/oLgDn4MhGX7bBYnvufrBT8Y5ZwNO0E7zEsScIklOr55XmNHyoR
+         Fcez+JUTAqG+eMEsrWiz+E16rGO9PTuMzvdIJTo0QbDpXN0S1XCyeF6GsF7XfptCG6oU
+         WumA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714421214; x=1715026014;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X5r9jrj7lJ8K2c/A/X813S+F4evPMkrfmwuk9AJ2VgE=;
-        b=A8rCjSKXN6TiW8TV0fCv8tDgobysw3yz6Wz3Fq2gzf3KWZBD4Dsz8BLhvfcQ7uPdnz
-         EF7a8uFC57XF1wHk7VVTqMLu7wBOJLpdWtR78J9uDd10d4NuIMMwyF0avQPJ56Ir/3dL
-         GAgTqo+STS46dgzzJnWzbXlrkqa5BfwyOj1GXNhYN9TyZrNwRNvCfpvcLQXB4M6uhykR
-         szSIaqVrJ+w/+QOEllTRTyPWBzLS7MQ+ngu+1UiFJx/NeBwJ92XzKEuegU+8PSBowxvU
-         tzvnr8o8K1pfc1Dy+M4qdfGNGBK8rXESOu4eAeSIUh8YEX2MllO6QAV6DWyiiIcMAQup
-         N68A==
-X-Forwarded-Encrypted: i=1; AJvYcCWdHEqd1nX6MQ/tuwBvyFm0yY2Y2I/NPlONnIoSNTfZtKfkzzKeCwnmHZRuZ9BA/HIcOxZbe2sSMpqubPF3Tl6GGVZr
-X-Gm-Message-State: AOJu0YzDbq69KrKVGRPnRrkvxHFzav3r0fHt/17dwSztDu1T8ToPeyDZ
-	CncX+62uE5fstazQ62yzDxE5RB1NrnM2QTWU/x1WUaWJy10EJqmMqiECTTNykpQrsp9mVf2K2Pt
-	iVw==
-X-Google-Smtp-Source: AGHT+IFf8IzkssAjSX9+E+pyZ8b6wCf8T3MVnGnh3lV3JTeTnffbD7Ts+m4DeJyAG04Wpn1kmZbYGRXnX+g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:c12:b0:dc6:cd85:bcd7 with SMTP id
- fs18-20020a0569020c1200b00dc6cd85bcd7mr3946933ybb.3.1714421214393; Mon, 29
- Apr 2024 13:06:54 -0700 (PDT)
-Date: Mon, 29 Apr 2024 13:06:52 -0700
-In-Reply-To: <b2bfc0d157929b098dde09b32c9a3af18835ec57.camel@intel.com>
+        d=1e100.net; s=20230601; t=1714421352; x=1715026152;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6uD+v0Myecvi4JLGVtz2H/p0vC9IC2MSMPkRl0WDjKA=;
+        b=XkQzwlmJdS1hQozW4QX7yHtKTLwIrJP/ieS8ZfvEbNOlzj2GDAUd3u1H7IefvzVDXV
+         Cy20GA52kXwpmGhEiKwz5Bbp5ZdvVIPMKZOLxjR8EgQ2P7+wYJiVXxHd5BafC/wPtw43
+         MjcXcdE72GMfkqGHW2DA06clCQ6gDYe3ZIfRBRW1YbDyuPRCA58HntemjZD1uuI0L9RB
+         UnEn35qeu+gxHOpPOXoZZcEitgagymuAfU8xSl5rKYYaDTjujcL+VL0ZTpOSACpHu8ME
+         CeErZy5NUfkIHNySEahhtF7uIIgYXjA/M4hRAcdiS0Kd7dO+xXnScwHVmTRQmzcLqHHn
+         doYA==
+X-Forwarded-Encrypted: i=1; AJvYcCW9ytgtyMnsszr52BE7onGoxxOi6vm9yjSqPRZI9WHH68kuUzzte0CciOjjgP29cMu407tjbPCQmkwt7LmO4AnEmkxC
+X-Gm-Message-State: AOJu0YyVto4wHDTePXn7UghJ8pru69i8cKr0pk7UhIkB6RKLRnWQHN8d
+	XdQUC+83GyXCLFNBtQflD2QKLmsuNI4/oezkf/6zD2KBUfVnfuTV6DQ4u/IFJSM=
+X-Google-Smtp-Source: AGHT+IEQp5LAzSUEqceAMOZ4Uu3U4DXrwe0G8FjiRbH/1M7d5c095lndVdyyR3xsIqyzMfvxI1xSMw==
+X-Received: by 2002:a67:f683:0:b0:47b:d7e7:a8a9 with SMTP id n3-20020a67f683000000b0047bd7e7a8a9mr12027600vso.5.1714421352233;
+        Mon, 29 Apr 2024 13:09:12 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id w15-20020a0ce10f000000b0069b6e19090csm10783967qvk.10.2024.04.29.13.09.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Apr 2024 13:09:11 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1s1XJG-002nm2-H1;
+	Mon, 29 Apr 2024 17:09:10 -0300
+Date: Mon, 29 Apr 2024 17:09:10 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>, kvm@vger.kernel.org,
+	linux-s390@vger.kernel.org, Ankit Agrawal <ankita@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Julian Ruess <julianr@linux.ibm.com>
+Subject: Re: [PATCH v3 1/3] vfio/pci: Extract duplicated code into macro
+Message-ID: <20240429200910.GQ231144@ziepe.ca>
+References: <20240425165604.899447-1-gbayer@linux.ibm.com>
+ <20240425165604.899447-2-gbayer@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <Zib76LqLfWg3QkwB@google.com> <6e83e89f145aee496c6421fc5a7248aae2d6f933.camel@intel.com>
- <d0563f077a7f86f90e72183cf3406337423f41fe.camel@intel.com>
- <ZifQiCBPVeld-p8Y@google.com> <61ec08765f0cd79f2d5ea1e2acf285ea9470b239.camel@intel.com>
- <9c6119dacac30750defb2b799f1a192c516ac79c.camel@intel.com>
- <ZiqFQ1OSFM4OER3g@google.com> <b605722ac1ffb0ffdc1d3a4702d4e987a5639399.camel@intel.com>
- <Zircphag9i1h-aAK@google.com> <b2bfc0d157929b098dde09b32c9a3af18835ec57.camel@intel.com>
-Message-ID: <Zi_93AF1qRapsUOq@google.com>
-Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>, 
-	Bo2 Chen <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Erdem Aktas <erdemaktas@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240425165604.899447-2-gbayer@linux.ibm.com>
 
-On Mon, Apr 29, 2024, Kai Huang wrote:
-> On Thu, 2024-04-25 at 15:43 -0700, Sean Christopherson wrote:
-> > > And the odd is currently the common SEAMCALL functions, a.k.a,
-> > > __seamcall() and seamcall() (the latter is a mocro actually), both return
-> > > u64, so if we want to have such CR4.VMX check code in the common code, we
-> > > need to invent a new error code for it.
-> > 
-> > Oh, I wasn't thinking that we'd check CR4.VMXE before *every* SEAMCALL, just
-> > before the TDH.SYS.LP.INIT call, i.e. before the one that is most likely to fail
-> > due to a software bug that results in the CPU not doing VMXON before enabling
-> > TDX.
-> > 
-> > Again, my intent is to add a simple, cheap, and targeted sanity check to help
-> > deal with potential failures in code that historically has been less than rock
-> > solid, and in function that has a big fat assumption that the caller has done
-> > VMXON on the CPU.
+On Thu, Apr 25, 2024 at 06:56:02PM +0200, Gerd Bayer wrote:
+> vfio_pci_core_do_io_rw() repeats the same code for multiple access
+> widths. Factor this out into a macro
 > 
-> I see.
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_rdwr.c | 106 ++++++++++++++-----------------
+>  1 file changed, 46 insertions(+), 60 deletions(-)
 > 
-> (To be fair, personally I don't recall that we ever had any bug due to
-> "cpu not in post-VMXON before SEAMCALL", but maybe it's just me. :-).)
-> 
-> But if tdx_enable() doesn't call tdx_cpu_enable() internally, then we will
-> have two functions need to handle.
+> diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+> index 03b8f7ada1ac..3335f1b868b1 100644
+> --- a/drivers/vfio/pci/vfio_pci_rdwr.c
+> +++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+> @@ -90,6 +90,40 @@ VFIO_IOREAD(8)
+>  VFIO_IOREAD(16)
+>  VFIO_IOREAD(32)
+>  
+> +#define VFIO_IORDWR(size)						\
+> +static int vfio_pci_core_iordwr##size(struct vfio_pci_core_device *vdev,\
+> +				bool iswrite, bool test_mem,		\
+> +				void __iomem *io, char __user *buf,	\
+> +				loff_t off, size_t *filled)		\
+> +{									\
+> +	u##size val;							\
+> +	int ret;							\
+> +									\
+> +	if (iswrite) {							\
+> +		if (copy_from_user(&val, buf, sizeof(val)))		\
+> +			return -EFAULT;					\
+> +									\
+> +		ret = vfio_pci_core_iowrite##size(vdev, test_mem,	\
+> +						  val, io + off);	\
+> +		if (ret)						\
+> +			return ret;					\
+> +	} else {							\
+> +		ret = vfio_pci_core_ioread##size(vdev, test_mem,	\
+> +						 &val, io + off);	\
+> +		if (ret)						\
+> +			return ret;					\
+> +									\
+> +		if (copy_to_user(buf, &val, sizeof(val)))		\
+> +			return -EFAULT;					\
+> +	}								\
+> +									\
+> +	*filled = sizeof(val);						\
+> +	return 0;							\
+> +}									\
+> +
+> +VFIO_IORDWR(8)
+> +VFIO_IORDWR(16)
+> +VFIO_IORDWR(32)
 
-Why?  I assume there will be exactly one caller of TDH.SYS.LP.INIT.
+I'd suggest to try writing this without so many macros.
 
-> For tdx_enable(), given it's still good idea to disable CPU hotplug around
-> it, we can still do some check for all online cpus at the beginning, like:
-> 
-> 	on_each_cpu(check_cr4_vmx(), &err, 1);
+This isn't very performance optimal already, we take a lock on every
+iteration, so there isn't much point in inlining multiple copies of
+everything to save an branch.
 
-If it gets to that point, just omit the check.  I really think you're making much
-ado about nothing.  My suggestion is essentially "throw in a CR4.VMXE check before
-TDH.SYS.LP.INIT if it's easy".  If it's not easy for some reason, then don't do
-it.
+Push the sizing switch down to the bottom, start with a function like:
 
-> Btw, please also see my last reply to Chao why I don't like calling
-> tdx_cpu_enable() inside tdx_enable():
-> 
-> https://lore.kernel.org/lkml/1fd17c931d5c2effcf1105b63deac8e3fb1664bc.camel@intel.com/
-> 
-> That being said, I can try to add additional patch(es) to do CR4.VMX check
-> if you want, but personally I found hard to have a strong justification to
-> do so.
-> 
+static void __iowrite(const void *val, void __iomem *io, size_t len)
+{
+	switch (len) {
+	case 8: {
+#ifdef iowrite64 // NOTE this doesn't seem to work on x86?
+		if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
+			return iowrite64be(*(const u64 *)val, io);
+		return iowrite64(*(const u64 *)val, io);
+#else
+		if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)) {
+			iowrite32be(*(const u32 *)val, io);
+			iowrite32be(*(const u32 *)(val + 4), io + 4);
+		} else {
+			iowrite32(*(const u32 *)val, io);
+			iowrite32(*(const u32 *)(val + 4), io + 4);
+		}
+		return;
+#endif
+	}
+
+	case 4:
+		if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
+			return iowrite32be(*(const u32 *)val, io);
+		return iowrite32(*(const u32 *)val, io);
+	case 2:
+		if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
+			return iowrite16be(*(const u16 *)val, io);
+		return iowrite16(*(const u16 *)val, io);
+
+	case 1:
+		return iowrite8(*(const u8 *)val, io);
+	}
+}
+
+And then wrap it with the copy and the lock:
+
+static int do_iordwr(struct vfio_pci_core_device *vdev, bool test_mem,
+		     const void __user *buf, void __iomem *io, size_t len,
+		     bool iswrite)
+{
+	u64 val;
+
+	if (iswrite && copy_from_user(&val, buf, len))
+		return -EFAULT;
+
+	if (test_mem) {
+		down_read(&vdev->memory_lock);
+		if (!__vfio_pci_memory_enabled(vdev)) {
+			up_read(&vdev->memory_lock);
+			return -EIO;
+		}
+	}
+
+	if (iswrite)
+		__iowrite(&val, io, len);
+	else
+		__ioread(&val, io, len);
+
+	if (test_mem)
+		up_read(&vdev->memory_lock);
+
+	if (!iswrite && copy_to_user(buf, &val, len))
+		return -EFAULT;
+
+	return 0;
+}
+
+And then the loop can be simple:
+
+		if (fillable) {
+			filled = num_bytes(fillable, off);
+			ret = do_iordwr(vdev, test_mem, buf, io + off, filled,
+					iswrite);
+			if (ret)
+				return ret;
+		} else {
+			filled = min(count, (size_t)(x_end - off));
+			/* Fill reads with -1, drop writes */
+			ret = fill_err(buf, filled);
+			if (ret)
+				return ret;
+		}
+
+Jason
 
