@@ -1,117 +1,141 @@
-Return-Path: <kvm+bounces-16189-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16190-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 767BA8B6267
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 21:36:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC0F28B6334
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 22:07:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3195F2851A8
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 19:36:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8658D2816BF
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 20:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D4313BAFB;
-	Mon, 29 Apr 2024 19:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C4BA1411F0;
+	Mon, 29 Apr 2024 20:06:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BUlM5pvj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B4M3XXzP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB56313AD22;
-	Mon, 29 Apr 2024 19:35:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE751411C9
+	for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 20:06:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714419318; cv=none; b=Yn11oR4BCoBdrGcAqdR9cZi6eIr8Ipg44y/48EgX6yUkH3RneM2jAjKZH9F8K18v+hhxK47uvz/WM33ySM9nziMv/SBA1sJV7qkedq/4e1zOpIk/3z22zUSsHmrHOg9LLzaiOuKRvTYYhO9M1ucOeeYUyd4LYnl3vCvmNGEEHYY=
+	t=1714421216; cv=none; b=EcVwXaxGTfIYeEBw7j4Ed3jvBStBXZlNgAYWmMx2rjhqdytRbem4Fnh/wIyWkBOXrc+EpGER1dIVB4VqQow/RRNiQNFlRoiIwvbuNPEBWBzzBT534MgnXuNZBEbbzH4HdrIdKTemb28mYawBcsM9eaYoAbb+oXXxdRDbFshPiZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714419318; c=relaxed/simple;
-	bh=UyGvQria8CPcwqnOwNSwK6RHeI6dLGVcMlqTvFJPOcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UziMZ7WS6Zr6b59gTDSw/YVsBI7YGIpkHUdfgEM0bEm2JkfK/zW+mrv8FMOpYKjYduU3oQKdP8DR/Z61W87ZSNCZWytOWdoQV0tvg+cgRb1TaTpJyVF8NA0C4Z/zLfbRnl/+5RdMvwS/y7fTSBkCeMnF1w+EbyqAM0zrcmun1Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BUlM5pvj; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43TJNoJ4017723;
-	Mon, 29 Apr 2024 19:35:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=UyGvQria8CPcwqnOwNSwK6RHeI6dLGVcMlqTvFJPOcQ=;
- b=BUlM5pvj+mXVCs9Ksf6ejrUYQO9hae9Snw/9pW7Ou18iD2Xc/K5Ta2Wf8tO0pxB69Juk
- kHEjojq2gVG8LXzp7+5Vsqs5DBqFWKMVqAagTXbSOiXvIVEFCcYb1qCcyTqr5E4dlv7S
- 1U/vPHmvQaIFXNKHjsGTa9CPGWhFW6m22xE83EaOqr0SYxqW1jMQWZ0etRuldiZ5Sl43
- uDo6Nh8p2BhKOwv5GPV+FfwTI2y+76AYuQc9V0dbTJix8J526U3PfG/2xA+r+zvoTVyK
- N7ecqZJ/48jM0Tcar6SZkmr6OZh/V9MqhFPIJJzIwQ08y/ftPMzsyLYCAtEl2LbXl/ml OQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xthn5r0ny-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Apr 2024 19:35:15 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43TJZFAb001957;
-	Mon, 29 Apr 2024 19:35:15 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xthn5r0nw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Apr 2024 19:35:15 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43THZrTJ027546;
-	Mon, 29 Apr 2024 19:35:14 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xsc309awm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Apr 2024 19:35:13 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43TJZ7Rs16449920
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Apr 2024 19:35:09 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B6FBA2005A;
-	Mon, 29 Apr 2024 19:35:07 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9EA682004B;
-	Mon, 29 Apr 2024 19:35:06 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.179.5.151])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 29 Apr 2024 19:35:06 +0000 (GMT)
-Date: Mon, 29 Apr 2024 21:35:04 +0200
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH] s390/kvm/vsie: Use virt_to_phys for crypto control block
-Message-ID: <Zi/2aDGGEhyZfko9@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20240429171512.879215-1-nsg@linux.ibm.com>
- <2f046603-ae89-4ad2-95df-8e187501e06d@linux.ibm.com>
+	s=arc-20240116; t=1714421216; c=relaxed/simple;
+	bh=ZQkpSdpmt4mYDJwdDVa8RfLmPSrJrAufaXCOysNf5gk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UBR/DCrYqEFPeW+Ptoqg6f1YRxGQTJswX1uswlsreRA0AhMSUuBbAMlAbwHSEfHmf7Qe5Kva+BHURRWSyKzPYhg9L3AgZF0hdckC8vgo/N70JBjdDkMdLABrm7rEXupuQKVvzMbyjssNngmaM+WxIs6lPm0a7ke5Z/KtwQ5fgMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B4M3XXzP; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de604d35ec0so1287516276.3
+        for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 13:06:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714421214; x=1715026014; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=X5r9jrj7lJ8K2c/A/X813S+F4evPMkrfmwuk9AJ2VgE=;
+        b=B4M3XXzP2iQXxgSV+N1tdLcL/ldPIxZodk+z9Ek9SwtVBjUFW6+VNMRyK1R/LKqYhR
+         6/KTDP0RvVxXm1MLemFV9ktyTwvBaJagz6twaL7B8IowpxNlqe8brVePneBxgasLYX40
+         +ME6R8X+skT3ZKPKXSiXtP5euoxxmHFDh/z2GxT1TSm07Il3k7j4MPKg7HPv5hsQNBry
+         TU3LsxD4EpXtD61LEo2KGE6DXCORI89Iu1U0pSBthH1nSTaYkC9C/w8M6sjDpKr8Foe5
+         Nv+VE6G99Ly9aY0PFYRaTF8JiRkFBLgnXn2AUKQ8Y1GxB+eQgiAyWc5MN3O/ZzqV8ahQ
+         5+rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714421214; x=1715026014;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X5r9jrj7lJ8K2c/A/X813S+F4evPMkrfmwuk9AJ2VgE=;
+        b=A8rCjSKXN6TiW8TV0fCv8tDgobysw3yz6Wz3Fq2gzf3KWZBD4Dsz8BLhvfcQ7uPdnz
+         EF7a8uFC57XF1wHk7VVTqMLu7wBOJLpdWtR78J9uDd10d4NuIMMwyF0avQPJ56Ir/3dL
+         GAgTqo+STS46dgzzJnWzbXlrkqa5BfwyOj1GXNhYN9TyZrNwRNvCfpvcLQXB4M6uhykR
+         szSIaqVrJ+w/+QOEllTRTyPWBzLS7MQ+ngu+1UiFJx/NeBwJ92XzKEuegU+8PSBowxvU
+         tzvnr8o8K1pfc1Dy+M4qdfGNGBK8rXESOu4eAeSIUh8YEX2MllO6QAV6DWyiiIcMAQup
+         N68A==
+X-Forwarded-Encrypted: i=1; AJvYcCWdHEqd1nX6MQ/tuwBvyFm0yY2Y2I/NPlONnIoSNTfZtKfkzzKeCwnmHZRuZ9BA/HIcOxZbe2sSMpqubPF3Tl6GGVZr
+X-Gm-Message-State: AOJu0YzDbq69KrKVGRPnRrkvxHFzav3r0fHt/17dwSztDu1T8ToPeyDZ
+	CncX+62uE5fstazQ62yzDxE5RB1NrnM2QTWU/x1WUaWJy10EJqmMqiECTTNykpQrsp9mVf2K2Pt
+	iVw==
+X-Google-Smtp-Source: AGHT+IFf8IzkssAjSX9+E+pyZ8b6wCf8T3MVnGnh3lV3JTeTnffbD7Ts+m4DeJyAG04Wpn1kmZbYGRXnX+g=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:c12:b0:dc6:cd85:bcd7 with SMTP id
+ fs18-20020a0569020c1200b00dc6cd85bcd7mr3946933ybb.3.1714421214393; Mon, 29
+ Apr 2024 13:06:54 -0700 (PDT)
+Date: Mon, 29 Apr 2024 13:06:52 -0700
+In-Reply-To: <b2bfc0d157929b098dde09b32c9a3af18835ec57.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2f046603-ae89-4ad2-95df-8e187501e06d@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: SBt9g2mizOO7VNsPxatMwiqZ2tfYm5cV
-X-Proofpoint-ORIG-GUID: HcrhO01mfB2yosRCPFAQq4rMswxJ20Sa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-29_17,2024-04-29_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- adultscore=0 mlxlogscore=535 suspectscore=0 spamscore=0 clxscore=1015
- priorityscore=1501 phishscore=0 lowpriorityscore=0 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404290128
+Mime-Version: 1.0
+References: <Zib76LqLfWg3QkwB@google.com> <6e83e89f145aee496c6421fc5a7248aae2d6f933.camel@intel.com>
+ <d0563f077a7f86f90e72183cf3406337423f41fe.camel@intel.com>
+ <ZifQiCBPVeld-p8Y@google.com> <61ec08765f0cd79f2d5ea1e2acf285ea9470b239.camel@intel.com>
+ <9c6119dacac30750defb2b799f1a192c516ac79c.camel@intel.com>
+ <ZiqFQ1OSFM4OER3g@google.com> <b605722ac1ffb0ffdc1d3a4702d4e987a5639399.camel@intel.com>
+ <Zircphag9i1h-aAK@google.com> <b2bfc0d157929b098dde09b32c9a3af18835ec57.camel@intel.com>
+Message-ID: <Zi_93AF1qRapsUOq@google.com>
+Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>, 
+	Bo2 Chen <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Erdem Aktas <erdemaktas@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Apr 29, 2024 at 08:32:43PM +0200, Christian Borntraeger wrote:
-> I guess this should go via the s390 with the other virt/phys changes.
+On Mon, Apr 29, 2024, Kai Huang wrote:
+> On Thu, 2024-04-25 at 15:43 -0700, Sean Christopherson wrote:
+> > > And the odd is currently the common SEAMCALL functions, a.k.a,
+> > > __seamcall() and seamcall() (the latter is a mocro actually), both return
+> > > u64, so if we want to have such CR4.VMX check code in the common code, we
+> > > need to invent a new error code for it.
+> > 
+> > Oh, I wasn't thinking that we'd check CR4.VMXE before *every* SEAMCALL, just
+> > before the TDH.SYS.LP.INIT call, i.e. before the one that is most likely to fail
+> > due to a software bug that results in the CPU not doing VMXON before enabling
+> > TDX.
+> > 
+> > Again, my intent is to add a simple, cheap, and targeted sanity check to help
+> > deal with potential failures in code that historically has been less than rock
+> > solid, and in function that has a big fat assumption that the caller has done
+> > VMXON on the CPU.
+> 
+> I see.
+> 
+> (To be fair, personally I don't recall that we ever had any bug due to
+> "cpu not in post-VMXON before SEAMCALL", but maybe it's just me. :-).)
+> 
+> But if tdx_enable() doesn't call tdx_cpu_enable() internally, then we will
+> have two functions need to handle.
 
-Yes, I will pick it.
+Why?  I assume there will be exactly one caller of TDH.SYS.LP.INIT.
 
-Thanks!
+> For tdx_enable(), given it's still good idea to disable CPU hotplug around
+> it, we can still do some check for all online cpus at the beginning, like:
+> 
+> 	on_each_cpu(check_cr4_vmx(), &err, 1);
+
+If it gets to that point, just omit the check.  I really think you're making much
+ado about nothing.  My suggestion is essentially "throw in a CR4.VMXE check before
+TDH.SYS.LP.INIT if it's easy".  If it's not easy for some reason, then don't do
+it.
+
+> Btw, please also see my last reply to Chao why I don't like calling
+> tdx_cpu_enable() inside tdx_enable():
+> 
+> https://lore.kernel.org/lkml/1fd17c931d5c2effcf1105b63deac8e3fb1664bc.camel@intel.com/
+> 
+> That being said, I can try to add additional patch(es) to do CR4.VMX check
+> if you want, but personally I found hard to have a strong justification to
+> do so.
+> 
 
