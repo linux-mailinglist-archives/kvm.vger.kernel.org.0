@@ -1,127 +1,170 @@
-Return-Path: <kvm+bounces-16170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E231D8B5E3F
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 17:56:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95EAB8B5E4B
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 17:57:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F5FF1C21886
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 15:56:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C82A01C219B2
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 15:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E776B82D8E;
-	Mon, 29 Apr 2024 15:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8C683A18;
+	Mon, 29 Apr 2024 15:57:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HIDKepGJ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="C30e7yIK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F7582D7F
-	for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 15:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F087A839E2;
+	Mon, 29 Apr 2024 15:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714406203; cv=none; b=CYyafewG8T7v2G6yyX06DBZR3F0hNuu2EWcbJeOTtHcrbinh+JRyp2jSJA2uz8Lz+/GEWO42tQTptfqTGTGk6wr3ykt1EqlL1OOMXAtW7dQis6pDs3wdrjXrhhQ+iWbVGYrZQpoXKkdS761khZlmjlGwrtzS+5+JIbQ7Ilbb1I4=
+	t=1714406268; cv=none; b=Pmh3242ELbPaC6MIsjw+MElkYVgbZj1K+Txp7+lJABAFeZtN8x/vNPuJbaNkUcQPYmDuko+uNVNqCpAcyCvrx81EGa1mWRStMvf6aNIJdDzcnSDCPlpeJhze9xvAnpDmUO581rQhuLD3w+z4fUDN1Ecemvrf5uVFI84Bt3qE08A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714406203; c=relaxed/simple;
-	bh=A07QcFP/MMmIg3bG1V9Wl7fpGXwWKW9aaf37uhkjfiw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F/f5vQqK4x76rgdPUSygAqwCm3bjSAqD/ZgNAZFMX4DwM6gU00tQealSDTGbMWSI2q+Waai4xNM7+/Hi5tS/oaWLNEZDDIKDYCd37m3Aev4HBc0g9peblCWxdyb//s3nrWxuqFbrh21YvoMiI8ybeV8us7lK5VRzyDdvUo8LJSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HIDKepGJ; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a2fe3c35a1so4941858a91.0
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 08:56:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714406201; x=1715011001; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HEQuwU3fVtab/n23+uZu3RYhTzAI76tzPa5Uy0uousA=;
-        b=HIDKepGJdWRmrET6mj1o5iCF/5Um2lprTLstyuik1GBZynCwfWE/f6hjd5915JTTTL
-         xw/h/QfRA1lfvrCUC8/gpyy1Aai5J2jYKhgy/ov4PqtRPrnyIzfCSZsiJAsBJI+iMULb
-         ZY3IjAxUWoDF6OY63J3fQLf953fH91C7ffaSW8qIkbZRCCjCQ7FV00zHCyokKaS+qd6E
-         hYpVJoK9RwOqy/imjpOQjVLVBl1giaRKe0CYp3oi5NfLogH1V+PQ2L+3Uwahw0iQmOnJ
-         DdAtL2YRM5oFiEinuFnvgQaMlD1Y+68EBq2hp/x2BXtlTiu91RCrJfCH+Gjy5zYCisU6
-         lNZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714406201; x=1715011001;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HEQuwU3fVtab/n23+uZu3RYhTzAI76tzPa5Uy0uousA=;
-        b=k468oCNACxPp9VQTnfjTs+oBruGhY1JbYNKQ+4YECvJJGE/GLjrv3Bu0/4sh77/jkt
-         j/iYXZQSqIyzxVBezjO3AzvCY8SFh2D/YZF1nQWwVxpCiXDj5d31+PC99J5Lic7pWnxw
-         vvskunVVqONmDE13Znqq4VJjq8So07DVlshckCLjylH+jyLOs8ad7zbQKd6pGTDP2ea/
-         DY/E5IlLo9IyPa8Aa2EVydVjNPHizwhjWCy6kS1f9xCxt6mp9ZphAt4Cr9rNbszx1Oot
-         fibzcjd86bwAgKMnuj7Q6GQvIFfjdf+n1VIDurdYlJ8pzHs6MxyBN+iDtvuu70+/qb9c
-         GRPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVDA3V6SEnTkHh1Ic2ffXEi9qrJNTaHqKJG3UKkVlbBAP2yhqXPlSkKAB6NSSOP5yV5oTDld9jMlDs23Pn8ZyI7/4zf
-X-Gm-Message-State: AOJu0Yz1sdW+NiAXad+HuEgLkAQLysHvMUcixXkS1y35Gv6eFpgWNZq9
-	MjA7syybLq9uLZpUaZULZM5JSru49BJ0GLEmHSekV2mjGSg2pX0yp7TAEtEMvIStigJjgGlscM1
-	ufg==
-X-Google-Smtp-Source: AGHT+IHBVUsW/5Qt9t3LLdGhu7oHg9VBlpWPRRiyLHb8hlj9J2tk0cnqrDVW3ZR4vZtNZUWF1/ZBf9pUcqI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:e384:b0:2ad:7736:1a05 with SMTP id
- b4-20020a17090ae38400b002ad77361a05mr31292pjz.3.1714406199473; Mon, 29 Apr
- 2024 08:56:39 -0700 (PDT)
-Date: Mon, 29 Apr 2024 08:56:37 -0700
-In-Reply-To: <514f75b3-a2c5-4e8f-a98a-1ec54acb10bc@intel.com>
+	s=arc-20240116; t=1714406268; c=relaxed/simple;
+	bh=sLrrAHqZlF1X56CXdSNoLpSd8RrM139WBbW+izxEvXY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iR2sFbrLs5KDxlLF2T/dwgVBhMe2UOlHG/3rfiIbUvViNrVd+yljSiVmfjNTEqlK6Khsox1BK6GHI9mFNGnqT92mioB5FfbBTWgeIUGfaXdmUrGd+BP0wYn1irwZJRBNXQE0cbmfF3yX+UDOS8yolJGNRbJiskemNIvrPY4t6aM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=C30e7yIK; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43TFnZ6f028131;
+	Mon, 29 Apr 2024 15:57:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=NI3ArjhF/GJ5SZWvlrsqW2i59fZz8Art3BAI3Citk0o=;
+ b=C30e7yIKf7YFf2BZ0YKapxyUwaT2M42hTa9NDaacHARrp4YlXSygfBpA+woGNKFh4vxd
+ 1sR6/IJUjUfOB/NaJmrZ64XweKWrO9q0zNtH7ViL3H1JuNtajKBs9jmoeCuK/4qXz8dV
+ S4Ryl605sxdig1sFAMnXu9c1gF+xkAASaieveDhjGebnreJZWGjM/htSi0G5gk2qG+ri
+ 4+tVwLjgE7A6CrCwhoqZrr3F9OhQCVO9z6yuKbamOZP96aNtDsd1t9rBIyU1nxqtj1Qv
+ dl8hURL9ef4ytPU+o7ESnXh3EGzunhl4C+kbDaG0OhaS7fxQqBIkKNmTpF9be/zh8NiO uA== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xrswvjxwm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Apr 2024 15:57:41 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43TF7l1T011403;
+	Mon, 29 Apr 2024 15:57:41 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xrqt6j93f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 29 Apr 2024 15:57:40 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43TFuxjK040299;
+	Mon, 29 Apr 2024 15:57:40 GMT
+Received: from alaljime-dev-e4flex-vm.osdevelopmeniad.oraclevcn.com (alaljime-dev-e4flex-vm.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.106])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3xrqt6j91w-1;
+	Mon, 29 Apr 2024 15:57:40 +0000
+From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, linux-kernel@vger.kernel.org,
+        suravee.suthikulpanit@amd.com, vashegde@amd.com, mlevitsk@redhat.com,
+        joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
+        mark.kanda@oracle.com, alejandro.j.jimenez@oracle.com
+Subject: [PATCH 0/4] Export APICv-related state via binary stats interface
+Date: Mon, 29 Apr 2024 15:57:34 +0000
+Message-Id: <20240429155738.990025-1-alejandro.j.jimenez@oracle.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240423165328.2853870-1-seanjc@google.com> <4a66f882-12bf-4a07-a80a-a1600e89a103@intel.com>
- <ZippEkpjrEsGh5mj@google.com> <7f3001de041334b5c196b5436680473786a21816.camel@intel.com>
- <ZivMkK5PJbCQXnw2@google.com> <514f75b3-a2c5-4e8f-a98a-1ec54acb10bc@intel.com>
-Message-ID: <Zi_DNaC4FIIr7bRP@google.com>
-Subject: Re: [PATCH 0/3] KVM: x86: Fix supported VM_TYPES caps
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Xiaoyao Li <xiaoyao.li@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-04-29_14,2024-04-29_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
+ adultscore=0 mlxscore=0 suspectscore=0 phishscore=0 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404290101
+X-Proofpoint-GUID: JooSZhZd6ljsWBVCn_gWkiWrys_PiyNw
+X-Proofpoint-ORIG-GUID: JooSZhZd6ljsWBVCn_gWkiWrys_PiyNw
 
-On Mon, Apr 29, 2024, Kai Huang wrote:
-> On 27/04/2024 3:47 am, Sean Christopherson wrote:
-> > On Fri, Apr 26, 2024, Kai Huang wrote:
-> > > On Thu, 2024-04-25 at 07:30 -0700, Sean Christopherson wrote:
-> > > > On Thu, Apr 25, 2024, Xiaoyao Li wrote:
-> > > > > On 4/24/2024 12:53 AM, Sean Christopherson wrote:
-> > > > > > Fix a goof where KVM fails to re-initialize the set of supported VM types,
-> > > > > > resulting in KVM overreporting the set of supported types when a vendor
-> > > > > > module is reloaded with incompatible settings.  E.g. unload kvm-intel.ko,
-> > > > > > reload with ept=0, and KVM will incorrectly treat SW_PROTECTED_VM as
-> > > > > > supported.
-> > > > > 
-> > > > > Hah, this reminds me of the bug of msrs_to_save[] and etc.
-> > > > > 
-> > > > >     7a5ee6edb42e ("KVM: X86: Fix initialization of MSR lists")
-> > > > 
-> > > > Yeah, and we had the same bug with allow_smaller_maxphyaddr
-> > > > 
-> > > >    88213da23514 ("kvm: x86: disable the narrow guest module parameter on unload")
-> > > > 
-> > > > If the side effects of linking kvm.ko into kvm-{amd,intel}.ko weren't so painful
-> > > > for userspace,
-> > > > 
-> > > 
-> > > Do we have any real side effects for _userspace_ here?
-> > 
-> > kvm.ko ceasing to exist, and "everything" being tied to the vendor module is the
-> > big problem.  E.g. params from the kernel command line for kvm.??? will become
-> > ineffective, etc.  Some of that can be handled in the kernel, e.g. KVM can create
-> > a sysfs symlink so that the accesses through sysfs continue to work, but AFAIK
-> > params don't supporting such aliasing/links.
-> > 
-> > I don't think there are any deal breakers, but I don't expect it to Just Work either.
-> 
-> Perhaps we can make the kvm.ko as a dummy module which only keeps the module
-> parameters for backward compatibility?
+After discussion in the RFC thread[0], the following items were identified as
+desirable to expose via the stats interface:
 
-Keeping parameters in a dummy kvm.ko would largely defeat the purpose of linking
-everything into vendor modules, i.e. would make it possible for the parameters to
-hold a stale value.
+- APICv status: (apicv_enabled, boolean, per-vCPU)
+
+- Guest using SynIC's AutoEOI: (synic_auto_eoi_used, boolean, per-VM)
+
+- KVM PIT in reinject mode inhibits AVIC: (pit_reinject_mode, boolean, per-VM)
+
+- APICv unaccelerated injections causing a vmexit (i.e. AVIC_INCOMPLETE_IPI,
+  AVIC_UNACCELERATED_ACCESS, APIC_WRITE): (apicv_unaccelerated_inj, counter,
+  per-vCPU)
+
+Example retrieving the newly introduced stats for guest running on AMD Genoa
+host, with AVIC enabled:
+
+(QEMU) query-stats target=vcpu vcpus=['/machine/unattached/device[0]'] providers=[{'provider':'kvm','names':['apicv_unaccelerated_inj','apicv_active']}]
+{
+    "return": [
+        {
+            "provider": "kvm",
+            "qom-path": "/machine/unattached/device[0]",
+            "stats": [
+                {
+                    "name": "apicv_unaccelerated_inj",
+                    "value": 2561
+                },
+                {
+                    "name": "apicv_active",
+                    "value": true
+                }
+            ]
+        }
+    ]
+}
+(QEMU) query-stats target=vm providers=[{'provider':'kvm','names':['pit_reinject_mode','synic_auto_eoi_used']}]
+{
+    "return": [
+        {
+            "provider": "kvm",
+            "stats": [
+                {
+                    "name": "pit_reinject_mode",
+                    "value": false
+                },
+                {
+                    "name": "synic_auto_eoi_used",
+                    "value": false
+                }
+            ]
+        }
+    ]
+}
+
+Changes were also sanity tested on Intel Sapphire Rapids platform, with/without
+IPI virtualization.
+
+Regards,
+Alejandro
+
+[0] https://lore.kernel.org/all/20240215160136.1256084-1-alejandro.j.jimenez@oracle.com/
+
+Alejandro Jimenez (4):
+  KVM: x86: Expose per-vCPU APICv status
+  KVM: x86: Add a VM stat exposing when SynIC AutoEOI is in use
+  KVM: x86: Add a VM stat exposing when KVM PIT is set to reinject mode
+  KVM: x86: Add vCPU stat for APICv interrupt injections causing #VMEXIT
+
+ arch/x86/include/asm/kvm_host.h | 4 ++++
+ arch/x86/kvm/hyperv.c           | 2 ++
+ arch/x86/kvm/i8254.c            | 2 ++
+ arch/x86/kvm/lapic.c            | 1 +
+ arch/x86/kvm/svm/avic.c         | 7 +++++++
+ arch/x86/kvm/vmx/vmx.c          | 2 ++
+ arch/x86/kvm/x86.c              | 7 ++++++-
+ 7 files changed, 24 insertions(+), 1 deletion(-)
+
+
+base-commit: 7b076c6a308ec5bce9fc96e2935443ed228b9148
+-- 
+2.39.3
+
 
