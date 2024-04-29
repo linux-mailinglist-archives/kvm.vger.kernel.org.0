@@ -1,80 +1,71 @@
-Return-Path: <kvm+bounces-16149-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16150-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C27F08B58C7
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 14:41:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E5F68B5983
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 15:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73320285057
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 12:41:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52B90B2DE0F
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 13:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C1E10A2E;
-	Mon, 29 Apr 2024 12:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1AF56B6C;
+	Mon, 29 Apr 2024 13:08:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MyQueRBE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dUta8Edg"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB59BE4E
-	for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 12:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC08C2C6;
+	Mon, 29 Apr 2024 13:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714394444; cv=none; b=NLr1jEwLUMgBHZ7OXYYZlCVPxQTO+UD974fZPdz9aIt1Y1geZOmcZguHFn1M+RJ1lClyk1dxomIrzd4+b1b76dE94rlIabGnWQNe67eEVc63v3b2cXIA9/xAIUT9ARvHF3ZTi7dWOTBeb1YwMXL9oOYlpXpMYk2V2Tdo35cYKnU=
+	t=1714396128; cv=none; b=h+poRy0Hh7Rk+ojoLneMXg+Mx9odiAn5LM5UM0OH5Hgw5qWkGHIN8qQR4DPfsYRqWyvqNet1aGhuuTjZkhkqRwRQFmifYXI8JaNOE+RkLET0jscLNcUqWt3MFk3lIhz3x/T+VJ/I2eJhpnFRPXrwGUPON0+RekJotiiePUzPHt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714394444; c=relaxed/simple;
-	bh=6D2a3vGvyPEJ5sHXioTCcxQC31damFpV0mzd8HdSwSo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=srCdG8dwV83lxPCywLJYCGPn5MxHldriAeRQT7+rqFJbC1dVX/AwxnhX8unrCY/SoYarweabbRoXZ0BpIbP6+ms2jdibg90iFMR6vSbSrgqFgyVEU0fwFVnXB3b2MHTCVSE9v8i/umNuo/lyDjh3orOutO1fxVsGaM9kRt64FFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MyQueRBE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714394441;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6D2a3vGvyPEJ5sHXioTCcxQC31damFpV0mzd8HdSwSo=;
-	b=MyQueRBE9LlX4/Ww7SZJHnnNPrDBeQmiMvezW0VHdBX+GKJ/bcXJ5g/YiO29oP1HfzOLS5
-	QL0En0pTKMwD+TEKwzF/DNHduYZwEeA2W+ChKcZ+w23ROlF/fr8PCBGOWsEzpDZ97icKYR
-	hjrceyLOBWmIqa5F215tn8m0ZZOMmKw=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-57-tPwSxdREOZCWrx21KguoqQ-1; Mon, 29 Apr 2024 08:40:39 -0400
-X-MC-Unique: tPwSxdREOZCWrx21KguoqQ-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-43aeee4d2c7so10604471cf.2
-        for <kvm@vger.kernel.org>; Mon, 29 Apr 2024 05:40:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714394439; x=1714999239;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6D2a3vGvyPEJ5sHXioTCcxQC31damFpV0mzd8HdSwSo=;
-        b=ekp8qlPBQOw+M/Oo1um693mPfzgdmDKw7nObJACGgye1W01lYPckCWwYCFEPKQneyR
-         Qzyc4w2YjLDRoyQK1PJyYIAzcAgj3gAJzWWVbZ8jmTa/qrTahKUdiIIOOwrDZcAYoNdZ
-         ZptyEFtnKNB7q0yPOkpu5FsX1MB7f8/AzbKogwxmjGHbrG3oDb7CF3fBtW7N/7Rasmtf
-         N+Nb9IkwnX2cP/B7iwnqRepELgf4FRfrWpQWY+puD+zDOmJ3I3i1gRNvdb7GVCHolLPf
-         JcdPqOD+xIZeUzlvA2GEhZCCSmUvGjl5QlZEqfsP6WZsY5nBdsEeheBkwV2pzQf55Biw
-         xhwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXqv2k4XiQ9dgBpUkvMPYEmkn/HKderIYhrPhQ6US0v6Z2iz9Z8HuNDwsdjtDif/UUHc44tmq17uETNReEnQFGsBThn
-X-Gm-Message-State: AOJu0Yy2yEDa/1rnITiljnHD1VlwodpoUXqrYx4A1TwA4Z8RghIPPuSA
-	87q/NEmq3OdXSfhy4IHtpqZP92qfTN5L0hKzjqqy1kcR1o3cMJbt2i7JLfK6KvMDrcLSAwhfKDN
-	ImiK0BgfySLL+Xe7EBra71ogdCk/FEslouoeJsjljx5N5PbxGWg==
-X-Received: by 2002:ac8:5ad6:0:b0:43a:ef4e:7b28 with SMTP id d22-20020ac85ad6000000b0043aef4e7b28mr3558093qtd.21.1714394439474;
-        Mon, 29 Apr 2024 05:40:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+6+yZssObbaeBialeUKT9GT3Il2t+xTdj7JPBwoyu19bRWzh7C46GmQYHvJdfmx+jFldVVg==
-X-Received: by 2002:ac8:5ad6:0:b0:43a:ef4e:7b28 with SMTP id d22-20020ac85ad6000000b0043aef4e7b28mr3558080qtd.21.1714394439200;
-        Mon, 29 Apr 2024 05:40:39 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
-        by smtp.gmail.com with ESMTPSA id s24-20020ac87598000000b00436440fd8bfsm10368318qtq.3.2024.04.29.05.40.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Apr 2024 05:40:38 -0700 (PDT)
-Message-ID: <d8cc4405-fe9c-4b47-be76-708a72d4b1a1@redhat.com>
-Date: Mon, 29 Apr 2024 14:40:35 +0200
+	s=arc-20240116; t=1714396128; c=relaxed/simple;
+	bh=h/k+QXiqSs9/NGwWZ9VrWj0RyO1ZNwAX2jIDUWeJ//s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iBMiEIg9sppFmHwkUMxnnVTg1AmVp2wIuFGdwI5C3rooJtQTLa9GD1THoHtp2/bb3I0qGxYYP+F+oGudAksT4HaApPOX/fDySRV+ggwJ3v5iyUx2xXp08SR3kJVpDziHMcDPA2X9IId2pM8u8llpmS8ZdqK2Dg06PM8lBIqkOlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dUta8Edg; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714396127; x=1745932127;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=h/k+QXiqSs9/NGwWZ9VrWj0RyO1ZNwAX2jIDUWeJ//s=;
+  b=dUta8EdgXPDedFUh1dEn18K+zbpMWsg7NiSCg8B5X/s+a6DvV6xlb7Yr
+   RWdti8K4EoKElWUlEkk41DkbzILauDfrASHiQJTRB3mjSK+sRaOOn2aUr
+   VJ+du1vQpI2q807tLJR+OTIf52BLuUtUY7ndT4mmXNAoKI7NI7gD7KKzL
+   SAvmzjoc9YgCwYBiRJRh9BO3BD5gsdlO/4jPKD2MJPPByKTQsKDHOzols
+   nQU5cl43lv7Wf7Qk5ZWa+CngDZgKadLuKyy54Q2ne/xx0Dlo0XtVf8cUv
+   Ep3dYhTEzcBLT5Tbi0L/GqbybcjMzEoCUci8NsZrSrpKI5QE04oBMVsDg
+   A==;
+X-CSE-ConnectionGUID: d1mmrVxlTcmS6fPvk5KAMQ==
+X-CSE-MsgGUID: jeui67zPRRCVGXaGYIoplA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11057"; a="13840570"
+X-IronPort-AV: E=Sophos;i="6.07,239,1708416000"; 
+   d="scan'208";a="13840570"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2024 06:08:46 -0700
+X-CSE-ConnectionGUID: 8oTf2g0rRwu8qkcwHrQnqA==
+X-CSE-MsgGUID: VOAb7zO/RFKVe+CSmynZPw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,239,1708416000"; 
+   d="scan'208";a="25976696"
+Received: from linux.intel.com ([10.54.29.200])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2024 06:08:47 -0700
+Received: from [10.212.16.233] (kliang2-mobl1.ccr.corp.intel.com [10.212.16.233])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id 9E06420B5739;
+	Mon, 29 Apr 2024 06:08:43 -0700 (PDT)
+Message-ID: <4bd55385-0c8e-4989-95be-37862b564dea@linux.intel.com>
+Date: Mon, 29 Apr 2024 09:08:42 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,89 +73,100 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] vfio/pci: migration: Skip config space check for
- Vendor Specific Information in VSC during restore/load
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Vinayak Kale <vkale@nvidia.com>, qemu-devel@nongnu.org,
- marcel.apfelbaum@gmail.com, avihaih@nvidia.com, acurrid@nvidia.com,
- cjia@nvidia.com, zhiw@nvidia.com, targupta@nvidia.com, kvm@vger.kernel.org
-References: <20240322064210.1520394-1-vkale@nvidia.com>
- <20240327113915.19f6256c.alex.williamson@redhat.com>
- <20240327161108-mutt-send-email-mst@kernel.org>
- <20240327145235.47338c2b.alex.williamson@redhat.com>
- <10a42156-067e-4dc1-8467-b840595b38fa@redhat.com>
-Content-Language: en-US, fr
-In-Reply-To: <10a42156-067e-4dc1-8467-b840595b38fa@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>, maobibo <maobibo@loongson.cn>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <CAL715WKh8VBJ-O50oqSnCqKPQo4Bor_aMnRZeS_TzJP3ja8-YQ@mail.gmail.com>
+ <6af2da05-cb47-46f7-b129-08463bc9469b@linux.intel.com>
+ <CAL715W+zeqKenPLP2Fm9u_BkGRKAk-mncsOxrg=EKs74qK5f1Q@mail.gmail.com>
+ <42acf1fc-1603-4ac5-8a09-edae2d85963d@linux.intel.com>
+ <ZirPGnSDUzD-iWwc@google.com>
+ <77913327-2115-42b5-850a-04ef0581faa7@linux.intel.com>
+ <CAL715WJCHJD_wcJ+r4TyWfvmk9uNT_kPy7Pt=CHkB-Sf0D4Rqw@mail.gmail.com>
+ <ff4a4229-04ac-4cbf-8aea-c84ccfa96e0b@linux.intel.com>
+ <CAL715WJKL5__8RU0xxUf0HifNVQBDRODE54O2bwOx45w67TQTQ@mail.gmail.com>
+ <5f5bcbc0-e2ef-4232-a56a-fda93c6a569e@linux.intel.com>
+ <ZiwEoZDIg8l7-uid@google.com>
+ <CAL715WJ4jHmto3ci=Fz5Bwx2Y=Hiy1MoFCpcUhz-C8aPMqYskw@mail.gmail.com>
+Content-Language: en-US
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <CAL715WJ4jHmto3ci=Fz5Bwx2Y=Hiy1MoFCpcUhz-C8aPMqYskw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hello Vinayak,
 
-On 3/28/24 10:30, Cédric Le Goater wrote:
-> On 3/27/24 21:52, Alex Williamson wrote:
->> On Wed, 27 Mar 2024 16:11:37 -0400
->> "Michael S. Tsirkin" <mst@redhat.com> wrote:
->>
->>> On Wed, Mar 27, 2024 at 11:39:15AM -0600, Alex Williamson wrote:
->>>> On Fri, 22 Mar 2024 12:12:10 +0530
->>>> Vinayak Kale <vkale@nvidia.com> wrote:
->>>>> In case of migration, during restore operation, qemu checks config space of the
->>>>> pci device with the config space in the migration stream captured during save
->>>>> operation. In case of config space data mismatch, restore operation is failed.
->>>>>
->>>>> config space check is done in function get_pci_config_device(). By default VSC
->>>>> (vendor-specific-capability) in config space is checked.
->>>>>
->>>>> Due to qemu's config space check for VSC, live migration is broken across NVIDIA
->>>>> vGPU devices in situation where source and destination host driver is different.
->>>>> In this situation, Vendor Specific Information in VSC varies on the destination
->>>>> to ensure vGPU feature capabilities exposed to the guest driver are compatible
->>>>> with destination host.
->>>>>
->>>>> If a vfio-pci device is migration capable and vfio-pci vendor driver is OK with
->>>>> volatile Vendor Specific Info in VSC then qemu should exempt config space check
->>>>> for Vendor Specific Info. It is vendor driver's responsibility to ensure that
->>>>> VSC is consistent across migration. Here consistency could mean that VSC format
->>>>> should be same on source and destination, however actual Vendor Specific Info
->>>>> may not be byte-to-byte identical.
->>>>>
->>>>> This patch skips the check for Vendor Specific Information in VSC for VFIO-PCI
->>>>> device by clearing pdev->cmask[] offsets. Config space check is still enforced
->>>>> for 3 byte VSC header. If cmask[] is not set for an offset, then qemu skips
->>>>> config space check for that offset.
->>>>>
->>>>> Signed-off-by: Vinayak Kale <vkale@nvidia.com>
->>>>> ---
->>>>> Version History
->>>>> v2->v3:
->>>>>      - Config space check skipped only for Vendor Specific Info in VSC, check is
->>>>>        still enforced for 3 byte VSC header.
->>>>>      - Updated commit description with live migration failure scenario.
->>>>> v1->v2:
->>>>>      - Limited scope of change to vfio-pci devices instead of all pci devices.
->>>>>
->>>>>   hw/vfio/pci.c | 24 ++++++++++++++++++++++++
->>>>>   1 file changed, 24 insertions(+)
->>>>
->>>>
->>>> Acked-by: Alex Williamson <alex.williamson@redhat.com>
->>>
->>>
->>> A very reasonable way to do it.
->>>
->>> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
->>>
->>> Merge through the VFIO tree I presume?
->>
->> Yep, Cédric said he´d grab it for 9.1.  Thanks,
 
-Could you please resend an update of this change adding a machine
-compatibility property for migration ?
+On 2024-04-26 11:04 p.m., Mingwei Zhang wrote:
+> On Fri, Apr 26, 2024 at 12:46 PM Sean Christopherson <seanjc@google.com> wrote:
+>>
+>> On Fri, Apr 26, 2024, Kan Liang wrote:
+>>>> Optimization 4
+>>>> allows the host side to immediately profiling this part instead of
+>>>> waiting for vcpu to reach to PMU context switch locations. Doing so
+>>>> will generate more accurate results.
+>>>
+>>> If so, I think the 4 is a must to have. Otherwise, it wouldn't honer the
+>>> definition of the exclude_guest. Without 4, it brings some random blind
+>>> spots, right?
+>>
+>> +1, I view it as a hard requirement.  It's not an optimization, it's about
+>> accuracy and functional correctness.
+> 
+> Well. Does it have to be a _hard_ requirement? no? The irq handler
+> triggered by "perf record -a" could just inject a "state". Instead of
+> immediately preempting the guest PMU context, perf subsystem could
+> allow KVM defer the context switch when it reaches the next PMU
+> context switch location.
+
+It depends on what is the upcoming PMU context switch location.
+If it's the upcoming VM-exit/entry, the defer should be fine. Because
+it's a exclude_guest event, nothing should be counted when a VM is running.
+If it's the upcoming vCPU boundary, no. I think there may be several
+VM-exit/entry before the upcoming vCPU switch. We may lose some results.
+> 
+> This is the same as the preemption kernel logic. Do you want me to
+> stop the work immediately? Yes (if you enable preemption), or No, let
+> me finish my job and get to the scheduling point.
+
+I don't think it's necessary. Just make sure that the counters are
+scheduled in the upcoming VM-exit/entry boundary should be fine.
 
 Thanks,
-
-C.
-
+Kan
+> 
+> Implementing this might be more difficult to debug. That's my real
+> concern. If we do not enable preemption, the PMU context switch will
+> only happen at the 2 pairs of locations. If we enable preemption, it
+> could happen at any time.
+> 
+>>
+>> What _is_ an optimization is keeping guest state loaded while KVM is in its
+>> run loop, i.e. initial mediated/passthrough PMU support could land upstream with
+>> unconditional switches at entry/exit.  The performance of KVM would likely be
+>> unacceptable for any production use cases, but that would give us motivation to
+>> finish the job, and it doesn't result in random, hard to diagnose issues for
+>> userspace.
+> 
+> That's true. I agree with that.
+> 
+>>
+>>>> Do we want to preempt that? I think it depends. For regular cloud
+>>>> usage, we don't. But for any other usages where we want to prioritize
+>>>> KVM/VMM profiling over guest vPMU, it is useful.
+>>>>
+>>>> My current opinion is that optimization 4 is something nice to have.
+>>>> But we should allow people to turn it off just like we could choose to
+>>>> disable preempt kernel.
+>>>
+>>> The exclude_guest means everything but the guest. I don't see a reason
+>>> why people want to turn it off and get some random blind spots.
+> 
 
