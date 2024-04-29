@@ -1,274 +1,177 @@
-Return-Path: <kvm+bounces-16134-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16135-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A718B50B9
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 07:28:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E42DA8B50F7
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 08:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F5871F21F4E
-	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 05:28:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECD38B216D0
+	for <lists+kvm@lfdr.de>; Mon, 29 Apr 2024 06:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8807DDF59;
-	Mon, 29 Apr 2024 05:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34CF1111A5;
+	Mon, 29 Apr 2024 06:07:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vme8Aj58"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AWr+lnqo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2046.outbound.protection.outlook.com [40.107.243.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DB368BE2;
-	Mon, 29 Apr 2024 05:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714368492; cv=none; b=qbnC+ZYdMZuvoPPV2l0FHN4k+jllSRDk7mCscCifkLy2nyin/dNIG5HK/+OmHy1ayFIWkqF6kM6nyaBANMa8A7EygmrTJ4ADVgdponobENz+FTRWXRnhyh2gA5AMOXS7hSEl5r4kyhCNPyihA60mF7tGTkfHloK9Zdy9rF62Abs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714368492; c=relaxed/simple;
-	bh=GXqfD+mhyD93lvJEnldh1X3LIZPQ3b/q2ihJ2sJw/ro=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=biksD/hoYmv+4l4SCAEKI9e2bhp0YGRIomX9xDc4u2MSZyR8RDRxB2rFY8yRsUK0HJfQnLhZSphcBYgDKl7AkEvfiOd/SMm4dDhOijGj/+nvA/NW+VkoBzTGGBZ1Bb44MI9dPdJzVIUqenxsuGJulNiwsOnqTcBQbqXlYSdjsk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vme8Aj58; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714368490; x=1745904490;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GXqfD+mhyD93lvJEnldh1X3LIZPQ3b/q2ihJ2sJw/ro=;
-  b=Vme8Aj58La4mYqruOYJDgN7jqbkmpQ16tRlBMs8EQeu/TXMfflsc+VUF
-   rzsvZr0icbC6Uda2W1GrewUfe7Uy1eg61vsWwCPnwxh9cM3DABuWuGx3L
-   G2ktXRK5UEFfRR1qeTClXVk5PQItlJ6eMUQG3dQbvTrCC3OsCzj9WgPE1
-   +3VBil4TcuZBGt0A/ei3+is4r+17GOlSZGY3QB8FFv0tuVR4PeaAT2/Yc
-   Jw9sw30szqaA5lu/wUsXDjjX/x8pTb9ISxGQyQC7mMw/uRvU+r+k9UshC
-   b1zUUsLSmcbmIlolWKbOlDliIkJDB3jF0cAc40Vr2F7rs/U3pK8RKvE0J
-   Q==;
-X-CSE-ConnectionGUID: gV32TAbYQG2TJ/p8Oe5S3w==
-X-CSE-MsgGUID: q14eGwziTpalN2GE7YBPlw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11057"; a="9897621"
-X-IronPort-AV: E=Sophos;i="6.07,238,1708416000"; 
-   d="scan'208";a="9897621"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2024 22:28:09 -0700
-X-CSE-ConnectionGUID: oOkl1dw2Tz2klj8z8Bo35Q==
-X-CSE-MsgGUID: pGxZfn3vSp2sKJgivZmbMA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,238,1708416000"; 
-   d="scan'208";a="26070351"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.242.48]) ([10.124.242.48])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2024 22:28:06 -0700
-Message-ID: <a9e7004f-0d2d-4a32-b663-a57391a9cedd@intel.com>
-Date: Mon, 29 Apr 2024 13:28:02 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64881118E;
+	Mon, 29 Apr 2024 06:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714370832; cv=fail; b=LZQBI3XBWvRNEy8l2Q9B6/BB1FT0m2AGuJSbJpWm9iKFssRWhMxN3ZLWeffoBD8tYpIyCzhyh0Nco54p2b595J5TfRJgIIdA3S57Gdvfyixz/VMsYgpeLR8+uLDwkMV4rY0WFrIXUOxpT6/ggQO7Stnn+jBzGjszqumIME5VFHk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714370832; c=relaxed/simple;
+	bh=+zOTj0NEnYB/z5AGERqCslJaBpgdpwL7oSfWRuUYLUQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Url8jdllYr98F15+geE2Ec3tqKyBmbqAcszyEscFpCWuul/KnXE7G/9/GEkKYO2YOsJxOUyueFshG5rl7FhkxiFV/3Ln3nIPfljEmwORTejMSDN9UkF2YYhaEK+e1maT6cABA+U2kB+S8veAaTJm6TC2kKfgghPggEOoemEUS/0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AWr+lnqo; arc=fail smtp.client-ip=40.107.243.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G1luz2VNwHTGp3aAwD0n5Sd+hTWrWAaZJdViH9dPdDSorCBQFFLkzDCueREFDOk3R872A/bsaWwowY4mmzZViQMxKidOD8qQ+SS616UuWeyGTJeastQnF9Zdlx6JcAlNyTIOwE3fmy1IPFXE8yxQZngyaaBfBDvtQi4dzpeUPbWhgbJnITXNTjhKzhI244n3FsH5c756mo2nRtyE7/BtJedXU6s4PpuYD+APCjlc/uDYkQOB0xJ7Hp3QcNS41YxH0fhlPr/SLul4ow0addsWHClVNYj77MUnP5QvG7LHtaY/6CVGnh2P9vta3TzPuSWGi9ucXe8LbQObtKKSCyRrNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JGIZWMNHfQBigxUt6Q67X+tErMKpYpAJE1kKOlS9iFE=;
+ b=a6COBK6dfckYWvbnMFvm3amqlR9wDB4A3i/zqfdliW+qXI/Z+DfTnXm5v2HIOdGDz9x1pRFyocxROkOy3smMtKiEoOgxtWcQHWe5Uww44ZueiBWlQrA7/y1JvAFY5S6ePKzHbiW81Kcr7G0OFTmH5chv9IW6MxPuDTVpuATRtZ+cTgOXyYLyp40Dhx8e+1yf1Mzo7HuEE9d1cKbwJ7IPu2+yLqkwoYjI5GsD1p3MeWTpbC2A14AiPYRZaSTfrIB+mwF2RKo3FZwOAA5vEWx+xunTeSzqiN7K0hVCqHRHNyrrTwQ+bWZFCP2kUXTMi2SAL2o51ELQGqKZc+lZ7GGHvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=linutronix.de smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JGIZWMNHfQBigxUt6Q67X+tErMKpYpAJE1kKOlS9iFE=;
+ b=AWr+lnqotNmc19dx+MuTDn///u0P12nQyBnaZwKfkA86R1HkAzWuYbRWY4LW4F7jF+WH8XmkJlDEB2lX5Nswx4GLyPHHyeHLV3MQ3r7uMQ/FcXkj0f2L7G5RxvENGGk8jPlgJb67NuhFCpcdq+H/wHNIVZj82rxJ7dWjWDzCeMQ=
+Received: from CH2PR14CA0046.namprd14.prod.outlook.com (2603:10b6:610:56::26)
+ by LV2PR12MB5824.namprd12.prod.outlook.com (2603:10b6:408:176::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Mon, 29 Apr
+ 2024 06:07:08 +0000
+Received: from CH2PEPF00000148.namprd02.prod.outlook.com
+ (2603:10b6:610:56:cafe::f0) by CH2PR14CA0046.outlook.office365.com
+ (2603:10b6:610:56::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.38 via Frontend
+ Transport; Mon, 29 Apr 2024 06:07:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH2PEPF00000148.mail.protection.outlook.com (10.167.244.105) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7544.18 via Frontend Transport; Mon, 29 Apr 2024 06:07:08 +0000
+Received: from BLR-5CG113396H.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 29 Apr
+ 2024 01:06:57 -0500
+From: Ravi Bangoria <ravi.bangoria@amd.com>
+To: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
+	<thomas.lendacky@amd.com>
+CC: <ravi.bangoria@amd.com>, <hpa@zytor.com>, <rmk+kernel@armlinux.org.uk>,
+	<peterz@infradead.org>, <james.morse@arm.com>, <lukas.bulwahn@gmail.com>,
+	<arjan@linux.intel.com>, <j.granados@samsung.com>, <sibs@chinatelecom.cn>,
+	<nik.borisov@suse.com>, <michael.roth@amd.com>, <nikunj.dadhania@amd.com>,
+	<babu.moger@amd.com>, <x86@kernel.org>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <santosh.shukla@amd.com>,
+	<ananth.narayan@amd.com>, <sandipan.das@amd.com>
+Subject: [PATCH 0/3] x86/cpu: Add Bus Lock Detect support for AMD
+Date: Mon, 29 Apr 2024 11:36:40 +0530
+Message-ID: <20240429060643.211-1-ravi.bangoria@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 3/4] KVM: x86: Add a capability to configure bus
- frequency for APIC timer
-To: Reinette Chatre <reinette.chatre@intel.com>, isaku.yamahata@intel.com,
- pbonzini@redhat.com, erdemaktas@google.com, vkuznets@redhat.com,
- seanjc@google.com, vannapurve@google.com, jmattson@google.com,
- mlevitsk@redhat.com, chao.gao@intel.com, rick.p.edgecombe@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <cover.1714081725.git.reinette.chatre@intel.com>
- <6748a4c12269e756f0c48680da8ccc5367c31ce7.1714081726.git.reinette.chatre@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <6748a4c12269e756f0c48680da8ccc5367c31ce7.1714081726.git.reinette.chatre@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000148:EE_|LV2PR12MB5824:EE_
+X-MS-Office365-Filtering-Correlation-Id: 573c6836-eb55-4b2e-1362-08dc68129a01
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|376005|7416005|1800799015|82310400014|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?F4wnNPMA+7LOwlD1VggdBPg0UtxxbdHpNzLuZegwK+kccNM+YGdCgpa+8z17?=
+ =?us-ascii?Q?EOnNEV8JJwec8B1z8pcyAO9E4HNUkk0vkWrm4rHvX+GoDrOTGU+nfH8Jui0d?=
+ =?us-ascii?Q?vaNnbojh2wkbaQy1JRfpyEQfe1V5o/CjHrd8AZLgxycrca0TLaPaRW3LUhGI?=
+ =?us-ascii?Q?88jcBpD/Q5SpJxirEerW9jdYu9SRTtO60NVnmvhlDLpmhqFuaPNFKfzmiE2L?=
+ =?us-ascii?Q?YPvYK8k1cThwutKlDND3OsPhBbZzJG3i2Jv/ktb4X3HTWaww8e7ywkVUpQRQ?=
+ =?us-ascii?Q?5whHGp0dNPUFU9BcSDrBubmj6T1R1L0io7siqtzRJEe1B50uXDyxeWdiA4EA?=
+ =?us-ascii?Q?BgqOfCFHRcl43xIgv5llEiPY1s2DITjzzxn+pePm28TUEQvKRrEedbOmPf10?=
+ =?us-ascii?Q?LReJATBs4TKv1a7Z7WcCL6Xq9qFj43CBUqg0n+l4OmhTGQUKC18ADAa4hOqX?=
+ =?us-ascii?Q?naO/QkflI3FbPFH2abjk57I2keUrkRTAsmvsli7g8MtP/O+8z2Dl9zcwmaFR?=
+ =?us-ascii?Q?t+1eP3l5BEw7A2u/PYMJZnxlG6qbHt5q3RXtUd8oMAB1u8NnUD/+BE+XEWsC?=
+ =?us-ascii?Q?zTJs3ThK4gnZntj9J3pnTNEjXqnHJtgQ/Pbdvn8b2u0zIthPcDvlGCvggGj6?=
+ =?us-ascii?Q?aYOAX3GOt48/O1OU+tizR9YsMmKUPLnwmxylcd9QTbaFmbPkrr5OBcR0Rjv1?=
+ =?us-ascii?Q?A8ZExAm00/mOUfXm33R9qfZJdmWcmGBbCl4bw0WZmm4NHroIBYevP5KLoc1d?=
+ =?us-ascii?Q?42zIbEwGEhxyEzwrbaExq+3aEcxa2I+bolScY4AFJ+kni3gND38iyctFkBNb?=
+ =?us-ascii?Q?+anZ04Iy6SvNHTbetdokuSPhaQ3H0YnrtaiN8TH4x6rqjF4lR6vsTTrbxCOP?=
+ =?us-ascii?Q?3otXtwDGbaCN2xoZgT82sBDCYUcS/1x3QC/Im4bKTh06XWfdhBT8YgjX3ayB?=
+ =?us-ascii?Q?6OKMZDprMivAUAEVAmleOlBh6Z70okDpB1izyIGdSQ2HvJ62aYWOIIjkOF0v?=
+ =?us-ascii?Q?KzcbJ+3I3lexMp0zj+s70Q3pTB3EPIfOfZQD2ilV+VeC1xlN1OFj4BxXMypK?=
+ =?us-ascii?Q?AWQVGXi1qYycjDQAmctnxH302yYcGgeEkLFEcFHashLj9YwVY+u0yt9y2W6e?=
+ =?us-ascii?Q?Gs+f0jQTMO1wKDWB+sgeRKt0HOwm07mz6eNVy4Dv2oqBnPaQ28bGPN/Qqva8?=
+ =?us-ascii?Q?waDbvQiZOxQH5tqwmcCbBofPcmTDndrCpjYvF/8XTcWHSipgxTe/o4JLuDgy?=
+ =?us-ascii?Q?wJIHsxus+xMF5vBrBJ1oiP0xwD+bRuH++1IbczwY/cjzjaQvAIph+D06cARj?=
+ =?us-ascii?Q?Tvwc55evAcvP2k9pSJsU6MjOwL5ZwHKLP8JL5qBru9k5JQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(82310400014)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Apr 2024 06:07:08.1604
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 573c6836-eb55-4b2e-1362-08dc68129a01
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000148.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5824
 
-On 4/26/2024 6:07 AM, Reinette Chatre wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Add KVM_CAP_X86_APIC_BUS_CYCLES_NS capability to configure the APIC
-> bus clock frequency for APIC timer emulation.
-> Allow KVM_ENABLE_CAPABILITY(KVM_CAP_X86_APIC_BUS_CYCLES_NS) to set the
-> frequency in nanoseconds. When using this capability, the user space
-> VMM should configure CPUID leaf 0x15 to advertise the frequency.
-> 
-> Vishal reported that the TDX guest kernel expects a 25MHz APIC bus
-> frequency but ends up getting interrupts at a significantly higher rate.
-> 
-> The TDX architecture hard-codes the core crystal clock frequency to
-> 25MHz and mandates exposing it via CPUID leaf 0x15. The TDX architecture
-> does not allow the VMM to override the value.
-> 
-> In addition, per Intel SDM:
->      "The APIC timer frequency will be the processor’s bus clock or core
->       crystal clock frequency (when TSC/core crystal clock ratio is
->       enumerated in CPUID leaf 0x15) divided by the value specified in
->       the divide configuration register."
-> 
-> The resulting 25MHz APIC bus frequency conflicts with the KVM hardcoded
-> APIC bus frequency of 1GHz.
-> 
-> The KVM doesn't enumerate CPUID leaf 0x15 to the guest unless the user
-> space VMM sets it using KVM_SET_CPUID. If the CPUID leaf 0x15 is
-> enumerated, the guest kernel uses it as the APIC bus frequency. If not,
-> the guest kernel measures the frequency based on other known timers like
-> the ACPI timer or the legacy PIT. As reported by Vishal the TDX guest
-> kernel expects a 25MHz timer frequency but gets timer interrupt more
-> frequently due to the 1GHz frequency used by KVM.
-> 
-> To ensure that the guest doesn't have a conflicting view of the APIC bus
-> frequency, allow the userspace to tell KVM to use the same frequency that
-> TDX mandates instead of the default 1Ghz.
-> 
-> There are several options to address this:
-> 1. Make the KVM able to configure APIC bus frequency (this series).
->     Pro: It resembles the existing hardware.  The recent Intel CPUs
->          adapts 25MHz.
->     Con: Require the VMM to emulate the APIC timer at 25MHz.
-> 2. Make the TDX architecture enumerate CPUID leaf 0x15 to configurable
->     frequency or not enumerate it.
->     Pro: Any APIC bus frequency is allowed.
->     Con: Deviates from TDX architecture.
-> 3. Make the TDX guest kernel use 1GHz when it's running on KVM.
->     Con: The kernel ignores CPUID leaf 0x15.
-> 4. Change CPUID leaf 0x15 under TDX to report the crystal clock frequency
->     as 1 GHz.
->     Pro: This has been the virtual APIC frequency for KVM guests for 13
->          years.
->     Pro: This requires changing only one hard-coded constant in TDX.
->     Con: It doesn't work with other VMMs as TDX isn't specific to KVM.
->     Con: Core crystal clock frequency is also used to calculate TSC
->          frequency.
->     Con: If it is configured to value different from hardware, it will
->          break the correctness of INTEL-PT Mini Time Count (MTC) packets
->          in TDs.
-> 
-> Reported-by: Vishal Annapurve <vannapurve@google.com>
-> Closes: https://lore.kernel.org/lkml/20231006011255.4163884-1-vannapurve@google.com/
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> Co-developed-by: Reinette Chatre <reinette.chatre@intel.com>
-> Signed-off-by: Reinette Chatre <reinette.chatre@intel.com>
+Upcoming AMD uarch will support Bus Lock Detect (called Bus Lock Trap
+in AMD docs). Add support for the same in Linux. Bus Lock Detect is
+enumerated with cpuid CPUID Fn0000_0007_ECX_x0 bit [24 / BUSLOCKTRAP].
+It can be enabled through MSR_IA32_DEBUGCTLMSR. When enabled, hardware
+clears DR6[11] and raises a #DB exception on occurrence of Bus Lock if
+CPL > 0. More detail about the feature can be found in AMD APM[1].
 
-Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Patches are prepared on tip/x86/cpu (e063b531d4e8)
 
-> ---
-> Changes v5:
-> - Rename capability KVM_CAP_X86_APIC_BUS_FREQUENCY ->
->    KVM_CAP_X86_APIC_BUS_CYCLES_NS. (Xiaoyao Li)
-> - Add Rick's Reviewed-by tag.
-> 
-> Changes v4:
-> - Rework implementation following Sean's guidance in:
->    https://lore.kernel.org/all/ZdjzIgS6EAeCsUue@google.com/
-> - Reword con #2 to acknowledge feedback. (Sean)
-> - Add the "con" information from Xiaoyao during earlier review of v2.
-> - Rework changelog to address comments related to "bus clock" vs
->    "core crystal clock" frequency. (Xiaoyao)
-> - Drop snippet about impact on TSC deadline timer emulation. (Maxim)
-> - Drop Maxim Levitsky's "Reviewed-by" tag due to many changes to patch
->    since tag received.
-> - Switch "Subject:" to match custom "KVM: X86:" -> "KVM: x86:"
-> 
-> Changes v3:
-> - Added reviewed-by Maxim Levitsky.
-> - Minor update of the commit message.
-> 
-> Changes v2:
-> - Add check if vcpu isn't created.
-> - Add check if lapic chip is in-kernel emulation.
-> - Fix build error for i386.
-> - Add document to api.rst.
-> - Typo in the commit message.
-> 
->   Documentation/virt/kvm/api.rst | 17 +++++++++++++++++
->   arch/x86/kvm/x86.c             | 27 +++++++++++++++++++++++++++
->   include/uapi/linux/kvm.h       |  1 +
->   3 files changed, 45 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index f0b76ff5030d..f014cd9b2217 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8063,6 +8063,23 @@ error/annotated fault.
->   
->   See KVM_EXIT_MEMORY_FAULT for more information.
->   
-> +7.35 KVM_CAP_X86_APIC_BUS_CYCLES_NS
-> +-----------------------------------
-> +
-> +:Architectures: x86
-> +:Target: VM
-> +:Parameters: args[0] is the desired APIC bus clock rate, in nanoseconds
-> +:Returns: 0 on success, -EINVAL if args[0] contains an invalid value for the
-> +          frequency or if any vCPUs have been created, -ENXIO if a virtual
-> +          local APIC has not been created using KVM_CREATE_IRQCHIP.
-> +
-> +This capability sets VM's APIC bus clock frequency, used by KVM's in-kernel
-> +virtual APIC when emulating APIC timers.  KVM's default value can be retrieved
-> +by KVM_CHECK_EXTENSION.
-> +
-> +Note: Userspace is responsible for correctly configuring CPUID 0x15, a.k.a. the
-> +core crystal clock frequency, if a non-zero CPUID 0x15 is exposed to the guest.
-> +
->   8. Other capabilities.
->   ======================
->   
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 10e6315103f4..fa6954c9a9d2 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4715,6 +4715,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_MEMORY_FAULT_INFO:
->   		r = 1;
->   		break;
-> +	case KVM_CAP_X86_APIC_BUS_CYCLES_NS:
-> +		r = APIC_BUS_CYCLE_NS_DEFAULT;
-> +		break;
->   	case KVM_CAP_EXIT_HYPERCALL:
->   		r = KVM_EXIT_HYPERCALL_VALID_MASK;
->   		break;
-> @@ -6755,6 +6758,30 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->   		}
->   		mutex_unlock(&kvm->lock);
->   		break;
-> +	case KVM_CAP_X86_APIC_BUS_CYCLES_NS: {
-> +		u64 bus_cycle_ns = cap->args[0];
-> +		u64 unused;
-> +
-> +		r = -EINVAL;
-> +		/*
-> +		 * Guard against overflow in tmict_to_ns(). 128 is the highest
-> +		 * divide value that can be programmed in APIC_TDCR.
-> +		 */
-> +		if (!bus_cycle_ns ||
-> +		    check_mul_overflow((u64)U32_MAX * 128, bus_cycle_ns, &unused))
-> +			break;
-> +
-> +		r = 0;
-> +		mutex_lock(&kvm->lock);
-> +		if (!irqchip_in_kernel(kvm))
-> +			r = -ENXIO;
-> +		else if (kvm->created_vcpus)
-> +			r = -EINVAL;
-> +		else
-> +			kvm->arch.apic_bus_cycle_ns = bus_cycle_ns;
-> +		mutex_unlock(&kvm->lock);
-> +		break;
-> +	}
->   	default:
->   		r = -EINVAL;
->   		break;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 2190adbe3002..6a4d9432ab11 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -917,6 +917,7 @@ struct kvm_enable_cap {
->   #define KVM_CAP_MEMORY_ATTRIBUTES 233
->   #define KVM_CAP_GUEST_MEMFD 234
->   #define KVM_CAP_VM_TYPES 235
-> +#define KVM_CAP_X86_APIC_BUS_CYCLES_NS 236
->   
->   struct kvm_irq_routing_irqchip {
->   	__u32 irqchip;
+Patch #3 depends on SEV-ES LBRV fix:
+https://lore.kernel.org/r/20240416050338.517-1-ravi.bangoria@amd.com
+
+[1]: AMD64 Architecture Programmer's Manual Pub. 40332, Rev. 4.07 - June
+     2023, Vol 2, 13.1.3.6 Bus Lock Trap
+     https://bugzilla.kernel.org/attachment.cgi?id=304653
+
+Ravi Bangoria (3):
+  x86/split_lock: Move Split and Bus lock code to a dedicated file
+  x86/bus_lock: Add support for AMD
+  KVM SVM: Add Bus Lock Detect support
+
+ arch/x86/include/asm/cpu.h           |   4 +
+ arch/x86/kernel/cpu/Makefile         |   1 +
+ arch/x86/kernel/cpu/amd.c            |   2 +
+ arch/x86/kernel/cpu/intel.c          | 407 ---------------------------
+ arch/x86/kernel/cpu/split-bus-lock.c | 406 ++++++++++++++++++++++++++
+ arch/x86/kvm/svm/nested.c            |   3 +-
+ arch/x86/kvm/svm/svm.c               |  16 +-
+ 7 files changed, 430 insertions(+), 409 deletions(-)
+ create mode 100644 arch/x86/kernel/cpu/split-bus-lock.c
+
+-- 
+2.44.0
 
 
