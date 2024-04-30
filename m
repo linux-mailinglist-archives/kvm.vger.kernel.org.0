@@ -1,95 +1,197 @@
-Return-Path: <kvm+bounces-16231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16232-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D583C8B748D
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 13:32:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 218A28B74C4
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 13:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 961B1287F57
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 11:32:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB7BE281AEE
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 11:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0859412D761;
-	Tue, 30 Apr 2024 11:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E2D13CF87;
+	Tue, 30 Apr 2024 11:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgGs3GKJ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="A25zNcBP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365A012D1E9
-	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 11:32:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D4215AAA4;
+	Tue, 30 Apr 2024 11:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714476741; cv=none; b=jRkWW70T4bjqTuQ41pc/Clsxd53+Lifw6fNN3Z/i5Ea5GK8twCgQq/ntQz4sSXA4RHj0wuUcnqM5tINHZKgH0o5E57JvGnBOjj/aegb/LH82/m/X50oL4ZnYRe+NHNI1luR3tRNBd4NN8KHcvqblyeMVoxg4pIToL5uFzFJTibo=
+	t=1714477526; cv=none; b=lCkTVzdahBfJus+cBsuFHubo10n0TtTHIJeHIZKumTaNaPPvTpgEST8kUSsspd6iW7Ebl32DwQMzrADlnzYXTQ+kJyvpHCqeGcCGbjKNZLnDD1InduSezKssHxhE5K+YwZcRExWJZB0JVmv0omK6KNLDAapSzdk22iXAPtdc/9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714476741; c=relaxed/simple;
-	bh=qTLTjMBqUAZzbJw23rk2+Mi+qfZ7tHZM02zjuQvwKZU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CbIHcJzRexBzW7ifDpWJxLUmryek+EcEYjg7lE2KrkTVZxT/ZLALYfFm6hjHBRY0a8WllidHibimwm22SIeSwV4caRW7ifajgEUCPCXZKQYXY6THOMDF3fCnph3xai4m3dIQqxujUKydzQV48i24+kXPhi4ZJjfBdPjeknPz+/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgGs3GKJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 045BFC4AF18
-	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 11:32:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714476741;
-	bh=qTLTjMBqUAZzbJw23rk2+Mi+qfZ7tHZM02zjuQvwKZU=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=RgGs3GKJwefDNXiGqx76p1M/mfn6SuOKGNPJ9jINv7mjqRPzpIcLvMu+1AKGn1X34
-	 btbwFAn2skISXcaZNhOCHBHLIoGDgsRChF2UmBC2F4zoD8PQ3FqIhGMl5j+kX6VPJq
-	 rWALeDL3rOEh5/bDHTGmxMOJ2m+M6fBhMpssSS+TQE3VqQWdZRR/tu8dc34D+tgYmz
-	 5WNZxA3nnHq3qr7jGyWyeYAiIlO6oXDls6MLvlG+aF2/yQ+MS4ZyLO2liJ2iiUslu9
-	 2STuIPwPcDT+ynDqKlC5Sk8bbJkWrhoziK5Hy7LTpJCtfrx8f9rRAy82rgfWzPtTLd
-	 4CvkjUNL+mhoQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id F22EEC433E5; Tue, 30 Apr 2024 11:32:20 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218792] Guest call trace with mwait enabled
-Date: Tue, 30 Apr 2024 11:32:20 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_kernel_version
-Message-ID: <bug-218792-28872-WTmTGM4gld@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218792-28872@https.bugzilla.kernel.org/>
-References: <bug-218792-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1714477526; c=relaxed/simple;
+	bh=fHd/tvgknZmDQ1B+dKw15+R47eqN73inFJLNupe/g1s=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QA/PFD3R8JoYdeASZQzBoBwSIjymw11vSZtgVu6dq26EmR9m371G+ekj/IEnXBgC2mwK6+SeXlQNnqGGgPHHm1f64PlfDjDIJPGa99zrVYO709hhgAFEhBOoSQLzHoYZTJ8jKKXBKN2mx6GbqN8Hy4RkXMk801OTZio0RNqVqjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=A25zNcBP; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1714477524; x=1746013524;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=fHd/tvgknZmDQ1B+dKw15+R47eqN73inFJLNupe/g1s=;
+  b=A25zNcBPz5slS+g+28gjb5qbg+h28Q5qBrTNou6vSMHIM+rsq9nPmLaN
+   BDMceGe5qICILFvTb7eGU555TFRWpABws4BEXnyWFQA1S7yX5Ao000Pf6
+   lRWquYf79ym7aj5Ewkzo1/DpsTOOZVeDeXxKTpbBjthxl0VcEXLzMW7e6
+   eefnSYWtD/k9JgJdebKOUe4SMK3Wsn6IaHzq8Igb8cCYDj9H1gIHNmYp9
+   7x5TQwYH8QAePViA7kCTKh8o0S2nDjwypczQ0zRuFzkj/beGsq8hkK7Ow
+   mfG1TvbfnPmiwBhF+afQC8Yl9LOmtigQnAV/vyuLO3RCHVa45emsJlb8d
+   w==;
+X-CSE-ConnectionGUID: rJqdjKizQQ68Np9QZCjhLw==
+X-CSE-MsgGUID: kyLwJnyCT2SNMFyBqjKUEg==
+X-IronPort-AV: E=Sophos;i="6.07,242,1708412400"; 
+   d="asc'?scan'208";a="190592988"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Apr 2024 04:45:22 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 30 Apr 2024 04:44:50 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Tue, 30 Apr 2024 04:44:47 -0700
+Date: Tue, 30 Apr 2024 12:44:30 +0100
+From: Conor Dooley <conor.dooley@microchip.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+CC: Conor Dooley <conor@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Paul
+ Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Anup Patel
+	<anup@brainfault.org>, Shuah Khan <shuah@kernel.org>, Atish Patra
+	<atishp@atishpatra.org>, <linux-doc@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<kvm-riscv@lists.infradead.org>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v4 02/11] riscv: add ISA extensions validation
+Message-ID: <20240430-payable-famished-6711765d5ca4@wendy>
+References: <20240429150553.625165-1-cleger@rivosinc.com>
+ <20240429150553.625165-3-cleger@rivosinc.com>
+ <20240429-subtext-tabby-3a1532f058a5@spud>
+ <5d5febd5-d113-4e8c-9535-9e75acf23398@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="o3hC9HS35D3JsI9f"
+Content-Disposition: inline
+In-Reply-To: <5d5febd5-d113-4e8c-9535-9e75acf23398@rivosinc.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218792
+--o3hC9HS35D3JsI9f
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+On Tue, Apr 30, 2024 at 09:18:47AM +0200, Cl=E9ment L=E9ger wrote:
+>=20
+>=20
+> On 30/04/2024 00:15, Conor Dooley wrote:
+> > On Mon, Apr 29, 2024 at 05:04:55PM +0200, Cl=E9ment L=E9ger wrote:
+> >> Since a few extensions (Zicbom/Zicboz) already needs validation and
+> >> future ones will need it as well (Zc*) add a validate() callback to
+> >> struct riscv_isa_ext_data. This require to rework the way extensions a=
+re
+> >> parsed and split it in two phases. First phase is isa string or isa
+> >> extension list parsing and consists in enabling all the extensions in a
+> >> temporary bitmask without any validation. The second step "resolves" t=
+he
+> >> final isa bitmap, handling potential missing dependencies. The mechani=
+sm
+> >> is quite simple and simply validate each extension described in the
+> >> temporary bitmap before enabling it in the final isa bitmap. validate()
+> >> callbacks can return either 0 for success, -EPROBEDEFER if extension
+> >> needs to be validated again at next loop. A previous ISA bitmap is kept
+> >> to avoid looping mutliple times if an extension dependencies are never
+> >> satisfied until we reach a stable state. In order to avoid any potenti=
+al
+> >> infinite looping, allow looping a maximum of the number of extension we
+> >> handle. Zicboz and Zicbom extensions are modified to use this validati=
+on
+> >> mechanism.
+> >=20
+> > Your reply to my last review only talked about part of my comments,
+> > which is usually what you do when you're gonna implement the rest, but
+> > you haven't.
+> > I like the change you've made to shorten looping, but I'd at least like
+> > a response to why a split is not worth doing :)
+>=20
+> Hi Conor,
+>=20
+> Missed that point since I was feeling that my solution actually
+> addresses your concerns. Your argument was that there is no reason to
+> loop for Zicbom/Zicboz but that would also apply to Zcf in case we are
+> on RV64 as well (since zcf is not supported on RV64). So for Zcf, that
+> would lead to using both mecanism or additional ifdefery with little to
+> no added value since the current solution actually solves both cases:
+>=20
+> - We don't have any extra looping if all validation callback returns 0
+> (except the initial one on riscv_isa_ext, which is kind of unavoidable).
+> - Zicbom, Zicboz callbacks will be called only once (which was one of
+> your concern).
+>=20
+> Adding a second kind of callback for after loop validation would only
+> lead to a bunch of additional macros/ifdefery for extensions with
+> validate() callback, with validate_end() or with both (ie Zcf)). For
+> these reasons, I do not think there is a need for a separate mechanism
+> nor additional callback for such extensions except adding extra code
+> with no real added functionality.
+>=20
+> AFAIK, the platform driver probing mechanism works the same, the probe()
+> callback is actually called even if for some reason properties are
+> missing from nodes for platform devices and thus the probe() returns
+> -EINVAL or whatever.
+>=20
+> Hope this answers your question,
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-     Kernel Version|                            |6.9-rc6
+Yeah, pretty much I am happy with just an "it's not worth doing it"
+response. Given it wasn't your first choice, I doubt you're overly happy
+with it either, but I really would like to avoid looping to closure to
+sort out dependencies - particularly on the boot CPU before we bring
+anyone else up, but if the code is now more proactive about breaking
+out, I suppose that'll have to do :)
+I kinda wish we didn't do this at all, but I think we've brought this
+upon ourselves via hwprobe. I'm still on the fence as to whether things
+that are implied need to be handled in this way. I think I'll bring this
+up tomorrow at the weekly call, because so far it's only been you and I
+discussing this really and it's a policy decision that hwprobe-ists
+should be involved in I think.
 
---- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
-Is this a regression? Could you bisect?
+Implied extensions aside, I think we will eventually need this stuff
+anyway, for extensions that make no sense to consider if a config option
+for a dependency is disabled.
+=46rom talking to Eric Biggers the other week about
+riscv_isa_extension_available() I'm of the opinion that we need to do
+better with that interface w.r.t. extension and config dependencies,
+and what seems like a good idea to me at the moment is putting tests for
+IS_ENABLED(RISCV_ISA_FOO) into these validate hooks.
 
---=20
-You may reply to this email to add a comment.
+I'll try to look at the actual implementation here tomorrow.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Cheers,
+Conor.
+
+--o3hC9HS35D3JsI9f
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZjDZngAKCRB4tDGHoIJi
+0jaXAQDZLEWybBZ6OTc/u2wI/xhLxITFoBF1IWTZ2CPcg9nOugD/e972YLWSGflR
+ZM//z1//gOap3OewaAJgMnP4nvYeEA4=
+=U5u8
+-----END PGP SIGNATURE-----
+
+--o3hC9HS35D3JsI9f--
 
