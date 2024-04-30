@@ -1,191 +1,153 @@
-Return-Path: <kvm+bounces-16263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4278B8088
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 21:31:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 634528B808C
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 21:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 561111F245CA
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 19:31:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 839DD1C2307A
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 19:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E516199E86;
-	Tue, 30 Apr 2024 19:31:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85886199E9C;
+	Tue, 30 Apr 2024 19:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FtBfdoph"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pVbL//pF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDEB7710B;
-	Tue, 30 Apr 2024 19:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6826194C9D
+	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 19:32:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714505478; cv=none; b=mB59+FvZdzrn9fKgZ+nxAol5XPUWd47LDyVSTdN7aGRg9Wb7kJ6jVtc6/ouFuEfWfL6TKVwq/I0L/Ommns/NKH7/TpxCXnrTLPK+MpyUM+Bkj4xP8rwMwP/0q9lPb1UPVZT3V+4VzxRO2z0uETGJsZzEItYUUvNCzh9NVsz/kOs=
+	t=1714505522; cv=none; b=ojbE1aJaHI1CSFvaP4sHTFV4Q4W/jL6E6bQ0dYELtmtj8HvTWKFigzx5Ote+YKiA3hhewpCFHOeUUuTSx/ppDyn/wn/9w7/1Ne1+8L2XGpIDyn38mSWEfXgAqVZpgVAtVYF0C/cu1jsqyKufyp5F0YAvYBl2SLTN4GpxYnirnzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714505478; c=relaxed/simple;
-	bh=NCkfdFfYPyv+cxw3YGXRQCLfnck0tkHnGZpWYoan5MQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=b3bJP84y7PZ3v3s2tDJpTmyC5uS88FjKARvUDDHktvKFJkOjnjuI8jucSfSVcWmUYIHWzuT1c7FSMOrWRgmp5YXffCtMtjJTCXnbBV7oHJl7eXpydJyxiCaaxHmYiPhiHWuHlXVl6sq6U1KR/Av/99mnz9ti++BKc2y4EaQwYD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FtBfdoph; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43UJSXHM012934;
-	Tue, 30 Apr 2024 19:31:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=NCkfdFfYPyv+cxw3YGXRQCLfnck0tkHnGZpWYoan5MQ=;
- b=FtBfdophn3v5VnKFI58xajgjWC6nphVsubfh3Yq0lHKX/IZPcPQzbvzTKKjKjMCSApUF
- 1CrJ2iBRGbNwUaPeiDwYXVo+j2tmXokBNdnLFKxdg+tQpeupbADaoFA+vSgxJoAtiocw
- qFbjpGlsGYLHDxkGbKGak6yES2Hm5b0+UZNSXy3hQ8bFhh5xi4TVb5HDlQHvZxW3Trc6
- 0SB1+OziqXJ4PzWdXN+tX5oYvDRjRxf3lJY527ZASPUXZfaM6w01z8pCKhAxlyRy8Z3A
- Y5F60CPlFaLTXQ3Xz+LeO1gScYBiT4bLzuutL1le6dSfmmjWAgSe1AQVG0nfM9qyXvC+ eA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xu6tx804h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 19:31:14 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43UJVE7X016586;
-	Tue, 30 Apr 2024 19:31:14 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xu6tx804f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 19:31:13 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43UGnd0O002989;
-	Tue, 30 Apr 2024 19:31:13 GMT
-Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xscppet9n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Apr 2024 19:31:13 +0000
-Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
-	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43UJVA4t36766094
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Apr 2024 19:31:12 GMT
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DD0805806D;
-	Tue, 30 Apr 2024 19:31:08 +0000 (GMT)
-Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1FC0858070;
-	Tue, 30 Apr 2024 19:31:08 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.85.173])
-	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 30 Apr 2024 19:31:08 +0000 (GMT)
-Message-ID: <0cfe41f08d89481125ddc1f0087af6bd6bcd1b39.camel@linux.ibm.com>
-Subject: Re: [PATCH] KVM: s390: vsie: retry SIE instruction on host
- intercepts
-From: Eric Farman <farman@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        David Hildenbrand
- <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda
- <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens
-	 <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
-	 <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Date: Tue, 30 Apr 2024 15:31:07 -0400
-In-Reply-To: <dceeac23-0c58-4c78-850a-d09e7b45d6e8@linux.ibm.com>
-References: <20240301204342.3217540-1-farman@linux.ibm.com>
-	 <338544a6-4838-4eeb-b1b2-2faa6c11c1be@redhat.com>
-	 <1deb0e32-7351-45d2-a342-96a659402be8@linux.ibm.com>
-	 <8fbd41c0fb16a5e10401f6c2888d44084e9af86a.camel@linux.ibm.com>
-	 <dceeac23-0c58-4c78-850a-d09e7b45d6e8@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1714505522; c=relaxed/simple;
+	bh=ZyEi6X5pCM2tp1slqyp4M7rxWVN5czCX48iQBtE7Jeo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Eb4T1+AKV34EDmstbOz/VcGDlRxJO4sYYQqFdZvLUIo96Bv8YIe9EG+SDGHM1cROc4m/vSiZDZaXecAarb+rgDxpUAa0IC5DbnChKnAOz0zZn/Yqrlu7iPenXQPs57BIcCx9VmuoXde66+/1jyfjqHujIxLNGxTLszkZVcZa0Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pVbL//pF; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2ac3403b27eso6941949a91.0
+        for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 12:32:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714505520; x=1715110320; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z8cKIw53BRkz+z0+cac0VztUPzZ2bkNPe6LEvW4OcBU=;
+        b=pVbL//pFn986soxarrKWGavPTzgb+nNosoRNSY7l4l+G7TXLTTPIsqVy8S3fRMOrGx
+         kA2WtNhsSfmZ8NcJzpm58DPU4GvSzS5zOWDpMS1TXtzBDUKj6FnNzV4y8GIseweI3tc0
+         mRilImRhOjk+WS3GLE2oARsGeH2N+K+ydBVllC/04KBn8mo7ItfLZDDNV+4gTNZTXzIF
+         i5unsMQpZ7x15jTxb16NJohmtPwvwBbUKRRn9tO4eQA+EUQbUZiXKKkW2d0md3MwuaDn
+         7JAJbATuYkYYWeLAWcESPrNuFQi+T4uS9aUddK0FrbVNayrWHJI/GKqZHg0LGOYZMhXq
+         xcGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714505520; x=1715110320;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z8cKIw53BRkz+z0+cac0VztUPzZ2bkNPe6LEvW4OcBU=;
+        b=lVFRBIWBDK+Nh7lybrPvGeFq+Um83veBY0XNX2jfi/W6MBaIO5x2wW1nr4DUekJC3I
+         lRcFmTlQ+JDE75rHUX4jXBaanWFnRrKKEU1NFoxzffHy3dgmjbshSGTLUQQgjXAJPab1
+         PFzqiX+HN51+3MllTEliPOlnZ7XDVU0vQQrY8kJLxAByN/Ld0R4ZRIfHnfO0UvGyfIBE
+         P8EDjIrAJR0lWQKw3vzNS+UDmFVxHDN1PAoev/qlWPJaSDHEyoMgx01qCde14vHu1Dmc
+         NGh0a8qSysMHGxr6cf2i8ClzZc2ZnTKF8GVSi/VVWzkxXQv4gJfcMRYFb7ffTnXHj57q
+         MVDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXyEKvFok9ZEdE2CY5z3zV29y1Ht/KGqtW+Wg3+s0fMJTE6typg7gGo3608WC6WkB9pn/VsIjH5ySfdZPENe0QIGgyB
+X-Gm-Message-State: AOJu0Yxcc1oYXFXDXPRB/Eh258CNLPW/QMlyneWHrqEaIgrxrMYs5rfQ
+	FpYKligPTHTLpz5I7Em6Io+PdFScztfVV9YS8n+Dakp+fxwKgvo3iypGRYm9jk4CkHfqM7RhIKE
+	uuA==
+X-Google-Smtp-Source: AGHT+IH3JUNqnUxIpxTDCx/ljNN0s2y6mLqDYiJH9gncvZUrZrTQ/cL7Kjz1TcqYgEZ6lTuIQ7azs+1F9y4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:e504:b0:2a2:ff01:dd7c with SMTP id
+ t4-20020a17090ae50400b002a2ff01dd7cmr1190pjy.8.1714505520000; Tue, 30 Apr
+ 2024 12:32:00 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 30 Apr 2024 12:31:53 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: uDnnbdN_dTEFkyRZhTcmu8ADGFKDn_5c
-X-Proofpoint-ORIG-GUID: ly8BUBbMSAWihqa4Zm65oKhVkATqD_f3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-04-30_12,2024-04-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 priorityscore=1501 spamscore=0
- lowpriorityscore=0 clxscore=1011 impostorscore=0 mlxlogscore=398
- phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404300139
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc0.197.gbae5840b3b-goog
+Message-ID: <20240430193157.419425-1-seanjc@google.com>
+Subject: [PATCH 0/4] KVM: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
+From: Sean Christopherson <seanjc@google.com>
+To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2024-04-29 at 12:18 +0200, Christian Borntraeger wrote:
-> Am 04.03.24 um 16:37 schrieb Eric Farman:
-> > On Mon, 2024-03-04 at 09:44 +0100, Christian Borntraeger wrote:
-> > >=20
-> > >=20
-> > > Am 04.03.24 um 09:35 schrieb David Hildenbrand:
-> > > > On 01.03.24 21:43, Eric Farman wrote:
-> > > > > It's possible that SIE exits for work that the host needs to
-> > > > > perform
-> > > > > rather than something that is intended for the guest.
-> > > > >=20
-> > > > > A Linux guest will ignore this intercept code since there is
-> > > > > nothing
-> > > > > for it to do, but a more robust solution would rewind the PSW
-> > > > > back to
-> > > > > the SIE instruction. This will transparently resume the guest
-> > > > > once
-> > > > > the host completes its work, without the guest needing to
-> > > > > process
-> > > > > what is effectively a NOP and re-issue SIE itself.
-> > > >=20
-> > > > I recall that 0-intercepts are valid by the architecture.
-> > > > Further,
-> > > > I recall that there were some rather tricky corner cases where
-> > > > avoiding 0-intercepts would not be that easy.
-> >=20
-> > Any chance you recall any details of those corner cases? I can try
-> > to
-> > chase some of them down.
-> >=20
-> > > >=20
-> > > > Now, it's been a while ago, and maybe I misremember. SoI'm
-> > > > trusting
-> > > > people with access to documentation can review this.
-> > >=20
-> > > Yes, 0-intercepts are allowed, and this also happens when LPAR
-> > > has an
-> > > exit.
-> >=20
-> > =C2=A0From an offline conversation I'd had some months back:
-> >=20
-> > """
-> > The arch does allow ICODE=3D0 to be stored, but it's supposed to
-> > happen
-> > only upon a host interruption -- in which case the old PSW is
-> > supposed
-> > to point back at the SIE, to resume guest execution if the host
-> > should
-> > LPSW oldPSW.
-> > """
->=20
-> Just re-read the architecture again and I agree, the SIE instruction
-> should
-> be nullified. So we should go forward with this somehow.
->=20
-> Eric, can you maybe add this to devel for CI coverage so that we see
-> if there
-> are corner cases?=C2=A0
+Drop kvm_arch_sched_in() and instead pass a @sched_in boolean to
+kvm_arch_vcpu_load().
 
-Sure thing.
+While fiddling with an idea for optimizing state management on AMD CPUs,
+I wanted to skip re-saving certain host state when a vCPU is scheduled back
+in, as the state (theoretically) shouldn't change for the task while it's
+scheduled out.  Actually doing that was annoying and unnecessarily brittle
+due to having a separate API for the kvm_sched_in() case (the state save
+needed to be in kvm_arch_vcpu_load() for the common path).
 
-> Maybe also try to do some performance things (how many IPIs
-> can we get in guest2 when a guest3 is running and how many IPIs are
-> possible
-> in a guest3).
->=20
+E.g. I could have set a "temporary"-ish flag somewhere in kvm_vcpu, but (a)
+that's gross and (b) it would rely on the arbitrary ordering between
+sched_in() and vcpu_load() staying the same.
 
-Fair enough. I'll see if I can come up with something and report back
-here.
+The only real downside I see is that arm64 and riscv end up having to pass
+"false" for their direct usage of kvm_arch_vcpu_load(), and passing boolean
+literals isn't ideal.  But that can be solved by adding an inner helper that
+omits the @sched_in param (I almost added a patch to do that, but I couldn't
+convince myself it was necessary).
+
+The other motivation for this is to avoid yet another arch hook, and more
+arbitrary ordering, if there's a future need to hook kvm_sched_out() (we've
+come close on the x86 side several times).
+
+Sean Christopherson (4):
+  KVM: Plumb in a @sched_in flag to kvm_arch_vcpu_load()
+  KVM: VMX: Move PLE grow/shrink helpers above vmx_vcpu_load()
+  KVM: x86: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
+  KVM: Delete the now unused kvm_arch_sched_in()
+
+ arch/arm64/include/asm/kvm_host.h     |  1 -
+ arch/arm64/kvm/arm.c                  |  2 +-
+ arch/arm64/kvm/emulate-nested.c       |  4 +-
+ arch/arm64/kvm/reset.c                |  2 +-
+ arch/loongarch/include/asm/kvm_host.h |  1 -
+ arch/loongarch/kvm/vcpu.c             |  2 +-
+ arch/mips/include/asm/kvm_host.h      |  1 -
+ arch/mips/kvm/mmu.c                   |  2 +-
+ arch/powerpc/include/asm/kvm_host.h   |  1 -
+ arch/powerpc/kvm/powerpc.c            |  2 +-
+ arch/riscv/include/asm/kvm_host.h     |  1 -
+ arch/riscv/kvm/vcpu.c                 |  4 +-
+ arch/s390/include/asm/kvm_host.h      |  1 -
+ arch/s390/kvm/kvm-s390.c              |  2 +-
+ arch/x86/include/asm/kvm-x86-ops.h    |  1 -
+ arch/x86/include/asm/kvm_host.h       |  4 +-
+ arch/x86/kvm/pmu.c                    |  6 +--
+ arch/x86/kvm/svm/svm.c                | 13 ++---
+ arch/x86/kvm/vmx/main.c               |  2 -
+ arch/x86/kvm/vmx/vmx.c                | 75 +++++++++++++--------------
+ arch/x86/kvm/vmx/x86_ops.h            |  3 +-
+ arch/x86/kvm/x86.c                    | 26 +++++-----
+ include/linux/kvm_host.h              |  4 +-
+ virt/kvm/kvm_main.c                   |  5 +-
+ 24 files changed, 70 insertions(+), 95 deletions(-)
+
+
+base-commit: a96cb3bf390eebfead5fc7a2092f8452a7997d1b
+-- 
+2.45.0.rc0.197.gbae5840b3b-goog
+
 
