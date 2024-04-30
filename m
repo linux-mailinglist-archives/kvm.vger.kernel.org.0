@@ -1,127 +1,191 @@
-Return-Path: <kvm+bounces-16262-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16263-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6BAD8B8085
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 21:30:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF4278B8088
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 21:31:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CDE3284AA6
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 19:30:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 561111F245CA
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 19:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B4F199E88;
-	Tue, 30 Apr 2024 19:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E516199E86;
+	Tue, 30 Apr 2024 19:31:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b="RUOH/U3T"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FtBfdoph"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00364e01.pphosted.com (mx0b-00364e01.pphosted.com [148.163.139.74])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21A9A194C9E
-	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 19:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.139.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDEB7710B;
+	Tue, 30 Apr 2024 19:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714505405; cv=none; b=HvXIGGugds7dkVbNx5Yk6UxnQs1T21MLdAtR3JwOacZ1tlDBXdWw6vbGmAlfEc+uR3zXlYJJOEXL0kQmKZFaCh6vRiGbdkNFbQ0t101ZTzYg/tc1qEImCZnaWBCNlXcqUL4T+ACKg5zHzkNztSMrkV9yO88uKavf8myY8jxcpsA=
+	t=1714505478; cv=none; b=mB59+FvZdzrn9fKgZ+nxAol5XPUWd47LDyVSTdN7aGRg9Wb7kJ6jVtc6/ouFuEfWfL6TKVwq/I0L/Ommns/NKH7/TpxCXnrTLPK+MpyUM+Bkj4xP8rwMwP/0q9lPb1UPVZT3V+4VzxRO2z0uETGJsZzEItYUUvNCzh9NVsz/kOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714505405; c=relaxed/simple;
-	bh=lJ8gp0NYd9wG/QoyYsmtFfPkGu0N506QK1W8f8hKE3I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lCl+TGniOc9OKIGJLZfW5lIKopwORmWR2s5az4h5jj+ab1VehvOmAGuiSjUlgk8J/PtOclHFtERy39bkseFdq/ONNxtfB+qZYpcGbkmbE+NPPuf5k+49Mss/Ug1gphcyl0tLHZ6HBz1Lq111lDSC/4/jiD7P7G3/cE805pcF0Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu; spf=pass smtp.mailfrom=columbia.edu; dkim=pass (2048-bit key) header.d=columbia.edu header.i=@columbia.edu header.b=RUOH/U3T; arc=none smtp.client-ip=148.163.139.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.columbia.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=columbia.edu
-Received: from pps.filterd (m0167075.ppops.net [127.0.0.1])
-	by mx0b-00364e01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43UJFTtH003696
-	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 15:29:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=columbia.edu; h=mime-version :
- references : in-reply-to : from : date : message-id : subject : to : cc :
- content-type : content-transfer-encoding; s=pps01;
- bh=oc6kRPcRubpTdbbh9aZFXcZ0hJcAAlplqE5O2JpJvY8=;
- b=RUOH/U3T6h0GQ5BjA0yfokmOt+K5fZtvY9pktAMHPBggF8mFHhO4Xv6tjA2shihvqEQU
- 26EiruThwle+cRXPxA75I9rzIskBiywZZd5jz1OX1qUqOEc9IDUm/5kcdB7VViXZ8jb4
- 8DvyzBKnd8nKr6DLbyoqmCHDBA/VfiKjRiVRBCi4jPJHfjqCdWRWa/qsNq19PikNy+Oo
- wstQa/NdPH6cm/G3x2+uAP2Ha2kynzRSebpqkMhXr9MlN3zOwBbSPokWKAO5OA6VG4eq
- VwzA/rHxxet0olEZpXBUlcxoGAQE9ryWb998jhZu5371OfV8y0OYkWsMG0A1ou+sb339 Mw== 
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	by mx0b-00364e01.pphosted.com (PPS) with ESMTPS id 3xrwbt9gn9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 15:29:55 -0400
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7ded263daeeso36022839f.2
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 12:29:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714505378; x=1715110178;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oc6kRPcRubpTdbbh9aZFXcZ0hJcAAlplqE5O2JpJvY8=;
-        b=f6y9l/5dLUW/xdpgm/tOfezVeelSE4YjLsaSd+U/Fu0CQfAZn1TijWFsGNhXUDq7zR
-         rfBn0hU/E5AXSQ1fYHiaa0PBeXpjYLVtXQoViq5Tas2mu1lPTu2CoZYt2v/B7noZ+ok+
-         osL5mlnRSRQEqjhkLpXmMsHbEf79UKHR1/CbB2Qjd5yFZTqwrD8nozPsCFatCnTQoCQ1
-         ZoanGZCFvKIz3FiS3B3T4j5r7iV5Tk6tkmLghYyXeJfezmru4gf++03tJ7h/2oAmQdje
-         AyPH4EUqyrGJdpscY+iZDLq0h99feYXCkcQVU7t6CzHXpZtLhcZRCENxr63ovObqca+6
-         75Aw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVkzlxJsj58nvw+Wi8dkyj1gv66fEUbAtiSeAfRqil5NTvmwDWXtQS9gm9l9J6UvcDqGKaRlmlEsF+cB2we2jMkeQq
-X-Gm-Message-State: AOJu0YzR3wjwO0KV9c3aJGL/04OZ0LY+QLayYcb/orJPlVdPnotDNANF
-	oDP3xlpz/UYvQP01G23aP/CutbnmwVfXdLKl4/1M/4dSAbXAxwXDrKVF6hway0JWYuIVFEGtJx/
-	CagKgQAMwk0dkwAWlj4JCbwerSOpM5j2oDyBjJqGStBgbM2v4ZFVhhez2CMhOevQJfp+WsXuJp5
-	oHMzDVfO+UjSk6dDbY5GwyqSLCrLv8
-X-Received: by 2002:a05:6e02:13a5:b0:368:974b:f7c7 with SMTP id h5-20020a056e0213a500b00368974bf7c7mr870865ilo.0.1714505377726;
-        Tue, 30 Apr 2024 12:29:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHVZ5eVX/DFyc6ZnORp/zfn+c+/E5krTaQ8B3t4hgiFErNsnVt3+K6VkFnwU2mAH1p7a+RcMCNLAB+CJJnexNk=
-X-Received: by 2002:a05:6e02:13a5:b0:368:974b:f7c7 with SMTP id
- h5-20020a056e0213a500b00368974bf7c7mr870855ilo.0.1714505377430; Tue, 30 Apr
- 2024 12:29:37 -0700 (PDT)
+	s=arc-20240116; t=1714505478; c=relaxed/simple;
+	bh=NCkfdFfYPyv+cxw3YGXRQCLfnck0tkHnGZpWYoan5MQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=b3bJP84y7PZ3v3s2tDJpTmyC5uS88FjKARvUDDHktvKFJkOjnjuI8jucSfSVcWmUYIHWzuT1c7FSMOrWRgmp5YXffCtMtjJTCXnbBV7oHJl7eXpydJyxiCaaxHmYiPhiHWuHlXVl6sq6U1KR/Av/99mnz9ti++BKc2y4EaQwYD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FtBfdoph; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43UJSXHM012934;
+	Tue, 30 Apr 2024 19:31:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=NCkfdFfYPyv+cxw3YGXRQCLfnck0tkHnGZpWYoan5MQ=;
+ b=FtBfdophn3v5VnKFI58xajgjWC6nphVsubfh3Yq0lHKX/IZPcPQzbvzTKKjKjMCSApUF
+ 1CrJ2iBRGbNwUaPeiDwYXVo+j2tmXokBNdnLFKxdg+tQpeupbADaoFA+vSgxJoAtiocw
+ qFbjpGlsGYLHDxkGbKGak6yES2Hm5b0+UZNSXy3hQ8bFhh5xi4TVb5HDlQHvZxW3Trc6
+ 0SB1+OziqXJ4PzWdXN+tX5oYvDRjRxf3lJY527ZASPUXZfaM6w01z8pCKhAxlyRy8Z3A
+ Y5F60CPlFaLTXQ3Xz+LeO1gScYBiT4bLzuutL1le6dSfmmjWAgSe1AQVG0nfM9qyXvC+ eA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xu6tx804h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 19:31:14 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43UJVE7X016586;
+	Tue, 30 Apr 2024 19:31:14 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xu6tx804f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 19:31:13 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43UGnd0O002989;
+	Tue, 30 Apr 2024 19:31:13 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xscppet9n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Apr 2024 19:31:13 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43UJVA4t36766094
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Apr 2024 19:31:12 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DD0805806D;
+	Tue, 30 Apr 2024 19:31:08 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1FC0858070;
+	Tue, 30 Apr 2024 19:31:08 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.85.173])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 30 Apr 2024 19:31:08 +0000 (GMT)
+Message-ID: <0cfe41f08d89481125ddc1f0087af6bd6bcd1b39.camel@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390: vsie: retry SIE instruction on host
+ intercepts
+From: Eric Farman <farman@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda
+ <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens
+	 <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+	 <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Date: Tue, 30 Apr 2024 15:31:07 -0400
+In-Reply-To: <dceeac23-0c58-4c78-850a-d09e7b45d6e8@linux.ibm.com>
+References: <20240301204342.3217540-1-farman@linux.ibm.com>
+	 <338544a6-4838-4eeb-b1b2-2faa6c11c1be@redhat.com>
+	 <1deb0e32-7351-45d2-a342-96a659402be8@linux.ibm.com>
+	 <8fbd41c0fb16a5e10401f6c2888d44084e9af86a.camel@linux.ibm.com>
+	 <dceeac23-0c58-4c78-850a-d09e7b45d6e8@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240423024933.80143-1-kele@cs.columbia.edu> <de0096bf-08a8-4ee4-94d7-6e5854b056b4@intel.com>
- <CAOfLF_L2UgSUyUsbiBDhLPskt2xLWujy1GBAhpcWzi2i3brAww@mail.gmail.com>
- <CAOfLF_+ZP-X8yT7qDb0t57ZZu7RNhdOGyCNfR2fheZG+h_jZ7w@mail.gmail.com>
- <ZivTmpMmeuIShbcC@google.com> <CAOfLF_L+bxOo4kK5H6WAUcOeTu5wFiU57UtR5qmr1rQBT5mAfA@mail.gmail.com>
- <Zi__ZF5SY2k7BtTE@google.com>
-In-Reply-To: <Zi__ZF5SY2k7BtTE@google.com>
-From: Kele Huang <kele@cs.columbia.edu>
-Date: Tue, 30 Apr 2024 15:29:26 -0400
-Message-ID: <CAOfLF_+GHrvqWK48YSwbJciM9n=QA9bHn-PjZSd9uo37Gx0ZMQ@mail.gmail.com>
-Subject: Re: [1/1] KVM: restrict kvm_gfn_to_hva_cache_init() to only accept
- address ranges within one page
-To: Sean Christopherson <seanjc@google.com>
-Cc: Zide Chen <zide.chen@intel.com>, pbonzini@redhat.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-ORIG-GUID: HTWDADBMq0wUUeShptbSyw4h-WqNiOra
-X-Proofpoint-GUID: HTWDADBMq0wUUeShptbSyw4h-WqNiOra
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: uDnnbdN_dTEFkyRZhTcmu8ADGFKDn_5c
+X-Proofpoint-ORIG-GUID: ly8BUBbMSAWihqa4Zm65oKhVkATqD_f3
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.650,FMLib:17.11.176.26
  definitions=2024-04-30_12,2024-04-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=872 bulkscore=10 priorityscore=1501 mlxscore=0 adultscore=0
- malwarescore=0 clxscore=1015 lowpriorityscore=10 spamscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404300140
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 clxscore=1011 impostorscore=0 mlxlogscore=398
+ phishscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404300139
 
-On Mon, Apr 29, 2024 at 4:13=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Mon, 2024-04-29 at 12:18 +0200, Christian Borntraeger wrote:
+> Am 04.03.24 um 16:37 schrieb Eric Farman:
+> > On Mon, 2024-03-04 at 09:44 +0100, Christian Borntraeger wrote:
+> > >=20
+> > >=20
+> > > Am 04.03.24 um 09:35 schrieb David Hildenbrand:
+> > > > On 01.03.24 21:43, Eric Farman wrote:
+> > > > > It's possible that SIE exits for work that the host needs to
+> > > > > perform
+> > > > > rather than something that is intended for the guest.
+> > > > >=20
+> > > > > A Linux guest will ignore this intercept code since there is
+> > > > > nothing
+> > > > > for it to do, but a more robust solution would rewind the PSW
+> > > > > back to
+> > > > > the SIE instruction. This will transparently resume the guest
+> > > > > once
+> > > > > the host completes its work, without the guest needing to
+> > > > > process
+> > > > > what is effectively a NOP and re-issue SIE itself.
+> > > >=20
+> > > > I recall that 0-intercepts are valid by the architecture.
+> > > > Further,
+> > > > I recall that there were some rather tricky corner cases where
+> > > > avoiding 0-intercepts would not be that easy.
+> >=20
+> > Any chance you recall any details of those corner cases? I can try
+> > to
+> > chase some of them down.
+> >=20
+> > > >=20
+> > > > Now, it's been a while ago, and maybe I misremember. SoI'm
+> > > > trusting
+> > > > people with access to documentation can review this.
+> > >=20
+> > > Yes, 0-intercepts are allowed, and this also happens when LPAR
+> > > has an
+> > > exit.
+> >=20
+> > =C2=A0From an offline conversation I'd had some months back:
+> >=20
+> > """
+> > The arch does allow ICODE=3D0 to be stored, but it's supposed to
+> > happen
+> > only upon a host interruption -- in which case the old PSW is
+> > supposed
+> > to point back at the SIE, to resume guest execution if the host
+> > should
+> > LPSW oldPSW.
+> > """
+>=20
+> Just re-read the architecture again and I agree, the SIE instruction
+> should
+> be nullified. So we should go forward with this somehow.
+>=20
+> Eric, can you maybe add this to devel for CI coverage so that we see
+> if there
+> are corner cases?=C2=A0
 
-> Oh, don't get me wrong, I completely agree that the code isn't straightfo=
-rward.
-> But I don't think this is a problem that can be reasonably solved in the =
-caching
-> code, at least not easily, as a lot of the oddities stem from KVM's memsl=
-ots, and
-> KVM's contracts with userspace and the guest.
+Sure thing.
 
-Thanks!  I agree with you.  It seems using flags to indicate that
-cross-page cache
-initialization failed and checking flags on following guest memory
-read and write also
-would mess up the code.  On the other hand, simply refusing to set up the
-cross-page cache initialization also would confuse users.  I think it
-is good to check
-the validity of asserts before using it.  Not sure if a brief comment
-is helpful to it.
+> Maybe also try to do some performance things (how many IPIs
+> can we get in guest2 when a guest3 is running and how many IPIs are
+> possible
+> in a guest3).
+>=20
+
+Fair enough. I'll see if I can come up with something and report back
+here.
 
