@@ -1,251 +1,365 @@
-Return-Path: <kvm+bounces-16226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16227-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBE3E8B6DFE
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 11:16:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 195A88B6E3D
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 11:27:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 920812844E7
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 09:16:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4F722853BC
+	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 09:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A10F128362;
-	Tue, 30 Apr 2024 09:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fGhIRGHB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73846199E8F;
+	Tue, 30 Apr 2024 09:22:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA97D127B68
-	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 09:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714468572; cv=fail; b=k40/fBXiUqnu3lvGlNpiFNaprhlVA2jesSagPOFDwWn/pN9vkKOxmlp6xni6BxEd6ELKDRySxQig1utbNgn4nCZOVBQrPObN1x3F5WpyWUAwritLn++iOD66w4GT/lRafqXW9QpsQTX2AvF7eijNzXciCZMFaoakS9vXhFYGSUo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714468572; c=relaxed/simple;
-	bh=PrTEIqms+yG524cCw6CvM6Hdm1QLBrlGqNO0AcKagdk=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=s+6qSnOUBIpg4Sr1L/TMV/P2eeFjko7jn8NLmt0jrSUE4INF3H3ECoywOdTY2G/0K/YTaWwA6zVzYqL7QgbU2MVLnZGs4Gg+f2HOW0NvN715i1IAHhwT/PlWRQ1ROpF7w8Zq4Ra4b1fNFpReCwnbjzguRL65sRCgC9QhXhbmUoU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fGhIRGHB; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714468571; x=1746004571;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PrTEIqms+yG524cCw6CvM6Hdm1QLBrlGqNO0AcKagdk=;
-  b=fGhIRGHB93L6I/xfa1ViW/4h18/Zjrt5myrU0ZuSmD5WuFmVCNpGeyoz
-   vEAgYu8UmUer1c9Wy30gOjHveKG8Qt4Bs7UmG8NUon3oNbKEas5qjyOHX
-   cwxCmiyk9ikWZbrcOt5LONH/e70FgotvNkSUVUwrKbrmGbWeE7qVy4R/9
-   qql4uJb9qXMQlFjmcpCtZfmRastjMNTAf/E6Mj3pyKh2CWgrTqqBuuIXI
-   YkLj3l4luvbwj0WcQFWPOc0aRHbWCrZgW3xl32E/QUFuEgHTnQQJZhz0K
-   E0LeLKfhMksq1ByiHQLm9/u6bUla9b8EB7guiARsLAcvekLjmDwGjcmuw
-   w==;
-X-CSE-ConnectionGUID: gDDwkzH8Tz2KnoRPQJc3lg==
-X-CSE-MsgGUID: Qhx5Bj7NT56LdY+mvgAV9w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11059"; a="10702897"
-X-IronPort-AV: E=Sophos;i="6.07,241,1708416000"; 
-   d="scan'208";a="10702897"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Apr 2024 02:16:10 -0700
-X-CSE-ConnectionGUID: foCpNHyGTAaDTF+jQTC1Iw==
-X-CSE-MsgGUID: yaXPmyjwSKGxzPXBH7qmXw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,241,1708416000"; 
-   d="scan'208";a="26503556"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Apr 2024 02:16:10 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 30 Apr 2024 02:16:09 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 30 Apr 2024 02:16:09 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 30 Apr 2024 02:16:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hh2rPvgsR85fC/otVhAoyLiZ6kxpEmQI1StKAzUMp5HG+VJKv5ztFbmKJCkUMSDlIXQsbcBEV6ZX8MkpesIosVYS4TfgbZ6CKE+EKiLvY9I7rcGP3d/wIl3RIViuDC2+qGyaWk4k/2PTJUibJsDKtYjYCwW+xt75mA5ZFn2Cj9ykG++9+bxXYWSGkPbmIQdHVfH6Gl+LqIUF8YPWEJHJTE3W+GqJMcLF+KEer4SeKtlpc56+MP5oX8uUDDFYjYW1wsWbkr90jMo6rRYb85pUYfemrepdC7u91DaTPkGbwSAFN6St6S71si030gnDeSoo6iJ5YUaiumYNO7y8Qq8NxA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hdsogOOjTLiVEuP+2DwUIDNJbx0a6zA9U72qOgk6Hco=;
- b=RTRyaEnIQuybRLu1/b8VHNWnJ/kVmlK5lhDWeiJq4qXVzKDTqI+VfWmz/Q5PzLjbUv/VsFMSaXn5rTNaLKzFm5QuwVTKBji/kGaERFjZI0vSFvkV2NZUwPvplTAAhGVaeiDGiTDlefeE7nBqQnK52NpVwGNA7/klMpIYda6prkcMEC2MRWldmUvBxj2AXI2iJfXu8CCgLBw9PwABy9/AtFBnLkFXqtNb965u9gBMCvOMFIGGkYbxPq87iT6EpZW+Px1+KIdPGrZi1FJWCwWaDR0ujoyN7dyG2Ttfm5Sl0LVECFeRXMZEyJZAyeditYI8wUb8uBGuHYshFflKizta2w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by MN6PR11MB8243.namprd11.prod.outlook.com (2603:10b6:208:46e::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Tue, 30 Apr
- 2024 09:16:07 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a%7]) with mapi id 15.20.7519.031; Tue, 30 Apr 2024
- 09:16:07 +0000
-Message-ID: <d466eb97-8c2b-4262-8213-b6a9987f59ea@intel.com>
-Date: Tue, 30 Apr 2024 17:19:40 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 12/12] iommu/vt-d: Add set_dev_pasid callback for
- nested domain
-Content-Language: en-US
-To: "Tian, Kevin" <kevin.tian@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
-	"jgg@nvidia.com" <jgg@nvidia.com>, "baolu.lu@linux.intel.com"
-	<baolu.lu@linux.intel.com>
-CC: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>, "eric.auger@redhat.com"
-	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
-	<chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
-	<iommu@lists.linux.dev>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>, "Pan,
- Jacob jun" <jacob.jun.pan@intel.com>
-References: <20240412081516.31168-1-yi.l.liu@intel.com>
- <20240412081516.31168-13-yi.l.liu@intel.com>
- <BN9PR11MB5276E97AECE1A58D9714B0C38C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <BN9PR11MB5276E97AECE1A58D9714B0C38C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0060.apcprd02.prod.outlook.com
- (2603:1096:4:54::24) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4AB129A72;
+	Tue, 30 Apr 2024 09:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714468924; cv=none; b=uZwQfIo2RbNLQW8Vp4Z9gkLopXRo1gxEMDpMdG3gpaCk5DYXcS5MZrUgruo/1GJkMES8mKwb3TewFWSuCWYsSk/XFxrNiXO5vnuk6vhf6BDHpDQA1j/7iqShn9MZ7jp2hbvt6RPCdKlUvCSpvmsr2YYDZro5UmdcuS1CADLzLE4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714468924; c=relaxed/simple;
+	bh=iYhXku7HTLMjaeeyU6kofVpf2Jfk/V1AqLTcPtAZyd4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=nHc2mwPHxYI1BmtHVKAirvEclGuUP/IG0haCxjTEoKz4FQg7PUmtYTANpPILl9O1IuThvN6xCrcnaqVJBAxC4zBo8a2Rs9bo7EJw43VzCFEg538IT9LB6kxb+NhacKTXB9g9ZwUrj71A3EbUjf7AWuDAoQT7nG4mF0NuRBXKRlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.173])
+	by gateway (Coremail) with SMTP id _____8BxV_A1uDBm_1oFAA--.18038S3;
+	Tue, 30 Apr 2024 17:21:57 +0800 (CST)
+Received: from [10.20.42.173] (unknown [10.20.42.173])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxsFUxuDBmcgILAA--.9409S3;
+	Tue, 30 Apr 2024 17:21:55 +0800 (CST)
+Subject: Re: [PATCH v2 2/2] LoongArch: Add steal time support in guest side
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux.dev
+References: <20240430014505.2102631-1-maobibo@loongson.cn>
+ <20240430014505.2102631-3-maobibo@loongson.cn>
+ <CAAhV-H4xN9rdBkSA4PJafr5MNqEiCbNHTgim_bj89YNaB4PFjw@mail.gmail.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <1e64a738-5197-8bd2-5977-9d95bdf61a2d@loongson.cn>
+Date: Tue, 30 Apr 2024 17:21:53 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|MN6PR11MB8243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 30e59dff-bbc7-4d9a-af69-08dc68f62abb
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005|7416005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?d1RMa1hXTVdJaGdwem9YbmhnRS9ENm9HQSs3dzc4aUlRMXpZaVorZ0k3VHdw?=
- =?utf-8?B?bk91R1RYLyt0aWltUGwrT0RvR3Vpam9BbUswOStCbjI1ZmVTNmRUbGFxN1ln?=
- =?utf-8?B?QXFTL0U0NTlGZ25KMU5XNlFpL0xFalNPZWpmbjErWm4yNUphL3JpYitnNVNw?=
- =?utf-8?B?NEI1WFJ1VWpCN3g0TWMxRTZNTjlNaHFhb0RtYWpzTjlmRFd5ZDlRRmhGckUw?=
- =?utf-8?B?MHhsSkZoWW1Hczl0WHNXSXJZVnFXR243MlpubjJlWGU3NWlrZ3lUS2ZyYTdR?=
- =?utf-8?B?NkFYcmVGTWJ6UDhVamNvOFZUUFZITjdxb3JLRVhZcG9SZjltT3dXcTh0K0U5?=
- =?utf-8?B?bEFMYnd6bHVmdGExdVZkMkgxZFRNMTV5eGJpYUJFOEhnTUtUMFZlTnFubUdr?=
- =?utf-8?B?QnRaT3h2Z09laFNPekd3TVpKRWNqaHZ1QVFTenhIdjYzZEFvQzB6QkEycC80?=
- =?utf-8?B?c2tsbkx1MXdZa0NrZ2YxZ1RlMiswNmlRSlVOUXpveTJIQThlVHdhbzU3TEx2?=
- =?utf-8?B?R21aSnlDVTA5ak1YckRpdW1jNXp2YjlCcFJRYUhsUDdRU1lTc0Q1aVRMZGhT?=
- =?utf-8?B?MUpPUmF1NGljbWtCeDc1K2JiZG5KZUsxZkIzUHJ3NUlMbUZtZUJGVlZFcTJD?=
- =?utf-8?B?Y3dTakkwNDltTlZ4bUxWam0vc0tKME5mcVU5SkI5NHVLY0VjTXloRzZFblNM?=
- =?utf-8?B?R0QrSElCa3VzWGgzNzdxdm9yQzQxc2l4WDBoVkkwN3ZPbXk0aEhzWHVZZ28r?=
- =?utf-8?B?aEdhRGNTWlUrUEpzenhFcTNvdWpoaDhuWlRSMzgzVVVyajRQaEZ4K3RzaStK?=
- =?utf-8?B?V1FzTWxiTjFFaWpycGM3YmxuVGNyK3F4d2FrQnAwOENtZDh6L0lYa0pRSEg2?=
- =?utf-8?B?MnhsWUpXOERpazZQdEpoL0NkU0RjM3pONDRBTmUvOWV0Z2NkUUQ3MlBFYVox?=
- =?utf-8?B?dUdBbXFCanZ3WGVLQ2RzNjlTMzFBUUlxaVRZb3JBTDdpVmZHZ2dXbW5oYXA3?=
- =?utf-8?B?blI5N2laek1qL3dIa2tnUnMzcjI2S1RMamlsem1BSzdIVWpsc2Y1bWdZZTJn?=
- =?utf-8?B?WURyb0ZmRjlqaldBVXFzcUpVMERRSzFwVXpaQlMxRTVmcENhR1VvUHU5a2JI?=
- =?utf-8?B?S2ZIT2tldXZlQXIwQUU2QXFLRjl4cEdBMkZPaDBZTHFOQ1JZNGdqVFpUc0I4?=
- =?utf-8?B?QkFJZndJNlI2akF4ZjA2YWp6MWxtNUZGZ2hhM1RQRUU3ZFlUZE92N2M4T1FN?=
- =?utf-8?B?NzVMV2lXczA4cXI1djFnMUo3eGVuS3RQOWpocXkvRzc4SzladlFhUkxPY0xH?=
- =?utf-8?B?bDdWWC84bG10cHN5TEUwSUNvbDdkUWxwK2dvVU9vNkFGREkvNnhRQkN6aFBr?=
- =?utf-8?B?clZBb0xBd3dvWG5kL1MrQ0NmNTNBZjNSbUNuR2hTbGJsWGxzMWNGeUpwZ0Iz?=
- =?utf-8?B?eTM5cEZnWU1lL05JMU5NY21iTUJFVzRTTE5uR0pLZDVtT1JtSWpab0taY0Rv?=
- =?utf-8?B?VC82c1F2ZDFJbzFjaXl2UzhjQVZRWkluNVdwRWxjTjlyNTMxQTh0aUtNeXg0?=
- =?utf-8?B?Z2FLYVk1UmFrakE1TXdTdThNc2VXaFUrTHZET0k4ZHFoaVpsRFllUDhyUDVV?=
- =?utf-8?B?NlB1SGRBcGpHMUpEMUNva1ZWeU53QjhYcU11RGttVS9oNmJaTkNRS0R0dWFR?=
- =?utf-8?B?Qm5hcHNRQXcyTTlLZWowSzhWKzVtWEJmZlVTbXMzMGJqb2ROVXVLdHNBPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eHFMazlQUS8vQzNmMG5FbXQ1dHdObkJSKzZzNFV4R1k1VDMrWWxYV1RwWlF3?=
- =?utf-8?B?MlJEaWF4RUdLazRadzBUSkE5aFYvdUJ1VVFmanNUaFRPTVB1aEw3amZqSURk?=
- =?utf-8?B?bVV4MzlYNC9kTkxrSGtwb2d1NDhocWJ4UzA3SGNLRFNvWElORzVxYko0Z2ww?=
- =?utf-8?B?RFhQQjF2SHRPSDdRL3VIdHBwMlZmRXNlYWY3cmpuQXU4Y3hUaXFNY094bGVt?=
- =?utf-8?B?YzFONzExUEpUdFE1QTdSTng5YXkzYzE3MDBDSHk0blF5WjRrK2ZlSElQRDYv?=
- =?utf-8?B?Yk14MEwxZmJ0ang4Vyt6YlZPT0taRHZKdkcxK0VTS0RxbnBsMTNKY2VtQUlP?=
- =?utf-8?B?MXhuYitTdzJhM0MvM0swY0FsUTFoOGxZQ1cwdWNveEVjczZzT3I4OEtMQjNT?=
- =?utf-8?B?d093NVpJWHU1LzVOSFJPMml3RFlRblFvbXRlWURzbXZBOS92STVUOFVUZVlr?=
- =?utf-8?B?eEw0dVUwVjhqR0NyaTNZaTgxVk9yQitLMHJJeWRBYXhDNjQ5bVFLSHVjTStG?=
- =?utf-8?B?ZkNqdGcvWlN4VEFDLzlNQ0p6c0pzSFkrVi9oZGVRTzlkZXdPcEdTN20wOEpu?=
- =?utf-8?B?dlJZWmdDQmNWQ2drV1JiV1c0QlBJWU1Fd01CYSs2blI4bzRpUjVkUDlGOE9t?=
- =?utf-8?B?bjYxMUpmd1krN2ZGWTNKbkNIU1RVOU1YR0FlSDBIOWN5dHRuU29ST0svOWtX?=
- =?utf-8?B?MFFFWW5JdVlYT1ZVS2hQeUw2ZUNBUjZHdldVbFNkbUJlZUJTaDNhbHlnaU5U?=
- =?utf-8?B?Z2NzU25MaVhUMkdFQU5KWDRiOWtXV1hnVUs1MUZBc2RxKy9sRUs5dTg2bTNI?=
- =?utf-8?B?WmpFck9zVGpCYTZHRjhacWQ0UXU3RjhPRGZ5WFpheUlwZDFGK29ZOFBkZk81?=
- =?utf-8?B?dVl2TnJxYTJaQVRzYzBWQzlhN3JHM2VYMThSTVhRYmhnZjh4WW83WHhFckpH?=
- =?utf-8?B?MHVQVVJNV0VnODA1WkNDNDVDS0Z1dXhuSXdRbWFrWTJVWHpLQjhOM2U2OS9B?=
- =?utf-8?B?bkdYN2xGdHdGNDc5MG9HRHFlZEVHUjNZRTdJKzYzNGFkZ294dnFHZFhBcHAy?=
- =?utf-8?B?ZTdNNDZOSkFlakNsRjJTenVMU0dyMHdhdEt3K1lGejJjMzNEWEhDTHk5dndL?=
- =?utf-8?B?a3haRkJRQkhid08zZmI2aGlGN1hPU0hVUHZPQzJTV3dob3Mzd0N1Q2JqdG00?=
- =?utf-8?B?VlViQVo4cHBlVjdUajFOeDFWa01zS0MvVmtWS3V2cnV1Ym1EdlliVXZGQVc2?=
- =?utf-8?B?TXFMZ2JVRlg4alhXVzVVYlNXUkRic2ZUWkltMmtMTGtJeDNNWUliSStxRlhJ?=
- =?utf-8?B?L3R1WmNzOU1PMXlZNElzMUlxR3gvSldjSG9abktZcSt0ZlRrNEdNQnBycWVX?=
- =?utf-8?B?c20yNXM0b005VEJzMTJOaitFdFQwRUJTam5FeDVKMWZoUFlEcDdhRjJmM1Rv?=
- =?utf-8?B?TWNkNnRTaEtvOGlvc3BNajlJZUlaVW5OM1RGem1KQmJPVGNKYnpzM0QyLzhT?=
- =?utf-8?B?TjV1Mjd1QmVsMkpJZVlKU2ZDbWR2T0l6U0JqL0hINEs5dHVFWXlQUW9qc2hu?=
- =?utf-8?B?QStDUFRLOFp4RTlSL0p6TityMWo5VDduOTlUMHVFcytnQWVKRVAyanYvUlFw?=
- =?utf-8?B?bVdaTEI5NEhXYkpwZ3dIODhDOUQ0Nk9IMHRDN0pvRFFOSFlLTU0waVNHY2pB?=
- =?utf-8?B?ZDRzYThGWnVrU1ZvQVFkandlSkdkQkxHM3RjYVZSakRWeHY5T0Vremh1aTEx?=
- =?utf-8?B?UUlLeWEybnFlbWtKWmhXNWd4b2JsZ3ZXeVp3TkRTMUppd0YzZThKWjBydWlJ?=
- =?utf-8?B?Y3M5NHh2cEFtNC9YTk4wazM5SGtRcHk2Tm80bEkyV3hIMGFuRHVPd0ExQzRz?=
- =?utf-8?B?c0tVWUt3YkV1clpUdkg1R2trOFM2eHB6VGN2VU9NalgyZHFhSUhNQW1tYlV3?=
- =?utf-8?B?L0QrNkVrMFRXTmtzYTBmVHJhQ0hObVdGUmxuQWZjRUFWTkNYK2pJejlUNHI3?=
- =?utf-8?B?RmZlcGVzU0VmR1B4UWsyVzBpMTkvMFdWMUR6Z3g4alpBNjhmaW44ZDVsa3NP?=
- =?utf-8?B?NCsyMmZZVXZUc2tvbkhVUW81UHRqRExpeU5Rd2J3SnhCdWpTS1FxNVhnYWwx?=
- =?utf-8?Q?RG/Izj3Qx4NAMYIedlj+e3cYy?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 30e59dff-bbc7-4d9a-af69-08dc68f62abb
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Apr 2024 09:16:07.1321
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F9UJjDa8+mnmivZnZ0pAosiDR9s244UnJNeOtePyLDG//4ObBbZRm2QY0lZxa9wXJ7/iHI2L1IBJ/w6UQSvIYw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8243
-X-OriginatorOrg: intel.com
+In-Reply-To: <CAAhV-H4xN9rdBkSA4PJafr5MNqEiCbNHTgim_bj89YNaB4PFjw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxsFUxuDBmcgILAA--.9409S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Wr4DAw4kKw48Ww45Zr15ZFc_yoW3Kr18pF
+	ZrCFs3KF48GF97ArsIqrWkWF1Yqrs7Gr12vFy2ka4fAFsFvr1xAr18WryY9Fyku397GF10
+	vFyrJrnI9a1Dt3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
+	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
+	67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
+	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
+	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
+	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
+	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jY
+	SoJUUUUU=
 
-On 2024/4/17 17:25, Tian, Kevin wrote:
->> From: Liu, Yi L <yi.l.liu@intel.com>
->> Sent: Friday, April 12, 2024 4:15 PM
->>
->> From: Lu Baolu <baolu.lu@linux.intel.com>
->>
->> This allows the upper layers to set a nested type domain to a PASID of a
->> device if the PASID feature is supported by the IOMMU hardware.
->>
->> The set_dev_pasid callback for non-nested domain has already be there, so
->> this only needs to add it for nested domains. Note that the S2 domain with
->> dirty tracking capability is not supported yet as no user for now.
+
+
+On 2024/4/30 下午4:23, Huacai Chen wrote:
+> Hi, Bibo,
 > 
-> S2 domain does support dirty tracking. Do you mean the specific
-> check in intel_iommu_set_dev_pasid() i.e. pasid-granular dirty
-> tracking is not supported yet?
+> On Tue, Apr 30, 2024 at 9:45 AM Bibo Mao <maobibo@loongson.cn> wrote:
+>>
+>> Percpu struct kvm_steal_time is added here, its size is 64 bytes and
+>> also defined as 64 bytes, so that the whole structure is in one physical
+>> page.
+>>
+>> When vcpu is onlined, function pv_enable_steal_time() is called. This
+>> function will pass guest physical address of struct kvm_steal_time and
+>> tells hypervisor to enable steal time. When vcpu is offline, physical
+>> address is set as 0 and tells hypervisor to disable steal time.
+>>
+>> Here is output of vmstat on guest when there is workload on both host
+>> and guest. It includes steal time stat information.
+>>
+>> procs -----------memory---------- -----io---- -system-- ------cpu-----
+>>   r  b   swpd   free  inact active   bi    bo   in   cs us sy id wa st
+>> 15  1      0 7583616 184112  72208    20    0  162   52 31  6 43  0 20
+>> 17  0      0 7583616 184704  72192    0     0 6318 6885  5 60  8  5 22
+>> 16  0      0 7583616 185392  72144    0     0 1766 1081  0 49  0  1 50
+>> 16  0      0 7583616 184816  72304    0     0 6300 6166  4 62 12  2 20
+>> 18  0      0 7583632 184480  72240    0     0 2814 1754  2 58  4  1 35
+>>
+>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>> ---
+>>   arch/loongarch/Kconfig                |  11 +++
+>>   arch/loongarch/include/asm/paravirt.h |   5 +
+>>   arch/loongarch/kernel/paravirt.c      | 131 ++++++++++++++++++++++++++
+>>   arch/loongarch/kernel/time.c          |   2 +
+>>   4 files changed, 149 insertions(+)
+>>
+>> diff --git a/arch/loongarch/Kconfig b/arch/loongarch/Kconfig
+>> index 0a1540a8853e..f3a03c33a052 100644
+>> --- a/arch/loongarch/Kconfig
+>> +++ b/arch/loongarch/Kconfig
+>> @@ -592,6 +592,17 @@ config PARAVIRT
+>>            over full virtualization.  However, when run without a hypervisor
+>>            the kernel is theoretically slower and slightly larger.
+>>
+>> +config PARAVIRT_TIME_ACCOUNTING
+>> +       bool "Paravirtual steal time accounting"
+>> +       select PARAVIRT
+>> +       help
+>> +         Select this option to enable fine granularity task steal time
+>> +         accounting. Time spent executing other tasks in parallel with
+>> +         the current vCPU is discounted from the vCPU power. To account for
+>> +         that, there can be a small performance impact.
+>> +
+>> +         If in doubt, say N here.
+>> +
+> Can we use a hidden selection manner, which means:
+> 
+> config PARAVIRT_TIME_ACCOUNTING
+>         def_bool PARAVIRT
+> 
+> Because I think we needn't give too many choices to users (and bring
+> much more effort to test).
+> 
+> PowerPC even hide all the PARAVIRT config options...
+> see arch/powerpc/platforms/pseries/Kconfig
 
-yes. We may remove this check when real usage comes. e.g. SIOV.
+I do not know neither :(  It is just used at beginning, maybe there is
+negative effect or potential issue, I just think that it can be selected 
+by user for easily debugging. After it is matured, hidden selection 
+manner can be used.
 
->> +static int intel_nested_set_dev_pasid(struct iommu_domain *domain,
->> +				      struct device *dev, ioasid_t pasid,
->> +				      struct iommu_domain *old)
+Regards
+Bibo Mao
+> 
+> Huacai
+> 
+>>   config ARCH_SUPPORTS_KEXEC
+>>          def_bool y
+>>
+>> diff --git a/arch/loongarch/include/asm/paravirt.h b/arch/loongarch/include/asm/paravirt.h
+>> index 58f7b7b89f2c..fe27fb5e82b8 100644
+>> --- a/arch/loongarch/include/asm/paravirt.h
+>> +++ b/arch/loongarch/include/asm/paravirt.h
+>> @@ -17,11 +17,16 @@ static inline u64 paravirt_steal_clock(int cpu)
+>>   }
+>>
+>>   int pv_ipi_init(void);
+>> +int __init pv_time_init(void);
+>>   #else
+>>   static inline int pv_ipi_init(void)
+>>   {
+>>          return 0;
+>>   }
+>>
+>> +static inline int pv_time_init(void)
 >> +{
->> +	struct device_domain_info *info = dev_iommu_priv_get(dev);
->> +	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->> +	struct intel_iommu *iommu = info->iommu;
+>> +       return 0;
+>> +}
+>>   #endif // CONFIG_PARAVIRT
+>>   #endif
+>> diff --git a/arch/loongarch/kernel/paravirt.c b/arch/loongarch/kernel/paravirt.c
+>> index 9044ed62045c..3f83afc7e2d2 100644
+>> --- a/arch/loongarch/kernel/paravirt.c
+>> +++ b/arch/loongarch/kernel/paravirt.c
+>> @@ -5,10 +5,13 @@
+>>   #include <linux/jump_label.h>
+>>   #include <linux/kvm_para.h>
+>>   #include <asm/paravirt.h>
+>> +#include <linux/reboot.h>
+>>   #include <linux/static_call.h>
+>>
+>>   struct static_key paravirt_steal_enabled;
+>>   struct static_key paravirt_steal_rq_enabled;
+>> +static DEFINE_PER_CPU(struct kvm_steal_time, steal_time) __aligned(64);
+>> +static int has_steal_clock;
+>>
+>>   static u64 native_steal_clock(int cpu)
+>>   {
+>> @@ -17,6 +20,57 @@ static u64 native_steal_clock(int cpu)
+>>
+>>   DEFINE_STATIC_CALL(pv_steal_clock, native_steal_clock);
+>>
+>> +static bool steal_acc = true;
+>> +static int __init parse_no_stealacc(char *arg)
+>> +{
+>> +       steal_acc = false;
+>> +       return 0;
+>> +}
+>> +early_param("no-steal-acc", parse_no_stealacc);
 >> +
->> +	if (iommu->agaw < dmar_domain->s2_domain->agaw)
->> +		return -EINVAL;
+>> +static u64 para_steal_clock(int cpu)
+>> +{
+>> +       u64 steal;
+>> +       struct kvm_steal_time *src;
+>> +       int version;
 >> +
-> 
-> this check is covered by prepare_domain_attach_device() already.
+>> +       src = &per_cpu(steal_time, cpu);
+>> +       do {
+>> +
+>> +               version = src->version;
+>> +               /* Make sure that the version is read before the steal */
+>> +               virt_rmb();
+>> +               steal = src->steal;
+>> +               /* Make sure that the steal is read before the next version */
+>> +               virt_rmb();
+>> +
+>> +       } while ((version & 1) || (version != src->version));
+>> +       return steal;
+>> +}
+>> +
+>> +static int pv_enable_steal_time(void)
+>> +{
+>> +       int cpu = smp_processor_id();
+>> +       struct kvm_steal_time *st;
+>> +       unsigned long addr;
+>> +
+>> +       if (!has_steal_clock)
+>> +               return -EPERM;
+>> +
+>> +       st = &per_cpu(steal_time, cpu);
+>> +       addr = per_cpu_ptr_to_phys(st);
+>> +
+>> +       /* The whole structure kvm_steal_time should be one page */
+>> +       if (PFN_DOWN(addr) != PFN_DOWN(addr + sizeof(*st))) {
+>> +               pr_warn("Illegal PV steal time addr %lx\n", addr);
+>> +               return -EFAULT;
+>> +       }
+>> +
+>> +       addr |= KVM_STEAL_PHYS_VALID;
+>> +       kvm_hypercall2(KVM_HCALL_FUNC_NOTIFY, KVM_FEATURE_STEAL_TIME, addr);
+>> +       return 0;
+>> +}
+>> +
+>>   #ifdef CONFIG_SMP
+>>   static void pv_send_ipi_single(int cpu, unsigned int action)
+>>   {
+>> @@ -110,6 +164,32 @@ static void pv_init_ipi(void)
+>>          if (r < 0)
+>>                  panic("SWI0 IRQ request failed\n");
+>>   }
+>> +
+>> +static void pv_disable_steal_time(void)
+>> +{
+>> +       if (has_steal_clock)
+>> +               kvm_hypercall2(KVM_HCALL_FUNC_NOTIFY, KVM_FEATURE_STEAL_TIME, 0);
+>> +}
+>> +
+>> +static int pv_time_cpu_online(unsigned int cpu)
+>> +{
+>> +       unsigned long flags;
+>> +
+>> +       local_irq_save(flags);
+>> +       pv_enable_steal_time();
+>> +       local_irq_restore(flags);
+>> +       return 0;
+>> +}
+>> +
+>> +static int pv_time_cpu_down_prepare(unsigned int cpu)
+>> +{
+>> +       unsigned long flags;
+>> +
+>> +       local_irq_save(flags);
+>> +       pv_disable_steal_time();
+>> +       local_irq_restore(flags);
+>> +       return 0;
+>> +}
+>>   #endif
+>>
+>>   static bool kvm_para_available(void)
+>> @@ -149,3 +229,54 @@ int __init pv_ipi_init(void)
+>>
+>>          return 1;
+>>   }
+>> +
+>> +static void pv_cpu_reboot(void *unused)
+>> +{
+>> +       pv_disable_steal_time();
+>> +}
+>> +
+>> +static int pv_reboot_notify(struct notifier_block *nb, unsigned long code,
+>> +               void *unused)
+>> +{
+>> +       on_each_cpu(pv_cpu_reboot, NULL, 1);
+>> +       return NOTIFY_DONE;
+>> +}
+>> +
+>> +static struct notifier_block pv_reboot_nb = {
+>> +       .notifier_call  = pv_reboot_notify,
+>> +};
+>> +
+>> +int __init pv_time_init(void)
+>> +{
+>> +       int feature;
+>> +
+>> +       if (!cpu_has_hypervisor)
+>> +               return 0;
+>> +       if (!kvm_para_available())
+>> +               return 0;
+>> +
+>> +       feature = read_cpucfg(CPUCFG_KVM_FEATURE);
+>> +       if (!(feature & KVM_FEATURE_STEAL_TIME))
+>> +               return 0;
+>> +
+>> +       has_steal_clock = 1;
+>> +       if (pv_enable_steal_time()) {
+>> +               has_steal_clock = 0;
+>> +               return 0;
+>> +       }
+>> +
+>> +       register_reboot_notifier(&pv_reboot_nb);
+>> +       static_call_update(pv_steal_clock, para_steal_clock);
+>> +       static_key_slow_inc(&paravirt_steal_enabled);
+>> +       if (steal_acc)
+>> +               static_key_slow_inc(&paravirt_steal_rq_enabled);
+>> +
+>> +#ifdef CONFIG_SMP
+>> +       if (cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN,
+>> +                       "loongarch/pvi_time:online",
+>> +                       pv_time_cpu_online, pv_time_cpu_down_prepare) < 0)
+>> +               pr_err("Failed to install cpu hotplug callbacks\n");
+>> +#endif
+>> +       pr_info("Using stolen time PV\n");
+>> +       return 0;
+>> +}
+>> diff --git a/arch/loongarch/kernel/time.c b/arch/loongarch/kernel/time.c
+>> index fd5354f9be7c..46d7d40c87e3 100644
+>> --- a/arch/loongarch/kernel/time.c
+>> +++ b/arch/loongarch/kernel/time.c
+>> @@ -15,6 +15,7 @@
+>>
+>>   #include <asm/cpu-features.h>
+>>   #include <asm/loongarch.h>
+>> +#include <asm/paravirt.h>
+>>   #include <asm/time.h>
+>>
+>>   u64 cpu_clock_freq;
+>> @@ -214,4 +215,5 @@ void __init time_init(void)
+>>
+>>          constant_clockevent_init();
+>>          constant_clocksource_init();
+>> +       pv_time_init();
+>>   }
+>> --
+>> 2.39.3
+>>
+>>
 
-This was added to avoid modifying the s2_domain's agaw. I'm fine to remove
-it personally as the existing attach path also needs to update domain's
-agaw per device attachment. @Baolu, how about your opinion?
-
--- 
-Regards,
-Yi Liu
 
