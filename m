@@ -1,179 +1,195 @@
-Return-Path: <kvm+bounces-16342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16344-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC448B8BDD
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 16:28:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 852418B8C32
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 16:55:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA781C211F4
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 14:28:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A59171C21890
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 14:55:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5130012F399;
-	Wed,  1 May 2024 14:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1D012F399;
+	Wed,  1 May 2024 14:55:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yIkInVr+"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1GmXMWg6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2060.outbound.protection.outlook.com [40.107.220.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C62612F369
-	for <kvm@vger.kernel.org>; Wed,  1 May 2024 14:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714573705; cv=none; b=sEVBbkAuNe2d7XQWWHcY3FO5Nc2XKwTq9ipuggiA7b9avpWhSh6tSaO5LkD1v0t6nfMbn2Ax0QnvK8oW+tgBM/cdJ7j9+c8tM+DAV3LYXO9+KhuEMAzjpXkinYSBEnAS2bXH4IBlvPcHdbwYISPahHVCveasy1Y/pMs5unZATO4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714573705; c=relaxed/simple;
-	bh=ejN7GdpXckHQzIXsC1FJGXtUzTE2KYdclj/fn/dJjrg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WZntnB/le90MRoOi22DWhk0zLQGMtcPUD81bhoKZNyoPYez77Slyv1s1gPAhqASjev1voIp4ZJwPQKEnviEWednXVUazTDQdSBUBVQgYQAIZD5K1mOhTKqviMnwi9qkJHL0jquPR26HNvBQb3zj6HwVfc3XpC2z11sogX16Y/Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yIkInVr+; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61acc68c1bdso9075827b3.1
-        for <kvm@vger.kernel.org>; Wed, 01 May 2024 07:28:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714573703; x=1715178503; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XN3PxGtZEQXNqntUnTfIz5xk/K9LwEoscNdYQ+/jCbc=;
-        b=yIkInVr+T2n9SqoReSpWC6KAI3dtuyHyqF3lQtWvSow7T07+bGmZXWhr/D/jWWZXG6
-         y5ZV3CtlY7DKLyOvsYU6R6PJEVtXlb7/7A9mGgIzZ9hd7/gk/cq5vAVqwlZDuMscRWO6
-         Vnwf7MeCNZcfoEDWziDkYZnzDHrdhSgL76ACkpU3JdjLixdwGCn7HzKMUQf8l4EDgYSV
-         0w+HSrjqbZIiH4EpBEitkRRrP5CLRz8UTk0lEwQlqJfcsZTOM/OcQY84IkuRhl+I1eFb
-         BN/E5oDtYLo6Oya7cu9vWEiLyVucoQrrOdBqFqpSL6yIQ6uPPmq8t57yEaeKrneSN0Gf
-         f/0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714573703; x=1715178503;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XN3PxGtZEQXNqntUnTfIz5xk/K9LwEoscNdYQ+/jCbc=;
-        b=gWh6GJLdRKtWDHKp3sEnBKeS9As6iGfSyRAfqPpz9KlWCzU2ccOn7fF65ej5rHKoOD
-         zyxlFgZ1KmauanpVjq+FviAo7q9btArLvXlybZfu56c+HL6R7pBAKd+TrPYnjDNuKEYY
-         xwQaurJDGHskx3Zj3Q6KEMONniz1o32QPBPhQp5Yw1ri3ryUsfc1IktPCVN266gMP3M8
-         +3Q3cfN9uWfvltWL3LvU8zqZvZJxNm5u48OeApJLw0pfJAhc/JVLpC7Mb8fCWr5R6xJ5
-         TwAtVnR78czvZOTkNnWHSsHmGiLXS63dXF0oFqwdXCVNafhZqlRD44lJTD4joV97vP1C
-         I66Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVHcOh7254gq4622aPsHyEIb8YAuI/ZpV+W0/XGvcZXZ2SHX5Cr2qKayv1YAGn2se1sbHWw4eGaTtwUc3v8sLc+ouR0
-X-Gm-Message-State: AOJu0Yzk+GBcUipX3++lt4sG+WSPA+qE3NvECeUI6RolIBdfegkaGg6a
-	89WV03uNB/R8tbiiOYTqhW66dDre2PxMPj1pR/0Yed9NfxgRXcl5wP2FRzHgXJezjQOkwmeyMLj
-	R3w==
-X-Google-Smtp-Source: AGHT+IHUezc4IZyZaMpXPcKS4Nl6spB8OORkXUO8w6Eu/n8Z2MEF5bQ0emcAkaZbOCNg6hB5INRjxf830ZQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:a283:0:b0:de5:a44c:25af with SMTP id
- c3-20020a25a283000000b00de5a44c25afmr1319848ybi.5.1714573703105; Wed, 01 May
- 2024 07:28:23 -0700 (PDT)
-Date: Wed, 1 May 2024 07:28:21 -0700
-In-Reply-To: <ZjGMn5tlq8edKZYv@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1200812D779;
+	Wed,  1 May 2024 14:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.60
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714575321; cv=fail; b=XSxPdN7DibLQbJrj48L526t/FfkktTLx2qYN1jjtoeeyAJqVOxYQ/A7QHMtITfIXZ2tO9xttVp853lXXx2sosIrhXHP+vRFTnsMCaV5o/OmsWXJIPHB09V/hpQwwAMiuV1pWu45wfJD7iBKUmTZq4PXFVI3eXLz2svMGJCuvmDo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714575321; c=relaxed/simple;
+	bh=ccbsUzLUDmt8K78GZGcF5FxkX7cIAD2kW6bE0+TtrfE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=AFlMjLKgAM6NrYGT2ZZMGn0kFcTWt4oCS8jlFthEWAbH5H94Muxehfj8fmTCIA7WuAzpp11I5Y2ChxatUCPamZBXfY/EsgQgLcQXX51Twc9xWlrg9mu5jrMsz85/tuSm1mKHV0m7CyyL5Zy5piQz1Rk7JntCFgBOqam/Fq89Jm8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1GmXMWg6; arc=fail smtp.client-ip=40.107.220.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N0g36Pt3WR5Voje2X0WvnEQSs4YUFoOkCLjM8+/3V2pqdsq3SaUy8gVItJWAdFU6+Kfe5lAVHouoGOZz/EqskQRJO0wP2Hvgqwpg8JM2Mp5XGhnYjxjCappc3D9lzDsZEdSAS/P7dSN52rd1q2aMt0uY0AqZhbq9MkqM/WfkDFfgWHtaCqzVXpgCTJ+zoR8PT3uuU48Q9xO63lOSWxEH4UatJ5c1OI3tlfQEvTIfLOgk+ruDJCMOOVGgsklzbXxaaNs9iWv4QoZ5MY3ocD833s0mORvfeIwaEGUNRWCpO/F3HOwh5cc0OAIQB2upC5VUaRBrxwUFr1a50L840fhf7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S3YTc/ZxExyvr4Z3THBrK5vr01b0hvDQ8hUGL9hQWyA=;
+ b=elD4kdglYG9OVnVxAskTDsir9C/yB3DBVrjjzfXa4R7r25E7cEvpSfJrLteRlOT23GNwojrkC4qXEykDiVPAFQeSjqLpKE2UbOSbyeNuKyhVMkDEDtAnPkyV8P9NrhgKh2ahybpXuLErIBv4TvPowi9Q/Lb+iCO6IGM2mQDjINqa9SFm/V/y3TPXOXgz+WSx/XgAZK7kBI24d6FKAmPDkkZcRYGSV5N474ZTeVQ6qn4JGxh5I3RnfBh8o3bza07O7jEtNWbr2zEMxvC3gOp5fGwCjNjuv7IeBAVwXYHKmqZsIa7AlbEhj0QtVZSDCV+++o7P3pjTdQkI0U1gpjOoWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S3YTc/ZxExyvr4Z3THBrK5vr01b0hvDQ8hUGL9hQWyA=;
+ b=1GmXMWg6kA12ABVWmjbXGSgvSE2GqwX3Xrp9n73fYViSMiMedr17URgNDKCUPVfbnSliEqTaNQVxg2oEenmvg5krfeYuk6kMFq3W5y1BpHPY5flwQPBuGLLBfxgYDHOKyUGJIsWVo0szMKdw0EsP3SJ/HQ13PHlv7c7PqvBSSxQ=
+Received: from CH2PR10CA0001.namprd10.prod.outlook.com (2603:10b6:610:4c::11)
+ by PH7PR12MB5925.namprd12.prod.outlook.com (2603:10b6:510:1d8::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.29; Wed, 1 May
+ 2024 14:55:15 +0000
+Received: from CH3PEPF00000016.namprd21.prod.outlook.com
+ (2603:10b6:610:4c:cafe::59) by CH2PR10CA0001.outlook.office365.com
+ (2603:10b6:610:4c::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.29 via Frontend
+ Transport; Wed, 1 May 2024 14:55:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH3PEPF00000016.mail.protection.outlook.com (10.167.244.121) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7519.0 via Frontend Transport; Wed, 1 May 2024 14:55:14 +0000
+Received: from chalupa-4a00host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 1 May
+ 2024 09:55:13 -0500
+From: Manali Shukla <manali.shukla@amd.com>
+To: <kvm@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+CC: <pbonzini@redhat.com>, <seanjc@google.com>, <shuah@kernel.org>,
+	<nikunj@amd.com>, <thomas.lendacky@amd.com>, <vkuznets@redhat.com>,
+	<manali.shukla@amd.com>, <bp@alien8.de>
+Subject: [PATCH v2 0/5] Add support for the Idle HLT intercept feature
+Date: Wed, 1 May 2024 14:54:28 +0000
+Message-ID: <20240501145433.4070-1-manali.shukla@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240430193157.419425-1-seanjc@google.com> <ZjGMn5tlq8edKZYv@linux.dev>
-Message-ID: <ZjJRhQhX_12eBvY-@google.com>
-Subject: Re: [PATCH 0/4] KVM: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Marc Zyngier <maz@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000016:EE_|PH7PR12MB5925:EE_
+X-MS-Office365-Filtering-Correlation-Id: d518f993-a97a-4dc7-bcf7-08dc69eeb558
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|82310400014|376005|36860700004|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QU9RMFRVeUU4YjJxMUk3cmx2Ky80cVhpVFBOWjk1bElaTHdTVlFycXRCUFdW?=
+ =?utf-8?B?TXZvenY2NFdzMEQzUkhJUXlCaTgvWE52TlBCa21EOW1PTDRPc3VnMzUwbUkx?=
+ =?utf-8?B?aU84bVM4SlZ2NTQwVnJUSm1XVzdYbmc4a0FaK1BlTVRGWUJnMkk0LzVlVTMv?=
+ =?utf-8?B?eFlFWittdFlEd0lCQno4TkFtOTkvYlpqdmxCbXdBM2hWMWRlc2I0QlEvK2Zt?=
+ =?utf-8?B?NE1CR092djlwL0lTM3h0QVEzMTQ0RXRpNzRnaXFsanUwNHRHQkJqR01rVzBW?=
+ =?utf-8?B?UU9aaXczWWQxakI1T1FjQzBablEyNFloeUpvcURCZGRSeGwrbGFzajhVOFVV?=
+ =?utf-8?B?SDQrZjVZN056anRLUDlXbXFaR1JVNXNydExwczFyZnZDaDU5WmdGV1dHTUNq?=
+ =?utf-8?B?TE90R2hMWVVJejBWRUh3NHNsSGV2S2djdm9MK3pMUnZwWGxmaVNvWDBwSkxl?=
+ =?utf-8?B?YVcxeGIxbThXNkpTRXZLMnd5Yld6Ty9mTmZvNDI1VVNjaVdhSXo3SzFDYzhU?=
+ =?utf-8?B?NWZmZEU4MDBEZG9iL1hMSVRVcnhoTmttNWsvRXJIWUZoK1N4QVZhY2FEMWlP?=
+ =?utf-8?B?T2J3L1JlZDhCV0JZbmlMempxZjdqNTlVeFJ2dHVJYUg2VDRFbFVrZ2xtbS9u?=
+ =?utf-8?B?dlVGV01CWllWK1NEV0poM09TM2pOZHJBdzJmeENRb0VFSC9Va0pzR1hENkgr?=
+ =?utf-8?B?eHFKRWVmSFZnNXJBSDlSQkJKcFdDK0VOanhFNjJuencwZ2tUNEhrdHdBQ2Ey?=
+ =?utf-8?B?a0tZb3hERHlDSVVmUjhxNm1oRThaMGJ3ODlJYldLMGNQNytGQXFqajA1dGpi?=
+ =?utf-8?B?b2ZCZ092R0FMR2hzQWpZdE1rUXpMZ3dpbTJUbGFoNExPbGJwTGR2UlF0QUhp?=
+ =?utf-8?B?TEZPeWF5cjRtV0RCaDRrSXBTT3VsQWV5dXM4L0t1OXBXRDN1SGhYSzEwUi9h?=
+ =?utf-8?B?VFlISW9PWk1neExpRlZtaU0yNUwwZ0RmeHdyTWdzdGhONDc0cDNUZlZObGJl?=
+ =?utf-8?B?YVdSYVhNV2J3TldQangwY0ZrZUNBcFg4V1h0eXlwUXFjZkRVTVd1STBSUTVF?=
+ =?utf-8?B?bkJ4bXk3TTZuVm5FdVJqMGhOSHczOHZrOGxsNFdtREREbUg1V1FsUkZMMDkv?=
+ =?utf-8?B?cU9BUXVUcFVHdEJ1NnRlYU1XNm9jRWp4NVpyenZCeXdXUXpNMTBpMFpHNHpG?=
+ =?utf-8?B?YjAvRmRidjlIOWY3ZHJiM2pRcFJlcmhNMG1tS2YreTk3Wk5uck90UmVkbmpC?=
+ =?utf-8?B?ZERlekN6Mi85WlJkaXFRSG8xajVWdG1rekZoVVpqVWhLcWJJa1R3anVhbXVD?=
+ =?utf-8?B?RFloN2cxWEt0SWZmTWJmQ3dEQ25tOENybU54S1Nqby94TFdPZ0UxVXZza2o1?=
+ =?utf-8?B?SnBpRXNvL2g2eHdMOGxOcUZrWFhOWDhxei9EUjhDdzVWSHRjTFRKdVlSQWVk?=
+ =?utf-8?B?R1FzcXFveHBhNTVXQUFHY0lXUS83c2FDVjlxdWNHNy84ZWdXQzFLdG9zSWEx?=
+ =?utf-8?B?RExxM3k0NGlyR0xxT3R5ZEFKQnpOdjNaUXNYd3pVZm1Zc3lBeWhEWXczZlM3?=
+ =?utf-8?B?ZENoL2xpRjVuc3F2NW80RVFLY3hJOUxzVWVtaVRTaTZRNXhEUzh4cFE0YmlN?=
+ =?utf-8?B?eStMREFtUGp0bWNBc3pHVk9XWUtnQ1Y3Q3JxS3ExNWJpUjAvZGN6TVRISGhZ?=
+ =?utf-8?B?cnNlUEE5a3dwakhiTm50ZkNHV0lEWFRKYW9jejRlQXZVanNxMEVvZUxLTngy?=
+ =?utf-8?Q?qRioY3njIYZnzrO6ulq5r3m1ZzXcNnI6FGhhydA?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400014)(376005)(36860700004)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2024 14:55:14.4767
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d518f993-a97a-4dc7-bcf7-08dc69eeb558
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000016.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5925
 
-On Wed, May 01, 2024, Oliver Upton wrote:
-> On Tue, Apr 30, 2024 at 12:31:53PM -0700, Sean Christopherson wrote:
-> > Drop kvm_arch_sched_in() and instead pass a @sched_in boolean to
-> > kvm_arch_vcpu_load().
-> > 
-> > While fiddling with an idea for optimizing state management on AMD CPUs,
-> > I wanted to skip re-saving certain host state when a vCPU is scheduled back
-> > in, as the state (theoretically) shouldn't change for the task while it's
-> > scheduled out.  Actually doing that was annoying and unnecessarily brittle
-> > due to having a separate API for the kvm_sched_in() case (the state save
-> > needed to be in kvm_arch_vcpu_load() for the common path).
-> > 
-> > E.g. I could have set a "temporary"-ish flag somewhere in kvm_vcpu, but (a)
-> > that's gross and (b) it would rely on the arbitrary ordering between
-> > sched_in() and vcpu_load() staying the same.
-> 
-> Another option would be to change the rules around kvm_arch_sched_in()
-> where the callee is expected to load the vCPU context.
-> 
-> The default implementation could just call kvm_arch_vcpu_load() directly
-> and the x86 implementation can order things the way it wants before
-> kvm_arch_vcpu_load().
-> 
-> I say this because ...
-> 
-> > The only real downside I see is that arm64 and riscv end up having to pass
-> > "false" for their direct usage of kvm_arch_vcpu_load(), and passing boolean
-> > literals isn't ideal.  But that can be solved by adding an inner helper that
-> > omits the @sched_in param (I almost added a patch to do that, but I couldn't
-> > convince myself it was necessary).
-> 
-> Needing to pass @sched_in for other usage of kvm_arch_vcpu_load() hurts
-> readability, especially when no other architecture besides x86 cares
-> about it.
+The upcoming new Idle HLT Intercept feature allows for the HLT
+instruction execution by a vCPU to be intercepted by the hypervisor
+only if there are no pending V_INTR and V_NMI events for the vCPU.
+When the vCPU is expected to service the pending V_INTR and V_NMI
+events, the Idle HLT intercept won’t trigger. The feature allows the
+hypervisor to determine if the vCPU is actually idle and reduces
+wasteful VMEXITs.
 
-Yeah, that bothers me too.
+Presence of the Idle HLT Intercept feature is indicated via CPUID
+function Fn8000_000A_EDX[30].
 
-I tried your suggestion of having x86's kvm_arch_sched_in() do kvm_arch_vcpu_load(),
-and even with an added kvm_arch_sched_out() to provide symmetry, the x86 code is
-kludgy, and even the common code is a bit confusing as it's not super obvious
-that kvm_sched_{in,out}() is really just kvm_arch_vcpu_{load,put}().
+Document for the Idle HLT intercept feature is available at [1].
 
-Staring a bit more at the vCPU flags we have, adding a "bool scheduled_out" isn't
-terribly gross if it's done in common code and persists across load() and put(),
-i.e. isn't so blatantly a temporary field.  And because it's easy, it could be
-set with WRITE_ONCE() so that if it can be read cross-task if there's ever a
-reason to do so.
+[1]: AMD64 Architecture Programmer's Manual Pub. 24593, April 2024,
+     Vol 2, 15.9 Instruction Intercepts (Table 15-7: IDLE_HLT).
+     https://bugzilla.kernel.org/attachment.cgi?id=306250
 
-The x86 code ends up being less ugly, and adding future arch/vendor code for
-sched_in() *or* sched_out() requires minimal churn, e.g. arch code doesn't need
-to override kvm_arch_sched_in().
+Testing Done:
+Added a selftest to test the Idle HLT intercept functionality.
+Tested SEV and SEV-ES guest for the Idle HLT intercept functionality.
 
-The only weird part is that vcpu->preempted and vcpu->ready have slightly
-different behavior, as they are cleared before kvm_arch_vcpu_load().  But the
-weirdness is really with those flags no having symmetry, not with scheduled_out
-itself.
+v1 -> v2
+- Done changes in svm_idle_hlt_test based on the review comments from Sean.
+- Added an enum based approach to get binary stats in vcpu_get_stat() which
+  doesn't use string to get stat data based on the comments from Sean.
+- Added self_halt() and cli() helpers based on the comments from Sean.
 
-Thoughts?
+Manali Shukla (5):
+  x86/cpufeatures: Add CPUID feature bit for Idle HLT intercept
+  KVM: SVM: Add Idle HLT intercept support
+  KVM: selftests: Add safe_halt() and cli() helpers to common code
+  KVM: selftests: Add an interface to read the data of named vcpu stat
+  KVM: selftests: KVM: SVM: Add Idle HLT intercept test
 
-static void kvm_sched_in(struct preempt_notifier *pn, int cpu)
-{
-	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
+ arch/x86/include/asm/cpufeatures.h            |  1 +
+ arch/x86/include/asm/svm.h                    |  1 +
+ arch/x86/include/uapi/asm/svm.h               |  2 +
+ arch/x86/kvm/svm/svm.c                        | 15 +++-
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../testing/selftests/kvm/include/kvm_util.h  | 66 ++++++++++++++
+ .../selftests/kvm/include/x86_64/processor.h  | 18 ++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 32 +++++++
+ .../selftests/kvm/x86_64/svm_idle_hlt_test.c  | 87 +++++++++++++++++++
+ 9 files changed, 220 insertions(+), 3 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/svm_idle_hlt_test.c
 
-	WRITE_ONCE(vcpu->preempted, false);
-	WRITE_ONCE(vcpu->ready, false);
 
-	__this_cpu_write(kvm_running_vcpu, vcpu);
-	kvm_arch_vcpu_load(vcpu, cpu);
+base-commit: 2489e6c9ebb57d6d0e98936479b5f586201379c7
+-- 
+2.34.1
 
-	WRITE_ONCE(vcpu->scheduled_out, false);
-}
-
-static void kvm_sched_out(struct preempt_notifier *pn,
-			  struct task_struct *next)
-{
-	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
-
-	WRITE_ONCE(vcpu->scheduled_out, true);
-
-	if (current->on_rq) {
-		WRITE_ONCE(vcpu->preempted, true);
-		WRITE_ONCE(vcpu->ready, true);
-	}
-	kvm_arch_vcpu_put(vcpu);
-	__this_cpu_write(kvm_running_vcpu, NULL);
-}
 
