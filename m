@@ -1,216 +1,358 @@
-Return-Path: <kvm+bounces-16374-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16375-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB0258B90AA
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 22:36:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D9F18B90B6
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 22:40:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 613911F22AA8
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 20:36:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15A2B2831C4
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 20:40:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2942D1649D1;
-	Wed,  1 May 2024 20:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E45163A80;
+	Wed,  1 May 2024 20:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FohSaX+p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="20M3j84O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E113C537FB
-	for <kvm@vger.kernel.org>; Wed,  1 May 2024 20:36:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69A212F378
+	for <kvm@vger.kernel.org>; Wed,  1 May 2024 20:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714595796; cv=none; b=kPNJRuwJNOATHLEIOn50HF4izMknWxZHyH1tUuleEZVjQ/SbBclv5WrbUpqdDKjyEq2UZlIU5L0UrlE8bVIhMrBHKqYOOYUC7w+aY04NIJbJPsdP3mRRozYGHwz5WBELAgM++dU+OxbKSaJ2t7ir4EuhT8p6MMRllB6vILiwi1Y=
+	t=1714596029; cv=none; b=CwZgu+C4Fpc9QVOgSBoJZJDrqMXM523sBLwsjsuoT8QUR96/24uugxAqD6SOCQPjevYP3ZVGwcoyvFPlEqBhrrt9hnfeKUZYaxKpv4MMEnYB5SQEDBFERpNIe4cKPy5i59kqVfZ+yuSCrssq7xudX0uHw0fL1CmbFa91DldPGaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714595796; c=relaxed/simple;
-	bh=CZ+1HcLUExAb6ySEYUXpONpcatEAnu4JCOSJlhyZEdM=;
+	s=arc-20240116; t=1714596029; c=relaxed/simple;
+	bh=/AzTAlFYOZyP1Z6rVIGJkxs2GFf5RmhfZpm3TZuulJY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HIXU4TUA/DuD5509oZG9r5LlDIPQTzJgBYOY8nbzFMCe0co9b6AwulqU6y0OgrePUOplqKnYe54fs/KUoPm8h4YiNFiXScypcahrSRfRZzeIbhfjaz58cHT2vdqkvPWmycGgy9G1+twXFDm4AxasR7021ur5CzJjOMNm47T3cpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FohSaX+p; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=h7SwBuXx6MGTenyizu0dsmpS2Fh/Y/PWzbMlWfiM95Qe56u8eXrnmV9DbguhsC2W12yT6kHOZJGtUzmQC2zYr8R3KZjDAsLkKe7DXLnky9uRHTBqWxavZoCLo6eX//fVBmzBTKe1HEMA5zbOfVdSUvshBKx6pvtbnsH35jzs1jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=20M3j84O; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61e0949fc17so9959357b3.0
-        for <kvm@vger.kernel.org>; Wed, 01 May 2024 13:36:34 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be75e21fdso50499467b3.0
+        for <kvm@vger.kernel.org>; Wed, 01 May 2024 13:40:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714595794; x=1715200594; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HoqEk2d89pzrIsVW2yhRLPcbk87IRHxiIo5sAWdVlus=;
-        b=FohSaX+p/gHXG6zLC8UucV9GzTAS0UZhiUvlDqpzByYy1Zvgcwssn+9grHZKlR77Qa
-         6LSskw99w2flR3zqLaSJMDm7fuY345NcOHueq/kerme/INHe5zi2c3A5X5LuRouiU78i
-         qen/axYlgVB6hAeoatHlbdUUQIFnJu/8bCyN+Nyu8Po+nBBlhiNR9S+qngexNabD7DGQ
-         LondwNsjvJOJIHxKYFxF3FJrsl7CGYeK8i8APiXJpo5Mh8XFI5mh9Mn2v7liL0oZztz4
-         5l0dyXNOJ1+UNMUpD4c9mM3uWs+A9dqm6AYlBE7F0j1xkRWwC3dtD/vH1MFl06a1BIV0
-         ssEA==
+        d=google.com; s=20230601; t=1714596027; x=1715200827; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ocZGRDwSRA0JErEaXo6J6ZFLNp2SZZV6No2MVqBh+RU=;
+        b=20M3j84OINIVXaSnce3XZ2v0EoWCSRaQoU3neBkWTbrIJ7zTlRjd+61NFh/BNcCi7m
+         a2ZWWD2oLlfYSzVcTEXvzmVN00/+nnApQjbFBmkoXjzKaKTNXD5ayikvk8U12PKqglMH
+         bjK/UCgJF/ozGrM/xTp7xUDqbT0Q+OsrywvUL3eSG7yuZjYCrjar3NzlaBH59vC8L/yh
+         CUnxZQQj4K9CuV/gg4DBa2Y8BKtHbQfPyciO5dS45Fp3cxRSM8kaWdIxJke5qcd9riA1
+         swxFDjKG1N5vrD0w06kBv1RQ6JWV8atfoeLt7cxN6gN7BUYEbQ+SCbVnue4797LiVwz5
+         eUsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714595794; x=1715200594;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HoqEk2d89pzrIsVW2yhRLPcbk87IRHxiIo5sAWdVlus=;
-        b=iZ81+/QR/UPqB0ZQWFF774qvar0LsadO3cV0TAi4MaumthMwnytTVCBqFMIvyhpZs6
-         WY6i7CbIDvidYmyeNd4mRfTM/EiOjjG0/lVKZqosKy1RRJi2KW3muVessPiMeC1uBNQC
-         fbAPztFIuH3U5seGc/bTBnrXubqZ38UMJ5xpj5JtHXmdsnvj6/Ny/PxK9GCOdFciNTcC
-         VZSstyh57L8f9ZGv6xtBeEdakL3SjQEJ+iKfkHfhHP3a9e3sqJOvCfborz072OfFP4fW
-         GPm25D5xVRdspVIUPaB1XOWNTWER3xJOmpNOe2sfg+3XkDL+pMVWYWowHBk6h4pZetpj
-         58tg==
-X-Forwarded-Encrypted: i=1; AJvYcCXO/yODt6mrSM/buJbqC9yQPZnCMivWWqIVdHrlNO1PKH1h+MIpd4zYsAeAVOnQTulTneoBL1eNXC528XauTOaASveR
-X-Gm-Message-State: AOJu0YzXN9uf4wIs5V26Pt/8KDTaNPn0hIHcmE1OLbaGGG1JRWqIwITm
-	CV/NeUXeczJkDgbY1e1kE1lVaIRSxUWh+Ao+gvl+vTCrzQbM0GXp64cjXlZiKcMTazZxG4JthEu
-	duQ==
-X-Google-Smtp-Source: AGHT+IGBl505/z0XBb88u3lR/7JlRlWZqwWbuFXHJgVFCCMMlH1u96V0iZ5bQhdv/H411OBPpCC2caAJc9I=
+        d=1e100.net; s=20230601; t=1714596027; x=1715200827;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ocZGRDwSRA0JErEaXo6J6ZFLNp2SZZV6No2MVqBh+RU=;
+        b=YfajYdKeCQSqD139c3OAuUmGT2+wCsM0KphKBSp/vLwr132CGj+9nW9m11yFOmqOLf
+         whcd3Tr7/ZI+spnIc8KjiX79hlRz7qPSiNMV98/8RfcfeRVIzZW4Py0Xd5qvQw2yQ7Yp
+         RGof3tRkg8g7i3mVy6dizy00rdvAVf7/T9e2MNyYbzw6Uc9HSQM1ZQGpb44MMBgZh8hb
+         mtHMvxE1HDkPvX7nuDZLX0RErBmZf1MFIy3Stywsaj//hbxe9DRqC/ya5pIjxnS5Qf2q
+         VEH4UwRu0tznxoIrTgSB9bYZiO6cfATJ4cXCoN0w/CXwJk0eeDvhwJ/xj/DnEa628WxM
+         rkbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUobDuXYTaYSdCwwjrVK3UFMxIl9Gx69qcWHdcbTIrK6KmgOZRyW7LMXtjxAUeuYZhX36vAxdnqKU5RqoRW+ZXm6H+Q
+X-Gm-Message-State: AOJu0YwKHdlzWwTbjzn/flE0olTzow+xEq11kDr/JQn5jqZNm5IWxNI8
+	OqelaXtUs9vIIxfN+IgR863d4mELq38EtW6ToYzvkSghBv/+CYB0XPWnAXjtRYOoUY0eIw1JLzF
+	Ydg==
+X-Google-Smtp-Source: AGHT+IF0X/E3JWdTyxCnsrqVP3nouBjTkZAU0SvCzTLrkZadu9iBGhLYkR7qpI5ByA84Kg9q14a4ayExcEg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4fc5:0:b0:61b:982:4da0 with SMTP id
- d188-20020a814fc5000000b0061b09824da0mr825560ywb.0.1714595793888; Wed, 01 May
- 2024 13:36:33 -0700 (PDT)
-Date: Wed, 1 May 2024 13:36:32 -0700
-In-Reply-To: <CAL715WJbYNqm2SXiTgqWHs34DtRfdFE7Hx48X_4ASHyQXeaPzA@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a0d:d60e:0:b0:61b:e8a2:6f4b with SMTP id
+ y14-20020a0dd60e000000b0061be8a26f4bmr1589ywd.1.1714596026913; Wed, 01 May
+ 2024 13:40:26 -0700 (PDT)
+Date: Wed, 1 May 2024 13:40:25 -0700
+In-Reply-To: <20240219074733.122080-11-weijiang.yang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <CAL715WJCHJD_wcJ+r4TyWfvmk9uNT_kPy7Pt=CHkB-Sf0D4Rqw@mail.gmail.com>
- <ff4a4229-04ac-4cbf-8aea-c84ccfa96e0b@linux.intel.com> <CAL715WJKL5__8RU0xxUf0HifNVQBDRODE54O2bwOx45w67TQTQ@mail.gmail.com>
- <5f5bcbc0-e2ef-4232-a56a-fda93c6a569e@linux.intel.com> <ZiwEoZDIg8l7-uid@google.com>
- <CAL715WJ4jHmto3ci=Fz5Bwx2Y=Hiy1MoFCpcUhz-C8aPMqYskw@mail.gmail.com>
- <b9095b0d-72f0-4e54-8d2e-f965ddff06bb@linux.intel.com> <CAL715WKm0X9NJxq8SNGD5EJomzY4DDSiwLb1wMMgcgHqeZ64BA@mail.gmail.com>
- <Zi_cle1-5SZK2558@google.com> <CAL715WJbYNqm2SXiTgqWHs34DtRfdFE7Hx48X_4ASHyQXeaPzA@mail.gmail.com>
-Message-ID: <ZjKn0HKKJrWTT4E8@google.com>
-Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
- state for Intel CPU
+References: <20240219074733.122080-1-weijiang.yang@intel.com> <20240219074733.122080-11-weijiang.yang@intel.com>
+Message-ID: <ZjKouS2ZyH7cXOqM@google.com>
+Subject: Re: [PATCH v10 10/27] KVM: x86: Refine xsave-managed guest
+ register/MSR reset handling
 From: Sean Christopherson <seanjc@google.com>
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@linux.intel.com>, 
-	maobibo <maobibo@loongson.cn>, Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com, 
-	peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com, 
-	jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com, 
-	irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com, 
-	chao.gao@intel.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Yang Weijiang <weijiang.yang@intel.com>
+Cc: pbonzini@redhat.com, dave.hansen@intel.com, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, peterz@infradead.org, 
+	chao.gao@intel.com, rick.p.edgecombe@intel.com, mlevitsk@redhat.com, 
+	john.allen@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, May 01, 2024, Mingwei Zhang wrote:
-> On Mon, Apr 29, 2024 at 10:44=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > On Sat, Apr 27, 2024, Mingwei Zhang wrote:
-> > > That's ok. It is about opinions and brainstorming. Adding a parameter
-> > > to disable preemption is from the cloud usage perspective. The
-> > > conflict of opinions is which one you prioritize: guest PMU or the
-> > > host PMU? If you stand on the guest vPMU usage perspective, do you
-> > > want anyone on the host to shoot a profiling command and generate
-> > > turbulence? no. If you stand on the host PMU perspective and you want
-> > > to profile VMM/KVM, you definitely want accuracy and no delay at all.
-> >
-> > Hard no from me.  Attempting to support two fundamentally different mod=
-els means
-> > twice the maintenance burden.  The *best* case scenario is that usage i=
-s roughly
-> > a 50/50 spit.  The worst case scenario is that the majority of users fa=
-vor one
-> > model over the other, thus resulting in extremely limited tested of the=
- minority
-> > model.
-> >
-> > KVM already has this problem with scheduler preemption models, and it's=
- painful.
-> > The overwhelming majority of KVM users run non-preemptible kernels, and=
- so our
-> > test coverage for preemtible kernels is abysmal.
-> >
-> > E.g. the TDP MMU effectively had a fatal flaw with preemptible kernels =
-that went
-> > unnoticed for many kernel releases[*], until _another_ bug introduced w=
-ith dynamic
-> > preemption models resulted in users running code that was supposed to b=
-e specific
-> > to preemtible kernels.
-> >
-> > [* https://lore.kernel.org/kvm/ef81ff36-64bb-4cfe-ae9b-e3acf47bff24@pro=
-xmox.com
-> >
->=20
-> I hear your voice, Sean.
->=20
-> In our cloud, we have a host-level profiling going on for all cores
-> periodically. It will be profiling X seconds every Y minute. Having
-> the host-level profiling using exclude_guest is fine, but stopping the
-> host-level profiling is a no no. Tweaking the X and Y is theoretically
-> possible, but highly likely out of the scope of virtualization. Now,
-> some of the VMs might be actively using vPMU at the same time. How can
-> we properly ensure the guest vPMU has consistent performance? Instead
-> of letting the VM suffer from the high overhead of PMU for X seconds
-> of every Y minute?
->=20
-> Any thought/help is appreciated. I see the logic of having preemption
-> there for correctness of the profiling on the host level. Doing this,
-> however, negatively impacts the above business usage.
->=20
-> One of the things on top of the mind is that: there seems to be no way
-> for the perf subsystem to express this: "no, your host-level profiling
-> is not interested in profiling the KVM_RUN loop when our guest vPMU is
-> actively running".
+The shortlog is a bit stale now that it only deals with XSTATE.  This?
 
-For good reason, IMO.  The KVM_RUN loop can reach _far_ outside of KVM, esp=
-ecially
-when IRQs and NMIs are involved.  I don't think anyone can reasonably say t=
-hat
-profiling is never interested in what happens while a task in KVM_RUN.  E.g=
-. if
-there's a bottleneck in some memory allocation flow that happens to be trig=
-gered
-in the greater KVM_RUN loop, that's something we'd want to show up in our p=
-rofiling
-data.
+  KVM: x86: Zero XSTATE components on INIT by iterating over supported features
 
-And if our systems our properly configured, for VMs with a mediated/passthr=
-ough
-PMU, 99.99999% of their associated pCPU's time should be spent in KVM_RUN. =
- If
-that's our reality, what's the point of profiling if KVM_RUN is out of scop=
-e?
+On Sun, Feb 18, 2024, Yang Weijiang wrote:
+> Tweak the code a bit to facilitate resetting more xstate components in
+> the future, e.g., CET's xstate-managed MSRs.
+> 
+> No functional change intended.
+> 
+> Suggested-by: Chao Gao <chao.gao@intel.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/x86.c | 30 +++++++++++++++++++++++++++---
+>  1 file changed, 27 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 10847e1cc413..5a9c07751c0e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12217,11 +12217,27 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>  		static_branch_dec(&kvm_has_noapic_vcpu);
+>  }
+>  
+> +#define XSTATE_NEED_RESET_MASK	(XFEATURE_MASK_BNDREGS | \
+> +				 XFEATURE_MASK_BNDCSR)
+> +
+> +static bool kvm_vcpu_has_xstate(unsigned long xfeature)
+> +{
+> +	switch (xfeature) {
+> +	case XFEATURE_MASK_BNDREGS:
+> +	case XFEATURE_MASK_BNDCSR:
+> +		return kvm_cpu_cap_has(X86_FEATURE_MPX);
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+>  void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  {
+>  	struct kvm_cpuid_entry2 *cpuid_0x1;
+>  	unsigned long old_cr0 = kvm_read_cr0(vcpu);
+> +	DECLARE_BITMAP(reset_mask, 64);
 
-We could make the context switching logic more sophisticated, e.g. trigger =
-a
-context switch when control leaves KVM, a la the ASI concepts, but that's a=
-ll but
-guaranteed to be overkill, and would have a very high maintenance cost.
+I vote to use a u64 instead of a bitmask.  The result cast isn't exactly pretty,
+but it's not all that uncommon, and it's easy enough to make it "safe" by adding
+BUILD_BUG_ON().
 
-But we can likely get what we want (low observed overhead from the guest) w=
-hile
-still context switching PMU state in vcpu_enter_guest().  KVM already handl=
-es the
-hottest VM-Exit reasons in its fastpath, i.e without triggering a PMU conte=
-xt
-switch.  For a variety of reason, I think we should be more aggressive and =
-handle
-more VM-Exits in the fastpath, e.g. I can't think of any reason KVM can't h=
-andle
-fast page faults in the fastpath.
+On the flip side, using the bitmap_*() APIs for super simple bitwise-OR/AND/TEST
+operations makes the code harder to read.
 
-If we handle that overwhelming majority of VM-Exits in the fastpath when th=
-e guest
-is already booted, e.g. when vCPUs aren't taking a high number of "slow" VM=
--Exits,
-then the fact that slow VM-Exits trigger a PMU context switch should be a n=
-on-issue,
-because taking a slow exit would be a rare operation.
+>  	unsigned long new_cr0;
+> +	unsigned int i;
+>  
+>  	/*
+>  	 * Several of the "set" flows, e.g. ->set_cr0(), read other registers
+> @@ -12274,7 +12290,12 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	kvm_async_pf_hash_reset(vcpu);
+>  	vcpu->arch.apf.halted = false;
+>  
+> -	if (vcpu->arch.guest_fpu.fpstate && kvm_mpx_supported()) {
+> +	bitmap_from_u64(reset_mask, (kvm_caps.supported_xcr0 |
+> +				     kvm_caps.supported_xss) &
+> +				    XSTATE_NEED_RESET_MASK);
+> +
+> +	if (vcpu->arch.guest_fpu.fpstate &&
+> +	    !bitmap_empty(reset_mask, XFEATURE_MAX)) {
+>  		struct fpstate *fpstate = vcpu->arch.guest_fpu.fpstate;
+>  
+>  		/*
+> @@ -12284,8 +12305,11 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  		if (init_event)
+>  			kvm_put_guest_fpu(vcpu);
+>  
+> -		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDREGS);
+> -		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDCSR);
+> +		for_each_set_bit(i, reset_mask, XFEATURE_MAX) {
+> +			if (!kvm_vcpu_has_xstate(i))
+> +				continue;
+> +			fpstate_clear_xstate_component(fpstate, i);
+> +		}
 
-I.e. rather than solving the overhead problem by moving around the context =
-switch
-logic, solve the problem by moving KVM code inside the "guest PMU" section.=
-  It's
-essentially a different way of doing the same thing, with the critical diff=
-erence
-being that only hand-selected flows are excluded from profiling, i.e. only =
-the
-flows that need to be blazing fast and should be uninteresting from a profi=
-ling
-perspective are excluded.
+A few intertwined thoughts:
+
+ 1. fpstate is zero allocated, and KVM absolutely relies on that, e.g. KVM doesn't
+    manually zero out the XSAVE fields that are preserved on INIT, but zeroed on
+    RESET.
+
+ 2. That means there is no need to manually clear XSTATE components during RESET,
+    as KVM doesn't support standalone RESET, i.e. it's only cleared during vCPU
+    creation, when guest FPU state is guaranteed to be '0'.
+
+ 3. That makes XSTATE_NEED_RESET_MASK a misnomer, as it's literally the !RESET
+    path that is relevant.  E.g. it should be XSTATE_CLEAR_ON_INIT_MASK or so.
+
+ 4. If we add a helper, then XSTATE_NEED_RESET_MASK is probably unneeded.
+
+So, what if we slot in the below (compile tested only) patch as prep work?  Then
+this patch becomes:
+
+---
+ arch/x86/kvm/x86.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b441bf61b541..b00730353a28 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12220,6 +12220,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ static void kvm_xstate_reset(struct kvm_vcpu *vcpu, bool init_event)
+ {
+ 	struct fpstate *fpstate = vcpu->arch.guest_fpu.fpstate;
++	u64 xfeatures_mask;
++	int i;
+ 
+ 	/*
+ 	 * Guest FPU state is zero allocated and so doesn't need to be manually
+@@ -12233,16 +12235,20 @@ static void kvm_xstate_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	 * are unchanged.  Currently, the only components that are zeroed and
+ 	 * supported by KVM are MPX related.
+ 	 */
+-	if (!kvm_mpx_supported())
++	xfeatures_mask = (kvm_caps.supported_xcr0 | kvm_caps.supported_xss) &
++			 (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR);
++	if (!xfeatures_mask)
+ 		return;
+ 
++	BUILD_BUG_ON(XFEATURE_MAX >= sizeof(xfeatures_mask));
++
+ 	/*
+ 	 * All paths that lead to INIT are required to load the guest's FPU
+ 	 * state (because most paths are buried in KVM_RUN).
+ 	 */
+ 	kvm_put_guest_fpu(vcpu);
+-	fpstate_clear_xstate_component(fpstate, XFEATURE_BNDREGS);
+-	fpstate_clear_xstate_component(fpstate, XFEATURE_BNDCSR);
++	for_each_set_bit(i, xfeatures_mask, XFEATURE_MAX)
++		fpstate_clear_xstate_component(fpstate, i);
+ 	kvm_load_guest_fpu(vcpu);
+ }
+ 
+
+base-commit: efca8b27900dfec160b6ba90820fa2ced81de904
+-- 
+
+
+and the final code looks like:
+
+
+static void kvm_xstate_reset(struct kvm_vcpu *vcpu, bool init_event)
+{
+	struct fpstate *fpstate = vcpu->arch.guest_fpu.fpstate;
+	u64 xfeatures_mask;
+	int i;
+
+	/*
+	 * Guest FPU state is zero allocated and so doesn't need to be manually
+	 * cleared on RESET, i.e. during vCPU creation.
+	 */
+	if (!init_event || !fpstate)
+		return;
+
+	/*
+	 * On INIT, only select XSTATE components are zeroed, most compoments
+	 * are unchanged.  Currently, the only components that are zeroed and
+	 * supported by KVM are MPX and CET related.
+	 */
+	xfeatures_mask = (kvm_caps.supported_xcr0 | kvm_caps.supported_xss) &
+			 (XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR |
+			  XFEATURE_MASK_CET_USER | XFEATURE_MASK_CET_KERNEL);
+	if (!xfeatures_mask)
+		return;
+
+	BUILD_BUG_ON(XFEATURE_MAX >= sizeof(xfeatures_mask) * BITS_PER_BYTE);
+
+	/*
+	 * All paths that lead to INIT are required to load the guest's FPU
+	 * state (because most paths are buried in KVM_RUN).
+	 */
+	kvm_put_guest_fpu(vcpu);
+	for_each_set_bit(i, (unsigned long *)&xfeatures_mask, XFEATURE_MAX)
+		fpstate_clear_xstate_component(fpstate, i);
+	kvm_load_guest_fpu(vcpu);
+}
+
+
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Wed, 1 May 2024 12:12:31 -0700
+Subject: [PATCH] KVM: x86: Manually clear MPX state only on INIT
+
+Don't manually clear/zero MPX state on RESET, as the guest FPU state is
+zero allocated and KVM only does RESET during vCPU creation, i.e. the
+relevant state is guaranteed to be all zeroes.
+
+Opportunistically move the relevant code into a helper in anticipation of
+adding support for CET shadow stacks, which also has state that is zeroed
+on INIT.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 46 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 10847e1cc413..b441bf61b541 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12217,6 +12217,35 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 		static_branch_dec(&kvm_has_noapic_vcpu);
+ }
+ 
++static void kvm_xstate_reset(struct kvm_vcpu *vcpu, bool init_event)
++{
++	struct fpstate *fpstate = vcpu->arch.guest_fpu.fpstate;
++
++	/*
++	 * Guest FPU state is zero allocated and so doesn't need to be manually
++	 * cleared on RESET, i.e. during vCPU creation.
++	 */
++	if (!init_event || !fpstate)
++		return;
++
++	/*
++	 * On INIT, only select XSTATE components are zeroed, most compoments
++	 * are unchanged.  Currently, the only components that are zeroed and
++	 * supported by KVM are MPX related.
++	 */
++	if (!kvm_mpx_supported())
++		return;
++
++	/*
++	 * All paths that lead to INIT are required to load the guest's FPU
++	 * state (because most paths are buried in KVM_RUN).
++	 */
++	kvm_put_guest_fpu(vcpu);
++	fpstate_clear_xstate_component(fpstate, XFEATURE_BNDREGS);
++	fpstate_clear_xstate_component(fpstate, XFEATURE_BNDCSR);
++	kvm_load_guest_fpu(vcpu);
++}
++
+ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ {
+ 	struct kvm_cpuid_entry2 *cpuid_0x1;
+@@ -12274,22 +12303,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	kvm_async_pf_hash_reset(vcpu);
+ 	vcpu->arch.apf.halted = false;
+ 
+-	if (vcpu->arch.guest_fpu.fpstate && kvm_mpx_supported()) {
+-		struct fpstate *fpstate = vcpu->arch.guest_fpu.fpstate;
+-
+-		/*
+-		 * All paths that lead to INIT are required to load the guest's
+-		 * FPU state (because most paths are buried in KVM_RUN).
+-		 */
+-		if (init_event)
+-			kvm_put_guest_fpu(vcpu);
+-
+-		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDREGS);
+-		fpstate_clear_xstate_component(fpstate, XFEATURE_BNDCSR);
+-
+-		if (init_event)
+-			kvm_load_guest_fpu(vcpu);
+-	}
++	kvm_xstate_reset(vcpu, init_event);
+ 
+ 	if (!init_event) {
+ 		vcpu->arch.smbase = 0x30000;
+
+base-commit: 1a89965fa9dae1ae04f44679860ef6bc008c2003
+-- 
 
