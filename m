@@ -1,98 +1,122 @@
-Return-Path: <kvm+bounces-16370-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16371-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349C38B8FE8
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 20:55:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 432838B909C
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 22:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DBF1B20EAE
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 18:54:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65E9DB21AD3
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 20:30:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183E2161328;
-	Wed,  1 May 2024 18:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA5D1635C7;
+	Wed,  1 May 2024 20:29:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rfbhiel2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NAqkBQLK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD9616087B
-	for <kvm@vger.kernel.org>; Wed,  1 May 2024 18:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34D5DF9EB
+	for <kvm@vger.kernel.org>; Wed,  1 May 2024 20:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714589683; cv=none; b=FFyIFfCCxiksWHuhVFcVSEuU2u8QIBkXGNri9RdAIwJVKz8FkGLVtArk/u3VjdMjt7TSjMSo8ugF/4ScEa2bboY3Mm3qlsMGHJnbKQGkO9APfATgC+wKW+CQYOgr4OZymEd7UzO39rCb5RLVIsxOIVuyKn6FviqzNURr0HKQZVs=
+	t=1714595395; cv=none; b=bDGHoA0L08YFYxIXY7vrhCDcei70UK3UNbj0kzi6c9f4S99Jd389B8jYTSq9nbEEe1K41z5f5DxUhMZh2PZmGIiUurX+IpHVY8dzu9R59zX831ZKJ3Ic0V1xkyYjZWpmw8wptbZw8jLQv3frWwhu+XBS34nOhD1hngLztlsnTpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714589683; c=relaxed/simple;
-	bh=ZDFyiXcFQpYmQqUMFVEe9FegPdW34mLyaWMr9aBCBF4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Om0bIlMWcC7HNa/T+aZqqGZftzA7BQ+qR3cl3rA+o6Ofmnm/oVjUuBKTnfyepSvXHjZLaBaU64knCvTmhBDjSj3FxTzj8CbN8QZ2+E/W9ytAGEGk02izKXGkf69glg5o6uiZ7GYibWcOFQGVI8gieqCtBs68tU2g2rN5oAf9G5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rfbhiel2; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b35b8a9feaso468688a91.3
-        for <kvm@vger.kernel.org>; Wed, 01 May 2024 11:54:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714589681; x=1715194481; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7WCk4sjm/hGbZuv1UBg6truPSxtFEYVHoQRMNBTBqho=;
-        b=Rfbhiel2rJKy23lQlRVin50n81HUSBV3ZFmnpqRyt/db2N4NpMBjc7ErfvOvU2jSil
-         PycsNaw9FS3MS9JmMqYHesOx8L+/alQuAPaqnknrB0a8QAVXNruTycAHtQjomZsOiV96
-         qVneOV9dTDdzdLoLLA5fkv+ciXXmXJRkqPEGEijut85x40eruV1zz9GUG+oOr/Fxt/Tu
-         LMBAQefduIF9SMwDyIcNaGvwY+QAq+irqzbJY2RQCZOYst2dDb9kw2Ys/1FIZTmxtYfH
-         XteEVba/lOoNT9kXWVIB/4J+HHey7AEjiK400kVZBuYC/rswnTO9RXyk/+IsvNaBWhtz
-         ycnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714589681; x=1715194481;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7WCk4sjm/hGbZuv1UBg6truPSxtFEYVHoQRMNBTBqho=;
-        b=wfXRk8sCQ26h4CiB/PLhfvBDuRl9awPA9oFNQ/m/G8Cts+kv77QV4KvfKZtx4YhvoD
-         N2zXIoqbBTmy8SJdyW9HX7ODOBKikeZaQ/tJArLJKDLyAu4YnGtIcfbDBR9hlwzXzEiu
-         0KBx6Ir9Te46vxaO9sef2M3ixgXbPVC3z5z8eldLiEwO1CGxTkBVk2rz2Ffs8bqDHQze
-         m8p1YuNDy/5j+14wwSSAukRaj2bCK/fSR4opph3ETCTLg5v1VUlF53cmag//cU/wW+0m
-         p3vp48QTKNLiiOni/Uj14jsc7TArOacDYq98DYN2HURy23ZtMesKQDinUssAekenTeZN
-         aeDw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3ZO0OPp436DnprnN+c9hDdn1ehXtrGiJpOcj3Tf9QaD7rtapUI6gAcvNPClYYcCiCOhzHJ1xSoxrJZ36BEwJMWovE
-X-Gm-Message-State: AOJu0YyTfap2bKjwKJh05i5/9UCgyeQR22Z0ChiButG5J+9pFUPBgAHT
-	arlryngGZMc2fuplgs9Z/10ejMmAKU2GjikmzHUmSqtIWuHq16PneqcxI+EfjeivhKKdh331QUE
-	xSg==
-X-Google-Smtp-Source: AGHT+IEaEMkzuIRvQdXiBfaDkh9C3i4lsdhVtSwmc/4q4ol6mkUrYSdgzDL/fKpff9VrOEqYhmXsnGuyTYg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:360e:b0:2b3:90eb:7b46 with SMTP id
- ml14-20020a17090b360e00b002b390eb7b46mr692pjb.7.1714589681215; Wed, 01 May
- 2024 11:54:41 -0700 (PDT)
-Date: Wed, 1 May 2024 11:54:39 -0700
-In-Reply-To: <20240219074733.122080-10-weijiang.yang@intel.com>
+	s=arc-20240116; t=1714595395; c=relaxed/simple;
+	bh=w8jYKZFvQbgnl2hyCDvwQDdjslVByhTjeMFVvpaWjxc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OHMLOp0wosS8fLmtP9UbN8afzer+QRTTzMTuMiiGnU8/VBYSG8tsRlGLOg1S2dON8W0YF3+XA5udcItClfdWhtC9MCgaMCc0heAALW3S3jBe11dkX6xAjqs284kwyKcpk6d8F15LEIApxFL6nzKKn9kaxjJCxTSXwmUcRAeiqlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NAqkBQLK; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714595393; x=1746131393;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=w8jYKZFvQbgnl2hyCDvwQDdjslVByhTjeMFVvpaWjxc=;
+  b=NAqkBQLKXrHO/qtPQeUtQKaIpVlIzQNP8wdCM6RFKcCzh7qtwGScq73e
+   KKyPgBqTFFt5qwh3fTjtjU5h4j2v0oJfeEbEfvOkLAoYuWU9qrqJN0shz
+   RV6lK6Z4gKCbuKO99wa9/Un4crCKRmXZaYY5hjtWm5wopSkEpPbJsP7f2
+   i3VPGrEc7b6fnglt5Hb9tW454OxRjVk5VyDlnVqPUYr1j3L0Rqdv84Kcv
+   wQVfFRgnOuJPUfokfNc0s66DEkKD05AlSo11I3XlIUIv9P0Y84S4gR7L3
+   yNdLvavAzovsrQfiPjF1vk06C+AqlBl8YeDBdYGR/Y67we4qWSopcn5Fj
+   w==;
+X-CSE-ConnectionGUID: dCONCjdWSMSygj23Ra120g==
+X-CSE-MsgGUID: obmAt4nRSS2Eo/KR4XpOQw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11061"; a="10472606"
+X-IronPort-AV: E=Sophos;i="6.07,246,1708416000"; 
+   d="scan'208";a="10472606"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 13:29:52 -0700
+X-CSE-ConnectionGUID: JoTiF7twR5y+ZIvHfBlhJg==
+X-CSE-MsgGUID: 0HRcQ21fT2OIDZ8C41DaRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,246,1708416000"; 
+   d="scan'208";a="26890441"
+Received: from otc-tsn-4.jf.intel.com ([10.23.153.135])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 13:29:52 -0700
+From: Kishen Maloor <kishen.maloor@intel.com>
+To: kvm@vger.kernel.org,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	mlevitsk@redhat.com,
+	zheyuma97@gmail.com
+Cc: Kishen Maloor <kishen.maloor@intel.com>
+Subject: [PATCH v3 0/2] Address syzkaller warnings in nested VM-Exit after RSM
+Date: Wed,  1 May 2024 16:29:32 -0400
+Message-Id: <20240501202934.1365061-1-kishen.maloor@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240219074733.122080-1-weijiang.yang@intel.com> <20240219074733.122080-10-weijiang.yang@intel.com>
-Message-ID: <ZjKP7_vydkig2FQ4@google.com>
-Subject: Re: [PATCH v10 09/27] KVM: x86: Rename kvm_{g,s}et_msr()* to menifest
- emulation operations
-From: Sean Christopherson <seanjc@google.com>
-To: Yang Weijiang <weijiang.yang@intel.com>
-Cc: pbonzini@redhat.com, dave.hansen@intel.com, x86@kernel.org, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, peterz@infradead.org, 
-	chao.gao@intel.com, rick.p.edgecombe@intel.com, mlevitsk@redhat.com, 
-	john.allen@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-s/menifest/manifest, though I find the shortlog confusing irrespective of the
-typo.  I think this would be more grammatically correct:
+This series aims to close the loop on a prior conversation on this matter.
+I have picked this up from Michal Wilczynski who had proposed different
+fixes (v1 and v2).
 
-  KVM: x86: Rename kvm_{g,s}et_msr()* to manifest their emulation operations
+v2: https://lore.kernel.org/all/20240123001555.4168188-1-michal.wilczynski@intel.com/
+v1: https://lore.kernel.org/all/20231222164543.918037-1-michal.wilczynski@intel.com/
 
-but I still find that unnecessarily "fancy".  What about this instead?
+The issue was initially reported here:
+https://lore.kernel.org/all/CAMhUBjmXMYsEoVYw_M8hSZjBMHh24i88QYm-RY6HDta5YZ7Wgw@mail.gmail.com/
 
-  KVM: x86: Rename kvm_{g,s}et_msr()* to show that they emulate guest accesses
+It is caused by setting nested_run_pending in the vendor-specific leave_smm()
+callback from the RSM emulation. The syzkaller test produced a triple fault in
+rsm_load_state_64() resulting in a nested VM-Exit with nested_run_pending being
+set and triggered the warnings. The commit message for patch 2 has a detailed
+description of the flow.
 
-It's not perfect, e.g. it might be read as saying they emulate guest RDMSR and
-WRMSR, but for a shortlog I think that's fine.
+The patches do the following:
+a) Move nested_run_pending out of vendor structs and into the x86 kvm_vcpu_arch
+so it can be accessed by common x86 code (e.g., the SMM emulation).
+The usage and semantics of this flag are common between SVM and VMX. 
+
+b) Set nested_run_pending only after a successful RSM emulation.
+
+This evidently resolves the issue, but I would appreciate feedback
+(if the patches are acceptable) and/or suggestions.
+
+Kishen Maloor (2):
+  KVM: x86: nSVM/nVMX: Move nested_run_pending to kvm_vcpu_arch
+  KVM: x86: nSVM/nVMX: Fix RSM logic leading to L2 VM-Entries
+
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/smm.c              | 12 ++++++++--
+ arch/x86/kvm/svm/nested.c       | 14 +++++------
+ arch/x86/kvm/svm/svm.c          | 12 ++++------
+ arch/x86/kvm/svm/svm.h          |  4 ----
+ arch/x86/kvm/vmx/nested.c       | 42 ++++++++++++++++-----------------
+ arch/x86/kvm/vmx/vmx.c          | 13 +++++-----
+ arch/x86/kvm/vmx/vmx.h          |  3 ---
+ 8 files changed, 50 insertions(+), 51 deletions(-)
+
+-- 
+2.31.1
+
 
