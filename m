@@ -1,145 +1,210 @@
-Return-Path: <kvm+bounces-16298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16300-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AFAB8B8579
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 08:01:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 688D78B8649
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 09:47:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A2241F23B84
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 06:01:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FCE8281E92
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 07:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C974C624;
-	Wed,  1 May 2024 06:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289634DA11;
+	Wed,  1 May 2024 07:46:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajEg7ubJ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="h1ByIOa/"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2080.outbound.protection.outlook.com [40.107.223.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2BB4AEC6
-	for <kvm@vger.kernel.org>; Wed,  1 May 2024 06:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714543293; cv=none; b=SPzdaYi0gTdJGYI0ocmUmjbDlq4ou/t6JVpOreBuroWE+a2t4Ehh2Fo9oZLwmS8KGvsTsoR084z5TXwHWZ66XYToFbI5qDFUToVSQnuMjXY820QOftcwXJEYVNxEsOFQM1/JNen92R30EaRdLyYpvSOMdBmbTAGSH2aG2d3RMZA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714543293; c=relaxed/simple;
-	bh=826e6puMm6zzTrxffD62gEQ3vdQCaEKJUlUGOq1Xpv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DTQtAjtctQrfMxARKjLANuIEqy4g23DhmkvqSYpq+f4vcgy84vb5pFcdpAWaMQIgD7seR/YX9147dA1xWA16qk+tmqM4x6ommSeXbpYD86h1rJuZ44TKNmCDkWAC7h7MKvDjr0Fgr22grm6NJY7Znuu9cawQYY7KSLphKOxjcwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ajEg7ubJ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714543289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ACs9fP8UeUOFIH6gYeB8LpBxm1NZNbq1XOuqsdPyK04=;
-	b=ajEg7ubJC1R8JoNBH/k+PrEQTuLplizrn5KCfr9FmJG5+4jYyjVSOHai6rZtuLQxJr8RJj
-	Lcq7Z8NdnFpUfmFna1TYuY2t5qRSGRZQYtF/SvjjMgegQybcyA4J6FBiBXUATCjUZAwrP3
-	eFwcSHi+di81pSsOeAPlRlzwQWAgHF8=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-Aw4wx58oNJGIQUuucI5JZg-1; Wed, 01 May 2024 02:01:28 -0400
-X-MC-Unique: Aw4wx58oNJGIQUuucI5JZg-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a590fa4a117so134982866b.1
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 23:01:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714543286; x=1715148086;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ACs9fP8UeUOFIH6gYeB8LpBxm1NZNbq1XOuqsdPyK04=;
-        b=OFrU1kfydkNBJZ3KuQ2G51RTu0bINa+L157drrmT+vPMH9/v/b0+NI1k3oaux3NBen
-         B1hCfKVnfFr0yjp1A3w1JG/SHZWpi7+w1G1cCOgS3YtM+n0WJZxNkL69N+Q8fjL1qEe+
-         8toMqB7U7VDnziBjI/ufkG+AX7tgYNYWOaXnQtaLpvHjauKSLG4No9lGpMeVYCZGl7I+
-         2O13stMsLw2nYkxSKNiQn69TueokTySyHvb/OTeUiPRqQ9MVWkl4CkxkdAwcaUtXzYUA
-         qDCNkHD2ffOruv9krDkrUbAj5zk92smFKgAT9ne/sR8x/AGq2JChT9p+O9Al3EXSq8hL
-         c57g==
-X-Forwarded-Encrypted: i=1; AJvYcCX1FikE9Wvfx4TTsNO0LBtKyVI9Pqdx0+HPdMUJMT3lxudhRw2yO+Bjf8NnHLN2DFw/lyw/MtzByZAdDBsbkMVe0Gyn
-X-Gm-Message-State: AOJu0YwBuZkNZU46JJY5q5rMXWApWZPhaPGIr4oKIf42ArrMc9uIiXMQ
-	Vb7Wj3+6WCY1zEAwlp3TKY3KTlu+cV4JDjg0pgv7u/ehVhiItivAwqOyHyjZ1xsv36wPjz/XQ0I
-	uwKzDxXSxQswl1fSBb5GpuMB12wMM2mCFER0x8ompmaeEMnlmCw==
-X-Received: by 2002:a17:906:e219:b0:a58:f186:192 with SMTP id gf25-20020a170906e21900b00a58f1860192mr1224411ejb.0.1714543286590;
-        Tue, 30 Apr 2024 23:01:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHSlMxEoUZ88OBzUnW9OSy6mbDeqVmGiKA+13uWDb7mOt6quE44mzfAWkhW9+s6sFw1/mZ2+A==
-X-Received: by 2002:a17:906:e219:b0:a58:f186:192 with SMTP id gf25-20020a170906e21900b00a58f1860192mr1224363ejb.0.1714543285807;
-        Tue, 30 Apr 2024 23:01:25 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:346:6a42:bb79:449b:3f0b:a228])
-        by smtp.gmail.com with ESMTPSA id e20-20020a170906249400b00a5910978816sm2187459ejb.121.2024.04.30.23.01.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Apr 2024 23:01:25 -0700 (PDT)
-Date: Wed, 1 May 2024 02:01:20 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Hillf Danton <hdanton@sina.com>
-Cc: Mike Christie <michael.christie@oracle.com>,
-	Edward Adam Davis <eadavis@qq.com>,
-	syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
-	jasowang@redhat.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
-Subject: Re: [PATCH next] vhost_task: after freeing vhost_task it should not
- be accessed in vhost_task_fn
-Message-ID: <20240501020057-mutt-send-email-mst@kernel.org>
-References: <b959b82a-510f-45c0-9e06-acf526c2f4a1@oracle.com>
- <20240501001544.1606-1-hdanton@sina.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFF884D58A;
+	Wed,  1 May 2024 07:46:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714549610; cv=fail; b=HLrAzU1Gta7Sn2LsbPnX9Xu4vKPx9yaZi275yJnTEwBfUEHms4sB8XZBHDygA6vha7o4M8c1acPFQhZ86j/No039Ey3sNTrNBnpTsAKCeObfJ6KNiJNLIPdobtW2M+j6yC5N2ZJKMlqasmlEhvasy0pAZV++pBpBm3FHWLM3mAI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714549610; c=relaxed/simple;
+	bh=K1+iQ+eLC1zz+PtZUfrbfGM8wwej7vCcJb1lV7B45CA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qFo0aQA1qDCBLQkxLfgDG5zfxTXKCpjs2p7JcD6yrmgY159Jl5lhAujJBSIcy4v183nDBgi/fJjBAUW10YpX283K12DM95aQ2MH/wdhdi9nJmZuI25BjqL06KhFS5tnYeLSTxjtyizoeezbn2j6epOt4timPjJVZMNZs/oV0j9U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=h1ByIOa/; arc=fail smtp.client-ip=40.107.223.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RsxABI4p+QWdUr+6B3wbJVl/m24bHr112Ddu2JtiiRQH7NsTN897mYbLdWPrVEcv35B79CFVJq19i4s+k0g+lByKtCEir+v+NoDi02t14yfkL7kNwKR67tQ1OoqrcYJysw4/9T2R8q+ryzYF8a+AUEApivBPcUVjIUF4/lWYUhu+KTuTqWeKeZ8cgu7UJwxzNRRfWamwaHFv+XYlEN735RMxnMTgjSH1CAlUBBoa9pLN0TDweVF1IdyXaGlzrlh6ySapff13ytKSUuy0qtENw3KktCqocmCe+kkuCGMyXtHPDN9EwQF7N9IVPpsBM1SGgeFFvZle76iVX7caW6nDMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EgIEkJloiJzj3W0Di61zLbBQ2w7L1hwIk3Kwnb4p5pI=;
+ b=FwZ7nsjkROGKl9SzCbnxkKcQGc1AQL371FJnDcFYDwxsDZfagdECKy+Txj3SdJaqYtlK/Ou5QmwrTSwcrg2OVIxfSfhdz1K1QMnGSMWz2UlA91q2cMG3p+NePhp59COYBcI1NwXFA4ZgpVwP1uiLRGu2T5oLubkPFmNbTHgg4HMIMLFkC48P+BcUIBG82GIPeLVjm3ydUObJwfWzjfmHmgiYfz2sToBdkS+imHEJ826bNY5MCKE+fag8WuxZ8AH0oLoSUC0+3PDpZN0tT6Il1/JTQWw3dV7HXdEbCLfJc64BHQbqVAhPLc6HnRi9yOCw3xrQwvUeyJQFWqprCIXjDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EgIEkJloiJzj3W0Di61zLbBQ2w7L1hwIk3Kwnb4p5pI=;
+ b=h1ByIOa/ibJRxnk8NnEFQ2Q7tazAJJwD04TSKjivrnOXDQY4uzxVURShM5hoF63cdW0nqpLRL4/NTuKVXaRtpgYp//zrj9An3MmwX0faTLkIYGWITcYqWtpoS/NjT/BIRAVU+TFeY6Nnqxtz1q+gUOxv7VXB+uIQ5tE9yqqFzRY=
+Received: from CY8PR12CA0028.namprd12.prod.outlook.com (2603:10b6:930:49::28)
+ by CH3PR12MB8728.namprd12.prod.outlook.com (2603:10b6:610:171::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Wed, 1 May
+ 2024 07:46:45 +0000
+Received: from CY4PEPF0000EE31.namprd05.prod.outlook.com
+ (2603:10b6:930:49:cafe::3e) by CY8PR12CA0028.outlook.office365.com
+ (2603:10b6:930:49::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.27 via Frontend
+ Transport; Wed, 1 May 2024 07:46:45 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE31.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7544.18 via Frontend Transport; Wed, 1 May 2024 07:46:45 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 1 May
+ 2024 02:46:44 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
+	<pbonzini@redhat.com>, <seanjc@google.com>, <pgonda@google.com>,
+	<ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>, <pankaj.gupta@amd.com>
+Subject: [PATCH 0/4] Add SEV-ES hypervisor support for GHCB protocol version 2
+Date: Wed, 1 May 2024 02:10:44 -0500
+Message-ID: <20240501071048.2208265-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240501001544.1606-1-hdanton@sina.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|CH3PR12MB8728:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5ac0b4c8-1c12-498a-2450-08dc69b2d98c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|7416005|1800799015|376005|36860700004|82310400014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Y2V4IXadIbYfRffWQ6IHa54nOFFuRPVOAd0Si1Opi3E2L73f0U8lKCsHheG+?=
+ =?us-ascii?Q?pLTQp3Lyuwb2MF0INjwVbzXkBIHXhkb3T0e7lcvpIkIaTaA9GH35nwf0TLZx?=
+ =?us-ascii?Q?q22QONIW1hTSL8gViKPAbpSb5CVjz0PnXSaaChO6K2+cjjFQ8G1WgIkNBQr7?=
+ =?us-ascii?Q?apkmvfjvpzGjlauR1IfuXcwEO2y0ZbSiw2mypuvIGRjn/qCaJAaPZKW3iNXM?=
+ =?us-ascii?Q?OnPQwOTe/5MrHpg6OZDpicFXM4CKPLTaXkzMjF4P+lDVzdn5mxs3PxsC93XS?=
+ =?us-ascii?Q?MpKO/CixGuREh0o27NXqa1JwdHuPSMM8D7qiZhrPj3i1rohUgPTW0FYdGWi2?=
+ =?us-ascii?Q?1Qh1VzxUprgSFFJ4zTBADFp0UmJuZT2Wl3TwIE0rL/ykkPNzKFEyS35A7EFr?=
+ =?us-ascii?Q?3/24WorJzzlCZ2AVLeZ9Zy/bBClUHuw+R7Jdn+O/WK4PwiWO2WtN9/OKHg+G?=
+ =?us-ascii?Q?gfjZJ55GUgs3sNtbZqMG9D2gmOyJBVf991oyX2lgz1xI97e/V4HVrXRA5cnv?=
+ =?us-ascii?Q?oGvqB81xzzMI3nejWuNQLMvy6m0Zfqms8APucOkXrPF1fiKovN+X669XtlgZ?=
+ =?us-ascii?Q?66jreSpWUcDyfw+qk44B6h2smlN82pZQcOzHMnWdoAsFFVaaedDTBDf4JjQ9?=
+ =?us-ascii?Q?BrPOZEWSFHp/wcAL64l8kJNBPBCuZGUfgn/LmGyD0neb1LPCZnsrPCHsKliP?=
+ =?us-ascii?Q?gDmC0YZP8+ddzbb0iOO0X06DFdvJ5qObTAwcaWFsQ22RTRMkKGe5LxDJEHUA?=
+ =?us-ascii?Q?It66Lhx9Ksz2aAwuoKGTFxbT6QYyXJXOBAIWzHyiqUMZCVOiHj2d4S2l/qSv?=
+ =?us-ascii?Q?/WcPrVAJkL6SZoH8jKawxSdf9arBhz3nhHq0ju1rsNHQvC5QsGLzTj3ch4q2?=
+ =?us-ascii?Q?emsDd+LFTDZ41c/XJVDh28nXOPE1FS4xXX/oc5JkLV0unds1h9EsMRyYJ7RR?=
+ =?us-ascii?Q?jwMpojApwJYXoS54TuLPcB+PWI+T/9g1eCZW4UrLf6DNWNPQ+03bphTIR/co?=
+ =?us-ascii?Q?PaSCtNHcmrgOgqYtOrxPtY0uRQMp3evpp967NDCco694mjvPz0hT5I/ozYUZ?=
+ =?us-ascii?Q?jYV2P3HppRFJTW9S9RdM2/Lr0C++TnGz0OBnsNRU4Bc6nLDQnf9u4p2QM4aG?=
+ =?us-ascii?Q?YVUkazcT1B0xfRVNs0sMrvl3pWFGrgBevw/f761uuj6wqg0MX6D92+ZeBOvE?=
+ =?us-ascii?Q?iJFMNvfxt2lmbWZ9F4MKTNA6Ik0SjlfRFulR0rTUsvTBK+rtEjF7+6U51t2b?=
+ =?us-ascii?Q?EgrPncrXlMW3hgMG7G1JZiYyWZUn3JI22eeKBNlEQ7nSTwbBpGPMWUbYajml?=
+ =?us-ascii?Q?BK9KW+asSIiYN0ro32VIk4u6Aaqjn4qqQIDuXBN3K4l4iQ=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2024 07:46:45.3682
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ac0b4c8-1c12-498a-2450-08dc69b2d98c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE31.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8728
 
-On Wed, May 01, 2024 at 08:15:44AM +0800, Hillf Danton wrote:
-> On Tue, Apr 30, 2024 at 11:23:04AM -0500, Mike Christie wrote:
-> > On 4/30/24 8:05 AM, Edward Adam Davis wrote:
-> > >  static int vhost_task_fn(void *data)
-> > >  {
-> > >  	struct vhost_task *vtsk = data;
-> > > @@ -51,7 +51,7 @@ static int vhost_task_fn(void *data)
-> > >  			schedule();
-> > >  	}
-> > >  
-> > > -	mutex_lock(&vtsk->exit_mutex);
-> > > +	mutex_lock(&exit_mutex);
-> > >  	/*
-> > >  	 * If a vhost_task_stop and SIGKILL race, we can ignore the SIGKILL.
-> > >  	 * When the vhost layer has called vhost_task_stop it's already stopped
-> > > @@ -62,7 +62,7 @@ static int vhost_task_fn(void *data)
-> > >  		vtsk->handle_sigkill(vtsk->data);
-> > >  	}
-> > >  	complete(&vtsk->exited);
-> > > -	mutex_unlock(&vtsk->exit_mutex);
-> > > +	mutex_unlock(&exit_mutex);
-> > >  
-> > 
-> > Edward, thanks for the patch. I think though I just needed to swap the
-> > order of the calls above.
-> > 
-> > Instead of:
-> > 
-> > complete(&vtsk->exited);
-> > mutex_unlock(&vtsk->exit_mutex);
-> > 
-> > it should have been:
-> > 
-> > mutex_unlock(&vtsk->exit_mutex);
-> > complete(&vtsk->exited);
-> 
-> JFYI Edward did it [1]
-> 
-> [1] https://lore.kernel.org/lkml/tencent_546DA49414E876EEBECF2C78D26D242EE50A@qq.com/
+This patchset is also available at:
 
-and then it failed testing.
+  https://github.com/amdese/linux/commits/sev-init2-ghcb-v1
 
-> > 
-> > If my analysis is correct, then Michael do you want me to resubmit a
-> > patch on top of your vhost branch or resubmit the entire patchset?
+and is based on commit 20cc50a0410f (just before the v13 SNP patches) from:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=kvm-coco-queue
+
+Overview
+--------
+
+While the main additions from GHCB protocol version 1 to version 2 revolve
+mostly around SEV-SNP support, there are a number of changes applicable to
+SEV-ES guests as well. This series plucks a handful patches from the SNP
+hypervisor patchset that comprise the total set of GHCB-related changes that
+are also applicable to SEV-ES, and then introduces a KVM_SEV_INIT2 field so
+that userspace can control the maximum GHCB protocol version advertised to
+guests to help manage compatibility across kernels/versions.
+
+For more background discussion, see:
+
+  https://lore.kernel.org/kvm/ZimnngU7hn7sKoSc@google.com/
+
+
+Patch Layout
+------------
+
+01-03: These patches add support for all version 2 GHCB requests that
+       are applicable to SEV-ES
+04:    This patch switches the KVM_SEV_INIT2 default to GHCB protocol
+       version 2, and extends it with a new parameter that userspace
+       can use to control the specific GHCB version for a guest
+
+
+Testing
+-------
+
+For testing this via QEMU, use the following tree:
+
+  https://github.com/amdese/qemu/commits/snp-v4-wip3c
+
+A basic command-line invocation for SEV-ES would be:
+
+ qemu-system-x86_64 -smp 32,maxcpus=255 -cpu EPYC-Milan-v2
+  -machine q35,confidential-guest-support=sev0
+  -object sev-guest,id=sev0,cbitpos=51,reduced-phys-bits=1,ghcb-version=2
+
+Feedback/review is very much appreciated.
+
+-Mike
+
+
+----------------------------------------------------------------
+Brijesh Singh (1):
+      KVM: SEV: Add GHCB handling for Hypervisor Feature Support requests
+
+Michael Roth (2):
+      KVM: SEV: Add GHCB handling for termination requests
+      KVM: SEV: Allow per-guest configuration of GHCB protocol version
+
+Tom Lendacky (1):
+      KVM: SEV: Add support to handle AP reset MSR protocol
+
+ Documentation/virt/kvm/x86/amd-memory-encryption.rst |  11 ++++-
+ arch/x86/include/asm/sev-common.h                    |   8 +++-
+ arch/x86/include/uapi/asm/kvm.h                      |   4 +-
+ arch/x86/kvm/svm/sev.c                               | 111 ++++++++++++++++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.h                               |   2 +
+ 5 files changed, 120 insertions(+), 16 deletions(-)
+
 
 
