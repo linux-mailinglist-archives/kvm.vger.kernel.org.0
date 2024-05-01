@@ -1,65 +1,71 @@
-Return-Path: <kvm+bounces-16364-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16365-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8341B8B8F43
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 19:56:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4CD28B8F4E
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 20:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D877B22118
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 17:56:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E69A0B21F20
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 18:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE4B1474A8;
-	Wed,  1 May 2024 17:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6DA1474B9;
+	Wed,  1 May 2024 18:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oCCD4AZV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l2U3kks0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1416C748D;
-	Wed,  1 May 2024 17:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE1F5024E;
+	Wed,  1 May 2024 18:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714586159; cv=none; b=GQ5arNIIaO5/Zqtcogc1N4ru8WuPo5DIfrVVyqo1NjSLm1cUNOS7aLiZ/eBaY4FRXqpCqQe51tLu40CRqo5EU0fSijY4QJOmDTRBQ1Q5UxWKh9lwlwu+o4ANQo2WX8bt1QAVNlYaByuWGK3VfJQmFoCgyv5RtX0hEUZikp7u5N0=
+	t=1714586429; cv=none; b=kpze8KVtXJTtd3fLyoUjE+W5souMCVp3REkYnHzsIVK/E7k34854p8VZRJXgoKnlyzOHSWzyh8AAX3ECxVvn1Y2iEQPduepyE9R5CCx6gtvT4+ve7asz6RjQzTBfBjJb2fpySfDJYt4FcqVlxP7Z+grbw7C+asb5jcHyin9ZrMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714586159; c=relaxed/simple;
-	bh=ImsoO37LmIyxcjfq9GfK3cKoACG+YHaB+w+naaUo6Rc=;
+	s=arc-20240116; t=1714586429; c=relaxed/simple;
+	bh=k+dIFqMwQZ2aUiDi9ejc2u8LVegSYH+CS+A6rMZQZao=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GcdYb3w1ufVHzaz+XoW7JkksLHYkfADravCF0VITV15A0HCmtr6lB4pAENIOJinl4bFp7+fAGULnXEi/YDiWdBYCgPdFG7ZQ5rxBQ48hbJee+/ZH3oAU6rOHI/W5kU9nXrQDKli6KvzLGRRwpatRW3P92d6NhCDR3HDi08lhd4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oCCD4AZV; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 In-Reply-To:Content-Type; b=Gc3T49NwV1U7JMS6tKx6kyuB3QvNQvFTKHDrKzrkFy+4OwCUe82vzWLVfQEpj29ExH+hglhe7urPL05AyQd/2BS0xok+yP1P3hvlOyCN9OqWvENyqJfemWPlQLAyu8YuRQBG3bE2q012hR9L6FwbJ8Td0Dl9qO39CrsuVfdFbho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l2U3kks0; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714586158; x=1746122158;
+  t=1714586427; x=1746122427;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=ImsoO37LmIyxcjfq9GfK3cKoACG+YHaB+w+naaUo6Rc=;
-  b=oCCD4AZVluDNgtK8Q06y6mGOUX82+UpJWc8Wls3ttzpAAQPz7LXqInbf
-   wvh+cCuVBplvrZhH3ptZOYaNmn9aUh0g3uTY+ArXInmKv5PEBRT68kSFJ
-   MiJrAkrXru0JiHxuYfdC3vW3XKp0ck0Ip64Is4nuwWWxHrMc0prY9AvDo
-   2T7Oh30vCVLPr1WhMth9Z9YKLf7+fV3kcmgx0OTksEN8ZxAb+x1bo0XhZ
-   NFzFped9EblFeyPlYZbZC/24M45FB4TY5BW8BCcymA95aFDwq4ETH4Ofb
-   pkYMUUPJOmRt7ui2ux1a2UWNuBevyOFwaF+o02EoxivUKa+aIObcuMKTG
-   w==;
-X-CSE-ConnectionGUID: jA7c0FJbTJaUZLK8G5Y/0w==
-X-CSE-MsgGUID: xnm3Mn8XRWe1GWyq1ggQ4w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11061"; a="35714918"
+  bh=k+dIFqMwQZ2aUiDi9ejc2u8LVegSYH+CS+A6rMZQZao=;
+  b=l2U3kks0iRB8jYGQG3x1sKgp6MHMsY3puPxNm32woUFqaanu2KzTzTEa
+   UOr0SSlP7ikiSC0miQ2L0e5bFSHON/9I2ua93ajkNMbeOdt45vRF0G29u
+   /Zxn9BYyrnKph7JmXOGCmZZ6X4sSPfNYyQTiwdlOPpareCWccBto+OOEY
+   QwJEk36pJSEYrp5QCBfYtrBhZEopkipFbQrkVFrKAW6XATg9Nn0pk5RPb
+   AYWA/SKdKM+WCMVR9KuUUbXodMbXQwMrJT63CCl/o3dkSkE6Nf602DzLn
+   hUxHQcC9gnuuTWhdlE+wCYHxqT8K+ljZqPeBAw4LuJodqAidnkJuWbo+H
+   A==;
+X-CSE-ConnectionGUID: zNTOMlCdTUywh+crgY7l9w==
+X-CSE-MsgGUID: WTeGrNNvRHqeb2hDMKNH/Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11061"; a="10454627"
 X-IronPort-AV: E=Sophos;i="6.07,246,1708416000"; 
-   d="scan'208";a="35714918"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 10:55:45 -0700
-X-CSE-ConnectionGUID: fA5cYtbySBK+URiVZ2UYqQ==
-X-CSE-MsgGUID: sl7aHpoRT0mXP/c6i7u+8w==
+   d="scan'208";a="10454627"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 11:00:26 -0700
+X-CSE-ConnectionGUID: 6yvooRm2TD+Bsr9luSpjyg==
+X-CSE-MsgGUID: ykIbpHkiRSai8G40A9GwMQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,246,1708416000"; 
-   d="scan'208";a="31663564"
-Received: from soc-cp83kr3.jf.intel.com (HELO [10.24.10.57]) ([10.24.10.57])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 10:55:44 -0700
-Message-ID: <d788bdab-91b9-4034-a241-ee253ee4fb3e@intel.com>
-Date: Wed, 1 May 2024 10:55:46 -0700
+   d="scan'208";a="26817144"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 May 2024 11:00:26 -0700
+Received: from [10.212.96.143] (kliang2-mobl1.ccr.corp.intel.com [10.212.96.143])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id 2AD8620B5739;
+	Wed,  1 May 2024 11:00:23 -0700 (PDT)
+Message-ID: <e1aae0a8-fcd8-42ea-81b2-0f95c9d7cc2b@linux.intel.com>
+Date: Wed, 1 May 2024 14:00:21 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,90 +73,46 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 15/15] KVM: x86: Factor out kvm_use_master_clock()
-To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Sean Christopherson <seanjc@google.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant
- <paul@xen.org>, Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- Oliver Upton <oliver.upton@linux.dev>, Marcelo Tosatti
- <mtosatti@redhat.com>, jalliste@amazon.co.uk, sveith@amazon.de,
- Dongli Zhang <dongli.zhang@oracle.com>
-References: <20240427111929.9600-1-dwmw2@infradead.org>
- <20240427111929.9600-16-dwmw2@infradead.org>
+Subject: Re: [RFC PATCH 23/41] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>
+Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>, maobibo <maobibo@loongson.cn>,
+ Xiong Zhang <xiong.y.zhang@linux.intel.com>, pbonzini@redhat.com,
+ peterz@infradead.org, kan.liang@intel.com, zhenyuw@linux.intel.com,
+ jmattson@google.com, kvm@vger.kernel.org, linux-perf-users@vger.kernel.org,
+ linux-kernel@vger.kernel.org, zhiyuan.lv@intel.com, eranian@google.com,
+ irogers@google.com, samantha.alt@intel.com, like.xu.linux@gmail.com,
+ chao.gao@intel.com
+References: <ZirPGnSDUzD-iWwc@google.com>
+ <77913327-2115-42b5-850a-04ef0581faa7@linux.intel.com>
+ <CAL715WJCHJD_wcJ+r4TyWfvmk9uNT_kPy7Pt=CHkB-Sf0D4Rqw@mail.gmail.com>
+ <ff4a4229-04ac-4cbf-8aea-c84ccfa96e0b@linux.intel.com>
+ <CAL715WJKL5__8RU0xxUf0HifNVQBDRODE54O2bwOx45w67TQTQ@mail.gmail.com>
+ <5f5bcbc0-e2ef-4232-a56a-fda93c6a569e@linux.intel.com>
+ <ZiwEoZDIg8l7-uid@google.com>
+ <CAL715WJ4jHmto3ci=Fz5Bwx2Y=Hiy1MoFCpcUhz-C8aPMqYskw@mail.gmail.com>
+ <b9095b0d-72f0-4e54-8d2e-f965ddff06bb@linux.intel.com>
+ <CAL715WKm0X9NJxq8SNGD5EJomzY4DDSiwLb1wMMgcgHqeZ64BA@mail.gmail.com>
+ <Zi_cle1-5SZK2558@google.com>
+ <CAL715WJbYNqm2SXiTgqWHs34DtRfdFE7Hx48X_4ASHyQXeaPzA@mail.gmail.com>
 Content-Language: en-US
-From: "Chen, Zide" <zide.chen@intel.com>
-In-Reply-To: <20240427111929.9600-16-dwmw2@infradead.org>
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <CAL715WJbYNqm2SXiTgqWHs34DtRfdFE7Hx48X_4ASHyQXeaPzA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 
 
-On 4/27/2024 4:05 AM, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> Both kvm_track_tsc_matching() and pvclock_update_vm_gtod_copy() make a
-> decision about whether the KVM clock should be in master clock mode.
-> 
-> They use *different* criteria for the decision though. This isn't really
-> a problem; it only has the potential to cause unnecessary invocations of
-> KVM_REQ_MASTERCLOCK_UPDATE if the masterclock was disabled due to TSC
-> going backwards, or the guest using the old MSR. But it isn't pretty.
-> 
-> Factor the decision out to a single function. And document the historical
-> reason why it's disabled for guests that use the old MSR_KVM_SYSTEM_TIME.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  arch/x86/kvm/x86.c | 27 +++++++++++++++++++++++----
->  1 file changed, 23 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d6e4469f531a..680b39f17851 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2518,6 +2518,27 @@ static inline bool gtod_is_based_on_tsc(int mode)
->  }
->  #endif
->  
-> +static bool kvm_use_master_clock(strut kvm *kvm)
+On 2024-05-01 1:43 p.m., Mingwei Zhang wrote:
+> One of the things on top of the mind is that: there seems to be no way
+> for the perf subsystem to express this: "no, your host-level profiling
+> is not interested in profiling the KVM_RUN loop when our guest vPMU is
+> actively running".
 
-typo: 'strut' -> 'struct'
+exclude_hv? Although it seems the option is not well supported on X86
+for now.
 
-> +{
-> +	struct kvm_arch *ka = &kvm->arch;
-> +
-> +	/*
-> +	 * The 'old kvmclock' check is a workaround (from 2015) for a
-> +	 * SUSE 2.6.16 kernel that didn't boot if the system_time in
-> +	 * its kvmclock was too far behind the current time. So the
-> +	 * mode of just setting the reference point and allowing time
-> +	 * to proceed linearly from there makes it fail to boot.
-> +	 * Despite that being kind of the *point* of the way the clock
-> +	 * is exposed to the guest. By coincidence, the offending
-> +	 * kernels used the old MSR_KVM_SYSTEM_TIME, which was moved
-> +	 * only because it resided in the wrong number range. So the
-> +	 * workaround is activated for *all* guests using the old MSR.
-> +	 */
-> +	return ka->all_vcpus_matched_tsc &&
-> +		!ka->backwards_tsc_observed &&
-> +		!ka->boot_vcpu_runs_old_kvmclock;
-> +}
-> +
->  static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
->  {
->  #ifdef CONFIG_X86_64
-> @@ -2550,7 +2571,7 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
->  	 * To use the masterclock, the host clocksource must be based on TSC
->  	 * and all vCPUs must have matching TSC frequencies.
->  	 */
-> -	bool use_master_clock = ka->all_vcpus_matched_tsc &&
-> +	bool use_master_clock = kvm_use_master_clock(kvm) &&
-
-'kvm' should be `vcpu->kvm`
-
->  				gtod_is_based_on_tsc(gtod->clock.vclock_mode);
+Thanks,
+Kan
 
