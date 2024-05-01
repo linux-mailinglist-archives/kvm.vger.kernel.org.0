@@ -1,134 +1,109 @@
-Return-Path: <kvm+bounces-16290-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16291-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B26E8B836D
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 01:57:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28F58B83A2
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 02:16:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A85F1C22512
-	for <lists+kvm@lfdr.de>; Tue, 30 Apr 2024 23:57:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D75FAB21276
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 00:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614E93DABEA;
-	Tue, 30 Apr 2024 23:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="folleoKM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91394C66;
+	Wed,  1 May 2024 00:15:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail114-241.sinamail.sina.com.cn (mail114-241.sinamail.sina.com.cn [218.30.114.241])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8C821C18C
-	for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 23:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C399B625
+	for <kvm@vger.kernel.org>; Wed,  1 May 2024 00:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.114.241
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714521126; cv=none; b=nC6Q+1NfrZhIToTbLM19v5WgB1Zm6HDI2X0RTdy3szxJmIpkLOZP/bA0XjUhXRIRYuAcksPqIg+rWUADzMZ6d++uXutWb9Xx/Z3BONzb5jqQXrdiJgFRUZaMD5jfb+vfWz7oBw0pCZc2htf0pipylTD+xlLNDtovIbIYJ2TzGRg=
+	t=1714522557; cv=none; b=AhjIMt8G6dBUWOtkfX3mRC70PqgMxU0PKt/7MWA+BJP8YjTa7bZR1UiwgI7P3j1lCe9XvMK0KHZGF4/a4hoFRVZVmJSa8rTRzeN9GANJvuxCo1W4n3T4BdULBK+iIRvzB0/EeoR6dfWJJS7KpNKU78YmhqH7xp1v7dvi436C6AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714521126; c=relaxed/simple;
-	bh=Cwp4S5VNvQqFtoPw/nroKEGF2YpUUdO6wVGQiqGsbAY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=d7Y+7r/PnTeVzZOb159FDv5IiQfUG4Nz1WcxLvU2wgT4JqN5Kql0Uj8VyuhulrA1MRGxLtdfPprONfz0z3uuMXHvefpEsJZhTGTRMYnTL0xmvWqr8jjdjpxdfhsuuZxXtPbsnNDP/kWI5Wr0OyfoQbHLv29C3OVCv/lQqXm7Beo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=folleoKM; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de60321ce6cso4217453276.1
-        for <kvm@vger.kernel.org>; Tue, 30 Apr 2024 16:52:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714521124; x=1715125924; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eMZD6S1LecT7yIEbG0UvTaidEBINYi20NzKFmLDZVV4=;
-        b=folleoKMFVRvi8dW0bCiqpuMPxaVBXHSqPGhHmRQaNl6zqayRuzzzaiG2Tb3zA83iP
-         morx19xZkRe6kEGkwp1Zt+otnWqi/wra9Jb0bO1/Cm/jVdJepjsIOnu97ooL44chizIz
-         H/v35//62TlWRSkl0h+OKxiamUjvRTtlnlfn8QDJNf8qbRLbdsmF+tZPhYYzgXZZ/RSo
-         YEKSrhK5D5pa9B/One0ZHUJcy8B1+rkGOQPtDSHsZwe9h8sMxuMuxxn/eXV1AwN3nQo0
-         wbJ4oDqc8rKxRh8+Zo96DUlmHEPSLi+8zvO0fX9aMDpyv+Eyc3XFv7dDyoeSRtKfGd5h
-         YqdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714521124; x=1715125924;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eMZD6S1LecT7yIEbG0UvTaidEBINYi20NzKFmLDZVV4=;
-        b=O/CdYBUlKCj3CBbza6pypIZwYuT0fexZ1dugc0hyPG7SScVI/TxaSbp2tk4496n31H
-         Ph9aj6ohHCEFBvF8+/Y3++Th+OzcIaO7u3wSas4/eA44ydD+ihkizRvc16VRbd07cY6P
-         4c1aNafIXkAjn1jbs31nUSdvwy/boomMdAzre5aojB2ZhkRXrj76SZaqALsZFNPYH3xQ
-         Tx83ntxcWLpNt6q1bzjnPVDDyiVs1NpdTB3+sy0YijKrXQsFE2KzHd8r6KDRaWNiTXrk
-         WAQo7SHdGqDh86lTeb65DlKUbi5D7T9yt8pxIDSVmpCeMi3l11ME3nOKaE1SgdNRGNA1
-         KR7g==
-X-Forwarded-Encrypted: i=1; AJvYcCW6qh1RJ15IaTLbJYdXbXzBPKCWLkM1glNhusHuKyt7+AwvO7/Jr1oLKC5Dft/MVhdaRMuFKwKDwqdooFhbCy0W3wlt
-X-Gm-Message-State: AOJu0YwL5ZT1AIDZDGebtAKNPON4MkSkXb/fGKq1je4H1fnRHoWTBx3u
-	BhfCB5UxfnOyZ0FXpGsQn1puKBu8CPVb+OoH8fxmYIrRS/pD/B5K+LldoqxqmRj3fB9uWLphSFb
-	UiA==
-X-Google-Smtp-Source: AGHT+IH4VJpB6ZdNUNwNGYphVaIrnOi2jx2Xja9WJZJclJ5U3AS0GX9uELFDr7+Yl08gZsB5HUor9KgguaE=
-X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a05:6902:154b:b0:de5:3003:4b7b with SMTP id
- r11-20020a056902154b00b00de530034b7bmr333229ybu.1.1714521124169; Tue, 30 Apr
- 2024 16:52:04 -0700 (PDT)
-Date: Tue, 30 Apr 2024 23:50:19 +0000
-In-Reply-To: <20240430235057.1351993-1-edliaw@google.com>
+	s=arc-20240116; t=1714522557; c=relaxed/simple;
+	bh=nL5c8XNclkvqZv1Vzc756f7bzufCJeq11kAFTQAbigI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=uALABpT8/Lv7B9rtg/nL7qvouVXMO9apk0DXdXZ1RKsUbsEp6HfEFFfuEF9/vNiK27aVlg6Layt0VqRIL3mQPUCzcrv+xat40U06yviYFFZ30+TngqgloLGhAT0PtyNciUs5WNpn50dtFd49bavv8zhWf5Q7LsHPAfQcpjjLFP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.114.241
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([116.24.11.115])
+	by sina.com (172.16.235.24) with ESMTP
+	id 663189AB00000C1A; Wed, 1 May 2024 08:15:42 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 72843945089313
+X-SMAIL-UIID: 7A00621F2F04402EAA292C9DDB7F6377-20240501-081542-1
+From: Hillf Danton <hdanton@sina.com>
+To: Mike Christie <michael.christie@oracle.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Edward Adam Davis <eadavis@qq.com>,
+	syzbot+98edc2df894917b3431f@syzkaller.appspotmail.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH next] vhost_task: after freeing vhost_task it should not be accessed in vhost_task_fn
+Date: Wed,  1 May 2024 08:15:44 +0800
+Message-Id: <20240501001544.1606-1-hdanton@sina.com>
+In-Reply-To: <b959b82a-510f-45c0-9e06-acf526c2f4a1@oracle.com>
+References: 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240430235057.1351993-1-edliaw@google.com>
-X-Mailer: git-send-email 2.45.0.rc0.197.gbae5840b3b-goog
-Message-ID: <20240430235057.1351993-11-edliaw@google.com>
-Subject: [PATCH v1 10/10] selftests/user_events: Compiled with -D_GNU_SOURCE
-From: Edward Liaw <edliaw@google.com>
-To: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Jiri Kosina <jikos@kernel.org>, 
-	Benjamin Tissoires <bentiss@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Edward Liaw <edliaw@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, 
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kernel-team@android.com, linux-sound@vger.kernel.org, 
-	linux-input@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-asprintf into kselftest_harness.h, which is a GNU extension and needs
-_GNU_SOURCE to either be defined prior to including headers or with the
--D_GNU_SOURCE flag passed to the compiler.
+On Tue, Apr 30, 2024 at 11:23:04AM -0500, Mike Christie wrote:
+> On 4/30/24 8:05 AM, Edward Adam Davis wrote:
+> >  static int vhost_task_fn(void *data)
+> >  {
+> >  	struct vhost_task *vtsk = data;
+> > @@ -51,7 +51,7 @@ static int vhost_task_fn(void *data)
+> >  			schedule();
+> >  	}
+> >  
+> > -	mutex_lock(&vtsk->exit_mutex);
+> > +	mutex_lock(&exit_mutex);
+> >  	/*
+> >  	 * If a vhost_task_stop and SIGKILL race, we can ignore the SIGKILL.
+> >  	 * When the vhost layer has called vhost_task_stop it's already stopped
+> > @@ -62,7 +62,7 @@ static int vhost_task_fn(void *data)
+> >  		vtsk->handle_sigkill(vtsk->data);
+> >  	}
+> >  	complete(&vtsk->exited);
+> > -	mutex_unlock(&vtsk->exit_mutex);
+> > +	mutex_unlock(&exit_mutex);
+> >  
+> 
+> Edward, thanks for the patch. I think though I just needed to swap the
+> order of the calls above.
+> 
+> Instead of:
+> 
+> complete(&vtsk->exited);
+> mutex_unlock(&vtsk->exit_mutex);
+> 
+> it should have been:
+> 
+> mutex_unlock(&vtsk->exit_mutex);
+> complete(&vtsk->exited);
 
-Fixes: 809216233555 ("selftests/harness: remove use of LINE_MAX")
-Signed-off-by: Edward Liaw <edliaw@google.com>
----
- tools/testing/selftests/user_events/Makefile   | 2 +-
- tools/testing/selftests/user_events/abi_test.c | 1 -
- 2 files changed, 1 insertion(+), 2 deletions(-)
+JFYI Edward did it [1]
 
-diff --git a/tools/testing/selftests/user_events/Makefile b/tools/testing/selftests/user_events/Makefile
-index 10fcd0066203..344a71769113 100644
---- a/tools/testing/selftests/user_events/Makefile
-+++ b/tools/testing/selftests/user_events/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--CFLAGS += -Wl,-no-as-needed -Wall $(KHDR_INCLUDES)
-+CFLAGS += -Wl,-no-as-needed -Wall -D_GNU_SOURCE $(KHDR_INCLUDES)
- LDLIBS += -lrt -lpthread -lm
-
- TEST_GEN_PROGS = ftrace_test dyn_test perf_test abi_test
-diff --git a/tools/testing/selftests/user_events/abi_test.c b/tools/testing/selftests/user_events/abi_test.c
-index 7288a05136ba..3e3a0327afdc 100644
---- a/tools/testing/selftests/user_events/abi_test.c
-+++ b/tools/testing/selftests/user_events/abi_test.c
-@@ -5,7 +5,6 @@
-  * Copyright (c) 2022 Beau Belgrave <beaub@linux.microsoft.com>
-  */
-
--#define _GNU_SOURCE
- #include <sched.h>
-
- #include <errno.h>
---
-2.45.0.rc0.197.gbae5840b3b-goog
-
+[1] https://lore.kernel.org/lkml/tencent_546DA49414E876EEBECF2C78D26D242EE50A@qq.com/
+> 
+> If my analysis is correct, then Michael do you want me to resubmit a
+> patch on top of your vhost branch or resubmit the entire patchset?
 
