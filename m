@@ -1,300 +1,179 @@
-Return-Path: <kvm+bounces-16341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 085BA8B8BDB
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 16:27:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEC448B8BDD
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 16:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18569B21D62
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 14:27:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DA781C211F4
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 14:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9AE712F392;
-	Wed,  1 May 2024 14:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5130012F399;
+	Wed,  1 May 2024 14:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZzVsZ8T7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yIkInVr+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287AE12F369
-	for <kvm@vger.kernel.org>; Wed,  1 May 2024 14:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C62612F369
+	for <kvm@vger.kernel.org>; Wed,  1 May 2024 14:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714573624; cv=none; b=V+xlkowTMo5pEWgLNVR7sjsDoAcfeMH+f860UBKW5uQHB+yLUFnWkB5V+kwg+V77MRFFSMQWJYI/tfMk3D3VcC8OvJLxqNdzIndw+4X1w7XlaUv7XXBYPokOCfCbmdwgeipAlR99ROYlnnpypI3ytQ6prK7ZG9+c9439GHkYFy4=
+	t=1714573705; cv=none; b=sEVBbkAuNe2d7XQWWHcY3FO5Nc2XKwTq9ipuggiA7b9avpWhSh6tSaO5LkD1v0t6nfMbn2Ax0QnvK8oW+tgBM/cdJ7j9+c8tM+DAV3LYXO9+KhuEMAzjpXkinYSBEnAS2bXH4IBlvPcHdbwYISPahHVCveasy1Y/pMs5unZATO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714573624; c=relaxed/simple;
-	bh=VLDaNGeiHmozD59IvSgOUbhpYMSflJM6reIT+ykbn0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gRRLWhBmQ2sBks28B/bB0a9uTHOv29NcyEqlpkhx0uN7oeY9XeOTJAKrjkUCnTiS1Pq3EyHoO7294W0ExAgL6XGL2ZkqrKh61435ygU0HnVKKiPoWF64dpFHzg/bxW1znfJGdAQ9oLGN8eMkPCynwtb5byG9uLK+QbtfehRr3UI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZzVsZ8T7; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d858501412so87911311fa.0
-        for <kvm@vger.kernel.org>; Wed, 01 May 2024 07:27:01 -0700 (PDT)
+	s=arc-20240116; t=1714573705; c=relaxed/simple;
+	bh=ejN7GdpXckHQzIXsC1FJGXtUzTE2KYdclj/fn/dJjrg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WZntnB/le90MRoOi22DWhk0zLQGMtcPUD81bhoKZNyoPYez77Slyv1s1gPAhqASjev1voIp4ZJwPQKEnviEWednXVUazTDQdSBUBVQgYQAIZD5K1mOhTKqviMnwi9qkJHL0jquPR26HNvBQb3zj6HwVfc3XpC2z11sogX16Y/Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yIkInVr+; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61acc68c1bdso9075827b3.1
+        for <kvm@vger.kernel.org>; Wed, 01 May 2024 07:28:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1714573620; x=1715178420; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ZjthxVOkAIkSgJpgMhl5+EWLLpCqE1AJWtsVBUVw14=;
-        b=ZzVsZ8T7FBNw7kQ0Wu4QVusISJrAvYXSTU5tWOR0BWvk3RQ1uP92yTbx8zSIdKNY/s
-         qNZf2RYbYaThduQ1KsPxSTIIBTQHM1Zv570JGoOnk7B2rqfq21r37sDAh0epOfY9KbMu
-         o5yLB87TDQBA3jGLmUAtwfhLIbs+Oj7MHqxHu8Nga13phfzoEdT3uBMruUS2OULg+Oqk
-         9LsEgIHBqib/eBrOjRWU0loNafAIQyFUURHkMRIP2vrgmChPZIVsyY/S8B6eEjBc9vrR
-         nfO4RclXeNxQrlEM5N6Q5gzLuji6dW0VNjt45H6xobTUv8XMMWGjJHJ8wpSaY/U76d8Q
-         9MFg==
+        d=google.com; s=20230601; t=1714573703; x=1715178503; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XN3PxGtZEQXNqntUnTfIz5xk/K9LwEoscNdYQ+/jCbc=;
+        b=yIkInVr+T2n9SqoReSpWC6KAI3dtuyHyqF3lQtWvSow7T07+bGmZXWhr/D/jWWZXG6
+         y5ZV3CtlY7DKLyOvsYU6R6PJEVtXlb7/7A9mGgIzZ9hd7/gk/cq5vAVqwlZDuMscRWO6
+         Vnwf7MeCNZcfoEDWziDkYZnzDHrdhSgL76ACkpU3JdjLixdwGCn7HzKMUQf8l4EDgYSV
+         0w+HSrjqbZIiH4EpBEitkRRrP5CLRz8UTk0lEwQlqJfcsZTOM/OcQY84IkuRhl+I1eFb
+         BN/E5oDtYLo6Oya7cu9vWEiLyVucoQrrOdBqFqpSL6yIQ6uPPmq8t57yEaeKrneSN0Gf
+         f/0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714573620; x=1715178420;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/ZjthxVOkAIkSgJpgMhl5+EWLLpCqE1AJWtsVBUVw14=;
-        b=dnXJi8yXyaMSTEGkQdAxlK0yrMtQet1cStiZgAi19ycw+mMtoLgWVhwxe+HxN/yFPj
-         K2DwMbnX0NIq+2XunuUB5AKJpnLtPxf+FN7Lyjf6Jc7Sg2K1PaMeXTHl7V0ybCNJ/nvt
-         JuZHC10WQtCIsl9RDTi+Z6gGC/m/tP+YCZalZtxfuZq1DBJu67s9LQckG5UC5uDHvcck
-         aeJX+aM97ziOqCRWyM2THq7qxRHbEd3NNtHXWWWzsYyouTQYN79gw3h7EAtsyGtOyb5k
-         41updfH70DxO81ZN0m9vinkKRfiO65541y7BC8qxqPCLrdN726xWi792FeVvsOW2jhl7
-         inMg==
-X-Gm-Message-State: AOJu0Yz4VxlmYyJpzxkuGRPM0r8q+A3KRd3fYHp4RvmJtPdKuiV4v8nI
-	4wI9ih8q+ytw/fgqDJwJ+/qIQbyeOvO9ghCYaWRUxZg7xwnNyuXC6VEYpyfYxbk=
-X-Google-Smtp-Source: AGHT+IFP00lEVMK3ZoYagazXRbuD0jd0lzZYQqIAYWDPU+So3WVKQ11BgdI+7AOnv7sHvxT3s2Lbbg==
-X-Received: by 2002:a2e:87d6:0:b0:2e0:c6ec:bcf8 with SMTP id v22-20020a2e87d6000000b002e0c6ecbcf8mr1753294ljj.41.1714573620325;
-        Wed, 01 May 2024 07:27:00 -0700 (PDT)
-Received: from myrica ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id p18-20020a7bcc92000000b0041bfa2171efsm2340897wma.40.2024.05.01.07.26.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 May 2024 07:26:59 -0700 (PDT)
-Date: Wed, 1 May 2024 15:27:12 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 17/43] arm64: RME: Allow VMM to set RIPAS
-Message-ID: <20240501142712.GB484338@myrica>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-18-steven.price@arm.com>
+        d=1e100.net; s=20230601; t=1714573703; x=1715178503;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XN3PxGtZEQXNqntUnTfIz5xk/K9LwEoscNdYQ+/jCbc=;
+        b=gWh6GJLdRKtWDHKp3sEnBKeS9As6iGfSyRAfqPpz9KlWCzU2ccOn7fF65ej5rHKoOD
+         zyxlFgZ1KmauanpVjq+FviAo7q9btArLvXlybZfu56c+HL6R7pBAKd+TrPYnjDNuKEYY
+         xwQaurJDGHskx3Zj3Q6KEMONniz1o32QPBPhQp5Yw1ri3ryUsfc1IktPCVN266gMP3M8
+         +3Q3cfN9uWfvltWL3LvU8zqZvZJxNm5u48OeApJLw0pfJAhc/JVLpC7Mb8fCWr5R6xJ5
+         TwAtVnR78czvZOTkNnWHSsHmGiLXS63dXF0oFqwdXCVNafhZqlRD44lJTD4joV97vP1C
+         I66Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVHcOh7254gq4622aPsHyEIb8YAuI/ZpV+W0/XGvcZXZ2SHX5Cr2qKayv1YAGn2se1sbHWw4eGaTtwUc3v8sLc+ouR0
+X-Gm-Message-State: AOJu0Yzk+GBcUipX3++lt4sG+WSPA+qE3NvECeUI6RolIBdfegkaGg6a
+	89WV03uNB/R8tbiiOYTqhW66dDre2PxMPj1pR/0Yed9NfxgRXcl5wP2FRzHgXJezjQOkwmeyMLj
+	R3w==
+X-Google-Smtp-Source: AGHT+IHUezc4IZyZaMpXPcKS4Nl6spB8OORkXUO8w6Eu/n8Z2MEF5bQ0emcAkaZbOCNg6hB5INRjxf830ZQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:a283:0:b0:de5:a44c:25af with SMTP id
+ c3-20020a25a283000000b00de5a44c25afmr1319848ybi.5.1714573703105; Wed, 01 May
+ 2024 07:28:23 -0700 (PDT)
+Date: Wed, 1 May 2024 07:28:21 -0700
+In-Reply-To: <ZjGMn5tlq8edKZYv@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412084309.1733783-18-steven.price@arm.com>
+Mime-Version: 1.0
+References: <20240430193157.419425-1-seanjc@google.com> <ZjGMn5tlq8edKZYv@linux.dev>
+Message-ID: <ZjJRhQhX_12eBvY-@google.com>
+Subject: Re: [PATCH 0/4] KVM: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
+From: Sean Christopherson <seanjc@google.com>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Marc Zyngier <maz@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Apr 12, 2024 at 09:42:43AM +0100, Steven Price wrote:
-> +static inline bool realm_is_addr_protected(struct realm *realm,
-> +					   unsigned long addr)
-> +{
-> +	unsigned int ia_bits = realm->ia_bits;
-> +
-> +	return !(addr & ~(BIT(ia_bits - 1) - 1));
+On Wed, May 01, 2024, Oliver Upton wrote:
+> On Tue, Apr 30, 2024 at 12:31:53PM -0700, Sean Christopherson wrote:
+> > Drop kvm_arch_sched_in() and instead pass a @sched_in boolean to
+> > kvm_arch_vcpu_load().
+> > 
+> > While fiddling with an idea for optimizing state management on AMD CPUs,
+> > I wanted to skip re-saving certain host state when a vCPU is scheduled back
+> > in, as the state (theoretically) shouldn't change for the task while it's
+> > scheduled out.  Actually doing that was annoying and unnecessarily brittle
+> > due to having a separate API for the kvm_sched_in() case (the state save
+> > needed to be in kvm_arch_vcpu_load() for the common path).
+> > 
+> > E.g. I could have set a "temporary"-ish flag somewhere in kvm_vcpu, but (a)
+> > that's gross and (b) it would rely on the arbitrary ordering between
+> > sched_in() and vcpu_load() staying the same.
+> 
+> Another option would be to change the rules around kvm_arch_sched_in()
+> where the callee is expected to load the vCPU context.
+> 
+> The default implementation could just call kvm_arch_vcpu_load() directly
+> and the x86 implementation can order things the way it wants before
+> kvm_arch_vcpu_load().
+> 
+> I say this because ...
+> 
+> > The only real downside I see is that arm64 and riscv end up having to pass
+> > "false" for their direct usage of kvm_arch_vcpu_load(), and passing boolean
+> > literals isn't ideal.  But that can be solved by adding an inner helper that
+> > omits the @sched_in param (I almost added a patch to do that, but I couldn't
+> > convince myself it was necessary).
+> 
+> Needing to pass @sched_in for other usage of kvm_arch_vcpu_load() hurts
+> readability, especially when no other architecture besides x86 cares
+> about it.
 
-Is it enough to return !(addr & BIT(realm->ia_bits - 1))?
+Yeah, that bothers me too.
 
-> +static void realm_unmap_range_shared(struct kvm *kvm,
-> +				     int level,
-> +				     unsigned long start,
-> +				     unsigned long end)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	unsigned long rd = virt_to_phys(realm->rd);
-> +	ssize_t map_size = rme_rtt_level_mapsize(level);
-> +	unsigned long next_addr, addr;
-> +	unsigned long shared_bit = BIT(realm->ia_bits - 1);
-> +
-> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +		return;
-> +
-> +	start |= shared_bit;
-> +	end |= shared_bit;
-> +
-> +	for (addr = start; addr < end; addr = next_addr) {
-> +		unsigned long align_addr = ALIGN(addr, map_size);
-> +		int ret;
-> +
-> +		next_addr = ALIGN(addr + 1, map_size);
-> +
-> +		if (align_addr != addr || next_addr > end) {
-> +			/* Need to recurse deeper */
-> +			if (addr < align_addr)
-> +				next_addr = align_addr;
-> +			realm_unmap_range_shared(kvm, level + 1, addr,
-> +						 min(next_addr, end));
-> +			continue;
-> +		}
-> +
-> +		ret = rmi_rtt_unmap_unprotected(rd, addr, level, &next_addr);
-> +		switch (RMI_RETURN_STATUS(ret)) {
-> +		case RMI_SUCCESS:
-> +			break;
-> +		case RMI_ERROR_RTT:
-> +			if (next_addr == addr) {
-> +				next_addr = ALIGN(addr + 1, map_size);
-> +				realm_unmap_range_shared(kvm, level + 1, addr,
-> +							 next_addr);
-> +			}
-> +			break;
-> +		default:
-> +			WARN_ON(1);
+I tried your suggestion of having x86's kvm_arch_sched_in() do kvm_arch_vcpu_load(),
+and even with an added kvm_arch_sched_out() to provide symmetry, the x86 code is
+kludgy, and even the common code is a bit confusing as it's not super obvious
+that kvm_sched_{in,out}() is really just kvm_arch_vcpu_{load,put}().
 
-In this case we also need to return, because RMM returns with next_addr ==
-0, causing an infinite loop. At the moment a VMM can trigger this easily
-by creating guest memfd before creating a RD, see below
+Staring a bit more at the vCPU flags we have, adding a "bool scheduled_out" isn't
+terribly gross if it's done in common code and persists across load() and put(),
+i.e. isn't so blatantly a temporary field.  And because it's easy, it could be
+set with WRITE_ONCE() so that if it can be read cross-task if there's ever a
+reason to do so.
 
-> +		}
-> +	}
-> +}
-> +
-> +static void realm_unmap_range_private(struct kvm *kvm,
-> +				      unsigned long start,
-> +				      unsigned long end)
-> +{
-> +	struct realm *realm = &kvm->arch.realm;
-> +	ssize_t map_size = RME_PAGE_SIZE;
-> +	unsigned long next_addr, addr;
-> +
-> +	for (addr = start; addr < end; addr = next_addr) {
-> +		int ret;
-> +
-> +		next_addr = ALIGN(addr + 1, map_size);
-> +
-> +		ret = realm_destroy_protected(realm, addr, &next_addr);
-> +
-> +		if (WARN_ON(ret))
-> +			break;
-> +	}
-> +}
-> +
-> +static void realm_unmap_range(struct kvm *kvm,
-> +			      unsigned long start,
-> +			      unsigned long end,
-> +			      bool unmap_private)
-> +{
+The x86 code ends up being less ugly, and adding future arch/vendor code for
+sched_in() *or* sched_out() requires minimal churn, e.g. arch code doesn't need
+to override kvm_arch_sched_in().
 
-Should this check for a valid kvm->arch.realm.rd, or a valid realm state?
-I'm not sure what the best place is but none of the RMM calls will succeed
-if the RD is NULL, causing some WARNs.
+The only weird part is that vcpu->preempted and vcpu->ready have slightly
+different behavior, as they are cleared before kvm_arch_vcpu_load().  But the
+weirdness is really with those flags no having symmetry, not with scheduled_out
+itself.
 
-I can trigger this with set_memory_attributes() ioctls before creating a
-RD for example.
+Thoughts?
 
-> +	realm_unmap_range_shared(kvm, RME_RTT_MAX_LEVEL - 1, start, end);
-> +	if (unmap_private)
-> +		realm_unmap_range_private(kvm, start, end);
-> +}
-> +
->  u32 kvm_realm_ipa_limit(void)
->  {
->  	return u64_get_bits(rmm_feat_reg0, RMI_FEATURE_REGISTER_0_S2SZ);
-> @@ -190,6 +341,30 @@ static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
->  	return ret;
->  }
->  
-> +static int realm_create_rtt_levels(struct realm *realm,
-> +				   unsigned long ipa,
-> +				   int level,
-> +				   int max_level,
-> +				   struct kvm_mmu_memory_cache *mc)
-> +{
-> +	if (WARN_ON(level == max_level))
-> +		return 0;
-> +
-> +	while (level++ < max_level) {
-> +		phys_addr_t rtt = alloc_delegated_page(realm, mc);
-> +
-> +		if (rtt == PHYS_ADDR_MAX)
-> +			return -ENOMEM;
-> +
-> +		if (realm_rtt_create(realm, ipa, level, rtt)) {
-> +			free_delegated_page(realm, rtt);
-> +			return -ENXIO;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int realm_tear_down_rtt_level(struct realm *realm, int level,
->  				     unsigned long start, unsigned long end)
->  {
-> @@ -265,6 +440,68 @@ static int realm_tear_down_rtt_range(struct realm *realm,
->  					 start, end);
->  }
->  
-> +/*
-> + * Returns 0 on successful fold, a negative value on error, a positive value if
-> + * we were not able to fold all tables at this level.
-> + */
-> +static int realm_fold_rtt_level(struct realm *realm, int level,
-> +				unsigned long start, unsigned long end)
-> +{
-> +	int not_folded = 0;
-> +	ssize_t map_size;
-> +	unsigned long addr, next_addr;
-> +
-> +	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-> +		return -EINVAL;
-> +
-> +	map_size = rme_rtt_level_mapsize(level - 1);
-> +
-> +	for (addr = start; addr < end; addr = next_addr) {
-> +		phys_addr_t rtt_granule;
-> +		int ret;
-> +		unsigned long align_addr = ALIGN(addr, map_size);
-> +
-> +		next_addr = ALIGN(addr + 1, map_size);
-> +
-> +		ret = realm_rtt_fold(realm, align_addr, level, &rtt_granule);
-> +
-> +		switch (RMI_RETURN_STATUS(ret)) {
-> +		case RMI_SUCCESS:
-> +			if (!WARN_ON(rmi_granule_undelegate(rtt_granule)))
-> +				free_page((unsigned long)phys_to_virt(rtt_granule));
-> +			break;
-> +		case RMI_ERROR_RTT:
-> +			if (level == RME_RTT_MAX_LEVEL ||
-> +			    RMI_RETURN_INDEX(ret) < level) {
-> +				not_folded++;
-> +				break;
-> +			}
-> +			/* Recurse a level deeper */
-> +			ret = realm_fold_rtt_level(realm,
-> +						   level + 1,
-> +						   addr,
-> +						   next_addr);
-> +			if (ret < 0)
-> +				return ret;
-> +			else if (ret == 0)
-> +				/* Try again at this level */
-> +				next_addr = addr;
-> +			break;
-> +		default:
+static void kvm_sched_in(struct preempt_notifier *pn, int cpu)
+{
+	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
 
-Maybe this also deserves a WARN() to be consistent with the other RMI
-calls
+	WRITE_ONCE(vcpu->preempted, false);
+	WRITE_ONCE(vcpu->ready, false);
 
-Thanks,
-Jean
+	__this_cpu_write(kvm_running_vcpu, vcpu);
+	kvm_arch_vcpu_load(vcpu, cpu);
 
-> +			return -ENXIO;
-> +		}
-> +	}
-> +
-> +	return not_folded;
-> +}
+	WRITE_ONCE(vcpu->scheduled_out, false);
+}
+
+static void kvm_sched_out(struct preempt_notifier *pn,
+			  struct task_struct *next)
+{
+	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
+
+	WRITE_ONCE(vcpu->scheduled_out, true);
+
+	if (current->on_rq) {
+		WRITE_ONCE(vcpu->preempted, true);
+		WRITE_ONCE(vcpu->ready, true);
+	}
+	kvm_arch_vcpu_put(vcpu);
+	__this_cpu_write(kvm_running_vcpu, NULL);
+}
 
