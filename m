@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-16386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16387-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74298B9261
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 01:28:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E8908B9266
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 01:35:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86F621F211DC
-	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 23:28:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6012A1C20E35
+	for <lists+kvm@lfdr.de>; Wed,  1 May 2024 23:35:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9D916C43E;
-	Wed,  1 May 2024 23:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3B416ABEA;
+	Wed,  1 May 2024 23:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SHIsYObo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uSEOjapK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE95168B0A
-	for <kvm@vger.kernel.org>; Wed,  1 May 2024 23:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A3A130A4E
+	for <kvm@vger.kernel.org>; Wed,  1 May 2024 23:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714606070; cv=none; b=U5+Xvqr+KCniXyNGRh2TxuXhtYmGe2HGeEvHpOm0BuULC+isfJJChcib92gwMOuV8o4EGOpDkA8kaDjD8XWR8oDzlHrZ4k5k3Z7ze/UNIzZy2YxogMu5fnkRYALqHFP4w9T93sQVuBI1ggASyYiGWKN3C/sYiGdjxvfs3qAwAYE=
+	t=1714606498; cv=none; b=lipIq0wSzXI0nXSHt9YtJT2KNfLWJdZAxGAIa26KpZGi2RRN0ue++Yi1UplsSyJ4smNmcz8o7QymuLeGHO1ykfOJuPAai7YHtavT23AxB3w4PPkCqIQOxzEQoQnwnjPuFdqM+iWNohfX9N3GgK4/BzQKhRPLsJFPUW1gtlDlMd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714606070; c=relaxed/simple;
-	bh=xPKTQAY6H9NH4LCGNLAuTIrJpoVGbJlh2oFRm7BmuLA=;
+	s=arc-20240116; t=1714606498; c=relaxed/simple;
+	bh=cmg5ombo2+E108T+B8HGQWpNl7y2fndkiQ0TRQW1pto=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PUwkKEt9pkdgXY3ypLEGhOieCavYeBhYIgLZW6nDGTqnORaxTGhDB/lNK5ymW4D0bUBovP67wSICIg8M1wkug9PxBzQVrrW2nbgKsbGGs7vqVqgftkeqC8O4TAtRxFsaok7H8C80yBxyb8bo+/apZYueBAvOR0s1G2AjpFx05WA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SHIsYObo; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=FuTFB0yRIpRGBcP1T0QfLhv7qbJYEicQ12HUCirFL+UgQXE5QHfk1VrJYGA+Ej6UTR93ocrrwhj6Udhd/IcwvSvw1b0F4MoxwnDQ2S9AZ/Iu0L1QxJH2N1ZpbRLtNmARE+kyJSJzdFVsuFWJiXVLbAHgrMxoWZCboq5PyOVDShA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uSEOjapK; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b2738ce656so2205012a91.0
-        for <kvm@vger.kernel.org>; Wed, 01 May 2024 16:27:48 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b028ae5easo141282087b3.3
+        for <kvm@vger.kernel.org>; Wed, 01 May 2024 16:34:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714606068; x=1715210868; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714606495; x=1715211295; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MXAwrtGLrbcI4VZUxU94il3rKUGPiRgHtzGv9dxe9YQ=;
-        b=SHIsYObocUNELf4CV9FZxpUx69nv7W7TC52LxT0jKwUMQ2SUYNPeBT7V4/rN4g99GR
-         Wbyg+uAgd6x1ZCFStANOfcizhcfSrm7S/RH2S1GPW4q3mb5g2qzYDgfQHHitqP21aExy
-         fHjcIVSRWLqOExMDbuU8y6x3TtL3U7+9xoDF9wu8yKXGK/M5ZTjRRVgohvAmCR5NltdC
-         4/ST5AeMhLLD1UfC9xvp6dbb3dnBKmtQthhYfzthozYicfkSdtUNI/iKWIn4ZZOjcXSW
-         HbLaZdKQ2e3/uJ9t57OgJtWnPXmlFkdBNpikVFZKrfkHTew/ntOnqfWaxQVyThUzXPgD
-         gUaA==
+        bh=AQJqxc+lvi4niEeN7+w6OaI+bGgWHi17//EOTNci/0A=;
+        b=uSEOjapKYsQGXTB+5nYufs2o/v7/cOQCJ75OyNc2xIx174+kgeuBR+weaCcSyNSiSH
+         Qtcbc0fVMBYD0U24XoGhtdYrSsH2TlyFaIOHf9WeIcQK6gnFonOL9F3RSiL38qhG/8x8
+         yRnG/kOLPjzSqK0uLlD3LFw7McKc2CSUUKbEqNFIKToMIqS7YOozBSKnRVaZGvNLOX8I
+         wZGUzHgMbSKGpDyjafEOmmkDQAdXubPGo/2PGGAmRZcOfQm7RDwggZ874Gs/ltp21pXE
+         LOVaa6Mw9PmzO+ol6ZqTtIlPUV90rP8KMzEtTD9KRj4gN/+An8V2Q2kLfWq6nrvR4bqB
+         v9KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714606068; x=1715210868;
+        d=1e100.net; s=20230601; t=1714606495; x=1715211295;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MXAwrtGLrbcI4VZUxU94il3rKUGPiRgHtzGv9dxe9YQ=;
-        b=v/2sHWjTCsSvUCq85+ZVoBa0zpEsx7c3xPscHfKjCLCfq6vbQUcM34m0UTboz4uPzP
-         IuxyWuSLQutqD5Rut6jmelL20JyVl/avBtAbacuGF4zbCLL+YkcY34sosIrca3Bicg0+
-         beuwh5MoLob7cYxWBZdbgr8opSNxoiIXSNpgdiI0Zfg7BrNOb+peIu1YjgB1Gsfvl20E
-         Dx22bdKHAKIVDEvos5eiWrIcgBK41tT8CQNMdlNmgnMMjb88Pfwg1FsP3vz8GC4YQA+w
-         6R0YEBtBypeXW/Ds9lb1ILpXQ8MGgBiLgeST3s1JyAGSCH08t+mT+4CuprDf5P0jdXJR
-         p74w==
-X-Forwarded-Encrypted: i=1; AJvYcCXAgF4lrPy2/5IBO5kA7Vw6Cp9a2QPhOh16GlZVnmSczrsWE+2MB8gW2tzkUl60Sj6b6fscnYB9nTne5nzovcZcFFqc
-X-Gm-Message-State: AOJu0YyJTKehuVFbWsrbQFjjiqTgebza01mBrAW/zxqgZp0y7sHqQJhR
-	bEtj3KyzwFAnMKys/oTtaP32383LK8wE54H8L4szLrRECeGJnfXtyWxpVjawrH3J284MrvGuGV5
-	iww==
-X-Google-Smtp-Source: AGHT+IF4EwXU0JmQLvZRvuwORWuJiQp6XzXl9sqqMI0dc8K3/CZscl+xenDCC2dCoWsq9Og/2wncxvjuPJ8=
+        bh=AQJqxc+lvi4niEeN7+w6OaI+bGgWHi17//EOTNci/0A=;
+        b=fjy98Sp8J21KiStJM++r5ae4Yevg4H6/JAvRUtaYXp2K05M0jDxWKuNRLGGFDSee7P
+         s4C2vj4bU9oBsrbxbQPvt3sofehv3Sff5w9nLbkK/lnk+KlN4//5r8/hswn/P28sHOmR
+         YPboTIBllQxojCW7RHfPslSgtUVWXtRKc7pRpJd0pX573Yt2KyyohKFWDhguyHTruIgS
+         hz3YM3BKfOIAea2fpVZJqAyqjPOzL6+Rjs5C6VWkG7CCsIIcDFjYv+X1Yrtekh7XF0DC
+         4QVSSPEK/OqLA2yJTSZz9E2uywviIZhFWoOBIvSjtKu5kCFjdyiAxBUiNLVoh5meSr0L
+         iicw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcHiC4yDDZdhvIexWkOnIdRDpe4MzgQOgaoQiNDxHn4FTpZXtrRqvvdwa2Mj9oqTC6P8FCdF18gd7XuCVyvSHZ06Fy
+X-Gm-Message-State: AOJu0YxxusxgkWZikh77dkA7cdBDuKF7ndZWkld9pc7RtLNmycDT0Nbq
+	sSkoNQmRLNkw5UztqxlgOmZJeaJXekZSEB/Sjh3Dr3iDeG6op55YtVyPeSkvwckUl/Z5mSdU7ip
+	yRg==
+X-Google-Smtp-Source: AGHT+IFHBs070SjkQ6MZ513umVgzARseu57FPy78r3YifTI1JE3eDVZ40dsi3yaOYDlXF0exAkKhP4t6KW0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4d85:b0:2b2:7c77:ec7d with SMTP id
- oj5-20020a17090b4d8500b002b27c77ec7dmr11147pjb.2.1714606068268; Wed, 01 May
- 2024 16:27:48 -0700 (PDT)
-Date: Wed, 1 May 2024 16:27:46 -0700
-In-Reply-To: <20240219074733.122080-1-weijiang.yang@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:4b13:b0:61b:eac7:37f5 with SMTP id
+ ip19-20020a05690c4b1300b0061beac737f5mr92895ywb.9.1714606495617; Wed, 01 May
+ 2024 16:34:55 -0700 (PDT)
+Date: Wed, 1 May 2024 16:34:54 -0700
+In-Reply-To: <20240219074733.122080-25-weijiang.yang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240219074733.122080-1-weijiang.yang@intel.com>
-Message-ID: <ZjLP8jLWGOWnNnau@google.com>
-Subject: Re: [PATCH v10 00/27] Enable CET Virtualization
+References: <20240219074733.122080-1-weijiang.yang@intel.com> <20240219074733.122080-25-weijiang.yang@intel.com>
+Message-ID: <ZjLRnisdUgeYgg8i@google.com>
+Subject: Re: [PATCH v10 24/27] KVM: x86: Enable CET virtualization for VMX and
+ advertise to userspace
 From: Sean Christopherson <seanjc@google.com>
 To: Yang Weijiang <weijiang.yang@intel.com>
 Cc: pbonzini@redhat.com, dave.hansen@intel.com, x86@kernel.org, 
@@ -84,46 +85,50 @@ Cc: pbonzini@redhat.com, dave.hansen@intel.com, x86@kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Sun, Feb 18, 2024, Yang Weijiang wrote:
-> Sean Christopherson (4):
->   x86/fpu/xstate: Always preserve non-user xfeatures/flags in
->     __state_perm
->   KVM: x86: Rework cpuid_get_supported_xcr0() to operate on vCPU data
->   KVM: x86: Report XSS as to-be-saved if there are supported features
->   KVM: x86: Load guest FPU state when access XSAVE-managed MSRs
-> 
-> Yang Weijiang (23):
->   x86/fpu/xstate: Refine CET user xstate bit enabling
->   x86/fpu/xstate: Add CET supervisor mode state support
->   x86/fpu/xstate: Introduce XFEATURE_MASK_KERNEL_DYNAMIC xfeature set
->   x86/fpu/xstate: Introduce fpu_guest_cfg for guest FPU configuration
->   x86/fpu/xstate: Create guest fpstate with guest specific config
->   x86/fpu/xstate: Warn if kernel dynamic xfeatures detected in normal
->     fpstate
->   KVM: x86: Rename kvm_{g,s}et_msr()* to menifest emulation operations
->   KVM: x86: Refine xsave-managed guest register/MSR reset handling
->   KVM: x86: Add kvm_msr_{read,write}() helpers
->   KVM: x86: Refresh CPUID on write to guest MSR_IA32_XSS
->   KVM: x86: Initialize kvm_caps.supported_xss
->   KVM: x86: Add fault checks for guest CR4.CET setting
->   KVM: x86: Report KVM supported CET MSRs as to-be-saved
->   KVM: VMX: Introduce CET VMCS fields and control bits
->   KVM: x86: Use KVM-governed feature framework to track "SHSTK/IBT
->     enabled"
->   KVM: VMX: Emulate read and write to CET MSRs
->   KVM: x86: Save and reload SSP to/from SMRAM
->   KVM: VMX: Set up interception for CET MSRs
->   KVM: VMX: Set host constant supervisor states to VMCS fields
->   KVM: x86: Enable CET virtualization for VMX and advertise to userspace
->   KVM: nVMX: Introduce new VMX_BASIC bit for event error_code delivery
->     to L1
->   KVM: nVMX: Enable CET support for nested guest
->   KVM: x86: Don't emulate instructions guarded by CET
+> @@ -665,7 +665,7 @@ void kvm_set_cpu_caps(void)
+>  		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+>  		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+>  		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
+> -		F(SGX_LC) | F(BUS_LOCK_DETECT)
+> +		F(SGX_LC) | F(BUS_LOCK_DETECT) | F(SHSTK)
+>  	);
+>  	/* Set LA57 based on hardware capability. */
+>  	if (cpuid_ecx(7) & F(LA57))
+> @@ -683,7 +683,8 @@ void kvm_set_cpu_caps(void)
+>  		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
+>  		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
+>  		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) |
+> -		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(FLUSH_L1D)
+> +		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(FLUSH_L1D) |
+> +		F(IBT)
+>  	);
 
-A decent number of comments, but almost all of them are quite minor.  The big
-open is how to handle save/restore of SSP from userspace.
+...
 
-Instead of spinning a full v10, maybe send an RFC for KVM_{G,S}ET_ONE_REG idea?
-That will make it easier to review, and if you delay v11 a bit, I should be able
-to get various series applied that have minor conflicts/dependencies, e.g. the
-MSR access and the kvm_host series.
+> @@ -7977,6 +7993,18 @@ static __init void vmx_set_cpu_caps(void)
+>  
+>  	if (cpu_has_vmx_waitpkg())
+>  		kvm_cpu_cap_check_and_set(X86_FEATURE_WAITPKG);
+> +
+> +	/*
+> +	 * Disable CET if unrestricted_guest is unsupported as KVM doesn't
+> +	 * enforce CET HW behaviors in emulator. On platforms with
+> +	 * VMX_BASIC[bit56] == 0, inject #CP at VMX entry with error code
+> +	 * fails, so disable CET in this case too.
+> +	 */
+> +	if (!cpu_has_load_cet_ctrl() || !enable_unrestricted_guest ||
+> +	    !cpu_has_vmx_basic_no_hw_errcode()) {
+> +		kvm_cpu_cap_clear(X86_FEATURE_SHSTK);
+> +		kvm_cpu_cap_clear(X86_FEATURE_IBT);
+> +	}
+
+Oh!  Almost missed it.  This patch should explicitly kvm_cpu_cap_clear()
+X86_FEATURE_SHSTK and X86_FEATURE_IBT.  We *know* there are upcoming AMD CPUs
+that support at least SHSTK, so enumerating support for common code would yield
+a version of KVM that incorrectly advertises support for SHSTK.
+
+I hope to land both Intel and AMD virtualization in the same kernel release, but
+there are no guarantees that will happen.  And explicitly clearing both SHSTK and
+IBT would guard against IBT showing up in some future AMD CPU in advance of KVM
+gaining full support.
 
