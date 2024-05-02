@@ -1,48 +1,48 @@
-Return-Path: <kvm+bounces-16438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16442-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D673A8BA1E4
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 23:10:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46888BA1EF
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 23:12:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AFC11F22C3E
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 21:10:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 961CE283D29
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 21:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 620C91C0DCC;
-	Thu,  2 May 2024 21:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6339C1C0DF0;
+	Thu,  2 May 2024 21:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="me3UiuiT"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="me/zohhA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-190f.mail.infomaniak.ch (smtp-190f.mail.infomaniak.ch [185.125.25.15])
+Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [84.16.66.168])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA93194C9D
-	for <kvm@vger.kernel.org>; Thu,  2 May 2024 21:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C871C65E4
+	for <kvm@vger.kernel.org>; Thu,  2 May 2024 21:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.168
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714684191; cv=none; b=mETMeoCto96jVE4tbV6Gr/reibU+Zu6ruy+Z9dZIXqcZUmZEvzlC7AL7a3hfKIN7pSKmTftGkfuMXeykHZYhsozzo1dXcdGRmT2Na2SCpkJo7SdUiIn357d94PEUqbPZT4HHo62K1Yq6E6RtfhWUxmWrUTpl1BOtgzJSykyV+EQ=
+	t=1714684199; cv=none; b=ecrfQ8LSCYkymiXfVSdKn3W9lzrXBf+OOjHuP8Q0otWj1TxmdGVEXX4BQHxUnLXLVXp19lo7hJkjPA8xMoYSOY067NwyuytTAp2tlbwrsFQ8t3TE5M3QdKEOSiuLllSrECVg3GQ0IbwVoZ9NaOzydY7qvukadqTtrpbWZ16ZiNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714684191; c=relaxed/simple;
-	bh=6QKYOrdzJppIqKyHAIvgA7WW5vjmQK1fdvdMiBvid54=;
+	s=arc-20240116; t=1714684199; c=relaxed/simple;
+	bh=15Py21Y0wiTWxGYN8/FXrHgQsVA/abvkNE37zFQYec8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IXJCTFC2giXPyIUb8hUbJ3FRqD7unWX+JZz3RZMBNd2lBBjgtofW74O2S25Db0Gef6CCHxN7lIKOSSJSm80+DGUHqbgsZ8HGczvLzazD9F7DXEZ0hwhHkHNqaMRoic43saVvW3McHSEXkiyh6mNk81iwJQ/R0OFiXz9+eA9I6Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=me3UiuiT; arc=none smtp.client-ip=185.125.25.15
+	 MIME-Version:Content-Type; b=nOpXglCatZ9QmTxoNih1M75lmv6RtgXoO7KS+84wU9SVHeG1SMZefFpvMG0Dy3dwmCObyQRz46ahHlMTbxIj83HKtm2pZ49+nZGKraWnFq0s0ZkIsXjfPTbPuDPV+Q9EF2qPgzxNMSBP/6i+NoB1KdjTCLwTS9qcpRdLlveKtAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=me/zohhA; arc=none smtp.client-ip=84.16.66.168
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VVmlv741fzLQ2;
-	Thu,  2 May 2024 23:09:47 +0200 (CEST)
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VVmlw6pyKzMV6;
+	Thu,  2 May 2024 23:09:48 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1714684187;
-	bh=6QKYOrdzJppIqKyHAIvgA7WW5vjmQK1fdvdMiBvid54=;
+	s=20191114; t=1714684188;
+	bh=15Py21Y0wiTWxGYN8/FXrHgQsVA/abvkNE37zFQYec8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=me3UiuiTo9L4KbjRC31w7Yq+MfVhL+ME0ZFXeZJlS8sv2/4VjHU/NpfMs9etTiCC6
-	 SD6s7G6p2gmfPDxQGFLBJIaUcJTt9Kt6l5POZAWhpAXq4zFdIzTXr4e0FPPevvlwCe
-	 62bOqF9KHfmnxtDfs/LizG28HFnpM5Zw8dvsIxlg=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VVmlv30fKzLRB;
-	Thu,  2 May 2024 23:09:47 +0200 (CEST)
+	b=me/zohhAObZfSouj8HYKxLVfoDGVy4fwktvPiW/nUVS9aJMw3G1n6T81dfmH8G5rw
+	 FKzDsnhS5BUV50Lc7E/5JM75UTVhqHokaSNa9tVcmeTJK2lZ8qAmmY0XOBqiDpltn7
+	 I2WlZqKMKOXOQVYWA05QSYyI+dSCmMx4vk7DXDNg=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VVmlw3F5rzqpc;
+	Thu,  2 May 2024 23:09:48 +0200 (CEST)
 From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 To: Christian Brauner <brauner@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -60,9 +60,9 @@ Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
 	linux-kernel@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	Shuah Khan <skhan@linuxfoundation.org>
-Subject: [PATCH v4 07/10] selftests/pidfd: Fix wrong expectation
-Date: Thu,  2 May 2024 23:09:23 +0200
-Message-ID: <20240502210926.145539-8-mic@digikod.net>
+Subject: [PATCH v4 08/10] selftests/harness: Share _metadata between forked processes
+Date: Thu,  2 May 2024 23:09:24 +0200
+Message-ID: <20240502210926.145539-9-mic@digikod.net>
 In-Reply-To: <20240502210926.145539-1-mic@digikod.net>
 References: <20240502210926.145539-1-mic@digikod.net>
 Precedence: bulk
@@ -75,36 +75,61 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Infomaniak-Routing: alpha
 
-Replace a wrong EXPECT_GT(self->child_pid_exited, 0) with EXPECT_GE(),
-which will be actually tested on the parent and child sides with a
-following commit.
+Unconditionally share _metadata between all forked processes, which
+enables to actually catch errors which were previously ignored.
 
+This is required for a following commit replacing vfork() with clone3()
+and CLONE_VFORK (i.e. not sharing the full memory) .  It should also be
+useful to share _metadata to extend expectations to test process's
+forks.  For instance, this change identified a wrong expectation in
+pidfd_setns_test.
+
+Cc: Jakub Kicinski <kuba@kernel.org>
 Cc: Shuah Khan <skhan@linuxfoundation.org>
+Cc: Will Drewry <wad@chromium.org>
 Reviewed-by: Kees Cook <keescook@chromium.org>
-Reviewed-by: Christian Brauner <brauner@kernel.org>
 Signed-off-by: Mickaël Salaün <mic@digikod.net>
-Link: https://lore.kernel.org/r/20240502210926.145539-8-mic@digikod.net
+Link: https://lore.kernel.org/r/20240502210926.145539-9-mic@digikod.net
 ---
 
 Changes since v1:
 * Extract change from a bigger patch (suggested by Kees).
 ---
- tools/testing/selftests/pidfd/pidfd_setns_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kselftest_harness.h | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/pidfd/pidfd_setns_test.c b/tools/testing/selftests/pidfd/pidfd_setns_test.c
-index 6e2f2cd400ca..47746b0c6acd 100644
---- a/tools/testing/selftests/pidfd/pidfd_setns_test.c
-+++ b/tools/testing/selftests/pidfd/pidfd_setns_test.c
-@@ -158,7 +158,7 @@ FIXTURE_SETUP(current_nsset)
- 	/* Create task that exits right away. */
- 	self->child_pid_exited = create_child(&self->child_pidfd_exited,
- 					      CLONE_NEWUSER | CLONE_NEWNET);
--	EXPECT_GT(self->child_pid_exited, 0);
-+	EXPECT_GE(self->child_pid_exited, 0);
- 
- 	if (self->child_pid_exited == 0)
- 		_exit(EXIT_SUCCESS);
+diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+index 201040207c85..abf2ffd2094f 100644
+--- a/tools/testing/selftests/kselftest_harness.h
++++ b/tools/testing/selftests/kselftest_harness.h
+@@ -430,19 +430,17 @@ static inline pid_t clone3_vfork(void)
+ 			kill(getpid(), WTERMSIG(status)); \
+ 		__test_check_assert(_metadata); \
+ 	} \
+-	static struct __test_metadata \
+-		      _##fixture_name##_##test_name##_object = { \
+-		.name = #test_name, \
+-		.fn = &wrapper_##fixture_name##_##test_name, \
+-		.fixture = &_##fixture_name##_fixture_object, \
+-		.termsig = signal, \
+-		.timeout = tmout, \
+-		.teardown_parent = false, \
+-	 }; \
+ 	static void __attribute__((constructor)) \
+ 			_register_##fixture_name##_##test_name(void) \
+ 	{ \
+-		__register_test(&_##fixture_name##_##test_name##_object); \
++		struct __test_metadata *object = mmap(NULL, sizeof(*object), \
++			PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0); \
++		object->name = #test_name; \
++		object->fn = &wrapper_##fixture_name##_##test_name; \
++		object->fixture = &_##fixture_name##_fixture_object; \
++		object->termsig = signal; \
++		object->timeout = tmout; \
++		__register_test(object); \
+ 	} \
+ 	static void fixture_name##_##test_name( \
+ 		struct __test_metadata __attribute__((unused)) *_metadata, \
 -- 
 2.45.0
 
