@@ -1,138 +1,139 @@
-Return-Path: <kvm+bounces-16440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16445-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 058508BA1EB
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 23:11:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3037A8BA368
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 00:41:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F118EB22D16
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 21:11:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D28C1C220C3
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 22:41:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E551BF6DD;
-	Thu,  2 May 2024 21:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25151CA8A;
+	Thu,  2 May 2024 22:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="Y6QJwMwP"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="J8qjv+4O"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00E1418133D
-	for <kvm@vger.kernel.org>; Thu,  2 May 2024 21:09:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F151B28D
+	for <kvm@vger.kernel.org>; Thu,  2 May 2024 22:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714684196; cv=none; b=PxTNC1vj6nin1hzeGV/f4hVMu4gxgvT7dgh1s8wltnHOvr+okKwGdxlk/UQW8X4QQKvaEs0mI+f56buufpf7gRAiI2FplytSGXarSfNLor7WUzY7uhmp9wSpWwgYTr9BvVLdM2Izbb8PfVSRFMeDLjpWhhkRjLUfpNNwNgxk1r4=
+	t=1714689663; cv=none; b=X9iMyJLcCScH9Ycp3VOe2Z+7xYA9XiF2qDI6HLThJ8maN3iGGAgUOr7sGo6G58aUkAYigD4o37jl/ptUbZ5/4h8IvbESrLcmj1YNw0AnCwK1IxyhXTatB6k9Jlkn9+0MMsvwFWZVQwe50OujqgO/pSy/SwxZkSNgo2zBkOduy9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714684196; c=relaxed/simple;
-	bh=KqEsjBjuhpsjwrbJBGS/A9dvVAlJ3/nK7tVCR3svPG8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LT2kUeW0YJLffbSqzis8SpLnzoCK38IQfFnrUsgP3670IAYPjJ7B6hxXiB+6CfYKJqY2orStfJQPujPg66WaR85J8lfSqu73DBzS1rNAg4rZBpQuO72JYpDPEMBJ+Ly7zW8eaB1S+DqIwICy84gUg6NhTz6eEhMOHpqi3meTrXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=Y6QJwMwP; arc=none smtp.client-ip=84.16.66.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VVmm03jwczL5X;
-	Thu,  2 May 2024 23:09:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1714684192;
-	bh=KqEsjBjuhpsjwrbJBGS/A9dvVAlJ3/nK7tVCR3svPG8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Y6QJwMwPh4Vk1yiDX75N9NqUtxGjQbcqVDnJJwMC+pksry1GXyClOGQ3GYzXMUgZO
-	 HgLgI1GKJocjJZMQo+kHGoQzfFTMTkDLfiAqNYUgFcIeKUQaZgU7TW8RfojFaD2C32
-	 8h9VOq5brlKrfatEcHyD+/ITP9JwPb9ac502cs2c=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VVmlz3TX3zqTH;
-	Thu,  2 May 2024 23:09:51 +0200 (CEST)
-From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-To: Christian Brauner <brauner@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	Mark Brown <broonie@kernel.org>,
-	Sean Christopherson <seanjc@google.com>,
-	Shengyu Li <shengyu.li.evgeny@gmail.com>,
-	Shuah Khan <shuah@kernel.org>
-Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	"David S . Miller" <davem@davemloft.net>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Will Drewry <wad@chromium.org>,
-	kernel test robot <oliver.sang@intel.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH v4 10/10] selftests/harness: Fix TEST_F()'s exit codes
-Date: Thu,  2 May 2024 23:09:26 +0200
-Message-ID: <20240502210926.145539-11-mic@digikod.net>
-In-Reply-To: <20240502210926.145539-1-mic@digikod.net>
-References: <20240502210926.145539-1-mic@digikod.net>
+	s=arc-20240116; t=1714689663; c=relaxed/simple;
+	bh=bzyP4Xdw6nGRMa8O/ZIWOZc2YGpey8Rpt1THkkiSlKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NSwJh+U4mYWVDJaVIJnEl1GtyaQ2ET1vnZZW8y65CNYRq4foUcH58od7SnAuVX4sB8GtC0iJcrc0Kt3qtAtQ5soyDWC41g40K0W2dQlSrYXxOFWc4Xn6P/fWLMZEieNEWtKeuMk8Dm+UsmTK5C9VevdEnIGe87Dn96yd/x+Gj+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=J8qjv+4O; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6edb76d83d0so7496224b3a.0
+        for <kvm@vger.kernel.org>; Thu, 02 May 2024 15:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1714689661; x=1715294461; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/L9jD35jpO4uNtUxWEojKtoKI6VMvNDOlsLmuwoeTBY=;
+        b=J8qjv+4OwWekS+smq2pAOO2aD+7G0zxDDskE6DxYIMEFCqOJDEWRbgw67BNbn/LqVp
+         /dF4BxMfu/exf8AdUS3KFyACeksI+tvM7dHgD2xT2KgOJi96dSQomKCnPmIE7NeiHkcA
+         3qUG8xEx6vCC85Cn4OMcuMtdSxHYd464PTSqM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714689661; x=1715294461;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/L9jD35jpO4uNtUxWEojKtoKI6VMvNDOlsLmuwoeTBY=;
+        b=tWKSATJpdCL5uaswWuuogNHLlnyaEwnpLayphCfrdb9O7rpDS3yPIWPIqzyVlSmSrv
+         BphJEmvw9LF0y6pJ/oDTQ2aNPy8dqgMgVHzwbao6a0Z2s67wQDl+qqhQG/JFE2K/4NeV
+         nx7i/Dcpnhy8II+cY88wG38pBQ7E4c2JEa+Ft5Cjfw3vP1gkMQ91BSIlIogVgG+yGck5
+         5tLiWo6/c+LU2GN5bvpueO67Y8ohhVPdRpG0CyxTKah11Me2fvUY3jQsw7FTbeF1w2/2
+         9vYjypWBfDpot27aqBrPV5QwObjybF4StVdN2nAHFA9DoJpeaeJkI/agyULNaZBlEaKB
+         3Gww==
+X-Forwarded-Encrypted: i=1; AJvYcCXAWZbgFhfCMYV45rkr+zSZyQt7WvW8LJCK1ltPBjDUft3y+nWDbpW/1a2LQ/fFc2vi5Smh4RUD/lPNTCPlU4l2KdXT
+X-Gm-Message-State: AOJu0YwJ287nEPeWuNHBVEFx139nKbttf47qJeJM/ijmIOHhBuuL7X0C
+	hCth6F2p4Ee4YC4oh9XmscYw+T9GK0+vIAGPJEhmzb/GvjF01OmpXrCEX79tZw==
+X-Google-Smtp-Source: AGHT+IHT/crKZRZ/k6RhvANBVZPADnzOe9chhI8JjANxhrQb7VX4JbkZba2YNbbf5dsZ8cKd3o/FlQ==
+X-Received: by 2002:a05:6a20:5530:b0:1ad:8606:6484 with SMTP id ko48-20020a056a20553000b001ad86066484mr1120307pzb.8.1714689661156;
+        Thu, 02 May 2024 15:41:01 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id s185-20020a625ec2000000b006ed64f4767asm1845468pfb.112.2024.05.02.15.41.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 May 2024 15:41:00 -0700 (PDT)
+Date: Thu, 2 May 2024 15:41:00 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mark Brown <broonie@kernel.org>, Edward Liaw <edliaw@google.com>,
+	shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>, Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Bongsu Jeon <bongsu.jeon@samsung.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kernel-team@android.com, linux-sound@vger.kernel.org,
+	linux-input@vger.kernel.org, kvm@vger.kernel.org,
+	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
+	linux-sgx@vger.kernel.org
+Subject: Re: [PATCH v1 00/10] Define _GNU_SOURCE for sources using
+Message-ID: <202405021540.3FF73DF47@keescook>
+References: <20240430235057.1351993-1-edliaw@google.com>
+ <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
+ <ZjJClMYEIyGEo37e@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjJClMYEIyGEo37e@google.com>
 
-Always forward grandchild's exit codes to its parent.  This fixes
-KVM_ONE_VCPU_TEST().
+On Wed, May 01, 2024 at 06:24:36AM -0700, Sean Christopherson wrote:
+> On Wed, May 01, 2024, Mark Brown wrote:
+> > On Tue, Apr 30, 2024 at 11:50:09PM +0000, Edward Liaw wrote:
+> > > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> > > asprintf into kselftest_harness.h, which is a GNU extension and needs
+> > > _GNU_SOURCE to either be defined prior to including headers or with the
+> > > -D_GNU_SOURCE flag passed to the compiler.
+> > 
+> > This seems like something that should be handled centrally rather than
+> > having to go round and audit the users every time some update is made.
+> 
+> +1.
+> 
+> And if for some reason unilaterally defining _GNU_SOURCE in
+> tools/testing/selftests/lib.mk isn't an option, we should at least have
+> kselftest_harness.h assert instead of making a futile attempt to provide its own
+> definition, e.g.
+> 
+> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+> index 4fd735e48ee7..6741b4f20f25 100644
+> --- a/tools/testing/selftests/kselftest_harness.h
+> +++ b/tools/testing/selftests/kselftest_harness.h
+> @@ -51,7 +51,7 @@
+>  #define __KSELFTEST_HARNESS_H
+>  
+>  #ifndef _GNU_SOURCE
+> -#define _GNU_SOURCE
+> +static_assert(0, "Using the kselftests harness requires building with _GNU_SOURCE");
+>  #endif
+>  #include <asm/types.h>
+>  #include <ctype.h>
 
-Initial patch written by Sean Christopherson [1].
+Yeah, let's fix centrally. I like this approach.
 
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Will Drewry <wad@chromium.org>
-Link: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com [1]
-Fixes: 0710a1a73fb4 ("selftests/harness: Merge TEST_F_FORK() into TEST_F()")
-Signed-off-by: Mickaël Salaün <mic@digikod.net>
-Link: https://lore.kernel.org/r/20240502210926.145539-11-mic@digikod.net
----
-
-Changes since v3:
-* New patch mainly from Sean Christopherson.
----
- tools/testing/selftests/kselftest_harness.h | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-index d3837a3a584e..77d4fac8d0c0 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -442,7 +442,7 @@ static inline pid_t clone3_vfork(void)
- 				fixture_name##_setup(_metadata, self, variant->data); \
- 				/* Let setup failure terminate early. */ \
- 				if (_metadata->exit_code) \
--					_exit(0); \
-+					_exit(_metadata->exit_code); \
- 				_metadata->setup_completed = true; \
- 				fixture_name##_##test_name(_metadata, self, variant->data); \
- 			} else if (child < 0 || child != waitpid(child, &status, 0)) { \
-@@ -454,7 +454,7 @@ static inline pid_t clone3_vfork(void)
- 			if (_metadata->setup_completed && !fixture_name##_teardown_parent && \
- 					__sync_bool_compare_and_swap(teardown, false, true)) \
- 				fixture_name##_teardown(_metadata, self, variant->data); \
--			_exit(0); \
-+			_exit(_metadata->exit_code); \
- 		} \
- 		if (_metadata->setup_completed && fixture_name##_teardown_parent && \
- 				__sync_bool_compare_and_swap(teardown, false, true)) \
-@@ -462,8 +462,10 @@ static inline pid_t clone3_vfork(void)
- 		munmap(teardown, sizeof(*teardown)); \
- 		if (self && fixture_name##_teardown_parent) \
- 			munmap(self, sizeof(*self)); \
--		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
--			/* Forward signal to __wait_for_test(). */ \
-+		/* Forward exit codes and signals to __wait_for_test(). */ \
-+		if (WIFEXITED(status)) \
-+			_exit(_metadata->exit_code); \
-+		if (WIFSIGNALED(status)) \
- 			kill(getpid(), WTERMSIG(status)); \
- 		__test_check_assert(_metadata); \
- 	} \
 -- 
-2.45.0
-
+Kees Cook
 
