@@ -1,139 +1,131 @@
-Return-Path: <kvm+bounces-16445-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16446-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3037A8BA368
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 00:41:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC19E8BA36F
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 00:45:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D28C1C220C3
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 22:41:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C471CB212C1
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 22:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25151CA8A;
-	Thu,  2 May 2024 22:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37381BC53;
+	Thu,  2 May 2024 22:45:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="J8qjv+4O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ujVMxPHJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F151B28D
-	for <kvm@vger.kernel.org>; Thu,  2 May 2024 22:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D3518EB0
+	for <kvm@vger.kernel.org>; Thu,  2 May 2024 22:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714689663; cv=none; b=X9iMyJLcCScH9Ycp3VOe2Z+7xYA9XiF2qDI6HLThJ8maN3iGGAgUOr7sGo6G58aUkAYigD4o37jl/ptUbZ5/4h8IvbESrLcmj1YNw0AnCwK1IxyhXTatB6k9Jlkn9+0MMsvwFWZVQwe50OujqgO/pSy/SwxZkSNgo2zBkOduy9o=
+	t=1714689926; cv=none; b=MSj8EX0e52VnWx5dK5tOKGEmPtm6kMLBheSwrJi1FyHcXIZ0wj4O310p2wVIG7u6micaVZx7/RNT63Z4MabX9YJDshLMXaUDw4LiVaSUfsn6MTHBXZErkyAZIHmPindUzAhxq6PqKw1zQw/Dvg210bydgN0ENkT0Yj1BX8YE1ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714689663; c=relaxed/simple;
-	bh=bzyP4Xdw6nGRMa8O/ZIWOZc2YGpey8Rpt1THkkiSlKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NSwJh+U4mYWVDJaVIJnEl1GtyaQ2ET1vnZZW8y65CNYRq4foUcH58od7SnAuVX4sB8GtC0iJcrc0Kt3qtAtQ5soyDWC41g40K0W2dQlSrYXxOFWc4Xn6P/fWLMZEieNEWtKeuMk8Dm+UsmTK5C9VevdEnIGe87Dn96yd/x+Gj+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=J8qjv+4O; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6edb76d83d0so7496224b3a.0
-        for <kvm@vger.kernel.org>; Thu, 02 May 2024 15:41:01 -0700 (PDT)
+	s=arc-20240116; t=1714689926; c=relaxed/simple;
+	bh=I3uuLxNzOCssz8m+55xA6cGRFEwNKBKZs5w/RJydG7A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FjaC9oOtYul4uvsPFVmhP0KAs0xOv2VIxezzJ1zW4NkE4BpgMWNzGuyhtQOvwnDApij2qhYj8wetrfDXuozLC/Uc6aQ5KEklXDBpkWWu1XgU7ZWqt0DrWXFIzAyXtZzT6A2Mm9xawmH4brTyQnJ9bemrmlIPxXTd1X3pown1Oi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ujVMxPHJ; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de615257412so7027870276.0
+        for <kvm@vger.kernel.org>; Thu, 02 May 2024 15:45:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1714689661; x=1715294461; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/L9jD35jpO4uNtUxWEojKtoKI6VMvNDOlsLmuwoeTBY=;
-        b=J8qjv+4OwWekS+smq2pAOO2aD+7G0zxDDskE6DxYIMEFCqOJDEWRbgw67BNbn/LqVp
-         /dF4BxMfu/exf8AdUS3KFyACeksI+tvM7dHgD2xT2KgOJi96dSQomKCnPmIE7NeiHkcA
-         3qUG8xEx6vCC85Cn4OMcuMtdSxHYd464PTSqM=
+        d=google.com; s=20230601; t=1714689923; x=1715294723; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ng8wdniletCwnFQX4IxNkyDUgPARM59dfJ0NnGdDa/E=;
+        b=ujVMxPHJ2Cn7k+MIfeXQJknX/zdFnoKByglTesLMNxj9NselwIXhhpSSTGw4glqJL/
+         UUVuvlEYuBXfS9wvx43VAFRprj+J2AdpfK2KPsBl115Wz0HP//N62Esnh97eVseorvZB
+         x4CYopuRvL8/28ozmAeuYmxynuLVqi6BBF03BHJjxanCvSHuHdaL+9IYTpkxmX5+T9G3
+         rgsnEDk0iO0LMYeZvxKiA2yfbZVa5Ojc+dIjb16R84BRheBPuBLT6uh5DVkGXcwLumsI
+         sJ6WZ7Ripb3ZfvvXusjMN0r9N/pOJdqMtkxg1GYkzf+sOfH84O6btzuIUxWvOonOpzKj
+         G8aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714689661; x=1715294461;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/L9jD35jpO4uNtUxWEojKtoKI6VMvNDOlsLmuwoeTBY=;
-        b=tWKSATJpdCL5uaswWuuogNHLlnyaEwnpLayphCfrdb9O7rpDS3yPIWPIqzyVlSmSrv
-         BphJEmvw9LF0y6pJ/oDTQ2aNPy8dqgMgVHzwbao6a0Z2s67wQDl+qqhQG/JFE2K/4NeV
-         nx7i/Dcpnhy8II+cY88wG38pBQ7E4c2JEa+Ft5Cjfw3vP1gkMQ91BSIlIogVgG+yGck5
-         5tLiWo6/c+LU2GN5bvpueO67Y8ohhVPdRpG0CyxTKah11Me2fvUY3jQsw7FTbeF1w2/2
-         9vYjypWBfDpot27aqBrPV5QwObjybF4StVdN2nAHFA9DoJpeaeJkI/agyULNaZBlEaKB
-         3Gww==
-X-Forwarded-Encrypted: i=1; AJvYcCXAWZbgFhfCMYV45rkr+zSZyQt7WvW8LJCK1ltPBjDUft3y+nWDbpW/1a2LQ/fFc2vi5Smh4RUD/lPNTCPlU4l2KdXT
-X-Gm-Message-State: AOJu0YwJ287nEPeWuNHBVEFx139nKbttf47qJeJM/ijmIOHhBuuL7X0C
-	hCth6F2p4Ee4YC4oh9XmscYw+T9GK0+vIAGPJEhmzb/GvjF01OmpXrCEX79tZw==
-X-Google-Smtp-Source: AGHT+IHT/crKZRZ/k6RhvANBVZPADnzOe9chhI8JjANxhrQb7VX4JbkZba2YNbbf5dsZ8cKd3o/FlQ==
-X-Received: by 2002:a05:6a20:5530:b0:1ad:8606:6484 with SMTP id ko48-20020a056a20553000b001ad86066484mr1120307pzb.8.1714689661156;
-        Thu, 02 May 2024 15:41:01 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id s185-20020a625ec2000000b006ed64f4767asm1845468pfb.112.2024.05.02.15.41.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 15:41:00 -0700 (PDT)
-Date: Thu, 2 May 2024 15:41:00 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Mark Brown <broonie@kernel.org>, Edward Liaw <edliaw@google.com>,
-	shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>, Jiri Kosina <jikos@kernel.org>,
-	Benjamin Tissoires <bentiss@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Bongsu Jeon <bongsu.jeon@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kernel-team@android.com, linux-sound@vger.kernel.org,
-	linux-input@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-sgx@vger.kernel.org
-Subject: Re: [PATCH v1 00/10] Define _GNU_SOURCE for sources using
-Message-ID: <202405021540.3FF73DF47@keescook>
-References: <20240430235057.1351993-1-edliaw@google.com>
- <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
- <ZjJClMYEIyGEo37e@google.com>
+        d=1e100.net; s=20230601; t=1714689923; x=1715294723;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Ng8wdniletCwnFQX4IxNkyDUgPARM59dfJ0NnGdDa/E=;
+        b=P1+PK3O8heoyMDLOKH8r6FFW4Feh2SmHSoOuTM0CFED1C5F/PDX1ndREbVGUTNrRZU
+         syMh4k0uCN6jcl85k1zsQHUu1oRYg2GwOxwzW0BtXjCJzSVzz5VUW6GblF9ZtzSKWB/q
+         6YucuRB4yvMHSErJquxZTc9EoFkt0NITO9jf4f4tb2KEpoiFYqjAlJHDmuyZjQBdKFtU
+         jo/jZYniMgvN4t8iZmyYm6XaNf7t3AMZH80LrLgovt/Gozy68aBfnO4d6UdtZT4B6LpR
+         Dq0g01UNOiazUjsyYHYLp6oiYX4xAxLh541dmz0loEbhCRltgVWCd3rDvNqRjoV4ErJK
+         /8Pg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAtmHYd/1N5/jU23tfhumK9azR/vSxfL5Z8vZq8DU1OB3hL0ph2Au3+ZEOJdTD5WmmxAnJ57J/xdCbeR64P0G2Ca5B
+X-Gm-Message-State: AOJu0Yx6wypP7C+IJ1QRdHOymFSo78lcRdamXUI9Lk7ediOWPdUn3lJI
+	NlxM//8HfvGgNW9dIWwcJjaqSB6pfWBrEV+XK9yoDg+Pz7GMgWE24wwb2TR1M1OdHVHEb7aoDrw
+	Csg==
+X-Google-Smtp-Source: AGHT+IHSaclY4T7RoFl8xX5G9CqldxXXjOMPdHJpuQAdr0cFPX+iMLHEEOj88Q1SBORTFHpk2Agd2Mml/kE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:154f:b0:dc6:cd85:bcd7 with SMTP id
+ r15-20020a056902154f00b00dc6cd85bcd7mr359179ybu.3.1714689923750; Thu, 02 May
+ 2024 15:45:23 -0700 (PDT)
+Date: Thu, 2 May 2024 15:45:22 -0700
+In-Reply-To: <20240502210926.145539-11-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZjJClMYEIyGEo37e@google.com>
+Mime-Version: 1.0
+References: <20240502210926.145539-1-mic@digikod.net> <20240502210926.145539-11-mic@digikod.net>
+Message-ID: <ZjQXghB6imRFU4HX@google.com>
+Subject: Re: [PATCH v4 10/10] selftests/harness: Fix TEST_F()'s exit codes
+From: Sean Christopherson <seanjc@google.com>
+To: "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>
+Cc: Christian Brauner <brauner@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>, 
+	Shengyu Li <shengyu.li.evgeny@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>, Will Drewry <wad@chromium.org>, 
+	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 01, 2024 at 06:24:36AM -0700, Sean Christopherson wrote:
-> On Wed, May 01, 2024, Mark Brown wrote:
-> > On Tue, Apr 30, 2024 at 11:50:09PM +0000, Edward Liaw wrote:
-> > > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> > > asprintf into kselftest_harness.h, which is a GNU extension and needs
-> > > _GNU_SOURCE to either be defined prior to including headers or with the
-> > > -D_GNU_SOURCE flag passed to the compiler.
-> > 
-> > This seems like something that should be handled centrally rather than
-> > having to go round and audit the users every time some update is made.
-> 
-> +1.
-> 
-> And if for some reason unilaterally defining _GNU_SOURCE in
-> tools/testing/selftests/lib.mk isn't an option, we should at least have
-> kselftest_harness.h assert instead of making a futile attempt to provide its own
-> definition, e.g.
-> 
-> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-> index 4fd735e48ee7..6741b4f20f25 100644
-> --- a/tools/testing/selftests/kselftest_harness.h
-> +++ b/tools/testing/selftests/kselftest_harness.h
-> @@ -51,7 +51,7 @@
->  #define __KSELFTEST_HARNESS_H
->  
->  #ifndef _GNU_SOURCE
-> -#define _GNU_SOURCE
-> +static_assert(0, "Using the kselftests harness requires building with _GNU_SOURCE");
->  #endif
->  #include <asm/types.h>
->  #include <ctype.h>
+On Thu, May 02, 2024, Micka=C3=ABl Sala=C3=BCn wrote:
+> @@ -462,8 +462,10 @@ static inline pid_t clone3_vfork(void)
+>  		munmap(teardown, sizeof(*teardown)); \
+>  		if (self && fixture_name##_teardown_parent) \
+>  			munmap(self, sizeof(*self)); \
+> -		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
+> -			/* Forward signal to __wait_for_test(). */ \
+> +		/* Forward exit codes and signals to __wait_for_test(). */ \
+> +		if (WIFEXITED(status)) \
+> +			_exit(_metadata->exit_code); \
 
-Yeah, let's fix centrally. I like this approach.
+This needs to be:
 
--- 
-Kees Cook
+		if (WIFEXITED(status)) \
+			_exit(WEXITSTATUS(status)); \
+
+otherwise existing tests that communicate FAIL/SKIP via exit() continue to =
+yield
+exit(0) and thus false passes.
+
+If that conflicts with tests that want to communicate via _metadata->exit_c=
+ode,
+then maybe this?
+
+		if (WIFEXITED(status)) \
+			_exit(WEXITSTATUS(status) ?: _metadata->exit_code); \
+
+Or I suppose _metadata->exit_code could have priority, but that seems weird=
+ to
+me, e.g. if a test sets exit_code and then explodes, it seems like the expl=
+osion
+should be reported.
+
+> +		if (WIFSIGNALED(status)) \
+>  			kill(getpid(), WTERMSIG(status)); \
+>  		__test_check_assert(_metadata); \
+>  	} \
+> --=20
+> 2.45.0
+>=20
 
