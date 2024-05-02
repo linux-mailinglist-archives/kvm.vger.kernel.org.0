@@ -1,131 +1,145 @@
-Return-Path: <kvm+bounces-16446-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16447-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC19E8BA36F
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 00:45:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 487278BA3D1
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 01:11:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C471CB212C1
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 22:45:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 795C61C22D59
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 23:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37381BC53;
-	Thu,  2 May 2024 22:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A28B2200C7;
+	Thu,  2 May 2024 23:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ujVMxPHJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xqy6CaAq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D3518EB0
-	for <kvm@vger.kernel.org>; Thu,  2 May 2024 22:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61EE71C2BE;
+	Thu,  2 May 2024 23:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714689926; cv=none; b=MSj8EX0e52VnWx5dK5tOKGEmPtm6kMLBheSwrJi1FyHcXIZ0wj4O310p2wVIG7u6micaVZx7/RNT63Z4MabX9YJDshLMXaUDw4LiVaSUfsn6MTHBXZErkyAZIHmPindUzAhxq6PqKw1zQw/Dvg210bydgN0ENkT0Yj1BX8YE1ZI=
+	t=1714691504; cv=none; b=JuT9w+SagOoDFpuHG3awwWFR7cybIcE6fibo0M7A/esenhzKirzuhA7ZeeCaCW8O4ocaOsi5ObupKj+qpnklrn+vhV/N4gNmnw+7BYPovfgUD+cTsevMjhSIpn3czkQ/8nU/p7Pnj8VvjS89FaXWl+NXurQCpfEKnFkVHURqjq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714689926; c=relaxed/simple;
-	bh=I3uuLxNzOCssz8m+55xA6cGRFEwNKBKZs5w/RJydG7A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FjaC9oOtYul4uvsPFVmhP0KAs0xOv2VIxezzJ1zW4NkE4BpgMWNzGuyhtQOvwnDApij2qhYj8wetrfDXuozLC/Uc6aQ5KEklXDBpkWWu1XgU7ZWqt0DrWXFIzAyXtZzT6A2Mm9xawmH4brTyQnJ9bemrmlIPxXTd1X3pown1Oi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ujVMxPHJ; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de615257412so7027870276.0
-        for <kvm@vger.kernel.org>; Thu, 02 May 2024 15:45:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714689923; x=1715294723; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ng8wdniletCwnFQX4IxNkyDUgPARM59dfJ0NnGdDa/E=;
-        b=ujVMxPHJ2Cn7k+MIfeXQJknX/zdFnoKByglTesLMNxj9NselwIXhhpSSTGw4glqJL/
-         UUVuvlEYuBXfS9wvx43VAFRprj+J2AdpfK2KPsBl115Wz0HP//N62Esnh97eVseorvZB
-         x4CYopuRvL8/28ozmAeuYmxynuLVqi6BBF03BHJjxanCvSHuHdaL+9IYTpkxmX5+T9G3
-         rgsnEDk0iO0LMYeZvxKiA2yfbZVa5Ojc+dIjb16R84BRheBPuBLT6uh5DVkGXcwLumsI
-         sJ6WZ7Ripb3ZfvvXusjMN0r9N/pOJdqMtkxg1GYkzf+sOfH84O6btzuIUxWvOonOpzKj
-         G8aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714689923; x=1715294723;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ng8wdniletCwnFQX4IxNkyDUgPARM59dfJ0NnGdDa/E=;
-        b=P1+PK3O8heoyMDLOKH8r6FFW4Feh2SmHSoOuTM0CFED1C5F/PDX1ndREbVGUTNrRZU
-         syMh4k0uCN6jcl85k1zsQHUu1oRYg2GwOxwzW0BtXjCJzSVzz5VUW6GblF9ZtzSKWB/q
-         6YucuRB4yvMHSErJquxZTc9EoFkt0NITO9jf4f4tb2KEpoiFYqjAlJHDmuyZjQBdKFtU
-         jo/jZYniMgvN4t8iZmyYm6XaNf7t3AMZH80LrLgovt/Gozy68aBfnO4d6UdtZT4B6LpR
-         Dq0g01UNOiazUjsyYHYLp6oiYX4xAxLh541dmz0loEbhCRltgVWCd3rDvNqRjoV4ErJK
-         /8Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAtmHYd/1N5/jU23tfhumK9azR/vSxfL5Z8vZq8DU1OB3hL0ph2Au3+ZEOJdTD5WmmxAnJ57J/xdCbeR64P0G2Ca5B
-X-Gm-Message-State: AOJu0Yx6wypP7C+IJ1QRdHOymFSo78lcRdamXUI9Lk7ediOWPdUn3lJI
-	NlxM//8HfvGgNW9dIWwcJjaqSB6pfWBrEV+XK9yoDg+Pz7GMgWE24wwb2TR1M1OdHVHEb7aoDrw
-	Csg==
-X-Google-Smtp-Source: AGHT+IHSaclY4T7RoFl8xX5G9CqldxXXjOMPdHJpuQAdr0cFPX+iMLHEEOj88Q1SBORTFHpk2Agd2Mml/kE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:154f:b0:dc6:cd85:bcd7 with SMTP id
- r15-20020a056902154f00b00dc6cd85bcd7mr359179ybu.3.1714689923750; Thu, 02 May
- 2024 15:45:23 -0700 (PDT)
-Date: Thu, 2 May 2024 15:45:22 -0700
-In-Reply-To: <20240502210926.145539-11-mic@digikod.net>
+	s=arc-20240116; t=1714691504; c=relaxed/simple;
+	bh=BCu5DjqXcmPG//vCsbZOiiWzxlLCpxGZ01rex1Oz3Sw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hUt4bvIhPjAAbBbh9Qd8Iz/2xsOkz8CaCbcifehHq/I0yAdP42nP9a2gL9FZIy0JfDzDbHA5mhh5yKuTCikK1QJj6x6QcitDuxD8lbtA1NvhnQRcGTh8LebVrBTT8N+4YCVFJ1kEb1S20+KG1JyIEJmCsv9ebBoPBGBSZ746/uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xqy6CaAq; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714691503; x=1746227503;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BCu5DjqXcmPG//vCsbZOiiWzxlLCpxGZ01rex1Oz3Sw=;
+  b=Xqy6CaAqLf+VOn44b0AG/O4pMvLF65FU2OqVd/ELXmRd5z9z8JrwEj0C
+   NR8da0OyOGz+WEiKTil1LK4gsrKSxjC260jxNh3U6QPhXIuC8Y5Sod3PF
+   NRy0I4Elc0lZLJC4+cJBWo3FHwrdSi+P5HJKaN9JOfYpjACQBAoyixk9s
+   cLXDFeYwqw3EZZMSGsySMsYIxgHPJMYew50xV2SYDayPTJb4Jyc0x2qvA
+   Ohma0Bezu4vGGfSDcufjLeva48hFaZRzgvSG0cO8c/VhMDtqNESCk/oUH
+   QvnvX7QBnNGprNa/1yJMEYggE37h8bclZPUc3S8Ftj4N0ZLG6QaC0cBXy
+   A==;
+X-CSE-ConnectionGUID: K8bMoHgMQh2ZrZADPt/NjQ==
+X-CSE-MsgGUID: xJqCWu6FQU+i+mdXfaUZMw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11062"; a="10709730"
+X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
+   d="scan'208";a="10709730"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 16:11:42 -0700
+X-CSE-ConnectionGUID: pZ7LHjPERy2vcF7eAyPTwQ==
+X-CSE-MsgGUID: wVxZ/QkLRjizm+OBuZjfCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,247,1708416000"; 
+   d="scan'208";a="31777977"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.31])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2024 16:11:41 -0700
+Date: Thu, 2 May 2024 16:11:40 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev, linux-mm@kvack.org,
+	linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+	ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+	bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+	ak@linux.intel.com, tony.luck@intel.com,
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
+	pankaj.gupta@amd.com, liam.merwick@oracle.com,
+	isaku.yamahata@intel.com, isaku.yamahata@linux.intel.com,
+	rick.p.edgecombe@intel.com
+Subject: Re: [PATCH v15 02/20] KVM: x86: Add hook for determining max NPT
+ mapping level
+Message-ID: <20240502231140.GC13783@ls.amr.corp.intel.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-3-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240502210926.145539-1-mic@digikod.net> <20240502210926.145539-11-mic@digikod.net>
-Message-ID: <ZjQXghB6imRFU4HX@google.com>
-Subject: Re: [PATCH v4 10/10] selftests/harness: Fix TEST_F()'s exit codes
-From: Sean Christopherson <seanjc@google.com>
-To: "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>
-Cc: Christian Brauner <brauner@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>, 
-	Shengyu Li <shengyu.li.evgeny@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>, Will Drewry <wad@chromium.org>, 
-	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240501085210.2213060-3-michael.roth@amd.com>
 
-On Thu, May 02, 2024, Micka=C3=ABl Sala=C3=BCn wrote:
-> @@ -462,8 +462,10 @@ static inline pid_t clone3_vfork(void)
->  		munmap(teardown, sizeof(*teardown)); \
->  		if (self && fixture_name##_teardown_parent) \
->  			munmap(self, sizeof(*self)); \
-> -		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
-> -			/* Forward signal to __wait_for_test(). */ \
-> +		/* Forward exit codes and signals to __wait_for_test(). */ \
-> +		if (WIFEXITED(status)) \
-> +			_exit(_metadata->exit_code); \
+On Wed, May 01, 2024 at 03:51:52AM -0500,
+Michael Roth <michael.roth@amd.com> wrote:
 
-This needs to be:
+...
 
-		if (WIFEXITED(status)) \
-			_exit(WEXITSTATUS(status)); \
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index c6c5018376be..87265b73906a 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1816,6 +1816,7 @@ struct kvm_x86_ops {
+>  	void *(*alloc_apic_backing_page)(struct kvm_vcpu *vcpu);
+>  	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+>  	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
+> +	int (*private_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
 
-otherwise existing tests that communicate FAIL/SKIP via exit() continue to =
-yield
-exit(0) and thus false passes.
+Explicit private prefix is nice.
 
-If that conflicts with tests that want to communicate via _metadata->exit_c=
-ode,
-then maybe this?
 
-		if (WIFEXITED(status)) \
-			_exit(WEXITSTATUS(status) ?: _metadata->exit_code); \
+>  };
+>  
+>  struct kvm_x86_nested_ops {
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 510eb1117012..0d556da052f6 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4271,6 +4271,20 @@ static inline u8 kvm_max_level_for_order(int order)
+>  	return PG_LEVEL_4K;
+>  }
+>  
+> +static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+> +					u8 max_level, int gmem_order)
+> +{
+> +	if (max_level == PG_LEVEL_4K)
+> +		return PG_LEVEL_4K;
+> +
+> +	max_level = min(kvm_max_level_for_order(gmem_order), max_level);
+> +	if (max_level == PG_LEVEL_4K)
+> +		return PG_LEVEL_4K;
+> +
+> +	return min(max_level,
+> +		   static_call(kvm_x86_private_max_mapping_level)(kvm, pfn));
 
-Or I suppose _metadata->exit_code could have priority, but that seems weird=
- to
-me, e.g. if a test sets exit_code and then explodes, it seems like the expl=
-osion
-should be reported.
+If we don't implement this hook, OPTIONAL_RET0 causes always PG_LEVEL_NONE.
+Anyway when TDX implements the hook, we can remove OPTIONAL_RET0.
 
-> +		if (WIFSIGNALED(status)) \
->  			kill(getpid(), WTERMSIG(status)); \
->  		__test_check_assert(_metadata); \
->  	} \
-> --=20
-> 2.45.0
->=20
+This hook works for TDX by "return PG_LEVEL_4K;".
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
