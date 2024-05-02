@@ -1,55 +1,77 @@
-Return-Path: <kvm+bounces-16404-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16405-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2153D8B9729
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 11:06:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6411A8B9763
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 11:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCD74283BCB
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 09:06:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A8BE1F235E9
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 09:16:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D7F524B8;
-	Thu,  2 May 2024 09:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCAC453E20;
+	Thu,  2 May 2024 09:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="On4Ul2hr"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VlFbWNta"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324514F88C
-	for <kvm@vger.kernel.org>; Thu,  2 May 2024 09:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52364524D4;
+	Thu,  2 May 2024 09:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714640759; cv=none; b=YoR+x3S41JPwTyDcu4WdLDxLGsF0M6EYweLqvj5Pv3+wSfK3z0BTgnG50UY4lSKCBhXwYDex/v+vTNTiMXhUXSHOL7fIMKhtseJdtbDn45s+lS1ClrMkLuBaxEiG6zlfYudh9ZrBc4z2XqaD4PuGdJb+8B7ARe4+2oEs6QoKlmU=
+	t=1714641387; cv=none; b=UVIl49wCeM72CAUPVSD5cJwdz3T01f8mwdmO2r+c/U606WIHP8GEh2vJa6r4/Ij3g9K/qQ/UMvs/e9nQbghhf7lG6Bm3jlg442dOLaRBMcXI/SUC5mwVZ8VG95vw0DmeSDoTIQhqjmOCVV/eqOdS5LllRVKVvYKdH7AFEI/55RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714640759; c=relaxed/simple;
-	bh=raCWB4wu4X/HydTHJtlHR7UkkQKRzYd+JrrVZKNc5us=;
+	s=arc-20240116; t=1714641387; c=relaxed/simple;
+	bh=XpgtUboWUY4K6D8ln7r4Kd9Dv08JhYX+E7YkIpI3eo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ox4mttFBhBijB0X2tk/YzJ3v9tQ5x/Ka8grKf4bNrEGMXWh2ewtsXPZCNHe4mgMbenrWEZkmZJXwICBjxhE4DtSHA12gHiaZ/ra5N7R8hKSAX8qdmEvO6glzITyk6oJPKwhpUSlS8z77mt+ZjD7E6hA+9uS8duBMFjYBzUyfY74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=On4Ul2hr; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 2 May 2024 11:05:51 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1714640755;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4BD7u+E4fo5H0RPACm1/Cr8Sod7384r4iX9H+qoX0LI=;
-	b=On4Ul2hr0EN5cicHAOH5uBgVUp+Yycb6Br0GqaoSvvwLVZff0kK5Pch2aB2Ddn03pKKOqv
-	If4er+mhaaA5DCoHlmAy+Ewv6igc+qVyZr4uaJnjbDwoL9Na6xtoSgHdmeteU45Us3c1Cp
-	2T4yiH/LU6zFox62MYY3byeYzMCvOBM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Alexandru Elisei <alexandru.elisei@arm.com>, 
-	Eric Auger <eric.auger@redhat.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] arm64: Default to 4K translation granule
-Message-ID: <20240502-d67a14b9ac3dd606a52af562@orel>
-References: <20240502074156.1346049-1-oliver.upton@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oyt4LOdExWE8Avd3+POYrvR/y0GPC41Z3W2GKnpRx7elJRued7kdvymIH7Stm/BTpVxMK4/wC5vDe/lCQyb4eM9dX1cv6wXNxvkoWq6zNETorC5GgVsIa552EqPiQJyBN3rhsfMohRXOFo69hCi7e4z11/92ieJQmCg70T8H18E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VlFbWNta; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=zdfrErG2WKK57Kqg0tDJeJKezf1hsqRf679zsJ01Sx8=; b=VlFbWNta+BWffxnbEWRjYv+8ar
+	0mSAZEi/5K7GE5WmbbDT+r4ARA9iQeFFKkzCACPe/gwvSf/LmUcAlJNX/ZoW8bwgnYR9QDAGNKCRl
+	LzUKo6XjLhjBfyI4SmA0ITYpIXJydjEMOIR5DsW+FpCgValTn4WKP1/mCF21xbM9WHcwZgrRyRpU3
+	FiEPtEuWLxgIvsZuc6BZmNuqB9C27xGU6sZ+HHCefx17Ax1NXRdpTkAdW+Lul7YwDGf4y9Ll5M8Pf
+	tKmEV2OKo3OjFdHTXGjEEinxeVzjqku1MmncoJ0aeBuJXe50y5tEKJEF/VvmaENEvgQqxyQgc0DNI
+	6DxwtawA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s2SY5-00000001KYe-3aFr;
+	Thu, 02 May 2024 09:16:18 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 82B8B30057A; Thu,  2 May 2024 11:16:17 +0200 (CEST)
+Date: Thu, 2 May 2024 11:16:17 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Tobias Huschle <huschle@linux.ibm.com>,
+	Luis Machado <luis.machado@arm.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	nd <nd@arm.com>, borntraeger@linux.ibm.com,
+	Ingo Molnar <mingo@kernel.org>,
+	Mike Galbraith <umgwanakikbuti@gmail.com>
+Subject: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6 sched/fair: Add
+ lag based placement)
+Message-ID: <20240502091617.GZ30852@noisy.programming.kicks-ass.net>
+References: <73123.124031407552500165@us-mta-156.us.mimecast.lan>
+ <20240314110649-mutt-send-email-mst@kernel.org>
+ <84704.124031504335801509@us-mta-515.us.mimecast.lan>
+ <20240315062839-mutt-send-email-mst@kernel.org>
+ <b3fd680c675208370fc4560bb3b4d5b8@linux.ibm.com>
+ <20240319042829-mutt-send-email-mst@kernel.org>
+ <4808eab5fc5c85f12fe7d923de697a78@linux.ibm.com>
+ <ZjDM3SsZ3NkZuphP@DESKTOP-2CCOB1S.>
+ <20240501105151.GG40213@noisy.programming.kicks-ass.net>
+ <20240501112830-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,59 +80,30 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240502074156.1346049-1-oliver.upton@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240501112830-mutt-send-email-mst@kernel.org>
 
-On Thu, May 02, 2024 at 07:41:56AM GMT, Oliver Upton wrote:
-> Some arm64 implementations in the wild, like the Apple parts, do not
-> support the 64K translation granule. This can be a bit annoying when
-> running with the defaults on such hardware, as every test fails
-> before getting the MMU turned on.
-> 
-> Switch the default page size to 4K with the intention of having the
-> default setting be the most widely applicable one.
+On Wed, May 01, 2024 at 11:31:02AM -0400, Michael S. Tsirkin wrote:
+> On Wed, May 01, 2024 at 12:51:51PM +0200, Peter Zijlstra wrote:
 
-Yeah, this makes sense. The original 64k default didn't have any real
-justification. I only selected it since I had been drinking the "64k
-pages will rule the world" Kool-Aid for too long. The effects of that
-Kool-Aid have already long worn off though, so I'll get this merged.
+> > I'm still wondering why exactly it is imperative for t2 to preempt t1.
+> > Is there some unexpressed serialization / spin-waiting ?
+> 
+> 
+> I am not sure but I think the point is that t2 is a kworker. It is
+> much cheaper to run it right now when we are already in the kernel
+> than return to userspace, let it run for a bit then interrupt it
+> and then run t2.
+> Right, Tobias?
 
-Thanks,
-drew
+So that is fundamentally a consequence of using a kworker.
 
-> 
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  configure | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 49f047cb2d7d..4ac2ff3e6106 100755
-> --- a/configure
-> +++ b/configure
-> @@ -75,7 +75,7 @@ usage() {
->  	                           (s390x only)
->  	    --page-size=PAGE_SIZE
->  	                           Specify the page size (translation granule) (4k, 16k or
-> -	                           64k, default is 64k, arm64 only)
-> +	                           64k, default is 4k, arm64 only)
->  	    --earlycon=EARLYCON
->  	                           Specify the UART name, type and address (optional, arm and
->  	                           arm64 only). The specified address will overwrite the UART
-> @@ -243,11 +243,7 @@ if [ "$efi" ] && [ "$arch" = "riscv64" ] && [ -z "$efi_direct" ]; then
->  fi
->  
->  if [ -z "$page_size" ]; then
-> -    if [ "$efi" = 'y' ] && [ "$arch" = "arm64" ]; then
-> -        page_size="4096"
-> -    elif [ "$arch" = "arm64" ]; then
-> -        page_size="65536"
-> -    elif [ "$arch" = "arm" ]; then
-> +    if [ "$arch" = "arm" ] || [ "$arch" = "arm64" ]; then
->          page_size="4096"
->      fi
->  else
-> -- 
-> 2.45.0.rc1.225.g2a3ae87e7f-goog
-> 
+So I tried to have a quick peek at vhost to figure out why you're using
+kworkers... but no luck :/
+
+Also, when I look at drivers/vhost/ it seems to implement it's own
+worker and not use normal workqueues or even kthread_worker. Did we
+really need yet another copy of all that?
+
+Anyway, I tried to have a quick look at the code, but I can't seem to
+get a handle on what and why it's doing things.
 
