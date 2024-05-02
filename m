@@ -1,106 +1,161 @@
-Return-Path: <kvm+bounces-16391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 587868B932E
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 03:45:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A3BA8B94CF
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 08:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9617B22651
-	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 01:45:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 839A9B20F7B
+	for <lists+kvm@lfdr.de>; Thu,  2 May 2024 06:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E35171AD;
-	Thu,  2 May 2024 01:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8F01BC4E;
+	Thu,  2 May 2024 06:47:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b="EZAY33JE"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="LKe0TM3L"
 X-Original-To: kvm@vger.kernel.org
-Received: from gentwo.org (gentwo.org [62.72.0.81])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474733207;
-	Thu,  2 May 2024 01:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.72.0.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45757819;
+	Thu,  2 May 2024 06:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714614300; cv=none; b=X6OxVT8M5GzmKZlZXfyILrYQdxR7vtCqLVbQrXUeNJ2GNuBb9SScbxENsODQoXZUZU0BuJz9Kb2IIUN64j7Z6leF+/mdSEr9giJEerNnqFhROhgjV5cmRciVq4VzzQNaCOknytLerM06VMfQl3QvkG8/X5sCM1qJx8Dg3lwBfn0=
+	t=1714632443; cv=none; b=fqqvpDrq3HYNcfcuTcoujxUSsUozfIeSg8FZfds7RRklTndRiN0Ry/0KCriDZzV/3P8wz2KEDjiFQH/qw6w0N7kp5Ad3fTGbqrIlqOu44pRGOeGHxei77+mILcdcaNmZpBwF4RkQ5N+XlzXjAn/pRA4S627NEf8BNlDmkO7POfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714614300; c=relaxed/simple;
-	bh=4/6ccF66M6jfy4na42oviYshr2LOBPT25Dm7w4642t4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=RINtBZzi5mDN6/hWe4eGwUXSNAQ25/oe2pnfYNpguijOedhyIIdEtvPtN0rkuY3yDPjNpY5rAkGUV5FxTijrcaleBiESzoUpbsn/Dq/Iom5oprk3J1a65yNMJz3GS7VlVuFXdOaifU9KOOd4SLiM1ktz0Y9z47uPSRoKEPxjfXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gentwo.org; spf=pass smtp.mailfrom=gentwo.org; dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b=EZAY33JE; arc=none smtp.client-ip=62.72.0.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gentwo.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentwo.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gentwo.org;
-	s=default; t=1714613623;
-	bh=4/6ccF66M6jfy4na42oviYshr2LOBPT25Dm7w4642t4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=EZAY33JEALU8XVl7KTq3DxYg/uHLFyAMRvc4XqzUNE64PUsUG/nI+FirEx7DByHNF
-	 ZbpTx75v9UJMxP/IMChibVgFYJup586biteVaVOAQar6SqFbC+LrFD0f4TQQ86BH94
-	 3Uu9sInK+nne4DE4ugGPvNsR2M36BSUVqMBcoPeI=
-Received: by gentwo.org (Postfix, from userid 1003)
-	id F07EF401D5; Wed,  1 May 2024 18:33:42 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by gentwo.org (Postfix) with ESMTP id ECB50401C3;
-	Wed,  1 May 2024 18:33:42 -0700 (PDT)
-Date: Wed, 1 May 2024 18:33:42 -0700 (PDT)
-From: "Christoph Lameter (Ampere)" <cl@gentwo.org>
-To: Ankur Arora <ankur.a.arora@oracle.com>
-cc: linux-pm@vger.kernel.org, kvm@vger.kernel.org, 
-    linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-    catalin.marinas@arm.com, will@kernel.org, tglx@linutronix.de, 
-    mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com, 
-    pbonzini@redhat.com, wanpengli@tencent.com, vkuznets@redhat.com, 
-    rafael@kernel.org, daniel.lezcano@linaro.org, peterz@infradead.org, 
-    arnd@arndb.de, lenb@kernel.org, mark.rutland@arm.com, harisokn@amazon.com, 
-    joao.m.martins@oracle.com, boris.ostrovsky@oracle.com, 
-    konrad.wilk@oracle.com
-Subject: Re: [PATCH 1/9] cpuidle: rename ARCH_HAS_CPU_RELAX to
- ARCH_HAS_OPTIMIZED_POLL
-In-Reply-To: <20240430183730.561960-2-ankur.a.arora@oracle.com>
-Message-ID: <7473bd3d-f812-e039-24cf-501502206dc9@gentwo.org>
-References: <20240430183730.561960-1-ankur.a.arora@oracle.com> <20240430183730.561960-2-ankur.a.arora@oracle.com>
+	s=arc-20240116; t=1714632443; c=relaxed/simple;
+	bh=SLYUWv1FqeTmDucVkpoJ6azIPS2DejVJixDpKAATot0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Z2TtyPyOH0DgJYgu8S2XN3DqCHKT3I1lO5abxB7NLf7KRUHJghRIlLDMHfpg0wFWo6GIu2sFq6WZnPA2bb/HGvt6Yvt2W3GCP9N+RuryaNSb6XEGm1L1hEMEI7XJaV3bxMg5ojJalt6aF70F9IITWezZFny3ZLJ928Hf3iLBeZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=LKe0TM3L; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1714632436;
+	bh=mrGgxvSw1F21bEEOMCuH3SGmeA9rITTKwq+RASVYwX0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=LKe0TM3LD3wZWwj/dP77NlSbI5kZ3W/iQZF2Ey9s1g2QDPfK00qDN+GeZrSmIdlnB
+	 w1X2TruWqj79fGGXvxDMRLktYA0LvdYh6cjTudFdVerht02CfeKvJmZxCsAD9fWV/B
+	 J9h8bki04nxNCUojXHJ8tNxOKUNiDXO+FaQSY4cJithJJQkoklhLtK/vPnv9l4fGRE
+	 9EOrS07Rbf2QMmajADs+fomDQnU91dcEOFPIlK8qFeTIRewQQygpcWD6bP4pNr+edV
+	 l+3aYs4iEdue4huXXt35hTWp0bmAxUkGIXiexm4aFbPi15wX+FeAAUXqiORrSKhNSs
+	 CVe6c5U8m4c1g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VVPcd5kvkz4wxf;
+	Thu,  2 May 2024 16:47:13 +1000 (AEST)
+Date: Thu, 2 May 2024 16:47:11 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin"
+ <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>
+Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>, Isaku Yamahata
+ <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>,
+ Xiaoyao Li <xiaoyao.li@intel.com>, KVM <kvm@vger.kernel.org>, Linux Kernel
+ Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the kvm tree
+Message-ID: <20240502164711.06b5aca6@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+Content-Type: multipart/signed; boundary="Sig_/u9taxsfNaih2JgKfzbuTXpf";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, 30 Apr 2024, Ankur Arora wrote:
+--Sig_/u9taxsfNaih2JgKfzbuTXpf
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> ARCH_HAS_CPU_RELAX is a bit of a misnomer since all architectures
-> define cpu_relax(). Not all, however, have a performant version, with
-> some only implementing it as a compiler barrier.
->
-> In contexts that this config option is used, it is expected to provide
-> an architectural primitive that can be used as part of a polling
-> mechanism -- one that would be cheaper than spinning in a tight loop.
+Hi all,
 
-The intend of cpu_relax() is not a polling mechanism. Initial AFAICT it 
-was introduced on x86 as the REP NOP instruction. Aka as PAUSE. And it was 
-part of a spin loop. So there was no connection to polling anything.
+After merging the kvm tree, today's linux-next build (x86_64 allmodconfig)
+failed like this:
 
-The intend was to make the processor aware that we are in a spin loop. 
-Various processors have different actions that they take upon encountering 
-such a cpu relax operation.
+arch/x86/kvm/vmx/main.c:102:43: error: 'pi_has_pending_interrupt' undeclare=
+d here (not in a function)
+  102 |         .dy_apicv_has_pending_interrupt =3D pi_has_pending_interrup=
+t,
+      |                                           ^~~~~~~~~~~~~~~~~~~~~~~~
+arch/x86/kvm/vmx/main.c:131:27: error: 'vmx_pi_update_irte' undeclared here=
+ (not in a function); did you mean 'kvm_apic_update_irr'?
+  131 |         .pi_update_irte =3D vmx_pi_update_irte,
+      |                           ^~~~~~~~~~~~~~~~~~
+      |                           kvm_apic_update_irr
+arch/x86/kvm/vmx/main.c:132:32: error: 'vmx_pi_start_assignment' undeclared=
+ here (not in a function); did you mean 'kvm_arch_start_assignment'?
+  132 |         .pi_start_assignment =3D vmx_pi_start_assignment,
+      |                                ^~~~~~~~~~~~~~~~~~~~~~~
+      |                                kvm_arch_start_assignment
 
-The polling (WFE/WFI) available on ARM (and potentially other platforms) 
-is a different mechanism that is actually intended to reduce the power 
-requirement of the processor until a certain condition is met and that 
-check is done in hardware.
+Probably caused by commit
 
-These are not the same and I think we need both config options.
+  5f18c642ff7e ("KVM: VMX: Move out vmx_x86_ops to 'main.c' to dispatch VMX=
+ and TDX")
 
-The issues that you have with WFET later in the patchset arise from not 
-making this distinction.
+interacting with commit
 
-The polling (waiting for an event) could be implemented for a 
-processor not supporting that in hardware by using a loop that 
-checks for the condition and then does a cpu_relax().
+  699f67512f04 ("KVM: VMX: Move posted interrupt descriptor out of VMX code=
+")
 
-With that you could f.e. support the existing cpu_relax() and also have 
-some form of cpu_poll() interface.
+from the tip tree.
 
+I have applied the following merge resolution patch.
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Thu, 2 May 2024 14:13:25 +1000
+Subject: [PATCH] fixup for "KVM: VMX: Move posted interrupt descriptor out =
+of
+ VMX code"
+
+interacting with commit
+
+  5f18c642ff7e ("KVM: VMX: Move out vmx_x86_ops to 'main.c' to dispatch VMX=
+ andTDX")
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ arch/x86/kvm/vmx/main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 7c546ad3e4c9..d4ed681785fd 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -5,6 +5,7 @@
+ #include "vmx.h"
+ #include "nested.h"
+ #include "pmu.h"
++#include "posted_intr.h"
+=20
+ #define VMX_REQUIRED_APICV_INHIBITS				\
+ 	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
+--=20
+2.43.0
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/u9taxsfNaih2JgKfzbuTXpf
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYzNu8ACgkQAVBC80lX
+0GzQeAf/QqH2Kd0FrILfzRcfD/fuGeTiiQhbezCcAffbBJ0B74DONLWlg1Zi/UAz
+4LyeaRA6E8FrL2/wfTe+XTazFuB9hzWxvEr+sPbwPBwtjQdk+c/0/JlQ1ZLhbT3T
+t2k/xkPQEIZm5s9y37RjemCVvLICSdcr5FnJBKnR8SBwH4U6TqE+g5GYmAIVdDhC
+29t9Ileob+8btzcIRbP/13JYnSQBfgkQqJbT2Ff4Q/CVdYCP/HdICm5KHuXUzMD6
+rHlKsHynE91+zOSwOnFei/PZuC2Qte/lwddcK9Xi8OebO9kRv1cUNu64whVRx3iN
+E7TDTmPlXwsXo5YRpVSd16d+uG3K7A==
+=HXEM
+-----END PGP SIGNATURE-----
+
+--Sig_/u9taxsfNaih2JgKfzbuTXpf--
 
