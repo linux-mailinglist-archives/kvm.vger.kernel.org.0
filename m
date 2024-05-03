@@ -1,208 +1,212 @@
-Return-Path: <kvm+bounces-16524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7F68BB0D8
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:25:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DA298BB126
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E7A81C2122F
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:25:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14E5E2839C9
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01107155390;
-	Fri,  3 May 2024 16:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D33156C60;
+	Fri,  3 May 2024 16:42:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRUzpHcy"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="TE0zOntu"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFB7155358
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 16:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307BF156C5D
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 16:42:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714753513; cv=none; b=revEaNCayXJyLeAJTR5pAv6Sd+giJ68QEoHtj6Ud4kVTuehAkl3OwbirHEOdllqReihAMVCkCPuCqjl4VNclvknSbmmdSch83qQTbkMbOZvtzhC/YvL3RndFIxeGdn7bipDOmtMfsnEdqD9G6FWzXB1GIr2h/rvG/343xR/RZ3A=
+	t=1714754563; cv=none; b=suo3mlh7dQYjsvSK7ceU3SvLaEU5fG6k/poLZJb/n/Xw6o2c89w4WlDtgwJLYK4qd7peF32no/GZF4GFl5A4YyB5+yEogOSav/D3ao+PL/WCZHYfahCuhWiN51KcWNIBdetHy6bTugwC2Pyp1YY8rZ0i5jLLDBdJzdE+IMiFA9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714753513; c=relaxed/simple;
-	bh=RoF676vuyFm27DHY4XwxyZaQwzrnj2uD1HQnRhgi47M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o1tzNhliOKQpLdbicLlvFeVjPnU2ABSfaO586KQ3S796Xbcf6f+hYyKMTKd8fR+I3cUNA9DlTRSF1ES6AZv0njse7avgmkHVu4HT5Puab7Gq4G15S9vPD3e/K7dr5giobkxqHznWOfIj2ElsKplISNpjuUKHXDUyF4w+bH7QY/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PRUzpHcy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714753510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vqE9UjZMAlqhqqJ6rt/S7AmYw8z0wQLatEs+TgaWqbw=;
-	b=PRUzpHcyMJhFHSQ/rzV6+4VKZeYMtxEqnvDTUM2uPOWkFbEPAMJTfXD8vpbQFLHyQ/iUAg
-	I7UEm3iMrKiNa9kt+CPjTng/SYzPmm7p8roQ70chEzC0DNrGX4ZSB07sa9sPiOctlsudu7
-	qp3M98uECtcECjSYiloh4bESvDhnZqk=
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
- [209.85.166.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-56-Rv9DwUPdOYSBIBn_WK--Zw-1; Fri, 03 May 2024 12:25:09 -0400
-X-MC-Unique: Rv9DwUPdOYSBIBn_WK--Zw-1
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36c6b24fd6eso27951495ab.1
-        for <kvm@vger.kernel.org>; Fri, 03 May 2024 09:25:09 -0700 (PDT)
+	s=arc-20240116; t=1714754563; c=relaxed/simple;
+	bh=yC4oGgKTnqIzx0SwseiUuBVl6ikYuhNImy0LdahK+hY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yk3YEZZwOF0wzS/prtgDSCwitnHHGT4cuLQ9AcV6F7JT1LZseBgXjDnSarHnDf+9mmxAunVU2y0qWtOqX5VetoConhqbn1eRkqxLEFjrR80zI92gt+bTzN9gbchIUIKElrFyzkSsxMRGJTQnClXU5qOcSOG7y+43HeEEgV/ThwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=TE0zOntu; arc=none smtp.client-ip=209.85.210.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6ee2fda66easo3066092a34.3
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 09:42:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1714754561; x=1715359361; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9MCkvEl6vfBsR3xGXbm5ipuSQzsyNXlO2daQS9IANas=;
+        b=TE0zOntu+3apuUKJVLSWkF78FO0PGQCdxodCLGmkOG0wDvF3GWppAPWCmWBOQEOVP7
+         YJ0Awj7odvTnTxD7vMXpoZopROrJtOXzJGabZ2jhSyO+WopjtgVDLsz4G+jXyfSm4UF4
+         EiNl9NasSl5dKmhqBeXXbIPT0YdbeujHt75WCQoNJpGi1zArUz2uf+scBJO1IVeny7rA
+         7J/LRfVdPcY9Qbl8U/57m+oK1acU2EgPsYIT3f5ACWjsN4eIJbE4Pv3Q5vCn1+YCHw30
+         0ZNw1sxQvHLt0Qd4fsCjym+bhijRBVpaf21oauLcQxGy0r/Im7WfZStR2gC6XmaOBkMB
+         Cvcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714753508; x=1715358308;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vqE9UjZMAlqhqqJ6rt/S7AmYw8z0wQLatEs+TgaWqbw=;
-        b=rbjAzB4y+nTvQKuZnJhWXfmh1F8aM6GA8a1ym9+JJsF8JaYBUVB3bw8YhA/+jgOvQI
-         sJC9l9KVXQ2JjsbTQcYBWNuzQLjomp/QwlfzDTzqzaXA5Zk+74D/fGVuSHeMgV9/COOr
-         Gau5iLkJwhaOVSrwBfEVyqVL3MB9mIFFY6M9L7qyj0W/6Mn/RYjsStMNFiCCp3TFctoO
-         h1flkxLGX/nUnIoexsWacH+ygEpAz669t2sxmjijcf0JHG+gYgbtmyW1BSv/5nsLB0IF
-         DixO9pI2TroqcBB+TGOLJ133i91cQMUBApGAQaUFJCVrVzXDb3Ri3ODaOh3OMF6wXjSP
-         NxqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGsGqN5CQnk02gWSTzPC+9NITDtyeqry7d+W7djKX7Rr+A/R+800FmIBwQqTIgHnKJGxMILpaFcOUcuDToVDsLLuAx
-X-Gm-Message-State: AOJu0YzGwoMClf9A2FZPJ9yGG9UzW31N26iEvcngyAfDPLtbDTpHhPlJ
-	ANC9Tuo4HZikQR2vSmqOJPD9jKOAsZEnALL5WdqQajMRGgBmYsdK+37gCGZkKHlE2Lw/NRebe88
-	1bcH8sox5r4wzvk53Hz6O7gu5imPFU3lT+iXMuJg2O5BdGhPWpg==
-X-Received: by 2002:a05:6e02:b28:b0:36b:3b43:e3c3 with SMTP id e8-20020a056e020b2800b0036b3b43e3c3mr3818907ilu.14.1714753508375;
-        Fri, 03 May 2024 09:25:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEMHUNldeUszv7dyi3lt7U394Ez+ASLW0Y20RcLJK82P2cm6dyI2rq2WHK/yL+YRrrvT6vO2Q==
-X-Received: by 2002:a05:6e02:b28:b0:36b:3b43:e3c3 with SMTP id e8-20020a056e020b2800b0036b3b43e3c3mr3818886ilu.14.1714753508028;
-        Fri, 03 May 2024 09:25:08 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id dv14-20020a056638608e00b00487909f7416sm866115jab.5.2024.05.03.09.25.07
+        d=1e100.net; s=20230601; t=1714754561; x=1715359361;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9MCkvEl6vfBsR3xGXbm5ipuSQzsyNXlO2daQS9IANas=;
+        b=XdlXQUNWbxK5o0JyaFToUsg4PSqIUjwyIegSE2tFX/qJYKutZENdaArUdMbUCp5CUn
+         qdvSJ76AsvE9zLJGWG7smZMFrbMr8V3fMjX7ltmovJjmmnu3RxQlRxDuWVVi0yCRUbjy
+         YhWNXVXEairvcvd5lRN90PM49eww9/cTowcoRQwdb+tHaIPmLIAc0v9hP+knRIVlk3LT
+         Pq1HwE8+lrcvM4AEpWeWrdNDzu0uLtjVuVtYI/oAaYZgmZ/9nwMDgYsDudA8Us6lnaGj
+         fNEYH7zFoGt1qy6Y7NeaqQfBTFsOv+QBVd5tTwamFzIoggc5q72QfS4sV6EBhbkJuonh
+         acuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXDLxbqdNeeprHbe2ikd+2MLSz/i65+/LDTYjUxvEaw7OIKH7cdvHHeLc7QKV1bqezxdtEWyFHGSJ1OOJyEFkg6bjTE
+X-Gm-Message-State: AOJu0YxQwzzPMav8FgCkx5Y+ZD5aThhecmNtqZxMfCXSqGe4+xb4G437
+	ae9BCBlwJGT9NPxQQc8OG1dvBMebf3jjbIGaooIpAf4HcAkXqmu3G/luv3Ddkrg=
+X-Google-Smtp-Source: AGHT+IFVT2rAsXVdMpvr8pAPF1WuNA1CE6Xv9L67MOMLKugSh13tMbQmSyNxDuuJNWHb/QOcrYHVYQ==
+X-Received: by 2002:a05:6830:33fb:b0:6ee:1cc5:68c3 with SMTP id i27-20020a05683033fb00b006ee1cc568c3mr3499852otu.12.1714754561211;
+        Fri, 03 May 2024 09:42:41 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id ca14-20020a056830610e00b006ee5b409f23sm701317otb.22.2024.05.03.09.42.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 09:25:07 -0700 (PDT)
-Date: Fri, 3 May 2024 10:25:06 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Longfang Liu <liulongfang@huawei.com>
-Cc: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
- <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-Subject: Re: [PATCH v6 3/5] hisi_acc_vfio_pci: create subfunction for data
- reading
-Message-ID: <20240503102506.5b7a41ef.alex.williamson@redhat.com>
-In-Reply-To: <20240425132322.12041-4-liulongfang@huawei.com>
-References: <20240425132322.12041-1-liulongfang@huawei.com>
-	<20240425132322.12041-4-liulongfang@huawei.com>
-Organization: Red Hat
+        Fri, 03 May 2024 09:42:40 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1s2vzb-007ETb-4i;
+	Fri, 03 May 2024 13:42:39 -0300
+Date: Fri, 3 May 2024 13:42:39 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: "Zeng, Oak" <oak.zeng@intel.com>
+Cc: "leon@kernel.org" <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"Brost, Matthew" <matthew.brost@intel.com>,
+	"Hellstrom, Thomas" <thomas.hellstrom@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Zhu Yanjun <zyjzyj2000@gmail.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240503164239.GB901876@ziepe.ca>
+References: <cover.1709635535.git.leon@kernel.org>
+ <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
 
-On Thu, 25 Apr 2024 21:23:20 +0800
-Longfang Liu <liulongfang@huawei.com> wrote:
+On Thu, May 02, 2024 at 11:32:55PM +0000, Zeng, Oak wrote:
 
-> During the live migration process.
-
-This is not a complete sentence.
-
-> It needs to obtain various status
-> data of drivers and devices.
-
-What's "It" describing here?
-
-> In order to facilitate calling it in the
-> debugfs function.
-
-Also not a complete sentence.
-
-> For all operations that read data from device registers,
-> the driver creates a subfunction.
-
-There's only one sub-function.
-
-> Also fixed the location of address data.
-
-I think this is addressed in the previous patch now?  Thanks,
-
-Alex
-
-> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> ---
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    | 54 +++++++++++--------
->  1 file changed, 33 insertions(+), 21 deletions(-)
+> > Instead of teaching DMA to know these specific datatypes, let's separate
+> > existing DMA mapping routine to two steps and give an option to advanced
+> > callers (subsystems) perform all calculations internally in advance and
+> > map pages later when it is needed.
 > 
-> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> index 0c7e31076ff4..bf358ba94b5d 100644
-> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> @@ -486,31 +486,11 @@ static int vf_qm_load_data(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  	return 0;
->  }
->  
-> -static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> -			    struct hisi_acc_vf_migration_file *migf)
-> +static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
->  {
-> -	struct acc_vf_data *vf_data = &migf->vf_data;
-> -	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
->  	struct device *dev = &vf_qm->pdev->dev;
->  	int ret;
->  
-> -	if (unlikely(qm_wait_dev_not_ready(vf_qm))) {
-> -		/* Update state and return with match data */
-> -		vf_data->vf_qm_state = QM_NOT_READY;
-> -		hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
-> -		migf->total_length = QM_MATCH_SIZE;
-> -		return 0;
-> -	}
-> -
-> -	vf_data->vf_qm_state = QM_READY;
-> -	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
-> -
-> -	ret = vf_qm_cache_wb(vf_qm);
-> -	if (ret) {
-> -		dev_err(dev, "failed to writeback QM Cache!\n");
-> -		return ret;
-> -	}
-> -
->  	ret = qm_get_regs(vf_qm, vf_data);
->  	if (ret)
->  		return -EINVAL;
-> @@ -536,6 +516,38 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
->  		return -EINVAL;
->  	}
->  
-> +	return 0;
-> +}
-> +
-> +static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
-> +			    struct hisi_acc_vf_migration_file *migf)
-> +{
-> +	struct acc_vf_data *vf_data = &migf->vf_data;
-> +	struct hisi_qm *vf_qm = &hisi_acc_vdev->vf_qm;
-> +	struct device *dev = &vf_qm->pdev->dev;
-> +	int ret;
-> +
-> +	if (unlikely(qm_wait_dev_not_ready(vf_qm))) {
-> +		/* Update state and return with match data */
-> +		vf_data->vf_qm_state = QM_NOT_READY;
-> +		hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
-> +		migf->total_length = QM_MATCH_SIZE;
-> +		return 0;
-> +	}
-> +
-> +	vf_data->vf_qm_state = QM_READY;
-> +	hisi_acc_vdev->vf_qm_state = vf_data->vf_qm_state;
-> +
-> +	ret = vf_qm_cache_wb(vf_qm);
-> +	if (ret) {
-> +		dev_err(dev, "failed to writeback QM Cache!\n");
-> +		return ret;
-> +	}
-> +
-> +	ret = vf_qm_read_data(vf_qm, vf_data);
-> +	if (ret)
-> +		return -EINVAL;
-> +
->  	migf->total_length = sizeof(struct acc_vf_data);
->  	return 0;
->  }
+> I looked into how this scheme can be applied to DRM subsystem and GPU drivers. 
+> 
+> I figured RDMA can apply this scheme because RDMA can calculate the
+> iova size. Per my limited knowledge of rdma, user can register a
+> memory region (the reg_user_mr vfunc) and memory region's sized is
+> used to pre-allocate iova space. And in the RDMA use case, it seems
+> the user registered region can be very big, e.g., 512MiB or even GiB
 
+In RDMA the iova would be linked to the SVA granual we discussed
+previously.
+
+> In GPU driver, we have a few use cases where we need dma-mapping. Just name two:
+> 
+> 1) userptr: it is user malloc'ed/mmap'ed memory and registers to gpu
+> (in Intel's driver it is through a vm_bind api, similar to mmap). A
+> userptr can be of any random size, depending on user malloc
+> size. Today we use dma-map-sg for this use case. The down side of
+> our approach is, during userptr invalidation, even if user only
+> munmap partially of an userptr, we invalidate the whole userptr from
+> gpu page table, because there is no way for us to partially
+> dma-unmap the whole sg list. I think we can try your new API in this
+> case. The main benefit of the new approach is the partial munmap
+> case.
+
+Yes, this is one of the main things it will improve.
+ 
+> We will have to pre-allocate iova for each userptr, and we have many
+> userptrs of random size... So we might be not as efficient as RDMA
+> case where I assume user register a few big memory regions.
+
+You are already doing this. dma_map_sg() does exactly the same IOVA
+allocation under the covers.
+ 
+> 2) system allocator: it is malloc'ed/mmap'ed memory be used for GPU
+> program directly, without any other extra driver API call. We call
+> this use case system allocator.
+ 
+> For system allocator, driver have no knowledge of which virtual
+> address range is valid in advance. So when GPU access a
+> malloc'ed/mmap'ed address, we have a page fault. We then look up a
+> CPU vma which contains the fault address. I guess we can use the CPU
+> vma size to allocate the iova space of the same size?
+
+No. You'd follow what we discussed in the other thread.
+
+If you do a full SVA then you'd split your MM space into granuals and
+when a fault hits a granual you'd allocate the IOVA for the whole
+granual. RDMA ODP is using a 512M granual currently.
+
+If you are doing sub ranges then you'd probably allocate the IOVA for
+the well defined sub range (assuming the typical use case isn't huge)
+
+> But there will be a true difficulty to apply your scheme to this use
+> case. It is related to the STICKY flag. As I understand it, the
+> sticky flag is designed for driver to mark "this page/pfn has been
+> populated, no need to re-populate again", roughly...Unlike userptr
+> and RDMA use cases where the backing store of a buffer is always in
+> system memory, in the system allocator use case, the backing store
+> can be changing b/t system memory and GPU's device private
+> memory. Even worse, we have to assume the data migration b/t system
+> and GPU is dynamic. When data is migrated to GPU, we don't need
+> dma-map. And when migration happens to a pfn with STICKY flag, we
+> still need to repopulate this pfn. So you can see, it is not easy to
+> apply this scheme to this use case. At least I can't see an obvious
+> way.
+
+You are already doing this today, you are keeping the sg list around
+until you unmap it.
+
+Instead of keeping the sg list you'd keep a much smaller datastructure
+per-granual. The sticky bit is simply a convient way for ODP to manage
+the smaller data structure, you don't have to use it.
+
+But you do need to keep track of what pages in the granual have been
+DMA mapped - sg list was doing this before. This could be a simple
+bitmap array matching the granual size.
+
+Looking (far) forward we may be able to have a "replace" API that
+allows installing a new page unconditionally regardless of what is
+already there.
+
+Jason
 
