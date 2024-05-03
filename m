@@ -1,150 +1,94 @@
-Return-Path: <kvm+bounces-16543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48B9E8BB5B8
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 23:30:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA5D38BB5C3
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 23:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C9171C22DCD
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 21:30:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64C1C2842ED
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 21:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D2A5644F;
-	Fri,  3 May 2024 21:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80EDB54BD8;
+	Fri,  3 May 2024 21:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DdxW38AY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xq67X2Km"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 564D04F88C
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 21:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839FB2AEEE
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 21:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714771800; cv=none; b=Gy93q+2DMepT10su5N2FjHZzRgGeEvKHMkibuH4RXEGSaNWfNsZFBDqHHGYS+OsHq80j7ONv4wKdgdr/dxOJIUCVb+uHbozfPhEzuXNOLirkMSZshouasP6GLAPJz4CX6osuN8np5KFLOcohns2dgQ/qQBVn9hht2Xf/WJYxpQQ=
+	t=1714772003; cv=none; b=iu261F7pbwRYg12GRHQrcb3efpVQFjTHMYjiQ1fDIiIgBkaEHSNDnuXeJDHrCMveoLi2kDiYG3o1aLjIr8SWeqtoV7f1SoNMEZQKl22ENfbfohgkZ1VkG/wwA3aQo76QYuHMbK0I0qzrCYwrRcZ9H3wfYlcHiJ+Gtz7em4SNqtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714771800; c=relaxed/simple;
-	bh=EQL3IeOBP2Bu3dDlMxHDHIr3MtiCwMbPHUudi15G5QY=;
+	s=arc-20240116; t=1714772003; c=relaxed/simple;
+	bh=WqWc8suVd1Df3ueM1A2CgaqKlvPzR3CdLdrTJnLXcxA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jUVrsgXbZPvzqD23SXQY2ij/1+wCw6aQ6ymUXH28dPWwaWdox4q2Dms/H5QzifMvDLPRGUvRZukLVlz+5XHmYO4kkaYUp1jGJAroi7H6tzi1C0h+pTpHhd0It1yiCQev7EHJKp0bW5DvwqsPYUHeiFjdn27itII6fr8kHjieeyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DdxW38AY; arc=none smtp.client-ip=209.85.216.73
+	 To:Content-Type; b=FAvtovpFT5/bn8vjmIFXij8BLSYjghSRK5GsXRE9zVyctwhpbrtAfDr/qJvY0KDPIzeQuCMPEOWNpydoMuvw06g5EXYOuJS5m/DCAiAvauEvXOVrXBSpek+FN9+Kv6msd/Rb+PE2YprRaJQdo3K2KsYmJQ5BgfnclLpioGhUGoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xq67X2Km; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b2c438d031so162086a91.0
-        for <kvm@vger.kernel.org>; Fri, 03 May 2024 14:29:59 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1ec3e871624so1188595ad.2
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 14:33:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714771799; x=1715376599; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lNr9lZmsjOzqzGs7i+GBj2/4wYllIMuY8anx349EdT0=;
-        b=DdxW38AYZ4c9t5T6ft/zwfIdQQBEngxmtBJsZei+Ux8Y8kjJRgGUq46Wa7AbpuomB3
-         aHveA0IQ+/ta5QwTefzZSjS6po6YK/Lcy6nrVRkbqbv5uD/acTYTKIEQrL9GhW+7YhVa
-         GqRoXL3vSA+3NKPGEsAqKmMUdFr0Jj3u3DdO6RIpzOdcBBb3S0zy6hVq5pIgPANfObei
-         TjoA1tFqNYRc/CZUfLHLZgWUlZoidlm0VWwzqN6qOeLmD9ZURZst7xr5pJ4+dKtK9a33
-         omjMKM/hcWLU1C/uilp9BAP4Kg9u+FAX1e+3VwwAuZ9hv7wi/I4kEHNZnZrXCPjcMDwM
-         NVeQ==
+        d=google.com; s=20230601; t=1714772002; x=1715376802; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0RoYswLMrwyNTK07fZtKkAYuz7VD/335YhXH33cGgm4=;
+        b=Xq67X2KmX/1kXyfF7/Kvfp5fiRihsehhRfHnozQVI5u8wwBDjg0/fxZDLe81wuekwA
+         jtIAeeJvzXqGGzUJdci14ztgOhM5Nf3bvQq/o/52iNuSQTNjDGGjzm9s9hHLUaMkofIM
+         27Qu4XjKGBewCR3J2KrQ4OWzVQbRukO2eOC/0sv4mHYSSmbIB8w09IoyWIL/twyeSQAB
+         75pps2FXk0pWYflkakQD++BF+FamRnPWkrPodNl4i9fR5MNfmI5uqnVJTEoiWdA5aSyv
+         DNinGwytC+mAUk+Z456/wJf7dk5kYhRdIwmO7b/hRWvuRWNhj2VLoNwUST9IDn2pGGDd
+         bOHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714771799; x=1715376599;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lNr9lZmsjOzqzGs7i+GBj2/4wYllIMuY8anx349EdT0=;
-        b=in247+zpqwhzAHuT6fuuf1ENka6PcBUbgASy1vt9hKaxOQf/DLb9e/dAfk7YhSlr6P
-         bDQbnOYwpdApEBVw1oUarTyH9CnFnG/iXy7wubKwZM0YiPqJwjALe8RjMl86qannay5K
-         0xymnOkh4bLjOzyOi2l71mYCSbW62lYN3ZuaJKA7oCMN6P4XQEdNTGyhpR47NHFnmmi7
-         NnZKOqLLOCf/QKqc/27VPRkw9J3AeAZli4PAsX6KrneznvU9Dvf1nk/PT0Msi0ubffdr
-         idzJdiV9ATIiKRXf2u/Xo6eaByXQh2S+cU+eTqvf05Bw3gpBjee1xplaqkfK+QOIKqH0
-         HFjg==
-X-Forwarded-Encrypted: i=1; AJvYcCV/HlCdh5Dp5vjk/1i5Sdq4AIY3uOEpLeCft4Q2audu5O/jcxjGySG0mb2bnx41SkB9Ke0WfABySZZuxjz5mlBgADZ9
-X-Gm-Message-State: AOJu0YwDittB9uPGTZn+QWu4FMtOlq7OZsmXWu/oQkceipDMvgdxvBcH
-	ntigRk/n6TFm4sLRmfeGpmIp5uvPUwARgkNnrmhIIVFUrYVf++9zpXGIldIx345JrzCNO54FWtK
-	QOg==
-X-Google-Smtp-Source: AGHT+IF9Vxd2NYDOkdG6bdDYRHr51xqBZdk7NhC734vEBMcRNr/FlI1t8PmITviB5QPPFCtj8eIQae1ddMg=
+        d=1e100.net; s=20230601; t=1714772002; x=1715376802;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0RoYswLMrwyNTK07fZtKkAYuz7VD/335YhXH33cGgm4=;
+        b=Q/Bbuh5efiLFRmlRO9wQBfuKs9/VvYaRsL49u7u8zhb7sAWnG++k3XzGaU1+i4HxWT
+         miaKUJlZ3PCXXodvZSKRrslod5QCq4UJjRX0VwAx6Ok+HeJDfNB+9wUEOHQE2xUr9eMJ
+         pWLjzUzq3ulBJmpVSkwpgIZp3iKbiIeUcZQE4uR88J8JoZd/yAv5PV8CQZGKE91lgZ8e
+         UFvh71Ke99K2rtrBiXry1rAMxjCT6wXyn2p2q621y3yAdvP8sOFz5a/t0NXmUeCM7Gh1
+         gMcfQ4rMY3o1n7qThCzqJiFURHUU2Q6AqP7NLs8MzGfYHpV/HmK34uUgv5nusRc0HMh6
+         zUXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUH4axjrdNcnmePs6JqgU4qXIyNiZM1IwY5iAl+Pixo2nqwGXP8Xy3fIs35hruzVeBD5hUrv5OhB0m6BMuKcnPfhKNr
+X-Gm-Message-State: AOJu0YwmkLeamj/YE1skidnnEXGGpQJmj8qOEDlR5uGWlii4nhxZ7o91
+	x4E6lWEq3yDVvA2msnT4YoAzkRAiLGKaYM5/iL9sDFRflYHcKgG9bbL1GV46KGKz3q157FHSrU3
+	GOA==
+X-Google-Smtp-Source: AGHT+IFhaiHPssHnlXzdxwO6av6mBuLGwFQjQOUGMHO4ZCfgub0Pc/6hTx7C18hdUNKrU+GMoA0xj5I/V6A=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:db55:b0:2b2:9773:edab with SMTP id
- u21-20020a17090adb5500b002b29773edabmr10552pjx.0.1714771798574; Fri, 03 May
- 2024 14:29:58 -0700 (PDT)
-Date: Fri, 3 May 2024 14:29:57 -0700
-In-Reply-To: <ZjUwHvyvkM3lj80Q@LeoBras>
+ (user=seanjc job=sendgmr) by 2002:a17:903:124c:b0:1eb:826:a241 with SMTP id
+ u12-20020a170903124c00b001eb0826a241mr9750plh.11.1714772001723; Fri, 03 May
+ 2024 14:33:21 -0700 (PDT)
+Date: Fri,  3 May 2024 14:32:12 -0700
+In-Reply-To: <20240404232651.1645176-1-venkateshs@chromium.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240328171949.743211-1-leobras@redhat.com> <ZgsXRUTj40LmXVS4@google.com>
- <ZjUwHvyvkM3lj80Q@LeoBras>
-Message-ID: <ZjVXVc2e_V8NiMy3@google.com>
-Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+References: <20240404232651.1645176-1-venkateshs@chromium.org>
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <171466127070.768556.12609702796312030081.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: Remove kvm_make_all_cpus_request_except
 From: Sean Christopherson <seanjc@google.com>
-To: Leonardo Bras <leobras@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay <quic_neeraju@quicinc.com>, 
-	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
-	Boqun Feng <boqun.feng@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
-	Zqiang <qiang.zhang1211@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Venkatesh Srinivas <venkateshs@chromium.org>
+Content-Type: text/plain; charset="utf-8"
 
-On Fri, May 03, 2024, Leonardo Bras wrote:
-> > KVM can provide that information with much better precision, e.g. KVM
-> > knows when when it's in the core vCPU run loop.
-> 
-> That would not be enough.
-> I need to present the application/problem to make a point:
-> 
-> - There is multiple  isolated physical CPU (nohz_full) on which we want to 
->   run KVM_RT vcpus, which will be running a real-time (low latency) task.
-> - This task should not miss deadlines (RT), so we test the VM to make sure 
->   the maximum latency on a long run does not exceed the latency requirement
-> - This vcpu will run on SCHED_FIFO, but has to run on lower priority than
->   rcuc, so we can avoid stalling other cpus.
-> - There may be some scenarios where the vcpu will go back to userspace
->   (from KVM_RUN ioctl), and that does not mean it's good to interrupt the 
->   this to run other stuff (like rcuc).
->
-> Now, I understand it will cover most of our issues if we have a context 
-> tracking around the vcpu_run loop, since we can use that to decide not to 
-> run rcuc on the cpu if the interruption hapenned inside the loop.
-> 
-> But IIUC we can have a thread that "just got out of the loop" getting 
-> interrupted by the timer, and asked to run rcu_core which will be bad for 
-> latency.
-> 
-> I understand that the chance may be statistically low, but happening once 
-> may be enough to crush the latency numbers.
-> 
-> Now, I can't think on a place to put this context trackers in kvm code that 
-> would avoid the chance of rcuc running improperly, that's why the suggested 
-> timeout, even though its ugly.
-> 
-> About the false-positive, IIUC we could reduce it if we reset the per-cpu 
-> last_guest_exit on kvm_put.
+On Thu, 04 Apr 2024 23:26:51 +0000, Venkatesh Srinivas wrote:
+> except argument was not used.
 
-Which then opens up the window that you're trying to avoid (IRQ arriving just
-after the vCPU is put, before the CPU exits to userspace).
+Applied to kvm-x86 generic, with a much more verbose change.  Thanks!
 
-If you want the "entry to guest is imminent" status to be preserved across an exit
-to userspace, then it seems liek the flag really should be a property of the task,
-not a property of the physical CPU.  Similar to how rcu_is_cpu_rrupt_from_idle()
-detects that an idle task was interrupted, that goal is to detect if a vCPU task
-was interrupted.
+[1/1] KVM: Remove kvm_make_all_cpus_request_except
+      https://github.com/kvm-x86/linux/commit/82e9c84d8712
 
-PF_VCPU is already "taken" for similar tracking, but if we want to track "this
-task will soon enter an extended quiescent state", I don't see any reason to make
-it specific to vCPU tasks.  Unless the kernel/KVM dynamically manages the flag,
-which as above will create windows for false negatives, the kernel needs to
-trust userspace to a certaine extent no matter what.  E.g. even if KVM sets a
-PF_xxx flag on the first KVM_RUN, nothing would prevent userspace from calling
-into KVM to get KVM to set the flag, and then doing something else entirely with
-the task.
-
-So if we're comfortable relying on the 1 second timeout to guard against a
-misbehaving userspace, IMO we might as well fully rely on that guardrail.  I.e.
-add a generic PF_xxx flag (or whatever flag location is most appropriate) to let
-userspace communicate to the kernel that it's a real-time task that spends the
-overwhelming majority of its time in userspace or guest context, i.e. should be
-given extra leniency with respect to rcuc if the task happens to be interrupted
-while it's in kernel context.
+--
+https://github.com/kvm-x86/linux/tree/next
 
