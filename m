@@ -1,167 +1,143 @@
-Return-Path: <kvm+bounces-16516-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16517-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B28A78BAEA8
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:17:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C678BAEFC
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:28:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9035B21EA9
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 14:17:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0441F1F21B48
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 14:28:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6631552E0;
-	Fri,  3 May 2024 14:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFA1154C18;
+	Fri,  3 May 2024 14:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ADcoalrC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fGYJU+jX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10238154455
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 14:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142AE152193;
+	Fri,  3 May 2024 14:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714745840; cv=none; b=EraK2vKm37pkv9/fTiRvHSYNqZWRXG2uEoGBgemPb1e/Bn92mijppYF77cMvF9J84ZojCm7Rf/se6/gYqw87EXOcjmAYgv7wZq8uxpvz/H6zg6K5X/kfTTmbKx9ZTif6yXLndGLc4i92IyY5N7iiyuxnUjct+0RfdLycygbhfp4=
+	t=1714746472; cv=none; b=hXxXjvgZUjFnur09iU10k4/pBWhgK3w/meBAVHVCeCA8x7VzNSlLO47NOagqxfgiUJDaJmnMqP7dtzroTr1pDfdhAjykweHgYQs19O7bbZGnJQyguFgMvkU5StpCgxUboN8JcRoKuPHMmollEDvZCVTriijKsSk3+I6taLjNo+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714745840; c=relaxed/simple;
-	bh=Tw2mHGCJBZondqE0Nbp48iklfjoW+xXMxK0fvzgsi4M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nzwFA8I6uqEAXFUIFLkt+stU5euvdkfnzKP6IG20fj5ob42mIxACD5Nc8d0E/3mPIq5CiGP8bICVzGcRE6XU08N9lQugOp842kAz5LYuxaqUcNG7fGc1hEpGcYHU5hQYCU7Ijf0RC01Mc6LR5BJVNEY92D5M0jcmyvN8lKYvpws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ADcoalrC; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1ed1553c530so14493245ad.3
-        for <kvm@vger.kernel.org>; Fri, 03 May 2024 07:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714745838; x=1715350638; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=euaWG2d1xrAd5eW72Lhyga6K2ICgPg5ZdZZkZnwoCG8=;
-        b=ADcoalrCktZfm9wwMo8gYx9SYC7zLL5WOagtw8vpTsMTMkDbDzwn95quOU8z6A+z1U
-         w3TcXHWTbmcVuYw4tep1j7zpQqyxRgG8Zmy0i2amxcPEcPB7me4Miuzh4DLRxlcMO7nQ
-         ueorGKQaj4HmY+AFj9YvipJgTu56gqJsy1E8TAj6ATM2MT3SuR07pTfXyVj/cJtQwsjW
-         djpTznxnz05V/o6pRcmmqjoJ8q/lYDziFUKM1xTnYnGKW4ptJbezWxRVqvNt80w0JtSa
-         Mm/qsQFB/dc0+ut/dR1mnRuPDNfp+8HOB7OmHUIUiB4DZ2kYIsguNl3LjkgyyeyNAudn
-         J87w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714745838; x=1715350638;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=euaWG2d1xrAd5eW72Lhyga6K2ICgPg5ZdZZkZnwoCG8=;
-        b=F5Jq+aLGjHGzpvPmIVur0FSjb9CybatyZe9YtI2YiN9s6NzHwmVSjHdaDWKkS8U/C9
-         A4eQJCCRffhX0Cme5zwG7SuomuUCba0PLSXRPavpiQM6xJCiFvnUdqNC03u7hzAuKigO
-         VHThOl2JTee2j4KgFyzm2YPoAQYTDBmb0tUUb9FJLSzJUsntnG32Nv9TaBtoy468unv2
-         UYHA2ufHrPPLeSeupDYxodqhioWhBtcL1CNO7+fBgPOq4Dkjgczd36wiRhg+Mj7QRDxy
-         i/+AhrvdI/g/n5flgKQb91eaLdruSPyK0ZZxr6wIIZb/CHDwQD7Qj91qRJDap8oa3NhJ
-         1QbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXOf/dizjJ/Loqx+VMTKYtOM70ARn/QnBkXoHZRBs0UkQmBNni960Jaj+Ass+HD+CQ+rmlllIVjItX2V85eq+h+ZNhd
-X-Gm-Message-State: AOJu0Yx3vl1/Hi0tbEBU3RYK/HYHCVe1Chj/ZMEtos/BFq0GQ+s/WzNn
-	eA+UtEqunQbpd9DBVjqS8ATgVRahnOz8QWBo6csEmOMRDFV+uoZFiOHV5Wx2JOnm+ddjNkkgzqN
-	8Yw==
-X-Google-Smtp-Source: AGHT+IFXmNX8BI/5OInh9uFJfx5hH/VOCZeejP86ugVK83ToSLHsemrYMRjQmBhAQcz5sMlxtgdDcmPXGNw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d2d0:b0:1e2:97f1:87c0 with SMTP id
- n16-20020a170902d2d000b001e297f187c0mr247114plc.1.1714745838315; Fri, 03 May
- 2024 07:17:18 -0700 (PDT)
-Date: Fri, 3 May 2024 07:17:16 -0700
-In-Reply-To: <20240503105820.300927-11-mic@digikod.net>
+	s=arc-20240116; t=1714746472; c=relaxed/simple;
+	bh=DrBGLgX8Lrjw7dwGYbKIReB5FXtCr5ZSrbTwUaBz7Xg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=u3psqTRWijvp3+lgX6dQLYreGMW46DDn6KWelAk0JEeFbdBaa+LG5r1HGz5W/9rve/AqCHg+pou55zPCqRgo/v7pVZOdi4DuKAL2rlzwT7xS2mmHAZ2HgGh/pJfy/Ku1i3waHnqfnR6blZS5ai4CKUQK0iw9IM8cWaJZMOi3hhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fGYJU+jX; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1714746471; x=1746282471;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DrBGLgX8Lrjw7dwGYbKIReB5FXtCr5ZSrbTwUaBz7Xg=;
+  b=fGYJU+jXcQYXyHStZtKCMnpH73tEmvdbzTOmKvYHVUAiBtrYyFbrJTzC
+   a8isyt+L2Fvv+kHkNxezx2FxewGIRyyV9vqvwgbJqrgFRUAtoIG7L9P4H
+   U++zfIGS/Bk9HCju/uL40ydfJgNK216yoGxBvUuslPjffpqWyqGBLKemb
+   qX/YgjmhB5GM6kTsy9e3/mrcaO9mVTjuR2XoZ6+IbH5PPSVfxep5OL/fe
+   G/OcJEraFf/zHcs5P4cAQZ2RFU518G1fXwspi9rm/2GWyw4FOn+TzRktR
+   gjO7yETlVZjshy+/X6VOZ9RkuAR0TLwkRPIAcUkZFnpkTCXDeVuDOx8ER
+   Q==;
+X-CSE-ConnectionGUID: HSrbAGk/QUyjKQRr9BYDHQ==
+X-CSE-MsgGUID: F5bHBC9CSHuspS5aZhEtSQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10680766"
+X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
+   d="scan'208";a="10680766"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 07:25:55 -0700
+X-CSE-ConnectionGUID: UB+JpBRVSh+jzT1Od1MP2g==
+X-CSE-MsgGUID: zisVq0q/R1+YvZZzSPoPoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
+   d="scan'208";a="28055180"
+Received: from tdx-lm.sh.intel.com ([10.239.53.27])
+  by orviesa008.jf.intel.com with ESMTP; 03 May 2024 07:25:50 -0700
+From: Wei Wang <wei.w.wang@intel.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wei Wang <wei.w.wang@intel.com>
+Subject: [PATCH v1] KVM: x86: 0-initialize kvm_caps.supported_xss on definition
+Date: Fri,  3 May 2024 22:25:48 +0800
+Message-Id: <20240503142548.194585-1-wei.w.wang@intel.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240503105820.300927-1-mic@digikod.net> <20240503105820.300927-11-mic@digikod.net>
-Message-ID: <ZjTx7BYvbrqFSNuH@google.com>
-Subject: Re: [PATCH v5 10/10] selftests/harness: Handle TEST_F()'s explicit
- exit codes
-From: Sean Christopherson <seanjc@google.com>
-To: "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>
-Cc: Christian Brauner <brauner@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>, 
-	Shengyu Li <shengyu.li.evgeny@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>, Will Drewry <wad@chromium.org>, 
-	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 03, 2024, Micka=C3=ABl Sala=C3=BCn wrote:
-> If TEST_F() explicitly calls exit(code) with code different than 0, then
-> _metadata->exit_code is set to this code (e.g. KVM_ONE_VCPU_TEST()).  We
-> need to keep in mind that _metadata->exit_code can be KSFT_SKIP while
-> the process exit code is 0.
->=20
-> Initial patch written by Sean Christopherson [1].
+0-initialize kvm_caps.supported_xss on definition, so that it doesn't
+need to be explicitly zero-ed either in the common x86 or VMX/SVM
+initialization paths. This simplifies the code and reduces LOCs.
 
-Heh, my pseudo patch barely has any relevance at this point.  How about rep=
-lacing
-that with:
+No functional changes intended.
 
-  Reported-by: Sean Christopherson <seanjc@google.com>
-  Closes: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com
+Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+---
+ arch/x86/kvm/svm/svm.c | 1 -
+ arch/x86/kvm/vmx/vmx.c | 2 --
+ arch/x86/kvm/x86.c     | 4 +---
+ 3 files changed, 1 insertion(+), 6 deletions(-)
 
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Sean Christopherson <seanjc@google.com>
-> Cc: Shuah Khan <shuah@kernel.org>
-> Cc: Will Drewry <wad@chromium.org>
-> Link: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com [1]
-> Fixes: 0710a1a73fb4 ("selftests/harness: Merge TEST_F_FORK() into TEST_F(=
-)")
-> Signed-off-by: Micka=C3=ABl Sala=C3=BCn <mic@digikod.net>
-> Link: https://lore.kernel.org/r/20240503105820.300927-11-mic@digikod.net
-> ---
->=20
-> Changes since v4:
-> * Check abort status when the grandchild exited.
-> * Keep the _exit(0) calls because _metadata->exit_code is always
->   checked.
-> * Only set _metadata->exit_code to WEXITSTATUS() if it is not zero.
->=20
-> Changes since v3:
-> * New patch mainly from Sean Christopherson.
-> ---
->  tools/testing/selftests/kselftest_harness.h | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/=
-selftests/kselftest_harness.h
-> index eb25f7c11949..7612bf09c5f8 100644
-> --- a/tools/testing/selftests/kselftest_harness.h
-> +++ b/tools/testing/selftests/kselftest_harness.h
-> @@ -462,9 +462,13 @@ static inline pid_t clone3_vfork(void)
->  		munmap(teardown, sizeof(*teardown)); \
->  		if (self && fixture_name##_teardown_parent) \
->  			munmap(self, sizeof(*self)); \
-> -		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
-> +		if (WIFEXITED(status)) { \
-> +			if (WEXITSTATUS(status)) \
-> +				_metadata->exit_code =3D WEXITSTATUS(status); \
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 9aaf83c8d57d..8105e5383b62 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -5092,7 +5092,6 @@ static __init void svm_set_cpu_caps(void)
+ 	kvm_set_cpu_caps();
+ 
+ 	kvm_caps.supported_perf_cap = 0;
+-	kvm_caps.supported_xss = 0;
+ 
+ 	/* CPUID 0x80000001 and 0x8000000A (SVM features) */
+ 	if (nested) {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 22411f4aff53..495125723c15 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7952,8 +7952,6 @@ static __init void vmx_set_cpu_caps(void)
+ 	if (vmx_umip_emulated())
+ 		kvm_cpu_cap_set(X86_FEATURE_UMIP);
+ 
+-	/* CPUID 0xD.1 */
+-	kvm_caps.supported_xss = 0;
+ 	if (!cpu_has_vmx_xsaves())
+ 		kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 91478b769af0..6a97592950ff 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -94,6 +94,7 @@
+ 
+ struct kvm_caps kvm_caps __read_mostly = {
+ 	.supported_mce_cap = MCG_CTL_P | MCG_SER_P,
++	.supported_xss = 0,
+ };
+ EXPORT_SYMBOL_GPL(kvm_caps);
+ 
+@@ -9795,9 +9796,6 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
+ 
+ 	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
+ 
+-	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+-		kvm_caps.supported_xss = 0;
+-
+ #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
+ 	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
+ #undef __kvm_cpu_cap_has
 
-Ah, IIUC, this works because __run_test() effectively forwards the exit_cod=
-e?
+base-commit: 16c20208b9c2fff73015ad4e609072feafbf81ad
+-- 
+2.27.0
 
-	} else if (t->pid =3D=3D 0) {
-		setpgrp();
-		t->fn(t, variant);
-		_exit(t->exit_code);
-	}
-
-Tested-by: Sean Christopherson <seanjc@google.com>
-
-> +		} else if (WIFSIGNALED(status)) { \
->  			/* Forward signal to __wait_for_test(). */ \
->  			kill(getpid(), WTERMSIG(status)); \
-> +		} \
->  		__test_check_assert(_metadata); \
->  	} \
->  	static void __attribute__((constructor)) \
-> --=20
-> 2.45.0
->=20
 
