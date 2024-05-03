@@ -1,252 +1,284 @@
-Return-Path: <kvm+bounces-16535-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16536-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0758BB363
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 20:43:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9608A8BB36D
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 20:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB791C21F66
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:43:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B95BD1C21AC8
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD1212F38E;
-	Fri,  3 May 2024 18:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A3E148855;
+	Fri,  3 May 2024 18:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuLdIbmU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wBPbdiUO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA9C28E11
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 18:42:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47759126F33
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 18:44:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714761778; cv=none; b=ez5DwhQsF+ACNH0K+f7EaHXuC6ow/GbstauhbFHfke2NNAvSOMJV2gbirw8obhddtDGGtKfyKGgIGk8m6VqFGvSkpFoRGp/Wlw/FijVzFonxpDK5BaVBegScNwEgT4NaKBaAew5DZbds0C62nRYwklj4AyYM0gQTQKc6Dn7DXog=
+	t=1714761901; cv=none; b=gGDGzgJDGkTqgUZfClXl0hOCr5KvvDjJdbWjgHZ810/9BiRYqAxTi7cKCdYeMAKxO4EmIulCLzGBo4mUSv/S2wT4d/BKEFYspu7gxN6hd8VpYw2cWzmE/wJGMbMUz43r2HnMEmKpKqwQSBm0ByjcZz5okGsCjx/zg2FVOjFMTyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714761778; c=relaxed/simple;
-	bh=tU6G7JYGWRkG+2O/O2roQvpxabuBZJxtfMZ8Pdnsff0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=GAJ5T4lOeAiuHsMojuLDOBlBsX2e4Z4DfL/Khw6i2XXqD5NLg8hfUk+9AL98ulJvH/IlZcVDenz2/d+XajCZLtiso1l89d6m8JKRHKIo+8vTHs8HaQcxvfAv3bWCyNC7KXYRxYM24voRP514MRrMYSCcsRZeA//h30UYk14pvsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JuLdIbmU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714761775;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7jg1F0r+Luam104Y7UVnMDpQtCctuiu4jLX0tf0Er1I=;
-	b=JuLdIbmUOWthf/SfUfhZzbHmM8sbDv35ewFqCntRW8JzA5xdoFZXjhtGrrvceHccjfYqni
-	Ww4u41V/TZI3ndQdNBQKmEWFUDuNAQFGPTsLeUqu5ER5W62z6KGH3egaXQN+v9d6t0D8eF
-	htKso3kNlnZltOP4VhIYoR5/Ncki3Zg=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-283--Fbwrea9MqSg5A2OJozs3Q-1; Fri, 03 May 2024 14:42:54 -0400
-X-MC-Unique: -Fbwrea9MqSg5A2OJozs3Q-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1ec4c65a091so34720415ad.3
-        for <kvm@vger.kernel.org>; Fri, 03 May 2024 11:42:54 -0700 (PDT)
+	s=arc-20240116; t=1714761901; c=relaxed/simple;
+	bh=DpLbOXcsDefc9eadWLyevH6SV5/Lj+N6zdbxsM8MFjU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=R03TvRDofFx/pNn04atNmBKZHOoJHEYGggfARJt7WU8+aEuVpeAneGfdzq+9J1EpGNT9gHS0LMDquIyGZvjAEpho4kgr3Qa6OTpj9Bq4Zo7UaylyQDmYlDsUrzYecwV5CvQTj5XVwmeBIdLhslwGQU2ATw+VK5/uSEgkDO5oOUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wBPbdiUO; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ecf84f7cb3so32072b3a.0
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 11:44:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714761899; x=1715366699; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c4xhm1GLSMgZL12H1tRWafB6PB4QZWb78tjxuvu5l88=;
+        b=wBPbdiUOZEVBSRlwGj6qGKxjxteeYyiaGmhN33d7Lvr+Sj3cV4GndEv1Csq6auSynU
+         0vCgHw8vy9x7rCufvi7PCD0ag++UVeICvA92F8HhKwhkVTc1loCUr1pQqJ6/koDAhHGV
+         D1ieSLi0MDS0ic20fGc5PsfbFduUgr07HGkeEEZYbDUpqg+SS1detBJZwXsQFmqyj/Ea
+         U0WkszyFtxZNgQq752ckFZV85G57otHFCcJ1PFprRwmMNgMQWd2abr/BqEOAB7XTKSjE
+         47c6xx5+70WK3SQqHp0FoiaDbS3YNc3RI2T9W6rlr0ZBEksADFiVol0d109xiIQLQZpc
+         gQAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714761773; x=1715366573;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7jg1F0r+Luam104Y7UVnMDpQtCctuiu4jLX0tf0Er1I=;
-        b=w+r1uanImd+ZxhiValDj8V+oQmQR9MYsOKVTQ4SzafbyuqV4LD6brLE8CfGJhgFsHI
-         h6iJFcjK8VYHXhzg3QpIx8a+yaeJLTSPDlrnBwULUS+LK+vA035Q/ZgAAq0GIQvZ8fJN
-         Os3baOw8sNDBl3nhPS70dKMLip6pQ3wk/B67ZfYG/xQiCt8OyyzhzB6ydPlzKAlDu4uk
-         +/+d2GkKSGiAwmcA2l6rHrnfzAhX95R3C+mFE312M3Vows2Dt8yE+txbtXQ2v9Wo4LNP
-         H8Rd7LvhNLV1Fxql3pjvwKRfSI2Tw+c90iEA9Qyx9CZEN90yvXxHkkSqCFOw9O30NMoS
-         HvBA==
-X-Forwarded-Encrypted: i=1; AJvYcCXvtDWdKNLqx5jXGNoNB7PzFtSyCpj8MYlDM/GmqnR6LC8FO2xq3lvTkRI7PlnOnZbAQTdniO91mv5OalbFON4hTFQt
-X-Gm-Message-State: AOJu0Yx4GMqn7uT+n2+3xKfH4NXqksAVmFUtz94bXHN4zbiTDsZYaCVB
-	1EkSuboDpv/rCQT0ybTIgLl0y8cA4z7U9rRd1JmVinelOCebw2bushMDVVad67TPzsDZmemqMEn
-	czNjVNJAm4jp5sigZnZU3hv6Boi6vYmRsW7O86OSo+F0gonTVkw==
-X-Received: by 2002:a17:902:f70f:b0:1dd:81a3:8dc3 with SMTP id h15-20020a170902f70f00b001dd81a38dc3mr4364024plo.46.1714761773116;
-        Fri, 03 May 2024 11:42:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHO/B7NcxkkrJOjUeyFPE3oTYjTTOUH1HEefTB3GxhO5X3BJw+May4aWchCVGJZGF1h0o9dfQ==
-X-Received: by 2002:a17:902:f70f:b0:1dd:81a3:8dc3 with SMTP id h15-20020a170902f70f00b001dd81a38dc3mr4363995plo.46.1714761772691;
-        Fri, 03 May 2024 11:42:52 -0700 (PDT)
-Received: from LeoBras.redhat.com ([2804:1b3:a800:4b0a:b7a4:5eb9:b8a9:508d])
-        by smtp.gmail.com with ESMTPSA id l16-20020a170903245000b001eb6280cb42sm3590633pls.11.2024.05.03.11.42.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 May 2024 11:42:52 -0700 (PDT)
-From: Leonardo Bras <leobras@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Leonardo Bras <leobras@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	rcu@vger.kernel.org
-Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
-Date: Fri,  3 May 2024 15:42:38 -0300
-Message-ID: <ZjUwHvyvkM3lj80Q@LeoBras>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <ZgsXRUTj40LmXVS4@google.com>
-References: <20240328171949.743211-1-leobras@redhat.com> <ZgsXRUTj40LmXVS4@google.com>
+        d=1e100.net; s=20230601; t=1714761899; x=1715366699;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c4xhm1GLSMgZL12H1tRWafB6PB4QZWb78tjxuvu5l88=;
+        b=T4OZitYruHofC+SNswzNemnEEAeynoFdwszYzwrR9b+ZWr3aTzXD9/Bm1dJWMoYp4d
+         pRu/DIoGg0FTShH0k268EYtJOY4HLxFhx0v2gmOU0PlByJtNAcUmIeVT+bCFRB1doITq
+         NwSByc6nOEphy6l6/p5+d8IVtlUejFgEPhcic9LVQ8wikDgPQyYB+ib0/POggVsq/CPN
+         caz4fd8revhheQTyqk6xYO7ku19IjJmiMYWcnI61sj0jI0y6haLvQusPKqMnmQKVZCln
+         tFkiYt6deM89/Z9ab5+w3NrWNFiGMEtwET4h8lRahictqnciBFg9ifBGBFKBzRCpt6Ce
+         4skQ==
+X-Gm-Message-State: AOJu0YzUP1MjWUOxgXZ2kO6bTWFheakGpwEsGCD537hSrorkc6qXOjbZ
+	TKrChsaC9bCgq3YAwCJ6q0F3pOOvFZfkLFKm1nm3gnrJEVdGDBmJg8ft5Ay7SjJDa5xTCGL7aOS
+	flg==
+X-Google-Smtp-Source: AGHT+IEVA+Aa/pdkpL7D6dSdvrtJeHXSYi4PpImkwV6isZQpPqnUDsVT7EPB0AlT6V7chnPW8/lfRatMF+k=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2d8a:b0:6f3:84f4:78e4 with SMTP id
+ fb10-20020a056a002d8a00b006f384f478e4mr115865pfb.4.1714761898541; Fri, 03 May
+ 2024 11:44:58 -0700 (PDT)
+Date: Fri, 3 May 2024 11:44:56 -0700
+In-Reply-To: <25cc89b7-822f-4735-bec5-59458ec18a49@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240426114552.667346-1-thuth@redhat.com> <ZjPrlLNNGNh2mOmW@google.com>
+ <25cc89b7-822f-4735-bec5-59458ec18a49@redhat.com>
+Message-ID: <ZjUwqEXPA5QVItyX@google.com>
+Subject: Re: [PATCH v2] KVM: selftests: Use TAP interface in the
+ set_memory_region test
+From: Sean Christopherson <seanjc@google.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shuah Khan <shuah@kernel.org>, Muhammad Usama Anjum <usama.anjum@collabora.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hello Sean, Marcelo and Paul,
-
-Thank you for your comments on this thread!
-I will try to reply some of the questions below:
-
-(Sorry for the delay, I was OOO for a while.)
-
-
-On Mon, Apr 01, 2024 at 01:21:25PM -0700, Sean Christopherson wrote:
-> On Thu, Mar 28, 2024, Leonardo Bras wrote:
-> > I am dealing with a latency issue inside a KVM guest, which is caused by
-> > a sched_switch to rcuc[1].
+On Fri, May 03, 2024, Thomas Huth wrote:
+> On 02/05/2024 21.37, Sean Christopherson wrote:
+> > On Fri, Apr 26, 2024, Thomas Huth wrote:
+> > I like that we can actually report sub-tests as being skipped, but I don't like
+> > having multiple ways to express requirements.  And IMO, this is much less readable
+> > than TEST_REQUIRE(has_cap_guest_memfd());
 > > 
-> > During guest entry, kernel code will signal to RCU that current CPU was on
-> > a quiescent state, making sure no other CPU is waiting for this one.
+> > AIUI, each test runs in a child process, so TEST_REQUIRE() can simply exit(), it
+> > just needs to avoid ksft_exit_skip() so that a sub-test doesn't spit out the full
+> > test summary.
 > > 
-> > If a vcpu just stopped running (guest_exit), and a syncronize_rcu() was
-> > issued somewhere since guest entry, there is a chance a timer interrupt
-> > will happen in that CPU, which will cause rcu_sched_clock_irq() to run.
+> > And if using exit() isn't an option, setjmp()+longjmp() will do the trick (I got
+> > that working for KVM_ONE_VCPU_TEST() before I realized tests run as a child).
 > > 
-> > rcu_sched_clock_irq() will check rcu_pending() which will return true,
-> > and cause invoke_rcu_core() to be called, which will (in current config)
-> > cause rcuc/N to be scheduled into the current cpu.
-> > 
-> > On rcu_pending(), I noticed we can avoid returning true (and thus invoking
-> > rcu_core()) if the current cpu is nohz_full, and the cpu came from either
-> > idle or userspace, since both are considered quiescent states.
-> > 
-> > Since this is also true to guest context, my idea to solve this latency
-> > issue by avoiding rcu_core() invocation if it was running a guest vcpu.
-> > 
-> > On the other hand, I could not find a way of reliably saying the current
-> > cpu was running a guest vcpu, so patch #1 implements a per-cpu variable
-> > for keeping the time (jiffies) of the last guest exit.
-> > 
-> > In patch #2 I compare current time to that time, and if less than a second
-> > has past, we just skip rcu_core() invocation, since there is a high chance
-> > it will just go back to the guest in a moment.
+> > The below is lightly tested, but I think it does what we want?
 > 
-> What's the downside if there's a false positive?
+> Not quite ... for example, if I force vmx_pmu_caps_test to skip the last
+> test, I get:
 
-False positive being guest_exit without going back in this CPU, right?
-If so in WSC, supposing no qs happens and there is a pending request, RCU 
-will take a whole second to run again, possibly making other CPUs wait 
-this long for a synchronize_rcu.
+...
 
-This value (1 second) could defined in .config or as a parameter if needed, 
-but does not seem a big deal, 
+> As you can see, the "ok 5" line is duplicated now, once marked with "# SKIP"
+> and once as successfull. I don't think that this is valid TAP anymore?
 
+Ah, IIUC, it's because the test reports a SKIP, and then also eventually exits
+with KSFT_SKIP too.
+
+> > I also think we would effectively forbid direct use of TEST().  Partly because
+> > it's effectively necessary to use TEST_REQUIRE(), but also so that all tests will
+> > have an existing single point of contact if we need/want to make similar changes
+> > in the future.
 > 
-> > What I know it's weird with this patch:
-> > 1 - Not sure if this is the best way of finding out if the cpu was
-> >     running a guest recently.
-> > 
-> > 2 - This per-cpu variable needs to get set at each guest_exit(), so it's
-> >     overhead, even though it's supposed to be in local cache. If that's
-> >     an issue, I would suggest having this part compiled out on 
-> >     !CONFIG_NO_HZ_FULL, but further checking each cpu for being nohz_full
-> >     enabled seems more expensive than just setting this out.
-> 
-> A per-CPU write isn't problematic, but I suspect reading jiffies will be quite
-> imprecise, e.g. it'll be a full tick "behind" on many exits.
+> Ok, but I wrote in the patch description, KVM_ONE_VCPU_TEST_SUITE() does not
+> work for the set_memory_region test since it does not like to have a
+> pre-defined vcpu ... so if we want to forbid TEST(), I assume we'd need
+> another macro like KVM_BAREBONE_TEST_SUITE() ?
 
-That would not be a problem, as it would mean 1 tick less waiting in the 
-false positive WSC, and the 1s amount is plenty.
+Yeah, though we probably don't need BAREBONE, e.g. KVM_TEST_SUITE() would suffice.
+The "barebones" terminology exists for VMs because the vanilla "create VM" helpers
+do waay more than the bare minimum, whereas I don't think we'll have the same
+issues here.
 
-> 
-> > 3 - It checks if the guest exit happened over than 1 second ago. This 1
-> >     second value was copied from rcu_nohz_full_cpu() which checks if the
-> >     grace period started over than a second ago. If this value is bad,
-> >     I have no issue changing it.
-> 
-> IMO, checking if a CPU "recently" ran a KVM vCPU is a suboptimal heuristic regardless
-> of what magic time threshold is used.  IIUC, what you want is a way to detect if
-> a CPU is likely to _run_ a KVM vCPU in the near future.
+> Not sure whether I really like it, though, since I'd prefer if we could keep
+> the possibility to use the original selftest macros (for people who are
+> already used to those macros from other selftests).
 
-That's correct!
+The more I fiddle with the kselftests harness, the more I'm opposed to using it
+directly.  The harness code heavily assumes a "simple" environment, i.e. a test
+environment without libraries.  E.g. including kselftest_harness.h without invoking
+test_harness_run() fails due to unused functions, and including it in multiple
+compilation units, e.g. to allow using its macros in utilities, fails due to
+duplicate symbols.
 
->  KVM can provide that
-> information with much better precision, e.g. KVM knows when when it's in the core
-> vCPU run loop.
+It's obviously possible to split kselftest_harness.h to get around the immediate
+issues, but that doesn't help with SKIP() (and other macros) only being usable at
+the top-level TEST().  And using the undersored globals and functions params,
+i.e. the "private" stuff, directly seems like a bad idea, e.g. the odds of KVM
+selftests being broken by changes to the common code would be too high for my
+taste.
 
-That would not be enough.
-I need to present the application/problem to make a point:
+While I agree it would be nice to not diverge from the common kselftest framework,
+as far as things like SKIP and ASSERT macros go, that ship sailed a long time ago,
+as TEST_REQUIRE() and TEST_ASSERT() usage is ubiquitous throughout KVM selftests.
+And given the limitations of the common framework versus what we have in KVM's
+framework, I don't see us converging on the common framework.
 
-- There is multiple  isolated physical CPU (nohz_full) on which we want to 
-  run KVM_RT vcpus, which will be running a real-time (low latency) task.
-- This task should not miss deadlines (RT), so we test the VM to make sure 
-  the maximum latency on a long run does not exceed the latency requirement
-- This vcpu will run on SCHED_FIFO, but has to run on lower priority than
-  rcuc, so we can avoid stalling other cpus.
-- There may be some scenarios where the vcpu will go back to userspace
-  (from KVM_RUN ioctl), and that does not mean it's good to interrupt the 
-  this to run other stuff (like rcuc).
+It's not perfect, but the best idea I can come up with is to trampoline the skip
+out through KVM's harness and on to the common harness.
 
-Now, I understand it will cover most of our issues if we have a context 
-tracking around the vcpu_run loop, since we can use that to decide not to 
-run rcuc on the cpu if the interruption hapenned inside the loop.
+---
+ .../selftests/kvm/include/kvm_test_harness.h  | 11 ++++++-
+ .../testing/selftests/kvm/include/test_util.h | 31 ++++++++++++++++++-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  2 ++
+ .../selftests/kvm/x86_64/vmx_pmu_caps_test.c  |  3 +-
+ 4 files changed, 43 insertions(+), 4 deletions(-)
 
-But IIUC we can have a thread that "just got out of the loop" getting 
-interrupted by the timer, and asked to run rcu_core which will be bad for 
-latency.
+diff --git a/tools/testing/selftests/kvm/include/kvm_test_harness.h b/tools/testing/selftests/kvm/include/kvm_test_harness.h
+index 8f7c6858e8e2..fa4b5f707135 100644
+--- a/tools/testing/selftests/kvm/include/kvm_test_harness.h
++++ b/tools/testing/selftests/kvm/include/kvm_test_harness.h
+@@ -9,6 +9,7 @@
+ #define SELFTEST_KVM_TEST_HARNESS_H
+ 
+ #include "kselftest_harness.h"
++#include "test_util.h"
+ 
+ #define KVM_ONE_VCPU_TEST_SUITE(name)					\
+ 	FIXTURE(name) {							\
+@@ -28,8 +29,16 @@ static void __suite##_##test(struct kvm_vcpu *vcpu);			\
+ 									\
+ TEST_F(suite, test)							\
+ {									\
++	struct kvm_selftests_subtest subtest;				\
++									\
+ 	vcpu_arch_set_entry_point(self->vcpu, guestcode);		\
+-	__suite##_##test(self->vcpu);					\
++									\
++	kvm_subtest = &subtest;						\
++	if (!setjmp(subtest.buf))					\
++		__suite##_##test(self->vcpu);				\
++	else								\
++		SKIP(, "%s", subtest.reason);				\
++	kvm_subtest = NULL;						\
+ }									\
+ static void __suite##_##test(struct kvm_vcpu *vcpu)
+ 
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+index 3e473058849f..2fce7b2ed07c 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -8,6 +8,7 @@
+ #ifndef SELFTEST_KVM_TEST_UTIL_H
+ #define SELFTEST_KVM_TEST_UTIL_H
+ 
++#include <setjmp.h>
+ #include <stdlib.h>
+ #include <stdarg.h>
+ #include <stdbool.h>
+@@ -18,8 +19,22 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include <sys/mman.h>
++
+ #include "kselftest.h"
+ 
++/*
++ * kvm_selftests_subtest is used to trampoline from __TEST_REQUIRE(), which can
++ * be called from any context, e.g. KVM selftests library code, out to the test
++ * being run, as the kselftests harness only allows calling SKIP() (and other
++ * macros/helpers) from the top-level TEST_*() context.
++ */
++struct kvm_selftests_subtest {
++	char reason[1024];
++	jmp_buf buf;
++};
++
++extern struct kvm_selftests_subtest *kvm_subtest;
++
+ #define msecs_to_usecs(msec)    ((msec) * 1000ULL)
+ 
+ static inline int _no_printf(const char *format, ...) { return 0; }
+@@ -36,10 +51,24 @@ static inline int _no_printf(const char *format, ...) { return 0; }
+ #endif
+ 
+ void __printf(1, 2) print_skip(const char *fmt, ...);
++
++/*
++ * Skip the test if a required capability/feature/whatever is not available,
++ * e.g. due to lack of support in the underlying hardware, running against an
++ * older kernel/KVM, etc.  If a subtest is running, skip only the subtest,
++ * otherwise treat the requirement as applying to the entire test.
++ */
+ #define __TEST_REQUIRE(f, fmt, ...)				\
+ do {								\
+-	if (!(f))						\
++	if (!(f)) {						\
++		if (kvm_subtest) {				\
++			snprintf(kvm_subtest->reason,		\
++				 sizeof(kvm_subtest->reason),	\
++				 fmt, ##__VA_ARGS__);		\
++			longjmp(kvm_subtest->buf, 1);		\
++		}						\
+ 		ksft_exit_skip("- " fmt "\n", ##__VA_ARGS__);	\
++	}							\
+ } while (0)
+ 
+ #define TEST_REQUIRE(f) __TEST_REQUIRE(f, "Requirement not met: %s", #f)
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 6b2158655baa..9601eed3ed57 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -19,6 +19,8 @@
+ 
+ #define KVM_UTIL_MIN_PFN	2
+ 
++struct kvm_selftests_subtest *kvm_subtest;
++
+ uint32_t guest_random_seed;
+ struct guest_random_state guest_rng;
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+index 7c92536551cc..a58e0b1c2ee5 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c
+@@ -195,8 +195,7 @@ KVM_ONE_VCPU_TEST(vmx_pmu_caps, lbr_perf_capabilities, guest_code)
+ {
+ 	int r;
+ 
+-	if (!host_cap.lbr_format)
+-		return;
++	TEST_REQUIRE(host_cap.lbr_format);
+ 
+ 	vcpu_set_msr(vcpu, MSR_IA32_PERF_CAPABILITIES, host_cap.capabilities);
+ 	vcpu_set_msr(vcpu, MSR_LBR_TOS, 7);
 
-I understand that the chance may be statistically low, but happening once 
-may be enough to crush the latency numbers.
-
-Now, I can't think on a place to put this context trackers in kvm code that 
-would avoid the chance of rcuc running improperly, that's why the suggested 
-timeout, even though its ugly.
-
-About the false-positive, IIUC we could reduce it if we reset the per-cpu 
-last_guest_exit on kvm_put.
-
-> 
-> > 4 - Even though I could detect no issue, I included linux/kvm_host.h into 
-> >     rcu/tree_plugin.h, which is the first time it's getting included
-> >     outside of kvm or arch code, and can be weird.
-> 
-> Heh, kvm_host.h isn't included outside of KVM because several architectures can
-> build KVM as a module, which means referencing global KVM varibles from the kernel
-> proper won't work.
-> 
-> >     An alternative would be to create a new header for providing data for
-> >     non-kvm code.
-> 
-> I doubt a new .h or .c file is needed just for this, there's gotta be a decent
-> landing spot for a one-off variable.
-
-You are probably right
-
->  E.g. I wouldn't be at all surprised if there
-> is additional usefulness in knowing if a CPU is in KVM's core run loop and thus
-> likely to do a VM-Enter in the near future, at which point you could probably make
-> a good argument for adding a flag in "struct context_tracking".  Even without a
-> separate use case, there's a good argument for adding that info to context_tracking.
-
-For the tracking solution, makes sense :)
-Not sure if the 'timeout' alternative will be that useful outside rcu.
-
-Thanks!
-Leo
+base-commit: df8e458e70ce925b533ff33f1e8979650cf44e3e
+-- 
 
 
