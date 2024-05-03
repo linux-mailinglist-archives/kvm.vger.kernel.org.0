@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-16486-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16487-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A230C8BA744
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 08:56:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30B78BA7CB
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 09:31:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 580B5282B45
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 06:56:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 697D9280DA9
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 07:31:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EAB1465A2;
-	Fri,  3 May 2024 06:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570B01474B8;
+	Fri,  3 May 2024 07:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NkEeWZuT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IlqJNhKQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2551857CA8
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 06:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76463139CF1
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 07:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714719372; cv=none; b=XPEKRHKojU/vglB0xjlYfnwt+2trPGh0imXyzsCWKHrjPbhkF1JwN6xJk692FrQFwRTLHsIRWbKi83OKNCJ/b/qdNvKhqD+8q/wT20HG9Fksswj5Hj8j01t0xo51TB649yrPGZgRZVyaDCIntP+Iv0WNYGq86Fi9tXOg5O4c5yY=
+	t=1714721467; cv=none; b=F+OYbyQSKQhYB/7Euc4IAUoQCpEvOPDW4aaZ+jGE6phCRksuwB8nla4SFFG7OMo/+VqRe3uvBr0kpB9stK3dCplEO8Ad0xbmRQ+518flNDrBcgC8IE/7EDSWlgzviBtNIFXuNRSJ/+DTV4zJEXDqIK6EgNv5wlmb0C+/38sdM9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714719372; c=relaxed/simple;
-	bh=3G3c3NE8LrVbzexu46c+BLr17Qv2A4lsjNdI+HIralY=;
+	s=arc-20240116; t=1714721467; c=relaxed/simple;
+	bh=LHo8e5MgzEpABxZMmyiDu+cre42cy1wLl6f0BueObXA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G4ovgjOgg1y/BaaW8KcJj4Qwsq4RxzanRIptUqsymlvpxEB47CY2rs+eE1hDerTpXP0QIizTTv/1pxpF/riQuTl/VQHwDEOI2KakkgDcb737czAKNA6yxHb9RJcHa4HDMNXFGvY0RoCIIqU8G2kDBuI/Rkzi7hepN3KQ7a0Qe8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NkEeWZuT; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=daluXd+L/pWz9NMiIWo8DPeEVcgN+79BbrGLJ+Xtz/0SqC37uu55b5l6fNqY221zWEuUhD07R1KZGgtALN6wEpzbMhPlHTlgcVSrbazKyzHWDgA3FcRZqgyvAnOjLF1JB/zLP8v1CDCccDJ24drtFWcb/yTCeNoRnzjHWHT8ZdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IlqJNhKQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714719369;
+	s=mimecast20190719; t=1714721464;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=V6p1b52yI6TXyt1fECtGqOpIF975IIXtsLuXmCF6zMA=;
-	b=NkEeWZuTW+RaX38jn/g4wCsFX8mxuNq4qlyQv8ZvQXuixFPCScUN0VEAxnKYKmGVmYAy+X
-	umI2qWhLBGT+NQwV1dpSsqzIp+MgL9B/FAnUum+fI0LpM5tZWy8wxPdeh45kkQOf3Qez3M
-	sxFz94x8tUJWH+MorK3PZIIy8hBx+bo=
-Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
- [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=kay3G1XsLA4JleZx3Fv2uRt6GLaRElqrFFYQVMsBqFo=;
+	b=IlqJNhKQnCNUy25FTyNh6xcep3n/i8dsTab/3RAX+GYM8Vw+QHmkImzzlnp8ZkVEXc/4le
+	RnDRDV2Nmr/fnkWXdBfxqgk9pTA7Re017ntVNkR2/kHsqTcqJNw/NUwssR6A/UUSr+yqRS
+	wFRWGltItMS8+k/gqEdEQ8+wl/kaDgw=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-422-URILEEaGO8Oq6NL-dWZxhw-1; Fri, 03 May 2024 02:56:07 -0400
-X-MC-Unique: URILEEaGO8Oq6NL-dWZxhw-1
-Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-4daca01d01bso4442709e0c.3
-        for <kvm@vger.kernel.org>; Thu, 02 May 2024 23:56:07 -0700 (PDT)
+ us-mta-639-rIzk6yIDMqygTOVDnhMJdQ-1; Fri, 03 May 2024 03:31:03 -0400
+X-MC-Unique: rIzk6yIDMqygTOVDnhMJdQ-1
+Received: by mail-ot1-f69.google.com with SMTP id 46e09a7af769-6ef88ce1ef9so3627081a34.3
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 00:31:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714719367; x=1715324167;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V6p1b52yI6TXyt1fECtGqOpIF975IIXtsLuXmCF6zMA=;
-        b=W96a3vqL647ne4DAN+LUB3F61ZtuYinFn7uRoBqhJWNyJJ4SxhchtF3hhux2uWPmto
-         773+bDlA+3hMhrdWfkJhB3U6Z5/qP8NBZ49c/O4mXaQzE1Y7ppdJQEeMqwRsyELZpRDA
-         XOKsKhq4G3cfY4iL8p2hLh+5+LtHyeVeuYpcQfbC9Nohx9ZDrPUSKUDJTwWZx44wfPQZ
-         cajFjwUlqMXLZGcCv5S+JQckJ1zgpiNIH7zwyKN+inQriQ9nRxdJ8tlX5u2T+Ouij6vT
-         XIHeDAPdwuFAYAUlHnpK1QJ2ZdIlIBJcHxAMV2ookfN4HzrBYBLpPJmH6FsSeLQWe9fu
-         7bAA==
-X-Gm-Message-State: AOJu0YxpKj/0My/l8WbSMVhjTt9qj6B28/9Y2S6HgLKGM6Pa3gopFMvK
-	VH8eX9ju8kEETDVU/ce8Z+76mKKTSBsMfZBfHdbeLrBuP2n+CbxrnWYPIQQPHJYqSKRwSYqCEnb
-	xiqJZ0CyH+W0ecaQCi1jOc5YdZVj09T3urHp5tiUYqmYGbvsUPw==
-X-Received: by 2002:a05:6102:342:b0:47c:a74:9e03 with SMTP id e2-20020a056102034200b0047c0a749e03mr1818254vsa.3.1714719367246;
-        Thu, 02 May 2024 23:56:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IER59IttyU2qfuXQt2k1jIj0hQThCkHaCGSWvplfWGRe+elGIox4xz4jNykRanIB+aGKKs79g==
-X-Received: by 2002:a05:6102:342:b0:47c:a74:9e03 with SMTP id e2-20020a056102034200b0047c0a749e03mr1818238vsa.3.1714719366648;
-        Thu, 02 May 2024 23:56:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714721462; x=1715326262;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kay3G1XsLA4JleZx3Fv2uRt6GLaRElqrFFYQVMsBqFo=;
+        b=fzR7nkN0+Pr86hKEyHjm2ClUAR07dTQfSoPaT66tuOnsH1BIj1rJuROjepyRjURPv1
+         AyCwrS7Aysl+KNMzBnFxqWWRM5cgP1ZrL7DJD/GRnDjanAiQCynhv/yR0IUAwkvFOcon
+         Y1roaR+Cnw1P+NRpRMiIkvA3oFWZeGghE9mSSYQHCVvXksDYSIdd1/KYL08Bc8MzPPic
+         3IRe1rKQCD7BbUbOktQ2iGFQY4/H68O7tIiHkQOM10lE7izy7UCrabwrVXroqKUEelkq
+         dN2wZSLuoCIXiwC4Uq9xXatRFmr+JzrQUE6nYaK6JIEl7cEeYljlAmEpXmHv+X7sJSgA
+         cHRg==
+X-Gm-Message-State: AOJu0YzSGqgRYLHUW499X+cmwEi/swxiKoRIo3yWanTdZaB9PI9p+9ds
+	BUZ9BjjuPRN2k78v1rVasJk1H2yV/DCdqjfQRCqio5lGiZpPn8uCtxJ7q6KYm1xqMIYyAkfr5vi
+	D2j5H/YCdXs1RccZg7NF4S6CCGn0MYwyRhZaB+hPWhfX8THPcLA==
+X-Received: by 2002:a05:6830:3149:b0:6ee:5560:4031 with SMTP id c9-20020a056830314900b006ee55604031mr2614743ots.38.1714721462141;
+        Fri, 03 May 2024 00:31:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGGxYIIkxGIgyH8aktHNZwF1zguXlgnaHiw5tGDmBHmpDDHgKQ6H7EwBYU2hX/95eHSN7chVg==
+X-Received: by 2002:a05:6830:3149:b0:6ee:5560:4031 with SMTP id c9-20020a056830314900b006ee55604031mr2614728ots.38.1714721461701;
+        Fri, 03 May 2024 00:31:01 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-43-179-34.web.vodafone.de. [109.43.179.34])
-        by smtp.gmail.com with ESMTPSA id cx10-20020a056214188a00b0069b5672bab8sm972010qvb.134.2024.05.02.23.56.05
+        by smtp.gmail.com with ESMTPSA id c23-20020ae9e217000000b0078d5fdc929fsm1013411qkc.104.2024.05.03.00.30.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 23:56:06 -0700 (PDT)
-Message-ID: <951ccd88-0e39-4379-8d86-718e72594dd9@redhat.com>
-Date: Fri, 3 May 2024 08:56:03 +0200
+        Fri, 03 May 2024 00:31:01 -0700 (PDT)
+Message-ID: <25cc89b7-822f-4735-bec5-59458ec18a49@redhat.com>
+Date: Fri, 3 May 2024 09:30:57 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,12 +82,17 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH] doc: update unittests doc
-To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org
-References: <20240503060039.978863-1-npiggin@gmail.com>
-Content-Language: en-US
+Subject: Re: [PATCH v2] KVM: selftests: Use TAP interface in the
+ set_memory_region test
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Shuah Khan <shuah@kernel.org>,
+ Muhammad Usama Anjum <usama.anjum@collabora.com>
+References: <20240426114552.667346-1-thuth@redhat.com>
+ <ZjPrlLNNGNh2mOmW@google.com>
 From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -130,55 +135,114 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240503060039.978863-1-npiggin@gmail.com>
+In-Reply-To: <ZjPrlLNNGNh2mOmW@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 03/05/2024 08.00, Nicholas Piggin wrote:
-> Some cleanups and a comment about the check parameter restrictions.
+On 02/05/2024 21.37, Sean Christopherson wrote:
+> On Fri, Apr 26, 2024, Thomas Huth wrote:
+>> Use the kselftest_harness.h interface in this test to get TAP
+>> output, so that it is easier for the user to see what the test
+>> is doing. (Note: We are not using the KVM_ONE_VCPU_TEST_SUITE()
+>> macro here since these tests are creating their VMs with the
+>> vm_create_barebones() function, not with vm_create_with_one_vcpu())
+>>
+>> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>> ---
+>>   v2:
+>>   - Rebase to linux-next branch
+>>   - Make "loops" variable static
+>>   - Added Andrew's Reviewed-by
+>>
+>>   .../selftests/kvm/set_memory_region_test.c    | 86 +++++++++----------
+>>   1 file changed, 42 insertions(+), 44 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/set_memory_region_test.c b/tools/testing/selftests/kvm/set_memory_region_test.c
+>> index 68c899d27561..a5c9bee5235a 100644
+>> --- a/tools/testing/selftests/kvm/set_memory_region_test.c
+>> +++ b/tools/testing/selftests/kvm/set_memory_region_test.c
+>> @@ -16,6 +16,7 @@
+>>   #include <test_util.h>
+>>   #include <kvm_util.h>
+>>   #include <processor.h>
+>> +#include "kselftest_harness.h"
+>>   
+>>   /*
+>>    * s390x needs at least 1MB alignment, and the x86_64 MOVE/DELETE tests need a
+>> @@ -38,6 +39,8 @@ extern const uint64_t final_rip_end;
+>>   
+>>   static sem_t vcpu_ready;
+>>   
+>> +static int loops;
 > 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   docs/unittests.txt | 12 +++++++-----
->   1 file changed, 7 insertions(+), 5 deletions(-)
+> ...
 > 
-> diff --git a/docs/unittests.txt b/docs/unittests.txt
-> index 3192a60ec..7cf2c55ad 100644
-> --- a/docs/unittests.txt
-> +++ b/docs/unittests.txt
-> @@ -15,8 +15,8 @@ unittests.cfg format
->   
->   # is the comment symbol, all following contents of the line is ignored.
->   
-> -Each unit test is defined with a [unit-test-name] line, followed by
-> -a set of parameters that control how the test case is run. The name is
-> +Each unit test is defined with a [unit-test-name] line, followed by a
-> +set of parameters that control how the test case is run. The name is
+>> -static void test_add_overlapping_private_memory_regions(void)
+>> +TEST(add_overlapping_private_memory_regions)
+>>   {
+>>   	struct kvm_vm *vm;
+>>   	int memfd;
+>>   	int r;
+>>   
+>> -	pr_info("Testing ADD of overlapping KVM_MEM_GUEST_MEMFD memory regions\n");
+>> +	if (!has_cap_guest_memfd())
+>> +		SKIP(return, "Missing KVM_MEM_GUEST_MEMFD / KVM_X86_SW_PROTECTED_VM");
+> 
+> I like that we can actually report sub-tests as being skipped, but I don't like
+> having multiple ways to express requirements.  And IMO, this is much less readable
+> than TEST_REQUIRE(has_cap_guest_memfd());
+> 
+> AIUI, each test runs in a child process, so TEST_REQUIRE() can simply exit(), it
+> just needs to avoid ksft_exit_skip() so that a sub-test doesn't spit out the full
+> test summary.
+> 
+> And if using exit() isn't an option, setjmp()+longjmp() will do the trick (I got
+> that working for KVM_ONE_VCPU_TEST() before I realized tests run as a child).
+> 
+> The below is lightly tested, but I think it does what we want?
 
-This looks like it's only moving the "a" from one line to the other? I'd 
-suggest to drop this hunk.
+Not quite ... for example, if I force vmx_pmu_caps_test to skip the last 
+test, I get:
 
->   arbitrary and appears in the status reporting output.
->   
->   Parameters appear on their own lines under the test name, and have a
-> @@ -62,8 +62,8 @@ groups
->   groups = <group_name1> <group_name2> ...
->   
->   Used to group the test cases for the `run_tests.sh -g ...` run group
-> -option. Adding a test to the nodefault group will cause it to not be
-> -run by default.
-> +option. The group name is arbitrary, aside from the nodefault group
-> +which makes the test to not be run by default.
+TAP version 13
+1..5
+# Starting 5 tests from 1 test cases.
+#  RUN           vmx_pmu_caps.guest_wrmsr_perf_capabilities ...
+#            OK  vmx_pmu_caps.guest_wrmsr_perf_capabilities
+ok 1 vmx_pmu_caps.guest_wrmsr_perf_capabilities
+#  RUN           vmx_pmu_caps.basic_perf_capabilities ...
+#            OK  vmx_pmu_caps.basic_perf_capabilities
+ok 2 vmx_pmu_caps.basic_perf_capabilities
+#  RUN           vmx_pmu_caps.fungible_perf_capabilities ...
+#            OK  vmx_pmu_caps.fungible_perf_capabilities
+ok 3 vmx_pmu_caps.fungible_perf_capabilities
+#  RUN           vmx_pmu_caps.immutable_perf_capabilities ...
+#            OK  vmx_pmu_caps.immutable_perf_capabilities
+ok 4 vmx_pmu_caps.immutable_perf_capabilities
+#  RUN           vmx_pmu_caps.lbr_perf_capabilities ...
+ok 5 # SKIP - Requirement not met: host_cap.lbr_format && 0
+#            OK  vmx_pmu_caps.lbr_perf_capabilities
+ok 5 vmx_pmu_caps.lbr_perf_capabilities
+# PASSED: 5 / 5 tests passed.
+# Totals: pass:5 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Actually, there are some other "magic" groups that have been introduced in 
-the course of time:
+As you can see, the "ok 5" line is duplicated now, once marked with "# SKIP" 
+and once as successfull. I don't think that this is valid TAP anymore?
 
-- The "migration" group is required for migration tests.
+> I also think we would effectively forbid direct use of TEST().  Partly because
+> it's effectively necessary to use TEST_REQUIRE(), but also so that all tests will
+> have an existing single point of contact if we need/want to make similar changes
+> in the future.
 
-- The "panic" group is required for tests where success means that the
-   guest crashed (but it's currently only used on s390x).
+Ok, but I wrote in the patch description, KVM_ONE_VCPU_TEST_SUITE() does not 
+work for the set_memory_region test since it does not like to have a 
+pre-defined vcpu ... so if we want to forbid TEST(), I assume we'd need 
+another macro like KVM_BAREBONE_TEST_SUITE() ?
 
-We might want to document those groups here, too?
+Not sure whether I really like it, though, since I'd prefer if we could keep 
+the possibility to use the original selftest macros (for people who are 
+already used to those macros from other selftests).
 
   Thomas
 
