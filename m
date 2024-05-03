@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-16531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9498BB2B0
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 20:20:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 363F18BB2B1
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 20:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 820B9289036
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:20:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6838F1C21268
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515CE158D8B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC84F158D9A;
 	Fri,  3 May 2024 18:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xp7JuRF6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UTtRwsdT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9406158D69
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 18:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85DE7158D7A
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 18:17:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714760265; cv=none; b=Q0cuw8Y6eNECifktuHZn97CMPk3al3ZqBe3qer9qMuxRosY/myIRkrsX1C8zlA6bFXJG1z+Z7W576aZlVoKI+R5u5rLgL8insSBhqEV3QFKdmYF0E33mPMsmjtpbkoV/hPqvz14yJ625la3v/tdZPLj+xm2XiNZD/wFFEuSoO28=
+	t=1714760265; cv=none; b=CUD4GMllZihVx+lcOyPXLcS4i3I+xQF6Noy8AXZCM8I89dkj8keCCXQtTPyym/g9nUv6Q/YFLvuPmExLpHdCCoks3cyj7WC2mMvCd1KdOZ17OsHPhigYPoBrTWVTNavs8vQYkQjae5Cy5apOXWmdRtzswlwx6XdhEj0UI7PiYTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714760265; c=relaxed/simple;
-	bh=mXEp7/JVq5ahA3gE3cHKv/B7qtsS8wcRgKa4iiw3GNs=;
+	bh=MnH1Wy/qfGLoK8pqY0vb3YbaD+FyQMej5pfO9Kyf6Bw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lrEizUVC7zsEYMuMvDDEmrK6G16HQcdeLS/01lnIBPqHZBD1+0xb+LBEX3uuTkD5T5O5WMpsKHcb0DGR37/E+mueGAQr3NCGKxOfLs8XtYFwODvxPlC9/vIRMLg/u1ip8D+UP3Mhdl/NCNmDwJ+ODw1w3s5AzIMIgJHW1qNb2Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xp7JuRF6; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=p3gz+iSNxofBliVClqGBPieoy92297kjSqwBJaCvvG7MzVVjZCJCF/TNiBdts7MBHqCdlmvcmrfJwuMesqkIgF5f7uNNkT1pS7cW7c9tHKV+2ESznNRAcRHcu5VujUJWtvxh5LzTdF1jyE6ToqUWCTgQIWWSWjjeptpcGjPXyA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UTtRwsdT; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de603db5d6aso9890694276.2
-        for <kvm@vger.kernel.org>; Fri, 03 May 2024 11:17:42 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b028ae5easo175890097b3.3
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 11:17:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714760262; x=1715365062; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714760263; x=1715365063; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHXu+3wMl1x8qNonydytLIV6nGk0zgXCPmBNIKdSDOU=;
-        b=Xp7JuRF6KzK9RhwEzZqYKBxAr5JJ1yJQJCZxHhdf9FBLSCiDNoBj099QKXwT+ooPnr
-         Bywfs1QmeQk6JiEoVBu48J8Susf50V5mmMXr1JlogZfrowZj/Xr21gsbz4k4bHDi2CJQ
-         qzSG5fwIiDZj3ug4Ss98yonOIlB97aLBM5AqdqtLksyO6KQpfwrojEI54fIXjUJa0uue
-         Rtfv+vydWfgpAjjNSL2CVEY4l0o1rUbeOt9f/xZRtiDTR/FcVTuCRYEXbzPzEiP7SoKM
-         WRCJ0kTgGEgDBKU074MywegCaqRe81cehnIw1jHmL0oyVVqDN9Yc1aPAYVMoHXH3u7Ov
-         IpUg==
+        bh=XCWz5AboezUKY+fKcSkwtkc56yFvTydQOL6+C1uV1TA=;
+        b=UTtRwsdT8uk2thfIcXtPuU7pHscZJWBYeHv7wvyURQSARTlHnNS47ky1LbBwz0blCB
+         0maxojdoE78kFdCLmP+U9j89gf+UzWPkc1HPBMb5cZsLFLlkIAT1RiyfPgycKBIIYN/m
+         bf/M8giqwWdJmM9kT+zGgGmUpiMQkg5nrXbpb845/aYrXvGvUJ01nrWIFnbndFtN5oJn
+         bZ1/hGtwl7ol849efgECnOaJDPuU6QAZSf96V3SmmqmZ/fNbo4LgAKLRlk8xVZXwaQsc
+         F/++iDVJsx3+s+OKWIedek4S7FLqsA+i925Kzi/RPg1WKJvg1yTRl7u5A4hS+ouNrgYu
+         1O8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714760262; x=1715365062;
+        d=1e100.net; s=20230601; t=1714760263; x=1715365063;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QHXu+3wMl1x8qNonydytLIV6nGk0zgXCPmBNIKdSDOU=;
-        b=AAEJRGBRLLPAuIiuVwPfJLQ86DpLh+hZ7P8exR7vAtnE73iUhk8OTGsGMgT/DS3D1U
-         LCnVIXHlEt0uMjAHNnmT93Lj9Qg5/islZDu+4nd7IVAwgWwolQIX3/LGy94lS2Iwr5uG
-         tuQ7TV7bVuIRVtbJOCneOCpTK2c3I+S5V+yaZlO3HLZUKi8WbVaSpLKw6VvSC1Jw0FzG
-         PpfjHaBiGOZSflAwjufLgIFqSUa+OXF8Ajo3wRGa/e+AOP5ld3G83nyktSr4f2It+xWI
-         2s/ajHh7ebBu/pLVsF1yxsjJddSb+3zWGQvSq6eRa3/t5lk36FLDejtFqFT6eX0Ok4IY
-         9/lg==
-X-Forwarded-Encrypted: i=1; AJvYcCUVM2b0DcoGaCYffHkuiOgfJady1nYiSOcsq7buXGJfTQ3CJ7NR/YGzN2Ch8ABXGlgZjb9fyJ7UfZaVvfv8sMpzFHgy
-X-Gm-Message-State: AOJu0YzIl9CU9BVXhRr0o1uywnM+i8FKqAJM0F/X72ZRTvbELT/jDSgW
-	TQY4SmLyo46u/dRGjqCYUATj/9qa2m80/hXHwGsFjW3x56k1xGrQRGDHDfi1ySf77IhBMxlod2f
-	kmgEBz8Z1Rw==
-X-Google-Smtp-Source: AGHT+IH9qLn6o/uHe9WEM8VyAqFxWSMZ3MFnxC1YcYZ+IPtGArmXDrrlLFlgmBP/HenuKUWhjozjdfJl16Pvww==
+        bh=XCWz5AboezUKY+fKcSkwtkc56yFvTydQOL6+C1uV1TA=;
+        b=Lnq8meM90T15GIgjopsswRG2/lLG30yYhTBLeRTr0D5WGxjIeXIIjNKIQUDpL0zwi5
+         Tt6XnyakF9cIMKG0DG2a7Ka03ZKIE7J69xqW0Weab7VtMXpMO9B3pvqwwVnU3axBH9Xq
+         GA16pMYKQsT2x43fHgdQxjTqXu1zQ5ZiUEm9JSCyqFqXjvSz+o/m4Y+UIpp9ttRCbhy/
+         8YttgMWDV2PyULSx5HWmvJ3w7kQSL4LbDrak38Lu8AtJdB0GdCfxHVAKcs55dC/RHJ1u
+         hQ33Q5kvrc9sVUcCIUOh4QD8kLOAlbal2A/y1Da0GIjd1pK062FaDmTlBK+hBKzhGoom
+         TLlA==
+X-Forwarded-Encrypted: i=1; AJvYcCXuA6Bd/Shqi4H4CW+dAOPHHUG7apFcVSrgurZST+VJ/73JHLj8/e3+k8iZ18uaGoew0Kz1mL2JRm03t2FFoDPu+CMV
+X-Gm-Message-State: AOJu0YwyDTs+NASAAN6JkhpO7MHiAhsT0Yjmgja22GsFXAQnAt+9EPg3
+	6QA3jVDTet6mQlOe7FEkjrOjPMDKKXQS6WvFo13M4DUUCtD7Fgd80EoF5RWOGUxsEn11M8yXQmK
+	l//8Oz2Jsqg==
+X-Google-Smtp-Source: AGHT+IG8z91B85kZw12g8ILejBDce9nCeI6uZrPNjYvj7vQXfcVKq57xpnYqIWHHCJ8gvpfpvg4aSbrDSFG7Mg==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:26cc:0:b0:de4:e042:eee9 with SMTP id
- m195-20020a2526cc000000b00de4e042eee9mr1003169ybm.6.1714760262024; Fri, 03
- May 2024 11:17:42 -0700 (PDT)
-Date: Fri,  3 May 2024 11:17:33 -0700
+ (user=dmatlack job=sendgmr) by 2002:a0d:ea05:0:b0:61b:7912:6cad with SMTP id
+ t5-20020a0dea05000000b0061b79126cadmr815080ywe.2.1714760263504; Fri, 03 May
+ 2024 11:17:43 -0700 (PDT)
+Date: Fri,  3 May 2024 11:17:34 -0700
 In-Reply-To: <20240503181734.1467938-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240503181734.1467938-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240503181734.1467938-3-dmatlack@google.com>
-Subject: [PATCH v3 2/3] KVM: Ensure new code that references immediate_exit
- gets extra scrutiny
+Message-ID: <20240503181734.1467938-4-dmatlack@google.com>
+Subject: [PATCH v3 3/3] KVM: Mark a vCPU as preempted/ready iff it's scheduled
+ out while running
 From: David Matlack <dmatlack@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -95,68 +95,44 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Ensure that any new KVM code that references immediate_exit gets extra
-scrutiny by renaming it to immediate_exit__unsafe in kernel code.
+Mark a vCPU as preempted/ready if-and-only-if it's scheduled out while
+running. i.e. Do not mark a vCPU preempted/ready if it's scheduled out
+during a non-KVM_RUN ioctl() or when userspace is doing KVM_RUN with
+immediate_exit.
 
-All fields in struct kvm_run are subject to TOCTOU races since they are
-mapped into userspace, which may be malicious or buggy. To protect KVM,
-this commit introduces a new macro that appends __unsafe to field names
-in struct kvm_run, hinting to developers and reviewers that accessing
-this field must be done carefully.
+Commit 54aa83c90198 ("KVM: x86: do not set st->preempted when going back
+to user space") stopped marking a vCPU as preempted when returning to
+userspace, but if userspace then invokes a KVM vCPU ioctl() that gets
+preempted, the vCPU will be marked preempted/ready. This is arguably
+incorrect behavior since the vCPU was not actually preempted while the
+guest was running, it was preempted while doing something on behalf of
+userspace.
 
-Apply the new macro to immediate_exit, since userspace can make
-immediate_exit inconsistent with vcpu->wants_to_run, i.e. accessing
-immediate_exit directly could lead to unexpected bugs in the future.
+This commit also avoids KVM dirtying guest memory after userspace has
+paused vCPUs, e.g. for Live Migration, which allows userspace to collect
+the final dirty bitmap before or in parallel with saving vCPU state
+without having to worry about saving vCPU state triggering writes to
+guest memory.
 
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- include/uapi/linux/kvm.h | 15 ++++++++++++++-
- virt/kvm/kvm_main.c      |  2 +-
- 2 files changed, 15 insertions(+), 2 deletions(-)
+ virt/kvm/kvm_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 2190adbe3002..3611ad3b9c2a 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -192,11 +192,24 @@ struct kvm_xen_exit {
- /* Flags that describe what fields in emulation_failure hold valid data. */
- #define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
- 
-+/*
-+ * struct kvm_run can be modified by userspace at any time, so KVM must be
-+ * careful to avoid TOCTOU bugs. In order to protect KVM, HINT_UNSAFE_IN_KVM()
-+ * renames fields in struct kvm_run from <symbol> to <symbol>__unsafe when
-+ * compiled into the kernel, ensuring that any use within KVM is obvious and
-+ * gets extra scrutiny.
-+ */
-+#ifdef __KERNEL__
-+#define HINT_UNSAFE_IN_KVM(_symbol) _symbol##__unsafe
-+#else
-+#define HINT_UNSAFE_IN_KVM(_symbol) _symbol
-+#endif
-+
- /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
- struct kvm_run {
- 	/* in */
- 	__u8 request_interrupt_window;
--	__u8 immediate_exit;
-+	__u8 HINT_UNSAFE_IN_KVM(immediate_exit);
- 	__u8 padding1[6];
- 
- 	/* out */
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index bdea5b978f80..2b29851a90bd 100644
+index 2b29851a90bd..3973e62acc7c 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -4425,7 +4425,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
- 				synchronize_rcu();
- 			put_pid(oldpid);
- 		}
--		vcpu->wants_to_run = !READ_ONCE(vcpu->run->immediate_exit);
-+		vcpu->wants_to_run = !READ_ONCE(vcpu->run->immediate_exit__unsafe);
- 		r = kvm_arch_vcpu_ioctl_run(vcpu);
- 		vcpu->wants_to_run = false;
+@@ -6302,7 +6302,7 @@ static void kvm_sched_out(struct preempt_notifier *pn,
+ {
+ 	struct kvm_vcpu *vcpu = preempt_notifier_to_vcpu(pn);
  
+-	if (current->on_rq) {
++	if (current->on_rq && vcpu->wants_to_run) {
+ 		WRITE_ONCE(vcpu->preempted, true);
+ 		WRITE_ONCE(vcpu->ready, true);
+ 	}
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
