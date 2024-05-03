@@ -1,145 +1,157 @@
-Return-Path: <kvm+bounces-16522-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16523-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBFE58BB07E
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:01:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA2FE8BB09B
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B2251C22739
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:01:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC0E01C21117
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6A5926AF5;
-	Fri,  3 May 2024 16:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E1AA155342;
+	Fri,  3 May 2024 16:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Aef4gjis"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M6StspMX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB1C155397;
-	Fri,  3 May 2024 16:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CA846421
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 16:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714752109; cv=none; b=lLvPhr80AxlLJGTIScnhDSt3+BT/io0fKsaSlOCyn+XxzzpWbaW6aWymwXBt6CWWLQOCynEAWJDMuqAfqr8Yi0HFAUOGU2koPtbYGmVG+yJ9NVDDdTkg4Vc43Pws0pQbPPjmHImnABrB2JcjyBvzV/yuhX0lc8qFFC/Hsl/hwP0=
+	t=1714752707; cv=none; b=TRHqCx/uxj6q+dhuaJdfGxJLTXLLbQhVt4WZTEAEt5ChOeIzoUwoeCa3a4B4p0XiOnczwn1sGADPFqu7w72VAftUQ9XwluZmL1A5/erMF22HChyPI9d3jkP/UXwBAPdRhlFOYZySfQu87cwoQxoirD1RbBaPS9WAP/cOTkYaeu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714752109; c=relaxed/simple;
-	bh=toj4JNt/0SGplSZYRBmdaHv21iUmacqFjF9Z0TMqpOA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FZMhHZZ6FdsITVSPlfIMa9zVjsejDeC4VjZGbGQsa9T+Ots5UqpX57LWqCVSr2Dxdl9ESA6GRKkQZm8+d/tAr5vzTK2m0mNGDXLiS3JeibxfZxXVq/5uHFNIM9Sap/2yop8++ZdqOjBiwyOzWhArOJWM76fjQ2gqN17CW32otBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Aef4gjis; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714752106; x=1746288106;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=toj4JNt/0SGplSZYRBmdaHv21iUmacqFjF9Z0TMqpOA=;
-  b=Aef4gjis7rRRV46GE/fA1fJr86OSPAwk/+aiwA+B3Ab9n1BJ9+AHkKKv
-   3Hn7GXpBYwuHgcmjyX5jwl4OEFYCQjCzA4cI1NMmoAqPzdyG038NhriJY
-   6ns7I8Dca0RY6Cch1Sdx58TR+3TpFJuL/1xpGic0dDFX7/kPoun+G8Slx
-   kH236MaDrWgS0TApe+BL4VMsRe6QczlDWNEseQeFNiFlYJO3q2n5RZ00P
-   jUv5MpceaKkntFykJMzmmua04Yqg6AyLJFm7aZcN9St4rRiH6DweCo0nu
-   DkjKtxxHgYFqwHC/Ah97I3A8j9vWQQ3obB7YbUphMo5ziLfDiogAOqWrF
-   g==;
-X-CSE-ConnectionGUID: S9IwbmWQQkyLt3owFLwLJw==
-X-CSE-MsgGUID: z/Nf2RK4RGiM7e8Pn3ejug==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="11098772"
-X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
-   d="scan'208";a="11098772"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 09:01:34 -0700
-X-CSE-ConnectionGUID: QMbUy9s0QV2EjF4/eXWwKg==
-X-CSE-MsgGUID: 8sTeKWiSRAOZATLgO+dLjw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
-   d="scan'208";a="27891983"
-Received: from zhangche-mobl.amr.corp.intel.com (HELO [10.209.82.31]) ([10.209.82.31])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 09:01:32 -0700
-Message-ID: <b78a383d-27bb-43e3-8e61-f8a6b25b2708@intel.com>
-Date: Fri, 3 May 2024 09:01:31 -0700
+	s=arc-20240116; t=1714752707; c=relaxed/simple;
+	bh=lBc8mIGqc0Pyzb4/0nOXv6g1qY48kquuboJ7JtBmRDE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fD1bKj8HuldYgZMFvNUDSOcjyylFQPTIpk7gozkK5jzcl589CcNrmJJ1Iavmas/+hsaKmA0wBiyi+LZJIZcxSQxTevpjl5+W1uFf5LS3SQKtr1Cs+pFZwOls9mtaGrO/H4PoY00WPQXvcyn6CoiWl3d07Y/t+ZDTSyPT5FbDNT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M6StspMX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714752704;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/ZOiOpZyBKuObIgtTt9nNi/hSpkFKeeLY85af4HJ/a4=;
+	b=M6StspMXWxDtjYNCJHLKmyH56gq+sTqScXZyZk0/hpMq3GXDDSZGihVSxKGRHlPtXXkjij
+	aZaImnUGCg1U1CPtwo/VDbQqfNMdEwoGa97RxSqYpMCGsFI3odhpdLWxfwBklt0l+NC6/3
+	SoKSa5wg37PrHmwzr99N6cr9Dr2z7QI=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-126-Wm13e3SFOoKAHtUeYDxJZQ-1; Fri, 03 May 2024 12:11:43 -0400
+X-MC-Unique: Wm13e3SFOoKAHtUeYDxJZQ-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-5aa50631e23so9762199eaf.2
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 09:11:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714752703; x=1715357503;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/ZOiOpZyBKuObIgtTt9nNi/hSpkFKeeLY85af4HJ/a4=;
+        b=dCw3rI+rf6irqpIGfml8s2obatCz3kP3scTJuuG0scbxIkL/bO5T8dSaHg5N9cu8Vp
+         TA3KRX/FnXpdapHr+3s+FLfNyBP+sXs8N2aTvzy1dZJv/azFWjz90m/2jEqLr4osbBB9
+         KEPfKmgKjZj2eVQ6ol33KXtGG+ZvTaasGlzLfJSSIPf2eqBZer0lpwYpKnzjtdTI0aHw
+         08VfU0Uy2ybL/+fL0ZzN4sksl5drAzHSXsJysX4E02T8tXfnzXk5bNcrOARI8rDevd2R
+         RFwYtB+m8YuVIveMNvEKOwlke4nBkZeTo824DPkCnqx5/Hr27EckQHrmffJDYh+Iu3vj
+         NC5w==
+X-Forwarded-Encrypted: i=1; AJvYcCV+FAjXxIHcRjLbtlaCpZ3oH6Y6uOUkA47/hYyi6z87REbwEMWSVEm9/++lajwt/RCFcjYstbVmNJA8h1Bp/RM6KcfH
+X-Gm-Message-State: AOJu0YxP9cCHSBoth+xl7USl4XWDdgDvuOUy0ZeV9nbdgkyrOUN7+UFq
+	3r2Ce0hIOK1U0Ijpv48UaQNxHzkTNESPjj1ziZOaTkmiUOZvGcEsMPo13sxSfI3rfqhFv/ghIAn
+	U6wR2t3pSbgA9qko/W9CSq8WalXpk6+OMk0iTXRUICq0YZpiBdw==
+X-Received: by 2002:a4a:d888:0:b0:5ac:bdbf:8a31 with SMTP id b8-20020a4ad888000000b005acbdbf8a31mr3298911oov.8.1714752702770;
+        Fri, 03 May 2024 09:11:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IENI13JqeWl+3nRXkEgDH9DAZfXX8Y7O0g+Kcb7NHM7u5AIluDQAEa1B47G9dtTONyGkn4Qkw==
+X-Received: by 2002:a4a:d888:0:b0:5ac:bdbf:8a31 with SMTP id b8-20020a4ad888000000b005acbdbf8a31mr3298888oov.8.1714752702398;
+        Fri, 03 May 2024 09:11:42 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id cg12-20020a056820098c00b005b1da7520c9sm358982oob.7.2024.05.03.09.11.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 09:11:42 -0700 (PDT)
+Date: Fri, 3 May 2024 10:11:38 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Longfang Liu <liulongfang@huawei.com>
+Cc: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
+ <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
+Subject: Re: [PATCH v6 2/5] hisi_acc_vfio_pci: modify the register location
+ of the XQC address
+Message-ID: <20240503101138.7921401f.alex.williamson@redhat.com>
+In-Reply-To: <20240425132322.12041-3-liulongfang@huawei.com>
+References: <20240425132322.12041-1-liulongfang@huawei.com>
+	<20240425132322.12041-3-liulongfang@huawei.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/5] x86/virt/tdx: Move TDMR metadata fields map table to
- local variable
-To: Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org
-Cc: x86@kernel.org, kirill.shutemov@linux.intel.com, peterz@infradead.org,
- tglx@linutronix.de, bp@alien8.de, mingo@redhat.com, hpa@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, isaku.yamahata@intel.com,
- jgross@suse.com
-References: <cover.1709288433.git.kai.huang@intel.com>
- <41cd371d8a9caadf183e3ab464c57f9f715184d3.1709288433.git.kai.huang@intel.com>
-Content-Language: en-US
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <41cd371d8a9caadf183e3ab464c57f9f715184d3.1709288433.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 3/1/24 03:20, Kai Huang wrote:
-> The kernel reads all TDMR related global metadata fields based on a
-> table which maps the metadata fields to the corresponding members of
-> 'struct tdx_tdmr_sysinfo'.
+On Thu, 25 Apr 2024 21:23:19 +0800
+Longfang Liu <liulongfang@huawei.com> wrote:
+
+> According to the latest hardware register specification. The DMA
+> addresses of EQE and AEQE are not at the front of their respective
+> register groups, but start from the second.
+> So, previously fetching the value starting from the first register
+> would result in an incorrect address.
 > 
-> Currently this table is a static variable.  But this table is only used
-> by the function which reads these metadata fields and becomes useless
-> after reading is done.
+> Therefore, the register location from which the address is obtained
+> needs to be modified.
 
-Is this intended to be a problem statement?  _How_ is this a problem?
+How does this affect migration?  Has it ever worked?  Does this make
+the migration data incompatible?
 
-> Change the table to function local variable.  This also saves the
-> storage of the table from the kernel image.
+Fixes: ???
 
-I'm confused how this would happen.  Could you please explain your logic
-a bit here?
+> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+> ---
+>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 8 ++++----
+>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h | 3 +++
+>  2 files changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> index 45351be8e270..0c7e31076ff4 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
+> @@ -516,12 +516,12 @@ static int vf_qm_state_save(struct hisi_acc_vf_core_device *hisi_acc_vdev,
+>  		return -EINVAL;
+>  
+>  	/* Every reg is 32 bit, the dma address is 64 bit. */
+> -	vf_data->eqe_dma = vf_data->qm_eqc_dw[1];
+> +	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
+>  	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
+> -	vf_data->eqe_dma |= vf_data->qm_eqc_dw[0];
+> -	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[1];
+> +	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
+> +	vf_data->aeqe_dma = vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
+>  	vf_data->aeqe_dma <<= QM_XQC_ADDR_OFFSET;
+> -	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[0];
+> +	vf_data->aeqe_dma |= vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
+>  
+>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
+>  	ret = qm_get_sqc(vf_qm, &vf_data->sqc_dma);
+> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> index 5bab46602fad..f887ab98581c 100644
+> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
+> @@ -38,6 +38,9 @@
+>  #define QM_REG_ADDR_OFFSET	0x0004
+>  
+>  #define QM_XQC_ADDR_OFFSET	32U
+> +#define QM_XQC_ADDR_LOW	0x1
+> +#define QM_XQC_ADDR_HIGH	0x2
+> +
+>  #define QM_VF_AEQ_INT_MASK	0x0004
+>  #define QM_VF_EQ_INT_MASK	0x000c
+>  #define QM_IFC_INT_SOURCE_V	0x0020
+
 
