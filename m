@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-16485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16486-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 886398BA728
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 08:35:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A230C8BA744
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 08:56:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7EC128257F
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 06:35:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 580B5282B45
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 06:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA1714658F;
-	Fri,  3 May 2024 06:35:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EAB1465A2;
+	Fri,  3 May 2024 06:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cP655uGs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NkEeWZuT"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E7361F614
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 06:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2551857CA8
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 06:56:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714718115; cv=none; b=NtTEmlyEm72FNEIlXEIpLZaV5pp1FirQpxQr2scTBuqQp63UmNSan62HmiW65+I/vQEOKPqjQbLtossgVuSQT18RvHpijgNUcOLo5hdqRCrTfqjlDT6hKly6xqLjav3uYbuzYWW85wQSXsOpWjsUm3uwEqO/8DSCDYUuQ3HDftc=
+	t=1714719372; cv=none; b=XPEKRHKojU/vglB0xjlYfnwt+2trPGh0imXyzsCWKHrjPbhkF1JwN6xJk692FrQFwRTLHsIRWbKi83OKNCJ/b/qdNvKhqD+8q/wT20HG9Fksswj5Hj8j01t0xo51TB649yrPGZgRZVyaDCIntP+Iv0WNYGq86Fi9tXOg5O4c5yY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714718115; c=relaxed/simple;
-	bh=LqwwyCERY8OkvxiiXh2EXX+tvE3h0No58Fb/mOgdW+s=;
+	s=arc-20240116; t=1714719372; c=relaxed/simple;
+	bh=3G3c3NE8LrVbzexu46c+BLr17Qv2A4lsjNdI+HIralY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JKcnHXFNYDoLjrJLbZIYZfAk+ucvOUep/aJaKp9LxeYzzuUebANe5+xOgsBmrAZ04ceUPq9qKZj/d3j+CJoa2S8u6XKF5abqiG+MwBSp9XYzlfoBC/zGFs0yvZbaqak+FCdd6JWfFjMQkweJbDCX61AcvuYWOGVzpuT6mz/i3U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cP655uGs; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=G4ovgjOgg1y/BaaW8KcJj4Qwsq4RxzanRIptUqsymlvpxEB47CY2rs+eE1hDerTpXP0QIizTTv/1pxpF/riQuTl/VQHwDEOI2KakkgDcb737czAKNA6yxHb9RJcHa4HDMNXFGvY0RoCIIqU8G2kDBuI/Rkzi7hepN3KQ7a0Qe8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NkEeWZuT; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714718113;
+	s=mimecast20190719; t=1714719369;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=esVujG4oIhQrEcm/O6iebU5lC8d05HhTaZJi0SEv/K4=;
-	b=cP655uGsYVwR0K8CsjWvGZjnK0x3zCaxbm8wmxyjeptmUmqV/Vmo0008EJmMudK0wnPupK
-	8I/aJ0kkO7s3gGJMkhA9J9TUmZkjTLEW4sPC0utanDQOZMrqdWR7HUZ9klkBl10SBA76AY
-	YMvLws73B7UjF6Ew9n05i7jhzaxKsrU=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=V6p1b52yI6TXyt1fECtGqOpIF975IIXtsLuXmCF6zMA=;
+	b=NkEeWZuTW+RaX38jn/g4wCsFX8mxuNq4qlyQv8ZvQXuixFPCScUN0VEAxnKYKmGVmYAy+X
+	umI2qWhLBGT+NQwV1dpSsqzIp+MgL9B/FAnUum+fI0LpM5tZWy8wxPdeh45kkQOf3Qez3M
+	sxFz94x8tUJWH+MorK3PZIIy8hBx+bo=
+Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
+ [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-412-X5QSEGhTPUWKRT2w_1Ve5g-1; Fri, 03 May 2024 02:35:10 -0400
-X-MC-Unique: X5QSEGhTPUWKRT2w_1Ve5g-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4365ab4c663so80518481cf.0
-        for <kvm@vger.kernel.org>; Thu, 02 May 2024 23:35:10 -0700 (PDT)
+ us-mta-422-URILEEaGO8Oq6NL-dWZxhw-1; Fri, 03 May 2024 02:56:07 -0400
+X-MC-Unique: URILEEaGO8Oq6NL-dWZxhw-1
+Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-4daca01d01bso4442709e0c.3
+        for <kvm@vger.kernel.org>; Thu, 02 May 2024 23:56:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714718110; x=1715322910;
+        d=1e100.net; s=20230601; t=1714719367; x=1715324167;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=esVujG4oIhQrEcm/O6iebU5lC8d05HhTaZJi0SEv/K4=;
-        b=lP+fvLm/gGAjR5i/uTbqYcTeY9o4ncOF8RA2BryuMW6ZKq/E6Xi6uDUYk5fwr0nWaQ
-         H/rOudpjfnq5BH5qPQIXgIxyBMvtTJy4IoO5ARisgAQMfat1fPen+skRuMDgu3TelvrD
-         JVpkzCHxpXsoXil2yn90A7fejOpamc8Ow4qgjJSzZoJRVUX5mWiFdPXiqixsgbO2r8Vn
-         N8s+e34+f+EtVsb5QiOO9ByjKYJllNvxIPUk+aPzvbq+2cGv9F08kNj9fMdem77yzsfc
-         /HX1YBP+Tv2KZluYHLPdZ7eCskXDgasUGGWMBJiTTjF0i4f+b6UXwqCtYtRnvctCgCIG
-         IC1w==
-X-Gm-Message-State: AOJu0YzcUeknbiRSQbD2N98SuoV/poCOQrtn8FEYBc4/70bCZXy3ZNAw
-	iB2D/EPYy3Ut8fvzD6aqKUdnAtOiGOMvYQmG+u06FQ5j7gvjidJwuOZxwscthkXJVSVnWO8ExaR
-	4fSVstSixyO4ebwtg40syWViCjSI35DE34u9NF6rn0Up4YpNf4g==
-X-Received: by 2002:a05:622a:64e:b0:43a:dc29:a219 with SMTP id a14-20020a05622a064e00b0043adc29a219mr1829134qtb.2.1714718110470;
-        Thu, 02 May 2024 23:35:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFBwJMzszwMrOyWBGEvWcj7L8f6jc3WnErhE1iLTDHj0A5t8mdbgsUAOQGI/FzHj0uoHtlR5Q==
-X-Received: by 2002:a05:622a:64e:b0:43a:dc29:a219 with SMTP id a14-20020a05622a064e00b0043adc29a219mr1829118qtb.2.1714718110040;
-        Thu, 02 May 2024 23:35:10 -0700 (PDT)
+        bh=V6p1b52yI6TXyt1fECtGqOpIF975IIXtsLuXmCF6zMA=;
+        b=W96a3vqL647ne4DAN+LUB3F61ZtuYinFn7uRoBqhJWNyJJ4SxhchtF3hhux2uWPmto
+         773+bDlA+3hMhrdWfkJhB3U6Z5/qP8NBZ49c/O4mXaQzE1Y7ppdJQEeMqwRsyELZpRDA
+         XOKsKhq4G3cfY4iL8p2hLh+5+LtHyeVeuYpcQfbC9Nohx9ZDrPUSKUDJTwWZx44wfPQZ
+         cajFjwUlqMXLZGcCv5S+JQckJ1zgpiNIH7zwyKN+inQriQ9nRxdJ8tlX5u2T+Ouij6vT
+         XIHeDAPdwuFAYAUlHnpK1QJ2ZdIlIBJcHxAMV2ookfN4HzrBYBLpPJmH6FsSeLQWe9fu
+         7bAA==
+X-Gm-Message-State: AOJu0YxpKj/0My/l8WbSMVhjTt9qj6B28/9Y2S6HgLKGM6Pa3gopFMvK
+	VH8eX9ju8kEETDVU/ce8Z+76mKKTSBsMfZBfHdbeLrBuP2n+CbxrnWYPIQQPHJYqSKRwSYqCEnb
+	xiqJZ0CyH+W0ecaQCi1jOc5YdZVj09T3urHp5tiUYqmYGbvsUPw==
+X-Received: by 2002:a05:6102:342:b0:47c:a74:9e03 with SMTP id e2-20020a056102034200b0047c0a749e03mr1818254vsa.3.1714719367246;
+        Thu, 02 May 2024 23:56:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IER59IttyU2qfuXQt2k1jIj0hQThCkHaCGSWvplfWGRe+elGIox4xz4jNykRanIB+aGKKs79g==
+X-Received: by 2002:a05:6102:342:b0:47c:a74:9e03 with SMTP id e2-20020a056102034200b0047c0a749e03mr1818238vsa.3.1714719366648;
+        Thu, 02 May 2024 23:56:06 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-43-179-34.web.vodafone.de. [109.43.179.34])
-        by smtp.gmail.com with ESMTPSA id z6-20020a05622a124600b0043781985244sm1245696qtx.59.2024.05.02.23.35.08
+        by smtp.gmail.com with ESMTPSA id cx10-20020a056214188a00b0069b5672bab8sm972010qvb.134.2024.05.02.23.56.05
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 May 2024 23:35:09 -0700 (PDT)
-Message-ID: <252ef6c6-e0e1-4eaa-bf4a-b678e4e8b190@redhat.com>
-Date: Fri, 3 May 2024 08:35:07 +0200
+        Thu, 02 May 2024 23:56:06 -0700 (PDT)
+Message-ID: <951ccd88-0e39-4379-8d86-718e72594dd9@redhat.com>
+Date: Fri, 3 May 2024 08:56:03 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,10 +82,10 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 0/2] shellcheck: post-merge fixups
+Subject: Re: [kvm-unit-tests PATCH] doc: update unittests doc
 To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
 Cc: kvm@vger.kernel.org
-References: <20240503052510.968229-1-npiggin@gmail.com>
+References: <20240503060039.978863-1-npiggin@gmail.com>
 Content-Language: en-US
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -130,31 +130,56 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240503052510.968229-1-npiggin@gmail.com>
+In-Reply-To: <20240503060039.978863-1-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 03/05/2024 07.25, Nicholas Piggin wrote:
-> Thomas noticed a couple of issues after merge (did you report at
-> least one before merge and I didn't notice? -- apologies if yes).
-
-No worries, I just started testing at the same time as Drew pushed the 
-patches to the master branch.
-
-> Thanks,
-> Nick
+On 03/05/2024 08.00, Nicholas Piggin wrote:
+> Some cleanups and a comment about the check parameter restrictions.
 > 
-> Nicholas Piggin (2):
->    shellcheck: Fix shellcheck target with out of tree build
->    shellcheck: Suppress SC2209 quoting warning in config.mak
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   docs/unittests.txt | 12 +++++++-----
+>   1 file changed, 7 insertions(+), 5 deletions(-)
 > 
->   Makefile  | 2 +-
->   configure | 2 ++
->   2 files changed, 3 insertions(+), 1 deletion(-)
+> diff --git a/docs/unittests.txt b/docs/unittests.txt
+> index 3192a60ec..7cf2c55ad 100644
+> --- a/docs/unittests.txt
+> +++ b/docs/unittests.txt
+> @@ -15,8 +15,8 @@ unittests.cfg format
+>   
+>   # is the comment symbol, all following contents of the line is ignored.
+>   
+> -Each unit test is defined with a [unit-test-name] line, followed by
+> -a set of parameters that control how the test case is run. The name is
+> +Each unit test is defined with a [unit-test-name] line, followed by a
+> +set of parameters that control how the test case is run. The name is
 
-Thanks! Fixes applied.
+This looks like it's only moving the "a" from one line to the other? I'd 
+suggest to drop this hunk.
+
+>   arbitrary and appears in the status reporting output.
+>   
+>   Parameters appear on their own lines under the test name, and have a
+> @@ -62,8 +62,8 @@ groups
+>   groups = <group_name1> <group_name2> ...
+>   
+>   Used to group the test cases for the `run_tests.sh -g ...` run group
+> -option. Adding a test to the nodefault group will cause it to not be
+> -run by default.
+> +option. The group name is arbitrary, aside from the nodefault group
+> +which makes the test to not be run by default.
+
+Actually, there are some other "magic" groups that have been introduced in 
+the course of time:
+
+- The "migration" group is required for migration tests.
+
+- The "panic" group is required for tests where success means that the
+   guest crashed (but it's currently only used on s390x).
+
+We might want to document those groups here, too?
 
   Thomas
-
 
 
