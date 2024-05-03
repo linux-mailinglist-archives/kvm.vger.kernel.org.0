@@ -1,100 +1,129 @@
-Return-Path: <kvm+bounces-16513-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16514-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA588BADCB
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 15:35:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5389C8BAE0B
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 15:50:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC231C21BC8
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 13:35:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FE9A1C229A6
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 13:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A762153BFE;
-	Fri,  3 May 2024 13:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9EC15442B;
+	Fri,  3 May 2024 13:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCl2yHHJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qoK9pR0V"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0ECE153BEE;
-	Fri,  3 May 2024 13:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C14153BD4
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 13:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714743332; cv=none; b=MVFEeKwNazWiMWt6wuQV5IJOwQTsxQAMzsCmVaai+3Dp/PyAMusJjKn2ybzyxKTAmRAZmA0VfGQyslZST+nGUrYoz2ZNwpIZZw0YMz37WoLqT0r22mqHaNkFiYvisc0ZHUHsnoTp2En8Znu0vrl5J08x2QNX4MwJRxZaZCpJ6MI=
+	t=1714744191; cv=none; b=Vp0dxKR/Jkot0BKB3EzemNIyOViga0AafXws9TMS2I9goZQxktV4w5zcpBkdki/4yjNIV88vTQlUM6bmOiXR3GdO9me0HvCL01sKt9hMgKw2ACrUxOKaF7D05B1ANqShi85vuu9KeILEi37OQo/DrI6exW2fkCmy+cKfzriU/js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714743332; c=relaxed/simple;
-	bh=BvENLRYbFMQcqoQZl0GKVZ/ssG9xqu4OZFThI74E6mE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o8KbvajCETGcHHP0wqKcBq/Kj27JV+dJcmpTn4d9JA19Qkv3SDeJ7Lj2L0Y9VoutERFcF8xjxiGSNyonIB1IEapRWlOuus+rp/+KbqPemm1SR4x2EtX1pPRq+dR8mWffta+uqiRSxkANCDwK9BHIk9/LiukEMk3Msvshmmtknu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WCl2yHHJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B99DC4AF1B;
-	Fri,  3 May 2024 13:35:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1714743330;
-	bh=BvENLRYbFMQcqoQZl0GKVZ/ssG9xqu4OZFThI74E6mE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WCl2yHHJYG4XdrI95Np2IB4PW1zh++y27Nd4NkgbAGM+R8rF55h4AeXyh1/umKfz/
-	 8ciNM45R29XkkBXZjZnwc17v51frM4LB9ZxNzNDFt48q/1+FRVb8vLu34DxD5XacsE
-	 DqXevIO5FtaZwfx6XLyynBnBl8VjzUdTX9e4Ml6qUenzEMJGLZrVz4dxX7ytjuu2Qa
-	 suWphn2L7VwwKTiY3AjyFZDIlb93ZDkBZXAA+eyQZU7gD4zkqAhDf148ws79yjLxlC
-	 Z4J5iVli0F6/MESWH09/yB8TOXQXkAOvAFJTgszC+m/rkpGDRPOPtAKH/IHK62fjxM
-	 3C4gessjKYD+w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s2t4S-00AKZC-9A;
-	Fri, 03 May 2024 14:35:28 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Marc Zyngier <maz@kernel.org>
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: vgic: Allocate private interrupts on demand
-Date: Fri,  3 May 2024 14:35:17 +0100
-Message-Id: <171474325427.3225213.9683195489644361681.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240502154545.3012089-1-maz@kernel.org>
-References: <20240502154545.3012089-1-maz@kernel.org>
+	s=arc-20240116; t=1714744191; c=relaxed/simple;
+	bh=j07SrBcbxR5dXX5FuZ1/lpjovjv+PAI0Ty3nUmrfPsk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=a0MxwG6WjJuvYV3RgCunM1RGuRv61uyGsUCNzT/b7saCIGtGo9NNtILAziJ5pkx+qc03msDpwXVr4tx0Fh2t4fB7+2oGDzi0h/YnfmC1cwHdma9wm5FnZy5DmOkk6kGSQQkaBJdovPWjRwFjwFXMYuvt2LJb31CEK56cte15QrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qoK9pR0V; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6f446a1ec59so1008737b3a.1
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 06:49:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714744189; x=1715348989; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rQGv5UfxS6jX/aTPX2JQQkA4rH0rnz4JsGbkCfvMiug=;
+        b=qoK9pR0VX+7yhK5foV7UyI7xzgxVCafNPWDfgEv1EYfsASd7/3RTz2J6u0EQ/QBhkw
+         otBXrvIMWr1t9rTLYIfWfzPrQeZ2DTen8ejGl8V4A4BJSpaATMSUE5J0cn9LhNt2Nol7
+         uDBwYWai7AFD3W3Va47EnJZfo6tG1I9ezJDPPgKLCIRYaXqkRaFJszt5k9e9RlKkqko2
+         dMGXiQ/k0sGDw17do6A24w9Ncme6LERJqMpxW6rAH8niwA+L0k1+QoI95AtE1KVBsNrk
+         c7hcGDcxVwOhHBX5HO7wR0maJRNsmmBrgq221iGCSj8ltZw6ctVaMTC3as/5j0HfKmL9
+         SItg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714744189; x=1715348989;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rQGv5UfxS6jX/aTPX2JQQkA4rH0rnz4JsGbkCfvMiug=;
+        b=pntMGHd6c7oyzbrEHRnQ4SHHXVjhYE2iOUxyucDIqsNi18YrK2m4l8QURXGzPKpNG/
+         9D30b1Efmb9yAepnpdQYx0vqpf+4lv8DnL3kdbmeZs4JpkGR4K81Uvo0AyfMQEt8Un/M
+         4QRZ0h8ljrno6B1XxnQ5NVToM8wMZur0hoeK6oCi7eoAAV5vAopNBM5zM2nAT3MIDvjL
+         THVp4jqgm413Mo4CxFuE8xJVcYb11cpbefZd8FarJomT2LGcffc6vXuG+Xf3Osk3gHdp
+         MAArJ38dSYmNyLb8NvVRdoCjrzVkl7w/FsEuH6kXo430mGBpgajXs9/N2y1N4iQR9xdY
+         TZAg==
+X-Forwarded-Encrypted: i=1; AJvYcCWz3Los8ottYsnoDmtu/Q+7WZV1Cx8hm2qkDy5pytHdYJUD24dZ9AX3QjSaWzh9xd1l+yqVRBtk2GFi7knRmtmIsqWb
+X-Gm-Message-State: AOJu0Yylm9MeGVH2Q7U01c2IWQUT/joemWvJgFYcipNZDSQnThrGQFXE
+	NdAhB8rYUxeomGG5k0g+DKvcme7W6O7c0PhqSpaNGc42StRAZW6Lch0qlt853bI5v8RQMJhHDy0
+	rkw==
+X-Google-Smtp-Source: AGHT+IGc0eGZplb+oZL3dkGKqelUQj57uqxGLcLhw0noqTEVy1iaqZaCu7zCqnCr5z1/yKblcKIpSFxnXkk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2e07:b0:6ea:baf6:57a3 with SMTP id
+ fc7-20020a056a002e0700b006eabaf657a3mr154355pfb.6.1714744189252; Fri, 03 May
+ 2024 06:49:49 -0700 (PDT)
+Date: Fri, 3 May 2024 06:49:47 -0700
+In-Reply-To: <20240503131910.307630-1-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <20240503131910.307630-1-mic@digikod.net>
+Message-ID: <ZjTre6BYRpkI_H4o@google.com>
+Subject: Re: [RFC PATCH v3 0/5] Hypervisor-Enforced Kernel Integrity - CR pinning
+From: Sean Christopherson <seanjc@google.com>
+To: "=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?=" <mic@digikod.net>
+Cc: Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Kees Cook <keescook@chromium.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, Alexander Graf <graf@amazon.com>, 
+	Angelina Vu <angelinavu@linux.microsoft.com>, 
+	Anna Trikalinou <atrikalinou@microsoft.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Forrest Yuan Yu <yuanyu@google.com>, James Gowans <jgowans@amazon.com>, 
+	James Morris <jamorris@linux.microsoft.com>, John Andersen <john.s.andersen@intel.com>, 
+	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marian Rotariu <marian.c.rotariu@gmail.com>, 
+	"Mihai =?utf-8?B?RG9uyJt1?=" <mdontu@bitdefender.com>, 
+	"=?utf-8?B?TmljdciZb3IgQ8OuyJt1?=" <nicu.citu@icloud.com>, Thara Gopinath <tgopinath@microsoft.com>, 
+	Trilok Soni <quic_tsoni@quicinc.com>, Wei Liu <wei.liu@kernel.org>, 
+	Will Deacon <will@kernel.org>, Yu Zhang <yu.c.zhang@linux.intel.com>, 
+	"=?utf-8?Q?=C8=98tefan_=C8=98icleru?=" <ssicleru@bitdefender.com>, dev@lists.cloudhypervisor.org, 
+	kvm@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, qemu-devel@nongnu.org, 
+	virtualization@lists.linux-foundation.org, x86@kernel.org, 
+	xen-devel@lists.xenproject.org
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 02 May 2024 16:45:45 +0100, Marc Zyngier wrote:
-> Private interrupts are currently part of the CPU interface structure
-> that is part of each and every vcpu we create.
-> 
-> Currently, we have 32 of them per vcpu, resulting in a per-vcpu array
-> that is just shy of 4kB. On its own, that's no big deal, but it gets
-> in the way of other things:
-> 
-> [...]
+On Fri, May 03, 2024, Micka=C3=ABl Sala=C3=BCn wrote:
+> Hi,
+>=20
+> This patch series implements control-register (CR) pinning for KVM and
+> provides an hypervisor-agnostic API to protect guests.  It includes the
+> guest interface, the host interface, and the KVM implementation.
+>=20
+> It's not ready for mainline yet (see the current limitations), but we
+> think the overall design and interfaces are good and we'd like to have
+> some feedback on that.
 
-Applied to next, thanks!
+...
 
-[1/1] KVM: arm64: vgic: Allocate private interrupts on demand
-      commit: 03b3d00a70b55857439511c1b558ca00a99f4126
+> # Current limitations
+>=20
+> This patch series doesn't handle VM reboot, kexec, nor hybernate yet.
+> We'd like to leverage the realated feature from KVM CR-pinning patch
+> series [3].  Help appreciated!
 
-Cheers,
-
-	M.
--- 
-Without deviation from the norm, progress is not possible.
-
-
+Until you have a story for those scenarios, I don't expect you'll get a lot=
+ of
+valuable feedback, or much feedback at all.  They were the hot topic for KV=
+M CR
+pinning, and they'll likely be the hot topic now.
 
