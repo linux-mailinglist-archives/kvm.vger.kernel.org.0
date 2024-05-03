@@ -1,231 +1,252 @@
-Return-Path: <kvm+bounces-16534-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16535-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195D38BB34D
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 20:35:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B0758BB363
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 20:43:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AC99B20F76
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:35:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EB791C21F66
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 18:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFED8126F33;
-	Fri,  3 May 2024 18:33:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD1212F38E;
+	Fri,  3 May 2024 18:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MiecLUmY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JuLdIbmU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9266E2E646;
-	Fri,  3 May 2024 18:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714761198; cv=fail; b=EygZ5iiyr++bC1odL6T1KFvOxsr/u/53Kfz9Qgarg58xcDFjn9e+pnjAgGGDeEU0L+VPYYAwwyMuO8aeBOn3cHF5JRC6TYCmBjJV5qqrG+2BD8ApUoEMt9SuDIy8uhhLB74mUqSHHBYLWFULPfx/39paKpR91DS9ZxhxSnpd9rM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714761198; c=relaxed/simple;
-	bh=xz9O6eKTTDMR5xHoNm7xpJ70ixlh0EVc09cBCqD9OiA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Qwql0tPDdtBbjwtRRRLJK3sPyWwaQFM3DFIeEMEtZhT9PGuH9+7zCOnooT+RLkX+yhb+Nk8VD0hX9MmM4p52QZi7AW7gvlq285dkfu0fccu9llmX3LtQJNt49lgghCvbg43rWISu2cW5Y47l8rqHgtQvCyOARVO+xx5AuwMrfmo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MiecLUmY; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714761196; x=1746297196;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=xz9O6eKTTDMR5xHoNm7xpJ70ixlh0EVc09cBCqD9OiA=;
-  b=MiecLUmY9EOJE4TZE5iWs8jhDXIRcyUEVMoMZrN8erWowHsEkcjwv3Bm
-   yZFJn2kt0Z390IG7WqEgeCfr2XGKzgtgH/Obqvo+7pSNJFPU9boPek3b8
-   m08lwD7kZmaa+FmBt5nfv1eQ3M3h5MYJfT3yct/YcsufBy6iGkxAmHoba
-   GOhmNd6jkfze8ocs5S1L36SbInCfQiNzxS3BKsJjx2RsHx+wlAr9Pj5og
-   ck23wMBFsC6naerSBJfJ+oKF94/n/H/nqiztvnhzbHXC5xpJbGXNx7ys2
-   mEL6Q/5HhojVXNz2UaCAUKSLG3EduoUF8mpdXVwNmQSS9T80kxJqhZ7I6
-   w==;
-X-CSE-ConnectionGUID: JjvgP0coT0yVF1EItsnx7A==
-X-CSE-MsgGUID: sqRItVn5SnGiqs9SzAbMLA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11063"; a="10412078"
-X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
-   d="scan'208";a="10412078"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 May 2024 11:32:50 -0700
-X-CSE-ConnectionGUID: pYNYEpy8Q8y+7q2/P4e7vQ==
-X-CSE-MsgGUID: rtdx7lY5RRC1lvgySIuT5w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,251,1708416000"; 
-   d="scan'208";a="27632835"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 May 2024 11:32:50 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 3 May 2024 11:32:49 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 3 May 2024 11:32:49 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 3 May 2024 11:32:49 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IqF2qkIBRJVPpjpRGW0gQ7gM20zJ/WN/e22dzDdQAuOSd1+e3xYAaGyiZ4xWpv/J4nqneFBwvVDDEwgEx56SwdSuKmlAJvVQKBhnccgPu0L1FzqtSUVAXIifW1SSWGGEUt1xYUiOAce0EsX5AhQoZg+FH2JpyG4WDETaWVTzbB4MP2FTWuhxPeXzqq2KDhsF6BNRTPiAchrZb5jguxjNHQU+LVkfTVJz2paFdZ/QSbWrrE2kj/NSZccmPr2NAPwkV6JwOno5KSSWGj6yTQ6c9MA5+Rdvh0oSBECDiFXoV603QlSEIHbpW+OTSxUPM4U9ITGuRG2Jilq9leqvuHDoMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xz9O6eKTTDMR5xHoNm7xpJ70ixlh0EVc09cBCqD9OiA=;
- b=f9Zaq5VzaLh6qaH5FHJjGy5apQEuf8QJuPtcs2jxCCfQN6npU4mrLL9/OEOEH7dkeL61CUXRARotyCKtNg90Gp/UK7eXGBwXUiCBnZNB/CH4Lzp8KNiIWoq3w3oWxAbhcZUgdd4bH8Ore/JiUsdCfEybTDVctm3qdVEWdypewPbcV8dmgGHog8qTKrc8E6Q0/7COa9keVfwZeTVE3pqNF0NeTjx6eKhj0VaBywkggjXqKRc7IA6Zq2Ub759clmBNCU+Gl6XgoD/68q4Fz3FpeubAn0F6OB4WnFe1slF8WGNelZ/BY8VwhlelrYE2djImJ3CwLEGX9MQPt3k9cx3wxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by PH0PR11MB7657.namprd11.prod.outlook.com (2603:10b6:510:26c::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34; Fri, 3 May
- 2024 18:32:47 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%3]) with mapi id 15.20.7519.031; Fri, 3 May 2024
- 18:32:47 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Huang, Kai"
-	<kai.huang@intel.com>
-CC: "Hansen, Dave" <dave.hansen@intel.com>, "seanjc@google.com"
-	<seanjc@google.com>, "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org"
-	<x86@kernel.org>, "peterz@infradead.org" <peterz@infradead.org>,
-	"hpa@zytor.com" <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "jgross@suse.com" <jgross@suse.com>, "Yamahata, Isaku"
-	<isaku.yamahata@intel.com>
-Subject: Re: [PATCH 4/5] x86/virt/tdx: Support global metadata read for all
- element sizes
-Thread-Topic: [PATCH 4/5] x86/virt/tdx: Support global metadata read for all
- element sizes
-Thread-Index: AQHanO1LV4iR6HM/g0OQuJggcdeiqbGEpTKAgAAPaQCAALdAgIAABIYAgABmWgA=
-Date: Fri, 3 May 2024 18:32:47 +0000
-Message-ID: <ba2b0efa804c26034118c61f1eb6f335fc4cf02d.camel@intel.com>
-References: <cover.1709288433.git.kai.huang@intel.com>
-	 <17f1c66ae6360b14f175c45aa486f4bdcf6e0a20.1709288433.git.kai.huang@intel.com>
-	 <c4f63ccb75dea5f8d62ec0fef928c08e5d4d632e.camel@intel.com>
-	 <45eb11ba-8868-4a92-9d02-a33f4279d705@intel.com>
-	 <16a8d8dc15b9afd6948a4f3913be568caeff074b.camel@intel.com>
-	 <fb829c94a45f246eac0dd869478e0dcfc965232b.camel@intel.com>
-In-Reply-To: <fb829c94a45f246eac0dd869478e0dcfc965232b.camel@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|PH0PR11MB7657:EE_
-x-ms-office365-filtering-correlation-id: 269ead07-f8e8-4951-2c63-08dc6b9f6e1f
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230031|376005|1800799015|7416005|366007|38070700009;
-x-microsoft-antispam-message-info: =?utf-8?B?bGN5MkYxMkozTDZJQ3FXbXhRUzJ5cVBzUWtOSUMzM2pUaGQramQzTnR2bGRW?=
- =?utf-8?B?eHVwQmZidlh0Z3BnN1J2R3pBS2F2ZFJuTE0ySWZmN2l2VWswMnJpRWNiZXdB?=
- =?utf-8?B?ZjVCMjErdkExZlF1UndmZzl0MTkvclZQRElOcXp4MUc5WUp6L0g0OEMxWEZZ?=
- =?utf-8?B?MUxFZjIxMlNKa2RVL1p6UkYzbUdUTDZSa2ZDM1BISUxIQy9YYis1cjNabCtI?=
- =?utf-8?B?cS9uQ1JNbnBYNVFBdkJ6LzYwUWFTeC84cUtDVFZiYi9qSktnbmlSbG5BY256?=
- =?utf-8?B?VkFINGhVNWk0RUgrQ1l1RVUwQ3F3M01tQ2MwZThSN1Z1alpBNk1lMDR1TjV1?=
- =?utf-8?B?bi9JYlBhbno2QWtWTDJGYlhINGxMUnNYN2xvUlVMTHpZWjJwUS9JNDY2citO?=
- =?utf-8?B?NmphNm5jRlA5QkQ1YTlRekpEdTZtUk5DRUFjUXgzMkJxUXFUa1kxd3FiM0hQ?=
- =?utf-8?B?eUFHVUszYkhxSVBKcU1ZVUE5Ym9GRGdTejdhdklmdTBDQ25VRTZNZ0Z4SmZV?=
- =?utf-8?B?eUZhOUtheVBaVlQrTjYrdTlYdWordmxtM3RPbEYzZ085OEhmc1Vmenk4NDN0?=
- =?utf-8?B?MitxaVJrVWRUU01vdmRablZPdjZnMkpuQUlXakRPc3lEYzVad2h5NVdrR3c4?=
- =?utf-8?B?clJGR1lPdU9oVExGLzRmenFUSHJmQUZuUjBLRGkrblF0aDVVTERrSGNIa2dz?=
- =?utf-8?B?TFFzZDZmSzNVanpsRTFmMUlGWXpTUFRoK2V4MC9WMytRRnBNUnJjN0x5VFZX?=
- =?utf-8?B?bWJMTFFBTXRlM1FScDVPanFQZEJvZ3haODBGOXRNNzNPSnlZOFg0Ym04Zmpt?=
- =?utf-8?B?ckVGVWh5a3RsNW9YenJpd29XQU5keVg3d2sxcS9TTUpyNjlEa0YrVmg3QzNV?=
- =?utf-8?B?STh1azlmQzh3TkZQTmpTYzRKVDdvSzNiclJwM3MvbXlLU1ppNVVTU3BqbmZS?=
- =?utf-8?B?MjMzRXZ4c0FuYXdqclhWZ1kzbzFhbDhyU2E1aWJzMW92ZXQwT0hCcDVZb25D?=
- =?utf-8?B?LzRXWHJJTXB0eVI3b0dCc1JYdVJ3MmdJTlVrRkYxbzlnZHNRVHdZWGcvMXRH?=
- =?utf-8?B?blFhSGQveUxNbzhQU2lzcTY4dG5Kb3d4SlVzQ05PR3JTWG9aOGk4WmRYaVBN?=
- =?utf-8?B?MnR2NFBlbHJSYmgwMWVYTEFCNWhkNnpXSnN4aU5VU0M5OUh0QWltVmI3cUkv?=
- =?utf-8?B?T1lIUVByYXEyTm5hb1l3eTBjTnQ0MEo0UzgweWRLQ2llVHZWWlNRRGV5UEQ0?=
- =?utf-8?B?OHdDQnd4dHFsbGJ6cVlzbmdETkV5Zm1qUHUwQ2kySndEVDU2OFB3TGVTdVd0?=
- =?utf-8?B?ZjZNVHNPa2JkQlV4VlRLY2IrUCtCdFVqYWk1bjB6cW44UFhLRmxTcmFoaTBr?=
- =?utf-8?B?eVdiOElDTExBbEVaSDBIL0p4OUJ5a0lpMHhkaEpqdzVGR2JwRk9qZDd2VUFE?=
- =?utf-8?B?blg5OHYyZGFta0cvb2xGWTRBZFpRK3pYQnc4ZkdBbVIvVEx4anlWb2g5eVVV?=
- =?utf-8?B?Uml5TnJKTFBIYlJaMUxFZ2kvTkVmSWxKMnJQMHRUMm95MGYyeDhWREpTUjJZ?=
- =?utf-8?B?TmVsNG1UL3JLclprcUYza3cwY2s5eS9VTnZoM3hkSGV4SDI1cnZ5YVFHTUFU?=
- =?utf-8?B?OGlOTVlyb0tRaUVVdmZKU3dja2thd0pzM1g4S2xRRUlCVy9oT3ZLRWp5dmNS?=
- =?utf-8?B?eXBRa2NmaEdDQzhHR1h4RnZ6MGkxSUYxdmhnOFhxK0pKVmxEdjlFTmVJNnJ3?=
- =?utf-8?B?d3hyWjRaQ0NsM2F2aGFqTk56S0IvRHdPWGs3R1pwWnZOeUZVaDlRTXdyTnhq?=
- =?utf-8?B?Q3JUK2pEWWZIV2ZDSVZuUT09?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZDhDeEFZc1VYRGpNbzFJam1Cc2thY2Y4WEJzWWtCTTlIdVk2OGswQ0VHcWll?=
- =?utf-8?B?K2E5ZWVwZjNwYWxobGRlOG40UC8vSWNHdE96NXFKd2pEZytiK0M2ak5JZlBP?=
- =?utf-8?B?dGovUnJQVDc5WDRienhSbTFaSC9HVG95aHN6bzRsOEtaTUlvcVB5MXYyZzFO?=
- =?utf-8?B?Zlp1WkpZSTBSeVRjS1E0TlA0QThncE1xQTFiZ3MxSWFYOHZlYXhPUVNucTY4?=
- =?utf-8?B?QTlONTl4NDQ4dC8ya2VpSU5rYmdySUI1UUtWMWxMV2x4VDh6VWJncDY5V2k3?=
- =?utf-8?B?ZnhpNSttNE1Sajh5cFVLM01mc1pZRnVRbWNYNVJ4QjJsN1RHMUxZLzZ2MkVW?=
- =?utf-8?B?d3JPNkRwYnJPNG9lT25KUklGUjJrTlgyVnRtSWRSeGIvaTFkaThMN2NsL1Ji?=
- =?utf-8?B?UHBPVzYyc05XMU45RDNVZmI4Yk1ON1dqNDZrcldhSjVremhHcjhiUCs5anI1?=
- =?utf-8?B?d08rdi9wNzBZL1JvNVNLU1ZOeVB5R21TbGFKd04xbEJjWlRBWEdnUng2Y3l3?=
- =?utf-8?B?OUI0UkhvSndnYTlhZ1NDWUtRQ3Fwc0VyWTRPdURPR3dIMDNMN3JINWRGaWRI?=
- =?utf-8?B?a3dXUm5JUTRTWStiYjlsSlpKbndRT2tQRk5GN0hkSDdUcWp0UkZmQmhUSjB3?=
- =?utf-8?B?emlsMUt1R1JFNFRsekhENVMwd0hUaXRmbG8zaG1ubU9kUS9OWE96N0VnVGJz?=
- =?utf-8?B?YkI3d3c5S0hhQ1ZxdG4wVHZhdXNWd05mT09sazIwbGpneWR6K3NGRFE4K1c4?=
- =?utf-8?B?WUVEajMyZGZObzh6dVhRWFlvSmlKTXZwVFRBbzJyUXk0dzlTM1BpWm1RYTlI?=
- =?utf-8?B?LzJwbHQ2N3RCNU4xenM3cHE0Wkdubkw1dTJHUG55NnlxU2dtNVhVZThuTFpw?=
- =?utf-8?B?T2VUb0hrVTNNOTZhU0N0TW4xVXFQOWN2TDhLTFpNTFYySGVEY1cvcG5CSVhN?=
- =?utf-8?B?UTFPT1BBNGRLaHNmT3I4VDlqWWJ2aktETXo5b3VsRGJVWTl3UjhpeFJyTDJH?=
- =?utf-8?B?MkthWWJ5bzFXNUdvY1Y3OUxCM09MbVZRWkNIZXhLcGdBQXBVcDRVYkpmTGlO?=
- =?utf-8?B?V2hMVURWc0xaeGpXNGgzS1YrZCtwVmRDWUx3VUZRTHFCTDIvU0dOcTdIV2tt?=
- =?utf-8?B?d0tUdGozVEFFbUxhUlh3TjhrNDBkcjdQYjhqQm1WMGRpSFFGbGhVUUVraG5P?=
- =?utf-8?B?eWxjU1lhMUQva1FTMWZiR3pPUjh3Q3Awc1g4NWQ2dTdleVBKeUdDZ1hBZWtD?=
- =?utf-8?B?WDdYMitTbEdqRWtrcjJLSGZkNUxuRUhITC8rQVpoVU1XSmpsMnJKTm5WK3Rz?=
- =?utf-8?B?OGhpT1hhcmhFQWFVQytRWlNaRTVvZ1kxL0wwVXFLT0VGbC9vK1pDdlFIcEFp?=
- =?utf-8?B?ckN1NEU3bnZDdk9DQXQxVEpYcXJXLzYvaUxJeGVWTGhQcmYxaUtIRXNobU1X?=
- =?utf-8?B?YjVjcktaVFlHaWxicDhmYjRQU3k2Q2hWMkM3Ui9KUjdzaDN3UmtGK3hkUVZT?=
- =?utf-8?B?Z25Pb2VMTTZHNjRuVURxMGJQVTlZeUR5SmhyV21DeW5SVWxsNmdyVTBNUTE3?=
- =?utf-8?B?QTl4ZjJ2cjY3Y3lMNnI5Szg4a0ZyVXBQaVVDSUZ1eld1VnlFQlFBZXcvZ0VU?=
- =?utf-8?B?ZGpiZ21jN3JkbGhzSmlmTVlKNThOR2gvdlM4QXlrNG5HbkpXd1FhcjAvMWhu?=
- =?utf-8?B?TFFvWGlGNmxNQ2s5TnJOWjB4M3JHMWpDaVZLL3FVNGhoN0tza0ZraC9KNGgz?=
- =?utf-8?B?dXRrN2JMaS9BVmMyRXlDVFJuTWZMZk16WUZadmowVTdhU3ZTektCM3pURERj?=
- =?utf-8?B?N2VmU0J2QlJhTGJJZ0ozMTRXZGtQQ2JreHk4ZHNuS1VHdnhlT1R1dS8yR0pU?=
- =?utf-8?B?MWZGNkhUZkczQXB1azJxanp4ZnF0UittaDVxSEtiOW5ndlBORTVtdnVYbjdC?=
- =?utf-8?B?RjQrM0pPWWN4NHhxeFVXSEo0UG1vbEYySUtudDAvbE1oV3hNQ0gvQWppeXRt?=
- =?utf-8?B?UUpIM2xud1I2M1l6RmxTc2dQcXRmUlhPekpuTlpQNzEyNHZyb3ZuQXpoMlNX?=
- =?utf-8?B?VUNaUmc2dmR6QWI2Ty9zOEpKRy83MmtnNlRQdGsrYXVTZVNUTW53aklvbEti?=
- =?utf-8?B?Nlh3bmMyNmtQcHdxbEJCMEhuTUVFanlueHJ1WVYwSU40MGcvQ2FKZ1l3cStt?=
- =?utf-8?Q?rRD5NpBHNzp3E0yDsSuaJXk=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <881B833AAE3221448CFDF67A094B7A3A@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA9C28E11
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 18:42:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714761778; cv=none; b=ez5DwhQsF+ACNH0K+f7EaHXuC6ow/GbstauhbFHfke2NNAvSOMJV2gbirw8obhddtDGGtKfyKGgIGk8m6VqFGvSkpFoRGp/Wlw/FijVzFonxpDK5BaVBegScNwEgT4NaKBaAew5DZbds0C62nRYwklj4AyYM0gQTQKc6Dn7DXog=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714761778; c=relaxed/simple;
+	bh=tU6G7JYGWRkG+2O/O2roQvpxabuBZJxtfMZ8Pdnsff0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=GAJ5T4lOeAiuHsMojuLDOBlBsX2e4Z4DfL/Khw6i2XXqD5NLg8hfUk+9AL98ulJvH/IlZcVDenz2/d+XajCZLtiso1l89d6m8JKRHKIo+8vTHs8HaQcxvfAv3bWCyNC7KXYRxYM24voRP514MRrMYSCcsRZeA//h30UYk14pvsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JuLdIbmU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714761775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7jg1F0r+Luam104Y7UVnMDpQtCctuiu4jLX0tf0Er1I=;
+	b=JuLdIbmUOWthf/SfUfhZzbHmM8sbDv35ewFqCntRW8JzA5xdoFZXjhtGrrvceHccjfYqni
+	Ww4u41V/TZI3ndQdNBQKmEWFUDuNAQFGPTsLeUqu5ER5W62z6KGH3egaXQN+v9d6t0D8eF
+	htKso3kNlnZltOP4VhIYoR5/Ncki3Zg=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-283--Fbwrea9MqSg5A2OJozs3Q-1; Fri, 03 May 2024 14:42:54 -0400
+X-MC-Unique: -Fbwrea9MqSg5A2OJozs3Q-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1ec4c65a091so34720415ad.3
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 11:42:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714761773; x=1715366573;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7jg1F0r+Luam104Y7UVnMDpQtCctuiu4jLX0tf0Er1I=;
+        b=w+r1uanImd+ZxhiValDj8V+oQmQR9MYsOKVTQ4SzafbyuqV4LD6brLE8CfGJhgFsHI
+         h6iJFcjK8VYHXhzg3QpIx8a+yaeJLTSPDlrnBwULUS+LK+vA035Q/ZgAAq0GIQvZ8fJN
+         Os3baOw8sNDBl3nhPS70dKMLip6pQ3wk/B67ZfYG/xQiCt8OyyzhzB6ydPlzKAlDu4uk
+         +/+d2GkKSGiAwmcA2l6rHrnfzAhX95R3C+mFE312M3Vows2Dt8yE+txbtXQ2v9Wo4LNP
+         H8Rd7LvhNLV1Fxql3pjvwKRfSI2Tw+c90iEA9Qyx9CZEN90yvXxHkkSqCFOw9O30NMoS
+         HvBA==
+X-Forwarded-Encrypted: i=1; AJvYcCXvtDWdKNLqx5jXGNoNB7PzFtSyCpj8MYlDM/GmqnR6LC8FO2xq3lvTkRI7PlnOnZbAQTdniO91mv5OalbFON4hTFQt
+X-Gm-Message-State: AOJu0Yx4GMqn7uT+n2+3xKfH4NXqksAVmFUtz94bXHN4zbiTDsZYaCVB
+	1EkSuboDpv/rCQT0ybTIgLl0y8cA4z7U9rRd1JmVinelOCebw2bushMDVVad67TPzsDZmemqMEn
+	czNjVNJAm4jp5sigZnZU3hv6Boi6vYmRsW7O86OSo+F0gonTVkw==
+X-Received: by 2002:a17:902:f70f:b0:1dd:81a3:8dc3 with SMTP id h15-20020a170902f70f00b001dd81a38dc3mr4364024plo.46.1714761773116;
+        Fri, 03 May 2024 11:42:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHO/B7NcxkkrJOjUeyFPE3oTYjTTOUH1HEefTB3GxhO5X3BJw+May4aWchCVGJZGF1h0o9dfQ==
+X-Received: by 2002:a17:902:f70f:b0:1dd:81a3:8dc3 with SMTP id h15-20020a170902f70f00b001dd81a38dc3mr4363995plo.46.1714761772691;
+        Fri, 03 May 2024 11:42:52 -0700 (PDT)
+Received: from LeoBras.redhat.com ([2804:1b3:a800:4b0a:b7a4:5eb9:b8a9:508d])
+        by smtp.gmail.com with ESMTPSA id l16-20020a170903245000b001eb6280cb42sm3590633pls.11.2024.05.03.11.42.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 May 2024 11:42:52 -0700 (PDT)
+From: Leonardo Bras <leobras@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Leonardo Bras <leobras@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rcu@vger.kernel.org
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+Date: Fri,  3 May 2024 15:42:38 -0300
+Message-ID: <ZjUwHvyvkM3lj80Q@LeoBras>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <ZgsXRUTj40LmXVS4@google.com>
+References: <20240328171949.743211-1-leobras@redhat.com> <ZgsXRUTj40LmXVS4@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 269ead07-f8e8-4951-2c63-08dc6b9f6e1f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 May 2024 18:32:47.0927
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 42rO185gdgOzZdnSYLhB/tG76vOj35KeMZXAO/0QdsVoMEFffCTg35yMHffpohRkbZGQK8Vzt6NJIHBBZHpiJZ58Zb3pttHJJt7YZJw3b6E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7657
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-T24gRnJpLCAyMDI0LTA1LTAzIGF0IDEyOjI2ICswMDAwLCBIdWFuZywgS2FpIHdyb3RlOg0KPiAN
-Cj4gVG8gcmVzb2x2ZSB0aGlzIG9uY2UgZm9yIGFsbCwgZXh0ZW5kIHRoZSBleGlzdGluZyBtZXRh
-ZGF0YSByZWFkaW5nIGNvZGUNCj4gdG8gcHJvdmlkZSBhIGdlbmVyaWMgbWV0YWRhdGEgcmVhZCBp
-bmZyYXN0cnVjdHVyZSB3aGljaCBzdXBwb3J0cyByZWFkaW5nDQo+IGFsbCA4LzE2LzMyLzY0IGJp
-dHMgZWxlbWVudCBzaXplcy4NCg0KSSB0aGluayB0aGUga2V5IHBvaW50IGlzIHRoYXQgaXQgaXMg
-YWN0dWFsbHkgc2ltcGxlciB0byBzdXBwb3J0IGFsbCBmaWVsZCB0eXBlcw0KdGhlbiBvbmx5IDE2
-IGFuZCA2NC4NCg==
+Hello Sean, Marcelo and Paul,
+
+Thank you for your comments on this thread!
+I will try to reply some of the questions below:
+
+(Sorry for the delay, I was OOO for a while.)
+
+
+On Mon, Apr 01, 2024 at 01:21:25PM -0700, Sean Christopherson wrote:
+> On Thu, Mar 28, 2024, Leonardo Bras wrote:
+> > I am dealing with a latency issue inside a KVM guest, which is caused by
+> > a sched_switch to rcuc[1].
+> > 
+> > During guest entry, kernel code will signal to RCU that current CPU was on
+> > a quiescent state, making sure no other CPU is waiting for this one.
+> > 
+> > If a vcpu just stopped running (guest_exit), and a syncronize_rcu() was
+> > issued somewhere since guest entry, there is a chance a timer interrupt
+> > will happen in that CPU, which will cause rcu_sched_clock_irq() to run.
+> > 
+> > rcu_sched_clock_irq() will check rcu_pending() which will return true,
+> > and cause invoke_rcu_core() to be called, which will (in current config)
+> > cause rcuc/N to be scheduled into the current cpu.
+> > 
+> > On rcu_pending(), I noticed we can avoid returning true (and thus invoking
+> > rcu_core()) if the current cpu is nohz_full, and the cpu came from either
+> > idle or userspace, since both are considered quiescent states.
+> > 
+> > Since this is also true to guest context, my idea to solve this latency
+> > issue by avoiding rcu_core() invocation if it was running a guest vcpu.
+> > 
+> > On the other hand, I could not find a way of reliably saying the current
+> > cpu was running a guest vcpu, so patch #1 implements a per-cpu variable
+> > for keeping the time (jiffies) of the last guest exit.
+> > 
+> > In patch #2 I compare current time to that time, and if less than a second
+> > has past, we just skip rcu_core() invocation, since there is a high chance
+> > it will just go back to the guest in a moment.
+> 
+> What's the downside if there's a false positive?
+
+False positive being guest_exit without going back in this CPU, right?
+If so in WSC, supposing no qs happens and there is a pending request, RCU 
+will take a whole second to run again, possibly making other CPUs wait 
+this long for a synchronize_rcu.
+
+This value (1 second) could defined in .config or as a parameter if needed, 
+but does not seem a big deal, 
+
+> 
+> > What I know it's weird with this patch:
+> > 1 - Not sure if this is the best way of finding out if the cpu was
+> >     running a guest recently.
+> > 
+> > 2 - This per-cpu variable needs to get set at each guest_exit(), so it's
+> >     overhead, even though it's supposed to be in local cache. If that's
+> >     an issue, I would suggest having this part compiled out on 
+> >     !CONFIG_NO_HZ_FULL, but further checking each cpu for being nohz_full
+> >     enabled seems more expensive than just setting this out.
+> 
+> A per-CPU write isn't problematic, but I suspect reading jiffies will be quite
+> imprecise, e.g. it'll be a full tick "behind" on many exits.
+
+That would not be a problem, as it would mean 1 tick less waiting in the 
+false positive WSC, and the 1s amount is plenty.
+
+> 
+> > 3 - It checks if the guest exit happened over than 1 second ago. This 1
+> >     second value was copied from rcu_nohz_full_cpu() which checks if the
+> >     grace period started over than a second ago. If this value is bad,
+> >     I have no issue changing it.
+> 
+> IMO, checking if a CPU "recently" ran a KVM vCPU is a suboptimal heuristic regardless
+> of what magic time threshold is used.  IIUC, what you want is a way to detect if
+> a CPU is likely to _run_ a KVM vCPU in the near future.
+
+That's correct!
+
+>  KVM can provide that
+> information with much better precision, e.g. KVM knows when when it's in the core
+> vCPU run loop.
+
+That would not be enough.
+I need to present the application/problem to make a point:
+
+- There is multiple  isolated physical CPU (nohz_full) on which we want to 
+  run KVM_RT vcpus, which will be running a real-time (low latency) task.
+- This task should not miss deadlines (RT), so we test the VM to make sure 
+  the maximum latency on a long run does not exceed the latency requirement
+- This vcpu will run on SCHED_FIFO, but has to run on lower priority than
+  rcuc, so we can avoid stalling other cpus.
+- There may be some scenarios where the vcpu will go back to userspace
+  (from KVM_RUN ioctl), and that does not mean it's good to interrupt the 
+  this to run other stuff (like rcuc).
+
+Now, I understand it will cover most of our issues if we have a context 
+tracking around the vcpu_run loop, since we can use that to decide not to 
+run rcuc on the cpu if the interruption hapenned inside the loop.
+
+But IIUC we can have a thread that "just got out of the loop" getting 
+interrupted by the timer, and asked to run rcu_core which will be bad for 
+latency.
+
+I understand that the chance may be statistically low, but happening once 
+may be enough to crush the latency numbers.
+
+Now, I can't think on a place to put this context trackers in kvm code that 
+would avoid the chance of rcuc running improperly, that's why the suggested 
+timeout, even though its ugly.
+
+About the false-positive, IIUC we could reduce it if we reset the per-cpu 
+last_guest_exit on kvm_put.
+
+> 
+> > 4 - Even though I could detect no issue, I included linux/kvm_host.h into 
+> >     rcu/tree_plugin.h, which is the first time it's getting included
+> >     outside of kvm or arch code, and can be weird.
+> 
+> Heh, kvm_host.h isn't included outside of KVM because several architectures can
+> build KVM as a module, which means referencing global KVM varibles from the kernel
+> proper won't work.
+> 
+> >     An alternative would be to create a new header for providing data for
+> >     non-kvm code.
+> 
+> I doubt a new .h or .c file is needed just for this, there's gotta be a decent
+> landing spot for a one-off variable.
+
+You are probably right
+
+>  E.g. I wouldn't be at all surprised if there
+> is additional usefulness in knowing if a CPU is in KVM's core run loop and thus
+> likely to do a VM-Enter in the near future, at which point you could probably make
+> a good argument for adding a flag in "struct context_tracking".  Even without a
+> separate use case, there's a good argument for adding that info to context_tracking.
+
+For the tracking solution, makes sense :)
+Not sure if the 'timeout' alternative will be that useful outside rcu.
+
+Thanks!
+Leo
+
 
