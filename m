@@ -1,508 +1,282 @@
-Return-Path: <kvm+bounces-16519-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16520-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB40F8BAF20
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:41:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01D0C8BAF40
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 16:52:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 392681F220DF
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 14:41:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 250831C22327
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 14:52:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4CBF46B80;
-	Fri,  3 May 2024 14:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B785747F7F;
+	Fri,  3 May 2024 14:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ED4hSxZI"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="S1EYUgso"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2048.outbound.protection.outlook.com [40.107.212.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D895379E5;
-	Fri,  3 May 2024 14:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714747287; cv=none; b=Gqj8DAQjrTBRg/jjumaVzUlmPcgdrB/tOqbBumQcFjOXRH6sxto8TYtJzSfxqJRZtDo2mVrZ0FA58si5DdV+IYoGYSdc9EJbmwTYE5Y6wNYU5TpmzLqjdgbo4ese2EERBvqHJaILOi9oKz1Ub55u4HO6XyeGVy5xk8CJIg7fBbg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714747287; c=relaxed/simple;
-	bh=zlHjK/PxE1TRXjUMhkONFHt7Y6Ilexx1/gDIujwhsOw=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UN0h+TguRxctk4Rk86+wRgEBLXill/8yVivDEnoKnaZJJGz+HItN7C7Ec780CCg1BOqJcdPyRmn0VzsIHLgHqek7V0fHq+FvhTpNb5HN/aQXwe++HrixWkN0Fva7DpsssjmA9Q/ctVaiP6YVWeNW9HVXNyvme2V5QxHG9NM2z/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ED4hSxZI; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41ba1ba55e8so54843065e9.1;
-        Fri, 03 May 2024 07:41:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714747283; x=1715352083; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=azRagsGySzV5eAEs8d+ON6g73h2e/RJB1Lcdlw2LC84=;
-        b=ED4hSxZI+3Cya7T3tRTfOZH0S7rJHdy+gGD+IljMlvQdce3a18AafrVdmCd7eC6af6
-         3bMtf2SvPeZpaqfdAOPQqL5L0RaSNpWebClyfPn6QQNaj4Yn/VJF4LYCIsryb65s/Ott
-         orJ/FjvKHvd6XU27Hq2g9AACrrr+Pq60S1oBUZoMhSJqv4wGuSLmZAFX6kCwiVgMy30C
-         8U9Xbzoo5FOTgJJnizGoedvAJC4JwhWCbwr4awXadspxBeVQb2fdZKoqHKWCyNuJa6Hi
-         T+0lKk5wjplDIsohlNrKuZ7PQICged/MmFXSdIm/muf5wNWLC9HE3YFr4LGWh7R4mpOj
-         ywvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714747283; x=1715352083;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=azRagsGySzV5eAEs8d+ON6g73h2e/RJB1Lcdlw2LC84=;
-        b=Xddk0T2sZ7fHYahJ6ZhA+OVYQE2bNN6tzcnkSpv4A2ROWWCkm/WooMg6jpfw8QzVZ5
-         QRerhFrrrdhGYWhxXOn+rf+nbthBs+a4rO64FF3+fff+kRvhGAvbL0T7CpQdyOHwWFi1
-         TSQjTwcX97vNRoDEoYqtjzRRpbJJbG882nYBlO5cNtDMB6rsN/1HfLdoJh4AqwZyiK1l
-         CuE3Tas1poswUZdHLT5Iojn3Cqmj67YwoHTJpWysxgmJiqZYeHvvixlShnLiMq/5MC8W
-         VXS3uLXlc06kyaK9a//2P9NDsdd+1FDC8mVu2fBlqoI+rNMK3bw1QQbGXid8Jilx1EaX
-         B24Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUBtsTF8MhuOH/K/4Wy56ICFZYaOEdYSgQrdYUKgD1Fk+LZRyBBSioYomlNxupIGL4g9lkNmBnrCn+zGGB0HbL465sfw3+0RIFAdqqLHlU4oEyvNdIXYQriTjCy+zgLmeBJO1mLDGLvKscbF/nas7qfEpGOfxE0hI/Jugk/k2SzJfFEgayMKH8JXwqcQPxYY0ezodPd8n1s5OMppr8asXIzBufgXlPf6vKDjyfS8BofnP7Pob/B
-X-Gm-Message-State: AOJu0YxIVdfTg5NIxTPqYlY6xcAdJEQTjNtpBd+c/9mcggBXXhBuH/r8
-	pk4PjLTjBQieaowS3FtGa3VuU4RLsap2OBVaPGigXkdntRE/6rmy
-X-Google-Smtp-Source: AGHT+IFwwDzx7kiKOowz9Bq/5p6VLgEK7705r0A4XgwNwtMoQjgzKV8U7tRiQEBrFzAOa1zNKfTrDw==
-X-Received: by 2002:a05:600c:458e:b0:41c:83aa:18b7 with SMTP id r14-20020a05600c458e00b0041c83aa18b7mr2241241wmo.33.1714747282852;
-        Fri, 03 May 2024 07:41:22 -0700 (PDT)
-Received: from [10.16.124.60] ([212.227.34.98])
-        by smtp.gmail.com with ESMTPSA id p12-20020adfe60c000000b0034ccd06a6a3sm3935256wrm.18.2024.05.03.07.41.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 May 2024 07:41:22 -0700 (PDT)
-From: Zhu Yanjun <zyjzyj2000@gmail.com>
-X-Google-Original-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-Message-ID: <c9f9e29e-c2e1-4f99-b359-db0babd41dec@linux.dev>
-Date: Fri, 3 May 2024 16:41:21 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019266FC7
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 14:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.48
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714747959; cv=fail; b=Z0WaFpJ+UpgkHx40RT61mH/S6foQdB9H7001PQ8DHdzbjdVaM+vg7zEwltW+cONcrKTI8fSPlgGpc57nQlNpFSpOI4CQ/FYz75t/UQy7zA+ykcOSQu1RUoeEYSldL5VYUNcg2f2QSc+uuMGNT3pIOEijpu95jGDCre1yH7H4X+0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714747959; c=relaxed/simple;
+	bh=6WAo2tEvXZnlnL80oZalckzk+SyBNQ0aplklL1v3C5c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h7M3WLMMkyxRQnhCcubmJ12+78PYERxKkjjj0JHifRFQG+Z6a0qoXzj/fkYbs7AN23VXiUOoT9EbE78kzZOyMs/8yoakkdfi8uKya77qXSqf2O7657tJpka77nke2QV+Bk8FucyfEha+YG2676UHGkT9D5pfHuNApZ2gCLdIfiI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=S1EYUgso; arc=fail smtp.client-ip=40.107.212.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YLU9o8mJ2gAtdTKd7AL10B1Eq51rZmsVHc3Xrr4hf15AwdzJ6qcFXDSu/e9UwFPa99JG2lYaElm8a/9QBqIbDS8x2qhlRB8I8FjMJtVoCWts9PFcGNh1N9v28E+WOHcihXj2cFgX8DFCEr9yhqubdNBUxvd63HmCSP2/Ak4dnnq5Ez09PoNVFAFxEm532ZwSOdmWvHftHl3MoSVcJGp7+6dxH1uCeLvr4ltexHmxeCsfYwo2br8pjxV8j8ayb9Xe4mMdSVYMn2LrPOONKn7K0rJphGdknO5w0qN+wcOrOSP+JDC1NwXBFYpvVvk2+vtoHFUkG7unCyVlMvUeZ2TRow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aLJYcyAAeFEG64XhQP6rm7KTbxNIi98O91QY5f93ktI=;
+ b=RFaTyzrtttbl3GmA0zCqCL3+piztgeL+AKUXk2+CBt/9nDO8FnrBpkad2U9MRXusjM+jLzLB+6x4VEjwtVxTxjw+chUTZ23tby5e0wk+uDaR9rHrkFYsNuatg1EAx7fpPSBJtKmos9sVSRMZEELtIEI2BrcZOd4b7Mch+j7KoQLBlMWiEFDVUYrHb08hUgbUt5GI29yQRnn0Ack/+sAL2S3IMONZWsSZ4lIttXt3BKGafl/GWWAC9zZwT1pa4MSiLtlPJ5BZIUzK1Wj41TXJSEgHRVzhnhb3dRMjk8rBbiAxuYoVIqQbSGZHfz0DPcn4rAG+vkd1vk29Yno8XCLJBQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=nongnu.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aLJYcyAAeFEG64XhQP6rm7KTbxNIi98O91QY5f93ktI=;
+ b=S1EYUgsoN+tAzmuGJkdvIEyBzYOGSTfMGMnrlT4qcDlo05VpltxTvRHZovK9D6OF2G5wU4AHLhXQ1JmsvphSd4xgywG6kaHbrAcuIgwcvZr9HwXlrjl1nyb1sgtVNh5jiuN6oCGJbRwLfMUzVNvURcnBKk9lJ5K4pyuUa/L8faU2sIXt7/Qg/ilXRacXXgHPiOM6PMc1Dw41LSb/Hp+t10Y8NfEUjLhIcWc2jazGxq99fkGHzqTAXuMI/ChDnZyCkueKsp70VQk+2Oux4PnkCB3P88jpj3Vl137Vbcpeajrn0i3PQd6fRKQdHq1ujM83PTQJfe4CKzKq4w2S179b/g==
+Received: from SA1P222CA0001.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:22c::34)
+ by SJ0PR12MB7081.namprd12.prod.outlook.com (2603:10b6:a03:4ae::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.32; Fri, 3 May
+ 2024 14:52:31 +0000
+Received: from SA2PEPF0000150A.namprd04.prod.outlook.com
+ (2603:10b6:806:22c:cafe::21) by SA1P222CA0001.outlook.office365.com
+ (2603:10b6:806:22c::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.34 via Frontend
+ Transport; Fri, 3 May 2024 14:52:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ SA2PEPF0000150A.mail.protection.outlook.com (10.167.242.42) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7544.18 via Frontend Transport; Fri, 3 May 2024 14:52:30 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 3 May 2024
+ 07:52:13 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Fri, 3 May 2024 07:52:13 -0700
+Received: from vkale-dev-linux.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4 via Frontend
+ Transport; Fri, 3 May 2024 07:52:10 -0700
+From: Vinayak Kale <vkale@nvidia.com>
+To: <qemu-devel@nongnu.org>
+CC: <alex.williamson@redhat.com>, <mst@redhat.com>,
+	<marcel.apfelbaum@gmail.com>, <clg@redhat.com>, <avihaih@nvidia.com>,
+	<acurrid@nvidia.com>, <cjia@nvidia.com>, <zhiw@nvidia.com>,
+	<targupta@nvidia.com>, <kvm@vger.kernel.org>, Vinayak Kale <vkale@nvidia.com>
+Subject: [PATCH v4] vfio/pci: migration: Skip config space check for Vendor Specific Information in VSC during restore/load
+Date: Fri, 3 May 2024 20:21:42 +0530
+Message-ID: <20240503145142.2806030-1-vkale@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC RESEND 16/16] nvme-pci: use blk_rq_dma_map() for NVMe SGL
-To: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Robin Murphy <robin.murphy@arm.com>,
- Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>, Jonathan Corbet <corbet@lwn.net>,
- Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
- Sagi Grimberg <sagi@grimberg.me>, Yishai Hadas <yishaih@nvidia.com>,
- Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
- Kevin Tian <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
- linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
- linux-nvme@lists.infradead.org, kvm@vger.kernel.org, linux-mm@kvack.org,
- Bart Van Assche <bvanassche@acm.org>,
- Damien Le Moal <damien.lemoal@opensource.wdc.com>,
- Amir Goldstein <amir73il@gmail.com>,
- "josef@toxicpanda.com" <josef@toxicpanda.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- "daniel@iogearbox.net" <daniel@iogearbox.net>,
- Dan Williams <dan.j.williams@intel.com>, "jack@suse.com" <jack@suse.com>,
- Leon Romanovsky <leonro@nvidia.com>, Zhu Yanjun <zyjzyj2000@gmail.com>
-References: <cover.1709635535.git.leon@kernel.org>
- <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
-Content-Language: en-US
-In-Reply-To: <016fc02cbfa9be3c156a6f74df38def1e09c08f1.1709635535.git.leon@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-NVConfidentiality: public
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF0000150A:EE_|SJ0PR12MB7081:EE_
+X-MS-Office365-Filtering-Correlation-Id: f8fd8696-31e0-4133-9587-08dc6b80a8ae
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RzZzamw5SXdWWW5VSm5TbG9qZWVaNURXRHZqdHBOVTNham11KzJ3UjlrNVAz?=
+ =?utf-8?B?ZDhYT3NqQ3Ayeks0ZlJwcE9sZ1Z0aHh3Uys4c1RJNUhpVlNvTEpiZTFoZmlR?=
+ =?utf-8?B?TmNCRmh5WkIzVlVLQXpnSnpFL1RNSVQxSktsd1hNbTcxVW1jS204YTZQN0Vw?=
+ =?utf-8?B?cEorRDBsY0J2OHJaMk8yQm8vS0ljSTVnTHA1ZEJidjFKZnVUR0R6RkNBenBI?=
+ =?utf-8?B?dTdlakNlVlNPZzV3ZVNxQkNVZ052WkJsWjJpcUY3bkNyNGpHWHN2UTl5MGF3?=
+ =?utf-8?B?Mm9EVEZOa2JvNXBDZTVvenJhdVlxU1NZRlZCYzBpaDRBazRiais3QmJLNUNX?=
+ =?utf-8?B?dkpaV3d5bzc2V2RHTzg1ZlNjd3RYWkVsRm5COGVGZzEzWi9NWXFES1FOZklU?=
+ =?utf-8?B?VGxQM0taT3N3eUxaL3ZrcjJhZFEwVlRYNUxOeDJZYUUrcVVoa2VkMUI2dXEv?=
+ =?utf-8?B?L3ZiWUZHb0lyemY3WnZxMitSa3FqNmJaTy9HY0gvNndaU0ozV3FSQlF1RWtw?=
+ =?utf-8?B?QXFMbG9Vd1o2SXFSVExrM2ZCZFl5SXN4b2hBazhZU1BNWHlob0xacFdmc2o2?=
+ =?utf-8?B?VTlFcVFSZG9qME1EUk9rMWtrblRaekJ4cXpOVDNIMDVTR3RlTG53MnhEWTVZ?=
+ =?utf-8?B?TjNUR0dwemRzSkVyUmZyOVNSc3JTdnFLVmRJbzY1SHZ3WTRZa1NINk9Bb3JE?=
+ =?utf-8?B?YVJFNmttNkFtYloxZ0pCY2ptNHJ4dWQ5bG15MHVPOXB3ejhXNXFRV0k2TlRO?=
+ =?utf-8?B?a2owT1p5QUYwUFNIdVN2TnFhYjl4MDVqMVJxaDhrTXhWbUFZcmRabno1SnY4?=
+ =?utf-8?B?YWZjSXRFSTlncTZhUklQS3o1TmpYZFZGMHg0RVVEeC96V1phRDRUTW5ZZTFn?=
+ =?utf-8?B?WTZ1Um1xdkl3cC9BeENGYnNVV2xJWjlQK2IrSTZJOGtRNkwwYmw0UnlHaDk1?=
+ =?utf-8?B?TlFOdDlyUUkyU1dBbUk3SHFUK2hycTg0aFYrUytkNjFuY3pTU0R5SWc4NWk3?=
+ =?utf-8?B?WXloKzlkMmlEbHgybG05cENXYmEvT1NPM1IrWnh5elNGTGt0MDhEdTBOcmxt?=
+ =?utf-8?B?WVZsTGxYdG5sRlRMV1JCWU1VaytOUTRVNGZ2ZmdoYmRoQVV3WDhkMDhnV2d5?=
+ =?utf-8?B?U1JhR3VsWHMvNEg2NDMrQVhiN3RSRmlvNEE4QkhMSnlUZmVlb1ZjTjhjUFBl?=
+ =?utf-8?B?N0o4b25pYU9HeUpEN1dnRmY0ckZDdFJLV1Ird0xiek9lTGZGZ2hDdC9ieVI2?=
+ =?utf-8?B?NHpZdy9hc2Q5NVh3S3pqTEZ5WGlWN2ZXY3hrVXhTK2FiQkR3Q28wV3FoRk15?=
+ =?utf-8?B?VUdRY1h2aVN1djZvalJLT09lQ1JqY2szVUVLWHVGWWRtSUFOUzRDTURqTTd3?=
+ =?utf-8?B?dlJoMlZCOGR4bjg3SWJnUXJPWE1YTHlqVmhnVnZGcjFKTDhkVFFHM3VGR1lM?=
+ =?utf-8?B?MFlUS3VZRDJPYmZiRkY0dENkUCsrck9GNVcvbnVoamFLWk9lTG0yZzhUL3Qr?=
+ =?utf-8?B?ZDZXMVN0NUg1Mmx0dUFSd3NXV013N2czcTlCVnQ1OEp0Zi9xUmFQYlpLY2ls?=
+ =?utf-8?B?Y3NWRXVOWUxpRjNTS3ZVM2t2eVBUMUQ0Q1N2SjhCbHJ5TFY5eS9HYjJUcVNk?=
+ =?utf-8?B?YjZNUWNISEFOLzlwVktRTTVCSDNPdlZVazdUVElRVXdFWU45eFhJd1JxeGFK?=
+ =?utf-8?B?YjFUUUl1U2Q2a1dOQUd1QktubXNVZWxJdXBySml5QldWSGdtcnFLVHkyRXRN?=
+ =?utf-8?B?ZGliRUw0S0twb0pVWmk2S1hVZTZ2bDhzWU9haXNhT05XUWFyVzk1VWpTaHhB?=
+ =?utf-8?B?WnhuTys1L3dVQ1g0ZEV5N051YUdlTmVCUlB2NDRXRFc4SGwxbSt4YmdwQkVZ?=
+ =?utf-8?Q?9D0X2offmyx3O?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(1800799015)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 May 2024 14:52:30.8361
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8fd8696-31e0-4133-9587-08dc6b80a8ae
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF0000150A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB7081
 
-On 05.03.24 12:18, Leon Romanovsky wrote:
-> From: Chaitanya Kulkarni <kch@nvidia.com>
-> 
-> Update nvme_iod structure to hold iova, list of DMA linked addresses and
-> total linked count, first one is needed in the request submission path
-> to create a request to DMA mapping and last two are needed in the
-> request completion path to remove the DMA mapping. In nvme_map_data()
-> initialize iova with device, direction, and iova dma length with the
-> help of blk_rq_get_dma_length(). Allocate iova using dma_alloc_iova().
-> and call in nvme_pci_setup_sgls().
-> 
-> Call newly added blk_rq_dma_map() to create request to DMA mapping and
-> provide a callback function nvme_pci_sgl_map(). In the callback
-> function initialize NVMe SGL dma addresses.
-> 
-> Finally in nvme_unmap_data() unlink the dma address and free iova.
-> 
-> Full disclosure:-
-> -----------------
-> 
-> This is an RFC to demonstrate the newly added DMA APIs can be used to
-> map/unmap bvecs without the use of sg list, hence I've modified the pci
-> code to only handle SGLs for now. Once we have some agreement on the
-> structure of new DMA API I'll add support for PRPs along with all the
-> optimization that I've removed from the code for this RFC for NVMe SGLs
-> and PRPs.
-> 
-> I was able to run fio verification job successfully :-
-> 
-> $ fio fio/verify.fio --ioengine=io_uring --filename=/dev/nvme0n1
->                       --loops=10
-> write-and-verify: (g=0): rw=randwrite, bs=(R) 8192B-8192B, (W) 8192B-8192B,
-> 	(T) 8192B-8192B, ioengine=io_uring, iodepth=16
-> fio-3.36
-> Starting 1 process
-> Jobs: 1 (f=1): [V(1)][81.6%][r=12.2MiB/s][r=1559 IOPS][eta 03m:00s]
-> write-and-verify: (groupid=0, jobs=1): err= 0: pid=4435: Mon Mar  4 20:54:48 2024
->    read: IOPS=2789, BW=21.8MiB/s (22.9MB/s)(6473MiB/297008msec)
->      slat (usec): min=4, max=5124, avg=356.51, stdev=604.30
->      clat (nsec): min=1593, max=23376k, avg=5377076.99, stdev=2039189.93
->       lat (usec): min=493, max=23407, avg=5733.58, stdev=2103.22
->      clat percentiles (usec):
->       |  1.00th=[ 1172],  5.00th=[ 2114], 10.00th=[ 2835], 20.00th=[ 3654],
->       | 30.00th=[ 4228], 40.00th=[ 4752], 50.00th=[ 5276], 60.00th=[ 5800],
->       | 70.00th=[ 6325], 80.00th=[ 7046], 90.00th=[ 8094], 95.00th=[ 8979],
->       | 99.00th=[10421], 99.50th=[11076], 99.90th=[12780], 99.95th=[14222],
->       | 99.99th=[16909]
->    write: IOPS=2608, BW=20.4MiB/s (21.4MB/s)(10.0GiB/502571msec); 0 zone resets
->      slat (usec): min=4, max=5787, avg=382.68, stdev=649.01
->      clat (nsec): min=521, max=23650k, avg=5751363.17, stdev=2676065.35
->       lat (usec): min=95, max=23674, avg=6134.04, stdev=2813.48
->      clat percentiles (usec):
->       |  1.00th=[  709],  5.00th=[ 1270], 10.00th=[ 1958], 20.00th=[ 3261],
->       | 30.00th=[ 4228], 40.00th=[ 5014], 50.00th=[ 5800], 60.00th=[ 6521],
->       | 70.00th=[ 7373], 80.00th=[ 8225], 90.00th=[ 9241], 95.00th=[ 9896],
->       | 99.00th=[11469], 99.50th=[11863], 99.90th=[13960], 99.95th=[15270],
->       | 99.99th=[17695]
->     bw (  KiB/s): min= 1440, max=132496, per=99.28%, avg=20715.88, stdev=13123.13, samples=1013
->     iops        : min=  180, max=16562, avg=2589.34, stdev=1640.39, samples=1013
->    lat (nsec)   : 750=0.01%
->    lat (usec)   : 2=0.01%, 4=0.01%, 100=0.01%, 250=0.01%, 500=0.07%
->    lat (usec)   : 750=0.79%, 1000=1.22%
->    lat (msec)   : 2=5.94%, 4=18.87%, 10=69.53%, 20=3.58%, 50=0.01%
->    cpu          : usr=1.01%, sys=98.95%, ctx=1591, majf=0, minf=2286
->    IO depths    : 1=0.1%, 2=0.1%, 4=0.1%, 8=0.1%, 16=100.0%, 32=0.0%, >=64=0.0%
->       submit    : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.0%, 32=0.0%, 64=0.0%, >=64=0.0%
->       complete  : 0=0.0%, 4=100.0%, 8=0.0%, 16=0.1%, 32=0.0%, 64=0.0%, >=64=0.0%
->       issued rwts: total=828524,1310720,0,0 short=0,0,0,0 dropped=0,0,0,0
->       latency   : target=0, window=0, percentile=100.00%, depth=16
-> 
-> Run status group 0 (all jobs):
->     READ: bw=21.8MiB/s (22.9MB/s), 21.8MiB/s-21.8MiB/s (22.9MB/s-22.9MB/s),
-> 	io=6473MiB (6787MB), run=297008-297008msec
->    WRITE: bw=20.4MiB/s (21.4MB/s), 20.4MiB/s-20.4MiB/s (21.4MB/s-21.4MB/s),
-> 	io=10.0GiB (10.7GB), run=502571-502571msec
-> 
-> Disk stats (read/write):
->    nvme0n1: ios=829189/1310720, sectors=13293416/20971520, merge=0/0,
-> 	ticks=836561/1340351, in_queue=2176913, util=99.30%
-> 
-> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> ---
->   drivers/nvme/host/pci.c | 220 +++++++++-------------------------------
->   1 file changed, 49 insertions(+), 171 deletions(-)
-> 
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index e6267a6aa380..140939228409 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -236,7 +236,9 @@ struct nvme_iod {
->   	unsigned int dma_len;	/* length of single DMA segment mapping */
->   	dma_addr_t first_dma;
->   	dma_addr_t meta_dma;
-> -	struct sg_table sgt;
-> +	struct dma_iova_attrs iova;
-> +	dma_addr_t dma_link_address[128];
+In case of migration, during restore operation, qemu checks config space of the
+pci device with the config space in the migration stream captured during save
+operation. In case of config space data mismatch, restore operation is failed.
 
-Why the length of this array is 128? Can we increase this length of the 
-array?
+config space check is done in function get_pci_config_device(). By default VSC
+(vendor-specific-capability) in config space is checked.
 
-Thanks,
-Zhu Yanjun
+Due to qemu's config space check for VSC, live migration is broken across NVIDIA
+vGPU devices in situation where source and destination host driver is different.
+In this situation, Vendor Specific Information in VSC varies on the destination
+to ensure vGPU feature capabilities exposed to the guest driver are compatible
+with destination host.
 
-> +	u16 nr_dma_link_address;
->   	union nvme_descriptor list[NVME_MAX_NR_ALLOCATIONS];
->   };
->   
-> @@ -521,25 +523,10 @@ static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req,
->   	return true;
->   }
->   
-> -static void nvme_free_prps(struct nvme_dev *dev, struct request *req)
-> -{
-> -	const int last_prp = NVME_CTRL_PAGE_SIZE / sizeof(__le64) - 1;
-> -	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> -	dma_addr_t dma_addr = iod->first_dma;
-> -	int i;
-> -
-> -	for (i = 0; i < iod->nr_allocations; i++) {
-> -		__le64 *prp_list = iod->list[i].prp_list;
-> -		dma_addr_t next_dma_addr = le64_to_cpu(prp_list[last_prp]);
-> -
-> -		dma_pool_free(dev->prp_page_pool, prp_list, dma_addr);
-> -		dma_addr = next_dma_addr;
-> -	}
-> -}
-> -
->   static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
->   {
->   	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> +	u16 i;
->   
->   	if (iod->dma_len) {
->   		dma_unmap_page(dev->dev, iod->first_dma, iod->dma_len,
-> @@ -547,9 +534,8 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
->   		return;
->   	}
->   
-> -	WARN_ON_ONCE(!iod->sgt.nents);
-> -
-> -	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
-> +	for (i = 0; i < iod->nr_dma_link_address; i++)
-> +		dma_unlink_range(&iod->iova, iod->dma_link_address[i]);
->   
->   	if (iod->nr_allocations == 0)
->   		dma_pool_free(dev->prp_small_pool, iod->list[0].sg_list,
-> @@ -557,120 +543,15 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
->   	else if (iod->nr_allocations == 1)
->   		dma_pool_free(dev->prp_page_pool, iod->list[0].sg_list,
->   			      iod->first_dma);
-> -	else
-> -		nvme_free_prps(dev, req);
-> -	mempool_free(iod->sgt.sgl, dev->iod_mempool);
-> -}
-> -
-> -static void nvme_print_sgl(struct scatterlist *sgl, int nents)
-> -{
-> -	int i;
-> -	struct scatterlist *sg;
-> -
-> -	for_each_sg(sgl, sg, nents, i) {
-> -		dma_addr_t phys = sg_phys(sg);
-> -		pr_warn("sg[%d] phys_addr:%pad offset:%d length:%d "
-> -			"dma_address:%pad dma_length:%d\n",
-> -			i, &phys, sg->offset, sg->length, &sg_dma_address(sg),
-> -			sg_dma_len(sg));
-> -	}
-> -}
-> -
-> -static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
-> -		struct request *req, struct nvme_rw_command *cmnd)
-> -{
-> -	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> -	struct dma_pool *pool;
-> -	int length = blk_rq_payload_bytes(req);
-> -	struct scatterlist *sg = iod->sgt.sgl;
-> -	int dma_len = sg_dma_len(sg);
-> -	u64 dma_addr = sg_dma_address(sg);
-> -	int offset = dma_addr & (NVME_CTRL_PAGE_SIZE - 1);
-> -	__le64 *prp_list;
-> -	dma_addr_t prp_dma;
-> -	int nprps, i;
-> -
-> -	length -= (NVME_CTRL_PAGE_SIZE - offset);
-> -	if (length <= 0) {
-> -		iod->first_dma = 0;
-> -		goto done;
-> -	}
-> -
-> -	dma_len -= (NVME_CTRL_PAGE_SIZE - offset);
-> -	if (dma_len) {
-> -		dma_addr += (NVME_CTRL_PAGE_SIZE - offset);
-> -	} else {
-> -		sg = sg_next(sg);
-> -		dma_addr = sg_dma_address(sg);
-> -		dma_len = sg_dma_len(sg);
-> -	}
-> -
-> -	if (length <= NVME_CTRL_PAGE_SIZE) {
-> -		iod->first_dma = dma_addr;
-> -		goto done;
-> -	}
-> -
-> -	nprps = DIV_ROUND_UP(length, NVME_CTRL_PAGE_SIZE);
-> -	if (nprps <= (256 / 8)) {
-> -		pool = dev->prp_small_pool;
-> -		iod->nr_allocations = 0;
-> -	} else {
-> -		pool = dev->prp_page_pool;
-> -		iod->nr_allocations = 1;
-> -	}
-> -
-> -	prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
-> -	if (!prp_list) {
-> -		iod->nr_allocations = -1;
-> -		return BLK_STS_RESOURCE;
-> -	}
-> -	iod->list[0].prp_list = prp_list;
-> -	iod->first_dma = prp_dma;
-> -	i = 0;
-> -	for (;;) {
-> -		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
-> -			__le64 *old_prp_list = prp_list;
-> -			prp_list = dma_pool_alloc(pool, GFP_ATOMIC, &prp_dma);
-> -			if (!prp_list)
-> -				goto free_prps;
-> -			iod->list[iod->nr_allocations++].prp_list = prp_list;
-> -			prp_list[0] = old_prp_list[i - 1];
-> -			old_prp_list[i - 1] = cpu_to_le64(prp_dma);
-> -			i = 1;
-> -		}
-> -		prp_list[i++] = cpu_to_le64(dma_addr);
-> -		dma_len -= NVME_CTRL_PAGE_SIZE;
-> -		dma_addr += NVME_CTRL_PAGE_SIZE;
-> -		length -= NVME_CTRL_PAGE_SIZE;
-> -		if (length <= 0)
-> -			break;
-> -		if (dma_len > 0)
-> -			continue;
-> -		if (unlikely(dma_len < 0))
-> -			goto bad_sgl;
-> -		sg = sg_next(sg);
-> -		dma_addr = sg_dma_address(sg);
-> -		dma_len = sg_dma_len(sg);
-> -	}
-> -done:
-> -	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sgt.sgl));
-> -	cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma);
-> -	return BLK_STS_OK;
-> -free_prps:
-> -	nvme_free_prps(dev, req);
-> -	return BLK_STS_RESOURCE;
-> -bad_sgl:
-> -	WARN(DO_ONCE(nvme_print_sgl, iod->sgt.sgl, iod->sgt.nents),
-> -			"Invalid SGL for payload:%d nents:%d\n",
-> -			blk_rq_payload_bytes(req), iod->sgt.nents);
-> -	return BLK_STS_IOERR;
-> +	dma_free_iova(&iod->iova);
->   }
->   
->   static void nvme_pci_sgl_set_data(struct nvme_sgl_desc *sge,
-> -		struct scatterlist *sg)
-> +				 dma_addr_t dma_addr,
-> +				 unsigned int dma_len)
->   {
-> -	sge->addr = cpu_to_le64(sg_dma_address(sg));
-> -	sge->length = cpu_to_le32(sg_dma_len(sg));
-> +	sge->addr = cpu_to_le64(dma_addr);
-> +	sge->length = cpu_to_le32(dma_len);
->   	sge->type = NVME_SGL_FMT_DATA_DESC << 4;
->   }
->   
-> @@ -682,25 +563,37 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
->   	sge->type = NVME_SGL_FMT_LAST_SEG_DESC << 4;
->   }
->   
-> +struct nvme_pci_sgl_map_data {
-> +	struct nvme_iod *iod;
-> +	struct nvme_sgl_desc *sgl_list;
-> +};
-> +
-> +static void nvme_pci_sgl_map(void *data, u32 cnt, dma_addr_t dma_addr,
-> +			    dma_addr_t offset, u32 len)
-> +{
-> +	struct nvme_pci_sgl_map_data *d = data;
-> +	struct nvme_sgl_desc *sgl_list = d->sgl_list;
-> +	struct nvme_iod *iod = d->iod;
-> +
-> +	nvme_pci_sgl_set_data(&sgl_list[cnt], dma_addr, len);
-> +	iod->dma_link_address[cnt] = offset;
-> +	iod->nr_dma_link_address++;
-> +}
-> +
->   static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
->   		struct request *req, struct nvme_rw_command *cmd)
->   {
-> +	unsigned int entries = blk_rq_nr_phys_segments(req);
->   	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
-> -	struct dma_pool *pool;
->   	struct nvme_sgl_desc *sg_list;
-> -	struct scatterlist *sg = iod->sgt.sgl;
-> -	unsigned int entries = iod->sgt.nents;
-> +	struct dma_pool *pool;
->   	dma_addr_t sgl_dma;
-> -	int i = 0;
-> +	int linked_count;
-> +	struct nvme_pci_sgl_map_data data;
->   
->   	/* setting the transfer type as SGL */
->   	cmd->flags = NVME_CMD_SGL_METABUF;
->   
-> -	if (entries == 1) {
-> -		nvme_pci_sgl_set_data(&cmd->dptr.sgl, sg);
-> -		return BLK_STS_OK;
-> -	}
-> -
->   	if (entries <= (256 / sizeof(struct nvme_sgl_desc))) {
->   		pool = dev->prp_small_pool;
->   		iod->nr_allocations = 0;
-> @@ -718,11 +611,13 @@ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
->   	iod->list[0].sg_list = sg_list;
->   	iod->first_dma = sgl_dma;
->   
-> -	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, entries);
-> -	do {
-> -		nvme_pci_sgl_set_data(&sg_list[i++], sg);
-> -		sg = sg_next(sg);
-> -	} while (--entries > 0);
-> +	data.iod = iod;
-> +	data.sgl_list = sg_list;
-> +
-> +	linked_count = blk_rq_dma_map(req, nvme_pci_sgl_map, &data,
-> +				       &iod->iova);
-> +
-> +	nvme_pci_sgl_set_seg(&cmd->dptr.sgl, sgl_dma, linked_count);
->   
->   	return BLK_STS_OK;
->   }
-> @@ -788,36 +683,20 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
->   							     &cmnd->rw, &bv);
->   		}
->   	}
-> -
-> -	iod->dma_len = 0;
-> -	iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
-> -	if (!iod->sgt.sgl)
-> +	iod->iova.dev = dev->dev;
-> +	iod->iova.dir = rq_dma_dir(req);
-> +	iod->iova.attrs = DMA_ATTR_NO_WARN;
-> +	iod->iova.size = blk_rq_get_dma_length(req);
-> +	if (!iod->iova.size)
->   		return BLK_STS_RESOURCE;
-> -	sg_init_table(iod->sgt.sgl, blk_rq_nr_phys_segments(req));
-> -	iod->sgt.orig_nents = blk_rq_map_sg(req->q, req, iod->sgt.sgl);
-> -	if (!iod->sgt.orig_nents)
-> -		goto out_free_sg;
->   
-> -	rc = dma_map_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req),
-> -			     DMA_ATTR_NO_WARN);
-> -	if (rc) {
-> -		if (rc == -EREMOTEIO)
-> -			ret = BLK_STS_TARGET;
-> -		goto out_free_sg;
-> -	}
-> +	rc = dma_alloc_iova(&iod->iova);
-> +	if (rc)
-> +		return BLK_STS_RESOURCE;
->   
-> -	if (nvme_pci_use_sgls(dev, req, iod->sgt.nents))
-> -		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
-> -	else
-> -		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
-> -	if (ret != BLK_STS_OK)
-> -		goto out_unmap_sg;
-> -	return BLK_STS_OK;
-> +	iod->dma_len = 0;
->   
-> -out_unmap_sg:
-> -	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
-> -out_free_sg:
-> -	mempool_free(iod->sgt.sgl, dev->iod_mempool);
-> +	ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
->   	return ret;
->   }
->   
-> @@ -841,7 +720,6 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
->   
->   	iod->aborted = false;
->   	iod->nr_allocations = -1;
-> -	iod->sgt.nents = 0;
->   
->   	ret = nvme_setup_cmd(req->q->queuedata, req);
->   	if (ret)
+If a vfio-pci device is migration capable and vfio-pci vendor driver is OK with
+volatile Vendor Specific Info in VSC then qemu should exempt config space check
+for Vendor Specific Info. It is vendor driver's responsibility to ensure that
+VSC is consistent across migration. Here consistency could mean that VSC format
+should be same on source and destination, however actual Vendor Specific Info
+may not be byte-to-byte identical.
+
+This patch skips the check for Vendor Specific Information in VSC for VFIO-PCI
+device by clearing pdev->cmask[] offsets. Config space check is still enforced
+for 3 byte VSC header. If cmask[] is not set for an offset, then qemu skips
+config space check for that offset.
+
+VSC check is skipped for machine types >= 9.1. The check would be enforced on
+older machine types (<= 9.0).
+
+Signed-off-by: Vinayak Kale <vkale@nvidia.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Cédric Le Goater <clg@redhat.com>
+---
+Version History
+v3->v4:
+    - VSC check is skipped for machine types >= 9.1. The check would be enforced
+      on older machine types (<= 9.0).
+v2->v3:
+    - Config space check skipped only for Vendor Specific Info in VSC, check is
+      still enforced for 3 byte VSC header.
+    - Updated commit description with live migration failure scenario.
+v1->v2:
+    - Limited scope of change to vfio-pci devices instead of all pci devices.
+
+ hw/core/machine.c |  1 +
+ hw/vfio/pci.c     | 26 ++++++++++++++++++++++++++
+ hw/vfio/pci.h     |  1 +
+ 3 files changed, 28 insertions(+)
+
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 4ff60911e7..fc3eb5115f 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -35,6 +35,7 @@
+ 
+ GlobalProperty hw_compat_9_0[] = {
+     {"arm-cpu", "backcompat-cntfrq", "true" },
++    {"vfio-pci", "skip-vsc-check", "false" },
+ };
+ const size_t hw_compat_9_0_len = G_N_ELEMENTS(hw_compat_9_0);
+ 
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 64780d1b79..2ece9407cc 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2134,6 +2134,28 @@ static void vfio_check_af_flr(VFIOPCIDevice *vdev, uint8_t pos)
+     }
+ }
+ 
++static int vfio_add_vendor_specific_cap(VFIOPCIDevice *vdev, int pos,
++                                        uint8_t size, Error **errp)
++{
++    PCIDevice *pdev = &vdev->pdev;
++
++    pos = pci_add_capability(pdev, PCI_CAP_ID_VNDR, pos, size, errp);
++    if (pos < 0) {
++        return pos;
++    }
++
++    /*
++     * Exempt config space check for Vendor Specific Information during
++     * restore/load.
++     * Config space check is still enforced for 3 byte VSC header.
++     */
++    if (vdev->skip_vsc_check && size > 3) {
++        memset(pdev->cmask + pos + 3, 0, size - 3);
++    }
++
++    return pos;
++}
++
+ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+ {
+     ERRP_GUARD();
+@@ -2202,6 +2224,9 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+         vfio_check_af_flr(vdev, pos);
+         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+         break;
++    case PCI_CAP_ID_VNDR:
++        ret = vfio_add_vendor_specific_cap(vdev, pos, size, errp);
++        break;
+     default:
+         ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+         break;
+@@ -3390,6 +3415,7 @@ static Property vfio_pci_dev_properties[] = {
+     DEFINE_PROP_LINK("iommufd", VFIOPCIDevice, vbasedev.iommufd,
+                      TYPE_IOMMUFD_BACKEND, IOMMUFDBackend *),
+ #endif
++    DEFINE_PROP_BOOL("skip-vsc-check", VFIOPCIDevice, skip_vsc_check, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+index 6e64a2654e..92cd62d115 100644
+--- a/hw/vfio/pci.h
++++ b/hw/vfio/pci.h
+@@ -177,6 +177,7 @@ struct VFIOPCIDevice {
+     OnOffAuto ramfb_migrate;
+     bool defer_kvm_irq_routing;
+     bool clear_parent_atomics_on_exit;
++    bool skip_vsc_check;
+     VFIODisplay *dpy;
+     Notifier irqchip_change_notifier;
+ };
+-- 
+2.34.1
 
 
