@@ -1,115 +1,100 @@
-Return-Path: <kvm+bounces-16510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0D988BADB0
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 15:25:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 03A448BADC9
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 15:35:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C42A01C21900
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 13:25:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E4211C21CB3
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 13:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 559AF153BE1;
-	Fri,  3 May 2024 13:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B767153BD1;
+	Fri,  3 May 2024 13:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kW3w76/r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oz2OKeXG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7AD153575
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 13:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C20B15358C;
+	Fri,  3 May 2024 13:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714742691; cv=none; b=FmvO5csMId0igVEyvmkWuJUnAQ3JCWu0yyv81EJ5zbM4FOWds2dIwhjRFIK3C783QDN5RW1iinnmf2msYYDn837OMxh3C8/ufRJQNPbryu7sLBDDXrAnUmwgI+jIRRkf1MeipWT1Mj2FXo+a7ISTYI2OJawDwzmb+dFwdqgY0m4=
+	t=1714743330; cv=none; b=tzo0aq9cW4TM2OzFQk1fqzQ9Z6vBjuMVy3uS0tKjXgAZdGdlgMxr7zuP4Ma2a8hJ7sp6nAnyhhAOC30ltPE2j3weBpEcMO2vkVD2pw3PHwJpC60MxXrwbmX826yaLHG+4GmVw4xl3y4lqBV/CtbeCUz26wP6Ilh9hoIIG+WyE80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714742691; c=relaxed/simple;
-	bh=LnQBqRowOn/mmqH744BQ56CUkrHMmmG7pILmr2k3FwQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=unr1vNcSSdsZwDjhhG1Kv8NWQNnMzPqT/R/ZNfjBIabKgcZnAM2y1j7PrL8KqN8iGp7pNU5/WNta/oLOzJi7dEsJiNHSa9JVMKr60Id3mIcpo1lzQdl27jWvvPWPOK+HG2IdVgiwflsNIvvzPB8OiYtCxxUAGDWlUkT6NQBUYhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kW3w76/r; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ee128aa957so11096353b3a.2
-        for <kvm@vger.kernel.org>; Fri, 03 May 2024 06:24:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714742688; x=1715347488; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+ccOeukr23e3h6a0N8DffRaB2MUtEUXB1eb2oExcKkQ=;
-        b=kW3w76/rsYjB2Aw2hH5w+q98JKgzG+DyYm6qhv9gF2jS+2J8EE6ZiUxcYdjIDfKZV9
-         hVeJCOICkGQGIa1vyzFmb8v3+7sNDVjcl6XPCcxof2AC2y5hWgIHADeaEuSnM5Ehbzd+
-         r2X75cvehYAW/hljvHI4wCTg2bAvHOZ+Fg5eJuEIM0MdAQFtfyKnmohkcgQN8Q3wwUr3
-         5ErAGQX+Eqjc++Vv4kwhqRcMIELSk4MSqQiYZxFYEx+YWR+s0gAD2xzhN0FaiQExpZUI
-         arorupLC/GMjgPEjZaiOc9BQYj8vS2VWw9ZFWUMO1mAD8LHstE1ut1SO2cZxLbIORbXL
-         F6Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714742688; x=1715347488;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+ccOeukr23e3h6a0N8DffRaB2MUtEUXB1eb2oExcKkQ=;
-        b=G3SQ3UjFa7Zz9yDL1H5xZ7KWFIAkoT9epMlrR3cttP/fA4wpF42zeyIgOReS5taGLA
-         ihKiNUvPeRzGSPjPJ51j9xgEckAnHpxnnq/xIW5RWJxt7S4qAk/ftrID1VSoJVuADQwb
-         J8yoyKWoBvOx94Scw8ndH4MEj4RU64T/k0TyUmoWtc0H6dlaZMV25ighVBJfCLSYBwLw
-         mMrxoYjy8n3AijlZHQs9jC3lA9Btc61gOu6aJMDHC3FE48wTbhqok/NAIjDcs5lZ0PmQ
-         t5ogEnIgX1jBD3kvUDNqQ9MlGM4ubDlVVT8ml/v8d6sG4caBaUm1F/HzgiNr4c8Urx7L
-         +RCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXa48UC3LnehpITZTVP5RrfM6BzH79AHVjhZCKKaudt17uMTelEY9UJvZOIqGt9wFtJRjeA1T5cSwKJv9PY56NjAn9E
-X-Gm-Message-State: AOJu0Yw522rJINIddPd54lzSmzpqhQm61guC1WNk4FvR1lNQW4kslTy2
-	GukdDYfTUHzdz8IDX+7Szh1uu6Snt3Uz5vIUXTrt2kdwTfIROlsn+wEvWrq31u3tmEedB39Wf0C
-	aBg==
-X-Google-Smtp-Source: AGHT+IFqaqDYUgUT1sFW3BILdnSLhDiEXyo5YaoA9nj8RUO7yNSem5r8cA469uOkvhX2zmIw7iPay/E5mxs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:181a:b0:6f4:42d7:fe02 with SMTP id
- y26-20020a056a00181a00b006f442d7fe02mr106073pfa.3.1714742688288; Fri, 03 May
- 2024 06:24:48 -0700 (PDT)
-Date: Fri, 3 May 2024 06:24:47 -0700
-In-Reply-To: <DS0PR11MB6373EA67C70B8579A194089EDC1F2@DS0PR11MB6373.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1714743330; c=relaxed/simple;
+	bh=1Gj0ji1WJGaVGrQBE5Z164B4WogRDBy3MPOTTBDGUFs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=W23kJ3Prt/kxa+GQtFHsYCUJusck7bXrL8YgzaSUUHCAQF0RSQEz3aeN/r5hXP9os/xHGnzu3RG5Q8hUF8agSnuMzexpRyftaNH3RDWxgBesZ048EI1oTaQF1qLvHkzn+6812mzs0sKUCd8iG9ofGlyR5JTi0KIGrf9x+TGLiQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oz2OKeXG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11034C116B1;
+	Fri,  3 May 2024 13:35:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1714743330;
+	bh=1Gj0ji1WJGaVGrQBE5Z164B4WogRDBy3MPOTTBDGUFs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Oz2OKeXGbtiOl3WZP8XjJ4oQIV7xNjYFaJCqmHpE3h11eCzqFI6WwvSGt/q3eO9XL
+	 Yy6kFOkZf1ebmXr+3TV+ooP8EDdOi9tLX/Y0h9NUvaortLTNlfMvxRYaJ5qaKlaqDR
+	 ULM8XdDJ6dYrbkAqGG8JODJ5zOO20eDk0WF+Tf1o2kD5Ekg1ZUmMX65SI3DcqNyaTy
+	 N/LdulSJC0SQB//09pf9wTV4yYJUy9lJHqQs+fPyV77JD0CpQSgE2MtTqI9MMwgWE/
+	 pHb+Li5jVvLQGn4kUbSWgX3E6E/M1yRt8zuREGJoyeJA/JD1SUfOzC9utcWDCBl/id
+	 WLBFLCd0eWfrw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s2t4R-00AKZC-RB;
+	Fri, 03 May 2024 14:35:27 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH] KVM: arm64: Convert kvm_mpidr_index() to bitmap_gather()
+Date: Fri,  3 May 2024 14:35:15 +0100
+Message-Id: <171474325427.3225213.7275231723236470580.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240502154247.3012042-1-maz@kernel.org>
+References: <20240502154247.3012042-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240425125252.48963-1-wei.w.wang@intel.com> <20240425125252.48963-4-wei.w.wang@intel.com>
- <ZjQjYiwBg1jGmdUq@google.com> <DS0PR11MB6373EA67C70B8579A194089EDC1F2@DS0PR11MB6373.namprd11.prod.outlook.com>
-Message-ID: <ZjTlkSi9jYn2e9oc@google.com>
-Subject: Re: [PATCH v3 3/3] KVM: x86/pmu: Add KVM_PMU_CALL() to simplify
- static calls of kvm_pmu_ops
-From: Sean Christopherson <seanjc@google.com>
-To: Wei W Wang <wei.w.wang@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, May 03, 2024, Wei W Wang wrote:
-> On Friday, May 3, 2024 7:36 AM, Sean Christopherson wrote:
-> > On Thu, Apr 25, 2024, Wei Wang wrote:
-> > >  #define KVM_X86_CALL(func) static_call(kvm_x86_##func)
-> > > +#define KVM_PMU_CALL(func) static_call(kvm_x86_pmu_##func)
-> > 
-> > ...
-> > 
-> > > @@ -796,7 +796,7 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
-> > >  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> > >
-> > >  	memset(pmu, 0, sizeof(*pmu));
-> > > -	static_call(kvm_x86_pmu_init)(vcpu);
-> > > +	KVM_PMU_CALL(init)(vcpu);
-> > >  	kvm_pmu_refresh(vcpu);
-> > 
-> > I usually like macros to use CAPS so that they're clearly macros, but in this case
-> > I find the code a bit jarring.  Essentially, I *want* my to be fooled into thinking
-> > it's a function call, because that's really what it is.
-> > 
-> > So rather than all caps, what if we follow function naming style?  E.g.
+On Thu, 02 May 2024 16:42:47 +0100, Marc Zyngier wrote:
+> Linux 6.9 has introduced new bitmap manipulation helpers, with
+> bitmap_gather() being of special interest, as it does exactly
+> what kvm_mpidr_index() is already doing.
 > 
-> Yep, it looks good to me, and the coding-style doc mentions that "CAPITALIZED
-> macro names are appreciated but macros resembling functions may be named in
-> lower case".
+> Make the latter a wrapper around the former.
 > 
-> To maintain consistency, maybe apply the same lower-case style for KVM_X86_CALL()?
+> 
+> [...]
 
-Yeah, for sure, I should have explicitly called that out.
+Applied to next, thanks!
+
+[1/1] KVM: arm64: Convert kvm_mpidr_index() to bitmap_gather()
+      commit: 838d992b84486311e6039170d28b79a7a0633f06
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
 
