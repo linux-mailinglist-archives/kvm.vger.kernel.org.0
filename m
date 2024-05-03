@@ -1,79 +1,83 @@
-Return-Path: <kvm+bounces-16477-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8105A8BA698
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 07:25:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8778B8BA699
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 07:25:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12D1F28303B
-	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 05:25:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EFDF1F224AF
+	for <lists+kvm@lfdr.de>; Fri,  3 May 2024 05:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA79139596;
-	Fri,  3 May 2024 05:25:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9ACF139CE4;
+	Fri,  3 May 2024 05:25:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gGSGmLSv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ePGDkfsx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47B72C181
-	for <kvm@vger.kernel.org>; Fri,  3 May 2024 05:25:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA7FF2C181
+	for <kvm@vger.kernel.org>; Fri,  3 May 2024 05:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714713922; cv=none; b=JIgC0r7EjdjRb23va6VCChFFDt4727u+oAlqKyrCDFUfQbCeS6SkvKJWjDlTDzsqVxPBd8uxQayoQ/W7X6O2kEfUVCCCOG66Snj+9L2cw2qMg09oA0k4j5/oadVdH+jdo616cd8VVcMNPfMhZLOjKh6lK6yYPMZmxQvxXmfSwbM=
+	t=1714713926; cv=none; b=kVu0XZd7Dp2RX8pkJcLtheObnh1L5yFECxFtHhsBLvkujjhy0REWQjB/VFMbmIcLJWKHGsHjiiO03Os9y3HnM7fEc/wTFibSegkW3TUdHaHA4ciH3ccXhB+8Dp9X55oiBUCy/WfbBnQFXwpldSUe9Bj45+/2RRZmX+LaqPHn9hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714713922; c=relaxed/simple;
-	bh=hujr2hJRG1QFpIQVVEy55YEB9nVugABk03o/R8v3tyA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dRV32HJ49w4lkulqlCTSWJE28cul2WBb+huVUsJAuaYE2hpp+Ny9fq5eJlf3yAjvcoyO3kcjfcScEd2iO+YNwBK6CmGnXQwvvlTWKBdpgMjQGyPLZtjZubI/8bxY6nYkLlGp7RMCt1MDMAkGgcJgsx/wwaI7xHXiFbHAd1UHl2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gGSGmLSv; arc=none smtp.client-ip=209.85.160.53
+	s=arc-20240116; t=1714713926; c=relaxed/simple;
+	bh=/5uJMQp3yNu8bhBnBFO/iH8SSkGNUC3g8iOpw2JBT38=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=c2dmh6isaMhd4DRS6oLdVeirEHXRvK+hyY5XXqAtPXKdZAy59NcnC8kYZ0u5jT8Egl6zfiG/tMgtQxAe+YXG4DMCGowsOql7tZUzrNpPtX7ITO1vSzIXXrKxwSKNBnObUiuS/nGFB+f8QlyP2VsMWK3RaWq63kbVc4xtNnvKIxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ePGDkfsx; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-22ed075a629so3591638fac.3
-        for <kvm@vger.kernel.org>; Thu, 02 May 2024 22:25:20 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6f42924ca64so2005990b3a.2
+        for <kvm@vger.kernel.org>; Thu, 02 May 2024 22:25:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714713920; x=1715318720; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gve4LJmh/O0Qj6MqIbaQYyQ7Zh0pLazfl2F5VQdN9Yc=;
-        b=gGSGmLSvzd0MDKl5B9o9TRMKu4ZEJ2k48YRjkDt5AW4J0jLW1s9T14BoyiDtqcexzn
-         eOV3oq2xb60anwZgCmoxq4uWI+mO36jcqz81NIMWsESgQ7CU1bDpgLI2NURA0cS65Ieb
-         GpxFmY7zDYk3Bq7smBb+6HCg513U07UvL1kM5uRruK/hgVjbPC3rzw6VJa4IOGCYMrTo
-         QSwH/klIojKrHUcklaXVcWA0LcuBiAXvkT2CKzFH3IB4F0yWJaN/RlZCtmc3cCtj62b0
-         ngpAZcQyUG6XDUspefPc2y0B84eUL+1RzsvixEbARs/NkpNzL2J0SIORB7RHoNVSPje8
-         wNJQ==
+        d=gmail.com; s=20230601; t=1714713924; x=1715318724; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4UbIgVBqQvP02FKP8S0NEy2lwq+MKac1wEMDpbWbGGY=;
+        b=ePGDkfsx9cWAM9GKAqtdaLiv6uHlXy1XMQrUMTwTRnuRi0DzLoG6X3h4xSrPQMFTp+
+         NIebtNJt267kjcf1IOMCcc3tpSvpnrpL099Zc30HFn7ZlReYIgmbZXNRHmrJdyuDhGui
+         SzFQBGs36UyGxW0/i61FSZ/PA/ilUcMrcczNUS/c771NXicafQshwB3T130HLu4uZxcT
+         b0jdpSANLn9UTqbuHtxUKqsWc9l0dKs//D2SPlCGM0XgObdnzvv7TtP9sXh3gUTGHRhF
+         FXShPX0p0Idu9QbnGQmVrgnX1WRpwX6p1fL91f/2eAGGFAlUeJO+OaoUjRI1qkRoiVEN
+         yunA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714713920; x=1715318720;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gve4LJmh/O0Qj6MqIbaQYyQ7Zh0pLazfl2F5VQdN9Yc=;
-        b=AJQxbkbyoKGpBmqjUdlA7Kg5sqIGbj4/4uKWrVeZvf4xoT9cl+VLKJQxNZevx/nv4O
-         NviEeNfUNq9MC8a/xnq7CMKZU1TMPF+AO7c2RHwXTAazLrG9RscaEl2VOAi8525XPoI+
-         Mcjw+eIWeV9njlgeFizGVh+U2bhD8hDGlfFCwnyZIA1o0YzixBiiZGudwSoyWliwRwvD
-         9Ysh2vUEwv7ebRx3XDO2HiWftXN4OquEDjPi8aoQ8tltI7kNb/yYqxtlbc0qsf7mWLd/
-         4NQ9xO7NDoMTTO3nxAmKoBVxepnKLaAUNpUX1hWBnp+0GiZwG1IAEwshHae6Tkw2JLTR
-         jk/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUGfLdQlqLtbFAhCz102tqdGXZJhzv6fleETaPDm+OfvzI6T0RUiAkh9SZkI13TTzc/ngf6rCm9FOxU6xcR33u+Z+06
-X-Gm-Message-State: AOJu0YwYZ+o3mjhsgZWHAfM4WVaMhGc0Y/zB7GAj3sqx4nxbPAjVadLU
-	wDzoNlB7QeYpfVKsTh1SmkMn8v5JaDOJypHkSqxAP4megKGwZSXf
-X-Google-Smtp-Source: AGHT+IG+aNx4Zq3d5GpfuGDXF5te83Hb2RWefCWiPbPlWPUtq9yR8nckp0k3ySlm7TpSsauodXdnFw==
-X-Received: by 2002:a05:6870:9d86:b0:22e:ca72:faad with SMTP id pv6-20020a0568709d8600b0022eca72faadmr2022115oab.43.1714713919790;
-        Thu, 02 May 2024 22:25:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1714713924; x=1715318724;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4UbIgVBqQvP02FKP8S0NEy2lwq+MKac1wEMDpbWbGGY=;
+        b=vEp0/RAhTFo1zY7qrDnoTOR7IkHclOiHCp5mVcP2Wcffm99ZUMJKJb2NmVl20mBnKu
+         9haj2V2BPuSIVZhxjcYxkReRIdr498u2UtEZGBIAGV0CIL6iTlNXOaNOw2JablLYaQQV
+         QvR7V+mDZdnXJjtjvL/kzNjVwet2ZssrK1unjw2OsxLssIho5Gvjq9cOjlclIlcrTA8d
+         OX3xbk0rLi12dV2e1oufJkNzbTqcxIQUlzzLaH6ZGx2Q2NIIgGElVthwtwGaecc2rKRa
+         TOgWuhsWyJae5hF4gJNBV4jPwXKKCtqViiQchf2AMs4WU8Q1cuhFRki+NyDSIM//Ssv5
+         Bvow==
+X-Forwarded-Encrypted: i=1; AJvYcCWOkuT09paPwt3qxnH59bfezePXzEukbT/B0VzyS7MUrdVkoum3unKzkFGQy9l8eUjJzkmnsJHUPS+2hzaLkh8ONz7m
+X-Gm-Message-State: AOJu0Yw8GKy0xEISzF5jpHtCyxsKf2suoyod4bjtc0bV2qBX/wdusvCH
+	iXEl3AjVVT/yXLcGmt09FQjdFEosG+f1z2ntv536guD/YAKDyCGv
+X-Google-Smtp-Source: AGHT+IHFYEWop2IhIirSfpH+QcxAMZ7fjLEj89ByiMeJxNxxryk37TEpKcQqrbPMWxGZ8N+d/cyQBQ==
+X-Received: by 2002:a05:6a00:140f:b0:6ed:4288:650a with SMTP id l15-20020a056a00140f00b006ed4288650amr1560736pfu.19.1714713922965;
+        Thu, 02 May 2024 22:25:22 -0700 (PDT)
 Received: from wheely.local0.net ([1.146.23.181])
-        by smtp.gmail.com with ESMTPSA id y21-20020a056a00191500b006ece7bb5636sm2205571pfi.134.2024.05.02.22.25.17
+        by smtp.gmail.com with ESMTPSA id y21-20020a056a00191500b006ece7bb5636sm2205571pfi.134.2024.05.02.22.25.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 May 2024 22:25:19 -0700 (PDT)
+        Thu, 02 May 2024 22:25:22 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>,
 	Andrew Jones <andrew.jones@linux.dev>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 0/2] shellcheck: post-merge fixups
-Date: Fri,  3 May 2024 15:25:05 +1000
-Message-ID: <20240503052510.968229-1-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH 1/2] shellcheck: Fix shellcheck target with out of tree build
+Date: Fri,  3 May 2024 15:25:06 +1000
+Message-ID: <20240503052510.968229-2-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240503052510.968229-1-npiggin@gmail.com>
+References: <20240503052510.968229-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,20 +86,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Thomas noticed a couple of issues after merge (did you report at
-least one before merge and I didn't notice? -- apologies if yes).
+Prepend source directory to script names, and include source directory
+in shellcheck search path.
 
-Thanks,
-Nick
+Fixes: ddfdcc3929aef ("Add initial shellcheck checking")
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Nicholas Piggin (2):
-  shellcheck: Fix shellcheck target with out of tree build
-  shellcheck: Suppress SC2209 quoting warning in config.mak
-
- Makefile  | 2 +-
- configure | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
-
+diff --git a/Makefile b/Makefile
+index 6240d8dfa..b0f7ad08b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -143,7 +143,7 @@ cscope:
+ 
+ .PHONY: shellcheck
+ shellcheck:
+-	shellcheck -a run_tests.sh */run */efi/run scripts/mkstandalone.sh
++	shellcheck -P $(SRCDIR) -a $(SRCDIR)/run_tests.sh $(SRCDIR)/*/run $(SRCDIR)/*/efi/run $(SRCDIR)/scripts/mkstandalone.sh
+ 
+ .PHONY: tags
+ tags:
 -- 
 2.43.0
 
