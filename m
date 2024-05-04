@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-16582-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16583-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3394E8BBB49
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 14:30:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EE478BBB4A
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 14:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AAEFB2138B
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 12:30:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3973E282AE2
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 12:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C982557F;
-	Sat,  4 May 2024 12:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A012869B;
+	Sat,  4 May 2024 12:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E1cDSzk8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jid4S5SA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D088F22611
-	for <kvm@vger.kernel.org>; Sat,  4 May 2024 12:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E873398A
+	for <kvm@vger.kernel.org>; Sat,  4 May 2024 12:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714825806; cv=none; b=BfUp7RWzEK3lSP7Ft4bCXPAqUY3kz1P9bb3EAoWoDU3Q+cwqsWm3LiK3pdomTvrUYT5G8eLp30n5YuuuzbIDmjcQJ2aokqtmGmHUn8d1nNjPiznS2xZUIKat5CcYRNzPElssc2TEMrApAtmXeBGdkLtCheRlOlK0yhalAPScn1w=
+	t=1714825810; cv=none; b=tAVQ86Wg8RUOqT7gr4ck35Tvmiu3u7eg4C6LDP3bCf3fjJnl8W/E8nfSj+j2W/6uHIvcogk++uKVB/E0BSeAo9CzBL5SA1C90xIlglWJCZmZemvaRztP8dLKgJtasgvJEYzepTcYInrTgCNWYYNcPstJH0iD5EDY95vRl4d53Ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714825806; c=relaxed/simple;
-	bh=7VA9sk/bLG7s1uX6xYd/Ykj03bJXyed+4/Afp4ZN9fc=;
+	s=arc-20240116; t=1714825810; c=relaxed/simple;
+	bh=1xDaqiNHirbwXiOjBrun72wkC56gfLEPcrUc4sjiNxU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JQmJLYGQrYcZ0EMQKyByysQTd0DNxSNugDqr32GtJz3qIvLmj266c8rK7mfL5KMNqkT6224ZLZ+3CTAEKbongIbmIdt/+KtXkc7rzh6KP90QXs9dX1WBXYD8FBINLCafnva75+epQ7H4UWb44O6K8XaK22skPQmZTnJOZ9OKCmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E1cDSzk8; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=nYCJL1x4Jw6RnAKwaOMGutGvH0viX7vkLTqWFBetp0/8RCN5PwQwYZeyeM6Qw+CoFS/od207kGBp/2A9vea0DLTa10h1Tt7UCfm09v2yCEyNzVvTizOXReEzxeDu/NKGlqPCnEWFJip9cTPEPX7nCu+W85F7qTIdMpeXvVNo7lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jid4S5SA; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6f3e3d789cdso486105b3a.1
-        for <kvm@vger.kernel.org>; Sat, 04 May 2024 05:30:04 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6f4603237e0so113877b3a.0
+        for <kvm@vger.kernel.org>; Sat, 04 May 2024 05:30:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714825804; x=1715430604; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714825808; x=1715430608; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1J1rerHtz2/IUl9CIlFdWIoy05A/oeTKAK2mDsoOQ0I=;
-        b=E1cDSzk8qH/W03eStzNAfsWsBxSpfjslqIUyzzelRfGWJ34FRPInc1LFB60dvzprvd
-         ktwfTfqhaz9+b3xplMV2XQiw85WtFlzEKugs/YAMDe/kOH+SYGyAK7hTaQjuMDuEna3Q
-         g81XG2R2ou3ziFd/SnGowq/eU97LI+o/y8d/siL6A8wsfVg3dO680PY0CoeO6+vuZqEX
-         rKEXCLeDhJO0LZ1QdyulgLAtR+1dkXexdK2F7fDyUxW4kz5JgUbUKBB1GMptzg5LEaQE
-         EO3FVwAwUzlqbzBjH0ReOekOQEM7v+cACo6eAeEibNb5I0wyYqcjrH8lMQuVOa2vZITk
-         Hvkg==
+        bh=mvlqWTm5R6hH1aJHvySsaUaw6d4VUJ6a487Wd4qHA3w=;
+        b=Jid4S5SAswqy1BCGfn2bS9WibpWIfZrwlXJbtclnw3aLHTc70UxblpSuKoWHp3PyXk
+         QDX5U7yhBXKYQnThuDjVwuZGmpXDXeaPryB4k77tCBAfaLqlIpjyunNIvqbecnZAUH05
+         dnv+h6SwNa/7jyY7kd9ALA69mZv2mQmkeYiObv0RzTmxYAROgd3D9GADL47awfNgeQ4y
+         0CyaA+NGMesONopdw2/de+haEpWASGJpWZqxAb1Z4zfoBsZ8ukvRBG4G6JXtk4nE6scw
+         O/d+54ESBaYjeoI/R+rlrXRZJBoFSywlsw3H0UYRgc6BZH36FBL05xSIVOfoH1KT9j0Q
+         Bfag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714825804; x=1715430604;
+        d=1e100.net; s=20230601; t=1714825808; x=1715430608;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1J1rerHtz2/IUl9CIlFdWIoy05A/oeTKAK2mDsoOQ0I=;
-        b=omB70SB8221+TgBLMJmmGrH9ywRlnljlXVMlNYt36kbggAL5vZr2mefNFnKXzgdBbb
-         CcFgYqulIJsO1CKBFJWtTVyt2SoGZuv0thIygiTV+B3gLJ5WDNlff0bDkjzNJ/N6o4Un
-         b7Cn22dqtfbDATA2pmJtlpqkOC7YzTjrxk48pfqTwT8AWSjr2xDWl7riiBN5uZH7xlJQ
-         xkCdDsfd82VXHBognRXK7Ulxq36mW/xcWUbQnCIfePaDY/GVQyi50ei0+FPJVJ0/zMC7
-         Q312nWVA4lZmdBOsXpE5dsUWC51cunqreu2/LEMWriBkSTmdhRAYb2EcJYT00vZ2q2tK
-         7Hnw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxaUsO6CQx53LME8pHz+Lr1lLMepQaEWWYwr/lzMLc/9NxJdQOnKe7YzLEMjmXVgOc3l9vYgDJ1QtKF7ksv0sHaioa
-X-Gm-Message-State: AOJu0Yyo1jfV3n51BHwkwkMR0OP9RU2T0cs1gsDmBlLhLXMC4LLDK/e/
-	KpS31En05hQvfSeSHZqExhksecZM297cf0ZbDeUhUbR9mE41mcqJ
-X-Google-Smtp-Source: AGHT+IE705BbaLHg0dkpi38AsyXDqDVglxsJuuZBWB5uM1M5vnAAvSQE55y3EV0uFEDzYsyhbYKW+A==
-X-Received: by 2002:a05:6a00:1799:b0:6ed:4aaa:3cbf with SMTP id s25-20020a056a00179900b006ed4aaa3cbfmr6768331pfg.3.1714825804126;
-        Sat, 04 May 2024 05:30:04 -0700 (PDT)
+        bh=mvlqWTm5R6hH1aJHvySsaUaw6d4VUJ6a487Wd4qHA3w=;
+        b=cIWeeT8GvpFjWa27/LNExAY8DHPI3lILAXKXx5pTKT6MbzUsvpag3pGuTrN3r19lTs
+         KaHRXxCzslMcTvZEH9h/X9OABcJyk/crZzIisYZBNULnrzRQ/D4AtRPqjYKdczK9C0aC
+         CkPTC4JwglEmbK7LWtDfg9fOp6+QfPtq6AblFqnoMG4nps3eWPZMwSAF3scMFmt6EozE
+         PGyq7cmAa0X5OwBRiqsef4Q7trQ0eux3LhWsThy6MqG6iDEqpaMyAXDeXD9vRfgbw4Qy
+         9ecig5YF0ljC2KnRtpVsyrXF4Y5/Q31VbbW7uTN4javrEuoSg3zOs2zoECFIMwljqoe8
+         fdRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3gFUZ/HgI7BaZIIqQD/tImg1Sdwlw6xSJx+sN7fqzvvZeubFzo3lo9aYOmoKB+TRM/+RWjQyXIgLJuWZckAP9nq2b
+X-Gm-Message-State: AOJu0Yzlhm69iqdWlCJp62aiGM/1+0F6jgEAY9qY+0mKQgyzIDtskuJh
+	EXlm5CNHfdpILYbFoSp+/8JBDPRSFe7xG3sY8TZbGFZqWp9z7bVk
+X-Google-Smtp-Source: AGHT+IGtGsf5x/pEdQUlJKVmIg6cVX+m/JLMV6X990354Hcrk/iR00AB92q+lWqDkq9PpcE6KITNrA==
+X-Received: by 2002:a05:6a20:da83:b0:1af:81fd:63be with SMTP id iy3-20020a056a20da8300b001af81fd63bemr7138409pzb.13.1714825807773;
+        Sat, 04 May 2024 05:30:07 -0700 (PDT)
 Received: from wheely.local0.net (220-245-239-57.tpgi.com.au. [220.245.239.57])
-        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.30.00
+        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.30.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 05:30:03 -0700 (PDT)
+        Sat, 04 May 2024 05:30:07 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -74,9 +74,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v9 19/31] powerpc: Avoid using larx/stcx. in spinlocks when only one CPU is running
-Date: Sat,  4 May 2024 22:28:25 +1000
-Message-ID: <20240504122841.1177683-20-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v9 20/31] powerpc: Add atomics tests
+Date: Sat,  4 May 2024 22:28:26 +1000
+Message-ID: <20240504122841.1177683-21-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240504122841.1177683-1-npiggin@gmail.com>
 References: <20240504122841.1177683-1-npiggin@gmail.com>
@@ -88,130 +88,427 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The test harness uses spinlocks if they are implemented with larx/stcx.
-it can prevent some test scenarios such as testing migration of a
-reservation.
-
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- lib/powerpc/asm/smp.h    |  1 +
- lib/powerpc/smp.c        |  5 +++++
- lib/powerpc/spinlock.c   | 29 +++++++++++++++++++++++++++++
- lib/ppc64/asm/spinlock.h |  7 ++++++-
- powerpc/Makefile.common  |  1 +
- 5 files changed, 42 insertions(+), 1 deletion(-)
- create mode 100644 lib/powerpc/spinlock.c
+ powerpc/Makefile.common |   1 +
+ powerpc/atomics.c       | 375 ++++++++++++++++++++++++++++++++++++++++
+ powerpc/unittests.cfg   |   9 +
+ 3 files changed, 385 insertions(+)
+ create mode 100644 powerpc/atomics.c
 
-diff --git a/lib/powerpc/asm/smp.h b/lib/powerpc/asm/smp.h
-index c45988bfa..66188b9dd 100644
---- a/lib/powerpc/asm/smp.h
-+++ b/lib/powerpc/asm/smp.h
-@@ -15,6 +15,7 @@ struct cpu {
- 
- extern int nr_cpus_present;
- extern int nr_cpus_online;
-+extern bool multithreaded;
- extern struct cpu cpus[];
- 
- register struct cpu *__current_cpu asm("r13");
-diff --git a/lib/powerpc/smp.c b/lib/powerpc/smp.c
-index 27b169841..73c0ef214 100644
---- a/lib/powerpc/smp.c
-+++ b/lib/powerpc/smp.c
-@@ -276,6 +276,8 @@ static void start_each_secondary(int fdtnode, u64 regval __unused, void *info)
- 	start_core(fdtnode, datap->entry);
- }
- 
-+bool multithreaded = false;
-+
- /*
-  * Start all stopped cpus on the guest at entry with register 3 set to r3
-  * We expect that we come in with only one thread currently started
-@@ -290,6 +292,7 @@ bool start_all_cpus(secondary_entry_fn entry)
- 
- 	assert(nr_cpus_online == 1);
- 	assert(nr_started == 1);
-+	multithreaded = true;
- 	ret = dt_for_each_cpu_node(start_each_secondary, &data);
- 	assert(ret == 0);
- 	assert(nr_started == nr_cpus_present);
-@@ -361,10 +364,12 @@ static void wait_each_secondary(int fdtnode, u64 regval __unused, void *info)
- 
- void stop_all_cpus(void)
- {
-+	assert(multithreaded);
- 	while (nr_cpus_online > 1)
- 		cpu_relax();
- 
- 	dt_for_each_cpu_node(wait_each_secondary, NULL);
- 	mb();
- 	nr_started = 1;
-+	multithreaded = false;
- }
-diff --git a/lib/powerpc/spinlock.c b/lib/powerpc/spinlock.c
-new file mode 100644
-index 000000000..623a1f2c1
---- /dev/null
-+++ b/lib/powerpc/spinlock.c
-@@ -0,0 +1,29 @@
-+/* SPDX-License-Identifier: LGPL-2.0 */
-+#include <asm/spinlock.h>
-+#include <asm/smp.h>
-+
-+/*
-+ * Skip the atomic when single-threaded, which helps avoid larx/stcx. in
-+ * the harness when testing tricky larx/stcx. sequences (e.g., migration
-+ * vs reservation).
-+ */
-+void spin_lock(struct spinlock *lock)
-+{
-+	if (!multithreaded) {
-+		assert(lock->v == 0);
-+		lock->v = 1;
-+	} else {
-+		while (__sync_lock_test_and_set(&lock->v, 1))
-+			;
-+	}
-+}
-+
-+void spin_unlock(struct spinlock *lock)
-+{
-+	assert(lock->v == 1);
-+	if (!multithreaded) {
-+		lock->v = 0;
-+	} else {
-+		__sync_lock_release(&lock->v);
-+	}
-+}
-diff --git a/lib/ppc64/asm/spinlock.h b/lib/ppc64/asm/spinlock.h
-index f59eed191..b952386da 100644
---- a/lib/ppc64/asm/spinlock.h
-+++ b/lib/ppc64/asm/spinlock.h
-@@ -1,6 +1,11 @@
- #ifndef _ASMPPC64_SPINLOCK_H_
- #define _ASMPPC64_SPINLOCK_H_
- 
--#include <asm-generic/spinlock.h>
-+struct spinlock {
-+	unsigned int v;
-+};
-+
-+void spin_lock(struct spinlock *lock);
-+void spin_unlock(struct spinlock *lock);
- 
- #endif /* _ASMPPC64_SPINLOCK_H_ */
 diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
-index b98f71c2f..1ee9c25d6 100644
+index 1ee9c25d6..420103c87 100644
 --- a/powerpc/Makefile.common
 +++ b/powerpc/Makefile.common
-@@ -49,6 +49,7 @@ cflatobjs += lib/powerpc/rtas.o
- cflatobjs += lib/powerpc/processor.o
- cflatobjs += lib/powerpc/handlers.o
- cflatobjs += lib/powerpc/smp.o
-+cflatobjs += lib/powerpc/spinlock.o
+@@ -11,6 +11,7 @@ tests-common = \
+ 	$(TEST_DIR)/spapr_hcall.elf \
+ 	$(TEST_DIR)/rtas.elf \
+ 	$(TEST_DIR)/emulator.elf \
++	$(TEST_DIR)/atomics.elf \
+ 	$(TEST_DIR)/tm.elf \
+ 	$(TEST_DIR)/smp.elf \
+ 	$(TEST_DIR)/sprs.elf \
+diff --git a/powerpc/atomics.c b/powerpc/atomics.c
+new file mode 100644
+index 000000000..975711fc8
+--- /dev/null
++++ b/powerpc/atomics.c
+@@ -0,0 +1,375 @@
++/* SPDX-License-Identifier: LGPL-2.0-only */
++/*
++ * Test some powerpc instructions
++ *
++ * Copyright 2024 Nicholas Piggin, IBM Corp.
++ */
++#include <stdint.h>
++#include <libcflat.h>
++#include <migrate.h>
++#include <asm/processor.h>
++#include <asm/time.h>
++#include <asm/atomic.h>
++#include <asm/setup.h>
++#include <asm/barrier.h>
++#include <asm/smp.h>
++
++static bool do_migrate;
++static bool do_record;
++
++#define RSV_SIZE 128
++
++static uint8_t granule[RSV_SIZE] __attribute((__aligned__(RSV_SIZE)));
++
++static void spin_lock(unsigned int *lock)
++{
++	unsigned int old;
++
++	asm volatile ("1:"
++		      "lwarx	%0,0,%2;"
++		      "cmpwi	%0,0;"
++		      "bne	1b;"
++		      "stwcx.	%1,0,%2;"
++		      "bne-	1b;"
++		      "lwsync;"
++		      : "=&r"(old) : "r"(1), "r"(lock) : "cr0", "memory");
++}
++
++static void spin_unlock(unsigned int *lock)
++{
++	asm volatile("lwsync;"
++		     "stw	%1,%0;"
++		     : "+m"(*lock) : "r"(0) : "memory");
++}
++
++static volatile bool got_interrupt;
++static volatile struct pt_regs recorded_regs;
++
++static void interrupt_handler(struct pt_regs *regs, void *opaque)
++{
++	assert(!got_interrupt);
++	got_interrupt = true;
++	memcpy((void *)&recorded_regs, regs, sizeof(struct pt_regs));
++	regs_advance_insn(regs);
++}
++
++static void test_lwarx_stwcx(int argc, char *argv[])
++{
++	unsigned int *var = (unsigned int *)granule;
++	unsigned int old;
++	unsigned int result;
++
++	*var = 0;
++	asm volatile ("1:"
++		      "lwarx	%0,0,%2;"
++		      "stwcx.	%1,0,%2;"
++		      "bne-	1b;"
++		      : "=&r"(old) : "r"(1), "r"(var) : "cr0", "memory");
++	report(old == 0 && *var == 1, "simple update");
++
++	*var = 0;
++	asm volatile ("li	%0,0;"
++		      "stwcx.	%1,0,%2;"
++		      "stwcx.	%1,0,%2;"
++		      "bne-	1f;"
++		      "li	%0,1;"
++		      "1:"
++		      : "=&r"(result)
++		      : "r"(1), "r"(var) : "cr0", "memory");
++	report(result == 0 && *var == 0, "failed stwcx. (no reservation)");
++
++	*var = 0;
++	asm volatile ("li	%0,0;"
++		      "lwarx	%1,0,%4;"
++		      "stw	%3,0(%4);"
++		      "stwcx.	%2,0,%4;"
++		      "bne-	1f;"
++		      "li	%0,1;"
++		      "1:"
++		      : "=&r"(result), "=&r"(old)
++		      : "r"(1), "r"(2), "r"(var) : "cr0", "memory");
++	/* This is implementation specific, so don't fail */
++	if (result == 0 && *var == 2)
++		report(true, "failed stwcx. (intervening store)");
++	else
++		report(true, "succeeded stwcx. (intervening store)");
++
++	handle_exception(0x600, interrupt_handler, NULL);
++	handle_exception(0x700, interrupt_handler, NULL);
++
++	/* Implementations may not necessarily invoke the alignment interrupt */
++	old = 10;
++	*var = 0;
++	asm volatile (
++		      "lwarx	%0,0,%1;"
++		      : "+&r"(old) : "r"((char *)var + 1));
++	report(old == 10 && got_interrupt && recorded_regs.trap == 0x600, "unaligned lwarx causes fault");
++	got_interrupt = false;
++
++	/*
++	 * Unaligned stwcx. is more difficult to test, at least under QEMU,
++	 * the store does not proceed if there is no matching reservation, so
++	 * the alignment handler does not get invoked. This is okay according
++	 * to the Power ISA (unalignment does not necessarily invoke the
++	 * alignment interrupt). But POWER CPUs do cause alignment interrupt.
++	 */
++	*var = 0;
++	asm volatile (
++		      "lwarx	%0,0,%2;"
++		      "stwcx.	%1,0,%3;"
++		      : "=&r"(old) : "r"(1), "r"(var), "r"((char *)var+1) : "cr0", "memory");
++	/* unaligned larx/stcx. is not required by the ISA to cause an exception, in TCG the stcx does not. */
++	report_kfail(true, old == 0 && *var == 0 && got_interrupt && recorded_regs.trap == 0x600, "unaligned stwcx. causes fault");
++	got_interrupt = false;
++
++	handle_exception(0x600, NULL, NULL);
++
++}
++
++static void test_lqarx_stqcx(int argc, char *argv[])
++{
++	union {
++		__int128_t var;
++		struct {
++#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++			unsigned long var1;
++			unsigned long var2;
++#else
++			unsigned long var2;
++			unsigned long var1;
++#endif
++		};
++	} var __attribute__((aligned(16)));
++	register unsigned long new1 asm("r8");
++	register unsigned long new2 asm("r9");
++	register unsigned long old1 asm("r10");
++	register unsigned long old2 asm("r11");
++	unsigned int result;
++
++	var.var1 = 1;
++	var.var2 = 2;
++
++	(void)new2;
++	(void)old2;
++
++	old1 = 0;
++	old2 = 0;
++	new1 = 3;
++	new2 = 4;
++	asm volatile ("1:"
++		      "lqarx	%0,0,%4;"
++		      "stqcx.	%2,0,%4;"
++		      "bne-	1b;"
++		      : "=&r"(old1), "=&r"(old2)
++		      : "r"(new1), "r"(new2), "r"(&var)
++		      : "cr0", "memory");
++
++	report(old1 == 2 && old2 == 1 && var.var1 == 4 && var.var2 == 3,
++			"simple update");
++
++	var.var1 = 1;
++	var.var2 = 2;
++	new1 = 3;
++	new2 = 4;
++	asm volatile ("li	%0,0;"
++		      "stqcx.	%1,0,%3;"
++		      "stqcx.	%1,0,%3;"
++		      "bne-	1f;"
++		      "li	%0,1;"
++		      "1:"
++		      : "=&r"(result)
++		      : "r"(new1), "r"(new2), "r"(&var)
++		      : "cr0", "memory");
++	report(result == 0 && var.var1 == 1 && var.var2 == 2,
++			"failed stqcx. (no reservation)");
++
++	var.var1 = 1;
++	var.var2 = 2;
++	new1 = 3;
++	new2 = 4;
++	asm volatile ("li	%0,0;"
++		      "lqarx	%1,0,%6;"
++		      "std	%5,0(%6);"
++		      "stqcx.	%3,0,%6;"
++		      "bne-	1f;"
++		      "li	%0,1;"
++		      "1:"
++		      : "=&r"(result), "=&r"(old1), "=&r"(old2)
++		      : "r"(new1), "r"(new2), "r"(0), "r"(&var)
++		      : "cr0", "memory");
++	/* This is implementation specific, so don't fail */
++	if (result == 0 && (var.var1 == 0 || var.var2 == 0))
++		report(true, "failed stqcx. (intervening store)");
++	else
++		report(true, "succeeded stqcx. (intervening store)");
++}
++
++static void test_migrate_reserve(int argc, char *argv[])
++{
++	unsigned int *var = (unsigned int *)granule;
++	unsigned int old;
++	int i;
++	int succeed = 0;
++
++	if (!do_migrate)
++		return;
++
++	for (i = 0; i < 10; i++) {
++		*var = 0x12345;
++		asm volatile ("lwarx	%0,0,%1" : "=&r"(old) : "r"(var) : "memory");
++		migrate_quiet();
++		asm volatile ("stwcx.	%0,0,%1" : : "r"(0xf00d), "r"(var) : "cr0", "memory");
++		if (*var == 0xf00d)
++			succeed++;
++	}
++
++	if (do_record) {
++		/*
++		 * Running under TCG record-replay, reservations must not
++		 * be lost by migration
++		 */
++		report(succeed > 0, "migrated reservation is not lost");
++	} else {
++		report(succeed == 0, "migrated reservation is lost");
++	}
++
++	report_prefix_pop();
++}
++
++#define ITERS 10000000
++static int test_counter = 0;
++static void test_inc_perf(int argc, char *argv[])
++{
++	int i;
++	uint64_t tb1, tb2;
++
++	tb1 = get_tb();
++	for (i = 0; i < ITERS; i++)
++		__atomic_fetch_add(&test_counter, 1, __ATOMIC_RELAXED);
++	tb2 = get_tb();
++	report(true, "atomic add takes %ldns", (tb2 - tb1) * 1000000000 / ITERS / tb_hz);
++
++	tb1 = get_tb();
++	for (i = 0; i < ITERS; i++)
++		__atomic_fetch_add(&test_counter, 1, __ATOMIC_SEQ_CST);
++	tb2 = get_tb();
++	report(true, "sequentially conssistent atomic add takes %ldns", (tb2 - tb1) * 1000000000 / ITERS / tb_hz);
++}
++
++static long smp_inc_counter = 0;
++static int smp_inc_started;
++
++static void smp_inc_fn(int cpu_id)
++{
++	long i;
++
++	atomic_fetch_inc(&smp_inc_started);
++	while (smp_inc_started < nr_cpus_present)
++		cpu_relax();
++
++	for (i = 0; i < ITERS; i++)
++		atomic_fetch_inc(&smp_inc_counter);
++	atomic_fetch_dec(&smp_inc_started);
++}
++
++static void test_smp_inc(int argc, char **argv)
++{
++	if (nr_cpus_present < 2)
++		return;
++
++	if (!start_all_cpus(smp_inc_fn))
++		report_abort("Failed to start secondary cpus");
++
++	while (smp_inc_started < nr_cpus_present - 1)
++		cpu_relax();
++	smp_inc_fn(smp_processor_id());
++	while (smp_inc_started > 0)
++		cpu_relax();
++
++	stop_all_cpus();
++
++	report(smp_inc_counter == nr_cpus_present * ITERS, "counter lost no increments");
++}
++
++static long smp_lock_counter __attribute__((aligned(128))) = 0;
++static unsigned int smp_lock __attribute__((aligned(128)));
++static int smp_lock_started;
++
++static void smp_lock_fn(int cpu_id)
++{
++	long i;
++
++	atomic_fetch_inc(&smp_lock_started);
++	while (smp_lock_started < nr_cpus_present)
++		cpu_relax();
++
++	for (i = 0; i < ITERS; i++) {
++		spin_lock(&smp_lock);
++		smp_lock_counter++;
++		spin_unlock(&smp_lock);
++	}
++	atomic_fetch_dec(&smp_lock_started);
++}
++
++static void test_smp_lock(int argc, char **argv)
++{
++	if (nr_cpus_present < 2)
++		return;
++
++	if (!start_all_cpus(smp_lock_fn))
++		report_abort("Failed to start secondary cpus");
++
++	while (smp_lock_started < nr_cpus_present - 1)
++		cpu_relax();
++	smp_lock_fn(smp_processor_id());
++	while (smp_lock_started > 0)
++		cpu_relax();
++
++	stop_all_cpus();
++
++	report(smp_lock_counter == nr_cpus_present * ITERS, "counter lost no increments");
++}
++
++struct {
++	const char *name;
++	void (*func)(int argc, char **argv);
++} hctests[] = {
++	{ "lwarx/stwcx", test_lwarx_stwcx },
++	{ "lqarx/stqcx", test_lqarx_stqcx },
++	{ "migration", test_migrate_reserve },
++	{ "performance", test_inc_perf },
++	{ "SMP-atomic", test_smp_inc },
++	{ "SMP-lock", test_smp_lock },
++	{ NULL, NULL }
++};
++
++int main(int argc, char **argv)
++{
++	int i;
++	int all;
++
++	all = argc == 1 || !strcmp(argv[1], "all");
++
++	for (i = 1; i < argc; i++) {
++		if (strcmp(argv[i], "-r") == 0) {
++			do_record = true;
++		}
++		if (strcmp(argv[i], "-m") == 0) {
++			do_migrate = true;
++		}
++	}
++
++	report_prefix_push("atomics");
++
++	for (i = 0; hctests[i].name != NULL; i++) {
++		if (all || strcmp(argv[1], hctests[i].name) == 0) {
++			report_prefix_push(hctests[i].name);
++			hctests[i].func(argc, argv);
++			report_prefix_pop();
++		}
++	}
++
++	report_prefix_pop();
++
++	return report_summary();
++}
+diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+index 5c458996b..a4210ab2a 100644
+--- a/powerpc/unittests.cfg
++++ b/powerpc/unittests.cfg
+@@ -83,6 +83,15 @@ file = smp.elf
+ smp = 8,threads=4
+ accel = tcg,thread=single
  
- OBJDIRS += lib/powerpc
- 
++[atomics]
++file = atomics.elf
++
++[atomics-migration]
++file = atomics.elf
++machine = pseries
++extra_params = -append "migration -m"
++groups = migration
++
+ [h_cede_tm]
+ file = tm.elf
+ machine = pseries
 -- 
 2.43.0
 
