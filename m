@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-16577-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16578-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 092D38BBB43
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 14:30:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52CD98BBB45
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 14:30:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B44D81F2208F
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 12:30:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 796DC1C21387
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 12:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 259D22C1A9;
-	Sat,  4 May 2024 12:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6FF37140;
+	Sat,  4 May 2024 12:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OChQbX/P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e5Tdcbj/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172202C1A0
-	for <kvm@vger.kernel.org>; Sat,  4 May 2024 12:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7955022EFB
+	for <kvm@vger.kernel.org>; Sat,  4 May 2024 12:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714825787; cv=none; b=dRpVOtfwZ4LYenoUhcVvs84EfJiGFHKAhDjd4+2K5elhaYriRSB5qcqxFH0Hm9PxO+2LFLNh0xW3qr+CUrhJE51AQbzdgQmRzYq8WxIJyc7TwMeuKi9oz/CuqvqoRoWUnCyeREYSSYp1EuygS1Q/onJtaxSz+G1JibVu/+d1oNs=
+	t=1714825790; cv=none; b=ptmpNPs9NKZLTNqfgvRSW5rrZsXfPs9s57pRs7m7E3a4XKRtvHErLEMM0XursA5FaTf5Zn13czODJKBdKlISOKwmL4kcZqTECEsDdrc5ObTX+8MuAR74n0kZ9F9rGJmNdRl3tiZ67mkdB/UAjR8DvOuLslmZErvAV0hMIEf13Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714825787; c=relaxed/simple;
-	bh=+esOD28Xrw/oOACu8sjfJ6yuAEFXUf7gOepPYFafkxo=;
+	s=arc-20240116; t=1714825790; c=relaxed/simple;
+	bh=8RK9eJnJ5WuAym6YragJ1GGkd6qXv+cnx3hvPIaTKZA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M5lw55OLCEUlm+s/j3QcFW5nRwQPW2cmsXdUnTisDqLqfCvi8U5ZgTCw2tswUc1F7CQAWds62U+J0/BFd2p4crtVeLC5UyRwNup9jswaqFG9swhmy1tPbc/rAJdjTw4EJgauaE9+QKNno5SIhgCh2DrqaFMBbF8KgxWu2Z+sVak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OChQbX/P; arc=none smtp.client-ip=209.85.210.181
+	 MIME-Version; b=XlfL/JMCPdvLX6fvbDh2tkO0yv+ZdMCa6D6vDyu3zkDm25EjhV5Jai25qPKOOrtM4mKKA+oMuU3fM4n3Jz7frEDMoVVAu7iTVWb/WoZzsUCx2A7bQDTpg9EYT8sgBBM4ErNXPa6LkwLuejEUKiqCWmhR3XczPidHXkqZXN+3nOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e5Tdcbj/; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6f44ed6e82fso499921b3a.3
-        for <kvm@vger.kernel.org>; Sat, 04 May 2024 05:29:45 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6f449ea8e37so516148b3a.3
+        for <kvm@vger.kernel.org>; Sat, 04 May 2024 05:29:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714825785; x=1715430585; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714825789; x=1715430589; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JCnyyrhUMJlPFe7cyug7bxp4Z8jcIGiZmkD9LBikPH8=;
-        b=OChQbX/Pc8zYY29SONYHtGz3A+if7TYblF3VXXK9ebLRO0XrJETV8MHfa4yXjxKklT
-         J2eBDXcz0mukLXqDUINr8mL9VI98igoFuFtloUNWoEECN9gLLLwkL3OD0H700esBNTat
-         OkMe5mhPM3XVpuCvxChrx2f/yyas06LyVtWpbpnGdP4rijqusQOI3OH4wiiIJzHLnPS5
-         FzYAhzqo8mmGkFOI5YnrL8nlxK35ctt+TjcGsVU8FAtpsCzCCuh9ftTgOPNwSIOiyVOQ
-         0rfUWl/eR5tMwbPbmGy7Y1tvdm4N3PmKeGhGkMgy4BgjOTh4OJAcc9vw1cy224o0cMAJ
-         3d4Q==
+        bh=fDXzWLE/DUs3GDPPxGlpa8evNqGRj/CtlxJusPx/GlU=;
+        b=e5Tdcbj/efAA+o1OklLHBEwzQjsLMZW8oCy4BOy88Pxp/2xkQiejVsARGYvk0FjZEf
+         /PdMd0qsOLT0Gjwjqu351hfoTXdAt0ec1ArCttBwvfBj3h+WBT1zSFUjXvzDiwZMmMHG
+         P/qYAgeoONf8gN+IV9j1hEHqgVT7DjXGiHpofYo5E+pHokeTsiiMHJPZyTgC0yUOwJ/s
+         HvPuDD1Aj/tjLthNeTlYdCpGCF1+a+mv9NYOdn2+jPnDZd5ZlMr+dsrL+XKRDMiXOXn2
+         qi45N6ynLBxEfKJ/f6dmUmNlRJjcp+C4hzB/PhJJ9t8g/mwcEcz8HARKvG2LFXTfYfXt
+         ugjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714825785; x=1715430585;
+        d=1e100.net; s=20230601; t=1714825789; x=1715430589;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JCnyyrhUMJlPFe7cyug7bxp4Z8jcIGiZmkD9LBikPH8=;
-        b=YedEK36GBL98Tt6VruzbN/WYyFVm2WunTBJce6OBiEtdSegx6m63HbBBqZOdmq0H8U
-         ENso3+Sao8lcFZ9Mipfo+9pGg4canb+/lkqJ/qZYTESvZyr3B/oY5undy6DuQDnWRAoX
-         dAZFi5IuBjUnAxOXF2U9pDSiFR+2+A0S3tMBGE4Tw0/1YRY/JhPuh50iTE+pPaX0Ny3n
-         c24wANeP45XBrfq6kDdUq5LI61AyB2GMDwPjKBfaDwsERZxOklOnp4WLXGUr6YG6kShD
-         t8mMxH1oHjuLmLnzVvj1hiUcQxH4s7G0qkFkYQFYgrnBQQthJlh2LBhrW/x+avacewc8
-         +qxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXQXWezhljyYliYZnBb1bG75erqiECVEV0JfCN31dLCWjKBCtUzQCcWVhlizb5mHFvwlnTZiBdTpDCDK4JQ/xI98HaF
-X-Gm-Message-State: AOJu0YycrtUQtC/uMUFUsqnQ1YsiYRvIytgFdtmZ45W9Ko1t2eBw6tOQ
-	R5r8pkLlLivar0H0oPsmYMkyOYMnf0e8dZGwo9nFlbHLCZHdmd1G
-X-Google-Smtp-Source: AGHT+IHpmwlZ1Ova538YiLDhjk47+Mf6xmDk20bCNSb9DMpIy00uqVcKZrw5LeJQK/2vW1ivif+7wA==
-X-Received: by 2002:a05:6a00:22c2:b0:6f0:c214:7974 with SMTP id f2-20020a056a0022c200b006f0c2147974mr5985175pfj.12.1714825785325;
-        Sat, 04 May 2024 05:29:45 -0700 (PDT)
+        bh=fDXzWLE/DUs3GDPPxGlpa8evNqGRj/CtlxJusPx/GlU=;
+        b=WmvwyIY1FNLPPM+buua3lcHf5qjW4mo34y9L1kvfrlwZezMbz050eLBbWLtXGgLL8q
+         wsbAmnc081AX23m2e7ahxpKQXzw0Fm3MldCCcoZk+eFJPsa3qlT2XWOm3icJiF8EK0lh
+         3puuRJPHlNfguFFg+mI7VC9sv16Cr4EsypwZK2BR8Wyd2MZ+3KkWv9dXFnVyNbI7Fg9W
+         IUP+CLOTH8WkV/FML5Ar3B1+u6WTssgrBlyCQVQHcYi1W24g3cO0OQ/zOhIPx0yQwvY2
+         sKjEJOQUZ2VWLkwiOH+3ZQW/iABVlpF4IhYUpm96+Rit5m/fH/VHfmaScm9clpwT2SRh
+         sW2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUUl7NAKN0+USvYNo0G9ECJ8VQpIXYkVDypN1eSxhdA+RaEx0EUgqt1v3VkcCkXeZOouak2AN5rnoBLyS8rgT6/WMRV
+X-Gm-Message-State: AOJu0YxVLSTjG9YnLrOOfN6qAMsOXv/hbfO3m8n0klJ9ZzKkp6g2lyz7
+	HnN6X5nOqYhSY0UaEBabxmLIqW2yPMJE7J5S/xr3QuetTP9h1GYH
+X-Google-Smtp-Source: AGHT+IHnQ2zuv/B+C0SD3NBohPwkG9C/rQDC8UTekLkLibupZ9dNhnjts9LIMNCchzomoGQJps/l9g==
+X-Received: by 2002:a05:6a00:4b4d:b0:6f3:ee81:13b5 with SMTP id kr13-20020a056a004b4d00b006f3ee8113b5mr7759237pfb.17.1714825788886;
+        Sat, 04 May 2024 05:29:48 -0700 (PDT)
 Received: from wheely.local0.net (220-245-239-57.tpgi.com.au. [220.245.239.57])
-        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.29.42
+        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.29.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 05:29:44 -0700 (PDT)
+        Sat, 04 May 2024 05:29:48 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -74,9 +74,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v9 14/31] powerpc: Remove broken SMP exception stack setup
-Date: Sat,  4 May 2024 22:28:20 +1000
-Message-ID: <20240504122841.1177683-15-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v9 15/31] powerpc: Enable page alloc operations
+Date: Sat,  4 May 2024 22:28:21 +1000
+Message-ID: <20240504122841.1177683-16-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240504122841.1177683-1-npiggin@gmail.com>
 References: <20240504122841.1177683-1-npiggin@gmail.com>
@@ -88,68 +88,59 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The exception stack setup does not work correctly for SMP, because
-it is the boot processor that calls cpu_set() which sets SPRG2 to
-the exception stack, not the target CPU itself. So secondaries
-never got their SPRG2 set to a valid exception stack.
-
-Remove the SMP code and just set an exception stack for the boot
-processor. Make the stack 64kB while we're here, to match the
-size of the regular stack.
+These will be used for stack allocation for secondary CPUs.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- lib/powerpc/setup.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ lib/powerpc/setup.c     | 8 ++++++++
+ powerpc/Makefile.common | 1 +
+ 2 files changed, 9 insertions(+)
 
 diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
-index 9b665f59c..58be93f08 100644
+index 58be93f08..73ca2f931 100644
 --- a/lib/powerpc/setup.c
 +++ b/lib/powerpc/setup.c
-@@ -42,10 +42,6 @@ struct cpu_set_params {
- 	uint64_t tb_hz;
- };
+@@ -15,6 +15,7 @@
+ #include <devicetree.h>
+ #include <alloc.h>
+ #include <alloc_phys.h>
++#include <alloc_page.h>
+ #include <argv.h>
+ #include <asm/setup.h>
+ #include <asm/page.h>
+@@ -133,6 +134,7 @@ static void mem_init(phys_addr_t freemem_start)
+ 		.start = (phys_addr_t)-1,
+ 	};
+ 	int nr_regs, i;
++	phys_addr_t base, top;
  
--#define EXCEPTION_STACK_SIZE	(32*1024) /* 32kB */
--
--static char exception_stack[NR_CPUS][EXCEPTION_STACK_SIZE];
--
- static void cpu_set(int fdtnode, u64 regval, void *info)
- {
- 	static bool read_common_info = false;
-@@ -56,10 +52,6 @@ static void cpu_set(int fdtnode, u64 regval, void *info)
- 
- 	cpus[cpu] = regval;
- 
--	/* set exception stack address for this CPU (in SPGR0) */
--	asm volatile ("mtsprg0 %[addr]" ::
--		      [addr] "r" (exception_stack[cpu + 1]));
--
- 	if (!read_common_info) {
- 		const struct fdt_property *prop;
- 		u32 *data;
-@@ -180,6 +172,10 @@ static void mem_init(phys_addr_t freemem_start)
+ 	nr_regs = dt_get_memory_params(regs, NR_MEM_REGIONS);
+ 	assert(nr_regs > 0);
+@@ -170,6 +172,12 @@ static void mem_init(phys_addr_t freemem_start)
+ 	phys_alloc_init(freemem_start, primary.end - freemem_start);
+ 	phys_alloc_set_minimum_alignment(__icache_bytes > __dcache_bytes
  					 ? __icache_bytes : __dcache_bytes);
++
++	phys_alloc_get_unused(&base, &top);
++	base = PAGE_ALIGN(base);
++	top &= PAGE_MASK;
++	page_alloc_init_area(0, base >> PAGE_SHIFT, top >> PAGE_SHIFT);
++	page_alloc_ops_enable();
  }
  
-+#define EXCEPTION_STACK_SIZE	SZ_64K
-+
-+static char boot_exception_stack[EXCEPTION_STACK_SIZE];
-+
- void setup(const void *fdt)
- {
- 	void *freemem = &stacktop;
-@@ -189,6 +185,10 @@ void setup(const void *fdt)
- 
- 	cpu_has_hv = !!(mfmsr() & (1ULL << MSR_HV_BIT));
- 
-+	/* set exception stack address for this CPU (in SPGR0) */
-+	asm volatile ("mtsprg0 %[addr]" ::
-+		      [addr] "r" (boot_exception_stack + EXCEPTION_STACK_SIZE - 64));
-+
- 	enable_mcheck();
- 
- 	/*
+ #define EXCEPTION_STACK_SIZE	SZ_64K
+diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
+index 68165fc25..6374418d2 100644
+--- a/powerpc/Makefile.common
++++ b/powerpc/Makefile.common
+@@ -38,6 +38,7 @@ cflatobjs += lib/util.o
+ cflatobjs += lib/getchar.o
+ cflatobjs += lib/alloc_phys.o
+ cflatobjs += lib/alloc.o
++cflatobjs += lib/alloc_page.o
+ cflatobjs += lib/devicetree.o
+ cflatobjs += lib/migrate.o
+ cflatobjs += lib/powerpc/io.o
 -- 
 2.43.0
 
