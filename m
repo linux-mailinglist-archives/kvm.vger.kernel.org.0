@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-16581-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16582-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 310208BBB48
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 14:30:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3394E8BBB49
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 14:30:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5CE51F21F7F
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 12:30:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AAEFB2138B
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 12:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556BB364BE;
-	Sat,  4 May 2024 12:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C982557F;
+	Sat,  4 May 2024 12:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1SEAZ/X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E1cDSzk8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE4622F1E
-	for <kvm@vger.kernel.org>; Sat,  4 May 2024 12:30:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D088F22611
+	for <kvm@vger.kernel.org>; Sat,  4 May 2024 12:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714825802; cv=none; b=dj70SXxEu5NRnUPbV9fYs/0yZjjTkL4/pA63g2tMKZXaxjqqOipfXKdacCDvNwVYAP/4rMbxFHKadRBEgr77Junp8/ZRaGYLwmV6h+wyb8Yz4rHBu266QXq9x61dgwbx1Az/0beqjzTYs7muU7YTA0QS6EIoMUNck+K4qkcDqvI=
+	t=1714825806; cv=none; b=BfUp7RWzEK3lSP7Ft4bCXPAqUY3kz1P9bb3EAoWoDU3Q+cwqsWm3LiK3pdomTvrUYT5G8eLp30n5YuuuzbIDmjcQJ2aokqtmGmHUn8d1nNjPiznS2xZUIKat5CcYRNzPElssc2TEMrApAtmXeBGdkLtCheRlOlK0yhalAPScn1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714825802; c=relaxed/simple;
-	bh=bLgWQKMziaFfXXm0tNHQbZNeFsRAi0SRuS5vZ460W+E=;
+	s=arc-20240116; t=1714825806; c=relaxed/simple;
+	bh=7VA9sk/bLG7s1uX6xYd/Ykj03bJXyed+4/Afp4ZN9fc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kms4RdWV6ZWjnehow1keDiHD08x8zEhqPQ6pVNT/iITL3KxvXl4tFYgVUH1szx2fYh0QaknbctMlE6B2nzH0P7b0r1cu1Qw9eMyPjr8Sw4rtUREEyDdJvDOFriq5O90wDvPCOXo3UA5NnO0zpCz2tICnEDDqEe9iD/3kvfJqQi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R1SEAZ/X; arc=none smtp.client-ip=209.85.160.49
+	 MIME-Version; b=JQmJLYGQrYcZ0EMQKyByysQTd0DNxSNugDqr32GtJz3qIvLmj266c8rK7mfL5KMNqkT6224ZLZ+3CTAEKbongIbmIdt/+KtXkc7rzh6KP90QXs9dX1WBXYD8FBINLCafnva75+epQ7H4UWb44O6K8XaK22skPQmZTnJOZ9OKCmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E1cDSzk8; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-23d39e4c0d9so326827fac.0
-        for <kvm@vger.kernel.org>; Sat, 04 May 2024 05:30:00 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6f3e3d789cdso486105b3a.1
+        for <kvm@vger.kernel.org>; Sat, 04 May 2024 05:30:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714825800; x=1715430600; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1714825804; x=1715430604; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Z4h54USUHBKAJcfNGm1VvT3BcXAZlUGZA4uOX+ggTWE=;
-        b=R1SEAZ/XWZw80hTzGcKPIwRQUAdUHgFRfn86T8SM1xg1CdkAZssI95IV0TMEkGUNVn
-         gUke/WSWCOc7dCKulIFITqSclctboPQuVI83medkiMqOeFmZTWYnHL5PRNrH/AyPqFWZ
-         loS1BukAPBVOjsi30BHuVM+3OYMwV91kFdgY2T82sE5+9jAQDwrhE+0MKjM7A3zMkvdv
-         zr72lNjp+VsWPjgtBtCI3n2bNxojeE8p4+vWRYwdzmQpdRwZEKMszTjX3ZBh9PTBnJeP
-         BeBXtfxJl2ob30rFXnkW2OEay1QnvZqsE9bo2LjtGVl3wfD2l7IH8UOoe6WlISiVej0r
-         oAuQ==
+        bh=1J1rerHtz2/IUl9CIlFdWIoy05A/oeTKAK2mDsoOQ0I=;
+        b=E1cDSzk8qH/W03eStzNAfsWsBxSpfjslqIUyzzelRfGWJ34FRPInc1LFB60dvzprvd
+         ktwfTfqhaz9+b3xplMV2XQiw85WtFlzEKugs/YAMDe/kOH+SYGyAK7hTaQjuMDuEna3Q
+         g81XG2R2ou3ziFd/SnGowq/eU97LI+o/y8d/siL6A8wsfVg3dO680PY0CoeO6+vuZqEX
+         rKEXCLeDhJO0LZ1QdyulgLAtR+1dkXexdK2F7fDyUxW4kz5JgUbUKBB1GMptzg5LEaQE
+         EO3FVwAwUzlqbzBjH0ReOekOQEM7v+cACo6eAeEibNb5I0wyYqcjrH8lMQuVOa2vZITk
+         Hvkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714825800; x=1715430600;
+        d=1e100.net; s=20230601; t=1714825804; x=1715430604;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Z4h54USUHBKAJcfNGm1VvT3BcXAZlUGZA4uOX+ggTWE=;
-        b=Uccxs92cl0Wcpk3QBdLIQiKrR0k8fU5p5fOQJ9sj3Ye3Jrv0V3oPh5lJhTMMV1GbjB
-         EvUMBP+o/KnA9OSW1foZzapLz7kmlPuADOhTA8ViuZuYuVOHyJB5IEavWfDo3DfcUb0i
-         IYJHWnjovvS+jHAFnTgnPunPFrQA60vUFfDzoWZ6rWz9R9FWBQ/sOGz6GgJK7f5eEvAE
-         tPqzuSVPeCvqezn2nXXedAbHpYAAT7RiikkOv6CjSDp9UKuqBJlO/n9c+7bIltyCudnP
-         f/0Ll2a4JIJXh6pQCDp2uxYzFh3Ex8OeJgPe8zQWXbGuUqRiio5KQcoClpsTYunUHFDV
-         D6Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCUlUZjhX914FLAZ7vor7l/mm7SsuX2THDBPq81xOiC3LgJtfqb+vEW3XlfIIXHhLllXVj9e/5j23gxLve+HU3OyzNZQ
-X-Gm-Message-State: AOJu0YzvS/SlyVNo362LnCCxQdAjNgRsTOON6tThTnqq5oIwUbuBs71F
-	iBvxi6SXXqdXHqoGYDIkRAquU8Rh8G3WU8bT7TfJqhcQoiFBk0m48JE1QQ==
-X-Google-Smtp-Source: AGHT+IEvzIyj5q/YWunpbhcGD2rfjuIoMmYhPDFOu5tKaJohsYhSC3wKPUC/yABZy9c9/DJ3fHCG+g==
-X-Received: by 2002:a05:6871:5213:b0:23c:e7b:9208 with SMTP id ht19-20020a056871521300b0023c0e7b9208mr7091453oac.17.1714825800287;
-        Sat, 04 May 2024 05:30:00 -0700 (PDT)
+        bh=1J1rerHtz2/IUl9CIlFdWIoy05A/oeTKAK2mDsoOQ0I=;
+        b=omB70SB8221+TgBLMJmmGrH9ywRlnljlXVMlNYt36kbggAL5vZr2mefNFnKXzgdBbb
+         CcFgYqulIJsO1CKBFJWtTVyt2SoGZuv0thIygiTV+B3gLJ5WDNlff0bDkjzNJ/N6o4Un
+         b7Cn22dqtfbDATA2pmJtlpqkOC7YzTjrxk48pfqTwT8AWSjr2xDWl7riiBN5uZH7xlJQ
+         xkCdDsfd82VXHBognRXK7Ulxq36mW/xcWUbQnCIfePaDY/GVQyi50ei0+FPJVJ0/zMC7
+         Q312nWVA4lZmdBOsXpE5dsUWC51cunqreu2/LEMWriBkSTmdhRAYb2EcJYT00vZ2q2tK
+         7Hnw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxaUsO6CQx53LME8pHz+Lr1lLMepQaEWWYwr/lzMLc/9NxJdQOnKe7YzLEMjmXVgOc3l9vYgDJ1QtKF7ksv0sHaioa
+X-Gm-Message-State: AOJu0Yyo1jfV3n51BHwkwkMR0OP9RU2T0cs1gsDmBlLhLXMC4LLDK/e/
+	KpS31En05hQvfSeSHZqExhksecZM297cf0ZbDeUhUbR9mE41mcqJ
+X-Google-Smtp-Source: AGHT+IE705BbaLHg0dkpi38AsyXDqDVglxsJuuZBWB5uM1M5vnAAvSQE55y3EV0uFEDzYsyhbYKW+A==
+X-Received: by 2002:a05:6a00:1799:b0:6ed:4aaa:3cbf with SMTP id s25-20020a056a00179900b006ed4aaa3cbfmr6768331pfg.3.1714825804126;
+        Sat, 04 May 2024 05:30:04 -0700 (PDT)
 Received: from wheely.local0.net (220-245-239-57.tpgi.com.au. [220.245.239.57])
-        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.29.56
+        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.30.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 05:30:00 -0700 (PDT)
+        Sat, 04 May 2024 05:30:03 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -74,9 +74,9 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v9 18/31] powerpc: Permit ACCEL=tcg,thread=single
-Date: Sat,  4 May 2024 22:28:24 +1000
-Message-ID: <20240504122841.1177683-19-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v9 19/31] powerpc: Avoid using larx/stcx. in spinlocks when only one CPU is running
+Date: Sat,  4 May 2024 22:28:25 +1000
+Message-ID: <20240504122841.1177683-20-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240504122841.1177683-1-npiggin@gmail.com>
 References: <20240504122841.1177683-1-npiggin@gmail.com>
@@ -88,55 +88,130 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Modify run script to permit single vs mttcg threading, add a
-thread=single smp case to unittests.cfg.
+The test harness uses spinlocks if they are implemented with larx/stcx.
+it can prevent some test scenarios such as testing migration of a
+reservation.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- powerpc/run           | 4 ++--
- powerpc/unittests.cfg | 6 ++++++
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ lib/powerpc/asm/smp.h    |  1 +
+ lib/powerpc/smp.c        |  5 +++++
+ lib/powerpc/spinlock.c   | 29 +++++++++++++++++++++++++++++
+ lib/ppc64/asm/spinlock.h |  7 ++++++-
+ powerpc/Makefile.common  |  1 +
+ 5 files changed, 42 insertions(+), 1 deletion(-)
+ create mode 100644 lib/powerpc/spinlock.c
 
-diff --git a/powerpc/run b/powerpc/run
-index 172f32a46..27abf1ef6 100755
---- a/powerpc/run
-+++ b/powerpc/run
-@@ -36,8 +36,8 @@ if ! $qemu -machine '?' 2>&1 | grep $MACHINE > /dev/null; then
- 	exit 2
- fi
+diff --git a/lib/powerpc/asm/smp.h b/lib/powerpc/asm/smp.h
+index c45988bfa..66188b9dd 100644
+--- a/lib/powerpc/asm/smp.h
++++ b/lib/powerpc/asm/smp.h
+@@ -15,6 +15,7 @@ struct cpu {
  
-+A="-accel $ACCEL$ACCEL_PROPS"
- M="-machine $MACHINE"
--M+=",accel=$ACCEL$ACCEL_PROPS"
- B=""
- D=""
+ extern int nr_cpus_present;
+ extern int nr_cpus_online;
++extern bool multithreaded;
+ extern struct cpu cpus[];
  
-@@ -54,7 +54,7 @@ if [[ "$MACHINE" == "powernv"* ]] ; then
- 	D+="-device ipmi-bmc-sim,id=bmc0 -device isa-ipmi-bt,bmc=bmc0,irq=10"
- fi
+ register struct cpu *__current_cpu asm("r13");
+diff --git a/lib/powerpc/smp.c b/lib/powerpc/smp.c
+index 27b169841..73c0ef214 100644
+--- a/lib/powerpc/smp.c
++++ b/lib/powerpc/smp.c
+@@ -276,6 +276,8 @@ static void start_each_secondary(int fdtnode, u64 regval __unused, void *info)
+ 	start_core(fdtnode, datap->entry);
+ }
  
--command="$qemu -nodefaults $M $B $D"
-+command="$qemu -nodefaults $A $M $B $D"
- command+=" -display none -serial stdio -kernel"
- command="$(migration_cmd) $(timeout_cmd) $command"
- 
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index aa707e0f3..5c458996b 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -77,6 +77,12 @@ smp = 2
- file = smp.elf
- smp = 8,threads=4
- 
-+# mttcg is the default most places, so add a thread=single test
-+[smp-thread-single]
-+file = smp.elf
-+smp = 8,threads=4
-+accel = tcg,thread=single
++bool multithreaded = false;
 +
- [h_cede_tm]
- file = tm.elf
- machine = pseries
+ /*
+  * Start all stopped cpus on the guest at entry with register 3 set to r3
+  * We expect that we come in with only one thread currently started
+@@ -290,6 +292,7 @@ bool start_all_cpus(secondary_entry_fn entry)
+ 
+ 	assert(nr_cpus_online == 1);
+ 	assert(nr_started == 1);
++	multithreaded = true;
+ 	ret = dt_for_each_cpu_node(start_each_secondary, &data);
+ 	assert(ret == 0);
+ 	assert(nr_started == nr_cpus_present);
+@@ -361,10 +364,12 @@ static void wait_each_secondary(int fdtnode, u64 regval __unused, void *info)
+ 
+ void stop_all_cpus(void)
+ {
++	assert(multithreaded);
+ 	while (nr_cpus_online > 1)
+ 		cpu_relax();
+ 
+ 	dt_for_each_cpu_node(wait_each_secondary, NULL);
+ 	mb();
+ 	nr_started = 1;
++	multithreaded = false;
+ }
+diff --git a/lib/powerpc/spinlock.c b/lib/powerpc/spinlock.c
+new file mode 100644
+index 000000000..623a1f2c1
+--- /dev/null
++++ b/lib/powerpc/spinlock.c
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: LGPL-2.0 */
++#include <asm/spinlock.h>
++#include <asm/smp.h>
++
++/*
++ * Skip the atomic when single-threaded, which helps avoid larx/stcx. in
++ * the harness when testing tricky larx/stcx. sequences (e.g., migration
++ * vs reservation).
++ */
++void spin_lock(struct spinlock *lock)
++{
++	if (!multithreaded) {
++		assert(lock->v == 0);
++		lock->v = 1;
++	} else {
++		while (__sync_lock_test_and_set(&lock->v, 1))
++			;
++	}
++}
++
++void spin_unlock(struct spinlock *lock)
++{
++	assert(lock->v == 1);
++	if (!multithreaded) {
++		lock->v = 0;
++	} else {
++		__sync_lock_release(&lock->v);
++	}
++}
+diff --git a/lib/ppc64/asm/spinlock.h b/lib/ppc64/asm/spinlock.h
+index f59eed191..b952386da 100644
+--- a/lib/ppc64/asm/spinlock.h
++++ b/lib/ppc64/asm/spinlock.h
+@@ -1,6 +1,11 @@
+ #ifndef _ASMPPC64_SPINLOCK_H_
+ #define _ASMPPC64_SPINLOCK_H_
+ 
+-#include <asm-generic/spinlock.h>
++struct spinlock {
++	unsigned int v;
++};
++
++void spin_lock(struct spinlock *lock);
++void spin_unlock(struct spinlock *lock);
+ 
+ #endif /* _ASMPPC64_SPINLOCK_H_ */
+diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
+index b98f71c2f..1ee9c25d6 100644
+--- a/powerpc/Makefile.common
++++ b/powerpc/Makefile.common
+@@ -49,6 +49,7 @@ cflatobjs += lib/powerpc/rtas.o
+ cflatobjs += lib/powerpc/processor.o
+ cflatobjs += lib/powerpc/handlers.o
+ cflatobjs += lib/powerpc/smp.o
++cflatobjs += lib/powerpc/spinlock.o
+ 
+ OBJDIRS += lib/powerpc
+ 
 -- 
 2.43.0
 
