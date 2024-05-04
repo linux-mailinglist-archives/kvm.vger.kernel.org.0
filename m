@@ -1,272 +1,143 @@
-Return-Path: <kvm+bounces-16557-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB6838BB8B0
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 02:25:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D83D88BB90F
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 03:10:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 732992859E4
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 00:25:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90F00284928
+	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 01:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21D06AB9;
-	Sat,  4 May 2024 00:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9150017F0;
+	Sat,  4 May 2024 01:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="MBAiGv1C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xmax+py6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336B4816
-	for <kvm@vger.kernel.org>; Sat,  4 May 2024 00:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E9A803
+	for <kvm@vger.kernel.org>; Sat,  4 May 2024 01:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714782324; cv=none; b=CQN2Yg2O+AmFEv1634BhFIAIWXa9Jv6OpFqChJzLGVpkNar6FHuoZxro29cCwDkBkJxc8IVbrZRuNQHQYC5i93uMMpmQFjOMRuThJVYnUrVDTtvn9GCoEQGIyi/gv4eJ0hXboWZDCp0r/iLiLTfE3njbqs+67wGOGVUsqc8I+jA=
+	t=1714785043; cv=none; b=B1+HJ3oXyDFCwljRPEk4HOtJ25kUH+RY8nB9EU48uJVF4TM9roBHA40LdsEwtS27PW8DambPYuOdOGPMYC3W8Vb+RieUCSNQnNlwoxPLp1pJXXWsIioqlk44zhGqHd9V0k04zBXbGawHOm+dmuzjKrxcmHHWY29E8gqC/7Jr93g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714782324; c=relaxed/simple;
-	bh=ik9ixoec2pD/xrYpFHiGKUQlC8TluSlJgnXtkO2J3dU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=RiSvwA/zCngzE6j6X/xsobPraHDIOp4hWMQD4kmp8pRpEL7GYzRixH0/LWD3YzOLPZaMl0UbJAM61XQKr6s4gtrl9BROc8DMk8B4hUfUb3NmhAvCS5ZdneAXl80PZ/EYUSgjmK8RrMC+Hu1JuGqMqqnE9P+rrupXxR37e6dVXTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=MBAiGv1C; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1ec4dc64c6cso1751625ad.0
-        for <kvm@vger.kernel.org>; Fri, 03 May 2024 17:25:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1714782321; x=1715387121; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jNUgL2JIPtjHS0zU6FMK7+7DqPWIOUfewm5xxpb/qS8=;
-        b=MBAiGv1CjzplPQiaLDgsltufVUKHeKb/earvf27FoEBJzVoLL2ngLWePP4MFCNs+1A
-         hcJHl86XTFcUeU7yQ7xTOjpLGvAr9zdvWFHy+19/BZlZ6enFjhyJNNrsZ/QFkxJJ0RGK
-         wyRlkyNM2SFbCpJF4fNFdx7Vmw7HfPB7bbsmNSUZEpYNqSJjHjHlzcHQlUuSx6OX/iZq
-         265E7ngLqV3JH67Czynfzqy14CSijspqPGJxXo6gfMz8W6TkNa4o4556WZAUEAmAhDkp
-         MqSJ25XEJ+UjynjEoS4JDU+a9US7q+Gmztwce8eQCF1U9zYx2NSZ6JwXAPQAWVNjSRvI
-         b9JA==
+	s=arc-20240116; t=1714785043; c=relaxed/simple;
+	bh=5j15pv+yrGZxzoFQ7805vjKNBspZb0b8yz0WVYzwRsQ=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=RmQMUpajMxQJefocR2gW8ZXggqP5Tzu5iMTS08ceqTuPTz7tl8z5tS0ijvS9mdmEK9qwe/oqo0ehNuFPKHjykGHMXh0SolzJYf/kFmt9Bs5xbdxH50KQphJbuL1bqHlnZHkq8qfZv3D3JqSJE56t3NXKASEgf8XMqVgW74gNb20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xmax+py6; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1714785040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5j15pv+yrGZxzoFQ7805vjKNBspZb0b8yz0WVYzwRsQ=;
+	b=Xmax+py6TZ+dLcSj7X+yNRLWKB3R7L0ZRI67FGBKf9ctSuvV0Py1RJkXATvaknZImY/v4z
+	p++AHJRBuugF3N3/xAELkIchSEH1QSb5C/Hshyac7rvv5WlIe9L/jLzNf0OJb1zksZ/W7L
+	cyhxVgs63oK8KTEk3y9vg1W+B7L2qxs=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-322-DH0CBq-PNISMYWWlwsvmtA-1; Fri, 03 May 2024 21:10:38 -0400
+X-MC-Unique: DH0CBq-PNISMYWWlwsvmtA-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2e2035036f5so2207661fa.0
+        for <kvm@vger.kernel.org>; Fri, 03 May 2024 18:10:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714782321; x=1715387121;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jNUgL2JIPtjHS0zU6FMK7+7DqPWIOUfewm5xxpb/qS8=;
-        b=kGEkVMq4y7SlvRNKcX3XFIbtW6nuVtOXJuaym9nNk0AkK5Dtu2/5PQhDwBgV1BGh5n
-         2OxwCGGErxqpfo2Qn+eCrMhaVih12gBftunEtw+HB0Jauh6WpwViBW/UFIMZ1iiI376B
-         Q4ViHg8t9i1+ViyW6cUFbLPyq+vdpl8FIRug2mekqi4O2riO7XT0KGKk3ZL6neqdcnTt
-         UjpCtYVgFWUqJhT1uhjwM3Oj096KuSunzRDEN1PHkwYamPgREwnqAP+bz6bY/bOjSdr2
-         59+rHFbfhoEsD8OjcgXBFDt2nR6VsQa9rnwgNpoMC3eoONNoDz9akplUQOzWHhmHoCVI
-         RGMg==
-X-Forwarded-Encrypted: i=1; AJvYcCV22sdeS5ZFN2Ivjt7F6II+Wx+Nu/9i5iRZDz+CovcVLkPJhomMR0iYh+9TihhtbbWk1HBENLZ2vagsWE9FnxDlnGsp
-X-Gm-Message-State: AOJu0Yyd7b5fhBHkzcHmXn5KbwGgkdnJZlqtwTkL5vX+YT3XiiVhpf5H
-	hilsKAaL19d314m0NLSKNfioZKlCpoV2usNDIGxYfQ+cuIZ7CBmWCYIR5qCO0Mw=
-X-Google-Smtp-Source: AGHT+IGh4V5FPTFI69/PZua5IgLwb84yNbPsAUwBRhqzoGZaQ1fIxi3CqnFLXXpBX5NraTbXqAyf6Q==
-X-Received: by 2002:a17:902:d353:b0:1eb:3d68:fc2d with SMTP id l19-20020a170902d35300b001eb3d68fc2dmr3537235plk.34.1714782321529;
-        Fri, 03 May 2024 17:25:21 -0700 (PDT)
-Received: from [172.16.0.22] (c-67-188-2-18.hsd1.ca.comcast.net. [67.188.2.18])
-        by smtp.gmail.com with ESMTPSA id la8-20020a170902fa0800b001e421f98ebdsm3849598plb.280.2024.05.03.17.25.19
+        d=1e100.net; s=20230601; t=1714785037; x=1715389837;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:user-agent:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5j15pv+yrGZxzoFQ7805vjKNBspZb0b8yz0WVYzwRsQ=;
+        b=fbdm+o5lCRG93o7yobTfAuJFxOkvEDOQUlkWDpcP/9WZkzoGoPo4YxKiFoZ/YN20Cg
+         9I0+y+XNcilFVzZm1TeVcYa546/NWp6FsiRBDIDsY64HHoaJzWH0aSrx1HH92UQ7erBT
+         GIql8DVFoYiccsBOXtUPXgvpBIgUJA94yEopO43mQ3/cW+CBjqSLBAnapP49N4PIg5n7
+         xe24hV/C1w6n5QsZhO0o+XSPwrlKHUsJfWLDh7AZRqkKH3zEA7BG0+Mfw9ss9LZDO9m7
+         geUconRGnAL3LYjVxJDL/dD5TizJCVjJ+mJqlYP+Ln4dQvcbyqtwV7VZPl9y5G3Mm5aU
+         dIdw==
+X-Gm-Message-State: AOJu0Yzdl/hh2M9HTg87houWYBneJ7iZcC5lRMlP5GNSfI8B+2OVN7/K
+	xNLa7XRbs+n/Psn7AkD7RDRsUbi4ao/9kcNeC1WQNKQ5Bs9qN8KLWtYGKUsN+usAdl9zh0VAiMJ
+	GXk3oyNtJm/0AY2pjpyYkGMEJf7gi7gFhG1lXgbp/yK1Y5qIB8w==
+X-Received: by 2002:a2e:9ad7:0:b0:2e0:b713:6bb3 with SMTP id p23-20020a2e9ad7000000b002e0b7136bb3mr4284486ljj.8.1714785037440;
+        Fri, 03 May 2024 18:10:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEr79L85iSn4mJxJvI3pNeWzN2d/P9lDGaQQNo1PN79AXRL4vlwHDJwAzOFSuYJsvYnLxbtVQ==
+X-Received: by 2002:a2e:9ad7:0:b0:2e0:b713:6bb3 with SMTP id p23-20020a2e9ad7000000b002e0b7136bb3mr4284470ljj.8.1714785036983;
+        Fri, 03 May 2024 18:10:36 -0700 (PDT)
+Received: from [127.0.0.1] ([151.95.155.52])
+        by smtp.gmail.com with ESMTPSA id o5-20020aa7c7c5000000b00572c25023b1sm2330239eds.0.2024.05.03.18.10.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 May 2024 17:25:21 -0700 (PDT)
-Message-ID: <e4c61017-6667-4773-8f09-497002cbc6a9@rivosinc.com>
-Date: Fri, 3 May 2024 17:25:18 -0700
+        Fri, 03 May 2024 18:10:36 -0700 (PDT)
+Date: Sat, 04 May 2024 03:10:33 +0200
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>,
+ James Morris <jamorris@linux.microsoft.com>
+CC: kvm@vger.kernel.org, Thara Gopinath <tgopinath@linux.microsoft.com>,
+ mic@digikod.net
+Subject: Re: 2024 HEKI discussion: LPC microconf / KVM Forum?
+User-Agent: K-9 Mail for Android
+In-Reply-To: <ZjV0vXZJJ2_2p8gz@google.com>
+References: <3564836-aa87-76d5-88d5-50269137f1@linux.microsoft.com> <ZjV0vXZJJ2_2p8gz@google.com>
+Message-ID: <F301C3DE-2248-4E73-B694-07DC4FB6AE80@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] perf kvm/riscv: Port perf kvm stat to RISC-V
-Content-Language: en-US
-To: Shenlin Liang <liangshenlin@eswincomputing.com>, anup@brainfault.org,
- atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
- aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- peterz@infradead.org, mingo@redhat.com, acme@kernel.org,
- namhyung@kernel.org, mark.rutland@arm.com,
- alexander.shishkin@linux.intel.com, jolsa@kernel.org, irogers@google.com,
- adrian.hunter@intel.com, linux-perf-users@vger.kernel.org
-References: <20240422080833.8745-1-liangshenlin@eswincomputing.com>
- <20240422080833.8745-3-liangshenlin@eswincomputing.com>
-From: Atish Patra <atishp@rivosinc.com>
-In-Reply-To: <20240422080833.8745-3-liangshenlin@eswincomputing.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 4/22/24 01:08, Shenlin Liang wrote:
-> 'perf kvm stat report/record' generates a statistical analysis of KVM
-> events and can be used to analyze guest exit reasons.
-> 
-> "report" reports statistical analysis of guest exit events.
-> 
-> To record kvm events on the host:
->   # perf kvm stat record -a
-> 
-> To report kvm VM EXIT events:
->   # perf kvm stat report --event=vmexit
-> 
-> Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
-> ---
->   tools/perf/arch/riscv/Makefile                |  1 +
->   tools/perf/arch/riscv/util/Build              |  1 +
->   tools/perf/arch/riscv/util/kvm-stat.c         | 79 +++++++++++++++++++
->   .../arch/riscv/util/riscv_exception_types.h   | 35 ++++++++
->   4 files changed, 116 insertions(+)
->   create mode 100644 tools/perf/arch/riscv/util/kvm-stat.c
->   create mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
-> 
-> diff --git a/tools/perf/arch/riscv/Makefile b/tools/perf/arch/riscv/Makefile
-> index a8d25d005207..e1e445615536 100644
-> --- a/tools/perf/arch/riscv/Makefile
-> +++ b/tools/perf/arch/riscv/Makefile
-> @@ -3,3 +3,4 @@ PERF_HAVE_DWARF_REGS := 1
->   endif
->   PERF_HAVE_ARCH_REGS_QUERY_REGISTER_OFFSET := 1
->   PERF_HAVE_JITDUMP := 1
-> +HAVE_KVM_STAT_SUPPORT := 1
-> \ No newline at end of file
-> diff --git a/tools/perf/arch/riscv/util/Build b/tools/perf/arch/riscv/util/Build
-> index 603dbb5ae4dc..d72b04f8d32b 100644
-> --- a/tools/perf/arch/riscv/util/Build
-> +++ b/tools/perf/arch/riscv/util/Build
-> @@ -1,5 +1,6 @@
->   perf-y += perf_regs.o
->   perf-y += header.o
->   
-> +perf-$(CONFIG_LIBTRACEEVENT) += kvm-stat.o
->   perf-$(CONFIG_DWARF) += dwarf-regs.o
->   perf-$(CONFIG_LIBDW_DWARF_UNWIND) += unwind-libdw.o
-> diff --git a/tools/perf/arch/riscv/util/kvm-stat.c b/tools/perf/arch/riscv/util/kvm-stat.c
-> new file mode 100644
-> index 000000000000..58813049fc45
-> --- /dev/null
-> +++ b/tools/perf/arch/riscv/util/kvm-stat.c
-> @@ -0,0 +1,79 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Arch specific functions for perf kvm stat.
-> + *
-> + * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
-> + *
-> + */
-> +#include <errno.h>
-> +#include <memory.h>
-> +#include "../../../util/evsel.h"
-> +#include "../../../util/kvm-stat.h"
-> +#include "riscv_exception_types.h"
-> +#include "debug.h"
-> +
-> +define_exit_reasons_table(riscv_exit_reasons, kvm_riscv_exception_class);
-> +
-> +const char *vcpu_id_str = "id";
-> +const char *kvm_exit_reason = "scause";
-> +const char *kvm_entry_trace = "kvm:kvm_entry";
-> +const char *kvm_exit_trace = "kvm:kvm_exit";
-> +
-> +const char *kvm_events_tp[] = {
-> +	"kvm:kvm_entry",
-> +	"kvm:kvm_exit",
-> +	NULL,
-> +};
-> +
-> +static void event_get_key(struct evsel *evsel,
-> +			  struct perf_sample *sample,
-> +			  struct event_key *key)
-> +{
-> +	key->info = 0;
-> +	key->key = evsel__intval(evsel, sample, kvm_exit_reason);
-> +	key->key = (int)key->key;
-> +	key->exit_reasons = riscv_exit_reasons;
-> +}
-> +
-> +static bool event_begin(struct evsel *evsel,
-> +			struct perf_sample *sample __maybe_unused,
-> +			struct event_key *key __maybe_unused)
-> +{
-> +	return evsel__name_is(evsel, kvm_entry_trace);
-> +}
-> +
-> +static bool event_end(struct evsel *evsel,
-> +		      struct perf_sample *sample,
-> +		      struct event_key *key)
-> +{
-> +	if (evsel__name_is(evsel, kvm_exit_trace)) {
-> +		event_get_key(evsel, sample, key);
-> +		return true;
-> +	}
-> +	return false;
-> +}
-> +
-> +static struct kvm_events_ops exit_events = {
-> +	.is_begin_event = event_begin,
-> +	.is_end_event	= event_end,
-> +	.decode_key	= exit_event_decode_key,
-> +	.name		= "VM-EXIT"
-> +};
-> +
-> +struct kvm_reg_events_ops kvm_reg_events_ops[] = {
-> +	{
-> +		.name	= "vmexit",
-> +		.ops	= &exit_events,
-> +	},
-> +	{ NULL, NULL },
-> +};
-> +
-> +const char * const kvm_skip_events[] = {
-> +	NULL,
-> +};
-> +
-> +int cpu_isa_init(struct perf_kvm_stat *kvm, const char *cpuid __maybe_unused)
-> +{
-> +	kvm->exit_reasons_isa = "riscv64";
-> +	return 0;
-> +}
-> diff --git a/tools/perf/arch/riscv/util/riscv_exception_types.h b/tools/perf/arch/riscv/util/riscv_exception_types.h
-> new file mode 100644
-> index 000000000000..c49b8fa5e847
-> --- /dev/null
-> +++ b/tools/perf/arch/riscv/util/riscv_exception_types.h
-> @@ -0,0 +1,35 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#ifndef ARCH_PERF_RISCV_EXCEPTION_TYPES_H
-> +#define ARCH_PERF_RISCV_EXCEPTION_TYPES_H
-> +
-> +#define EXC_INST_MISALIGNED 0
-> +#define EXC_INST_ACCESS 1
-> +#define EXC_INST_ILLEGAL 2
-> +#define EXC_BREAKPOINT 3
-> +#define EXC_LOAD_MISALIGNED 4
-> +#define EXC_LOAD_ACCESS 5
-> +#define EXC_STORE_MISALIGNED 6
-> +#define EXC_STORE_ACCESS 7
-> +#define EXC_SYSCALL 8
-> +#define EXC_HYPERVISOR_SYSCALL 9
-> +#define EXC_SUPERVISOR_SYSCALL 10
-> +#define EXC_INST_PAGE_FAULT 12
-> +#define EXC_LOAD_PAGE_FAULT 13
-> +#define EXC_STORE_PAGE_FAULT 15
-> +#define EXC_INST_GUEST_PAGE_FAULT 20
-> +#define EXC_LOAD_GUEST_PAGE_FAULT 21
-> +#define EXC_VIRTUAL_INST_FAULT 22
-> +#define EXC_STORE_GUEST_PAGE_FAULT 23
-> +
-> +#define EXC(x) {EXC_##x, #x }
-> +
-> +#define kvm_riscv_exception_class                                         \
-> +	EXC(INST_MISALIGNED), EXC(INST_ACCESS), EXC(INST_ILLEGAL),         \
-> +	EXC(BREAKPOINT), EXC(LOAD_MISALIGNED), EXC(LOAD_ACCESS),           \
-> +	EXC(STORE_MISALIGNED), EXC(STORE_ACCESS), EXC(SYSCALL),            \
-> +	EXC(HYPERVISOR_SYSCALL), EXC(SUPERVISOR_SYSCALL),                  \
-> +	EXC(INST_PAGE_FAULT), EXC(LOAD_PAGE_FAULT), EXC(STORE_PAGE_FAULT), \
-> +	EXC(INST_GUEST_PAGE_FAULT), EXC(LOAD_GUEST_PAGE_FAULT),            \
-> +	EXC(VIRTUAL_INST_FAULT), EXC(STORE_GUEST_PAGE_FAULT)
-> +
-> +#endif /* ARCH_PERF_RISCV_EXCEPTION_TYPES_H */
 
-For some reason my previous RB email doesn't show up in lore. So here it 
-goes agian. Sorry for the spam it gets delivered twice.
 
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
+Il 4 maggio 2024 01:35:25 CEST, Sean Christopherson <seanjc@google=2Ecom> =
+ha scritto:
+>The most contentious aspects of HEKI are the guest changes, not the KVM c=
+hanges=2E
+>The KVM uAPI and guest ABI will require some discussion, but I don't anti=
+cipate
+>those being truly hard problems to solve=2E
 
+I am not sure I agree=2E=2E=2E The problem with HEKI as of last November w=
+as that it's not clear what it protects against=2E What's the attack and ho=
+w it's prevented=2E Pinning CR0/CR4 bits is fine and okay it helps for SMEP=
+/SMAP/WP, but it's not the interesting part=2E
+
+For example, it is nice to store all the kernel text in memory that is not=
+ writable except during module loading and patching, but it doesn't add muc=
+h to the security of the system if writability is just a hypercall away=2E =
+So for example you could map the module loading and patching code so that i=
+t has access to read-only data (enforced by the hypervisor system-wide) but=
+ on the other hand can write to the kernel text=2E
+
+So a potential API could be:=20
+- a hypercall to register a key to be used for future authentication
+- a hypercall to copy something to that region of memory only if the data =
+passes some HMAC or signature algorithm
+- introduce a VTL-like mechanism for permissions on a region of memory, e=
+=2Eg=2E: memory that is never writable except from more privileged code (ke=
+rnel text), memory that is never writable except through a hypercall=2E
+
+And that is not necessarily a good idea or even something implementable :)=
+ but at least it has an attack model and a strategy to prevent it=20
+
+Otherwise the alternative would be to use VTLs for Linux and adopt a simil=
+ar API in KVM=2E That is more generic, but it is probably even more controv=
+ersial for guest side changes and therefore it needs even more a clear just=
+ification of the attack model and how it's mitigated=2E
+
+Paolo=20
+
+> And if you really want to get HEKI
+>moving, I would advise you not wait until September to hash out the KVM s=
+ide of
+>things, e=2Eg=2E I'd be more than happy to talk about HEKI in a PUCK[3] s=
+ession=2E
+Paolo
 
 
