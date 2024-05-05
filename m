@@ -1,244 +1,216 @@
-Return-Path: <kvm+bounces-16595-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16596-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5928BBF3B
-	for <lists+kvm@lfdr.de>; Sun,  5 May 2024 06:57:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FA3C8BC04A
+	for <lists+kvm@lfdr.de>; Sun,  5 May 2024 13:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DECBD1F21709
-	for <lists+kvm@lfdr.de>; Sun,  5 May 2024 04:57:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2010E1C2048D
+	for <lists+kvm@lfdr.de>; Sun,  5 May 2024 11:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928111C3E;
-	Sun,  5 May 2024 04:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A40CB18C36;
+	Sun,  5 May 2024 11:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="exE/1vqq"
+	dkim=pass (4096-bit key) header.d=glanzmann.de header.i=@glanzmann.de header.b="XPS/khcK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from infra.glanzmann.de (infra.glanzmann.de [88.198.237.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498E415A8;
-	Sun,  5 May 2024 04:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9807111A8;
+	Sun,  5 May 2024 11:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=88.198.237.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714885013; cv=none; b=AXhJADgKXIoN3rAHbBvPMFWf9hwQzJ6aptlncjddQ0QrzytCxGOzqqDc1qQIMDCV6KXEdMYwFXaQC0jhlbvoLtkN8FZ92q79GzvRW23pZDp3rQclV1cpKiRiZbI8WTMOoJvIdKDvbF8M/62vAhwH2EOno/pMc5XQeLh0rZTlPZo=
+	t=1714909154; cv=none; b=rlDyPDEcjd9kYuWZoUVIj89FLFHlxRv4kJ8tHbflEfLPwP3WRTPUaHCBbW9xYW6yp7w+HsFL5WIzNrIdA8E/hP7nCXyK6NupIKidElKhIDXghZJRQ17GsHK8OBi3Nc669TX71ciQULrehJLfKSYBBc0YGS0ASM/a6yC/zaBhkqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714885013; c=relaxed/simple;
-	bh=5Y0YjiRqnO6A5dniWdhSBIB0N8ldWUfmJumCUrN+o6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WNylU5y+xB9Mg8xOYAaRfMociCnkVADl7KlBZYUGvzpvRpKgqzkh7Xzktr82TlTNmrW8N8msJGDhU4try0JpE2eUAgV7kn2cdg4ZVUEMWJQpcCVEUZGePnnVpXM+npmyLq6BtDiOUjtW65nB8+Kw2Wz+1cv4HrxPK6QE/q8wmDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=exE/1vqq; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-de8b66d1726so2414113276.0;
-        Sat, 04 May 2024 21:56:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714885011; x=1715489811; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2NhuRV0uRDm62gy8P9p70beyb9gwrk6ySf9IjmIAWvg=;
-        b=exE/1vqq7Xq5jcyrvqVr5kP8pj54y51guOMCMNEYGJ/mg9Hyk0BSjCQk8K+ixa4l/+
-         aDoJKVt4K7sZeIUWCe3OLbTZtB+LYHwCnOT8VepuY2V24x60vZMpdhkLe2arw2lTGtm4
-         ueaAw9olg/d5ryZlELo4tl49E8SpqSLJ7e0k7ihK3EikY7/sz6XLXTYqiDSsF+FxF+j5
-         48E55lCAC45F3yIhpi7nNvWPGSkD57uSdRQpu8n+idjoxeyo+ST0HSOsuIbHyX64lz/K
-         RYHvQ2Nvn8xz31rHuZwiPX+9sPp6OCUjG9AUcbEKoOEVUb4DGf31uShgqVCscmkU4dcf
-         Ugcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714885011; x=1715489811;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2NhuRV0uRDm62gy8P9p70beyb9gwrk6ySf9IjmIAWvg=;
-        b=eU/b9aazQyr+l5PPc8WfzvBq1B2cT1agkHR7EQMe23V3XcBac/mXVTqMJL3HD38AXW
-         eIxc+okNh8GTfXAkUWLYaA6G7nv18LiSrdI9Yr3N8oM2CslDlaKFYMbDOfZQQNtO3vqR
-         5pYsumkblyWGZTN3YIapn1zWIFua20lffUeWxskBIyfTYy6LJm9uP7LvEL8GuC4P6pMf
-         syGgmJirhYN/vnHKUS+Ol1aXa11WizuHsr10+CbRaaFVdfkk2wATQ/vyf9URWlvI+7s+
-         AjCmhjnxqfZ/SOZ3xcm7MnzVPiFur4/YmxhfLWTfZjXhYAmtm+HvWglBXF6Lxu+FUuZq
-         hIzA==
-X-Forwarded-Encrypted: i=1; AJvYcCWIbFHYgN/JadQjxCC4M7ea6nLhh2Ja9k9VnPQ4oO1YNxpwHZOUcxizrfCXu751hUo8gtplZSEVYeSMP29DU+RblVuQKBR+GgCsKRZVNcKoIWnQb5VrRC1NFFvfQvLKws3w
-X-Gm-Message-State: AOJu0YwmF3WBsy5cfskWPRXihMwP60qcd9q6oOKLYhRzolmReE/laed/
-	xtsOtuENOhXEO4u00Dc+bSnlmlp8BURQr6Fs2y+blrxtTEaBE227Br2uFYWCwKLIcW6C6fgBG76
-	aQ3EzX5ZqUtYhwbixY0ODd17ZsZ4=
-X-Google-Smtp-Source: AGHT+IG1sPgiLlgNrZV318ofiSAvstdjPPafYHRRBbw4NEO6YjabhxDmUuAYWggKJX7zVxTl3Csf5lfWzmyvm/Jz3cE=
-X-Received: by 2002:a05:6902:13cf:b0:de5:4f75:fcf1 with SMTP id
- y15-20020a05690213cf00b00de54f75fcf1mr7398329ybu.6.1714885011281; Sat, 04 May
- 2024 21:56:51 -0700 (PDT)
+	s=arc-20240116; t=1714909154; c=relaxed/simple;
+	bh=RTU6cfd46xPlUBW0KfgAdnCj+0ikjRajIHBUcOiRCr8=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=NVMwF+11NRTXjhIh1WVcj/ZpdwgoYbjLTeqayEipPYPL1s12KeZR1SkEK6wOMOWH+PYihWrAms0DhGAfsyyBoqbHndupXiXPirg9H0zffAxAwBSv0qvJJ0BcLA0inP48WFUEZ5ph0d1svHjmCOyMACOg0CNGg/6BjYMiOPlqj9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=glanzmann.de; spf=pass smtp.mailfrom=glanzmann.de; dkim=pass (4096-bit key) header.d=glanzmann.de header.i=@glanzmann.de header.b=XPS/khcK; arc=none smtp.client-ip=88.198.237.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=glanzmann.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=glanzmann.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=glanzmann.de;
+	s=infra26101010; t=1714908568;
+	bh=aYf2RxSJLLq0un4EWYICHjEP3BhOEWbaehFDxI8ZvOY=;
+	h=Date:From:To:Subject:From;
+	b=XPS/khcK0e6DDP1KMSmDppxPU8ZM/M0lbLnzazsaCzifG39GlLaPfpmebYsnOfjWy
+	 koClpY7q+jT8P3+Oj0U2CIznScVfedZvH3EXcCMqesxnEpoJhBOrf2M6ZbYpJjYQI8
+	 YDoAgaacsHEIj9ikBDizZNmzfJXs7dS061+YaQkXl2o6W+hoNW9AiUqDzpSn5WrcmE
+	 GC/G+J/cIlTtADbrrPBkFQ/0B54HDr23vsl9fw7DTlpEomk70Sd/ObTdEBfIHJszVI
+	 0WIhDd0IuSiCarbpXxs0JgHYINZiSdacFqsxYdzUAZZBuN4yomTmscxo5TTKrosBpG
+	 xUyV+qs959tMMkmzSTz+H53LTelHcN09vnIvXkOo72Ag91EtXdqGgf8cn73f9Hg2AZ
+	 9RYYfBvriEFRwjqYqcJ4Ix+h4gNuhnvEF1py06eaCPp2OqD/+GfbEuv/0rcnvkge4h
+	 hxuawG+B07yE+a0vhAkG5to+wOwI3qeaLulRzMxOtrxDPwurP0VRWzfxxSBB8JmbZt
+	 gFwDHB3/ObYqqWrp0KI9Xepji9nVpwK6tjljIh2Vs2Hvo7mfqOt1Z60jJNoIOgIKbY
+	 +sqFMLpCs55k7nGwzQ5CLpesY+ETwxzSAhyte+Ucbz/QxIN71NuL0iJiXVv6fdx/gp
+	 JfcB4fA1ZDOIjHdoA38+8/MM=
+Received: by infra.glanzmann.de (Postfix, from userid 1000)
+	id 289E07A80089; Sun,  5 May 2024 13:29:28 +0200 (CEST)
+Date: Sun, 5 May 2024 13:29:28 +0200
+From: Thomas Glanzmann <thomas@glanzmann.de>
+To: kvm@vger.kernel.org, linux-nfs@vger.kernel.org
+Subject: I/O stalls when merging qcow2 snapshots on nfs
+Message-ID: <ZjdtmFu92mSlaHZ2@glanzmann.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240426041559.3717884-1-foxywang@tencent.com>
- <20240426041559.3717884-2-foxywang@tencent.com> <ZjVgWvrXyyVYXoxj@google.com>
-In-Reply-To: <ZjVgWvrXyyVYXoxj@google.com>
-From: Yi Wang <up2wing@gmail.com>
-Date: Sun, 5 May 2024 12:56:39 +0800
-Message-ID: <CAN35MuTTy+ZxVHfFjPAGVDpqA_teGBg7vi9btCL8oQe+iUqnHg@mail.gmail.com>
-Subject: Re: [v4 RESEND 1/3] KVM: setup empty irq routing when create vm
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wanpengli@tencent.com, 
-	foxywang@tencent.com, oliver.upton@linux.dev, maz@kernel.org, 
-	anup@brainfault.org, atishp@atishpatra.org, borntraeger@linux.ibm.com, 
-	frankja@linux.ibm.com, imbrenda@linux.ibm.com, weijiang.yang@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hi Sean,
+Hello,
+I often take snapshots in order to move kvm VMs from one nfs share to
+another while they're running or to take backups. Sometimes I have very
+large VMs (1.1 TB) which take a very long time (40 minutes - 2 hours) to
+backup or move. They also write between 20 - 60 GB of data while being
+backed up or moved. Once the backup or move is done the dirty snapshot
+data needs to be merged to the parent disk. While doing this I often
+experience I/O stalls within the VMs in the range of 1 - 20 seconds.
+Sometimes worse. But I have some very latency sensitive VMs which crash
+or misbehave after 15 seconds I/O stalls. So I would like to know if there
+is some tuening I can do to make these I/O stalls shorter.
 
-Thanks so much for your patient reply.
+- I already tried to set vm.dirty_expire_centisecs=100 which appears to
+  make it better, but not under 15 seconds. Perfect would be I/O stalls
+  no more than 1 second.
 
-On Sat, May 4, 2024 at 6:08=E2=80=AFAM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Fri, Apr 26, 2024, Yi Wang wrote:
-> > From: Yi Wang <foxywang@tencent.com>
-> >
-> > Add a new function to setup empty irq routing in kvm path, which
-> > can be invoded in non-architecture-specific functions. The difference
-> > compared to the kvm_setup_empty_irq_routing() is this function just
-> > alloc the empty irq routing and does not need synchronize srcu, as
-> > we will call it in kvm_create_vm().
-> >
-> > Using the new adding function, we can setup empty irq routing when
-> > kvm_create_vm(), so that x86 and s390 no longer need to set
-> > empty/dummy irq routing when creating an IRQCHIP 'cause it avoid
-> > an synchronize_srcu.
-> >
-> > Signed-off-by: Yi Wang <foxywang@tencent.com>
-> > ---
-> >  include/linux/kvm_host.h |  1 +
-> >  virt/kvm/irqchip.c       | 19 +++++++++++++++++++
-> >  virt/kvm/kvm_main.c      |  4 ++++
-> >  3 files changed, 24 insertions(+)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 48f31dcd318a..9256539139ef 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -2100,6 +2100,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
-> >                       const struct kvm_irq_routing_entry *entries,
-> >                       unsigned nr,
-> >                       unsigned flags);
-> > +int kvm_setup_empty_irq_routing_lockless(struct kvm *kvm);
->
-> This is in an #ifdef, the #else needs a stub (for MIPS).
+This is how you can reproduce the issue:
 
-Okay, I'll update the patch.
+- NFS Server:
+mkdir /ssd
+apt install -y nfs-kernel-server
+echo '/nfs 0.0.0.0/0.0.0.0(rw,no_root_squash,no_subtree_check,sync)' > /etc/exports
+exports -ra
 
->
-> >  int kvm_set_routing_entry(struct kvm *kvm,
-> >                         struct kvm_kernel_irq_routing_entry *e,
-> >                         const struct kvm_irq_routing_entry *ue);
-> > diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-> > index 1e567d1f6d3d..266bab99a8a8 100644
-> > --- a/virt/kvm/irqchip.c
-> > +++ b/virt/kvm/irqchip.c
-> > @@ -237,3 +237,22 @@ int kvm_set_irq_routing(struct kvm *kvm,
-> >
-> >       return r;
-> >  }
-> > +
-> > +int kvm_setup_empty_irq_routing_lockless(struct kvm *kvm)
->
-> I vote for kvm_init_irq_routing() to make it more obvious that the API is=
- purely
-> for initializing the routing, i.e. only to be used at VM creation.  Then =
-the
-> "lockless" tag is largely redundant.  And then maybe add a comment about =
-how this
-> creates an empty routing table?  Because every time I look at this code, =
-it takes
-> me a few seconds to remember how this is actually an empty table.
+- NFS Client / KVM Host:
+mount server:/ssd /mnt
+# Put a VM on /mnt and start it.
+# Create a snapshot:
+virsh snapshot-create-as --domain testy guest-state1 --diskspec vda,file=/mnt/overlay.qcow2 --disk-only --atomic --no-metadata -no-metadata
 
-That sounds reasonable to me.
+- In the VM:
 
->
-> > +{
-> > +     struct kvm_irq_routing_table *new;
-> > +     int chip_size;
-> > +
-> > +     new =3D kzalloc(struct_size(new, map, 1), GFP_KERNEL_ACCOUNT);
-> > +     if (!new)
-> > +             return -ENOMEM;
-> > +
-> > +     new->nr_rt_entries =3D 1;
-> > +
-> > +     chip_size =3D sizeof(int) * KVM_NR_IRQCHIPS * KVM_IRQCHIP_NUM_PIN=
-S;
-> > +     memset(new->chip, -1, chip_size);
-> > +
-> > +     RCU_INIT_POINTER(kvm->irq_routing, new);
-> > +
-> > +     return 0;
-> > +}
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index ff0a20565f90..b5f4fa9d050d 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1285,6 +1285,10 @@ static struct kvm *kvm_create_vm(unsigned long t=
-ype, const char *fdname)
-> >       if (r)
-> >               goto out_err;
-> >
-> > +     r =3D kvm_setup_empty_irq_routing_lockless(kvm);
-> > +     if (r)
-> > +             goto out_err;
->
-> This is too late.  It might not matter in practice, but the call before t=
-his is
-> to kvm_arch_post_init_vm(), which quite strongly suggests that *all* comm=
-on setup
-> is done before that arch hook is invoked.
->
-> Calling this right before kvm_arch_init_vm() seems like the best/easiest =
-fit, e.g.
+# Write some data (in my case 6 GB of data are writen in 60 seconds due
+# to the nfs client being connected with a 1 Gbit/s link)
+fio --ioengine=libaio --filesize=32G --ramp_time=2s --runtime=1m --numjobs=1 --direct=1 --verify=0 --randrepeat=0 --group_reporting --directory=/mnt --name=write --blocksize=1m --iodepth=1 --readwrite=write --unlink=1
+# Do some synchronous I/O
+while true; do date | tee -a date.log; sync; sleep 1; done
 
-Got it. I will update the patch ASAP, before that I will do some tests.
+- On the NFS Client / KVM host:
+# Merge the snapshot into the parentdisk
+time virsh blockcommit testy vda --active --pivot --delete
 
-Thanks again, Sean.
+Successfully pivoted
 
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 2e388972d856..ab607441686f 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1197,9 +1197,13 @@ static struct kvm *kvm_create_vm(unsigned long typ=
-e, const char *fdname)
->                 rcu_assign_pointer(kvm->buses[i],
->                         kzalloc(sizeof(struct kvm_io_bus), GFP_KERNEL_ACC=
-OUNT));
->                 if (!kvm->buses[i])
-> -                       goto out_err_no_arch_destroy_vm;
-> +                       goto out_err_no_irq_routing;
->         }
->
-> +       r =3D kvm_init_irq_routing(kvm);
-> +       if (r)
-> +               goto out_err_no_irq_routing;
-> +
->         r =3D kvm_arch_init_vm(kvm, type);
->         if (r)
->                 goto out_err_no_arch_destroy_vm;
-> @@ -1254,6 +1258,8 @@ static struct kvm *kvm_create_vm(unsigned long type=
-, const char *fdname)
->         WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
->         for (i =3D 0; i < KVM_NR_BUSES; i++)
->                 kfree(kvm_get_bus(kvm, i));
-> +       kvm_free_irq_routing(kvm);
-> +out_err_no_irq_routing:
->         cleanup_srcu_struct(&kvm->irq_srcu);
->  out_err_no_irq_srcu:
->         cleanup_srcu_struct(&kvm->srcu);
->
+real    1m4.666s
+user    0m0.017s
+sys     0m0.007s
 
+I exported the nfs share with sync on purpose because I often use drbd
+in sync mode (protocol c) to replicate the data on the nfs server to a
+site which is 200 km away using a 10 Gbit/s link.
 
---=20
----
-Best wishes
-Yi Wang
+The result is:
+(testy) [~] while true; do date | tee -a date.log; sync; sleep 1; done
+Sun May  5 12:53:36 CEST 2024
+Sun May  5 12:53:37 CEST 2024
+Sun May  5 12:53:38 CEST 2024
+Sun May  5 12:53:39 CEST 2024
+Sun May  5 12:53:40 CEST 2024
+Sun May  5 12:53:41 CEST 2024 < here I started virsh blockcommit
+Sun May  5 12:53:45 CEST 2024
+Sun May  5 12:53:50 CEST 2024
+Sun May  5 12:53:59 CEST 2024
+Sun May  5 12:54:04 CEST 2024
+Sun May  5 12:54:22 CEST 2024
+Sun May  5 12:54:23 CEST 2024
+Sun May  5 12:54:27 CEST 2024
+Sun May  5 12:54:32 CEST 2024
+Sun May  5 12:54:40 CEST 2024
+Sun May  5 12:54:42 CEST 2024
+Sun May  5 12:54:45 CEST 2024
+Sun May  5 12:54:46 CEST 2024
+Sun May  5 12:54:47 CEST 2024
+Sun May  5 12:54:48 CEST 2024
+Sun May  5 12:54:49 CEST 2024
+
+This is with 'vm.dirty_expire_centisecs=100' with the default values
+'vm.dirty_expire_centisecs=3000' it is worse.
+
+I/O stalls:
+- 4 seconds
+- 9 seconds
+- 5 seconds
+- 18 seconds
+- 4 seconds
+- 5 seconds
+- 8 seconds
+- 2 seconds
+- 3 seconds
+
+With the default vm.dirty_expire_centisecs=3000 I get something like that:
+
+(testy) [~] while true; do date | tee -a date.log; sync; sleep 1; done
+Sun May  5 11:51:33 CEST 2024
+Sun May  5 11:51:34 CEST 2024
+Sun May  5 11:51:35 CEST 2024
+Sun May  5 11:51:37 CEST 2024
+Sun May  5 11:51:38 CEST 2024
+Sun May  5 11:51:39 CEST 2024
+Sun May  5 11:51:40 CEST 2024 << virsh blockcommit
+Sun May  5 11:51:49 CEST 2024
+Sun May  5 11:52:07 CEST 2024
+Sun May  5 11:52:08 CEST 2024
+Sun May  5 11:52:27 CEST 2024
+Sun May  5 11:52:45 CEST 2024
+Sun May  5 11:52:47 CEST 2024
+Sun May  5 11:52:48 CEST 2024
+Sun May  5 11:52:49 CEST 2024
+
+I/O stalls:
+
+- 9 seconds
+- 18 seconds
+- 19 seconds
+- 18 seconds
+- 1 seconds
+
+I'm open to any suggestions which improve the situation. I often have 10
+Gbit/s network and a lot of dirty buffer cache, but at the same time I
+often replicate synchronously to a second site 200 kms apart which only
+gives me around 100 MB/s write performance.
+
+With vm.dirty_expire_centisecs=10 even worse:
+
+(testy) [~] while true; do date | tee -a date.log; sync; sleep 1; done
+Sun May  5 13:25:31 CEST 2024
+Sun May  5 13:25:32 CEST 2024
+Sun May  5 13:25:33 CEST 2024
+Sun May  5 13:25:34 CEST 2024
+Sun May  5 13:25:35 CEST 2024
+Sun May  5 13:25:36 CEST 2024
+Sun May  5 13:25:37 CEST 2024 < virsh blockcommit
+Sun May  5 13:26:00 CEST 2024
+Sun May  5 13:26:01 CEST 2024
+Sun May  5 13:26:06 CEST 2024
+Sun May  5 13:26:11 CEST 2024
+Sun May  5 13:26:40 CEST 2024
+Sun May  5 13:26:42 CEST 2024
+Sun May  5 13:26:43 CEST 2024
+Sun May  5 13:26:44 CEST 2024
+
+I/O stalls:
+
+- 23 seconds
+- 5 seconds
+- 5 seconds
+- 29 seconds
+- 1 second
+
+Cheers,
+        Thomas
 
