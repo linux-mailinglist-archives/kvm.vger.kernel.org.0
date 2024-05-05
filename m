@@ -1,278 +1,244 @@
-Return-Path: <kvm+bounces-16594-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16595-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F31658BBB5A
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 14:32:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B5928BBF3B
+	for <lists+kvm@lfdr.de>; Sun,  5 May 2024 06:57:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA5AF282BDA
-	for <lists+kvm@lfdr.de>; Sat,  4 May 2024 12:31:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DECBD1F21709
+	for <lists+kvm@lfdr.de>; Sun,  5 May 2024 04:57:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A86347A2;
-	Sat,  4 May 2024 12:30:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928111C3E;
+	Sun,  5 May 2024 04:56:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AVcN0woV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="exE/1vqq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE2F22F0D
-	for <kvm@vger.kernel.org>; Sat,  4 May 2024 12:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498E415A8;
+	Sun,  5 May 2024 04:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714825856; cv=none; b=jRKTFq+XvUz3CVxDJJR2N5qOj/PPqaKokdVLcY0JQRzffn0FvI999dhnoQmZwFWE36NT6Snm7pieeU41vkKm/IGKPaDaTlLjn9q+DYcY3F0I4hJmxxsycq/tfkasj7d+rXJHy+WRrB7H7hqj9NX5XQcAuarexKuBfA+eDPczmmk=
+	t=1714885013; cv=none; b=AXhJADgKXIoN3rAHbBvPMFWf9hwQzJ6aptlncjddQ0QrzytCxGOzqqDc1qQIMDCV6KXEdMYwFXaQC0jhlbvoLtkN8FZ92q79GzvRW23pZDp3rQclV1cpKiRiZbI8WTMOoJvIdKDvbF8M/62vAhwH2EOno/pMc5XQeLh0rZTlPZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714825856; c=relaxed/simple;
-	bh=RLg/GdgVF0GhSqC5pIs50MGv7ydgRO/qGea7Z+i6NOA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EAzIwbiPi8DUAinS9Dxg3ssOWZM4+AsaNBek5HcuBlXtrC/l9F4fcWYaE0G8DaND3tQ6IjrYzx1cjBNvEiFWh/13lf1+wWx+FloHH0K2OlD8PaGLcT4dKY5EFHcmETaE+oaWtvKFF3mDvjiVj+Id266mPZEjrcBTSyecHZDFB3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVcN0woV; arc=none smtp.client-ip=209.85.210.176
+	s=arc-20240116; t=1714885013; c=relaxed/simple;
+	bh=5Y0YjiRqnO6A5dniWdhSBIB0N8ldWUfmJumCUrN+o6M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WNylU5y+xB9Mg8xOYAaRfMociCnkVADl7KlBZYUGvzpvRpKgqzkh7Xzktr82TlTNmrW8N8msJGDhU4try0JpE2eUAgV7kn2cdg4ZVUEMWJQpcCVEUZGePnnVpXM+npmyLq6BtDiOUjtW65nB8+Kw2Wz+1cv4HrxPK6QE/q8wmDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=exE/1vqq; arc=none smtp.client-ip=209.85.219.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6f447260f9dso444411b3a.0
-        for <kvm@vger.kernel.org>; Sat, 04 May 2024 05:30:54 -0700 (PDT)
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-de8b66d1726so2414113276.0;
+        Sat, 04 May 2024 21:56:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1714825854; x=1715430654; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1714885011; x=1715489811; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r8yFjHHWiVn05YU2Lfr80oawzBMI5TmP8UkXksKXrkY=;
-        b=AVcN0woVRVmybTCDERXn3a8L6B9wrTnQw6imMkjdCzInF9G9UeD9YvdF1vquaz3Thm
-         EtleS49C2iHvEUS5njSrlQW60ug4uaSsd5todn1WSAwPTpe9xcX+n2Z4ILD1GbCh1bVJ
-         CDxcupUTfF42QY8jDAS7vPa7XSvB2Yi1TLs55De/Kf3oG6ywYeOcXmYzmbEV6Nt3U4EN
-         NMJelVl5zgIXJCI0oYGPaMddB43Pr6DnT0YI24tX43sOe7SewGhYmtGYuU1850JIeAg2
-         CRTIAOyDfKYh0zZSbsuEU7lIBQ9/FqI8+UXTf8bCRgfEFVmfyO316yvcMVM2FfINOqis
-         ZMXA==
+        bh=2NhuRV0uRDm62gy8P9p70beyb9gwrk6ySf9IjmIAWvg=;
+        b=exE/1vqq7Xq5jcyrvqVr5kP8pj54y51guOMCMNEYGJ/mg9Hyk0BSjCQk8K+ixa4l/+
+         aDoJKVt4K7sZeIUWCe3OLbTZtB+LYHwCnOT8VepuY2V24x60vZMpdhkLe2arw2lTGtm4
+         ueaAw9olg/d5ryZlELo4tl49E8SpqSLJ7e0k7ihK3EikY7/sz6XLXTYqiDSsF+FxF+j5
+         48E55lCAC45F3yIhpi7nNvWPGSkD57uSdRQpu8n+idjoxeyo+ST0HSOsuIbHyX64lz/K
+         RYHvQ2Nvn8xz31rHuZwiPX+9sPp6OCUjG9AUcbEKoOEVUb4DGf31uShgqVCscmkU4dcf
+         Ugcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714825854; x=1715430654;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1714885011; x=1715489811;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r8yFjHHWiVn05YU2Lfr80oawzBMI5TmP8UkXksKXrkY=;
-        b=dBs7UPwUjI/bVRbz1qGwFWllLleygwpEkhjQgmHF4/DxsBSr/s1WrQGvPS2WIctWM1
-         75G+Ea5ut8ULfcC5rl5fd19lU9/lihHKHqwR1Fn70Aodc2HMEa7Z+oWK6Or8I2R3FQ1f
-         zLUhRlZwnrM/xGWgvC3KpyIfG/B+lq/XqRlEsxYzk39YlWm8a1cmv1STaLm/Bm0RILaq
-         nj43L625tUoADC3FKSE3F63rhn4KBbln9mgK+6dY6NO6H4XZcMCNB2nTnShW/S2ZcLHk
-         lspB6MKUNHLrqe1bAtxNuVXPyoagsk4o+JZENEd7XFdC/F/BfQnLcRMijfYvYp1VaSWg
-         nFVw==
-X-Forwarded-Encrypted: i=1; AJvYcCWS7i+Zulb8aPpm6jzSVH2iwYam7J8PSP1mVExeRRftSP/vQQZy8L3gIOKZAtXC6HHDTtV2A3rWgiT6V9jr89+1JTre
-X-Gm-Message-State: AOJu0YwWsVRmk41EEwCk5g+85OTCGkSYHDUM5leHr6i1EQdAFrQ1aH6q
-	p2cN4OWhODgRc9lCBE607S0HhyKndh1arezOVsx7p36mHq/Dp0Au
-X-Google-Smtp-Source: AGHT+IFK1UoGsUuy1jTGZj15GLUUMj86a05csarOb+o+flJ9cXlyK08mpPMTmyD9G8IPIczuf3KW8g==
-X-Received: by 2002:a05:6a20:f3af:b0:1ac:423b:7c7a with SMTP id qr47-20020a056a20f3af00b001ac423b7c7amr5094243pzb.21.1714825853935;
-        Sat, 04 May 2024 05:30:53 -0700 (PDT)
-Received: from wheely.local0.net (220-245-239-57.tpgi.com.au. [220.245.239.57])
-        by smtp.gmail.com with ESMTPSA id b16-20020a056a000a9000b006f4473daa38sm3480068pfl.128.2024.05.04.05.30.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 May 2024 05:30:53 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>,
-	Laurent Vivier <lvivier@redhat.com>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	linuxppc-dev@lists.ozlabs.org,
-	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v9 31/31] powerpc: gitlab CI update
-Date: Sat,  4 May 2024 22:28:37 +1000
-Message-ID: <20240504122841.1177683-32-npiggin@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240504122841.1177683-1-npiggin@gmail.com>
-References: <20240504122841.1177683-1-npiggin@gmail.com>
+        bh=2NhuRV0uRDm62gy8P9p70beyb9gwrk6ySf9IjmIAWvg=;
+        b=eU/b9aazQyr+l5PPc8WfzvBq1B2cT1agkHR7EQMe23V3XcBac/mXVTqMJL3HD38AXW
+         eIxc+okNh8GTfXAkUWLYaA6G7nv18LiSrdI9Yr3N8oM2CslDlaKFYMbDOfZQQNtO3vqR
+         5pYsumkblyWGZTN3YIapn1zWIFua20lffUeWxskBIyfTYy6LJm9uP7LvEL8GuC4P6pMf
+         syGgmJirhYN/vnHKUS+Ol1aXa11WizuHsr10+CbRaaFVdfkk2wATQ/vyf9URWlvI+7s+
+         AjCmhjnxqfZ/SOZ3xcm7MnzVPiFur4/YmxhfLWTfZjXhYAmtm+HvWglBXF6Lxu+FUuZq
+         hIzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIbFHYgN/JadQjxCC4M7ea6nLhh2Ja9k9VnPQ4oO1YNxpwHZOUcxizrfCXu751hUo8gtplZSEVYeSMP29DU+RblVuQKBR+GgCsKRZVNcKoIWnQb5VrRC1NFFvfQvLKws3w
+X-Gm-Message-State: AOJu0YwmF3WBsy5cfskWPRXihMwP60qcd9q6oOKLYhRzolmReE/laed/
+	xtsOtuENOhXEO4u00Dc+bSnlmlp8BURQr6Fs2y+blrxtTEaBE227Br2uFYWCwKLIcW6C6fgBG76
+	aQ3EzX5ZqUtYhwbixY0ODd17ZsZ4=
+X-Google-Smtp-Source: AGHT+IG1sPgiLlgNrZV318ofiSAvstdjPPafYHRRBbw4NEO6YjabhxDmUuAYWggKJX7zVxTl3Csf5lfWzmyvm/Jz3cE=
+X-Received: by 2002:a05:6902:13cf:b0:de5:4f75:fcf1 with SMTP id
+ y15-20020a05690213cf00b00de54f75fcf1mr7398329ybu.6.1714885011281; Sat, 04 May
+ 2024 21:56:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240426041559.3717884-1-foxywang@tencent.com>
+ <20240426041559.3717884-2-foxywang@tencent.com> <ZjVgWvrXyyVYXoxj@google.com>
+In-Reply-To: <ZjVgWvrXyyVYXoxj@google.com>
+From: Yi Wang <up2wing@gmail.com>
+Date: Sun, 5 May 2024 12:56:39 +0800
+Message-ID: <CAN35MuTTy+ZxVHfFjPAGVDpqA_teGBg7vi9btCL8oQe+iUqnHg@mail.gmail.com>
+Subject: Re: [v4 RESEND 1/3] KVM: setup empty irq routing when create vm
+To: Sean Christopherson <seanjc@google.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, wanpengli@tencent.com, 
+	foxywang@tencent.com, oliver.upton@linux.dev, maz@kernel.org, 
+	anup@brainfault.org, atishp@atishpatra.org, borntraeger@linux.ibm.com, 
+	frankja@linux.ibm.com, imbrenda@linux.ibm.com, weijiang.yang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This adds testing for the powernv machine, and adds a gitlab-ci test
-group instead of specifying all tests in .gitlab-ci.yml, and adds a
-few new tests (smp, atomics) that are known to work in CI.
+Hi Sean,
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+Thanks so much for your patient reply.
+
+On Sat, May 4, 2024 at 6:08=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Fri, Apr 26, 2024, Yi Wang wrote:
+> > From: Yi Wang <foxywang@tencent.com>
+> >
+> > Add a new function to setup empty irq routing in kvm path, which
+> > can be invoded in non-architecture-specific functions. The difference
+> > compared to the kvm_setup_empty_irq_routing() is this function just
+> > alloc the empty irq routing and does not need synchronize srcu, as
+> > we will call it in kvm_create_vm().
+> >
+> > Using the new adding function, we can setup empty irq routing when
+> > kvm_create_vm(), so that x86 and s390 no longer need to set
+> > empty/dummy irq routing when creating an IRQCHIP 'cause it avoid
+> > an synchronize_srcu.
+> >
+> > Signed-off-by: Yi Wang <foxywang@tencent.com>
+> > ---
+> >  include/linux/kvm_host.h |  1 +
+> >  virt/kvm/irqchip.c       | 19 +++++++++++++++++++
+> >  virt/kvm/kvm_main.c      |  4 ++++
+> >  3 files changed, 24 insertions(+)
+> >
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 48f31dcd318a..9256539139ef 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -2100,6 +2100,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
+> >                       const struct kvm_irq_routing_entry *entries,
+> >                       unsigned nr,
+> >                       unsigned flags);
+> > +int kvm_setup_empty_irq_routing_lockless(struct kvm *kvm);
+>
+> This is in an #ifdef, the #else needs a stub (for MIPS).
+
+Okay, I'll update the patch.
+
+>
+> >  int kvm_set_routing_entry(struct kvm *kvm,
+> >                         struct kvm_kernel_irq_routing_entry *e,
+> >                         const struct kvm_irq_routing_entry *ue);
+> > diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+> > index 1e567d1f6d3d..266bab99a8a8 100644
+> > --- a/virt/kvm/irqchip.c
+> > +++ b/virt/kvm/irqchip.c
+> > @@ -237,3 +237,22 @@ int kvm_set_irq_routing(struct kvm *kvm,
+> >
+> >       return r;
+> >  }
+> > +
+> > +int kvm_setup_empty_irq_routing_lockless(struct kvm *kvm)
+>
+> I vote for kvm_init_irq_routing() to make it more obvious that the API is=
+ purely
+> for initializing the routing, i.e. only to be used at VM creation.  Then =
+the
+> "lockless" tag is largely redundant.  And then maybe add a comment about =
+how this
+> creates an empty routing table?  Because every time I look at this code, =
+it takes
+> me a few seconds to remember how this is actually an empty table.
+
+That sounds reasonable to me.
+
+>
+> > +{
+> > +     struct kvm_irq_routing_table *new;
+> > +     int chip_size;
+> > +
+> > +     new =3D kzalloc(struct_size(new, map, 1), GFP_KERNEL_ACCOUNT);
+> > +     if (!new)
+> > +             return -ENOMEM;
+> > +
+> > +     new->nr_rt_entries =3D 1;
+> > +
+> > +     chip_size =3D sizeof(int) * KVM_NR_IRQCHIPS * KVM_IRQCHIP_NUM_PIN=
+S;
+> > +     memset(new->chip, -1, chip_size);
+> > +
+> > +     RCU_INIT_POINTER(kvm->irq_routing, new);
+> > +
+> > +     return 0;
+> > +}
+> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > index ff0a20565f90..b5f4fa9d050d 100644
+> > --- a/virt/kvm/kvm_main.c
+> > +++ b/virt/kvm/kvm_main.c
+> > @@ -1285,6 +1285,10 @@ static struct kvm *kvm_create_vm(unsigned long t=
+ype, const char *fdname)
+> >       if (r)
+> >               goto out_err;
+> >
+> > +     r =3D kvm_setup_empty_irq_routing_lockless(kvm);
+> > +     if (r)
+> > +             goto out_err;
+>
+> This is too late.  It might not matter in practice, but the call before t=
+his is
+> to kvm_arch_post_init_vm(), which quite strongly suggests that *all* comm=
+on setup
+> is done before that arch hook is invoked.
+>
+> Calling this right before kvm_arch_init_vm() seems like the best/easiest =
+fit, e.g.
+
+Got it. I will update the patch ASAP, before that I will do some tests.
+
+Thanks again, Sean.
+
+>
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 2e388972d856..ab607441686f 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1197,9 +1197,13 @@ static struct kvm *kvm_create_vm(unsigned long typ=
+e, const char *fdname)
+>                 rcu_assign_pointer(kvm->buses[i],
+>                         kzalloc(sizeof(struct kvm_io_bus), GFP_KERNEL_ACC=
+OUNT));
+>                 if (!kvm->buses[i])
+> -                       goto out_err_no_arch_destroy_vm;
+> +                       goto out_err_no_irq_routing;
+>         }
+>
+> +       r =3D kvm_init_irq_routing(kvm);
+> +       if (r)
+> +               goto out_err_no_irq_routing;
+> +
+>         r =3D kvm_arch_init_vm(kvm, type);
+>         if (r)
+>                 goto out_err_no_arch_destroy_vm;
+> @@ -1254,6 +1258,8 @@ static struct kvm *kvm_create_vm(unsigned long type=
+, const char *fdname)
+>         WARN_ON_ONCE(!refcount_dec_and_test(&kvm->users_count));
+>         for (i =3D 0; i < KVM_NR_BUSES; i++)
+>                 kfree(kvm_get_bus(kvm, i));
+> +       kvm_free_irq_routing(kvm);
+> +out_err_no_irq_routing:
+>         cleanup_srcu_struct(&kvm->irq_srcu);
+>  out_err_no_irq_srcu:
+>         cleanup_srcu_struct(&kvm->srcu);
+>
+
+
+--=20
 ---
- .gitlab-ci.yml        | 30 ++++++++----------------------
- powerpc/unittests.cfg | 32 ++++++++++++++++++++++++++------
- 2 files changed, 34 insertions(+), 28 deletions(-)
-
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 23bb69e24..31a2a4e34 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -97,17 +97,10 @@ build-ppc64be:
-  - cd build
-  - ../configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
-  - make -j2
-- - ACCEL=tcg ./run_tests.sh
--      selftest-setup
--      selftest-migration
--      selftest-migration-skip
--      spapr_hcall
--      rtas-get-time-of-day
--      rtas-get-time-of-day-base
--      rtas-set-time-of-day
--      emulator
--      | tee results.txt
-- - if grep -q FAIL results.txt ; then exit 1 ; fi
-+ - ACCEL=tcg MAX_SMP=8 ./run_tests.sh -g gitlab-ci | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+ - ACCEL=tcg MAX_SMP=8 MACHINE=powernv ./run_tests.sh -g gitlab-ci | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
- build-ppc64le:
-  extends: .intree_template
-@@ -115,17 +108,10 @@ build-ppc64le:
-  - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
-  - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
-  - make -j2
-- - ACCEL=tcg ./run_tests.sh
--      selftest-setup
--      selftest-migration
--      selftest-migration-skip
--      spapr_hcall
--      rtas-get-time-of-day
--      rtas-get-time-of-day-base
--      rtas-set-time-of-day
--      emulator
--      | tee results.txt
-- - if grep -q FAIL results.txt ; then exit 1 ; fi
-+ - ACCEL=tcg MAX_SMP=8 ./run_tests.sh -g gitlab-ci | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
-+ - ACCEL=tcg MAX_SMP=8 MACHINE=powernv ./run_tests.sh -g gitlab-ci | tee results.txt
-+ - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
- # build-riscv32:
- # Fedora doesn't package a riscv32 compiler for QEMU. Oh, well.
-diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
-index d767f5d68..6fae688a8 100644
---- a/powerpc/unittests.cfg
-+++ b/powerpc/unittests.cfg
-@@ -16,17 +16,25 @@
- file = selftest.elf
- smp = 2
- extra_params = -m 1g -append 'setup smp=2 mem=1024'
--groups = selftest
-+groups = selftest gitlab-ci
- 
- [selftest-migration]
- file = selftest-migration.elf
- machine = pseries
- groups = selftest migration
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI has known migration bugs in TCG, so
-+# make a kvm-only version for CI
-+[selftest-migration-ci]
-+file = selftest-migration.elf
-+machine = pseries
-+groups = nodefault selftest migration gitlab-ci
-+accel = kvm
-+
- [selftest-migration-skip]
- file = selftest-migration.elf
- machine = pseries
--groups = selftest migration
-+groups = selftest migration gitlab-ci
- extra_params = -append "skip"
- 
- [migration-memory]
-@@ -37,6 +45,7 @@ groups = migration
- [spapr_hcall]
- file = spapr_hcall.elf
- machine = pseries
-+groups = gitlab-ci
- 
- [spapr_vpa]
- file = spapr_vpa.elf
-@@ -47,38 +56,43 @@ file = rtas.elf
- machine = pseries
- timeout = 5
- extra_params = -append "get-time-of-day date=$(date +%s)"
--groups = rtas
-+groups = rtas gitlab-ci
- 
- [rtas-get-time-of-day-base]
- file = rtas.elf
- machine = pseries
- timeout = 5
- extra_params = -rtc base="2006-06-17" -append "get-time-of-day date=$(date --date="2006-06-17 UTC" +%s)"
--groups = rtas
-+groups = rtas gitlab-ci
- 
- [rtas-set-time-of-day]
- file = rtas.elf
- machine = pseries
- extra_params = -append "set-time-of-day"
- timeout = 5
--groups = rtas
-+groups = rtas gitlab-ci
- 
- [emulator]
- file = emulator.elf
-+groups = gitlab-ci
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI fails this
- [interrupts]
- file = interrupts.elf
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI fails this
- [mmu]
- file = mmu.elf
- smp = $MAX_SMP
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI fails this
- [pmu]
- file = pmu.elf
- 
- [smp]
- file = smp.elf
- smp = 2
-+groups = gitlab-ci
- 
- [smp-smt]
- file = smp.elf
-@@ -92,16 +106,19 @@ accel = tcg,thread=single
- 
- [atomics]
- file = atomics.elf
-+groups = gitlab-ci
- 
- [atomics-migration]
- file = atomics.elf
- machine = pseries
- extra_params = -append "migration -m"
--groups = migration
-+groups = migration gitlab-ci
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI fails this
- [timebase]
- file = timebase.elf
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI fails this
- [timebase-icount]
- file = timebase.elf
- accel = tcg
-@@ -115,14 +132,17 @@ smp = 2,threads=2
- extra_params = -machine cap-htm=on -append "h_cede_tm"
- groups = h_cede_tm
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI fails this
- [sprs]
- file = sprs.elf
- 
-+# QEMU 7.0 (Fedora 37) in gitlab CI fails this
- [sprs-migration]
- file = sprs.elf
- machine = pseries
- extra_params = -append '-w'
- groups = migration
- 
-+# Too costly to run in CI
- [sieve]
- file = sieve.elf
--- 
-2.43.0
-
+Best wishes
+Yi Wang
 
