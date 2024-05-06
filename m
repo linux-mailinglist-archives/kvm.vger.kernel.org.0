@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-16614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 769728BC6C8
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:30:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3523B8BC6C9
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 371212816FD
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:30:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81FFBB2122C
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:31:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EA84654B;
-	Mon,  6 May 2024 05:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352D54DA06;
+	Mon,  6 May 2024 05:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JAZ7xSHq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4e4TJifF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84136495CC
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D666482C3
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714973434; cv=none; b=dwZtP5/orCvVfo/mQnFZCZh/XeWK7MmqUWsvxGrXin/vc13aQZy56keVLsWaaINNu51Jrt9lQ5qZa6BnwbXldFaAUzjtfepjWtCmQ04XKkPOsmFYugPKZxtitE0BlXjfPM77wZcM48N0pHl7PpuB5XqdEKWV5ez8gxg81zxeEW0=
+	t=1714973436; cv=none; b=rdP3r5jFiDkUq5nP1RVOWXtd5IDQsl2nFqjXEvRACjDPNh9JMm1GwiC027fO8/p3yJTgVnl5UZD5f+yZzxaHM8j2fgomiqxT2iNWgWLiivB30zRcHQouE3CwMfDY2QTX71EBwMXPA5AHtILS6tcunA0rXEBr3O7Dm4Cr2mENLgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714973434; c=relaxed/simple;
-	bh=4W0yLa6oBQ/HRA1qRoRsk778I56HckekrC7N/x6LuBQ=;
+	s=arc-20240116; t=1714973436; c=relaxed/simple;
+	bh=hpGFwuEXoFmBtlDS2Xsv0cI2mMBEbvBdKxaSTdCthok=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TOoBGCZxYiWBNXQhqj4sOaPLTyJu5zebxG/k6eaAKSa7Wvr/cQJgIzNlsf/43ovBtwQWLyGfLf1ljz3XyBKOz6UGncd0B34SHAglR6+BXOQKq2swWkVT3N37x5gz1Cp0BIa6D/hFrYMRibFaGTXKCkGzDCKUPAeiaIblC4o+snU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JAZ7xSHq; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=TSw0gPcoWjvvIwtRu8i7oVUvuypOa/1sq0H6aqi68EbYUTktYRj8jOvb2mM/yF5YCW9MG0eCJpxpOE9UBz4O0OUOzUJSXEIdgA40XB8RH3yWtFNEzZ1V33OamTieGeRx1fvarMZ9/O/nLL61d82307mTg4oRggrrA0j+qCeMUm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4e4TJifF; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6f3efd63657so1620127b3a.2
-        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:30:31 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be23bb01aso43432557b3.2
+        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:30:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714973431; x=1715578231; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714973432; x=1715578232; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=U8NsbyTwuJobhAQmcgiqFL5cgPms3xpU1WY3K3ROCJw=;
-        b=JAZ7xSHq6eUB/GX3CPa222L5XkxUmsXg49hDAXT2AowBeV28tNdJXmXlFLzW/aH5yT
-         gz8wZLWLe1raY1/ittOakWy43p9HP53PYvTwrYvoPCd3hgVJfiOaFvgqQaO7pw9/btxV
-         07ve/LxbD2QVbI4lDdbQbWa6MLSGd+NHxjuSxTi+K0ts2FGXB6jy4ernKTHRl+08I7X8
-         ptBto1iVENLaLK6DN9r2nrjbFrOUZhaMmRdxYRiJTc+MkyPtriC62lBsoe4cG+oaTR+2
-         bu8wvHgH99r90Cn7I+s9oXU1pWSKXJyXiQ+LYWKhIuxmPpldsKsOPa+3YC/B1+F4je0P
-         yF+A==
+        bh=X9eceQ0IPQgvcClpLg9adRP7wmQKiFwD/5KRHzUimqY=;
+        b=4e4TJifF75pNZWSGZp8lXq0dpsqa9g6BWGpqSUjct1NwYzdF1Hn4ijczsDA2GEow4d
+         k9j8/nBJbBdjzrf2xMmJnqClpsYGG2t4Lf1dfNFO4Y45v5Cre1HHLkvCr8RekFGYN6EO
+         vCRxsObt0hQxMUzp9fQHm8MTOeLYcz+DzggKnhxvwEyLboQIvKbzIlUy+KJtZDsP9peL
+         S7DqCscLjhmcvpeEBTagEE6pWO4E5paUl4VyelxuzPRtnO3HCcIN7iYpEpUDMs1ptu8Q
+         hMQ5ZKza0Hf5sTuXCAc1VFbfz9rNNAA0OpeDsHRquBv5TqJv4No9yVi3Qopq/DLyiMJa
+         QxsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714973431; x=1715578231;
+        d=1e100.net; s=20230601; t=1714973432; x=1715578232;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=U8NsbyTwuJobhAQmcgiqFL5cgPms3xpU1WY3K3ROCJw=;
-        b=kPbqrPyrLe6Wiue2sBXWd1uIGszaxQstw1BtFkoR1kMWBp+UJCUtsH79C3x9ICDESY
-         57Qwa9JAlGCUTCP9y4Zmr43fcAixVFTR+r08b42ApewmJWmbxKjCZbI4ryF/tA5vstzl
-         5oBlrQAXAv66r28A9rv7leYEwlbjwcERs6ALPD35LRV1NfkBmfFjKRxJIgcO7Jk44fr3
-         1aAi85rygTEOHSUqqOup3U7YtdnHY7dlEm1VHH2+Rk3OXZ6DjTviVAhkbLPGgf2GHNd9
-         oM02Cn5n1nKlsCFlWTjKJOejUllNTKfj4Lvu5DVbchU3lhs11eACONOEufzqbxW2mO+B
-         zpTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVHXhRcRWvotP6mjhjMxZueG2WGpm3vIoLNpgJrPlP5LVaU/U6e99UcFT21O5/xx1XEMFvj0aSaiPUgezVfUayfr61O
-X-Gm-Message-State: AOJu0YygWDlLXeM5HoOu7LU+O0ApC9UCmCOGZAr3Pi6zY7rqBAL3/CZr
-	EUX3qqS5MVTgUnLfE6nO4+fsh9NgIHljlFgyqwrBKbaGOmNH1Q2X16evHTbAnZ0RQG7w3/lQ5uF
-	h4ys7Tg==
-X-Google-Smtp-Source: AGHT+IHmvVH27HQl/P8w/FpVWvPHsGrMZu+/fj4Rdo3TMiGnLUSHb1D2dIB9PAzUg5StYItR8iyUPuTIsG9m
+        bh=X9eceQ0IPQgvcClpLg9adRP7wmQKiFwD/5KRHzUimqY=;
+        b=iFPzvjefDRNFyQ94Ny0Hcg6nZBJEw8wHdwObXX+IXwOhyyQh80CtxXb39jq0U+ZVpI
+         GtoITXwZ6+TGhMUv2QExm6PFmzR4aCg0lGLmfR9VI+nNqzjqRS1DFSv3X/AjK/IDruUk
+         vL/E0bpWHYq8z7u+rwJ1iEjqlH5pV9eI9GqOlzwhl6X8lg60OFioShrc5yZEa8KDXrVk
+         619fXa6E66gZwS22SPPguhM74mpOpJfANIpILTqmFIfSzZTk5pe+Wvc9aKTiQpYL7h0e
+         FEBapQ5QCMcLxYYc7KEZkC3zfr9CekddGkNIHRThJoxhlWnN0FyjA9CV5uA6EDWtlDY/
+         LXOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwATUNYoZm8Q0vMlQRW8P7suHyM4569djJgI444EAKhKJZJLIlUC6mH3tZOIWbtdNW3PyN2TmHnxWRrFvzl2JXLDF5
+X-Gm-Message-State: AOJu0YyPiSiNiWX0ouRUnNsr8TPyYDTnakxMYaZGzDBdPx/WzdtHAbp2
+	NhKRf3fS4e2vX+wh7AnlNtXbNWk0QW93Ff/3CoR46Jlq5Z1txHZM2oPYpQROBQMd9ymeqHU8paH
+	Fze32rg==
+X-Google-Smtp-Source: AGHT+IEhOZv1p1zs3TnUGO6lf+4CykGiPpB1mkJ4IsXZPJGzL/4mqaPmD0EEMS34GHaQzHMnj1shCFO74F8d
 X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a05:6a00:3904:b0:6ed:95ce:3417 with SMTP id
- fh4-20020a056a00390400b006ed95ce3417mr271076pfb.5.1714973430736; Sun, 05 May
- 2024 22:30:30 -0700 (PDT)
+ job=sendgmr) by 2002:a0d:d90d:0:b0:61b:14af:df5 with SMTP id
+ b13-20020a0dd90d000000b0061b14af0df5mr2514160ywe.10.1714973432656; Sun, 05
+ May 2024 22:30:32 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon,  6 May 2024 05:29:27 +0000
+Date: Mon,  6 May 2024 05:29:28 +0000
 In-Reply-To: <20240506053020.3911940-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240506053020.3911940-1-mizhang@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240506053020.3911940-3-mizhang@google.com>
-Subject: [PATCH v2 02/54] KVM: x86: Snapshot if a vCPU's vendor model is AMD
- vs. Intel compatible
+Message-ID: <20240506053020.3911940-4-mizhang@google.com>
+Subject: [PATCH v2 03/54] KVM: x86/pmu: Do not mask LVTPC when handling a PMI
+ on AMD platforms
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
@@ -93,120 +93,58 @@ Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
 	linux-perf-users@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-From: Sean Christopherson <seanjc@google.com>
+From: Sandipan Das <sandipan.das@amd.com>
 
-Add kvm_vcpu_arch.is_amd_compatible to cache if a vCPU's vendor model is
-compatible with AMD, i.e. if the vCPU vendor is AMD or Hygon, along with
-helpers to check if a vCPU is compatible AMD vs. Intel.  To handle Intel
-vs. AMD behavior related to masking the LVTPC entry, KVM will need to
-check for vendor compatibility on every PMI injection, i.e. querying for
-AMD will soon be a moderately hot path.
+On AMD and Hygon platforms, the local APIC does not automatically set
+the mask bit of the LVTPC register when handling a PMI and there is
+no need to clear it in the kernel's PMI handler.
 
-Note!  This subtly (or maybe not-so-subtly) makes "Intel compatible" KVM's
-default behavior, both if userspace omits (or never sets) CPUID 0x0 and if
-userspace sets a completely unknown vendor.  One could argue that KVM
-should treat such vCPUs as not being compatible with Intel *or* AMD, but
-that would add useless complexity to KVM.
+For guests, the mask bit is currently set by kvm_apic_local_deliver()
+and unless it is cleared by the guest kernel's PMI handler, PMIs stop
+arriving and break use-cases like sampling with perf record.
 
-KVM needs to do *something* in the face of vendor specific behavior, and
-so unless KVM conjured up a magic third option, choosing to treat unknown
-vendors as neither Intel nor AMD means that checks on AMD compatibility
-would yield Intel behavior, and checks for Intel compatibility would yield
-AMD behavior.  And that's far worse as it would effectively yield random
-behavior depending on whether KVM checked for AMD vs. Intel vs. !AMD vs.
-!Intel.  And practically speaking, all x86 CPUs follow either Intel or AMD
-architecture, i.e. "supporting" an unknown third architecture adds no
-value.
+This does not affect non-PerfMonV2 guests because PMIs are handled in
+the guest kernel by x86_pmu_handle_irq() which always clears the LVTPC
+mask bit irrespective of the vendor.
 
-Deliberately don't convert any of the existing guest_cpuid_is_intel()
-checks, as the Intel side of things is messier due to some flows explicitly
-checking for exactly vendor==Intel, versus some flows assuming anything
-that isn't "AMD compatible" gets Intel behavior.  The Intel code will be
-cleaned up in the future.
+Before:
 
+  $ perf record -e cycles:u true
+  [ perf record: Woken up 1 times to write data ]
+  [ perf record: Captured and wrote 0.001 MB perf.data (1 samples) ]
+
+After:
+
+  $ perf record -e cycles:u true
+  [ perf record: Woken up 1 times to write data ]
+  [ perf record: Captured and wrote 0.002 MB perf.data (19 samples) ]
+
+Fixes: a16eb25b09c0 ("KVM: x86: Mask LVTPC when handling a PMI")
 Cc: stable@vger.kernel.org
+Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
+[sean: use is_intel_compatible instead of !is_amd_or_hygon()]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
-Message-ID: <20240405235603.1173076-2-seanjc@google.com>
+Message-ID: <20240405235603.1173076-3-seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/cpuid.c            |  1 +
- arch/x86/kvm/cpuid.h            | 10 ++++++++++
- arch/x86/kvm/mmu/mmu.c          |  2 +-
- arch/x86/kvm/x86.c              |  2 +-
- 5 files changed, 14 insertions(+), 2 deletions(-)
+ arch/x86/kvm/lapic.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 16e07a2eee19..6efd1497b026 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -855,6 +855,7 @@ struct kvm_vcpu_arch {
- 	int cpuid_nent;
- 	struct kvm_cpuid_entry2 *cpuid_entries;
- 	struct kvm_hypervisor_cpuid kvm_cpuid;
-+	bool is_amd_compatible;
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index cf37586f0466..ebf41023be38 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2776,7 +2776,8 @@ int kvm_apic_local_deliver(struct kvm_lapic *apic, int lvt_type)
+ 		trig_mode = reg & APIC_LVT_LEVEL_TRIGGER;
  
- 	/*
- 	 * FIXME: Drop this macro and use KVM_NR_GOVERNED_FEATURES directly
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index bfc0bfcb2bc6..77352a4abd87 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -376,6 +376,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 
- 	kvm_update_pv_runtime(vcpu);
- 
-+	vcpu->arch.is_amd_compatible = guest_cpuid_is_amd_or_hygon(vcpu);
- 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
- 	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
- 
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 856e3037e74f..23dbb9eb277c 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -120,6 +120,16 @@ static inline bool guest_cpuid_is_intel(struct kvm_vcpu *vcpu)
- 	return best && is_guest_vendor_intel(best->ebx, best->ecx, best->edx);
- }
- 
-+static inline bool guest_cpuid_is_amd_compatible(struct kvm_vcpu *vcpu)
-+{
-+	return vcpu->arch.is_amd_compatible;
-+}
-+
-+static inline bool guest_cpuid_is_intel_compatible(struct kvm_vcpu *vcpu)
-+{
-+	return !guest_cpuid_is_amd_compatible(vcpu);
-+}
-+
- static inline int guest_cpuid_family(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpuid_entry2 *best;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 992e651540e8..bf4de6d7e39c 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4935,7 +4935,7 @@ static void reset_guest_rsvds_bits_mask(struct kvm_vcpu *vcpu,
- 				context->cpu_role.base.level, is_efer_nx(context),
- 				guest_can_use(vcpu, X86_FEATURE_GBPAGES),
- 				is_cr4_pse(context),
--				guest_cpuid_is_amd_or_hygon(vcpu));
-+				guest_cpuid_is_amd_compatible(vcpu));
- }
- 
- static void __reset_rsvds_bits_mask_ept(struct rsvd_bits_validate *rsvd_check,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 47d9f03b7778..ebcc12d1e1de 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3470,7 +3470,7 @@ static bool is_mci_status_msr(u32 msr)
- static bool can_set_mci_status(struct kvm_vcpu *vcpu)
- {
- 	/* McStatusWrEn enabled? */
--	if (guest_cpuid_is_amd_or_hygon(vcpu))
-+	if (guest_cpuid_is_amd_compatible(vcpu))
- 		return !!(vcpu->arch.msr_hwcr & BIT_ULL(18));
- 
- 	return false;
+ 		r = __apic_accept_irq(apic, mode, vector, 1, trig_mode, NULL);
+-		if (r && lvt_type == APIC_LVTPC)
++		if (r && lvt_type == APIC_LVTPC &&
++		    guest_cpuid_is_intel_compatible(apic->vcpu))
+ 			kvm_lapic_set_reg(apic, APIC_LVTPC, reg | APIC_LVT_MASKED);
+ 		return r;
+ 	}
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
