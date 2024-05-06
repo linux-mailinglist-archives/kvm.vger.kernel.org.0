@@ -1,133 +1,138 @@
-Return-Path: <kvm+bounces-16666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 719E08BC702
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:37:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D23F8BC70D
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 279A51F23CCD
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:37:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 120D51F2462A
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16481145323;
-	Mon,  6 May 2024 05:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B10386D1A8;
+	Mon,  6 May 2024 05:36:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="N6fvUmSQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CKVr+cM/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2157A144D38
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A255841C62
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:36:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714973530; cv=none; b=d/4MYFu5EiAJGU+w+6PwyeOGDWT4eOYdKhfyKM44Bgbfg1TH+6pcdb7qu2bjdVvb+tHlX3UKwZI670BnnJIrizp5WBIy+AGVGjVmMw0LcrMKNBlvtwI6miVEPuArFgnUF5ADa5Rz6L/kTuzk0+dv3Azs/f+8eb6LzUMVIrNdmKw=
+	t=1714973794; cv=none; b=PbNFGtuEhfD29E9FO2jTd8TEwE7RgAhhCTScX8yUkxEtsH5KFqFBQu+qf+WXi9Gg07PNiLVbQ0vYBjN+zeQ1ZWfoyD7tb2yHXfljDlB+i738uJJqabbLzTxYzUP+T90oXy2Nzv7Hc3/o3cNFiUUbaKbU20NExsoFt87AzFDISW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714973530; c=relaxed/simple;
-	bh=BVEc3GheAMrvPPEiSDpTNWaEswxhgD9hvN+mtoDq/PE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YIldMBDQ+E/3Ow6fAA/v308ms116PtPbd08i9b9jOwqILIWMH93A1xFH65dGu+Yo+9bxy/l8boxvNbi17Vez5eL/paZ5pdMYWf71fFNDO6hUEDiJPuk39XvJWK9FbJpq86rW3a1y45G/ToHUpt7JnLGpnSyxbeL1/gzLQw9SNOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=N6fvUmSQ; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1714973794; c=relaxed/simple;
+	bh=G7CdsgNpfTQRen0iYorRaxR7iwHQ+rJicDUKG3UcIeY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HDo1o/N6H6xTkDe/HWyh7aSRbk5ptYvA0wSI16MUjDfjXigDwLVWzMkiqVxc4k71ceLzGR6WLgsPGXQ54UxJYSr6DbL8gmCZERcshsM/lWHcEvxwFHU7m0sUiig9HxLpzuK1O1C3QbSLaTjo4vtfKGrhfJ/zrx6u9HjUoRvps1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CKVr+cM/; arc=none smtp.client-ip=209.85.218.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b38f8cac9dso2811502a91.1
-        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:32:08 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a599a298990so364596366b.2
+        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:36:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714973528; x=1715578328; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=r0dMbpLuPkp27Z0NYeXAfwk+uuX6GzkvFCu4OKzkqfg=;
-        b=N6fvUmSQJpIJ9NdwabWFmQ08m2n8dwgniGZuQCGQmXt377YDWpFBmO1VGsBKljv3KV
-         xgUfBfNpY20u7vZ3eXUquxpTh6wwWnBUYjszn2mb5mydbMULMaFD/zDMZRkN8XNJh2vU
-         TgpkSXgE6lyFA3ehjuW3p+x+earEG7+SFjNxR3Dfctwr/oQepr9rkiYe4nLtRI+jlJ2N
-         EYVAPMJB4FaU7fSFC2sYOpEoUkvHkJ9eaexvcylENcL3LWYEUrOOAX0B5uXdIyFxf7gN
-         0TwvvKsITy+c1TOixU8Dz2tfnuJz5oYJoUZmNOsRjtVMpNEMu3dzGa4o9TjwTWcqRTP1
-         A39Q==
+        d=google.com; s=20230601; t=1714973791; x=1715578591; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2GWWRLCvakvhhYyd3WrFl6nbheuV8ncCxq9hNwV1fNc=;
+        b=CKVr+cM/+cVSRoGrSZJWtn+aJxlj5FxmfqbjI6Hbavo4PiFkBHT/5EvOij6zxdaW4f
+         bc4ssRBOO8xi1Cy18zK8ZBDULQuzWfthF6hw5Fv8h/1063RK91FZlWZV3sr1Sc26fOOp
+         z9g/JznlkPcxD/JnLvfc41uidAXkfBYx5SMM3bi7zC7pJ9iOP84HvDvxosUbYEKCQNin
+         BH7qokKpYbWhrGzcbJSh6MAv6q/VAoyk+s6s4vG/+6y71RWryt+2n4bjqaEd+pp2mOgl
+         735tF0ZgLDa9GGiuXAXbhR/JQCAcVL0GuaCCJ7fn6glvxChwY5t10GusXJ8KqG+sJRrZ
+         ZpKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714973528; x=1715578328;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r0dMbpLuPkp27Z0NYeXAfwk+uuX6GzkvFCu4OKzkqfg=;
-        b=QlAq8R1jpvnMUGTtKbWNqRQ+MT7gp49PIKsXiWjZgvf1//jEkAdmPLswyKzuzCfpV7
-         WgEuF5mFne9SxGiwxEh6/iuI38WslZCJzzdPI5flr7ebpxZ9+O6YqdL4WdFjH5TVFPoB
-         U6rV6nW7POfAzkn03BPV9+d2Eywlidmn0EeTqrODMcQgHvXhB2UwhtVe/UNAFSibO4Ue
-         ikBCTD75FxoRzPvRtK//VRXxddVikbBs6BrFFmP+7MQJwP72n+8PLjgjujMIbRKl1Sex
-         Y2pO88le7anzfRdfJRyEEdlOMxuNkB9l32GdMJ0ljs/exR/3p9RvEONqKqRUSay3eniu
-         b4IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpy/AYRomZe+ZV0WhZx+aMT3PK1PAqip6bJ1tYEiUWjRsACyefopTi3ESKvJuDATChacPJ+1Fx/0c8/pAgliFROGOP
-X-Gm-Message-State: AOJu0Yx5Q4s3xOQGQbdLVbRJ7buOadNAJquUC/3d9R6opHK1CnFKzC6/
-	DooDH5aPKPZypctZiQ0dNIFFLa1VPuW6GbvZVACjeeOTg1TE8ijwwr2V49ygWd8/g3bN/tp4UQX
-	SKpFPHw==
-X-Google-Smtp-Source: AGHT+IHEVIsC3OzLcKPgw25unnky+n+wjQaLNtSetm/7/zKes1bE9kZoM4IWaLd7BdgQxrlqRoWjj60+LZyI
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a17:90a:9f83:b0:2b2:7ca7:a217 with SMTP id
- o3-20020a17090a9f8300b002b27ca7a217mr53260pjp.4.1714973528312; Sun, 05 May
- 2024 22:32:08 -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon,  6 May 2024 05:30:19 +0000
-In-Reply-To: <20240506053020.3911940-1-mizhang@google.com>
+        d=1e100.net; s=20230601; t=1714973791; x=1715578591;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2GWWRLCvakvhhYyd3WrFl6nbheuV8ncCxq9hNwV1fNc=;
+        b=ZNcxu8LFqVm7HavMrBR5eXmjLUnmvapHizB8JbjZYILRFcfEoK7lC+PxSo6dGOtN11
+         AyjnemkIBhTXnPAGVcKrSMjwohzkDwH78tARiopQyx3SdG8MqPpiw9PwEGVnXuaYbvRO
+         P9oUwE4Jtbe70MhEjgV67Tf1iLoxoPtAusbnZnXhdtr3aWJVnDXK3Kk732FBNvSq9PgI
+         9fnZdOpmbWkmupOvVvXInEdr77KbpNW1uW07Ea7gJR7h9CCoqSj5Hd7FRcqgvvsgoncS
+         zixsCIhkRV1mb8lm4C4C8O5qG7Fe3m2ddeu9ApWXrGYtvVQoH1b3jyb55rF89qxg/VUR
+         /GBA==
+X-Forwarded-Encrypted: i=1; AJvYcCXDE9erFXyY6XUoFs22pkB9+xgEBCLhhHbwx9pMhAvAoBGCc1S1tgWoVTf3wZsuGnz7v7LE3mMWEJJcvRvAQ1HJysQt
+X-Gm-Message-State: AOJu0Ywohjyl5ZFkMXSQHkNfOZ9pNefhJZSofKAgY03CN64rypG3B1R8
+	ebQtgznPWuu5cUhrbBVjl89EAz3u6lFFxOceCi5/4krlipiTREKKi6dPaxuOt3zeEa+rqC5psWj
+	Bic8nhyKo+yhR8uYmhMkhOUWkvEgFnf9yhYeZMtPZKy0LJ9deyTwI
+X-Google-Smtp-Source: AGHT+IFH75j9Jfg4XNOvXjKUn+IO0imz46ymW5Bese8YTjt3itWQfNiQUeA6Kp+fVGIfekoSHg3Y4Xw08O/aZkSMJsE=
+X-Received: by 2002:a17:907:7212:b0:a59:bde5:398 with SMTP id
+ dr18-20020a170907721200b00a59bde50398mr2638397ejc.14.1714973790923; Sun, 05
+ May 2024 22:36:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240506053020.3911940-1-mizhang@google.com>
-X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240506053020.3911940-55-mizhang@google.com>
-Subject: [PATCH v2 54/54] KVM: x86/pmu/svm: Wire up PMU filtering
- functionality for passthrough PMU
+MIME-Version: 1.0
+References: <20240430005239.13527-1-dapeng1.mi@linux.intel.com>
+ <CAL715WK9+aXa53DXM3TP2POwAtA2o40wpojfum+SezdxoOsj1A@mail.gmail.com> <22b52180-27a2-4df8-a949-401f73440641@linux.intel.com>
+In-Reply-To: <22b52180-27a2-4df8-a949-401f73440641@linux.intel.com>
 From: Mingwei Zhang <mizhang@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
-Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>, 
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, 
-	Mingwei Zhang <mizhang@google.com>, gce-passthrou-pmu-dev@google.com, 
-	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
-	Yanfei Xu <yanfei.xu@intel.com>, maobibo <maobibo@loongson.cn>, 
-	Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
+Date: Sun, 5 May 2024 22:35:54 -0700
+Message-ID: <CAL715W+JTyba76u5BdqHi2u7iBObbBp8cEr42oqm6HWthb_4pg@mail.gmail.com>
+Subject: Re: [PATCH 0/2] vPMU code refines
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>, 
+	Xiong Zhang <xiong.y.zhang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>, 
+	Dapeng Mi <dapeng1.mi@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Manali Shukla <manali.shukla@amd.com>
+On Sun, May 5, 2024 at 6:37=E2=80=AFPM Mi, Dapeng <dapeng1.mi@linux.intel.c=
+om> wrote:
+>
+>
+> On 5/1/2024 2:15 AM, Mingwei Zhang wrote:
+> > On Mon, Apr 29, 2024 at 5:45=E2=80=AFPM Dapeng Mi <dapeng1.mi@linux.int=
+el.com> wrote:
+> >> This small patchset refines the ambiguous naming in kvm_pmu structure
+> >> and use macros instead of magic numbers to manipulate FIXED_CTR_CTRL M=
+SR
+> >> to increase readability.
+> >>
+> >> No logic change is introduced in this patchset.
+> >>
+> >> Dapeng Mi (2):
+> >>   KVM: x86/pmu: Change ambiguous _mask suffix to _rsvd in kvm_pmu
+> > So, it looks like the 1st patch is also in the upcoming RFCv2 for
+> > mediated passthrough vPMU. I will remove that from my list then.
+>
+> Mingwei, we'd better keep this patch in RFCv2 until the this patchset is
+> merged, then we don't rebase it again when this patch is merged. Thanks.
+>
 
-With the Passthrough PMU enabled, the PERF_CTLx MSRs (event selectors) are
-always intercepted and the event filter checking can be directly done
-inside amd_pmu_set_msr().
+yeah. too late. I don't want to have a duplicate patch in LKML. On the
+other hand, you could have waited a little bit before sending this
+one. Next time, coordinate with us before sending.
 
-Add a check to allow writing to event selector for GP counters if and only
-if the event is allowed in filter.
-
-Signed-off-by: Manali Shukla <manali.shukla@amd.com>
----
- arch/x86/kvm/svm/pmu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 9629a172aa1b..cb6d3bfdd588 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -166,6 +166,15 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		if (data != pmc->eventsel) {
- 			pmc->eventsel = data;
- 			if (is_passthrough_pmu_enabled(vcpu)) {
-+				if (!check_pmu_event_filter(pmc)) {
-+					/*
-+					 * When guest request an invalid event,
-+					 * stop the counter by clearing the
-+					 * event selector MSR.
-+					 */
-+					pmc->eventsel_hw = 0;
-+					return 0;
-+				}
- 				data &= ~AMD64_EVENTSEL_HOSTONLY;
- 				pmc->eventsel_hw = data | AMD64_EVENTSEL_GUESTONLY;
- 			} else {
--- 
-2.45.0.rc1.225.g2a3ae87e7f-goog
-
+Thanks.
+-Mingwei
+>
+> > Thanks. Regards
+> > -Mingwei
+> >
+> >>   KVM: x86/pmu: Manipulate FIXED_CTR_CTRL MSR with macros
+> >>
+> >>  arch/x86/include/asm/kvm_host.h | 10 ++++-----
+> >>  arch/x86/kvm/pmu.c              | 26 ++++++++++++------------
+> >>  arch/x86/kvm/pmu.h              |  8 +++++---
+> >>  arch/x86/kvm/svm/pmu.c          |  4 ++--
+> >>  arch/x86/kvm/vmx/pmu_intel.c    | 36 +++++++++++++++++++-------------=
+-
+> >>  5 files changed, 46 insertions(+), 38 deletions(-)
+> >>
+> >>
+> >> base-commit: 7b076c6a308ec5bce9fc96e2935443ed228b9148
+> >> --
+> >> 2.40.1
+> >>
 
