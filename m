@@ -1,239 +1,281 @@
-Return-Path: <kvm+bounces-16611-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16612-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 378308BC698
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 06:49:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C06F28BC6C5
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 368EDB2126D
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 04:49:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FBFD281757
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3919C47F4A;
-	Mon,  6 May 2024 04:49:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5418F47F69;
+	Mon,  6 May 2024 05:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="aB2+YbNy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G4rfta4O"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2076.outbound.protection.outlook.com [40.107.212.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2339345943;
-	Mon,  6 May 2024 04:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714970963; cv=fail; b=Tk38plm1/v6Eagy+/PDvJJUU9x6PCuWP1OiNPrrJ/lb9bsEwaKgqYDW0Be48VdDW8/F7MR46Il7LHKL1cnFc048WzLhl/FOZCdA9fn2njoWc61twNfrvp8BRX5IC2sgO2FRrsh5fhR3wb6Xo/LK7g1gJ+qJMtNncAZ9TBG/XtBc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714970963; c=relaxed/simple;
-	bh=mfB8NTYkh/wTP/xKaBKwLTj1+Z4KkYqahvSPCA+U+Bk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kd4mErIT7dmBOIEqrWykNw6IbaHIgEI96ch1lAPk0JoXZw2yQN+m+bU4ZAtT26viPUZG+Yh4DJcP2ZVSKpmUcaV13aljS5lkqgVBeql/RNRq+ry6v5KDKBy8gCkIKcnAMfrbi7zijGaJ/50zmJd0riOe1MV3kf9OPREM0+JGcL4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=aB2+YbNy; arc=fail smtp.client-ip=40.107.212.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UidfyqCoorawTeflRliugvWejv/KNuql6xuX6ll2GpC2eCVNYHWCqLw4jNkIaFJnfoxCP8xl46IBWp/ZhQaH0QwoEx2+qMouafOlfAlFz5Dy3N5XhMKLrySXpz/cz6tB4nBJ63l5a1spYlcBlE4pCngXuXHFbUJV+YzlPbAQIg6aipJDpKIW7csdzWe+xZN5gqiFEOAMTJsB7eIVbO8Pc8GZxHp5EF2Enrru6GVPKDK159qM5IABZUQDs6yE2Fk77rDYo0aIhF+O3ZAXiPJXZ1WGLnz/MtgjOhTYJysglbpoXUNqsRmW189BE3Nd9jG/S2tf4urvC1dwGMn8fC/eAg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cKZvdIFbpRou2pU9PEf2THyxHuMdbtsqpHz4hveELvw=;
- b=GdOgtMA4J3u3V8rqxWWPF/R+ZDlkE3R5o6dhx90/zM4Wc4VgVMMU3P3a85Jf5lDYVptbs/OTqDBAU4fiNNxyNjpDedcEXYpQDwfjIFrHxZyplsNaekbQVEJQK+t4nPIROa1T/EW1gB16TQO3Z7Qbz6qvds7ASZwdGJym+PrIuKwNIQnZfbWOoaVmT+0+pDCiKvRWHazXAILFabVmumRqZ+XI5uwxdN5edDXAD+LPS2WDnxbf9lm5AY06bbHj5LGiTyq6GA6O4nwtpunaMv/FA8v/XwYoY7lkacM8m6qh3tmhwPiJVmPj3fLzJm18UD4ZJ2mvnMJ+xy4zN4Z7ZIRB6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cKZvdIFbpRou2pU9PEf2THyxHuMdbtsqpHz4hveELvw=;
- b=aB2+YbNy5J83rmNF7Xt7zzq4LlpeAWH2yYbGLh6UJfZFY4MGOZHX40Z8Q8fiNLbVlwg5RXKiQa2Ti3oC2whf0B25IRomxk9MQS7yw1nd53a5vixbbRwXURL6dMR/AslL0oPs4L5EWax+Bz5K+OReQvVx4z9f696UwZ+MaowJbg8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH7PR12MB6588.namprd12.prod.outlook.com (2603:10b6:510:210::10)
- by DM4PR12MB6566.namprd12.prod.outlook.com (2603:10b6:8:8d::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.39; Mon, 6 May
- 2024 04:49:16 +0000
-Received: from PH7PR12MB6588.namprd12.prod.outlook.com
- ([fe80::5e9c:4117:b5e0:cf39]) by PH7PR12MB6588.namprd12.prod.outlook.com
- ([fe80::5e9c:4117:b5e0:cf39%5]) with mapi id 15.20.7544.041; Mon, 6 May 2024
- 04:49:16 +0000
-Message-ID: <9252b68e-2b6a-6173-2e13-20154903097d@amd.com>
-Date: Mon, 6 May 2024 10:19:05 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH v2] KVM: SEV-ES: Don't intercept MSR_IA32_DEBUGCTLMSR for
- SEV-ES guests
-To: Sean Christopherson <seanjc@google.com>
-Cc: pbonzini@redhat.com, thomas.lendacky@amd.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
- hpa@zytor.com, michael.roth@amd.com, nikunj.dadhania@amd.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, santosh.shukla@amd.com,
- Ravi Bangoria <ravi.bangoria@amd.com>
-References: <20240416050338.517-1-ravi.bangoria@amd.com>
- <ZjQnFO9Pf4OLZdLU@google.com>
-Content-Language: en-US
-From: Ravi Bangoria <ravi.bangoria@amd.com>
-In-Reply-To: <ZjQnFO9Pf4OLZdLU@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0248.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:21a::19) To PH7PR12MB6588.namprd12.prod.outlook.com
- (2603:10b6:510:210::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9F840847
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1714973429; cv=none; b=KcykDfFd4/Vd9pLh+f58Zq+3Nj8BLMDDkVt+xFK1ceHzVmIqzBTKGVi1/XuY0rQp0jIQ8aF2ufJUWjX5CxMY0T/aW679mIDMe7LD8URh5c/uQSq6KViIOhT9zS7ZsItmVkqt6JeCTtUkvA37tu/LIsJSykk+/XtpNrwoO5aNKL4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1714973429; c=relaxed/simple;
+	bh=8klybuOjTZHZ/FbpxQbeoYlXPCecxwX52rCVffBpENY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X807LdEHVK+iyMz1g5pXoruLIzQd6+ZFJJXmBWj5kZF92lbxZEaUTNtV98KVCChMKxuNapK3oqJw6ITxFGI15qnJCtNRXGZl+KCsWEdNfkmSpSKlAtABKiSCvWl7BxckJA8Yqgna0TKIRUmTSIh8WJIJ5+1BlcskXnuYD4u3W34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G4rfta4O; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b413f9999eso1184534a91.1
+        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:30:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1714973427; x=1715578227; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HTsozWncuu3/k1xPpYFeOsw/JjW5F1S9IK8z9IeMfA0=;
+        b=G4rfta4ONh2CtLL4vLaVYfDgyf+5kdq28t5Txc1Ngpkj1g/D/3k0Rtd2fEOeN4NlqD
+         xVk2KqD3YLHfrsjBCHvuLvIfIqRV+t6QGFtKsC6aO0QaHSBhlBMTWj/aR8uVU7AciZlA
+         VodTcY+AufX/rrdawriGcAJgD3MKygETfg3FDgDif9WAIPhYtnuHBfUYW7yca21qLyjA
+         rRkJy/qhQPDLVWaOl3aTHcCDi9Qbv7NLSEmtAxixUoMQ7auH3Hqz21Kun+0TxIueQcmL
+         mt05rOhCOM3EYFdIA4N4udeJg+2nNUMzsGY6mczwKRPEcib5Gdw8C6iQx6JbfVoxPRM5
+         jqyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1714973427; x=1715578227;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HTsozWncuu3/k1xPpYFeOsw/JjW5F1S9IK8z9IeMfA0=;
+        b=M8nECe+kLmIyRlJFmGHbmxUVP79Zun9dfsaOle++MmcH3bYrevrXdn0vW8WsRO4l+D
+         6eHjTcGsKa9A0v2t/7wobgORxyNXfuL/o6v3+Arr2zYiuU0AV+aa125A2gQIEE/WD4Qm
+         hrZrNf1Tj7z4JyysM1HLyBEJuO3MCI/hDV5piXmmabPkDrsXAXh4Kz3cbEWQUDXEJaEv
+         V9o4oOUJYnSWJvBu6c248ZpEV44RqEwfHKR391/WODVZLpRyaoFF91EZgzgnxi4S8ID7
+         nkRQJjFeBS/ZrjjzGWKzHX4AUTZmXH6YJcjiR51Uwc2oOcYkO3yHgV8iSZZ4B1enDzy3
+         hAZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWHbdjJsJkeaVzbRvy6MNYOabcJfO5If+dgpsLl1ZwfvqBZKq+gAOLWLSQtQ2ZC2ECrG5opWUWPdr8W/RTlpaJPku4s
+X-Gm-Message-State: AOJu0YwUA1KuTI7VODxyzunALZiTm5hEwMqLOgPCG42BEmcy16xhrhod
+	AJEekazE1303L3fT/qT1kJP/anbTGw6Tt9Ld70sWuTO2W5v63sBILyvIeUkBr1VMe7D7lg+IneW
+	PmLiCaA==
+X-Google-Smtp-Source: AGHT+IEI8+8euR0WlnAdmtVWp76yu8WH7m4NaT/I67wDvpnu7xMO3AMRSIfUFM6Pkd0MEmWMMCmW96nfq7CO
+X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
+ job=sendgmr) by 2002:a17:90b:4016:b0:2ac:39d9:dd2e with SMTP id
+ ie22-20020a17090b401600b002ac39d9dd2emr35978pjb.0.1714973426003; Sun, 05 May
+ 2024 22:30:26 -0700 (PDT)
+Reply-To: Mingwei Zhang <mizhang@google.com>
+Date: Mon,  6 May 2024 05:29:25 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH7PR12MB6588:EE_|DM4PR12MB6566:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2cf128c0-9efd-428f-628d-08dc6d87e25e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|366007|7416005|1800799015;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Ymp5blZFSGFGL0x2eE9BWmlnVkQ4ZkxKVEpSVkNLeG4zd2MwWVpVcUdIUmJt?=
- =?utf-8?B?M1NpREVhNTZ2MWROaCtlQ1poMmpvZno2cGhwbEhvOUQ0aTN4cmJ4amJkSW1x?=
- =?utf-8?B?akJJeE5nbEtWdUNYbjlJdm9jVXl6M09GUTlScDhuYjNSbTV5cXVUdVhabDVD?=
- =?utf-8?B?dHJGL2doSVFIUGZxcS90THRxbW05Z0JJZmR6M3I5VmhONGtvaDQ5MkpuK1NS?=
- =?utf-8?B?UkJoTXc0VVpvdTdIaHVyNVZMSVhyaU9IT3hTaVduY1pTWG5mcE9XNnRSS0pp?=
- =?utf-8?B?amdCZURFbDZudWJqczNLMnF1MWY0dm5SNmtNMjhTcnN2eEFKZVdQTnRWL0pl?=
- =?utf-8?B?N285SGRqNm9yUHM3aWhzd2VKZUlPd05NdzJEcTFhdkZ2eXByODZFVXhieGk3?=
- =?utf-8?B?SXRzM3REWFd3aXN5TGpSUXNpclRQVEhxby9PekVsT3I5UWpxZy80ejZIVmNu?=
- =?utf-8?B?YXFFRFBTeXRzMlRzUlUzY25qNXVJOVo0blhKNENBWDd6K1JNZmtHbGlGZ0w5?=
- =?utf-8?B?ZlMyVlIwMnA5Y1dyOU5TZVpiK0MvdWZUNDljNVZmcGwvZUFmRDdTaTBSbXlE?=
- =?utf-8?B?T3pqRHhrNWZXc1dWVy9QUE56QzFZNHpIMS9URTN1ZkRuVndzS0hkVTYvVXNE?=
- =?utf-8?B?VVB6end3aW1iSFp2U2kvazhldlRWY3NjRGR3VXlSQzFIc1VCeVZmZFZZd24r?=
- =?utf-8?B?ODl3UlQ4VVhSMjlUUnJRMEQvMmtjRnAvYW1UR3JZR0NmWi9jRXVZV2lFWHFD?=
- =?utf-8?B?YVdSdXYxZ2c5amFSNHd5Wk5LTCs5cGRRLzkwSTNnMU1ZbXpsbXFIQkRIWktD?=
- =?utf-8?B?KzgraG14ZEFXVHJzSXovVTVuZW5MaDRZaUNISUJROFhpaU9rL2Zxa1YvSVpn?=
- =?utf-8?B?enBBRDgzN0Q5REw0M0FxdVhZY3hjb0N1NDkvZ1V3VU5CWnRNWDdmSmFSb3NH?=
- =?utf-8?B?eUlZY0w2Nk9oVFJrZ0RSZGFJZXlXQ1A3UTlWL0dLOU9NYkUvaU9jWW8rdEFZ?=
- =?utf-8?B?S1RRZjdHYVRnZVg4em9oMnhza3RjNXd4QXNrWGtsQTZnWlVRdjlVV3ljd1Bv?=
- =?utf-8?B?VkpDMEVaQ3VnUThEMk5LOFZqZ08vZk1LNXN6cWxLaENkcDFwaTM2STA4YkJ3?=
- =?utf-8?B?eERYMEF1WGtCSHJFbDBYOUR4ZzQ3QVkzdUsvZ2JURXFMcDZnbkFNcndmdUZK?=
- =?utf-8?B?cTRnSmNQNis4cW1RTS94T2Q2Mlc3ZjVFWDhqQnlMTHhTNUJHeGhiTEU0ajlJ?=
- =?utf-8?B?YjJHQjZyaFRJK3dvTWY5eTZ6bEJIY1JoY1NhS0Y1eitjK0dnbnMwYU9xbS9I?=
- =?utf-8?B?SnF0bHE3TWhaRU5QYjg4YXlXTjZ6MnhpTUdwZ04rQjI1LzVzSWl1a2IvVWZ3?=
- =?utf-8?B?RVBhTWlzMkt1L3ZnY3Z3YzF2MU4za0JQdE5BVGtWZGhaZFFBNzFmK3grZUxZ?=
- =?utf-8?B?c2h6MXJwRTBvUmxJODhSRmkvR3BXd2ZyZDVXM0hQOFhrOTJuNWlhZVRXbjJU?=
- =?utf-8?B?Qy8xSkFkbU1BK3VxcmhVMTFwd2V0VElxWGpUQ2VNNm1zNEZYMjBLR3R5L3Uw?=
- =?utf-8?B?RUowdXhjeEh5bnE4QjJRKzZwMzhBaXdUTkJoMzNXRVlEQ0xNa0JUTXRxN3VL?=
- =?utf-8?Q?IhJlh0SjgH3p+4m40/RTeVhUpsXSWPVewOZb32OMo5FY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB6588.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(7416005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZG5ua29ja0piOStLMEovRlRPTHVOd0JnSnI2ZVVqY1krUHlKb2dOSmpSWDlp?=
- =?utf-8?B?L2Qva2xmVEdRdUc3Z1RnTWgwYzZ5aGE5UVVMbW4raFhvR3JTZjdrNktuNWUz?=
- =?utf-8?B?NTJGeGdPU2RkVzh0TGwvd0xPVnFVUlJCZWpWbUVnUDQzeUJocmx5SHFaMUp6?=
- =?utf-8?B?UHRQOGpnanRibDcrZTFJK2l2T2NsM1h5WjdjZjNXTnBnVi9iN3JJT0t5ekJm?=
- =?utf-8?B?UVJsblowbjRCVGtjanVaSk5EWnZTOUxxRWNSeE5VM25PbkxSUlVKVFFwZ2g3?=
- =?utf-8?B?bUc1Rzl3Z29HN0VIcktObzVVSC9uWlFJRzdMK2U5WDF3SklPVFlVdVZZdEZ3?=
- =?utf-8?B?WVlST05kbGtUeTZKSFZKS3kzMDBXQkJrTmh6U3hzTm9pMlBBUmdpTlNxaXpr?=
- =?utf-8?B?VGlTNnVReWFVNGRla1RmeXZXWS81bC9NeUhDUkV3V1oxVHpBVEp5OERhR1Bk?=
- =?utf-8?B?ME43L3FhWFRyc1grZ3Q4VEE1SVloYWsxL1hxWnlmTXQ4SkhmbE13b3YydnpE?=
- =?utf-8?B?Q25kenFEbFhrQ1NOcXQzeXY0NkF4WVlvUmFRM1AxbnY3Q2xzM2Jhb01zUXBH?=
- =?utf-8?B?eTJPVThkaGJzYjAweGJUaGRXVmtLc3NsMStBWjBRbk96ZWYrOEFwTHFZMFI1?=
- =?utf-8?B?dkJVTlZWMld5dmVlOFlRUU1ZUW5rV2RGclBGOUE5US9FcDJrMXBEVVk1KzRM?=
- =?utf-8?B?RzFybjY5eUlzRHovUTVHM3MwcHFzNlE1NVlIWFVwc1hCR2laSi9jYVJ0cEZS?=
- =?utf-8?B?d0JxRlBoNnBOQmlURyt4QmxsZnc1UklqLzNUeDRGUlNjMjdvT09yejRkQXhQ?=
- =?utf-8?B?ci85R3Z1YjBKQjc3dkNXQ2tsZ3FNL0Y4QVJWYUR4WGl6c2dUaDhRc05uODNQ?=
- =?utf-8?B?UHI4VC9iM2J5ejhhSkc4THdUNjRYZ3VvN1VCRHFQeDdsZ0lmWUxjVkZOOXIr?=
- =?utf-8?B?bElGV1h5L0xYeEVwZVRPOVZJakVGK0ZGMFZveG80RkFFT2FndTg2WU1USzVt?=
- =?utf-8?B?ZmRmcXFqNTltZytndlBuS0pDcG9ueExnYXZSV2hWR0k3NFUyZTFJcHF6a3N5?=
- =?utf-8?B?R0I0dldjWDBwbFdtNW96UW45M25iUGQ2eTNhYnlHNkQxWFBQOUdTd2J6MXVD?=
- =?utf-8?B?MDVKd0ZLOVJlYXJjMysrOTRhdW1DaDRiQ096eWM3bUtscFRIYk1IbXZLR0Vu?=
- =?utf-8?B?cjRueTlFdjhwVmZkTmxsL1E0Q2FHL2VnWGNMME4yM0VNYy9UYVgwWEtmdHRs?=
- =?utf-8?B?bEcwZCtkSWNLQXdZb1NvRjZDQTc2QVhWV2VlL0c3SXBINWxUbm1mSXJVU2o1?=
- =?utf-8?B?d041NTl6SURaSHVOang3WUFTcW5jYkRmNWNvNWc0bmkrTll6ZG5FeHJxT0hq?=
- =?utf-8?B?TTMwU1d6KzFYTlRWR1RBOFh0dld5V1N0V2p3U1hxNHRINGUrbUdsenVSM3ZW?=
- =?utf-8?B?SUxDYkdueU9OL3pIMkhsdU1JeDlIWXB5Um54UnBNSVNWZFp2c0wrYUV1b3dG?=
- =?utf-8?B?LzE5MHlVSW44SW5rR1lYUHRJd0N3M0YyVnFCdnVjcTFhd2VXY25hQmdQTFpP?=
- =?utf-8?B?K2pGY3lMTVZWYlVsNmRJMVJtSGt1WGQyb2Jrb1cwZEx0TlUwMmlickhBVjJp?=
- =?utf-8?B?TEpJcVFNK203bnNZR3ZyaXZJQ3NEZ0RZK1RxV1A1dkNlbHNiRVgvMW04a0g1?=
- =?utf-8?B?Z3FiVnJKb1JLYXVlMGpxTDc4UlRxU2lQN3lHK3pFa01WQkVyV2twSWI1VzBu?=
- =?utf-8?B?aGU1OE0rLzNEaGlvVU10OUtoeXJpRFVERlpLck93NUVqajRQcWcxUDQxbklx?=
- =?utf-8?B?TjRoNW4vempOQ2xGT0pWZGk3UENqZ0hwUWd2N3QwcHovcHZKZ0ZHVU9heVZH?=
- =?utf-8?B?aWJyaHZ5Qi83cWV0QXBqNnZVWFNRZjA3aGpwL1M0MU5Od1drREh0OEdVMkJY?=
- =?utf-8?B?K2FpMWNiM041L1lOL0JqdFJmQkZxQTNxS2xQNEFlV3BucHlYZzJpSXdpbmdQ?=
- =?utf-8?B?WDgrRFhmOHBjQ3dFOU5scDRKOS9UaGwvN1BlUHVUL0FUWllrMEptVWM4UGgw?=
- =?utf-8?B?eHhwT2ozQzl4WFhoZmxnU2Uvcy9TUjVGYlByTzEyYUdpcUF0dkFPNnpzaGtZ?=
- =?utf-8?Q?7riaYcDkqkmskU2pGcuQliNFv?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2cf128c0-9efd-428f-628d-08dc6d87e25e
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB6588.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 May 2024 04:49:16.7213
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3gqdTAAnt7Zmr+5dIXmfg89LZ2pHQ3g5xjrkMRa8Smrzy3iGZOpUbc+Gx4HbcKr+AGpazgYKlCP/Y4QmkQoCPA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6566
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
+Message-ID: <20240506053020.3911940-1-mizhang@google.com>
+Subject: [PATCH v2 00/54] Mediated Passthrough vPMU 2.0 for x86
+From: Mingwei Zhang <mizhang@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
+	Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
+Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>, 
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, 
+	Mingwei Zhang <mizhang@google.com>, gce-passthrou-pmu-dev@google.com, 
+	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
+	Yanfei Xu <yanfei.xu@intel.com>, maobibo <maobibo@loongson.cn>, 
+	Like Xu <like.xu.linux@gmail.com>, Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 03-May-24 5:21 AM, Sean Christopherson wrote:
-> On Tue, Apr 16, 2024, Ravi Bangoria wrote:
->> Currently, LBR Virtualization is dynamically enabled and disabled for
->> a vcpu by intercepting writes to MSR_IA32_DEBUGCTLMSR. This helps by
->> avoiding unnecessary save/restore of LBR MSRs when nobody is using it
->> in the guest. However, SEV-ES guest mandates LBR Virtualization to be
->> _always_ ON[1] and thus this dynamic toggling doesn't work for SEV-ES
->> guest, in fact it results into fatal error:
->>
->> SEV-ES guest on Zen3, kvm-amd.ko loaded with lbrv=1
->>
->>   [guest ~]# wrmsr 0x1d9 0x4
->>   KVM: entry failed, hardware error 0xffffffff
->>   EAX=00000004 EBX=00000000 ECX=000001d9 EDX=00000000
->>   ...
->>
->> Fix this by never intercepting MSR_IA32_DEBUGCTLMSR for SEV-ES guests.
-> 
-> Uh, what?  I mean, sure, it works, maybe, I dunno.  But there's a _massive_
-> disconnect between the first paragraph and this statement.
-> 
-> Oh, good gravy, it "works" because SEV already forces LBR virtualization.
-> 
-> 	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
-> 
-> (a) the changelog needs to call that out.
+In this version, we added the mediated passthrough vPMU support for AMD.
+This is 1st version that comes up with a full x86 support on the vPMU
+new design.
 
-Sorry, I should have called that out explicitly.
+Major changes:
+ - AMD support integration. Supporting guest PerfMon v1 and v2.
+ - Ensure !exclude_guest events only exist prior to mediate passthrough
+   vPMU loaded. [sean]
+ - Update PMU MSR interception according to exposed counters and pmu
+   version. [mingwei reported pmu_counters_test fails]
+ - Enforce RDPMC interception unless all counters exposed to guest. This
+   removes a hack in RFCv1 where we pass through RDPMC and zero
+   unexposed counters. [jim/sean]
+ - Combine the PMU context switch for both AMD and Intel.
+ - Because of RDPMC interception, update PMU context switch code by
+   removing the "zeroing out" logic when restoring the guest context.
+   [jim/sean: intercept rdpmc]
 
->  (b) KVM needs to disallow SEV-ES if
-> LBR virtualization is disabled by the admin, i.e. if lbrv=false.
+Minor changes:
+ - Flip enable_passthrough_pmu to false and change to a vendor param.
+ - Remove "Intercept full-width GP counter MSRs by checking with perf
+   capabilities".
+ - Remove the write to pmc patch.
+ - Move host_perf_cap as an independent variable, will update after
+   https://lore.kernel.org/all/20240423221521.2923759-1-seanjc@google.com/
 
-That's what I initially thought. But since KVM currently allows booting SEV-ES
-guests even when lbrv=0 (by silently ignoring lbrv value), erroring out would
-be a behavior change.
+TODOs:
+ - Simplify enabling code for mediated passthrough vPMU.
+ - Further optimization on PMU context switch.
 
-> Alternatively, I would be a-ok simply deleting lbrv, e.g. to avoid yet more
-> printks about why SEV-ES couldn't be enabled.
-> 
-> Hmm, I'd probably be more than ok.  Because AMD (thankfully, blessedly) uses CPUID
-> bits for SVM features, the admin can disable LBRV via clear_cpuid (or whatever it's
-> called now).  And there are hardly any checks on the feature, so it's not like
-> having a boolean saves anything.  AMD is clearly committed to making sure LBRV
-> works, so the odds of KVM really getting much value out of a module param is low.
+On-going discussions:
+ - Final name of mediated passthrough vPMU.
+ - PMU context switch optimizations.
 
-Currently, lbrv is not enabled by default with model specific -cpu profiles in
-qemu. So I guess this is not backward compatible?
+Testing:
+ - Testcases:
+   - selftest: pmu_counters_test
+   - selftest: pmu_event_filter_test
+   - kvm-unit-tests: pmu
+   - qemu based ubuntu 20.04 (guest kernel: 5.10 and 6.7.9)
+ - Platforms:
+   - genoa
+   - skylake
+   - icelake
+   - sapphirerapids
+   - emeraldrapids
 
-> And then when you delete lbrv, please add a WARN_ON_ONCE() sanity check in
-> sev_hardware_setup() (if SEV-ES is supported), because like the DECODEASSISTS
-> and FLUSHBYASID requirements, it's not super obvious that LBRV is a hard
-> requirement for SEV-ES (that's an understatment; I'm curious how some decided
-> that LBR virtualization is where the line go drawn for "yeah, _this_ is mandatory").
+Ongoing Issues:
+ - AMD platform [milan]:
+  - ./pmu_event_filter_test error:
+    - test_amd_deny_list: Branch instructions retired = 44 (expected 42)
+    - test_without_filter: Branch instructions retired = 44 (expected 42)
+    - test_member_allow_list: Branch instructions retired = 44 (expected 42)
+    - test_not_member_deny_list: Branch instructions retired = 44 (expected 42)
+ - Intel platform [skylake]:
+  - kvm-unit-tests/pmu fails with two errors:
+    - FAIL: Intel: TSX cycles: gp cntr-3 with a value of 0
+    - FAIL: Intel: full-width writes: TSX cycles: gp cntr-3 with a value of 0
 
-I'm not sure. Some ES internal dependency.
+Installation guidance:
+ - echo 0 > /proc/sys/kernel/nmi_watchdog
+ - modprobe kvm_{amd,intel} enable_passthrough_pmu=Y 2>/dev/null
 
-In any case, the patch simply fixes 'missed clearing MSR Interception' for
-SEV-ES guests. So, would it be okay to apply this patch as is and do lbrv
-cleanup as a followup series?
+v1: https://lore.kernel.org/all/20240126085444.324918-1-xiong.y.zhang@linux.intel.com/
 
-PS: AMD Bus Lock Detect virtualization also dependents on LBR Virtualization:
-https://lore.kernel.org/r/20240429060643.211-4-ravi.bangoria@amd.com
 
-Thanks for the review,
-Ravi
+Dapeng Mi (3):
+  x86/msr: Introduce MSR_CORE_PERF_GLOBAL_STATUS_SET
+  KVM: x86/pmu: Introduce macro PMU_CAP_PERF_METRICS
+  KVM: x86/pmu: Add intel_passthrough_pmu_msrs() to pass-through PMU
+    MSRs
+
+Kan Liang (3):
+  perf: Support get/put passthrough PMU interfaces
+  perf: Add generic exclude_guest support
+  perf/x86/intel: Support PERF_PMU_CAP_PASSTHROUGH_VPMU
+
+Manali Shukla (1):
+  KVM: x86/pmu/svm: Wire up PMU filtering functionality for passthrough
+    PMU
+
+Mingwei Zhang (24):
+  perf: core/x86: Forbid PMI handler when guest own PMU
+  perf: core/x86: Plumb passthrough PMU capability from x86_pmu to
+    x86_pmu_cap
+  KVM: x86/pmu: Introduce enable_passthrough_pmu module parameter
+  KVM: x86/pmu: Plumb through pass-through PMU to vcpu for Intel CPUs
+  KVM: x86/pmu: Add a helper to check if passthrough PMU is enabled
+  KVM: x86/pmu: Add host_perf_cap and initialize it in
+    kvm_x86_vendor_init()
+  KVM: x86/pmu: Allow RDPMC pass through when all counters exposed to
+    guest
+  KVM: x86/pmu: Introduce PMU operator to check if rdpmc passthrough
+    allowed
+  KVM: x86/pmu: Create a function prototype to disable MSR interception
+  KVM: x86/pmu: Avoid legacy vPMU code when accessing global_ctrl in
+    passthrough vPMU
+  KVM: x86/pmu: Exclude PMU MSRs in vmx_get_passthrough_msr_slot()
+  KVM: x86/pmu: Add counter MSR and selector MSR index into struct
+    kvm_pmc
+  KVM: x86/pmu: Introduce PMU operation prototypes for save/restore PMU
+    context
+  KVM: x86/pmu: Implement the save/restore of PMU state for Intel CPU
+  KVM: x86/pmu: Make check_pmu_event_filter() an exported function
+  KVM: x86/pmu: Allow writing to event selector for GP counters if event
+    is allowed
+  KVM: x86/pmu: Allow writing to fixed counter selector if counter is
+    exposed
+  KVM: x86/pmu: Exclude existing vLBR logic from the passthrough PMU
+  KVM: x86/pmu: Introduce PMU operator to increment counter
+  KVM: x86/pmu: Introduce PMU operator for setting counter overflow
+  KVM: x86/pmu: Implement emulated counter increment for passthrough PMU
+  KVM: x86/pmu: Update pmc_{read,write}_counter() to disconnect perf API
+  KVM: x86/pmu: Disconnect counter reprogram logic from passthrough PMU
+  KVM: nVMX: Add nested virtualization support for passthrough PMU
+
+Sandipan Das (11):
+  KVM: x86/pmu: Do not mask LVTPC when handling a PMI on AMD platforms
+  x86/msr: Define PerfCntrGlobalStatusSet register
+  KVM: x86/pmu: Always set global enable bits in passthrough mode
+  perf/x86/amd/core: Set passthrough capability for host
+  KVM: x86/pmu/svm: Set passthrough capability for vcpus
+  KVM: x86/pmu/svm: Set enable_passthrough_pmu module parameter
+  KVM: x86/pmu/svm: Allow RDPMC pass through when all counters exposed
+    to guest
+  KVM: x86/pmu/svm: Implement callback to disable MSR interception
+  KVM: x86/pmu/svm: Set GuestOnly bit and clear HostOnly bit when guest
+    write to event selectors
+  KVM: x86/pmu/svm: Add registers to direct access list
+  KVM: x86/pmu/svm: Implement handlers to save and restore context
+
+Sean Christopherson (2):
+  KVM: x86/pmu: Set enable bits for GP counters in PERF_GLOBAL_CTRL at
+    "RESET"
+  KVM: x86: Snapshot if a vCPU's vendor model is AMD vs. Intel
+    compatible
+
+Xiong Zhang (10):
+  perf: core/x86: Register a new vector for KVM GUEST PMI
+  KVM: x86: Extract x86_set_kvm_irq_handler() function
+  KVM: x86/pmu: Register guest pmi handler for emulated PMU
+  perf: x86: Add x86 function to switch PMI handler
+  KVM: x86/pmu: Manage MSR interception for IA32_PERF_GLOBAL_CTRL
+  KVM: x86/pmu: Switch IA32_PERF_GLOBAL_CTRL at VM boundary
+  KVM: x86/pmu: Switch PMI handler at KVM context switch boundary
+  KVM: x86/pmu: Grab x86 core PMU for passthrough PMU VM
+  KVM: x86/pmu: Call perf_guest_enter() at PMU context switch
+  KVM: x86/pmu: Add support for PMU context switch at VM-exit/enter
+
+ arch/x86/events/amd/core.c               |   3 +
+ arch/x86/events/core.c                   |  41 ++++-
+ arch/x86/events/intel/core.c             |   6 +
+ arch/x86/events/perf_event.h             |   1 +
+ arch/x86/include/asm/hardirq.h           |   1 +
+ arch/x86/include/asm/idtentry.h          |   1 +
+ arch/x86/include/asm/irq.h               |   2 +-
+ arch/x86/include/asm/irq_vectors.h       |   5 +-
+ arch/x86/include/asm/kvm-x86-pmu-ops.h   |   6 +
+ arch/x86/include/asm/kvm_host.h          |  10 ++
+ arch/x86/include/asm/msr-index.h         |   2 +
+ arch/x86/include/asm/perf_event.h        |   4 +
+ arch/x86/include/asm/vmx.h               |   1 +
+ arch/x86/kernel/idt.c                    |   1 +
+ arch/x86/kernel/irq.c                    |  36 ++++-
+ arch/x86/kvm/cpuid.c                     |   4 +
+ arch/x86/kvm/cpuid.h                     |  10 ++
+ arch/x86/kvm/lapic.c                     |   3 +-
+ arch/x86/kvm/mmu/mmu.c                   |   2 +-
+ arch/x86/kvm/pmu.c                       | 168 ++++++++++++++++++-
+ arch/x86/kvm/pmu.h                       |  47 ++++++
+ arch/x86/kvm/svm/pmu.c                   | 112 ++++++++++++-
+ arch/x86/kvm/svm/svm.c                   |  23 +++
+ arch/x86/kvm/svm/svm.h                   |   2 +-
+ arch/x86/kvm/vmx/capabilities.h          |   1 +
+ arch/x86/kvm/vmx/nested.c                |  52 ++++++
+ arch/x86/kvm/vmx/pmu_intel.c             | 192 ++++++++++++++++++++--
+ arch/x86/kvm/vmx/vmx.c                   | 197 +++++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.h                   |   3 +-
+ arch/x86/kvm/x86.c                       |  47 +++++-
+ arch/x86/kvm/x86.h                       |   1 +
+ include/linux/perf_event.h               |  18 +++
+ kernel/events/core.c                     | 176 ++++++++++++++++++++
+ tools/arch/x86/include/asm/irq_vectors.h |   3 +-
+ 34 files changed, 1120 insertions(+), 61 deletions(-)
+
+
+base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
+-- 
+2.45.0.rc1.225.g2a3ae87e7f-goog
+
 
