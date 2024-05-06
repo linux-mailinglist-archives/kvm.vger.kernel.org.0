@@ -1,80 +1,79 @@
-Return-Path: <kvm+bounces-16605-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16607-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 075458BC5D1
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 04:40:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 058CE8BC5D6
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 04:42:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88FEA1F2226E
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 02:40:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 372A31C214B6
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 02:42:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7530A3399B;
-	Mon,  6 May 2024 02:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECC034CD8;
+	Mon,  6 May 2024 02:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="djWDYfPI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L6M2js6q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09C9643156
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 02:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00C71096F
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 02:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714963236; cv=none; b=eDwmOxqm2BX1r0dg4t5XUWctHQbCcwELDjkizBtx39bmeqeERADaS8BX4HKcunMUIXSGTAiBynihpKPsVrDPeRBgBXIOXbLPBYvh3Nb87MMRI/AzmoAAaVd7lleZc963WpwEOOd9CyNFdLgBm48Ypvi6/LJhHe9G9cYvh5nRBl0=
+	t=1714963373; cv=none; b=PLZ8tyl9iKsFpt86gBQXOQXmt7cHSbOaOH3wgHT5KTs/Oa52GmiX9yhmUEKaessqr6JnrGWYfWiNjtw9MNPr0HxqAUfUNJ6eG6UgZdI0Zxh5qe8QILLWCrzdo6rViUEuorxTSRleSErYCNOkN1EQosbMWR+KCQ5q32lfohypE18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714963236; c=relaxed/simple;
-	bh=8NCHiPb7AIUJPCLV8GfvbkSeFl/6CephUsTfkltLJuU=;
+	s=arc-20240116; t=1714963373; c=relaxed/simple;
+	bh=LzRCBXPhfqaFfj4fQHqmi9NM6+t8R/Qm8mpHsXOCVnA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=efcqLZT79JL6x6bBRvhB7itN8BAItMau98eGPVhhgSGWDb6KVKagLrYvLkMN6XbNWvOY+lnq1wXN8HHBfAaz6JSaUDmgvCYRyRJOXbvmX6fefjqtYw4HWiOdH34Qx+/60TolNsZxOCK7mpRwk88bgCOfUD2jdASb9KkJAWAR+CU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=djWDYfPI; arc=none smtp.client-ip=192.198.163.7
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q+2T8EpBULo+xpwJGSrsHbHQzTkP0mLM6cOWe3e7Ysv/Kft+2ZFg7j+B/oo7vpRCiXH8uw1ikDYgjqP5WWPufxFfXQo0NSZmkZR+tFHFvvwjRc5qFNfvhIbLHNwuaX55tl7RFyRIVl/M2w6wqpNhRg6N7oBCF9Y4kzZEKopUKWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L6M2js6q; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714963234; x=1746499234;
+  t=1714963372; x=1746499372;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=8NCHiPb7AIUJPCLV8GfvbkSeFl/6CephUsTfkltLJuU=;
-  b=djWDYfPIedTKz8kOoawhVlBoiYMQM8fYZB/ad4nn6wicYmHMtRI2zwqj
-   IzpaTb/p92UHQdqG79unhQWEpBQQGK9p1w9FhvJh8K2+URSENeSqJBFNc
-   jUQU0C0HsrH6aSjN49e8Kdly2h6Zy4N8fz2QKaJwFgi9BIr3DYDJoy63m
-   jkLdIYz/Aq6KthDnZMHvZF3IYu1hr5YdGVdekXMnoCRJpCescZz6EucaV
-   W4JY5JY5AfQ8uUxdkioK4MC1yrgy5tHcojcS6At9aVld/+d9W5UweKD49
-   txt4f2d20eoPQnGSsD7F122f4mxPTsG8wKX4TaVjCgfsZRC0Jp8Wgrus+
-   Q==;
-X-CSE-ConnectionGUID: ulv0MauKSQ65RuZFKdgeMg==
-X-CSE-MsgGUID: XJpzucKvSyW9bqXawRry4Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11064"; a="36080382"
+  bh=LzRCBXPhfqaFfj4fQHqmi9NM6+t8R/Qm8mpHsXOCVnA=;
+  b=L6M2js6q7wPZkDibEjqoCRHie4db5yMn8zMAJfzPyVyhZi/yUwhHiY6I
+   7P33TwtKjMgYm+OUOcU2W/unFt28kyhOXhtf5jL353jc5a/Avgd9X9GqK
+   arJGIl92sQk2LfOs6DHyGYSLH3ptEbyWmJ0fKrE+q29qXNwCMsHaDDQG5
+   DCUhMhYYotaDInRw4B6LF8rctVCR7j+Jogj5EcS8UJ2xJpcAMvQOGNqFP
+   iOSh60Z3cry7ewNq7zc+CSDvxZBsaknrOfV3I4+ktleXAkc8GOnb0iYKB
+   qpCt1BWdpdQjjbNCxB3dwzhdPgx6FNmpTK6rHIKhz52PdIizHDMgJ7OBM
+   A==;
+X-CSE-ConnectionGUID: +86XdyhKS/WNvAJ3yiiqkg==
+X-CSE-MsgGUID: sfEzv1qyQ1qtQ/HC9ZoG3Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11064"; a="10524761"
 X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="36080382"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2024 19:40:33 -0700
-X-CSE-ConnectionGUID: ool1PNuwS6WykBKUBLBn2g==
-X-CSE-MsgGUID: Os5rVDVeQ9yhjdj2IAtbiA==
+   d="scan'208";a="10524761"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2024 19:42:51 -0700
+X-CSE-ConnectionGUID: L8z9fa1MS0+ruIrD18g45Q==
+X-CSE-MsgGUID: hJNJZ3e0QFuwIDprIVz+/g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="32494811"
+   d="scan'208";a="28106331"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa005.fm.intel.com with ESMTP; 05 May 2024 19:40:30 -0700
-Date: Mon, 6 May 2024 10:54:42 +0800
+  by fmviesa010.fm.intel.com with ESMTP; 05 May 2024 19:42:49 -0700
+Date: Mon, 6 May 2024 10:57:01 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
-To: "Chen, Zide" <zide.chen@intel.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
 	Richard Henderson <richard.henderson@linaro.org>,
 	Eduardo Habkost <eduardo@habkost.net>,
 	"Michael S . Tsirkin" <mst@redhat.com>,
 	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Xiaoyao Li <xiaoyao.li@intel.com>, qemu-devel@nongnu.org,
+	Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH 1/6] target/i386/kvm: Add feature bit definitions for KVM
- CPUID
-Message-ID: <ZjhGchDOqGB1taVz@intel.com>
+Subject: Re: [PATCH 6/6] target/i386/confidential-guest: Fix comment of
+ x86_confidential_guest_kvm_type()
+Message-ID: <ZjhG/cCMFP9T1z6J@intel.com>
 References: <20240426100716.2111688-1-zhao1.liu@intel.com>
- <20240426100716.2111688-2-zhao1.liu@intel.com>
- <04d827f7-fb18-4c93-b223-91dd5e190421@intel.com>
+ <20240426100716.2111688-8-zhao1.liu@intel.com>
+ <c75723d7-353e-4208-96bc-865a227f1bac@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,63 +82,28 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <04d827f7-fb18-4c93-b223-91dd5e190421@intel.com>
+In-Reply-To: <c75723d7-353e-4208-96bc-865a227f1bac@intel.com>
 
-Hi Zide,
+Hi Xiaoyao,
 
-On Fri, Apr 26, 2024 at 10:23:27AM -0700, Chen, Zide wrote:
-> Date: Fri, 26 Apr 2024 10:23:27 -0700
-> From: "Chen, Zide" <zide.chen@intel.com>
-> Subject: Re: [PATCH 1/6] target/i386/kvm: Add feature bit definitions for
->  KVM CPUID
+On Sat, Apr 27, 2024 at 07:05:41AM +0800, Xiaoyao Li wrote:
+> Date: Sat, 27 Apr 2024 07:05:41 +0800
+> From: Xiaoyao Li <xiaoyao.li@intel.com>
+> Subject: Re: [PATCH 6/6] target/i386/confidential-guest: Fix comment of
+>  x86_confidential_guest_kvm_type()
 > 
-> On 4/26/2024 3:07 AM, Zhao Liu wrote:
-> > Add feature definiations for KVM_CPUID_FEATURES in CPUID (
-> > CPUID[4000_0001].EAX and CPUID[4000_0001].EDX), to get rid of lots of
-> > offset calculations.
+> On 4/26/2024 6:07 PM, Zhao Liu wrote:
+> > Update the comment to match the X86ConfidentialGuestClass
+> > implementation.
 > > 
-> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> > ---
-> > v2: Changed the prefix from CPUID_FEAT_KVM_* to CPUID_KVM_*. (Xiaoyao)
-> > ---
-> >  hw/i386/kvm/clock.c   |  5 ++---
-> >  target/i386/cpu.h     | 23 +++++++++++++++++++++++
-> >  target/i386/kvm/kvm.c | 28 ++++++++++++++--------------
-> >  3 files changed, 39 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/hw/i386/kvm/clock.c b/hw/i386/kvm/clock.c
-> > index 40aa9a32c32c..ce416c05a3d0 100644
-> > --- a/hw/i386/kvm/clock.c
-> > +++ b/hw/i386/kvm/clock.c
-> > @@ -27,7 +27,6 @@
-> >  #include "qapi/error.h"
-> >  
-> >  #include <linux/kvm.h>
-> > -#include "standard-headers/asm-x86/kvm_para.h"
-> >  #include "qom/object.h"
-> >  
-> >  #define TYPE_KVM_CLOCK "kvmclock"
-> > @@ -334,8 +333,8 @@ void kvmclock_create(bool create_always)
-> >  
-> >      assert(kvm_enabled());
-> >      if (create_always ||
-> > -        cpu->env.features[FEAT_KVM] & ((1ULL << KVM_FEATURE_CLOCKSOURCE) |
-> > -                                       (1ULL << KVM_FEATURE_CLOCKSOURCE2))) {
-> > +        cpu->env.features[FEAT_KVM] & (CPUID_KVM_CLOCK |
-> > +                                       CPUID_KVM_CLOCK2)) {
+> > Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
 > 
-> To achieve this purpose, how about doing the alternative to define an
-> API similar to KVM's guest_pv_has()?
+> I think it should be "Reported-by"
 >
-> xxxx_has() is simpler and clearer than "features[] & CPUID_xxxxx",
-> additionally, this helps to keep the definitions identical to KVM, more
-> readable and easier for future maintenance.
 
-Yes, it's a clearer way! I can explore the xxxx_has() pattern in another
-series and try to expand it to more CPUID leaves.
+Right, let me fix and respin it.
 
 Thanks,
 Zhao
-
 
 
