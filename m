@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-16613-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16614-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BF18BC6C7
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:30:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 769728BC6C8
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:30:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EB5B1F21BE0
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:30:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 371212816FD
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:30:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF54C482DB;
-	Mon,  6 May 2024 05:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6EA84654B;
+	Mon,  6 May 2024 05:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hOGx83fE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JAZ7xSHq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62D74654B
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84136495CC
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714973431; cv=none; b=ojcAhYF5wGXMcTJy6No1btQk3KaRpMWtfZr4uUmUZy5TkNiDamIIHx5tHjKUFGa+Wl7hBceZAhQ6EKOzcL1RtFe9p1Zqd9rmy8UZq+lpYbP4c0sdtKPAMrmI9dzogdenSZgXIIcuCi1HwsxrzZBsN8QtUxv9zyjqN0pbYRfLlgc=
+	t=1714973434; cv=none; b=dwZtP5/orCvVfo/mQnFZCZh/XeWK7MmqUWsvxGrXin/vc13aQZy56keVLsWaaINNu51Jrt9lQ5qZa6BnwbXldFaAUzjtfepjWtCmQ04XKkPOsmFYugPKZxtitE0BlXjfPM77wZcM48N0pHl7PpuB5XqdEKWV5ez8gxg81zxeEW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714973431; c=relaxed/simple;
-	bh=lgGol9X9PrvDjavTqlM9a/BDUdJpyT52hF22FchYLKs=;
+	s=arc-20240116; t=1714973434; c=relaxed/simple;
+	bh=4W0yLa6oBQ/HRA1qRoRsk778I56HckekrC7N/x6LuBQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RoeOuZpjlgdmmU8xA3FO0BPRaHsJcMsR5/j0bJUCAwQ0UnAg6hNW2CgZiW4kqJFbdb2KPBkj1nR9CzzWZ9I54gHswZQ/oT0VItSjOBYD2T47dE2Z7sryS8HoMhv9bVrOSgbiLZXM1DX7GWotpHxwQP1MkixHwTPENpGMjF39/TU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hOGx83fE; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=TOoBGCZxYiWBNXQhqj4sOaPLTyJu5zebxG/k6eaAKSa7Wvr/cQJgIzNlsf/43ovBtwQWLyGfLf1ljz3XyBKOz6UGncd0B34SHAglR6+BXOQKq2swWkVT3N37x5gz1Cp0BIa6D/hFrYMRibFaGTXKCkGzDCKUPAeiaIblC4o+snU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JAZ7xSHq; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6f46acb3537so566607b3a.1
-        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:30:29 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6f3efd63657so1620127b3a.2
+        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:30:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714973429; x=1715578229; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714973431; x=1715578231; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=ACCDkCRlD9tBHoUvBKfn0tCSNmu+4uS3hC8KCTfss/M=;
-        b=hOGx83fEoY1D3j5dH5nXeAYnSSNbIHiu/SvDYf4O6jwsVCO6ksiKH08/6jlK8iAYvw
-         P5XCZHAklkjM6tNRx96JUFyporoJaitOQWx6fdtTwGsW0bBscaY75ciCTwcUN/6SFsVC
-         72xkMRhneBxiKVtfovZRIw2sAwcTMuS/wQ5Fw2NPQStUcPxePdbeWoGImSjMfQQONxWc
-         Es1hB+QxTJxNzxWH62YXL5xUCDGM4bCY8fHs0dB1CChazCrGNnX2jRRL57L7Sy340+Qp
-         zwnrf3Game/2DmdR+KXd/6xHjtnJdWt8QlCqucXE98Ou323+mTPsfweto+bnN7NmNiyl
-         hErQ==
+        bh=U8NsbyTwuJobhAQmcgiqFL5cgPms3xpU1WY3K3ROCJw=;
+        b=JAZ7xSHq6eUB/GX3CPa222L5XkxUmsXg49hDAXT2AowBeV28tNdJXmXlFLzW/aH5yT
+         gz8wZLWLe1raY1/ittOakWy43p9HP53PYvTwrYvoPCd3hgVJfiOaFvgqQaO7pw9/btxV
+         07ve/LxbD2QVbI4lDdbQbWa6MLSGd+NHxjuSxTi+K0ts2FGXB6jy4ernKTHRl+08I7X8
+         ptBto1iVENLaLK6DN9r2nrjbFrOUZhaMmRdxYRiJTc+MkyPtriC62lBsoe4cG+oaTR+2
+         bu8wvHgH99r90Cn7I+s9oXU1pWSKXJyXiQ+LYWKhIuxmPpldsKsOPa+3YC/B1+F4je0P
+         yF+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714973429; x=1715578229;
+        d=1e100.net; s=20230601; t=1714973431; x=1715578231;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ACCDkCRlD9tBHoUvBKfn0tCSNmu+4uS3hC8KCTfss/M=;
-        b=B8WoxQBN5X9Khfdo3caVJnaidcqmG2SWGtvYb8T+/15XCsu7pn4i63mskUHjoabphN
-         E+QxDNkvgBmUigdzf6Lv+/EiAVy2NeBcPpW52iauVXnVMQkf4+U4RhG4ix0MpvO5DFlb
-         6eTvXoEwMtv4FBdRh9yOE+DXA2lJs8PDzY8WuQkKe6hWZAzcdj86xrD9aVrYjdLpr37v
-         +pq7JWeN+RRWH0vwEyN42e/GbSwxGVY5rrpRS9fkLGTuys3Zyylqy5fFrAuAvmxJzE5l
-         MswLRdopeT/NCFGBIa9GGRR9OfokfH6XMHpvfOxnSP1JoH53AXuc5ubUd1Fg3tj8yoUB
-         i/cQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjBffsZJKhNK9yGii7AYfUNhsyHVOuhSHl5D8VfacygYI95jO1oEKoXyozIkBlSNPhZ0Q9TReEVP0Xd/438AlsHwU5
-X-Gm-Message-State: AOJu0Yw31W19GKcxXaCAq4vjjYjpiHwFbv///l57wSO7biFEXwxtZ39Z
-	va1BRT6YRyiFx6am15QojWvEFYU/iLGfwTbrxh+Wm/jwJF6jBRP/s/v6zyEq9/+c4seEEbbSQKj
-	wM6wghg==
-X-Google-Smtp-Source: AGHT+IEYX4QtJtZ/gu/SdroIPQpUpze1OVtX91ab7uVt7OcHA79QmRucTrnpzZmqcXaHZl7kYfEN/QektcBg
+        bh=U8NsbyTwuJobhAQmcgiqFL5cgPms3xpU1WY3K3ROCJw=;
+        b=kPbqrPyrLe6Wiue2sBXWd1uIGszaxQstw1BtFkoR1kMWBp+UJCUtsH79C3x9ICDESY
+         57Qwa9JAlGCUTCP9y4Zmr43fcAixVFTR+r08b42ApewmJWmbxKjCZbI4ryF/tA5vstzl
+         5oBlrQAXAv66r28A9rv7leYEwlbjwcERs6ALPD35LRV1NfkBmfFjKRxJIgcO7Jk44fr3
+         1aAi85rygTEOHSUqqOup3U7YtdnHY7dlEm1VHH2+Rk3OXZ6DjTviVAhkbLPGgf2GHNd9
+         oM02Cn5n1nKlsCFlWTjKJOejUllNTKfj4Lvu5DVbchU3lhs11eACONOEufzqbxW2mO+B
+         zpTg==
+X-Forwarded-Encrypted: i=1; AJvYcCVHXhRcRWvotP6mjhjMxZueG2WGpm3vIoLNpgJrPlP5LVaU/U6e99UcFT21O5/xx1XEMFvj0aSaiPUgezVfUayfr61O
+X-Gm-Message-State: AOJu0YygWDlLXeM5HoOu7LU+O0ApC9UCmCOGZAr3Pi6zY7rqBAL3/CZr
+	EUX3qqS5MVTgUnLfE6nO4+fsh9NgIHljlFgyqwrBKbaGOmNH1Q2X16evHTbAnZ0RQG7w3/lQ5uF
+	h4ys7Tg==
+X-Google-Smtp-Source: AGHT+IHmvVH27HQl/P8w/FpVWvPHsGrMZu+/fj4Rdo3TMiGnLUSHb1D2dIB9PAzUg5StYItR8iyUPuTIsG9m
 X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a05:6a00:992:b0:6eb:1d5:a3a with SMTP id
- u18-20020a056a00099200b006eb01d50a3amr187533pfg.1.1714973428832; Sun, 05 May
- 2024 22:30:28 -0700 (PDT)
+ job=sendgmr) by 2002:a05:6a00:3904:b0:6ed:95ce:3417 with SMTP id
+ fh4-20020a056a00390400b006ed95ce3417mr271076pfb.5.1714973430736; Sun, 05 May
+ 2024 22:30:30 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon,  6 May 2024 05:29:26 +0000
+Date: Mon,  6 May 2024 05:29:27 +0000
 In-Reply-To: <20240506053020.3911940-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240506053020.3911940-1-mizhang@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240506053020.3911940-2-mizhang@google.com>
-Subject: [PATCH v2 01/54] KVM: x86/pmu: Set enable bits for GP counters in
- PERF_GLOBAL_CTRL at "RESET"
+Message-ID: <20240506053020.3911940-3-mizhang@google.com>
+Subject: [PATCH v2 02/54] KVM: x86: Snapshot if a vCPU's vendor model is AMD
+ vs. Intel compatible
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
@@ -95,127 +95,118 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Sean Christopherson <seanjc@google.com>
 
-Set the enable bits for general purpose counters in IA32_PERF_GLOBAL_CTRL
-when refreshing the PMU to emulate the MSR's architecturally defined
-post-RESET behavior.  Per Intel's SDM:
+Add kvm_vcpu_arch.is_amd_compatible to cache if a vCPU's vendor model is
+compatible with AMD, i.e. if the vCPU vendor is AMD or Hygon, along with
+helpers to check if a vCPU is compatible AMD vs. Intel.  To handle Intel
+vs. AMD behavior related to masking the LVTPC entry, KVM will need to
+check for vendor compatibility on every PMI injection, i.e. querying for
+AMD will soon be a moderately hot path.
 
-  IA32_PERF_GLOBAL_CTRL:  Sets bits n-1:0 and clears the upper bits.
+Note!  This subtly (or maybe not-so-subtly) makes "Intel compatible" KVM's
+default behavior, both if userspace omits (or never sets) CPUID 0x0 and if
+userspace sets a completely unknown vendor.  One could argue that KVM
+should treat such vCPUs as not being compatible with Intel *or* AMD, but
+that would add useless complexity to KVM.
 
-and
+KVM needs to do *something* in the face of vendor specific behavior, and
+so unless KVM conjured up a magic third option, choosing to treat unknown
+vendors as neither Intel nor AMD means that checks on AMD compatibility
+would yield Intel behavior, and checks for Intel compatibility would yield
+AMD behavior.  And that's far worse as it would effectively yield random
+behavior depending on whether KVM checked for AMD vs. Intel vs. !AMD vs.
+!Intel.  And practically speaking, all x86 CPUs follow either Intel or AMD
+architecture, i.e. "supporting" an unknown third architecture adds no
+value.
 
-  Where "n" is the number of general-purpose counters available in the processor.
+Deliberately don't convert any of the existing guest_cpuid_is_intel()
+checks, as the Intel side of things is messier due to some flows explicitly
+checking for exactly vendor==Intel, versus some flows assuming anything
+that isn't "AMD compatible" gets Intel behavior.  The Intel code will be
+cleaned up in the future.
 
-AMD also documents this behavior for PerfMonV2 CPUs in one of AMD's many
-PPRs.
-
-Do not set any PERF_GLOBAL_CTRL bits if there are no general purpose
-counters, although a literal reading of the SDM would require the CPU to
-set either bits 63:0 or 31:0.  The intent of the behavior is to globally
-enable all GP counters; honor the intent, if not the letter of the law.
-
-Leaving PERF_GLOBAL_CTRL '0' effectively breaks PMU usage in guests that
-haven't been updated to work with PMUs that support PERF_GLOBAL_CTRL.
-This bug was recently exposed when KVM added supported for AMD's
-PerfMonV2, i.e. when KVM started exposing a vPMU with PERF_GLOBAL_CTRL to
-guest software that only knew how to program v1 PMUs (that don't support
-PERF_GLOBAL_CTRL).
-
-Failure to emulate the post-RESET behavior results in such guests
-unknowingly leaving all general purpose counters globally disabled (the
-entire reason the post-RESET value sets the GP counter enable bits is to
-maintain backwards compatibility).
-
-The bug has likely gone unnoticed because PERF_GLOBAL_CTRL has been
-supported on Intel CPUs for as long as KVM has existed, i.e. hardly anyone
-is running guest software that isn't aware of PERF_GLOBAL_CTRL on Intel
-PMUs.  And because up until v6.0, KVM _did_ emulate the behavior for Intel
-CPUs, although the old behavior was likely dumb luck.
-
-Because (a) that old code was also broken in its own way (the history of
-this code is a comedy of errors), and (b) PERF_GLOBAL_CTRL was documented
-as having a value of '0' post-RESET in all SDMs before March 2023.
-
-Initial vPMU support in commit f5132b01386b ("KVM: Expose a version 2
-architectural PMU to a guests") *almost* got it right (again likely by
-dumb luck), but for some reason only set the bits if the guest PMU was
-advertised as v1:
-
-        if (pmu->version == 1) {
-                pmu->global_ctrl = (1 << pmu->nr_arch_gp_counters) - 1;
-                return;
-        }
-
-Commit f19a0c2c2e6a ("KVM: PMU emulation: GLOBAL_CTRL MSR should be
-enabled on reset") then tried to remedy that goof, presumably because
-guest PMUs were leaving PERF_GLOBAL_CTRL '0', i.e. weren't enabling
-counters.
-
-        pmu->global_ctrl = ((1 << pmu->nr_arch_gp_counters) - 1) |
-                (((1ull << pmu->nr_arch_fixed_counters) - 1) << X86_PMC_IDX_FIXED);
-        pmu->global_ctrl_mask = ~pmu->global_ctrl;
-
-That was KVM's behavior up until commit c49467a45fe0 ("KVM: x86/pmu:
-Don't overwrite the pmu->global_ctrl when refreshing") removed
-*everything*.  However, it did so based on the behavior defined by the
-SDM , which at the time stated that "Global Perf Counter Controls" is
-'0' at Power-Up and RESET.
-
-But then the March 2023 SDM (325462-079US), stealthily changed its
-"IA-32 and Intel 64 Processor States Following Power-up, Reset, or INIT"
-table to say:
-
-  IA32_PERF_GLOBAL_CTRL: Sets bits n-1:0 and clears the upper bits.
-
-Note, kvm_pmu_refresh() can be invoked multiple times, i.e. it's not a
-"pure" RESET flow.  But it can only be called prior to the first KVM_RUN,
-i.e. the guest will only ever observe the final value.
-
-Note #2, KVM has always cleared global_ctrl during refresh (see commit
-f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests")),
-i.e. there is no danger of breaking existing setups by clobbering a value
-set by userspace.
-
-Reported-by: Babu Moger <babu.moger@amd.com>
-Cc: Sandipan Das <sandipan.das@amd.com>
-Cc: Like Xu <like.xu.linux@gmail.com>
-Cc: Mingwei Zhang <mizhang@google.com>
-Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Cc: stable@vger.kernel.org
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Tested-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Link: https://lore.kernel.org/r/20240309013641.1413400-2-seanjc@google.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Message-ID: <20240405235603.1173076-2-seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/pmu.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/cpuid.c            |  1 +
+ arch/x86/kvm/cpuid.h            | 10 ++++++++++
+ arch/x86/kvm/mmu/mmu.c          |  2 +-
+ arch/x86/kvm/x86.c              |  2 +-
+ 5 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index c397b28e3d1b..a593b03c9aed 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -775,8 +775,20 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->pebs_data_cfg_mask = ~0ull;
- 	bitmap_zero(pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 16e07a2eee19..6efd1497b026 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -855,6 +855,7 @@ struct kvm_vcpu_arch {
+ 	int cpuid_nent;
+ 	struct kvm_cpuid_entry2 *cpuid_entries;
+ 	struct kvm_hypervisor_cpuid kvm_cpuid;
++	bool is_amd_compatible;
  
--	if (vcpu->kvm->arch.enable_pmu)
--		static_call(kvm_x86_pmu_refresh)(vcpu);
-+	if (!vcpu->kvm->arch.enable_pmu)
-+		return;
-+
-+	static_call(kvm_x86_pmu_refresh)(vcpu);
-+
-+	/*
-+	 * At RESET, both Intel and AMD CPUs set all enable bits for general
-+	 * purpose counters in IA32_PERF_GLOBAL_CTRL (so that software that
-+	 * was written for v1 PMUs don't unknowingly leave GP counters disabled
-+	 * in the global controls).  Emulate that behavior when refreshing the
-+	 * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
-+	 */
-+	if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
-+		pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
+ 	/*
+ 	 * FIXME: Drop this macro and use KVM_NR_GOVERNED_FEATURES directly
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index bfc0bfcb2bc6..77352a4abd87 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -376,6 +376,7 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_update_pv_runtime(vcpu);
+ 
++	vcpu->arch.is_amd_compatible = guest_cpuid_is_amd_or_hygon(vcpu);
+ 	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+ 	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+ 
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 856e3037e74f..23dbb9eb277c 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -120,6 +120,16 @@ static inline bool guest_cpuid_is_intel(struct kvm_vcpu *vcpu)
+ 	return best && is_guest_vendor_intel(best->ebx, best->ecx, best->edx);
  }
  
- void kvm_pmu_init(struct kvm_vcpu *vcpu)
++static inline bool guest_cpuid_is_amd_compatible(struct kvm_vcpu *vcpu)
++{
++	return vcpu->arch.is_amd_compatible;
++}
++
++static inline bool guest_cpuid_is_intel_compatible(struct kvm_vcpu *vcpu)
++{
++	return !guest_cpuid_is_amd_compatible(vcpu);
++}
++
+ static inline int guest_cpuid_family(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_cpuid_entry2 *best;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 992e651540e8..bf4de6d7e39c 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4935,7 +4935,7 @@ static void reset_guest_rsvds_bits_mask(struct kvm_vcpu *vcpu,
+ 				context->cpu_role.base.level, is_efer_nx(context),
+ 				guest_can_use(vcpu, X86_FEATURE_GBPAGES),
+ 				is_cr4_pse(context),
+-				guest_cpuid_is_amd_or_hygon(vcpu));
++				guest_cpuid_is_amd_compatible(vcpu));
+ }
+ 
+ static void __reset_rsvds_bits_mask_ept(struct rsvd_bits_validate *rsvd_check,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 47d9f03b7778..ebcc12d1e1de 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3470,7 +3470,7 @@ static bool is_mci_status_msr(u32 msr)
+ static bool can_set_mci_status(struct kvm_vcpu *vcpu)
+ {
+ 	/* McStatusWrEn enabled? */
+-	if (guest_cpuid_is_amd_or_hygon(vcpu))
++	if (guest_cpuid_is_amd_compatible(vcpu))
+ 		return !!(vcpu->arch.msr_hwcr & BIT_ULL(18));
+ 
+ 	return false;
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
