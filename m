@@ -1,234 +1,139 @@
-Return-Path: <kvm+bounces-16723-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16724-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258B28BCE3A
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 14:41:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E70DD8BCEA5
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 14:59:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5FD91F22428
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 12:41:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CAF21F23009
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 12:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB97533CC4;
-	Mon,  6 May 2024 12:41:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2EDA6EB53;
+	Mon,  6 May 2024 12:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ILt0GtOA"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="W644jclk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4BD29A9
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 12:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A510343687;
+	Mon,  6 May 2024 12:59:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714999311; cv=none; b=OlfIBiOt6OB2rnIwnuULoUd+0j27VlkEEBhHkveD6BqRvBueUYLpx1WfW73jPCcg/6WCPeHhXAjKErJI/Dhf5hPctPG8qOmPE84i2F6r2FYkK5E62ocBNmIyAOUtNMX425byMKoSb7QcpFV3rkfHK2qc52NeYU0Ppai6gkwpkmY=
+	t=1715000368; cv=none; b=kZQ5bpu9/oT3fSx8CWgBcinpBpYDF1yH9Dwg8os29g7oMjnWmSTkBH52QyFgaDjArwoObaJBgF7UEI9BFvRepxYtkwycFt4O+F3oqlElAtTYePoTnim3m4K3c5CQZ1XEFvYRWGLd0OV8gVGTgiLsJ4PgzYTeJQ/e8Qi5rarhBnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714999311; c=relaxed/simple;
-	bh=O3AwQVF1ogPa3hcLIUrJQe0Afoj5x2ELN6a12YMwmEs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rHcmRp432120b6iDgyyu7CuAYsGEwomWmiBwlf4a/KSGhFJHVBGxKUQXjRxwzvvgeMVlYp7PZZfOIB3TIprgrsyvndROBY8IXoMFSEDThcQkhZv81YD+HfaMOrVZh6FcY0l4KPGzqkoUjY4Y1uVS4b6WTjp40hJaVdBItICXLAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ILt0GtOA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1714999308;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bhNc3Aa7e3LhDxiHG5xCZbBmsJSMShBeUonH/I6KaCE=;
-	b=ILt0GtOA+wIARS31hXkdM70ZI51gy76PBwqD35sxHYcV6HucPcqdlhsqRR26/bkX6KBhbS
-	YYt/dpr3vV2rILNhFiWopZ5FJVT5gcl+ZcyyGVTEFPPGV0l42PKvd3kRvPJgDiE5H3cbti
-	1i0oVs6fVKp6QsaUerL3baeqmhGBXqY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-50-IfSGQsMwMwOGoPDTmQGN-g-1; Mon, 06 May 2024 08:41:46 -0400
-X-MC-Unique: IfSGQsMwMwOGoPDTmQGN-g-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-34d8ccf34f8so1526679f8f.2
-        for <kvm@vger.kernel.org>; Mon, 06 May 2024 05:41:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714999306; x=1715604106;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bhNc3Aa7e3LhDxiHG5xCZbBmsJSMShBeUonH/I6KaCE=;
-        b=HRHbP8MP7o6tgLR2MG2Cebq2KZH4NRIuCsGFVU7t3Nk2htXaiW+8nZ7fdXp724KV4J
-         Z7HQ1r1Z/5/Nf8/gtemjWfdKk1XvckIHD+m1SeC4lxR8crETh2lZNi+EkKHiCUqtudcq
-         A8vuMQByg1gcmtNcQHEy6nXTwhyBODXQqe7ZnEEfC0V+V8R9kN/X2w3iF2VEn6uqhRO7
-         ePvsyLYDb//Pgc+sHEaU/3QgNrf3Zma3TxclWRZwIXv3+uIdmH1qlxt4TKn8HO/XTfoC
-         jnV4IjDA0D1bA2D2c+rT+8cRwCoWeXAdpGo98R+dWeK5QgLKfBtHAj+T1ulYL+KxyJJU
-         h1dw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBe2kyckKWOoTFTlS/TmWH7UoXjUaB+8mSARbwt2L8CT1b9Bycjr3yvb/GUAWhF5/uOPdWhJ+VAXyXB5DrJozWB21Z
-X-Gm-Message-State: AOJu0YwET33oUq+O+/lHXleaTz3DZVchnb9atyxK/7OF8QmWgHfacC++
-	yF2Ijd155Jx2tIQlrXdCGtoa4nOWPHy4L+c4aJSPIUtTeoBHnKGh1TBMW551aCTAB0UjhIYdPvV
-	cRIomq0N/cST/L9gpjM7IMBeHXAuWExATJo5tt4StVgE2IZQCLA==
-X-Received: by 2002:a05:6000:dd1:b0:34d:a35c:cf89 with SMTP id dw17-20020a0560000dd100b0034da35ccf89mr6676021wrb.18.1714999305834;
-        Mon, 06 May 2024 05:41:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFEFbKlSmtS/JQLzy6y8f2QcGvEqjUMPw2T+t1DxoRrki46Q4CrXPumFszJ479sgGJGcJvXTQ==
-X-Received: by 2002:a05:6000:dd1:b0:34d:a35c:cf89 with SMTP id dw17-20020a0560000dd100b0034da35ccf89mr6676000wrb.18.1714999305305;
-        Mon, 06 May 2024 05:41:45 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:280:24f0:eb4a:c9d8:c8bb:c0b0? ([2a01:e0a:280:24f0:eb4a:c9d8:c8bb:c0b0])
-        by smtp.gmail.com with ESMTPSA id h18-20020a056000001200b0034c78001f6asm10589938wrx.109.2024.05.06.05.41.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 May 2024 05:41:44 -0700 (PDT)
-Message-ID: <76a741bc-a7b8-4c8a-bc7f-7648bc421cb9@redhat.com>
-Date: Mon, 6 May 2024 14:41:43 +0200
+	s=arc-20240116; t=1715000368; c=relaxed/simple;
+	bh=u4YorYLo//Zdf2cB2fFMSFyysd7c8cFd6Z4cCfzLHho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rK3HoFTzbeOmHogrRyeExEKTPUxTRsFRPno6X8yLkykAypOZgtQ8exm3J3zEH+6X8qxzX2XE75AjshkLBPIm7a3KPj5aHl3n5mmvL6OuuATChgZ53M4481aOy/ury82+UMg+d078P8XnSRvNcBfH5R/ypjbW1+paEWgk0Kd5SDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=W644jclk; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 1F59140E0187;
+	Mon,  6 May 2024 12:59:24 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id 6YJBEWDVV4ff; Mon,  6 May 2024 12:59:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1715000359; bh=pylzvv8NGZK4ROfBoCs4iOsfuRAG+JTsfYFB/x19Qwg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W644jclk1AM0sw2RlXxg82b3Fp4SesPBn/1UUCBoTGfGypjIrFtVIJFgPBFoQbV/u
+	 XeyHQjWXmZ0MIsvEIPbtNOvf60SQ7IdgQluzugT5sBI4XwgYgp2xvduvOzp5vHP0wt
+	 SHPvSrhxeuRtlNG/GKNH055324JiwZOQpotO1qnNnoWyUXTOX52QI0DlfhyBZa6P6c
+	 cRq19SnK+BbZl/EhzjOt307iIlkpKoOwdACg5Ur2Kbrdx8VX1JjxIVz7c27s82aU79
+	 QBA1ffIiAnpYx6FLjHSZaEZo4KqRlM5X183LjF0sjwJF8vlwpJ4Jp+ERsdABs68Ega
+	 erD/khJZjsDeomY/FKp/f06De19HujqEZCOYD9rBzoCtXgs/kq+4DHcyonHNh0QIz4
+	 +9NhsXN8rzl7ThLujh6lG/hcXOQBtH+mO5Jugd5PDuW4d0iT03bQxhyIoP8aRiWatk
+	 u4jhNpWNqVh7YnoZPaAiRDMYC/dVtxd4Etc4zU8hS9o+6S/ChdNTN3jiSmJGwD5IXk
+	 jqBN+mNVWSqE5LqKOGZYXHf+rNB4ae5U9i5t0h1QjxgqrNYEbgg8YvA/7tlU0W6qhh
+	 oFSirzoOjJEqQxo7LKtbUT7OkxXoDJkW03hPCMRYe8lx4KD5JqQaimhMQ5O1tEqKT6
+	 7Np6+H8aG9cHwR38au0pG0tY=
+Received: from zn.tnic (pd953020b.dip0.t-ipconnect.de [217.83.2.11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D622240E0249;
+	Mon,  6 May 2024 12:58:53 +0000 (UTC)
+Date: Mon, 6 May 2024 14:58:47 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Ravi Bangoria <ravi.bangoria@amd.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, dave.hansen@linux.intel.com,
+	seanjc@google.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
+	hpa@zytor.com, rmk+kernel@armlinux.org.uk, peterz@infradead.org,
+	james.morse@arm.com, lukas.bulwahn@gmail.com, arjan@linux.intel.com,
+	j.granados@samsung.com, sibs@chinatelecom.cn, nik.borisov@suse.com,
+	michael.roth@amd.com, nikunj.dadhania@amd.com, babu.moger@amd.com,
+	x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	santosh.shukla@amd.com, ananth.narayan@amd.com,
+	sandipan.das@amd.com
+Subject: Re: [PATCH 1/3] x86/split_lock: Move Split and Bus lock code to a
+ dedicated file
+Message-ID: <20240506125847.GTZjjUB6D_cClwghMc@fat_crate.local>
+References: <20240429060643.211-1-ravi.bangoria@amd.com>
+ <20240429060643.211-2-ravi.bangoria@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] vfio/pci: migration: Skip config space check for
- Vendor Specific Information in VSC during restore/load
-To: Vinayak Kale <vkale@nvidia.com>, qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com,
- avihaih@nvidia.com, acurrid@nvidia.com, cjia@nvidia.com, zhiw@nvidia.com,
- targupta@nvidia.com, kvm@vger.kernel.org
-References: <20240503145142.2806030-1-vkale@nvidia.com>
-Content-Language: en-US, fr
-From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
-In-Reply-To: <20240503145142.2806030-1-vkale@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240429060643.211-2-ravi.bangoria@amd.com>
 
-On 5/3/24 16:51, Vinayak Kale wrote:
-> In case of migration, during restore operation, qemu checks config space of the
-> pci device with the config space in the migration stream captured during save
-> operation. In case of config space data mismatch, restore operation is failed.
+On Mon, Apr 29, 2024 at 11:36:41AM +0530, Ravi Bangoria wrote:
+> Upcoming AMD uarch will support Bus Lock Detect, which functionally works
+> identical to Intel. Move split_lock and bus_lock specific code from
+> intel.c to a dedicated file so that it can be compiled and supported on
+> non-intel platforms.
 > 
-> config space check is done in function get_pci_config_device(). By default VSC
-> (vendor-specific-capability) in config space is checked.
-> 
-> Due to qemu's config space check for VSC, live migration is broken across NVIDIA
-> vGPU devices in situation where source and destination host driver is different.
-> In this situation, Vendor Specific Information in VSC varies on the destination
-> to ensure vGPU feature capabilities exposed to the guest driver are compatible
-> with destination host.
-> 
-> If a vfio-pci device is migration capable and vfio-pci vendor driver is OK with
-> volatile Vendor Specific Info in VSC then qemu should exempt config space check
-> for Vendor Specific Info. It is vendor driver's responsibility to ensure that
-> VSC is consistent across migration. Here consistency could mean that VSC format
-> should be same on source and destination, however actual Vendor Specific Info
-> may not be byte-to-byte identical.
-> 
-> This patch skips the check for Vendor Specific Information in VSC for VFIO-PCI
-> device by clearing pdev->cmask[] offsets. Config space check is still enforced
-> for 3 byte VSC header. If cmask[] is not set for an offset, then qemu skips
-> config space check for that offset.
-> 
-> VSC check is skipped for machine types >= 9.1. The check would be enforced on
-> older machine types (<= 9.0).
-> 
-> Signed-off-by: Vinayak Kale <vkale@nvidia.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Michael S. Tsirkin <mst@redhat.com>
-> Cc: Cédric Le Goater <clg@redhat.com>
-
-LGTM,
-
-Reviewed-by: Cédric Le Goater <clg@redhat.com>
-
-Thanks,
-
-C.
-
-
+> Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
 > ---
-> Version History
-> v3->v4:
->      - VSC check is skipped for machine types >= 9.1. The check would be enforced
->        on older machine types (<= 9.0).
-> v2->v3:
->      - Config space check skipped only for Vendor Specific Info in VSC, check is
->        still enforced for 3 byte VSC header.
->      - Updated commit description with live migration failure scenario.
-> v1->v2:
->      - Limited scope of change to vfio-pci devices instead of all pci devices.
+>  arch/x86/include/asm/cpu.h           |   4 +
+>  arch/x86/kernel/cpu/Makefile         |   1 +
+>  arch/x86/kernel/cpu/intel.c          | 407 ---------------------------
+>  arch/x86/kernel/cpu/split-bus-lock.c | 406 ++++++++++++++++++++++++++
+>  4 files changed, 411 insertions(+), 407 deletions(-)
+>  create mode 100644 arch/x86/kernel/cpu/split-bus-lock.c
 > 
->   hw/core/machine.c |  1 +
->   hw/vfio/pci.c     | 26 ++++++++++++++++++++++++++
->   hw/vfio/pci.h     |  1 +
->   3 files changed, 28 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index 4ff60911e7..fc3eb5115f 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -35,6 +35,7 @@
->   
->   GlobalProperty hw_compat_9_0[] = {
->       {"arm-cpu", "backcompat-cntfrq", "true" },
-> +    {"vfio-pci", "skip-vsc-check", "false" },
->   };
->   const size_t hw_compat_9_0_len = G_N_ELEMENTS(hw_compat_9_0);
->   
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index 64780d1b79..2ece9407cc 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -2134,6 +2134,28 @@ static void vfio_check_af_flr(VFIOPCIDevice *vdev, uint8_t pos)
->       }
->   }
->   
-> +static int vfio_add_vendor_specific_cap(VFIOPCIDevice *vdev, int pos,
-> +                                        uint8_t size, Error **errp)
-> +{
-> +    PCIDevice *pdev = &vdev->pdev;
+> diff --git a/arch/x86/include/asm/cpu.h b/arch/x86/include/asm/cpu.h
+> index aa30fd8cad7f..4b5c31dc8112 100644
+> --- a/arch/x86/include/asm/cpu.h
+> +++ b/arch/x86/include/asm/cpu.h
+> @@ -51,6 +51,10 @@ static inline u8 get_this_hybrid_cpu_type(void)
+>  	return 0;
+>  }
+>  #endif
 > +
-> +    pos = pci_add_capability(pdev, PCI_CAP_ID_VNDR, pos, size, errp);
-> +    if (pos < 0) {
-> +        return pos;
-> +    }
+> +void split_lock_init(void);
+> +void bus_lock_init(void);
 > +
-> +    /*
-> +     * Exempt config space check for Vendor Specific Information during
-> +     * restore/load.
-> +     * Config space check is still enforced for 3 byte VSC header.
-> +     */
-> +    if (vdev->skip_vsc_check && size > 3) {
-> +        memset(pdev->cmask + pos + 3, 0, size - 3);
-> +    }
-> +
-> +    return pos;
-> +}
-> +
->   static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
->   {
->       ERRP_GUARD();
-> @@ -2202,6 +2224,9 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
->           vfio_check_af_flr(vdev, pos);
->           ret = pci_add_capability(pdev, cap_id, pos, size, errp);
->           break;
-> +    case PCI_CAP_ID_VNDR:
-> +        ret = vfio_add_vendor_specific_cap(vdev, pos, size, errp);
-> +        break;
->       default:
->           ret = pci_add_capability(pdev, cap_id, pos, size, errp);
->           break;
-> @@ -3390,6 +3415,7 @@ static Property vfio_pci_dev_properties[] = {
->       DEFINE_PROP_LINK("iommufd", VFIOPCIDevice, vbasedev.iommufd,
->                        TYPE_IOMMUFD_BACKEND, IOMMUFDBackend *),
->   #endif
-> +    DEFINE_PROP_BOOL("skip-vsc-check", VFIOPCIDevice, skip_vsc_check, true),
->       DEFINE_PROP_END_OF_LIST(),
->   };
->   
-> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-> index 6e64a2654e..92cd62d115 100644
-> --- a/hw/vfio/pci.h
-> +++ b/hw/vfio/pci.h
-> @@ -177,6 +177,7 @@ struct VFIOPCIDevice {
->       OnOffAuto ramfb_migrate;
->       bool defer_kvm_irq_routing;
->       bool clear_parent_atomics_on_exit;
-> +    bool skip_vsc_check;
->       VFIODisplay *dpy;
->       Notifier irqchip_change_notifier;
->   };
+>  #ifdef CONFIG_IA32_FEAT_CTL
+>  void init_ia32_feat_ctl(struct cpuinfo_x86 *c);
+>  #else
+> diff --git a/arch/x86/kernel/cpu/Makefile b/arch/x86/kernel/cpu/Makefile
+> index eb4dbcdf41f1..86a10472ad1d 100644
+> --- a/arch/x86/kernel/cpu/Makefile
+> +++ b/arch/x86/kernel/cpu/Makefile
+> @@ -27,6 +27,7 @@ obj-y			+= aperfmperf.o
+>  obj-y			+= cpuid-deps.o
+>  obj-y			+= umwait.o
+>  obj-y 			+= capflags.o powerflags.o
+> +obj-y 			+= split-bus-lock.o
 
+Too fine-grained a name and those "-" should be "_".
+
+Perhaps bus_lock.c only...
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
