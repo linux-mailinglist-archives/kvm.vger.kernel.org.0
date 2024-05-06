@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-16655-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16654-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A1D08BC6F6
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:36:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 640ED8BC6F7
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B2EE1C21110
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53D9EB20B97
 	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471F6143C7A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6CF143C76;
 	Mon,  6 May 2024 05:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Tc2QyGBr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LuirrmSr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8815143C60
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3200C136E22
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:31:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714973510; cv=none; b=IK9bhlYajqWDw9LEL3YLolCfnGew3JsYj+M6vLKqiU+kIgJpfjDwPS19t1hsOFZO+bvCJSoB2wwSwuzjlQdU1+aHEeeD52LqFyiqOGsCnx2cg0i4v0oMrjSFDwgdVangmnX8emapJLy5dvChTksFUNj2ssZjDB+OCKMTidT0rYw=
+	t=1714973510; cv=none; b=YACdWXCRFBpW1JuQDyZEsNYExAEzbsl/zc7ZYISCpUMv1STnvuXHLR4gUWfksDeJzmNW4+hm46iJTpb0yf+KOx6TzMVA/YAwIU6S5StHBMtXXW4YiHjklG4BasfOnLJtRUyuEXHRYfD3dodHVdtZ2Fx9gJvjxFHc1Es0sdGHXFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1714973510; c=relaxed/simple;
-	bh=b/P/gkmdpkwdCe7Xv7Hg2B3zNjJs1cOBq5vflYDSvQc=;
+	bh=dhPbAFhJ8mb4pBRNt8/QCVsudVnkKq9AnmE8N85GoY0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CRb0yPtJ6oIaTGz1BZTuSXkrIMeRbItImwE+iHeTtKALDYxXQINW1zxitroGsUlHssAD8LgLOmrl7yPioInU8kCPqiEEVt4Hlm1ryZfoPK/0mqXyYYbKI6qStKb3u7v1a5TzzLVruW2j15hKRtyoYgONyxZM1q60OjVlAFLjXzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Tc2QyGBr; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=TZYQwfpleYsk2+daRN7tsN1QUvdpMnzONdufVgdDV10uay4bsqx6HvWwdXRJT7/SjETBBY73Pj5aprF36Rzj4+QBI80HPx3Fj3ZL3UMBWiLBw6EaroWoisuRJERpyO12ZhAMHgpWSDwd8XtFY7WAg6vkFuPsKMTxvksnofzVEgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LuirrmSr; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b028ae5easo31282267b3.3
-        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:31:47 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2b2a06c0caeso2093936a91.1
+        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:31:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714973507; x=1715578307; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714973509; x=1715578309; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=tX8Dgq5ewz02szpnrMWrF7pO4CEI9/6VrSnV9138ff8=;
-        b=Tc2QyGBrrlJ1U2Gs/ax8er3VbGvnZd3mvT8v5tKzIRJsVCTBf4kxyBUsZe2I+KtSeb
-         VRBgd6icB2XZE8jTdYepX+jepAb6c5aKtJhHu2YnQZsHF343BK3EmUZtYcPR9f8OPpmS
-         or9pKPuTKw1E53uFdFsBZTAwRHrhxuJKBfT/CXAjUeTkl8dJmUkLwVd7RbrzOXEIHiMG
-         jfKwz/xcZB/LEIlZynC13/tzbygUWbRYp4em5vxFb9fnubnHAUiyJf3nCPWGlkgNyCG+
-         627dQjPqbNAIdaxaycqc4m75wvflJlPjMtkVtGS6pDf78NwNehatMgBjLLmXpaXs7c/A
-         izuQ==
+        bh=LVxcBKJRM/xj/uclatTOhxRt9aaIXTCvWP79vIrkrtA=;
+        b=LuirrmSrUJppxWAJY+xa9hoAaZigy6KiINogMv1oY3aIoxIi+oFzxiLDn4IgUE7giQ
+         tJ1fmcGvb+Gt9G+5f71+b1C8Q6n7VXJQLxpeJNF6q1UjmeLgiLG+jSBQ544wf7I7vt4b
+         +8OUvV1owRf0rtu6krHE3X2xgyhjdFbdMZJucESDqz1MDroZdPNr+ciln0js9jbxTV01
+         vbYr37jqVKQtlWdpgA3ot7/PcJY3EPcizKrJfhx+79AsMs6Qnm2Ydtn398eOVCr1ljE+
+         iOcZugAj4Y2wpt3USQAzj0Fx63APZ4p3g/nSN9Jq3X6vxhuncC8Z/LH4zgFHQvix2Nyu
+         9rgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714973507; x=1715578307;
+        d=1e100.net; s=20230601; t=1714973509; x=1715578309;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=tX8Dgq5ewz02szpnrMWrF7pO4CEI9/6VrSnV9138ff8=;
-        b=gTyoAJDq5zK+Y7BDXLWsF774Nn3lRte4wqEhT5yzgkTlQu+jZ9V41OUMw7y4XlHLOZ
-         Uj9KjLSsSD9ZyOyqBX56vv+uUf4X/vM5iYRSk63WXCIR0mRGyFrpvz/YnaPYsTtgg4yM
-         TGg//Rn4/NJkv74gWQ/llsINsz8v3gBIBSX73/EgFaf1sgWS3aRzteH46s0ne0MssXmO
-         dGplEa5QWbsOOMn4io2NMjGGSZu34OzNxMurWZpAnC19iT4o/OSdNtM065+LWR+c1Bsw
-         F6boS5OZU3glXP0jgskgcoPNJ8wqb+CVCsFWAHdU5FHDWPF7ce0UnSecZu8v06c+f4WM
-         RpMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXrekE8Lhf6y6NbKEYRNnv6Rw23Y19NiZJKasu8dLcG8KRUjYASVz1ro1WeHM+vHMXtHEKlwzQaBizUI7JLIX3p71HW
-X-Gm-Message-State: AOJu0YyRdI9tjo+aj9FkhuB2boty37uZqrjeEMFkReoezJc6hQrqyWxL
-	/mE+qtz4boV75W/9S8G2r3PREnR91P25BdF837QvUVGFvo6UOyZh1AILLnrhKIWuAZcchdRV89t
-	bwUqOFw==
-X-Google-Smtp-Source: AGHT+IG0dJqulSQCgFV/zhqyz9b6/M0NS8Knkq7ByoXipCtrR2cMK7wbJyY7hepfUVtSnQc1M0T72skWCOQc
+        bh=LVxcBKJRM/xj/uclatTOhxRt9aaIXTCvWP79vIrkrtA=;
+        b=NVLyjPbdLLQ1daC7wARblc9on7PIGHfaUYxjIpz2HcZa8f1qXFJb79hwZH9UQHC0Xf
+         0k5FLpOJkarZ3DoGMVFQLbW9ScQy0EQ1TXmTZaW2KVjZMYhB4M3fXaWVBLUQPpOjOxxR
+         YUFlhC1SDa+GWvIKhsNQJgz5aED6n8IvvV+k2cRvExhsuzn4tmlsDb2NhZ7+tiYsGKKK
+         2lQxn3Mnpprr60Y20HAfwC3hm0+zbySnL8nkr37ppyikpp8YcJW4GYa7du8GX38bZg+M
+         qkdk0SphVvmcb3u+M2hbfSIEReMLqVoC1mD6eD+eDms2Ps+U0H0dKuEqs+7gi58jr4q4
+         qL9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWaZ3IBUSmWnirt4+JFdOzj/6hg/G2Z+nERxgHEqAMusu4mU22HVQ2GhKacbz6WpT9BbLM11qFbVEb32qsPSP7v2OnT
+X-Gm-Message-State: AOJu0YxmqvNWbgtlYvhSGRVnnUs8/dbFaP3cBPsh9Js9tU7t7iWf/MeJ
+	irLzzsbERO1LhUr9Ou5fL+yfqX0JAw3AR2BPOkvRvZmjQBrCiKUreO6QKtnl6imCkLnMBbSpl6I
+	RleL3wg==
+X-Google-Smtp-Source: AGHT+IE172p7cnEMx31yUx6AO1DUrBNNY80Q7d+yV5jnzzruiiQhToxQu7JpPgzaeKwzvvEndWq8+tBOswES
 X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a05:6902:1502:b0:de4:c54c:6754 with SMTP id
- q2-20020a056902150200b00de4c54c6754mr3292381ybu.3.1714973506891; Sun, 05 May
- 2024 22:31:46 -0700 (PDT)
+ job=sendgmr) by 2002:a17:90a:bf8b:b0:2a2:ff01:dd7c with SMTP id
+ d11-20020a17090abf8b00b002a2ff01dd7cmr26238pjs.8.1714973508675; Sun, 05 May
+ 2024 22:31:48 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon,  6 May 2024 05:30:07 +0000
+Date: Mon,  6 May 2024 05:30:08 +0000
 In-Reply-To: <20240506053020.3911940-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240506053020.3911940-1-mizhang@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240506053020.3911940-43-mizhang@google.com>
-Subject: [PATCH v2 42/54] KVM: x86/pmu: Implement emulated counter increment
- for passthrough PMU
+Message-ID: <20240506053020.3911940-44-mizhang@google.com>
+Subject: [PATCH v2 43/54] KVM: x86/pmu: Update pmc_{read,write}_counter() to
+ disconnect perf API
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
@@ -93,125 +93,49 @@ Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
 	linux-perf-users@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Implement emulated counter increment for passthrough PMU under KVM_REQ_PMU.
-Defer the counter increment to KVM_REQ_PMU handler because counter
-increment requests come from kvm_pmu_trigger_event() which can be triggered
-within the KVM_RUN inner loop or outside of the inner loop. This means the
-counter increment could happen before or after PMU context switch.
-
-So process counter increment in one place makes the implementation simple.
+Update pmc_{read,write}_counter() to disconnect perf API because
+passthrough PMU does not use host PMU on backend. Because of that
+pmc->counter contains directly the actual value of the guest VM when set by
+the host (VMM) side.
 
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
-Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- arch/x86/kvm/pmu.c | 50 +++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 47 insertions(+), 3 deletions(-)
+ arch/x86/kvm/pmu.c | 5 +++++
+ arch/x86/kvm/pmu.h | 4 ++++
+ 2 files changed, 9 insertions(+)
 
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index a12012a00c11..06e70f74559d 100644
+index 06e70f74559d..12330d3f92f4 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -510,6 +510,18 @@ static int reprogram_counter(struct kvm_pmc *pmc)
- 				     eventsel & ARCH_PERFMON_EVENTSEL_INT);
- }
+@@ -322,6 +322,11 @@ static void pmc_update_sample_period(struct kvm_pmc *pmc)
  
-+static void kvm_pmu_handle_event_in_passthrough_pmu(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-+
-+	static_call_cond(kvm_x86_pmu_set_overflow)(vcpu);
-+
-+	if (atomic64_read(&pmu->__reprogram_pmi)) {
-+		kvm_make_request(KVM_REQ_PMI, vcpu);
-+		atomic64_set(&pmu->__reprogram_pmi, 0ull);
-+	}
-+}
-+
- void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+ void pmc_write_counter(struct kvm_pmc *pmc, u64 val)
  {
- 	DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
-@@ -517,6 +529,9 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
- 	struct kvm_pmc *pmc;
- 	int bit;
- 
-+	if (is_passthrough_pmu_enabled(vcpu))
-+		return kvm_pmu_handle_event_in_passthrough_pmu(vcpu);
++	if (pmc_to_pmu(pmc)->passthrough) {
++		pmc->counter = val;
++		return;
++	}
 +
- 	bitmap_copy(bitmap, pmu->reprogram_pmi, X86_PMC_IDX_MAX);
- 
  	/*
-@@ -848,6 +863,17 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
- 	kvm_pmu_reset(vcpu);
- }
- 
-+static void kvm_passthrough_pmu_incr_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
-+{
-+	if (static_call(kvm_x86_pmu_incr_counter)(pmc)) {
-+		__set_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->global_status);
-+		kvm_make_request(KVM_REQ_PMU, vcpu);
-+
-+		if (pmc->eventsel & ARCH_PERFMON_EVENTSEL_INT)
-+			set_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
-+	}
-+}
-+
- static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
+ 	 * Drop any unconsumed accumulated counts, the WRMSR is a write, not a
+ 	 * read-modify-write.  Adjust the counter value so that its value is
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 78a7f0c5f3ba..7e006cb61296 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -116,6 +116,10 @@ static inline u64 pmc_read_counter(struct kvm_pmc *pmc)
  {
- 	pmc->emulated_counter++;
-@@ -880,11 +906,13 @@ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
- 	return (static_call(kvm_x86_get_cpl)(pmc->vcpu) == 0) ? select_os : select_user;
- }
+ 	u64 counter, enabled, running;
  
--void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
-+static void __kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel,
-+				    bool is_passthrough)
- {
- 	DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct kvm_pmc *pmc;
-+	bool is_pmc_allowed;
- 	int i;
- 
- 	BUILD_BUG_ON(sizeof(pmu->global_ctrl) * BITS_PER_BYTE != X86_PMC_IDX_MAX);
-@@ -896,6 +924,12 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
- 		return;
- 
- 	kvm_for_each_pmc(pmu, pmc, i, bitmap) {
-+		if (is_passthrough)
-+			is_pmc_allowed = pmc_speculative_in_use(pmc) &&
-+					 check_pmu_event_filter(pmc);
-+		else
-+			is_pmc_allowed = pmc_event_is_allowed(pmc);
++	counter = pmc->counter;
++	if (pmc_to_pmu(pmc)->passthrough)
++		return counter & pmc_bitmask(pmc);
 +
- 		/*
- 		 * Ignore checks for edge detect (all events currently emulated
- 		 * but KVM are always rising edges), pin control (unsupported
-@@ -911,12 +945,22 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
- 		 * could ignoring them, so do the simple thing for now.
- 		 */
- 		if (((pmc->eventsel ^ eventsel) & AMD64_RAW_EVENT_MASK_NB) ||
--		    !pmc_event_is_allowed(pmc) || !cpl_is_matched(pmc))
-+		    !is_pmc_allowed || !cpl_is_matched(pmc))
- 			continue;
+ 	counter = pmc->counter + pmc->emulated_counter;
  
--		kvm_pmu_incr_counter(pmc);
-+		if (is_passthrough)
-+			kvm_passthrough_pmu_incr_counter(vcpu, pmc);
-+		else
-+			kvm_pmu_incr_counter(pmc);
- 	}
- }
-+
-+void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
-+{
-+	bool is_passthrough = is_passthrough_pmu_enabled(vcpu);
-+
-+	__kvm_pmu_trigger_event(vcpu, eventsel, is_passthrough);
-+}
- EXPORT_SYMBOL_GPL(kvm_pmu_trigger_event);
- 
- static bool is_masked_filter_valid(const struct kvm_x86_pmu_event_filter *filter)
+ 	if (pmc->perf_event && !pmc->is_paused)
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
