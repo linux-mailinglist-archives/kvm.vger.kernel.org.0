@@ -1,153 +1,110 @@
-Return-Path: <kvm+bounces-16738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16739-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6F508BD290
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 18:22:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C0E48BD2B7
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 18:25:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63BEB286D49
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 16:22:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7BC8285AEF
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 16:25:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A2815688E;
-	Mon,  6 May 2024 16:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E58156655;
+	Mon,  6 May 2024 16:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="QVGJW07x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZXSJuTEY"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-42a8.mail.infomaniak.ch (smtp-42a8.mail.infomaniak.ch [84.16.66.168])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56AC015575A
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 16:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A013156258
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 16:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715012561; cv=none; b=XcZNUo4gZVlXu0rJWUC3G+YIooSCslxtLnw9ByKY8kYtN8zVRR3JVsuY/lpUAXZ5htP7+Rhjc51f69qrW67FbXTXv1Ny9op7igzOTxe0LKCwv7r7G+7+27HqGK8GeexdW2MpYgmWXex4/NXw7w79pZmNz0FQrzYLhNCvxe8+LdM=
+	t=1715012669; cv=none; b=NpH7mqXX/1mqBeOUDIcEv7lHuIFjNOAoOnoJQLiNC4b9AZMTArv5yaWluHo8wCB8oM6jX1MJSVPcG2tPwE+wbKwq+kU9q+s4eFBak+NicfbEDcX92tMZCK2fiJDhcPqnVB14TFGWb0Yuhf1M+uuqHH2ejgBRCP/wMNxnHr+vkL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715012561; c=relaxed/simple;
-	bh=frTG5OBPlS3cpKFuLzpv3nMYxGsgU18EpPK6RPYW230=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mr98M6XqNyBphriMYZ5HRzrJm+4srq13EtkWgMcVoQwbrbpTIpzfNsNPbms6W6MVesaLakmx9oB5DFuIadjD3BnAnqwdKiexAB906ZHOjFk0ZzBl6EftUbzndisUdfyRZK46WR36dQ9ykYPyx5oAdfNgCsiSfvt6DLTAz+gAmFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=QVGJW07x; arc=none smtp.client-ip=84.16.66.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VY6BX035Yzv5F;
-	Mon,  6 May 2024 18:22:28 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1715012547;
-	bh=frTG5OBPlS3cpKFuLzpv3nMYxGsgU18EpPK6RPYW230=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QVGJW07xk8eHL6UpWADM18ljmNpCsUZFZ/y+hnujvAG4wypA725OzVnlFCVIrzeIC
-	 hLijnFYam4uOXYA7uIhnwTtwavFoEY7K9tQ4KEDq+PhS9u4z/2SnXX09JSBL1tqE1e
-	 POk3pm5g+TTYR6xyTDIy65DL078axdOiRswSeqfc=
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VY6BV5nyRzpxL;
-	Mon,  6 May 2024 18:22:26 +0200 (CEST)
-Date: Mon, 6 May 2024 18:22:25 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Christian Brauner <brauner@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Kees Cook <keescook@chromium.org>, 
-	Mark Brown <broonie@kernel.org>, Shengyu Li <shengyu.li.evgeny@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Will Drewry <wad@chromium.org>, 
-	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v5 10/10] selftests/harness: Handle TEST_F()'s explicit
- exit codes
-Message-ID: <20240506.Ceeche0coolu@digikod.net>
-References: <20240503105820.300927-1-mic@digikod.net>
- <20240503105820.300927-11-mic@digikod.net>
- <ZjTx7BYvbrqFSNuH@google.com>
+	s=arc-20240116; t=1715012669; c=relaxed/simple;
+	bh=1umspOg6P+YBt+kF0yVj2x9Zp4XiH8wmBDIrxcQqV7g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S2kTNH2km8Vwb/anhrkWTXvGvCn8ZQJ6sDZqSjklv7csrmHpaz2Sr2evVcHkaamSy//9l387xFtetBNwEQDLFiveEHEeGgsTKD1SpYMRUrbNHypRtGMq1MyjBJ4yBKMSzbggUQpoIKmwpC6HrXay5VHXQ2xZrKq03byV8XdSwVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZXSJuTEY; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso13805a12.1
+        for <kvm@vger.kernel.org>; Mon, 06 May 2024 09:24:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715012665; x=1715617465; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v0dZxDAccYcCY4EmOhr7flN+YOjsFHzjNLPRNOnfYa0=;
+        b=ZXSJuTEYUFZMmt8P2dFsiBGlWk/ItnjYTJnxAKAWaTAjoGb4HDCprRjJHsqZ1Gro/A
+         ivY7sRYI8HacYb9zESUqJbUIu+2d96GkVZuTaS+X+RcNM40Gb8A9iCjQTlfmAU3GsLhl
+         yjZr76Sc29wR1JJOIgP1SNyc7apW27T94OwVdPJFXB+0qXmFcMPviQxQQfqCElWtpMdv
+         33DZnLp/c5YvRz/tsEEIU1LE8O0UETVNOIY48aHtTEyKCUTLFopbQ4fP8BHLzWiy+5Ay
+         wyym0oONZ6UOi2bTtJuPyH2afKt+193nAO+wpPX8DNBoI+ws8QWgUj4bYr+Mck9V8BBt
+         NXow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715012665; x=1715617465;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v0dZxDAccYcCY4EmOhr7flN+YOjsFHzjNLPRNOnfYa0=;
+        b=wWzC0bzk0BskFJZXc65vZiWXR2245Oq/AZ4q0wSSDACpCgx4979Gyv1FLXn7pXkwQr
+         xaQ/IO1Q25XsU9Ay9AQ/esn9ijEJrk1Adlsx9pXTJe6S6MJUt1N86Zu7nokDjFZMfMPw
+         qM95/it+YQUgz//1L+thLvN3RTprSZ9upKhUWBLNTSAWugDSWlZfDDAsZ3co0tdyk0tP
+         DxYVXco3qaAzPmsm2ltOc9HMGMAKlXLBLp31JNEve+i1jUKBn+0D1FVsyMOhxfuTrY26
+         UZSZUWR5p1vrpQce+FliO5B+vF37s6yllZvvoXsN3LDhspIjTT5r1OUxDH0xiAXhpC6B
+         o+DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUTG4pFWwwFQcbxK7Ye4SyxMDyr7he6RRV8Uvztqbs8H3O2AwoR+iR0fO/17916/5uOhnsUXxS6xdZboO61JTSJuwJC
+X-Gm-Message-State: AOJu0YypQwWCeQfiIh2k6oPcdzj71U8PxI6402DHqpX442FmoRhAlkMu
+	IpBgGLqfNSKEU4gZLC0Nw/aKvcmPtp548cev347MIZwYCYLTy3LDxaEfaV49VdINjIyA9btxroW
+	0BzuOWx46ftT3JZ9W1fhlooct5w1+yW44yMZV
+X-Google-Smtp-Source: AGHT+IFfKJPpR85/urooKgDXyAvRKv1p8Ab+gb4qgrqhtuI42OCDChtqOgl7yd9hwmAY+uLAF+ntmjZvvrebUqjOnAQ=
+X-Received: by 2002:aa7:d44f:0:b0:572:e6fb:ab07 with SMTP id
+ 4fb4d7f45d1cf-572e6fbac14mr225538a12.7.1715012653454; Mon, 06 May 2024
+ 09:24:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZjTx7BYvbrqFSNuH@google.com>
-X-Infomaniak-Routing: alpha
+References: <20240429060643.211-1-ravi.bangoria@amd.com> <20240429060643.211-3-ravi.bangoria@amd.com>
+In-Reply-To: <20240429060643.211-3-ravi.bangoria@amd.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Mon, 6 May 2024 09:24:00 -0700
+Message-ID: <CALMp9eQzbNVJpuxp1orNswnyfKy=aFSPYFRnd3H7fbi0+NfDvw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] x86/bus_lock: Add support for AMD
+To: Ravi Bangoria <ravi.bangoria@amd.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, seanjc@google.com, pbonzini@redhat.com, 
+	thomas.lendacky@amd.com, hpa@zytor.com, rmk+kernel@armlinux.org.uk, 
+	peterz@infradead.org, james.morse@arm.com, lukas.bulwahn@gmail.com, 
+	arjan@linux.intel.com, j.granados@samsung.com, sibs@chinatelecom.cn, 
+	nik.borisov@suse.com, michael.roth@amd.com, nikunj.dadhania@amd.com, 
+	babu.moger@amd.com, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, santosh.shukla@amd.com, ananth.narayan@amd.com, 
+	sandipan.das@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 03, 2024 at 07:17:16AM GMT, Sean Christopherson wrote:
-> On Fri, May 03, 2024, Mickaël Salaün wrote:
-> > If TEST_F() explicitly calls exit(code) with code different than 0, then
-> > _metadata->exit_code is set to this code (e.g. KVM_ONE_VCPU_TEST()).  We
-> > need to keep in mind that _metadata->exit_code can be KSFT_SKIP while
-> > the process exit code is 0.
-> > 
-> > Initial patch written by Sean Christopherson [1].
-> 
-> Heh, my pseudo patch barely has any relevance at this point.  How about replacing
-> that with:
-> 
->   Reported-by: Sean Christopherson <seanjc@google.com>
->   Closes: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com
-> 
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: Mark Brown <broonie@kernel.org>
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Cc: Shuah Khan <shuah@kernel.org>
-> > Cc: Will Drewry <wad@chromium.org>
-> > Link: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com [1]
-> > Fixes: 0710a1a73fb4 ("selftests/harness: Merge TEST_F_FORK() into TEST_F()")
-> > Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> > Link: https://lore.kernel.org/r/20240503105820.300927-11-mic@digikod.net
-> > ---
-> > 
-> > Changes since v4:
-> > * Check abort status when the grandchild exited.
-> > * Keep the _exit(0) calls because _metadata->exit_code is always
-> >   checked.
-> > * Only set _metadata->exit_code to WEXITSTATUS() if it is not zero.
-> > 
-> > Changes since v3:
-> > * New patch mainly from Sean Christopherson.
-> > ---
-> >  tools/testing/selftests/kselftest_harness.h | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-> > index eb25f7c11949..7612bf09c5f8 100644
-> > --- a/tools/testing/selftests/kselftest_harness.h
-> > +++ b/tools/testing/selftests/kselftest_harness.h
-> > @@ -462,9 +462,13 @@ static inline pid_t clone3_vfork(void)
-> >  		munmap(teardown, sizeof(*teardown)); \
-> >  		if (self && fixture_name##_teardown_parent) \
-> >  			munmap(self, sizeof(*self)); \
-> > -		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
-> > +		if (WIFEXITED(status)) { \
-> > +			if (WEXITSTATUS(status)) \
-> > +				_metadata->exit_code = WEXITSTATUS(status); \
-> 
-> Ah, IIUC, this works because __run_test() effectively forwards the exit_code?
-> 
-> 	} else if (t->pid == 0) {
-> 		setpgrp();
-> 		t->fn(t, variant);
-> 		_exit(t->exit_code);
-> 	}
+On Sun, Apr 28, 2024 at 11:08=E2=80=AFPM Ravi Bangoria <ravi.bangoria@amd.c=
+om> wrote:
+>
+> Upcoming AMD uarch will support Bus Lock Detect (called Bus Lock Trap
+> in AMD docs). Add support for the same in Linux. Bus Lock Detect is
+> enumerated with cpuid CPUID Fn0000_0007_ECX_x0 bit [24 / BUSLOCKTRAP].
+> It can be enabled through MSR_IA32_DEBUGCTLMSR. When enabled, hardware
+> clears DR6[11] and raises a #DB exception on occurrence of Bus Lock if
+> CPL > 0. More detail about the feature can be found in AMD APM[1].
+>
+> [1]: AMD64 Architecture Programmer's Manual Pub. 40332, Rev. 4.07 - June
+>      2023, Vol 2, 13.1.3.6 Bus Lock Trap
+>      https://bugzilla.kernel.org/attachment.cgi?id=3D304653
 
-Yes
-
-> 
-> Tested-by: Sean Christopherson <seanjc@google.com>
-
-OK, I'll send a v6. We really need to get this into -next.
-
-> 
-> > +		} else if (WIFSIGNALED(status)) { \
-> >  			/* Forward signal to __wait_for_test(). */ \
-> >  			kill(getpid(), WTERMSIG(status)); \
-> > +		} \
-> >  		__test_check_assert(_metadata); \
-> >  	} \
-> >  	static void __attribute__((constructor)) \
-> > -- 
-> > 2.45.0
-> > 
-> 
+Is there any chance of getting something similar to Intel's "VMM
+bus-lock detection," which causes a trap-style VM-exit on a bus lock
+event?
 
