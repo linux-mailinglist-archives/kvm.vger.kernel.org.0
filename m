@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-16623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080608BC6D4
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:32:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 832218BC6D5
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D9581F21BD8
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:32:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEE6C1F21E10
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 05:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D28140E5F;
-	Mon,  6 May 2024 05:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0001411DF;
+	Mon,  6 May 2024 05:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CZ5MBHEA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tsV731uT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AD0140E25
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1305C140E4D
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 05:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714973450; cv=none; b=EsNPXVXPPlDmyYpA4z+e6G+oz6DZi4w9VRbxgmvHyuMe9o/dBkQ8ocGBuIcHjKZwEboNpc4ihdcnhpEsexlvfAxqS/RbdACPTw3Y69EUe/uSMymoUK4vQDQEIRTyJRWSoge8qIn0QHR4elgUXvwCstWzGCYn4rfy4mIRRLAvlKQ=
+	t=1714973451; cv=none; b=F/K4sGTvrICKuYjY2rOY2DUTPfBI2qKpUHELJWE3rjfUDTES/KZ2AcXSd62GL7Ac+AOkvRAhqcoQ2leHI5o7SVe1rekx3LyO4lYGyU2ElyZ6L7QqGztnckzo1tBbeFwiQyK4j+KeGoJjvVNggN/nxsmk6YLZxe5x1+3SS1XlqVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714973450; c=relaxed/simple;
-	bh=kQemOPD0Zydqsmtn0w+cnNnsyxjU727hdz4fooWjwfo=;
+	s=arc-20240116; t=1714973451; c=relaxed/simple;
+	bh=OKVnKqjqLes500+TVVKHCbNHVn805ASKjv1fJgD46/Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QNCcYoqTxAZXZ5wF3duwzGaL5DT65qgqRonLrSffyC51bq9TiBj2DPJU3jdvYITBP5WAsWLYe+UtUlmocCEcUcY8bqDha0lN+k5YktCzpYxm8FFNBHpPH1/YPiF+JxdX/5LQ+NZw8uXa5itJneIEvnQ3LgSMGqOkTg2PVF2ja2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CZ5MBHEA; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=jCL4Xd6Hje5QLa2Kh8o4N7BnLxwXnd38IXptQ+EkcLqhlxFBUZuuw2by4zQhLc9+o4c+2NIybeVu/DSA0bAuoyW72lz6gbe1tif2Gn+WvF21bIi5yxiId/wSgOU9zSSGmp0HixH3cNO+DTSSBfjS6/5IBFP7owT6yVNH8XGFg2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tsV731uT; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8dd488e09so2334636a12.2
-        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:30:48 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6f446a1ec59so1735902b3a.1
+        for <kvm@vger.kernel.org>; Sun, 05 May 2024 22:30:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1714973448; x=1715578248; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1714973449; x=1715578249; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=9Dgs20dNjgAl9Yl4ETI/O5/Y7n5eoiN1wzowsGzoois=;
-        b=CZ5MBHEACVJjouiWRaqSO4IuDijBhry+bgkmbBXV2QgX1iUtmRRBX3TJZ0WMqmtH5s
-         xaU/DUsvtRZgrOB5TkBcAvAw7tjGKlm0KJzWAr2V5332dbt2exnMZGIcMlCAQDIyjRMj
-         KUhVRVkDDqR8wgr5ktQC4gtTqF7ScCmSo7Nt6skFd64rxcCUoGmenyaeGtpPbHmkbA5o
-         0iWjeHnhUKPIn1TGl3GhxKLtiogI8b7jJnM86oJ21XenNUmfVsfYZrvSUVY7sp4MNmp0
-         +r91w1ZhDJL9e/333BnGOejLP+f7wSXE2T8lMaR10idhBuhVUJmy/dHBXySWdU2pWNBM
-         4SfQ==
+        bh=L3LCM1OsaYiIlnrBibBFz2xG/zfA/cshhJRla+qWYkk=;
+        b=tsV731uTrqRxA7Vjs5I1TYT8urvii6Hg7Nifcybq6LSKV7rZGjSha8t3VIFlSNYWyd
+         4xh/Wlf2OmbYe9PCDkP2wdHkWleaaGCQYXAOCqArbSGp0qAG731P7h9JaBm2na+wJAJE
+         YKEoe3cR0Gr0dvvBUSNaY9SYulp7Z+njSsLZgfLY3fy1JeGSwTRnOuXrKd8hw25F0GCr
+         gB8ybAdI0yxkeHgFT/ZbIBTacNgcsg3VpyiQPDfl5G+VrTAj0kH9vCjTvvTEbF1K1XHX
+         8Za9UkezTfYTa/DphTEDX3sGsUCVn+VkWhZEtOajKRxdhqjCW1HzHDNco6bv/MywhNJ7
+         QSpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1714973448; x=1715578248;
+        d=1e100.net; s=20230601; t=1714973449; x=1715578249;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9Dgs20dNjgAl9Yl4ETI/O5/Y7n5eoiN1wzowsGzoois=;
-        b=EZvbNy43rjWbf17bB0DwAJKs/FLuwEnfxJHtF+Hg2jSF+/7h0cneXmdSAcHXI5ujn4
-         GElPR+IP3pNrmMbapFRhh3/QZJEivmNhFppD/+1ypb0GBYlCPcbRs+lGIBcK+bt+qDrt
-         Ac3p99hVCMFCHQj6nSY3OpipAvthCFqSpPi6dSLxqmKCSZsnQrs87n0mZhiK2FkZzJ7W
-         jPuPTDtz+JfN89gezqOpABA256jZEbVBYuJbHB9b0TrzntJc6r8Z5tRRKghxWwc+ZbZ1
-         PwNs8xfYOWyaUdObiuYgNakmo2YNrvQCTLY5iZfmhBBVg2VzqDbsA79gAS+ELOvBtGZS
-         PprQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8CWstmWN/cZSIEa6yiFkZlvKvCdwUgdZfRj6b/rfEfpIQC0T/gCKwrTvNqSi78ACd1xRpJq2pZkEQ2TI0+qQbhQcy
-X-Gm-Message-State: AOJu0YziJEdvhOiVcZb+kqfBWwUB4+dKhhnGozxZiA3OrfuoOlSCdIGz
-	cFwrMRTqbx/NyUYZevN3iCxdXru7qqZjjpWBmL2DW3bWbLVxCoDN2fso/tqF0bJLskjuRGdv2VK
-	5F3PgBQ==
-X-Google-Smtp-Source: AGHT+IEddBveDzLs8KjlI+n90U+GWRV3jtIkb+j1aP+Aml/IbiLi1j81dg8g4Ubmb4YPqwtk2l6FE9b0Wsxm
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a05:6a02:68f:b0:5dc:2d1c:43c6 with SMTP id
- ca15-20020a056a02068f00b005dc2d1c43c6mr27121pgb.9.1714973447431; Sun, 05 May
- 2024 22:30:47 -0700 (PDT)
+        bh=L3LCM1OsaYiIlnrBibBFz2xG/zfA/cshhJRla+qWYkk=;
+        b=OuP1SyS9Bwv5pJ3GzF3bJJGh686S9rKQhkroLNVM4jRZBu3mlz7wed4YnYaPS4vl1v
+         EUC68u3AcbvNz2ntFdLAt0Yo6i7T3mrb3QImLky6jzwArVjYB/z4D4yJGcZA39El4YcJ
+         OOqi+UGAsOhgpzXUHXY/7pzklgkCgotnOwACCpUPvQITZDgt6doSGJdnBnmM79fXZzlm
+         EzJiINBsk2+Idy0I0Wuig2A0RU4C6Xxz6LvduTEfkua48BDpEktAjcsa7ofBkox+yWEn
+         EzHvBpxxO1iqfpTDaVb50TFKMQafQdE4qgJIne9Uc5PcQ0SUZbrJ8YrePqoOhKdIAHjI
+         h5Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8pKUEHabBJiHHUYcBtov1HCLnfzpXjQW2OmqaL9QdJs4NSmynvLCQ2Sd42/vqk8wvcbZ0oK5jG3dTA24S8AdYd/71
+X-Gm-Message-State: AOJu0YyiNv1v/uy952CXHz+Ao9NEZK3GrkGcWBQjZhaFmGjKxIpvdi0q
+	uLL+liR+hW5st24zcob1lCuLVKZxCNZumO5o1Wb8ltgfObRxxFVDuOj/AEFTi01JviF1563IcTh
+	IaQc+sw==
+X-Google-Smtp-Source: AGHT+IEoDoKL6bIcsKXu5g80INJRprO1/lLAhr+CEcEGoJrqGc2N33Bj0ShzzTtaYaOJs/MTq2tsW/TfUFFh
+X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
+ job=sendgmr) by 2002:a05:6a00:39a1:b0:6ec:ceb4:d9e2 with SMTP id
+ fi33-20020a056a0039a100b006ecceb4d9e2mr239424pfb.0.1714973449476; Sun, 05 May
+ 2024 22:30:49 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Mon,  6 May 2024 05:29:36 +0000
+Date: Mon,  6 May 2024 05:29:37 +0000
 In-Reply-To: <20240506053020.3911940-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240506053020.3911940-1-mizhang@google.com>
 X-Mailer: git-send-email 2.45.0.rc1.225.g2a3ae87e7f-goog
-Message-ID: <20240506053020.3911940-12-mizhang@google.com>
-Subject: [PATCH v2 11/54] KVM: x86/pmu: Register guest pmi handler for
- emulated PMU
+Message-ID: <20240506053020.3911940-13-mizhang@google.com>
+Subject: [PATCH v2 12/54] perf: x86: Add x86 function to switch PMI handler
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
@@ -95,51 +94,64 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
 
-Add function to register/unregister PMI handler at KVM module
-initialization and destroy. This allows the host PMU with passthough
-capability enabled switch PMI handler at PMU context switch.
+Add x86 specific function to switch PMI handler since passthrough PMU and host
+PMU use different interrupt vectors.
+
+x86_perf_guest_enter() switch PMU vector from NMI to KVM_GUEST_PMI_VECTOR,
+and guest LVTPC_MASK value should be reflected onto HW to indicate whether
+guest has cleared LVTPC_MASK or not, so guest lvt_pc is passed as parameter.
+
+x86_perf_guest_exit() switch PMU vector from KVM_GUEST_PMI_VECTOR to NMI.
 
 Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- arch/x86/kvm/x86.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ arch/x86/events/core.c            | 17 +++++++++++++++++
+ arch/x86/include/asm/perf_event.h |  3 +++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ebcc12d1e1de..51b5a88222ef 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -13887,6 +13887,16 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+index 09050641ce5d..8167f2230d3a 100644
+--- a/arch/x86/events/core.c
++++ b/arch/x86/events/core.c
+@@ -701,6 +701,23 @@ struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data)
  }
- EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
+ EXPORT_SYMBOL_GPL(perf_guest_get_msrs);
  
-+static void kvm_handle_guest_pmi(void)
++void x86_perf_guest_enter(u32 guest_lvtpc)
 +{
-+	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
++	lockdep_assert_irqs_disabled();
 +
-+	if (WARN_ON_ONCE(!vcpu))
-+		return;
-+
-+	kvm_make_request(KVM_REQ_PMI, vcpu);
++	apic_write(APIC_LVTPC, APIC_DM_FIXED | KVM_GUEST_PMI_VECTOR |
++			       (guest_lvtpc & APIC_LVT_MASKED));
 +}
++EXPORT_SYMBOL_GPL(x86_perf_guest_enter);
 +
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_entry);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_exit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_fast_mmio);
-@@ -13921,12 +13931,14 @@ static int __init kvm_x86_init(void)
- {
- 	kvm_mmu_x86_module_init();
- 	mitigate_smt_rsb &= boot_cpu_has_bug(X86_BUG_SMT_RSB) && cpu_smt_possible();
-+	x86_set_kvm_irq_handler(KVM_GUEST_PMI_VECTOR, kvm_handle_guest_pmi);
- 	return 0;
- }
- module_init(kvm_x86_init);
++void x86_perf_guest_exit(void)
++{
++	lockdep_assert_irqs_disabled();
++
++	apic_write(APIC_LVTPC, APIC_DM_NMI);
++}
++EXPORT_SYMBOL_GPL(x86_perf_guest_exit);
++
+ /*
+  * There may be PMI landing after enabled=0. The PMI hitting could be before or
+  * after disable_all.
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 3736b8a46c04..807ea9c98567 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -577,6 +577,9 @@ static inline void perf_events_lapic_init(void)	{ }
+ static inline void perf_check_microcode(void) { }
+ #endif
  
- static void __exit kvm_x86_exit(void)
- {
-+	x86_set_kvm_irq_handler(KVM_GUEST_PMI_VECTOR, NULL);
- 	WARN_ON_ONCE(static_branch_unlikely(&kvm_has_noapic_vcpu));
- }
- module_exit(kvm_x86_exit);
++void x86_perf_guest_enter(u32 guest_lvtpc);
++void x86_perf_guest_exit(void);
++
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+ extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr, void *data);
+ extern void x86_perf_get_lbr(struct x86_pmu_lbr *lbr);
 -- 
 2.45.0.rc1.225.g2a3ae87e7f-goog
 
