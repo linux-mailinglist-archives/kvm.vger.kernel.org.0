@@ -1,87 +1,87 @@
-Return-Path: <kvm+bounces-16735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16736-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A5F28BD270
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 18:19:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FD08BD272
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 18:19:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19ECBB22AD9
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 16:19:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9960C2869EE
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 16:19:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703E8156997;
-	Mon,  6 May 2024 16:18:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E277156C76;
+	Mon,  6 May 2024 16:18:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UvBQlARU"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Zl5mrDT5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24FF15665C;
-	Mon,  6 May 2024 16:18:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D94315664B;
+	Mon,  6 May 2024 16:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715012293; cv=none; b=g7uRyhTyiES6pB9y+Kf1kkY58gQvxsBxGIDR1XwgUw0Suj68WXiKpEEV0P8biQHe/q0u57Xx4cXyzImeRpFW1kz/XSo9NO4TVtJz+ikdrYMray+SJb8ZXqDd2469FBtm/3GL/I2Ii17hfUR9uXJ9pKY3vq3uYg2IRaeWeGCDiHE=
+	t=1715012303; cv=none; b=XHoEx2wxkEeYoouZdyJaNmaVTS5Zgp4HIP1JtugRzmH9672YolsPBXENuMnwLZ6x5igP31zxfOVBP+pApV1alvMtrV+hg0EsX8oJKZaFwb5uL+6hbpyi8ZyL44sfuAjSLXjEyI3CBlhE/1r9VuI4UIJ7z9oFQXZP6/iQ8PfwIlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715012293; c=relaxed/simple;
-	bh=Yudd+LbphmqwuVEHJwSLVDg9XFbhqEuPzRJAqIoAD5Y=;
+	s=arc-20240116; t=1715012303; c=relaxed/simple;
+	bh=fxNefskKpD2OANrNxXrnrAAT0Q0jJDzhonaTjHySxxo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eycSWUcR3hHBUIkRL417rOfJQ10T/oHta5x+EVIKjI9S35uvyyWq8nbucZUZPqzfpgqC4aUWCK8cGO2CQxYyK2/tCEgCsVrIrETmvohQnTEqREGfDpMRKnp9eMMWXJXUJa8noR3w/WUaMKzDwdhbpiHHdqoCob7AvVSEkm2gP4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UvBQlARU; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=fM8UgBtEmGaC9ozx9CkRg+T0tAyiw5JV8tzZWKoDAb7wodxu0XchyFeE6Ju5FYAE7bgpbrM099dCkAsgxCfDWzO4FatjxM2v7vyunGjaShpKEy0NblnFIN1vm0tOyLDyqSz41gQ7R+F3yqZ+ERqAjop41ee9AfNSN8OIpR4ANr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Zl5mrDT5; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446GH6lL026899;
-	Mon, 6 May 2024 16:18:05 GMT
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446FEDnQ006374;
+	Mon, 6 May 2024 16:18:14 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=1ZljFRPQkJliM89Aj1uqay/WLHKarY1XQa8XB660YSs=;
- b=UvBQlARUFXa/fssmm0GGeaXvHKxkwHVeJRHjzsx9EjlVZwcx2gaOmqGdTvp3/BH4cBWa
- rg2mgmX2GkHD4CtQAxMrn3WVw0pR0xeqDMat8jnG/YzCuWJ+un3C2WfKShK2bs9qzwj6
- wrhe6LJT5YRZBzFSOvZfuUviKlDDd5noe2Q1Mr2qdYHQVmlc/T1k6Ey3xPKndO9Oir/P
- p0sqca5LrHwRC+4+GxzOjw8UC6OK8BsD9vCW5i7LIcr8qP+WkiTe4A5Xno2smzTOqEpJ
- v/UVXYTf/Tw4XJzduVi7yOrSMOnPqqqL7jkrXItFwf24mm7p7NU90X74BJfePVl01/zc 2A== 
+ bh=kMBRKF0m+ZIYkax/WD20be0LrYx6C1oQnvg851lGN1U=;
+ b=Zl5mrDT5E/gnrFcd57mYQEDskqCsM/DYWyxnlk24i+4JEDVhyia1Q97BdBvlS0xzHcto
+ eJ/MnMWhpgyXjNs4RybzO79C5YblFikQfLIyJtWBYPoLXe0oiFiVXXDqbIdcJs9Frjvo
+ nYSTaUffMQCneTNcN9luweU8m012XUePy2Pl0/ohLoBshkBJ9PwUF5N6h0uQnWe49590
+ ovVyNuUfGzhex/XQWrwkld81agaDOUyGoPtLHPuZknLVVvlanRsgSsi7m5cl2qa4JTDd
+ iy7yxHg37hcQdLrGmt7AWjTGAPEvnU9YFO0M0iZH8NJPoCeS6R0DkC4Dj5MYGtQR6zC+ SA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy2ka806e-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy11k89ny-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 May 2024 16:18:04 +0000
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446GI4K0029545;
-	Mon, 6 May 2024 16:18:04 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy2ka806b-1
+	Mon, 06 May 2024 16:18:13 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446GIDHe011646;
+	Mon, 6 May 2024 16:18:13 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xy11k89nw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 May 2024 16:18:03 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 446DklrG022497;
-	Mon, 6 May 2024 16:18:02 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx1jkrj34-1
+	Mon, 06 May 2024 16:18:13 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 446G9qJ8010635;
+	Mon, 6 May 2024 16:18:12 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xx0bp0vec-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 06 May 2024 16:18:02 +0000
+	Mon, 06 May 2024 16:18:12 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 446GHvTo57016824
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 446GI6Dj48103934
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 6 May 2024 16:17:59 GMT
+	Mon, 6 May 2024 16:18:08 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 890BE20040;
-	Mon,  6 May 2024 16:17:57 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id A3D0C20043;
+	Mon,  6 May 2024 16:18:06 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A564F20043;
-	Mon,  6 May 2024 16:17:51 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 12A1D20040;
+	Mon,  6 May 2024 16:18:00 +0000 (GMT)
 Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com.com (unknown [9.43.105.31])
 	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  6 May 2024 16:17:51 +0000 (GMT)
+	Mon,  6 May 2024 16:17:58 +0000 (GMT)
 From: Gautam Menghani <gautam@linux.ibm.com>
 To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
         naveen.n.rao@linux.ibm.com
 Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] arch/powerpc/kvm: Use bitmap to speed up resend of irqs in ICS
-Date: Mon,  6 May 2024 21:47:29 +0530
-Message-ID: <20240506161735.83358-2-gautam@linux.ibm.com>
+Subject: [PATCH 2/3] arch/powerpc/kvm: Optimize the server number -> ICP lookup
+Date: Mon,  6 May 2024 21:47:30 +0530
+Message-ID: <20240506161735.83358-3-gautam@linux.ibm.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240506161735.83358-1-gautam@linux.ibm.com>
 References: <20240506161735.83358-1-gautam@linux.ibm.com>
@@ -93,87 +93,82 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: I0zi3wmf-XEqBJBOGsx18Ged2lPofcQi
-X-Proofpoint-ORIG-GUID: EmSSA70nkoVw2EnX0XdqyKahIU2YJXJc
+X-Proofpoint-GUID: UU-kyuhKFyzoEfxvb1KalCQhcwB5PbDh
+X-Proofpoint-ORIG-GUID: Br6O1nZSQbn2vhMdQCbldY1bQydJLiY6
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
  definitions=2024-05-06_11,2024-05-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 phishscore=0 suspectscore=0 mlxscore=0
- priorityscore=1501 bulkscore=0 impostorscore=0 spamscore=0 malwarescore=0
- mlxlogscore=493 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2404010000 definitions=main-2405060114
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=1 lowpriorityscore=0
+ mlxlogscore=220 impostorscore=0 mlxscore=1 adultscore=0 clxscore=1015
+ priorityscore=1501 spamscore=1 malwarescore=0 bulkscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2405060114
 
-When an irq is to be resent, all 1024 irqs in an ICS are scanned and the
-irqs having 'resend' flag set are resent. Optimize this flow using bitmap
-array to speed up the resends.
+Given a server number, kvmppc_xics_find_server() does a linear search
+over the vcpus of a VM. Optimize this logic by using an array to
+maintain the mapping between server number -> icp.
 
 Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
 ---
- arch/powerpc/kvm/book3s_xics.c | 22 +++++++++++-----------
- arch/powerpc/kvm/book3s_xics.h |  1 +
- 2 files changed, 12 insertions(+), 11 deletions(-)
+ arch/powerpc/kvm/book3s_xics.c |  4 ++--
+ arch/powerpc/kvm/book3s_xics.h | 10 ++--------
+ 2 files changed, 4 insertions(+), 10 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
-index 589a8f257120..12de526f04c4 100644
+index 12de526f04c4..1dc2f77571e7 100644
 --- a/arch/powerpc/kvm/book3s_xics.c
 +++ b/arch/powerpc/kvm/book3s_xics.c
-@@ -47,9 +47,6 @@
+@@ -47,8 +47,6 @@
   * TODO
   * ====
   *
-- * - To speed up resends, keep a bitmap of "resend" set bits in the
-- *   ICS
+- * - Speed up server# -> ICP lookup (array ? hash table ?)
 - *
-  * - Speed up server# -> ICP lookup (array ? hash table ?)
-  *
   * - Make ICS lockless as well, or at least a per-interrupt lock or hashed
-@@ -125,15 +122,17 @@ static int ics_deliver_irq(struct kvmppc_xics *xics, u32 irq, u32 level)
- static void ics_check_resend(struct kvmppc_xics *xics, struct kvmppc_ics *ics,
- 			     struct kvmppc_icp *icp)
+  *   locks array to improve scalability
+  */
+@@ -1062,6 +1060,7 @@ static struct kvmppc_ics *kvmppc_xics_create_ics(struct kvm *kvm,
+ static int kvmppc_xics_create_icp(struct kvm_vcpu *vcpu, unsigned long server_num)
  {
--	int i;
-+	u32 irq;
-+	struct ics_irq_state *state;
+ 	struct kvmppc_icp *icp;
++	struct kvm *kvm = vcpu->kvm;
  
--	for (i = 0; i < KVMPPC_XICS_IRQ_PER_ICS; i++) {
--		struct ics_irq_state *state = &ics->irq_state[i];
--		if (state->resend) {
--			XICS_DBG("resend %#x prio %#x\n", state->number,
--				      state->priority);
--			icp_deliver_irq(xics, icp, state->number, true);
--		}
-+	for_each_set_bit(irq, ics->resend_map, KVMPPC_XICS_IRQ_PER_ICS) {
-+		state = &ics->irq_state[irq];
-+
-+		if (!test_and_clear_bit(irq, ics->resend_map))
-+			continue;
-+		if (!state)
-+			continue;
-+		icp_deliver_irq(xics, icp, state->number, true);
- 	}
- }
+ 	if (!vcpu->kvm->arch.xics)
+ 		return -ENODEV;
+@@ -1078,6 +1077,7 @@ static int kvmppc_xics_create_icp(struct kvm_vcpu *vcpu, unsigned long server_nu
+ 	icp->state.mfrr = MASKED;
+ 	icp->state.pending_pri = MASKED;
+ 	vcpu->arch.icp = icp;
++	kvm->arch.xics->icps[server_num] = icp;
  
-@@ -489,6 +488,7 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
- 		 */
- 		smp_wmb();
- 		set_bit(ics->icsid, icp->resend_map);
-+		set_bit(src, ics->resend_map);
+ 	XICS_DBG("created server for vcpu %d\n", vcpu->vcpu_id);
  
- 		/*
- 		 * If the need_resend flag got cleared in the ICP some time
 diff --git a/arch/powerpc/kvm/book3s_xics.h b/arch/powerpc/kvm/book3s_xics.h
-index 08fb0843faf5..8fcb34ea47a4 100644
+index 8fcb34ea47a4..feeb0897d555 100644
 --- a/arch/powerpc/kvm/book3s_xics.h
 +++ b/arch/powerpc/kvm/book3s_xics.h
-@@ -98,6 +98,7 @@ struct kvmppc_ics {
- 	arch_spinlock_t lock;
- 	u16 icsid;
- 	struct ics_irq_state irq_state[KVMPPC_XICS_IRQ_PER_ICS];
-+	DECLARE_BITMAP(resend_map, KVMPPC_XICS_IRQ_PER_ICS);
+@@ -111,19 +111,13 @@ struct kvmppc_xics {
+ 	u32 err_noics;
+ 	u32 err_noicp;
+ 	struct kvmppc_ics *ics[KVMPPC_XICS_MAX_ICS_ID + 1];
++	DECLARE_FLEX_ARRAY(struct kvmppc_icp *, icps);
  };
  
- struct kvmppc_xics {
+ static inline struct kvmppc_icp *kvmppc_xics_find_server(struct kvm *kvm,
+ 							 u32 nr)
+ {
+-	struct kvm_vcpu *vcpu = NULL;
+-	unsigned long i;
+-
+-	kvm_for_each_vcpu(i, vcpu, kvm) {
+-		if (vcpu->arch.icp && nr == vcpu->arch.icp->server_num)
+-			return vcpu->arch.icp;
+-	}
+-	return NULL;
++	return kvm->arch.xics->icps[nr];
+ }
+ 
+ static inline struct kvmppc_ics *kvmppc_xics_find_ics(struct kvmppc_xics *xics,
 -- 
 2.44.0
 
