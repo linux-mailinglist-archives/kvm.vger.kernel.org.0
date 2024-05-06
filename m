@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-16769-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16770-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 304C68BD7F8
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 00:56:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBC118BD7FA
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 00:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9DA1281178
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 22:56:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03F771C22EF9
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 22:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221B715EFD9;
-	Mon,  6 May 2024 22:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A44615F326;
+	Mon,  6 May 2024 22:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lPnIswQG"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TqzM5GPk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5091C15EFC4;
-	Mon,  6 May 2024 22:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE0215EFCA;
+	Mon,  6 May 2024 22:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715036010; cv=none; b=kMYeWSCeTzm9Eyj5BgkglC9FNvGmbpW5SpgqKypfSCoddkSXb8x5c2vNe4aybo5hvQ+t4MCOL20CLXgfuT2/j1OkzYr8tCWV7eH9Fm5OqoiBMjOBe+Lp3n66KgblwNfEi1AMBmhhwwD0yZ45Fg4AA4HGeU6owQqGVvez84bjcz8=
+	t=1715036011; cv=none; b=Gsx7GrfFrLHL0zXtaCOvOJQnSxZjOZPoW4DuW8It3DfumAt3GnLdBZj9q2epJL40yvw1p57hqokJTxnJo8Z1IylAO9Vzx15u8HK7QS06kObi90665GaDQp5B7abQZgELu0OMxJjkdJNm9UiSG00+c66RFg/l1iPwNmvh1feAQ7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715036010; c=relaxed/simple;
-	bh=N83RTlbkk1uWKz5wxtRBpnWXby9KMfSeVUq0AzDvW0Y=;
+	s=arc-20240116; t=1715036011; c=relaxed/simple;
+	bh=OO26FdXFEBlagFtETE8C+k5hqlOa3G7JdRW5eT/w6Xg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Z6ztgTWUUoDgE4OVe7nA0stUzGsplWhn7kN17+880Sn2KXXiEnE8WY9pkpILGDvYa4/B77vAHdqT3Gd0Zx1DYFD7An4NoGlM8ySCL87F3rVv0qp4gdgkn/suayjatqANwvu5mDxmADIDWBQ2Gk/5qsxKYeXwH+6dCTfs3rlFtAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lPnIswQG; arc=none smtp.client-ip=205.220.177.32
+	 MIME-Version; b=uQS74rUVtj3NVFIR+YBUhs++xGVw2PWrpDybbhcxTsF9KMuHK/X9BMDB8Z634WgiFZ7vkF/xMhbZpw3vnfuQrp4/19uK/5Q0qeFiqdDG8EnVAatKIb04QWsvE324wC8gLGQRvcRXtsfhouVHM57m328lEOD357nbt9PBx+r0SJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=TqzM5GPk; arc=none smtp.client-ip=205.220.165.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446MmiNa018450;
-	Mon, 6 May 2024 22:53:24 GMT
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446MqTZh006875;
+	Mon, 6 May 2024 22:53:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2023-11-20;
- bh=L03fituX5ED4j0N/+xawJHW+6W8Cf/jN9ak36qucFGQ=;
- b=lPnIswQGLG0ufbGrw+XQccZULuO42QdqfYXaH+GAKPFKLWdat94fdlwxzzpsolLUbnQW
- qx3DYAF8vRdwDhj0uN2+h2V/qKAptfg3z2XzXCaaNzth0PWjeQxIiTm8RO6usAO+fyDX
- yqDHadsrsN/d54WHa93aTytbrDovwawyIQD3r01lisxiAzmP8FjQuzNIUg9N3fHoWKNC
- 2fEUS4+kgFwYZn2U9YKYCDFG2ilPotwW5fVk333KdYYh0fQFJ2Gh3dLlbjJNumFcJP4U
- nEBt7cs9zgxdGeIJohNZGcK6pYbjp8APm9xUYh2tI4puMAQWbOy31sKMP4uITw0BPaiO ag== 
+ bh=H9IZVi3DWKq501eRNFuQDWwQF55QlP0lPQ2r++Zshwg=;
+ b=TqzM5GPkH8MKkNofGT8oZ7zIgb0nM+XArXAVdociuD/qpECgkXzZHACnRo083Jmdkka1
+ 7cJvuPpYBYaX/T+fUF37nIXNrcxO6FDnSSUWJjvI5FQDWkdeRFoWgdm+lXZyjjR+4Uc5
+ c9VgZGPn78n+hMj2kAiRbmGeti9uJGadvkEhpWnF5hzZR/WhmMi8qBB6Pvjvhk0HqYN4
+ uaUEY3T0YHD+oqi8fe+xHGtl86XgYEPDARohSujprJfRB9D3wX9FoUerFeIGp4lquNtA
+ 33wVNomaBuqxqs0nRPHCMvvpue3sKHylDA3ZKyQSvMxR757UqgN+/yxnIIoIIYUmaSes Sw== 
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xwd2duqpx-1
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xwbm5ks55-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 06 May 2024 22:53:23 +0000
+	Mon, 06 May 2024 22:53:24 +0000
 Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 446LFKRL027629;
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 446LsjOD027579;
 	Mon, 6 May 2024 22:53:23 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3xwbfdg8nd-1
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3xwbfdg8p0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Mon, 06 May 2024 22:53:23 +0000
 Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446MrMxC006764;
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446MrMxE006764;
 	Mon, 6 May 2024 22:53:22 GMT
 Received: from alaljime-dev-e4flex-vm.osdevelopmeniad.oraclevcn.com (alaljime-dev-e4flex-vm.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.106])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3xwbfdg8mq-2;
+	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3xwbfdg8mq-3;
 	Mon, 06 May 2024 22:53:22 +0000
 From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
 To: kvm@vger.kernel.org, seanjc@google.com, vasant.hegde@amd.com
@@ -66,9 +66,9 @@ Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org,
         joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
         suravee.suthikulpanit@amd.com, mlevitsk@redhat.com,
         alejandro.j.jimenez@oracle.com
-Subject: [PATCH v2 1/2] KVM: x86: Print names of apicv inhibit reasons in traces
-Date: Mon,  6 May 2024 22:53:20 +0000
-Message-Id: <20240506225321.3440701-2-alejandro.j.jimenez@oracle.com>
+Subject: [PATCH v2 2/2] KVM: x86: Keep consistent naming for APICv/AVIC inhibit reasons
+Date: Mon,  6 May 2024 22:53:21 +0000
+Message-Id: <20240506225321.3440701-3-alejandro.j.jimenez@oracle.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20240506225321.3440701-1-alejandro.j.jimenez@oracle.com>
 References: <20240506225321.3440701-1-alejandro.j.jimenez@oracle.com>
@@ -86,100 +86,85 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spams
  mlxlogscore=999 suspectscore=0 malwarescore=0 adultscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
  definitions=main-2405060166
-X-Proofpoint-GUID: fhH8LZyyFX6i2M0TQm15-WjQk_lqZCQr
-X-Proofpoint-ORIG-GUID: fhH8LZyyFX6i2M0TQm15-WjQk_lqZCQr
+X-Proofpoint-GUID: U9-hmjDCybQjSc_yhM6KDU82HtpzWzFn
+X-Proofpoint-ORIG-GUID: U9-hmjDCybQjSc_yhM6KDU82HtpzWzFn
 
-Use the tracing infrastructure helper __print_flags() for printing flag
-bitfields, to enhance the trace output by displaying a string describing
-each of the inhibit reasons set.
+Keep kvm_apicv_inhibit enum naming consistent with the current pattern by
+renaming the reason/enumerator defined as APICV_INHIBIT_REASON_DISABLE to
+APICV_INHIBIT_REASON_DISABLED.
 
-The kvm_apicv_inhibit_changed tracepoint currently shows the raw bitmap
-value, requiring the user to consult the source file where the inhibit
-reasons are defined to decode the trace output.
+No functional change intended.
 
-Co-developed-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
 ---
- arch/x86/include/asm/kvm_host.h | 19 +++++++++++++++++++
- arch/x86/kvm/trace.h            |  9 +++++++--
- arch/x86/kvm/x86.c              |  4 ++++
- 3 files changed, 30 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 4 ++--
+ arch/x86/kvm/svm/svm.h          | 2 +-
+ arch/x86/kvm/vmx/main.c         | 2 +-
+ arch/x86/kvm/x86.c              | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1d13e3cd1dc5..08f83efd12ff 100644
+index 08f83efd12ff..8910a8ac23b0 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1273,8 +1273,27 @@ enum kvm_apicv_inhibit {
- 	 * mapping between logical ID and vCPU.
+@@ -1203,7 +1203,7 @@ enum kvm_apicv_inhibit {
+ 	 * APIC acceleration is disabled by a module parameter
+ 	 * and/or not supported in hardware.
  	 */
- 	APICV_INHIBIT_REASON_LOGICAL_ID_ALIASED,
-+
-+	NR_APICV_INHIBIT_REASONS,
- };
+-	APICV_INHIBIT_REASON_DISABLE,
++	APICV_INHIBIT_REASON_DISABLED,
  
-+#define __APICV_INHIBIT_REASON(reason)			\
-+	{ BIT(APICV_INHIBIT_REASON_##reason), #reason }
-+
-+#define APICV_INHIBIT_REASONS				\
-+	__APICV_INHIBIT_REASON(DISABLE),		\
-+	__APICV_INHIBIT_REASON(HYPERV),			\
-+	__APICV_INHIBIT_REASON(ABSENT),			\
-+	__APICV_INHIBIT_REASON(BLOCKIRQ),		\
-+	__APICV_INHIBIT_REASON(PHYSICAL_ID_ALIASED),	\
-+	__APICV_INHIBIT_REASON(APIC_ID_MODIFIED),	\
-+	__APICV_INHIBIT_REASON(APIC_BASE_MODIFIED),	\
-+	__APICV_INHIBIT_REASON(NESTED),			\
-+	__APICV_INHIBIT_REASON(IRQWIN),			\
-+	__APICV_INHIBIT_REASON(PIT_REINJ),		\
-+	__APICV_INHIBIT_REASON(SEV),			\
-+	__APICV_INHIBIT_REASON(LOGICAL_ID_ALIASED)
-+
- struct kvm_arch {
- 	unsigned long n_used_mmu_pages;
- 	unsigned long n_requested_mmu_pages;
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index 9d0b02ef307e..f23fb9a6776e 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1375,6 +1375,10 @@ TRACE_EVENT(kvm_hv_stimer_cleanup,
- 		  __entry->vcpu_id, __entry->timer_index)
- );
+ 	/*
+ 	 * APIC acceleration is inhibited because AutoEOI feature is
+@@ -1281,7 +1281,7 @@ enum kvm_apicv_inhibit {
+ 	{ BIT(APICV_INHIBIT_REASON_##reason), #reason }
  
-+#define kvm_print_apicv_inhibit_reasons(inhibits)	\
-+	(inhibits), (inhibits) ? " " : "",		\
-+	(inhibits) ? __print_flags(inhibits, "|", APICV_INHIBIT_REASONS) : ""
-+
- TRACE_EVENT(kvm_apicv_inhibit_changed,
- 	    TP_PROTO(int reason, bool set, unsigned long inhibits),
- 	    TP_ARGS(reason, set, inhibits),
-@@ -1391,9 +1395,10 @@ TRACE_EVENT(kvm_apicv_inhibit_changed,
- 		__entry->inhibits = inhibits;
- 	),
+ #define APICV_INHIBIT_REASONS				\
+-	__APICV_INHIBIT_REASON(DISABLE),		\
++	__APICV_INHIBIT_REASON(DISABLED),		\
+ 	__APICV_INHIBIT_REASON(HYPERV),			\
+ 	__APICV_INHIBIT_REASON(ABSENT),			\
+ 	__APICV_INHIBIT_REASON(BLOCKIRQ),		\
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 323901782547..7ba09aca2342 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -634,7 +634,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
+ /* avic.c */
+ #define AVIC_REQUIRED_APICV_INHIBITS			\
+ (							\
+-	BIT(APICV_INHIBIT_REASON_DISABLE) |		\
++	BIT(APICV_INHIBIT_REASON_DISABLED) |		\
+ 	BIT(APICV_INHIBIT_REASON_ABSENT) |		\
+ 	BIT(APICV_INHIBIT_REASON_HYPERV) |		\
+ 	BIT(APICV_INHIBIT_REASON_NESTED) |		\
+diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+index 7c546ad3e4c9..5418feb17e13 100644
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -7,7 +7,7 @@
+ #include "pmu.h"
  
--	TP_printk("%s reason=%u, inhibits=0x%lx",
-+	TP_printk("%s reason=%u, inhibits=0x%lx%s%s",
- 		  __entry->set ? "set" : "cleared",
--		  __entry->reason, __entry->inhibits)
-+		  __entry->reason,
-+		  kvm_print_apicv_inhibit_reasons(__entry->inhibits))
- );
- 
- TRACE_EVENT(kvm_apicv_accept_irq,
+ #define VMX_REQUIRED_APICV_INHIBITS				\
+-	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
++	(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
+ 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
+ 	 BIT(APICV_INHIBIT_REASON_HYPERV) |			\
+ 	 BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |			\
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index b389129d59a9..597ff748f955 100644
+index 597ff748f955..9747c3bc52f9 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -10011,6 +10011,10 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_apicv_activated);
- static void set_or_clear_apicv_inhibit(unsigned long *inhibits,
- 				       enum kvm_apicv_inhibit reason, bool set)
+@@ -10026,7 +10026,7 @@ static void set_or_clear_apicv_inhibit(unsigned long *inhibits,
+ static void kvm_apicv_init(struct kvm *kvm)
  {
-+	const struct trace_print_flags apicv_inhibits[] = { APICV_INHIBIT_REASONS };
-+
-+	BUILD_BUG_ON(ARRAY_SIZE(apicv_inhibits) != NR_APICV_INHIBIT_REASONS);
-+
- 	if (set)
- 		__set_bit(reason, inhibits);
- 	else
+ 	enum kvm_apicv_inhibit reason = enable_apicv ? APICV_INHIBIT_REASON_ABSENT :
+-						       APICV_INHIBIT_REASON_DISABLE;
++						       APICV_INHIBIT_REASON_DISABLED;
+ 
+ 	set_or_clear_apicv_inhibit(&kvm->arch.apicv_inhibit_reasons, reason, true);
+ 
 -- 
 2.39.3
 
