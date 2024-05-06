@@ -1,171 +1,164 @@
-Return-Path: <kvm+bounces-16770-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16772-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBC118BD7FA
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 00:56:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 308E48BD833
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 01:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03F771C22EF9
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 22:56:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B28441F21A9D
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 23:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A44615F326;
-	Mon,  6 May 2024 22:53:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527C115CD7D;
+	Mon,  6 May 2024 23:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TqzM5GPk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KsFFjHCe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE0215EFCA;
-	Mon,  6 May 2024 22:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A7015B0ED
+	for <kvm@vger.kernel.org>; Mon,  6 May 2024 23:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715036011; cv=none; b=Gsx7GrfFrLHL0zXtaCOvOJQnSxZjOZPoW4DuW8It3DfumAt3GnLdBZj9q2epJL40yvw1p57hqokJTxnJo8Z1IylAO9Vzx15u8HK7QS06kObi90665GaDQp5B7abQZgELu0OMxJjkdJNm9UiSG00+c66RFg/l1iPwNmvh1feAQ7A=
+	t=1715038401; cv=none; b=tP9L7kycgsh9vX7bh3QmJpnys8Z/dbqY8pjBUYLmoKCrb0kaUsdRXNLHVaZT/qFP0YfWbyeEJtx/Um/dNqo62Rr3aTS9mf121Sseru/vAiMm/pfL8fbNFvq3ia4nXYliN1g4W7gGt3jOmDpUfAzq35wnxPiX5GDo8kSWB7dzpFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715036011; c=relaxed/simple;
-	bh=OO26FdXFEBlagFtETE8C+k5hqlOa3G7JdRW5eT/w6Xg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uQS74rUVtj3NVFIR+YBUhs++xGVw2PWrpDybbhcxTsF9KMuHK/X9BMDB8Z634WgiFZ7vkF/xMhbZpw3vnfuQrp4/19uK/5Q0qeFiqdDG8EnVAatKIb04QWsvE324wC8gLGQRvcRXtsfhouVHM57m328lEOD357nbt9PBx+r0SJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=TqzM5GPk; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 446MqTZh006875;
-	Mon, 6 May 2024 22:53:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2023-11-20;
- bh=H9IZVi3DWKq501eRNFuQDWwQF55QlP0lPQ2r++Zshwg=;
- b=TqzM5GPkH8MKkNofGT8oZ7zIgb0nM+XArXAVdociuD/qpECgkXzZHACnRo083Jmdkka1
- 7cJvuPpYBYaX/T+fUF37nIXNrcxO6FDnSSUWJjvI5FQDWkdeRFoWgdm+lXZyjjR+4Uc5
- c9VgZGPn78n+hMj2kAiRbmGeti9uJGadvkEhpWnF5hzZR/WhmMi8qBB6Pvjvhk0HqYN4
- uaUEY3T0YHD+oqi8fe+xHGtl86XgYEPDARohSujprJfRB9D3wX9FoUerFeIGp4lquNtA
- 33wVNomaBuqxqs0nRPHCMvvpue3sKHylDA3ZKyQSvMxR757UqgN+/yxnIIoIIYUmaSes Sw== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xwbm5ks55-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 06 May 2024 22:53:24 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 446LsjOD027579;
-	Mon, 6 May 2024 22:53:23 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3xwbfdg8p0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 06 May 2024 22:53:23 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 446MrMxE006764;
-	Mon, 6 May 2024 22:53:22 GMT
-Received: from alaljime-dev-e4flex-vm.osdevelopmeniad.oraclevcn.com (alaljime-dev-e4flex-vm.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.106])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3xwbfdg8mq-3;
-	Mon, 06 May 2024 22:53:22 +0000
-From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-To: kvm@vger.kernel.org, seanjc@google.com, vasant.hegde@amd.com
-Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org,
-        joao.m.martins@oracle.com, boris.ostrovsky@oracle.com,
-        suravee.suthikulpanit@amd.com, mlevitsk@redhat.com,
-        alejandro.j.jimenez@oracle.com
-Subject: [PATCH v2 2/2] KVM: x86: Keep consistent naming for APICv/AVIC inhibit reasons
-Date: Mon,  6 May 2024 22:53:21 +0000
-Message-Id: <20240506225321.3440701-3-alejandro.j.jimenez@oracle.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240506225321.3440701-1-alejandro.j.jimenez@oracle.com>
-References: <20240506225321.3440701-1-alejandro.j.jimenez@oracle.com>
+	s=arc-20240116; t=1715038401; c=relaxed/simple;
+	bh=eYF/5LBlojZTPQk7R6ARo4QRGpN0U8rhB702OyWsxic=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GeAaXeifBrpSA89kioCFCBu9y/A9MPDgRSpSyl9eCG/yDVrDoibrq8BQuOc+OYkkvP+988AXTvg5+1C6AzgjzSTAEJt2N1Su0EnM9+MjeG7cgQ6q18beVMaL0KlS3M6g7prmMNNTG1MQBMctMmVWl/s8HL4KdCLRTRoRZrQwRT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KsFFjHCe; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a473ba0632so2963561a91.0
+        for <kvm@vger.kernel.org>; Mon, 06 May 2024 16:33:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715038399; x=1715643199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=naRWxGi0DISf7tT9GtjLPuvLnh/f9UY/0yCGnr5vVNE=;
+        b=KsFFjHCett/cyiLbo77Bl4y2+hlSJWzdbJK+h9kEUy0IkFkvT8gEdJDnd7wcUbxU5y
+         hGbmmuPSQ9kMkhXnjJ4NQGhtM1NO1JT3UixX4eIrwCN0Fwb3YLUujXa/9uyVwJNBuftK
+         tKAg/TXALwPWJmt24Myx3M0Vthb4Exf8YcUgelqBf134/46yenxU1uCstiliMYgl2y9q
+         rcQzlxFkkkjTZuAQ/T1NjoXTFlvBmx5mVUMggZqxx67vVBPL8dtL//cnK2pZMmI8DWxg
+         Wq7HJyWnbACIAHAyodF22vKlgHlI94QpgflbqQGUH3vrv0XMRvlVcqyl9A2Tv/l4fleC
+         MahQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715038399; x=1715643199;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=naRWxGi0DISf7tT9GtjLPuvLnh/f9UY/0yCGnr5vVNE=;
+        b=DqkBLz9NNW+dm3fJgMg9A3JQnRBB9yF5SgIcgM9defVT7TVzqf49q7AZLHB9CL6swr
+         KAbMhMcXbHA5BU+/oUvQaaKxij2rxXa++aZlIcRRTTwP/Uhy7zGcel1LMDf66PCTgOG+
+         Wj3mbf+f9nF4MATb1Yf8j4dzrNpDtSj1qcIsn519lijyjZXgVhLe2M5mC+mWYMkuGUXh
+         oTT6y/HOoO2wh3C+ym9YFm+3umfgo2qDAqpdYXX4QLFq6UWBQq4/PuVKstwlXkzyfWs8
+         8juXBW6rpZINQjl7oh8cY4u/uNyJ6EB13FWjymxn+nGLMIGPvoqeC3aaRdaWSPOpOUst
+         wlMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVay1/o6FxfK+E4xZl8UmQkfj+HGVOi+s8oW6veat8rD90szMMZlDd+T7Xuv/xB5wdMtJ8INMVaCAhendQqSFK0+y/f
+X-Gm-Message-State: AOJu0YxXvubPoDNfUXcGlScZx23zEKFjpUWOQAH2Ni6mPBWRCPVOHMVR
+	gGJ09w2ZG66WuFCFr6ZT+yDIHn5ojfx4jDrOkhkxQIp7OHmZlScOKkvJCLoc7mVMs7pX1f8khp5
+	D8g==
+X-Google-Smtp-Source: AGHT+IFVdGY0Y8CICjJjkQNm8G7tr0LJBvFQGZgnwAzw3Vs3/H1kG0dT3dJGoY8axS4Ic1zPBmJpOeSP2u8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3685:b0:2b2:9855:2852 with SMTP id
+ mj5-20020a17090b368500b002b298552852mr32798pjb.5.1715038399442; Mon, 06 May
+ 2024 16:33:19 -0700 (PDT)
+Date: Mon, 6 May 2024 16:33:17 -0700
+In-Reply-To: <038379acaf26dd942a744290bde0fc772084dbe9.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-06_17,2024-05-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 mlxscore=0
- mlxlogscore=999 suspectscore=0 malwarescore=0 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2405060166
-X-Proofpoint-GUID: U9-hmjDCybQjSc_yhM6KDU82HtpzWzFn
-X-Proofpoint-ORIG-GUID: U9-hmjDCybQjSc_yhM6KDU82HtpzWzFn
+Mime-Version: 1.0
+References: <20240219074733.122080-1-weijiang.yang@intel.com>
+ <20240219074733.122080-25-weijiang.yang@intel.com> <ZjLNEPwXwPFJ5HJ3@google.com>
+ <e39f609f-314b-43c7-b297-5c01e90c023a@intel.com> <038379acaf26dd942a744290bde0fc772084dbe9.camel@intel.com>
+Message-ID: <ZjlovaBlLicFb6Z_@google.com>
+Subject: Re: [PATCH v10 24/27] KVM: x86: Enable CET virtualization for VMX and
+ advertise to userspace
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Weijiang Yang <weijiang.yang@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Dave Hansen <dave.hansen@intel.com>, "x86@kernel.org" <x86@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "john.allen@amd.com" <john.allen@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "mlevitsk@redhat.com" <mlevitsk@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Keep kvm_apicv_inhibit enum naming consistent with the current pattern by
-renaming the reason/enumerator defined as APICV_INHIBIT_REASON_DISABLE to
-APICV_INHIBIT_REASON_DISABLED.
+On Mon, May 06, 2024, Rick P Edgecombe wrote:
+> On Mon, 2024-05-06 at 17:19 +0800, Yang, Weijiang wrote:
+> > On 5/2/2024 7:15 AM, Sean Christopherson wrote:
+> > > On Sun, Feb 18, 2024, Yang Weijiang wrote:
+> > > > @@ -696,6 +697,20 @@ void kvm_set_cpu_caps(void)
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_cpu_cap_set(X86_FEATURE_INTEL_STIBP);
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (boot_cpu_has(X8=
+6_FEATURE_AMD_SSBD))
+> > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL_SSBD);
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Don't use boot_cpu_ha=
+s() to check availability of IBT because
+> > > > the
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * feature bit is cleare=
+d in boot_cpu_data when ibt=3Doff is applied
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * in host cmdline.
+> > > I'm not convinced this is a good reason to diverge from the host kern=
+el.=C2=A0
+> > > E.g.  PCID and many other features honor the host setup, I don't see =
+what
+> > > makes IBT special.
+> >=20
+> > This is mostly based on our user experience and the hypothesis for clou=
+d
+> > computing: When we evolve host kernels, we constantly encounter issues =
+when
+> > kernel IBT is on, so we have to disable kernel IBT by adding ibt=3Doff.=
+ But
+> > we need to test the CET features in VM, if we just simply refer to host
+> > boot cpuid data, then IBT cannot be enabled in VM which makes CET featu=
+res
+> > incomplete in guest.
+> >=20
+> > I guess in cloud computing, it could run into similar dilemma. In this
+> > case, the tenant cannot benefit the feature just because of host SW
+> > problem. I know currently KVM except LA57 always honors host feature
+> > configurations, but in CET case, there could be divergence wrt honoring
+> > host configuration as long as there's no quirk for the feature.
+> >=20
+> > But I think the issue is still open for discussion...
+>=20
+> I think the back and forth I remembered was actually around SGX IBT, but =
+I did
+> find this thread:
+> https://lore.kernel.org/lkml/20231128085025.GA3818@noisy.programming.kick=
+s-ass.net/
+>=20
+> Disabling kernel IBT enforcement without disabling KVM IBT seems worthwhi=
+le. But
+> the solution is to not to not honor host support. It is to have kernel IB=
+T not
+> clear the feature flag and instead clear something else. This can be done
+> independently of the KVM series.
 
-No functional change intended.
+Hmm, I don't disagree, but I'm not sure it makes sense to wait on that disc=
+ussion
+to exempt IBT from the "it must be supported in the host" rule.  I suspect =
+that
+tweaking the handling X86_FEATURE_IBT of will open a much larger can of wor=
+ms,
+as overhauling feature flag handling is very much on the x86 maintainers to=
+do
+list.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
----
- arch/x86/include/asm/kvm_host.h | 4 ++--
- arch/x86/kvm/svm/svm.h          | 2 +-
- arch/x86/kvm/vmx/main.c         | 2 +-
- arch/x86/kvm/x86.c              | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 08f83efd12ff..8910a8ac23b0 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1203,7 +1203,7 @@ enum kvm_apicv_inhibit {
- 	 * APIC acceleration is disabled by a module parameter
- 	 * and/or not supported in hardware.
- 	 */
--	APICV_INHIBIT_REASON_DISABLE,
-+	APICV_INHIBIT_REASON_DISABLED,
- 
- 	/*
- 	 * APIC acceleration is inhibited because AutoEOI feature is
-@@ -1281,7 +1281,7 @@ enum kvm_apicv_inhibit {
- 	{ BIT(APICV_INHIBIT_REASON_##reason), #reason }
- 
- #define APICV_INHIBIT_REASONS				\
--	__APICV_INHIBIT_REASON(DISABLE),		\
-+	__APICV_INHIBIT_REASON(DISABLED),		\
- 	__APICV_INHIBIT_REASON(HYPERV),			\
- 	__APICV_INHIBIT_REASON(ABSENT),			\
- 	__APICV_INHIBIT_REASON(BLOCKIRQ),		\
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 323901782547..7ba09aca2342 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -634,7 +634,7 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- /* avic.c */
- #define AVIC_REQUIRED_APICV_INHIBITS			\
- (							\
--	BIT(APICV_INHIBIT_REASON_DISABLE) |		\
-+	BIT(APICV_INHIBIT_REASON_DISABLED) |		\
- 	BIT(APICV_INHIBIT_REASON_ABSENT) |		\
- 	BIT(APICV_INHIBIT_REASON_HYPERV) |		\
- 	BIT(APICV_INHIBIT_REASON_NESTED) |		\
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 7c546ad3e4c9..5418feb17e13 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -7,7 +7,7 @@
- #include "pmu.h"
- 
- #define VMX_REQUIRED_APICV_INHIBITS				\
--	(BIT(APICV_INHIBIT_REASON_DISABLE)|			\
-+	(BIT(APICV_INHIBIT_REASON_DISABLED) |			\
- 	 BIT(APICV_INHIBIT_REASON_ABSENT) |			\
- 	 BIT(APICV_INHIBIT_REASON_HYPERV) |			\
- 	 BIT(APICV_INHIBIT_REASON_BLOCKIRQ) |			\
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 597ff748f955..9747c3bc52f9 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10026,7 +10026,7 @@ static void set_or_clear_apicv_inhibit(unsigned long *inhibits,
- static void kvm_apicv_init(struct kvm *kvm)
- {
- 	enum kvm_apicv_inhibit reason = enable_apicv ? APICV_INHIBIT_REASON_ABSENT :
--						       APICV_INHIBIT_REASON_DISABLE;
-+						       APICV_INHIBIT_REASON_DISABLED;
- 
- 	set_or_clear_apicv_inhibit(&kvm->arch.apicv_inhibit_reasons, reason, true);
- 
--- 
-2.39.3
-
+IMO, the odds of there being a hardware bug that necessitates hard disablin=
+g IBT
+are lower than the odds of KVM support for CET landing well before the feat=
+ure
+stuff is sorted out.
 
