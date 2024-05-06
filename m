@@ -1,142 +1,107 @@
-Return-Path: <kvm+bounces-16682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 176838BC87F
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 09:42:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A29C8BC88E
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 09:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 487521C20ACB
-	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:42:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B97962809E2
+	for <lists+kvm@lfdr.de>; Mon,  6 May 2024 07:49:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E0E913F44F;
-	Mon,  6 May 2024 07:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC85140389;
+	Mon,  6 May 2024 07:49:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mJDdjNUv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N4lm6PsX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0AEA1EB36
-	for <kvm@vger.kernel.org>; Mon,  6 May 2024 07:42:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F2942ABE;
+	Mon,  6 May 2024 07:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1714981350; cv=none; b=RqTuttLsz47jpEQ6OjNO9YqYMB9GLuwh77nxjlkll30H5PXZgVWpBxZUtX/L7fGbdS1qqhxyXjuwaFrrFaCAJ6X0/gL09B4JYmFqdVo9D+AVadOoY1uYnZTgiQJS5wmEG84deiD2s2e4GWR1BDHbpfVVPjGlOD6sLmXSdlmlamU=
+	t=1714981742; cv=none; b=MHjqz+1d8Bz3PwRmXoeSgguDxH9qFkr3aa8l5l61k1siufvHWsSe/+Vhl71CzhPvxO0+h9gDhXw/7BNYoComZQXVbQimWXlY7CG/WGwDSogPPiRZV8adN9xZ8rDmYvwSCPpFxqz/FuV+K6WObQilaMiPduZivIvu9suB30PT4oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1714981350; c=relaxed/simple;
-	bh=iHKO1qzhns2fF3u7KQYzVcb8QhFm4i6HTrDF0c5MQPk=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=nETQVl6vNmcf5pr1RHNge9DXf+PQkdYsn2cNG7AqC/J8Xk+hOQ0EOZhSzEfLqQCSOTPegjrZzVwNDQ/qx0XxmQLCK9YMPL5H9zSoZVrfTi0JfEGZdEmb56kyUgK1gHElpFcm0VtQ+bTtLlG/PbiMRUIZrA4o3jDWFowGo11GsRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mJDdjNUv; arc=none smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1714981742; c=relaxed/simple;
+	bh=OWCqVsjgfLNQN6XDNs/tB8tkUMXSZcy5HJhfHw0iAsw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fugM/i/SQw21osdaqXNheVa+Rz77CAe0zy0SqiiWVxaO7Kgj6YWCg3zp7srFiFwC4UUC8MIFm7KumpvpVjkmHNCu+Bmb5TfSsVMZTZPXgeH1MlycdFMmCVWJqEEZ5Heye74SxJYHoyszGfDuxa9h/kQ4SARJ4XMwTL+u7qmgYgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N4lm6PsX; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1714981348; x=1746517348;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iHKO1qzhns2fF3u7KQYzVcb8QhFm4i6HTrDF0c5MQPk=;
-  b=mJDdjNUv3Ls3KbQ2742tMc8BrCsaU5RVE7XmuRs380Zd+4xBr23DOXea
-   Kc44Ba2Kb2RK5Cnidxs/Zx4+gdZGsSfF3adqbwi4Qqt6o3RK5wfxciXDp
-   t/DsSQ3rd8VYwIgDMBaiN4+qxc5SFvYmpOqWYKHwBcJmDb36mrCyNI4oO
-   +oRX6qiN/MYwj73ajzIdrp2VV4WlRK518891Ee2SiWmxxqRiX6ozxmWdz
-   7H88NDmKVx4crq3lDDrdw+GWVFrW6/nvWpQbUuEAuLOy5OG6b6HahP2Fg
-   D7XlbNXaxOBZmTB7n8oxUkTEXk+Ir9sLXeLnyJcyis/YkEhi+/q0F+Brt
+  t=1714981740; x=1746517740;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OWCqVsjgfLNQN6XDNs/tB8tkUMXSZcy5HJhfHw0iAsw=;
+  b=N4lm6PsX8IWO4hEnKTLJR3lemUDWJmeu8nhESozKEW2uT0wysM1yOJsS
+   c/LdO0Od11BMSZDJ4RwA/NlD261LYL55OBFQXSKj5hLw8u5BORNoY3rQI
+   hH1/lIyhvjdcOjZDhqjPw28vKtEZ6IEjXOypGn86ECwEYZqFOm4ypfEnm
+   2tl+822+lpK4CgkbBHLto3y6OEfRnaH2k1Cwqy+xz0VrhwMlU+5OARrx4
+   iQlH9pc4R7bepL3K+EBC2WxuRl1Qwa0nF3IGuRKOFCMjdszqIA2pGhsua
+   MmWRcZM1mKozH7U72SZmp1WXZj8MMPnap7GpnJpRkaH9TEy4N3X82kdet
    w==;
-X-CSE-ConnectionGUID: F0vZjmFPRjG8M6VskU2XgQ==
-X-CSE-MsgGUID: Q96almGKQpGTnmUq05DUuA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11064"; a="11249419"
+X-CSE-ConnectionGUID: 4cwa4OnARymaR/t89ZnNYQ==
+X-CSE-MsgGUID: k45d4y2OSUGxSaibQdWDjA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11064"; a="14521183"
 X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="11249419"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 00:42:27 -0700
-X-CSE-ConnectionGUID: pPqXQTQxT0iQdRXrEE8LaQ==
-X-CSE-MsgGUID: FU75hEBKQSKFvFqwFPit3w==
+   d="scan'208";a="14521183"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 00:49:00 -0700
+X-CSE-ConnectionGUID: IqlXt6B0ReGFum9OufbOdg==
+X-CSE-MsgGUID: TOlTN3aNTpag/I7/R9d2yw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,257,1708416000"; 
-   d="scan'208";a="32889587"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.125.244.72]) ([10.125.244.72])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 00:42:24 -0700
-Message-ID: <b4fe7b7c-d988-4c71-a34c-6e3806327b27@linux.intel.com>
-Date: Mon, 6 May 2024 15:42:21 +0800
+   d="scan'208";a="28194981"
+Received: from unknown (HELO litbin-desktop.sh.intel.com) ([10.239.156.93])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 00:48:58 -0700
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: pbonzini@redhat.com,
+	seanjc@google.com,
+	isaku.yamahata@intel.com,
+	xiaoyao.li@intel.com,
+	binbin.wu@linux.intel.com
+Subject: [PATCH] KVM: VMX: Remove unused declaration of vmx_request_immediate_exit()
+Date: Mon,  6 May 2024 15:50:25 +0800
+Message-Id: <20240506075025.2251131-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "Pan, Jacob jun" <jacob.jun.pan@intel.com>
-Subject: Re: [PATCH v2 12/12] iommu/vt-d: Add set_dev_pasid callback for
- nested domain
-To: Yi Liu <yi.l.liu@intel.com>, "Tian, Kevin" <kevin.tian@intel.com>,
- "joro@8bytes.org" <joro@8bytes.org>, "jgg@nvidia.com" <jgg@nvidia.com>
-References: <20240412081516.31168-1-yi.l.liu@intel.com>
- <20240412081516.31168-13-yi.l.liu@intel.com>
- <BN9PR11MB5276E97AECE1A58D9714B0C38C0F2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <d466eb97-8c2b-4262-8213-b6a9987f59ea@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <d466eb97-8c2b-4262-8213-b6a9987f59ea@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 2024/4/30 17:19, Yi Liu wrote:
-> On 2024/4/17 17:25, Tian, Kevin wrote:
->>> From: Liu, Yi L <yi.l.liu@intel.com>
->>> Sent: Friday, April 12, 2024 4:15 PM
->>>
->>> From: Lu Baolu <baolu.lu@linux.intel.com>
->>>
->>> This allows the upper layers to set a nested type domain to a PASID of a
->>> device if the PASID feature is supported by the IOMMU hardware.
->>>
->>> The set_dev_pasid callback for non-nested domain has already be 
->>> there, so
->>> this only needs to add it for nested domains. Note that the S2 domain 
->>> with
->>> dirty tracking capability is not supported yet as no user for now.
->>
->> S2 domain does support dirty tracking. Do you mean the specific
->> check in intel_iommu_set_dev_pasid() i.e. pasid-granular dirty
->> tracking is not supported yet?
-> 
-> yes. We may remove this check when real usage comes. e.g. SIOV.
-> 
->>> +static int intel_nested_set_dev_pasid(struct iommu_domain *domain,
->>> +                      struct device *dev, ioasid_t pasid,
->>> +                      struct iommu_domain *old)
->>> +{
->>> +    struct device_domain_info *info = dev_iommu_priv_get(dev);
->>> +    struct dmar_domain *dmar_domain = to_dmar_domain(domain);
->>> +    struct intel_iommu *iommu = info->iommu;
->>> +
->>> +    if (iommu->agaw < dmar_domain->s2_domain->agaw)
->>> +        return -EINVAL;
->>> +
->>
->> this check is covered by prepare_domain_attach_device() already.
-> 
-> This was added to avoid modifying the s2_domain's agaw. I'm fine to remove
-> it personally as the existing attach path also needs to update domain's
-> agaw per device attachment. @Baolu, how about your opinion?
+After commit 0ec3d6d1f169 "KVM: x86: Fully defer to vendor code to decide
+how to force immediate exit", vmx_request_immediate_exit() was removed.
+Commit 5f18c642ff7e "KVM: VMX: Move out vmx_x86_ops to 'main.c' to dispatch
+VMX and TDX" added its declaration by accident.  Remove it.
 
-We still need something to do before we can safely remove this check.
-All the domain allocation interfaces should eventually have the device
-pointer as the input, and all domain attributions could be initialized
-during domain allocation. In the attach paths, it should return -EINVAL
-directly if the domain is not compatible with the iommu for the device.
+Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+---
+ arch/x86/kvm/vmx/x86_ops.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-Best regards,
-baolu
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 502704596c83..dfab2c2941ad 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -111,7 +111,6 @@ u64 vmx_get_l2_tsc_offset(struct kvm_vcpu *vcpu);
+ u64 vmx_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu);
+ void vmx_write_tsc_offset(struct kvm_vcpu *vcpu);
+ void vmx_write_tsc_multiplier(struct kvm_vcpu *vcpu);
+-void vmx_request_immediate_exit(struct kvm_vcpu *vcpu);
+ void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu);
+ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu);
+ #ifdef CONFIG_X86_64
+
+base-commit: d91a9cc16417b8247213a0144a1f0fd61dc855dd
+-- 
+2.25.1
+
 
