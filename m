@@ -1,131 +1,290 @@
-Return-Path: <kvm+bounces-16879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16882-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E07678BE8C6
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:24:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18BF8BE94D
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:39:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8852835C4
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:24:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E44C1F27AE3
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:39:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB9416C453;
-	Tue,  7 May 2024 16:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A0C016D4FE;
+	Tue,  7 May 2024 16:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n7K6i1j0"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SbBm54P5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C5516ABE8
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 16:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD1915FA70;
+	Tue,  7 May 2024 16:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715099062; cv=none; b=OWEbKbu5+8zFVsJDi1HyxriT5OsnF8QEcKF+9PKMga7sfujgNnGkdRT1U0OFXX7hKaV+Iy0fwTmVcVFRm2jPGCCaBbyPNy0MBQylLmZshk1vcg7rSVSQvpcVn3rIviGUoS5e9GY8+9TMp+zqy5KKGbZf3OjuWieZb2WjWVD4HNc=
+	t=1715099707; cv=none; b=Ti+JQlBKkVjx9YzV9ZTfFZJk4/G6rYDEYOPt/1RW03eF/nW369FEfffNDvnOzs4SLS1HuQZhmlAR5YIANzaUOjfOp2wsBSquhouFAQZu1IzcOgTgxLkAydzFJjEnWC0kzT1QWlh1t9z+CoPvsKNDLmiiqx9OKfeKS1EK5YvwSg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715099062; c=relaxed/simple;
-	bh=wJbp6WjEK+6FtVYJhPdauEq2bIrS1FhcPXI3PtQy6wU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RfT45XjfNAer3gzygXQbfggxKqvAcS1+g3dDzcwIrbxHrOei09kaViNRXKMSEF3iV9pEsxElZfvkj+aGx8HOoHosfIXCmxDs3ri2yWCh0zoY/HeYr9we18Bx37RneMksAs5haW0wvUYHQ30Euv8/cKlNMpuI1SAPeHPe/iJIdjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n7K6i1j0; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so6173628276.1
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 09:24:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715099060; x=1715703860; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zDm0nic8Bf4ROxi6HvrqFLQrZg3PZkT7VQQx+aQhnBY=;
-        b=n7K6i1j0CKyRAITHjMEkX8wOIaFkNBux9wU875LGgXTUDjA6mWdy0g7obvcMlINETx
-         phVZICSPfWT1nQVGKBynSfnFcQ/9neh83sUHGf1oTu6vW8oMIJs63b5Bcwfh5VgrDZDm
-         kwWYcFCyldVwrqJwLwEMhyUlQA07BUUjC5SHDEEtPolQoWhCjZH+Rr6MB2Wub2Yq6m6/
-         3SaDgw9P/6tXWe3rOF7UVwJ2DhKqSo7T0WyVDdhslLM3q+WrxXH/puAXlNftOR1RLbmM
-         LFdaEF3H7A7H6mFCg7eK2gXMN4t2FzSDJRUGdSYkzImsyVmFVsd2Nvk0ivENfVF2YPHt
-         h/Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715099060; x=1715703860;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zDm0nic8Bf4ROxi6HvrqFLQrZg3PZkT7VQQx+aQhnBY=;
-        b=HUY/XxHkL5kqzVLY8obIop8//Jc0nx8yVAYFZmkjUrtMEedeF2ymza0IbK/8XbrDKj
-         Qb4jL86VDfz4rDa0fHQ9/J3VrhxR5lUg0QM+9Begf+wS3IBw/GMTgX/HJG7qUUI5UZwv
-         sij1zwpVlzoWYSWkso3Lq/b8nXMGtFKNjl/hHTupcryVA+SmPySoXIOs9ErdMP+hRFLO
-         faeDzglZPl6DmPFo5M0rO1FI945I/sx1ykcvVBgpDobFc2gNqvFxfhq9woi2SBRDIxEA
-         rXfm0LvItOiVNjKaV+wuVHsYICLRHZz0PW/1gX0Q9+PMh3t8MGs7Th7kiyIa+DTdODpo
-         lfgA==
-X-Forwarded-Encrypted: i=1; AJvYcCXXsVHABmpNEaEluzPXCewNSJ6JLnzd9iidAhasilPEi/n64aTpOyAO2O6CQjQ2CoIn0ZvqGW2GBVxa0B2LF0QPUl3C
-X-Gm-Message-State: AOJu0YxMmU6NHtHZHv/u7QQksyKqUjQkVRoHKbnnsoQ+rCbz5PNERTMi
-	yUIb6/j/Klx/0rYPr8seJF5Gx8GZAzzvgHdXURkxy37flD0fvcTc18jJrEnyasCFf2ZsRte7o3j
-	jjA==
-X-Google-Smtp-Source: AGHT+IHEV9Hww+r9vbzxSYmAo5y0EjAd48qQLH6oEVfcJ7yZe2szu31qLFICvdM4H82xlI8amm0za/20DLw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:44:0:b0:dc2:466a:23c4 with SMTP id
- 3f1490d57ef6-debb9d86d55mr29973276.4.1715099060476; Tue, 07 May 2024 09:24:20
- -0700 (PDT)
-Date: Tue, 7 May 2024 09:24:18 -0700
-In-Reply-To: <0ddb198c9a8ae72519c3f7847089d84a8de4821f.camel@intel.com>
+	s=arc-20240116; t=1715099707; c=relaxed/simple;
+	bh=lfScHmvdqPaBXlvaQ/bWWDypFh9amox+v4VqxmSQXYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Anjdy/KM+B42BmHO5l65opclZ/vApNOUPMfMz2c8ieuwG0zy3l7ondNdqC/GVGMnZadvuRIi6xhrveF0Tt7RVb7xShgVNr1eOInKvEZGZ3rBYNmHN9qhoPH9jura6/seX/ELfxP3T1dBtgMQF8iRVl14dDPrtwP8ZhhDO7+Su4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SbBm54P5; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 447G7Iq8016296;
+	Tue, 7 May 2024 16:34:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=0g2Y1HrdZhlmW9KUaTvwqMGRRwkTNvfztHJ1kclu0Gs=;
+ b=SbBm54P53l6zmjOw7F3mI5njHXS3ZlF2JxwnOas5/alRvfX5UxH8VCPyJFEIrNEIOX4U
+ Qxg+tCP5UmRqA4XiBURj78mNHP6YXrziNxLB2EVmuHalrQgt3+NZOba+ABYmabzQCBBl
+ p/EjuX6GarkYwD2eELiSR58Z0dtZUqiWlPG0ITvCElTHIcSfWkNVwWmrZaCVHa7QuC5/
+ K1vxc3KultgN1yzfliFjaH+Z7qh1TEp9E30YshSjQPkucYCiLhmv5IEPFlM5pememZOl
+ PKEC4zduwsqA5qFg5VgNRW2weyZViPcWSweTqHOlyM7WYJAX6QtuKy9qCyGFdDRzuG+6 6A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyqhr81s5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 16:34:56 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 447GYtwa025401;
+	Tue, 7 May 2024 16:34:55 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyqhr81s2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 16:34:55 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 447E9Wsr013959;
+	Tue, 7 May 2024 16:34:54 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx222xvqu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 16:34:54 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 447GYniC47448406
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 May 2024 16:34:51 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 128912004E;
+	Tue,  7 May 2024 16:34:49 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C939C2004D;
+	Tue,  7 May 2024 16:34:48 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  7 May 2024 16:34:48 +0000 (GMT)
+Date: Tue, 7 May 2024 18:25:15 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily
+ Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Gerald
+ Schaefer <gerald.schaefer@linux.ibm.com>,
+        Matthew Wilcox
+ <willy@infradead.org>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v2 07/10] s390/uv: convert uv_destroy_owned_page() to
+ uv_destroy_(folio|pte)()
+Message-ID: <20240507182515.0ce19da5@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20240412142120.220087-8-david@redhat.com>
+References: <20240412142120.220087-1-david@redhat.com>
+	<20240412142120.220087-8-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <Zh7KrSwJXu-odQpN@google.com> <900fc6f75b3704780ac16c90ace23b2f465bb689.camel@intel.com>
- <Zh_exbWc90khzmYm@google.com> <2383a1e9-ba2b-470f-8807-5f5f2528c7ad@intel.com>
- <ZiBc13qU6P3OBn7w@google.com> <5ffd4052-4735-449a-9bee-f42563add778@intel.com>
- <ZiEulnEr4TiYQxsB@google.com> <22b19d11-056c-402b-ac19-a389000d6339@intel.com>
- <ZiKoqMk-wZKdiar9@google.com> <0ddb198c9a8ae72519c3f7847089d84a8de4821f.camel@intel.com>
-Message-ID: <ZjpVslp5M0JJbPrB@google.com>
-Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
- loading the KVM intel kernel module
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>, 
-	Bo2 Chen <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Erdem Aktas <erdemaktas@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Gy31hXtW57XyqcX0sZhg-EMLdzCls9Qj
+X-Proofpoint-GUID: BbCVk9QsfWD0wnuk-eB_b9oO3gnVttpe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-07_10,2024-05-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 suspectscore=0 clxscore=1015 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 impostorscore=0 bulkscore=0
+ malwarescore=0 mlxscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2404010000 definitions=main-2405070113
 
-On Tue, May 07, 2024, Kai Huang wrote:
-> > > So I think we have consensus to go with the approach that shows in your
-> > > second diff -- that is to always enable virtualization during module loading
-> > > for all other ARCHs other than x86, for which we only always enables
-> > > virtualization during module loading for TDX.
-> > 
-> > Assuming the other arch maintainers are ok with that approach.  If waiting until
-> > a VM is created is desirable for other architectures, then we'll need to figure
-> > out a plan b.  E.g. KVM arm64 doesn't support being built as a module, so enabling
-> > hardware during initialization would mean virtualization is enabled for any kernel
-> > that is built with CONFIG_KVM=y.
-> > 
-> > Actually, duh.  There's absolutely no reason to force other architectures to
-> > choose when to enable virtualization.  As evidenced by the massaging to have x86
-> > keep enabling virtualization on-demand for !TDX, the cleanups don't come from
-> > enabling virtualization during module load, they come from registering cpuup and
-> > syscore ops when virtualization is enabled.
-> > 
-> > I.e. we can keep kvm_usage_count in common code, and just do exactly what I
-> > proposed for kvm_x86_enable_virtualization().
-> > 
-> > I have patches to do this, and initial testing suggests they aren't wildly
-> > broken.  I'll post them soon-ish, assuming nothing pops up in testing.  They are
-> > clean enough that they can land in advance of TDX, e.g. in kvm-coco-queue even
-> > before other architectures verify I didn't break them.
-> > 
-> 
-> Hi Sean,
-> 
-> Just want to check with you what is your plan on this?
-> 
-> Please feel free to let me know if there's anything that I can help. 
+On Fri, 12 Apr 2024 16:21:17 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-Ah shoot, I posted patches[*] but managed to forget to Cc any of the TDX folks.
-Sorry :-/
+> Let's have the following variants for destroying pages:
+> 
+> (1) uv_destroy(): Like uv_pin_shared() and uv_convert_from_secure(),
+> "low level" helper that operates on paddr and doesn't mess with folios.
+> 
+> (2) uv_destroy_folio(): Consumes a folio to which we hold a reference.
+> 
+> (3) uv_destroy_pte(): Consumes a PTE that holds a reference through the
+> mapping.
+> 
+> Unfortunately we need uv_destroy_pte(), because pfn_folio() and
+> friends are not available in pgtable.h.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-[*] https://lore.kernel.org/all/20240425233951.3344485-1-seanjc@google.com
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  arch/s390/include/asm/pgtable.h |  2 +-
+>  arch/s390/include/asm/uv.h      | 10 ++++++++--
+>  arch/s390/kernel/uv.c           | 24 +++++++++++++++++-------
+>  arch/s390/mm/gmap.c             |  6 ++++--
+>  4 files changed, 30 insertions(+), 12 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/pgtable.h b/arch/s390/include/asm/pgtable.h
+> index 60950e7a25f5..97e040617c29 100644
+> --- a/arch/s390/include/asm/pgtable.h
+> +++ b/arch/s390/include/asm/pgtable.h
+> @@ -1199,7 +1199,7 @@ static inline pte_t ptep_get_and_clear_full(struct mm_struct *mm,
+>  	 * The notifier should have destroyed all protected vCPUs at this
+>  	 * point, so the destroy should be successful.
+>  	 */
+> -	if (full && !uv_destroy_owned_page(pte_val(res) & PAGE_MASK))
+> +	if (full && !uv_destroy_pte(res))
+>  		return res;
+>  	/*
+>  	 * If something went wrong and the page could not be destroyed, or
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index d2205ff97007..a1bef30066ef 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -483,7 +483,8 @@ static inline int is_prot_virt_host(void)
+>  int uv_pin_shared(unsigned long paddr);
+>  int gmap_make_secure(struct gmap *gmap, unsigned long gaddr, void *uvcb);
+>  int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr);
+> -int uv_destroy_owned_page(unsigned long paddr);
+> +int uv_destroy_folio(struct folio *folio);
+> +int uv_destroy_pte(pte_t pte);
+>  int uv_convert_owned_from_secure(unsigned long paddr);
+>  int gmap_convert_to_secure(struct gmap *gmap, unsigned long gaddr);
+>  
+> @@ -497,7 +498,12 @@ static inline int uv_pin_shared(unsigned long paddr)
+>  	return 0;
+>  }
+>  
+> -static inline int uv_destroy_owned_page(unsigned long paddr)
+> +static inline int uv_destroy_folio(struct folio *folio)
+> +{
+> +	return 0;
+> +}
+> +
+> +static inline int uv_destroy_pte(pte_t pte)
+>  {
+>  	return 0;
+>  }
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index 3d3250b406a6..61c1ce51c883 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -110,7 +110,7 @@ EXPORT_SYMBOL_GPL(uv_pin_shared);
+>   *
+>   * @paddr: Absolute host address of page to be destroyed
+>   */
+> -static int uv_destroy_page(unsigned long paddr)
+> +static int uv_destroy(unsigned long paddr)
+>  {
+>  	struct uv_cb_cfs uvcb = {
+>  		.header.cmd = UVC_CMD_DESTR_SEC_STOR,
+> @@ -131,11 +131,10 @@ static int uv_destroy_page(unsigned long paddr)
+>  }
+>  
+>  /*
+> - * The caller must already hold a reference to the page
+> + * The caller must already hold a reference to the folio
+>   */
+> -int uv_destroy_owned_page(unsigned long paddr)
+> +int uv_destroy_folio(struct folio *folio)
+>  {
+> -	struct folio *folio = phys_to_folio(paddr);
+>  	int rc;
+>  
+>  	/* See gmap_make_secure(): large folios cannot be secure */
+> @@ -143,13 +142,22 @@ int uv_destroy_owned_page(unsigned long paddr)
+>  		return 0;
+>  
+>  	folio_get(folio);
+> -	rc = uv_destroy_page(paddr);
+> +	rc = uv_destroy(folio_to_phys(folio));
+>  	if (!rc)
+>  		clear_bit(PG_arch_1, &folio->flags);
+>  	folio_put(folio);
+>  	return rc;
+>  }
+>  
+> +/*
+> + * The present PTE still indirectly holds a folio reference through the mapping.
+> + */
+> +int uv_destroy_pte(pte_t pte)
+> +{
+> +	VM_WARN_ON(!pte_present(pte));
+> +	return uv_destroy_folio(pfn_folio(pte_pfn(pte)));
+> +}
+> +
+>  /*
+>   * Requests the Ultravisor to encrypt a guest page and make it
+>   * accessible to the host for paging (export).
+> @@ -437,6 +445,7 @@ int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
+>  {
+>  	struct vm_area_struct *vma;
+>  	unsigned long uaddr;
+> +	struct folio *folio;
+>  	struct page *page;
+>  	int rc;
+>  
+> @@ -460,7 +469,8 @@ int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
+>  	page = follow_page(vma, uaddr, FOLL_WRITE | FOLL_GET);
+>  	if (IS_ERR_OR_NULL(page))
+>  		goto out;
+> -	rc = uv_destroy_owned_page(page_to_phys(page));
+> +	folio = page_folio(page);
+> +	rc = uv_destroy_folio(folio);
+>  	/*
+>  	 * Fault handlers can race; it is possible that two CPUs will fault
+>  	 * on the same secure page. One CPU can destroy the page, reboot,
+> @@ -472,7 +482,7 @@ int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
+>  	 */
+>  	if (rc)
+>  		rc = uv_convert_owned_from_secure(page_to_phys(page));
+> -	put_page(page);
+> +	folio_put(folio);
+>  out:
+>  	mmap_read_unlock(gmap->mm);
+>  	return rc;
+> diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
+> index 094b43b121cd..0351cb139df4 100644
+> --- a/arch/s390/mm/gmap.c
+> +++ b/arch/s390/mm/gmap.c
+> @@ -2756,13 +2756,15 @@ static const struct mm_walk_ops gather_pages_ops = {
+>   */
+>  void s390_uv_destroy_pfns(unsigned long count, unsigned long *pfns)
+>  {
+> +	struct folio *folio;
+>  	unsigned long i;
+>  
+>  	for (i = 0; i < count; i++) {
+> +		folio = pfn_folio(pfns[i]);
+>  		/* we always have an extra reference */
+> -		uv_destroy_owned_page(pfn_to_phys(pfns[i]));
+> +		uv_destroy_folio(folio);
+>  		/* get rid of the extra reference */
+> -		put_page(pfn_to_page(pfns[i]));
+> +		folio_put(folio);
+>  		cond_resched();
+>  	}
+>  }
+
 
