@@ -1,276 +1,180 @@
-Return-Path: <kvm+bounces-16844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BCDA8BE703
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:09:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD1058BE708
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:10:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FAB4B292A2
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 15:09:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84388284D8C
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 15:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B5216192D;
-	Tue,  7 May 2024 15:08:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1452D1635D8;
+	Tue,  7 May 2024 15:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jfu3nI35"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DGqOJ2pV"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801E5161338
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 15:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C9D161318
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 15:09:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715094521; cv=none; b=trdIc5Jc9cZDtDZy57sXQ5KIHwVypTRkcfuK6O2zziqynQPxd4rCP40I2U9BnmUtSTYhHVF4UnALntZVgno4wU4dn0HXx7DwJCZ3W9H/QVgkFkdiMSUvpdQM9QxTt21RwSPakbORRwbXdTIRu6o02fsjJs5nN73C0cvZT8GMp+c=
+	t=1715094575; cv=none; b=h409gBuMxBtaAA99RbzgodsUgOBZjwBBxo6CiHJs2jpmt8Sp6MsghM6dOjR2NefcVisNgCTTaXzlWyeeLDDkUVaybSxEQ+3FYfmRAYsJTdGbTPwfwF7LZP3OI+fXq10xKTQj72B8v63Br3UEhZKm+apD9MicPzvqCmjY/d7hFUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715094521; c=relaxed/simple;
-	bh=fS/nzGNi+cvHbWeJsz7+9c2DtJyc8zQr7zza2Ag3BKw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MYmIxp3AIq4X5Ag3LJ74mTtYllBhV0daCEtOSX9NBzueU+KdGfFFrnF/ZaTv91ioaiwjb8yCW0X3t4diV1sw2kNcZDR00J5m+rnhTFGY45W0GzU5nvY1trPYBV1Z+5LdbjY/BYyMvMMeEdCoQXmZwC09pEkBKgK2m0S6rEa2UNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jfu3nI35; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1715094575; c=relaxed/simple;
+	bh=nVFd+LTD+ZasaPoO7HR/lIoIYtajnvD2wdGwA14r9FI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RLgaG7qJUBKlar9NBRk+EEvBov+A0a8aCOlFvMGlzhdOIM3hp9pp2xcziSN7O7pYo5ZxFGYq6Yh02FjS7W5oOIwG/rI7+iNthcYItbqvTnONNGjjC1/agrgon3vzZYH3tK5ga92vWTPrAGUIwrWMqEcOXNSHC8Xx75DG/LRqiXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DGqOJ2pV; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715094518;
+	s=mimecast20190719; t=1715094572;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HpVW0/9+/L+kKwM3Qnf0wff1bD8U05A1KXwBGl1ho/Q=;
-	b=Jfu3nI35GGfEZ54CLfPAMXzKFNMO4Pn1TpFqV/mfctBI9xI+IzvbVBT6JeVGBvcjA85osw
-	T0g/4OLFwFW5kfSCgHiV7KwURqlJsUj7banZ+1M+ne7yqOE6Ha37UysCDxvTsx6WfIkUiw
-	g76uylTdSw/UrbebkJmJt7VqwuXr9FM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-16-sK9FYs_INzyyPWgpomJv6w-1; Tue, 07 May 2024 11:08:37 -0400
-X-MC-Unique: sK9FYs_INzyyPWgpomJv6w-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-41e8954066aso10774385e9.3
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 08:08:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715094516; x=1715699316;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HpVW0/9+/L+kKwM3Qnf0wff1bD8U05A1KXwBGl1ho/Q=;
-        b=OzGip3BX1iY2mhCZywBpGNnv8uTLLDyPagVtVjPcMQjCAMPt/CxFcwwhgivQKlfC8P
-         BWiLxmQx9F56h75Ek3lMDyYj+zSQFS5QTRMuQjMqqxjHNqU0t8nOxOF/1q4LQMNogz3l
-         j5lsS91+42qM8euon2xx5mKBZD/tkalErlzT1cl9Sqrod+XpEsUqLYkgDmksomns3iKJ
-         mK1Pp70/fNQnHNoTDroGVcnrJjUYyYXseavses5JUE0d6F0ftQkrdBMp9jQAh+Y7rkwG
-         6iyMctZPHmAWwxnTMpXob7lXXZf5ACW5KS9Uaoc/KRJRFIvLw2e/9xpihwND7Br797ul
-         xqWw==
-X-Forwarded-Encrypted: i=1; AJvYcCXIUCBrJ0y4J9nWCds1izoO/9MLgX21k6gJxrNOpND0p6sa0Kbzr862FE08wuW2/hKwib4xmK6YpbRoJlTMqv8+I65K
-X-Gm-Message-State: AOJu0YxGtlm8Sv4GSZ3T/ynaNBTHrf1BHvh5K4qhTTLqcvord19rBaEr
-	YtWz89bq1QnFsXjlYy4kIv9hbxve33zoyIB7Zh3MSdVO5TBGiX6YOlr4JSPcHZFXqRqAt+rA7oi
-	VAhavsGVxUSIaEGsMetlMcWrB5NPyOd0mWiCGM7fbagLn5b+asA==
-X-Received: by 2002:a05:600c:1f81:b0:41b:de8d:dcd7 with SMTP id 5b1f17b1804b1-41f71ebf891mr639445e9.20.1715094515907;
-        Tue, 07 May 2024 08:08:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGHZ3fHNVLmAQgwakct5lEQriA0Qg34lqLbb28Uv1myWsEsWU4Y4PADgvg9u993fG3wNf7rUQ==
-X-Received: by 2002:a05:600c:1f81:b0:41b:de8d:dcd7 with SMTP id 5b1f17b1804b1-41f71ebf891mr639265e9.20.1715094515515;
-        Tue, 07 May 2024 08:08:35 -0700 (PDT)
-Received: from [192.168.0.9] (ip-109-40-241-109.web.vodafone.de. [109.40.241.109])
-        by smtp.gmail.com with ESMTPSA id fc20-20020a05600c525400b00418accde252sm19827078wmb.30.2024.05.07.08.08.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 08:08:35 -0700 (PDT)
-Message-ID: <e0df1892-c17f-4fc3-b95a-4efc0af917d3@redhat.com>
-Date: Tue, 7 May 2024 17:08:33 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=IAMmzCwLtdG5RVdAgwNgLH0bsE7H0cYhJOrp1QsvG/c=;
+	b=DGqOJ2pVyrarRhxOkPKtbqePmwyu/ofd/c4Zu+apKG7BIFHFFAKUtKTJrTksj9RJ1iIlvF
+	ZY292MiBhEZaEwvGWKGRJKIaOpqUdo8mtZT+6xUIAkafF1tEf3hEm83x2RVc1b8SEl/PD3
+	zLmx2pOToV6FvYsBceKriHk6My5zoJQ=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-642-cMH_NkvYNBO7fhiLbC7z4g-1; Tue,
+ 07 May 2024 11:09:29 -0400
+X-MC-Unique: cMH_NkvYNBO7fhiLbC7z4g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BCB741C01516;
+	Tue,  7 May 2024 15:09:28 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.114])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C11AA1C060AE;
+	Tue,  7 May 2024 15:09:26 +0000 (UTC)
+Date: Tue, 7 May 2024 11:09:19 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <rth@twiddle.net>,
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+	Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+	Julia Suvorova <jusual@redhat.com>,
+	Aarushi Mehta <mehta.aaru20@gmail.com>,
+	Kevin Wolf <kwolf@redhat.com>, kvm@vger.kernel.org,
+	=?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Raphael Norwitz <raphael.norwitz@nutanix.com>,
+	qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Hanna Reitz <hreitz@redhat.com>, Eric Blake <eblake@redhat.com>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Fam Zheng <fam@euphon.net>, Sam Li <faithilikerun@gmail.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PULL v2 03/16] block/block-backend: add block layer APIs
+ resembling Linux ZonedBlockDevice ioctls
+Message-ID: <20240507150919.GE105913@fedora.redhat.com>
+References: <20230515160506.1776883-1-stefanha@redhat.com>
+ <20230515160506.1776883-4-stefanha@redhat.com>
+ <CAFEAcA9U8jtHFYY1xZ69=PoR1imgzrTB9aK5aoe+vZJtQrU1Jg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 07/31] scripts: allow machine option to
- be specified in unittests.cfg
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
- <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
-References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-8-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240504122841.1177683-8-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="evVfc2bZ/OH8O6xW"
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9U8jtHFYY1xZ69=PoR1imgzrTB9aK5aoe+vZJtQrU1Jg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On 04/05/2024 14.28, Nicholas Piggin wrote:
-> This allows different machines with different requirements to be
-> supported by run_tests.sh, similarly to how different accelerators
-> are handled.
-> 
-> Acked-by: Thomas Huth <thuth@redhat.com>
-> Acked-by: Andrew Jones <andrew.jones@linux.dev>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   docs/unittests.txt   |  7 +++++++
->   scripts/common.bash  |  8 ++++++--
->   scripts/runtime.bash | 16 ++++++++++++----
->   3 files changed, 25 insertions(+), 6 deletions(-)
-> 
-> diff --git a/docs/unittests.txt b/docs/unittests.txt
-> index 7cf2c55ad..6449efd78 100644
-> --- a/docs/unittests.txt
-> +++ b/docs/unittests.txt
-> @@ -42,6 +42,13 @@ For <arch>/ directories that support multiple architectures, this restricts
->   the test to the specified arch. By default, the test will run on any
->   architecture.
->   
-> +machine
-> +-------
-> +For those architectures that support multiple machine types, this restricts
-> +the test to the specified machine. By default, the test will run on
-> +any machine type. (Note, the machine can be specified with the MACHINE=
-> +environment variable, and defaults to the architecture's default.)
-> +
->   smp
->   ---
->   smp = <number>
-> diff --git a/scripts/common.bash b/scripts/common.bash
-> index 5e9ad53e2..3aa557c8c 100644
-> --- a/scripts/common.bash
-> +++ b/scripts/common.bash
-> @@ -10,6 +10,7 @@ function for_each_unittest()
->   	local opts
->   	local groups
->   	local arch
-> +	local machine
->   	local check
->   	local accel
->   	local timeout
-> @@ -21,7 +22,7 @@ function for_each_unittest()
->   		if [[ "$line" =~ ^\[(.*)\]$ ]]; then
->   			rematch=${BASH_REMATCH[1]}
->   			if [ -n "${testname}" ]; then
-> -				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +				$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
->   			fi
->   			testname=$rematch
->   			smp=1
-> @@ -29,6 +30,7 @@ function for_each_unittest()
->   			opts=""
->   			groups=""
->   			arch=""
-> +			machine=""
->   			check=""
->   			accel=""
->   			timeout=""
-> @@ -58,6 +60,8 @@ function for_each_unittest()
->   			groups=${BASH_REMATCH[1]}
->   		elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
->   			arch=${BASH_REMATCH[1]}
-> +		elif [[ $line =~ ^machine\ *=\ *(.*)$ ]]; then
-> +			machine=${BASH_REMATCH[1]}
->   		elif [[ $line =~ ^check\ *=\ *(.*)$ ]]; then
->   			check=${BASH_REMATCH[1]}
->   		elif [[ $line =~ ^accel\ *=\ *(.*)$ ]]; then
-> @@ -67,7 +71,7 @@ function for_each_unittest()
->   		fi
->   	done
->   	if [ -n "${testname}" ]; then
-> -		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> +		$(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
->   	fi
->   	exec {fd}<&-
->   }
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index 177b62166..0c96d6ea2 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -32,7 +32,7 @@ premature_failure()
->   get_cmdline()
->   {
->       local kernel=$1
-> -    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
-> +    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
->   }
->   
->   skip_nodefault()
-> @@ -80,9 +80,10 @@ function run()
->       local kernel="$4"
->       local opts="$5"
->       local arch="$6"
-> -    local check="${CHECK:-$7}"
-> -    local accel="$8"
-> -    local timeout="${9:-$TIMEOUT}" # unittests.cfg overrides the default
-> +    local machine="$7"
-> +    local check="${CHECK:-$8}"
-> +    local accel="$9"
-> +    local timeout="${10:-$TIMEOUT}" # unittests.cfg overrides the default
->   
->       if [ "${CONFIG_EFI}" == "y" ]; then
->           kernel=${kernel/%.flat/.efi}
-> @@ -116,6 +117,13 @@ function run()
->           return 2
->       fi
->   
-> +    if [ -n "$machine" ] && [ -n "$MACHINE" ] && [ "$machine" != "$MACHINE" ]; then
-> +        print_result "SKIP" $testname "" "$machine only"
-> +        return 2
-> +    elif [ -n "$MACHINE" ]; then
-> +        machine="$MACHINE"
-> +    fi
-> +
->       if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" ]; then
->           print_result "SKIP" $testname "" "$accel only, but ACCEL=$ACCEL"
->           return 2
 
-For some reasons that I don't quite understand yet, this patch causes the 
-"sieve" test to always timeout on the s390x runner, see e.g.:
+--evVfc2bZ/OH8O6xW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  https://gitlab.com/thuth/kvm-unit-tests/-/jobs/6798954987
+On Fri, May 03, 2024 at 01:33:51PM +0100, Peter Maydell wrote:
+> On Mon, 15 May 2023 at 17:07, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >
+> > From: Sam Li <faithilikerun@gmail.com>
+> >
+> > Add zoned device option to host_device BlockDriver. It will be presente=
+d only
+> > for zoned host block devices. By adding zone management operations to t=
+he
+> > host_block_device BlockDriver, users can use the new block layer APIs
+> > including Report Zone and four zone management operations
+> > (open, close, finish, reset, reset_all).
+> >
+> > Qemu-io uses the new APIs to perform zoned storage commands of the devi=
+ce:
+> > zone_report(zrp), zone_open(zo), zone_close(zc), zone_reset(zrs),
+> > zone_finish(zf).
+> >
+> > For example, to test zone_report, use following command:
+> > $ ./build/qemu-io --image-opts -n driver=3Dhost_device, filename=3D/dev=
+/nullb0
+> > -c "zrp offset nr_zones"
+>=20
+> Hi; Coverity points out an issue in this commit (CID 1544771):
+>=20
+> > +static int zone_report_f(BlockBackend *blk, int argc, char **argv)
+> > +{
+> > +    int ret;
+> > +    int64_t offset;
+> > +    unsigned int nr_zones;
+> > +
+> > +    ++optind;
+> > +    offset =3D cvtnum(argv[optind]);
+> > +    ++optind;
+> > +    nr_zones =3D cvtnum(argv[optind]);
+>=20
+> cvtnum() can fail and return a negative value on error
+> (e.g. if the number in the string is out of range),
+> but we are not checking for that. Instead we stuff
+> the value into an 'unsigned int' and then pass that to
+> g_new(), which will result in our trying to allocate a large
+> amount of memory.
+>=20
+> Here, and also in the other functions below that use cvtnum(),
+> I think we should follow the pattern for use of that function
+> that is used in the pre-existing code in this function:
+>=20
+>  int64_t foo; /* NB: not an unsigned or some smaller type */
+>=20
+>  foo =3D cvtnum(arg)
+>  if (foo < 0) {
+>      print_cvtnum_err(foo, arg);
+>      return foo; /* or otherwise handle returning an error upward */
+>  }
+>=20
+> It looks like all the uses of cvtnum in this patch should be
+> adjusted to handle errors.
 
-Everything is fine in the previous patches (I pushed now the previous 5 
-patches to the repo):
+Thanks for letting me know. I will send a patch.
 
-  https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/pipelines/1281919104
+Stefan
 
-Could it be that he TIMEOUT gets messed up in certain cases?
+--evVfc2bZ/OH8O6xW
+Content-Type: application/pgp-signature; name="signature.asc"
 
-  Thomas
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmY6RB8ACgkQnKSrs4Gr
+c8g8kAgAxj4bwKXeYT8BKNFRjR/8G+m/TrpTmXgPwgOBCGGBcA4XvLNzMqDXlM4T
+H+dv8UrKzKWI0l3RlQ37/DgWd7T4Wcc/f7BeUFTtFnOovPJ/CPtIuEgK28WwBZ0V
+IRIP+yHusXY+AJ7TDvdrfrQlcY/tyZFoWUaQGw+DJDhWQWUcgGNBSs7y7IVBwf+f
+XNjPFHLywD0Ct5leYJ50spSZlsBRPUZn+bqSoLcg6hb8OrWGR0j0DEAnqf3YqkVQ
+A6e2sWnX5aRFnQJiy3HGretXG7IhTlP9oNRdlpNb076RawCUVshf9TmGIytxbTnm
+H59Wlb6Tbi7aFVkbLj+Ufy7Qd8ELEg==
+=h4Ah
+-----END PGP SIGNATURE-----
+
+--evVfc2bZ/OH8O6xW--
 
 
