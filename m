@@ -1,62 +1,62 @@
-Return-Path: <kvm+bounces-16795-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16796-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 545198BDB5A
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 08:24:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30DBD8BDB60
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 08:25:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5A381F22009
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 06:24:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 532941C215A2
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 06:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A75873528;
-	Tue,  7 May 2024 06:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4C177F30;
+	Tue,  7 May 2024 06:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RXjWKWOC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DdKxo+O3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234506F07E;
-	Tue,  7 May 2024 06:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C1A71B3A;
+	Tue,  7 May 2024 06:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715062941; cv=none; b=S8A2w4A3Q7OTwdzVTbq8YJdGNZJppxftIAsQzElVf3XqIAxzncraF+aZCjpu0ib8pav6hQMisE2y2KsuKN7fTRKgXmljN2VhjzIKy2+WFgnGHbkR7HkBmJbznop9ClNun0SEgWGLlIVCx0UD/9xJ4m4LDmBeZzGHGjal2w4Hong=
+	t=1715062978; cv=none; b=Na7OvryLTmv8At474OQ33rwWQ5p21DeRgyb37XDv0hmL0Mj22LLLChrwScGuvYf8bWkM3W8tNOOBv0AWLeIaAty1+4PsSffHPmqOE7QEw7bsz72QineASjFUqwPrUuCr+1rjDOoxXzYturSOzhjx+ab3tOONaUPwc2Hr09Z9NpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715062941; c=relaxed/simple;
-	bh=VNRR4fx4YmPYaR7+Cgk91GS1CDvBbw1zKYy24fWdEs4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=IopaWhFGc5zEN/iCBPwDmorReUmCTNI6MEZJK1TL8JcSArimzbmwe/MgclX6Pdhm+3U8Sku2LIcqJd63vUCOrw/Wpt793Ye80I31yjHQL31SQXACgw2fZWPKnE4h65aiE5K1sIS0GHyy+hJ1qaRKEzvuUMliPWroSI3RGDUSjfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RXjWKWOC; arc=none smtp.client-ip=192.198.163.16
+	s=arc-20240116; t=1715062978; c=relaxed/simple;
+	bh=TL0UZXMfyUTYYFYNxhfZM0gx/hJkCl1fIxqe8cLgHB0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=jgiGH4OWFkV3ZTrhKMyTK6VX+IMqGQY+Dj/7Z4MTCv/S62HGXK8PU/rXXsX+r1fezrj4rkJ0FF+mWwYrXf6uYiOXA/Uoir2twSwzmFYIg7uebSQQskYq5F5S8wWUIaRuPARYBNwsVqFbdJi7pDStvogebgZtJNQKCLtspUv+gPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DdKxo+O3; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715062940; x=1746598940;
+  t=1715062974; x=1746598974;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references;
-  bh=VNRR4fx4YmPYaR7+Cgk91GS1CDvBbw1zKYy24fWdEs4=;
-  b=RXjWKWOCnkNVGO02M8loVB3fzcKnd+I6ncMSMRNHqrfV8tAVO9PVJ2gT
-   dBx4PiSe2NwtKbVEqVfePuxJg0PxPf/0u872x3PwIAYQ7l77pBgjjy8Hm
-   ThOrHgnpoDHwcid4FOfcQG754pw9mwIYTvp64FLOvEaNX9g916CfMLz3f
-   0s9S45iyXM1XFT44Ne02vGwfDO1yxMX4/dwUj617mzVAA4Y9z6KA4I1Pl
-   nzO47soLevEBo5xpIqLXUOfI32VfbXnafj+ig15RsKbd6n+5riMX0SWa4
-   XVNsjeQDxJTKMxlDy55mus2qYDQhH4sq9hAlxW8mFKHLHFx4nez0u3WI8
+  bh=TL0UZXMfyUTYYFYNxhfZM0gx/hJkCl1fIxqe8cLgHB0=;
+  b=DdKxo+O36SyUhE0W7MSwC43ZvL++v0DmAj3qS3B5SVMsRMMhuBFM9RHI
+   2Q0jtXvBTl+e7JShS+350r2gA0s5SmbOTzURCaWdv6nrcW4GBBRKLPPLx
+   T50IskMtycQ0gbbexB+tbiZo0M5nHfnUVu4/tnHgca+0Uf1NmLrpymI0O
+   EvGkcr3A3neo1C4O8TGHyK6kxuB0A44Rcl4SfGE3KgsmVD709oxt5oEhh
+   4ZSfU9Bhp6JrMzd0Wob1q7XWCs/1LiyaYaBXNoCeVRopJZz/xRMkRmfeP
+   x8ay+r8wNAtJuVm3v1qMT+pDDwhQqoGamoYjlrZnIqs7htDMEXRQcSfqh
    A==;
-X-CSE-ConnectionGUID: 16a3ubdyRHO9QYTA++w5Vg==
-X-CSE-MsgGUID: CSAaFozYRTGl0eTMWsgSeA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="11376138"
+X-CSE-ConnectionGUID: OUec294VRwuXogdB6eGP/Q==
+X-CSE-MsgGUID: ULSFlFI1SjKZkYTKhK4Jgw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11065"; a="10720354"
 X-IronPort-AV: E=Sophos;i="6.07,260,1708416000"; 
-   d="scan'208";a="11376138"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 23:22:19 -0700
-X-CSE-ConnectionGUID: vZ4DaZevSs2y/SHiQir9dA==
-X-CSE-MsgGUID: 3vFs5M/fS6yR8m5yKpRQbA==
+   d="scan'208";a="10720354"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 23:22:53 -0700
+X-CSE-ConnectionGUID: /8n9UBt7RNevDb1XsRFpXw==
+X-CSE-MsgGUID: XGQwIr8gRyGZnywFHvC53w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,260,1708416000"; 
-   d="scan'208";a="28930445"
+   d="scan'208";a="65857923"
 Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 23:22:14 -0700
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2024 23:22:48 -0700
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
@@ -81,9 +81,9 @@ Cc: iommu@lists.linux.dev,
 	baolu.lu@linux.intel.com,
 	yi.l.liu@intel.com,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 4/5] vfio/type1: Flush CPU caches on DMA pages in non-coherent domains
-Date: Tue,  7 May 2024 14:21:38 +0800
-Message-Id: <20240507062138.20465-1-yan.y.zhao@intel.com>
+Subject: [PATCH 5/5] iommufd: Flush CPU caches on DMA pages in non-coherent domains
+Date: Tue,  7 May 2024 14:22:12 +0800
+Message-Id: <20240507062212.20535-1-yan.y.zhao@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240507061802.20184-1-yan.y.zhao@intel.com>
 References: <20240507061802.20184-1-yan.y.zhao@intel.com>
@@ -134,173 +134,204 @@ Reasons for adopting this lazily flushing design include:
 - Avoid dividing a large unmap range into several smaller ones or
   allocating additional memory to hold IOVA to HPA relationship.
 
+Unlike "has_noncoherent_domain" flag used in vfio_iommu, the
+"noncoherent_domain_cnt" counter is implemented in io_pagetable to track
+whether an iopt has non-coherent domains attached.
+Such a difference is because in iommufd only hwpt of type paging contains
+flag "enforce_cache_coherency" and iommu domains in io_pagetable has no
+flag "enforce_cache_coherency" as that in vfio_domain.
+A counter in io_pagetable can avoid traversing ioas->hwpt_list and holding
+ioas->mutex.
+
 Reported-by: Jason Gunthorpe <jgg@nvidia.com>
 Closes: https://lore.kernel.org/lkml/20240109002220.GA439767@nvidia.com
-Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
+Fixes: e8d57210035b ("iommufd: Add kAPI toward external drivers for physical devices")
 Cc: Alex Williamson <alex.williamson@redhat.com>
 Cc: Jason Gunthorpe <jgg@nvidia.com>
 Cc: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 51 +++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ drivers/iommu/iommufd/hw_pagetable.c    | 19 +++++++++--
+ drivers/iommu/iommufd/io_pagetable.h    |  5 +++
+ drivers/iommu/iommufd/iommufd_private.h |  1 +
+ drivers/iommu/iommufd/pages.c           | 44 +++++++++++++++++++++++--
+ 4 files changed, 65 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index b5c15fe8f9fc..ce873f4220bf 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -74,6 +74,7 @@ struct vfio_iommu {
- 	bool			v2;
- 	bool			nesting;
- 	bool			dirty_page_tracking;
-+	bool			has_noncoherent_domain;
- 	struct list_head	emulated_iommu_groups;
- };
+diff --git a/drivers/iommu/iommufd/hw_pagetable.c b/drivers/iommu/iommufd/hw_pagetable.c
+index 33d142f8057d..e3099d732c5c 100644
+--- a/drivers/iommu/iommufd/hw_pagetable.c
++++ b/drivers/iommu/iommufd/hw_pagetable.c
+@@ -14,12 +14,18 @@ void iommufd_hwpt_paging_destroy(struct iommufd_object *obj)
+ 		container_of(obj, struct iommufd_hwpt_paging, common.obj);
  
-@@ -99,6 +100,7 @@ struct vfio_dma {
- 	unsigned long		*bitmap;
- 	struct mm_struct	*mm;
- 	size_t			locked_vm;
-+	bool			cache_flush_required; /* For noncoherent domain */
- };
+ 	if (!list_empty(&hwpt_paging->hwpt_item)) {
++		struct io_pagetable *iopt = &hwpt_paging->ioas->iopt;
+ 		mutex_lock(&hwpt_paging->ioas->mutex);
+ 		list_del(&hwpt_paging->hwpt_item);
+ 		mutex_unlock(&hwpt_paging->ioas->mutex);
  
- struct vfio_batch {
-@@ -716,6 +718,9 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
- 	long unlocked = 0, locked = 0;
- 	long i;
- 
-+	if (dma->cache_flush_required)
-+		arch_clean_nonsnoop_dma(pfn << PAGE_SHIFT, npage << PAGE_SHIFT);
+-		iopt_table_remove_domain(&hwpt_paging->ioas->iopt,
+-					 hwpt_paging->common.domain);
++		iopt_table_remove_domain(iopt, hwpt_paging->common.domain);
 +
- 	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
- 		if (put_pfn(pfn++, dma->prot)) {
- 			unlocked++;
-@@ -1099,6 +1104,8 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 					    &iotlb_gather);
++		if (!hwpt_paging->enforce_cache_coherency) {
++			down_write(&iopt->domains_rwsem);
++			iopt->noncoherent_domain_cnt--;
++			up_write(&iopt->domains_rwsem);
++		}
  	}
  
-+	dma->cache_flush_required = false;
-+
- 	if (do_accounting) {
- 		vfio_lock_acct(dma, -unlocked, true);
- 		return 0;
-@@ -1120,6 +1127,21 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- 	iommu->dma_avail++;
- }
+ 	if (hwpt_paging->common.domain)
+@@ -176,6 +182,12 @@ iommufd_hwpt_paging_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+ 			goto out_abort;
+ 	}
  
-+static void vfio_update_noncoherent_domain_state(struct vfio_iommu *iommu)
-+{
-+	struct vfio_domain *domain;
-+	bool has_noncoherent = false;
-+
-+	list_for_each_entry(domain, &iommu->domain_list, next) {
-+		if (domain->enforce_cache_coherency)
-+			continue;
-+
-+		has_noncoherent = true;
-+		break;
++	if (!hwpt_paging->enforce_cache_coherency) {
++		down_write(&ioas->iopt.domains_rwsem);
++		ioas->iopt.noncoherent_domain_cnt++;
++		up_write(&ioas->iopt.domains_rwsem);
 +	}
-+	iommu->has_noncoherent_domain = has_noncoherent;
++
+ 	rc = iopt_table_add_domain(&ioas->iopt, hwpt->domain);
+ 	if (rc)
+ 		goto out_detach;
+@@ -183,6 +195,9 @@ iommufd_hwpt_paging_alloc(struct iommufd_ctx *ictx, struct iommufd_ioas *ioas,
+ 	return hwpt_paging;
+ 
+ out_detach:
++	down_write(&ioas->iopt.domains_rwsem);
++	ioas->iopt.noncoherent_domain_cnt--;
++	up_write(&ioas->iopt.domains_rwsem);
+ 	if (immediate_attach)
+ 		iommufd_hw_pagetable_detach(idev);
+ out_abort:
+diff --git a/drivers/iommu/iommufd/io_pagetable.h b/drivers/iommu/iommufd/io_pagetable.h
+index 0ec3509b7e33..557da8fb83d9 100644
+--- a/drivers/iommu/iommufd/io_pagetable.h
++++ b/drivers/iommu/iommufd/io_pagetable.h
+@@ -198,6 +198,11 @@ struct iopt_pages {
+ 	void __user *uptr;
+ 	bool writable:1;
+ 	u8 account_mode;
++	/*
++	 * CPU cache flush is required before mapping the pages to or after
++	 * unmapping it from a noncoherent domain
++	 */
++	bool cache_flush_required:1;
+ 
+ 	struct xarray pinned_pfns;
+ 	/* Of iopt_pages_access::node */
+diff --git a/drivers/iommu/iommufd/iommufd_private.h b/drivers/iommu/iommufd/iommufd_private.h
+index 991f864d1f9b..fc77fd43b232 100644
+--- a/drivers/iommu/iommufd/iommufd_private.h
++++ b/drivers/iommu/iommufd/iommufd_private.h
+@@ -53,6 +53,7 @@ struct io_pagetable {
+ 	struct rb_root_cached reserved_itree;
+ 	u8 disable_large_pages;
+ 	unsigned long iova_alignment;
++	unsigned int noncoherent_domain_cnt;
+ };
+ 
+ void iopt_init_table(struct io_pagetable *iopt);
+diff --git a/drivers/iommu/iommufd/pages.c b/drivers/iommu/iommufd/pages.c
+index 528f356238b3..8f4b939cba5b 100644
+--- a/drivers/iommu/iommufd/pages.c
++++ b/drivers/iommu/iommufd/pages.c
+@@ -272,6 +272,17 @@ struct pfn_batch {
+ 	unsigned int total_pfns;
+ };
+ 
++static void iopt_cache_flush_pfn_batch(struct pfn_batch *batch)
++{
++	unsigned long cur, i;
++
++	for (cur = 0; cur < batch->end; cur++) {
++		for (i = 0; i < batch->npfns[cur]; i++)
++			arch_clean_nonsnoop_dma(PFN_PHYS(batch->pfns[cur] + i),
++						PAGE_SIZE);
++	}
 +}
 +
- static void vfio_update_pgsize_bitmap(struct vfio_iommu *iommu)
+ static void batch_clear(struct pfn_batch *batch)
  {
- 	struct vfio_domain *domain;
-@@ -1455,6 +1477,12 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 
- 	vfio_batch_init(&batch);
- 
-+	/*
-+	 * Record necessity to flush CPU cache to make sure CPU cache is flushed
-+	 * for both pin & map and unmap & unpin (for unwind) paths.
-+	 */
-+	dma->cache_flush_required = iommu->has_noncoherent_domain;
+ 	batch->total_pfns = 0;
+@@ -637,10 +648,18 @@ static void batch_unpin(struct pfn_batch *batch, struct iopt_pages *pages,
+ 	while (npages) {
+ 		size_t to_unpin = min_t(size_t, npages,
+ 					batch->npfns[cur] - first_page_off);
++		unsigned long pfn = batch->pfns[cur] + first_page_off;
 +
- 	while (size) {
- 		/* Pin a contiguous chunk of memory */
- 		npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
-@@ -1466,6 +1494,10 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
- 			break;
- 		}
- 
-+		if (dma->cache_flush_required)
++		/*
++		 * Lazily flushing CPU caches when a page is about to be
++		 * unpinned if the page was mapped into a noncoherent domain
++		 */
++		if (pages->cache_flush_required)
 +			arch_clean_nonsnoop_dma(pfn << PAGE_SHIFT,
-+						npage << PAGE_SHIFT);
-+
- 		/* Map it! */
- 		ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
- 				     dma->prot);
-@@ -1683,9 +1715,14 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 	for (; n; n = rb_next(n)) {
- 		struct vfio_dma *dma;
- 		dma_addr_t iova;
-+		bool cache_flush_required;
++						to_unpin << PAGE_SHIFT);
  
- 		dma = rb_entry(n, struct vfio_dma, node);
- 		iova = dma->iova;
-+		cache_flush_required = !domain->enforce_cache_coherency &&
-+				       !dma->cache_flush_required;
+ 		unpin_user_page_range_dirty_lock(
+-			pfn_to_page(batch->pfns[cur] + first_page_off),
+-			to_unpin, pages->writable);
++			pfn_to_page(pfn), to_unpin, pages->writable);
+ 		iopt_pages_sub_npinned(pages, to_unpin);
+ 		cur++;
+ 		first_page_off = 0;
+@@ -1358,10 +1377,17 @@ int iopt_area_fill_domain(struct iopt_area *area, struct iommu_domain *domain)
+ {
+ 	unsigned long done_end_index;
+ 	struct pfn_reader pfns;
++	bool cache_flush_required;
+ 	int rc;
+ 
+ 	lockdep_assert_held(&area->pages->mutex);
+ 
++	cache_flush_required = area->iopt->noncoherent_domain_cnt &&
++			       !area->pages->cache_flush_required;
++
++	if (cache_flush_required)
++		area->pages->cache_flush_required = true;
++
+ 	rc = pfn_reader_first(&pfns, area->pages, iopt_area_index(area),
+ 			      iopt_area_last_index(area));
+ 	if (rc)
+@@ -1369,6 +1395,9 @@ int iopt_area_fill_domain(struct iopt_area *area, struct iommu_domain *domain)
+ 
+ 	while (!pfn_reader_done(&pfns)) {
+ 		done_end_index = pfns.batch_start_index;
 +		if (cache_flush_required)
-+			dma->cache_flush_required = true;
- 
- 		while (iova < dma->iova + dma->size) {
- 			phys_addr_t phys;
-@@ -1737,6 +1774,9 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 				size = npage << PAGE_SHIFT;
- 			}
- 
-+			if (cache_flush_required)
-+				arch_clean_nonsnoop_dma(phys, size);
++			iopt_cache_flush_pfn_batch(&pfns.batch);
 +
- 			ret = iommu_map(domain->domain, iova, phys, size,
- 					dma->prot | IOMMU_CACHE,
- 					GFP_KERNEL_ACCOUNT);
-@@ -1801,6 +1841,7 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
- 			vfio_unpin_pages_remote(dma, iova, phys >> PAGE_SHIFT,
- 						size >> PAGE_SHIFT, true);
- 		}
-+		dma->cache_flush_required = false;
- 	}
+ 		rc = batch_to_domain(&pfns.batch, domain, area,
+ 				     pfns.batch_start_index);
+ 		if (rc)
+@@ -1413,6 +1442,7 @@ int iopt_area_fill_domains(struct iopt_area *area, struct iopt_pages *pages)
+ 	unsigned long unmap_index;
+ 	struct pfn_reader pfns;
+ 	unsigned long index;
++	bool cache_flush_required;
+ 	int rc;
  
- 	vfio_batch_fini(&batch);
-@@ -1828,6 +1869,9 @@ static void vfio_test_domain_fgsp(struct vfio_domain *domain, struct list_head *
- 	if (!pages)
- 		return;
+ 	lockdep_assert_held(&area->iopt->domains_rwsem);
+@@ -1426,9 +1456,19 @@ int iopt_area_fill_domains(struct iopt_area *area, struct iopt_pages *pages)
+ 	if (rc)
+ 		goto out_unlock;
  
-+	if (!domain->enforce_cache_coherency)
-+		arch_clean_nonsnoop_dma(page_to_phys(pages), PAGE_SIZE * 2);
++	cache_flush_required = area->iopt->noncoherent_domain_cnt &&
++			       !pages->cache_flush_required;
 +
- 	list_for_each_entry(region, regions, list) {
- 		start = ALIGN(region->start, PAGE_SIZE * 2);
- 		if (start >= region->end || (region->end - start < PAGE_SIZE * 2))
-@@ -1847,6 +1891,9 @@ static void vfio_test_domain_fgsp(struct vfio_domain *domain, struct list_head *
- 		break;
- 	}
- 
-+	if (!domain->enforce_cache_coherency)
-+		arch_clean_nonsnoop_dma(page_to_phys(pages), PAGE_SIZE * 2);
++	if (cache_flush_required)
++		pages->cache_flush_required = true;
 +
- 	__free_pages(pages, order);
- }
- 
-@@ -2308,6 +2355,8 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 
- 	list_add(&domain->next, &iommu->domain_list);
- 	vfio_update_pgsize_bitmap(iommu);
-+	if (!domain->enforce_cache_coherency)
-+		vfio_update_noncoherent_domain_state(iommu);
- done:
- 	/* Delete the old one and insert new iova list */
- 	vfio_iommu_iova_insert_copy(iommu, &iova_copy);
-@@ -2508,6 +2557,8 @@ static void vfio_iommu_type1_detach_group(void *iommu_data,
- 			}
- 			iommu_domain_free(domain->domain);
- 			list_del(&domain->next);
-+			if (!domain->enforce_cache_coherency)
-+				vfio_update_noncoherent_domain_state(iommu);
- 			kfree(domain);
- 			vfio_iommu_aper_expand(iommu, &iova_copy);
- 			vfio_update_pgsize_bitmap(iommu);
+ 	while (!pfn_reader_done(&pfns)) {
+ 		done_first_end_index = pfns.batch_end_index;
+ 		done_all_end_index = pfns.batch_start_index;
++
++		if (cache_flush_required)
++			iopt_cache_flush_pfn_batch(&pfns.batch);
++
+ 		xa_for_each(&area->iopt->domains, index, domain) {
+ 			rc = batch_to_domain(&pfns.batch, domain, area,
+ 					     pfns.batch_start_index);
 -- 
 2.17.1
 
