@@ -1,242 +1,262 @@
-Return-Path: <kvm+bounces-16888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16880-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982978BE95C
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:41:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B858BE933
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:37:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBC701C23E6A
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:41:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B205A28F161
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D473D181318;
-	Tue,  7 May 2024 16:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1737F16F0C4;
+	Tue,  7 May 2024 16:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="p5wO3re0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z7bmK0W6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B7617967C;
-	Tue,  7 May 2024 16:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F7716EC16
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 16:31:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715099712; cv=none; b=FW4qG+FTUheUAK0aZCbhuzwh5/wO7eSq0sZx68kEsafluhjvpGQe7IFYbOGVUSYVq9Em43XIhjp/PXQpPWQxlXFWVeimWyCqQGQg1lUboTmNyt95q/XJ6D++EPaTHbSfEHy4+fXks8Yg3QMtb/yrN+evEeSMo33C1ugqUc4kc1E=
+	t=1715099520; cv=none; b=JvpEOJI+P1vh6SxOz1I5ZM/SgNyntcGuzeX9oETI6kArz2XvrJSQMk6OrdqglWdSgEH3tlV0UUV/vJSPJEBel8WXgu9gcstFY4GX84BbW+kytRXk76zxigtmEeKPamC0D4WeZPGLbugkLgMbR3L9Qfyauj5pZKqcCmC7ve4KBP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715099712; c=relaxed/simple;
-	bh=nYYHI1lX7tSIULkrAfAULdVwRSwZQZMaF/wYbKQevjg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mkRZCdsCqoadmZ1b1GpM7EtGvoL+oAB2x+FVovembI7UUQXKP1UtMLbOij0XC8RtCh+NSo6CAZ/32OiSLs0/WYM2QBgHY572mWpAdUKYzGcA6lOkdzQQLj192Ez7MG7tuiJGq9BSYNLpzZf6XT8pQ/g5DFgbVB+d8iEeZHVvj+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=p5wO3re0; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 447G96CR014054;
-	Tue, 7 May 2024 16:35:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=qZAsXK2MlNndj48kA4lJe7DQZC7zLHkchPdAIkp7POY=;
- b=p5wO3re0JzadvMNN1jfTfQacxHdg993byB6p8hzsrG7TwXECcxb0sjaFJh4sgHzlK5Ao
- 0CDgOJix2yJnPzSjhLMYSHS9FXdn0xX8loNdExOuKy0uGdbbYaZ46s1P7CCjLDPBJ27B
- qzqNj9gc7E7966c6mpOvkO7f57FgQG9Zqo6dZwP/G8Hixp02vfcmK1KFeqm46CKwiswI
- 2VWJrT094dLjXiR04EgLAV+ESnIyfoT9BREePqPt+0boxsXpkElO7bZd/AxFW4i7Ndhu
- w3nhM1Wy7JQMgUzZ54gUaapbYhDsqA8Tm5U9GiU3TS2AdhXq9TnycR+A9ziRIIrC3HBx IA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyqj98204-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 16:35:07 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 447GZ6Qf021808;
-	Tue, 7 May 2024 16:35:06 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyqj981yy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 16:35:06 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 447FCYRZ028617;
-	Tue, 7 May 2024 16:35:05 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xwyr07egh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 07 May 2024 16:35:05 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 447GZ0Bd46924212
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 7 May 2024 16:35:02 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EBDEA2004D;
-	Tue,  7 May 2024 16:34:59 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B7AC82004B;
-	Tue,  7 May 2024 16:34:59 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  7 May 2024 16:34:59 +0000 (GMT)
-Date: Tue, 7 May 2024 18:29:30 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily
- Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Gerald
- Schaefer <gerald.schaefer@linux.ibm.com>,
-        Matthew Wilcox
- <willy@infradead.org>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v2 09/10] s390/uv: implement
- HAVE_ARCH_MAKE_FOLIO_ACCESSIBLE
-Message-ID: <20240507182930.03ca0be2@p-imbrenda.boeblingen.de.ibm.com>
-In-Reply-To: <20240412142120.220087-10-david@redhat.com>
-References: <20240412142120.220087-1-david@redhat.com>
-	<20240412142120.220087-10-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1715099520; c=relaxed/simple;
+	bh=7kgjLi9TNhjqGWboyoms3uNHLSO0jTRhJxxJrePYkO8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Content-Type; b=JZKzsJNo5GFAIqYISfaIeh4HNs+CXoS7xigjC/P9MPXzxp59HJmkaneSQlDNjQI9Sfs2Q4qEhwh8L4LHE408Vidgmrm6452ZGV6qJG/fgOwLOxCZJGAVfUZUNO2ME7DBc/fimsenzsMl548Qw9r6bvAiHf1qgp++jqDOVLSAW0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z7bmK0W6; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6204c4f4240so43769607b3.3
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 09:31:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715099518; x=1715704318; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1e/eDMa4fHA47lU+IKD4lhvdRlMMmjjebDxPNzXZQkk=;
+        b=Z7bmK0W6k5Jf+l3d7XlrHPyPfGX5CnM+VrivBM2ILcve+aB+6i6iVBB2gQlktm0Pfa
+         NklAIYuRWMnxo50ZrL149YCxloCrMZM1k1verJa6QbnqMsH6Jd3fY85pDNEI41W68ZZv
+         WRBWmTj6LzgQCkZ2oMcOnJvMnQY78ElNAs00pzzdj9ZCIFYkpG7LEI1EDkdEo3/oWzSH
+         sLozun/180E/SIXIp7bKaSPxHa/IK5GnGV7rybNCgziw4eddO/Or1J0/vxLxv/7D9R09
+         cNyFm+1CGTvZKCWGNU6PsVXZde5xFe2Kd7bLoHo1lQ0pMkDp99O5RE5EdEYy45PobDpL
+         nN7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715099518; x=1715704318;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1e/eDMa4fHA47lU+IKD4lhvdRlMMmjjebDxPNzXZQkk=;
+        b=DlEq8O7ujQETFbFFylCBbcXlWpaCquQxYBIWcEH/JjWzzPs6EOUCCj/6sZug70zj/c
+         jv57M1VRa7/MNET97Jhkb+vKrAJR7IHaAp8HXRZFiGMs3ATvdG9VwuEkJPZz5qfNmnlP
+         SDIw5vPYtLMy9sGwM1zJ9Tq+MWzi2sJ1MjwD51/O/Xuudzehe3yEXFX3TG2ePf/9dzaI
+         Y1gwWRw4L5uQi6+v1ofjlhbSN1h76sRQl9UZxKGdzQ+b8S8I36Ssqfr5oQdKh0kmLwea
+         gryFWxoTVqnEQ8uJe8M8J9i2I7QPDsOlxcRo1rW+3o7L9zqkY3wdkX8mF3jdbdRK/dl2
+         FI3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXcxRCjsYEHa9764/O3R8RctO7KKd8dbZ8sWdVk3yM9d1h8XCuubO2pYKwPpqOU1GFm3RjJ3lhDkAf8bvgeToRn7wjx
+X-Gm-Message-State: AOJu0YzLcTTuBBQJFB6osAy04IiSSNG3XAfBXN1vZ4HPYwt/5I0N8B4L
+	pGzquJWUYrCBiq2roLk5c3llqSDATZ5/UoyY/6aEuluh59mTMUFbBnXWLaoRm16maSO60H43RQw
+	LYw==
+X-Google-Smtp-Source: AGHT+IGZVgoWBMMFq1L9YeULM2uZbSISiYBnO4niE0YUsWvKq+soQEHDD98XH3lHMNeIe8FvRkQJIKWr3j8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2991:b0:de5:c2b:389b with SMTP id
+ 3f1490d57ef6-debb9d2db7cmr11986276.5.1715099517748; Tue, 07 May 2024 09:31:57
+ -0700 (PDT)
+Date: Tue, 7 May 2024 09:31:55 -0700
+In-Reply-To: <20240425233951.3344485-4-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: loY9liwNUfC4v6qaY8I0WNlGJL_TWcnb
-X-Proofpoint-GUID: vOSKbZP4nf5hKs6sdNkVvYDQMnFoL3rK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-07_09,2024-05-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- priorityscore=1501 bulkscore=0 phishscore=0 malwarescore=0
- lowpriorityscore=0 impostorscore=0 spamscore=0 mlxscore=0 adultscore=0
- clxscore=1015 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2404010000 definitions=main-2405070112
+Mime-Version: 1.0
+References: <20240425233951.3344485-1-seanjc@google.com> <20240425233951.3344485-4-seanjc@google.com>
+Message-ID: <ZjpXeyzU46I1eu0A@google.com>
+Subject: Re: [PATCH 3/4] KVM: Register cpuhp and syscore callbacks when
+ enabling hardware
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 12 Apr 2024 16:21:19 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> Let's also implement HAVE_ARCH_MAKE_FOLIO_ACCESSIBLE, so we can convert
-> arch_make_page_accessible() to be a simple wrapper around
-> arch_make_folio_accessible(). Unfortuantely, we cannot do that in the
-> header.
+On Thu, Apr 25, 2024, Sean Christopherson wrote:
+> Register KVM's cpuhp and syscore callback when enabling virtualization
+> in hardware instead of registering the callbacks during initialization,
+> and let the CPU up/down framework invoke the inner enable/disable
+> functions.  Registering the callbacks during initialization makes things
+> more complex than they need to be, as KVM needs to be very careful about
+> handling races between enabling CPUs being onlined/offlined and hardware
+> being enabled/disabled.
 > 
-> There are only two arch_make_page_accessible() calls remaining in gup.c.
-> We can now drop HAVE_ARCH_MAKE_PAGE_ACCESSIBLE completely form core-MM.
-> We'll handle that separately, once the s390x part landed.
-> 
-> Suggested-by: Matthew Wilcox <willy@infradead.org>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
->  arch/s390/include/asm/page.h |  3 +++
->  arch/s390/kernel/uv.c        | 18 +++++++++++-------
->  arch/s390/mm/fault.c         | 14 ++++++++------
->  3 files changed, 22 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
-> index b64384872c0f..03bbc782e286 100644
-> --- a/arch/s390/include/asm/page.h
-> +++ b/arch/s390/include/asm/page.h
-> @@ -162,6 +162,7 @@ static inline int page_reset_referenced(unsigned long addr)
->  #define _PAGE_ACC_BITS		0xf0	/* HW access control bits	*/
->  
->  struct page;
-> +struct folio;
->  void arch_free_page(struct page *page, int order);
->  void arch_alloc_page(struct page *page, int order);
->  
-> @@ -174,6 +175,8 @@ static inline int devmem_is_allowed(unsigned long pfn)
->  #define HAVE_ARCH_ALLOC_PAGE
->  
->  #if IS_ENABLED(CONFIG_PGSTE)
-> +int arch_make_folio_accessible(struct folio *folio);
-> +#define HAVE_ARCH_MAKE_FOLIO_ACCESSIBLE
->  int arch_make_page_accessible(struct page *page);
->  #define HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
->  #endif
-> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-> index b456066d72da..fa62fa0e369f 100644
-> --- a/arch/s390/kernel/uv.c
-> +++ b/arch/s390/kernel/uv.c
-> @@ -498,14 +498,13 @@ int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
->  EXPORT_SYMBOL_GPL(gmap_destroy_page);
->  
->  /*
-> - * To be called with the page locked or with an extra reference! This will
-> - * prevent gmap_make_secure from touching the page concurrently. Having 2
-> - * parallel make_page_accessible is fine, as the UV calls will become a
-> - * no-op if the page is already exported.
-> + * To be called with the folio locked or with an extra reference! This will
-> + * prevent gmap_make_secure from touching the folio concurrently. Having 2
-> + * parallel arch_make_folio_accessible is fine, as the UV calls will become a
-> + * no-op if the folio is already exported.
->   */
-> -int arch_make_page_accessible(struct page *page)
-> +int arch_make_folio_accessible(struct folio *folio)
->  {
-> -	struct folio *folio = page_folio(page);
->  	int rc = 0;
->  
->  	/* See gmap_make_secure(): large folios cannot be secure */
-> @@ -537,8 +536,13 @@ int arch_make_page_accessible(struct page *page)
->  
->  	return rc;
->  }
-> -EXPORT_SYMBOL_GPL(arch_make_page_accessible);
-> +EXPORT_SYMBOL_GPL(arch_make_folio_accessible);
->  
-> +int arch_make_page_accessible(struct page *page)
+> Intel TDX support will require KVM to enable virtualization during KVM
+> initialization, i.e. will add another wrinkle to things, at which point
+> sorting out the potential races with kvm_usage_count would become even
+> more complex.
+> +static int hardware_enable_all(void)
 > +{
-> +	return arch_make_folio_accessible(page_folio(page));
-> +}
-> +EXPORT_SYMBOL_GPL(arch_make_page_accessible);
->  #endif
->  
->  #if defined(CONFIG_PROTECTED_VIRTUALIZATION_GUEST) || IS_ENABLED(CONFIG_KVM)
-> diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-> index c421dd44ffbe..a1ba58460593 100644
-> --- a/arch/s390/mm/fault.c
-> +++ b/arch/s390/mm/fault.c
-> @@ -491,6 +491,7 @@ void do_secure_storage_access(struct pt_regs *regs)
->  	unsigned long addr = get_fault_address(regs);
->  	struct vm_area_struct *vma;
->  	struct mm_struct *mm;
-> +	struct folio *folio;
->  	struct page *page;
->  	struct gmap *gmap;
->  	int rc;
-> @@ -538,17 +539,18 @@ void do_secure_storage_access(struct pt_regs *regs)
->  			mmap_read_unlock(mm);
->  			break;
->  		}
-> -		if (arch_make_page_accessible(page))
-> +		folio = page_folio(page);
-> +		if (arch_make_folio_accessible(folio))
->  			send_sig(SIGSEGV, current, 0);
-> -		put_page(page);
-> +		folio_put(folio);
->  		mmap_read_unlock(mm);
->  		break;
->  	case KERNEL_FAULT:
-> -		page = phys_to_page(addr);
-> -		if (unlikely(!try_get_page(page)))
-> +		folio = phys_to_folio(addr);
-> +		if (unlikely(!folio_try_get(folio)))
->  			break;
-> -		rc = arch_make_page_accessible(page);
-> -		put_page(page);
-> +		rc = arch_make_folio_accessible(folio);
-> +		folio_put(folio);
->  		if (rc)
->  			BUG();
->  		break;
+> +	int r;
+> +
+> +	guard(mutex)(&kvm_lock);
+> +
+> +	if (kvm_usage_count++)
+> +		return 0;
+> +
+> +	r = cpuhp_setup_state(CPUHP_AP_KVM_ONLINE, "kvm/cpu:online",
+> +			      kvm_online_cpu, kvm_offline_cpu);
+> +	if (r)
+> +		return r;
+
+There's a lock ordering issue here.  KVM currently takes kvm_lock inside
+cpu_hotplug_lock, but this code does the opposite.  I need to take a closer look
+at the locking, as I'm not entirely certain that the existing ordering is correct
+or ideal.  E.g. cpu_hotplug_lock is taken when updating static keys, static calls,
+etc., which makes taking cpu_hotplug_lock outside kvm_lock dicey, as flows that
+take kvm_lock then need to be very careful to never trigger seemingly innocuous
+updates.
+
+And this lockdep splat that I've now hit twice with the current implementation
+suggests that cpu_hotplug_lock => kvm_lock is already unsafe/broken (I need to
+re-decipher the splat; I _think_ mostly figured it out last week, but then forgot
+over the weekend).
+
+
+[48419.244819] ======================================================
+[48419.250999] WARNING: possible circular locking dependency detected
+[48419.257179] 6.9.0-smp--04b1c6b4841d-next #301 Tainted: G S         O      
+[48419.264050] ------------------------------------------------------
+[48419.270229] tee/27085 is trying to acquire lock:
+[48419.274849] ffffb5fdd4e430a8 (&kvm->slots_lock){+.+.}-{3:3}, at: set_nx_huge_pages+0x179/0x1e0 [kvm]
+[48419.284085] 
+               but task is already holding lock:
+[48419.289918] ffffffffc06ccba8 (kvm_lock){+.+.}-{3:3}, at: set_nx_huge_pages+0x14a/0x1e0 [kvm]
+[48419.298386] 
+               which lock already depends on the new lock.
+
+[48419.306559] 
+               the existing dependency chain (in reverse order) is:
+[48419.314040] 
+               -> #3 (kvm_lock){+.+.}-{3:3}:
+[48419.319523]        __mutex_lock+0x6a/0xb40
+[48419.323622]        mutex_lock_nested+0x1f/0x30
+[48419.328071]        kvm_dev_ioctl+0x4fb/0xe50 [kvm]
+[48419.332898]        __se_sys_ioctl+0x7b/0xd0
+[48419.337082]        __x64_sys_ioctl+0x21/0x30
+[48419.341357]        do_syscall_64+0x8b/0x170
+[48419.345540]        entry_SYSCALL_64_after_hwframe+0x71/0x79
+[48419.351115] 
+               -> #2 (cpu_hotplug_lock){++++}-{0:0}:
+[48419.357294]        cpus_read_lock+0x2e/0xb0
+[48419.361480]        static_key_slow_inc+0x16/0x30
+[48419.366098]        kvm_lapic_set_base+0x6a/0x1c0 [kvm]
+[48419.371298]        kvm_set_apic_base+0x8f/0xe0 [kvm]
+[48419.376298]        kvm_set_msr_common+0xa29/0x1080 [kvm]
+[48419.381645]        vmx_set_msr+0xa54/0xbe0 [kvm_intel]
+[48419.386795]        __kvm_set_msr+0xb6/0x1a0 [kvm]
+[48419.391535]        kvm_arch_vcpu_ioctl+0xf66/0x1150 [kvm]
+[48419.396970]        kvm_vcpu_ioctl+0x485/0x5b0 [kvm]
+[48419.401881]        __se_sys_ioctl+0x7b/0xd0
+[48419.406067]        __x64_sys_ioctl+0x21/0x30
+[48419.410342]        do_syscall_64+0x8b/0x170
+[48419.414528]        entry_SYSCALL_64_after_hwframe+0x71/0x79
+[48419.420099] 
+               -> #1 (&kvm->srcu){.?.+}-{0:0}:
+[48419.425758]        __synchronize_srcu+0x44/0x1a0
+[48419.430378]        synchronize_srcu_expedited+0x21/0x30
+[48419.435603]        kvm_swap_active_memslots+0x113/0x1c0 [kvm]
+[48419.441385]        kvm_set_memslot+0x360/0x620 [kvm]
+[48419.446387]        __kvm_set_memory_region+0x27b/0x300 [kvm]
+[48419.452078]        kvm_vm_ioctl_set_memory_region+0x43/0x60 [kvm]
+[48419.458207]        kvm_vm_ioctl+0x295/0x650 [kvm]
+[48419.462945]        __se_sys_ioctl+0x7b/0xd0
+[48419.467133]        __x64_sys_ioctl+0x21/0x30
+[48419.471406]        do_syscall_64+0x8b/0x170
+[48419.475590]        entry_SYSCALL_64_after_hwframe+0x71/0x79
+[48419.481164] 
+               -> #0 (&kvm->slots_lock){+.+.}-{3:3}:
+[48419.487343]        __lock_acquire+0x15ef/0x2e40
+[48419.491876]        lock_acquire+0xe0/0x260
+[48419.495977]        __mutex_lock+0x6a/0xb40
+[48419.500076]        mutex_lock_nested+0x1f/0x30
+[48419.504521]        set_nx_huge_pages+0x179/0x1e0 [kvm]
+[48419.509694]        param_attr_store+0x93/0x100
+[48419.514142]        module_attr_store+0x22/0x40
+[48419.518587]        sysfs_kf_write+0x81/0xb0
+[48419.522774]        kernfs_fop_write_iter+0x133/0x1d0
+[48419.527738]        vfs_write+0x317/0x380
+[48419.531663]        ksys_write+0x70/0xe0
+[48419.535505]        __x64_sys_write+0x1f/0x30
+[48419.539777]        do_syscall_64+0x8b/0x170
+[48419.543961]        entry_SYSCALL_64_after_hwframe+0x71/0x79
+[48419.549534] 
+               other info that might help us debug this:
+
+[48419.557534] Chain exists of:
+                 &kvm->slots_lock --> cpu_hotplug_lock --> kvm_lock
+
+[48419.567873]  Possible unsafe locking scenario:
+
+[48419.573793]        CPU0                    CPU1
+[48419.578325]        ----                    ----
+[48419.582859]   lock(kvm_lock);
+[48419.585831]                                lock(cpu_hotplug_lock);
+[48419.592011]                                lock(kvm_lock);
+[48419.597499]   lock(&kvm->slots_lock);
+[48419.601173] 
+                *** DEADLOCK ***
+
+[48419.607090] 5 locks held by tee/27085:
+[48419.610841]  #0: ffffa0dcc92eb410 (sb_writers#4){.+.+}-{0:0}, at: vfs_write+0xe4/0x380
+[48419.618765]  #1: ffffa0dce221ac88 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0xd8/0x1d0
+[48419.627553]  #2: ffffa11c4d6bef28 (kn->active#257){.+.+}-{0:0}, at: kernfs_fop_write_iter+0xe0/0x1d0
+[48419.636684]  #3: ffffffffc06e3c50 (&mod->param_lock){+.+.}-{3:3}, at: param_attr_store+0x57/0x100
+[48419.645575]  #4: ffffffffc06ccba8 (kvm_lock){+.+.}-{3:3}, at: set_nx_huge_pages+0x14a/0x1e0 [kvm]
+[48419.654564] 
+               stack backtrace:
+[48419.658925] CPU: 93 PID: 27085 Comm: tee Tainted: G S         O       6.9.0-smp--04b1c6b4841d-next #301
+[48419.668312] Hardware name: Google Interlaken/interlaken, BIOS 0.20231025.0-0 10/25/2023
+[48419.676314] Call Trace:
+[48419.678770]  <TASK>
+[48419.680878]  dump_stack_lvl+0x83/0xc0
+[48419.684552]  dump_stack+0x14/0x20
+[48419.687880]  print_circular_bug+0x2f0/0x300
+[48419.692068]  check_noncircular+0x103/0x120
+[48419.696163]  ? __lock_acquire+0x5e3/0x2e40
+[48419.700266]  __lock_acquire+0x15ef/0x2e40
+[48419.704286]  ? __lock_acquire+0x5e3/0x2e40
+[48419.708387]  ? __lock_acquire+0x5e3/0x2e40
+[48419.712486]  ? __lock_acquire+0x5e3/0x2e40
+[48419.716586]  lock_acquire+0xe0/0x260
+[48419.720164]  ? set_nx_huge_pages+0x179/0x1e0 [kvm]
+[48419.725060]  ? lock_acquire+0xe0/0x260
+[48419.728822]  ? param_attr_store+0x57/0x100
+[48419.732921]  ? set_nx_huge_pages+0x179/0x1e0 [kvm]
+[48419.737768]  __mutex_lock+0x6a/0xb40
+[48419.741359]  ? set_nx_huge_pages+0x179/0x1e0 [kvm]
+[48419.746207]  ? set_nx_huge_pages+0x14a/0x1e0 [kvm]
+[48419.751054]  ? param_attr_store+0x57/0x100
+[48419.755158]  ? __mutex_lock+0x240/0xb40
+[48419.759005]  ? param_attr_store+0x57/0x100
+[48419.763107]  mutex_lock_nested+0x1f/0x30
+[48419.767031]  set_nx_huge_pages+0x179/0x1e0 [kvm]
+[48419.771705]  param_attr_store+0x93/0x100
+[48419.775629]  module_attr_store+0x22/0x40
+[48419.779556]  sysfs_kf_write+0x81/0xb0
+[48419.783222]  kernfs_fop_write_iter+0x133/0x1d0
+[48419.787668]  vfs_write+0x317/0x380
+[48419.791084]  ksys_write+0x70/0xe0
+[48419.794401]  __x64_sys_write+0x1f/0x30
+[48419.798152]  do_syscall_64+0x8b/0x170
+[48419.801819]  entry_SYSCALL_64_after_hwframe+0x71/0x79
+[48419.806872] RIP: 0033:0x7f98eff1ee0d
+[48419.810465] Code: e5 41 57 41 56 53 50 49 89 d6 49 89 f7 89 fb 48 8b 05 37 7c 07 00 83 38 00 75 28 b8 01 00 00 00 89 df 4c 89 fe 4c 89 f2 0f 05 <48> 89 c3 48 3d 01 f0 ff ff 73 3a 48 89 d8 48 83 c4 08 5b 41 5e 41
+[48419.829213] RSP: 002b:00007ffd5dee15c0 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[48419.836792] RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f98eff1ee0d
+[48419.843931] RDX: 0000000000000002 RSI: 00007ffd5dee16d0 RDI: 0000000000000005
+[48419.851065] RBP: 00007ffd5dee15e0 R08: 00007f98efe161d2 R09: 0000000000000001
+[48419.858196] R10: 00000000000001b6 R11: 0000000000000246 R12: 0000000000000002
+[48419.865328] R13: 00007ffd5dee16d0 R14: 0000000000000002 R15: 00007ffd5dee16d0
+[48419.872472]  </TASK>
+
 
 
