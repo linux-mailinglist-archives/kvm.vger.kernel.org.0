@@ -1,268 +1,207 @@
-Return-Path: <kvm+bounces-16920-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16921-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A28278BEBFB
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 20:53:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277428BEC4D
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 21:08:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D61C0B26F8D
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:53:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A74C31F25ACC
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CA316EBFA;
-	Tue,  7 May 2024 18:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8BD16F0DE;
+	Tue,  7 May 2024 19:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b="kUo3SyVr";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="aYEDvQiN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lb84cuJQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from wfhigh2-smtp.messagingengine.com (wfhigh2-smtp.messagingengine.com [64.147.123.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D2816F0CE;
-	Tue,  7 May 2024 18:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E75916EBFA
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 19:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715107903; cv=none; b=JYfzHRNfH06MnEcH+h6RNe7lW+igckb3tvZqYLL4LPIPeaSsQJ0yJCIyG0R1WhoHLERHohh0N1v3wuspFJ6THlIHjI7/FLq0mwTCBKuMUAaMYjDt0wP5BiP7Bh8fP3wZNwTg0qb6ocT64FjgtOeSgi0ia/vVjotS+rkHfXN13LM=
+	t=1715108868; cv=none; b=ZvMUTR227TZXcJAfYbN5XHFQRbOyFiDP1/UzmLe/ITYRTCfPL5v/jFLx2YTt/J1OYXqdBC03+FmKckZlYsWnp7hETaWZLAbRASdksRu4sJIR7KUaSdErA79hLvi9ot35sfowQfv6Nk2xud7uSVhScC5cAlBlJJDfXXyGkdkHdO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715107903; c=relaxed/simple;
-	bh=NkwgO3Xx+CZsPTw6Ct6xNfXjIzDoPYKA1nrX18S20Ho=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=XF8Y9Ahniz6aDfMaYo3/f4oFw2zOUAV+fbRhUPnmscoI99Ad4GeNiE5j5r/B5nBuLaWev+uu4vqwXHHXeJlle4kI8pWE5OhHXJCtyoiJuTop04eHVdgVGLHOY+paecVPS1ixMP+/xzYRDoVuzFJ3/eM1PeaaQbBS7vKDDoqKxoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com; spf=pass smtp.mailfrom=flygoat.com; dkim=pass (2048-bit key) header.d=flygoat.com header.i=@flygoat.com header.b=kUo3SyVr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=aYEDvQiN; arc=none smtp.client-ip=64.147.123.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=flygoat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flygoat.com
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailfhigh.west.internal (Postfix) with ESMTP id 7EF1A180008E;
-	Tue,  7 May 2024 14:51:40 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute7.internal (MEProxy); Tue, 07 May 2024 14:51:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=flygoat.com; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1715107900;
-	 x=1715194300; bh=jf3K4jfhVQv94P++cE/GZXhfZxx3dBPciOpFjrGUmBw=; b=
-	kUo3SyVrVhaV6HJw+Mi2+XKYQz+bJgVj38c2a2j+gr2xGXsFM+obkZ0h70U9CfQU
-	sXN84h3tiOW73IhJwlXVXrZxK80DYWnevDc2sU4CmWS2oJtgp3ZYhZNoEIPK41bh
-	h2phgaVnnkgn8wjrXsbf8xo8L8zzM5Dx90W7brlhpmCgQLMzztu1EvQZphGrGYb3
-	9XyUjIspZD4TdR+83FkLH3ZaTOXgACiT2U2YqZHUub1QyCBmHR+T8lWGftGkVCDg
-	L/SQT90nCguXguta8qWG9WEKLhhk33y8HF0EWPfq0ygSORO4yXA3qffew5s0KkuE
-	cCgwFwnLmj2lgqsoxasvvg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1715107900; x=
-	1715194300; bh=jf3K4jfhVQv94P++cE/GZXhfZxx3dBPciOpFjrGUmBw=; b=a
-	YEDvQiNwF5keLlmSpuA/NggsJAF72KvQkuxwI7j74sTHFAblloqn8gU5r5BGWAet
-	Co3NyboJcLAGBxOJ6QorUUre0iHTCGh758EWkYOnc5xSddERSUFmsrjdquTFrQ5p
-	hr0MkA8tW44+ahDUtQclHt9SUBzhAgBTjZeZOLFQXCfFkRIhh6c7IQq+Gep9cBoN
-	sDmgyJlnYgbBSQMj0veNNwdh2QjNMfT0pllHMPoQLuUlFuaM5uFsdNZlZ+aep7H+
-	nz/T0uK0/YP/DQSwAJViXE+mvF5PyE7ND3wI1NwbO3LMMKUKzoyXOUKCG7gf2jfJ
-	KbPiwz2slLV51cUEumjeA==
-X-ME-Sender: <xms:O3g6ZlFGzOxPrZi4NEjfLcIHPf8UXBJWNhy6k22saqrfAY-d6V6fpQ>
-    <xme:O3g6ZqXSyLLFOKLRo_7jXvnSo9bOWccYzCzEDS1Kmll4Yn5SM7AsWsHeGG_CZUXnz
-    K--zt0ETFksLAjJ5wU>
-X-ME-Received: <xmr:O3g6ZnJGPspH_e7Ssw8XmKRIMQALPR222IvKDhefgz_CAHs7E92Rq0w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrvddvkedguddvkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefhfffugggtgffkfhgjvfevofesthejredtredtjeenucfhrhhomheplfhi
-    rgiguhhnucgjrghnghcuoehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhmqe
-    enucggtffrrghtthgvrhhnpedvkeeihfefveekueevteefleffkeegudeghfdtuddugefh
-    ueevgeffgedukeejleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
-    hlfhhrohhmpehjihgrgihunhdrhigrnhhgsehflhihghhorghtrdgtohhm
-X-ME-Proxy: <xmx:O3g6ZrHWySEwmg6qZeNW4vFoOEzTdz4EehLwrL_iST4jCqVzdB0kdQ>
-    <xmx:O3g6ZrUzQ18Xy-D1_etmA9yqxbK2Mr4idbJ7BRtk5GHML0T111A5Jg>
-    <xmx:O3g6ZmM-1BGbwmYIYpGRlPEKPmVlun4guvxCbIGON2t1oX-8h6MNzw>
-    <xmx:O3g6Zq0TTRdYHD0lFt9COPh3T_j3ByJ9bOBdzBK6BX8oFxZyTNEb6A>
-    <xmx:PHg6ZktZyfUqRV-GdSlEZlQu3Tug5htDsNTV2wPo1I7WB7ESUk0OEgEH>
-Feedback-ID: ifd894703:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 7 May 2024 14:51:38 -0400 (EDT)
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-Date: Tue, 07 May 2024 19:51:22 +0100
-Subject: [PATCH 4/4] MIPS: Loongson64: DTS: Fix PCIe port nodes for ls7a
+	s=arc-20240116; t=1715108868; c=relaxed/simple;
+	bh=9K/bO5jtlWAadEx++bJ4tBnwyCoDvk5e6sU6qqppTJc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=J7FyLcuI610QWDjpubJNTEkE+venc4wBtUSmHTyX2z8Z0HOvcXB+GhpRsgmMlgN+hl50p+IRkv7AhRTi1q3BxTdoCZmUnSTbC/uwYUSzmPW3op8iLddmMRvbKq36S/z3/BL9DXouKZ/hdUSk8Omt+3mohqCoHnTyS3GRUMhJ/Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lb84cuJQ; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-61c943c18a8so3590935a12.0
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 12:07:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715108866; x=1715713666; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jkQu4Jm3xj+OSWk/nhy3+Jt5eXwFDQEAw7ll75hZ8tw=;
+        b=Lb84cuJQCVpWPod3fTIPvQb3Nm1Rf2NGWNrgl9RX53l4L8anb8uMsdJD+nz4GGYcIY
+         4sWzPkbwSMk+thBfJNoxWBEUVIUbp/bHAYnzqyyHnsxuuOE4b24KobqlLhGE4AvHI1JV
+         FHEcjL7wkeIe+SvlK1Hbomduy+gplLYdBEhbD//ozHLVvSHr8dgawJd5Kij/UtnLepQr
+         Ze3TY8K9OiuAE3B/iQyPJ0HhxpocuMGP6mfjOma2kM0vr2IoEc4RmAP60XuCf+ipKGoF
+         3t11FG5teEJj6bSmq7kIOGOV4QEA1ZOAp0rR2q7ugbwCmpPuLc5JJJsyeuOMZBtHGQvg
+         camw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715108866; x=1715713666;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jkQu4Jm3xj+OSWk/nhy3+Jt5eXwFDQEAw7ll75hZ8tw=;
+        b=euqsKr7bxf35Ft6lmALJc+J2kppFhtHs7T5M3T1QcBS6Y6EIrtv3Kw1ct4C/biQZvy
+         m8xmU22LEV6FyAkjjYloYc/BrboOLvqx71jbxsqvkekcx0loO4+Ttu9cyHAeMkdJ5VuT
+         ohF0xK7nbuEoIi3Oqimw2UDhx9pbS3dRnN5BpFmjRGW6+NuQ2s+nz5O0NnTs9E5Lrr/O
+         DF71SNZdHRBBlNqzXZAWy5eSqPFePr6rBbFtWukH/n8yy11FA3Gofiw+XsJBkARrDry5
+         752gJLFsyNsFqr2RSbDLtmdr+g7y5+eYcIeT+ZUEAQXia0Hhzf3jcE3fP9+5y9R1JNlQ
+         AkFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWULvDqDWgyRHZcwXmXuoAoPm1y57igpVDDseXg5wqcP/9j6brTV9GDJA674HG9Y1Qzfb1MOJDG2bWUSkfFAAwP5QQ6
+X-Gm-Message-State: AOJu0YylD6T4Rd7j0hXYQ6Rn91JXeodDYIzOUJ3a2p2Iz5E+604jhrm5
+	7nz0BdPcbov2Y08aB5NuN4b55a8mRuak/bWp+MiXFNF0t/PyXFZIFwBWb+WLH5b7R+deTb+TeZL
+	/2A==
+X-Google-Smtp-Source: AGHT+IEgjxdsHk9aJmOIaJyY9cp6EJfT5579+ZXn0lQR+zEfJ/cnb/Xx+FkIFQJQtpXQchgkEeeXdrdRsVg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:fe18:0:b0:5d6:cfc:2f39 with SMTP id
+ 41be03b00d2f7-62f23220b0fmr23804a12.11.1715108865796; Tue, 07 May 2024
+ 12:07:45 -0700 (PDT)
+Date: Tue, 7 May 2024 12:07:44 -0700
+In-Reply-To: <9252b68e-2b6a-6173-2e13-20154903097d@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240507-loongson64-warnings-v1-4-2cad88344e9e@flygoat.com>
-References: <20240507-loongson64-warnings-v1-0-2cad88344e9e@flygoat.com>
-In-Reply-To: <20240507-loongson64-warnings-v1-0-2cad88344e9e@flygoat.com>
-To: Huacai Chen <chenhuacai@kernel.org>, 
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: Jiaxun Yang <jiaxun.yang@flygoat.com>, linux-mips@vger.kernel.org, 
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
- devicetree@vger.kernel.org
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4399;
- i=jiaxun.yang@flygoat.com; h=from:subject:message-id;
- bh=NkwgO3Xx+CZsPTw6Ct6xNfXjIzDoPYKA1nrX18S20Ho=;
- b=owGbwMvMwCHmXMhTe71c8zDjabUkhjSrCt1Ky+OVNZtkZycEOfxuE460CH8r1HhS1ezpyfOL9
- hU2LYnuKGVhEONgkBVTZAkRUOrb0HhxwfUHWX9g5rAygQxh4OIUgInYv2dk+LVD0Dv/b+xmaZNT
- SQGST+bvnVecZcpz1PBp2JnqhNZblxgZdjAkVtSUxS71Kxbk37pJuuew/cL9v56kFlQ+er1GqGo
- LGwA=
-X-Developer-Key: i=jiaxun.yang@flygoat.com; a=openpgp;
- fpr=980379BEFEBFBF477EA04EF9C111949073FC0F67
+Mime-Version: 1.0
+References: <20240416050338.517-1-ravi.bangoria@amd.com> <ZjQnFO9Pf4OLZdLU@google.com>
+ <9252b68e-2b6a-6173-2e13-20154903097d@amd.com>
+Message-ID: <Zjp8AIorXJ-TEZP0@google.com>
+Subject: Re: [PATCH v2] KVM: SEV-ES: Don't intercept MSR_IA32_DEBUGCTLMSR for
+ SEV-ES guests
+From: Sean Christopherson <seanjc@google.com>
+To: Ravi Bangoria <ravi.bangoria@amd.com>
+Cc: pbonzini@redhat.com, thomas.lendacky@amd.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, michael.roth@amd.com, nikunj.dadhania@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, santosh.shukla@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-Add various required properties to silent warnings:
+On Mon, May 06, 2024, Ravi Bangoria wrote:
+> On 03-May-24 5:21 AM, Sean Christopherson wrote:
+> > On Tue, Apr 16, 2024, Ravi Bangoria wrote:
+> >> Currently, LBR Virtualization is dynamically enabled and disabled for
+> >> a vcpu by intercepting writes to MSR_IA32_DEBUGCTLMSR. This helps by
+> >> avoiding unnecessary save/restore of LBR MSRs when nobody is using it
+> >> in the guest. However, SEV-ES guest mandates LBR Virtualization to be
+> >> _always_ ON[1] and thus this dynamic toggling doesn't work for SEV-ES
+> >> guest, in fact it results into fatal error:
+> >>
+> >> SEV-ES guest on Zen3, kvm-amd.ko loaded with lbrv=1
+> >>
+> >>   [guest ~]# wrmsr 0x1d9 0x4
+> >>   KVM: entry failed, hardware error 0xffffffff
+> >>   EAX=00000004 EBX=00000000 ECX=000001d9 EDX=00000000
+> >>   ...
+> >>
+> >> Fix this by never intercepting MSR_IA32_DEBUGCTLMSR for SEV-ES guests.
+> > 
+> > Uh, what?  I mean, sure, it works, maybe, I dunno.  But there's a _massive_
+> > disconnect between the first paragraph and this statement.
+> > 
+> > Oh, good gravy, it "works" because SEV already forces LBR virtualization.
+> > 
+> > 	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
+> > 
+> > (a) the changelog needs to call that out.
+> 
+> Sorry, I should have called that out explicitly.
+> 
+> >  (b) KVM needs to disallow SEV-ES if
+> > LBR virtualization is disabled by the admin, i.e. if lbrv=false.
+> 
+> That's what I initially thought. But since KVM currently allows booting SEV-ES
+> guests even when lbrv=0 (by silently ignoring lbrv value), erroring out would
+> be a behavior change.
 
-arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi:116.16-297.5: Warning (interrupt_provider): /bus@10000000/pci@1a000000: '#interrupt-cells' found, but node is not an interrupt provider
-arch/mips/boot/dts/loongson/loongson64_2core_2k1000.dtb: Warning (interrupt_map): Failed prerequisite 'interrupt_provider'
+IMO, that's totally fine.  There are no hard guarantees regarding module params,
 
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
----
- arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi | 37 ++++++++++++++++++----
- 1 file changed, 30 insertions(+), 7 deletions(-)
+> > Alternatively, I would be a-ok simply deleting lbrv, e.g. to avoid yet more
+> > printks about why SEV-ES couldn't be enabled.
+> > 
+> > Hmm, I'd probably be more than ok.  Because AMD (thankfully, blessedly) uses CPUID
+> > bits for SVM features, the admin can disable LBRV via clear_cpuid (or whatever it's
+> > called now).  And there are hardly any checks on the feature, so it's not like
+> > having a boolean saves anything.  AMD is clearly committed to making sure LBRV
+> > works, so the odds of KVM really getting much value out of a module param is low.
+> 
+> Currently, lbrv is not enabled by default with model specific -cpu profiles in
+> qemu. So I guess this is not backward compatible?
 
-diff --git a/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi b/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi
-index ee3e2153dd13..b5593f7cc383 100644
---- a/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi
-+++ b/arch/mips/boot/dts/loongson/loongson64-2k1000.dtsi
-@@ -118,7 +118,6 @@ pci@1a000000 {
- 			device_type = "pci";
- 			#address-cells = <3>;
- 			#size-cells = <2>;
--			#interrupt-cells = <2>;
- 
- 			reg = <0 0x1a000000 0 0x02000000>,
- 				<0xfe 0x00000000 0 0x20000000>;
-@@ -204,93 +203,117 @@ sata@8,0 {
- 				interrupt-parent = <&liointc0>;
- 			};
- 
--			pci_bridge@9,0 {
-+			pcie@9,0 {
- 				compatible = "pci0014,7a19.0",
- 						   "pci0014,7a19",
- 						   "pciclass060400",
- 						   "pciclass0604";
- 
- 				reg = <0x4800 0x0 0x0 0x0 0x0>;
-+				#address-cells = <3>;
-+				#size-cells = <2>;
-+				device_type = "pci";
- 				#interrupt-cells = <1>;
- 				interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
- 				interrupt-parent = <&liointc1>;
- 				interrupt-map-mask = <0 0 0 0>;
- 				interrupt-map = <0 0 0 0 &liointc1 0 IRQ_TYPE_LEVEL_LOW>;
-+				ranges;
- 				external-facing;
- 			};
- 
--			pci_bridge@a,0 {
-+			pcie@a,0 {
- 				compatible = "pci0014,7a09.0",
- 						   "pci0014,7a09",
- 						   "pciclass060400",
- 						   "pciclass0604";
- 
- 				reg = <0x5000 0x0 0x0 0x0 0x0>;
-+				#address-cells = <3>;
-+				#size-cells = <2>;
-+				device_type = "pci";
- 				#interrupt-cells = <1>;
- 				interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
- 				interrupt-parent = <&liointc1>;
- 				interrupt-map-mask = <0 0 0 0>;
- 				interrupt-map = <0 0 0 0 &liointc1 1 IRQ_TYPE_LEVEL_LOW>;
-+				ranges;
- 				external-facing;
- 			};
- 
--			pci_bridge@b,0 {
-+			pcie@b,0 {
- 				compatible = "pci0014,7a09.0",
- 						   "pci0014,7a09",
- 						   "pciclass060400",
- 						   "pciclass0604";
- 
- 				reg = <0x5800 0x0 0x0 0x0 0x0>;
-+				#address-cells = <3>;
-+				#size-cells = <2>;
-+				device_type = "pci";
- 				#interrupt-cells = <1>;
- 				interrupts = <2 IRQ_TYPE_LEVEL_LOW>;
- 				interrupt-parent = <&liointc1>;
- 				interrupt-map-mask = <0 0 0 0>;
- 				interrupt-map = <0 0 0 0 &liointc1 2 IRQ_TYPE_LEVEL_LOW>;
-+				ranges;
- 				external-facing;
- 			};
- 
--			pci_bridge@c,0 {
-+			pcie@c,0 {
- 				compatible = "pci0014,7a09.0",
- 						   "pci0014,7a09",
- 						   "pciclass060400",
- 						   "pciclass0604";
- 
- 				reg = <0x6000 0x0 0x0 0x0 0x0>;
-+				#address-cells = <3>;
-+				#size-cells = <2>;
-+				device_type = "pci";
- 				#interrupt-cells = <1>;
- 				interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
- 				interrupt-parent = <&liointc1>;
- 				interrupt-map-mask = <0 0 0 0>;
- 				interrupt-map = <0 0 0 0 &liointc1 3 IRQ_TYPE_LEVEL_LOW>;
-+				ranges;
- 				external-facing;
- 			};
- 
--			pci_bridge@d,0 {
-+			pcie@d,0 {
- 				compatible = "pci0014,7a19.0",
- 						   "pci0014,7a19",
- 						   "pciclass060400",
- 						   "pciclass0604";
- 
- 				reg = <0x6800 0x0 0x0 0x0 0x0>;
-+				#address-cells = <3>;
-+				#size-cells = <2>;
-+				device_type = "pci";
- 				#interrupt-cells = <1>;
- 				interrupts = <4 IRQ_TYPE_LEVEL_LOW>;
- 				interrupt-parent = <&liointc1>;
- 				interrupt-map-mask = <0 0 0 0>;
- 				interrupt-map = <0 0 0 0 &liointc1 4 IRQ_TYPE_LEVEL_LOW>;
-+				ranges;
- 				external-facing;
- 			};
- 
--			pci_bridge@e,0 {
-+			pcie@e,0 {
- 				compatible = "pci0014,7a09.0",
- 						   "pci0014,7a09",
- 						   "pciclass060400",
- 						   "pciclass0604";
- 
- 				reg = <0x7000 0x0 0x0 0x0 0x0>;
-+				#address-cells = <3>;
-+				#size-cells = <2>;
-+				device_type = "pci";
- 				#interrupt-cells = <1>;
- 				interrupts = <5 IRQ_TYPE_LEVEL_LOW>;
- 				interrupt-parent = <&liointc1>;
- 				interrupt-map-mask = <0 0 0 0>;
- 				interrupt-map = <0 0 0 0 &liointc1 5 IRQ_TYPE_LEVEL_LOW>;
-+				ranges;
- 				external-facing;
- 			};
- 
+I am talking about LBRV being disabled in the _host_ kernel, not guest CPUID.
+QEMU enabling LBRV only affects nested SVM, which is out of scope for SEV-ES.
 
--- 
-2.34.1
+> > And then when you delete lbrv, please add a WARN_ON_ONCE() sanity check in
+> > sev_hardware_setup() (if SEV-ES is supported), because like the DECODEASSISTS
+> > and FLUSHBYASID requirements, it's not super obvious that LBRV is a hard
+> > requirement for SEV-ES (that's an understatment; I'm curious how some decided
+> > that LBR virtualization is where the line go drawn for "yeah, _this_ is mandatory").
+> 
+> I'm not sure. Some ES internal dependency.
+> 
+> In any case, the patch simply fixes 'missed clearing MSR Interception' for
+> SEV-ES guests. So, would it be okay to apply this patch as is and do lbrv
+> cleanup as a followup series?
 
+No.
+
+(a) the lbrv module param mess needs to be sorted out.
+(b) this is not a complete fix.
+(c) I'm not convinced it's the right way to fix this, at all.
+(d) there's a big gaping hole in KVM's handling of MSRs that are passed through
+    to SEV-ES guests.
+(e) it's not clear to me that KVM needs to dynamically toggle LBRV for _any_ guest.
+(f) I don't like that sev_es_init_vmcb() mucks with the LBRV intercepts without
+    using svm_enable_lbrv().
+
+Unless I'm missing something, KVM allows userspace to get/set MSRs for SEV-ES
+guests, even after the VMSA is encrypted.  E.g. a naive userspace could attempt
+to migrate MSR_IA32_DEBUGCTLMSR and end up unintentionally disabling LBRV on the
+target.  The proper fix for VMSA being encrypted is to likely to disallow
+KVM_{G,S}ET_MSR on MSRs that are contexted switched via the VMSA.
+
+But that doesn't address the issue where KVM will disable LBRV if userspace
+sets MSR_IA32_DEBUGCTLMSR before the VMSA is encrypted.  The easiest fix for
+that is to have svm_disable_lbrv() do nothing for SEV-ES guests, but I'm not
+convinced that's the best fix.
+
+AFAICT, host perf doesn't use the relevant MSRs, and even if host perf did use
+the MSRs, IIUC there is no "stack", and #VMEXIT retains the guest values for
+non-SEV-ES guests.  I.e. functionally, running with and without LBRV would be
+largely equivalent as far as perf is concerned.  The guest could scribble an MSR
+with garbage, but overall, host perf wouldn't be meaningfully affected by LBRV.
+
+So unless I'm missing something, the only reason to ever disable LBRV would be
+for performance reasons.  Indeed the original commits more or less says as much:
+
+  commit 24e09cbf480a72f9c952af4ca77b159503dca44b
+  Author:     Joerg Roedel <joerg.roedel@amd.com>
+  AuthorDate: Wed Feb 13 18:58:47 2008 +0100
+
+    KVM: SVM: enable LBR virtualization
+    
+    This patch implements the Last Branch Record Virtualization (LBRV) feature of
+    the AMD Barcelona and Phenom processors into the kvm-amd module. It will only
+    be enabled if the guest enables last branch recording in the DEBUG_CTL MSR. So
+    there is no increased world switch overhead when the guest doesn't use these
+    MSRs.
+
+but what it _doesn't_ say is what the world switch overhead is when LBRV is
+enabled.  If the overhead is small, e.g. 20 cycles?, then I see no reason to
+keep the dynamically toggling.
+
+And if we ditch the dynamic toggling, then this patch is unnecessary to fix the
+LBRV issue.  It _is_ necessary to actually let the guest use the LBRs, but that's
+a wildly different changelog and justification.
+
+And if we _don't_ ditch the dynamic toggling, then sev_es_init_vmcb() should be
+using svm_enable_lbrv(), not open coding the exact same thing.
 
