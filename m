@@ -1,283 +1,397 @@
-Return-Path: <kvm+bounces-16855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16858-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDE5D8BE7B4
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:46:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B089A8BE807
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:59:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73286286799
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 15:46:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C16D284664
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 15:59:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3B316C87F;
-	Tue,  7 May 2024 15:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2C416C684;
+	Tue,  7 May 2024 15:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W2p633vc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCzl4NPD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E7F16ABFD
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 15:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D27165FD4
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 15:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715096708; cv=none; b=rv9sEr/IyWdTntSpOfujidMpLWPTCrp6ru8mmWvfmoDFZyvGpkDhh7kKLVL7NKu1vxwa5t9Kgn0rQiRoUaqHVhCBTExJYZd5FHki34KgtBorw01DMAtUE6GYCrApKzsvguYVZsBDuh/SbVHqHYshkE9RwfQxEo6ep0g+HJFedYY=
+	t=1715097503; cv=none; b=MovoK1PNfRjStHbf3Fqrb+OyQRaQ+4KZx3Q+qv9dGMSxsjOjzgHUN9iuB3mjfn87DN9ZiBXmHibTHng5JhfWD5xN+b4s0f/UAdpkZb5QpibKHfatYNqyvniSlpiYZZbLOd+5ua6w19xbnNXo9ETt+5L07cnYWV6lCk7Q0cnl4oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715096708; c=relaxed/simple;
-	bh=L3kGN8uyw/Ew7Q01CNgiHp9NV1lLvt9g54vof/4wKgY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EMCY9ND9E1Xmn/ob5m18qm3JfGU7lvPKfJXHVCZ/xNgaatP2Nr6mBLdu7S0uCvtEBHhfIVFKU5SjsJOjLoNYBs9sOf4Jnzx7wlEmnXAI3hkHGsDmqAHCwS8ZsfXv8r5KoMzfe7UZ5r8BFG5g7aPTx/YXJaYvtENpVPnfzEs37Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W2p633vc; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1715097503; c=relaxed/simple;
+	bh=4RohMnPCJFnKpKqUnP8yO28gs460BLP/sGG3w/07gi0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e2o87aKeVPOTiDxzS4RA7DB6BF0+335vkQOrngPDbwnVYlucsOABMukkEB7qS0EKpeslYO6h6dc+2wNC6cCz6PFvxeMuJNDQYLMZkH7AfqaUTO2ch+BhpXrnQhoPbQdrYK93Sp1G1juAjhGBXKb5uH8z5SPuxJLU++ugy7GYiEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fCzl4NPD; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715096705;
+	s=mimecast20190719; t=1715097499;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DEGWSMU46Vtho/KF+via1nc+bZYocNO5WGIxzuJ1CSE=;
-	b=W2p633vcurrXPzsoO4pO3KOd76oK6lj8UAtKYvKI6zGMskJiJUqo0VIVe/v8lbpTJTf50p
-	by6H5HSjvnjJpPUXh2C+P2AcNpKN8WzZ4La57138MBEokZm+umXlIJGZoydSqQ5hoH8mX7
-	/pFWOlJvrQs40BzPE8906wC/ipc+gFg=
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=iN5+TAR35lqisRhmEUIVe+XBdqZArxYl3xk4LC3xq68=;
+	b=fCzl4NPDTcQMkhE3o9oGZpHJxjYXsB7dXocCC/t/HJ9QYmJMjqEKSsUKncT6DyMqNHL3l4
+	sJtSuGQ6UTZjpfFOttFXKM7Vd6CnGvM/OWDkZjnX0hHtLGdjn3AHMp6ThE7h07aSt9zVhk
+	dz2pJcdfuuxOJMEUduAREumH/Wm6tQo=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-F8TAFoFqM4KhUeU4rQv1Yw-1; Tue, 07 May 2024 11:45:02 -0400
-X-MC-Unique: F8TAFoFqM4KhUeU4rQv1Yw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+ us-mta-135-DYBDo6HCM9GHDhLJzKkOow-1; Tue, 07 May 2024 11:58:18 -0400
+X-MC-Unique: DYBDo6HCM9GHDhLJzKkOow-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E4453101A55E;
-	Tue,  7 May 2024 15:45:01 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 05E801816EC5;
+	Tue,  7 May 2024 15:58:18 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C8A67C154E5;
-	Tue,  7 May 2024 15:45:01 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DD19E2141800;
+	Tue,  7 May 2024 15:58:17 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
-Cc: Isaku Yamahata <isaku.yamahata@intel.com>
-Subject: [PATCH 7/7] KVM: VMX: Introduce test mode related to EPT violation VE
-Date: Tue,  7 May 2024 11:44:59 -0400
-Message-ID: <20240507154459.3950778-8-pbonzini@redhat.com>
-In-Reply-To: <20240507154459.3950778-1-pbonzini@redhat.com>
-References: <20240507154459.3950778-1-pbonzini@redhat.com>
+Subject: [PATCH v2 00/17] KVM: x86/mmu: Page fault and MMIO cleanups
+Date: Tue,  7 May 2024 11:58:00 -0400
+Message-ID: <20240507155817.3951344-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+This is an updated version of the series at
+https://patchew.org/linux/20240228024147.41573-1-seanjc@google.com/
+which has been used for SEV-SNP development, taking into account
+all review comments.  Patch 8 is the only completely new patch
+(and even then it had been posted together with the various
+TDX/SNP prep series).
 
-To support TDX, KVM is enhanced to operate with #VE.  For TDX, KVM uses the
-suppress #VE bit in EPT entries selectively, in order to be able to trap
-non-present conditions.  However, #VE isn't used for VMX and it's a bug
-if it happens.  To be defensive and test that VMX case isn't broken
-introduce an option ept_violation_ve_test and when it's set, BUG the vm.
+Here is an annotated git range-diff:
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Message-Id: <d6db6ba836605c0412e166359ba5c46a63c22f86.1705965635.git.isaku.yamahata@intel.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/Kconfig    | 13 ++++++++++
- arch/x86/kvm/vmx/vmcs.h |  5 ++++
- arch/x86/kvm/vmx/vmx.c  | 53 ++++++++++++++++++++++++++++++++++++++---
- arch/x86/kvm/vmx/vmx.h  |  6 ++++-
- 4 files changed, 73 insertions(+), 4 deletions(-)
+==============================================================================
+KVM: x86/mmu: Exit to userspace with -EFAULT if private fault hits emulation
+- tweak commit message, add comment
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 0ebdd088f28b..d64fb2b3eb69 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -95,6 +95,19 @@ config KVM_INTEL
- 	  To compile this as a module, choose M here: the module
- 	  will be called kvm-intel.
- 
-+config KVM_INTEL_PROVE_VE
-+        bool "Check that guests do not receive #VE exceptions"
-+        default KVM_PROVE_MMU || DEBUG_KERNEL
-+        depends on KVM_INTEL
-+        help
-+
-+          Checks that KVM's page table management code will not incorrectly
-+          let guests receive a virtualization exception.  Virtualization
-+          exceptions will be trapped by the hypervisor rather than injected
-+          in the guest.
-+
-+          If unsure, say N.
-+
- config X86_SGX_KVM
- 	bool "Software Guard eXtensions (SGX) Virtualization"
- 	depends on X86_SGX && KVM_INTEL
-diff --git a/arch/x86/kvm/vmx/vmcs.h b/arch/x86/kvm/vmx/vmcs.h
-index 7c1996b433e2..b25625314658 100644
---- a/arch/x86/kvm/vmx/vmcs.h
-+++ b/arch/x86/kvm/vmx/vmcs.h
-@@ -140,6 +140,11 @@ static inline bool is_nm_fault(u32 intr_info)
- 	return is_exception_n(intr_info, NM_VECTOR);
- }
- 
-+static inline bool is_ve_fault(u32 intr_info)
-+{
-+	return is_exception_n(intr_info, VE_VECTOR);
-+}
-+
- /* Undocumented: icebp/int1 */
- static inline bool is_icebp(u32 intr_info)
- {
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index d780eee9b697..f4644f61d770 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -869,6 +869,12 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
- 
- 	eb = (1u << PF_VECTOR) | (1u << UD_VECTOR) | (1u << MC_VECTOR) |
- 	     (1u << DB_VECTOR) | (1u << AC_VECTOR);
-+	/*
-+	 * #VE isn't used for VMX.  To test against unexpected changes
-+	 * related to #VE for VMX, intercept unexpected #VE and warn on it.
-+	 */
-+	if (IS_ENABLED(CONFIG_KVM_INTEL_PROVE_VE))
-+		eb |= 1u << VE_VECTOR;
- 	/*
- 	 * Guest access to VMware backdoor ports could legitimately
- 	 * trigger #GP because of TSS I/O permission bitmap.
-@@ -2602,6 +2608,9 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 					&_cpu_based_2nd_exec_control))
- 			return -EIO;
- 	}
-+	if (!IS_ENABLED(CONFIG_KVM_INTEL_PROVE_VE))
-+		_cpu_based_2nd_exec_control &= ~SECONDARY_EXEC_EPT_VIOLATION_VE;
-+
- #ifndef CONFIG_X86_64
- 	if (!(_cpu_based_2nd_exec_control &
- 				SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES))
-@@ -2626,6 +2635,7 @@ static int setup_vmcs_config(struct vmcs_config *vmcs_conf,
- 			return -EIO;
- 
- 		vmx_cap->ept = 0;
-+		_cpu_based_2nd_exec_control &= ~SECONDARY_EXEC_EPT_VIOLATION_VE;
- 	}
- 	if (!(_cpu_based_2nd_exec_control & SECONDARY_EXEC_ENABLE_VPID) &&
- 	    vmx_cap->vpid) {
-@@ -4588,6 +4598,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
- 		exec_control &= ~SECONDARY_EXEC_ENABLE_VPID;
- 	if (!enable_ept) {
- 		exec_control &= ~SECONDARY_EXEC_ENABLE_EPT;
-+		exec_control &= ~SECONDARY_EXEC_EPT_VIOLATION_VE;
- 		enable_unrestricted_guest = 0;
- 	}
- 	if (!enable_unrestricted_guest)
-@@ -4711,8 +4722,12 @@ static void init_vmcs(struct vcpu_vmx *vmx)
- 
- 	exec_controls_set(vmx, vmx_exec_control(vmx));
- 
--	if (cpu_has_secondary_exec_ctrls())
-+	if (cpu_has_secondary_exec_ctrls()) {
- 		secondary_exec_controls_set(vmx, vmx_secondary_exec_control(vmx));
-+		if (vmx->ve_info)
-+			vmcs_write64(VE_INFORMATION_ADDRESS,
-+				     __pa(vmx->ve_info));
-+	}
- 
- 	if (cpu_has_tertiary_exec_ctrls())
- 		tertiary_exec_controls_set(vmx, vmx_tertiary_exec_control(vmx));
-@@ -5200,6 +5215,9 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
- 	if (is_invalid_opcode(intr_info))
- 		return handle_ud(vcpu);
- 
-+	if (KVM_BUG_ON(is_ve_fault(intr_info), vcpu->kvm))
-+		return -EIO;
-+
- 	error_code = 0;
- 	if (intr_info & INTR_INFO_DELIVER_CODE_MASK)
- 		error_code = vmcs_read32(VM_EXIT_INTR_ERROR_CODE);
-@@ -6409,8 +6427,22 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
- 		pr_err("Virtual processor ID = 0x%04x\n",
- 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
- 	if (secondary_exec_control & SECONDARY_EXEC_EPT_VIOLATION_VE) {
--		pr_err("VE info address = 0x%016llx\n",
--		       vmcs_read64(VE_INFORMATION_ADDRESS));
-+		struct vmx_ve_information *ve_info = vmx->ve_info;
-+		u64 ve_info_pa = vmcs_read64(VE_INFORMATION_ADDRESS);
-+
-+		/*
-+		 * If KVM is dumping the VMCS, then something has gone wrong
-+		 * already.  Derefencing an address from the VMCS, which could
-+		 * very well be corrupted, is a terrible idea.  The virtual
-+		 * address is known so use it.
-+		 */
-+		pr_err("VE info address = 0x%016llx%s\n", ve_info_pa,
-+		       ve_info_pa == __pa(ve_info) ? "" : "(corrupted!)");
-+		pr_err("ve_info: 0x%08x 0x%08x 0x%016llx 0x%016llx 0x%016llx 0x%04x\n",
-+		       ve_info->exit_reason, ve_info->delivery,
-+		       ve_info->exit_qualification,
-+		       ve_info->guest_linear_address,
-+		       ve_info->guest_physical_address, ve_info->eptp_index);
- 	}
- }
- 
-@@ -7466,6 +7498,7 @@ void vmx_vcpu_free(struct kvm_vcpu *vcpu)
- 	free_vpid(vmx->vpid);
- 	nested_vmx_free_vcpu(vcpu);
- 	free_loaded_vmcs(vmx->loaded_vmcs);
-+	free_page((unsigned long)vmx->ve_info);
- }
- 
- int vmx_vcpu_create(struct kvm_vcpu *vcpu)
-@@ -7559,6 +7592,20 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
- 			goto free_vmcs;
- 	}
- 
-+	err = -ENOMEM;
-+	if (vmcs_config.cpu_based_2nd_exec_ctrl & SECONDARY_EXEC_EPT_VIOLATION_VE) {
-+		struct page *page;
-+
-+		BUILD_BUG_ON(sizeof(*vmx->ve_info) > PAGE_SIZE);
-+
-+		/* ve_info must be page aligned. */
-+		page = alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-+		if (!page)
-+			goto free_vmcs;
-+
-+		vmx->ve_info = page_to_virt(page);
-+	}
-+
- 	if (vmx_can_use_ipiv(vcpu))
- 		WRITE_ONCE(to_kvm_vmx(vcpu->kvm)->pid_table[vcpu->vcpu_id],
- 			   __pa(&vmx->pi_desc) | PID_TABLE_ENTRY_VALID);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 65786dbe7d60..0da79a386825 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -362,6 +362,9 @@ struct vcpu_vmx {
- 		DECLARE_BITMAP(read, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 		DECLARE_BITMAP(write, MAX_POSSIBLE_PASSTHROUGH_MSRS);
- 	} shadow_msr_intercept;
-+
-+	/* ve_info must be page aligned. */
-+	struct vmx_ve_information *ve_info;
- };
- 
- struct kvm_vmx {
-@@ -574,7 +577,8 @@ static inline u8 vmx_get_rvi(void)
- 	 SECONDARY_EXEC_ENABLE_VMFUNC |					\
- 	 SECONDARY_EXEC_BUS_LOCK_DETECTION |				\
- 	 SECONDARY_EXEC_NOTIFY_VM_EXITING |				\
--	 SECONDARY_EXEC_ENCLS_EXITING)
-+	 SECONDARY_EXEC_ENCLS_EXITING |					\
-+	 SECONDARY_EXEC_EPT_VIOLATION_VE)
- 
- #define KVM_REQUIRED_VMX_TERTIARY_VM_EXEC_CONTROL 0
- #define KVM_OPTIONAL_VMX_TERTIARY_VM_EXEC_CONTROL			\
+    @@ Commit message
+         Exit to userspace with -EFAULT / KVM_EXIT_MEMORY_FAULT if a private fault
+         triggers emulation of any kind, as KVM doesn't currently support emulating
+         access to guest private memory.  Practically speaking, private faults and
+    -    emulation are already mutually exclusive, but there are edge cases upon
+    -    edge cases where KVM can return RET_PF_EMULATE, and adding one last check
+    -    to harden against weird, unexpected combinations is inexpensive.
+    +    emulation are already mutually exclusive, but there are many flow that
+    +    can result in KVM returning RET_PF_EMULATE, and adding one last check
+    +    to harden against weird, unexpected combinations and/or KVM bugs is
+    +    inexpensive.
+     
+         Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
+         Signed-off-by: Sean Christopherson <seanjc@google.com>
+    @@ arch/x86/kvm/mmu/mmu_internal.h: static inline int kvm_mmu_do_page_fault(struct
+      	else
+      		r = vcpu->arch.mmu->page_fault(vcpu, &fault);
+      
+    ++	/*
+    ++	 * Not sure what's happening, but punt to userspace and hope that
+    ++	 * they can fix it by changing memory to shared, or they can
+    ++	 * provide a better error.
+    ++	 */
+     +	if (r == RET_PF_EMULATE && fault.is_private) {
+    ++		pr_warn_ratelimited("kvm: unexpected emulation request on private memory\n");
+     +		kvm_mmu_prepare_memory_fault_exit(vcpu, &fault);
+     +		return -EFAULT;
+     +	}
+
+
+==============================================================================
+KVM: x86: Remove separate "bit" defines for page fault error code masks
+- do not use ilog2
+
+    @@ Commit message
+         just to see which flag corresponds to which bit is quite annoying, as is
+         having to define two macros just to add recognition of a new flag.
+     
+    -    Use ilog2() to derive the bit in permission_fault(), the one function that
+    -    actually needs the bit number (it does clever shifting to manipulate flags
+    -    in order to avoid conditional branches).
+    +    Use ternary operator to derive the bit in permission_fault(), the one
+    +    function that actually needs the bit number as part of clever shifting
+    +    to avoid conditional branches.  Generally the compiler is able to turn
+    +    it into a conditional move, and if not it's not really a big deal.
+     
+         No functional change intended.
+     
+    @@ arch/x86/kvm/mmu.h: static inline u8 permission_fault(struct kvm_vcpu *vcpu, str
+      	u64 implicit_access = access & PFERR_IMPLICIT_ACCESS;
+      	bool not_smap = ((rflags & X86_EFLAGS_AC) | implicit_access) == X86_EFLAGS_AC;
+     -	int index = (pfec + (not_smap << PFERR_RSVD_BIT)) >> 1;
+    -+	int index = (pfec + (not_smap << ilog2(PFERR_RSVD_MASK))) >> 1;
+    ++	int index = (pfec | (not_smap ? PFERR_RSVD_MASK : 0)) >> 1;
+      	u32 errcode = PFERR_PRESENT_MASK;
+      	bool fault;
+      
+     @@ arch/x86/kvm/mmu.h: static inline u8 permission_fault(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+    + 		pkru_bits = (vcpu->arch.pkru >> (pte_pkey * 2)) & 3;
+      
+      		/* clear present bit, replace PFEC.RSVD with ACC_USER_MASK. */
+    - 		offset = (pfec & ~1) +
+    +-		offset = (pfec & ~1) +
+     -			((pte_access & PT_USER_MASK) << (PFERR_RSVD_BIT - PT_USER_SHIFT));
+    -+			((pte_access & PT_USER_MASK) << (ilog2(PFERR_RSVD_MASK) - PT_USER_SHIFT));
+    ++		offset = (pfec & ~1) | ((pte_access & PT_USER_MASK) ? PFERR_RSVD_MASK : 0);
+      
+      		pkru_bits &= mmu->pkru_mask >> offset;
+      		errcode |= -pkru_bits & PFERR_PK_MASK;
+
+==============================================================================
+KVM: x86: Define more SEV+ page fault error bits/flags for #NPF
+- match commit message to bits defined in header file
+
+    @@ Commit message
+         Define more #NPF error code flags that are relevant to SEV+ (mostly SNP)
+         guests, as specified by the APM:
+     
+    +     * Bit 31 (RMP):   Set to 1 if the fault was caused due to an RMP check or a
+    +                       VMPL check failure, 0 otherwise.
+          * Bit 34 (ENC):   Set to 1 if the guest’s effective C-bit was 1, 0 otherwise.
+          * Bit 35 (SIZEM): Set to 1 if the fault was caused by a size mismatch between
+                            PVALIDATE or RMPADJUST and the RMP, 0 otherwise.
+          * Bit 36 (VMPL):  Set to 1 if the fault was caused by a VMPL permission
+                            check failure, 0 otherwise.
+    -     * Bit 37 (SSS):   Set to VMPL permission mask SSS (bit 4) value if VmplSSS is
+    -                       enabled.
+     
+         Note, the APM is *extremely* misleading, and strongly implies that the
+         above flags can _only_ be set for #NPF exits from SNP guests.  That is a
+
+
+==============================================================================
+KVM: x86: Move synthetic PFERR_* sanity checks to SVM's #NPF handler
+- add a description of PFERR_IMPLICIT_ACCESS
+
+    @@ Commit message
+         Add a compile-time assert in the legacy #PF handler to make sure that KVM-
+         define flags are covered by its existing sanity check on the upper bits.
+     
+    +    Opportunistically add a description of PFERR_IMPLICIT_ACCESS, since we
+    +    are removing the comment that defined it.
+    +
+         Signed-off-by: Sean Christopherson <seanjc@google.com>
+    +    Reviewed-by: Kai Huang <kai.huang@intel.com>
+    +    Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+         Message-ID: <20240228024147.41573-8-seanjc@google.com>
+    +    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    +
+    + ## arch/x86/include/asm/kvm_host.h ##
+    +@@ arch/x86/include/asm/kvm_host.h: enum x86_intercept_stage;
+    + #define PFERR_GUEST_ENC_MASK	BIT_ULL(34)
+    + #define PFERR_GUEST_SIZEM_MASK	BIT_ULL(35)
+    + #define PFERR_GUEST_VMPL_MASK	BIT_ULL(36)
+    ++
+    ++/*
+    ++ * IMPLICIT_ACCESS is a KVM-defined flag used to correctly perform SMAP checks
+    ++ * when emulating instructions that triggers implicit access.
+    ++ */
+    + #define PFERR_IMPLICIT_ACCESS	BIT_ULL(48)
+    ++#define PFERR_SYNTHETIC_MASK	(PFERR_IMPLICIT_ACCESS)
+    + 
+    + #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
+    + 				 PFERR_WRITE_MASK |		\
+     
+      ## arch/x86/kvm/mmu/mmu.c ##
+     @@ arch/x86/kvm/mmu/mmu.c: int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+    - 	if (WARN_ON_ONCE(error_code >> 32))
+    - 		error_code = lower_32_bits(error_code);
+    + 		return -EFAULT;
+    + #endif
+      
+     +	/* Ensure the above sanity check also covers KVM-defined flags. */
+     +	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
+
+- move in front of the other synthetic page fault error code patches
+
+==============================================================================
+KVM: x86/mmu: WARN if upper 32 bits of legacy #PF error code are non-zero
+  commit message copy editing
+
+    @@ Commit message
+         and even more explicitly in the SDM as VMCS.VM_EXIT_INTR_ERROR_CODE is a
+         32-bit field.
+     
+    -    Simply drop the upper bits of hardware provides garbage, as spurious
+    +    Simply drop the upper bits if hardware provides garbage, as spurious
+         information should do no harm (though in all likelihood hardware is buggy
+         and the kernel is doomed).
+     
+    @@ Commit message
+         which in turn will allow deriving PFERR_PRIVATE_ACCESS from AMD's
+         PFERR_GUEST_ENC_MASK without running afoul of the sanity check.
+     
+    -    Note, this also why Intel uses bit 15 for SGX (highest bit on Intel CPUs)
+    +    Note, this is also why Intel uses bit 15 for SGX (highest bit on Intel CPUs)
+         and AMD uses bit 31 for RMP (highest bit on AMD CPUs); using the highest
+         bit minimizes the probability of a collision with the "other" vendor,
+         without needing to plumb more bits through microcode.
+
+
+==============================================================================
+KVM: x86/mmu: Use synthetic page fault error code to indicate private faults
+- patch reordering, no other changes
+
+==============================================================================
+KVM: x86/mmu: check for invalid async page faults involving private memory
+- new patch coming from TDX/SNP prep series; test PFERR_PRIVATE_ACCESS, set arch.error_code
+
+    @@ arch/x86/kvm/mmu/mmu.c: static u32 alloc_apf_token(struct kvm_vcpu *vcpu)
+      	arch.token = alloc_apf_token(vcpu);
+     -	arch.gfn = gfn;
+     +	arch.gfn = fault->gfn;
+    ++	arch.error_code = fault->error_code;
+      	arch.direct_map = vcpu->arch.mmu->root_role.direct;
+      	arch.cr3 = kvm_mmu_get_guest_pgd(vcpu, vcpu->arch.mmu);
+      
+    @@ arch/x86/kvm/mmu/mmu.c: static u32 alloc_apf_token(struct kvm_vcpu *vcpu)
+      {
+      	int r;
+      
+    -+	if (WARN_ON_ONCE(work->arch.error_code & PFERR_GUEST_ENC_MASK))
+    ++	if (WARN_ON_ONCE(work->arch.error_code & PFERR_PRIVATE_ACCESS))
+     +		return;
+     +
+      	if ((vcpu->arch.mmu->root_role.direct != work->arch.direct_map) ||
+
+
+==============================================================================
+KVM: x86/mmu: WARN and skip MMIO cache on private, reserved page faults
+- exit to userspace if the wrong case happens, test PFERR_PRIVATE_ACCESS
+
+    @@ Commit message
+     
+      ## arch/x86/kvm/mmu/mmu.c ##
+     @@ arch/x86/kvm/mmu/mmu.c: int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+    - 		error_code |= PFERR_PRIVATE_ACCESS;
+      
+      	r = RET_PF_INVALID;
+    --	if (unlikely(error_code & PFERR_RSVD_MASK)) {
+    -+	if (unlikely((error_code & PFERR_RSVD_MASK) &&
+    -+		     !WARN_ON_ONCE(error_code & PFERR_GUEST_ENC_MASK))) {
+    + 	if (unlikely(error_code & PFERR_RSVD_MASK)) {
+    ++		if (WARN_ON_ONCE(error_code & PFERR_PRIVATE_ACCESS))
+    ++			return -EFAULT;
+    ++
+      		r = handle_mmio_page_fault(vcpu, cr2_or_gpa, direct);
+      		if (r == RET_PF_EMULATE)
+      			goto emulate;
+
+==============================================================================
+KVM: x86/mmu: Move private vs. shared check above slot validity checks
+- add comment about use of mmu_invalidate_seq
+
+    @@ arch/x86/kvm/mmu/mmu.c: static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, stru
+      		return kvm_faultin_pfn_private(vcpu, fault);
+      
+     @@ arch/x86/kvm/mmu/mmu.c: static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+    + {
+    + 	int ret;
+    + 
+    ++	/*
+    ++	 * Note that the mmu_invalidate_seq also serves to detect a concurrent
+    ++	 * change in attributes.  is_page_fault_stale() will detect an
+    ++	 * invalidation relate to fault->fn and resume the guest without
+    ++	 * installing a mapping in the page tables.
+    ++	 */
+      	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
+      	smp_rmb();
+      
+     +	/*
+    -+	 * Check for a private vs. shared mismatch *after* taking a snapshot of
+    -+	 * mmu_invalidate_seq, as changes to gfn attributes are guarded by the
+    -+	 * invalidation notifier.
+    ++	 * Now that we have a snapshot of mmu_invalidate_seq we can check for a
+    ++	 * private vs. shared mismatch.
+     +	 */
+     +	if (fault->is_private != kvm_mem_is_private(vcpu->kvm, fault->gfn)) {
+     +		kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+
+
+
+==============================================================================
+KVM: x86/mmu: Move slot checks from __kvm_faultin_pfn() to kvm_faultin_pfn()
+- differences in moved code, range-diff is unreadable
+
+
+==============================================================================
+KVM: x86/mmu: Handle no-slot faults at the beginning of kvm_faultin_pfn()
+- remove unnecessary change
+
+    @@ arch/x86/kvm/mmu/mmu.c: static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct
+      		return kvm_handle_noslot_fault(vcpu, fault, access);
+      
+      	/*
+    -
+    - ## arch/x86/kvm/mmu/mmu_internal.h ##
+    -@@ arch/x86/kvm/mmu/mmu_internal.h: struct kvm_page_fault {
+    - 	/* The memslot containing gfn. May be NULL. */
+    - 	struct kvm_memory_slot *slot;
+    - 
+    --	/* Outputs of kvm_faultin_pfn.  */
+    -+	/* Outputs of kvm_faultin_pfn. */
+    - 	unsigned long mmu_seq;
+    - 	kvm_pfn_t pfn;
+    - 	hva_t hva;
+
+
+Isaku Yamahata (1):
+  KVM: x86/mmu: Pass full 64-bit error code when handling page faults
+
+Paolo Bonzini (1):
+  KVM: x86/mmu: check for invalid async page faults involving private
+    memory
+
+Sean Christopherson (15):
+  KVM: x86/mmu: Exit to userspace with -EFAULT if private fault hits
+    emulation
+  KVM: x86: Remove separate "bit" defines for page fault error code
+    masks
+  KVM: x86: Define more SEV+ page fault error bits/flags for #NPF
+  KVM: x86: Move synthetic PFERR_* sanity checks to SVM's #NPF handler
+  KVM: x86/mmu: WARN if upper 32 bits of legacy #PF error code are
+    non-zero
+  KVM: x86/mmu: Use synthetic page fault error code to indicate private
+    faults
+  KVM: x86/mmu: WARN and skip MMIO cache on private, reserved page
+    faults
+  KVM: x86/mmu: Move private vs. shared check above slot validity checks
+  KVM: x86/mmu: Don't force emulation of L2 accesses to non-APIC
+    internal slots
+  KVM: x86/mmu: Explicitly disallow private accesses to emulated MMIO
+  KVM: x86/mmu: Move slot checks from __kvm_faultin_pfn() to
+    kvm_faultin_pfn()
+  KVM: x86/mmu: Handle no-slot faults at the beginning of
+    kvm_faultin_pfn()
+  KVM: x86/mmu: Set kvm_page_fault.hva to KVM_HVA_ERR_BAD for "no slot"
+    faults
+  KVM: x86/mmu: Initialize kvm_page_fault's pfn and hva to error values
+  KVM: x86/mmu: Sanity check that __kvm_faultin_pfn() doesn't create
+    noslot pfns
+
+ arch/x86/include/asm/kvm_host.h |  46 ++++----
+ arch/x86/kvm/mmu.h              |   5 +-
+ arch/x86/kvm/mmu/mmu.c          | 182 ++++++++++++++++++++------------
+ arch/x86/kvm/mmu/mmu_internal.h |  28 ++++-
+ arch/x86/kvm/mmu/mmutrace.h     |   2 +-
+ arch/x86/kvm/svm/svm.c          |   9 ++
+ 6 files changed, 174 insertions(+), 98 deletions(-)
+
 -- 
 2.43.0
 
