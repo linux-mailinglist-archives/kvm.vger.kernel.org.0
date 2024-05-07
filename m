@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-16824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A236D8BE154
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 13:45:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2518BE1BD
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 14:12:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1073B28825
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 11:45:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38C6228479F
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 12:12:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFA5156F21;
-	Tue,  7 May 2024 11:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D672156F37;
+	Tue,  7 May 2024 12:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VlYxvc0L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdaVbSEv"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D6915252F
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 11:45:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84A6152526
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 12:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715082304; cv=none; b=FizWLkj6vWV0eHEALGCyGj/izr5CMXJtiVodte5CyIxm6Cha++Wa5Y/kKRq22YeCwJIIYb5cO80eJZGE9AbulSx3PiTuel+JcA+Ap/ryMO+XfB6Zy7RiI04Llw5IIaR8DEY7qaf5bkDmk1YEwGudkhbHOUcUPkBAqOccDhkPL+Q=
+	t=1715083933; cv=none; b=XHsqiK49KJJysvtfR7l2jz11hpnNwDe5RWCRTS1bsR1HmIYlIbKGy0F/GYf/FzaxFCOyE70hITeZ7PGPyGJ+0mgv+BDXswhSxU/K5/zU17QvViDsyqJ5J3gkYcQIBwG4SZlxMrSMBrcMjSnF42e1ZLcseQ7VslW80lnP4UK3f2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715082304; c=relaxed/simple;
-	bh=tc0Z2T0sY9guCCl+/hlNGIXORrQsFpWc+byENfsUZ+Q=;
+	s=arc-20240116; t=1715083933; c=relaxed/simple;
+	bh=Dm7BMCqISXd2ReMkwouRU7WnBhcSYa6TYWJVoX3yX0c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xo1TPvA5mfGhreOU3RFR7HiKt+K09moLLHHDk4FKTXHfulVSl1Dr2ZKMM/YMvm/lYyEfwD+RHLrEw+C32r7SOc/IUC+SlpZ7JmKg38PDIdUgrgPQ2EQN4EORzlB6Axi6megRZ4m46vZX+Ql1t07xRVx2JmyXm6fwhV7STkbbfyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VlYxvc0L; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=irCow2w8jzp2Skn4j7yCCEq5hUQu05lBT32d3eAX1j1zLc4yNJoREoG9COkg+cbtbYqzzJqS2seNj3RGXTAQbq0gk18bJ0gMN8kDktyjdCeIvTKebFEESHH2TWEkcc3PQJb0fY1q1UrlJ0XOjCS0TTNqLR/jiQLkEl+W32RY7r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BdaVbSEv; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715082301;
+	s=mimecast20190719; t=1715083930;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IdjnCRPF6KIi2xa+JTCJU6XDqzu+qhgJ7js/LxEsyeI=;
-	b=VlYxvc0L7kAzBt/kVqL9OtTvAZQv+R0RZTkm+Upd3Kj8vooETg0tTcqGYDgWVfPThKNdM5
-	xMGDBXbXSDf0y4hVN73EWmgDWkv7ZkiTw6IwLSTdAnMZmqOgCwg5EUMh8V28+hTXIygg+K
-	2cwkDm4hbB5FgyjVRr5h87fGjkzdSnE=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=S/Rt/oXApoYK9IP8vZV0dgBdJum8ffeGB8fzTzIwuIQ=;
+	b=BdaVbSEvJHMVkErZfPwDbkUWG36AT9LlxDXLKykVTuoiuSTc1R64VvwH6m7ZJ05inYq74q
+	wiOpWJmtaivYvFxeCg6oONAiOQ9vUkzjeESwanJ97gobVMX6h6BpQp9YNumItoRgcanzCU
+	n8TWW1wromstFDpqxi4nz9IFE+cdDoQ=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-580-NIgRgAo1PFO-KyR73TShYg-1; Tue, 07 May 2024 07:45:00 -0400
-X-MC-Unique: NIgRgAo1PFO-KyR73TShYg-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6a0b7ebba6cso49660596d6.0
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 04:45:00 -0700 (PDT)
+ us-mta-92-x1ayAd_OMa60yPnqVEFcWg-1; Tue, 07 May 2024 08:12:08 -0400
+X-MC-Unique: x1ayAd_OMa60yPnqVEFcWg-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-43d3072072cso36944391cf.3
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 05:12:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715082300; x=1715687100;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IdjnCRPF6KIi2xa+JTCJU6XDqzu+qhgJ7js/LxEsyeI=;
-        b=MDmC4/KlJ1uZLfIP++FL4UJkGugly30vScAV8xwlSCsWzv/BhGZRsqBjXkNh6SbS0G
-         tzoANW8rLokrABYvE1Pbp7ghGxNO7Yfrhiu/ZR7AwwQibTmi4pn7osfP24cb4C5C2aV/
-         ijOKlL9f+PLa5o/rz33aVy1QwmVOaixFcPTh5mIN6JOMFdq+GZCj4UAMUpqmU1Qa9bUJ
-         kqfhZTkuokPUSjj1iXsg2Vv7EmGe9uPelatWNJo3dCQcYPASuATENCqM6xpyw6+bjSFU
-         4Pr1X7Pa9+PQJDuHlENi3bZntcpm21BXWeGaUhfABpNOTSZpGysbmp1q3lCk5cN4wN9g
-         1iHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVObF1OMfriOf6Wdp+T57bL92yMbhTk1N1sg7/+1hNeB+SvMQcVQUk76IhKcK3b+ZHnCb1aDtKy6CM2OyXlPtiOiDDz
-X-Gm-Message-State: AOJu0YxrKfWMkZxqWG7ZOvv+QijkvPHI/xxxNRq+sZQrf6HZMWdOyPfS
-	FfHDtZcnbWleDwAfjxZNEgA5HXGC+brfldbefRiKpHg4eeEcyrZGpau4GRb+Z2dn7RzbY2NO8T/
-	/A5DLRvBhoKzjcXnZySyD3HSOmuvLwTcY+qAZ6R8C9ALlT1Y3vw==
-X-Received: by 2002:a05:6214:20cb:b0:6a0:cba9:374d with SMTP id 11-20020a05621420cb00b006a0cba9374dmr16882864qve.1.1715082300048;
-        Tue, 07 May 2024 04:45:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFn5zp9cvKYCQsDht+IznsH9QjfYMruFo57MWUdiCANe/cc3LC8nZHXzUqWoY78m0wmvWw3qQ==
-X-Received: by 2002:a05:6214:20cb:b0:6a0:cba9:374d with SMTP id 11-20020a05621420cb00b006a0cba9374dmr16882847qve.1.1715082299723;
-        Tue, 07 May 2024 04:44:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715083928; x=1715688728;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=S/Rt/oXApoYK9IP8vZV0dgBdJum8ffeGB8fzTzIwuIQ=;
+        b=ZFlN6jqQ5Dlbz6BpgvbLQmhGqunYKiHGTu5aSOnWPWdz9ShkGaPwZJz+9SRO8ROfEz
+         oP+tCkk/d9+MCOh1fnTc3xKz6R8fC9oGTpBTy9EtFtEm3nEnRPqCH3b7EHsnFAzkYiyZ
+         TbKd2zGBYZer0hh4DMfK0/quSLzUheVoDmWugkFco2vNP80f+FvwkV8eZrOIznBuhr/J
+         H5JHm1km8w7+ioCiPUXIS2/SzZf01H71HvYMmPTV+FmnEum9ZHEYU46U47yZUwKBiq7h
+         f8zBaFr/nz8HH7U6wH4W4c41fqqldIUbDx1eUwBfS4wItn4MJodwn7Iw8q5iF7ImRL+N
+         zzMg==
+X-Forwarded-Encrypted: i=1; AJvYcCWOQ9NnIStuSOTQGgdXq8XSS+02OiYN3B/O8KMT9eCuIKjxqbouimy0PuSCWYdFyglE/Gi4HmTeo3d/asrVKmi/Zdt+
+X-Gm-Message-State: AOJu0YzApVQ250Il+ZtqOCrWN9T99XJ0/zaL8SUk2LisaND+NOETQvVv
+	YwhejyzZGvo4kvYd2kmhv7ccZ8SICev5QOzB+u53X6c5ZsKhxfaQ3CWi/h6qE4GiFqOKyDZz3IM
+	jHSG3xgvTJlbvHghGrGknzv1RFy+5t7sNZCxIv1GpcH92re7pTw==
+X-Received: by 2002:ac8:5981:0:b0:43a:f577:ea0e with SMTP id e1-20020ac85981000000b0043af577ea0emr16270080qte.47.1715083927890;
+        Tue, 07 May 2024 05:12:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/yP6bwlMLnw6uz4Cw+ijC7SOgK2UxZaa1PcaL8Md2gPm+ER9vgzABsQYNLXRCjlkuXORSCw==
+X-Received: by 2002:ac8:5981:0:b0:43a:f577:ea0e with SMTP id e1-20020ac85981000000b0043af577ea0emr16270060qte.47.1715083927546;
+        Tue, 07 May 2024 05:12:07 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-40-241-109.web.vodafone.de. [109.40.241.109])
-        by smtp.gmail.com with ESMTPSA id n14-20020ad444ae000000b006a0f057489fsm4611227qvt.125.2024.05.07.04.44.58
+        by smtp.gmail.com with ESMTPSA id f9-20020ac84989000000b0043d7b229014sm1629966qtq.77.2024.05.07.05.12.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 04:44:59 -0700 (PDT)
-Message-ID: <c16d6ebc-1e0e-4f56-929f-495cef708d27@redhat.com>
-Date: Tue, 7 May 2024 13:44:56 +0200
+        Tue, 07 May 2024 05:12:07 -0700 (PDT)
+Message-ID: <1125bbbe-9af0-4d0b-b841-4e0506670acc@redhat.com>
+Date: Tue, 7 May 2024 14:12:04 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,17 +83,14 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 03/31] powerpc: Mark known failing tests
- as kfail
+Subject: Re: [kvm-unit-tests PATCH v9 12/31] powerpc: general interrupt tests
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
  <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
 References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-4-npiggin@gmail.com>
- <f2411fc8-5f90-4577-9599-f43bb8694cd0@redhat.com>
- <D1347PSKXAVS.2EMGLUQSZN8W4@gmail.com>
-Content-Language: en-US
+ <20240504122841.1177683-13-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -136,51 +133,29 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <D1347PSKXAVS.2EMGLUQSZN8W4@gmail.com>
+In-Reply-To: <20240504122841.1177683-13-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 07/05/2024 06.07, Nicholas Piggin wrote:
-> On Mon May 6, 2024 at 5:37 PM AEST, Thomas Huth wrote:
->> On 04/05/2024 14.28, Nicholas Piggin wrote:
->>> Mark the failing h_cede_tm and spapr_vpa tests as kfail.
->>>
->>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>> ---
->>>    powerpc/spapr_vpa.c | 3 ++-
->>>    powerpc/tm.c        | 3 ++-
->>>    2 files changed, 4 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/powerpc/spapr_vpa.c b/powerpc/spapr_vpa.c
->>> index c2075e157..46fa0485c 100644
->>> --- a/powerpc/spapr_vpa.c
->>> +++ b/powerpc/spapr_vpa.c
->>> @@ -150,7 +150,8 @@ static void test_vpa(void)
->>>    		report_fail("Could not deregister after registration");
->>>    
->>>    	disp_count1 = be32_to_cpu(vpa->vp_dispatch_count);
->>> -	report(disp_count1 % 2 == 1, "Dispatch count is odd after deregister");
->>> +	/* TCG known fail, could be wrong test, must verify against PowerVM */
->>> +	report_kfail(true, disp_count1 % 2 == 1, "Dispatch count is odd after deregister");
->>
->> Using "true" as first argument looks rather pointless - then you could also
->> simply delete the test completely if it can never be tested reliably.
->>
->> Thus could you please introduce a helper function is_tcg() that could be
->> used to check whether we run under TCG (and not KVM)? I think you could
->> check for "linux,kvm" in the "compatible" property in /hypervisor in the
->> device tree to see whether we're running in KVM mode or in TCG mode.
+On 04/05/2024 14.28, Nicholas Piggin wrote:
+> Add basic testing of various kinds of interrupts, machine check,
+> page fault, illegal, decrementer, trace, syscall, etc.
 > 
-> This I added in patch 30.
+> This has a known failure on QEMU TCG pseries machines where MSR[ME]
+> can be incorrectly set to 0.
 > 
-> The reason for the suboptimal patch ordering was just me being lazy and
-> avoiding rebasing annoyance. I'd written a bunch of failing test cases
-> for QEMU work, but hadn't done the kvm/tcg test yet. It had a few
-> conflicts so I put it at the end... can rebase if you'd really prefer.
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   lib/powerpc/asm/processor.h |   4 +
+>   lib/powerpc/asm/reg.h       |  17 ++
+>   lib/powerpc/setup.c         |  11 +
+>   lib/ppc64/asm/ptrace.h      |  16 ++
+>   powerpc/Makefile.common     |   3 +-
+>   powerpc/interrupts.c        | 414 ++++++++++++++++++++++++++++++++++++
+>   powerpc/unittests.cfg       |   3 +
+>   7 files changed, 467 insertions(+), 1 deletion(-)
+>   create mode 100644 powerpc/interrupts.c
 
-Ah, ok, no need to rebase then, as long it's there in the end, it's fine.
-
-  Thanks,
-   Thomas
+Acked-by: Thomas Huth <thuth@redhat.com>
 
 
