@@ -1,130 +1,134 @@
-Return-Path: <kvm+bounces-16892-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16893-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645D48BE9D1
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:55:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8928BE9F7
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:02:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17B431F2237A
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:55:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3351F1C21CC0
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A31538DD6;
-	Tue,  7 May 2024 16:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD1654BEA;
+	Tue,  7 May 2024 17:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="LPTpxEu/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h6jVbKJc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FF0C148
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 16:54:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F114E570
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 17:02:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715100894; cv=none; b=DeDHlosBJqtcD/gfbzyoBzbivMhX4GlMvvVFXVd1Z73UMvW/x1gQqXB/+QWm3Zls8wB3pPPfw94pdWfNxvz2QJclwYU0LeGrQFnnqZUVkkqjQ/ZMd0W7tQTpBmXyu55gAWIKdr226n3tARF26RgPUqosQd27tuSvIwz8E5RKWv0=
+	t=1715101326; cv=none; b=o7cEP3vW1nSHV1fGR/oZcS9hwSVlwgL238OHyF61QDshUOz59TZMKiw8oW35oKpQetVcz4MckDsSbRe4X+6SI4JMKRMJSJQiuxxjnMG9Ey8tL8CmUtUWynoZanWUAi2i5hR015xj3BcFeomZMsPmeav7QXG9rCzpwtLzbkgQhJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715100894; c=relaxed/simple;
-	bh=qpL7mrChMH7iiYyuJ5+LEbL3MTJsN+KBRA6txOCFD6E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XFfWTbbWgQ+upqZtVk3IL7MZtiu16ee9MXRfnA6y6t6mhgw2GmP9qnY7Xq0C30w5mXzzTtWN2x1bEsDZfIlhYHiUdJeNHx1MLgxV0vYyLKfw/VUI8Fx4N3OcU/9zFwMDPj2kjq/R+/9lmszGeQlc+x/Ywll2B35L9yuFpJ6FwvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=LPTpxEu/; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-792940cc66eso222525185a.0
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 09:54:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1715100892; x=1715705692; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hs91KlgKHS6Ryk+5UHzlM+ht6/94snYgy6BHXDz+jUk=;
-        b=LPTpxEu/Fb+QRbtNflP03E5gusFXmrm3wDh+bMhVPvWtlcxCQ9R/g7NRiUAEREYUyu
-         yOkf5eiDW+I4ch5ioSk6ni/CdShlHKeBEe26Yz2iU+iMkDFPQ3Mn7mwdY3RnVdXR6c1m
-         X0IK0j6ZuhA3h65L8tK8M+zZpHTEl2bXkvsbdEg6MMd9o/vb6oUZt+5CWMGcxP+DiBYS
-         qk5fAcJgueHBHJQBD41oFIiwNFbzyUDNyb5wbefT/Lea07FD5yBKpRvMBcSXeKz0KuDX
-         dzWbYNNWDTAdQ4YtsoElueVqpkvvI0TJTpTZz/9dGVOo7vKyEF3Ieg7Pb0Rs1sKzjs/i
-         qC0Q==
+	s=arc-20240116; t=1715101326; c=relaxed/simple;
+	bh=lnmeGx6mM8HK2cbcBMXEki7Leq6zV0uSfpE3Sd53tq4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V50OdUjrc/HSIZ8VonYkZAIcVtHg9lEKfgEKGH9EhFuL+kGvPjja/riki2c+S9sHAeRZLMlYqqY76FIKtBwtXM7TDLudbCPj6KyX41sagqJiYhcbkMYVt51SaL/g+Iz479qe25bmgj21OgEwViIbN4NFMxPr4b8KF9/iQXkveME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h6jVbKJc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715101324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=35j9M18N36vk6wSyApQ+5MJ9yl+jkARaDRgd2CC1aRs=;
+	b=h6jVbKJc6ZO6Yc1gRg+4VTMddSQKKtV8VZBJJEVwu0wNdN2n83i/y5OD7DNFWJgSZeOpy5
+	kIknVsBywX4ZyNjO2sD2FuvXj9M7JPYxU38X9sjJnDGtYX9cP8EeWMcS+H/hFBb5NwrALe
+	y54dv9pWSYLNIA5RtgFdVVjo7kj1iPk=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-0tg_wa1xO2y3VW7GspW1Ww-1; Tue, 07 May 2024 13:02:02 -0400
+X-MC-Unique: 0tg_wa1xO2y3VW7GspW1Ww-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2e2da49e82aso33474511fa.3
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 10:02:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715100892; x=1715705692;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hs91KlgKHS6Ryk+5UHzlM+ht6/94snYgy6BHXDz+jUk=;
-        b=ED0mhaK5OHs7bbgBfoIJVBoUMM6NtP7OELSJfuVxnblaN8CBPIdWqAnb3GRjgSMhgC
-         7gP0d4tved0dYTX0185HV+/3EhZ3NjtfSu8jdtmYzzma7vzCi/VRln/kbvjn0KuQlkal
-         RVzM1NT+9+XtrJOjzZH6qceSRRCg53G14yIsSfPAJAy8S2TWDMlVRP/3UfgGVaizROe0
-         QDw/tRAPR43XLEkTNhDsGqeLhuJv22KWnNn1cz+HxywpVTF8NpVubEvwdJWTBnfeGaYb
-         b5JXS3TzksrRzST8pnqqds8y+4VOjEfs7vQ0IoTwi/LMYLXJn+2BbdB85XLLGa4v1l+4
-         IfIA==
-X-Gm-Message-State: AOJu0YxCBVU3G/y7T+fsyz2RB5Ku6A+uxic09RJIrRTzLE785vKqtrNv
-	AlQzF9c0KGTZeyvupTB0NF0Zghnm32wzgb7c2g40Cb5IPDywNP8U9CCOaLkYy3Uv2rCe0mrJ5HS
-	N
-X-Google-Smtp-Source: AGHT+IHlD+3EgAUHX0haSzd9vw8MtUGK2hO1IVfJXLZa0KHjmeG6nzVKMJrSdVzvJ2zmH0Bj1gzshA==
-X-Received: by 2002:a05:620a:2a11:b0:790:f382:23ec with SMTP id af79cd13be357-792a6471d76mr501947985a.16.1715100891854;
-        Tue, 07 May 2024 09:54:51 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id x5-20020a05620a0b4500b007929602e42asm2426537qkg.96.2024.05.07.09.54.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 May 2024 09:54:51 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1s4O5a-0001dZ-V3;
-	Tue, 07 May 2024 13:54:50 -0300
-Date: Tue, 7 May 2024 13:54:50 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org
-Subject: Re: [PATCH] vfio/pci: Collect hot-reset devices to local buffer
-Message-ID: <20240507165450.GI4718@ziepe.ca>
-References: <20240503143138.3562116-1-alex.williamson@redhat.com>
+        d=1e100.net; s=20230601; t=1715101321; x=1715706121;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=35j9M18N36vk6wSyApQ+5MJ9yl+jkARaDRgd2CC1aRs=;
+        b=l1CCeQlISWku6Fcr/27dHaY44x9jds29fPWXypGRepBRJVDI0bBn40DozK+PqkEffW
+         Apb9sNPRKuGnM5KLwab8bQzTxFKUtnGQAfqRpwPDo5YktIB6Kef1LunlHOcJQrLqlNZb
+         EbhVzoACg10JOzm6Ps2lVJ5XNmMQkr+QP2OcylGqWgL6yyu0RuimNkHCZ7xrpYfcRhIK
+         DoU1pzLZwlW4rEpVPKSrslJJH1sII9n+p0nC+7UKmwadOks137vKXDXnPOj03KRKUB0f
+         tTEq+bx3OklG7x4ChwF7s/P0S5lGng5mh4EpnGaeIifBwwjILHICz3y0a1QwpcKDOY5K
+         SI0w==
+X-Gm-Message-State: AOJu0Yww4k6skZOD7+gvf2NWnzVaqc/ysGJ0C9ucxwF1gTvUa7EfhdTM
+	Jh5KfKfeD5X57crx5JvqyL3iWIt+HmtPq3jWFRNt4An81ws+tF2ZEK9SFjvl8sh7A23JfCIT86m
+	bL5fNRY1Ph+sCXuC+uHGtnF9BokD40tCRydqB+7PPQu6yiffhY+tV8TBiCvn6FGn+tVwB7h7GeI
+	aAMIHEBL9rP8G3TzldSAVtkdRs
+X-Received: by 2002:ac2:5e30:0:b0:518:ce4b:17ef with SMTP id 2adb3069b0e04-5217cf3b0dbmr60098e87.60.1715101321279;
+        Tue, 07 May 2024 10:02:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH6IWm96F+cIDzth/uQd3l0oaQARW+aFQiEI+UhoNsuY9HQ0VD+mdg3aAHEreT/EfAicuI1kFYJx5l4fRs6tJo=
+X-Received: by 2002:ac2:5e30:0:b0:518:ce4b:17ef with SMTP id
+ 2adb3069b0e04-5217cf3b0dbmr60070e87.60.1715101320848; Tue, 07 May 2024
+ 10:02:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240503143138.3562116-1-alex.williamson@redhat.com>
+References: <20240507122945.2571-1-borntraeger@linux.ibm.com>
+In-Reply-To: <20240507122945.2571-1-borntraeger@linux.ibm.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 7 May 2024 19:01:49 +0200
+Message-ID: <CABgObfaww5Dtp0Ji1ff99RrW11stWhf_JahJAyUwpV=RyTxpCQ@mail.gmail.com>
+Subject: Re: [GIT PULL 0/1] KVM: s390: Fix for 6.9
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	linux-s390 <linux-s390@vger.kernel.org>, Heiko Carstens <hca@linux.ibm.com>, 
+	Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	Thomas Huth <thuth@redhat.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 03, 2024 at 08:31:36AM -0600, Alex Williamson wrote:
-> Lockdep reports the below circular locking dependency issue.  The
-> mmap_lock acquisition while holding pci_bus_sem is due to the use of
-> copy_to_user() from within a pci_walk_bus() callback.
-> 
-> Building the devices array directly into the user buffer is only for
-> convenience.  Instead we can allocate a local buffer for the array,
-> bounded by the number of devices on the bus/slot, fill the device
-> information into this local buffer, then copy it into the user buffer
-> outside the bus walk callback.
+On Tue, May 7, 2024 at 2:29=E2=80=AFPM Christian Borntraeger
+<borntraeger@linux.ibm.com> wrote:
+>
+> Paolo,
+>
+> one fix for s390.
 
-> Chain exists of:
->   &vdev->vma_lock --> pci_bus_sem --> &mm->mmap_lock
-> 
->  Possible unsafe locking scenario:
-> 
-> block dm-0: the capability attribute has been deprecated.
->        CPU0                    CPU1
->        ----                    ----
->   rlock(&mm->mmap_lock);
->                                lock(pci_bus_sem);
->                                lock(&mm->mmap_lock);
->   lock(&vdev->vma_lock);
-> 
->  *** DEADLOCK ***
+Pulled, thanks.
 
- 
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
->  drivers/vfio/pci/vfio_pci_core.c | 78 ++++++++++++++++++++------------
->  1 file changed, 49 insertions(+), 29 deletions(-)
+Paolo
 
-I feel like I created this bug...
+> The following changes since commit 16c20208b9c2fff73015ad4e609072feafbf81=
+ad:
+>
+>   Merge tag 'kvmarm-fixes-6.9-2' of git://git.kernel.org/pub/scm/linux/ke=
+rnel/git/kvmarm/kvmarm into HEAD (2024-04-30 13:50:55 -0400)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kv=
+m-s390-master-6.9-1
+>
+> for you to fetch changes up to 175f2f5bcdfce9e728f1ff956a50f28824d28791:
+>
+>   KVM: s390: Check kvm pointer when testing KVM_CAP_S390_HPAGE_1M (2024-0=
+5-02 09:41:38 +0200)
+>
+> ----------------------------------------------------------------
+> KVM: s390: Fix for 6.9
+>
+> Fix wild read on capability check.
+>
+> ----------------------------------------------------------------
+> Jean-Philippe Brucker (1):
+>       KVM: s390: Check kvm pointer when testing KVM_CAP_S390_HPAGE_1M
+>
+>  arch/s390/kvm/kvm-s390.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
 
-It is sad we have to allocate kernel memory, but can't think of a
-better option.
-
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-
-Jason
 
