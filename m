@@ -1,122 +1,150 @@
-Return-Path: <kvm+bounces-16842-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16843-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF6118BE6B4
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:57:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35CCE8BE6FB
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:08:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 825861F2346E
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 14:57:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E158B2832D2
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 15:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ABEB1607B8;
-	Tue,  7 May 2024 14:57:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB28D16132B;
+	Tue,  7 May 2024 15:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuFx7JZy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rvvu9Tvd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8A7747F;
-	Tue,  7 May 2024 14:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC26B15F414
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 15:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715093859; cv=none; b=rkDZ8VYDKPR7vG9OdvNvpKORy8TA+q96k7ypizjUFcemWPqIjeIo2U68QhY+4ByG2YXopWttVs1dHgAz50t2rirnP2/lLEwxA6L5YeC3PZ90opVNkneS0MY4mcr4xlrNnDLCF6H8Pr1VOkNgwfPZgGYhu07yyyTeP0nFiN/bfpc=
+	t=1715094510; cv=none; b=CZPlMWg6dv3EtHZFJDOh1VzSL8GCScxX/m9POtHatvXc7l0U8rTUy7nW/jzFE9B8jhnGGC/tggr16e0QXy15sefg4RJMqShPMq0RTTgI/HICmt1Jci1mFbPZOhwVBrZSmZqeD5Wa7JDjTua2HoVEZWLti6oBN6D/v9few88xB2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715093859; c=relaxed/simple;
-	bh=sOYKJAaNjyz5tc9w5JMsbSZzmPQw/hxRG+nTJcqDj98=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ek/Datuw+lEhmBvRiXCzo7tMhm5zgHNsHrHu9iQx//GJtbr5v81dEPGWfz+dMekkqvuCMFYcl7n6pWmdWkoJLVUnoxxLlLld5OVKCCxfB2AOjwfpXtLCHYpG5becOLKuynfSKbw3wo9g/RIyBRkbiLnQHwwG4uq0vESYluA9AQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuFx7JZy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E94AC2BBFC;
-	Tue,  7 May 2024 14:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715093859;
-	bh=sOYKJAaNjyz5tc9w5JMsbSZzmPQw/hxRG+nTJcqDj98=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LuFx7JZyqH5uR3thtGzntatMszyZ3KlB2lRy43ps3A5Vdzmj8iyd2wCAutuGDAT39
-	 406qxn1vyD7yHKbvle4n8eCtgCbDbdmC5LC9Lvf3e9IS3qlOcDNoyumD/XO6dN2VWZ
-	 bMYSHPejOf2/WTHII/NusNWASnqddAwgqTWwlccdZTGvywMkjgCXL97qm6XoPY1dwm
-	 8z4ZBJUtT5fixmkk+62gvjkpkqZaKsX7WHEwRjEwzjCN45OIvf2WBsarF861sIVOXK
-	 pfTzaM4LMyt4Is4CwFRDivBzccGlXC8eJJbjWPAN0Enj1TmhlwOQwjI42lyk/fJOi7
-	 QGyLknVYQtWmQ==
-Date: Tue, 7 May 2024 15:57:34 +0100
-From: Will Deacon <will@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH] KVM: arm64: Correct BTYPE/SS in host SMC emulation
-Message-ID: <20240507145733.GB22453@willie-the-truck>
-References: <20240502180020.3215547-1-maz@kernel.org>
+	s=arc-20240116; t=1715094510; c=relaxed/simple;
+	bh=etFllyEupyaknEFf+lcPrCQd6nzzutaeEMKfMlLm/30=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=egbLLcCV8Hyg2WZrL4wRPaLpt/wPfqv77lHqniAym81+7c4tIVc61UOEqKnKjLAweSDo5lCItQmBJlXs7JSvW6hgkmIVEWSiFSBm+wrrgGlDnzwlg/mT8WNotYAJYO2iK+k8QVUo7v17l9/xfSOUsVa2FwGKF3bBbvv4EVy6vjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rvvu9Tvd; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc64f63d768so5861891276.2
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 08:08:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715094508; x=1715699308; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XIQy57nw8js2S4anIYd24L9R1IqwqfbqyoiYCyYOBxY=;
+        b=rvvu9Tvd3egW8lGyezAGdrLE+g/wU/xLOQeoQKoncJiHbIx0X+UN2+TnnXPyY+kZub
+         WDVLX4JHmVDndQT/+aXGwNQDdsHU9EUmFwxSeINpGCmQVQNROYzyzuiCcJSKaKHEfSSP
+         KP/u6iTwYSapylbkufHpm8BhO+CnKYq6nEMX/Cio+cQt4dvR+stmMj94Y0VViywuX+tl
+         N2jiQWyetwtLL8zZulJAt9lnV7ksFAN33kt5WfyS6wPfryLpKBnT56Ed2tEFaKU3PRPp
+         bH7uPuZ9Tz3g8xOqLRbGFe1GTTMOWKXQb2ybDZLOAfKiVj3ZmPK+i31JhIZiutj4rfxX
+         YsIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715094508; x=1715699308;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XIQy57nw8js2S4anIYd24L9R1IqwqfbqyoiYCyYOBxY=;
+        b=c3zQt65oq6F7MePRiteWrZ2o7eVxWG+42ikaNxfoACP5OAJS5vnU1SffXWrjbtinAE
+         yjkeiA/cSBwEgtEpQHA7CnPZgWw75xmv/ozvGZsyap/Zxz1MkWb+jkaQ+eXQZqkrXE8t
+         VN5esUS+cIcv2QLntwIIavjbg4JOrorfhnUUI0kbGibu+VLoTBwjlZHqdjjigQD/AG6y
+         iXhGIqW4ddjOdokO0a/t2cQXruLnO012praBfPQYVg0nf261NIRn4TH7SGwAFaQnHPdK
+         w28VxNEwktaL4HXDvW4pWL1wo2PxuHcW5LttrHCMRthPmZXYk0kdWK7TMt02xfKJ1q6U
+         9q3A==
+X-Forwarded-Encrypted: i=1; AJvYcCXfawNC9HpfHLyLtpOO2CxpRsgclK/iikhC3b7Mp1EuGS7f4+xeFvWhQmOzZVHDTNu51BCKgPXYl203N0Gbih+WGmrc
+X-Gm-Message-State: AOJu0YzMS2D+GJ4J7KnvGYmUNjWUGls2VqFMh/G/uX+uVVuS+vaBL0Rz
+	Tg1GT3k14TS1Nm5LesdScay2UHQf2UWHH3AHWTA7wEuxO1xbHBRDegcak1kXOq8WCH0MqnBwTIE
+	9Iw==
+X-Google-Smtp-Source: AGHT+IGAAglNqpXyaYJUaI2uBs8e7jY1OuLq1VqZRy2zy+xyQcXN8cDWnwsKdrBjSbkcmiU1ZDRoZGIH/Ac=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1245:b0:deb:8bc5:eb5b with SMTP id
+ t5-20020a056902124500b00deb8bc5eb5bmr1772807ybu.5.1715094507868; Tue, 07 May
+ 2024 08:08:27 -0700 (PDT)
+Date: Tue, 7 May 2024 08:08:26 -0700
+In-Reply-To: <994d42e4c4fb74899474a87766d7583507f13a73.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240502180020.3215547-1-maz@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+References: <20240219074733.122080-1-weijiang.yang@intel.com>
+ <20240219074733.122080-25-weijiang.yang@intel.com> <ZjLNEPwXwPFJ5HJ3@google.com>
+ <e39f609f-314b-43c7-b297-5c01e90c023a@intel.com> <038379acaf26dd942a744290bde0fc772084dbe9.camel@intel.com>
+ <ZjlovaBlLicFb6Z_@google.com> <8a6c88c7457f9677449b0be3835c7844b34b4e8a.camel@intel.com>
+ <Zjo46HkBg2eKYMc7@google.com> <994d42e4c4fb74899474a87766d7583507f13a73.camel@intel.com>
+Message-ID: <ZjpD2BaO5SXPUEj0@google.com>
+Subject: Re: [PATCH v10 24/27] KVM: x86: Enable CET virtualization for VMX and
+ advertise to userspace
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Chao Gao <chao.gao@intel.com>, Dave Hansen <dave.hansen@intel.com>, 
+	"x86@kernel.org" <x86@kernel.org>, "peterz@infradead.org" <peterz@infradead.org>, 
+	"john.allen@amd.com" <john.allen@amd.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"mlevitsk@redhat.com" <mlevitsk@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	Weijiang Yang <weijiang.yang@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 02, 2024 at 07:00:20PM +0100, Marc Zyngier wrote:
-> When taking a trap for an SMC instruction on the host, we must
-> stau true to the letter of the architecture and perform all the
+On Tue, May 07, 2024, Rick P Edgecombe wrote:
+> On Tue, 2024-05-07 at 07:21 -0700, Sean Christopherson wrote:
+> >=20
+> > Keeping X86_FEATURE_IBT set will result in "ibt" being reported in
+> > /proc/cpuinfo,
+> > i.e. will mislead userspace into thinking IBT is supported and fully en=
+abled
+> > by
+> > the kernel.=C2=A0 For a security feature, that's a pretty big issue.
+>=20
+> Since the beginning, if you don't configure kernel IBT in Kconfig but the=
+ HW
+> supports it, "ibt" will appear in /proc/cpuinfo. It never was a reliable
+> indicator of kernel IBT enforcement.
 
-typo: stay
+Ah, good to know.
 
-> actions that the CPU would otherwise do. Among those are clearing
-> the BTYPE and SS bits.
-> 
-> Just do that.
-> 
-> Fixes: a805e1fb3099 ("KVM: arm64: Add SMC handler in nVHE EL2")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/hyp/include/hyp/adjust_pc.h | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-> index 4fdfeabefeb4..b1afb7b59a31 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/adjust_pc.h
-> @@ -47,7 +47,13 @@ static inline void __kvm_skip_instr(struct kvm_vcpu *vcpu)
->   */
->  static inline void kvm_skip_host_instr(void)
->  {
-> +	u64 spsr = read_sysreg_el2(SYS_SPSR);
-> +
->  	write_sysreg_el2(read_sysreg_el2(SYS_ELR) + 4, SYS_ELR);
-> +
-> +	spsr &= ~(PSR_BTYPE_MASK | DBG_SPSR_SS);
-> +
-> +	write_sysreg_el2(spsr, SYS_SPSR);
+> It is just an indicator of if the IBT feature is usable.
 
-The handling of SS looks correct to me, but I think the BTYPE
-manipulation could do with a little more commentary as it looks quite
-subtle when the SMC is in a guarded page. Am I right in thinking:
+Does ibt=3Doff make IBT unusable for userspace?  Huh.  Looking at the #CP h=
+andler,
+I take it userspace support for IBT hasn't landed yet?
 
-   * If the SMC is in a guarded page, the Branch Target exception is
-     higher priority (12) than the trap to EL2 and so the host will
-     handle it.
+> I think tying kernel IBT enforcement to the CPU feature is wrong. But if =
+you
+> disable the HW feature, it makes sense that the enforcement would be
+> disabled.
+>=20
+> CET is something that requires a fair amount of SW enablement. SW needs t=
+o do
+> things in special ways or things will go wrong. So whether IBT is in use =
+and
+> whether it is supported by the HW are useful to maintain as separate conc=
+epts.
+>=20
+> >=20
+> > To fudge around that, we could add a synthetic feature flag to let the
+> > kernel tell KVM whether or not it's safe to virtualize IBT, but I don't=
+ see
+> > what value that adds over KVM checking raw host CPUID.
+>=20
+> A synthetic feature flag for kernel IBT seems reasonable to me. It's what=
+ I
+> suggested on that thread I linked earlier. But Peterz was advocating for =
+a bool.
+> How enforcement would be exposed, would just be dmesg I guess. Having a n=
+ew
+> feature flag still makes sense to me. Maybe he could be convinced.
 
-   * Therefore if a trapping SMC is in a guarded page, BTYPE must be
-     zero and we don't have to worry about injecting a Branch Target
-     exception.
-
-   * Otherwise, if the SMC is in a non-guarded page, we should clear it
-     to 0 per the architecture (R_YWFHD).
-
-?
-
-Having said that, I can't actually find the priority of an SMC trapped
-to EL2 by HCR_EL2.TSC in the Arm ARM. Trapped HVCs are priority 15 and
-SMCs trapped to EL3 are priority 23.
-
-Will
+If there's a need for IBT and KERNEL_IBT, I agree a synthetic flag makes se=
+nse.
+But as above, it's not clear to me why both are needed, at least for KVM's =
+sake.
+Is the need more apparent when userspace IBT support comes along?
 
