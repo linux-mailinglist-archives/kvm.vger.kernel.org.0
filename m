@@ -1,108 +1,131 @@
-Return-Path: <kvm+bounces-16878-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16879-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49DED8BE8B8
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:22:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07678BE8C6
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:24:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B8141C238F3
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:22:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A8852835C4
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0127616C45B;
-	Tue,  7 May 2024 16:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB9416C453;
+	Tue,  7 May 2024 16:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tyFFzb6t"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n7K6i1j0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF5C168AE8
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 16:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C5516ABE8
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 16:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715098905; cv=none; b=lo8Jz/4xwn9iYXjOtNEQ6SDHWobv7OEDNFnmSerlvkow9ADEqjTk/LXSpE3YcgQRjY9Lc0NaeiXLbBD+LnikDerc7xWyyUiP1RSwYChJsJOjw1aLf3KoELf1rURe68xkKAwcHwp0NrjiEW9GKbCs1lIJL/hCdebTYVWCAYsxKrU=
+	t=1715099062; cv=none; b=OWEbKbu5+8zFVsJDi1HyxriT5OsnF8QEcKF+9PKMga7sfujgNnGkdRT1U0OFXX7hKaV+Iy0fwTmVcVFRm2jPGCCaBbyPNy0MBQylLmZshk1vcg7rSVSQvpcVn3rIviGUoS5e9GY8+9TMp+zqy5KKGbZf3OjuWieZb2WjWVD4HNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715098905; c=relaxed/simple;
-	bh=vspPBwfCR3bmmeZQ5EusjF8lVRuYv1ubtXwG70oU+DM=;
+	s=arc-20240116; t=1715099062; c=relaxed/simple;
+	bh=wJbp6WjEK+6FtVYJhPdauEq2bIrS1FhcPXI3PtQy6wU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kcGb1EdZdjKLrbq+ObZifhOXUzNJtTsdqkdcgpHdvjjfmRtECMo/AZKygj0E6prVwUdjvXA3R8gGQ185ITtA2HVMW7daPKsiA1elhAjzpCqUg/oPS/WJOfo62d2wksZ0BGeEy4uEMq2HjsZD3I3idqGVahhj0t9TefmNHZNUZ70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tyFFzb6t; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=RfT45XjfNAer3gzygXQbfggxKqvAcS1+g3dDzcwIrbxHrOei09kaViNRXKMSEF3iV9pEsxElZfvkj+aGx8HOoHosfIXCmxDs3ri2yWCh0zoY/HeYr9we18Bx37RneMksAs5haW0wvUYHQ30Euv8/cKlNMpuI1SAPeHPe/iJIdjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n7K6i1j0; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6f446a1ec59so3080562b3a.1
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 09:21:43 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so6173628276.1
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 09:24:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715098903; x=1715703703; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1715099060; x=1715703860; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ShcrSBR6L/ztU6jULZGVC9zQBLJvV7z+Ngxu7KBV4r8=;
-        b=tyFFzb6tSzPyCEubYeTRjDHXgbCC8WJtZNv6r3Q7igu6WrhzE1pFODAdlj3NXCIIKq
-         3E1r7eeFup6uivouwrF6rRIQaKezdV0+IyZ7NywEOcIYMpwXG/SNCSz5vQ/qhpkvbThN
-         0ORD6/19FYcUIlXMLYMa1uFIpRUtdJ99Lo3cy9lztwoKMIzrTeZe+XtqcrLs0FERZTyY
-         TmQ1oR6yJtROX3djKew7sLhcgUtj/bViy6u/xpo8/lS/9QsjB/FXDEWzNPf7pXtX2NLP
-         4paDhnW660C30MEs/6ykUgBtJ3KxtOJcSw28nfGZqf080SwKDH1QmS1Lq9Z9Fo6Os+uo
-         YpFQ==
+        bh=zDm0nic8Bf4ROxi6HvrqFLQrZg3PZkT7VQQx+aQhnBY=;
+        b=n7K6i1j0CKyRAITHjMEkX8wOIaFkNBux9wU875LGgXTUDjA6mWdy0g7obvcMlINETx
+         phVZICSPfWT1nQVGKBynSfnFcQ/9neh83sUHGf1oTu6vW8oMIJs63b5Bcwfh5VgrDZDm
+         kwWYcFCyldVwrqJwLwEMhyUlQA07BUUjC5SHDEEtPolQoWhCjZH+Rr6MB2Wub2Yq6m6/
+         3SaDgw9P/6tXWe3rOF7UVwJ2DhKqSo7T0WyVDdhslLM3q+WrxXH/puAXlNftOR1RLbmM
+         LFdaEF3H7A7H6mFCg7eK2gXMN4t2FzSDJRUGdSYkzImsyVmFVsd2Nvk0ivENfVF2YPHt
+         h/Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715098903; x=1715703703;
+        d=1e100.net; s=20230601; t=1715099060; x=1715703860;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ShcrSBR6L/ztU6jULZGVC9zQBLJvV7z+Ngxu7KBV4r8=;
-        b=FevD3is2r9Nw9Z/zaTNRq4r3UxoInJJtpatbKbvgLJc+Jj9bH7fsgPc6H5SPgEeGPR
-         LmmmoXK1tSeXfzMz9CDwAUCb0/6+QS71/hTrObgE3t6dwaSN18D+3/XGqos2wJSJ/rr4
-         BO58d5lW2RDU8OGwvZkqwFYjjjwm8LXH0PPiE4jwvUyZoMn9OXsYP/+drcRix8bAuCot
-         A0qQvSCcyq/vogIJRfq8UtsjJhLLrop0kNtwxeKk1HMf5CWnv99+TOx8FClY4rUnj5EU
-         dln6VU2KdWeIRkG5Ma4c1oACSxIG9HCzlVMhY1znYIRupuCzBxn2CRiTBz59QuwBlFG+
-         zkaA==
-X-Forwarded-Encrypted: i=1; AJvYcCWSniKrO4OKBomrkNzJIMJWIjvJ45WPhdvQtZJPkHfQGufd1sJLwVEe9a4h3d87Ps3LwtBuu/cFszCjEiQH9Qv7TFee
-X-Gm-Message-State: AOJu0YyOGNmh42U2coHXlvZMnOewGID/2uqSquuYCprQ1PNZC6mIaMJ2
-	8Ge7hDhcZ2DshJaI2keNawfwiCAqC+hruXBPDWlXt+Gd97Np6C/6GTqfxdGn4zisEt0OxW7bzDE
-	xPg==
-X-Google-Smtp-Source: AGHT+IEQAgGUUiNs9ueiQI8ezbZWTyayde6E7x9Utw9Z6xDB+xZmpi54Evri6lqVD4w6PL4czEL0J1Y+26c=
+        bh=zDm0nic8Bf4ROxi6HvrqFLQrZg3PZkT7VQQx+aQhnBY=;
+        b=HUY/XxHkL5kqzVLY8obIop8//Jc0nx8yVAYFZmkjUrtMEedeF2ymza0IbK/8XbrDKj
+         Qb4jL86VDfz4rDa0fHQ9/J3VrhxR5lUg0QM+9Begf+wS3IBw/GMTgX/HJG7qUUI5UZwv
+         sij1zwpVlzoWYSWkso3Lq/b8nXMGtFKNjl/hHTupcryVA+SmPySoXIOs9ErdMP+hRFLO
+         faeDzglZPl6DmPFo5M0rO1FI945I/sx1ykcvVBgpDobFc2gNqvFxfhq9woi2SBRDIxEA
+         rXfm0LvItOiVNjKaV+wuVHsYICLRHZz0PW/1gX0Q9+PMh3t8MGs7Th7kiyIa+DTdODpo
+         lfgA==
+X-Forwarded-Encrypted: i=1; AJvYcCXXsVHABmpNEaEluzPXCewNSJ6JLnzd9iidAhasilPEi/n64aTpOyAO2O6CQjQ2CoIn0ZvqGW2GBVxa0B2LF0QPUl3C
+X-Gm-Message-State: AOJu0YxMmU6NHtHZHv/u7QQksyKqUjQkVRoHKbnnsoQ+rCbz5PNERTMi
+	yUIb6/j/Klx/0rYPr8seJF5Gx8GZAzzvgHdXURkxy37flD0fvcTc18jJrEnyasCFf2ZsRte7o3j
+	jjA==
+X-Google-Smtp-Source: AGHT+IHEV9Hww+r9vbzxSYmAo5y0EjAd48qQLH6oEVfcJ7yZe2szu31qLFICvdM4H82xlI8amm0za/20DLw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:b8f:b0:6ea:baf6:57a3 with SMTP id
- d2e1a72fcca58-6f49c464c18mr445b3a.6.1715098903272; Tue, 07 May 2024 09:21:43
+ (user=seanjc job=sendgmr) by 2002:a25:44:0:b0:dc2:466a:23c4 with SMTP id
+ 3f1490d57ef6-debb9d86d55mr29973276.4.1715099060476; Tue, 07 May 2024 09:24:20
  -0700 (PDT)
-Date: Tue, 7 May 2024 09:21:41 -0700
-In-Reply-To: <ee8c0227816d546a0a02f3db9519d289d3e275b0.camel@intel.com>
+Date: Tue, 7 May 2024 09:24:18 -0700
+In-Reply-To: <0ddb198c9a8ae72519c3f7847089d84a8de4821f.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <7856925dde37b841568619e41070ea6fd2ff1bbb.camel@intel.com>
- <ZirNfel6-9RcusQC@google.com> <5bde4c96c26c6af1699f1922ea176daac61ab279.camel@intel.com>
- <Zire2UuF9lR2cmnQ@google.com> <f01c6dc3087161353331538732edc4c5715b49ed.camel@intel.com>
- <ZirnOf10fJh3vWJ-@google.com> <3a3d4ef275e0b98149be3831c15b8233bd32c6ea.camel@intel.com>
- <322e67ab6e965a70a7365da441179a7fa65f2314.camel@intel.com>
- <Zjo5QBVXjO2/wLE6@chao-email> <ee8c0227816d546a0a02f3db9519d289d3e275b0.camel@intel.com>
-Message-ID: <ZjpVFa0vUMitP2wF@google.com>
-Subject: Re: [RFC] TDX module configurability of 0x80000008
+References: <Zh7KrSwJXu-odQpN@google.com> <900fc6f75b3704780ac16c90ace23b2f465bb689.camel@intel.com>
+ <Zh_exbWc90khzmYm@google.com> <2383a1e9-ba2b-470f-8807-5f5f2528c7ad@intel.com>
+ <ZiBc13qU6P3OBn7w@google.com> <5ffd4052-4735-449a-9bee-f42563add778@intel.com>
+ <ZiEulnEr4TiYQxsB@google.com> <22b19d11-056c-402b-ac19-a389000d6339@intel.com>
+ <ZiKoqMk-wZKdiar9@google.com> <0ddb198c9a8ae72519c3f7847089d84a8de4821f.camel@intel.com>
+Message-ID: <ZjpVslp5M0JJbPrB@google.com>
+Subject: Re: [PATCH v19 023/130] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
 From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Chao Gao <chao.gao@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>, 
+	Bo2 Chen <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Erdem Aktas <erdemaktas@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, May 07, 2024, Rick P Edgecombe wrote:
-> On Tue, 2024-05-07 at 22:22 +0800, Chao Gao wrote:
-> > > 2. There was some concern that exposing non-zero bits in [23:16] could
-> > > confuse existing TDs. Of course KVM doesn't support any TDs today, but if
-> > > this feature comes after initial KVM support for TDX and KVM wants to set
-> > > it by default, then it could be an issue.
+On Tue, May 07, 2024, Kai Huang wrote:
+> > > So I think we have consensus to go with the approach that shows in your
+> > > second diff -- that is to always enable virtualization during module loading
+> > > for all other ARCHs other than x86, for which we only always enables
+> > > virtualization during module loading for TDX.
 > > 
-> > Do you mean some TDs may assert that [23:16] are 0s? A future-proof design
-> > won't have this assertion. And this case (i.e., some CPUID bits become non-
-> > zero) happens on every new generation of CPUs and doesn't confuse existing
-> > OSes. I don't understand why it would be a problem for TDs.
+> > Assuming the other arch maintainers are ok with that approach.  If waiting until
+> > a VM is created is desirable for other architectures, then we'll need to figure
+> > out a plan b.  E.g. KVM arm64 doesn't support being built as a module, so enabling
+> > hardware during initialization would mean virtualization is enabled for any kernel
+> > that is built with CONFIG_KVM=y.
+> > 
+> > Actually, duh.  There's absolutely no reason to force other architectures to
+> > choose when to enable virtualization.  As evidenced by the massaging to have x86
+> > keep enabling virtualization on-demand for !TDX, the cleanups don't come from
+> > enabling virtualization during module load, they come from registering cpuup and
+> > syscore ops when virtualization is enabled.
+> > 
+> > I.e. we can keep kvm_usage_count in common code, and just do exactly what I
+> > proposed for kvm_x86_enable_virtualization().
+> > 
+> > I have patches to do this, and initial testing suggests they aren't wildly
+> > broken.  I'll post them soon-ish, assuming nothing pops up in testing.  They are
+> > clean enough that they can land in advance of TDX, e.g. in kvm-coco-queue even
+> > before other architectures verify I didn't break them.
+> > 
 > 
-> Intel defined these as reserved. AMD defined them for guest MAXPA. So, yes, OSs
-> should be masking them. I'm not suggesting that any are not, but TDX module
-> folks were concerned about this, and that then KVM would not be able to turn
-> this on later without breaking them. So just circling back here to double check.
+> Hi Sean,
+> 
+> Just want to check with you what is your plan on this?
+> 
+> Please feel free to let me know if there's anything that I can help. 
 
-I'm with Chao, a kernel/firmware implementation that asserts some CPUID bits that
-are currently reserved on _some_ CPUs are always zero deserves to be broken.
+Ah shoot, I posted patches[*] but managed to forget to Cc any of the TDX folks.
+Sorry :-/
+
+[*] https://lore.kernel.org/all/20240425233951.3344485-1-seanjc@google.com
 
