@@ -1,114 +1,149 @@
-Return-Path: <kvm+bounces-16896-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16897-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C5A8BEA21
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:12:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19B608BEA65
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:21:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494391F23D7C
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:12:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2ED11F25704
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D81157A41;
-	Tue,  7 May 2024 17:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B6D16C690;
+	Tue,  7 May 2024 17:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O8T3i7rc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WgyruFN2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263083F9E8
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 17:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485848F72
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 17:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715101921; cv=none; b=ujjV2j0he7NfxnZgorv3TgSumsVBhPMhyiBGfbMLiSVcJXh9GrsLu1PTPN/kGIjx4yB8xWV8/79LG9UPS4nN8cQgFmLNSzGfla3LFLhhPt8z5jZIqx+UUVjiZw5q1ThynN9QALPGOJKxzjmpoOLZJZnzwCkHqE3ql6I8xoXK8uw=
+	t=1715102467; cv=none; b=FgKtrfCdPZ25AEftyNTa3NAkP15gxSIk5C6mEQcuERsW6TJwb2Bd2CJEYE/LRpedE3e7fI3a9aAUtk7uYsu20iCWZUqv4QB4z3tLUChEzvkQy9C15Emg1BSP5Ucj97vB6QsCZCCjK0pjPwaRMEom5Qh6sRsEPiwlwfO8IegksIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715101921; c=relaxed/simple;
-	bh=7OSkgP5+kPRPnXz92hms6Q0kbyy8WDX+cILm9CSvN1M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=GzJ26BAmQl+nE+97fX8XeenZFEYiz44CnOJAPCEjJ1e5o26uD2SZinOGoSpYjk2EhdP0pd1kpGckx3jGbndKyUdTYvc8R2TT3r6yynD5BNxSjJN1Aj8rKsugexXRnb91lx5gvZtjDIskW7RagONeKg40O6qG6DaUfdkUs77evy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O8T3i7rc; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6292562bac4so2428186a12.1
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 10:11:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715101919; x=1715706719; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jNWTjRHNzguG/ECX3sxXEdtUovfHpdLwJgS1SRLByzU=;
-        b=O8T3i7rc+RkWnSrCk9mcubuP5KVcymafCfpjL9wB9fVo2xZUtppD1OoH4gLp0OhTWR
-         F6920V715+PLHJRNsnFP/QtSEwlP+q4UGoUHnKSwLWdQcSZDFZHNVOaPc2wk4AbPHsIe
-         1NnLCMZ8PDrKClv7fYa85u2d66KbnMmpN++J9V1A/G+gBeWWQENaiJxWj+xqUvN+rCdC
-         0DZImk2eBk65/vwqdYl4Yvp3BOvPy3rY7owIRle3YUpr67eEeZA73brIFfcMw1YJQw00
-         zEMrgYIIQk5syCcCr0XDmeHUvqDIuZeI7UK8nzbtQHKVu4C6aIDlJw3cnZZfD5KXV/Lh
-         vXSA==
+	s=arc-20240116; t=1715102467; c=relaxed/simple;
+	bh=Td1SHhWq6Wvpr0je4B4v22NIo5BXgO45S9j6dXvvWc0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IV7I/3DmwuOQ3GoHR39Me7u/CUQRkjtc3j6pM3RnXSYhFBX0GFk3J+S729FzIaAJw/0cY/I2WPeELT1iwylbX9K+3op7wQou959q8GQqN45/r4a2yq2S64ESHa4XDOC96bNqvNBU9XQebz0Ytqv4F5wUgOY9Llu0R9cTpcS9FLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WgyruFN2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715102465;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zvToZ7WqfcgMTwXbVfEgk8KX+0yA+ouGzL56lXRGL64=;
+	b=WgyruFN2NabItYQyDsYcOgZyBMM82U4RMCMojAXSj4761U8E2UUUovRsn2PvDipKaoeLtJ
+	ZUlPALYeuBNiUIlt7WZkVxdHng8trUfHnwoAdXhfieNpd/4I1Li+wziZNdD+Ynw88oPcpp
+	oZTR2tAWl43OMJlWpmbIu5M2z5eb3qM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-488-7kVL5xRCM0y_CwRCWjuGIg-1; Tue, 07 May 2024 13:21:03 -0400
+X-MC-Unique: 7kVL5xRCM0y_CwRCWjuGIg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-34d99cc6c3dso2065789f8f.3
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 10:21:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715101919; x=1715706719;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=jNWTjRHNzguG/ECX3sxXEdtUovfHpdLwJgS1SRLByzU=;
-        b=fW8rW9UZMauXsqvak7fseCp10Z3y5XDbArYmebfHJcOxr24nCYPV8J7E/3H5ZNaYcZ
-         c7I0x/uzvVGojRiC1IHhBt3S+UPPPlEJveg4Wy49a81ABr25vKGyvcR9gU1s2l2Ozihf
-         CA0hOd0udtTgv2HISYlklv/DCmhgYfpx3pYEc4hNKVnEi3j3OAGaIA2MwGS26I9I7Mio
-         S15O3dd+XT614GBMQ8BocQ9s35lKCkKX4zsyZ1j4CVVSq0/uJ/kkoYk902olee51oayt
-         /TBT6834q8wjhvhRv4xmRbFWvNL20BNKvyRgSr1y2End0H2xx2DGh9r5MXkFpjh0k5p9
-         2lkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPPpraKYPLaf2y/WmIuY/XbiTLDpzekCU6f4XYbF5oxuadysZKdnHUjEpiw8oumFHtBXF9U2pesx57/vveVDIw/Eqw
-X-Gm-Message-State: AOJu0YyOYPf6IngVFUw6G91ZioZFN65Du2BhWfMV72n65vsgLlV5lJmc
-	QcbEVGqMaC8L1TOHI1pyzZh56NHqMPGdNrnFK+5kWQomycwALv38W/IT74SIsoPkzlHtQmkwzhD
-	nkw==
-X-Google-Smtp-Source: AGHT+IGXYTNhE4o6Jz4a9tofzokKuMCJots4ro+a/npTiGMlkU1K2gSt900bsifAeL/u4yulw2hSE1dwe40=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6d0c:0:b0:5f7:651b:fed8 with SMTP id
- 41be03b00d2f7-62f295deabemr1389a12.12.1715101919434; Tue, 07 May 2024
- 10:11:59 -0700 (PDT)
-Date: Tue, 7 May 2024 10:11:57 -0700
-In-Reply-To: <6e0dc5f2-169e-4277-b7fe-e69234ccc1fd@intel.com>
+        d=1e100.net; s=20230601; t=1715102462; x=1715707262;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zvToZ7WqfcgMTwXbVfEgk8KX+0yA+ouGzL56lXRGL64=;
+        b=gilVQYl7afU5B2C57McRDDHgdAMayNw9L0PRBvuePZjxrivUitY3Nd3DbEGAp//TEq
+         zXyMgC7/lC3od5UKveQT1g59Szgvq2CO8VWZaCM64kE5jbPhIMb/lo9B4EtaD+3y9NBD
+         F43Hb6bjBEvxJ4WbyK8D6zuspy5p1YJu2SynHDNo9VXeXcO4k7SvQ3DNcHqSxQsOY/Ex
+         lRckF2So3gTEVcmLnf3rpCT2FL+1Ed9DZ4MeavhgJ8R4hBa1SpHQBI2xnEuXINWD5D0X
+         Dcbss3lsnVkttuufYYc93H/V8iO1eHAeLFHA4H21N1qdBrvx+2nDh5Nil4v/Y0b2Hctl
+         OeMw==
+X-Forwarded-Encrypted: i=1; AJvYcCW//Sd3el2Y+uAXFOfZ4Gpvyqrif8od20/uC8FUdK/0aM8fZUrf5/3/wMsQ2jloq0B0iWt8Inv4bjUNApS8JSh6tZ3t
+X-Gm-Message-State: AOJu0YyRLBzcwmfTTiHk7TzIRpgcARoJkmpB4GzcCRU9kVvD1vZQ9bks
+	2K6bC0TZhTlsTKJ1V2q5Csgz2jZ8qxuA4xPJBPqtQJ86PFjCJvBBAZSIv59uTh2+mqOmlG0v6Ln
+	N9cL9DFBmgFu9hos+zaGIQlxP5M1J3DYPHSLloYXf7sa/i9pejkoC6ECeJfiudfxH5rrfl2pwSq
+	FGtgFNDyb0iTchaPMHImKHLzIl
+X-Received: by 2002:adf:ebcf:0:b0:34d:b243:5415 with SMTP id ffacd0b85a97d-34fcb3abdd8mr272810f8f.70.1715102462533;
+        Tue, 07 May 2024 10:21:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUEYCOfnDHy/EIoxjKGa949EaCj1vuoCQ08bvHLYnStorLuvGOeo1MfLxqAif12vjZfI5TzpEebQUV0rf5pgA=
+X-Received: by 2002:adf:ebcf:0:b0:34d:b243:5415 with SMTP id
+ ffacd0b85a97d-34fcb3abdd8mr272797f8f.70.1715102462154; Tue, 07 May 2024
+ 10:21:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <f9f1da5dc94ad6b776490008dceee5963b451cda.camel@intel.com> <6e0dc5f2-169e-4277-b7fe-e69234ccc1fd@intel.com>
-Message-ID: <Zjpg3dhf0mWetkSE@google.com>
-Subject: Re: [RFC] TDX module configurability of 0x80000008
-From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20240423165328.2853870-1-seanjc@google.com> <4a66f882-12bf-4a07-a80a-a1600e89a103@intel.com>
+ <ZippEkpjrEsGh5mj@google.com> <7f3001de041334b5c196b5436680473786a21816.camel@intel.com>
+ <ZivMkK5PJbCQXnw2@google.com> <514f75b3-a2c5-4e8f-a98a-1ec54acb10bc@intel.com>
+ <Zi_DNaC4FIIr7bRP@google.com>
+In-Reply-To: <Zi_DNaC4FIIr7bRP@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 7 May 2024 19:20:51 +0200
+Message-ID: <CABgObfYvkT39Msd11uJMZMquOsvNKBa=Z548JQZGfOmCF=TPaA@mail.gmail.com>
+Subject: Re: [PATCH 0/3] KVM: x86: Fix supported VM_TYPES caps
+To: Sean Christopherson <seanjc@google.com>
+Cc: Kai Huang <kai.huang@intel.com>, Xiaoyao Li <xiaoyao.li@intel.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 08, 2024, Xiaoyao Li wrote:
-> On 4/25/2024 12:55 AM, Edgecombe, Rick P wrote:
-> > One of the TDX module features is called MAXPA_VIRT. In short, it is si=
-milar to
-> > KVM=E2=80=99s allow_smaller_maxphyaddr. It requires an explicit opt-in =
-by the VMM, and
-> > allows a TD=E2=80=99s 0x80000008.EAX[7:0] to be configured by the VMM. =
-Accesses to
-> > physical addresses above the specified value by the TD will cause the T=
-DX module
-> > to inject a mostly correct #PF with the RSVD error code set. It has to =
-deal with
-> > the same problems as allow_smaller_maxphyaddr for correctly setting the=
- RSVD
-> > bit. I wasn=E2=80=99t thinking to push this feature for KVM due the mov=
-ement away from
-> > allow_smaller_maxphyaddr and towards 0x80000008.EAX[23:16].
-> >=20
->=20
-> I would like to get your opinion of the MAXPA_VIRT feature of TDX. What i=
-s
-> likely the KVM's decision on it? Won't support it due to it has the same
-> limitation of allow_smaller_maxphyaddr?
+On Mon, Apr 29, 2024 at 5:56=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+> > Perhaps we can make the kvm.ko as a dummy module which only keeps the m=
+odule
+> > parameters for backward compatibility?
+>
+> Keeping parameters in a dummy kvm.ko would largely defeat the purpose of =
+linking
+> everything into vendor modules, i.e. would make it possible for the param=
+eters to
+> hold a stale value.
 
-Not supporting MAXPA_VIRT has my vote.  I'm of the opinion that allow_small=
-er_maxphyaddr
-should die a horrible, fiery death :-)
+We have the following read-write params:
+
+parm:           nx_huge_pages:bool
+parm:           nx_huge_pages_recovery_ratio:uint
+parm:           nx_huge_pages_recovery_period_ms:uint
+parm:           flush_on_reuse:bool
+parm:           ignore_msrs:bool
+parm:           report_ignored_msrs:bool
+parm:           min_timer_period_us:uint
+parm:           tsc_tolerance_ppm:uint
+parm:           lapic_timer_advance_ns:int
+parm:           force_emulation_prefix:int
+parm:           pi_inject_timer:bint
+parm:           eager_page_split:bool
+parm:           halt_poll_ns:uint
+parm:           halt_poll_ns_grow:uint
+parm:           halt_poll_ns_grow_start:uint
+parm:           halt_poll_ns_shrink:uint
+
+Vendor modules do not muck with them (the only one that is exported is
+report_ignored_msrs for which permanency is obviously harmless).
+
+And the following read-only params:
+
+parm:           tdp_mmu:bool
+parm:           mmio_caching:bool
+parm:           kvmclock_periodic_sync:bool
+parm:           vector_hashing:bool
+parm:           enable_vmware_backdoor:bool
+parm:           enable_pmu:bool
+parm:           mitigate_smt_rsb:bool
+
+The only really bad one is tdp_mmu, which can change depending on the
+ept/npt parameters of kvm-intel/kvm-amd; everything else is okay to
+have in a common module.
+
+mitigate_smt_rsb could (should?) move to kvm-amd.ko if the modules
+were unified with kvm.ko as a dummy one.
+
+Paolo
+
 
