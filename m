@@ -1,162 +1,177 @@
-Return-Path: <kvm+bounces-16944-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16945-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8ED0D8BF2C7
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 01:58:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70A458BF2EE
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 02:02:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40BB72821CF
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 23:58:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27852280DAE
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 00:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D541A2C3C;
-	Tue,  7 May 2024 23:17:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856A412E1F1;
+	Tue,  7 May 2024 23:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PtiqjXJs"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="YSKyRV2q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0ABD1A2C2C;
-	Tue,  7 May 2024 23:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0005812BF28
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 23:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715123833; cv=none; b=KO+tinD8Sb7pQYISrA9YaO6Meb+sOEKuY5VtMYgH0ZiJ4D7vxMmyNBNT47eGPzAj/WX4AddO+AG4ZwcTXnuIpVzP3hQdlP1Obp5cWW1bncxt6ck4O3Pf/hP9b6lENhCIDrp+YnLQU2rsnG37cAng7/B/RQrw5TaqugWLcygabbc=
+	t=1715124538; cv=none; b=VzSkOwR76ssxJROY55bj3bYR7fPo0vA2vS3tSvJiNSygOmqQtZxa1soVRmMW72tZ6NJGQ3oHjl6JhBgs/zkAUwgefm1sFMqHVjHZ5deHKY9TKYAMQiVgwBMQ/Qc3WXRkNdg1seJ5xsChDoi24o/+fiBOboIcMku9WG9z/lsqmZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715123833; c=relaxed/simple;
-	bh=B5sed5cD0tFGfPPl8ZuyN1Mtoj9J0cyirngFnFvehDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MJwV3DbxGOIfnWzrXCDHm48+apoO2h8cLo7hoDDxo/Fj2YRS0+TdRCRpcNcB3YC9eVPs3DEJ/EOBFPQ8wd0I0pdSGy0E/5VcXsB4PMGwCuLWIXioJa94CM79qNjdk6Vdsw/IlZ4BauKVm7xDJKkUxWvUVMNZOaCzgf4xbTapQ0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PtiqjXJs; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715123832; x=1746659832;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=B5sed5cD0tFGfPPl8ZuyN1Mtoj9J0cyirngFnFvehDY=;
-  b=PtiqjXJs/0JIAHWHlbelLk4vGMjue7shVk+Wo4zW20nvcgJpjs4skYly
-   PrB5R/4LQA6sJsYeA1jmD4rKfgAGqJj9qis1shTuWEZO7SQXR35RxjZcA
-   F2e5xV6Su2v0k+fG1L7fVYpjsUFRlnFgUb9loTpqdw23nsfp7a1S6oQ3o
-   8WP6ScCdkMcGw07o+RiMttL6zw/aaKYdNQIhCKORPAR0JVNFcH4q/vcms
-   tYhF3Y7iPwJJAkgpFgLsM2jBp1//pX/THJPlNRUtvxIjpj3FHUT4OInOU
-   jQlkSU9nObJF42bCxX8MPg4hG07HQ6aoWFfyH6dldN72chch539edKpe6
-   g==;
-X-CSE-ConnectionGUID: 0aQWMACETtukRh5XduQpwA==
-X-CSE-MsgGUID: TFFCACrmRTOTQaXy0yOJsw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="10824388"
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="10824388"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 16:17:11 -0700
-X-CSE-ConnectionGUID: lyEAteqBTdexIi7z6YFrRw==
-X-CSE-MsgGUID: 2DuMD2hdQuGn3kmMuqF0sA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="28780835"
-Received: from vidhyath-mobl2.amr.corp.intel.com (HELO [10.212.210.63]) ([10.212.210.63])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 16:17:11 -0700
-Message-ID: <1159c4e1-dae6-462a-8e34-6f74be4c83b3@intel.com>
-Date: Tue, 7 May 2024 16:17:09 -0700
+	s=arc-20240116; t=1715124538; c=relaxed/simple;
+	bh=JX0XCKXr1thgDPxaTecjtKr6rIsRQAHKTIazy9OBhDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k4yBHDs6P7kPHfw9T1OXGL2yrYd5KAf658bdT+Ft5Vr8AevBjSOGpyWgd62iizj0zzOA/X8/qTBq4RA3poGdjQHDzSu7CeVoiOKxzsP9cOn9z1oi2CcZnD9eIIBrlxaGMDZaPanfDun3bj8VqiMgd+dEaeQgxS7FChFMNRNM2Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=YSKyRV2q; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-5e4f79007ffso2533377a12.2
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 16:28:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1715124534; x=1715729334; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Tt8XgRQm+eA+VmBxGqEcvvy66oE9R2AfbLeL3WkCPuU=;
+        b=YSKyRV2qjy0ljrYgd0U6Ch3uzgizQZe+4pSJYHsZSP01gcra909Tiz1I1roMahHF4f
+         R02+dz1KaKB4os+ZuM06R3OW4OuuE5O+jtzs5QpwOMbe9ciAbxWjG0HBoTz/GjMb/HTS
+         JZzkAPMzRCPpiJPnaz9ioUHMig2uiUqQfpOOs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715124534; x=1715729334;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tt8XgRQm+eA+VmBxGqEcvvy66oE9R2AfbLeL3WkCPuU=;
+        b=YUrG/c33jSiYRxhbR2fOUr+PpbzFt0axnF2ScFkRvuNrP/4rWa48JLy9Iz0Pv3p+YG
+         M87bKWDBWQSBJuHO5nfl6SZkjpy/Z1nOgG/oIM18/vEKstgf5EQqUgLFsU31Cw1PgOd5
+         sRW846UfmLsmkZe/0gvzV2L3zUgivcc9EuEo2USwPFQUL6hdd2BrvTV1G5fQVcqPTC5t
+         GRJMfe44VAnI/ppiXFVRrtBqQtM2G5iS0S8KrLXtReO1SQOiCghU/uKHG+z0h5kbm+RL
+         EzpbAT33AP/rQZTltWEQrHxMhqxelswbTp2RuAyJnjVswBdddotEEK0jLHUvykri8kzP
+         Dn8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUPd3kW3z+0rRUNmA6Qo9jQW5GKlDc6+bWN/e1RO0fyCif04UgONMoJVQosfiGFcscWa1FGqybVPRGDJsiUlwr/9uQa
+X-Gm-Message-State: AOJu0YzDWxKDHlMekbuRMfPAKy48a8o2vQ9AEhgVOXzov5Y9jnjcHODo
+	gFeoZYeior9BQbrnqxe1vCT1sm41zNOWZJiryv/vjRZrsn7n4oQANbK6CS+kzA==
+X-Google-Smtp-Source: AGHT+IElkYKkPF9F5WlZiOfJXRbgeCSMUqbJ3Z1JrZ5HzzcuDvdHCUlR3LVeoTae63dQgTdtTlamYA==
+X-Received: by 2002:a05:6a20:9f88:b0:1ad:6c5:4ea1 with SMTP id adf61e73a8af0-1afc8db5479mr1525582637.41.1715124534335;
+        Tue, 07 May 2024 16:28:54 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id 60-20020a17090a09c200b002b624b0161fsm80422pjo.19.2024.05.07.16.28.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 16:28:53 -0700 (PDT)
+Date: Tue, 7 May 2024 16:28:53 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Edward Liaw <edliaw@google.com>
+Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Eric Biederman <ebiederm@xmission.com>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	=?iso-8859-1?Q?Andr=E9?= Almeida <andrealmeid@igalia.com>,
+	Jiri Kosina <jikos@kernel.org>,
+	Benjamin Tissoires <bentiss@kernel.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+	Andy Lutomirski <luto@amacapital.net>,
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Seth Forshee <sforshee@kernel.org>,
+	Bongsu Jeon <bongsu.jeon@samsung.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kernel-team@android.com, linux-sound@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+	linux-input@vger.kernel.org, iommu@lists.linux.dev,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-security-module@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+Message-ID: <202405071628.7F8C3EC@keescook>
+References: <20240507214254.2787305-1-edliaw@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 04/27] x86/fpu/xstate: Introduce
- XFEATURE_MASK_KERNEL_DYNAMIC xfeature set
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yang Weijiang <weijiang.yang@intel.com>, pbonzini@redhat.com,
- x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- peterz@infradead.org, chao.gao@intel.com, rick.p.edgecombe@intel.com,
- mlevitsk@redhat.com, john.allen@amd.com
-References: <20240219074733.122080-1-weijiang.yang@intel.com>
- <20240219074733.122080-5-weijiang.yang@intel.com>
- <ZjKNxt1Sq71DI0K8@google.com>
- <893ac578-baaf-4f4f-96ee-e012dfc073a8@intel.com>
- <Zjqx8-ZPyB--6Eys@google.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <Zjqx8-ZPyB--6Eys@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
 
-On 5/7/24 15:57, Sean Christopherson wrote:
->> So I still prefer calling it "KERNEL" over "GUEST".  But I also don't
->> feel strongly about it and I've said my peace.  I won't NAK it one way
->> or the other.
-> I assume you mean "DYNAMIC" over "GUEST"?  I'm ok with DYNAMIC, reflecting the
-> impact on each buffer makes sense.
-
-Yes.  Silly thinko/typo on my part.
-
-> My one request would be to change the WARN in os_xsave() to fire on CET_KERNEL,
-> not KERNEL_DYNAMIC, because it's specifically CET_KERNEL that is guest-only.
-> Future dynamic xfeatures could be guest-only, but they could also be dynamic for
-> some completely different reason.  That was my other hang-up with "DYNAMIC";
-> as-is, os_xsave() implies that it really truly is GUEST_ONLY.
+On Tue, May 07, 2024 at 09:38:25PM +0000, Edward Liaw wrote:
+> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> asprintf into kselftest_harness.h, which is a GNU extension and needs
+> _GNU_SOURCE to either be defined prior to including headers or with the
+> -D_GNU_SOURCE flag passed to the compiler.
 > 
-> diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
-> index 83ebf1e1cbb4..2a1ff49ccfd5 100644
-> --- a/arch/x86/kernel/fpu/xstate.h
-> +++ b/arch/x86/kernel/fpu/xstate.h
-> @@ -185,8 +185,7 @@ static inline void os_xsave(struct fpstate *fpstate)
->         WARN_ON_FPU(!alternatives_patched);
->         xfd_validate_state(fpstate, mask, false);
->  
-> -       WARN_ON_FPU(!fpstate->is_guest &&
-> -                   (mask & XFEATURE_MASK_KERNEL_DYNAMIC));
-> +       WARN_ON_FPU(!fpstate->is_guest && (mask & XFEATURE_MASK_CET_KERNEL));
->  
->         XSTATE_XSAVE(&fpstate->regs.xsave, lmask, hmask, err);
+> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
+> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+> location.  Remove #define _GNU_SOURCE from source code to resolve
+> redefinition warnings.
+> 
+> Edward Liaw (5):
+>   selftests: Compile kselftest headers with -D_GNU_SOURCE
+>   selftests/sgx: Include KHDR_INCLUDES in Makefile
+>   selftests: Include KHDR_INCLUDES in Makefile
+>   selftests: Drop define _GNU_SOURCE
+>   selftests: Drop duplicate -D_GNU_SOURCE
 
-Yeah, that would make a lot of sense.  We could add a more generic
-#define for it later if another feature gets added like this.
+It's a lot of churn, but I don't see a way to do it differently. :)
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+-- 
+Kees Cook
 
