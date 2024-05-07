@@ -1,161 +1,137 @@
-Return-Path: <kvm+bounces-16825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A2518BE1BD
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 14:12:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8008E8BE21B
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 14:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38C6228479F
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 12:12:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3702F28AF96
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 12:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D672156F37;
-	Tue,  7 May 2024 12:12:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D752F15ADB8;
+	Tue,  7 May 2024 12:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BdaVbSEv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="P3VLFPrP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84A6152526
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 12:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFD8156F39;
+	Tue,  7 May 2024 12:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715083933; cv=none; b=XHsqiK49KJJysvtfR7l2jz11hpnNwDe5RWCRTS1bsR1HmIYlIbKGy0F/GYf/FzaxFCOyE70hITeZ7PGPyGJ+0mgv+BDXswhSxU/K5/zU17QvViDsyqJ5J3gkYcQIBwG4SZlxMrSMBrcMjSnF42e1ZLcseQ7VslW80lnP4UK3f2s=
+	t=1715084996; cv=none; b=rfYcbuJ52etKl5BlI18HER1XOlXRh4aSLhChKDuqMfAAZpcgigG9wZU8lEN73bqzGF4EZt3Y/RKzaoCFP7/Nsk9UMO1s6p/khPzQ20lEzjAmsSKT5rorUUq8bZGjM9BwZjQ6g9UWXQ7UYrY9A26kpHjKkojXhqqCSYDlXEytZC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715083933; c=relaxed/simple;
-	bh=Dm7BMCqISXd2ReMkwouRU7WnBhcSYa6TYWJVoX3yX0c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=irCow2w8jzp2Skn4j7yCCEq5hUQu05lBT32d3eAX1j1zLc4yNJoREoG9COkg+cbtbYqzzJqS2seNj3RGXTAQbq0gk18bJ0gMN8kDktyjdCeIvTKebFEESHH2TWEkcc3PQJb0fY1q1UrlJ0XOjCS0TTNqLR/jiQLkEl+W32RY7r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BdaVbSEv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715083930;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=S/Rt/oXApoYK9IP8vZV0dgBdJum8ffeGB8fzTzIwuIQ=;
-	b=BdaVbSEvJHMVkErZfPwDbkUWG36AT9LlxDXLKykVTuoiuSTc1R64VvwH6m7ZJ05inYq74q
-	wiOpWJmtaivYvFxeCg6oONAiOQ9vUkzjeESwanJ97gobVMX6h6BpQp9YNumItoRgcanzCU
-	n8TWW1wromstFDpqxi4nz9IFE+cdDoQ=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-92-x1ayAd_OMa60yPnqVEFcWg-1; Tue, 07 May 2024 08:12:08 -0400
-X-MC-Unique: x1ayAd_OMa60yPnqVEFcWg-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-43d3072072cso36944391cf.3
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 05:12:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715083928; x=1715688728;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S/Rt/oXApoYK9IP8vZV0dgBdJum8ffeGB8fzTzIwuIQ=;
-        b=ZFlN6jqQ5Dlbz6BpgvbLQmhGqunYKiHGTu5aSOnWPWdz9ShkGaPwZJz+9SRO8ROfEz
-         oP+tCkk/d9+MCOh1fnTc3xKz6R8fC9oGTpBTy9EtFtEm3nEnRPqCH3b7EHsnFAzkYiyZ
-         TbKd2zGBYZer0hh4DMfK0/quSLzUheVoDmWugkFco2vNP80f+FvwkV8eZrOIznBuhr/J
-         H5JHm1km8w7+ioCiPUXIS2/SzZf01H71HvYMmPTV+FmnEum9ZHEYU46U47yZUwKBiq7h
-         f8zBaFr/nz8HH7U6wH4W4c41fqqldIUbDx1eUwBfS4wItn4MJodwn7Iw8q5iF7ImRL+N
-         zzMg==
-X-Forwarded-Encrypted: i=1; AJvYcCWOQ9NnIStuSOTQGgdXq8XSS+02OiYN3B/O8KMT9eCuIKjxqbouimy0PuSCWYdFyglE/Gi4HmTeo3d/asrVKmi/Zdt+
-X-Gm-Message-State: AOJu0YzApVQ250Il+ZtqOCrWN9T99XJ0/zaL8SUk2LisaND+NOETQvVv
-	YwhejyzZGvo4kvYd2kmhv7ccZ8SICev5QOzB+u53X6c5ZsKhxfaQ3CWi/h6qE4GiFqOKyDZz3IM
-	jHSG3xgvTJlbvHghGrGknzv1RFy+5t7sNZCxIv1GpcH92re7pTw==
-X-Received: by 2002:ac8:5981:0:b0:43a:f577:ea0e with SMTP id e1-20020ac85981000000b0043af577ea0emr16270080qte.47.1715083927890;
-        Tue, 07 May 2024 05:12:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/yP6bwlMLnw6uz4Cw+ijC7SOgK2UxZaa1PcaL8Md2gPm+ER9vgzABsQYNLXRCjlkuXORSCw==
-X-Received: by 2002:ac8:5981:0:b0:43a:f577:ea0e with SMTP id e1-20020ac85981000000b0043af577ea0emr16270060qte.47.1715083927546;
-        Tue, 07 May 2024 05:12:07 -0700 (PDT)
-Received: from [192.168.0.9] (ip-109-40-241-109.web.vodafone.de. [109.40.241.109])
-        by smtp.gmail.com with ESMTPSA id f9-20020ac84989000000b0043d7b229014sm1629966qtq.77.2024.05.07.05.12.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 07 May 2024 05:12:07 -0700 (PDT)
-Message-ID: <1125bbbe-9af0-4d0b-b841-4e0506670acc@redhat.com>
-Date: Tue, 7 May 2024 14:12:04 +0200
+	s=arc-20240116; t=1715084996; c=relaxed/simple;
+	bh=39cF6JGV0KEK1SNEEBenCELE44m5KE8iw8HoplNrNQM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nTKADbLzVxpZ3FzoWE9i+dBRCaZaM6QyB0CEzl9mhzsQk0fMwqx97GcipYDskLNy5GgbP/irHQ+Mz/PObzM7xKlIty6Jhp8tqXG89mb9LG5+7EYKR3OGp/khkNGaecQWj6aDb31bOm6fxRCYAl0PzbB88yQiXE+X3e5ciOj5HzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=P3VLFPrP; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 447CRge6013539;
+	Tue, 7 May 2024 12:29:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=7IusaSmN/1TtKe36R2nh/qRwDIW4LW0JwQYzueBK42I=;
+ b=P3VLFPrP/vpNO6+9aJOezBplROwxuaePhS65oWHtjbEHeyxkaP7IW6/TNP5tekf48GiM
+ Tw1/R8u/j5suxMZ5cK+FvQ7WaCd42IP5hHcvM9GGGFEfYK1tDXh4CCV/dH0a+v71z/zR
+ l5+C0qbeOAkvJuEocKtTYA8C1rz8l2AoxbX3gssfXrqoQjV2Kk9cZ4Iv+wyxEnGGpTGi
+ 8xcAKQmQg/zrfsbLD+StdSxQtvFFJPZh5QJnPcJf9AuVC1fRHNqCKLmGAgeQDcKTVetF
+ yrJguBHJdnQnvHLsr9FkoS5d5soVqHirj4p16Yy2qkS56lWB1cXGrkmeeDK/geZXAtqy kA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyman806x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 12:29:52 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 447CTqOo016875;
+	Tue, 7 May 2024 12:29:52 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xyman806v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 12:29:52 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 447AxTKI013859;
+	Tue, 7 May 2024 12:29:51 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx222wn02-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 12:29:51 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 447CTkWJ52953408
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 May 2024 12:29:48 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0C4F720040;
+	Tue,  7 May 2024 12:29:46 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AE3DC2004B;
+	Tue,  7 May 2024 12:29:45 +0000 (GMT)
+Received: from m83lp52.lnxne.boe (unknown [9.152.108.100])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  7 May 2024 12:29:45 +0000 (GMT)
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>
+Subject: [GIT PULL 0/1] KVM: s390: Fix for 6.9
+Date: Tue,  7 May 2024 14:29:44 +0200
+Message-ID: <20240507122945.2571-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.45.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Jg2c7kijo_C5zBP3x1goTu7KCFZWCqU_
+X-Proofpoint-ORIG-GUID: pX9Va7OW15gYY8IOBxEmquMjwGPj2RK5
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 12/31] powerpc: general interrupt tests
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
- <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
-References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-13-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240504122841.1177683-13-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-07_06,2024-05-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
+ suspectscore=0 mlxscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 mlxlogscore=671 phishscore=0
+ impostorscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2404010000 definitions=main-2405070086
 
-On 04/05/2024 14.28, Nicholas Piggin wrote:
-> Add basic testing of various kinds of interrupts, machine check,
-> page fault, illegal, decrementer, trace, syscall, etc.
-> 
-> This has a known failure on QEMU TCG pseries machines where MSR[ME]
-> can be incorrectly set to 0.
-> 
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->   lib/powerpc/asm/processor.h |   4 +
->   lib/powerpc/asm/reg.h       |  17 ++
->   lib/powerpc/setup.c         |  11 +
->   lib/ppc64/asm/ptrace.h      |  16 ++
->   powerpc/Makefile.common     |   3 +-
->   powerpc/interrupts.c        | 414 ++++++++++++++++++++++++++++++++++++
->   powerpc/unittests.cfg       |   3 +
->   7 files changed, 467 insertions(+), 1 deletion(-)
->   create mode 100644 powerpc/interrupts.c
+Paolo,
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+one fix for s390.
 
+The following changes since commit 16c20208b9c2fff73015ad4e609072feafbf81ad:
+
+  Merge tag 'kvmarm-fixes-6.9-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-04-30 13:50:55 -0400)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-6.9-1
+
+for you to fetch changes up to 175f2f5bcdfce9e728f1ff956a50f28824d28791:
+
+  KVM: s390: Check kvm pointer when testing KVM_CAP_S390_HPAGE_1M (2024-05-02 09:41:38 +0200)
+
+----------------------------------------------------------------
+KVM: s390: Fix for 6.9
+
+Fix wild read on capability check.
+
+----------------------------------------------------------------
+Jean-Philippe Brucker (1):
+      KVM: s390: Check kvm pointer when testing KVM_CAP_S390_HPAGE_1M
+
+ arch/s390/kvm/kvm-s390.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
