@@ -1,54 +1,82 @@
-Return-Path: <kvm+bounces-16891-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBB88BE9C8
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:53:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 645D48BE9D1
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 18:55:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59AEC1F24CA5
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:53:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17B431F2237A
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 16:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BAC2D796;
-	Tue,  7 May 2024 16:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A31538DD6;
+	Tue,  7 May 2024 16:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="f12l5SQp"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="LPTpxEu/"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5BA4182AF
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 16:52:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2FF0C148
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 16:54:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715100775; cv=none; b=N+5D3Cb+OAtlrKTXWy0E8npAzs+vAbvlKF+eX4x0B7fu6zR4uuwTuGVzFX9/dTpZvc6yPJS0BOvaVS2ox40JCSwxfKUjffOnfD71MRjSkkHGTIGzjZp+30CF1djbxBPFBKJ9N0OBoFtovTRQDhO0VlnVVi3/f/sIUH10m75NRMU=
+	t=1715100894; cv=none; b=DeDHlosBJqtcD/gfbzyoBzbivMhX4GlMvvVFXVd1Z73UMvW/x1gQqXB/+QWm3Zls8wB3pPPfw94pdWfNxvz2QJclwYU0LeGrQFnnqZUVkkqjQ/ZMd0W7tQTpBmXyu55gAWIKdr226n3tARF26RgPUqosQd27tuSvIwz8E5RKWv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715100775; c=relaxed/simple;
-	bh=9d1il97f/NLbhz6KeARpDvqTFrX7jDVVILM7uqq5K8s=;
+	s=arc-20240116; t=1715100894; c=relaxed/simple;
+	bh=qpL7mrChMH7iiYyuJ5+LEbL3MTJsN+KBRA6txOCFD6E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fr/rD7lqg3XktZ4Iulzf5i5arGJ1RCv3R/FkcMetZUukRy++ol7xC9ctLjt7bOepl2/K/NrpQLEl6tgtPSzP/5n4Mft9F8tvNlCqBeHfCcw4SEtP1PphdoIqTLFmtl1meIhRFohNFqXSXUEuVY2bPhvA4x8jL6r3VAF9aUo21gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=f12l5SQp; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 7 May 2024 18:52:46 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715100770;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4RpTd6tdyv3VnipQuZDaMG+zhXF/8EENNowO/9cqVPc=;
-	b=f12l5SQpKVP3BP3d0UTUilxNaGbHfYqYmYko8Z8BT1k6de7aWzmvKG7C6OEufI2IIaaGOL
-	1ccQTApFXiVtwwgGYrBK1osOkKLH4q2n3CkZdmbyGciamQPclnACp+czUYGjQbQWiQCTUI
-	T9T9EUijPM3RqoZ5AyU0aQZxpl5F37I=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Thomas Huth <thuth@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH] travis.yml: Update the aarch64 and
- ppc64le jobs to Jammy
-Message-ID: <20240507-715514f1926819d21f229551@orel>
-References: <20240507133426.211454-1-thuth@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XFfWTbbWgQ+upqZtVk3IL7MZtiu16ee9MXRfnA6y6t6mhgw2GmP9qnY7Xq0C30w5mXzzTtWN2x1bEsDZfIlhYHiUdJeNHx1MLgxV0vYyLKfw/VUI8Fx4N3OcU/9zFwMDPj2kjq/R+/9lmszGeQlc+x/Ywll2B35L9yuFpJ6FwvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=LPTpxEu/; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-792940cc66eso222525185a.0
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 09:54:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1715100892; x=1715705692; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=hs91KlgKHS6Ryk+5UHzlM+ht6/94snYgy6BHXDz+jUk=;
+        b=LPTpxEu/Fb+QRbtNflP03E5gusFXmrm3wDh+bMhVPvWtlcxCQ9R/g7NRiUAEREYUyu
+         yOkf5eiDW+I4ch5ioSk6ni/CdShlHKeBEe26Yz2iU+iMkDFPQ3Mn7mwdY3RnVdXR6c1m
+         X0IK0j6ZuhA3h65L8tK8M+zZpHTEl2bXkvsbdEg6MMd9o/vb6oUZt+5CWMGcxP+DiBYS
+         qk5fAcJgueHBHJQBD41oFIiwNFbzyUDNyb5wbefT/Lea07FD5yBKpRvMBcSXeKz0KuDX
+         dzWbYNNWDTAdQ4YtsoElueVqpkvvI0TJTpTZz/9dGVOo7vKyEF3Ieg7Pb0Rs1sKzjs/i
+         qC0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715100892; x=1715705692;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hs91KlgKHS6Ryk+5UHzlM+ht6/94snYgy6BHXDz+jUk=;
+        b=ED0mhaK5OHs7bbgBfoIJVBoUMM6NtP7OELSJfuVxnblaN8CBPIdWqAnb3GRjgSMhgC
+         7gP0d4tved0dYTX0185HV+/3EhZ3NjtfSu8jdtmYzzma7vzCi/VRln/kbvjn0KuQlkal
+         RVzM1NT+9+XtrJOjzZH6qceSRRCg53G14yIsSfPAJAy8S2TWDMlVRP/3UfgGVaizROe0
+         QDw/tRAPR43XLEkTNhDsGqeLhuJv22KWnNn1cz+HxywpVTF8NpVubEvwdJWTBnfeGaYb
+         b5JXS3TzksrRzST8pnqqds8y+4VOjEfs7vQ0IoTwi/LMYLXJn+2BbdB85XLLGa4v1l+4
+         IfIA==
+X-Gm-Message-State: AOJu0YxCBVU3G/y7T+fsyz2RB5Ku6A+uxic09RJIrRTzLE785vKqtrNv
+	AlQzF9c0KGTZeyvupTB0NF0Zghnm32wzgb7c2g40Cb5IPDywNP8U9CCOaLkYy3Uv2rCe0mrJ5HS
+	N
+X-Google-Smtp-Source: AGHT+IHlD+3EgAUHX0haSzd9vw8MtUGK2hO1IVfJXLZa0KHjmeG6nzVKMJrSdVzvJ2zmH0Bj1gzshA==
+X-Received: by 2002:a05:620a:2a11:b0:790:f382:23ec with SMTP id af79cd13be357-792a6471d76mr501947985a.16.1715100891854;
+        Tue, 07 May 2024 09:54:51 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id x5-20020a05620a0b4500b007929602e42asm2426537qkg.96.2024.05.07.09.54.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 09:54:51 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1s4O5a-0001dZ-V3;
+	Tue, 07 May 2024 13:54:50 -0300
+Date: Tue, 7 May 2024 13:54:50 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org
+Subject: Re: [PATCH] vfio/pci: Collect hot-reset devices to local buffer
+Message-ID: <20240507165450.GI4718@ziepe.ca>
+References: <20240503143138.3562116-1-alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,53 +85,46 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240507133426.211454-1-thuth@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240503143138.3562116-1-alex.williamson@redhat.com>
 
-On Tue, May 07, 2024 at 03:34:26PM GMT, Thomas Huth wrote:
-> Ubuntu Focal is now four years old, so we might miss some new compiler
-> warnings that have been introduced in later versions. Ubuntu Jammy is
-> available in Travis since a while already, so let's update to that
-> version now.
+On Fri, May 03, 2024 at 08:31:36AM -0600, Alex Williamson wrote:
+> Lockdep reports the below circular locking dependency issue.  The
+> mmap_lock acquisition while holding pci_bus_sem is due to the use of
+> copy_to_user() from within a pci_walk_bus() callback.
 > 
-> Unfortunately, there seems to be a linking problem with Jammy on s390x,
-> so we have to keep the s390x on Focal for now.
+> Building the devices array directly into the user buffer is only for
+> convenience.  Instead we can allocate a local buffer for the array,
+> bounded by the number of devices on the bus/slot, fill the device
+> information into this local buffer, then copy it into the user buffer
+> outside the bus walk callback.
+
+> Chain exists of:
+>   &vdev->vma_lock --> pci_bus_sem --> &mm->mmap_lock
 > 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>  Possible unsafe locking scenario:
+> 
+> block dm-0: the capability attribute has been deprecated.
+>        CPU0                    CPU1
+>        ----                    ----
+>   rlock(&mm->mmap_lock);
+>                                lock(pci_bus_sem);
+>                                lock(&mm->mmap_lock);
+>   lock(&vdev->vma_lock);
+> 
+>  *** DEADLOCK ***
+
+ 
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 > ---
->  .travis.yml | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 9b987641..99d55c5f 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -1,4 +1,4 @@
-> -dist: focal
-> +dist: jammy
->  language: c
->  cache: ccache
->  compiler: clang
-> @@ -20,13 +20,14 @@ jobs:
->  
->      - arch: ppc64le
->        addons:
-> -        apt_packages: clang-11 qemu-system-ppc
-> +        apt_packages: clang qemu-system-ppc
->        env:
-> -      - CONFIG="--arch=ppc64 --endian=little --cc=clang-11 --cflags=-no-integrated-as"
-> +      - CONFIG="--arch=ppc64 --endian=little --cc=clang --cflags=-no-integrated-as"
->        - TESTS="emulator rtas-get-time-of-day rtas-get-time-of-day-base
->            rtas-set-time-of-day selftest-setup spapr_hcall"
->  
->      - arch: s390x
-> +      dist: focal
->        addons:
->          apt_packages: clang-11 qemu-system-s390x
->        env:
-> -- 
-> 2.45.0
->
+>  drivers/vfio/pci/vfio_pci_core.c | 78 ++++++++++++++++++++------------
+>  1 file changed, 49 insertions(+), 29 deletions(-)
 
-Acked-by: Andrew Jones <andrew.jones@linux.dev>
+I feel like I created this bug...
+
+It is sad we have to allocate kernel memory, but can't think of a
+better option.
+
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+
+Jason
 
