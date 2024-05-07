@@ -1,207 +1,301 @@
-Return-Path: <kvm+bounces-16921-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16922-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 277428BEC4D
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 21:08:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FCA28BEC55
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 21:09:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A74C31F25ACC
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:08:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3AB01C24771
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8BD16F0DE;
-	Tue,  7 May 2024 19:07:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A8516EBE6;
+	Tue,  7 May 2024 19:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lb84cuJQ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MdWnk8yo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E75916EBFA
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 19:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ADB416D9A7;
+	Tue,  7 May 2024 19:08:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715108868; cv=none; b=ZvMUTR227TZXcJAfYbN5XHFQRbOyFiDP1/UzmLe/ITYRTCfPL5v/jFLx2YTt/J1OYXqdBC03+FmKckZlYsWnp7hETaWZLAbRASdksRu4sJIR7KUaSdErA79hLvi9ot35sfowQfv6Nk2xud7uSVhScC5cAlBlJJDfXXyGkdkHdO8=
+	t=1715108932; cv=none; b=MJ3uZGqN1Z7K9sNdUiA4ygxooirqn4lNl2lxKWhjWgTtojeBCfs5PdmGzh8LobCSJtvljuOspR1fvvn3gYk5sMIzHKOvZEuUzOEK1EEstp79POlAJiHwKbz12Y1OrdlS1mKg1fYsZSwhz6T3t+nV3w4oF2Np131n439tQ7scpcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715108868; c=relaxed/simple;
-	bh=9K/bO5jtlWAadEx++bJ4tBnwyCoDvk5e6sU6qqppTJc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=J7FyLcuI610QWDjpubJNTEkE+venc4wBtUSmHTyX2z8Z0HOvcXB+GhpRsgmMlgN+hl50p+IRkv7AhRTi1q3BxTdoCZmUnSTbC/uwYUSzmPW3op8iLddmMRvbKq36S/z3/BL9DXouKZ/hdUSk8Omt+3mohqCoHnTyS3GRUMhJ/Us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lb84cuJQ; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-61c943c18a8so3590935a12.0
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 12:07:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715108866; x=1715713666; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jkQu4Jm3xj+OSWk/nhy3+Jt5eXwFDQEAw7ll75hZ8tw=;
-        b=Lb84cuJQCVpWPod3fTIPvQb3Nm1Rf2NGWNrgl9RX53l4L8anb8uMsdJD+nz4GGYcIY
-         4sWzPkbwSMk+thBfJNoxWBEUVIUbp/bHAYnzqyyHnsxuuOE4b24KobqlLhGE4AvHI1JV
-         FHEcjL7wkeIe+SvlK1Hbomduy+gplLYdBEhbD//ozHLVvSHr8dgawJd5Kij/UtnLepQr
-         Ze3TY8K9OiuAE3B/iQyPJ0HhxpocuMGP6mfjOma2kM0vr2IoEc4RmAP60XuCf+ipKGoF
-         3t11FG5teEJj6bSmq7kIOGOV4QEA1ZOAp0rR2q7ugbwCmpPuLc5JJJsyeuOMZBtHGQvg
-         camw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715108866; x=1715713666;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jkQu4Jm3xj+OSWk/nhy3+Jt5eXwFDQEAw7ll75hZ8tw=;
-        b=euqsKr7bxf35Ft6lmALJc+J2kppFhtHs7T5M3T1QcBS6Y6EIrtv3Kw1ct4C/biQZvy
-         m8xmU22LEV6FyAkjjYloYc/BrboOLvqx71jbxsqvkekcx0loO4+Ttu9cyHAeMkdJ5VuT
-         ohF0xK7nbuEoIi3Oqimw2UDhx9pbS3dRnN5BpFmjRGW6+NuQ2s+nz5O0NnTs9E5Lrr/O
-         DF71SNZdHRBBlNqzXZAWy5eSqPFePr6rBbFtWukH/n8yy11FA3Gofiw+XsJBkARrDry5
-         752gJLFsyNsFqr2RSbDLtmdr+g7y5+eYcIeT+ZUEAQXia0Hhzf3jcE3fP9+5y9R1JNlQ
-         AkFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWULvDqDWgyRHZcwXmXuoAoPm1y57igpVDDseXg5wqcP/9j6brTV9GDJA674HG9Y1Qzfb1MOJDG2bWUSkfFAAwP5QQ6
-X-Gm-Message-State: AOJu0YylD6T4Rd7j0hXYQ6Rn91JXeodDYIzOUJ3a2p2Iz5E+604jhrm5
-	7nz0BdPcbov2Y08aB5NuN4b55a8mRuak/bWp+MiXFNF0t/PyXFZIFwBWb+WLH5b7R+deTb+TeZL
-	/2A==
-X-Google-Smtp-Source: AGHT+IEgjxdsHk9aJmOIaJyY9cp6EJfT5579+ZXn0lQR+zEfJ/cnb/Xx+FkIFQJQtpXQchgkEeeXdrdRsVg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:fe18:0:b0:5d6:cfc:2f39 with SMTP id
- 41be03b00d2f7-62f23220b0fmr23804a12.11.1715108865796; Tue, 07 May 2024
- 12:07:45 -0700 (PDT)
-Date: Tue, 7 May 2024 12:07:44 -0700
-In-Reply-To: <9252b68e-2b6a-6173-2e13-20154903097d@amd.com>
+	s=arc-20240116; t=1715108932; c=relaxed/simple;
+	bh=zBtOdwwtvKm20Q77bQR/mEqpEaFtLymX61Rz+GGBf8I=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tjQlz+pTL1MaEB5FkuoJm5HaHkcNpH2SArlLzwIrFvHkWNQJvU7h3pOkGoYVQnA1NXiJqdPUvubgiUuVzvPI1fRpPEiSUstmKRwrVz8SAW1m8pM2F/yyiAlNDTvofggCsP/iaB1QUSYX/9rI/sVwTqJdR0M0fvDv1TmFsLGZB/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MdWnk8yo; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=zBtOdwwtvKm20Q77bQR/mEqpEaFtLymX61Rz+GGBf8I=; b=MdWnk8yoI2DOelSJXtTlIUSpzj
+	IQ3W64s3IyVTPaLMA6DEOtDjKp2/Nx8QfV7Q7H78ngnw0+FpgcJKClmwzFRSP/pdkyoIHmfSUHJR2
+	3M028WgCpRtgQELOITgr51x9myAnIGJY0sYy5bQPzHHpGvK+XeKggPfG7l9eyxxcIPEIsrCaE94OB
+	tnJwsxryJ3rdnaiyL47JuljvYXR62OJ8FuHg2yFG21qp9xkk1KdOJIOkRyIh4i51efiyypodxn702
+	KgQNwzMkoSujXejKdm8LvsJZ5GNVQ1qpQTQK1NxVA+6ZsR6XMo3dYRQOzwTicQWqXDfTzPO5ZH5UL
+	pg3GX21Q==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1s4QB7-0000000Dsk7-40yh;
+	Tue, 07 May 2024 19:08:42 +0000
+Message-ID: <51dea3a632131d9a49af3991a633f26ce8592dd3.camel@infradead.org>
+Subject: Re: [PATCH v2 01/15] KVM: x86/xen: Do not corrupt KVM clock in
+ kvm_xen_shared_info_init()
+From: David Woodhouse <dwmw2@infradead.org>
+To: Marcelo Tosatti <mtosatti@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, Sean Christopherson <seanjc@google.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant
+ <paul@xen.org>, Shuah Khan <shuah@kernel.org>,  linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-kselftest@vger.kernel.org, Oliver
+ Upton <oliver.upton@linux.dev>,  jalliste@amazon.co.uk, sveith@amazon.de,
+ zide.chen@intel.com, Dongli Zhang <dongli.zhang@oracle.com>
+Date: Tue, 07 May 2024 20:08:40 +0100
+In-Reply-To: <ZjXm9w/y3/NLCxLQ@tpad>
+References: <20240427111929.9600-1-dwmw2@infradead.org>
+	 <20240427111929.9600-2-dwmw2@infradead.org> <ZjXm9w/y3/NLCxLQ@tpad>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-1MxL1pyflkVSO892kaNk"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240416050338.517-1-ravi.bangoria@amd.com> <ZjQnFO9Pf4OLZdLU@google.com>
- <9252b68e-2b6a-6173-2e13-20154903097d@amd.com>
-Message-ID: <Zjp8AIorXJ-TEZP0@google.com>
-Subject: Re: [PATCH v2] KVM: SEV-ES: Don't intercept MSR_IA32_DEBUGCTLMSR for
- SEV-ES guests
-From: Sean Christopherson <seanjc@google.com>
-To: Ravi Bangoria <ravi.bangoria@amd.com>
-Cc: pbonzini@redhat.com, thomas.lendacky@amd.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, michael.roth@amd.com, nikunj.dadhania@amd.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, santosh.shukla@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, May 06, 2024, Ravi Bangoria wrote:
-> On 03-May-24 5:21 AM, Sean Christopherson wrote:
-> > On Tue, Apr 16, 2024, Ravi Bangoria wrote:
-> >> Currently, LBR Virtualization is dynamically enabled and disabled for
-> >> a vcpu by intercepting writes to MSR_IA32_DEBUGCTLMSR. This helps by
-> >> avoiding unnecessary save/restore of LBR MSRs when nobody is using it
-> >> in the guest. However, SEV-ES guest mandates LBR Virtualization to be
-> >> _always_ ON[1] and thus this dynamic toggling doesn't work for SEV-ES
-> >> guest, in fact it results into fatal error:
-> >>
-> >> SEV-ES guest on Zen3, kvm-amd.ko loaded with lbrv=1
-> >>
-> >>   [guest ~]# wrmsr 0x1d9 0x4
-> >>   KVM: entry failed, hardware error 0xffffffff
-> >>   EAX=00000004 EBX=00000000 ECX=000001d9 EDX=00000000
-> >>   ...
-> >>
-> >> Fix this by never intercepting MSR_IA32_DEBUGCTLMSR for SEV-ES guests.
-> > 
-> > Uh, what?  I mean, sure, it works, maybe, I dunno.  But there's a _massive_
-> > disconnect between the first paragraph and this statement.
-> > 
-> > Oh, good gravy, it "works" because SEV already forces LBR virtualization.
-> > 
-> > 	svm->vmcb->control.virt_ext |= LBR_CTL_ENABLE_MASK;
-> > 
-> > (a) the changelog needs to call that out.
-> 
-> Sorry, I should have called that out explicitly.
-> 
-> >  (b) KVM needs to disallow SEV-ES if
-> > LBR virtualization is disabled by the admin, i.e. if lbrv=false.
-> 
-> That's what I initially thought. But since KVM currently allows booting SEV-ES
-> guests even when lbrv=0 (by silently ignoring lbrv value), erroring out would
-> be a behavior change.
 
-IMO, that's totally fine.  There are no hard guarantees regarding module params,
+--=-1MxL1pyflkVSO892kaNk
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > Alternatively, I would be a-ok simply deleting lbrv, e.g. to avoid yet more
-> > printks about why SEV-ES couldn't be enabled.
-> > 
-> > Hmm, I'd probably be more than ok.  Because AMD (thankfully, blessedly) uses CPUID
-> > bits for SVM features, the admin can disable LBRV via clear_cpuid (or whatever it's
-> > called now).  And there are hardly any checks on the feature, so it's not like
-> > having a boolean saves anything.  AMD is clearly committed to making sure LBRV
-> > works, so the odds of KVM really getting much value out of a module param is low.
-> 
-> Currently, lbrv is not enabled by default with model specific -cpu profiles in
-> qemu. So I guess this is not backward compatible?
+On Sat, 2024-05-04 at 04:42 -0300, Marcelo Tosatti wrote:
+> On Sat, Apr 27, 2024 at 12:04:58PM +0100, David Woodhouse wrote:
+> >=20
+> > In particular, KVM_REQ_MASTERCLOCK_UPDATE will take a new snapshot of
+> > time as the reference in master_kernel_ns and master_cycle_now, yanking
+> > the guest's clock back to match definition A at that moment.
+>=20
+> KVM_REQ_MASTERCLOCK_UPDATE stops the vcpus because:
 
-I am talking about LBRV being disabled in the _host_ kernel, not guest CPUID.
-QEMU enabling LBRV only affects nested SVM, which is out of scope for SEV-ES.
+Took me a while to work that one out, btw. The fact that the=C2=A0
+KVM_REQ_MCLOCK_INPROGRESS request is asserted but never actually
+*handled*, so all it does is repeatedly kick the vCPU out and make it
+spin until the request is cleared is... interesting. Likewise the way
+that we set KVM_REQ_MASTERCLOCK_UPDATE on *all* vCPUs, so they *all*
+call kvm_update_masterclock(), when only one of them needed to. I may
+clean that up a little.
 
-> > And then when you delete lbrv, please add a WARN_ON_ONCE() sanity check in
-> > sev_hardware_setup() (if SEV-ES is supported), because like the DECODEASSISTS
-> > and FLUSHBYASID requirements, it's not super obvious that LBRV is a hard
-> > requirement for SEV-ES (that's an understatment; I'm curious how some decided
-> > that LBR virtualization is where the line go drawn for "yeah, _this_ is mandatory").
-> 
-> I'm not sure. Some ES internal dependency.
-> 
-> In any case, the patch simply fixes 'missed clearing MSR Interception' for
-> SEV-ES guests. So, would it be okay to apply this patch as is and do lbrv
-> cleanup as a followup series?
+> =C2=A0* To avoid that problem, do not allow visibility of distinct
+> =C2=A0* system_timestamp/tsc_timestamp values simultaneously: use a maste=
+r
+> =C2=A0* copy of host monotonic time values. Update that master copy
+> =C2=A0* in lockstep.
 
-No.
+Right. That comment is a lot longer than the part you cited here, and
+starts with 'assuming a stable TSC across pCPUS, and a stable TSC
+across vCPUs'. It's the "if (ka->use_master_clock)" case.
 
-(a) the lbrv module param mess needs to be sorted out.
-(b) this is not a complete fix.
-(c) I'm not convinced it's the right way to fix this, at all.
-(d) there's a big gaping hole in KVM's handling of MSRs that are passed through
-    to SEV-ES guests.
-(e) it's not clear to me that KVM needs to dynamically toggle LBRV for _any_ guest.
-(f) I don't like that sev_es_init_vmcb() mucks with the LBRV intercepts without
-    using svm_enable_lbrv().
+And yes, what it's basically saying is a special case of the fact that
+if you let the KVM clock run at its "natural" rate based on the guest
+TSC (definition B), but each vCPU runs at that rate from a *different*
+point on the line that is definition A (the host CLOCK_MONOTONIC_RAW),
+bad things will happen.
 
-Unless I'm missing something, KVM allows userspace to get/set MSRs for SEV-ES
-guests, even after the VMSA is encrypted.  E.g. a naive userspace could attempt
-to migrate MSR_IA32_DEBUGCTLMSR and end up unintentionally disabling LBRV on the
-target.  The proper fix for VMSA being encrypted is to likely to disallow
-KVM_{G,S}ET_MSR on MSRs that are contexted switched via the VMSA.
+I'm OK with it stopping the vCPUs (although I'd like it to do so in a
+less implicitly awful way). But when we don't need to update the
+reference time at all, let's not do so.
 
-But that doesn't address the issue where KVM will disable LBRV if userspace
-sets MSR_IA32_DEBUGCTLMSR before the VMSA is encrypted.  The easiest fix for
-that is to have svm_disable_lbrv() do nothing for SEV-ES guests, but I'm not
-convinced that's the best fix.
+> > When invoked from in 'use_master_clock' mode, kvm_update_masterclock()
+> > should probably *adjust* kvm->arch.kvmclock_offset to account for the
+> > drift, instead of yanking the clock back to defintion A.
+>=20
+> You are likely correct...
+>=20
+> > But in the meantime there are a bunch of places where it just doesn't n=
+eed to be
+> > invoked at all.
+> >=20
+> > To start with: there is no need to do such an update when a Xen guest
+> > populates the shared_info page. This seems to have been a hangover from
+> > the very first implementation of shared_info which automatically
+> > populated the vcpu_info structures at their default locations, but even
+> > then it should just have raised KVM_REQ_CLOCK_UPDATE on each vCPU
+> > instead of using KVM_REQ_MASTERCLOCK_UPDATE. And now that userspace is
+> > expected to explicitly set the vcpu_info even in its default locations,
+> > there's not even any need for that either.
+> >=20
+> > Fixes: 629b5348841a1 ("KVM: x86/xen: update wallclock region")
+> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> > Reviewed-by: Paul Durrant <paul@xen.org>
+> > ---
+> > =C2=A0arch/x86/kvm/xen.c | 2 --
+> > =C2=A01 file changed, 2 deletions(-)
+> >=20
+> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> > index f65b35a05d91..5a83a8154b79 100644
+> > --- a/arch/x86/kvm/xen.c
+> > +++ b/arch/x86/kvm/xen.c
+> > @@ -98,8 +98,6 @@ static int kvm_xen_shared_info_init(struct kvm *kvm)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wc->version =3D wc_vers=
+ion + 1;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0read_unlock_irq(&gpc->l=
+ock);
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_make_all_cpus_request(kv=
+m, KVM_REQ_MASTERCLOCK_UPDATE);
+> > -
+> > =C2=A0out:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0srcu_read_unlock(&kvm->=
+srcu, idx);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return ret;
+> > --=20
+> > 2.44.0
+>=20
+> So KVM_REQ_MASTERCLOCK_UPDATE is to avoid the race above.
+>=20
+> In what contexes is kvm_xen_shared_info_init called from again?
+>=20
+> Not clear to me KVM_REQ_MASTERCLOCK_UPDATE is not needed (or that is
+> needed, for that matter...).
 
-AFAICT, host perf doesn't use the relevant MSRs, and even if host perf did use
-the MSRs, IIUC there is no "stack", and #VMEXIT retains the guest values for
-non-SEV-ES guests.  I.e. functionally, running with and without LBRV would be
-largely equivalent as far as perf is concerned.  The guest could scribble an MSR
-with garbage, but overall, host perf wouldn't be meaningfully affected by LBRV.
+We cal kvm_xen_shared_info_init() when the Xen "shared info" page is
+set up. The only interesting part of that is the *wallclock* epoch.
 
-So unless I'm missing something, the only reason to ever disable LBRV would be
-for performance reasons.  Indeed the original commits more or less says as much:
+The wallclock (just like KSR_KVM_WALL_CLOCK{,_NEW}) is *entirely* hosed
+ever since the KVM clock stopped being based on CLOCK_MONOTONIC, since
+that means that the value of "wallclock time minus KVM clock time"
+actually *changes* as the KVM clock runs at a different rate to
+wallclock time.=20
 
-  commit 24e09cbf480a72f9c952af4ca77b159503dca44b
-  Author:     Joerg Roedel <joerg.roedel@amd.com>
-  AuthorDate: Wed Feb 13 18:58:47 2008 +0100
+I'm looking at a replacement for that which uses the gtod information
+to give the guest a direct mapping of guest TSC to host CLOCK_TAI. And
+in doing so we can *also* indicate when live migration has potentially
+disrupted the guest TSC, so any further NTP/PTP refinement that the
+guest may have done for itself needs to be thrown away.
 
-    KVM: SVM: enable LBR virtualization
-    
-    This patch implements the Last Branch Record Virtualization (LBRV) feature of
-    the AMD Barcelona and Phenom processors into the kvm-amd module. It will only
-    be enabled if the guest enables last branch recording in the DEBUG_CTL MSR. So
-    there is no increased world switch overhead when the guest doesn't use these
-    MSRs.
 
-but what it _doesn't_ say is what the world switch overhead is when LBRV is
-enabled.  If the overhead is small, e.g. 20 cycles?, then I see no reason to
-keep the dynamically toggling.
+--=-1MxL1pyflkVSO892kaNk
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-And if we ditch the dynamic toggling, then this patch is unnecessary to fix the
-LBRV issue.  It _is_ necessary to actually let the guest use the LBRs, but that's
-a wildly different changelog and justification.
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNTA3MTkwODQwWjAvBgkqhkiG9w0BCQQxIgQgHVmiWasw
+frgDY5E3eFn0b2+Z8rpbfP6rB7OVXKnqfWgwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgChZ/FYOFQZZOOYZG05b4wiJdTD0tZ47wKq
+LYyo2tJiF2gtDaUDWztKlqtXJIhy1EHqLJkXexeS+G2NXJKc5m0GZfapeKEKDnlr4m7T6SSisSPl
+ou2+ZtAwIvnQg22lFFbDKBrzpKCvR2TPAhnbFEck/sUzmostgvzLgc4q76A16HYZ9dYLqShXGJoa
+gUOMidK1fOFrWC/36QjUDNB0JEHPDBYxvq4hSLlmMI81AxZ0+xCSOHOeTNHM7yqOJEGKJlTqgtx7
+UzSkB/W+uOs6re+XgyHZegmMukZyWEKHEZXo44gYfx4QZUUMi0pmOU8NC27TwLpD9N6mMvOsmkGo
+iUP8ZcTnNGjjFJKqfpEVeOymeGkPJxFBPfccQdc/WaPht2IDVnKiIDYc2Sw5QggL54iU4uwUKFay
+rXpzuMXRdJmfIyAQQIOIZokQJ0TLFJNW4q1gfulgO7HK48CRDxaceSbxHMBjwVfx9Zf5e8zfYFJC
+UT/pNvdY4RdfDUUMf+tzUyLKbE7XbrT5FvNCWlNyZgyTJgleGDKTj7KV0fCVQM/mqmwHipQo45fh
+4DFMfwa2FF045ZXH0ICN6ovrfYbjmcjMdPWQFvxCFX09dwPFYfmWvgBVdqJJi8EVHUTepQytBUqd
+Y2ueJkoJdXRulF3xvCQ006bk3AcMevjRqueyVfTXFAAAAAAAAA==
 
-And if we _don't_ ditch the dynamic toggling, then sev_es_init_vmcb() should be
-using svm_enable_lbrv(), not open coding the exact same thing.
+
+--=-1MxL1pyflkVSO892kaNk--
 
