@@ -1,129 +1,123 @@
-Return-Path: <kvm+bounces-16901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1E28BEADC
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:54:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F9DB8BEAE3
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 19:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16D9028217D
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:54:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF3BB281EA6
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 17:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B57716D30F;
-	Tue,  7 May 2024 17:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ECEF16C87C;
+	Tue,  7 May 2024 17:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R5pdE+Oj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WGKgC/qL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C42143687
-	for <kvm@vger.kernel.org>; Tue,  7 May 2024 17:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA5A16C857
+	for <kvm@vger.kernel.org>; Tue,  7 May 2024 17:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715104439; cv=none; b=P8JJ+VoWaL6UtYaFuzBzUV8ChXbM4CP/ygpiwLe7WsdA2qBBQ3oy8OGSJiHYByVNo/jlIHxf597fF0o9gmzUdEoLSx1+hhbenYofoKJClgKl0JpmArIfHJD5i5yAQccxodW+osxVla1Vq0pvBT+qpcBxoM69wxK07dXQfsPk6Do=
+	t=1715104558; cv=none; b=S1CzjpB1gxSVe7sirtgKa4H//6pymVVUzyoFAwy+grIfr12NTZjcoyjj3vpNd136Zy26zhvueOAy1er9DtRzpPdih9D2Ecww5IJALcGpRzUB5i/sRlfWQMpLNa6nUjCV8UZrb0DIoUpJ8wseHpmNQKqIytYzBpPSFM2TPE9IZE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715104439; c=relaxed/simple;
-	bh=f4jkcb6eCGK9z9a2d3qPQI3YlfWTfGaPefAR0W1j3LQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LPAgziLeve0cIUQDFmnIomgz4svcV3JP40FkEXZ5BW0Wz98c0Wse5WIbTFmLPpcOokNCI/9x7ID9y4lJN3z341YhKdb/e+BDraB1x24S92+v+X4+ZFWJhw7QO9bdkbxgIN3hYXLFnC7ICN/ZAUhDAbpqTHN+qnjVHAO8y0yvVw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R5pdE+Oj; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1715104558; c=relaxed/simple;
+	bh=i1B0BczLSo3SWF7MKkmZ007UspXePFGAXjtEUDsAbtE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kMJ3yrVhElhjd7SAxsBi239phZ8Q+GYIgL31clJlk0DovMpS+p3I4QEYt6UvKXz8G/oNdqrGbNicFYgDpt5pZKSVWys4tbvLJE2/gT1thMq9poHoEKNdsGC0AAurSNiBdXbg7PKBcGEnyGMGnT4JGS9qhBfZ2AV9/MqegZ4x1YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WGKgC/qL; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-418820e6effso12715e9.0
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 10:53:57 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-61cb5628620so3994419a12.3
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 10:55:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715104436; x=1715709236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZZSBxoniVFCnSwsRyNGGB/5WVFKEVwOzPElRSvx/1EU=;
-        b=R5pdE+Ojdt2Cf5snoCts3zjuPF+NBboucpKaRWvWgyataQj2lyuCl8muFmDUew1dIJ
-         pDT0/AfQStpl9KL5fIHOuhGp/GFnj/lvtdIgkxXj0TeJyfYCJsmg5l0+Nx+iRcwvEK2K
-         +T6bgg/8EupoWfWeKz4F5PGwEWZJF4OgUdYAptkWRbt9z2bCz7HQwYNdNLQW+vO7DY7R
-         1Otjr7MtGzNjSh1KPtRe1WvnwHFWbbZhX/C+UnSGdcFMNNX1gox1bnmmu0UY9B8fWjhB
-         gN01Ma6l8bRH9yRsacL7Pq/XGNZPAciiYzX4QcNJNRYeOr5H6ak9cuiYu73daIk4JlMb
-         PXRg==
+        d=google.com; s=20230601; t=1715104557; x=1715709357; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=U/zdljaT58TeUovqBD+WPeAJgx4d8t4+C/lLtRXXISU=;
+        b=WGKgC/qLLGDzqckkvrqP7f1LsoRyBJ91zHpkQ75EQG/sElibpIdyYY7zGP23rKsK7X
+         YbR1/n4r2qJjORhPoCGFAC+WoMhQUStqt68dt0l8U0LwkDQGz3yHS4eWHGuqTGG2B72k
+         NL4OhYBy0Imjefoo9mC7p/5hEIF2yzH8HWGmD6Fjfv4tcLpe5lwGlnera88zxYWyRUs6
+         M1BS2OtHx23GDzJ1Z3/0kh9zRX3kaP+UD9rO4MycvZYvzPHeVJdTmwxIQcmXCsfWE+RC
+         1yM39swBkFGQpZ0iorAU7aWCQR5TRwUbCetfw7VkWGNYP28f7Bklsu657QI+9vL1GLWy
+         t4oA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715104436; x=1715709236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZZSBxoniVFCnSwsRyNGGB/5WVFKEVwOzPElRSvx/1EU=;
-        b=qdgyKifIr05yqYK/hrEC401pVvv0oTzuIK6rV61wdlTL0iabpNDECp6jfcpDKRcWuq
-         AyTVrLnZU89QEjXDnS4fT0REPdEfrxSUZLn0M6DSZMNQNAC8CW683boLNJgHhWdn9D6S
-         s635TAvYhzgaQHo1bVArWKyCNDm4aB0f246Tq9PXY+whwvzC6VL9aWM5ALA46mGqCK7K
-         mHgCYjrhs8tPQ8l4qbJlQ3PIU/zvzCssGK8Jr6y3jVb+WQR/3qxuBs1j2REZrzf4fm/U
-         7Th/TQbg4DN4vNYNoCO1k/LmF7BbaBLcmGyB7h+uXiJVfVuYrcQYXQ5xBpRFO7yl+Jr/
-         StFw==
-X-Forwarded-Encrypted: i=1; AJvYcCXX1m47TNrjq0ivOuPxqth5gAFbgKFEBVXlAzIwm8IXkJdPNZ58FumAq0HBNRy7VUyCOAogFDbUElWSe5rSFCJ8KFli
-X-Gm-Message-State: AOJu0YzRaAmcC63L/L07xj2ZDdAcE5Z+P65RaCrusJFWNFU5KqiB8Vt4
-	aH3OUQf7V6Is+xzJlqGeG0aZiE/TwCoe2cMEuhjAgJwenqevOIfyPuoPqQYAHYThFSUfIpuDCub
-	QkkCBRhcaDm3EFmQocyWHIWGFbJD1dFf7Z4vF
-X-Google-Smtp-Source: AGHT+IGz1XnPd5AWeO8uJ/y11xaVSFsWnWF3iUnew2fdVCadE6k0qGy9DNTjKr8tWwxbE8CeHiLNiXoVqCbHcy7HxH0=
-X-Received: by 2002:a7b:c046:0:b0:419:b16:9c14 with SMTP id
- 5b1f17b1804b1-41f7a8634ffmr90295e9.1.1715104436438; Tue, 07 May 2024 10:53:56
+        d=1e100.net; s=20230601; t=1715104557; x=1715709357;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=U/zdljaT58TeUovqBD+WPeAJgx4d8t4+C/lLtRXXISU=;
+        b=A3CSgm5ZMKizFeMaXvDOmDNqPx14gluCeUiD7rzr+vIvKR2xa2mSIv4yuOa9U6SuAw
+         /pOa5SG05Cr7EsyJxqBq0nMwZ+tX/s8WODkRq8yTbIENGSev/wHMqUOEQxvq4qAodr7s
+         L6Gk613XXHNlUPpcDw21IjA1J1N067NJN6k6/JZdvPGh2r7K4Y7CpdXckQJxBAVdSMKH
+         zvDBGGpYu0LfRqwATZx/llkLPtcDzFwSRfJ9JAV3XW0zUSzqlWxNo00muWOVK+ApQEVu
+         kowk/c7626OLdMn9P/tNa0oKuJbg7YgfxzLl0hrcWUo2fDH0mFMiuIQNYeEZHtT3sTOF
+         dL5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUFO1UJk6NKBJga3KuG0+2GXPMzE6bAbQYHErC4qCyjP/1NiH0xSatZuBNq5FD/mTyjhdHJde7SfeHSf2dHWLhHypC+
+X-Gm-Message-State: AOJu0YwtEK5I4wsAaXWdaqONzOn3fdIXw3wHOZ/6BpJCfy0k1n0UGtSz
+	cvhhOQ+No2hcRy0WueuMtqdac7DsRcag9USRHb/MjUgOGdqtbwbWaj09voA4cwaeX1wWKUZDzCU
+	JhQ==
+X-Google-Smtp-Source: AGHT+IFeM0B7my9SeMqYR5n+RtBG5AhiHXPGjV0Tz0oCPILMUffxAWA/E9oddAskv4XRf7h+1SVeBgTe8hc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:3ecb:0:b0:5f7:fca4:6d2f with SMTP id
+ 41be03b00d2f7-62f24b1978bmr1264a12.7.1715104556721; Tue, 07 May 2024 10:55:56
  -0700 (PDT)
+Date: Tue, 7 May 2024 10:55:54 -0700
+In-Reply-To: <3b2c222b-9ef7-43e2-8ab3-653a5ee824d4@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240430235057.1351993-1-edliaw@google.com> <ZjGiGq-_kUVht63m@finisterre.sirena.org.uk>
- <be921714-b684-401e-a89a-8256df5fcb86@collabora.com>
-In-Reply-To: <be921714-b684-401e-a89a-8256df5fcb86@collabora.com>
-From: Edward Liaw <edliaw@google.com>
-Date: Tue, 7 May 2024 10:53:28 -0700
-Message-ID: <CAG4es9V1SYe-JA3xfkwqchZ37Oc3PY6O36hGcA26-JHZ2MmSCQ@mail.gmail.com>
-Subject: Re: [PATCH v1 00/10] Define _GNU_SOURCE for sources using
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: Mark Brown <broonie@kernel.org>, shuah@kernel.org, Jaroslav Kysela <perex@perex.cz>, 
-	Takashi Iwai <tiwai@suse.com>, Jiri Kosina <jikos@kernel.org>, 
-	Benjamin Tissoires <bentiss@kernel.org>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Jarkko Sakkinen <jarkko@kernel.org>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	kernel-team@android.com, linux-sound@vger.kernel.org, 
-	linux-input@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240328171949.743211-1-leobras@redhat.com> <ZgsXRUTj40LmXVS4@google.com>
+ <ZjUwHvyvkM3lj80Q@LeoBras> <ZjVXVc2e_V8NiMy3@google.com> <3b2c222b-9ef7-43e2-8ab3-653a5ee824d4@paulmck-laptop>
+Message-ID: <ZjprKm5jG3JYsgGB@google.com>
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+From: Sean Christopherson <seanjc@google.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Leonardo Bras <leobras@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay <quic_neeraju@quicinc.com>, 
+	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Zqiang <qiang.zhang1211@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Apr 30, 2024 at 10:41=E2=80=AFPM Muhammad Usama Anjum
-<usama.anjum@collabora.com> wrote:
->
-> Thanks for the fixes.
->
-> On 5/1/24 6:59 AM, Mark Brown wrote:
-> > On Tue, Apr 30, 2024 at 11:50:09PM +0000, Edward Liaw wrote:
-> >> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
-> >> asprintf into kselftest_harness.h, which is a GNU extension and needs
-> >> _GNU_SOURCE to either be defined prior to including headers or with th=
-e
-> >> -D_GNU_SOURCE flag passed to the compiler.
-> >
-> > This seems like something that should be handled centrally rather than
-> > having to go round and audit the users every time some update is made.
-> The easiest way I could think of is to add -D_GNU_SOURCE to KHDR_HEADERS
-> definition in tools/testing/selftests/Makefile. It wouldn't be obvious fr=
-om
-> KHDR_HEADERS name that there could be other flags in it as well though.
+On Fri, May 03, 2024, Paul E. McKenney wrote:
+> On Fri, May 03, 2024 at 02:29:57PM -0700, Sean Christopherson wrote:
+> > So if we're comfortable relying on the 1 second timeout to guard against a
+> > misbehaving userspace, IMO we might as well fully rely on that guardrail.  I.e.
+> > add a generic PF_xxx flag (or whatever flag location is most appropriate) to let
+> > userspace communicate to the kernel that it's a real-time task that spends the
+> > overwhelming majority of its time in userspace or guest context, i.e. should be
+> > given extra leniency with respect to rcuc if the task happens to be interrupted
+> > while it's in kernel context.
+> 
+> But if the task is executing in host kernel context for quite some time,
+> then the host kernel's RCU really does need to take evasive action.
 
-I'll try this approach and see.  It looks like there are also some
-Makefiles that don't currently include KHDR_INCLUDES.
+Agreed, but what I'm saying is that RCU already has the mechanism to do so in the
+form of the 1 second timeout.
 
-Also, this will cause _GNU_SOURCE redefined warnings wherever #define
-_GNU_SOURCE is present.  Should I also delete them or wrap them with
-#ifndef?
+And while KVM does not guarantee that it will immediately resume the guest after
+servicing the IRQ, neither does the existing userspace logic.  E.g. I don't see
+anything that would prevent the kernel from preempting the interrupt task.
 
->
->
-> --
-> BR,
-> Muhammad Usama Anjum
+> On the other hand, if that task is executing in guest context (either
+> kernel or userspace), then the host kernel's RCU can immediately report
+> that task's quiescent state.
+> 
+> Too much to ask for the host kernel's RCU to be able to sense the
+> difference?  ;-)
+
+KVM already notifies RCU when its entering/exiting an extended quiescent state,
+via __ct_user_{enter,exit}().
+
+When handling an IRQ that _probably_ triggered an exit from the guest, the CPU
+has already exited the quiescent state.  And AFAIK, that can't be safely changed,
+i.e. KVM must note the context switch before enabling IRQs.
 
