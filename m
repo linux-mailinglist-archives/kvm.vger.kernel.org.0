@@ -1,198 +1,318 @@
-Return-Path: <kvm+bounces-16822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11FF88BE0B2
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 13:10:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 803AB8BE14B
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 13:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DD751F21A00
-	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 11:10:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B5F31F22C98
+	for <lists+kvm@lfdr.de>; Tue,  7 May 2024 11:44:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B23E1514F1;
-	Tue,  7 May 2024 11:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDEFF153579;
+	Tue,  7 May 2024 11:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ARevRImt"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 490C115216D;
-	Tue,  7 May 2024 11:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68EB9152172;
+	Tue,  7 May 2024 11:44:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715080209; cv=none; b=dAIExXEklMVbUX8InvlYVxwq0VhkJ7GR1fTjowrDjgUFO1zXSCsdPT10MU4GOuao0Y0Y2Fm9qn2A55WhSzGLTBGuOq+bDgSf7noawP7v+XoC9yMB4HiZ8xwpyQuBAr2u2tCv3SuDpf49gGk2EIgJDEc1TOarMofVwvzRcGz5iw8=
+	t=1715082271; cv=none; b=ZghHNF3C6gY413CwV5889iSNqgEwgFP3ls8aEkQZjvFr3HrNfb5epc2zPi+sHxgAjJawVmwuwPYgtXhH2tE3uVXv41vVaBAw1w9TRg6yH00iqAHC/PQdq2IBLlz3xDK147t8PBjpLgb6/ysg7sXpKuxyuw53oW3tNZOIUdPoKic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715080209; c=relaxed/simple;
-	bh=fqwAiVgdIG1/1mfzXlBpT/WZA7mbZC3oys8LNVsxBqE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=E05zT/tzvqAA8LBJoRdYGboSbmpcWWWwdKUOZaFdfHF+3hlAG15ShdNeauFqQj2amSEu00EQ/bhQ6Fn44PYITbJKu5PICziGseqdiYd5+WpD4Z5WOGalx7o4N/5az+RDBwfsJf8fwau9C37SEl1HCgrXinxhpnDTcqPT7zBFmOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4VYb846Tfjz6K7Gf;
-	Tue,  7 May 2024 19:07:00 +0800 (CST)
-Received: from lhrpeml100004.china.huawei.com (unknown [7.191.162.219])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2BB46140B33;
-	Tue,  7 May 2024 19:10:03 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100004.china.huawei.com (7.191.162.219) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 7 May 2024 12:10:02 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Tue, 7 May 2024 12:10:02 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: liulongfang <liulongfang@huawei.com>, Alex Williamson
-	<alex.williamson@redhat.com>
-CC: "jgg@nvidia.com" <jgg@nvidia.com>, Jonathan Cameron
-	<jonathan.cameron@huawei.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-Subject: RE: [PATCH v6 2/5] hisi_acc_vfio_pci: modify the register location of
- the XQC address
-Thread-Topic: [PATCH v6 2/5] hisi_acc_vfio_pci: modify the register location
- of the XQC address
-Thread-Index: AQHalxSYiMUGo9i0CEeMRf9rOEDS3LGFqjoAgAXIF4CAADztAA==
-Date: Tue, 7 May 2024 11:10:02 +0000
-Message-ID: <2bc044ee1f86407bb22c3244e152e106@huawei.com>
-References: <20240425132322.12041-1-liulongfang@huawei.com>
- <20240425132322.12041-3-liulongfang@huawei.com>
- <20240503101138.7921401f.alex.williamson@redhat.com>
- <bc4fd179-265a-cbd8-afcb-358748ece897@huawei.com>
-In-Reply-To: <bc4fd179-265a-cbd8-afcb-358748ece897@huawei.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1715082271; c=relaxed/simple;
+	bh=60U2Bc6asAn7NidqKXexi1U7ISdZ2UfiA0OSGyFGvok=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t7I+qS/6iUNiczYoPtlfu0zB9cj7v4XJwDLEbIyBGb9zmpWhRaZXEcVAmjXOBoOZ9i0sUKy99y1owv9ml8w/euIu9sL/6hjsLEOWqfWZQDUVnJ1YSunhRlSJdyPrac/xzndKdo+3M4xgUaUgix3ansYTvM1E4cwn+GJOI/IisWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ARevRImt; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 447Bh5N7019035;
+	Tue, 7 May 2024 11:44:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=otzPcaazGn9g+pLvwtbtDObHp2piOhkZasDXAFFP0fw=;
+ b=ARevRImtO92G/PTpUydNB9y+fV6avH6oKz8o2O/NxtHrM1lu7J3Xb8d1W6ygmMdORX7P
+ q0J1/lcygLcjHpCSZBlCuXEzy0vjONVty513eevAg4mDDz5oUTJ2CgPER+uPUJEb4vVp
+ JcuwDfZD2/8QkKEEuXtcZnNY4DwwXFgbrJa/247wsAi/GMiytLj4Z6d1QtBnnII+MbYR
+ 95R7+yioCfjnjhiWO8O4pGEfi9YVadqvsw4oeDZBVdcVG2PVn4rD4NBHhZr4uXkSyK0q
+ pH34V7W8/zxSoiF/eYU1qnhvKOn+mJnbNLVj4XO5edHog+mAsNia6pGvUJyqQMy0reGE Iw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xykntg02s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 11:44:12 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 447BiB9b019975;
+	Tue, 7 May 2024 11:44:11 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xykntg02q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 11:44:11 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 447AThJl022558;
+	Tue, 7 May 2024 11:44:10 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xx1jkwj3n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 07 May 2024 11:44:10 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 447Bi5VS45351252
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 7 May 2024 11:44:07 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6D5EC20043;
+	Tue,  7 May 2024 11:44:05 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4EEFE20040;
+	Tue,  7 May 2024 11:44:01 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com.com (unknown [9.43.79.251])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  7 May 2024 11:44:00 +0000 (GMT)
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+        naveen.n.rao@linux.ibm.com
+Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Naveen N Rao <naveen@kernel.org>, Vaibhav Jain <vaibhav@linux.ibm.com>
+Subject: [PATCH v7] arch/powerpc/kvm: Add support for reading VPA counters for pseries guests
+Date: Tue,  7 May 2024 17:13:48 +0530
+Message-ID: <20240507114352.51819-1-gautam@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: nNipPBvCewN7W1260uvHkJQ39eL6XonP
+X-Proofpoint-GUID: gDbvdjFnxUD-5yXqqZnX2AoZ3WWNWZDB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-07_05,2024-05-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 spamscore=0 clxscore=1015
+ priorityscore=1501 malwarescore=0 impostorscore=0 mlxlogscore=999
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2405070080
 
+PAPR hypervisor has introduced three new counters in the VPA area of
+LPAR CPUs for KVM L2 guest (see [1] for terminology) observability - 2
+for context switches from host to guest and vice versa, and 1 counter
+for getting the total time spent inside the KVM guest. Add a tracepoint
+that enables reading the counters for use by ftrace/perf. Note that this
+tracepoint is only available for nestedv2 API (i.e, KVM on PowerVM).
 
+[1] Terminology:
+a. L1 refers to the VM (LPAR) booted on top of PAPR hypervisor
+b. L2 refers to the KVM guest booted on top of L1.
 
-> -----Original Message-----
-> From: liulongfang <liulongfang@huawei.com>
-> Sent: Tuesday, May 7, 2024 9:29 AM
-> To: Alex Williamson <alex.williamson@redhat.com>
-> Cc: jgg@nvidia.com; Shameerali Kolothum Thodi
-> <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
-> <jonathan.cameron@huawei.com>; kvm@vger.kernel.org; linux-
-> kernel@vger.kernel.org; linuxarm@openeuler.org
-> Subject: Re: [PATCH v6 2/5] hisi_acc_vfio_pci: modify the register locati=
-on of
-> the XQC address
->=20
-> On 2024/5/4 0:11, Alex Williamson wrote:
-> > On Thu, 25 Apr 2024 21:23:19 +0800
-> > Longfang Liu <liulongfang@huawei.com> wrote:
-> >
-> >> According to the latest hardware register specification. The DMA
-> >> addresses of EQE and AEQE are not at the front of their respective
-> >> register groups, but start from the second.
-> >> So, previously fetching the value starting from the first register
-> >> would result in an incorrect address.
-> >>
-> >> Therefore, the register location from which the address is obtained
-> >> needs to be modified.
-> >
-> > How does this affect migration?  Has it ever worked?  Does this make
->=20
-> The general HiSilicon accelerator task will only use SQE and CQE.
-> EQE is only used when user running kernel mode task and uses interrupt mo=
-de.
-> AEQE is only used when user running task exceptions occur and software re=
-set
-> is required.
->=20
-> The DMA addresses of these four queues are written to the device by the d=
-evice
-> driver through the mailbox command during driver initialization.
-> The DMA addresses of EQE and AEQE are migrated through the device registe=
-r.
->=20
-> EQE and AEQE are not used in general task, after the live migration is
-> completed,
-> this DMA address error will not be found. until we added a new kernel-mod=
-e test
-> case
-> that we discovered that this address was abnormal.
->=20
-> > the migration data incompatible?
-> >
->=20
-> This address only affects the kernel mode interrupt mode task function an=
-d
-> device
-> exception recovery function.
-> They do not affect live migration functionality
->=20
-> > Fixes: ???
->=20
-> OK!
+Acked-by: Naveen N Rao <naveen@kernel.org>
+Signed-off-by: Vaibhav Jain <vaibhav@linux.ibm.com>
+Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
+---
+v6 -> v7:
+1. Use TRACE_EVENT_FN_COND to handle zero counters case.
+2. Use for_each_present_cpu() to handle hotplugs.
 
-Hi,
+v5 -> v6:
+1. Use TRACE_EVENT_FN to enable/disable counters only once.
+2. Remove the agg. counters from vcpu->arch.
+3. Use PACA to maintain old counter values instead of zeroing on every
+entry.
+4. Simplify variable names
 
-Could you please add the Fixes tag and resend this separately if there are =
-no
-outstanding comments on this. This is not related to the debugfs support an=
-yway.
+v4 -> v5:
+1. Define helper functions for getting/setting the accumulation counter
+in L2's VPA
 
-Thanks,
-Shameer
+v3 -> v4:
+1. After vcpu_run, check the VPA flag instead of checking for tracepoint
+being enabled for disabling the cs time accumulation.
 
-> Thanks.
-> Longfang.
-> >> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-> >> ---
-> >>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c | 8 ++++----
-> >>  drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h | 3 +++
-> >>  2 files changed, 7 insertions(+), 4 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> >> index 45351be8e270..0c7e31076ff4 100644
-> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.c
-> >> @@ -516,12 +516,12 @@ static int vf_qm_state_save(struct
-> hisi_acc_vf_core_device *hisi_acc_vdev,
-> >>  		return -EINVAL;
-> >>
-> >>  	/* Every reg is 32 bit, the dma address is 64 bit. */
-> >> -	vf_data->eqe_dma =3D vf_data->qm_eqc_dw[1];
-> >> +	vf_data->eqe_dma =3D vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
-> >>  	vf_data->eqe_dma <<=3D QM_XQC_ADDR_OFFSET;
-> >> -	vf_data->eqe_dma |=3D vf_data->qm_eqc_dw[0];
-> >> -	vf_data->aeqe_dma =3D vf_data->qm_aeqc_dw[1];
-> >> +	vf_data->eqe_dma |=3D vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
-> >> +	vf_data->aeqe_dma =3D vf_data->qm_aeqc_dw[QM_XQC_ADDR_HIGH];
-> >>  	vf_data->aeqe_dma <<=3D QM_XQC_ADDR_OFFSET;
-> >> -	vf_data->aeqe_dma |=3D vf_data->qm_aeqc_dw[0];
-> >> +	vf_data->aeqe_dma |=3D vf_data->qm_aeqc_dw[QM_XQC_ADDR_LOW];
-> >>
-> >>  	/* Through SQC_BT/CQC_BT to get sqc and cqc address */
-> >>  	ret =3D qm_get_sqc(vf_qm, &vf_data->sqc_dma);
-> >> diff --git a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> >> index 5bab46602fad..f887ab98581c 100644
-> >> --- a/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> >> +++ b/drivers/vfio/pci/hisilicon/hisi_acc_vfio_pci.h
-> >> @@ -38,6 +38,9 @@
-> >>  #define QM_REG_ADDR_OFFSET	0x0004
-> >>
-> >>  #define QM_XQC_ADDR_OFFSET	32U
-> >> +#define QM_XQC_ADDR_LOW	0x1
-> >> +#define QM_XQC_ADDR_HIGH	0x2
-> >> +
-> >>  #define QM_VF_AEQ_INT_MASK	0x0004
-> >>  #define QM_VF_EQ_INT_MASK	0x000c
-> >>  #define QM_IFC_INT_SOURCE_V	0x0020
-> >
-> > .
-> >
+v2 -> v3:
+1. Move the counter disabling and zeroing code to a different function.
+2. Move the get_lppaca() inside the tracepoint_enabled() branch.
+3. Add the aggregation logic to maintain total context switch time.
+
+v1 -> v2:
+1. Fix the build error due to invalid struct member reference.
+
+ arch/powerpc/include/asm/lppaca.h | 11 +++++--
+ arch/powerpc/include/asm/paca.h   |  5 +++
+ arch/powerpc/kvm/book3s_hv.c      | 52 +++++++++++++++++++++++++++++++
+ arch/powerpc/kvm/trace_hv.h       | 29 +++++++++++++++++
+ 4 files changed, 94 insertions(+), 3 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/lppaca.h b/arch/powerpc/include/asm/lppaca.h
+index 61ec2447dabf..f40a646bee3c 100644
+--- a/arch/powerpc/include/asm/lppaca.h
++++ b/arch/powerpc/include/asm/lppaca.h
+@@ -62,7 +62,8 @@ struct lppaca {
+ 	u8	donate_dedicated_cpu;	/* Donate dedicated CPU cycles */
+ 	u8	fpregs_in_use;
+ 	u8	pmcregs_in_use;
+-	u8	reserved8[28];
++	u8	l2_counters_enable;  /* Enable usage of counters for KVM guest */
++	u8	reserved8[27];
+ 	__be64	wait_state_cycles;	/* Wait cycles for this proc */
+ 	u8	reserved9[28];
+ 	__be16	slb_count;		/* # of SLBs to maintain */
+@@ -92,9 +93,13 @@ struct lppaca {
+ 	/* cacheline 4-5 */
+ 
+ 	__be32	page_ins;		/* CMO Hint - # page ins by OS */
+-	u8	reserved12[148];
++	u8	reserved12[28];
++	volatile __be64 l1_to_l2_cs_tb;
++	volatile __be64 l2_to_l1_cs_tb;
++	volatile __be64 l2_runtime_tb;
++	u8 reserved13[96];
+ 	volatile __be64 dtl_idx;	/* Dispatch Trace Log head index */
+-	u8	reserved13[96];
++	u8	reserved14[96];
+ } ____cacheline_aligned;
+ 
+ #define lppaca_of(cpu)	(*paca_ptrs[cpu]->lppaca_ptr)
+diff --git a/arch/powerpc/include/asm/paca.h b/arch/powerpc/include/asm/paca.h
+index 1d58da946739..f20ac7a6efa4 100644
+--- a/arch/powerpc/include/asm/paca.h
++++ b/arch/powerpc/include/asm/paca.h
+@@ -278,6 +278,11 @@ struct paca_struct {
+ 	struct mce_info *mce_info;
+ 	u8 mce_pending_irq_work;
+ #endif /* CONFIG_PPC_BOOK3S_64 */
++#ifdef CONFIG_KVM_BOOK3S_HV_POSSIBLE
++	u64 l1_to_l2_cs;
++	u64 l2_to_l1_cs;
++	u64 l2_runtime_agg;
++#endif
+ } ____cacheline_aligned;
+ 
+ extern void copy_mm_to_paca(struct mm_struct *mm);
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 8e86eb577eb8..6acfe59c9b4f 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -4108,6 +4108,54 @@ static void vcpu_vpa_increment_dispatch(struct kvm_vcpu *vcpu)
+ 	}
+ }
+ 
++static inline int kvmhv_get_l2_counters_status(void)
++{
++	return get_lppaca()->l2_counters_enable;
++}
++
++static inline void kvmhv_set_l2_counters_status(int cpu, bool status)
++{
++	if (status)
++		lppaca_of(cpu).l2_counters_enable = 1;
++	else
++		lppaca_of(cpu).l2_counters_enable = 0;
++}
++
++int kmvhv_counters_tracepoint_regfunc(void)
++{
++	int cpu;
++
++	for_each_present_cpu(cpu) {
++		kvmhv_set_l2_counters_status(cpu, true);
++	}
++	return 0;
++}
++
++void kmvhv_counters_tracepoint_unregfunc(void)
++{
++	int cpu;
++
++	for_each_present_cpu(cpu) {
++		kvmhv_set_l2_counters_status(cpu, false);
++	}
++}
++
++static void do_trace_nested_cs_time(struct kvm_vcpu *vcpu)
++{
++	struct lppaca *lp = get_lppaca();
++	u64 l1_to_l2_ns, l2_to_l1_ns, l2_runtime_ns;
++
++	l1_to_l2_ns = tb_to_ns(be64_to_cpu(lp->l1_to_l2_cs_tb));
++	l2_to_l1_ns = tb_to_ns(be64_to_cpu(lp->l2_to_l1_cs_tb));
++	l2_runtime_ns = tb_to_ns(be64_to_cpu(lp->l2_runtime_tb));
++	trace_kvmppc_vcpu_stats(vcpu, l1_to_l2_ns - local_paca->l1_to_l2_cs,
++					l2_to_l1_ns - local_paca->l2_to_l1_cs,
++					l2_runtime_ns - local_paca->l2_runtime_agg);
++	local_paca->l1_to_l2_cs = l1_to_l2_ns;
++	local_paca->l2_to_l1_cs = l2_to_l1_ns;
++	local_paca->l2_runtime_agg = l2_runtime_ns;
++}
++
+ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+ 				     unsigned long lpcr, u64 *tb)
+ {
+@@ -4156,6 +4204,10 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
+ 
+ 	timer_rearm_host_dec(*tb);
+ 
++	/* Record context switch and guest_run_time data */
++	if (kvmhv_get_l2_counters_status())
++		do_trace_nested_cs_time(vcpu);
++
+ 	return trap;
+ }
+ 
+diff --git a/arch/powerpc/kvm/trace_hv.h b/arch/powerpc/kvm/trace_hv.h
+index 8d57c8428531..8c563e9438db 100644
+--- a/arch/powerpc/kvm/trace_hv.h
++++ b/arch/powerpc/kvm/trace_hv.h
+@@ -238,6 +238,9 @@
+ 	{H_MULTI_THREADS_ACTIVE,	"H_MULTI_THREADS_ACTIVE"}, \
+ 	{H_OUTSTANDING_COP_OPS,		"H_OUTSTANDING_COP_OPS"}
+ 
++int kmvhv_counters_tracepoint_regfunc(void);
++void kmvhv_counters_tracepoint_unregfunc(void);
++
+ TRACE_EVENT(kvm_guest_enter,
+ 	TP_PROTO(struct kvm_vcpu *vcpu),
+ 	TP_ARGS(vcpu),
+@@ -512,6 +515,32 @@ TRACE_EVENT(kvmppc_run_vcpu_exit,
+ 			__entry->vcpu_id, __entry->exit, __entry->ret)
+ );
+ 
++TRACE_EVENT_FN_COND(kvmppc_vcpu_stats,
++	TP_PROTO(struct kvm_vcpu *vcpu, u64 l1_to_l2_cs, u64 l2_to_l1_cs, u64 l2_runtime),
++
++	TP_ARGS(vcpu, l1_to_l2_cs, l2_to_l1_cs, l2_runtime),
++
++	TP_CONDITION(l1_to_l2_cs || l2_to_l1_cs || l2_runtime),
++
++	TP_STRUCT__entry(
++		__field(int,		vcpu_id)
++		__field(u64,		l1_to_l2_cs)
++		__field(u64,		l2_to_l1_cs)
++		__field(u64,		l2_runtime)
++	),
++
++	TP_fast_assign(
++		__entry->vcpu_id  = vcpu->vcpu_id;
++		__entry->l1_to_l2_cs = l1_to_l2_cs;
++		__entry->l2_to_l1_cs = l2_to_l1_cs;
++		__entry->l2_runtime = l2_runtime;
++	),
++
++	TP_printk("VCPU %d: l1_to_l2_cs_time=%llu ns l2_to_l1_cs_time=%llu ns l2_runtime=%llu ns",
++		__entry->vcpu_id,  __entry->l1_to_l2_cs,
++		__entry->l2_to_l1_cs, __entry->l2_runtime),
++	kmvhv_counters_tracepoint_regfunc, kmvhv_counters_tracepoint_unregfunc
++);
+ #endif /* _TRACE_KVM_HV_H */
+ 
+ /* This part must be outside protection */
+-- 
+2.44.0
+
 
