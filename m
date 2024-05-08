@@ -1,114 +1,163 @@
-Return-Path: <kvm+bounces-16954-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A30C8BF4CA
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 04:58:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C328BF4E5
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 05:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC59F1C21CD3
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 02:58:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D71F01F24D90
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 03:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C627F15E88;
-	Wed,  8 May 2024 02:57:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7861427E;
+	Wed,  8 May 2024 03:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fK6K0Qbc"
+	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="qs3G3HLZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from out0-193.mail.aliyun.com (out0-193.mail.aliyun.com [140.205.0.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81CCB14003;
-	Wed,  8 May 2024 02:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A1110A31;
+	Wed,  8 May 2024 03:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.205.0.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715137078; cv=none; b=S5BBO08m6oydZ1ELyQvOnQJy4y/UgidHh0XrKqgm7b80cDsHIH4SdBqpjnHIAJKBE9Ef6yQhpq9tyfrftqF2iSwPWjNTglFvTLigSjxUVPLDFaBV/6nGVZ0yc4N3l2AKjH2/EiGj5KE3zUpWD4GO40TyUY5pgzlCGP2kCIyboOY=
+	t=1715138336; cv=none; b=d4KeCbgaAC0WBq7Oyzh666VXDtLx7NAW4S1AdgWokwHyKldwwsMIn4vbR+llZ9K4dXYFT5dKJAn0xUWaekMMU2rijvhWlS1LGUSQHMwEgC2hFTpE5FDW1Ttl87lQsvADKoAFHvT+0o2S/bW/zUVhAppKMFJ+rG0ceXvZIGciAAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715137078; c=relaxed/simple;
-	bh=7Fb40uljgKsFnE1FzE9EeCrT6mqgfdQY5bkG3RtT+n0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSXIDtOLhexXPSqwZujs3PHMQxocgCsL616EcqYRIN87mVnm3g/JkGNuBLVkY95j1fLW3j/zK36wTsldQ1Pp4phtru4lMTwewf/DHl6xcUOhyaL4YQiV6srLoOX1zZ2asywyCCGi/yib03E2mGxCwstiHXvR098TjlE8KkLonWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fK6K0Qbc; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715137077; x=1746673077;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=7Fb40uljgKsFnE1FzE9EeCrT6mqgfdQY5bkG3RtT+n0=;
-  b=fK6K0Qbc4uz0oW5sTJlmm4SmZVTrgSJP+E90a5X45dzSwXnF/WeFtDBU
-   S5mVFCVc8pMLtywTsqvgNSzZ4RmDTmTBmpi9u4t7x3uPSxCw/MXRXGoZ5
-   Tg3gN/Y4zh8+zx31/viPwKG7P6osqAoAKu30ILUuFW2DtYXEFTcc/S/Lp
-   zSc3IBrNsF08ljT3+CkRfM5vYH/MM2m0hwj1ckJhbsO7vyeL17CrkOZDP
-   m+RLRyb5aAK+yzQ4EMrUJkvOXIZyrHyThqk3EsjzvvO6VceqmhDxA7LKW
-   wY/SPpNdBwR3PH093OkFiuw9IMEXaAQRaHFIXeaWDgyru81SE4qVEaKil
-   g==;
-X-CSE-ConnectionGUID: tuIqC/l+RV2/JCk90SpOTQ==
-X-CSE-MsgGUID: CMd0MxKaTP+9d9m4HDkS1w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="21533526"
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="21533526"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 19:57:56 -0700
-X-CSE-ConnectionGUID: anmJjyLiR6S4ei743rWx4w==
-X-CSE-MsgGUID: SLR/iHPIS5Wre20AGIkdTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="33291964"
-Received: from linux.bj.intel.com ([10.238.157.71])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 19:57:50 -0700
-Date: Wed, 8 May 2024 10:55:05 +0800
-From: Tao Su <tao1.su@linux.intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-sound@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-sgx@vger.kernel.org, edliaw@google.com,
-	ivan.orlov0322@gmail.com, broonie@kernel.org, perex@perex.cz,
-	tiwai@suse.com, shuah@kernel.org, seanjc@google.com,
-	pbonzini@redhat.com, bongsu.jeon@samsung.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alexandre.belloni@bootlin.com, jarkko@kernel.org,
-	dave.hansen@linux.intel.com
-Subject: Re: [PATCH] selftests: Add _GNU_SOURCE definition when including
- kselftest_harness.h
-Message-ID: <ZjrpieLKXFhklVwR@linux.bj.intel.com>
-References: <20240507063534.4191447-1-tao1.su@linux.intel.com>
- <20240507100651.8faca09c7af34de28f830f03@linux-foundation.org>
+	s=arc-20240116; t=1715138336; c=relaxed/simple;
+	bh=XLuR9VxXVV1Ku8DVWVb7b2tLdtBtCxg3+Z+626HBzJ4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BcJu4cKohEzCTI1ENLDjGSgD25LsrTZlHuY4X4qx1JvIbo1uxNTGMJYP34CSQ/WlKhhM+U7Bx1xQsWfzk8u3TXXwZXSCt6vGXOGDKH3nN4uQenUTUerMc7w8I/PGEHp/3EBSGspxps0sKizdLXCuLDu0BUXvJK1XWD9D6d07n+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=qs3G3HLZ; arc=none smtp.client-ip=140.205.0.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=antgroup.com; s=default;
+	t=1715138325; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=DnAX2XxWMmT4hYoRUEoVeoZJUWhjhnceF4d+AxQfu6I=;
+	b=qs3G3HLZuWzK77mam8IvxbBqK3JADd/OxmQyBoXfPlTnNBUA99zKZMChDTRBWS8SY6Mlds2WTeeCaPAFZOktL6bTj67/Jeo1gBEyBz08YMau1LbfMmmaLp+9uDRIVQJ6Wfqwsnz/tO3wZYOE3kzvEx4keBWVEBfvFzBtjvWexAc=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047205;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---.XV8fOaO_1715138323;
+Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.XV8fOaO_1715138323)
+          by smtp.aliyun-inc.com;
+          Wed, 08 May 2024 11:18:44 +0800
+From: "Hou Wenlong" <houwenlong.hwl@antgroup.com>
+To: kvm@vger.kernel.org
+Cc: "Lai Jiangshan" <jiangshan.ljs@antgroup.com>,
+  "Sean Christopherson" <seanjc@google.com>,
+  "Paolo Bonzini" <pbonzini@redhat.com>,
+  "Thomas Gleixner" <tglx@linutronix.de>,
+  "Ingo Molnar" <mingo@redhat.com>,
+  "Borislav Petkov" <bp@alien8.de>,
+  "Dave Hansen" <dave.hansen@linux.intel.com>,
+   <x86@kernel.org>,
+  "H. Peter Anvin" <hpa@zytor.com>,
+   <linux-kernel@vger.kernel.org>
+Subject: [PATCH] KVM: x86/mmu: Only allocate shadowed translation cache for sp->role.level <= KVM_MAX_HUGEPAGE_LEVEL
+Date: Wed, 08 May 2024 11:18:42 +0800
+Message-Id: <bf08a06675ed97d2456f7dcd9b0b2ef92f4602be.1715137643.git.houwenlong.hwl@antgroup.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240507100651.8faca09c7af34de28f830f03@linux-foundation.org>
 
-On Tue, May 07, 2024 at 10:06:51AM -0700, Andrew Morton wrote:
-> On Tue,  7 May 2024 14:35:34 +0800 Tao Su <tao1.su@linux.intel.com> wrote:
-> 
-> > asprintf() is declared in stdio.h when defining _GNU_SOURCE, but stdio.h
-> > is so common that many files don’t define _GNU_SOURCE before including
-> > stdio.h, and defining _GNU_SOURCE after including stdio.h will no longer
-> > take effect.
-> > 
-> > Since kselftest_harness.h introduces asprintf(), it is necessary to add
-> > _GNU_SOURCE definition in all selftests including kselftest_harness.h,
-> > otherwise, there will be warnings or even errors during compilation.
-> > There are already many selftests that define _GNU_SOURCE or put the
-> > include of kselftest_harness.h at the very beginning of the .c file, just
-> > add the _GNU_SOURCE definition in the tests that have compilation warnings.
-> 
-> That asprintf() continues to cause problems.  How about we just remove
-> it? Do the malloc(snprintf(str, 0, ...)) separately?
+Only the indirect SP with sp->role.level <= KVM_MAX_HUGEPAGE_LEVEL might
+have leaf gptes, so allocation of shadowed translation cache is needed
+only for it. Additionally, use sp->shadowed_translation to determine
+whether to use the information in shadowed translation cache or not.
 
-Removing asprintf() is indeed an good option, but using snprintf(str, 0, ...)
-to get string size may go against the original intention of commit 38c957f07038.
+Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
-Back to commit 38c957f07038, I don't see any advantage in using LINE_MAX.
-Can we use a fixed value instead of LINE_MAX? E.g., 1024, 2048. Then we
-just need to revert commit 809216233555.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index fc3b59b59ee1..8be987d0f05e 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -716,12 +716,12 @@ static bool sp_has_gptes(struct kvm_mmu_page *sp);
+ 
+ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+ {
++	if (sp->shadowed_translation)
++		return sp->shadowed_translation[index] >> PAGE_SHIFT;
++
+ 	if (sp->role.passthrough)
+ 		return sp->gfn;
+ 
+-	if (!sp->role.direct)
+-		return sp->shadowed_translation[index] >> PAGE_SHIFT;
+-
+ 	return sp->gfn + (index << ((sp->role.level - 1) * SPTE_LEVEL_BITS));
+ }
+ 
+@@ -733,7 +733,7 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+  */
+ static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
+ {
+-	if (sp_has_gptes(sp))
++	if (sp->shadowed_translation)
+ 		return sp->shadowed_translation[index] & ACC_ALL;
+ 
+ 	/*
+@@ -754,7 +754,7 @@ static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
+ static void kvm_mmu_page_set_translation(struct kvm_mmu_page *sp, int index,
+ 					 gfn_t gfn, unsigned int access)
+ {
+-	if (sp_has_gptes(sp)) {
++	if (sp->shadowed_translation) {
+ 		sp->shadowed_translation[index] = (gfn << PAGE_SHIFT) | access;
+ 		return;
+ 	}
+@@ -1697,7 +1697,7 @@ static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
+ 	hlist_del(&sp->hash_link);
+ 	list_del(&sp->link);
+ 	free_page((unsigned long)sp->spt);
+-	if (!sp->role.direct)
++	if (sp->shadowed_translation)
+ 		free_page((unsigned long)sp->shadowed_translation);
+ 	kmem_cache_free(mmu_page_header_cache, sp);
+ }
+@@ -1850,6 +1850,17 @@ static bool kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+ static void kvm_mmu_commit_zap_page(struct kvm *kvm,
+ 				    struct list_head *invalid_list);
+ 
++static bool sp_might_have_leaf_gptes(struct kvm_mmu_page *sp)
++{
++	if (sp->role.direct)
++		return false;
++
++	if (sp->role.level > KVM_MAX_HUGEPAGE_LEVEL)
++		return false;
++
++	return true;
++}
++
+ static bool sp_has_gptes(struct kvm_mmu_page *sp)
+ {
+ 	if (sp->role.direct)
+@@ -2199,7 +2210,8 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+ 
+ 	sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
+ 	sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
+-	if (!role.direct)
++	sp->role = role;
++	if (sp_might_have_leaf_gptes(sp))
+ 		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
+ 
+ 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+@@ -2216,7 +2228,6 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+ 	kvm_account_mmu_page(kvm, sp);
+ 
+ 	sp->gfn = gfn;
+-	sp->role = role;
+ 	hlist_add_head(&sp->hash_link, sp_list);
+ 	if (sp_has_gptes(sp))
+ 		account_shadowed(kvm, sp);
+-- 
+2.31.1
+
 
