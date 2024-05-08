@@ -1,233 +1,155 @@
-Return-Path: <kvm+bounces-16986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03E18BF864
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 10:22:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED8338BF86B
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 10:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1030F1C2141B
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 08:22:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 673B91F238E3
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 08:23:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF2B4502A;
-	Wed,  8 May 2024 08:22:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874DD45957;
+	Wed,  8 May 2024 08:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PjuDEr2R"
+	dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b="O051azcW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A354086F
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 08:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485A02C861
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 08:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715156539; cv=none; b=r2PvAQCYI8jtEymVLtBZb9ceqkm0fFY9CA2jFiI0eID3AJf3ttH27c0gRB3QBGfUAUYHXRJRmkQKwdKfpbfO9MFuNP88NvKX3G0PrrR3tBukH1bgH0p+8bUI5JAkvvQzTnVK0bW32Y7+4YuQLgMlhx8AwWg9AL7vorZeydaznA0=
+	t=1715156594; cv=none; b=cc5CORwWQho/euhUp0Rw36ub3DFSfo14pkUMfyq4q4DAdvqFF0mXNacj7jRdvcYqdEBMpILNA68sPJiMLy1Geo0WI5DH+SEK5QmRsShChp6KBsZwU3eUwxU5ni1fHc2IDog1AmZ5lGbO8Fb6vGSfMvQm/cea/389JhwVVWZ68aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715156539; c=relaxed/simple;
-	bh=ygFz4Xi5KPzs5xGDIbJIGzXq1wtvM0/GTF+V51fuSIA=;
+	s=arc-20240116; t=1715156594; c=relaxed/simple;
+	bh=L9G2zXTS16Mb+4am/gUrC3INgoVtn6qnR/OXIt3yAGk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G74T4Lm5UWherL9iqAO9zs2dJWuHB2nPKrs1OZCQlbKC4NlQuO+WCQQxnywVEXveA/Ubzngij1LkNloToyFVi2h1yML3VxjJm7mdE5W/7/x2UvDu7V1g5njbYbeDCIIF1MKIoLwcm/uhOoUrWV54KlVEXy6dIOgbM3lA0zoJzx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PjuDEr2R; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715156536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WECjWQs8mty4SiAVTCtSfnAeiyCSuc/uRnEzCXqgsoI=;
-	b=PjuDEr2RSg4nALYsYflfPBPT6xMlnEfNI2kBNSfIml1lfMXSezKngYJDtZmkGezYyxUO7y
-	6NWf2lroAN0QqrvuNXMGxj9MfW3tr2ppLcsc5CIioB8C5GiwPR2qqTBo9scLCMYre/Agh0
-	HxbnDEkkzmRp7imVPH6u3vELq1DWiig=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-131-5a0d1AYSMCSatKPCQ5dYTg-1; Wed, 08 May 2024 04:22:15 -0400
-X-MC-Unique: 5a0d1AYSMCSatKPCQ5dYTg-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a599dbd2b6aso242539366b.2
-        for <kvm@vger.kernel.org>; Wed, 08 May 2024 01:22:15 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WsD2DQGpsAqsOeEvDwj2LmCqJs5CDvDMjefKjpgYEKR9I7reBy4+kMTSJcGWsexL1uXL/OzFbDHf+yr2OzVcXUoOtSXft0sQYM8RmE8M70OjNW3f8hLbOFv5TD8YvOkOm9wgaPN2fm85Gb7vyvbFUakejQix6GtS/t8kYUFjp2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch; spf=none smtp.mailfrom=ffwll.ch; dkim=pass (1024-bit key) header.d=ffwll.ch header.i=@ffwll.ch header.b=O051azcW; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ffwll.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ffwll.ch
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a59c0d5423aso59577266b.0
+        for <kvm@vger.kernel.org>; Wed, 08 May 2024 01:23:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ffwll.ch; s=google; t=1715156591; x=1715761391; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xX8T7z7JX/d3uw4bZ2bZEEE/EwwDbdoePKTyocl8yug=;
+        b=O051azcWeaUdieG5z6eGWGsCxpkth8aoKM7Uxqs31yUSx1RF57dkPOV4vdKxMp5/dy
+         fsau1jvbVsPyEXRadd0Z/cGo70XACc/u5KEalTe9iMLz5YM0GJGTsygKzU5aKD2PConV
+         NPMRZ2Q9gxEprU9MbE8FoGNLB1+a6OY0Pxf7k=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715156534; x=1715761334;
+        d=1e100.net; s=20230601; t=1715156591; x=1715761391;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WECjWQs8mty4SiAVTCtSfnAeiyCSuc/uRnEzCXqgsoI=;
-        b=nVzoZy9eyLSmopYb4DNR1AhgiEwqkWdk1ovIOQ/BSGotU6Czn/TGgutialhCH4Hy0d
-         Neq40mVHrvI6xsvEu9Sg1gTvSV85XxQVvXRqtGm4gRf8n4YL4nXzD2DDowb9R/T+FPow
-         JYfDHp3bCLypZ3uSeAOVuvXc0V8bqt831XKJAsO6b6tHWl1IxqVP7T4lqtYUy9iPk6+p
-         hPEoJAorr4BJ2aRnGNNs2/FMpXRZYSGWSj5GzO+Eicr6AVI6vbCa9ZcdXLN+fkCKCDgm
-         k7agEsNbFTirok/himBjbVCbAd5d+Op/4cjxOtAzR4XR+6BbGgdfcLygca4DDddMHUdB
-         AXhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXQh9sp69dZV7Sz4Ewt+SbzWkbxHcE5nl1s2wN2Vl5RipOD4h4akG0uiCEB7lu9ZvRAX7PxIBcQJjyQgzf8MsWvOx7G
-X-Gm-Message-State: AOJu0YwA6olHkgBBoYL9rRj8w/d98nLAWVI8jLXAvjsCUIqUvGwa9Fcq
-	XUxe874wL10NV4Hx7OvojTmUsID38cnlOVG9CxphHvbGntJrV+xlkQqGpWyCP3hKnTvoQ95+dKY
-	TXPaUaKjNnHp3zVavl96eZEn9LhMIzio4NvCagHXmUUm682eF7g==
-X-Received: by 2002:a17:906:74d:b0:a59:bb20:9964 with SMTP id a640c23a62f3a-a59fb94b8f0mr124741766b.23.1715156534167;
-        Wed, 08 May 2024 01:22:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHU9a/9Dj60z9UWENRsQNKFMOX3GbrPe06GNksU418kuNjSLQfi4iB448HOWm6NjY8xN34DpA==
-X-Received: by 2002:a17:906:74d:b0:a59:bb20:9964 with SMTP id a640c23a62f3a-a59fb94b8f0mr124740166b.23.1715156533853;
-        Wed, 08 May 2024 01:22:13 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-12-25-56.business.telecomitalia.it. [87.12.25.56])
-        by smtp.gmail.com with ESMTPSA id cf14-20020a170906b2ce00b00a59ef203579sm1645424ejb.138.2024.05.08.01.22.12
+        bh=xX8T7z7JX/d3uw4bZ2bZEEE/EwwDbdoePKTyocl8yug=;
+        b=jIAFrpeM0xPfPBuISNaENTLjEj2R3qY/SVLxomq1WGkSwElYkzIgDhGtJjJuCdl/qF
+         T0xwNXdx9Jo1HCms6pLj45wX7VucHkIZoHwcFw1UorChJ0F+ZTVknJrhPjAJDb0GdJe+
+         ASMhPiBy2qlNQHDTzArZltd8at7wEbImvgFeFgZmxEJdS/XjUbJ1LRMPy8OwTpA1M/zl
+         sbjKYXtGmZEEG4EPxL5yDpuPJEmneIQr676g5mqFiQ/qaICVRnsIhvZg13bNvMpefPQM
+         Zck+OhykhyDh45isF0aJ9mfsjGHxkPb3QlEBkRSSJv9wwcoVleaKD/WtWk7Y4ejhwQK7
+         4VZA==
+X-Forwarded-Encrypted: i=1; AJvYcCWRAbTce74cKL4Bn+RQwaHO0Lgao5zYX7wCPplbX/oYNeAJnchLblEDwHicWuuzE+kqzMvN5KL89eAvW1JRGvTdqFLN
+X-Gm-Message-State: AOJu0YzygbmlVVjYnYGKSE+IvEhRMlQwEpCprtt6FX5CErfYu7y/jgFH
+	B8e3MTCrHFv2mzu9gQjUTpsyfVug7Vu0ZkL8bmAjk5R2QTjSHLosOr0nbEOVAYA=
+X-Google-Smtp-Source: AGHT+IERZtXNeoCiRmo1mqas8Y/UQ6pzLyLJDXpgtWRZ1RzE0ZKKFqa1dMwitwttSdKyrV7CIRB1ew==
+X-Received: by 2002:a17:906:f359:b0:a59:dbb0:ddcf with SMTP id a640c23a62f3a-a59fb6fba8fmr121830766b.0.1715156591554;
+        Wed, 08 May 2024 01:23:11 -0700 (PDT)
+Received: from phenom.ffwll.local ([2a02:168:57f4:0:efd0:b9e5:5ae6:c2fa])
+        by smtp.gmail.com with ESMTPSA id g8-20020a1709067c4800b00a59a9cfec7esm5128792ejp.133.2024.05.08.01.23.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 01:22:13 -0700 (PDT)
-Date: Wed, 8 May 2024 10:22:09 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <luigi.leonardi@outlook.com>
-Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, kuba@kernel.org, stefanha@redhat.com, 
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, kvm@vger.kernel.org, 
-	jasowang@redhat.com, Daan De Meyer <daan.j.demeyer@gmail.com>
-Subject: Re: [PATCH net-next v2 1/3] vsock: add support for SIOCOUTQ ioctl
- for all vsock socket types.
-Message-ID: <t752lxu3kwqypmdgr36nrd63pfigdgi22xhjawitr6mhjz2u4g@7xa3ucifp2sc>
-References: <20240408133749.510520-1-luigi.leonardi@outlook.com>
- <AS2P194MB21708B8955BEC4C0D2EF822B9A002@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+        Wed, 08 May 2024 01:23:11 -0700 (PDT)
+Date: Wed, 8 May 2024 10:23:09 +0200
+From: Daniel Vetter <daniel@ffwll.ch>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: "Kasireddy, Vivek" <vivek.kasireddy@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v1 2/2] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <Zjs2bVVxBHEGUhF_@phenom.ffwll.local>
+References: <20240422063602.3690124-1-vivek.kasireddy@intel.com>
+ <20240422063602.3690124-3-vivek.kasireddy@intel.com>
+ <20240430162450.711f4616.alex.williamson@redhat.com>
+ <20240501125309.GB941030@nvidia.com>
+ <IA0PR11MB718509BB8B56455710DB2033F8182@IA0PR11MB7185.namprd11.prod.outlook.com>
+ <20240508003153.GC4650@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AS2P194MB21708B8955BEC4C0D2EF822B9A002@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+In-Reply-To: <20240508003153.GC4650@nvidia.com>
+X-Operating-System: Linux phenom 6.6.15-amd64 
 
-On Mon, Apr 08, 2024 at 03:37:47PM GMT, Luigi Leonardi wrote:
->This add support for ioctl(s) for SOCK_STREAM SOCK_SEQPACKET and SOCK_DGRAM
->in AF_VSOCK.
->The only ioctl available is SIOCOUTQ/TIOCOUTQ, which returns the number
->of unsent bytes in the socket. This information is transport-specific
->and is delegated to them using a callback.
->
->Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->---
-> include/net/af_vsock.h   |  3 +++
-> net/vmw_vsock/af_vsock.c | 51 +++++++++++++++++++++++++++++++++++++---
-> 2 files changed, 51 insertions(+), 3 deletions(-)
->
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 535701efc1e5..7d67faa7bbdb 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -169,6 +169,9 @@ struct vsock_transport {
-> 	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
-> 	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
->
->+	/* SIOCOUTQ ioctl */
->+	int (*unsent_bytes)(struct vsock_sock *vsk);
->+
-> 	/* Shutdown. */
-> 	int (*shutdown)(struct vsock_sock *, int);
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 54ba7316f808..fc108283409a 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -112,6 +112,7 @@
-> #include <net/sock.h>
-> #include <net/af_vsock.h>
-> #include <uapi/linux/vm_sockets.h>
->+#include <uapi/asm-generic/ioctls.h>
->
-> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
-> static void vsock_sk_destruct(struct sock *sk);
->@@ -1292,6 +1293,50 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
-> }
-> EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
->
->+static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
->+			  int __user *arg)
->+{
->+	struct sock *sk = sock->sk;
->+	struct vsock_sock *vsk;
->+	int retval;
->+
->+	vsk = vsock_sk(sk);
->+
->+	switch (cmd) {
->+	case SIOCOUTQ: {
->+		int n_bytes;
->+
->+		if (vsk->transport->unsent_bytes) {
+On Tue, May 07, 2024 at 09:31:53PM -0300, Jason Gunthorpe wrote:
+> On Thu, May 02, 2024 at 07:50:36AM +0000, Kasireddy, Vivek wrote:
+> > Hi Jason,
+> > 
+> > > 
+> > > On Tue, Apr 30, 2024 at 04:24:50PM -0600, Alex Williamson wrote:
+> > > > > +static vm_fault_t vfio_pci_dma_buf_fault(struct vm_fault *vmf)
+> > > > > +{
+> > > > > +	struct vm_area_struct *vma = vmf->vma;
+> > > > > +	struct vfio_pci_dma_buf *priv = vma->vm_private_data;
+> > > > > +	pgoff_t pgoff = vmf->pgoff;
+> > > > > +
+> > > > > +	if (pgoff >= priv->nr_pages)
+> > > > > +		return VM_FAULT_SIGBUS;
+> > > > > +
+> > > > > +	return vmf_insert_pfn(vma, vmf->address,
+> > > > > +			      page_to_pfn(priv->pages[pgoff]));
+> > > > > +}
+> > > >
+> > > > How does this prevent the MMIO space from being mmap'd when disabled
+> > > at
+> > > > the device?  How is the mmap revoked when the MMIO becomes disabled?
+> > > > Is it part of the move protocol?
+> > In this case, I think the importers that mmap'd the dmabuf need to be tracked
+> > separately and their VMA PTEs need to be zapped when MMIO access is revoked.
+> 
+> Which, as we know, is quite hard.
+> 
+> > > Yes, we should not have a mmap handler for dmabuf. vfio memory must be
+> > > mmapped in the normal way.
+> > Although optional, I think most dmabuf exporters (drm ones) provide a mmap
+> > handler. Otherwise, there is no easy way to provide CPU access (backup slow path)
+> > to the dmabuf for the importer.
+> 
+> Here we should not, there is no reason since VFIO already provides a
+> mmap mechanism itself. Anything using this API should just call the
+> native VFIO function instead of trying to mmap the DMABUF. Yes, it
+> will be inconvient for the scatterlist case you have, but the kernel
+> side implementation is much easier ..
 
-Should we also check the `vsk->transport` is not null?
+Just wanted to confirm that it's entirely legit to not implement dma-buf
+mmap. Same for the in-kernel vmap functions. Especially for really funny
+buffers like these it's just not a good idea, and the dma-buf interfaces
+are intentionally "everything is optional".
 
-I also suggest an early return, or to have the shortest branch on top
-for readability:
+Similarly you can (and should) reject and dma_buf_attach to devices where
+p2p connectevity isn't there, or well really for any other reason that
+makes stuff complicated and is out of scope for your use-case. It's better
+to reject strictly and than accidentally support something really horrible
+(we've been there).
 
-		if (!vsk->transport || !vsk->transport->unsent_bytes) {
-			retval = -EOPNOTSUPP;
-			break;
-		}
-
-Thanks,
-Stefano
-
->+			if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
->+				retval = -EINVAL;
->+				break;
->+			}
->+
->+			n_bytes = vsk->transport->unsent_bytes(vsk);
->+			if (n_bytes < 0) {
->+				retval = n_bytes;
->+				break;
->+			}
->+
->+			retval = put_user(n_bytes, arg);
->+		} else {
->+			retval = -EOPNOTSUPP;
->+		}
->+		break;
->+	}
->+	default:
->+		retval = -ENOIOCTLCMD;
->+	}
->+
->+	return retval;
->+}
->+
->+static int vsock_ioctl(struct socket *sock, unsigned int cmd,
->+		       unsigned long arg)
->+{
->+	return vsock_do_ioctl(sock, cmd, (int __user *)arg);
->+}
->+
-> static const struct proto_ops vsock_dgram_ops = {
-> 	.family = PF_VSOCK,
-> 	.owner = THIS_MODULE,
->@@ -1302,7 +1347,7 @@ static const struct proto_ops vsock_dgram_ops = {
-> 	.accept = sock_no_accept,
-> 	.getname = vsock_getname,
-> 	.poll = vsock_poll,
->-	.ioctl = sock_no_ioctl,
->+	.ioctl = vsock_ioctl,
-> 	.listen = sock_no_listen,
-> 	.shutdown = vsock_shutdown,
-> 	.sendmsg = vsock_dgram_sendmsg,
->@@ -2286,7 +2331,7 @@ static const struct proto_ops vsock_stream_ops = {
-> 	.accept = vsock_accept,
-> 	.getname = vsock_getname,
-> 	.poll = vsock_poll,
->-	.ioctl = sock_no_ioctl,
->+	.ioctl = vsock_ioctl,
-> 	.listen = vsock_listen,
-> 	.shutdown = vsock_shutdown,
-> 	.setsockopt = vsock_connectible_setsockopt,
->@@ -2308,7 +2353,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
-> 	.accept = vsock_accept,
-> 	.getname = vsock_getname,
-> 	.poll = vsock_poll,
->-	.ioctl = sock_no_ioctl,
->+	.ioctl = vsock_ioctl,
-> 	.listen = vsock_listen,
-> 	.shutdown = vsock_shutdown,
-> 	.setsockopt = vsock_connectible_setsockopt,
->-- 
->2.34.1
->
-
+The only real rule with all the interfaces is that when attach() worked,
+then map must too (except when you're in OOM). Because at least for some
+drivers/subsystems, that's how userspace figures out whether a buffer can
+be shared.
+-Sima
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
 
