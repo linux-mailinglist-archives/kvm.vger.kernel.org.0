@@ -1,185 +1,125 @@
-Return-Path: <kvm+bounces-16971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BAA98BF63B
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 08:28:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD0978BF664
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 08:39:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F99428AA8A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 06:28:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 038BEB211AD
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 06:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D5618651;
-	Wed,  8 May 2024 06:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8A217BCD;
+	Wed,  8 May 2024 06:39:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZdKnLhl0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m4ZZTlMM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78F47171A2;
-	Wed,  8 May 2024 06:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 447E817730;
+	Wed,  8 May 2024 06:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715149674; cv=none; b=Op7mpaANPUBPvkiwrRgZF9nZVZbMiVnSms35m3/7DwFet5LcOTthiyOInnqqKzXSIByPPBPqMOQaaw6OG1AO3VRuE/cVI13emX4u38R+ryl/ECjLqgSCH8/muXwClHU76fjOoBEGGa+dOrCYzpG5yaW/ycwcitJq8ytFNZf/HLk=
+	t=1715150363; cv=none; b=tS8eGiTNn17VyNbsSnlzwReJD0mSFyMCCmK7TcD1c/7q1rmpAgoh2WIGQJCXb7Evmk69lfsXX22E0qvOYjzmmR1gE69+A0JZP6EsA/z6vc5iBvArno8NE+kL5utpvnfph0R2MmHlIqujCYJHUywpQddUf6g+iuFydyrvXL3BzXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715149674; c=relaxed/simple;
-	bh=SRdSWoGxwc2/ZbcZujDPJNT4qWG4QjJ6L+NyNtSaN54=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J+DLLXKQyqJvIlNW5IrzMxNnUb0MmYK92QjB3rla7TSB3M2kck3OU4EYX5GZLwkiGtmo4Y512H8vmE4NfBIqUP+mtdRCjWsSGHC9Nm+AJvhyDk3+zZhoGwFfr5koAklQ2XmLwvQ9v4Ub0TLx7pzQEV1LCx0jUj4wIEt+2+i5RjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZdKnLhl0; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715149672; x=1746685672;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=SRdSWoGxwc2/ZbcZujDPJNT4qWG4QjJ6L+NyNtSaN54=;
-  b=ZdKnLhl07AImnc3lceqOVPFx+IoGnNDMY0h5BHqhz/kWWCCNwLEKC1df
-   i6WH1TSMyGtgyslQXhLbX+AZvPd+iyCXWKDAUawGTGU1RBtzaDj5HXQsk
-   YFrTqBINd+f6dSpB1Lf0ZU/N+rbWf7N5ERmZe1uZCB09xQAgdhtnURIW2
-   5E0Ye3p7XvpRuIoBFZW4lZAwmngCfYv+ghsIgKJIZMUwLeKaTnBpurBDz
-   Q8FEoTaHrNRhYp9hjPbkh9hTo6igK6eOyfucC8F4JsKSVcJZOXmf9bIHb
-   7/ntBzXnpVJ0gpdBj27A+xf7s3mwfUrxsmJiPxZn8TX0MflApZ2ot6f+B
-   A==;
-X-CSE-ConnectionGUID: V9Cj0zhqQWezigXarULbfQ==
-X-CSE-MsgGUID: OgRvmr2VQ2aGq9BvEYd6Zw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="11111214"
-X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
-   d="scan'208";a="11111214"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 23:27:52 -0700
-X-CSE-ConnectionGUID: 5gWhoNniS2uImUH2RYZkgw==
-X-CSE-MsgGUID: eCACEudSTXqwIWvevVd+tw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
-   d="scan'208";a="28873958"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.92]) ([10.124.225.92])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 23:27:46 -0700
-Message-ID: <fbb8306c-775b-4f00-a2a6-a0b17c8f038e@linux.intel.com>
-Date: Wed, 8 May 2024 14:27:44 +0800
+	s=arc-20240116; t=1715150363; c=relaxed/simple;
+	bh=WIaSWmeiy1cef8r3CsP+YKgmEtowE4dXK2ALP2FJFio=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uG99QM+NYaDXeedb6CH6gFt6KnuVkJNVeBBvCOiqnOdMPFqzXcyjdZWrH3O1ptdZg3yekwBh2YGIafk/vGdL7HkLqYv6S8OX8DzPwtFz8jLAZnPF/qSVZRa3iKVvYyRk5UjZnep15M2CyBEGYI+UAVWjztB3sCUmtV4AMYZjJuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m4ZZTlMM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9BECC113CC;
+	Wed,  8 May 2024 06:39:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715150362;
+	bh=WIaSWmeiy1cef8r3CsP+YKgmEtowE4dXK2ALP2FJFio=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=m4ZZTlMMNZynUPi7TZNTSUytnxpv8uJmJY+by6sgylLoq5+Wu168UPUnbHhbwdYZB
+	 NOnirh4m/PD5rIli+HIFrgpk2UYNzuenYz1qNqeuqED2yhyNIu0Y2YgjvSxNciHcDM
+	 w0fTduuYN5KuqUeKdlN8nClLqAqnLiT2kv8iVk3iyvNiRN+C33MLtI4NdD4lQpIadk
+	 p0vChkM++ug46OgkuEIg+7KwNsNiWTkswHHRkwPfZ6X/xny2IJvrqXmnSpGxAwJLy2
+	 Sh+HZhW9w8xIzgSlkxzGvpkdxEllixT0f4DdAhwt0kSzJIDr/RPV8TtaNcKeuolyXT
+	 czaCstPFf0Qew==
+Received: from cpe.ge-3-3-8-100.vbrnqe11.dk.customer.tdc.net ([80.164.103.190] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s4axU-00BXNh-Tr;
+	Wed, 08 May 2024 07:39:21 +0100
+Date: Wed, 08 May 2024 07:39:20 +0100
+Message-ID: <87h6f8zu1z.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: Destroy mpidr_data for 'late' vCPU creation
+In-Reply-To: <20240507192912.1096658-1-oliver.upton@linux.dev>
+References: <20240507192912.1096658-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 17/54] KVM: x86/pmu: Always set global enable bits in
- passthrough mode
-To: Mingwei Zhang <mizhang@google.com>
-Cc: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
- Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
- Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
- Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org,
- linux-perf-users@vger.kernel.org
-References: <20240506053020.3911940-1-mizhang@google.com>
- <20240506053020.3911940-18-mizhang@google.com>
- <3eb01add-3776-46a8-87f7-54144692d7d7@linux.intel.com>
- <CAL715WL80ZOtAo2mT95_zW9Xhv-qOqnPjLGPMp1bJKZ1dOxhTg@mail.gmail.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <CAL715WL80ZOtAo2mT95_zW9Xhv-qOqnPjLGPMp1bJKZ1dOxhTg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 80.164.103.190
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Tue, 07 May 2024 20:29:12 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> A particularly annoying userspace could create a vCPU after KVM has
+> computed mpidr_data for the VM, either by racing against VGIC
+> initialization or having a userspace irqchip.
+> 
+> In any case, this means mpidr_data no longer fully describes the VM, and
+> attempts to find the new vCPU with kvm_mpidr_to_vcpu() will fail. The
+> fix is to discard mpidr_data altogether, as it is only a performance
+> optimization and not required for correctness. In all likelihood KVM
+> will recompute the mappings when KVM_RUN is called on the new vCPU.
+> 
+> Note that reads of mpidr_data are not guarded by a lock; promote to RCU
+> to cope with the possibility of mpidr_data being invalidated at runtime.
+> 
+> Fixes: 54a8006d0b49 ("KVM: arm64: Fast-track kvm_mpidr_to_vcpu() when mpidr_data is available")
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/arm.c | 49 ++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 40 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> index c4a0a35e02c7..0d845131a0e0 100644
+> --- a/arch/arm64/kvm/arm.c
+> +++ b/arch/arm64/kvm/arm.c
+> @@ -195,6 +195,22 @@ void kvm_arch_create_vm_debugfs(struct kvm *kvm)
+>  	kvm_sys_regs_create_debugfs(kvm);
+>  }
+>  
+> +static void kvm_destroy_mpidr_data(struct kvm *kvm)
+> +{
+> +	struct kvm_mpidr_data *data;
+> +
+> +	mutex_lock(&kvm->arch.config_lock);
+> +
+> +	data = rcu_dereference_raw(kvm->arch.mpidr_data);
 
-On 5/8/2024 12:36 PM, Mingwei Zhang wrote:
-> On Tue, May 7, 2024 at 9:19 PM Mi, Dapeng <dapeng1.mi@linux.intel.com> wrote:
->>
->> On 5/6/2024 1:29 PM, Mingwei Zhang wrote:
->>> From: Sandipan Das <sandipan.das@amd.com>
->>>
->>> Currently, the global control bits for a vcpu are restored to the reset
->>> state only if the guest PMU version is less than 2. This works for
->>> emulated PMU as the MSRs are intercepted and backing events are created
->>> for and managed by the host PMU [1].
->>>
->>> If such a guest in run with passthrough PMU, the counters no longer work
->>> because the global enable bits are cleared. Hence, set the global enable
->>> bits to their reset state if passthrough PMU is used.
->>>
->>> A passthrough-capable host may not necessarily support PMU version 2 and
->>> it can choose to restore or save the global control state from struct
->>> kvm_pmu in the PMU context save and restore helpers depending on the
->>> availability of the global control register.
->>>
->>> [1] 7b46b733bdb4 ("KVM: x86/pmu: Set enable bits for GP counters in PERF_GLOBAL_CTRL at "RESET"");
->>> Reported-by: Mingwei Zhang <mizhang@google.com>
->>> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
->>> [removed the fixes tag]
->>> ---
->>>  arch/x86/kvm/pmu.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->>> index 5768ea2935e9..e656f72fdace 100644
->>> --- a/arch/x86/kvm/pmu.c
->>> +++ b/arch/x86/kvm/pmu.c
->>> @@ -787,7 +787,7 @@ void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
->>>        * in the global controls).  Emulate that behavior when refreshing the
->>>        * PMU so that userspace doesn't need to manually set PERF_GLOBAL_CTRL.
->>>        */
->>> -     if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
->>> +     if ((pmu->passthrough || kvm_pmu_has_perf_global_ctrl(pmu)) && pmu->nr_arch_gp_counters)
->> The logic seems not correct. we could support perfmon version 1 for
->> meidated vPMU (passthrough vPMU) as well in the future.  pmu->passthrough
->> is ture doesn't guarantee GLOBAL_CTRL MSR always exists.
-> heh, the logic is correct here. However, I would say the code change
-> may not reflect that clearly.
->
-> The if condition combines the handling of global ctrl registers for
-> both the legacy vPMU and the mediated passthrough vPMU.
->
-> In legacy pmu, the logic should be this:
->
-> if (kvm_pmu_has_perf_global_ctrl(pmu) && pmu->nr_arch_gp_counters)
->
-> Because, since KVM emulates the MSR, if the global ctrl register does
-> not exist, then there is no point resetting it to any value. However,
-> if it does exist, there are non-zero number of GP counters, we should
-> reset it to some value (all enabling bits are set for GP counters)
-> according to SDM.
->
-> The logic for mediated passthrough PMU is different as follows:
->
-> if (pmu->passthrough && pmu->nr_arch_gp_counters)
->
-> Since mediated passthrough PMU requires PerfMon v4 in Intel (PerfMon
-> v2 in AMD), once it is enabled (pmu->passthrough = true), then global
-> ctrl _must_ exist phyiscally. Regardless of whether we expose it to
-> the guest VM, at reset time, we need to ensure enabling bits for GP
-> counters are set (behind the screen). This is critical for AMD, since
-> most of the guests are usually in (AMD) PerfMon v1 in which global
-> ctrl MSR is inaccessible, but does exist and is operating in HW.
->
-> Yes, if we eliminate that requirement (pmu->passthrough -> Perfmon v4
-> Intel / Perfmon v2 AMD), then this code will have to change. However,
-Yeah, that's what I'm worrying about. We ever discussed to support mediated
-vPMU on HW below perfmon v4. When someone implements this, he may not
-notice this place needs to be changed as well, this introduces a potential
-bug and we should avoid this.
-> that is currently not in our RFCv2.
->
-> Thanks.
-> -Mingwei
->
->
->
->
->
->
->
->>
->>>               pmu->global_ctrl = GENMASK_ULL(pmu->nr_arch_gp_counters - 1, 0);
->>>  }
->>>
+I'm slightly worried by this. Why can't we use the "cooked" version?
+If anything I'd like to see a comment about this, as it is usually
+frowned upon.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
