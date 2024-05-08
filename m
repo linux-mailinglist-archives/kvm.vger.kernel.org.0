@@ -1,219 +1,336 @@
-Return-Path: <kvm+bounces-17007-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C986D8BFEF1
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 15:39:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65C918BFED0
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 15:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D20D1F20584
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 13:39:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C2A82898D9
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 13:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCFF6127E0E;
-	Wed,  8 May 2024 13:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A277A13A;
+	Wed,  8 May 2024 13:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H438L9Qd"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92C9A86AE2;
-	Wed,  8 May 2024 13:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020D179945
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 13:36:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715175425; cv=none; b=DjfWDw07fFDW6b2UN+ebp14h7yO08rDyGTKP+7dgpQsPZ5lrxzuxLs/apxMGUFM/KY5jxC/h5OARZlPr4wqXhroEb7QfHJE0uccc8nDNXLzRBMmiwkToB4v7oJseBLGux+m5mlAz+IItBo1gplNNcDf+N/rnv5+ZaALlUI9B8yg=
+	t=1715175380; cv=none; b=oGeM1g/mvkUGX+h2TkqCmv5/NrIKxFlyquFyDW6eGCcxZTUpLGGxDcpXZg2NFtMuQ5UmUwaL1X4fDQ+V4IlvVAznRZsZmxVKDoM+vtkFFMNABCRAb8svcGouGB7ryUoUMuFgjnlTH1lMo10JEB4y7SzutGm4e+ZR3n9ATZZGbhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715175425; c=relaxed/simple;
-	bh=aUMv2EyZWKJgCD0BZ6yrbkGsvXQDS9HIZgEmv9GZke0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FtXOzXZe9xbVKI3Z4ppNAIuEXPEbLVMifLx5NuCMojsoQwFSRMvdgerKbR/VFoHOIHW2jDy3R/8bLWBP86idQz71nFISExgjuh4nFnPlK9YyRKIR06nCmc3/58SnAV+qC1tsPIVh/zUiVZWjaUJMMb1LEELSVD+5rf1oM2IoEew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VZGLd3YXtztTBx;
-	Wed,  8 May 2024 21:33:29 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id B419C1800B8;
-	Wed,  8 May 2024 21:36:55 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 8 May 2024 21:36:55 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
-	<edumazet@google.com>, David Howells <dhowells@redhat.com>, Marc Dionne
-	<marc.dionne@auristor.com>, Trond Myklebust
-	<trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, Chuck
- Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-afs@lists.infradead.org>, <linux-nfs@vger.kernel.org>
-Subject: [PATCH net-next v3 07/13] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Wed, 8 May 2024 21:34:02 +0800
-Message-ID: <20240508133408.54708-8-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240508133408.54708-1-linyunsheng@huawei.com>
-References: <20240508133408.54708-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1715175380; c=relaxed/simple;
+	bh=xZ/2Obh52g1vI3tD7r2VsbhZPceQDa52gNisJ/zD270=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:Cc:
+	 In-Reply-To:Content-Type; b=hpi8pgXykI0jvcSt3i3Mn9OwsaH30WouiUX+atES+j8m0KTuvMTUPrODr6uiW7A03wk4+krMiEeHLIUAbOyyNWJNGNljir36/q3pDy1jicoy+9V1seWt/H5A8ejRXkAFH7mb1iaKKJZs4v/mmRdEC7hSPWGWNRbK0JhE6n9byJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H438L9Qd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715175377;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=jlOOVvquEONflhjYihi2YNb8HhKu47eWlw4WXGMSFeE=;
+	b=H438L9QdybvKjnO2iNEAWyfRSXHEF/ShoLrOBE9thfK0yN/zo+yVDT5hrocQm7qE/rU+Fb
+	nD5GluUgCrAaFnrkwbj/Nez37ZdcU3cIRp25qgvT7J/KPvv36yz+yLxcD2F18+pbexDJ3Q
+	KV83FfqRY0H632JkeP2hUogcVY3wE8I=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-546-gMWyk0XXPVSLws-LRzwZ4g-1; Wed, 08 May 2024 09:36:16 -0400
+X-MC-Unique: gMWyk0XXPVSLws-LRzwZ4g-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-418f8271081so14799595e9.3
+        for <kvm@vger.kernel.org>; Wed, 08 May 2024 06:36:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715175375; x=1715780175;
+        h=content-transfer-encoding:in-reply-to:autocrypt:cc:content-language
+         :references:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jlOOVvquEONflhjYihi2YNb8HhKu47eWlw4WXGMSFeE=;
+        b=W7Swm4adfUmvCTTM7sr1YuWfRaSKiEnu8BWeK5usZ3YDXuR9MzIiB8Dp7/9+A9G0AL
+         xZwuA8AdW0+w5TOwMNIRvLVJ4bHSGBEDECcBbOHITv79c2E7xuNDtS6EBwdLg08VSNS8
+         ubAB2szs0K6U4C4bF2oVlya20quwz3FqaN00mZmx8y6b8JFZqjRDsyWvqlR32CqmVHKH
+         4AHzE4NEVkd4NoKfxHqBNyb1TJmqmU93XDYc2+t9JQL8VNeaQ/pus9D393cHA4mDHFgO
+         6iPjsPhGA3iEPuuCwStu5Cjk36i8s2oUtcQB3Ya52BInOffhz2GIRWT/kFZyukDvFJXa
+         4GKA==
+X-Gm-Message-State: AOJu0Yw8IGBB3lc723HVbFu0DG9u9vW/GT5YVW7mbHA7tAr7bOCk41+M
+	QCmt1aFvwE8NZ4AIJc4vrrnJqFBuxZ0ixxe5NjHT/bcqSDNOzEk1z1Cl7xY97zMTpTkneU6kPJb
+	b28Gr2WzOlCfH+kO2qut5XcFzd/QuRC7+FvdZ05zX+i8H4glPAA==
+X-Received: by 2002:a05:600c:5027:b0:418:d6f2:a97a with SMTP id 5b1f17b1804b1-41f71cd2685mr27463605e9.13.1715175375026;
+        Wed, 08 May 2024 06:36:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFHr5S6VX+J+5hPD+jWfX8CO9JkNOJmRGWnOHIbdlGmr1BrExt9NlJKhWg/GQQf9KYlZRjb0w==
+X-Received: by 2002:a05:600c:5027:b0:418:d6f2:a97a with SMTP id 5b1f17b1804b1-41f71cd2685mr27463435e9.13.1715175374590;
+        Wed, 08 May 2024 06:36:14 -0700 (PDT)
+Received: from [10.33.192.191] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41facbd295fsm5326515e9.36.2024.05.08.06.36.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 May 2024 06:36:14 -0700 (PDT)
+Message-ID: <50e43047-b251-465b-b4b0-b5987ec9aa78@redhat.com>
+Date: Wed, 8 May 2024 15:36:13 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v9 07/31] scripts: allow machine option to
+ be specified in unittests.cfg
+From: Thomas Huth <thuth@redhat.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+References: <20240504122841.1177683-1-npiggin@gmail.com>
+ <20240504122841.1177683-8-npiggin@gmail.com>
+ <e0df1892-c17f-4fc3-b95a-4efc0af917d3@redhat.com>
+ <D149GFR9LAZH.1X2F7YKPEJ42C@gmail.com>
+ <f304924b-8acf-40f6-9426-10fdf77712b6@redhat.com>
+ <1e07de7a-5b14-4168-aa14-56dae8766dc0@redhat.com>
+Content-Language: en-US
+Cc: kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Autocrypt: addr=thuth@redhat.com; keydata=
+ xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzR5UaG9tYXMgSHV0
+ aCA8dGh1dGhAcmVkaGF0LmNvbT7CwXgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
+ QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
+ EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
+ 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
+ eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
+ ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
+ zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
+ tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
+ WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
+ UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDzsFN
+ BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
+ 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
+ +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
+ 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
+ gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
+ WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
+ VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
+ knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
+ cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
+ X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABwsFfBBgBAgAJBQJR+3lM
+ AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
+ ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
+ fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
+ 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
+ cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
+ ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
+ Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
+ oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
+ IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
+ yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
+In-Reply-To: <1e07de7a-5b14-4168-aa14-56dae8766dc0@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
+On 08/05/2024 14.58, Thomas Huth wrote:
+> On 08/05/2024 14.55, Thomas Huth wrote:
+>> On 08/05/2024 14.27, Nicholas Piggin wrote:
+>>> On Wed May 8, 2024 at 1:08 AM AEST, Thomas Huth wrote:
+>>>> On 04/05/2024 14.28, Nicholas Piggin wrote:
+>>>>> This allows different machines with different requirements to be
+>>>>> supported by run_tests.sh, similarly to how different accelerators
+>>>>> are handled.
+>>>>>
+>>>>> Acked-by: Thomas Huth <thuth@redhat.com>
+>>>>> Acked-by: Andrew Jones <andrew.jones@linux.dev>
+>>>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>>>>> ---
+>>>>>    docs/unittests.txt   |  7 +++++++
+>>>>>    scripts/common.bash  |  8 ++++++--
+>>>>>    scripts/runtime.bash | 16 ++++++++++++----
+>>>>>    3 files changed, 25 insertions(+), 6 deletions(-)
+>>>>>
+>>>>> diff --git a/docs/unittests.txt b/docs/unittests.txt
+>>>>> index 7cf2c55ad..6449efd78 100644
+>>>>> --- a/docs/unittests.txt
+>>>>> +++ b/docs/unittests.txt
+>>>>> @@ -42,6 +42,13 @@ For <arch>/ directories that support multiple 
+>>>>> architectures, this restricts
+>>>>>    the test to the specified arch. By default, the test will run on any
+>>>>>    architecture.
+>>>>> +machine
+>>>>> +-------
+>>>>> +For those architectures that support multiple machine types, this 
+>>>>> restricts
+>>>>> +the test to the specified machine. By default, the test will run on
+>>>>> +any machine type. (Note, the machine can be specified with the MACHINE=
+>>>>> +environment variable, and defaults to the architecture's default.)
+>>>>> +
+>>>>>    smp
+>>>>>    ---
+>>>>>    smp = <number>
+>>>>> diff --git a/scripts/common.bash b/scripts/common.bash
+>>>>> index 5e9ad53e2..3aa557c8c 100644
+>>>>> --- a/scripts/common.bash
+>>>>> +++ b/scripts/common.bash
+>>>>> @@ -10,6 +10,7 @@ function for_each_unittest()
+>>>>>        local opts
+>>>>>        local groups
+>>>>>        local arch
+>>>>> +    local machine
+>>>>>        local check
+>>>>>        local accel
+>>>>>        local timeout
+>>>>> @@ -21,7 +22,7 @@ function for_each_unittest()
+>>>>>            if [[ "$line" =~ ^\[(.*)\]$ ]]; then
+>>>>>                rematch=${BASH_REMATCH[1]}
+>>>>>                if [ -n "${testname}" ]; then
+>>>>> -                $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" 
+>>>>> "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
+>>>>> +                $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" 
+>>>>> "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+>>>>>                fi
+>>>>>                testname=$rematch
+>>>>>                smp=1
+>>>>> @@ -29,6 +30,7 @@ function for_each_unittest()
+>>>>>                opts=""
+>>>>>                groups=""
+>>>>>                arch=""
+>>>>> +            machine=""
+>>>>>                check=""
+>>>>>                accel=""
+>>>>>                timeout=""
+>>>>> @@ -58,6 +60,8 @@ function for_each_unittest()
+>>>>>                groups=${BASH_REMATCH[1]}
+>>>>>            elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
+>>>>>                arch=${BASH_REMATCH[1]}
+>>>>> +        elif [[ $line =~ ^machine\ *=\ *(.*)$ ]]; then
+>>>>> +            machine=${BASH_REMATCH[1]}
+>>>>>            elif [[ $line =~ ^check\ *=\ *(.*)$ ]]; then
+>>>>>                check=${BASH_REMATCH[1]}
+>>>>>            elif [[ $line =~ ^accel\ *=\ *(.*)$ ]]; then
+>>>>> @@ -67,7 +71,7 @@ function for_each_unittest()
+>>>>>            fi
+>>>>>        done
+>>>>>        if [ -n "${testname}" ]; then
+>>>>> -        $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" 
+>>>>> "$opts" "$arch" "$check" "$accel" "$timeout"
+>>>>> +        $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" 
+>>>>> "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+>>>>>        fi
+>>>>>        exec {fd}<&-
+>>>>>    }
+>>>>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+>>>>> index 177b62166..0c96d6ea2 100644
+>>>>> --- a/scripts/runtime.bash
+>>>>> +++ b/scripts/runtime.bash
+>>>>> @@ -32,7 +32,7 @@ premature_failure()
+>>>>>    get_cmdline()
+>>>>>    {
+>>>>>        local kernel=$1
+>>>>> -    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel 
+>>>>> $RUNTIME_arch_run $kernel -smp $smp $opts"
+>>>>> +    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine 
+>>>>> ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
+>>>>>    }
+>>>>>    skip_nodefault()
+>>>>> @@ -80,9 +80,10 @@ function run()
+>>>>>        local kernel="$4"
+>>>>>        local opts="$5"
+>>>>>        local arch="$6"
+>>>>> -    local check="${CHECK:-$7}"
+>>>>> -    local accel="$8"
+>>>>> -    local timeout="${9:-$TIMEOUT}" # unittests.cfg overrides the default
+>>>>> +    local machine="$7"
+>>>>> +    local check="${CHECK:-$8}"
+>>>>> +    local accel="$9"
+>>>>> +    local timeout="${10:-$TIMEOUT}" # unittests.cfg overrides the default
+>>>>>        if [ "${CONFIG_EFI}" == "y" ]; then
+>>>>>            kernel=${kernel/%.flat/.efi}
+>>>>> @@ -116,6 +117,13 @@ function run()
+>>>>>            return 2
+>>>>>        fi
+>>>>> +    if [ -n "$machine" ] && [ -n "$MACHINE" ] && [ "$machine" != 
+>>>>> "$MACHINE" ]; then
+>>>>> +        print_result "SKIP" $testname "" "$machine only"
+>>>>> +        return 2
+>>>>> +    elif [ -n "$MACHINE" ]; then
+>>>>> +        machine="$MACHINE"
+>>>>> +    fi
+>>>>> +
+>>>>>        if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" 
+>>>>> ]; then
+>>>>>            print_result "SKIP" $testname "" "$accel only, but 
+>>>>> ACCEL=$ACCEL"
+>>>>>            return 2
+>>>>
+>>>> For some reasons that I don't quite understand yet, this patch causes the
+>>>> "sieve" test to always timeout on the s390x runner, see e.g.:
+>>>>
+>>>>    https://gitlab.com/thuth/kvm-unit-tests/-/jobs/6798954987
+>>>
+>>> How do you use the s390x runner?
+>>>
+>>>>
+>>>> Everything is fine in the previous patches (I pushed now the previous 5
+>>>> patches to the repo):
+>>>>
+>>>>    https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/pipelines/1281919104
+>>>>
+>>>> Could it be that he TIMEOUT gets messed up in certain cases?
+>>>
+>>> Hmm not sure yet. At least it got timeout right for the duration=90s
+>>> message.
+>>
+>> That seems to be wrong, the test is declared like this in 
+>> s390x/unittests.cfg :
+>>
+>> [sieve]
+>> file = sieve.elf
+>> groups = selftest
+>> # can take fairly long when KVM is nested inside z/VM
+>> timeout = 600
+>>
+>> And indeed, it takes way longer than 90 seconds on that CI machine, so the 
+>> timeout after 90 seconds should not occur here...
+> 
+> I guess you need to adjust arch_cmd_s390x in scripts/s390x/func.bash to be 
+> aware of the new parameter, too?
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- drivers/vhost/net.c             |  2 +-
- include/linux/page_frag_cache.h | 10 ++++++++++
- mm/page_frag_test.c             |  2 +-
- net/core/skbuff.c               |  6 +++---
- net/rxrpc/conn_object.c         |  4 +---
- net/rxrpc/local_object.c        |  4 +---
- net/sunrpc/svcsock.c            |  6 ++----
- 7 files changed, 19 insertions(+), 15 deletions(-)
+This seems to fix the problem:
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 6691fac01e0d..b2737dc0dc50 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index a5747cf7a3a1..024ff73a7ea4 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -23,6 +23,16 @@ struct page_frag_cache {
- 	bool pfmemalloc;
- };
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
-index 92eb288aab75..8a974d0588bf 100644
---- a/mm/page_frag_test.c
-+++ b/mm/page_frag_test.c
-@@ -329,7 +329,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_frag.va = NULL;
-+	page_frag_cache_init(&test_frag);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index dca4e7445348..caee22db1cc7 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -741,12 +741,12 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 		local_bh_enable();
- 	}
- 
-@@ -834,7 +834,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc_va(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 
- 	if (unlikely(!data))
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 42d20412c1c3..4b1e87187614 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
--- 
-2.33.0
+diff --git a/scripts/s390x/func.bash b/scripts/s390x/func.bash
+index fa47d019..6b817727 100644
+--- a/scripts/s390x/func.bash
++++ b/scripts/s390x/func.bash
+@@ -13,12 +13,13 @@ function arch_cmd_s390x()
+         local kernel=$5
+         local opts=$6
+         local arch=$7
+-       local check=$8
+-       local accel=$9
+-       local timeout=${10}
++       local machine=$8
++       local check=$9
++       local accel=${10}
++       local timeout=${11}
+  
+         # run the normal test case
+-       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
++       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
+  
+         # run PV test case
+         if [ "$accel" = 'tcg' ] || grep -q "migration" <<< "$groups"; then
+
+If you don't like to respin, I can add it to the patch while picking it up?
+
+  Thomas
 
 
