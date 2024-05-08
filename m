@@ -1,65 +1,55 @@
-Return-Path: <kvm+bounces-16983-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16985-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDEC88BF7AB
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 09:51:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45D348BF7DB
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 09:58:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B53B1C20C70
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 07:51:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F045C285F77
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 07:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43CE3F8D6;
-	Wed,  8 May 2024 07:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210ED4500F;
+	Wed,  8 May 2024 07:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CtCbvi31"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="d+6Wlldu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758292C6B2
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 07:50:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE503F8F0;
+	Wed,  8 May 2024 07:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715154661; cv=none; b=hbFMLIeHDeGOQzMKXyR8kIMP3kxYlmESQCIKUdNByUnr4AGt0k6WchfFaC1NsRLSmrkKfZRWjy5Z1VWMeYV5CBGWYn8d+4oAFs/mm7Ip//Y+CwWim1rV6h6ClBoKxshbtw1miRsTv9KeepXAacjgm2u0LXeY65h4/iXqGq6P+sc=
+	t=1715155104; cv=none; b=gQ4T2L0LXhqW/pB+iPtxRhC2vQXpUkZORoctNgSKFqiwpu82JG31vKlnrXFkq5gS1NUDo3zNgLjfHCumcCS8W1PpwNK7H8ckUIzBfWJ2kDZWQzZvlDhg3d3v0L4VBmsMw80dDmbO5s7GQyBalxCj+Gks06aXedKEu9V1B+fGf8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715154661; c=relaxed/simple;
-	bh=zzEfmZ/dJmIjdWYZLr302I3iYwcl4ehqIfY6gL+Ct2Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oymMnZjLmf3VLOGa9SLqIKg7Ak5gJXIvLjdIGh7hiWhTA3p7+wAGQWC/1of75LORhQhMcgLe81NoaVTio9KT51rA8Z0xep4HHdjW1Kk4VYYf/ugTrXYgNRZEBD1cVJqoPd6FEq9xUhKlTEhA6f5V0VQrJNSX6OQbARbrzqA7Zqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CtCbvi31; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715154660; x=1746690660;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=zzEfmZ/dJmIjdWYZLr302I3iYwcl4ehqIfY6gL+Ct2Q=;
-  b=CtCbvi31+MFf+8qIPEZFsNP6hEZ95wO9zKpqVvJ7OtcNIC1G/0ivUnxb
-   jRrconjqIBnSOt7aJxhsw5gGNA2K2c5XcifiTV8C2QG5ghHE1CUJP5f+K
-   5NvqW3tQ9c2db5FpsWPIOtaW+31KdveTR+0qOuSFCnIABtyBCphosACPS
-   LCXEDnPDIghc73UIUtyvcqDU/sSnSaBr3uAUWfmqy+WgfVec1QG6ojDPG
-   /1G0Lan0E711cU3iLzjU1f8GfXeImsVXOHy3s6xIxIX37GoK51vFphKvE
-   byXzFLR0R0QXrAO40P/myODtqCCkhYvVqmk+nol4Rx93+nn/yLuXhLjPy
-   g==;
-X-CSE-ConnectionGUID: 3lwD/cEORmyz2j7wB41eWA==
-X-CSE-MsgGUID: Ml98EUvzTdaIcFsXGECv9Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="11423785"
-X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
-   d="scan'208";a="11423785"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 00:50:57 -0700
-X-CSE-ConnectionGUID: A4w1oc3+Skq2wawLzbV1IA==
-X-CSE-MsgGUID: dOvri4tmQ5KuStHL37xYPQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
-   d="scan'208";a="29331639"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.51]) ([10.124.227.51])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 May 2024 00:50:56 -0700
-Message-ID: <193c8685-2bb8-46ec-9e34-72fd70300d15@intel.com>
-Date: Wed, 8 May 2024 15:50:53 +0800
+	s=arc-20240116; t=1715155104; c=relaxed/simple;
+	bh=W8h0zv7fM5rho2qCrJQe63u3RrkuJY8jHMl1xzQ0llk=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=IjU25Xg9gPe5MqgyNQI+U3t/5SVR1EJeHEUhkho0498dTu6O/PwyMaXW/1V8dqTMNciDI3/Ib7JxDW4bGVwTxeFpb9L0irSuXYBlYHPO7p5/4qsnQIxnJ3cc+vzZGpmgGXU6AJRQn8PXpSLDRpfFxbisyejQSs7AqMsrCk1ga40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=d+6Wlldu; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1715155100;
+	bh=W8h0zv7fM5rho2qCrJQe63u3RrkuJY8jHMl1xzQ0llk=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=d+6WlldukdN+eWmS3sBsn4libaX2zcJvXa/ngL+dhdc+DchosZSUl43ALM0fKrizz
+	 ysZ99uHC/8UpNmyFE4hOPapdp0NUzrlzrQjGLrkMDMqYNps7lgHGiCM7grlVWeqvuL
+	 e5HkvXoNYPhMwpb30PKIuWAHw1A/b8v33oat12Wn15tu738O33/VYc94jtdztajScu
+	 4J+5rFyzWIZ90H5CzrX9B4Ib32RGjnbcFX2KDX2Cv9yM6dA7sRVQyStsK2OIpLFTHR
+	 MsAgmoQsx7QhT2c2rNTU9MLlxEjijsJQpah0OPot4l0rd5cOVPx4wu8rShkkg7Xmln
+	 rRM76zFaWDvsw==
+Received: from [10.193.1.1] (broslavsky.collaboradmins.com [68.183.210.73])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 5163A378107C;
+	Wed,  8 May 2024 07:57:56 +0000 (UTC)
+Message-ID: <e3f6bb2a-a9bd-43c2-9468-85242eab0390@collabora.com>
+Date: Wed, 8 May 2024 12:58:20 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,43 +57,136 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] TDX module configurability of 0x80000008
-To: Sean Christopherson <seanjc@google.com>
-Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
-References: <f9f1da5dc94ad6b776490008dceee5963b451cda.camel@intel.com>
- <6e0dc5f2-169e-4277-b7fe-e69234ccc1fd@intel.com>
- <Zjpg3dhf0mWetkSE@google.com>
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@android.com, linux-sound@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+ linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+ linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v2 5/5] selftests: Drop duplicate -D_GNU_SOURCE
+To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+ Johannes Weiner <hannes@cmpxchg.org>, Christian Brauner
+ <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>,
+ Kees Cook <keescook@chromium.org>,
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
+ <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
+ Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+ <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
+ <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>
+References: <20240507214254.2787305-1-edliaw@google.com>
+ <20240507214254.2787305-6-edliaw@google.com>
 Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <Zjpg3dhf0mWetkSE@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <20240507214254.2787305-6-edliaw@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 5/8/2024 1:11 AM, Sean Christopherson wrote:
-> On Wed, May 08, 2024, Xiaoyao Li wrote:
->> On 4/25/2024 12:55 AM, Edgecombe, Rick P wrote:
->>> One of the TDX module features is called MAXPA_VIRT. In short, it is similar to
->>> KVM’s allow_smaller_maxphyaddr. It requires an explicit opt-in by the VMM, and
->>> allows a TD’s 0x80000008.EAX[7:0] to be configured by the VMM. Accesses to
->>> physical addresses above the specified value by the TD will cause the TDX module
->>> to inject a mostly correct #PF with the RSVD error code set. It has to deal with
->>> the same problems as allow_smaller_maxphyaddr for correctly setting the RSVD
->>> bit. I wasn’t thinking to push this feature for KVM due the movement away from
->>> allow_smaller_maxphyaddr and towards 0x80000008.EAX[23:16].
->>>
->>
->> I would like to get your opinion of the MAXPA_VIRT feature of TDX. What is
->> likely the KVM's decision on it? Won't support it due to it has the same
->> limitation of allow_smaller_maxphyaddr?
+On 5/8/24 2:38 AM, Edward Liaw wrote:
+> -D_GNU_SOURCE can be de-duplicated here, as it is added by
+> KHDR_INCLUDES.
 > 
-> Not supporting MAXPA_VIRT has my vote.  I'm of the opinion that allow_smaller_maxphyaddr
-> should die a horrible, fiery death :-)
+> Signed-off-by: Edward Liaw <edliaw@google.com>
+Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
 
-Thanks for the response. It's good to know your preference.
+> ---
+>  tools/testing/selftests/futex/functional/Makefile | 2 +-
+>  tools/testing/selftests/iommu/Makefile            | 2 --
+>  tools/testing/selftests/net/tcp_ao/Makefile       | 2 +-
+>  tools/testing/selftests/resctrl/Makefile          | 2 +-
+>  4 files changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
+> index a392d0917b4e..f79f9bac7918 100644
+> --- a/tools/testing/selftests/futex/functional/Makefile
+> +++ b/tools/testing/selftests/futex/functional/Makefile
+> @@ -1,6 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  INCLUDES := -I../include -I../../ $(KHDR_INCLUDES)
+> -CFLAGS := $(CFLAGS) -g -O2 -Wall -D_GNU_SOURCE -pthread $(INCLUDES) $(KHDR_INCLUDES)
+> +CFLAGS := $(CFLAGS) -g -O2 -Wall -pthread $(INCLUDES) $(KHDR_INCLUDES)
+>  LDLIBS := -lpthread -lrt
+>  
+>  LOCAL_HDRS := \
+> diff --git a/tools/testing/selftests/iommu/Makefile b/tools/testing/selftests/iommu/Makefile
+> index 32c5fdfd0eef..fd6477911f24 100644
+> --- a/tools/testing/selftests/iommu/Makefile
+> +++ b/tools/testing/selftests/iommu/Makefile
+> @@ -2,8 +2,6 @@
+>  CFLAGS += -Wall -O2 -Wno-unused-function
+>  CFLAGS += $(KHDR_INCLUDES)
+>  
+> -CFLAGS += -D_GNU_SOURCE
+> -
+>  TEST_GEN_PROGS :=
+>  TEST_GEN_PROGS += iommufd
+>  TEST_GEN_PROGS += iommufd_fail_nth
+> diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
+> index 522d991e310e..c608b1ec02e6 100644
+> --- a/tools/testing/selftests/net/tcp_ao/Makefile
+> +++ b/tools/testing/selftests/net/tcp_ao/Makefile
+> @@ -26,7 +26,7 @@ LIB	:= $(LIBDIR)/libaotst.a
+>  LDLIBS	+= $(LIB) -pthread
+>  LIBDEPS	:= lib/aolib.h Makefile
+>  
+> -CFLAGS	:= -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing
+> +CFLAGS	:= -Wall -O2 -g -fno-strict-aliasing
+>  CFLAGS	+= $(KHDR_INCLUDES)
+>  CFLAGS	+= -iquote ./lib/ -I ../../../../include/
+>  
+> diff --git a/tools/testing/selftests/resctrl/Makefile b/tools/testing/selftests/resctrl/Makefile
+> index 2deac2031de9..5073dbc96125 100644
+> --- a/tools/testing/selftests/resctrl/Makefile
+> +++ b/tools/testing/selftests/resctrl/Makefile
+> @@ -1,6 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  
+> -CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE
+> +CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2
+>  CFLAGS += $(KHDR_INCLUDES)
+>  
+>  TEST_GEN_PROGS := resctrl_tests
 
-I'm not sure if there is any user of "allow_smaller_maxphyaddr". On QEMU 
-side, it doesn't check it nor rely on it. QEMU always allow the user to 
-configure a smaller PA.
+-- 
+BR,
+Muhammad Usama Anjum
 
