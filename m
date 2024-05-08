@@ -1,181 +1,392 @@
-Return-Path: <kvm+bounces-17070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD89E8C073C
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 00:14:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA85D8C078D
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 01:10:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EEE2B210F0
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 22:14:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 587641F2270E
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 23:10:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31311332B5;
-	Wed,  8 May 2024 22:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F40A1332A9;
+	Wed,  8 May 2024 23:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UtAdvgx/"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Iwxf4bkt"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78337132C38
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 22:14:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05984D59F
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 23:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715206482; cv=none; b=SJlfIsTXnHfob8nUXVkgWZD8oFW8kwoBNhQVghkF4k6RjyVngyoigMOq5qS5BQKLmXFw8NNtyznuFFyeEz9A3ht818zX/dcnR2MZJ/tNxmI87QvQDdAKVyNNpzaNOeOdExt4Q00+o4E1GqizxbBFO3HMgoxvwikijXysROZesVg=
+	t=1715209831; cv=none; b=HSF1F2S3+ejRfWaBN1Q/f7hACZOAIMVLvDUUPzgV0v8qrX/6IILfaTBtm5Xt5NQliTObkYXn4UDBLuZmUjB2pvPQf6U3As2vnc4kkydpa9CMk8UxYIFytq3ahWmXfmcmetAXxcWA4z5hPj2gBrHDuTp1ADtq9eWaaCMxTkku1lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715206482; c=relaxed/simple;
-	bh=+Ao4yAI4mBjlM1cqgglOXt+RF11lFCvP7EpPBkwdEWE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O8i9INtryopqted2P7kpx6vx+huK1M/vONq5cVGkp1jOLN1v8P3q5ITnvxsclWrHt5U155Cy42bMqkt4bOKDWkbn755qtHsBX0C0aUpaVBw2JepVAPCrqCP3pSs5gS+ojJaUgtd2FfGuU6vcyMJ6yokHor7xcIzuLuw+jvokTUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UtAdvgx/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715206478;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i3G13vP2j90cJ9q1iIJXsqeuLSqXZ2uwWRDCL6P8CGI=;
-	b=UtAdvgx/8QfwJtZsTvX/xBbjLyT/lJP3y8zVksjMdMJ2BxD3+j20uazsFYymYoixvkFBZr
-	axfca7cwjknxQDa7AmaO0rCXllbsjdG2B/Mb1K6aHp0Ry23Bxn0+uRtmalx9oku726dqgv
-	eLHirCVOZj+Afbepvp3RTmVidii+gKE=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-nHepFtTDNHGenbvjApLE0g-1; Wed, 08 May 2024 18:14:37 -0400
-X-MC-Unique: nHepFtTDNHGenbvjApLE0g-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2b3717c5decso237424a91.2
-        for <kvm@vger.kernel.org>; Wed, 08 May 2024 15:14:37 -0700 (PDT)
+	s=arc-20240116; t=1715209831; c=relaxed/simple;
+	bh=GLERfbMnsmuFAuMuxywN9iF9fGY0EwPrTh8sSjCh724=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZaMoAsy0x8VBGsw+z8ZQmsxkcwOJwG5aA4yWBhevYmMvOty3aLO/l0O9j4E+S9w3adzOUqJmvEvDg2pyMFvLFNI+mUkFQPBd0bUuh39LU2fGmzhQ51iFUxfV/icqcf9WrSrXbKjIb6J7CuB+FMYV2oRoeLPfsBpJ5DkXukA6z1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Iwxf4bkt; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-36c31c23ab6so90045ab.0
+        for <kvm@vger.kernel.org>; Wed, 08 May 2024 16:10:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1715209828; x=1715814628; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xLnlpoMndJv6kXCz+FbZOexc9v1XQ4k/KtWuckbio3c=;
+        b=Iwxf4bktbwUVJx1SVqOyYZgiC3xjRaHoWQbFDzoFSVtJcrruuQ175G6cdb+cZHYURL
+         0/47qBcikRMUvFGRmRJVnDC6TSRjbuyQSTPQBGyq2fp0XIM1NNgiWnKU9TcLiYXVcO1s
+         +2dDcJAiDScGDIug8CCQdqyC+mkoZkE3IxZqc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715206476; x=1715811276;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i3G13vP2j90cJ9q1iIJXsqeuLSqXZ2uwWRDCL6P8CGI=;
-        b=MHpAC+MlGhNSfMscHybBW5sJSzGmsvuwP2YWnz+BdVbvPsw2ZJwx2mp+EjAOzcblki
-         1lTQmLgWCKsynBCmKxWOKSN/btpvvWMbXk1HQS9X3/x+IV7lqQPwvHjcWscrufMvN3yD
-         DLT2+8nIsy7jEzAFCz5aGKSgNACLdQ85z6+ixuJOJTE+Kju0EtmBFRZc5cdsxRcV4RAH
-         9VHu/tXgCRws9iZ+L/OIQZRVIMR7Jg1DaQUDsBb4u4Qxr2CT1URLfaxF5XMILCVts+7+
-         hgC48A+ra+gafgBOmjeCk4CeMvCiYHfL4pKTDUx4yAFRDPLsU19Wc6z/+xs5NodLyZPd
-         W3Ug==
-X-Forwarded-Encrypted: i=1; AJvYcCWPnrQx//zCjzDe14/VcxV0We4mLIw7GS590HQ0GMbgsAYG6QM9F8KcGNAoHP8T15m5KS8lCR212Uq+wik3UM156OKG
-X-Gm-Message-State: AOJu0YyqJDRtHpmcYYn5550GnyO2WEl2lonwOUwSfjCWVz07FCqFptwK
-	nTBKIQxKNaci/80iwUgPXWowrWbCkPW7Sr9CT0biRNJEZ2if8yQZY3slbW21g5qmqgCNd0Yjj68
-	E0axRmtVwwWAD9kvYYAzVTWqEulPOTg4W4QQOHEvISFbmKJoH2w==
-X-Received: by 2002:a17:90b:212:b0:2b3:28be:df00 with SMTP id 98e67ed59e1d1-2b61649c518mr3754976a91.4.1715206476124;
-        Wed, 08 May 2024 15:14:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHqekJWhaOCFpDvgUHfEsURtD8vvaEirNcpayRV4i36jyg3fF3di+TgBruB/JIdNfVDBYiP1w==
-X-Received: by 2002:a17:90b:212:b0:2b3:28be:df00 with SMTP id 98e67ed59e1d1-2b61649c518mr3754803a91.4.1715206469754;
-        Wed, 08 May 2024 15:14:29 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b628ea6ae7sm1941595a91.51.2024.05.08.15.14.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 15:14:29 -0700 (PDT)
-Date: Wed, 8 May 2024 16:14:24 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>,
- "jgg@nvidia.com" <jgg@nvidia.com>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "seanjc@google.com" <seanjc@google.com>, "dave.hansen@linux.intel.com"
- <dave.hansen@linux.intel.com>, "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
- <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>, "corbet@lwn.net"
- <corbet@lwn.net>, "joro@8bytes.org" <joro@8bytes.org>, "will@kernel.org"
- <will@kernel.org>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "Liu, Yi L"
- <yi.l.liu@intel.com>
-Subject: Re: [PATCH 1/5] x86/pat: Let pat_pfn_immune_to_uc_mtrr() check MTRR
- for untracked PAT range
-Message-ID: <20240508161424.5bf4bdfc.alex.williamson@redhat.com>
-In-Reply-To: <ZjnwiKcmdpDAjMQ5@yzhao56-desk.sh.intel.com>
-References: <20240507061802.20184-1-yan.y.zhao@intel.com>
-	<20240507061924.20251-1-yan.y.zhao@intel.com>
-	<BN9PR11MB5276DA8F389AAE7237C7F48E8CE42@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<ZjnwiKcmdpDAjMQ5@yzhao56-desk.sh.intel.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1715209828; x=1715814628;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xLnlpoMndJv6kXCz+FbZOexc9v1XQ4k/KtWuckbio3c=;
+        b=jXTPvY5sG06vqYfS3noCMuXRmjR95vJ/qwSamU27bJu4uwSpg3ahBGptca0qsBTsl/
+         789s6dVp+ffKVVfMdHMHwUWsphpav+bBWdbEchFZc66MTGYEi/x4zxozTDUYUBMR60JX
+         aa7dHZ6bT86Vd6/HLHclY9/JOgEgmI2a3Yx4NfDQ2MB71/QIbCWXvRuz8TK8dRTzyWfQ
+         gKdqUrZYYZtBPo14S5Vft55t8mw1/gUJQ8T6uHr761A9fgneHknt+1L2+2OoBeUUZApL
+         2aBl22s4qM8JWwn+1NGZ/HmiGDh/vp+wvAm2xKvIX5EIRqC2SybJW3xLBql/bntI9jlq
+         8+fg==
+X-Forwarded-Encrypted: i=1; AJvYcCUvNFQ9QjclWPlUKnBg8BIk5grt5+0jiJ+SRcqy02Sp+oxeeZ/SaTTqwcalfQ2BLdzdMJSfZPSi2nF+jQJi64YZ8uSL
+X-Gm-Message-State: AOJu0Ywt8js8ST18iKP47zhy5d8NR89nwRawZBX6x589GcvNXH5Jqycz
+	8BrBuf+endVHqxT8Gvl2IVPQQN4IR+2BRduMppwr2yhEdj545stbPwanDH4U6JQ=
+X-Google-Smtp-Source: AGHT+IGjHhKKM24ZUFIVswkuYx3QwGN8iZAP+skToQSUH9ATxlCCLFZFt3zeJLulXQKSKo0MDx46iA==
+X-Received: by 2002:a05:6e02:2193:b0:369:f53b:6c2 with SMTP id e9e14a558f8ab-36caecc858bmr42995245ab.1.1715209827936;
+        Wed, 08 May 2024 16:10:27 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-36cb9e08d92sm170485ab.54.2024.05.08.16.10.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 May 2024 16:10:27 -0700 (PDT)
+Message-ID: <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
+Date: Wed, 8 May 2024 17:10:24 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+ Johannes Weiner <hannes@cmpxchg.org>, Christian Brauner
+ <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>,
+ Kees Cook <keescook@chromium.org>,
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
+ <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
+ Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+ <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
+ <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Muhammad Usama Anjum <usama.anjum@collabora.com>
+Cc: linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kernel-team@android.com, linux-sound@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
+ linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+ linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240507214254.2787305-1-edliaw@google.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20240507214254.2787305-1-edliaw@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 7 May 2024 17:12:40 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
-
-> On Tue, May 07, 2024 at 04:26:37PM +0800, Tian, Kevin wrote:
-> > > From: Zhao, Yan Y <yan.y.zhao@intel.com>
-> > > Sent: Tuesday, May 7, 2024 2:19 PM
-> > > 
-> > > However, lookup_memtype() defaults to returning WB for PFNs within the
-> > > untracked PAT range, regardless of their actual MTRR type. This behavior
-> > > could lead KVM to misclassify the PFN as non-MMIO, permitting cacheable
-> > > guest access. Such access might result in MCE on certain platforms, (e.g.
-> > > clflush on VGA range (0xA0000-0xBFFFF) triggers MCE on some platforms).  
-> > 
-> > the VGA range is not exposed to any guest today. So is it just trying to
-> > fix a theoretical problem?  
+On 5/7/24 15:38, Edward Liaw wrote:
+> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> asprintf into kselftest_harness.h, which is a GNU extension and needs
+> _GNU_SOURCE to either be defined prior to including headers or with the
+> -D_GNU_SOURCE flag passed to the compiler.
 > 
-> Yes. Not sure if VGA range is allowed to be exposed to guest in future, given
-> we have VFIO variant drivers.
-
-include/uapi/linux/vfio.h:
-        /*
-         * Expose VGA regions defined for PCI base class 03, subclass 00.
-         * This includes I/O port ranges 0x3b0 to 0x3bb and 0x3c0 to 0x3df
-         * as well as the MMIO range 0xa0000 to 0xbffff.  Each implemented
-         * range is found at it's identity mapped offset from the region
-         * offset, for example 0x3b0 is region_info.offset + 0x3b0.  Areas
-         * between described ranges are unimplemented.
-         */
-        VFIO_PCI_VGA_REGION_INDEX,
-
-We don't currently support mmap for this region though, so I think we
-still don't technically require this, but I guess an mmap through KVM
-is theoretically possible.  Thanks,
-
-Alex
-
-> > > @@ -705,7 +705,17 @@ static enum page_cache_mode
-> > > lookup_memtype(u64 paddr)
-> > >   */
-> > >  bool pat_pfn_immune_to_uc_mtrr(unsigned long pfn)
-> > >  {
-> > > -	enum page_cache_mode cm = lookup_memtype(PFN_PHYS(pfn));
-> > > +	u64 paddr = PFN_PHYS(pfn);
-> > > +	enum page_cache_mode cm;
-> > > +
-> > > +	/*
-> > > +	 * Check MTRR type for untracked pat range since lookup_memtype()
-> > > always
-> > > +	 * returns WB for this range.
-> > > +	 */
-> > > +	if (x86_platform.is_untracked_pat_range(paddr, paddr + PAGE_SIZE))
-> > > +		cm = pat_x_mtrr_type(paddr, paddr + PAGE_SIZE,
-> > > _PAGE_CACHE_MODE_WB);  
-> > 
-> > doing so violates the name of this function. The PAT of the untracked
-> > range is still WB and not immune to UC MTRR.  
-> Right.
-> Do you think we can rename this function to something like
-> pfn_of_uncachable_effective_memory_type() and make it work under !pat_enabled()
-> too?
+> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
+> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+> location.  Remove #define _GNU_SOURCE from source code to resolve
+> redefinition warnings.
 > 
-> >   
-> > > +	else
-> > > +		cm = lookup_memtype(paddr);
-> > > 
-> > >  	return cm == _PAGE_CACHE_MODE_UC ||
-> > >  	       cm == _PAGE_CACHE_MODE_UC_MINUS ||  
-> >   
+> Edward Liaw (5):
+>    selftests: Compile kselftest headers with -D_GNU_SOURCE
+>    selftests/sgx: Include KHDR_INCLUDES in Makefile
+
+I appled patches 1/5 and 2.5 - The rest need to be split up.
+
+>    selftests: Include KHDR_INCLUDES in Makefile
+>    selftests: Drop define _GNU_SOURCE
+>    selftests: Drop duplicate -D_GNU_SOURCE
 > 
 
+Please split these patches pwe test directory. Otherwise it will
+cause merge conflicts which can be hard to resolve.
+
+>   tools/testing/selftests/Makefile                              | 4 ++--
+>   tools/testing/selftests/alsa/Makefile                         | 2 +-
+>   tools/testing/selftests/arm64/signal/Makefile                 | 2 +-
+>   tools/testing/selftests/cachestat/test_cachestat.c            | 2 --
+>   tools/testing/selftests/capabilities/test_execve.c            | 2 --
+>   tools/testing/selftests/clone3/clone3.c                       | 2 --
+>   .../testing/selftests/clone3/clone3_cap_checkpoint_restore.c  | 2 --
+>   tools/testing/selftests/clone3/clone3_clear_sighand.c         | 2 --
+>   tools/testing/selftests/clone3/clone3_selftests.h             | 1 -
+>   tools/testing/selftests/clone3/clone3_set_tid.c               | 2 --
+>   tools/testing/selftests/core/close_range_test.c               | 2 --
+>   tools/testing/selftests/drivers/dma-buf/udmabuf.c             | 1 -
+>   tools/testing/selftests/exec/Makefile                         | 2 +-
+>   tools/testing/selftests/fchmodat2/fchmodat2_test.c            | 2 --
+>   tools/testing/selftests/filesystems/binderfs/binderfs_test.c  | 2 --
+>   tools/testing/selftests/filesystems/devpts_pts.c              | 1 -
+>   tools/testing/selftests/filesystems/dnotify_test.c            | 1 -
+>   tools/testing/selftests/filesystems/epoll/epoll_wakeup_test.c | 2 --
+>   tools/testing/selftests/filesystems/eventfd/eventfd_test.c    | 2 --
+>   tools/testing/selftests/filesystems/fat/rename_exchange.c     | 2 --
+>   tools/testing/selftests/filesystems/overlayfs/Makefile        | 2 +-
+>   tools/testing/selftests/filesystems/overlayfs/dev_in_maps.c   | 2 --
+>   .../testing/selftests/filesystems/statmount/statmount_test.c  | 3 ---
+>   tools/testing/selftests/futex/functional/Makefile             | 2 +-
+>   tools/testing/selftests/futex/functional/futex_requeue_pi.c   | 3 ---
+>   tools/testing/selftests/hid/Makefile                          | 2 +-
+>   tools/testing/selftests/iommu/Makefile                        | 2 --
+>   tools/testing/selftests/ipc/msgque.c                          | 1 -
+>   tools/testing/selftests/kcmp/kcmp_test.c                      | 2 --
+>   tools/testing/selftests/kselftest_harness.h                   | 2 +-
+>   tools/testing/selftests/kvm/aarch64/arch_timer.c              | 2 --
+>   tools/testing/selftests/kvm/aarch64/page_fault_test.c         | 1 -
+>   tools/testing/selftests/kvm/aarch64/psci_test.c               | 3 ---
+>   tools/testing/selftests/kvm/aarch64/vgic_init.c               | 1 -
+>   tools/testing/selftests/kvm/arch_timer.c                      | 3 ---
+>   tools/testing/selftests/kvm/demand_paging_test.c              | 3 ---
+>   tools/testing/selftests/kvm/dirty_log_test.c                  | 3 ---
+>   tools/testing/selftests/kvm/guest_memfd_test.c                | 2 --
+>   tools/testing/selftests/kvm/hardware_disable_test.c           | 3 ---
+>   tools/testing/selftests/kvm/include/userfaultfd_util.h        | 3 ---
+>   tools/testing/selftests/kvm/kvm_binary_stats_test.c           | 2 --
+>   tools/testing/selftests/kvm/kvm_create_max_vcpus.c            | 2 --
+>   tools/testing/selftests/kvm/kvm_page_table_test.c             | 3 ---
+>   tools/testing/selftests/kvm/lib/assert.c                      | 3 ---
+>   tools/testing/selftests/kvm/lib/kvm_util.c                    | 2 --
+>   tools/testing/selftests/kvm/lib/memstress.c                   | 2 --
+>   tools/testing/selftests/kvm/lib/test_util.c                   | 2 --
+>   tools/testing/selftests/kvm/lib/userfaultfd_util.c            | 3 ---
+>   tools/testing/selftests/kvm/lib/x86_64/sev.c                  | 1 -
+>   tools/testing/selftests/kvm/max_guest_memory_test.c           | 2 --
+>   .../testing/selftests/kvm/memslot_modification_stress_test.c  | 3 ---
+>   tools/testing/selftests/kvm/riscv/arch_timer.c                | 3 ---
+>   tools/testing/selftests/kvm/rseq_test.c                       | 1 -
+>   tools/testing/selftests/kvm/s390x/cmma_test.c                 | 2 --
+>   tools/testing/selftests/kvm/s390x/sync_regs_test.c            | 2 --
+>   tools/testing/selftests/kvm/set_memory_region_test.c          | 1 -
+>   tools/testing/selftests/kvm/steal_time.c                      | 1 -
+>   tools/testing/selftests/kvm/x86_64/amx_test.c                 | 2 --
+>   .../selftests/kvm/x86_64/exit_on_emulation_failure_test.c     | 3 ---
+>   tools/testing/selftests/kvm/x86_64/hwcr_msr_test.c            | 2 --
+>   tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c             | 2 --
+>   tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c             | 1 -
+>   tools/testing/selftests/kvm/x86_64/hyperv_ipi.c               | 2 --
+>   tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c          | 1 -
+>   tools/testing/selftests/kvm/x86_64/hyperv_tlb_flush.c         | 2 --
+>   tools/testing/selftests/kvm/x86_64/nested_exceptions_test.c   | 2 --
+>   tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c       | 3 ---
+>   tools/testing/selftests/kvm/x86_64/platform_info_test.c       | 2 --
+>   tools/testing/selftests/kvm/x86_64/pmu_counters_test.c        | 2 --
+>   tools/testing/selftests/kvm/x86_64/pmu_event_filter_test.c    | 3 ---
+>   .../selftests/kvm/x86_64/private_mem_conversions_test.c       | 1 -
+>   tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c          | 1 -
+>   tools/testing/selftests/kvm/x86_64/set_sregs_test.c           | 1 -
+>   .../selftests/kvm/x86_64/smaller_maxphyaddr_emulation_test.c  | 3 ---
+>   tools/testing/selftests/kvm/x86_64/smm_test.c                 | 1 -
+>   tools/testing/selftests/kvm/x86_64/state_test.c               | 1 -
+>   tools/testing/selftests/kvm/x86_64/sync_regs_test.c           | 2 --
+>   tools/testing/selftests/kvm/x86_64/ucna_injection_test.c      | 2 --
+>   tools/testing/selftests/kvm/x86_64/userspace_msr_exit_test.c  | 2 --
+>   tools/testing/selftests/kvm/x86_64/vmx_dirty_log_test.c       | 3 ---
+>   tools/testing/selftests/kvm/x86_64/vmx_pmu_caps_test.c        | 1 -
+>   .../testing/selftests/kvm/x86_64/vmx_preemption_timer_test.c  | 1 -
+>   tools/testing/selftests/kvm/x86_64/xapic_ipi_test.c           | 2 --
+>   tools/testing/selftests/kvm/x86_64/xapic_state_test.c         | 1 -
+>   tools/testing/selftests/kvm/x86_64/xss_msr_test.c             | 2 --
+>   tools/testing/selftests/landlock/base_test.c                  | 2 --
+>   tools/testing/selftests/landlock/fs_test.c                    | 2 --
+>   tools/testing/selftests/landlock/net_test.c                   | 2 --
+>   tools/testing/selftests/landlock/ptrace_test.c                | 2 --
+>   tools/testing/selftests/lib.mk                                | 2 +-
+>   tools/testing/selftests/lsm/common.c                          | 2 --
+>   tools/testing/selftests/lsm/lsm_get_self_attr_test.c          | 2 --
+>   tools/testing/selftests/lsm/lsm_list_modules_test.c           | 2 --
+>   tools/testing/selftests/lsm/lsm_set_self_attr_test.c          | 2 --
+>   tools/testing/selftests/membarrier/membarrier_test_impl.h     | 1 -
+>   .../selftests/membarrier/membarrier_test_multi_thread.c       | 1 -
+>   .../selftests/membarrier/membarrier_test_single_thread.c      | 1 -
+>   tools/testing/selftests/memfd/common.c                        | 1 -
+>   tools/testing/selftests/memfd/fuse_test.c                     | 2 --
+>   tools/testing/selftests/memfd/memfd_test.c                    | 1 -
+>   tools/testing/selftests/mm/cow.c                              | 1 -
+>   tools/testing/selftests/mm/gup_longterm.c                     | 1 -
+>   tools/testing/selftests/mm/hugepage-mmap.c                    | 1 -
+>   tools/testing/selftests/mm/hugepage-mremap.c                  | 2 --
+>   tools/testing/selftests/mm/hugetlb-madvise.c                  | 2 --
+>   tools/testing/selftests/mm/hugetlb-read-hwpoison.c            | 2 --
+>   tools/testing/selftests/mm/khugepaged.c                       | 1 -
+>   tools/testing/selftests/mm/ksm_functional_tests.c             | 1 -
+>   tools/testing/selftests/mm/madv_populate.c                    | 1 -
+>   tools/testing/selftests/mm/map_populate.c                     | 2 --
+>   tools/testing/selftests/mm/mdwe_test.c                        | 1 -
+>   tools/testing/selftests/mm/memfd_secret.c                     | 2 --
+>   tools/testing/selftests/mm/mlock2-tests.c                     | 1 -
+>   tools/testing/selftests/mm/mrelease_test.c                    | 1 -
+>   tools/testing/selftests/mm/mremap_dontunmap.c                 | 1 -
+>   tools/testing/selftests/mm/mremap_test.c                      | 2 --
+>   tools/testing/selftests/mm/pagemap_ioctl.c                    | 1 -
+>   tools/testing/selftests/mm/pkey-helpers.h                     | 1 -
+>   tools/testing/selftests/mm/protection_keys.c                  | 1 -
+>   tools/testing/selftests/mm/split_huge_page_test.c             | 2 --
+>   tools/testing/selftests/mm/thuge-gen.c                        | 2 --
+>   tools/testing/selftests/mm/uffd-common.h                      | 1 -
+>   tools/testing/selftests/mount_setattr/mount_setattr_test.c    | 1 -
+>   .../move_mount_set_group/move_mount_set_group_test.c          | 1 -
+>   tools/testing/selftests/nci/Makefile                          | 2 +-
+>   tools/testing/selftests/net/af_unix/diag_uid.c                | 2 --
+>   tools/testing/selftests/net/af_unix/scm_pidfd.c               | 1 -
+>   tools/testing/selftests/net/af_unix/unix_connect.c            | 2 --
+>   tools/testing/selftests/net/csum.c                            | 3 ---
+>   tools/testing/selftests/net/gro.c                             | 3 ---
+>   tools/testing/selftests/net/ip_defrag.c                       | 3 ---
+>   tools/testing/selftests/net/ipsec.c                           | 3 ---
+>   tools/testing/selftests/net/ipv6_flowlabel.c                  | 3 ---
+>   tools/testing/selftests/net/ipv6_flowlabel_mgr.c              | 3 ---
+>   tools/testing/selftests/net/mptcp/mptcp_connect.c             | 3 ---
+>   tools/testing/selftests/net/mptcp/mptcp_inq.c                 | 3 ---
+>   tools/testing/selftests/net/mptcp/mptcp_sockopt.c             | 3 ---
+>   tools/testing/selftests/net/msg_zerocopy.c                    | 3 ---
+>   tools/testing/selftests/net/nettest.c                         | 2 --
+>   tools/testing/selftests/net/psock_fanout.c                    | 3 ---
+>   tools/testing/selftests/net/psock_snd.c                       | 3 ---
+>   tools/testing/selftests/net/reuseport_addr_any.c              | 3 ---
+>   tools/testing/selftests/net/reuseport_bpf_cpu.c               | 3 ---
+>   tools/testing/selftests/net/reuseport_bpf_numa.c              | 3 ---
+>   tools/testing/selftests/net/reuseport_dualstack.c             | 3 ---
+>   tools/testing/selftests/net/so_incoming_cpu.c                 | 1 -
+>   tools/testing/selftests/net/so_netns_cookie.c                 | 1 -
+>   tools/testing/selftests/net/so_txtime.c                       | 3 ---
+>   tools/testing/selftests/net/tap.c                             | 3 ---
+>   tools/testing/selftests/net/tcp_ao/Makefile                   | 2 +-
+>   tools/testing/selftests/net/tcp_fastopen_backup_key.c         | 1 -
+>   tools/testing/selftests/net/tcp_inq.c                         | 2 --
+>   tools/testing/selftests/net/tcp_mmap.c                        | 1 -
+>   tools/testing/selftests/net/tls.c                             | 3 ---
+>   tools/testing/selftests/net/toeplitz.c                        | 3 ---
+>   tools/testing/selftests/net/tun.c                             | 3 ---
+>   tools/testing/selftests/net/txring_overwrite.c                | 3 ---
+>   tools/testing/selftests/net/txtimestamp.c                     | 3 ---
+>   tools/testing/selftests/net/udpgso.c                          | 3 ---
+>   tools/testing/selftests/net/udpgso_bench_rx.c                 | 3 ---
+>   tools/testing/selftests/net/udpgso_bench_tx.c                 | 3 ---
+>   tools/testing/selftests/perf_events/remove_on_exec.c          | 2 --
+>   tools/testing/selftests/perf_events/sigtrap_threads.c         | 2 --
+>   tools/testing/selftests/pid_namespace/regression_enomem.c     | 1 -
+>   tools/testing/selftests/pidfd/pidfd.h                         | 1 -
+>   tools/testing/selftests/pidfd/pidfd_fdinfo_test.c             | 2 --
+>   tools/testing/selftests/pidfd/pidfd_getfd_test.c              | 2 --
+>   tools/testing/selftests/pidfd/pidfd_open_test.c               | 2 --
+>   tools/testing/selftests/pidfd/pidfd_poll_test.c               | 2 --
+>   tools/testing/selftests/pidfd/pidfd_setns_test.c              | 2 --
+>   tools/testing/selftests/pidfd/pidfd_test.c                    | 2 --
+>   tools/testing/selftests/pidfd/pidfd_wait.c                    | 2 --
+>   tools/testing/selftests/prctl/Makefile                        | 2 ++
+>   tools/testing/selftests/proc/Makefile                         | 2 +-
+>   tools/testing/selftests/ptrace/get_set_sud.c                  | 1 -
+>   tools/testing/selftests/ptrace/peeksiginfo.c                  | 1 -
+>   tools/testing/selftests/resctrl/Makefile                      | 2 +-
+>   tools/testing/selftests/riscv/mm/Makefile                     | 2 +-
+>   tools/testing/selftests/rseq/basic_percpu_ops_test.c          | 1 -
+>   tools/testing/selftests/rseq/basic_test.c                     | 2 --
+>   tools/testing/selftests/rseq/param_test.c                     | 1 -
+>   tools/testing/selftests/rseq/rseq.c                           | 2 --
+>   tools/testing/selftests/rtc/Makefile                          | 2 +-
+>   tools/testing/selftests/seccomp/seccomp_benchmark.c           | 1 -
+>   tools/testing/selftests/seccomp/seccomp_bpf.c                 | 2 --
+>   tools/testing/selftests/sgx/Makefile                          | 2 +-
+>   tools/testing/selftests/sgx/sigstruct.c                       | 1 -
+>   tools/testing/selftests/tmpfs/Makefile                        | 2 +-
+>   tools/testing/selftests/user_events/abi_test.c                | 2 --
+>   tools/testing/selftests/x86/amx.c                             | 2 --
+>   tools/testing/selftests/x86/check_initial_reg_state.c         | 3 ---
+>   tools/testing/selftests/x86/corrupt_xstate_header.c           | 3 ---
+>   tools/testing/selftests/x86/entry_from_vm86.c                 | 3 ---
+>   tools/testing/selftests/x86/fsgsbase.c                        | 2 --
+>   tools/testing/selftests/x86/fsgsbase_restore.c                | 2 --
+>   tools/testing/selftests/x86/ioperm.c                          | 2 --
+>   tools/testing/selftests/x86/iopl.c                            | 2 --
+>   tools/testing/selftests/x86/lam.c                             | 1 -
+>   tools/testing/selftests/x86/ldt_gdt.c                         | 2 --
+>   tools/testing/selftests/x86/mov_ss_trap.c                     | 2 --
+>   tools/testing/selftests/x86/nx_stack.c                        | 2 --
+>   tools/testing/selftests/x86/ptrace_syscall.c                  | 2 --
+>   tools/testing/selftests/x86/sigaltstack.c                     | 2 --
+>   tools/testing/selftests/x86/sigreturn.c                       | 3 ---
+>   tools/testing/selftests/x86/single_step_syscall.c             | 3 ---
+>   tools/testing/selftests/x86/syscall_arg_fault.c               | 3 ---
+>   tools/testing/selftests/x86/syscall_numbering.c               | 3 ---
+>   tools/testing/selftests/x86/sysret_rip.c                      | 3 ---
+>   tools/testing/selftests/x86/sysret_ss_attrs.c                 | 3 ---
+>   tools/testing/selftests/x86/test_FCMOV.c                      | 4 ----
+>   tools/testing/selftests/x86/test_FCOMI.c                      | 4 ----
+>   tools/testing/selftests/x86/test_FISTTP.c                     | 4 ----
+>   tools/testing/selftests/x86/test_mremap_vdso.c                | 1 -
+>   tools/testing/selftests/x86/test_shadow_stack.c               | 3 ---
+>   tools/testing/selftests/x86/test_syscall_vdso.c               | 4 ----
+>   tools/testing/selftests/x86/test_vsyscall.c                   | 3 ---
+>   tools/testing/selftests/x86/unwind_vdso.c                     | 3 ---
+>   tools/testing/selftests/x86/vdso_restorer.c                   | 3 ---
+>   218 files changed, 20 insertions(+), 426 deletions(-)
+> 
+> --
+> 2.45.0.rc1.225.g2a3ae87e7f-goog
+> 
+> 
+
+thanks,
+-- Shuah
 
