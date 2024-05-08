@@ -1,136 +1,85 @@
-Return-Path: <kvm+bounces-17030-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17031-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080888C023A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 18:45:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC63A8C03D3
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 19:55:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89079B2306A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 16:45:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A44B028678A
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 17:55:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28187101DA;
-	Wed,  8 May 2024 16:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA5812BEB8;
+	Wed,  8 May 2024 17:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6T4Vx0y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLtaVWag"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13441633;
-	Wed,  8 May 2024 16:44:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1462D20309;
+	Wed,  8 May 2024 17:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715186700; cv=none; b=RjWEvBLj8kuO7x31YkqGMm1cy/d1/cIKPMvYDEIdJmWH0VUUULuifWcdFVEcG97GU3tSO6XPb0wB8HBYbZtrBCtgo/4L6V8WmxCFI0WiZcHdXrfndlRUQ/TYdsztHZLYA4hHgh08b+HT9cqO5s/IlxEPGeBgEIIxky+VOwMNc6o=
+	t=1715190937; cv=none; b=WwaikWEzZBopq8JcqaM5gjHQipCrWynZDfZPOVESPQSju4hXNmDSLVi8U9IYc39iQfw/QZGfxi9RhEL73mSyNr8zCIenVOb339FfkLv5Qhh6VrvnVking8oHpi7TgTF9MtnU4vo6Y9ag9gwCkKJyQf210FjHqYFrGVW94bpn3pA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715186700; c=relaxed/simple;
-	bh=0vXy5kTUEu7Jx0jxctDNvQbCc0ApL3aWNbp3Y8Ze7FM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=U0mN3p+TENNrVE3SV+SQlpiEcgZ7LDr6Iawqp7KVWGb8EnEqpTsNS1AGzc+A7N9JaORPilNxShAbfAO1aw6iz5xTv6lVqOBGW6Yul1eCzLUCteUgz3rMbFvqq/O8zF4Kyi5VltezECJrMaWfkV4O9YVmBVUnpbhUfeYCtyal6OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6T4Vx0y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A392AC113CC;
-	Wed,  8 May 2024 16:44:42 +0000 (UTC)
+	s=arc-20240116; t=1715190937; c=relaxed/simple;
+	bh=q7pa0YfnYWgOB6Pb3JSefyh0UJ2HHmVcHneYQIPrH50=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nBnOcSOqggKekGIbO1UJ8NQt8yOU1LzGJjGqIAiAfJCXcNNuPQRlONvjxU11NPDzqQCC2ytOtDgcxjDg7570FeLptVOHf6e6J90CjtB895UvHzMf9AfQ5NPtIESh0HPLBZpd3W8F6CvT7v28ZjoYCE2SbJ7RQPnW75hzfHHhJ4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLtaVWag; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B9EBC113CC;
+	Wed,  8 May 2024 17:55:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715186699;
-	bh=0vXy5kTUEu7Jx0jxctDNvQbCc0ApL3aWNbp3Y8Ze7FM=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=r6T4Vx0y4QOnGwpBQOgFUY2eu34NThzwvqE9iWCIEwfBWxfBXLKwMeMXC2MZkCWgE
-	 sSy8eWZ2B09C4cJWuUtyV7pp1xxjYBJcb9dKqRcNcRwWuRWNUhvaX8ZZNACrQ8akj+
-	 fVsf0Qgb7/q7++0jy9wmy9zGxZ08j6Zv4QRrw0dL1nzsSXULP5hHSA299xoBM9AD05
-	 6riemVsfFd1imBZpGu8mE+0OdEWqZvuhuWPeX4o1a5jHgyaeVks/tD4RoFmGk5XVgC
-	 it22dgUxqoUlvZZ7CdgHHzCOiO9So64lLxbdbeLXKuMGmV15xh0wplv/ZWkSBTpDGK
-	 EGKaRAElv3B+A==
+	s=k20201202; t=1715190936;
+	bh=q7pa0YfnYWgOB6Pb3JSefyh0UJ2HHmVcHneYQIPrH50=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lLtaVWag7Om718+7XkkyEv/ThcZBa3h3Bres49t08+lHLmkB/ekXvpWEY428oi0ku
+	 JbYhnrsnToqMsTZBw77X56gZZNOm2hcFDrewRqxax4vLzz+CBVDSMSkNIcspTN+vYZ
+	 V2qWkk7BbyNmmjhgVwYjTDij1uGifjIOx1E97P/6dxK5SySpvpj04lfnIZTHtjVQ9m
+	 cGZxaNCdwYdvxoscPEwI9ksB/3/vVu1Gg1D+VfxkxPXmRVq1vO2zlniBQdXxu4uwvW
+	 PUSqMpNItTuvgHpHdB8mld0InZ7RdFbOk71imBtyrjRfuGcGLh1J614QJAL5OK06mD
+	 yEBJ3TOcrMK/Q==
+Date: Wed, 8 May 2024 13:55:34 -0400
+From: Sasha Levin <sashal@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
+	shuah@kernel.org, linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 6.8 18/52] KVM: selftests: Add test for uaccesses
+ to non-existent vgic-v2 CPUIF
+Message-ID: <Zju8lrutLRubQUbK@sashalap>
+References: <20240507230800.392128-1-sashal@kernel.org>
+ <20240507230800.392128-18-sashal@kernel.org>
+ <Zjsa4yeD_EmV7TgP@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 08 May 2024 19:44:40 +0300
-Message-Id: <D14EXNEBOKFY.8SJ7SOCABM01@kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <kernel-team@android.com>, <linux-sound@vger.kernel.org>,
- <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>,
- <linux-input@vger.kernel.org>, <iommu@lists.linux.dev>,
- <kvmarm@lists.linux.dev>, <kvm@vger.kernel.org>,
- <kvm-riscv@lists.infradead.org>, <linux-riscv@lists.infradead.org>,
- <linux-security-module@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <linux-actions@lists.infradead.org>,
- <mptcp@lists.linux.dev>, <linux-rtc@vger.kernel.org>,
- <linux-sgx@vger.kernel.org>, <bpf@vger.kernel.org>, "kernel test robot"
- <oliver.sang@intel.com>
-Subject: Re: [PATCH v2 2/5] selftests/sgx: Include KHDR_INCLUDES in Makefile
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Dave Hansen" <dave.hansen@intel.com>, "Edward Liaw"
- <edliaw@google.com>, <shuah@kernel.org>, "Mark Brown" <broonie@kernel.org>,
- "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai" <tiwai@suse.com>,
- "Catalin Marinas" <catalin.marinas@arm.com>, "Will Deacon"
- <will@kernel.org>, "Nhat Pham" <nphamcs@gmail.com>, "Johannes Weiner"
- <hannes@cmpxchg.org>, "Christian Brauner" <brauner@kernel.org>, "Eric
- Biederman" <ebiederm@xmission.com>, "Kees Cook" <keescook@chromium.org>,
- "OGAWA Hirofumi" <hirofumi@mail.parknet.co.jp>, "Thomas Gleixner"
- <tglx@linutronix.de>, "Ingo Molnar" <mingo@redhat.com>, "Peter Zijlstra"
- <peterz@infradead.org>, "Darren Hart" <dvhart@infradead.org>, "Davidlohr
- Bueso" <dave@stgolabs.net>, =?utf-8?q?Andr=C3=A9_Almeida?=
- <andrealmeid@igalia.com>, "Jiri Kosina" <jikos@kernel.org>, "Benjamin
- Tissoires" <bentiss@kernel.org>, "Jason Gunthorpe" <jgg@ziepe.ca>, "Kevin
- Tian" <kevin.tian@intel.com>, "Andy Lutomirski" <luto@amacapital.net>,
- "Will Drewry" <wad@chromium.org>, "Marc Zyngier" <maz@kernel.org>, "Oliver
- Upton" <oliver.upton@linux.dev>, "James Morse" <james.morse@arm.com>,
- "Suzuki K Poulose" <suzuki.poulose@arm.com>, "Zenghui Yu"
- <yuzenghui@huawei.com>, "Paolo Bonzini" <pbonzini@redhat.com>, "Sean
- Christopherson" <seanjc@google.com>, "Anup Patel" <anup@brainfault.org>,
- "Atish Patra" <atishp@atishpatra.org>, "Paul Walmsley"
- <paul.walmsley@sifive.com>, "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert
- Ou" <aou@eecs.berkeley.edu>, "Christian Borntraeger"
- <borntraeger@linux.ibm.com>, "Janosch Frank" <frankja@linux.ibm.com>,
- "Claudio Imbrenda" <imbrenda@linux.ibm.com>, "David Hildenbrand"
- <david@redhat.com>, =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- "Paul Moore" <paul@paul-moore.com>, "James Morris" <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>, "Andrew Morton"
- <akpm@linux-foundation.org>, "Seth Forshee" <sforshee@kernel.org>, "Bongsu
- Jeon" <bongsu.jeon@samsung.com>, "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Steffen Klassert"
- <steffen.klassert@secunet.com>, "Herbert Xu" <herbert@gondor.apana.org.au>,
- =?utf-8?q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, "Manivannan Sadhasivam"
- <manivannan.sadhasivam@linaro.org>, "Matthieu Baerts" <matttbe@kernel.org>,
- "Mat Martineau" <martineau@kernel.org>, "Geliang Tang"
- <geliang@kernel.org>, "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- "Fenghua Yu" <fenghua.yu@intel.com>, "Reinette Chatre"
- <reinette.chatre@intel.com>, "Mathieu Desnoyers"
- <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>,
- "Boqun Feng" <boqun.feng@gmail.com>, "Alexandre Belloni"
- <alexandre.belloni@bootlin.com>, "Muhammad Usama Anjum"
- <usama.anjum@collabora.com>
-X-Mailer: aerc 0.17.0
-References: <20240507214254.2787305-1-edliaw@google.com>
- <20240507214254.2787305-3-edliaw@google.com>
- <c3fc5396-bc71-4dee-a3e0-d59dbbc6eda1@intel.com>
-In-Reply-To: <c3fc5396-bc71-4dee-a3e0-d59dbbc6eda1@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <Zjsa4yeD_EmV7TgP@linux.dev>
 
-On Wed May 8, 2024 at 6:33 PM EEST, Dave Hansen wrote:
-> On 5/7/24 14:38, Edward Liaw wrote:
-> > Add KHDR_INCLUDES to the CFLAGS to pull in the kselftest harness
-> > dependencies (-D_GNU_SOURCE).
-> >=20
-> > Also, remove redefinitions of _GNU_SOURCE in the source code.
+On Wed, May 08, 2024 at 06:25:39AM +0000, Oliver Upton wrote:
+>Hi,
 >
-> From an x86 and SGX perspective, looks fine.  I assume Shuah is planning
-> on taking this pile.
+>On Tue, May 07, 2024 at 07:06:44PM -0400, Sasha Levin wrote:
+>> From: Oliver Upton <oliver.upton@linux.dev>
+>>
+>> [ Upstream commit 160933e330f4c5a13931d725a4d952a4b9aefa71 ]
 >
-> Acked-by: Dave Hansen <dave.hansen@linux.intel.com>
+>Can you please drop this and pick up the bugfix instead?
+>
+>6ddb4f372fc6 ("KVM: arm64: vgic-v2: Check for non-NULL vCPU in vgic_v2_parse_attr()")
 
-Yep,
+Ack, will do.
 
-Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
-
-I also quickly tested with NUC7 for what it is worth:
-
-Tested-by: Jarkko Sakkinen <jarkko@kernel.org>
-
-BR, Jarkko
+-- 
+Thanks,
+Sasha
 
