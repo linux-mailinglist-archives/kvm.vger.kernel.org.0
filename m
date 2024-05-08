@@ -1,163 +1,329 @@
-Return-Path: <kvm+bounces-16955-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16956-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C328BF4E5
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 05:19:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2956B8BF4E7
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 05:21:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D71F01F24D90
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 03:19:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6048CB2155F
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 03:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7861427E;
-	Wed,  8 May 2024 03:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE5F1426E;
+	Wed,  8 May 2024 03:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="qs3G3HLZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y/e2EDso"
 X-Original-To: kvm@vger.kernel.org
-Received: from out0-193.mail.aliyun.com (out0-193.mail.aliyun.com [140.205.0.193])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A1110A31;
-	Wed,  8 May 2024 03:18:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.205.0.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B65610A31;
+	Wed,  8 May 2024 03:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715138336; cv=none; b=d4KeCbgaAC0WBq7Oyzh666VXDtLx7NAW4S1AdgWokwHyKldwwsMIn4vbR+llZ9K4dXYFT5dKJAn0xUWaekMMU2rijvhWlS1LGUSQHMwEgC2hFTpE5FDW1Ttl87lQsvADKoAFHvT+0o2S/bW/zUVhAppKMFJ+rG0ceXvZIGciAAM=
+	t=1715138454; cv=none; b=MX2w8/XIPxNVCDE3t1FO1TOsjHNAtmHIEwLq2YuOLq3KCIO1Jl3s+n/Ks1tLNIDOTXE9IvkTaguqiASiSpst4binIapPcAw285lkvYVrodayYqpD5nqI5pLVvThKJIYKvsrc1aSwoJ2FuwrURmbnTHZfncpBUjsqju3XCYXyy70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715138336; c=relaxed/simple;
-	bh=XLuR9VxXVV1Ku8DVWVb7b2tLdtBtCxg3+Z+626HBzJ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BcJu4cKohEzCTI1ENLDjGSgD25LsrTZlHuY4X4qx1JvIbo1uxNTGMJYP34CSQ/WlKhhM+U7Bx1xQsWfzk8u3TXXwZXSCt6vGXOGDKH3nN4uQenUTUerMc7w8I/PGEHp/3EBSGspxps0sKizdLXCuLDu0BUXvJK1XWD9D6d07n+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=qs3G3HLZ; arc=none smtp.client-ip=140.205.0.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1715138325; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=DnAX2XxWMmT4hYoRUEoVeoZJUWhjhnceF4d+AxQfu6I=;
-	b=qs3G3HLZuWzK77mam8IvxbBqK3JADd/OxmQyBoXfPlTnNBUA99zKZMChDTRBWS8SY6Mlds2WTeeCaPAFZOktL6bTj67/Jeo1gBEyBz08YMau1LbfMmmaLp+9uDRIVQJ6Wfqwsnz/tO3wZYOE3kzvEx4keBWVEBfvFzBtjvWexAc=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047205;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---.XV8fOaO_1715138323;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.XV8fOaO_1715138323)
-          by smtp.aliyun-inc.com;
-          Wed, 08 May 2024 11:18:44 +0800
-From: "Hou Wenlong" <houwenlong.hwl@antgroup.com>
-To: kvm@vger.kernel.org
-Cc: "Lai Jiangshan" <jiangshan.ljs@antgroup.com>,
-  "Sean Christopherson" <seanjc@google.com>,
-  "Paolo Bonzini" <pbonzini@redhat.com>,
-  "Thomas Gleixner" <tglx@linutronix.de>,
-  "Ingo Molnar" <mingo@redhat.com>,
-  "Borislav Petkov" <bp@alien8.de>,
-  "Dave Hansen" <dave.hansen@linux.intel.com>,
-   <x86@kernel.org>,
-  "H. Peter Anvin" <hpa@zytor.com>,
-   <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: x86/mmu: Only allocate shadowed translation cache for sp->role.level <= KVM_MAX_HUGEPAGE_LEVEL
-Date: Wed, 08 May 2024 11:18:42 +0800
-Message-Id: <bf08a06675ed97d2456f7dcd9b0b2ef92f4602be.1715137643.git.houwenlong.hwl@antgroup.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1715138454; c=relaxed/simple;
+	bh=YLzdKHkoxEtOhqoq3SeLW5bg3uDOWGFmCX+W0iZlc0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gk6dWCVWCbLKLT4gC4J6UU8xa6T0wIPbefr1is+xpyJEoz+QE2BHDE1+RoXV940Jul4pHvad4i8o8osMYk8YR0v2rrDI+32y6mR/K7ji2xnBpwN73ENTDmcy8m4WrgOFDZbMKwDUmKXB4LzdEthHagD0dO+5Uyb9b3AITHK4VOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y/e2EDso; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2B21C2BBFC;
+	Wed,  8 May 2024 03:20:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715138454;
+	bh=YLzdKHkoxEtOhqoq3SeLW5bg3uDOWGFmCX+W0iZlc0A=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=Y/e2EDsoB7U2R+MoUGeE6CSUQG3ZOq6itZXzlpDEX7o5jcaKBQye+6DdRIHCKDfXz
+	 fCgZwEjAGcI6feW5L2IGM5j81uMhgtTjbUCCnUFIUW2uzNWDX88sdC/DwP5qx4e6jF
+	 cjQ/FW0GvHTovXqkXIlTyPyC7darIKO7BRFluK0Zz65YwYYUg6s9aE9j3l6Wv1tFGG
+	 e8tNblHxtOFEU3JZCCZ9qMwqAwsOuamv6iGqp0i3KVisSGo75sG2R3EMyJPcrKzayF
+	 rEaDJhG3t3HsJMHV0S+cSxZrmA6p02fuoPCIF09seruLdipz/BqjOkfWtvAqhRrXR9
+	 ol3c4vOU0wcRw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 808A4CE0FF3; Tue,  7 May 2024 20:20:53 -0700 (PDT)
+Date: Tue, 7 May 2024 20:20:53 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Leonardo Bras <leobras@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+Message-ID: <ac66bb23-2955-41bf-b1f0-85adcc4628a0@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <ZgsXRUTj40LmXVS4@google.com>
+ <ZjUwHvyvkM3lj80Q@LeoBras>
+ <ZjVXVc2e_V8NiMy3@google.com>
+ <3b2c222b-9ef7-43e2-8ab3-653a5ee824d4@paulmck-laptop>
+ <ZjprKm5jG3JYsgGB@google.com>
+ <663a659d-3a6f-4bec-a84b-4dd5fd16c3c1@paulmck-laptop>
+ <ZjqWXPFuoYWWcxP3@google.com>
+ <0e239143-65ed-445a-9782-e905527ea572@paulmck-laptop>
+ <Zjq9okodmvkywz82@google.com>
+ <ZjrClk4Lqw_cLO5A@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZjrClk4Lqw_cLO5A@google.com>
 
-Only the indirect SP with sp->role.level <= KVM_MAX_HUGEPAGE_LEVEL might
-have leaf gptes, so allocation of shadowed translation cache is needed
-only for it. Additionally, use sp->shadowed_translation to determine
-whether to use the information in shadowed translation cache or not.
+On Tue, May 07, 2024 at 05:08:54PM -0700, Sean Christopherson wrote:
+> On Tue, May 07, 2024, Sean Christopherson wrote:
+> > On Tue, May 07, 2024, Paul E. McKenney wrote:
+> > > On Tue, May 07, 2024 at 02:00:12PM -0700, Sean Christopherson wrote:
+> > > > On Tue, May 07, 2024, Paul E. McKenney wrote:
+> > > > > On Tue, May 07, 2024 at 10:55:54AM -0700, Sean Christopherson wrote:
+> > > > > > On Fri, May 03, 2024, Paul E. McKenney wrote:
+> > > > > > > On Fri, May 03, 2024 at 02:29:57PM -0700, Sean Christopherson wrote:
+> > > > > > > > So if we're comfortable relying on the 1 second timeout to guard against a
+> > > > > > > > misbehaving userspace, IMO we might as well fully rely on that guardrail.  I.e.
+> > > > > > > > add a generic PF_xxx flag (or whatever flag location is most appropriate) to let
+> > > > > > > > userspace communicate to the kernel that it's a real-time task that spends the
+> > > > > > > > overwhelming majority of its time in userspace or guest context, i.e. should be
+> > > > > > > > given extra leniency with respect to rcuc if the task happens to be interrupted
+> > > > > > > > while it's in kernel context.
+> > > > > > > 
+> > > > > > > But if the task is executing in host kernel context for quite some time,
+> > > > > > > then the host kernel's RCU really does need to take evasive action.
+> > > > > > 
+> > > > > > Agreed, but what I'm saying is that RCU already has the mechanism to do so in the
+> > > > > > form of the 1 second timeout.
+> > > > > 
+> > > > > Plus RCU will force-enable that CPU's scheduler-clock tick after about
+> > > > > ten milliseconds of that CPU not being in a quiescent state, with
+> > > > > the time varying depending on the value of HZ and the number of CPUs.
+> > > > > After about ten seconds (halfway to the RCU CPU stall warning), it will
+> > > > > resched_cpu() that CPU every few milliseconds.
+> > > > > 
+> > > > > > And while KVM does not guarantee that it will immediately resume the guest after
+> > > > > > servicing the IRQ, neither does the existing userspace logic.  E.g. I don't see
+> > > > > > anything that would prevent the kernel from preempting the interrupt task.
+> > > > > 
+> > > > > Similarly, the hypervisor could preempt a guest OS's RCU read-side
+> > > > > critical section or its preempt_disable() code.
+> > > > > 
+> > > > > Or am I missing your point?
+> > > > 
+> > > > I think you're missing my point?  I'm talking specifically about host RCU, what
+> > > > is or isn't happening in the guest is completely out of scope.
+> > > 
+> > > Ah, I was thinking of nested virtualization.
+> > > 
+> > > > My overarching point is that the existing @user check in rcu_pending() is optimistic,
+> > > > in the sense that the CPU is _likely_ to quickly enter a quiescent state if @user
+> > > > is true, but it's not 100% guaranteed.  And because it's not guaranteed, RCU has
+> > > > the aforementioned guardrails.
+> > > 
+> > > You lost me on this one.
+> > > 
+> > > The "user" argument to rcu_pending() comes from the context saved at
+> > > the time of the scheduling-clock interrupt.  In other words, the CPU
+> > > really was executing in user mode (which is an RCU quiescent state)
+> > > when the interrupt arrived.
+> > > 
+> > > And that suffices, 100% guaranteed.
+> > 
+> > Ooh, that's where I'm off in the weeds.  I was viewing @user as "this CPU will be
+> > quiescent", but it really means "this CPU _was_ quiescent".
 
-Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
----
- arch/x86/kvm/mmu/mmu.c | 27 +++++++++++++++++++--------
- 1 file changed, 19 insertions(+), 8 deletions(-)
+Exactly!
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index fc3b59b59ee1..8be987d0f05e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -716,12 +716,12 @@ static bool sp_has_gptes(struct kvm_mmu_page *sp);
- 
- static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
- {
-+	if (sp->shadowed_translation)
-+		return sp->shadowed_translation[index] >> PAGE_SHIFT;
-+
- 	if (sp->role.passthrough)
- 		return sp->gfn;
- 
--	if (!sp->role.direct)
--		return sp->shadowed_translation[index] >> PAGE_SHIFT;
--
- 	return sp->gfn + (index << ((sp->role.level - 1) * SPTE_LEVEL_BITS));
- }
- 
-@@ -733,7 +733,7 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
-  */
- static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
- {
--	if (sp_has_gptes(sp))
-+	if (sp->shadowed_translation)
- 		return sp->shadowed_translation[index] & ACC_ALL;
- 
- 	/*
-@@ -754,7 +754,7 @@ static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
- static void kvm_mmu_page_set_translation(struct kvm_mmu_page *sp, int index,
- 					 gfn_t gfn, unsigned int access)
- {
--	if (sp_has_gptes(sp)) {
-+	if (sp->shadowed_translation) {
- 		sp->shadowed_translation[index] = (gfn << PAGE_SHIFT) | access;
- 		return;
- 	}
-@@ -1697,7 +1697,7 @@ static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
- 	hlist_del(&sp->hash_link);
- 	list_del(&sp->link);
- 	free_page((unsigned long)sp->spt);
--	if (!sp->role.direct)
-+	if (sp->shadowed_translation)
- 		free_page((unsigned long)sp->shadowed_translation);
- 	kmem_cache_free(mmu_page_header_cache, sp);
- }
-@@ -1850,6 +1850,17 @@ static bool kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
- static void kvm_mmu_commit_zap_page(struct kvm *kvm,
- 				    struct list_head *invalid_list);
- 
-+static bool sp_might_have_leaf_gptes(struct kvm_mmu_page *sp)
-+{
-+	if (sp->role.direct)
-+		return false;
-+
-+	if (sp->role.level > KVM_MAX_HUGEPAGE_LEVEL)
-+		return false;
-+
-+	return true;
-+}
-+
- static bool sp_has_gptes(struct kvm_mmu_page *sp)
- {
- 	if (sp->role.direct)
-@@ -2199,7 +2210,8 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
- 
- 	sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
- 	sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
--	if (!role.direct)
-+	sp->role = role;
-+	if (sp_might_have_leaf_gptes(sp))
- 		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
- 
- 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-@@ -2216,7 +2228,6 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
- 	kvm_account_mmu_page(kvm, sp);
- 
- 	sp->gfn = gfn;
--	sp->role = role;
- 	hlist_add_head(&sp->hash_link, sp_list);
- 	if (sp_has_gptes(sp))
- 		account_shadowed(kvm, sp);
--- 
-2.31.1
+> Hrm, I'm still confused though.  That's rock solid for this check:
+> 
+> 	/* Is the RCU core waiting for a quiescent state from this CPU? */
+> 
+> But I don't understand how it plays into the next three checks that can result in
+> rcuc being awakened.  I suspect it's these checks that Leo and Marcelo are trying
+> squash, and these _do_ seem like they are NOT 100% guaranteed by the @user check.
 
+The short answer is that RCU is a state machine.  These checks all
+indicate that there is something for that state machine to do, so
+rcu_core() (in the rcuc kthread in some configurations) is invoked to
+make the per-CPU portion of this state machine take a step.  The state
+machine's state will reject a quiescent-state report that does not
+apply to the current grace period.  It will also recognize the case
+where there is no quiescent-state report.
+
+> 	/* Does this CPU have callbacks ready to invoke? */
+
+If callbacks are not offloaded, then the state machine is in charge of
+invoking them.
+
+> 	/* Has RCU gone idle with this CPU needing another grace period? */
+
+If this CPU needs a grace period and there is currently on grace
+period in progress, the state machine will start a grace period.
+(Though grace periods can also be started from elsewhere.)
+
+> 	/* Have RCU grace period completed or started?  */
+
+If this CPU is not yet aware of a grace period's start or completion,
+the state machine takes care of it.
+
+This state machine has per-task, per-CPU, and global components.
+It optimizes to do its work locally.  This means that the implementation
+of this state machine is distributed across quite a bit of code.
+You won't likely understand it by looking at only a small piece of it.
+You will instead need to go line-by-line through much of the contents
+of kernel/rcu, starting with kernel/rcu/tree.c.
+
+If you are interested, we have done quite a bit of work documenting it,
+please see here:
+
+https://docs.google.com/document/d/1GCdQC8SDbb54W1shjEXqGZ0Rq8a6kIeYutdSIajfpLA/edit?usp=sharing
+
+If you do get a chance to look it over, feedback is welcome!
+
+> > > The reason that it suffices is that other RCU code such as rcu_qs() and
+> > > rcu_note_context_switch() ensure that this CPU does not pay attention to
+> > > the user-argument-induced quiescent state unless this CPU had previously
+> > > acknowledged the current grace period.
+> > > 
+> > > And if the CPU has previously acknowledged the current grace period, that
+> > > acknowledgement must have preceded the interrupt from user-mode execution.
+> > > Thus the prior quiescent state represented by that user-mode execution
+> > > applies to that previously acknowledged grace period.
+> > 
+> > To confirm my own understanding: 
+> > 
+> >   1. Acknowledging the current grace period means any future rcu_read_lock() on
+> >      the CPU will be accounted to the next grace period.
+
+More or less.  Any uncertainty will cause RCU to err on the side of
+accounting that rcu_read_lock() to the current grace period.  Why any
+uncertainty?  Because certainty is exceedingly expensive in this game.
+See for example the video of my Kernel Recipes talk from last year.
+
+> >   2. A CPU can acknowledge a grace period without being quiescent.
+
+Yes, and either the beginning or the end of that grace period.
+(It clearly cannot acknowledge both without going quiescent at some
+point in between times, because otherwise that grace period could not
+be permitted to end.)
+
+> >   3. Userspace can't acknowledge a grace period, because it doesn't run kernel
+> >      code (stating the obvious).
+
+Agreed.
+
+> >   4. All RCU read-side critical sections must complete before exiting to usersepace.
+
+Agreed.  Any that try not to will hear from lockdep.
+
+> > And so if an IRQ interrupts userspace, and the CPU previously acknowledged grace
+> > period N, RCU can infer that grace period N elapsed on the CPU, because all
+> > "locks" held on grace period N are guaranteed to have been dropped.
+
+More precisely, previously noted the beginning of that grace period,
+but yes.
+
+> > > This is admittedly a bit indirect, but then again this is Linux-kernel
+> > > RCU that we are talking about.
+> > > 
+> > > > And I'm arguing that, since the @user check isn't bombproof, there's no reason to
+> > > > try to harden against every possible edge case in an equivalent @guest check,
+> > > > because it's unnecessary for kernel safety, thanks to the guardrails.
+> > > 
+> > > And the same argument above would also apply to an equivalent check for
+> > > execution in guest mode at the time of the interrupt.
+> > 
+> > This is partly why I was off in the weeds.  KVM cannot guarantee that the
+> > interrupt that leads to rcu_pending() actually interrupted the guest.  And the
+> > original patch didn't help at all, because a time-based check doesn't come
+> > remotely close to the guarantees that the @user check provides.
+
+Nothing in the registers from the interrupted context permits that
+determination?
+
+> > > Please understand that I am not saying that we absolutely need an
+> > > additional check (you tell me!).
+> > 
+> > Heh, I don't think I'm qualified to answer that question, at least not yet.
+
+Me, I would assume that we don't unless something says otherwise.  One
+example of such a somthing is an RCU CPU stall warning.
+
+> > > But if we do need RCU to be more aggressive about treating guest execution as
+> > > an RCU quiescent state within the host, that additional check would be an
+> > > excellent way of making that happen.
+> > 
+> > It's not clear to me that being more agressive is warranted.  If my understanding
+> > of the existing @user check is correct, we _could_ achieve similar functionality
+> > for vCPU tasks by defining a rule that KVM must never enter an RCU critical section
+> > with PF_VCPU set and IRQs enabled, and then rcu_pending() could check PF_VCPU.
+> > On x86, this would be relatively straightforward (hack-a-patch below), but I've
+> > no idea what it would look like on other architectures.
+
+At first glance, this looks plausible.  I would guess that a real patch
+would have to be architecture dependent, and that could simply involve
+a Kconfig option (perhaps something like CONFIG_RCU_SENSE_GUEST), so
+that the check you add to rcu_pending is conditioned on something like
+IS_ENABLED(CONFIG_RCU_SENSE_GUEST).
+
+There would also need to be a similar check in rcu_sched_clock_irq(),
+or maybe in rcu_flavor_sched_clock_irq(), to force a call to rcu_qs()
+in this situation.
+
+> > But the value added isn't entirely clear to me, probably because I'm still missing
+> > something.  KVM will have *very* recently called __ct_user_exit(CONTEXT_GUEST) to
+> > note the transition from guest to host kernel.  Why isn't that a sufficient hook
+> > for RCU to infer grace period completion?
+
+Agreed, unless we are sure we need the change, we should not make it.
+All I am going on is that I was sent a patch that looked to be intended to
+make RCU more aggressive about finding quiescent states from guest OSes.
+I suspect that some change like this might eventually be needed in the
+non-nohz_full case, something about a 2017 USENIX paper.
+
+But we should have hard evidence that we need a change before making one.
+And you are more likely to come across such evidence than am I.  ;-)
+
+							Thanx, Paul
+
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 1a9e1e0c9f49..259b60adaad7 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11301,6 +11301,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >         if (vcpu->arch.guest_fpu.xfd_err)
+> >                 wrmsrl(MSR_IA32_XFD_ERR, 0);
+> >  
+> > +       RCU_LOCKDEP_WARN(lock_is_held(&rcu_bh_lock_map) ||
+> > +                        lock_is_held(&rcu_lock_map) ||
+> > +                        lock_is_held(&rcu_sched_lock_map),
+> > +                        "KVM in RCU read-side critical section with PF_VCPU set and IRQs enabled");
+> > +
+> >         /*
+> >          * Consume any pending interrupts, including the possible source of
+> >          * VM-Exit on SVM and any ticks that occur between VM-Exit and now.
+> > diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+> > index b2bccfd37c38..cdb815105de4 100644
+> > --- a/kernel/rcu/tree.c
+> > +++ b/kernel/rcu/tree.c
+> > @@ -3929,7 +3929,8 @@ static int rcu_pending(int user)
+> >                 return 1;
+> >  
+> >         /* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
+> > -       if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
+> > +       if ((user || rcu_is_cpu_rrupt_from_idle() || (current->flags & PF_VCPU)) &&
+> > +           rcu_nohz_full_cpu())
+> >                 return 0;
+> >  
+> >         /* Is the RCU core waiting for a quiescent state from this CPU? */
+> > 
+> > 
 
