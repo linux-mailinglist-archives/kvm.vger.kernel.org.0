@@ -1,120 +1,127 @@
-Return-Path: <kvm+bounces-16973-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16974-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A568BF66B
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 08:41:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB188BF677
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 08:44:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8482F1C21A61
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 06:41:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C417C1F23167
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 06:44:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E3522338;
-	Wed,  8 May 2024 06:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A7820DCC;
+	Wed,  8 May 2024 06:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fTfgDz1X"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UAEUjb/G"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858C71B95E
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 06:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 593A41A2C15
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 06:44:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715150483; cv=none; b=oqAZ6XF4UcJsPgjr3IkVrALZKyhmQuYHJX88oF4ZrPRqC51v0SQSgbyDkPfIluEtQUZpjm6XI4bQkLuK6R2FhtiZo99/0MAqMas+I/rz/pfvldM4nRrptd5zHIaf6EfAW6W8f0XMi/odkRbJb3F8zxnh8QowfJOjMIpqr28G76I=
+	t=1715150676; cv=none; b=iUTwSbCXSrW2MXv80ex/a3ESBig2eno5f7b9qIuA8/p3VpuYeYdGcHXPCuyXG5NcSTfe634jbHnZxSVv4iMfMYR8lBfBPlip5NfWVXPmsnHfmQHq6eUrDEnMCkNFqCEq/e6O4TtvpLsFvhGhNAa0DEzLJI46KNjQ09oedB3EkQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715150483; c=relaxed/simple;
-	bh=HudRakf3D9CeUbnWUUiGSx/9kGKnmIN2BmxCQmevDME=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=G/919+QLRaUYcmdTdlXXmq40PLXyBlgycuxwfMEcKLIqlHwbgtHDhp49hCG6XgJQ8oYR9ygV/Gvmxkd+Sxh2nxawdTkLpF4L/B2ni+xJ7SIHCtYuv/zUtiwCVcoHqNrsmUz57l3uuhHxWxW6COPY3A+8IolYAssLz/gDa/9yzG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fTfgDz1X; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1715150479;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HudRakf3D9CeUbnWUUiGSx/9kGKnmIN2BmxCQmevDME=;
-	b=fTfgDz1XhsgVdMHzUgZE9QB/inof8pX2WqyQObELukjydd455eFIOjtzdVv+ee369xusup
-	mN+EAqxU2hUqgAids7bmsiuT3T6ErZaEc3UDnHsp2XrGuanIBNuH+/Vkd8u9wyQTclMdnf
-	K3cVaerHysVz4nPpYXKV9u2tL2ibjiQ=
+	s=arc-20240116; t=1715150676; c=relaxed/simple;
+	bh=hQrICqZXnIj7ZtIyESqqqcco4pHKYZ5QVSNgXaca+8A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KSKQ1B6EuIVTTXTXXwiFtTrQqDaQNWr3YJlxLyNP+1jsVCmyvEKyty0gnH5aFkAwnjV/mK4ColoxRsfdhm+Zn1UK9kCWXKwkR7xurgBr+14dbFYAsI77kD9Kai5RzJSjJETVvGY7th2cW7xER8+dJAm3/WXyDH9F8MXi8UvHIKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UAEUjb/G; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715150675; x=1746686675;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=hQrICqZXnIj7ZtIyESqqqcco4pHKYZ5QVSNgXaca+8A=;
+  b=UAEUjb/GfpNmJSObw9UnjzZuMFc3IzL5dCQoAuvCNDuvBwQPBBvzCfAI
+   WWBQS7WkfqOnGivS2Lvyte93ARJudoBhpTEC59RMgwE1dCgeojgc+JoOt
+   UVfPmdvHwFdMKXgh47ut821yScrJilOvjILaxG2x/VfUswyn+uZIma1VW
+   kb1V9oiNzySfqErRHm5vwILXvccv+54tY+gTOp7WJpkqXt24sj0aO8DlK
+   xwveJDymd6wVCH6n08iCsylcbZKUCWNF49zXvztjbCAoBjVeT/kfspHhC
+   6HzfMdQi2obj4jQYd1pYbeRnFmEBQUAfpSNcJI6+okzRDV0pCCiRrurBq
+   w==;
+X-CSE-ConnectionGUID: CtYOrvJ9TZWayx4bpZs2tw==
+X-CSE-MsgGUID: xxHJzf3+QrahZi5L0dZXDQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="11112960"
+X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
+   d="scan'208";a="11112960"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 23:44:35 -0700
+X-CSE-ConnectionGUID: mEICq7kURhSdz9Cli+3XWQ==
+X-CSE-MsgGUID: EGQtvVyhQMKnkdyLQVW3tA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,144,1712646000"; 
+   d="scan'208";a="28876324"
+Received: from unknown (HELO st-server.bj.intel.com) ([10.240.193.102])
+  by fmviesa010.fm.intel.com with ESMTP; 07 May 2024 23:44:33 -0700
+From: Tao Su <tao1.su@linux.intel.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	chao.gao@intel.com,
+	xiaoyao.li@intel.com,
+	tao1.su@linux.intel.com
+Subject: [PATCH] KVM: selftests: x86: Prioritize getting max_gfn from GuestPhysBits
+Date: Wed,  8 May 2024 14:42:05 +0800
+Message-Id: <20240508064205.15301-1-tao1.su@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.400.31\))
-Subject: Re: [PATCH] Build guest_memfd_test also on arm64.
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Itaru Kitayama <itaru.kitayama@linux.dev>
-In-Reply-To: <CABgObfakz1KQ==Cvrxr5wS36Lq8mvF9uJtW3AWVe9m-b+0OKYA@mail.gmail.com>
-Date: Wed, 8 May 2024 15:41:00 +0900
-Cc: Shuah Khan <shuah@kernel.org>,
- kvm@vger.kernel.org,
- linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Itaru Kitayama <itaru.kitayama@fujitsu.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E7E9D65D-1DAC-4CA5-BDA5-D515D15E50F8@linux.dev>
-References: <20240222-memfd-v1-1-7d39680286f1@linux.dev>
- <CABgObfakz1KQ==Cvrxr5wS36Lq8mvF9uJtW3AWVe9m-b+0OKYA@mail.gmail.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Paolo,
+Use the max mappable GPA via GuestPhysBits advertised by KVM to calculate
+max_gfn. Currently some selftests (e.g. access_tracking_perf_test,
+dirty_log_test...) add RAM regions close to max_gfn, so guest may access
+GPA beyond its mappable range and cause infinite loop.
 
-> On Feb 23, 2024, at 17:57, Paolo Bonzini <pbonzini@redhat.com> wrote:
->=20
-> On Thu, Feb 22, 2024 at 12:44=E2=80=AFAM Itaru Kitayama
-> <itaru.kitayama@linux.dev> wrote:
->> on arm64 KVM_CAP_GUEST_MEMDF capability is not enabled, but
->> guest_memfd_test can build on arm64, let's build it on arm64 as well.
->=20
-> The test will be skipped, so there's no point in compiling it.
+Prioritize obtaining pa_bits from the GuestPhysBits field advertised by
+KVM, so max_gfn can be limited to the mappable range.
 
-It=E2=80=99s not merged yet, but the Arm CCA support series V2 is out =
-there, would you consider building it for arm64
-as well?
+Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+---
+This patch is based on https://github.com/kvm-x86/linux/commit/b628cb523c65
+---
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 1 +
+ tools/testing/selftests/kvm/lib/x86_64/processor.c     | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-Thanks,
-Itaru.
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 81ce37ec407d..ff99f66d81a0 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -282,6 +282,7 @@ struct kvm_x86_cpu_property {
+ #define X86_PROPERTY_MAX_EXT_LEAF		KVM_X86_CPU_PROPERTY(0x80000000, 0, EAX, 0, 31)
+ #define X86_PROPERTY_MAX_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 0, 7)
+ #define X86_PROPERTY_MAX_VIRT_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 8, 15)
++#define X86_PROPERTY_MAX_GUEST_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 16, 23)
+ #define X86_PROPERTY_SEV_C_BIT			KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
+ #define X86_PROPERTY_PHYS_ADDR_REDUCTION	KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 74a4c736c9ae..6c69f1dfeed2 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1074,7 +1074,9 @@ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
+ 		*pa_bits = kvm_cpu_has(X86_FEATURE_PAE) ? 36 : 32;
+ 		*va_bits = 32;
+ 	} else {
+-		*pa_bits = kvm_cpu_property(X86_PROPERTY_MAX_PHY_ADDR);
++		*pa_bits = kvm_cpu_property(X86_PROPERTY_MAX_GUEST_PHY_ADDR);
++		if (*pa_bits == 0)
++			*pa_bits = kvm_cpu_property(X86_PROPERTY_MAX_PHY_ADDR);
+ 		*va_bits = kvm_cpu_property(X86_PROPERTY_MAX_VIRT_ADDR);
+ 	}
+ }
 
->=20
-> Paolo
->=20
->> Signed-off-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
->> ---
->> tools/testing/selftests/kvm/Makefile | 1 +
->> 1 file changed, 1 insertion(+)
->>=20
->> diff --git a/tools/testing/selftests/kvm/Makefile =
-b/tools/testing/selftests/kvm/Makefile
->> index 492e937fab00..8a4f8afb81ca 100644
->> --- a/tools/testing/selftests/kvm/Makefile
->> +++ b/tools/testing/selftests/kvm/Makefile
->> @@ -158,6 +158,7 @@ TEST_GEN_PROGS_aarch64 +=3D =
-access_tracking_perf_test
->> TEST_GEN_PROGS_aarch64 +=3D demand_paging_test
->> TEST_GEN_PROGS_aarch64 +=3D dirty_log_test
->> TEST_GEN_PROGS_aarch64 +=3D dirty_log_perf_test
->> +TEST_GEN_PROGS_aarch64 +=3D guest_memfd_test
->> TEST_GEN_PROGS_aarch64 +=3D guest_print_test
->> TEST_GEN_PROGS_aarch64 +=3D get-reg-list
->> TEST_GEN_PROGS_aarch64 +=3D kvm_create_max_vcpus
->>=20
->> ---
->> base-commit: 39133352cbed6626956d38ed72012f49b0421e7b
->> change-id: 20240222-memfd-7285f9564c1e
->>=20
->> Best regards,
->> --
->> Itaru Kitayama <itaru.kitayama@linux.dev>
->>=20
->=20
+base-commit: dccb07f2914cdab2ac3a5b6c98406f765acab803
+-- 
+2.34.1
 
 
