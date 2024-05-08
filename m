@@ -1,146 +1,274 @@
-Return-Path: <kvm+bounces-16949-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16950-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E2E8BF382
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 02:21:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E36B78BF3B8
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 02:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5908428425D
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 00:21:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1389D1C23073
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 00:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACF4621;
-	Wed,  8 May 2024 00:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF97065C;
+	Wed,  8 May 2024 00:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fefSUt/A"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="azMe9IoT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061.outbound.protection.outlook.com [40.107.244.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69B5372
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 00:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715127666; cv=none; b=KRdPUnfC3Fff+SyznMRyJ4xQSugWKPQ96SQfHV2utVv+enwNuPM03OS8dQguSUJa2fYMVxRO2GeKcLXch+V1PCPMfCSgsRGhQGsefFw5zd0xrP2EY/u/vdzMeWAV7tz3EryLIMR4oAnNGXbl637gNn8ALT5+DufH8y5BfoZeuKA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715127666; c=relaxed/simple;
-	bh=6QNGrVnw6PUGIQqkgtVttbRiZ7WaoPYzwoKhGNB5rZw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=BpUCo1aOpPpWH6GJZdM+BoolJLe1dPEeqkAybFQIoBxlGUmYv9tff85IXrB3ALg1r5Y+aEAQcKTWi9SyClu8cya9usSjz5UNh9ZZPmEofyo7/1gjI/5VfHPaBBFeZhxmBXM21TCkLUNpvDRyr7GbTJY/e+ElZL3NuHG18rYIDkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fefSUt/A; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61e0c296333so4594227b3.1
-        for <kvm@vger.kernel.org>; Tue, 07 May 2024 17:21:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715127663; x=1715732463; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c5zLDljjdB2rK7nQXYwlp9FD4GIUWDXqjmQ12YQdFX8=;
-        b=fefSUt/A2doUcKT5UNST+SXlINkKY1T9YAmyqRjq74PD4iRBZHDejmqTBoL0R5Mc7e
-         hsId+W/dYeoJYo+0aV8uwa21F+1g6jDd7lCa1zGaWAm3VdLKRccMj6/9tbw7AVyOxgxl
-         XIJbe9jAVejIDdhkvorg8D/p8KvIrmnTLVU1gPkQ0jIYn1YCx6LzPuYG65x/SayCbIXi
-         zLzELfqJK79XfqNQmADvgkxSqEWuhZwtbPZLyRW2VRzlBPMANdRoavm4KoEHb1mSdVHg
-         LFegORuqyUg59+nCH4A2Z3uzEF2nMHF0WGuD8+mcP+19DJnNguXTuoR7gXtX1z85nlS8
-         s6kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715127663; x=1715732463;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=c5zLDljjdB2rK7nQXYwlp9FD4GIUWDXqjmQ12YQdFX8=;
-        b=fBbHRoF8zXHPH9Z4C5wAfggAYHBJXo41xPK0uiljbJCijDezUyV0TvApMA0cloRkLu
-         LKu5ZytBPs9oE/9E16rqbZDnj7cBzp2YU1sZo4IPcYZb3YlBHK+wQBAnXbQKGPXMSNRv
-         SVyqSyrOSoFhfR1ruTwuY6cim7cPeBfRfAVKt6rqJ90h9tHvDsxAmvCpXGLeBaLuxBpJ
-         xHUobkKs7px5ZgZ0dcaS82R4IJGhuPPMzco+24QSfbxK0CcFDxRXvAuW6Ej4rNPqHC77
-         2CqVe5zqZYfF54nFy6dFxdNYr3+SelpILiYCIPM8NwX4nagV/8ztwhvftsYzw55t4pdv
-         bGJg==
-X-Gm-Message-State: AOJu0YxhV4K6pjuyrhc6i7oDlXuSZLJs2VeNgfZt6dLCqzNIYUJhEuw7
-	esLbMt40HV33zSCr6NBqU1c0nAZPbzFHAUlBkqBsylgPkmfZ5FBZrrlH3Ex4QYqlWkZxpqG3iL5
-	O7Q==
-X-Google-Smtp-Source: AGHT+IFxJMvsXuvfR7+WfinHqEuybGv+6+GJ2/YrtrunJGOl9Hyc0rlRZrKELtyNNAhrSsSrlLz0CwdSzEc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a0d:d80e:0:b0:611:6f24:62b1 with SMTP id
- 00721157ae682-62085a32ba6mr3654617b3.1.1715127663759; Tue, 07 May 2024
- 17:21:03 -0700 (PDT)
-Date: Tue, 7 May 2024 17:21:02 -0700
-In-Reply-To: <b4892d4cb7fea466fd82bcaf72ad3b29d28ce778.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18ECC387;
+	Wed,  8 May 2024 00:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715128323; cv=fail; b=guLIrELpMfYVstEp0LCPdlBEtnaLu4L7nYmbvsBPGTJyL5vtEhNer/nEM8b+UvoGaWk+OZaguKh844VBHsuTDFpc/DO3tcIvDaIPswLyVw2INMB8/m19rgfloEVo5yqWeYMzg7OfjEwtqEGbAndJtQG/Vh6zbshzaMGhUFXZ0WU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715128323; c=relaxed/simple;
+	bh=4XyIl2oaiXGV4PgzKCZrb3txz2PHgNu0/F1LavPp7ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=h45+Tac2rvJXQ8/1UJ8DdJHXVqBZmcomAhGobVBMRNtI2nObcRtk/O9nThXf4r4YV6UsYC5WI6iEZvL13qatjAUbKljl9X/I1uKqZHw7yBfRBgQj9wLoyrv8kPIERtMjDtZdxco52czpoe37noHpgAxZCUxDf3pxwdgKonZslwo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=azMe9IoT; arc=fail smtp.client-ip=40.107.244.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ls1fiy4eAqjRuZz4uoH2HWIzZhZpL3p+hFKpK3nFWd254nGzw/01+h3aNVyX/Ftd0Mfn0NcFudCZDjbuGHfmv3XCum1kZcU4RTzyrGoJN5xI0eAdVy7Qs9WDXc0YwzjlmAvzewJ8auGCfNANg6b9YhzEIyAzq7yRrJwN2nz5abSgf0M9XbEknAtPQ0UKTY4sthQFWNXAiF8brzoP3LbySHtb6rFYw08b33eJQ42pYXXs0mgPSV44mLnVumMXmTiXu2KSKxUZ41S9FbTz0ovOKDdFlHSFarfctUrNrpUws+IjLUq3bUqRAv1m7FzFdCkSxvMaLq/PO/c7s7wX0qL0Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tHi5GOuwaOsan8doJX76CFShJQRqMQuKL5RsNiq7BmQ=;
+ b=AoqIpjWJvXMyMKPfh4Esl9zYL8twnvTOklnLGxLtiezdLmeRaZNwmt8nxyhjYTUq/2XSNTdyMfT0Kl5KsZx6sLmH8DOkuV4vI/q39J6QhFyc1VOUBd+nABnIptaxpHKjb7aKOPAQg1XkJF05vFjQelAO34wUW97/lV6KCY92hG3jXGeTTqxIJOipDnTFdsa5ukPeBTCN+hRURLxEKKFCcTQor4VlY8G4d1y7SJxEx4tz1s1KTOnMWeypIIsflUJSb4hMYXK0OHjj9FEURCAeTexfZdX4vpX3QvFqyU/tO49hrL9SPmR5OlThDNyjJ2H0WW6WQxmGG5dPEuGdeWKQag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tHi5GOuwaOsan8doJX76CFShJQRqMQuKL5RsNiq7BmQ=;
+ b=azMe9IoT+tMMjzHeAriDQvJYIFQUJqqGmCJurJIZFym0Pnma52HcZuL+MDf0P45vatbOjlso5sY/Oi/H5fxZL7O2LmTmQGeJEYonzJ1o4gVcfEdgMV5KK2bx2G7EE4H34gCEzDhkiQLr+90l9+UqKhzmpAohDUCwRTnICwVLkX9/QeLQq4nVosktx2hy7rTwjDTn+ao3ZEfPGCcYTbCc0F0aQ7k17gyl04mJDYtEsoepmP51vJ47azwUi83WeFkc6zCTUD5GYAOXKsuQUpHVX20VdyIRuZ6jyFvlX6HMXLja5JHqQb9GxHS3xSfQht0/ayQnlKlYkbZPcQXKw5KkRg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by IA1PR12MB8335.namprd12.prod.outlook.com (2603:10b6:208:3fa::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.43; Wed, 8 May
+ 2024 00:31:55 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e%3]) with mapi id 15.20.7544.041; Wed, 8 May 2024
+ 00:31:55 +0000
+Date: Tue, 7 May 2024 21:31:53 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: "Kasireddy, Vivek" <vivek.kasireddy@intel.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	"dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v1 2/2] vfio/pci: Allow MMIO regions to be exported
+ through dma-buf
+Message-ID: <20240508003153.GC4650@nvidia.com>
+References: <20240422063602.3690124-1-vivek.kasireddy@intel.com>
+ <20240422063602.3690124-3-vivek.kasireddy@intel.com>
+ <20240430162450.711f4616.alex.williamson@redhat.com>
+ <20240501125309.GB941030@nvidia.com>
+ <IA0PR11MB718509BB8B56455710DB2033F8182@IA0PR11MB7185.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <IA0PR11MB718509BB8B56455710DB2033F8182@IA0PR11MB7185.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR10CA0002.namprd10.prod.outlook.com
+ (2603:10b6:208:120::15) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240404121327.3107131-1-pbonzini@redhat.com> <20240404121327.3107131-8-pbonzini@redhat.com>
- <43d1ade0461868016165e964e2bc97f280aee9d4.camel@intel.com>
- <ZhSYEVCHqSOpVKMh@google.com> <b4892d4cb7fea466fd82bcaf72ad3b29d28ce778.camel@intel.com>
-Message-ID: <ZjrFblWaPNwXe0my@google.com>
-Subject: Re: [PATCH v5 07/17] KVM: x86: add fields to struct kvm_arch for CoCo features
-From: Sean Christopherson <seanjc@google.com>
-To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Yan Y Zhao <yan.y.zhao@intel.com>, 
-	"michael.roth@amd.com" <michael.roth@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|IA1PR12MB8335:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4174cf60-baa3-4e7a-66da-08dc6ef64330
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?E1f9aggElgd1ObG3mahJap+KCi/RE2c4u3D9sAyOKJGKQhlTQeGceW1iKk0E?=
+ =?us-ascii?Q?nOWEUD1F9RvlNRiq6TvuwymJyD2IWgfTehFu+QmJRuDzDhKjdPC5t8SO2dnm?=
+ =?us-ascii?Q?gAFyKJ4VWF9jACuAYtTi6nntbDrcl89Yis9mLrEDgiQ18nxYgaYG9wclOLRJ?=
+ =?us-ascii?Q?/5cSLQnBh26bj3bUH/0aPrJYcSrzp7xolPofXwn4P1vGQMlANOQrypw1gBZ9?=
+ =?us-ascii?Q?EvsUg3FTMnMMBAJtqKuoWa6bM7J0ljAiy7+TUepegabuWYIIuowZLQAFj123?=
+ =?us-ascii?Q?nhzbi5rq4U2AwxSAeU+SoVm3jeCiaEtuLr7eILH2gJYhU7w4/LBdh8berzHM?=
+ =?us-ascii?Q?s4kxFxMpipcKcmF3UhfsfILCsQzwP+KbdMj7DSSPXuc8vy+VvWZLRnwxL4sn?=
+ =?us-ascii?Q?W2rMcjPIDKNfA/kIVW0XS6jMFlO+KPd+M5XwAGnac6E2nR0Vqwp+pRQFT7H+?=
+ =?us-ascii?Q?QLicgWL9AAdn1D7YOoRj4fGkfOjfAYpij16ksk4lYxMzI9tcTXOe/toRdhE+?=
+ =?us-ascii?Q?0X2BPnA/ATmcnFZwq1axWe+TMdXySNNJ8+iXnK27QSdoTu4NCx1PdKzJm9IY?=
+ =?us-ascii?Q?hzwZjMzHrTY4ifv8HmhfpVcW6MZHjlgAUOaDzT5neb1e9xMX10oeXk4R51qu?=
+ =?us-ascii?Q?deaUmg7bRqHjAUMO1O51svjIlHAJfmAhMrLBZrCF4j8Vu6jE7foSe1J30of2?=
+ =?us-ascii?Q?xZkAKe6wJZaqKygRu0P/5QtGhLaxTI4njxaOluwpHIOjwktBc5o2RvDXlCxI?=
+ =?us-ascii?Q?EoXEDMuivYUiO+b0wbaVph1lPOmpVmDif4DX7FKlaQorFoNJkvmk4zLl7qJR?=
+ =?us-ascii?Q?bQ/CMyYLb1GAUtS6vfSzD42q5nGp9VoaGMFPxVuUNLs+2qIf2LyVwrZy//3u?=
+ =?us-ascii?Q?U7/xXMxypwk5dpYakQlqoexcWketTxDiVWa+uiwzfmrolznvoqjBhZhzXKwj?=
+ =?us-ascii?Q?yqdAxIblyEJE64rioALJJQ06PsGXNTldaDIxV/JaNZ1J+cMOPkWIwrIo5K0B?=
+ =?us-ascii?Q?uBYFMuzwvraExHfUaS5+DsKaqgOgJfCWjps1lhRMtaZKxngccg9KW3NZGUDA?=
+ =?us-ascii?Q?S+N3eqW706f6xnjn3aCjqK32WD2ba8HNgMLjJtcMSQ3YDzAwHUWaqLBoQV84?=
+ =?us-ascii?Q?t6Dc/uHVUidBoS35ks2SwxhTAgT4lHuDQ5sWALsXYaIqcATIIfrrrn8KZCx5?=
+ =?us-ascii?Q?tXRAg5MdqOC0fX5kAF/KllPLffOHgRaoi5IwC7ht2VPRYd2pWQRvAy4m9nlF?=
+ =?us-ascii?Q?bBlMC6uoz3G1RZIhMmaW4Ku0V92c8ypqR4+kdXLp1A=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?nhhBNXMBpxNHbfic2w2LnypaAdqCy1yZwmaUeUwjBjW6hdcggcnioNC88FIo?=
+ =?us-ascii?Q?03lm2HlkxQ/jpZ1fWe7el+5NqW42k3tSmnoLlbxloI4z5B7E3CkgGF07bm1a?=
+ =?us-ascii?Q?wwCz4hQxXBsRZRa3X2+UrXfnXuPDkWnXyYjthPD53U5zV5lmYoQ6BuvTwhjV?=
+ =?us-ascii?Q?cS84Ri2hD6Z3MqNWlUtc7Yy6P9ByXedavcgm5b0hDjd+waD2bBw5BjLN6bY4?=
+ =?us-ascii?Q?EO2eeQgzubehzdtD8/kQ9oWPnvKbNdJgTikhejZyjyM2BPAA7YlF/ZDPEuMw?=
+ =?us-ascii?Q?KLZsE34ZqaHWmJUGcOCMDNR4emeYHKKmGCJUbIADlM9IZn6qg8HFJuVWY0Ip?=
+ =?us-ascii?Q?u7oPiz2dw15nbZKKgUMyy70tYhyWkTq4xSJUhUsLFvXIEEVhOgayZGGO6Lb+?=
+ =?us-ascii?Q?mZFDjqdcukKfQdHCgcuxtfOmUazlu9jttheaWwqHlD9iscEuQnqOPYSSnRKO?=
+ =?us-ascii?Q?O5Md+QHOiPJikLRENisFipf1KmP84Rsv6HOiSvoVLFpwDEOlKf3XYM+eLSg+?=
+ =?us-ascii?Q?wPmsRZElmbodJsOzaGwHdR7fHMSi66HqkJa2rSMo7LFSu4DonB2OA4u9DyLr?=
+ =?us-ascii?Q?aZMvOoom0R6X4U2ewLg79y3XomFn1fXjfKOSR34o0iOOMcD/vTn/abTtnMT/?=
+ =?us-ascii?Q?7l5cmeB2Q6oweTSr0bRcbgaoB2rX7Fqk7liRl7L6tuJlx+o0L0YPtPP+iedK?=
+ =?us-ascii?Q?ka/NDdaWTcgnEfnFoXNs4JMMgrtNCZYW2mnF16v6xR/YpReBsunMoOL5ZNiE?=
+ =?us-ascii?Q?MNg+ijeoSVFVZv5Goxq2TUaQxFKiiiMXI1dn0yJTiQP4csOP06DhPsSluEWh?=
+ =?us-ascii?Q?iOJXRj/Kt1/Ex5NLrH6r85f6nl8aTgjTXZQtkexNfDhWX+ZFbEVfBCrfGmvY?=
+ =?us-ascii?Q?f5Qnni3EBT/KnyWOy2hJFDV9KwCoCb8Sq88vKbTG7Nsq5vrccp2spxOfkOmE?=
+ =?us-ascii?Q?f8KORuDzY1km14uf09LH2LOFunjh9G73bOfbfWiVHzz2tk71dQezwq/BUqjz?=
+ =?us-ascii?Q?GwmM41NOX2QWzyLs21LHzf0cTX0C1CLgvg05fcHwPz+BooAvwrOcasWmKVel?=
+ =?us-ascii?Q?NwFQXmcClwr7XW9koIsPZivWeyvoPfiu1DcjIjZn1XJkMdNKfnfTfDC2fcwA?=
+ =?us-ascii?Q?5gugNvYlkTibRPJjyooNt/lpYpGYFBsM71Kkgf99m09+iufFjMDTANRpLRxA?=
+ =?us-ascii?Q?IOltF/+VB6n7V0W0MfzwqbI31oinOKlxpfmmjKMN2JFmVXqW48J9sdyzusF0?=
+ =?us-ascii?Q?P2Ai2YdFPwJzsM40S2+ifv6k7Yj6TJgOc4DWUYyrqofcik1bbOKLvw77GRFh?=
+ =?us-ascii?Q?CpIrSaYzt0G0vf+r8tmO8XC6pRgkR3rIjQTVHpB5D6gPjIKpA3YrEJwqwMtO?=
+ =?us-ascii?Q?f5qU5WNWrs1TgBgj10AofQkLwMj//rTIyIXw9nya2ajlThOvhhoCGEWEu6U3?=
+ =?us-ascii?Q?Ambl9anarpyjYYfFVtOVD7MNaM2dlYz8PAvxDTBAPN1a8+R+cs5QKvbodTz8?=
+ =?us-ascii?Q?h8PHbT9OzK5SO29plP+sPAsgsj6AtJABzoUKi3RsZCZPLsB6ultma3a6jIg7?=
+ =?us-ascii?Q?g9Xz/zrnPM+aRrsMTapsSpegfK2bKBbjQu87abYY?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4174cf60-baa3-4e7a-66da-08dc6ef64330
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2024 00:31:54.9629
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aULDc2x2mRR1JKWx8Ob+ZxjmrrlBFxfYU9zXx+9VTuQds7Im+r/prspdwHZEvWoV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8335
 
-On Tue, May 07, 2024, Rick P Edgecombe wrote:
-> On Mon, 2024-04-08 at 18:21 -0700, Sean Christopherson wrote:
-> > > - Give other name for this check like zap_from_leafs (or better name?=
-)
-> > > =C2=A0=C2=A0 The implementation is same to kvm_gfn_shared_mask() with=
- comment.
-> > > =C2=A0=C2=A0 - Or we can add a boolean variable to struct kvm
-> >=20
-> > If we _don't_ hardcode the behavior, a per-memslot flag or a per-VM
-> > capability (and thus boolean) is likely the way to go.=C2=A0 My off-the=
--cuff
-> > vote is probably for a per-memslot flag.
->=20
-> Hi Sean,
->=20
-> Can you elaborate on the reason for a per-memslot flag? We are discussing=
- this
-> design point internally, and also the intersection with the previous atte=
-mpts to
-> do something similar with a per-vm flag[0].
->=20
-> I'm wondering if the intention is to try to make a memslot flag, so it ca=
-n be
-> expanded for the normal VM usage.
+On Thu, May 02, 2024 at 07:50:36AM +0000, Kasireddy, Vivek wrote:
+> Hi Jason,
+> 
+> > 
+> > On Tue, Apr 30, 2024 at 04:24:50PM -0600, Alex Williamson wrote:
+> > > > +static vm_fault_t vfio_pci_dma_buf_fault(struct vm_fault *vmf)
+> > > > +{
+> > > > +	struct vm_area_struct *vma = vmf->vma;
+> > > > +	struct vfio_pci_dma_buf *priv = vma->vm_private_data;
+> > > > +	pgoff_t pgoff = vmf->pgoff;
+> > > > +
+> > > > +	if (pgoff >= priv->nr_pages)
+> > > > +		return VM_FAULT_SIGBUS;
+> > > > +
+> > > > +	return vmf_insert_pfn(vma, vmf->address,
+> > > > +			      page_to_pfn(priv->pages[pgoff]));
+> > > > +}
+> > >
+> > > How does this prevent the MMIO space from being mmap'd when disabled
+> > at
+> > > the device?  How is the mmap revoked when the MMIO becomes disabled?
+> > > Is it part of the move protocol?
+> In this case, I think the importers that mmap'd the dmabuf need to be tracked
+> separately and their VMA PTEs need to be zapped when MMIO access is revoked.
 
-Sure, I'll go with that answer.  Like I said, off-the-cuff.
+Which, as we know, is quite hard.
 
-There's no concrete motiviation, it's more that _if_ we're going to expose =
-a knob
-to userspace, then I'd prefer to make it as precise as possible to minimize=
- the
-changes of KVM ending up back in ABI hell again.
+> > Yes, we should not have a mmap handler for dmabuf. vfio memory must be
+> > mmapped in the normal way.
+> Although optional, I think most dmabuf exporters (drm ones) provide a mmap
+> handler. Otherwise, there is no easy way to provide CPU access (backup slow path)
+> to the dmabuf for the importer.
 
-> Because the discussion on the original attempts, it seems safer to keep t=
-his
-> behavior more limited (TDX only) for now.  And for TDX's usage a struct k=
-vm
-> bool fits best because all memslots need to be set to zap_leafs_only =3D =
-true,
-> anyway.
+Here we should not, there is no reason since VFIO already provides a
+mmap mechanism itself. Anything using this API should just call the
+native VFIO function instead of trying to mmap the DMABUF. Yes, it
+will be inconvient for the scatterlist case you have, but the kernel
+side implementation is much easier ..
 
-No they don't.  They might be set that way in practice for QEMU, but it's n=
-ot
-strictly required.  E.g. nothing would prevent a VMM from exposing a shared=
--only
-memslot to a guest.  The memslots that burned KVM the first time around wer=
-e
-related to VFIO devices, and I wouldn't put it past someone to be crazy eno=
-ugh
-to expose an passhtrough an untrusted device to a TDX guest.
 
-> It's simpler for userspace, and less possible situations to worry about f=
-or KVM.
->=20
-> [0] https://lore.kernel.org/kvm/20200703025047.13987-1-sean.j.christopher=
-son@intel.com/
+> > > > +/**
+> > > > + * Upon VFIO_DEVICE_FEATURE_GET create a dma_buf fd for the
+> > > > + * region selected.
+> > > > + *
+> > > > + * open_flags are the typical flags passed to open(2), eg O_RDWR,
+> > O_CLOEXEC,
+> > > > + * etc. offset/length specify a slice of the region to create the dmabuf
+> > from.
+> > > > + * If both are 0 then the whole region is used.
+> > > > + *
+> > > > + * Return: The fd number on success, -1 and errno is set on failure.
+> > > > + */
+> > > > +#define VFIO_DEVICE_FEATURE_DMA_BUF 11
+> > > > +
+> > > > +struct vfio_region_p2p_area {
+> > > > +	__u32	region_index;
+> > > > +	__u32	__pad;
+> > > > +	__u64	offset;
+> > > > +	__u64	length;
+> > > > +};
+> > > > +
+> > > > +struct vfio_device_feature_dma_buf {
+> > > > +	__u32	open_flags;
+> > > > +	__u32	nr_areas;
+> > > > +	struct vfio_region_p2p_area p2p_areas[];
+> > > > +};
+> > 
+> > Still have no clue what this p2p areas is. You want to create a dmabuf
+> > out of a scatterlist? Why??
 
+> Because the data associated with a buffer that needs to be shared can
+> come from multiple ranges. I probably should have used the terms ranges
+> or slices or chunks to make it more clear instead of p2p areas.
+
+Yes, please pick a better name.
+
+> > I'm also not sure of the use of the pci_p2pdma family of functions, it
+> > is a bold step to make struct pages, that isn't going to work in quite
+
+> I guess things may have changed since the last discussion on this topic or
+> maybe I misunderstood but I thought Christoph's suggestion was to use
+> struct pages to populate the scatterlist instead of using DMA addresses
+> and, I figured pci_p2pdma APIs can easily help with that.
+
+It was, but it doesn't really work for VFIO. You can only create
+struct pages for large MMIO spaces, and only on some architectures.
+
+Requiring them will make VFIO unusable in alot of places. Requiring
+them just for DMABUF will make that feature unusable.
+
+Creating them on first use, and then ignoring how broken it is 
+perhaps reasonable for now, but I'm unhappy to see it so poorly
+usable.
+> 
+> > alot of cases. It is really hacky/wrong to immediately call
+> > pci_alloc_p2pmem() to defeat the internal genalloc.
+
+> In my use-case, I need to use all the pages from the pool and I don't see any
+> better way to do it.
+
+You have to fix the P2P API to work properly for this kind of use
+case.
+
+There should be no genalloc at all.
+
+> > I'd rather we stick with the original design. Leon is working on DMA
+> > API changes that should address half the issue.
+>
+> Ok, I'll keep an eye out for Leon's work.
+
+It saves from messing with the P2P stuff, but you get the other issues
+back.
+
+Jason
 
