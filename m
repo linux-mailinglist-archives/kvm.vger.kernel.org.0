@@ -1,309 +1,281 @@
-Return-Path: <kvm+bounces-17001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49C608BFDDA
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 14:59:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91A2C8BFEB0
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 15:25:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56F5E1C21355
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 12:59:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 483D22874FA
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 13:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A5873518;
-	Wed,  8 May 2024 12:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C197A13A;
+	Wed,  8 May 2024 13:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JbEm6ty2"
+	dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b="URx3yHuK"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from DEU01-BE0-obe.outbound.protection.outlook.com (mail-be0deu01on2138.outbound.protection.outlook.com [40.107.127.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB4536D1BB
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 12:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715173137; cv=none; b=tYQbs0veJy6E6kcy7rw5lAdKn2ZXBU6g6Mf9BgFo9I3QJaU7y8cEKKFLK1UBeoLfm68XHkTyDvf7RZRf3Agesn50tAh2InjL29XKy8AmUd+e/1J+yVu7xBEl5eAsxuUY5Vf+BpN7dNYCU7KZaZmyYYFH3wubJT7wao21cP6ShzY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715173137; c=relaxed/simple;
-	bh=gaJrrFaRPstQNF3PpHHYlRDm7uNpnjcLOQ4gwm0MjIM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Vk8WDBWnk+OwLr+ndsK7knSwAIJW5DYlraYTfM+sEuZcEvUsRfIVtOZQeG0bWPDNR37zg8iDPARAkkbw7msK0P5RDBhctQYdshT6NK8KL23y1LZvcX1uekIeP9kIhwT2T699hBl5+aQLlIoZ4UJypf+pLhhVPtinq9CbuRSdB2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JbEm6ty2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715173132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=X20IeCsRKuBhpLAA246KVLp3hrEO7YgRAEV/rvRSWiE=;
-	b=JbEm6ty2JzSi2niixxeJTcCwC7Di4mo11tw8l4go+at5lbDjBMsM96c8PjNnFkH/ThqUds
-	O0obRca6WkyF14Q/8xpfvr+fddvMu793xfKckQLeeDRj9gYcl2u0zUNz7FXD9e3FWal8XX
-	6JV+ZSitihYrUfUsXo+I+4BGfXS4tmI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-PCFHrQxDNZi_bpaOfwMuQw-1; Wed, 08 May 2024 08:58:51 -0400
-X-MC-Unique: PCFHrQxDNZi_bpaOfwMuQw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4190b0735d1so15180915e9.1
-        for <kvm@vger.kernel.org>; Wed, 08 May 2024 05:58:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715173130; x=1715777930;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :references:cc:to:from:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=X20IeCsRKuBhpLAA246KVLp3hrEO7YgRAEV/rvRSWiE=;
-        b=E9oVEBEeniaAUuLcswXAA5RR9wyAD7JC7SAGtdFRj8hsOCaMmy4YjOPFLsqhJ1dTvf
-         fAiakaxvINCIaWiK3HpzP86030zZTjx5RNSaiMoWk9leBKEWBtCEcRzMyPbBtQ30NtSM
-         8Pa1ig7B7UX2i9PaJBqxjVCty4RfmG7eFYnET1j42x01tm7VCvVDBkgq6+g/B40o0piH
-         HdChEBiMcQcHmC8gOKUpZYuVwxZk6i4AHJWBB3fqnVcoZ8TllF/qFaDJdkJyngX8QfzA
-         WCuOvE8i8ti6KqGwoFZTrR0CIav6GFmccQlWp+MslsQp2U9l9X8Z7jqTYDljbScwDINk
-         cdyA==
-X-Forwarded-Encrypted: i=1; AJvYcCXhom0JJzlRDOAqAVF8ASaLor9nZvYccGOIbQIdoPw1Mf0p3MPgXi1P5m5lTlItd5Fs0EvzeNe/0z1Y5CSEXKMzZ43I
-X-Gm-Message-State: AOJu0Yz9YXuLcTJf5qPHjlZ/KkfCT+UcOgAq+ALhW8zwzhlucbivWloS
-	fTNVAjTj1e9rkJcjNnWF/GW0wla9w9VFQA6A3x567uOiHhVWYVVCh7MBngGwOwRbVNZqK36axxI
-	8GoIXgKmKuXSbosa7ekmolvqZMnjz8E3SLUU3KXdxhlM1hC3XQw==
-X-Received: by 2002:a05:600c:548b:b0:418:60d6:8622 with SMTP id 5b1f17b1804b1-41f714f6e87mr18033135e9.18.1715173130308;
-        Wed, 08 May 2024 05:58:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFkQsuMQ7iUSAjfPcMCiEhqVuJI4Lkr20F1MfsM1B51FdMikRLEVgJbKU/hWBGX+y5/hZhntQ==
-X-Received: by 2002:a05:600c:548b:b0:418:60d6:8622 with SMTP id 5b1f17b1804b1-41f714f6e87mr18033035e9.18.1715173129842;
-        Wed, 08 May 2024 05:58:49 -0700 (PDT)
-Received: from [10.33.192.191] (nat-pool-str-t.redhat.com. [149.14.88.106])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41f87d1fc93sm22910205e9.21.2024.05.08.05.58.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 May 2024 05:58:49 -0700 (PDT)
-Message-ID: <1e07de7a-5b14-4168-aa14-56dae8766dc0@redhat.com>
-Date: Wed, 8 May 2024 14:58:48 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450696E5FE;
+	Wed,  8 May 2024 13:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.127.138
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715174733; cv=fail; b=o+AAqBq0xl08Qlso7SVToZJ381vukhLi4zzMZsA4AH1dNtQQkcjwMya9lbWB5VODOx1dAG2N29x5cjQs588EKuCq27L1oF3h5ZOJMBOr8wRdeix8tehJpAEH4XMmnFu00vKKISfQd/lxznD+XdDjMAL23WD49NfySSoOyIL38w4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715174733; c=relaxed/simple;
+	bh=5CgWbz/0tjPl8chy+2VXaGvySyVKSEU74VOqQ2DBv30=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=kcd87GyIN9QyFRrQ6f89cVXxCreKJRM+Ha8qpQDVBDYhzvR9S5MxV6WzSMRU9FcgR0oa8ywrteYWjaC3Zo9ypKL9Pn5H8iK300nwK+uiGQxRfskXcdO2PlxWQWFFuiBIDoWJabYKu6HSJPcmefL0IWYKnhN7N0R4k+8vCQFRDiU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de; spf=pass smtp.mailfrom=cyberus-technology.de; dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b=URx3yHuK; arc=fail smtp.client-ip=40.107.127.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyberus-technology.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZK0Bqs5vciz3x1bP7lk/PyIET8i3eDeVMztfuMvFo6RiE5SMRGRmos5j7YNk9BkPf58xQg0EgAJhslUpxZb+5//rVVQoAhEsOHXQFuzhtQ5ml1oIKIQxIF14iWBY2pwFiMaQXPMTU5k0A4LxSqfgXqUYnzG4lB6W3NEfuosx7v9J/DKpAOIb8zRiS1kfSA8j+0SxudKpKGdMr4weIDhgb+lvRB0yyzOKGTlNkdxMcSuaEjAeCUNSfn5R569TvVto1N5+9kXfe/jm+BgyiFwnTtEH0TwjWeGiKTZtEvRYsvWTVhFTc5T8AiACPqSxzdVrv+aZRHi4r/xhSkE/Vwpwng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qgwgEhVqqg2Q/zoj2y9pbbQ6twB5Hk34jv8tGlwQY3E=;
+ b=TtWnyazgp0NXXte6hufylErRhyvTnGfMIm6mTBTZh5UTHuCQpEEP401GhXJrokQt/J65/VpXy9AHTOKMQyIYsYYPsmv/F64JLYIfoOkaYErs9HgP39/6gV4JlCOvkEg6eBcn+lIwDfHluHI1uvcvqmvuWVQWxT+HKn9/5VeQI62jcPs4nYhgzLh6AaokVLjm4rDGvvsDpNkqqSlUK5Z7YxRnFpC/s1P0OBxjFBWpgJuEtC0KM3MNllifcnmBQbkC20wY7Zcm7LokrSX30QIjUtOVBctuWog0CXe9hKugwBoHMVZl+ZkSO3o9ymtnUJERrqCQk82CALn9ek+3FzT0hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=cyberus-technology.de; dmarc=pass action=none
+ header.from=cyberus-technology.de; dkim=pass header.d=cyberus-technology.de;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyberus-technology.de;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qgwgEhVqqg2Q/zoj2y9pbbQ6twB5Hk34jv8tGlwQY3E=;
+ b=URx3yHuKf9a94S8A2ix19GXcjs1E6JNcJLw1dtXAsCtelGiT4yn4MihDTOTxUiYpQ9MGE/x7r46BIkofjd+xtpRBimESzRPer2TJ04tIJVKZQVJEuYcVF8a6xWMGHdYE6KWeQ/CFpNDPQmDUe9nlew2/AvUL1KtnR7cMSAD8AqDMY1hrD4XeChBpCgexzRufxGr6OqHDMUx+CyJW9WBGML4j1Tgt1ULykCGyhYv58c61anQ+YTI82Z4DsrC8WOoGLcdPpVjK8ficzakQG+Bmsn6RZL5vYheSkWNOHwcoobPp6geBiUh49W2MThJsB0Mk9sOvy3EF3V4Rk1fI8v6o7g==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=cyberus-technology.de;
+Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:38::7) by
+ FR5P281MB4522.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:11f::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7544.45; Wed, 8 May 2024 13:25:27 +0000
+Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::bf0d:16fc:a18c:c423]) by FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
+ ([fe80::bf0d:16fc:a18c:c423%5]) with mapi id 15.20.7544.041; Wed, 8 May 2024
+ 13:25:27 +0000
+From: Julian Stecklina <julian.stecklina@cyberus-technology.de>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sean Christopherson <seanjc@google.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>
+Cc: Thomas Prescher <thomas.prescher@cyberus-technology.de>,
+	Julian Stecklina <julian.stecklina@cyberus-technology.de>,
+	kvm@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: x86: add KVM_RUN_X86_GUEST_MODE kvm_run flag
+Date: Wed,  8 May 2024 15:25:01 +0200
+Message-ID: <20240508132502.184428-1-julian.stecklina@cyberus-technology.de>
+X-Mailer: git-send-email 2.44.0
+Reply-To: <ZiFmNmlUxfQnXIua@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA2P292CA0015.ESPP292.PROD.OUTLOOK.COM
+ (2603:10a6:250:1::12) To FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:38::7)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 07/31] scripts: allow machine option to
- be specified in unittests.cfg
-From: Thomas Huth <thuth@redhat.com>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
- <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
-References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-8-npiggin@gmail.com>
- <e0df1892-c17f-4fc3-b95a-4efc0af917d3@redhat.com>
- <D149GFR9LAZH.1X2F7YKPEJ42C@gmail.com>
- <f304924b-8acf-40f6-9426-10fdf77712b6@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <f304924b-8acf-40f6-9426-10fdf77712b6@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: FR2P281MB2329:EE_|FR5P281MB4522:EE_
+X-MS-Office365-Filtering-Correlation-Id: 07dcb821-65b5-449e-fece-08dc6f625338
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|1800799015|52116005|7416005|376005|366007|38350700005;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?9sY2o3Doy3MqH82b7EfiPdbqsZ8qJtvFclEEgq7LZzv2GYdNd5PMbkNvSc7x?=
+ =?us-ascii?Q?gvZlYChUFM8s/jRyXEeyFs3rzhrNUzgNl6NVYlDkW/J/wH//GElERURgb+xF?=
+ =?us-ascii?Q?J99apbonVjovb0D0IKXPSWMv2lRYnIPktK9UeM86szdZ55/BERquGa92BCBR?=
+ =?us-ascii?Q?xBqEQsePwdiySMkB64EUO1c2g1QJ1EurjpuCuu9yJMLmlqYD7Ta3tLo4XunQ?=
+ =?us-ascii?Q?sLf95j6KellCdKg20rPC1+rGshq4lJnVurfTseTgjZrAMzioSdc6Zxgno1u2?=
+ =?us-ascii?Q?ErvmvVNExemuYGIRx0NxVE+M/urIrL17dGOteqMAKQQQMdUYb97qwYLixzf6?=
+ =?us-ascii?Q?wZLQj+154VioWjBhpN8tzgWhqroJDHbSLNAv3Y/P5Qy6HPEvX3cBXnZyXnW5?=
+ =?us-ascii?Q?LzWyhwTgX+o5TVHkiCvLHtS55D/tzPd/DSVw/WqO1Hdqdh/14qYfhyyu0OVZ?=
+ =?us-ascii?Q?99mRZqJcbV8TK6G4q8DeZVWsj8XTgJ1aMrwcB/8iUzUOQOt9FE8Y/tGbI1Fd?=
+ =?us-ascii?Q?2nhMHnItu1bGoONWLtTQoODiqNHDSQakALQiHQMav3Z440kFkxj74kGB5NTn?=
+ =?us-ascii?Q?wNj3fC91Dw7Y5jaWSwyQYVjX7Bnjjgb8hcp3WX+MSNDVMNAKvALge/J2eymJ?=
+ =?us-ascii?Q?vzQ0UIFbW+4UuVnjevtspnyc1d3w+ssKbOpMRO0cpZTnFOv9M+5+J+5yHXG3?=
+ =?us-ascii?Q?cQr0+q6BFLhjEOum+Ujgt58HVBjVbis00aYbR4foGWClT1f6ihIIpSSWTmUY?=
+ =?us-ascii?Q?SqbKmyCvAkDl7Qbcc6khiEgShVUCM/jiF9lTy3i474R6nFCiq4YjhCc5d7bJ?=
+ =?us-ascii?Q?V52ltQz+Yl7XLV4ZxLWHkLTrj59E0XORrClVB+QCsLF6keu8FMuXWUXkStxp?=
+ =?us-ascii?Q?EfO021z7KuWi+cfCrKZQ22sNm8hBvhecHqYyf2zZ7B1uFLM8PxWxuMJs364g?=
+ =?us-ascii?Q?jRj/GxchMH7WyEwwKyuq32olEAQ6PLk2w6B3W+5pUCe4sZO4zcf/WD/hOk8d?=
+ =?us-ascii?Q?G2fa4m/4OH2Empcm5AnMiMnekYjU1TRm4l1d0a+WC4cZrJHomJrbaxq6jY3N?=
+ =?us-ascii?Q?YZyfNJJ+5nZoYjli2c/n7fUqIIX6GN6xLowYG8sYR31at6+IS23cm8t5Rcyk?=
+ =?us-ascii?Q?2/NFH4CRatVY07R1PtPz3JNOS4O9EKMDqaoOFRxfQEV0ADIw/oFGzBwKUxIA?=
+ =?us-ascii?Q?AUbhvFNfCYCIfmEDusG1+xsdj4en/VY8l4xyWqsyjWBW27DtOG+5oPz6vhio?=
+ =?us-ascii?Q?PESEFBB7eMHEoFRAnw3aBd+XLEvm7L8i5jmMdNV6gA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(52116005)(7416005)(376005)(366007)(38350700005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?ZLwhE37KXhY0JdZaSdAD7qQJ0XklPZrMkamMJRgKOahDe+aowE9y5VD0dtrj?=
+ =?us-ascii?Q?fCDFVOCiHBVaDGdIMabBOMfbaQF1JkkvD/0gicNhagMs8qYPw9RhRYWaqvDZ?=
+ =?us-ascii?Q?NjpsbIkvG5P9D6iRbkbF7Jyznqy7gRZCLJB273aSsiQKAhFWuWXWXJgx8Cet?=
+ =?us-ascii?Q?hDlsHkIzYFvUWEN7mliRvXIU3HQLKB7m4OZ8Y4UIazWaUwyj/HfEhoUZnyas?=
+ =?us-ascii?Q?k5FIDYpG2fGG2jTKXz++h0XWV+vwUt6m2ZZv+HUk3NqgszqXFBrXmE4583xu?=
+ =?us-ascii?Q?j9Y7bRMHkj5TIy9JRAR97fbcgy6FvqTIfgcuUAk7JA30QzAMmnG+0sODABeU?=
+ =?us-ascii?Q?RYd2czIzsd/EBbsRWfbneIM40RSNSKzZYEgyyxB2K8SYuie3DB//LzT2u71K?=
+ =?us-ascii?Q?I/tlhu0UfJBW3o515+/0VVx62pwfvYHq6gVAZzl2HRAa6RMklnjsEsCD5jyn?=
+ =?us-ascii?Q?c+/gfMw6kMljZOEI2FykSjg1T5I+fg9bbQZoS1ANzDnm8zld7UVCbD4FZg1J?=
+ =?us-ascii?Q?jmojlEThOhg3XR6rPyqU0/g9+yKnFvITFzuEYQ8ACyQm3JHHr0NpHRV/qrIj?=
+ =?us-ascii?Q?/1p45c4TaTA2AXURRdOv89LwElnpIZylUWdnSJ5gcgmeWznLWRo1qZWeDHul?=
+ =?us-ascii?Q?zEKtdowM36fI3WV/QaUKO3lW9qWf8+Aam63u9gdlQL+/yAh2OyasTUxF62mj?=
+ =?us-ascii?Q?HEVGYNfxcS3OehV6hoGcYSeCm6ttWYvH7eEff6JGOHJoJxX/8K/3kGLuLPGz?=
+ =?us-ascii?Q?A8bLvIZctkKBTjiGrMMX4OSLa9HCN/DD8mvokBKYT1GNhzQ6MH4C6sPTIGT0?=
+ =?us-ascii?Q?ZrJPLA2n/tbIsfTsk7YqDDONaxkl5JOks1/Itdbxce3aSQQiVlcKRLFWcLPH?=
+ =?us-ascii?Q?Wf3QTzt8DpcpC5AONCCGDzB87AsXWYRG6TFfWbufLOcX1qS4+zOzyajLARW2?=
+ =?us-ascii?Q?RXu+AIYEvvCyL0u1lq0UfLsue9dvkOTEOtSTvxTWmPSxPoz1FHJRchZPH/rY?=
+ =?us-ascii?Q?1DCKGQgDnxAu4qvGStVz+Yakf+czxQQ4FgZ1hk8EgmOGGWIA6f2XMUMpsiGE?=
+ =?us-ascii?Q?6oASgbD/ENMzqJ6wfznUSK5/0P1+JxDYkpE55BdJ8uICVGXTq+3xb29akPE/?=
+ =?us-ascii?Q?5MDDeCMUksMwvNbaFM+2NGEI2BU7Gxn6Lm64zDW9DMWMZwAJ15xewwFbbu2K?=
+ =?us-ascii?Q?m2jfllbMZlCANUWajP88kKC1ZSqdDWGtUf+Zdk9FwmrDlZh2XmcxPDA/9o9u?=
+ =?us-ascii?Q?kBGsZ6lT4npCgBdGeQd+rMXWB2dckaa3ruFFbTAtEqLDpvqm+w2uE/MtnJrc?=
+ =?us-ascii?Q?Mr/r0xIn9oO772X/EWT9+3f1dMrrQdp+qY6K+ha7mnWv90t+1ZmAhWu4U0+G?=
+ =?us-ascii?Q?VJ58aAvKUFGE7KeXuHmisYkIRxYjMh20lukGybxwUBAp5qN0zWg6XyDiPhNK?=
+ =?us-ascii?Q?OY8DE1WMW+6NROYkGo0Gy4t5xgjO36W4O9OnuPtfsJAoKjswlvApwzBc2Zuo?=
+ =?us-ascii?Q?T76Vzn900TX7c8k7S1t+vqyqIiOtcCRi2+NfkQvgK3o10C0HGfumGqKI0blu?=
+ =?us-ascii?Q?Zhsxz5EZGdpO/YyrLuBhGzDr8oloLEn2Eptj6z6xYGi5PgekifYS7Hn3cOa4?=
+ =?us-ascii?Q?1JGGvhDcSKkVU3OIPBWOHsM=3D?=
+X-OriginatorOrg: cyberus-technology.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07dcb821-65b5-449e-fece-08dc6f625338
+X-MS-Exchange-CrossTenant-AuthSource: FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2024 13:25:27.5434
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: f4e0f4e0-9d68-4bd6-a95b-0cba36dbac2e
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dPG8q+gQyhlecBho6M4v1baOTfQHFa7tyr5Fncq1Aln5I9Wv3CAUvCxaG9u5cWxjOUWfEgi4Uz5yOa61zOoTxLEmO4I2SgbZ42U+Ap28HxDt6J4gxPha5mhx+diDdPPv
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR5P281MB4522
 
-On 08/05/2024 14.55, Thomas Huth wrote:
-> On 08/05/2024 14.27, Nicholas Piggin wrote:
->> On Wed May 8, 2024 at 1:08 AM AEST, Thomas Huth wrote:
->>> On 04/05/2024 14.28, Nicholas Piggin wrote:
->>>> This allows different machines with different requirements to be
->>>> supported by run_tests.sh, similarly to how different accelerators
->>>> are handled.
->>>>
->>>> Acked-by: Thomas Huth <thuth@redhat.com>
->>>> Acked-by: Andrew Jones <andrew.jones@linux.dev>
->>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>>> ---
->>>>    docs/unittests.txt   |  7 +++++++
->>>>    scripts/common.bash  |  8 ++++++--
->>>>    scripts/runtime.bash | 16 ++++++++++++----
->>>>    3 files changed, 25 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/docs/unittests.txt b/docs/unittests.txt
->>>> index 7cf2c55ad..6449efd78 100644
->>>> --- a/docs/unittests.txt
->>>> +++ b/docs/unittests.txt
->>>> @@ -42,6 +42,13 @@ For <arch>/ directories that support multiple 
->>>> architectures, this restricts
->>>>    the test to the specified arch. By default, the test will run on any
->>>>    architecture.
->>>> +machine
->>>> +-------
->>>> +For those architectures that support multiple machine types, this 
->>>> restricts
->>>> +the test to the specified machine. By default, the test will run on
->>>> +any machine type. (Note, the machine can be specified with the MACHINE=
->>>> +environment variable, and defaults to the architecture's default.)
->>>> +
->>>>    smp
->>>>    ---
->>>>    smp = <number>
->>>> diff --git a/scripts/common.bash b/scripts/common.bash
->>>> index 5e9ad53e2..3aa557c8c 100644
->>>> --- a/scripts/common.bash
->>>> +++ b/scripts/common.bash
->>>> @@ -10,6 +10,7 @@ function for_each_unittest()
->>>>        local opts
->>>>        local groups
->>>>        local arch
->>>> +    local machine
->>>>        local check
->>>>        local accel
->>>>        local timeout
->>>> @@ -21,7 +22,7 @@ function for_each_unittest()
->>>>            if [[ "$line" =~ ^\[(.*)\]$ ]]; then
->>>>                rematch=${BASH_REMATCH[1]}
->>>>                if [ -n "${testname}" ]; then
->>>> -                $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" 
->>>> "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
->>>> +                $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" 
->>>> "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
->>>>                fi
->>>>                testname=$rematch
->>>>                smp=1
->>>> @@ -29,6 +30,7 @@ function for_each_unittest()
->>>>                opts=""
->>>>                groups=""
->>>>                arch=""
->>>> +            machine=""
->>>>                check=""
->>>>                accel=""
->>>>                timeout=""
->>>> @@ -58,6 +60,8 @@ function for_each_unittest()
->>>>                groups=${BASH_REMATCH[1]}
->>>>            elif [[ $line =~ ^arch\ *=\ *(.*)$ ]]; then
->>>>                arch=${BASH_REMATCH[1]}
->>>> +        elif [[ $line =~ ^machine\ *=\ *(.*)$ ]]; then
->>>> +            machine=${BASH_REMATCH[1]}
->>>>            elif [[ $line =~ ^check\ *=\ *(.*)$ ]]; then
->>>>                check=${BASH_REMATCH[1]}
->>>>            elif [[ $line =~ ^accel\ *=\ *(.*)$ ]]; then
->>>> @@ -67,7 +71,7 @@ function for_each_unittest()
->>>>            fi
->>>>        done
->>>>        if [ -n "${testname}" ]; then
->>>> -        $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" 
->>>> "$opts" "$arch" "$check" "$accel" "$timeout"
->>>> +        $(arch_cmd) "$cmd" "$testname" "$groups" "$smp" "$kernel" 
->>>> "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
->>>>        fi
->>>>        exec {fd}<&-
->>>>    }
->>>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
->>>> index 177b62166..0c96d6ea2 100644
->>>> --- a/scripts/runtime.bash
->>>> +++ b/scripts/runtime.bash
->>>> @@ -32,7 +32,7 @@ premature_failure()
->>>>    get_cmdline()
->>>>    {
->>>>        local kernel=$1
->>>> -    echo "TESTNAME=$testname TIMEOUT=$timeout ACCEL=$accel 
->>>> $RUNTIME_arch_run $kernel -smp $smp $opts"
->>>> +    echo "TESTNAME=$testname TIMEOUT=$timeout MACHINE=$machine 
->>>> ACCEL=$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
->>>>    }
->>>>    skip_nodefault()
->>>> @@ -80,9 +80,10 @@ function run()
->>>>        local kernel="$4"
->>>>        local opts="$5"
->>>>        local arch="$6"
->>>> -    local check="${CHECK:-$7}"
->>>> -    local accel="$8"
->>>> -    local timeout="${9:-$TIMEOUT}" # unittests.cfg overrides the default
->>>> +    local machine="$7"
->>>> +    local check="${CHECK:-$8}"
->>>> +    local accel="$9"
->>>> +    local timeout="${10:-$TIMEOUT}" # unittests.cfg overrides the default
->>>>        if [ "${CONFIG_EFI}" == "y" ]; then
->>>>            kernel=${kernel/%.flat/.efi}
->>>> @@ -116,6 +117,13 @@ function run()
->>>>            return 2
->>>>        fi
->>>> +    if [ -n "$machine" ] && [ -n "$MACHINE" ] && [ "$machine" != 
->>>> "$MACHINE" ]; then
->>>> +        print_result "SKIP" $testname "" "$machine only"
->>>> +        return 2
->>>> +    elif [ -n "$MACHINE" ]; then
->>>> +        machine="$MACHINE"
->>>> +    fi
->>>> +
->>>>        if [ -n "$accel" ] && [ -n "$ACCEL" ] && [ "$accel" != "$ACCEL" 
->>>> ]; then
->>>>            print_result "SKIP" $testname "" "$accel only, but ACCEL=$ACCEL"
->>>>            return 2
->>>
->>> For some reasons that I don't quite understand yet, this patch causes the
->>> "sieve" test to always timeout on the s390x runner, see e.g.:
->>>
->>>    https://gitlab.com/thuth/kvm-unit-tests/-/jobs/6798954987
->>
->> How do you use the s390x runner?
->>
->>>
->>> Everything is fine in the previous patches (I pushed now the previous 5
->>> patches to the repo):
->>>
->>>    https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/pipelines/1281919104
->>>
->>> Could it be that he TIMEOUT gets messed up in certain cases?
->>
->> Hmm not sure yet. At least it got timeout right for the duration=90s
->> message.
-> 
-> That seems to be wrong, the test is declared like this in s390x/unittests.cfg :
-> 
-> [sieve]
-> file = sieve.elf
-> groups = selftest
-> # can take fairly long when KVM is nested inside z/VM
-> timeout = 600
-> 
-> And indeed, it takes way longer than 90 seconds on that CI machine, so the 
-> timeout after 90 seconds should not occur here...
+From: Thomas Prescher <thomas.prescher@cyberus-technology.de>
 
-I guess you need to adjust arch_cmd_s390x in scripts/s390x/func.bash to be 
-aware of the new parameter, too?
+When a vCPU is interrupted by a signal while running a nested guest,
+KVM will exit to userspace with L2 state. However, userspace has no
+way to know whether it sees L1 or L2 state (besides calling
+KVM_GET_STATS_FD, which does not have a stable ABI).
 
-  Thomas
+This causes multiple problems:
 
+The simplest one is L2 state corruption when userspace marks the sregs
+as dirty. See this mailing list thread [1] for a complete discussion.
+
+Another problem is that if userspace decides to continue by emulating
+instructions, it will unknowingly emulate with L2 state as if L1
+doesn't exist, which can be considered a weird guest escape.
+
+This patch introduces a new flag KVM_RUN_X86_GUEST_MODE in the kvm_run
+data structure, which is set when the vCPU exited while running a
+nested guest. Userspace can then handle this situation.
+
+To see whether this functionality is available, this patch also
+introduces a new capability KVM_CAP_X86_GUEST_MODE.
+
+[1] https://lore.kernel.org/kvm/20240416123558.212040-1-julian.stecklina@cyberus-technology.de/T/#m280aadcb2e10ae02c191a7dc4ed4b711a74b1f55
+
+Signed-off-by: Thomas Prescher <thomas.prescher@cyberus-technology.de>
+Signed-off-by: Julian Stecklina <julian.stecklina@cyberus-technology.de>
+---
+ Documentation/virt/kvm/api.rst  | 17 +++++++++++++++++
+ arch/x86/include/uapi/asm/kvm.h |  1 +
+ arch/x86/kvm/x86.c              |  3 +++
+ include/uapi/linux/kvm.h        |  1 +
+ 4 files changed, 22 insertions(+)
+
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 0b5a33ee71ee..7748c3eb98e0 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6419,6 +6419,9 @@ affect the device's behavior. Current defined flags::
+   #define KVM_RUN_X86_SMM     (1 << 0)
+   /* x86, set if bus lock detected in VM */
+   #define KVM_RUN_BUS_LOCK    (1 << 1)
++  /* x86, set if the VCPU exited from a nested (L2) guest */
++  #define KVM_RUN_X86_GUEST_MODE (1 << 2)
++
+   /* arm64, set for KVM_EXIT_DEBUG */
+   #define KVM_DEBUG_ARCH_HSR_HIGH_VALID  (1 << 0)
+ 
+@@ -8063,6 +8066,20 @@ error/annotated fault.
+ 
+ See KVM_EXIT_MEMORY_FAULT for more information.
+ 
++7.34 KVM_CAP_X86_GUEST_MODE
++------------------------------
++
++:Architectures: x86
++:Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
++
++The presence of this capability indicates that KVM_RUN will update the
++KVM_RUN_X86_GUEST_MODE bit in kvm_run.flags to indicate whether the
++vCPU was executing nested guest code when it exited.
++
++KVM exits with the register state of either the L1 or L2 guest
++depending on which executed at the time of an exit. Userspace must
++take care to differentiate between these cases.
++
+ 8. Other capabilities.
+ ======================
+ 
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index ef11aa4cab42..ff4ed82a2d06 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -106,6 +106,7 @@ struct kvm_ioapic_state {
+ 
+ #define KVM_RUN_X86_SMM		 (1 << 0)
+ #define KVM_RUN_X86_BUS_LOCK     (1 << 1)
++#define KVM_RUN_X86_GUEST_MODE   (1 << 2)
+ 
+ /* for KVM_GET_REGS and KVM_SET_REGS */
+ struct kvm_regs {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 91478b769af0..64f2cba9345e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -4714,6 +4714,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VM_DISABLE_NX_HUGE_PAGES:
+ 	case KVM_CAP_IRQFD_RESAMPLE:
+ 	case KVM_CAP_MEMORY_FAULT_INFO:
++	case KVM_CAP_X86_GUEST_MODE:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+@@ -10200,6 +10201,8 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
+ 
+ 	if (is_smm(vcpu))
+ 		kvm_run->flags |= KVM_RUN_X86_SMM;
++	if (is_guest_mode(vcpu))
++		kvm_run->flags |= KVM_RUN_X86_GUEST_MODE;
+ }
+ 
+ static void update_cr8_intercept(struct kvm_vcpu *vcpu)
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 2190adbe3002..ccb12f6a656d 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -917,6 +917,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_MEMORY_ATTRIBUTES 233
+ #define KVM_CAP_GUEST_MEMFD 234
+ #define KVM_CAP_VM_TYPES 235
++#define KVM_CAP_X86_GUEST_MODE 236
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
+-- 
+2.42.0
 
 
