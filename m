@@ -1,185 +1,177 @@
-Return-Path: <kvm+bounces-17033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33BA08C03F8
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 20:00:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E04D8C040D
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 20:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D20FF281A8A
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 18:00:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 652A5B248B3
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 18:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA0212BF25;
-	Wed,  8 May 2024 18:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BDD512C52E;
+	Wed,  8 May 2024 18:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gQY20pF9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DUGEar/2"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 264EF79E1
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 18:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342F112B153
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 18:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715191207; cv=none; b=a5NdFLLEurcpEU6IZTdPNPOEvKIcYPjs9hP1JESObTuqb3vma4wloDcWV6E9noyWmz5xHxFteQbbW0qcudTfyHYzTV77egnfacmTziVibJ8Jg3IQox5FTB4xcqu/7bglfHf2NPm3yxV3Qpm/m7r2B40oIkPs6vHS16hJIz4Cz38=
+	t=1715191420; cv=none; b=QwKLaPybITGRwrw0sjNDKRlrG/WFLcbD3bLvMBPP06YVB7rmO5Pqoh1HAZa5Hq0vl+KiGO8CMWk6V3Cut3PNJPJmfUe0qaQ8/nBViwZ7vi7LEIp7CfiMiCVz6rdPMW3PnZtwv7EoS9oUltLj+e124JMNb6XhUAUtvncG5ATAaP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715191207; c=relaxed/simple;
-	bh=xKd/JpOZD9BXaNk6je0WQzsYpCg7KNabWmTkWrqEL5g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N4Bw+mAhF8DJiiZYwqIK0Yd5WJ0ApANQp9JFvPgrkEUyOScENTPtvPpL5VAIkp6EIAz6NA9+AoRaKxdg9SPwaSELKHz7AuvbxZvUrHDPR9yGb1ACAam/D+ve8+Eass4C+gzk4agTdWIVbco0RMYE3ihWsfCE9wB2PmbR7//Oh4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gQY20pF9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715191202;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BXHeP1fxReFkb3vlF8uR86FPrcsGToM3TdgcQK2RQNU=;
-	b=gQY20pF9oLms6oP6JV0v3nMNnq4rucrC0SY/IBkU6J9+VJaEd68BzrloHhS7ISWxiz1UOz
-	7XJdKHHhLBs+YpT2aoLQpIzDsUiImq9WOLiH9wRqNXkAURs3m977ERntELXfwFOVyYp4lu
-	j1QZnGtqrpuVupP7nP35LX5plu9fGsg=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-244-NwJj_3gQP9WAn7sdLzvTqA-1; Wed, 08 May 2024 14:00:01 -0400
-X-MC-Unique: NwJj_3gQP9WAn7sdLzvTqA-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7dece1fa472so467542639f.0
-        for <kvm@vger.kernel.org>; Wed, 08 May 2024 11:00:01 -0700 (PDT)
+	s=arc-20240116; t=1715191420; c=relaxed/simple;
+	bh=QnIGcOGbV4cqrx4Nx/huveAV3Zfk93aDR5GKJzn4mog=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X4xCKkjxxX6MmPJS8Svj/Ap0aSXIL8v3ZnwBy14gFiEqKbmDWqhs0MJw4zsQk6rFPodkNhmVHop7f0W7yhJ+tEki3E+jhetzoP7cpcKTXJ+HbkguV5o9yffcoOkPo1SN7AqdwBiTgN/eQ9JlwofjMs7yjYkJo9MWId54e6GfH0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DUGEar/2; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-572a1b3d6baso1719a12.1
+        for <kvm@vger.kernel.org>; Wed, 08 May 2024 11:03:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715191416; x=1715796216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NKy0w8SAVZYo27FpU6ZBovVv7b8KWTwyUtyfvoxHua4=;
+        b=DUGEar/2Azn7Sk1QTNCuUDEulN/0fZl9vXB5hOQzu0/nOgrwg4fZf52/mToQDVM8qK
+         jiUsdPGqqUwvZzc5u0l9202dIYL0q+IMe7xxZmBhlXB3J5eRzxWX0fftblZOgWkxI+we
+         9XD++0LEzvNluWOsumBz40KWlPtxbPjPC1kf6Ok4aTOZesZCMqDyE4i2PbM2TmRkV77y
+         fnpSfFLerzM3rn5+E4gNgR7DEPJhXlLQCIGbBmOfFDZ+yXafG5xPNT3IZJeGT7IZdJGj
+         zytDYAaO/LVJKWnOCxxOJKkQXzbNcmOYPnzY1vzpXmWU5IB7rQ0/IA1p+LCrYBo48PLP
+         biFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715191200; x=1715796000;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1715191416; x=1715796216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BXHeP1fxReFkb3vlF8uR86FPrcsGToM3TdgcQK2RQNU=;
-        b=l/IZLC8ICZL6TT5jLraBfrIBdkD3vrbHB30Rzkpc6BsL2Zs8LT8dwwqedQhSmcwQez
-         SewKecccCnVZvHpXwsFW5DzJ+giJjd6MSrh0ofQ1AlHQZICPNe3Te4MCV0+oPs4Mw8sR
-         RW8tNCTnTHH56bhgTiK/UTqNtCS330tYIIglGgyG1On7oFp5F3FJmzCRlxEHk07yj2gD
-         VLoUjGzTEMwg49ipY6oy7OjY9wREEB4nDcjefbe7pzDt5PZnduJUzmRQbZeiuX565DUc
-         bX5G/SCJy5QRsATAisu1usQhPQ8gxj6tzpZ/Lye/GMZT09B8qJWNC7g+noNay2jtLUs4
-         K8rQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWGnAzJOJTE4e8rZY2LlP7L3OYE19IXwwr2x+WUnlEcStcgMp+aiYeo3flZLgw3/HmaoibR2ir6Qyg2q/ceB1GOLTpr
-X-Gm-Message-State: AOJu0Yz0/ulQiutnSnAJuAJK2ay4gku6vDVRYS56cIYP5mj3uQkcfmML
-	ridErM9It5NX0GS3wh+f17JT1LDCv/D+VUHoIdvvPwTeiYhl47uaAJpP7jdHF7GmTeGLIDuLtHj
-	/7Tl40a6PCBDxbvPQ4IXO/P15yHPBoiH5YNRUgmAiMoBw5YKK6jINBL1G/g==
-X-Received: by 2002:a6b:6b08:0:b0:7de:ca65:35b8 with SMTP id ca18e2360f4ac-7e18fdb65bfmr351286339f.19.1715191200449;
-        Wed, 08 May 2024 11:00:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFhOuEABofsJkR0NAvIggMb7kZ1ROrNVq+UeRIufOurky168HE2D00Us8McIBTeYaXwIA4RLA==
-X-Received: by 2002:a6b:6b08:0:b0:7de:ca65:35b8 with SMTP id ca18e2360f4ac-7e18fdb65bfmr351284639f.19.1715191200047;
-        Wed, 08 May 2024 11:00:00 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id t32-20020a05663834a000b0048892084e73sm1854432jal.155.2024.05.08.10.59.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 May 2024 10:59:59 -0700 (PDT)
-Date: Wed, 8 May 2024 11:59:57 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: liulongfang <liulongfang@huawei.com>
-Cc: <jgg@nvidia.com>, <shameerali.kolothum.thodi@huawei.com>,
- <jonathan.cameron@huawei.com>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linuxarm@openeuler.org>
-Subject: Re: [PATCH v6 2/5] hisi_acc_vfio_pci: modify the register location
- of the XQC address
-Message-ID: <20240508115957.1c13dd12.alex.williamson@redhat.com>
-In-Reply-To: <3911fd96-a872-c352-b0ab-0eb2ae982037@huawei.com>
-References: <20240425132322.12041-1-liulongfang@huawei.com>
-	<20240425132322.12041-3-liulongfang@huawei.com>
-	<20240503101138.7921401f.alex.williamson@redhat.com>
-	<bc4fd179-265a-cbd8-afcb-358748ece897@huawei.com>
-	<20240507063552.705cb1b6.alex.williamson@redhat.com>
-	<3911fd96-a872-c352-b0ab-0eb2ae982037@huawei.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        bh=NKy0w8SAVZYo27FpU6ZBovVv7b8KWTwyUtyfvoxHua4=;
+        b=IvcDOIs6RUXLQXSbovbmLUWAjiFqpG6orCASFHhgBVnIcmogOdjyj4pGc/bz7S3mgr
+         UvpkfaikZthKn1Jp86q3orzrvmkhBZx/WiIEzLV0rVdC0JWUoaExFGQOpYpBIjL6lWRS
+         AVsolgP3O4PTQQr8EgVnmpxDXpzVD7DI6/3NHHVMcpN7Pnxb6jemDvRUEr9ELrTfYnOg
+         4GYuhkm/ETF3MqVONnw6atLvJhouqKIpVtoI5EYZffVGDXXolYNza7cACIp+QSq4aupK
+         hhEWTfy7FCtUcZpGO4lJLpJl0lNoI6VNnqc0GrR/AcaXG/0CRWQSqOXPbbK/agNRBnDv
+         Ycyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXnMNMqI8ZYOgqkli7cxI2qIztIMubZlFVaSVwSpRgZXm4cfnu1zpbHAmhxHw3fpj2x5YpDBIH7TvH1/nAewoXxUsgm
+X-Gm-Message-State: AOJu0YyhoIc5TrmmMq9pNQxM77ldM8ZZnhrAOJV7MmwCKupP/qmDfPOn
+	cAdQLOQSgTqo9xLIzM9cCtEMqsU/itwbhWYQB3Bzysa6NB2T9qyJkFUvyqEdJQYEhF4S1Wfs6X7
+	DfZAr71CVIDISyBDsruL3Ar3IuB7gt8xlIPiC
+X-Google-Smtp-Source: AGHT+IFdyxKHKBA5RxjNJeg0nvw+PuOv0TpVA43qYYBbq4FC0UUJLuiCzYnH7rV9IAgiFwYJSHM5Q/yPLhYa7GrUbHY=
+X-Received: by 2002:a05:6402:1763:b0:572:554b:ec66 with SMTP id
+ 4fb4d7f45d1cf-57334b922acmr1088a12.3.1715191416289; Wed, 08 May 2024 11:03:36
+ -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240507214254.2787305-1-edliaw@google.com> <ZjuA3aY_iHkjP7bQ@google.com>
+In-Reply-To: <ZjuA3aY_iHkjP7bQ@google.com>
+From: Edward Liaw <edliaw@google.com>
+Date: Wed, 8 May 2024 11:03:07 -0700
+Message-ID: <CAG4es9V1578h2EgpztcoEv3CPGftbgA+HNfhgaPxBqOxP6-CrQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+To: Sean Christopherson <seanjc@google.com>
+Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
+	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
+	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
+	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	David Hildenbrand <david@redhat.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Seth Forshee <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Fenghua Yu <fenghua.yu@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
+	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 8 May 2024 15:18:55 +0800
-liulongfang <liulongfang@huawei.com> wrote:
+On Wed, May 8, 2024 at 6:47=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Tue, May 07, 2024, Edward Liaw wrote:
+> > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> > asprintf into kselftest_harness.h, which is a GNU extension and needs
+> > _GNU_SOURCE to either be defined prior to including headers or with the
+> > -D_GNU_SOURCE flag passed to the compiler.
+> >
+> > v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-ed=
+liaw@google.com/
+> > v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+> > location.  Remove #define _GNU_SOURCE from source code to resolve
+> > redefinition warnings.
+> >
+> > Edward Liaw (5):
+> >   selftests: Compile kselftest headers with -D_GNU_SOURCE
+> >   selftests/sgx: Include KHDR_INCLUDES in Makefile
+> >   selftests: Include KHDR_INCLUDES in Makefile
+> >   selftests: Drop define _GNU_SOURCE
+> >   selftests: Drop duplicate -D_GNU_SOURCE
+>
+> Can you rebase this on top of linux-next?  I have a conflicting fix[*] fo=
+r the
+> KVM selftests queued for 6.10, and I would prefer not to drop that commit=
+ at
+> this stage as it would require a rebase of a pile of other commits.
 
-> On 2024/5/7 20:35, Alex Williamson wrote:
-> > On Tue, 7 May 2024 16:29:05 +0800
-> > liulongfang <liulongfang@huawei.com> wrote:
-> >   
-> >> On 2024/5/4 0:11, Alex Williamson wrote:  
-> >>> On Thu, 25 Apr 2024 21:23:19 +0800
-> >>> Longfang Liu <liulongfang@huawei.com> wrote:
-> >>>     
-> >>>> According to the latest hardware register specification. The DMA
-> >>>> addresses of EQE and AEQE are not at the front of their respective
-> >>>> register groups, but start from the second.
-> >>>> So, previously fetching the value starting from the first register
-> >>>> would result in an incorrect address.
-> >>>>
-> >>>> Therefore, the register location from which the address is obtained
-> >>>> needs to be modified.    
-> >>>
-> >>> How does this affect migration?  Has it ever worked?  Does this make    
-> >>
-> >> The general HiSilicon accelerator task will only use SQE and CQE.
-> >> EQE is only used when user running kernel mode task and uses interrupt mode.
-> >> AEQE is only used when user running task exceptions occur and software reset
-> >> is required.
-> >>
-> >> The DMA addresses of these four queues are written to the device by the device
-> >> driver through the mailbox command during driver initialization.
-> >> The DMA addresses of EQE and AEQE are migrated through the device register.
-> >>
-> >> EQE and AEQE are not used in general task, after the live migration is completed,
-> >> this DMA address error will not be found. until we added a new kernel-mode test case
-> >> that we discovered that this address was abnormal.
-> >>  
-> >>> the migration data incompatible?
-> >>>    
-> >>
-> >> This address only affects the kernel mode interrupt mode task function and device
-> >> exception recovery function.
-> >> They do not affect live migration functionality  
-> > 
-> > Then why are we migrating them?  Especially EQE, if it is only used by
-> > kernel mode drivers then why does the migration protocol have any
-> > business transferring the value from the source device?  It seems the
-> > fix should be not to apply the value from the source and mark these as
-> > reserved fields in the migration data stream.  Thanks,
-> >  
-> 
-> HiSilicon accelerator equipment can perform general services after completing live migration.
-> This kind of business is executed through the user mode driver and only needs to use SQE and CQE.
-> 
-> At the same time, this device can also perform kernel-mode services in the VM through the crypto
-> subsystem. This kind of service requires the use of EQE.
-> 
-> Finally, if the device is abnormal, the driver needs to perform a device reset, and AEQE needs to
-> be used in this case.
-> 
-> Therefore, a complete device live migration function needs to ensure that device functions are
-> normal in all these scenarios.
-> Therefore, this data still needs to be migrated.
+Ok, I'll do that.
 
-Ok, I had jumped to an in-kernel host driver in reference to "kernel
-mode" rather than a guest kernel.  Migrating with bad data only affects
-the current configuration of the device, reloading a guest driver to
-update these registers or a reset of the device would allow proper
-operation of the device, correct?
+>
+> And I doubt KVM is the only subsystem that has a targeted fix for the _GN=
+U_SOURCE
+> mess.
+>
+> If we want/need to get a fix into 6.9, then IMO we should just revert 809=
+216233555
+> ("selftests/harness: remove use of LINE_MAX"), as that came in quite late=
+ in the
+> 6.9 cycle, and I don't think it's feasible to be 100% confident that glob=
+ally
+> defining _GNU_SOURCE works for all selftests, i.e. we really should have =
+a full
+> cycle for folks to test.
 
-But I think this still isn't really a complete solution, we know
-there's a bug in the migration data stream, so not only would we fix
-the data stream, but I think we should also take measures to prevent
-loading a known bad data stream.  AIUI migration of this device while
-running in kernel mode (ie. a kernel driver within a guest VM) is
-broken.  Therefore, the least we can do in a new kernel, knowing that
-there was previously a bug in the migration data stream, is to fail to
-load that migration data because it risks this scenario where the
-device is broken after migration.  Shouldn't we then also increment a
-migration version field in the data stream to block migrations that
-risk this breakage, or barring that, change the magic data field to
-prevent the migration?  Thanks,
+That sounds reasonable to me.  In this thread Tao suggested reverting
+back to 809216233555 and using a fixed value in place of LINE_MAX to
+fix 38c957f07038
+https://lore.kernel.org/linux-kselftest/20240508070003.2acdf9b4@kernel.org/
 
-Alex
-
+>
+> [*] https://github.com/kvm-x86/linux/commit/730cfa45b5f4
 
