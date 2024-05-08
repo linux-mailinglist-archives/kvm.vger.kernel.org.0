@@ -1,192 +1,233 @@
-Return-Path: <kvm+bounces-16985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D348BF7DB
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 09:58:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E03E18BF864
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 10:22:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F045C285F77
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 07:58:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1030F1C2141B
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 08:22:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210ED4500F;
-	Wed,  8 May 2024 07:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF2B4502A;
+	Wed,  8 May 2024 08:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="d+6Wlldu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PjuDEr2R"
 X-Original-To: kvm@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE503F8F0;
-	Wed,  8 May 2024 07:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6A354086F
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 08:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715155104; cv=none; b=gQ4T2L0LXhqW/pB+iPtxRhC2vQXpUkZORoctNgSKFqiwpu82JG31vKlnrXFkq5gS1NUDo3zNgLjfHCumcCS8W1PpwNK7H8ckUIzBfWJ2kDZWQzZvlDhg3d3v0L4VBmsMw80dDmbO5s7GQyBalxCj+Gks06aXedKEu9V1B+fGf8E=
+	t=1715156539; cv=none; b=r2PvAQCYI8jtEymVLtBZb9ceqkm0fFY9CA2jFiI0eID3AJf3ttH27c0gRB3QBGfUAUYHXRJRmkQKwdKfpbfO9MFuNP88NvKX3G0PrrR3tBukH1bgH0p+8bUI5JAkvvQzTnVK0bW32Y7+4YuQLgMlhx8AwWg9AL7vorZeydaznA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715155104; c=relaxed/simple;
-	bh=W8h0zv7fM5rho2qCrJQe63u3RrkuJY8jHMl1xzQ0llk=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=IjU25Xg9gPe5MqgyNQI+U3t/5SVR1EJeHEUhkho0498dTu6O/PwyMaXW/1V8dqTMNciDI3/Ib7JxDW4bGVwTxeFpb9L0irSuXYBlYHPO7p5/4qsnQIxnJ3cc+vzZGpmgGXU6AJRQn8PXpSLDRpfFxbisyejQSs7AqMsrCk1ga40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=d+6Wlldu; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1715155100;
-	bh=W8h0zv7fM5rho2qCrJQe63u3RrkuJY8jHMl1xzQ0llk=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=d+6WlldukdN+eWmS3sBsn4libaX2zcJvXa/ngL+dhdc+DchosZSUl43ALM0fKrizz
-	 ysZ99uHC/8UpNmyFE4hOPapdp0NUzrlzrQjGLrkMDMqYNps7lgHGiCM7grlVWeqvuL
-	 e5HkvXoNYPhMwpb30PKIuWAHw1A/b8v33oat12Wn15tu738O33/VYc94jtdztajScu
-	 4J+5rFyzWIZ90H5CzrX9B4Ib32RGjnbcFX2KDX2Cv9yM6dA7sRVQyStsK2OIpLFTHR
-	 MsAgmoQsx7QhT2c2rNTU9MLlxEjijsJQpah0OPot4l0rd5cOVPx4wu8rShkkg7Xmln
-	 rRM76zFaWDvsw==
-Received: from [10.193.1.1] (broslavsky.collaboradmins.com [68.183.210.73])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: usama.anjum)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 5163A378107C;
-	Wed,  8 May 2024 07:57:56 +0000 (UTC)
-Message-ID: <e3f6bb2a-a9bd-43c2-9468-85242eab0390@collabora.com>
-Date: Wed, 8 May 2024 12:58:20 +0500
+	s=arc-20240116; t=1715156539; c=relaxed/simple;
+	bh=ygFz4Xi5KPzs5xGDIbJIGzXq1wtvM0/GTF+V51fuSIA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G74T4Lm5UWherL9iqAO9zs2dJWuHB2nPKrs1OZCQlbKC4NlQuO+WCQQxnywVEXveA/Ubzngij1LkNloToyFVi2h1yML3VxjJm7mdE5W/7/x2UvDu7V1g5njbYbeDCIIF1MKIoLwcm/uhOoUrWV54KlVEXy6dIOgbM3lA0zoJzx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PjuDEr2R; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715156536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WECjWQs8mty4SiAVTCtSfnAeiyCSuc/uRnEzCXqgsoI=;
+	b=PjuDEr2RSg4nALYsYflfPBPT6xMlnEfNI2kBNSfIml1lfMXSezKngYJDtZmkGezYyxUO7y
+	6NWf2lroAN0QqrvuNXMGxj9MfW3tr2ppLcsc5CIioB8C5GiwPR2qqTBo9scLCMYre/Agh0
+	HxbnDEkkzmRp7imVPH6u3vELq1DWiig=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-131-5a0d1AYSMCSatKPCQ5dYTg-1; Wed, 08 May 2024 04:22:15 -0400
+X-MC-Unique: 5a0d1AYSMCSatKPCQ5dYTg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a599dbd2b6aso242539366b.2
+        for <kvm@vger.kernel.org>; Wed, 08 May 2024 01:22:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715156534; x=1715761334;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WECjWQs8mty4SiAVTCtSfnAeiyCSuc/uRnEzCXqgsoI=;
+        b=nVzoZy9eyLSmopYb4DNR1AhgiEwqkWdk1ovIOQ/BSGotU6Czn/TGgutialhCH4Hy0d
+         Neq40mVHrvI6xsvEu9Sg1gTvSV85XxQVvXRqtGm4gRf8n4YL4nXzD2DDowb9R/T+FPow
+         JYfDHp3bCLypZ3uSeAOVuvXc0V8bqt831XKJAsO6b6tHWl1IxqVP7T4lqtYUy9iPk6+p
+         hPEoJAorr4BJ2aRnGNNs2/FMpXRZYSGWSj5GzO+Eicr6AVI6vbCa9ZcdXLN+fkCKCDgm
+         k7agEsNbFTirok/himBjbVCbAd5d+Op/4cjxOtAzR4XR+6BbGgdfcLygca4DDddMHUdB
+         AXhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQh9sp69dZV7Sz4Ewt+SbzWkbxHcE5nl1s2wN2Vl5RipOD4h4akG0uiCEB7lu9ZvRAX7PxIBcQJjyQgzf8MsWvOx7G
+X-Gm-Message-State: AOJu0YwA6olHkgBBoYL9rRj8w/d98nLAWVI8jLXAvjsCUIqUvGwa9Fcq
+	XUxe874wL10NV4Hx7OvojTmUsID38cnlOVG9CxphHvbGntJrV+xlkQqGpWyCP3hKnTvoQ95+dKY
+	TXPaUaKjNnHp3zVavl96eZEn9LhMIzio4NvCagHXmUUm682eF7g==
+X-Received: by 2002:a17:906:74d:b0:a59:bb20:9964 with SMTP id a640c23a62f3a-a59fb94b8f0mr124741766b.23.1715156534167;
+        Wed, 08 May 2024 01:22:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHU9a/9Dj60z9UWENRsQNKFMOX3GbrPe06GNksU418kuNjSLQfi4iB448HOWm6NjY8xN34DpA==
+X-Received: by 2002:a17:906:74d:b0:a59:bb20:9964 with SMTP id a640c23a62f3a-a59fb94b8f0mr124740166b.23.1715156533853;
+        Wed, 08 May 2024 01:22:13 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-56.business.telecomitalia.it. [87.12.25.56])
+        by smtp.gmail.com with ESMTPSA id cf14-20020a170906b2ce00b00a59ef203579sm1645424ejb.138.2024.05.08.01.22.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 01:22:13 -0700 (PDT)
+Date: Wed, 8 May 2024 10:22:09 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Luigi Leonardi <luigi.leonardi@outlook.com>
+Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, kuba@kernel.org, stefanha@redhat.com, 
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, kvm@vger.kernel.org, 
+	jasowang@redhat.com, Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] vsock: add support for SIOCOUTQ ioctl
+ for all vsock socket types.
+Message-ID: <t752lxu3kwqypmdgr36nrd63pfigdgi22xhjawitr6mhjz2u4g@7xa3ucifp2sc>
+References: <20240408133749.510520-1-luigi.leonardi@outlook.com>
+ <AS2P194MB21708B8955BEC4C0D2EF822B9A002@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kernel-team@android.com, linux-sound@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org,
- linux-input@vger.kernel.org, iommu@lists.linux.dev, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
- linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
- linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH v2 5/5] selftests: Drop duplicate -D_GNU_SOURCE
-To: Edward Liaw <edliaw@google.com>, shuah@kernel.org,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
- Johannes Weiner <hannes@cmpxchg.org>, Christian Brauner
- <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>,
- Kees Cook <keescook@chromium.org>,
- OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
- Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
- <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
- Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
- Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
- Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
- Atish Patra <atishp@atishpatra.org>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
- <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
- James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
- Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
- <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
- <afaerber@suse.de>, Manivannan Sadhasivam
- <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Fenghua Yu <fenghua.yu@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Jarkko Sakkinen <jarkko@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>
-References: <20240507214254.2787305-1-edliaw@google.com>
- <20240507214254.2787305-6-edliaw@google.com>
-Content-Language: en-US
-From: Muhammad Usama Anjum <usama.anjum@collabora.com>
-In-Reply-To: <20240507214254.2787305-6-edliaw@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <AS2P194MB21708B8955BEC4C0D2EF822B9A002@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
 
-On 5/8/24 2:38 AM, Edward Liaw wrote:
-> -D_GNU_SOURCE can be de-duplicated here, as it is added by
-> KHDR_INCLUDES.
-> 
-> Signed-off-by: Edward Liaw <edliaw@google.com>
-Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+On Mon, Apr 08, 2024 at 03:37:47PM GMT, Luigi Leonardi wrote:
+>This add support for ioctl(s) for SOCK_STREAM SOCK_SEQPACKET and SOCK_DGRAM
+>in AF_VSOCK.
+>The only ioctl available is SIOCOUTQ/TIOCOUTQ, which returns the number
+>of unsent bytes in the socket. This information is transport-specific
+>and is delegated to them using a callback.
+>
+>Suggested-by: Daan De Meyer <daan.j.demeyer@gmail.com>
+>Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>---
+> include/net/af_vsock.h   |  3 +++
+> net/vmw_vsock/af_vsock.c | 51 +++++++++++++++++++++++++++++++++++++---
+> 2 files changed, 51 insertions(+), 3 deletions(-)
+>
+>diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>index 535701efc1e5..7d67faa7bbdb 100644
+>--- a/include/net/af_vsock.h
+>+++ b/include/net/af_vsock.h
+>@@ -169,6 +169,9 @@ struct vsock_transport {
+> 	void (*notify_buffer_size)(struct vsock_sock *, u64 *);
+> 	int (*notify_set_rcvlowat)(struct vsock_sock *vsk, int val);
+>
+>+	/* SIOCOUTQ ioctl */
+>+	int (*unsent_bytes)(struct vsock_sock *vsk);
+>+
+> 	/* Shutdown. */
+> 	int (*shutdown)(struct vsock_sock *, int);
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 54ba7316f808..fc108283409a 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -112,6 +112,7 @@
+> #include <net/sock.h>
+> #include <net/af_vsock.h>
+> #include <uapi/linux/vm_sockets.h>
+>+#include <uapi/asm-generic/ioctls.h>
+>
+> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
+> static void vsock_sk_destruct(struct sock *sk);
+>@@ -1292,6 +1293,50 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+> }
+> EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
+>
+>+static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
+>+			  int __user *arg)
+>+{
+>+	struct sock *sk = sock->sk;
+>+	struct vsock_sock *vsk;
+>+	int retval;
+>+
+>+	vsk = vsock_sk(sk);
+>+
+>+	switch (cmd) {
+>+	case SIOCOUTQ: {
+>+		int n_bytes;
+>+
+>+		if (vsk->transport->unsent_bytes) {
 
-> ---
->  tools/testing/selftests/futex/functional/Makefile | 2 +-
->  tools/testing/selftests/iommu/Makefile            | 2 --
->  tools/testing/selftests/net/tcp_ao/Makefile       | 2 +-
->  tools/testing/selftests/resctrl/Makefile          | 2 +-
->  4 files changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
-> index a392d0917b4e..f79f9bac7918 100644
-> --- a/tools/testing/selftests/futex/functional/Makefile
-> +++ b/tools/testing/selftests/futex/functional/Makefile
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  INCLUDES := -I../include -I../../ $(KHDR_INCLUDES)
-> -CFLAGS := $(CFLAGS) -g -O2 -Wall -D_GNU_SOURCE -pthread $(INCLUDES) $(KHDR_INCLUDES)
-> +CFLAGS := $(CFLAGS) -g -O2 -Wall -pthread $(INCLUDES) $(KHDR_INCLUDES)
->  LDLIBS := -lpthread -lrt
->  
->  LOCAL_HDRS := \
-> diff --git a/tools/testing/selftests/iommu/Makefile b/tools/testing/selftests/iommu/Makefile
-> index 32c5fdfd0eef..fd6477911f24 100644
-> --- a/tools/testing/selftests/iommu/Makefile
-> +++ b/tools/testing/selftests/iommu/Makefile
-> @@ -2,8 +2,6 @@
->  CFLAGS += -Wall -O2 -Wno-unused-function
->  CFLAGS += $(KHDR_INCLUDES)
->  
-> -CFLAGS += -D_GNU_SOURCE
-> -
->  TEST_GEN_PROGS :=
->  TEST_GEN_PROGS += iommufd
->  TEST_GEN_PROGS += iommufd_fail_nth
-> diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-> index 522d991e310e..c608b1ec02e6 100644
-> --- a/tools/testing/selftests/net/tcp_ao/Makefile
-> +++ b/tools/testing/selftests/net/tcp_ao/Makefile
-> @@ -26,7 +26,7 @@ LIB	:= $(LIBDIR)/libaotst.a
->  LDLIBS	+= $(LIB) -pthread
->  LIBDEPS	:= lib/aolib.h Makefile
->  
-> -CFLAGS	:= -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing
-> +CFLAGS	:= -Wall -O2 -g -fno-strict-aliasing
->  CFLAGS	+= $(KHDR_INCLUDES)
->  CFLAGS	+= -iquote ./lib/ -I ../../../../include/
->  
-> diff --git a/tools/testing/selftests/resctrl/Makefile b/tools/testing/selftests/resctrl/Makefile
-> index 2deac2031de9..5073dbc96125 100644
-> --- a/tools/testing/selftests/resctrl/Makefile
-> +++ b/tools/testing/selftests/resctrl/Makefile
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
-> -CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE
-> +CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2
->  CFLAGS += $(KHDR_INCLUDES)
->  
->  TEST_GEN_PROGS := resctrl_tests
+Should we also check the `vsk->transport` is not null?
 
--- 
-BR,
-Muhammad Usama Anjum
+I also suggest an early return, or to have the shortest branch on top
+for readability:
+
+		if (!vsk->transport || !vsk->transport->unsent_bytes) {
+			retval = -EOPNOTSUPP;
+			break;
+		}
+
+Thanks,
+Stefano
+
+>+			if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
+>+				retval = -EINVAL;
+>+				break;
+>+			}
+>+
+>+			n_bytes = vsk->transport->unsent_bytes(vsk);
+>+			if (n_bytes < 0) {
+>+				retval = n_bytes;
+>+				break;
+>+			}
+>+
+>+			retval = put_user(n_bytes, arg);
+>+		} else {
+>+			retval = -EOPNOTSUPP;
+>+		}
+>+		break;
+>+	}
+>+	default:
+>+		retval = -ENOIOCTLCMD;
+>+	}
+>+
+>+	return retval;
+>+}
+>+
+>+static int vsock_ioctl(struct socket *sock, unsigned int cmd,
+>+		       unsigned long arg)
+>+{
+>+	return vsock_do_ioctl(sock, cmd, (int __user *)arg);
+>+}
+>+
+> static const struct proto_ops vsock_dgram_ops = {
+> 	.family = PF_VSOCK,
+> 	.owner = THIS_MODULE,
+>@@ -1302,7 +1347,7 @@ static const struct proto_ops vsock_dgram_ops = {
+> 	.accept = sock_no_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = sock_no_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.sendmsg = vsock_dgram_sendmsg,
+>@@ -2286,7 +2331,7 @@ static const struct proto_ops vsock_stream_ops = {
+> 	.accept = vsock_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = vsock_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.setsockopt = vsock_connectible_setsockopt,
+>@@ -2308,7 +2353,7 @@ static const struct proto_ops vsock_seqpacket_ops = {
+> 	.accept = vsock_accept,
+> 	.getname = vsock_getname,
+> 	.poll = vsock_poll,
+>-	.ioctl = sock_no_ioctl,
+>+	.ioctl = vsock_ioctl,
+> 	.listen = vsock_listen,
+> 	.shutdown = vsock_shutdown,
+> 	.setsockopt = vsock_connectible_setsockopt,
+>-- 
+>2.34.1
+>
+
 
