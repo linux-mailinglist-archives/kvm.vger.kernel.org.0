@@ -1,31 +1,31 @@
-Return-Path: <kvm+bounces-17008-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D13498BFF1E
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 15:44:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A36A08BFF44
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 15:47:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 716CC1F2651F
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 13:44:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 431D21F29688
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 13:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0967F126F04;
-	Wed,  8 May 2024 13:42:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AF485930;
+	Wed,  8 May 2024 13:46:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E0008615C;
-	Wed,  8 May 2024 13:42:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD51E85C74;
+	Wed,  8 May 2024 13:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715175721; cv=none; b=U/3HaWDg9qx1S/RM91HXGObl8ZAXVNe8l5PaM2TQD8yhxWEXI6UCgkdAp6qJrgse6JvkAmtKGs/2Wp2A2CR5zV6xMnxpIVVewbi9XkHnC/UeTZcUVgBoY0Sjyg298eaYEEkRUkEfldC2gbbojjsCCf61IvzI556QL/GBUo7OC3M=
+	t=1715175988; cv=none; b=V4QLJkdmKBUFLLvB+0NYJfLYMl08qwFt7YoS/1QAq/dtviY4lMI2/rTn+Ru/XavFfgqBX/IaMEQ+Ax6Nzc9hW+hOIo2e1RxUFASeqlCZOb8JqNHWtiNrTRYyEslXSt2zmgaOB04W8svnWwiX6ClcVAesOdWzoU8/ETX1NDlxyqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715175721; c=relaxed/simple;
-	bh=Z3UoGjcVQojEIaroYcDyo95FKDRaXFaw6zcSksTz3Tg=;
+	s=arc-20240116; t=1715175988; c=relaxed/simple;
+	bh=QdgvVBLaGVh8Hgex4e8pqIu0O0yKM4UstbHMpQAL9fU=;
 	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=YtZaB/RNSEVZtm/gmwF+1J2Q96jCQvVepr4PwOAwPjsZ+L8ENr0nwj9p2izN4Jj9ttlC1DZXGoyBLebGEykMHPQtjWZFjJUp2XtIGXqxo6nayjbbKPAY+uBsvRsgjz9wCPEAd37q9dqLBjSaBoObEvCoeDKWiB7SzRO7DoJPNBc=
+	 MIME-Version:Content-Type; b=oisu6EaVF1pY7AjD3idU++EOb+lRW4ptoksWLfy9A9a8/zytpX0F43otaBCaepox9OMAPzX0wFOwGACfAUTa3ZENpc2UVQ8WHPvdSnrNmRmmAGfSP9JBiLrMuAf9qBMgyhtzYawhyCM0zbM38IpmXPsrE+oJ42z83RWiauck5zM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; arc=none smtp.client-ip=150.107.74.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
@@ -33,16 +33,16 @@ Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VZGXR5Wghz4xDB;
-	Wed,  8 May 2024 23:41:59 +1000 (AEST)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VZGdY2PzCz4x30;
+	Wed,  8 May 2024 23:46:25 +1000 (AEST)
 From: Michael Ellerman <patch-notifications@ellerman.id.au>
-To: Michael Ellerman <mpe@ellerman.id.au>, Christophe Leroy <christophe.leroy@csgroup.eu>, Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-pm@vger.kernel.org, linux@ew.tq-group.com
-In-Reply-To: <20240124105031.45734-1-matthias.schiffer@ew.tq-group.com>
-References: <20240124105031.45734-1-matthias.schiffer@ew.tq-group.com>
-Subject: Re: [PATCH] powerpc: rename SPRN_HID2 define to SPRN_HID2_750FX
-Message-Id: <171517558558.165093.2026366324457459260.b4-ty@ellerman.id.au>
-Date: Wed, 08 May 2024 23:39:45 +1000
+To: linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, Vaibhav Jain <vaibhav@linux.ibm.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, Jordan Niethe <jniethe5@gmail.com>, Vaidyanathan Srinivasan <svaidy@linux.vnet.ibm.com>, mikey@neuling.org, paulus@ozlabs.org, sbhat@linux.ibm.com, gautam@linux.ibm.com, kconsul@linux.vnet.ibm.com, amachhiw@linux.vnet.ibm.com, David.Laight@ACULAB.COM
+In-Reply-To: <20240415035731.103097-1-vaibhav@linux.ibm.com>
+References: <20240415035731.103097-1-vaibhav@linux.ibm.com>
+Subject: Re: [PATCH v2] KVM: PPC: Book3S HV nestedv2: Cancel pending DEC exception
+Message-Id: <171517595456.167543.8572230162605343190.b4-ty@ellerman.id.au>
+Date: Wed, 08 May 2024 23:45:54 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -52,20 +52,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-On Wed, 24 Jan 2024 11:50:31 +0100, Matthias Schiffer wrote:
-> This register number is hardware-specific, rename it for clarity.
+On Mon, 15 Apr 2024 09:27:29 +0530, Vaibhav Jain wrote:
+> This reverts commit 180c6b072bf3 ("KVM: PPC: Book3S HV nestedv2: Do not
+> cancel pending decrementer exception") [1] which prevented canceling a
+> pending HDEC exception for nestedv2 KVM guests. It was done to avoid
+> overhead of a H_GUEST_GET_STATE hcall to read the 'DEC expiry TB' register
+> which was higher compared to handling extra decrementer exceptions.
 > 
-> FIXME comments are added in a few places where it seems like the wrong
-> register is used. As I can't test this, only the rename is done with no
-> functional change.
-> 
+> However recent benchmarks indicate that overhead of not handling 'DECR'
+> expiry for Nested KVM Guest(L2) is higher and results in much larger exits
+> to Pseries Host(L1) as indicated by the Unixbench-arithoh bench[2]
 > 
 > [...]
 
-Applied to powerpc/next.
+Applied to powerpc/topic/ppc-kvm.
 
-[1/1] powerpc: rename SPRN_HID2 define to SPRN_HID2_750FX
-      https://git.kernel.org/powerpc/c/ad679719d7020a200c4a10248ebb3bbb374d423d
+[1/1] KVM: PPC: Book3S HV nestedv2: Cancel pending DEC exception
+      https://git.kernel.org/powerpc/c/7be6ce7043b4cf293c8826a48fd9f56931cef2cf
 
 cheers
 
