@@ -1,80 +1,100 @@
-Return-Path: <kvm+bounces-17047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571B78C0476
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 20:33:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 848CB8C04CE
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 21:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7AAFB276F6
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 18:33:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5FBB1C21157
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 19:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE7C13049F;
-	Wed,  8 May 2024 18:30:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD2D130A59;
+	Wed,  8 May 2024 19:19:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pil1Dy9+"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="1/i2io5o"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEBAB7B3E1
-	for <kvm@vger.kernel.org>; Wed,  8 May 2024 18:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28CF31E532
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 19:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715193046; cv=none; b=gsVWgQtdDbinAmWGi29pLxWXmZ4w6ji/CBIJkIGvrX/D4hNy5k46ysBhB3s5JAGIN8glF4qcVcjSXM3KD057FdKl753nNOvZJK8MFsR55G4pRHnJCZxPWpjfW5RNKUqCkeB1kIlu7Md3qaG2CLUGqQwCF2l0AeApv7cdydaPwE4=
+	t=1715195978; cv=none; b=KRWUmGUe9EBUh5UBACWq8xRE/d/lC2kufmZg2k2qgURUmp4sOWvXu1Yl8a+CGlvNWKR24OmaM3Cy0MCPJ/ozHX5801jb9ZdptQWnQiaWgwSg+2lB2pAXI4Y/0pDURhGjblXQrLQEBj8rr1dcbwja/5lV+mCYgZSoEJp+qQIhZBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715193046; c=relaxed/simple;
-	bh=REiKTjB5W6PjMHaoXVnysNIszjXK5RKLJJ6FNByQdzE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YqbIqUlS106VrtIQwoEokkIk+pYutQEh75Dc/V1+XpPWhbLg7ZWNgdYAYywmU1yxKfAyneuGazFJr4evOHhMPHSZC1I7qdyxeYLZhxv45f6Q/OZL4OvsGDBDbu8SEXfDF1+OLh5MxHndAWZhvNY0MiWP/fYDj1MyJdxX1pWIocI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pil1Dy9+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715193044;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=co8YhVpiS2u93sCq2Y2snJ8ldSVnZQFxzC5QqTWtcW8=;
-	b=Pil1Dy9+E/usWUdXppmLVyC+3S1OQL5X4nWoAf2BQ32SjzR9ZxdEwNVwUk5b6zvqiBI1B/
-	AW/DTiR+UF9IjiWSew3YGcVE+wJknh14+2YLGZQN9T4wHu6ABeQsfs91uD8+dYzxfMyM42
-	AIg+LdrsbERyFTv7N7UxJdw5fxV9q8w=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-690-kc1v_k0JNoCo06US66xzHQ-1; Wed, 08 May 2024 14:30:41 -0400
-X-MC-Unique: kc1v_k0JNoCo06US66xzHQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D140684B165;
-	Wed,  8 May 2024 18:30:33 +0000 (UTC)
-Received: from t14s.fritz.box (unknown [10.39.192.63])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3EC961005B83;
-	Wed,  8 May 2024 18:30:30 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Thomas Huth <thuth@redhat.com>
-Subject: [PATCH v3 10/10] s390/hugetlb: convert PG_arch_1 code to work on folio->flags
-Date: Wed,  8 May 2024 20:29:55 +0200
-Message-ID: <20240508182955.358628-11-david@redhat.com>
-In-Reply-To: <20240508182955.358628-1-david@redhat.com>
-References: <20240508182955.358628-1-david@redhat.com>
+	s=arc-20240116; t=1715195978; c=relaxed/simple;
+	bh=YIVNY41R8E3i0qyQzpYxu5vSIyMEkNoTli1SIL3s7xg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GOfXZxs2LR10Ylo+ZQ+/U/Bb+nFj1sdtZfbVgl6E6VTBKEDV3QhOEuBFTEwIbHDwacVjeaYkOpNsVe+ON0PRxt0fh73zCC/mHJU+/7CnDkps9AO+Afs+FWWrH8Ugk4At3/jtTcIyMySn/D5Q5gNfi9LwyywMszWpmL9xYJ7lBfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=1/i2io5o; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2db17e8767cso1542081fa.3
+        for <kvm@vger.kernel.org>; Wed, 08 May 2024 12:19:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1715195973; x=1715800773; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=K1uKlYjMTe4xfHBkLhM4fwrAS4H0Wd2FQ2UyNN+YPgM=;
+        b=1/i2io5o+yUAKNufrkNKnrlHRqEG7ucxRXgpH73zSfgZfkeMZg57mnB621KbEn7E9x
+         LB12510yD8FiUHF+NU2xhSjYmUsksbihYzx49T5XdqR/M/9G5V4kHAlKwW5Nvu3nyX7H
+         d+ttaO01uRO8Tm/DNxzWLYiFduch/OirW0ngKcpbTvYm4kHHdbLBQB1igrhdzp/+aJOd
+         72j3FRE7xSsVS6sOkyGs7OYiXlH2dF5eQ8/5nylLlDLjjk3ZCtvMxgCLE5mFqEvk0jzr
+         yjT6PCxfvGN6tUEjZma4DuEwtXYHEzk5AlFVNTBUUhSKOeOMkvHmn5HkQzumj9ef1g0t
+         6tcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715195973; x=1715800773;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K1uKlYjMTe4xfHBkLhM4fwrAS4H0Wd2FQ2UyNN+YPgM=;
+        b=iH/DWe40UixIeV8AmZdfcgyofOBe8kYUvGZkLEt3nLm7y0Kk1wxSs9LVEHXHiL0C+s
+         Z5vD+bId0E2FP5uVLp53qQ6jAqa2lYGzcutN57Yg807gerJ1/aN7BOdfRKSHbLVO5KY/
+         BMcVYfk2YCEjsNBkO7ykAgpcRJqX8N7vxT7EBDBWnaPoqWdrHz5V4Ydaqu83iI4xyIiQ
+         Y7bnpY3H6EPIqV7XRwqFtOZM0uP8nIMEEOtudS6D/2NpK5PqX9XRz9GZhJ77Q2ketj7A
+         //l/0QHfrgfSE8qA9kzoBn2bNuEYEjL2dX0eu17/QYHaI1i1UWtN9mxJn+EIl1NS5YoV
+         Kcbg==
+X-Forwarded-Encrypted: i=1; AJvYcCVUKvpeqcehRpqH0KysDvj+Sy08Yp98l2bYOJF8dF973/WMYE623TdOfCFuG9WgQlI76GMxt8LyqPUCcCg2eLJHbt00
+X-Gm-Message-State: AOJu0Yz/F2r5CZ9kpAJDOE7rAr3fNlKa/sw4QJvRTTfCaeUT6swhff/a
+	XPIp3Lc144HyggY2dXWaJ8UcDXN1g0S2nJoCYBWgJC+ue9d3oYt2Wpgsz4AYfFU=
+X-Google-Smtp-Source: AGHT+IHeP5I15KzeyyHS9QyEylQJKB8BxwDLerdVkeWn4X1OoVdiknVfTODJicHq4kG+uWiKxO6g7A==
+X-Received: by 2002:a2e:81a:0:b0:2e0:12f1:f827 with SMTP id 38308e7fff4ca-2e4479a2ca4mr23591601fa.43.1715195973157;
+        Wed, 08 May 2024 12:19:33 -0700 (PDT)
+Received: from alex-rivos.ba.rivosinc.com (amontpellier-656-1-456-62.w92-145.abo.wanadoo.fr. [92.145.124.62])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41f88110f3esm32622515e9.29.2024.05.08.12.19.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 May 2024 12:19:32 -0700 (PDT)
+From: Alexandre Ghiti <alexghiti@rivosinc.com>
+To: Ryan Roberts <ryan.roberts@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Marco Elver <elver@google.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Andrey Ryabinin <ryabinin.a.a@gmail.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Vincenzo Frascino <vincenzo.frascino@arm.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kasan-dev@googlegroups.com,
+	linux-riscv@lists.infradead.org,
+	linux-efi@vger.kernel.org,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-mm@kvack.org
+Cc: Alexandre Ghiti <alexghiti@rivosinc.com>
+Subject: [PATCH 00/12] Make riscv use THP contpte support for arm64
+Date: Wed,  8 May 2024 21:19:19 +0200
+Message-Id: <20240508191931.46060-1-alexghiti@rivosinc.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,79 +102,64 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Let's make it clearer that we are always working on folio flags and
-never page flags of tail pages by converting remaining PG_arch_1 users
-that modify page->flags to modify folio->flags instead.
+This allows riscv to support napot (riscv equivalent to contpte) THPs by
+moving arm64 contpte support into mm, the previous series [1] only merging
+riscv and arm64 implementations of hugetlbfs contpte.
 
-No functional change intended, because we would always have worked with
-the head page (where page->flags corresponds to folio->flags) and never
-with tail pages.
+riscv contpte specification allows for different contpte sizes, although
+only 64KB is supported for now. So in this patchset is implemented the
+support of multiple contpte sizes, which introduces a few arch specific
+helpers to determine what sizes are supported. Even though only one size
+is supported on riscv, the implementation of the multi size support is to
+show what it will look like when we support other sizes, and make sure
+it does not regress arm64.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/mm/gmap.c        | 4 ++--
- arch/s390/mm/hugetlbpage.c | 8 ++++----
- 2 files changed, 6 insertions(+), 6 deletions(-)
+I tested arm64 using the cow kselftest and a kernel build with 4KB base
+page size and 64KB contpte. riscv was tested with the same tests on *all*
+contpte sizes that fit in the last page table level (support for PMD sizes
+is not present here). Both arch were only tested on qemu.
 
-diff --git a/arch/s390/mm/gmap.c b/arch/s390/mm/gmap.c
-index 797068dccb73..7319be707a98 100644
---- a/arch/s390/mm/gmap.c
-+++ b/arch/s390/mm/gmap.c
-@@ -2733,7 +2733,7 @@ static int __s390_enable_skey_hugetlb(pte_t *pte, unsigned long addr,
- {
- 	pmd_t *pmd = (pmd_t *)pte;
- 	unsigned long start, end;
--	struct page *page = pmd_page(*pmd);
-+	struct folio *folio = page_folio(pmd_page(*pmd));
- 
- 	/*
- 	 * The write check makes sure we do not set a key on shared
-@@ -2748,7 +2748,7 @@ static int __s390_enable_skey_hugetlb(pte_t *pte, unsigned long addr,
- 	start = pmd_val(*pmd) & HPAGE_MASK;
- 	end = start + HPAGE_SIZE - 1;
- 	__storage_key_init_range(start, end);
--	set_bit(PG_arch_1, &page->flags);
-+	set_bit(PG_arch_1, &folio->flags);
- 	cond_resched();
- 	return 0;
- }
-diff --git a/arch/s390/mm/hugetlbpage.c b/arch/s390/mm/hugetlbpage.c
-index c2e8242bd15d..a32047315f9a 100644
---- a/arch/s390/mm/hugetlbpage.c
-+++ b/arch/s390/mm/hugetlbpage.c
-@@ -121,7 +121,7 @@ static inline pte_t __rste_to_pte(unsigned long rste)
- 
- static void clear_huge_pte_skeys(struct mm_struct *mm, unsigned long rste)
- {
--	struct page *page;
-+	struct folio *folio;
- 	unsigned long size, paddr;
- 
- 	if (!mm_uses_skeys(mm) ||
-@@ -129,16 +129,16 @@ static void clear_huge_pte_skeys(struct mm_struct *mm, unsigned long rste)
- 		return;
- 
- 	if ((rste & _REGION_ENTRY_TYPE_MASK) == _REGION_ENTRY_TYPE_R3) {
--		page = pud_page(__pud(rste));
-+		folio = page_folio(pud_page(__pud(rste)));
- 		size = PUD_SIZE;
- 		paddr = rste & PUD_MASK;
- 	} else {
--		page = pmd_page(__pmd(rste));
-+		folio = page_folio(pmd_page(__pmd(rste)));
- 		size = PMD_SIZE;
- 		paddr = rste & PMD_MASK;
- 	}
- 
--	if (!test_and_set_bit(PG_arch_1, &page->flags))
-+	if (!test_and_set_bit(PG_arch_1, &folio->flags))
- 		__storage_key_init_range(paddr, paddr + size - 1);
- }
- 
+Alexandre Ghiti (12):
+  mm, arm64: Rename ARM64_CONTPTE to THP_CONTPTE
+  mm, riscv, arm64: Use common ptep_get() function
+  mm, riscv, arm64: Use common set_ptes() function
+  mm, riscv, arm64: Use common ptep_get_lockless() function
+  mm, riscv, arm64: Use common set_pte() function
+  mm, riscv, arm64: Use common pte_clear() function
+  mm, riscv, arm64: Use common ptep_get_and_clear() function
+  mm, riscv, arm64: Use common ptep_test_and_clear_young() function
+  mm, riscv, arm64: Use common ptep_clear_flush_young() function
+  mm, riscv, arm64: Use common ptep_set_access_flags() function
+  mm, riscv, arm64: Use common ptep_set_wrprotect()/wrprotect_ptes()
+    functions
+  mm, riscv, arm64: Use common
+    get_and_clear_full_ptes()/clear_full_ptes() functions
+
+ arch/arm64/Kconfig               |   9 -
+ arch/arm64/include/asm/pgtable.h | 318 +++++---------
+ arch/arm64/mm/Makefile           |   1 -
+ arch/arm64/mm/contpte.c          | 408 ------------------
+ arch/arm64/mm/hugetlbpage.c      |   6 +-
+ arch/arm64/mm/mmu.c              |   2 +-
+ arch/riscv/include/asm/kfence.h  |   4 +-
+ arch/riscv/include/asm/pgtable.h | 206 +++++++++-
+ arch/riscv/kernel/efi.c          |   4 +-
+ arch/riscv/kernel/hibernate.c    |   2 +-
+ arch/riscv/kvm/mmu.c             |  26 +-
+ arch/riscv/mm/fault.c            |   2 +-
+ arch/riscv/mm/init.c             |   4 +-
+ arch/riscv/mm/kasan_init.c       |  16 +-
+ arch/riscv/mm/pageattr.c         |   8 +-
+ arch/riscv/mm/pgtable.c          |   6 +-
+ include/linux/contpte.h          |  37 ++
+ mm/Kconfig                       |   9 +
+ mm/contpte.c                     | 685 ++++++++++++++++++++++++++++++-
+ 19 files changed, 1056 insertions(+), 697 deletions(-)
+ delete mode 100644 arch/arm64/mm/contpte.c
+ create mode 100644 include/linux/contpte.h
+
 -- 
-2.45.0
+2.39.2
 
 
