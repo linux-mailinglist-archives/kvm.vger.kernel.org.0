@@ -1,241 +1,295 @@
-Return-Path: <kvm+bounces-16952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-16953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E89DA8BF3FE
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 03:20:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED9A68BF4BD
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 04:51:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F915285EA3
-	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 01:20:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 650711F24D6F
+	for <lists+kvm@lfdr.de>; Wed,  8 May 2024 02:51:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EDA8C1D;
-	Wed,  8 May 2024 01:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E50C13AEE;
+	Wed,  8 May 2024 02:51:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d7EkpQut"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YUEZNn0C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AACF8BE7;
-	Wed,  8 May 2024 01:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715131211; cv=fail; b=AmMdW+ieJeoIy+Eq7JhdDUTnF1O61klBw4bKaSKnlrn7jLZoeeNEo4AvaqCnpsID64gYCtRDLfTLO8kp79aZm82PKZWsEque2TR7A5HCvIcR0kz89qQx2rDDaag0QJR2SWwJnEVVh3wuM6LT1x1c88btpzsh0wdDxDzj04P2pBQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715131211; c=relaxed/simple;
-	bh=0p7+7xks8nQLqT1QcNC5M9gO7oSYYxHqC568d8MQSso=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ufQMFw1kxumbKVceVulthEaJULu/B8ESpfGjKjE8Z07VIju87IL5jWAmjqBOujS42y3hyc0kWeJaV8ukS1syUixNiK3H/mgAVfGRJ5Xsfza/beoCmjdqqFTt+8RLQstkzoqiCBqdzRrFODAu4Njxjz/xlfXK/NahdOwrwckYcSQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d7EkpQut; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715131211; x=1746667211;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=0p7+7xks8nQLqT1QcNC5M9gO7oSYYxHqC568d8MQSso=;
-  b=d7EkpQutY68Xo3DenRfxzNJ7q5bMpWk/+K9iziKCVe3KssWrWZvVxdzX
-   BEkLr6GH57kca3vls0w0y27aWSn86X14sC0Qhysa+FOYnIqQ81AhUMXzV
-   y+iq/j5bpgg7cbse4KudGs+9hBO72OgCEv1i8XndGPFFv6IWZ5szqrVQk
-   64JXwF5IgL6ySSnaZUF/85xUW/nnlDCZu+AoED0bkhCbWakftdW+ZQ9Ub
-   /MFAHZgpHa/lpaJdGRIUDagUwpodlbotm2ZDpqu107V2Nz/qwgVjuhX4V
-   Hocb4K5UgDwaeLW61hcsSVAN3tIN4uh8aKD6GICg2qrzDVOgfwbM5jRwV
-   w==;
-X-CSE-ConnectionGUID: zLluhBWVSByNf9KeekUpGQ==
-X-CSE-MsgGUID: d2FFG0JBSGGVqiP2FW3TIA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11066"; a="11120086"
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="11120086"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 May 2024 18:20:10 -0700
-X-CSE-ConnectionGUID: z0fJo1ujS86tpCx/p+YItQ==
-X-CSE-MsgGUID: RPyzJy6/SY6eqX33RkXqoA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,143,1712646000"; 
-   d="scan'208";a="33527433"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 May 2024 18:20:10 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 7 May 2024 18:20:09 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 7 May 2024 18:20:09 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 7 May 2024 18:20:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n8V/VKGaE4W3afREuoAVAR+jFG5YKrveJXzYnvZ3l4HqvToIfCjHJc7eZEicQl0jVI4zl1I3Qctti7Gq30oat+QVHp04sbM8zrVu7F2cSrFie05MEftw0yeQNVvwpDCvbTFWC+lPY0j7bIUj7j/y5VHt0ZXfpfyA1C2f44Gj6ZF3PEjeMZ8jI6h2KFXKXME3KLxXat5BHJcAbv2SOaECF1xeDunsrUy6VQi4wjpGejkU2fRY0PhYdfzkDzC9xKmDHEkNvVh0AFDNcSI3ngr75Vmz+Tohg3USoZ8c87XSZUU6AnJmrRor88vn9UDXQgg93J7ikZsD26WT+zNn+v5u6Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=doilYN7X0x9tFnaeyfV8jnERGiC6NNWd0MNZWN04pMM=;
- b=PDXaQjtqaQjvz53LCVWwcxgiwmgtFCtVPB1lt/I75kLro2M992Sxkmom6NdlYEmnn94NYluhYZi7mPCooWD50V39ddOu4P2g9IT7K0uUFdkYLH/wIa+VK5m7DPvHBP0NIuBd7Ko/xElfwq3cvJcJpCIn+DFvKnfFqMaj1SMj+7KpbyWmlKCC9/ZaJknoba/K8kg4HPT25wIaArbXtg6e4XuOHGzOIm5t+6jaYuSOp/YxRrazaY+Br1O2GtTRxXV8U4DsQFb1BVAWE145bhsStPZjIyq7TNTODwMql+7vaHE4g6WOVvuCmgm+Pbb43wknnz03JMp8KwN3WRGRMIKXUA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com (2603:10b6:510:34::7)
- by PH0PR11MB5127.namprd11.prod.outlook.com (2603:10b6:510:3c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.43; Wed, 8 May
- 2024 01:20:02 +0000
-Received: from PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::36c3:f638:9d28:2cd4]) by PH0PR11MB4965.namprd11.prod.outlook.com
- ([fe80::36c3:f638:9d28:2cd4%6]) with mapi id 15.20.7544.029; Wed, 8 May 2024
- 01:20:02 +0000
-Message-ID: <aa0bd09d-5b9f-4bb9-ad31-061b0244afc8@intel.com>
-Date: Wed, 8 May 2024 09:19:52 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v10 04/27] x86/fpu/xstate: Introduce
- XFEATURE_MASK_KERNEL_DYNAMIC xfeature set
-To: Dave Hansen <dave.hansen@intel.com>, Sean Christopherson
-	<seanjc@google.com>
-CC: <pbonzini@redhat.com>, <x86@kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <peterz@infradead.org>, <chao.gao@intel.com>,
-	<rick.p.edgecombe@intel.com>, <mlevitsk@redhat.com>, <john.allen@amd.com>
-References: <20240219074733.122080-1-weijiang.yang@intel.com>
- <20240219074733.122080-5-weijiang.yang@intel.com>
- <ZjKNxt1Sq71DI0K8@google.com>
- <893ac578-baaf-4f4f-96ee-e012dfc073a8@intel.com>
- <Zjqx8-ZPyB--6Eys@google.com>
- <1159c4e1-dae6-462a-8e34-6f74be4c83b3@intel.com>
-Content-Language: en-US
-From: "Yang, Weijiang" <weijiang.yang@intel.com>
-In-Reply-To: <1159c4e1-dae6-462a-8e34-6f74be4c83b3@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: KL1PR01CA0059.apcprd01.prod.exchangelabs.com
- (2603:1096:820:5::23) To PH0PR11MB4965.namprd11.prod.outlook.com
- (2603:10b6:510:34::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB16714A83
+	for <kvm@vger.kernel.org>; Wed,  8 May 2024 02:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715136700; cv=none; b=Is6znC/fzcG+IZTq4QioLbVIOub/FiBO9dxlpc+GnyqdpKpdwKWAw+kF/dyWm6UeRwRorurQsdBUR7UsGSM0s6i9yTX8ILNM/uyqHtC1LeV3Tj31FGCHyGtcwa4bx/TZdDFE6mRj3BkOaPxVuTlX2MrXUM6tdGE+sXSYzdWjkmE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715136700; c=relaxed/simple;
+	bh=96jLrpnO7xA+Xi8Fl73OQcTWlA1+oomeCJfeSICvHaw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=Urvr/zgK40vgf38iyQ69EMYuHCGOhgjpsFaG0YLbaSyFyt3Mmfa1upX0aT638p/pvhov2mTjZTjTsb8L5mRneI+Cj1yRECOw/fNk5CCELiitFaQ0oszawvq/xXTBLifaRbwI0ckXY0RNFDRw6gr3yo/T9omf54RkoVtkweLn+cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YUEZNn0C; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715136696;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wzghtbwC7fCwhqmIIbZDW0dMUUlzfhLtklhx6OArQF4=;
+	b=YUEZNn0Cy0xl19WtIUNE09paz1tpISK/IIolfdh2wBcdJV4kBuVaHay1ln9ANTbNNQIxLz
+	JmncdqQNJENnOK/m8/lo4xXXccMduiugu36vofiJmv5jtjaz5jnvWFrRaCgRegh40xAmZu
+	k3nesG6VnvVSnybUy3A3zsTzm3WC01E=
+Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
+ [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-12-xKMvX4bQMwueWWmgP033xQ-1; Tue, 07 May 2024 22:51:35 -0400
+X-MC-Unique: xKMvX4bQMwueWWmgP033xQ-1
+Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-1ec3e871624so39775215ad.2
+        for <kvm@vger.kernel.org>; Tue, 07 May 2024 19:51:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715136694; x=1715741494;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wzghtbwC7fCwhqmIIbZDW0dMUUlzfhLtklhx6OArQF4=;
+        b=XSB6FCUdMz+kFiqjSAhepYsyGdzaP5rFjhEnkKqR6QKJMgN1BWRqYoj2zOtLwLlqZP
+         HdA00BfQRJqyTDd1hOGveMHCNFGLgUNU74KyGkTDST5B81Hr1ricYRre/FRY2doEq6mw
+         2nmnEi7LCRR1GCdPLklyfV+/iHycmt5N3ETV1e7MdYg3l3I4KA1YLO2zyETf2CT3TphP
+         JyQ72G5ApB/gBwhXOYFtT6TjLClTHvE5wdf9XiqMH1AQ9IcOx26Ni3cklpqVmwQq81Yp
+         Rnbv7N17DT5J8azGf5hA9iNX5crH+BvpfjFM3bCih9jYdTyjIRAXmUcolr+bzKsje9LX
+         oU3g==
+X-Forwarded-Encrypted: i=1; AJvYcCURkj/7saIkgp4sAblXRmBwJwjl38pNULp+p/In0skfG+bHA0qFSSJkE7S21UPqgcYPgt8+ZYFsjiaEkuUYdGXOPqpf
+X-Gm-Message-State: AOJu0Ywv9nd3m1/fIEfJibmuY9MEVVTMsvjw8I0xXVuQhQhKDs+eX9nk
+	I3hyXserQbb3MVZvSUET4s1vD3XcHo4yKnQdtmr9mc4SF9pIOcxX8DeqGzGHXxU0TDAmo4mWy0u
+	QeXEkT+utecks+yhC3aME6RsUC3jgOHHTQT2KSxQqZw2wcZEmwQ==
+X-Received: by 2002:a17:902:aa8e:b0:1eb:54b7:2724 with SMTP id d9443c01a7336-1eeb0bad67emr12695585ad.64.1715136694195;
+        Tue, 07 May 2024 19:51:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF6dF5z3NTCGB2Np9gpb1pWKKzHfNNQr6EvBR9bVSywVQJlhuuJPHAKfYXvfhKyBw3H22dhnQ==
+X-Received: by 2002:a17:902:aa8e:b0:1eb:54b7:2724 with SMTP id d9443c01a7336-1eeb0bad67emr12695315ad.64.1715136693642;
+        Tue, 07 May 2024 19:51:33 -0700 (PDT)
+Received: from localhost.localdomain ([2804:1b3:a800:4b0a:b7a4:5eb9:b8a9:508d])
+        by smtp.gmail.com with ESMTPSA id c4-20020a170903234400b001eb8fb27b59sm10727134plh.111.2024.05.07.19.51.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 May 2024 19:51:32 -0700 (PDT)
+From: Leonardo Bras <leobras@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Leonardo Bras <leobras@redhat.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rcu@vger.kernel.org
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+Date: Tue,  7 May 2024 23:51:15 -0300
+Message-ID: <Zjroo8OsYcVJLsYO@LeoBras>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <ZjrClk4Lqw_cLO5A@google.com>
+References: <ZgsXRUTj40LmXVS4@google.com> <ZjUwHvyvkM3lj80Q@LeoBras> <ZjVXVc2e_V8NiMy3@google.com> <3b2c222b-9ef7-43e2-8ab3-653a5ee824d4@paulmck-laptop> <ZjprKm5jG3JYsgGB@google.com> <663a659d-3a6f-4bec-a84b-4dd5fd16c3c1@paulmck-laptop> <ZjqWXPFuoYWWcxP3@google.com> <0e239143-65ed-445a-9782-e905527ea572@paulmck-laptop> <Zjq9okodmvkywz82@google.com> <ZjrClk4Lqw_cLO5A@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB4965:EE_|PH0PR11MB5127:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a835eb2-b423-4544-4afb-08dc6efcfc0f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|376005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bnNIWjQ2WWZac1lCaXNPeUR4R1lTU3NGTjdKZzFUd3VpeElnVXd4YUVqcU1m?=
- =?utf-8?B?VUVpU2xCelJwdS85KzNkWENQQzlTNDB4a2pJSDFhVVZFY0I1SGhUUEpIcS9k?=
- =?utf-8?B?ZlU5UFVnVnN6ZHNucC9zMS90WFkwQnRUQnhoV1RPa01nSzhYQ0NwQkp0ajQw?=
- =?utf-8?B?L1h1OEdERmdDM3MzSlhiK3hHd0NHSnZsUFZuOUtXdVRudC9iT2xHMS8wbGFm?=
- =?utf-8?B?a0FBRXd0VlBrL3hoc0hoZGhWWkZHZDNvdzZpUHl2VGtQMHNCQkh4ZUltZ1hC?=
- =?utf-8?B?dzBoOWRXUmZRTUI2YXhQVlIwTEhKdFBWWGxiMWRWdWJGTEFXL1hrc0lTQ3A4?=
- =?utf-8?B?TkdJWmd6SW1ReThlbTQ5alJkZkx3Y2hmSWErL0F3THVaaGFwcEdIaWVUekFo?=
- =?utf-8?B?MXlLZlZ0NDVMWlN6djNqZmlkYi9hZUVNRDdJaFhZeUNOekNLOTFxQW5jZ0FM?=
- =?utf-8?B?S0d4VFpwYm5NeVVYTVM1cU5ZbDBqMG1FbEYyNGxBdHZwNU5FbkQvRFRwWXlv?=
- =?utf-8?B?SFI1elpDS1R5ajZpM3Y1VzBlS0p5alEyM0hMYWhNNmZIOWF2cVVla2pZUlZO?=
- =?utf-8?B?eHBXbmJ1VVB6blhsU29xUlRhNDdBaW80Mi9paWFxQlZiOWNWNXoxcUxOSXhI?=
- =?utf-8?B?N0pMWXZFMG9hWlhtclo2Rm4ySStkL2NoUUFWRjRRRDlneGFjU29vOEtZeGFC?=
- =?utf-8?B?Skl4K3E3ak90SEdUY1VZdUtLWGh0Z2pKZVBuMVM2RGJnOHlHZUlFT2J1RE9S?=
- =?utf-8?B?S2ZVMGkxYTlYM0NzUTJMdkFoR0w5bTZPYUpFUThmTTgwQktCUnVwU2FKOHhG?=
- =?utf-8?B?dUFUelBmNFNGRDI3dFZCbW9mdGIvOXIra2NTS0lpSWRPRFhKekFKYjZaMkty?=
- =?utf-8?B?L09Cd3JIWjVWblFUVzNtaXRzUFRORnM0RkNDcG1yYmlGaGxSajM3VjhzODVi?=
- =?utf-8?B?YVVqMkVPajRLVnhrSUh3cHdOTTE4dlc0UUpKb2JScWdkWldwMksvaUlHM1pE?=
- =?utf-8?B?cDFlR3BMK2xIbnpiUm5LUUpzWlBjRnJzVUZQdGlFZFRQZ0Yzc2MvakRNcGhh?=
- =?utf-8?B?MUdTT1RYVEp1VUJuem9pVGtzbVA1VGNDZEVCc0VrN1ZYRmk3cDh3WEJicElH?=
- =?utf-8?B?aHRhakwyUUxQM3RRc3VWOFJJRStMYW1SQ2hJbTZ1blFnV2psYjkySDVoM0xW?=
- =?utf-8?B?eXA4amtXODJ1U0REcVhVTUVmNm44dERnaTNwaTdhcUxHSjRmUHhiT0x1QSt6?=
- =?utf-8?B?QXJmY3F4K21tRTU5dlB6Y09abmhnbXY3ejV2cGs2OCs5MDlwNjgxUTNpL3F4?=
- =?utf-8?B?cUNkdFJxRk5DOXhPZ28wUjZkS0c4ajFmeTJTWWl4WHdKUmkwUFdiNFQyVVNk?=
- =?utf-8?B?Ylc5MWZnMUsvUjRUeFkweW11QjYxWHBvNzdCK1F3VXNaVk5NRXpmK1BqWUwz?=
- =?utf-8?B?MUNWSHVHM3RyUE1qVE5sRUJ4VXVDbmhkcmhEb2xxR1pBTERLdDZPaVV1dUdV?=
- =?utf-8?B?bUN4MmZDTkJjSVJyaEdKWnFXNytrbTdIWnZsWDU3a1VtSXVxRGMxL1JyeDRP?=
- =?utf-8?B?Y1cvMEx4NTJ0UGtrYzh6QkhvMXQrRTlkbEpBMnRoN2J4ejNHL28vUGRVNThh?=
- =?utf-8?B?S3RuaUREY0FWb3UwTkxoQzNCOFNtOUVNeTlsT1VOaU9BRWRYUWd2ejh3alF0?=
- =?utf-8?B?bDlWZE5DSGZnRkdsanNYTFBGMys3QURLbHl3ZlBhZmFOR0pRMHlmNlN3PT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB4965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?T1NycFg5MGV6NEhWV3BxWW1ZQ290MURPL2IwdCsyK2hYS21obXY1Z0lXVGoy?=
- =?utf-8?B?MG8rS0FUcDB3WVZwbFFXQjBhWFJhSXBsd0xORGJIRmIrM2ZnVVU0R0lLSzhR?=
- =?utf-8?B?ZEExc2NJd1ZVRDNuRytoYldvSkw4T3FPemt4VUpHd040VVhaeFBMcVVzQVNZ?=
- =?utf-8?B?eS8vWkJWc0ptUzgrdjNNenNZNTg2ampMZGsyTXUzeWVvRzBydXJOQ3ozMTky?=
- =?utf-8?B?V05TRVNpUXBHNXVtS3REUnFaeW13eStMTzN1R3NNZE1wWVEvdERWMUNSZ0lv?=
- =?utf-8?B?OXBwWnhnTlY5TUtXS3hzZ0NaMFJDOWtVNUFJdUM2NzJjL3NYcmlWN2RKRE44?=
- =?utf-8?B?dk9qdS91TG55QW5WYmJQT3A0NnJGL0IwS05JYjYvZWZyWkptRTBqMGVxVkdW?=
- =?utf-8?B?S2c1V1VsS1pRdXliaEtId25JU1BVL3JFakVOTEZiVkYrc1d6RXJaZnF3UDNx?=
- =?utf-8?B?eTBnVGwxZ2dldlVzZEpYNE8vUGRCaTFpU2VhckJUbEdvclJNTEV6V0NyQ1BB?=
- =?utf-8?B?SUJyek42WGZ1b0RPdG9UTVZ5Qk9zK0FGSVBKSG9ZZzRvWmM1cnllS0VrNmhQ?=
- =?utf-8?B?MVBKM1VjekxkQlJ5SitNN2szWWZwUWxnVDltaVp2dXFXMS9YT2ZSM3IwVzhX?=
- =?utf-8?B?bE5nYnRKSTdrVG1ZMWRudkpRN2ZhUjVqcW56Q0VGcGRYSDNOcUJOaFZWdzdZ?=
- =?utf-8?B?SzAvbko0eW0vb09PVzFRQ0ttZmJYMTJwSEh0WkErZDl6UHdxRFNWNWVhaWMz?=
- =?utf-8?B?YyswWUZoT1Y0SFp3V3NzbmY0VXNKcnZKQjdYWEZCQWwxTzBSSUREeUFTTmZu?=
- =?utf-8?B?WmtYUXNoWXJJalVuWkNCdHE5YW90YWd5Z1lOM2VHUTRMQXArd0lkM29rLzVX?=
- =?utf-8?B?ZjRBRUlOUkJiTUFSWlhEUjI4bUxKZ2N1Zk1KRm9wNFhaTDc3ZkR4aWhOUW42?=
- =?utf-8?B?SllUR2Y4cFZsTUdSbXhNTms1QTRSWnpWUkprTjlZcGVNeGdWaGFBcmxKckl6?=
- =?utf-8?B?ZHRWa0JJY1RubmJHVmJ2bWpOV0lZa1daSXNlOFlWNityRUs5aU50L0prcFda?=
- =?utf-8?B?Q1RMREp6OXBpOUNjVXFvUGRJNE5YZVFGY1R1a003cXdSbmJGaW5jTGU1NjJN?=
- =?utf-8?B?UElTME5FTmF2TmJMVHhwam5Kem5McWgzRmI2ZWxiZGRpY29NYXZydFYyYWly?=
- =?utf-8?B?ckV1YmFlOGxDaXRYdW1sUmQzcnlIVzAvZEc2VFpxOUVqdFRUS0I2RGtZYWky?=
- =?utf-8?B?TkRwblN2MEhmeUZBRTAvejhYbVdSa0IzUlduRHpGd2IzRUV0bjMzRkRrRlU0?=
- =?utf-8?B?TW5VOWRVVzBuNC9McmdNT2UwSzdqcDlhK0RlSzBXSk16bEtkQkhicXFZQWlv?=
- =?utf-8?B?Mm9HUHVWUktuTUxWOHRQcGcxMzAyWGsvMllGWkNWcEJDU3c4WXh1SGwxbzB3?=
- =?utf-8?B?cFNhWU9ITkZKeE9mS2poclRGWUtKRXdLWDFWTkNlL3JCVXdWSEdJd2g3U1pv?=
- =?utf-8?B?UGh1dmdkNTB2RUI2S3AyQ3cxR1ZUQXQyVVh6U2FpVlkzV3lLamlQdDNocHJa?=
- =?utf-8?B?d0JmVEVWZ0MvSkZzbXRIWWJZRzJ6RUNIU29XYXBuTmk1RWhHZGMzanBQdmZJ?=
- =?utf-8?B?UUVqYm1UUzF6RkNRZGFudDhnLzNpeDk5MmtrY3Npa2RPOFIxTHdLMUpaUFJP?=
- =?utf-8?B?VmhYczllWUVmOXNDc2l5SW9HdDJVeC9HUmlmTjE5VnhILzlNcGZ1TjZ4NFZB?=
- =?utf-8?B?bUVvWloxOENEdDFlWTg0bE9mMGs1RklIK1A1blZ2alIyYkV2ZTFKNTFjOG5k?=
- =?utf-8?B?UFdFSTZqbk8xaGFVUUoxOStCVnJINVFTSW5YSG5ZQjYyeXZLK1U2K25GN0hL?=
- =?utf-8?B?b3V3ZXlXOW14UGh3RjVnQ0dGTmY1MlhzbURHV3hzWG1pcVAxRDJTejE1ZE9Y?=
- =?utf-8?B?YWM3SG96ZEtnQWg2VU85RW5nL2ZOSjRNTm1haktLN3JpaW5pWnB0dUUrYXFF?=
- =?utf-8?B?ZitObFJpaDhJT3pTdDVPc0Y0SllFV2RQWldqVjdvM09GdTRieUludjg1czJw?=
- =?utf-8?B?TnAxV25sNFV5dnF6RE9YRWxEL2xBWEZQMlNiQ2xxY0d0cC82eXVTQUl5MG43?=
- =?utf-8?B?LzR5OE1GRWswOG5CVmZTR1UrbHNtaklsdlJNb0p4eTd5SDVFMXB2em1PN2lw?=
- =?utf-8?B?dHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a835eb2-b423-4544-4afb-08dc6efcfc0f
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB4965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 May 2024 01:20:02.4173
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fmqAXAK1QvOL7OI+4FMDzWBafmFd7L0VNse+KS9kOdyOLfjaBskqlYelY61efsSHfkbLP9xfUj0E2DnJf6WBVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5127
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On 5/8/2024 7:17 AM, Dave Hansen wrote:
-> On 5/7/24 15:57, Sean Christopherson wrote:
+On Tue, May 07, 2024 at 05:08:54PM -0700, Sean Christopherson wrote:
+> On Tue, May 07, 2024, Sean Christopherson wrote:
+> > On Tue, May 07, 2024, Paul E. McKenney wrote:
+> > > On Tue, May 07, 2024 at 02:00:12PM -0700, Sean Christopherson wrote:
+> > > > On Tue, May 07, 2024, Paul E. McKenney wrote:
+> > > > > On Tue, May 07, 2024 at 10:55:54AM -0700, Sean Christopherson wrote:
+> > > > > > On Fri, May 03, 2024, Paul E. McKenney wrote:
+> > > > > > > On Fri, May 03, 2024 at 02:29:57PM -0700, Sean Christopherson wrote:
+> > > > > > > > So if we're comfortable relying on the 1 second timeout to guard against a
+> > > > > > > > misbehaving userspace, IMO we might as well fully rely on that guardrail.  I.e.
+> > > > > > > > add a generic PF_xxx flag (or whatever flag location is most appropriate) to let
+> > > > > > > > userspace communicate to the kernel that it's a real-time task that spends the
+> > > > > > > > overwhelming majority of its time in userspace or guest context, i.e. should be
+> > > > > > > > given extra leniency with respect to rcuc if the task happens to be interrupted
+> > > > > > > > while it's in kernel context.
+> > > > > > > 
+> > > > > > > But if the task is executing in host kernel context for quite some time,
+> > > > > > > then the host kernel's RCU really does need to take evasive action.
+> > > > > > 
+> > > > > > Agreed, but what I'm saying is that RCU already has the mechanism to do so in the
+> > > > > > form of the 1 second timeout.
+> > > > > 
+> > > > > Plus RCU will force-enable that CPU's scheduler-clock tick after about
+> > > > > ten milliseconds of that CPU not being in a quiescent state, with
+> > > > > the time varying depending on the value of HZ and the number of CPUs.
+> > > > > After about ten seconds (halfway to the RCU CPU stall warning), it will
+> > > > > resched_cpu() that CPU every few milliseconds.
+> > > > > 
+> > > > > > And while KVM does not guarantee that it will immediately resume the guest after
+> > > > > > servicing the IRQ, neither does the existing userspace logic.  E.g. I don't see
+> > > > > > anything that would prevent the kernel from preempting the interrupt task.
+> > > > > 
+> > > > > Similarly, the hypervisor could preempt a guest OS's RCU read-side
+> > > > > critical section or its preempt_disable() code.
+> > > > > 
+> > > > > Or am I missing your point?
+> > > > 
+> > > > I think you're missing my point?  I'm talking specifically about host RCU, what
+> > > > is or isn't happening in the guest is completely out of scope.
+> > > 
+> > > Ah, I was thinking of nested virtualization.
+> > > 
+> > > > My overarching point is that the existing @user check in rcu_pending() is optimistic,
+> > > > in the sense that the CPU is _likely_ to quickly enter a quiescent state if @user
+> > > > is true, but it's not 100% guaranteed.  And because it's not guaranteed, RCU has
+> > > > the aforementioned guardrails.
+> > > 
+> > > You lost me on this one.
+> > > 
+> > > The "user" argument to rcu_pending() comes from the context saved at
+> > > the time of the scheduling-clock interrupt.  In other words, the CPU
+> > > really was executing in user mode (which is an RCU quiescent state)
+> > > when the interrupt arrived.
+> > > 
+> > > And that suffices, 100% guaranteed.
+> > 
+> > Ooh, that's where I'm off in the weeds.  I was viewing @user as "this CPU will be
+> > quiescent", but it really means "this CPU _was_ quiescent".
+> 
+> Hrm, I'm still confused though.  That's rock solid for this check:
+> 
+> 	/* Is the RCU core waiting for a quiescent state from this CPU? */
+> 
+> But I don't understand how it plays into the next three checks that can result in
+> rcuc being awakened.  I suspect it's these checks that Leo and Marcelo are trying
+> squash, and these _do_ seem like they are NOT 100% guaranteed by the @user check.
+> 
+> 	/* Does this CPU have callbacks ready to invoke? */
+> 	/* Has RCU gone idle with this CPU needing another grace period? */
+> 	/* Have RCU grace period completed or started?  */
+> 
+> > > The reason that it suffices is that other RCU code such as rcu_qs() and
+> > > rcu_note_context_switch() ensure that this CPU does not pay attention to
+> > > the user-argument-induced quiescent state unless this CPU had previously
+> > > acknowledged the current grace period.
+> > > 
+> > > And if the CPU has previously acknowledged the current grace period, that
+> > > acknowledgement must have preceded the interrupt from user-mode execution.
+> > > Thus the prior quiescent state represented by that user-mode execution
+> > > applies to that previously acknowledged grace period.
+> > 
+> > To confirm my own understanding: 
+> > 
+> >   1. Acknowledging the current grace period means any future rcu_read_lock() on
+> >      the CPU will be accounted to the next grace period.
+> > 
+> >   2. A CPU can acknowledge a grace period without being quiescent.
+> > 
+> >   3. Userspace can't acknowledge a grace period, because it doesn't run kernel
+> >      code (stating the obvious).
+> > 
+> >   4. All RCU read-side critical sections must complete before exiting to usersepace.
+> > 
+> > And so if an IRQ interrupts userspace, and the CPU previously acknowledged grace
+> > period N, RCU can infer that grace period N elapsed on the CPU, because all
+> > "locks" held on grace period N are guaranteed to have been dropped.
+> > 
+> > > This is admittedly a bit indirect, but then again this is Linux-kernel
+> > > RCU that we are talking about.
+> > > 
+> > > > And I'm arguing that, since the @user check isn't bombproof, there's no reason to
+> > > > try to harden against every possible edge case in an equivalent @guest check,
+> > > > because it's unnecessary for kernel safety, thanks to the guardrails.
+> > > 
+> > > And the same argument above would also apply to an equivalent check for
+> > > execution in guest mode at the time of the interrupt.
+> > 
+> > This is partly why I was off in the weeds.  KVM cannot guarantee that the
+> > interrupt that leads to rcu_pending() actually interrupted the guest.  And the
+> > original patch didn't help at all, because a time-based check doesn't come
+> > remotely close to the guarantees that the @user check provides.
+> > 
+> > > Please understand that I am not saying that we absolutely need an
+> > > additional check (you tell me!).
+> > 
+> > Heh, I don't think I'm qualified to answer that question, at least not yet.
+> > 
+> > > But if we do need RCU to be more aggressive about treating guest execution as
+> > > an RCU quiescent state within the host, that additional check would be an
+> > > excellent way of making that happen.
+> > 
+> > It's not clear to me that being more agressive is warranted.  If my understanding
+> > of the existing @user check is correct, we _could_ achieve similar functionality
+> > for vCPU tasks by defining a rule that KVM must never enter an RCU critical section
+> > with PF_VCPU set and IRQs enabled, and then rcu_pending() could check PF_VCPU.
+> > On x86, this would be relatively straightforward (hack-a-patch below), but I've
+> > no idea what it would look like on other architectures.
+> > 
+> > But the value added isn't entirely clear to me, probably because I'm still missing
+> > something.  KVM will have *very* recently called __ct_user_exit(CONTEXT_GUEST) to
+> > note the transition from guest to host kernel.  Why isn't that a sufficient hook
+> > for RCU to infer grace period completion?
 
-[...]
+This is one of the solutions I tested when I was trying to solve the bug:
+- Report quiescent state both in guest entry & guest exit.
 
->> My one request would be to change the WARN in os_xsave() to fire on CET_KERNEL,
->> not KERNEL_DYNAMIC, because it's specifically CET_KERNEL that is guest-only.
->> Future dynamic xfeatures could be guest-only, but they could also be dynamic for
->> some completely different reason.  That was my other hang-up with "DYNAMIC";
->> as-is, os_xsave() implies that it really truly is GUEST_ONLY.
->>
->> diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
->> index 83ebf1e1cbb4..2a1ff49ccfd5 100644
->> --- a/arch/x86/kernel/fpu/xstate.h
->> +++ b/arch/x86/kernel/fpu/xstate.h
->> @@ -185,8 +185,7 @@ static inline void os_xsave(struct fpstate *fpstate)
->>          WARN_ON_FPU(!alternatives_patched);
->>          xfd_validate_state(fpstate, mask, false);
->>   
->> -       WARN_ON_FPU(!fpstate->is_guest &&
->> -                   (mask & XFEATURE_MASK_KERNEL_DYNAMIC));
->> +       WARN_ON_FPU(!fpstate->is_guest && (mask & XFEATURE_MASK_CET_KERNEL));
->>   
->>          XSTATE_XSAVE(&fpstate->regs.xsave, lmask, hmask, err);
-> Yeah, that would make a lot of sense.  We could add a more generic
-> #define for it later if another feature gets added like this.
+It improves the bug, but has 2 issues compared to the timing alternative:
+1 - Saving jiffies to a per-cpu local variable is usually cheaper than 
+    reporting a quiescent state
+2 - If we report it on guest_exit() and some other cpu requests a grace 
+    period in the next few cpu cycles, there is chance a timer interrupt 
+    can trigger rcu_core() before the next guest_entry, which would 
+    introduce unnecessary latency, and cause be the issue we are trying to 
+    fix.
 
-Thank you for getting alignment! I will change the code accordingly.
+I mean, it makes the bug reproduce less, but do not fix it.
 
+Thx,
+Leo
+
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 1a9e1e0c9f49..259b60adaad7 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -11301,6 +11301,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> >         if (vcpu->arch.guest_fpu.xfd_err)
+> >                 wrmsrl(MSR_IA32_XFD_ERR, 0);
+> >  
+> > +       RCU_LOCKDEP_WARN(lock_is_held(&rcu_bh_lock_map) ||
+> > +                        lock_is_held(&rcu_lock_map) ||
+> > +                        lock_is_held(&rcu_sched_lock_map),
+> > +                        "KVM in RCU read-side critical section with PF_VCPU set and IRQs enabled");
+> > +
+> >         /*
+> >          * Consume any pending interrupts, including the possible source of
+> >          * VM-Exit on SVM and any ticks that occur between VM-Exit and now.
+> > diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+> > index b2bccfd37c38..cdb815105de4 100644
+> > --- a/kernel/rcu/tree.c
+> > +++ b/kernel/rcu/tree.c
+> > @@ -3929,7 +3929,8 @@ static int rcu_pending(int user)
+> >                 return 1;
+> >  
+> >         /* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
+> > -       if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
+> > +       if ((user || rcu_is_cpu_rrupt_from_idle() || (current->flags & PF_VCPU)) &&
+> > +           rcu_nohz_full_cpu())
+> >                 return 0;
+> >  
+> >         /* Is the RCU core waiting for a quiescent state from this CPU? */
+> > 
+> > 
+> 
 
 
