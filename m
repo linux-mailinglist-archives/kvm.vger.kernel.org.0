@@ -1,137 +1,156 @@
-Return-Path: <kvm+bounces-17126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA3788C1212
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 17:38:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2653B8C130E
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 18:36:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7D6E1C21263
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 15:38:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B98131F219AD
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 16:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CA816F27F;
-	Thu,  9 May 2024 15:38:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C625E8F49;
+	Thu,  9 May 2024 16:36:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b="l2NteKRJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P2Q8Qnnu"
 X-Original-To: kvm@vger.kernel.org
-Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A3D12A179;
-	Thu,  9 May 2024 15:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.40.148.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BA654A2D
+	for <kvm@vger.kernel.org>; Thu,  9 May 2024 16:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715269098; cv=none; b=bjKAKIF4sqhNBqX7LcZ1pa0gDg+By3Gxn7o4zGFWMVSP54LKhXYodt4W5Nv5Swrdj5DLGjJKX8RxcYhi5IreXTBXKfrqrd5kZXq6VOfZwePTE242dIXuu5fDa0RaFatR74VrFnzLZIKikL2yNdEuPzi2bkhqQYHijeBpZ1Yngxk=
+	t=1715272563; cv=none; b=OAmdVtZhnQmtTUIsS7Ro4FumYTBSHlCvAsaWSVlcTBG/A54vBx7JTbLrJ8+zE+s6KB5PaQWRwwshAHrUl67VbzSy9MJq7cMuaSbJJbWflrlEGNLtRtcOcqljKrSXJbVmtbfglbT3kZ+Tjg4VMKGHmZdRtgXnns/tV64c3JdGRmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715269098; c=relaxed/simple;
-	bh=nANHlT8bQuzaSmFK3lwpS7Cj4BPy1dbSvsaWfROiQuQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LNgFo3//ZuQ+/JuGMqaZYmjWuRg27I/wXvE5PIA3Sepsy0skYgK3NNJfSbMmuFoZ8jqhhYEUIIR9Vghr1mImk0FsqGd2XmK+45AyezDZI6A2Ps+FYM8c7gesAj3gqBsoL5nLKDycdX9QpRv7yLoHhCYKFCjrhkwHYMhFxTarKLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk; spf=pass smtp.mailfrom=codethink.co.uk; dkim=pass (2048-bit key) header.d=codethink.co.uk header.i=@codethink.co.uk header.b=l2NteKRJ; arc=none smtp.client-ip=78.40.148.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=codethink.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codethink.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=codethink.co.uk; s=imap5-20230908; h=Sender:Content-Transfer-Encoding:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=50SVXh7j8YqDqiQBc6TkcGnGUn+l90zrT0o1BlM2Ags=; b=l2NteKRJVsFxAzIoByojnt/Vfu
-	qGc+PJQHO+cCUCM6K4zGy6fOQD5KE+qffxitaRdbqmKL5FVtNuvHqa1CUlzu9Dd2/QgtUgGQfmXdD
-	6HHEkXyCZ8e1zJVkxBx6tUYdJdsjIJTQF2XY+fNNcCHzSwtscyCuT9OFRzvQLn0X+KnpYwRmybtAi
-	mu/DURR1YvT4emFjagxsU1an1mnNDGaEOR3m4AN++mm/crvPkK3CcqbYwLReek35RrX8ONz0XZ004
-	PS2E0AmL6FxHEC1zYtrUPgjkl4gidrmvmNdZ2riFTfsxHbbSFHd0eRchxnv9/V+oH5owo6jzDCxCJ
-	EkdfNMQQ==;
-Received: from [167.98.27.226] (helo=ct-lt-2504.office.codethink.co.uk)
-	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-	id 1s55qI-000cg5-FA; Thu, 09 May 2024 16:37:59 +0100
-From: Ivan Orlov <ivan.orlov@codethink.co.uk>
-To: pbonzini@redhat.com,
-	shuah@kernel.org
-Cc: Ivan Orlov <ivan.orlov@codethink.co.uk>,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: selftests: Check API version when creating VM
-Date: Thu,  9 May 2024 16:37:57 +0100
-Message-Id: <20240509153757.42032-1-ivan.orlov@codethink.co.uk>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1715272563; c=relaxed/simple;
+	bh=87bp7rOhrqwnSubPXK+LN1e3D61Ah/S325tsXWPIZGE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sLREBXvbEh/k+g2csJRq66zDkCNc3VnevVocKDR92Q2x9SrkEZmnRYDG3llYD1vweDJUZEKfDmBwPtmhxmhgS8zJ08IQdPK48IAlVYLd/kkZ0sk4R2eJa3FCWNdKkT7+FJXSPKbaUSLmCzO7SGPrA8WjSkJ/KbmMOGfmXjCJxhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P2Q8Qnnu; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de603db5d6aso1805875276.2
+        for <kvm@vger.kernel.org>; Thu, 09 May 2024 09:36:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715272559; x=1715877359; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Iw2S8aMsSqYdON9wuYedcQx5DOc1DfHVFQCMk+J37cE=;
+        b=P2Q8Qnnu11sEtRxdK42sxv/06HpQkOBMUqsUp75z66uULW6Nj4T5UXjckP9Szpg6gY
+         9r/dfsd+f4GsChJEASbx6tyG90VmVrtf042F2utitlq0kAhJ0aLIdSlfiAje0fN9Eo6K
+         DL4mTvU8f6+DBU1U/Qf20vzUKKScZX4UHTehJaXlkut9lVYn+S9LHITP1QLut16LaH0L
+         WK3j/csGfIZdCUSBgQ3NtDQoFt+MqiiCUrg/+BU+tzgvTtE5A+gwSVanVpQ9k+mudRnK
+         qetZLQ0K0vT3WsnpK0s68i+W2Ah8NeyJfOuY0OkEztQtjMONG16ty8Gh82MZ5N4MSDbe
+         yyJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715272559; x=1715877359;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Iw2S8aMsSqYdON9wuYedcQx5DOc1DfHVFQCMk+J37cE=;
+        b=QlmZ1lVi+G35nZDI4euYbiskLEPozTSoJuxwW+IFmPI++SZRY0rET266SFfKv7sY0M
+         bSItORHdvEqRbmABNzDNp/quLOAHQC0QD2/t2rPGOadQ7jXJ4FrfXrU3Hv/vIY3KDuNp
+         sWYdCiWFaYfwsSG+kpHkpNJlI8CgM1j1HCBaR8+KlnuyKWQGOwA9oyDWpsXMxh9IyeCw
+         LrFjZSZzrLEFiSBlBuwFq7gkrgLybFkcDsFp5Rsz+o3QR6NO0BTne7QY6NPXzRnU8P6R
+         apfJe2fFnSa0qNb51x6H0xSg8fuj1lC5ozVtFxVG1KLBBVDYBxA4g+2n36wvjbBsajRr
+         wcsQ==
+X-Gm-Message-State: AOJu0Yzmk72Wn7wrbgjkRe7N/1mBjAAQIa0M7i8IhHGYZ/ltB2eI4HhU
+	YVAa0BQ+2CZprOVgF3UzA1mpw9Yj5//a6gIMkANI9jdT4cyyeArjoUjVK6HDect6+B5P6iFUBn8
+	Ycw==
+X-Google-Smtp-Source: AGHT+IFoKoT4p2eM5fgOn661sHqE65PS3MBIpAxxHcbHhckzhgqXx+gWzNwUX4idLZLXJC6IJ3QKfsk8log=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1002:b0:de5:9f2c:c17c with SMTP id
+ 3f1490d57ef6-dee4f37bbfbmr7282276.9.1715272559399; Thu, 09 May 2024 09:35:59
+ -0700 (PDT)
+Date: Thu, 9 May 2024 09:35:57 -0700
+In-Reply-To: <9bd868a287599eb2a854f6983f13b4500f47d2ae.1708933498.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: ivan.orlov@codethink.co.uk
+Mime-Version: 1.0
+References: <cover.1708933498.git.isaku.yamahata@intel.com> <9bd868a287599eb2a854f6983f13b4500f47d2ae.1708933498.git.isaku.yamahata@intel.com>
+Message-ID: <Zjz7bRcIpe8nL0Gs@google.com>
+Subject: Re: [PATCH v19 037/130] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend specific
+From: Sean Christopherson <seanjc@google.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, 
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
+	hang.yuan@intel.com, tina.zhang@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-As it is said in the docs, we should always check the KVM API version
-before running the KVM-based applications. Add the function which
-queries the current KVM API version through `ioctl` to the `kvm_util.c`
-file.
+On Mon, Feb 26, 2024, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> TDX has its own limitation on the maximum number of vcpus that the guest
+> can accommodate.  Allow x86 kvm backend to implement its own KVM_ENABLE_CAP
+> handler and implement TDX backend for KVM_CAP_MAX_VCPUS.  user space VMM,
+> e.g. qemu, can specify its value instead of KVM_MAX_VCPUS.
+> 
+> When creating TD (TDH.MNG.INIT), the maximum number of vcpu needs to be
+> specified as struct td_params_struct.  and the value is a part of
+> measurement.  The user space has to specify the value somehow.  There are
+> two options for it.
+> option 1. API (Set KVM_CAP_MAX_VCPU) to specify the value (this patch)
 
-Add a new TEST_REQUIRE statement to the `vm_open` function in order
-to verify the version of the KVM API before creating a VM.
+When I suggested adding a capability[*], the intent was for the capability to
+be generic, not buried in TDX code.  I can't think of any reason why this can't
+be supported for all VMs on all architectures.  The only wrinkle is that it'll
+require a separate capability since userspace needs to be able to detect that
+KVM supports restricting the number of vCPUs, but that'll still be _less_ code.
 
-Signed-off-by: Ivan Orlov <ivan.orlov@codethink.co.uk>
----
- .../testing/selftests/kvm/include/kvm_util_base.h  |  2 ++
- tools/testing/selftests/kvm/lib/kvm_util.c         | 14 ++++++++++++++
- 2 files changed, 16 insertions(+)
+[*] https://lore.kernel.org/all/YZVsnZ8e7cXls2P2@google.com
 
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index 3e0db283a46a..d7a83387ae33 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -38,6 +38,7 @@
- #define kvm_static_assert(expr, ...) __kvm_static_assert(expr, ##__VA_ARGS__, #expr)
+> +static int vt_max_vcpus(struct kvm *kvm)
+> +{
+> +	if (!kvm)
+> +		return KVM_MAX_VCPUS;
+> +
+> +	if (is_td(kvm))
+> +		return min(kvm->max_vcpus, TDX_MAX_VCPUS);
+> +
+> +	return kvm->max_vcpus;
+
+This is _completely_ orthogonal to allowing userspace to restrict the maximum
+number of vCPUs.  And unless I'm missing something, it's also ridiculous and
+unnecessary at this time.  KVM x86 limits KVM_MAX_VCPUS to 4096:
+
+  config KVM_MAX_NR_VCPUS
+	int "Maximum number of vCPUs per KVM guest"
+	depends on KVM
+	range 1024 4096
+	default 4096 if MAXSMP
+	default 1024
+	help
+
+whereas the limitation from TDX is apprarently simply due to TD_PARAMS taking
+a 16-bit unsigned value:
+
+  #define TDX_MAX_VCPUS  (~(u16)0)
+
+i.e. it will likely be _years_ before TDX's limitation matters, if it ever does.
+And _if_ it becomes a problem, we don't necessarily need to have a different
+_runtime_ limit for TDX, e.g. TDX support could be conditioned on KVM_MAX_NR_VCPUS
+being <= 64k.
+
+So rather than add a bunch of pointless plumbing, just throw in
+
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 137d08da43c3..018d5b9eb93d 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -2488,6 +2488,9 @@ static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
+                return -EOPNOTSUPP;
+        }
  
- #define KVM_DEV_PATH "/dev/kvm"
-+#define KVM_DEFAULT_API_VERSION 12
- #define KVM_MAX_VCPUS 512
- 
- #define NSEC_PER_SEC 1000000000L
-@@ -275,6 +276,7 @@ int get_kvm_intel_param_integer(const char *param);
- int get_kvm_amd_param_integer(const char *param);
- 
- unsigned int kvm_check_cap(long cap);
-+int kvm_get_api_version(void);
- 
- static inline bool kvm_has_cap(long cap)
- {
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index b2262b5fad9e..58a5deccb388 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -176,6 +176,19 @@ unsigned int kvm_check_cap(long cap)
- 	return (unsigned int)ret;
- }
- 
-+int kvm_get_api_version(void)
-+{
-+	int ret;
-+	int kvm_fd;
++       BUILD_BUG_ON(CONFIG_KVM_MAX_NR_VCPUS <
++                    sizeof(td_params->max_vcpus) * BITS_PER_BYTE);
 +
-+	kvm_fd = open_kvm_dev_path_or_exit();
-+	ret = __kvm_ioctl(kvm_fd, KVM_GET_API_VERSION, NULL);
-+
-+	close(kvm_fd);
-+
-+	return ret;
-+}
-+
- void vm_enable_dirty_ring(struct kvm_vm *vm, uint32_t ring_size)
- {
- 	if (vm_check_cap(vm, KVM_CAP_DIRTY_LOG_RING_ACQ_REL))
-@@ -190,6 +203,7 @@ static void vm_open(struct kvm_vm *vm)
- 	vm->kvm_fd = _open_kvm_dev_path_or_exit(O_RDWR);
- 
- 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_IMMEDIATE_EXIT));
-+	TEST_REQUIRE(kvm_get_api_version() == KVM_DEFAULT_API_VERSION);
- 
- 	vm->fd = __kvm_ioctl(vm->kvm_fd, KVM_CREATE_VM, (void *)vm->type);
- 	TEST_ASSERT(vm->fd >= 0, KVM_IOCTL_ERROR(KVM_CREATE_VM, vm->fd));
--- 
-2.34.1
+        td_params->max_vcpus = kvm->max_vcpus;
+        td_params->attributes = init_vm->attributes;
+        /* td_params->exec_controls = TDX_CONTROL_FLAG_NO_RBP_MOD; */
 
 
