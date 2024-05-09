@@ -1,152 +1,136 @@
-Return-Path: <kvm+bounces-17124-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17125-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF5B58C1197
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 16:59:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A454E8C119E
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 17:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABA06283DBF
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 14:59:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33E641F221B4
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 15:05:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF7D15278F;
-	Thu,  9 May 2024 14:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BE01581E1;
+	Thu,  9 May 2024 15:05:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NDnw5hW4"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mAnfqiCx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777763F8E2
-	for <kvm@vger.kernel.org>; Thu,  9 May 2024 14:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC6439AC9;
+	Thu,  9 May 2024 15:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715266769; cv=none; b=KaNqe6M0EreddKJvJi55LA5zjhu+iw3/h0AxDMYZsfeSEVzlg/4Mp/gLWMevS0F4c0zaOsTBw5DHkq8apG/J436p+vFFZow09KATXGhK5KYZQ1fK9hWLXsOSkYONH4UHQ8r/N1I48IgQWovIlB1H20GRSqi4Oju5ZLuD3eHEv30=
+	t=1715267125; cv=none; b=PGdFz+oSlJyLZN3E2+G62oZm/EOuX2i5aLp+haZjnIVDfmrVs9qJPdD53ZnR1O9dLA5lCnaSaJ7x5cXij5TsfRMqTyKzjXgCYxUVGJLCh28wHwCQFOdLVyFd0haCJLibl6VcjnmTlNTuSULQ2mpGmP+PrUdrsmMClIDBXBgXzBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715266769; c=relaxed/simple;
-	bh=tCD+L+VvuerRjgMAiszpRPFFSvc4JDjxToq8q+1CXO0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WlKz6j/CjQzlmPzhU6Ree0katFU6AnPZMwk1J8wyExpyK4wbrTRck2jQVN5hDH1uvuHrS2x2tWG+Lv1kO6wRL6+BoHuTAWbie0w/RQhFHWhlE9svTisi5Ybf+0IP9iBvx8LGOayJwB3H3HaJf+Tp9ovUrbDpX9txJT2hA3I7hyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NDnw5hW4; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1ec5104ce06so7690195ad.1
-        for <kvm@vger.kernel.org>; Thu, 09 May 2024 07:59:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715266768; x=1715871568; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRILAk7h01/fT5BGJbVj7y6a6cEN0j9+rCMJHje+Tu8=;
-        b=NDnw5hW4ZjeidZTMRcTQ4WP0RY4CDXHhREte/f104nTDyioOyiMRsKVJF8tGB5FvGZ
-         ruDorRL/ARhp0NEAAxsRU2qYw9hY+amo3AK/z/XEfuh1MErFM2lcqaDa2JkXuh7j2/kh
-         uxfUHdVw1uij3Ophz1l9g90qT+6WjF91KqoqIf3L9b6yQ2ODLg+FxFVaCR2nHaOZbQA0
-         2VphIjf/65lrMCJrEjywirGeEycyi4MOFe0d7AhAF6pN5KQQQQ8xoGdJ4DbeKO86QPi4
-         dFkNd3KwlJDjgcSBGTc2Qua7yNkNuHrFElhH1J1JNUxdeqy3IHukIr9Ja4V4PLdV6T6f
-         b7xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715266768; x=1715871568;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SRILAk7h01/fT5BGJbVj7y6a6cEN0j9+rCMJHje+Tu8=;
-        b=IdjFIj3A+5xHFNBF/R6mi5UD9r0jQIj7qkRUqW0CJtwnp6wQS/Of8YAhC5FERHVVVz
-         vJv+vvwLHbhfM3d+JG8NSPbwBj0VZ6H9+Ej4qYZaXONt0cVU/JfWLWLMxw38kPj/Vrhd
-         MpbHocoPS4GMgAD5YnC+aBaZuG9NyqgZwHvMzoyg0ThSbPmxJ3v7HpPp81nHmQr2k2S6
-         EzMLe7ONEkSr55iJ8le1jmNqo5OtfAFdjW9hVuvDWfdR9dJix0kGzasv0rNvpTu74xEN
-         zwvjZNScOvJOclu1EJvGFIG1x1JiwlpI/zVgp3LweMvocsIvVYwYosw2cA/UMR3LqfLP
-         62jw==
-X-Forwarded-Encrypted: i=1; AJvYcCWFqbOGsRoMEmT7EC8Fhsd2h8DMI4ieBTpNMsl9pGmpkKU6cmUh5Bs4UKaB3oTqgSz+j63NEMKA29KwycZvkGIRB/+U
-X-Gm-Message-State: AOJu0YxdFqb2xMGjbjk1SUHTL+0pTMSb+FTJHj2JXJ4xyW82CzhxYxCf
-	mgooUAVnhf+ckxKMDQJQviCKStNMj9Ag2axhWxShzV+hkidyNo5468WYabWOJvJX4dMEu7/kMLK
-	Iug==
-X-Google-Smtp-Source: AGHT+IHK988GVPbIdB5zCuGdw7y1k+VuVsH8cph3YTDGdrjAWgKSTPaD2BUAym95OZHpCCMbUFtpNFD6Nok=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2844:b0:1ec:e716:60d3 with SMTP id
- d9443c01a7336-1eefa239c99mr73705ad.2.1715266767690; Thu, 09 May 2024 07:59:27
- -0700 (PDT)
-Date: Thu, 9 May 2024 07:59:26 -0700
-In-Reply-To: <202405091030597804KUqLDPPj2FpTIBrZZ5Eo@zte.com.cn>
+	s=arc-20240116; t=1715267125; c=relaxed/simple;
+	bh=fDDk+OytCDgLeiBOfAWSUC4PwjJtsWMWHyWSbnMu3Wc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=E2H/PptuJw2tmqH8F5SqZggD2sJIrA7d/62FSYaTXahTN2N4GU8Jd20nJO2wdbu2piw1fFd0f+7xDhM+ggIWxke5uyyMFCaTDEHKfjK45Zup6pGCEHE4iSPHt7GrqcfxDuadoFH1S2KYED/FuWwGywUej4C75Z8R4Gb2vHA6EyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mAnfqiCx; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 449EgXMq010803;
+	Thu, 9 May 2024 15:05:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=pp1; bh=0BoWS1URMndnGijkXUpbozrc7xc/t2T7Orm5y+7rPRM=;
+ b=mAnfqiCxK77z9C9sOBWZDa0elFLPIW+LjuoEkSKh11EGStGeEVs3dXX9sq1oxbIUeOfp
+ SdFLmVBlC2OdwK7YpQ+CodJDhpRe8XcBbigzLl5a+Wf0pc4sFsNBa9Kye7BOZfNQB//T
+ +pEZs0gWEE+dtIioUK4fORFOMnd3oipxfFEkUd0hTm3EXRFOXvy6N67JFW+TiXwot7oG
+ ng7kaSYOzCUsYx07axkdpXcRKdJySVHeXzYq3oXOHbT+3eOBuS3t0ZFWGPZz6EzZGxAy
+ WBErbVOdJoRjuqqAXLpR5RAO3mHr5qJzd4moylwsUnNVtwyBywIOh06DIJdCSNLX+Sgs bA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y10fx02d6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 May 2024 15:05:10 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 449F5ARU019220;
+	Thu, 9 May 2024 15:05:10 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y10fx02d2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 May 2024 15:05:10 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 449F4vwn009327;
+	Thu, 9 May 2024 15:05:09 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xyshuugxx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 09 May 2024 15:05:09 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 449F533930409332
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 9 May 2024 15:05:05 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B12792006E;
+	Thu,  9 May 2024 15:05:01 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F0B432004E;
+	Thu,  9 May 2024 15:05:00 +0000 (GMT)
+Received: from osiris (unknown [9.171.33.183])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu,  9 May 2024 15:05:00 +0000 (GMT)
+Date: Thu, 9 May 2024 17:04:59 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Matthew Wilcox <willy@infradead.org>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH v3 00/10] s390: PG_arch_1+folio cleanups for uv+hugetlb
+Message-ID: <20240509150459.12056-A-hca@linux.ibm.com>
+References: <20240508182955.358628-1-david@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240508182955.358628-1-david@redhat.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2GicvU8MHc_i4sl9SPrSTpMXuetyH1lT
+X-Proofpoint-GUID: VI2Q2YeRd-Lr97pq3VMV0JYa0QdW1vpY
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <ZjuhDH_i9QWL4vyz@google.com> <202405091030597804KUqLDPPj2FpTIBrZZ5Eo@zte.com.cn>
-Message-ID: <Zjzkzu3gVUQt8gJG@google.com>
-Subject: Re: [PATCH] KVM: introduce vm's max_halt_poll_ns to debugfs
-From: Sean Christopherson <seanjc@google.com>
-To: cheng.lin130@zte.com.cn
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jiang.yong5@zte.com.cn, wang.liang82@zte.com.cn, jiang.xuexin@zte.com.cn
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
+ definitions=2024-05-09_08,2024-05-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
+ adultscore=0 bulkscore=0 malwarescore=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2405010000 definitions=main-2405090101
 
-On Thu, May 09, 2024, cheng.lin130@zte.com.cn wrote:
-> > From: seanjc <seanjc@google.com>
-> > > From: Cheng Lin <cheng.lin130@zte.com.cn>
-> > >
-> > > Introduce vm's max_halt_poll_ns and override_halt_poll_ns to
-> > > debugfs. Provide a way to check and modify them.
-> > Why?
-> If a vm's max_halt_poll_ns has been set using KVM_CAP_HALT_POLL,
-> the module parameter kvm.halt_poll.ns will no longer indicate the maximum
-> halt pooling interval for that vm. After introducing these two attributes into
-> debugfs, it can be used to check whether the individual configuration of the
-> vm is enabled and the working value.
+On Wed, May 08, 2024 at 08:29:45PM +0200, David Hildenbrand wrote:
+> Rebased on 390x/features. Cleanups around PG_arch_1 and folio handling
+> in UV and hugetlb code.
+> 
+> One "easy" fix upfront. Another issue I spotted is documented in [1].
+> 
+> Once this hits upstream, we can remove HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
+> from core-mm and s390x, so only the folio variant will remain.
+> 
+> Compile tested, but not runtime tested with UV, I'll appreciate some
+> testing help from people with UV access and experience.
+> 
+> [1] https://lkml.kernel.org/r/20240404163642.1125529-1-david@redhat.com
+> 
+> v2 -> v3:
+> * "s390/uv: split large folios in gmap_make_secure()"
+>  -> Spelling fix
+> * "s390/hugetlb: convert PG_arch_1 code to work on folio->flags"
+>  -> Extended patch description
 
-But why is max_halt_poll_ns special enough to warrant debugfs entries?  There is
-a _lot_ of state in KVM that is configurable per-VM, it simply isn't feasible to
-dump everything into debugfs.
+Added Claudio's Reviewed-by from v2 to the third patch, and fixed a
+typo in the commit message of patch 9.
 
-I do think it would be reasonable to capture the max allowed polling time in
-the existing tracepoint though, e.g.
-
-diff --git a/include/trace/events/kvm.h b/include/trace/events/kvm.h
-index 74e40d5d4af4..7e66e9b2e497 100644
---- a/include/trace/events/kvm.h
-+++ b/include/trace/events/kvm.h
-@@ -41,24 +41,26 @@ TRACE_EVENT(kvm_userspace_exit,
- );
- 
- TRACE_EVENT(kvm_vcpu_wakeup,
--           TP_PROTO(__u64 ns, bool waited, bool valid),
--           TP_ARGS(ns, waited, valid),
-+           TP_PROTO(__u64 ns, __u32 max_ns, bool waited, bool valid),
-+           TP_ARGS(ns, max_ns, waited, valid),
- 
-        TP_STRUCT__entry(
-                __field(        __u64,          ns              )
-+               __field(        __u32,          max_ns          )
-                __field(        bool,           waited          )
-                __field(        bool,           valid           )
-        ),
- 
-        TP_fast_assign(
-                __entry->ns             = ns;
-+               __entry->max_ns         = max_ns;
-                __entry->waited         = waited;
-                __entry->valid          = valid;
-        ),
- 
--       TP_printk("%s time %lld ns, polling %s",
-+       TP_printk("%s time %llu ns (max poll %u ns), polling %s",
-                  __entry->waited ? "wait" : "poll",
--                 __entry->ns,
-+                 __entry->ns, __entry->max_ns,
-                  __entry->valid ? "valid" : "invalid")
- );
- 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 2e388972d856..f093138f3cd7 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3846,7 +3846,8 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
-                }
-        }
- 
--       trace_kvm_vcpu_wakeup(halt_ns, waited, vcpu_valid_wakeup(vcpu));
-+       trace_kvm_vcpu_wakeup(halt_ns, max_halt_poll_ns, waited,
-+                             vcpu_valid_wakeup(vcpu));
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_halt);
+Applied, thanks!
 
