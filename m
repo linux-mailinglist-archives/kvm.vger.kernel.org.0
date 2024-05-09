@@ -1,180 +1,185 @@
-Return-Path: <kvm+bounces-17133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 494D78C148C
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 20:11:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 179AB8C14A6
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 20:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 999EF1F22DEE
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 18:11:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E986B22637
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 18:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C35C0770FC;
-	Thu,  9 May 2024 18:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7467D07D;
+	Thu,  9 May 2024 18:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nL0LcUgs"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Y0vwhbgp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 730246EB62
-	for <kvm@vger.kernel.org>; Thu,  9 May 2024 18:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399E2770FE;
+	Thu,  9 May 2024 18:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715278301; cv=none; b=bXrnZsF0Nvl7386vgpit9KFEHSYdgheSK90GbsCwgwHnYDcGk8XVZvFFs5RBxod17DGFy0do56HgkKcClx/xjbUl0u76VbvDi+YTlQW7+8JjGMf7BRBXazCR7TPqNev1zcBA/Sr4n6DdFYnKHub0RBIywEiG3HvAaXavF/dBRpE=
+	t=1715278820; cv=none; b=FMnsZIY44/vqA75SH/j64Qx9W8BkojnH0OKF/6pHkqu+PSJXJZw3KgOwzamhxeDDDd2UoJjPJ4El4zKeCoTPZXmZo4wYuCKbM9qDoCzMro2p7Q2N6LhcUDD4xBfWsG0O9b66ynchtn0OhjY2aPSdQzdUIauiyXuQhEJW2oA0v74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715278301; c=relaxed/simple;
-	bh=vyL4+7rwBlSzQ1yw64XA+jmOZTA4LTXHIexIIjpvqcw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pfS3VZoylkY7f0huCY0Tt71AXnPl1hf9QT3K3ajvAoebo/ssRcHfYlhCUrg/lX6OYEJSA8DT4NPqtuuwyAzCZkjltclOj/Rdf4oX8HyUaX8W7ZY4kpJrqA+qCbcnlMb91CgCWZpnKzcycHD5NI4oXXqyfupF6OgUsWyFYM4pKXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nL0LcUgs; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dmatlack.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de603db5d6aso1961942276.2
-        for <kvm@vger.kernel.org>; Thu, 09 May 2024 11:11:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715278298; x=1715883098; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=c+nrjDian7TK/aMUH1xjmM/ZogxsmrGe5vjnrXIZTgU=;
-        b=nL0LcUgsPYsC3AYv6aVqTF5pjIbdgsgn8hoEM46eP2zk74UsCWYTJ3vrbY0bGhz+ZE
-         ummLScX0zio2cKbIQzKLfwaBMNRlwXFDzBuOxwI7qrd+atAjAA6JAYQYBjxDKA9SG6wV
-         X7qKLHo89oWSQJ5Y6S7mHF/1cyRWX6b6xcA+QGs8POSOpnnM2luA61QSS8mGrCVpDZtF
-         idHpIoXvluZ3gp+vSzwhdb9x58DhnOk8oQbUBx/QRD7A2mXDoTKYzRFG7AmfLyQXdUHy
-         opnX18PJGMVHAXBF6sLzCzlX3rHFToNWWdS7CpcH7IEhaFqdiSOl2dipLdgEiIli9oU7
-         eULg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715278298; x=1715883098;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c+nrjDian7TK/aMUH1xjmM/ZogxsmrGe5vjnrXIZTgU=;
-        b=SHs8BtlSEyCaWXQnGG4kEGLIzrzql+eWaURbUN4RA0CBgauVSgCO6V8peUZ6uMwdKE
-         zp0VTsCbjlJDFMmiHj70fiX7QGxzZU63X0lt1eaw5Z8qB4e0+JFPO3TWjlaJxHgdWU/f
-         6A4GWjMC+blKphaFdXKciyXrxxgbkLGvk5fEjFcGYY6OedRYsuvbDoPcC9oUqh5JMx9s
-         XpTS+m9+DJW3afF2aK9yKLAnb2vV+8Q44ZSxOghxvjbklbtWSzCsJlRn2AZ1YLHDe3qm
-         o1K9B45RXGYBplAGCLkpLp5qv7Tf9SWXWE6AFeJ9yB+THvGKB/R9zi3vOu1mQY6MHJsJ
-         VOLw==
-X-Gm-Message-State: AOJu0Yzqu6J4usPz2ow5NyPbn+HXdXCULs+ySkrssfCuLn1ro+QWc+gz
-	aonlChrpcgEGbq/uAv1K6DdFiOv6T9nRLxcELG0rd+gWV8EDnkaUj6sUSziH6sqP7xOVYn0gSM8
-	fbIIDcZyZyA==
-X-Google-Smtp-Source: AGHT+IEP23+qP0wzhW4Fi0tttzJPPNyFOxQmMv5bs0uRv9ume3b1wzMDhjG96Pu7MknJILDCaKHwadddDjHOgw==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a05:6902:1002:b0:de5:9f2c:c17c with SMTP
- id 3f1490d57ef6-dee4f37bbfbmr74981276.9.1715278298406; Thu, 09 May 2024
- 11:11:38 -0700 (PDT)
-Date: Thu,  9 May 2024 11:11:33 -0700
+	s=arc-20240116; t=1715278820; c=relaxed/simple;
+	bh=JCJaK6QpOrmmUJdi/1h2/P/m5VnuJoQJ8ijlBJBZs2E=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=E8cxY7+zC++X+urFqgMQxq9ZHtP3Hq7NmNm/UjICxXOYm1BDbRQBrLLrvkcx4eevo3SS4zdA7JPsxuskc651xjxDmubUe41XgC+ZoOYcC5nW0OBgZSnXB0PfR7hC1vsJ14nkqv5QoQeYiiGCoshy1wqB//9TaELbAy9RKwmTkVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Y0vwhbgp; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1715278815;
+	bh=JCJaK6QpOrmmUJdi/1h2/P/m5VnuJoQJ8ijlBJBZs2E=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=Y0vwhbgpxSGiErJBlZANaCoV14K1sUaA4F/ooMPA8bO48t72Fpno5DrnfALIMJiFY
+	 oMSvCEfOkwdTnfzldtNTgWgnNeYnX0lnmSBwYV+uUcXI50biIzPUgTSdbJDAk9h9/N
+	 bVUTOACTMW2U5cMSjfFt9b0R/BiIAN1Kzg0OIMCCtoqr8O1bj2D1Led/rtVGtGTVC8
+	 kz3S35qqjR2mswHsIzoVynyPqK+vGV6uTv4IAVR+VARRqE/hZwUo8M6kQ1/zzNJO7N
+	 IQqLkWeZKdjhwuxngilpfTAlT58QqNdElQbuZGDixBXFgx76yRt8hchoMtP4P0BWps
+	 4uG5Wxt7oOVIg==
+Received: from [100.113.15.66] (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 3ED82378214F;
+	Thu,  9 May 2024 18:19:55 +0000 (UTC)
+Message-ID: <57f47bc1-972c-45b5-81ef-d8269dcadebb@collabora.com>
+Date: Thu, 9 May 2024 23:20:19 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.0.118.g7fe29c98d7-goog
-Message-ID: <20240509181133.837001-1-dmatlack@google.com>
-Subject: [PATCH v3] KVM: x86/mmu: Always drop mmu_lock to allocate TDP MMU SPs
- for eager splitting
-From: David Matlack <dmatlack@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, David Matlack <dmatlack@google.com>, 
-	Bibo Mao <maobibo@loongson.cn>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>, shuah@kernel.org,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Will Deacon <will@kernel.org>, Nhat Pham <nphamcs@gmail.com>,
+ Johannes Weiner <hannes@cmpxchg.org>, Christian Brauner
+ <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>,
+ Kees Cook <keescook@chromium.org>,
+ OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
+ <andrealmeid@igalia.com>, Jiri Kosina <jikos@kernel.org>,
+ Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>,
+ Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>,
+ Atish Patra <atishp@atishpatra.org>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+ <mic@digikod.net>, Paul Moore <paul@paul-moore.com>,
+ James Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Seth Forshee
+ <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Boqun Feng <boqun.feng@gmail.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@android.com,
+ linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev,
+ kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-actions@lists.infradead.org, mptcp@lists.linux.dev,
+ linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+To: Edward Liaw <edliaw@google.com>, Shuah Khan <skhan@linuxfoundation.org>
+References: <20240507214254.2787305-1-edliaw@google.com>
+ <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
+ <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
+ <946ae22f-a4af-448a-92e1-60afb6ed9261@linuxfoundation.org>
+ <CAG4es9V2CcBJr0josSoGNsD+ZPQ6vasVXh_Hc_j88oeSqn__yQ@mail.gmail.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <CAG4es9V2CcBJr0josSoGNsD+ZPQ6vasVXh_Hc_j88oeSqn__yQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Always drop mmu_lock to allocate shadow pages in the TDP MMU when doing
-eager page splitting. Dropping mmu_lock during eager page splitting is
-cheap since KVM does not have to flush remote TLBs, and avoids stalling
-vCPU threads that are taking page faults in parallel.
+On 5/9/24 10:45 PM, Edward Liaw wrote:
+> On Thu, May 9, 2024 at 7:37 AM Shuah Khan <skhan@linuxfoundation.org> wrote:
+>>
+>> On 5/9/24 00:13, Edward Liaw wrote:
+>>> On Wed, May 8, 2024 at 4:10 PM Shuah Khan <skhan@linuxfoundation.org> wrote:
+>>>>
+>>>> On 5/7/24 15:38, Edward Liaw wrote:
+>>>>> 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+>>>>> asprintf into kselftest_harness.h, which is a GNU extension and needs
+>>>>> _GNU_SOURCE to either be defined prior to including headers or with the
+>>>>> -D_GNU_SOURCE flag passed to the compiler.
+>>>>>
+>>>>> v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-edliaw@google.com/
+>>>>> v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+>>>>> location.  Remove #define _GNU_SOURCE from source code to resolve
+>>>>> redefinition warnings.
+>>>>>
+>>>>> Edward Liaw (5):
+>>>>>     selftests: Compile kselftest headers with -D_GNU_SOURCE
+>>>>>     selftests/sgx: Include KHDR_INCLUDES in Makefile
+>>>>
+>>>> I appled patches 1/5 and 2.5 - The rest need to be split up.
+>>>>
+>>>>>     selftests: Include KHDR_INCLUDES in Makefile
+>>>>>     selftests: Drop define _GNU_SOURCE
+>>>>>     selftests: Drop duplicate -D_GNU_SOURCE
+>>>>>
+>>>>
+>>>> Please split these patches pwe test directory. Otherwise it will
+>>>> cause merge conflicts which can be hard to resolve.
+>>>
+>>> Hi Shuah,
+>>> Sean asked that I rebase the patches on linux-next, and I will need to
+>>> remove additional _GNU_SOURCE defines.  Should I send an unsplit v3 to
+>>> be reviewed, then split it afterwards?  I'm concerned that it will be
+>>> difficult to review with ~70 patches once split.
+>>
+>> Please send them split - it will be easier to review and apply. You
+>> might as well wait until the merge window is done. I don't think
+>> anybody would have time to review now since merge window starts
+>> next week.
+> 
+> Sorry, I have them split already; is it ok if I send them now?  I will
+> be on leave soon and may not be able to get back to it in a while.
+Feel free to send the patches. There is no restriction on that.
 
-This change reduces 20%+ dips in MySQL throughput during live migration
-in a 160 vCPU VM while userspace is issuing CLEAR_DIRTY_LOG ioctls
-(tested with 1GiB and 8GiB CLEARs). Userspace could issue finer-grained
-CLEARs, which would also reduce contention on mmu_lock, but doing so
-will increase the rate of remote TLB flushing (KVM must flush TLBs
-before returning from CLEAR_DITY_LOG).
+> 
+> Thanks,
+> Edward
+> 
+>>
+>>
+>> thanks,
+>> -- Shuah
+> 
 
-When there isn't contention on mmu_lock[1], this change does not regress
-the time it takes to perform eager page splitting.
-
-[1] Tested with dirty_log_perf_test, which does not run vCPUs during
-eager page splitting, and with a 16 vCPU VM Live Migration with
-manual-protect disabled (where mmu_lock is held in read-mode).
-
-Cc: Bibo Mao <maobibo@loongson.cn>
-Cc: Sean Christopherson <seanjc@google.com>
-Signed-off-by: David Matlack <dmatlack@google.com>
----
-v3:
- - Only drop mmu_lock during TDP MMU eager page splitting. This fixes
-   the perfomance regression without regressing CLEAR_DIRTY_LOG
-   performance on other architectures from frequent lock dropping.
-
-v2: https://lore.kernel.org/kvm/20240402213656.3068504-1-dmatlack@google.com/
- - Rebase onto kvm/queue [Marc]
-
-v1: https://lore.kernel.org/kvm/20231205181645.482037-1-dmatlack@google.com/
-
- arch/x86/kvm/mmu/tdp_mmu.c | 22 ++++------------------
- 1 file changed, 4 insertions(+), 18 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index aaa2369a9479..2089d696e3c6 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1385,11 +1385,11 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
- 	return spte_set;
- }
- 
--static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
-+static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(void)
- {
-+	gfp_t gfp = GFP_KERNEL_ACCOUNT | __GFP_ZERO;
- 	struct kvm_mmu_page *sp;
- 
--	gfp |= __GFP_ZERO;
- 
- 	sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
- 	if (!sp)
-@@ -1412,19 +1412,6 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 
- 	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
- 
--	/*
--	 * Since we are allocating while under the MMU lock we have to be
--	 * careful about GFP flags. Use GFP_NOWAIT to avoid blocking on direct
--	 * reclaim and to avoid making any filesystem callbacks (which can end
--	 * up invoking KVM MMU notifiers, resulting in a deadlock).
--	 *
--	 * If this allocation fails we drop the lock and retry with reclaim
--	 * allowed.
--	 */
--	sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT);
--	if (sp)
--		return sp;
--
- 	rcu_read_unlock();
- 
- 	if (shared)
-@@ -1433,7 +1420,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
- 		write_unlock(&kvm->mmu_lock);
- 
- 	iter->yielded = true;
--	sp = __tdp_mmu_alloc_sp_for_split(GFP_KERNEL_ACCOUNT);
-+	sp = __tdp_mmu_alloc_sp_for_split();
- 
- 	if (shared)
- 		read_lock(&kvm->mmu_lock);
-@@ -1524,8 +1511,7 @@ static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
- 				break;
- 			}
- 
--			if (iter.yielded)
--				continue;
-+			continue;
- 		}
- 
- 		tdp_mmu_init_child_sp(sp, &iter);
-
-base-commit: 2d181d84af38146748042a6974c577fc46c3f1c3
 -- 
-2.45.0.118.g7fe29c98d7-goog
-
+BR,
+Muhammad Usama Anjum
 
