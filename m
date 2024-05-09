@@ -1,126 +1,378 @@
-Return-Path: <kvm+bounces-17139-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17140-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A968C199B
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 00:53:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E228C19C5
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 01:07:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27AA11C21917
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 22:53:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23FD31C20E16
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 23:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815F4129A6F;
-	Thu,  9 May 2024 22:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424CC12D76B;
+	Thu,  9 May 2024 23:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lbA9rSby"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHDn6mqx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A236D12D76B
-	for <kvm@vger.kernel.org>; Thu,  9 May 2024 22:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB86E12838D
+	for <kvm@vger.kernel.org>; Thu,  9 May 2024 23:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715295185; cv=none; b=aq7WiJ8mYN2v3gJoqlUgnKOZoTKmA4rpiwgiyZtar2VAsRy+FV/9MY0GGLs8P9CZm5G12YxexhMpKvutdtN6xLcXAJMkXWP3jp2ExRL6Pax2wgDBDSHo9RaEBtSHckVt+UEyxwH0VCTPIVZX4CYlU3TrYLWmB0IWHbmB+re71U0=
+	t=1715296061; cv=none; b=FUP0Vsz7kVZ7BplPBUUgR8sk7QgdjWaKQx0H79/YSpVeIT08I6rRLkw5DlqRy4hqXMmtTtQ8LKWeRjLIeFfBl9b4t8AlhsQiX3KbB+FgYKE0vAVNV1oWRhUNXBlrDUbxMfuEC4I7Sp3/BV2GmwOcQaKn446xuZVHkYukzRonSFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715295185; c=relaxed/simple;
-	bh=ckYw/fPw8cWuIIDpNf0IHTJPYm/aVSFzE+XL4Y6KroU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vbe4FuOBJRCSEMTFckA4051Ml9xcKTGmB/PR/XfEnwcC/ZZIiLff69Dy8P+6tzlCjo6fdl7fl1sGXnzYNzaYbk5SbblhZTKcyQiaIuJnVejH8c+j0yNzqxsB8tzkkwMmqKcNxShQBCCPfdznfQyvLW6wZnslGhO3oEOCO/wyeuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lbA9rSby; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61bb09d8fecso25021157b3.0
-        for <kvm@vger.kernel.org>; Thu, 09 May 2024 15:53:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715295181; x=1715899981; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ME9lJAyFxkTypmVhuXddPd71uqtDTvwVdbPhhkE/e0=;
-        b=lbA9rSbyzy2PIdwy/vfC3n/t52/iwGRLJu1WIdUfI15uZP/COYHH4gVERHgRqoUmAG
-         YjuX0xPXQUJ4crWBpHusszKQlFHyd2Nv1noSznZVadZpR2YjYFEZt5QknQd4/uLfohO+
-         ycJkDE3Oj4McIuIfqHh0H+6xMkq0Xtl4H3drqv9Y6NTUKDK3q/gUoiqjp+mZxNfXBiDm
-         Gq8RoOGOK9oPPiSG++okJ58mKtft3FBAOnjOmSRNHM+Mx4Lwf57zNmwB83+7rbsGug1t
-         B24+ljkLPqH3YnpnoI2nZgoypidF5jztIDOFtvy0r8zPRsFWeZjl42xUFQ6zoutRXaFM
-         o3MA==
+	s=arc-20240116; t=1715296061; c=relaxed/simple;
+	bh=gp8pOF3IuXWxQKBZ6DWNOxyiPHT5bmd27HVxhF2Y3GY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gKLWbtcgZ8B5siy7qEEZK/Njb+UsGxrd4OahyYeuV/Awg2rmJJotITgtMGEq2Yo0VzloN+/+u6ya0HGCCQEIzVFljgbKpVK1Z0/qqPG9+8aIwGvIHFze52xbGd/w1GFBdI+8Jx6RTSdXxJCB4lGzOUVDo3zzGBCxZGNgz5cHIpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iHDn6mqx; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715296057;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CFaELFWpjddYkl/64kvLJs1WRRF9HXHu9i0yKLDkOEs=;
+	b=iHDn6mqx1hIbGMiVBoSBdx8RqMPbtgrnXc7j6ibt+2iHh4tGY9cN6nAVcwhizqdy8L8zMM
+	7mDDmwY0KYMKI57Nfv4dOEgAXccMoylihdpqUvK7z1NQ24T+842DQLnOcsFIr3tG1rz/DS
+	MoQqQe4i+TJEH04gxjRqMk5sGBhnwEc=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-84-oJvhPxbKO0OWeK19VsH0Pg-1; Thu, 09 May 2024 19:07:36 -0400
+X-MC-Unique: oJvhPxbKO0OWeK19VsH0Pg-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2b3756e6333so1361092a91.0
+        for <kvm@vger.kernel.org>; Thu, 09 May 2024 16:07:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715295181; x=1715899981;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ME9lJAyFxkTypmVhuXddPd71uqtDTvwVdbPhhkE/e0=;
-        b=M6PSO2VRr17JymsO5C56gr1bNJ03sW/h+/7VPk3yuGlUwDSveFAV6HUaTMPr4D726p
-         o5vDe0+RfAoh9vA6ZrEswUsQ/lFCRJRYJ1k1DNOjkoI2VXm7vmiVIrGDPyyjvvHKEQlF
-         YY06iRKpyE7QZFGMmI3eAZGeu4SRnZfVzt6dWXibotyiez95UJcITcDAX2jcEwXGGhtR
-         eWnHJv3Ut0Yj0Sbv9NoIta3j7TCAp4G1UPYAqoqqp2p4bOOFc+BRMg8n+CuF2NIXqDZJ
-         MELxubcchvLAbaIV8Rh610apq/oUWsPcj1xmKDf5nh7FHgACwK9B0LPaEljGSKBJMCsL
-         K5kg==
-X-Forwarded-Encrypted: i=1; AJvYcCViR3JRpq3x5Fb3A0hqOAu9xpbFCFG5S/21DsY6VQLqB8Wp4VVjkB/IMwg0rF0Ti6n0skN+tR76LMlQrF78gfLgbdHX
-X-Gm-Message-State: AOJu0YyNqZNo3qkY3eeGL8kMYq0QfuD7c7eva3naBIK2UCjPcPXDZcHT
-	3oQSHYF6f3SYgz/HlgaRIIXe1jKB5Li+xhEjdrY3LJARTKkBZisAHPzg5Rd9aXIc4DHtR9MUIIY
-	XQw==
-X-Google-Smtp-Source: AGHT+IHXr0Ip/gr6px7u8Lg8iBTMhb3wftkpSHicRh3tOfJA2tQ77XzCrUEIalKFLIbFCTu3T9uH74i0hXc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6010:b0:618:876d:b87d with SMTP id
- 00721157ae682-622b013431emr2114887b3.5.1715295181353; Thu, 09 May 2024
- 15:53:01 -0700 (PDT)
-Date: Thu, 9 May 2024 15:52:59 -0700
-In-Reply-To: <5ba2b661-0db5-4b49-9489-4d3e72adf7d2@intel.com>
+        d=1e100.net; s=20230601; t=1715296055; x=1715900855;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CFaELFWpjddYkl/64kvLJs1WRRF9HXHu9i0yKLDkOEs=;
+        b=kuvenmPGXEE5X1GUQRmW+REJj9Xsf6Dm1tUr6UO+oTon6oHaxgVKFYIK6INCBXeYEu
+         u2SkB4UwNjvbmd0MIAwiwJnnDSZgWYHHgiWYpamio33/WLh6l+Vhy02sb21/leftM02C
+         p0oFUXA9GYOB2OgjHwrj/T6nqtvBT/snHLZ9/GgnT76rRsAAZ4f+7rdiwaR8KpsWtwmm
+         ECZBq2Cd4OhqqJ0uGCT1zgRrv+DW8gq4jL6+JSE+Mjbm8JEQsZerp9FSFYDDhmlOl1ZL
+         q8b3anq4oiy/1wdn9E3X6a7ws/0FVrOokqroOYm2BB5Y+iqVdFi5c2DzARhR7G2sy0JY
+         g8JA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfHnDx020weAJPuIqLm8lBpmfgGxvp3Z0zNcJLak6s3VKuIkZpq1Ick1j5Ppmo9tHOJMqOs/FYVO5mw4pufz8kNTAa
+X-Gm-Message-State: AOJu0YxLKMnbHbntJbZnHH8eqS5k7GjzvjMFEOwf8OpXXuuyX38AhN/j
+	nqS4W5Lm1sBBNVwqoMA+MrWkN/GiRLPKabglHIkoSjSRFPX5gZaeOk0HK6ZMj7JkylERI9oShgO
+	mSNhWb+rRYMSahcX3gE2Wqk5sf304sTIqhGop46ugbmns+KwWhmOInRiZn2i5PVRUif04N5A2CI
+	psrWIe8MsVvmyKlm/wXmHPm7Pt
+X-Received: by 2002:a17:90a:7e11:b0:2b6:c4d7:fd9d with SMTP id 98e67ed59e1d1-2b6ccc72f75mr943290a91.35.1715296055198;
+        Thu, 09 May 2024 16:07:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH/tETTTwQT03sxCmkOb4viliHZXHbh2TuSgm6BrIdm/xGbTuTZd5G6B8tBSHad3DKv/GtsmDGttKuAYWvYpho=
+X-Received: by 2002:a17:90a:7e11:b0:2b6:c4d7:fd9d with SMTP id
+ 98e67ed59e1d1-2b6ccc72f75mr943264a91.35.1715296054648; Thu, 09 May 2024
+ 16:07:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <9bd868a287599eb2a854f6983f13b4500f47d2ae.1708933498.git.isaku.yamahata@intel.com>
- <Zjz7bRcIpe8nL0Gs@google.com> <5ba2b661-0db5-4b49-9489-4d3e72adf7d2@intel.com>
-Message-ID: <Zj1Ty6bqbwst4u_N@google.com>
-Subject: Re: [PATCH v19 037/130] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend specific
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, 
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com, Sagi Shahar <sagis@google.com>, 
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <ZjqWXPFuoYWWcxP3@google.com> <0e239143-65ed-445a-9782-e905527ea572@paulmck-laptop>
+ <Zjq9okodmvkywz82@google.com> <ZjrClk4Lqw_cLO5A@google.com>
+ <Zjroo8OsYcVJLsYO@LeoBras> <b44962dd-7b8a-4201-90b7-4c39ba20e28d@paulmck-laptop>
+ <ZjsZVUdmDXZOn10l@LeoBras> <ZjuFuZHKUy7n6-sG@google.com> <5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop>
+ <ZjyGefTZ8ThZukNG@LeoBras> <4e368040-05b0-46ab-bafa-59710d5de549@paulmck-laptop>
+In-Reply-To: <4e368040-05b0-46ab-bafa-59710d5de549@paulmck-laptop>
+From: Leonardo Bras Soares Passos <leobras@redhat.com>
+Date: Thu, 9 May 2024 20:07:22 -0300
+Message-ID: <CAJ6HWG4LyyLuQ9ZZ2ayLRt79_m_6-=ZePhHyQV8VTMPjFG+kYg@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+To: paulmck@kernel.org
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Neeraj Upadhyay <quic_neeraju@quicinc.com>, 
+	Joel Fernandes <joel@joelfernandes.org>, Josh Triplett <josh@joshtriplett.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Lai Jiangshan <jiangshanlai@gmail.com>, 
+	Zqiang <qiang.zhang1211@gmail.com>, Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 10, 2024, Kai Huang wrote:
-> On 10/05/2024 4:35 am, Sean Christopherson wrote:
-> > KVM x86 limits KVM_MAX_VCPUS to 4096:
-> > 
-> >    config KVM_MAX_NR_VCPUS
-> > 	int "Maximum number of vCPUs per KVM guest"
-> > 	depends on KVM
-> > 	range 1024 4096
-> > 	default 4096 if MAXSMP
-> > 	default 1024
-> > 	help
-> > 
-> > whereas the limitation from TDX is apprarently simply due to TD_PARAMS taking
-> > a 16-bit unsigned value:
-> > 
-> >    #define TDX_MAX_VCPUS  (~(u16)0)
-> > 
-> > i.e. it will likely be _years_ before TDX's limitation matters, if it ever does.
-> > And _if_ it becomes a problem, we don't necessarily need to have a different
-> > _runtime_ limit for TDX, e.g. TDX support could be conditioned on KVM_MAX_NR_VCPUS
-> > being <= 64k.
-> 
-> Actually later versions of TDX module (starting from 1.5 AFAICT), the module
-> has a metadata field to report the maximum vCPUs that the module can support
-> for all TDX guests.
+On Thu, May 9, 2024 at 7:44=E2=80=AFPM Paul E. McKenney <paulmck@kernel.org=
+> wrote:
+>
+> On Thu, May 09, 2024 at 05:16:57AM -0300, Leonardo Bras wrote:
+> > On Wed, May 08, 2024 at 08:32:40PM -0700, Paul E. McKenney wrote:
+> > > On Wed, May 08, 2024 at 07:01:29AM -0700, Sean Christopherson wrote:
+> > > > On Wed, May 08, 2024, Leonardo Bras wrote:
+> > > > > Something just hit me, and maybe I need to propose something more=
+ generic.
+> > > >
+> > > > Yes.  This is what I was trying to get across with my complaints ab=
+out keying off
+> > > > of the last VM-Exit time.  It's effectively a broad stroke "this ta=
+sk will likely
+> > > > be quiescent soon" and so the core concept/functionality belongs in=
+ common code,
+> > > > not KVM.
+> > >
+> > > OK, we could do something like the following wholly within RCU, namel=
+y
+> > > to make rcu_pending() refrain from invoking rcu_core() until the grac=
+e
+> > > period is at least the specified age, defaulting to zero (and to the
+> > > current behavior).
+> > >
+> > > Perhaps something like the patch shown below.
+> >
+> > That's exactly what I was thinking :)
+> >
+> > >
+> > > Thoughts?
+> >
+> > Some suggestions below:
+> >
+> > >
+> > >                                                     Thanx, Paul
+> > >
+> > > ---------------------------------------------------------------------=
+---
+> > >
+> > > commit abc7cd2facdebf85aa075c567321589862f88542
+> > > Author: Paul E. McKenney <paulmck@kernel.org>
+> > > Date:   Wed May 8 20:11:58 2024 -0700
+> > >
+> > >     rcu: Add rcutree.nocb_patience_delay to reduce nohz_full OS jitte=
+r
+> > >
+> > >     If a CPU is running either a userspace application or a guest OS =
+in
+> > >     nohz_full mode, it is possible for a system call to occur just as=
+ an
+> > >     RCU grace period is starting.  If that CPU also has the schedulin=
+g-clock
+> > >     tick enabled for any reason (such as a second runnable task), and=
+ if the
+> > >     system was booted with rcutree.use_softirq=3D0, then RCU can add =
+insult to
+> > >     injury by awakening that CPU's rcuc kthread, resulting in yet ano=
+ther
+> > >     task and yet more OS jitter due to switching to that task, runnin=
+g it,
+> > >     and switching back.
+> > >
+> > >     In addition, in the common case where that system call is not of
+> > >     excessively long duration, awakening the rcuc task is pointless.
+> > >     This pointlessness is due to the fact that the CPU will enter an =
+extended
+> > >     quiescent state upon returning to the userspace application or gu=
+est OS.
+> > >     In this case, the rcuc kthread cannot do anything that the main R=
+CU
+> > >     grace-period kthread cannot do on its behalf, at least if it is g=
+iven
+> > >     a few additional milliseconds (for example, given the time durati=
+on
+> > >     specified by rcutree.jiffies_till_first_fqs, give or take schedul=
+ing
+> > >     delays).
+> > >
+> > >     This commit therefore adds a rcutree.nocb_patience_delay kernel b=
+oot
+> > >     parameter that specifies the grace period age (in milliseconds)
+> > >     before which RCU will refrain from awakening the rcuc kthread.
+> > >     Preliminary experiementation suggests a value of 1000, that is,
+> > >     one second.  Increasing rcutree.nocb_patience_delay will increase
+> > >     grace-period latency and in turn increase memory footprint, so sy=
+stems
+> > >     with constrained memory might choose a smaller value.  Systems wi=
+th
+> > >     less-aggressive OS-jitter requirements might choose the default v=
+alue
+> > >     of zero, which keeps the traditional immediate-wakeup behavior, t=
+hus
+> > >     avoiding increases in grace-period latency.
+> > >
+> > >     Link: https://lore.kernel.org/all/20240328171949.743211-1-leobras=
+@redhat.com/
+> > >
+> > >     Reported-by: Leonardo Bras <leobras@redhat.com>
+> > >     Suggested-by: Leonardo Bras <leobras@redhat.com>
+> > >     Suggested-by: Sean Christopherson <seanjc@google.com>
+> > >     Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+> > >
+> > > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Docume=
+ntation/admin-guide/kernel-parameters.txt
+> > > index 0a3b0fd1910e6..42383986e692b 100644
+> > > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > > @@ -4981,6 +4981,13 @@
+> > >                     the ->nocb_bypass queue.  The definition of "too
+> > >                     many" is supplied by this kernel boot parameter.
+> > >
+> > > +   rcutree.nocb_patience_delay=3D [KNL]
+> > > +                   On callback-offloaded (rcu_nocbs) CPUs, avoid
+> > > +                   disturbing RCU unless the grace period has
+> > > +                   reached the specified age in milliseconds.
+> > > +                   Defaults to zero.  Large values will be capped
+> > > +                   at five seconds.
+> > > +
+> > >     rcutree.qhimark=3D [KNL]
+> > >                     Set threshold of queued RCU callbacks beyond whic=
+h
+> > >                     batch limiting is disabled.
+> > > diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
+> > > index 7560e204198bb..6e4b8b43855a0 100644
+> > > --- a/kernel/rcu/tree.c
+> > > +++ b/kernel/rcu/tree.c
+> > > @@ -176,6 +176,8 @@ static int gp_init_delay;
+> > >  module_param(gp_init_delay, int, 0444);
+> > >  static int gp_cleanup_delay;
+> > >  module_param(gp_cleanup_delay, int, 0444);
+> > > +static int nocb_patience_delay;
+> > > +module_param(nocb_patience_delay, int, 0444);
+> > >
+> > >  // Add delay to rcu_read_unlock() for strict grace periods.
+> > >  static int rcu_unlock_delay;
+> > > @@ -4334,6 +4336,8 @@ EXPORT_SYMBOL_GPL(cond_synchronize_rcu_full);
+> > >  static int rcu_pending(int user)
+> > >  {
+> > >     bool gp_in_progress;
+> > > +   unsigned long j =3D jiffies;
+> >
+> > I think this is probably taken care by the compiler, but just in case I=
+ would move the
+> > j =3D jiffies;
+> > closer to it's use, in order to avoid reading 'jiffies' if rcu_pending
+> > exits before the nohz_full testing.
+>
+> Good point!  I just removed j and used jiffies directly.
+>
+> > > +   unsigned int patience =3D msecs_to_jiffies(nocb_patience_delay);
+> >
+> > What do you think on processsing the new parameter in boot, and saving =
+it
+> > in terms of jiffies already?
+> >
+> > It would make it unnecessary to convert ms -> jiffies every time we run
+> > rcu_pending.
+> >
+> > (OOO will probably remove the extra division, but may cause less impact=
+ in
+> > some arch)
+>
+> This isn't exactly a fastpath, but it is easy enough to do the conversion
+> in rcu_bootup_announce_oddness() and place it into another variable
+> (for the benefit of those using drgn or going through crash dumps).
+>
+> > >     struct rcu_data *rdp =3D this_cpu_ptr(&rcu_data);
+> > >     struct rcu_node *rnp =3D rdp->mynode;
+> > >
+> > > @@ -4347,11 +4351,13 @@ static int rcu_pending(int user)
+> > >             return 1;
+> > >
+> > >     /* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if =
+so.) */
+> > > -   if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu()=
+)
+> > > +   gp_in_progress =3D rcu_gp_in_progress();
+> > > +   if ((user || rcu_is_cpu_rrupt_from_idle() ||
+> > > +        (gp_in_progress && time_before(j + patience, rcu_state.gp_st=
+art))) &&
+> >
+> > I think you meant:
+> >       time_before(j, rcu_state.gp_start + patience)
+> >
+> > or else this always fails, as we can never have now to happen before a
+> > previously started gp, right?
+> >
+> > Also, as per rcu_nohz_full_cpu() we probably need it to be read with
+> > READ_ONCE():
+> >
+> >       time_before(j, READ_ONCE(rcu_state.gp_start) + patience)
+>
+> Good catch on both counts, fixed!
+>
+> > > +       rcu_nohz_full_cpu())
+> > >             return 0;
+> > >
+> > >     /* Is the RCU core waiting for a quiescent state from this CPU? *=
+/
+> > > -   gp_in_progress =3D rcu_gp_in_progress();
+> > >     if (rdp->core_needs_qs && !rdp->cpu_no_qs.b.norm && gp_in_progres=
+s)
+> > >             return 1;
+> > >
+> > > diff --git a/kernel/rcu/tree_plugin.h b/kernel/rcu/tree_plugin.h
+> > > index 340bbefe5f652..174333d0e9507 100644
+> > > --- a/kernel/rcu/tree_plugin.h
+> > > +++ b/kernel/rcu/tree_plugin.h
+> > > @@ -93,6 +93,15 @@ static void __init rcu_bootup_announce_oddness(voi=
+d)
+> > >             pr_info("\tRCU debug GP init slowdown %d jiffies.\n", gp_=
+init_delay);
+> > >     if (gp_cleanup_delay)
+> > >             pr_info("\tRCU debug GP cleanup slowdown %d jiffies.\n", =
+gp_cleanup_delay);
+> > > +   if (nocb_patience_delay < 0) {
+> > > +           pr_info("\tRCU NOCB CPU patience negative (%d), resetting=
+ to zero.\n", nocb_patience_delay);
+> > > +           nocb_patience_delay =3D 0;
+> > > +   } else if (nocb_patience_delay > 5 * MSEC_PER_SEC) {
+> > > +           pr_info("\tRCU NOCB CPU patience too large (%d), resettin=
+g to %ld.\n", nocb_patience_delay, 5 * MSEC_PER_SEC);
+> > > +           nocb_patience_delay =3D 5 * MSEC_PER_SEC;
+> > > +   } else if (nocb_patience_delay) {
+> >
+> > Here you suggest that we don't print if 'nocb_patience_delay =3D=3D 0',
+> > as it's the default behavior, right?
+>
+> Exactly, in keeping with the function name rcu_bootup_announce_oddness().
+>
+> This approach allows easy spotting of deviations from default settings,
+> which can be very helpful when debugging.
+>
+> > I think printing on 0 could be useful to check if the feature exists, e=
+ven
+> > though we are zeroing it, but this will probably add unnecessary verbos=
+ity.
+>
+> It could be quite useful to people learning the RCU implementation,
+> and I encourage those people to remove all those "if" statements from
+> rcu_bootup_announce_oddness() in order to get the full story.
+>
+> > > +           pr_info("\tRCU NOCB CPU patience set to %d milliseconds.\=
+n", nocb_patience_delay);
+> > > +   }
+> >
+> > Here I suppose something like this can take care of not needing to conv=
+ert
+> > ms -> jiffies every rcu_pending():
+> >
+> > +     nocb_patience_delay =3D msecs_to_jiffies(nocb_patience_delay);
+>
+> Agreed, but I used a separate variable to help people looking at crash
+> dumps or using drgn.
+>
+> And thank you for your review and comments!  Applying these changes
+> with attribution.
+>
 
-My quick glance at the 1.5 source shows that the limit is still effectively
-0xffff, so again, who cares?  Assert on 0xffff compile time, and on the reported
-max at runtime and simply refuse to use a TDX module that has dropped the minimum
-below 0xffff.
+Thank you!
+Leo
 
-> And we only allow the kvm->max_vcpus to be updated if it's a TDX guest in
-> the vt_vm_enable_cap().  The reason is we want to avoid unnecessary change
-> for normal VMX guests.
+>                                                         Thanx, Paul
+>
+> > >     if (!use_softirq)
+> > >             pr_info("\tRCU_SOFTIRQ processing moved to rcuc kthreads.=
+\n");
+> > >     if (IS_ENABLED(CONFIG_RCU_EQS_DEBUG))
+> > >
+> >
+> >
+> > Thanks!
+> > Leo
+> >
+>
 
-That's a frankly ridiculous reason to bury code in TDX.  Nothing is _forcing_
-userspace to set KVM_CAP_MAX_VCPUS, i.e. there won't be any change to VMX VMs
-unless userspace _wants_ there to be a change.
 
