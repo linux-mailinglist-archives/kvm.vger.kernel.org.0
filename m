@@ -1,346 +1,160 @@
-Return-Path: <kvm+bounces-17096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 794298C0B1B
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 07:44:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E1008C0B59
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 08:14:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 019D5281DCC
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 05:44:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7029DB20F84
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 06:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E5D1494AB;
-	Thu,  9 May 2024 05:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8F88149C74;
+	Thu,  9 May 2024 06:14:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UxJIRiS9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WEm/VoPd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980E0C13C
-	for <kvm@vger.kernel.org>; Thu,  9 May 2024 05:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D700A1494C6
+	for <kvm@vger.kernel.org>; Thu,  9 May 2024 06:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715233475; cv=none; b=ep4ivWiP9OOLMDVYsHJZ2NbvCsvhL0MTWf+jYo1vktyR8cgfgp4rAX5GI+OIy4b03cp8sOD92pQRLzm/aqvyFJHRSQ7o9+64M4Dw87MseDEJ5ploxO8DZ0U/0QazdajUOgtX0wzmLAK5PFV+AnUBgNgUlTVNp0V1oAkwXUWDhs8=
+	t=1715235263; cv=none; b=R1I6huXM1zVM/78drb4dc4mNbTOZY6NHUSmedNkXYmI+LHH/28bmpKOpR+M2AxtQvmqXHivghgqzPVHtsZ76SaCs+arrzGcQWZtUM46rBrRoqI6M7O4q2MXH85kGplz2GIO34HxkXxb1t9ZyGNnuWmr2eF75nopL4z8geUyiQ/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715233475; c=relaxed/simple;
-	bh=rWY6owxGWaT0K4KnL0t1XoHYa61/+PJJDoCVgrNMLOA=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=L7x61LA+ZbdieD4lzJOv8BvktJVASMnrPTl93UcEN+y645CWpen2yjlHWwbNRRPL+Fp/yZ7OYeUtwR5A+ewTkKsLVeShWhpwMbLsWzt4ZiB471qALGBycjlyyNC9e+IMARSCzg2z/Fizfl8HM7/4seFREWd4gWXTuZ4ffH0FrHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UxJIRiS9; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1ed41eb3382so3365875ad.0
-        for <kvm@vger.kernel.org>; Wed, 08 May 2024 22:44:33 -0700 (PDT)
+	s=arc-20240116; t=1715235263; c=relaxed/simple;
+	bh=EL59YAvQ+NejbE+MgsQ0pGcYE6qA6HsEuHDusaEk0N4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g80+BH94R5mKdOLBVH5hhHhMrWybYyKKti6DonXp06A3y+9/2pvraPmxyuADvmsOX2FKmmso2WF9T7+o6qntwzMxTpNf/8BXJJs39YHu2q+FiLfIQiYJLegkpX+1LMnD9uNLYcBTEtsjgEanFxsQ6veIc+0xSxjJEDKx14tT290=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WEm/VoPd; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5724736770cso4820a12.1
+        for <kvm@vger.kernel.org>; Wed, 08 May 2024 23:14:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715233473; x=1715838273; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1715235259; x=1715840059; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AJWRqriluNl85+42GdgojZnsAFr/eRJv/kXU3cwJsng=;
-        b=UxJIRiS9P4XQ5MGdkDmU6nbI0yuNKpGQTdtzf1p113fk6ehvsur9ABxnoqkzN0HXi5
-         G39lgz+yKztm4sz1NV13JIjjBXukrTnFsAtlt785d2MFlgRYi9Y+6XYr5xdRfu+y/d/o
-         fdxrFlgt2Uo2sp2T5EF+DQL+WVDiTVp+RbDn3M1J3A7y5K+gxXm+wQmh9w0lqqeYFVVa
-         dg0qGGeklm9q7nx7HmLfCpOzsgsSnq6zFS9atDL2ddTQoXTrP7aeZfDEqz1LmuYKpRLm
-         hTfLntTUAGwchegtUN22Ccv7sIeAD73q2xQ5oc8IVZwmgkmgtToINxheKWopWiAkOfts
-         8ecA==
+        bh=72bWBwjQodIuSi8MsUtQvKNvKwdUWjXGREUei480Xwo=;
+        b=WEm/VoPdoWkj0T759QWiuYvMX4pHXbQGtGV6B8BdS6/Cq0VFDkresAaaMIYb++Xv07
+         NGG+jf4a1dEnvAy0YaC/s7lcBHZYg4XfdFyn0UE/NSSxuV4NI+ONOzRkSN7wuCtF7G6m
+         GTOO87BGuQVGfzWL5T65/lgJj6fjNzyMISuP7RyGnMi7ZT8v5eJ20/bJPOff/6tMEzYf
+         htFF4m10x/m7ACoxg+H+qSKb1axBk/xf7pNTnIFlBhJxau06TJtioZB85NLY3yGUoNGf
+         qsBS4tNQxQMxJEtkUampvrB3zly877wqooUCzxdQkmiqESGQ2AKpeP3mEO/CMSG07Le0
+         wmxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715233473; x=1715838273;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=AJWRqriluNl85+42GdgojZnsAFr/eRJv/kXU3cwJsng=;
-        b=Jy2ObV2kqKc1Ripe6Q7r0hixFItxw0wOrtpHk3YlmRHaAh0g8+ruDRr7ba6tYVLr5K
-         1lMmXMxMMOfg0gnpSlWiTlNl3O0qRTzsVfy+9KeCEB1EqbwshCjNVg4Ds3pFPKw7eS7f
-         5+A4aa22X/5ZeiKDrIWbpL/5kp+4tqnyfV/NxQw5g332c47EVsJAjP0kINEhWaLKcbwK
-         zH+TE/v3R3nPInMunkEHjj0/PQpsFwsMS9LKL5JLClrM0JI34syRIOhRM9MU1Dy0+EbD
-         MAhWIvFVA7+e8BlHBjD7NwjHk4v8U7Fpm+l+Txc8JUzKa+PneUiUritGFq6MjQcsqqwI
-         fySw==
-X-Gm-Message-State: AOJu0Yw6Vx5wVG7u4vi7oQvcqkH3YMUeakoPXOe8ggyWzIwL0LmxuuSe
-	NG2Q/Agl20AU23rDJF+jgC0QraplBajgmb0LtaMvQG6ssFour6x2
-X-Google-Smtp-Source: AGHT+IGd4oa2yMXCfYQP+bxGt12i9vjzrC31YakhXmhGF7KdK4LjzEQLYLhaBSydZRE54ks0BhUoqg==
-X-Received: by 2002:a17:903:2283:b0:1eb:2f02:cd0d with SMTP id d9443c01a7336-1eeaf870a61mr69944755ad.0.1715233472788;
-        Wed, 08 May 2024 22:44:32 -0700 (PDT)
-Received: from localhost (220-245-239-57.tpgi.com.au. [220.245.239.57])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c1368cfsm5209235ad.253.2024.05.08.22.44.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 May 2024 22:44:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715235259; x=1715840059;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=72bWBwjQodIuSi8MsUtQvKNvKwdUWjXGREUei480Xwo=;
+        b=vX/PXtSUlCMS6p89RAznfAIhO+/gQ9bFzimi+l4xlOSgORvdppBFbEWLDVx+MVZ4/n
+         l1XeQ3B7d23++ZsVL8n/RZeMzMf6pqVovufqJx0X9bCDiElvB7og143DBldULZWeyqHU
+         h+vADGeKXwFVP46wWz775et0lI4KoQs7B2ZRjLEt2eJgHv/xJwKivZ+sFDbIhOfT9yKY
+         P35wx9h1di88ZVQY/lt+znmxXJvuQnypWx6z5Iv5muQMVb3uxjsfdOJ6QsYEqiQGwf6r
+         lC1eqJSdNp6okkmzaClwBPJUWlVkNk/acKy1Ut99PlmlEahNFY/er1Qu0ph7MkQBUP39
+         Vq9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW/VR9BpcsVP86y/0CHSdCEgqOFKZWuxPISUbJ02WZXTNc6oe17RaEloViLyl3D31Wy81UKmeHKmZjL1LAVGBACJAE5
+X-Gm-Message-State: AOJu0YyR4jwoVIlE6JHe8BrG6QvWmOm9R5gdj0mc6vTvi0dIEC5BPdC0
+	+DVSEuRYU8YtBJIHcUwYWQ7LYAyciiwvgj692tU9K4WPUPylWVKDPo5h4frshssnP6j31cRxu1V
+	o514/Yx/m5LY4C4TJ2xrMfYZ5livh1VfhfmzK
+X-Google-Smtp-Source: AGHT+IHsPAG0LEeM4cJXnAxgH06RrdZlxemOxK5bdPXtb66jyshH3jVsPNC7i5pX8kAB1x6smMgaq3eKTmHMEonCtFw=
+X-Received: by 2002:a05:6402:5206:b0:572:a23b:1d81 with SMTP id
+ 4fb4d7f45d1cf-5733b9d3b3emr79412a12.5.1715235258767; Wed, 08 May 2024
+ 23:14:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+References: <20240507214254.2787305-1-edliaw@google.com> <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
+In-Reply-To: <f4e45604-86b0-4be6-9bea-36edf301df33@linuxfoundation.org>
+From: Edward Liaw <edliaw@google.com>
+Date: Wed, 8 May 2024 23:13:51 -0700
+Message-ID: <CAG4es9XE2D94BNboRSf607NbJVW7OW4xkVq4jZ8pDZ_AZsb3nQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/5] Define _GNU_SOURCE for sources using
+To: Shuah Khan <skhan@linuxfoundation.org>
+Cc: shuah@kernel.org, Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+	Takashi Iwai <tiwai@suse.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Nhat Pham <nphamcs@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Christian Brauner <brauner@kernel.org>, Eric Biederman <ebiederm@xmission.com>, 
+	Kees Cook <keescook@chromium.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>, 
+	Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>, 
+	Jiri Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, 
+	Kevin Tian <kevin.tian@intel.com>, Andy Lutomirski <luto@amacapital.net>, 
+	Will Drewry <wad@chromium.org>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Zenghui Yu <yuzenghui@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Sean Christopherson <seanjc@google.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, David Hildenbrand <david@redhat.com>, 
+	=?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Seth Forshee <sforshee@kernel.org>, Bongsu Jeon <bongsu.jeon@samsung.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	=?UTF-8?Q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Matthieu Baerts <matttbe@kernel.org>, 
+	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Fenghua Yu <fenghua.yu@intel.com>, 
+	Reinette Chatre <reinette.chatre@intel.com>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Muhammad Usama Anjum <usama.anjum@collabora.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team@android.com, 
+	linux-sound@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mm@kvack.org, linux-input@vger.kernel.org, iommu@lists.linux.dev, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-security-module@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-actions@lists.infradead.org, mptcp@lists.linux.dev, 
+	linux-rtc@vger.kernel.org, linux-sgx@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 09 May 2024 15:44:27 +1000
-Message-Id: <D14VIP36ZLPW.334QUWLZMQ5T3@gmail.com>
-Cc: <kvm@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [kvm-unit-tests PATCH v9 07/31] scripts: allow machine option
- to be specified in unittests.cfg
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Thomas Huth" <thuth@redhat.com>
-X-Mailer: aerc 0.17.0
-References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-8-npiggin@gmail.com>
- <e0df1892-c17f-4fc3-b95a-4efc0af917d3@redhat.com>
- <D149GFR9LAZH.1X2F7YKPEJ42C@gmail.com>
- <f304924b-8acf-40f6-9426-10fdf77712b6@redhat.com>
- <1e07de7a-5b14-4168-aa14-56dae8766dc0@redhat.com>
- <50e43047-b251-465b-b4b0-b5987ec9aa78@redhat.com>
-In-Reply-To: <50e43047-b251-465b-b4b0-b5987ec9aa78@redhat.com>
 
-On Wed May 8, 2024 at 11:36 PM AEST, Thomas Huth wrote:
-> On 08/05/2024 14.58, Thomas Huth wrote:
-> > On 08/05/2024 14.55, Thomas Huth wrote:
-> >> On 08/05/2024 14.27, Nicholas Piggin wrote:
-> >>> On Wed May 8, 2024 at 1:08 AM AEST, Thomas Huth wrote:
-> >>>> On 04/05/2024 14.28, Nicholas Piggin wrote:
-> >>>>> This allows different machines with different requirements to be
-> >>>>> supported by run_tests.sh, similarly to how different accelerators
-> >>>>> are handled.
-> >>>>>
-> >>>>> Acked-by: Thomas Huth <thuth@redhat.com>
-> >>>>> Acked-by: Andrew Jones <andrew.jones@linux.dev>
-> >>>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> >>>>> ---
-> >>>>> =C2=A0=C2=A0 docs/unittests.txt=C2=A0=C2=A0 |=C2=A0 7 +++++++
-> >>>>> =C2=A0=C2=A0 scripts/common.bash=C2=A0 |=C2=A0 8 ++++++--
-> >>>>> =C2=A0=C2=A0 scripts/runtime.bash | 16 ++++++++++++----
-> >>>>> =C2=A0=C2=A0 3 files changed, 25 insertions(+), 6 deletions(-)
-> >>>>>
-> >>>>> diff --git a/docs/unittests.txt b/docs/unittests.txt
-> >>>>> index 7cf2c55ad..6449efd78 100644
-> >>>>> --- a/docs/unittests.txt
-> >>>>> +++ b/docs/unittests.txt
-> >>>>> @@ -42,6 +42,13 @@ For <arch>/ directories that support multiple=20
-> >>>>> architectures, this restricts
-> >>>>> =C2=A0=C2=A0 the test to the specified arch. By default, the test w=
-ill run on any
-> >>>>> =C2=A0=C2=A0 architecture.
-> >>>>> +machine
-> >>>>> +-------
-> >>>>> +For those architectures that support multiple machine types, this=
-=20
-> >>>>> restricts
-> >>>>> +the test to the specified machine. By default, the test will run o=
-n
-> >>>>> +any machine type. (Note, the machine can be specified with the MAC=
-HINE=3D
-> >>>>> +environment variable, and defaults to the architecture's default.)
-> >>>>> +
-> >>>>> =C2=A0=C2=A0 smp
-> >>>>> =C2=A0=C2=A0 ---
-> >>>>> =C2=A0=C2=A0 smp =3D <number>
-> >>>>> diff --git a/scripts/common.bash b/scripts/common.bash
-> >>>>> index 5e9ad53e2..3aa557c8c 100644
-> >>>>> --- a/scripts/common.bash
-> >>>>> +++ b/scripts/common.bash
-> >>>>> @@ -10,6 +10,7 @@ function for_each_unittest()
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local opts
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local groups
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local arch
-> >>>>> +=C2=A0=C2=A0=C2=A0 local machine
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local check
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local accel
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local timeout
-> >>>>> @@ -21,7 +22,7 @@ function for_each_unittest()
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if [[ =
-"$line" =3D~ ^\[(.*)\]$ ]]; then
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 rematch=3D${BASH_REMATCH[1]}
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 if [ -n "${testname}" ]; then
-> >>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 $(arch_cmd) "$cmd" "$testname" "$groups" "$smp"=20
-> >>>>> "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 $(arch_cmd) "$cmd" "$testname" "$groups" "$smp"=20
-> >>>>> "$kernel" "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 fi
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 testname=3D$rematch
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 smp=3D1
-> >>>>> @@ -29,6 +30,7 @@ function for_each_unittest()
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 opts=3D""
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 groups=3D""
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 arch=3D""
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- machine=3D""
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 check=3D""
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 accel=3D""
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 timeout=3D""
-> >>>>> @@ -58,6 +60,8 @@ function for_each_unittest()
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 groups=3D${BASH_REMATCH[1]}
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 elif [=
-[ $line =3D~ ^arch\ *=3D\ *(.*)$ ]]; then
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 arch=3D${BASH_REMATCH[1]}
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 elif [[ $line =3D~ ^mac=
-hine\ *=3D\ *(.*)$ ]]; then
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- machine=3D${BASH_REMATCH[1]}
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 elif [=
-[ $line =3D~ ^check\ *=3D\ *(.*)$ ]]; then
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 check=3D${BASH_REMATCH[1]}
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 elif [=
-[ $line =3D~ ^accel\ *=3D\ *(.*)$ ]]; then
-> >>>>> @@ -67,7 +71,7 @@ function for_each_unittest()
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fi
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 done
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if [ -n "${testname}" ]; then
-> >>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 $(arch_cmd) "$cmd" "$te=
-stname" "$groups" "$smp" "$kernel"=20
-> >>>>> "$opts" "$arch" "$check" "$accel" "$timeout"
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 $(arch_cmd) "$cmd" "$te=
-stname" "$groups" "$smp" "$kernel"=20
-> >>>>> "$opts" "$arch" "$machine" "$check" "$accel" "$timeout"
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fi
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exec {fd}<&-
-> >>>>> =C2=A0=C2=A0 }
-> >>>>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> >>>>> index 177b62166..0c96d6ea2 100644
-> >>>>> --- a/scripts/runtime.bash
-> >>>>> +++ b/scripts/runtime.bash
-> >>>>> @@ -32,7 +32,7 @@ premature_failure()
-> >>>>> =C2=A0=C2=A0 get_cmdline()
-> >>>>> =C2=A0=C2=A0 {
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local kernel=3D$1
-> >>>>> -=C2=A0=C2=A0=C2=A0 echo "TESTNAME=3D$testname TIMEOUT=3D$timeout A=
-CCEL=3D$accel=20
-> >>>>> $RUNTIME_arch_run $kernel -smp $smp $opts"
-> >>>>> +=C2=A0=C2=A0=C2=A0 echo "TESTNAME=3D$testname TIMEOUT=3D$timeout M=
-ACHINE=3D$machine=20
-> >>>>> ACCEL=3D$accel $RUNTIME_arch_run $kernel -smp $smp $opts"
-> >>>>> =C2=A0=C2=A0 }
-> >>>>> =C2=A0=C2=A0 skip_nodefault()
-> >>>>> @@ -80,9 +80,10 @@ function run()
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local kernel=3D"$4"
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local opts=3D"$5"
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local arch=3D"$6"
-> >>>>> -=C2=A0=C2=A0=C2=A0 local check=3D"${CHECK:-$7}"
-> >>>>> -=C2=A0=C2=A0=C2=A0 local accel=3D"$8"
-> >>>>> -=C2=A0=C2=A0=C2=A0 local timeout=3D"${9:-$TIMEOUT}" # unittests.cf=
-g overrides the default
-> >>>>> +=C2=A0=C2=A0=C2=A0 local machine=3D"$7"
-> >>>>> +=C2=A0=C2=A0=C2=A0 local check=3D"${CHECK:-$8}"
-> >>>>> +=C2=A0=C2=A0=C2=A0 local accel=3D"$9"
-> >>>>> +=C2=A0=C2=A0=C2=A0 local timeout=3D"${10:-$TIMEOUT}" # unittests.c=
-fg overrides the default
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if [ "${CONFIG_EFI}" =3D=3D "y=
-" ]; then
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kernel=
-=3D${kernel/%.flat/.efi}
-> >>>>> @@ -116,6 +117,13 @@ function run()
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return=
- 2
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 fi
-> >>>>> +=C2=A0=C2=A0=C2=A0 if [ -n "$machine" ] && [ -n "$MACHINE" ] && [ =
-"$machine" !=3D=20
-> >>>>> "$MACHINE" ]; then
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 print_result "SKIP" $te=
-stname "" "$machine only"
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 2
-> >>>>> +=C2=A0=C2=A0=C2=A0 elif [ -n "$MACHINE" ]; then
-> >>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 machine=3D"$MACHINE"
-> >>>>> +=C2=A0=C2=A0=C2=A0 fi
-> >>>>> +
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if [ -n "$accel" ] && [ -n "$A=
-CCEL" ] && [ "$accel" !=3D "$ACCEL"=20
-> >>>>> ]; then
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 print_=
-result "SKIP" $testname "" "$accel only, but=20
-> >>>>> ACCEL=3D$ACCEL"
-> >>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return=
- 2
-> >>>>
-> >>>> For some reasons that I don't quite understand yet, this patch cause=
-s the
-> >>>> "sieve" test to always timeout on the s390x runner, see e.g.:
-> >>>>
-> >>>> =C2=A0=C2=A0 https://gitlab.com/thuth/kvm-unit-tests/-/jobs/67989549=
-87
-> >>>
-> >>> How do you use the s390x runner?
-> >>>
-> >>>>
-> >>>> Everything is fine in the previous patches (I pushed now the previou=
-s 5
-> >>>> patches to the repo):
-> >>>>
-> >>>> =C2=A0=C2=A0 https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/pipe=
-lines/1281919104
-> >>>>
-> >>>> Could it be that he TIMEOUT gets messed up in certain cases?
-> >>>
-> >>> Hmm not sure yet. At least it got timeout right for the duration=3D90=
-s
-> >>> message.
-> >>
-> >> That seems to be wrong, the test is declared like this in=20
-> >> s390x/unittests.cfg :
-> >>
-> >> [sieve]
-> >> file =3D sieve.elf
-> >> groups =3D selftest
-> >> # can take fairly long when KVM is nested inside z/VM
-> >> timeout =3D 600
-> >>
-> >> And indeed, it takes way longer than 90 seconds on that CI machine, so=
- the=20
-> >> timeout after 90 seconds should not occur here...
-> >=20
-> > I guess you need to adjust arch_cmd_s390x in scripts/s390x/func.bash to=
- be=20
-> > aware of the new parameter, too?
+On Wed, May 8, 2024 at 4:10=E2=80=AFPM Shuah Khan <skhan@linuxfoundation.or=
+g> wrote:
 >
-> This seems to fix the problem:
-
-Thanks, that looks good.
-
-> diff --git a/scripts/s390x/func.bash b/scripts/s390x/func.bash
-> index fa47d019..6b817727 100644
-> --- a/scripts/s390x/func.bash
-> +++ b/scripts/s390x/func.bash
-> @@ -13,12 +13,13 @@ function arch_cmd_s390x()
->          local kernel=3D$5
->          local opts=3D$6
->          local arch=3D$7
-> -       local check=3D$8
-> -       local accel=3D$9
-> -       local timeout=3D${10}
-> +       local machine=3D$8
-> +       local check=3D$9
-> +       local accel=3D${10}
-> +       local timeout=3D${11}
->  =20
->          # run the normal test case
-> -       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$c=
-heck" "$accel" "$timeout"
-> +       "$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$m=
-achine" "$check" "$accel" "$timeout"
->  =20
->          # run PV test case
->          if [ "$accel" =3D 'tcg' ] || grep -q "migration" <<< "$groups"; =
-then
+> On 5/7/24 15:38, Edward Liaw wrote:
+> > 809216233555 ("selftests/harness: remove use of LINE_MAX") introduced
+> > asprintf into kselftest_harness.h, which is a GNU extension and needs
+> > _GNU_SOURCE to either be defined prior to including headers or with the
+> > -D_GNU_SOURCE flag passed to the compiler.
+> >
+> > v1: https://lore.kernel.org/linux-kselftest/20240430235057.1351993-1-ed=
+liaw@google.com/
+> > v2: add -D_GNU_SOURCE to KHDR_INCLUDES so that it is in a single
+> > location.  Remove #define _GNU_SOURCE from source code to resolve
+> > redefinition warnings.
+> >
+> > Edward Liaw (5):
+> >    selftests: Compile kselftest headers with -D_GNU_SOURCE
+> >    selftests/sgx: Include KHDR_INCLUDES in Makefile
 >
-> If you don't like to respin, I can add it to the patch while picking it u=
-p?
+> I appled patches 1/5 and 2.5 - The rest need to be split up.
+>
+> >    selftests: Include KHDR_INCLUDES in Makefile
+> >    selftests: Drop define _GNU_SOURCE
+> >    selftests: Drop duplicate -D_GNU_SOURCE
+> >
+>
+> Please split these patches pwe test directory. Otherwise it will
+> cause merge conflicts which can be hard to resolve.
 
-Yeah I shouldn't resend the full series just for this. If you're happy
-to squash it in that would be good.
-
-Thanks,
-Nick
+Hi Shuah,
+Sean asked that I rebase the patches on linux-next, and I will need to
+remove additional _GNU_SOURCE defines.  Should I send an unsplit v3 to
+be reviewed, then split it afterwards?  I'm concerned that it will be
+difficult to review with ~70 patches once split.
 
