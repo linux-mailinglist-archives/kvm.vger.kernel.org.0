@@ -1,306 +1,226 @@
-Return-Path: <kvm+bounces-17137-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17138-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87E238C1987
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 00:41:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2387B8C1992
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 00:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C99428280A
-	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 22:41:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C161C21795
+	for <lists+kvm@lfdr.de>; Thu,  9 May 2024 22:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A630770E0;
-	Thu,  9 May 2024 22:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CA712D745;
+	Thu,  9 May 2024 22:47:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g8JGIzqe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cI2mAntJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA68129E76;
-	Thu,  9 May 2024 22:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715294498; cv=none; b=uKO6T10Ma3NAhnnByCb2JK+Eb/OsCcfJlz2JCV0m5Jpw0zyqTFwq6oQ4qhiBJtciEKEm0oxar8FbCAhMF0DO4LbXkEICuiWFl+m7DqdBGO18b/lYjpVFre7uJqeHlq5Siz43K0JdBfg1zxN1fVcL+k8o/tkqNfMaiFga7lcQBEI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715294498; c=relaxed/simple;
-	bh=ZStfz+7SAPXBya+1cmR3OE1rs4ZUeYeuw7TPFCKi6Kw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mP+oIvF4+dEqgk/zFjnF+jJMQ5X5s7BR8wgsard5odMz5OZZFpBEc4fMbC9pFrn8QtZEK9Kn9ISSU3aCkquCCH1nWvq6jyicV2o9aBt6VHNmR2MqHza9w1a6pDqd/2eC2cJAzIe5/HW5au13CNnZ84QI+JMoCVx5o+1InXNnjww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g8JGIzqe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3923C116B1;
-	Thu,  9 May 2024 22:41:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715294497;
-	bh=ZStfz+7SAPXBya+1cmR3OE1rs4ZUeYeuw7TPFCKi6Kw=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=g8JGIzqe5O3hp560kRjTM4ectDADuWbG1WKs681FMOkIlloVNCFoVjf5/MeCCJxFb
-	 O7cj7E9oZN5QDfGoiP5XaqeDOlJ6kJ4H+heZsOI/YKOWUPlyezJjNahF5FCJyfFYIi
-	 angmgw7jglvr7e7GLnswev/RwslWe4k/ppsxB4ioggKfkf5G+CISCM8I6SxlcX6Ukl
-	 RUxvq/gSf7Y/Zuf30BxeBwNfK34upYsNRNfUdbNpv2i8y+KSeJOcz11fFssKugZ37f
-	 bTTpAdphLlYfEP/iXbgns9AIDkjp6+8DV+nDMTWl76JZY0pSRfIreSL46/mtoI3COB
-	 ZAM4tZoBZMBXA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 5D8BBCE04A9; Thu,  9 May 2024 15:41:37 -0700 (PDT)
-Date: Thu, 9 May 2024 15:41:37 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Leonardo Bras <leobras@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
-Message-ID: <4e368040-05b0-46ab-bafa-59710d5de549@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <ZjqWXPFuoYWWcxP3@google.com>
- <0e239143-65ed-445a-9782-e905527ea572@paulmck-laptop>
- <Zjq9okodmvkywz82@google.com>
- <ZjrClk4Lqw_cLO5A@google.com>
- <Zjroo8OsYcVJLsYO@LeoBras>
- <b44962dd-7b8a-4201-90b7-4c39ba20e28d@paulmck-laptop>
- <ZjsZVUdmDXZOn10l@LeoBras>
- <ZjuFuZHKUy7n6-sG@google.com>
- <5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop>
- <ZjyGefTZ8ThZukNG@LeoBras>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0EA770E0;
+	Thu,  9 May 2024 22:47:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715294872; cv=fail; b=r6v0DQsV210EKYDoDqge+nC5VQ+mc+l7wtPLY4ULUsFT4J9m7KzX0xG2sxNp43M9VnqXHOiF9xwIH405HQCH/maIFy3Nutnuxc6DbW47P+WnRyKLXIVGPkMRk/lm/ytX79hNCIYV2sSIwpAizLSYNfesyoFaFgSrSNRZDdOQZBU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715294872; c=relaxed/simple;
+	bh=zpyqxGlmASClQmwzZHF22mZP234o2RLd+elfyhD2Tvk=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=pJPXorEWYNgnB0z0shR5xLMBE6JR6L603Mrj1p6TvVYIhNRUsaUi4N4Mt+QTe2mylrV6orplUrSNlrbNW5BeMObJJWUehRESRi9oElN2nGr13s4hOghk7AfHfhzE1OybN/EuXWcFoUaeUeFPksgCGmvZJZJJjH9KCC7EO0Yxkss=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cI2mAntJ; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715294871; x=1746830871;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=zpyqxGlmASClQmwzZHF22mZP234o2RLd+elfyhD2Tvk=;
+  b=cI2mAntJumnT7JhikiFlD+54uV7MadW3AQCbqdxXn487prHH4waXH5Zd
+   7BY3Jl8NtqeUYrS6CoILdMLou6jq1vc2Om/v9X5DwsqyRs0R3ljdiJjy5
+   Y6LuoKJ0XRIamtCwC7r6EbQCLz7wkToI3JIDb4cT18CJc7C3P+zvyjn+I
+   NILm2rq1AdEzTFqwzPL2gx0+Sm0cP4i4/ulNVoMmc1lByB2cvhwy+N3X1
+   9W8vZx4C71l6KEH/i1lfoL4jD1Ve9HCwreRvtKia5Y9aS050SEmjyZ/A4
+   /fQvElXxlhZRvkzVxfYtq4xPsmBaQeKkBJm95P+r4oNiUYZ7K0Gow8Zpg
+   Q==;
+X-CSE-ConnectionGUID: yVp9woUSRMqEKc8aIszMaQ==
+X-CSE-MsgGUID: 5TLl4EaqRfmLy5z025CELQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11068"; a="11417950"
+X-IronPort-AV: E=Sophos;i="6.08,149,1712646000"; 
+   d="scan'208";a="11417950"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2024 15:47:50 -0700
+X-CSE-ConnectionGUID: sJcKuDyvStGm58ZD97agVg==
+X-CSE-MsgGUID: 0w5akJCgRP+ohDx/kJdzCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,149,1712646000"; 
+   d="scan'208";a="34071332"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 May 2024 15:47:49 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 9 May 2024 15:47:49 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 9 May 2024 15:47:49 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 9 May 2024 15:47:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RtgRk96Rt1THCE/j4Mmx6AoZY1LtDP39vKbaWUnD70zW+lFXDNeX5ECw6i6HC3JRrSlNHojvq6u3hzA6+0LwGED6Mgvs6tz5cojvkFDyPaiV3b+3luQQMwPaqohT2kP/784OPPItfmcxhZaIvOUsEpvKkEqrcAKRhvkfhRYgXtx2k9jXFgN54ppjFTmLNvIW9g2g9VWdOfH6lyUZ0MkP7DC+oglmqlVya1pe88gNDeXnV1u2MblfFld+ABApFNv2up9/NvX822V7sfFoho3P5rvxnUTQ231YcD/KtY97ztVFb4rMNlI0zjS2BSZJxRXcoFIrnCe6EHVNyUZ14UE+fA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VHa8BF4s2pXzRaD52utjRbOX4TaskYd/0DJydczEhJI=;
+ b=Rhcq4ajUb4E5/w26j5W01F0J7gqRNkDrL5rysH8NBqIabm3Nq3Nhb9bhjehZjKoiuDFFCUO7YBdLmcDFv4zsb9ScDGtIKWRZG9SQD1E3GVoOdBaoPelAN0//cDfL2KtsdsMUVfjbgNn0TjMW9ooUcclNwEqNbhSCWL1enl9Et7G4vQdLG6wn3vAwoq2F7vxtICevu+B3x1kbSJE+LzM0Gdvcx8vYmqe++4sRJJw4xilEa/4sDxcPmL4aDVnAI/qSoTbl6g9iGYK2M95DMvqqffq2mdJAD88kVgttL6VPm2TYiz5i8ORVpq6ezStZq4d2CK/j/Fdzr9ljBqxgu5TvRA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by MW3PR11MB4667.namprd11.prod.outlook.com (2603:10b6:303:53::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.45; Thu, 9 May
+ 2024 22:47:46 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.7544.048; Thu, 9 May 2024
+ 22:47:46 +0000
+Message-ID: <473ccee3-81dd-4abf-829c-a0ce71c2ff7e@intel.com>
+Date: Fri, 10 May 2024 10:47:37 +1200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 037/130] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend
+ specific
+From: "Huang, Kai" <kai.huang@intel.com>
+To: Sean Christopherson <seanjc@google.com>, <isaku.yamahata@intel.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<isaku.yamahata@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	<erdemaktas@google.com>, Sagi Shahar <sagis@google.com>, <chen.bo@intel.com>,
+	<hang.yuan@intel.com>, <tina.zhang@intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <9bd868a287599eb2a854f6983f13b4500f47d2ae.1708933498.git.isaku.yamahata@intel.com>
+ <Zjz7bRcIpe8nL0Gs@google.com>
+ <5ba2b661-0db5-4b49-9489-4d3e72adf7d2@intel.com>
+Content-Language: en-US
+In-Reply-To: <5ba2b661-0db5-4b49-9489-4d3e72adf7d2@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0135.namprd03.prod.outlook.com
+ (2603:10b6:303:8c::20) To BL1PR11MB5978.namprd11.prod.outlook.com
+ (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZjyGefTZ8ThZukNG@LeoBras>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|MW3PR11MB4667:EE_
+X-MS-Office365-Filtering-Correlation-Id: f34bacd1-135c-4baf-f2f7-08dc707a0ba4
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|376005|1800799015|366007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?bEU2Tnh3S3JITHpoZHBMa1o4dDAzVVMzbGRKRmRsRGZIcnpUYXF5dVdYazlL?=
+ =?utf-8?B?ZUhIaDkvZkgzeTR1dGJ0OTJPOVQxR2l2VDB0L1RpYWdmU2Q0M3VuRGhoUVJH?=
+ =?utf-8?B?U1U3VmVpZ1NWV2dTdW81Q2JmRzU0bnZ3OTZXSXozZWViYkVOTmNCZWxGUlhO?=
+ =?utf-8?B?bGVZTnRlRkcwOWdGNEZpVkVianRoUFZmVlFlbVhhSDh4alI3cngzM081akVX?=
+ =?utf-8?B?ZEozTWZyUVROb3dTWE9wNFZaQkdKWVJiemIyanlzZDlwSkkvQTliZCs4b2lI?=
+ =?utf-8?B?blBBWndDY3ZIeFRsekU3eWY0bmY3N1ltUzY3UzRuLzhMMldOUjdrbnNMKzJJ?=
+ =?utf-8?B?MkVuRUFIMUFLYzdBWXhxYXNBSGk0SzYxUk1QcGo3UlRzcGhJZFVvUlFnRjhH?=
+ =?utf-8?B?ODJQTi93SkdGb0pVYkZ6WFJ6RFpjWXp2WXdlRVo3QkNrQURVdlpoY0VkYkJV?=
+ =?utf-8?B?OWRXVFVkTlNvWmlHTlhmQ0RIam4vV0NpZ0ZjM3hyTEFhSVNqS2JubmFITkpL?=
+ =?utf-8?B?TjJTV1lIbG0zTUo0MkxSNEJueTR5QjM2RTQ3NzRvVzBOUmU5aXVzeCtMTGsz?=
+ =?utf-8?B?Q1VCcm1hQTFtWWpNR3hMUUJyUFBaMzdranNIRGFJL3BoY2FKTnNBdVdka1dU?=
+ =?utf-8?B?bjg2NWV2SkhvQXRXSmRWQTJ1YXFzV1diVlBGR2ZrYjhXdUFzTDVLWUUweU8y?=
+ =?utf-8?B?OWJzejBkS3orQjFlWEVKd1V6K1N5UDVuZjdJN0J3STQ4UkUyQ2oxTHk1RURO?=
+ =?utf-8?B?RERBZzJlUVZHdVJBVm0vbFFHSCtCd2pWWnU0RmlTQzE0ZVg3ODRLZWxYSHAx?=
+ =?utf-8?B?aHorM2QzaUQvVFhpMjNKQVgrbzZyb2drNHJKYzRqazRJQTlVRDkzMFB1bDZa?=
+ =?utf-8?B?azNEV204dnFLUmJFUlJnV1FhY2JubmdITUxLUTdyMFlIemZsa0NXNWlVNVBM?=
+ =?utf-8?B?SjE4S2VsMkR3LzE1RDZvK2FpZkI2dHhrWDBiQlhEWTQvSlZqRkFyYWg4M3hX?=
+ =?utf-8?B?VStYR2tiMHZGaDE1VC9mQzRaUUdnYVZZM3VSaWRzaG1qM2phNUxqWXoyOGpq?=
+ =?utf-8?B?dURvODJhZFFQS201NWU3RUZpaHBQbWlEMHl1elUxaGMxRDdmNTV2YlF1eklx?=
+ =?utf-8?B?cGdBR1RxTCtSVnhOSXRvM2pqdWlmeXhSZmVGd25rL3psZ1grNTltbkwyQkw2?=
+ =?utf-8?B?WENmRDhHODNBOGgvcVRTR3FXNXQwQndBQWk0MlNSM1lBakdLaG13RGw5UG84?=
+ =?utf-8?B?YnhIYlhjREVXT29QeWxlejRURGdyMmFNNHZrZVdkUCtPeUhHeVBDanJJdjd4?=
+ =?utf-8?B?NVFZTzVWUmZRQ1h6c1l3bGdiaTlVR0YxS1o2VTYzRUN6QUgrVmNlZzQyZjBZ?=
+ =?utf-8?B?YnFOYmJMQ1Q4V2JBSmd6eDhJRjZFZ09aYW9jU05uenRKR2ZMc1ZvVE40dG1V?=
+ =?utf-8?B?SnBNb3NoYXhJM0Rra3FnQytHNzBLM0xvVmdqNE9pYmdBTTBkejJoNGd3NHNC?=
+ =?utf-8?B?VDNQVDhWS3hXeU1KbEEzNkwyQUE0dzR0bStWTUJadll6dnhLSFZsV0pmemxt?=
+ =?utf-8?B?RXFpZzlFLzkrTXg3NDBaa3dWSUw0QVFxam5PcS9QeGhYdEN1SjVDSmp0MUdz?=
+ =?utf-8?B?bk1mdXNOZzN4eUhvcjNqUzFoVUNBeDFYbGRpNEFhN2tHVFMvQUc0U2R0NWpT?=
+ =?utf-8?B?VVpQbmM3MVpzc1BCaUt5OXlsblorMnkyMmNBWEhubTdYQ3ZPMXdLcmNRPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RG1veXBHc0lJVCtIQVJDdDlSOTJqdlR5ZGlEdnRweTI4RWdyamRvQ3FIN01Y?=
+ =?utf-8?B?L1JvdytyNEhkV0lQNEFqdFFlMzA1TGVEeVdaeFM5ZHRDMnU4UjYvSUtPVzBP?=
+ =?utf-8?B?eHZCUm1QWmN5SzR3TkpHWkRZT3VQOVUwWFM3WVhRaldBaHFIbzRPYlNlWW1H?=
+ =?utf-8?B?MVdwaTlwSWEvblB5Vm9rUWZGM1JZOU9XQWxEdU9scWRWNXVtaUFxU3FJTFVp?=
+ =?utf-8?B?Z1NzdDFoM1ZML05lUE91NDY1c0RPRWhOWTFnYW10aDA0VlI3S0VJc21kUk1X?=
+ =?utf-8?B?Rmp5ZlA0TDI4VlZteG9mcjF4NC8zMk5HdDUzS2thUlFhWjJGSHlSb1lSaXRQ?=
+ =?utf-8?B?Q0wzUy9Sck1nUFAzTEcvYUtDZlJkdnF1dzBBMFhxanFTd3pVVU1jSnhETzVJ?=
+ =?utf-8?B?YWtaMTNxS1FzSC9ZRmNBQ25scTFGbUxLNXJSeC9LSEhpY2tReWQwcHZGVE9B?=
+ =?utf-8?B?Sm5UV3Azcm4zTHpnSVQvMmRZZnR0cUdDU2Q0ZjZBczYvNUFjOEcvUEtJY1Zq?=
+ =?utf-8?B?REZ0ejhvTml1ZjFlbGNUZEY3NFpKblBuRnU5RWNnZk5SbzlUeWN4blZXTWla?=
+ =?utf-8?B?SURTVUIrSjZqNkVoZFM4eUZ1VTJvNGlNQkNxUFJ2RkxtOTBzVmljTVpRbjRK?=
+ =?utf-8?B?bHJ6Mk9EU2dWYmFmR1huYk81MENaNjhBbEhmNDgzSmZDWDEvMU04VWNqWjVN?=
+ =?utf-8?B?a1dSMTlFVE0reTYzVG9UKzBkSG1ocjNMUUxIelJKY0xDcVB2SzFDc3ZBQ1ht?=
+ =?utf-8?B?eUp4c25mYkZGZVNTN09aUytrWElUOVNKSmRGVkRwbFJkd2hXYlpNLzkxbzMw?=
+ =?utf-8?B?MU15czN0TG9FUXd6dWdGOXNsSTBFV3dhZDRnd28xc3RyUm9yOFpkSzhKM1hS?=
+ =?utf-8?B?SnNtd1p1M2JUS3N5ZUhmZm1jeGI0WVR6V3RhdFRsVTdiaHNkb3grcjZOSm5r?=
+ =?utf-8?B?dGlwazdnTjZxdDFaNlVzTkxSektzcDJOeElPMXBZeDAzVTdBdlhlOWxKRExS?=
+ =?utf-8?B?WllXRi9haEJrZGZMRTFheUpoRHp5eDl5MDZud3J0RjdGVVNuSVY4N1VyUVVi?=
+ =?utf-8?B?QlQyTUUxYjVCUWlQTzQ3N2cxYkJGUWhiZ3BaSVdkNUcxN1ZsaWVaaE5EdmlG?=
+ =?utf-8?B?TER5TWxaNnFoUXdKTC9RMWNsVlhsVEV2aGpmcWR4Y2hZTTM1aGJmNkltbHlm?=
+ =?utf-8?B?WnR1dXZWQml0VS9LWXRpYzJUdHJHSnJlR013K01IQnFTTWhNaHJyYWpvOEEy?=
+ =?utf-8?B?eEN6QlkxMm43ZWs2cWJCSlFGZndJUFZJTWtzTzI5ZVcyZUt3NTlkbXpHR09P?=
+ =?utf-8?B?bmc1SHR6SkRQRTc0YUk5Ullmd2FySXBBczQ2YkNkWkVJWTIvMUFhWWF0UkVJ?=
+ =?utf-8?B?NFJ5R2tVcHVuZ09ESVl4aXVoZ29vblRGWUh5Y0RMRE1jTC96V0ZGbFU1SmRw?=
+ =?utf-8?B?TzdUcGV3ZTkyOXNINjlrT2JXU29Ob2JvcExLZXNockxuOXlDT1Y5VlpVMk1O?=
+ =?utf-8?B?N3Z1VjRCaTE2UVF3cmFsMVZJTFJTcWdMTkxqQjA2MTZSSms5QytVbmFPTFFq?=
+ =?utf-8?B?R3JlVWpTS3NXeC85eEl1bklFeVZ3Rkpqd0JvcmFUanhnTTg1M2xMY2I3VEtL?=
+ =?utf-8?B?bDlDRnZVMG12N0pwaWp0b3VpZEMrcGNrN09YalV5b0NxeTBMbkgwWnBmWWp3?=
+ =?utf-8?B?TXdNWXEvMUZhRFROdmc2aFNMN25WQWw1NXlVZS9DMFZjbXVETHp6bHBVWUtG?=
+ =?utf-8?B?OGdFUEU4ckc5bU5XM01uUGk3ZzR1ZVg0N2JOZFNId3FOY2FmamdpLzdOWnEz?=
+ =?utf-8?B?c0paMzh4UGY4Mk85cGpxTFpTNmtYY1RnaDBpZjE4WE12azVCQzBuQlZzcm5N?=
+ =?utf-8?B?Tlp0MTNmT1V5V1N2NjlvQUFTQkVRN0QyQzVocW5sTWVUbG1WVS9MRzFQUzBY?=
+ =?utf-8?B?VmtJb3cxaGRUdU5ObklXcWFhUHdTN1dPZThzV0JaOG04Q0d1WUZSeWNIZ203?=
+ =?utf-8?B?Y0Y1TnMybXRTenB1SFVRcjFoY29PQk9YTnRHd3VwcVV5VGJqVktMK3lScVBQ?=
+ =?utf-8?B?VVF0OWJkUnN0WFh0VlJnMmQ5UktZYmJNZDRkME9XYWFYYnRUWGh1QnJjTmRa?=
+ =?utf-8?Q?5e4Ad4MJBExPmNhNA3aDj5Szi?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: f34bacd1-135c-4baf-f2f7-08dc707a0ba4
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 May 2024 22:47:46.5256
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HhZN46WckB25CRQLIWIeVpgqQGqMhMq+YoEaVTCCsuw/0C+W2Q+LM+IcXeF38uV8Y8Vqb1rkAmxpZ9H/qRUAkw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4667
+X-OriginatorOrg: intel.com
 
-On Thu, May 09, 2024 at 05:16:57AM -0300, Leonardo Bras wrote:
-> On Wed, May 08, 2024 at 08:32:40PM -0700, Paul E. McKenney wrote:
-> > On Wed, May 08, 2024 at 07:01:29AM -0700, Sean Christopherson wrote:
-> > > On Wed, May 08, 2024, Leonardo Bras wrote:
-> > > > Something just hit me, and maybe I need to propose something more generic.
-> > > 
-> > > Yes.  This is what I was trying to get across with my complaints about keying off
-> > > of the last VM-Exit time.  It's effectively a broad stroke "this task will likely
-> > > be quiescent soon" and so the core concept/functionality belongs in common code,
-> > > not KVM.
-> > 
-> > OK, we could do something like the following wholly within RCU, namely
-> > to make rcu_pending() refrain from invoking rcu_core() until the grace
-> > period is at least the specified age, defaulting to zero (and to the
-> > current behavior).
-> > 
-> > Perhaps something like the patch shown below.
-> 
-> That's exactly what I was thinking :)
-> 
-> > 
-> > Thoughts?
-> 
-> Some suggestions below:
-> 
-> > 
-> > 							Thanx, Paul
-> > 
-> > ------------------------------------------------------------------------
-> > 
-> > commit abc7cd2facdebf85aa075c567321589862f88542
-> > Author: Paul E. McKenney <paulmck@kernel.org>
-> > Date:   Wed May 8 20:11:58 2024 -0700
-> > 
-> >     rcu: Add rcutree.nocb_patience_delay to reduce nohz_full OS jitter
-> >     
-> >     If a CPU is running either a userspace application or a guest OS in
-> >     nohz_full mode, it is possible for a system call to occur just as an
-> >     RCU grace period is starting.  If that CPU also has the scheduling-clock
-> >     tick enabled for any reason (such as a second runnable task), and if the
-> >     system was booted with rcutree.use_softirq=0, then RCU can add insult to
-> >     injury by awakening that CPU's rcuc kthread, resulting in yet another
-> >     task and yet more OS jitter due to switching to that task, running it,
-> >     and switching back.
-> >     
-> >     In addition, in the common case where that system call is not of
-> >     excessively long duration, awakening the rcuc task is pointless.
-> >     This pointlessness is due to the fact that the CPU will enter an extended
-> >     quiescent state upon returning to the userspace application or guest OS.
-> >     In this case, the rcuc kthread cannot do anything that the main RCU
-> >     grace-period kthread cannot do on its behalf, at least if it is given
-> >     a few additional milliseconds (for example, given the time duration
-> >     specified by rcutree.jiffies_till_first_fqs, give or take scheduling
-> >     delays).
-> >     
-> >     This commit therefore adds a rcutree.nocb_patience_delay kernel boot
-> >     parameter that specifies the grace period age (in milliseconds)
-> >     before which RCU will refrain from awakening the rcuc kthread.
-> >     Preliminary experiementation suggests a value of 1000, that is,
-> >     one second.  Increasing rcutree.nocb_patience_delay will increase
-> >     grace-period latency and in turn increase memory footprint, so systems
-> >     with constrained memory might choose a smaller value.  Systems with
-> >     less-aggressive OS-jitter requirements might choose the default value
-> >     of zero, which keeps the traditional immediate-wakeup behavior, thus
-> >     avoiding increases in grace-period latency.
-> >     
-> >     Link: https://lore.kernel.org/all/20240328171949.743211-1-leobras@redhat.com/
-> >     
-> >     Reported-by: Leonardo Bras <leobras@redhat.com>
-> >     Suggested-by: Leonardo Bras <leobras@redhat.com>
-> >     Suggested-by: Sean Christopherson <seanjc@google.com>
-> >     Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
-> > 
-> > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> > index 0a3b0fd1910e6..42383986e692b 100644
-> > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > @@ -4981,6 +4981,13 @@
-> >  			the ->nocb_bypass queue.  The definition of "too
-> >  			many" is supplied by this kernel boot parameter.
-> >  
-> > +	rcutree.nocb_patience_delay= [KNL]
-> > +			On callback-offloaded (rcu_nocbs) CPUs, avoid
-> > +			disturbing RCU unless the grace period has
-> > +			reached the specified age in milliseconds.
-> > +			Defaults to zero.  Large values will be capped
-> > +			at five seconds.
-> > +
-> >  	rcutree.qhimark= [KNL]
-> >  			Set threshold of queued RCU callbacks beyond which
-> >  			batch limiting is disabled.
-> > diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-> > index 7560e204198bb..6e4b8b43855a0 100644
-> > --- a/kernel/rcu/tree.c
-> > +++ b/kernel/rcu/tree.c
-> > @@ -176,6 +176,8 @@ static int gp_init_delay;
-> >  module_param(gp_init_delay, int, 0444);
-> >  static int gp_cleanup_delay;
-> >  module_param(gp_cleanup_delay, int, 0444);
-> > +static int nocb_patience_delay;
-> > +module_param(nocb_patience_delay, int, 0444);
-> >  
-> >  // Add delay to rcu_read_unlock() for strict grace periods.
-> >  static int rcu_unlock_delay;
-> > @@ -4334,6 +4336,8 @@ EXPORT_SYMBOL_GPL(cond_synchronize_rcu_full);
-> >  static int rcu_pending(int user)
-> >  {
-> >  	bool gp_in_progress;
-> > +	unsigned long j = jiffies;
-> 
-> I think this is probably taken care by the compiler, but just in case I would move the 
-> j = jiffies;
-> closer to it's use, in order to avoid reading 'jiffies' if rcu_pending 
-> exits before the nohz_full testing.
 
-Good point!  I just removed j and used jiffies directly.
-
-> > +	unsigned int patience = msecs_to_jiffies(nocb_patience_delay);
 > 
-> What do you think on processsing the new parameter in boot, and saving it 
-> in terms of jiffies already? 
-> 
-> It would make it unnecessary to convert ms -> jiffies every time we run 
-> rcu_pending.
-> 
-> (OOO will probably remove the extra division, but may cause less impact in 
-> some arch)
+> Implement the callback for TDX guest to check whether the maximum vCPUs
+> passed from usrspace can be supported by TDX, and if it can, override
+> Accordingly, in the KVM_CHECK_EXTENSION IOCTL(), change to return the
+> 'struct kvm::max_vcpus' for a given VM for the KVM_CAP_MAX_VCPUS.
 
-This isn't exactly a fastpath, but it is easy enough to do the conversion
-in rcu_bootup_announce_oddness() and place it into another variable
-(for the benefit of those using drgn or going through crash dumps).
+Sorry some error during copy/paste.  The above should be:
 
-> >  	struct rcu_data *rdp = this_cpu_ptr(&rcu_data);
-> >  	struct rcu_node *rnp = rdp->mynode;
-> >  
-> > @@ -4347,11 +4351,13 @@ static int rcu_pending(int user)
-> >  		return 1;
-> >  
-> >  	/* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
-> > -	if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
-> > +	gp_in_progress = rcu_gp_in_progress();
-> > +	if ((user || rcu_is_cpu_rrupt_from_idle() ||
-> > +	     (gp_in_progress && time_before(j + patience, rcu_state.gp_start))) &&
-> 
-> I think you meant:
-> 	time_before(j, rcu_state.gp_start + patience)
-> 
-> or else this always fails, as we can never have now to happen before a 
-> previously started gp, right?
-> 
-> Also, as per rcu_nohz_full_cpu() we probably need it to be read with 
-> READ_ONCE():
-> 
-> 	time_before(j, READ_ONCE(rcu_state.gp_start) + patience)
+Implement the callback for TDX guest to check whether the maximum vCPUs
+passed from usrspace can be supported by TDX, and if it can, override
+the 'struct kvm::max_vcpus'.  Leave VMX guests and all AMD guests
+unsupported to avoid any side-effect for those VMs.
 
-Good catch on both counts, fixed!
+Accordingly, in the KVM_CHECK_EXTENSION IOCTL(), change to return the
+'struct kvm::max_vcpus' for a given VM for the KVM_CAP_MAX_VCPUS.
 
-> > +	    rcu_nohz_full_cpu())
-> >  		return 0;
-> >  
-> >  	/* Is the RCU core waiting for a quiescent state from this CPU? */
-> > -	gp_in_progress = rcu_gp_in_progress();
-> >  	if (rdp->core_needs_qs && !rdp->cpu_no_qs.b.norm && gp_in_progress)
-> >  		return 1;
-> >  
-> > diff --git a/kernel/rcu/tree_plugin.h b/kernel/rcu/tree_plugin.h
-> > index 340bbefe5f652..174333d0e9507 100644
-> > --- a/kernel/rcu/tree_plugin.h
-> > +++ b/kernel/rcu/tree_plugin.h
-> > @@ -93,6 +93,15 @@ static void __init rcu_bootup_announce_oddness(void)
-> >  		pr_info("\tRCU debug GP init slowdown %d jiffies.\n", gp_init_delay);
-> >  	if (gp_cleanup_delay)
-> >  		pr_info("\tRCU debug GP cleanup slowdown %d jiffies.\n", gp_cleanup_delay);
-> > +	if (nocb_patience_delay < 0) {
-> > +		pr_info("\tRCU NOCB CPU patience negative (%d), resetting to zero.\n", nocb_patience_delay);
-> > +		nocb_patience_delay = 0;
-> > +	} else if (nocb_patience_delay > 5 * MSEC_PER_SEC) {
-> > +		pr_info("\tRCU NOCB CPU patience too large (%d), resetting to %ld.\n", nocb_patience_delay, 5 * MSEC_PER_SEC);
-> > +		nocb_patience_delay = 5 * MSEC_PER_SEC;
-> > +	} else if (nocb_patience_delay) {
-> 
-> Here you suggest that we don't print if 'nocb_patience_delay == 0', 
-> as it's the default behavior, right?
 
-Exactly, in keeping with the function name rcu_bootup_announce_oddness().
-
-This approach allows easy spotting of deviations from default settings,
-which can be very helpful when debugging.
-
-> I think printing on 0 could be useful to check if the feature exists, even 
-> though we are zeroing it, but this will probably add unnecessary verbosity.
-
-It could be quite useful to people learning the RCU implementation,
-and I encourage those people to remove all those "if" statements from
-rcu_bootup_announce_oddness() in order to get the full story.
-
-> > +		pr_info("\tRCU NOCB CPU patience set to %d milliseconds.\n", nocb_patience_delay);
-> > +	}
-> 
-> Here I suppose something like this can take care of not needing to convert 
-> ms -> jiffies every rcu_pending():
-> 
-> +	nocb_patience_delay = msecs_to_jiffies(nocb_patience_delay);
-
-Agreed, but I used a separate variable to help people looking at crash
-dumps or using drgn.
-
-And thank you for your review and comments!  Applying these changes
-with attribution.
-
-							Thanx, Paul
-
-> >  	if (!use_softirq)
-> >  		pr_info("\tRCU_SOFTIRQ processing moved to rcuc kthreads.\n");
-> >  	if (IS_ENABLED(CONFIG_RCU_EQS_DEBUG))
-> > 
-> 
-> 
-> Thanks!
-> Leo
-> 
 
