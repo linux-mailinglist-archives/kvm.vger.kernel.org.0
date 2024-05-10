@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-17212-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E875E8C2B9E
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 23:17:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 073F08C2BA5
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 23:18:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42BDFB23732
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 21:17:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E843B256E0
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 21:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBA413B5AD;
-	Fri, 10 May 2024 21:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD40C13B5B1;
+	Fri, 10 May 2024 21:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YezYwwGh"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GQrmbXgR"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2083.outbound.protection.outlook.com [40.107.243.83])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2078.outbound.protection.outlook.com [40.107.220.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CA510965;
-	Fri, 10 May 2024 21:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 168B613B586;
+	Fri, 10 May 2024 21:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.78
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715375827; cv=fail; b=qUWVUCWB57i06F+pBVTeNRktsq69/p7Avqpg8OoiqGl9BTllzpdYjES8UFvz6Xjv5+DozMxQ1dC/pAJk7H65tycePQ3TjCRyRJoDYh/oDrCTAOppThUEGEoR487BtYrvU3ZcNkPigZ2EI+/RXP/3Gc2p0a1WbBwzIQ/d6OlNCVY=
+	t=1715375871; cv=fail; b=X8sjr0Psbq/vrK0tOVO3cb3RJuaDHx74JnAkTzLrNsUoyZwB4dkTFPpEdyNjv1KrIa3qH7T0JauByVdIZ9cOOF+NgS1Jt4Yyw+wn3h8DsowWnXibso2G9ChE9BKcVnnMoEPaXOc5vMELWnKtZJMgCHRK5s55em0ZkYBZx7KOzNI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715375827; c=relaxed/simple;
-	bh=TdNxHHKH2EbpTqFZiKuFqqUIp7P7PwKuvZEqXvI+yHc=;
+	s=arc-20240116; t=1715375871; c=relaxed/simple;
+	bh=PENgeX+vrApi6IpkTW0KDgA7CblzLJUlO3kphnZQ5Fc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hwJP3jRGN7/ZO1EXbYEr5j7SX4b+1J6spLqs3HxlxvO8Ywi1nCuXZzObtQwqSI61qeZ4TseEkqvGZdbTTmHAeQsXCbmufEVqHk/jKBSjwyR8/5A/UZnTevuA3kyV7e4k12favbDBNmCXkF8iyYRd4KhhaY/yGmWu2ND2gXbBix0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YezYwwGh; arc=fail smtp.client-ip=40.107.243.83
+	 MIME-Version:Content-Type; b=OjUeVeTY+FFXJa/2MtLyGJ3xRK/dyZlEzgGtNia0TpnWJ63bfPfqQwJy8UnsPmFuqi+1wVAphDk0QnkCXXDtqxq5HMfy2KoWWr0UlRyXouStn8Hkkf/v3Gc+hTzZC8bBIZrSLexH2IiAf4Ohmlgi+YLz69MgBXQqSWenyaaKw6c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GQrmbXgR; arc=fail smtp.client-ip=40.107.220.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XkhYAwo6YQbUdW4uIyVhL1Hv0aZBVL1XjWOifzq+Hao2XBaJB/wkgceCu3tB0SUyDx7NUHm/WpmNbKfjikeB7qHslErQ2OCPFwKTp5sEhBWChM8hVRdV/q9yciwAtqqLjxAKAS4kbBBQTu1OsP4p0cC1ScuOn5A0sOZcRA+2v1QcLteEezqRgXeM++yBUiw2Td4T53l/2rtnciRWNVr3UbLPdUqwrXUXx31YIJThEi1zcy8XA+7u+sBo/mlsxirw1AFCguxhmZxl0T13XTITeD0KslxPzjPlFDzNfjdinC+H7VlvReSlBojugGcnBcvpQ0PnP7yyfsG7jjCysbyc3g==
+ b=hhAmBaZQHCX6lCfPYl8yN42Mg+LJFqdlI8jwtnMKCtNSlyAPHebk2FGoLXvBYSP5PqRHsZnyv6WZJyWmiNBVsTZtlmB6HlFKBB42tP0XTAcAEXFoRVuci+zEYcswcc6h4Ahn1I1UnduCVFA2yVG9pu1ZLP5jTJ9NeftwGLdTvjZLCvDTEDR4hyn8RRb6tjy0oj+ookCIf5b4ihgySbytJ15w602iASj9IxMb+DOcCqfbQq2mihNwXT5vODlst0E3QofuWu1C09Te8OxSIyyc9pwP4+YETpYBDz0/EzCpMILprfRgo8gITy95Dt3H5ZzXHSZ44sL+/nor+sqzfGvnug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QlA6wwvx5NMnfKyPenKsCZ7bQrqbmcr4ATyGSvj81Es=;
- b=Eap0w3LQHi8wqa/S2sdJcxgaMyyXZ1vh6s1JmYNXuPpboBSwvvOCo6tZEYFS1LoBjjSJWAPZ+p2wAmfhpSQ4tgo1NzHBP90ruUEJWj0IlDg+gD0eGxUevDq+hRRQIFVj/jy2z8G1v0TZFE7ozAtEUXHiWWcbcLIVVfOjZXywA0UjWbw3dS7qbZ4d5+6gCx+uZMUurCMJLbCF+qWDlicop++LO4+BctTkgpOO9UcLv3M5sGFluLWO9YDzoiU0SBj5vyZfhhx6Dl/G0C9sfZk/Fke5ogteurvdiCc0O4BYz4yD67kN8Mv/WYyPgy7cMwffRUZFMa1S55u46mC5igQUxA==
+ bh=lTxXD2A9DOFqRa/MSHJvs5BzzSriZQQApOCwI+ouCr0=;
+ b=PYRYxLoFaLNLdD4zOUwHywFy0MIGFYAXZGygbJE2MFolNb8erVKK0yQfylD1pTkB7LeE3oapdg3ul/ZJjYK0rxme+ZVvKzheY9dEUXeGmG3lNuSWLAL1MoXQFao20Z3PzWx0A2p1PCltGbTTSZADWoFLigLqVA8R2RlabBDLzFsqjr1U5LH23z3H1OuxUTFy9oIjds7vk70Fm1XD1rKgDwSlG4e1u07+pqK5/6oVyJ1EtdIypWa+rOjUoxPr5BkSaPG455VMWpsjzySghFokjS6rLK/cfz9hU840fWdKqi7PiuQowuRj1bOns6D7D3cQwwMwoxJ0SxZbbMx08OlwpA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QlA6wwvx5NMnfKyPenKsCZ7bQrqbmcr4ATyGSvj81Es=;
- b=YezYwwGhRTTA17dcVnmr+lnuaykt1Q8a9lJDk85af1sFOLkIrzQ19sMKTn6h1kb/v3kZNjYuzciQ9sAza7t1DcolecJhaWM+LY2y1FEgOKMND3kt24EVzBKbAQGARkFtIZlosMU+vYdfnNb/U3x5j6XUZHvhlQhiiSx9Wzl4e/c=
-Received: from BN1PR10CA0016.namprd10.prod.outlook.com (2603:10b6:408:e0::21)
- by DS0PR12MB6605.namprd12.prod.outlook.com (2603:10b6:8:d3::11) with
+ bh=lTxXD2A9DOFqRa/MSHJvs5BzzSriZQQApOCwI+ouCr0=;
+ b=GQrmbXgR8RojPeiDbdXm+kr0amdkaM1FHnAgPzAfdqH6mb0rRREPR0q1GzPyexIa0maWtdC2ZVd2bJdsgxMDRgMc4qhXeDSXlNg2zKL2xN4gk+orv8w4jRSNCNkhIQ+xvi5ORCIZX4vy/x9w75FjcC+/yiaPWxHzGX9MzlMvF+w=
+Received: from BN6PR17CA0037.namprd17.prod.outlook.com (2603:10b6:405:75::26)
+ by IA0PR12MB7553.namprd12.prod.outlook.com (2603:10b6:208:43f::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48; Fri, 10 May
- 2024 21:17:02 +0000
-Received: from BN1PEPF00004686.namprd03.prod.outlook.com
- (2603:10b6:408:e0:cafe::bb) by BN1PR10CA0016.outlook.office365.com
- (2603:10b6:408:e0::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.51 via Frontend
- Transport; Fri, 10 May 2024 21:17:02 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.49; Fri, 10 May
+ 2024 21:17:44 +0000
+Received: from BN1PEPF00004684.namprd03.prod.outlook.com
+ (2603:10b6:405:75:cafe::f0) by BN6PR17CA0037.outlook.office365.com
+ (2603:10b6:405:75::26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.49 via Frontend
+ Transport; Fri, 10 May 2024 21:17:44 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,21 +63,21 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN1PEPF00004686.mail.protection.outlook.com (10.167.243.91) with Microsoft
+ BN1PEPF00004684.mail.protection.outlook.com (10.167.243.90) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7544.18 via Frontend Transport; Fri, 10 May 2024 21:17:02 +0000
+ 15.20.7544.18 via Frontend Transport; Fri, 10 May 2024 21:17:43 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 10 May
- 2024 16:17:02 -0500
+ 2024 16:17:43 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Sean Christopherson
-	<seanjc@google.com>, Brijesh Singh <brijesh.singh@amd.com>, Ashish Kalra
-	<ashish.kalra@amd.com>
-Subject: [PULL 10/19] KVM: SEV: Add support to handle RMP nested page faults
-Date: Fri, 10 May 2024 16:10:15 -0500
-Message-ID: <20240510211024.556136-11-michael.roth@amd.com>
+	<seanjc@google.com>, Tom Lendacky <thomas.lendacky@amd.com>, Brijesh Singh
+	<brijesh.singh@amd.com>, Ashish Kalra <ashish.kalra@amd.com>
+Subject: [PULL 11/19] KVM: SEV: Support SEV-SNP AP Creation NAE event
+Date: Fri, 10 May 2024 16:10:16 -0500
+Message-ID: <20240510211024.556136-12-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240510211024.556136-1-michael.roth@amd.com>
 References: <20240510211024.556136-1-michael.roth@amd.com>
@@ -93,368 +93,513 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00004686:EE_|DS0PR12MB6605:EE_
-X-MS-Office365-Filtering-Correlation-Id: 45d6774b-6c35-464a-1407-08dc71368948
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004684:EE_|IA0PR12MB7553:EE_
+X-MS-Office365-Filtering-Correlation-Id: de4b3266-4a85-49af-ff50-08dc7136a204
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|376005|36860700004|82310400017|1800799015;
+	BCL:0;ARA:13230031|82310400017|376005|36860700004|1800799015;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?nlw3w5E3mPko//NAdL6IEkCqAh71tJQvSX1dq/SqDieDUgri+K6t6OL+7IcQ?=
- =?us-ascii?Q?UzUPgwQeVI+q9xliQmfZc3C2JxhZoxWLnrfyjXPtzfGcpoONE8yOKC1AZ0R8?=
- =?us-ascii?Q?coPqUK9FMj+F7G6cFec25NcH10wen1GVlVd8W2bwsAU2JOiTCD7OMYJu2lYf?=
- =?us-ascii?Q?O7mDgBqE+/Z8dyAyO2b5PB3BlTpryuL8xAnQ0piSGUrL4SE0X+6/tD7ANrVA?=
- =?us-ascii?Q?wQuP+KXwA5PRJg5lxxZ4BNh3kQa9G/cDIfK1niSc6D7QxgnAenJLwSXLM8+d?=
- =?us-ascii?Q?98cGHf2Aq8PuBISVHRHt8d4qtbe+YdXTYUaeFuouymYvzrZQ3dQ5FX74us61?=
- =?us-ascii?Q?ZW0xleuRUhCx7JTl9HjkF4lDIu9UsdjER/EtYSSawH5Cq94uNxZYe43w8bcf?=
- =?us-ascii?Q?5M+McXBmvCPXuhGSSPjfq4d2dDI1Vbuk21DoY7SxWopE0ogcoE23G0We5dk5?=
- =?us-ascii?Q?jiZNuOUtMkne5FAdgOmpifDta2jyH2u9I53ornSCiAoH192AHgqLg+Tast6E?=
- =?us-ascii?Q?NG1WFuvPtjbpmgp46O31V/qnHClHDH9hu7fXbpcW4pdXEkKeb6XTZfZPHxny?=
- =?us-ascii?Q?2S4quRiGW4ysbkH4LfgaNxTE0upX10LJ4+e9I8gr8IP4WCHcnjGzdd4i2Qsi?=
- =?us-ascii?Q?32EQSmAasrzZfVhBaYcXHkTJkmLM10VtM84YEMsldYVVUPwRjL/ALy2dKlrp?=
- =?us-ascii?Q?3EBJxq5ZgLbOHwUW/AMgwAUdO8yekBde9nIaKjDHzwXZakgsjJnU5Z47KnB9?=
- =?us-ascii?Q?kZd4BKpsY79cWXxYIggiVAEEi30bqopDN9qGuGFZLV7zHoG2INwyKTxraHgL?=
- =?us-ascii?Q?m1l3gWdCmfqmn/i5x2T4L5ba1zbbUOblEe/TluyZTijrhgI/EeYpeps70crJ?=
- =?us-ascii?Q?5NpqzxsarZ8DqlEE3YLW5RgUCsegE2wY/AjNQw7MkZyBOrhg+SGQbRiAyEQa?=
- =?us-ascii?Q?2l1BtSDQnXDi5DANV5k70Bfmv3vEHmrnR+IB3wrvuSbeN9LRL4SPvkXL4AGk?=
- =?us-ascii?Q?b6v/upv0wnvZsFOF4O+tDZXNcxiZSwlpeNduBkBb/V4AwuDtmLQn2rq76ImV?=
- =?us-ascii?Q?Qkn2OqOyYWCiEhyMG6G9Y81ihd357UHtExhCXB4L1CLe7apmH157OCNk9X4a?=
- =?us-ascii?Q?145hErIp7mvBUBO2vsyTcZ/Zne64hG2U3zcasjEcWFr0rxT+HKik/JzqKJpt?=
- =?us-ascii?Q?bd1YZsrkyWJTmkodplG3rjYBhVlv1p/GPuJHgUMHgenDbbla/a4ONfiARQLi?=
- =?us-ascii?Q?0q0ZDk3RuMkFWkrZp3+yqyOCzhBG2TTMppjEKoAkVTkSBMtUfnKp1xRySfht?=
- =?us-ascii?Q?qEqR5xBIfK15Sd7joyhINX+j0E0Np1sg2VgTKj2cKuT2SrdmYvg4IHxjvUxR?=
- =?us-ascii?Q?Xm+XutQ=3D?=
+	=?us-ascii?Q?RkQPs4g6oLn3fDmWKlPyULd5A3y0fMjeGk8UlQTfX+glaujfGRRK69BxPY7D?=
+ =?us-ascii?Q?QSVgt1ExxS7MQqfm7aZUYq4g3WVMspbTZDT2C1CuycH2ZPBJfENtUR8tFP6M?=
+ =?us-ascii?Q?OV0bcRscUdoPMlnKLcFOfwObZVLA4P2mGS9vtFY60hOGQm87SPWwHCvAUsRg?=
+ =?us-ascii?Q?HwMin9HQs/MvFAAnYV+J4sk5HYHMEwmBwQmWWQ2oADnTWK+ulNAYScEEuDyI?=
+ =?us-ascii?Q?RmISN+7JCouHEochyGlvSXAWg4Qbj1feC/EyAfd5jIbN9jGrTHJCdyFRc1HR?=
+ =?us-ascii?Q?WP0Ru/sqscU4Z+zNsUNvNvRqR2gNfooXS3Y3CQfDr5TcDx9MKRSGzg6RDVt5?=
+ =?us-ascii?Q?9Qb7tTwfrVZGNnd9o+pYTdkY6/g26FJykPmIj0FoJAN1qtFqS/8rDTk8D7i/?=
+ =?us-ascii?Q?Cuha+HHosUps8UnmOyMmI+TlQzeZmdENB7QenzUL0XRMOe6ID8JJ56/NdsOI?=
+ =?us-ascii?Q?k+UjTUm1pATGrTeqIcEVR8oSTrJBRUaykaCdVr3AF+5wuRLjdKKweKKgQa2T?=
+ =?us-ascii?Q?5RaUWmMrskxYjoEGQITK3rVsHMKaEAt8Dtm3WNR2NKSO8jKRxE4r07WpyFF8?=
+ =?us-ascii?Q?t09LtF7PErdty9oyUFzMunIxx33yKBklm6T2p6lgu1swKYnPoySXNvFZ2Ryh?=
+ =?us-ascii?Q?Qi8R+sWz56usY4zUkMupxLhTDRlnRz5d28/Fkj1M5E8bGvworPkRS534+tXr?=
+ =?us-ascii?Q?oMduX1sxFcoV5ROpH2NbGWSZ9sjKky/z7N++z/UztCDOpVZAf3QzWAhd+E/m?=
+ =?us-ascii?Q?HojdijrDdukrXCoZlBRCJHSKl/jZ9fifEE/c+hJLmhu06otAGLyIYi3soR2j?=
+ =?us-ascii?Q?K+RuQy/t85nxeTUjrG8QLzgnM2z9+WlOLvQqFn9gkHIO9LZ+C5YIy1+El5PI?=
+ =?us-ascii?Q?5JXOHHSKCAx7MIUZRX4ZnSLb1O1082PA/LDoJ4y22v1f0/J9hAY+PCYqyN7g?=
+ =?us-ascii?Q?N8xkMUJhRmQdKWX+yN36ZC4ffzl3o1xgI46iZbezUPedopmYza0dc2hdxhmk?=
+ =?us-ascii?Q?OGFBYhmgOA96dJJooAuE4i4BRahFQbjFFFzQDeJPG4tWaV1/bT9aD3YP/az6?=
+ =?us-ascii?Q?c54fXH0DHzahQ7w5wvZ7DwHHrDBcUaWHRgvfpwmrVy7GHmsGFQ5l4sb83iep?=
+ =?us-ascii?Q?O6oGEilr0z+y+XTi9pCdGPau2gVVzTRtg57Rn9l5lAL3vahunnVCBohcfGla?=
+ =?us-ascii?Q?GMJimOa0tmwqRkh+Q722pyjp/uBexgAK5bpJ/asRijWnO6ZZzIAy9oosLu+Q?=
+ =?us-ascii?Q?Lcrblo3TZ1kKl29ZpUBOOTXq3tVrGcAj1J+/MrCvHQ0cUOt/dUSEll+MSoM1?=
+ =?us-ascii?Q?x7g3fB4OwLne7mvPg47MOm2EHGovEwMpAJKin07LUdCFPD+TxWW8Hc1E3hiD?=
+ =?us-ascii?Q?8KiI4wI=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400017)(1800799015);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(376005)(36860700004)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 21:17:02.4674
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 21:17:43.9708
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45d6774b-6c35-464a-1407-08dc71368948
+X-MS-Exchange-CrossTenant-Network-Message-Id: de4b3266-4a85-49af-ff50-08dc7136a204
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00004686.namprd03.prod.outlook.com
+	BN1PEPF00004684.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6605
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7553
 
-From: Brijesh Singh <brijesh.singh@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-When SEV-SNP is enabled in the guest, the hardware places restrictions
-on all memory accesses based on the contents of the RMP table. When
-hardware encounters RMP check failure caused by the guest memory access
-it raises the #NPF. The error code contains additional information on
-the access type. See the APM volume 2 for additional information.
+Add support for the SEV-SNP AP Creation NAE event. This allows SEV-SNP
+guests to alter the register state of the APs on their own. This allows
+the guest a way of simulating INIT-SIPI.
 
-When using gmem, RMP faults resulting from mismatches between the state
-in the RMP table vs. what the guest expects via its page table result
-in KVM_EXIT_MEMORY_FAULTs being forwarded to userspace to handle. This
-means the only expected case that needs to be handled in the kernel is
-when the page size of the entry in the RMP table is larger than the
-mapping in the nested page table, in which case a PSMASH instruction
-needs to be issued to split the large RMP entry into individual 4K
-entries so that subsequent accesses can succeed.
+A new event, KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, is created and used
+so as to avoid updating the VMSA pointer while the vCPU is running.
 
-Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+For CREATE
+  The guest supplies the GPA of the VMSA to be used for the vCPU with
+  the specified APIC ID. The GPA is saved in the svm struct of the
+  target vCPU, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is added
+  to the vCPU and then the vCPU is kicked.
+
+For CREATE_ON_INIT:
+  The guest supplies the GPA of the VMSA to be used for the vCPU with
+  the specified APIC ID the next time an INIT is performed. The GPA is
+  saved in the svm struct of the target vCPU.
+
+For DESTROY:
+  The guest indicates it wishes to stop the vCPU. The GPA is cleared
+  from the svm struct, the KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event is
+  added to vCPU and then the vCPU is kicked.
+
+The KVM_REQ_UPDATE_PROTECTED_GUEST_STATE event handler will be invoked
+as a result of the event or as a result of an INIT. If a new VMSA is to
+be installed, the VMSA guest page is set as the VMSA in the vCPU VMCB
+and the vCPU state is set to KVM_MP_STATE_RUNNABLE. If a new VMSA is not
+to be installed, the VMSA is cleared in the vCPU VMCB and the vCPU state
+is set to KVM_MP_STATE_HALTED to prevent it from being run.
+
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 Co-developed-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
+Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Message-ID: <20240501085210.2213060-12-michael.roth@amd.com>
+Message-ID: <20240501085210.2213060-13-michael.roth@amd.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
  arch/x86/include/asm/kvm_host.h |   1 +
- arch/x86/include/asm/sev.h      |   3 +
- arch/x86/kvm/mmu.h              |   2 -
- arch/x86/kvm/mmu/mmu.c          |   1 +
- arch/x86/kvm/svm/sev.c          | 109 ++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.c          |  14 ++--
- arch/x86/kvm/svm/svm.h          |   3 +
- arch/x86/kvm/trace.h            |  31 +++++++++
- arch/x86/kvm/x86.c              |   1 +
- 9 files changed, 159 insertions(+), 6 deletions(-)
+ arch/x86/include/asm/svm.h      |   6 +
+ arch/x86/kvm/svm/sev.c          | 231 +++++++++++++++++++++++++++++++-
+ arch/x86/kvm/svm/svm.c          |  11 +-
+ arch/x86/kvm/svm/svm.h          |   9 ++
+ arch/x86/kvm/x86.c              |  11 ++
+ 6 files changed, 266 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ea992f9b6e68..5830d42232da 100644
+index 5830d42232da..72f4ec1ee062 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1945,6 +1945,7 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- 				   const struct kvm_memory_slot *memslot);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
-+void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
+@@ -121,6 +121,7 @@
+ 	KVM_ARCH_REQ_FLAGS(31, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_HV_TLB_FLUSH \
+ 	KVM_ARCH_REQ_FLAGS(32, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_UPDATE_PROTECTED_GUEST_STATE	KVM_ARCH_REQ(34)
  
- int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
+ #define CR0_RESERVED_BITS                                               \
+ 	(~(unsigned long)(X86_CR0_PE | X86_CR0_MP | X86_CR0_EM | X86_CR0_TS \
+diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+index 544a43c1cf11..f0dea3750ca9 100644
+--- a/arch/x86/include/asm/svm.h
++++ b/arch/x86/include/asm/svm.h
+@@ -286,8 +286,14 @@ static_assert((X2AVIC_MAX_PHYSICAL_ID & AVIC_PHYSICAL_MAX_INDEX_MASK) == X2AVIC_
+ #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
  
-diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
-index 93ed60080cfe..14394407245c 100644
---- a/arch/x86/include/asm/sev.h
-+++ b/arch/x86/include/asm/sev.h
-@@ -91,6 +91,9 @@ extern bool handle_vc_boot_ghcb(struct pt_regs *regs);
- /* RMUPDATE detected 4K page and 2MB page overlap. */
- #define RMPUPDATE_FAIL_OVERLAP		4
+ #define SVM_SEV_FEAT_SNP_ACTIVE				BIT(0)
++#define SVM_SEV_FEAT_RESTRICTED_INJECTION		BIT(3)
++#define SVM_SEV_FEAT_ALTERNATE_INJECTION		BIT(4)
+ #define SVM_SEV_FEAT_DEBUG_SWAP				BIT(5)
  
-+/* PSMASH failed due to concurrent access by another CPU */
-+#define PSMASH_FAIL_INUSE		3
++#define SVM_SEV_FEAT_INT_INJ_MODES		\
++	(SVM_SEV_FEAT_RESTRICTED_INJECTION |	\
++	 SVM_SEV_FEAT_ALTERNATE_INJECTION)
 +
- /* RMP page size */
- #define RMP_PG_SIZE_4K			0
- #define RMP_PG_SIZE_2M			1
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 2343c9f00e31..e3cb35b9396d 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -251,8 +251,6 @@ static inline bool kvm_mmu_honors_guest_mtrrs(struct kvm *kvm)
- 	return __kvm_mmu_honors_guest_mtrrs(kvm_arch_has_noncoherent_dma(kvm));
- }
- 
--void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
--
- int kvm_arch_write_log_dirty(struct kvm_vcpu *vcpu);
- 
- int kvm_mmu_post_init_vm(struct kvm *kvm);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 9c7ab06ce454..83025fe2d17d 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6783,6 +6783,7 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 
- 	return need_tlb_flush;
- }
-+EXPORT_SYMBOL_GPL(kvm_zap_gfn_range);
- 
- static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
- 					   const struct kvm_memory_slot *slot)
+ struct vmcb_seg {
+ 	u16 selector;
+ 	u16 attrib;
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 46669431b53d..515bd6154a4b 100644
+index 515bd6154a4b..518c44296f8d 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3465,6 +3465,23 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
- 	svm->vmcb->control.ghcb_gpa = value;
+@@ -38,7 +38,7 @@
+ #define GHCB_VERSION_DEFAULT	2ULL
+ #define GHCB_VERSION_MIN	1ULL
+ 
+-#define GHCB_HV_FT_SUPPORTED	GHCB_HV_FT_SNP
++#define GHCB_HV_FT_SUPPORTED	(GHCB_HV_FT_SNP | GHCB_HV_FT_SNP_AP_CREATION)
+ 
+ /* enable/disable SEV support */
+ static bool sev_enabled = true;
+@@ -3267,6 +3267,13 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+ 		if (!kvm_ghcb_sw_scratch_is_valid(svm))
+ 			goto vmgexit_err;
+ 		break;
++	case SVM_VMGEXIT_AP_CREATION:
++		if (!sev_snp_guest(vcpu->kvm))
++			goto vmgexit_err;
++		if (lower_32_bits(control->exit_info_1) != SVM_VMGEXIT_AP_DESTROY)
++			if (!kvm_ghcb_rax_is_valid(svm))
++				goto vmgexit_err;
++		break;
+ 	case SVM_VMGEXIT_NMI_COMPLETE:
+ 	case SVM_VMGEXIT_AP_HLT_LOOP:
+ 	case SVM_VMGEXIT_AP_JUMP_TABLE:
+@@ -3701,6 +3708,205 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
+ 	unreachable();
  }
  
-+static int snp_rmptable_psmash(kvm_pfn_t pfn)
++static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
 +{
-+	int ret;
++	struct vcpu_svm *svm = to_svm(vcpu);
 +
-+	pfn = pfn & ~(KVM_PAGES_PER_HPAGE(PG_LEVEL_2M) - 1);
++	WARN_ON(!mutex_is_locked(&svm->sev_es.snp_vmsa_mutex));
++
++	/* Mark the vCPU as offline and not runnable */
++	vcpu->arch.pv.pv_unhalted = false;
++	vcpu->arch.mp_state = KVM_MP_STATE_HALTED;
++
++	/* Clear use of the VMSA */
++	svm->vmcb->control.vmsa_pa = INVALID_PAGE;
++
++	if (VALID_PAGE(svm->sev_es.snp_vmsa_gpa)) {
++		gfn_t gfn = gpa_to_gfn(svm->sev_es.snp_vmsa_gpa);
++		struct kvm_memory_slot *slot;
++		kvm_pfn_t pfn;
++
++		slot = gfn_to_memslot(vcpu->kvm, gfn);
++		if (!slot)
++			return -EINVAL;
++
++		/*
++		 * The new VMSA will be private memory guest memory, so
++		 * retrieve the PFN from the gmem backend.
++		 */
++		if (kvm_gmem_get_pfn(vcpu->kvm, slot, gfn, &pfn, NULL))
++			return -EINVAL;
++
++		/*
++		 * From this point forward, the VMSA will always be a
++		 * guest-mapped page rather than the initial one allocated
++		 * by KVM in svm->sev_es.vmsa. In theory, svm->sev_es.vmsa
++		 * could be free'd and cleaned up here, but that involves
++		 * cleanups like wbinvd_on_all_cpus() which would ideally
++		 * be handled during teardown rather than guest boot.
++		 * Deferring that also allows the existing logic for SEV-ES
++		 * VMSAs to be re-used with minimal SNP-specific changes.
++		 */
++		svm->sev_es.snp_has_guest_vmsa = true;
++
++		/* Use the new VMSA */
++		svm->vmcb->control.vmsa_pa = pfn_to_hpa(pfn);
++
++		/* Mark the vCPU as runnable */
++		vcpu->arch.pv.pv_unhalted = false;
++		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
++
++		svm->sev_es.snp_vmsa_gpa = INVALID_PAGE;
++
++		/*
++		 * gmem pages aren't currently migratable, but if this ever
++		 * changes then care should be taken to ensure
++		 * svm->sev_es.vmsa is pinned through some other means.
++		 */
++		kvm_release_pfn_clean(pfn);
++	}
 +
 +	/*
-+	 * PSMASH_FAIL_INUSE indicates another processor is modifying the
-+	 * entry, so retry until that's no longer the case.
++	 * When replacing the VMSA during SEV-SNP AP creation,
++	 * mark the VMCB dirty so that full state is always reloaded.
 +	 */
-+	do {
-+		ret = psmash(pfn);
-+	} while (ret == PSMASH_FAIL_INUSE);
++	vmcb_mark_all_dirty(svm->vmcb);
++
++	return 0;
++}
++
++/*
++ * Invoked as part of svm_vcpu_reset() processing of an init event.
++ */
++void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	int ret;
++
++	if (!sev_snp_guest(vcpu->kvm))
++		return;
++
++	mutex_lock(&svm->sev_es.snp_vmsa_mutex);
++
++	if (!svm->sev_es.snp_ap_waiting_for_reset)
++		goto unlock;
++
++	svm->sev_es.snp_ap_waiting_for_reset = false;
++
++	ret = __sev_snp_update_protected_guest_state(vcpu);
++	if (ret)
++		vcpu_unimpl(vcpu, "snp: AP state update on init failed\n");
++
++unlock:
++	mutex_unlock(&svm->sev_es.snp_vmsa_mutex);
++}
++
++static int sev_snp_ap_creation(struct vcpu_svm *svm)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(svm->vcpu.kvm)->sev_info;
++	struct kvm_vcpu *vcpu = &svm->vcpu;
++	struct kvm_vcpu *target_vcpu;
++	struct vcpu_svm *target_svm;
++	unsigned int request;
++	unsigned int apic_id;
++	bool kick;
++	int ret;
++
++	request = lower_32_bits(svm->vmcb->control.exit_info_1);
++	apic_id = upper_32_bits(svm->vmcb->control.exit_info_1);
++
++	/* Validate the APIC ID */
++	target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, apic_id);
++	if (!target_vcpu) {
++		vcpu_unimpl(vcpu, "vmgexit: invalid AP APIC ID [%#x] from guest\n",
++			    apic_id);
++		return -EINVAL;
++	}
++
++	ret = 0;
++
++	target_svm = to_svm(target_vcpu);
++
++	/*
++	 * The target vCPU is valid, so the vCPU will be kicked unless the
++	 * request is for CREATE_ON_INIT. For any errors at this stage, the
++	 * kick will place the vCPU in an non-runnable state.
++	 */
++	kick = true;
++
++	mutex_lock(&target_svm->sev_es.snp_vmsa_mutex);
++
++	target_svm->sev_es.snp_vmsa_gpa = INVALID_PAGE;
++	target_svm->sev_es.snp_ap_waiting_for_reset = true;
++
++	/* Interrupt injection mode shouldn't change for AP creation */
++	if (request < SVM_VMGEXIT_AP_DESTROY) {
++		u64 sev_features;
++
++		sev_features = vcpu->arch.regs[VCPU_REGS_RAX];
++		sev_features ^= sev->vmsa_features;
++
++		if (sev_features & SVM_SEV_FEAT_INT_INJ_MODES) {
++			vcpu_unimpl(vcpu, "vmgexit: invalid AP injection mode [%#lx] from guest\n",
++				    vcpu->arch.regs[VCPU_REGS_RAX]);
++			ret = -EINVAL;
++			goto out;
++		}
++	}
++
++	switch (request) {
++	case SVM_VMGEXIT_AP_CREATE_ON_INIT:
++		kick = false;
++		fallthrough;
++	case SVM_VMGEXIT_AP_CREATE:
++		if (!page_address_valid(vcpu, svm->vmcb->control.exit_info_2)) {
++			vcpu_unimpl(vcpu, "vmgexit: invalid AP VMSA address [%#llx] from guest\n",
++				    svm->vmcb->control.exit_info_2);
++			ret = -EINVAL;
++			goto out;
++		}
++
++		/*
++		 * Malicious guest can RMPADJUST a large page into VMSA which
++		 * will hit the SNP erratum where the CPU will incorrectly signal
++		 * an RMP violation #PF if a hugepage collides with the RMP entry
++		 * of VMSA page, reject the AP CREATE request if VMSA address from
++		 * guest is 2M aligned.
++		 */
++		if (IS_ALIGNED(svm->vmcb->control.exit_info_2, PMD_SIZE)) {
++			vcpu_unimpl(vcpu,
++				    "vmgexit: AP VMSA address [%llx] from guest is unsafe as it is 2M aligned\n",
++				    svm->vmcb->control.exit_info_2);
++			ret = -EINVAL;
++			goto out;
++		}
++
++		target_svm->sev_es.snp_vmsa_gpa = svm->vmcb->control.exit_info_2;
++		break;
++	case SVM_VMGEXIT_AP_DESTROY:
++		break;
++	default:
++		vcpu_unimpl(vcpu, "vmgexit: invalid AP creation request [%#x] from guest\n",
++			    request);
++		ret = -EINVAL;
++		break;
++	}
++
++out:
++	if (kick) {
++		kvm_make_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, target_vcpu);
++
++		if (target_vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)
++			kvm_make_request(KVM_REQ_UNBLOCK, target_vcpu);
++
++		kvm_vcpu_kick(target_vcpu);
++	}
++
++	mutex_unlock(&target_svm->sev_es.snp_vmsa_mutex);
 +
 +	return ret;
 +}
 +
- static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
+ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
  {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-@@ -4229,3 +4246,95 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+@@ -3966,6 +4172,15 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
  
+ 		ret = snp_begin_psc(svm, svm->sev_es.ghcb_sa);
+ 		break;
++	case SVM_VMGEXIT_AP_CREATION:
++		ret = sev_snp_ap_creation(svm);
++		if (ret) {
++			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
++			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
++		}
++
++		ret = 1;
++		break;
+ 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
+ 		vcpu_unimpl(vcpu,
+ 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+@@ -4060,7 +4275,7 @@ static void sev_es_init_vmcb(struct vcpu_svm *svm)
+ 	 * the VMSA will be NULL if this vCPU is the destination for intrahost
+ 	 * migration, and will be copied later.
+ 	 */
+-	if (svm->sev_es.vmsa)
++	if (svm->sev_es.vmsa && !svm->sev_es.snp_has_guest_vmsa)
+ 		svm->vmcb->control.vmsa_pa = __pa(svm->sev_es.vmsa);
+ 
+ 	/* Can't intercept CR register access, HV can't modify CR registers */
+@@ -4136,6 +4351,8 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
+ 	set_ghcb_msr(svm, GHCB_MSR_SEV_INFO((__u64)sev->ghcb_version,
+ 					    GHCB_VERSION_MIN,
+ 					    sev_enc_bit));
++
++	mutex_init(&svm->sev_es.snp_vmsa_mutex);
+ }
+ 
+ void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_area *hostsa)
+@@ -4247,6 +4464,16 @@ struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu)
  	return p;
  }
-+
-+void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+ 
++void sev_vcpu_unblocking(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_memory_slot *slot;
-+	struct kvm *kvm = vcpu->kvm;
-+	int order, rmp_level, ret;
-+	bool assigned;
-+	kvm_pfn_t pfn;
-+	gfn_t gfn;
-+
-+	gfn = gpa >> PAGE_SHIFT;
-+
-+	/*
-+	 * The only time RMP faults occur for shared pages is when the guest is
-+	 * triggering an RMP fault for an implicit page-state change from
-+	 * shared->private. Implicit page-state changes are forwarded to
-+	 * userspace via KVM_EXIT_MEMORY_FAULT events, however, so RMP faults
-+	 * for shared pages should not end up here.
-+	 */
-+	if (!kvm_mem_is_private(kvm, gfn)) {
-+		pr_warn_ratelimited("SEV: Unexpected RMP fault for non-private GPA 0x%llx\n",
-+				    gpa);
++	if (!sev_snp_guest(vcpu->kvm))
 +		return;
-+	}
 +
-+	slot = gfn_to_memslot(kvm, gfn);
-+	if (!kvm_slot_can_be_private(slot)) {
-+		pr_warn_ratelimited("SEV: Unexpected RMP fault, non-private slot for GPA 0x%llx\n",
-+				    gpa);
-+		return;
-+	}
-+
-+	ret = kvm_gmem_get_pfn(kvm, slot, gfn, &pfn, &order);
-+	if (ret) {
-+		pr_warn_ratelimited("SEV: Unexpected RMP fault, no backing page for private GPA 0x%llx\n",
-+				    gpa);
-+		return;
-+	}
-+
-+	ret = snp_lookup_rmpentry(pfn, &assigned, &rmp_level);
-+	if (ret || !assigned) {
-+		pr_warn_ratelimited("SEV: Unexpected RMP fault, no assigned RMP entry found for GPA 0x%llx PFN 0x%llx error %d\n",
-+				    gpa, pfn, ret);
-+		goto out_no_trace;
-+	}
-+
-+	/*
-+	 * There are 2 cases where a PSMASH may be needed to resolve an #NPF
-+	 * with PFERR_GUEST_RMP_BIT set:
-+	 *
-+	 * 1) RMPADJUST/PVALIDATE can trigger an #NPF with PFERR_GUEST_SIZEM
-+	 *    bit set if the guest issues them with a smaller granularity than
-+	 *    what is indicated by the page-size bit in the 2MB RMP entry for
-+	 *    the PFN that backs the GPA.
-+	 *
-+	 * 2) Guest access via NPT can trigger an #NPF if the NPT mapping is
-+	 *    smaller than what is indicated by the 2MB RMP entry for the PFN
-+	 *    that backs the GPA.
-+	 *
-+	 * In both these cases, the corresponding 2M RMP entry needs to
-+	 * be PSMASH'd to 512 4K RMP entries.  If the RMP entry is already
-+	 * split into 4K RMP entries, then this is likely a spurious case which
-+	 * can occur when there are concurrent accesses by the guest to a 2MB
-+	 * GPA range that is backed by a 2MB-aligned PFN who's RMP entry is in
-+	 * the process of being PMASH'd into 4K entries. These cases should
-+	 * resolve automatically on subsequent accesses, so just ignore them
-+	 * here.
-+	 */
-+	if (rmp_level == PG_LEVEL_4K)
-+		goto out;
-+
-+	ret = snp_rmptable_psmash(pfn);
-+	if (ret) {
-+		/*
-+		 * Look it up again. If it's 4K now then the PSMASH may have
-+		 * raced with another process and the issue has already resolved
-+		 * itself.
-+		 */
-+		if (!snp_lookup_rmpentry(pfn, &assigned, &rmp_level) &&
-+		    assigned && rmp_level == PG_LEVEL_4K)
-+			goto out;
-+
-+		pr_warn_ratelimited("SEV: Unable to split RMP entry for GPA 0x%llx PFN 0x%llx ret %d\n",
-+				    gpa, pfn, ret);
-+	}
-+
-+	kvm_zap_gfn_range(kvm, gfn, gfn + PTRS_PER_PMD);
-+out:
-+	trace_kvm_rmp_fault(vcpu, gpa, pfn, error_code, rmp_level, ret);
-+out_no_trace:
-+	put_page(pfn_to_page(pfn));
++	if (kvm_test_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu) &&
++	    vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)
++		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
 +}
++
+ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code)
+ {
+ 	struct kvm_memory_slot *slot;
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 66d5e2e46a66..bdaf39571817 100644
+index bdaf39571817..546656606b44 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -2044,6 +2044,7 @@ static int pf_interception(struct kvm_vcpu *vcpu)
- static int npf_interception(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-+	int rc;
+@@ -1398,6 +1398,9 @@ static void svm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	svm->spec_ctrl = 0;
+ 	svm->virt_spec_ctrl = 0;
  
- 	u64 fault_address = svm->vmcb->control.exit_info_2;
- 	u64 error_code = svm->vmcb->control.exit_info_1;
-@@ -2061,10 +2062,15 @@ static int npf_interception(struct kvm_vcpu *vcpu)
- 		error_code |= PFERR_PRIVATE_ACCESS;
++	if (init_event)
++		sev_snp_init_protected_guest_state(vcpu);
++
+ 	init_vmcb(vcpu);
  
- 	trace_kvm_page_fault(vcpu, fault_address, error_code);
--	return kvm_mmu_page_fault(vcpu, fault_address, error_code,
--			static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
--			svm->vmcb->control.insn_bytes : NULL,
--			svm->vmcb->control.insn_len);
-+	rc = kvm_mmu_page_fault(vcpu, fault_address, error_code,
-+				static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
-+				svm->vmcb->control.insn_bytes : NULL,
-+				svm->vmcb->control.insn_len);
-+
-+	if (rc > 0 && error_code & PFERR_GUEST_RMP_MASK)
-+		sev_handle_rmp_fault(vcpu, fault_address, error_code);
-+
-+	return rc;
+ 	if (!init_event)
+@@ -4940,6 +4943,12 @@ static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
+ 	return page_address(page);
  }
  
- static int db_interception(struct kvm_vcpu *vcpu)
++static void svm_vcpu_unblocking(struct kvm_vcpu *vcpu)
++{
++	sev_vcpu_unblocking(vcpu);
++	avic_vcpu_unblocking(vcpu);
++}
++
+ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.name = KBUILD_MODNAME,
+ 
+@@ -4962,7 +4971,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.vcpu_load = svm_vcpu_load,
+ 	.vcpu_put = svm_vcpu_put,
+ 	.vcpu_blocking = avic_vcpu_blocking,
+-	.vcpu_unblocking = avic_vcpu_unblocking,
++	.vcpu_unblocking = svm_vcpu_unblocking,
+ 
+ 	.update_exception_bitmap = svm_update_exception_bitmap,
+ 	.get_msr_feature = svm_get_msr_feature,
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 32d37ef5f580..36b573427b85 100644
+index 36b573427b85..926bfce571a6 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -728,6 +728,7 @@ void sev_hardware_unsetup(void);
- int sev_cpu_init(struct svm_cpu_data *sd);
+@@ -216,6 +216,11 @@ struct vcpu_sev_es_state {
+ 	bool psc_2m;
+ 
+ 	u64 ghcb_registered_gpa;
++
++	struct mutex snp_vmsa_mutex; /* Used to handle concurrent updates of VMSA. */
++	gpa_t snp_vmsa_gpa;
++	bool snp_ap_waiting_for_reset;
++	bool snp_has_guest_vmsa;
+ };
+ 
+ struct vcpu_svm {
+@@ -729,6 +734,8 @@ int sev_cpu_init(struct svm_cpu_data *sd);
  int sev_dev_get_attr(u32 group, u64 attr, u64 *val);
  extern unsigned int max_sev_asid;
-+void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
+ void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code);
++void sev_vcpu_unblocking(struct kvm_vcpu *vcpu);
++void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
  #else
  static inline struct page *snp_safe_alloc_page(struct kvm_vcpu *vcpu) {
  	return alloc_page(GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-@@ -741,6 +742,8 @@ static inline void sev_hardware_unsetup(void) {}
- static inline int sev_cpu_init(struct svm_cpu_data *sd) { return 0; }
+@@ -743,6 +750,8 @@ static inline int sev_cpu_init(struct svm_cpu_data *sd) { return 0; }
  static inline int sev_dev_get_attr(u32 group, u64 attr, u64 *val) { return -ENXIO; }
  #define max_sev_asid 0
-+static inline void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code) {}
-+
+ static inline void sev_handle_rmp_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code) {}
++static inline void sev_vcpu_unblocking(struct kvm_vcpu *vcpu) {}
++static inline void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu) {}
+ 
  #endif
  
- /* vmenter.S */
-diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
-index c6b4b1728006..3531a187d5d9 100644
---- a/arch/x86/kvm/trace.h
-+++ b/arch/x86/kvm/trace.h
-@@ -1834,6 +1834,37 @@ TRACE_EVENT(kvm_vmgexit_msr_protocol_exit,
- 		  __entry->vcpu_id, __entry->ghcb_gpa, __entry->result)
- );
- 
-+/*
-+ * Tracepoint for #NPFs due to RMP faults.
-+ */
-+TRACE_EVENT(kvm_rmp_fault,
-+	TP_PROTO(struct kvm_vcpu *vcpu, u64 gpa, u64 pfn, u64 error_code,
-+		 int rmp_level, int psmash_ret),
-+	TP_ARGS(vcpu, gpa, pfn, error_code, rmp_level, psmash_ret),
-+
-+	TP_STRUCT__entry(
-+		__field(unsigned int, vcpu_id)
-+		__field(u64, gpa)
-+		__field(u64, pfn)
-+		__field(u64, error_code)
-+		__field(int, rmp_level)
-+		__field(int, psmash_ret)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->vcpu_id	= vcpu->vcpu_id;
-+		__entry->gpa		= gpa;
-+		__entry->pfn		= pfn;
-+		__entry->error_code	= error_code;
-+		__entry->rmp_level	= rmp_level;
-+		__entry->psmash_ret	= psmash_ret;
-+	),
-+
-+	TP_printk("vcpu %u gpa %016llx pfn 0x%llx error_code 0x%llx rmp_level %d psmash_ret %d",
-+		  __entry->vcpu_id, __entry->gpa, __entry->pfn,
-+		  __entry->error_code, __entry->rmp_level, __entry->psmash_ret)
-+);
-+
- #endif /* _TRACE_KVM_H */
- 
- #undef TRACE_INCLUDE_PATH
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index be43c77315ce..60ebe3ee9118 100644
+index 60ebe3ee9118..62a0474e1346 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -14003,6 +14003,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_enter);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
- EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
-+EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
+@@ -10945,6 +10945,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
  
- static int __init kvm_x86_init(void)
- {
+ 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
+ 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
++
++		if (kvm_check_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu)) {
++			kvm_vcpu_reset(vcpu, true);
++			if (vcpu->arch.mp_state != KVM_MP_STATE_RUNNABLE) {
++				r = 1;
++				goto out;
++			}
++		}
+ 	}
+ 
+ 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
+@@ -13152,6 +13160,9 @@ static inline bool kvm_vcpu_has_events(struct kvm_vcpu *vcpu)
+ 	if (kvm_test_request(KVM_REQ_PMI, vcpu))
+ 		return true;
+ 
++	if (kvm_test_request(KVM_REQ_UPDATE_PROTECTED_GUEST_STATE, vcpu))
++		return true;
++
+ 	if (kvm_arch_interrupt_allowed(vcpu) &&
+ 	    (kvm_cpu_has_interrupt(vcpu) ||
+ 	    kvm_guest_apic_has_interrupt(vcpu)))
 -- 
 2.25.1
 
