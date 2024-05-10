@@ -1,166 +1,208 @@
-Return-Path: <kvm+bounces-17163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A808C22D1
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 13:08:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B988C235F
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 13:30:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52ED2B22D76
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 11:08:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB6511F2556B
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 11:30:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5463516E893;
-	Fri, 10 May 2024 11:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C72A171675;
+	Fri, 10 May 2024 11:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dc1GOyQa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5359316DEA0
-	for <kvm@vger.kernel.org>; Fri, 10 May 2024 11:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E32171640
+	for <kvm@vger.kernel.org>; Fri, 10 May 2024 11:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715339312; cv=none; b=S9Wo0sFX44Wabz/YsKTfIJFQgN+4+0sMH0F9V2Yc3bAa3ZAl6kyqvEQaSHgtPESJ2p3i1VyFQb+p8X06VTThIwHrssejU+mtTe7T/EPCELWpLQ4zJcWRTqtt/CuY9CrHS+z9wYTpetvMQ46Bixwt/5pN4p6i7pnTgJz5/cn1C/o=
+	t=1715340440; cv=none; b=eX62JhVUddeNurRmLz78MwYE5B+lInDSOrtR5QH6qOz4UwVJ2ZoiTa+sbv10P8Ys5xJ1CVXOtR/4wGSnTo32eGdfX1pK0DAQ5JGHBwGfL219CdZlTRjVK3m4cG1/siYaD6rYVqW1UiitbXZlfGyfObluojjX0MDh2YojBpApDZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715339312; c=relaxed/simple;
-	bh=mthTqTxjW/ABmV9GWJElXotkm7Bia41/clJDZa0PFv8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AzCeBjQVa867psgYSgBu8o2dLXnCy0X6EdNJG8NhVd5ByHtGpBMwuOtKniMgx1TU8QqzyoLFHipdXmHkVaf1fj/kvMlmaZLedqA8nGVHp9kEActiIWHL0jJHGRscE7Xou8jxAIRK8TQ6TTLSpiDqgYW7cixQQPmIkJupIF2QsoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-36c5e4166cfso19754655ab.0
-        for <kvm@vger.kernel.org>; Fri, 10 May 2024 04:08:31 -0700 (PDT)
+	s=arc-20240116; t=1715340440; c=relaxed/simple;
+	bh=W1srijuSTb7jeqkogw773MDhdMTTGhTLI4r93emG8so=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=p6FjW4fHAizM/jUeNOJXVkLSQd5mvmdtAP7+PGYyH58dpGDXu8VBFPHyD3Ib2rNHMmRKK2JBw1wSLIOfYiIwAe9rrlRYajiJTC2oYqsL0nzcFwHZhovoMy0UjuMM0sCZwBPdkHRHzmtOeAETGhRvxgFpMDqYTD8YN4yj7JtSAro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dc1GOyQa; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dee5f035dd6so25118276.0
+        for <kvm@vger.kernel.org>; Fri, 10 May 2024 04:27:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715340437; x=1715945237; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GeTpsY//IUL3F2M4pGNF9LnkrFBIxs/L6CWJHc93UMI=;
+        b=dc1GOyQaf/VwYxcxJSdT3rleQS6uUSFcZ96d9RkxLxhgKKDRVJ7ezeEj0HwEXiKyD3
+         2qYnTilAvqq04UugIW7UXd96usIhT0J9GWmw1yj4pa69dTCiX/YKuDz/vzHgYSk2rlPW
+         BvnobaHSyI4wl9FbreR2JtHfc/Cj9yTNBpuGxXt0lhvuztKqbyO2FeCsUzH2oWVnzbl9
+         6UaDVXnzdMBdiu/7tiA8Z4H9X99Cpq0jDiMhfMHeiVVvt6NJgDmQJZu3yGZXED7USOZ1
+         rZAa7j8ioo3LpjJRRGkLedUDSBQd7jY00W+rhpdq6YxVYUQG2GGkdMwZZxzIQkin4GwT
+         2SGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715339310; x=1715944110;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CgOne8gL8gTh/YPgNB/bRh1J8ouQJ3eSp/81eDHHLoU=;
-        b=OKTORrsqxGPD7sxbonjZ6Y7BkXZrEVmRPv6AtYnJXBlR8G/7CRYdPzPW0JFovsgth7
-         +OZA+i7brpRUMWvxt9EXyOWUGJBrP3ZPMJJz1JkHk03ONUoPopcyRuKT2zbymzoy2HD1
-         MNQ+BgpDc6X73sU3qjxwLNgyo67EHhYhF5eP53vl3wwfFiIHOoeJWleJ/IK/7ra6hCZC
-         GD4rzQVEhJ8qtZqVnbCy4Ssz06CtMdjbKrvzTOhwErNCO+HYbcbOj0bM/2/uRap1tlm1
-         AptajQoIkeWhcX2I+tolkQ1hMB8oljDYaq3s02M2JM2OSI0oC3j9dTvsvbTCUuoTEbSx
-         xx2w==
-X-Gm-Message-State: AOJu0YwGKeCE6NW6+Q8OHwEmtxln4uiQdVPEEuHnc8ifcr42dDqauHzV
-	+J7YSFntrAhNhzCbVOabTBjot29W4DrQ59+6FVVHbgaZDfroDtnSnvJi87WHM/c948+lu4jbaU1
-	uNiW2+rPBSyeE0j1bqmBUXFXgaANO2qZ8iJV3yfGhNrG5hfgeacCDu0FdZQ==
-X-Google-Smtp-Source: AGHT+IGPpSFw3gNXkyId/H9xxhnGz9pZG86FI1OS8Tqr+uiaoK7iSQqqneZI+lMwPmS0bKRy2m4Uyq67M0VytRZMKeydZ+oPRJyM
+        d=1e100.net; s=20230601; t=1715340437; x=1715945237;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GeTpsY//IUL3F2M4pGNF9LnkrFBIxs/L6CWJHc93UMI=;
+        b=Nj1XbPeTz/Dpgmo20E13VCvmxslrM6YmkuMbZE9mQ7XVYQlrH8xN+iVYDkHW1TcShe
+         W2Y6XKfHnJsVmJCCErdUStsAdY8aAbPt2fmtjZLOVJx8LMT9wjMbLiixJfJ42CXr4L1U
+         HjJk86ya25+t1nf5r4pe6GxF4SsNe/gLGGcEbxh3y9I4KvK0RIMeZQF5ojFhhtX3UKgo
+         N6fE+NMIqIQMJtJ1WGHgTbVZ8K2fYWJT10RWzt7pW4L1SUNaNrpRi9VvSfM/YZrvwb+U
+         EmGDKHMXK0o+Ey1zjw4CAO45mBRx0TDHfrSetJbg3mJv3X1NKtYBUR4HtdrB1wEno6hU
+         8Wcw==
+X-Forwarded-Encrypted: i=1; AJvYcCU8al3HGwha8kXXkLO/T++9BWgpn5AYOhT2Utg4+vPffZ//JNnWoREnLQrGWZ7DBAP7r5sX/aH7bqrmRGJdle+8/1OD
+X-Gm-Message-State: AOJu0Yy/ZtqyEQuj4fxXkQVwpOeFIiacL6Ie3rFzpiUB5n0KV2mJcPPN
+	B+ADCjTWDVaCiY7NVIrT41XDdBVELWUJOrXA+0yJWIEpfTQlEYUXoIsLEtTMSXbfvs1r5QUQ/w=
+	=
+X-Google-Smtp-Source: AGHT+IH8LcT7Mlvj6sPM9cJjFdpOx3dU6FNulJiXugTsKM/5ei+quZrDmLQDkQIioDTzRKYsUovHynihLw==
+X-Received: from ptosi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:11ec])
+ (user=ptosi job=sendgmr) by 2002:a05:6902:100f:b0:dee:5d43:a0f3 with SMTP id
+ 3f1490d57ef6-dee5d43c91fmr54501276.6.1715340437656; Fri, 10 May 2024 04:27:17
+ -0700 (PDT)
+Date: Fri, 10 May 2024 12:26:29 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a92:4b06:0:b0:36c:5029:1925 with SMTP id
- e9e14a558f8ab-36cc1385589mr779395ab.0.1715339310489; Fri, 10 May 2024
- 04:08:30 -0700 (PDT)
-Date: Fri, 10 May 2024 04:08:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004574160618178e1e@google.com>
-Subject: [syzbot] [kvm?] WARNING in kvm_mmu_notifier_invalidate_range_start (4)
-From: syzbot <syzbot+30d8503d558f3d50306b@syzkaller.appspotmail.com>
-To: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.118.g7fe29c98d7-goog
+Message-ID: <20240510112645.3625702-1-ptosi@google.com>
+Subject: [PATCH v3 00/12] KVM: arm64: Add support for hypervisor kCFI
+From: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>
+To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+	kvm@vger.kernel.org
+Cc: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Vincent Donnefort <vdonnefort@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+CONFIG_CFI_CLANG ("kernel Control Flow Integrity") makes the compiler injec=
+t
+runtime type checks before any indirect function call. On AArch64, it gener=
+ates
+a BRK instruction to be executed on type mismatch and encodes the indices o=
+f the
+registers holding the branch target and expected type in the immediate of t=
+he
+instruction. As a result, a synchronous exception gets triggered on kCFI fa=
+ilure
+and the fault handler can retrieve the immediate (and indices) from ESR_ELx=
+.
 
-syzbot found the following issue on:
+This feature has been supported at EL1 ("host") since it was introduced by
+b26e484b8bb3 ("arm64: Add CFI error handling"), where cfi_handler() decodes
+ESR_EL1, giving informative panic messages such as
 
-HEAD commit:    2b84edefcad1 Add linux-next specific files for 20240506
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=16f76404980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b499929e4aaba1af
-dashboard link: https://syzkaller.appspot.com/bug?extid=30d8503d558f3d50306b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+  [   21.885179] CFI failure at lkdtm_indirect_call+0x2c/0x44 [lkdtm]
+  (target: lkdtm_increment_int+0x0/0x1c [lkdtm]; expected type: 0x7e0c52a)
+  [   21.886593] Internal error: Oops - CFI: 0 [#1] PREEMPT SMP
 
-Unfortunately, I don't have any reproducer for this issue yet.
+However, it is not or only partially supported at EL2: in nVHE (or pKVM),
+CONFIG_CFI_CLANG gets filtered out at build time, preventing the compiler f=
+rom
+injecting the checks. In VHE, EL2 code gets compiled with the checks but th=
+e
+handlers in VBAR_EL2 are not aware of kCFI and will produce a generic and
+not-so-helpful panic message such as
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6a22cf95ee14/disk-2b84edef.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f5c45b515282/vmlinux-2b84edef.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9bf98258a662/bzImage-2b84edef.xz
+  [   36.456088][  T200] Kernel panic - not syncing: HYP panic:
+  [   36.456088][  T200] PS:204003c9 PC:ffffffc080092310 ESR:f2008228
+  [   36.456088][  T200] FAR:0000000081a50000 HPFAR:000000000081a500 PAR:1d=
+e7ec7edbadc0de
+  [   36.456088][  T200] VCPU:00000000e189c7cf
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+30d8503d558f3d50306b@syzkaller.appspotmail.com
+To address this,
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 16762 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:595 __kvm_handle_hva_range arch/x86/kvm/../../../virt/kvm/kvm_main.c:595 [inline]
-WARNING: CPU: 0 PID: 16762 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:595 kvm_mmu_notifier_invalidate_range_start+0xa63/0xc10 arch/x86/kvm/../../../virt/kvm/kvm_main.c:787
-Modules linked in:
-CPU: 0 PID: 16762 Comm: syz-executor.1 Not tainted 6.9.0-rc7-next-20240506-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:__kvm_handle_hva_range arch/x86/kvm/../../../virt/kvm/kvm_main.c:595 [inline]
-RIP: 0010:kvm_mmu_notifier_invalidate_range_start+0xa63/0xc10 arch/x86/kvm/../../../virt/kvm/kvm_main.c:787
-Code: c6 05 fb 42 8b 0e 01 48 c7 c7 80 be c1 8b be 03 04 00 00 48 c7 c2 20 9f c1 8b e8 b8 a6 66 00 e9 f6 f8 ff ff e8 8e f5 89 00 90 <0f> 0b 90 e9 28 ff ff ff e8 80 f5 89 00 90 0f 0b 90 e9 c9 f6 ff ff
-RSP: 0018:ffffc9000a29e940 EFLAGS: 00010283
-RAX: ffffffff810c23a2 RBX: 0000000020000000 RCX: 0000000000040000
-RDX: ffffc9001580a000 RSI: 00000000000039aa RDI: 00000000000039ab
-RBP: ffffc9000a29eaf0 R08: ffffffff810c1bb6 R09: 0000000000000000
-R10: ffffc9000a29ea40 R11: fffff52001453d4d R12: dffffc0000000000
-R13: ffffc9000a29ea40 R14: 0000000020000000 R15: 1ffff92001453dc4
-FS:  00007f1c65b3f6c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0f815a8000 CR3: 00000000201c0000 CR4: 00000000003526f0
-DR0: 000000000000e8ca DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- mn_hlist_invalidate_range_start mm/mmu_notifier.c:476 [inline]
- __mmu_notifier_invalidate_range_start+0x45e/0x890 mm/mmu_notifier.c:531
- mmu_notifier_invalidate_range_start include/linux/mmu_notifier.h:439 [inline]
- try_to_unmap_one+0x9a0/0x3290 mm/rmap.c:1664
- rmap_walk_file+0x52f/0x9f0 mm/rmap.c:2669
- try_to_unmap+0x219/0x2e0
- unmap_folio+0x197/0x370 mm/huge_memory.c:2685
- split_huge_page_to_list_to_order+0xbf6/0x1cd0 mm/huge_memory.c:3187
- split_folio_to_list_to_order include/linux/huge_mm.h:581 [inline]
- split_folio_to_order include/linux/huge_mm.h:586 [inline]
- truncate_inode_partial_folio+0x470/0x740 mm/truncate.c:242
- shmem_undo_range+0x9a5/0x1df0 mm/shmem.c:1023
- shmem_truncate_range mm/shmem.c:1114 [inline]
- shmem_fallocate+0x497/0x11f0 mm/shmem.c:3117
- vfs_fallocate+0x564/0x6c0 fs/open.c:330
- madvise_remove mm/madvise.c:1012 [inline]
- madvise_vma_behavior mm/madvise.c:1036 [inline]
- madvise_walk_vmas mm/madvise.c:1268 [inline]
- do_madvise+0x192a/0x44d0 mm/madvise.c:1464
- __do_sys_madvise mm/madvise.c:1481 [inline]
- __se_sys_madvise mm/madvise.c:1479 [inline]
- __x64_sys_madvise+0xa6/0xc0 mm/madvise.c:1479
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f1c64e7dca9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f1c65b3f0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000001c
-RAX: ffffffffffffffda RBX: 00007f1c64fac050 RCX: 00007f1c64e7dca9
-RDX: 0000000000000009 RSI: 000000000060000b RDI: 0000000020000000
-RBP: 00007f1c64ec947e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000006e R14: 00007f1c64fac050 R15: 00007ffe73a84cc8
- </TASK>
+- [01/12] fixes an existing bug where the ELR_EL2 was getting clobbered on
+  synchronous exceptions, causing the wrong "PC" to be reported by
+  nvhe_hyp_panic_handler() or __hyp_call_panic(). This is particularly limi=
+ting
+  for kCFI, as it would mask the location of the failed type check.
+- [02/12] & [03/12] (resp.) fix and improve __pkvm_init_switch_pgd for kCFI
+- [04/12] to [06/12] prepare nVHE for CONFIG_CFI_CLANG and [10/12] enables =
+it
+- [12/12] improves kCFI error messages by saving then parsing the CPU conte=
+xt
+- [09/12] adds a kCFI test module for VHE and [11/12] extends it to nVHE & =
+pKVM
 
+As a result, an informative kCFI panic message is printed by or on behalf o=
+f EL2
+giving the expected type and target address (possibly resolved to a symbol)=
+ for
+VHE, nVHE, and pKVM (iff CONFIG_NVHE_EL2_DEBUG=3Dy).
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Note that kCFI errors remain fatal at EL2, even when CONFIG_CFI_PERMISSIVE=
+=3Dy.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Change in v3:
+  - Reworked the commit message of [04/12]
+  - (no code changes since v2, questions on v1 remain open)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Changes in v2:
+  - Added 2 commits implementing a test module for hyp kCFI;
+  - For __kvm_hyp_host_vector, dropped changes to the sync EL2t handler and=
+ kept
+    the SP overflow checks;
+  - Used the names __guest_exit_restore_elr_and_panic, esr_brk_comment;
+  - Documented the use of SYM_TYPED_FUNC_START for __pkvm_init_switch_pgd;
+  - Fixed or clarified commit messages.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+Pierre-Cl=C3=A9ment Tosi (12):
+  KVM: arm64: Fix clobbered ELR in sync abort/SError
+  KVM: arm64: Fix __pkvm_init_switch_pgd C signature
+  KVM: arm64: Pass pointer to __pkvm_init_switch_pgd
+  KVM: arm64: nVHE: Remove __guest_exit_panic path
+  KVM: arm64: nVHE: Add EL2h sync exception handler
+  KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+  KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
+  arm64: Move esr_comment() to <asm/esr.h>
+  KVM: arm64: VHE: Add test module for hyp kCFI
+  KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
+  KVM: arm64: nVHE: Support test module for hyp kCFI
+  KVM: arm64: Improve CONFIG_CFI_CLANG error message
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+ arch/arm64/include/asm/esr.h            |  11 ++
+ arch/arm64/include/asm/kvm_asm.h        |   3 +
+ arch/arm64/include/asm/kvm_cfi.h        |  38 +++++++
+ arch/arm64/include/asm/kvm_hyp.h        |   4 +-
+ arch/arm64/kernel/asm-offsets.c         |   1 +
+ arch/arm64/kernel/debug-monitors.c      |   4 +-
+ arch/arm64/kernel/traps.c               |   8 +-
+ arch/arm64/kvm/Kconfig                  |  20 ++++
+ arch/arm64/kvm/Makefile                 |   3 +
+ arch/arm64/kvm/handle_exit.c            |  39 ++++++-
+ arch/arm64/kvm/hyp/cfi.c                |  37 +++++++
+ arch/arm64/kvm/hyp/entry.S              |  43 +++++++-
+ arch/arm64/kvm/hyp/hyp-entry.S          |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/cfi.h    |  47 +++++++++
+ arch/arm64/kvm/hyp/include/hyp/switch.h |   5 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile        |   7 +-
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c    |   6 ++
+ arch/arm64/kvm/hyp/nvhe/host.S          |  20 ++--
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  18 +++-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c      |  19 ++++
+ arch/arm64/kvm/hyp/nvhe/setup.c         |   6 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c        |   7 ++
+ arch/arm64/kvm/hyp/vhe/Makefile         |   1 +
+ arch/arm64/kvm/hyp/vhe/switch.c         |  34 +++++-
+ arch/arm64/kvm/hyp_cfi_test.c           |  75 +++++++++++++
+ arch/arm64/kvm/hyp_cfi_test_module.c    | 135 ++++++++++++++++++++++++
+ 26 files changed, 553 insertions(+), 42 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_cfi.h
+ create mode 100644 arch/arm64/kvm/hyp/cfi.c
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/cfi.h
+ create mode 100644 arch/arm64/kvm/hyp_cfi_test.c
+ create mode 100644 arch/arm64/kvm/hyp_cfi_test_module.c
 
-If you want to undo deduplication, reply with:
-#syz undup
+--=20
+2.45.0.118.g7fe29c98d7-goog
+
 
