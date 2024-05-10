@@ -1,446 +1,245 @@
-Return-Path: <kvm+bounces-17209-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17210-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BC518C2ACE
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 21:51:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA9B8C2AE1
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 22:04:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCCDA1F244F0
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 19:51:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA5C01F25425
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 20:04:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF91E4C62A;
-	Fri, 10 May 2024 19:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32A94F881;
+	Fri, 10 May 2024 20:04:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuakNsAt"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="csGWWaUy"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2089.outbound.protection.outlook.com [40.107.243.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19B33E48C
-	for <kvm@vger.kernel.org>; Fri, 10 May 2024 19:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715370677; cv=none; b=YDSjSbPUkN+xM6cCEsRkvrcy+HV08NA7XyKszYNOPaKH2F7NIflNQEOO7q0jRjp3sp9ovFLMBkX+PpkaSklvO7Imo1YvDig3TAHNJeWtGlHagrS9+MBVAFlAHbYUvPvI7KrarYlV14uE0ZFZLWdswGhbyTUEw7b5cltdoXtesh4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715370677; c=relaxed/simple;
-	bh=7N79Cc1wOFMSsDDyjWHTW4I4FZNuavURtKrdNEHxbyY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=fSf82PSXmzrpT0UDhXi/0dtS4DcyL98El1d4/duwZ4qQ1RYuM8SyLcPaZV+Gjx/0pntxCa0IFP8sO9HZ8+qIFQmWxWS0GeqTUntBapje9c+MTQZhK7RnHQCOl5LIu2z3FmRhoq1knNXeNVxJRjVlROs3lruNxdJbzrVBPr1ugq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FuakNsAt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715370674;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=77iTtuTAICuw/H86O+BM2/FFN/3thgThNre5PX281P8=;
-	b=FuakNsAtADWCsTZKlp2vlNLG4EOSnBzc938JK+KPyGSWiXfvkxIoXgaeDqdhLZxu9JzxI2
-	jh76LlBH9WdU4c6o3EJmvQHeN/+N6CoGuQW9d37trHQog0XlomA82+hPGSmJaThAAUEPzL
-	UYNgzceX8pUbrve+0vTcRxCh2YbZOos=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-333-B61qB3fAN5SCV4cmL8uxrA-1; Fri, 10 May 2024 15:51:03 -0400
-X-MC-Unique: B61qB3fAN5SCV4cmL8uxrA-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-6383fd1e475so945097a12.0
-        for <kvm@vger.kernel.org>; Fri, 10 May 2024 12:51:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715370662; x=1715975462;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=77iTtuTAICuw/H86O+BM2/FFN/3thgThNre5PX281P8=;
-        b=qKHaMtyOos1aXwugGWWekDJHQNDJAHe5w4wsKaw6WYAwJ9f2FlftU2AH2Rq2BSN4MW
-         30tFBMNUNUDJIkcCE8MaO9XvyAbFwatIX0JIaUursf/wvxLnC+PAQfXB3MSkuMifc47F
-         ljObVNlBEJqRW6CFhtRBF2F7QcY95wlp4cWJztTeviU/4EHEvlyanfo0V6dRFuYjLuYd
-         5hUpX4q9MJr37qfAg/c0rMeGRxgcPgpNs3J97cENrGWuvs94SLipOx5z8JbfqYdh8/JD
-         OxNkvgiHxl9TlV/GzllxnePfxBk64i3IY1wkNAKwFEmhIdTy0kbqw4qJlZ55QNGVetkg
-         DCbg==
-X-Forwarded-Encrypted: i=1; AJvYcCVMu9mx2FgLpX9yRLCkTH6OP8sKPKLDpwMY3xNhyQpkcKn+n3E1LBigZyr++LjRYkR8ibh6yqvV9ccI23qCZPCMK+AT
-X-Gm-Message-State: AOJu0YxW77lO5Bn6HibFe43N6e6Q/AuOaodfC8TasEJ4X444xXX93pzr
-	c4EizW3/bGkzPUp2cBx91CXF1PKbJRL0LuXQDVBPoP67olOwHfPkNvpWKngwTS2opxnbE4SKrk5
-	ojKw9bgLPJGchNfTrKh1tWXwny0n0a8weQnzWwjpRBMywZgmY5g==
-X-Received: by 2002:a05:6a20:9145:b0:1ad:7e4d:2ea2 with SMTP id adf61e73a8af0-1afde0825dbmr5271984637.4.1715370662359;
-        Fri, 10 May 2024 12:51:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHNimRuY9IezukVV9xELSqrI2Uj0shkidemhyXzN9aQ5WnE44Y0YHWYyDwyL19neSIjVsPW9Q==
-X-Received: by 2002:a05:6a20:9145:b0:1ad:7e4d:2ea2 with SMTP id adf61e73a8af0-1afde0825dbmr5271947637.4.1715370661756;
-        Fri, 10 May 2024 12:51:01 -0700 (PDT)
-Received: from localhost.localdomain ([2804:1b3:a800:8d87:eac1:dae4:8dd4:fe50])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c0369f1sm35978865ad.185.2024.05.10.12.50.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 May 2024 12:51:00 -0700 (PDT)
-From: Leonardo Bras <leobras@redhat.com>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Leonardo Bras <leobras@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	rcu@vger.kernel.org
-Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
-Date: Fri, 10 May 2024 16:50:41 -0300
-Message-ID: <Zj56kVxuTJm4EsAn@LeoBras>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <d5021b48-09d6-4a54-9874-740051aab574@paulmck-laptop>
-References: <ZjsZVUdmDXZOn10l@LeoBras> <ZjuFuZHKUy7n6-sG@google.com> <5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop> <ZjyGefTZ8ThZukNG@LeoBras> <Zjyh-qRt3YewHsdP@LeoBras> <09a8f4f6-a692-4586-bb68-b0a524b7a5d8@paulmck-laptop> <Zj5GEK8bt3061TiD@LeoBras> <a5784417-d65d-45c2-a66f-310a494b9827@paulmck-laptop> <Zj5VgM_RzaDWQs1t@LeoBras> <d5021b48-09d6-4a54-9874-740051aab574@paulmck-laptop>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 676E44CB28
+	for <kvm@vger.kernel.org>; Fri, 10 May 2024 20:04:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715371444; cv=fail; b=p7OlPKyEgy8RNIUnihwftodGESD/B+bxy2AD6161uDaBV5HGPod87StyJhi9Na54KgbE1L9mwvhZ+qVMMQt89LmDlyfHYpCWbjK2R9u1VLjoFs5mqN6RDIeuBFY6IG6k5bFVNhrjc35/TaXMItxXK++H5r+DP3qRYRfILZ0tiVo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715371444; c=relaxed/simple;
+	bh=/BpgNj+23ghIldTFdBROUyQiAgXv9HNueUrYOqyE3V4=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=QXRGT0DsQ+1Y5y5WGU2JdLEKSO7YRmDgM8aynnjMhrRM+59YSrYHXFbAVeeSaXO7GbWt3MqyjnQymNk94KXuSSaPg6smpL1F+atvFvH8Tsx7RgacW1CcTVUvmQtNucIgc0pzOC5ythLJ/29+bNmYQeVUlRydNoUmobfAdrZ5sxI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=csGWWaUy; arc=fail smtp.client-ip=40.107.243.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QlMJLCaVeCLtyVND5ePFpOrtG3wl77vNiv5cNNE3KugyUQ+/xZtew9b0Abxj4rkJ/Ru9SQXP7oU2xayomNg1H4kIk21OX18zG35WKCPITTNXPI9Y5Se707WZeq49uNazj68tp1u//APjy7S65ETLCx88zGpjJF6wSErMTUJRSP1HGLnLDBX9ZxjhTwzqbVOmRN0ufSBE5H7RHq9bki6YaqCjt1bZET19t2OT25kC2prdaLyYlndg5WXdg0oFBAB9yJuPB6M7DbAvcT/mdAwPhW4qnJqJ5DnmQv0HgqsV7WjYkCYFCjLzrQ8gPnZW3yP+LKc5PmSMRZpsbbMo2uNzzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YHLtm0b3qrSPmc7f5sPfQK8maAal2rz21rJj33b340g=;
+ b=h1AEHsS5X2ajOx1NMu80pbNCM51vnCvMwEINipcQdnWbFaSJj4Vn9EgF8oV2IuF2LnDG8nPurOYdycNt6AYJaahnu2ILT4L1Rg2p/XwWXiouzujlH6EhSGXnDIPeIc7ILpS3bYiXE8ImpcnbVQlsqZdvPCeSFksYsKMbtt067ZQGmxm3uJpk5FFQVg2regqDFMht5zgyRnI4W+M5GWHbr5CZwjAJbS/o72gR5vOBBCgZhj5r4VvPdLTVzPHEfzkwYFVmanR38DH7Fbd4wpAKjbroRxfla2g++eQMJ9i8T+UD2QYrLlfHoEQ4kJlCsCG1rhjtlGiGUrBY2W7bTOfAeQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YHLtm0b3qrSPmc7f5sPfQK8maAal2rz21rJj33b340g=;
+ b=csGWWaUy5X65HKzt2JeVr3vpvreRruLgX+n0xWE5SBbEneIsslaTodoyYzlhgPJCDne7dSRhwLuMscoEXoGES0qeTrqR+ZMNEYqdXSjOZZpCJT54aqm3LuEGRCZsTN1rdlBKUO2c+56m85QeO87JSSIs46963XsTT/9iqs8+SSU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com (2603:10b6:303:2c::19)
+ by SN7PR12MB6958.namprd12.prod.outlook.com (2603:10b6:806:262::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.46; Fri, 10 May
+ 2024 20:03:59 +0000
+Received: from MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::b0ef:2936:fec1:3a87]) by MW3PR12MB4553.namprd12.prod.outlook.com
+ ([fe80::b0ef:2936:fec1:3a87%4]) with mapi id 15.20.7544.047; Fri, 10 May 2024
+ 20:03:59 +0000
+Message-ID: <531146c2-9a9e-f84d-1301-8e069785248a@amd.com>
+Date: Fri, 10 May 2024 15:03:55 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Reply-To: babu.moger@amd.com
+Subject: Re: [PATCH v3] target/i386: Fix CPUID encoding of Fn8000001E_ECX
+Content-Language: en-US
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>
+Cc: Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com,
+ richard.henderson@linaro.org, weijiang.yang@intel.com, philmd@linaro.org,
+ dwmw@amazon.co.uk, paul@xen.org, joao.m.martins@oracle.com,
+ qemu-devel@nongnu.org, mtosatti@redhat.com, kvm@vger.kernel.org,
+ mst@redhat.com, marcel.apfelbaum@gmail.com, yang.zhong@intel.com,
+ jing2.liu@intel.com, vkuznets@redhat.com, michael.roth@amd.com,
+ wei.huang2@amd.com, bdas@redhat.com, eduardo@habkost.net,
+ qemu-stable <qemu-stable@nongnu.org>
+References: <20240102231738.46553-1-babu.moger@amd.com>
+ <0ee4b0a8293188a53970a2b0e4f4ef713425055e.1714757834.git.babu.moger@amd.com>
+ <89911cf2-7048-4571-a39a-8fa44d7efcda@tls.msk.ru>
+ <ZjzZgmt-UMFsGjvZ@redhat.com>
+ <efb17c5f-11f0-498d-b59d-e0dfab93b56d@tls.msk.ru>
+ <Zj3WhjDW9YBW7LP8@redhat.com>
+From: "Moger, Babu" <bmoger@amd.com>
+In-Reply-To: <Zj3WhjDW9YBW7LP8@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA0PR11CA0157.namprd11.prod.outlook.com
+ (2603:10b6:806:1bb::12) To MW3PR12MB4553.namprd12.prod.outlook.com
+ (2603:10b6:303:2c::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW3PR12MB4553:EE_|SN7PR12MB6958:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ac41ed6-d45a-448c-e7ce-08dc712c54c0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|1800799015|7416005|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SkdXVHNYVlhGbUVhSktoT0pBaDBvKys4OXI5S0dkSCs5NFJsK0ZtWGkrSGds?=
+ =?utf-8?B?eThlVmdtbCsvVFBmcndKb1grNFl5S2FQNVdaK1RUOHd5T1htRjlRZ3diRkZW?=
+ =?utf-8?B?UVpETmN5TEpYNjd3NXg3a25oMmFJdWhZcmFIaDFoUlZYajV2NkxmNHk5MVEy?=
+ =?utf-8?B?RkpOMU0rbEk0TVgxQUQ5KzRKeWQraWJka09GbmNmY2VJYUdVUUVHZlo0NG10?=
+ =?utf-8?B?NE43em9Jd3lBbUs3cmIxbDdha1FxUHhZcmozbmhvVkZXekd1TjN5VHh0MGhn?=
+ =?utf-8?B?NzlCQUE1dXFBaDlEVHpTYXZhdmpXcFc1ZFIyQXNOZHVuMThlbTAyZTFKV0hh?=
+ =?utf-8?B?SWc4OWVvTHo5NFdnOHNaQnJFNjhzQjlZZ3lJTzNPZFZodnNlQjBUSUlxVHpx?=
+ =?utf-8?B?NTFZTjVHZXlyd0hxQzhCbGRwcWh6WCsvOXphak8vaTdRcU5NN3F6eUJiUTkz?=
+ =?utf-8?B?Mm1Sd3ZwZ3JBM3lWOGUyNzJleFlkeWFaSkdJenBuaWsvWUNHSWJndWNKNllj?=
+ =?utf-8?B?R2l2b0pxVTJHdEFkWHExeVI2QWhpdFM1ZW1HMEZkd1ZoVklqZnJadU5XK013?=
+ =?utf-8?B?SnhMTGUyekdHcThSWExvT2lqenMwQWhiUklzVGpZTmJxSFFLWkI3TEFSMHNF?=
+ =?utf-8?B?RmtFK2grTUtZNmhXMlFyMEY4UTZkYm9iMkZtYk9ORDE3aEhaU2VwSmI3NTJ0?=
+ =?utf-8?B?NTNoL1pMY1R0Z002dFhreXY5QVEzVkErNVpZcWxXTGN6Mkg0OHg2SCtDQUh4?=
+ =?utf-8?B?dzZUaytmeDc0Mmsrc01Ed2tMYmpGSkhxbjd6bjlBUC9BdFVNcHRKT0Fad3hG?=
+ =?utf-8?B?QU5xcE1yT2IrRU93RXZGNjczcUkzZGRlVk1jOTg3Sm9IVCtuQ3l4VFJNK0E1?=
+ =?utf-8?B?bGJDWjEzYUIzQ2pMSEQrT3ROeUZ6TklLWkp6a3JxV2lBelI5TkxndXRiUndi?=
+ =?utf-8?B?ckxBcEZSZU0yL2JEWlhWM0s1VU1VbnZPbWVUK09vL3ZOZUNtRUZEaW9nazE3?=
+ =?utf-8?B?R1ZVUHJwVXpFbytyLzZNOU5RREVRUm50TXZsa2ZhTlF5ZllMM0w3SVh0d0tq?=
+ =?utf-8?B?YU5rSXp1N0EzME10WFRPNEJibG9Pd1dpNkYyRklHbDE1bTRITXplOVBMa0U1?=
+ =?utf-8?B?V2lXTTErZDkyK09zdm5IcEFUNE4ycGtCVmxxemdvdUcxWm90N2Zjak9NYTdC?=
+ =?utf-8?B?d0c2bzJqOEpxMG9BRDFBUWZobWtFSXE0czl0MzJPWXRSbFVPWFV2YnZ1VGZU?=
+ =?utf-8?B?bkppNTZyUmpscEtzODBDODZNMGVUWTZPZVpvN2ZZdEIyY21YZWJXbzJhTHVQ?=
+ =?utf-8?B?SnB3MjRubHMzNU9xbmQwN2l1NjJTYTJvcTFBUHhNTVEzdkptMU5UOHdYbVpM?=
+ =?utf-8?B?eWNjN2hVMkdwVlJEM1dtaFFzUlUyR3c1WU9RWmJoYkwzYkI0emxWeDVwT2o4?=
+ =?utf-8?B?VTc5SU45MndFK2VWR0hXVGxlZHIzUC9MRkR3dUtrdHdJZk5DTjIrelN2YmdV?=
+ =?utf-8?B?YTM4YzBJR3Vma2FiS0FtWDlXcDI4MDJtb3VUS2dkZEJqUmNiS2ZvME5TdlUr?=
+ =?utf-8?B?SFY2YXZNdnIwMFNoRTRvN1dTM0R1dUNOVDJVUWdCN2YyVDFrSXRSSzhndUU1?=
+ =?utf-8?B?Z25sZHd4YjVKK0lWNmtPVE5Nbkl1SVl3ZzFUSUl2L3dBbjdyMjBKUzR2cTNy?=
+ =?utf-8?B?MysxUThUaUdGNWZjSHFSL3JMd0c0Myt1QW1wdU1TVkZxbEI0b05ITUZBPT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR12MB4553.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(7416005)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Rzl4Sm5rOEEyYmJiTTBHeXArR2ZOT2ExSXlKaERRenJxNXFRWTk2RnJScGto?=
+ =?utf-8?B?OWt3ZVpaVjlsOXRXRlN3SEdpeWpxOWFVd0lISnZsVlEyNytQSjh1V0dnK0Rq?=
+ =?utf-8?B?MWdaUVhxR1RRSUl4U0tkaHdFUk9WTS8wYmNtYW5uVDVtZWRCa3FuT001bWRa?=
+ =?utf-8?B?TDJWRGd5YmNuUUQ0U1d0SDREa255UFhjSjBvUDdaZHRXSm93VmxhKzR0bkZ4?=
+ =?utf-8?B?QVExVDVFL2IvdHU3WTlxcHFmQTRia2Z3OFZDWSsxV2JtTVNwa2loRXdOWnlh?=
+ =?utf-8?B?b05GUjZTUE9OejJlODlDVWVmYlBhcnZpVFBwT0xQL3lqWDREd1hCcG5yNXdu?=
+ =?utf-8?B?NzBvQTUrYVdWMHJFNHVrTVVhejN4Q3VDeTZ2b0lsZnVNQnRjU0xjN3NQbVBR?=
+ =?utf-8?B?OEZsWGVDSEhxQXRBblNlNk5kdlJrUitsWC9Nb01DQVZ3aGIrS09KM3ZUV2NQ?=
+ =?utf-8?B?K3ArVkQ0MExzb3Nkd1d0QllwTFlGUXk4OE9DRURrR0FIN29zc3BsTld1ZmJM?=
+ =?utf-8?B?UlZYeFNuZHBxa3NzbnY0VVdQL1pscG5YRVFFcGxqTnNob25nOWc0Um9iK2gr?=
+ =?utf-8?B?aFpkeUxMZDc0Z2xWVjcvbUVWRld4Nnd1TnJqRVh0dXFHVTk3YkNNdW1PQjZF?=
+ =?utf-8?B?aFNUUlVmQzFaQXo0MVNqUW8zZTZiTmRiQmNxOW9ITmVoajR5czllUVVoQlY0?=
+ =?utf-8?B?aFFYR2UrYVR5cHBOcEgweHVxeUFxanVLWXZqVXRXanUrOHRMZTkxUnNRRVhm?=
+ =?utf-8?B?VlErcTc1QnQ5S3JSRUdlUkcySjhlb3JKTXAwWlNTak45VGxIejd0akJhdE9T?=
+ =?utf-8?B?dzFTWmhVUzVzeXp6b2JUS2thVExhN09OdmNjQk9FZXVMRktuL2daK0dnMFgz?=
+ =?utf-8?B?Z085ZEF6MzVtSkF5eWEvTTJUWjZwWUJ2V21Na2gwaVJPK3c1S1VCUXFYanFs?=
+ =?utf-8?B?L3VrTFFNem51ODBHbDNFTE1jNGU1VmR6dnhRY1ZKcllTUzcrZENHaGludWJM?=
+ =?utf-8?B?UVkyMlorSE93Wks0aGI1MW5FYk9ycGxHV1pyeDZMZmRRWXQrb2hvMmFyamFn?=
+ =?utf-8?B?eDEvWWpBRDNVSGhsdUJ4SC90UnBuRzdSY21uMTZMM0dqKzZtc2JrTnVINk4y?=
+ =?utf-8?B?T3d6Q0FOLzFFK3ZzQlVSM0R3MzF6dm8zVHlxTWFZa2pHdG5STUlvaVUrakJN?=
+ =?utf-8?B?bng4bzhucHdBZVlrSWlkYVZHZmVSOHVRbno2TVZyK1gxc2RmMGJ4akxpK1hV?=
+ =?utf-8?B?ZzVTakY2OWkvWTZaZnNpTjFsN2ErRmVzMHM4TGlwTHZJOE1PcE80Y1N6NW15?=
+ =?utf-8?B?TzhITUFKSnJ1ekFSc0ZFSUlQU1c1cTFCUWpJZmVna0htbzlOOENhUjVoRVEw?=
+ =?utf-8?B?bTJKS0t2NW9oYWhCTkM5Um9JVEZTZGJ2OFViZ0JMQVZXTlpjQ3JvbjlDSFBO?=
+ =?utf-8?B?TndDUWppQ1pFL0djd2FHUUZLR0NycFNQaHk0UG55Umt6aEY0d3BaTFQyUkpI?=
+ =?utf-8?B?cGdCM0FRc2xZcktYUW9xUW0rNHQ4RDdlZ1h6ai8vY1dYallldDBObmozN05M?=
+ =?utf-8?B?UkZpR0dydTBkWFZPd2Q1U1hENTQ0L05mOFN5SmNYMnhRMWR6WVdpb092Qkdr?=
+ =?utf-8?B?R0dVWXkvU0xjbVZoeDBSaitSSnNKSkRSYnIzU0dxRUl6eW9BVUlyQkRSTDBJ?=
+ =?utf-8?B?ZVZ5SlhKYjNhbUFqcWdpWldxUVVCWlhqVjdmYzFxendHK3k0aXhidUsvYnhv?=
+ =?utf-8?B?OFFXNEhYa1VsZ0JGT2dPbUNpRE9lV2YxMTZlY0x5SFVJekU2M1dWd3BpMzZN?=
+ =?utf-8?B?OXAzY0hpeEtHS3llY3BCV0c3TFp1T1ZnYTBWTHU4NEVyODE0SERZN3E2WHls?=
+ =?utf-8?B?ZVg5SlBPRDVjaWZUQ3k2UnVRWDFRSjdGODFWWmxtWFJwNUFmTkcwTU1JN1dY?=
+ =?utf-8?B?KzJJbkdzSFBVYUh6eXUxY1E3TlBRNVR3cGVqZ25RNFhBdlNRc1dNYWFDbG1w?=
+ =?utf-8?B?d2t1anBvQWh5T2NuWmVQbXVFdGhsOHc2Q3d5NHZlOUovL0JUVWZGKzVEVDZT?=
+ =?utf-8?B?WjhETEdCNSt1aUpHTWNiVjc3RFIvNE9RMkVqVVRneElWK2dxeS9idXlnMGVQ?=
+ =?utf-8?Q?DAIc=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ac41ed6-d45a-448c-e7ce-08dc712c54c0
+X-MS-Exchange-CrossTenant-AuthSource: MW3PR12MB4553.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 20:03:59.6131
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2B/SR5ANpEMgCTNxRs41VZbqiXwlFy/7HGVcu4tUOpilQWt/tbHgjYqoPkwpbs+X
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6958
 
-On Fri, May 10, 2024 at 10:41:53AM -0700, Paul E. McKenney wrote:
-> On Fri, May 10, 2024 at 02:12:32PM -0300, Leonardo Bras wrote:
-> > On Fri, May 10, 2024 at 09:21:59AM -0700, Paul E. McKenney wrote:
-> > > On Fri, May 10, 2024 at 01:06:40PM -0300, Leonardo Bras wrote:
-> > > > On Thu, May 09, 2024 at 04:45:53PM -0700, Paul E. McKenney wrote:
-> > > > > On Thu, May 09, 2024 at 07:14:18AM -0300, Leonardo Bras wrote:
-> > > > > > On Thu, May 09, 2024 at 05:16:57AM -0300, Leonardo Bras wrote:
-> > > > > 
-> > > > > [ . . . ]
-> > > > > 
-> > > > > > > Here I suppose something like this can take care of not needing to convert 
-> > > > > > > ms -> jiffies every rcu_pending():
-> > > > > > > 
-> > > > > > > +	nocb_patience_delay = msecs_to_jiffies(nocb_patience_delay);
-> > > > > > > 
-> > > > > > 
-> > > > > > Uh, there is more to it, actually. We need to make sure the user 
-> > > > > > understands that we are rounding-down the value to multiple of a jiffy 
-> > > > > > period, so it's not a surprise if the delay value is not exactly the same 
-> > > > > > as the passed on kernel cmdline.
-> > > > > > 
-> > > > > > So something like bellow diff should be ok, as this behavior is explained 
-> > > > > > in the docs, and pr_info() will print the effective value.
-> > > > > > 
-> > > > > > What do you think?
-> > > > > 
-> > > > > Good point, and I have taken your advice on making the documentation
-> > > > > say what it does.
-> > > > 
-> > > > Thanks :)
-> > > > 
-> > > > > 
-> > > > > > Thanks!
-> > > > > > Leo
-> > > > > > 
-> > > > > > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> > > > > > index 0a3b0fd1910e..9a50be9fd9eb 100644
-> > > > > > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > > > > > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > > > > > @@ -4974,20 +4974,28 @@
-> > > > > >                         otherwise be caused by callback floods through
-> > > > > >                         use of the ->nocb_bypass list.  However, in the
-> > > > > >                         common non-flooded case, RCU queues directly to
-> > > > > >                         the main ->cblist in order to avoid the extra
-> > > > > >                         overhead of the ->nocb_bypass list and its lock.
-> > > > > >                         But if there are too many callbacks queued during
-> > > > > >                         a single jiffy, RCU pre-queues the callbacks into
-> > > > > >                         the ->nocb_bypass queue.  The definition of "too
-> > > > > >                         many" is supplied by this kernel boot parameter.
-> > > > > >  
-> > > > > > +       rcutree.nocb_patience_delay= [KNL]
-> > > > > > +                       On callback-offloaded (rcu_nocbs) CPUs, avoid
-> > > > > > +                       disturbing RCU unless the grace period has
-> > > > > > +                       reached the specified age in milliseconds.
-> > > > > > +                       Defaults to zero.  Large values will be capped
-> > > > > > +                       at five seconds. Values rounded-down to a multiple
-> > > > > > +                       of a jiffy period.
-> > > > > > +
-> > > > > >         rcutree.qhimark= [KNL]
-> > > > > >                         Set threshold of queued RCU callbacks beyond which
-> > > > > >                         batch limiting is disabled.
-> > > > > >  
-> > > > > >         rcutree.qlowmark= [KNL]
-> > > > > >                         Set threshold of queued RCU callbacks below which
-> > > > > >                         batch limiting is re-enabled.
-> > > > > >  
-> > > > > >         rcutree.qovld= [KNL]
-> > > > > >                         Set threshold of queued RCU callbacks beyond which
-> > > > > > diff --git a/kernel/rcu/tree.h b/kernel/rcu/tree.h
-> > > > > > index fcf2b4aa3441..62ede401420f 100644
-> > > > > > --- a/kernel/rcu/tree.h
-> > > > > > +++ b/kernel/rcu/tree.h
-> > > > > > @@ -512,20 +512,21 @@ do {                                                              \
-> > > > > >         local_irq_save(flags);                                  \
-> > > > > >         if (rcu_segcblist_is_offloaded(&(rdp)->cblist)) \
-> > > > > >                 raw_spin_lock(&(rdp)->nocb_lock);               \
-> > > > > >  } while (0)
-> > > > > >  #else /* #ifdef CONFIG_RCU_NOCB_CPU */
-> > > > > >  #define rcu_nocb_lock_irqsave(rdp, flags) local_irq_save(flags)
-> > > > > >  #endif /* #else #ifdef CONFIG_RCU_NOCB_CPU */
-> > > > > >  
-> > > > > >  static void rcu_bind_gp_kthread(void);
-> > > > > >  static bool rcu_nohz_full_cpu(void);
-> > > > > > +static bool rcu_on_patience_delay(void);
-> > > > > 
-> > > > > I don't think we need an access function, but will check below.
-> > > > > 
-> > > > > >  /* Forward declarations for tree_stall.h */
-> > > > > >  static void record_gp_stall_check_time(void);
-> > > > > >  static void rcu_iw_handler(struct irq_work *iwp);
-> > > > > >  static void check_cpu_stall(struct rcu_data *rdp);
-> > > > > >  static void rcu_check_gp_start_stall(struct rcu_node *rnp, struct rcu_data *rdp,
-> > > > > >                                      const unsigned long gpssdelay);
-> > > > > >  
-> > > > > >  /* Forward declarations for tree_exp.h. */
-> > > > > >  static void sync_rcu_do_polled_gp(struct work_struct *wp);
-> > > > > > diff --git a/kernel/rcu/tree_plugin.h b/kernel/rcu/tree_plugin.h
-> > > > > > index 340bbefe5f65..639243b0410f 100644
-> > > > > > --- a/kernel/rcu/tree_plugin.h
-> > > > > > +++ b/kernel/rcu/tree_plugin.h
-> > > > > > @@ -5,20 +5,21 @@
-> > > > > >   * or preemptible semantics.
-> > > > > >   *
-> > > > > >   * Copyright Red Hat, 2009
-> > > > > >   * Copyright IBM Corporation, 2009
-> > > > > >   *
-> > > > > >   * Author: Ingo Molnar <mingo@elte.hu>
-> > > > > >   *        Paul E. McKenney <paulmck@linux.ibm.com>
-> > > > > >   */
-> > > > > >  
-> > > > > >  #include "../locking/rtmutex_common.h"
-> > > > > > +#include <linux/jiffies.h>
-> > > > > 
-> > > > > This is already pulled in by the enclosing tree.c file, so it should not
-> > > > > be necessary to include it again. 
-> > > > 
-> > > > Even better :)
-> > > > 
-> > > > > (Or did you get a build failure when
-> > > > > leaving this out?)
-> > > > 
-> > > > I didn't, it's just that my editor complained the symbols were not getting 
-> > > > properly resolved, so I included it and it was fixed. But since clangd is 
-> > > > know to make some mistakes, I should have compile-test'd before adding it.
-> > > 
-> > > Ah, got it!  ;-)
-> > > 
-> > > > > >  static bool rcu_rdp_is_offloaded(struct rcu_data *rdp)
-> > > > > >  {
-> > > > > >         /*
-> > > > > >          * In order to read the offloaded state of an rdp in a safe
-> > > > > >          * and stable way and prevent from its value to be changed
-> > > > > >          * under us, we must either hold the barrier mutex, the cpu
-> > > > > >          * hotplug lock (read or write) or the nocb lock. Local
-> > > > > >          * non-preemptible reads are also safe. NOCB kthreads and
-> > > > > >          * timers have their own means of synchronization against the
-> > > > > > @@ -86,20 +87,33 @@ static void __init rcu_bootup_announce_oddness(void)
-> > > > > >         if (rcu_kick_kthreads)
-> > > > > >                 pr_info("\tKick kthreads if too-long grace period.\n");
-> > > > > >         if (IS_ENABLED(CONFIG_DEBUG_OBJECTS_RCU_HEAD))
-> > > > > >                 pr_info("\tRCU callback double-/use-after-free debug is enabled.\n");
-> > > > > >         if (gp_preinit_delay)
-> > > > > >                 pr_info("\tRCU debug GP pre-init slowdown %d jiffies.\n", gp_preinit_delay);
-> > > > > >         if (gp_init_delay)
-> > > > > >                 pr_info("\tRCU debug GP init slowdown %d jiffies.\n", gp_init_delay);
-> > > > > >         if (gp_cleanup_delay)
-> > > > > >                 pr_info("\tRCU debug GP cleanup slowdown %d jiffies.\n", gp_cleanup_delay);
-> > > > > > +       if (nocb_patience_delay < 0) {
-> > > > > > +               pr_info("\tRCU NOCB CPU patience negative (%d), resetting to zero.\n",
-> > > > > > +                       nocb_patience_delay);
-> > > > > > +               nocb_patience_delay = 0;
-> > > > > > +       } else if (nocb_patience_delay > 5 * MSEC_PER_SEC) {
-> > > > > > +               pr_info("\tRCU NOCB CPU patience too large (%d), resetting to %ld.\n",
-> > > > > > +                       nocb_patience_delay, 5 * MSEC_PER_SEC);
-> > > > > > +               nocb_patience_delay = msecs_to_jiffies(5 * MSEC_PER_SEC);
-> > > > > > +       } else if (nocb_patience_delay) {
-> > > > > > +               nocb_patience_delay = msecs_to_jiffies(nocb_patience_delay);
-> > > > > > +               pr_info("\tRCU NOCB CPU patience set to %d milliseconds.\n",
-> > > > > > +                       jiffies_to_msecs(nocb_patience_delay);
-> > > > > > +       }
-> > > > > 
-> > > > > I just did this here at the end:
-> > > > > 
-> > > > > 	nocb_patience_delay_jiffies = msecs_to_jiffies(nocb_patience_delay);
-> > > > > 
-> > > > > Ah, you are wanting to print out the milliseconds after the rounding
-> > > > > to jiffies.
-> > > > 
-> > > > That's right, just to make sure the user gets the effective patience time, 
-> > > > instead of the before-rounding one, which was on input.
-> > > > 
-> > > > > I am going to hold off on that for the moment, but I hear your request
-> > > > > and I have not yet said "no".  ;-)
-> > > > 
-> > > > Sure :)
-> > > > It's just something I think it's nice to have (as a user).
-> > > 
-> > > If you would like to do a separate patch adding this, here are the
-> > > requirements:
-> > > 
-> > > o	If the current code prints nothing, nothing additional should
-> > > 	be printed.
-> > > 
-> > > o	If the rounding ended up with the same value (as it should in
-> > > 	systems with HZ=1000), nothing additional should be printed.
-> > > 
-> > > o	Your choice as to whether or not you want to print out the
-> > > 	jiffies value.
-> > > 
-> > > o	If the additional message is on a new line, it needs to be
-> > > 	indented so that it is clear that it is subordinate to the
-> > > 	previous message.
-> > > 
-> > > 	Otherwise, you can use pr_cont() to continue the previous
-> > > 	line, of course being careful about "\n".
-> > > 
-> > > Probably also something that I am forgetting, but that is most of it.
-> > 
-> > Thanks!
-> > I will work on a patch doing that :)
+Hi Daniel,
+
+On 5/10/2024 3:10 AM, Daniel P. Berrangé wrote:
+> On Fri, May 10, 2024 at 11:05:44AM +0300, Michael Tokarev wrote:
+>> 09.05.2024 17:11, Daniel P. Berrangé wrote:
+>>> On Thu, May 09, 2024 at 04:54:16PM +0300, Michael Tokarev wrote:
+>>>> 03.05.2024 20:46, Babu Moger wrote:
+>>
+>>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>>> index 08c7de416f..46235466d7 100644
+>>>>> --- a/hw/i386/pc.c
+>>>>> +++ b/hw/i386/pc.c
+>>>>> @@ -81,6 +81,7 @@
+>>>>>     GlobalProperty pc_compat_9_0[] = {
+>>>>>         { TYPE_X86_CPU, "guest-phys-bits", "0" },
+>>>>>         { "sev-guest", "legacy-vm-type", "true" },
+>>>>> +    { TYPE_X86_CPU, "legacy-multi-node", "on" },
+>>>>>     };
+>>>>
+>>>> Should this legacy-multi-node property be added to previous
+>>>> machine types when applying to stable?  How about stable-8.2
+>>>> and stable-7.2?
+>>>
+>>> machine types are considered to express a fixed guest ABI
+>>> once part of a QEMU release. Given that we should not be
+>>> changing existing machine types in stable branches.
+>>
+>> Yes, I understand this, and this is exactly why I asked.
+>> The change in question has been Cc'ed to stable.  And I'm
+>> trying to understand what should I do with it :)
+>>
+>>> In theory we could create new "bug fix" machine types in stable
+>>> branches. To support live migration, we would then need to also
+>>> add those same stable branch "bug fix" machine type versions in
+>>> all future QEMU versions. This is generally not worth the hassle
+>>> of exploding the number of machine types.
+>>>
+>>> If you backport the patch, minus the machine type, then users
+>>> can still get the fix but they'll need to manually set the
+>>> property to enable it.
+>>
+>> I don't think this makes big sense.  But maybe for someone who
+>> actually hits this issue such backport will let to fix it.
+>> Hence, again, I'm asking if it really a good idea to pick this
+>> up for stable (any version of, - currently there are 2 active
+>> series, 7.2, 8.2 and 9.0).
 > 
-> Very good, looking forward to seeing what you come up with!
+> Hmm, the description says
 > 
-> My current state is on the "dev" branch of the -rcu tree, so please base
-> on that.
-
-Thanks! I used it earlier to send the previous diff :)
-
+>    "Observed the following failure while booting the SEV-SNP guest"
 > 
-> > > > > >         if (!use_softirq)
-> > > > > >                 pr_info("\tRCU_SOFTIRQ processing moved to rcuc kthreads.\n");
-> > > > > >         if (IS_ENABLED(CONFIG_RCU_EQS_DEBUG))
-> > > > > >                 pr_info("\tRCU debug extended QS entry/exit.\n");
-> > > > > >         rcupdate_announce_bootup_oddness();
-> > > > > >  }
-> > > > > >  
-> > > > > >  #ifdef CONFIG_PREEMPT_RCU
-> > > > > >  
-> > > > > >  static void rcu_report_exp_rnp(struct rcu_node *rnp, bool wake);
-> > > > > > @@ -1260,10 +1274,29 @@ static bool rcu_nohz_full_cpu(void)
-> > > > > >  
-> > > > > >  /*
-> > > > > >   * Bind the RCU grace-period kthreads to the housekeeping CPU.
-> > > > > >   */
-> > > > > >  static void rcu_bind_gp_kthread(void)
-> > > > > >  {
-> > > > > >         if (!tick_nohz_full_enabled())
-> > > > > >                 return;
-> > > > > >         housekeeping_affine(current, HK_TYPE_RCU);
-> > > > > >  }
-> > > > > > +
-> > > > > > +/*
-> > > > > > + * Is this CPU a NO_HZ_FULL CPU that should ignore RCU if the time since the
-> > > > > > + * start of current grace period is smaller than nocb_patience_delay ?
-> > > > > > + *
-> > > > > > + * This code relies on the fact that all NO_HZ_FULL CPUs are also
-> > > > > > + * RCU_NOCB_CPU CPUs.
-> > > > > > + */
-> > > > > > +static bool rcu_on_patience_delay(void)
-> > > > > > +{
-> > > > > > +#ifdef CONFIG_NO_HZ_FULL
-> > > > > 
-> > > > > You lost me on this one.  Why do we need the #ifdef instead of
-> > > > > IS_ENABLED()?  Also, please note that rcu_nohz_full_cpu() is already a
-> > > > > compile-time @false in CONFIG_NO_HZ_FULL=n kernels.
-> > > > 
-> > > > You are right. rcu_nohz_full_cpu() has a high chance of being inlined on
-> > > > 	if ((...) && rcu_nohz_full_cpu())
-> > > > And since it returns false, this whole statement will be compiled out, and 
-> > > > the new function will not exist in CONFIG_NO_HZ_FULL=n, so there  is no 
-> > > > need to test it.
-> > > 
-> > > Very good!  You had me going there for a bit.  ;-)
-> > > 
-> > > > > > +       if (!nocb_patience_delay)
-> > > > > > +               return false;
-> > > > > 
-> > > > > We get this automatically with the comparison below, right?
-> > > > 
-> > > > Right
-> > > > 
-> > > > >   If so, we
-> > > > > are not gaining much by creating the helper function.  Or am I missing
-> > > > > some trick here?
-> > > > 
-> > > > Well, it's a fastpath. Up to here, we just need to read 
-> > > > nocb_patience_delay{,_jiffies} from memory.
-> > > 
-> > > Just nocb_patience_delay_jiffies, correct?  Unless I am missing something,
-> > > nocb_patience_delay is unused after boot.
-> > 
-> > Right, I used both because I was referring to the older version and the 
-> > current version with _jiffies.
-> 
-> Fair enough!
-> 
-> > > > If we don't include the fastpath we have to read jiffies and 
-> > > > rcu_state.gp_start, which can take extra time: up to 2 cache misses.
-> > > > 
-> > > > I thought it could be relevant, as we reduce the overhead of the new 
-> > > > parameter when it's disabled (patience=0). 
-> > > > 
-> > > > Do you think that could be relevant?
-> > > 
-> > > Well, the hardware's opinion is what matters.  ;-)
-> > > 
-> > > But the caller's code path reads jiffies a few times, so it should
-> > > be hot in the cache, correct?
-> > 
-> > Right, but I wonder how are the chances of it getting updated between  
-> > caller's use and this function's. Same for gp_start.
-> 
-> Well, jiffies is updated at most once per millisecond, and gp_start is
-> updated at most once per few milliseconds.  So the chances of it being
-> updated within that code sequence are quite small.
+> and yet the patches for SEV-SNP are *not* merged in QEMU yet. So this
+> does not look relevant for stable unless I'm missing something.
 
-Fair enough, and we probably don't need to worry about it getting 
-cached-out in this sequence, as well. 
+I have not thought thru about stable tag. This is not critical for 
+stable release.
 
-Also time_before() is a macro and we don't need to worry on the function 
-call, so we just spend 2 extra L1-cache reads and a couple arithmetic 
-instructions which are not supposed to take long, so it's fair to assume 
-the fast-path would not be that much faster than the slow path, which means 
-we don't need a fast path after all.
+If required I will send a separate patch for stable later. It is not 
+required right now. Sorry about the noise.
 
-Thanks for helping me notice that :)
-
-> 
-> > > But that does lead to another topic, namely the possibility of tagging
-> > > nocb_patience_delay_jiffies with __read_mostly. 
-> > 
-> > Oh, right. This was supposed to be in the diff I sent earlier, but I 
-> > completelly forgot to change before sending. So, yeah, I agree on 
-> > nocb_patience_delay being __read_mostly; 
-> > 
-> > > And there might be
-> > > a number of other of RCU's variables that could be similarly tagged
-> > > in order to avoid false sharing.  (But is there any false sharing?
-> > > This might be worth testing.)
-> > 
-> > Maybe there isn't, but I wonder if it would hurt performance if they were 
-> > tagged as __read_only anyway. 
-> 
-> Let's be at least a little careful here.  It is just as easy to hurt
-> performance by marking things __read_mostly or __read_only as it is
-> to help performance.  ;-)
-
-Fair enough :)
-
-> 
-> 							Thanx, Paul
-> 
-
-Thanks!
-Leo
-
+-- 
+- Babu Moger
 
