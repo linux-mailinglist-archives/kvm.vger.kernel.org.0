@@ -1,437 +1,283 @@
-Return-Path: <kvm+bounces-17197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93ADE8C28A8
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 18:22:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02B8C8C28D4
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 18:39:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D5411F241B9
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 16:22:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25A441C21BD5
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 16:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE39A172BB2;
-	Fri, 10 May 2024 16:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 983BB15E86;
+	Fri, 10 May 2024 16:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fmb5TIUj"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="WtfGqVyk"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152251A2C3A;
-	Fri, 10 May 2024 16:21:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715358120; cv=none; b=nt6RTrZ4XBOM5AXymHjtLk8BPSEX0Z2CsHOylzLoQVmsMgXPIsWwnVUKSzk+Qson+14j0JhwUuK0sA6LtbChL7t6BlA05Inx2x9wmZeRuzebbkVzyAL3SehI2U4KA2bV8a26fP40YWZOXZO3rlL34lVyZDsvKcLC7A3fqbQJQZ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715358120; c=relaxed/simple;
-	bh=t65f4jnK9Y0kArp0L6VpbmFAs/ipV4rc1P0xnazLwXg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qqJ224wmzrEj1218xcSt8LafQ7yWZv0DOZuQ7RUJ8DJMyx7gn9itSpxyHlV0s1hx516yxUbpN3KTWLy10s3EDyaDaP24vuYEjpROcn6hVvLs5qzDJB+AHa0UHeXFk2Hmhb+62RWrwY0h3mvhIJkuJXx/HflzgT79/0KxMb5WXgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fmb5TIUj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 876CBC113CC;
-	Fri, 10 May 2024 16:21:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715358119;
-	bh=t65f4jnK9Y0kArp0L6VpbmFAs/ipV4rc1P0xnazLwXg=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=Fmb5TIUjJ4cLj3bc7HmEKIirJtt7QqidVefu7pz5XqmAOhl76CobbYOFgtL5ZvWpy
-	 sflTYymAun5jLWet2ilqZym4E94K9fnX+Y15uzLF+wXNdS9Ruh+P6maKdUzon5XLxF
-	 x4nO6BTZWkN8dvLoZMEQjtFCJJlvc6FoIkP5dY8Q5XGAXiVYffpd1k6z0z0Uz6o/Jk
-	 JGB2j/YtDjb04PbDkIyWFk8uIHZlwvCPG5U/kAkgL0Ei7N5UgXfZUZ4McPkb5/aN8T
-	 DRyg4V72E7AjcORZzybmEu4ZeiigeQmoCyOCEiDEKvmWZ2xxoX+gn0Xhuv78h2Gz24
-	 zeedRO4Q9WldQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 20CF1CE094C; Fri, 10 May 2024 09:21:59 -0700 (PDT)
-Date: Fri, 10 May 2024 09:21:59 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Leonardo Bras <leobras@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Zqiang <qiang.zhang1211@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org
-Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
-Message-ID: <a5784417-d65d-45c2-a66f-310a494b9827@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <ZjrClk4Lqw_cLO5A@google.com>
- <Zjroo8OsYcVJLsYO@LeoBras>
- <b44962dd-7b8a-4201-90b7-4c39ba20e28d@paulmck-laptop>
- <ZjsZVUdmDXZOn10l@LeoBras>
- <ZjuFuZHKUy7n6-sG@google.com>
- <5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop>
- <ZjyGefTZ8ThZukNG@LeoBras>
- <Zjyh-qRt3YewHsdP@LeoBras>
- <09a8f4f6-a692-4586-bb68-b0a524b7a5d8@paulmck-laptop>
- <Zj5GEK8bt3061TiD@LeoBras>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153CBEAF6;
+	Fri, 10 May 2024 16:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715359150; cv=fail; b=AJHDZ7pfP42KjF7MiLgr7RfNGZPS/RQAXCQtw3Qnng3/JCe3TQff/R1XnPG1CWFv87IhJ84/PwSUaAsxdG+rzITkA9l9pNmDFMmDSl9ixy2eLtfXQIrMqMxsdeg1zqE2x8kVXvsJmpXLVlQTuULe/X/jbStD9AGtA2Ri95xfmvQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715359150; c=relaxed/simple;
+	bh=jVY8gObdPoNTdgCrmt5KhZWmbZiYvYLKGfKXTIcznUw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dXIG5CyxJHrPjzQvb9ddA/pg/nUs1wuzwC+qsOoFXKwPZhMOS3PnLyOUMTF3ciOv5P2YAF+hwKFDRmV2C+enQoHTnvVjJwi+EKvI1NTA5OY8K0Y1CYWa/6fEchLUXhtQQPjdtme6R+7oUuocYLWA0cka3SznnIWUQUYg/ksTBBs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=WtfGqVyk; arc=fail smtp.client-ip=40.107.244.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KXsr8dqfSOk8po+QbK2KvCJTwGQ2NnrfnaVBVAkbz5vPipbGXwGUE8aq6X+j2cA/RB8CpVN2JZlV2fBFwNaqGpbZ9SSkzepQfFRT8wL5anyqc/BNVl91dYgF4RomnTNiKNpTE/RGw4aXctd8/LLBPjfNgbMESb714fawD+QQqZwVyl4YRfqCEkDLRwwpVXJSu1rcHB2wm8FWcB5qsZP5bUnEgDaVxn34UaNkb8wbrkivoz9ud8G7UnUt8AtbXPQXLY1Ni4y/EOrQBjxExbRxr9MYYRgJ4AGIRPVNcq6VEM+OBYfvlcuxeIukYhpCMoueeNAb6Vlnbt009n0URKDPjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PtheikfdM3MiWCRRCEQVVcbQm28faHRKtu63rAf8K3w=;
+ b=n0hSIWrGPkGNaSs2Hlux/1FuMoG9aDRdywefOyyCqbqVyk9/fiRbPam63DjXTS3QPFWTJD13oRsbwZ+QBELaaKocCESk1eg6IYPBFaKMoy7HBl11RT3ly6r+FE7qckrZCpX5xZEcAn43SFFBDvo/eb//S+WE4V2894KkCX72XHxvNshGwNNJ/IsYIYQqj7lb/HZUA03IbUNK9ZZ1fUHL8HhQ0NpFkQa9FLuHC0lw24fa/gIOEITjEqB/sQtD3c3cWZBIhSk8etvGhTUZCht09YOuL/VY4m3+Ho+u62CmIYAjFS7z63DDBKPDGT+9zRbMXJMhRXUGttlLl3G0mZMkgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PtheikfdM3MiWCRRCEQVVcbQm28faHRKtu63rAf8K3w=;
+ b=WtfGqVykfgCwnMV0dqwh/8KXUXrCgvAV9NhXVhc3ZAzSkVyNtCOhgymX6pFanEKZLVImmrdZLv3iDZQMUoHXawM+Yxw8Jj9RUhVJpd+vORDS3DyjgNzfomoUz1FseXD+WL881ZUNe5r/WdRq+zbpWC1iXl48OQVEMNKGYl4rrj4=
+Received: from PH7P220CA0112.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:32d::33)
+ by CH2PR12MB4328.namprd12.prod.outlook.com (2603:10b6:610:a6::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.49; Fri, 10 May
+ 2024 16:39:06 +0000
+Received: from MWH0EPF000A6735.namprd04.prod.outlook.com
+ (2603:10b6:510:32d:cafe::d7) by PH7P220CA0112.outlook.office365.com
+ (2603:10b6:510:32d::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.51 via Frontend
+ Transport; Fri, 10 May 2024 16:39:06 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000A6735.mail.protection.outlook.com (10.167.249.27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7544.18 via Frontend Transport; Fri, 10 May 2024 16:39:05 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 10 May
+ 2024 11:39:05 -0500
+Date: Fri, 10 May 2024 11:37:19 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: Sean Christopherson <seanjc@google.com>, <kvm@vger.kernel.org>,
+	<linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <vkuznets@redhat.com>, <jmattson@google.com>,
+	<luto@kernel.org>, <dave.hansen@linux.intel.com>, <slp@redhat.com>,
+	<pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <papaluri@amd.com>
+Subject: Re: [PATCH v15 22/23] KVM: SEV: Fix return code interpretation for
+ RMP nested page faults
+Message-ID: <20240510163719.pnwdwarsbgmcop3h@amd.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240510015822.503071-1-michael.roth@amd.com>
+ <20240510015822.503071-2-michael.roth@amd.com>
+ <Zj4oFffc7OQivyV-@google.com>
+ <566b57c0-27cd-4591-bded-9a397a1d44d5@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <Zj5GEK8bt3061TiD@LeoBras>
+In-Reply-To: <566b57c0-27cd-4591-bded-9a397a1d44d5@redhat.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A6735:EE_|CH2PR12MB4328:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e7bc636-5ecd-4e24-5cd3-08dc710fb55f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|7416005|376005|82310400017|1800799015|36860700004;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?A7U+XZ7d9Ba4y7DOgiPUBJ+ZZ8YY5YcU60dCmM5v7KLhKfz6zG6HI0oiTc7P?=
+ =?us-ascii?Q?4uTLsRAFpI0VukWIHci2MeHmHa3x+2+WmYWahEJXw0uXSUoxHCiWB7SN1XQm?=
+ =?us-ascii?Q?huVyxzm0zrefCYfQic/MV+z2yZnlEg7yBO2QSkv3+8xQiVTnVqy/WPrx93b0?=
+ =?us-ascii?Q?itvf5pL7RGqkk4eIS0OUrINi8psoEn72XiYZeCNODGZHQ+hHVlWX5xcGagKD?=
+ =?us-ascii?Q?skFG1dpVw8MaORvkv1Fs+uoCsziTlWsyZCJ54AG2jGQv3v4EsZj+vQu7fCVk?=
+ =?us-ascii?Q?qp4n097MCOAVTcmOKgSyJlv7kHwc28SfvGp/bfF/abfRcocN7QHOwNRlJHYy?=
+ =?us-ascii?Q?4+SoGBrjO5pqB2hohQnRjkfprAg8R6tUmf82E/cXUgmMhv3MPYWh7jV6Z3KM?=
+ =?us-ascii?Q?cGPt8pEscAKTVOPd5GYJBpm89ylcgxLKxNrk+YQNM1XtuLSbk64YbmG+5CVu?=
+ =?us-ascii?Q?RPGljD4+6RfUew6prlNUdYxLehASuIatAksdM2hDc5+KbKLx3K48KGNotICv?=
+ =?us-ascii?Q?ktBEq97KIwghFlnN98e+oud39+iLy34HaIW4qX4Cd7EQwaqRz4XhsAWajUTe?=
+ =?us-ascii?Q?UHCWzRv1Jo6W5KrnUpbGXEeevjOMYL3OJMVr51Gua81UMVouDFsdK2irQrey?=
+ =?us-ascii?Q?ujJIX+Q+Dt6SmgXN3K5WZsaFcS6Jlgr3HSU75ATFV61FyF0drYjQTX5dzqmF?=
+ =?us-ascii?Q?hl7fjWgABPsolMEqUjJpcAtsqo6t4lIe4pzr1RU76NoitZpRSYL4iYlYmMV2?=
+ =?us-ascii?Q?/2zaX5erQkYLiNPV+/qQiyVn9V9wK6+MSYn/ZkVBleYHflIPBsmuqlHECsiX?=
+ =?us-ascii?Q?/0XzU6tPeazqnoUPJbBfEqkgYVK47UsfddcT3kpBLThrpUOGt2pCmLzEIFvr?=
+ =?us-ascii?Q?pz8ko68MYwzpgi+QK7tHBc1izrD3TQTiA7ATB3uyqYQKOFMdWs3luiigv0mT?=
+ =?us-ascii?Q?ve7azumfNzLM9SFSyxof5enlIFIIrf3QSFbyBSQOycD7ukEJkPfW8xYEOnwj?=
+ =?us-ascii?Q?1XlCXwlTtTIzj9MHW+MppEcXTaq5jjkCiT5Tj7x09Zah0uqL7H6F3JEw83OO?=
+ =?us-ascii?Q?GESryAd0ioBqJn1c2YRNtJrGawcGAnjfXx3Zu0nW5WUBf5BnMYX50k8gwLII?=
+ =?us-ascii?Q?ZRcu6Vc/ZOVYIRpE3ScFX7rXS1Lj6NDNlHbv527uHNuyp98CymVxpQBw3/Xx?=
+ =?us-ascii?Q?AaX4JIxUcx4BTpypxz6w3ImAVngYe1IJ7iIdHY3Rf9xSTUzY2Ae7NEutVa80?=
+ =?us-ascii?Q?QApNNmRdIkxzojVmqRhHhyh9F+nRbztLzFPlXkBWSURh3ywxnHq+2cZwYwCL?=
+ =?us-ascii?Q?vA2Vk6mD5qykT+x5XB6lmtqlqZytS8RBspeGOb6SRNcqFKQLVIEu4rRnBosY?=
+ =?us-ascii?Q?+87soXMrZyWZlV+4oOyCdu9bKHAr?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(376005)(82310400017)(1800799015)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 16:39:05.9735
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e7bc636-5ecd-4e24-5cd3-08dc710fb55f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000A6735.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4328
 
-On Fri, May 10, 2024 at 01:06:40PM -0300, Leonardo Bras wrote:
-> On Thu, May 09, 2024 at 04:45:53PM -0700, Paul E. McKenney wrote:
-> > On Thu, May 09, 2024 at 07:14:18AM -0300, Leonardo Bras wrote:
-> > > On Thu, May 09, 2024 at 05:16:57AM -0300, Leonardo Bras wrote:
-> > 
-> > [ . . . ]
-> > 
-> > > > Here I suppose something like this can take care of not needing to convert 
-> > > > ms -> jiffies every rcu_pending():
-> > > > 
-> > > > +	nocb_patience_delay = msecs_to_jiffies(nocb_patience_delay);
-> > > > 
+On Fri, May 10, 2024 at 06:01:52PM +0200, Paolo Bonzini wrote:
+> On 5/10/24 15:58, Sean Christopherson wrote:
+> > On Thu, May 09, 2024, Michael Roth wrote:
+> > > The intended logic when handling #NPFs with the RMP bit set (31) is to
+> > > first check to see if the #NPF requires a shared<->private transition
+> > > and, if so, to go ahead and let the corresponding KVM_EXIT_MEMORY_FAULT
+> > > get forwarded on to userspace before proceeding with any handling of
+> > > other potential RMP fault conditions like needing to PSMASH the RMP
+> > > entry/etc (which will be done later if the guest still re-faults after
+> > > the KVM_EXIT_MEMORY_FAULT is processed by userspace).
 > > > 
-> > > Uh, there is more to it, actually. We need to make sure the user 
-> > > understands that we are rounding-down the value to multiple of a jiffy 
-> > > period, so it's not a surprise if the delay value is not exactly the same 
-> > > as the passed on kernel cmdline.
+> > > The determination of whether any userspace handling of
+> > > KVM_EXIT_MEMORY_FAULT is needed is done by interpreting the return code
+> > > of kvm_mmu_page_fault(). However, the current code misinterprets the
+> > > return code, expecting 0 to indicate a userspace exit rather than less
+> > > than 0 (-EFAULT). This leads to the following unexpected behavior:
 > > > 
-> > > So something like bellow diff should be ok, as this behavior is explained 
-> > > in the docs, and pr_info() will print the effective value.
+> > >    - for KVM_EXIT_MEMORY_FAULTs resulting for implicit shared->private
+> > >      conversions, warnings get printed from sev_handle_rmp_fault()
+> > >      because it does not expect to be called for GPAs where
+> > >      KVM_MEMORY_ATTRIBUTE_PRIVATE is not set. Standard linux guests don't
+> > >      generally do this, but it is allowed and should be handled
+> > >      similarly to private->shared conversions rather than triggering any
+> > >      sort of warnings
 > > > 
-> > > What do you think?
-> > 
-> > Good point, and I have taken your advice on making the documentation
-> > say what it does.
-> 
-> Thanks :)
-> 
-> > 
-> > > Thanks!
-> > > Leo
+> > >    - if gmem support for 2MB folios is enabled (via currently out-of-tree
+> > >      code), implicit shared<->private conversions will always result in
+> > >      a PSMASH being attempted, even if it's not actually needed to
+> > >      resolve the RMP fault. This doesn't cause any harm, but results in a
+> > >      needless PSMASH and zapping of the sPTE
 > > > 
-> > > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-> > > index 0a3b0fd1910e..9a50be9fd9eb 100644
-> > > --- a/Documentation/admin-guide/kernel-parameters.txt
-> > > +++ b/Documentation/admin-guide/kernel-parameters.txt
-> > > @@ -4974,20 +4974,28 @@
-> > >                         otherwise be caused by callback floods through
-> > >                         use of the ->nocb_bypass list.  However, in the
-> > >                         common non-flooded case, RCU queues directly to
-> > >                         the main ->cblist in order to avoid the extra
-> > >                         overhead of the ->nocb_bypass list and its lock.
-> > >                         But if there are too many callbacks queued during
-> > >                         a single jiffy, RCU pre-queues the callbacks into
-> > >                         the ->nocb_bypass queue.  The definition of "too
-> > >                         many" is supplied by this kernel boot parameter.
-> > >  
-> > > +       rcutree.nocb_patience_delay= [KNL]
-> > > +                       On callback-offloaded (rcu_nocbs) CPUs, avoid
-> > > +                       disturbing RCU unless the grace period has
-> > > +                       reached the specified age in milliseconds.
-> > > +                       Defaults to zero.  Large values will be capped
-> > > +                       at five seconds. Values rounded-down to a multiple
-> > > +                       of a jiffy period.
-> > > +
-> > >         rcutree.qhimark= [KNL]
-> > >                         Set threshold of queued RCU callbacks beyond which
-> > >                         batch limiting is disabled.
-> > >  
-> > >         rcutree.qlowmark= [KNL]
-> > >                         Set threshold of queued RCU callbacks below which
-> > >                         batch limiting is re-enabled.
-> > >  
-> > >         rcutree.qovld= [KNL]
-> > >                         Set threshold of queued RCU callbacks beyond which
-> > > diff --git a/kernel/rcu/tree.h b/kernel/rcu/tree.h
-> > > index fcf2b4aa3441..62ede401420f 100644
-> > > --- a/kernel/rcu/tree.h
-> > > +++ b/kernel/rcu/tree.h
-> > > @@ -512,20 +512,21 @@ do {                                                              \
-> > >         local_irq_save(flags);                                  \
-> > >         if (rcu_segcblist_is_offloaded(&(rdp)->cblist)) \
-> > >                 raw_spin_lock(&(rdp)->nocb_lock);               \
-> > >  } while (0)
-> > >  #else /* #ifdef CONFIG_RCU_NOCB_CPU */
-> > >  #define rcu_nocb_lock_irqsave(rdp, flags) local_irq_save(flags)
-> > >  #endif /* #else #ifdef CONFIG_RCU_NOCB_CPU */
-> > >  
-> > >  static void rcu_bind_gp_kthread(void);
-> > >  static bool rcu_nohz_full_cpu(void);
-> > > +static bool rcu_on_patience_delay(void);
-> > 
-> > I don't think we need an access function, but will check below.
-> > 
-> > >  /* Forward declarations for tree_stall.h */
-> > >  static void record_gp_stall_check_time(void);
-> > >  static void rcu_iw_handler(struct irq_work *iwp);
-> > >  static void check_cpu_stall(struct rcu_data *rdp);
-> > >  static void rcu_check_gp_start_stall(struct rcu_node *rnp, struct rcu_data *rdp,
-> > >                                      const unsigned long gpssdelay);
-> > >  
-> > >  /* Forward declarations for tree_exp.h. */
-> > >  static void sync_rcu_do_polled_gp(struct work_struct *wp);
-> > > diff --git a/kernel/rcu/tree_plugin.h b/kernel/rcu/tree_plugin.h
-> > > index 340bbefe5f65..639243b0410f 100644
-> > > --- a/kernel/rcu/tree_plugin.h
-> > > +++ b/kernel/rcu/tree_plugin.h
-> > > @@ -5,20 +5,21 @@
-> > >   * or preemptible semantics.
-> > >   *
-> > >   * Copyright Red Hat, 2009
-> > >   * Copyright IBM Corporation, 2009
-> > >   *
-> > >   * Author: Ingo Molnar <mingo@elte.hu>
-> > >   *        Paul E. McKenney <paulmck@linux.ibm.com>
-> > >   */
-> > >  
-> > >  #include "../locking/rtmutex_common.h"
-> > > +#include <linux/jiffies.h>
-> > 
-> > This is already pulled in by the enclosing tree.c file, so it should not
-> > be necessary to include it again. 
-> 
-> Even better :)
-> 
-> > (Or did you get a build failure when
-> > leaving this out?)
-> 
-> I didn't, it's just that my editor complained the symbols were not getting 
-> properly resolved, so I included it and it was fixed. But since clangd is 
-> know to make some mistakes, I should have compile-test'd before adding it.
-
-Ah, got it!  ;-)
-
-> > >  static bool rcu_rdp_is_offloaded(struct rcu_data *rdp)
-> > >  {
-> > >         /*
-> > >          * In order to read the offloaded state of an rdp in a safe
-> > >          * and stable way and prevent from its value to be changed
-> > >          * under us, we must either hold the barrier mutex, the cpu
-> > >          * hotplug lock (read or write) or the nocb lock. Local
-> > >          * non-preemptible reads are also safe. NOCB kthreads and
-> > >          * timers have their own means of synchronization against the
-> > > @@ -86,20 +87,33 @@ static void __init rcu_bootup_announce_oddness(void)
-> > >         if (rcu_kick_kthreads)
-> > >                 pr_info("\tKick kthreads if too-long grace period.\n");
-> > >         if (IS_ENABLED(CONFIG_DEBUG_OBJECTS_RCU_HEAD))
-> > >                 pr_info("\tRCU callback double-/use-after-free debug is enabled.\n");
-> > >         if (gp_preinit_delay)
-> > >                 pr_info("\tRCU debug GP pre-init slowdown %d jiffies.\n", gp_preinit_delay);
-> > >         if (gp_init_delay)
-> > >                 pr_info("\tRCU debug GP init slowdown %d jiffies.\n", gp_init_delay);
-> > >         if (gp_cleanup_delay)
-> > >                 pr_info("\tRCU debug GP cleanup slowdown %d jiffies.\n", gp_cleanup_delay);
-> > > +       if (nocb_patience_delay < 0) {
-> > > +               pr_info("\tRCU NOCB CPU patience negative (%d), resetting to zero.\n",
-> > > +                       nocb_patience_delay);
-> > > +               nocb_patience_delay = 0;
-> > > +       } else if (nocb_patience_delay > 5 * MSEC_PER_SEC) {
-> > > +               pr_info("\tRCU NOCB CPU patience too large (%d), resetting to %ld.\n",
-> > > +                       nocb_patience_delay, 5 * MSEC_PER_SEC);
-> > > +               nocb_patience_delay = msecs_to_jiffies(5 * MSEC_PER_SEC);
-> > > +       } else if (nocb_patience_delay) {
-> > > +               nocb_patience_delay = msecs_to_jiffies(nocb_patience_delay);
-> > > +               pr_info("\tRCU NOCB CPU patience set to %d milliseconds.\n",
-> > > +                       jiffies_to_msecs(nocb_patience_delay);
-> > > +       }
-> > 
-> > I just did this here at the end:
-> > 
-> > 	nocb_patience_delay_jiffies = msecs_to_jiffies(nocb_patience_delay);
-> > 
-> > Ah, you are wanting to print out the milliseconds after the rounding
-> > to jiffies.
-> 
-> That's right, just to make sure the user gets the effective patience time, 
-> instead of the before-rounding one, which was on input.
-> 
-> > I am going to hold off on that for the moment, but I hear your request
-> > and I have not yet said "no".  ;-)
-> 
-> Sure :)
-> It's just something I think it's nice to have (as a user).
-
-If you would like to do a separate patch adding this, here are the
-requirements:
-
-o	If the current code prints nothing, nothing additional should
-	be printed.
-
-o	If the rounding ended up with the same value (as it should in
-	systems with HZ=1000), nothing additional should be printed.
-
-o	Your choice as to whether or not you want to print out the
-	jiffies value.
-
-o	If the additional message is on a new line, it needs to be
-	indented so that it is clear that it is subordinate to the
-	previous message.
-
-	Otherwise, you can use pr_cont() to continue the previous
-	line, of course being careful about "\n".
-
-Probably also something that I am forgetting, but that is most of it.
-
-> > >         if (!use_softirq)
-> > >                 pr_info("\tRCU_SOFTIRQ processing moved to rcuc kthreads.\n");
-> > >         if (IS_ENABLED(CONFIG_RCU_EQS_DEBUG))
-> > >                 pr_info("\tRCU debug extended QS entry/exit.\n");
-> > >         rcupdate_announce_bootup_oddness();
-> > >  }
-> > >  
-> > >  #ifdef CONFIG_PREEMPT_RCU
-> > >  
-> > >  static void rcu_report_exp_rnp(struct rcu_node *rnp, bool wake);
-> > > @@ -1260,10 +1274,29 @@ static bool rcu_nohz_full_cpu(void)
-> > >  
-> > >  /*
-> > >   * Bind the RCU grace-period kthreads to the housekeeping CPU.
-> > >   */
-> > >  static void rcu_bind_gp_kthread(void)
-> > >  {
-> > >         if (!tick_nohz_full_enabled())
-> > >                 return;
-> > >         housekeeping_affine(current, HK_TYPE_RCU);
-> > >  }
-> > > +
-> > > +/*
-> > > + * Is this CPU a NO_HZ_FULL CPU that should ignore RCU if the time since the
-> > > + * start of current grace period is smaller than nocb_patience_delay ?
-> > > + *
-> > > + * This code relies on the fact that all NO_HZ_FULL CPUs are also
-> > > + * RCU_NOCB_CPU CPUs.
-> > > + */
-> > > +static bool rcu_on_patience_delay(void)
-> > > +{
-> > > +#ifdef CONFIG_NO_HZ_FULL
-> > 
-> > You lost me on this one.  Why do we need the #ifdef instead of
-> > IS_ENABLED()?  Also, please note that rcu_nohz_full_cpu() is already a
-> > compile-time @false in CONFIG_NO_HZ_FULL=n kernels.
-> 
-> You are right. rcu_nohz_full_cpu() has a high chance of being inlined on
-> 	if ((...) && rcu_nohz_full_cpu())
-> And since it returns false, this whole statement will be compiled out, and 
-> the new function will not exist in CONFIG_NO_HZ_FULL=n, so there  is no 
-> need to test it.
-
-Very good!  You had me going there for a bit.  ;-)
-
-> > > +       if (!nocb_patience_delay)
-> > > +               return false;
-> > 
-> > We get this automatically with the comparison below, right?
-> 
-> Right
-> 
-> >   If so, we
-> > are not gaining much by creating the helper function.  Or am I missing
-> > some trick here?
-> 
-> Well, it's a fastpath. Up to here, we just need to read 
-> nocb_patience_delay{,_jiffies} from memory.
-
-Just nocb_patience_delay_jiffies, correct?  Unless I am missing something,
-nocb_patience_delay is unused after boot.
-
-> If we don't include the fastpath we have to read jiffies and 
-> rcu_state.gp_start, which can take extra time: up to 2 cache misses.
-> 
-> I thought it could be relevant, as we reduce the overhead of the new 
-> parameter when it's disabled (patience=0). 
-> 
-> Do you think that could be relevant?
-
-Well, the hardware's opinion is what matters.  ;-)
-
-But the caller's code path reads jiffies a few times, so it should
-be hot in the cache, correct?
-
-But that does lead to another topic, namely the possibility of tagging
-nocb_patience_delay_jiffies with __read_mostly.  And there might be
-a number of other of RCU's variables that could be similarly tagged
-in order to avoid false sharing.  (But is there any false sharing?
-This might be worth testing.)
-
-							Thanx, Paul
-
-> Thanks!
-> Leo
-> 
-> > 
-> > 							Thanx, Paul
-> > 
-> > > +       if (time_before(jiffies, READ_ONCE(rcu_state.gp_start) + nocb_patience_delay))
-> > > +               return true;
-> > > +#endif /* #ifdef CONFIG_NO_HZ_FULL */
-> > > +       return false;
-> > > +}
-> > > diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-> > > index 7560e204198b..7a2d94370ab4 100644
-> > > --- a/kernel/rcu/tree.c
-> > > +++ b/kernel/rcu/tree.c
-> > > @@ -169,20 +169,22 @@ static int kthread_prio = IS_ENABLED(CONFIG_RCU_BOOST) ? 1 : 0;
-> > >  module_param(kthread_prio, int, 0444);
-> > >  
-> > >  /* Delay in jiffies for grace-period initialization delays, debug only. */
-> > >  
-> > >  static int gp_preinit_delay;
-> > >  module_param(gp_preinit_delay, int, 0444);
-> > >  static int gp_init_delay;
-> > >  module_param(gp_init_delay, int, 0444);
-> > >  static int gp_cleanup_delay;
-> > >  module_param(gp_cleanup_delay, int, 0444);
-> > > +static int nocb_patience_delay;
-> > > +module_param(nocb_patience_delay, int, 0444);
-> > >  
-> > >  // Add delay to rcu_read_unlock() for strict grace periods.
-> > >  static int rcu_unlock_delay;
-> > >  #ifdef CONFIG_RCU_STRICT_GRACE_PERIOD
-> > >  module_param(rcu_unlock_delay, int, 0444);
-> > >  #endif
-> > >  
-> > >  /*
-> > >   * This rcu parameter is runtime-read-only. It reflects
-> > >   * a minimum allowed number of objects which can be cached
-> > > @@ -4340,25 +4342,27 @@ static int rcu_pending(int user)
-> > >         lockdep_assert_irqs_disabled();
-> > >  
-> > >         /* Check for CPU stalls, if enabled. */
-> > >         check_cpu_stall(rdp);
-> > >  
-> > >         /* Does this CPU need a deferred NOCB wakeup? */
-> > >         if (rcu_nocb_need_deferred_wakeup(rdp, RCU_NOCB_WAKE))
-> > >                 return 1;
-> > >  
-> > >         /* Is this a nohz_full CPU in userspace or idle?  (Ignore RCU if so.) */
-> > > -       if ((user || rcu_is_cpu_rrupt_from_idle()) && rcu_nohz_full_cpu())
-> > > +       gp_in_progress = rcu_gp_in_progress();
-> > > +       if ((user || rcu_is_cpu_rrupt_from_idle() ||
-> > > +            (gp_in_progress && rcu_on_patience_delay())) &&
-> > > +           rcu_nohz_full_cpu())
-> > >                 return 0;
-> > >  
-> > >         /* Is the RCU core waiting for a quiescent state from this CPU? */
-> > > -       gp_in_progress = rcu_gp_in_progress();
-> > >         if (rdp->core_needs_qs && !rdp->cpu_no_qs.b.norm && gp_in_progress)
-> > >                 return 1;
-> > >  
-> > >         /* Does this CPU have callbacks ready to invoke? */
-> > >         if (!rcu_rdp_is_offloaded(rdp) &&
-> > >             rcu_segcblist_ready_cbs(&rdp->cblist))
-> > >                 return 1;
-> > >  
-> > >         /* Has RCU gone idle with this CPU needing another grace period? */
-> > >         if (!gp_in_progress && rcu_segcblist_is_enabled(&rdp->cblist) &&
+> > > Resolve these issues by calling sev_handle_rmp_fault() only when
+> > > kvm_mmu_page_fault()'s return code is greater than or equal to 0,
+> > > indicating a KVM_MEMORY_EXIT_FAULT/-EFAULT isn't needed. While here,
+> > > simplify the code slightly and fix up the associated comments for better
+> > > clarity.
 > > > 
+> > > Fixes: ccc9d836c5c3 ("KVM: SEV: Add support to handle RMP nested page faults")
 > > > 
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >   arch/x86/kvm/svm/svm.c | 10 ++++------
+> > >   1 file changed, 4 insertions(+), 6 deletions(-)
 > > > 
+> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > index 426ad49325d7..9431ce74c7d4 100644
+> > > --- a/arch/x86/kvm/svm/svm.c
+> > > +++ b/arch/x86/kvm/svm/svm.c
+> > > @@ -2070,14 +2070,12 @@ static int npf_interception(struct kvm_vcpu *vcpu)
+> > >   				svm->vmcb->control.insn_len);
+> > >   	/*
+> > > -	 * rc == 0 indicates a userspace exit is needed to handle page
+> > > -	 * transitions, so do that first before updating the RMP table.
+> > > +	 * rc < 0 indicates a userspace exit may be needed to handle page
+> > > +	 * attribute updates, so deal with that first before handling other
+> > > +	 * potential RMP fault conditions.
+> > >   	 */
+> > > -	if (error_code & PFERR_GUEST_RMP_MASK) {
+> > > -		if (rc == 0)
+> > > -			return rc;
+> > > +	if (rc >= 0 && error_code & PFERR_GUEST_RMP_MASK)
 > > 
+> > This isn't correct either.  A return of '0' also indiciates "exit to userspace",
+> > it just doesn't happen with SNP because '0' is returned only when KVM attempts
+> > emulation, and that too gets short-circuited by svm_check_emulate_instruction().
+> > 
+> > And I would honestly drop the comment, KVM's less-than-pleasant 1/0/-errno return
+> > values overload is ubiquitous enough that it should be relatively self-explanatory.
+> > 
+> > Or if you prefer to keep a comment, drop the part that specifically calls out
+> > attributes updates, because that incorrectly implies that's the _only_ reason
+> > why KVM checks the return.  But my vote is to drop the comment, because it
+> > essentially becomes "don't proceed to step 2 if step 1 failed", which kind of
+> > makes the reader go "well, yeah".
+> 
+> So IIUC you're suggesting
+> 
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 426ad49325d7..c39eaeb21981 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -2068,16 +2068,11 @@ static int npf_interception(struct kvm_vcpu *vcpu)
+>  				static_cpu_has(X86_FEATURE_DECODEASSISTS) ?
+>  				svm->vmcb->control.insn_bytes : NULL,
+>  				svm->vmcb->control.insn_len);
+> +	if (rc <= 0)
+> +		return rc;
+> -	/*
+> -	 * rc == 0 indicates a userspace exit is needed to handle page
+> -	 * transitions, so do that first before updating the RMP table.
+> -	 */
+> -	if (error_code & PFERR_GUEST_RMP_MASK) {
+> -		if (rc == 0)
+> -			return rc;
+> +	if (error_code & PFERR_GUEST_RMP_MASK)
+>  		sev_handle_rmp_fault(vcpu, fault_address, error_code);
+> -	}
+>  	return rc;
+>  }
+> 
+> ?
+> 
+> So, we're... a bit tight for 6.10 to include SNP and that is an
+> understatement.  My plan is to merge it for 6.11, but do so
+> immediately after the merge window ends.  In other words, it
+> is a delay in terms of release but not in terms of time.  I
+> don't want QEMU and kvm-unit-tests work to be delayed any
+> further, in particular.
+
+That's unfortunate, I'd thought from the PUCK call that we still had
+some time to stabilize things before merge window. But whatever you
+think is best.
+
+> 
+> Once we sort out the loose ends of patches 21-23, you could send
+> it as a pull request.
+
+Ok, as a pull request against kvm/next, or kvm/queue?
+
+Thanks,
+
+Mike
+
+> 
+> Paolo
 > 
 > 
 
