@@ -1,135 +1,167 @@
-Return-Path: <kvm+bounces-17186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E020A8C2704
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 16:39:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B328C8C2716
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 16:45:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 151B01C21E73
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 14:39:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 235842846C8
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 14:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 993681708B5;
-	Fri, 10 May 2024 14:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E2217106B;
+	Fri, 10 May 2024 14:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4R96vW7N"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T/R9ZiRD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821C512C526
-	for <kvm@vger.kernel.org>; Fri, 10 May 2024 14:39:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DCB14B08C
+	for <kvm@vger.kernel.org>; Fri, 10 May 2024 14:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715351957; cv=none; b=d0u2aEnDUgOYMOV87jX6uDqsfnDDgNNGujf3u6LEqJjhzrUK8DjP+vMF/nXn232lwLSbLuhcb1iGzfAEZ2mE6O3Aby/jEfL8vdVxAI3eKUNV6BebaPcsjQ4qSXNTBQPaXrvJnV5z6MJko/tLprcJ+g7/NmVTPIncz7z6q6Nf2nw=
+	t=1715352317; cv=none; b=j+lHZt+Siw0Gm/JETsUY1qEvxCTx/m6L70NtbT6elqz5wGV7lS0vIGnXpOk6eHESgBahnQHV48RsGaffkxDrT7Oel/qCOzseeFdGjK5jvPsEKvq2IyLPwwEdqtmG1J7s1LSuwRN6HQSh1eMX8UDuqh0Rv01qUEHZ2/dQL2HUfkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715351957; c=relaxed/simple;
-	bh=2w9De7V5jOfTq8rH1l9a1Xsc541rGrm7F/L+4BdzLqw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eqsoXkLtd9ii6mR+GDxmrx79YdSxPZHBbjkD19KOi+fGVC3Z2SXok8KambjmdEZhpA16nVjYtZTw2gGdOPhnRiIkgnGW/AoT2fHOfP4UZS99d5JAPEisA5y2/qonL2xF8lnptqvStmlPxNvFbyRVTEaxOpLjdyRng4H/cO6XmLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4R96vW7N; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b413f9999eso1654134a91.1
-        for <kvm@vger.kernel.org>; Fri, 10 May 2024 07:39:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715351956; x=1715956756; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wKy0hWUxkHzFjSEjyTqN35P4DeSOXD6rseF0af2cPcA=;
-        b=4R96vW7N54aIW9Yb0dziMr+i6W3KFdPC8+UVYhim7167BnmAT8iXdWsZJGvsH9mtNJ
-         EyV0GQIC4gKMeOnZ3z9X2F3buOTQc7spaCR3a1UJraa7bl9fzrVO8XFy5Lsr+xYz49Vx
-         AIVzHxtc1mbfBTzQeUsZWcyM73Sv+mBMyJ/w1bOASMF9n85UkIqed9ZxPzIMDJ856xwf
-         XeirRXaz8MHj0wsIi00z6uJwRsuFFgwlW8adYCp+3d7RIQYgXlUVgPoVE24ZtPBL0e9F
-         vLYpEvc4RLZ7aU9Crc0tWPDKoGSRi0+hmppRzQ/p5Uaqdff3Fg/oMMDKnKLFNoOjsZTS
-         342w==
+	s=arc-20240116; t=1715352317; c=relaxed/simple;
+	bh=kmj44PEzEs1Hc7RYAG2y6Omx6rTiyxtrlA8AzcCTcUs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EYRmU3dDbftzAPBPDB46K8FvUa26stY/WCQ5rt9JSLNeCbvVboPtsjNEM2fVh21ZIj5dWBmNkQtXCz8pS620//hiCcN7U8uGT0mwZaoLv2f1CN6FxSedTGQfA06Dpbq5h0J8GUbkJeIrKHF033e3NsKRWHTNi7WNUjiBj3jCHJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T/R9ZiRD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715352315;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V0JbujFYt/9SItNTEbEiczRuSL3qAb2lZe4U6XNdsCE=;
+	b=T/R9ZiRD8cowlEvt6k45zjjee8Kz32Ig6uE04Hl+0adaxC7SEYVRZ9pHV6omzhdCLueWKJ
+	5Tr5u9HyopoRvIY/YBvdMI54UffAINO2tR/Fc+LDtxVUeMwEVeCeOlaxa0G4xa1LHr/WpC
+	VkRlaK5h061dzpV+hatkQdfPbrK6eH8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-537-KPZS8ySEMJqTERihKi1k0Q-1; Fri, 10 May 2024 10:44:58 -0400
+X-MC-Unique: KPZS8ySEMJqTERihKi1k0Q-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34d9055c7e0so1252902f8f.3
+        for <kvm@vger.kernel.org>; Fri, 10 May 2024 07:44:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715351956; x=1715956756;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wKy0hWUxkHzFjSEjyTqN35P4DeSOXD6rseF0af2cPcA=;
-        b=EYt15XSKiT3E+DLG5txrEXVCZtK5hAlOzhFgZ4exUr173M6/dCxuc9F8YEoBkANNcD
-         t/7SzxnTj+88EDWPv84b/Wqe9dWu1FkMMplVVf37EhWJf+7K/SdpE4G23mZXQnRqIne6
-         l3I6M+QeSUeUR0xxu1p2pOWPdm3/OLDL2ZtJ9OW2UX6HpKd4pY9+CsDLS4VqhYIks+8k
-         buxxjcx47+VYAoCtsTWlJ+aNhXsuGf/2cv1PQCcRd5qX8pF5cuI0fF+tvIT5c+slWw8m
-         1bjKoFWQfpg7z62l1kipAFIL3ydTdRNKQlUp57iqVrfBeMwbrGqxTY0mVzSLMkXtV0B+
-         0t1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWRPSGH54g1EGo8kqLFrrMzZ5Ygb6cRj1n5keGC4QG26ZoU091bF+AK8cOtlIVjl23y4YRVtrktqsZixvxG7t832FDQ
-X-Gm-Message-State: AOJu0Yx8RmLvj0PW2C8e3MrzN2XcxNeNRhbKFQLCuRvEco7sjOTqF9/H
-	5B8Zkzq3Z9Kod1+ucaKcm0mqlgydgMq4Yp30oPXTu5Zf2M+XW0szNfbGOrS1CixIUnQAJkBrhE1
-	upg==
-X-Google-Smtp-Source: AGHT+IGZeVKNIE9bJ4O0rd5TeJRSNjyTsYan7QSvYjPkqaIu/3O25cixtXLnzCOJSyWTprQTMx7K6kjXyfo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:30c5:b0:2b2:1919:dda4 with SMTP id
- 98e67ed59e1d1-2b6c75cf00amr30981a91.4.1715351955569; Fri, 10 May 2024
- 07:39:15 -0700 (PDT)
-Date: Fri, 10 May 2024 07:39:14 -0700
-In-Reply-To: <Zj3ksShWaFSWstii@gmail.com>
+        d=1e100.net; s=20230601; t=1715352297; x=1715957097;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V0JbujFYt/9SItNTEbEiczRuSL3qAb2lZe4U6XNdsCE=;
+        b=u8yWurAndqBjtZBwXpgiy6DNzcAOlimzZ96aKP3BWXGgBxT00Lpkxc4hw00ql9OAwM
+         YKcusp5bpvxHux90fp6zBag4F60takMlHVS4AN4LluHy5Jso57pUElTX23ii5kliJqYj
+         UzJ3Ue4djqV2q4nAZ2RCl2iy7YlMSOr9BI440dXsTBYb2Q0cHjgAO9wpkp1qVMWILiQ0
+         Y+QuvZn08BkX/Ejh/FRhJA1U30n0uY9KS0r8JTlWP8WZAu284PlvSiOyJCTCT7UOVSWs
+         mwj2rl0IYCz3GKyjDOiB1zyf/AXlDFUG+Vp+Yc+rj191Sr9vsrQ5Vq0+fGdbRxCUvHVI
+         PmDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXsgPd1C2LGoM82Qicdd8GSkNNA7F1g8PBIXc4cfSODXepDErP7RO+dp5qR0q3ePiAB/EqsS+q1nNI0SkG6CpkJxDmw
+X-Gm-Message-State: AOJu0YxVNs1mbr5VrB24jE582ySebTg58pelexMAh/wAlLSqCAceji7B
+	Th+lOX3HkfqCHlF9MxnWj7J1kC0OPvzz3KhtDMMxrWqiPq+CubhHWOHHA/Uq4rq04KMS46jPO4u
+	Q62Ag8fgd9dWcfOGaJz9kb9Mr5rYAkuMIQOqXdVZinNxBo7aZU+DZ540nsflHyR3nkire0sgyrE
+	B4bkPFLcKZ+P+2NAyUDtMwFnNp
+X-Received: by 2002:a05:6000:1003:b0:33e:7f5c:a75d with SMTP id ffacd0b85a97d-3504a96cca2mr1881552f8f.57.1715352297320;
+        Fri, 10 May 2024 07:44:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEqPh3msW6mLhD5AYzc7IzmHoZiilZKRmz2o9qQNP3DbnrKVIBIgk/dOAj3od9jdxMGgdFJY8LFNOkvNb4LRmc=
+X-Received: by 2002:a05:6000:1003:b0:33e:7f5c:a75d with SMTP id
+ ffacd0b85a97d-3504a96cca2mr1881542f8f.57.1715352296757; Fri, 10 May 2024
+ 07:44:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240509090146.146153-1-leitao@debian.org> <Zjz9CLAIxRXlWe0F@google.com>
- <Zj3ksShWaFSWstii@gmail.com>
-Message-ID: <Zj4xkoMZh8zJdKyq@google.com>
-Subject: Re: [PATCH] KVM: Addressing a possible race in kvm_vcpu_on_spin:
-From: Sean Christopherson <seanjc@google.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, rbc@meta.com, paulmck@kernel.org, 
-	"open list:KERNEL VIRTUAL MACHINE (KVM)" <kvm@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240508150240.225429-1-chenhuacai@loongson.cn>
+In-Reply-To: <20240508150240.225429-1-chenhuacai@loongson.cn>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 10 May 2024 16:44:44 +0200
+Message-ID: <CABgObfaivYUYZwmC9p2uwCWTC-hzJc4P_=rK0S244Hjx3X8kvg@mail.gmail.com>
+Subject: Re: [GIT PULL] LoongArch KVM changes for v6.10
+To: Huacai Chen <chenhuacai@loongson.cn>
+Cc: Huacai Chen <chenhuacai@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Xuerui Wang <kernel@xen0n.name>, 
+	Jiaxun Yang <jiaxun.yang@flygoat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 10, 2024, Breno Leitao wrote:
-> > IMO, reworking it to be like this is more straightforward:
-> > 
-> > 	int nr_vcpus, start, i, idx, yielded;
-> > 	struct kvm *kvm = me->kvm;
-> > 	struct kvm_vcpu *vcpu;
-> > 	int try = 3;
-> > 
-> > 	nr_vcpus = atomic_read(&kvm->online_vcpus);
-> > 	if (nr_vcpus < 2)
-> > 		return;
-> > 
-> > 	/* Pairs with the smp_wmb() in kvm_vm_ioctl_create_vcpu(). */
-> > 	smp_rmb();
-> 
-> Why do you need this now? Isn't the RCU read lock in xa_load() enough?
+On Wed, May 8, 2024 at 5:11=E2=80=AFPM Huacai Chen <chenhuacai@loongson.cn>=
+ wrote:
+>
+> The following changes since commit dd5a440a31fae6e459c0d6271dddd628255053=
+61:
+>
+>   Linux 6.9-rc7 (2024-05-05 14:06:01 -0700)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson=
+.git tags/loongarch-kvm-6.10
+>
+> for you to fetch changes up to 7b7e584f90bf670d5c6f2b1fff884bf3b972cad4:
+>
+>   LoongArch: KVM: Add mmio trace events support (2024-05-06 22:00:47 +080=
+0)
 
-No.  RCU read lock doesn't suffice, because on kernels without PREEMPT_COUNT
-rcu_read_lock() may be a literal nop.  There may be a _compiler_ barrier, but
-smp_rmb() requires more than a compiler barrier on many architectures.
+Pulled, thanks.
 
-And just as importantly, KVM shouldn't be relying on the inner details of other
-code without a hard guarantee of that behavior.  E.g. KVM does rely on
-srcu_read_unlock() to provide a full memory barrier, but KVM does so through an
-"official" API, smp_mb__after_srcu_read_unlock().
+Paolo
 
-> > 	kvm_vcpu_set_in_spin_loop(me, true);
-> > 
-> > 	start = READ_ONCE(kvm->last_boosted_vcpu) + 1;
-> > 	for (i = 0; i < nr_vcpus; i++) {
-> 
-> Why do you need to started at the last boosted vcpu? I.e, why not
-> starting at 0 and skipping me->vcpu_idx and kvm->last_boosted_vcpu?
+> ----------------------------------------------------------------
+> LoongArch KVM changes for v6.10
+>
+> 1. Add ParaVirt IPI support.
+> 2. Add software breakpoint support.
+> 3. Add mmio trace events support.
+>
+> ----------------------------------------------------------------
+> Bibo Mao (8):
+>       LoongArch/smp: Refine some ipi functions on LoongArch platform
+>       LoongArch: KVM: Add hypercall instruction emulation
+>       LoongArch: KVM: Add cpucfg area for kvm hypervisor
+>       LoongArch: KVM: Add vcpu mapping from physical cpuid
+>       LoongArch: KVM: Add PV IPI support on host side
+>       LoongArch: KVM: Add PV IPI support on guest side
+>       LoongArch: KVM: Add software breakpoint support
+>       LoongArch: KVM: Add mmio trace events support
+>
+>  arch/loongarch/Kconfig                          |   9 ++
+>  arch/loongarch/include/asm/Kbuild               |   1 -
+>  arch/loongarch/include/asm/hardirq.h            |   6 +
+>  arch/loongarch/include/asm/inst.h               |   2 +
+>  arch/loongarch/include/asm/irq.h                |  11 +-
+>  arch/loongarch/include/asm/kvm_host.h           |  33 +++++
+>  arch/loongarch/include/asm/kvm_para.h           | 161 ++++++++++++++++++=
+++++++
+>  arch/loongarch/include/asm/kvm_vcpu.h           |  11 ++
+>  arch/loongarch/include/asm/loongarch.h          |  12 ++
+>  arch/loongarch/include/asm/paravirt.h           |  30 +++++
+>  arch/loongarch/include/asm/paravirt_api_clock.h |   1 +
+>  arch/loongarch/include/asm/smp.h                |  22 ++--
+>  arch/loongarch/include/uapi/asm/kvm.h           |   4 +
+>  arch/loongarch/kernel/Makefile                  |   1 +
+>  arch/loongarch/kernel/irq.c                     |  24 +---
+>  arch/loongarch/kernel/paravirt.c                | 151 ++++++++++++++++++=
+++++
+>  arch/loongarch/kernel/perf_event.c              |  14 +--
+>  arch/loongarch/kernel/smp.c                     |  52 +++++---
+>  arch/loongarch/kernel/time.c                    |  12 +-
+>  arch/loongarch/kvm/exit.c                       | 151 ++++++++++++++++++=
++---
+>  arch/loongarch/kvm/trace.h                      |  20 ++-
+>  arch/loongarch/kvm/vcpu.c                       | 105 +++++++++++++++-
+>  arch/loongarch/kvm/vm.c                         |  11 ++
+>  23 files changed, 746 insertions(+), 98 deletions(-)
+>  create mode 100644 arch/loongarch/include/asm/kvm_para.h
+>  create mode 100644 arch/loongarch/include/asm/paravirt.h
+>  create mode 100644 arch/loongarch/include/asm/paravirt_api_clock.h
+>  create mode 100644 arch/loongarch/kernel/paravirt.c
+>
 
-To provide round-robin style yielding in order to (hopefully) yield to the vCPU
-that is holding a spinlock (or some other asset that is causing a vCPU to spin
-in kernel mode).
-
-E.g. if there are 4 vCPUs all running on a single CPU, vCPU3 gets preempted while
-holding a spinlock, and all vCPUs are contented for said spinlock then starting
-at vCPU0 every time would result in vCPU1 yielding to vCPU0, and vCPU0 yielding
-back to vCPU1, indefinitely.
-
-Starting at the last boosted vCPU instead results in vCPU0 yielding to vCPU1,
-vCPU1 yielding to vCPU2, and vCPU2 yielding to vCPU3, thus getting back to the
-vCPU that holds the spinlock soon-ish.
-
-I'm sure more sophisticated/performant approaches are possible, but they would
-likely be more complex, require persistent state (a.k.a. memory usage), and/or
-need knowledge of the workload being run.
 
