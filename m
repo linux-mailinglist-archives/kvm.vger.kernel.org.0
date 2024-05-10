@@ -1,178 +1,244 @@
-Return-Path: <kvm+bounces-17144-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17146-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CE328C1BCD
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 02:39:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 152068C1C71
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 04:36:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 702411C2217B
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 00:39:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38C0B1C20BF7
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 02:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD15C134CC;
-	Fri, 10 May 2024 00:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8351A14883B;
+	Fri, 10 May 2024 02:36:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b="WzsE+sp5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wpApFz8i"
 X-Original-To: kvm@vger.kernel.org
-Received: from SG2PR03CU006.outbound.protection.outlook.com (mail-southeastasiaazon11020002.outbound.protection.outlook.com [52.101.133.2])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389494A33;
-	Fri, 10 May 2024 00:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.133.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5DB1148FEB;
+	Fri, 10 May 2024 02:36:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.75
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715301477; cv=fail; b=lmds/ZUcONhZQzpeMvkRtFeHAkymegKKGAfGibdHGUjdSyA5umICBoiIkQ0zEBPfGVWR2k1u79jx4bwUipzZvB3HVMnCYmrDLKWXpa52dqN0msxIkrzyPbXI0oQsQkOgc1A2d1zVcTNvs2iclN/NWj7X5nyptF8aHv6phJENOKE=
+	t=1715308602; cv=fail; b=LUwTY/y7nwdBQNBDBgXvs+mjiQSTd9Db9JpGv1VQ72V9SNdIC22Q2p185xUVVYtYR4y3lnu2wFTNWJRHObfOur/RCAyrkXRPgdp4UJuXiTAHBJyGPwFKmrLyVruxGrgePFDcJbe1f+YjiCkVV2Tr+WHoz2jszcLIj5pkDgVO2/4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715301477; c=relaxed/simple;
-	bh=5vn1YGaQCnaKUz9iQLpCKwUxJi7HkkEnfYNsGr6hbpg=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=fL0hvMSIze4Q5qJgKfiy2ae6mvG5u1OELX/JYiFvLMlupLs7dczgDbukYYq0uEddLd3eLLqh+BXdVAnma6gSjLH0ugid79ZW5HHdHtuQvPUrSZ2SmTa7gSJfuvUni32lVTbZ4DPW3En2QDiH41C1sK4Xpn4r/AlCqraGxjS4q18=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com; spf=pass smtp.mailfrom=jaguarmicro.com; dkim=pass (2048-bit key) header.d=jaguarmicro.com header.i=@jaguarmicro.com header.b=WzsE+sp5; arc=fail smtp.client-ip=52.101.133.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=jaguarmicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jaguarmicro.com
+	s=arc-20240116; t=1715308602; c=relaxed/simple;
+	bh=55rOGSOSrcRZM3UtM+oxDWtePaOWhJq7An03Nsz/miU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rR5wgk/lwtQHGGusljRawIYa7P3HDzZ/QQIBsunh4S8o3bAXNFZ2gynEw35ESPgNaPTgQsbv71xa0hdlGRcO9OP8gwDrvS7SxLm1YWeSH1Uz2SFq5M83vZUJVyGsEqU/OqFCy3YeS4c1EWSCL8RdZuCJAmw6apMlcPMNY7F0tW8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wpApFz8i; arc=fail smtp.client-ip=40.107.237.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ewthdat6nnuBFVlKBMtNIxpLz/N3mpUmx56yoYmbPMjqvUC62fQLAU5mMqxbBUNZagbW0MDnjttEnEd2I8VIS4sgeBgYGzaT9llwHSNKr8Mf1pHae8W66ZVKs2p7H2Vv7bohjpB+XvZpWwwohp73hw3x6pSxm7zLfpba8oR77KyXZiLlKjehcC0HHEtIkvPPqbBLP2quip8e4j17ADkoOhPdoAV6vF7lQbYn1yzUwLsrTjFIm6wnpNze9vd6jkMtBtNL7eK9x1tey1ABdvssBwl+q5JQWfDjx7JauWwzNV1kTtPeFpOp6pWJrulzXLQeH1Z1eVYCu8IKvxihmvKwzQ==
+ b=jvUJ2uQLt5PVmBLnGtBqYs6HYo4SbN01xFxHcMlfRpMHmVlSyvlhwR5HJvfHnGLgu5PejxDGEgL6EUmdGCrn0cLF+MZbLr+HY95j3C5Xtobq9wxpC6V3eXgr23X/F7cykl2cPDfWYx5dX/RwpVrFM5Uqf+o6IpHFqbgfts1yiSSJjvtYoIjfPlW862o7AUT2mcFo7HDmpiVAZ5tp+rBgUbCnQNN/iDnP41u/wl2mK2gXDmCXL9ZLzhpkSmwlbXAZmLF+fCmhRz+ylDeXTa6dQ2T/tPFc9Eel0kMcolEmEyG6vog4BBEEu4HG8HD/69ME9WfyFwcqrr93MOoWwUJ4MQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AC1JAacRssBq3LzzaU8NpbMnKNxIhvj9sWlUpaIlI6E=;
- b=WRn9mP3OEiX44Zu2CrCZpA8OqAzkZcmA66U0LzYmBdw3Zo1JRHQuRCVZ/cZ2e8ssZKkXJBJjE2FMYixgQVwNIV92FpdHGgGiBSmjYWU8bUP3Pb2ieGvijGKFF3O8IYYZVWG808WeyXXw6ncRwSCjRrt1aez8czyuMiH8Z/DFnkLlpFz6D1mxLkHkfGmZVHDp54mDj46hdAzuqaURvgxpmYkKC1eoxuI99syN5vXbSQLPSVZVvEU9nmPiq9WN052CMlKk0kCrQqNkt3YBYbbMZ5fOAIO9jXggf+PDkx77RefeYfoLFMQeKg3N+waNurOXgH85h1IsRhKR3jFqW1tVdA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=jaguarmicro.com; dmarc=pass action=none
- header.from=jaguarmicro.com; dkim=pass header.d=jaguarmicro.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jaguarmicro.com;
- s=selector2;
+ bh=zvSZolCBykKdQtTZaILW7FQXukMYbhMEQkcghT+tDNw=;
+ b=gqnSKT629gQzl3bOWgWoA6NQ8Kk8nNcc9QaenPmK3em5Qx1v2aEVKQqveewzcI5k24jVcyJUjGopvYAHruM5iOm83fdHdF3uw1Yl1QczLUtNWu3vPNtu1zzkqJVX3dZNUIX3wcQL0jsnuIaAoVBl91s4fkJrpoEGryUY1JGhu2YBPVqTNO1B5R+RiVwJMPwD/VVD4yWFq/YFUq49QNQBKmiktYrQscrke1esN0OXkzNfcUcLTZGverbowNPQCafD4BKKdCQOAcUWbCo8Ssu3zr6e69M23CWRG7ZYh9WWVIpkWFqj7I7RBbgSoyQlmjNQJ1zCMgkBX/WhaxwD/DbbVQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AC1JAacRssBq3LzzaU8NpbMnKNxIhvj9sWlUpaIlI6E=;
- b=WzsE+sp5yg18KK4Xw68hoKVNL8EMIesgsXIXOsMyfDLOxe7rkn8mq8rEqZICxgFGg/iFNB/XWXFmT4g4nL0LNogV5VfcylVZbM6E53ADZ/36TqBIpiL9AKtkljOw4HpIxqBBkaIAH6h6l77CHnGlqYE0wDHVse+1oQL8ze0tojrusvqDxquVCMcN3VK+JXgr/x36YRaFscF5pLG7YQ7OO43UWSdYU4y2qUNmRGDtpH+cS4hMtnUT2hfr7Wsj0I5pyvHbr0rkpDDCBLOVxpekHrKkACXwiR1blM3koTe/olGAbHfrSHRbV5Osap4d48Y4Q/QbHlH/dkmpby8H1BH1XQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=jaguarmicro.com;
-Received: from SEYPR06MB5256.apcprd06.prod.outlook.com (2603:1096:101:83::14)
- by SG2PR06MB5431.apcprd06.prod.outlook.com (2603:1096:4:1bb::10) with
+ bh=zvSZolCBykKdQtTZaILW7FQXukMYbhMEQkcghT+tDNw=;
+ b=wpApFz8iNOpST/ptOBC9jf9MLZ3qXtQowrhszTUfU7ORQRopZHPywvNrq3R34WRFMqHD2zyB52yMBWY176+a0qsF2hCFHJF4dg+HK056ZIy64gJKsNPNVNgaGQE3dod1V6YW8MExwjf8ZvOOwwQ77qkFubmLvupGTCTDT36ir9M=
+Received: from MN2PR11CA0023.namprd11.prod.outlook.com (2603:10b6:208:23b::28)
+ by CH2PR12MB4149.namprd12.prod.outlook.com (2603:10b6:610:7c::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.47; Fri, 10 May
- 2024 00:37:48 +0000
-Received: from SEYPR06MB5256.apcprd06.prod.outlook.com
- ([fe80::ea7:4953:3160:4916]) by SEYPR06MB5256.apcprd06.prod.outlook.com
- ([fe80::ea7:4953:3160:4916%3]) with mapi id 15.20.7544.048; Fri, 10 May 2024
- 00:37:48 +0000
-From: "foryun.ma" <foryun.ma@jaguarmicro.com>
-To: corbet@lwn.net
-Cc: alex.williamson@redhat.com,
-	kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	angus.chen@jaguarmicro.com,
-	"foryun.ma" <foryun.ma@jaguarmicro.com>
-Subject: [PATCH] vfio: remove an extra semicolon
-Date: Fri, 10 May 2024 14:37:35 +1400
-Message-Id: <20240510003735.2766-1-foryun.ma@jaguarmicro.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR06CA0189.apcprd06.prod.outlook.com (2603:1096:4:1::21)
- To SEYPR06MB5256.apcprd06.prod.outlook.com (2603:1096:101:83::14)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48; Fri, 10 May
+ 2024 02:36:32 +0000
+Received: from MN1PEPF0000ECD7.namprd02.prod.outlook.com
+ (2603:10b6:208:23b:cafe::bd) by MN2PR11CA0023.outlook.office365.com
+ (2603:10b6:208:23b::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.49 via Frontend
+ Transport; Fri, 10 May 2024 02:36:32 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000ECD7.mail.protection.outlook.com (10.167.242.136) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7544.18 via Frontend Transport; Fri, 10 May 2024 02:36:32 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 9 May
+ 2024 21:36:30 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
+	<vkuznets@redhat.com>, <jmattson@google.com>, <luto@kernel.org>,
+	<dave.hansen@linux.intel.com>, <slp@redhat.com>, <pgonda@google.com>,
+	<peterz@infradead.org>, <srinivas.pandruvada@linux.intel.com>,
+	<rientjes@google.com>, <dovmurik@linux.ibm.com>, <tobin@ibm.com>,
+	<bp@alien8.de>, <vbabka@suse.cz>, <kirill@shutemov.name>,
+	<ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <papaluri@amd.com>, "Isaku
+ Yamahata" <isaku.yamahata@intel.com>
+Subject: [PATCH v15 21/23] KVM: MMU: Disable fast path for private memslots
+Date: Thu, 9 May 2024 20:58:20 -0500
+Message-ID: <20240510015822.503071-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240501085210.2213060-1-michael.roth@amd.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEYPR06MB5256:EE_|SG2PR06MB5431:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5a87dd87-31f8-49ac-2e83-08dc70896ad1
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD7:EE_|CH2PR12MB4149:EE_
+X-MS-Office365-Filtering-Correlation-Id: 097b6ffb-7c53-4761-2923-08dc709a00d3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|1800799015|376005|366007|52116005|38350700005;
+	BCL:0;ARA:13230031|1800799015|7416005|36860700004|376005|82310400017;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?NZoCsTHzVblDhF+BPq6oGxqW93F61/HaqKH5jJLl59SqjXD8H0r9VrFTyXQ3?=
- =?us-ascii?Q?2p+pWGerPT+Kr/YMjhc6vbjfo3JskVZhZvmk89cRusSFSEu+14N2UTiEiXAO?=
- =?us-ascii?Q?moSw8SVgVCypvU2+Kck4z7gNj/o4sEfMhHBy+DHHrLkXPtloE7LsMt5FXBaQ?=
- =?us-ascii?Q?4DyPf++AMn29e4zHD45Cipf5Fa6BcjtXHytGZQhXIznp7bEqE2xL125qr1fr?=
- =?us-ascii?Q?25WBjGYRtcyJKynlrlnAWS3octgLpdIxUS10ZbDFNjRqvnoX5jyktIwTorMl?=
- =?us-ascii?Q?CXHsZdn1ZOhtrWmDoLerdmPA6m06JW6Vxboif7XGusTr2hJRbq47oPbzV5ur?=
- =?us-ascii?Q?Vdpsu39K0yeGgrvJkgiDsb6x1a+jCRYImBQQL4CouXMzqx6MepRMq+UIHS2u?=
- =?us-ascii?Q?UMx59WJUG4WIcJlG5vh3g1iSIa4TZbUAc3XkGyRBagxFrlvrP9UR8FvtvIrN?=
- =?us-ascii?Q?CxLSAUDymlE1bQI0rnW9Cq75fPiTrv0MFy7uEuzNy4Huj5GzH5i0mjoe3lk2?=
- =?us-ascii?Q?H5Ftwk5bGRrkRDNXsPpe7bhGmHnSDi8ipZ2iqrJbPpf28KI8hLpr2w3JrCwA?=
- =?us-ascii?Q?Sv2ImSQlSYSOEDv+0WQoPeFMHEBjTZtB1w8WKDfdF3RAQFTiOPgYodAsYoMe?=
- =?us-ascii?Q?o9Vx5Q/UiXjFDUlom1IFznD74sB8GGgIs1oQa5cc/m39UUxlSE4g2ObiHrnt?=
- =?us-ascii?Q?g3pbfLoLPCuSncovO4vdAzeKPxdKuCat7ESLKwMENZgzjTE3EuATASbyBFAH?=
- =?us-ascii?Q?9HMeKONJ7e+LZ6HMxDkq+I8wi0HyFWrkoEPQ9ji2iHJSz17dqpK9jCazhS5y?=
- =?us-ascii?Q?ueGhy08YAkYKqy4xhF/Qq8kLL/dgROrJTB4PGKIrdEvP1JWs6YXSWBKTQ9rZ?=
- =?us-ascii?Q?dJ75f3HOIQCLxwXzwHD5pz2sqHYxm9jFSJ99j+yllYOJyqTi+FrdHlv0RIdy?=
- =?us-ascii?Q?LWtJXc23YhsPaYEK/UeXXfwKeXpeVYzcCZFY+76cvyBji937oqdkgm+nzeSS?=
- =?us-ascii?Q?idGAV4D+RTyjyEVRMfvkPPf7bqIX8L8OywFO/ZIjRB8BVd6Rilej436V2pZg?=
- =?us-ascii?Q?BQEW2cKkp+573pDO/kboJc523pSEjkB1Wa1rIRHH5txdSIBeGE9rWrdgm0wY?=
- =?us-ascii?Q?1trflqcqOfboyaXbfl1eaoatRNLKSsaoz9KzWVaev4DeIYSwu9/H89BfgK18?=
- =?us-ascii?Q?wN7qLbvZeyj4Mp0p6sJRWEK3R8xeQOUGuAg/iwLkySWqUG+i1sfwC4feQ1mO?=
- =?us-ascii?Q?aOAmR1HnSDOYy5esCrWRtSWRRPJhIaVZu9pzVmQhYyHkYyKDF3pqcQhxumZA?=
- =?us-ascii?Q?RkQm1JowH/4jeMmUsX3XiiEtsDgKFFkxzwFsYgAkvvH1Mw=3D=3D?=
+	=?us-ascii?Q?Jcc013T/TnDlncSxcKTAre8nd9XjAKVnDK5/eAD2XzDjCUJY3vEZP4Yb+39O?=
+ =?us-ascii?Q?QKek7B7rYKlQPfXOZAbBfWQieYUOIxNsxt77KDQsGQlyepMOZJzuPKvgycRn?=
+ =?us-ascii?Q?8bcQvDACipdY3J+AxyXxYFyNkUUQthz8ERUW54uh/pXNxW2cB1tl8zb82Li1?=
+ =?us-ascii?Q?TAuzQ6fdwF0sYFNiS03Z7cTpMNAZ+YTTYXJBYWIC1IamzR7r3/ElN0iHmK9H?=
+ =?us-ascii?Q?hpP0xay7f9WbfueybKuA10IzERtAGikLYjpVhMpq6fOAJc83Z+pJLmfGD8/+?=
+ =?us-ascii?Q?lFC1aZhndbzS4hVsaGAI1GHqRrLgQNG2FZ4PWsOvGb8BLRPx86yQ80F6w29I?=
+ =?us-ascii?Q?7dS5+MZ8+HpoXBjf4zcqSMtJfKQF8sDyt8YB7E5GT/uxTqkPgMfGRzJceLaf?=
+ =?us-ascii?Q?zFUu827Oa7P8KQ4uYtD1+csWTKgupWB5jAV2gVjbwH90YLGlmlHmW1C99Mrr?=
+ =?us-ascii?Q?f81IKDLWtXFfwsWdFkV0YphLH6Tlqqf7Q4AkPJfTPdGhkJcgN7BjrIO4yOtd?=
+ =?us-ascii?Q?5PMjmjZTRqAXfnXWfST5r3oDCqRVg0rQktG2XxnL8Cl+pKMaoCYbw/rdvIXe?=
+ =?us-ascii?Q?q6AB9NQ29h2wndTl+RCY+FqGpcyTyFnub61ZhZlgri3uV8AaUrNEBlshvHsV?=
+ =?us-ascii?Q?ZbKrZTG/KWY42rWtSrkttqwvoKNybqevOq117EbG2PkAnM/5mYChfuYTJI6a?=
+ =?us-ascii?Q?6psqv7PgtVVHfPPUslNfUGNpFHwqHZRiBEz1iUHuk0I/vDnNdlzh4TkJCLbt?=
+ =?us-ascii?Q?eqA+q4D7JHQenHhMr1KYbR/PNhDp6igSpw/x7EpKFQgHU7sE3ao7vel7whjO?=
+ =?us-ascii?Q?UjY/ndHzg3NDDQKIShfGJ5sQwJX72nDf/jf9exh+Tyc2iGzHTVXgmbLjjdmG?=
+ =?us-ascii?Q?uapnyskwWqe+Mq6vycId2gLu3PPK4yBwaT1KYzuhBh4lIUk6GZtwnNGyNLUw?=
+ =?us-ascii?Q?RDvHIHCzn4hOKIpAH5Y5Qx4S2M/2y8tWdS0gfM7sPD5XYBTDHIy8lZzxmmVP?=
+ =?us-ascii?Q?t0p7vcIGCNlIknxkjLYWuVqRCiMYa3UJ/rhDmv9gwFuQwybUyJR9DPHTCGZf?=
+ =?us-ascii?Q?+zxtTsySV5sre8+DP6sypPjmueACiexuDLt+n7QO20XD1lF+LpdmZqTecHGy?=
+ =?us-ascii?Q?ofULqIJUXeKe/lee+PnJVVoxcamdHIeJo9/vPRZEPaA6MVvaHm6FTj1aJ4Tk?=
+ =?us-ascii?Q?BFEB7R80fFLmymevZFrQjmA6QjsqdVCABoFNPwkHwADQ6ZrYpcDF5R4DS0Bw?=
+ =?us-ascii?Q?wPLO9J6bQfkshOmvtPD0LoPNz3y+q3yZIP7sjqMMrn0Mp7lm++fHhVnphP88?=
+ =?us-ascii?Q?rysocejpT+vfRdVzXL68uL/QlTy/tLkV67n6yPXL4iUrUncUgrVWfwgwEoGN?=
+ =?us-ascii?Q?olojh8t1cX3d+ZZYrQnn+Usn1mSW?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5256.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(52116005)(38350700005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Yp1Ruv2J2PUewv0xdONTBvujy5qn2pjcWKL5HSo6Ml1n66OBZJo4EMU6MRU6?=
- =?us-ascii?Q?pDxuLq6XEsY18csqyKdQcyOAe0B9o8KZEMgk9f0fdCaGHiCAI5jKmz3q5abb?=
- =?us-ascii?Q?j93mHn5K4qYelaqnyyJIFa8CS+oFKsOR2eSLKzhOqWMZP2UvlaRb8LYKlCIv?=
- =?us-ascii?Q?DrdAZdP7sKeGhURUck2avFwJKtU2XO7RabwecWyI9TS+QHdWJi5ZJoS+G4Kq?=
- =?us-ascii?Q?Pxx1rjQsgnuX5t5tISec+Wi25yfKZS++AxqY8FmMuA2GSHlSc6WrjW7ky4oc?=
- =?us-ascii?Q?JuhG7awdKPaCzrisjUZVmniuzcEu1AvUubMKZMhS4MVxwynpBEre14cTbQZ6?=
- =?us-ascii?Q?zbF6KPAIor4LlR4PpuuirSyDhCbyaoH8WdeTT4hB+PI5BTCR3JoNjtVGadYH?=
- =?us-ascii?Q?D4d8SvbH6xsvThUv1NgaTWJQOVR4gMAT9yHgVR0hgpjDHRxYFdVQt+3s/nXD?=
- =?us-ascii?Q?20LlObANEAG7H9soNjc9GiuKuGWAXcfRTt2yqUw54Mkp2bc+wwFPWmuOjQBf?=
- =?us-ascii?Q?l3Gn1LeZNXzImCDgeEhUMhIoWXNWv+2pfpAgFMIQriTt2QDBnqLzP/x4M2dC?=
- =?us-ascii?Q?2gtJ5Ipa4MSGrvMb0GKiCIy1NigztfnWccjqoAiym+jm/mqQ0iAo2+VqnwZ5?=
- =?us-ascii?Q?3L5LKWSC2dixSIHOjQtXX3Bd3vTcfe/6Tto2B8emfi+MuWk5SOzaOcCJ25vP?=
- =?us-ascii?Q?/2Y2krk6ZhjYVgQ/TpSjdM65u3BB3L7XYWaSu3xvZRYZPYMLp86PYg3j9KPU?=
- =?us-ascii?Q?5r9kaI0Cm54dfz4eRl/r+76voyQClV3n0Z5mf2Q/szXjUnYls+nXY52e0nE/?=
- =?us-ascii?Q?gwVkca6s6xzWue5maVVkwDF9T2knj8elK2oxHYJwUnARIP3CxD0umTYfCW6M?=
- =?us-ascii?Q?G0gpzgA1eoVRQ63mKK3BQu9zvGzBmt8q/cUHtN934ig+WkGvbTZDyiWtg9sn?=
- =?us-ascii?Q?4itclaaV3hcYQqGRledl6ZmA9EvS8Zmm6Ab3kAHi+FwkM1tzeZ7ywyfybS3w?=
- =?us-ascii?Q?g8A1RlKHbUG3vkHT2X0DHJw2VzH6Gm+g1LUdQziInE7MSPEXlABA8itO4Qn+?=
- =?us-ascii?Q?AA2belKSlSI/5tHPmVW0VPsQh1enfpu3x87UkxKh8W0loHzVAbbGjtFI1F61?=
- =?us-ascii?Q?Zxd1YlFP2mlc9LC7SQ83cC54IrGqY+A6LIxEdjdKoqgC5Ea80eIYGW5aUeRm?=
- =?us-ascii?Q?Pgdg3JhV6gFMzRudKyXVN25CY6rMKZmEWH4ru+MLZi+6fRidY1224xZOkhOD?=
- =?us-ascii?Q?Dfv3cWmTCpV3I08PujrTjZ9b7sLswcQFc5cuu2quUsaZ81oo7Fz7NvdONBHJ?=
- =?us-ascii?Q?dbn43ODJwbV56hoea0mv5VhnTAnzghXqNZaWiDDyQypuFRAM4kXugMXCHFT6?=
- =?us-ascii?Q?IMcIw9r5+4gnhQkmNPKcpI6HKVZMHxLNSx7+gpZjTF60jp4WnlAMdKfN7/cc?=
- =?us-ascii?Q?Fag8LCBH92kXWYCe1w91m/3ttxeKHGGKU0q/eQHaQSK1vo00xBF2eYnBA2wu?=
- =?us-ascii?Q?kKZ9067Jy8bRPlnKGK1jCVUJwE21SiK0tB9IW+EMuEN69zHQwO5L9VYiRf4T?=
- =?us-ascii?Q?5mCvmYeDeL+0ldzagHEmxiGn+31QnL3PNBdt4sBSQ3Pnipk14is1uoPawsSw?=
- =?us-ascii?Q?tw=3D=3D?=
-X-OriginatorOrg: jaguarmicro.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5a87dd87-31f8-49ac-2e83-08dc70896ad1
-X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5256.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 00:37:48.7044
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(36860700004)(376005)(82310400017);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 02:36:32.0255
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 1e45a5c2-d3e1-46b3-a0e6-c5ebf6d8ba7b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PsXwlyxbvCNOIpsqXc6ILexBAG0TNCORjBmXu8XKC+K7sp4dfgtu4qFhbSqwR+b2p4hqTF8K5/50FCh6J9UZO1Tnm+CSDRtqISfq5HP3zrc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SG2PR06MB5431
+X-MS-Exchange-CrossTenant-Network-Message-Id: 097b6ffb-7c53-4761-2923-08dc709a00d3
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD7.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4149
 
-remove an extra semicolon from the example code
+For hardware-protected VMs like SEV-SNP guests, certain conditions like
+attempting to perform a write to a page which is not in the state that
+the guest expects it to be in can result in a nested/extended #PF which
+can only be satisfied by the host performing an implicit page state
+change to transition the page into the expected shared/private state.
+This is generally handled by generating a KVM_EXIT_MEMORY_FAULT event
+that gets forwarded to userspace to handle via
+KVM_SET_MEMORY_ATTRIBUTES.
 
-Signed-off-by: foryun.ma <foryun.ma@jaguarmicro.com>
+However, the fast_page_fault() code might misconstrue this situation as
+being the result of a write-protected access, and treat it as a spurious
+case when it sees that writes are already allowed for the sPTE. This
+results in the KVM MMU trying to resume the guest rather than taking any
+action to satisfy the real source of the #PF such as generating a
+KVM_EXIT_MEMORY_FAULT, resulting in the guest spinning on nested #PFs.
+
+For now, just skip the fast path for hardware-protected VMs since they
+don't currently utilize any of this access-tracking machinery anyway. In
+the future, these considerations will need to be taken into account if
+there's any need/desire to re-enable the fast path for
+hardware-protected VMs.
+
+Since software-protected VMs don't have a notion of a shared vs. private
+that's separate from what KVM is tracking, the above
+KVM_EXIT_MEMORY_FAULT condition wouldn't occur, so avoid the special
+handling for that case for now.
+
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>
+Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- Documentation/driver-api/vfio.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 30 ++++++++++++++++++++++++++++--
+ 1 file changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
-index 633d11c7fa71..2a21a42c9386 100644
---- a/Documentation/driver-api/vfio.rst
-+++ b/Documentation/driver-api/vfio.rst
-@@ -364,7 +364,7 @@ IOMMUFD IOAS/HWPT to enable userspace DMA::
- 				    MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
- 	map.iova = 0; /* 1MB starting at 0x0 from device view */
- 	map.length = 1024 * 1024;
--	map.ioas_id = alloc_data.out_ioas_id;;
-+	map.ioas_id = alloc_data.out_ioas_id;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 62ad38b2a8c9..cecd8360378f 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3296,7 +3296,7 @@ static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
+ 	return RET_PF_CONTINUE;
+ }
  
- 	ioctl(iommufd, IOMMU_IOAS_MAP, &map);
+-static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
++static bool page_fault_can_be_fast(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	/*
+ 	 * Page faults with reserved bits set, i.e. faults on MMIO SPTEs, only
+@@ -3307,6 +3307,32 @@ static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
+ 	if (fault->rsvd)
+ 		return false;
  
++	/*
++	 * For hardware-protected VMs, certain conditions like attempting to
++	 * perform a write to a page which is not in the state that the guest
++	 * expects it to be in can result in a nested/extended #PF. In this
++	 * case, the below code might misconstrue this situation as being the
++	 * result of a write-protected access, and treat it as a spurious case
++	 * rather than taking any action to satisfy the real source of the #PF
++	 * such as generating a KVM_EXIT_MEMORY_FAULT. This can lead to the
++	 * guest spinning on a #PF indefinitely.
++	 *
++	 * For now, just skip the fast path for hardware-protected VMs since
++	 * they don't currently utilize any of this machinery anyway. In the
++	 * future, these considerations will need to be taken into account if
++	 * there's any need/desire to re-enable the fast path for
++	 * hardware-protected VMs.
++	 *
++	 * Since software-protected VMs don't have a notion of a shared vs.
++	 * private that's separate from what KVM is tracking, the above
++	 * KVM_EXIT_MEMORY_FAULT condition wouldn't occur, so avoid the
++	 * special handling for that case for now.
++	 */
++	if (kvm_slot_can_be_private(fault->slot) &&
++	    !(IS_ENABLED(CONFIG_KVM_SW_PROTECTED_VM) &&
++	      vcpu->kvm->arch.vm_type == KVM_X86_SW_PROTECTED_VM))
++		return false;
++
+ 	/*
+ 	 * #PF can be fast if:
+ 	 *
+@@ -3407,7 +3433,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	u64 *sptep;
+ 	uint retry_count = 0;
+ 
+-	if (!page_fault_can_be_fast(fault))
++	if (!page_fault_can_be_fast(vcpu, fault))
+ 		return ret;
+ 
+ 	walk_shadow_page_lockless_begin(vcpu);
 -- 
-2.17.1
+2.25.1
 
 
