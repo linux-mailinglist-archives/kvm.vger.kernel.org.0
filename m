@@ -1,446 +1,446 @@
-Return-Path: <kvm+bounces-17208-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17209-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 837898C2A57
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 21:09:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC518C2ACE
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 21:51:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7343B25022
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 19:09:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCCDA1F244F0
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 19:51:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26BEB487B3;
-	Fri, 10 May 2024 19:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF91E4C62A;
+	Fri, 10 May 2024 19:51:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="165O5gkM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FuakNsAt"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2059.outbound.protection.outlook.com [40.107.96.59])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C7E481D5;
-	Fri, 10 May 2024 19:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715368148; cv=fail; b=ZBUeA8COgARPpNQB6jkvY64gsh/5oiCQPGrJX603epJHzT1xvZDy6lUoNL4g7IdsRzsWrliMpzn1VhzdJY9ccN5VAYIEiNkWVbjO+wHFhdjyYE9OqnM36HjBaLVFCCayu7X6eSsqpfkcourbdrOfg6ukeFv/YA04mH/REOvHilQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715368148; c=relaxed/simple;
-	bh=0ByqADji/+c2K66VLruGUyOTov8ON3fZ71VCLEC6eFk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kvSFn1AUH5FT8nIA3UaXx+aR6v3VhRXnfgyjeLt9ZS5U00b27/Wl++e0ztkwknxHUfAVEaosN4F9S1XTmBvSVBbJbu7F3EJqMtBNhp6OwkPsgXNG7Za4DUY6P9/Hz4k8AvQoX89TVmP84m/RiXiVN1z3W/l7hrfyiPBm9km5f+M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=165O5gkM; arc=fail smtp.client-ip=40.107.96.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L2IB6QYsQAqla6mRFKJJBQzjQNh5AJBrmSjB2wHiG/0hQ0XRTXycKwmmMB1rwTxn8hZg7RXqZR+QUiOeLRGlZkJrY3ayyYJ1pnsS6tue0KBsDagel/CW7Y31WxGRreIzBMkeRSOWPnL41sEam9bK7dmrN7t0eKJJ/60Imx2hzRHQtJyB+ZGbuhHDN3oKqfa5s0+/8XG18rP4FWfypJEcRxzO0UVQk4nQMBPdOC5Eeq9E0VoFGrxbo6/VM5yCLdFWj94CF6t1yV+VUkRwlc3aNQf88ni/zXEL152wVZEHHlzE/CMrUv/GFbnqriHLbFbb7xrL9UArXhY1I9TgKbaomg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xrx6loo7EdKYmH9u5AM9rsavyb7lhvWfgqE+eRctvDs=;
- b=FnFgI4Ns2kQIACdnQdxe4FMwyW5FIsBJnWH6UlfuUnD0cC5zg3w3E6rJlvpoPz+b3H+PEwLA6dvMu0MmYds9nszLhMGikEI/1fzYDruXPD9/7CHOpqQKJcRYN9DKQjr8KTxpwZQ8sSFgHZcIWE/SRgdwzE1zL4ActAtdi0MOBBMCZg/dd279TYvVlb+oMNil7uvQBpB+ydyIsOzEgx4pF1F6FMYWNsROCopmTzbCI6BW3fZ3wlyB9X4nP07dIfayfzzGkY5qR1cmcQOqz7aBpSHctlqoO+MISI1g7cogXFG3FeudHsPBlKeMEmzfukwkC7fYEkRofz5n9sPYDnM5pA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xrx6loo7EdKYmH9u5AM9rsavyb7lhvWfgqE+eRctvDs=;
- b=165O5gkM5c3qTp6+v4g3zeKaSLZgQ/8cYne+KbC+A4eLkPrEbjSMOlJM0X7u7viGL7KYnKzdhjmn8uSVtWKx1Gu+H38Ycmto7fDCb6mK6UxUV+dFesnC4Ss0VfxI7J6QVQ9LSiDbL6kn2BZdEvCkF827hvMV8T75e+gspyEQ570=
-Received: from BN9PR03CA0797.namprd03.prod.outlook.com (2603:10b6:408:13f::22)
- by SJ1PR12MB6241.namprd12.prod.outlook.com (2603:10b6:a03:458::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48; Fri, 10 May
- 2024 19:09:01 +0000
-Received: from BN3PEPF0000B075.namprd04.prod.outlook.com
- (2603:10b6:408:13f:cafe::fc) by BN9PR03CA0797.outlook.office365.com
- (2603:10b6:408:13f::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.48 via Frontend
- Transport; Fri, 10 May 2024 19:09:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B075.mail.protection.outlook.com (10.167.243.120) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7544.18 via Frontend Transport; Fri, 10 May 2024 19:09:01 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 10 May
- 2024 14:09:00 -0500
-Date: Fri, 10 May 2024 14:08:43 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
-	<ardb@kernel.org>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
-	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
-	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
-	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
-	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
-	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
-	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>, <papaluri@amd.com>
-Subject: Re: [PATCH v15 23/23] KVM: SEV: Fix PSC handling for SMASH/UNSMASH
- and partial update ops
-Message-ID: <20240510190843.yivmiwaj5isvqyph@amd.com>
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240510015822.503071-1-michael.roth@amd.com>
- <20240510015822.503071-3-michael.roth@amd.com>
- <fe5cc86b-43e0-4685-99e7-998e61db333f@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19B33E48C
+	for <kvm@vger.kernel.org>; Fri, 10 May 2024 19:51:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715370677; cv=none; b=YDSjSbPUkN+xM6cCEsRkvrcy+HV08NA7XyKszYNOPaKH2F7NIflNQEOO7q0jRjp3sp9ovFLMBkX+PpkaSklvO7Imo1YvDig3TAHNJeWtGlHagrS9+MBVAFlAHbYUvPvI7KrarYlV14uE0ZFZLWdswGhbyTUEw7b5cltdoXtesh4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715370677; c=relaxed/simple;
+	bh=7N79Cc1wOFMSsDDyjWHTW4I4FZNuavURtKrdNEHxbyY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=fSf82PSXmzrpT0UDhXi/0dtS4DcyL98El1d4/duwZ4qQ1RYuM8SyLcPaZV+Gjx/0pntxCa0IFP8sO9HZ8+qIFQmWxWS0GeqTUntBapje9c+MTQZhK7RnHQCOl5LIu2z3FmRhoq1knNXeNVxJRjVlROs3lruNxdJbzrVBPr1ugq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FuakNsAt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715370674;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=77iTtuTAICuw/H86O+BM2/FFN/3thgThNre5PX281P8=;
+	b=FuakNsAtADWCsTZKlp2vlNLG4EOSnBzc938JK+KPyGSWiXfvkxIoXgaeDqdhLZxu9JzxI2
+	jh76LlBH9WdU4c6o3EJmvQHeN/+N6CoGuQW9d37trHQog0XlomA82+hPGSmJaThAAUEPzL
+	UYNgzceX8pUbrve+0vTcRxCh2YbZOos=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-333-B61qB3fAN5SCV4cmL8uxrA-1; Fri, 10 May 2024 15:51:03 -0400
+X-MC-Unique: B61qB3fAN5SCV4cmL8uxrA-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-6383fd1e475so945097a12.0
+        for <kvm@vger.kernel.org>; Fri, 10 May 2024 12:51:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715370662; x=1715975462;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=77iTtuTAICuw/H86O+BM2/FFN/3thgThNre5PX281P8=;
+        b=qKHaMtyOos1aXwugGWWekDJHQNDJAHe5w4wsKaw6WYAwJ9f2FlftU2AH2Rq2BSN4MW
+         30tFBMNUNUDJIkcCE8MaO9XvyAbFwatIX0JIaUursf/wvxLnC+PAQfXB3MSkuMifc47F
+         ljObVNlBEJqRW6CFhtRBF2F7QcY95wlp4cWJztTeviU/4EHEvlyanfo0V6dRFuYjLuYd
+         5hUpX4q9MJr37qfAg/c0rMeGRxgcPgpNs3J97cENrGWuvs94SLipOx5z8JbfqYdh8/JD
+         OxNkvgiHxl9TlV/GzllxnePfxBk64i3IY1wkNAKwFEmhIdTy0kbqw4qJlZ55QNGVetkg
+         DCbg==
+X-Forwarded-Encrypted: i=1; AJvYcCVMu9mx2FgLpX9yRLCkTH6OP8sKPKLDpwMY3xNhyQpkcKn+n3E1LBigZyr++LjRYkR8ibh6yqvV9ccI23qCZPCMK+AT
+X-Gm-Message-State: AOJu0YxW77lO5Bn6HibFe43N6e6Q/AuOaodfC8TasEJ4X444xXX93pzr
+	c4EizW3/bGkzPUp2cBx91CXF1PKbJRL0LuXQDVBPoP67olOwHfPkNvpWKngwTS2opxnbE4SKrk5
+	ojKw9bgLPJGchNfTrKh1tWXwny0n0a8weQnzWwjpRBMywZgmY5g==
+X-Received: by 2002:a05:6a20:9145:b0:1ad:7e4d:2ea2 with SMTP id adf61e73a8af0-1afde0825dbmr5271984637.4.1715370662359;
+        Fri, 10 May 2024 12:51:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHNimRuY9IezukVV9xELSqrI2Uj0shkidemhyXzN9aQ5WnE44Y0YHWYyDwyL19neSIjVsPW9Q==
+X-Received: by 2002:a05:6a20:9145:b0:1ad:7e4d:2ea2 with SMTP id adf61e73a8af0-1afde0825dbmr5271947637.4.1715370661756;
+        Fri, 10 May 2024 12:51:01 -0700 (PDT)
+Received: from localhost.localdomain ([2804:1b3:a800:8d87:eac1:dae4:8dd4:fe50])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c0369f1sm35978865ad.185.2024.05.10.12.50.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 10 May 2024 12:51:00 -0700 (PDT)
+From: Leonardo Bras <leobras@redhat.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Leonardo Bras <leobras@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Neeraj Upadhyay <quic_neeraju@quicinc.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Zqiang <qiang.zhang1211@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	rcu@vger.kernel.org
+Subject: Re: [RFC PATCH v1 0/2] Avoid rcu_core() if CPU just left guest vcpu
+Date: Fri, 10 May 2024 16:50:41 -0300
+Message-ID: <Zj56kVxuTJm4EsAn@LeoBras>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <d5021b48-09d6-4a54-9874-740051aab574@paulmck-laptop>
+References: <ZjsZVUdmDXZOn10l@LeoBras> <ZjuFuZHKUy7n6-sG@google.com> <5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop> <ZjyGefTZ8ThZukNG@LeoBras> <Zjyh-qRt3YewHsdP@LeoBras> <09a8f4f6-a692-4586-bb68-b0a524b7a5d8@paulmck-laptop> <Zj5GEK8bt3061TiD@LeoBras> <a5784417-d65d-45c2-a66f-310a494b9827@paulmck-laptop> <Zj5VgM_RzaDWQs1t@LeoBras> <d5021b48-09d6-4a54-9874-740051aab574@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fe5cc86b-43e0-4685-99e7-998e61db333f@redhat.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B075:EE_|SJ1PR12MB6241:EE_
-X-MS-Office365-Filtering-Correlation-Id: ef6650de-1de2-486c-902b-08dc7124a714
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|82310400017|36860700004|376005|1800799015|7416005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?g9NllTG9StPr6fyX6Rffgjd0j+LMafgEO7V2agCTYwvABitcTXeS4nG/G1MW?=
- =?us-ascii?Q?6OdogbZleJGOFvJ6xJ4roRNpAWqhWQswjxqzQnP1GiMMeZA5hr2hjq83P2uj?=
- =?us-ascii?Q?jqeEkVlmULiuqtkdlxuFXIoZL7Gc7JhFL44T+4ud0mszLSl13Ks33hp/wc6U?=
- =?us-ascii?Q?EabgOX02DDvJHioGNUCf9nJEO4QFuBrkm6RzUnB0JzSApGAkYZFV46vIxbRt?=
- =?us-ascii?Q?yuMexiqRPRzoByWveJP3TXOH9i7pruiSWJL0hXdc0aJdQutOYEsGBLtebO8Z?=
- =?us-ascii?Q?8A9JFDQPZgrI9QnrNinKVRrYOazqCSnC2U0+JEVp8BzRODcRm1kXspDRDwbL?=
- =?us-ascii?Q?AwOBdQCrgUGUHgXVWYHtGfsgED4/gHCWiINm8p8c3aAA9S63bPZCGniQGMgY?=
- =?us-ascii?Q?/IiWmtnWQWQQezoQHpfrYR5ZuyiEz3OeV10riuAwAiXoRajUyMK2EreQNuiN?=
- =?us-ascii?Q?a5SnLx0OGbIEEtykZOLvgP08PXERlBlytlI9GB8N+e6lpxzMRkF1H6Ex3gMK?=
- =?us-ascii?Q?3OBirA2DgxSEeL421qPnCva9DlBJCNzjfje0p3dptp8cAhzJAeiRaOnf1uPR?=
- =?us-ascii?Q?iSwYQGdTXTpZsbxpuxUzWVH2OOQXArH+qNk0HtZgzVrAOB1C3x1gmuH2yJXF?=
- =?us-ascii?Q?3XlaBSXBIY8u/RXdLoMhu1OqcxgTfr5FGwWB7ogCbmfoJKVT3iCHx2LAB/8T?=
- =?us-ascii?Q?V/APYljWFc8fq2p3iyleTDFWqQCcZTnyh05pM5pJrW11MlUsZY+ZLoXSlxXf?=
- =?us-ascii?Q?s8ME+TyukqEhd7C0wndlwpLiha5dAFdJTKGXf/zpqDLwilE5AC9V+h3HMASW?=
- =?us-ascii?Q?vhjfnGIDkqoaY9JbJsfBJ3YAOTk1nD0gWU7Cn8SRXqCYJKYDa9JsRS1yFyxF?=
- =?us-ascii?Q?dvrs3zbLezPoggXktN0I0kmUebl30opBFKQK7FPNMzr7EqOTsvyo8BvDaJEK?=
- =?us-ascii?Q?xvzzvllYEhRTyz3ilYubM50OOOlLrZ1ufemM7452DvoXOh0f1sDorshXwvVu?=
- =?us-ascii?Q?kL+/zcDatBD+3sPMLJFGDWBhXXhJ1y7/EMzFx/lV3WrFId2LJx7jC/773zLV?=
- =?us-ascii?Q?Twut7pcTtVIK2uM97UDpIEcjfC6AeWMjgSlzwObNdednh/nsqHKLFpx3zw4Q?=
- =?us-ascii?Q?nFFf8wLLg7FWMuxyf+OZREwY7XZemQp3QYbiNLlhAOCybKhVK/4lgRtDqa5S?=
- =?us-ascii?Q?lUzhNieflMkJjZ60ukR9q6CIbZmtKsXBV+xXREegmTxBSzgbRdtUUfmQdgmh?=
- =?us-ascii?Q?q5WYOeNyzxtdQhr9hQf8rhmXQhuKCqUYihmk1lpAfvr7AmoH3xYq+Xx0Pp+n?=
- =?us-ascii?Q?pgl5w5VXFdk0VRH+PoFJtnqf?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(36860700004)(376005)(1800799015)(7416005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 May 2024 19:09:01.4890
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef6650de-1de2-486c-902b-08dc7124a714
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B075.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6241
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 10, 2024 at 07:09:07PM +0200, Paolo Bonzini wrote:
-> On 5/10/24 03:58, Michael Roth wrote:
-> > There are a few edge-cases that the current processing for GHCB PSC
-> > requests doesn't handle properly:
+On Fri, May 10, 2024 at 10:41:53AM -0700, Paul E. McKenney wrote:
+> On Fri, May 10, 2024 at 02:12:32PM -0300, Leonardo Bras wrote:
+> > On Fri, May 10, 2024 at 09:21:59AM -0700, Paul E. McKenney wrote:
+> > > On Fri, May 10, 2024 at 01:06:40PM -0300, Leonardo Bras wrote:
+> > > > On Thu, May 09, 2024 at 04:45:53PM -0700, Paul E. McKenney wrote:
+> > > > > On Thu, May 09, 2024 at 07:14:18AM -0300, Leonardo Bras wrote:
+> > > > > > On Thu, May 09, 2024 at 05:16:57AM -0300, Leonardo Bras wrote:
+> > > > > 
+> > > > > [ . . . ]
+> > > > > 
+> > > > > > > Here I suppose something like this can take care of not needing to convert 
+> > > > > > > ms -> jiffies every rcu_pending():
+> > > > > > > 
+> > > > > > > +	nocb_patience_delay = msecs_to_jiffies(nocb_patience_delay);
+> > > > > > > 
+> > > > > > 
+> > > > > > Uh, there is more to it, actually. We need to make sure the user 
+> > > > > > understands that we are rounding-down the value to multiple of a jiffy 
+> > > > > > period, so it's not a surprise if the delay value is not exactly the same 
+> > > > > > as the passed on kernel cmdline.
+> > > > > > 
+> > > > > > So something like bellow diff should be ok, as this behavior is explained 
+> > > > > > in the docs, and pr_info() will print the effective value.
+> > > > > > 
+> > > > > > What do you think?
+> > > > > 
+> > > > > Good point, and I have taken your advice on making the documentation
+> > > > > say what it does.
+> > > > 
+> > > > Thanks :)
+> > > > 
+> > > > > 
+> > > > > > Thanks!
+> > > > > > Leo
+> > > > > > 
+> > > > > > diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> > > > > > index 0a3b0fd1910e..9a50be9fd9eb 100644
+> > > > > > --- a/Documentation/admin-guide/kernel-parameters.txt
+> > > > > > +++ b/Documentation/admin-guide/kernel-parameters.txt
+> > > > > > @@ -4974,20 +4974,28 @@
+> > > > > >                         otherwise be caused by callback floods through
+> > > > > >                         use of the ->nocb_bypass list.  However, in the
+> > > > > >                         common non-flooded case, RCU queues directly to
+> > > > > >                         the main ->cblist in order to avoid the extra
+> > > > > >                         overhead of the ->nocb_bypass list and its lock.
+> > > > > >                         But if there are too many callbacks queued during
+> > > > > >                         a single jiffy, RCU pre-queues the callbacks into
+> > > > > >                         the ->nocb_bypass queue.  The definition of "too
+> > > > > >                         many" is supplied by this kernel boot parameter.
+> > > > > >  
+> > > > > > +       rcutree.nocb_patience_delay= [KNL]
+> > > > > > +                       On callback-offloaded (rcu_nocbs) CPUs, avoid
+> > > > > > +                       disturbing RCU unless the grace period has
+> > > > > > +                       reached the specified age in milliseconds.
+> > > > > > +                       Defaults to zero.  Large values will be capped
+> > > > > > +                       at five seconds. Values rounded-down to a multiple
+> > > > > > +                       of a jiffy period.
+> > > > > > +
+> > > > > >         rcutree.qhimark= [KNL]
+> > > > > >                         Set threshold of queued RCU callbacks beyond which
+> > > > > >                         batch limiting is disabled.
+> > > > > >  
+> > > > > >         rcutree.qlowmark= [KNL]
+> > > > > >                         Set threshold of queued RCU callbacks below which
+> > > > > >                         batch limiting is re-enabled.
+> > > > > >  
+> > > > > >         rcutree.qovld= [KNL]
+> > > > > >                         Set threshold of queued RCU callbacks beyond which
+> > > > > > diff --git a/kernel/rcu/tree.h b/kernel/rcu/tree.h
+> > > > > > index fcf2b4aa3441..62ede401420f 100644
+> > > > > > --- a/kernel/rcu/tree.h
+> > > > > > +++ b/kernel/rcu/tree.h
+> > > > > > @@ -512,20 +512,21 @@ do {                                                              \
+> > > > > >         local_irq_save(flags);                                  \
+> > > > > >         if (rcu_segcblist_is_offloaded(&(rdp)->cblist)) \
+> > > > > >                 raw_spin_lock(&(rdp)->nocb_lock);               \
+> > > > > >  } while (0)
+> > > > > >  #else /* #ifdef CONFIG_RCU_NOCB_CPU */
+> > > > > >  #define rcu_nocb_lock_irqsave(rdp, flags) local_irq_save(flags)
+> > > > > >  #endif /* #else #ifdef CONFIG_RCU_NOCB_CPU */
+> > > > > >  
+> > > > > >  static void rcu_bind_gp_kthread(void);
+> > > > > >  static bool rcu_nohz_full_cpu(void);
+> > > > > > +static bool rcu_on_patience_delay(void);
+> > > > > 
+> > > > > I don't think we need an access function, but will check below.
+> > > > > 
+> > > > > >  /* Forward declarations for tree_stall.h */
+> > > > > >  static void record_gp_stall_check_time(void);
+> > > > > >  static void rcu_iw_handler(struct irq_work *iwp);
+> > > > > >  static void check_cpu_stall(struct rcu_data *rdp);
+> > > > > >  static void rcu_check_gp_start_stall(struct rcu_node *rnp, struct rcu_data *rdp,
+> > > > > >                                      const unsigned long gpssdelay);
+> > > > > >  
+> > > > > >  /* Forward declarations for tree_exp.h. */
+> > > > > >  static void sync_rcu_do_polled_gp(struct work_struct *wp);
+> > > > > > diff --git a/kernel/rcu/tree_plugin.h b/kernel/rcu/tree_plugin.h
+> > > > > > index 340bbefe5f65..639243b0410f 100644
+> > > > > > --- a/kernel/rcu/tree_plugin.h
+> > > > > > +++ b/kernel/rcu/tree_plugin.h
+> > > > > > @@ -5,20 +5,21 @@
+> > > > > >   * or preemptible semantics.
+> > > > > >   *
+> > > > > >   * Copyright Red Hat, 2009
+> > > > > >   * Copyright IBM Corporation, 2009
+> > > > > >   *
+> > > > > >   * Author: Ingo Molnar <mingo@elte.hu>
+> > > > > >   *        Paul E. McKenney <paulmck@linux.ibm.com>
+> > > > > >   */
+> > > > > >  
+> > > > > >  #include "../locking/rtmutex_common.h"
+> > > > > > +#include <linux/jiffies.h>
+> > > > > 
+> > > > > This is already pulled in by the enclosing tree.c file, so it should not
+> > > > > be necessary to include it again. 
+> > > > 
+> > > > Even better :)
+> > > > 
+> > > > > (Or did you get a build failure when
+> > > > > leaving this out?)
+> > > > 
+> > > > I didn't, it's just that my editor complained the symbols were not getting 
+> > > > properly resolved, so I included it and it was fixed. But since clangd is 
+> > > > know to make some mistakes, I should have compile-test'd before adding it.
+> > > 
+> > > Ah, got it!  ;-)
+> > > 
+> > > > > >  static bool rcu_rdp_is_offloaded(struct rcu_data *rdp)
+> > > > > >  {
+> > > > > >         /*
+> > > > > >          * In order to read the offloaded state of an rdp in a safe
+> > > > > >          * and stable way and prevent from its value to be changed
+> > > > > >          * under us, we must either hold the barrier mutex, the cpu
+> > > > > >          * hotplug lock (read or write) or the nocb lock. Local
+> > > > > >          * non-preemptible reads are also safe. NOCB kthreads and
+> > > > > >          * timers have their own means of synchronization against the
+> > > > > > @@ -86,20 +87,33 @@ static void __init rcu_bootup_announce_oddness(void)
+> > > > > >         if (rcu_kick_kthreads)
+> > > > > >                 pr_info("\tKick kthreads if too-long grace period.\n");
+> > > > > >         if (IS_ENABLED(CONFIG_DEBUG_OBJECTS_RCU_HEAD))
+> > > > > >                 pr_info("\tRCU callback double-/use-after-free debug is enabled.\n");
+> > > > > >         if (gp_preinit_delay)
+> > > > > >                 pr_info("\tRCU debug GP pre-init slowdown %d jiffies.\n", gp_preinit_delay);
+> > > > > >         if (gp_init_delay)
+> > > > > >                 pr_info("\tRCU debug GP init slowdown %d jiffies.\n", gp_init_delay);
+> > > > > >         if (gp_cleanup_delay)
+> > > > > >                 pr_info("\tRCU debug GP cleanup slowdown %d jiffies.\n", gp_cleanup_delay);
+> > > > > > +       if (nocb_patience_delay < 0) {
+> > > > > > +               pr_info("\tRCU NOCB CPU patience negative (%d), resetting to zero.\n",
+> > > > > > +                       nocb_patience_delay);
+> > > > > > +               nocb_patience_delay = 0;
+> > > > > > +       } else if (nocb_patience_delay > 5 * MSEC_PER_SEC) {
+> > > > > > +               pr_info("\tRCU NOCB CPU patience too large (%d), resetting to %ld.\n",
+> > > > > > +                       nocb_patience_delay, 5 * MSEC_PER_SEC);
+> > > > > > +               nocb_patience_delay = msecs_to_jiffies(5 * MSEC_PER_SEC);
+> > > > > > +       } else if (nocb_patience_delay) {
+> > > > > > +               nocb_patience_delay = msecs_to_jiffies(nocb_patience_delay);
+> > > > > > +               pr_info("\tRCU NOCB CPU patience set to %d milliseconds.\n",
+> > > > > > +                       jiffies_to_msecs(nocb_patience_delay);
+> > > > > > +       }
+> > > > > 
+> > > > > I just did this here at the end:
+> > > > > 
+> > > > > 	nocb_patience_delay_jiffies = msecs_to_jiffies(nocb_patience_delay);
+> > > > > 
+> > > > > Ah, you are wanting to print out the milliseconds after the rounding
+> > > > > to jiffies.
+> > > > 
+> > > > That's right, just to make sure the user gets the effective patience time, 
+> > > > instead of the before-rounding one, which was on input.
+> > > > 
+> > > > > I am going to hold off on that for the moment, but I hear your request
+> > > > > and I have not yet said "no".  ;-)
+> > > > 
+> > > > Sure :)
+> > > > It's just something I think it's nice to have (as a user).
+> > > 
+> > > If you would like to do a separate patch adding this, here are the
+> > > requirements:
+> > > 
+> > > o	If the current code prints nothing, nothing additional should
+> > > 	be printed.
+> > > 
+> > > o	If the rounding ended up with the same value (as it should in
+> > > 	systems with HZ=1000), nothing additional should be printed.
+> > > 
+> > > o	Your choice as to whether or not you want to print out the
+> > > 	jiffies value.
+> > > 
+> > > o	If the additional message is on a new line, it needs to be
+> > > 	indented so that it is clear that it is subordinate to the
+> > > 	previous message.
+> > > 
+> > > 	Otherwise, you can use pr_cont() to continue the previous
+> > > 	line, of course being careful about "\n".
+> > > 
+> > > Probably also something that I am forgetting, but that is most of it.
 > > 
-> >   - KVM properly ignores SMASH/UNSMASH ops when they are embedded in a
-> >     PSC request buffer which contains other PSC operations, but
-> >     inadvertantly forwards them to userspace as private->shared PSC
-> >     requests if they appear at the end of the buffer. Make sure these are
-> >     ignored instead, just like cases where they are not at the end of the
-> >     request buffer.
-> > 
-> >   - Current code handles non-zero 'cur_page' fields when they are at the
-> >     beginning of a new GPA range, but it is not handling properly when
-> >     iterating through subsequent entries which are otherwise part of a
-> >     contiguous range. Fix up the handling so that these entries are not
-> >     combined into a larger contiguous range that include unintended GPA
-> >     ranges and are instead processed later as the start of a new
-> >     contiguous range.
-> > 
-> >   - The page size variable used to track 2M entries in KVM for inflight PSCs
-> >     might be artifically set to a different value, which can lead to
-> >     unexpected values in the entry's final 'cur_page' update. Use the
-> >     entry's 'pagesize' field instead to determine what the value of
-> >     'cur_page' should be upon completion of processing.
-> > 
-> > While here, also add a small helper for clearing in-flight PSCs
-> > variables and fix up comments for better readability.
-> > 
-> > Fixes: 266205d810d2 ("KVM: SEV: Add support to handle Page State Change VMGEXIT")
-> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > Thanks!
+> > I will work on a patch doing that :)
 > 
-> There are some more improvements that can be made to the readability of
-> the code... this one is already better than the patch is fixing up, but I
-> don't like the code that is in the loop even though it is unconditionally
-> followed by "break".
+> Very good, looking forward to seeing what you come up with!
 > 
-> Here's my attempt at replacing this patch, which is really more of a
-> rewrite of the whole function...  Untested beyond compilation.
+> My current state is on the "dev" branch of the -rcu tree, so please base
+> on that.
 
-Thanks for the suggested rework. I tested with/without 2MB pages and
-everything worked as-written. This is the full/squashed patch I plan to
-include in the pull request:
-
-  https://github.com/mdroth/linux/commit/91f6d31c4dfc88dd1ac378e2db6117b0c982e63c
-
--Mike
+Thanks! I used it earlier to send the previous diff :)
 
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 35f0bd91f92e..6e612789c35f 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -3555,23 +3555,25 @@ struct psc_buffer {
->  static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc);
-> -static int snp_complete_psc(struct kvm_vcpu *vcpu)
-> +static void snp_complete_psc(struct vcpu_svm *svm, u64 psc_ret)
-> +{
-> +	svm->sev_es.psc_inflight = 0;
-> +	svm->sev_es.psc_idx = 0;
-> +	svm->sev_es.psc_2m = 0;
-> +	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
-> +}
-> +
-> +static void __snp_complete_one_psc(struct vcpu_svm *svm)
->  {
-> -	struct vcpu_svm *svm = to_svm(vcpu);
->  	struct psc_buffer *psc = svm->sev_es.ghcb_sa;
->  	struct psc_entry *entries = psc->entries;
->  	struct psc_hdr *hdr = &psc->hdr;
-> -	__u64 psc_ret;
->  	__u16 idx;
-> -	if (vcpu->run->hypercall.ret) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
-> -		goto out_resume;
-> -	}
-> -
->  	/*
->  	 * Everything in-flight has been processed successfully. Update the
-> -	 * corresponding entries in the guest's PSC buffer.
-> +	 * corresponding entries in the guest's PSC buffer and zero out the
-> +	 * count of in-flight PSC entries.
->  	 */
->  	for (idx = svm->sev_es.psc_idx; svm->sev_es.psc_inflight;
->  	     svm->sev_es.psc_inflight--, idx++) {
-> @@ -3581,17 +3583,22 @@ static int snp_complete_psc(struct kvm_vcpu *vcpu)
->  	}
->  	hdr->cur_entry = idx;
-> +}
-> +
-> +static int snp_complete_one_psc(struct kvm_vcpu *vcpu)
-> +{
-> +	struct vcpu_svm *svm = to_svm(vcpu);
-> +	struct psc_buffer *psc = svm->sev_es.ghcb_sa;
-> +
-> +	if (vcpu->run->hypercall.ret) {
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
-> +		return 1; /* resume guest */
-> +	}
-> +
-> +	__snp_complete_one_psc(svm);
->  	/* Handle the next range (if any). */
->  	return snp_begin_psc(svm, psc);
-> -
-> -out_resume:
-> -	svm->sev_es.psc_idx = 0;
-> -	svm->sev_es.psc_inflight = 0;
-> -	svm->sev_es.psc_2m = false;
-> -	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
-> -
-> -	return 1; /* resume guest */
->  }
->  static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
-> @@ -3601,18 +3608,20 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
->  	struct psc_hdr *hdr = &psc->hdr;
->  	struct psc_entry entry_start;
->  	u16 idx, idx_start, idx_end;
-> -	__u64 psc_ret, gpa;
-> +	u64 gfn;
->  	int npages;
-> -
-> -	/* There should be no other PSCs in-flight at this point. */
-> -	if (WARN_ON_ONCE(svm->sev_es.psc_inflight)) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
-> -		goto out_resume;
-> -	}
-> +	bool huge;
->  	if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_MAP_GPA_RANGE))) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
-> -		goto out_resume;
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
-> +		return 1;
-> +	}
-> +
-> +next_range:
-> +	/* There should be no other PSCs in-flight at this point. */
-> +	if (WARN_ON_ONCE(svm->sev_es.psc_inflight)) {
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
-> +		return 1;
->  	}
->  	/*
-> @@ -3624,97 +3633,99 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
->  	idx_end = hdr->end_entry;
->  	if (idx_end >= VMGEXIT_PSC_MAX_COUNT) {
-> -		psc_ret = VMGEXIT_PSC_ERROR_INVALID_HDR;
-> -		goto out_resume;
-> -	}
-> -
-> -	/* Nothing more to process. */
-> -	if (idx_start > idx_end) {
-> -		psc_ret = 0;
-> -		goto out_resume;
-> +		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_INVALID_HDR);
-> +		return 1;
->  	}
->  	/* Find the start of the next range which needs processing. */
->  	for (idx = idx_start; idx <= idx_end; idx++, hdr->cur_entry++) {
-> -		__u16 cur_page;
-> -		gfn_t gfn;
-> -		bool huge;
-> -
->  		entry_start = entries[idx];
-> -
-> -		/* Only private/shared conversions are currently supported. */
-> -		if (entry_start.operation != VMGEXIT_PSC_OP_PRIVATE &&
-> -		    entry_start.operation != VMGEXIT_PSC_OP_SHARED)
-> -			continue;
-> -
->  		gfn = entry_start.gfn;
-> -		cur_page = entry_start.cur_page;
->  		huge = entry_start.pagesize;
-> +		npages = huge ? 512 : 1;
-> -		if ((huge && (cur_page > 512 || !IS_ALIGNED(gfn, 512))) ||
-> -		    (!huge && cur_page > 1)) {
-> -			psc_ret = VMGEXIT_PSC_ERROR_INVALID_ENTRY;
-> -			goto out_resume;
-> +		if (entry_start.cur_page > npages || !IS_ALIGNED(gfn, npages)) {
-> +			snp_complete_psc(svm, VMGEXIT_PSC_ERROR_INVALID_ENTRY);
-> +			return 1;
->  		}
-> +		if (entry_start.cur_page) {
-> +			/*
-> +			 * If this is a partially-completed 2M range, force 4K
-> +			 * handling for the remaining pages since they're effectively
-> +			 * split at this point. Subsequent code should ensure this
-> +			 * doesn't get combined with adjacent PSC entries where 2M
-> +			 * handling is still possible.
-> +			 */
-> +			npages -= entry_start.cur_page;
-> +			gfn += entry_start.cur_page;
-> +			huge = false;
-> +		}
-> +		if (npages)
-> +			break;
-> +
->  		/* All sub-pages already processed. */
-> -		if ((huge && cur_page == 512) || (!huge && cur_page == 1))
-> -			continue;
-> -
-> -		/*
-> -		 * If this is a partially-completed 2M range, force 4K handling
-> -		 * for the remaining pages since they're effectively split at
-> -		 * this point. Subsequent code should ensure this doesn't get
-> -		 * combined with adjacent PSC entries where 2M handling is still
-> -		 * possible.
-> -		 */
-> -		svm->sev_es.psc_2m = cur_page ? false : huge;
-> -		svm->sev_es.psc_idx = idx;
-> -		svm->sev_es.psc_inflight = 1;
-> -
-> -		gpa = gfn_to_gpa(gfn + cur_page);
-> -		npages = huge ? 512 - cur_page : 1;
-> -		break;
->  	}
-> +	if (idx > idx_end) {
-> +		/* Nothing more to process. */
-> +		snp_complete_psc(svm, 0);
-> +		return 1;
-> +	}
-> +
-> +	svm->sev_es.psc_2m = huge;
-> +	svm->sev_es.psc_idx = idx;
-> +	svm->sev_es.psc_inflight = 1;
-> +
->  	/*
->  	 * Find all subsequent PSC entries that contain adjacent GPA
->  	 * ranges/operations and can be combined into a single
->  	 * KVM_HC_MAP_GPA_RANGE exit.
->  	 */
-> -	for (idx = svm->sev_es.psc_idx + 1; idx <= idx_end; idx++) {
-> +	while (++idx <= idx_end) {
->  		struct psc_entry entry = entries[idx];
->  		if (entry.operation != entry_start.operation ||
-> -		    entry.gfn != entry_start.gfn + npages ||
-> -		    !!entry.pagesize != svm->sev_es.psc_2m)
-> +		    entry.gfn != gfn + npages ||
-> +		    entry.cur_page ||
-> +		    !!entry.pagesize != huge)
->  			break;
->  		svm->sev_es.psc_inflight++;
-> -		npages += entry_start.pagesize ? 512 : 1;
-> +		npages += huge ? 512 : 1;
->  	}
-> -	vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
-> -	vcpu->run->hypercall.nr = KVM_HC_MAP_GPA_RANGE;
-> -	vcpu->run->hypercall.args[0] = gpa;
-> -	vcpu->run->hypercall.args[1] = npages;
-> -	vcpu->run->hypercall.args[2] = entry_start.operation == VMGEXIT_PSC_OP_PRIVATE
-> -				       ? KVM_MAP_GPA_RANGE_ENCRYPTED
-> -				       : KVM_MAP_GPA_RANGE_DECRYPTED;
-> -	vcpu->run->hypercall.args[2] |= entry_start.pagesize
-> -					? KVM_MAP_GPA_RANGE_PAGE_SZ_2M
-> -					: KVM_MAP_GPA_RANGE_PAGE_SZ_4K;
-> -	vcpu->arch.complete_userspace_io = snp_complete_psc;
-> +	switch (entry_start.operation) {
-> +	case VMGEXIT_PSC_OP_PRIVATE:
-> +	case VMGEXIT_PSC_OP_SHARED:
-> +		vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
-> +		vcpu->run->hypercall.nr = KVM_HC_MAP_GPA_RANGE;
-> +		vcpu->run->hypercall.args[0] = gfn_to_gpa(gfn);
-> +		vcpu->run->hypercall.args[1] = npages;
-> +		vcpu->run->hypercall.args[2] = entry_start.operation == VMGEXIT_PSC_OP_PRIVATE
-> +			? KVM_MAP_GPA_RANGE_ENCRYPTED
-> +			: KVM_MAP_GPA_RANGE_DECRYPTED;
-> +		vcpu->run->hypercall.args[2] |= huge
-> +			? KVM_MAP_GPA_RANGE_PAGE_SZ_2M
-> +			: KVM_MAP_GPA_RANGE_PAGE_SZ_4K;
-> +		vcpu->arch.complete_userspace_io = snp_complete_one_psc;
-> -	return 0; /* forward request to userspace */
-> +		return 0; /* forward request to userspace */
-> -out_resume:
-> -	svm->sev_es.psc_idx = 0;
-> -	svm->sev_es.psc_inflight = 0;
-> -	svm->sev_es.psc_2m = false;
-> -	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
-> +	default:
-> +		/*
-> +		 * Only shared/private PSC operations are currently supported, so if the
-> +		 * entire range consists of unsupported operations (e.g. SMASH/UNSMASH),
-> +		 * then consider the entire range completed and avoid exiting to
-> +		 * userspace. In theory snp_complete_psc() can be called directly
-> +		 * at this point to complete the current range and start the next one,
-> +		 * but that could lead to unexpected levels of recursion.
-> +		 */
-> +		__snp_complete_one_psc(svm);
-> +		goto next_range;
-> +	}
-> -	return 1; /* resume guest */
-> +	unreachable();
->  }
->  static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
+> > > > > >         if (!use_softirq)
+> > > > > >                 pr_info("\tRCU_SOFTIRQ processing moved to rcuc kthreads.\n");
+> > > > > >         if (IS_ENABLED(CONFIG_RCU_EQS_DEBUG))
+> > > > > >                 pr_info("\tRCU debug extended QS entry/exit.\n");
+> > > > > >         rcupdate_announce_bootup_oddness();
+> > > > > >  }
+> > > > > >  
+> > > > > >  #ifdef CONFIG_PREEMPT_RCU
+> > > > > >  
+> > > > > >  static void rcu_report_exp_rnp(struct rcu_node *rnp, bool wake);
+> > > > > > @@ -1260,10 +1274,29 @@ static bool rcu_nohz_full_cpu(void)
+> > > > > >  
+> > > > > >  /*
+> > > > > >   * Bind the RCU grace-period kthreads to the housekeeping CPU.
+> > > > > >   */
+> > > > > >  static void rcu_bind_gp_kthread(void)
+> > > > > >  {
+> > > > > >         if (!tick_nohz_full_enabled())
+> > > > > >                 return;
+> > > > > >         housekeeping_affine(current, HK_TYPE_RCU);
+> > > > > >  }
+> > > > > > +
+> > > > > > +/*
+> > > > > > + * Is this CPU a NO_HZ_FULL CPU that should ignore RCU if the time since the
+> > > > > > + * start of current grace period is smaller than nocb_patience_delay ?
+> > > > > > + *
+> > > > > > + * This code relies on the fact that all NO_HZ_FULL CPUs are also
+> > > > > > + * RCU_NOCB_CPU CPUs.
+> > > > > > + */
+> > > > > > +static bool rcu_on_patience_delay(void)
+> > > > > > +{
+> > > > > > +#ifdef CONFIG_NO_HZ_FULL
+> > > > > 
+> > > > > You lost me on this one.  Why do we need the #ifdef instead of
+> > > > > IS_ENABLED()?  Also, please note that rcu_nohz_full_cpu() is already a
+> > > > > compile-time @false in CONFIG_NO_HZ_FULL=n kernels.
+> > > > 
+> > > > You are right. rcu_nohz_full_cpu() has a high chance of being inlined on
+> > > > 	if ((...) && rcu_nohz_full_cpu())
+> > > > And since it returns false, this whole statement will be compiled out, and 
+> > > > the new function will not exist in CONFIG_NO_HZ_FULL=n, so there  is no 
+> > > > need to test it.
+> > > 
+> > > Very good!  You had me going there for a bit.  ;-)
+> > > 
+> > > > > > +       if (!nocb_patience_delay)
+> > > > > > +               return false;
+> > > > > 
+> > > > > We get this automatically with the comparison below, right?
+> > > > 
+> > > > Right
+> > > > 
+> > > > >   If so, we
+> > > > > are not gaining much by creating the helper function.  Or am I missing
+> > > > > some trick here?
+> > > > 
+> > > > Well, it's a fastpath. Up to here, we just need to read 
+> > > > nocb_patience_delay{,_jiffies} from memory.
+> > > 
+> > > Just nocb_patience_delay_jiffies, correct?  Unless I am missing something,
+> > > nocb_patience_delay is unused after boot.
+> > 
+> > Right, I used both because I was referring to the older version and the 
+> > current version with _jiffies.
 > 
+> Fair enough!
 > 
+> > > > If we don't include the fastpath we have to read jiffies and 
+> > > > rcu_state.gp_start, which can take extra time: up to 2 cache misses.
+> > > > 
+> > > > I thought it could be relevant, as we reduce the overhead of the new 
+> > > > parameter when it's disabled (patience=0). 
+> > > > 
+> > > > Do you think that could be relevant?
+> > > 
+> > > Well, the hardware's opinion is what matters.  ;-)
+> > > 
+> > > But the caller's code path reads jiffies a few times, so it should
+> > > be hot in the cache, correct?
+> > 
+> > Right, but I wonder how are the chances of it getting updated between  
+> > caller's use and this function's. Same for gp_start.
+> 
+> Well, jiffies is updated at most once per millisecond, and gp_start is
+> updated at most once per few milliseconds.  So the chances of it being
+> updated within that code sequence are quite small.
+
+Fair enough, and we probably don't need to worry about it getting 
+cached-out in this sequence, as well. 
+
+Also time_before() is a macro and we don't need to worry on the function 
+call, so we just spend 2 extra L1-cache reads and a couple arithmetic 
+instructions which are not supposed to take long, so it's fair to assume 
+the fast-path would not be that much faster than the slow path, which means 
+we don't need a fast path after all.
+
+Thanks for helping me notice that :)
+
+> 
+> > > But that does lead to another topic, namely the possibility of tagging
+> > > nocb_patience_delay_jiffies with __read_mostly. 
+> > 
+> > Oh, right. This was supposed to be in the diff I sent earlier, but I 
+> > completelly forgot to change before sending. So, yeah, I agree on 
+> > nocb_patience_delay being __read_mostly; 
+> > 
+> > > And there might be
+> > > a number of other of RCU's variables that could be similarly tagged
+> > > in order to avoid false sharing.  (But is there any false sharing?
+> > > This might be worth testing.)
+> > 
+> > Maybe there isn't, but I wonder if it would hurt performance if they were 
+> > tagged as __read_only anyway. 
+> 
+> Let's be at least a little careful here.  It is just as easy to hurt
+> performance by marking things __read_mostly or __read_only as it is
+> to help performance.  ;-)
+
+Fair enough :)
+
+> 
+> 							Thanx, Paul
+> 
+
+Thanks!
+Leo
+
 
