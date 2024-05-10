@@ -1,126 +1,268 @@
-Return-Path: <kvm+bounces-17203-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B023E8C2935
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 19:26:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD2F98C295F
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 19:36:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FB7A287177
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 17:26:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0F5E1C22448
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 17:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B3D18AE4;
-	Fri, 10 May 2024 17:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B3PyL4KM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 197B31BDE6;
+	Fri, 10 May 2024 17:35:55 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D2017C7F
-	for <kvm@vger.kernel.org>; Fri, 10 May 2024 17:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8714E17C68;
+	Fri, 10 May 2024 17:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715361961; cv=none; b=hgO52E3eM08j4BC6P9I3CUR6sph9DLkUZchzbi6MmpprNXJI5K9/fjENAW0h03Tw0DNi50chwyfE8n1/teLx2k40OwIlWmpAAYemtM9d1uaeMPgnWjy5nOlTGMiGso+JkBqp1MRXVAKEKF/75M5Tjmk5uFFMFCvvRcEq14ON00E=
+	t=1715362554; cv=none; b=YpgQHAHmAWQ/fI/7QZ1P+j+Pym7AgGXxvGaA9YbfhhHL8uOrJiWP5qrPsFXNZsHrbYJRqOAfTSVzfjDLAXQoEMCCUmUrYz9YGGod9wAc0zkYY8qLmaZCvwIP21bdSg3Q+3ln9BDPNYXsoAwg6utGR26esbVIOYaAyoU1ZQuk3ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715361961; c=relaxed/simple;
-	bh=EsLzXB6Gs7ZQtkmepgwzqKCcyMI9oEm1j34c4xvtcr8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FdoXJ9cM8pDID/vggEqyfno18o7qaghHrmSTq9XEtuXNNk9fKQgRu4n/hcx9o0IbnybhnxB2FMDsdL9b93HOv5pWLCYMZrJD5eZGkzaryWAR3LJo3txBwX4L/vI4CkAKplDO7xb3XrQ6xwdxv1TI51TnPqSalaMrUFGCYRAP4qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B3PyL4KM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715361958;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v0uH1Y67e/JYlAU3ZBz+NOGOD31UpxofQKkMvjjtZOo=;
-	b=B3PyL4KMWG8JrfSUt9u0R13Z0rD/l7579LapQosR7gGZUYdtBL7DMRuuXPQqo5NuoUJhh/
-	n6dfr+rg7ghPBGKlw81fUTqHH7kLMQFcZksRM1/Eg+6/CgsCvHvPsPB0nEpt1IMUyjiiDC
-	HidG8cZ1Hwj8OdTqYc4MHSbSyFZaEwE=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-556-D72UJ21ZM365ZA16NWTGPw-1; Fri, 10 May 2024 13:25:48 -0400
-X-MC-Unique: D72UJ21ZM365ZA16NWTGPw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-51fa975896eso1917391e87.3
-        for <kvm@vger.kernel.org>; Fri, 10 May 2024 10:25:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715361947; x=1715966747;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v0uH1Y67e/JYlAU3ZBz+NOGOD31UpxofQKkMvjjtZOo=;
-        b=SoQzPMktqsP2QKwIlQltJriVVxgXUH1TQG70+aOYeYtE04LWCOfqK4yveXBvOC2g6G
-         n6QAwV8NlLs35SBrcJP5e2UWWvASZgk0dP8Jhn48IAQ+GQGwwSvzr9df9fVTj0Pwy6kY
-         /9I73BKuAaBiy+VzoQW9uTBS8eN8iL0pcCd5A3c/EMujnhZUXJimSpGzBSrD4Vnx06qi
-         19VDdZgYOIfDE1HDx6Dtsng8k7vV2uIkg3JUFrAAEl2bU/8YBvndPZle/9kcgdt9Aafi
-         rbDfLTuLOCq/x0gwW9cfyyweykC4APJbUzR7HmWStdDhUb3odUeko4VwHU+8QKjhyVnn
-         /0KA==
-X-Forwarded-Encrypted: i=1; AJvYcCUlyNtWnhcjlcCnE31q3A+WeVVCL3CFQbn5FHDluHB/Df6xN9ogqIKISZGRysJU1CX619ul7bwKQmXc+bnqA0cyj74h
-X-Gm-Message-State: AOJu0YwUTRy4ClGDn/ifiJ8aWYmpHPy36/O7A32PkNPzoG4/LkC1RpUh
-	0fyEt2g+L5emVzwyY8CjDh2uTxJN/Wo1uargciM1Dj7yI3gUw9RFvKTFMIIAJWBDFTL0nOVLrW2
-	cgbN+KQKli93JRcEzbs7695zASNnHGnJ6AFD8hp4YFqreOZdipi3GOLHdz1nwL5Jl852uOpQVeO
-	Av+Lq8aEY7ZhNnT4BmTJX8FGoJ
-X-Received: by 2002:a19:a40f:0:b0:522:f6:9268 with SMTP id 2adb3069b0e04-5220fc7eed8mr1904828e87.31.1715361947339;
-        Fri, 10 May 2024 10:25:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH+3UgqTDnmRVAiNjyATZxMd/ldNZtXGyYEy7zEh+oH8PVqYii06B+EkIez4lJParuMv/x2eUO16iD1lvVu4gU=
-X-Received: by 2002:a19:a40f:0:b0:522:f6:9268 with SMTP id 2adb3069b0e04-5220fc7eed8mr1904804e87.31.1715361946880;
- Fri, 10 May 2024 10:25:46 -0700 (PDT)
+	s=arc-20240116; t=1715362554; c=relaxed/simple;
+	bh=/beIqi8bAOLCu4vO/A4YsPuXEwyf7rU71KbEp3qpLE0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EbbDQkfpLra8qBLQjF8HZYbqqXOKVP5XjgWnJpabdEuZ2rXKohgmqj7trQCAgyeaft0kW8AGI8pWdZu/YzEA1B4eqQRNDVMer6dZVj2/VfkoNABCwQKfiyGETwQ5Ifg49s4aC48CrzV4LYznvRhbN/4MAEZpSrfWaYtxvYEmEkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BEA9C113CC;
+	Fri, 10 May 2024 17:35:51 +0000 (UTC)
+Date: Fri, 10 May 2024 18:35:48 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 02/14] arm64: Detect if in a realm and set RIPAS RAM
+Message-ID: <Zj5a9Kt6r7U9WN5E@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-3-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240510015822.503071-1-michael.roth@amd.com> <20240510015822.503071-2-michael.roth@amd.com>
- <Zj4oFffc7OQivyV-@google.com> <566b57c0-27cd-4591-bded-9a397a1d44d5@redhat.com>
- <20240510163719.pnwdwarsbgmcop3h@amd.com> <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
-In-Reply-To: <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 10 May 2024 19:25:34 +0200
-Message-ID: <CABgObfaJaDr38BsTYRrMQzYr-wK8cLW+TJr5ewsgBEcm8ghb3g@mail.gmail.com>
-Subject: Re: [PATCH v15 22/23] KVM: SEV: Fix return code interpretation for
- RMP nested page faults
-To: Michael Roth <michael.roth@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
-	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
-	vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
-	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
-	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
-	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
-	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
-	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240412084213.1733764-3-steven.price@arm.com>
 
-On Fri, May 10, 2024 at 6:59=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
-> Well, the merge window starts next sunday, doesn't it?  If there's an
-> -rc8 I agree there's some leeway, but that is not too likely.
->
-> >> Once we sort out the loose ends of patches 21-23, you could send
-> >> it as a pull request.
-> > Ok, as a pull request against kvm/next, or kvm/queue?
->
-> Against kvm/next.
+On Fri, Apr 12, 2024 at 09:42:01AM +0100, Steven Price wrote:
+> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+> new file mode 100644
+> index 000000000000..3b56aac5dc43
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rsi.h
+> @@ -0,0 +1,46 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
 
-Ah no, only kvm/queue has the preparatory hooks - they make no sense
-without something that uses them.  kvm/queue is ready now.
+You may want to update the year ;).
 
-Also, please send the pull request "QEMU style", i.e. with patches
-as replies.
+> + */
+> +
+> +#ifndef __ASM_RSI_H_
+> +#define __ASM_RSI_H_
+> +
+> +#include <linux/jump_label.h>
+> +#include <asm/rsi_cmds.h>
+> +
+> +extern struct static_key_false rsi_present;
 
-If there's an -rc8, I'll probably pull it on Thursday morning.
+Nitpick: we tend to use DECLARE_STATIC_KEY_FALSE(), it pairs with
+DEFINE_STATIC_KEY_FALSE().
 
-Paolo
+> +void arm64_setup_memory(void);
+> +
+> +void __init arm64_rsi_init(void);
+> +static inline bool is_realm_world(void)
+> +{
+> +	return static_branch_unlikely(&rsi_present);
+> +}
+> +
+> +static inline void set_memory_range(phys_addr_t start, phys_addr_t end,
+> +				    enum ripas state)
+> +{
+> +	unsigned long ret;
+> +	phys_addr_t top;
+> +
+> +	while (start != end) {
+> +		ret = rsi_set_addr_range_state(start, end, state, &top);
+> +		BUG_ON(ret);
+> +		BUG_ON(top < start);
+> +		BUG_ON(top > end);
 
+Are these always fatal? BUG_ON() is frowned upon in general. The
+alternative would be returning an error code from the function and maybe
+printing a warning here (it seems that some people don't like WARN_ON
+either but it's better than BUG_ON; could use a pr_err() instead). Also
+if something's wrong with the RSI interface to mess up the return
+values, it will be hard to debug just from those BUG_ON().
+
+If there's no chance of continuing beyond the point, add a comment on
+why we have a BUG_ON().
+
+> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+> new file mode 100644
+> index 000000000000..1076649ac082
+> --- /dev/null
+> +++ b/arch/arm64/kernel/rsi.c
+> @@ -0,0 +1,58 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#include <linux/jump_label.h>
+> +#include <linux/memblock.h>
+> +#include <asm/rsi.h>
+> +
+> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
+> +EXPORT_SYMBOL(rsi_present);
+
+Does this need to be made available to loadable modules?
+
+> +
+> +static bool rsi_version_matches(void)
+> +{
+> +	unsigned long ver;
+> +	unsigned long ret = rsi_get_version(RSI_ABI_VERSION, &ver, NULL);
+
+I wonder whether rsi_get_version() is the right name (I know it was
+introduced in the previous patch but the usage is here, hence my
+comment). From the RMM spec, this looks more like an
+rsi_request_version() to me.
+
+TBH, the RMM spec around versioning doesn't fully make sense to me ;). I
+assume people working on it had some good reasons around the lower
+revision reporting in case of an error.
+
+> +
+> +	if (ret == SMCCC_RET_NOT_SUPPORTED)
+> +		return false;
+> +
+> +	if (ver != RSI_ABI_VERSION) {
+> +		pr_err("RME: RSI version %lu.%lu not supported\n",
+> +		       RSI_ABI_VERSION_GET_MAJOR(ver),
+> +		       RSI_ABI_VERSION_GET_MINOR(ver));
+> +		return false;
+> +	}
+
+The above check matches what the spec says but wouldn't it be clearer to
+just check for ret == RSI_SUCCESS? It saves one having to read the spec
+to figure out what lower revision actually means in the spec (not the
+actual lowest supported but the highest while still lower than the
+requested one _or_ equal to the higher revision if the lower is higher
+than the requested one - if any of this makes sense to people ;), I'm
+sure I missed some other combinations).
+
+> +
+> +	pr_info("RME: Using RSI version %lu.%lu\n",
+> +		RSI_ABI_VERSION_GET_MAJOR(ver),
+> +		RSI_ABI_VERSION_GET_MINOR(ver));
+> +
+> +	return true;
+> +}
+> +
+> +void arm64_setup_memory(void)
+
+I would give this function a better name, something to resemble the RSI
+setup. Similarly for others like set_memory_range_protected/shared().
+Some of the functions have 'rsi' in the name like arm64_rsi_init() but
+others don't and at a first look they'd seem like some generic memory
+setup on arm64, not RSI-specific.
+
+> +{
+> +	u64 i;
+> +	phys_addr_t start, end;
+> +
+> +	if (!static_branch_unlikely(&rsi_present))
+> +		return;
+
+We have an accessor for rsi_present - is_realm_world(). Why not use
+that?
+
+> +
+> +	/*
+> +	 * Iterate over the available memory ranges
+> +	 * and convert the state to protected memory.
+> +	 */
+> +	for_each_mem_range(i, &start, &end) {
+> +		set_memory_range_protected(start, end);
+> +	}
+> +}
+> +
+> +void __init arm64_rsi_init(void)
+> +{
+> +	if (!rsi_version_matches())
+> +		return;
+> +
+> +	static_branch_enable(&rsi_present);
+> +}
+> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+> index 65a052bf741f..a4bd97e74704 100644
+> --- a/arch/arm64/kernel/setup.c
+> +++ b/arch/arm64/kernel/setup.c
+> @@ -43,6 +43,7 @@
+>  #include <asm/cpu_ops.h>
+>  #include <asm/kasan.h>
+>  #include <asm/numa.h>
+> +#include <asm/rsi.h>
+>  #include <asm/scs.h>
+>  #include <asm/sections.h>
+>  #include <asm/setup.h>
+> @@ -293,6 +294,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+>  	 * cpufeature code and early parameters.
+>  	 */
+>  	jump_label_init();
+> +	/* Init RSI after jump_labels are active */
+> +	arm64_rsi_init();
+>  	parse_early_param();
+
+Does it need to be this early? It's fine for now but I wonder whether we
+may have some early parameter at some point that could influence what we
+do in the arm64_rsi_init(). I'd move it after or maybe even as part of
+the arm64_setup_memory(), though I haven't read the following patches if
+they update this function.
+
+>  
+>  	dynamic_scs_init();
+> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> index 03efd86dce0a..786fd6ce5f17 100644
+> --- a/arch/arm64/mm/init.c
+> +++ b/arch/arm64/mm/init.c
+> @@ -40,6 +40,7 @@
+>  #include <asm/kvm_host.h>
+>  #include <asm/memory.h>
+>  #include <asm/numa.h>
+> +#include <asm/rsi.h>
+>  #include <asm/sections.h>
+>  #include <asm/setup.h>
+>  #include <linux/sizes.h>
+> @@ -313,6 +314,7 @@ void __init arm64_memblock_init(void)
+>  	early_init_fdt_scan_reserved_mem();
+>  
+>  	high_memory = __va(memblock_end_of_DRAM() - 1) + 1;
+> +	arm64_setup_memory();
+>  }
+
+This feels like a random placement. This function is about memblock
+initialisation. You might as well put it in paging_init(), it could make
+more sense there. But I'd rather keep it in setup_arch() immediately
+after arm64_memblock_init().
+
+-- 
+Catalin
 
