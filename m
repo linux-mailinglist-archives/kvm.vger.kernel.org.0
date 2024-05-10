@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-17200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD1FB8C290A
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 19:04:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D5098C2916
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 19:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A1FD28303D
-	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 17:04:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C7A281522
+	for <lists+kvm@lfdr.de>; Fri, 10 May 2024 17:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0FC17C7F;
-	Fri, 10 May 2024 17:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4377E17C6B;
+	Fri, 10 May 2024 17:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HhC9e1dy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSVY8eX6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1441B17BA3
-	for <kvm@vger.kernel.org>; Fri, 10 May 2024 17:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C63D15E86
+	for <kvm@vger.kernel.org>; Fri, 10 May 2024 17:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715360641; cv=none; b=Z8eD8YilQ4XAy00zrZ0bskVxI9go/v1S2FSWCzR7jvFEa42HjVR0/DDmSittef4nCYvOYO2x2I5jDwJbrpdXbMc8+ViSu5PmFf+BW0PllZ1of5hV6Lzhhz9M9V+rYb2WsQXemX/RfdhHRfqCkW2oE1x/H6fFReWYqMkTahczdv0=
+	t=1715360958; cv=none; b=i2KKaPdVtrmrXy/etHIWvAJABLQzNE89pa3fI85QpWeNHE/lWIJWEq8zQB8u1u6PA4aOMqR4kLNNE3/rGKKr7RorijHL+8dTsJ/n75ib4zrded34B4GWDQdneZhk5/Ip3XuJSTlLwMrcB7vU869PLRPkL7pXLz3Gtkcj5PT3TG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715360641; c=relaxed/simple;
-	bh=mrAxYLN7YaKXLmK0pnZRcR4iGVsgpjNfTJqetsyp/K4=;
+	s=arc-20240116; t=1715360958; c=relaxed/simple;
+	bh=o3HzQiNDCwGit4QggZnMuI+ScqHocZvAJc6fOILdelI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FtVgdpnSsnd+gfYgnoYpZHchy5Lqx5TkVmbnppXpiaHy8e6PVK0w/KZUWPhjge+Op/268a6Fm9a8m+LzCkeato2OaUkilK9GRSLBlK56jIox43JzraAQgrjOMjodgDPfBjwTYS0M+s6IHYn5CD23dOz2jXAscNCLref/UqlVE+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HhC9e1dy; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=UjRgbV2jjA2e4xg2BaeCXCNR366/hXCnaLTATzs4oqqkxb1G18BnIPwqGNn8h+vlCnAiJMaXk0kJBmBBVieDmjCIroqxeag4N4kSjK80Q0a8DTGDh55DLhJiksh5MKyL/xMJisIlnIG7u/8vfrwTPay58PfrMcSFKz8s30HzzVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZSVY8eX6; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715360638;
+	s=mimecast20190719; t=1715360955;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=f7sEcl6o9eRoGhOwSAHXKaKKxu23m+YNGmYQyYZJgpk=;
-	b=HhC9e1dyNtfVednlOLVMrqhSWL0lfs0aKvXpR7BasFA1zARYnB6JW+yTS9mKduwP4Tsg4t
-	GXN/gCwBaq9l3IgWdgATH5o9zN7MYWRTzUQoyuHo3ZAcLpKQeylH563L3TNsvEx52yKwx8
-	dX7DOwcEz60Jd2oeK/RZFFOZGQ7eGC4=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7p3PXm6krOSd+K8cPm+lYpKDJuTh76+T2MFZsxS42kQ=;
+	b=ZSVY8eX63hCu6O68NKr4Q/vMl5y+8xob8mpLIXUtB6z5R2fQjQyS5JzUiUQ1G8V+zfLpR0
+	JmOAx5umfDiSW01z+YsFeZGiLj4z93hojBH/6SnY4X0DGFrRRY7NTq589xdoDsYnjaGt1B
+	JiqrexFWMmYbT9JVDuRdptdPfmxsi9U=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-678-uwNkp6hyN3eHdpQ4hh9AWw-1; Fri, 10 May 2024 12:59:42 -0400
-X-MC-Unique: uwNkp6hyN3eHdpQ4hh9AWw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a59cfaba975so76563566b.2
-        for <kvm@vger.kernel.org>; Fri, 10 May 2024 09:59:42 -0700 (PDT)
+ us-mta-391-LjL1OgS1NqygO6N2JFucNA-1; Fri, 10 May 2024 13:09:13 -0400
+X-MC-Unique: LjL1OgS1NqygO6N2JFucNA-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a59eea00cafso156980666b.1
+        for <kvm@vger.kernel.org>; Fri, 10 May 2024 10:09:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715360381; x=1715965181;
+        d=1e100.net; s=20230601; t=1715360952; x=1715965752;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=f7sEcl6o9eRoGhOwSAHXKaKKxu23m+YNGmYQyYZJgpk=;
-        b=GZ0VXHYIptvk3hFHHH1klnYUjJtpAgzR5Coo3wRIUOuP9snmaFk5VZcnkjd3JSE/yO
-         3kV7wx6jQZoXzyKyaqXs+gKN6s/ZaRoImAFs+u/0JVCmiIo3c1lwmU6QDoFzf412Wlzx
-         kBdEkYOslo+D2UJIL7j3CFdUaTGBBeorCLoGn/HTdfXV2QElg5rjpLAIA1J4EhkTA9lg
-         IiALEY0Z/4slTOAqbw1W5+rMw9oWDYTddVvJybk7D03Dpqh3dpysNt3uYAnamJG4rGtw
-         Oyxn0maJs6DTsJftEQCeMFecwCTZO9iadTs9UEWM3txPNGxqzPfTy9ynuZULfSOcSWvP
-         xEAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWu9gIo5k866CrNZKPtZxmC5VEHlOsXdVvu31v/UKWclkfla1VgvNqsO+f15u7/Hjut9MOG+AUxGvfrgwWGVj2HR7yX
-X-Gm-Message-State: AOJu0YyT5m0TA5FeJrwSS0MadrRaDa15Lmh+7AmYKN9FqktMZfeeXrJ3
-	nwF4iPNc2WqnhBsTnptkYiIBd3AQvHX9eDNQwvZNb8ByZDOB81VQoWYLgc2TZYw0EiWcFct8+GG
-	7V50TENS8MwMnPE46KmISE7VS3vRL8Ia7iqddoyXNN3GXQAFeYw==
-X-Received: by 2002:a50:c012:0:b0:56d:f3f3:f61f with SMTP id 4fb4d7f45d1cf-5734d597da8mr3087112a12.9.1715360381264;
-        Fri, 10 May 2024 09:59:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE1NRP6cZSOa1XYwX9+D1CVHmUjYsL2urgesJf7rD62GMtL4OAvAaffXB16L2Ce76IP/7uSvw==
-X-Received: by 2002:a50:c012:0:b0:56d:f3f3:f61f with SMTP id 4fb4d7f45d1cf-5734d597da8mr3087084a12.9.1715360380864;
-        Fri, 10 May 2024 09:59:40 -0700 (PDT)
+        bh=7p3PXm6krOSd+K8cPm+lYpKDJuTh76+T2MFZsxS42kQ=;
+        b=Vh2elRU+AAZ/vG0mD8dPJYrHSowih1h5uMWdzMBFbOw/8Z73agu3ZYMEgfreyuV5Cm
+         5Hm7v6wmt4JamRWOcDpZufnGdH5sxZ8bm+Py+bMqiChSM8q5nqcvAklWFvo6BXP1wOMj
+         FiT1s+3HOwB7957sMccRJ46YeXaD4gBAxrfRF+/4o+u79Kcvy3iIgYRY/hUukt60OZIf
+         jfyFSF8I+RxwnvGvjF/Gx1iq/pisg/7CWs7Ny+O6rWzcojQ61ZicYCgAEIv8LNRMb/Jk
+         3GyKKr7uabdaig5kBdvJgaVGIt3MHdWuJQHE3IxvjutLjS3dDgpER+aoKY2UM6ADSXoD
+         2NeA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJFD6cU7sS+v6z4K5nV1A0mKslSW7bz1y4gHRJ2VV6AGpHLoLRh3PPxT23fKZex2zP9Lr+7x8dWDaP0qKwZyPTg+TB
+X-Gm-Message-State: AOJu0Yy77MN/BA9J80/6/PG6aE5TPA+7byUWQwR/4gZL71wQvW4COX6X
+	eycSJKIpXdbX3RYuiPaUQnHDUtrjWds9VvaEJhtRs5x5XfYxfb6OC6CaxomotYvhbE5ZCGlEHRb
+	8+XstcmyFrIHJZGtOp6x9wAHg34FhS7CyMx5jucxaYbadBaPnDA==
+X-Received: by 2002:a17:906:dd7:b0:a59:d5e4:1487 with SMTP id a640c23a62f3a-a5a2d5cb6ffmr296460266b.42.1715360952388;
+        Fri, 10 May 2024 10:09:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEM811MEkD14aLnO6nvhAkFbQgZ7sUPC3JmgKjoPSF+RTljS81r9GeaHQExLPjzmjW5n7F/Og==
+X-Received: by 2002:a17:906:dd7:b0:a59:d5e4:1487 with SMTP id a640c23a62f3a-a5a2d5cb6ffmr296457566b.42.1715360951811;
+        Fri, 10 May 2024 10:09:11 -0700 (PDT)
 Received: from [192.168.10.48] ([151.95.155.52])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5735a2490casm559601a12.32.2024.05.10.09.59.38
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a5a1781cf70sm204202566b.30.2024.05.10.10.09.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 May 2024 09:59:39 -0700 (PDT)
-Message-ID: <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
-Date: Fri, 10 May 2024 18:59:37 +0200
+        Fri, 10 May 2024 10:09:10 -0700 (PDT)
+Message-ID: <fe5cc86b-43e0-4685-99e7-998e61db333f@redhat.com>
+Date: Fri, 10 May 2024 19:09:07 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,14 +83,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 22/23] KVM: SEV: Fix return code interpretation for
- RMP nested page faults
-To: Michael Roth <michael.roth@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
+Subject: Re: [PATCH v15 23/23] KVM: SEV: Fix PSC handling for SMASH/UNSMASH
+ and partial update ops
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, linux-mm@kvack.org,
  linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
  tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
+ thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
  vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
  dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
  peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
@@ -102,9 +101,7 @@ Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
  papaluri@amd.com
 References: <20240501085210.2213060-1-michael.roth@amd.com>
  <20240510015822.503071-1-michael.roth@amd.com>
- <20240510015822.503071-2-michael.roth@amd.com> <Zj4oFffc7OQivyV-@google.com>
- <566b57c0-27cd-4591-bded-9a397a1d44d5@redhat.com>
- <20240510163719.pnwdwarsbgmcop3h@amd.com>
+ <20240510015822.503071-3-michael.roth@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -142,31 +139,310 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240510163719.pnwdwarsbgmcop3h@amd.com>
+In-Reply-To: <20240510015822.503071-3-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 5/10/24 18:37, Michael Roth wrote:
->> So, we're... a bit tight for 6.10 to include SNP and that is an
->> understatement.  My plan is to merge it for 6.11, but do so
->> immediately after the merge window ends.  In other words, it
->> is a delay in terms of release but not in terms of time.  I
->> don't want QEMU and kvm-unit-tests work to be delayed any
->> further, in particular.
->
-> That's unfortunate, I'd thought from the PUCK call that we still had
-> some time to stabilize things before merge window. But whatever you
-> think is best.
+On 5/10/24 03:58, Michael Roth wrote:
+> There are a few edge-cases that the current processing for GHCB PSC
+> requests doesn't handle properly:
+> 
+>   - KVM properly ignores SMASH/UNSMASH ops when they are embedded in a
+>     PSC request buffer which contains other PSC operations, but
+>     inadvertantly forwards them to userspace as private->shared PSC
+>     requests if they appear at the end of the buffer. Make sure these are
+>     ignored instead, just like cases where they are not at the end of the
+>     request buffer.
+> 
+>   - Current code handles non-zero 'cur_page' fields when they are at the
+>     beginning of a new GPA range, but it is not handling properly when
+>     iterating through subsequent entries which are otherwise part of a
+>     contiguous range. Fix up the handling so that these entries are not
+>     combined into a larger contiguous range that include unintended GPA
+>     ranges and are instead processed later as the start of a new
+>     contiguous range.
+> 
+>   - The page size variable used to track 2M entries in KVM for inflight PSCs
+>     might be artifically set to a different value, which can lead to
+>     unexpected values in the entry's final 'cur_page' update. Use the
+>     entry's 'pagesize' field instead to determine what the value of
+>     'cur_page' should be upon completion of processing.
+> 
+> While here, also add a small helper for clearing in-flight PSCs
+> variables and fix up comments for better readability.
+> 
+> Fixes: 266205d810d2 ("KVM: SEV: Add support to handle Page State Change VMGEXIT")
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-Well, the merge window starts next sunday, doesn't it?  If there's an 
--rc8 I agree there's some leeway, but that is not too likely.
+There are some more improvements that can be made to the readability of
+the code... this one is already better than the patch is fixing up, but I
+don't like the code that is in the loop even though it is unconditionally
+followed by "break".
 
->> Once we sort out the loose ends of patches 21-23, you could send
->> it as a pull request.
-> Ok, as a pull request against kvm/next, or kvm/queue?
+Here's my attempt at replacing this patch, which is really more of a
+rewrite of the whole function...  Untested beyond compilation.
 
-Against kvm/next.
-
-Paolo
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 35f0bd91f92e..6e612789c35f 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3555,23 +3555,25 @@ struct psc_buffer {
+  
+  static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc);
+  
+-static int snp_complete_psc(struct kvm_vcpu *vcpu)
++static void snp_complete_psc(struct vcpu_svm *svm, u64 psc_ret)
++{
++	svm->sev_es.psc_inflight = 0;
++	svm->sev_es.psc_idx = 0;
++	svm->sev_es.psc_2m = 0;
++	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
++}
++
++static void __snp_complete_one_psc(struct vcpu_svm *svm)
+  {
+-	struct vcpu_svm *svm = to_svm(vcpu);
+  	struct psc_buffer *psc = svm->sev_es.ghcb_sa;
+  	struct psc_entry *entries = psc->entries;
+  	struct psc_hdr *hdr = &psc->hdr;
+-	__u64 psc_ret;
+  	__u16 idx;
+  
+-	if (vcpu->run->hypercall.ret) {
+-		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
+-		goto out_resume;
+-	}
+-
+  	/*
+  	 * Everything in-flight has been processed successfully. Update the
+-	 * corresponding entries in the guest's PSC buffer.
++	 * corresponding entries in the guest's PSC buffer and zero out the
++	 * count of in-flight PSC entries.
+  	 */
+  	for (idx = svm->sev_es.psc_idx; svm->sev_es.psc_inflight;
+  	     svm->sev_es.psc_inflight--, idx++) {
+@@ -3581,17 +3583,22 @@ static int snp_complete_psc(struct kvm_vcpu *vcpu)
+  	}
+  
+  	hdr->cur_entry = idx;
++}
++
++static int snp_complete_one_psc(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct psc_buffer *psc = svm->sev_es.ghcb_sa;
++
++	if (vcpu->run->hypercall.ret) {
++		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
++		return 1; /* resume guest */
++	}
++
++	__snp_complete_one_psc(svm);
+  
+  	/* Handle the next range (if any). */
+  	return snp_begin_psc(svm, psc);
+-
+-out_resume:
+-	svm->sev_es.psc_idx = 0;
+-	svm->sev_es.psc_inflight = 0;
+-	svm->sev_es.psc_2m = false;
+-	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
+-
+-	return 1; /* resume guest */
+  }
+  
+  static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
+@@ -3601,18 +3608,20 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
+  	struct psc_hdr *hdr = &psc->hdr;
+  	struct psc_entry entry_start;
+  	u16 idx, idx_start, idx_end;
+-	__u64 psc_ret, gpa;
++	u64 gfn;
+  	int npages;
+-
+-	/* There should be no other PSCs in-flight at this point. */
+-	if (WARN_ON_ONCE(svm->sev_es.psc_inflight)) {
+-		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
+-		goto out_resume;
+-	}
++	bool huge;
+  
+  	if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_MAP_GPA_RANGE))) {
+-		psc_ret = VMGEXIT_PSC_ERROR_GENERIC;
+-		goto out_resume;
++		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
++		return 1;
++	}
++
++next_range:
++	/* There should be no other PSCs in-flight at this point. */
++	if (WARN_ON_ONCE(svm->sev_es.psc_inflight)) {
++		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
++		return 1;
+  	}
+  
+  	/*
+@@ -3624,97 +3633,99 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
+  	idx_end = hdr->end_entry;
+  
+  	if (idx_end >= VMGEXIT_PSC_MAX_COUNT) {
+-		psc_ret = VMGEXIT_PSC_ERROR_INVALID_HDR;
+-		goto out_resume;
+-	}
+-
+-	/* Nothing more to process. */
+-	if (idx_start > idx_end) {
+-		psc_ret = 0;
+-		goto out_resume;
++		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_INVALID_HDR);
++		return 1;
+  	}
+  
+  	/* Find the start of the next range which needs processing. */
+  	for (idx = idx_start; idx <= idx_end; idx++, hdr->cur_entry++) {
+-		__u16 cur_page;
+-		gfn_t gfn;
+-		bool huge;
+-
+  		entry_start = entries[idx];
+-
+-		/* Only private/shared conversions are currently supported. */
+-		if (entry_start.operation != VMGEXIT_PSC_OP_PRIVATE &&
+-		    entry_start.operation != VMGEXIT_PSC_OP_SHARED)
+-			continue;
+-
+  		gfn = entry_start.gfn;
+-		cur_page = entry_start.cur_page;
+  		huge = entry_start.pagesize;
++		npages = huge ? 512 : 1;
+  
+-		if ((huge && (cur_page > 512 || !IS_ALIGNED(gfn, 512))) ||
+-		    (!huge && cur_page > 1)) {
+-			psc_ret = VMGEXIT_PSC_ERROR_INVALID_ENTRY;
+-			goto out_resume;
++		if (entry_start.cur_page > npages || !IS_ALIGNED(gfn, npages)) {
++			snp_complete_psc(svm, VMGEXIT_PSC_ERROR_INVALID_ENTRY);
++			return 1;
+  		}
+  
++		if (entry_start.cur_page) {
++			/*
++			 * If this is a partially-completed 2M range, force 4K
++			 * handling for the remaining pages since they're effectively
++			 * split at this point. Subsequent code should ensure this
++			 * doesn't get combined with adjacent PSC entries where 2M
++			 * handling is still possible.
++			 */
++			npages -= entry_start.cur_page;
++			gfn += entry_start.cur_page;
++			huge = false;
++		}
++		if (npages)
++			break;
++
+  		/* All sub-pages already processed. */
+-		if ((huge && cur_page == 512) || (!huge && cur_page == 1))
+-			continue;
+-
+-		/*
+-		 * If this is a partially-completed 2M range, force 4K handling
+-		 * for the remaining pages since they're effectively split at
+-		 * this point. Subsequent code should ensure this doesn't get
+-		 * combined with adjacent PSC entries where 2M handling is still
+-		 * possible.
+-		 */
+-		svm->sev_es.psc_2m = cur_page ? false : huge;
+-		svm->sev_es.psc_idx = idx;
+-		svm->sev_es.psc_inflight = 1;
+-
+-		gpa = gfn_to_gpa(gfn + cur_page);
+-		npages = huge ? 512 - cur_page : 1;
+-		break;
+  	}
+  
++	if (idx > idx_end) {
++		/* Nothing more to process. */
++		snp_complete_psc(svm, 0);
++		return 1;
++	}
++
++	svm->sev_es.psc_2m = huge;
++	svm->sev_es.psc_idx = idx;
++	svm->sev_es.psc_inflight = 1;
++
+  	/*
+  	 * Find all subsequent PSC entries that contain adjacent GPA
+  	 * ranges/operations and can be combined into a single
+  	 * KVM_HC_MAP_GPA_RANGE exit.
+  	 */
+-	for (idx = svm->sev_es.psc_idx + 1; idx <= idx_end; idx++) {
++	while (++idx <= idx_end) {
+  		struct psc_entry entry = entries[idx];
+  
+  		if (entry.operation != entry_start.operation ||
+-		    entry.gfn != entry_start.gfn + npages ||
+-		    !!entry.pagesize != svm->sev_es.psc_2m)
++		    entry.gfn != gfn + npages ||
++		    entry.cur_page ||
++		    !!entry.pagesize != huge)
+  			break;
+  
+  		svm->sev_es.psc_inflight++;
+-		npages += entry_start.pagesize ? 512 : 1;
++		npages += huge ? 512 : 1;
+  	}
+  
+-	vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
+-	vcpu->run->hypercall.nr = KVM_HC_MAP_GPA_RANGE;
+-	vcpu->run->hypercall.args[0] = gpa;
+-	vcpu->run->hypercall.args[1] = npages;
+-	vcpu->run->hypercall.args[2] = entry_start.operation == VMGEXIT_PSC_OP_PRIVATE
+-				       ? KVM_MAP_GPA_RANGE_ENCRYPTED
+-				       : KVM_MAP_GPA_RANGE_DECRYPTED;
+-	vcpu->run->hypercall.args[2] |= entry_start.pagesize
+-					? KVM_MAP_GPA_RANGE_PAGE_SZ_2M
+-					: KVM_MAP_GPA_RANGE_PAGE_SZ_4K;
+-	vcpu->arch.complete_userspace_io = snp_complete_psc;
++	switch (entry_start.operation) {
++	case VMGEXIT_PSC_OP_PRIVATE:
++	case VMGEXIT_PSC_OP_SHARED:
++		vcpu->run->exit_reason = KVM_EXIT_HYPERCALL;
++		vcpu->run->hypercall.nr = KVM_HC_MAP_GPA_RANGE;
++		vcpu->run->hypercall.args[0] = gfn_to_gpa(gfn);
++		vcpu->run->hypercall.args[1] = npages;
++		vcpu->run->hypercall.args[2] = entry_start.operation == VMGEXIT_PSC_OP_PRIVATE
++			? KVM_MAP_GPA_RANGE_ENCRYPTED
++			: KVM_MAP_GPA_RANGE_DECRYPTED;
++		vcpu->run->hypercall.args[2] |= huge
++			? KVM_MAP_GPA_RANGE_PAGE_SZ_2M
++			: KVM_MAP_GPA_RANGE_PAGE_SZ_4K;
++		vcpu->arch.complete_userspace_io = snp_complete_one_psc;
+  
+-	return 0; /* forward request to userspace */
++		return 0; /* forward request to userspace */
+  
+-out_resume:
+-	svm->sev_es.psc_idx = 0;
+-	svm->sev_es.psc_inflight = 0;
+-	svm->sev_es.psc_2m = false;
+-	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, psc_ret);
++	default:
++		/*
++		 * Only shared/private PSC operations are currently supported, so if the
++		 * entire range consists of unsupported operations (e.g. SMASH/UNSMASH),
++		 * then consider the entire range completed and avoid exiting to
++		 * userspace. In theory snp_complete_psc() can be called directly
++		 * at this point to complete the current range and start the next one,
++		 * but that could lead to unexpected levels of recursion.
++		 */
++		__snp_complete_one_psc(svm);
++		goto next_range;
++	}
+  
+-	return 1; /* resume guest */
++	unreachable();
+  }
+  
+  static int __sev_snp_update_protected_guest_state(struct kvm_vcpu *vcpu)
 
 
