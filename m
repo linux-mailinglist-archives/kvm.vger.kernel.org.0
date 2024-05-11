@@ -1,152 +1,156 @@
-Return-Path: <kvm+bounces-17248-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17249-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 251318C2F70
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 05:46:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F218C2FF8
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 09:08:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D613C284EA6
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 03:46:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56D241C21290
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 07:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116F73F8F7;
-	Sat, 11 May 2024 03:46:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9DF9D2FE;
+	Sat, 11 May 2024 07:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="IkF1OcpO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lr5l8XTa"
 X-Original-To: kvm@vger.kernel.org
-Received: from out0-212.mail.aliyun.com (out0-212.mail.aliyun.com [140.205.0.212])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC941843;
-	Sat, 11 May 2024 03:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.205.0.212
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CE4610B
+	for <kvm@vger.kernel.org>; Sat, 11 May 2024 07:08:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715399206; cv=none; b=gOt08WsRbWbxINGExO+q4ooGF6KThYcZ/EsYYffQ8DWOJ0FiST87UvZ4Np2T8WI8c0Q8LQjQSrUWJu9miZvpP0fPTuZi9kn6orfaxG7A7jfOWF0iZ47yUFH/X/PORLJlTgBZTUzESiidR2wh1s94HG5FXO79mjaPPWEbpldGOqI=
+	t=1715411305; cv=none; b=jjkhOqr6qVUHOFm94F3/TeUMPlOiN95B70vfafr/GKNyyA/8viz4ye7SiFTPlZFqhnsSl31cGbN6+R+plW4EAqtWc2YwSugIs9bij6JVY0g+RhmAUNmgAEHpuIKEAkRzmNArwG/3/9jxiHA54Sy91Wuc74O3mu5WR1Aca/F1qUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715399206; c=relaxed/simple;
-	bh=hZ03FoXZ1F+HCTHSptsV5XuAZGqY5U010SnORP5VsWg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=AM3XBXVWly+PPgp1i0k06f7t2Iye+Ail4tTnMtYn7vVaG1Af8uHBERJlm3kj27ZKkKshCOiqWEVy0J97zJTwX57BVajNLYcYQAvuPsQFgQVpIeDbMP/h7yKryKuQJCPJCeYi2py5sgYcmgSrz0j0DddWibidBC7jdQybsHswzAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=IkF1OcpO; arc=none smtp.client-ip=140.205.0.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1715399199; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=/oQPtMgHD8rA3njQCT4IplE8E+0JmO4poKrpVU3HxCw=;
-	b=IkF1OcpOqrZOX8gHWEO4Ay8znEZHzAnY+dLaEd3Y6LbM3jWMasIFN0RRhY0o+BeA/kY/b8s+a6u6rlgqlMulbxWcCW1s6u/vS5u9EuSPHLR+meeEgl9+B+/WBGM50FZmiY/5jdw6ItPYHthFVAurHxE1tnGJfeHFqKivsUX2/7Y=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R311e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047205;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---.XYYlGFt_1715399198;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.XYYlGFt_1715399198)
-          by smtp.aliyun-inc.com;
-          Sat, 11 May 2024 11:46:39 +0800
-From: "Hou Wenlong" <houwenlong.hwl@antgroup.com>
-To: kvm@vger.kernel.org
-Cc: "Lai Jiangshan" <jiangshan.ljs@antgroup.com>,
-  "Sean Christopherson" <seanjc@google.com>,
-  "Paolo Bonzini" <pbonzini@redhat.com>,
-  "Thomas Gleixner" <tglx@linutronix.de>,
-  "Ingo Molnar" <mingo@redhat.com>,
-  "Borislav Petkov" <bp@alien8.de>,
-  "Dave Hansen" <dave.hansen@linux.intel.com>,
-   <x86@kernel.org>,
-  "H. Peter Anvin" <hpa@zytor.com>,
-   <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2] KVM: x86/mmu: Only allocate shadowed translation cache for sp->role.level <= KVM_MAX_HUGEPAGE_LEVEL
-Date: Sat, 11 May 2024 11:46:37 +0800
-Message-Id: <5b0cda8a7456cda476b14fca36414a56f921dd52.1715398655.git.houwenlong.hwl@antgroup.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1715411305; c=relaxed/simple;
+	bh=p8kV1rvAwoWvjzhcVQht8UjJlqE6bgmZ5khl4heqc2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RuHWhYdtiG2E/88k019Y/AdWk2cJnCTpybZ0c02GRefIFTCUPsvvGQj1Xsfw6/s0Ghvdid5sX1gzm6qM5kPKpEMB7zHDyoq9QNj+DUMgH8QHqhn2Aem00GouEGKpqUix9L9Ez8e+OvqhutaTHEqZBVuSJyKIBFqrhkMs2LEpAgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lr5l8XTa; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715411303; x=1746947303;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=p8kV1rvAwoWvjzhcVQht8UjJlqE6bgmZ5khl4heqc2M=;
+  b=lr5l8XTawiaMUqgNkev92Gd78afNZBuZ83lg/0jl7qed8h6iyApA0ul9
+   ZeiEM9WwovStaBa6ofVE/C4Ionpz/7UjGsP44+L+4t1pf+8Srm2unEbq5
+   QCc7cmHQrIUDJ7tAqJj1vApofAhSNnTy83xAf8L6ZBXA/xZ7y7tLU4NXK
+   3D+OIacrC/fTfl5ecpkX4SeudaUd2atg88xbVvR3PmK8SWvPG/k3K0MT1
+   YngIf+FeR/DO3o3SqUiM0sD6xBFSIDnioV/i21QSZRgNN+U+FL012OgF2
+   S9cqIgSCXF85IXxfilMyJvxQKHJeRrLdP6qKBlShnoX3hGBANgHcvKuqc
+   g==;
+X-CSE-ConnectionGUID: ZI9USOjFTNG1o2aEguMsnw==
+X-CSE-MsgGUID: n2LEKlenQci2KeGZQbFsuw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11069"; a="36790644"
+X-IronPort-AV: E=Sophos;i="6.08,153,1712646000"; 
+   d="scan'208";a="36790644"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2024 00:08:22 -0700
+X-CSE-ConnectionGUID: nCI4lW54QkKAYbJLndNl1A==
+X-CSE-MsgGUID: k9Xo5meFSLSiCmF8pBj0yQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,153,1712646000"; 
+   d="scan'208";a="30416493"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.125.243.198]) ([10.125.243.198])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2024 00:08:20 -0700
+Message-ID: <456e2a3b-a96f-46a2-96d2-03dab56f9eb9@intel.com>
+Date: Sat, 11 May 2024 15:08:16 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] KVM: selftests: x86: Prioritize getting max_gfn from
+ GuestPhysBits
+To: Tao Su <tao1.su@linux.intel.com>, kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, chao.gao@intel.com,
+ yi1.lai@intel.com
+References: <20240510020346.12528-1-tao1.su@linux.intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20240510020346.12528-1-tao1.su@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Only the indirect SP with sp->role.level <= KVM_MAX_HUGEPAGE_LEVEL might
-have leaf gptes, so allocation of shadowed translation cache is needed
-only for it. Then, it can use sp->shadowed_translation to determine
-whether to use the information in the shadowed translation cache or not.
-Also, extend the WARN in FNAME(sync_spte)() to ensure that this won't
-break shadow_mmu_get_sp_for_split().
+On 5/10/2024 10:03 AM, Tao Su wrote:
+> Use the max mappable GPA via GuestPhysBits advertised by KVM to calculate
+> max_gfn. Currently some selftests (e.g. access_tracking_perf_test,
+> dirty_log_test...) add RAM regions close to max_gfn, so guest may access
+> GPA beyond its mappable range and cause infinite loop.
+> 
+> Adjust max_gfn in vm_compute_max_gfn() since x86 selftests already
+> overrides vm_compute_max_gfn() specifically to deal with goofy edge cases.
+> 
+> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+> Tested-by: Yi Lai <yi1.lai@intel.com>
+> ---
+> This patch is based on https://github.com/kvm-x86/linux/commit/b628cb523c65
+> 
+> Changelog:
+> v1 -> v2:
+>   - Only adjust vm->max_gfn in vm_compute_max_gfn()
+>   - Add Yi Lai's Tested-by
+> 
+> v1: https://lore.kernel.org/all/20240508064205.15301-1-tao1.su@linux.intel.com/
+> ---
+>   tools/testing/selftests/kvm/include/x86_64/processor.h |  1 +
+>   tools/testing/selftests/kvm/lib/x86_64/processor.c     | 10 ++++++++--
+>   2 files changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 81ce37ec407d..ff99f66d81a0 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -282,6 +282,7 @@ struct kvm_x86_cpu_property {
+>   #define X86_PROPERTY_MAX_EXT_LEAF		KVM_X86_CPU_PROPERTY(0x80000000, 0, EAX, 0, 31)
+>   #define X86_PROPERTY_MAX_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 0, 7)
+>   #define X86_PROPERTY_MAX_VIRT_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 8, 15)
+> +#define X86_PROPERTY_MAX_GUEST_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 16, 23)
+>   #define X86_PROPERTY_SEV_C_BIT			KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
+>   #define X86_PROPERTY_PHYS_ADDR_REDUCTION	KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
+>   
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 74a4c736c9ae..aa9966ead543 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1293,10 +1293,16 @@ const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu)
+>   unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
+>   {
+>   	const unsigned long num_ht_pages = 12 << (30 - vm->page_shift); /* 12 GiB */
+> -	unsigned long ht_gfn, max_gfn, max_pfn;
+> +	unsigned long ht_gfn, max_gfn, max_pfn, max_bits = 0;
+>   	uint8_t maxphyaddr;
+>   
+> -	max_gfn = (1ULL << (vm->pa_bits - vm->page_shift)) - 1;
+> +	if (kvm_cpu_has_p(X86_PROPERTY_MAX_GUEST_PHY_ADDR))
+> +		max_bits = kvm_cpu_property(X86_PROPERTY_MAX_GUEST_PHY_ADDR);
 
-Suggested-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
----
-v1->v2:
-- Remove the order change in kvm_mmu_page_get_gfn() to keep smallest
-  diff.
-- Drop the helper.
-- Extend the WARN in FNAME(sync_spte).
+We can get rid of the kvm_cpu_has_p(X86_PROPERTY_MAX_GUEST_PHY_ADDR) 
+check and call kvm_cpu_property() unconditionally. As a bonus, we don't 
+need to init max_bits as 0.
 
- arch/x86/kvm/mmu/mmu.c         | 11 +++++------
- arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
- 2 files changed, 6 insertions(+), 7 deletions(-)
+BTW, could we just name it guest_pa_bits?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index fc3b59b59ee1..dc6f6a272e98 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -719,7 +719,7 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
- 	if (sp->role.passthrough)
- 		return sp->gfn;
+Otherwise,
 
--	if (!sp->role.direct)
-+	if (sp->shadowed_translation)
- 		return sp->shadowed_translation[index] >> PAGE_SHIFT;
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
- 	return sp->gfn + (index << ((sp->role.level - 1) * SPTE_LEVEL_BITS));
-@@ -733,7 +733,7 @@ static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
-  */
- static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
- {
--	if (sp_has_gptes(sp))
-+	if (sp->shadowed_translation)
- 		return sp->shadowed_translation[index] & ACC_ALL;
-
- 	/*
-@@ -754,7 +754,7 @@ static u32 kvm_mmu_page_get_access(struct kvm_mmu_page *sp, int index)
- static void kvm_mmu_page_set_translation(struct kvm_mmu_page *sp, int index,
- 					 gfn_t gfn, unsigned int access)
- {
--	if (sp_has_gptes(sp)) {
-+	if (sp->shadowed_translation) {
- 		sp->shadowed_translation[index] = (gfn << PAGE_SHIFT) | access;
- 		return;
- 	}
-@@ -1697,8 +1697,7 @@ static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
- 	hlist_del(&sp->hash_link);
- 	list_del(&sp->link);
- 	free_page((unsigned long)sp->spt);
--	if (!sp->role.direct)
--		free_page((unsigned long)sp->shadowed_translation);
-+	free_page((unsigned long)sp->shadowed_translation);
- 	kmem_cache_free(mmu_page_header_cache, sp);
- }
-
-@@ -2199,7 +2198,7 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
-
- 	sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
- 	sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
--	if (!role.direct)
-+	if (!role.direct && role.level <= KVM_MAX_HUGEPAGE_LEVEL)
- 		sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
-
- 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 7a87097cb45b..89b5d73e9e3c 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -911,7 +911,7 @@ static int FNAME(sync_spte)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp, int
- 	gpa_t pte_gpa;
- 	gfn_t gfn;
-
--	if (WARN_ON_ONCE(!sp->spt[i]))
-+	if (WARN_ON_ONCE(!sp->spt[i] || !sp->shadowed_translation))
- 		return 0;
-
- 	first_pte_gpa = FNAME(get_level1_sp_gpa)(sp);
---
-2.31.1
+> +
+> +	if (!max_bits)
+> +		max_bits = vm->pa_bits;
+> +
+> +	max_gfn = (1ULL << (max_bits - vm->page_shift)) - 1;
+>   
+>   	/* Avoid reserved HyperTransport region on AMD processors.  */
+>   	if (!host_cpu_is_amd)
+> 
+> base-commit: 448b3fe5a0eab5b625a7e15c67c7972169e47ff8
 
 
