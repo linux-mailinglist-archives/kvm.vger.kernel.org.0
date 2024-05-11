@@ -1,93 +1,79 @@
-Return-Path: <kvm+bounces-17264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCB778C33C2
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 22:31:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0FEB8C3499
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 00:56:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284CC282003
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 20:31:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A2181F21BF9
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 22:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AD9219E0;
-	Sat, 11 May 2024 20:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB0E3FB0F;
+	Sat, 11 May 2024 22:56:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tt/8r/UE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aulYneye"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659271CD11
-	for <kvm@vger.kernel.org>; Sat, 11 May 2024 20:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFDD17BA8;
+	Sat, 11 May 2024 22:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715459503; cv=none; b=UsXj4eBYrpSfhg15UJ9MEuQmBtQzWazXjgCXQ+nEBmIa3iZTK7dljSCZWgDC5koB/T08AHhsEIv7axKjr6sd4cw5wvWG+wj8tmiGnMUSQe5pg/+d0IH8TXP5RjzII9AWZykSAVpWpVm3Qc66SmQuCh21O5nMMeyLKjgLdcpGrXE=
+	t=1715468192; cv=none; b=KM+i6AsRzm2BSiSz0ywbpS0QmDC/Rrk1N/eCUE5Y0cB82Eo4r8oy8g7sPmFQks4TJPdaJPmLf1Sn26GTN5UY2SqM1hy0AYJDV56+oS0tTmAcdpFmDRJU6H6XOgUkp2xpl6InCzIE/mEELDfz0otKBxMCoEzcaNCJ/wVo7OUghmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715459503; c=relaxed/simple;
-	bh=ZJCjeTD4BIzJC78hCBnDbdYDSIfpi5tTg6nMh5euC6I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type:Content-Disposition; b=REPQkW854lC8vo1d78g0slwk8lSwtHl+aL8+ADUU7wqQi7MfkNwMKMFzfzL5pjYn89SHHW+JhnpwRyXdeerK0k50/Iknmog2vMwrddEflqUC8jXeGIu7t8wVZB1+dJ0zprhJoMukH4+RIJyuMh9zaPqx1G8ELXvXbAYEH4AJObQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tt/8r/UE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715459500;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xzSjQIEMrJJgZniLc2C8D6P/avkSP2th2xNzph1s0BM=;
-	b=Tt/8r/UERJVfHFDImukiBeQfDEvssXxOM9LEmjwyd0i8qnayTXGvcQLR7u+42/Rm+9KyUD
-	KbjKIDxgSw1vrm4iPAUn7Qx7CLJufsq5pDrzKd1HlYkMaJz1+jtlhMCRhLSYT9WlZrJNOn
-	xZVK9iA8xQkALKtKv2/YG51cbTEhQfw=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-214-5T_Gx13vObuyLjGnckRjhw-1; Sat, 11 May 2024 16:31:39 -0400
-X-MC-Unique: 5T_Gx13vObuyLjGnckRjhw-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1ec620ccf77so23020765ad.0
-        for <kvm@vger.kernel.org>; Sat, 11 May 2024 13:31:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715459498; x=1716064298;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xzSjQIEMrJJgZniLc2C8D6P/avkSP2th2xNzph1s0BM=;
-        b=fmWc+aiNGEVwhIlRUMJeyKRbdDbb6/qJjZJ0TS+hFcDhmG7ettoFWXrvdzJz+qyqyp
-         lmbjk8/143ebMAI0UDRbOViW1nVC2IpDoI+7qlUt78Lo3gUC6vhxzvaHZRi+H93o+oC1
-         BTwkAOAk+WgM7vN8gfQaI37CFIF/slGLP/6HoXNBs4H0Xv86Ul33JyNp+Ui83Ipe3SN9
-         vl+CTBTYd0hWCyL0UftgKsPhFarNEfLqt/PgQ+zFHFFh7xz6Ke17HzEPVH6G9Noydu++
-         4m9hus6kRguonxVdom2Aw6lCXmZZHZnLg+FFyRO/+/bdvqbE2TaRBKzwCCzik5yGVOqK
-         RN8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVYPSbnuw/U4BYGHE/W/aVlKPz88M9Cw+8IU/HwA/YFn88M2b4cKrUWO3CCke2jXjWSBTgzKeq/yQ9gi0q45itsigN4
-X-Gm-Message-State: AOJu0YxitTlBs3IpAfylwD7wZYAhYezBCsEBOJRHweeu9hXOb0VBc9VQ
-	x3GVlNTJxW98pc1YKwtZuBeMs5gpvwloLoHLHeYEq/p+f5itvdoIeyOGspqlzJxzH8qJ4TQenLe
-	q2odxmW3xLuHxGCT9yH5G21OZUmCG1Kggiw2Fy/6IhbQ/f1CCXw==
-X-Received: by 2002:a17:903:1250:b0:1ea:26bf:928 with SMTP id d9443c01a7336-1ef44161501mr74878935ad.50.1715459497698;
-        Sat, 11 May 2024 13:31:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJwasUoov14+GDZen/0VvvhZVxtK7I1vIGZMsS0lAp8OwoeSy+UK0QH0xibloBei2YEBMThQ==
-X-Received: by 2002:a17:903:1250:b0:1ea:26bf:928 with SMTP id d9443c01a7336-1ef44161501mr74878775ad.50.1715459497223;
-        Sat, 11 May 2024 13:31:37 -0700 (PDT)
-Received: from localhost.localdomain ([2804:1b3:a800:a9e8:e01f:c640:3398:ffe5])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c0361b2sm52236155ad.202.2024.05.11.13.31.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 11 May 2024 13:31:36 -0700 (PDT)
-From: Leonardo Bras <leobras@redhat.com>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Leonardo Bras <leobras@redhat.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
-Date: Sat, 11 May 2024 17:31:20 -0300
-Message-ID: <Zj_VmALxIhqaNgzG@LeoBras>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <e6e42572-f73b-4217-871a-37c439ec8552@paulmck-laptop>
-References: <20240511020557.1198200-1-leobras@redhat.com> <e6e42572-f73b-4217-871a-37c439ec8552@paulmck-laptop>
+	s=arc-20240116; t=1715468192; c=relaxed/simple;
+	bh=M2lNWYotTn+V6B62NM9AJg/hLTmfkjAe5ZJGudVrO6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=mijZHRq57FOj3/d5pWDTQwqOx5HxiUlnN0b3+ITA5UzAtPK35D/wdyAADVw28z3eIEW+ZByMRnxIBs9c21870AoZ+E62VhzSQprq7MgjRRSRVvz0TA2MkR3BJNuk48iZZF3yvyvNB3EkybdmGbpjCAvKc9trqxmJiAxn6M3aCVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aulYneye; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715468191; x=1747004191;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=M2lNWYotTn+V6B62NM9AJg/hLTmfkjAe5ZJGudVrO6s=;
+  b=aulYneyeiDaSjK85A1yO8ZEyAaWksgwwLFzezL700GFRjIqeaGZYjEhx
+   k2hnPFDgLQ0eM0BpN5oOo4wQKEq5WJREStkRjf1F6e9WSzH+Isq9BV08t
+   NX90TBNdLlUfsHbD9vOlgOm+5hiboC3WFqp6hVZ5pyC22GGqYK7rSwKQd
+   zlOeOp3zkZzwq4BKZTdSPsSW4VFvNVq1K3LZOAx0ZzvdZX6gTWo8q38eP
+   Y5OSWXj8p+IJ36JzRgi027v54HxBR1yPDfdMH9GfE4mk7Qn7EfTVPAWA0
+   LG1w8489wJE3AoYuywbC+IfgO7de3g0kRzuRVuI7BlJc6xUqToXkah1On
+   Q==;
+X-CSE-ConnectionGUID: l/lj/+KAQguB4XttyRER5A==
+X-CSE-MsgGUID: Y55EIaV5RYK+neCU7/Pj9Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11070"; a="22586001"
+X-IronPort-AV: E=Sophos;i="6.08,155,1712646000"; 
+   d="scan'208";a="22586001"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 May 2024 15:56:30 -0700
+X-CSE-ConnectionGUID: uL3m4BpASfqm6pqUQ8q49Q==
+X-CSE-MsgGUID: XrBiXpF/TRevXQOe/xUsCA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,155,1712646000"; 
+   d="scan'208";a="34841426"
+Received: from lkp-server01.sh.intel.com (HELO f8b243fe6e68) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 11 May 2024 15:56:27 -0700
+Received: from kbuild by f8b243fe6e68 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s5vdg-0007uh-2Y;
+	Sat, 11 May 2024 22:56:24 +0000
+Date: Sun, 12 May 2024 06:55:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Srujana Challa <schalla@marvell.com>
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Vamsi Attunuru <vattunuru@marvell.com>,
+	Shijith Thotton <sthotton@marvell.com>,
+	Nithin Dabilpuram <ndabilpuram@marvell.com>
+Subject: [mst-vhost:vhost 54/54]
+ drivers/vdpa/octeon_ep/octep_vdpa_main.c:538:25: error: implicit declaration
+ of function 'readq'; did you mean 'readl'?
+Message-ID: <202405120615.TTwouGSU-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,136 +82,101 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 
-On Sat, May 11, 2024 at 07:55:55AM -0700, Paul E. McKenney wrote:
-> On Fri, May 10, 2024 at 11:05:56PM -0300, Leonardo Bras wrote:
-> > As of today, KVM notes a quiescent state only in guest entry, which is good
-> > as it avoids the guest being interrupted for current RCU operations.
-> > 
-> > While the guest vcpu runs, it can be interrupted by a timer IRQ that will
-> > check for any RCU operations waiting for this CPU. In case there are any of
-> > such, it invokes rcu_core() in order to sched-out the current thread and
-> > note a quiescent state.
-> > 
-> > This occasional schedule work will introduce tens of microsseconds of
-> > latency, which is really bad for vcpus running latency-sensitive
-> > applications, such as real-time workloads.
-> > 
-> > So, note a quiescent state in guest exit, so the interrupted guests is able
-> > to deal with any pending RCU operations before being required to invoke
-> > rcu_core(), and thus avoid the overhead of related scheduler work.
-> > 
-> > Signed-off-by: Leonardo Bras <leobras@redhat.com>
-> 
-> Acked-by: Paul E. McKenney <paulmck@kernel.org>
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+head:   0a0b17725dd921ed0364cd217a100ed0ed85c8c1
+commit: 0a0b17725dd921ed0364cd217a100ed0ed85c8c1 [54/54] virtio: vdpa: vDPA driver for Marvell OCTEON DPU devices
+config: mips-allmodconfig (https://download.01.org/0day-ci/archive/20240512/202405120615.TTwouGSU-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240512/202405120615.TTwouGSU-lkp@intel.com/reproduce)
 
-Thanks!
-Leo
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405120615.TTwouGSU-lkp@intel.com/
 
-> 
-> > ---
-> > 
-> > ps: A patch fixing this same issue was discussed in this thread:
-> > https://lore.kernel.org/all/20240328171949.743211-1-leobras@redhat.com/
-> > 
-> > Also, this can be paired with a new RCU option (rcutree.nocb_patience_delay)
-> > to avoid having invoke_rcu() being called on grace-periods starting between
-> > guest exit and the timer IRQ. This RCU option is being discussed in a
-> > sub-thread of this message:
-> > https://lore.kernel.org/all/5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop/
-> > 
-> > 
-> >  include/linux/context_tracking.h |  6 ++++--
-> >  include/linux/kvm_host.h         | 10 +++++++++-
-> >  2 files changed, 13 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/include/linux/context_tracking.h b/include/linux/context_tracking.h
-> > index 6e76b9dba00e..8a78fabeafc3 100644
-> > --- a/include/linux/context_tracking.h
-> > +++ b/include/linux/context_tracking.h
-> > @@ -73,39 +73,41 @@ static inline void exception_exit(enum ctx_state prev_ctx)
-> >  }
-> >  
-> >  static __always_inline bool context_tracking_guest_enter(void)
-> >  {
-> >  	if (context_tracking_enabled())
-> >  		__ct_user_enter(CONTEXT_GUEST);
-> >  
-> >  	return context_tracking_enabled_this_cpu();
-> >  }
-> >  
-> > -static __always_inline void context_tracking_guest_exit(void)
-> > +static __always_inline bool context_tracking_guest_exit(void)
-> >  {
-> >  	if (context_tracking_enabled())
-> >  		__ct_user_exit(CONTEXT_GUEST);
-> > +
-> > +	return context_tracking_enabled_this_cpu();
-> >  }
-> >  
-> >  #define CT_WARN_ON(cond) WARN_ON(context_tracking_enabled() && (cond))
-> >  
-> >  #else
-> >  static inline void user_enter(void) { }
-> >  static inline void user_exit(void) { }
-> >  static inline void user_enter_irqoff(void) { }
-> >  static inline void user_exit_irqoff(void) { }
-> >  static inline int exception_enter(void) { return 0; }
-> >  static inline void exception_exit(enum ctx_state prev_ctx) { }
-> >  static inline int ct_state(void) { return -1; }
-> >  static inline int __ct_state(void) { return -1; }
-> >  static __always_inline bool context_tracking_guest_enter(void) { return false; }
-> > -static __always_inline void context_tracking_guest_exit(void) { }
-> > +static __always_inline bool context_tracking_guest_exit(void) { return false; }
-> >  #define CT_WARN_ON(cond) do { } while (0)
-> >  #endif /* !CONFIG_CONTEXT_TRACKING_USER */
-> >  
-> >  #ifdef CONFIG_CONTEXT_TRACKING_USER_FORCE
-> >  extern void context_tracking_init(void);
-> >  #else
-> >  static inline void context_tracking_init(void) { }
-> >  #endif /* CONFIG_CONTEXT_TRACKING_USER_FORCE */
-> >  
-> >  #ifdef CONFIG_CONTEXT_TRACKING_IDLE
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 48f31dcd318a..e37724c44843 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -480,21 +480,29 @@ static __always_inline void guest_state_enter_irqoff(void)
-> >  /*
-> >   * Exit guest context and exit an RCU extended quiescent state.
-> >   *
-> >   * Between guest_context_enter_irqoff() and guest_context_exit_irqoff() it is
-> >   * unsafe to use any code which may directly or indirectly use RCU, tracing
-> >   * (including IRQ flag tracing), or lockdep. All code in this period must be
-> >   * non-instrumentable.
-> >   */
-> >  static __always_inline void guest_context_exit_irqoff(void)
-> >  {
-> > -	context_tracking_guest_exit();
-> > +	/*
-> > +	 * Guest mode is treated as a quiescent state, see
-> > +	 * guest_context_enter_irqoff() for more details.
-> > +	 */
-> > +	if (!context_tracking_guest_exit()) {
-> > +		instrumentation_begin();
-> > +		rcu_virt_note_context_switch();
-> > +		instrumentation_end();
-> > +	}
-> >  }
-> >  
-> >  /*
-> >   * Stop accounting time towards a guest.
-> >   * Must be called after exiting guest context.
-> >   */
-> >  static __always_inline void guest_timing_exit_irqoff(void)
-> >  {
-> >  	instrumentation_begin();
-> >  	/* Flush the guest cputime we spent on the guest */
-> > -- 
-> > 2.45.0
-> > 
-> 
+All error/warnings (new ones prefixed by >>):
 
+   drivers/vdpa/octeon_ep/octep_vdpa_main.c: In function 'get_device_ready_status':
+>> drivers/vdpa/octeon_ep/octep_vdpa_main.c:538:25: error: implicit declaration of function 'readq'; did you mean 'readl'? [-Werror=implicit-function-declaration]
+     538 |         u64 signature = readq(addr + OCTEP_VF_MBOX_DATA(0));
+         |                         ^~~~~
+         |                         readl
+>> drivers/vdpa/octeon_ep/octep_vdpa_main.c:541:17: error: implicit declaration of function 'writeq'; did you mean 'writel'? [-Werror=implicit-function-declaration]
+     541 |                 writeq(0, addr + OCTEP_VF_MBOX_DATA(0));
+         |                 ^~~~~~
+         |                 writel
+   cc1: some warnings being treated as errors
+--
+   In file included from include/linux/device.h:15,
+                    from include/linux/pci.h:37,
+                    from drivers/vdpa/octeon_ep/octep_vdpa.h:7,
+                    from drivers/vdpa/octeon_ep/octep_vdpa_hw.c:6:
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c: In function 'octep_hw_caps_read':
+>> drivers/vdpa/octeon_ep/octep_vdpa_hw.c:478:60: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     478 |         dev_info(dev, "common cfg mapped at: 0x%016llx\n", (u64)oct_hw->common_cfg);
+         |                                                            ^
+   include/linux/dev_printk.h:110:37: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                                     ^~~~~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:478:9: note: in expansion of macro 'dev_info'
+     478 |         dev_info(dev, "common cfg mapped at: 0x%016llx\n", (u64)oct_hw->common_cfg);
+         |         ^~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:479:60: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     479 |         dev_info(dev, "device cfg mapped at: 0x%016llx\n", (u64)oct_hw->dev_cfg);
+         |                                                            ^
+   include/linux/dev_printk.h:110:37: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                                     ^~~~~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:479:9: note: in expansion of macro 'dev_info'
+     479 |         dev_info(dev, "device cfg mapped at: 0x%016llx\n", (u64)oct_hw->dev_cfg);
+         |         ^~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:480:57: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     480 |         dev_info(dev, "isr cfg mapped at: 0x%016llx\n", (u64)oct_hw->isr);
+         |                                                         ^
+   include/linux/dev_printk.h:110:37: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                                     ^~~~~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:480:9: note: in expansion of macro 'dev_info'
+     480 |         dev_info(dev, "isr cfg mapped at: 0x%016llx\n", (u64)oct_hw->isr);
+         |         ^~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:482:18: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     482 |                  (u64)oct_hw->notify_base, oct_hw->notify_off_multiplier);
+         |                  ^
+   include/linux/dev_printk.h:110:37: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                                     ^~~~~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:481:9: note: in expansion of macro 'dev_info'
+     481 |         dev_info(dev, "notify base: 0x%016llx, notify off multiplier: %u\n",
+         |         ^~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:514:54: warning: cast from pointer to integer of different size [-Wpointer-to-int-cast]
+     514 |         dev_info(dev, "mbox mapped at: 0x%016llx\n", (u64)mbox);
+         |                                                      ^
+   include/linux/dev_printk.h:110:37: note: in definition of macro 'dev_printk_index_wrap'
+     110 |                 _p_func(dev, fmt, ##__VA_ARGS__);                       \
+         |                                     ^~~~~~~~~~~
+   drivers/vdpa/octeon_ep/octep_vdpa_hw.c:514:9: note: in expansion of macro 'dev_info'
+     514 |         dev_info(dev, "mbox mapped at: 0x%016llx\n", (u64)mbox);
+         |         ^~~~~~~~
+
+
+vim +538 drivers/vdpa/octeon_ep/octep_vdpa_main.c
+
+   535	
+   536	static bool get_device_ready_status(u8 __iomem *addr)
+   537	{
+ > 538		u64 signature = readq(addr + OCTEP_VF_MBOX_DATA(0));
+   539	
+   540		if (signature == OCTEP_DEV_READY_SIGNATURE) {
+ > 541			writeq(0, addr + OCTEP_VF_MBOX_DATA(0));
+   542			return true;
+   543		}
+   544	
+   545		return false;
+   546	}
+   547	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
