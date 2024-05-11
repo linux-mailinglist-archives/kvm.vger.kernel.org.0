@@ -1,146 +1,231 @@
-Return-Path: <kvm+bounces-17261-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EC38C32D3
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 19:17:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCB778C33C2
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 22:31:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5CACB21033
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 17:17:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284CC282003
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 20:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8311021350;
-	Sat, 11 May 2024 17:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18AD9219E0;
+	Sat, 11 May 2024 20:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="U/jljERU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tt/8r/UE"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-bc0b.mail.infomaniak.ch (smtp-bc0b.mail.infomaniak.ch [45.157.188.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49A822EF2
-	for <kvm@vger.kernel.org>; Sat, 11 May 2024 17:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659271CD11
+	for <kvm@vger.kernel.org>; Sat, 11 May 2024 20:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715447708; cv=none; b=I3FPyXaTHdn5Sr5c8rboOztTuyJhOEhYI4qq+zYBtFV5yW1PkVzk5stYaED+GD6/NWUyPYooxhjbgemfHVx+Dgjo645JL0dTrn9yiV8c2IU42u7FcNGQwa5KkpkbRSCZekY4GBx93t6RMK87dJ5AxktzJfEG08E5ZJFkS3GGaLE=
+	t=1715459503; cv=none; b=UsXj4eBYrpSfhg15UJ9MEuQmBtQzWazXjgCXQ+nEBmIa3iZTK7dljSCZWgDC5koB/T08AHhsEIv7axKjr6sd4cw5wvWG+wj8tmiGnMUSQe5pg/+d0IH8TXP5RjzII9AWZykSAVpWpVm3Qc66SmQuCh21O5nMMeyLKjgLdcpGrXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715447708; c=relaxed/simple;
-	bh=788u9Ll57Ys8HanKTUXYX18fyulkHMSJMNamEoiF3dE=;
+	s=arc-20240116; t=1715459503; c=relaxed/simple;
+	bh=ZJCjeTD4BIzJC78hCBnDbdYDSIfpi5tTg6nMh5euC6I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LmMg/4zoMN9pIxWnnZllBxq6vrGhF0ECAqHq238dpJUYKtT9E2JaW7IHQbfIW25Tgh+GTXoUs7IcPcvF0eYk+LiRPn9jmEklCVl/ievWjrvgCfutivg7gkzUtcGmGUrcGCZGASajuAuP15N6SZ/R9O3fuAH2XTbYa6m07+yTH0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=U/jljERU; arc=none smtp.client-ip=45.157.188.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VcC6v6TSMzkr2;
-	Sat, 11 May 2024 19:15:03 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1715447703;
-	bh=iC1DSJl1PeqWX6x9aSS4+KXcksdR90artpUmueb/AB0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=U/jljERUOqe/Z4nt3Hwt5Pj28zTqnanMqp8O9vWLFujZOzL7mXfibxaPV2aInBVjt
-	 jn4aAQ9WNxHiiwOzj/TWzTYsRS2Ywi1OmWkqiPP2Y+N8A7mY8xxG56gbmoSpvKIwZs
-	 r+QLALDEbqltuGI3sqESUbU/71VJtaTh1bj9WBCU=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VcC6v0xg5z82q;
-	Sat, 11 May 2024 19:15:03 +0200 (CEST)
-From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-To: Christian Brauner <brauner@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Kees Cook <keescook@chromium.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Mark Brown <broonie@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
+	 MIME-Version:Content-Type:Content-Disposition; b=REPQkW854lC8vo1d78g0slwk8lSwtHl+aL8+ADUU7wqQi7MfkNwMKMFzfzL5pjYn89SHHW+JhnpwRyXdeerK0k50/Iknmog2vMwrddEflqUC8jXeGIu7t8wVZB1+dJ0zprhJoMukH4+RIJyuMh9zaPqx1G8ELXvXbAYEH4AJObQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Tt/8r/UE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715459500;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xzSjQIEMrJJgZniLc2C8D6P/avkSP2th2xNzph1s0BM=;
+	b=Tt/8r/UERJVfHFDImukiBeQfDEvssXxOM9LEmjwyd0i8qnayTXGvcQLR7u+42/Rm+9KyUD
+	KbjKIDxgSw1vrm4iPAUn7Qx7CLJufsq5pDrzKd1HlYkMaJz1+jtlhMCRhLSYT9WlZrJNOn
+	xZVK9iA8xQkALKtKv2/YG51cbTEhQfw=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-214-5T_Gx13vObuyLjGnckRjhw-1; Sat, 11 May 2024 16:31:39 -0400
+X-MC-Unique: 5T_Gx13vObuyLjGnckRjhw-1
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1ec620ccf77so23020765ad.0
+        for <kvm@vger.kernel.org>; Sat, 11 May 2024 13:31:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715459498; x=1716064298;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xzSjQIEMrJJgZniLc2C8D6P/avkSP2th2xNzph1s0BM=;
+        b=fmWc+aiNGEVwhIlRUMJeyKRbdDbb6/qJjZJ0TS+hFcDhmG7ettoFWXrvdzJz+qyqyp
+         lmbjk8/143ebMAI0UDRbOViW1nVC2IpDoI+7qlUt78Lo3gUC6vhxzvaHZRi+H93o+oC1
+         BTwkAOAk+WgM7vN8gfQaI37CFIF/slGLP/6HoXNBs4H0Xv86Ul33JyNp+Ui83Ipe3SN9
+         vl+CTBTYd0hWCyL0UftgKsPhFarNEfLqt/PgQ+zFHFFh7xz6Ke17HzEPVH6G9Noydu++
+         4m9hus6kRguonxVdom2Aw6lCXmZZHZnLg+FFyRO/+/bdvqbE2TaRBKzwCCzik5yGVOqK
+         RN8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVYPSbnuw/U4BYGHE/W/aVlKPz88M9Cw+8IU/HwA/YFn88M2b4cKrUWO3CCke2jXjWSBTgzKeq/yQ9gi0q45itsigN4
+X-Gm-Message-State: AOJu0YxitTlBs3IpAfylwD7wZYAhYezBCsEBOJRHweeu9hXOb0VBc9VQ
+	x3GVlNTJxW98pc1YKwtZuBeMs5gpvwloLoHLHeYEq/p+f5itvdoIeyOGspqlzJxzH8qJ4TQenLe
+	q2odxmW3xLuHxGCT9yH5G21OZUmCG1Kggiw2Fy/6IhbQ/f1CCXw==
+X-Received: by 2002:a17:903:1250:b0:1ea:26bf:928 with SMTP id d9443c01a7336-1ef44161501mr74878935ad.50.1715459497698;
+        Sat, 11 May 2024 13:31:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJwasUoov14+GDZen/0VvvhZVxtK7I1vIGZMsS0lAp8OwoeSy+UK0QH0xibloBei2YEBMThQ==
+X-Received: by 2002:a17:903:1250:b0:1ea:26bf:928 with SMTP id d9443c01a7336-1ef44161501mr74878775ad.50.1715459497223;
+        Sat, 11 May 2024 13:31:37 -0700 (PDT)
+Received: from localhost.localdomain ([2804:1b3:a800:a9e8:e01f:c640:3398:ffe5])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c0361b2sm52236155ad.202.2024.05.11.13.31.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 11 May 2024 13:31:36 -0700 (PDT)
+From: Leonardo Bras <leobras@redhat.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Leonardo Bras <leobras@redhat.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
-	Shengyu Li <shengyu.li.evgeny@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Brendan Higgins <brendanhiggins@google.com>,
-	David Gow <davidgow@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Ron Economos <re@w6rz.net>,
-	Ronald Warsow <rwarsow@gmx.de>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Will Drewry <wad@chromium.org>,
-	kernel test robot <oliver.sang@intel.com>,
-	kvm@vger.kernel.org,
+	Marcelo Tosatti <mtosatti@redhat.com>,
 	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH v7 10/10] selftests/harness: Handle TEST_F()'s explicit exit codes
-Date: Sat, 11 May 2024 19:14:45 +0200
-Message-ID: <20240511171445.904356-11-mic@digikod.net>
-In-Reply-To: <20240511171445.904356-1-mic@digikod.net>
-References: <20240511171445.904356-1-mic@digikod.net>
+	kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
+Date: Sat, 11 May 2024 17:31:20 -0300
+Message-ID: <Zj_VmALxIhqaNgzG@LeoBras>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <e6e42572-f73b-4217-871a-37c439ec8552@paulmck-laptop>
+References: <20240511020557.1198200-1-leobras@redhat.com> <e6e42572-f73b-4217-871a-37c439ec8552@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
 
-If TEST_F() explicitly calls exit(code) with code different than 0, then
-_metadata->exit_code is set to this code (e.g. KVM_ONE_VCPU_TEST()).  We
-need to keep in mind that _metadata->exit_code can be KSFT_SKIP while
-the process exit code is 0.
+On Sat, May 11, 2024 at 07:55:55AM -0700, Paul E. McKenney wrote:
+> On Fri, May 10, 2024 at 11:05:56PM -0300, Leonardo Bras wrote:
+> > As of today, KVM notes a quiescent state only in guest entry, which is good
+> > as it avoids the guest being interrupted for current RCU operations.
+> > 
+> > While the guest vcpu runs, it can be interrupted by a timer IRQ that will
+> > check for any RCU operations waiting for this CPU. In case there are any of
+> > such, it invokes rcu_core() in order to sched-out the current thread and
+> > note a quiescent state.
+> > 
+> > This occasional schedule work will introduce tens of microsseconds of
+> > latency, which is really bad for vcpus running latency-sensitive
+> > applications, such as real-time workloads.
+> > 
+> > So, note a quiescent state in guest exit, so the interrupted guests is able
+> > to deal with any pending RCU operations before being required to invoke
+> > rcu_core(), and thus avoid the overhead of related scheduler work.
+> > 
+> > Signed-off-by: Leonardo Bras <leobras@redhat.com>
+> 
+> Acked-by: Paul E. McKenney <paulmck@kernel.org>
 
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Kees Cook <keescook@chromium.org>
-Cc: Mark Brown <broonie@kernel.org>
-Cc: Shuah Khan <shuah@kernel.org>
-Cc: Will Drewry <wad@chromium.org>
-Reported-by: Sean Christopherson <seanjc@google.com>
-Tested-by: Sean Christopherson <seanjc@google.com>
-Closes: https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com
-Fixes: 0710a1a73fb4 ("selftests/harness: Merge TEST_F_FORK() into TEST_F()")
-Signed-off-by: Mickaël Salaün <mic@digikod.net>
-Link: https://lore.kernel.org/r/20240511171445.904356-11-mic@digikod.net
----
+Thanks!
+Leo
 
-Changes since v5:
-* Update commit message as suggested by Sean.
-
-Changes since v4:
-* Check abort status when the grandchild exited.
-* Keep the _exit(0) calls because _metadata->exit_code is always
-  checked.
-* Only set _metadata->exit_code to WEXITSTATUS() if it is not zero.
-
-Changes since v3:
-* New patch mainly from Sean Christopherson.
----
- tools/testing/selftests/kselftest_harness.h | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-index cbedb4a6cf7b..3c8f2965c285 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -462,9 +462,13 @@ static inline pid_t clone3_vfork(void)
- 		munmap(teardown, sizeof(*teardown)); \
- 		if (self && fixture_name##_teardown_parent) \
- 			munmap(self, sizeof(*self)); \
--		if (!WIFEXITED(status) && WIFSIGNALED(status)) \
-+		if (WIFEXITED(status)) { \
-+			if (WEXITSTATUS(status)) \
-+				_metadata->exit_code = WEXITSTATUS(status); \
-+		} else if (WIFSIGNALED(status)) { \
- 			/* Forward signal to __wait_for_test(). */ \
- 			kill(getpid(), WTERMSIG(status)); \
-+		} \
- 		__test_check_assert(_metadata); \
- 	} \
- 	static struct __test_metadata *_##fixture_name##_##test_name##_object; \
--- 
-2.45.0
+> 
+> > ---
+> > 
+> > ps: A patch fixing this same issue was discussed in this thread:
+> > https://lore.kernel.org/all/20240328171949.743211-1-leobras@redhat.com/
+> > 
+> > Also, this can be paired with a new RCU option (rcutree.nocb_patience_delay)
+> > to avoid having invoke_rcu() being called on grace-periods starting between
+> > guest exit and the timer IRQ. This RCU option is being discussed in a
+> > sub-thread of this message:
+> > https://lore.kernel.org/all/5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop/
+> > 
+> > 
+> >  include/linux/context_tracking.h |  6 ++++--
+> >  include/linux/kvm_host.h         | 10 +++++++++-
+> >  2 files changed, 13 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/include/linux/context_tracking.h b/include/linux/context_tracking.h
+> > index 6e76b9dba00e..8a78fabeafc3 100644
+> > --- a/include/linux/context_tracking.h
+> > +++ b/include/linux/context_tracking.h
+> > @@ -73,39 +73,41 @@ static inline void exception_exit(enum ctx_state prev_ctx)
+> >  }
+> >  
+> >  static __always_inline bool context_tracking_guest_enter(void)
+> >  {
+> >  	if (context_tracking_enabled())
+> >  		__ct_user_enter(CONTEXT_GUEST);
+> >  
+> >  	return context_tracking_enabled_this_cpu();
+> >  }
+> >  
+> > -static __always_inline void context_tracking_guest_exit(void)
+> > +static __always_inline bool context_tracking_guest_exit(void)
+> >  {
+> >  	if (context_tracking_enabled())
+> >  		__ct_user_exit(CONTEXT_GUEST);
+> > +
+> > +	return context_tracking_enabled_this_cpu();
+> >  }
+> >  
+> >  #define CT_WARN_ON(cond) WARN_ON(context_tracking_enabled() && (cond))
+> >  
+> >  #else
+> >  static inline void user_enter(void) { }
+> >  static inline void user_exit(void) { }
+> >  static inline void user_enter_irqoff(void) { }
+> >  static inline void user_exit_irqoff(void) { }
+> >  static inline int exception_enter(void) { return 0; }
+> >  static inline void exception_exit(enum ctx_state prev_ctx) { }
+> >  static inline int ct_state(void) { return -1; }
+> >  static inline int __ct_state(void) { return -1; }
+> >  static __always_inline bool context_tracking_guest_enter(void) { return false; }
+> > -static __always_inline void context_tracking_guest_exit(void) { }
+> > +static __always_inline bool context_tracking_guest_exit(void) { return false; }
+> >  #define CT_WARN_ON(cond) do { } while (0)
+> >  #endif /* !CONFIG_CONTEXT_TRACKING_USER */
+> >  
+> >  #ifdef CONFIG_CONTEXT_TRACKING_USER_FORCE
+> >  extern void context_tracking_init(void);
+> >  #else
+> >  static inline void context_tracking_init(void) { }
+> >  #endif /* CONFIG_CONTEXT_TRACKING_USER_FORCE */
+> >  
+> >  #ifdef CONFIG_CONTEXT_TRACKING_IDLE
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index 48f31dcd318a..e37724c44843 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -480,21 +480,29 @@ static __always_inline void guest_state_enter_irqoff(void)
+> >  /*
+> >   * Exit guest context and exit an RCU extended quiescent state.
+> >   *
+> >   * Between guest_context_enter_irqoff() and guest_context_exit_irqoff() it is
+> >   * unsafe to use any code which may directly or indirectly use RCU, tracing
+> >   * (including IRQ flag tracing), or lockdep. All code in this period must be
+> >   * non-instrumentable.
+> >   */
+> >  static __always_inline void guest_context_exit_irqoff(void)
+> >  {
+> > -	context_tracking_guest_exit();
+> > +	/*
+> > +	 * Guest mode is treated as a quiescent state, see
+> > +	 * guest_context_enter_irqoff() for more details.
+> > +	 */
+> > +	if (!context_tracking_guest_exit()) {
+> > +		instrumentation_begin();
+> > +		rcu_virt_note_context_switch();
+> > +		instrumentation_end();
+> > +	}
+> >  }
+> >  
+> >  /*
+> >   * Stop accounting time towards a guest.
+> >   * Must be called after exiting guest context.
+> >   */
+> >  static __always_inline void guest_timing_exit_irqoff(void)
+> >  {
+> >  	instrumentation_begin();
+> >  	/* Flush the guest cputime we spent on the guest */
+> > -- 
+> > 2.45.0
+> > 
+> 
 
 
