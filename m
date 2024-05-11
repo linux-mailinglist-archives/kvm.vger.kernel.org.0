@@ -1,191 +1,171 @@
-Return-Path: <kvm+bounces-17252-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17254-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E59D48C31F9
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 16:56:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F5818C32B8
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 19:15:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FA36281D45
-	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 14:56:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40BB21F219D2
+	for <lists+kvm@lfdr.de>; Sat, 11 May 2024 17:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E25356448;
-	Sat, 11 May 2024 14:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29A65208A9;
+	Sat, 11 May 2024 17:15:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UtnLedF1"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="N0dHxiYm"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-bc0e.mail.infomaniak.ch (smtp-bc0e.mail.infomaniak.ch [45.157.188.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D051E526;
-	Sat, 11 May 2024 14:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69CD1B960;
+	Sat, 11 May 2024 17:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715439356; cv=none; b=JurrWZECkNLrBiuqhjIDnn4SROBdSuuzLbJl95J208h59z/cqN4VladiDzl0o1t6tG/83P/PJtORnsbohNh8ywQ/3UXvk1mnKP8I8T4JbGbfBpffH1q5PeQPyGzAEt3xTFQiL4+4EyuKkU0RjoVu6nG8M5thcsNEYYYSM0Z8OYE=
+	t=1715447704; cv=none; b=Z1eIEyRGMqv0Z+mD6K2hHBoaO19WPtMHYR/VirtFHO8HfL3FWkzyU20AzgjgkOEmjuCy4iEWlg0rLaY9FkCIT06FXiNHeJcMpWTZh0IrLBdFZLM8hO0scXM6l8ASeFmoXGH61PczL6rodMPwK4JDxdyGaM7JYCZEIEyAaIZuXHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715439356; c=relaxed/simple;
-	bh=6DaDv/aTgU/LZfJ58oDLB7kdos+gFtmzwvnoGqwfpIA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A0fvAOSg7AXs0/dh0RGnv0N036DARCRNmVLPbZynpJw4JVWXyGuopaHNzzOft6VRSxmm2/I6Sl51AnKb0MKrMp2fdlkeXo1h77TQS7NW5/WkyMF/r7+VTuEbuQ7yD34meSWcPqrtUQ9aPxDoFJtDSbpSY4uaZCvd+eWisZ8o5GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UtnLedF1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21487C2BD11;
-	Sat, 11 May 2024 14:55:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715439356;
-	bh=6DaDv/aTgU/LZfJ58oDLB7kdos+gFtmzwvnoGqwfpIA=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=UtnLedF1ycLpwyfLm9aXe0rro8YcpWVqtOydbHroNV3uMetv/7QUqr6trC1JwysyI
-	 wdmx+WUWMgIdLaTGWacx9L9XHop1frC8AYexeE4mVwVkzj6QPz8INx84yVNaHNVPzO
-	 5svWuehf9w5QsiMqkRkJkSJAmwNbgzUlWq3alZ2oziE1vkHPBm8cPJ2xadmeWGdcHv
-	 T2GmPV1pwgc07EQN0p6j0Bzy7pvsTyl5G4P5YtohmaCAbrrLUwkWXhgz34vTB57YBb
-	 r7A2sCTvdIXsG31yGmCBpv1xxuaOqWwkB9SsMMJ5ywB0NBlg31sJ4+5eWycP5Yn6Xk
-	 GNahXig56Du0g==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id C01D1CE0F8E; Sat, 11 May 2024 07:55:55 -0700 (PDT)
-Date: Sat, 11 May 2024 07:55:55 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Leonardo Bras <leobras@redhat.com>
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
+	s=arc-20240116; t=1715447704; c=relaxed/simple;
+	bh=+tQTqpBZCO71TI+xI+ycJvxEwQZ2ovGc4EulihGFtA4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EEnRLHdmtcKiWLYY/h+7m25p4NXyl9CzmN0drRzPzxO3DQ3wEafrLabngauep2U6OXlCc4eQZWCF2T2EZCE5Zq9xYygEMUQQd3spnl5e/cP6knayhNrMBN+bvyVVapv+FARShPjGeGmkoXj5GaUwrQCk+GSqCqmRUKxn/Jj7hNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=N0dHxiYm; arc=none smtp.client-ip=45.157.188.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VcC6g06BzzZwN;
+	Sat, 11 May 2024 19:14:51 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1715447690;
+	bh=AhX78OfDbhvNohV5s96n3dHIuZwZXD9GikV+VwHjPBk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=N0dHxiYmx8vVCys6IRVXrYH2dIepVwv2/zMpcy+tQzcVlIsHRbh/USCROwlSJ6UnD
+	 4Bh6tkCOOX2dNo9htOlBc63EMhcAuI3Z6Rn7RFHEGt3VmFLvAIIxtqFD4XL9Sa5r4m
+	 ZOAauyRkkzriLHck1Jl9r4HjGL+PSbfDZBHJ9mi4=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VcC6c3FkrzRFZ;
+	Sat, 11 May 2024 19:14:48 +0200 (CEST)
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+To: Christian Brauner <brauner@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mark Brown <broonie@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
 	Sean Christopherson <seanjc@google.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
-Message-ID: <e6e42572-f73b-4217-871a-37c439ec8552@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240511020557.1198200-1-leobras@redhat.com>
+	Shengyu Li <shengyu.li.evgeny@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	Ron Economos <re@w6rz.net>,
+	Ronald Warsow <rwarsow@gmx.de>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Will Drewry <wad@chromium.org>,
+	kernel test robot <oliver.sang@intel.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH v7 00/10] Fix Kselftest's vfork() side effects
+Date: Sat, 11 May 2024 19:14:35 +0200
+Message-ID: <20240511171445.904356-1-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240511020557.1198200-1-leobras@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-On Fri, May 10, 2024 at 11:05:56PM -0300, Leonardo Bras wrote:
-> As of today, KVM notes a quiescent state only in guest entry, which is good
-> as it avoids the guest being interrupted for current RCU operations.
-> 
-> While the guest vcpu runs, it can be interrupted by a timer IRQ that will
-> check for any RCU operations waiting for this CPU. In case there are any of
-> such, it invokes rcu_core() in order to sched-out the current thread and
-> note a quiescent state.
-> 
-> This occasional schedule work will introduce tens of microsseconds of
-> latency, which is really bad for vcpus running latency-sensitive
-> applications, such as real-time workloads.
-> 
-> So, note a quiescent state in guest exit, so the interrupted guests is able
-> to deal with any pending RCU operations before being required to invoke
-> rcu_core(), and thus avoid the overhead of related scheduler work.
-> 
-> Signed-off-by: Leonardo Bras <leobras@redhat.com>
+Hi,
 
-Acked-by: Paul E. McKenney <paulmck@kernel.org>
+This seven series fix an issue reported by kernel test robot [3].
 
-> ---
-> 
-> ps: A patch fixing this same issue was discussed in this thread:
-> https://lore.kernel.org/all/20240328171949.743211-1-leobras@redhat.com/
-> 
-> Also, this can be paired with a new RCU option (rcutree.nocb_patience_delay)
-> to avoid having invoke_rcu() being called on grace-periods starting between
-> guest exit and the timer IRQ. This RCU option is being discussed in a
-> sub-thread of this message:
-> https://lore.kernel.org/all/5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop/
-> 
-> 
->  include/linux/context_tracking.h |  6 ++++--
->  include/linux/kvm_host.h         | 10 +++++++++-
->  2 files changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/context_tracking.h b/include/linux/context_tracking.h
-> index 6e76b9dba00e..8a78fabeafc3 100644
-> --- a/include/linux/context_tracking.h
-> +++ b/include/linux/context_tracking.h
-> @@ -73,39 +73,41 @@ static inline void exception_exit(enum ctx_state prev_ctx)
->  }
->  
->  static __always_inline bool context_tracking_guest_enter(void)
->  {
->  	if (context_tracking_enabled())
->  		__ct_user_enter(CONTEXT_GUEST);
->  
->  	return context_tracking_enabled_this_cpu();
->  }
->  
-> -static __always_inline void context_tracking_guest_exit(void)
-> +static __always_inline bool context_tracking_guest_exit(void)
->  {
->  	if (context_tracking_enabled())
->  		__ct_user_exit(CONTEXT_GUEST);
-> +
-> +	return context_tracking_enabled_this_cpu();
->  }
->  
->  #define CT_WARN_ON(cond) WARN_ON(context_tracking_enabled() && (cond))
->  
->  #else
->  static inline void user_enter(void) { }
->  static inline void user_exit(void) { }
->  static inline void user_enter_irqoff(void) { }
->  static inline void user_exit_irqoff(void) { }
->  static inline int exception_enter(void) { return 0; }
->  static inline void exception_exit(enum ctx_state prev_ctx) { }
->  static inline int ct_state(void) { return -1; }
->  static inline int __ct_state(void) { return -1; }
->  static __always_inline bool context_tracking_guest_enter(void) { return false; }
-> -static __always_inline void context_tracking_guest_exit(void) { }
-> +static __always_inline bool context_tracking_guest_exit(void) { return false; }
->  #define CT_WARN_ON(cond) do { } while (0)
->  #endif /* !CONFIG_CONTEXT_TRACKING_USER */
->  
->  #ifdef CONFIG_CONTEXT_TRACKING_USER_FORCE
->  extern void context_tracking_init(void);
->  #else
->  static inline void context_tracking_init(void) { }
->  #endif /* CONFIG_CONTEXT_TRACKING_USER_FORCE */
->  
->  #ifdef CONFIG_CONTEXT_TRACKING_IDLE
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 48f31dcd318a..e37724c44843 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -480,21 +480,29 @@ static __always_inline void guest_state_enter_irqoff(void)
->  /*
->   * Exit guest context and exit an RCU extended quiescent state.
->   *
->   * Between guest_context_enter_irqoff() and guest_context_exit_irqoff() it is
->   * unsafe to use any code which may directly or indirectly use RCU, tracing
->   * (including IRQ flag tracing), or lockdep. All code in this period must be
->   * non-instrumentable.
->   */
->  static __always_inline void guest_context_exit_irqoff(void)
->  {
-> -	context_tracking_guest_exit();
-> +	/*
-> +	 * Guest mode is treated as a quiescent state, see
-> +	 * guest_context_enter_irqoff() for more details.
-> +	 */
-> +	if (!context_tracking_guest_exit()) {
-> +		instrumentation_begin();
-> +		rcu_virt_note_context_switch();
-> +		instrumentation_end();
-> +	}
->  }
->  
->  /*
->   * Stop accounting time towards a guest.
->   * Must be called after exiting guest context.
->   */
->  static __always_inline void guest_timing_exit_irqoff(void)
->  {
->  	instrumentation_begin();
->  	/* Flush the guest cputime we spent on the guest */
-> -- 
-> 2.45.0
-> 
+Shuah,  I (as well as Kees and Sean [4]) think this should be in -next
+really soon to make sure everything works fine for the v6.9 release,
+which is not currently the case.  I cannot test against all kselftests
+though.  I would prefer to let you handle this, but I guess you're not
+able to do so and I'll push it on my branch without reply from you.
+Even if I push it on my branch, please push it on yours too as soon as
+you see this and I'll remove it from mine.
+
+Mark, Jakub, could you please test this series?
+
+As reported by Kernel Test Robot [1] and Sean Christopherson [2], some
+tests fail since v6.9-rc1 .  This is due to the use of vfork() which
+introduced some side effects.  Similarly, while making it more generic,
+a previous commit made some Landlock file system tests flaky, and
+subject to the host's file system mount configuration.
+
+This series fixes all these side effects by replacing vfork() with
+clone3() and CLONE_VFORK, which is cleaner (no arbitrary shared memory)
+and makes the Kselftest framework more robust.
+
+I tried different approaches and I found this one to be the cleaner and
+less invasive for current test cases.
+
+I successfully ran the following tests (using TEST_F and
+fork/clone/clone3, and KVM_ONE_VCPU_TEST) with this series:
+- kvm:fix_hypercall_test
+- kvm:sync_regs_test
+- kvm:userspace_msr_exit_test
+- kvm:vmx_pmu_caps_test
+- landlock:fs_test
+- landlock:net_test
+- landlock:ptrace_test
+- move_mount_set_group:move_mount_set_group_test
+- net/af_unix:scm_pidfd
+- perf_events:remove_on_exec
+- pidfd:pidfd_getfd_test
+- pidfd:pidfd_setns_test
+- seccomp:seccomp_bpf
+- user_events:abi_test
+
+[1] https://lore.kernel.org/oe-lkp/202403291015.1fcfa957-oliver.sang@intel.com
+[2] https://lore.kernel.org/r/ZjPelW6-AbtYvslu@google.com
+[3] https://lore.kernel.org/r/202405100339.vfBe0t9C-lkp@intel.com
+[4] https://lore.kernel.org/r/202405061002.01D399877A@keescook
+
+Previous versions:
+v1: https://lore.kernel.org/r/20240426172252.1862930-1-mic@digikod.net
+v2: https://lore.kernel.org/r/20240429130931.2394118-1-mic@digikod.net
+v3: https://lore.kernel.org/r/20240429191911.2552580-1-mic@digikod.net
+v4: https://lore.kernel.org/r/20240502210926.145539-1-mic@digikod.net
+v5: https://lore.kernel.org/r/20240503105820.300927-1-mic@digikod.net
+v6: https://lore.kernel.org/r/20240506165518.474504-1-mic@digikod.net
+
+Regards,
+
+Mickaël Salaün (10):
+  selftests/pidfd: Fix config for pidfd_setns_test
+  selftests/landlock: Fix FS tests when run on a private mount point
+  selftests/harness: Fix fixture teardown
+  selftests/harness: Fix interleaved scheduling leading to race
+    conditions
+  selftests/landlock: Do not allocate memory in fixture data
+  selftests/harness: Constify fixture variants
+  selftests/pidfd: Fix wrong expectation
+  selftests/harness: Share _metadata between forked processes
+  selftests/harness: Fix vfork() side effects
+  selftests/harness: Handle TEST_F()'s explicit exit codes
+
+ tools/testing/selftests/kselftest_harness.h   | 127 +++++++++++++-----
+ tools/testing/selftests/landlock/fs_test.c    |  83 +++++++-----
+ tools/testing/selftests/pidfd/config          |   2 +
+ .../selftests/pidfd/pidfd_setns_test.c        |   2 +-
+ 4 files changed, 147 insertions(+), 67 deletions(-)
+
+
+base-commit: e67572cd2204894179d89bd7b984072f19313b03
+-- 
+2.45.0
+
 
