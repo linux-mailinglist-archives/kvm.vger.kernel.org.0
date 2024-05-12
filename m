@@ -1,102 +1,210 @@
-Return-Path: <kvm+bounces-17273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17276-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D82048C3854
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 22:11:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE748C39C0
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 03:07:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB051C20E52
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 20:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C06D52811FD
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 01:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2CB548E7;
-	Sun, 12 May 2024 20:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9723910A16;
+	Mon, 13 May 2024 01:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dajm0p5b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eKWv9Ath"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6729E2F52;
-	Sun, 12 May 2024 20:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC18101F7
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 01:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715544679; cv=none; b=ocUbTLMHo5uXhN5VBu9uMWD16IQubsJli4Lo8tTHjj7tavpDWsci7q2TXN+EUL5svhNJawYSJgpy6IZHTrJ9v3fauKqrYd9HeEOhqtVl2mJOeiEsNm9+65F7kMv5UUEfxvGksdN1bUnBgdBlkC/spbn4d4D4AlYWNpRV6pOR1vM=
+	t=1715562412; cv=none; b=TB0vK5pS7Gji/XfKKLq+7efwOnj67v8eWyPBS2H2DdZE+dYm5yximO2bBYDbiu65feHP21Aln5yIYtAYj68hYhqnTpKFTLWrtT9S+c37iQptQeNvyLttenOfR46DN1de5UYjIVZSRUwZyVmr9IVs4I70xeyhehL7f6HGJ0d2sPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715544679; c=relaxed/simple;
-	bh=WxFuKPriljJ3Xa85qH6iujL69qp832395i4t0PU3Sjg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=hMtiFpbdl+wnp3lPrjGpY80dTwr26NrYoEHKw4BiZ4gFOYU2T8W5NYM835M/utZGNcNwlDJq86wnI/3tSK8rDg9jKebzy7RMgUPaCNiFzlL8l541EACzpxZWrREAjVxOowLNK6oHwqgB2/NCv67fVVIbck/ruMckyeOX+mt0NDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dajm0p5b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 32E64C116B1;
-	Sun, 12 May 2024 20:11:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715544679;
-	bh=WxFuKPriljJ3Xa85qH6iujL69qp832395i4t0PU3Sjg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=dajm0p5byqeAp6X2BJydLicltnqwT8xPowWWTEe2wryhwQwmpPvFkNJzhWCtOnBSQ
-	 xRKkBP30rlRwdF3/TA+dGw6KcDDKccEXuPa+z0IH5Ep01Hx8PRZM2MI4bUnS6uEMA0
-	 kUkHwt2OsPxArgtuIGU+9ey6TCZnv3B+W8gXQrN4FBGSrbZR8MeMxsvHwY6xAwsDAM
-	 +AZLBuzEuNn0RPxnCI1KUAGoUB+OV71lfzgDQZ3uTt6tp4vUXcCZzq2mjef/yw/Hgw
-	 DufQyFnP9hkvpJNKvLz76Pq5nhk2bbv3RlnIGU616w8F3n2RtwFQlHBjMH5P+MfpXl
-	 i8g2mArLzRuIw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 24791E7C0E2;
-	Sun, 12 May 2024 20:11:19 +0000 (UTC)
-Subject: Re: [GIT PULL] Kselftest fixes for v6.9
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240512105657.931466-1-mic@digikod.net>
-References: <20240512105657.931466-1-mic@digikod.net>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240512105657.931466-1-mic@digikod.net>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/kselftest-fix-vfork-2024-05-12
-X-PR-Tracked-Commit-Id: 323feb3bdb67649bfa5614eb24ec9cb92a60cf33
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: af300a3959290b005f27ab5858bfebcb4840cd66
-Message-Id: <171554467912.30874.14448790672055631894.pr-tracker-bot@kernel.org>
-Date: Sun, 12 May 2024 20:11:19 +0000
-To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Brendan Higgins <brendanhiggins@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	David Gow <davidgow@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
-	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>,
-	Ron Economos <re@w6rz.net>, Ronald Warsow <rwarsow@gmx.de>,
-	Sasha Levin <sashal@kernel.org>,
+	s=arc-20240116; t=1715562412; c=relaxed/simple;
+	bh=z5mJ1/5uug7AEPGBHrwQP1RnsDF46AQ6CEpaPD25I/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j98KkFBZGo/6VUlKx94R8u02/W8wssrhsh3VMSnkgIKNdNxuu4jxpLqxq03ux3UBIE9BY2X+iwT++y2SWUL1Q3XrqbLaNMP3nhnkrhDmYawxscnqLDTYowd3WXqyGCIdBdyLHvUXhwxBH6vu8iNT0yl1JRtPI2Fm5G4YV2qlYlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eKWv9Ath; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715562410;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4m6P5DzqA8so+cu7rXtxZX9zRgtX/pSS/kHNFecXgEU=;
+	b=eKWv9AthtEe5cARwPrH9f3GMajcbdgWb64o66sFPNLzm+kyay7FAOAsRZ6rb21A40OVKco
+	XfdtXz5BzVs9hnBp6wbuV9BrXy/doxKVxHw6WDyTx+k+zNtQoUbvj7NigHX1Kw0rogetpw
+	BfVb2FJba4tVhF7bDY8JtuuxKYlSewc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-A_bfeSZ0NhqbI3YTU8cf1A-1; Sun, 12 May 2024 21:06:36 -0400
+X-MC-Unique: A_bfeSZ0NhqbI3YTU8cf1A-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 22CE485A58C;
+	Mon, 13 May 2024 01:06:36 +0000 (UTC)
+Received: from tpad.localdomain (unknown [10.96.133.2])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C112103A3AA;
+	Mon, 13 May 2024 01:06:35 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+	id 16E0F400DF40C; Sun, 12 May 2024 18:44:23 -0300 (-03)
+Date: Sun, 12 May 2024 18:44:23 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Leonardo Bras <leobras@redhat.com>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>,
-	Shengyu Li <shengyu.li.evgeny@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Will Drewry <wad@chromium.org>,
-	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
-	linux-kernel@vge.smtp.subspace.kernel.org,
-	r.kernel.org@web.codeaurora.org, linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
+Message-ID: <ZkE4N1X0wglygt75@tpad>
+References: <20240511020557.1198200-1-leobras@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240511020557.1198200-1-leobras@redhat.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-The pull request you sent on Sun, 12 May 2024 12:56:57 +0200:
+On Fri, May 10, 2024 at 11:05:56PM -0300, Leonardo Bras wrote:
+> As of today, KVM notes a quiescent state only in guest entry, which is good
+> as it avoids the guest being interrupted for current RCU operations.
+> 
+> While the guest vcpu runs, it can be interrupted by a timer IRQ that will
+> check for any RCU operations waiting for this CPU. In case there are any of
+> such, it invokes rcu_core() in order to sched-out the current thread and
+> note a quiescent state.
+> 
+> This occasional schedule work will introduce tens of microsseconds of
+> latency, which is really bad for vcpus running latency-sensitive
+> applications, such as real-time workloads.
+> 
+> So, note a quiescent state in guest exit, so the interrupted guests is able
+> to deal with any pending RCU operations before being required to invoke
+> rcu_core(), and thus avoid the overhead of related scheduler work.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/kselftest-fix-vfork-2024-05-12
+This does not properly fix the current problem, as RCU work might be
+scheduled after the VM exit, followed by a timer interrupt.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/af300a3959290b005f27ab5858bfebcb4840cd66
+Correct?
 
-Thank you!
+> 
+> Signed-off-by: Leonardo Bras <leobras@redhat.com>
+> ---
+> 
+> ps: A patch fixing this same issue was discussed in this thread:
+> https://lore.kernel.org/all/20240328171949.743211-1-leobras@redhat.com/
+> 
+> Also, this can be paired with a new RCU option (rcutree.nocb_patience_delay)
+> to avoid having invoke_rcu() being called on grace-periods starting between
+> guest exit and the timer IRQ. This RCU option is being discussed in a
+> sub-thread of this message:
+> https://lore.kernel.org/all/5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop/
+> 
+> 
+>  include/linux/context_tracking.h |  6 ++++--
+>  include/linux/kvm_host.h         | 10 +++++++++-
+>  2 files changed, 13 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/context_tracking.h b/include/linux/context_tracking.h
+> index 6e76b9dba00e..8a78fabeafc3 100644
+> --- a/include/linux/context_tracking.h
+> +++ b/include/linux/context_tracking.h
+> @@ -73,39 +73,41 @@ static inline void exception_exit(enum ctx_state prev_ctx)
+>  }
+>  
+>  static __always_inline bool context_tracking_guest_enter(void)
+>  {
+>  	if (context_tracking_enabled())
+>  		__ct_user_enter(CONTEXT_GUEST);
+>  
+>  	return context_tracking_enabled_this_cpu();
+>  }
+>  
+> -static __always_inline void context_tracking_guest_exit(void)
+> +static __always_inline bool context_tracking_guest_exit(void)
+>  {
+>  	if (context_tracking_enabled())
+>  		__ct_user_exit(CONTEXT_GUEST);
+> +
+> +	return context_tracking_enabled_this_cpu();
+>  }
+>  
+>  #define CT_WARN_ON(cond) WARN_ON(context_tracking_enabled() && (cond))
+>  
+>  #else
+>  static inline void user_enter(void) { }
+>  static inline void user_exit(void) { }
+>  static inline void user_enter_irqoff(void) { }
+>  static inline void user_exit_irqoff(void) { }
+>  static inline int exception_enter(void) { return 0; }
+>  static inline void exception_exit(enum ctx_state prev_ctx) { }
+>  static inline int ct_state(void) { return -1; }
+>  static inline int __ct_state(void) { return -1; }
+>  static __always_inline bool context_tracking_guest_enter(void) { return false; }
+> -static __always_inline void context_tracking_guest_exit(void) { }
+> +static __always_inline bool context_tracking_guest_exit(void) { return false; }
+>  #define CT_WARN_ON(cond) do { } while (0)
+>  #endif /* !CONFIG_CONTEXT_TRACKING_USER */
+>  
+>  #ifdef CONFIG_CONTEXT_TRACKING_USER_FORCE
+>  extern void context_tracking_init(void);
+>  #else
+>  static inline void context_tracking_init(void) { }
+>  #endif /* CONFIG_CONTEXT_TRACKING_USER_FORCE */
+>  
+>  #ifdef CONFIG_CONTEXT_TRACKING_IDLE
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 48f31dcd318a..e37724c44843 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -480,21 +480,29 @@ static __always_inline void guest_state_enter_irqoff(void)
+>  /*
+>   * Exit guest context and exit an RCU extended quiescent state.
+>   *
+>   * Between guest_context_enter_irqoff() and guest_context_exit_irqoff() it is
+>   * unsafe to use any code which may directly or indirectly use RCU, tracing
+>   * (including IRQ flag tracing), or lockdep. All code in this period must be
+>   * non-instrumentable.
+>   */
+>  static __always_inline void guest_context_exit_irqoff(void)
+>  {
+> -	context_tracking_guest_exit();
+> +	/*
+> +	 * Guest mode is treated as a quiescent state, see
+> +	 * guest_context_enter_irqoff() for more details.
+> +	 */
+> +	if (!context_tracking_guest_exit()) {
+> +		instrumentation_begin();
+> +		rcu_virt_note_context_switch();
+> +		instrumentation_end();
+> +	}
+>  }
+>  
+>  /*
+>   * Stop accounting time towards a guest.
+>   * Must be called after exiting guest context.
+>   */
+>  static __always_inline void guest_timing_exit_irqoff(void)
+>  {
+>  	instrumentation_begin();
+>  	/* Flush the guest cputime we spent on the guest */
+> -- 
+> 2.45.0
+> 
+> 
+> 
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
 
