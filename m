@@ -1,131 +1,140 @@
-Return-Path: <kvm+bounces-17271-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17272-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F53C8C3579
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 10:17:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A528B8C3620
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 12:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 915481C209C2
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 08:17:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF78A1C209FC
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 10:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C861C697;
-	Sun, 12 May 2024 08:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEDE20B0F;
+	Sun, 12 May 2024 10:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfvCRwIm"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="n6YJ3OFJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-8fad.mail.infomaniak.ch (smtp-8fad.mail.infomaniak.ch [83.166.143.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E4E1C68C
-	for <kvm@vger.kernel.org>; Sun, 12 May 2024 08:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF881CAB7
+	for <kvm@vger.kernel.org>; Sun, 12 May 2024 10:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715501845; cv=none; b=Am4CGmUnFRvFG6Ej/TUann9H51Rnozxy1ZrDg0LDUx/Z7NArqR0IKNakj/0axtj0ZsgcLgzYsJSF5JHGia2rA96R29YMCM4d9U93r388XEE0ZtX/73yyaTVohp44h10IlQHkFt5qZJ4Lc1QI3oUiZp7CGCMJkRVf7hjvHe3T09Q=
+	t=1715511436; cv=none; b=jDXls55FcIjlpJADXdVz18kBJ4scuYdys6sw7xjp4cEvugh6SdFjlcHMO07AAaMQb0fIfTUaYTkdedCz0adYY1hFbi9CLlJ2zqRAzQNx8MUUf8eeHtV1eeUZr20D0isX/KScvhZOIW1kg7ydGMZVj14867mJ46TY73jmmpDfVwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715501845; c=relaxed/simple;
-	bh=gy1fqqrNliFvIEA/4j3QrSKFmukTGVMtOxoq+znsGwA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bGzAOk8C+MF0WIDPd9QXbddfBXqvzsFWtv6FZsIe303sZtq/Dc5rPu9yMakJwsK/I9hjhReo0PwKVOtQGOJO9mPZicUCwvC2xuxNerX5NtnlAVJt6UrwvhZle5zPC7xu+8YEBZG7JJEw4GUHRADvx7hPCxlaEgd5e3vQStkrgDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dfvCRwIm; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715501843;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QUSDVa+t4AWwqTmRuepudvFoykXU2aaVqb2V4N5FOvo=;
-	b=dfvCRwImAQgTq4WNl0vgteq+U3DRSHPK9CJg2tlWvdmyX5aBEQmeRDz7dcUgr0W9N5ev5S
-	vGNe01x8e2F6sK+ULuqN/PAyV3Ig9X8hAmWXVXfllh40iEcBpnXyeUwVdfPF9l6q+T4gwW
-	5LU4Dap6+YvTNgxmFyEYofsZvLoqPF4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-510-oPIIM7hKPCyADqlz5aPKzQ-1; Sun, 12 May 2024 04:17:20 -0400
-X-MC-Unique: oPIIM7hKPCyADqlz5aPKzQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-34eb54c888cso2692272f8f.3
-        for <kvm@vger.kernel.org>; Sun, 12 May 2024 01:17:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715501839; x=1716106639;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QUSDVa+t4AWwqTmRuepudvFoykXU2aaVqb2V4N5FOvo=;
-        b=tpk00jfUxMRNJVlVqdeuKTYPfuwgnN0SDsaqmEGBQk3gmWxXINh+n1X5zxhD7wUcW9
-         zBilz+x0CDht+hCWvnqIW5+trSaRQTrb+I2Unzvuvg+p1t11ixY+lJm1oGUs40UBN2hT
-         33drCjw+yIl7jwlkIp4OnYSVLZknjg1Bqq/LfilPcNG9stIf/n1ibYPWszr4g4AuxbER
-         h86qXrMicd5R+ZEdepn14r+5uo4/PYvCOnGjWc4rFFb7bE0blJoICFIyPGwhNzNYmSJ4
-         efU4bcfPsyAxL/7GnFnBsDZRA3QpeRERKTu065Bp8cIdS6dYyUXUmtwv1WuotrfhUuKP
-         N5FQ==
-X-Gm-Message-State: AOJu0Yy4cE6pmMQcfMlYzBtaN9/pwpvJaAu8LAmTcAZ50tyfTvbiNW2G
-	xuf0Q7ctVqqpu/kyHiQvpK/xSuXWmjqW82tTRlxPF9IfWYRGb4s6oT+nByFTxFibm1+Z4UtcCj2
-	bSXyt08rDbDZ2O4D8bZeHHNrbzzsCn1Fp/w02999in84GuVKhD1Kyd5osJSc8VMLjRnRf6f+GNO
-	ix/QkCNdoJoBZXoam0NdJpq5BZ
-X-Received: by 2002:a05:6000:a88:b0:34c:e62a:db70 with SMTP id ffacd0b85a97d-3504aa63447mr6802434f8f.67.1715501839247;
-        Sun, 12 May 2024 01:17:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHKCS7P8m0E2FzwUMTNi7Ql+HIEI6NbkihSJrrDNgDeVBjsAxZChtVoPCY2m8yJvJpjjb/lbmUnz6gptq1HRKA=
-X-Received: by 2002:a05:6000:a88:b0:34c:e62a:db70 with SMTP id
- ffacd0b85a97d-3504aa63447mr6802413f8f.67.1715501838935; Sun, 12 May 2024
- 01:17:18 -0700 (PDT)
+	s=arc-20240116; t=1715511436; c=relaxed/simple;
+	bh=6K4mWNvEVxf0D2mRiXc39TcNks2VNhZHAk+y2vumSe4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=a+7ApqDPTMfyaTKnk9agVVrCXLAASiiRop95qZ5xjc6OTKGkrSLRT/34NCtBo49BPJHiWQUATsBcGZ2EBQyRwGbuyiGj/1PnQJbWiG1Mqp3YTDKONnHpdKD2Z1gGgcl2dzF0qzzWcwXgSV1p0IZKmJXiFgnSFS59K7Fd3ggH6Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=n6YJ3OFJ; arc=none smtp.client-ip=83.166.143.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0001.mail.infomaniak.ch (smtp-3-0001.mail.infomaniak.ch [10.4.36.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VcfhN47xpz8FW;
+	Sun, 12 May 2024 12:57:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1715511428;
+	bh=EF6C0AxPKx3Rr03GQ/CspouJVXujlSY9SWJekRRc0Os=;
+	h=From:To:Cc:Subject:Date:From;
+	b=n6YJ3OFJwTnXQvwJ4HS013+4irGRMaBZALgIxTdqhZjQePQHEvGh4GwBQBsm65kk/
+	 ap/bEUMY6n1Nyn70uRmzx2TbxXSNTkJbgvt2haeKKIvfzh0qApCIGV29D3VF98GW+/
+	 OipiXDgU0T5SGRmmDfU/JgUzw54SgpPWuYfoI8FE=
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VcfhL1ln1zKlP;
+	Sun, 12 May 2024 12:57:06 +0200 (CEST)
+From: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>
+Cc: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Gow <davidgow@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	Kees Cook <keescook@chromium.org>,
+	Mark Brown <broonie@kernel.org>,
+	Ron Economos <re@w6rz.net>,
+	Ronald Warsow <rwarsow@gmx.de>,
+	Sasha Levin <sashal@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Shengyu Li <shengyu.li.evgeny@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Will Drewry <wad@chromium.org>,
+	kernel test robot <oliver.sang@intel.com>,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [GIT PULL] Kselftest fixes for v6.9
+Date: Sun, 12 May 2024 12:56:57 +0200
+Message-ID: <20240512105657.931466-1-mic@digikod.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240510211024.556136-1-michael.roth@amd.com> <CABgObfZxeqfNB4tETpH4PqPTnTi0C4pGmCST73a5cTdRWLO9Yw@mail.gmail.com>
-In-Reply-To: <CABgObfZxeqfNB4tETpH4PqPTnTi0C4pGmCST73a5cTdRWLO9Yw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 12 May 2024 10:17:06 +0200
-Message-ID: <CABgObfZ=FcDdX=2kT-JZTq=5aYeEAkRQaS4A8Wew44ytQPCS7Q@mail.gmail.com>
-Subject: Re: [PULL 00/19] KVM: Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To: Michael Roth <michael.roth@amd.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>, linux-coco@lists.linux.dev, jroedel@suse.de, 
-	thomas.lendacky@amd.com, vkuznets@redhat.com, pgonda@google.com, 
-	rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, 
-	alpergun@google.com, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 
-On Sun, May 12, 2024 at 9:14=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
->
-> On Fri, May 10, 2024 at 11:17=E2=80=AFPM Michael Roth <michael.roth@amd.c=
-om> wrote:
-> >
-> > Hi Paolo,
-> >
-> > This pull request contains v15 of the KVM SNP support patchset[1] along
-> > with fixes and feedback from you and Sean regarding PSC request process=
-ing,
-> > fast_page_fault() handling for SNP/TDX, and avoiding uncessary
-> > PSMASH/zapping for KVM_EXIT_MEMORY_FAULT events. It's also been rebased
-> > on top of kvm/queue (commit 1451476151e0), and re-tested with/without
-> > 2MB gmem pages enabled.
->
-> Pulled into kvm-coco-queue, thanks (and sorry for the sev_complete_psc
-> mess up - it seemed too good to be true that the PSC changes were all
-> fine...).
+Hi Linus,
 
-... and there was a missing signoff in "KVM: SVM: Add module parameter
-to enable SEV-SNP" so I ended up not using the pull request. But it
-was still good to have it because it made it simpler to double check
-what you tested vs. what I applied.
+Without reply from Shuah, and given the importance of these fixes [1], here is
+a PR to fix Kselftest (broken since v6.9-rc1) for at least KVM, pidfd, and
+Landlock.  I cannot test against all kselftests though.  This has been in
+linux-next since the beginning of this week, and so far only one issue has been
+reported [2] and fixed [3].
 
-Also I have already received the full set of pull requests for
-submaintainers, so I put it in kvm/next.  It's not impossible that it
-ends up in the 6.10 merge window, so I might as well give it a week or
-two in linux-next.
+Feel free to take this PR if you see fit.
 
-Paolo
+Regards,
+ Mickaël
 
+[1] https://lore.kernel.org/r/Zjo1xyhjmehsRhZ2@google.com
+[2] https://lore.kernel.org/r/202405100339.vfBe0t9C-lkp@intel.com
+[3] https://lore.kernel.org/r/20240511171445.904356-1-mic@digikod.net
 
-Paolo
+--
+The following changes since commit e67572cd2204894179d89bd7b984072f19313b03:
 
+  Linux 6.9-rc6 (2024-04-28 13:47:24 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/kselftest-fix-vfork-2024-05-12
+
+for you to fetch changes up to 323feb3bdb67649bfa5614eb24ec9cb92a60cf33:
+
+  selftests/harness: Handle TEST_F()'s explicit exit codes (2024-05-11 19:18:47 +0200)
+
+----------------------------------------------------------------
+Fix Kselftest's vfork() side effects
+
+See https://lore.kernel.org/r/20240511171445.904356-1-mic@digikod.net
+
+----------------------------------------------------------------
+Mickaël Salaün (10):
+      selftests/pidfd: Fix config for pidfd_setns_test
+      selftests/landlock: Fix FS tests when run on a private mount point
+      selftests/harness: Fix fixture teardown
+      selftests/harness: Fix interleaved scheduling leading to race conditions
+      selftests/landlock: Do not allocate memory in fixture data
+      selftests/harness: Constify fixture variants
+      selftests/pidfd: Fix wrong expectation
+      selftests/harness: Share _metadata between forked processes
+      selftests/harness: Fix vfork() side effects
+      selftests/harness: Handle TEST_F()'s explicit exit codes
+
+ tools/testing/selftests/kselftest_harness.h      | 127 +++++++++++++++++------
+ tools/testing/selftests/landlock/fs_test.c       |  83 +++++++++------
+ tools/testing/selftests/pidfd/config             |   2 +
+ tools/testing/selftests/pidfd/pidfd_setns_test.c |   2 +-
+ 4 files changed, 147 insertions(+), 67 deletions(-)
 
