@@ -1,114 +1,97 @@
-Return-Path: <kvm+bounces-17268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4517C8C3544
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 09:16:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026348C354F
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 09:23:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75A431C20A56
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 07:16:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 915AD281BEC
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 07:23:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A9111CA9;
-	Sun, 12 May 2024 07:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3F111CA9;
+	Sun, 12 May 2024 07:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DXPRjI1f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STmaAlEA"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E932E3D6A
-	for <kvm@vger.kernel.org>; Sun, 12 May 2024 07:16:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592C6FC0C
+	for <kvm@vger.kernel.org>; Sun, 12 May 2024 07:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715498208; cv=none; b=pn7mGtUfOr3LsqBUZgTttYmIDVRCDUe0zkD8tm4pu6tCOCSUGpn6vnXg6QSImp3p4MdsApG+z8RRBulwpgsATts8dTvOQYy9D7QmTGiapHukHU3yDAxKPJpvganymxBbB3xaKLdEqAbvtcjJZ2KNGSAml63Vj8kbKOFXhmNhRnY=
+	t=1715498589; cv=none; b=j0gGo4Xopr3RNTGKzSwZ8FG75B6CjpOXYgI8eGJXcAH/ObW+0dzRu/8f/iYHJGJMFALcIabkMVw/h/0NQdCBeSm4nMlgHxI775IP7P9q/H6s2NYul45eNAt5uKPjqIpsg3AJOYhM/UhOC3nEJ/GHB0i2JsVgb3rNzYi7fS0XCIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715498208; c=relaxed/simple;
-	bh=llPJis9jHxYgJNuKqOaYb6WM18KDn6Zthld3LXdW+rw=;
+	s=arc-20240116; t=1715498589; c=relaxed/simple;
+	bh=SjhuRfJMuyO7GM96jJNtrPoACgPadZ8CofQaX4mKANM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QT7oQJX3ECT1tirWt0efES32f6kDtVATrgQF7dolCUcXh/o1OwtCSfxv/3nA+V3/0WqckcK1G3NfpAyP4wWQk6+W84t/V3xktjPXlgW7NotFZnTdBE2Q+7T8lWZTpApCLPljI0LKDtYycGTjsuJ1Vw3uHaBz0u8lX1e2VLC3wH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DXPRjI1f; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=iToV3Rcv3kmgBCBmPj3gx1lHHIdoo+TOx7fEVm3hwtqjfEuj6Jee+tX09qP4kQA3k2vnDOELgLuP9L8vsXHHLmeDl5vKfi4QWHpEseTmHzdShVYFDNIJxy4UTetGa6UeNEALS8UDtuI+u4C34CEOK8qMtZ9PnGi4suOaCXTTfBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=STmaAlEA; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715498205;
+	s=mimecast20190719; t=1715498587;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=llPJis9jHxYgJNuKqOaYb6WM18KDn6Zthld3LXdW+rw=;
-	b=DXPRjI1fALMGPJhT3gseRUqwO/UVSxxxELurVDYXCrVKodaaqHAYzkrRrveemCKEcAS33m
-	9DVvTSOJKLEIiTvOJPPn9k7I9/v2pqpJKLR+i4mN/YlsY/xXvSIul1L5ASl2M7iAGLNYZp
-	r+1kZ5phz1VL3WCMtNcfali3N10jzG0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=SjhuRfJMuyO7GM96jJNtrPoACgPadZ8CofQaX4mKANM=;
+	b=STmaAlEACpkE3R4151vokOW+8Dblj10DlSjagYbMOw5GYIK/PLY1WgBAvHA31rur2X42tW
+	WF6fGBTeNZRaEn1sY6OTyGbtRyzEjij31JD1iAg3yeUGO3XeWpUi8Fv2oj+ZYpJ9dOkL6t
+	qqC3X+0m5wwx55HcDEmOabByIw5wtSU=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-439-x3uIsCeWOYSPu5P3kjb9nA-1; Sun, 12 May 2024 03:16:43 -0400
-X-MC-Unique: x3uIsCeWOYSPu5P3kjb9nA-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-34c93732095so1457416f8f.0
-        for <kvm@vger.kernel.org>; Sun, 12 May 2024 00:16:43 -0700 (PDT)
+ us-mta-286-T3xjzF03OFCb8lphFkXpkQ-1; Sun, 12 May 2024 03:19:31 -0400
+X-MC-Unique: T3xjzF03OFCb8lphFkXpkQ-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-51fa2c23f62so3107148e87.1
+        for <kvm@vger.kernel.org>; Sun, 12 May 2024 00:19:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715498202; x=1716103002;
+        d=1e100.net; s=20230601; t=1715498369; x=1716103169;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=llPJis9jHxYgJNuKqOaYb6WM18KDn6Zthld3LXdW+rw=;
-        b=KDvLmZhT02NEN9dD8pbR/1U7Bk82KgeJ8IKBr8WCHG6LOWPxC5+yrrSVAA2D7hxtKN
-         AzScb9nSuQR10TdpkfY4f1n7omYidRBTc/VdIjBpzrk6kbINqAzk4vXUJzvEvEr3/ys5
-         pfAB0MTo/Nan3TZnwvvdX0kUE9zCy/rNSSViH1qcmlYn50P0XhEOjBTnT9HiOx3PUWo+
-         A/ZDUdhZqAcIfc6au/KURr17LWEIqPX27b3WYUjo5/JxJyKxHLGCR+WUN0+YnhGWxRlm
-         yeHoW80hSStiIwv/ai3dGSF083K1wRtfZnTJk0mNWgi6wqWnTgcOndZePMhPm245LmG7
-         0F2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWSVvRC6cH7CN40TOUVJP+3wXuKqobKt3CkyQ1TAp/J73DiNtM6YfasTzWVS4xowh9BclG3MC1JI2wX7RKVMMn7L/KM
-X-Gm-Message-State: AOJu0YxtiP2EXpLKym1B/eVzX5js/m+9RsTixyKlOuKO5/qS0T5Z89MW
-	shLa3CCVgL0P1yOmcUi3pa65+0VZ31TTO/bw2sA34ASD8qYZWynXq/n5Enuy0FxE/zzUAY7Nuh/
-	qecUinDYw1pzhmdby79MIY2ywC49FSuzZ1zR/TrcICzFyYTHP4+5jTDMB5aRdnmSM4jbGIZEfKS
-	DODSy3VLvd+H+5zw/qHqFCAemE
-X-Received: by 2002:a5d:4d43:0:b0:346:92d2:a496 with SMTP id ffacd0b85a97d-3504a7388demr4503669f8f.29.1715498202234;
-        Sun, 12 May 2024 00:16:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF6BcSwq6X8dx97vsGDZlMoQs6520j3e4edXNcZL3E4BuTPppqRk6MNDV9SpKfoH0O7ZE891G+pNO3dvQPK+1Q=
-X-Received: by 2002:a5d:4d43:0:b0:346:92d2:a496 with SMTP id
- ffacd0b85a97d-3504a7388demr4503646f8f.29.1715498201833; Sun, 12 May 2024
- 00:16:41 -0700 (PDT)
+        bh=SjhuRfJMuyO7GM96jJNtrPoACgPadZ8CofQaX4mKANM=;
+        b=Y2x9cZ6kFpnU3GXiNJdXWxXJ2IVZ8huA+xkilGVX1oVbCC+6cVSvLVKHUy4N6KJA8/
+         wADkDnXTvd+c1CtJ3O8itpnaaQIuDtEuzrqUU6z6hkIa6r6dpEai9pbHqCgOFuflw3VU
+         0Ra1uAU7ZOYSMi3pC/mNsbQWgAlydkiY15mkgrC3XDv2DXCURfbcxwqPuWdckQAzjAO9
+         s3SYhyGvVqxluiAapEuWELoEGIBcUEVHxl3vvDObXRdsiLgWC2SATOcX8h0Kz6oVsOiI
+         KR+0YE8lrDGGEyRRwe+W9czoZUuzfJquqvR31cJnMVHziiX5EicbgxQGot3iFU3M4hqG
+         0sVA==
+X-Gm-Message-State: AOJu0Yyhv+yzxB10jeTwOOEXmeDZ/ZzqMxWQt3tgURT2s5CPpd2Uaz1l
+	E4ib/CquqvyC+OsjxzGlPSPX4r9v+zBkYPUf/HQN0aRPs2LBKA4SMNKmYQ77PrrMD5Qji6u82j+
+	Ce3z5uMBnI/lBrntnY9vMc6iWpaY18brRtQ6TftEkZZN4SPjoFHnPEM9I1BA/QMkKJ4+r6sziVp
+	QA/mJnZ/rzNjl4WxPArpUFEXhdxXg+vg5b
+X-Received: by 2002:a19:770b:0:b0:51e:f8ae:db35 with SMTP id 2adb3069b0e04-5220fe798b9mr4043006e87.43.1715498368834;
+        Sun, 12 May 2024 00:19:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFzsEg1aJ25kKXmalZ4iS95ClJKdZVZF8uHKMumVpfk3l28kpvTcd6c9CIHX58M/zdIrqZBVfHzmNsuYtTNFMA=
+X-Received: by 2002:a19:770b:0:b0:51e:f8ae:db35 with SMTP id
+ 2adb3069b0e04-5220fe798b9mr4043000e87.43.1715498368440; Sun, 12 May 2024
+ 00:19:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240511095237.3993387-1-maz@kernel.org>
-In-Reply-To: <20240511095237.3993387-1-maz@kernel.org>
+References: <20240510235055.2811352-1-seanjc@google.com>
+In-Reply-To: <20240510235055.2811352-1-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sun, 12 May 2024 09:16:30 +0200
-Message-ID: <CABgObfaMMb4f75nitSiCgYZvOU=dMoPh0Lrs-fz8WVxyxnOw5A@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.10
-To: Marc Zyngier <maz@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Colton Lewis <coltonlewis@google.com>, Fuad Tabba <tabba@google.com>, 
-	Joey Gouly <joey.gouly@arm.com>, Mark Brown <broonie@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Quentin Perret <qperret@google.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Russell King <rmk+kernel@armlinux.org.uk>, Sean Christopherson <seanjc@google.com>, 
-	Sebastian Ene <sebastianene@google.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <zenghui.yu@linux.dev>, 
-	James Morse <james.morse@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Date: Sun, 12 May 2024 09:19:17 +0200
+Message-ID: <CABgObfauP2zPdhK65uVJb92kwp7TBve_8n7AE2Hhe9sQf+iNZw@mail.gmail.com>
+Subject: Re: KVM: x86 pull requests for 6.10
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, May 11, 2024 at 11:52=E2=80=AFAM Marc Zyngier <maz@kernel.org> wrot=
-e:
->
-> Paolo,
->
-> Here's the set of KVM/arm64 updates for 6.10. No new feature exactly,
-> but a lot of internal rework, improvements and bug fixes, However, it
-> is pretty good to see that the Android folks are resuming the
-> upstreaming effort after a long period of silence.
->
-> As usual, details in the tag below.
+On Sat, May 11, 2024 at 1:51=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+> Nothing notable to say here, this mail exits purely to be the parent.
 
-Pulled, thanks.
+Pulled all of them, thanks.
 
 Paolo
 
