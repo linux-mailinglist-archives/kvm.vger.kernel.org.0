@@ -1,101 +1,131 @@
-Return-Path: <kvm+bounces-17270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CADD78C3573
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 10:15:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F53C8C3579
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 10:17:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07E001C2093B
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 08:15:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 915481C209C2
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 08:17:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FBF182B5;
-	Sun, 12 May 2024 08:15:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C861C697;
+	Sun, 12 May 2024 08:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DIu4j1Ze"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dfvCRwIm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A116E168DA
-	for <kvm@vger.kernel.org>; Sun, 12 May 2024 08:15:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E4E1C68C
+	for <kvm@vger.kernel.org>; Sun, 12 May 2024 08:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715501707; cv=none; b=Rr5rQddK6Cg5TY5A9fYqkPs+EG91712pOHwvULEjDIHoZgWy281e7DKrs9T5mwB2ERZ8C6h6dW3rukK3rLA6QCa2Cpfkok1BGOHP2fVU4VZAcA5I14zTBFHlHBaKJLJyI1FqOO2Hmnk0ugCoPKDFasV4PF2ZjEsIrkP+nvAY/RQ=
+	t=1715501845; cv=none; b=Am4CGmUnFRvFG6Ej/TUann9H51Rnozxy1ZrDg0LDUx/Z7NArqR0IKNakj/0axtj0ZsgcLgzYsJSF5JHGia2rA96R29YMCM4d9U93r388XEE0ZtX/73yyaTVohp44h10IlQHkFt5qZJ4Lc1QI3oUiZp7CGCMJkRVf7hjvHe3T09Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715501707; c=relaxed/simple;
-	bh=zmyn4ldXcydGOu085bKLxBkxoeRgS7KGn+vebca4B1U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lq6gMaHM97twqtx81d0djpGQdCT1jMLxbrQSHNNoSjY/+uKH9fYTejTGS/5V910yU12BSw25QeCbuMKjXxx7HAqiIpQA8rmJRLulGxmDtbKWnSUeZd2ZBR9XF94Kzk8SYitjT/d3kVvtWLd3ZUwhz67ez/LL3+LFMbtwnspLzvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DIu4j1Ze; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1715501845; c=relaxed/simple;
+	bh=gy1fqqrNliFvIEA/4j3QrSKFmukTGVMtOxoq+znsGwA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bGzAOk8C+MF0WIDPd9QXbddfBXqvzsFWtv6FZsIe303sZtq/Dc5rPu9yMakJwsK/I9hjhReo0PwKVOtQGOJO9mPZicUCwvC2xuxNerX5NtnlAVJt6UrwvhZle5zPC7xu+8YEBZG7JJEw4GUHRADvx7hPCxlaEgd5e3vQStkrgDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dfvCRwIm; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715501704;
+	s=mimecast20190719; t=1715501843;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=meYZleFwX1lq0/EColt3Ez1OL0qo//O5LwnO/aFGWTg=;
-	b=DIu4j1ZeMdJzj1CVS2wjsFrB94teFfBjNkEfHitq9AoD/7+eLQXIKjvcYAgh2pVwEorfqx
-	GaMn0w2nAmVeV3dcG1VrZzmchHM/BMHbj80jY6eUNeiJKyHGZvddjpZmkfsizp0zAn6DzV
-	6UL27WiZT5nTXYvPcG+K7hyD/m8uN6E=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-103-7sa_3yHFN2yKCLApz7bdcQ-1; Sun,
- 12 May 2024 04:14:59 -0400
-X-MC-Unique: 7sa_3yHFN2yKCLApz7bdcQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 341573801ED2;
-	Sun, 12 May 2024 08:14:59 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 177F947B;
-	Sun, 12 May 2024 08:14:59 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: [GIT PULL] Final KVM change for Linux 6.9
-Date: Sun, 12 May 2024 04:14:58 -0400
-Message-ID: <20240512081458.4022758-1-pbonzini@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QUSDVa+t4AWwqTmRuepudvFoykXU2aaVqb2V4N5FOvo=;
+	b=dfvCRwImAQgTq4WNl0vgteq+U3DRSHPK9CJg2tlWvdmyX5aBEQmeRDz7dcUgr0W9N5ev5S
+	vGNe01x8e2F6sK+ULuqN/PAyV3Ig9X8hAmWXVXfllh40iEcBpnXyeUwVdfPF9l6q+T4gwW
+	5LU4Dap6+YvTNgxmFyEYofsZvLoqPF4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-510-oPIIM7hKPCyADqlz5aPKzQ-1; Sun, 12 May 2024 04:17:20 -0400
+X-MC-Unique: oPIIM7hKPCyADqlz5aPKzQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-34eb54c888cso2692272f8f.3
+        for <kvm@vger.kernel.org>; Sun, 12 May 2024 01:17:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715501839; x=1716106639;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QUSDVa+t4AWwqTmRuepudvFoykXU2aaVqb2V4N5FOvo=;
+        b=tpk00jfUxMRNJVlVqdeuKTYPfuwgnN0SDsaqmEGBQk3gmWxXINh+n1X5zxhD7wUcW9
+         zBilz+x0CDht+hCWvnqIW5+trSaRQTrb+I2Unzvuvg+p1t11ixY+lJm1oGUs40UBN2hT
+         33drCjw+yIl7jwlkIp4OnYSVLZknjg1Bqq/LfilPcNG9stIf/n1ibYPWszr4g4AuxbER
+         h86qXrMicd5R+ZEdepn14r+5uo4/PYvCOnGjWc4rFFb7bE0blJoICFIyPGwhNzNYmSJ4
+         efU4bcfPsyAxL/7GnFnBsDZRA3QpeRERKTu065Bp8cIdS6dYyUXUmtwv1WuotrfhUuKP
+         N5FQ==
+X-Gm-Message-State: AOJu0Yy4cE6pmMQcfMlYzBtaN9/pwpvJaAu8LAmTcAZ50tyfTvbiNW2G
+	xuf0Q7ctVqqpu/kyHiQvpK/xSuXWmjqW82tTRlxPF9IfWYRGb4s6oT+nByFTxFibm1+Z4UtcCj2
+	bSXyt08rDbDZ2O4D8bZeHHNrbzzsCn1Fp/w02999in84GuVKhD1Kyd5osJSc8VMLjRnRf6f+GNO
+	ix/QkCNdoJoBZXoam0NdJpq5BZ
+X-Received: by 2002:a05:6000:a88:b0:34c:e62a:db70 with SMTP id ffacd0b85a97d-3504aa63447mr6802434f8f.67.1715501839247;
+        Sun, 12 May 2024 01:17:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHKCS7P8m0E2FzwUMTNi7Ql+HIEI6NbkihSJrrDNgDeVBjsAxZChtVoPCY2m8yJvJpjjb/lbmUnz6gptq1HRKA=
+X-Received: by 2002:a05:6000:a88:b0:34c:e62a:db70 with SMTP id
+ ffacd0b85a97d-3504aa63447mr6802413f8f.67.1715501838935; Sun, 12 May 2024
+ 01:17:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+References: <20240510211024.556136-1-michael.roth@amd.com> <CABgObfZxeqfNB4tETpH4PqPTnTi0C4pGmCST73a5cTdRWLO9Yw@mail.gmail.com>
+In-Reply-To: <CABgObfZxeqfNB4tETpH4PqPTnTi0C4pGmCST73a5cTdRWLO9Yw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sun, 12 May 2024 10:17:06 +0200
+Message-ID: <CABgObfZ=FcDdX=2kT-JZTq=5aYeEAkRQaS4A8Wew44ytQPCS7Q@mail.gmail.com>
+Subject: Re: [PULL 00/19] KVM: Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To: Michael Roth <michael.roth@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, linux-coco@lists.linux.dev, jroedel@suse.de, 
+	thomas.lendacky@amd.com, vkuznets@redhat.com, pgonda@google.com, 
+	rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, 
+	alpergun@google.com, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Linus,
+On Sun, May 12, 2024 at 9:14=E2=80=AFAM Paolo Bonzini <pbonzini@redhat.com>=
+ wrote:
+>
+> On Fri, May 10, 2024 at 11:17=E2=80=AFPM Michael Roth <michael.roth@amd.c=
+om> wrote:
+> >
+> > Hi Paolo,
+> >
+> > This pull request contains v15 of the KVM SNP support patchset[1] along
+> > with fixes and feedback from you and Sean regarding PSC request process=
+ing,
+> > fast_page_fault() handling for SNP/TDX, and avoiding uncessary
+> > PSMASH/zapping for KVM_EXIT_MEMORY_FAULT events. It's also been rebased
+> > on top of kvm/queue (commit 1451476151e0), and re-tested with/without
+> > 2MB gmem pages enabled.
+>
+> Pulled into kvm-coco-queue, thanks (and sorry for the sev_complete_psc
+> mess up - it seemed too good to be true that the PSC changes were all
+> fine...).
 
-The following changes since commit 16c20208b9c2fff73015ad4e609072feafbf81ad:
+... and there was a missing signoff in "KVM: SVM: Add module parameter
+to enable SEV-SNP" so I ended up not using the pull request. But it
+was still good to have it because it made it simpler to double check
+what you tested vs. what I applied.
 
-  Merge tag 'kvmarm-fixes-6.9-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD (2024-04-30 13:50:55 -0400)
+Also I have already received the full set of pull requests for
+submaintainers, so I put it in kvm/next.  It's not impossible that it
+ends up in the 6.10 merge window, so I might as well give it a week or
+two in linux-next.
 
-are available in the Git repository at:
+Paolo
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus-6.9
 
-for you to fetch changes up to 0a9c28bec202bbd14ae3fd184522490e5f5498b5:
-
-  Merge tag 'kvm-s390-master-6.9-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD (2024-05-07 13:01:39 -0400)
-
-----------------------------------------------------------------
-s390:
-
-* Fix NULL pointer read on ioctl(KVM_CHECK_EXTENSION) for /dev/kvm.
-
-----------------------------------------------------------------
-Jean-Philippe Brucker (1):
-      KVM: s390: Check kvm pointer when testing KVM_CAP_S390_HPAGE_1M
-
-Paolo Bonzini (1):
-      Merge tag 'kvm-s390-master-6.9-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
-
- arch/s390/kvm/kvm-s390.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Paolo
 
 
