@@ -1,75 +1,98 @@
-Return-Path: <kvm+bounces-17274-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17273-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E2EA8C3856
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 22:11:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D82048C3854
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 22:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29486B20CD8
-	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 20:11:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EB051C20E52
+	for <lists+kvm@lfdr.de>; Sun, 12 May 2024 20:11:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E921655C3B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C2CB548E7;
 	Sun, 12 May 2024 20:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="picFkeNe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dajm0p5b"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1770554750;
-	Sun, 12 May 2024 20:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6729E2F52;
+	Sun, 12 May 2024 20:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715544680; cv=none; b=mXJm9zj9mwF9Hqt3NAHOaMOUBW++ZMykGBTxhIOtQx4z/B45sTQ8aDHqFm0z8RSbZp1n6+ouctLkDmAKWkz9mQWOR5h231StQ9GVVR03VigI+akX0ppmLKccQ04r8essYTjQlbqFc1z10JOGevvfjPHcjSDdfRiiK2SnmTaB6Nc=
+	t=1715544679; cv=none; b=ocUbTLMHo5uXhN5VBu9uMWD16IQubsJli4Lo8tTHjj7tavpDWsci7q2TXN+EUL5svhNJawYSJgpy6IZHTrJ9v3fauKqrYd9HeEOhqtVl2mJOeiEsNm9+65F7kMv5UUEfxvGksdN1bUnBgdBlkC/spbn4d4D4AlYWNpRV6pOR1vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715544680; c=relaxed/simple;
-	bh=pHF1vH8cQN56bRf/CcUImOHVIx+ckC3b7O815ZK//4c=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Npzdep7NW0DOj7l/xxQ2MDt8pv6WVgZnU9FaJP7nwr1FU9Pv9M93M5i4ih0g9dMmD/rG8vkh+4HhE0oD/uFaKjCH1MtX74+jSuvWAPVSKzEnoYqrug5G34J8kGpne2t9L4O9RQ6txAb6hwglIacjF5dfWftmCYGZzELJSkLYhSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=picFkeNe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E5914C4AF0F;
+	s=arc-20240116; t=1715544679; c=relaxed/simple;
+	bh=WxFuKPriljJ3Xa85qH6iujL69qp832395i4t0PU3Sjg=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=hMtiFpbdl+wnp3lPrjGpY80dTwr26NrYoEHKw4BiZ4gFOYU2T8W5NYM835M/utZGNcNwlDJq86wnI/3tSK8rDg9jKebzy7RMgUPaCNiFzlL8l541EACzpxZWrREAjVxOowLNK6oHwqgB2/NCv67fVVIbck/ruMckyeOX+mt0NDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dajm0p5b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 32E64C116B1;
 	Sun, 12 May 2024 20:11:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1715544679;
-	bh=pHF1vH8cQN56bRf/CcUImOHVIx+ckC3b7O815ZK//4c=;
+	bh=WxFuKPriljJ3Xa85qH6iujL69qp832395i4t0PU3Sjg=;
 	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=picFkeNedxDBAbim2M0wh7hxu2Mb9PbhdWtbDyQeM4pyotTmpBjxxBI+VLdpW3l1t
-	 s7obBkQ44rEYNT7mikJtkaX7GFkEksxfCSQ3ra7dRDD1A8QqIV18Uw4bw+/B1aObNU
-	 8h8+J/ns2fMkg7avoVs7PAiz+8c6akn9JL7Ki4NbK2jFrVmUd3+1kId/h3/LlhCiEe
-	 rfTkzgTBTSoMBFitEgI8oEzCEbUWr6SpjNh2J62nXhQm1GoJnztoanWu5y2r4gwK3j
-	 jtgyeMPj2A5u6zF55+HsSxT9rAMX47UJk4FwTtA5OOM3TDomm8isegyngv9ntmImcm
-	 yckfJcm6kvHTg==
+	b=dajm0p5byqeAp6X2BJydLicltnqwT8xPowWWTEe2wryhwQwmpPvFkNJzhWCtOnBSQ
+	 xRKkBP30rlRwdF3/TA+dGw6KcDDKccEXuPa+z0IH5Ep01Hx8PRZM2MI4bUnS6uEMA0
+	 kUkHwt2OsPxArgtuIGU+9ey6TCZnv3B+W8gXQrN4FBGSrbZR8MeMxsvHwY6xAwsDAM
+	 +AZLBuzEuNn0RPxnCI1KUAGoUB+OV71lfzgDQZ3uTt6tp4vUXcCZzq2mjef/yw/Hgw
+	 DufQyFnP9hkvpJNKvLz76Pq5nhk2bbv3RlnIGU616w8F3n2RtwFQlHBjMH5P+MfpXl
+	 i8g2mArLzRuIw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DAAE3C43440;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 24791E7C0E2;
 	Sun, 12 May 2024 20:11:19 +0000 (UTC)
-Subject: Re: [GIT PULL] Final KVM change for Linux 6.9
+Subject: Re: [GIT PULL] Kselftest fixes for v6.9
 From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240512081458.4022758-1-pbonzini@redhat.com>
-References: <20240512081458.4022758-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240512081458.4022758-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus-6.9
-X-PR-Tracked-Commit-Id: 0a9c28bec202bbd14ae3fd184522490e5f5498b5
+In-Reply-To: <20240512105657.931466-1-mic@digikod.net>
+References: <20240512105657.931466-1-mic@digikod.net>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240512105657.931466-1-mic@digikod.net>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/kselftest-fix-vfork-2024-05-12
+X-PR-Tracked-Commit-Id: 323feb3bdb67649bfa5614eb24ec9cb92a60cf33
 X-PR-Merge-Tree: torvalds/linux.git
 X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 2842076beb698b8b5f76aa9c987f4aa95b0e74d7
-Message-Id: <171554467989.30874.3904173329734105320.pr-tracker-bot@kernel.org>
+X-PR-Merge-Commit-Id: af300a3959290b005f27ab5858bfebcb4840cd66
+Message-Id: <171554467912.30874.14448790672055631894.pr-tracker-bot@kernel.org>
 Date: Sun, 12 May 2024 20:11:19 +0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	=?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Gow <davidgow@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	=?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+	Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>,
+	Ron Economos <re@w6rz.net>, Ronald Warsow <rwarsow@gmx.de>,
+	Sasha Levin <sashal@kernel.org>,
+	Sean Christopherson <seanjc@google.com>,
+	Shengyu Li <shengyu.li.evgeny@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Will Drewry <wad@chromium.org>,
+	kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
+	linux-kernel@vge.smtp.subspace.kernel.org,
+	r.kernel.org@web.codeaurora.org, linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 
-The pull request you sent on Sun, 12 May 2024 04:14:58 -0400:
+The pull request you sent on Sun, 12 May 2024 12:56:57 +0200:
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus-6.9
+> git://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git tags/kselftest-fix-vfork-2024-05-12
 
 has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/2842076beb698b8b5f76aa9c987f4aa95b0e74d7
+https://git.kernel.org/torvalds/c/af300a3959290b005f27ab5858bfebcb4840cd66
 
 Thank you!
 
