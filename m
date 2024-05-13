@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-17319-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17320-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 712B58C4297
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 15:55:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C41DA8C42C8
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 16:03:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22BE61F22273
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 13:55:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EDD5287B02
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 14:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4352B153587;
-	Mon, 13 May 2024 13:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7722153598;
+	Mon, 13 May 2024 14:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E21Yv4Cj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WW854H3A"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D87114EC7A;
-	Mon, 13 May 2024 13:55:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC91850279;
+	Mon, 13 May 2024 14:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715608548; cv=none; b=EsSwsmV85mKLhWJ9s5Ybbc/SQTGqsWXcppE0hapDC3z8MVklhz+dNCopqHgHo7majWSM5Fuo89CfpDeb7G3O3J1dbHuaBTyqF0VbnDQA4qvd/8ubV97ycU/AydVUxPXlm5ird4UV2fqxb/W31fbxlVKt2jtYILkgFP2DfFgtbak=
+	t=1715608999; cv=none; b=eHxeRtF7hl5BgpQCt6sCGnFaEYlFzYV90X0tXCMc5so9436K2R2ISis4+TJuxFlMKdMznGWwd5uYKBMNN5brD8KZoxInlyfSZA+ijAwQ3g4IKCQcu45jW264C6oPfNkgoJ9XnrNpJ4QKA3fH+JhgXfe9H0CPW0iP1ow1e3ywxu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715608548; c=relaxed/simple;
-	bh=+zJygHwJDYYbEHrrcyWnil8v90ICcXTefv5dJxPZ8lI=;
+	s=arc-20240116; t=1715608999; c=relaxed/simple;
+	bh=xJFzAh3ysLEFv0WcBOW0PLVx4z6smc3rpdHEbvwQUtY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gaK/zgNVaLN1PfzCEAX8eIl/SDJG5XUiRPtuKlEZBfWmFpfwmYPP4NY9Vfjp7Jg9ntqm4+l/lfsoiHleG4euHrYSqcPGZqFvDJDs8e0rfJBbwHHC6WDJVdfpuYEqQE2nR8iV2sUIKaIRxOHZtdtZSsAgs6Y0d3GfNDjASJrwQYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E21Yv4Cj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A774C113CC;
-	Mon, 13 May 2024 13:55:46 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=m6O6ivzb7KQyGzQIUxuuEUHGrceeS9LzfLHx5Bkrq7Wsd11flmZKbPNhvSX0WNPvnm9yg2L7StKK3EK/FHmosnBtbbakXZrOaJ2lR3wgQP2qXjr63KlCPbNd+CxF20H59t8hMz7pWOkGRJgJb3Xpry/0RcOg3QgvP8loTxMxXvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WW854H3A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 176F4C113CC;
+	Mon, 13 May 2024 14:03:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715608548;
-	bh=+zJygHwJDYYbEHrrcyWnil8v90ICcXTefv5dJxPZ8lI=;
+	s=k20201202; t=1715608998;
+	bh=xJFzAh3ysLEFv0WcBOW0PLVx4z6smc3rpdHEbvwQUtY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E21Yv4CjfRNH9NPlgkc8u7W1/WiUPP+/YhrSUmG92G6vgADSfsWECEKcpOMhyEfG/
-	 RbpGvEBPmK4qhlTtTRp18c/c2Jrxg3/HEXhg+XtU8DkruSan+t5ct+a5eT+JVNHYwX
-	 zdSNb5naXaJBpBrUHam4L8u7AWMjMWLYLSJgzmwDspv4ZIpr9G3mSLUAyB8hdyj1P0
-	 cnBcw+sEKShIvp4QsrAxO4WElLFWhUjjALm8Y4SHCqARkdqLGA93RFa6KbJLaCKGBD
-	 bz814/nJPG09eFFTbVOMRuUZDnPshBl60b1iZD/ykTEnQTXxJMI5FwPdNoeDAmF+b1
-	 iDbl+22GqOMHA==
-Date: Mon, 13 May 2024 14:55:42 +0100
+	b=WW854H3AORnWWjRhWN/bANcICXpLI+R9Oc4n+nvHPBPfpoqb/HuxeI3rbDhsVO4th
+	 FOtxizkjI1Tqxuulo17DqJHn555n2sqxON/N/69b3h5czPLszdpI+h51ucoWI3RdYO
+	 zvIJVKwr3hAruztAL5yBaWdl7r/r15eHx01+O4BKHyR5erugF7ckrSgVebLNajcAJY
+	 g1GBZ1SZdmo8zkbAgcaJuyUV59DiG7WHXG6MeBwlzO8uq8qZPLoSoNL/ZU0PyF0QD9
+	 flAgmWfeBsO2IL9pBWiArSP8t/US3HWqCMbyMI/agcja5EIJ50SqHKaAAyvvG/uZm6
+	 Js4Q9TXNgH5aA==
+Date: Mon, 13 May 2024 15:03:13 +0100
 From: Will Deacon <will@kernel.org>
 To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -49,11 +49,11 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v3 01/12] KVM: arm64: Fix clobbered ELR in sync
- abort/SError
-Message-ID: <20240513135542.GA28749@willie-the-truck>
+Subject: Re: [PATCH v3 02/12] KVM: arm64: Fix __pkvm_init_switch_pgd C
+ signature
+Message-ID: <20240513140313.GB28749@willie-the-truck>
 References: <20240510112645.3625702-1-ptosi@google.com>
- <20240510112645.3625702-2-ptosi@google.com>
+ <20240510112645.3625702-3-ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,69 +63,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240510112645.3625702-2-ptosi@google.com>
+In-Reply-To: <20240510112645.3625702-3-ptosi@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, May 10, 2024 at 12:26:30PM +0100, Pierre-Clément Tosi wrote:
-> When the hypervisor receives a SError or synchronous exception (EL2h)
-> while running with the __kvm_hyp_vector and if ELR_EL2 doesn't point to
-> an extable entry, it panics indirectly by overwriting ELR with the
-> address of a panic handler in order for the asm routine it returns to to
-> ERET into the handler.
+On Fri, May 10, 2024 at 12:26:31PM +0100, Pierre-Clément Tosi wrote:
+> Update the function declaration to match the asm implementation.
 > 
-> However, this clobbers ELR_EL2 for the handler itself. As a result,
-> hyp_panic(), when retrieving what it believes to be the PC where the
-> exception happened, actually ends up reading the address of the panic
-> handler that called it! This results in an erroneous and confusing panic
-> message where the source of any synchronous exception (e.g. BUG() or
-> kCFI) appears to be __guest_exit_panic, making it hard to locate the
-> actual BRK instruction.
-> 
-> Therefore, store the original ELR_EL2 in the per-CPU kvm_hyp_ctxt and
-> point the sysreg to a routine that first restores it to its previous
-> value before running __guest_exit_panic.
-> 
-> Fixes: 7db21530479f ("KVM: arm64: Restore hyp when panicking in guest context")
+> Fixes: f320bc742bc2 ("KVM: arm64: Prepare the creation of s1 mappings at EL2")
 > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 > ---
->  arch/arm64/kernel/asm-offsets.c         | 1 +
->  arch/arm64/kvm/hyp/entry.S              | 9 +++++++++
->  arch/arm64/kvm/hyp/include/hyp/switch.h | 5 +++--
->  3 files changed, 13 insertions(+), 2 deletions(-)
+>  arch/arm64/include/asm/kvm_hyp.h | 3 +--
+>  arch/arm64/kvm/hyp/nvhe/setup.c  | 2 +-
+>  2 files changed, 2 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm64/kernel/asm-offsets.c b/arch/arm64/kernel/asm-offsets.c
-> index 81496083c041..27de1dddb0ab 100644
-> --- a/arch/arm64/kernel/asm-offsets.c
-> +++ b/arch/arm64/kernel/asm-offsets.c
-> @@ -128,6 +128,7 @@ int main(void)
->    DEFINE(VCPU_FAULT_DISR,	offsetof(struct kvm_vcpu, arch.fault.disr_el1));
->    DEFINE(VCPU_HCR_EL2,		offsetof(struct kvm_vcpu, arch.hcr_el2));
->    DEFINE(CPU_USER_PT_REGS,	offsetof(struct kvm_cpu_context, regs));
-> +  DEFINE(CPU_ELR_EL2,		offsetof(struct kvm_cpu_context, sys_regs[ELR_EL2]));
->    DEFINE(CPU_RGSR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[RGSR_EL1]));
->    DEFINE(CPU_GCR_EL1,		offsetof(struct kvm_cpu_context, sys_regs[GCR_EL1]));
->    DEFINE(CPU_APIAKEYLO_EL1,	offsetof(struct kvm_cpu_context, sys_regs[APIAKEYLO_EL1]));
-> diff --git a/arch/arm64/kvm/hyp/entry.S b/arch/arm64/kvm/hyp/entry.S
-> index f3aa7738b477..bcaaf1a11b4e 100644
-> --- a/arch/arm64/kvm/hyp/entry.S
-> +++ b/arch/arm64/kvm/hyp/entry.S
-> @@ -83,6 +83,15 @@ alternative_else_nop_endif
->  	eret
->  	sb
+> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+> index 3e2a1ac0c9bb..96daf7cf6802 100644
+> --- a/arch/arm64/include/asm/kvm_hyp.h
+> +++ b/arch/arm64/include/asm/kvm_hyp.h
+> @@ -123,8 +123,7 @@ void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
+>  #endif
 >  
-> +SYM_INNER_LABEL(__guest_exit_restore_elr_and_panic, SYM_L_GLOBAL)
-> +	// x0-x29,lr: hyp regs
-> +
-> +	stp	x0, x1, [sp, #-16]!
-> +	adr_this_cpu x0, kvm_hyp_ctxt, x1
-> +	ldr	x0, [x0, #CPU_ELR_EL2]
-> +	msr	elr_el2, x0
-> +	ldp	x0, x1, [sp], #16
+>  #ifdef __KVM_NVHE_HYPERVISOR__
+> -void __pkvm_init_switch_pgd(phys_addr_t phys, unsigned long size,
+> -			    phys_addr_t pgd, void *sp, void *cont_fn);
+> +void __pkvm_init_switch_pgd(phys_addr_t params, void (*finalize_fn)(void));
+>  int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+>  		unsigned long *per_cpu_base, u32 hyp_va_bits);
+>  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
+> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
+> index bc58d1b515af..bcaeb0fafd2d 100644
+> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
+> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
+> @@ -316,7 +316,7 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+>  {
+>  	struct kvm_nvhe_init_params *params;
+>  	void *virt = hyp_phys_to_virt(phys);
+> -	void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
+> +	typeof(__pkvm_init_switch_pgd) *fn;
+>  	int ret;
+>  
+>  	BUG_ON(kvm_check_pvm_sysreg_table());
+> -- 
+> 2.45.0.118.g7fe29c98d7-goog
 
-Why do you have to preserve x0 and x1 here? afaict, we fall into
-__guest_exit_panic(), which clobbers them both immediately because it's
-going to pull them off the stack (they get saved _very_ early during
-exception entry).
+Acked-by: Will Deacon <will@kernel.org>
 
 Will
 
