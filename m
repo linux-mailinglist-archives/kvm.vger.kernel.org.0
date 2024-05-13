@@ -1,121 +1,108 @@
-Return-Path: <kvm+bounces-17340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 015408C45D2
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 19:16:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A9A38C45E6
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 19:21:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFBF3282B42
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 17:15:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B56C1C22AFE
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 17:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A5521342;
-	Mon, 13 May 2024 17:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BEF210EC;
+	Mon, 13 May 2024 17:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PXQC96iq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Px+H+TfI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DD21CFB2
-	for <kvm@vger.kernel.org>; Mon, 13 May 2024 17:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0071220310
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 17:21:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715620549; cv=none; b=eiZrRnOYG9qE3IY/c1RS+S4qySo4pfVBVeSOPExnBG/97w+p1UeCQd+DOBP2Tkki5WUC91xQt2crnFb/HyQfmO9M99Vh4Ii4WvZS6pdUYVFntTLQkVHcHiHDjiTiM6liZSoVT7XA9BskNbYhhUFACr/D0ICZZ42qqrr30BlJIlU=
+	t=1715620869; cv=none; b=b7hh4q5eUmfInyCG4xtp/EoKC+nmkC0sdz3lU+30qQ+keBdXLn2KJYlHEaFjP5IapqJAXK0otQHyL2L+3moihyl0ASnfq+OLO53q0Pkmve25jTNRx1pxFr5mXFtSftJ/rdK+OnCYXbUfbRZJW0cUBBi3xf4jmZ/jzZtQxIMK2/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715620549; c=relaxed/simple;
-	bh=Kpqsl0XSnFWNY3VT/3iCR1YsNFUYLpITGe1YGMB5gWY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K29psEfDfAW81prG7kMglMiGLENdRRWh6ipuUm0iz451AZcwg776aCL8FbejXvxY0HV8OrAGeMp/QbyyQZNZ9MOdJPJGi7cix4fORw4t5AjarQXdTL6AEZQ+OW19l7mg3Epf1SipoSq1bXYWQNSiEp7kzt8m3kjnAP2+O2Oj6vM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PXQC96iq; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7e1b8606bfdso24893339f.3
-        for <kvm@vger.kernel.org>; Mon, 13 May 2024 10:15:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1715620547; x=1716225347; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dkhS35s9f4IrzQ+xDWVyzbK3FS+T/wMMOlTPXDBz7SM=;
-        b=PXQC96iqmBFhpewiiaLtUIx131w4X7zkSiQZxwfApKEPDJEQEtsPPmCIcvbdbP2wYa
-         us10KJPxTokfHPdI9HRhhdpBvIDR2uQo5FP6rhS6lZHpf9YqMIy4B+DsJubBXBC55R1v
-         tgI34GZ7lmdKolCGMIlKVzmuaG/JIWgkUJwtY=
+	s=arc-20240116; t=1715620869; c=relaxed/simple;
+	bh=4cY9MtXU2I4telm66R69VUj9RASu9tfSf8B/kojAaNg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M/UC90nLytgPeDRlOs6IjvJdoPeDz+kR/SlscuKC2QNf06sbHQXy9vNeimPGtKBigg3gMgLeIJnSWlVFmv1ZFfX1TWESFNQ4flHrVYHulBY0vPRBGKOme+7GwYjdqVD5LvxacQLKyijLzTIJ/2QNmBU1ax3g9KmpVYODFcG5OfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Px+H+TfI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715620866;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lFetHttmrSPEk8iB/RIqp6UII+/zXMI6LYRqsBUqiFc=;
+	b=Px+H+TfI7JfxYy49DEOWW+wlPuuZ/z3UurkwmjUA59rZgi4UpUx/AjucL+Sn1dp0QrAJx9
+	H37k44ttod0onK8+Eq0Pr/a6ua9/wTj0TGdqa54qpcmeuXnMlMigYcSflA9PpKiZjm/tJc
+	xv6jy5cs9H/0EMA4QnsFaGNjvWwacQg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-312-67OxwoxHPn6VkN7NjhpBYA-1; Mon, 13 May 2024 13:21:05 -0400
+X-MC-Unique: 67OxwoxHPn6VkN7NjhpBYA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-41ffa918455so18007985e9.3
+        for <kvm@vger.kernel.org>; Mon, 13 May 2024 10:21:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715620547; x=1716225347;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dkhS35s9f4IrzQ+xDWVyzbK3FS+T/wMMOlTPXDBz7SM=;
-        b=O1/G6yZw1q7OInuvdILiB5kzXNEevXuofyJ6hkO8sPBjkBb1sIZjF8+cBBP1Tn9ez/
-         F2ts4uHvOwRxY3d3fFCBdDO9WP8Emgx+jjLrNJmxwF6jLHZUtXM3YovarYt4zGiAXScq
-         +fbq9TyaodyxeisFGwRYHDpw+7BhLMJQ/62PB+R8xYkPa/7YR8KrWnOwHohdwOhiTzKk
-         wsP1faLD6Tk386ri99lbOwCKQLfDPS2csJl41uVsOwCZ8WNDQL6CaKQnd2o49YARaeNf
-         PH4t9L5RDsC2ASd9QdGIZgCAYXoJrmzJxp4WDGhhUcJv9tg0ErPnjhhLx/FDZoadfqBP
-         PBLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVWMPubZqUmLYbdjUv8sSNVuPzycf0VixgNnUYpg33jwphjCwQCVA4FXpW97kUtnEP7jB+xQwLygWDQOlTQ8YIF4VIK
-X-Gm-Message-State: AOJu0YyrrTq7Ofevc4LqIha9GI3kamddgvl4rQqnjs0p9xSp0ekIYuB/
-	xRqL5x8TLlNX8D9z3JE93QxiBS/us2RK+H/xFsUmr4Jrup4MwdQ9h5yN8gUbRd4=
-X-Google-Smtp-Source: AGHT+IEsUUvesNSzDOZXBVwOpH/mJvxScDlUqihZEzqBcc1/za2BRTRLILpTeNLwc1aaK6xtRTtPOg==
-X-Received: by 2002:a6b:5007:0:b0:7de:b4dc:9b8f with SMTP id ca18e2360f4ac-7e1b5238e16mr1143476539f.2.1715620547263;
-        Mon, 13 May 2024 10:15:47 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4893714d92esm2559667173.75.2024.05.13.10.15.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 May 2024 10:15:46 -0700 (PDT)
-Message-ID: <6016b316-d266-48cf-aca9-127c72f9681b@linuxfoundation.org>
-Date: Mon, 13 May 2024 11:15:45 -0600
+        d=1e100.net; s=20230601; t=1715620863; x=1716225663;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lFetHttmrSPEk8iB/RIqp6UII+/zXMI6LYRqsBUqiFc=;
+        b=c7VVUVVKYhQbeXIkEca93eD8Tl6qLWBXwjDYGVFX+vhs2DaYJtizkYAxysU+Im8Eiy
+         BPqWvyvjn6YHmX4E4ZCi92jNlWnTyWVBEts/dQlvzkmDd4+JqdkLH0PFEV0lv8K50qhg
+         4cwMh+tmY/ok7CWDkb7k7QGn16BkjxX5Nex74dzcNiaVhNqsQJEQ+9rCQi7iSWBqQIt7
+         nNj/p07iqs7FWo/3q/mF/MLcTwplaxo+7/CTplntiNXxDmAqSszowfAMQd5+WIe0i0nQ
+         5nWPX6h8eCEramQ11llrmjmH1bFvKxMLJF8Sk8Qj676RJFVyyb9Up4xnopa+eNeVmP5E
+         9Zvw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYJ5ZapURQsdB2ONSa6gCTbp38Osppur8Hq7qhQdhgokBog/WRFQhT9LUJs69VklldpgEyM5QVZHzaI13o/1kWMiYy
+X-Gm-Message-State: AOJu0Yz6axi9YP5xerjzd+ZhKltrNXcV4gZ3It46Jb8eTgX1hIIAcSRb
+	neKrXR/MHlChimeoDJUwohhMOkKeaEw3NxNcaqVqjdwM/+Sy3HNddJTumRYMQapaoM36Yzd/b8B
+	Mm6MvCf1LgD5yVEv1DDS5qWTjHfo+9eYgfATK97SV5gZF+HYBH7jvvwhGPRe/9S9JOOVdacr5oi
+	C0qUb2TEQidbmR2QGShDwON5Su
+X-Received: by 2002:a05:600c:3582:b0:41b:143b:5c2d with SMTP id 5b1f17b1804b1-41feac55195mr86486985e9.28.1715620863717;
+        Mon, 13 May 2024 10:21:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG+7klRRXayuHxgQuN4xrnk2PibSO57rwQTkXNO9jJpJsh5eowNn5cZ4BTWrNPZBX2tLF3nvF6BA/OvQNnQl1w=
+X-Received: by 2002:a05:600c:3582:b0:41b:143b:5c2d with SMTP id
+ 5b1f17b1804b1-41feac55195mr86486845e9.28.1715620863376; Mon, 13 May 2024
+ 10:21:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL] Kselftest fixes for v6.9
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
- Linus Torvalds <torvalds@linux-foundation.org>, Shuah Khan <shuah@kernel.org>
-Cc: Bagas Sanjaya <bagasdotme@gmail.com>,
- Brendan Higgins <brendanhiggins@google.com>,
- Christian Brauner <brauner@kernel.org>, David Gow <davidgow@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- Florian Fainelli <florian.fainelli@broadcom.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
- Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>,
- Ron Economos <re@w6rz.net>, Ronald Warsow <rwarsow@gmx.de>,
- Sasha Levin <sashal@kernel.org>, Sean Christopherson <seanjc@google.com>,
- Shengyu Li <shengyu.li.evgeny@gmail.com>,
- Stephen Rothwell <sfr@canb.auug.org.au>, Will Drewry <wad@chromium.org>,
- kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
- shuah <shuah@kernel.org>
-References: <20240512105657.931466-1-mic@digikod.net>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240512105657.931466-1-mic@digikod.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240510211024.556136-1-michael.roth@amd.com> <20240510211024.556136-19-michael.roth@amd.com>
+ <20240513151920.GA3061950@thelio-3990X> <0ceafce9-0e08-4d47-813d-6b3f52ac5fd6@redhat.com>
+ <20240513170535.je74yhujxpogijga@amd.com>
+In-Reply-To: <20240513170535.je74yhujxpogijga@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 13 May 2024 19:20:52 +0200
+Message-ID: <CABgObfY0SEjdnNbXqeFyht4FWSf8joW8-zVS1qJ8HrxR5D5AGQ@mail.gmail.com>
+Subject: Re: [PULL 18/19] KVM: SEV: Provide support for SNP_EXTENDED_GUEST_REQUEST
+ NAE event
+To: Michael Roth <michael.roth@amd.com>
+Cc: Nathan Chancellor <nathan@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 5/12/24 04:56, Mickaël Salaün wrote:
-> Hi Linus,
-> 
-> Without reply from Shuah, and given the importance of these fixes [1], here is
-> a PR to fix Kselftest (broken since v6.9-rc1) for at least KVM, pidfd, and
-> Landlock.  I cannot test against all kselftests though.  This has been in
-> linux-next since the beginning of this week, and so far only one issue has been
-> reported [2] and fixed [3].
-> 
-> Feel free to take this PR if you see fit.
+On Mon, May 13, 2024 at 7:11=E2=80=AFPM Michael Roth <michael.roth@amd.com>=
+ wrote:
+> Hi Paolo,
+>
+> Yes, I was just about to submit a patch that does just that:
+>
+>   https://github.com/mdroth/linux/commit/df55e9c5b97542fe037f5b5293c11a49=
+f7c658ef
 
-Thank you - I totally missed the emails about sending these up for 6.9 :(
+Go ahead then!
 
-I see that these are already in Linux 6.9
-
-thanks,
--- Shuah
+Paolo
 
 
