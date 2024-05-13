@@ -1,167 +1,152 @@
-Return-Path: <kvm+bounces-17346-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17347-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D6018C46C1
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 20:20:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8BC8C4775
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 21:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20B691C22818
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 18:20:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18F84B20A15
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 19:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D974A36120;
-	Mon, 13 May 2024 18:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D6452F6A;
+	Mon, 13 May 2024 19:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="hmOHVHuP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="STOFMvFd"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2076.outbound.protection.outlook.com [40.107.236.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BBBF381BD;
-	Mon, 13 May 2024 18:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715624409; cv=fail; b=tlsk1O6tADaedFD/ww+0QYMlYbGJY11IwUELkFLL4JULdjyt9gEzH9aPqt4WgTsgLNZ1k0SUioHdaikt/6mxwjjvcf8p2SaqiejgEg/KyYYHzSN4ShDQxUDcF5Yfk7Re+GN5hwPfeDvFga2srePU2/ej44M/Z6CazGfK2XBhpOg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715624409; c=relaxed/simple;
-	bh=IXp105klcdDEAaLR8Ywv1xJLz3hn+QHeyZz15f/UAns=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OlhxM+1AuAfjwZj+CqiQfvjCNHf9Whi3i9BsNSzTeI5gdRmQR9B70VDlyQ96wk/RUwuygpFqrEXWfuoupVyQA3Fuwsuew2mPyw+wJFEMY8G3iNz5h68P1QgLXUY3tf9PeykiCGsFdDvpVAv2pfTnQP/HHGsCIxRqhDtdpUHcbjc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=hmOHVHuP; arc=fail smtp.client-ip=40.107.236.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bRaVxPf20gUrTXlS9RGYAEfQZlBVpMvs3dhPespjgLjPSqzDy7r7ASX+bXf4hvJ6BPVNLKwRu8/WfgAIS8yZUkk0ZNcU9lI+HiRnP2kfyZCAMWfwHot6SEiC9Q4HAj9eWLaO/pjaJuIKhmUToldT0t1p0vAI1/EFIuRMvArMo8lWpeYnmxmeBEGk7ySqWohThVZdufcNq39e1/d1l6LM07S7ugDcS9OVYtU1hRPXIaRtJwl1y/02n0SOobsckOQ5XNM+GnDviSKy38i9z7/NO5W+VCqmvvUsKmZiHcg1S/C3spl2MoLQ+jicOqP4S0tkHUAt9YlsLqbtV+PAG/GeGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FbgyawJm6sz098MO/ajzKlH6Es8z4+0gm12yCzNVxAU=;
- b=gTdf6lviGTJtlwN/fDOgOU4EnruXQ4jfEL7OSlmaPPaL4yD4a5ULcnV4D+dUgB6IAGSeQERdeq0uhzjtxRSBXdPMXRPMe2xjD7e2+LidbrmLI8sEyXK/Pc0j5UsG5TVXaox6Lf9otAZUsviBmXwXBaOgOaoldQ25lT0WBTihHv+FMtxZGpcfBuyTS9nozl9aKfHyH3J+vTZSOjeqCscRvM6Ube7BqVizGboqBdKb30b+Z1LS6JrFziqJ+OosMouZa9Uq1uFvlDlHwL2XckYplNKK8Qg0sm0Xvq63tyTGYUc8jZSrm05ZghMuUOGcjAKUPruP4B1oEryF9NGhQZrO+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FbgyawJm6sz098MO/ajzKlH6Es8z4+0gm12yCzNVxAU=;
- b=hmOHVHuP3MKyQnGT5UI9caSaVh5zQ3qq+73eGBChO38YzFB9RP3a27yzoZKLn6X3s7RFdJzjT6uIShlm140BE1cLc9wGvwA3C6TAf7iK7yWbXjDzyNTi7tG1ueo06CHUFYBUFtEG+S5cuzvIxJ97MmPg1pdZPStrAgOPTelo7yA=
-Received: from BN0PR04CA0167.namprd04.prod.outlook.com (2603:10b6:408:eb::22)
- by DM6PR12MB4466.namprd12.prod.outlook.com (2603:10b6:5:2ae::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Mon, 13 May
- 2024 18:20:02 +0000
-Received: from BN2PEPF000044A5.namprd04.prod.outlook.com
- (2603:10b6:408:eb:cafe::83) by BN0PR04CA0167.outlook.office365.com
- (2603:10b6:408:eb::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55 via Frontend
- Transport; Mon, 13 May 2024 18:20:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN2PEPF000044A5.mail.protection.outlook.com (10.167.243.104) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7587.21 via Frontend Transport; Mon, 13 May 2024 18:20:02 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 13 May
- 2024 13:20:00 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-	<linux-coco@lists.linux.dev>, Sean Christopherson <seanjc@google.com>
-Subject: [PATCH] KVM: SEV: Fix unused variable in guest request handling
-Date: Mon, 13 May 2024 13:19:28 -0500
-Message-ID: <20240513181928.720979-1-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE851BDD0
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 19:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715628259; cv=none; b=hBUBEa9NMUSroeJ6pJrn6hbphZWNty6bw3P5TehKl0Pr3sD/66TAvIOkYip2XeVWT/nKwc5W5Tn3WFDiwUVwb39kvMP2jB10ZTAj0NDMwEWWkBNSWARSgJvlbf0OUF/j3wUAedHlTcapQHXlwlD8EIZ71op7VrOypHiGs1oMlTE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715628259; c=relaxed/simple;
+	bh=5N15qcryEo41N2/C4GG6RzQY4PJ2O8cJAktjHr+5acU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A/gsGXYepw+Hthyaayqu6pCqx4tAiZCMAyCEpK/nk1RgyUYNP1k3PMcL7kky5SiQEi8Qa9gyPEtKVSHpKOAHve728aY3lNDqedGkvUrHm2jN82V35f7IOw5ZAc7zVgeTFdog8UzQeYbWq6BRHh19luP8IYKavmdnLDCl8GfitEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=STOFMvFd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715628257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=es+FVsqPWUNIRpUuG3Q0WLOBQbEEWGORQ4d1y6RL/uI=;
+	b=STOFMvFdOFzXikKgg2GMjZglNkfluCmvlQeTimpm/MFczGuZoTQVSjTpCeJk21PoPJwIBV
+	esFBFfb4TSg8JMaGdT6DhlQqPccUNfNaPOzUH6zgFa2p1sR9lpvCV9HNOCYFpjQqmZPRZe
+	l9l14yUwcg8ZxnRMWseSBlRDFCZ8oWc=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-691-IhuntFJkPiuuUjT2CZHgqA-1; Mon,
+ 13 May 2024 15:14:21 -0400
+X-MC-Unique: IhuntFJkPiuuUjT2CZHgqA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 92A5E380009A;
+	Mon, 13 May 2024 19:14:20 +0000 (UTC)
+Received: from tpad.localdomain (unknown [10.96.133.8])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C255200B4D8;
+	Mon, 13 May 2024 19:14:20 +0000 (UTC)
+Received: by tpad.localdomain (Postfix, from userid 1000)
+	id 7C663400E4E82; Mon, 13 May 2024 16:14:03 -0300 (-03)
+Date: Mon, 13 May 2024 16:14:03 -0300
+From: Marcelo Tosatti <mtosatti@redhat.com>
+To: Leonardo Bras <leobras@redhat.com>
+Cc: Frederic Weisbecker <frederic@kernel.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
+Message-ID: <ZkJme7kRGGNdxwnb@tpad>
+References: <20240511020557.1198200-1-leobras@redhat.com>
+ <ZkE4N1X0wglygt75@tpad>
+ <ZkGFmISfnrKNrUgj@LeoBras>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A5:EE_|DM6PR12MB4466:EE_
-X-MS-Office365-Filtering-Correlation-Id: 245cd088-b6e3-40fd-c1bf-08dc73794eb2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|36860700004|82310400017|1800799015|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xdFf62ZoEJaavF/Rtdg4aDHDt0ZUoXLBA/kj3Zf/pMEg8Vp40ILMk1Wz0aav?=
- =?us-ascii?Q?S27xgUEMHzOyw8/w4ejlxu0Jzhx28h2WKpCuKnh8JRGr2W+IkdBznU8d1sQ6?=
- =?us-ascii?Q?RxnSoVXno4lCrBHr1lIVWnrMal8HFEDsAzSCfqLw/I9RBeonvWbjKkPBrvzX?=
- =?us-ascii?Q?yvrgBbsdkDkdZVLyyHKlekJx3Op3Tz3UIcJnpJi9fQQ95JQyOz2eDryohwab?=
- =?us-ascii?Q?XuRr1nRpC61FK7CphAt2bLegarKOAIIaJju0bxaDu/QRbhMh4CD12DUschWZ?=
- =?us-ascii?Q?QzbXR3NX+cs89WyhT1jvgPoi6AYmz0I6kk/LnYxVS7QkWhodAvQRLETqYq7c?=
- =?us-ascii?Q?+tJ7GuzjE46rQbpCmZCRK3NDHo8n5a2nbF/YsBmV3r+CBZvxDoTTDwBDgX3u?=
- =?us-ascii?Q?t4fRTykRGfL4jZuXlYHt2NWYJwI7LngIP6xTH5iY7mafEoa96xsl2uQoAIfz?=
- =?us-ascii?Q?QQ760N8qgxQrc6r5/mwaOm+MPTWeoTqba3OFuLiGSKl0k10/a4IbcPTcpf7r?=
- =?us-ascii?Q?QGT/x6Es3CPNQeW81RtVfPfP+I6VFcrbB0STJOuIXOGQRSvf6wZWTPho8R8j?=
- =?us-ascii?Q?iAFn0cIFOpH5ESkMpUsugwkixybPLnb+c6rE1gf9QR6RvuSFHDwelqVt+mg5?=
- =?us-ascii?Q?P584xEUmg2v85c13U+s8xnX3zku/QEBqMqtpEG8tW6B+/SrtILxwLbrVe6qj?=
- =?us-ascii?Q?M/bSo+2SVDzZndvnou8aatqIWrwOQ+5gsfufkNVerOJXWfMGaqQMrvul8Z4z?=
- =?us-ascii?Q?aynUIo+3e5sOXsmT2fB0s1ar7nQEmzlsoRqbgFnQqeOPao6Hw3CvfCx7jEzK?=
- =?us-ascii?Q?rjMU2mNv9BqHdBlxCt4i21qiLI+v8Fy1WABo7i2YgkZZPuG8zSIZa/GJdfId?=
- =?us-ascii?Q?ZiNkH3pDwLUhKwOMK3+fs7Rt+WsQ9+jlLCmTOLODsoupzh/7ZhGiB8kBm2gx?=
- =?us-ascii?Q?n/+Dl5iCFmyh2RqSALZZJlm6q40Hnp/X+2qaUq/WiTMxGDkkC/68TqcDvL/X?=
- =?us-ascii?Q?5SnqAU6dEgJtAJH4K1GOJo2Q4kQZSmluNjNFCDYaIkUb8MKRLTwuRARU1gYY?=
- =?us-ascii?Q?has3gTyOYzrldCFuCcdaOs+0Czl1TgVlHlLzeMWa6OpgvlUtrcy9PbxNZyUn?=
- =?us-ascii?Q?9bGcKdlNxH16suMQoZ0pug2SG0NyZd4LlaKyhycojdPvib9gBto8uLmOlmda?=
- =?us-ascii?Q?5CrxlWSSmKtBSY6155UcHzBGjp2v0/9ZEN/FBtvYQPs731QXErYMAKWLAW9i?=
- =?us-ascii?Q?WrvNlVVuEg/Bok9V/+huIcex35nhTXIzPlgUFMtEvFtZeXJIV1kTLI2aZm96?=
- =?us-ascii?Q?Hs/4geWXlJ3r23jSm7QxPp5e7h0pmDPc5Ije5gCETz2r4NEAi/yIlXpjp8BN?=
- =?us-ascii?Q?K1wa0LE=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400017)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2024 18:20:02.8030
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 245cd088-b6e3-40fd-c1bf-08dc73794eb2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A5.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4466
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkGFmISfnrKNrUgj@LeoBras>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-The variable 'sev' is assigned, but never used. Remove it.
+On Mon, May 13, 2024 at 12:14:32AM -0300, Leonardo Bras wrote:
+> On Sun, May 12, 2024 at 06:44:23PM -0300, Marcelo Tosatti wrote:
+> > On Fri, May 10, 2024 at 11:05:56PM -0300, Leonardo Bras wrote:
+> > > As of today, KVM notes a quiescent state only in guest entry, which is good
+> > > as it avoids the guest being interrupted for current RCU operations.
+> > > 
+> > > While the guest vcpu runs, it can be interrupted by a timer IRQ that will
+> > > check for any RCU operations waiting for this CPU. In case there are any of
+> > > such, it invokes rcu_core() in order to sched-out the current thread and
+> > > note a quiescent state.
+> > > 
+> > > This occasional schedule work will introduce tens of microsseconds of
+> > > latency, which is really bad for vcpus running latency-sensitive
+> > > applications, such as real-time workloads.
+> > > 
+> > > So, note a quiescent state in guest exit, so the interrupted guests is able
+> > > to deal with any pending RCU operations before being required to invoke
+> > > rcu_core(), and thus avoid the overhead of related scheduler work.
+> > 
+> > This does not properly fix the current problem, as RCU work might be
+> > scheduled after the VM exit, followed by a timer interrupt.
+> > 
+> > Correct?
+> 
+> Correct, for this case, check the note below:
+> 
+> > 
+> > > 
+> > > Signed-off-by: Leonardo Bras <leobras@redhat.com>
+> > > ---
+> > > 
+> > > ps: A patch fixing this same issue was discussed in this thread:
+> > > https://lore.kernel.org/all/20240328171949.743211-1-leobras@redhat.com/
+> > > 
+> > > Also, this can be paired with a new RCU option (rcutree.nocb_patience_delay)
+> > > to avoid having invoke_rcu() being called on grace-periods starting between
+> > > guest exit and the timer IRQ. This RCU option is being discussed in a
+> > > sub-thread of this message:
+> > > https://lore.kernel.org/all/5fd66909-1250-4a91-aa71-93cb36ed4ad5@paulmck-laptop/
+> 
+> ^ This one above.
+> The idea is to use this rcutree.nocb_patience_delay=N :
+> a new option we added on RCU that allow us to avoid invoking rcu_core() if 
+> the grace_period < N miliseconds. This only works on nohz_full cpus.
+> 
+> So with both the current patch and the one in above link, we have the same 
+> effect as we previously had with last_guest_exit, with a cherry on top: we 
+> can avoid rcu_core() getting called in situations where a grace period just 
+> started after going into kernel code, and a timer interrupt happened before 
+> it can report quiescent state again. 
+> 
+> For our nohz_full vcpu thread scenario, we have:
+> 
+> - guest_exit note a quiescent state
+> - let's say we start a grace period in the next cycle
+> - If timer interrupts, it requires the grace period to be older than N 
+>   miliseconds
+>   - If we configure a proper value for patience, it will never reach the 
+>     end of patience before going guest_entry, and thus noting a quiescent 
+>     state
+> 
+> What do you think?
 
-Fixes: 449ead2d1edb ("KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE event")
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
- arch/x86/kvm/svm/sev.c | 3 ---
- 1 file changed, 3 deletions(-)
+I don't fully understand all of the RCU details, but since RCU quiescent
+state marking happens in IRQ disabled section, there is no chance for a
+timer interrupt to conflict with the marking of quiescent state.
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 59c0d89a4d52..6cf665c410b2 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3965,14 +3965,11 @@ static int __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t resp_gpa
- 				  sev_ret_code *fw_err)
- {
- 	struct sev_data_snp_guest_request data = {0};
--	struct kvm_sev_info *sev;
- 	int ret;
- 
- 	if (!sev_snp_guest(kvm))
- 		return -EINVAL;
- 
--	sev = &to_kvm_svm(kvm)->sev_info;
--
- 	ret = snp_setup_guest_buf(kvm, &data, req_gpa, resp_gpa);
- 	if (ret)
- 		return ret;
--- 
-2.25.1
+So seem to make sense to me.
 
 
