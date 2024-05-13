@@ -1,194 +1,155 @@
-Return-Path: <kvm+bounces-17344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BEC28C460A
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 19:30:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24B1E8C460E
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 19:31:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28B161F2187C
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 17:30:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDE91281DE3
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 17:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 233251BF40;
-	Mon, 13 May 2024 17:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9859922F00;
+	Mon, 13 May 2024 17:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WyvnryIL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kurVcHcM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378621C6BD;
-	Mon, 13 May 2024 17:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 491FF20DE8
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 17:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715621411; cv=none; b=nOghBcD2NKc7Mgk4pr6ADYzUDuC2ZDS4IH8WuDrzun9sQtR3xIKDOc6ZIdF9FeB/7M96N/K3Y48/qyk1fuuNoQUDGnGUczLrAnU4i34rbjv5fVFRJvWXkoHgGHvGycSvhCEQd0bZQ+siCo6HoUGQjsf+5yhKfyzIFn57ZFRBC6k=
+	t=1715621492; cv=none; b=lVieKzi0mHsIkubus4zPEkUEantikYaOUzu0JQjrn/5MnuS9hTsNUdbd673dA0HryOIL5BwhXoEKrvLdPrqg12ZNrbWOOs09reHIYQvGrIKeGHCf+ffdjiVOZmQRDJrSZeJPXMjYKZ2yGNK9k4euqPI2O9l5D88HEoYm9Q075Fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715621411; c=relaxed/simple;
-	bh=DR8jZ69miHfLN6RA278vWtF1Q++hEjEfLoVuHTEHdlU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l20JM/WKvTHgc6+3LYnp3p6GBbmEDw/7MCbqN1H6iznOPVZntYsjW0gdJFeUlbeWMbURN3N8NP8RCBxmLGpojsg4qLRQbKCLLYnG5ftMeX1xWxEhfuehZMlWxL6bS3gfNerqBlToKrJoNYXBH7KGXKc1OtHjX2TIKVHdlq5kiF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WyvnryIL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70519C113CC;
-	Mon, 13 May 2024 17:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715621411;
-	bh=DR8jZ69miHfLN6RA278vWtF1Q++hEjEfLoVuHTEHdlU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WyvnryILwoH46oQY60Sd0tWHReEVP7XtxcJy9oCodoVoEvlTUGXW/jQh8T9RgFEmc
-	 SiNYJutIB4CR5lxhnhG3Abd6V8o4FuQP24bUHbudJuSMxkvo5hOXGLFoVljXGPGP2Q
-	 75GIfK8EiFZBp3b/lRQ+Qje6iD33uvYHOXzPjbBGZKSxmikKV7mElKl+CO9d4qCIMf
-	 3BdRsXYsdS1IRM8b8wi7+iTrs/s0ILgCH4ODstVjUis+JFfXdshXgwHsM7XhYiLvd6
-	 5MVNf5fdsdyXbRsv0Tp3zK7WXY585wbPITYM6FN0Jp7Ju0/cDKzV7ZibjFOpjHtmnO
-	 W3wWcM9psdfHw==
-Date: Mon, 13 May 2024 18:30:05 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v3 10/12] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at
- EL2
-Message-ID: <20240513173005.GB29051@willie-the-truck>
-References: <20240510112645.3625702-1-ptosi@google.com>
- <20240510112645.3625702-11-ptosi@google.com>
+	s=arc-20240116; t=1715621492; c=relaxed/simple;
+	bh=EyY6dM+BwYruN5Dec5VKwj6CPokffR2F/ZvHPPbD8N8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EVddK8A6pp32Wl1QSfN1LDdOH6Wg4B663YPJ+b/tinolc2F6uOGQV/3PYUebjgVtJCzDA2W7oLpRNGOHTtbJl4GNVj8JIaBMyp2bMxi5rK0gl4VBFmiKC7mx7g4VlvZ3X44tpB24Ch6gt1bXE6SHO7BfNURXTabHKEJ+mwbsjIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kurVcHcM; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de615257412so8294002276.0
+        for <kvm@vger.kernel.org>; Mon, 13 May 2024 10:31:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715621489; x=1716226289; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0dgYn6JxWZgYuUksjjgLPAFKoY39/xTqa2uyfMub0pU=;
+        b=kurVcHcMyy+gcBjkFVRIHmLtqAzWusl0rWYeDLXnzkoRH7OxiLWcbB9a0rJOTd2jzJ
+         AtnnC7cg0nZ0eZYk5YJlgBXOGXDgELG/dTXFxpNpY8O2d8N2XgV0cLJB1cU0qwam0X57
+         aWIsGJDWC7M5/w7q9nJx2lCYDollnjvixHbBcjr+ttedaT9WPnLFYqTht5YCJJlx3qiS
+         Y+mMg2PdqTxTdVqPtq8fvjWhdOVh0OJEMhwD8DMH87CV+bkAcN72Jk837uz8HS+TEdyE
+         2kNBbJwcG2MFtNwoS2CEfjJscisBWul07UCe3FYerHEc/AydvS58q9YQlfT8je5U50H0
+         Nczg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715621489; x=1716226289;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0dgYn6JxWZgYuUksjjgLPAFKoY39/xTqa2uyfMub0pU=;
+        b=bA82Fp4fiyaLCT5pw6M89gK0kZWj1/Hh6US3hiIkD/ZCx0EdLByEvFd2oe9mEma+dn
+         syVgsKvK0YF8PbUgQwM9/+9faaa0tHFpy+tlx3/8P512a+U3M/TvykY8cokCmInM6eJM
+         AcwQktidsOPrzok4MjTUDJfiO9O3mbt2fFByFBjHb4gNclUyXoHrRmLohgh38bz2Vm0o
+         Fg9UOmxMv7GvED7+jwXIVliPkJImP20tXeMNIGQm49U98opSCJXi5FGSd7pG3T2TSN7g
+         8Zm/pe+wUaiTn2w/oKCUtS+SojZaXTC+jh2irRAi8A2CCihRqbD9eWDMFu5jRHo/SnL7
+         nGFw==
+X-Forwarded-Encrypted: i=1; AJvYcCX8f1iY7InWZyaEZr3DhBqYlCG+2B9H30t8cJJ4FBOZCbhdqATPCBP/c2BuUuAQ2XyyOKGeqDV42DiWWLbsejjZ1VR0
+X-Gm-Message-State: AOJu0Yz45jhGFVX2tkQnRmn0cZ10JUJIgh2BGwwOve1tEPCRWbMFHABX
+	9tArEDYfg/GUmkBuzf9ZH6yY2rx8n70ZU3yc6uo4JqqTq3NYyLcyFmJ4xm9ROY1HAp2/auTi0U8
+	Qxw==
+X-Google-Smtp-Source: AGHT+IFQset6SjwpwvVPpNmhl4NIM65WNzAgXX+cfWJEfUX6e1kfPn0nfLSCJZXjMlAohxyrtYzX2C4OFAw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1027:b0:dcc:c57c:8873 with SMTP id
+ 3f1490d57ef6-dee4f3659c5mr2944912276.9.1715621489131; Mon, 13 May 2024
+ 10:31:29 -0700 (PDT)
+Date: Mon, 13 May 2024 10:31:27 -0700
+In-Reply-To: <3b6bc6ac-276f-4a83-8972-68b98db672c7@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240510112645.3625702-11-ptosi@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+References: <20240507155817.3951344-1-pbonzini@redhat.com> <20240507155817.3951344-5-pbonzini@redhat.com>
+ <3b6bc6ac-276f-4a83-8972-68b98db672c7@intel.com>
+Message-ID: <ZkJOb4zJJnOAYnTi@google.com>
+Subject: Re: [PATCH 04/17] KVM: x86: Move synthetic PFERR_* sanity checks to
+ SVM's #NPF handler
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	Kai Huang <kai.huang@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, May 10, 2024 at 12:26:39PM +0100, Pierre-Clément Tosi wrote:
-> The compiler implements kCFI by adding type information (u32) above
-> every function that might be indirectly called and, whenever a function
-> pointer is called, injects a read-and-compare of that u32 against the
-> value corresponding to the expected type. In case of a mismatch, a BRK
-> instruction gets executed. When the hypervisor triggers such an
-> exception in nVHE, it panics and triggers and exception return to EL1.
+On Mon, May 13, 2024, Xiaoyao Li wrote:
+> On 5/7/2024 11:58 PM, Paolo Bonzini wrote:
+> > From: Sean Christopherson <seanjc@google.com>
+> > 
+> > Move the sanity check that hardware never sets bits that collide with KVM-
+> > define synthetic bits from kvm_mmu_page_fault() to npf_interception(),
+> > i.e. make the sanity check #NPF specific.  The legacy #PF path already
+> > WARNs if _any_ of bits 63:32 are set, and the error code that comes from
+> > VMX's EPT Violatation and Misconfig is 100% synthesized (KVM morphs VMX's
+> > EXIT_QUALIFICATION into error code flags).
+> > 
+> > Add a compile-time assert in the legacy #PF handler to make sure that KVM-
+> > define flags are covered by its existing sanity check on the upper bits.
+> > 
+> > Opportunistically add a description of PFERR_IMPLICIT_ACCESS, since we
+> > are removing the comment that defined it.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > Reviewed-by: Kai Huang <kai.huang@intel.com>
+> > Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+> > Message-ID: <20240228024147.41573-8-seanjc@google.com>
+> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > ---
+> >   arch/x86/include/asm/kvm_host.h |  6 ++++++
+> >   arch/x86/kvm/mmu/mmu.c          | 14 +++-----------
+> >   arch/x86/kvm/svm/svm.c          |  9 +++++++++
+> >   3 files changed, 18 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 58bbcf76ad1e..12e727301262 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -267,7 +267,13 @@ enum x86_intercept_stage;
+> >   #define PFERR_GUEST_ENC_MASK	BIT_ULL(34)
+> >   #define PFERR_GUEST_SIZEM_MASK	BIT_ULL(35)
+> >   #define PFERR_GUEST_VMPL_MASK	BIT_ULL(36)
+> > +
+> > +/*
+> > + * IMPLICIT_ACCESS is a KVM-defined flag used to correctly perform SMAP checks
+> > + * when emulating instructions that triggers implicit access.
+> > + */
+> >   #define PFERR_IMPLICIT_ACCESS	BIT_ULL(48)
+> > +#define PFERR_SYNTHETIC_MASK	(PFERR_IMPLICIT_ACCESS)
+> >   #define PFERR_NESTED_GUEST_PAGE (PFERR_GUEST_PAGE_MASK |	\
+> >   				 PFERR_WRITE_MASK |		\
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index c72a2033ca96..5562d693880a 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4502,6 +4502,9 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+> >   		return -EFAULT;
+> >   #endif
+> > +	/* Ensure the above sanity check also covers KVM-defined flags. */
 > 
-> Therefore, teach nvhe_hyp_panic_handler() to detect kCFI errors from the
-> ESR and report them. If necessary, remind the user that EL2 kCFI is not
-> affected by CONFIG_CFI_PERMISSIVE.
+> 1. There is no sanity check above related to KVM-defined flags yet. It has
+> to be after Patch 6.
+
+Ya, it's not just the comment, the entire changelog expects this patch to land
+after patch 6.
 > 
-> Pass $(CC_FLAGS_CFI) to the compiler when building the nVHE hyp code.
-> 
-> Use SYM_TYPED_FUNC_START() for __pkvm_init_switch_pgd, as nVHE can't
-> call it directly and must use a PA function pointer from C (because it
-> is part of the idmap page), which would trigger a kCFI failure if the
-> type ID wasn't present.
-> 
-> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> ---
->  arch/arm64/include/asm/esr.h       |  6 ++++++
->  arch/arm64/kvm/handle_exit.c       | 11 +++++++++++
->  arch/arm64/kvm/hyp/nvhe/Makefile   |  6 +++---
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S |  6 +++++-
->  4 files changed, 25 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-> index 2bcf216be376..9eb9e6aa70cf 100644
-> --- a/arch/arm64/include/asm/esr.h
-> +++ b/arch/arm64/include/asm/esr.h
-> @@ -391,6 +391,12 @@ static inline bool esr_is_data_abort(unsigned long esr)
->  	return ec == ESR_ELx_EC_DABT_LOW || ec == ESR_ELx_EC_DABT_CUR;
->  }
->  
-> +static inline bool esr_is_cfi_brk(unsigned long esr)
-> +{
-> +	return ESR_ELx_EC(esr) == ESR_ELx_EC_BRK64 &&
-> +	       (esr_brk_comment(esr) & ~CFI_BRK_IMM_MASK) == CFI_BRK_IMM_BASE;
-> +}
+> 2. I somehow cannot parse the comment properly, though I know it's to ensure
+> KVM-defined PFERR_SYNTHETIC_MASK not contain any bit below 32-bits.
 
-This can now be used by early_brk64().
+Hmm, how about this?
 
->  static inline bool esr_fsc_is_translation_fault(unsigned long esr)
->  {
->  	/* Translation fault, level -1 */
-> diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-> index 0bcafb3179d6..0db23a6304ce 100644
-> --- a/arch/arm64/kvm/handle_exit.c
-> +++ b/arch/arm64/kvm/handle_exit.c
-> @@ -383,6 +383,15 @@ void handle_exit_early(struct kvm_vcpu *vcpu, int exception_index)
->  		kvm_handle_guest_serror(vcpu, kvm_vcpu_get_esr(vcpu));
->  }
->  
-> +static void kvm_nvhe_report_cfi_failure(u64 panic_addr)
-> +{
-> +	kvm_err("nVHE hyp CFI failure at: [<%016llx>] %pB!\n", panic_addr,
-> +		(void *)(panic_addr + kaslr_offset()));
-
-Perhaps add a helper for displaying a hyp panic banner so that we remain
-consistent?
-
-> +
-> +	if (IS_ENABLED(CONFIG_CFI_PERMISSIVE))
-> +		kvm_err(" (CONFIG_CFI_PERMISSIVE ignored for hyp failures)\n");
-> +}
-> +
->  void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
->  					      u64 elr_virt, u64 elr_phys,
->  					      u64 par, uintptr_t vcpu,
-> @@ -413,6 +422,8 @@ void __noreturn __cold nvhe_hyp_panic_handler(u64 esr, u64 spsr,
->  		else
->  			kvm_err("nVHE hyp BUG at: [<%016llx>] %pB!\n", panic_addr,
->  					(void *)(panic_addr + kaslr_offset()));
-> +	} else if (IS_ENABLED(CONFIG_CFI_CLANG) && esr_is_cfi_brk(esr)) {
-> +		kvm_nvhe_report_cfi_failure(panic_addr);
->  	} else {
->  		kvm_err("nVHE hyp panic at: [<%016llx>] %pB!\n", panic_addr,
->  				(void *)(panic_addr + kaslr_offset()));
-> diff --git a/arch/arm64/kvm/hyp/nvhe/Makefile b/arch/arm64/kvm/hyp/nvhe/Makefile
-> index 2250253a6429..2eb915d8943f 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/Makefile
-> +++ b/arch/arm64/kvm/hyp/nvhe/Makefile
-> @@ -89,9 +89,9 @@ quiet_cmd_hyprel = HYPREL  $@
->  quiet_cmd_hypcopy = HYPCOPY $@
->        cmd_hypcopy = $(OBJCOPY) --prefix-symbols=__kvm_nvhe_ $< $@
->  
-> -# Remove ftrace, Shadow Call Stack, and CFI CFLAGS.
-> -# This is equivalent to the 'notrace', '__noscs', and '__nocfi' annotations.
-> -KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS) $(CC_FLAGS_CFI), $(KBUILD_CFLAGS))
-> +# Remove ftrace and Shadow Call Stack CFLAGS.
-> +# This is equivalent to the 'notrace' and '__noscs' annotations.
-> +KBUILD_CFLAGS := $(filter-out $(CC_FLAGS_FTRACE) $(CC_FLAGS_SCS), $(KBUILD_CFLAGS))
->  # Starting from 13.0.0 llvm emits SHT_REL section '.llvm.call-graph-profile'
->  # when profile optimization is applied. gen-hyprel does not support SHT_REL and
->  # causes a build failure. Remove profile optimization flags.
-> diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> index 5a15737b4233..33fb5732ab83 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> @@ -5,6 +5,7 @@
->   */
->  
->  #include <linux/arm-smccc.h>
-> +#include <linux/cfi_types.h>
->  #include <linux/linkage.h>
->  
->  #include <asm/alternative.h>
-> @@ -268,8 +269,11 @@ SYM_CODE_END(__kvm_handle_stub_hvc)
->  /*
->   * void __pkvm_init_switch_pgd(struct kvm_nvhe_init_params *params,
->   *                             void (*finalize_fn)(void));
-> + *
-> + * SYM_TYPED_FUNC_START() allows C to call this ID-mapped function indirectly
-> + * using a physical pointer without triggering a kCFI failure.
->   */
-> -SYM_FUNC_START(__pkvm_init_switch_pgd)
-> +SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
->  	/* Load the inputs from the VA pointer before turning the MMU off */
->  	ldr	x5, [x0, #NVHE_INIT_PGD_PA]
->  	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
-
-Unrelated hunk?
-
-Will
+	/*
+	 * Ensure that the above sanity check on hardware error code bits 63:32
+	 * also prevents false positives on KVM-defined flags.
+	 */
 
