@@ -1,116 +1,96 @@
-Return-Path: <kvm+bounces-17334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A37FA8C44FE
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 18:21:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 571F98C4531
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 18:39:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15CB9B20DDB
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 16:21:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D4031F22BE5
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 16:39:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B586155355;
-	Mon, 13 May 2024 16:20:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KNqmLJSG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD5D18E2A;
+	Mon, 13 May 2024 16:39:00 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426E415533E
-	for <kvm@vger.kernel.org>; Mon, 13 May 2024 16:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA2C208A1;
+	Mon, 13 May 2024 16:38:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715617254; cv=none; b=idNtCAn+wM+qpmiMFq5Y028K4iDwWeD6W45qIjV0bn/ckySJ9JGe3fISURvQlC/OK3OJxrtPJtiHr2vkG11NHsOPbppcUkDtYfj62nSc0ZTfypJgLDfSj5XH8l1mdymE6u8fbXk/OW7rz9Kof23dT6tEHf6fzomyjfPkRotPfTc=
+	t=1715618339; cv=none; b=R0H7c09MH9nzalO4YXvQdpsnk0YwSJJ05zZxK3sWanS82DMNNnpdyzFvbLfZJRZGkYL7WCYzzjWFe3RAoCGujq/Y3t5Dd+o84CNVoH32CzF+3zJnGr/zJF/4SOp9hvwi/7ZGxmUDkg0L1sYKkXCP/GwFGE7BgXJV0WtWNfx1Zao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715617254; c=relaxed/simple;
-	bh=BdY/cBLngQnlcwyixvI71fNjSSKMQrGCPriZ2LpM/Ic=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MrTf5tVpn0A8G6NbvFtLku6BNa7yW4TMTRbp8vIOQWVAHSupXMbJofY1vVQmb7WBtUW1eNoq/HXSt5jakudTEbic2WPWh9JY79veNqS0fK1i2EP3zF1YzTsUFtW3aEzb2zTh6OXhw/rSQJ2zOWl3ImLgo3ZaWH/NSSgmQ+QAzGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KNqmLJSG; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a49440f7b5so3883840a91.1
-        for <kvm@vger.kernel.org>; Mon, 13 May 2024 09:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715617252; x=1716222052; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zgt+w/nU1JjUrZ0GRJPLjZLIv1xcz6lTgN5YKDDkzT8=;
-        b=KNqmLJSGpLRA+dQx83K8Sr37612TC3IE4T2huVpE6xzee8kFLmHl+q+Vfw8InNTvIr
-         ErmhgUtLq4hpc6iwAmUR3XxQxIwYybcNVDBYuhvECqof78EpEqoFWoaPgJVBr5eJd6xO
-         nviPf3KbcM/8aK6PrYHsCDfi1qGnoDkY8ZhWV4HAc3HMnSkdjXKTAVf/EX/uQ8nFP3Gh
-         IG8tp3WdJB5gtwbCnvyOulGJM+ZCP0J1HGv4Gd8F4Olxb8UgBNXFTzzG6IhkIGEDUH0i
-         pjQ5nx9r+MgNN/Z959gSonbKSTu7O/y6ZrphF/RNn1qPtpQYY0rgIFaqwiYUly8gunis
-         pb+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715617252; x=1716222052;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zgt+w/nU1JjUrZ0GRJPLjZLIv1xcz6lTgN5YKDDkzT8=;
-        b=bt7dk2GS2c+YXT+6c5Hv2/iOCZlKJ9vUnw8KlaX0DOwbnFSykUxonlyZGiuTRtW00Y
-         oshQvW102c3umLNboB2QmlfiSXAaei8J2RwpRuwRuV2Fp9/JWdGBhd4GPF22DfruiFFE
-         GktOg/Qgp+SCt1JJt5spbuS902C5GhDAQfZZ7qD6NzqyuPzfATce0ZpWm8wgHn72X3Ow
-         Tmkj0mFsbvU+51ZOmIc2OX7m1j1vXa4UJr/ECWn1DHG2UMJBo18KK6ZmZvxRS9kBk1/O
-         WRdPP04u8keireoKNuRkib8lJRo0iEmr/Z18Z/y//EYK+9d45DXD4TzJhiAq5Ri4JOKX
-         p/KA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBWViVX76nWMDfYSunUdlUpaB0eBkI6Uf6orCfxtTrcnr+hbm39cAcrxc/1i6hNtXEKcwWkckCdcWf6sCG8TX1x4FP
-X-Gm-Message-State: AOJu0YxDrYdVRDoKXjSEqlVfBzE+6vh6r8LloV+XoTSt3dgqLJNzUsqx
-	PCL2O+FM5m9/DfcTpLZWaYUSy/36Rjyw/TqaalNNCzDNQwK/sz/yrhfyNHN5kC20h1I6lnMU52X
-	t3g==
-X-Google-Smtp-Source: AGHT+IFHnrXdTgKbPjNIvcthWplF4GAmm0C+xXuTvFWx+kW05nR4GtvDbz0e+nNcsaVMkxBWnlqwf3ezKV0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:350f:b0:2b4:32ae:483e with SMTP id
- 98e67ed59e1d1-2b6cc03bd09mr29750a91.2.1715617252422; Mon, 13 May 2024
- 09:20:52 -0700 (PDT)
-Date: Mon, 13 May 2024 09:20:50 -0700
-In-Reply-To: <4f2112f3c4f62607a1186faa138ccc06f38ee523.camel@intel.com>
+	s=arc-20240116; t=1715618339; c=relaxed/simple;
+	bh=fhiBDdzgfG8w+pcwYov50xsdrVpjMez9OR8PkWTcBTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LuoaaTXMH+synXiWwM+oPiOq4coGdBvbAsk3sQA/XothX+1Sf2hqde7ez5Sr2/NZLdDLs8kZhE1X0sWMOXYZ13fzSQnye8V/ZAdD25TaOuI9SDQLQ+YHWNQAqGkHOZaFu7AaHZiCnuOxwoXvlIJoWckNFWfosk89oWLxaBpYvGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E331C113CC;
+	Mon, 13 May 2024 16:38:56 +0000 (UTC)
+Date: Mon, 13 May 2024 17:38:53 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 07/14] arm64: Make the PHYS_MASK_SHIFT dynamic
+Message-ID: <ZkJCHcqfXxV1wlB0@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-8-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240425233951.3344485-1-seanjc@google.com> <20240425233951.3344485-5-seanjc@google.com>
- <4f2112f3c4f62607a1186faa138ccc06f38ee523.camel@intel.com>
-Message-ID: <ZkI94l9rcfBSH0pV@google.com>
-Subject: Re: [PATCH 4/4] KVM: Rename functions related to enabling
- virtualization hardware
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240412084213.1733764-8-steven.price@arm.com>
 
-On Mon, May 13, 2024, Kai Huang wrote:
-> On Thu, 2024-04-25 at 16:39 -0700, Sean Christopherson wrote:
-> > Rename the various functions that enable virtualization to prepare for
-> > upcoming changes, and to clean up artifacts of KVM's previous behavior,
-> > which required manually juggling locks around kvm_usage_count.
-> > 
-> > Drop the "nolock" qualifier from per-CPU functions now that there are no
-> > "nolock" implementations of the "all" variants, i.e. now that calling a
-> > non-nolock function from a nolock function isn't confusing (unlike this
-> > sentence).
-> > 
-> > Drop "all" from the outer helpers as they no longer manually iterate
-> > over all CPUs, and because it might not be obvious what "all" refers to.
-> > Instead, use double-underscores to communicate that the per-CPU functions
-> > are helpers to the outer APIs.
-> > 
-> 
-> I kinda prefer
-> 
-> 	cpu_enable_virtualization();
-> 
-> instead of
-> 
-> 	__kvm_enable_virtualization();
-> 
-> But obviously not a strong opinion :-)
+On Fri, Apr 12, 2024 at 09:42:06AM +0100, Steven Price wrote:
+> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> index e01bb5ca13b7..9944aca348bd 100644
+> --- a/arch/arm64/include/asm/kvm_arm.h
+> +++ b/arch/arm64/include/asm/kvm_arm.h
+> @@ -398,7 +398,7 @@
+>   * bits in PAR are res0.
+>   */
+>  #define PAR_TO_HPFAR(par)		\
+> -	(((par) & GENMASK_ULL(52 - 1, 12)) >> 8)
+> +	(((par) & GENMASK_ULL(MAX_PHYS_MASK_SHIFT - 1, 12)) >> 8)
 
-I feel quite strongly about using __kvm_enable_virtualization().  While "cpu" is
-very precise, to me it implies that the code lives outside of KVM and isn't purely
-a helper for kvm_enable_virtualization().
+Why does this need to be changed? It's still a constant not dependent on
+the new dynamic IPA size.
+
+> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> index ef207a0d4f0d..90dc292bed5f 100644
+> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> @@ -206,8 +206,8 @@
+>  /*
+>   * Highest possible physical address supported.
+>   */
+> -#define PHYS_MASK_SHIFT		(CONFIG_ARM64_PA_BITS)
+> -#define PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
+> +#define MAX_PHYS_MASK_SHIFT	(CONFIG_ARM64_PA_BITS)
+> +#define MAX_PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
+
+I prefer to have MAX as suffix in those definitions, it matches other
+places like TASK_SIZE_MAX, PHYS_ADDR_MAX (I know PHYS_MASK_MAX doesn't
+roll off the tongue easily but very few people tend to read the kernel
+aloud ;)).
+
+-- 
+Catalin
 
