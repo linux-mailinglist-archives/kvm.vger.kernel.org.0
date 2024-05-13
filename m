@@ -1,174 +1,126 @@
-Return-Path: <kvm+bounces-17355-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17356-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F4C08C48FD
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 23:47:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD4078C4974
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 00:03:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B2EF1F22AA8
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 21:47:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE4FD1C21371
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 22:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C708405D;
-	Mon, 13 May 2024 21:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7988584D25;
+	Mon, 13 May 2024 22:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSXBDEn4"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gdMDMg0N"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB13F175A6
-	for <kvm@vger.kernel.org>; Mon, 13 May 2024 21:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E9384D05
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 22:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715636850; cv=none; b=tNVMb6tqhhri0XQQPNzVAypiVeflqml9VsH4YtxGdatYZVX0LhJGyXFv7EaIteR9mEP19LNEwH4C9gBz+H+MUefe11UpF+i+MSt9TeaCB4zSwrZ/KIwuUX4KsvNVIOj/wUsHDw7+EelyHIrpQV4E2Ur2aXotHuqRLQzNWyQGrkE=
+	t=1715637730; cv=none; b=gwUkB/tqJ+SOFaM1EnuQVCD7eJROFX4eSgEPNoQFFhAzFgDJYjTEsIY5A7dTCH0cgFA2XdJC7z4d2s6X8ANyYsrCS45wyfB4KVcxtFWKiY9t5+rV3kDVxY9o/ff2/ILI97EA/1BODssSI+ALxaPQoIsYhYq8leUCclxIhevzLI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715636850; c=relaxed/simple;
-	bh=GsvEB0jrgKOQaYhaQDNrmbyGu9pT3dQg3hSPhGvs95A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cS9giPI2XeKrGtdBoU/oyBq34Wv0fVsrDxDQs0Ii8ByZa3qXF+pzWzwPB+XJ4Pf7oPYO/TY8AmEgLmQTLpeM8COSzLCB+ObBasE2QRKfhK7/DGZiy6TN++lDkisElGYAlr9xtMDtWDZQ6HH5xz9sTZmHmkZS1WeVUwmHVaz3wl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZSXBDEn4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715636847;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zezx3lgmnnnDtiiLnluAFlp/ntQq1a9r2G/1DoFg4n0=;
-	b=ZSXBDEn4BeX3bMPTbXUivaCe8iGaYvUkGcnimV9F21jPOc3la1vR8Uecw0Md2eeM3bSgru
-	f45SMSNO7cPwV9Nbovig6NrpFF4s1YwZOwDlSBairKisuu5sHrzJtEZNXHX5SfwQgqTvvp
-	l4GA5hnB3ysKtrxvORZ5CwW6T/gv1ZU=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-388-pvLsVtOqNhiMu3eKinuKWQ-1; Mon, 13 May 2024 17:47:26 -0400
-X-MC-Unique: pvLsVtOqNhiMu3eKinuKWQ-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-43dfa80c9ccso58145941cf.3
-        for <kvm@vger.kernel.org>; Mon, 13 May 2024 14:47:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715636845; x=1716241645;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zezx3lgmnnnDtiiLnluAFlp/ntQq1a9r2G/1DoFg4n0=;
-        b=F64lgB3pRNzbJ2TMfDDP8sDlI+Pww7FeJyEnkJCwACoiKExOA4dmwlRTdg++4N3IbR
-         9w67RZd8XxzQPvf+3NvO9ZUqaMOi4CAeZrt+60r3BrF2wPJ1STM9zXazRzeS4DmsM06Y
-         yb4ZJwaacQmw+vRAOCHi2CcPU83xOrwiq8ZiergkFdVKYEL+R9eX6LL6T9RoUo656Yl9
-         P1AWpFTlEyJ3U8x+P0Pxm6D5GdEv2HQG+fWV4pUR1TjihUUt+nNkO3BYka35d2/3I6Yc
-         vAlBjb+SV/MNz4fOPuem9j9nfzRyqRow4DveyIsiz+qpJ13OJ0ou3kgxrjUrDgiOrpw2
-         gLzg==
-X-Forwarded-Encrypted: i=1; AJvYcCW7joCF3uybdOaqNpGR0URBp13KQeZaxfDAsIGzH1qQwWxCOXclL0kXMbXJideacB8QDfO+59r5Kt+CEnvC8BX66YCO
-X-Gm-Message-State: AOJu0YyELtwVvUznP36U+Q9PCmUR77yWLmkYDI4ntiWR+oAGdb++RUjB
-	AgkZg6lUqozaMQAyF7fRTZ1liV2VYU5DxxzMFRFcjHCXCoFRDPR03AkUgJCosX8Km1bccu1gsKJ
-	1b1O3Lf5UA2Eb7ZcjSOqd7aOlryP7vH7Um5oExrPJ7+cAa4bZhzwqQzf8sZ8ZjD1dSUmlgtY+Ne
-	a+gra5dYQ3AVELzF/kPLqNVsRi
-X-Received: by 2002:a05:622a:148a:b0:43a:dc29:a219 with SMTP id d75a77b69052e-43dfda8e639mr142376941cf.2.1715636845534;
-        Mon, 13 May 2024 14:47:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHl8mtvZ1AqP2eTCQHLv7194Xa2gyO4esR0o+IYBTEGNUDz7XONxYrIUGwyTPc05Dwa+aFhe3D+YU3/19Zu628=
-X-Received: by 2002:a05:622a:148a:b0:43a:dc29:a219 with SMTP id
- d75a77b69052e-43dfda8e639mr142376681cf.2.1715636845074; Mon, 13 May 2024
- 14:47:25 -0700 (PDT)
+	s=arc-20240116; t=1715637730; c=relaxed/simple;
+	bh=5+iQQpOEZdEkzvrHSJ41DjlAjDtbE5SACcQXxQVlFBs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LfBTDmAnqrfrc++gti+DSKc6OtGThF0+ldxHpQKqSQD5ActF7+6/Ded5rsrjQGmhfRROSZ4RAgDbz2jBTYYAzaPqF8rWonnL7s4N9+0o5XnF+vPq/IsFlbo356MoLeS2zj9UrZXzoGEyKyjOk0BO3Npazpk4OP+bkIiYb9O0kAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gdMDMg0N; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1715637730; x=1747173730;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=5+iQQpOEZdEkzvrHSJ41DjlAjDtbE5SACcQXxQVlFBs=;
+  b=gdMDMg0NHYV3WRAkJcF8/bjHV0cF6CP/mwvwFkDJqPaS+sDvEQv2SCJH
+   wU/QWeJli1AxxJrkJ824D4xMHNZE03aVQI99dDDrm+w9h8Br1/kz4jzJo
+   QcQyZIWIQNY7WjsNrmbBifyQKO4inKgWEzofo9A5sDf7Y12qOL7JYs+01
+   c=;
+X-IronPort-AV: E=Sophos;i="6.08,159,1712620800"; 
+   d="scan'208";a="726172843"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 22:02:08 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:19998]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.254:2525] with esmtp (Farcaster)
+ id 166c483a-d211-48eb-b873-34e5ed9da520; Mon, 13 May 2024 22:01:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 166c483a-d211-48eb-b873-34e5ed9da520
+Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 13 May 2024 22:01:49 +0000
+Received: from [192.168.232.44] (10.106.101.48) by
+ EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 13 May 2024 22:01:48 +0000
+Message-ID: <7107a45b-0635-4040-9f4c-288708b13c04@amazon.com>
+Date: Mon, 13 May 2024 15:01:46 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240511020557.1198200-1-leobras@redhat.com> <ZkJsvTH3Nye-TGVa@google.com>
-In-Reply-To: <ZkJsvTH3Nye-TGVa@google.com>
-From: Leonardo Bras Soares Passos <leobras@redhat.com>
-Date: Mon, 13 May 2024 18:47:13 -0300
-Message-ID: <CAJ6HWG7pgMu7sAUPykFPtsDfq5Kfh1WecRcgN5wpKQj_EyrbJA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
-To: Sean Christopherson <seanjc@google.com>
-Cc: Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: Unmapping KVM Guest Memory from Host Kernel
+To: Sean Christopherson <seanjc@google.com>, James Gowans <jgowans@amazon.com>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-coco@lists.linux.dev"
+	<linux-coco@lists.linux.dev>, Nikita Kalyazin <kalyazin@amazon.co.uk>,
+	"rppt@kernel.org" <rppt@kernel.org>, "qemu-devel@nongnu.org"
+	<qemu-devel@nongnu.org>, Patrick Roy <roypat@amazon.co.uk>, "somlo@cmu.edu"
+	<somlo@cmu.edu>, "vbabka@suse.cz" <vbabka@suse.cz>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, David Woodhouse
+	<dwmw@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, Alexander Graf <graf@amazon.de>,
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+	"lstoakes@gmail.com" <lstoakes@gmail.com>, "mst@redhat.com" <mst@redhat.com>,
+	Moritz Lipp <mlipp@amazon.at>, Claudio Canella <canellac@amazon.at>
+References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
+ <ZeudRmZz7M6fWPVM@google.com> <ZexEkGkNe_7UY7w6@kernel.org>
+ <58f39f23-0314-4e34-a8c7-30c3a1ae4777@amazon.co.uk>
+ <ZkI0SCMARCB9bAfc@google.com>
+ <aaf684b5eb3a3fe9cfbb6205c16f0973c6f8bb07.camel@amazon.com>
+ <ZkJFIpEHIQvfuzx1@google.com>
+ <f880d0187e2d482bc8a8095cf5b7404ea9d6fb03.camel@amazon.com>
+ <ZkJ37uwNOPis0EnW@google.com>
+Content-Language: en-US
+From: "Manwaring, Derek" <derekmn@amazon.com>
+In-Reply-To: <ZkJ37uwNOPis0EnW@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D043UWC001.ant.amazon.com (10.13.139.202) To
+ EX19D003UWC002.ant.amazon.com (10.13.138.169)
 
-On Mon, May 13, 2024 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Fri, May 10, 2024, Leonardo Bras wrote:
-> > As of today, KVM notes a quiescent state only in guest entry, which is =
-good
-> > as it avoids the guest being interrupted for current RCU operations.
-> >
-> > While the guest vcpu runs, it can be interrupted by a timer IRQ that wi=
-ll
-> > check for any RCU operations waiting for this CPU. In case there are an=
-y of
-> > such, it invokes rcu_core() in order to sched-out the current thread an=
-d
-> > note a quiescent state.
-> >
-> > This occasional schedule work will introduce tens of microsseconds of
-> > latency, which is really bad for vcpus running latency-sensitive
-> > applications, such as real-time workloads.
-> >
-> > So, note a quiescent state in guest exit, so the interrupted guests is =
-able
-> > to deal with any pending RCU operations before being required to invoke
-> > rcu_core(), and thus avoid the overhead of related scheduler work.
->
-> Are there any downsides to this?  E.g. extra latency or anything?  KVM wi=
-ll note
-> a context switch on the next VM-Enter, so even if there is extra latency =
-or
-> something, KVM will eventually take the hit in the common case no matter =
-what.
-> But I know some setups are sensitive to handling select VM-Exits as soon =
-as possible.
->
-> I ask mainly because it seems like a no brainer to me to have both VM-Ent=
-ry and
-> VM-Exit note the context switch, which begs the question of why KVM isn't=
- already
-> doing that.  I assume it was just oversight when commit 126a6a542446 ("kv=
-m,rcu,nohz:
-> use RCU extended quiescent state when running KVM guest") handled the VM-=
-Entry
-> case?
+On 2024-05-13 13:36-0700, Sean Christopherson wrote:
+> Hmm, a slightly crazy idea (ok, maybe wildly crazy) would be to support mapping
+> all of guest_memfd into kernel address space, but as USER=1 mappings.  I.e. don't
+> require a carve-out from userspace, but do require CLAC/STAC when access guest
+> memory from the kernel.  I think/hope that would provide the speculative execution
+> mitigation properties you're looking for?
 
-I don't know, by the lore I see it happening in guest entry since the
-first time it was introduced at
-https://lore.kernel.org/all/1423167832-17609-5-git-send-email-riel@redhat.c=
-om/
+This is interesting. I'm hesitant to rely on SMAP since it can be
+enforced too late by the microarchitecture. But Canella, et al. [1] did
+say in 2019 that the kernel->user access route seemed to be free of any
+"Meltdown" effects. LASS sounds like it will be even stronger, though
+it's not clear to me from Intel's programming reference that speculative
+scenarios are in scope [2]. AMD does list SMAP specifically as a
+feature that can control speculation [3].
 
-Noting a quiescent state is cheap, but it may cost a few accesses to
-possibly non-local cachelines. (Not an expert in this, Paul please let
-me know if I got it wrong).
+I don't see an equivalent read-access control on ARM. It has PXN for
+execute. Read access can probably also be controlled?  But I think for
+the non-CoCo case we should favor solutions that are less dependent on
+hardware-specific protections.
 
-I don't have a historic context on why it was just implemented on
-guest_entry, but it would make sense when we don't worry about latency
-to take the entry-only approach:
-- It saves the overhead of calling rcu_virt_note_context_switch()
-twice per guest entry in the loop
-- KVM will probably run guest entry soon after guest exit (in loop),
-so there is no need to run it twice
-- Eventually running rcu_core() may be cheaper than noting quiescent
-state every guest entry/exit cycle
+Derek
 
-Upsides of the new strategy:
-- Noting a quiescent state in guest exit avoids calling rcu_core() if
-there was a grace period request while guest was running, and timer
-interrupt hits the cpu.
-- If the loop re-enter quickly there is a high chance that guest
-entry's rcu_virt_note_context_switch() will be fast (local cacheline)
-as there is low probability of a grace period request happening
-between exit & re-entry.
-- It allows us to use the rcu patience strategy to avoid rcu_core()
-running if any grace period request happens between guest exit and
-guest re-entry, which is very important for low latency workloads
-running on guests as it reduces maximum latency in long runs.
 
-What do you think?
-
-Thanks!
-Leo
-
+[1] https://www.usenix.org/system/files/sec19-canella.pdf
+[2] https://cdrdv2.intel.com/v1/dl/getContent/671368
+[3] https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/tuning-guides/software-techniques-for-managing-speculation.pdf
 
