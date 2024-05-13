@@ -1,146 +1,121 @@
-Return-Path: <kvm+bounces-17339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 903FF8C45B9
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 19:10:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 015408C45D2
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 19:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44C132829D7
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 17:10:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFBF3282B42
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 17:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27341CF92;
-	Mon, 13 May 2024 17:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A5521342;
+	Mon, 13 May 2024 17:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nwg3FU0Y"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PXQC96iq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8721CAAF
-	for <kvm@vger.kernel.org>; Mon, 13 May 2024 17:10:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DD21CFB2
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 17:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715620202; cv=none; b=pFMUJKM3f4+NgguDHLoersvfIajQY+TED4fWPlJokyT+xZeUWR0yTfQ2lz+WSWjAjCDZEfjqvwXSi00RTlZMJwo9x1+x6Hue+J28Fmvfeq1pWZFoSZxfdgiE+iBLlhWb4MEF1NxE9XUX07Lqx0H+cHr6n/OjNE5Gc2Fu5+14OSw=
+	t=1715620549; cv=none; b=eiZrRnOYG9qE3IY/c1RS+S4qySo4pfVBVeSOPExnBG/97w+p1UeCQd+DOBP2Tkki5WUC91xQt2crnFb/HyQfmO9M99Vh4Ii4WvZS6pdUYVFntTLQkVHcHiHDjiTiM6liZSoVT7XA9BskNbYhhUFACr/D0ICZZ42qqrr30BlJIlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715620202; c=relaxed/simple;
-	bh=vntz1T6lSeN+0vUm9L7SvFCiGb+zPgUS4AJcZyT09Eg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MMWd8JnbXGRlijzaHDSqyNKY6viT1Kr+Hh44aPlCEy7DOMeDRHIH7Qvn/msEQBKwiIpE8QE8aYHNKcleSBxt8U07bssP//jb/Yh1DzFRsWLihjyNX0tKM31jbw8VhR0tdpv4agkUZDFnvWj8z+SjVdyQ2sw5jz81J+OyAKNlnqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nwg3FU0Y; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1ec6de5fff5so47068585ad.2
-        for <kvm@vger.kernel.org>; Mon, 13 May 2024 10:10:01 -0700 (PDT)
+	s=arc-20240116; t=1715620549; c=relaxed/simple;
+	bh=Kpqsl0XSnFWNY3VT/3iCR1YsNFUYLpITGe1YGMB5gWY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=K29psEfDfAW81prG7kMglMiGLENdRRWh6ipuUm0iz451AZcwg776aCL8FbejXvxY0HV8OrAGeMp/QbyyQZNZ9MOdJPJGi7cix4fORw4t5AjarQXdTL6AEZQ+OW19l7mg3Epf1SipoSq1bXYWQNSiEp7kzt8m3kjnAP2+O2Oj6vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PXQC96iq; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-7e1b8606bfdso24893339f.3
+        for <kvm@vger.kernel.org>; Mon, 13 May 2024 10:15:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715620201; x=1716225001; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eqAMYyJARP70lQweb95UizBZYpowafIc/1BTiL7HAHE=;
-        b=nwg3FU0YvFzGYEctJD2ZOknC0UhBAScrvlanq/fgb8Ig8UlwfYAKbfbiWRF1/lAuRY
-         gZHLwLT+1mm4jUuKr6T0PGAbDSDU9bNbwMwxJPI1dd/25neOBwxvclQsjPs60DUo8R3w
-         3HyH/EbPBxbIGQUrUY7V/d9Iw0RtHCmue8wFdqf+j2YZ8Xd2gWO4u95ZxBj3TrDC8PhU
-         ZNP9TBmphqoSJhFcaiLQe9XsVNcE/MitimOx/WaqiguChcfXDVMSBkGNrGonGbvDulvn
-         G4BLqOLBd5b4WaufNq93hs4RaxjZNaloUPlosvUFoc7Gkk1cY+P12m+8eueyS2ChodU2
-         nGjQ==
+        d=linuxfoundation.org; s=google; t=1715620547; x=1716225347; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dkhS35s9f4IrzQ+xDWVyzbK3FS+T/wMMOlTPXDBz7SM=;
+        b=PXQC96iqmBFhpewiiaLtUIx131w4X7zkSiQZxwfApKEPDJEQEtsPPmCIcvbdbP2wYa
+         us10KJPxTokfHPdI9HRhhdpBvIDR2uQo5FP6rhS6lZHpf9YqMIy4B+DsJubBXBC55R1v
+         tgI34GZ7lmdKolCGMIlKVzmuaG/JIWgkUJwtY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715620201; x=1716225001;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eqAMYyJARP70lQweb95UizBZYpowafIc/1BTiL7HAHE=;
-        b=iYBzX1QbclPA1xojlwSzHW0QUEO+cdNzWEpAxXZeUCGHxCiBeTxf1RM5vkS9PD20DV
-         J26W7orrl31ys+zABAlBo2sY6qX58IR5q7P38mGh4OdDE+3EVDgDRIvq5wXX28ahvjjM
-         Hyf028Ni72wBb+qj77dL0R/Zx7piXRmoSy9yvEwtqMa6JWOnYQB5ISmqtF8KnYX4A+k+
-         O5HWv/HFeMU5233kuHIrATncUxm34vNy5HwB83bckl7bMrs1cCXk+81n6wNGya2JzKyg
-         cpYMS3QDRJorAfqF2hEGpW5CqxqMU0jZhpoNjYdJbhOuN9SGA51frLbaZys6J1SQ2OyE
-         yPSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVkZ809/3pTn+QDQkBK8S3vyX9uEP7x/FprFdDEKFS/YdRg0ifsVj+cYH7soHdJOSB5mYPy2srAVHinQk2E0eU9mSG5
-X-Gm-Message-State: AOJu0YzO4FZJ+nMiexEXaRagL/sg3ZCzocmN/LqHZWzn5iMNZelNSZMf
-	y4q8m0/egAdC1cwhqSuPMZ6NnUrVVy2lh3iXyZh0tBniuatO47jCh3RtFezt+xiHgR064y7rO9X
-	tbw==
-X-Google-Smtp-Source: AGHT+IFe9bUcF2cKcIAR1X9HznQBXdRthmRbSGERQIgzvsrvwXGdt51Pjnpg13XPQnNPLlENosr3rjbDm/4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e752:b0:1e5:62:7aa6 with SMTP id
- d9443c01a7336-1ef43c0fe5emr540015ad.2.1715620200915; Mon, 13 May 2024
- 10:10:00 -0700 (PDT)
-Date: Mon, 13 May 2024 10:09:59 -0700
-In-Reply-To: <aaf684b5eb3a3fe9cfbb6205c16f0973c6f8bb07.camel@amazon.com>
+        d=1e100.net; s=20230601; t=1715620547; x=1716225347;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dkhS35s9f4IrzQ+xDWVyzbK3FS+T/wMMOlTPXDBz7SM=;
+        b=O1/G6yZw1q7OInuvdILiB5kzXNEevXuofyJ6hkO8sPBjkBb1sIZjF8+cBBP1Tn9ez/
+         F2ts4uHvOwRxY3d3fFCBdDO9WP8Emgx+jjLrNJmxwF6jLHZUtXM3YovarYt4zGiAXScq
+         +fbq9TyaodyxeisFGwRYHDpw+7BhLMJQ/62PB+R8xYkPa/7YR8KrWnOwHohdwOhiTzKk
+         wsP1faLD6Tk386ri99lbOwCKQLfDPS2csJl41uVsOwCZ8WNDQL6CaKQnd2o49YARaeNf
+         PH4t9L5RDsC2ASd9QdGIZgCAYXoJrmzJxp4WDGhhUcJv9tg0ErPnjhhLx/FDZoadfqBP
+         PBLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVWMPubZqUmLYbdjUv8sSNVuPzycf0VixgNnUYpg33jwphjCwQCVA4FXpW97kUtnEP7jB+xQwLygWDQOlTQ8YIF4VIK
+X-Gm-Message-State: AOJu0YyrrTq7Ofevc4LqIha9GI3kamddgvl4rQqnjs0p9xSp0ekIYuB/
+	xRqL5x8TLlNX8D9z3JE93QxiBS/us2RK+H/xFsUmr4Jrup4MwdQ9h5yN8gUbRd4=
+X-Google-Smtp-Source: AGHT+IEsUUvesNSzDOZXBVwOpH/mJvxScDlUqihZEzqBcc1/za2BRTRLILpTeNLwc1aaK6xtRTtPOg==
+X-Received: by 2002:a6b:5007:0:b0:7de:b4dc:9b8f with SMTP id ca18e2360f4ac-7e1b5238e16mr1143476539f.2.1715620547263;
+        Mon, 13 May 2024 10:15:47 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4893714d92esm2559667173.75.2024.05.13.10.15.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 May 2024 10:15:46 -0700 (PDT)
+Message-ID: <6016b316-d266-48cf-aca9-127c72f9681b@linuxfoundation.org>
+Date: Mon, 13 May 2024 11:15:45 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cc1bb8e9bc3e1ab637700a4d3defeec95b55060a.camel@amazon.com>
- <ZeudRmZz7M6fWPVM@google.com> <ZexEkGkNe_7UY7w6@kernel.org>
- <58f39f23-0314-4e34-a8c7-30c3a1ae4777@amazon.co.uk> <ZkI0SCMARCB9bAfc@google.com>
- <aaf684b5eb3a3fe9cfbb6205c16f0973c6f8bb07.camel@amazon.com>
-Message-ID: <ZkJFIpEHIQvfuzx1@google.com>
-Subject: Re: Unmapping KVM Guest Memory from Host Kernel
-From: Sean Christopherson <seanjc@google.com>
-To: James Gowans <jgowans@amazon.com>
-Cc: Patrick Roy <roypat@amazon.co.uk>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Nikita Kalyazin <kalyazin@amazon.co.uk>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, 
-	"rppt@kernel.org" <rppt@kernel.org>, "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, 
-	"somlo@cmu.edu" <somlo@cmu.edu>, "vbabka@suse.cz" <vbabka@suse.cz>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"Liam.Howlett@oracle.com" <Liam.Howlett@oracle.com>, 
-	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>, David Woodhouse <dwmw@amazon.co.uk>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	Alexander Graf <graf@amazon.de>, Derek Manwaring <derekmn@amazon.com>, 
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>, "lstoakes@gmail.com" <lstoakes@gmail.com>, 
-	"mst@redhat.com" <mst@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Kselftest fixes for v6.9
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
+ Linus Torvalds <torvalds@linux-foundation.org>, Shuah Khan <shuah@kernel.org>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Brendan Higgins <brendanhiggins@google.com>,
+ Christian Brauner <brauner@kernel.org>, David Gow <davidgow@google.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jon Hunter <jonathanh@nvidia.com>,
+ Kees Cook <keescook@chromium.org>, Mark Brown <broonie@kernel.org>,
+ Ron Economos <re@w6rz.net>, Ronald Warsow <rwarsow@gmx.de>,
+ Sasha Levin <sashal@kernel.org>, Sean Christopherson <seanjc@google.com>,
+ Shengyu Li <shengyu.li.evgeny@gmail.com>,
+ Stephen Rothwell <sfr@canb.auug.org.au>, Will Drewry <wad@chromium.org>,
+ kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, Shuah Khan <skhan@linuxfoundation.org>,
+ shuah <shuah@kernel.org>
+References: <20240512105657.931466-1-mic@digikod.net>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20240512105657.931466-1-mic@digikod.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, May 13, 2024, James Gowans wrote:
-> On Mon, 2024-05-13 at 08:39 -0700, Sean Christopherson wrote:
-> > > Sean, you mentioned that you envision guest_memfd also supporting non=
--CoCo VMs.
-> > > Do you have some thoughts about how to make the above cases work in t=
-he
-> > > guest_memfd context?
-> >=20
-> > Yes.=C2=A0 The hand-wavy plan is to allow selectively mmap()ing guest_m=
-emfd().=C2=A0 There
-> > is a long thread[*] discussing how exactly we want to do that.=C2=A0 Th=
-e TL;DR is that
-> > the basic functionality is also straightforward; the bulk of the discus=
-sion is
-> > around gup(), reclaim, page migration, etc.
->=20
-> I still need to read this long thread, but just a thought on the word
-> "restricted" here: for MMIO the instruction can be anywhere and
-> similarly the load/store MMIO data can be anywhere. Does this mean that
-> for running unmodified non-CoCo VMs with guest_memfd backend that we'll
-> always need to have the whole of guest memory mmapped?
+On 5/12/24 04:56, Mickaël Salaün wrote:
+> Hi Linus,
+> 
+> Without reply from Shuah, and given the importance of these fixes [1], here is
+> a PR to fix Kselftest (broken since v6.9-rc1) for at least KVM, pidfd, and
+> Landlock.  I cannot test against all kselftests though.  This has been in
+> linux-next since the beginning of this week, and so far only one issue has been
+> reported [2] and fixed [3].
+> 
+> Feel free to take this PR if you see fit.
 
-Not necessarily, e.g. KVM could re-establish the direct map or mremap() on-=
-demand.
-There are variation on that, e.g. if ASI[*] were to ever make it's way upst=
-ream,
-which is a huge if, then we could have guest_memfd mapped into a KVM-only C=
-R3.
+Thank you - I totally missed the emails about sending these up for 6.9 :(
 
-> I guess the idea is that this use case will still be subject to the
-> normal restriction rules, but for a non-CoCo non-pKVM VM there will be=20
-> no restriction in practice, and userspace will need to mmap everything
-> always?
->=20
-> It really seems yucky to need to have all of guest RAM mmapped all the
-> time just for MMIO to work... But I suppose there is no way around that
-> for Intel x86.
+I see that these are already in Linux 6.9
 
-It's not just MMIO.  Nested virtualization, and more specifically shadowing=
- nested
-TDP, is also problematic (probably more so than MMIO).  And there are more =
-cases,
-i.e. we'll need a generic solution for this.  As above, there are a variety=
- of
-options, it's largely just a matter of doing the work.  I'm not saying it's=
- a
-trivial amount of work/effort, but it's far from an unsolvable problem.
+thanks,
+-- Shuah
+
 
