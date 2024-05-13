@@ -1,233 +1,128 @@
-Return-Path: <kvm+bounces-17314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD4A78C4171
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 15:09:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE338C41A7
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 15:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C8EE1C2281D
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 13:09:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 269A71F235D9
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 13:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047E01514CD;
-	Mon, 13 May 2024 13:09:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B57152171;
+	Mon, 13 May 2024 13:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="oIWNTRP8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vFwPJo67"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DD91509A3
-	for <kvm@vger.kernel.org>; Mon, 13 May 2024 13:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E808150980
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 13:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715605770; cv=none; b=RZVH7tWwWKX0VsctpucEUgmlMjOju2WuPuXUVpgjSoUcLUJjUuVfgYl7tznV95i0OcR0+MRL5QCx92X44EHq4vn8KkGLVR9eiWGVMTR8+eLSsxjohywyGompdRGTxBBIBab8tEsAFDhgpnYboRVV6eYCuabfVUNWt4DkXwptWqg=
+	t=1715606293; cv=none; b=EmE3OtHl1o6h+gQ4JGlWql30Myti1MYrj6AcJ6qFa5FuL0sM+1CPSvu2T5PXCgOoT1ZYwv9ksL/I5+bTyGMctzbfgczBvZuOGLMIdJ+dv577dBRYWDDvZOx3DnuM2InfvC8BCQgd0XEivG6UrrjSTXvQWcsk6aueSgt/K1Y9YVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715605770; c=relaxed/simple;
-	bh=zpZGnwRw0RonuhIC/M2/86imsc5RbcnkegqTXx4M9uk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XqJSX2mcQJj3zM1ACbHZFjmP4umLwl22M2TzmOdzPwlg8D8DNIjlWLjdhX1vo0FQT17h7gYtlqkNpx3LIrq+/a9vQg9FZV+obONzPeTBEYZX/oWALhURIUzJNG8jXJRYnTihp2zg2YRgm/O2fhA8vtUOiGb/K61IkF1sJlJn+6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=oIWNTRP8; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a59cdd185b9so918761666b.1
-        for <kvm@vger.kernel.org>; Mon, 13 May 2024 06:09:28 -0700 (PDT)
+	s=arc-20240116; t=1715606293; c=relaxed/simple;
+	bh=R1mjgHJalS937furFw/3CcRQaH1lDxfYP247THS079Q=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=L+5z4yznXdpw8ZA+SKgbCWgSJA4kAAbmf6cZoNqsPJLNppuwbeEBoNsmpqtg01zoi2sBlC5+iLWpv6yk8QoFD8bI3+PtF4V5crlqBX9dHCdFmTNsgjEJoHTfn1du07qLvHJMC1WkfV/haYOzAwmi2myVhxB1XtzGPS4SzaRrAzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=vFwPJo67; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-52232d0e5ceso2705492e87.0
+        for <kvm@vger.kernel.org>; Mon, 13 May 2024 06:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1715605767; x=1716210567; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5MKXjMChMNLDQEAHfT5KxNeT5FU7Py9gH+YOnRbraDE=;
-        b=oIWNTRP8SAX0NgR/uD+TIJzKATCaaMFzSHJ+PA7E8BLMewYu3rxPP49ebk9L0A5CN0
-         xBVOMnjSiKqfsCXXVHbPIPskRV/Zyuj7y+P7uViP4linF+aDvfrEveEhj3HbE1ChGtoQ
-         thiDKPrb6OoUw/bvxZfreqsiskOKai9vIiZ+E/fs/w3p43Uyc+2sV4YAnZ4MkKaPfU7q
-         weQV34JkQCcHq8DAbTsuRw/J5YTnuT1FFGLXbeiz5D2jxGQCyHn5F4WNxFGbQ9qncg2R
-         2v5iOUH6qcD2jspHpO7y4+yyHhMIMUyLsOiWqXWYGLSOp8odBBGc55Trcyhym/YaLC0f
-         DCvA==
+        d=linaro.org; s=google; t=1715606289; x=1716211089; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kPjgYgq2OJKi2+MpSVcM8/6vIKwKmBz6OcIcuKES9D4=;
+        b=vFwPJo67VC68YlacY2sI9VR4RRHpLjptEte8zoXiWNIfO0D5FNubB55zIfzwz3117z
+         7raXfD4eWgE3ap/tO1HLnKNs2XLOzfKVdw67dfrf5QLLJ0FZYlaSIBbjNrzhTZfGjQPF
+         MrxRhGRQsSLT/5VK3ATvEOlHfChIfySxbekZKWw9h+uR1FeIE0AfUYQreatv9Lbg1QSV
+         h/wRr8qApl9RsbCLD52af44ucZh1CtIQG16aF8+1KcNJs54btA3BN0oOFC9bWv8hjsCb
+         74S3gCoJBBWI2+psdtisodPM5aSqze1Er3ATVbAREzbe/Nvdxy96i/eMDjczO3go2+oW
+         JuFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715605767; x=1716210567;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5MKXjMChMNLDQEAHfT5KxNeT5FU7Py9gH+YOnRbraDE=;
-        b=goZW1ZDy9Qh/SJotLm7vrM7svxCdE02OAKE7aD0e1WYD5AeDqDWOux3wllc/kaw1Cj
-         HTZ321aZBAWX2zF6a+veSCiM3zMfjj2xRx982bwR8K+LDZ0cGdt3nDqj2OOR6GzV7h6s
-         Bw2bnsHbQKulPfwwqi34HSsbZTcj62UE3FqVba7RVRiiX7zVCiP1qse50+XM7/5ziUl0
-         SWto5IDwCDctLgmCn4lS3w9pwZSSsW7UioEWjO86bi8VKSDkBKL2y32T+kv869Jso3vH
-         rpsb+Gj2EZ3aqAfe+LNcLWgqx81OPOPZGjybMIh7McIcbZ2Dyru8Y/qYV/8otjGXlQfp
-         wAxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJPC+BE/qYYeN+T2ch28sTQ76AQ1aHGF1SJQgUJ/pNiJu5Sa421ANyiJKO0QRzyjQbkJnQNPm56r33ZJLjigrQY1po
-X-Gm-Message-State: AOJu0YyZam/WGaRmC4vUxZUFtNE38/cfLrwqZOVTWk7Bn0XJwKd9WOes
-	/r1tFpWgkJuI2ojAevzRiCMRZVENVQxQ2RRbW49YApBCqXaDSjJz4UCazsbc2pNJXJecK3J2Orn
-	yi0EYvuoaxeQXcwIG2D4f8xLmBMrWuXXfV53Djg==
-X-Google-Smtp-Source: AGHT+IE2QlkBf1B/qIqHvwWeBSEoU1R5RwhfvNE59sMHl2qimtxCkyusw1APubthP2zoyId5MUd15f47oIJVMuD1t0A=
-X-Received: by 2002:a17:906:ca8e:b0:a5a:7b88:8672 with SMTP id
- a640c23a62f3a-a5a7b888747mr3863166b.16.1715605766892; Mon, 13 May 2024
- 06:09:26 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715606289; x=1716211089;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kPjgYgq2OJKi2+MpSVcM8/6vIKwKmBz6OcIcuKES9D4=;
+        b=Npvs66ualkGYtjx/L+inFwwKCv3mf8ZgOTpWFyHHkDnHMb3Awy6tneOaEkxZjdFDqw
+         UebWlsjCxvIxLgNPLlCFdcydqAJ6gLYxIqEzfneYtxzDhwye9JRFwk4bGZ4QcSGrqr5x
+         TsaVHFl/keucnYuyGnNuSM+PSuklFen+ofMpSSxC3dZtQO9wezQneGmOAoQ8kXarec5Z
+         b0jBS23PDDFiGWeCbmj8wpN5+lrzEYo7xRhGVG4nBfyCVueXYeToa+Bq0FWp7y3vJqfh
+         Aizp/Pwwk0jmiOH072PUpadKh7aAkU868b8x/ztBytNHzdc+xBHfxQuqrKNYEAsuGyqb
+         GDWw==
+X-Forwarded-Encrypted: i=1; AJvYcCUoRAX8w1rbnmwXVGQVAfsSB+1V4AkYdiJBF+Us9+plaNrTPrPIf7q+/3zgN74qb25rIw9HhZ5KaH5KCLL79NNOT7iY
+X-Gm-Message-State: AOJu0YwUKrSkx35OvaRk/rEynLu7a3GosJrtvQJbQ8B6qsqSTT/+baP/
+	gfVm5wH8JopbpRWcoeMAzKc0UVXcU5zkjMsNdvPIX0V+EuU26Izcv+XnjL1dfj8=
+X-Google-Smtp-Source: AGHT+IEmbQJ/GCAcDR+7HrtDxBpzEwKlvqLnJY7pc3yj/c4s2dlJM/qy/szuRs/tWG/axCagE+LYLQ==
+X-Received: by 2002:ac2:4309:0:b0:518:bc7c:413a with SMTP id 2adb3069b0e04-52210276505mr5149644e87.69.1715606289265;
+        Mon, 13 May 2024 06:18:09 -0700 (PDT)
+Received: from [10.1.2.72] ([149.14.240.163])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-522403ed95asm937750e87.57.2024.05.13.06.18.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 May 2024 06:18:08 -0700 (PDT)
+Message-ID: <96c088de-8144-4f37-81e5-f3b51d6c29be@linaro.org>
+Date: Mon, 13 May 2024 15:18:06 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240508191931.46060-1-alexghiti@rivosinc.com>
- <20240508191931.46060-2-alexghiti@rivosinc.com> <CAGsJ_4xayC4D4y0d7SPXxCvuW4-rJQUCa_-OUDSsOGm_HyPm1w@mail.gmail.com>
-In-Reply-To: <CAGsJ_4xayC4D4y0d7SPXxCvuW4-rJQUCa_-OUDSsOGm_HyPm1w@mail.gmail.com>
-From: Alexandre Ghiti <alexghiti@rivosinc.com>
-Date: Mon, 13 May 2024 15:09:15 +0200
-Message-ID: <CAHVXubiOo3oe0=-qU2kBaFXebPJvmnc+-1UOPEHS2spcCeMzsw@mail.gmail.com>
-Subject: Re: [PATCH 01/12] mm, arm64: Rename ARM64_CONTPTE to THP_CONTPTE
-To: Barry Song <21cnbao@gmail.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Ard Biesheuvel <ardb@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, 
-	linux-riscv@lists.infradead.org, linux-efi@vger.kernel.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 00/22] hw/i386: Remove deprecated pc-i440fx-2.0 -> 2.3
+ machines
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
+ Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
+ qemu-ppc@nongnu.org, qemu-arm@nongnu.org
+References: <20240416185939.37984-1-philmd@linaro.org>
+ <6de106f2-1061-483e-97db-96b09e5b40ad@linaro.org>
+Content-Language: en-US
+In-Reply-To: <6de106f2-1061-483e-97db-96b09e5b40ad@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Barry,
+ping^2
 
-On Thu, May 9, 2024 at 2:46=E2=80=AFAM Barry Song <21cnbao@gmail.com> wrote=
-:
->
-> On Thu, May 9, 2024 at 7:20=E2=80=AFAM Alexandre Ghiti <alexghiti@rivosin=
-c.com> wrote:
-> >
-> > The ARM64_CONTPTE config represents the capability to transparently use
-> > contpte mappings for THP userspace mappings, which will be implemented
-> > in the next commits for riscv, so make this config more generic and mov=
-e
-> > it to mm.
-> >
-> > Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
-> > ---
-> >  arch/arm64/Kconfig               | 9 ---------
-> >  arch/arm64/include/asm/pgtable.h | 6 +++---
-> >  arch/arm64/mm/Makefile           | 2 +-
-> >  mm/Kconfig                       | 9 +++++++++
-> >  4 files changed, 13 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> > index ac2f6d906cc3..9d823015b4e5 100644
-> > --- a/arch/arm64/Kconfig
-> > +++ b/arch/arm64/Kconfig
-> > @@ -2227,15 +2227,6 @@ config UNWIND_PATCH_PAC_INTO_SCS
-> >         select UNWIND_TABLES
-> >         select DYNAMIC_SCS
-> >
-> > -config ARM64_CONTPTE
-> > -       bool "Contiguous PTE mappings for user memory" if EXPERT
-> > -       depends on TRANSPARENT_HUGEPAGE
-> > -       default y
-> > -       help
-> > -         When enabled, user mappings are configured using the PTE cont=
-iguous
-> > -         bit, for any mappings that meet the size and alignment requir=
-ements.
-> > -         This reduces TLB pressure and improves performance.
-> > -
-> >  endmenu # "Kernel Features"
-> >
-> >  menu "Boot options"
-> > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/=
-pgtable.h
-> > index 7c2938cb70b9..1758ce71fae9 100644
-> > --- a/arch/arm64/include/asm/pgtable.h
-> > +++ b/arch/arm64/include/asm/pgtable.h
-> > @@ -1369,7 +1369,7 @@ extern void ptep_modify_prot_commit(struct vm_are=
-a_struct *vma,
-> >                                     unsigned long addr, pte_t *ptep,
-> >                                     pte_t old_pte, pte_t new_pte);
-> >
-> > -#ifdef CONFIG_ARM64_CONTPTE
-> > +#ifdef CONFIG_THP_CONTPTE
->
-> Is it necessarily THP? can't be hugetlb or others? I feel THP_CONTPTE
-> isn't a good name.
+On 6/5/24 16:29, Philippe Mathieu-Daudé wrote:
+> On 16/4/24 20:59, Philippe Mathieu-Daudé wrote:
+>> Series fully reviewed.
+> 
+> Ping, is there some issue holding this series?
+> 
+>> Philippe Mathieu-Daudé (22):
+>>    hw/i386/pc: Deprecate 2.4 to 2.12 pc-i440fx machines
+>>    hw/i386/pc: Remove deprecated pc-i440fx-2.0 machine
+>>    hw/usb/hcd-xhci: Remove XHCI_FLAG_FORCE_PCIE_ENDCAP flag
+>>    hw/usb/hcd-xhci: Remove XHCI_FLAG_SS_FIRST flag
+>>    hw/i386/acpi: Remove PCMachineClass::legacy_acpi_table_size
+>>    hw/acpi/ich9: Remove 'memory-hotplug-support' property
+>>    hw/acpi/ich9: Remove dead code related to 'acpi_memory_hotplug'
+>>    hw/i386/pc: Remove deprecated pc-i440fx-2.1 machine
+>>    target/i386/kvm: Remove x86_cpu_change_kvm_default() and 'kvm-cpu.h'
+>>    hw/i386/pc: Remove PCMachineClass::smbios_uuid_encoded
+>>    hw/smbios: Remove 'uuid_encoded' argument from smbios_set_defaults()
+>>    hw/smbios: Remove 'smbios_uuid_encoded', simplify smbios_encode_uuid()
+>>    hw/i386/pc: Remove PCMachineClass::enforce_aligned_dimm
+>>    hw/mem/pc-dimm: Remove legacy_align argument from pc_dimm_pre_plug()
+>>    hw/mem/memory-device: Remove legacy_align from
+>>      memory_device_pre_plug()
+>>    hw/i386/pc: Remove deprecated pc-i440fx-2.2 machine
+>>    hw/i386/pc: Remove PCMachineClass::resizable_acpi_blob
+>>    hw/i386/pc: Remove PCMachineClass::rsdp_in_ram
+>>    hw/i386/acpi: Remove AcpiBuildState::rsdp field
+>>    hw/i386/pc: Remove deprecated pc-i440fx-2.3 machine
+>>    target/i386: Remove X86CPU::kvm_no_smi_migration field
+>>    hw/i386/pc: Replace PCMachineClass::acpi_data_size by
+>>      PC_ACPI_DATA_SIZE
 
-This does not target hugetlbfs (see my other patchset for that here
-https://lore.kernel.org/linux-riscv/7504a525-8211-48b3-becb-a6e838c1b42e@ar=
-m.com/T/#m57d273d680fc531b3aa1074e6f8558a52ba5badc).
-
-What could be "others" here?
-
-Thanks for your comment,
-
-Alex
-
->
-> >
-> >  /*
-> >   * The contpte APIs are used to transparently manage the contiguous bi=
-t in ptes
-> > @@ -1622,7 +1622,7 @@ static inline int ptep_set_access_flags(struct vm=
-_area_struct *vma,
-> >         return contpte_ptep_set_access_flags(vma, addr, ptep, entry, di=
-rty);
-> >  }
-> >
-> > -#else /* CONFIG_ARM64_CONTPTE */
-> > +#else /* CONFIG_THP_CONTPTE */
-> >
-> >  #define ptep_get                               __ptep_get
-> >  #define set_pte                                        __set_pte
-> > @@ -1642,7 +1642,7 @@ static inline int ptep_set_access_flags(struct vm=
-_area_struct *vma,
-> >  #define __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS
-> >  #define ptep_set_access_flags                  __ptep_set_access_flags
-> >
-> > -#endif /* CONFIG_ARM64_CONTPTE */
-> > +#endif /* CONFIG_THP_CONTPTE */
-> >
-> >  int find_num_contig(struct mm_struct *mm, unsigned long addr,
-> >                     pte_t *ptep, size_t *pgsize);
-> > diff --git a/arch/arm64/mm/Makefile b/arch/arm64/mm/Makefile
-> > index 60454256945b..52a1b2082627 100644
-> > --- a/arch/arm64/mm/Makefile
-> > +++ b/arch/arm64/mm/Makefile
-> > @@ -3,7 +3,7 @@ obj-y                           :=3D dma-mapping.o exta=
-ble.o fault.o init.o \
-> >                                    cache.o copypage.o flush.o \
-> >                                    ioremap.o mmap.o pgd.o mmu.o \
-> >                                    context.o proc.o pageattr.o fixmap.o
-> > -obj-$(CONFIG_ARM64_CONTPTE)    +=3D contpte.o
-> > +obj-$(CONFIG_THP_CONTPTE)      +=3D contpte.o
-> >  obj-$(CONFIG_HUGETLB_PAGE)     +=3D hugetlbpage.o
-> >  obj-$(CONFIG_PTDUMP_CORE)      +=3D ptdump.o
-> >  obj-$(CONFIG_PTDUMP_DEBUGFS)   +=3D ptdump_debugfs.o
-> > diff --git a/mm/Kconfig b/mm/Kconfig
-> > index c325003d6552..fd4de221a1c6 100644
-> > --- a/mm/Kconfig
-> > +++ b/mm/Kconfig
-> > @@ -984,6 +984,15 @@ config ARCH_HAS_CACHE_LINE_SIZE
-> >  config ARCH_HAS_CONTPTE
-> >         bool
-> >
-> > +config THP_CONTPTE
-> > +       bool "Contiguous PTE mappings for user memory" if EXPERT
-> > +       depends on ARCH_HAS_CONTPTE && TRANSPARENT_HUGEPAGE
-> > +       default y
-> > +       help
-> > +         When enabled, user mappings are configured using the PTE cont=
-iguous
-> > +         bit, for any mappings that meet the size and alignment requir=
-ements.
-> > +         This reduces TLB pressure and improves performance.
-> > +
-> >  config ARCH_HAS_CURRENT_STACK_POINTER
-> >         bool
-> >         help
-> > --
-> > 2.39.2
->
-> Thanks
-> Barry
 
