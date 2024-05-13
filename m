@@ -1,372 +1,116 @@
-Return-Path: <kvm+bounces-17333-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17334-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 696388C44FA
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 18:19:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37FA8C44FE
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 18:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E771280F87
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 16:19:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15CB9B20DDB
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 16:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A8C15534C;
-	Mon, 13 May 2024 16:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B586155355;
+	Mon, 13 May 2024 16:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HRWpst6J"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KNqmLJSG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E3F14D2BF;
-	Mon, 13 May 2024 16:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426E415533E
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 16:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715617182; cv=none; b=JMyyO6pv1iWu3bcH6yAVZQCsTvfNTVmcuIJRId95dGA6KUVUb/DuDbzO0c7pX/MJgqRCl/n3jqk/DMTORNeM9ipJPMsbLAbFk59NaJPdSt9ft5Qfl69QmBLX/dwEztVkSzpV6gRQ4aQKmXXHo4hAPz/xmHAjFwB64zNNbydKeVU=
+	t=1715617254; cv=none; b=idNtCAn+wM+qpmiMFq5Y028K4iDwWeD6W45qIjV0bn/ckySJ9JGe3fISURvQlC/OK3OJxrtPJtiHr2vkG11NHsOPbppcUkDtYfj62nSc0ZTfypJgLDfSj5XH8l1mdymE6u8fbXk/OW7rz9Kof23dT6tEHf6fzomyjfPkRotPfTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715617182; c=relaxed/simple;
-	bh=vD7X+Ao+W12WTcLa+fYbUGGl0ZipNgpNyrh4jIzYIyU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bw40sVuG5D+KoJaILKaeG0EbRkgoUOtO3HiYzATL/crsR8AWtiOg+M+RSNGSRR5jfg6GaDH+jXZVZ03yBAc4/hvrwVtJ7aF5H3rBQohvbScfnP40fUWbtUtNhLHMWCmukWtN1zJn80rl61TNZdppFQZ6z80kgamkkp5zrnckKW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HRWpst6J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBFDCC113CC;
-	Mon, 13 May 2024 16:19:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715617182;
-	bh=vD7X+Ao+W12WTcLa+fYbUGGl0ZipNgpNyrh4jIzYIyU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HRWpst6JsD4icBNYc82I3q1S17Jbos8fZuec2eQD6MnU5NoZMPmaDRjUEPHR4qFAL
-	 cS0yl/9Gp/5zkS2lA8WFGf7JFwB/b3l9Xvur/y9mNA2pNhAP9klIob/S0geo3+UgXF
-	 cjxB0CNTslG5rybbaKISxindvIVflX5IyzdW6l49RrgKRooJSP36pGVMV1pEbhOzw7
-	 yAMQnwwHgpNwYPIaGf4RMgHd9/yhGK5fJtFG8IlVI5SVPwpaZAryBH/5jTB6SfGUiR
-	 U/18li5zgV/waVSY3WMQ9+32Txue0e0oXtzy9OPOmt43F3X/XwE3GCnb3HJydlcuCU
-	 JVEdSkjo+F1hQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1s6YOp-00Csg5-JY;
-	Mon, 13 May 2024 17:19:39 +0100
-Date: Mon, 13 May 2024 17:19:39 +0100
-Message-ID: <86wmnxn0pw.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH 01/16] KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-In-Reply-To: <ZjnHaYjgMqcpfxdV@linux.dev>
-References: <20240409175448.3507472-1-maz@kernel.org>
-	<20240409175448.3507472-2-maz@kernel.org>
-	<ZjnHaYjgMqcpfxdV@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1715617254; c=relaxed/simple;
+	bh=BdY/cBLngQnlcwyixvI71fNjSSKMQrGCPriZ2LpM/Ic=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=MrTf5tVpn0A8G6NbvFtLku6BNa7yW4TMTRbp8vIOQWVAHSupXMbJofY1vVQmb7WBtUW1eNoq/HXSt5jakudTEbic2WPWh9JY79veNqS0fK1i2EP3zF1YzTsUFtW3aEzb2zTh6OXhw/rSQJ2zOWl3ImLgo3ZaWH/NSSgmQ+QAzGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KNqmLJSG; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2a49440f7b5so3883840a91.1
+        for <kvm@vger.kernel.org>; Mon, 13 May 2024 09:20:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715617252; x=1716222052; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zgt+w/nU1JjUrZ0GRJPLjZLIv1xcz6lTgN5YKDDkzT8=;
+        b=KNqmLJSGpLRA+dQx83K8Sr37612TC3IE4T2huVpE6xzee8kFLmHl+q+Vfw8InNTvIr
+         ErmhgUtLq4hpc6iwAmUR3XxQxIwYybcNVDBYuhvECqof78EpEqoFWoaPgJVBr5eJd6xO
+         nviPf3KbcM/8aK6PrYHsCDfi1qGnoDkY8ZhWV4HAc3HMnSkdjXKTAVf/EX/uQ8nFP3Gh
+         IG8tp3WdJB5gtwbCnvyOulGJM+ZCP0J1HGv4Gd8F4Olxb8UgBNXFTzzG6IhkIGEDUH0i
+         pjQ5nx9r+MgNN/Z959gSonbKSTu7O/y6ZrphF/RNn1qPtpQYY0rgIFaqwiYUly8gunis
+         pb+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715617252; x=1716222052;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zgt+w/nU1JjUrZ0GRJPLjZLIv1xcz6lTgN5YKDDkzT8=;
+        b=bt7dk2GS2c+YXT+6c5Hv2/iOCZlKJ9vUnw8KlaX0DOwbnFSykUxonlyZGiuTRtW00Y
+         oshQvW102c3umLNboB2QmlfiSXAaei8J2RwpRuwRuV2Fp9/JWdGBhd4GPF22DfruiFFE
+         GktOg/Qgp+SCt1JJt5spbuS902C5GhDAQfZZ7qD6NzqyuPzfATce0ZpWm8wgHn72X3Ow
+         Tmkj0mFsbvU+51ZOmIc2OX7m1j1vXa4UJr/ECWn1DHG2UMJBo18KK6ZmZvxRS9kBk1/O
+         WRdPP04u8keireoKNuRkib8lJRo0iEmr/Z18Z/y//EYK+9d45DXD4TzJhiAq5Ri4JOKX
+         p/KA==
+X-Forwarded-Encrypted: i=1; AJvYcCWBWViVX76nWMDfYSunUdlUpaB0eBkI6Uf6orCfxtTrcnr+hbm39cAcrxc/1i6hNtXEKcwWkckCdcWf6sCG8TX1x4FP
+X-Gm-Message-State: AOJu0YxDrYdVRDoKXjSEqlVfBzE+6vh6r8LloV+XoTSt3dgqLJNzUsqx
+	PCL2O+FM5m9/DfcTpLZWaYUSy/36Rjyw/TqaalNNCzDNQwK/sz/yrhfyNHN5kC20h1I6lnMU52X
+	t3g==
+X-Google-Smtp-Source: AGHT+IFHnrXdTgKbPjNIvcthWplF4GAmm0C+xXuTvFWx+kW05nR4GtvDbz0e+nNcsaVMkxBWnlqwf3ezKV0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:350f:b0:2b4:32ae:483e with SMTP id
+ 98e67ed59e1d1-2b6cc03bd09mr29750a91.2.1715617252422; Mon, 13 May 2024
+ 09:20:52 -0700 (PDT)
+Date: Mon, 13 May 2024 09:20:50 -0700
+In-Reply-To: <4f2112f3c4f62607a1186faa138ccc06f38ee523.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Mime-Version: 1.0
+References: <20240425233951.3344485-1-seanjc@google.com> <20240425233951.3344485-5-seanjc@google.com>
+ <4f2112f3c4f62607a1186faa138ccc06f38ee523.camel@intel.com>
+Message-ID: <ZkI94l9rcfBSH0pV@google.com>
+Subject: Re: [PATCH 4/4] KVM: Rename functions related to enabling
+ virtualization hardware
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 07 May 2024 07:17:13 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Mon, May 13, 2024, Kai Huang wrote:
+> On Thu, 2024-04-25 at 16:39 -0700, Sean Christopherson wrote:
+> > Rename the various functions that enable virtualization to prepare for
+> > upcoming changes, and to clean up artifacts of KVM's previous behavior,
+> > which required manually juggling locks around kvm_usage_count.
+> > 
+> > Drop the "nolock" qualifier from per-CPU functions now that there are no
+> > "nolock" implementations of the "all" variants, i.e. now that calling a
+> > non-nolock function from a nolock function isn't confusing (unlike this
+> > sentence).
+> > 
+> > Drop "all" from the outer helpers as they no longer manually iterate
+> > over all CPUs, and because it might not be obvious what "all" refers to.
+> > Instead, use double-underscores to communicate that the per-CPU functions
+> > are helpers to the outer APIs.
+> > 
 > 
-> Hey Marc,
+> I kinda prefer
 > 
-> On Tue, Apr 09, 2024 at 06:54:33PM +0100, Marc Zyngier wrote:
-> > +static inline bool kvm_s2_mmu_valid(struct kvm_s2_mmu *mmu)
-> > +{
-> > +	return !(mmu->tlb_vttbr & 1);
-> > +}
+> 	cpu_enable_virtualization();
 > 
-> More readable if you use VTTBR_CNP_BIT here.
-
-Yes, well spotted.
-
-[...]
-
-> > +int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long type)
-> > +{
-> > +	int cpu, err;
-> > +	struct kvm_pgtable *pgt;
-> > +
-> > +	/*
-> > +	 * If we already have our page tables in place, and that the
-> > +	 * MMU context is the canonical one, we have a bug somewhere,
-> > +	 * as this is only supposed to ever happen once per VM.
-> > +	 *
-> > +	 * Otherwise, we're building nested page tables, and that's
-> > +	 * probably because userspace called KVM_ARM_VCPU_INIT more
-> > +	 * than once on the same vcpu. Since that's actually legal,
-> > +	 * don't kick a fuss and leave gracefully.
-> > +	 */
-> >  	if (mmu->pgt != NULL) {
-> > +		if (&kvm->arch.mmu != mmu)
+> instead of
 > 
-> A helper might be a good idea, I see this repeated several times:
+> 	__kvm_enable_virtualization();
 > 
-> static inline bool kvm_is_nested_s2_mmu(struct kvm_s2_mmu *mmu)
-> {
-> 	return &arch->mmu != mmu;
-> }
+> But obviously not a strong opinion :-)
 
-Yeah, I can probably fit something like this in a number of spots.
-Just need to be careful as mmu is not initialised at all in some
-contexts.
-
-> 
-> > +			return 0;
-> > +
-> >  		kvm_err("kvm_arch already initialized?\n");
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > +	/*
-> > +	 * We only initialise the IPA range on the canonical MMU, so
-> > +	 * the type is meaningless in all other situations.
-> > +	 */
-> > +	if (&kvm->arch.mmu != mmu)
-> > +		type = kvm_get_pa_bits(kvm);
-> 
-> I'm not sure I follow this comment, because kvm_init_ipa_range() still
-> gets called on nested MMUs. Is this suggesting that the configured IPA
-> limit of the shadow MMUs doesn't matter as they can only ever map things
-> in the canonical IPA space?
-
-Yes, that's exactly what I meant. Just because we limit the IPA space
-to some number of bits doesn't mean we can limit the guest's own S2 to
-the same thing, because they mean different things:
-
-- the canonical IPA space (aka type) is a contract between KVM and
-  userspace on which ranges the MMIO exits are valid
-
-- the nested IPA space is whatever the virtual HW exposes as PARange,
-  and the only constraint is that the *output* of the nested IPA space
-  must be contained in the canonical IPA space
-
-Does this make sense? Happy to rework the comment to clarify this.
-
-> 
-> > +	err = kvm_init_ipa_range(mmu, type);
-> > +	if (err)
-> > +		return err;
-> > +
-> >  	pgt = kzalloc(sizeof(*pgt), GFP_KERNEL_ACCOUNT);
-> >  	if (!pgt)
-> >  		return -ENOMEM;
-> > @@ -925,6 +960,10 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
-> >  
-> >  	mmu->pgt = pgt;
-> >  	mmu->pgd_phys = __pa(pgt->pgd);
-> > +
-> > +	if (&kvm->arch.mmu != mmu)
-> > +		kvm_init_nested_s2_mmu(mmu);
-> > +
-> >  	return 0;
-> >  
-> >  out_destroy_pgtable:
-> > @@ -976,7 +1015,7 @@ static void stage2_unmap_memslot(struct kvm *kvm,
-> >  
-> >  		if (!(vma->vm_flags & VM_PFNMAP)) {
-> >  			gpa_t gpa = addr + (vm_start - memslot->userspace_addr);
-> > -			unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
-> > +			kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, vm_end - vm_start);
-> >  		}
-> >  		hva = vm_end;
-> >  	} while (hva < reg_end);
-> > @@ -2054,11 +2093,6 @@ void kvm_arch_memslots_updated(struct kvm *kvm, u64 gen)
-> >  {
-> >  }
-> >  
-> > -void kvm_arch_flush_shadow_all(struct kvm *kvm)
-> > -{
-> > -	kvm_uninit_stage2_mmu(kvm);
-> > -}
-> > -
-> >  void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
-> >  				   struct kvm_memory_slot *slot)
-> >  {
-> > @@ -2066,7 +2100,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
-> >  	phys_addr_t size = slot->npages << PAGE_SHIFT;
-> >  
-> >  	write_lock(&kvm->mmu_lock);
-> > -	unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-> > +	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
-> >  	write_unlock(&kvm->mmu_lock);
-> >  }
-> >  
-> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-> > index ced30c90521a..1f4f80a8c011 100644
-> > --- a/arch/arm64/kvm/nested.c
-> > +++ b/arch/arm64/kvm/nested.c
-> > @@ -7,7 +7,9 @@
-> >  #include <linux/kvm.h>
-> >  #include <linux/kvm_host.h>
-> >  
-> > +#include <asm/kvm_arm.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_mmu.h>
-> >  #include <asm/kvm_nested.h>
-> >  #include <asm/sysreg.h>
-> >  
-> > @@ -16,6 +18,209 @@
-> >  /* Protection against the sysreg repainting madness... */
-> >  #define NV_FTR(r, f)		ID_AA64##r##_EL1_##f
-> >  
-> > +void kvm_init_nested(struct kvm *kvm)
-> > +{
-> > +	kvm->arch.nested_mmus = NULL;
-> > +	kvm->arch.nested_mmus_size = 0;
-> > +}
-> > +
-> > +int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
-> > +{
-> > +	struct kvm *kvm = vcpu->kvm;
-> > +	struct kvm_s2_mmu *tmp;
-> > +	int num_mmus;
-> > +	int ret = -ENOMEM;
-> > +
-> > +	if (!test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->kvm->arch.vcpu_features))
-> > +		return 0;
-> > +
-> > +	if (!cpus_have_final_cap(ARM64_HAS_NESTED_VIRT))
-> > +		return -EINVAL;
-> 
-> nitpick: maybe guard the call to kvm_vcpu_init_nested() with
-> vcpu_has_nv() and collapse these into
-> 
-> 	if (!vcpu_has_nv(vcpu))
-> 		return -EINVAL;
-
-Indeed, this is definitely old cruft we can get rid off. We don't even
-need to error out, as there is a single call site.
-
-> 
-> > +	/*
-> > +	 * Let's treat memory allocation failures as benign: If we fail to
-> > +	 * allocate anything, return an error and keep the allocated array
-> > +	 * alive. Userspace may try to recover by intializing the vcpu
-> > +	 * again, and there is no reason to affect the whole VM for this.
-> > +	 */
-> 
-> This code feels a bit tricky, and I'm not sure much will be done to
-> recover the VM in practice should this allocation / ioctl fail.
-
-I think this is a question of consistency. We don't break the VM when
-VPCU_INIT fails in any other case. But yeah, I agree that the whole
-fixup code is tricky.
-
-> Is it possible to do this late in kvm_arch_vcpu_run_pid_change() and
-> only have the first vCPU to reach the call do the initialization for the
-> whole VM? We could then dispose of the reallocation / fixup scheme
-> below.
-
-We could, but then the error becomes pretty non-recoverable.
-
-Another thing is that I really should move this over to be vmalloc'd
-rather than kmalloc'd -- there is no benefit in having this physically
-contiguous.
-
-> 
-> If we keep this code...
-> 
-> > +	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
-> > +	tmp = krealloc(kvm->arch.nested_mmus,
-> > +		       num_mmus * sizeof(*kvm->arch.nested_mmus),
-> > +		       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
-> 
-> Just do an early 'return -ENOMEM' here to cut a level of indendation for
-> the rest that follows.
->
-> > +	if (tmp) {
-> > +		/*
-> > +		 * If we went through a realocation, adjust the MMU
-> > +		 * back-pointers in the previously initialised
-> > +		 * pg_table structures.
-> 
-> nitpick: pgtable or kvm_pgtable structures
->
-> > +		 */
-> > +		if (kvm->arch.nested_mmus != tmp) {
-> > +			int i;
-> > +
-> > +			for (i = 0; i < num_mmus - 2; i++)
-> > +				tmp[i].pgt->mmu = &tmp[i];
-> > +		}
-> > +
-> > +		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1], 0) ||
-> > +		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2], 0)) {
-> > +			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
-> > +			kvm_free_stage2_pgd(&tmp[num_mmus - 2]);
-> > +		} else {
-> > +			kvm->arch.nested_mmus_size = num_mmus;
-> > +			ret = 0;
-> > +		}
-> > +
-> > +		kvm->arch.nested_mmus = tmp;
-> > +	}
-> > +
-> > +	return ret;
-> > +}
-> > +
-> > +struct kvm_s2_mmu *lookup_s2_mmu(struct kvm_vcpu *vcpu)
-> > +{
-> > +	bool nested_stage2_enabled;
-> > +	u64 vttbr, vtcr, hcr;
-> > +	struct kvm *kvm;
-> > +	int i;
-> > +
-> > +	kvm = vcpu->kvm;
-> 
-> nit: just do this when declaring the local.
-> 
-> > +	lockdep_assert_held_write(&kvm->mmu_lock);
-> > +
-> > +	vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-> > +	vtcr = vcpu_read_sys_reg(vcpu, VTCR_EL2);
-> > +	hcr = vcpu_read_sys_reg(vcpu, HCR_EL2);
-> > +
-> > +	nested_stage2_enabled = hcr & HCR_VM;
-> > +
-> > +	/* Don't consider the CnP bit for the vttbr match */
-> > +	vttbr = vttbr & ~VTTBR_CNP_BIT;
-> 
-> nit: &=
-> 
-> > +	/*
-> > +	 * Two possibilities when looking up a S2 MMU context:
-> > +	 *
-> > +	 * - either S2 is enabled in the guest, and we need a context that is
-> > +         *   S2-enabled and matches the full VTTBR (VMID+BADDR) and VTCR,
-> > +         *   which makes it safe from a TLB conflict perspective (a broken
-> > +         *   guest won't be able to generate them),
-> > +	 *
-> > +	 * - or S2 is disabled, and we need a context that is S2-disabled
-> > +         *   and matches the VMID only, as all TLBs are tagged by VMID even
-> > +         *   if S2 translation is disabled.
-> > +	 */
-> 
-> Looks like some spaces snuck in and got the indendation weird.
-
-
-Ack on all the above.
-
-Thanks for having looked into it!
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+I feel quite strongly about using __kvm_enable_virtualization().  While "cpu" is
+very precise, to me it implies that the code lives outside of KVM and isn't purely
+a helper for kvm_enable_virtualization().
 
