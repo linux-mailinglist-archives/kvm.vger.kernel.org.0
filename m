@@ -1,228 +1,174 @@
-Return-Path: <kvm+bounces-17354-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17355-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB2AD8C48BB
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 23:18:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4C08C48FD
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 23:47:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60301282B0D
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 21:18:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B2EF1F22AA8
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 21:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62B5982C7E;
-	Mon, 13 May 2024 21:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C708405D;
+	Mon, 13 May 2024 21:47:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ECv/sK9Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZSXBDEn4"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2061.outbound.protection.outlook.com [40.107.243.61])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D701E824A3;
-	Mon, 13 May 2024 21:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715635127; cv=fail; b=Q53KPOagxKIfAoI+Yxb2ZtBQktKSgcXEBBOXX0jF0MwlWHXUpsMGetdo6KneCf6UfIMRBVDmZHjXt5LUCwLFI94IaOwixciWtxW0ySAD2YEEBgOaZWm58Gj66vxb6HPgl4LcyMhDU9nnpH8E5Ax+iQudC33nlbM/YrGEYW5iyO4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715635127; c=relaxed/simple;
-	bh=5oUD2nPoyGUCx5TGQuQtjxRyRApUCGP3mMnNFdt9mAQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uGI2POb6pLLcl1qeVgN6AI8hDiq4WoZFu3fsSs8/jaaFvJUJTkfUZbSl/lIAu1zOV8XklegEVmrTGBWxwb+UzoI0s9ccaCL5R13nKbOlRjxXSbPaJeFApoRU51emq1+92J6UQwMv9iTSPXwrhYxlzur78gSpKi7SEAAyN7ouWbk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ECv/sK9Z; arc=fail smtp.client-ip=40.107.243.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lXX27+MYX0BgM9/g1WhC1ssgcYZ3JYzCSJH14XJjYGNcIN9sBBbS9+bCi0cOyRljp11w3BlTbpKdF4RCGJrQ7cHko7argJ/9EFW4UsrGBvPidb/f4k0Yw8k7GmBsohQQkHb9wrolLSal+BYChZW2dvX02wV6c114P+xLi/E4OwmDRBDD0o6pXsYP+eFRItA3MJtog8v8vzHejmbpIaoUPq19VrnLGk9AR4r9zOzhIuH5TCBDYMWlYAgfNKpXl+n9+hNYfIyMm92rHl/c2Xjn3l2KQY9GvGRb3F7p+OAbSSWwsFXcVoNoADgeBPeJ71+u8LqxI3XEeHaOu+JkaqWmvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2JwlqFjexOxmYJkPHvWfL5YnAjxWZsyeZM1VRbh7/sE=;
- b=Apzi9pRNpvjlGts9WhTchSX8RCOKsNp4xyGrLepeB2bPQaPflfl1C0TvDWCOEs+MQviZxg8y+gQbRGxNvRxu6Bjxm0ccKJU1+uJKHBi9Wxa+FkAghHXLYf8A4a8anhR3wKjovxE/trDRmib9Jh7VgwIHrvfnnbGg04NMMxHvOAZA81qprkdn+DpYuqlzc1JbSPUoIi3RIRzCLTpha/a1rvRfGSJYo55CmM3jlpf58xWC3EHOOW0rhVR/wWV8aQej+mo+kzF6MUF73qUnNVNrf4mJggYvuiwh2PVmKnR2mfncOSt+kkvI67U5oxvTbVAinV+pU2YXu96wieNSMEeOaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2JwlqFjexOxmYJkPHvWfL5YnAjxWZsyeZM1VRbh7/sE=;
- b=ECv/sK9ZqJ0si+JwhN8mib6mDUy+lj25eTEw+I4yj4IVR7oo9dQ9HIWbsak9fSO0Y/lhTG4iHi0KNJK1OTAWNSSdVn/+nNs/aj0wiYt26THyB0Q4ekYM9Fvk20G+opPNMQvZi1kWG1iaFuFjxo+5/jrN+UYMUmQwT5/0a7zIL00=
-Received: from CH2PR05CA0023.namprd05.prod.outlook.com (2603:10b6:610::36) by
- DS0PR12MB7534.namprd12.prod.outlook.com (2603:10b6:8:139::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7544.49; Mon, 13 May 2024 21:18:40 +0000
-Received: from CH2PEPF00000148.namprd02.prod.outlook.com
- (2603:10b6:610:0:cafe::9a) by CH2PR05CA0023.outlook.office365.com
- (2603:10b6:610::36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.22 via Frontend
- Transport; Mon, 13 May 2024 21:18:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF00000148.mail.protection.outlook.com (10.167.244.105) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7587.21 via Frontend Transport; Mon, 13 May 2024 21:18:40 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 13 May
- 2024 16:18:40 -0500
-Date: Mon, 13 May 2024 16:18:21 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: Nathan Chancellor <nathan@kernel.org>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Sean Christopherson <seanjc@google.com>,
-	<llvm@lists.linux.dev>
-Subject: Re: [PULL 18/19] KVM: SEV: Provide support for
- SNP_EXTENDED_GUEST_REQUEST NAE event
-Message-ID: <20240513211821.rgg6mz4dgj5w3b4h@amd.com>
-References: <20240510211024.556136-1-michael.roth@amd.com>
- <20240510211024.556136-19-michael.roth@amd.com>
- <20240513151920.GA3061950@thelio-3990X>
- <0ceafce9-0e08-4d47-813d-6b3f52ac5fd6@redhat.com>
- <20240513170535.je74yhujxpogijga@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB13F175A6
+	for <kvm@vger.kernel.org>; Mon, 13 May 2024 21:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715636850; cv=none; b=tNVMb6tqhhri0XQQPNzVAypiVeflqml9VsH4YtxGdatYZVX0LhJGyXFv7EaIteR9mEP19LNEwH4C9gBz+H+MUefe11UpF+i+MSt9TeaCB4zSwrZ/KIwuUX4KsvNVIOj/wUsHDw7+EelyHIrpQV4E2Ur2aXotHuqRLQzNWyQGrkE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715636850; c=relaxed/simple;
+	bh=GsvEB0jrgKOQaYhaQDNrmbyGu9pT3dQg3hSPhGvs95A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cS9giPI2XeKrGtdBoU/oyBq34Wv0fVsrDxDQs0Ii8ByZa3qXF+pzWzwPB+XJ4Pf7oPYO/TY8AmEgLmQTLpeM8COSzLCB+ObBasE2QRKfhK7/DGZiy6TN++lDkisElGYAlr9xtMDtWDZQ6HH5xz9sTZmHmkZS1WeVUwmHVaz3wl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZSXBDEn4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715636847;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zezx3lgmnnnDtiiLnluAFlp/ntQq1a9r2G/1DoFg4n0=;
+	b=ZSXBDEn4BeX3bMPTbXUivaCe8iGaYvUkGcnimV9F21jPOc3la1vR8Uecw0Md2eeM3bSgru
+	f45SMSNO7cPwV9Nbovig6NrpFF4s1YwZOwDlSBairKisuu5sHrzJtEZNXHX5SfwQgqTvvp
+	l4GA5hnB3ysKtrxvORZ5CwW6T/gv1ZU=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-388-pvLsVtOqNhiMu3eKinuKWQ-1; Mon, 13 May 2024 17:47:26 -0400
+X-MC-Unique: pvLsVtOqNhiMu3eKinuKWQ-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-43dfa80c9ccso58145941cf.3
+        for <kvm@vger.kernel.org>; Mon, 13 May 2024 14:47:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715636845; x=1716241645;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Zezx3lgmnnnDtiiLnluAFlp/ntQq1a9r2G/1DoFg4n0=;
+        b=F64lgB3pRNzbJ2TMfDDP8sDlI+Pww7FeJyEnkJCwACoiKExOA4dmwlRTdg++4N3IbR
+         9w67RZd8XxzQPvf+3NvO9ZUqaMOi4CAeZrt+60r3BrF2wPJ1STM9zXazRzeS4DmsM06Y
+         yb4ZJwaacQmw+vRAOCHi2CcPU83xOrwiq8ZiergkFdVKYEL+R9eX6LL6T9RoUo656Yl9
+         P1AWpFTlEyJ3U8x+P0Pxm6D5GdEv2HQG+fWV4pUR1TjihUUt+nNkO3BYka35d2/3I6Yc
+         vAlBjb+SV/MNz4fOPuem9j9nfzRyqRow4DveyIsiz+qpJ13OJ0ou3kgxrjUrDgiOrpw2
+         gLzg==
+X-Forwarded-Encrypted: i=1; AJvYcCW7joCF3uybdOaqNpGR0URBp13KQeZaxfDAsIGzH1qQwWxCOXclL0kXMbXJideacB8QDfO+59r5Kt+CEnvC8BX66YCO
+X-Gm-Message-State: AOJu0YyELtwVvUznP36U+Q9PCmUR77yWLmkYDI4ntiWR+oAGdb++RUjB
+	AgkZg6lUqozaMQAyF7fRTZ1liV2VYU5DxxzMFRFcjHCXCoFRDPR03AkUgJCosX8Km1bccu1gsKJ
+	1b1O3Lf5UA2Eb7ZcjSOqd7aOlryP7vH7Um5oExrPJ7+cAa4bZhzwqQzf8sZ8ZjD1dSUmlgtY+Ne
+	a+gra5dYQ3AVELzF/kPLqNVsRi
+X-Received: by 2002:a05:622a:148a:b0:43a:dc29:a219 with SMTP id d75a77b69052e-43dfda8e639mr142376941cf.2.1715636845534;
+        Mon, 13 May 2024 14:47:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHl8mtvZ1AqP2eTCQHLv7194Xa2gyO4esR0o+IYBTEGNUDz7XONxYrIUGwyTPc05Dwa+aFhe3D+YU3/19Zu628=
+X-Received: by 2002:a05:622a:148a:b0:43a:dc29:a219 with SMTP id
+ d75a77b69052e-43dfda8e639mr142376681cf.2.1715636845074; Mon, 13 May 2024
+ 14:47:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240513170535.je74yhujxpogijga@amd.com>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000148:EE_|DS0PR12MB7534:EE_
-X-MS-Office365-Filtering-Correlation-Id: c6f9db7b-1a52-49a8-c6d4-08dc73924316
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|36860700004|82310400017|376005|1800799015;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?z4Jb8G/hXkRc6ODxswmySX4zZsJKYq2s3duZgNg8YRVbEVK9+br6TGbF8YxJ?=
- =?us-ascii?Q?NnZ1lgZm8RuZnoTnkAGLwy0QKlU9Ab1w9ODkx16tmQ9Ot7P91p+ykAXqr87Y?=
- =?us-ascii?Q?tXoPmuD5DNBqARVdTF2cBYLaCBX1sRUqMpol80/BZVLMIAgD4gHATUSwYPP1?=
- =?us-ascii?Q?yvDecyoLJ0ZWbeXava16A2IAb9LeX8gGgRsy9dcKEwgIe2+NF1j/BeyTIxCF?=
- =?us-ascii?Q?4ZehqRrmjBKP/9+1VLnvLRxLEQ/nJH+VoETF9UbEH1XKA3klmSHVxkrOySP/?=
- =?us-ascii?Q?2kvQF/O5586RFyoPTy+TyoLNxdj52ijwwXWYAFISkMyCes/4jDre/7MwEUMi?=
- =?us-ascii?Q?iAR3cNRiepitkVrNfGs4cmeF/4H24qyiERCoHwyfdb9o/SmontvLgkDLKTHy?=
- =?us-ascii?Q?qOpgwyQRSYnxTmet+4JkjRegimquLKaaOgjlNdGRrjfmghtgDGojVCZQjA/H?=
- =?us-ascii?Q?f7EahBawerJOB67mb0WnAcdxXg23h6ryFbytp1oMfzghI96aMw1DNoYyhZpT?=
- =?us-ascii?Q?Ahb0v/vd2AV0k3XbxlwG3c2trijH2i932dVlF1skB6OYvG490bGzvYLU9tD/?=
- =?us-ascii?Q?AchrhZYl+iYBF3Xfq++4vZ5Ay+NqZqcR4FuyEeN9nSOn8yxepO2iheTm43Wd?=
- =?us-ascii?Q?95cXBQY64hdfYJEze2kl7ycPG/s33nc/3sNXeRTazaCXoF+fWQI65Gkb59ql?=
- =?us-ascii?Q?vp360pYDJ699FMVUARn8XEa+6MLWR/ubBVJfs0mv1rsadnsXCXnA3bq5DuzG?=
- =?us-ascii?Q?Si9pxnRs9lo/z3nZ78rk7tNuNjALb396JVIpoO1oKUFv5f/4DtKgNOLIsE9p?=
- =?us-ascii?Q?yymTcYaskXe2BPhks16lXK70oEV/rtE0/RBjt4gC1QXOMJB+Y3lX3dLFld15?=
- =?us-ascii?Q?8oX2MhF25W8TZ/O65iXDr22gn8XH05MxTA7BPJgA7ixHsmz2CIY5SHoG87P/?=
- =?us-ascii?Q?oUWLdV9VNOPNGh4dF3ZYXgZvMTjkjjnlfHa3tXRqwk50teIjwMYAUXSFvqVR?=
- =?us-ascii?Q?012COh3INLU7QV0KPNcZ5ejCQAcZrpDnKBR/Q6b0IcN+RJO4e/a2Dc/iPAZY?=
- =?us-ascii?Q?975kndCkx6ffQAesAOy+lQWLDdYJScZ+iHUCPrvffghVpc6XQu6i/+E2vNdE?=
- =?us-ascii?Q?tYstH/yNolE1LV6kCdqRJsszwE1EFX2d1NJfekUX8lGXfktAu8Q9SbKYvg7d?=
- =?us-ascii?Q?fDuSxicNkvDwomaEygteAU34PQWMbK4CC3cczCiABxblM+FWrtcFS3IrDse4?=
- =?us-ascii?Q?re/zsg9xVS3YsolARHI3XkRRJ9wMpZm3PKzU6dG10mzdOropNbYZIllZhK9u?=
- =?us-ascii?Q?qvzjoUghUO/HRidPnMnoL/h0PWyXRdoz0tWRyzZiO1mVVA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(82310400017)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 May 2024 21:18:40.6659
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6f9db7b-1a52-49a8-c6d4-08dc73924316
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000148.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7534
+References: <20240511020557.1198200-1-leobras@redhat.com> <ZkJsvTH3Nye-TGVa@google.com>
+In-Reply-To: <ZkJsvTH3Nye-TGVa@google.com>
+From: Leonardo Bras Soares Passos <leobras@redhat.com>
+Date: Mon, 13 May 2024 18:47:13 -0300
+Message-ID: <CAJ6HWG7pgMu7sAUPykFPtsDfq5Kfh1WecRcgN5wpKQj_EyrbJA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
+To: Sean Christopherson <seanjc@google.com>
+Cc: Frederic Weisbecker <frederic@kernel.org>, "Paul E. McKenney" <paulmck@kernel.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 13, 2024 at 12:05:35PM -0500, Michael Roth wrote:
-> On Mon, May 13, 2024 at 06:53:24PM +0200, Paolo Bonzini wrote:
-> > On 5/13/24 17:19, Nathan Chancellor wrote:
-> > > > +static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
-> > > > +{
-> > > > +	int vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
-> > > > +	struct vcpu_svm *svm = to_svm(vcpu);
-> > > > +	unsigned long data_npages;
-> > > > +	sev_ret_code fw_err;
-> > > > +	gpa_t data_gpa;
-> > > > +
-> > > > +	if (!sev_snp_guest(vcpu->kvm))
-> > > > +		goto abort_request;
-> > > > +
-> > > > +	data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
-> > > > +	data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
-> > > > +
-> > > > +	if (!IS_ALIGNED(data_gpa, PAGE_SIZE))
-> > > > +		goto abort_request;
-> > > 
-> > > [...]
-> > > 
-> > > > +abort_request:
-> > > > +	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
-> > > > +	return 1; /* resume guest */
-> > > > +}
-> > > 
-> > > This patch is now in -next as commit 32fde9e18b3f ("KVM: SEV: Provide
-> > > support for SNP_EXTENDED_GUEST_REQUEST NAE event"), where it causes a
-> > > clang warning (or hard error when CONFIG_WERROR is enabled) [...]
-> > > Seems legitimate to me. What was the intention here?
-> > 
-> > Mike, I think this should just be 0?
-> 
-> Hi Paolo,
-> 
-> Yes, I was just about to submit a patch that does just that:
-> 
->   https://github.com/mdroth/linux/commit/df55e9c5b97542fe037f5b5293c11a49f7c658ef
+On Mon, May 13, 2024 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Fri, May 10, 2024, Leonardo Bras wrote:
+> > As of today, KVM notes a quiescent state only in guest entry, which is =
+good
+> > as it avoids the guest being interrupted for current RCU operations.
+> >
+> > While the guest vcpu runs, it can be interrupted by a timer IRQ that wi=
+ll
+> > check for any RCU operations waiting for this CPU. In case there are an=
+y of
+> > such, it invokes rcu_core() in order to sched-out the current thread an=
+d
+> > note a quiescent state.
+> >
+> > This occasional schedule work will introduce tens of microsseconds of
+> > latency, which is really bad for vcpus running latency-sensitive
+> > applications, such as real-time workloads.
+> >
+> > So, note a quiescent state in guest exit, so the interrupted guests is =
+able
+> > to deal with any pending RCU operations before being required to invoke
+> > rcu_core(), and thus avoid the overhead of related scheduler work.
+>
+> Are there any downsides to this?  E.g. extra latency or anything?  KVM wi=
+ll note
+> a context switch on the next VM-Enter, so even if there is extra latency =
+or
+> something, KVM will eventually take the hit in the common case no matter =
+what.
+> But I know some setups are sensitive to handling select VM-Exits as soon =
+as possible.
+>
+> I ask mainly because it seems like a no brainer to me to have both VM-Ent=
+ry and
+> VM-Exit note the context switch, which begs the question of why KVM isn't=
+ already
+> doing that.  I assume it was just oversight when commit 126a6a542446 ("kv=
+m,rcu,nohz:
+> use RCU extended quiescent state when running KVM guest") handled the VM-=
+Entry
+> case?
 
-Submitted a proper patch here:
+I don't know, by the lore I see it happening in guest entry since the
+first time it was introduced at
+https://lore.kernel.org/all/1423167832-17609-5-git-send-email-riel@redhat.c=
+om/
 
-  https://lore.kernel.org/kvm/20240513172704.718533-1-michael.roth@amd.com/
+Noting a quiescent state is cheap, but it may cost a few accesses to
+possibly non-local cachelines. (Not an expert in this, Paul please let
+me know if I got it wrong).
 
-and also one for a separate warning:
+I don't have a historic context on why it was just implemented on
+guest_entry, but it would make sense when we don't worry about latency
+to take the entry-only approach:
+- It saves the overhead of calling rcu_virt_note_context_switch()
+twice per guest entry in the loop
+- KVM will probably run guest entry soon after guest exit (in loop),
+so there is no need to run it twice
+- Eventually running rcu_core() may be cheaper than noting quiescent
+state every guest entry/exit cycle
 
-  https://lore.kernel.org/kvm/20240513181928.720979-1-michael.roth@amd.com/
+Upsides of the new strategy:
+- Noting a quiescent state in guest exit avoids calling rcu_core() if
+there was a grace period request while guest was running, and timer
+interrupt hits the cpu.
+- If the loop re-enter quickly there is a high chance that guest
+entry's rcu_virt_note_context_switch() will be fast (local cacheline)
+as there is low probability of a grace period request happening
+between exit & re-entry.
+- It allows us to use the rcu patience strategy to avoid rcu_core()
+running if any grace period request happens between guest exit and
+guest re-entry, which is very important for low latency workloads
+running on guests as it reduces maximum latency in long runs.
 
-I saw my build environment had WARN=0 for the last round of changes, so I
-re-tested various kernel configs with/without clang and haven't seen any
-other issues. So I think that should be the last of it. I'll be sure to be
-a lot more careful about this in the future.
+What do you think?
 
-Thanks,
+Thanks!
+Leo
 
-Mike
-
-> 
-> Sorry for the breakage,
-> 
-> Mike
-> 
-> > 
-> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> > index c7a0971149f2..affb4fb47f91 100644
-> > --- a/arch/x86/kvm/svm/sev.c
-> > +++ b/arch/x86/kvm/svm/sev.c
-> > @@ -3911,7 +3911,6 @@ static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
-> >  	int vmm_ret = SNP_GUEST_VMM_ERR_GENERIC;
-> >  	struct vcpu_svm *svm = to_svm(vcpu);
-> >  	unsigned long data_npages;
-> > -	sev_ret_code fw_err;
-> >  	gpa_t data_gpa;
-> >  	if (!sev_snp_guest(vcpu->kvm))
-> > @@ -3938,7 +3937,7 @@ static int snp_begin_ext_guest_req(struct kvm_vcpu *vcpu)
-> >  	return 0; /* forward request to userspace */
-> >  abort_request:
-> > -	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, fw_err));
-> > +	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, SNP_GUEST_ERR(vmm_ret, 0));
-> >  	return 1; /* resume guest */
-> >  }
-> > Paolo
-> > 
-> > 
-> 
 
