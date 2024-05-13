@@ -1,112 +1,131 @@
-Return-Path: <kvm+bounces-17320-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17321-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C41DA8C42C8
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 16:03:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C0488C42CA
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 16:03:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EDD5287B02
-	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 14:03:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD7691C231A4
+	for <lists+kvm@lfdr.de>; Mon, 13 May 2024 14:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7722153598;
-	Mon, 13 May 2024 14:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WW854H3A"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F309153814;
+	Mon, 13 May 2024 14:03:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC91850279;
-	Mon, 13 May 2024 14:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACF950279;
+	Mon, 13 May 2024 14:03:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715608999; cv=none; b=eHxeRtF7hl5BgpQCt6sCGnFaEYlFzYV90X0tXCMc5so9436K2R2ISis4+TJuxFlMKdMznGWwd5uYKBMNN5brD8KZoxInlyfSZA+ijAwQ3g4IKCQcu45jW264C6oPfNkgoJ9XnrNpJ4QKA3fH+JhgXfe9H0CPW0iP1ow1e3ywxu4=
+	t=1715609008; cv=none; b=IpbAy+saQTitQIJQl5aVxx5BImj9m7OZ0WiohZYdUyy1PxqwgYjverR8bTl0VMCOtkLoTivqST2BGLv2DQnh7uBD5ccD9QRgw95MQZn4nROJSICk+0WD5Q9nC3GI5/LCLDoPWvj5+ab63eJPP0jcruWPT5E4OZMLe5Q09cWHe1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715608999; c=relaxed/simple;
-	bh=xJFzAh3ysLEFv0WcBOW0PLVx4z6smc3rpdHEbvwQUtY=;
+	s=arc-20240116; t=1715609008; c=relaxed/simple;
+	bh=K7veTtApNyiwjmLaFO5BMobsj0TYJEd3cEVzL9mDR7w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m6O6ivzb7KQyGzQIUxuuEUHGrceeS9LzfLHx5Bkrq7Wsd11flmZKbPNhvSX0WNPvnm9yg2L7StKK3EK/FHmosnBtbbakXZrOaJ2lR3wgQP2qXjr63KlCPbNd+CxF20H59t8hMz7pWOkGRJgJb3Xpry/0RcOg3QgvP8loTxMxXvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WW854H3A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 176F4C113CC;
-	Mon, 13 May 2024 14:03:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715608998;
-	bh=xJFzAh3ysLEFv0WcBOW0PLVx4z6smc3rpdHEbvwQUtY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WW854H3AORnWWjRhWN/bANcICXpLI+R9Oc4n+nvHPBPfpoqb/HuxeI3rbDhsVO4th
-	 FOtxizkjI1Tqxuulo17DqJHn555n2sqxON/N/69b3h5czPLszdpI+h51ucoWI3RdYO
-	 zvIJVKwr3hAruztAL5yBaWdl7r/r15eHx01+O4BKHyR5erugF7ckrSgVebLNajcAJY
-	 g1GBZ1SZdmo8zkbAgcaJuyUV59DiG7WHXG6MeBwlzO8uq8qZPLoSoNL/ZU0PyF0QD9
-	 flAgmWfeBsO2IL9pBWiArSP8t/US3HWqCMbyMI/agcja5EIJ50SqHKaAAyvvG/uZm6
-	 Js4Q9TXNgH5aA==
-Date: Mon, 13 May 2024 15:03:13 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=chahyhx/xePUlSqPPjz3XDo+WfwF4WT4o25UZL9qdId7ac17Q+Xje82Y7VOkb3y/hh7M34uSxdEIkNrH6GNYFjk3SJ8v+yyCPgm/4kqcmtGlIBLyQ4dBhi+WYyg6e4BNtWzSHfStdk+JC0PjjCK6/qqaQnSG/xf6GuuSFBiVV3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBA00C4AF17;
+	Mon, 13 May 2024 14:03:24 +0000 (UTC)
+Date: Mon, 13 May 2024 15:03:22 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v3 02/12] KVM: arm64: Fix __pkvm_init_switch_pgd C
- signature
-Message-ID: <20240513140313.GB28749@willie-the-truck>
-References: <20240510112645.3625702-1-ptosi@google.com>
- <20240510112645.3625702-3-ptosi@google.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 03/14] arm64: realm: Query IPA size from the RMM
+Message-ID: <ZkIdqoELmQ3tUJ8M@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-4-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240510112645.3625702-3-ptosi@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240412084213.1733764-4-steven.price@arm.com>
 
-On Fri, May 10, 2024 at 12:26:31PM +0100, Pierre-Clément Tosi wrote:
-> Update the function declaration to match the asm implementation.
-> 
-> Fixes: f320bc742bc2 ("KVM: arm64: Prepare the creation of s1 mappings at EL2")
-> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> ---
->  arch/arm64/include/asm/kvm_hyp.h | 3 +--
->  arch/arm64/kvm/hyp/nvhe/setup.c  | 2 +-
->  2 files changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
-> index 3e2a1ac0c9bb..96daf7cf6802 100644
-> --- a/arch/arm64/include/asm/kvm_hyp.h
-> +++ b/arch/arm64/include/asm/kvm_hyp.h
-> @@ -123,8 +123,7 @@ void __noreturn __hyp_do_panic(struct kvm_cpu_context *host_ctxt, u64 spsr,
->  #endif
+On Fri, Apr 12, 2024 at 09:42:02AM +0100, Steven Price wrote:
+> diff --git a/arch/arm64/include/asm/pgtable-prot.h b/arch/arm64/include/asm/pgtable-prot.h
+> index dd9ee67d1d87..15d8f0133af8 100644
+> --- a/arch/arm64/include/asm/pgtable-prot.h
+> +++ b/arch/arm64/include/asm/pgtable-prot.h
+> @@ -63,6 +63,9 @@
+>  #include <asm/pgtable-types.h>
 >  
->  #ifdef __KVM_NVHE_HYPERVISOR__
-> -void __pkvm_init_switch_pgd(phys_addr_t phys, unsigned long size,
-> -			    phys_addr_t pgd, void *sp, void *cont_fn);
-> +void __pkvm_init_switch_pgd(phys_addr_t params, void (*finalize_fn)(void));
->  int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
->  		unsigned long *per_cpu_base, u32 hyp_va_bits);
->  void __noreturn __host_enter(struct kvm_cpu_context *host_ctxt);
-> diff --git a/arch/arm64/kvm/hyp/nvhe/setup.c b/arch/arm64/kvm/hyp/nvhe/setup.c
-> index bc58d1b515af..bcaeb0fafd2d 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/setup.c
-> +++ b/arch/arm64/kvm/hyp/nvhe/setup.c
-> @@ -316,7 +316,7 @@ int __pkvm_init(phys_addr_t phys, unsigned long size, unsigned long nr_cpus,
+>  extern bool arm64_use_ng_mappings;
+> +extern unsigned long prot_ns_shared;
+> +
+> +#define PROT_NS_SHARED		((prot_ns_shared))
+
+Nit: what's with the double parenthesis here?
+
+>  #define PTE_MAYBE_NG		(arm64_use_ng_mappings ? PTE_NG : 0)
+>  #define PMD_MAYBE_NG		(arm64_use_ng_mappings ? PMD_SECT_NG : 0)
+> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+> index 1076649ac082..b93252ed6fc5 100644
+> --- a/arch/arm64/kernel/rsi.c
+> +++ b/arch/arm64/kernel/rsi.c
+> @@ -7,6 +7,11 @@
+>  #include <linux/memblock.h>
+>  #include <asm/rsi.h>
+>  
+> +struct realm_config __attribute((aligned(PAGE_SIZE))) config;
+
+Another nit: use __aligned(PAGE_SIZE).
+
+However, does the spec require this to be page-size aligned? The spec
+says aligned to 0x1000 and that's not necessarily the kernel page size.
+It also states that the RsiRealmConfig structure is 4096 and I did not
+see this in the first patch, you only have 8 bytes in this structure.
+Some future spec may write more data here overriding your other
+variables in the data section.
+
+So that's the wrong place to force the alignment. Just do this when you
+define the actual structure in the first patch:
+
+struct realm_config {
+	union {
+		unsigned long ipa_bits; /* Width of IPA in bits */
+		u8 __pad[4096];
+	};
+} __aligned(4096);
+
+and maybe with a comment on why the alignment and padding. You could
+also have an unnamed struct around ipa_bits in case you want to add more
+fields in the future (siginfo follows this pattern).
+
+> +
+> +unsigned long prot_ns_shared;
+> +EXPORT_SYMBOL(prot_ns_shared);
+> +
+>  DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
+>  EXPORT_SYMBOL(rsi_present);
+>  
+> @@ -53,6 +58,9 @@ void __init arm64_rsi_init(void)
 >  {
->  	struct kvm_nvhe_init_params *params;
->  	void *virt = hyp_phys_to_virt(phys);
-> -	void (*fn)(phys_addr_t params_pa, void *finalize_fn_va);
-> +	typeof(__pkvm_init_switch_pgd) *fn;
->  	int ret;
+>  	if (!rsi_version_matches())
+>  		return;
+> +	if (rsi_get_realm_config(&config))
+> +		return;
+> +	prot_ns_shared = BIT(config.ipa_bits - 1);
 >  
->  	BUG_ON(kvm_check_pvm_sysreg_table());
-> -- 
-> 2.45.0.118.g7fe29c98d7-goog
+>  	static_branch_enable(&rsi_present);
+>  }
 
-Acked-by: Will Deacon <will@kernel.org>
-
-Will
+-- 
+Catalin
 
