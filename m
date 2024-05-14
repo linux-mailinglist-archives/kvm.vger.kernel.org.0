@@ -1,140 +1,115 @@
-Return-Path: <kvm+bounces-17391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F5828C5ABB
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 20:00:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 796A98C5D64
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 00:01:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D4BDB22113
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 18:00:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32A572828FF
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 22:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 558691802D1;
-	Tue, 14 May 2024 18:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A22181D1A;
+	Tue, 14 May 2024 22:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fCSceKzd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9AE1802B6;
-	Tue, 14 May 2024 18:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6577181BBF
+	for <kvm@vger.kernel.org>; Tue, 14 May 2024 22:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715709618; cv=none; b=J8iVnm0a3BzL6f9dxMR4wbjQWrJ+mcWvTDNk4q1C2TsvUJciJo6Jx+yNrDPJfAJiQ38uEcGGP0L3AeIDRe9uuHqD3h0PutFPvRQLy+fL9h8+26EVbXwF1LGpWYwDDkDlTArmjYDagnbey0H4RaMdsZNjsRCD+W+FFYdZGQycNug=
+	t=1715724043; cv=none; b=bwstkh5tKgfcdT3UyHIsQ1F/oUCCloOShv7un+JKJKQbEbxPOpYmZzq5QezIhSxwciTsAgWk0nd7nT1ODaCjpRTavsQE+r6MfZ9IjJlvZRz9tseCIwHarDiH/GEAEJvTqcE08U2M/ORvCaKKNgdA7rL4lPP4pA9f1FaxV0k2Ydw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715709618; c=relaxed/simple;
-	bh=PGg21Fv5zTdyXu46lFNWZlRUE2G+nr6G9MZPkue/+SI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dwtc+Gt8OC24W5S6RwYCMqKinTQ0lsQmxI2DS89bsyVI80GZy8fVw9nd5kqL/OYu4OTMDkfbc0COvKpfq98QSUrMzCR5S0sL/nQ+Omn9lwi5qnN3P295EOjJkhKSPr0taYZILNi2EFJXQadlKttWcKt9j8HCeSWBwW5gYzkCdsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 235D4C2BD10;
-	Tue, 14 May 2024 18:00:14 +0000 (UTC)
-Date: Tue, 14 May 2024 19:00:12 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
-Message-ID: <ZkOmrMIMFCgEKuVw@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-10-steven.price@arm.com>
+	s=arc-20240116; t=1715724043; c=relaxed/simple;
+	bh=ZesKsYDyRLqGOwxtVdB1+K8Zx7Lg3+8aB8pP+CHz0Dg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kNVGIC0QAb27NEGRXV8RosmT4Lvv4Tj4XeqGXiB/gKsQMevJvif6VdJAu7NorjI8dB0qKSOs7STBzTyJLvlAiP7Jqa83wXFh5T9QAU6oD/ACvobq963umS7m/lXsWRiggO0qAUWYVuZXT2EhB4GODsowu3rT/l3C0FxlAGHKjiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fCSceKzd; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf216080f5so10532549276.1
+        for <kvm@vger.kernel.org>; Tue, 14 May 2024 15:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1715724041; x=1716328841; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f5EfcMEAUsY+SnBp06Z60R+yACvmNOdhzYQEu5su4rs=;
+        b=fCSceKzdUJgUhkpUWttA2hYbpOAbWGMG3SvjwyjwceF3uL0JisQM25zYW4r9ZvmVJk
+         OTYV6JdZo0lgvc4TP0QksNuKtKSt51oca0doTGW6Ry8bH8nJNbef9l3G4/aHymVpr+Cv
+         Wuh5lw9VxWNjjcD+AezreK+nUpeFPXxYS/v8hUPAgXFMZ45v5umIY7UbFVSXJsNS4kOI
+         UjuPtCGT58BG4it42XQniwFV6klMCs7mOsVZGH0ZxIhdPPXlNhckaOvMCXcNJL7gNXOy
+         NZ64Er6zY2vct2QgcSgmfHAI3BlAS2vdmLjl86GZCdaDTvyXFSALQp8Us4GJEvas7CwS
+         Js1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715724041; x=1716328841;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=f5EfcMEAUsY+SnBp06Z60R+yACvmNOdhzYQEu5su4rs=;
+        b=HMLJeB6nvhU2VpnmKu6okV55G3ByYCu1gLcKcrwxqk7+Dabzs7hCLX3VNfxwmDfJBH
+         YBwYFOoqGVsPU8azwnnm3vVal9iWmvWWjM/3pkU8QN39M+EqOkT9nnJXtS9diuy5mUxp
+         Ol72/oPbsN+jbm2+BHfLfk/+93T50Cm0ieZe27QQAh7uFjp8FOynh1NVAsWxu2lGMXje
+         1g1Vgf6oUYlY80e6W8LacdQ/NsdYsmklMVM5imUO98XoqxHepbOu/kGVcPKGWRWZEYZ/
+         PL9JGNZD4Jf/pILsgmbiCwmWIj5jL2s4En5l4v48LcEp+KDYQX3eL33ho+0RuKcG/Aai
+         WFJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYeYKYIeKZCeY3d0hb9iYqG8ozYcMq0UQgt0Zmmz+3sHf6tFbzzsjSElUgZ6zYatHbJEYc7iqs2rKaefK2cHveonlg
+X-Gm-Message-State: AOJu0Yz/NwftAmFEhrmrLgTGwVzwmK0dfJjQvL9SECl/6UFOamFFQWMv
+	6485m+RR0BQj8jpMD/T+xH3du+/mLnFfOd1C8FK+6A3AgO06uRex19a35bQgKT0LPuenJO3IRl9
+	u1A==
+X-Google-Smtp-Source: AGHT+IEHn/IozBdXsx0bX0Dkzx1Eykeu5z0TT4Gh/z+2WrwAmnf+V/tSLSSBrYXzdJT2aMvByp0UpHOfWHw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2b87:b0:de4:7bae:3333 with SMTP id
+ 3f1490d57ef6-dee4f340733mr3995440276.3.1715724040895; Tue, 14 May 2024
+ 15:00:40 -0700 (PDT)
+Date: Tue, 14 May 2024 15:00:39 -0700
+In-Reply-To: <202405111034432081zGPU1OUESImLVeboZ0zQ@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412084213.1733764-10-steven.price@arm.com>
+Mime-Version: 1.0
+References: <Zj4qEG5QfbX4mo48@google.com> <202405111034432081zGPU1OUESImLVeboZ0zQ@zte.com.cn>
+Message-ID: <ZkPfB2VpGkRmMLsi@google.com>
+Subject: Re: [PATCH] KVM: introduce vm's max_halt_poll_ns to debugfs
+From: Sean Christopherson <seanjc@google.com>
+To: cheng.lin130@zte.com.cn
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	jiang.yong5@zte.com.cn, wang.liang82@zte.com.cn, jiang.xuexin@zte.com.cn
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Apr 12, 2024 at 09:42:08AM +0100, Steven Price wrote:
->  static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> @@ -41,6 +45,7 @@ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
->  	pte = clear_pte_bit(pte, cdata->clear_mask);
->  	pte = set_pte_bit(pte, cdata->set_mask);
->  
-> +	/* TODO: Break before make for PROT_NS_SHARED updates */
->  	__set_pte(ptep, pte);
->  	return 0;
+On Sat, May 11, 2024, cheng.lin130@zte.com.cn wrote:
+> > > > > > From: seanjc <seanjc@google.com>
+> > > > > > > From: Cheng Lin <cheng.lin130@zte.com.cn>
+> > > > > > >
+> > > > > > > Introduce vm's max_halt_poll_ns and override_halt_poll_ns to
+> > > > > > > debugfs. Provide a way to check and modify them.
+> > > > > > Why?
+> > > > > If a vm's max_halt_poll_ns has been set using KVM_CAP_HALT_POLL,
+> > > > > the module parameter kvm.halt_poll.ns will no longer indicate the maximum
+> > > > > halt pooling interval for that vm. After introducing these two attributes into
+> > > > > debugfs, it can be used to check whether the individual configuration of the
+> > > > > vm is enabled and the working value.
+> > > > But why is max_halt_poll_ns special enough to warrant debugfs entries?  There is
+> > > > a _lot_ of state in KVM that is configurable per-VM, it simply isn't feasible to
+> > > > dump everything into debugfs.
+> > > If we want to provide a directly modification interface under /sys for per-vm
+> > > max_halt_poll_ns, like module parameter /sys/module/kvm/parameters/halt_poll_ns,
+> > > using debugfs may be worth.
+> > Yes, but _why_?  I know _what_ a debugs knob allows, but you have yet to explain
+> > why this
+> I think that if such an interface is provided, it can be used to check the source of
+> vm's max_halt_poll_ns, general module parameter or per-vm configuration.
+> When configured through per-vm, such an interface can be used to monitor this
+> configuration. If there is an error in the setting through KVMCAP_HALL_POLL, such
+> an interface can be used to fix or reset it dynamicly.
 
-Oh, this TODO is problematic, not sure we can do it safely. There are
-some patches on the list to trap faults from other CPUs if they happen
-to access the page when broken but so far we pushed back as complex and
-at risk of getting the logic wrong.
+But again, that argument can be made for myriad settings in KVM.  And unlike many
+settings, a "bad" max_halt_poll_ns can be fixed simply by redoing KVM_CAP_HALL_POLL.
 
-From an architecture perspective, you are changing the output address
-and D8.16.1 requires a break-before-make sequence (FEAT_BBM doesn't
-help). So we either come up with a way to do BMM safely (stop_machine()
-maybe if it's not too expensive or some way to guarantee no accesses to
-this page while being changed) or we get the architecture clarified on
-the possible side-effects here ("unpredictable" doesn't help).
-
->  }
-> @@ -192,6 +197,43 @@ int set_direct_map_default_noflush(struct page *page)
->  				   PAGE_SIZE, change_page_range, &data);
->  }
->  
-> +static int __set_memory_encrypted(unsigned long addr,
-> +				  int numpages,
-> +				  bool encrypt)
-> +{
-> +	unsigned long set_prot = 0, clear_prot = 0;
-> +	phys_addr_t start, end;
-> +
-> +	if (!is_realm_world())
-> +		return 0;
-> +
-> +	WARN_ON(!__is_lm_address(addr));
-
-Just return from this function if it's not a linear map address. No
-point in corrupting other areas since __virt_to_phys() will get it
-wrong.
-
-> +	start = __virt_to_phys(addr);
-> +	end = start + numpages * PAGE_SIZE;
-> +
-> +	if (encrypt) {
-> +		clear_prot = PROT_NS_SHARED;
-> +		set_memory_range_protected(start, end);
-> +	} else {
-> +		set_prot = PROT_NS_SHARED;
-> +		set_memory_range_shared(start, end);
-> +	}
-> +
-> +	return __change_memory_common(addr, PAGE_SIZE * numpages,
-> +				      __pgprot(set_prot),
-> +				      __pgprot(clear_prot));
-> +}
-
-Can someone summarise what the point of this protection bit is? The IPA
-memory is marked as protected/unprotected already via the RSI call and
-presumably the RMM disables/permits sharing with a non-secure hypervisor
-accordingly irrespective of which alias the realm guest has the linear
-mapping mapped to. What does it do with the top bit of the IPA? Is it
-that the RMM will prevent (via Stage 2) access if the IPA does not match
-the requested protection? IOW, it unmaps one or the other at Stage 2?
-
-Also, the linear map is not the only one that points to this IPA. What
-if this is a buffer mapped in user-space or remapped as non-cacheable
-(upgraded to cacheable via FWB) in the kernel, the code above does not
-(and cannot) change the user mappings.
-
-It needs some digging into dma_direct_alloc() as well, it uses a
-pgprot_decrypted() but that's not implemented by your patches. Not sure
-it helps, it looks like the remap path in this function does not have a
-dma_set_decrypted() call (or maybe I missed it).
-
--- 
-Catalin
+It's not KVM's responsibility to police userspace for bugs/errors, and IMO a
+backdoor into max_halt_poll_ns isn't justified.
 
