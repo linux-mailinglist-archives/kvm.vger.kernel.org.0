@@ -1,287 +1,266 @@
-Return-Path: <kvm+bounces-17372-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17373-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A928C8C4ED8
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 12:20:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C518C4EF8
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 12:26:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A76280F7E
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 10:20:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AB1F1C21111
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 10:26:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DCDA12C49C;
-	Tue, 14 May 2024 09:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A67130E45;
+	Tue, 14 May 2024 09:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHGUl3gv"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="iWMQ5of0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121B1DDC0;
-	Tue, 14 May 2024 09:30:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FB112F59E
+	for <kvm@vger.kernel.org>; Tue, 14 May 2024 09:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715679050; cv=none; b=NrTpg4BKlwYFeXC42tqaJLnXIB8YdgQTURhUtqc7O2wdmAuv/e5ODOY8TlQHMjnmfSJHy/xqhjByw+0lrNOcLCZjdbLuMGzBGgVg/EhYcpWyb+QYKSa/nyQIJDbQbI0a4Ilt0br7l+PWqS3iEWjbIYH1n6GKvm2hHRNFfe4W5+E=
+	t=1715679801; cv=none; b=kZ1D0/IzI0YjodQNTFIJGqktdL3Ip9OXnuHorkLvacRpoKa5SSEm6L1PTpbU2djg2jqxPn7JDay4cp3Q5BedcjUL7GYhztF9OZWUXaYAyaPQcBkRxlj8TSYopFx91QWytgNsFPQAR1sbJEs500CaoAmJFldAad+wyeI2+50OPis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715679050; c=relaxed/simple;
-	bh=wxxfMb6xLPNc0GtCv2kZ8br7AECDWg9X2HA0DsXGjOg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iVGvb99XNgm37iB6WXPID+3uY3U/CzZg+pKxgJ2ZFpVaTKT5/K6N5ykKbyPw4pWKPR3stf0WCxg/kv34DOMf2/e3Xq48Ypp98He84GULpQmgXjgNLU64tFMu/NzNoq/auMfvYWr7Ng9PSsLkxORTuBZQL/slqGR0T+oOYl/QAN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHGUl3gv; arc=none smtp.client-ip=209.85.222.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-7ebe09eb289so1976435241.2;
-        Tue, 14 May 2024 02:30:48 -0700 (PDT)
+	s=arc-20240116; t=1715679801; c=relaxed/simple;
+	bh=GNuSE3s2r9EbP9ocQpFNdq2tZtq7uo/Tjsb9ccdwGJY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UXnTdxWbwcsgBHx7xArle/wQI1uXzEWK/ZTdakR797qwGxZzqMlQsPGsq1c3xOWRE5UGX6OBFOKZFAZlv/LZbIVgB3F38vbpv3N6N9zHcc1n8y05hO3pBeJoTBbRzIHIbFsUWQCkaiVQlMpKlHpbtCA+nyT+EMFMAUGcZBn6Xts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=iWMQ5of0; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-34ca50999cdso277076f8f.2
+        for <kvm@vger.kernel.org>; Tue, 14 May 2024 02:43:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1715679048; x=1716283848; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wdHFnHTcKzscSCgje4pLV0ENAixI1q19eindkQ9bbmI=;
-        b=MHGUl3gvMvcG3gy0mgpGyRR6g0ljSbR8Te9cd28W0xHEjuca5Icfyy6BmMQiQPZr7g
-         zCm9v7QcdpoOnwdjIIKAKinUa56Metzwd0ciAXDVglYYr+ZZUJvVvYKZutEyKb+AhAXL
-         X5l8l0aifpgfw3t1X/WFMJQL1kHYfnIT4DR+Io5CcyJ1zRDqsRoguSbQSm8+tE5HX563
-         EsuchCncrobQfvhSVtNg6MWxqXJ4pA273k3xqGlZIShbRvnoGP9fwRS6f23nA+aaAPpY
-         SYQt0N8YFSeahN4oO7ReskUIUoWBBgAzH0Mtw768+53qb7numd0e0U8za43r+6dIYUov
-         q/dw==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1715679796; x=1716284596; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HEietWmYD6kKU/pV6wujRo1uhNo/bfHaQjmoZVTM8+A=;
+        b=iWMQ5of0/ggMHzemNXGUGyT0aEwb8+6FgtXh5FkV01Su/b2T8pycIpxmyLrnpo6ds8
+         VLiglOgv+TFRb/7+BRusIGNNEaWMXZ5ezwpknsmQ/lMuTkLdXCRiSWo60xVRKm+toslz
+         LTKi83IDni+xqjly7SCgd9ij3Z9FJzNGw/x+ZL+st2uQYWtvfYRYB7o1eFjnQyWJNFFJ
+         T8ZeBybw01vSgI7sDMfLF6uNcZAYnmpCAKCDwWgmNNEq4XFDLQfmsdCFLU0e4mEnuED7
+         YO/gYBWt0qXdOjS8eVCPDuHJYFgS936FcpCkBUAhUXm0dzJg74swQ/sl4iYEbJ4BFBVk
+         Gsrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715679048; x=1716283848;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wdHFnHTcKzscSCgje4pLV0ENAixI1q19eindkQ9bbmI=;
-        b=wQ40FTiXPTnEnEw9BZFvZQHK3i9PVkvdJ2dcmvSXmjDQA/8A0J0kCWuK/2u9p6xKag
-         2dm3agpQgrK+5G/+5xhu+5jWlM/S1KJbV4pl5XVYjY4V4sRfHcnpO+n8ZH8uVivND0CB
-         b6YpoiLzuBDO995CNBZfhLfpinnSA871Ipx2Reacl5Fk3LufUrg30NlIqF8z2A+pVOSb
-         iefBc4KQ4atSG6SwNXBV90lTvUMqP+MbbVP0Tys1Cq+6PkTUOauy+W2aKiGPw74rjGgq
-         fAoA+ZH0ec42ssCZzPnBkctcjlP2yyG0DuU1QjEAB2m8pj6MnZOE4CJF3S3m+m6KR8sH
-         inNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpoR/RpfcQFtvSgk39BohBTIev/UU218FOin7Cdl4QNwRxJ0LbZhsqQZBG2bN2pBSAvNyPe1gDRpLQ2lwYO3qHQbu2hU7GnSoA2wxD7HvyPTfdNpCY6sjtLYB5w7tGcmZ7tO+nP7RUzuBWVj3WKoXhFOuSRaOIuXldK95Z
-X-Gm-Message-State: AOJu0YyN5LPXxtMTnMAbDF6o41u+dNhdM3wAIY7CnBslT6/oc0D0GmKm
-	0Hpd0JFx7/rLaBJ2SBErWtVh4GuOJzadJ6vvVl7i4gHPxUXy8coYH1/AJr7JvULD4jqo+mzncpu
-	liKkFFdjWqDMiTxxQ+OAn0Vw/Yf0=
-X-Google-Smtp-Source: AGHT+IFsXlUYAyC/dVyPAc91tSYUW8lcOIZYX7vhSynTmD9ch/K7amSJeNqyvopCZMfgCDfYyurmNf0h2XrY9tF0I4Y=
-X-Received: by 2002:a05:6102:2acc:b0:47e:f686:ccf with SMTP id
- ada2fe7eead31-48077e83663mr12661860137.23.1715679047234; Tue, 14 May 2024
- 02:30:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1715679796; x=1716284596;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HEietWmYD6kKU/pV6wujRo1uhNo/bfHaQjmoZVTM8+A=;
+        b=SZyLiVBxsum4d0WjV/K0vX2cbXRNI2LKT/jz5Oehhv4VVSzDHB/FTsgsVrBYN3d0qs
+         IZo5HrV4xBeIE+xy1c62UdM2sDMY5QCbz72S2aH/SbHxIgWtpRc3Zuua4FAIb08KJC5z
+         lbNehtpHFGlV2NtM+nyonFMkXSIrJ2GcWTHOyRSCdZyGW84LQDGfMyl/QMHACky6Stg6
+         RzytsF2uBuzy938P5ILgPpp3QUHfEqnzL0bgsDxORNojzgoPQz/QFwqwGiF816rG/w5R
+         UQ+Hkm5bXbmCu24QxFgOJfmpQpA7m0suHPjRyaYoHH4Ygu+ghAhtl/k8TOlK9yHMXkM8
+         kBPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHKGqQnaRelVagTSdGCTIuvCz01LrFDBc3i8Xa4DQFm4noS/5gyQi1jE49H2GVts6/G42KiydmsJpjE61NUTOQfK/B
+X-Gm-Message-State: AOJu0Yzuo8AFs0JxTPF34r7zSkh3+SfPxvNrSA77Jv5r9DMJf4wzBEAF
+	YZO/OAy/zjDltUJ+yE97Z4LTvdFDCji31KYfCjbqlNfQsXpCfS0xzjzi9kM1Ck0=
+X-Google-Smtp-Source: AGHT+IHsscONJjXt03GkOV8zZbc6kOxoRUClFHpAMSKc94NJeP6QWGgAaazEO2tWqCS4ba0q1uyBGQ==
+X-Received: by 2002:a05:600c:1c11:b0:41f:9c43:574f with SMTP id 5b1f17b1804b1-41feac59cffmr88723965e9.3.1715679796443;
+        Tue, 14 May 2024 02:43:16 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:999:a3a0:1660:5f6e:2f9c:91b9? ([2a01:e0a:999:a3a0:1660:5f6e:2f9c:91b9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-41faedf5dcesm76566455e9.0.2024.05.14.02.43.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 May 2024 02:43:15 -0700 (PDT)
+Message-ID: <c8e4c44d-8125-417e-8c61-a1f6d438815e@rivosinc.com>
+Date: Tue, 14 May 2024 11:43:15 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240508191931.46060-1-alexghiti@rivosinc.com>
- <20240508191931.46060-2-alexghiti@rivosinc.com> <CAGsJ_4xayC4D4y0d7SPXxCvuW4-rJQUCa_-OUDSsOGm_HyPm1w@mail.gmail.com>
- <CAHVXubiOo3oe0=-qU2kBaFXebPJvmnc+-1UOPEHS2spcCeMzsw@mail.gmail.com>
-In-Reply-To: <CAHVXubiOo3oe0=-qU2kBaFXebPJvmnc+-1UOPEHS2spcCeMzsw@mail.gmail.com>
-From: Barry Song <21cnbao@gmail.com>
-Date: Tue, 14 May 2024 21:30:36 +1200
-Message-ID: <CAGsJ_4w_mOL5egHV9a3+0vcZV6ODvr=3KFXevedH19voSCHXwQ@mail.gmail.com>
-Subject: Re: [PATCH 01/12] mm, arm64: Rename ARM64_CONTPTE to THP_CONTPTE
-To: Alexandre Ghiti <alexghiti@rivosinc.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Ard Biesheuvel <ardb@kernel.org>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, 
-	linux-riscv@lists.infradead.org, linux-efi@vger.kernel.org, 
-	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, May 14, 2024 at 1:09=E2=80=AFAM Alexandre Ghiti <alexghiti@rivosinc=
-.com> wrote:
->
-> Hi Barry,
->
-> On Thu, May 9, 2024 at 2:46=E2=80=AFAM Barry Song <21cnbao@gmail.com> wro=
-te:
-> >
-> > On Thu, May 9, 2024 at 7:20=E2=80=AFAM Alexandre Ghiti <alexghiti@rivos=
-inc.com> wrote:
-> > >
-> > > The ARM64_CONTPTE config represents the capability to transparently u=
-se
-> > > contpte mappings for THP userspace mappings, which will be implemente=
-d
-> > > in the next commits for riscv, so make this config more generic and m=
-ove
-> > > it to mm.
-> > >
-> > > Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
-> > > ---
-> > >  arch/arm64/Kconfig               | 9 ---------
-> > >  arch/arm64/include/asm/pgtable.h | 6 +++---
-> > >  arch/arm64/mm/Makefile           | 2 +-
-> > >  mm/Kconfig                       | 9 +++++++++
-> > >  4 files changed, 13 insertions(+), 13 deletions(-)
-> > >
-> > > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> > > index ac2f6d906cc3..9d823015b4e5 100644
-> > > --- a/arch/arm64/Kconfig
-> > > +++ b/arch/arm64/Kconfig
-> > > @@ -2227,15 +2227,6 @@ config UNWIND_PATCH_PAC_INTO_SCS
-> > >         select UNWIND_TABLES
-> > >         select DYNAMIC_SCS
-> > >
-> > > -config ARM64_CONTPTE
-> > > -       bool "Contiguous PTE mappings for user memory" if EXPERT
-> > > -       depends on TRANSPARENT_HUGEPAGE
-> > > -       default y
-> > > -       help
-> > > -         When enabled, user mappings are configured using the PTE co=
-ntiguous
-> > > -         bit, for any mappings that meet the size and alignment requ=
-irements.
-> > > -         This reduces TLB pressure and improves performance.
-> > > -
-> > >  endmenu # "Kernel Features"
-> > >
-> > >  menu "Boot options"
-> > > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/as=
-m/pgtable.h
-> > > index 7c2938cb70b9..1758ce71fae9 100644
-> > > --- a/arch/arm64/include/asm/pgtable.h
-> > > +++ b/arch/arm64/include/asm/pgtable.h
-> > > @@ -1369,7 +1369,7 @@ extern void ptep_modify_prot_commit(struct vm_a=
-rea_struct *vma,
-> > >                                     unsigned long addr, pte_t *ptep,
-> > >                                     pte_t old_pte, pte_t new_pte);
-> > >
-> > > -#ifdef CONFIG_ARM64_CONTPTE
-> > > +#ifdef CONFIG_THP_CONTPTE
-> >
-> > Is it necessarily THP? can't be hugetlb or others? I feel THP_CONTPTE
-> > isn't a good name.
->
-> This does not target hugetlbfs (see my other patchset for that here
-> https://lore.kernel.org/linux-riscv/7504a525-8211-48b3-becb-a6e838c1b42e@=
-arm.com/T/#m57d273d680fc531b3aa1074e6f8558a52ba5badc).
->
-> What could be "others" here?
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 6/7] riscv: kvm: add SBI FWFT support for
+ SBI_FWFT_DOUBLE_TRAP_ENABLE
+To: Deepak Gupta <debug@rivosinc.com>
+Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
+ linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, Ved Shanbhogue <ved@rivosinc.com>
+References: <20240418142701.1493091-1-cleger@rivosinc.com>
+ <20240418142701.1493091-7-cleger@rivosinc.com>
+ <ZixSFLZYZaf8BKHP@debug.ba.rivosinc.com>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <ZixSFLZYZaf8BKHP@debug.ba.rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 
-I acknowledge that the current focus is on Transparent Huge Pages. However,
-many aspects of CONT-PTE appear to be applicable to the mm-core in general.
-For example,
 
-/*
- * The below functions constitute the public API that arm64 presents to the
- * core-mm to manipulate PTE entries within their page tables (or at least =
-this
- * is the subset of the API that arm64 needs to implement). These public
- * versions will automatically and transparently apply the contiguous bit w=
-here
- * it makes sense to do so. Therefore any users that are contig-aware (e.g.
- * hugetlb, kernel mapper) should NOT use these APIs, but instead use the
- * private versions, which are prefixed with double underscore. All of thes=
-e
- * APIs except for ptep_get_lockless() are expected to be called with the P=
-TL
- * held. Although the contiguous bit is considered private to the
- * implementation, it is deliberately allowed to leak through the getters (=
-e.g.
- * ptep_get()), back to core code. This is required so that pte_leaf_size()=
- can
- * provide an accurate size for perf_get_pgtable_size(). But this leakage m=
-eans
- * its possible a pte will be passed to a setter with the contiguous bit se=
-t, so
- * we explicitly clear the contiguous bit in those cases to prevent acciden=
-tally
- * setting it in the pgtable.
- */
+On 27/04/2024 03:17, Deepak Gupta wrote:
+> On Thu, Apr 18, 2024 at 04:26:45PM +0200, Clément Léger wrote:
+>> Add support in KVM SBI FWFT extension to allow VS-mode to request double
+>> trap enabling. Double traps can then be generated by VS-mode, allowing
+>> M-mode to redirect them to S-mode.
+>>
+>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+>> ---
+>> arch/riscv/include/asm/csr.h               |  1 +
+>> arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h |  2 +-
+>> arch/riscv/kvm/vcpu_sbi_fwft.c             | 41 ++++++++++++++++++++++
+>> 3 files changed, 43 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+>> index 905cdf894a57..ee1b73655bec 100644
+>> --- a/arch/riscv/include/asm/csr.h
+>> +++ b/arch/riscv/include/asm/csr.h
+>> @@ -196,6 +196,7 @@
+>> /* xENVCFG flags */
+>> #define ENVCFG_STCE            (_AC(1, ULL) << 63)
+>> #define ENVCFG_PBMTE            (_AC(1, ULL) << 62)
+>> +#define ENVCFG_DTE            (_AC(1, ULL) << 59)
+>> #define ENVCFG_CBZE            (_AC(1, UL) << 7)
+>> #define ENVCFG_CBCFE            (_AC(1, UL) << 6)
+>> #define ENVCFG_CBIE_SHIFT        4
+>> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>> b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>> index 7dc1b80c7e6c..a9e20d655126 100644
+>> --- a/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi_fwft.h
+>> @@ -11,7 +11,7 @@
+>>
+>> #include <asm/sbi.h>
+>>
+>> -#define KVM_SBI_FWFT_FEATURE_COUNT    1
+>> +#define KVM_SBI_FWFT_FEATURE_COUNT    2
+>>
+>> struct kvm_sbi_fwft_config;
+>> struct kvm_vcpu;
+>> diff --git a/arch/riscv/kvm/vcpu_sbi_fwft.c
+>> b/arch/riscv/kvm/vcpu_sbi_fwft.c
+>> index b9b7f8fa6d22..9e8e397eb02f 100644
+>> --- a/arch/riscv/kvm/vcpu_sbi_fwft.c
+>> +++ b/arch/riscv/kvm/vcpu_sbi_fwft.c
+>> @@ -9,10 +9,19 @@
+>> #include <linux/errno.h>
+>> #include <linux/err.h>
+>> #include <linux/kvm_host.h>
+>> +#include <linux/riscv_dbltrp.h>
+>> #include <asm/sbi.h>
+>> #include <asm/kvm_vcpu_sbi.h>
+>> #include <asm/kvm_vcpu_sbi_fwft.h>
+>>
+>> +#ifdef CONFIG_32BIT
+>> +# define CSR_HENVCFG_DBLTRP    CSR_HENVCFGH
+>> +# define DBLTRP_DTE    (ENVCFG_DTE >> 32)
+>> +#else
+>> +# define CSR_HENVCFG_DBLTRP    CSR_HENVCFG
+>> +# define DBLTRP_DTE    ENVCFG_DTE
+>> +#endif
+>> +
+>> #define MIS_DELEG (1UL << EXC_LOAD_MISALIGNED | 1UL <<
+>> EXC_STORE_MISALIGNED)
+>>
+>> static int kvm_sbi_fwft_set_misaligned_delegation(struct kvm_vcpu *vcpu,
+>> @@ -36,6 +45,33 @@ static int
+>> kvm_sbi_fwft_get_misaligned_delegation(struct kvm_vcpu *vcpu,
+>>     return SBI_SUCCESS;
+>> }
+>>
+>> +static int kvm_sbi_fwft_set_double_trap(struct kvm_vcpu *vcpu,
+>> +                    struct kvm_sbi_fwft_config *conf,
+>> +                    unsigned long value)
+>> +{
+>> +    if (!riscv_double_trap_enabled())
+>> +        return SBI_ERR_NOT_SUPPORTED;
+> 
+> Why its required to check whether host has enabled double trap for itself ?
+> It's orthogonal to guest asking hypervisor to enable double trap.
 
-#define ptep_get ptep_get
-static inline pte_t ptep_get(pte_t *ptep)
-{
-        pte_t pte =3D __ptep_get(ptep);
+Hi Deepak,
 
-        if (likely(!pte_valid_cont(pte)))
-                return pte;
+Indeed, as you saw, henvcfg.DTE needs menvcfg.DTE to be enabled in order
+to be usable.
 
-        return contpte_ptep_get(ptep, pte);
-}
+> 
+> Probably you need a check here whether underlying FW supports handling
+> double
+> trap.
+> 
+> Am I missing something here?
+> 
+>> +
+>> +    if (value)
+>> +        csr_set(CSR_HENVCFG_DBLTRP, DBLTRP_DTE);
+>> +    else
+>> +        csr_clear(CSR_HENVCFG_DBLTRP, DBLTRP_DTE);
+> 
+> I think vcpu->arch.cfg has `henvcfg` field. Can we reflect it there as
+> well so that current
+> `henvcfg` copy in vcpu arch specifci config is consistent? Otherwise
+> it'll be lost when vCPU
+> is scheduled out and later scheduled back in (on vcpu load)
 
-Could it possibly be given a more generic name such as "PGTABLE_CONTPTE"?
+henvcfg is restored when loading the vpcu (kvm_arch_vcpu_load()) and
+saved when the CPU is put (kvm_arch_vcpu_put()). But I just saw that
+this change is included in the next patch. Should have been this one ,
+I'll fix that.
 
->
-> Thanks for your comment,
->
-> Alex
->
-> >
-> > >
-> > >  /*
-> > >   * The contpte APIs are used to transparently manage the contiguous =
-bit in ptes
-> > > @@ -1622,7 +1622,7 @@ static inline int ptep_set_access_flags(struct =
-vm_area_struct *vma,
-> > >         return contpte_ptep_set_access_flags(vma, addr, ptep, entry, =
-dirty);
-> > >  }
-> > >
-> > > -#else /* CONFIG_ARM64_CONTPTE */
-> > > +#else /* CONFIG_THP_CONTPTE */
-> > >
-> > >  #define ptep_get                               __ptep_get
-> > >  #define set_pte                                        __set_pte
-> > > @@ -1642,7 +1642,7 @@ static inline int ptep_set_access_flags(struct =
-vm_area_struct *vma,
-> > >  #define __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS
-> > >  #define ptep_set_access_flags                  __ptep_set_access_fla=
-gs
-> > >
-> > > -#endif /* CONFIG_ARM64_CONTPTE */
-> > > +#endif /* CONFIG_THP_CONTPTE */
-> > >
-> > >  int find_num_contig(struct mm_struct *mm, unsigned long addr,
-> > >                     pte_t *ptep, size_t *pgsize);
-> > > diff --git a/arch/arm64/mm/Makefile b/arch/arm64/mm/Makefile
-> > > index 60454256945b..52a1b2082627 100644
-> > > --- a/arch/arm64/mm/Makefile
-> > > +++ b/arch/arm64/mm/Makefile
-> > > @@ -3,7 +3,7 @@ obj-y                           :=3D dma-mapping.o ex=
-table.o fault.o init.o \
-> > >                                    cache.o copypage.o flush.o \
-> > >                                    ioremap.o mmap.o pgd.o mmu.o \
-> > >                                    context.o proc.o pageattr.o fixmap=
-.o
-> > > -obj-$(CONFIG_ARM64_CONTPTE)    +=3D contpte.o
-> > > +obj-$(CONFIG_THP_CONTPTE)      +=3D contpte.o
-> > >  obj-$(CONFIG_HUGETLB_PAGE)     +=3D hugetlbpage.o
-> > >  obj-$(CONFIG_PTDUMP_CORE)      +=3D ptdump.o
-> > >  obj-$(CONFIG_PTDUMP_DEBUGFS)   +=3D ptdump_debugfs.o
-> > > diff --git a/mm/Kconfig b/mm/Kconfig
-> > > index c325003d6552..fd4de221a1c6 100644
-> > > --- a/mm/Kconfig
-> > > +++ b/mm/Kconfig
-> > > @@ -984,6 +984,15 @@ config ARCH_HAS_CACHE_LINE_SIZE
-> > >  config ARCH_HAS_CONTPTE
-> > >         bool
-> > >
-> > > +config THP_CONTPTE
-> > > +       bool "Contiguous PTE mappings for user memory" if EXPERT
-> > > +       depends on ARCH_HAS_CONTPTE && TRANSPARENT_HUGEPAGE
-> > > +       default y
-> > > +       help
-> > > +         When enabled, user mappings are configured using the PTE co=
-ntiguous
-> > > +         bit, for any mappings that meet the size and alignment requ=
-irements.
-> > > +         This reduces TLB pressure and improves performance.
-> > > +
-> > >  config ARCH_HAS_CURRENT_STACK_POINTER
-> > >         bool
-> > >         help
-> > > --
-> > > 2.39.2
-> >
-Thanks
-Barry
+
+> 
+> Furthermore, lets not do feature specific alias names for CSR.
+> 
+> Instead let's keep consistent 64bit image of henvcfg in vcpu->arch.cfg.
+> 
+> And whenever it's time to pick up the setting, pick up logic either
+> perform the writes in
+> henvcfg. And if required it'll perform henvcfgh too (as
+> `kvm_arch_vcpu_load` already does)
+
+I don't have a strong opinion on that point so if you think it really is
+better, I'll switch to that.
+
+Thanks,
+
+Clément
+
+> 
+>> +
+>> +    return SBI_SUCCESS;
+>> +}
+>> +
+>> +static int kvm_sbi_fwft_get_double_trap(struct kvm_vcpu *vcpu,
+>> +                    struct kvm_sbi_fwft_config *conf,
+>> +                    unsigned long *value)
+>> +{
+>> +    if (!riscv_double_trap_enabled())
+>> +        return SBI_ERR_NOT_SUPPORTED;
+>> +
+>> +    *value = (csr_read(CSR_HENVCFG_DBLTRP) & DBLTRP_DTE) != 0;
+>> +
+>> +    return SBI_SUCCESS;
+>> +}
+>> +
+>> static struct kvm_sbi_fwft_config *
+>> kvm_sbi_fwft_get_config(struct kvm_vcpu *vcpu, enum sbi_fwft_feature_t
+>> feature)
+>> {
+>> @@ -111,6 +147,11 @@ static const struct kvm_sbi_fwft_feature
+>> features[] = {
+>>         .id = SBI_FWFT_MISALIGNED_DELEG,
+>>         .set = kvm_sbi_fwft_set_misaligned_delegation,
+>>         .get = kvm_sbi_fwft_get_misaligned_delegation,
+>> +    },
+>> +    {
+>> +        .id = SBI_FWFT_DOUBLE_TRAP_ENABLE,
+>> +        .set = kvm_sbi_fwft_set_double_trap,
+>> +        .get = kvm_sbi_fwft_get_double_trap,
+>>     }
+>> };
+>>
+>> -- 
+>> 2.43.0
+>>
+>>
 
