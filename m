@@ -1,103 +1,287 @@
-Return-Path: <kvm+bounces-17371-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 093B88C4D82
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 10:11:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A928C8C4ED8
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 12:20:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D7611F21E32
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 08:11:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A76280F7E
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 10:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 682961CFBE;
-	Tue, 14 May 2024 08:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DCDA12C49C;
+	Tue, 14 May 2024 09:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="FG5dvltM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHGUl3gv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31D817583;
-	Tue, 14 May 2024 08:10:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121B1DDC0;
+	Tue, 14 May 2024 09:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715674253; cv=none; b=qktp+wyLUuWpjnbhx1lwx80q00FVcXiN4bAJOGBAgJ4s35irP6haNpDf35aXy/4QR9cm1928VORRxT38cgdbQWd3yAdcSghVRllAuPTf5jMEgcyLI/CwBVQsbHSSfCIfhA+ZSs8cCgrAUOUdHwRw7j4IgxtQx9D7NNjtuk8SAyI=
+	t=1715679050; cv=none; b=NrTpg4BKlwYFeXC42tqaJLnXIB8YdgQTURhUtqc7O2wdmAuv/e5ODOY8TlQHMjnmfSJHy/xqhjByw+0lrNOcLCZjdbLuMGzBGgVg/EhYcpWyb+QYKSa/nyQIJDbQbI0a4Ilt0br7l+PWqS3iEWjbIYH1n6GKvm2hHRNFfe4W5+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715674253; c=relaxed/simple;
-	bh=MpHkCTTzT86UodOTRs7438YKurSYodl9BhzbJLYQrFc=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=qsGJ0D2+wLF8CcV2pq2AMeW9XIvx+Y1oscPI/5go4blPY+vNyPyFktg1cEtLSEWVJV9Vi4J1efk+BsE/JqOt8t7Ol2q08w4lG5hTddHc7KrTxRSxa4C5EsJCkALF5c5d1nxSoP6qL38hUk7TlQnQfHsfdkJUjPOvMSPLy0rt+Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=FG5dvltM; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C2B0D40E016A;
-	Tue, 14 May 2024 08:10:46 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 5GgcEjtDY3OT; Tue, 14 May 2024 08:10:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1715674243; bh=t5ROxBLyd57crBiDvNCn5htGvcOSCvJ21aXiNcdc1Jc=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=FG5dvltMk9er4ZGaXvdDhAltrQWcMie0x7swib34kGp8na3+Bm2tQyIU/eewygFVm
-	 TEdg0nVvIBeFvFWtwVzrncxatN2IDrDdN2x2VUtDf58H2j+wK6wpLsuVwFbrXTz8y8
-	 +c30TK9zpPkQYwbMeOcPNVTwShQjJ+3CayDY4PRRwMsp8OVu5iC/ZNh2wq3x2nR7Sg
-	 ulJ7EnZ/MWaH2K8EqRk/lJT0YtcFB6Blo08a0pV0Gvke2PKams9StkGzthkKtxMpd0
-	 xbPcXcdwgvDuSmSQ5aFtIOBm4beqZ8i/LQCuYJVRa9jlnIjohP0B1/GLR8Qylxnhn0
-	 DWy8NAQEx3s1ZIWomP/wAtnmCAhjsQ+gV0v86sPuvo/Qf5xsIHLUWnvtDLFt7gYro8
-	 C94c1cl28IE2QuZuX3px16ws3rkWEPmrjUue0GEaeU1QyxCUbUETG4t/uLnnejFZ8F
-	 q70r8GhLiPwv9oJsHiQMa3NQu+ZelgdueHdKwOz2EHG9YxqfYZJwLUMxvq7KOB+jfR
-	 h60Q4BaIKOIEiwB+YUQhISlLKpkzoldR6RUqovhSCogCNkTsxJS1iPWiO9apfu4xRy
-	 Q7HDaOl41AG07Px788iehUPgEs2ghyswpGSrCARG8MU+B6AiN1bXTeQ5g7hRSIh6St
-	 tmd5zLArc3Gxe5H6VLx3MwIs=
-Received: from [IPv6:::1] (p200300eA973a3496499cB1fE0c65A759.dip0.t-ipconnect.de [IPv6:2003:ea:973a:3496:499c:b1fe:c65:a759])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5FC3240E0192;
-	Tue, 14 May 2024 08:10:04 +0000 (UTC)
-Date: Tue, 14 May 2024 10:10:02 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Paolo Bonzini <pbonzini@redhat.com>, Michael Roth <michael.roth@amd.com>
-CC: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org, linux-crypto@vger.kernel.org,
- x86@kernel.org, linux-kernel@vger.kernel.org, tglx@linutronix.de,
- mingo@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
- ardb@kernel.org, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
- kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
- sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
- jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com,
- pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v15_22/23=5D_KVM=3A_SEV=3A_Fix_return_c?=
- =?US-ASCII?Q?ode_interpretation_for_RMP_nested_page_faults?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
-References: <20240501085210.2213060-1-michael.roth@amd.com> <20240510015822.503071-1-michael.roth@amd.com> <20240510015822.503071-2-michael.roth@amd.com> <Zj4oFffc7OQivyV-@google.com> <566b57c0-27cd-4591-bded-9a397a1d44d5@redhat.com> <20240510163719.pnwdwarsbgmcop3h@amd.com> <a47e7b49-96d2-4e7b-ae39-a3bfe6b0ed83@redhat.com>
-Message-ID: <AFCDFEE1-40CF-4780-B129-5AE56057BE41@alien8.de>
+	s=arc-20240116; t=1715679050; c=relaxed/simple;
+	bh=wxxfMb6xLPNc0GtCv2kZ8br7AECDWg9X2HA0DsXGjOg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iVGvb99XNgm37iB6WXPID+3uY3U/CzZg+pKxgJ2ZFpVaTKT5/K6N5ykKbyPw4pWKPR3stf0WCxg/kv34DOMf2/e3Xq48Ypp98He84GULpQmgXjgNLU64tFMu/NzNoq/auMfvYWr7Ng9PSsLkxORTuBZQL/slqGR0T+oOYl/QAN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHGUl3gv; arc=none smtp.client-ip=209.85.222.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-7ebe09eb289so1976435241.2;
+        Tue, 14 May 2024 02:30:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715679048; x=1716283848; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wdHFnHTcKzscSCgje4pLV0ENAixI1q19eindkQ9bbmI=;
+        b=MHGUl3gvMvcG3gy0mgpGyRR6g0ljSbR8Te9cd28W0xHEjuca5Icfyy6BmMQiQPZr7g
+         zCm9v7QcdpoOnwdjIIKAKinUa56Metzwd0ciAXDVglYYr+ZZUJvVvYKZutEyKb+AhAXL
+         X5l8l0aifpgfw3t1X/WFMJQL1kHYfnIT4DR+Io5CcyJ1zRDqsRoguSbQSm8+tE5HX563
+         EsuchCncrobQfvhSVtNg6MWxqXJ4pA273k3xqGlZIShbRvnoGP9fwRS6f23nA+aaAPpY
+         SYQt0N8YFSeahN4oO7ReskUIUoWBBgAzH0Mtw768+53qb7numd0e0U8za43r+6dIYUov
+         q/dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715679048; x=1716283848;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wdHFnHTcKzscSCgje4pLV0ENAixI1q19eindkQ9bbmI=;
+        b=wQ40FTiXPTnEnEw9BZFvZQHK3i9PVkvdJ2dcmvSXmjDQA/8A0J0kCWuK/2u9p6xKag
+         2dm3agpQgrK+5G/+5xhu+5jWlM/S1KJbV4pl5XVYjY4V4sRfHcnpO+n8ZH8uVivND0CB
+         b6YpoiLzuBDO995CNBZfhLfpinnSA871Ipx2Reacl5Fk3LufUrg30NlIqF8z2A+pVOSb
+         iefBc4KQ4atSG6SwNXBV90lTvUMqP+MbbVP0Tys1Cq+6PkTUOauy+W2aKiGPw74rjGgq
+         fAoA+ZH0ec42ssCZzPnBkctcjlP2yyG0DuU1QjEAB2m8pj6MnZOE4CJF3S3m+m6KR8sH
+         inNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpoR/RpfcQFtvSgk39BohBTIev/UU218FOin7Cdl4QNwRxJ0LbZhsqQZBG2bN2pBSAvNyPe1gDRpLQ2lwYO3qHQbu2hU7GnSoA2wxD7HvyPTfdNpCY6sjtLYB5w7tGcmZ7tO+nP7RUzuBWVj3WKoXhFOuSRaOIuXldK95Z
+X-Gm-Message-State: AOJu0YyN5LPXxtMTnMAbDF6o41u+dNhdM3wAIY7CnBslT6/oc0D0GmKm
+	0Hpd0JFx7/rLaBJ2SBErWtVh4GuOJzadJ6vvVl7i4gHPxUXy8coYH1/AJr7JvULD4jqo+mzncpu
+	liKkFFdjWqDMiTxxQ+OAn0Vw/Yf0=
+X-Google-Smtp-Source: AGHT+IFsXlUYAyC/dVyPAc91tSYUW8lcOIZYX7vhSynTmD9ch/K7amSJeNqyvopCZMfgCDfYyurmNf0h2XrY9tF0I4Y=
+X-Received: by 2002:a05:6102:2acc:b0:47e:f686:ccf with SMTP id
+ ada2fe7eead31-48077e83663mr12661860137.23.1715679047234; Tue, 14 May 2024
+ 02:30:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+References: <20240508191931.46060-1-alexghiti@rivosinc.com>
+ <20240508191931.46060-2-alexghiti@rivosinc.com> <CAGsJ_4xayC4D4y0d7SPXxCvuW4-rJQUCa_-OUDSsOGm_HyPm1w@mail.gmail.com>
+ <CAHVXubiOo3oe0=-qU2kBaFXebPJvmnc+-1UOPEHS2spcCeMzsw@mail.gmail.com>
+In-Reply-To: <CAHVXubiOo3oe0=-qU2kBaFXebPJvmnc+-1UOPEHS2spcCeMzsw@mail.gmail.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Tue, 14 May 2024 21:30:36 +1200
+Message-ID: <CAGsJ_4w_mOL5egHV9a3+0vcZV6ODvr=3KFXevedH19voSCHXwQ@mail.gmail.com>
+Subject: Re: [PATCH 01/12] mm, arm64: Rename ARM64_CONTPTE to THP_CONTPTE
+To: Alexandre Ghiti <alexghiti@rivosinc.com>
+Cc: Ryan Roberts <ryan.roberts@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>, 
+	Dmitry Vyukov <dvyukov@google.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Ard Biesheuvel <ardb@kernel.org>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Andrey Ryabinin <ryabinin.a.a@gmail.com>, 
+	Andrey Konovalov <andreyknvl@gmail.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, 
+	linux-riscv@lists.infradead.org, linux-efi@vger.kernel.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On May 10, 2024 6:59:37 PM GMT+02:00, Paolo Bonzini <pbonzini@redhat=2Ecom>=
- wrote:
->Well, the merge window starts next sunday, doesn't it?  If there's an -rc=
-8 I agree there's some leeway, but that is not too likely=2E
+On Tue, May 14, 2024 at 1:09=E2=80=AFAM Alexandre Ghiti <alexghiti@rivosinc=
+.com> wrote:
+>
+> Hi Barry,
+>
+> On Thu, May 9, 2024 at 2:46=E2=80=AFAM Barry Song <21cnbao@gmail.com> wro=
+te:
+> >
+> > On Thu, May 9, 2024 at 7:20=E2=80=AFAM Alexandre Ghiti <alexghiti@rivos=
+inc.com> wrote:
+> > >
+> > > The ARM64_CONTPTE config represents the capability to transparently u=
+se
+> > > contpte mappings for THP userspace mappings, which will be implemente=
+d
+> > > in the next commits for riscv, so make this config more generic and m=
+ove
+> > > it to mm.
+> > >
+> > > Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+> > > ---
+> > >  arch/arm64/Kconfig               | 9 ---------
+> > >  arch/arm64/include/asm/pgtable.h | 6 +++---
+> > >  arch/arm64/mm/Makefile           | 2 +-
+> > >  mm/Kconfig                       | 9 +++++++++
+> > >  4 files changed, 13 insertions(+), 13 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> > > index ac2f6d906cc3..9d823015b4e5 100644
+> > > --- a/arch/arm64/Kconfig
+> > > +++ b/arch/arm64/Kconfig
+> > > @@ -2227,15 +2227,6 @@ config UNWIND_PATCH_PAC_INTO_SCS
+> > >         select UNWIND_TABLES
+> > >         select DYNAMIC_SCS
+> > >
+> > > -config ARM64_CONTPTE
+> > > -       bool "Contiguous PTE mappings for user memory" if EXPERT
+> > > -       depends on TRANSPARENT_HUGEPAGE
+> > > -       default y
+> > > -       help
+> > > -         When enabled, user mappings are configured using the PTE co=
+ntiguous
+> > > -         bit, for any mappings that meet the size and alignment requ=
+irements.
+> > > -         This reduces TLB pressure and improves performance.
+> > > -
+> > >  endmenu # "Kernel Features"
+> > >
+> > >  menu "Boot options"
+> > > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/as=
+m/pgtable.h
+> > > index 7c2938cb70b9..1758ce71fae9 100644
+> > > --- a/arch/arm64/include/asm/pgtable.h
+> > > +++ b/arch/arm64/include/asm/pgtable.h
+> > > @@ -1369,7 +1369,7 @@ extern void ptep_modify_prot_commit(struct vm_a=
+rea_struct *vma,
+> > >                                     unsigned long addr, pte_t *ptep,
+> > >                                     pte_t old_pte, pte_t new_pte);
+> > >
+> > > -#ifdef CONFIG_ARM64_CONTPTE
+> > > +#ifdef CONFIG_THP_CONTPTE
+> >
+> > Is it necessarily THP? can't be hugetlb or others? I feel THP_CONTPTE
+> > isn't a good name.
+>
+> This does not target hugetlbfs (see my other patchset for that here
+> https://lore.kernel.org/linux-riscv/7504a525-8211-48b3-becb-a6e838c1b42e@=
+arm.com/T/#m57d273d680fc531b3aa1074e6f8558a52ba5badc).
+>
+> What could be "others" here?
 
-Nah, the merge window just opened yesterday=2E=20
 
---=20
-Sent from a small device: formatting sucks and brevity is inevitable=2E 
+I acknowledge that the current focus is on Transparent Huge Pages. However,
+many aspects of CONT-PTE appear to be applicable to the mm-core in general.
+For example,
+
+/*
+ * The below functions constitute the public API that arm64 presents to the
+ * core-mm to manipulate PTE entries within their page tables (or at least =
+this
+ * is the subset of the API that arm64 needs to implement). These public
+ * versions will automatically and transparently apply the contiguous bit w=
+here
+ * it makes sense to do so. Therefore any users that are contig-aware (e.g.
+ * hugetlb, kernel mapper) should NOT use these APIs, but instead use the
+ * private versions, which are prefixed with double underscore. All of thes=
+e
+ * APIs except for ptep_get_lockless() are expected to be called with the P=
+TL
+ * held. Although the contiguous bit is considered private to the
+ * implementation, it is deliberately allowed to leak through the getters (=
+e.g.
+ * ptep_get()), back to core code. This is required so that pte_leaf_size()=
+ can
+ * provide an accurate size for perf_get_pgtable_size(). But this leakage m=
+eans
+ * its possible a pte will be passed to a setter with the contiguous bit se=
+t, so
+ * we explicitly clear the contiguous bit in those cases to prevent acciden=
+tally
+ * setting it in the pgtable.
+ */
+
+#define ptep_get ptep_get
+static inline pte_t ptep_get(pte_t *ptep)
+{
+        pte_t pte =3D __ptep_get(ptep);
+
+        if (likely(!pte_valid_cont(pte)))
+                return pte;
+
+        return contpte_ptep_get(ptep, pte);
+}
+
+Could it possibly be given a more generic name such as "PGTABLE_CONTPTE"?
+
+>
+> Thanks for your comment,
+>
+> Alex
+>
+> >
+> > >
+> > >  /*
+> > >   * The contpte APIs are used to transparently manage the contiguous =
+bit in ptes
+> > > @@ -1622,7 +1622,7 @@ static inline int ptep_set_access_flags(struct =
+vm_area_struct *vma,
+> > >         return contpte_ptep_set_access_flags(vma, addr, ptep, entry, =
+dirty);
+> > >  }
+> > >
+> > > -#else /* CONFIG_ARM64_CONTPTE */
+> > > +#else /* CONFIG_THP_CONTPTE */
+> > >
+> > >  #define ptep_get                               __ptep_get
+> > >  #define set_pte                                        __set_pte
+> > > @@ -1642,7 +1642,7 @@ static inline int ptep_set_access_flags(struct =
+vm_area_struct *vma,
+> > >  #define __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS
+> > >  #define ptep_set_access_flags                  __ptep_set_access_fla=
+gs
+> > >
+> > > -#endif /* CONFIG_ARM64_CONTPTE */
+> > > +#endif /* CONFIG_THP_CONTPTE */
+> > >
+> > >  int find_num_contig(struct mm_struct *mm, unsigned long addr,
+> > >                     pte_t *ptep, size_t *pgsize);
+> > > diff --git a/arch/arm64/mm/Makefile b/arch/arm64/mm/Makefile
+> > > index 60454256945b..52a1b2082627 100644
+> > > --- a/arch/arm64/mm/Makefile
+> > > +++ b/arch/arm64/mm/Makefile
+> > > @@ -3,7 +3,7 @@ obj-y                           :=3D dma-mapping.o ex=
+table.o fault.o init.o \
+> > >                                    cache.o copypage.o flush.o \
+> > >                                    ioremap.o mmap.o pgd.o mmu.o \
+> > >                                    context.o proc.o pageattr.o fixmap=
+.o
+> > > -obj-$(CONFIG_ARM64_CONTPTE)    +=3D contpte.o
+> > > +obj-$(CONFIG_THP_CONTPTE)      +=3D contpte.o
+> > >  obj-$(CONFIG_HUGETLB_PAGE)     +=3D hugetlbpage.o
+> > >  obj-$(CONFIG_PTDUMP_CORE)      +=3D ptdump.o
+> > >  obj-$(CONFIG_PTDUMP_DEBUGFS)   +=3D ptdump_debugfs.o
+> > > diff --git a/mm/Kconfig b/mm/Kconfig
+> > > index c325003d6552..fd4de221a1c6 100644
+> > > --- a/mm/Kconfig
+> > > +++ b/mm/Kconfig
+> > > @@ -984,6 +984,15 @@ config ARCH_HAS_CACHE_LINE_SIZE
+> > >  config ARCH_HAS_CONTPTE
+> > >         bool
+> > >
+> > > +config THP_CONTPTE
+> > > +       bool "Contiguous PTE mappings for user memory" if EXPERT
+> > > +       depends on ARCH_HAS_CONTPTE && TRANSPARENT_HUGEPAGE
+> > > +       default y
+> > > +       help
+> > > +         When enabled, user mappings are configured using the PTE co=
+ntiguous
+> > > +         bit, for any mappings that meet the size and alignment requ=
+irements.
+> > > +         This reduces TLB pressure and improves performance.
+> > > +
+> > >  config ARCH_HAS_CURRENT_STACK_POINTER
+> > >         bool
+> > >         help
+> > > --
+> > > 2.39.2
+> >
+Thanks
+Barry
 
