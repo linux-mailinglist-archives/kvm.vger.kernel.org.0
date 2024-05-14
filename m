@@ -1,129 +1,206 @@
-Return-Path: <kvm+bounces-17378-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17379-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01A8B8C55F9
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 14:24:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 103468C5620
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 14:44:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3382E1C209B1
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 12:24:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00A48282712
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 12:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5F54500E;
-	Tue, 14 May 2024 12:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698B06EB67;
+	Tue, 14 May 2024 12:44:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="HUYIhJQS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WHZuW4sr"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37695103D;
-	Tue, 14 May 2024 12:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8214D66B5E;
+	Tue, 14 May 2024 12:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715689436; cv=none; b=V57XBzYwnEttLoCntFnQhXPtLTBLunhR2Hls+qm5IpfRCbKjAIX7AFxWzW0aju6vdxa7CMPA2x6v88jL8YC/Qv+4nRR3u8YgdP/Z7ujihI6IejbaGx7T2UxCNedHkAnR1AB8Yvt0Vo7741sLvtEdxGOj/nSGvfXaQ7ErqSMXux0=
+	t=1715690640; cv=none; b=LEfwU0SDe/JOXlS4YyAr5bQXiRMMZLRMdQUikAFI5hvCtAwE5FQyJd8Taq/iIr11SfztWOgx6lNMS9o2JzwOBjg3hTJCoUsvHxgaoQlQAs0fXjjL7DACTUgM68NhvxQ4t7la7WJFPgjAnOT1HM5rKMesjKyFVMgrwrH4oKizQ6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715689436; c=relaxed/simple;
-	bh=bRkarWPZPXCcGNKnN/GFmEsDu3L8Us8oWBdG536diIA=;
+	s=arc-20240116; t=1715690640; c=relaxed/simple;
+	bh=frcCTz483GMnhYg7RWj0qSs/9NEH9LvHXWO5H2Yy4ig=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NsZFg4BAI/gfXxhrWwBreOP+dQrbX9EB4u63TIJGzvfCLbHRAbyOu+NiP8pVDZxiTT6yxLuC8aaEf42HCad4QrvVG95063WTLfDW+h7B6qYPu7+facWPpt8LSMrkPFD2o4tFS4DS0UjewnGQQW5/3ZhQ3+yNYxiEopveCyx9TgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=HUYIhJQS; arc=none smtp.client-ip=84.16.66.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VdwWP64pbzTXk;
-	Tue, 14 May 2024 14:23:45 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1715689425;
-	bh=I0eZWdP4Q+KPu4Hx3s3mpwHuoQ0UvkeO9/nafOAr82w=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYG+XxTi2aTzB2x5jFpynWgHV1E4GbdsmIyRUdE+3eTH/HKACY35xAST5DbAhIvf2N+n/Eabjwg9Vrw+Rd6j5d/+HnM1GHL9pH9pl9EVQVKzpzIjUV6Gt618UB3TozCi/Eba7+naslobFQZCiBNCq6YRDLSoEGSV5QfOn2HSVs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WHZuW4sr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2213C2BD10;
+	Tue, 14 May 2024 12:43:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715690640;
+	bh=frcCTz483GMnhYg7RWj0qSs/9NEH9LvHXWO5H2Yy4ig=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HUYIhJQSGxJF3jwUizanlmonUX7sygOvcV8noUaAFzN0V3a3iKwuGB8/GEum6Clxq
-	 EcKo1qBH3Un5VS8jWoGkoTi3TiKlCjIcaIL1kB+8poVzqExKvp5IQ2ywDDPeKqlugY
-	 OVZlyAPCKt5gtA5k6143lcqKUer3NgtqPGvwYp+A=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4VdwWN5tzlzF2L;
-	Tue, 14 May 2024 14:23:44 +0200 (CEST)
-Date: Tue, 14 May 2024 14:23:42 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Nicolas Saenz Julienne <nsaenz@amazon.com>
-Cc: Sean Christopherson <seanjc@google.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, 
-	Kees Cook <keescook@chromium.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Vitaly Kuznetsov <vkuznets@redhat.com>, 
-	Wanpeng Li <wanpengli@tencent.com>, Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
-	Alexander Graf <graf@amazon.com>, Angelina Vu <angelinavu@linux.microsoft.com>, 
-	Anna Trikalinou <atrikalinou@microsoft.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Forrest Yuan Yu <yuanyu@google.com>, James Gowans <jgowans@amazon.com>, 
-	James Morris <jamorris@linux.microsoft.com>, John Andersen <john.s.andersen@intel.com>, 
-	"Madhavan T . Venkataraman" <madvenka@linux.microsoft.com>, Marian Rotariu <marian.c.rotariu@gmail.com>, 
-	Mihai =?utf-8?B?RG9uyJt1?= <mdontu@bitdefender.com>, =?utf-8?B?TmljdciZb3IgQ8OuyJt1?= <nicu.citu@icloud.com>, 
-	Thara Gopinath <tgopinath@microsoft.com>, Trilok Soni <quic_tsoni@quicinc.com>, 
-	Wei Liu <wei.liu@kernel.org>, Will Deacon <will@kernel.org>, 
-	Yu Zhang <yu.c.zhang@linux.intel.com>, =?utf-8?Q?=C8=98tefan_=C8=98icleru?= <ssicleru@bitdefender.com>, 
-	dev@lists.cloudhypervisor.org, kvm@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, 
-	x86@kernel.org, xen-devel@lists.xenproject.org
-Subject: Re: [RFC PATCH v3 3/5] KVM: x86: Add notifications for Heki policy
- configuration and violation
-Message-ID: <20240514.mai3Ahdoo2qu@digikod.net>
-References: <20240503131910.307630-1-mic@digikod.net>
- <20240503131910.307630-4-mic@digikod.net>
- <ZjTuqV-AxQQRWwUW@google.com>
- <20240506.ohwe7eewu0oB@digikod.net>
- <ZjmFPZd5q_hEBdBz@google.com>
- <20240507.ieghomae0UoC@digikod.net>
- <ZjpTxt-Bxia3bRwB@google.com>
- <D15VQ97L5M8J.1TDNQE6KLW6JO@amazon.com>
+	b=WHZuW4srm0yCDfSbJUt5JCAxCjKy7cx7Q1H3MbIduBZqdIECmEiWfF/AXzRGjYxME
+	 GW2/CRUxcrQ0bQp8yDXScoMqdoZG0/KtGNE7ImqeXvan3fS7YfUL+u14bqag6i3gzD
+	 IQLtGQazfqcdl/DkfSnxxX38HL4cvm/vuT0/djBaE1+wID4tOnzwJVIBw10ppTJ9HX
+	 p/xSP4MFZp8AMV/0GEAo/MsORo1RdQ3eZlmsx1m3OHYIBqUZJyv42UczQ5JPWf6Liq
+	 XfyKyJ10c0bVUZns5frYAgeCGUVeoLkF7BQR7t4Q0qaEOD7XpZblYZ0iouWN5YvG2W
+	 jk2uzrlyC7etw==
+Date: Tue, 14 May 2024 13:43:54 +0100
+From: Conor Dooley <conor@kernel.org>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 02/11] riscv: add ISA extensions validation
+Message-ID: <20240514-sip-exclusion-014b07b01f4c@spud>
+References: <20240429150553.625165-1-cleger@rivosinc.com>
+ <20240429150553.625165-3-cleger@rivosinc.com>
+ <20240429-subtext-tabby-3a1532f058a5@spud>
+ <5d5febd5-d113-4e8c-9535-9e75acf23398@rivosinc.com>
+ <20240430-payable-famished-6711765d5ca4@wendy>
+ <e57f8b70-7981-42c1-bb04-2060054dd796@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="d4LtUScPc142c/dS"
 Content-Disposition: inline
-In-Reply-To: <D15VQ97L5M8J.1TDNQE6KLW6JO@amazon.com>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <e57f8b70-7981-42c1-bb04-2060054dd796@rivosinc.com>
 
-On Fri, May 10, 2024 at 10:07:00AM +0000, Nicolas Saenz Julienne wrote:
-> On Tue May 7, 2024 at 4:16 PM UTC, Sean Christopherson wrote:
-> > > If yes, that would indeed require a *lot* of work for something we're not
-> > > sure will be accepted later on.
-> >
-> > Yes and no.  The AWS folks are pursuing VSM support in KVM+QEMU, and SVSM support
-> > is trending toward the paired VM+vCPU model.  IMO, it's entirely feasible to
-> > design KVM support such that much of the development load can be shared between
-> > the projects.  And having 2+ use cases for a feature (set) makes it _much_ more
-> > likely that the feature(s) will be accepted.
-> 
-> Since Sean mentioned our VSM efforts, a small update. We were able to
-> validate the concept of one KVM VM per VTL as discussed in LPC. Right
-> now only for single CPU guests, but are in the late stages of bringing
-> up MP support. The resulting KVM code is small, and most will be
-> uncontroversial (I hope). If other obligations allow it, we plan on
-> having something suitable for review in the coming months.
 
-Looks good!
+--d4LtUScPc142c/dS
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Our implementation aims to implement all the VSM spec necessary to run
-> with Microsoft Credential Guard. But note that some aspects necessary
-> for HVCI are not covered, especially the ones that depend on MBEC
-> support, or some categories of secure intercepts.
+On Tue, May 14, 2024 at 09:53:08AM +0200, Cl=E9ment L=E9ger wrote:
+>=20
+>=20
+> On 30/04/2024 13:44, Conor Dooley wrote:
+> > On Tue, Apr 30, 2024 at 09:18:47AM +0200, Cl=E9ment L=E9ger wrote:
+> >>
+> >>
+> >> On 30/04/2024 00:15, Conor Dooley wrote:
+> >>> On Mon, Apr 29, 2024 at 05:04:55PM +0200, Cl=E9ment L=E9ger wrote:
+> >>>> Since a few extensions (Zicbom/Zicboz) already needs validation and
+> >>>> future ones will need it as well (Zc*) add a validate() callback to
+> >>>> struct riscv_isa_ext_data. This require to rework the way extensions=
+ are
+> >>>> parsed and split it in two phases. First phase is isa string or isa
+> >>>> extension list parsing and consists in enabling all the extensions i=
+n a
+> >>>> temporary bitmask without any validation. The second step "resolves"=
+ the
+> >>>> final isa bitmap, handling potential missing dependencies. The mecha=
+nism
+> >>>> is quite simple and simply validate each extension described in the
+> >>>> temporary bitmap before enabling it in the final isa bitmap. validat=
+e()
+> >>>> callbacks can return either 0 for success, -EPROBEDEFER if extension
+> >>>> needs to be validated again at next loop. A previous ISA bitmap is k=
+ept
+> >>>> to avoid looping mutliple times if an extension dependencies are nev=
+er
+> >>>> satisfied until we reach a stable state. In order to avoid any poten=
+tial
+> >>>> infinite looping, allow looping a maximum of the number of extension=
+ we
+> >>>> handle. Zicboz and Zicbom extensions are modified to use this valida=
+tion
+> >>>> mechanism.
+> >>>
+> >>> Your reply to my last review only talked about part of my comments,
+> >>> which is usually what you do when you're gonna implement the rest, but
+> >>> you haven't.
+> >>> I like the change you've made to shorten looping, but I'd at least li=
+ke
+> >>> a response to why a split is not worth doing :)
+> >>
+> >> Hi Conor,
+> >>
+> >> Missed that point since I was feeling that my solution actually
+> >> addresses your concerns. Your argument was that there is no reason to
+> >> loop for Zicbom/Zicboz but that would also apply to Zcf in case we are
+> >> on RV64 as well (since zcf is not supported on RV64). So for Zcf, that
+> >> would lead to using both mecanism or additional ifdefery with little to
+> >> no added value since the current solution actually solves both cases:
+> >>
+> >> - We don't have any extra looping if all validation callback returns 0
+> >> (except the initial one on riscv_isa_ext, which is kind of unavoidable=
+).
+> >> - Zicbom, Zicboz callbacks will be called only once (which was one of
+> >> your concern).
+> >>
+> >> Adding a second kind of callback for after loop validation would only
+> >> lead to a bunch of additional macros/ifdefery for extensions with
+> >> validate() callback, with validate_end() or with both (ie Zcf)). For
+> >> these reasons, I do not think there is a need for a separate mechanism
+> >> nor additional callback for such extensions except adding extra code
+> >> with no real added functionality.
+> >>
+> >> AFAIK, the platform driver probing mechanism works the same, the probe=
+()
+> >> callback is actually called even if for some reason properties are
+> >> missing from nodes for platform devices and thus the probe() returns
+> >> -EINVAL or whatever.
+> >>
+> >> Hope this answers your question,
+> >=20
+> > Yeah, pretty much I am happy with just an "it's not worth doing it"
+> > response. Given it wasn't your first choice, I doubt you're overly happy
+> > with it either, but I really would like to avoid looping to closure to
+> > sort out dependencies - particularly on the boot CPU before we bring
+> > anyone else up, but if the code is now more proactive about breaking
+> > out, I suppose that'll have to do :)
+> > I kinda wish we didn't do this at all, but I think we've brought this
+> > upon ourselves via hwprobe. I'm still on the fence as to whether things
+> > that are implied need to be handled in this way. I think I'll bring this
+> > up tomorrow at the weekly call, because so far it's only been you and I
+> > discussing this really and it's a policy decision that hwprobe-ists
+> > should be involved in I think.
+>=20
+> Hi Conor,
+>=20
+> Were you able to discuss that topic ?
 
-We already implemented support for MBEC, so that should not be an issue.
-We just need to find the best interface to configure it.
+I realised last night that I'd not got back to this thread and meant to
+do that today (I had accidentally deleted it from my mailbox), but I had
+a migraine this morning and so didn't.
+I did bring it up and IIRC Palmer was of the opinion that we should try
+our best to infer extensions.
 
-> 
-> Development happens
-> https://github.com/vianpl/{linux,qemu,kvm-unit-tests} and the vsm-next
-> branch, but I'd advice against looking into it until we add some order
-> to the rework. Regardless, feel free to get in touch.
+> > Implied extensions aside, I think we will eventually need this stuff
+> > anyway, for extensions that make no sense to consider if a config option
+> > for a dependency is disabled.
+> > From talking to Eric Biggers the other week about
+> > riscv_isa_extension_available() I'm of the opinion that we need to do
+> > better with that interface w.r.t. extension and config dependencies,
+> > and what seems like a good idea to me at the moment is putting tests for
+> > IS_ENABLED(RISCV_ISA_FOO) into these validate hooks.
+> >=20
+> > I'll try to look at the actual implementation here tomorrow.
+>=20
+> Did you found time to look at the implementation ?
 
-Thanks for the update.
+No, with the above excuse. I'll try to get to it today or tomorrow...
 
-Could we schedule a PUCK meeting to synchronize and help each other?
-What about June 12?
+--d4LtUScPc142c/dS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZkNcigAKCRB4tDGHoIJi
+0kA2AQDbZCPdb5B0I8LI5ibKy3ZRNF+UdA1ZiQXHtgoETMFd0gEA1hljHOnzoE/w
+C3Pfa2PGHUyVZgXKvpMsjyz8TWUNpQE=
+=uWRj
+-----END PGP SIGNATURE-----
+
+--d4LtUScPc142c/dS--
 
