@@ -1,256 +1,239 @@
-Return-Path: <kvm+bounces-17383-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17384-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 963238C5821
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 16:39:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F2C8C5836
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 16:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8C0D1C22061
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 14:39:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CD802845C1
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 14:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 068C217EB81;
-	Tue, 14 May 2024 14:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E79B17EB8D;
+	Tue, 14 May 2024 14:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="hf2ZhyaL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNn88E3q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F20B1586C6
-	for <kvm@vger.kernel.org>; Tue, 14 May 2024 14:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458E326AC6;
+	Tue, 14 May 2024 14:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715697545; cv=none; b=PGBE/vuJmgaQuz77L/zXl7UefaS5lX6UrUfb6Ua2toIy7MV+byiQAUF8ln7CYpPmK0Wu8hTtk7/K9EBsfJfradqblpBP95QNXsbGxv0EI05IPfzTTi/FXjEUH+smc78QzIPzKKJZ0z9usR7r24Vxh4U8Xl2YqZcSbGEDAB5SNp0=
+	t=1715697851; cv=none; b=XktmwwpcuLud2BWGCHppJH+ci0xBHMtouWYgLfjsWR4WW40a0R2tH+4hS2DuWR/c5yMDT0S37yxk7FrDDvP4H5khqztRYjDcaAbAqBM/GKOggPmVZ9UkQ2dU88nR1ZAa4Hnl27oPOHCRwwfbd5HimmQ3XJG8eTxYjcrx6gyi4eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715697545; c=relaxed/simple;
-	bh=WNcVowLF738bBUYU9q9s1F6x75YSSD23yiDfQaIObKk=;
+	s=arc-20240116; t=1715697851; c=relaxed/simple;
+	bh=y6f6cP8b+wbXxgeRLntoPzUrt10oVgLSe6lqdbiAE/Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n4u4Ngq/VpA8ABy3kCIbXB8Ch72qQzmHXXVCPbsGEQLJ6LMHj+RILtyVe3lvWr2ZkCffM9FyVdpKbttQs5Abrt66nTGAJI4Gy9TcOj06tbf7/6rYzXLVLxFKHTJ8aKDGsoxfdGEYmOd0UUk8wX4XqmruuuiQXwYUR7uq6zBch60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=hf2ZhyaL; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6f44e3fd382so4678636b3a.1
-        for <kvm@vger.kernel.org>; Tue, 14 May 2024 07:39:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1715697542; x=1716302342; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WNcVowLF738bBUYU9q9s1F6x75YSSD23yiDfQaIObKk=;
-        b=hf2ZhyaLwrr+qO/oaKUFMagLFXBzs6PTYrkee0DviHfHAYr7sV8MBmFCNNRd/HuLw4
-         FQ0yh3R4XCWoE9dcPSG47LS/SoNQrHLl9oI0SnzlifxmTf5ji2Fti6gdK1NgCvcCvPCL
-         eDReSiaMYhMTmRSBCaW1OjU1ep4brBnhXS+ImulkMrbJ6PKDM7uX8RyG7lNC831AezJM
-         pdDiIMbYVvNaabbnViLrGEmm1/3bwTUcXDyOXszTBnCAbvgtVPpFIYQdunIt+R8J6zRY
-         Yls7qZ4ynbs/RmHAtYopeUGNqksqsj/s5IIeYUXTCNha1sT1OcT7HmFFFmqcJqqFUQRg
-         7jOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715697542; x=1716302342;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WNcVowLF738bBUYU9q9s1F6x75YSSD23yiDfQaIObKk=;
-        b=NwkQ2aXpBnolh85VQ9ppgavVpZSfJB1lUUPA91rS0uf8ohz8ageRDfQpEcgrVSrxTv
-         pe67clqtNwGWKsRXwTjbnG5QMrPx7qSyYXGHUCquRgiwkK+4lJrFw40KkQyGlfn1J+Rv
-         MB0cCXv6t5/tTBdypLK2ReulVCwlZNXNoCWotUMeRbv0G998TlsW0mQ3auC23Oox4YED
-         wiW4T5XjbkgjS80dc6hFzFuj0fIvSr6ShD03a3RAg2UvqusUKXZ3OFHWAKGQaQWB8EBz
-         qBkEVM3YdaU0Wx/Lc7mTJeiwimBz1ncdW7eJnQnnUdghlqF09nNYHXcOM+Ja5ykRD7Wb
-         WNXw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdN/P04An1V/BRCqZFmlGz4uEMMJW/WwpbVq+xZP53XwCp4oa5eDYo2pVchb0R9H8F2PtbmkWVp73FiRvtOOsscyoq
-X-Gm-Message-State: AOJu0YxWx9d5xbF3rlBMVe0mUPw0/YfiVI1r5cbsl6puDTerhZMhURTl
-	OP3H7/NzEaNv2XoBsIwxFFaut8/ezhEfnEnP0B15J8Gi4HaBJJ9cz0aQzNJUTss=
-X-Google-Smtp-Source: AGHT+IHdkOKBG0DyoFSxyrRHAS+ghpUAA5spIffvQqpiXqFnRsKCPZ4PJ12xD5NX3np4aQAOmlluRg==
-X-Received: by 2002:a05:6a00:14d1:b0:6e7:20a7:9fc0 with SMTP id d2e1a72fcca58-6f4e03a70c4mr15441852b3a.34.1715697541813;
-        Tue, 14 May 2024 07:39:01 -0700 (PDT)
-Received: from debug.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2b26ceasm9183891b3a.187.2024.05.14.07.39.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 May 2024 07:39:01 -0700 (PDT)
-Date: Tue, 14 May 2024 07:38:59 -0700
-From: Deepak Gupta <debug@rivosinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DiNRnUICMyUSdWqZP/6t1a/iRJmCuIt2vLSDQaagUtA0Ir+4yWGQCZIXAB2dsaVNwPsfjj5ERdBnl/yIZ0mO5ejrqynYqqfojst2HCQekYkzCdNf1Nb9coaVT112yRHHWPOkDn6fF49TsjMqHSEWtXew5HgVvGtNpBefecORbF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNn88E3q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54926C2BD10;
+	Tue, 14 May 2024 14:44:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715697850;
+	bh=y6f6cP8b+wbXxgeRLntoPzUrt10oVgLSe6lqdbiAE/Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JNn88E3qwlFZ8IDo6NLYz/WL2sOshJD3Uwz336B+1EH4VNtFWEZ+38K/urjlox5v4
+	 +p20OpHYmetUOS7FZF3FMG+TTHQ74Py0oaqF+8nysAdUl6Q/S+A6DtPPu1CbPT0nD2
+	 56JsY/sPwMcRh+UeCI85oV+CUt42T8bkE/rro8rs6hAli5pQnKnI6mikqVICbwyVtE
+	 T/89KdPyIKiQM5KK3IxQEOcmODsQ6xNUdO5WbgVHnDkYF/G5O9Otq4LkDmXfqLHxwu
+	 8uLS1hakZ34fk7+HjgCTmylScgB4wF6RJM2WTkGHUyuZJLNwKszxO5OW1N0yZa0b9x
+	 qfcktlIO2YeRA==
+Date: Tue, 14 May 2024 15:44:05 +0100
+From: Conor Dooley <conor@kernel.org>
 To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	Jonathan Corbet <corbet@lwn.net>,
 	Paul Walmsley <paul.walmsley@sifive.com>,
 	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, Ved Shanbhogue <ved@rivosinc.com>
-Subject: Re: [RFC PATCH 5/7] riscv: add double trap driver
-Message-ID: <ZkN3gyfL1hUcjPgD@debug.ba.rivosinc.com>
-References: <20240418142701.1493091-1-cleger@rivosinc.com>
- <20240418142701.1493091-6-cleger@rivosinc.com>
- <Ziw//90J0WfOY/tl@debug.ba.rivosinc.com>
- <e33b8eba-85f0-44b7-8a6f-802a6979f6c8@rivosinc.com>
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH v4 02/11] riscv: add ISA extensions validation
+Message-ID: <20240514-ascend-joyous-a15969f703de@spud>
+References: <20240429150553.625165-1-cleger@rivosinc.com>
+ <20240429150553.625165-3-cleger@rivosinc.com>
+ <20240429-subtext-tabby-3a1532f058a5@spud>
+ <5d5febd5-d113-4e8c-9535-9e75acf23398@rivosinc.com>
+ <20240430-payable-famished-6711765d5ca4@wendy>
+ <e57f8b70-7981-42c1-bb04-2060054dd796@rivosinc.com>
+ <20240514-sip-exclusion-014b07b01f4c@spud>
+ <9d0840ff-d00a-4866-8f45-e8676f369ad6@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="77IYhpXVRVT+g+0m"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e33b8eba-85f0-44b7-8a6f-802a6979f6c8@rivosinc.com>
+In-Reply-To: <9d0840ff-d00a-4866-8f45-e8676f369ad6@rivosinc.com>
 
-On Tue, May 14, 2024 at 10:06:31AM +0200, Clément Léger wrote:
->
->
->On 27/04/2024 01:59, Deepak Gupta wrote:
->> On Thu, Apr 18, 2024 at 04:26:44PM +0200, Clément Léger wrote:
->>> Add a small driver to request double trap enabling as well as
->>> registering a SSE handler for double trap. This will also be used by KVM
->>> SBI FWFT extension support to detect if it is possible to enable double
->>> trap in VS-mode.
->>>
->>> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->>> ---
->>> arch/riscv/include/asm/sbi.h    |  1 +
->>> drivers/firmware/Kconfig        |  7 +++
->>> drivers/firmware/Makefile       |  1 +
->>> drivers/firmware/riscv_dbltrp.c | 95 +++++++++++++++++++++++++++++++++
->>> include/linux/riscv_dbltrp.h    | 19 +++++++
->>> 5 files changed, 123 insertions(+)
->>> create mode 100644 drivers/firmware/riscv_dbltrp.c
->>> create mode 100644 include/linux/riscv_dbltrp.h
->>>
->>> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
->>> index 744aa1796c92..9cd4ca66487c 100644
->>> --- a/arch/riscv/include/asm/sbi.h
->>> +++ b/arch/riscv/include/asm/sbi.h
->>> @@ -314,6 +314,7 @@ enum sbi_sse_attr_id {
->>> #define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SPIE    (1 << 2)
->>>
->>> #define SBI_SSE_EVENT_LOCAL_RAS        0x00000000
->>> +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP    0x00000001
->>> #define SBI_SSE_EVENT_GLOBAL_RAS    0x00008000
->>> #define SBI_SSE_EVENT_LOCAL_PMU        0x00010000
->>> #define SBI_SSE_EVENT_LOCAL_SOFTWARE    0xffff0000
->>> diff --git a/drivers/firmware/Kconfig b/drivers/firmware/Kconfig
->>> index 59f611288807..a037f6e89942 100644
->>> --- a/drivers/firmware/Kconfig
->>> +++ b/drivers/firmware/Kconfig
->>> @@ -197,6 +197,13 @@ config RISCV_SSE_TEST
->>>       Select if you want to enable SSE extension testing at boot time.
->>>       This will run a series of test which verifies SSE sanity.
->>>
->>> +config RISCV_DBLTRP
->>> +    bool "Enable Double trap handling"
->>> +    depends on RISCV_SSE && RISCV_SBI
->>> +    default n
->>> +    help
->>> +      Select if you want to enable SSE double trap handler.
->>> +
->>> config SYSFB
->>>     bool
->>>     select BOOT_VESA_SUPPORT
->>> diff --git a/drivers/firmware/Makefile b/drivers/firmware/Makefile
->>> index fb7b0c08c56d..ad67a1738c0f 100644
->>> --- a/drivers/firmware/Makefile
->>> +++ b/drivers/firmware/Makefile
->>> @@ -18,6 +18,7 @@ obj-$(CONFIG_RASPBERRYPI_FIRMWARE) += raspberrypi.o
->>> obj-$(CONFIG_FW_CFG_SYSFS)    += qemu_fw_cfg.o
->>> obj-$(CONFIG_RISCV_SSE)        += riscv_sse.o
->>> obj-$(CONFIG_RISCV_SSE_TEST)    += riscv_sse_test.o
->>> +obj-$(CONFIG_RISCV_DBLTRP)    += riscv_dbltrp.o
->>> obj-$(CONFIG_SYSFB)        += sysfb.o
->>> obj-$(CONFIG_SYSFB_SIMPLEFB)    += sysfb_simplefb.o
->>> obj-$(CONFIG_TI_SCI_PROTOCOL)    += ti_sci.o
->>> diff --git a/drivers/firmware/riscv_dbltrp.c
->>> b/drivers/firmware/riscv_dbltrp.c
->>> new file mode 100644
->>> index 000000000000..72f9a067e87a
->>> --- /dev/null
->>> +++ b/drivers/firmware/riscv_dbltrp.c
->>> @@ -0,0 +1,95 @@
->>> +// SPDX-License-Identifier: GPL-2.0-only
->>> +/*
->>> + * Copyright (C) 2023 Rivos Inc.
->>> + */
->>
->> nit: fix copyright year
->>> +
->>> +#define pr_fmt(fmt) "riscv-dbltrp: " fmt
->>> +
->>> +#include <linux/cpu.h>
->>> +#include <linux/init.h>
->>> +#include <linux/riscv_dbltrp.h>
->>> +#include <linux/riscv_sse.h>
->>> +
->>> +#include <asm/sbi.h>
->>> +
->>> +static bool double_trap_enabled;
->>> +
->>> +static int riscv_sse_dbltrp_handle(uint32_t evt, void *arg,
->>> +                   struct pt_regs *regs)
->>> +{
->>> +    __show_regs(regs);
->>> +    panic("Double trap !\n");
->>> +
->>> +    return 0;
->> Curious:
->> Does panic return?
->> What's the point of returning from here?
->
->Hi Deepak,
->
->No, panic() does not return and indeed, the "return 0" is useless. It's
->a leftover of a previous implementation without panic in order to keep
->GCC mouth shut ;).
->
->>
->>> +}
->>> +
->>> +struct cpu_dbltrp_data {
->>> +    int error;
->>> +};
->>> +
->>> +static void
->>> +sbi_cpu_enable_double_trap(void *data)
->>> +{
->>> +    struct sbiret ret;
->>> +    struct cpu_dbltrp_data *cdd = data;
->>> +
->>> +    ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_SET,
->>> +            SBI_FWFT_DOUBLE_TRAP_ENABLE, 1, 0, 0, 0, 0);
->>> +
->>> +    if (ret.error) {
->>> +        cdd->error = 1;
->>> +        pr_err("Failed to enable double trap on cpu %d\n",
->>> smp_processor_id());
->>> +    }
->>> +}
->>> +
->>> +static int sbi_enable_double_trap(void)
->>> +{
->>> +    struct cpu_dbltrp_data cdd = {0};
->>> +
->>> +    on_each_cpu(sbi_cpu_enable_double_trap, &cdd, 1);
->>> +    if (cdd.error)
->>> +        return -1;
->>
->> There is a bug here. If `sbi_cpu_enable_double_trap` failed on all cpus
->> but last cpu.
->> Then cdd.error would not record error and will be reflect as if double
->> trap was enabled.
->
->cdd.error is only written in case of error by the per-cpu callbacks, so
->it is only set if enabled failed. Is there something I'm missing ?
 
-No. Sorry I missed that detail. lgtm.
+--77IYhpXVRVT+g+0m
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->
->Thanks,
->
->Clément
->
->>
->> Its less likely to happen that FW would return success for one cpu and
->> fail for others.
->> But there is non-zero probablity here.
->>
->
+On Tue, May 14, 2024 at 02:48:01PM +0200, Cl=E9ment L=E9ger wrote:
+>=20
+>=20
+> On 14/05/2024 14:43, Conor Dooley wrote:
+> > On Tue, May 14, 2024 at 09:53:08AM +0200, Cl=E9ment L=E9ger wrote:
+> >>
+> >>
+> >> On 30/04/2024 13:44, Conor Dooley wrote:
+> >>> On Tue, Apr 30, 2024 at 09:18:47AM +0200, Cl=E9ment L=E9ger wrote:
+> >>>>
+> >>>>
+> >>>> On 30/04/2024 00:15, Conor Dooley wrote:
+> >>>>> On Mon, Apr 29, 2024 at 05:04:55PM +0200, Cl=E9ment L=E9ger wrote:
+> >>>>>> Since a few extensions (Zicbom/Zicboz) already needs validation and
+> >>>>>> future ones will need it as well (Zc*) add a validate() callback to
+> >>>>>> struct riscv_isa_ext_data. This require to rework the way extensio=
+ns are
+> >>>>>> parsed and split it in two phases. First phase is isa string or isa
+> >>>>>> extension list parsing and consists in enabling all the extensions=
+ in a
+> >>>>>> temporary bitmask without any validation. The second step "resolve=
+s" the
+> >>>>>> final isa bitmap, handling potential missing dependencies. The mec=
+hanism
+> >>>>>> is quite simple and simply validate each extension described in the
+> >>>>>> temporary bitmap before enabling it in the final isa bitmap. valid=
+ate()
+> >>>>>> callbacks can return either 0 for success, -EPROBEDEFER if extensi=
+on
+> >>>>>> needs to be validated again at next loop. A previous ISA bitmap is=
+ kept
+> >>>>>> to avoid looping mutliple times if an extension dependencies are n=
+ever
+> >>>>>> satisfied until we reach a stable state. In order to avoid any pot=
+ential
+> >>>>>> infinite looping, allow looping a maximum of the number of extensi=
+on we
+> >>>>>> handle. Zicboz and Zicbom extensions are modified to use this vali=
+dation
+> >>>>>> mechanism.
+> >>>>>
+> >>>>> Your reply to my last review only talked about part of my comments,
+> >>>>> which is usually what you do when you're gonna implement the rest, =
+but
+> >>>>> you haven't.
+> >>>>> I like the change you've made to shorten looping, but I'd at least =
+like
+> >>>>> a response to why a split is not worth doing :)
+> >>>>
+> >>>> Hi Conor,
+> >>>>
+> >>>> Missed that point since I was feeling that my solution actually
+> >>>> addresses your concerns. Your argument was that there is no reason to
+> >>>> loop for Zicbom/Zicboz but that would also apply to Zcf in case we a=
+re
+> >>>> on RV64 as well (since zcf is not supported on RV64). So for Zcf, th=
+at
+> >>>> would lead to using both mecanism or additional ifdefery with little=
+ to
+> >>>> no added value since the current solution actually solves both cases:
+> >>>>
+> >>>> - We don't have any extra looping if all validation callback returns=
+ 0
+> >>>> (except the initial one on riscv_isa_ext, which is kind of unavoidab=
+le).
+> >>>> - Zicbom, Zicboz callbacks will be called only once (which was one of
+> >>>> your concern).
+> >>>>
+> >>>> Adding a second kind of callback for after loop validation would only
+> >>>> lead to a bunch of additional macros/ifdefery for extensions with
+> >>>> validate() callback, with validate_end() or with both (ie Zcf)). For
+> >>>> these reasons, I do not think there is a need for a separate mechani=
+sm
+> >>>> nor additional callback for such extensions except adding extra code
+> >>>> with no real added functionality.
+> >>>>
+> >>>> AFAIK, the platform driver probing mechanism works the same, the pro=
+be()
+> >>>> callback is actually called even if for some reason properties are
+> >>>> missing from nodes for platform devices and thus the probe() returns
+> >>>> -EINVAL or whatever.
+> >>>>
+> >>>> Hope this answers your question,
+> >>>
+> >>> Yeah, pretty much I am happy with just an "it's not worth doing it"
+> >>> response. Given it wasn't your first choice, I doubt you're overly ha=
+ppy
+> >>> with it either, but I really would like to avoid looping to closure to
+> >>> sort out dependencies - particularly on the boot CPU before we bring
+> >>> anyone else up, but if the code is now more proactive about breaking
+> >>> out, I suppose that'll have to do :)
+> >>> I kinda wish we didn't do this at all, but I think we've brought this
+> >>> upon ourselves via hwprobe. I'm still on the fence as to whether thin=
+gs
+> >>> that are implied need to be handled in this way. I think I'll bring t=
+his
+> >>> up tomorrow at the weekly call, because so far it's only been you and=
+ I
+> >>> discussing this really and it's a policy decision that hwprobe-ists
+> >>> should be involved in I think.
+> >>
+> >> Hi Conor,
+> >>
+> >> Were you able to discuss that topic ?
+> >=20
+> > I realised last night that I'd not got back to this thread and meant to
+> > do that today (I had accidentally deleted it from my mailbox), but I had
+> > a migraine this morning and so didn't.
+> > I did bring it up and IIRC Palmer was of the opinion that we should try
+> > our best to infer extensions.
+> >=20
+> >>> Implied extensions aside, I think we will eventually need this stuff
+> >>> anyway, for extensions that make no sense to consider if a config opt=
+ion
+> >>> for a dependency is disabled.
+> >>> From talking to Eric Biggers the other week about
+> >>> riscv_isa_extension_available() I'm of the opinion that we need to do
+> >>> better with that interface w.r.t. extension and config dependencies,
+> >>> and what seems like a good idea to me at the moment is putting tests =
+for
+> >>> IS_ENABLED(RISCV_ISA_FOO) into these validate hooks.
+> >>>
+> >>> I'll try to look at the actual implementation here tomorrow.
+> >>
+> >> Did you found time to look at the implementation ?
+> >=20
+> > No, with the above excuse. I'll try to get to it today or tomorrow...
+>=20
+> No worries, I was on vacation and was just checking if I hadn't missed
+> anything in the meantime. Take your time ;)
+
+I forget where we talked about validation for F/V, but I chucked this
+together last week in response to another thread of Andy's that was
+adding some of the vector subset stuff, because I realised we don't turn
+off any of the stuff that depends on vector if vector gets disabled:
+https://git.kernel.org/pub/scm/linux/kernel/git/conor/linux.git/commit/?h=
+=3Driscv-check_vector&id=3D38050c6858143f43ce2fd04e9824727a7d7731d0
+
+What I've got there doesn't actually work for the vector subsets though,
+only for vector itself, because of the probe ordering. Your validate
+callback stuff should solve that issue though.
+
+--77IYhpXVRVT+g+0m
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZkN4tQAKCRB4tDGHoIJi
+0qISAP90Cmxbqg0YPzaeFWc+C9/VvgVu9xKpX7ljk8pbm7X1owD6AnM5MtNIBLJQ
+RIKtT/ATp2dDqn5rjyDfcJhTFVb4Qwk=
+=e78x
+-----END PGP SIGNATURE-----
+
+--77IYhpXVRVT+g+0m--
 
