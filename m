@@ -1,239 +1,159 @@
-Return-Path: <kvm+bounces-17384-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17385-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65F2C8C5836
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 16:44:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 598B48C5849
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 16:52:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CD802845C1
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 14:44:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 602CD1C21AC1
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 14:52:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E79B17EB8D;
-	Tue, 14 May 2024 14:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575C517BB39;
+	Tue, 14 May 2024 14:52:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNn88E3q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PeegqLhS"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 458E326AC6;
-	Tue, 14 May 2024 14:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BBE1E487;
+	Tue, 14 May 2024 14:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715697851; cv=none; b=XktmwwpcuLud2BWGCHppJH+ci0xBHMtouWYgLfjsWR4WW40a0R2tH+4hS2DuWR/c5yMDT0S37yxk7FrDDvP4H5khqztRYjDcaAbAqBM/GKOggPmVZ9UkQ2dU88nR1ZAa4Hnl27oPOHCRwwfbd5HimmQ3XJG8eTxYjcrx6gyi4eM=
+	t=1715698329; cv=none; b=BaAxPbuhOWd7Rb6kdDHqnkpL2MgbmTBIDkgGEK47V/Nk0TEr+OauMLp/8TEozhmAYZLdqCoDMQR0UQezMisPpi+3xhLx/tIJGZ3SkKsLJqiH5lLcVim/3YKOF2ivnND58g8M+tMb5wzZAssOtrXe6e5fOPE8TfWoDpg3xWNrH1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715697851; c=relaxed/simple;
-	bh=y6f6cP8b+wbXxgeRLntoPzUrt10oVgLSe6lqdbiAE/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DiNRnUICMyUSdWqZP/6t1a/iRJmCuIt2vLSDQaagUtA0Ir+4yWGQCZIXAB2dsaVNwPsfjj5ERdBnl/yIZ0mO5ejrqynYqqfojst2HCQekYkzCdNf1Nb9coaVT112yRHHWPOkDn6fF49TsjMqHSEWtXew5HgVvGtNpBefecORbF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNn88E3q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54926C2BD10;
-	Tue, 14 May 2024 14:44:07 +0000 (UTC)
+	s=arc-20240116; t=1715698329; c=relaxed/simple;
+	bh=RPq4l8wKvYlXeHYmhj8r/m8AdUmE1Arj5xOYZhuRmZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HlRGO4Sahx9IvcHkYpro6LuNyt/bTk/UokW1dMI8dHtJHp7ecZVal1+gjoo9OvegoV4IyX1x+Y4WG4NRJVFm1f+5jSAl+IrV4KBVYmYQsR8twUIsFP45dQgO2GRRyEuLJ9KEiKSSyL2jfue0GbzTHdzfNrN/5RHgn8RibsZLjzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PeegqLhS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA9AC2BD10;
+	Tue, 14 May 2024 14:52:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715697850;
-	bh=y6f6cP8b+wbXxgeRLntoPzUrt10oVgLSe6lqdbiAE/Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JNn88E3qwlFZ8IDo6NLYz/WL2sOshJD3Uwz336B+1EH4VNtFWEZ+38K/urjlox5v4
-	 +p20OpHYmetUOS7FZF3FMG+TTHQ74Py0oaqF+8nysAdUl6Q/S+A6DtPPu1CbPT0nD2
-	 56JsY/sPwMcRh+UeCI85oV+CUt42T8bkE/rro8rs6hAli5pQnKnI6mikqVICbwyVtE
-	 T/89KdPyIKiQM5KK3IxQEOcmODsQ6xNUdO5WbgVHnDkYF/G5O9Otq4LkDmXfqLHxwu
-	 8uLS1hakZ34fk7+HjgCTmylScgB4wF6RJM2WTkGHUyuZJLNwKszxO5OW1N0yZa0b9x
-	 qfcktlIO2YeRA==
-Date: Tue, 14 May 2024 15:44:05 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Cc: Conor Dooley <conor.dooley@microchip.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
-	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH v4 02/11] riscv: add ISA extensions validation
-Message-ID: <20240514-ascend-joyous-a15969f703de@spud>
-References: <20240429150553.625165-1-cleger@rivosinc.com>
- <20240429150553.625165-3-cleger@rivosinc.com>
- <20240429-subtext-tabby-3a1532f058a5@spud>
- <5d5febd5-d113-4e8c-9535-9e75acf23398@rivosinc.com>
- <20240430-payable-famished-6711765d5ca4@wendy>
- <e57f8b70-7981-42c1-bb04-2060054dd796@rivosinc.com>
- <20240514-sip-exclusion-014b07b01f4c@spud>
- <9d0840ff-d00a-4866-8f45-e8676f369ad6@rivosinc.com>
+	s=k20201202; t=1715698329;
+	bh=RPq4l8wKvYlXeHYmhj8r/m8AdUmE1Arj5xOYZhuRmZo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PeegqLhS+mR8mJOvPuXV17GSbM2bp7ftvhHyC4VFvzDHb3sgu3dhYWnoI9Zs0ptKN
+	 SJZkkgXTop2c12xBGNhf//0qccl39bUjepc5n689/2PCVoj842JNHqoAyab/KirNux
+	 PD3oUFha14LmX6qNU6Ytjt8xuQeQj2sBuLakdcsZFaYwOT12aSrTT6TzhopGQtyreF
+	 npypy8U/73om8Ffgp9gybYwsHxC0KZmQx/xh2tZwz2aOjSK92iFUeEgHBpyeOX4U3V
+	 0VTT3VbxvXEWJ32kt3q5P4yJAWFERCkV1RmvpHcgM0lBXIxHqSN2p37br4VEwtGLTH
+	 cktr0Kje1qvfA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1s6tVe-00D8pH-PW;
+	Tue, 14 May 2024 15:52:06 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: Joey Gouly <joey.gouly@arm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH] KVM: arm64: nv: Fix relative priorities of exceptions generated by ERETAx
+Date: Tue, 14 May 2024 15:51:54 +0100
+Message-Id: <20240514145154.377835-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="77IYhpXVRVT+g+0m"
-Content-Disposition: inline
-In-Reply-To: <9d0840ff-d00a-4866-8f45-e8676f369ad6@rivosinc.com>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, joey.gouly@arm.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+ERETAx can fail in multiple ways:
 
---77IYhpXVRVT+g+0m
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+(1) ELR_EL2 points lalaland
+(2) we get a PAC failure
+(3) SPSR_EL2 has the wrong mode
 
-On Tue, May 14, 2024 at 02:48:01PM +0200, Cl=E9ment L=E9ger wrote:
->=20
->=20
-> On 14/05/2024 14:43, Conor Dooley wrote:
-> > On Tue, May 14, 2024 at 09:53:08AM +0200, Cl=E9ment L=E9ger wrote:
-> >>
-> >>
-> >> On 30/04/2024 13:44, Conor Dooley wrote:
-> >>> On Tue, Apr 30, 2024 at 09:18:47AM +0200, Cl=E9ment L=E9ger wrote:
-> >>>>
-> >>>>
-> >>>> On 30/04/2024 00:15, Conor Dooley wrote:
-> >>>>> On Mon, Apr 29, 2024 at 05:04:55PM +0200, Cl=E9ment L=E9ger wrote:
-> >>>>>> Since a few extensions (Zicbom/Zicboz) already needs validation and
-> >>>>>> future ones will need it as well (Zc*) add a validate() callback to
-> >>>>>> struct riscv_isa_ext_data. This require to rework the way extensio=
-ns are
-> >>>>>> parsed and split it in two phases. First phase is isa string or isa
-> >>>>>> extension list parsing and consists in enabling all the extensions=
- in a
-> >>>>>> temporary bitmask without any validation. The second step "resolve=
-s" the
-> >>>>>> final isa bitmap, handling potential missing dependencies. The mec=
-hanism
-> >>>>>> is quite simple and simply validate each extension described in the
-> >>>>>> temporary bitmap before enabling it in the final isa bitmap. valid=
-ate()
-> >>>>>> callbacks can return either 0 for success, -EPROBEDEFER if extensi=
-on
-> >>>>>> needs to be validated again at next loop. A previous ISA bitmap is=
- kept
-> >>>>>> to avoid looping mutliple times if an extension dependencies are n=
-ever
-> >>>>>> satisfied until we reach a stable state. In order to avoid any pot=
-ential
-> >>>>>> infinite looping, allow looping a maximum of the number of extensi=
-on we
-> >>>>>> handle. Zicboz and Zicbom extensions are modified to use this vali=
-dation
-> >>>>>> mechanism.
-> >>>>>
-> >>>>> Your reply to my last review only talked about part of my comments,
-> >>>>> which is usually what you do when you're gonna implement the rest, =
-but
-> >>>>> you haven't.
-> >>>>> I like the change you've made to shorten looping, but I'd at least =
-like
-> >>>>> a response to why a split is not worth doing :)
-> >>>>
-> >>>> Hi Conor,
-> >>>>
-> >>>> Missed that point since I was feeling that my solution actually
-> >>>> addresses your concerns. Your argument was that there is no reason to
-> >>>> loop for Zicbom/Zicboz but that would also apply to Zcf in case we a=
-re
-> >>>> on RV64 as well (since zcf is not supported on RV64). So for Zcf, th=
-at
-> >>>> would lead to using both mecanism or additional ifdefery with little=
- to
-> >>>> no added value since the current solution actually solves both cases:
-> >>>>
-> >>>> - We don't have any extra looping if all validation callback returns=
- 0
-> >>>> (except the initial one on riscv_isa_ext, which is kind of unavoidab=
-le).
-> >>>> - Zicbom, Zicboz callbacks will be called only once (which was one of
-> >>>> your concern).
-> >>>>
-> >>>> Adding a second kind of callback for after loop validation would only
-> >>>> lead to a bunch of additional macros/ifdefery for extensions with
-> >>>> validate() callback, with validate_end() or with both (ie Zcf)). For
-> >>>> these reasons, I do not think there is a need for a separate mechani=
-sm
-> >>>> nor additional callback for such extensions except adding extra code
-> >>>> with no real added functionality.
-> >>>>
-> >>>> AFAIK, the platform driver probing mechanism works the same, the pro=
-be()
-> >>>> callback is actually called even if for some reason properties are
-> >>>> missing from nodes for platform devices and thus the probe() returns
-> >>>> -EINVAL or whatever.
-> >>>>
-> >>>> Hope this answers your question,
-> >>>
-> >>> Yeah, pretty much I am happy with just an "it's not worth doing it"
-> >>> response. Given it wasn't your first choice, I doubt you're overly ha=
-ppy
-> >>> with it either, but I really would like to avoid looping to closure to
-> >>> sort out dependencies - particularly on the boot CPU before we bring
-> >>> anyone else up, but if the code is now more proactive about breaking
-> >>> out, I suppose that'll have to do :)
-> >>> I kinda wish we didn't do this at all, but I think we've brought this
-> >>> upon ourselves via hwprobe. I'm still on the fence as to whether thin=
-gs
-> >>> that are implied need to be handled in this way. I think I'll bring t=
-his
-> >>> up tomorrow at the weekly call, because so far it's only been you and=
- I
-> >>> discussing this really and it's a policy decision that hwprobe-ists
-> >>> should be involved in I think.
-> >>
-> >> Hi Conor,
-> >>
-> >> Were you able to discuss that topic ?
-> >=20
-> > I realised last night that I'd not got back to this thread and meant to
-> > do that today (I had accidentally deleted it from my mailbox), but I had
-> > a migraine this morning and so didn't.
-> > I did bring it up and IIRC Palmer was of the opinion that we should try
-> > our best to infer extensions.
-> >=20
-> >>> Implied extensions aside, I think we will eventually need this stuff
-> >>> anyway, for extensions that make no sense to consider if a config opt=
-ion
-> >>> for a dependency is disabled.
-> >>> From talking to Eric Biggers the other week about
-> >>> riscv_isa_extension_available() I'm of the opinion that we need to do
-> >>> better with that interface w.r.t. extension and config dependencies,
-> >>> and what seems like a good idea to me at the moment is putting tests =
-for
-> >>> IS_ENABLED(RISCV_ISA_FOO) into these validate hooks.
-> >>>
-> >>> I'll try to look at the actual implementation here tomorrow.
-> >>
-> >> Did you found time to look at the implementation ?
-> >=20
-> > No, with the above excuse. I'll try to get to it today or tomorrow...
->=20
-> No worries, I was on vacation and was just checking if I hadn't missed
-> anything in the meantime. Take your time ;)
+(1) is easy, as we just let the CPU do its thing and deliver an
+Instruction Abort. However, (2) and (3) are interesting, because
+the PAC failure priority is way below that of the Illegal Execution
+State exception.
 
-I forget where we talked about validation for F/V, but I chucked this
-together last week in response to another thread of Andy's that was
-adding some of the vector subset stuff, because I realised we don't turn
-off any of the stuff that depends on vector if vector gets disabled:
-https://git.kernel.org/pub/scm/linux/kernel/git/conor/linux.git/commit/?h=
-=3Driscv-check_vector&id=3D38050c6858143f43ce2fd04e9824727a7d7731d0
+Which means that if we have detected a PAC failure (and that we have
+FPACCOMBINE), we must be careful to give priority to the Illegal
+Execution State exception, should one be pending.
 
-What I've got there doesn't actually work for the vector subsets though,
-only for vector itself, because of the probe ordering. Your validate
-callback stuff should solve that issue though.
+Solving this involves hoisting the SPSR calculation earlier and
+testing for the IL bit before injecting the FPAC exception.
 
---77IYhpXVRVT+g+0m
-Content-Type: application/pgp-signature; name="signature.asc"
+In the extreme case of a ERETAx returning to an invalid mode *and*
+failing its PAC check, we end up with an Instruction Abort (due
+to the new PC being mangled by the failed Auth) *and* PSTATE.IL
+being set. Which matches the requirements of the architecture.
 
------BEGIN PGP SIGNATURE-----
+Whilst we're at it, remove a stale comment that states the obvious
+and only confuses the reader.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZkN4tQAKCRB4tDGHoIJi
-0qISAP90Cmxbqg0YPzaeFWc+C9/VvgVu9xKpX7ljk8pbm7X1owD6AnM5MtNIBLJQ
-RIKtT/ATp2dDqn5rjyDfcJhTFVb4Qwk=
-=e78x
------END PGP SIGNATURE-----
+Fixes: 213b3d1ea161 ("KVM: arm64: nv: Handle ERETA[AB] instructions")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/emulate-nested.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
---77IYhpXVRVT+g+0m--
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 72d733c74a38..54090967a335 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2181,16 +2181,23 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	if (forward_traps(vcpu, HCR_NV))
+ 		return;
+ 
++	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
++	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
++
+ 	/* Check for an ERETAx */
+ 	esr = kvm_vcpu_get_esr(vcpu);
+ 	if (esr_iss_is_eretax(esr) && !kvm_auth_eretax(vcpu, &elr)) {
+ 		/*
+-		 * Oh no, ERETAx failed to authenticate.  If we have
+-		 * FPACCOMBINE, deliver an exception right away.  If we
+-		 * don't, then let the mangled ELR value trickle down the
++		 * Oh no, ERETAx failed to authenticate.
++		 *
++		 * If we have FPACCOMBINE and we don't have a pending
++		 * Illegal Execution State exception (which has priority
++		 * over FPAC), deliver an exception right away.
++		 *
++		 * Otherwise, let the mangled ELR value trickle down the
+ 		 * ERET handling, and the guest will have a little surprise.
+ 		 */
+-		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE)) {
++		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR_IL_BIT)) {
+ 			esr &= ESR_ELx_ERET_ISS_ERETA;
+ 			esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_FPAC);
+ 			kvm_inject_nested_sync(vcpu, esr);
+@@ -2201,17 +2208,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	preempt_disable();
+ 	kvm_arch_vcpu_put(vcpu);
+ 
+-	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
+-	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+ 	if (!esr_iss_is_eretax(esr))
+ 		elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+ 
+ 	trace_kvm_nested_eret(vcpu, elr, spsr);
+ 
+-	/*
+-	 * Note that the current exception level is always the virtual EL2,
+-	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
+-	 */
+ 	*vcpu_pc(vcpu) = elr;
+ 	*vcpu_cpsr(vcpu) = spsr;
+ 
+-- 
+2.39.2
+
 
