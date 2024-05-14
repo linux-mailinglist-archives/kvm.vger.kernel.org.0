@@ -1,133 +1,137 @@
-Return-Path: <kvm+bounces-17366-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17367-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD5458C4C14
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 07:51:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04EF58C4D1E
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 09:35:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D91B1C23143
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 05:51:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D931B227C1
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 07:35:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B521CA92;
-	Tue, 14 May 2024 05:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77AD81400A;
+	Tue, 14 May 2024 07:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="af8FGiD7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SU+YqhG4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077EB1BC39
-	for <kvm@vger.kernel.org>; Tue, 14 May 2024 05:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5183D1171D;
+	Tue, 14 May 2024 07:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715665860; cv=none; b=KMvFImk1gNLt5ehK26RYXb0tZ8FVHZyJNA39TU1F5h8zcqhbDJ7odqSBHuFqZBZnB7Vn5LNJ8tcApf1H82wXnw1hl8R2H+ouTE/vmX5JLMcsN/JQFM47dVijN66fi+4neA7fF44SuN21H/ejMeOOGsqpXYJG74sf2uWxURgj0HQ=
+	t=1715672096; cv=none; b=t6hHmrMHSj6TKZWXb8PpBA9FkGfaFv8AK8v2M8KxxTZuArRBmHBBN3zHqz68yKT+i/F3NdAD4iGAUdKp1IAkBoKVWSBRIpgNn2lXCN7q8mvTeM3kXYFFB536ZCR8fts1tKSgBlfLbI6AUUdqic2PjisVS1T1+EBWOKK36W1/KwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715665860; c=relaxed/simple;
-	bh=GUkJ4IWY9EpSK0OwqT/Dr2GF00OHHaC1BFftaKgdOGg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cwri9nQ2QApZn5GC5GXQvQ6u4xJWgAnxdSJw863tsf7I+EaHCvGhE1RLqJo8VdV7HVwXFaukZM3nSHU4+t4Clh+gMgeGvPselaPTkyCI61lfgBcvVF0BsFXWj2+CSarNiI1HhXypZYbE4KCEpYWc2rf2wIAAInnW/Yd111Kl2r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=af8FGiD7; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6f4472561f1so4749924b3a.0
-        for <kvm@vger.kernel.org>; Mon, 13 May 2024 22:50:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1715665858; x=1716270658; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DfIrpkWACzR2puMJkGg1Xnd11pljfe3Xljjryqmgcn8=;
-        b=af8FGiD73h8K/POMcelzuDGdd9kEqs/y1BDG1ILmMzPaF7i+LMloVsgeD+8sstT8Xj
-         AeVk8wcyVH7HeoFkKRKjJQg1Duc0QWOfZoXNejGEIQM/UDoC30xFNlahxDxkWopSaNEp
-         ulE5fLYYab72GL/azPRqNLG+U19TxXteiJreQ8Hzros7oizFPkkGOCbn69VO0p+eaXuv
-         esLtyb4lc7eaJdVGMFfy372IMJ5VYh7KzI/CP/Pek/Sbr2ImxDtmR0AMw6mbw7tfChn2
-         98WV7hulz1yI/2a7eKGFSKgbjtkJkoRtXSjSKo14LO2XIANN4gE7DJHdOpP0GHvGztS7
-         9P8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715665858; x=1716270658;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DfIrpkWACzR2puMJkGg1Xnd11pljfe3Xljjryqmgcn8=;
-        b=XwL1OeMVMRYaLvgT8+BoxiGolTjpP1uHd4jTgV9p50fMlJP7UwGN1/ZrhH/o8RRBjx
-         jXR/YAZq/zYOQjylZs52oUMJHGNSXSTtSo2IdMAA5kweZRjJKozQebdtDJo+meD/xyS0
-         g5Wf9a/vB0mu5DPQanOa3X7elAwwOs0kiNWhTVDfFZb7uM831ndAVHRA9dj/T3u9nR9f
-         sdFM87XKGGmBHgdcv39c33T2iH983QIQkPtyHKHkgUYPVXK1I1GhGedH8y+9zdPi3b3/
-         yWXdJQsv0D9hGkV3weDctV0yD9Js/k4JaLwMU96xGmGl27rcA4HDrt/lmayPc5X/dhwj
-         pfmA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWrD+c2/Ja/m38O3or9Hxg6q3c3VLBGyzVP8dTkQfgY1GN+UPsJ5N5LjJ2GOiKazerzsGmHbjDVAEILMuCKD74Xn6a
-X-Gm-Message-State: AOJu0YzGWevzY0ZT0jt1nWnu8qZyZuOIVp+SLPCq2fqAFMo10zl3FYEI
-	oFH0ffvPNQfUQm/jOlWKSFY18bHqmyjgnJ4NF3LRMaJrmpJ5CKMxu41au+pQnTo=
-X-Google-Smtp-Source: AGHT+IGDeCXQiyyb4hYkNlCwykJ2G3BGUQhS6Mw+XYtTCvB0oupEx4U7YFpcR0M48NXf1Dq8OAKkxA==
-X-Received: by 2002:a05:6a20:430e:b0:1aa:7097:49e2 with SMTP id adf61e73a8af0-1afde196759mr19414564637.50.1715665858115;
-        Mon, 13 May 2024 22:50:58 -0700 (PDT)
-Received: from localhost.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-6f4d2b2de1csm8689246b3a.204.2024.05.13.22.50.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 May 2024 22:50:57 -0700 (PDT)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Will Deacon <will@kernel.org>,
-	julien.thierry.kdev@gmail.com,
-	maz@kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [kvmtool PATCH 3/3] riscv: Add Zacas extensiona support
-Date: Tue, 14 May 2024 11:19:28 +0530
-Message-Id: <20240514054928.854419-4-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240514054928.854419-1-apatel@ventanamicro.com>
-References: <20240514054928.854419-1-apatel@ventanamicro.com>
+	s=arc-20240116; t=1715672096; c=relaxed/simple;
+	bh=TULusMh7T/SdxAZq8HnaEdWoBbssb9f1gBrF4iydUIY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AHP2HMg9gXqGi9RtM89xCoGr3kehqNz4+NBaAkAUpHMKaGtypq7D9dMLCbbWdsaRB62m+I5xuNoep9mrNblvnxlhk0mirhxwfro7q24O2NTm00DCJ2t5aXhY9WxdTEoHNi3+vLKOAUIa7gGPZ7D28niyH2btpXU5yVbj0jAJTks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SU+YqhG4; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715672096; x=1747208096;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=TULusMh7T/SdxAZq8HnaEdWoBbssb9f1gBrF4iydUIY=;
+  b=SU+YqhG4fJq4ZUbwrWBeXjYYJ4bsC5W1UINIE8j7eYnCRz8rtitofDsB
+   aHNneQLu9aG7UFufPs06MSZWYyxYd/b3J6+LqO9So6p6TORz6GuXmXAuL
+   xvSesINds2J7RxH4xkdensLW9opixY7qQhlpyVFK0KqCFZ7O7N7ZNhFa+
+   PrUjQj7kVK9hkYWbbU8d8AetpfQMvJym20wLFdjjyaPWRZkZnhx/7ytJh
+   clGZOCZVLBtmJqHEdHOp7TjbCwgI5w08W6K6MAJvLnX6m277siINTDoNn
+   ZDj3ns2aOPCXl8cf7dT04/rwb9+a9G7oeFusH1K1+OJqDsuVLVxUlD3xu
+   A==;
+X-CSE-ConnectionGUID: +r+bNhgoRHuc78cI8AEzsg==
+X-CSE-MsgGUID: I0oM94WpSvOAylbp8+cDtA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="22310152"
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="22310152"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 00:34:54 -0700
+X-CSE-ConnectionGUID: EVHuThG7S4aiReU+5Lqd2A==
+X-CSE-MsgGUID: l6mWBjcDS7ah0BG/vcvIqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="30735478"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.92]) ([10.124.225.92])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 00:33:08 -0700
+Message-ID: <f1d32929-c189-4c70-ba05-33224bdd5602@linux.intel.com>
+Date: Tue, 14 May 2024 15:33:05 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 27/54] KVM: x86/pmu: Exclude PMU MSRs in
+ vmx_get_passthrough_msr_slot()
+To: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
+ Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
+ Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
+Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <20240506053020.3911940-1-mizhang@google.com>
+ <20240506053020.3911940-28-mizhang@google.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20240506053020.3911940-28-mizhang@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When the Zacas extension is available expose it to the guest
-via device tree so that guest can use it.
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- riscv/fdt.c                         | 1 +
- riscv/include/kvm/kvm-config-arch.h | 3 +++
- 2 files changed, 4 insertions(+)
+On 5/6/2024 1:29 PM, Mingwei Zhang wrote:
+> Reject PMU MSRs interception explicitly in
+> vmx_get_passthrough_msr_slot() since interception of PMU MSRs are
+> specially handled in intel_passthrough_pmu_msrs().
+>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
+> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c9de7d2623b8..62b5913abdd6 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -164,7 +164,7 @@ module_param(enable_passthrough_pmu, bool, 0444);
+>  
+>  /*
+>   * List of MSRs that can be directly passed to the guest.
+> - * In addition to these x2apic, PT and LBR MSRs are handled specially.
+> + * In addition to these x2apic, PMU, PT and LBR MSRs are handled specially.
+>   */
+>  static u32 vmx_possible_passthrough_msrs[MAX_POSSIBLE_PASSTHROUGH_MSRS] = {
+>  	MSR_IA32_SPEC_CTRL,
+> @@ -694,6 +694,13 @@ static int vmx_get_passthrough_msr_slot(u32 msr)
+>  	case MSR_LBR_CORE_FROM ... MSR_LBR_CORE_FROM + 8:
+>  	case MSR_LBR_CORE_TO ... MSR_LBR_CORE_TO + 8:
+>  		/* LBR MSRs. These are handled in vmx_update_intercept_for_lbr_msrs() */
+> +	case MSR_IA32_PMC0 ... MSR_IA32_PMC0 + 7:
+> +	case MSR_IA32_PERFCTR0 ... MSR_IA32_PERFCTR0 + 7:
+> +	case MSR_CORE_PERF_FIXED_CTR0 ... MSR_CORE_PERF_FIXED_CTR0 + 2:
 
-diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 418b668..cf367b9 100644
---- a/riscv/fdt.c
-+++ b/riscv/fdt.c
-@@ -22,6 +22,7 @@ struct isa_ext_info isa_info_arr[] = {
- 	{"svinval", KVM_RISCV_ISA_EXT_SVINVAL},
- 	{"svnapot", KVM_RISCV_ISA_EXT_SVNAPOT},
- 	{"svpbmt", KVM_RISCV_ISA_EXT_SVPBMT},
-+	{"zacas", KVM_RISCV_ISA_EXT_ZACAS},
- 	{"zba", KVM_RISCV_ISA_EXT_ZBA},
- 	{"zbb", KVM_RISCV_ISA_EXT_ZBB},
- 	{"zbc", KVM_RISCV_ISA_EXT_ZBC},
-diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-index 7cfbf30..17f0ceb 100644
---- a/riscv/include/kvm/kvm-config-arch.h
-+++ b/riscv/include/kvm/kvm-config-arch.h
-@@ -43,6 +43,9 @@ struct kvm_config_arch {
- 	OPT_BOOLEAN('\0', "disable-svpbmt",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_SVPBMT],	\
- 		    "Disable Svpbmt Extension"),			\
-+	OPT_BOOLEAN('\0', "disable-zacas",				\
-+		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZACAS],	\
-+		    "Disable Zacas Extension"),				\
- 	OPT_BOOLEAN('\0', "disable-zba",				\
- 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZBA],	\
- 		    "Disable Zba Extension"),				\
--- 
-2.34.1
+We'd better use helpers to get the maximum supported GP and fixed counter
+instead of magic numbers here. There are more GP and fixed counters in the
+future's Intel CPUs.
 
+
+> +	case MSR_CORE_PERF_GLOBAL_STATUS:
+> +	case MSR_CORE_PERF_GLOBAL_CTRL:
+> +	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
+> +		/* PMU MSRs. These are handled in intel_passthrough_pmu_msrs() */
+>  		return -ENOENT;
+>  	}
+>  
 
