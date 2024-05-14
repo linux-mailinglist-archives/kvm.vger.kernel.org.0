@@ -1,74 +1,65 @@
-Return-Path: <kvm+bounces-17369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CEAE8C4D72
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 10:06:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BAF98C4D7D
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 10:08:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4042283BA1
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 08:06:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EA171C2128A
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 08:08:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904CB1862A;
-	Tue, 14 May 2024 08:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F732182B5;
+	Tue, 14 May 2024 08:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="EW+TjDsH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kh0x0zVB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8C317996
-	for <kvm@vger.kernel.org>; Tue, 14 May 2024 08:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B549810949;
+	Tue, 14 May 2024 08:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715673995; cv=none; b=TVFchwSOQDoE1FY5jArCp84MzOzz8FPm1qVjIT3SNKemGvTWzdup5ywCulpCqZ6QFhWL+/V1joSnOlr6LjQ15ZYv2U5JAVVOR78+ohYKdyXzpqMVr8HgG6Az7grDIoQV8kM1c5W33isLUk5hRDOw2R+4AY3YVq/fG6/Ed/7JWw0=
+	t=1715674103; cv=none; b=TaGiKp4hgqwuAGilMLtUyCfPQdUhNeYLb28ddvVEwvIS41tdJaUc1pSBfIachELS9Er+Zpy/NyQjS19BbRlKjq1wZQhUP2tQCzlZNcqMYRp2pcLMPTjmQjqj8I2kZmdsnEzoxdOIa+hmgylq8nzje/mARwdoV+u2yajHBV5sThs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715673995; c=relaxed/simple;
-	bh=wa4C6Ee4ECOYeCIj8wjhLw3SuJWijNKeWZClb1WFn2U=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=djfIQf6g/euKLbyNT9A+NeHOqiP2eDKHy8UqqmqPGyWadXEeM1xP4uJJvn05aTQTQjpT9vAzeBFzRvLO0NIm1mHn/Wyz2+YhAnL0DtzZO6XtqFrUQNGDE6pS24DgcJ2kSIOLm7I6+LIHJz2CdC9dsOBsNUUXa2gy41yRXZ7VmME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=EW+TjDsH; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-420197fba0eso2035885e9.1
-        for <kvm@vger.kernel.org>; Tue, 14 May 2024 01:06:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1715673992; x=1716278792; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=pjopg8Hd6ezoM2VPeWMeiUlmhpM5PP4esFYOJITTIpM=;
-        b=EW+TjDsHm2Pxm+1mvV9BATFejR590jZ9rWX5XYDjndrAu6rrUUgl+M+nGys1t37I57
-         IyrRyBL1Jkn46bIWrPdDhJKIs2EH8Se+/BEs26amQxTZJnAuvyEgwZ3B3NgyP/OmdI/V
-         WO0lAWP74Qd4tPq7B3DP6fUVIJdcxJz5xtjSUKV77YVrHN57TkTsqfSI2kfPCbb1xNhE
-         z96FgnoePIEwmB480adOdnnNii6OqgNr7wbqtfXGvhbE9bhNJWHmkOpxR8mn8R6yOkex
-         QXc30dy2J/8i3ppfBKIuw5s2nSGpQvnJLdC+v5ybk3bM/botPQjtgKmvWDTJ5TcBIQtC
-         AjWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715673992; x=1716278792;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pjopg8Hd6ezoM2VPeWMeiUlmhpM5PP4esFYOJITTIpM=;
-        b=MBw0X3J4CJD6LQ/5vUF7o63/9aMf8Dy1iX1WMydZRUSQycBxAKSfriSaQDY/bfw1CI
-         KJy+BM1Ed2GSm4HpGfi0Y7We5fIMp8gWkS3OFZfy2lvk7w+2D/mM8aaxfr/ZPmRBh6Vu
-         RD24Cd7W3/oasXuyyd3NFEhYDuXqVD2dQytnUEnDAkWPJQ0In/bwzLdhM4Q43w0Nmm+P
-         L9Gws/ncJrXLOZ60W/MqAREcuhcPp2CqmIuDX6m9MQAjqCbqcxsID+1FDBXhpVsdj5OU
-         iKKgY9U7KmbH+NBourcAHiS8v1wt0cg2iVgMd4ziXoHFc5HpvnQC6UPUiH2uZxkVsw5P
-         WTrg==
-X-Forwarded-Encrypted: i=1; AJvYcCUguqjS0bg1Esl8z72/JhxGhWBTl9QUw/dd+8O5PGy8ZOcJIdYBnJw2GmLevZRbDvPS57TGFmEHB0cYzJnDmR98cVbz
-X-Gm-Message-State: AOJu0YxdFgN+lEhecnHKVWn5UKRMLBytKNMAaYUHrguU2dhYCPg8FGXg
-	ThniSMwOPpzWD3cKejB3PE70pDfm+EZLpejKIZFXqAuhT1VjwKzLHpbGNnlj45I=
-X-Google-Smtp-Source: AGHT+IHrTYyJeDAN6oeeNkuklJ3k4rzrTPEj0NJCPsHETslMiuk4YMPVJXS8JcMds7tACAEYtoHs+w==
-X-Received: by 2002:adf:ff92:0:b0:34d:8ccf:c9ce with SMTP id ffacd0b85a97d-3504a967162mr8354223f8f.5.1715673992206;
-        Tue, 14 May 2024 01:06:32 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:999:a3a0:1660:5f6e:2f9c:91b9? ([2a01:e0a:999:a3a0:1660:5f6e:2f9c:91b9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502b896b0bsm13038230f8f.46.2024.05.14.01.06.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 May 2024 01:06:31 -0700 (PDT)
-Message-ID: <e33b8eba-85f0-44b7-8a6f-802a6979f6c8@rivosinc.com>
-Date: Tue, 14 May 2024 10:06:31 +0200
+	s=arc-20240116; t=1715674103; c=relaxed/simple;
+	bh=5WfZjxrYSw7zoXzdLkztv43J1D68SxBg97H0MZSYreQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FowxKYhypj08BCqPGXgymMuLhKFs9SqPkAmi7+VPxrRgk4QzMQROIG3vwsp5ZEHIYjYSli3uu8umaN0qeX2lJfA5pO2oE9w54JnqRyuOyTtOjq9iZuOUJkw+o3OH+fhyYyN8D87wTnkBkJxni4tuhnHK7BRtmO3kPq5tY/jIAkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kh0x0zVB; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715674102; x=1747210102;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=5WfZjxrYSw7zoXzdLkztv43J1D68SxBg97H0MZSYreQ=;
+  b=Kh0x0zVBLb6mRPTQq8FfZebqvKTQpVnvG5CDncNbLhqQ00E06S1iiZ1i
+   oJ4U/DG/7m/N520m+BcnZgWymyiuTTA1Bxu0cxoE7t8IFnGfeu+SqPf+u
+   eHB9khSqcUWBv0hpdhtmRUhxhuiufpzevI2r1nnZHLjn6XwYOb3Vd2PRh
+   R5wkoYcQmneAyT9PoIU2IpJ0lDewGAukkK/cChuu0ojEbw13iKBt+vvxh
+   0KUs8x1wF7e1PV7oDC6wsF3Y5Ii7I5dbhr2FQDh5nW4/CbDN80LdOXw67
+   l/WUZWp/TwlJPSEooaApVwHkFxlFFwZ0TRHeKhakRDJPeSnADwm6plHO9
+   w==;
+X-CSE-ConnectionGUID: 5ODAVHnkSD2FVpdRh722AQ==
+X-CSE-MsgGUID: CK3ZzsHXQBeMs6Fb1FepTw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="11586469"
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="11586469"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 01:08:21 -0700
+X-CSE-ConnectionGUID: IXGLHMD/Q4GuYScI6e7hmQ==
+X-CSE-MsgGUID: kksJ9NqFQ+yHVxnzPNncoA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
+   d="scan'208";a="30618676"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.92]) ([10.124.225.92])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 01:08:14 -0700
+Message-ID: <719d8331-331b-46b2-a2ff-fe5ff7fa4b5e@linux.intel.com>
+Date: Tue, 14 May 2024 16:08:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,176 +67,197 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-Subject: Re: [RFC PATCH 5/7] riscv: add double trap driver
-To: Deepak Gupta <debug@rivosinc.com>
-Cc: Conor Dooley <conor@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
- linux-riscv@lists.infradead.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, Ved Shanbhogue <ved@rivosinc.com>
-References: <20240418142701.1493091-1-cleger@rivosinc.com>
- <20240418142701.1493091-6-cleger@rivosinc.com>
- <Ziw//90J0WfOY/tl@debug.ba.rivosinc.com>
+Subject: Re: [PATCH v2 30/54] KVM: x86/pmu: Implement the save/restore of PMU
+ state for Intel CPU
+To: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
+ Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
+ Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
+Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org,
+ linux-perf-users@vger.kernel.org
+References: <20240506053020.3911940-1-mizhang@google.com>
+ <20240506053020.3911940-31-mizhang@google.com>
 Content-Language: en-US
-In-Reply-To: <Ziw//90J0WfOY/tl@debug.ba.rivosinc.com>
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <20240506053020.3911940-31-mizhang@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 
+On 5/6/2024 1:29 PM, Mingwei Zhang wrote:
+> Implement the save/restore of PMU state for pasthrough PMU in Intel. In
+> passthrough mode, KVM owns exclusively the PMU HW when control flow goes to
+> the scope of passthrough PMU. Thus, KVM needs to save the host PMU state
+> and gains the full HW PMU ownership. On the contrary, host regains the
+> ownership of PMU HW from KVM when control flow leaves the scope of
+> passthrough PMU.
+>
+> Implement PMU context switches for Intel CPUs and opptunistically use
+> rdpmcl() instead of rdmsrl() when reading counters since the former has
+> lower latency in Intel CPUs.
 
-On 27/04/2024 01:59, Deepak Gupta wrote:
-> On Thu, Apr 18, 2024 at 04:26:44PM +0200, Clément Léger wrote:
->> Add a small driver to request double trap enabling as well as
->> registering a SSE handler for double trap. This will also be used by KVM
->> SBI FWFT extension support to detect if it is possible to enable double
->> trap in VS-mode.
->>
->> Signed-off-by: Clément Léger <cleger@rivosinc.com>
->> ---
->> arch/riscv/include/asm/sbi.h    |  1 +
->> drivers/firmware/Kconfig        |  7 +++
->> drivers/firmware/Makefile       |  1 +
->> drivers/firmware/riscv_dbltrp.c | 95 +++++++++++++++++++++++++++++++++
->> include/linux/riscv_dbltrp.h    | 19 +++++++
->> 5 files changed, 123 insertions(+)
->> create mode 100644 drivers/firmware/riscv_dbltrp.c
->> create mode 100644 include/linux/riscv_dbltrp.h
->>
->> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
->> index 744aa1796c92..9cd4ca66487c 100644
->> --- a/arch/riscv/include/asm/sbi.h
->> +++ b/arch/riscv/include/asm/sbi.h
->> @@ -314,6 +314,7 @@ enum sbi_sse_attr_id {
->> #define SBI_SSE_ATTR_INTERRUPTED_FLAGS_SPIE    (1 << 2)
->>
->> #define SBI_SSE_EVENT_LOCAL_RAS        0x00000000
->> +#define SBI_SSE_EVENT_LOCAL_DOUBLE_TRAP    0x00000001
->> #define SBI_SSE_EVENT_GLOBAL_RAS    0x00008000
->> #define SBI_SSE_EVENT_LOCAL_PMU        0x00010000
->> #define SBI_SSE_EVENT_LOCAL_SOFTWARE    0xffff0000
->> diff --git a/drivers/firmware/Kconfig b/drivers/firmware/Kconfig
->> index 59f611288807..a037f6e89942 100644
->> --- a/drivers/firmware/Kconfig
->> +++ b/drivers/firmware/Kconfig
->> @@ -197,6 +197,13 @@ config RISCV_SSE_TEST
->>       Select if you want to enable SSE extension testing at boot time.
->>       This will run a series of test which verifies SSE sanity.
->>
->> +config RISCV_DBLTRP
->> +    bool "Enable Double trap handling"
->> +    depends on RISCV_SSE && RISCV_SBI
->> +    default n
->> +    help
->> +      Select if you want to enable SSE double trap handler.
->> +
->> config SYSFB
->>     bool
->>     select BOOT_VESA_SUPPORT
->> diff --git a/drivers/firmware/Makefile b/drivers/firmware/Makefile
->> index fb7b0c08c56d..ad67a1738c0f 100644
->> --- a/drivers/firmware/Makefile
->> +++ b/drivers/firmware/Makefile
->> @@ -18,6 +18,7 @@ obj-$(CONFIG_RASPBERRYPI_FIRMWARE) += raspberrypi.o
->> obj-$(CONFIG_FW_CFG_SYSFS)    += qemu_fw_cfg.o
->> obj-$(CONFIG_RISCV_SSE)        += riscv_sse.o
->> obj-$(CONFIG_RISCV_SSE_TEST)    += riscv_sse_test.o
->> +obj-$(CONFIG_RISCV_DBLTRP)    += riscv_dbltrp.o
->> obj-$(CONFIG_SYSFB)        += sysfb.o
->> obj-$(CONFIG_SYSFB_SIMPLEFB)    += sysfb_simplefb.o
->> obj-$(CONFIG_TI_SCI_PROTOCOL)    += ti_sci.o
->> diff --git a/drivers/firmware/riscv_dbltrp.c
->> b/drivers/firmware/riscv_dbltrp.c
->> new file mode 100644
->> index 000000000000..72f9a067e87a
->> --- /dev/null
->> +++ b/drivers/firmware/riscv_dbltrp.c
->> @@ -0,0 +1,95 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Copyright (C) 2023 Rivos Inc.
->> + */
-> 
-> nit: fix copyright year
->> +
->> +#define pr_fmt(fmt) "riscv-dbltrp: " fmt
->> +
->> +#include <linux/cpu.h>
->> +#include <linux/init.h>
->> +#include <linux/riscv_dbltrp.h>
->> +#include <linux/riscv_sse.h>
->> +
->> +#include <asm/sbi.h>
->> +
->> +static bool double_trap_enabled;
->> +
->> +static int riscv_sse_dbltrp_handle(uint32_t evt, void *arg,
->> +                   struct pt_regs *regs)
->> +{
->> +    __show_regs(regs);
->> +    panic("Double trap !\n");
->> +
->> +    return 0;
-> Curious:
-> Does panic return?
-> What's the point of returning from here?
+It looks rdpmcl() optimization is removed from this patch, right? The
+description is not identical with code.
 
-Hi Deepak,
 
-No, panic() does not return and indeed, the "return 0" is useless. It's
-a leftover of a previous implementation without panic in order to keep
-GCC mouth shut ;).
+>
+> Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+> Signed-off-by: Mingwei Zhang <mizhang@google.com>
 
-> 
->> +}
->> +
->> +struct cpu_dbltrp_data {
->> +    int error;
->> +};
->> +
->> +static void
->> +sbi_cpu_enable_double_trap(void *data)
->> +{
->> +    struct sbiret ret;
->> +    struct cpu_dbltrp_data *cdd = data;
->> +
->> +    ret = sbi_ecall(SBI_EXT_FWFT, SBI_EXT_FWFT_SET,
->> +            SBI_FWFT_DOUBLE_TRAP_ENABLE, 1, 0, 0, 0, 0);
->> +
->> +    if (ret.error) {
->> +        cdd->error = 1;
->> +        pr_err("Failed to enable double trap on cpu %d\n",
->> smp_processor_id());
->> +    }
->> +}
->> +
->> +static int sbi_enable_double_trap(void)
->> +{
->> +    struct cpu_dbltrp_data cdd = {0};
->> +
->> +    on_each_cpu(sbi_cpu_enable_double_trap, &cdd, 1);
->> +    if (cdd.error)
->> +        return -1;
-> 
-> There is a bug here. If `sbi_cpu_enable_double_trap` failed on all cpus
-> but last cpu.
-> Then cdd.error would not record error and will be reflect as if double
-> trap was enabled.
+The commit tags doesn't follow the rules in Linux document, we need to
+change it in next version.
 
-cdd.error is only written in case of error by the per-cpu callbacks, so
-it is only set if enabled failed. Is there something I'm missing ?
+https://docs.kernel.org/process/submitting-patches.html#:~:text=Co%2Ddeveloped%2Dby%3A%20states,work%20on%20a%20single%20patch.
 
-Thanks,
+> ---
+>  arch/x86/kvm/pmu.c           | 46 ++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/pmu_intel.c | 41 +++++++++++++++++++++++++++++++-
+>  2 files changed, 86 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 782b564bdf96..13197472e31d 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -1068,14 +1068,60 @@ void kvm_pmu_passthrough_pmu_msrs(struct kvm_vcpu *vcpu)
+>  
+>  void kvm_pmu_save_pmu_context(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +	struct kvm_pmc *pmc;
+> +	u32 i;
+> +
+>  	lockdep_assert_irqs_disabled();
+>  
+>  	static_call_cond(kvm_x86_pmu_save_pmu_context)(vcpu);
+> +
+> +	/*
+> +	 * Clear hardware selector MSR content and its counter to avoid
+> +	 * leakage and also avoid this guest GP counter get accidentally
+> +	 * enabled during host running when host enable global ctrl.
+> +	 */
+> +	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+> +		pmc = &pmu->gp_counters[i];
+> +		rdmsrl(pmc->msr_counter, pmc->counter);
 
-Clément
+I understood we want to use common code to manipulate PMU MSRs as much as
+possible, but I don't think we should sacrifice performance. rdpmcl() has
+better performance than rdmsrl(). If AMD CPUs doesn't support rdpmc
+instruction, I think we should move this into vendor specific
+xxx_save/restore_pmu_context helpers().
 
-> 
-> Its less likely to happen that FW would return success for one cpu and
-> fail for others.
-> But there is non-zero probablity here.
-> 
 
+> +		rdmsrl(pmc->msr_eventsel, pmc->eventsel);
+> +		if (pmc->counter)
+> +			wrmsrl(pmc->msr_counter, 0);
+> +		if (pmc->eventsel)
+> +			wrmsrl(pmc->msr_eventsel, 0);
+> +	}
+> +
+> +	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+> +		pmc = &pmu->fixed_counters[i];
+> +		rdmsrl(pmc->msr_counter, pmc->counter);
+> +		if (pmc->counter)
+> +			wrmsrl(pmc->msr_counter, 0);
+> +	}
+>  }
+>  
+>  void kvm_pmu_restore_pmu_context(struct kvm_vcpu *vcpu)
+>  {
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +	struct kvm_pmc *pmc;
+> +	int i;
+> +
+>  	lockdep_assert_irqs_disabled();
+>  
+>  	static_call_cond(kvm_x86_pmu_restore_pmu_context)(vcpu);
+> +
+> +	/*
+> +	 * No need to zero out unexposed GP/fixed counters/selectors since RDPMC
+> +	 * in this case will be intercepted. Accessing to these counters and
+> +	 * selectors will cause #GP in the guest.
+> +	 */
+> +	for (i = 0; i < pmu->nr_arch_gp_counters; i++) {
+> +		pmc = &pmu->gp_counters[i];
+> +		wrmsrl(pmc->msr_counter, pmc->counter);
+> +		wrmsrl(pmc->msr_eventsel, pmu->gp_counters[i].eventsel);
+> +	}
+> +
+> +	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+> +		pmc = &pmu->fixed_counters[i];
+> +		wrmsrl(pmc->msr_counter, pmc->counter);
+> +	}
+>  }
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index 7852ba25a240..a23cf9ca224e 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -572,7 +572,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+>  	}
+>  
+>  	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
+> -		pmu->fixed_counters[i].msr_eventsel = MSR_CORE_PERF_FIXED_CTR_CTRL;
+> +		pmu->fixed_counters[i].msr_eventsel = 0;
+Why to initialize msr_eventsel to 0 instead of the real MSR address here?
+>  		pmu->fixed_counters[i].msr_counter = MSR_CORE_PERF_FIXED_CTR0 + i;
+>  	}
+>  }
+> @@ -799,6 +799,43 @@ static void intel_passthrough_pmu_msrs(struct kvm_vcpu *vcpu)
+>  	vmx_set_intercept_for_msr(vcpu, MSR_CORE_PERF_GLOBAL_OVF_CTRL, MSR_TYPE_RW, msr_intercept);
+>  }
+>  
+> +static void intel_save_guest_pmu_context(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +
+> +	/* Global ctrl register is already saved at VM-exit. */
+> +	rdmsrl(MSR_CORE_PERF_GLOBAL_STATUS, pmu->global_status);
+> +	/* Clear hardware MSR_CORE_PERF_GLOBAL_STATUS MSR, if non-zero. */
+> +	if (pmu->global_status)
+> +		wrmsrl(MSR_CORE_PERF_GLOBAL_OVF_CTRL, pmu->global_status);
+> +
+> +	rdmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl);
+> +	/*
+> +	 * Clear hardware FIXED_CTR_CTRL MSR to avoid information leakage and
+> +	 * also avoid these guest fixed counters get accidentially enabled
+> +	 * during host running when host enable global ctrl.
+> +	 */
+> +	if (pmu->fixed_ctr_ctrl)
+> +		wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, 0);
+> +}
+> +
+> +static void intel_restore_guest_pmu_context(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +	u64 global_status, toggle;
+> +
+> +	/* Clear host global_ctrl MSR if non-zero. */
+> +	wrmsrl(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +	rdmsrl(MSR_CORE_PERF_GLOBAL_STATUS, global_status);
+> +	toggle = pmu->global_status ^ global_status;
+> +	if (global_status & toggle)
+> +		wrmsrl(MSR_CORE_PERF_GLOBAL_OVF_CTRL, global_status & toggle);
+> +	if (pmu->global_status & toggle)
+> +		wrmsrl(MSR_CORE_PERF_GLOBAL_STATUS_SET, pmu->global_status & toggle);
+> +
+> +	wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl);
+> +}
+> +
+>  struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>  	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
+>  	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
+> @@ -812,6 +849,8 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>  	.cleanup = intel_pmu_cleanup,
+>  	.is_rdpmc_passthru_allowed = intel_is_rdpmc_passthru_allowed,
+>  	.passthrough_pmu_msrs = intel_passthrough_pmu_msrs,
+> +	.save_pmu_context = intel_save_guest_pmu_context,
+> +	.restore_pmu_context = intel_restore_guest_pmu_context,
+>  	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
+>  	.MAX_NR_GP_COUNTERS = KVM_INTEL_PMC_MAX_GENERIC,
+>  	.MIN_NR_GP_COUNTERS = 1,
 
