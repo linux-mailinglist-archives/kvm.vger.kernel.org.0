@@ -1,314 +1,376 @@
-Return-Path: <kvm+bounces-17360-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17361-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDEA68C4B0C
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 04:01:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 114618C4B58
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 04:55:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C15028425D
-	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 02:01:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3508D1C20CE6
+	for <lists+kvm@lfdr.de>; Tue, 14 May 2024 02:55:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C41E2B64C;
-	Tue, 14 May 2024 02:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7905B5D3;
+	Tue, 14 May 2024 02:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XsF0jkMC"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NMBgW5Dd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2062.outbound.protection.outlook.com [40.107.94.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02491AD24;
-	Tue, 14 May 2024 02:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442884502B;
+	Tue, 14 May 2024 02:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.62
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715652095; cv=fail; b=dD3FphhEF62N0KB1P4S0PdRA+7Z85f/Gnx0SpGoeHqgd2Q4iFWRox1smLSbgjyaOSxgtWWTh1WmvSTU0dDCKTjkrApy/Zl33pWpLABJzTzjBKhcIId1crfqTckWa5sSiiuPUvfrrKDcQTIQkasEyW/QcImJtflpQc2CLuHIhuSs=
+	t=1715655097; cv=fail; b=oCV/pCwkC/2mnFaA9ygO7FRStHEI5fJj2tGTdMoqbbG8ZbHkN3/8BYUwzSgT2YmiR7P/ux4Img+ol/CyeyGXktjPT5MEg5R9cRZ3rZ371vU73q7tuktGFAPtPsaapPFbMLF7d6WAP9jlhXIEFuDAsKstDCkmEOwAV4Ybv0zKD00=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715652095; c=relaxed/simple;
-	bh=BH+rcFjRoSkMUjz0YKdu6ZSEVqmgq+puYbXpl2H01Po=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=XQRxp79kx3dn1HnRzBNPnzIMFp4DclGTks0S60zd7UcHeL08d2eGkkllIfjKlIUZJTFgNsFpuVne3ZegJc9bc8d1SQE5weX6+29T/8zHY4F5aKkg48CvJj6vC7L8nVcqTx3EGInY7PTX+SHS+yk/3tbXAwanpabLrQp4sCwT+ME=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XsF0jkMC; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715652093; x=1747188093;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=BH+rcFjRoSkMUjz0YKdu6ZSEVqmgq+puYbXpl2H01Po=;
-  b=XsF0jkMCWaD4s3r14x5GAkelCgbeuEfc/vFlhgR1J4NgqNWb/aAdQX3e
-   c6ggoI6V2ls53YGqh3lwCKQAcb8Hf8mRDJxbAo5IIibzgCf4BTOT8s2/o
-   cYrc86sT8+neDgrihrbkn0hL7Khd5tznZHLcpGaaWsTXGP12kSejpH5jK
-   K4qlEWPjU6oWxGDhTUWcShvcsU05C7lTY2O26FjqUQRWUtCIPcSn3Celw
-   vHxDqwMVrOZLrj6u3t7eofFxDCFMWM3gzRyz7EGyNlaaWeGQNeeltbZ27
-   Ea7f7//Zj8Tix+dOvveqLR0TcrHxXoJXmCXoP0k687oiJorrXgNb/lgj/
-   w==;
-X-CSE-ConnectionGUID: 4W9mq3NfQWGKAN80VDYLow==
-X-CSE-MsgGUID: SuzTORm3TZmISdxYAtBiIA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11072"; a="11775083"
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="11775083"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 May 2024 19:01:33 -0700
-X-CSE-ConnectionGUID: NlTNNKMNTluKQmGndsZeWQ==
-X-CSE-MsgGUID: qqkaxkC3TaW5aAvIx4IGDA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,159,1712646000"; 
-   d="scan'208";a="34969912"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 May 2024 19:01:31 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 13 May 2024 19:01:31 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 13 May 2024 19:01:31 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 13 May 2024 19:01:30 -0700
+	s=arc-20240116; t=1715655097; c=relaxed/simple;
+	bh=M/lAj6snV4y/b8BumZYHy5/iZyAnVGcfGd64p4fovoU=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HbCNJmCMi/WM5GreM8RZfdBYNU9hlqeK9YQHN/lsIdKhJOWl84z8+xIs6mL49Ap27Ya6kPAtE670Xyfz2kNyPlD9ogu/P5OpahxmE6pMazqt/71jbIaBkGWQJlzr+hvS/vA/8kvMk/boXSrUy/zGhPB2f61Kgkii+hbAttiAq6w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NMBgW5Dd; arc=fail smtp.client-ip=40.107.94.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GqH5QIDAted9cG6Ss8ecwj7cqOQTsNlr+R40JMcuMzGQ8cUwQFwT4I/WeNZ5wla6LchCE+bxDYgzf1zzv9CBoYHubr+VAxYCyIVP9kgvM/v0LD/0R2RQVflHI3D7MkcuCYZv4bCOxteKIcFF6Y5hAtNva2cQW5ivFCpbxKO+KLrET6L3xAtSW51jFt1f+iSHPXpUR1oCfWg78Gw0Zl28IfAzjWyomm34GGkLjyUWv7XUABEDgkTMVJziEsi1yAkNE3mnmwQ2fwHxUq47BFygUC96DSoJFRTlgAvRUbyqWVgVoygE9FSPsyCM3Jem5jIOfbQof/DG+qLGMbwUzcRAlg==
+ b=KYTPkQ9bws3GB3UR7HZ2I5jOZnlPSyX7Fyb0+FjlFMzpo8pFe6QwdTmdyNo3zQf1SYMPCcelMJB7uMkFqMuYf6uYHYtUmA2UqthNCpPAvY6nISjOqgTk5sZZ0j5b9kEFsfA5oVWU03HwQnr7xewTWdiRuSBqoluB5qEAwdb0qnPTnHNNOulDASCSaQu67DH4P5//pQSLaPkEx/woJf1Hpbd6OXL53g5QACe5k4QYRyobGeQ/CppkXaXB+heJFZuWVqhQl6UaaBR2mdcfKtOoKJjfwkC4DkDWEOKpVtzQ5K7p/iJpU4zw+3XZ0AqZUZuwvz1XBk6qP4k2NgGsgaLc5w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3a4apGWZ67BmWv0twpU2zjuSsQHtUzqUDqsP/9nXuWw=;
- b=F6gwrLBGyu3kAUNyAh2HCFAJayy1MZbPRy97v2fVLKg3rvtOqwrpj+v/yuKVs0dYbApTTr8KKc/TKkVraiKG6drFVMRZ+GPn6br6P2Z9cJ6Vqnuahj2orxClVBEOZhOCNzLOfrIavfpqG67vQzQhPrTMb52BQnMWELsd1cRuyoycsnA2mH2ygP3bxCeqLrNlB72GB4s2LygpSr3dtsd4JZ4G9ZsAwSXod019b/LLlMQScv0iXVjli4W3/ISXaIJrQ3n6vbdj8JhXfmViBCNgkPYLxGI5durcgYtSQI3l3DrxXAxToFDZzntxi1ON6cBi5u21/9Sxo61okUc8sxzzww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH7PR11MB6497.namprd11.prod.outlook.com (2603:10b6:510:1f2::13) with
+ bh=GU69nuJcCyxNtjbPHQk+VW2PKqI+VS0fW6UPRashnmY=;
+ b=b8g0YSo0+KBibl4e+/66oSJJqw6Y/7FXb2QftyOKGQPhINECtkDb7QgspdddopknoJztx7LKJyd9E1M7zb0nHqP7cDIDC4MgRVL5o+uKXMKwJy200/VeWCtbyy3E0OLExNFNDfZ+n51c1yIu1YyaKRx7y2n8PXZYZxpTn0jJQhsocm6ktyRf2tceMD065eNVWebEzIm+mygFkFwm+R9ocYO995whRTCJnTysfMjyByntxNpt6B2R9q9EJXOBfXBuhFpwkY22++ZPa4flMvS+54V+81rQOaF7sO7wSBt86n0cjJV13JBiZx+ppJwaV/Z8F7nZ5KJH964dOT8BqFwaug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GU69nuJcCyxNtjbPHQk+VW2PKqI+VS0fW6UPRashnmY=;
+ b=NMBgW5DdZJVLI1ERyaqRGXQis/nQLf/5NspSnzA0VGZr1AwgKkdYlSYUtrhPl+BXCj6AMDQEtNB1l0lx2kTh8vAOlxSVaJCKJn7/RqxV3o5bWhmDh0esjFr3dq8/CqK6n4gPbmgZRUK9f/6kF8s7PQoHeZZeH6/j4W5sPRQ+r7M=
+Received: from MN2PR07CA0029.namprd07.prod.outlook.com (2603:10b6:208:1a0::39)
+ by IA1PR12MB8358.namprd12.prod.outlook.com (2603:10b6:208:3fa::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55; Tue, 14 May
- 2024 02:01:22 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.7544.052; Tue, 14 May 2024
- 02:01:22 +0000
-Message-ID: <50e09676-4dfc-473f-8b34-7f7a98ab5228@intel.com>
-Date: Tue, 14 May 2024 14:01:12 +1200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 037/130] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend
- specific
-To: Sean Christopherson <seanjc@google.com>, Isaku Yamahata
-	<isaku.yamahata@intel.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Erdem Aktas <erdemaktas@google.com>, Sagi Shahar
-	<sagis@google.com>, Bo2 Chen <chen.bo@intel.com>, Hang Yuan
-	<hang.yuan@intel.com>, Tina Zhang <tina.zhang@intel.com>,
-	<isaku.yamahata@linux.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <9bd868a287599eb2a854f6983f13b4500f47d2ae.1708933498.git.isaku.yamahata@intel.com>
- <Zjz7bRcIpe8nL0Gs@google.com>
- <5ba2b661-0db5-4b49-9489-4d3e72adf7d2@intel.com>
- <Zj1Ty6bqbwst4u_N@google.com>
- <49b7402c-8895-4d53-ad00-07ce7863894d@intel.com>
- <20240509235522.GA480079@ls.amr.corp.intel.com> <Zj4phpnqYNoNTVeP@google.com>
-Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <Zj4phpnqYNoNTVeP@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4P221CA0004.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:303:8b::9) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+ 2024 02:51:32 +0000
+Received: from MN1PEPF0000F0E0.namprd04.prod.outlook.com
+ (2603:10b6:208:1a0:cafe::5) by MN2PR07CA0029.outlook.office365.com
+ (2603:10b6:208:1a0::39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.55 via Frontend
+ Transport; Tue, 14 May 2024 02:51:32 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MN1PEPF0000F0E0.mail.protection.outlook.com (10.167.242.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7587.21 via Frontend Transport; Tue, 14 May 2024 02:51:32 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 13 May
+ 2024 21:51:32 -0500
+Date: Mon, 13 May 2024 21:51:15 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Sean Christopherson <seanjc@google.com>
+CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+	<linux-crypto@vger.kernel.org>, <x86@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>,
+	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <hpa@zytor.com>,
+	<ardb@kernel.org>, <pbonzini@redhat.com>, <vkuznets@redhat.com>,
+	<jmattson@google.com>, <luto@kernel.org>, <dave.hansen@linux.intel.com>,
+	<slp@redhat.com>, <pgonda@google.com>, <peterz@infradead.org>,
+	<srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
+	<dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>, <vbabka@suse.cz>,
+	<kirill@shutemov.name>, <ak@linux.intel.com>, <tony.luck@intel.com>,
+	<sathyanarayanan.kuppuswamy@linux.intel.com>, <alpergun@google.com>,
+	<jarkko@kernel.org>, <ashish.kalra@amd.com>, <nikunj.dadhania@amd.com>,
+	<pankaj.gupta@amd.com>, <liam.merwick@oracle.com>
+Subject: Re: [PATCH v15 19/20] KVM: SEV: Provide support for
+ SNP_EXTENDED_GUEST_REQUEST NAE event
+Message-ID: <20240514025115.dkw3ysqrdbfaa2sg@amd.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-20-michael.roth@amd.com>
+ <ZkKmySIx_vn0W-k_@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZkKmySIx_vn0W-k_@google.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|PH7PR11MB6497:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2985b9f4-db1d-430c-ba11-08dc73b9c11c
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E0:EE_|IA1PR12MB8358:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8670b248-83af-442d-9650-08dc73c0c369
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?WVRvR0c5Tk43eGMvZE96Qk5Pc3B3TUxoQnNocWExYUtWWTJHVC9Ia001ekEv?=
- =?utf-8?B?Q0VyZTM4ditnanI4VmxhY0pzQXBTWS9wY0Q4byt0WEhQRG5SRHN6RFlXd2xh?=
- =?utf-8?B?RFl4UVRTOC9zZXY4RjFxbElubjJ3MERadURXMDBzKzZ2ZWVpSy9jTEh1Rmpq?=
- =?utf-8?B?MnhPbFVDWVowUXR0YmlWVUhpcDJMTmJtNjB2cnJ5RjcrZFhPYUdIVlg3QnZv?=
- =?utf-8?B?WEJyenJmelYzVVc2ZXFMdFgzK2FUTXp1RERMYXJlTkoxdE00d1lrV3lJd3V3?=
- =?utf-8?B?NHVIR2pGVmZkVVA0SHFnWU9uTlZDWUpEOStYWGh1ekNHNkdsQkI5aXFrQUhz?=
- =?utf-8?B?elUzQW1aNC9mQUdtUnI3eTdTcVB0dzlBVndRVnlBK2ZWZExsaVo4MGRBTkpN?=
- =?utf-8?B?TTZxWlBEN2I3U0JBUngyeEpwb0tvL2YxZGdHZm1ISmtSa3VOSmVIanZXWnRq?=
- =?utf-8?B?RDRoWldnV3QyRGFpeUkyUWZyOGtoVXM3eW0rbUY5ZG1URFhMak42eHlTOEd2?=
- =?utf-8?B?WWxuSERqWS9iREk1c3gvN1VueWpiQnBFZWhjMEhybElxcyttNmpFRE5iZkpE?=
- =?utf-8?B?NjJlTnR6Ynh2MnJ0Z0QyZzN3QmQ0MzlDbGo5TlM2MDBpTXJ6TjAyVEpCQ1oz?=
- =?utf-8?B?YkhTbEdIL3gvM0ptdlVOWVIrV2hnRjY2N1p3aDdhdEQ5Ui81NjROZGRxL21a?=
- =?utf-8?B?OVFnNFE0dkZEbmVnUmxTZkJyYzM5L05MczdGb2ZFcDhwZUNjaGRJczRCUGc1?=
- =?utf-8?B?dnVMYk5Kdk93NFg5MGwveEozc09Uck5kTGFJNnBmcGo4amlRRURySDRtKzh0?=
- =?utf-8?B?YStwakZsTzZrVVZiTGtmS3FmVmJTcDJQd0FLOWQ4WmdKZlYrbFdGVGJZcStY?=
- =?utf-8?B?MzBFQjY1VVBudjU2M0NwdHNjbkE5cm9CcmpUTGpjQzJ4aklhYkQwTnh1SUxQ?=
- =?utf-8?B?NzVPcjFvVHU2UUU2Q2grNktwNkdNWnFzNmhZbU42MVc1cFYyZFFNS2FUZ1ly?=
- =?utf-8?B?V2dLRUh3WkJzb3BXbXdJTCt0cUJoVVZZUnFscEZJeENGN2g5V3pFZk4wd3p4?=
- =?utf-8?B?ZGdqR21pVGtZTGpYaGdIcUhJUFhMOURoM05QaCs5OENYMHAwYjBZVWZzREE4?=
- =?utf-8?B?bER1MFA2RXBVN3RVVnRMT01UMTc0cDlKVU5kYUt5SFFhdVZvdkhjNnFoREFx?=
- =?utf-8?B?NUZsR0JSRDUyM2lDTmlSRDMwQXkybzVCNXpwVjVrNzArMHFQWURiRlUvMk4v?=
- =?utf-8?B?eGRRSCs2T0NabU8vb1M2UDNIaGFiWjk3V1NJbVdXbWJuaEJLYmtwamFsZi95?=
- =?utf-8?B?dUhLL0FoRnhKK1l6WkhnL2xZTE1za0lyN1lBOTRNc1Z2Y1NJbS91NUdHSWU1?=
- =?utf-8?B?V00xdE4xSFA3aThtaXdQZ1VCbG1PaVhndU5zdGVtOW8ycEx0cWpOc1NsVlNG?=
- =?utf-8?B?azc1dkRNeWJKbEFleENHaEQvZmkreUJaWXNSZzMyTE9oTEQxUkJTTTF1T1JR?=
- =?utf-8?B?bE40V281ajJWWVdDYnVTa3k2c2VzZEVmSnpjUkVEQS83bkduM3hLTzM3VnEr?=
- =?utf-8?B?djZLdVZScVFqMlZUMU5Sb0Vsc2RrWk1tTzNRUmt3aitSOVpsTUI4ZXZJTW1R?=
- =?utf-8?B?STBabnFVNEdBZmhkK0Q5RSs2KzNFaDk3L1gxUEV2UXdTSzg0NlN0dHgwRXFJ?=
- =?utf-8?B?dEJBOGdLbmVmUG11SDJwYnQ3UnpSTmwvUlIzdTkwbURWU0RBVkt5VE5RPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1NCdHBTME5XTW9kSVg3VlhGME9tRCtHOTJxNVZkeXdSRmJHWjkwVzVqdG9E?=
- =?utf-8?B?RUhQakhVdk5xczFXQkJIM0krWkd5NWM5UHJZMjBRdkpPeWVPMFkzTkRVdHpO?=
- =?utf-8?B?SEI3VzA0c1RkMFhnUWFrbHVDaERvWWJQVFZFTC9FVkkwMmVKVWZVWFAvbnc2?=
- =?utf-8?B?MVE3NGJwcXFrMHF1UFNKeXlmdVI5ek1mRzJnNEh5UEJPRTNBRTdveFN4WW15?=
- =?utf-8?B?U0NrbUc1ekpEbml0eDNxWTVGQ2J4QldZcU9vWDVOdUlhYkxjN0M4aU8velY0?=
- =?utf-8?B?M2E2UDFTa0ZJWHg0cFRteFZvSGsxYTNKV0txQkhFdDhUdThpZGZnM3BHKzcx?=
- =?utf-8?B?RHNrbWJPWmF0eXBmSXFyMXU2Yzl0eUNySXhpbjQzRDBoWWJ4TU5RRzZoc0F6?=
- =?utf-8?B?VHVKTWRsNGNuMTBpeFg4cERyR05NN3hOUTV4clZVRzk0QU5VZTV1UHpqSTJW?=
- =?utf-8?B?TXQxU1UrOGNaeFl1SEl5RjdzaFVWSzQ2bVZZQlM4WEQ1cVFoYStha1V4QXNm?=
- =?utf-8?B?d0IyUmJMOFhhRW5qcmtrSW0yNWtnby9UTUdyUE1pZTBBNUR1TEdhR2t2U0hv?=
- =?utf-8?B?YWNsUVpoZUFLQVdDd3RUcXkycURWL3dJOU5FOUVXTzJaM3Y4eGZjc3lQNnRJ?=
- =?utf-8?B?akYrV2tUWXFBUjE0ajhSZzEvVGRINnBkdGxvTGU5MHhXalhwdlMxakE1M3ZS?=
- =?utf-8?B?ZXE2SGtFRDhNNjdJLzlKZHMyVTYrT3M2TnQzYjJkYUxXVFBPTjFQY2xoc2pw?=
- =?utf-8?B?ZUFMbU8vdlB1am9NSDFaZzBVdS82ZFhVOWxpTEx0R05rbFhBbHp3emMrNy9B?=
- =?utf-8?B?bDdWZ0xzUEczVnhBd2dScTE4clhGcGgzM2tjTXlmVWRUS2RvQkduRmlSMkhJ?=
- =?utf-8?B?ek1BN2xRd2drUzBxTm9paWFNdWpqUFFaZDJZTDlReHBzVjdVMlluQXlBY3hw?=
- =?utf-8?B?ZTJrT1hhZ2RWMndOQzVXY1ByMzliV2JRK2Y4REVDWHI5aU5TNjQ2L0lvR1gw?=
- =?utf-8?B?ZUgxRm80Ui9Qbys1eEpleFUxZHY5NHZINmZpZnNoRVl3MUNaR3M4Uzc0aGdk?=
- =?utf-8?B?UFh6VHBuZlllZEM0bytQZ2FmMFZPOWFOT3p6cENQTmROS1d1Njl4U3h6Mkp0?=
- =?utf-8?B?clBYL3RjZDdJR3NhWU5CdUx3UzhaUEp1YmRBemtmSVg4VDh0bXQvT1hSWGkr?=
- =?utf-8?B?UTllMkgxZGsreGNRcUlDLzFOd1pUMUI4YUwwd0FQdDI0cFU2K0praTNtdGNH?=
- =?utf-8?B?TUZJVUMxWVFOSTJabUJmYlUybXBtaFVCRVlqekVhL2hGZlJpZGJ4emxaSklQ?=
- =?utf-8?B?eWlmTjlaRUFSeWRudTV2bnk3L0dLQTYwbEVyTkdoNERSQkZSYmQ0QkVESTZL?=
- =?utf-8?B?cTFvMmUzMjZDektTYnBSdVhXbW9zSUhXVGFBWFBvSzJ5bDFEMWN5ZldlZldt?=
- =?utf-8?B?S1R1MFFBRVc5cCtrTzZkV1ZNRFhZUUR2SjJ0b2Yrd1YwQm1BSjlXMUovMUtC?=
- =?utf-8?B?QUVzS25mWi9vT2RhWEJRcjlCQzNDMitheWovUTlrcDFKWGFMbTNJR3E0aXUw?=
- =?utf-8?B?eHZkWXA0S0pDeFV4aE5aUE1UNk1ubmZwbFN5eVRrT3doL2tGOFllRUNSVWI2?=
- =?utf-8?B?WmxNZnpsQWlqZTFQa05XUDRxeWl1NUZtZktUN1lxRTNzY1JXdWs3cW1xYWZk?=
- =?utf-8?B?bmtEWjRnNWtScEplNUF3b0wySW5IcHpLMy9LVDJzSmRsdTN2RFJjN2t5R1J4?=
- =?utf-8?B?NjZUVkdZdStSTXdNZjBHazZMYm43S2RaYTRsSUZIcEE5Z0ZjQklyVHVDbk8v?=
- =?utf-8?B?eGcycUFmY2tveXBkT0h2cm1FaEZSNk1nN2J6R1ZneFNlbEdaMURON2Q4OHRl?=
- =?utf-8?B?ZGFjSllkTFdyRlJQZnI0QnFwREVCbjVzd01zYzBZcXlYZE82bXFSWEpIRC9k?=
- =?utf-8?B?TmhrTUNWL0RSUFk0YUpkODZ3bDl5bTNIVUdWSE4wKzdGN2N2K29DZUZQeTY0?=
- =?utf-8?B?R1lFcHFwYWJNMUN5S2dOVVpRQzZSMDgwWE9nNzBQUDY5eXg4N05xMlh3dDJ3?=
- =?utf-8?B?RDhndnNPY3UwUkh5eGJQWW5CaEtZejU5L3VLR09XT1ZnZVB3eE1nQ2NkNHFk?=
- =?utf-8?Q?emSFo9HXpjLf+lQh4EkD6b1Ud?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2985b9f4-db1d-430c-ba11-08dc73b9c11c
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2024 02:01:22.7059
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230031|376005|36860700004|82310400017|7416005|1800799015;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?gT0YALttxef1Ch8gAfa/Uj9NF8IE/o4JCQyx5YJ8Lgupzyi4WGyPofJAg7H9?=
+ =?us-ascii?Q?xV+cel4PN+eujUccmF5ZjmTyT4VGy/WVAypRZn6GcDXFDPJUeX/zEUA9BgME?=
+ =?us-ascii?Q?09CCW7veHKpJoIZDdw/ydIY9faI0M81/CqBrBjD8VbeMBRjoFekfAHKE77+C?=
+ =?us-ascii?Q?vSIaxC1MfaYeiBWZ4d5qOa0nEJqijCiUF8KFlJ23eua6lgaEZaDyi3mnbxpo?=
+ =?us-ascii?Q?gzbTta9hw6DJFpriyUUtITciUt2rNgH8HmuzNb7WDfxe6Sj1ZeoqkCTETdDp?=
+ =?us-ascii?Q?f2Z2P2U+kGM563YkD/fPg/3rQnu+Fn9lxnxtb9CjkW7uKM+bqmP5UP5zQnOz?=
+ =?us-ascii?Q?H2zcN/NCFlQcCzuGLXK4vO3dP8xzV64xhnxTwC0W3J1Bu1R+W+WT08JHGP+X?=
+ =?us-ascii?Q?wbu0kuBwpegqlQIVZuFlNE8cZF4rjhBPZgJVw2BfJf8qyAs+q1gww/cOegEz?=
+ =?us-ascii?Q?/YKAoRfs4Hx5k47nkUE2g9cDIUNm6feWe1tUUXWpFn3XIeAdGmwBQrEtyth9?=
+ =?us-ascii?Q?bv14nKUhk85vmy8vDlctn8Dnx2aHmythd7CO2r4N+YbrSOEHsAErJyRXTErQ?=
+ =?us-ascii?Q?kjpT07kcD0wgE2lbUXp96MS12sLSHrzXDb5WBdNDQYRjk0OcLSBA0RMAeXp5?=
+ =?us-ascii?Q?4BGgVs0tvVlJpruB6FqsH6J9phhbiDa2pK/qi+FHxNn8MYFNTbpQShI1ePSD?=
+ =?us-ascii?Q?qKGRhtOuy+iY10riIXe/448GXoSatIIa4eI6n+hWdXIBdkzKNK1soBzDl8kE?=
+ =?us-ascii?Q?HAGV4QzMGz3WVWwHBlzgT0BJww4h2WPDXi6pnUTBONQPiSwaYSfTrd8VL1UF?=
+ =?us-ascii?Q?rJVtGkYPfb7bv4uIPCVQkCcNbD1qOAma75WWh7w29th57fmLZV6vyyae/11v?=
+ =?us-ascii?Q?gE2YZ877eXqogbQsw/jlRDDoKXtHQvTWCEOoKJyjFpiNhMefFI2vetNXS7vh?=
+ =?us-ascii?Q?OX/oirkm9kgtIZoN1Y296FOMYFTcTpV68ttsxRC8+BV4DJ+v2t0CRvDD/Xfs?=
+ =?us-ascii?Q?4gYPc8H7kvi2J5Trk0hZaJTlylP0o13qrds+Fa3tcj5xC5z4nqT0pYKq13b8?=
+ =?us-ascii?Q?vCWOQgZDHRdqnfuybvTmbk8dRWpOKLUrqUC8KGJH86f/MViFiLVqENq9SO9I?=
+ =?us-ascii?Q?3+upaNfrpYJzCEpwuykf+uHJNiznvmIawf/Py2yivTNZ28diVMgNTtzC0684?=
+ =?us-ascii?Q?pyEnd8+vnsMA152YVronvLzg6DW0Do54iEV15/jcs/Mub0l94N8aXGzTR3fz?=
+ =?us-ascii?Q?fsaKSdBsW+G460+KHpfwXWZpZHkwUQuBxFYg9p/XTECTiRKaJUK2pfiH44Ed?=
+ =?us-ascii?Q?KEPb7nuvWaODvRPHjLQ1dWloNhTTcy/zzVWLPZrHZiZLx81rNDZt7T3hurJc?=
+ =?us-ascii?Q?mUnQf1Em6O+BDkoAIh0VSgiLJM/O?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400017)(7416005)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 May 2024 02:51:32.8534
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Nv6MAS1/UeXcq2v1qCvTMqObR0UVqv/sxr6vSWwSmRkTswUctrsdrLvBfoGRGw7gZg57OlAxBEktpcqQQFQAcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6497
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8670b248-83af-442d-9650-08dc73c0c369
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000F0E0.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8358
 
-
-
-On 11/05/2024 2:04 am, Sean Christopherson wrote:
-> On Thu, May 09, 2024, Isaku Yamahata wrote:
->> On Fri, May 10, 2024 at 11:19:44AM +1200, Kai Huang <kai.huang@intel.com> wrote:
->>> On 10/05/2024 10:52 am, Sean Christopherson wrote:
->>>> On Fri, May 10, 2024, Kai Huang wrote:
->>>>> On 10/05/2024 4:35 am, Sean Christopherson wrote:
->>>>>> KVM x86 limits KVM_MAX_VCPUS to 4096:
->>>>>>
->>>>>>      config KVM_MAX_NR_VCPUS
->>>>>> 	int "Maximum number of vCPUs per KVM guest"
->>>>>> 	depends on KVM
->>>>>> 	range 1024 4096
->>>>>> 	default 4096 if MAXSMP
->>>>>> 	default 1024
->>>>>> 	help
->>>>>>
->>>>>> whereas the limitation from TDX is apprarently simply due to TD_PARAMS taking
->>>>>> a 16-bit unsigned value:
->>>>>>
->>>>>>      #define TDX_MAX_VCPUS  (~(u16)0)
->>>>>>
->>>>>> i.e. it will likely be _years_ before TDX's limitation matters, if it ever does.
->>>>>> And _if_ it becomes a problem, we don't necessarily need to have a different
->>>>>> _runtime_ limit for TDX, e.g. TDX support could be conditioned on KVM_MAX_NR_VCPUS
->>>>>> being <= 64k.
->>>>>
->>>>> Actually later versions of TDX module (starting from 1.5 AFAICT), the module
->>>>> has a metadata field to report the maximum vCPUs that the module can support
->>>>> for all TDX guests.
->>>>
->>>> My quick glance at the 1.5 source shows that the limit is still effectively
->>>> 0xffff, so again, who cares?  Assert on 0xffff compile time, and on the reported
->>>> max at runtime and simply refuse to use a TDX module that has dropped the minimum
->>>> below 0xffff.
->>>
->>> I need to double check why this metadata field was added.  My concern is in
->>> future module versions they may just low down the value.
->>
->> TD partitioning would reduce it much.
+On Mon, May 13, 2024 at 04:48:25PM -0700, Sean Christopherson wrote:
+> On Wed, May 01, 2024, Michael Roth wrote:
+> > Version 2 of GHCB specification added support for the SNP Extended Guest
+> > Request Message NAE event. This event serves a nearly identical purpose
+> > to the previously-added SNP_GUEST_REQUEST event, but allows for
+> > additional certificate data to be supplied via an additional
+> > guest-supplied buffer to be used mainly for verifying the signature of
+> > an attestation report as returned by firmware.
+> > 
+> > This certificate data is supplied by userspace, so unlike with
+> > SNP_GUEST_REQUEST events, SNP_EXTENDED_GUEST_REQUEST events are first
+> > forwarded to userspace via a KVM_EXIT_VMGEXIT exit structure, and then
+> > the firmware request is made after the certificate data has been fetched
+> > from userspace.
+> > 
+> > Since there is a potential for race conditions where the
+> > userspace-supplied certificate data may be out-of-sync relative to the
+> > reported TCB or VLEK that firmware will use when signing attestation
+> > reports, a hook is also provided so that userspace can be informed once
+> > the attestation request is actually completed. See the updates to
+> > Documentation/ for more details on these aspects.
+> > 
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  Documentation/virt/kvm/api.rst | 87 ++++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/svm/sev.c         | 86 +++++++++++++++++++++++++++++++++
+> >  arch/x86/kvm/svm/svm.h         |  3 ++
+> >  include/uapi/linux/kvm.h       | 23 +++++++++
+> >  4 files changed, 199 insertions(+)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index f0b76ff5030d..f3780ac98d56 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -7060,6 +7060,93 @@ Please note that the kernel is allowed to use the kvm_run structure as the
+> >  primary storage for certain register types. Therefore, the kernel may use the
+> >  values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
+> >  
+> > +::
+> > +
+> > +		/* KVM_EXIT_VMGEXIT */
+> > +		struct kvm_user_vmgexit {
 > 
-> That's still not a reason to plumb in what is effectively dead code.  Either
-> partitioning is opt-in, at which I suspect KVM will need yet more uAPI to express
-> the limitations to userspace, or the TDX-module is potentially breaking existing
-> use cases.
+> LOL, it looks dumb, but maybe kvm_vmgexit_exit to avoid confusing about whether
+> the struct refers to host userspace vs. guest userspace?
+> 
+> Actually, I vote to punt on naming until more exits need to be kicked to userspace,
+> and just do (see below for details on how I got here):
+> 
+> 		/* KVM_EXIT_VMGEXIT */
+> 		struct {
+> 			__u64 exit_code;
+> 			union {
+> 				struct {
+> 					__u64 data_gpa;
+> 					__u64 data_npages;
+> 					__u64 ret;
+> 				} req_certs;
+> 			};
+> 		} vmgexit;
+> 
+> > +  #define KVM_USER_VMGEXIT_REQ_CERTS		1
+> > +			__u32 type; /* KVM_USER_VMGEXIT_* type */
+> 
+> Regardless of whether or not requesting a certificate is vendor specific enough
+> to justify its own exit reason, I don't think KVM should have a #VMGEXIT that
+> adds its own layer.  Structuring the user exit this way will make it weird and/or
+> difficult to handle #VMGEXITs that _do_ fit a generic pattern, e.g. a user might
+> wonder why PSC #VMGEXITs don't show up here.
+> 
+> And defining an exit reason that is, for all intents and purposes, a regurgitation
+> of the raw #VMGEXIT reason, but with a different value, is also confusing.  E.g.
+> it wouldn't be unreasonable for a reader to expect that "type" matches the value
+> defined in the GHCB (or whever the values are defined).
 
-The 'max_vcpus_per_td' global metadata fields is static for the TDX 
-module.  If the module supports the TD partitioning, it just reports 
-some smaller value regardless whether we opt-in TDX partitioning or not.
+The type in this case is actually "extended guest request". You'd rightly
+pointed out that that is miles away from describing what KVM wants
+userspace to do, so I named it "request certificate". And now with PSC being
+handled as seperate KVM_HC_MAP_GPA_RANGE event with no exposure of GHCB/etc
+to userspace, it made further sense to not lean too heavily on the GHCB for
+defining the types.
 
-I think the point is this 'max_vcpus_per_td' is TDX architectural thing 
-and kernel should not make any assumption of the value of it.  The 
-architectural behaviour is:
+But continuing to name it KVM_EXIT_VMGEXIT sort of goes against that
+decoupling, so I can see some potential for confusion there. KVM_EXIT_SNP is
+probably a better generic name for what this exit is meant to cover. But I'm
+not aware of anything specific that would involve requiring extending this in
+the near-term, though maybe there's some potential with live migration. So a
+renaming to something more generic and less specific to VMGEXIT/GHCB,
+like KVM_EXIT_SNP, or something more specific like KVM_EXIT_SNP_REQ_CERTS,
+both seem warranted, but I don't think moving to something more coupled to
+VMGEXIT/GHCB would provide much benefit long-term.
 
-   If the module has this 'max_vcpus_per_td', software should read and
-   use it; Otherwise software should treat it as U16_MAX.
+> 
+> Ah, you copied what KVM does for Hyper-V and Xen emulation.  Hrm.  But only
+> partially.
+> 
+> Assuming it's impractical to have a generic user exit for this, and we think
+> there is a high likelihood of needing to punt more #VMGEXITs to userspace, then
+> we should more closely (perhaps even exactly) follow the Hyper-V and Xen models.
+> I.e. for all values and whanot that are controlled/defined by a third party
+> (Hyper-V, Xen, the GHCB, etc.) #define those values in a header that is clearly
+> "owned" by the third party.
+> 
+> E.g. IIRC, include/xen/interface/xen.h is copied verbatim from Xen documentation
+> (source?).  And include/asm-generic/hyperv-tlfs.h is the kernel's copy of the
+> TLFS, which dictates all of the Hyper-V hypercalls.
+> 
+> If we do that, then my concerns/objections largely go away, e.g. KVM isn't
+> defining magic values, there's less chance for confusion about what "type" holds,
+> etc.
+> 
+> Oh, and if we go that route, the sizes for all fields should follow the GHCB,
+> e.g. I believe the "type" should be a __u64.
+> 
+> > +			union {
+> > +				struct {
+> > +					__u64 data_gpa;
+> > +					__u64 data_npages;
+> > +  #define KVM_USER_VMGEXIT_REQ_CERTS_ERROR_INVALID_LEN   1
+> > +  #define KVM_USER_VMGEXIT_REQ_CERTS_ERROR_BUSY          2
+> > +  #define KVM_USER_VMGEXIT_REQ_CERTS_ERROR_GENERIC       (1 << 31)
+> 
+> Hopefully it won't matter, but are BUSY and GENERIC actually defined somewhere?
+> I don't see them in GHCB 2.0.
 
-Thus I don't think we will need a new uAPI (TDX specific presumably) 
-just for TD partitioning.  And this doesn't break existing use cases.
+BUSY is defined in 4.1.7:
 
-In fact, this doesn't prevent us from making the KVM_CAP_MAX_VCPUS code 
-generic, e.g., we can do below:
+  It is not expected that a guest would issue many Guest Request NAE
+  events. However, access to the SNP firmware is a sequential and
+  synchronous operation. To avoid the possibility of a guest creating a
+  denial-of-service attack against the SNP firmware, it is recommended
+  that some form of rate limiting be implemented should it be detected
+  that a high number of Guest Request NAE events are being issued. To
+  allow for this, the hypervisor may set the SW_EXITINFO2 field to
+  0x0000000200000000, which will inform the guest to retry the request
 
-1) In tdx_vm_init() (called via KVM_VM_CREATE -> vt_vm_init()), we do:
+INVALID_LEN in 4.1.8.1:
 
-	kvm->max_vcpus = min(kvm->max_vcpus,
-				tdx_info->max_vcpus_per_td);
+  The hypervisor must validate that the guest has supplied enough pages
+  to hold the certificates that will be returned before performing the SNP
+  guest request. If there are not enough guest pages to hold the certificate
+  table and certificate data, the hypervisor will return the required number
+  of pages needed to hold the certificate table and certificate data in the
+  RBX register and set the SW_EXITINFO2 field to 0x0000000100000000.
 
-2) In kvm_vm_ioctl_enable_cap_generic(), we add support to handle 
-KVM_CAP_MAX_VCPUS to have the generic code to do:
+and GENERIC chosen to provide an non-zero error code that doesn't
+conflict with that above (or future) GHCB-defined values. But KVM isn't
+trying to expose the actual GHCB details, like how these values are to be in
+the upper 32-bits of SW_EXITINFO2, it just re-uses the values to avoid
+purposefully obfuscating the GHCB return codes they relate to.
 
-	if (new_max_vcpus > kvm->max_vcpus)
-		return -EINVAL;
+> 
+> In a perfect world, it would be nice for KVM to not have to care about the error
+> codes.  But KVM disallows KVM_{G,S}ET_REGS for guest with protected state, which
+> means it's not feasible for userspace to set registers, at least not in any sane
+> way.
+> 
+> Heh, we could abuse KVM_SYNC_X86_REGS to let userspace specify RBX, but (a) that's
+> gross, and (b) KVM_SYNC_X86_REGS and KVM_SYNC_X86_SREGS really ought to be rejected
+> if guest state is protected.
+> 
+> > +					__u32 ret;
+> > +  #define KVM_USER_VMGEXIT_REQ_CERTS_FLAGS_NOTIFY_DONE	BIT(0)
+> 
+> This has no business being buried in a VMGEXIT_REQ_CERTS flags.  Notifying
+> userspace that KVM completed its portion of a userspace exit is completely generic.
+> 
+> And aside from where the notification flag lives, _if_ we add a notification
+> mechanism, it belongs in a separate patch, because it's purely a performance
+> optimization.  Userspace can use immediate_exit to force KVM to re-exit after
+> completing an exit.
+> 
+> Actually, I take that back, this isn't even an optimization, it's literally a
+> non-generic implementation of kvm_run.immediate_exit.
 
-	kvm->max_vcpus = new_max_vcpus;
+Relying on a generic -EINTR response resulting from kvm_run.immediate_exit
+doesn't seem like a very robust way to ensure the attestation request
+was made to firmware. It seems fully possible that future code changes
+could result in EINTR being returned for other reasons. So how do you
+reliably detect that the EINTR is a result of immediate_exit being called
+after the attestation request is made to firmware? We could squirrel something
+away in struct kvm_run to probe for, but delivering another
+KVM_EXIT_SNP_REQ_CERT with an extra flag set seems to be reasonably
+userspace-friendly.
 
-However this means we only allow "lowing down" the kvm->max_vcpus in the 
-kvm_vm_ioctl_enable_cap_generic(KVM_CAP_MAX_VCPUS), but I think this is 
-acceptable?
+> 
+> If this were an optimization, i.e. KVM truly notified userspace without exiting,
+> then it would need to be a lot more robust, e.g. to ensure userspace actually
+> received the notification before KVM moved on.
 
-If it is a concern, alternatively, we can add a new 
-'kvm->hard_max_vcpus' (or whatever makes sense), and set it in 
-kvm_create_vm() right after kvm_arch_init_vm():
+Right, this does rely on exiting via , not userspace polling for flags or
+anything along that line.
 
-	r = kvm_arch_init_vm(kvm, type);
-         if (r)
-                 goto out_err_no_arch_destroy_vm;
+> 
+> > +					__u8 flags;
+> > +  #define KVM_USER_VMGEXIT_REQ_CERTS_STATUS_PENDING	0
+> > +  #define KVM_USER_VMGEXIT_REQ_CERTS_STATUS_DONE		1
+> 
+> This is also a weird reimplementation of generic functionality.  KVM nullifies
+> vcpu->arch.complete_userspace_io _before_ invoking the callback.  So if a callback
+> needs to run again on the next KVM_RUN, it can simply set complete_userspace_io
+> again.  In other words, literally doing nothing will get you what you want :-)
 
-	kvm->hard_max_vcpus = kvm->max_vcpus;
+We could just have the completion callback set complete_userspace_io
+again, but then you'd always get 2 userspace exit events per attestation
+request. There could be some userspaces that don't implement the
+file-locking scheme, in which case they wouldn't need the 2nd notification.
+That's why the KVM_USER_VMGEXIT_REQ_CERTS_FLAGS_NOTIFY_DONE flag is provided
+as an opt-in.
 
-So it always contains "the max_vcpus limited by the ARCH 
-hardware/firmware etc".
+The pending/done status bits are so userspace can distinguish between the
+start of a certificate request and the completion side of it after it gets
+bound a completed attestation request and the filelock can be released.
 
-And in kvm_vm_ioctl_enable_cap_generic(), we check against 
-kvm->hard_max_vcpus instead to get rid of the limitation of only 
-allowing lowing down the kvm->max_vcpus.
+Thanks,
 
-But I don't think this is necessary at this stage.
+Mike
+
+> 
+> > +					__u8 status;
+> > +				} req_certs;
+> > +			};
+> > +		};
 
