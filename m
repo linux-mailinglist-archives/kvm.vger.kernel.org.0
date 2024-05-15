@@ -1,126 +1,123 @@
-Return-Path: <kvm+bounces-17423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D70CA8C6549
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 13:01:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 178DF8C654B
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 13:01:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B4FE1F23FA6
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 11:01:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAB08283530
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 11:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5103679E5;
-	Wed, 15 May 2024 11:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01DEB679E5;
+	Wed, 15 May 2024 11:01:08 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BFF25684;
-	Wed, 15 May 2024 11:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC5B6166E;
+	Wed, 15 May 2024 11:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715770857; cv=none; b=KW79ae24X5jAmSkRLhmpc7u+rRRQ3cEGMZYJhLuhdfKYyf9+36ewm/vsz9MdeuAvbonPDB/h1E2DwbcvTzs6mcYKZP0ndYBAJ7Pkc8BvXGuHag869c7oJvbpQOmgcsvup7MT/KhIXxvDkLWSyCS2a87pnobHwReyWW/dauu6DAI=
+	t=1715770867; cv=none; b=U+es19TjtnsbD95AZaBVIz5qPe1/+hrwGvZ5MkClahcQb1xrfKn/WTZ4uv0Lk/BLGI9KInPmcHTrYPGptrTcpsToPAh423advDErUj3PZ/ySnDzveRFbj3kgNnH4zOAEMABLGrBCz1tHm604KQ8Wrm9wl1BcpIiF97U19/zrZ0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715770857; c=relaxed/simple;
-	bh=J0syEP7m8ViRgWIbwy/RsJt/oCEtIdMONMLqCdV2agU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jqByRfHTbxBwpEeKGeEC4SDI21uujGeTp8IukEZZD/YEPSpIAOI4EfJ4UFqiQWu/VLrzSvBpH2o6DgU2Kq/hFH0x3cLtJIYEcpcnTOVTJa+XXSsWOKm9dqXKZXJTV03t66nydAUq0bi7gmTRIjW68/sZOx+lEHDcbWchqdjztHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 56E141042;
-	Wed, 15 May 2024 04:01:18 -0700 (PDT)
-Received: from [10.57.34.212] (unknown [10.57.34.212])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC2293F762;
-	Wed, 15 May 2024 04:00:50 -0700 (PDT)
-Message-ID: <4e89f047-ae70-43a8-a459-e375ca05b2c2@arm.com>
-Date: Wed, 15 May 2024 12:00:49 +0100
+	s=arc-20240116; t=1715770867; c=relaxed/simple;
+	bh=qpg84gYPLFPNjhtRges7kVRAYlORPDiwFGtGDMreZmg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oJUNBKFvwluWjEqAYCjBkG6hY5WJO5RkqRYv/HET59YbH7JgJl+LMgsWWfS7eHmyDZz1WvCyltVDk/h5o2nUCvYooV/sNSII9l8SSAUXnyYEO8Q2MgP5ZrAMhRILkXLAFvn22XdvMPh793LnSU79Q/fNt2X1aF9VOIOREswNgjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECA0BC116B1;
+	Wed, 15 May 2024 11:01:03 +0000 (UTC)
+Date: Wed, 15 May 2024 12:01:01 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+Message-ID: <ZkSV7Z8QFQYLETzD@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-13-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/14] arm64: Force device mappings to be non-secure
- shared
-Content-Language: en-GB
-To: Catalin Marinas <catalin.marinas@arm.com>,
- Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
- <maz@kernel.org>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Zenghui Yu <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-11-steven.price@arm.com> <ZkR535Hmh3WkMYai@arm.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <ZkR535Hmh3WkMYai@arm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240412084213.1733764-13-steven.price@arm.com>
 
-On 15/05/2024 10:01, Catalin Marinas wrote:
-> On Fri, Apr 12, 2024 at 09:42:09AM +0100, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> Device mappings (currently) need to be emulated by the VMM so must be
->> mapped shared with the host.
-> 
-> You say "currently". What's the plan when the device is not emulated?
-> How would the guest distinguish what's emulated and what's not to avoid
-> setting the PROT_NS_SHARED bit?
+On Fri, Apr 12, 2024 at 09:42:11AM +0100, Steven Price wrote:
+> @@ -198,6 +201,33 @@ static DEFINE_IDA(its_vpeid_ida);
+>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+>  
+> +static struct page *its_alloc_shared_pages_node(int node, gfp_t gfp,
+> +						unsigned int order)
+> +{
+> +	struct page *page;
+> +
+> +	if (node == NUMA_NO_NODE)
+> +		page = alloc_pages(gfp, order);
+> +	else
+> +		page = alloc_pages_node(node, gfp, order);
 
-Arm CCA plans to add support for passing through real devices,
-which support PCI-TDISP protocol. This would involve the Realm
-authenticating the device and explicitly requesting "protected"
-mapping *after* the verification (with the help of RMM).
+I think you can just call alloc_pages_node() in both cases. This
+function takes care of the NUMA_NO_NODE case itself.
 
+> +
+> +	if (page)
+> +		set_memory_decrypted((unsigned long)page_address(page),
+> +				     1 << order);
+> +	return page;
+> +}
+> +
+> +static struct page *its_alloc_shared_pages(gfp_t gfp, unsigned int order)
+> +{
+> +	return its_alloc_shared_pages_node(NUMA_NO_NODE, gfp, order);
+> +}
+> +
+> +static void its_free_shared_pages(void *addr, unsigned int order)
+> +{
+> +	set_memory_encrypted((unsigned long)addr, 1 << order);
+> +	free_pages((unsigned long)addr, order);
+> +}
 
+More of a nitpick on the naming: Are these functions used by the host as
+well? The 'shared' part of the name does not make much sense, so maybe
+just call them its_alloc_page() etc.
 
+> @@ -3432,7 +3468,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>  	nr_ites = max(2, nvecs);
+>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+> +	itt_order = get_order(sz);
+> +	page = its_alloc_shared_pages_node(its->numa_node,
+> +					   GFP_KERNEL | __GFP_ZERO,
+> +					   itt_order);
 
-> 
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->>   arch/arm64/include/asm/pgtable.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
->> index f5376bd567a1..db71c564ec21 100644
->> --- a/arch/arm64/include/asm/pgtable.h
->> +++ b/arch/arm64/include/asm/pgtable.h
->> @@ -598,7 +598,7 @@ static inline void set_pud_at(struct mm_struct *mm, unsigned long addr,
->>   #define pgprot_writecombine(prot) \
->>   	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_NORMAL_NC) | PTE_PXN | PTE_UXN)
->>   #define pgprot_device(prot) \
->> -	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN)
->> +	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN | PROT_NS_SHARED)
-> 
-> This pgprot_device() is not the only one used to map device resources.
-> pgprot_writecombine() is another commonly macro. It feels like a hack to
-> plug one but not the other and without any way for the guest to figure
-> out what's emulated.
+How much do we waste by going for a full page always if this is going to
+be used on the host?
 
-Agree. I have been exploring hooking this into ioremap_prot() where we
-could apply the attribute accordingly. We will change it in the next 
-version.
+> +	if (!page)
+> +		return NULL;
+> +	itt = (void *)page_address(page);
 
-> 
-> Can the DT actually place those emulated ranges in the higher IPA space
-> so that we avoid randomly adding this attribute for devices?
+page_address() has the void * type already.
 
-It can, but then we kind of break the "Realm" view of the IPA space. 
-i.e., right now it only knows about the "lower IPA" half and uses the 
-top bit as a protection attr to access the IPA as shared.
-
-Expanding IPA size view kind of breaks "sharing memory", where, we
-must "use a different PA" for a page that is now shared.
-
-Suzuki
-
-
+-- 
+Catalin
 
