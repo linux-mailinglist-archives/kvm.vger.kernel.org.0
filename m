@@ -1,186 +1,321 @@
-Return-Path: <kvm+bounces-17436-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17437-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D8C8C6912
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 16:57:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E80F8C692A
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 17:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46A801C21340
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 14:57:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3A9DB21379
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 15:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714E8155747;
-	Wed, 15 May 2024 14:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgI4gCrh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F5F15574C;
+	Wed, 15 May 2024 15:03:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926A81E480;
-	Wed, 15 May 2024 14:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0ED01553BF;
+	Wed, 15 May 2024 15:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715785062; cv=none; b=ucax1CJey5L551qdry2hehaCZ8Qi762hNWG3OZy8mQMEdQ3oXA5iHnd7IHHl0P6DkvpKPD/kranl4WGYA7mxeAI296Rol/luySJonVeIjGGAMMN8HU1kHtEG7UjWpbw0BRvxL1UIQagtN8fpWY2fnUxN/CYC0jbRLK6J3HmQ0rU=
+	t=1715785408; cv=none; b=FafCGtp4EO10rI+DUL17hEL/sVZPfa4+4FgDPWcXtgmNXl3jP+kyFeBbQYgsnWFmzfhglRUtkYfCFSRtSRGWfeBCZzZ0Yd5Bh6UdW8brbkoP29O8kwjj0ApZrn5jGYZ80DEYp/NRpUHTwEOhW2qIqGE6alzQWWgN/lgm5ffo+Hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715785062; c=relaxed/simple;
-	bh=WZoYbqGGnOPQEjzC3t94VjU0p7tCnohke6zY104Itrk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kOFhEeiiQJRzi/hOfAcsc7A2jGwCBrvIcrQPdhJDVbet/IGobrFypMW+1UpQ+IOMuhohk6zQ7D+swNviiTa9O+0AiEBo1ZFPX287imc8nS12fj+i1w66NG+ufpQ8eNZOlNKqc5AAGFWaSAMMcs3YKWx0SKvJr5FR2fyOAd2lg88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgI4gCrh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18897C116B1;
-	Wed, 15 May 2024 14:57:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715785062;
-	bh=WZoYbqGGnOPQEjzC3t94VjU0p7tCnohke6zY104Itrk=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=dgI4gCrhm8ErfM11kskowGtGU8gXHhXctsKdQ//nEYfJmqUINpSzyGocVth4T8O+S
-	 6r34N50hcA6BI5OpysiZAV0F7tOBtIwyWxEtRTVvuW5udYhX1q3Akx0bwypugodVSr
-	 HPQyQlnCIi33KvUPHjJIWBg4DYI2BOTm1U7VVWL67o6AZiVo1ytt3YnGiW+84WYM4w
-	 OYRU0HGC7DEtnzjEH8YrHTsFxUisoJkdSjMGS7DUDJ/3ekkGD/P9aMQa0jcuTKZvnH
-	 71SAJ8sNH02NEfafNORz4gL1rMQVv5bobaWtPBpXDs91EGw6u88Yfi4QkwS9nVWXtk
-	 8dw6KyydEb3ow==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 46BE9CE0443; Wed, 15 May 2024 07:57:41 -0700 (PDT)
-Date: Wed, 15 May 2024 07:57:41 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Leonardo Bras <leobras@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
-Message-ID: <17ebd54d-a058-4bc8-bd65-a175d73b6d1a@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240511020557.1198200-1-leobras@redhat.com>
- <ZkJsvTH3Nye-TGVa@google.com>
- <CAJ6HWG7pgMu7sAUPykFPtsDfq5Kfh1WecRcgN5wpKQj_EyrbJA@mail.gmail.com>
- <68c39823-6b1d-4368-bd1e-a521ade8889b@paulmck-laptop>
- <ZkQ97QcEw34aYOB1@LeoBras>
+	s=arc-20240116; t=1715785408; c=relaxed/simple;
+	bh=bylLm4vBR7uF8DJjgfEFk5Uyg7AOg+1HrxqT9xiN++I=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=HQIjzpypbHt/dWRTDP9xz++soGI9t6wruDUP+afgVe3oNgGdVIHh3Mi7D/87SA/75PzdnVbZHyx91ASzUmQf3EFpoV+rXsufm0Z0QO5odvWx06lmLzszDxEGKiZXfGkNF/G8FOQ1+OzUEUde0GopuBo8D9C9Rn4WWngRjtWJFmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A2311007;
+	Wed, 15 May 2024 08:03:50 -0700 (PDT)
+Received: from [10.57.35.28] (unknown [10.57.35.28])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D06513F7A6;
+	Wed, 15 May 2024 08:03:22 -0700 (PDT)
+Message-ID: <6fef6e77-a173-4c66-bf6c-574c19820dfa@arm.com>
+Date: Wed, 15 May 2024 16:03:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZkQ97QcEw34aYOB1@LeoBras>
+User-Agent: Mozilla Thunderbird
+From: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v2 02/14] arm64: Detect if in a realm and set RIPAS RAM
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-3-steven.price@arm.com> <Zj5a9Kt6r7U9WN5E@arm.com>
+Content-Language: en-GB
+In-Reply-To: <Zj5a9Kt6r7U9WN5E@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 15, 2024 at 01:45:33AM -0300, Leonardo Bras wrote:
-> On Tue, May 14, 2024 at 03:54:16PM -0700, Paul E. McKenney wrote:
-> > On Mon, May 13, 2024 at 06:47:13PM -0300, Leonardo Bras Soares Passos wrote:
-> > > On Mon, May 13, 2024 at 4:40 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Fri, May 10, 2024, Leonardo Bras wrote:
-> > > > > As of today, KVM notes a quiescent state only in guest entry, which is good
-> > > > > as it avoids the guest being interrupted for current RCU operations.
-> > > > >
-> > > > > While the guest vcpu runs, it can be interrupted by a timer IRQ that will
-> > > > > check for any RCU operations waiting for this CPU. In case there are any of
-> > > > > such, it invokes rcu_core() in order to sched-out the current thread and
-> > > > > note a quiescent state.
-> > > > >
-> > > > > This occasional schedule work will introduce tens of microsseconds of
-> > > > > latency, which is really bad for vcpus running latency-sensitive
-> > > > > applications, such as real-time workloads.
-> > > > >
-> > > > > So, note a quiescent state in guest exit, so the interrupted guests is able
-> > > > > to deal with any pending RCU operations before being required to invoke
-> > > > > rcu_core(), and thus avoid the overhead of related scheduler work.
-> > > >
-> > > > Are there any downsides to this?  E.g. extra latency or anything?  KVM will note
-> > > > a context switch on the next VM-Enter, so even if there is extra latency or
-> > > > something, KVM will eventually take the hit in the common case no matter what.
-> > > > But I know some setups are sensitive to handling select VM-Exits as soon as possible.
-> > > >
-> > > > I ask mainly because it seems like a no brainer to me to have both VM-Entry and
-> > > > VM-Exit note the context switch, which begs the question of why KVM isn't already
-> > > > doing that.  I assume it was just oversight when commit 126a6a542446 ("kvm,rcu,nohz:
-> > > > use RCU extended quiescent state when running KVM guest") handled the VM-Entry
-> > > > case?
-> > > 
-> > > I don't know, by the lore I see it happening in guest entry since the
-> > > first time it was introduced at
-> > > https://lore.kernel.org/all/1423167832-17609-5-git-send-email-riel@redhat.com/
-> > > 
-> > > Noting a quiescent state is cheap, but it may cost a few accesses to
-> > > possibly non-local cachelines. (Not an expert in this, Paul please let
-> > > me know if I got it wrong).
-> > 
-> > Yes, it is cheap, especially if interrupts are already disabled.
-> > (As in the scheduler asks RCU to do the same amount of work on its
-> > context-switch fastpath.)
+On 10/05/2024 18:35, Catalin Marinas wrote:
+> On Fri, Apr 12, 2024 at 09:42:01AM +0100, Steven Price wrote:
+>> diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
+>> new file mode 100644
+>> index 000000000000..3b56aac5dc43
+>> --- /dev/null
+>> +++ b/arch/arm64/include/asm/rsi.h
+>> @@ -0,0 +1,46 @@
+>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>> +/*
+>> + * Copyright (C) 2023 ARM Ltd.
 > 
-> Thanks!
-> 
-> > 
-> > > I don't have a historic context on why it was just implemented on
-> > > guest_entry, but it would make sense when we don't worry about latency
-> > > to take the entry-only approach:
-> > > - It saves the overhead of calling rcu_virt_note_context_switch()
-> > > twice per guest entry in the loop
-> > > - KVM will probably run guest entry soon after guest exit (in loop),
-> > > so there is no need to run it twice
-> > > - Eventually running rcu_core() may be cheaper than noting quiescent
-> > > state every guest entry/exit cycle
-> > > 
-> > > Upsides of the new strategy:
-> > > - Noting a quiescent state in guest exit avoids calling rcu_core() if
-> > > there was a grace period request while guest was running, and timer
-> > > interrupt hits the cpu.
-> > > - If the loop re-enter quickly there is a high chance that guest
-> > > entry's rcu_virt_note_context_switch() will be fast (local cacheline)
-> > > as there is low probability of a grace period request happening
-> > > between exit & re-entry.
-> > > - It allows us to use the rcu patience strategy to avoid rcu_core()
-> > > running if any grace period request happens between guest exit and
-> > > guest re-entry, which is very important for low latency workloads
-> > > running on guests as it reduces maximum latency in long runs.
-> > > 
-> > > What do you think?
-> > 
-> > Try both on the workload of interest with appropriate tracing and
-> > see what happens?  The hardware's opinion overrides mine.  ;-)
-> 
-> That's a great approach!
-> 
-> But in this case I think noting a quiescent state in guest exit is 
-> necessary to avoid a scenario in which a VM takes longer than RCU 
-> patience, and it ends up running rcuc in a nohz_full cpu, even if guest 
-> exit was quite brief. 
-> 
-> IIUC Sean's question is more on the tone of "Why KVM does not note a 
-> quiescent state in guest exit already, if it does in guest entry", and I 
-> just came with a few arguments to try finding a possible rationale, since 
-> I could find no discussion on that topic in the lore for the original 
-> commit.
+> You may want to update the year ;).
 
-Understood, and maybe trying it would answer that question quickly.
-Don't get me wrong, just because it appears to work in a few tests doesn't
-mean that it really works, but if it visibly blows up, that answers the
-question quite quickly and easily.  ;-)
+Noted! ;)
 
-But yes, if it appears to work, there must be a full investigation into
-whether or not the change really is safe.
+>> + */
+>> +
+>> +#ifndef __ASM_RSI_H_
+>> +#define __ASM_RSI_H_
+>> +
+>> +#include <linux/jump_label.h>
+>> +#include <asm/rsi_cmds.h>
+>> +
+>> +extern struct static_key_false rsi_present;
+> 
+> Nitpick: we tend to use DECLARE_STATIC_KEY_FALSE(), it pairs with
+> DEFINE_STATIC_KEY_FALSE().
 
-							Thanx, Paul
+Makes sense.
 
-> Since noting a quiescent state in guest exit is cheap enough, avoids rcuc 
-> schedules when grace period starts during guest execution, and enables a 
-> much more rational usage of RCU patience, it's a safe to assume it's a 
-> better way of dealing with RCU compared to current implementation.
+>> +void arm64_setup_memory(void);
+>> +
+>> +void __init arm64_rsi_init(void);
+>> +static inline bool is_realm_world(void)
+>> +{
+>> +	return static_branch_unlikely(&rsi_present);
+>> +}
+>> +
+>> +static inline void set_memory_range(phys_addr_t start, phys_addr_t end,
+>> +				    enum ripas state)
+>> +{
+>> +	unsigned long ret;
+>> +	phys_addr_t top;
+>> +
+>> +	while (start != end) {
+>> +		ret = rsi_set_addr_range_state(start, end, state, &top);
+>> +		BUG_ON(ret);
+>> +		BUG_ON(top < start);
+>> +		BUG_ON(top > end);
 > 
-> Sean, what do you think?
+> Are these always fatal? BUG_ON() is frowned upon in general. The
+> alternative would be returning an error code from the function and maybe
+> printing a warning here (it seems that some people don't like WARN_ON
+> either but it's better than BUG_ON; could use a pr_err() instead). Also
+> if something's wrong with the RSI interface to mess up the return
+> values, it will be hard to debug just from those BUG_ON().
 > 
-> Thanks!
-> Leo
+> If there's no chance of continuing beyond the point, add a comment on
+> why we have a BUG_ON().
+
+I think you're right, these shouldn't be (immediately) fatal - if this
+is a change happening at runtime it might be possible to handle it.
+However, at boot time it makes no sense to try to continue (which is
+what I was originally looking at when this was written) as the
+environment isn't what the guest is expecting, and continuing will
+either lead to a later crash, attestation failure, or potential exploit
+if the guest can be somehow be tricked to use the shared mapping rather
+than the protected one.
+
+I'll update the set_memory_range...() functions to return an error code
+and push the boot BUG_ON up the chain (with a comment). But this is
+still in the "should never happen" situation so I'll leave a WARN_ON here.
+
+>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+>> new file mode 100644
+>> index 000000000000..1076649ac082
+>> --- /dev/null
+>> +++ b/arch/arm64/kernel/rsi.c
+>> @@ -0,0 +1,58 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (C) 2023 ARM Ltd.
+>> + */
+>> +
+>> +#include <linux/jump_label.h>
+>> +#include <linux/memblock.h>
+>> +#include <asm/rsi.h>
+>> +
+>> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
+>> +EXPORT_SYMBOL(rsi_present);
 > 
-> > 
-> > 							Thanx, Paul
-> > 
+> Does this need to be made available to loadable modules?
+
+It's used by drivers/virt/coco/arm-cca-guest/arm-cca-guest.c (through
+is_realm_world()) which can be built as a module - see patch 14.
+
+>> +
+>> +static bool rsi_version_matches(void)
+>> +{
+>> +	unsigned long ver;
+>> +	unsigned long ret = rsi_get_version(RSI_ABI_VERSION, &ver, NULL);
 > 
+> I wonder whether rsi_get_version() is the right name (I know it was
+> introduced in the previous patch but the usage is here, hence my
+> comment). From the RMM spec, this looks more like an
+> rsi_request_version() to me.
+> 
+> TBH, the RMM spec around versioning doesn't fully make sense to me ;). I
+> assume people working on it had some good reasons around the lower
+> revision reporting in case of an error.
+
+There's been a fair bit of discussion around versioning. Currently the
+RMM implementation is very much a "get version" function. The issue was
+what happens if in the future there is an incompatible RMM spec (i.e.
+v2.0). The intention is that old OSes will provide the older version
+number and give the RMM the opportunity to 'emulate' it. Equally where
+the OS supports multiple versions then there's a need to negotiate a
+commonly accepted version.
+
+In terms of naming - mostly I've tried to just follow the spec, but the
+naming in the spec isn't great. Calling the function rsi_version() would
+be confusing so a verb is needed, but I'm not hung up on the verb. I'll
+change it to rsi_request_version().
+
+>> +
+>> +	if (ret == SMCCC_RET_NOT_SUPPORTED)
+>> +		return false;
+>> +
+>> +	if (ver != RSI_ABI_VERSION) {
+>> +		pr_err("RME: RSI version %lu.%lu not supported\n",
+>> +		       RSI_ABI_VERSION_GET_MAJOR(ver),
+>> +		       RSI_ABI_VERSION_GET_MINOR(ver));
+>> +		return false;
+>> +	}
+> 
+> The above check matches what the spec says but wouldn't it be clearer to
+> just check for ret == RSI_SUCCESS? It saves one having to read the spec
+> to figure out what lower revision actually means in the spec (not the
+> actual lowest supported but the highest while still lower than the
+> requested one _or_ equal to the higher revision if the lower is higher
+> than the requested one - if any of this makes sense to people ;), I'm
+> sure I missed some other combinations).
+
+Indeed - I got similar feedback on the RMI side. The spec evolved and I
+forgot to update it. It should be sufficient (for now) to just look for
+RSI_SUCCESS. Only when we start supporting multiple versions (on the
+Linux side) do we need to look at the returned version numbers.
+
+>> +
+>> +	pr_info("RME: Using RSI version %lu.%lu\n",
+>> +		RSI_ABI_VERSION_GET_MAJOR(ver),
+>> +		RSI_ABI_VERSION_GET_MINOR(ver));
+>> +
+>> +	return true;
+>> +}
+>> +
+>> +void arm64_setup_memory(void)
+> 
+> I would give this function a better name, something to resemble the RSI
+> setup. Similarly for others like set_memory_range_protected/shared().
+> Some of the functions have 'rsi' in the name like arm64_rsi_init() but
+> others don't and at a first look they'd seem like some generic memory
+> setup on arm64, not RSI-specific.
+
+Ack.
+
+>> +{
+>> +	u64 i;
+>> +	phys_addr_t start, end;
+>> +
+>> +	if (!static_branch_unlikely(&rsi_present))
+>> +		return;
+> 
+> We have an accessor for rsi_present - is_realm_world(). Why not use
+> that?
+
+Will change.
+
+>> +
+>> +	/*
+>> +	 * Iterate over the available memory ranges
+>> +	 * and convert the state to protected memory.
+>> +	 */
+>> +	for_each_mem_range(i, &start, &end) {
+>> +		set_memory_range_protected(start, end);
+>> +	}
+>> +}
+>> +
+>> +void __init arm64_rsi_init(void)
+>> +{
+>> +	if (!rsi_version_matches())
+>> +		return;
+>> +
+>> +	static_branch_enable(&rsi_present);
+>> +}
+>> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+>> index 65a052bf741f..a4bd97e74704 100644
+>> --- a/arch/arm64/kernel/setup.c
+>> +++ b/arch/arm64/kernel/setup.c
+>> @@ -43,6 +43,7 @@
+>>  #include <asm/cpu_ops.h>
+>>  #include <asm/kasan.h>
+>>  #include <asm/numa.h>
+>> +#include <asm/rsi.h>
+>>  #include <asm/scs.h>
+>>  #include <asm/sections.h>
+>>  #include <asm/setup.h>
+>> @@ -293,6 +294,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+>>  	 * cpufeature code and early parameters.
+>>  	 */
+>>  	jump_label_init();
+>> +	/* Init RSI after jump_labels are active */
+>> +	arm64_rsi_init();
+>>  	parse_early_param();
+> 
+> Does it need to be this early? It's fine for now but I wonder whether we
+> may have some early parameter at some point that could influence what we
+> do in the arm64_rsi_init(). I'd move it after or maybe even as part of
+> the arm64_setup_memory(), though I haven't read the following patches if
+> they update this function.
+
+As Suzuki said - it's needed for "earlycon" to work - I'll put a comment
+in explaining.
+
+>>  
+>>  	dynamic_scs_init();
+>> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+>> index 03efd86dce0a..786fd6ce5f17 100644
+>> --- a/arch/arm64/mm/init.c
+>> +++ b/arch/arm64/mm/init.c
+>> @@ -40,6 +40,7 @@
+>>  #include <asm/kvm_host.h>
+>>  #include <asm/memory.h>
+>>  #include <asm/numa.h>
+>> +#include <asm/rsi.h>
+>>  #include <asm/sections.h>
+>>  #include <asm/setup.h>
+>>  #include <linux/sizes.h>
+>> @@ -313,6 +314,7 @@ void __init arm64_memblock_init(void)
+>>  	early_init_fdt_scan_reserved_mem();
+>>  
+>>  	high_memory = __va(memblock_end_of_DRAM() - 1) + 1;
+>> +	arm64_setup_memory();
+>>  }
+> 
+> This feels like a random placement. This function is about memblock
+> initialisation. You might as well put it in paging_init(), it could make
+> more sense there. But I'd rather keep it in setup_arch() immediately
+> after arm64_memblock_init().
+> 
+
+Will move.
+
+Thanks,
+
+Steve
 
