@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-17402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17403-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 836778C5E8C
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 03:02:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA46E8C5E8F
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 03:02:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A56C31C20FE0
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 01:02:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7ECD1C208D3
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 01:02:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669672D054;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8928D2E416;
 	Wed, 15 May 2024 01:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nOy4ugC1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iq4SykKi"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BAB1EB26;
-	Wed, 15 May 2024 01:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170C9208CA;
+	Wed, 15 May 2024 01:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715734810; cv=none; b=kKAiCysAczkc2spuOD3iynWvWjFgYPQUFMb+PDB36FyHQ90jt2tZQV1sb3KpqnKfS2fWlBZ4xNe2B8TW0nY0kTp/8tMtpR7LfO2upXRu1tCfj85zhvw1nNgrSz2HltM0WXjSiLi1VQiDcotfFK7VfrZgHZAU5yXCBFoj3dfl9Vw=
+	t=1715734810; cv=none; b=b1vCsnPZcwNO0ScMairq4uhrL+ABdJylPRcDllP8IEY+ei5z8pZwCazFF3FRF5r7znVHDtWzx3tTH+v+YHNakGO0ekpLWmPN0Yzm521xZJryzv/96XWv7G9zDwGCr0extwbs8Zn2m/iWTbTKqm0fzhAIdyM4l3qy6ZljGIKtpaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1715734810; c=relaxed/simple;
-	bh=+6tj0kEKZAuUZugRM5HgXHgBCG9pzGLg+BLWoV5ezpM=;
+	bh=F8pMCkdedaDEThDQRu19WnnjslknaUfMOKX2A+N1yxQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bOPRQNbGqCOkFEdgsuK712/Vb7sdAfkucoMH8hFOSIXtyj3I9W2a70SVogjyw/cFnSnHBZj7K/1bpJ1gqGv6BO1Ctfiu4hJJW2nm2wdzoDTu9wUUTgKfAZVV6TrloKwIEk6E0nMpR9TmrU612Bb4KLNVlQFEvBs5w01ZJAfyK2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nOy4ugC1; arc=none smtp.client-ip=192.198.163.19
+	 MIME-Version; b=nD8S8lczp9Rfquuhtim4MfeNOXiy+h4ugXeZTdItiS4nLRWja3UtHiMgUoOX3zwhQ35N0nfPBiiQTKDRb6BuKJXslnnFX5fvIF6ppqpb82KK0tSvLGT289APcVL+U+wQMYKeVQpZtBOBLnL4ugxbekYlSmwx6L2qq/21uw7vW7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iq4SykKi; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,28 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1715734809; x=1747270809;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+6tj0kEKZAuUZugRM5HgXHgBCG9pzGLg+BLWoV5ezpM=;
-  b=nOy4ugC1lSOA3L5juhZaKHEFM0JrooZMkKrefZuLDxx/7bP/NKmDih6q
-   93xuDPn9SZcKy7UijJwZqlMzdeLKBDNqflMyXn2RbKzXoErfdq+Z7ud8t
-   pRoS3+L7WH9jNXqAUC2LTezh+joU1MXsmQxLi6+GCuiwfwVbmcT4yes6T
-   zb8dHEHTCsGSl/ThrD3FQXuhv+RYG7z+gKfYE2AsJoj19g12ZvDax/gHN
-   lLfYKDgWBA6pYaIgGAn+rAD+cv79z3p0ip6agFLdBCQorprUI7pFcau3k
-   k3tBofCh3557UhYOzkUQUz3NDAYxbcu2M6gLbs2umEotX2dImd1octJfv
+  bh=F8pMCkdedaDEThDQRu19WnnjslknaUfMOKX2A+N1yxQ=;
+  b=iq4SykKiBCkQRz22jrQ8/Fg8/A2SipiWvWkvsku1XngWBLP9Z2ylxqos
+   SwxC9ZBECrxA5toFzxEfa7L0luihlFJVGr1oEJTdUEiAtHRm2ERiQvHR9
+   HYzUle236moJVhbfGdQzkWIXjfUle8A7gkPx7luh4geyDLMm32Ebuz4Dj
+   Lw7NKIPEkMeP4pr5HKL1zD2gbSj4R5tvJjBq5FVB1BtZM/fdTi+5XWKpc
+   Er48fqj46pZNW4zptZj3OuHQdz9cqFyYY1RpqaclQyxPctd8yQaXv3wqD
+   djomzv1WJeNbQe+IwzBhCUCjQfo5pDmJ/ehMQgGMuIk9IlT96ya65iGLm
    A==;
-X-CSE-ConnectionGUID: wODc1ON9TVCTOF3fHbs+lg==
-X-CSE-MsgGUID: LUCFnbToQb6dY0cP9D6wBw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11073"; a="11613963"
+X-CSE-ConnectionGUID: aucpdI9cT6emLVw5xIz7CA==
+X-CSE-MsgGUID: 5K97AqX5Sxq2COkilqo6rA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11073"; a="11613967"
 X-IronPort-AV: E=Sophos;i="6.08,160,1712646000"; 
-   d="scan'208";a="11613963"
+   d="scan'208";a="11613967"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 18:00:05 -0700
-X-CSE-ConnectionGUID: bbyX+Y9bRnCQGjviptusEw==
-X-CSE-MsgGUID: GMk516bPQ/inx3OLKItl4A==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 18:00:06 -0700
+X-CSE-ConnectionGUID: AOJ4G5LsTwGNnoW5TOQ9hw==
+X-CSE-MsgGUID: puttENqYQQS+WPln4B9VHA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,160,1712646000"; 
-   d="scan'208";a="30942765"
+   d="scan'208";a="30942777"
 Received: from oyildiz-mobl1.amr.corp.intel.com (HELO rpedgeco-desk4.intel.com) ([10.209.51.34])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 18:00:04 -0700
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 May 2024 18:00:05 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: pbonzini@redhat.com,
 	seanjc@google.com,
@@ -69,9 +69,9 @@ Cc: linux-kernel@vger.kernel.org,
 	yan.y.zhao@intel.com,
 	dmatlack@google.com,
 	rick.p.edgecombe@intel.com
-Subject: [PATCH 08/16] KVM: x86/mmu: Bug the VM if kvm_zap_gfn_range() is called for TDX
-Date: Tue, 14 May 2024 17:59:44 -0700
-Message-Id: <20240515005952.3410568-9-rick.p.edgecombe@intel.com>
+Subject: [PATCH 09/16] KVM: x86/mmu: Make kvm_tdp_mmu_alloc_root() return void
+Date: Tue, 14 May 2024 17:59:45 -0700
+Message-Id: <20240515005952.3410568-10-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240515005952.3410568-1-rick.p.edgecombe@intel.com>
 References: <20240515005952.3410568-1-rick.p.edgecombe@intel.com>
@@ -83,95 +83,79 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When virtualizing some CPU features, KVM uses kvm_zap_gfn_range() to zap
-guest mappings so they can be faulted in with different PTE properties.
+The kvm_tdp_mmu_alloc_root() function currently always returns 0. This
+allows for the caller, mmu_alloc_direct_roots(), to call
+kvm_tdp_mmu_alloc_root() and also return 0 in one line:
+   return kvm_tdp_mmu_alloc_root(vcpu);
 
-For TDX private memory this technique is fundamentally not possible.
-Remapping private memory requires the guest to "accept" it, and also the
-needed PTE properties are not currently supported by TDX for private
-memory.
+So it is useful even though the return value of kvm_tdp_mmu_alloc_root()
+is always the same. However, in future changes, kvm_tdp_mmu_alloc_root()
+will be called twice in mmu_alloc_direct_roots(). This will force the
+first call to either awkwardly handle the return value that will always
+be zero or ignore it. So change kvm_tdp_mmu_alloc_root() to return void.
+Do it in a separate change so the future change will be cleaner.
 
-These CPU features are:
-1) MTRR update
-2) CR0.CD update
-3) Non-coherent DMA status update
-4) APICV update
-
-Since they cannot be supported, they should be blocked from being
-exercised by a TD. In the case of CRO.CD, the feature is fundamentally not
-supported for TDX as it cannot see the guest registers. For APICV
-inhibit it in future changes.
-
-Guest MTRR support is more of an interesting case. Supported versions of
-the TDX module fix the MTRR CPUID bit to 1, but as previously discussed,
-it is not possible to fully support the feature. This leaves KVM with a
-few options:
- - Support a modified version of the architecture where the caching
-   attributes are ignored for private memory.
- - Don't support MTRRs and treat the set MTRR CPUID bit as a TDX Module
-   bug.
-
-With the additional consideration that likely guest MTRR support in KVM
-will be going away, the later option is the best. Prevent MTRR MSR writes
-from calling kvm_zap_gfn_range() in future changes.
-
-Lastly, the most interesting case is non-coherent DMA status updates.
-There isn't a way to reject the call. KVM is just notified that there is a
-non-coherent DMA device attached, and expected to act accordingly. For
-normal VMs today, that means to start respecting guest PAT. However,
-recently there has been a proposal to avoid doing this on selfsnoop CPUs
-(see link). On such CPUs it should not be problematic to simply always
-configure the EPT to honor guest PAT. In future changes TDX can enforce
-this behavior for shared memory, resulting in shared memory always
-respecting guest PAT for TDX. So kvm_zap_gfn_range() will not need to be
-called in this case either.
-
-Unfortunately, this will result in different cache attributes between
-private and shared memory, as private memory is always WB and cannot be
-changed by the VMM on current TDX modules. But it can't really be helped
-while also supporting non-coherent DMA devices.
-
-Since all callers will be prevented from calling kvm_zap_gfn_range() in
-future changes, report a bug and terminate the guest if other future
-changes to KVM result in triggering kvm_zap_gfn_range() for a TD.
-
-For lack of a better method currently, use kvm_gfn_shared_mask() to
-determine if private memory cannot be zapped (as in TDX, the only VM type
-that sets it).
-
-Link: https://lore.kernel.org/all/20240309010929.1403984-6-seanjc@google.com/
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
 TDX MMU Part 1:
- - Remove support from "KVM: x86/tdp_mmu: Zap leafs only for private memory"
- - Add this KVM_BUG_ON() instead
+ - New patch
 ---
- arch/x86/kvm/mmu/mmu.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c     | 6 ++++--
+ arch/x86/kvm/mmu/tdp_mmu.c | 3 +--
+ arch/x86/kvm/mmu/tdp_mmu.h | 2 +-
+ 3 files changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index d5cf5b15a10e..808805b3478d 100644
+index 808805b3478d..76f92cb37a96 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6528,8 +6528,17 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 
- 	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
+@@ -3700,8 +3700,10 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
+ 	unsigned i;
+ 	int r;
  
 -	if (tdp_mmu_enabled)
+-		return kvm_tdp_mmu_alloc_root(vcpu);
 +	if (tdp_mmu_enabled) {
-+		/*
-+		 * kvm_zap_gfn_range() is used when MTRR or PAT memory
-+		 * type was changed.  TDX can't handle zapping the private
-+		 * mapping, but it's ok because KVM doesn't support either of
-+		 * those features for TDX. In case a new caller appears, BUG
-+		 * the VM if it's called for solutions with private aliases.
-+		 */
-+		KVM_BUG_ON(kvm_gfn_shared_mask(kvm), kvm);
- 		flush = kvm_tdp_mmu_zap_leafs(kvm, gfn_start, gfn_end, flush);
++		kvm_tdp_mmu_alloc_root(vcpu);
++		return 0;
 +	}
  
- 	if (flush)
- 		kvm_flush_remote_tlbs_range(kvm, gfn_start, gfn_end - gfn_start);
+ 	write_lock(&vcpu->kvm->mmu_lock);
+ 	r = make_mmu_pages_available(vcpu);
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 6fa910b017d1..0d6d96d86703 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -224,7 +224,7 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page *child_sp,
+ 	tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
+ }
+ 
+-int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
++void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	union kvm_mmu_page_role role = mmu->root_role;
+@@ -285,7 +285,6 @@ int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
+ 	 */
+ 	mmu->root.hpa = __pa(root->spt);
+ 	mmu->root.pgd = 0;
+-	return 0;
+ }
+ 
+ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index 58b55e61bd33..437ddd4937a9 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -10,7 +10,7 @@
+ void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
+ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
+ 
+-int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu);
++void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu);
+ 
+ __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
+ {
 -- 
 2.34.1
 
