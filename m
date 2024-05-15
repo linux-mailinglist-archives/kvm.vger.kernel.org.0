@@ -1,268 +1,651 @@
-Return-Path: <kvm+bounces-17427-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17428-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 316FC8C657B
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 13:23:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFE6A8C6702
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 15:14:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 805F0B2127A
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 11:23:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 666AA28509F
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 13:14:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09606EB53;
-	Wed, 15 May 2024 11:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b="jXM+7vmp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52A41292FC;
+	Wed, 15 May 2024 13:13:03 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from DEU01-FR2-obe.outbound.protection.outlook.com (mail-fr2deu01on2115.outbound.protection.outlook.com [40.107.135.115])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B284557CA1;
-	Wed, 15 May 2024 11:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.135.115
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715772180; cv=fail; b=oypF7Wq/efJg4KV2TfF431nV5rsM7To3Ribkgj+KUbusRMiw0y1GBGuzHaZwJ3TJpDYjppNPDWuL3rWQ+28Der7t6mcwhJN8SN/09sbyoQXc156WsHUSyh24Rww5TxWFulMUTP//lGkBiOoM+2rswyXpsJEXpjoU3i6/jDCl7Gk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715772180; c=relaxed/simple;
-	bh=wAh7swIbdRos8TsJVTUts5Ef1hOF1+b+2OmRtu4g3D8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=phoUV1eQta40e1Ab+sYDEnjpU7edVAS280ykIdkjQuqYB+D5koSxMjfB3ZMLkblveZb9fcMXzwEXrL4hE+JpfDiuDD58dOFYVXutpvEy+wuf4kFVC67jMYuitRKAf2gJbGYt6lhSevviMpkVAPrBtIP9HXhlw7XgGyD3IQXl7Zk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de; spf=pass smtp.mailfrom=cyberus-technology.de; dkim=pass (2048-bit key) header.d=cyberus-technology.de header.i=@cyberus-technology.de header.b=jXM+7vmp; arc=fail smtp.client-ip=40.107.135.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cyberus-technology.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cyberus-technology.de
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vrw67G8Dty7cDuMakx9TWzFJq4Caro/oxRjiInR2/RuNQ8I3x/aiMFnBzMDtgtZfC/LnAsflSTv/AQK5zWwzczrjHro+TAAcPzknuoOVyc/GMorSwMPu4WQ3KrTtJmgb+AfRWe2/tPWe4pZ7rw4PPZj/9UI7oE8zWWE+t1Y6fM/QAEgOf/TdSakOivmSjz4VDWf7ucG3IY3ThlfQsJenyiDkNqZP9d0OB8gxfKk1oSwbj1UIFfnRUTcRfyGlKrR5LtOliFZHwW4Vn2BZsJwez/FjLjAetaOng87Pf5PiQ3Eoak3kmmS474PS6bDPcu5RP0gt3Bd2sQ/XzBAlJm9dZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wAh7swIbdRos8TsJVTUts5Ef1hOF1+b+2OmRtu4g3D8=;
- b=GwRCcn0Ho7biaQPDNmU6WGlDPClZOXZk0XpE2n0t7bpUxW6oNoKSftY/VrBNP0Q8PsRLkp9xQL604Vl/lvG2XoqG8RQPiQu7S6K73Vu2/Vh08I0aXs+fCh+2Zxioa8aZ3CQUB7X1d1RroOT6uIpW1byeWD/BXJHuc0YJsuIA4J+IQpFIklVtMdyS8NEZba7cK1gHOj3ow+WnSJAxypa3/ThArzmxJ/hxQaedzmXH2ZKxt1UwHEm2T7yI+Rvj3jJBDKXVAYK7tRIDyqkFhCeiL2px4qhZALRQA5Xc96+iqpPiTxzElumky5ZbNhk5WFOboTr+oOhFRGr87lpiisPjDA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=cyberus-technology.de; dmarc=pass action=none
- header.from=cyberus-technology.de; dkim=pass header.d=cyberus-technology.de;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cyberus-technology.de;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wAh7swIbdRos8TsJVTUts5Ef1hOF1+b+2OmRtu4g3D8=;
- b=jXM+7vmpg3VWFv4cig50uHo6gVGhUwZ2iWovQawQwYFxdLXfYr7cVScV5ZaScjKAnPOkB/4SJG1Tpf+AE85RRaqiCz0kIeIgTKPiTwrBLglB7wKbZcR/Klc5VND0nmhuVOIFekRN7+XL1f3Rc2VnsDj1Q7qFvvw5OELR4fABtWqZPsHH+vrFzzPylpz1GIzQ+fuBeXR9sVFb4Q4MBLqclYI3k+XCII4MVFlcqHyO2MB2tpS/cDRhhavSG3fp5VdmuhF1W9UdRS9IKv4gJ0sR3A7aVUorMGuDpqfvQ5pVUmk4/rYzOogwgGKfWwMxD3/UjqWOE7pROz9uu13cZ3Zlmw==
-Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:38::7) by
- BEUP281MB3577.DEUP281.PROD.OUTLOOK.COM (2603:10a6:b10:a0::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7587.27; Wed, 15 May 2024 11:22:52 +0000
-Received: from FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
- ([fe80::bf0d:16fc:a18c:c423]) by FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
- ([fe80::bf0d:16fc:a18c:c423%5]) with mapi id 15.20.7587.026; Wed, 15 May 2024
- 11:22:52 +0000
-From: Julian Stecklina <julian.stecklina@cyberus-technology.de>
-To: "seanjc@google.com" <seanjc@google.com>
-CC: "corbet@lwn.net" <corbet@lwn.net>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com"
-	<hpa@zytor.com>, "x86@kernel.org" <x86@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, Thomas Prescher
-	<thomas.prescher@cyberus-technology.de>, "mingo@redhat.com"
-	<mingo@redhat.com>
-Subject: Re: [PATCH] KVM: x86: add KVM_RUN_X86_GUEST_MODE kvm_run flag
-Thread-Topic: [PATCH] KVM: x86: add KVM_RUN_X86_GUEST_MODE kvm_run flag
-Thread-Index: AQHaoUswDl+XNTW8/EaYqu1sERH8urGYMduA
-Date: Wed, 15 May 2024 11:22:52 +0000
-Message-ID:
- <5547dd176122865e6a13b61829aa9c4b6cc21ff3.camel@cyberus-technology.de>
-References: <20240508132502.184428-1-julian.stecklina@cyberus-technology.de>
-In-Reply-To: <20240508132502.184428-1-julian.stecklina@cyberus-technology.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=cyberus-technology.de;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: FR2P281MB2329:EE_|BEUP281MB3577:EE_
-x-ms-office365-filtering-correlation-id: ba0d7d33-ec8f-4375-9907-08dc74d15c21
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230031|366007|7416005|1800799015|376005|38070700009;
-x-microsoft-antispam-message-info:
- =?utf-8?B?Wmd6TTNhQWxWWGtOV1RwbmdmR2NnWjkrUkZhU2g2WlhMY1RFd2MyRitFUGNN?=
- =?utf-8?B?N2VqVUZZSTdQa3ZGQThTelc2akpNL3htL2FJeEFMcithTHMyQjl4SitiN1FE?=
- =?utf-8?B?ZEpPdXlNNWlKS0I5TGxXalVleDFDSFpoRUtkcTNOd2RHQXQxMTZQRWRueHRG?=
- =?utf-8?B?OVJYdXlXcVdUT004dUVsQTZ6VFN4bmw0WGF5VDN3ajJwNnFJWU8yNWliUGdu?=
- =?utf-8?B?cE90OWlWWFpiT2lCZ0hSMWI0S0NOaU1HbGNuYi9HUWc1NVRCVzR4cWw2SS9M?=
- =?utf-8?B?b1pEbldWNTRlTm4wZU5pNUt2c04zZDVBbE1UWWN3QjdyM2N0cTRScjhMN3FH?=
- =?utf-8?B?NW1pWUVVMUNRYTMzUWtTR2xRWHRLd0p1ZWJkUitUdzR2elAxWUNTMjhQdGdZ?=
- =?utf-8?B?eFhZTFFscGt4Z0dJcFkwempYTnQxVXlTdERta0lYMzRoODNqNkJwaGtDWG5w?=
- =?utf-8?B?bVVuUHI5d0w1cnR4eUVjb3dQWGZFcGh0MnRUbXJvYitoT1RjTXp4QlJlSk8r?=
- =?utf-8?B?dXZ4OWp3azJ2b2RBbng2ZTNqdkZqY0RMdDNoc0dvY0lwQjArWTl6YUROWFo1?=
- =?utf-8?B?MHp6TTk0OTJYSW9IcTI1cXZsdGg0djR3L2daVHBieTBtcUY0VmkwcEN5YkJl?=
- =?utf-8?B?aWZ3elM5R2I4TFN4Wm0zMWRoeThQTkJEbHFRSmdJR0xjZWJyY3Mxc3RGbWZQ?=
- =?utf-8?B?cWpENGNNa0ZkUTFDSCttK09va2pXZXBTVHB0NE5nM3ZSU0hVRHVjRjdmWVNH?=
- =?utf-8?B?a0NMRDdIRlYyQVhTeTlyMzZNK3hOSElvQ09uUzdTYUZEUm5XZFRDTWlqRzdh?=
- =?utf-8?B?NU9PbUFtRWZ0TktpcndXMm9CZ09DcFZwSUxvNksxYStZNFFRNU1qTVZ6OTRP?=
- =?utf-8?B?elRIUGoyVmxCNGZxQUZrME5EOWM2cXlwUFEwZENPaHhYQmw1Qk83V3ZpaFFt?=
- =?utf-8?B?MFFOdVl0elJFQjFlclVuY2VHaTlJb3YrWkJUbFBSNldOcG8zcmo5S0NjZ1Fl?=
- =?utf-8?B?dnVNWlFid0FKQ2FNSmxsVlNuOXY4MG43bjlEMTlLZnd3SmtWSE5YVnF6ODBP?=
- =?utf-8?B?SkN0bElWV3JRdXo3eGE2STJ5UDFSVFBMUDkxMjh3VFZIVUh1RzFuZXZFc1Bs?=
- =?utf-8?B?QXc5RHBEOWVSa0lMRmtnc0Q5TWpwZnVadnM1RFJtOTNkdXBueTJCbkc5MEIr?=
- =?utf-8?B?Q2pmRi8yVk5CYTdZMFRybVZUZkFHaTh2RG5XT1BuWmdzL1FvL0tTR2hzT2ZJ?=
- =?utf-8?B?ZTNGVDA3bGhiUDNXTk16K0NmSEZETlZTUmdMQXJRYWFnaENEZ3IyRXVxOWQx?=
- =?utf-8?B?RE1wcWdVOG85WFZ2b3VVM1pVL0RST21lR2lFNTI0eG94TFJDSlZqVk8ralUx?=
- =?utf-8?B?SFZrTEc5ZWliTFhWMHgxT0FoQ3dhaUdBcHozUlgwcVk5YVZwTTBySGwrVG5m?=
- =?utf-8?B?Ykc4WXozc3YvTzEyMWtubTFMUW9neWtTcGZpRlNDTGY2OUFySVEraENYV0VM?=
- =?utf-8?B?bXhkS200R1RLeHFRU3Y1dnNUMUlEN2JFN1c4VTk1ZXN1WVpoMzNmSFJISHAx?=
- =?utf-8?B?M3dtSTk5dEVyVWdVUEhSOC9JUHhRSWs1UU50Q2N3WTJCcyt6ZGZQak50MExJ?=
- =?utf-8?B?OG92T2FPMlFaMnJGUm15OE5CLzM0a3AzVkRXUHpSUWpncUlZR0ovMjJpeWdS?=
- =?utf-8?B?NWluY1A4Q3hNcDU4YWJ0cW9RKzRvNWlCK0JIVERUTGFUM2dUclNRSzJnPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?S0FMb2RtVW1tWUdEU3g0a2MvQkFpSXhJWXdHMTRXdzRJVUZvMUdaMmg0R0x1?=
- =?utf-8?B?eE0zWGJUSE42dTd5S1dYQ282aDZ1M3RNa1ZQcDR4ZWNZTzVSVnhKcmlycnZw?=
- =?utf-8?B?ZXJHQXJHMXU4QWY2aE5YMHBMUXpHRWUvS0tXQjVacVFpak5yOFVyRC81OE9h?=
- =?utf-8?B?Wjd5ZFdlOWpHWWNCaWlMWHF0YkYrWUN3VGZNdUY0SkpsWkV1R1hyZWdoMEEz?=
- =?utf-8?B?YzNMQUxQSUJKclY2bE5WenI3VzBSQ2lFTXFWay90czdDaEp0aXFOY1FEK2k0?=
- =?utf-8?B?enQ1djBCV1llUnl1SjloMTR6a1NYbi9TeVpDNisxOU1TczZSSFlsREt2RmZ1?=
- =?utf-8?B?UFM1bTF3dGdJcHEyMzR2K0RZSG9kRnJKU0hsZ3VkS3VwQUkwL3V4bUROV2k2?=
- =?utf-8?B?SHhPUzlHQUQxUmI2Tk5JZlNjTEhIbjE1VjFya3pMQ2NjbXcyWDViTk5VWXR6?=
- =?utf-8?B?d1pENSt6dW9RRTRMemJmcmxiRUtySjdlZExRRTQ2M00rKysvcjFhaVlNTXJL?=
- =?utf-8?B?TllrV2s2eVNUL1FPY3NDOFBzSUhHYm1iMU5XMFlXNStjUVdBWTgxVVFpd1Ra?=
- =?utf-8?B?SVo2c2s3VXkwSWxCSFQ5bEVuck1CbFhpMEt2bDR4YllzaUNzQlZJdjg3V29i?=
- =?utf-8?B?M3ZlVEZzcytYZXlCdjM5eXBtSWw3VTBFL1pkUDZNNHBFeHZ4UmkvTG1OcFFF?=
- =?utf-8?B?Q3YxMU5jcElGTlNmZW5OR1Q0ZzhCOTJzdlhPTzdabHFkTGN4TmdwNzI0dGF6?=
- =?utf-8?B?aXVLMCtoZUx4NEp6MXIrWEUrWldZT0xhMXM5UFd0dTEyWTBVRjVwWUJOT1BE?=
- =?utf-8?B?REc0bFk4aGNwNk5VaFBlQmd3MTFROW5pb2pjaUE1WHZCRXVVVFhETlZmLzV2?=
- =?utf-8?B?YWlnOXh5NnJjejJCSDQ4aUV3ZFI3ejF4dTh2eWoyR2VvOHJWNFlCemhaY3F0?=
- =?utf-8?B?b3BzQVBMWDRCb1Nsc1FoTWdRODlJRGhERGVXK2Z6Q3lvczdWeVZ2YmhjQjhM?=
- =?utf-8?B?S01VM1BseUhOc2Y4ZXEwM2ZKMTUwNlc2ZUl4TVFwOFRjTEdJa0FKLzJ5bFlG?=
- =?utf-8?B?WFNHVXhaeVZwZFRWNU5SMmZPaS9raUtjNTJSd25UQklKRlVGQi9ZeG1FbjFZ?=
- =?utf-8?B?cUp0YmwyZ0VuY29mK0VJK1k3a3dkY2t2SkFFay9HN3V1WkNKcDlEOUJMazIw?=
- =?utf-8?B?eVAvTzZDN1h4WkVobHUzVDRDTlFnN0w4KzRubkpJUUVMeW1rdTdIakFFL0JK?=
- =?utf-8?B?L2wySlZ5c1JkbXlJU01sRVl6cnpBL3dOMVMwR3J6UVZrQlVIMnVER1NCVGlm?=
- =?utf-8?B?SjBZYU9QTmFXeURDaXQ3b3BPS2JzcEFmaTRCTTVHRlFKbENtalNXbTdKd285?=
- =?utf-8?B?Ny9lMnRUWjBxcWVWNkE4Ym5aU1FqazB6SFcvOFd0UHJGWVA5Um5Yd0tIWGsz?=
- =?utf-8?B?Wkp6WWpWRDc1b0dKT2lTRmQwTGJNWFp2OXlscXVyUlMzZyt0bnNaY3dHQkpN?=
- =?utf-8?B?NE95WXUzOVQvZktqWnNFRXhrSWNKT0RBM3plZzU3NTBHZXYwZlVRUGpqZzJx?=
- =?utf-8?B?WThDWTcyYk5VeHJUUFhuWm9wWVpnV0N0T2hyMlA5aVhwMENCdGVkNWRiNEpE?=
- =?utf-8?B?eTNqYlJVRFpsOHZZN05OOVVIK0NqSGxvb0twL3dSdEkvanh4cmxLelBOUDcx?=
- =?utf-8?B?aTcwaENuRDFHY3htSGk1M1UxdE1XMjhmWkozdDJYWFJBSG9rZ2NtQ2tiMnkx?=
- =?utf-8?B?MVoraDJxTlhOdjlDN2orMzRURGU5TVBhMDBPTHh5VXlKRzY2Y2JsMDVscmQ1?=
- =?utf-8?B?UjVlTzJ0WTB2d1BiaWZUcHZyRkFXcnpDWk4vQy9kNTAxZXVMdmZ6YkVwTHp4?=
- =?utf-8?B?K25oZitwS3ZFbjNhVzNzc0d4WE14a2FjTnFmdjVLVXF6YS92T2FzMnV6VnR0?=
- =?utf-8?B?dHExMnBpcFVWWlIyK1NvQkgyMkJMdHp0Q2JFVW1HMjVIb2V2VC9YMVppZW9M?=
- =?utf-8?B?QlhsV0hheEFTQjZ3UHlJcGE1TU9KY3U3eFg1WVdZNmIxTjg5NENHTkxxOEVO?=
- =?utf-8?B?OHRIeUpPOXlXcDlBMjhnZWEyQU5tTGo4ejNtck5zSXFHMHJaN2ZqdEZlZGRR?=
- =?utf-8?B?N1ovVDFwVy90TUJ6M3lDV2xhUS9tQisxVmE0TUcrZkpaKzR3bytVZHo5SmNt?=
- =?utf-8?Q?K6QNnZZhQbJzGFg9dB9HGNH8GLYk3AJ/oAVVHlYm+nim?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <F8BED776102E8444BC8A34103C1561D4@DEUP281.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F301272C6;
+	Wed, 15 May 2024 13:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715778783; cv=none; b=uedi8VUeG4lsogHmWe+DQv+R4/hTSlvLHYfo6+WLNaZ1Q4Boxg8bJkNPLNlwwVu1dqipKkqJoOTDP+XtnLzU9jTP2rhUhP+8KnBgi/IRWt5qpWJ+4sem9tiDX8OkEKntyR8AWOI1tXoJanELeGBdxPhSQC/EafS/tgMHTUyJE/o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715778783; c=relaxed/simple;
+	bh=t3jCCUd7eaCgInJPnnLmLGf7hisyg8999OdeVg2h/xY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SKdOv8A1hZUC0Kd7apOEJ/74iifE66xBZKWtTKWFJNyVh2fqyMWWO28mhI9pc2B+AcNvQ0lgSahp3sDyZwppgasSVq6e3vNx9+IEdilalFotkRujMKS0GG3p1p7fRbBtWxYp0sHLh/4mIeWNuqZGHIdgknrCDUNibtATBnkcO0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VfYVK283XzPl71;
+	Wed, 15 May 2024 21:10:01 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id C5A74180080;
+	Wed, 15 May 2024 21:12:55 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 15 May 2024 21:12:55 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Jeroen
+ de Borst <jeroendb@google.com>, Praveen Kaligineedi
+	<pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, Eric Dumazet
+	<edumazet@google.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep
+	<sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau
+	<nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, Mark Lee
+	<Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg
+	<sagi@grimberg.me>, Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko
+	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
+ Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
+	<anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
+	<jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
+	<kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+	<tom@talpey.com>, <intel-wired-lan@lists.osuosl.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-nvme@lists.infradead.org>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>,
+	<bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
+	<linux-nfs@vger.kernel.org>
+Subject: [RFC v4 06/13] mm: page_frag: add '_va' suffix to page_frag API
+Date: Wed, 15 May 2024 21:09:25 +0800
+Message-ID: <20240515130932.18842-7-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240515130932.18842-1-linyunsheng@huawei.com>
+References: <20240515130932.18842-1-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: cyberus-technology.de
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: FR2P281MB2329.DEUP281.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba0d7d33-ec8f-4375-9907-08dc74d15c21
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2024 11:22:52.1979
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: f4e0f4e0-9d68-4bd6-a95b-0cba36dbac2e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 1TZvvtK9aqgskwoexMfVhVh3MkIhdhk66Q3zwR5AFKoEA1CcJTlCF1RwXvOuTbW6+VsiroUxbVKp4v0+2A5TEN8r6MwpAygu8h2brRGipzPNVg3TplM+fmG/vMjaMR4/
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BEUP281MB3577
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-SGV5IFNlYW4sDQoNCmRvZXMgdGhpcyB0aGlzIHBhdGNoIGdvIGludG8gdGhlIHJpZ2h0IGRpcmVj
-dGlvbj8NCg0KSnVsaWFuDQoNCk9uIFdlZCwgMjAyNC0wNS0wOCBhdCAxNToyNSArMDIwMCwgSnVs
-aWFuIFN0ZWNrbGluYSB3cm90ZToNCj4gRnJvbTogVGhvbWFzIFByZXNjaGVyIDx0aG9tYXMucHJl
-c2NoZXJAY3liZXJ1cy10ZWNobm9sb2d5LmRlPg0KPiANCj4gV2hlbiBhIHZDUFUgaXMgaW50ZXJy
-dXB0ZWQgYnkgYSBzaWduYWwgd2hpbGUgcnVubmluZyBhIG5lc3RlZCBndWVzdCwNCj4gS1ZNIHdp
-bGwgZXhpdCB0byB1c2Vyc3BhY2Ugd2l0aCBMMiBzdGF0ZS4gSG93ZXZlciwgdXNlcnNwYWNlIGhh
-cyBubw0KPiB3YXkgdG8ga25vdyB3aGV0aGVyIGl0IHNlZXMgTDEgb3IgTDIgc3RhdGUgKGJlc2lk
-ZXMgY2FsbGluZw0KPiBLVk1fR0VUX1NUQVRTX0ZELCB3aGljaCBkb2VzIG5vdCBoYXZlIGEgc3Rh
-YmxlIEFCSSkuDQo+IA0KPiBUaGlzIGNhdXNlcyBtdWx0aXBsZSBwcm9ibGVtczoNCj4gDQo+IFRo
-ZSBzaW1wbGVzdCBvbmUgaXMgTDIgc3RhdGUgY29ycnVwdGlvbiB3aGVuIHVzZXJzcGFjZSBtYXJr
-cyB0aGUgc3JlZ3MNCj4gYXMgZGlydHkuIFNlZSB0aGlzIG1haWxpbmcgbGlzdCB0aHJlYWQgWzFd
-IGZvciBhIGNvbXBsZXRlIGRpc2N1c3Npb24uDQo+IA0KPiBBbm90aGVyIHByb2JsZW0gaXMgdGhh
-dCBpZiB1c2Vyc3BhY2UgZGVjaWRlcyB0byBjb250aW51ZSBieSBlbXVsYXRpbmcNCj4gaW5zdHJ1
-Y3Rpb25zLCBpdCB3aWxsIHVua25vd2luZ2x5IGVtdWxhdGUgd2l0aCBMMiBzdGF0ZSBhcyBpZiBM
-MQ0KPiBkb2Vzbid0IGV4aXN0LCB3aGljaCBjYW4gYmUgY29uc2lkZXJlZCBhIHdlaXJkIGd1ZXN0
-IGVzY2FwZS4NCj4gDQo+IFRoaXMgcGF0Y2ggaW50cm9kdWNlcyBhIG5ldyBmbGFnIEtWTV9SVU5f
-WDg2X0dVRVNUX01PREUgaW4gdGhlIGt2bV9ydW4NCj4gZGF0YSBzdHJ1Y3R1cmUsIHdoaWNoIGlz
-IHNldCB3aGVuIHRoZSB2Q1BVIGV4aXRlZCB3aGlsZSBydW5uaW5nIGENCj4gbmVzdGVkIGd1ZXN0
-LiBVc2Vyc3BhY2UgY2FuIHRoZW4gaGFuZGxlIHRoaXMgc2l0dWF0aW9uLg0KPiANCj4gVG8gc2Vl
-IHdoZXRoZXIgdGhpcyBmdW5jdGlvbmFsaXR5IGlzIGF2YWlsYWJsZSwgdGhpcyBwYXRjaCBhbHNv
-DQo+IGludHJvZHVjZXMgYSBuZXcgY2FwYWJpbGl0eSBLVk1fQ0FQX1g4Nl9HVUVTVF9NT0RFLg0K
-PiANCj4gWzFdDQo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bS8yMDI0MDQxNjEyMzU1OC4y
-MTIwNDAtMS1qdWxpYW4uc3RlY2tsaW5hQGN5YmVydXMtdGVjaG5vbG9neS5kZS9ULyNtMjgwYWFk
-Y2IyZTEwYWUwMmMxOTFhN2RjNGVkNGI3MTFhNzRiMWY1NQ0KPiANCj4gU2lnbmVkLW9mZi1ieTog
-VGhvbWFzIFByZXNjaGVyIDx0aG9tYXMucHJlc2NoZXJAY3liZXJ1cy10ZWNobm9sb2d5LmRlPg0K
-PiBTaWduZWQtb2ZmLWJ5OiBKdWxpYW4gU3RlY2tsaW5hIDxqdWxpYW4uc3RlY2tsaW5hQGN5YmVy
-dXMtdGVjaG5vbG9neS5kZT4NCj4gLS0tDQo+IMKgRG9jdW1lbnRhdGlvbi92aXJ0L2t2bS9hcGku
-cnN0wqAgfCAxNyArKysrKysrKysrKysrKysrKw0KPiDCoGFyY2gveDg2L2luY2x1ZGUvdWFwaS9h
-c20va3ZtLmggfMKgIDEgKw0KPiDCoGFyY2gveDg2L2t2bS94ODYuY8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIHzCoCAzICsrKw0KPiDCoGluY2x1ZGUvdWFwaS9saW51eC9rdm0uaMKgwqDCoMKg
-wqDCoMKgIHzCoCAxICsNCj4gwqA0IGZpbGVzIGNoYW5nZWQsIDIyIGluc2VydGlvbnMoKykNCj4g
-DQo+IGRpZmYgLS1naXQgYS9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QgYi9Eb2N1bWVu
-dGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QNCj4gaW5kZXggMGI1YTMzZWU3MWVlLi43NzQ4YzNlYjk4
-ZTAgMTAwNjQ0DQo+IC0tLSBhL0RvY3VtZW50YXRpb24vdmlydC9rdm0vYXBpLnJzdA0KPiArKysg
-Yi9Eb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3QNCj4gQEAgLTY0MTksNiArNjQxOSw5IEBA
-IGFmZmVjdCB0aGUgZGV2aWNlJ3MgYmVoYXZpb3IuIEN1cnJlbnQgZGVmaW5lZCBmbGFnczo6DQo+
-IMKgwqAgI2RlZmluZSBLVk1fUlVOX1g4Nl9TTU3CoMKgwqDCoCAoMSA8PCAwKQ0KPiDCoMKgIC8q
-IHg4Niwgc2V0IGlmIGJ1cyBsb2NrIGRldGVjdGVkIGluIFZNICovDQo+IMKgwqAgI2RlZmluZSBL
-Vk1fUlVOX0JVU19MT0NLwqDCoMKgICgxIDw8IDEpDQo+ICvCoCAvKiB4ODYsIHNldCBpZiB0aGUg
-VkNQVSBleGl0ZWQgZnJvbSBhIG5lc3RlZCAoTDIpIGd1ZXN0ICovDQo+ICvCoCAjZGVmaW5lIEtW
-TV9SVU5fWDg2X0dVRVNUX01PREUgKDEgPDwgMikNCj4gKw0KPiDCoMKgIC8qIGFybTY0LCBzZXQg
-Zm9yIEtWTV9FWElUX0RFQlVHICovDQo+IMKgwqAgI2RlZmluZSBLVk1fREVCVUdfQVJDSF9IU1Jf
-SElHSF9WQUxJRMKgICgxIDw8IDApDQo+IMKgDQo+IEBAIC04MDYzLDYgKzgwNjYsMjAgQEAgZXJy
-b3IvYW5ub3RhdGVkIGZhdWx0Lg0KPiDCoA0KPiDCoFNlZSBLVk1fRVhJVF9NRU1PUllfRkFVTFQg
-Zm9yIG1vcmUgaW5mb3JtYXRpb24uDQo+IMKgDQo+ICs3LjM0IEtWTV9DQVBfWDg2X0dVRVNUX01P
-REUNCj4gKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiArDQo+ICs6QXJjaGl0ZWN0
-dXJlczogeDg2DQo+ICs6UmV0dXJuczogSW5mb3JtYXRpb25hbCBvbmx5LCAtRUlOVkFMIG9uIGRp
-cmVjdCBLVk1fRU5BQkxFX0NBUC4NCj4gKw0KPiArVGhlIHByZXNlbmNlIG9mIHRoaXMgY2FwYWJp
-bGl0eSBpbmRpY2F0ZXMgdGhhdCBLVk1fUlVOIHdpbGwgdXBkYXRlIHRoZQ0KPiArS1ZNX1JVTl9Y
-ODZfR1VFU1RfTU9ERSBiaXQgaW4ga3ZtX3J1bi5mbGFncyB0byBpbmRpY2F0ZSB3aGV0aGVyIHRo
-ZQ0KPiArdkNQVSB3YXMgZXhlY3V0aW5nIG5lc3RlZCBndWVzdCBjb2RlIHdoZW4gaXQgZXhpdGVk
-Lg0KPiArDQo+ICtLVk0gZXhpdHMgd2l0aCB0aGUgcmVnaXN0ZXIgc3RhdGUgb2YgZWl0aGVyIHRo
-ZSBMMSBvciBMMiBndWVzdA0KPiArZGVwZW5kaW5nIG9uIHdoaWNoIGV4ZWN1dGVkIGF0IHRoZSB0
-aW1lIG9mIGFuIGV4aXQuIFVzZXJzcGFjZSBtdXN0DQo+ICt0YWtlIGNhcmUgdG8gZGlmZmVyZW50
-aWF0ZSBiZXR3ZWVuIHRoZXNlIGNhc2VzLg0KPiArDQo+IMKgOC4gT3RoZXIgY2FwYWJpbGl0aWVz
-Lg0KPiDCoD09PT09PT09PT09PT09PT09PT09PT0NCj4gwqANCj4gZGlmZiAtLWdpdCBhL2FyY2gv
-eDg2L2luY2x1ZGUvdWFwaS9hc20va3ZtLmggYi9hcmNoL3g4Ni9pbmNsdWRlL3VhcGkvYXNtL2t2
-bS5oDQo+IGluZGV4IGVmMTFhYTRjYWI0Mi4uZmY0ZWQ4MmEyZDA2IDEwMDY0NA0KPiAtLS0gYS9h
-cmNoL3g4Ni9pbmNsdWRlL3VhcGkvYXNtL2t2bS5oDQo+ICsrKyBiL2FyY2gveDg2L2luY2x1ZGUv
-dWFwaS9hc20va3ZtLmgNCj4gQEAgLTEwNiw2ICsxMDYsNyBAQCBzdHJ1Y3Qga3ZtX2lvYXBpY19z
-dGF0ZSB7DQo+IMKgDQo+IMKgI2RlZmluZSBLVk1fUlVOX1g4Nl9TTU0JCSAoMSA8PCAwKQ0KPiDC
-oCNkZWZpbmUgS1ZNX1JVTl9YODZfQlVTX0xPQ0vCoMKgwqDCoCAoMSA8PCAxKQ0KPiArI2RlZmlu
-ZSBLVk1fUlVOX1g4Nl9HVUVTVF9NT0RFwqDCoCAoMSA8PCAyKQ0KPiDCoA0KPiDCoC8qIGZvciBL
-Vk1fR0VUX1JFR1MgYW5kIEtWTV9TRVRfUkVHUyAqLw0KPiDCoHN0cnVjdCBrdm1fcmVncyB7DQo+
-IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veDg2LmMgYi9hcmNoL3g4Ni9rdm0veDg2LmMNCj4g
-aW5kZXggOTE0NzhiNzY5YWYwLi42NGYyY2JhOTM0NWUgMTAwNjQ0DQo+IC0tLSBhL2FyY2gveDg2
-L2t2bS94ODYuYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0veDg2LmMNCj4gQEAgLTQ3MTQsNiArNDcx
-NCw3IEBAIGludCBrdm1fdm1faW9jdGxfY2hlY2tfZXh0ZW5zaW9uKHN0cnVjdCBrdm0gKmt2bSwg
-bG9uZw0KPiBleHQpDQo+IMKgCWNhc2UgS1ZNX0NBUF9WTV9ESVNBQkxFX05YX0hVR0VfUEFHRVM6
-DQo+IMKgCWNhc2UgS1ZNX0NBUF9JUlFGRF9SRVNBTVBMRToNCj4gwqAJY2FzZSBLVk1fQ0FQX01F
-TU9SWV9GQVVMVF9JTkZPOg0KPiArCWNhc2UgS1ZNX0NBUF9YODZfR1VFU1RfTU9ERToNCj4gwqAJ
-CXIgPSAxOw0KPiDCoAkJYnJlYWs7DQo+IMKgCWNhc2UgS1ZNX0NBUF9FWElUX0hZUEVSQ0FMTDoN
-Cj4gQEAgLTEwMjAwLDYgKzEwMjAxLDggQEAgc3RhdGljIHZvaWQgcG9zdF9rdm1fcnVuX3NhdmUo
-c3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiDCoA0KPiDCoAlpZiAoaXNfc21tKHZjcHUpKQ0KPiDC
-oAkJa3ZtX3J1bi0+ZmxhZ3MgfD0gS1ZNX1JVTl9YODZfU01NOw0KPiArCWlmIChpc19ndWVzdF9t
-b2RlKHZjcHUpKQ0KPiArCQlrdm1fcnVuLT5mbGFncyB8PSBLVk1fUlVOX1g4Nl9HVUVTVF9NT0RF
-Ow0KPiDCoH0NCj4gwqANCj4gwqBzdGF0aWMgdm9pZCB1cGRhdGVfY3I4X2ludGVyY2VwdChzdHJ1
-Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+IGRpZmYgLS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3Zt
-LmggYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgNCj4gaW5kZXggMjE5MGFkYmUzMDAyLi5jY2Ix
-MmY2YTY1NmQgMTAwNjQ0DQo+IC0tLSBhL2luY2x1ZGUvdWFwaS9saW51eC9rdm0uaA0KPiArKysg
-Yi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgNCj4gQEAgLTkxNyw2ICs5MTcsNyBAQCBzdHJ1Y3Qg
-a3ZtX2VuYWJsZV9jYXAgew0KPiDCoCNkZWZpbmUgS1ZNX0NBUF9NRU1PUllfQVRUUklCVVRFUyAy
-MzMNCj4gwqAjZGVmaW5lIEtWTV9DQVBfR1VFU1RfTUVNRkQgMjM0DQo+IMKgI2RlZmluZSBLVk1f
-Q0FQX1ZNX1RZUEVTIDIzNQ0KPiArI2RlZmluZSBLVk1fQ0FQX1g4Nl9HVUVTVF9NT0RFIDIzNg0K
-PiDCoA0KPiDCoHN0cnVjdCBrdm1faXJxX3JvdXRpbmdfaXJxY2hpcCB7DQo+IMKgCV9fdTMyIGly
-cWNoaXA7DQoNCg==
+Currently the page_frag API is returning 'virtual address'
+or 'va' when allocing and expecting 'virtual address' or
+'va' as input when freeing.
+
+As we are about to support new use cases that the caller
+need to deal with 'struct page' or need to deal with both
+'va' and 'struct page'. In order to differentiate the API
+handling between 'va' and 'struct page', add '_va' suffix
+to the corresponding API mirroring the page_pool_alloc_va()
+API of the page_pool. So that callers expecting to deal with
+va, page or both va and page may call page_frag_alloc_va*,
+page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
+
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+---
+ drivers/net/ethernet/google/gve/gve_rx.c      |  4 ++--
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  2 +-
+ .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 ++--
+ .../marvell/octeontx2/nic/otx2_common.c       |  2 +-
+ drivers/net/ethernet/mediatek/mtk_wed_wo.c    |  4 ++--
+ drivers/nvme/host/tcp.c                       |  8 +++----
+ drivers/nvme/target/tcp.c                     | 22 +++++++++----------
+ drivers/vhost/net.c                           |  6 ++---
+ include/linux/page_frag_cache.h               | 21 +++++++++---------
+ include/linux/skbuff.h                        |  2 +-
+ kernel/bpf/cpumap.c                           |  2 +-
+ mm/page_frag_cache.c                          | 12 +++++-----
+ mm/page_frag_test.c                           | 11 +++++-----
+ net/core/skbuff.c                             | 18 +++++++--------
+ net/core/xdp.c                                |  2 +-
+ net/rxrpc/txbuf.c                             | 15 +++++++------
+ net/sunrpc/svcsock.c                          |  6 ++---
+ 19 files changed, 74 insertions(+), 71 deletions(-)
+
+diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+index acb73d4d0de6..b6c10100e462 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx.c
++++ b/drivers/net/ethernet/google/gve/gve_rx.c
+@@ -729,7 +729,7 @@ static int gve_xdp_redirect(struct net_device *dev, struct gve_rx_ring *rx,
+ 
+ 	total_len = headroom + SKB_DATA_ALIGN(len) +
+ 		SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+-	frame = page_frag_alloc(&rx->page_cache, total_len, GFP_ATOMIC);
++	frame = page_frag_alloc_va(&rx->page_cache, total_len, GFP_ATOMIC);
+ 	if (!frame) {
+ 		u64_stats_update_begin(&rx->statss);
+ 		rx->xdp_alloc_fails++;
+@@ -742,7 +742,7 @@ static int gve_xdp_redirect(struct net_device *dev, struct gve_rx_ring *rx,
+ 
+ 	err = xdp_do_redirect(dev, &new, xdp_prog);
+ 	if (err)
+-		page_frag_free(frame);
++		page_frag_free_va(frame);
+ 
+ 	return err;
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 8bb743f78fcb..399b317c509d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -126,7 +126,7 @@ ice_unmap_and_free_tx_buf(struct ice_tx_ring *ring, struct ice_tx_buf *tx_buf)
+ 		dev_kfree_skb_any(tx_buf->skb);
+ 		break;
+ 	case ICE_TX_BUF_XDP_TX:
+-		page_frag_free(tx_buf->raw_buf);
++		page_frag_free_va(tx_buf->raw_buf);
+ 		break;
+ 	case ICE_TX_BUF_XDP_XMIT:
+ 		xdp_return_frame(tx_buf->xdpf);
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+index feba314a3fe4..6379f57d8228 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.h
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+@@ -148,7 +148,7 @@ static inline int ice_skb_pad(void)
+  * @ICE_TX_BUF_DUMMY: dummy Flow Director packet, unmap and kfree()
+  * @ICE_TX_BUF_FRAG: mapped skb OR &xdp_buff frag, only unmap DMA
+  * @ICE_TX_BUF_SKB: &sk_buff, unmap and consume_skb(), update stats
+- * @ICE_TX_BUF_XDP_TX: &xdp_buff, unmap and page_frag_free(), stats
++ * @ICE_TX_BUF_XDP_TX: &xdp_buff, unmap and page_frag_free_va(), stats
+  * @ICE_TX_BUF_XDP_XMIT: &xdp_frame, unmap and xdp_return_frame(), stats
+  * @ICE_TX_BUF_XSK_TX: &xdp_buff on XSk queue, xsk_buff_free(), stats
+  */
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+index 2719f0e20933..a1a41a14df0d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+@@ -250,7 +250,7 @@ ice_clean_xdp_tx_buf(struct device *dev, struct ice_tx_buf *tx_buf,
+ 
+ 	switch (tx_buf->type) {
+ 	case ICE_TX_BUF_XDP_TX:
+-		page_frag_free(tx_buf->raw_buf);
++		page_frag_free_va(tx_buf->raw_buf);
+ 		break;
+ 	case ICE_TX_BUF_XDP_XMIT:
+ 		xdp_return_frame_bulk(tx_buf->xdpf, bq);
+diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+index b938dc06045d..fcd1b149a45d 100644
+--- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
++++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
+@@ -303,7 +303,7 @@ static bool ixgbevf_clean_tx_irq(struct ixgbevf_q_vector *q_vector,
+ 
+ 		/* free the skb */
+ 		if (ring_is_xdp(tx_ring))
+-			page_frag_free(tx_buffer->data);
++			page_frag_free_va(tx_buffer->data);
+ 		else
+ 			napi_consume_skb(tx_buffer->skb, napi_budget);
+ 
+@@ -2413,7 +2413,7 @@ static void ixgbevf_clean_tx_ring(struct ixgbevf_ring *tx_ring)
+ 
+ 		/* Free all the Tx ring sk_buffs */
+ 		if (ring_is_xdp(tx_ring))
+-			page_frag_free(tx_buffer->data);
++			page_frag_free_va(tx_buffer->data);
+ 		else
+ 			dev_kfree_skb_any(tx_buffer->skb);
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index a85ac039d779..8eb5820b8a70 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -553,7 +553,7 @@ static int __otx2_alloc_rbuf(struct otx2_nic *pfvf, struct otx2_pool *pool,
+ 	*dma = dma_map_single_attrs(pfvf->dev, buf, pool->rbsize,
+ 				    DMA_FROM_DEVICE, DMA_ATTR_SKIP_CPU_SYNC);
+ 	if (unlikely(dma_mapping_error(pfvf->dev, *dma))) {
+-		page_frag_free(buf);
++		page_frag_free_va(buf);
+ 		return -ENOMEM;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/mediatek/mtk_wed_wo.c b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
+index 7063c78bd35f..c4228719f8a4 100644
+--- a/drivers/net/ethernet/mediatek/mtk_wed_wo.c
++++ b/drivers/net/ethernet/mediatek/mtk_wed_wo.c
+@@ -142,8 +142,8 @@ mtk_wed_wo_queue_refill(struct mtk_wed_wo *wo, struct mtk_wed_wo_queue *q,
+ 		dma_addr_t addr;
+ 		void *buf;
+ 
+-		buf = page_frag_alloc(&q->cache, q->buf_size,
+-				      GFP_ATOMIC | GFP_DMA32);
++		buf = page_frag_alloc_va(&q->cache, q->buf_size,
++					 GFP_ATOMIC | GFP_DMA32);
+ 		if (!buf)
+ 			break;
+ 
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 28bc2f373cfa..5f0af3191477 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -506,7 +506,7 @@ static void nvme_tcp_exit_request(struct blk_mq_tag_set *set,
+ {
+ 	struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
+ 
+-	page_frag_free(req->pdu);
++	page_frag_free_va(req->pdu);
+ }
+ 
+ static int nvme_tcp_init_request(struct blk_mq_tag_set *set,
+@@ -520,7 +520,7 @@ static int nvme_tcp_init_request(struct blk_mq_tag_set *set,
+ 	struct nvme_tcp_queue *queue = &ctrl->queues[queue_idx];
+ 	u8 hdgst = nvme_tcp_hdgst_len(queue);
+ 
+-	req->pdu = page_frag_alloc(&queue->pf_cache,
++	req->pdu = page_frag_alloc_va(&queue->pf_cache,
+ 		sizeof(struct nvme_tcp_cmd_pdu) + hdgst,
+ 		GFP_KERNEL | __GFP_ZERO);
+ 	if (!req->pdu)
+@@ -1337,7 +1337,7 @@ static void nvme_tcp_free_async_req(struct nvme_tcp_ctrl *ctrl)
+ {
+ 	struct nvme_tcp_request *async = &ctrl->async_req;
+ 
+-	page_frag_free(async->pdu);
++	page_frag_free_va(async->pdu);
+ }
+ 
+ static int nvme_tcp_alloc_async_req(struct nvme_tcp_ctrl *ctrl)
+@@ -1346,7 +1346,7 @@ static int nvme_tcp_alloc_async_req(struct nvme_tcp_ctrl *ctrl)
+ 	struct nvme_tcp_request *async = &ctrl->async_req;
+ 	u8 hdgst = nvme_tcp_hdgst_len(queue);
+ 
+-	async->pdu = page_frag_alloc(&queue->pf_cache,
++	async->pdu = page_frag_alloc_va(&queue->pf_cache,
+ 		sizeof(struct nvme_tcp_cmd_pdu) + hdgst,
+ 		GFP_KERNEL | __GFP_ZERO);
+ 	if (!async->pdu)
+diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
+index 380f22ee3ebb..bea3aa79ef43 100644
+--- a/drivers/nvme/target/tcp.c
++++ b/drivers/nvme/target/tcp.c
+@@ -1463,24 +1463,24 @@ static int nvmet_tcp_alloc_cmd(struct nvmet_tcp_queue *queue,
+ 	c->queue = queue;
+ 	c->req.port = queue->port->nport;
+ 
+-	c->cmd_pdu = page_frag_alloc(&queue->pf_cache,
++	c->cmd_pdu = page_frag_alloc_va(&queue->pf_cache,
+ 			sizeof(*c->cmd_pdu) + hdgst, GFP_KERNEL | __GFP_ZERO);
+ 	if (!c->cmd_pdu)
+ 		return -ENOMEM;
+ 	c->req.cmd = &c->cmd_pdu->cmd;
+ 
+-	c->rsp_pdu = page_frag_alloc(&queue->pf_cache,
++	c->rsp_pdu = page_frag_alloc_va(&queue->pf_cache,
+ 			sizeof(*c->rsp_pdu) + hdgst, GFP_KERNEL | __GFP_ZERO);
+ 	if (!c->rsp_pdu)
+ 		goto out_free_cmd;
+ 	c->req.cqe = &c->rsp_pdu->cqe;
+ 
+-	c->data_pdu = page_frag_alloc(&queue->pf_cache,
++	c->data_pdu = page_frag_alloc_va(&queue->pf_cache,
+ 			sizeof(*c->data_pdu) + hdgst, GFP_KERNEL | __GFP_ZERO);
+ 	if (!c->data_pdu)
+ 		goto out_free_rsp;
+ 
+-	c->r2t_pdu = page_frag_alloc(&queue->pf_cache,
++	c->r2t_pdu = page_frag_alloc_va(&queue->pf_cache,
+ 			sizeof(*c->r2t_pdu) + hdgst, GFP_KERNEL | __GFP_ZERO);
+ 	if (!c->r2t_pdu)
+ 		goto out_free_data;
+@@ -1495,20 +1495,20 @@ static int nvmet_tcp_alloc_cmd(struct nvmet_tcp_queue *queue,
+ 
+ 	return 0;
+ out_free_data:
+-	page_frag_free(c->data_pdu);
++	page_frag_free_va(c->data_pdu);
+ out_free_rsp:
+-	page_frag_free(c->rsp_pdu);
++	page_frag_free_va(c->rsp_pdu);
+ out_free_cmd:
+-	page_frag_free(c->cmd_pdu);
++	page_frag_free_va(c->cmd_pdu);
+ 	return -ENOMEM;
+ }
+ 
+ static void nvmet_tcp_free_cmd(struct nvmet_tcp_cmd *c)
+ {
+-	page_frag_free(c->r2t_pdu);
+-	page_frag_free(c->data_pdu);
+-	page_frag_free(c->rsp_pdu);
+-	page_frag_free(c->cmd_pdu);
++	page_frag_free_va(c->r2t_pdu);
++	page_frag_free_va(c->data_pdu);
++	page_frag_free_va(c->rsp_pdu);
++	page_frag_free_va(c->cmd_pdu);
+ }
+ 
+ static int nvmet_tcp_alloc_cmds(struct nvmet_tcp_queue *queue)
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index f16279351db5..6691fac01e0d 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -686,8 +686,8 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 		return -ENOSPC;
+ 
+ 	buflen += SKB_DATA_ALIGN(len + pad);
+-	buf = page_frag_alloc_align(&net->pf_cache, buflen, GFP_KERNEL,
+-				    SMP_CACHE_BYTES);
++	buf = page_frag_alloc_va_align(&net->pf_cache, buflen, GFP_KERNEL,
++				       SMP_CACHE_BYTES);
+ 	if (unlikely(!buf))
+ 		return -ENOMEM;
+ 
+@@ -734,7 +734,7 @@ static int vhost_net_build_xdp(struct vhost_net_virtqueue *nvq,
+ 	return 0;
+ 
+ err:
+-	page_frag_free(buf);
++	page_frag_free_va(buf);
+ 	return ret;
+ }
+ 
+diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+index 9da7cbd0ee47..a5747cf7a3a1 100644
+--- a/include/linux/page_frag_cache.h
++++ b/include/linux/page_frag_cache.h
+@@ -25,23 +25,24 @@ struct page_frag_cache {
+ 
+ void page_frag_cache_drain(struct page_frag_cache *nc);
+ void __page_frag_cache_drain(struct page *page, unsigned int count);
+-void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
+-			      gfp_t gfp_mask, unsigned int align_mask);
++void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
++				 unsigned int fragsz, gfp_t gfp_mask,
++				 unsigned int align_mask);
+ 
+-static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
+-					  unsigned int fragsz, gfp_t gfp_mask,
+-					  unsigned int align)
++static inline void *page_frag_alloc_va_align(struct page_frag_cache *nc,
++					     unsigned int fragsz,
++					     gfp_t gfp_mask, unsigned int align)
+ {
+ 	WARN_ON_ONCE(!is_power_of_2(align) || align > PAGE_SIZE);
+-	return __page_frag_alloc_align(nc, fragsz, gfp_mask, -align);
++	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, -align);
+ }
+ 
+-static inline void *page_frag_alloc(struct page_frag_cache *nc,
+-				    unsigned int fragsz, gfp_t gfp_mask)
++static inline void *page_frag_alloc_va(struct page_frag_cache *nc,
++				       unsigned int fragsz, gfp_t gfp_mask)
+ {
+-	return __page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
++	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, ~0u);
+ }
+ 
+-void page_frag_free(void *addr);
++void page_frag_free_va(void *addr);
+ 
+ #endif
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 2b5c0757b801..7a47e12a22d5 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3352,7 +3352,7 @@ static inline struct sk_buff *netdev_alloc_skb_ip_align(struct net_device *dev,
+ 
+ static inline void skb_free_frag(void *addr)
+ {
+-	page_frag_free(addr);
++	page_frag_free_va(addr);
+ }
+ 
+ void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask);
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index a8e34416e960..3a6a237e7dd3 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -322,7 +322,7 @@ static int cpu_map_kthread_run(void *data)
+ 
+ 			/* Bring struct page memory area to curr CPU. Read by
+ 			 * build_skb_around via page_is_pfmemalloc(), and when
+-			 * freed written by page_frag_free call.
++			 * freed written by page_frag_free_va call.
+ 			 */
+ 			prefetchw(page);
+ 		}
+diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+index 152ae5dec58a..c0ecfa733727 100644
+--- a/mm/page_frag_cache.c
++++ b/mm/page_frag_cache.c
+@@ -61,9 +61,9 @@ void __page_frag_cache_drain(struct page *page, unsigned int count)
+ }
+ EXPORT_SYMBOL(__page_frag_cache_drain);
+ 
+-void *__page_frag_alloc_align(struct page_frag_cache *nc,
+-			      unsigned int fragsz, gfp_t gfp_mask,
+-			      unsigned int align_mask)
++void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
++				 unsigned int fragsz, gfp_t gfp_mask,
++				 unsigned int align_mask)
+ {
+ 	unsigned int size, offset;
+ 	struct page *page;
+@@ -124,16 +124,16 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
+ 
+ 	return nc->va + offset;
+ }
+-EXPORT_SYMBOL(__page_frag_alloc_align);
++EXPORT_SYMBOL(__page_frag_alloc_va_align);
+ 
+ /*
+  * Frees a page fragment allocated out of either a compound or order 0 page.
+  */
+-void page_frag_free(void *addr)
++void page_frag_free_va(void *addr)
+ {
+ 	struct page *page = virt_to_head_page(addr);
+ 
+ 	if (unlikely(put_page_testzero(page)))
+ 		free_unref_page(page, compound_order(page));
+ }
+-EXPORT_SYMBOL(page_frag_free);
++EXPORT_SYMBOL(page_frag_free_va);
+diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
+index 62b7cedeff39..bb9f5aa84631 100644
+--- a/mm/page_frag_test.c
++++ b/mm/page_frag_test.c
+@@ -273,7 +273,7 @@ static int page_frag_pop_thread(void *arg)
+ 
+ 		if (obj) {
+ 			nr--;
+-			page_frag_free(obj);
++			page_frag_free_va(obj);
+ 		} else {
+ 			cond_resched();
+ 		}
+@@ -303,17 +303,18 @@ static int page_frag_push_thread(void *arg)
+ 
+ 		size = clamp(size, 1U, PAGE_SIZE);
+ 		if (test_align)
+-			va = page_frag_alloc_align(&test_frag, size, GFP_KERNEL,
+-						   SMP_CACHE_BYTES);
++			va = page_frag_alloc_va_align(&test_frag, size,
++						      GFP_KERNEL,
++						      SMP_CACHE_BYTES);
+ 		else
+-			va = page_frag_alloc(&test_frag, size, GFP_KERNEL);
++			va = page_frag_alloc_va(&test_frag, size, GFP_KERNEL);
+ 
+ 		if (!va)
+ 			continue;
+ 
+ 		ret = objpool_push(va, pool);
+ 		if (ret) {
+-			page_frag_free(va);
++			page_frag_free_va(va);
+ 			cond_resched();
+ 		} else {
+ 			nr--;
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 466999a7515e..dca4e7445348 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -309,8 +309,8 @@ void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
+ 
+ 	fragsz = SKB_DATA_ALIGN(fragsz);
+ 
+-	return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
+-				       align_mask);
++	return __page_frag_alloc_va_align(&nc->page, fragsz, GFP_ATOMIC,
++					  align_mask);
+ }
+ EXPORT_SYMBOL(__napi_alloc_frag_align);
+ 
+@@ -322,15 +322,15 @@ void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
+ 	if (in_hardirq() || irqs_disabled()) {
+ 		struct page_frag_cache *nc = this_cpu_ptr(&netdev_alloc_cache);
+ 
+-		data = __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC,
+-					       align_mask);
++		data = __page_frag_alloc_va_align(nc, fragsz, GFP_ATOMIC,
++						  align_mask);
+ 	} else {
+ 		struct napi_alloc_cache *nc;
+ 
+ 		local_bh_disable();
+ 		nc = this_cpu_ptr(&napi_alloc_cache);
+-		data = __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
+-					       align_mask);
++		data = __page_frag_alloc_va_align(&nc->page, fragsz, GFP_ATOMIC,
++						  align_mask);
+ 		local_bh_enable();
+ 	}
+ 	return data;
+@@ -740,12 +740,12 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
+ 
+ 	if (in_hardirq() || irqs_disabled()) {
+ 		nc = this_cpu_ptr(&netdev_alloc_cache);
+-		data = page_frag_alloc(nc, len, gfp_mask);
++		data = page_frag_alloc_va(nc, len, gfp_mask);
+ 		pfmemalloc = nc->pfmemalloc;
+ 	} else {
+ 		local_bh_disable();
+ 		nc = this_cpu_ptr(&napi_alloc_cache.page);
+-		data = page_frag_alloc(nc, len, gfp_mask);
++		data = page_frag_alloc_va(nc, len, gfp_mask);
+ 		pfmemalloc = nc->pfmemalloc;
+ 		local_bh_enable();
+ 	}
+@@ -833,7 +833,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
+ 	} else {
+ 		len = SKB_HEAD_ALIGN(len);
+ 
+-		data = page_frag_alloc(&nc->page, len, gfp_mask);
++		data = page_frag_alloc_va(&nc->page, len, gfp_mask);
+ 		pfmemalloc = nc->page.pfmemalloc;
+ 	}
+ 
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index 41693154e426..245a2d011aeb 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -391,7 +391,7 @@ void __xdp_return(void *data, struct xdp_mem_info *mem, bool napi_direct,
+ 		page_pool_put_full_page(page->pp, page, napi_direct);
+ 		break;
+ 	case MEM_TYPE_PAGE_SHARED:
+-		page_frag_free(data);
++		page_frag_free_va(data);
+ 		break;
+ 	case MEM_TYPE_PAGE_ORDER0:
+ 		page = virt_to_page(data); /* Assumes order0 page*/
+diff --git a/net/rxrpc/txbuf.c b/net/rxrpc/txbuf.c
+index c3913d8a50d3..dccb0353ee84 100644
+--- a/net/rxrpc/txbuf.c
++++ b/net/rxrpc/txbuf.c
+@@ -33,8 +33,8 @@ struct rxrpc_txbuf *rxrpc_alloc_data_txbuf(struct rxrpc_call *call, size_t data_
+ 
+ 	data_align = umax(data_align, L1_CACHE_BYTES);
+ 	mutex_lock(&call->conn->tx_data_alloc_lock);
+-	buf = page_frag_alloc_align(&call->conn->tx_data_alloc, total, gfp,
+-				    data_align);
++	buf = page_frag_alloc_va_align(&call->conn->tx_data_alloc, total, gfp,
++				       data_align);
+ 	mutex_unlock(&call->conn->tx_data_alloc_lock);
+ 	if (!buf) {
+ 		kfree(txb);
+@@ -96,17 +96,18 @@ struct rxrpc_txbuf *rxrpc_alloc_ack_txbuf(struct rxrpc_call *call, size_t sack_s
+ 	if (!txb)
+ 		return NULL;
+ 
+-	buf = page_frag_alloc(&call->local->tx_alloc,
+-			      sizeof(*whdr) + sizeof(*ack) + 1 + 3 + sizeof(*trailer), gfp);
++	buf = page_frag_alloc_va(&call->local->tx_alloc,
++				 sizeof(*whdr) + sizeof(*ack) + 1 + 3 + sizeof(*trailer), gfp);
+ 	if (!buf) {
+ 		kfree(txb);
+ 		return NULL;
+ 	}
+ 
+ 	if (sack_size) {
+-		buf2 = page_frag_alloc(&call->local->tx_alloc, sack_size, gfp);
++		buf2 = page_frag_alloc_va(&call->local->tx_alloc, sack_size,
++					  gfp);
+ 		if (!buf2) {
+-			page_frag_free(buf);
++			page_frag_free_va(buf);
+ 			kfree(txb);
+ 			return NULL;
+ 		}
+@@ -180,7 +181,7 @@ static void rxrpc_free_txbuf(struct rxrpc_txbuf *txb)
+ 			  rxrpc_txbuf_free);
+ 	for (i = 0; i < txb->nr_kvec; i++)
+ 		if (txb->kvec[i].iov_base)
+-			page_frag_free(txb->kvec[i].iov_base);
++			page_frag_free_va(txb->kvec[i].iov_base);
+ 	kfree(txb);
+ 	atomic_dec(&rxrpc_nr_txbuf);
+ }
+diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
+index 6b3f01beb294..42d20412c1c3 100644
+--- a/net/sunrpc/svcsock.c
++++ b/net/sunrpc/svcsock.c
+@@ -1222,8 +1222,8 @@ static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
+ 	/* The stream record marker is copied into a temporary page
+ 	 * fragment buffer so that it can be included in rq_bvec.
+ 	 */
+-	buf = page_frag_alloc(&svsk->sk_frag_cache, sizeof(marker),
+-			      GFP_KERNEL);
++	buf = page_frag_alloc_va(&svsk->sk_frag_cache, sizeof(marker),
++				 GFP_KERNEL);
+ 	if (!buf)
+ 		return -ENOMEM;
+ 	memcpy(buf, &marker, sizeof(marker));
+@@ -1235,7 +1235,7 @@ static int svc_tcp_sendmsg(struct svc_sock *svsk, struct svc_rqst *rqstp,
+ 	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, rqstp->rq_bvec,
+ 		      1 + count, sizeof(marker) + rqstp->rq_res.len);
+ 	ret = sock_sendmsg(svsk->sk_sock, &msg);
+-	page_frag_free(buf);
++	page_frag_free_va(buf);
+ 	if (ret < 0)
+ 		return ret;
+ 	*sentp += ret;
+-- 
+2.33.0
+
 
