@@ -1,450 +1,186 @@
-Return-Path: <kvm+bounces-17433-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17436-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FEDE8C68CF
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 16:33:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D8C8C6912
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 16:57:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D42251F234B6
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 14:33:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46A801C21340
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 14:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57DC915573D;
-	Wed, 15 May 2024 14:33:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714E8155747;
+	Wed, 15 May 2024 14:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N5secWMs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dgI4gCrh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EB21553A4
-	for <kvm@vger.kernel.org>; Wed, 15 May 2024 14:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926A81E480;
+	Wed, 15 May 2024 14:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715783618; cv=none; b=CzqCC9PmN2fel6oJcLPsJ2iqUbj9b61WREno2o1Ve2V4tmhSzNRoNUJ/EZCQer6UDEYfvZsisEBcairP26rfolERXG5aDftjOxdMjReJUTf1MwWRf5A/sQ+xjMtg8zuMjmn2IFY8Zlk9DiZx9nNuHuF3zy835c4R33uMLu1Kggc=
+	t=1715785062; cv=none; b=ucax1CJey5L551qdry2hehaCZ8Qi762hNWG3OZy8mQMEdQ3oXA5iHnd7IHHl0P6DkvpKPD/kranl4WGYA7mxeAI296Rol/luySJonVeIjGGAMMN8HU1kHtEG7UjWpbw0BRvxL1UIQagtN8fpWY2fnUxN/CYC0jbRLK6J3HmQ0rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715783618; c=relaxed/simple;
-	bh=kvlmCf22y9rDTw0KTVyLWcWhYGc+KWVk3FKMW6uE+5s=;
+	s=arc-20240116; t=1715785062; c=relaxed/simple;
+	bh=WZoYbqGGnOPQEjzC3t94VjU0p7tCnohke6zY104Itrk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ehNr3cq4HB//3NHx/JIIraUmD0jp/c7U/8wSEAUu+D31d4VyX/Wdnj3t+4FMHCdvtzxfsRfKh10rqBfwIUik4QCPIBIvguiYQt/fzd3zYrN4mEmgPvUaArDvj7CffePZ1esCbG4mJr09QTT1lRF3hTAayD+CvER9W8QTf1+Q5P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N5secWMs; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1715783616; x=1747319616;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kvlmCf22y9rDTw0KTVyLWcWhYGc+KWVk3FKMW6uE+5s=;
-  b=N5secWMsT+uUBb//A8QMy8Dcfe0kQnjnBJXTKugqApu9nyx+KkDRYpbL
-   nU66p+bn0JJQJ5AtJ+f6xIqGBYGAtxDyQkn3xCNPjPY9FZkhqOhSlZxV9
-   /jWH6HZSLBHD9wi17hz8nXSP4h2yGQzLHSOBQKROaK9MdpVpzQTiTIAbj
-   LR7PGpGBq0pgG6wPRdlgETYMMvVhrC7wd1wcI5Jg49VQMFUfTfenv0pbe
-   Xz1TTlcgQcExkjZP4eYOss8J1zUTrZArVg4t1+fy+3u+gdFiuuHv/P8Dg
-   dxcYYYA8Wj/l1hc3z6Er6hSpxxNZErlg0Wgp5qYeugDJFYklwDUyHb9Tl
-   g==;
-X-CSE-ConnectionGUID: XhaYv4nNSsuR64pIs7wdng==
-X-CSE-MsgGUID: fsAVUmT7QDyTpMcttnyHUQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="22438290"
-X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
-   d="scan'208";a="22438290"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2024 07:33:35 -0700
-X-CSE-ConnectionGUID: E0Yh7Ra6Thy8XxTP7ScEbA==
-X-CSE-MsgGUID: yvu3g8jgSNKcay9b9rfVqQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,162,1712646000"; 
-   d="scan'208";a="30907084"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orviesa010.jf.intel.com with ESMTP; 15 May 2024 07:33:30 -0700
-Date: Wed, 15 May 2024 22:48:48 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	qemu-devel@nongnu.org, kvm@vger.kernel.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Babu Moger <babu.moger@amd.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
-	Dapeng Mi <dapeng1.mi@intel.com>, Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: Re: [PATCH v11 00/21] i386: Introduce smp.modules and clean up cache
- topology
-Message-ID: <ZkTLUAt5PbXz4fcB@intel.com>
-References: <20240424154929.1487382-1-zhao1.liu@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kOFhEeiiQJRzi/hOfAcsc7A2jGwCBrvIcrQPdhJDVbet/IGobrFypMW+1UpQ+IOMuhohk6zQ7D+swNviiTa9O+0AiEBo1ZFPX287imc8nS12fj+i1w66NG+ufpQ8eNZOlNKqc5AAGFWaSAMMcs3YKWx0SKvJr5FR2fyOAd2lg88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dgI4gCrh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18897C116B1;
+	Wed, 15 May 2024 14:57:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715785062;
+	bh=WZoYbqGGnOPQEjzC3t94VjU0p7tCnohke6zY104Itrk=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=dgI4gCrhm8ErfM11kskowGtGU8gXHhXctsKdQ//nEYfJmqUINpSzyGocVth4T8O+S
+	 6r34N50hcA6BI5OpysiZAV0F7tOBtIwyWxEtRTVvuW5udYhX1q3Akx0bwypugodVSr
+	 HPQyQlnCIi33KvUPHjJIWBg4DYI2BOTm1U7VVWL67o6AZiVo1ytt3YnGiW+84WYM4w
+	 OYRU0HGC7DEtnzjEH8YrHTsFxUisoJkdSjMGS7DUDJ/3ekkGD/P9aMQa0jcuTKZvnH
+	 71SAJ8sNH02NEfafNORz4gL1rMQVv5bobaWtPBpXDs91EGw6u88Yfi4QkwS9nVWXtk
+	 8dw6KyydEb3ow==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 46BE9CE0443; Wed, 15 May 2024 07:57:41 -0700 (PDT)
+Date: Wed, 15 May 2024 07:57:41 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Leonardo Bras <leobras@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 1/1] kvm: Note an RCU quiescent state on guest exit
+Message-ID: <17ebd54d-a058-4bc8-bd65-a175d73b6d1a@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20240511020557.1198200-1-leobras@redhat.com>
+ <ZkJsvTH3Nye-TGVa@google.com>
+ <CAJ6HWG7pgMu7sAUPykFPtsDfq5Kfh1WecRcgN5wpKQj_EyrbJA@mail.gmail.com>
+ <68c39823-6b1d-4368-bd1e-a521ade8889b@paulmck-laptop>
+ <ZkQ97QcEw34aYOB1@LeoBras>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240424154929.1487382-1-zhao1.liu@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZkQ97QcEw34aYOB1@LeoBras>
 
-Hi Paolo,
+On Wed, May 15, 2024 at 01:45:33AM -0300, Leonardo Bras wrote:
+> On Tue, May 14, 2024 at 03:54:16PM -0700, Paul E. McKenney wrote:
+> > On Mon, May 13, 2024 at 06:47:13PM -0300, Leonardo Bras Soares Passos wrote:
+> > > On Mon, May 13, 2024 at 4:40 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > >
+> > > > On Fri, May 10, 2024, Leonardo Bras wrote:
+> > > > > As of today, KVM notes a quiescent state only in guest entry, which is good
+> > > > > as it avoids the guest being interrupted for current RCU operations.
+> > > > >
+> > > > > While the guest vcpu runs, it can be interrupted by a timer IRQ that will
+> > > > > check for any RCU operations waiting for this CPU. In case there are any of
+> > > > > such, it invokes rcu_core() in order to sched-out the current thread and
+> > > > > note a quiescent state.
+> > > > >
+> > > > > This occasional schedule work will introduce tens of microsseconds of
+> > > > > latency, which is really bad for vcpus running latency-sensitive
+> > > > > applications, such as real-time workloads.
+> > > > >
+> > > > > So, note a quiescent state in guest exit, so the interrupted guests is able
+> > > > > to deal with any pending RCU operations before being required to invoke
+> > > > > rcu_core(), and thus avoid the overhead of related scheduler work.
+> > > >
+> > > > Are there any downsides to this?  E.g. extra latency or anything?  KVM will note
+> > > > a context switch on the next VM-Enter, so even if there is extra latency or
+> > > > something, KVM will eventually take the hit in the common case no matter what.
+> > > > But I know some setups are sensitive to handling select VM-Exits as soon as possible.
+> > > >
+> > > > I ask mainly because it seems like a no brainer to me to have both VM-Entry and
+> > > > VM-Exit note the context switch, which begs the question of why KVM isn't already
+> > > > doing that.  I assume it was just oversight when commit 126a6a542446 ("kvm,rcu,nohz:
+> > > > use RCU extended quiescent state when running KVM guest") handled the VM-Entry
+> > > > case?
+> > > 
+> > > I don't know, by the lore I see it happening in guest entry since the
+> > > first time it was introduced at
+> > > https://lore.kernel.org/all/1423167832-17609-5-git-send-email-riel@redhat.com/
+> > > 
+> > > Noting a quiescent state is cheap, but it may cost a few accesses to
+> > > possibly non-local cachelines. (Not an expert in this, Paul please let
+> > > me know if I got it wrong).
+> > 
+> > Yes, it is cheap, especially if interrupts are already disabled.
+> > (As in the scheduler asks RCU to do the same amount of work on its
+> > context-switch fastpath.)
+> 
+> Thanks!
+> 
+> > 
+> > > I don't have a historic context on why it was just implemented on
+> > > guest_entry, but it would make sense when we don't worry about latency
+> > > to take the entry-only approach:
+> > > - It saves the overhead of calling rcu_virt_note_context_switch()
+> > > twice per guest entry in the loop
+> > > - KVM will probably run guest entry soon after guest exit (in loop),
+> > > so there is no need to run it twice
+> > > - Eventually running rcu_core() may be cheaper than noting quiescent
+> > > state every guest entry/exit cycle
+> > > 
+> > > Upsides of the new strategy:
+> > > - Noting a quiescent state in guest exit avoids calling rcu_core() if
+> > > there was a grace period request while guest was running, and timer
+> > > interrupt hits the cpu.
+> > > - If the loop re-enter quickly there is a high chance that guest
+> > > entry's rcu_virt_note_context_switch() will be fast (local cacheline)
+> > > as there is low probability of a grace period request happening
+> > > between exit & re-entry.
+> > > - It allows us to use the rcu patience strategy to avoid rcu_core()
+> > > running if any grace period request happens between guest exit and
+> > > guest re-entry, which is very important for low latency workloads
+> > > running on guests as it reduces maximum latency in long runs.
+> > > 
+> > > What do you think?
+> > 
+> > Try both on the workload of interest with appropriate tracing and
+> > see what happens?  The hardware's opinion overrides mine.  ;-)
+> 
+> That's a great approach!
+> 
+> But in this case I think noting a quiescent state in guest exit is 
+> necessary to avoid a scenario in which a VM takes longer than RCU 
+> patience, and it ends up running rcuc in a nohz_full cpu, even if guest 
+> exit was quite brief. 
+> 
+> IIUC Sean's question is more on the tone of "Why KVM does not note a 
+> quiescent state in guest exit already, if it does in guest entry", and I 
+> just came with a few arguments to try finding a possible rationale, since 
+> I could find no discussion on that topic in the lore for the original 
+> commit.
 
-I have a question before I do a new v12 rebase:
+Understood, and maybe trying it would answer that question quickly.
+Don't get me wrong, just because it appears to work in a few tests doesn't
+mean that it really works, but if it visibly blows up, that answers the
+question quite quickly and easily.  ;-)
 
-Since patch 5,6,7 fixed CPUID encoding way, should I add the compat
-options for older machines to be compatible with past encoding behavior?
+But yes, if it appears to work, there must be a full investigation into
+whether or not the change really is safe.
 
-Thanks,
-Zhao
+							Thanx, Paul
 
-On Wed, Apr 24, 2024 at 11:49:08PM +0800, Zhao Liu wrote:
-> Date: Wed, 24 Apr 2024 23:49:08 +0800
-> From: Zhao Liu <zhao1.liu@intel.com>
-> Subject: [PATCH v11 00/21] i386: Introduce smp.modules and clean up cache
->  topology
-> X-Mailer: git-send-email 2.34.1
-> 
-> Hi maintainers,
-> 
-> This is the my v11 patch series, rebased on the master branch at the
-> commit 88daa112d4ed ("Merge tag 'migration-20240423-pull-request' of
-> https://gitlab.com/peterx/qemu into staging").
-> 
-> Since v10 didn't receive comment so v11 just rebase on the latest v9.0
-> to resolve minor conflicts to facilitate maintainer. ;-)
-> 
-> This is a larger series, and almost all patches (containing all the key
-> changes) has gotten Reviewed-by and Acked-by, and tested from both Intel
-> and AMD.
-> 
-> Thank you all for your patience and help!
-> 
-> 
-> Abstract
-> ========
-> 
-> Intel's hybrid Client platform and E core server platform introduce
-> module level and share L2 cache on the module level, in order to
-> configure the CPU/cache topology for the Guest to be consistent with
-> Host's, this series did the following work:
->  * Add now "module" CPU topology level for x86 CPU.
->  * Refacter cache topology encoding for x86 CPU (This is base to
->    support the L2 per module).
-> 
-> So, this series is also necessary to support subsequent user
-> configurations of cache topology (via -smp, [2]) and Intel heterogeneous
-> CPU topology ([3] and [4]).
-> 
-> 
-> Background
-> ==========
-> 
-> At present, x86 defaults L2 cache is shared in one core, but this is
-> not enough. There're some platforms that multiple cores share the
-> same L2 cache, e.g., Alder Lake-P shares L2 cache for one module of
-> Atom cores, that is, every four Atom cores shares one L2 cache. On
-> E core server platform, there's the similar L2 per module topology.
-> Therefore, we need the new CPU topology level.
-> 
-> 
-> Another reason is that Intel client hybrid architectures organize P
-> cores and E cores via module, so a new CPU topology level is necessary
-> to support hybrid CPU topology!
-> 
-> 
-> Why We Introduce Module Instead of Reusing Cluster
-> --------------------------------------------------
-> 
-> For the discussion in v7 about whether we should reuse current
-> smp.clusters for x86 module, the core point is what's the essential
-> differences between x86 module and general cluster.
-> 
-> Since, cluster (for ARM/riscv) lacks a comprehensive and rigorous
-> hardware definition, and judging from the description of smp.clusters
-> [5] when it was introduced by QEMU, x86 module is very similar to
-> general smp.clusters: they are all a layer above existing core level
-> to organize the physical cores and share L2 cache.
-> 
-> But there are following reasons that drive us to introduce the new
-> smp.modules:
-> 
->   * As the CPU topology abstraction in device tree [6], cluster supports
->     nesting (though currently QEMU hasn't support that). In contrast,
->     (x86) module does not support nesting.
-> 
->   * Due to nesting, there is great flexibility in sharing resources
->     on cluster, rather than narrowing cluster down to sharing L2 (and
->     L3 tags) as the lowest topology level that contains cores.
-> 
->   * Flexible nesting of cluster allows it to correspond to any level
->     between the x86 package and core.
-> 
->   * In Linux kernel, x86's cluster only represents the L2 cache domain
->     but QEMU's smp.clusters is the CPU topology level. Linux kernel will
->     also expose module level topology information in sysfs for x86. To
->     avoid cluster ambiguity and keep a consistent CPU topology naming
->     style with the Linux kernel, we introduce module level for x86.
-> 
-> Based on the above considerations, and in order to eliminate the naming
-> confusion caused by the mapping between general cluster and x86 module,
-> we now formally introduce smp.modules as the new topology level.
-> 
-> 
-> Where to Place Module in Existing Topology Levels
-> -------------------------------------------------
-> 
-> The module is, in existing hardware practice, the lowest layer that
-> contains the core, while the cluster is able to have a higher topological
-> scope than the module due to its nesting.
-> 
-> Therefore, we place the module between the cluster and the core:
-> 
->     drawer/book/socket/die/cluster/module/core/thread
-> 
-> 
-> Patch Series Overview
-> =====================
-> 
-> Introduction of Module Level in -smp
-> ------------------------------------
-> 
-> First, a new module level is introduced in the -smp related code to
-> support the module topology in subsequent x86 parts.
-> 
-> Users can specify the number of modules (in one die) for a PC machine
-> with "-smp modules=*".
-> 
-> 
-> Why not Share L2 Cache in Module Directly
-> -----------------------------------------
-> 
-> Though one of module's goals is to implement L2 cache per module,
-> directly using module to define x86's L2 cache topology will cause the
-> compatibility problem:
-> 
-> Currently, x86 defaults that the L2 cache is shared in one core, which
-> actually implies a default setting "cores per L2 cache is 1" and
-> therefore implicitly defaults to having as many L2 caches as cores.
-> 
-> For example (i386 PC machine):
-> -smp 16,sockets=2,dies=2,cores=2,threads=2,maxcpus=16 (*)
-> 
-> Considering the topology of the L2 cache, this (*) implicitly means "1
-> core per L2 cache" and "2 L2 caches per die".
-> 
-> If we use module to configure L2 cache topology with the new default
-> setting "modules per L2 cache is 1", the above semantics will change
-> to "2 cores per module" and "1 module per L2 cache", that is, "2
-> cores per L2 cache".
-> 
-> So the same command (*) will cause changes in the L2 cache topology,
-> further affecting the performance of the virtual machine.
-> 
-> Therefore, x86 should only treat module as a cpu topology level and
-> avoid using it to change L2 cache by default for compatibility.
-> 
-> Thereby, we need another way to allow user to configure cache topology,
-> this is anther RFC [2].
-> 
-> 
-> Module Level in CPUID
-> ---------------------
-> 
-> Linux kernel (from v6.4, with commit edc0a2b595765 ("x86/topology: Fix
-> erroneous smp_num_siblings on Intel Hybrid platforms") is able to
-> handle platforms with Module level enumerated via CPUID.1F.
-> 
-> Expose the module level in CPUID[0x1F] (for Intel CPUs) if the machine
-> has more than 1 modules since v3.
-> 
-> 
-> New Cache Topology Info in CPUCacheInfo
-> ---------------------------------------
-> 
-> (This is in preparation for users being able to configure cache topology
-> from the command line later on.)
-> 
-> Currently, by default, the cache topology is encoded as:
-> 1. i/d cache is shared in one core.
-> 2. L2 cache is shared in one core.
-> 3. L3 cache is shared in one die.
-> 
-> This default general setting has caused a misunderstanding, that is, the
-> cache topology is completely equated with a specific CPU topology, such
-> as the connection between L2 cache and core level, and the connection
-> between L3 cache and die level.
-> 
-> In fact, the settings of these topologies depend on the specific
-> platform and are not static. For example, on Alder Lake-P, every
-> four Atom cores share the same L2 cache [3].
-> 
-> Thus, in this patch set, we explicitly define the corresponding cache
-> topology for different cache models and this has two benefits:
-> 1. Easy to expand to new cache models with different topology in the
->    future.
-> 2. It can easily support custom cache topology by some command.
-> 
-> 
-> Patch Description
-> =================
-> 
-> Patch 01-04: Add module support in -smp.
-> 
-> Patch    05: Fix Intel L1 cache topology.
-> 
-> Patch 06-08: Clean up cache topology related CPUID encoding and QEMU
->              topology variables.
-> 
-> Patch 09-11: Refactor CPUID[0x1F] (CPU topology) encoding to prepare to
->              introduce module level.
-> 
-> Patch 12-18: Add the module as the new CPU topology level in x86.
-> 
-> Patch 19-21: Refactor cache topology encoding for Intel and AMD.
-> 
-> 
-> Reference
-> =========
-> 
-> [1]: https://lore.kernel.org/qemu-devel/20240321144048.3699388-1-zhao1.liu@linux.intel.com/
-> [2]: https://lore.kernel.org/qemu-devel/20240220092504.726064-1-zhao1.liu@linux.intel.com/
-> [3]: https://lore.kernel.org/qemu-devel/20230213095035.158240-1-zhao1.liu@linux.intel.com/
-> [4]: https://lore.kernel.org/qemu-devel/20231130144203.2307629-1-zhao1.liu@linux.intel.com/
-> 
-> 
-> Thanks and Best Regards,
-> Zhao
-> ---
-> Changelog:
-> 
-> Changes since v10:
->  * Rebased on commit 88daa11.
-> 
-> Changes since v9:
->  * Collected a/b, t/b and r/b tags.
->  * Fixed typos.
->  * Minor cleanup of code.
->  * Added more comments and polished commit message.
-> 
-> Changes since v8:
->  * Added the reason of why a new module level is needed in commit
->    message. (Markus).
->  * Added the description about how Linux kernel supports x86 module
->    level in commit message. (Daniel)
->  * Added module description in qemu_smp_opts.
->  * Added missing "modules" parameter of -smp example in documentation.
->  * Added Philippe's reviewed-by tag.
-> 
-> Changes since v7 (main changes):
->  * Introduced smp.modules as a new CPU topology level. (Xiaoyao)
->  * Fixed calculations of cache_info_passthrough case in the
->    patch "i386/cpu: Use APIC ID info to encode cache topo in
->    CPUID[4]". (Xiaoyao)
->  * Moved the patch "i386/cpu: Use APIC ID info get NumSharingCache
->    for CPUID[0x8000001D].EAX[bits 25:14]" after CPUID[4]'s similar
->    change ("i386/cpu: Use APIC ID offset to encode cache topo in
->    CPUID[4]"). (Xiaoyao)
->  * Introduced a bitmap in CPUX86State to cache available CPU topology
->    levels.
->  * Refactored the encode_topo_cpuid1f() to use traversal to search the
->    encoded level and avoid using static variables.
->  * Mapped x86 module to smp module instead of cluster.
->  * Dropped Michael/Babu's ACKed/Tested tags for most patches since the
->    code change.
-> 
-> Changes since v6:
->  * Updated the comment when check cluster-id. Since there's no
->    v8.2, the cluster-id support should at least start from v9.0.
->  * Rebased on commit d328fef93ae7 ("Merge tag 'pull-20231230' of
->    https://gitlab.com/rth7680/qemu into staging").
-> 
-> Changes since v5:
->  * The first four patches of v5 [1] have been merged, v6 contains
->    the remaining patches.
->  * Reabsed on the latest master.
->  * Updated the comment when check cluster-id. Since current QEMU is
->    v8.2, the cluster-id support should at least start from v8.3.
-> 
-> Changes since v4:
->  * Dropped the "x-l2-cache-topo" option. (Michael)
->  * Added A/R/T tags.
-> 
-> Changes since v3 (main changes):
->  * Exposed module level in CPUID[0x1F].
->  * Fixed compile warnings. (Babu)
->  * Fixed cache topology uninitialization bugs for some AMD CPUs. (Babu)
-> 
-> Changes since v2:
->  * Added "Tested-by", "Reviewed-by" and "ACKed-by" tags.
->  * Used newly added wrapped helper to get cores per socket in
->    qemu_init_vcpu().
-> 
-> Changes since v1:
->  * Reordered patches. (Yanan)
->  * Deprecated the patch to fix comment of machine_parse_smp_config().
->    (Yanan)
->  * Renamed test-x86-cpuid.c to test-x86-topo.c. (Yanan)
->  * Split the intel's l1 cache topology fix into a new separate patch.
->    (Yanan)
->  * Combined module_id and APIC ID for module level support into one
->    patch. (Yanan)
->  * Made cache_into_passthrough case of cpuid 0x04 leaf also encode via
->    APICID way. (Yanan)
->  * cpu_x86_cpuid() used max_processor_ids_for_cache() and
->    max_core_ids_in_package() to encode CPUID[4]. (Yanan)
->  * Added the prefix "CPU_TOPO_LEVEL_*" for CPU topology level names.
->    (Yanan)
-> 
-> ---
-> Zhao Liu (20):
->   hw/core/machine: Introduce the module as a CPU topology level
->   hw/core/machine: Support modules in -smp
->   hw/core: Introduce module-id as the topology subindex
->   hw/core: Support module-id in numa configuration
->   i386/cpu: Fix i/d-cache topology to core level for Intel CPU
->   i386/cpu: Use APIC ID info to encode cache topo in CPUID[4]
->   i386/cpu: Use APIC ID info get NumSharingCache for
->     CPUID[0x8000001D].EAX[bits 25:14]
->   i386/cpu: Consolidate the use of topo_info in cpu_x86_cpuid()
->   i386/cpu: Introduce bitmap to cache available CPU topology levels
->   i386: Split topology types of CPUID[0x1F] from the definitions of
->     CPUID[0xB]
->   i386/cpu: Decouple CPUID[0x1F] subleaf with specific topology level
->   i386: Introduce module level cpu topology to CPUX86State
->   i386: Support modules_per_die in X86CPUTopoInfo
->   i386: Expose module level in CPUID[0x1F]
->   i386: Support module_id in X86CPUTopoIDs
->   i386/cpu: Introduce module-id to X86CPU
->   hw/i386/pc: Support smp.modules for x86 PC machine
->   i386: Add cache topology info in CPUCacheInfo
->   i386/cpu: Use CPUCacheInfo.share_level to encode CPUID[4]
->   i386/cpu: Use CPUCacheInfo.share_level to encode
->     CPUID[0x8000001D].EAX[bits 25:14]
-> 
-> Zhuocheng Ding (1):
->   tests: Add test case of APIC ID for module level parsing
-> 
->  hw/core/machine-hmp-cmds.c |   4 +
->  hw/core/machine-smp.c      |  41 ++++-
->  hw/core/machine.c          |  18 +++
->  hw/i386/pc.c               |   1 +
->  hw/i386/x86.c              |  67 +++++++--
->  include/hw/boards.h        |   4 +
->  include/hw/i386/topology.h |  60 +++++++-
->  qapi/machine.json          |   7 +
->  qemu-options.hx            |  18 ++-
->  system/vl.c                |   3 +
->  target/i386/cpu.c          | 301 +++++++++++++++++++++++++++++--------
->  target/i386/cpu.h          |  29 +++-
->  target/i386/kvm/kvm.c      |   3 +-
->  tests/unit/test-x86-topo.c |  56 ++++---
->  14 files changed, 490 insertions(+), 122 deletions(-)
-> 
-> -- 
-> 2.34.1
+> Since noting a quiescent state in guest exit is cheap enough, avoids rcuc 
+> schedules when grace period starts during guest execution, and enables a 
+> much more rational usage of RCU patience, it's a safe to assume it's a 
+> better way of dealing with RCU compared to current implementation.
+> 
+> Sean, what do you think?
+> 
+> Thanks!
+> Leo
+> 
+> > 
+> > 							Thanx, Paul
+> > 
 > 
 
