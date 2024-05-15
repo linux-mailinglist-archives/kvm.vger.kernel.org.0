@@ -1,141 +1,222 @@
-Return-Path: <kvm+bounces-17482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4FFF8C6F42
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 01:39:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EDF48C6F47
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 01:39:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00E3B1C21455
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 23:39:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05BF41F2344C
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 23:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CCB15B0FE;
-	Wed, 15 May 2024 23:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D507B50283;
+	Wed, 15 May 2024 23:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HP/aTBT0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0N7kRuU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2589E15B0F8
-	for <kvm@vger.kernel.org>; Wed, 15 May 2024 23:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475114D5A5
+	for <kvm@vger.kernel.org>; Wed, 15 May 2024 23:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715816331; cv=none; b=fxKAhCtkax+Tk2sHTSraxou6AQKXi/Eit/jMWdjEfVVsZdNXDQ+ADvEfRw0h1xJl9ky7hjDq8gn0WLYeN/i2EpOB6oFCNmYTG1xn9fTiH69A3OMGtBH8x1cmkiCtfCBkW0yxNDmUqfvlNkb1gDpdQHDxNq5gbb5DVVVJ6FRnUgg=
+	t=1715816393; cv=none; b=tDKEo5MT6nqguWEJD+qItq+rd4gYBNqW+lrjwbLMCanimC9mQmXcsNh3ya4Q8pFAKNkO0xy44CwdvXpCupddNU+xEpiUlUW6tZRGsz1AsJ9muoEjTUOMmUXuurMOs4HEk2FKKYvXDOTx7gbSjBw1LqXwNaQF09NcNW1BmnqecdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715816331; c=relaxed/simple;
-	bh=LrhcmnqbvXlfMxqRj+JfkKFzkgxTODJrJww+lA0v+g4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=m7ELN87zgf1M9OtqOznMUZsUqWBQEt+qzzhsCwUqcpqaojt4/qT9YTo2VIv+fivpjbeZoZ5bw/dtlqW9WEa4gcv+IHOfzY+Sw63Nbl9jIleDSy4L0WuY+aCw7TswopGV3n33ETlU9KmFGAGdzm67J+5bdLeYNjTbOIPKlUlO52k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HP/aTBT0; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6202fd268c1so133088767b3.2
-        for <kvm@vger.kernel.org>; Wed, 15 May 2024 16:38:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715816329; x=1716421129; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VxHwWqhZCDTeqX7ABJ/MC4TG+j2XaIlpsAn6kujEg3E=;
-        b=HP/aTBT0twuuunpvSUm4g29kdoJhlpJn4qwqZJazpM8YixKzIZGbpU5zss7Qh7YhmX
-         349hGBC3SZviCnfhRQvd6QtEbUcQmdvQP86V1evRytQKFrtE90JJQUiYD5M+4SoeRJUV
-         IAImqe0k2jho1aF20iqF+LlbG8FZ8jyJzhF1iNDVq/ntYwnP3tC25P7iujVX8WElLqlP
-         FyA63iS4zcy6iQlGU0kqD1BAx8zJeLd/orvy6rT1mgkVdsdPwsmVuuKX44IEoBLZMi9z
-         ZteDPCbQ9bGNDl/8pQ3A3Eu7taXFDTwbjBINcB09mSlbDvuJ4KVNMw8AgXLMcI+aB6nw
-         9Z5g==
+	s=arc-20240116; t=1715816393; c=relaxed/simple;
+	bh=3oMs/EAozxzRjmHc8oF2xhclaHJKmRWrtxRCgWJizQg=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=Fm/dWlN8YyEQmZTsYOa266DXYtrGOfMPddznQlEVaiSjckZgP/L+yi+fH2EoW4s6blix/k7Ls/XW+BQwjNQTofsp4KZ7Tec1AUm2XYVjVCAIY9H6/WM6xKQtCOrgMSo4Xm7FZYTHSMSrUvBOZjob4EIUirwVk37Q3PcEvRdXCjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f0N7kRuU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715816389;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=RJLZdH0XAbImcOFFuxXsaDPLDeUbL5976vCjbDbG+y8=;
+	b=f0N7kRuUdxmhUJe1LBrE0s71U90iJlShpOdKrbj7sVN6LchHOzyf0pNUMeVgp1LhY+QfWw
+	4zEwUTYcBnWsd7N+u+l05MglEH+eQcxq7ocKNjh8bvZPlmv1VD1D0anBRYT+YJFe57ooiv
+	4b6lw9tdJz20V5xaHeRVjz6m9DuG3vI=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-589-T7Qtta0bPQeHCFMfVdJX0Q-1; Wed, 15 May 2024 19:39:37 -0400
+X-MC-Unique: T7Qtta0bPQeHCFMfVdJX0Q-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6a156a0f5baso146673186d6.1
+        for <kvm@vger.kernel.org>; Wed, 15 May 2024 16:39:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715816329; x=1716421129;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VxHwWqhZCDTeqX7ABJ/MC4TG+j2XaIlpsAn6kujEg3E=;
-        b=gqzz6l69Ng5yzD+rZHttClU0tntP9RkW9re5ENlVvilb8ot3c6Rse7udboMD8qLtkQ
-         mug9wIQWrURv7nOs6G0ILLHWaJSWTsRO1+7pw0UyFCwksRkXfAyIZix3851yI/esArVc
-         z0mYxeCxo7ndQhEtklOizFfjEzIh2nEWMzPwopZfIwbSK8X+FvznsTmHv37eNnRT+J6m
-         uhE1o84O8bop5QLIoFE/OCyNGy4s8qB+RBRzGSh17cLLtw89iefk7KO9Tdi6Wap3BIT0
-         2lkTkLDZDOuMwBPggB/RgpnjDebkSlfYcX2ukHmNOaGnjwBE5TGk+T9K4Q7RWfBy9R3e
-         kGtg==
-X-Forwarded-Encrypted: i=1; AJvYcCWlfeljIRGQZINYYVQ8Pipg4bvdwJVVSb8QwGPz2YVVPQ8lG6oqUrMrHgAoKSaJ8W7zzD/k0W9/MN8tOWa+RmKkClIC
-X-Gm-Message-State: AOJu0YwKM5JqkOtze9UMXc8nszkMsh7vJuyWIbWRUZKwQGjp3oumjAcC
-	qcqQ5fhDTm296mjRiqaWuQpmAn9oP9mZP6gmpm5R2Jnnxe24uhTwWgYbBDiJGlYYTvE94Ijm+Q9
-	hiQ==
-X-Google-Smtp-Source: AGHT+IG1VymRwYPhDDRuWF6qTtiMKj/CRUAbL/zk5uaIGds/1vBcmZIwr7OftjRa+r7/Zg3Iis8ka/uKU8g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6202:b0:61a:d355:168f with SMTP id
- 00721157ae682-622affe5533mr45697717b3.5.1715816329189; Wed, 15 May 2024
- 16:38:49 -0700 (PDT)
-Date: Wed, 15 May 2024 16:38:47 -0700
-In-Reply-To: <20240507154459.3950778-8-pbonzini@redhat.com>
+        d=1e100.net; s=20230601; t=1715816377; x=1716421177;
+        h=content-transfer-encoding:mime-version:user-agent:date:cc:to:from
+         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RJLZdH0XAbImcOFFuxXsaDPLDeUbL5976vCjbDbG+y8=;
+        b=uX0WP2FHvi07pkcTcg5rHJ4RGjPdSeeenWULOpIiAcVlYPBht42psxW4mxDoS+DpU5
+         5RQLReDQFDTTHZtFmNuWkT0b92JJmcgTHBbsFpOVMIEIvoqngUeLaX0muq+1ujEaCAJl
+         eA1ztNwYK10KIITpjuqSnKe6Me6dI/ylneGuB8J7mgxlIy+nG5C0l0kWKFN7QiGgiNCy
+         bbHBTKL91wwvLzKINy9x8ZIjYyWIwC/7AayMIoQKRELP3su9dZ/MaOb3rqbixlkkWTSu
+         dc2OJvyKhZ5I1z0dpoqLgaOat7cXjUOQgmO6Cm/GasmJmgD2HTOGCSl5zFXRspagHYtO
+         0quQ==
+X-Gm-Message-State: AOJu0Yy3tpbGsuYb1qB+oMfWfmZSxq7LDiPiqa93Q9RC5msavNswaiPl
+	/Z52NbootBZUNIf8MwHwFnNkP/+CM9SgMMR/S/JC3D2TCMWmVzK9jlPKuTjB9+TDdt1sNVqqFYO
+	v27Q5BU09gJWthiMVVqFgeQpqasR2pwZQhsMeP4B9RuA4HUo7pLvQuQFgoPMxXQCNFssKK99qdA
+	dyEVYrDovAqzvXPUIRlBW1jxje2YtQyO+s4g==
+X-Received: by 2002:a05:6214:4806:b0:6a0:def5:8281 with SMTP id 6a1803df08f44-6a16791bce2mr293866976d6.11.1715816376859;
+        Wed, 15 May 2024 16:39:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE/FreTvJOKBUWb+O8LuC80crXjtW+UtDMrlX8Ra7hY/aOTvGrew9NnD1oHwZ9Ux5JDkds8pw==
+X-Received: by 2002:a05:6214:4806:b0:6a0:def5:8281 with SMTP id 6a1803df08f44-6a16791bce2mr293866696d6.11.1715816376231;
+        Wed, 15 May 2024 16:39:36 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f18520dsm69616536d6.44.2024.05.15.16.39.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 May 2024 16:39:35 -0700 (PDT)
+Message-ID: <7a46456d6750ea682ba321ad09541fa81677b81a.camel@redhat.com>
+Subject: access_tracking_perf_test kvm selftest doesn't work when Multi-Gen
+ LRU  is in use
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Henry Huang <henry.hj@antgroup.com>,
+ linux-mm@kvack.org
+Date: Wed, 15 May 2024 19:39:35 -0400
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240507154459.3950778-1-pbonzini@redhat.com> <20240507154459.3950778-8-pbonzini@redhat.com>
-Message-ID: <ZkVHh49Hn8gB3_9o@google.com>
-Subject: Re: [PATCH 7/7] KVM: VMX: Introduce test mode related to EPT
- violation VE
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	Isaku Yamahata <isaku.yamahata@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, May 07, 2024, Paolo Bonzini wrote:
-> @@ -5200,6 +5215,9 @@ static int handle_exception_nmi(struct kvm_vcpu *vcpu)
->  	if (is_invalid_opcode(intr_info))
->  		return handle_ud(vcpu);
->  
-> +	if (KVM_BUG_ON(is_ve_fault(intr_info), vcpu->kvm))
-> +		return -EIO;
+Hi,
 
-I've hit this three times now when running KVM-Unit-Tests (I'm pretty sure it's
-the EPT test, unsurprisingly).  And unless I screwed up my testing, I verified it
-still fires with Isaku's fix[*], though I'm suddenly having problems repro'ing.
+I would like to share a long rabbit hole dive I did some time ago on why access_tracking_perf_test test sometimes 
+fails and why it fails on only some RHEL9 machines.
 
-I'll update tomorrow as to whether I botched my testing of Isaku's fix, or if
-there's another bug lurking.
+When it fails you see an error like this:
 
-https://lore.kernel.org/all/20240515173209.GD168153@ls.amr.corp.intel.com
+Populating memory : 0.693662489s
+Writing to populated memory : 0.022868074s
+Reading from populated memory : 0.009497503s
+Mark memory idle : 2.206361533s
+Writing to idle memory : 0.282340559s
+==== Test Assertion Failure ====
+access_tracking_perf_test.c:188: this_cpu_has(X86_FEATURE_HYPERVISOR)
+pid=78914 tid=78918 errno=4 - Interrupted system call
+1 0x0000000000402e99: mark_vcpu_memory_idle at access_tracking_perf_test.c:188
+2 (inlined by) vcpu_thread_main at access_tracking_perf_test.c:240
+3 0x000000000040745d: vcpu_thread_main at memstress.c:283
+4 0x00007f68e66a1911: ?? ??:0
+5 0x00007f68e663f44f: ?? ??:0
+vCPU0: Too many pages still idle (123013 out of 262144)
 
-  ------------[ cut here ]------------
-  WARNING: CPU: 6 PID: 68167 at arch/x86/kvm/vmx/vmx.c:5217 handle_exception_nmi+0xd4/0x5b0 [kvm_intel]
-  Modules linked in: kvm_intel kvm vfat fat dummy bridge stp llc spidev cdc_ncm cdc_eem cdc_ether usbnet mii xhci_pci xhci_hcd ehci_pci ehci_hcd gq(O) sha3_generic
-  CPU: 6 PID: 68167 Comm: qemu Tainted: G S         O       6.9.0-smp--a3fee713d124-sigh #308
-  Hardware name: Google Interlaken/interlaken, BIOS 0.20231025.0-0 10/25/2023
-  RIP: 0010:handle_exception_nmi+0xd4/0x5b0 [kvm_intel]
-  Code: 03 00 80 75 4e 48 89 df be 07 00 00 00 e8 24 79 e7 ff b8 01 00 00 00 eb bd 48 8b 0b b8 fb ff ff ff 80 b9 11 9f 00 00 00 75 ac <0f> 0b 48 8b 3b 66 c7 87 11 9f 00 00 01 01 be 01 03 00 00 e8 f4 66
-  RSP: 0018:ff201f9afeebfb38 EFLAGS: 00010246
-  RAX: 00000000fffffffb RBX: ff201f5bea710000 RCX: ff43efc142e18000
-  RDX: 4813020000000002 RSI: 0000000000000000 RDI: ff201f5bea710000
-  RBP: ff201f9afeebfb70 R08: 0000000000000001 R09: 0000000000000000
-  R10: 0000000000000000 R11: ffffffffc0a3cd40 R12: 0000000080000300
-  R13: 0000000000000000 R14: 0000000080000314 R15: 0000000080000314
-  FS:  00007f65328006c0(0000) GS:ff201f993df00000(0000) knlGS:0000000000000000
-  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-  CR2: 0000000000000000 CR3: 00000040b5712002 CR4: 0000000000773ef0
-  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-  PKRU: 55555554
-  Call Trace:
-   <TASK>
-   vmx_handle_exit+0x565/0x7e0 [kvm_intel]
-   vcpu_run+0x188b/0x22b0 [kvm]
-   kvm_arch_vcpu_ioctl_run+0x358/0x680 [kvm]
-   kvm_vcpu_ioctl+0x4ca/0x5b0 [kvm]
-   __se_sys_ioctl+0x7b/0xd0
-   __x64_sys_ioctl+0x21/0x30
-   x64_sys_call+0x15ac/0x2e40
-   do_syscall_64+0x85/0x160
-   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-  RIP: 0033:0x7f653422bfbb
-   </TASK>
-  irq event stamp: 0
-  hardirqs last  enabled at (0): [<0000000000000000>] 0x0
-  hardirqs last disabled at (0): [<ffffffff85101206>] copy_process+0x366/0x13b0
-  softirqs last  enabled at (0): [<ffffffff85101206>] copy_process+0x366/0x13b0
-  softirqs last disabled at (0): [<0000000000000000>] 0x0
-  ---[ end trace 0000000000000000 ]---
- 
+
+access_tracking_perf_test uses '/sys/kernel/mm/page_idle/bitmap' interface to: 
+
+	- runs a guest once which writes to its memory pages and thus allocates and dirties them.
+
+	- clear A/D bits of the primary and secondary translation of guest pages
+	   (note that it clears the bits in the actual PTEs only)
+
+	- set so called 'idle' page flags bit on these pages
+
+	  (this bit is only used for page_idle private usage, it is not used in generic mm code, because
+	   generic mm code only tracks dirty and not accessed page status)
+
+	- runs again the guest which dirties those memory pages again.
+
+	- uses the same 'page_idle' interface to check that most (90%) of the guest pages are now accessed again.
+
+	  in terms of page_idle code, it will tell that page is not idle (=accessed) if either:
+		- idle bit of it is clear
+		- A/D bits are set in primary or secondary PTEs that map this page 
+		  (in this case it will also clear the idle bit,
+		   so that subsequent queries won't need to check the PTEs again)
+	  
+
+The problem is that sometimes the secondary translations (that is SPTEs) are destroyed/flushed by KVM 
+which causes KVM to mark guest pages which were mapped through these SPTEs as accessed:
+
+
+KVM calls kvm_set_pfn_accessed and this call eventually leads to folio_mark_accessed().
+
+This function used to clear the idle bit of the page.
+(but note that it would not set accessed bits in the primary translation of this page!)
+
+But now when MGLRU is enabled it doesn't do this anymore:
+
+void folio_mark_accessed(struct folio *folio)
+{
+	if (lru_gen_enabled()) {
+		folio_inc_refs(folio);
+		return;
+	}
+
+	....
+
+	if (folio_test_idle(folio))
+		folio_clear_idle(folio);
+}
+EXPORT_SYMBOL(folio_mark_accessed);
+
+
+Thus when the page_idle code checks the page, it sees no A/D bits in primary translation,
+no A/D bits in secondary translation (because it doesn't exist), and idle bit set,
+so it considers the page idle, that is not accessed.
+
+There is a patch series that seems to fix this, but it seems that it wasn't accepted upstream,
+I don't know what is the current status of this work.
+
+https://patchew.org/linux/951fb7edab535cf522def4f5f2613947ed7b7d28.1701853894.git.henry.hj@antgroup.com/
+
+
+Now the question is, what do you think we should do to fix it? 
+Should we at least disable page_idle interface when MGLRU is enabled?
+
+
+Best regards,
+	Maxim Levitsky
+
+
+PS:
+
+Small note on why we started seeing this failure on RHEL 9 and only on some machines: 
+
+	- RHEL9 has MGLRU enabled, RHEL8 doesn't.
+
+	- machine needs to have more than one NUMA node because NUMA balancing 
+	  (enabled by default) tries apparently to write protect the primary PTEs 
+	  of (all?) processes every few seconds, and that causes KVM to flush the secondary PTEs:
+	  (at least with new tdp mmu)
+
+access_tracking-3448    [091] ....1..  1380.244666: handle_changed_spte <-tdp_mmu_set_spte
+ access_tracking-3448    [091] ....1..  1380.244667: <stack trace>
+ => cdc_driver_init
+ => handle_changed_spte
+ => tdp_mmu_set_spte
+ => tdp_mmu_zap_leafs
+ => kvm_tdp_mmu_unmap_gfn_range
+ => kvm_unmap_gfn_range
+ => kvm_mmu_notifier_invalidate_range_start
+ => __mmu_notifier_invalidate_range_start
+ => change_p4d_range
+ => change_protection
+ => change_prot_numa
+ => task_numa_work
+ => task_work_run
+ => exit_to_user_mode_prepare
+ => syscall_exit_to_user_mode
+ => do_syscall_64
+ => entry_SYSCALL_64_after_hwframe
+
+It's a separate question, if the NUMA balancing should do this, or if NUMA balancing should be enabled by default,
+because there are other reasons that can force KVM to invalidate the secondary mappings and trigger this issue.
+
+
+
+
+
+
 
