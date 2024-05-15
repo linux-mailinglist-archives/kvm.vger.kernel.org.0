@@ -1,118 +1,82 @@
-Return-Path: <kvm+bounces-17415-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17416-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE0118C5F48
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 04:54:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E2F78C5F92
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 06:03:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB371C2124E
-	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 02:54:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F07C1C215D2
+	for <lists+kvm@lfdr.de>; Wed, 15 May 2024 04:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C8B376E4;
-	Wed, 15 May 2024 02:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="sFLDUAZg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0111383AC;
+	Wed, 15 May 2024 04:03:46 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mxhk.zte.com.cn (mxhk.zte.com.cn [63.216.63.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0253A36AE0;
-	Wed, 15 May 2024 02:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B76381B9;
+	Wed, 15 May 2024 04:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.216.63.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715741651; cv=none; b=b830/FUOFlWk/zNCq/O9tS9z9Vd4K8P3kxp+w2XvhJYqjns2QtE5F7A4YgW0WOHvpCIp3hpB7WVHv1ObsMtRlPnC43HJ8cI0smYBfE3ub0vMtsGYG9Q/0W184i64nZQWI/xX0RYgsnmy7savjvt6JPIhuxW1osup6tGBO/3CawI=
+	t=1715745826; cv=none; b=KxMXq4et7UMtyq7IAI88PwGWpYG17Xz+3e6yyR5VCpdWT2MlzAYXvqqqyAy3V4DpAGpyk+cMaLDl8AaznWsyyk9q2TIhtGTSIW792EV7ktAMU2KTybr6odotlQH0qFNNpJRVt5NPgeOIq264g3qKXnfsn9dHI4H4H0uGyq5UneQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715741651; c=relaxed/simple;
-	bh=FrTSNu9y56pabtP28PDvyyHeKaYZe4k+0eITepOd/qk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=fySH6L+X7UhGcRF0WO8BCJXzyjH0YQOVgjyydVlbSOW8ijRFguXz6Gnaux4rG1EoslvKjGee/Vdbmri93J/qZcyvt4X0v/KboGSOM79OI2QjLqnwpgdBdiuzrTSMk0JT6mRpvw+tHpiQWDSqgMwd3KGGNA6weiqOFakCt0e/NWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=sFLDUAZg; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1715741645;
-	bh=88zHo7n0BTHEK7IEgzwThHpPCEj50A3rg+9I/KaLZhs=;
-	h=Date:From:To:Cc:Subject:From;
-	b=sFLDUAZgNh4sCHhI2qdMgT5DDWq70DnQ/eEDSL2P6BvJRaD9Jh6FPh3jhHJni7Xyi
-	 /KwvBrGdGdef/AWxdtnMOBlMjkmsMulCQqDBGRNbUGylxHjLNygJ404EU3kU/52eoJ
-	 E1URO6FhKL9H1sfWgqgRyvcHqlc6C9e1SLqqu6qQY9sScV0pjZ4eKpUkCjcQ1RsPDw
-	 8BuGHeTpeK7Si8R54NxwLFVTjoSXZ30RgLuffN7XFlEQHSRjXOkSGA6Qp3EpDQ3hJW
-	 as4gd5dHLvkdX+7QkOKrVLTakBJmBP+vRb3I1/QAiIg4BAhef1Ir4fUdAEnFaZmoIU
-	 gNYM9K2F5HC8w==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1715745826; c=relaxed/simple;
+	bh=O88tAcTlnEuDEVNLDeD9ZcVV/l6h4nyW0awA4mXMQh8=;
+	h=Date:Message-ID:In-Reply-To:References:Mime-Version:From:To:Cc:
+	 Subject:Content-Type; b=YkfGRBbYWKtbb6fDS0m28LiYg/V1NzmWRTS5li3WdATcRVg863CBmUWLwD7w498wQvQ/EWA7bpOBLXdEzwYiXAmwJm3b+IJUkRx/5sFQpdPo1ROWRIXAfaHZGWxEspudiYWci1zl94nBU3chZyS0HD7GPzo3pXYeYhSM4GWYlos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=63.216.63.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VfHqc4lcQz4wc8;
-	Wed, 15 May 2024 12:54:04 +1000 (AEST)
-Date: Wed, 15 May 2024 12:54:04 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>, Huacai
- Chen <chenhuacai@loongson.cn>
-Cc: Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Tiezhu Yang
- <yangtiezhu@loongson.cn>
-Subject: linux-next: manual merge of the kvm tree with the loongarch tree
-Message-ID: <20240515125404.5ffbaada@canb.auug.org.au>
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4VfKMw1LbVz4xPBc;
+	Wed, 15 May 2024 12:03:40 +0800 (CST)
+Received: from szxlzmapp03.zte.com.cn ([10.5.231.207])
+	by mse-fl2.zte.com.cn with SMTP id 44F43WO1087412;
+	Wed, 15 May 2024 12:03:32 +0800 (+08)
+	(envelope-from cheng.lin130@zte.com.cn)
+Received: from mapi (szxlzmapp06[null])
+	by mapi (Zmail) with MAPI id mid14;
+	Wed, 15 May 2024 12:03:33 +0800 (CST)
+Date: Wed, 15 May 2024 12:03:33 +0800 (CST)
+X-Zmail-TransId: 2b0866443415ffffffffb5b-22ebd
+X-Mailer: Zmail v1.0
+Message-ID: <20240515120333724v7bc656U_mnZJaYDZd3vt@zte.com.cn>
+In-Reply-To: <ZkPfB2VpGkRmMLsi@google.com>
+References: Zj4qEG5QfbX4mo48@google.com,202405111034432081zGPU1OUESImLVeboZ0zQ@zte.com.cn,ZkPfB2VpGkRmMLsi@google.com
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/o_MYjImIFPwNGrSQLBO1o6j";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Mime-Version: 1.0
+From: <cheng.lin130@zte.com.cn>
+To: <seanjc@google.com>
+Cc: <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <jiang.yong5@zte.com.cn>,
+        <wang.liang82@zte.com.cn>, <jiang.xuexin@zte.com.cn>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSF0gS1ZNOiBpbnRyb2R1Y2Ugdm0ncyBtYXhfaGFsdF9wb2xsX25zIHRvIGRlYnVnZnM=?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 44F43WO1087412
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6644341C.000/4VfKMw1LbVz4xPBc
 
---Sig_/o_MYjImIFPwNGrSQLBO1o6j
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi all,
-
-Today's linux-next merge of the kvm tree got a conflict in:
-
-  arch/loongarch/kernel/irq.c
-
-between commit:
-
-  5685d7fcb55f ("LoongArch: Give a chance to build with !CONFIG_SMP")
-
-from the loongarch tree and commit:
-
-  316863cb62fe ("LoongArch/smp: Refine some ipi functions on LoongArch plat=
-form")
-
-from the kvm tree.
-
-I fixed it up (the latter removed a function that was made protected by
-CONFIG_SMP in the former - I just removed it) and can carry the fix as
-necessary. This is now fixed as far as linux-next is concerned, but any
-non trivial conflicts should be mentioned to your upstream maintainer
-when your tree is submitted for merging.  You may also want to consider
-cooperating with the maintainer of the conflicting tree to minimise any
-particularly complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/o_MYjImIFPwNGrSQLBO1o6j
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmZEI8wACgkQAVBC80lX
-0GytFAf+LwzWmlb8+iyV3iC1tKJKoM+QdKdzMfUejvrZdKabf64GAniBKDs3lsG9
-QoW12zerBpcB3PjbEz1qJ02Ph/5YfrgScsACfSBtQjGCGel65+0qokxnd1ZgOOX5
-7rm+u5uaG6dxN1ZKkQRfJSITwksiewkL296VJWZd0YNjgUA4E+u9CAGwfdCetOGR
-dTnDYNi1ys2oy6Yx2PYHPgQjtz/o/6Yu9exXlGtxfAxmwuNFQeToHUPhEy6UQ49M
-AJNl5LdVWM7ywSP5EPYvmlnEnQguQGL1gaOW/JgmjbVqLorL1QOUH5wcsEb6DVZd
-Rw4REV3p/09kOqC27mzzzzHDRFBiqg==
-=KwgP
------END PGP SIGNATURE-----
-
---Sig_/o_MYjImIFPwNGrSQLBO1o6j--
+> > > Yes, but _why_?  I know _what_ a debugs knob allows, but you have yet to explain
+> > > why this
+> > I think that if such an interface is provided, it can be used to check the source of
+> > vm's max_halt_poll_ns, general module parameter or per-vm configuration.
+> > When configured through per-vm, such an interface can be used to monitor this
+> > configuration. If there is an error in the setting through KVMCAP_HALL_POLL, such
+> > an interface can be used to fix or reset it dynamicly.
+> But again, that argument can be made for myriad settings in KVM.  And unlike many
+> settings, a "bad" max_halt_poll_ns can be fixed simply by redoing KVM_CAP_HALL_POLL.
+Yes, Whether it is convenient to redo it will depend on the userspace.
+> It's not KVM's responsibility to police userspace for bugs/errors, and IMO a
+> backdoor into max_halt_poll_ns isn't justified.
+Yes, It's not KVM's responsibility to police userspace. In addition to depend on userspace
+redo, it can be seen as a planB to ensure that the VM works as expected.
 
