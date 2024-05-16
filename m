@@ -1,121 +1,152 @@
-Return-Path: <kvm+bounces-17533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0B598C7831
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 16:02:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75D988C783D
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 16:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D3BC285F36
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 14:02:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B4C31F2242A
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 14:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E0214B961;
-	Thu, 16 May 2024 14:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1441D14A601;
+	Thu, 16 May 2024 14:07:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k+OJX8QB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yba0bHa5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609C114A4D7;
-	Thu, 16 May 2024 14:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C3C147C75
+	for <kvm@vger.kernel.org>; Thu, 16 May 2024 14:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715868155; cv=none; b=myLHs5mYp6MgpDzAe8VH6zQngntsWttLAgAmp6HuH6JrE6xkzIdtZqzWjhd7J4IflSf5m3Swp65UNCBvQ3knF8WtwVsFlsSQnHAjnRJmcMQvu8GpCFfbpUUbs3aMATNA77CeLVBFSCGPAPgIzFP3OO0xcxAoPdu8HCerulpyqQQ=
+	t=1715868428; cv=none; b=GqO7+u5+Oc7DOfvyjdnJgs09UX3pc/fRZlaRGzXrYuPJ57y4sMUXNd405jjhGEsNuXL2eGrTKkQupbd8QRwmQYkqc2nwS3+gsxoZCIyo6dL6Eu8zzGqcNBaGOE2wj8S4K13dQJtS9uuhjupoUNTh43JR5YNS7eM8LPpxlU2NfDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715868155; c=relaxed/simple;
-	bh=PII+OyY3HRsFOpjW5l++XBk5W4fZ/zADl3BCmJlUORM=;
-	h=Subject:MIME-Version:Content-Type:Date:Message-ID:CC:From:To:
-	 References:In-Reply-To; b=VOtslJur2zmnM700pOzHZn1PZXRU5uA3i3yp/+ipWYQicF1BGlVkJRv8Oqfqjtn8jwW0CTbHt1wTPHOfPou7A3M08NkaEKXKvSGF7qNNUer8hzTZ5SE5AY/lfNN5OgjJ9x7dKbMHf5fzxYDYP9mmtx1UDdwFg0lFkkzykvPke24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k+OJX8QB; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
+	s=arc-20240116; t=1715868428; c=relaxed/simple;
+	bh=tWr3SDz/keT0AUPlOI26qivjzXaj1FzjL66/DGqh04E=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ZLI6h86HpCNCJ1FEP+LtNr3h3bYr2xf1PwXF6CoO7GvpHgJT2he9zL+VCG0hWG4OaALouStcIngDRKZQgx4zSG3Ch0y7bUzcKLZCJBN3aRGDJUm3mvqcU/aoTcyCRP0oSZ2t6uMtg6ZwUJwVB4xSZqx83bLuFYhkYzhUkYdijbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yba0bHa5; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b269686aso12123990276.1
+        for <kvm@vger.kernel.org>; Thu, 16 May 2024 07:07:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1715868154; x=1747404154;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   cc:from:to:references:in-reply-to:subject;
-  bh=PII+OyY3HRsFOpjW5l++XBk5W4fZ/zADl3BCmJlUORM=;
-  b=k+OJX8QBKhlhXLL+yP7jzjxSe2kwEGUIlf1RVVo8QLlDuet++05n1dC7
-   dwhyvpEbW+sLKcnNuXJDwX9Dp1D1vS6zEXehHOJDcwbUoiDoTf/1MKlFU
-   esPMfQq5KW/aAQJWLPNk5j+/JXm0kvAxHpvRtIW0QAvZOHvajT8m1wCpz
-   k=;
-X-IronPort-AV: E=Sophos;i="6.08,164,1712620800"; 
-   d="scan'208";a="419475431"
-Subject: Re: [RFC PATCH v3 3/5] KVM: x86: Add notifications for Heki policy
- configuration and violation
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 14:02:24 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:61258]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.38.98:2525] with esmtp (Farcaster)
- id 669cf238-0252-433a-b5ae-10131f992275; Thu, 16 May 2024 14:02:23 +0000 (UTC)
-X-Farcaster-Flow-ID: 669cf238-0252-433a-b5ae-10131f992275
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 16 May 2024 14:02:23 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Thu, 16 May
- 2024 14:02:12 +0000
+        d=google.com; s=20230601; t=1715868425; x=1716473225; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cgdQVmJ7EdgxAUQ+Mn5lPrLPnO4lZEwTEM15imrbXrA=;
+        b=yba0bHa5am5fP5V616/M+WbhxwcDMo+NtPMCOrVpRyrspilC/XFfDk4xBrZvLGsWd+
+         fsxpgKIcffW6Gt3Eo52MpCteadFDr7YZ3Q7sZqCpw4sUc605ou7ETGWTxMSoIAP1AslZ
+         FvB+OlrpSnE5PkXRhtEqTa5ainnu7RCqjXxVI+2ncqAd+N8utOOPk+90WBqpE9rK7hYs
+         yxdZ4tG/qSTcYOU6n7qe7X+B9q/ew69wpqg9Q2yq2LJsYdgy+ImoyqBWayGqN2pLUu60
+         pZfjHeZk3b9xVolnkRdvc2wDlkB62L2wXXPtnDxJhX2PAfw7YfCG3POePFGjKaNhVNqp
+         z41Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715868425; x=1716473225;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cgdQVmJ7EdgxAUQ+Mn5lPrLPnO4lZEwTEM15imrbXrA=;
+        b=Vqt0c3Vo6dLrcrahXVh5js2/rJzDswRb3mbt8uGtSF+5KnRDU2TonO2pfAe4HPhfHF
+         CI9KHmcEh+IhLp5tfEJkwbBNVnwxXgoOr4Kkai/zXO1DMgq7yW1FeV7rGR4WDYmVUix5
+         dhw/FbZXRA4xKHZd+9cNUshkP7IRJRyirrfa5OFxo522D+58Zusikt/Tm77+ZJDxV6H7
+         3FnY+lbta5g1+iX7yrwiZEnT2jRZHjjn67IwJkbFnHb4PWbWDrkBMLOU9EMA5tZODhBO
+         QbWM8RaFExuv07PTO/o2n6Zy1q/Dg3n4Ov7KWcBaTDPLPk5ngflyKVDO9K8JrgYUqyzr
+         8rcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWh+Ea+TFcVygviPD7k2LbVGk7mtehwAHyiB4WkmugkWmbFVcbXk6x+SgUPG7UWOj8UdCtUdHsanZOd4GmzUmyRL9vA
+X-Gm-Message-State: AOJu0Yy+CKUEiKiSjhicm2DW1pIRNe/zNP2tMS245uamWRGsrn+mVwA6
+	uiskNVaWYBWFguiPFVZXQzvwb6ru3jZE1mJm7MJlqnJom290xN075WkttdQC9mIMjin5XhFx165
+	hfg==
+X-Google-Smtp-Source: AGHT+IEDBtrDbkovNrhAV/lyqKo9e3I9oLyUsaLll6pFh8+GoJQSddiJzF1Cv5ysvpR9u6J0VFHg196pMTA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1025:b0:de5:3003:4b83 with SMTP id
+ 3f1490d57ef6-dee4f4fbce6mr1659030276.8.1715868424907; Thu, 16 May 2024
+ 07:07:04 -0700 (PDT)
+Date: Thu, 16 May 2024 07:07:03 -0700
+In-Reply-To: <BN9PR11MB527614E72C1DF467FF3F4C948CED2@BN9PR11MB5276.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 16 May 2024 14:02:09 +0000
-Message-ID: <D1B4HKJAJG21.2DH9F3E1Q6J9L@amazon.com>
-CC: Sean Christopherson <seanjc@google.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, "H . Peter Anvin" <hpa@zytor.com>,
-	Ingo Molnar <mingo@redhat.com>, Kees Cook <keescook@chromium.org>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, "Vitaly
- Kuznetsov" <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, "Rick P
- Edgecombe" <rick.p.edgecombe@intel.com>, Alexander Graf <graf@amazon.com>,
-	Angelina Vu <angelinavu@linux.microsoft.com>, Anna Trikalinou
-	<atrikalinou@microsoft.com>, Chao Peng <chao.p.peng@linux.intel.com>,
-	"Forrest Yuan Yu" <yuanyu@google.com>, James Gowans <jgowans@amazon.com>,
-	James Morris <jamorris@linux.microsoft.com>, John Andersen
-	<john.s.andersen@intel.com>, "Madhavan T . Venkataraman"
-	<madvenka@linux.microsoft.com>, Marian Rotariu <marian.c.rotariu@gmail.com>,
-	=?utf-8?q?Mihai_Don=C8=9Bu?= <mdontu@bitdefender.com>,
-	=?utf-8?q?Nicu=C8=99or_C=C3=AE=C8=9Bu?= <nicu.citu@icloud.com>, Thara
- Gopinath <tgopinath@microsoft.com>, "Trilok Soni" <quic_tsoni@quicinc.com>,
-	Wei Liu <wei.liu@kernel.org>, Will Deacon <will@kernel.org>, Yu Zhang
-	<yu.c.zhang@linux.intel.com>, =?utf-8?q?=C8=98tefan_=C8=98icleru?=
-	<ssicleru@bitdefender.com>, <dev@lists.cloudhypervisor.org>,
-	<kvm@vger.kernel.org>, <linux-hardening@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-security-module@vger.kernel.org>, <qemu-devel@nongnu.org>,
-	<virtualization@lists.linux-foundation.org>, <x86@kernel.org>,
-	<xen-devel@lists.xenproject.org>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: =?utf-8?q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-X-Mailer: aerc 0.17.0-129-gd582ac682cdf-dirty
-References: <20240503131910.307630-1-mic@digikod.net>
- <20240503131910.307630-4-mic@digikod.net> <ZjTuqV-AxQQRWwUW@google.com>
- <20240506.ohwe7eewu0oB@digikod.net> <ZjmFPZd5q_hEBdBz@google.com>
- <20240507.ieghomae0UoC@digikod.net> <ZjpTxt-Bxia3bRwB@google.com>
- <D15VQ97L5M8J.1TDNQE6KLW6JO@amazon.com> <20240514.mai3Ahdoo2qu@digikod.net>
-In-Reply-To: <20240514.mai3Ahdoo2qu@digikod.net>
-X-ClientProxiedBy: EX19D046UWA001.ant.amazon.com (10.13.139.112) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Mime-Version: 1.0
+References: <20240507061802.20184-1-yan.y.zhao@intel.com> <20240507061924.20251-1-yan.y.zhao@intel.com>
+ <BN9PR11MB5276DA8F389AAE7237C7F48E8CE42@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZjnwiKcmdpDAjMQ5@yzhao56-desk.sh.intel.com> <BN9PR11MB527614E72C1DF467FF3F4C948CED2@BN9PR11MB5276.namprd11.prod.outlook.com>
+Message-ID: <ZkYTByuHu_IptChR@google.com>
+Subject: Re: [PATCH 1/5] x86/pat: Let pat_pfn_immune_to_uc_mtrr() check MTRR
+ for untracked PAT range
+From: Sean Christopherson <seanjc@google.com>
+To: Kevin Tian <kevin.tian@intel.com>
+Cc: Yan Y Zhao <yan.y.zhao@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, 
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com" <jgg@nvidia.com>, 
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "luto@kernel.org" <luto@kernel.org>, 
+	"peterz@infradead.org" <peterz@infradead.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
+	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>, 
+	"corbet@lwn.net" <corbet@lwn.net>, "joro@8bytes.org" <joro@8bytes.org>, "will@kernel.org" <will@kernel.org>, 
+	"robin.murphy@arm.com" <robin.murphy@arm.com>, 
+	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, Yi L Liu <yi.l.liu@intel.com>, 
+	Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue May 14, 2024 at 12:23 PM UTC, Micka=C3=ABl Sala=C3=BCn wrote:
-> > Development happens
-> > https://github.com/vianpl/{linux,qemu,kvm-unit-tests} and the vsm-next
-> > branch, but I'd advice against looking into it until we add some order
-> > to the rework. Regardless, feel free to get in touch.
->
-> Thanks for the update.
->
-> Could we schedule a PUCK meeting to synchronize and help each other?
-> What about June 12?
++Tom
 
-Sounds great! June 12th works for me.
+On Thu, May 16, 2024, Kevin Tian wrote:
+> > From: Zhao, Yan Y <yan.y.zhao@intel.com>
+> > Sent: Tuesday, May 7, 2024 5:13 PM
+> > 
+> > On Tue, May 07, 2024 at 04:26:37PM +0800, Tian, Kevin wrote:
+> > > > From: Zhao, Yan Y <yan.y.zhao@intel.com>
+> > > > Sent: Tuesday, May 7, 2024 2:19 PM
+> > > >
+> > > > @@ -705,7 +705,17 @@ static enum page_cache_mode
+> > > > lookup_memtype(u64 paddr)
+> > > >   */
+> > > >  bool pat_pfn_immune_to_uc_mtrr(unsigned long pfn)
+> > > >  {
+> > > > -	enum page_cache_mode cm = lookup_memtype(PFN_PHYS(pfn));
+> > > > +	u64 paddr = PFN_PHYS(pfn);
+> > > > +	enum page_cache_mode cm;
+> > > > +
+> > > > +	/*
+> > > > +	 * Check MTRR type for untracked pat range since lookup_memtype()
+> > > > always
+> > > > +	 * returns WB for this range.
+> > > > +	 */
+> > > > +	if (x86_platform.is_untracked_pat_range(paddr, paddr + PAGE_SIZE))
+> > > > +		cm = pat_x_mtrr_type(paddr, paddr + PAGE_SIZE,
+> > > > _PAGE_CACHE_MODE_WB);
+> > >
+> > > doing so violates the name of this function. The PAT of the untracked
+> > > range is still WB and not immune to UC MTRR.
+> > Right.
+> > Do you think we can rename this function to something like
+> > pfn_of_uncachable_effective_memory_type() and make it work under
+> > !pat_enabled() too?
+> 
+> let's hear from x86/kvm maintainers for their opinions.
+> 
+> My gut-feeling is that kvm_is_mmio_pfn() might be moved into the
+> x86 core as the logic there has nothing specific to kvm itself. Also
+> naming-wise it doesn't really matter whether the pfn is mmio. The
+> real point is to find the uncacheble memtype in the primary mmu
+> and then follow it in KVM.
 
-Nicolas
+Yeaaaah, we've got an existing problem there.  When AMD's SME is enabled, KVM
+uses kvm_is_mmio_pfn() to determine whether or not to map memory into the guest
+as encrypted or plain text.  I.e. KVM really does try to use this helper to
+detect MMIO vs. RAM.  I highly doubt that actually works in all setups.
+
+For SME, it seems like the best approach would be grab the C-Bit from the host
+page tables, similar to how KVM uses host_pfn_mapping_level().
+
+SME aside, I don't have objection to moving kvm_is_mmio_pfn() out of KVM.
+
+> from that point probably a pfn_memtype_uncacheable() reads clearer.
+
+or even just pfn_is_memtype_uc()?
 
