@@ -1,281 +1,234 @@
-Return-Path: <kvm+bounces-17541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C0B8C79FB
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 18:03:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A218D8C7A58
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 18:29:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A0F51F2215E
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 16:03:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59DBE2818B3
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 16:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA7614D712;
-	Thu, 16 May 2024 16:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81FA15099D;
+	Thu, 16 May 2024 16:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="siHbNN0H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Du/DW3FM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B99314D6E9
-	for <kvm@vger.kernel.org>; Thu, 16 May 2024 16:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A4514D6FA
+	for <kvm@vger.kernel.org>; Thu, 16 May 2024 16:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715875381; cv=none; b=dxa6QN7eCPAVgkmH3mwqRB4Z81RYq8o2JkaS7huTH0N47FQTst3RLc4zowGgMF9UbYiUeaUiixGSwsV6I82TixqMdmEsFQ+FP+aHFuU89MNhRuKa6Db81FSJzgVx36Z7ZInkr7HapJayBz1HAZnuu+S2Ue4zE77ouDGCMm72iZ0=
+	t=1715876961; cv=none; b=CPMRDUyJ55gDVt9OEtcF3TDmAczFkUlt2HyXEeUDu3W8uGVeleUOF9BSgBXC60+b1ztFZyT9bACP+rBRCjPAuHYWxscrV6+XQkq6PwRNLMVTXI+epjyj5Pkj6eFwNBsQuyVMCYGXXbkE+Lg4KGdc+MMwN/g3awF0BHUfarFJGkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715875381; c=relaxed/simple;
-	bh=Qvn+eDPV3KjfuRiCHUcxOODBkfjgRSK4kviR/a5h1b0=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Usfjt/2fEokzrp1KDD1LoEVJcoZluIKU4xZDP342OCquNFBBW+uvu1YLbqhlG/4xRytlQSi/Y2XAWCpm/nmZntyzxOwwtYoIkEAVlGa67Da9hJLWUkGsQZqxBeNmOnV4TYHybPbOhgVCl20JVWG+VZehgOpqdfJSDGEGT4/uL9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=siHbNN0H; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so10835008276.0
-        for <kvm@vger.kernel.org>; Thu, 16 May 2024 09:02:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715875378; x=1716480178; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7HpIXuT6tOszn6Sdim+VjymIhcvyFpypZfRE8OZjGxU=;
-        b=siHbNN0Hkag8LErRHX1pAwbMgIKp+zJYlmoN6XdicTxJc/rj0PGpfAKKVkhiovR8Xm
-         PLh6BFoecYu5ynnu7QPuZWBPyIOkPx5JpRvuBMhuzuEwbKoct+2pKt+/1pY8sMNGHLHA
-         upeNUc4mX2sQJn7zCPsmXjz5dTP8k4W/Ar104YMIWFYpitOC8Jnftt//qQrStp8SRnPQ
-         /wwjMG8IHEvXxN8ufI547BvO8fvgFxl2tQn1PIV+lrMSzA9gHDMslurPOG4wUEIGlWAo
-         Sfms6ZGdWxt/MDvj+BygTX2GdTraQjrZzsGRNJ3fDWIMBzqCoCqe7v5fJuoWWjkkfcLR
-         QVFw==
+	s=arc-20240116; t=1715876961; c=relaxed/simple;
+	bh=AkaGh5Z7+vXwmPwgd+w3K474/wVP6Nf3EHvCkDUAT64=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LHE7DuUJ8uCJAM9uHHJjbSN+2z5r6/qcFx7gT51T8htCzvXUR5hwbPEHB2HYqEyMs3LremyV/tLUoqD8+EMjCJvpYbY/pzkQ26z9X156U7nxnGjq0F6EEnbIDm4UxTl18amBmJnFHrQ3UdICOnOvEJXLMnQma5Nt84amgn32LLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Du/DW3FM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715876958;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vhi2RJebXZNQWiSz2qczyw3x7Kdto7QGyk0fWFzRDpI=;
+	b=Du/DW3FM1EW6qSxrRSAVWXAlHfRPh1pi66fEVbo88Lts28SANc5HHQj67i3L3ztMYl6KEF
+	WB6HvlqKlACWuWNxGNKR3lTiXdRlWK8qIclFnrhD4idwd7MjeVOktpVCaf6NxPPmFjJRAA
+	HBTYQUVLXfN6X0Yi2nLVwecm5qZ0lKk=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-mEB4cd2mNL2T1LwghuiQlQ-1; Thu, 16 May 2024 12:29:15 -0400
+X-MC-Unique: mEB4cd2mNL2T1LwghuiQlQ-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-792c707ca4aso617852785a.1
+        for <kvm@vger.kernel.org>; Thu, 16 May 2024 09:29:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715875378; x=1716480178;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        d=1e100.net; s=20230601; t=1715876955; x=1716481755;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7HpIXuT6tOszn6Sdim+VjymIhcvyFpypZfRE8OZjGxU=;
-        b=TbGWk8M2JJ0WXqrliojlWs3dawaECo9qtI2zTsZlA9osGVkgrKnyyvuG8qPS/p2hBr
-         a6sHPMpWMc68f6opz/1yzv/ao83nUgAFrZdx7wJCo8KbYwnQIzdutq1h3Z/oX+9sX6oG
-         mdAKcEA+A44sIF5NtccorEGIiOpgIP3PgjConVDDSbmMc8FGSeIOQx2E26IEHHLmTGvY
-         FXFNhMD0uIl759DJNi+eZwy68o3u+7hVi7UMBEhuqKv6DdIOyOVK9t+1qcDduRrcCJoL
-         4c9VzZ1Rg1QJH47wdMcJe+0DOKkQv5iLh3nAd4DA9drtdetpU2wYkBtZfnhuxOUFdDRN
-         LFoQ==
-X-Gm-Message-State: AOJu0YzdDjPABgbpFpILelKlXNc9VZQDVgXVianWPZOJb5EPww4tZSic
-	vnwORYZYyigW82S5G79/Gpubm+O5MMiKjE2kSoRx7MR4isjT65lXVe8yrYXh8zARJ9z19L2jrAm
-	qGYPa77sdyYmpGKdDv+e38g==
-X-Google-Smtp-Source: AGHT+IF/VTizL3uRcaPz4FUA6Qw+im1lfzOrpyEK3SLZlU2Rx96wjJQrdDCUaoRmdREzsaN+wgsjcIqTNDS1LM0OIQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6902:1201:b0:dee:6f9d:b753 with
- SMTP id 3f1490d57ef6-dee6f9dbdeamr1196625276.6.1715875378456; Thu, 16 May
- 2024 09:02:58 -0700 (PDT)
-Date: Thu, 16 May 2024 16:02:57 +0000
-In-Reply-To: <861q69oi9c.wl-maz@kernel.org> (message from Marc Zyngier on Fri,
- 10 May 2024 15:26:23 +0100)
+        bh=Vhi2RJebXZNQWiSz2qczyw3x7Kdto7QGyk0fWFzRDpI=;
+        b=vjq5CofwpHtM9JOK0Y6cfW0p5PtCTGqzDb8eNhNI/pPiO9kkV1s8/Iacg5v6PrSvQO
+         PcwQwKm5dgHDe0QiVp5WyY0fr4rCYwuqpCrmmXrfI+lN1fNaGEnzebG+iSj2pVSG3ZU9
+         HfdO+gCzbhOdUQzD6ocR+AW15g1erJ2vEg+VJ0bbB6/77y5GhLBnDKUMMX7cc7yBLn2G
+         vn1ysnBdAEPG4DmLqH0FvItblfWIMQ3bt3U0EfIHaHFl0Ubv94htalxav8MQzAgBnF/A
+         4Yp/QugODoGbqE/x+DxjKkdX+uy8O5FYRzrJpOiIu4PVarJzdprMom43zgEcXfyRJBTr
+         IBJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUY2sPA/Hk5ABs2LIfB7gM2nepY4tyg8iLK9aZnwkAIfYCTo8jrxzXXHvufoZi5hWHQXhZk8SEIEp3SutJWJoj6bhYS
+X-Gm-Message-State: AOJu0YxCIBlWk9lX4UDBR8XjOxv7+gfXE7p3GOlQRmwKM2fFK+o6n7Ci
+	9dyXYnp479vnjTUUm/l+ddIOznA8eye9BqPseK8SZO12og39rzztw20U5jyknqw94Wi8tiELlHM
+	3L8VzKQxD2xYh22gUpgfJwg7Uf/KW6U2hrbW3DqDlCbeOZxUZ+g==
+X-Received: by 2002:a05:620a:4494:b0:790:a8ca:c69d with SMTP id af79cd13be357-792c75ab7fcmr2526636385a.33.1715876954893;
+        Thu, 16 May 2024 09:29:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHxxbFo30AOLf/XW3onhYPuk8WsaWNhKlGTyPoHxcar8qPt81UX8pYbNbNzK//5+vE1eH0aEA==
+X-Received: by 2002:a05:620a:4494:b0:790:a8ca:c69d with SMTP id af79cd13be357-792c75ab7fcmr2526633285a.33.1715876954547;
+        Thu, 16 May 2024 09:29:14 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:280:24f0:9db0:474c:ff43:9f5c? ([2a01:e0a:280:24f0:9db0:474c:ff43:9f5c])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-792e564e4dbsm407930385a.82.2024.05.16.09.29.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 May 2024 09:29:14 -0700 (PDT)
+Message-ID: <97c8641e-8839-4711-947c-692a62af93f3@redhat.com>
+Date: Thu, 16 May 2024 18:29:11 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsntbk55agni.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v5] KVM: arm64: Add early_param to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, corbet@lwn.net, oliver.upton@linux.dev, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] vfio/pci: migration: Skip config space check for
+ Vendor Specific Information in VSC during restore/load
+To: Vinayak Kale <vkale@nvidia.com>, qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, mst@redhat.com, marcel.apfelbaum@gmail.com,
+ avihaih@nvidia.com, acurrid@nvidia.com, cjia@nvidia.com, zhiw@nvidia.com,
+ targupta@nvidia.com, kvm@vger.kernel.org
+References: <20240503145142.2806030-1-vkale@nvidia.com>
+Content-Language: en-US, fr
+From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@redhat.com>
+In-Reply-To: <20240503145142.2806030-1-vkale@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Marc. Thanks for the review.
+On 5/3/24 16:51, Vinayak Kale wrote:
+> In case of migration, during restore operation, qemu checks config space of the
+> pci device with the config space in the migration stream captured during save
+> operation. In case of config space data mismatch, restore operation is failed.
+> 
+> config space check is done in function get_pci_config_device(). By default VSC
+> (vendor-specific-capability) in config space is checked.
+> 
+> Due to qemu's config space check for VSC, live migration is broken across NVIDIA
+> vGPU devices in situation where source and destination host driver is different.
+> In this situation, Vendor Specific Information in VSC varies on the destination
+> to ensure vGPU feature capabilities exposed to the guest driver are compatible
+> with destination host.
+> 
+> If a vfio-pci device is migration capable and vfio-pci vendor driver is OK with
+> volatile Vendor Specific Info in VSC then qemu should exempt config space check
+> for Vendor Specific Info. It is vendor driver's responsibility to ensure that
+> VSC is consistent across migration. Here consistency could mean that VSC format
+> should be same on source and destination, however actual Vendor Specific Info
+> may not be byte-to-byte identical.
+> 
+> This patch skips the check for Vendor Specific Information in VSC for VFIO-PCI
+> device by clearing pdev->cmask[] offsets. Config space check is still enforced
+> for 3 byte VSC header. If cmask[] is not set for an offset, then qemu skips
+> config space check for that offset.
+> 
+> VSC check is skipped for machine types >= 9.1. The check would be enforced on
+> older machine types (<= 9.0).
+> 
+> Signed-off-by: Vinayak Kale <vkale@nvidia.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Michael S. Tsirkin <mst@redhat.com>
+> Cc: Cédric Le Goater <clg@redhat.com>
 
-Marc Zyngier <maz@kernel.org> writes:
 
-> On Tue, 30 Apr 2024 19:14:44 +0100,
-> Colton Lewis <coltonlewis@google.com> wrote:
->> diff --git a/Documentation/admin-guide/kernel-parameters.txt  
->> b/Documentation/admin-guide/kernel-parameters.txt
->> index 31b3a25680d0..a4d94d9abbe4 100644
->> --- a/Documentation/admin-guide/kernel-parameters.txt
->> +++ b/Documentation/admin-guide/kernel-parameters.txt
->> @@ -2653,6 +2653,22 @@
->>   			[KVM,ARM] Allow use of GICv4 for direct injection of
->>   			LPIs.
 
->> +	kvm-arm.wfe_trap_policy=
->> +			[KVM,ARM] Control when to set WFE instruction trap for
->> +			KVM VMs.
->> +
->> +			trap: set WFE instruction trap
->> +
->> +			notrap: clear WFE instruction trap
->> +
->> +	kvm-arm.wfi_trap_policy=
->> +			[KVM,ARM] Control when to set WFI instruction trap for
->> +			KVM VMs.
->> +
->> +			trap: set WFI instruction trap
->> +
->> +			notrap: clear WFI instruction trap
->> +
+Applied to vfio-next.
 
-> Please make it clear that neither traps are guaranteed. The
-> architecture *allows* an implementation to trap when no events (resp.
-> interrupts) are pending, but nothing more. An implementation is
-> perfectly allowed to ignore these bits.
+Thanks,
 
-Will do. I'll just add an additional sentence stating "Traps are allowed
-but not guaranteed by the CPU architecture"
+C.
 
->> diff --git a/arch/arm64/include/asm/kvm_host.h  
->> b/arch/arm64/include/asm/kvm_host.h
->> index 21c57b812569..315ee7bfc1cb 100644
->> --- a/arch/arm64/include/asm/kvm_host.h
->> +++ b/arch/arm64/include/asm/kvm_host.h
->> @@ -67,6 +67,13 @@ enum kvm_mode {
->>   	KVM_MODE_NV,
->>   	KVM_MODE_NONE,
->>   };
->> +
->> +enum kvm_wfx_trap_policy {
->> +	KVM_WFX_NOTRAP_SINGLE_TASK, /* Default option */
->> +	KVM_WFX_NOTRAP,
->> +	KVM_WFX_TRAP,
->> +};
 
-> Since this is only ever used in arm.c, it really doesn't need to be
-> exposed anywhere else.
+> ---
+> Version History
+> v3->v4:
+>      - VSC check is skipped for machine types >= 9.1. The check would be enforced
+>        on older machine types (<= 9.0).
+> v2->v3:
+>      - Config space check skipped only for Vendor Specific Info in VSC, check is
+>        still enforced for 3 byte VSC header.
+>      - Updated commit description with live migration failure scenario.
+> v1->v2:
+>      - Limited scope of change to vfio-pci devices instead of all pci devices.
+> 
+>   hw/core/machine.c |  1 +
+>   hw/vfio/pci.c     | 26 ++++++++++++++++++++++++++
+>   hw/vfio/pci.h     |  1 +
+>   3 files changed, 28 insertions(+)
+> 
+> diff --git a/hw/core/machine.c b/hw/core/machine.c
+> index 4ff60911e7..fc3eb5115f 100644
+> --- a/hw/core/machine.c
+> +++ b/hw/core/machine.c
+> @@ -35,6 +35,7 @@
+>   
+>   GlobalProperty hw_compat_9_0[] = {
+>       {"arm-cpu", "backcompat-cntfrq", "true" },
+> +    {"vfio-pci", "skip-vsc-check", "false" },
+>   };
+>   const size_t hw_compat_9_0_len = G_N_ELEMENTS(hw_compat_9_0);
+>   
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 64780d1b79..2ece9407cc 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -2134,6 +2134,28 @@ static void vfio_check_af_flr(VFIOPCIDevice *vdev, uint8_t pos)
+>       }
+>   }
+>   
+> +static int vfio_add_vendor_specific_cap(VFIOPCIDevice *vdev, int pos,
+> +                                        uint8_t size, Error **errp)
+> +{
+> +    PCIDevice *pdev = &vdev->pdev;
+> +
+> +    pos = pci_add_capability(pdev, PCI_CAP_ID_VNDR, pos, size, errp);
+> +    if (pos < 0) {
+> +        return pos;
+> +    }
+> +
+> +    /*
+> +     * Exempt config space check for Vendor Specific Information during
+> +     * restore/load.
+> +     * Config space check is still enforced for 3 byte VSC header.
+> +     */
+> +    if (vdev->skip_vsc_check && size > 3) {
+> +        memset(pdev->cmask + pos + 3, 0, size - 3);
+> +    }
+> +
+> +    return pos;
+> +}
+> +
+>   static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+>   {
+>       ERRP_GUARD();
+> @@ -2202,6 +2224,9 @@ static int vfio_add_std_cap(VFIOPCIDevice *vdev, uint8_t pos, Error **errp)
+>           vfio_check_af_flr(vdev, pos);
+>           ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+>           break;
+> +    case PCI_CAP_ID_VNDR:
+> +        ret = vfio_add_vendor_specific_cap(vdev, pos, size, errp);
+> +        break;
+>       default:
+>           ret = pci_add_capability(pdev, cap_id, pos, size, errp);
+>           break;
+> @@ -3390,6 +3415,7 @@ static Property vfio_pci_dev_properties[] = {
+>       DEFINE_PROP_LINK("iommufd", VFIOPCIDevice, vbasedev.iommufd,
+>                        TYPE_IOMMUFD_BACKEND, IOMMUFDBackend *),
+>   #endif
+> +    DEFINE_PROP_BOOL("skip-vsc-check", VFIOPCIDevice, skip_vsc_check, true),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>   
+> diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
+> index 6e64a2654e..92cd62d115 100644
+> --- a/hw/vfio/pci.h
+> +++ b/hw/vfio/pci.h
+> @@ -177,6 +177,7 @@ struct VFIOPCIDevice {
+>       OnOffAuto ramfb_migrate;
+>       bool defer_kvm_irq_routing;
+>       bool clear_parent_atomics_on_exit;
+> +    bool skip_vsc_check;
+>       VFIODisplay *dpy;
+>       Notifier irqchip_change_notifier;
+>   };
 
-I can move it to there.
-
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index a25265aca432..5ec52333e042 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -46,6 +46,8 @@
->>   #include <kvm/arm_psci.h>
-
->>   static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
->> +static enum kvm_wfx_trap_policy kvm_wfi_trap_policy =  
->> KVM_WFX_NOTRAP_SINGLE_TASK;
->> +static enum kvm_wfx_trap_policy kvm_wfe_trap_policy =  
->> KVM_WFX_NOTRAP_SINGLE_TASK;
-
-> It would be worth declaring those as __read_mostly.
-
-Will do.
-
->> +static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
->> +{
->> +	if (likely(kvm_wfi_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
->> +		return single_task_running() &&
->> +			(atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
->> +			 vcpu->kvm->arch.vgic.nassgireq);
-
-> So you are evaluating a runtime condition (scheduler queue length,
-> number of LPIs)...
-
-Yes. Only in the case of default behavior when no option is given, which
-should be equivalent to what the code was doing before.
-
->> +
->> +	return kvm_wfi_trap_policy == KVM_WFX_NOTRAP;
->> +}
->> +
->> +static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
->> +{
->> +	if (likely(kvm_wfe_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
->> +		return single_task_running();
->> +
->> +	return kvm_wfe_trap_policy == KVM_WFX_NOTRAP;
->> +}
->> +
->> +static inline void kvm_vcpu_reset_hcr(struct kvm_vcpu *vcpu)
-
-> Why the inline?
-
-Because I moved it from the kvm_emulate.h header with no
-modification. It doesn't have to be.
-
->> +{
->> +	vcpu->arch.hcr_el2 = HCR_GUEST_FLAGS;
->> +	if (has_vhe() || has_hvhe())
->> +		vcpu->arch.hcr_el2 |= HCR_E2H;
->> +	if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN)) {
->> +		/* route synchronous external abort exceptions to EL2 */
->> +		vcpu->arch.hcr_el2 |= HCR_TEA;
->> +		/* trap error record accesses */
->> +		vcpu->arch.hcr_el2 |= HCR_TERR;
->> +	}
->> +
->> +	if (cpus_have_final_cap(ARM64_HAS_STAGE2_FWB)) {
->> +		vcpu->arch.hcr_el2 |= HCR_FWB;
->> +	} else {
->> +		/*
->> +		 * For non-FWB CPUs, we trap VM ops (HCR_EL2.TVM) until M+C
->> +		 * get set in SCTLR_EL1 such that we can detect when the guest
->> +		 * MMU gets turned on and do the necessary cache maintenance
->> +		 * then.
->> +		 */
->> +		vcpu->arch.hcr_el2 |= HCR_TVM;
->> +	}
->> +
->> +	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
->> +	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
->> +		vcpu->arch.hcr_el2 |= HCR_TID4;
->> +	else
->> +		vcpu->arch.hcr_el2 |= HCR_TID2;
->> +
->> +	if (vcpu_el1_is_32bit(vcpu))
->> +		vcpu->arch.hcr_el2 &= ~HCR_RW;
->> +
->> +	if (kvm_has_mte(vcpu->kvm))
->> +		vcpu->arch.hcr_el2 |= HCR_ATA;
->> +
->> +
->> +	if (kvm_vcpu_should_clear_twe(vcpu))
->> +		vcpu->arch.hcr_el2 &= ~HCR_TWE;
->> +	else
->> +		vcpu->arch.hcr_el2 |= HCR_TWE;
->> +
->> +	if (kvm_vcpu_should_clear_twi(vcpu))
->> +		vcpu->arch.hcr_el2 &= ~HCR_TWI;
->> +	else
->> +		vcpu->arch.hcr_el2 |= HCR_TWI;
-
-> ... and from the above runtime conditions you make it a forever
-> decision, for a vcpu that still hasn't executed a single instruction.
-> What could possibly go wrong?
-
-Oh I see. kvm_arch_vcpu_ioctl_vcpu_init only executes once when the vcpu
-is created (makes sense given the name), thereby making the decision
-permanent for the life of the vcpu. I misunderstood that fact before.
-
-I will move the decision back to when the vcpu is loaded as it was in
-earlier versions of this series.
-
->> +static int __init early_kvm_wfx_trap_policy_cfg(char *arg, enum  
->> kvm_wfx_trap_policy *p)
->> +{
->> +	if (!arg)
->> +		return -EINVAL;
->> +
->> +	if (strcmp(arg, "trap") == 0) {
->> +		*p = KVM_WFX_TRAP;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "notrap") == 0) {
->> +		*p = KVM_WFX_NOTRAP;
->> +		return 0;
->> +	}
->> +
->> +	if (strcmp(arg, "default") == 0) {
->> +		*p = KVM_WFX_NOTRAP_SINGLE_TASK;
->> +		return 0;
->> +	}
-
-> Where is this "default" coming from? It's not documented.
-
-It was explicitly documented on earlier patch versions, but then I was
-told we didn't want people to rely on the default behavior so we have
-flexibility to change it in the future.
-
-There isn't much use for it if it isn't documented, so I'll take it out.
 
