@@ -1,106 +1,97 @@
-Return-Path: <kvm+bounces-17554-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17555-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFA068C7DBC
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 22:32:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F1A78C7DD7
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 22:50:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9713A283C0F
-	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 20:32:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 867D4B21DD0
+	for <lists+kvm@lfdr.de>; Thu, 16 May 2024 20:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED9F1586C1;
-	Thu, 16 May 2024 20:32:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6036E1581E9;
+	Thu, 16 May 2024 20:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5Mp6wV3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c2/z5HvE"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF542157E9D
-	for <kvm@vger.kernel.org>; Thu, 16 May 2024 20:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28EA15CB
+	for <kvm@vger.kernel.org>; Thu, 16 May 2024 20:50:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715891533; cv=none; b=kqC12IBPIzQFAOixkxgJQp1H3tAA3uUNplVjjMCqOh701LnBGeHnb3B6Gq5Im4ZwAPu4+ZgPmgpiM/Y41GynUuUTK+rXjiSynQuXtYElqj/t8paj9d9xINA0bNNW5OAQ0Kuh8e6TyQDIBtlNe9dDc9dejcmAfFY7AznALyHgatA=
+	t=1715892616; cv=none; b=OQ27/C8cYFh2cJfdUkOOJsSJ9pcPNU1CWexn/RlkNMhEd4LdKg9KKokaT2gjmFv/CxUWQwg47udH9ISrs43+NZpzuCm2rluFG3mNHupmwvGezu0FUzea77PjkXJUD9IM3RtustCSIq1mokX2BFhvLqwAA8j7V0Ts2DC09QcBOu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715891533; c=relaxed/simple;
-	bh=LuSL1Mpx4KPw1l3VT+HJPO9KvbyA0LOeza7avB0qiVA=;
+	s=arc-20240116; t=1715892616; c=relaxed/simple;
+	bh=jlXZv3qP8SJGyzwaITAAmc594iMe2iOqE24weI7m6oo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sdFPSKI0tMHcbjr0HqPGk5MajUV6Jll56JLHwqy2pZJVOuhWrTO7WgMFINlUzy7SHJZR7hwMNh9KVDwZAOllz46EXl6gc4zG31Y7m3e+r2yi5WfrH6TDfJZS6K/WuTKrmiBZrSldmogbB7qH0TV9iqHIYcB+pUqdCkaNLRKVWNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L5Mp6wV3; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-Type; b=DfeKSzwIy8xztyXnkP2FpjB6koue6d1Pb319XUV/N2VnyZsRVipEKf6M2hHCzs5AGrSn0KVuIzFYSECQIEliafVZ81OIC4ziUvGf6L1yLmYLLrnVFL8GxTCb1kTibm7iuQfSpGxWjfZxe1LWGbhQ7RVct9B0FUkTelyB2kdbgQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c2/z5HvE; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715891530;
+	s=mimecast20190719; t=1715892613;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ttpHvlXmiMi2UVt0UbQVx/o7cd/ODV6RN79VD1fX8s4=;
-	b=L5Mp6wV3ALeZdL76FuCUcJSGTDu+NbSV7jxrJ2O58fJOEMuy+DT6s10dAXuXUJiDKfKoPJ
-	gD6QG2PumC3qz84ZEh9gLYoIXonlh57Dglu2Dw3EPl/R9ZDEBXDilTwBdAo/2Z5tNY7sMj
-	rQNCFwXd50slJnZ0f29MU5hMyyDTeO8=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=DgfeXMkmseJgwm40V0OoBOyXRqsK7UUQX8yHhq3rw+s=;
+	b=c2/z5HvERQZnQZps5Vz6yRG8EvYw9f6cff4bjHJGGFR8mRTKD8il7IG369cGhbV62IBv1p
+	ylDPtBQ58hFnLQuJPZRc0UK89Tv1SNxCFrnkipfmpDtZt5JQ0u1I6DW+dMofAHfW0d0ALj
+	Aikk0CJQA8obV76gnhVodiaAlrv6CKA=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-SysuznUsO4-MwvmxtUYWWw-1; Thu, 16 May 2024 16:32:09 -0400
-X-MC-Unique: SysuznUsO4-MwvmxtUYWWw-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7da42114485so972223939f.2
-        for <kvm@vger.kernel.org>; Thu, 16 May 2024 13:32:05 -0700 (PDT)
+ us-mta-48-QmlTp6gwN6CQn6xZfsAa2A-1; Thu, 16 May 2024 16:50:12 -0400
+X-MC-Unique: QmlTp6gwN6CQn6xZfsAa2A-1
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7e1b97c1b19so823459739f.3
+        for <kvm@vger.kernel.org>; Thu, 16 May 2024 13:50:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715891523; x=1716496323;
+        d=1e100.net; s=20230601; t=1715892611; x=1716497411;
         h=content-transfer-encoding:mime-version:organization:references
          :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ttpHvlXmiMi2UVt0UbQVx/o7cd/ODV6RN79VD1fX8s4=;
-        b=SwNfAafQy7KmpeHuedc0K8TY2gz7wurx6raZDLz+byBvXODVXvPnE4RY1eKDZlh5IG
-         yidAIN6+IPtGchoG6dtLoEw8hIZlOK0cUM55Mwsg1XgoVlE8toqmAkyUNc5kDQ3h/TOk
-         4ME6Rb/bUc1ajBjnysgA5DyMqfyrNCNk0w13xFUs87xjkWXQJ2XgvlMTTJ/+CUX8pN9J
-         0Bavzq+X1XVAcu4QtxkI0ND575h0NhEFn1flTE79OtMt6WZHM60Ql1ajwXhDgcbRlyOY
-         EBw3mD2O82cp2A6Zvaq4PPM0zYC9wc6X8+2dz41ZMxvzgi8LhgqUm7dMekgEPn2zWV95
-         fLZg==
-X-Forwarded-Encrypted: i=1; AJvYcCXNY+GpxbQdsBH1kDsuLdd6Qg6MAbZQWlkzgebf4GVIliKoCUCu7bmmsTeqej+BTiiyx/A81ru3+IyDVWkjO3k9dpvt
-X-Gm-Message-State: AOJu0YybSCV1UEzkrudBqx6YjtOWjTS8O0nyIZhR4sdTjR2SXdr6lnrr
-	P7rX9ZoAMnOGlLk5NM6dLqW7Wn7HCW1IlhS1Lvq2oav+w2Vh7OP0yHwLurZ/BzRFXepulNJkSni
-	UF4SHrcDDm6VCTq9wpYtvzjsTdyB8sNvXdnRkXXhWM25951ZaaA==
-X-Received: by 2002:a5d:9489:0:b0:7e1:c607:ec47 with SMTP id ca18e2360f4ac-7e1c607ed07mr2036728739f.17.1715891523174;
-        Thu, 16 May 2024 13:32:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGDFnryyubjbN4uSOQA4friH279aw51l08N5liWIry0q3EK3fPSx3KYy87j9W0K7dR91RTAmw==
-X-Received: by 2002:a5d:9489:0:b0:7e1:c607:ec47 with SMTP id ca18e2360f4ac-7e1c607ed07mr2036726039f.17.1715891522839;
-        Thu, 16 May 2024 13:32:02 -0700 (PDT)
+        bh=DgfeXMkmseJgwm40V0OoBOyXRqsK7UUQX8yHhq3rw+s=;
+        b=Sc1Ws20zHsYa1lkw6sXaCgJakpJCf6l0yZP1XJlzAUsEnunpVQ0N9NnzkfFsCtRylC
+         /79I9syBWNJy0hR5Bf5MSKjJMIFo+IhwGzJn4Jl7uPK2xTyzUdrDTfBZiV8drF0Y38nQ
+         4HrfzLC0RiwZvFA7RfRL4ZWzr1ykpfCS1d2F8YOjemyQwXg3bAOMxKkApURm0vVJzuCd
+         qPRLV7XGmmB6GgccZ/5oHRRAutY1Wvzz7vgEfugHAUg7g7ZrngiVPOlx/NvuG6qsGnVp
+         ZdubWTw/VYXFAxlUTDCGrkOVohPluuXYIDQ12Cjt7CQ/BuQ2CRsPRCvr9qQzlGvYKpKj
+         8s3Q==
+X-Gm-Message-State: AOJu0YyvVV1Ut07Q5Nr84SL94r/7xMf0XjjBtliNmzdicUW0bTuOLuwe
+	fPJo5CuOkrlZRe2Y0Uxwk+HfuToQkCiCun4t3U73D0vxK3Lqwenkqqge6P1C8oT0jKynf50g0pj
+	M9X6U4H+7tAfz2i1wkwwfJK2cjQQTebuEYeD8AIunCSHBKi/tEg==
+X-Received: by 2002:a05:6602:1d53:b0:7e2:181:a054 with SMTP id ca18e2360f4ac-7e20181a1abmr821471939f.5.1715892611559;
+        Thu, 16 May 2024 13:50:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwRkXStIyZ5cr/BlvlET+DTEZcFSPsEWkGox9hOLQu2DM9ciDgxpqD5jYjyjYUSdbcJwJc+g==
+X-Received: by 2002:a05:6602:1d53:b0:7e2:181:a054 with SMTP id ca18e2360f4ac-7e20181a1abmr821469839f.5.1715892611202;
+        Thu, 16 May 2024 13:50:11 -0700 (PDT)
 Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-7e1bdc94fa4sm356294239f.48.2024.05.16.13.32.01
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-7e1d2a5a276sm285683339f.17.2024.05.16.13.50.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 May 2024 13:32:02 -0700 (PDT)
-Date: Thu, 16 May 2024 14:31:59 -0600
+        Thu, 16 May 2024 13:50:10 -0700 (PDT)
+Date: Thu, 16 May 2024 14:50:09 -0600
 From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>,
- "jgg@nvidia.com" <jgg@nvidia.com>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "seanjc@google.com" <seanjc@google.com>, "dave.hansen@linux.intel.com"
- <dave.hansen@linux.intel.com>, "luto@kernel.org" <luto@kernel.org>,
- "peterz@infradead.org" <peterz@infradead.org>, "tglx@linutronix.de"
- <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de"
- <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>, "corbet@lwn.net"
- <corbet@lwn.net>, "joro@8bytes.org" <joro@8bytes.org>, "will@kernel.org"
- <will@kernel.org>, "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>, "Liu, Yi L"
- <yi.l.liu@intel.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+ <jgg@nvidia.com>, <kevin.tian@intel.com>, <iommu@lists.linux.dev>,
+ <pbonzini@redhat.com>, <seanjc@google.com>, <dave.hansen@linux.intel.com>,
+ <luto@kernel.org>, <peterz@infradead.org>, <tglx@linutronix.de>,
+ <mingo@redhat.com>, <bp@alien8.de>, <hpa@zytor.com>, <corbet@lwn.net>,
+ <joro@8bytes.org>, <will@kernel.org>, <robin.murphy@arm.com>,
+ <baolu.lu@linux.intel.com>, <yi.l.liu@intel.com>
 Subject: Re: [PATCH 4/5] vfio/type1: Flush CPU caches on DMA pages in
  non-coherent domains
-Message-ID: <20240516143159.0416d6c7.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB52766D78684F6206121590B98CED2@BN9PR11MB5276.namprd11.prod.outlook.com>
+Message-ID: <20240516145009.3bcd3d0c.alex.williamson@redhat.com>
+In-Reply-To: <ZkG9IEQwi7HG3YBk@yzhao56-desk.sh.intel.com>
 References: <20240507061802.20184-1-yan.y.zhao@intel.com>
 	<20240507062138.20465-1-yan.y.zhao@intel.com>
 	<20240509121049.58238a6f.alex.williamson@redhat.com>
 	<Zj33cUe7HYOIfj5N@yzhao56-desk.sh.intel.com>
 	<20240510105728.76d97bbb.alex.williamson@redhat.com>
 	<ZkG9IEQwi7HG3YBk@yzhao56-desk.sh.intel.com>
-	<BN9PR11MB52766D78684F6206121590B98CED2@BN9PR11MB5276.namprd11.prod.outlook.com>
 Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -108,113 +99,195 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, 16 May 2024 08:34:20 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+On Mon, 13 May 2024 15:11:28 +0800
+Yan Zhao <yan.y.zhao@intel.com> wrote:
 
-> > From: Zhao, Yan Y <yan.y.zhao@intel.com>
-> > Sent: Monday, May 13, 2024 3:11 PM
-> > On Fri, May 10, 2024 at 10:57:28AM -0600, Alex Williamson wrote: =20
-> > > On Fri, 10 May 2024 18:31:13 +0800
-> > > Yan Zhao <yan.y.zhao@intel.com> wrote:
-> > > =20
-> > > > On Thu, May 09, 2024 at 12:10:49PM -0600, Alex Williamson wrote: =20
-> > > > > On Tue,  7 May 2024 14:21:38 +0800
-> > > > > Yan Zhao <yan.y.zhao@intel.com> wrote: =20
-> > > > > > @@ -1847,6 +1891,9 @@ static void vfio_test_domain_fgsp(struct =
-=20
-> > vfio_domain *domain, struct list_head * =20
-> > > > > >  		break;
-> > > > > >  	}
-> > > > > >
-> > > > > > +	if (!domain->enforce_cache_coherency)
-> > > > > > +		arch_clean_nonsnoop_dma(page_to_phys(pages), =20
-> > PAGE_SIZE * 2); =20
-> > > > > > + =20
-> > > > >
-> > > > > Seems like this use case isn't subject to the unmap aspect since =
-these
-> > > > > are kernel allocated and freed pages rather than userspace pages.
-> > > > > There's not an "ongoing use of the page" concern.
-> > > > >
-> > > > > The window of opportunity for a device to discover and exploit the
-> > > > > mapping side issue appears almost impossibly small.
-> > > > > =20
-> > > > The concern is for a malicious device attempting DMAs automatically.
-> > > > Do you think this concern is valid?
-> > > > As there're only extra flushes for 4 pages, what about keeping it f=
-or safety? =20
-> > >
-> > > Userspace doesn't know anything about these mappings, so to exploit
-> > > them the device would somehow need to discover and interact with the
-> > > mapping in the split second that the mapping exists, without exposing
-> > > itself with mapping faults at the IOMMU. =20
->=20
-> Userspace could guess the attacking ranges based on code, e.g. currently
-> the code just tries to use the 1st available IOVA region which likely sta=
-rts
-> at address 0.
->=20
-> and mapping faults don't stop the attack. Just some after-the-fact hint
-> revealing the possibility of being attacked. =F0=9F=98=8A
+> On Fri, May 10, 2024 at 10:57:28AM -0600, Alex Williamson wrote:
+> > On Fri, 10 May 2024 18:31:13 +0800
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >   
+> > > On Thu, May 09, 2024 at 12:10:49PM -0600, Alex Williamson wrote:  
+> > > > On Tue,  7 May 2024 14:21:38 +0800
+> > > > Yan Zhao <yan.y.zhao@intel.com> wrote:    
+> > > ...   
+> > > > >  drivers/vfio/vfio_iommu_type1.c | 51 +++++++++++++++++++++++++++++++++
+> > > > >  1 file changed, 51 insertions(+)
+> > > > > 
+> > > > > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> > > > > index b5c15fe8f9fc..ce873f4220bf 100644
+> > > > > --- a/drivers/vfio/vfio_iommu_type1.c
+> > > > > +++ b/drivers/vfio/vfio_iommu_type1.c
+> > > > > @@ -74,6 +74,7 @@ struct vfio_iommu {
+> > > > >  	bool			v2;
+> > > > >  	bool			nesting;
+> > > > >  	bool			dirty_page_tracking;
+> > > > > +	bool			has_noncoherent_domain;
+> > > > >  	struct list_head	emulated_iommu_groups;
+> > > > >  };
+> > > > >  
+> > > > > @@ -99,6 +100,7 @@ struct vfio_dma {
+> > > > >  	unsigned long		*bitmap;
+> > > > >  	struct mm_struct	*mm;
+> > > > >  	size_t			locked_vm;
+> > > > > +	bool			cache_flush_required; /* For noncoherent domain */    
+> > > > 
+> > > > Poor packing, minimally this should be grouped with the other bools in
+> > > > the structure, longer term they should likely all be converted to
+> > > > bit fields.    
+> > > Yes. Will do!
+> > >   
+> > > >     
+> > > > >  };
+> > > > >  
+> > > > >  struct vfio_batch {
+> > > > > @@ -716,6 +718,9 @@ static long vfio_unpin_pages_remote(struct vfio_dma *dma, dma_addr_t iova,
+> > > > >  	long unlocked = 0, locked = 0;
+> > > > >  	long i;
+> > > > >  
+> > > > > +	if (dma->cache_flush_required)
+> > > > > +		arch_clean_nonsnoop_dma(pfn << PAGE_SHIFT, npage << PAGE_SHIFT);
+> > > > > +
+> > > > >  	for (i = 0; i < npage; i++, iova += PAGE_SIZE) {
+> > > > >  		if (put_pfn(pfn++, dma->prot)) {
+> > > > >  			unlocked++;
+> > > > > @@ -1099,6 +1104,8 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+> > > > >  					    &iotlb_gather);
+> > > > >  	}
+> > > > >  
+> > > > > +	dma->cache_flush_required = false;
+> > > > > +
+> > > > >  	if (do_accounting) {
+> > > > >  		vfio_lock_acct(dma, -unlocked, true);
+> > > > >  		return 0;
+> > > > > @@ -1120,6 +1127,21 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+> > > > >  	iommu->dma_avail++;
+> > > > >  }
+> > > > >  
+> > > > > +static void vfio_update_noncoherent_domain_state(struct vfio_iommu *iommu)
+> > > > > +{
+> > > > > +	struct vfio_domain *domain;
+> > > > > +	bool has_noncoherent = false;
+> > > > > +
+> > > > > +	list_for_each_entry(domain, &iommu->domain_list, next) {
+> > > > > +		if (domain->enforce_cache_coherency)
+> > > > > +			continue;
+> > > > > +
+> > > > > +		has_noncoherent = true;
+> > > > > +		break;
+> > > > > +	}
+> > > > > +	iommu->has_noncoherent_domain = has_noncoherent;
+> > > > > +}    
+> > > > 
+> > > > This should be merged with vfio_domains_have_enforce_cache_coherency()
+> > > > and the VFIO_DMA_CC_IOMMU extension (if we keep it, see below).    
+> > > Will convert it to a counter and do the merge.
+> > > Thanks for pointing it out!
+> > >   
+> > > >     
+> > > > > +
+> > > > >  static void vfio_update_pgsize_bitmap(struct vfio_iommu *iommu)
+> > > > >  {
+> > > > >  	struct vfio_domain *domain;
+> > > > > @@ -1455,6 +1477,12 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+> > > > >  
+> > > > >  	vfio_batch_init(&batch);
+> > > > >  
+> > > > > +	/*
+> > > > > +	 * Record necessity to flush CPU cache to make sure CPU cache is flushed
+> > > > > +	 * for both pin & map and unmap & unpin (for unwind) paths.
+> > > > > +	 */
+> > > > > +	dma->cache_flush_required = iommu->has_noncoherent_domain;
+> > > > > +
+> > > > >  	while (size) {
+> > > > >  		/* Pin a contiguous chunk of memory */
+> > > > >  		npage = vfio_pin_pages_remote(dma, vaddr + dma->size,
+> > > > > @@ -1466,6 +1494,10 @@ static int vfio_pin_map_dma(struct vfio_iommu *iommu, struct vfio_dma *dma,
+> > > > >  			break;
+> > > > >  		}
+> > > > >  
+> > > > > +		if (dma->cache_flush_required)
+> > > > > +			arch_clean_nonsnoop_dma(pfn << PAGE_SHIFT,
+> > > > > +						npage << PAGE_SHIFT);
+> > > > > +
+> > > > >  		/* Map it! */
+> > > > >  		ret = vfio_iommu_map(iommu, iova + dma->size, pfn, npage,
+> > > > >  				     dma->prot);
+> > > > > @@ -1683,9 +1715,14 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+> > > > >  	for (; n; n = rb_next(n)) {
+> > > > >  		struct vfio_dma *dma;
+> > > > >  		dma_addr_t iova;
+> > > > > +		bool cache_flush_required;
+> > > > >  
+> > > > >  		dma = rb_entry(n, struct vfio_dma, node);
+> > > > >  		iova = dma->iova;
+> > > > > +		cache_flush_required = !domain->enforce_cache_coherency &&
+> > > > > +				       !dma->cache_flush_required;
+> > > > > +		if (cache_flush_required)
+> > > > > +			dma->cache_flush_required = true;    
+> > > > 
+> > > > The variable name here isn't accurate and the logic is confusing.  If
+> > > > the domain does not enforce coherency and the mapping is not tagged as
+> > > > requiring a cache flush, then we need to mark the mapping as requiring
+> > > > a cache flush.  So the variable state is something more akin to
+> > > > set_cache_flush_required.  But all we're saving with this is a
+> > > > redundant set if the mapping is already tagged as requiring a cache
+> > > > flush, so it could really be simplified to:
+> > > > 
+> > > > 		dma->cache_flush_required = !domain->enforce_cache_coherency;    
+> > > Sorry about the confusion.
+> > > 
+> > > If dma->cache_flush_required is set to true by a domain not enforcing cache
+> > > coherency, we hope it will not be reset to false by a later attaching to domain 
+> > > enforcing cache coherency due to the lazily flushing design.  
+> > 
+> > Right, ok, the vfio_dma objects are shared between domains so we never
+> > want to set 'dma->cache_flush_required = false' due to the addition of a
+> > 'domain->enforce_cache_coherent == true'.  So this could be:
+> > 
+> > 	if (!dma->cache_flush_required)
+> > 		dma->cache_flush_required = !domain->enforce_cache_coherency;  
+> 
+> Though this code is easier for understanding, it leads to unnecessary setting of
+> dma->cache_flush_required to false, given domain->enforce_cache_coherency is
+> true at the most time.
 
-As below, the gap is infinitesimally small, but not zero, and I don't
-mind closing it entirely.
+I don't really see that as an issue, but the variable name originally
+chosen above, cache_flush_required, also doesn't convey that it's only
+attempting to set the value if it wasn't previously set and is now
+required by a noncoherent domain.
 
-> > >
-> > > I don't mind keeping the flush before map so that infinitesimal gap
-> > > where previous data in physical memory exposed to the device is close=
-d,
-> > > but I have a much harder time seeing that the flush on unmap to
-> > > synchronize physical memory is required.
-> > >
-> > > For example, the potential KSM use case doesn't exist since the pages
-> > > are not owned by the user.  Any subsequent use of the pages would be
-> > > subject to the same condition we assumed after allocation, where the
-> > > physical data may be inconsistent with the cached data.  It's easy to=
- =20
->=20
-> physical data can be different from the cached one at any time. In normal
-> case the cache line is marked as dirty and the CPU cache protocol
-> guarantees coherency between cache/memory.
->=20
-> here we talked about a situation which a malicious user uses non-coherent
-> DMA to bypass CPU and makes memory/cache inconsistent when the
-> CPU still considers the memory copy is up-to-date (e.g. cacheline is in
-> exclusive or shared state). In this case multiple reads from the next-user
-> may get different values from cache or memory depending on when the
-> cacheline is invalidated.
->=20
-> So it's really about a bad inconsistency state which can be recovered only
-> by invalidating the cacheline (so memory data is up-to-date) or doing
-> a WB-type store (to mark memory copy out-of-date) before the next-use.
+> > > > It might add more clarity to just name the mapping flag
+> > > > dma->mapped_noncoherent.    
+> > > 
+> > > The dma->cache_flush_required is to mark whether pages in a vfio_dma requires
+> > > cache flush in the subsequence mapping into the first non-coherent domain
+> > > and page unpinning.  
+> > 
+> > How do we arrive at a sequence where we have dma->cache_flush_required
+> > that isn't the result of being mapped into a domain with
+> > !domain->enforce_cache_coherency?  
+> Hmm, dma->cache_flush_required IS the result of being mapped into a domain with
+> !domain->enforce_cache_coherency.
+> My concern only arrives from the actual code sequence, i.e.
+> dma->cache_flush_required is set to true before the actual mapping.
+> 
+> If we rename it to dma->mapped_noncoherent and only set it to true after the
+> actual successful mapping, it would lead to more code to handle flushing for the
+> unwind case.
+> Currently, flush for unwind is handled centrally in vfio_unpin_pages_remote()
+> by checking dma->cache_flush_required, which is true even before a full
+> successful mapping, so we won't miss flush on any pages that are mapped into a
+> non-coherent domain in a short window.
 
-Ok, so the initial state may be that the page is zero'd in cache, but
-the cacheline is dirty and is therefore the source of truth for all
-coherent operations.  In the case where a device has non-coherently
-modified physical memory, the coherent results are indeterminate, the
-processor could see a value from cache or physical memory.  So these
-are in fact different scenarios.
-
-> > > flush 2 pages, but I think it obscures the function of the flush if we
-> > > can't articulate the value in this case. =20
->=20
-> btw KSM is one example. Jason mentioned in earlier discussion that not all
-> free pages are zero-ed before the next use then it'd always good to
-> conservatively prevent any potential inconsistent state leaked back to
-> the kernel. Though I'm not sure what'd be a real usage in which the next
-> user will directly use then uninitialized content w/o doing any meaningful
-> writes (which once done then will stop the attacking window)...
-
-Yes, exactly.  Zero'ing the page would obviously reestablish the
-coherency, but the page could be reallocated without being zero'd and as
-you describe the owner of that page could then get inconsistent
-results.  It doesn't fit any use case that I can think of that next
-user only cares that the contents of the page are consistent without
-writing a specific value, but sure, let's not be the source of that
-obscure bug ;)  Thanks,
+I don't think we need to be so literal that "mapped_noncoherent" can
+only be set after the vfio_dma is fully mapped to a noncoherent domain,
+but also we can come up with other names for the flag.  Perhaps
+"is_noncoherent".  My suggestion was more from the perspective of what
+does the flag represent rather than what we intend to do as a result of
+the flag being set.  Thanks,
 
 Alex
 
