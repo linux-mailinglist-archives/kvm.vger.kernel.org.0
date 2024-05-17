@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-17658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17659-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 756258C8B54
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:41:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 398308C8B56
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:42:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 166BA1F24DAE
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:41:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAB65284F12
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805191411DA;
-	Fri, 17 May 2024 17:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4828B1419A0;
+	Fri, 17 May 2024 17:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ElGEPxtB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vxaBxEtW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9C5140383
-	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5F31411CF
+	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:39:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715967597; cv=none; b=LwXReFvlHkBJa/1hevpycRMtg6UZ/XyzcCoq6eoVdlHO9bbD5YflSeInr4AFQyNp/QtEUNXCnXr0Q9OquuFKN6Le04233D9ioASB3swqntHdECYMV/40txpKM756E1olD6F6Qpi/LwY2P5WrC3syNAo5hgWcVN5i3fiWQSgq0dE=
+	t=1715967599; cv=none; b=uMCxcSYcSArIx70aK3mTaqBoRIYwaQPZ4xq4UuIYJRF/kDe4nyQKSpnVBlzSU3IUe/GIV9SSo/In7dCRVP3bGWU9+i05F2JEY+g47odYfD3vghH/N3v5c+aijnu75BPJ2pqjjxDQ9VrbKXoCDp8B4uBFrRZ6wgkhL4Y8h6GFns4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715967597; c=relaxed/simple;
-	bh=AbfLQhyF3OH5B997fpsklE0q8dPfOTJZLQGWldAmSWo=;
+	s=arc-20240116; t=1715967599; c=relaxed/simple;
+	bh=N9PO5HRhq589/FZmt7XnV7moYhp7bMFPlsJa3v0pqAg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gbPCtu9jaYyjGgPWvQzE1H9dDd0V3n6w9Wu9PgmedNhY0ekEfX/wOxuRlcPxJNg84QZyBeOmVXh1JuvmXdrc7ntioGBfNG+L92NqP2nzCy872M2lWD0ym3zlLCObeiiLedO6qdqbipoGEZSQjl6JgJ37vEq4jWtAPynqEigoHWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ElGEPxtB; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=bi65wIerchDQX/g8inV8bCNxL1jdjr/C67UFTP1CM32uOnQ85k4ncLtFG0+KSe8OtKjVHSVMJ79WNvXfVNsz+RfiCvamPeUisLNw9zmShfkQHClgTYCYvHB5mNRNzMllJRjcpyteX11OCrazlW1GsIK7mutDuypuN7z83raCqLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vxaBxEtW; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1ec43465046so86986185ad.1
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:39:56 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1eea09ec7ecso94832985ad.2
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:39:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715967596; x=1716572396; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1715967597; x=1716572397; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=n2pDz7/oTNEpqtQer1kZX15zeO+uHNcrWAzJZzhQ5SY=;
-        b=ElGEPxtBLIRKCnvsx7fBDkE5gA923UJD1oi5+LRSkP1LYA+2gXzyceSOGMypl3WLvR
-         Vh1VBb/tApFBTqJr3nDrOxS4hh4cSrJ6GJo+2qoqz3kmsAAurNZES02D46yZHi11ZHee
-         ZZzjgN5EbiFnQBcqQKuvRkuS4d6E5jqXoy5kI7E/XHXNi6tP++wGpw9kCkzk78KmwOlM
-         UX0wDGMjK3oaZNe2qCVfDiRMwG5C/TxgbAWPiCrJOOnNOkGexMZr1xvWuadK8Vi2u79g
-         A4fUM0EhCne94vcNcghNU74v/0B2udcKGtihLprSLezajlm1Bhke4u5gT6qRCpfCN1Ic
-         fKEw==
+        bh=6Yo+VLe9odGlqzwhT9Gwf6Wef0XuvPIk4gSpAu9YZ3E=;
+        b=vxaBxEtWphVVSF9DbWSgakuS3mkOE2oj7pbq84DeXGBcw+uZu9JHBS+7ERylWPxY9+
+         6XFZdVVwp7QtbOg4qT0E4TFAP/0BH7nQCXqfjInk+uXUoeUbA7AXoIhnblQdGxIZftno
+         LL3Vm3ZMsMKzeEt9YqKsV4cJ1hshqirrvKdAJ2jnY0GCNJyB/3jpBnOpVt1ao1lWx1uO
+         4BRml0egPRlHvvt0LDaEl21pPXP03OEDAq/oFwmzxekqatTxpiN4jrSg3UaHluKqS16A
+         sRAc3OvvlzC4QchALCyZ3i2SPQ/8LNHc4WfsCSH6q60S8stzHP2tfPkhmYkhhiMwXysk
+         O49g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715967596; x=1716572396;
+        d=1e100.net; s=20230601; t=1715967597; x=1716572397;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=n2pDz7/oTNEpqtQer1kZX15zeO+uHNcrWAzJZzhQ5SY=;
-        b=WjNMXDUqeE181oiqGBvYtEJdp8gk0MrLPjKS9AHmyO9TIV0qH1cPmrQaf62zxGECmd
-         nvfEYqUf7sgAkOqF+QV7xOOXgzTeiJ712vvTBlZd/c9XCSjuRGfG5WmS7hLXdM8EqXy/
-         IXpTBcBDsVhKabe8VJPZU5U1FKh+YOT43nMClETw/1hbXQnnQNbl+Ue0/2h5FmMMO233
-         YhstoYeOUS5qURBgw4IYv5/VYOelnYS0iIw3NHiNSmQZnCYkWYKO125EKPVkcyaWjsY9
-         jLQocUSiKGS3n3uMatHW/cswGNKzkvEbmUXTX39vINIMPGnXwFcv+tpbWtHuxpk7bwXt
-         WKgQ==
-X-Gm-Message-State: AOJu0YwOLPheyTGgXGCfXLyX0AUlK4qbPd735IM/89Tyb15klMbhFk3+
-	zR7yH45ZfQ/x+UmwGRXVMSsakWhqidEo1onFHVaOKTfQ6l4lD5W3Lu4U6vH6+fMMhrNcYXjiDan
-	mEg==
-X-Google-Smtp-Source: AGHT+IHHJT9L7juixaqDq5aE+FqCbe9Hd6zC3NBYVhjtCHTrrsNtJXD+RNttaeuuiFjmdSa5oOeHG+DYsp8=
+        bh=6Yo+VLe9odGlqzwhT9Gwf6Wef0XuvPIk4gSpAu9YZ3E=;
+        b=Ta4rXTqqeAuvd3k6Kd58OlDcq/TupEthY3gMgU1TbjYSYtnLgtB5uf0a+p9dhwrzIh
+         rjNoIyowEkA+V3OrwpmGfSR7MnP7sq8P+CVkTTd5aI5yx1i/LmgxKMjTYzz338OQLN+j
+         vcABzJHC4/wYAsHZxgwb1tU8aSx15oUkFeVB7btKOhslJdBdB86T5MH+499WbokW4OZW
+         VBp4qQR63rtoAnuwd2gNLgBGodKyf9C9jg3A8ukpJPIIG3q9If8kG0X32YYPeYY/3my6
+         UXmniKOL7Ye5vcfj7cgv+4Ql0V/vNa2NXGhBqjankWafR2R8i5RBrMO+BxtajQT7F6VK
+         qrXw==
+X-Gm-Message-State: AOJu0YwZ2aU8RayycQeC6sz0k3QrqcRHWrstM4ZItAFtzhfiS9nKL9M8
+	u32pKTY3MIQPax10ctodKr6q5/JRDweHrqakPSPgvOIRFvoUPdNaqKZALBTzb7H24+T6thd4LaB
+	Gig==
+X-Google-Smtp-Source: AGHT+IHXiidSMA654/zQaJMUmb4GFxomZhcL0ZO5qiPxnLUpOmpXw2SDX4LG19i9eS8UqNld9GpMFUgu1xs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:c947:b0:1eb:50fd:c37a with SMTP id
- d9443c01a7336-1ef43d2e21fmr10094135ad.7.1715967595676; Fri, 17 May 2024
- 10:39:55 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:903:124e:b0:1e2:969b:dfdd with SMTP id
+ d9443c01a7336-1ef43f50544mr6561205ad.8.1715967597545; Fri, 17 May 2024
+ 10:39:57 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 17 May 2024 10:38:43 -0700
+Date: Fri, 17 May 2024 10:38:44 -0700
 In-Reply-To: <20240517173926.965351-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240517173926.965351-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240517173926.965351-7-seanjc@google.com>
-Subject: [PATCH v2 06/49] KVM: selftests: Refresh vCPU CPUID cache in __vcpu_get_cpuid_entry()
+Message-ID: <20240517173926.965351-8-seanjc@google.com>
+Subject: [PATCH v2 07/49] KVM: selftests: Verify KVM stuffs runtime CPUID OS
+ bits on CR4 writes
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -87,63 +88,37 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Refresh selftests' CPUID cache in the vCPU structure when querying a CPUID
-entry so that tests don't consume stale data when KVM modifies CPUID as a
-side effect to a completely unrelated change.  E.g. KVM adjusts OSXSAVE in
-response to CR4.OSXSAVE changes.
-
-Unnecessarily invoking KVM_GET_CPUID is suboptimal, but vcpu->cpuid exists
-to simplify selftests development, not for performance reasons.  And,
-unfortunately, trying to handle the side effects in tests or other flows
-is unpleasant, e.g. selftests could manually refresh if KVM_SET_SREGS is
-successful, but that would still leave a gap with respect to guest CR4
-changes.
+Extend x86's set sregs test to verify that KVM sets/clears OSXSAVE and
+OSKPKE according to CR4.XSAVE and CR4.PKE respectively.  For performance
+reasons, KVM is responsible for emulating the architectural behavior of
+the OS CPUID bits tracking CR4.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../testing/selftests/kvm/include/x86_64/processor.h  | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/x86_64/set_sregs_test.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 8eb57de0b587..99aa3dfca16c 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -992,10 +992,17 @@ static inline struct kvm_cpuid2 *allocate_kvm_cpuid2(int nr_entries)
- void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid);
- void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu);
+diff --git a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+index 96fd690d479a..f4095a3d1278 100644
+--- a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+@@ -85,6 +85,16 @@ static void test_cr_bits(struct kvm_vcpu *vcpu, uint64_t cr4)
+ 	rc = _vcpu_sregs_set(vcpu, &sregs);
+ 	TEST_ASSERT(!rc, "Failed to set supported CR4 bits (0x%lx)", cr4);
  
-+static inline void vcpu_get_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
-+}
++	TEST_ASSERT(!!(sregs.cr4 & X86_CR4_OSXSAVE) ==
++		    (vcpu->cpuid && vcpu_cpuid_has(vcpu, X86_FEATURE_OSXSAVE)),
++		    "KVM didn't %s OSXSAVE in CPUID as expected",
++		    (sregs.cr4 & X86_CR4_OSXSAVE) ? "set" : "clear");
 +
- static inline struct kvm_cpuid_entry2 *__vcpu_get_cpuid_entry(struct kvm_vcpu *vcpu,
- 							      uint32_t function,
- 							      uint32_t index)
- {
-+	vcpu_get_cpuid(vcpu);
++	TEST_ASSERT(!!(sregs.cr4 & X86_CR4_PKE) ==
++		    (vcpu->cpuid && vcpu_cpuid_has(vcpu, X86_FEATURE_OSPKE)),
++		    "KVM didn't %s OSPKE in CPUID as expected",
++		    (sregs.cr4 & X86_CR4_PKE) ? "set" : "clear");
 +
- 	return (struct kvm_cpuid_entry2 *)get_cpuid_entry(vcpu->cpuid,
- 							  function, index);
- }
-@@ -1016,7 +1023,7 @@ static inline int __vcpu_set_cpuid(struct kvm_vcpu *vcpu)
- 		return r;
- 
- 	/* On success, refresh the cache to pick up adjustments made by KVM. */
--	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
-+	vcpu_get_cpuid(vcpu);
- 	return 0;
- }
- 
-@@ -1026,7 +1033,7 @@ static inline void vcpu_set_cpuid(struct kvm_vcpu *vcpu)
- 	vcpu_ioctl(vcpu, KVM_SET_CPUID2, vcpu->cpuid);
- 
- 	/* Refresh the cache to pick up adjustments made by KVM. */
--	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
-+	vcpu_get_cpuid(vcpu);
- }
- 
- void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
+ 	vcpu_sregs_get(vcpu, &sregs);
+ 	TEST_ASSERT(sregs.cr4 == cr4, "sregs.CR4 (0x%llx) != CR4 (0x%lx)",
+ 		    sregs.cr4, cr4);
 -- 
 2.45.0.215.g3402c0e53f-goog
 
