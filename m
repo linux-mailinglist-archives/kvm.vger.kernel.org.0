@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-17639-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17640-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536938C8951
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:27:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E1ED8C8959
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:31:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03A79288E9A
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 15:27:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085112831B3
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 15:31:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C9C12D754;
-	Fri, 17 May 2024 15:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2C312D754;
+	Fri, 17 May 2024 15:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F3aJOB7I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i51VZTJj"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66C5741C66
-	for <kvm@vger.kernel.org>; Fri, 17 May 2024 15:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51DE8479
+	for <kvm@vger.kernel.org>; Fri, 17 May 2024 15:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715959658; cv=none; b=tNcrFsJ5b4g7CWT+qx5kTHbjoJpE9r6GX4Eb60vvxxt51GAN+gbvt/Khhx2hM9lrfAutV1+uKLBpyxPxYb+ZTGqhnbOcKVnBjI+HGMqQJOPsaiO42gyJGZpvo9UvvY9HXsXvuJDRHz2m0LyllzQLcLO87zKYcDOQCMMfA4Ml1Kg=
+	t=1715959858; cv=none; b=IdxrMGjrAJGNC4kpPl4F03Czz5nUaDtWA3sFxFSY9VnC3vZQVCqv5TeEn1/GtcEMRCfJOqnloLeGL7b5No1aQsjYTTnMyaYaZJkvd0T7Xi8INIsAwUScv0tAwtjfawHU2+O4ic2E28mnPvcu/8xiw8oVwsVWZwRIg+ZR7jvKURQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715959658; c=relaxed/simple;
-	bh=3XMr70djBC2wwTiLy0f88qgaJkOG35+cgZjEnDTWZ1I=;
+	s=arc-20240116; t=1715959858; c=relaxed/simple;
+	bh=oscng7hubUk0pbg5Km/hVar1kfLe5//OlAe5GTYQFis=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VVNa14axQRklmCTuTdJ1zC/vBupuAB7UGOQFHNWlnm8UwGsNJs/ALB/S/uNoqCWdm6uqPjgzuC8v5Jvru3VRTWcKRJw5oVjY5ZKsR0AoQ4lntKQX8qT6JydIxgdj0IEshA+DzuS9FrxZc8c4YP2qS+i+m8750EaZgOYBsJAPVkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F3aJOB7I; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=D9f71OGICcQMr09X3j4keP44clnxfOD4OUKD4m6xHe6wNST3Pok/akPAHEyOdRmj217CB9MFkkoff0THydw6Cs2lD9HGcbTp9cvZk01ZtHFnRVx0W4QleDdNhPQN9QS6WaRHOa9tRudAhPe4AE5LioKNna2Tf5P+JUoozyeeZAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i51VZTJj; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715959656;
+	s=mimecast20190719; t=1715959855;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WGDY5Z28wVzuAjsQs/ta+6J/yuKLaL4MRw5s433qlXs=;
-	b=F3aJOB7ILGQdIDdezOcED7asNYBfkjYbBDQ5hqbvtln+VU4a8aYYsd9GKpoiKMnaERME8t
-	ydVgLOkLODMpiZDiDvT6HIe2mJ3b0E/95wNSMMc+38r4Ozn+dv6Rx0uQO04AaLDhDJ3bWi
-	KNUByI6YaguxtXhen2V5miIH4isc5YI=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=aFq04/L6JW/eUr0Iijo6T20CVRsDnVggIdQMSpb6ERg=;
+	b=i51VZTJjXACDumhSw3A/hDn6/djRuij8aJKN4xwcPNNSZPcJ+05x4rspsGyMkPHHOQLijz
+	+cpILf2NqsGdl5ymZlcAXh400sx0ZbPTHIr2ImIjufPjTbijANiPC5yrJS/baB66WZ//eZ
+	d1gfEhowp/PcW2EmnaSObWZz5aMVXZ0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-517-yq9U0dtZPLKXhSxK8LGurA-1; Fri, 17 May 2024 11:27:35 -0400
-X-MC-Unique: yq9U0dtZPLKXhSxK8LGurA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a59c2583f0bso509882466b.1
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 08:27:34 -0700 (PDT)
+ us-mta-478-TvJ50rKGOw6AZ0aN5kvlAw-1; Fri, 17 May 2024 11:30:53 -0400
+X-MC-Unique: TvJ50rKGOw6AZ0aN5kvlAw-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a5a194b34a6so533306866b.3
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 08:30:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715959654; x=1716564454;
+        d=1e100.net; s=20230601; t=1715959853; x=1716564653;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=WGDY5Z28wVzuAjsQs/ta+6J/yuKLaL4MRw5s433qlXs=;
-        b=DIQWH0gcRiukTaaqQZm0ZBbcC96qcsW0JMATgND4L1zDHpHo/0sVf/zX8SCxYWbzwr
-         1VstC7j+uVTM7GGXm9wWP3GRC2VHuo+hbTlQ8JXpu6sN3ErN1bPzi2NI5yvjN3G6KUAn
-         40a8X7CP7h5yjzAO9wTgOKVHTVoKXymzxwCQiWY882hxDeoMUPd1JpC4o3/4e6vnjHk+
-         HBj5+fDk2HcDtPWrE6B1O1/2fsOjeSSeBikekOe+eHQSMEaS8Z2dAnf4oTLmBh7PD3II
-         Cg1G16HDClGRj2t2toLNfUcWtVMYVRdZfKDuKV72jZ5t107PJtVT3HWuJ7W6nbsZSbAt
-         rNag==
-X-Forwarded-Encrypted: i=1; AJvYcCUU4ldhsJrg387WfHcgfeFVxSXRGuTCoCTtaELtur8v9scAUa32z1As+jFZU4dP6QfhBYoPnKRZjcM+kR/XEZHJb2nd
-X-Gm-Message-State: AOJu0YxUYF8JQibKgfN6wf2HVCRoFnNs2zjd/eHjmnvCwiCgh/sKA5LZ
-	ESytH8OPUZni8Isj3WaFKr1LW+A4vAc8yn1+nOHD007KFmLEXXaBSdl2A0UDlyMX21T5UnROUIS
-	Ki/QJcFiwo+aH3lZ9KJiM0K0vPRVODEexukKpp3zUJwNUlwf3Jw==
-X-Received: by 2002:a17:906:f1cd:b0:a59:af54:1651 with SMTP id a640c23a62f3a-a5a2d641977mr1356727466b.57.1715959653880;
-        Fri, 17 May 2024 08:27:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE+l6w6qSHk15/SFXoayH2qKkKWEuppAZBqG5jkguylL6yIWhzCVgRBwcrCwOwTm7Za2LzYKQ==
-X-Received: by 2002:a17:906:f1cd:b0:a59:af54:1651 with SMTP id a640c23a62f3a-a5a2d641977mr1356725266b.57.1715959653523;
-        Fri, 17 May 2024 08:27:33 -0700 (PDT)
+        bh=aFq04/L6JW/eUr0Iijo6T20CVRsDnVggIdQMSpb6ERg=;
+        b=O0HBVMVYiYu0t5W1VUhh4vZlVPrrYNZ4CJF23APkFzPUfczNj9QNyTMcYp8/0NzOR1
+         m4cBmQXIK4f0Ulds58pDFBh6hbP2/Pnw48sNW3LvRmyuFYYZRCmJvkGV3Dk2uDWbI717
+         XLZDlhHysIGDnIDeB5iwNh8NecDLdHuI3kwF+0iEUszMFNMH59Dlqe20KrwFbYde8SNG
+         sNkBbAUEfYbW9BNM51Dzu1VJvamhKCtXjYNHRgvxeeQGHdIZI2aVs7JAdC+i93GpyFHk
+         9J749tqQzGBnKp6P532ldgHLSpVa+VbbThI7gmTBkzbr3gNLonsiIilDLsQwd1zZYsy8
+         0DIw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJi0iAFe0MHMVQT86uchm645h9AcK0y9TLUhxSrOmw/eql6tB/yD74UAPpKSvRVfDaPswjqVjezMxyht7+Ipmp4x1i
+X-Gm-Message-State: AOJu0YyULzlNK7azDqYqUp6YyQBkdwZe1NUM8xWPKRiK1+V8/SAvUsI+
+	bnodVuTocwJduFouOW314CilCY27VvZzkKHISQ/Yrwe1y+9d5nnZCHA/Lb/dSFWj1ZFUqrkuuEq
+	tMYpandVjn+63jhNtKj+GFXTfR4ZdXfdJkgufjZ50kYxJiooTfA==
+X-Received: by 2002:a17:906:1d05:b0:a59:c9b1:cb68 with SMTP id a640c23a62f3a-a5a2d55a759mr1601328466b.7.1715959852771;
+        Fri, 17 May 2024 08:30:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGD9t0MkoarZLjzEIqTUeL+tD1HnvH5GYALueos75VgC81hkYokcukSDCqIUCF40pqzjnMctQ==
+X-Received: by 2002:a17:906:1d05:b0:a59:c9b1:cb68 with SMTP id a640c23a62f3a-a5a2d55a759mr1601326766b.7.1715959852326;
+        Fri, 17 May 2024 08:30:52 -0700 (PDT)
 Received: from [192.168.10.81] ([151.95.155.52])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a5a179c81bfsm1129188766b.129.2024.05.17.08.27.32
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a5a17b17865sm1117591866b.204.2024.05.17.08.30.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 May 2024 08:27:33 -0700 (PDT)
-Message-ID: <fa88344c-cf0b-478f-9713-906aeb616da7@redhat.com>
-Date: Fri, 17 May 2024 17:27:32 +0200
+        Fri, 17 May 2024 08:30:51 -0700 (PDT)
+Message-ID: <7df9032d-83e4-46a1-ab29-6c7973a2ab0b@redhat.com>
+Date: Fri, 17 May 2024 17:30:50 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,21 +85,24 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH 02/16] KVM: x86/mmu: Introduce a slot flag to zap only
  slot leafs on slot deletion
-To: Sean Christopherson <seanjc@google.com>,
- Rick P Edgecombe <rick.p.edgecombe@intel.com>
-Cc: Kai Huang <kai.huang@intel.com>,
- "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+To: Sean Christopherson <seanjc@google.com>, Kai Huang <kai.huang@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+ "dmatlack@google.com" <dmatlack@google.com>,
  "sagis@google.com" <sagis@google.com>,
  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
  Yan Y Zhao <yan.y.zhao@intel.com>, Erdem Aktas <erdemaktas@google.com>,
  "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "dmatlack@google.com" <dmatlack@google.com>
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
 References: <20240515005952.3410568-1-rick.p.edgecombe@intel.com>
  <20240515005952.3410568-3-rick.p.edgecombe@intel.com>
  <b89385e5c7f4c3e5bc97045ec909455c33652fb1.camel@intel.com>
  <ZkUIMKxhhYbrvS8I@google.com>
  <1257b7b43472fad6287b648ec96fc27a89766eb9.camel@intel.com>
  <ZkUVcjYhgVpVcGAV@google.com>
+ <ac5cab4a25d3a1e022a6a1892e59e670e5fff560.camel@intel.com>
+ <ZkU7dl3BDXpwYwza@google.com>
+ <175989e7-2275-4775-9ad8-65c4134184dd@intel.com>
+ <ZkVDIkgj3lWKymfR@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -137,23 +140,20 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <ZkUVcjYhgVpVcGAV@google.com>
+In-Reply-To: <ZkVDIkgj3lWKymfR@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 5/15/24 22:05, Sean Christopherson wrote:
->> Again thinking of the userspace memory analogy... Aren't there some VMs where
->> the fast zap is faster? Like if you have guest with a small memslot that gets
->> deleted all the time, you could want it to be zapped specifically. But for the
->> giant memslot next to it, you might want to do the fast zap all thing.
->
-> Yes.  But...
+On 5/16/24 01:20, Sean Christopherson wrote:
+> Hmm, a quirk isn't a bad idea.  It suffers the same problems as a memslot flag,
+> i.e. who knows when it's safe to disable the quirk, but I would hope userspace
+> would be much, much cautious about disabling a quirk that comes with a massive
+> disclaimer.
+> 
+> Though I suspect Paolo will shoot this down too 😉
 
-On the other hand, tearing down a giant memslot isn't really common. 
-The main occurrence of memslots going away is 1) BIOS fiddling with low 
-memory permissions;  2) PCI BARs.  The former is only happening at boot 
-and with small memslots, the latter can in principle involve large
-memslots but... just don't do it.
+Not really, it's probably the least bad option.  Not as safe as keying 
+it off the new machine types, but less ugly.
 
 Paolo
 
