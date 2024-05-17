@@ -1,144 +1,182 @@
-Return-Path: <kvm+bounces-17641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B584D8C8A11
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 18:24:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 924CB8C8A16
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 18:25:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BB50282CD8
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 16:23:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C34981C2176F
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 16:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C881130A7F;
-	Fri, 17 May 2024 16:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAA8E12FF69;
+	Fri, 17 May 2024 16:25:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F8J6rGhR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OcOX+ZbI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0225D3D9E;
-	Fri, 17 May 2024 16:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5AA3D9E;
+	Fri, 17 May 2024 16:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715962994; cv=none; b=JbzhVl9QqOrGn5aI3Lp2QNl3nFNFVGz2U9XaYDDV5FovgM5gKKZAXRXy1/SmO9pdi7wgxYf4Ybf2RQI7LH29HkUaLiMIMdWi2pliMj4nIRJ4+c9q0QjMzoq0sWfXOJpcHg7fErYP1NBGlj//ZNX4xSSk6r7glY0UKNAc0GOIo/w=
+	t=1715963108; cv=none; b=UJmnPm4n/rNjwtILaiLwHkTb6Svw53QhW/RYLcwvA5lUM+rowGCnQ6hGPGOJRkT1SqgyUUd84PMtSrQi+7t+R4DiUkw78PE60T7R70adMmIbG+TNDAJkF1IkMYkjTHQUhfU/gju1VPqwM68WhesT78kphIWMduOwH24WDtWmGRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715962994; c=relaxed/simple;
-	bh=uNwlZVn0k6bBYrUn2NOTbtyZjAe9hAwPUWGNLiaSzKs=;
+	s=arc-20240116; t=1715963108; c=relaxed/simple;
+	bh=vhNvc95DBkL2aLYyLqRIQcrflwmg0YDC3PVeoxygFSM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MlIAnJvXoclx91HzV3KHgMAmzFsWWX7APIuqQKg6D8rdDfiO2lBWN8hNUnta8MkPvLMjbRrCzno9d+ey7uKWaxOu5yWMAIKuIS4yXd50yO6+ba4Jn3R+4XC21rSS0pTUnL9jV4xzW+y5gexohMQGsr+7nf1x4bn2gL2/M+fleQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F8J6rGhR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70342C2BD10;
-	Fri, 17 May 2024 16:23:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715962993;
-	bh=uNwlZVn0k6bBYrUn2NOTbtyZjAe9hAwPUWGNLiaSzKs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F8J6rGhR6abMw+H3e0sNsBE3c0HR9drUMq7zelYKMTQHa0vv/MIG2W8+/hD/7XTI+
-	 9VkRoCKMyZzVY3LjQAv7zTKPKrfWjp+PaYpWL+HZIXKwJ9PpfHkWCOm8/AnprKJTiS
-	 x71fH3FEiRuBcJ7Snaffb4mCRWAYWAV32gCoEeO44TUBKDap7ZLHPJJXjD0QMTmCNO
-	 ZUj+MK/eDva4zMj4VegTwZ0y/H/lyuO2Nk/KqN8YnLbubwD8YFqugReL9OgeiAJUxc
-	 u0pTJlCPPo4/7T1+KTMYWfO14b9TwwHb+K7KeD4YmO6RNA3DpP+PsNxwbeXmOHuVhd
-	 +qE7xoo2PLRTA==
-Date: Fri, 17 May 2024 09:23:12 -0700
-From: "Darrick J. Wong" <djwong@kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Linux trace kernel <linux-trace-kernel@vger.kernel.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org,
-	linux-block@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
-	freedreno@lists.freedesktop.org, virtualization@lists.linux.dev,
-	linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org,
-	iommu@lists.linux.dev, linux-tegra@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-	ath11k@lists.infradead.org, ath12k@lists.infradead.org,
-	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
-	linux-usb@vger.kernel.org, linux-bcachefs@vger.kernel.org,
-	linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
-	linux-cifs@vger.kernel.org, linux-xfs@vger.kernel.org,
-	linux-edac@vger.kernel.org, selinux@vger.kernel.org,
-	linux-btrfs@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-hwmon@vger.kernel.org,
-	io-uring@vger.kernel.org, linux-sound@vger.kernel.org,
-	bpf@vger.kernel.org, linux-wpan@vger.kernel.org,
-	dev@openvswitch.org, linux-s390@vger.kernel.org,
-	tipc-discussion@lists.sourceforge.net,
-	Julia Lawall <Julia.Lawall@inria.fr>
-Subject: Re: [PATCH] tracing/treewide: Remove second parameter of
- __assign_str()
-Message-ID: <20240517162312.GZ360919@frogsfrogsfrogs>
-References: <20240516133454.681ba6a0@rorschach.local.home>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ujYBuFlHN5eF8O2NXle94QOtpiQULH6mTkPg6vf7U5YbHB0VVFeHRVKx3gy2H/inHYLZbEWM9Pg16thbUn3JVvwcmYvyUc2dJ9kVatqIp/fvgylSIdKSGIkzdZjDXzY63dXCA6fwbaWwZ4XTrv5oZpXpy+boEdSD6JtWFNRPOjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OcOX+ZbI; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715963106; x=1747499106;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=vhNvc95DBkL2aLYyLqRIQcrflwmg0YDC3PVeoxygFSM=;
+  b=OcOX+ZbIpHZd8cIWflTd3QO3eSreG+Bu82c7dXvtsyBMFYZOaNEVsYkw
+   nPIHRZpsM8ylkbElqJbSxTj+1262EXlCn2/pT9eVxND04lwuZiIAg4GoW
+   CSLBZNFUuLkh9PbeDIt2STiW9/3uv+qZND/VJyjBoBl3xH/b5GYpw8BsI
+   i3e4JQ5BMRiuWYhI6q6iPmL/NS91mh7FyZB6TH4usbQ5+0VqEAN4CiIJW
+   p+k17e8RHnewObqOAUQxr5gsVPyNoEzpyJpUpBK1lrezt38a6J2KSCTbF
+   PKj+7JGqP9zJymxsC100PhOaD9UxS9UZPex5oZlxGVXqZ2DPfu/mJAM2B
+   w==;
+X-CSE-ConnectionGUID: GY6FLpUoS0eN04Q1cTG+aQ==
+X-CSE-MsgGUID: TvQxkltzRaO/uWPp4/DoMQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11075"; a="12360930"
+X-IronPort-AV: E=Sophos;i="6.08,168,1712646000"; 
+   d="scan'208";a="12360930"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2024 09:25:05 -0700
+X-CSE-ConnectionGUID: Zb/wWZh/Rc2luuvItdghFw==
+X-CSE-MsgGUID: XwKadQglQDKEPjnFfG4K3g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,168,1712646000"; 
+   d="scan'208";a="31847689"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmviesa006.fm.intel.com with ESMTP; 17 May 2024 09:25:02 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1000)
+	id DBDCF1F1; Fri, 17 May 2024 19:25:00 +0300 (EEST)
+Date: Fri, 17 May 2024 19:25:00 +0300
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: =?utf-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>, 
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, 
+	hang.yuan@intel.com, tina.zhang@intel.com, Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: Re: [PATCH v19 039/130] KVM: TDX: initialize VM with TDX specific
+ parameters
+Message-ID: <pfbphwefaefxw2l2u26qr6ptq7rtdmnihjmxvk34zv4srlnsum@qyjumzzdnfxo>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <5eca97e6a3978cf4dcf1cff21be6ec8b639a66b9.1708933498.git.isaku.yamahata@intel.com>
+ <46mh5hinsv5mup2x7jv4iu2floxmajo2igrxb3haru3cgjukbg@v44nspjozm4h>
+ <de344d2c-6790-49c5-85be-180bc4d92ea4@suse.com>
+ <etso5bvvs2gq3parvzukujgbatwqfb6lhzoxhenrapav6obbgl@o6lowhrcbucp>
+ <e8b36230-d59f-44f1-ba48-5a0533238d8e@suse.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240516133454.681ba6a0@rorschach.local.home>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e8b36230-d59f-44f1-ba48-5a0533238d8e@suse.com>
 
-On Thu, May 16, 2024 at 01:34:54PM -0400, Steven Rostedt wrote:
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+On Fri, May 17, 2024 at 05:00:19PM +0200, Jürgen Groß wrote:
+> On 17.05.24 16:53, Kirill A. Shutemov wrote:
+> > On Fri, May 17, 2024 at 04:37:16PM +0200, Juergen Gross wrote:
+> > > On 17.05.24 16:32, Kirill A. Shutemov wrote:
+> > > > On Mon, Feb 26, 2024 at 12:25:41AM -0800, isaku.yamahata@intel.com wrote:
+> > > > > @@ -725,6 +967,17 @@ static int __init tdx_module_setup(void)
+> > > > >    	tdx_info->nr_tdcs_pages = tdcs_base_size / PAGE_SIZE;
+> > > > > +	/*
+> > > > > +	 * Make TDH.VP.ENTER preserve RBP so that the stack unwinder
+> > > > > +	 * always work around it.  Query the feature.
+> > > > > +	 */
+> > > > > +	if (!(tdx_info->features0 & MD_FIELD_ID_FEATURES0_NO_RBP_MOD) &&
+> > > > > +	    !IS_ENABLED(CONFIG_FRAME_POINTER)) {
+> > > > 
+> > > > I think it supposed to be IS_ENABLED(CONFIG_FRAME_POINTER). "!" shouldn't
+> > > > be here.
+> > > 
+> > > No, I don't think so.
+> > > 
+> > > With CONFIG_FRAME_POINTER %rbp is being saved and restored, so there is no
+> > > problem in case the seamcall is clobbering it.
+> > 
+> > Could you check setup_tdparams() in your tree?
+> > 
+> > Commit
+> > 
+> > [SEAM-WORKAROUND] KVM: TDX: Don't use NO_RBP_MOD for backward compatibility
+> > 
+> > in my tree comments out the setting TDX_CONTROL_FLAG_NO_RBP_MOD.
+> > 
+> > I now remember there was problem in EDK2 using RBP. So the patch is
+> > temporary until EDK2 is fixed.
+> > 
 > 
-> [
->    This is a treewide change. I will likely re-create this patch again in
->    the second week of the merge window of v6.10 and submit it then. Hoping
->    to keep the conflicts that it will cause to a minimum.
-> ]
+> I have the following line in setup_tdparams() (not commented out):
 > 
-> With the rework of how the __string() handles dynamic strings where it
-> saves off the source string in field in the helper structure[1], the
-> assignment of that value to the trace event field is stored in the helper
-> value and does not need to be passed in again.
-> 
-> This means that with:
-> 
->   __string(field, mystring)
-> 
-> Which use to be assigned with __assign_str(field, mystring), no longer
-> needs the second parameter and it is unused. With this, __assign_str()
-> will now only get a single parameter.
-> 
-> There's over 700 users of __assign_str() and because coccinelle does not
-> handle the TRACE_EVENT() macro I ended up using the following sed script:
-> 
->   git grep -l __assign_str | while read a ; do
->       sed -e 's/\(__assign_str([^,]*[^ ,]\) *,[^;]*/\1)/' $a > /tmp/test-file;
->       mv /tmp/test-file $a;
->   done
-> 
-> I then searched for __assign_str() that did not end with ';' as those
-> were multi line assignments that the sed script above would fail to catch.
-> 
-> Note, the same updates will need to be done for:
-> 
->   __assign_str_len()
->   __assign_rel_str()
->   __assign_rel_str_len()
-> 
-> I tested this with both an allmodconfig and an allyesconfig (build only for both).
-> 
-> [1] https://lore.kernel.org/linux-trace-kernel/20240222211442.634192653@goodmis.org/
-> 
-> Cc: Masami Hiramatsu <mhiramat@kernel.org>
-> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> Cc: Julia Lawall <Julia.Lawall@inria.fr>
-> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+> 	td_params->exec_controls = TDX_CONTROL_FLAG_NO_RBP_MOD;
 
-/me finds this pretty magical, but such is the way of macros.
-Thanks for being much smarter about them than me. :)
+Could you check if it is visible from the guest side?
 
-Acked-by: Darrick J. Wong <djwong@kernel.org>	# xfs
+It is zero for me.
 
---D
+diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
+index c1cb90369915..f65993a6066d 100644
+--- a/arch/x86/coco/tdx/tdx.c
++++ b/arch/x86/coco/tdx/tdx.c
+@@ -822,13 +822,33 @@ static bool tdx_enc_status_change_finish(unsigned long vaddr, int numpages,
+ 	return true;
+ }
+ 
++#define TDG_VM_RD			7
++
++#define TDCS_CONFIG_FLAGS		0x1110000300000016
++
++#define TDCS_CONFIG_NO_RBP_MOD		BIT_ULL(2)
++
++/* Read TD-scoped metadata */
++static inline u64 tdg_vm_rd(u64 field, u64 *value)
++{
++	struct tdx_module_args args = {
++		.rdx = field,
++	};
++	u64 ret;
++
++	ret = __tdcall_ret(TDG_VM_RD, &args);
++	*value = args.r8;
++
++	return ret;
++}
++
+ void __init tdx_early_init(void)
+ {
+ 	struct tdx_module_args args = {
+ 		.rdx = TDCS_NOTIFY_ENABLES,
+ 		.r9 = -1ULL,
+ 	};
+-	u64 cc_mask;
++	u64 cc_mask, config;
+ 	u32 eax, sig[3];
+ 
+ 	cpuid_count(TDX_CPUID_LEAF_ID, 0, &eax, &sig[0], &sig[2],  &sig[1]);
+@@ -893,4 +913,7 @@ void __init tdx_early_init(void)
+ 	x86_cpuinit.parallel_bringup = false;
+ 
+ 	pr_info("Guest detected\n");
++
++	tdg_vm_rd(TDCS_CONFIG_FLAGS, &config);
++	printk("NO_RBP_MOD: %#llx\n", config & TDCS_CONFIG_NO_RBP_MOD);
+ }
+-- 
+  Kiryl Shutsemau / Kirill A. Shutemov
 
