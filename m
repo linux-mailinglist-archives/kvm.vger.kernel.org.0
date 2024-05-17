@@ -1,134 +1,152 @@
-Return-Path: <kvm+bounces-17588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17590-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B188C83B9
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 11:35:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F07508C83EF
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 11:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 850EC1F235A7
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 09:35:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 62DBF1F226BC
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 09:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD883A28E;
-	Fri, 17 May 2024 09:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02D3C374FB;
+	Fri, 17 May 2024 09:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q7nnnXKo"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C832E40D;
-	Fri, 17 May 2024 09:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAECC1FA5;
+	Fri, 17 May 2024 09:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715938446; cv=none; b=tYN99cBesEZ27cDs0XFxVXO65PdPV4UzCo1SbW9G5F6faUsz6UqcUVcO8vOSik3eg9MQBwaVD2rqoMRHOyt4w/NdxPSwb8w00v9hCh46Pjy4aDFzAjS2EErJItvXE1fuVOnf+ZHmtyAiN3mHHZsBtXdSB8WNRSj+eG7SssXutyM=
+	t=1715938720; cv=none; b=LYtXV8FyIDwECrOzDp3zf2PDcMK2Gk04+Kq37Fp3M+OzZTRTB8K1EOd4e7Na9Ql7BZZksuxi6t9X7w0055jStdddCic8vrxJSGzXDd/aV7nMdQ7miIpuErVDMOlQKbnMEeGD1ZT8DjHolMQkslIUvBxMHpZRWSZ+JD/81Xmayx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715938446; c=relaxed/simple;
-	bh=RJVwbXiVXMNHdFgcxkWovVgZblbHMFIR4uz+RoxIR4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Kd7ZvDXuaacgXiAM3TlwkI3DV2t02TtpvrN5uWirU21ln41KOgjLIdxfOswXZYA+SiUoEdjxTNlEwCS2bQ9EqzoKw0QtO0k1wgKD9iXfNIi8f9u3jdH44WTwp30P5xdWa2bzv9z07eUfPsUx3den3szWVdOrw4yJS0mLMgfbZWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2945C32786;
-	Fri, 17 May 2024 09:34:02 +0000 (UTC)
-Date: Fri, 17 May 2024 10:34:00 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Suzuki K Poulose <suzuki.poulose@arm.com>
-Cc: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 10/14] arm64: Force device mappings to be non-secure
- shared
-Message-ID: <ZkckiCiv1kzM0oCK@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-11-steven.price@arm.com>
- <ZkR535Hmh3WkMYai@arm.com>
- <4e89f047-ae70-43a8-a459-e375ca05b2c2@arm.com>
+	s=arc-20240116; t=1715938720; c=relaxed/simple;
+	bh=vcW+W1wogmO6WY+GSQu3IAR/P96Rw6SpWddj5psVWwk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gdtvfx1zrWDr2+27wVpxoZkNUNqQTGcCFHZtdkWsAO1+qAtpijXNpqSEqulLKIAGuBXnnEeJoAYzdc1UYAGTnFOB31LRNVuc9ZwiFbYGv4sfKYoNeQN7qC7/uDAUjW1zDpJ8DAqCOYIzbEv7afURBbDp7ldpsQ/dYPNBd7+VKJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q7nnnXKo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68B3BC4AF0D;
+	Fri, 17 May 2024 09:38:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1715938719;
+	bh=vcW+W1wogmO6WY+GSQu3IAR/P96Rw6SpWddj5psVWwk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Q7nnnXKoCoZCRE9y8qfd0GjlbgMZcow94ZBAhyo/a3WB7eilpoBw2+BvdmX0v1BZf
+	 e7OVkid9omI+gvcN303kxsn1XDNSTYdJqgftO+q7xqgbBFEfRALDNx6MNApEOaSItp
+	 R/U+wW3wKfdgVg1pSTt+l5Ktt5O2287ep0H8zh6uS0rANv32EVrNlYH0N2LN0Wkz4S
+	 7JyAvYOZKqMfev4RirENIqVjY9S2NBz5t0xMnmDlB0lD8J6a25LhI7NPYbYJS3uooO
+	 gi0eyy/jJtvOQvPPH73HE5rAvo90fxUfGOyoScW2xWZLVtSxLMRh/mH25kBaP3Lv2i
+	 C+gw9xG0H/JCg==
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5b27c804765so229613eaf.3;
+        Fri, 17 May 2024 02:38:39 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUWYCUUcc/b/FchSIKZURPFgta7rVvQ98EXrKHPJXFNwHm1NYA5mhnrnOqs5AhhxQ9GW9IakoPYM2tKBfhzrk/EyEzmJoi3rvafeJAUk4utvdM/gl8Q0DmNn+qVXUdMgmMqD7N28eXbKunqB+G5eCznmfnElM16y3btdfJz4m42lijWOBJhUrMFy8mEmV2NEgPSw2qBQsheFqZTdZfVYbQlXImgczqpO1gLjF09p1nkEr4Z6J8wUxVABJgHtADl9oMVjoWL+Y3sMeuOT3c0IKKGN4Dxt0z7elVxN4MdMm2/XgPnmczXwM2E4weNyvSvGYOUo3Dkl90oXWTCwB3ZLYTOOX3DyDPDKLYuxbGaQUBL8+WhtWwuGUB0xTB6Dt0bnoY5KbU/fG+9kK44As6lJ2NYR1485Vas5PJQxopYaNbQYGZKrDDagnzU882PHhfVixV7HYIl+4BeStudiFN7N/DWBfep9uW/SeWq5CfewEpV5Lf3eV8k3NxElPyWpSOxA6/+fW6RUzOihBnmLnDjCYTeCOtpkhqcB5stjrjHwctwJwFJWxtttDNNnrNyguRw7jsVNt6gPZGfFRHcHQg9pw7OMHZU8eus2L5UubhOWaO1vjpTW1xUxeSmHnP3lpDagZ2BgfipnFvr485MmMbecSsSkuNvMN2uUg9fsdHUmjBQkpMcYQVY0EHgYMrkejjAgzvPAv4h4eo4am5WALGnFB3CNcYUeaJLYxuzuzs3PSpK/dk6pyABso4gg0hpRt7mFgH36sxlE2vJYdkb+Ylhzt6PNwVMLWnD/0dPNbNSurY9wkoSfg+VlRhZ0Mcdtd/TIYeYJA3RTlFCmLh247gWcRQhFgjfTlo0xEw/l5O690hEm1/wM3BFIMnQy/+SMSXd/DRpx0WU7VXCYsoX8UyKC+EhFQdTCNYohD7n9LX8gfiYVyVyasai9AOwbkUAwQ==
+X-Gm-Message-State: AOJu0YxGXHeHUUHqXVkQ8sPUu7cuIKrwXOWNRvlYtJoG/9dUoyF9RkvT
+	EcOEQRJrDqc9Zb30XhSADfiY2PrEpiLTINFH80SW64FTRyYyGHMhaV9I/CjvzyO7Uit4iAJws/V
+	0JPKARYzgJJuMcO1qT60GjRzkwAk=
+X-Google-Smtp-Source: AGHT+IGDE99s+s68qJbXMtkzFnMd5s/9OBNB6sR0+sCICB0PpLHU9X3BbBFmCRlDywLZhowLPWB9T1lJ6YvckXBFFDs=
+X-Received: by 2002:a05:6820:2602:b0:5b2:8017:fb68 with SMTP id
+ 006d021491bc7-5b2815cd95fmr22153827eaf.0.1715938718475; Fri, 17 May 2024
+ 02:38:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e89f047-ae70-43a8-a459-e375ca05b2c2@arm.com>
+References: <20240516133454.681ba6a0@rorschach.local.home>
+In-Reply-To: <20240516133454.681ba6a0@rorschach.local.home>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Fri, 17 May 2024 11:38:25 +0200
+X-Gmail-Original-Message-ID: <CAJZ5v0hGNNvUq-BNHynaWr-5YVC6ugki81R70SG4uu34Rk-Mew@mail.gmail.com>
+Message-ID: <CAJZ5v0hGNNvUq-BNHynaWr-5YVC6ugki81R70SG4uu34Rk-Mew@mail.gmail.com>
+Subject: Re: [PATCH] tracing/treewide: Remove second parameter of __assign_str()
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, 
+	Linux trace kernel <linux-trace-kernel@vger.kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org, 
+	kvm@vger.kernel.org, linux-block@vger.kernel.org, linux-cxl@vger.kernel.org, 
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, 
+	amd-gfx@lists.freedesktop.org, intel-gfx@lists.freedesktop.org, 
+	intel-xe@lists.freedesktop.org, linux-arm-msm@vger.kernel.org, 
+	freedreno@lists.freedesktop.org, virtualization@lists.linux.dev, 
+	linux-rdma@vger.kernel.org, linux-pm@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-tegra@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, ath10k@lists.infradead.org, 
+	linux-wireless@vger.kernel.org, ath11k@lists.infradead.org, 
+	ath12k@lists.infradead.org, brcm80211@lists.linux.dev, 
+	brcm80211-dev-list.pdl@broadcom.com, linux-usb@vger.kernel.org, 
+	linux-bcachefs@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	ocfs2-devel@lists.linux.dev, linux-cifs@vger.kernel.org, 
+	linux-xfs@vger.kernel.org, linux-edac@vger.kernel.org, 
+	selinux@vger.kernel.org, linux-btrfs@vger.kernel.org, 
+	linux-erofs@lists.ozlabs.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-hwmon@vger.kernel.org, io-uring@vger.kernel.org, 
+	linux-sound@vger.kernel.org, bpf@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	dev@openvswitch.org, linux-s390@vger.kernel.org, 
+	tipc-discussion@lists.sourceforge.net, Julia Lawall <Julia.Lawall@inria.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 15, 2024 at 12:00:49PM +0100, Suzuki K Poulose wrote:
-> On 15/05/2024 10:01, Catalin Marinas wrote:
-> > On Fri, Apr 12, 2024 at 09:42:09AM +0100, Steven Price wrote:
-> > > From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> > > 
-> > > Device mappings (currently) need to be emulated by the VMM so must be
-> > > mapped shared with the host.
-> > 
-> > You say "currently". What's the plan when the device is not emulated?
-> > How would the guest distinguish what's emulated and what's not to avoid
-> > setting the PROT_NS_SHARED bit?
-> 
-> Arm CCA plans to add support for passing through real devices,
-> which support PCI-TDISP protocol. This would involve the Realm
-> authenticating the device and explicitly requesting "protected"
-> mapping *after* the verification (with the help of RMM).
+On Thu, May 16, 2024 at 7:35=E2=80=AFPM Steven Rostedt <rostedt@goodmis.org=
+> wrote:
+>
+> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+>
+> [
+>    This is a treewide change. I will likely re-create this patch again in
+>    the second week of the merge window of v6.10 and submit it then. Hopin=
+g
+>    to keep the conflicts that it will cause to a minimum.
+> ]
+>
+> With the rework of how the __string() handles dynamic strings where it
+> saves off the source string in field in the helper structure[1], the
+> assignment of that value to the trace event field is stored in the helper
+> value and does not need to be passed in again.
+>
+> This means that with:
+>
+>   __string(field, mystring)
+>
+> Which use to be assigned with __assign_str(field, mystring), no longer
+> needs the second parameter and it is unused. With this, __assign_str()
+> will now only get a single parameter.
+>
+> There's over 700 users of __assign_str() and because coccinelle does not
+> handle the TRACE_EVENT() macro I ended up using the following sed script:
+>
+>   git grep -l __assign_str | while read a ; do
+>       sed -e 's/\(__assign_str([^,]*[^ ,]\) *,[^;]*/\1)/' $a > /tmp/test-=
+file;
+>       mv /tmp/test-file $a;
+>   done
+>
+> I then searched for __assign_str() that did not end with ';' as those
+> were multi line assignments that the sed script above would fail to catch=
+.
+>
+> Note, the same updates will need to be done for:
+>
+>   __assign_str_len()
+>   __assign_rel_str()
+>   __assign_rel_str_len()
+>
+> I tested this with both an allmodconfig and an allyesconfig (build only f=
+or both).
+>
+> [1] https://lore.kernel.org/linux-trace-kernel/20240222211442.634192653@g=
+oodmis.org/
+>
+> Cc: Masami Hiramatsu <mhiramat@kernel.org>
+> Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: Julia Lawall <Julia.Lawall@inria.fr>
+> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
 
-I'd have to do some reading, no clue how this works.
-
-> > > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> > > index f5376bd567a1..db71c564ec21 100644
-> > > --- a/arch/arm64/include/asm/pgtable.h
-> > > +++ b/arch/arm64/include/asm/pgtable.h
-> > > @@ -598,7 +598,7 @@ static inline void set_pud_at(struct mm_struct *mm, unsigned long addr,
-> > >   #define pgprot_writecombine(prot) \
-> > >   	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_NORMAL_NC) | PTE_PXN | PTE_UXN)
-> > >   #define pgprot_device(prot) \
-> > > -	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN)
-> > > +	__pgprot_modify(prot, PTE_ATTRINDX_MASK, PTE_ATTRINDX(MT_DEVICE_nGnRE) | PTE_PXN | PTE_UXN | PROT_NS_SHARED)
-> > 
-> > This pgprot_device() is not the only one used to map device resources.
-> > pgprot_writecombine() is another commonly macro. It feels like a hack to
-> > plug one but not the other and without any way for the guest to figure
-> > out what's emulated.
-> 
-> Agree. I have been exploring hooking this into ioremap_prot() where we
-> could apply the attribute accordingly. We will change it in the next
-> version.
-
-pgprot_* at least has the advantage that it covers other places.
-ioremap_prot() would handle the kernel mappings but you have devices
-mapped in user-space via remap_pfn_range() for example. The protection
-bits may come from dma_pgprot() with either write-combine or cacheable
-attributes. One may map device I/O as well (not sure what DPDK does). We
-could restrict those to protected devices but we need to go through the
-use-cases.
-
-All this needs some thinking, especially if at some point we'll have
-protected devices. Just hijacking the low-level pgprot macros doesn't
-feel like a great approach.
-
-> > Can the DT actually place those emulated ranges in the higher IPA space
-> > so that we avoid randomly adding this attribute for devices?
-> 
-> It can, but then we kind of break the "Realm" view of the IPA space. i.e.,
-> right now it only knows about the "lower IPA" half and uses the top bit as a
-> protection attr to access the IPA as shared.
-> 
-> Expanding IPA size view kind of breaks "sharing memory", where, we
-> must "use a different PA" for a page that is now shared.
-
-True, I did not realise that the IPA split is transparent to the host.
-
-An option would be additional DT/ACPI attributes for those devices.
-That's not great either though as we can't handle those attributes in
-the arch code only and probably we don't want to change generic drivers.
-
-Yet another option would be to query the RMM somehow.
-
--- 
-Catalin
+Acked-by: Rafael J. Wysocki <rafael@kernel.org> # for thermal
 
