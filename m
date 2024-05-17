@@ -1,185 +1,78 @@
-Return-Path: <kvm+bounces-17599-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17600-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 272328C85DB
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 13:47:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4C668C8758
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 15:37:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1B8B2859BA
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 11:47:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5AF41C214FA
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 13:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD45D4503A;
-	Fri, 17 May 2024 11:47:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825465491A;
+	Fri, 17 May 2024 13:37:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FWuJnC7j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cpnt7SW+"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA67F41A91;
-	Fri, 17 May 2024 11:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 442C41E507
+	for <kvm@vger.kernel.org>; Fri, 17 May 2024 13:37:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715946434; cv=none; b=DZ0BVe1IlWjd/zukW0YqSptfXXIuSKJ9McRtYyoaE7RKGyCI11g4aE/qjRYUhFo96tZWypRKt0d34O3H5ZpR6l74M3hRRYOU3A74iWvuHlRrMojSt9SIKzbIFOJX2nSgsLnDtHrlrxc7F3VJVgsmBrxVueKkrCwVlnNmL/zVoAk=
+	t=1715953058; cv=none; b=BeTU+eEi214zRaQRSzWLf5CTv3jRTy8XZEDKdvySXXbJrT9HEVZ78deGkZphqCANsMl5tlRd3rWpattX44b5bod1kBl5rd1iAHk6eBWIUU2u1lZOx6cpJIAXMWaUn84OyITQ5SkLMGI50Q50eC6VepPe1kDc/W1Z+oy0NPtP9Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715946434; c=relaxed/simple;
-	bh=IZoCG+gnWyPzPIvcxdkZJK9rpMSStUGz9XrJiHOZlhw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Zj4PEuB3JW1smYpzHI44fcWARa92Ws0BozyW7NP8s1ZyIvWArtrooAiRaH+oyJUixBaPfqtGkm3Avhf5xf2a/gxGp3+66iajMhkCBtCgLt53ECz+Os+GJ/d/m4kILR19u45LuKDN57kbsHicCuerPtKzCbMIluKk/b+8fV/WpTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FWuJnC7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89202C2BD11;
-	Fri, 17 May 2024 11:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1715946434;
-	bh=IZoCG+gnWyPzPIvcxdkZJK9rpMSStUGz9XrJiHOZlhw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FWuJnC7jiNv++1D6rN000005VO9+94SQRgIX+HBbnYyi6VUxkNQZGBIIWA+k07T++
-	 pTlw4IimeEtA7OOHaVshlGUkLDOuxBP5eoCEfX1YPZKAZQdKRa4rqbW0Bl/a+W/guw
-	 7DYwCrWA2bdSZdhfNIgbAOscOlORVqPmRhLktaVvrPZyBMqtsjqT9Op3VlGLKx4rX1
-	 ul3dAO4nf5nqyQwQBIAcKfr9bTXAoME8O/+CPZf9uM49zHEdfkjKsNtQuvOSEKRbfW
-	 vTQw5GQiUc3fcdhsVwb+rsgF1K+Wq0rdl3YucoyX2XEmYlHgbpJVO7HNJfQULSvjVv
-	 BVtAZQH6+8PVA==
-From: Masahiro Yamada <masahiroy@kernel.org>
-To: Kees Cook <keescook@chromium.org>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>,
-	linux-kselftest@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Jiri Kosina <jikos@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	bpf@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-input@vger.kernel.org,
-	linux-rtc@vger.kernel.org
-Subject: [PATCH 1/2] selftests: harness: remove unneeded __constructor_order_last()
-Date: Fri, 17 May 2024 20:45:05 +0900
-Message-Id: <20240517114506.1259203-2-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240517114506.1259203-1-masahiroy@kernel.org>
-References: <20240517114506.1259203-1-masahiroy@kernel.org>
+	s=arc-20240116; t=1715953058; c=relaxed/simple;
+	bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=E2TF8NZq4EE9bk/ECD3+f0A5RarTORpLZ22crrHLhX5nThQoJT5CnJxAZB2cFSvOl9ZmewCzpiqodkfw+wz223wCHH0eUyrGIS08ltEoPF5l5ii+S9QXeUpf2gV0JCIWAx2PwmVpYs2zQcB2qt410XulqlMED6Vb2S1DaRBJxoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cpnt7SW+; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-52388d9ca98so1304270e87.0
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 06:37:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1715953055; x=1716557855; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+        b=Cpnt7SW++sN+NGrjGrkcie5OjyhTPcq4BBAivCMpx1PaftOW9QhAX3ohzR2g7nk1E6
+         AvvE1AE/aSj5NNASG4qJ8N6NU/7KDZBj23PBZDX9qjV8TglXOSDJY4sRLpj7U0OTh8tv
+         EtzjTVwtmppTTNX3zv/bDacC6IgwxSmyLcfM/V56ccC7p2gaJf2aZPFXII371WlHZizR
+         O52oepgxBDhLFLCfItn92mSLp2hCNvcKncvPjQLeomjaSgfH/qcQo8MiusCSs0CzVYRN
+         Di+VWzAcP6d6Wn2xjP9Uq3NZ+aXc/l3ycyfAILWQrEBtmYL8L+AMlgavnz0418Oxin5E
+         xKkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1715953055; x=1716557855;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=;
+        b=cJzIr3sc6qd3WxS0j0qzk7UodVBEpnUyTLzf6/RPhFZGC09ig6GfZs1syj+uw9j+/n
+         E48PXhaQSgVseDUagptbY/ywz8XQP10dGM2stS44hBtRSzS15CrHxOhQz+URe7jD0Q30
+         UOcfE8249i6WLWEtltQP+FvURXdRqpfDiAIiGFPUOwuYoyn2oXwlThO0/fW5Nf7c5Nr2
+         e9VEQvPQkZHuUcctmdyRFoVjJiBYshz13qEWlnj31W1dLqCkoJZfxqTgK7Qigbh1xtHU
+         5pwhTcNvuaOYLYL35G44tAHORS/gjNdhG87eYs8YaPiHFRgOHBYvPNkqvPYlVSkotKM9
+         WBTw==
+X-Gm-Message-State: AOJu0Yw8peshoTcFJsweO8K+2mGIyFr+N/27w+COWZ7leK02+/c0NyVU
+	psZYYL5XY0BE5HYr1bf6+CE98GK7tgwwQ7VkQ8M8R/+9mNZl+OekO5sxpMqKorluEUKr+WXr9NO
+	sBMmCFLzkEwXjFy3/7gaQxJ8sVkPlpQ==
+X-Google-Smtp-Source: AGHT+IGohEqzfubGnq0qYeK4klau43WTjF+71HRQVC7wJ1czwCtAFwdCK4cS8W0DcuTQFzztWv/t4nYaCwwb6T2GWKU=
+X-Received: by 2002:a2e:81c3:0:b0:2e2:a99a:4c4 with SMTP id
+ 38308e7fff4ca-2e52039d930mr173126331fa.47.1715953054958; Fri, 17 May 2024
+ 06:37:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Satay Epic <satayepic@gmail.com>
+Date: Fri, 17 May 2024 08:37:23 -0500
+Message-ID: <CADohWC_PW5oUmQLeMDU7zj0KFL0dDB-h+wsxDH1tY1XUhxAyjg@mail.gmail.com>
+Subject: unsubscribe
+To: kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-__constructor_order_last() is unneeded.
-
-If __constructor_order_last() is not called on reverse-order systems,
-__constructor_order will remain 0 instead of being set to
-_CONSTRUCTOR_ORDER_BACKWARD (= -1).
-
-__LIST_APPEND() will still take the 'else' branch, so there is no
-difference in the behavior.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- .../selftests/drivers/s390x/uvdevice/test_uvdevice.c   |  6 ------
- tools/testing/selftests/hid/hid_bpf.c                  |  6 ------
- tools/testing/selftests/kselftest_harness.h            | 10 +---------
- tools/testing/selftests/rtc/rtctest.c                  |  7 -------
- 4 files changed, 1 insertion(+), 28 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-index ea0cdc37b44f..7ee7492138c6 100644
---- a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-+++ b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
-@@ -257,12 +257,6 @@ TEST_F(attest_fixture, att_inval_addr)
- 	att_inval_addr_test(&self->uvio_attest.meas_addr, _metadata, self);
- }
- 
--static void __attribute__((constructor)) __constructor_order_last(void)
--{
--	if (!__constructor_order)
--		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
--}
--
- int main(int argc, char **argv)
- {
- 	int fd = open(UV_PATH, O_ACCMODE);
-diff --git a/tools/testing/selftests/hid/hid_bpf.c b/tools/testing/selftests/hid/hid_bpf.c
-index 2cf96f818f25..f47feef2aced 100644
---- a/tools/testing/selftests/hid/hid_bpf.c
-+++ b/tools/testing/selftests/hid/hid_bpf.c
-@@ -853,12 +853,6 @@ static int libbpf_print_fn(enum libbpf_print_level level,
- 	return 0;
- }
- 
--static void __attribute__((constructor)) __constructor_order_last(void)
--{
--	if (!__constructor_order)
--		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
--}
--
- int main(int argc, char **argv)
- {
- 	/* Use libbpf 1.0 API mode */
-diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-index ba3ddeda24bf..60c1cf5b0f0d 100644
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@ -444,12 +444,6 @@
-  * Use once to append a main() to the test file.
-  */
- #define TEST_HARNESS_MAIN \
--	static void __attribute__((constructor)) \
--	__constructor_order_last(void) \
--	{ \
--		if (!__constructor_order) \
--			__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD; \
--	} \
- 	int main(int argc, char **argv) { \
- 		return test_harness_run(argc, argv); \
- 	}
-@@ -846,7 +840,6 @@ static struct __fixture_metadata *__fixture_list = &_fixture_global;
- static int __constructor_order;
- 
- #define _CONSTRUCTOR_ORDER_FORWARD   1
--#define _CONSTRUCTOR_ORDER_BACKWARD -1
- 
- static inline void __register_fixture(struct __fixture_metadata *f)
- {
-@@ -1272,8 +1265,7 @@ static int test_harness_run(int argc, char **argv)
- 
- static void __attribute__((constructor)) __constructor_order_first(void)
- {
--	if (!__constructor_order)
--		__constructor_order = _CONSTRUCTOR_ORDER_FORWARD;
-+	__constructor_order = _CONSTRUCTOR_ORDER_FORWARD;
- }
- 
- #endif  /* __KSELFTEST_HARNESS_H */
-diff --git a/tools/testing/selftests/rtc/rtctest.c b/tools/testing/selftests/rtc/rtctest.c
-index 63ce02d1d5cc..9647b14b47c5 100644
---- a/tools/testing/selftests/rtc/rtctest.c
-+++ b/tools/testing/selftests/rtc/rtctest.c
-@@ -410,13 +410,6 @@ TEST_F_TIMEOUT(rtc, alarm_wkalm_set_minute, 65) {
- 	ASSERT_EQ(new, secs);
- }
- 
--static void __attribute__((constructor))
--__constructor_order_last(void)
--{
--	if (!__constructor_order)
--		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
--}
--
- int main(int argc, char **argv)
- {
- 	switch (argc) {
--- 
-2.40.1
 
 
