@@ -1,118 +1,126 @@
-Return-Path: <kvm+bounces-17566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B1C28C7FB2
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 03:57:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C7B68C7FB4
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 03:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08C6E2842B2
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 01:57:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1E8FB20A9D
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 01:59:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510A579CF;
-	Fri, 17 May 2024 01:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21A1523D;
+	Fri, 17 May 2024 01:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IwtZStbS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C5mhggp0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1354C69;
-	Fri, 17 May 2024 01:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A6C17FD;
+	Fri, 17 May 2024 01:59:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715911064; cv=none; b=umZwTusOTMNkFrc3RyIjERoVWd7YvhAudOnsmdeLDI3UGM+fU1YxU3A0GFzuNzkWrbLPQtu7s1WvTe3aByBMqRBH7JVuYjf+USJpqbHR/QVm8dHokLY7JomNBRoL1KdSGJ6TT+IZ0DXyPrJlccDjrpWZVCEmzqp79yAsq+MtxsU=
+	t=1715911154; cv=none; b=s/Ir95H5iO5PjFM4BtDpykJ0EGBVXUczSUUuucae+td1D5nRZVih3PoZbacrZ9YU25/37bPoyMDNzsIo2rw9Lip0JCwbLX2JrHwqlwUgrIK/Cvl+U1ZdzBZQftcsDSXDNM+JYo62GeMb199PSdK9bkqQh9nHeQAybi20XS7P04w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715911064; c=relaxed/simple;
-	bh=TeQwxcoJKMhlE7MRgBjHwcLfIU5flh55tSEr1OeVZTQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=oLX1Hja3UwEd9WNeMwocfueOXuv+rJfQYxJ218Os2bqUS4FsIl4rqCYuNTGYl854OupBvGBbUxFfB7h/mypTZ/4YkJ6XXFvROIyT9wI5CicLHnvQlo0L0jlzYCrRVVy3vx+tpoZ1KO5tK3rNrhGncEmyG83hKsE/Pb6rRwegYXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=IwtZStbS; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44GKMTnE014892;
-	Fri, 17 May 2024 01:57:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:date:subject:mime-version:content-type
-	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=4Xn
-	mAg2zsv4MMPg4ePcXWEN4bz039q9JRraQWkgbVw0=; b=IwtZStbSk3JYJzAeF0I
-	1mIEr7hmVeHiiFavZnE5+ZnApGP7Sv+azVQpMXZ//cJrZfedETwAax8+f74sj52k
-	RrIqFEFgq688rkyDe3M735wNDvr+YFzaJQgAYdMblvUpYilBZjgpbQvrCrYX610/
-	2JOPwJn3jEroQ2zyOZmrQO0CxWBtIumawuNuzrvjRA4wNTHwUyqFDYknOoPlr4QX
-	xAa8y2UI9dYwY31GFmGxHJeSohzR+QdvbDPsYCSZFVbsVmg7wyLpjQdAShOeuL1Y
-	aqkY0kiY0jcm9C+z47rjwNgPVKfRTdCLYwK+JjwpeRiZ10RaR+mbNIoGHbHkq8V7
-	GeQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3y5e9ct0gb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 May 2024 01:57:34 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 44H1vX5K025147
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 17 May 2024 01:57:33 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 16 May
- 2024 18:57:32 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Thu, 16 May 2024 18:57:32 -0700
-Subject: [PATCH] vringh: add MODULE_DESCRIPTION()
+	s=arc-20240116; t=1715911154; c=relaxed/simple;
+	bh=/asIFP3VhVOl5Bww+xsuwvWltg7PkBCAkGCa0RHdLdA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oaGDcJ54OrPnab2r4UZ6QQtdsgnN66gAt2vBSEx2CFQi/Dw/uCfwMXd3eIH1ycyw/qWEoHrv5ZP5XMC9tgsLouSX7jzEZxlj0OaP3HOOk9wAfGmlee20cAv5dQbuM/uPFkGPnPbfQivcPbgl4QSDGQb7+PbKV80fKswYovqwo1s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C5mhggp0; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1715911152; x=1747447152;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/asIFP3VhVOl5Bww+xsuwvWltg7PkBCAkGCa0RHdLdA=;
+  b=C5mhggp0moSPCqqGn08cnnyh9Iy0zfbR68XUZVrGnr0qic02WkkbmM5C
+   jQWRXmQbW3I3J6fE86Xe64WCrKuHQzooO3vsIi/emopDph2K0PWBxXsiO
+   jpv5oa1wOPcHhfnT0Lx1b//T3QcwB2crr5fzCt9LiCAqGaBG1vGRy7lM5
+   mJUmrUWy/aOS5vTrtS2uNXStcGxMa49QXYcURC5d1lhkD73KQo1B3zYHd
+   N/hlR87jP5eQof2xwUPs1cOmaZi+OawWCDUe8YTHMG60OGlE92yDBQxsn
+   mM4NIrytPRDiEhOjuJL4f6QRUs9pGLQFTA4R+xgSxGJL3bcMs2jr0EvQ2
+   g==;
+X-CSE-ConnectionGUID: 972Yn3yZRrK48/6V8Z8Kuw==
+X-CSE-MsgGUID: cEpmpB5uRU2M4MiqXfin1g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11074"; a="15851730"
+X-IronPort-AV: E=Sophos;i="6.08,166,1712646000"; 
+   d="scan'208";a="15851730"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2024 18:59:11 -0700
+X-CSE-ConnectionGUID: CNT/fEo6SwSom5nZfVz3+Q==
+X-CSE-MsgGUID: pPKBAhxkS6eFBytinS7TpQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,166,1712646000"; 
+   d="scan'208";a="36191348"
+Received: from unknown (HELO 108735ec233b) ([10.239.97.151])
+  by fmviesa004.fm.intel.com with ESMTP; 16 May 2024 18:59:09 -0700
+Received: from kbuild by 108735ec233b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1s7mri-00002e-30;
+	Fri, 17 May 2024 01:58:54 +0000
+Date: Fri, 17 May 2024 09:57:58 +0800
+From: kernel test robot <lkp@intel.com>
+To: Gautam Menghani <gautam@linux.ibm.com>, mpe@ellerman.id.au,
+	npiggin@gmail.com, christophe.leroy@csgroup.eu,
+	naveen.n.rao@linux.ibm.com
+Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
+	Gautam Menghani <gautam@linux.ibm.com>,
+	linux-kernel@vger.kernel.org, Naveen N Rao <naveen@kernel.org>,
+	Vaibhav Jain <vaibhav@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v8] arch/powerpc/kvm: Add support for reading VPA
+ counters for pseries guests
+Message-ID: <202405170932.TL7G99IJ-lkp@intel.com>
+References: <20240510104941.78410-1-gautam@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240516-md-vringh-v1-1-31bf37779a5a@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAIu5RmYC/x3MQQrCQAxA0auUrA1M21HEq4iLzDR2AnYsiZZK6
- d2NLh98/gbGKmxwaTZQXsTkWR3toYFcqI6MMrihC10Mx/aE04CLSh0L5tifQ08cEkXwfla+y/p
- /XW/uRMaYlGouv8ND6nvFiezFivPHU9j3L1yS0c+AAAAA
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-CC: <kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: yXUsnD5gIMwD8PMfWK8PGk4evjt5EaRT
-X-Proofpoint-ORIG-GUID: yXUsnD5gIMwD8PMfWK8PGk4evjt5EaRT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-16_07,2024-05-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- adultscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1011 mlxlogscore=805
- priorityscore=1501 bulkscore=0 malwarescore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405010000 definitions=main-2405170014
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240510104941.78410-1-gautam@linux.ibm.com>
 
-Fix the allmodconfig 'make w=1' issue:
+Hi Gautam,
 
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/vhost/vringh.o
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- drivers/vhost/vringh.c | 1 +
- 1 file changed, 1 insertion(+)
+[auto build test ERROR on powerpc/topic/ppc-kvm]
+[also build test ERROR on powerpc/next powerpc/fixes kvm/queue mst-vhost/linux-next linus/master v6.9 next-20240516]
+[cannot apply to kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 7b8fd977f71c..73e153f9b449 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -1614,4 +1614,5 @@ EXPORT_SYMBOL(vringh_need_notify_iotlb);
- 
- #endif
- 
-+MODULE_DESCRIPTION("host side of a virtio ring");
- MODULE_LICENSE("GPL");
+url:    https://github.com/intel-lab-lkp/linux/commits/Gautam-Menghani/arch-powerpc-kvm-Add-support-for-reading-VPA-counters-for-pseries-guests/20240510-185213
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
+patch link:    https://lore.kernel.org/r/20240510104941.78410-1-gautam%40linux.ibm.com
+patch subject: [PATCH v8] arch/powerpc/kvm: Add support for reading VPA counters for pseries guests
+config: powerpc-allmodconfig (https://download.01.org/0day-ci/archive/20240517/202405170932.TL7G99IJ-lkp@intel.com/config)
+compiler: powerpc64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240517/202405170932.TL7G99IJ-lkp@intel.com/reproduce)
 
----
-base-commit: 7f094f0e3866f83ca705519b1e8f5a7d6ecce232
-change-id: 20240516-md-vringh-c43803ae0ba4
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202405170932.TL7G99IJ-lkp@intel.com/
 
+All errors (new ones prefixed by >>):
+
+   powerpc64-linux-ld: warning: discarding dynamic section .glink
+   powerpc64-linux-ld: warning: discarding dynamic section .plt
+   powerpc64-linux-ld: linkage table error against `__traceiter_kvmppc_vcpu_stats'
+   powerpc64-linux-ld: stubs don't match calculated size
+   powerpc64-linux-ld: can not build stubs: bad value
+   powerpc64-linux-ld: arch/powerpc/kvm/book3s_hv_nestedv2.o: in function `do_trace_nested_cs_time':
+>> book3s_hv_nestedv2.c:(.text.do_trace_nested_cs_time+0x264): undefined reference to `__traceiter_kvmppc_vcpu_stats'
+>> powerpc64-linux-ld: arch/powerpc/kvm/book3s_hv_nestedv2.o:(__jump_table+0x8): undefined reference to `__tracepoint_kvmppc_vcpu_stats'
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
