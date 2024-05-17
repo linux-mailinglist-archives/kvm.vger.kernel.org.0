@@ -1,137 +1,178 @@
-Return-Path: <kvm+bounces-17713-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17714-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28C5B8C8DB1
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 23:27:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41AE48C8E39
+	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 00:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C87FB22A49
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 21:27:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A64BA1F2428C
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 22:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9247D13DDB8;
-	Fri, 17 May 2024 21:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97F2E1419AD;
+	Fri, 17 May 2024 22:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="b6Da8imk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6wzOec0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C161DFE1
-	for <kvm@vger.kernel.org>; Fri, 17 May 2024 21:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258E814036B
+	for <kvm@vger.kernel.org>; Fri, 17 May 2024 22:01:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715981258; cv=none; b=Zf3iF8ZNteZGF9YQ/X+bIHwwEj5rPEbVspMzHWsJy8ejoAH2C3b3apfVHJIx+F2VfQrjHh/pDB99RSrrn2AnfAI3BLhv0+qM5LkV2K4LVObG1Ka0p2QuMZgsQUdP7raAqPS/V9kvmGOHSVRSb108KDBTDStUubR/H6TLEt8eBi4=
+	t=1715983272; cv=none; b=p4gKw8Y8hTIalP2xDPOyh3z7jyq4xz62ZhECO8Vi1uW/3Hn+NpFe3TZRRcKwKnjjRxkumL0Lp1ZdPPJOP9ruPBCALH+nOcaB7rpA8dFJrqyUt46mAA4fWeeHZ3folG+Iuij9m3ydnSC9+lJPo7dA1OFNTVZU5/XYayBqJdyyghg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715981258; c=relaxed/simple;
-	bh=mZcbn9pTbHdvbEiKdVCqeMJrWb4nqNiC86MZdFsD0r0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gf56E1mgRu7pa60vh/P5cNIzvSz7vn8SSGBTgmOjgXZvNaoq5p0sKcNxpOmAUl/+ACwIGDvF+FhT53Qq1ZYUvYlF/wDFzuIMhfOmzhlSkwtEeCFqryrlvnSyvMb023eI3Pumf+Om1j5s+aoSFNMXuDHuzyYEAOkp1wj1uF7Mo7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=b6Da8imk; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f05b669b6cso21556735ad.3
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 14:27:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1715981257; x=1716586057; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nwumsOFzLhcSRvtv4E4XIjWS9Wdw51QyanOFC9u3vrw=;
-        b=b6Da8imk/8gNmVRmYGGLEwQhRFhk/mMpo33gVKEfmfcgQPdk0Zwys3suUOqqyu7Xys
-         EE/ww405sMpTuu9o+efr9ZgadxYEdCkmU9QkNnYvm8efavBQGbxHx0h2/r/bc+MWQ7sT
-         I+qcM9DR2v65iGT5xJE1h2aPz2B/l5t+uWaws=
+	s=arc-20240116; t=1715983272; c=relaxed/simple;
+	bh=tKFUvI5gt7hLN6dkyDdXMdQUukxhrEOMhNZL9hIIlpY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VDoumU6zSidV6xKfszESRf9o2SszhbL+R1fH5dVBnyZgArQVGouYom3jyth4lSyarkCI687pmZnC7gth5p1hCYv5+EGRVH6vPeE7wENtr8lyUKbSqa4P7fnmgr+7WACX8CzSFK3Dhi2y8W756Yxc3POsq8aol8WTZq133cBWFIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z6wzOec0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1715983269;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=qdpUFXRIVfL52195MnmJDcIlCYPzvNX7uOwOv3Xc+XA=;
+	b=Z6wzOec0L4AIPo2nU3bXjszdl0yozFbwEVxYBc5hmHqDNFOrR7Y1bQBxrLj/Nri1FbJ5Hd
+	IMrBGb8JtxWO/9lGcNXttzzeD4bQbgnRMRgoliic6/m26ZZTe2ssDG8KCcuGSNwjypchwN
+	6Q6utoAtYeMT6Z64zeokbttZTKF+yho=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-59-Hfd9jmLUNcOR04hfyEe5Ag-1; Fri, 17 May 2024 18:01:08 -0400
+X-MC-Unique: Hfd9jmLUNcOR04hfyEe5Ag-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a599dbd2b6aso566628566b.2
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 15:01:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715981257; x=1716586057;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nwumsOFzLhcSRvtv4E4XIjWS9Wdw51QyanOFC9u3vrw=;
-        b=p+GaHVbcaukiob3bq5ZktU6ulUYiBjiyBTbYwGYxCThJzb2yO69zDVq6BOMQTYEDkP
-         q3syuJ7Yy3xzbST3NWcxAvvbr+OPsrIurnApVtfitAOjbRUPwCtazjdNxICh8MafJyLi
-         uUrkqChi/Ndch7mphFfaVIY26D9X99Was9kERn2A49iXeAMP+S+TUaMPC/1PuQKqTguP
-         qTCI2Fnj0Ea4mej6EIxoDbHVl9O9FiXAkHavjdECZMryCx93yq+5OuDSIVUmbpnxgpMA
-         YpUC/33vlazYhVrUDLUUP86P0D5kyWiYLJSkU2jS0+yqqeF1aLKAYcoy9VYELs09ZfbT
-         64Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCUC88NA8saMWHQHzBIEc7qbaeiEd0wTPn8RMZPlvaIlaELi/w3wfkvUee0E4C1ymiXPeV+lc1RjzCPbTSafRYQAHeYC
-X-Gm-Message-State: AOJu0Yxg9pZTdjPjXHNZ104H3UIUusofcpIP5pp5QdrNSsf38m5rc2Es
-	npF3aYU3zF/wPBULvKBfEJuaAPTWmDiMr0C2iRiHWSULY08cIsmPsoj68+6DAw==
-X-Google-Smtp-Source: AGHT+IFluK3Eyorpte5TQvgACdUYQTNtTr1OkCqbBB7MpwGA6ZSBRPFcAQ5PudVW8axjuibL4dnJqQ==
-X-Received: by 2002:a17:902:9886:b0:1e2:577:f694 with SMTP id d9443c01a7336-1ef440596a9mr187163085ad.61.1715981256849;
-        Fri, 17 May 2024 14:27:36 -0700 (PDT)
-Received: from www.outflux.net ([198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ef0c2567absm160788595ad.297.2024.05.17.14.27.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 May 2024 14:27:35 -0700 (PDT)
-Date: Fri, 17 May 2024 14:27:35 -0700
-From: Kees Cook <keescook@chromium.org>
-To: Masahiro Yamada <masahiroy@kernel.org>
-Cc: Andy Lutomirski <luto@amacapital.net>, Will Drewry <wad@chromium.org>,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	David Hildenbrand <david@redhat.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Jiri Kosina <jikos@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	bpf@vger.kernel.org, kvm@vger.kernel.org,
-	linux-input@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH 0/2] selftests: harness: refactor __constructor_order
-Message-ID: <202405171426.B1ED9AD@keescook>
-References: <20240517114506.1259203-1-masahiroy@kernel.org>
+        d=1e100.net; s=20230601; t=1715983267; x=1716588067;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qdpUFXRIVfL52195MnmJDcIlCYPzvNX7uOwOv3Xc+XA=;
+        b=ZtX2Pgy9hjNYnSjfdhgOi+F89oF5xaC9BFNQET01pnfZddltAf7sDqhsPvJ7bIDt4T
+         ySIh9jDmeWIEk1C78dKvM6g4+e5lqy8cNbtg359zj/lrSSEd4MMU+n/8qg1SSlIJzQzh
+         4y3L6z03nkrdS/EpLmVVDuO9gw3SQaUD8fPOGDGmoXB+upMISC7GwGID+20TAk7xa7/z
+         SjbusXwB5KZ0FJdLQc+2BDwC1K1Xi+jIW1rAfxJ8txdG+8fJAteDw/qdwx9PItJ1uFg7
+         CW46C/WAw9JtLCl578CaBPVD5jYUgrZghQCTh6jTl1REsNdE95Y+bFVAvjRhe0gvw8SU
+         2MfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVEi+FNTWKtvVkOgyIV2Z6OPvDQnz00inXp9ty/0Sem40FKLO4CaoJIgb6q+qU+SZLmdj8HNh0hKoklp201yp9MkQgS
+X-Gm-Message-State: AOJu0YyFw0sARHc0OsyMgEGzmxNdw18vZIrkKYkfkalGXAZvMZKKLJfj
+	2NQacSHVhi6Mn0RLhwJIvzJs+MUpvKCG9wnwUJe8iCD5u4ZM3NNjRvn2254Dx+5ItytbG4zX88g
+	SM1snie6lRJ5qyQvMmAsh6fiDThaP1vVAMmhhTsTRt/ZfM7MBRg==
+X-Received: by 2002:a17:907:7da3:b0:a59:d063:f5f3 with SMTP id a640c23a62f3a-a5a2d673401mr2047180466b.63.1715983267338;
+        Fri, 17 May 2024 15:01:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGbO3RNBBJvjrmQrsSy2cv7ekGE/kUJSCKL4dwshp50q+y+7KPL9PGYTVFI+tQB68Or25mBGg==
+X-Received: by 2002:a17:907:7da3:b0:a59:d063:f5f3 with SMTP id a640c23a62f3a-a5a2d673401mr2047178366b.63.1715983266873;
+        Fri, 17 May 2024 15:01:06 -0700 (PDT)
+Received: from [192.168.10.81] ([151.95.155.52])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a5a69148b97sm701619366b.114.2024.05.17.15.01.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 May 2024 15:01:06 -0700 (PDT)
+Message-ID: <58492a1a-63bb-47d2-afef-164557d15261@redhat.com>
+Date: Sat, 18 May 2024 00:01:05 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240517114506.1259203-1-masahiroy@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PULL 17/19] KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE
+ event
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "michael.roth@amd.com" <michael.roth@amd.com>
+Cc: "aik@amd.com" <aik@amd.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
+ "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "seanjc@google.com" <seanjc@google.com>,
+ "brijesh.singh@amd.com" <brijesh.singh@amd.com>
+References: <20240510211024.556136-1-michael.roth@amd.com>
+ <20240510211024.556136-18-michael.roth@amd.com>
+ <96cf4b4929f489f291b3ae8385bb3527cbdf9400.camel@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <96cf4b4929f489f291b3ae8385bb3527cbdf9400.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 17, 2024 at 08:45:04PM +0900, Masahiro Yamada wrote:
+On 5/17/24 22:41, Edgecombe, Rick P wrote:
+> I get a build error in kvm-coco-queue with W=1:
 > 
-> This series refactors __constructor_order because
-> __constructor_order_last() is unneeded.
+> arch/x86/kvm/svm/sev.c: In function ‘__snp_handle_guest_req’:
+> arch/x86/kvm/svm/sev.c:3968:30: error: variable ‘sev’ set but not used [-
+> Werror=unused-but-set-variable]
+>   3968 |         struct kvm_sev_info *sev;
+>        |                              ^~~
+> cc1: all warnings being treated as errors
 > 
-> BTW, the comments in kselftest_harness.h was confusing to me.
+> To fix it:
 > 
-> As far as I tested, all arches executed constructors in the forward
-> order.
-> 
-> [test code]
-> 
->   #include <stdio.h>
-> 
->   static int x;
-> 
->   static void __attribute__((constructor)) increment(void)
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 57c2c8025547..6beaa6d42de9 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3965,14 +3965,11 @@ static int __snp_handle_guest_req(struct kvm *kvm, gpa_t
+> req_gpa, gpa_t resp_gpa
+>                                    sev_ret_code *fw_err)
 >   {
->            x += 1;
->   }
-> 
->   static void __attribute__((constructor)) multiply(void)
->   {
->           x *= 2;
->   }
-> 
->   int main(void)
->   {
->           printf("foo = %d\n", x);
->           return 0;
->   }
-> 
-> It should print 2 for forward order systems, 1 for reverse order systems.
-> 
-> I executed it on some archtes by using QEMU. I always got 2.
+>          struct sev_data_snp_guest_request data = {0};
+> -       struct kvm_sev_info *sev;
+>          int ret;
+>   
+>          if (!sev_snp_guest(kvm))
+>                  return -EINVAL;
+>   
+> -       sev = &to_kvm_svm(kvm)->sev_info;
+> -
+>          ret = snp_setup_guest_buf(kvm, &data, req_gpa, resp_gpa);
+>          if (ret)
+>                  return ret;
 
-IIRC, and it was a long time ago now, it was actually a difference
-between libc implementations where I encountered the problem. Maybe
-glibc vs Bionic?
+I'll post a fully updated version tomorrow with all the pending fixes. 
+Or today depending on the timezone.
 
--Kees
+Paolo
 
--- 
-Kees Cook
 
