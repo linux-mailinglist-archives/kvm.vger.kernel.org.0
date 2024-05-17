@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-17657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5748C8B52
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:41:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 756258C8B54
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:41:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96224282DF1
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:41:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 166BA1F24DAE
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:41:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7881D140389;
-	Fri, 17 May 2024 17:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805191411DA;
+	Fri, 17 May 2024 17:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dvtq8ZQ3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ElGEPxtB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5790A13FD81
-	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9C5140383
+	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:39:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715967595; cv=none; b=Xgokv5Iuq4YiYbd/3lTJGyQ6Q8gSASteNQQ4gp/EZzhPdoUq2d8+EMnzTtlTyeVptGZLE5hUu+oNxiiXkTGmZNaKo/6wmVYaGaNrjg/gjRGPvOgG6WGm8sqA/33vwvT8QKK2sBU1XEsxBg3C653xVW9/D2E61BGet83g0aGRpLk=
+	t=1715967597; cv=none; b=LwXReFvlHkBJa/1hevpycRMtg6UZ/XyzcCoq6eoVdlHO9bbD5YflSeInr4AFQyNp/QtEUNXCnXr0Q9OquuFKN6Le04233D9ioASB3swqntHdECYMV/40txpKM756E1olD6F6Qpi/LwY2P5WrC3syNAo5hgWcVN5i3fiWQSgq0dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715967595; c=relaxed/simple;
-	bh=aCfUY2cwJ9FyZLh6u5tXvW0EbzE1JhXczYPB0CjQxa8=;
+	s=arc-20240116; t=1715967597; c=relaxed/simple;
+	bh=AbfLQhyF3OH5B997fpsklE0q8dPfOTJZLQGWldAmSWo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=uJRH5Di5ANBuf4TgLKoOB3RXzOx3FgDkYNRYkSUNOmoXQ6zQfNvUJv8D651A8bQMW4zMJfV2S4PfcaZdLvUMtxg9XfsRJfL5HLbBqkXmgIYpbAEHhQcCv6zKXLHBiPAYZPW8qsvf1Vr9lYgHLmpu/mMUE9Yj53QIhBUO8EK/RaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dvtq8ZQ3; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=gbPCtu9jaYyjGgPWvQzE1H9dDd0V3n6w9Wu9PgmedNhY0ekEfX/wOxuRlcPxJNg84QZyBeOmVXh1JuvmXdrc7ntioGBfNG+L92NqP2nzCy872M2lWD0ym3zlLCObeiiLedO6qdqbipoGEZSQjl6JgJ37vEq4jWtAPynqEigoHWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ElGEPxtB; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5cfc2041cdfso7978695a12.2
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:39:54 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1ec43465046so86986185ad.1
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:39:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715967594; x=1716572394; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1715967596; x=1716572396; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ls63tfw1LENdu/wncAT6gu4iTMBSH9cLRZDJ5lKbc4Y=;
-        b=Dvtq8ZQ3kpHuzPty4e3qs4X8FTSrKc88HfCHjFTdKTVEzaQ4bjpinrsxAwDBNRYMdm
-         qaJ14V0f1GP0eUhBbWZFd8VZnkGXCvRgbUhUkBdy49MJtJUVgc2wOhHSBXBgciEkHTKm
-         Lo/rSVDzqQ7sFbhO2shn00BQmfAfRcL1+VLVgNAR+Tjdy0/p+sJfz5B/WC0xLXNpJMfe
-         NA3ednm0kEPTVoiI++wWfiPbemV8yRvGZRJhqWp6seVXtWGCzqlo3TwTCMoeZfpVpRv+
-         n6wx+SvVHLkLDy1sYqFvVR3wOy97ZZXDm9PSmRusgJ6CKgGXzxxooW8jT6IFyMX3xGTo
-         eLOw==
+        bh=n2pDz7/oTNEpqtQer1kZX15zeO+uHNcrWAzJZzhQ5SY=;
+        b=ElGEPxtBLIRKCnvsx7fBDkE5gA923UJD1oi5+LRSkP1LYA+2gXzyceSOGMypl3WLvR
+         Vh1VBb/tApFBTqJr3nDrOxS4hh4cSrJ6GJo+2qoqz3kmsAAurNZES02D46yZHi11ZHee
+         ZZzjgN5EbiFnQBcqQKuvRkuS4d6E5jqXoy5kI7E/XHXNi6tP++wGpw9kCkzk78KmwOlM
+         UX0wDGMjK3oaZNe2qCVfDiRMwG5C/TxgbAWPiCrJOOnNOkGexMZr1xvWuadK8Vi2u79g
+         A4fUM0EhCne94vcNcghNU74v/0B2udcKGtihLprSLezajlm1Bhke4u5gT6qRCpfCN1Ic
+         fKEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715967594; x=1716572394;
+        d=1e100.net; s=20230601; t=1715967596; x=1716572396;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Ls63tfw1LENdu/wncAT6gu4iTMBSH9cLRZDJ5lKbc4Y=;
-        b=CAMR+WfxGWWUP8gDipZoXi1IvjFnnZqswHPbFMzQVO0wL+mb6jnA4666KsWwcX8uzP
-         Z0advLJfy5NF6DDpLCCX3p+XCTLtef9IGkD9uYltfcisZ+8E+tj2bH8h59dKA1w4dMbs
-         HcYmR/AnU30wCZMu+Nj4ghZk7gHtoELPTgdN3Zr48TualFBSaXvaOwqwblEZD8gWrikT
-         9zcV9i9QrgC4KidYwDGprthtPy3agGvy2zcOvccUQUDCf266VVoBioHxNKaX20EtqD+E
-         HWWLpkR+wVUbHTOTjxvV6BjUk4ZMw61WQb7lwQoKr14Z9SVU5a4CaAfWFkrKhMe0s7rK
-         MRfw==
-X-Gm-Message-State: AOJu0Yy5j8DLZa96nZw3fTPacZmD5OHb+bNXmnf++9h1d5o2zHyXftbP
-	VePSaIrga41sKIsK+ON2JruNxlV3HOpweKVbKRA8IaR5DQ0MHxF2ZJu25MZGKMmSUkpBFHZke6C
-	nTQ==
-X-Google-Smtp-Source: AGHT+IGq7mDGV56F7XS81sz2VaOQIp7ARp6TameJrjIbuQMUVk9HZtTB8wUrzqkO40bbaK0aXO9qyCphroM=
+        bh=n2pDz7/oTNEpqtQer1kZX15zeO+uHNcrWAzJZzhQ5SY=;
+        b=WjNMXDUqeE181oiqGBvYtEJdp8gk0MrLPjKS9AHmyO9TIV0qH1cPmrQaf62zxGECmd
+         nvfEYqUf7sgAkOqF+QV7xOOXgzTeiJ712vvTBlZd/c9XCSjuRGfG5WmS7hLXdM8EqXy/
+         IXpTBcBDsVhKabe8VJPZU5U1FKh+YOT43nMClETw/1hbXQnnQNbl+Ue0/2h5FmMMO233
+         YhstoYeOUS5qURBgw4IYv5/VYOelnYS0iIw3NHiNSmQZnCYkWYKO125EKPVkcyaWjsY9
+         jLQocUSiKGS3n3uMatHW/cswGNKzkvEbmUXTX39vINIMPGnXwFcv+tpbWtHuxpk7bwXt
+         WKgQ==
+X-Gm-Message-State: AOJu0YwOLPheyTGgXGCfXLyX0AUlK4qbPd735IM/89Tyb15klMbhFk3+
+	zR7yH45ZfQ/x+UmwGRXVMSsakWhqidEo1onFHVaOKTfQ6l4lD5W3Lu4U6vH6+fMMhrNcYXjiDan
+	mEg==
+X-Google-Smtp-Source: AGHT+IHHJT9L7juixaqDq5aE+FqCbe9Hd6zC3NBYVhjtCHTrrsNtJXD+RNttaeuuiFjmdSa5oOeHG+DYsp8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:b609:0:b0:619:f921:b6e0 with SMTP id
- 41be03b00d2f7-6373d2172afmr53642a12.5.1715967593731; Fri, 17 May 2024
- 10:39:53 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:c947:b0:1eb:50fd:c37a with SMTP id
+ d9443c01a7336-1ef43d2e21fmr10094135ad.7.1715967595676; Fri, 17 May 2024
+ 10:39:55 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 17 May 2024 10:38:42 -0700
+Date: Fri, 17 May 2024 10:38:43 -0700
 In-Reply-To: <20240517173926.965351-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240517173926.965351-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240517173926.965351-6-seanjc@google.com>
-Subject: [PATCH v2 05/49] KVM: selftests: Assert that the @cpuid passed to
- get_cpuid_entry() is non-NULL
+Message-ID: <20240517173926.965351-7-seanjc@google.com>
+Subject: [PATCH v2 06/49] KVM: selftests: Refresh vCPU CPUID cache in __vcpu_get_cpuid_entry()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -88,28 +87,63 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a sanity check in get_cpuid_entry() to provide a friendlier error than
-a segfault when a test developer tries to use a vCPU CPUID helper on a
-barebones vCPU.
+Refresh selftests' CPUID cache in the vCPU structure when querying a CPUID
+entry so that tests don't consume stale data when KVM modifies CPUID as a
+side effect to a completely unrelated change.  E.g. KVM adjusts OSXSAVE in
+response to CR4.OSXSAVE changes.
+
+Unnecessarily invoking KVM_GET_CPUID is suboptimal, but vcpu->cpuid exists
+to simplify selftests development, not for performance reasons.  And,
+unfortunately, trying to handle the side effects in tests or other flows
+is unpleasant, e.g. selftests could manually refresh if KVM_SET_SREGS is
+successful, but that would still leave a gap with respect to guest CR4
+changes.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 ++
- 1 file changed, 2 insertions(+)
+ .../testing/selftests/kvm/include/x86_64/processor.h  | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index c664e446136b..f0f3434d767e 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1141,6 +1141,8 @@ const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
- {
- 	int i;
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 8eb57de0b587..99aa3dfca16c 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -992,10 +992,17 @@ static inline struct kvm_cpuid2 *allocate_kvm_cpuid2(int nr_entries)
+ void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid);
+ void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu);
  
-+	TEST_ASSERT(cpuid, "Must do vcpu_init_cpuid() first (or equivalent)");
++static inline void vcpu_get_cpuid(struct kvm_vcpu *vcpu)
++{
++	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
++}
 +
- 	for (i = 0; i < cpuid->nent; i++) {
- 		if (cpuid->entries[i].function == function &&
- 		    cpuid->entries[i].index == index)
+ static inline struct kvm_cpuid_entry2 *__vcpu_get_cpuid_entry(struct kvm_vcpu *vcpu,
+ 							      uint32_t function,
+ 							      uint32_t index)
+ {
++	vcpu_get_cpuid(vcpu);
++
+ 	return (struct kvm_cpuid_entry2 *)get_cpuid_entry(vcpu->cpuid,
+ 							  function, index);
+ }
+@@ -1016,7 +1023,7 @@ static inline int __vcpu_set_cpuid(struct kvm_vcpu *vcpu)
+ 		return r;
+ 
+ 	/* On success, refresh the cache to pick up adjustments made by KVM. */
+-	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
++	vcpu_get_cpuid(vcpu);
+ 	return 0;
+ }
+ 
+@@ -1026,7 +1033,7 @@ static inline void vcpu_set_cpuid(struct kvm_vcpu *vcpu)
+ 	vcpu_ioctl(vcpu, KVM_SET_CPUID2, vcpu->cpuid);
+ 
+ 	/* Refresh the cache to pick up adjustments made by KVM. */
+-	vcpu_ioctl(vcpu, KVM_GET_CPUID2, vcpu->cpuid);
++	vcpu_get_cpuid(vcpu);
+ }
+ 
+ void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
 -- 
 2.45.0.215.g3402c0e53f-goog
 
