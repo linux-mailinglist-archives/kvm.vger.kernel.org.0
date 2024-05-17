@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-17696-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17697-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7762A8C8BA8
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:53:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E008C8BAB
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:53:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A5F7282927
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:53:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 325C31C2258C
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F5E158D78;
-	Fri, 17 May 2024 17:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2699158DCC;
+	Fri, 17 May 2024 17:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WbuULUVq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l0VZBm7Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB2D158A1B
-	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:41:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBA213DDCF
+	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715967668; cv=none; b=bp7bHLEhKVXZXfJmnMUpuwCdQ7xanFg0mM6FexPxdtLM4jkmE7RjskOoxIWXXBGhZLZ6wP9CwkPPyiSoCmH9M0OynIcQZvDPsjgKfzxb9KuLHb9jR8S4LyHbbm9MdhMcfq/sJcTPDkwtcOblz/QwZdqJIQv58DTx6fQfjTk3a6c=
+	t=1715967671; cv=none; b=O72kMkQgDCY9nZ7Gw0Ktz2Dpj75pyxLLjA1tbHdYPMXpukPXp2YwFPWZ+wXjni5IpVNVn9DuK+bBcmWIzDxkXISjWzWdHxDYPZSXPspN5gSY+c/VCqG0MBZndJlCj/zMu9iJljaKrWQZYmWwhDNniYgKIFDMWcBLoUiIabX10SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715967668; c=relaxed/simple;
-	bh=eMG2WsWhu9ThjQQ2IwLLxCdRs+hT7CZoTJFSN5es+mM=;
+	s=arc-20240116; t=1715967671; c=relaxed/simple;
+	bh=ln2oK/KM1gDoYeYR3eZfciWq5Jni2fklzotf5eA5PH0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pf03zpsTLVpdRosN1iR5GuLiBQbuvwDZksKFRzLxDCT2bmacOxFqZGZ6C2z/xdW6YnMuOSgTORGMvZB0Fa/ezRF9us+reOWmpKF3dGiKunv3yas7TmDQ4weNfLMiFz8aJh1ZI4yp8xxcXr5qb16qt0KBLAAaoYYeejYosi/1vKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WbuULUVq; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=O1D+wD3vAM3vve/8kkFOGlqgC4tD2j5pdu1WsXTPc+PRE53UFHPCVfQ26IFdoimqq6felOfQiTsAj1F2HD0VIzMm06LI9LJHqnt6X+Ech7uS19IsrEjdQAaTIwzYWjlf5YJt/dTEHZgCnqIG/+qMrOm6ld2EC87fyVWqkaPZm7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=l0VZBm7Q; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1e54e6ba9a1so86689685ad.1
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:41:07 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-622d157d9fbso106140417b3.0
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:41:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715967667; x=1716572467; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1715967669; x=1716572469; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=S3i279oR5A9gafV11HN493qtqu4ESN7N+2a1+zoKYv8=;
-        b=WbuULUVqbXlxAXPTzPq5VF1YnA+ZvBqWpx51rR5N+tjTa7L9l35+/eP1Jq1hPBQCb0
-         YO/aA+Q/7D7m0pCzlGp/94oKblUt0vhsscfmufuDcFbSbkBsnvs33VoeqT3D1XRgcBMP
-         LR8f1x6IGdB1Q4JH7VxIkA2EG/yDPrN9alYC6hc49aO1svMKtDzpNC3dZnX+QnUbBmdB
-         TI6RNuj8H4j1M/oV0PoYs45VPqPtXAp7xm2Je7HBWoEJjrFnxlBRl7AM/2ykIwzdJ8K6
-         9ggqGVy9nd1zphTazagJhEaBnCKgofW+vqbe9zH6tbNJSPVlm9BY0Yh0RL32DgxXi3uV
-         Ua1A==
+        bh=lWJTyML0btVQwtFr3Kj+PF9ZU7fFVwzZvNC575eeaaY=;
+        b=l0VZBm7Qa8qhk+V7SbE4WxiWD6ZJx6zcTHELTiN3ApWBtt80BnoXr7Y7pVonVh5clq
+         zQatdburDI2XZU7bN431vdLwReIbkIkNkejT8mJQ1/qHQ/T4OGyXBhZsRyxyhiqLQvZJ
+         Myf96Mxf+Wl3RQBRvQnIRVnhWDJM0K27ssmPTIHhwQGXBUQWglLIM4kAVr/NcnPFLenq
+         +ASWR/k3W/TcZp12ytSC4EyNVr0aBpN42VzYSvte0H4209kaQUvkFCaZcboGLcf0yM6O
+         PvI883LCyGuBaL25Uw3ecbwSAfA5TRJZgAJZSExomfy8cIxIxG/wMBxCwy74YECLoLNf
+         Yb0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715967667; x=1716572467;
+        d=1e100.net; s=20230601; t=1715967669; x=1716572469;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=S3i279oR5A9gafV11HN493qtqu4ESN7N+2a1+zoKYv8=;
-        b=MimW2vGb+LHPjYBjrPlMEI+1rkAMTuWjG8jDVicvGe3pBPLvG50tEElpRKcmi1/V7B
-         Z3yxW/XalMNTD05zC9Pyioq9yOSSgyigitbGd9VVH8u2+QvhPHwYVFX7fZ/wI+tFLgPX
-         0HwBlZAA2UGbJfosNV/sVmsLN+cVRsbenxYritLE3bk1VkvgbJQwXaemq3PrMq+2bzVh
-         cAIC4Vkx92bV+Tc3YEWqoICc9zLAp2kQTdEYvgzh8Bv3+Yjlbo09RdIRN+IQdc3LTDVN
-         C0sX/PCFs3UBHaGrl8efCuJP/rbdkyqLIN9Gwt2I7xWMg3qO6QkjZhvtkJbgn1QaWhjv
-         kNSA==
-X-Gm-Message-State: AOJu0YzFQiMtLhkSqrw0uFg4d+IvGAL1iofP8YEyX7gOfaGl523VzX2e
-	nozsAo45APNfztnzrkRcQBxvonW4M1yz72CuHQ59EllkIuVn+HclETQAbIXWcxgSv4gwPHorJR1
-	/zg==
-X-Google-Smtp-Source: AGHT+IGVMP3UivBCHH3nAj+aWK1z4JhAOs3LsZDkYlD+Ckt4fFCv9ZqenfvScHIqK4t8zX36pp6bk3n4Pn0=
+        bh=lWJTyML0btVQwtFr3Kj+PF9ZU7fFVwzZvNC575eeaaY=;
+        b=YT2esKTc9SMAC1YmFPD58TYnwJcVC+7gHL+/YzjMiKfpdU2ZbCq4kH4BtoWxUKYyfM
+         Tll4Vm86IXMkAPQ/orn1tWOwJT7HqEwnwNzrR4Z/AC8Lpu5nWSV2jhqrCJXj9XdyLcQ+
+         UU2EF3keVipBBwznvKBhFyIX6ztTAUeaBgBAmN9ZQZbKRDZPvrysQs/ue2UYP032pPn1
+         6oHxaUjPh6WP3+pA8mHKo8RSFx6w8PpQJcG6r3oW4zkh0BU8FhIWawqkJ+SXbDdueZ8n
+         Nwog1pXp89iAzbF2RcyXvkT4SEFBLlJ3Lbf31Ea86tgwhXYciO/LBrlNmsEpwTiBHYVn
+         ttDg==
+X-Gm-Message-State: AOJu0YxwnadpvVZFXuIrYuI0U9ezwBdeBstT2SOVpoHIWvlnRxW1RFCW
+	vHcX3qs6Si0w/g/+jiuwSyfzyKtd0E+qHevhpj9LcHEz+k+g0RNdr7HNlFuzRZfrWqcPT69ChXf
+	lUg==
+X-Google-Smtp-Source: AGHT+IH770L4K1w+W/o94HrKzOsLDXb4Gu5UdwayEh46aYhNdxSnOv53qbdkgC8IMA/Dpdta9IJeX8mRa30=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:120c:b0:1eb:4b30:b5c with SMTP id
- d9443c01a7336-1ef43c0720emr9706875ad.1.1715967666996; Fri, 17 May 2024
- 10:41:06 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c3:b0:dee:7c5c:e336 with SMTP id
+ 3f1490d57ef6-dee7c5ce8a4mr1390438276.10.1715967668833; Fri, 17 May 2024
+ 10:41:08 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 17 May 2024 10:39:21 -0700
+Date: Fri, 17 May 2024 10:39:22 -0700
 In-Reply-To: <20240517173926.965351-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240517173926.965351-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240517173926.965351-45-seanjc@google.com>
-Subject: [PATCH v2 44/49] KVM: x86: Update guest cpu_caps at runtime for
- dynamic CPUID-based features
+Message-ID: <20240517173926.965351-46-seanjc@google.com>
+Subject: [PATCH v2 45/49] KVM: x86: Shuffle code to prepare for dropping guest_cpuid_has()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -88,78 +87,64 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-When updating guest CPUID entries to emulate runtime behavior, e.g. when
-the guest enables a CR4-based feature that is tied to a CPUID flag, also
-update the vCPU's cpu_caps accordingly.  This will allow replacing all
-usage of guest_cpuid_has() with guest_cpu_cap_has().
+Move the implementations of guest_has_{spec_ctrl,pred_cmd}_msr() down
+below guest_cpu_cap_has() so that their use of guest_cpuid_has() can be
+replaced with calls to guest_cpu_cap_has().
 
-Note, this relies on kvm_set_cpuid() taking a snapshot of cpu_caps before
-invoking kvm_update_cpuid_runtime(), i.e. when KVM is updating CPUID
-entries that *may* become the vCPU's CPUID, so that unwinding to the old
-cpu_caps is possible if userspace tries to set bogus CPUID information.
+No functional change intended.
 
-Note #2, none of the features in question use guest_cpu_cap_has() at this
-time, i.e. aside from settings bits in cpu_caps, this is a glorified nop.
-
-Cc: Yang Weijiang <weijiang.yang@intel.com>
-Cc: Robert Hoo <robert.hoo.linux@gmail.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+ arch/x86/kvm/cpuid.h | 30 +++++++++++++++---------------
+ 1 file changed, 15 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 552e65ba5efa..1424a9d4eb17 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -330,28 +330,38 @@ static u64 cpuid_get_supported_xcr0(struct kvm_vcpu *vcpu)
- 	return (best->eax | ((u64)best->edx << 32)) & kvm_caps.supported_xcr0;
+diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+index 60da304db4e4..7be56fa62342 100644
+--- a/arch/x86/kvm/cpuid.h
++++ b/arch/x86/kvm/cpuid.h
+@@ -168,21 +168,6 @@ static inline int guest_cpuid_stepping(struct kvm_vcpu *vcpu)
+ 	return x86_stepping(best->eax);
  }
  
-+static __always_inline void kvm_update_feature_runtime(struct kvm_vcpu *vcpu,
-+						       struct kvm_cpuid_entry2 *entry,
-+						       unsigned int x86_feature,
-+						       bool has_feature)
+-static inline bool guest_has_spec_ctrl_msr(struct kvm_vcpu *vcpu)
+-{
+-	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
+-		guest_cpuid_has(vcpu, X86_FEATURE_AMD_STIBP) ||
+-		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS) ||
+-		guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD));
+-}
+-
+-static inline bool guest_has_pred_cmd_msr(struct kvm_vcpu *vcpu)
+-{
+-	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
+-		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBPB) ||
+-		guest_cpuid_has(vcpu, X86_FEATURE_SBPB));
+-}
+-
+ static inline bool supports_cpuid_fault(struct kvm_vcpu *vcpu)
+ {
+ 	return vcpu->arch.msr_platform_info & MSR_PLATFORM_INFO_CPUID_FAULT;
+@@ -301,4 +286,19 @@ static inline bool kvm_vcpu_is_legal_cr3(struct kvm_vcpu *vcpu, unsigned long cr
+ 	return kvm_vcpu_is_legal_gpa(vcpu, cr3);
+ }
+ 
++static inline bool guest_has_spec_ctrl_msr(struct kvm_vcpu *vcpu)
 +{
-+	cpuid_entry_change(entry, x86_feature, has_feature);
-+	guest_cpu_cap_change(vcpu, x86_feature, has_feature);
++	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
++		guest_cpuid_has(vcpu, X86_FEATURE_AMD_STIBP) ||
++		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBRS) ||
++		guest_cpuid_has(vcpu, X86_FEATURE_AMD_SSBD));
 +}
 +
- void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_cpuid_entry2 *best;
- 
- 	best = kvm_find_cpuid_entry(vcpu, 1);
- 	if (best) {
--		cpuid_entry_change(best, X86_FEATURE_OSXSAVE,
--				   kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE));
-+		kvm_update_feature_runtime(vcpu, best, X86_FEATURE_OSXSAVE,
-+					   kvm_is_cr4_bit_set(vcpu, X86_CR4_OSXSAVE));
- 
--		cpuid_entry_change(best, X86_FEATURE_APIC,
--			   vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE);
-+		kvm_update_feature_runtime(vcpu, best, X86_FEATURE_APIC,
-+					   vcpu->arch.apic_base & MSR_IA32_APICBASE_ENABLE);
- 
- 		if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT))
--			cpuid_entry_change(best, X86_FEATURE_MWAIT,
--					   vcpu->arch.ia32_misc_enable_msr &
--					   MSR_IA32_MISC_ENABLE_MWAIT);
-+			kvm_update_feature_runtime(vcpu, best, X86_FEATURE_MWAIT,
-+						   vcpu->arch.ia32_misc_enable_msr &
-+						   MSR_IA32_MISC_ENABLE_MWAIT);
- 	}
- 
- 	best = kvm_find_cpuid_entry_index(vcpu, 7, 0);
- 	if (best)
--		cpuid_entry_change(best, X86_FEATURE_OSPKE,
--				   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
-+		kvm_update_feature_runtime(vcpu, best, X86_FEATURE_OSPKE,
-+					   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
++static inline bool guest_has_pred_cmd_msr(struct kvm_vcpu *vcpu)
++{
++	return (guest_cpuid_has(vcpu, X86_FEATURE_SPEC_CTRL) ||
++		guest_cpuid_has(vcpu, X86_FEATURE_AMD_IBPB) ||
++		guest_cpuid_has(vcpu, X86_FEATURE_SBPB));
++}
 +
- 
- 	best = kvm_find_cpuid_entry_index(vcpu, 0xD, 0);
- 	if (best)
+ #endif
 -- 
 2.45.0.215.g3402c0e53f-goog
 
