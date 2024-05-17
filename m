@@ -1,169 +1,216 @@
-Return-Path: <kvm+bounces-17647-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17648-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D16F8C8A54
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 18:52:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 968318C8A76
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:04:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19B7E1F24721
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 16:52:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AC6D1F24CA7
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0469513D8A5;
-	Fri, 17 May 2024 16:51:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBBC13DB8A;
+	Fri, 17 May 2024 17:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dxOB64+G"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gCwN+ysh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2067.outbound.protection.outlook.com [40.107.93.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A158613D887
-	for <kvm@vger.kernel.org>; Fri, 17 May 2024 16:51:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715964717; cv=none; b=i1z0ORFocNOgpIZ/NoDFyfO0LwKqar4ohIEglaTEtzV3MmB+JmRKkNOFmC06ZcC1kt7KegS5ysufh06J+fBMRTSH9gYI4gifLrrHXzVHamFbwwYfgnBqVPibRZ7BQIGeC9W95hqhk6evFSy3fjDWpmd24FN9Jk0VG0x5FfEgIY4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715964717; c=relaxed/simple;
-	bh=nJDeAWSMGgSV0BCmPrBvmVRCISlfWJnMS59TFeIoaW4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kfca1dZkRKV2OiT5n2qC+ENVWlFsScj8yZON6BNYeV9oyBrv2npX76EET/19N7hDMelx7edqSR51UFajk2BEk46XWVbDnygbnbThPNAKh/kS5sEtpxMygNoL8DSsUibk1QPZCTeB+m7IOmX5DzsSQx7eHKHi2qNYwTOQ1U+FejM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dxOB64+G; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1715964714;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=QaLkr3E2+4g4P9Qhu0RDI2xERQtUdx13qtBuZy3qY/M=;
-	b=dxOB64+G7uWLTGlOc8yRw6nojeIqubNFrBW8sYO+wHPasW6xThY6pKIuIiqENieUoHG+Dz
-	zDB63ZJSwOp+VuDkoXH2YqRBEW/5wB+2NIJss07RfhCOi7uBuXyZ7/ydeU14GgKGG7ACGe
-	3ymMDogtKUXUOu2Ou2vFxHM0Y6T4X2A=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-94-Kgq0ulKzMSulpARuJWQnSg-1; Fri, 17 May 2024 12:51:53 -0400
-X-MC-Unique: Kgq0ulKzMSulpARuJWQnSg-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a59caea8836so628057366b.1
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 09:51:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715964712; x=1716569512;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QaLkr3E2+4g4P9Qhu0RDI2xERQtUdx13qtBuZy3qY/M=;
-        b=LjfYJXnywUG8+Kd5bswCsiJOYsLSsBvje6oVpjaHFuWJz4fBPUybNyY7HWdWFJaP3U
-         XnVDu0Axd7mH1OZJIpJmwmufZsk6hhy3YIGUvWFVqt/WGrQMZx7ej8Mq/iPzchtc/k3k
-         jfShb2TgGycQ4kub7HNZmz/lK4Y0gAMYCQVoHog5vPTsu898QkgmJF9N5kNO7TnDkHCp
-         Y7bHt2wscilfNa81OSOgtKT0PM8fs2Eo6IBZKVKdmWJLhbSnWwSmiMUZq60JjSR27WqA
-         mKhg/TUj90pXvxnTP8eyPAdPgomE1frNR7EMboann7fftHz56bO1YynphgSbPi5QeAxU
-         /wDw==
-X-Forwarded-Encrypted: i=1; AJvYcCV8tfMXLBjjVYjxUmQm5kZBT4Djr9jF/ezGZ+n20lanTKsSRtNcGXU9Fv1OZMGMkf62HEKVG8YpGtkddGCluLTMGwx7
-X-Gm-Message-State: AOJu0YzQGLwvfOOjFLUT9d0QvSl+uY79guZqo95+NTF3KQkyuWY1hys5
-	R8tQGV4HuFfXpXDnnuHnaLUmsqTzEL5L7A6+XlBW9Zkz/mNVHv/Wp4JnDlB46dt49CntDN3A4cz
-	UIi1LO2Ku8mUB1Fa0KrJ/5wtC4dEt4eJBK0t+UWDRDt16OjZc2w==
-X-Received: by 2002:a17:907:130f:b0:a5c:df6b:a9b5 with SMTP id a640c23a62f3a-a5cdf6bade3mr414456466b.59.1715964712251;
-        Fri, 17 May 2024 09:51:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFpuBOnSqFKgCMManjP/w8LEoygbD1m3z9gUjwo4o5Sun9YN/hBzrpxVtU4MP/AK1D4S4WOXQ==
-X-Received: by 2002:a17:907:130f:b0:a5c:df6b:a9b5 with SMTP id a640c23a62f3a-a5cdf6bade3mr414455766b.59.1715964711941;
-        Fri, 17 May 2024 09:51:51 -0700 (PDT)
-Received: from [192.168.10.81] ([151.95.155.52])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a5a17b0195dsm1126073966b.184.2024.05.17.09.51.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 May 2024 09:51:51 -0700 (PDT)
-Message-ID: <83c1b5c9-fcf3-41ba-94e8-f536ebb9581e@redhat.com>
-Date: Fri, 17 May 2024 18:51:50 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EC112F5A3;
+	Fri, 17 May 2024 17:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1715965466; cv=fail; b=RWLUYIz+Jca7ECz/unHT9vZLh3nwHHfWowZUl7ctFWr7oxex1yh0z3PzkXVVfgSwMiC1rxhsO6A07RfTKxdq98cqyTqxuKcBPKHA8KR0sucarR3isp/Gq9P+QTMtQQ0lIbCpzDZFeIbczmkAMpoV1TrDHLhbOe3TD8dVlTTXj98=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1715965466; c=relaxed/simple;
+	bh=1bS1qICTxMyL/tdyvQ0/+EEwvGrdYREzJI0+wfYgDm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=HacQKFksRNkiS5ve5UVQbYOFA5LIvlhpwwXrlORGkAMy8Ac4xAJiJyMNtLKcQgAlYGREBx9KvuqpMuU3hF1hAy1w9GxhBqMoe7Ugo20AUYYXvDKXNAouRVCPyWBf2EYj3MObZkp+NPb7Q28EloNfA89VdOHI+CRT9EqgHdl5ZLA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gCwN+ysh; arc=fail smtp.client-ip=40.107.93.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TkFOeU2nqjaWdXj2joVHh949w/IqCqRjAizhhPIQxGwADE0s92pxHopH9l9AzY8LyyYzuvI98DfIfFQby2A5c3gb+hbevNobKLRut91TzkBZiO6ROVKzegg6VOuUgsa6FLBsVHgnjM5f9TO3vPs+vrahyS5FFdRC/CPBL2UoxYuVSV2h7iuOT7EuZLoQE6waltNyvYDBnKEExgODfTyUB02nukpj45ZW1ABGGkU3QV3r9SnChTLW98JbrBMnkEuEiJIdDtY1yG7Fy7w3HV0IvUIHwVtlGCfO2z/zzvt5LslQC7TDB65vibJCmkMPXkOf/k47rOyH2ueXYAPGQKybHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dsrsd2PVrcySksRQozuWfGsndKVBXRkUVmsL+TuBKAg=;
+ b=G9JiWkZQ6/3TpXvzxDAdf3yHzVDVb2mhgR5QJWcp6OgHgL6AU7vA6krOmTb68pic6ZtQwvjUN3E++8ZU1W9U+8m2bZwnu91RsooXqe5teEMk+n+g8QJI2pyIQ76svd1fTqNAPjzYvyBhN1jrWNED59hYMWroMlwQkmfo/IkLTUY67WuVNlG92gosDxnV8qC1AtW9eXbXqEeGYsRVgf4jKkTPXy6duBGddjQ33L6M0pIeLNjBHd/+U4xEoTopTcF/sMEZ4M9HMaxKRAjUnV35Wwuuz11xKWAb8DOIAW1a1XbJEXPBda9rWDdnNB/IS+u2juxjr4sPZuenHkP3CCNv0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dsrsd2PVrcySksRQozuWfGsndKVBXRkUVmsL+TuBKAg=;
+ b=gCwN+yshCXSynWUdQO/DDljYqyJ0s6t0Y92lJBM+UelqjiA6jOgzFSqj1lJeQVM9O8uYTM2DJvKMtm5xVLxS+AOHwcHare4EyV3Nuo07eiZhmff2d48o26IcmNN4/JO0jZ64y+0N2NjAWWiWcaCyZFL8oDiBtuTY/v/jyFJg+yiPOC5kFo+oDqDyfCD5LCLiWbcK4Fym+finOrEQta45JQkJlacQO2C+EYf+fRt4twBBIBy7Bj9M7vkL0w8bN4VS9yhfXPuVIyXDjSp+JLhnusHFOswfUz8pulY7jk4oN4SHzwSucNmlcAFQ43u3g++SWS2avmQPFtvdzCk0BZvibw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by LV2PR12MB5824.namprd12.prod.outlook.com (2603:10b6:408:176::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.26; Fri, 17 May
+ 2024 17:04:21 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7587.028; Fri, 17 May 2024
+ 17:04:20 +0000
+Date: Fri, 17 May 2024 14:04:18 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+	alex.williamson@redhat.com, kevin.tian@intel.com,
+	iommu@lists.linux.dev, pbonzini@redhat.com, seanjc@google.com,
+	dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+	corbet@lwn.net, joro@8bytes.org, will@kernel.org,
+	robin.murphy@arm.com, baolu.lu@linux.intel.com, yi.l.liu@intel.com
+Subject: Re: [PATCH 5/5] iommufd: Flush CPU caches on DMA pages in
+ non-coherent domains
+Message-ID: <20240517170418.GA20229@nvidia.com>
+References: <20240507061802.20184-1-yan.y.zhao@intel.com>
+ <20240507062212.20535-1-yan.y.zhao@intel.com>
+ <20240509141332.GP4650@nvidia.com>
+ <Zj3UuHQe4XgdDmDs@yzhao56-desk.sh.intel.com>
+ <20240510132928.GS4650@nvidia.com>
+ <ZkHEsfaGAXuOFMkq@yzhao56-desk.sh.intel.com>
+ <ZkN/F3dGKfGSdf/6@nvidia.com>
+ <ZkRe/HeAIgscsYZw@yzhao56-desk.sh.intel.com>
+ <ZkUeWAjHuvIhLcFH@nvidia.com>
+ <ZkVwS8n7ARzKAbyW@yzhao56-desk.sh.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZkVwS8n7ARzKAbyW@yzhao56-desk.sh.intel.com>
+X-ClientProxiedBy: YTBP288CA0001.CANP288.PROD.OUTLOOK.COM
+ (2603:10b6:b01:14::14) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86: Prevent L0 VMM from modifying L2 VM registers
- via ioctl
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org,
- syzbot+988d9efcdf137bc05f66@syzkaller.appspotmail.com
-References: <20240515080607.919497-1-liangchen.linux@gmail.com>
- <82c8c53b-56e8-45af-902a-a6b908e5a8b3@redhat.com>
- <CAKhg4t+=vMTaAfbetNZXfgUBiVZYo-tJK-BPX7RbL5kYJrFt=A@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <CAKhg4t+=vMTaAfbetNZXfgUBiVZYo-tJK-BPX7RbL5kYJrFt=A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|LV2PR12MB5824:EE_
+X-MS-Office365-Filtering-Correlation-Id: 92312765-32f2-43cf-b1c2-08dc769364e8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|7416005|1800799015|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?5oLwKuxoy6dbBf4HXxkOiAisBaoxquASHVpi8lDxidHIDXiU5Gh3aouZmBYV?=
+ =?us-ascii?Q?XNl8PDNNso4BQTp8raZoF413dSdGvFIRrI0tNbIWqGK1DdpiwKKsJp8NoAEX?=
+ =?us-ascii?Q?uwWNUj6ii6P0KSVOl21e4jukSJzxLOnSR7ma5R23z85KV03cMyqikV5SI7w1?=
+ =?us-ascii?Q?4ZHT9k56w5v6ARNorx/+SE5Ca5rEo2XGDE5pplBhpXyOVgsMpAWo3P/LxMba?=
+ =?us-ascii?Q?I8yuq7YeI1ECdHBxRk7gq4/WIxnBQcRVEtHMonbuDzt8Rdn0VKvYtOn/07I6?=
+ =?us-ascii?Q?0YAPjr7Cwq3hqTuaG5m47gzlTp9TewpI8+5guDgtRXTz9D9aMscKmag64D5T?=
+ =?us-ascii?Q?7SaCofqtwjDYlT8+TkZfZt67EsJNhT4IEn7TkXiuJIpjOWK1xMD/umrJNLdm?=
+ =?us-ascii?Q?Eka/hC27HVmErVmL/LkScKsv36BTDVZ25nNB4DIZLVcWyj5ES6cM5tFxUYiL?=
+ =?us-ascii?Q?wEx4LWnBkEFLR1yQn+m0/lV0IgmHPvw+mb/XvbOxF28qwY8XZsSV/nPuDXUm?=
+ =?us-ascii?Q?AOWJh/AAQz/JqTsK0DXLSkQ31W0kOIqmu2F9YT1NsZDT2X2J3DXYN9wP0eiY?=
+ =?us-ascii?Q?KTqT1dp39SSwZUVQWt2fREHHeQPQUNY8BDXtfRzqfMGbwgG1+B8T8mmEbc5g?=
+ =?us-ascii?Q?3J9msGWj8IBAK862+ToGlV3g0zwyiIkXgf47FET6sMPo2q9Qm0Hh2dBCfdB5?=
+ =?us-ascii?Q?dSxSRQ0N+SwseAgCeZw0CQv2FE3WJMzjjrENut5WrzthClX1qbzuyIaDPSiz?=
+ =?us-ascii?Q?I9ZSkCaX4bC3z0RL0KlyJGBDff9tLOHLzsdx0y9s3etgPjZwhNKu7r47aHzU?=
+ =?us-ascii?Q?/QlAUzUJSPT8BAm8mZJ3tCF1+8qSz3lbmjMZv+lCNCDpWpCEW2QYk+bNG6nV?=
+ =?us-ascii?Q?jAxcnEv4Uz6Rr8UUpxf1PxCzyQFFvBzUyw0WlK+0TDI0kNTr+c+35bpznMEs?=
+ =?us-ascii?Q?fFkcnsnqobuNMKkEku+0m9biJPgTciWN7VOT+Jn5HiBWjrHlUumq/pTSVFxK?=
+ =?us-ascii?Q?sd4HIEBzeE6fdtqnvWlPcFJGC89K2iHB+ldrsDf3hFvm0jx0LMQ/RfyadgM4?=
+ =?us-ascii?Q?2MMUbT13LJHlsdH37GkQezfQ9+usFY75SD2rOfPYhuyKFMIj7llbwTDhuuVr?=
+ =?us-ascii?Q?fOzlmnnAkwUEyvBxy9PCFrF4syOohfNX/lDuE5S4OyRBiMQQNCrpCd/+FehR?=
+ =?us-ascii?Q?sCmaRSwnCRTgYSBRUsyoZp9TSR2Crkoue5780O2r9mR7pFVpj3F2QD9YJ3K1?=
+ =?us-ascii?Q?fZd0Jjyhs10FEEhbFnyhC79u+pTG1V90J/f1WvNdMg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?2ubUwMZMQRgJ4pQY7pUEhPsCeI7s/UD1TmmBtMEreXiwX7SmbijzmUU6E45W?=
+ =?us-ascii?Q?j+dUKHYj9JQ0M3zXf2w9iZtXIuHtrYUHk/+3rauiJplUmox2koMozNmkj3Mj?=
+ =?us-ascii?Q?vYQaDJq8a1jfzooYRsWWyozDK5zDj0B/uJ3FhIn6W168SlwB2tcJeV6SeKZk?=
+ =?us-ascii?Q?RblJIDvC3dbtwMfIOOxPTXvHsfjZZbzoWAYtzk/olTspIBh90aIIhz06g0ez?=
+ =?us-ascii?Q?h1QWaQc09dTY7DotdEIL4FJRVHVFrQXYJczkJ2teKxjJczxrLZ7M8rROJFlw?=
+ =?us-ascii?Q?0GUjCqW/gaclIkiZ7uBfd3dYNJdjRj5yGTHNiCbNLcxFPphQyp6ErQGOXJtS?=
+ =?us-ascii?Q?R4WFzr5iflhqXcfMnkFtRhSF52BZfYg4Nu3hhIUeKHAqS7nD6dcew42gBOx3?=
+ =?us-ascii?Q?EZuZyRaT2xLupgH/Rw958oTQdqWbN1tT84Gx9Hpa89EnhGXhYzc/vTomhodM?=
+ =?us-ascii?Q?0ri+4ZqO44DLZo/xY/JhM2sIbGw074Dco2dMFL11SIY8sDCBWAgDLkgQZbau?=
+ =?us-ascii?Q?jMQNhfkJsUfB8GWnu4unuRnqrInFcWIrFjkn8dUrnN0NVipwhP9zjiPgwbJK?=
+ =?us-ascii?Q?vyoR2xWidH2SDnqrRXHAfxI2Y6nyWzDD511OCKQelVE0cag2toZHkPJTpKLj?=
+ =?us-ascii?Q?iP9Fiks8TuFcbRgEQRNC3Oaed6rmmcOACYs76WAjQyq1I6e/HNqAlbd/Hvaw?=
+ =?us-ascii?Q?eiL/bOKzXZDm29A9kjpKpAy4t0TXkA/LbHuGCUlVfAvDeiDQdxT+VVnV3RMA?=
+ =?us-ascii?Q?7I1p5YDP8DDsQXqmx++aVyhkzQGwn4JK15hKKAdP9PjPSOYAj9jXm7JEuaqp?=
+ =?us-ascii?Q?gGOHoFkR8LqiIEXhFi95/ZLKTrPdbA4vhDDWJ0Fo+0h4PlA2IPIdKjjI9q1i?=
+ =?us-ascii?Q?9BJujp/wWOSvZjAPfzeGNQcELGpjNMwCjocqZhKufWT2Cm5sn7qB7UUA7iKY?=
+ =?us-ascii?Q?ItOyV6x3cMpDlY0tQ3IhYw+07mnmZp0fuxzk1mw2awsVPZ/Oov1AKs0HWTds?=
+ =?us-ascii?Q?jKE18OiGTaXwuk5N52MmY7JlWXGGwxysXu6D3lAYKVbjX6bT+eq4Md85wiy3?=
+ =?us-ascii?Q?heXJPpsmE0zk7qjQtzCwXciNtEDUxbjH1X+Xpqq94qdAWl0F3XYgWrdRRa4j?=
+ =?us-ascii?Q?qKD7jb/acGOlso/JD/1a3cfTteZWcOo7E1+JnHIlPe+cA32BwnsLoS0huS3n?=
+ =?us-ascii?Q?nfRHMx0B2Cpm5AK5P25H+j8VRFq7B41fEAVPPZk4KKHm26peScL+o7uqF+s+?=
+ =?us-ascii?Q?RN60KKFK4YekJ5xJZr0eXcVvkfCHZr0QENauv4lcqzzWNRkBaCU30Dvm0jdk?=
+ =?us-ascii?Q?qnoUQiRs4CchbuAjW0GeSzqrOeTW9zKO99x7GmMNCuezOUAzjl75Is2QW2bn?=
+ =?us-ascii?Q?50461CZ4XqGxU+cX9ugmou8cQ/zI7oUfLYX8Zx5Ic1L1uzDwkH4HYFGtaC1Y?=
+ =?us-ascii?Q?MDJzgPwGmnDtvSMQcpPyGQLFNNDAzRVfVCdyD7XOIZeA8mML6LWgXeLARdgV?=
+ =?us-ascii?Q?AO+maCYJ6IAk3HzAX57YcInDfrd3dIt1Dqsmu55ggETfJrq6BQYWfBRDhN3s?=
+ =?us-ascii?Q?orktO4A03KKovXlHVZvQi+qLTqqd+9vVrKEi1BE3?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92312765-32f2-43cf-b1c2-08dc769364e8
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 May 2024 17:04:20.6789
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bM8Qj6a0KOAkiALWH6WLeV6h9sRFgL743SHMVQp843jEhJszWi8KjGgQTpoX9Kws
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5824
 
-On 5/17/24 13:37, Liang Chen wrote:
->>
->> The attached cleaned up reproducer shows that the problem is simply that
->> EFLAGS.VM is set in 64-bit mode.  To fix it, it should be enough to do
->> a nested_vmx_vmexit(vcpu, EXIT_REASON_TRIPLE_FAULT, 0, 0); just like
->> a few lines below.
->>
-> Yes, that was the situation we were trying to deal with. However, I am
-> not quite sure if I fully understand the suggestion, "To fix it, it
-> should be enough to do a nested_vmx_vmexit(vcpu,
-> EXIT_REASON_TRIPLE_FAULT, 0, 0); just like a few lines below.". From
-> what I see, "(vmx->nested.nested_run_pending, vcpu->kvm) == true" in
-> __vmx_handle_exit can be a result of an invalid VMCS12 from L1 that
-> somehow escaped checking when trapped into L0 in nested_vmx_run. It is
-> not convenient to tell whether it was a result of userspace
-> register_set ops, as we are discussing, or an invalid VMCS12 supplied
-> by L1.
+On Thu, May 16, 2024 at 10:32:43AM +0800, Yan Zhao wrote:
+> On Wed, May 15, 2024 at 05:43:04PM -0300, Jason Gunthorpe wrote:
+> > On Wed, May 15, 2024 at 03:06:36PM +0800, Yan Zhao wrote:
+> > 
+> > > > So it has to be calculated on closer to a page by page basis (really a
+> > > > span by span basis) if flushing of that span is needed based on where
+> > > > the pages came from. Only pages that came from a hwpt that is
+> > > > non-coherent can skip the flushing.
+> > > Is area by area basis also good?
+> > > Isn't an area either not mapped to any domain or mapped into all domains?
+> > 
+> > Yes, this is what the span iterator turns into in the background, it
+> > goes area by area to cover things.
+> > 
+> > > But, yes, considering the limited number of non-coherent domains, it appears
+> > > more robust and clean to always flush for non-coherent domain in
+> > > iopt_area_fill_domain().
+> > > It eliminates the need to decide whether to retain the area flag during a split.
+> > 
+> > And flush for pin user pages, so you basically always flush because
+> > you can't tell where the pages came from.
+> As a summary, do you think it's good to flush in below way?
+> 
+> 1. in iopt_area_fill_domains(), flush before mapping a page into domains when
+>    iopt->noncoherent_domain_cnt > 0, no matter where the page is from.
+>    Record cache_flush_required in pages for unpin.
+> 2. in iopt_area_fill_domain(), pass in hwpt to check domain non-coherency.
+>    flush before mapping a page into a non-coherent domain, no matter where the
+>    page is from.
+>    Record cache_flush_required in pages for unpin.
+> 3. in batch_unpin(), flush if pages->cache_flush_required before
+>    unpin_user_pages.
 
-Right, KVM assumes that it can delegate the "Checks on Guest Segment 
-Registers" to the processor if a field is copied straight from VMCS12 to 
-VMCS02.  In this case the segments are not set up for virtual-8086 mode;
-interestingly the manual seems to say that EFLAGS.VM wins over "IA-32e 
-mode guest" is 1 for the purpose of checking guest state.  AMD's manual 
-says that EFLAGS.VM is completely ignored in 64-bit mode instead.
+It does not quite sound right, there should be no tracking in the
+pages of this stuff.
 
-I need to look more at the sequence of VMLAUNCH/RESUME, KVM_SET_MSR and 
-the failed vmentry to understand exactly what the right fix is.
+If pfn_reader_fill_span() does batch_from_domain() and
+the source domain's storage_domain is non-coherent then you can skip
+the flush. This is not pedantically perfect in skipping all flushes, but
+in practice it is probably good enough.
 
-Paolo
+__iopt_area_unfill_domain() (and children) must flush after
+iopt_area_unmap_domain_range() if the area's domain is
+non-coherent. This is also not perfect, but probably good enough.
 
-> Additionally, nested_vmx_vmexit warns when
-> 'vmx->nested.nested_run_pending is true,' saying that "trying to
-> cancel vmlaunch/vmresume is a bug".
+Doing better in both cases would require inspecting the areas under
+the used span to see what is there. This is not so easy.
 
+Jason
 
