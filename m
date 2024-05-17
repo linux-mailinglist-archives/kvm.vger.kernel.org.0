@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-17678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF328C8B7C
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:48:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F7698C8B81
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 19:48:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D4901C20B77
-	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:48:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A7611F2194C
+	for <lists+kvm@lfdr.de>; Fri, 17 May 2024 17:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4B713E889;
-	Fri, 17 May 2024 17:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1247415350E;
+	Fri, 17 May 2024 17:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rHqiOYdp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PLaYV/Yt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261CA152189
-	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207FA152536
+	for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:40:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715967635; cv=none; b=DE1xFeHOOk3GiqrEqV5eJj5UCxob3i/k1lm9Q90X1nV3MZAbitdyVJ8hGjQeaWybCHRFeQDXlDX9c/dB8k7YoPXqIZ5vPwak8mVyjSU3Pv4eyrul+b9GAr8RcFpiqlriZqHYNwNvrW8eRkHmwjVHoIXwg0/Rh5TM23rix6lgiP8=
+	t=1715967638; cv=none; b=g2APzuY9DDrRmQcbFPWvtIBFN1EsFTrEeLwb5eBgaJTkv3W88HtlzBUOTOehdig7Ln3AmtOZNabkjBszF981/uQp24yrXv2cnugnLTIhwGwL7GuaYgi4r7o7geTJ39bMd+VQ2pzlEsiLjXfztpZBjTx9tMApXAaIqivG7Es3u1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715967635; c=relaxed/simple;
-	bh=oxejklLlbBEENy3IfZNQJ8hlgrGXAQmHeztU44XlEA4=;
+	s=arc-20240116; t=1715967638; c=relaxed/simple;
+	bh=MP3BojoyOHfE0eOIGMkQhT2nECUdHpDoHjRMy4FE9/c=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AFXlGIHZc99LwAFM5sei6RoJtOC2ElRCM0ITkvFRJvayMlQKgnpMwB56rvdkhP1wRrm2zuhnbkldDjPXy0Nv062Ff6rH669RhpbkH5SmtN9bq3QGJx9ouIgN0QHqg8pTE9Nv040zNOLs4TPfmDLbrVmfg6aInN+QCsv/aMaAJOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rHqiOYdp; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=nBpXfzzk+sejg7FHo626FhHxFkOfwLwiy/gdwbgeqdd+XC1fmL552pppg29NGjQDrUFOZKdwgDhnvm9gSgeWiD/sSs3nntt7NJ7e0wX86aMjGQQxBw4jDRYBPMuBeGPytDOt/z7cQtxjOK3JDFf0HvRxtuOjD2SU/EGiq8nE/4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PLaYV/Yt; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-df1cfa720aaso5479434276.2
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:40:33 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61bea0c36bbso187571937b3.2
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 10:40:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715967633; x=1716572433; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1715967635; x=1716572435; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=IIpzTjnpYWvr4z4L+FkXXo9hR1khs/BwnW5TGVqv/IQ=;
-        b=rHqiOYdpjW6Lwf3LFpflpCO//4QrXb0oRLwNT1VG9kmvFlr+BzVQdGNJyARlNoWgS3
-         lmfSqI5jQrasik/h3zrJyvI0/awwKhl0KlzY6JDD1pJLkhS5+SoYG7G9L9qxilotphac
-         J3zWUMHP9rqvNytL8R3EN5E4kYmYL29EtJqawyyV2xtNNkvLScVloEJHqrf+KPCpd6fH
-         gLnru4I4/YlekCs3co+ETL3kZ1chp4+zkUTqYVReCKA/toZJsTwERVs0AfZ1+Nn9wBXX
-         m7KYGUrDL2o7XplkQSpGrJwKQ4o80yZSNaM9KXR2PS0Ozhh3OeqGoDhljYW76DBLooVV
-         DN4g==
+        bh=RdXJF2LBYIp1MINsXWk2QfWIDNlEegsYL67SygmUdrU=;
+        b=PLaYV/Yt4uZBmQU4+NSEchgo23qUYvmAIkclPwF3R4EHJNAZYUTEAglBPUu2r/ZKtq
+         wzvcxkQXahkTUqecbTXq6yVrrGjUA9Kv9cJ2bxo2D3HoYy7PqsoJCQgAZ7zPGyF8t8Cr
+         9GV67qmDQNuo8cKjP/XL0KPHQWlZmYrKGbSLwY6dfscsGoxn64YSpfxWgEM1YCtv/YFi
+         LmSRXmN9p9bV8V88NgIHjpjLPMEueuJvsmV2LsgyAn0QsTXp/8FVJ5AIXcfCYy8Hb6RA
+         i0I379KkQJy7FBxMwI6e7dQq2iZIu99y7RTNO4x/JjkE/tRpFtiq8EPAwfiC2ASbssgB
+         EE0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715967633; x=1716572433;
+        d=1e100.net; s=20230601; t=1715967635; x=1716572435;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=IIpzTjnpYWvr4z4L+FkXXo9hR1khs/BwnW5TGVqv/IQ=;
-        b=g0K2ubI0G33SBikDbXAsmF5Rl3ReExM/WXlaZKRIt3gA7y95jPa564X40z5RjxW7VE
-         1l9+XkS4p1l0jibkBMdd1RNf1aEAzg5jQ0tfLGjZWZxbrSmNW/7cKFf4O28EoSKXI37U
-         m0o20ly+H7F/+0GFGe5FuedvpK5EUDEkhFd4NR9ljm0NFyIK25LaRCFD4iA/dLNaTUdP
-         cQdacux+9R9raDaCB8TOuxFDlzNDC0298kVNWTTjVgnoYEFtWik6apA8qjw+0sio4LNy
-         4ehKizwORnB/6TUkgh1blZaye8pJpnGlgmgHFn092PJohb8WJyBtyKx/nNoCtmAkYIoh
-         BTTA==
-X-Gm-Message-State: AOJu0YxWapralALR/xT+8qZ2a7pzGvYW3t4cIMclePUyYjKWEP3jN/Iu
-	d9OJKsvBij9iy70y3Ze4qVuauV6vcuXMKBtjJke/3yKvR7Z/86BcYUe5ukpYCHPMRkfwfKljphu
-	WOA==
-X-Google-Smtp-Source: AGHT+IHcMIoOJ01ehqIHGlvwd0sggE3znPLNKcQXWO67WrF3qyfm+l3LvlnPUSRXbx688hga9I6i/VG+rfQ=
+        bh=RdXJF2LBYIp1MINsXWk2QfWIDNlEegsYL67SygmUdrU=;
+        b=BKRGz5FHa1Irr7/RSvzt19ZDNOnohPl+40Y2OP3mHyJxyhXLcLPdKgILeFYHYbJGqY
+         Bv/+ZZqw1Th56SknqQkLtJF971fYjTbIDoeYIgVZRp7trRIBwGs8zBamEoxM6JNbxJap
+         dnEtdYlBqcFPaubjPxR54QEdTl4GeyzeUDbUHEgfhNBrs2tzc08Cp+A1a9AqqgtD64aD
+         ViGtHgRhj3Ju8HWUusOkBG8KYCDlL0bEctqJnnd6Rxuk2Zql1SaIgcTUS1OdbCKtGnXZ
+         pyO/RrxE/pv3p0R5SBtx8/y7STP3EuidW9lGQrCN7iPccGVh18aEgFVqCmMbU83HN42h
+         zChw==
+X-Gm-Message-State: AOJu0Yy+ngWGTzcKuGhcV5Ieu6yVlekMlnKxadiwEG5H3DwHjM1cPZyn
+	0hrIhfyJwi2ApuxFgdxtLyFaSY8S3QLAmhdVzTsGZGnLDKVkwR1TL0v3E3CphBQwGXX978giNr6
+	uuw==
+X-Google-Smtp-Source: AGHT+IEPO7Eaf/jeysyrL0b5SnzHzvQIj7fvXTUQGmsz6ZBVc/MZSwnDulbX7xYip0GIflrBHDNQtOc6I/w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:70a:b0:dee:615c:ac3a with SMTP id
- 3f1490d57ef6-dee615cb53fmr1728101276.5.1715967633201; Fri, 17 May 2024
- 10:40:33 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6302:b0:61b:46e:62da with SMTP id
+ 00721157ae682-622affc63bfmr57504267b3.4.1715967635244; Fri, 17 May 2024
+ 10:40:35 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 17 May 2024 10:39:03 -0700
+Date: Fri, 17 May 2024 10:39:04 -0700
 In-Reply-To: <20240517173926.965351-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240517173926.965351-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240517173926.965351-27-seanjc@google.com>
-Subject: [PATCH v2 26/49] KVM: x86: Add a macro to init CPUID features that
- KVM emulates in software
+Message-ID: <20240517173926.965351-28-seanjc@google.com>
+Subject: [PATCH v2 27/49] KVM: x86: Swap incoming guest CPUID into vCPU before
+ massaging in KVM_SET_CPUID2
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
 	Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -88,108 +88,134 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Robert Hoo <robert.hoo.linux@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that kvm_cpu_cap_init() is a macro with its own scope, add EMUL_F() to
-OR-in features that KVM emulates in software, i.e. that don't depend on
-the feature being available in hardware.  The contained scope
-of kvm_cpu_cap_init() allows using a local variable to track the set of
-emulated leaves, which in addition to avoiding confusing and/or
-unnecessary variables, helps prevent misuse of EMUL_F().
+When handling KVM_SET_CPUID{,2}, swap the old and new CPUID arrays and
+lengths before processing the new CPUID, and simply undo the swap if
+setting the new CPUID fails for whatever reason.
+
+To keep the diff reasonable, continue passing the entry array and length
+to most helpers, and defer the more complete cleanup to future commits.
+
+For any sane VMM, setting "bad" CPUID state is not a hot path (or even
+something that is surviable), and setting guest CPUID before it's known
+good will allow removing all of KVM's infrastructure for processing CPUID
+entries directly (as opposed to operating on vcpu->arch.cpuid_entries).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/cpuid.c | 36 +++++++++++++++++++++---------------
- 1 file changed, 21 insertions(+), 15 deletions(-)
+ arch/x86/kvm/cpuid.c | 49 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 30 insertions(+), 19 deletions(-)
 
 diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 1064e4d68718..33e3e77de1b7 100644
+index 33e3e77de1b7..4ad01867cb8d 100644
 --- a/arch/x86/kvm/cpuid.c
 +++ b/arch/x86/kvm/cpuid.c
-@@ -94,6 +94,16 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
- 	F(name);						\
- })
+@@ -175,10 +175,10 @@ static inline struct kvm_cpuid_entry2 *cpuid_entry2_find(
+ 	return NULL;
+ }
  
-+/*
-+ * Emulated Feature - For features that KVM emulates in software irrespective
-+ * of host CPU/kernel support.
-+ */
-+#define EMUL_F(name)						\
-+({								\
-+	kvm_cpu_cap_emulated |= F(name);			\
-+	F(name);						\
-+})
+-static int kvm_check_cpuid(struct kvm_vcpu *vcpu,
+-			   struct kvm_cpuid_entry2 *entries,
+-			   int nent)
++static int kvm_check_cpuid(struct kvm_vcpu *vcpu)
+ {
++	struct kvm_cpuid_entry2 *entries = vcpu->arch.cpuid_entries;
++	int nent = vcpu->arch.cpuid_nent;
+ 	struct kvm_cpuid_entry2 *best;
+ 	u64 xfeatures;
+ 
+@@ -369,9 +369,11 @@ void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu)
+ }
+ EXPORT_SYMBOL_GPL(kvm_update_cpuid_runtime);
+ 
+-static bool kvm_cpuid_has_hyperv(struct kvm_cpuid_entry2 *entries, int nent)
++static bool kvm_cpuid_has_hyperv(struct kvm_vcpu *vcpu)
+ {
+ #ifdef CONFIG_KVM_HYPERV
++	struct kvm_cpuid_entry2 *entries = vcpu->arch.cpuid_entries;
++	int nent = vcpu->arch.cpuid_nent;
+ 	struct kvm_cpuid_entry2 *entry;
+ 
+ 	entry = cpuid_entry2_find(entries, nent, HYPERV_CPUID_INTERFACE,
+@@ -436,8 +438,7 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 					 __cr4_reserved_bits(guest_cpuid_has, vcpu);
+ #undef __kvm_cpu_cap_has
+ 
+-	kvm_hv_set_cpuid(vcpu, kvm_cpuid_has_hyperv(vcpu->arch.cpuid_entries,
+-						    vcpu->arch.cpuid_nent));
++	kvm_hv_set_cpuid(vcpu, kvm_cpuid_has_hyperv(vcpu));
+ 
+ 	/* Invoke the vendor callback only after the above state is updated. */
+ 	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
+@@ -478,6 +479,15 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+ {
+ 	int r;
+ 
++	/*
++	 * Swap the existing (old) entries with the incoming (new) entries in
++	 * order to massage the new entries, e.g. to account for dynamic bits
++	 * that KVM controls, without clobbering the current guest CPUID, which
++	 * KVM needs to preserve in order to unwind on failure.
++	 */
++	swap(vcpu->arch.cpuid_entries, e2);
++	swap(vcpu->arch.cpuid_nent, nent);
 +
- /*
-  * Aliased Features - For features in 0x8000_0001.EDX that are duplicates of
-  * identical 0x1.EDX features, and thus are aliased from 0x1 to 0x8000_0001.
-@@ -649,6 +659,7 @@ do {									\
- do {									\
- 	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);	\
- 	const u32 __maybe_unused kvm_cpu_cap_init_in_progress = leaf;	\
-+	u32 kvm_cpu_cap_emulated = 0;					\
- 									\
- 	if (leaf < NCAPINTS)						\
- 		kvm_cpu_caps[leaf] &= (mask);				\
-@@ -656,6 +667,7 @@ do {									\
- 		kvm_cpu_caps[leaf] = (mask);				\
- 									\
- 	kvm_cpu_caps[leaf] &= raw_cpuid_get(cpuid);			\
-+	kvm_cpu_caps[leaf] |= kvm_cpu_cap_emulated;			\
- } while (0)
+ 	/*
+ 	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
+ 	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
+@@ -497,31 +507,25 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+ 		 * only because any change in CPUID is disallowed, i.e. using
+ 		 * stale data is ok because KVM will reject the change.
+ 		 */
+-		__kvm_update_cpuid_runtime(vcpu, e2, nent);
++		kvm_update_cpuid_runtime(vcpu);
  
- /*
-@@ -684,12 +696,10 @@ void kvm_set_cpu_caps(void)
- 		0 /* TM2 */ | F(SSSE3) | 0 /* CNXT-ID */ | 0 /* Reserved */ |
- 		F(FMA) | F(CX16) | 0 /* xTPR Update */ | F(PDCM) |
- 		F(PCID) | 0 /* Reserved, DCA */ | F(XMM4_1) |
--		F(XMM4_2) | F(X2APIC) | F(MOVBE) | F(POPCNT) |
-+		F(XMM4_2) | EMUL_F(X2APIC) | F(MOVBE) | F(POPCNT) |
- 		0 /* Reserved*/ | F(AES) | F(XSAVE) | 0 /* OSXSAVE */ | F(AVX) |
- 		F(F16C) | F(RDRAND)
- 	);
--	/* KVM emulates x2apic in software irrespective of host support. */
--	kvm_cpu_cap_set(X86_FEATURE_X2APIC);
- 
- 	kvm_cpu_cap_init(CPUID_1_EDX,
- 		F(FPU) | F(VME) | F(DE) | F(PSE) |
-@@ -703,13 +713,13 @@ void kvm_set_cpu_caps(void)
- 	);
- 
- 	kvm_cpu_cap_init(CPUID_7_0_EBX,
--		F(FSGSBASE) | F(SGX) | F(BMI1) | F(HLE) | F(AVX2) |
--		F(FDP_EXCPTN_ONLY) | F(SMEP) | F(BMI2) | F(ERMS) | F(INVPCID) |
--		F(RTM) | F(ZERO_FCS_FDS) | 0 /*MPX*/ | F(AVX512F) |
--		F(AVX512DQ) | F(RDSEED) | F(ADX) | F(SMAP) | F(AVX512IFMA) |
--		F(CLFLUSHOPT) | F(CLWB) | 0 /*INTEL_PT*/ | F(AVX512PF) |
--		F(AVX512ER) | F(AVX512CD) | F(SHA_NI) | F(AVX512BW) |
--		F(AVX512VL));
-+		F(FSGSBASE) | EMUL_F(TSC_ADJUST) | F(SGX) | F(BMI1) | F(HLE) |
-+		F(AVX2) | F(FDP_EXCPTN_ONLY) | F(SMEP) | F(BMI2) | F(ERMS) |
-+		F(INVPCID) | F(RTM) | F(ZERO_FCS_FDS) | 0 /*MPX*/ |
-+		F(AVX512F) | F(AVX512DQ) | F(RDSEED) | F(ADX) | F(SMAP) |
-+		F(AVX512IFMA) | F(CLFLUSHOPT) | F(CLWB) | 0 /*INTEL_PT*/ |
-+		F(AVX512PF) | F(AVX512ER) | F(AVX512CD) | F(SHA_NI) |
-+		F(AVX512BW) | F(AVX512VL));
- 
- 	kvm_cpu_cap_init(CPUID_7_ECX,
- 		F(AVX512VBMI) | RAW_F(LA57) | F(PKU) | 0 /*OSPKE*/ | F(RDPID) |
-@@ -728,16 +738,12 @@ void kvm_set_cpu_caps(void)
- 
- 	kvm_cpu_cap_init(CPUID_7_EDX,
- 		F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
--		F(SPEC_CTRL_SSBD) | F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
-+		F(SPEC_CTRL_SSBD) | EMUL_F(ARCH_CAPABILITIES) | F(INTEL_STIBP) |
- 		F(MD_CLEAR) | F(AVX512_VP2INTERSECT) | F(FSRM) |
- 		F(SERIALIZE) | F(TSXLDTRK) | F(AVX512_FP16) |
- 		F(AMX_TILE) | F(AMX_INT8) | F(AMX_BF16) | F(FLUSH_L1D)
- 	);
- 
--	/* TSC_ADJUST and ARCH_CAPABILITIES are emulated in software. */
--	kvm_cpu_cap_set(X86_FEATURE_TSC_ADJUST);
--	kvm_cpu_cap_set(X86_FEATURE_ARCH_CAPABILITIES);
+ 		r = kvm_cpuid_check_equal(vcpu, e2, nent);
+ 		if (r)
+-			return r;
 -
- 	if (boot_cpu_has(X86_FEATURE_IBPB) && boot_cpu_has(X86_FEATURE_IBRS))
- 		kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
- 	if (boot_cpu_has(X86_FEATURE_STIBP))
+-		kvfree(e2);
+-		return 0;
++			goto err;
++		goto success;
+ 	}
+ 
+ #ifdef CONFIG_KVM_HYPERV
+-	if (kvm_cpuid_has_hyperv(e2, nent)) {
++	if (kvm_cpuid_has_hyperv(vcpu)) {
+ 		r = kvm_hv_vcpu_init(vcpu);
+ 		if (r)
+-			return r;
++			goto err;
+ 	}
+ #endif
+ 
+-	r = kvm_check_cpuid(vcpu, e2, nent);
++	r = kvm_check_cpuid(vcpu);
+ 	if (r)
+-		return r;
+-
+-	kvfree(vcpu->arch.cpuid_entries);
+-	vcpu->arch.cpuid_entries = e2;
+-	vcpu->arch.cpuid_nent = nent;
++		goto err;
+ 
+ 	vcpu->arch.kvm_cpuid = kvm_get_hypervisor_cpuid(vcpu, KVM_SIGNATURE);
+ #ifdef CONFIG_KVM_XEN
+@@ -529,7 +533,14 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+ #endif
+ 	kvm_vcpu_after_set_cpuid(vcpu);
+ 
++success:
++	kvfree(e2);
+ 	return 0;
++
++err:
++	swap(vcpu->arch.cpuid_entries, e2);
++	swap(vcpu->arch.cpuid_nent, nent);
++	return r;
+ }
+ 
+ /* when an old userspace process fills a new kernel module */
 -- 
 2.45.0.215.g3402c0e53f-goog
 
