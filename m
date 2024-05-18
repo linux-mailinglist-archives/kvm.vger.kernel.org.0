@@ -1,128 +1,173 @@
-Return-Path: <kvm+bounces-17732-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17733-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5698C9065
-	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 12:18:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A3B8C9185
+	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 17:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9081C2100E
-	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 10:18:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F84DB20F69
+	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 15:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FAA12556F;
-	Sat, 18 May 2024 10:17:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A8A433C7;
+	Sat, 18 May 2024 15:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUMQswmV"
+	dkim=pass (2048-bit key) header.d=utexas.edu header.i=@utexas.edu header.b="FMzHi8a5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7BD0946F;
-	Sat, 18 May 2024 10:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A0C1E51F
+	for <kvm@vger.kernel.org>; Sat, 18 May 2024 15:19:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716027473; cv=none; b=VxGracI0AtdOf4U1vo/0qDBMtKtY067T1LU324fZOO/BElfuE1LDlcQSyLHUGoIGEQfbO1Ko7CplMhU4L3Vxn2G2b8gUGo+8UKjDIhwnV1tqIcVfAjslfoW24yBj2dbgd44loQhHX4awu8MsLZO6nPaX/xG0t7xI35XBmjHG6hw=
+	t=1716045567; cv=none; b=m+s//lnBKXgsPp5nmpO6xQG1hTgarOLwKON0we8idPIIphF6E2L34EUBJrloeVJMol3J8gV/c2Q5JzHlhBEgjGAw7aW4cjaoiHZcEFpM3Vo5FdG0hWTP/jwBuMg99c6z6mKSf1ZTFw84dHqQuoI9ewAeEzKSeXcVjqpDqGs/OTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716027473; c=relaxed/simple;
-	bh=xA2Bf8n5RCyqeoXlRG/S9pgpV9kOGAQ4TBNdrifLrLg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=iVA+hFtp0+VYSaPbSnDkJ30ljvbVvmaeo9e9boULm5MDoFBlA3TjlK6zjmO6HC8cAv1q1V92C7SbQBhhJZxxQIThOj5gIxy2PmuGZhpMPSMpJx8nltJ9ydMPfv6QQPxeYsqjvmITdN26mLQwJH7bv+gW8rD0T3+IO8/i/ZBWw0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUMQswmV; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2e3e18c24c1so30473391fa.1;
-        Sat, 18 May 2024 03:17:51 -0700 (PDT)
+	s=arc-20240116; t=1716045567; c=relaxed/simple;
+	bh=pfMVO62mbfSA2hHcn2IEujKHBMscJbTyrMrRW9shWVk=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=KMnxFKVgyVoFF78flRJ50K5KWCrGucSxckSIEc+h4ZqvsxeIshsZRbDIZ801tPr7J9332TqrE+vPoC3DOWpt2DraJ2Q0tH/CX8f2Czr5dlh1E+3hQycBzDRgoB8gdW9e2+BFpDsq7WXyddi3c3Kcn0t5SGyjmi6eF3ar5gz/Zco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=utexas.edu; spf=pass smtp.mailfrom=utexas.edu; dkim=pass (2048-bit key) header.d=utexas.edu header.i=@utexas.edu header.b=FMzHi8a5; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=utexas.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=utexas.edu
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6a077a861e7so13067906d6.2
+        for <kvm@vger.kernel.org>; Sat, 18 May 2024 08:19:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716027470; x=1716632270; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xA2Bf8n5RCyqeoXlRG/S9pgpV9kOGAQ4TBNdrifLrLg=;
-        b=AUMQswmV9UU06FcWmNpLQG4c/1nMBaQnDs3lZ+i9RObRo3Y2wSZx1m0nnhAw8Df9av
-         9aGYmcvP3SDqc4sC2d9LS0ar2ztfg3tYYr+XZP4KEDWVK3StvNPYCHAH7l/3Hjgjdtur
-         T08YSws443IcXGxqfIhhEmmGrEi/pcNr25mMTacT5BPmujh/gCEleOZZACpUoVNIdEuC
-         oP8dBpiWp69rvngQcAWXUy+A+EYQx++Bi5L+Z3sH2fqOW/sf+ic1/hyKun3/S6HApUpv
-         b9f8qNO2c1hTonK9DUzM75k+F30gWoJRpI4SCLB3exrZGlpxmyJoJ0cJBrnqXuT5vyRt
-         BvMg==
+        d=utexas.edu; s=google; t=1716045564; x=1716650364; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mKjOLLarc8bz1NAGUyB7AbZH8+7lIARnCen/FDmG78c=;
+        b=FMzHi8a5QzhBFeco+bNSHEM1Qp5dHTTr8hr431nVW4SpWqhdKnvojFVf5MDRwmKGpf
+         SnsXpmAaChJx/WkebRNgKL1ljs4ZyRFAwHYM8kXuQfGck3kyUrqsysmu8E+gERZ0phtx
+         f+E27mxawlW8lhFZJCqahr0G+O7eKT2WgDckDWOXzCii5mTM/PZTfH1hSCesIOY6WUvR
+         fNtCcpMhZ1SGHzRirjkBEk4iI212oI7lsRwuFRDjZGlot7cQ7YLsG6rZT4sI83TPeIy1
+         6y0aKE1VqMJKhsrRWpJ2Ew3yVb2WnKx58f775P1KbKmHByGFNn+HB1hpogLhsh+td316
+         FFLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716027470; x=1716632270;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xA2Bf8n5RCyqeoXlRG/S9pgpV9kOGAQ4TBNdrifLrLg=;
-        b=P3dXKQ1szIPaCrfPdAXqhvqneCv85VnHYvcqwXNBmUZtVA+l7qNZvJwvBFzVxO2dN+
-         93RU2eYxwUEd2fL7O1diMqG5jwn13GHy7VjdmDUfS6OGz6Ageq8BSmTH4U5iuhiotUyX
-         ouLxufr5jLSUyzv80jxhMK4nv872x1glb2Seg4e5vw9vi/+buKc3pcDMywghnVHck3aN
-         xwiuanXA1z6x0Gj/+xr7xcJtm9buNShS0qn1OWABscwppSmc5B6Xb+CZCtdWKrVwE7WC
-         ZXtm3M3CTuqlQlAAc3mTXnf3ETWSly4b7kR+RSqmb2tNO0zlkrZtjdrBeiIYfv8W4tdv
-         GSxw==
-X-Forwarded-Encrypted: i=1; AJvYcCW/wG8LYY2cRf/Xu3QhobQuxO16i7U6hEZBP5jg2teFnOuiBJfxf5gtGE3wrLkDAZiwz+NYCLvt06z2CAqFFH7lcOz4jFrS
-X-Gm-Message-State: AOJu0YxXY5uo90kwRJFWSRfTOHT3WfUiysOnmaf3ShY9Xj/0vGg9qdwj
-	mE0OzaO4Yc7rXk7Oaodz7iGLKvdPIQwXk0z0ykLyNdplhat7fC/HO7dYW8D8IGu3CLmN6Y3i5j6
-	fkCQTzAPA5854GkbRSeTxRJ+HjSc=
-X-Google-Smtp-Source: AGHT+IHdD80bucwwGfBvIzB+/cPOI8ABdlz0Zfb6O/bBatrsEmQ3rYLNrEXm0kKzesZxrgLoHZ0g9pPzIbQuxQvAe+E=
-X-Received: by 2002:a2e:9284:0:b0:2d7:1a30:e881 with SMTP id
- 38308e7fff4ca-2e51fd4a537mr167836001fa.12.1716027469622; Sat, 18 May 2024
- 03:17:49 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716045564; x=1716650364;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mKjOLLarc8bz1NAGUyB7AbZH8+7lIARnCen/FDmG78c=;
+        b=knRJJvY7dCTNaYAA8QKAq9JrWamGuhIh+l1w0ZEN4DiI2RKqPZ7yujl/G8ASpLuiEL
+         ywxRgQACOnL2k9xjFODynYk2JfrOHNGjdq/fqD99MRlYtefhK3dmrMn0saiue+bskJWl
+         7407RNOsS7vLBSzvXkjMvxcK68iXMjw74indDGijnZlfTM/51Ja8qQ0nIMN96YkSRUyk
+         h7286ASBHwcmW7ywPyOKNQsB8h4OsysnV3ftU1zmgGQbdiJcN3BFTVSAKkKyedAIBN9P
+         u0voCmmhyvYUS5It0APxveP5hvZKTAQLYXj4hjGr/kwb58dIezPIIdk4wm/Z3KI/t0qk
+         2mMw==
+X-Gm-Message-State: AOJu0YyQy89xC3bGrUv7h3Yonh9AkjdoP1bpJ+0cfW1QewHwXoi0zGuU
+	qmv/ItctPZFGX8bHxSooZjAUUTsWWxiZNSuFXxexZdgY/PDI4Egq7VkUUdokkys=
+X-Google-Smtp-Source: AGHT+IHg8FDZP+SigbLsZrzo7wA5DzSA+ztMMtVVC5XgWzAcRWTnMiUeZ1oXjm7dE3CUhWzrzKdXWQ==
+X-Received: by 2002:ad4:4f53:0:b0:6a3:2949:c496 with SMTP id 6a1803df08f44-6a32949c669mr188608896d6.21.1716045564226;
+        Sat, 18 May 2024 08:19:24 -0700 (PDT)
+Received: from localhost ([165.204.78.25])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1d7040sm94526876d6.107.2024.05.18.08.19.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 18 May 2024 08:19:23 -0700 (PDT)
+From: Michael Roth <mdroth@utexas.edu>
+X-Google-Original-From: Michael Roth <michael.roth@amd.com>
+To: pbonzini@redhat.com
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ashish.kalra@amd.com,
+	thomas.lendacky@amd.com,
+	seanjc@google.com,
+	rick.p.edgecombe@intel.com
+Subject: [PATCH] KVM: SEV: Fix guest memory leak when handling guest requests
+Date: Sat, 18 May 2024 10:04:57 -0500
+Message-Id: <20240518150457.1033295-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <58492a1a-63bb-47d2-afef-164557d15261@redhat.com>
+References: <58492a1a-63bb-47d2-afef-164557d15261@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
-Date: Sat, 18 May 2024 16:17:38 +0600
-Message-ID: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
-Subject: How to implement message forwarding from one CID to another in vhost driver
-To: virtualization@lists.linux.dev
-Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	Alexander Graf <graf@amazon.com>, agraf@csgraf.de, stefanha@redhat.com, sgarzare@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi,
+Before forwarding guest requests to firmware, KVM takes a reference on
+the 2 pages the guest uses for its request/response buffers. Make sure
+to release these when cleaning up after the request is completed.
 
-Hope you are doing well. I am working on adding AWS Nitro Enclave[1]
-emulation support in QEMU. Alexander Graf is mentoring me on this work. A v1
-patch series has already been posted to the qemu-devel mailing list[2].
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+---
 
-AWS nitro enclaves is an Amazon EC2[3] feature that allows creating isolated
-execution environments, called enclaves, from Amazon EC2 instances, which are
-used for processing highly sensitive data. Enclaves have no persistent storage
-and no external networking. The enclave VMs are based on Firecracker microvm
-and have a vhost-vsock device for communication with the parent EC2 instance
-that spawned it and a Nitro Secure Module (NSM) device for cryptographic
-attestation. The parent instance VM always has CID 3 while the enclave VM gets
-a dynamic CID. The enclave VMs can communicate with the parent instance over
-various ports to CID 3, for example, the init process inside an enclave sends a
-heartbeat to port 9000 upon boot, expecting a heartbeat reply, letting the
-parent instance know that the enclave VM has successfully booted.
+Hi Paolo,
 
-The plan is to eventually make the nitro enclave emulation in QEMU standalone
-i.e., without needing to run another VM with CID 3 with proper vsock
-communication support. For this to work, one approach could be to teach the
-vhost driver in kernel to forward CID 3 messages to another CID N
-(set to CID 2 for host) i.e., it patches CID from 3 to N on incoming messages
-and from N to 3 on responses. This will enable users of the
-nitro-enclave machine
-type in QEMU to run the necessary vsock server/clients in the host machine
-(some defaults can be implemented in QEMU as well, for example, sending a reply
-to the heartbeat) which will rid them of the cumbersome way of running another
-whole VM with CID 3. This way, users of nitro-enclave machine in QEMU, could
-potentially also run multiple enclaves with their messages for CID 3 forwarded
-to different CIDs which, in QEMU side, could then be specified using a new
-machine type option (parent-cid) if implemented. I guess in the QEMU side, this
-will be an ioctl call (or some other way) to indicate to the host kernel that
-the CID 3 messages need to be forwarded. Does this approach of
-forwarding CID 3 messages to another CID sound good?
+Sorry for another late fix, but I finally spotted this while looking over
+the code again today. I've re-tested attestation guest requests with this
+applied (after applying the other pending fix) and everything looks good.
 
-If this approach sounds good, I need some guidance on where the code
-should be written in order to achieve this. I would greatly appreciate
-any suggestions.
+-Mike
 
-Thanks.
+ arch/x86/kvm/svm/sev.c | 27 +++++++++++++++++----------
+ 1 file changed, 17 insertions(+), 10 deletions(-)
 
-Regards,
-Dorjoy
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 41e383e30797..e57faf7d04d1 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -3933,11 +3933,16 @@ static int snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_reques
+ 		return -EINVAL;
+ 
+ 	resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
+-	if (is_error_noslot_pfn(resp_pfn))
++	if (is_error_noslot_pfn(resp_pfn)) {
++		kvm_release_pfn_clean(req_pfn);
+ 		return -EINVAL;
++	}
+ 
+-	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
++	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true)) {
++		kvm_release_pfn_clean(req_pfn);
++		kvm_release_pfn_clean(resp_pfn);
+ 		return -EINVAL;
++	}
+ 
+ 	data->gctx_paddr = __psp_pa(sev->snp_context);
+ 	data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
+@@ -3948,11 +3953,16 @@ static int snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_reques
+ 
+ static int snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data)
+ {
+-	u64 pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
++	u64 req_pfn = __sme_clr(data->req_paddr) >> PAGE_SHIFT;
++	u64 resp_pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
++
++	kvm_release_pfn_clean(req_pfn);
+ 
+-	if (snp_page_reclaim(pfn) || rmp_make_shared(pfn, PG_LEVEL_4K))
++	if (snp_page_reclaim(resp_pfn) || rmp_make_shared(resp_pfn, PG_LEVEL_4K))
+ 		return -EINVAL;
+ 
++	kvm_release_pfn_dirty(resp_pfn);
++
+ 	return 0;
+ }
+ 
+@@ -3970,14 +3980,11 @@ static int __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t resp_gpa
+ 		return ret;
+ 
+ 	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, fw_err);
+-	if (ret)
+-		return ret;
+ 
+-	ret = snp_cleanup_guest_buf(&data);
+-	if (ret)
+-		return ret;
++	if (snp_cleanup_guest_buf(&data))
++		return -EINVAL;
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
+-- 
+2.25.1
 
-[1] https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html
-[2] https://mail.gnu.org/archive/html/qemu-devel/2024-05/msg03524.html
-[3] https://aws.amazon.com/ec2/
 
