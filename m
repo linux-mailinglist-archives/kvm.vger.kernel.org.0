@@ -1,173 +1,124 @@
-Return-Path: <kvm+bounces-17733-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17734-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A3B8C9185
-	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 17:19:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 931DB8C9189
+	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 17:29:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F84DB20F69
-	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 15:19:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F9661F21838
+	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 15:29:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A8A433C7;
-	Sat, 18 May 2024 15:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61AB945035;
+	Sat, 18 May 2024 15:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=utexas.edu header.i=@utexas.edu header.b="FMzHi8a5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WiZjDZ5o"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A0C1E51F
-	for <kvm@vger.kernel.org>; Sat, 18 May 2024 15:19:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B95E1773A;
+	Sat, 18 May 2024 15:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716045567; cv=none; b=m+s//lnBKXgsPp5nmpO6xQG1hTgarOLwKON0we8idPIIphF6E2L34EUBJrloeVJMol3J8gV/c2Q5JzHlhBEgjGAw7aW4cjaoiHZcEFpM3Vo5FdG0hWTP/jwBuMg99c6z6mKSf1ZTFw84dHqQuoI9ewAeEzKSeXcVjqpDqGs/OTM=
+	t=1716046146; cv=none; b=YCAYgb4MY1yEW9bbK/UTj6jP2KnxlLv5qnJ/9eaqjvzeV/IwYJKyTN4Jz2bh+tqn7OZU3KXVyyjGJd6ln1cnwUY0hSCoh7Eazl9HSeJOII7psi/QlxzzlwfQbMmOYa/eSKd9neoPIMlT0QSMhGjTHC+idC+UqHzDacUrFujX4Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716045567; c=relaxed/simple;
-	bh=pfMVO62mbfSA2hHcn2IEujKHBMscJbTyrMrRW9shWVk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KMnxFKVgyVoFF78flRJ50K5KWCrGucSxckSIEc+h4ZqvsxeIshsZRbDIZ801tPr7J9332TqrE+vPoC3DOWpt2DraJ2Q0tH/CX8f2Czr5dlh1E+3hQycBzDRgoB8gdW9e2+BFpDsq7WXyddi3c3Kcn0t5SGyjmi6eF3ar5gz/Zco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=utexas.edu; spf=pass smtp.mailfrom=utexas.edu; dkim=pass (2048-bit key) header.d=utexas.edu header.i=@utexas.edu header.b=FMzHi8a5; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=utexas.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=utexas.edu
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6a077a861e7so13067906d6.2
-        for <kvm@vger.kernel.org>; Sat, 18 May 2024 08:19:25 -0700 (PDT)
+	s=arc-20240116; t=1716046146; c=relaxed/simple;
+	bh=0oWWlE3oDhEW0XamtqcFvDPIPwOclTeWmexU0R6AMOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uWJwa7T8aVY2kUe+wmc15VR2eQP7lVjb3RCuQIbeaXfG77Vn1gQaCTmuZF/C8HZSsE8nJj4hKZA3KTJgOXFV9g2xenT1EvoncJHNieXPgQszT7aEwXevV2MoTmhPpmnQI0RbsFkahk3MRm8iXg2KsyYn2OOUJcMRJelZQnjtaX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WiZjDZ5o; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5b277a61f6fso884066eaf.1;
+        Sat, 18 May 2024 08:29:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=utexas.edu; s=google; t=1716045564; x=1716650364; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mKjOLLarc8bz1NAGUyB7AbZH8+7lIARnCen/FDmG78c=;
-        b=FMzHi8a5QzhBFeco+bNSHEM1Qp5dHTTr8hr431nVW4SpWqhdKnvojFVf5MDRwmKGpf
-         SnsXpmAaChJx/WkebRNgKL1ljs4ZyRFAwHYM8kXuQfGck3kyUrqsysmu8E+gERZ0phtx
-         f+E27mxawlW8lhFZJCqahr0G+O7eKT2WgDckDWOXzCii5mTM/PZTfH1hSCesIOY6WUvR
-         fNtCcpMhZ1SGHzRirjkBEk4iI212oI7lsRwuFRDjZGlot7cQ7YLsG6rZT4sI83TPeIy1
-         6y0aKE1VqMJKhsrRWpJ2Ew3yVb2WnKx58f775P1KbKmHByGFNn+HB1hpogLhsh+td316
-         FFLg==
+        d=gmail.com; s=20230601; t=1716046144; x=1716650944; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=YcGBSUjyXOA1JpVYvoN1EuahOO06ajza5ZUGXHQ/tYE=;
+        b=WiZjDZ5oVhdv4zkCxQaSDGEMNpfBcex8Q02ep9Zl9XMAv6/GMXLnXTwJMT1IYiXhWh
+         UgEp5DDIInVKQkf/He3FoYL+u4GMyp4QAdLLEqmFEoEXjMj+e46H1+wCCWNdOXY+YQ0t
+         A6JO6ZEFWPAi7azh/PwEqcriAW8jAOmmD6VdtrnuWj9192ugmPLWgK8kA2A6WVfZvjtR
+         THzfjWtfo2l7mWBQr/HWlGrKt6cqcm8sH/o1aubTqXn9ZJ81v/d8A92uiuAG2CuW/Xbl
+         S6mjcO9pVIfCFU7nm4fvzhgDDpgo6UlGgjtfswXBPgfDPVgldZLDDvmMYa5q182SarBT
+         MxIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716045564; x=1716650364;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mKjOLLarc8bz1NAGUyB7AbZH8+7lIARnCen/FDmG78c=;
-        b=knRJJvY7dCTNaYAA8QKAq9JrWamGuhIh+l1w0ZEN4DiI2RKqPZ7yujl/G8ASpLuiEL
-         ywxRgQACOnL2k9xjFODynYk2JfrOHNGjdq/fqD99MRlYtefhK3dmrMn0saiue+bskJWl
-         7407RNOsS7vLBSzvXkjMvxcK68iXMjw74indDGijnZlfTM/51Ja8qQ0nIMN96YkSRUyk
-         h7286ASBHwcmW7ywPyOKNQsB8h4OsysnV3ftU1zmgGQbdiJcN3BFTVSAKkKyedAIBN9P
-         u0voCmmhyvYUS5It0APxveP5hvZKTAQLYXj4hjGr/kwb58dIezPIIdk4wm/Z3KI/t0qk
-         2mMw==
-X-Gm-Message-State: AOJu0YyQy89xC3bGrUv7h3Yonh9AkjdoP1bpJ+0cfW1QewHwXoi0zGuU
-	qmv/ItctPZFGX8bHxSooZjAUUTsWWxiZNSuFXxexZdgY/PDI4Egq7VkUUdokkys=
-X-Google-Smtp-Source: AGHT+IHg8FDZP+SigbLsZrzo7wA5DzSA+ztMMtVVC5XgWzAcRWTnMiUeZ1oXjm7dE3CUhWzrzKdXWQ==
-X-Received: by 2002:ad4:4f53:0:b0:6a3:2949:c496 with SMTP id 6a1803df08f44-6a32949c669mr188608896d6.21.1716045564226;
-        Sat, 18 May 2024 08:19:24 -0700 (PDT)
-Received: from localhost ([165.204.78.25])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1d7040sm94526876d6.107.2024.05.18.08.19.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 May 2024 08:19:23 -0700 (PDT)
-From: Michael Roth <mdroth@utexas.edu>
-X-Google-Original-From: Michael Roth <michael.roth@amd.com>
-To: pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ashish.kalra@amd.com,
-	thomas.lendacky@amd.com,
-	seanjc@google.com,
-	rick.p.edgecombe@intel.com
-Subject: [PATCH] KVM: SEV: Fix guest memory leak when handling guest requests
-Date: Sat, 18 May 2024 10:04:57 -0500
-Message-Id: <20240518150457.1033295-1-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <58492a1a-63bb-47d2-afef-164557d15261@redhat.com>
-References: <58492a1a-63bb-47d2-afef-164557d15261@redhat.com>
+        d=1e100.net; s=20230601; t=1716046144; x=1716650944;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YcGBSUjyXOA1JpVYvoN1EuahOO06ajza5ZUGXHQ/tYE=;
+        b=ui0m/t/00dN+rO0dKFEiXZeTgbFnvfNSBtqpwftJEk32GJwdVXZJnoXzAIYGvRC6Ea
+         9NGnRVgm/r1F2CVDe9jMNjH46a9De5L0bSa2uiz7qh+0Cb+fDm96GkrJ9/Vw457HGZ9v
+         XVDF7SeTmEU20ymu7k/H1qWkOQjd6V4NNE5TsP8OXp4FW/81tUxmG7vRpmbTH0IOh2lF
+         Slc2g4KdIXhDZMZG14qY+8cq2B/Rv1xDmtsxJhxOBr/i1+mR0RokiiJ+x9qs1rUeMl57
+         obK3leCdPzuIyfO9UdVNp29b6efAoRkaMMuL+HMnZNlvUbDG7+i98vnwUVazUEbVFktU
+         YtwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaBbBn5cSP3mvfLRcBp5XODHHnuAzOS/ho8EQGgj1kmf2+0YkwW0F4h2TlCRvKLbTM48yiY+oSu5JF7MPjckmPOnI6
+X-Gm-Message-State: AOJu0YyBvRxNvYEr3H4/qJJTKsJsBeLcJiyYBWcXCK8abybdnkHWfDUp
+	SOs1b90RZi8RqWWW20zq6Tt1LrTjwn8MoDw/wM2/BNUpUWXeATlh
+X-Google-Smtp-Source: AGHT+IH71oEJiJAd+qKPw7I30ipuzZqOKbfz9SVHCqEDTVEIWdcivJlGSb6FpPimtRapWLRXuy7gDA==
+X-Received: by 2002:a05:6820:248c:b0:5b2:8deb:98cb with SMTP id 006d021491bc7-5b3299ba504mr933215eaf.2.1716046144372;
+        Sat, 18 May 2024 08:29:04 -0700 (PDT)
+Received: from ?IPV6:2603:8080:2300:de:3d70:f8:6869:93de? ([2603:8080:2300:de:3d70:f8:6869:93de])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5b26ddcc6acsm4088141eaf.24.2024.05.18.08.29.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 18 May 2024 08:29:04 -0700 (PDT)
+Message-ID: <83b2db44-c7bc-49af-8634-d349b91dfab0@gmail.com>
+Date: Sat, 18 May 2024 10:29:03 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: SEV: Fix unused variable in guest request handling
+To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ linux-coco@lists.linux.dev, Sean Christopherson <seanjc@google.com>
+References: <20240513181928.720979-1-michael.roth@amd.com>
+Content-Language: en-US
+From: Carlos Bilbao <carlos.bilbao.osdev@gmail.com>
+In-Reply-To: <20240513181928.720979-1-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Before forwarding guest requests to firmware, KVM takes a reference on
-the 2 pages the guest uses for its request/response buffers. Make sure
-to release these when cleaning up after the request is completed.
+On 5/13/24 13:19, Michael Roth wrote:
 
-Signed-off-by: Michael Roth <michael.roth@amd.com>
----
+> The variable 'sev' is assigned, but never used. Remove it.
+>
+> Fixes: 449ead2d1edb ("KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE event")
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 
-Hi Paolo,
 
-Sorry for another late fix, but I finally spotted this while looking over
-the code again today. I've re-tested attestation guest requests with this
-applied (after applying the other pending fix) and everything looks good.
+Reviewed-by: Carlos Bilbao <carlos.bilbao.osdev@gmail.com>
 
--Mike
 
- arch/x86/kvm/svm/sev.c | 27 +++++++++++++++++----------
- 1 file changed, 17 insertions(+), 10 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 41e383e30797..e57faf7d04d1 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3933,11 +3933,16 @@ static int snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_reques
- 		return -EINVAL;
- 
- 	resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
--	if (is_error_noslot_pfn(resp_pfn))
-+	if (is_error_noslot_pfn(resp_pfn)) {
-+		kvm_release_pfn_clean(req_pfn);
- 		return -EINVAL;
-+	}
- 
--	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true))
-+	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true)) {
-+		kvm_release_pfn_clean(req_pfn);
-+		kvm_release_pfn_clean(resp_pfn);
- 		return -EINVAL;
-+	}
- 
- 	data->gctx_paddr = __psp_pa(sev->snp_context);
- 	data->req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
-@@ -3948,11 +3953,16 @@ static int snp_setup_guest_buf(struct kvm *kvm, struct sev_data_snp_guest_reques
- 
- static int snp_cleanup_guest_buf(struct sev_data_snp_guest_request *data)
- {
--	u64 pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
-+	u64 req_pfn = __sme_clr(data->req_paddr) >> PAGE_SHIFT;
-+	u64 resp_pfn = __sme_clr(data->res_paddr) >> PAGE_SHIFT;
-+
-+	kvm_release_pfn_clean(req_pfn);
- 
--	if (snp_page_reclaim(pfn) || rmp_make_shared(pfn, PG_LEVEL_4K))
-+	if (snp_page_reclaim(resp_pfn) || rmp_make_shared(resp_pfn, PG_LEVEL_4K))
- 		return -EINVAL;
- 
-+	kvm_release_pfn_dirty(resp_pfn);
-+
- 	return 0;
- }
- 
-@@ -3970,14 +3980,11 @@ static int __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t resp_gpa
- 		return ret;
- 
- 	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, fw_err);
--	if (ret)
--		return ret;
- 
--	ret = snp_cleanup_guest_buf(&data);
--	if (ret)
--		return ret;
-+	if (snp_cleanup_guest_buf(&data))
-+		return -EINVAL;
- 
--	return 0;
-+	return ret;
- }
- 
- static void snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
--- 
-2.25.1
-
+> ---
+>  arch/x86/kvm/svm/sev.c | 3 ---
+>  1 file changed, 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 59c0d89a4d52..6cf665c410b2 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3965,14 +3965,11 @@ static int __snp_handle_guest_req(struct kvm *kvm, gpa_t req_gpa, gpa_t resp_gpa
+>  				  sev_ret_code *fw_err)
+>  {
+>  	struct sev_data_snp_guest_request data = {0};
+> -	struct kvm_sev_info *sev;
+>  	int ret;
+>  
+>  	if (!sev_snp_guest(kvm))
+>  		return -EINVAL;
+>  
+> -	sev = &to_kvm_svm(kvm)->sev_info;
+> -
+>  	ret = snp_setup_guest_buf(kvm, &data, req_gpa, resp_gpa);
+>  	if (ret)
+>  		return ret;
 
