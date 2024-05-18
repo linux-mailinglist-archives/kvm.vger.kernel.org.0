@@ -1,126 +1,189 @@
-Return-Path: <kvm+bounces-17726-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3A5D8C8ECB
-	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 02:07:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21AC38C8EDF
+	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 02:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EFC92828B0
-	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 00:07:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBF27283286
+	for <lists+kvm@lfdr.de>; Sat, 18 May 2024 00:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A22C381C8;
-	Sat, 18 May 2024 00:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0D44A2D;
+	Sat, 18 May 2024 00:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uKW/Z5a/"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gLNizZnL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2208C125CC
-	for <kvm@vger.kernel.org>; Sat, 18 May 2024 00:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBF464D
+	for <kvm@vger.kernel.org>; Sat, 18 May 2024 00:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1715990695; cv=none; b=GmDgTf4YgysJa2v1ZTJl58PPr1WT8+QAuVIrR3d9NXZrO3IOGv5UwFlp3nj2AYsOR8FI5oxWS7jVTgE7wWk1qMTY2mZC4RyHFHTSDzktUd7HVukpVmk99bYjIHpmNVuAdg7hl4SjZowJLC6W7rMviwi1ryUgZsqGJSfVIXtprT0=
+	t=1715991491; cv=none; b=WRBIEgrs3F0/aX6AjjJWsoWdSXVVv/vGDRi1c5nJqZfBRBz+3t9NJag5DES6lrBkOHKvfpc6QBt24o0LJ6rS2zxir4/BLGz69nDB2WlKlzJLy9yK0rJTXQd0cipGaecUoSNtnS4rhdVgEWa2VRiisg8XXjlfvgjlGR4TE8x2zik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1715990695; c=relaxed/simple;
-	bh=7aTw1q5fF2jfF8qaFVxCQ7vKf0J6QUU/de4LqX2pZiU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mVtLzleFI+fQsCcc3XW8dvzTKH4ievLmX8MM4PIz/nqSKbHmYW3/WyPioHdllYI4zw+pVzxlpy812QXh/wYHMbgJHwHqBcqSZH7fSeCRrR6DbPIqj3bb5InNwXf+Q4Uf/HDVonzfx3u1zLJlFo3lPz5XVy4oe6BC5/qn0PLlFfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uKW/Z5a/; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2b5cb8686c9so9236156a91.2
-        for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:04:54 -0700 (PDT)
+	s=arc-20240116; t=1715991491; c=relaxed/simple;
+	bh=Uymz9RGaEBz4cZeu7DiuAzeKhXotWtQUW9Tv3ePWw8s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hs5SkilmB+vOMk93loqfc+11iCu1zzLB5h1NgaU/oqgSWjanvZllkALWkintAYlrNxmuQ8GHPmhpAmGa+uU7buMj40eMPPPxsstwKBDp6aPitjs0woL0ScVfnV8LqftUh0JZVN9qQ4T8f9gM9IpFXF0ICdlQde6es/ZEfGFOyGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=gLNizZnL; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1eeabda8590so23799035ad.0
+        for <kvm@vger.kernel.org>; Fri, 17 May 2024 17:18:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1715990694; x=1716595494; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=KaG30rbQSApl1hJFQFNfcRVacF/4y69sxTalkt/kPiY=;
-        b=uKW/Z5a/2ekjqeq56LcRExA4lIDRl6EKXz4E97VoDd5NdAEjVOQ3/5YbV1PKzGcL92
-         onkw/aTfPFMtU8BO+aU3mk+OSZmodXEdQVZJ6xhtwxC1ON7zw6LDyHBsAdHkpJSB9lOt
-         yx8ftTszYtYEb0mKu8M19vIU5px/i8l5Her8A/neOc5Pi9kRN4kXqAgdKxSGolNybTMP
-         0WQa8DXIqFO75uaz4vjcSQ61PPQIppBiV0ML2RtdZdlERw/MbCSUgVy+ZnOwB8XMuy/f
-         /+EQKbCWL2hlsOskb0dj73gC126eCEWS3JcQOGXgv192j6gCpys2LfZs1JEk5tk7jw7U
-         t65g==
+        d=chromium.org; s=google; t=1715991489; x=1716596289; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qOLQVL/T02TWP/gLUEfGdGKqwMDMKOKPwTmMExwd+Es=;
+        b=gLNizZnLodSK7f8ah7us0QO9Xy/I8crCeWxIraKwYY9APHcA+M/IHq2PrIWQa/GT/4
+         t61hHADDqbusU14SMMC2SfNwBF4SB+xtaDAES+yrcfqYaYn0JKuha9smgI5mc7jo1aLy
+         J4zUjUHsv5rayk2QAGKyyx85YnEBIinSnUEz0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1715990694; x=1716595494;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1715991489; x=1716596289;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KaG30rbQSApl1hJFQFNfcRVacF/4y69sxTalkt/kPiY=;
-        b=f7FRsiVptPMfsdo+wITVweqiPAjs3sWVmLcwrBixuO6Mn4384cTO8xWz3cPnow5ae+
-         qSDfzvdgginSKPYTeX23WdUMG8C9zQF4Zt4XcoI6Vd8vEQskoDJgKAi1BomDT/TYTaB+
-         nv1CefZgdSyGK/U2juhqxAnZ3Fa3bYK332ZlIpRBlV6ZcPdBEGop8DkIhwZl5UzIRk4a
-         ZuqsmwAis6E9zqRQ+lj6UWNBpz9fkxTualaGdXlYil/GZJRF+OrsTIKi6t9cVUglhcCq
-         7J5CN/rRr/KxxqqZWrl4kgv0BmLTDQ/rAdERmqF0rPEym/90tHAn7iGPHZlqKXKClb74
-         34xw==
-X-Gm-Message-State: AOJu0YwNhfpaAnIhLMg9ONnDehFnSZq3DvHgyAQgWjoFgKmordmmKn3L
-	ylT+RY2cTQrbEYkdclUcCbwv/3FjI/q+RrcReXkdsQ0q/Y2o5ACa5+GQ3w9mrrQ7lr5lfbUli9s
-	qow==
-X-Google-Smtp-Source: AGHT+IEbccThIlHdBUKBF+9ohVSG5QaFMw6xK62nY9XRpFOKV92TLuuJQe5NE/0y95hCq2GrvpgsmmwHd5k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:d80b:b0:2a7:4bb8:b24e with SMTP id
- 98e67ed59e1d1-2b6cc453033mr63941a91.1.1715990693657; Fri, 17 May 2024
- 17:04:53 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 17 May 2024 17:04:30 -0700
-In-Reply-To: <20240518000430.1118488-1-seanjc@google.com>
+        bh=qOLQVL/T02TWP/gLUEfGdGKqwMDMKOKPwTmMExwd+Es=;
+        b=GsuNbQFpH9yvJhE64wrzcoVTChec6+mDgyLQx3Co9HphMTRir7GNbN358Or0+2kxz6
+         2F3gjRkHi9dPoIe+MbtcSdWWxkoCXa4mN88Rz+TdP4XdmHyKKERIyLFtnOIQpJ0bwKmZ
+         z86e7xtSA4sSkc/uLZqHPd3yrIocltsnuwQMSctEM586ncADJBFbt6HzGxI7gd77klPM
+         BLo2HxbjFJN6dz6Wic/DV2ZgrwFnBNJmxoRGMZpSpg1WVpF6kULKfq2nVBB+SXu05gys
+         YibKcPzECT6WCLbaZU2F9Br7YIRCZuAx4zsf3lZCysujxvJW6MZznFk8/9pgvCfxqgkq
+         Hm9A==
+X-Forwarded-Encrypted: i=1; AJvYcCVQPgya8bZCYUJ1nLCno0+CBfdXOwJCUSgmbgVKphT/auieIoIXdqZnQYJnxe68FlFJBvRxkFrR6zg2O7ZZPsYVGBeG
+X-Gm-Message-State: AOJu0YyyyPF4ccI5impGcX/BTaKc98Uw1lrO816hIp1Wz+1pkrbL9x2r
+	kkxyM9k588N4T6pbxAZons+VCkzJmWQaIGy2CjX51ocHtdUx3+l5Q7j265L9gajdswlojUMiOUM
+	=
+X-Google-Smtp-Source: AGHT+IE+d9yGCWrTkEXvkKzY8JkLoDpqtiZq9uh8bFOZrt5vEUiNH/DgeBWLjmMRV4Ve/lntSWdGKg==
+X-Received: by 2002:a17:90b:3118:b0:2b2:c2dd:9cb0 with SMTP id 98e67ed59e1d1-2b6ccd85e94mr19386194a91.43.1715991489343;
+        Fri, 17 May 2024 17:18:09 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2b67105666csm16054611a91.8.2024.05.17.17.18.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 May 2024 17:18:08 -0700 (PDT)
+From: Kees Cook <keescook@chromium.org>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Kees Cook <keescook@chromium.org>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] selftests: drivers/s390x: Use SKIP() during FIXTURE_SETUP
+Date: Fri, 17 May 2024 17:18:07 -0700
+Message-Id: <20240518001806.work.381-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240518000430.1118488-1-seanjc@google.com>
-X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240518000430.1118488-10-seanjc@google.com>
-Subject: [PATCH 9/9] KVM: x86: Disable KVM_INTEL_PROVE_VE by default
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2740; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=Uymz9RGaEBz4cZeu7DiuAzeKhXotWtQUW9Tv3ePWw8s=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBmR/O/Rs8JHxwPnfic8fsbbhMgIvS8iScbRPm04
+ rBHts7r65WJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZkfzvwAKCRCJcvTf3G3A
+ JqwyD/9QbmjNrx+bCJp6FJhOUOPry860Awt4ikGEV/G9GDHtUTJ8Tn1pSGgCPIkwf+OrGsMVJIe
+ J5kled3BURo/Z9D4e6NYju/3PWD/bnP5gmdtZg+FFXbBozEMiSyGfQiPdPnGshwqXFk0/H6jxeI
+ ron5SufK7RMxxfvh29UxnMMq/nLqlvb4tE7mx5G8ExVXR7W6JnSfEXyiDDGDtlWxRI5pwjFPfHb
+ /WRflW7pJOgS3oBDtoqLOi5f5XOl11NRpRaysxN4kamKW6JyO7Bzcvf/zsceq+n5BadoaECpAZ4
+ Q6y7tbo41st6By+dPt2ECJNhjVinAFUyNJjtmoYE2sS5jfAL6xouXohIxpM+KwAEK6OioGne8r4
+ s0ATg8Yh2sQnkc0pBvUvLzhg4i69ZzQuNlKZELxrKnNaqs92ymI14THqJCimvqY6st29PyHRhZH
+ 5H17g85n5mK9OvF6B3ppMt67reo5R2wab5QI9mAwyIzvH8vS6tWroONa8T3Z8bWhS0T2/Bv0Ams
+ 3QO+NCyJ2AB7nOtNosjOA7GfbwNL3ume6xLi8i4j1o/7vTMbKHqEVk4ig/jCsBCf8dE1UyA+FQ8
+ siQcnQEL+qrGwQoTh4k3rltFb0YaM9mKuRHEHHUlTQ0Sc+izD8DDiWnHD47185DNx7EpRqgEeio
+ VHccqGT 13SESqHA==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-Disable KVM's "prove #VE" support by default, as it provides no functional
-value, and even its sanity checking benefits are relatively limited.  I.e.
-it should be fully opt-in even on debug kernels, especially since EPT
-Violation #VE suppression appears to be buggy on some CPUs.
+Instead of mixing selftest harness and ksft helpers, perform SKIP
+testing from the FIXTURE_SETUPs. This also means TEST_HARNESS_MAIN does
+not need to be open-coded.
 
-Opportunistically add a line in the help text to make it abundantly clear
-that KVM_INTEL_PROVE_VE should never be enabled in a production
-environment.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/kvm/Kconfig | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Masahiro Yamada <masahiroy@kernel.org>
+Cc: kvm@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org
+---
+I wasn't able to build or run test this, since it's very s390 specific, it seems?
+---
+ .../drivers/s390x/uvdevice/test_uvdevice.c    | 32 ++++++++-----------
+ 1 file changed, 13 insertions(+), 19 deletions(-)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 2a7f69abcac3..3468efc4be55 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -97,15 +97,15 @@ config KVM_INTEL
+diff --git a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+index ea0cdc37b44f..9622fac42597 100644
+--- a/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
++++ b/tools/testing/selftests/drivers/s390x/uvdevice/test_uvdevice.c
+@@ -18,6 +18,16 @@
  
- config KVM_INTEL_PROVE_VE
-         bool "Check that guests do not receive #VE exceptions"
--        default KVM_PROVE_MMU || DEBUG_KERNEL
--        depends on KVM_INTEL
-+        depends on KVM_INTEL && DEBUG_KERNEL && EXPERT
-         help
--
-           Checks that KVM's page table management code will not incorrectly
-           let guests receive a virtualization exception.  Virtualization
-           exceptions will be trapped by the hypervisor rather than injected
-           in the guest.
- 
-+          This should never be enabled in a production environment.
+ #define UV_PATH  "/dev/uv"
+ #define BUFFER_SIZE 0x200
 +
-           If unsure, say N.
++#define open_uv() \
++do { \
++	self->uv_fd = open(UV_PATH, O_ACCMODE);	\
++	if (self->uv_fd < 0) \
++		SKIP(return, "No uv-device or cannot access " UV_PATH  "\n" \
++			     "Enable CONFIG_S390_UV_UAPI and check the access rights on " \
++			     UV_PATH ".\n"); \
++} while (0)
++
+ FIXTURE(uvio_fixture) {
+ 	int uv_fd;
+ 	struct uvio_ioctl_cb uvio_ioctl;
+@@ -37,7 +47,7 @@ FIXTURE_VARIANT_ADD(uvio_fixture, att) {
  
- config X86_SGX_KVM
+ FIXTURE_SETUP(uvio_fixture)
+ {
+-	self->uv_fd = open(UV_PATH, O_ACCMODE);
++	open_uv();
+ 
+ 	self->uvio_ioctl.argument_addr = (__u64)self->buffer;
+ 	self->uvio_ioctl.argument_len = variant->arg_size;
+@@ -159,7 +169,7 @@ FIXTURE(attest_fixture) {
+ 
+ FIXTURE_SETUP(attest_fixture)
+ {
+-	self->uv_fd = open(UV_PATH, O_ACCMODE);
++	open_uv();
+ 
+ 	self->uvio_ioctl.argument_addr = (__u64)&self->uvio_attest;
+ 	self->uvio_ioctl.argument_len = sizeof(self->uvio_attest);
+@@ -257,20 +267,4 @@ TEST_F(attest_fixture, att_inval_addr)
+ 	att_inval_addr_test(&self->uvio_attest.meas_addr, _metadata, self);
+ }
+ 
+-static void __attribute__((constructor)) __constructor_order_last(void)
+-{
+-	if (!__constructor_order)
+-		__constructor_order = _CONSTRUCTOR_ORDER_BACKWARD;
+-}
+-
+-int main(int argc, char **argv)
+-{
+-	int fd = open(UV_PATH, O_ACCMODE);
+-
+-	if (fd < 0)
+-		ksft_exit_skip("No uv-device or cannot access " UV_PATH  "\n"
+-			       "Enable CONFIG_S390_UV_UAPI and check the access rights on "
+-			       UV_PATH ".\n");
+-	close(fd);
+-	return test_harness_run(argc, argv);
+-}
++TEST_HARNESS_MAIN
 -- 
-2.45.0.215.g3402c0e53f-goog
+2.34.1
 
 
