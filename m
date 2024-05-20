@@ -1,126 +1,115 @@
-Return-Path: <kvm+bounces-17804-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17805-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD838CA4DA
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 01:03:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DE608CA4DF
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 01:09:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDC232820EB
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 23:03:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35EA1B215D6
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 23:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC03137C49;
-	Mon, 20 May 2024 23:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD78D137C21;
+	Mon, 20 May 2024 23:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LEq7Whtv"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Lu/DKLuY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1024501B
-	for <kvm@vger.kernel.org>; Mon, 20 May 2024 23:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3606937169
+	for <kvm@vger.kernel.org>; Mon, 20 May 2024 23:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716246197; cv=none; b=bSL3Eobi9g3zXUAhAzFm6WkmKzt/gBqst5Reybp10kw+mtBJsaXZezQHrSgExbQTNKHYNlgzo4ilsdltYO6jdyEodSMoAUmMweXWwyzsv76gYIbfNRdlw2r3OFLLbbijrnQo3ZKxi/fSXXIA0lScJRgobbPKrN9OKko9RLmIYV8=
+	t=1716246575; cv=none; b=uQxJDGbHWztAeWySSy+0uttGirFDWRA8mM8+lcNKbZ31m+6wnzVdwTOkxzhiPz472Acj1VYnQtsuFTrhkWc81RK0nLJ5vJILnn5fhIZZYDDGDlLdcG16jdN0hO9zG8olw2lCzGbBzf+CbCXk39SuGC2lQkx2ROiRjSELDsrRzOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716246197; c=relaxed/simple;
-	bh=mugvv6GTjodKhKIZg1AglPimA8bMFie87VLuCIwMXKA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D3YTMuj1tFp+jEGcmGauftOfjF2IsbAmDPDREtiG+m6mcWRc/pZxj5DvypMsqQTbbZ800b/qYNxBaNieh3KjY+FwWhxZ36fgT/ZMAVb9pdylBZ0xR//PnTURwkFxtspq8I/rZrUUAzRNggL6zM6AmWKd/0egVY3PjKc8bFR3X8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LEq7Whtv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716246194;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mcKWgmoG9CCcTrBbQPy1kCJWXglcuwtpryOOdLXdj5Q=;
-	b=LEq7WhtvyBWlWtIliesZfiz178VY+vWZXDrXTN7CjmYEqyoblonTaImNSe2s5rt+va61x7
-	qXHzYvjIB5Q+EjcC4LyZcFyInddsf4p6LGcan1E/5y69VMzlG0kIoZe2FpRtqouxs3Y2cw
-	yOGl19n4yKSZqQoj1QqcH2aNAciZQOc=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-rPqmX-jBMEar1ncbb41wxQ-1; Mon, 20 May 2024 19:03:13 -0400
-X-MC-Unique: rPqmX-jBMEar1ncbb41wxQ-1
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7e1d6c70aeaso1056491239f.3
-        for <kvm@vger.kernel.org>; Mon, 20 May 2024 16:03:12 -0700 (PDT)
+	s=arc-20240116; t=1716246575; c=relaxed/simple;
+	bh=oURIQ8GCHpqOqM5pA4QbJ6dnCOCQctIKVZEaL9xBDAQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cDzX+yMMV6/0b7UyLeYBCacgoeV8KfzrAoHSUGJs/s0HsVfYNIEow7pBCtmDlB1sxXcvfYmWKmayeOqUvWJ8B6IOI36texBtToqY+G6WTiNOiMqiYpYPYPQaUifWMbgbEPgz8ChRL7vcZaIm0Afd6UtoqwqTut8iXF+aW+PvpNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Lu/DKLuY; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-572c65cea55so13045212a12.0
+        for <kvm@vger.kernel.org>; Mon, 20 May 2024 16:09:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1716246571; x=1716851371; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=EvM0FitcwUpr4p4+bW7JYL4NlfErVMc9GVAB1zbL7e0=;
+        b=Lu/DKLuYjOPTR1jQf3YIaSgHxl5YhlQZd4RniEtAH4v/d5R/dChbb8j1f3XtOzlBWl
+         LGVlJ/QrlUDrMNqmHvI4ptmj94HW1OjkvDigB47L/j5ZxtOwC5Ntro/eBXcd3HvPK2Jq
+         p9jhw3cJE4p0M8im2KSNa+pQl1IxcK9ysMT1M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716246192; x=1716850992;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mcKWgmoG9CCcTrBbQPy1kCJWXglcuwtpryOOdLXdj5Q=;
-        b=NAZa1n5E6ZT/1BaDIChDe6Qfo8u9sHVOtTcXPj65ATHGkjG25hmCnrzf2QV49X58kC
-         i+3OoQqo7u0dKBXxNZM1DD9k0Av7AT1VDo7j59b4Po8daTtVErCE21VRhvOOBo+Jwtwi
-         /fTaOI6kkJdJ2Uby16tIKiGRf9PU5+3Pp44H29dP0ullQgeReOQz3a2KftQl8BZdfH03
-         F+uFEJ9uN4Hv6lrMvmKInvauEW6wOCXXUJei0LVMk+aaK7Gosvvacp7fN3hl6dIXrMiu
-         zVoVUTS61coXJ3R+esdzpSprGMKx3oAgM5zXAi3QTWv33BmOUUxrdix7omg3rrD1Ktpr
-         //Fw==
-X-Gm-Message-State: AOJu0YwcT2Cz3i6Ar07NJRvCUis931+jbS4CqDpnoumvSYLXctbpND/T
-	Hzg1e+EXdjdtnaP0bRxDBDAmt6lTzrH1oDIzhQhTOaEnsqCyZzZ9sH1uQWk4g+nI13LGS7M8Mav
-	mMJ5RkqdczJCpvje8o/p574/nTr1JAaU/HBk/AXCFXfVHqK+Taw==
-X-Received: by 2002:a6b:904:0:b0:7de:9519:8b43 with SMTP id ca18e2360f4ac-7e1b51a206cmr3407010939f.1.1716246192229;
-        Mon, 20 May 2024 16:03:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGocXMF+FgVHb/xFLIP90ALn89HrQL5pIshnNgMRZC94oxAXWYPxaMFx907CCVGsNW1Ox+aUg==
-X-Received: by 2002:a6b:904:0:b0:7de:9519:8b43 with SMTP id ca18e2360f4ac-7e1b51a206cmr3407009439f.1.1716246191902;
-        Mon, 20 May 2024 16:03:11 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-489376fb1fcsm6672822173.165.2024.05.20.16.03.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 20 May 2024 16:03:11 -0700 (PDT)
-Date: Mon, 20 May 2024 17:03:09 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- linux-kernel@vger.kernel.org
-Subject: Re: [GIT PULL] VFIO updates for v6.10-rc1
-Message-ID: <20240520170309.76b60123.alex.williamson@redhat.com>
-In-Reply-To: <CAHk-=wiecagwwqGQerx35p+1e2jwjjEbXCphKjPO6Q97DrtYPQ@mail.gmail.com>
-References: <20240520121223.5be06e39.alex.williamson@redhat.com>
-	<CAHk-=wiecagwwqGQerx35p+1e2jwjjEbXCphKjPO6Q97DrtYPQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1716246571; x=1716851371;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EvM0FitcwUpr4p4+bW7JYL4NlfErVMc9GVAB1zbL7e0=;
+        b=HmogNJ72Osxh2Z5ZQ6VXpge58RUdmpBsPsh24E471YDj3OuyryVQ2hMiMfjy+80LDE
+         RLQPQyMpdzNiZ0Wi5k71uSjPLnSqGQQbKVOCVte8zNt/YAJAb3tlQyEvPIG/xJ66rRef
+         mBx6OdsBILwI4RvZI5GyMuk7VzUv1NdM03z0qS9gB4GfD9Agm08heVn4yIbLlidt+F6a
+         VSNh5dyH5pM8M+wGbxh4WBZuUPf+GZ+F76lJ6KQRjryD8bOE8Iojx9GXIMfxgr5WKrgy
+         F7Rs+dF4iXY3ZQGp3DbYocvgDhYq06j70h7cBZZ7lbU3KUXTvC+8v1yReAa9Y8p5LWCf
+         vtQQ==
+X-Gm-Message-State: AOJu0Yyj/YbXb/xexEPRRkM+57gZxTE0g7xE72w90b3+VKmteX+ejbh7
+	P/kYjU3g2V6HfQr3gUnKoeokpyhyBzU1j52Ox0dP4b0v7AqKqWWhRLjxSBxWFIjMuQ1yn7H6+vM
+	7tih1fw==
+X-Google-Smtp-Source: AGHT+IEtuuzzPDEKgaSEfIAxbmmvFqno1kv7aX/r/Gnn1zai7G08ncfA3YeZYoB4rYpO5+d/zrSzTw==
+X-Received: by 2002:a50:c092:0:b0:56e:7281:55eb with SMTP id 4fb4d7f45d1cf-5752b474748mr6024046a12.9.1716246571407;
+        Mon, 20 May 2024 16:09:31 -0700 (PDT)
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com. [209.85.218.54])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5733bed0035sm15596723a12.50.2024.05.20.16.09.30
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 20 May 2024 16:09:31 -0700 (PDT)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a59cdd185b9so1199128366b.1
+        for <kvm@vger.kernel.org>; Mon, 20 May 2024 16:09:30 -0700 (PDT)
+X-Received: by 2002:a17:907:110c:b0:a5a:24ab:f5e with SMTP id
+ a640c23a62f3a-a5d5c824bedmr702435466b.25.1716246570519; Mon, 20 May 2024
+ 16:09:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240520121223.5be06e39.alex.williamson@redhat.com>
+ <CAHk-=wiecagwwqGQerx35p+1e2jwjjEbXCphKjPO6Q97DrtYPQ@mail.gmail.com> <20240520170309.76b60123.alex.williamson@redhat.com>
+In-Reply-To: <20240520170309.76b60123.alex.williamson@redhat.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 20 May 2024 16:09:13 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjGbNWK6aOcprocyO8qLySpzJ5-eZzC3if=gb-Fh8NsiA@mail.gmail.com>
+Message-ID: <CAHk-=wjGbNWK6aOcprocyO8qLySpzJ5-eZzC3if=gb-Fh8NsiA@mail.gmail.com>
+Subject: Re: [GIT PULL] VFIO updates for v6.10-rc1
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 20 May 2024 15:05:26 -0700
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On Mon, 20 May 2024 at 16:03, Alex Williamson
+<alex.williamson@redhat.com> wrote:
+>
+> Sorry.  In my case I've looked through logs and I've seen bare merges in
+> the past and I guess I assumed the reasoning here would be more obvious.
 
-> On Mon, 20 May 2024 at 11:12, Alex Williamson
-> <alex.williamson@redhat.com> wrote:
-> >
-> > I've provided the simplified diffstat from a temporary merge branch to
-> > avoid the noise of merging QAT dependencies from a branch provided by
-> > Herbert.  
-> 
-> The diffstat looks good, but the merge itself sucks.
-> 
-> This is the totality of the "explanation" in the merge commit: "".
-> 
-> Yup. That's it. Nothing. Nada.
-> 
-> If you cannot explain *why* you merged a branch from some other tree,
-> youi damn well shouldn't have done the merge in the first place.
-> 
-> Merge commits need explanations just like regular commits do. In fact,
-> because there isn't some obvious diff attached to them, explanations
-> are arguably even more needed.
-> 
-> I've pulled this, but dammit, why does this keep happening?
+Yeah, the bare merges in the past is why I'm so frustrated about this
+all. I don't understand why this keeps happening so much.
 
-Sorry.  In my case I've looked through logs and I've seen bare merges in
-the past and I guess I assumed the reasoning here would be more obvious.
-Clearly that's wrong.  I'll do better.  Thanks,
+Who do people keep doing this thing where they just think "I don't
+need to explain this thing".
 
-Alex
+Yes, git made merges easy. It was one of the design goals, since (a) I
+do a lot of them and (b) it's what EVERY OTHER SCM historically
+absolutely sucked at.
 
+But just because merging used to be hard, and git made it so easy,
+doesn't mean that people should then not even explain them.
+
+I complained to Andrew this merge window about one of his pull
+requests that had _seven_ pointless and totally unexplained merges.
+It's like people do this operation in their sleep or something, and
+don't think about how big an operation a merge is.
+
+            Linus
 
