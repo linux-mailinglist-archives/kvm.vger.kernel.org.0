@@ -1,109 +1,72 @@
-Return-Path: <kvm+bounces-17756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D9A8C9D02
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 14:14:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B2AA8C9D2A
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 14:26:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B554B28254A
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 12:14:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BFE51C21ECC
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 12:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A89854F86;
-	Mon, 20 May 2024 12:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9A6956760;
+	Mon, 20 May 2024 12:26:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738125337F;
-	Mon, 20 May 2024 12:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+Received: from njjs-sys-mailin01.njjs.baidu.com (mx314.baidu.com [180.101.52.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8543153E3D
+	for <kvm@vger.kernel.org>; Mon, 20 May 2024 12:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.101.52.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716207282; cv=none; b=JYS06gJzjAmbdYO+NovEmIf3V2CJaIAK7r18/ZHlLf7hEaiZnkuWC6jaSqfNR1UFx4VL0fe7HxMmoB+RWrMjXL4CXSST/m9+l8CuFWZu/H5Amkq6ktEicHaPay4R3D36E0r0UpHGBBbpd0JDsc40CMQrQj7IhZyzQv7wgNgzw14=
+	t=1716207961; cv=none; b=GfDXXZKMFUmLUkoJUm/QZ0egm/C3pRQSDJHBXZs25ie/Ai/W0SrpD27XMR7xjnJaMPlJVn8hom8DLXnhNHVMhqDH+Q49bgE4AbHwpQq+DGb45R5SmxXsl6jSWW0fge+4nNEVVB+sVpjhuRzE0HVVnQQeOJUvF4jg3zFr9t/+bHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716207282; c=relaxed/simple;
-	bh=mvD6sd9vndZ7Sf1mQsWKHKUTPiFurzaR4/bRViw4zaM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=L05/KGs2hCckn+tPQe+1ijkD6baJbOiBTZFYGwW9JL4ZLDqht7sl5QhZjAr+WAvubhodC8zZiwPk0GvC/zdGFqFHJWT5nASJsDAiFQBaAgb9tWRe6n0WSWGSle8E0APm/ogbTbxX+raDXM8HvkIG6R9W/PFuoY4Akd5xrJ5SVNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VjbcJ3M3dz2Cj98;
-	Mon, 20 May 2024 19:55:44 +0800 (CST)
-Received: from dggpemm500006.china.huawei.com (unknown [7.185.36.236])
-	by mail.maildlp.com (Postfix) with ESMTPS id B43F414037E;
-	Mon, 20 May 2024 19:59:11 +0800 (CST)
-Received: from huawei.com (10.173.134.152) by dggpemm500006.china.huawei.com
- (7.185.36.236) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Mon, 20 May
- 2024 19:59:11 +0800
-From: <zhoushuling@huawei.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>
-CC: <weiqi4@huawei.com>, <zhoushuling@huawei.com>, <wanpengli@tencent.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: LAPIC: Fix an inversion error when a negative value assigned to lapic_timer.timer_advance_ns
-Date: Mon, 20 May 2024 19:53:34 +0800
-Message-ID: <20240520115334.852510-1-zhoushuling@huawei.com>
-X-Mailer: git-send-email 2.23.0
+	s=arc-20240116; t=1716207961; c=relaxed/simple;
+	bh=SaQsi/c6OIaccgd4DL6Fzj7L7E7N0I3JG/mNdItCwCA=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=mVsOkneFKlM8hqKl845KbjLUza+7r+spZ6txrRqOVa1JiOcI2UjQGQsit1pYYG6Oh44a/J4Ynq86kQlBmwwWi+KuTTuxT6/Mj1buk+qs7oa47j3sINM5F7GwUQICCSEAoYUAmhxZqQZ1G+xriurXS7VKLz9DLstBcCAL7P+jZSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=180.101.52.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
+	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id BA0757F0005C;
+	Mon, 20 May 2024 20:09:00 +0800 (CST)
+From: Li RongQing <lirongqing@baidu.com>
+To: seanjc@google.com,
+	pbonzini@redhat.com,
+	kvm@vger.kernel.org,
+	thomas.lendacky@amd.com,
+	yosryahmed@google.com,
+	pgonda@google.com
+Cc: Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH v3 0/3] KVM: SVM: refine snp_safe_alloc_page() implementation
+Date: Mon, 20 May 2024 20:08:55 +0800
+Message-Id: <20240520120858.13117-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.9.4
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500006.china.huawei.com (7.185.36.236)
 
-From: Shuling Zhou <zhoushuling@huawei.com>
+This series include three changes for snp_safe_alloc_page:
+1. remove useless input parameter
+2. not account memory allocation for per-CPU svm_data
+3. Consider NUMA affinity when allocating per-CPU save_area
 
-After 'commit 0e6edceb8f18 ("KVM: LAPIC: Fix lapic_timer_advance_ns
-parameter overflow")',a negative value can be assigned to
-lapic_timer_advance_ns, when it is '-1', the kvm_create_lapic()
-will judge it and turns on adaptive tuning of timer advancement.
-However, when lapic_timer_advance_ns=-2, it will be assigned to
-an uint variable apic->lapic_timer.timer_advance_ns, the
-apic->lapic_timer.timer_advance_ns of each vCPU will become a huge
-value. When a VM is started, the VM is stuck in the
-"
-[    2.669717] ACPI: Core revision 20130517
-[    2.672378] ACPI: All ACPI Tables successfully acquired
-[    2.673309] ftrace: allocating 29651 entries in 116 pages
-[    2.698797] Enabling x2apic
-[    2.699431] Enabled x2apic
-[    2.700160] Switched APIC routing to physical x2apic.
-[    2.701644] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
-[    2.702575] smpboot: CPU0: Intel(R) Xeon(R) Platinum 8378A CPU @ 3.00GHz (fam: 06, model: 6a, stepping: 06)
-..........
-"
+Diff V3: rebase
+Diff V2: remove useless input parameter and not account per-CPU svm_data
 
-'Fixes: 0e6edceb8f18 ("KVM: LAPIC: Fix lapic_timer_advance_ns
-parameter overflow")'
+Li RongQing (3):
+  KVM: SVM: remove useless input parameter in snp_safe_alloc_page
+  KVM: SVM: not account memory allocation for per-CPU svm_data
+  KVM: SVM: Consider NUMA affinity when allocating per-CPU save_area
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <sean.j.christopherson@intel.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Signed-off-by: Shuling Zhou<zhoushuling@huawei.com>
----
- arch/x86/kvm/lapic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/nested.c |  2 +-
+ arch/x86/kvm/svm/sev.c    |  6 +++---
+ arch/x86/kvm/svm/svm.c    |  8 ++++----
+ arch/x86/kvm/svm/svm.h    | 18 +++++++++++++++---
+ 4 files changed, 23 insertions(+), 11 deletions(-)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index ebf41023be38..5feeb889ddb6 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2848,7 +2848,7 @@ int kvm_create_lapic(struct kvm_vcpu *vcpu, int timer_advance_ns)
- 	if (timer_advance_ns == -1) {
- 		apic->lapic_timer.timer_advance_ns = LAPIC_TIMER_ADVANCE_NS_INIT;
- 		lapic_timer_advance_dynamic = true;
--	} else {
-+	} else if (timer_advance_ns >= 0) {
- 		apic->lapic_timer.timer_advance_ns = timer_advance_ns;
- 		lapic_timer_advance_dynamic = false;
- 	}
 -- 
-2.27.0
+2.9.4
 
 
