@@ -1,333 +1,191 @@
-Return-Path: <kvm+bounces-17749-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17750-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8661B8C99C1
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 10:21:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0987A8C9A01
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 10:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA3C21C21237
-	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 08:21:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D8811F21ACA
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 08:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2011CA8D;
-	Mon, 20 May 2024 08:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFB61CA87;
+	Mon, 20 May 2024 08:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PJmc7lYp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PPLSaFYE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509182CCBE;
-	Mon, 20 May 2024 08:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECF2AE554
+	for <kvm@vger.kernel.org>; Mon, 20 May 2024 08:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716193267; cv=none; b=S2UMg9syyEQB+xy/ppbO7mPC/OoqsAIshlzG7kKuSCuYilxcTCsEPsQmu+XtyZ9M4kJBYhQ9n/1ZCshTVDkbrmOVgEsRHGZt12g40nFNztKC4OUslXHW/wu4+peZTLs3/AanG8ryKVCflWIaus3mLaJC5q6MyGykzAvWh5OJveI=
+	t=1716195337; cv=none; b=T3HwuhdPla7jtauFYzZt/xh1+umI2V54UGKuHVjKKtB85wn55iWClg0SZoX8II3+BQRPw2xM+6pqbKoAfo7K5qM5u2OnE0mYd0USb2/dSJC4/B3zxa1BYGtBlgWjOIxNp+VrjW4q5lxyNKfzn7pZK299nYLoqrkhj+Ts+pxpiPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716193267; c=relaxed/simple;
-	bh=nYOXwfkD4Aagx4HIXM0yufDLbQFaKlb+z99rD9eDC1I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VlegGgau9pJLnnjwEqQhSYlQkkQGtR/CI6R0f89niS9ez+5aXavpq2/RquOTe8AvYSDN5hI/OA4kpiNbf21QdI0KNDbtkvE4MSns3r9zLPJgfMT48PoQy+WIXa03UdT1s4nUjsNkAarBGEZQvI0JIUxwnZLGgrkVDCPjAsFpAQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PJmc7lYp; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44K62wlh003173;
-	Mon, 20 May 2024 08:20:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=YI+s/9jNr6WRySWWHUvNpGEk6ucoohYRHUK1CkL4ZOQ=;
- b=PJmc7lYpDNLN572Zl4hjgyvUDv5VUmcPjU9FMoH0E98LyD3hD4kIKry4rnx0v1+HTckA
- zyLtuG8+nqUipw4NlZ+PI7k3j/9ops0pJBzczrvqom3Lf+tPWTg+TC7WzI7s3kClNvla
- QMBqmWsKlUE7dAaEL5cT39V6aERxlLd8BRzd3TOZstl34OXAg5UbmmpqYpddK54sxRBX
- vo7QXu/OcPHEnMKQwg/ofjADjc6hga1pm/XGzSdnxGci1yFr4UYoZrw8PCMDQYYJbTY9
- 5ZxExJdX1rVQEcu18mVk1gE4ZgxAcNP0aJcHz0hYFglIv682grntB0C+15X2FNLrvI11 TA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y80w908u4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 May 2024 08:20:49 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44K8KmQY013615;
-	Mon, 20 May 2024 08:20:48 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y80w908u0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 May 2024 08:20:48 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44K6bAZE026443;
-	Mon, 20 May 2024 08:20:48 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y785m6kkv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 20 May 2024 08:20:47 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44K8KfIK54329746
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 20 May 2024 08:20:43 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9CD192004D;
-	Mon, 20 May 2024 08:20:41 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6DB3020040;
-	Mon, 20 May 2024 08:20:39 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.in.ibm.com (unknown [9.204.206.66])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 20 May 2024 08:20:39 +0000 (GMT)
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        naveen.n.rao@linux.ibm.com, clg@kaod.org
-Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RESEND PATCH 3/3] arch/powerpc/kvm: Reduce lock contention by moving spinlock from ics to irq_state
-Date: Mon, 20 May 2024 13:50:10 +0530
-Message-ID: <20240520082014.140697-4-gautam@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240520082014.140697-1-gautam@linux.ibm.com>
-References: <20240520082014.140697-1-gautam@linux.ibm.com>
+	s=arc-20240116; t=1716195337; c=relaxed/simple;
+	bh=zOveTwTANzAYimu3FBsiFyK8fzKWl7a/ASIdBtEaTDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgbAvXN7vqM0hEqof3CSblfWPEhhfYkde83UibjiEmlgIu20cTH2o3KnCJ+nLvgXePIxG5mXuCEAY5LZnOi6wFRrWPbedJSnCNq+T5ADwggcfhckVmlnaH62pqsdFyhJv1V0FXBjfbqXrFvRR4IHM/b6OSzQ1gavs2UcSRa6VhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PPLSaFYE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716195334;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ude2J6/YxYo8bNsBtIomuhFYlpHiE03QinnQpgm+Mes=;
+	b=PPLSaFYEObnLfVw/xENIYpquSU1MtGVnKtZHCWkCE5DHer3YVuTtP5/DYelCO09rnEAqGY
+	vvTtKp5Br0YF3gEWkh5nLzfS19jXeatJ7K9Tbq6IyjCiTgoa5/ZOSmyzdyeX36UR9X/8cQ
+	qNKMhyHlERCqBRe0utxHBfnJlkIi3lQ=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-445-mCZvVvVaN0yOtAjXR4jyxw-1; Mon, 20 May 2024 04:55:33 -0400
+X-MC-Unique: mCZvVvVaN0yOtAjXR4jyxw-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6a884aca64bso23809236d6.2
+        for <kvm@vger.kernel.org>; Mon, 20 May 2024 01:55:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716195333; x=1716800133;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ude2J6/YxYo8bNsBtIomuhFYlpHiE03QinnQpgm+Mes=;
+        b=opU6autZEi2FvCOwQPP86PefeGKk2RMLBt5C3veUXpvkujUYDzVSdSmNmTvBpqff1l
+         V1gyVlRFh/MePlS3Wi7/dubBE8Ru/gExwG6QJLF6Ge5xLR6Foytss3WHYW7XJtfeWozu
+         XIoOKISIOHVInXO8tCrwa53gcssE/HeNMqjhKB3ULOxrh3AY5gn+/k9PyaAE6WG/YFDO
+         Kt6RDA2Qq7lpSWovk7E7/NhQ8HXI2zic04UfLaoyD37Abze0rBol3RuJ+Yjko8+LkIKl
+         Aft4A8N+3sUmv5pqVUs0F/OnHnus09O0eqzEcUui/35pM2R4bxGQ3aGED9BSHUT1/a2U
+         XJxA==
+X-Forwarded-Encrypted: i=1; AJvYcCW9AuKqVUgbwOkhNGcTIXtmFD6EfPmtDXJxnN5cHkb0kgRn6PB2uMEWQlNZ0pfV7Lh2Y9RRen+bw9q15pBTczS4i4iq
+X-Gm-Message-State: AOJu0Yx8ZvUw0ojNQNsrpSdu4BGm85pNBjz51k82XLZRFZPyzxkLltiv
+	zxMiDDp2pr6RsuThx2/S/Z/51sMXZp4EJ4yXZzQi5nJSu/oDOl7oG8YEQmQIJXfCwQhyeiCSQ79
+	HHYTecMn5hMOTRWR/nXiumJmitm1U3ac3D5kn9xI28xL6DNkKyw==
+X-Received: by 2002:a05:6214:5d05:b0:69b:2523:fcd3 with SMTP id 6a1803df08f44-6a16825d79dmr338328336d6.60.1716195332704;
+        Mon, 20 May 2024 01:55:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFR8gdnVof1nmsWGREGF+KmJcs+xK22+zO3SVF1/gM6fpWReTV080ow/jA5YNvO2eD5VdzcYw==
+X-Received: by 2002:a05:6214:5d05:b0:69b:2523:fcd3 with SMTP id 6a1803df08f44-6a16825d79dmr338328186d6.60.1716195332350;
+        Mon, 20 May 2024 01:55:32 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-12-25-77.business.telecomitalia.it. [87.12.25.77])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f194da1sm109949106d6.67.2024.05.20.01.55.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 May 2024 01:55:31 -0700 (PDT)
+Date: Mon, 20 May 2024 10:55:26 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	netdev@vger.kernel.org, Alexander Graf <graf@amazon.com>, agraf@csgraf.de, 
+	stefanha@redhat.com
+Subject: Re: How to implement message forwarding from one CID to another in
+ vhost driver
+Message-ID: <4i525r6irzjgibqqtrs3qzofqfifws2k3fmzotg37pyurs5wkd@js54ugamyyin>
+References: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: ByXVqzFTru2cFNVeoqW3aaiIQL3nYDo0
-X-Proofpoint-GUID: -nwvkA9zgALh1NB1I92k0ZlrqQJ16Ln8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.11.176.26
- definitions=2024-05-20_04,2024-05-17_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
- bulkscore=0 malwarescore=0 clxscore=1015 adultscore=0 spamscore=0
- mlxlogscore=390 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405200068
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
 
-Take a spinlock on state of an IRQ instead of an entire ICS. This
-improves scalability by reducing contention.
+Hi Dorjoy,
 
-Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_hv_rm_xics.c |  8 ++---
- arch/powerpc/kvm/book3s_xics.c       | 44 ++++++++++++----------------
- arch/powerpc/kvm/book3s_xics.h       |  2 +-
- 3 files changed, 23 insertions(+), 31 deletions(-)
+On Sat, May 18, 2024 at 04:17:38PM GMT, Dorjoy Chowdhury wrote:
+>Hi,
+>
+>Hope you are doing well. I am working on adding AWS Nitro Enclave[1]
+>emulation support in QEMU. Alexander Graf is mentoring me on this work. A v1
+>patch series has already been posted to the qemu-devel mailing list[2].
+>
+>AWS nitro enclaves is an Amazon EC2[3] feature that allows creating isolated
+>execution environments, called enclaves, from Amazon EC2 instances, which are
+>used for processing highly sensitive data. Enclaves have no persistent storage
+>and no external networking. The enclave VMs are based on Firecracker microvm
+>and have a vhost-vsock device for communication with the parent EC2 instance
+>that spawned it and a Nitro Secure Module (NSM) device for cryptographic
+>attestation. The parent instance VM always has CID 3 while the enclave VM gets
+>a dynamic CID. The enclave VMs can communicate with the parent instance over
+>various ports to CID 3, for example, the init process inside an enclave sends a
+>heartbeat to port 9000 upon boot, expecting a heartbeat reply, letting the
+>parent instance know that the enclave VM has successfully booted.
+>
+>The plan is to eventually make the nitro enclave emulation in QEMU standalone
+>i.e., without needing to run another VM with CID 3 with proper vsock
 
-diff --git a/arch/powerpc/kvm/book3s_hv_rm_xics.c b/arch/powerpc/kvm/book3s_hv_rm_xics.c
-index e42984878503..178bc869b519 100644
---- a/arch/powerpc/kvm/book3s_hv_rm_xics.c
-+++ b/arch/powerpc/kvm/book3s_hv_rm_xics.c
-@@ -308,7 +308,7 @@ static void icp_rm_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
- 	state = &ics->irq_state[src];
- 
- 	/* Get a lock on the ICS */
--	arch_spin_lock(&ics->lock);
-+	arch_spin_lock(&state->lock);
- 
- 	/* Get our server */
- 	if (!icp || state->server != icp->server_num) {
-@@ -368,7 +368,7 @@ static void icp_rm_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
- 		 * Delivery was successful, did we reject somebody else ?
- 		 */
- 		if (reject && reject != XICS_IPI) {
--			arch_spin_unlock(&ics->lock);
-+			arch_spin_unlock(&state->lock);
- 			icp->n_reject++;
- 			new_irq = reject;
- 			check_resend = 0;
-@@ -397,13 +397,13 @@ static void icp_rm_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
- 		smp_mb();
- 		if (!icp->state.need_resend) {
- 			state->resend = 0;
--			arch_spin_unlock(&ics->lock);
-+			arch_spin_unlock(&state->lock);
- 			check_resend = 0;
- 			goto again;
- 		}
- 	}
-  out:
--	arch_spin_unlock(&ics->lock);
-+	arch_spin_unlock(&state->lock);
- }
- 
- static void icp_rm_down_cppr(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
-diff --git a/arch/powerpc/kvm/book3s_xics.c b/arch/powerpc/kvm/book3s_xics.c
-index 1dc2f77571e7..466c92cf49fb 100644
---- a/arch/powerpc/kvm/book3s_xics.c
-+++ b/arch/powerpc/kvm/book3s_xics.c
-@@ -36,21 +36,13 @@
-  * LOCKING
-  * =======
-  *
-- * Each ICS has a spin lock protecting the information about the IRQ
-- * sources and avoiding simultaneous deliveries of the same interrupt.
-+ * Each IRQ has a spin lock protecting its state sources and avoiding
-+ * simultaneous deliveries of the same interrupt.
-  *
-  * ICP operations are done via a single compare & swap transaction
-  * (most ICP state fits in the union kvmppc_icp_state)
-  */
- 
--/*
-- * TODO
-- * ====
-- *
-- * - Make ICS lockless as well, or at least a per-interrupt lock or hashed
-- *   locks array to improve scalability
-- */
--
- /* -- ICS routines -- */
- 
- static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
-@@ -142,7 +134,7 @@ static bool write_xive(struct kvmppc_xics *xics, struct kvmppc_ics *ics,
- 	unsigned long flags;
- 
- 	local_irq_save(flags);
--	arch_spin_lock(&ics->lock);
-+	arch_spin_lock(&state->lock);
- 
- 	state->server = server;
- 	state->priority = priority;
-@@ -154,7 +146,7 @@ static bool write_xive(struct kvmppc_xics *xics, struct kvmppc_ics *ics,
- 		deliver = true;
- 	}
- 
--	arch_spin_unlock(&ics->lock);
-+	arch_spin_unlock(&state->lock);
- 	local_irq_restore(flags);
- 
- 	return deliver;
-@@ -207,10 +199,10 @@ int kvmppc_xics_get_xive(struct kvm *kvm, u32 irq, u32 *server, u32 *priority)
- 	state = &ics->irq_state[src];
- 
- 	local_irq_save(flags);
--	arch_spin_lock(&ics->lock);
-+	arch_spin_lock(&state->lock);
- 	*server = state->server;
- 	*priority = state->priority;
--	arch_spin_unlock(&ics->lock);
-+	arch_spin_unlock(&state->lock);
- 	local_irq_restore(flags);
- 
- 	return 0;
-@@ -406,7 +398,7 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
- 
- 	/* Get a lock on the ICS */
- 	local_irq_save(flags);
--	arch_spin_lock(&ics->lock);
-+	arch_spin_lock(&state->lock);
- 
- 	/* Get our server */
- 	if (!icp || state->server != icp->server_num) {
-@@ -467,7 +459,7 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
- 		 * Delivery was successful, did we reject somebody else ?
- 		 */
- 		if (reject && reject != XICS_IPI) {
--			arch_spin_unlock(&ics->lock);
-+			arch_spin_unlock(&state->lock);
- 			local_irq_restore(flags);
- 			new_irq = reject;
- 			check_resend = false;
-@@ -497,14 +489,14 @@ static void icp_deliver_irq(struct kvmppc_xics *xics, struct kvmppc_icp *icp,
- 		smp_mb();
- 		if (!icp->state.need_resend) {
- 			state->resend = 0;
--			arch_spin_unlock(&ics->lock);
-+			arch_spin_unlock(&state->lock);
- 			local_irq_restore(flags);
- 			check_resend = false;
- 			goto again;
- 		}
- 	}
-  out:
--	arch_spin_unlock(&ics->lock);
-+	arch_spin_unlock(&state->lock);
- 	local_irq_restore(flags);
- }
- 
-@@ -992,20 +984,20 @@ static int xics_debug_show(struct seq_file *m, void *private)
- 		seq_printf(m, "=========\nICS state for ICS 0x%x\n=========\n",
- 			   icsid);
- 
--		local_irq_save(flags);
--		arch_spin_lock(&ics->lock);
- 
- 		for (i = 0; i < KVMPPC_XICS_IRQ_PER_ICS; i++) {
- 			struct ics_irq_state *irq = &ics->irq_state[i];
-+			local_irq_save(flags);
-+			arch_spin_lock(&irq->lock);
- 
- 			seq_printf(m, "irq 0x%06x: server %#x prio %#x save prio %#x pq_state %d resend %d masked pending %d\n",
- 				   irq->number, irq->server, irq->priority,
- 				   irq->saved_priority, irq->pq_state,
- 				   irq->resend, irq->masked_pending);
- 
-+			arch_spin_unlock(&irq->lock);
-+			local_irq_restore(flags);
- 		}
--		arch_spin_unlock(&ics->lock);
--		local_irq_restore(flags);
- 	}
- 	return 0;
- }
-@@ -1189,7 +1181,7 @@ static int xics_get_source(struct kvmppc_xics *xics, long irq, u64 addr)
- 
- 	irqp = &ics->irq_state[idx];
- 	local_irq_save(flags);
--	arch_spin_lock(&ics->lock);
-+	arch_spin_lock(&irqp->lock);
- 	ret = -ENOENT;
- 	if (irqp->exists) {
- 		val = irqp->server;
-@@ -1214,7 +1206,7 @@ static int xics_get_source(struct kvmppc_xics *xics, long irq, u64 addr)
- 
- 		ret = 0;
- 	}
--	arch_spin_unlock(&ics->lock);
-+	arch_spin_unlock(&irqp->lock);
- 	local_irq_restore(flags);
- 
- 	if (!ret && put_user(val, ubufp))
-@@ -1254,7 +1246,7 @@ static int xics_set_source(struct kvmppc_xics *xics, long irq, u64 addr)
- 		return -EINVAL;
- 
- 	local_irq_save(flags);
--	arch_spin_lock(&ics->lock);
-+	arch_spin_lock(&irqp->lock);
- 	irqp->server = server;
- 	irqp->saved_priority = prio;
- 	if (val & KVM_XICS_MASKED)
-@@ -1272,7 +1264,7 @@ static int xics_set_source(struct kvmppc_xics *xics, long irq, u64 addr)
- 	if (val & KVM_XICS_QUEUED)
- 		irqp->pq_state |= PQ_QUEUED;
- 	irqp->exists = 1;
--	arch_spin_unlock(&ics->lock);
-+	arch_spin_unlock(&irqp->lock);
- 	local_irq_restore(flags);
- 
- 	if (val & KVM_XICS_PENDING)
-diff --git a/arch/powerpc/kvm/book3s_xics.h b/arch/powerpc/kvm/book3s_xics.h
-index feeb0897d555..1ee62b7a8fdf 100644
---- a/arch/powerpc/kvm/book3s_xics.h
-+++ b/arch/powerpc/kvm/book3s_xics.h
-@@ -45,6 +45,7 @@ struct ics_irq_state {
- 	u8  exists;
- 	int intr_cpu;
- 	u32 host_irq;
-+	arch_spinlock_t lock;
- };
- 
- /* Atomic ICP state, updated with a single compare & swap */
-@@ -95,7 +96,6 @@ struct kvmppc_icp {
- };
- 
- struct kvmppc_ics {
--	arch_spinlock_t lock;
- 	u16 icsid;
- 	struct ics_irq_state irq_state[KVMPPC_XICS_IRQ_PER_ICS];
- 	DECLARE_BITMAP(resend_map, KVMPPC_XICS_IRQ_PER_ICS);
--- 
-2.44.0
+If you don't have to launch another VM, maybe we can avoid vhost-vsock 
+and emulate virtio-vsock in user-space, having complete control over the 
+behavior.
+
+So we could use this opportunity to implement virtio-vsock in QEMU [4] 
+or use vhost-user-vsock [5] and customize it somehow.
+(Note: vhost-user-vsock already supports sibling communication, so maybe 
+with a few modifications it fits your case perfectly)
+
+[4] https://gitlab.com/qemu-project/qemu/-/issues/2095
+[5] https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock
+
+>communication support. For this to work, one approach could be to teach the
+>vhost driver in kernel to forward CID 3 messages to another CID N
+
+So in this case both CID 3 and N would be assigned to the same QEMU
+process?
+
+Do you have to allocate 2 separate virtio-vsock devices, one for the 
+parent and one for the enclave?
+
+>(set to CID 2 for host) i.e., it patches CID from 3 to N on incoming messages
+>and from N to 3 on responses. This will enable users of the
+
+Will these messages have the VMADDR_FLAG_TO_HOST flag set?
+
+We don't support this in vhost-vsock yet, if supporting it helps, we 
+might, but we need to better understand how to avoid security issues, so 
+maybe each device needs to explicitly enable the feature and specify 
+from which CIDs it accepts packets.
+
+>nitro-enclave machine
+>type in QEMU to run the necessary vsock server/clients in the host machine
+>(some defaults can be implemented in QEMU as well, for example, sending a reply
+>to the heartbeat) which will rid them of the cumbersome way of running another
+>whole VM with CID 3. This way, users of nitro-enclave machine in QEMU, could
+>potentially also run multiple enclaves with their messages for CID 3 forwarded
+>to different CIDs which, in QEMU side, could then be specified using a new
+>machine type option (parent-cid) if implemented. I guess in the QEMU side, this
+>will be an ioctl call (or some other way) to indicate to the host kernel that
+>the CID 3 messages need to be forwarded. Does this approach of
+
+What if there is already a VM with CID = 3 in the system?
+
+>forwarding CID 3 messages to another CID sound good?
+
+It seems too specific a case, if we can generalize it maybe we could 
+make this change, but we would like to avoid complicating vhost-vsock 
+and keep it as simple as possible to avoid then having to implement 
+firewalls, etc.
+
+So first I would see if vhost-user-vsock or the QEMU built-in device is 
+right for this use-case.
+
+Thanks,
+Stefano
+
+>
+>If this approach sounds good, I need some guidance on where the code
+>should be written in order to achieve this. I would greatly appreciate
+>any suggestions.
+>
+>Thanks.
+>
+>Regards,
+>Dorjoy
+>
+>[1] https://docs.aws.amazon.com/enclaves/latest/user/nitro-enclave.html
+>[2] https://mail.gnu.org/archive/html/qemu-devel/2024-05/msg03524.html
+>[3] https://aws.amazon.com/ec2/
+>
 
 
