@@ -1,99 +1,184 @@
-Return-Path: <kvm+bounces-17739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17740-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 034B88C9385
-	for <lists+kvm@lfdr.de>; Sun, 19 May 2024 07:50:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC5E8C97E8
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 04:22:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C6E0B20E73
-	for <lists+kvm@lfdr.de>; Sun, 19 May 2024 05:50:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0752F2851A6
+	for <lists+kvm@lfdr.de>; Mon, 20 May 2024 02:22:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E1012E5D;
-	Sun, 19 May 2024 05:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65875A937;
+	Mon, 20 May 2024 02:21:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="MBvHwGn5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G4hHBeCM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6661C2E;
-	Sun, 19 May 2024 05:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D43E552
+	for <kvm@vger.kernel.org>; Mon, 20 May 2024 02:21:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716097831; cv=none; b=rD8J8CwMF74rALt+iYZot6oGO9WMHXchrpQKWS+T8s1/4csYn9XJ7kU05T8ERUr/gKnHsYVEZJkzwNzGXVQTfTEijOv8Lctz6rqhwnlOzxmP7wf+FU46poPQs0hdyybJg6mHaFEIoPTFK7h0ig0TCzAn7RVsT26IKFadMRAHK+0=
+	t=1716171716; cv=none; b=Z2SDX0JbWxjrRj/7uX8lBLL3hOFLbbH0QdTGsDylB/GPkKakGYhbNUdbKScRsJ9htT+RVy4U/M/1UEzXRs4LoZ/5SJD6HN1xgzpvdNX0sgRy8ICGjtsDR+fYH+PNOVwVACrTLiEhY/yTsdml5PlmzpeVXH2AUEaTviAaw78IDhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716097831; c=relaxed/simple;
-	bh=0yvbC3YWgtKvkehK3zxwUez8A5+kamVe/0eOYjtGMTE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=H+fKHUZwfEPWLwtdzmefkcJYnXgXCpFc0a7Ir/jd7gelWANkG/IZcRmVCIhKxgf1m4hCmj0Ge2GMgLZEIAfTpJXStwVp4Sfqc9KdGSOMAvtaSD1vLYwYKuuyuJiIymWFYK285xbX6jAxKUAdqvTTEUPhE8FfOjeU4L1zmzaK6tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=MBvHwGn5; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1716097818; x=1716702618; i=markus.elfring@web.de;
-	bh=0yvbC3YWgtKvkehK3zxwUez8A5+kamVe/0eOYjtGMTE=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=MBvHwGn5D8wKrTfcIuMVWEPKNyz5OGw8+xk6J8t5zAX0lxUX4IhLAQ3OR4OIzOsh
-	 gww8LHPLafO2HtjL62UG+vuNpd+a12PVSsjgYgou2453FMBw/TpW1usdkFuE31zMy
-	 +aih5j7EPMSxuM459acLa8LauxwitxrleQlu+jKnOjJkDXYlFCqFqwQg3pAyay5vM
-	 AXv+faCJJKk3CEho8601znrbi3e0DOLcBOliwyauzhH60cf2N600/LuJI3STqC6n4
-	 Qpv5tEiM1Lg2HI+GxVn5r39CkWthmbQcONv5wTXiFvpcEFod0jnXpLsYacegdCUTy
-	 3Gk8z7QQJujvjFk4NA==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.82.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MGxQX-1sM3hZ1kpf-001zNa; Sun, 19
- May 2024 07:50:18 +0200
-Message-ID: <76413d53-4572-4a38-baff-8b01f6179c8e@web.de>
-Date: Sun, 19 May 2024 07:50:14 +0200
+	s=arc-20240116; t=1716171716; c=relaxed/simple;
+	bh=mYRqEBC5MGEjOQQe/kms6BK1VSWz+BSJENKqOfBTr8k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Y+Gd8xevR4xYLI3vcCKc1FgBIXzzwtJXIId1exPYW2eAPW4Wq2/FcVAUK4Yqc7ME3zLFlYNXGMw4TWsq+C+AqHgNVRR0QvCLOn8jgvnVuvZ5EedbzW7LUrTZQEBoRBsxyUeaSxWxUpnEs4yIbAcbEoHyZgGCxNR+frMS2DOixdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G4hHBeCM; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716171715; x=1747707715;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mYRqEBC5MGEjOQQe/kms6BK1VSWz+BSJENKqOfBTr8k=;
+  b=G4hHBeCMi9QWEA3Xuf9bSwuQJGj8l+8PPZA554BCQo8MAecy33BSCWLv
+   LBVgCvhPVJ26rwV5tWOByNRLT9eEKjU8HOvhVnOpDVhLm5frEfxCx+ntD
+   2Fv5aaersYjOVTgWLuCP1RcqnvT3daZf8XTde7SJ81s3z6HxeZ6nplfwJ
+   +DwhfMCewKVXHO73R9MuypPpfpJDq1ZumsxOLUJjUrbjoh4fSVyMkiq4x
+   6N8GFBu5psNlW/yeWjyqLbbkAEaXNbMcqcD9Yt7Hv4dvDtdbIJ6MJt+LG
+   QQxAWVEkuulLja5mBr/kjg9sCURUn4EYBaZqwJf/80YmJecW7ueimjqPg
+   g==;
+X-CSE-ConnectionGUID: +dSRjOZjSXaiiGzANNd9VA==
+X-CSE-MsgGUID: 8YE+RAOaQm6x0l617cyLrA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11077"; a="12501598"
+X-IronPort-AV: E=Sophos;i="6.08,174,1712646000"; 
+   d="scan'208";a="12501598"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2024 19:21:54 -0700
+X-CSE-ConnectionGUID: iwT51rEuTVyzZX4GMDb35w==
+X-CSE-MsgGUID: hnhUWlOJTFGr2+q+IVZZ6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,174,1712646000"; 
+   d="scan'208";a="63608217"
+Received: from unknown (HELO st-server.bj.intel.com) ([10.240.193.102])
+  by fmviesa001.fm.intel.com with ESMTP; 19 May 2024 19:21:52 -0700
+From: Tao Su <tao1.su@linux.intel.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	chao.gao@intel.com,
+	xiaoyao.li@intel.com,
+	tao1.su@linux.intel.com
+Subject: [PATCH] KVM: x86: Advertise AVX10.1 CPUID to userspace
+Date: Mon, 20 May 2024 10:20:02 +0800
+Message-Id: <20240520022002.1494056-1-tao1.su@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
- kernel-janitors@vger.kernel.org, linux-coco@lists.linux.dev
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Carlos Bilbao <carlos.bilbao.osdev@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-References: <20240513181928.720979-1-michael.roth@amd.com>
-Subject: Re: [PATCH] KVM: SEV: Fix unused variable in guest request handling
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20240513181928.720979-1-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:86xkhBNlc093D6q3cjQlgFMXciyeSHTew5huDwPDpF/M1QEcniy
- OoNcSNgh8nUXAwTF+r4oqO6RME/I3KJ1ET7oiMUWh2Hycqsd4C9LIym7n9Y8U54aUv6evK/
- LLFEm+nRuJqGGeCorG4SCSKPKBQ1+XmTaK/cOpSloGbCIQYC1UpQWSQBThymHXd5Rt95vkI
- GbZ9C5mA7mzozKI+V5Z+g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:lcVEq/oY1Bg=;kyVlebdxuhJMfY0uiZgFoH+b0rv
- QCfP9AOimSDxeM/p8p95KyMqLiTHTDa9tkZFsExgYnrxg65G5hNaBKI5ulbaNmawy5qHAQbOv
- 78IuREnkD0tDqo7etBb8zhSC2lty5SpkRflP8iiPe3gwVPwvO+2QZy+R7TSZjSitDrh2t/OZY
- dWrItoYRshEIq7OenouiAMDCWMVcmCdx97p4FI7MQ/Ev4cAYqgqseAX/uimQe77TJ9lKkGYEW
- dG1EMAva0LjNPZQ1g4Zf3stRdQ6/Ap0DS0+VROBupSIJSTsX/NVuSW+1l3mXuYt+K8jhXiGiN
- wqhF9xDEyfxDwmqayab5GqchHSYeYES4hWxmfWr3Mf4eiubuMEfo59DWs8T161zjBEuDyfEeG
- lyt1OMLA7jt3tLGV5OAw6fZ9JzE3T7NvX7MG/LtY0ek7yX6stDbfhGHioKPO5ZPkMqZZDli4i
- N111LrJu5WJfvmczOvDVCZLAtqXe4jJ3/ae4Q33f6GeRDFFyHGVIlAdDCH2dk2ZDQBKWRRRin
- BPxJV2qcAVhtryGoc4jBgEAD3+oYI846ol8J9NjgFwX85a/yE1epAponyWvMT4//rDDkWyBe/
- Gln1KmBxG9VdKGrha2wESWE5s4Ae0kaB5sZNaEILB96yiMIOdR5cRaULndKww/sJbhn8H6/5P
- yUQlNCROzbYrPPTZ2p85wdq0d1O5MiPjV4Zf+rH0kSMRO/wI/3kEgWUr4DE7tcRJO3Mjprkr9
- xRTzyJDdqKQKapMazVyvPVgKPvqXiL7GG5QOSt80uvJXQaumDmOjkzHoaYXZr8UzUxTnUd+6C
- lekuPcNLkXK00WxnCmdM04R7zrc0siPY2OJuXisq5U5C0=
+Content-Transfer-Encoding: 8bit
 
-> The variable 'sev' is assigned, but never used. Remove it.
+Advertise AVX10.1 related CPUIDs, i.e. report AVX10 support bit via
+CPUID.(EAX=07H, ECX=01H):EDX[bit 19] and new CPUID leaf 0x24H so that
+guest OS and applications can query the AVX10.1 CPUIDs directly. Intel
+AVX10 represents the first major new vector ISA since the introduction of
+Intel AVX512, which will establish a common, converged vector instruction
+set across all Intel architectures[1].
 
-Would it be a bit nicer to use the word =E2=80=9COmit=E2=80=9D instead of =
-=E2=80=9CFix=E2=80=9D
-in the summary phrase?
+AVX10.1 is an early version of AVX10, that enumerates the Intel AVX512
+instruction set at 128, 256, and 512 bits which is enabled on
+Granite Rapids. I.e., AVX10.1 is only a new CPUID enumeration without
+any VMX controls.
 
-Regards,
-Markus
+Advertising AVX10.1 is safe because kernel doesn't enable AVX10.1 which is
+on KVM-only leaf now, just the CPUID checking is changed when using AVX512
+related instructions, e.g. if using one AVX512 instruction needs to check
+(AVX512 AND AVX512DQ), it can check ((AVX512 AND AVX512DQ) OR AVX10.1)
+after checking XCR0[7:5].
+
+The versions of AVX10 are expected to be inclusive, e.g. version N+1 is
+a superset of version N, so just advertise AVX10.1 if it's supported in
+hardware.
+
+[1] https://cdrdv2.intel.com/v1/dl/getContent/784267
+
+Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+---
+ arch/x86/include/asm/cpuid.h |  1 +
+ arch/x86/kvm/cpuid.c         | 20 ++++++++++++++++++--
+ arch/x86/kvm/reverse_cpuid.h |  1 +
+ 3 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/include/asm/cpuid.h b/arch/x86/include/asm/cpuid.h
+index 6b122a31da06..aa21c105eef1 100644
+--- a/arch/x86/include/asm/cpuid.h
++++ b/arch/x86/include/asm/cpuid.h
+@@ -179,6 +179,7 @@ static __always_inline bool cpuid_function_is_indexed(u32 function)
+ 	case 0x1d:
+ 	case 0x1e:
+ 	case 0x1f:
++	case 0x24:
+ 	case 0x8000001d:
+ 		return true;
+ 	}
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index f2f2be5d1141..ef9e3a4ed461 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -693,7 +693,7 @@ void kvm_set_cpu_caps(void)
+ 
+ 	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
+ 		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI) |
+-		F(AMX_COMPLEX)
++		F(AMX_COMPLEX) | F(AVX10)
+ 	);
+ 
+ 	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
+@@ -937,7 +937,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 	switch (function) {
+ 	case 0:
+ 		/* Limited to the highest leaf implemented in KVM. */
+-		entry->eax = min(entry->eax, 0x1fU);
++		entry->eax = min(entry->eax, 0x24U);
+ 		break;
+ 	case 1:
+ 		cpuid_entry_override(entry, CPUID_1_EDX);
+@@ -1162,6 +1162,22 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			break;
+ 		}
+ 		break;
++	case 0x24: {
++		u8 avx10_version;
++		u32 vector_support;
++
++		if (!kvm_cpu_cap_has(X86_FEATURE_AVX10)) {
++			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
++			break;
++		}
++		avx10_version = min(entry->ebx & 0xff, 1);
++		vector_support = entry->ebx & GENMASK(18, 16);
++		entry->eax = 0;
++		entry->ebx = vector_support | avx10_version;
++		entry->ecx = 0;
++		entry->edx = 0;
++		break;
++	}
+ 	case KVM_CPUID_SIGNATURE: {
+ 		const u32 *sigptr = (const u32 *)KVM_SIGNATURE;
+ 		entry->eax = KVM_CPUID_FEATURES;
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index 2f4e155080ba..695e1fb8d5bc 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -46,6 +46,7 @@ enum kvm_only_cpuid_leafs {
+ #define X86_FEATURE_AVX_NE_CONVERT      KVM_X86_FEATURE(CPUID_7_1_EDX, 5)
+ #define X86_FEATURE_AMX_COMPLEX         KVM_X86_FEATURE(CPUID_7_1_EDX, 8)
+ #define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
++#define X86_FEATURE_AVX10               KVM_X86_FEATURE(CPUID_7_1_EDX, 19)
+ 
+ /* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX) */
+ #define X86_FEATURE_INTEL_PSFD		KVM_X86_FEATURE(CPUID_7_2_EDX, 0)
+
+base-commit: eb6a9339efeb6f3d2b5c86fdf2382cdc293eca2c
+-- 
+2.34.1
+
 
