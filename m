@@ -1,140 +1,176 @@
-Return-Path: <kvm+bounces-17831-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E348CABD4
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 12:17:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7A768CADF8
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 14:15:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7211C21810
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 10:17:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E2A9B234AB
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 12:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D477C097;
-	Tue, 21 May 2024 10:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFE0763F0;
+	Tue, 21 May 2024 12:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Jq+CAtzQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C54E71B4F;
-	Tue, 21 May 2024 10:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F78F4F613;
+	Tue, 21 May 2024 12:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716286463; cv=none; b=F11vOt5+3xVEIuLIQFS8WrhfJ6IJDW4nWXXofYp/fa7lk942W9wEe/+GggRw9soAk5SRSzfjaCIACl3MbZobeIr3b7cTSVof/fqD2W4YdnUt46y4+jUFxoJ9EhDXSt/XSHaeH4Jjl+fmmyFJnQ6pWiznWJ3P0Z0esU3Q9l65AG0=
+	t=1716293735; cv=none; b=j2yD+KRQvm5SDgFQAbfqj3P/5jh+I42ZcmVmDTANtj+vk3ZVe9eer54Qea9yTL6UmgkSDuDX/IQOlSVmNNs2OKkxuzbBsDFyNWuyX0wTmLkguiME9bXYZPFsSw+x7lVi6xLFPtKEXXwmzS/Mj365WxTSgVWumSV9GSRrGg58Y70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716286463; c=relaxed/simple;
-	bh=S+wZXg5uTKAmZeL4zCJdXSkIvMKrrXSNrng1U4wro3c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FzI0gtfirjkzaC6pnJfEOjPMXhTGT3DtJaNKv9sv/Da0mLEmaIT0li7jRj/U7PwYw0umKe3JunIo5eSghSAvZSkE969sk95TqZfaY0L95NdEnyVN1ZQ7RKehX7wYJbjzo36Af6PCXTO25lMvg3LrTTK5zIC8vFAxF9AafOXqAn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E364EC4AF09;
-	Tue, 21 May 2024 10:14:19 +0000 (UTC)
-Date: Tue, 21 May 2024 11:14:17 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-To: Michael Kelley <mhklinux@outlook.com>
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Steven Price <steven.price@arm.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
-Message-ID: <Zkxz-QfzUM_D0SAm@arm.com>
-References: <20240412084213.1733764-1-steven.price@arm.com>
- <20240412084213.1733764-10-steven.price@arm.com>
- <ZkOmrMIMFCgEKuVw@arm.com>
- <5b2db977-7f0f-4c3a-b278-f195c7ddbd80@arm.com>
- <ZkuABQlGgtbzyQFT@arm.com>
- <SN6PR02MB41578D7BFEDE33BD2E8246EFD4E92@SN6PR02MB4157.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1716293735; c=relaxed/simple;
+	bh=FGMBhZF5fI9phy6STe357dhlmqhZWSl8UcKnEapLMTM=;
+	h=From:Subject:Date:Message-Id:Content-Type:To:Cc:MIME-Version; b=CUYoApbVS4prmTl8iDIK5eNH0Jyep0Z75yg82qMhYI3ZJz3IP67y8alSPiUU+qJYMK1GtjEeeDnuLhvW/JfIbFa4MPPTumt5jZuq1xihbwuIYvx0P63cgMMG2MppuI2FHSxSd642H9lNPpPWmBaZfZ2Aoj64sNCnE1+y/PWbMQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Jq+CAtzQ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44LC6wZV016281;
+	Tue, 21 May 2024 12:15:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : subject : date :
+ message-id : content-type : to : cc : content-transfer-encoding :
+ mime-version; s=pp1; bh=XE4ITXTQvw4tJmOT+42F6T48htuW2dEA28E8xztL1M0=;
+ b=Jq+CAtzQcg6FVKAaj3XpxWzhQ7GJ35VJyZTYJ8iWnmPJZoLLiBdewAUOCj1l0+dgvmI7
+ SheDDVInajqymL/I9dYaNX57qKKekwqxShrra/XzxgxIyz4OmBffwybwyOm6jOl1/M59
+ Zejjob1dpWtLhPn79zuAcTDbQS2vIeQyPjAhuY0cay1PlZl96sVlDjOhFP+g81EwmkhB
+ ZgVbZnh5kkW0dHvxy4uuaaUnV/n7vxyuelwuH6DWRnJfm/iypO/6yokHW9AjnGEplBGf
+ Ea0qOsoEKkxkvQuVzRiohn76/RGAmsg0yEVONq/5H9IjKOPl9NvMvvWqLjk9oVKNuVxe yg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y8ub3r0v7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 May 2024 12:15:32 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44LCELgi027805;
+	Tue, 21 May 2024 12:15:31 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y8ub3r0v3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 May 2024 12:15:31 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44L8Y6at007817;
+	Tue, 21 May 2024 12:15:30 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3y78vkw5f9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 May 2024 12:15:30 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44LCFRFc31982224
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 May 2024 12:15:30 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CC8A45805F;
+	Tue, 21 May 2024 12:15:27 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 07B6D58043;
+	Tue, 21 May 2024 12:15:26 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 21 May 2024 12:15:25 +0000 (GMT)
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+Subject: [PATCH 0/3] vfio/pci: s390: Fix issues preventing VFIO_PCI_MMAP=y
+ for s390 and enable it
+Date: Tue, 21 May 2024 14:14:56 +0200
+Message-Id: <20240521-vfio_pci_mmap-v1-0-2f6315e0054e@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+X-B4-Tracking: v=1; b=H4sIAECQTGYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDUwNj3bK0zPz4guTM+NzcxAJdQ1MTy1TjFAOj5ERzJaCegqLUtMwKsHn
+ RsbW1AIKc92lfAAAA
+To: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2222;
+ i=schnelle@linux.ibm.com; h=from:subject:message-id;
+ bh=FGMBhZF5fI9phy6STe357dhlmqhZWSl8UcKnEapLMTM=;
+ b=owGbwMvMwCH2Wz534YHOJ2GMp9WSGNJ8JkQrTZ4q6tmyPvg1Q7QAd3Ft9NwvW04nTFsc/HFZ0
+ 6M7Jpw6HaUsDGIcDLJiiiyLupz91hVMMd0T1N8BM4eVCWQIAxenAExkw3pGhp/C3mEvFijG5379
+ onPpqfTZxsjJ++/qW95m/JAgoGIZH8jIcDFXumGJQ3FQcYvcLfE473+tM1g8NRqqTz4IsPZlK+/
+ lAwA=
+X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
+ fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4qO4Pjv2r9eKKQ2G7KGeSCOHhPe-1MmU
+X-Proofpoint-GUID: uj0223dM56aVXRX1otLl6it3bqbPHPRv
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SN6PR02MB41578D7BFEDE33BD2E8246EFD4E92@SN6PR02MB4157.namprd02.prod.outlook.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-21_08,2024-05-21_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 impostorscore=0 clxscore=1011 phishscore=0 lowpriorityscore=0
+ malwarescore=0 spamscore=0 adultscore=0 suspectscore=0 mlxlogscore=760
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405210092
 
-On Mon, May 20, 2024 at 08:32:43PM +0000, Michael Kelley wrote:
-> From: Catalin Marinas <catalin.marinas@arm.com> Sent: Monday, May 20, 2024 9:53 AM
-> > > > On Fri, Apr 12, 2024 at 09:42:08AM +0100, Steven Price wrote:
-> > > > >   static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> > > > > @@ -41,6 +45,7 @@ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
-> > > > >   	pte = clear_pte_bit(pte, cdata->clear_mask);
-> > > > >   	pte = set_pte_bit(pte, cdata->set_mask);
-> > > > > +	/* TODO: Break before make for PROT_NS_SHARED updates */
-> > > > >   	__set_pte(ptep, pte);
-> > > > >   	return 0;
-[...]
-> > Thanks for the clarification on RIPAS states and behaviour in one of
-> > your replies. Thinking about this, since the page is marked as
-> > RIPAS_EMPTY prior to changing the PTE, the address is going to fault
-> > anyway as SEA if accessed. So actually breaking the PTE, TLBI, setting
-> > the new PTE would not add any new behaviour. Of course, this assumes
-> > that set_memory_decrypted() is never called on memory being currently
-> > accessed (can we guarantee this?).
-> 
-> While I worked on CoCo VM support on Hyper-V for x86 -- both AMD
-> SEV-SNP and Intel TDX, I haven't ramped up on the ARM64 CoCo
-> VM architecture yet.  With that caveat in mind, the assumption is that callers
-> of set_memory_decrypted() and set_memory_encrypted() ensure that
-> the target memory isn't currently being accessed.   But there's a big
-> exception:  load_unaligned_zeropad() can generate accesses that the
-> caller can't control.  If load_unaligned_zeropad() touches a page that is
-> in transition between decrypted and encrypted, a SEV-SNP or TDX architectural
-> fault could occur.  On x86, those fault handlers detect this case, and
-> fix things up.  The Hyper-V case requires a different approach, and marks
-> the PTEs as "not present" before initiating a transition between decrypted
-> and encrypted, and marks the PTEs "present" again after the transition.
+With the introduction of memory I/O (MIO) instructions enbaled in commit
+71ba41c9b1d9 ("s390/pci: provide support for MIO instructions") s390
+gained support for direct user-space access to mapped PCI resources.
+Even without those however user-space can access mapped PCI resources
+via the s390 specific MMIO syscalls. There is thus nothing fundamentally
+preventing s390 from supporting VFIO_PCI_MMAP allowing user-space drivers
+to access PCI resources without going through the pread() interface.
+To actually enable VFIO_PCI_MMAP a few issues need fixing however.
 
-Thanks. The load_unaligned_zeropad() case is a good point. I thought
-we'd get away with this on arm64 since accessing such decrypted page
-would trigger a synchronous exception but looking at the code, the
-do_sea() path never calls fixup_exception(), so we just kill the whole
-kernel.
+Firstly the s390 MMIO syscalls do not cause a page fault when
+follow_pte() fails due to the page not being present. This breaks
+vfio-pci's mmap() handling which lazily maps on first access.
 
-> This approach causes a reference generated by load_unaligned_zeropad() 
-> to take the normal page fault route, and use the page-fault-based fixup for
-> load_unaligned_zeropad(). See commit 0f34d11234868 for the Hyper-V case.
+Secondly on s390 there is a virtual PCI device called ISM which has
+a few oddities. For one it claims to have a 256 TiB PCI BAR (not a typo)
+which leads to any attempt to mmap() it fail with the following message:
 
-I think for arm64 set_memory_decrypted() (and encrypted) would have to
-first make the PTE invalid, TLBI, set the RIPAS_EMPTY state, set the new
-PTE. Any page fault due to invalid PTE would be handled by the exception
-fixup in load_unaligned_zeropad(). This way we wouldn't get any
-synchronous external abort (SEA) in standard uses. Not sure we need to
-do anything hyper-v specific as in the commit above.
+    vmap allocation for size 281474976714752 failed: use vmalloc=<size> to increase size
 
-> > (I did come across the hv_uio_probe() which, if I read correctly, it
-> > ends up calling set_memory_decrypted() with a vmalloc() address; let's
-> > pretend this code doesn't exist ;))
-> 
-> While the Hyper-V UIO driver is perhaps a bit of an outlier, the Hyper-V
-> netvsc driver also does set_memory_decrypted() on 16 Mbyte vmalloc()
-> allocations, and there's not really a viable way to avoid this. The
-> SEV-SNP and TDX code handles this case.   Support for this case will
-> probably also be needed for CoCo guests on Hyper-V on ARM64.
+Even if one tried to map this BAR only partially the mapping would not
+be usable on systems with MIO support enabled. So just block mapping
+BARs which don't fit between IOREMAP_START and IOREMAP_END.
 
-Ah, I was hoping we can ignore it. So the arm64 set_memory_*() code will
-have to detect and change both the vmalloc map and the linear map.
-Currently this patchset assumes the latter only.
+Note:
+For your convenience the code is also available in the tagged and signed
+b4/vfio_pci_mmap branch on my git.kernel.org site below:
+https: //git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/
 
-Such buffers may end up in user space as well but I think at the
-set_memory_decrypted() call there aren't any such mappings and
-subsequent remap_pfn_range() etc. would handle the permissions properly
-through the vma->vm_page_prot attributes (assuming that someone set
-those pgprot attributes).
+Thanks,
+Niklas
 
+Link: https://lore.kernel.org/all/c5ba134a1d4f4465b5956027e6a4ea6f6beff969.camel@linux.ibm.com/
+Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+---
+Niklas Schnelle (3):
+      s390/pci: Fix s390_mmio_read/write syscall page fault handling
+      vfio/pci: Tolerate oversized BARs by disallowing mmap
+      vfio/pci: Enable VFIO_PCI_MMAP for s390
+
+ arch/s390/pci/pci_mmio.c         | 18 +++++++++++++-----
+ drivers/vfio/pci/Kconfig         |  2 +-
+ drivers/vfio/pci/vfio_pci_core.c |  8 ++++++--
+ 3 files changed, 20 insertions(+), 8 deletions(-)
+---
+base-commit: a38297e3fb012ddfa7ce0321a7e5a8daeb1872b6
+change-id: 20240503-vfio_pci_mmap-1549e3d02ca7
+
+Best regards,
 -- 
-Catalin
+Niklas Schnelle
+
 
