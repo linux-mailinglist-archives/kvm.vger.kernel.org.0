@@ -1,122 +1,138 @@
-Return-Path: <kvm+bounces-17862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27D628CB485
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 22:03:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A3F58CB4AC
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 22:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1C12282F57
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 20:03:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 455B7281C09
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 20:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614901494C3;
-	Tue, 21 May 2024 20:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 841C51494D4;
+	Tue, 21 May 2024 20:25:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TGrTax9z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PHLE3FVL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECF91EB40
-	for <kvm@vger.kernel.org>; Tue, 21 May 2024 20:02:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130A63FB8B
+	for <kvm@vger.kernel.org>; Tue, 21 May 2024 20:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716321779; cv=none; b=q+vdUbRHGas15WElJHRjGAoBeQSbHaiRUNf4ZMWI2dLumxEQRTP5o2dkGssl4jLTNJLx+0r3s8gk40B85qFmOb7j30SBcAliM0Ry8TMVpsXbuyaB2Dvz+ndBrt+dGzUHXM3KDG1kJ5V8E2t8hGtafDB936kxE8irZ6EyV0t+658=
+	t=1716323138; cv=none; b=F26Jg+DjnLJK3RWEIfgVFeXVxU1kyZpfBK9T2lPKWMJTv+4FdMDYL1OFdGXhRqT/qu2/lggV4CCdCivZi5MBgICWPLzeRFv+Umg0nwuM0jaA/si8aBTGpPBluxEd6G/OK6LJ0MD1JqEaLEdhUv+UJ+taij9Hm2gTBpnYqT/DAsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716321779; c=relaxed/simple;
-	bh=iIAKgcqkrQku6Mr29zl/Q3Aq3+KvXVwIDxnt8qxjWcA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X2LphUT6ccjfzfKN21Y/zbHlGRcf1a/jGKb29vUL1caNv1C1jKXkZOTxLBDbw8x1kpdgOFziOWeiotw8sJyd0Aj231vPmqbQ7zZsHtLBidasxYCQOFJHjjnSv32BM0ad4TcOhVGQJDvjfhEKgCGYb4dFhhrai8dUxHSct724PN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TGrTax9z; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2b38f3e2919so152985a91.0
-        for <kvm@vger.kernel.org>; Tue, 21 May 2024 13:02:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716321777; x=1716926577; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Z2y/OBkKxgzmvSuCRJlFU+1HEUO6FATvJsnEDlaTHY=;
-        b=TGrTax9zbcNDUbLBxHleJWLVRommRaTHeZ7MtchmGSTapWxyg0608eh8SjanQ1+KS4
-         C6MQ0fEKgnZ1ltX8uqYQXDvd2gFUdnq4qr86GVgPZDvMJVsbtHEhYLP7v/hlKXHs6p2O
-         Vfn0iNyc4Wt1XxIzIio9x76UFxDw5WZuFF6Nk8I/bKVpPl57Dm4oi0gkw1kGiW8jPx7o
-         bavfnYkzSLtKZse6MR4ngDAjzhb8wTJJCY8O7O9PEW/sZImXQAZP6K8ntW9uYLIPcvyJ
-         KmZeezt0idsCVTokFhmd+bigDde/6/ZzEu424tfqxvfT8xER+NCwIKaHTLDmxicgDLWF
-         wDtA==
+	s=arc-20240116; t=1716323138; c=relaxed/simple;
+	bh=TNbVzSZ4k9mDMCWPwnEnUO8KrwqMSnosmMil9nH2X8E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=F3KNlDG0sdLYYMywmCSd2SEugIQ/46Y/Bs7sbohYiimEfYYtkIdssjSbWdo6dAFbQTNgdXyZL3pXUCorT00Ju3W7HhBU/QwRkrjlJ3cquMMzmuFiJiPFM+QY12XWJpehhjMUSn6WDoigfRzrHNMheaKafc6fxaIN91Ji8xTxP48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PHLE3FVL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716323136;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uLQerxE5R+lMZTgLtYljE+62W5PtbMN9LPsnxzlTokY=;
+	b=PHLE3FVLxKxA0pBWfK5Bq1skq5iwtlKRiPnQeuqSaQd/cHZvXYMdQDmyU0IwWTjLqgaETm
+	jyvoCCbheEydbeOLUld2wAJue1tWVonsUE8FaV6k2JsItwDKv07OmAHUKAtjoIkOhEN1SN
+	RSrSg9ZZQcwzqqUBCn7begGcM6bc8Zo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-368-6VUCZqlJOjiYnVQvDwVXbQ-1; Tue, 21 May 2024 16:25:34 -0400
+X-MC-Unique: 6VUCZqlJOjiYnVQvDwVXbQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-34f7618a1f2so101654f8f.1
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 13:25:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716321777; x=1716926577;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Z2y/OBkKxgzmvSuCRJlFU+1HEUO6FATvJsnEDlaTHY=;
-        b=BHik3IOOz/deAu+tKwswY849M1gdCL7oFoIoYy6/1O1WeiDGQy/hvS77Ny2li/lqla
-         dEVSwOFHOm5z2Ny26VO4BEELIt/arKod6GT6y2T707G4zLLvE/kng7jnB3ckCirCZ72v
-         kzzMNiuOSIKcaofSvI3Sq8yDyEPpF6Z/pfds8sxL9by0IiE51JCD10WGfD9j4UT6s93e
-         3Xva1sIhIbrhJDpUZbdrNUejn59nD/o026CrNIMnpwErdYLY8sgfwpOVafgd+a5Dp1pe
-         52K/ZN5KZudx8WhHYcLmRENBj1O20HLkxIhRv2Qnd3NjQF9SqC7i15QGSJuW2tXqTyO2
-         SV7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXab+QYTQFxZF0bnvZveGAz/JwKC1AOzu5qh+fFOJfdDqZqeC5d/Q+U2uz2nYxMhLGSrb2YJ8CaOeuFWf1COpUW8D33
-X-Gm-Message-State: AOJu0YxcurWceXW45rHQHzG6z3C5HbyvMmFTIc62/kCSVnS9Rxfuz0XW
-	GGLdGC5Bmg5aoF0VzvNZtk+e2OWrHroV20E0TwWz7wVbAH+cqnlvYK6KWEHZs7dpRYbHfGcefg4
-	26Q==
-X-Google-Smtp-Source: AGHT+IGc8AMfLKM+eg0g6UQUcqfUBCYk4fTqnxjiZdUzMhtJbdwzeQwWLJW3iNG9Bbk6zyIuCWPv8Gd0+4Y=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:5384:b0:2af:b21b:6432 with SMTP id
- 98e67ed59e1d1-2bd9f5c1a8amr520a91.2.1716321777329; Tue, 21 May 2024 13:02:57
- -0700 (PDT)
-Date: Tue, 21 May 2024 13:02:55 -0700
-In-Reply-To: <1dbb09c5-35c7-49b9-8c6f-24b532511f0b@intel.com>
+        d=1e100.net; s=20230601; t=1716323133; x=1716927933;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uLQerxE5R+lMZTgLtYljE+62W5PtbMN9LPsnxzlTokY=;
+        b=CZ8VqqkMfbPx+CGjobnOXFLW5CHDm38ShF7HwqRWfyLD08JJ01xkiEVrn1+8uVZ7De
+         E31VONPNSK5Oh3yhmoIVb/RrJiPU3nskVxmdClkN7nHTcb3pIdAw+Sez5F4QbInEmiel
+         QN5NoyogUElBpI53rQeczkDIQGuBtNDyCd/cxue1hI2MXzQ4MH/GOehyi9Xi4dwpYcN1
+         ePpeVNoPDSokKZluTNI8jPjE2chYVExB1S/OWva8UAVfnr/fc6IDTVIEd05EpTo4P7dP
+         YQELxqHMqfKubXtLhlanJXQzYW9G2LDMSbdyq4iz0RbO2f/2zqY5CYGplmbNCiPyxcr6
+         synA==
+X-Gm-Message-State: AOJu0Yy9zcLANZWNqbSlCB8E3SV22G9ZknkIihLqcNBi5WHvuq8rHw+O
+	yzFCneXgkM0ZWpbOGfQgaLrd1HGgqGEZh/TA+Te4xqslD8ZOIxYxnWTz+rOmyopqODrb/iBUsk9
+	bZto+kJXzLULrx6Vg+iXdtBzSBhW1zssWrHXWKA47oX0GhrW9xv9n1taaXA1f2/NcrI1h8sqEft
+	Qol7ZGQub3LAAbagGD3kNZb/CB
+X-Received: by 2002:a5d:5510:0:b0:34d:ab1a:6384 with SMTP id ffacd0b85a97d-354d804f46emr119874f8f.13.1716323133056;
+        Tue, 21 May 2024 13:25:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHB55ZmrkK7joPCTYgDCxER7qka48DTWgOfjPLcKVDrzhqdCM29sdaEnBuS0/mwQSDsQgyxkw4J2nGXaX3dtf8=
+X-Received: by 2002:a5d:5510:0:b0:34d:ab1a:6384 with SMTP id
+ ffacd0b85a97d-354d804f46emr119864f8f.13.1716323132726; Tue, 21 May 2024
+ 13:25:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240425233951.3344485-1-seanjc@google.com> <20240425233951.3344485-2-seanjc@google.com>
- <5dfc9eb860a587d1864371874bbf267fa0aa7922.camel@intel.com>
- <ZkI5WApAR6iqCgil@google.com> <6100e822-378b-422e-8ff8-f41b19785eea@intel.com>
- <1dbb09c5-35c7-49b9-8c6f-24b532511f0b@intel.com>
-Message-ID: <Zkz97y9VVAFgqNJB@google.com>
-Subject: Re: [PATCH 1/4] x86/reboot: Unconditionally define
- cpu_emergency_virt_cb typedef
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240518000430.1118488-1-seanjc@google.com> <20240518000430.1118488-10-seanjc@google.com>
+ <CABgObfYo3jR7b4ZkkuwKWbon-xAAn+Lvfux7ifQUXpDWJds1hg@mail.gmail.com> <ZkzldN0SwEhstwEB@google.com>
+In-Reply-To: <ZkzldN0SwEhstwEB@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 21 May 2024 22:25:20 +0200
+Message-ID: <CABgObfaE+M5QuTfAZ01OjeB87vGmjRgDUH=rnNX8FHzc7t1Oag@mail.gmail.com>
+Subject: Re: [PATCH 9/9] KVM: x86: Disable KVM_INTEL_PROVE_VE by default
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 15, 2024, Kai Huang wrote:
-> How about we just make all emergency virtualization disable code
-> unconditional but not guided by CONFIG_KVM_INTEL || CONFIG_KVM_AMD, i.e.,
-> revert commit
-> 
->    261cd5ed934e ("x86/reboot: Expose VMCS crash hooks if and only if
-> KVM_{INTEL,AMD} is enabled")
-> 
-> It makes sense anyway from the perspective that it allows the out-of-tree
-> kernel module hypervisor to use this mechanism w/o needing to have the
-> kernel built with KVM enabled in Kconfig.  Otherwise, strictly speaking,
-> IIUC, the kernel won't be able to support out-of-tree module hypervisor as
-> there's no other way the module can intercept emergency reboot.
+On Tue, May 21, 2024 at 8:18=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+> > -          This should never be enabled in a production environment.
+> > +          Note that #VE trapping appears to be buggy on some CPUs.
+>
+> I see where you're coming from, but I don't think "trapping" is much bett=
+er,
+> e.g. it suggests there's something broken with the interception of #VEs. =
+ Ah,
+> the entire help text is weird.
 
-Practically speaking, no one is running an out-of-tree hypervisor without either
-(a) KVM being enabled in the .config, or (b) non-trivial changes to the kernel.
+Yeah, I didn't want to say #VE is broken altogether - interception is
+where we saw issues, and #VE is used in production as far as I know
+(not just by TDX; at least Xen and maybe Hyper-V use it for
+anti-malware purposes?).
 
-Exposing/exporting select APIs and symbols if and only if KVM is enabled is a
-a well-established pattern, and there are concrete benefits to doing so.  E.g.
-it allows minimizing the kernel footprint for use cases that don't want/need KVM.
+Maybe "Note: there appear to be bugs in some CPUs that will trigger
+the WARN, in particular with eptad=3D0 and/or nested virtualization"
+covers all bases.
 
-> This approach avoids the weirdness of the unconditional define for only
-> cpu_emergency_virt_cb.
+Paolo
 
-I genuinely don't understand why you find it weird to unconditionally define
-cpu_emergency_virt_cb.  There are myriad examples throughout the kernel where a
-typedef, struct, enum, etc. is declared/defined even though support for its sole
-end consumer is disabled.  E.g. include/linux/mm_types.h declares "struct mem_cgroup"
-for pretty much the exact same reason, even though the structure is only fully
-defined if CONFIG_MEMCG=y.
+>
+> This?
+>
+> config KVM_INTEL_PROVE_VE
+>         bool "Verify guests do not receive unexpected EPT Violation #VEs"
+>         depends on KVM_INTEL && EXPERT
+>         help
+>           Enable EPT Violation #VEs (when supported) for all VMs, to veri=
+fy
+>           that KVM's EPT management code will not incorrectly result in a=
+ #VE
+>           (KVM is supposed to supress #VEs by default).  Unexpected #VEs =
+will
+>           be intercepted by KVM and will trigger a WARN, but are otherwis=
+e
+>           transparent to the guest.
+>
+>           Note, EPT Violation #VE support appears to be buggy on some CPU=
+s.
+>
+>           This should never be enabled in a production environment!
+>
+>           If unsure, say N.
+>
 
-The only oddity here is that the API that the #ifdef that guards the usage happens
-to be right below the typedef, but it shouldn't take that much brain power to
-figure out why a typedef exists outside of an #ifdef.
 
