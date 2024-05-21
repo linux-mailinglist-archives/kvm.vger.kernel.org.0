@@ -1,189 +1,172 @@
-Return-Path: <kvm+bounces-17855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17856-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 814E68CB291
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 18:58:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC81D8CB2FC
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 19:37:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 355A72816E5
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 16:58:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C814B229E9
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 17:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7BE7F49F;
-	Tue, 21 May 2024 16:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D6B1487CB;
+	Tue, 21 May 2024 17:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rqD/OJ1J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CQ0CQFBK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF16C7710F
-	for <kvm@vger.kernel.org>; Tue, 21 May 2024 16:58:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068237F48D
+	for <kvm@vger.kernel.org>; Tue, 21 May 2024 17:36:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716310720; cv=none; b=DzuLQJZ4a2z8isoLjvFGLFEKy+Fawq3R8OxivGhaR9Z0MUccXIOYT5AUyA4b/ztgo8JiFLF3NL0zm4muI38pSl1+3omFhL+ETNg/yX7hj7odFV/xx7d88CRdwH1LL+Gd7YYAKqkItCmy9xeswYmK/BH8AD1hG3ivkMP3IeXpO6E=
+	t=1716313005; cv=none; b=E9djioo3UQHy6qTmqaMunqcVBpYSWIFs55rlMeB+OobJuwrCVLweEOu7HHzKgYubuJzdRVYC71v0QIhHZyUjkOGMZ7nwQZ78qr+R6nO1JTuTc6i6w/LHbQZNLN0y4ivOGYzrguL6vW1elxDWAbztRw9HN3+/Ikd9jrprSOQspLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716310720; c=relaxed/simple;
-	bh=7k2kWL58JjVh4nVVVWtUiXq68vYdV+B+sjmnMACeFXY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RBejL/38bMEgm/KAcJWjW9rV8T+qknxvE0DMYplFXsHemihLYhYVJMEBNJhoKvZY5hilS33TOXnVz4qvqwfgpN8Cn2X8elXOXv7i5RTk6dScDGntcvqI4fxZvxj50EOGG46eNjoR5kY/oD3cIZk/chEVJEENw0uYthA/DbMpMZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rqD/OJ1J; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6f697985f86so2848149b3a.1
-        for <kvm@vger.kernel.org>; Tue, 21 May 2024 09:58:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716310718; x=1716915518; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=23Va6tBLKyrT6+rYe1Dwuy5+S+h8Qtz8qDJTWfCf654=;
-        b=rqD/OJ1JnrH7jXviVhBTzvlbzoqWoftnyGaMLsR4RDltOJtqA5FSS9fSdGN2xQswzY
-         usjR7Z3jRBD9SvA1H/MeohuX7QsADawAYDy/nJtwLCCr6tizTYAvPZIjIuQwkRUOr9nj
-         Gr60bU3C2+eDUoSC9NZ635g38d/YdE3iha3Z/R4QMvN4x3NskfRlFSSGeSCc/nkmkj5Y
-         HjcQsDJ+EKkBfb8A5opBIqcWuPaDIbxVOT2D+Nor+6FGbu61F/0f+KzifiJsdCm2i6ZV
-         SXBP6oNTjAIv8OWuKAo/0K6iq8ToHKCb+9+LDXeSmUqly2x9aZJHrsUEIsMnqyJw++hB
-         lHuQ==
+	s=arc-20240116; t=1716313005; c=relaxed/simple;
+	bh=wd0KBKKWgEMxHkVHXyAYq++wArTKYEyiWOm/WGzUV7I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QonCBsK6JlaD7LW4NORo4TmsAELyd1Ezkrp42o61KO0wr2B+7ZAwUOjEGsidJbvZiyWIwBDr4qc21tBqLqlkfrSLSH+BPHpbg+OLI7HJZK0H9b7CytbG1b+XkJs5302sHZqN8cLvkKvdffE6jPnMoZFLqO9FtwMr8oLAFIo4hyw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CQ0CQFBK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716313002;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q5zUpod+RhthWixXTCuMGnpnj5+irE7qQCxPAzed+KE=;
+	b=CQ0CQFBKooaI3/H30Vky7syyxJJQEmadlyyh5E6UoZ8IZrPi/5rRUwih+5LlWK68DYFw2M
+	uHS0EJVU7uUAgMRW/o7YJGPhZnLr/SR1PU9zcDbXoJGCxdbjGo6vnwcI/bQo6DLS7DIt7V
+	EC4d8cu4Hr3Q8aQWdrURVMjAuC9ZHIA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-190-HlJQdfh4MsmczXYoV_N_DA-1; Tue, 21 May 2024 13:36:40 -0400
+X-MC-Unique: HlJQdfh4MsmczXYoV_N_DA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-41c025915a9so69083775e9.3
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 10:36:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716310718; x=1716915518;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=23Va6tBLKyrT6+rYe1Dwuy5+S+h8Qtz8qDJTWfCf654=;
-        b=bSpxGNVKT9R+t1o56UHYWjwvhTRK0en2Ap0KORM2Q5jg6ZJPXwSRI6ckOtfYRmdQFl
-         uF6meoCY2mPq9sYUnas9rcyGKBhLJ9GIq47P7YR/tp0AdK+9hQjaBYcNiYp3pcrFzIDe
-         BxUDY/XGovaXGirEuHUvPV//Q7fkeOWM8Rr7JoXOYv2kywD6ZWrQfZRSxcHSQoubF4yY
-         OKIixJFaNZUxV6e9JL0ihMRX1jgiNI4kRHCM8BF60V/xK4fxs570YrAeruacpVWcT9Kj
-         SKt75tbvwqo7T03eN1137IG6Tv9Gw9gBWZxtFruPd7m/KHK2yPa2DxikiGwSH9IiTuQY
-         rGRg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXArT+9pwYlJRilcdR5/Nm8X+gd+KN6KnV1OSmPy2wPl1VdF5O7hMhH5fe8QSCrKoAdvlIuyJZ7XXOMj1z5kgGMkcR
-X-Gm-Message-State: AOJu0YzHclsvl8ttZNVnz8Va8maflYcoAI2erhKRTgqjMgyhyrdNoS6b
-	ptnjANewrWRK3SQBXS+PgcKKBwCWExG5vmOz8unpYax3Lp2wZT3Wy0hsNpNfjn9G/Nr0wVl+QWf
-	GUQ==
-X-Google-Smtp-Source: AGHT+IFvONb8srr3+xxmvcHKpYLr60Bhkuaprz/B1jPuBNbGhMT70+iD6UVhEdu6lLYdg8HqCCvOlFn9Zu0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1144:b0:6f3:e9c0:a195 with SMTP id
- d2e1a72fcca58-6f4e03cae91mr854337b3a.5.1716310717552; Tue, 21 May 2024
- 09:58:37 -0700 (PDT)
-Date: Tue, 21 May 2024 09:58:36 -0700
-In-Reply-To: <qgzgdh7fqynpvu6gh6kox5rnixswtu2ewl3hiutohpndmbdo6x@kfwegt625uqh>
+        d=1e100.net; s=20230601; t=1716312999; x=1716917799;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q5zUpod+RhthWixXTCuMGnpnj5+irE7qQCxPAzed+KE=;
+        b=lc62tZTr5NfbSXVPpQZQZ1o0azIMKarRs1+mOWx8YpDys9eqMF+p4G0C8NmNIcaS6w
+         PJLgZ2cuPSLh4jwjwx5unjcrCq1/dYGWMDbQZU28J8cIWO5ksSj8wS7f9CZcqVW2biIy
+         A6lXCR1c/LYxqrqIAg2NiMgCkXRj7uyyTjTHaeOjSMW5jn6qF1YzbC89ExzdobE5qlOA
+         R8M6HphcgG5YODM2I8cnxt60TbcBDZ/aIb7CdY1LAzsxixhN9lh2jFhJAittUMdlhYRE
+         qXUfN1zYovVK9IMtfFQ4DsHOIMbbj4bdMHorwi297brp//HLjM6zp30Oq5aD50RADGd3
+         YlWQ==
+X-Gm-Message-State: AOJu0Yy/V7IsKfvEcFd3mjI6sN8JhTl0wWO9jzHcY8DZrrDXsRkuPtRB
+	rl6cAGAiXdhkFV0+Szjlil7FWI0uVlWzuv8kL0mNcbscPSwtN2u0utNFjREIqAO5UDoUwhXF/gp
+	HPZSS2/8t7w7PzKnG/dbBii7imMBcAIPT4Bh9TcG0sxNWOX6NuZtNGJxDk1x7wQeXbfFcs/6Gdv
+	5Zkry9qO0emdw+YfQHJlU8XG2u
+X-Received: by 2002:a05:600c:35c2:b0:41c:2313:da92 with SMTP id 5b1f17b1804b1-41fea93afeemr277991495e9.4.1716312999333;
+        Tue, 21 May 2024 10:36:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGndNhJCjRsgtfdjd7EnztAR09WI4tEm4q2+MYJA7kncWp/ZgsQ/grGnsNbVM0PTqn4dlJqpJWUz3TjMCFFBjw=
+X-Received: by 2002:a05:600c:35c2:b0:41c:2313:da92 with SMTP id
+ 5b1f17b1804b1-41fea93afeemr277991385e9.4.1716312998926; Tue, 21 May 2024
+ 10:36:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <58492a1a-63bb-47d2-afef-164557d15261@redhat.com>
- <20240518150457.1033295-1-michael.roth@amd.com> <ZktbBRLXeOp9X6aH@google.com>
- <iqzde53xfkcpqpjvrpyetklutgqpepy3pzykwpdwyjdo7rth3m@taolptudb62c>
- <ZkvddEe3lnAlYQbQ@google.com> <20240521020049.tm3pa2jdi2pg4agh@amd.com>
- <ZkyrAETobNEjI4Tr@google.com> <qgzgdh7fqynpvu6gh6kox5rnixswtu2ewl3hiutohpndmbdo6x@kfwegt625uqh>
-Message-ID: <ZkzSvPGass4z4u9p@google.com>
-Subject: Re: [PATCH] KVM: SEV: Fix guest memory leak when handling guest requests
-From: Sean Christopherson <seanjc@google.com>
-To: Michael Roth <michael.roth@amd.com>
-Cc: Michael Roth <mdroth@utexas.edu>, pbonzini@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, ashish.kalra@amd.com, thomas.lendacky@amd.com, 
-	rick.p.edgecombe@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240518000430.1118488-1-seanjc@google.com> <20240518000430.1118488-10-seanjc@google.com>
+In-Reply-To: <20240518000430.1118488-10-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 21 May 2024 19:36:26 +0200
+Message-ID: <CABgObfYo3jR7b4ZkkuwKWbon-xAAn+Lvfux7ifQUXpDWJds1hg@mail.gmail.com>
+Subject: Re: [PATCH 9/9] KVM: x86: Disable KVM_INTEL_PROVE_VE by default
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 21, 2024, Michael Roth wrote:
-> On Tue, May 21, 2024 at 07:09:04AM -0700, Sean Christopherson wrote:
-> > On Mon, May 20, 2024, Michael Roth wrote:
-> > > On Mon, May 20, 2024 at 04:32:04PM -0700, Sean Christopherson wrote:
-> > > > On Mon, May 20, 2024, Michael Roth wrote:
-> > > > > But there is a possibility that the guest will attempt access the response
-> > > > > PFN before/during that reporting and spin on an #NPF instead though. So
-> > > > > maybe the safer more repeatable approach is to handle the error directly
-> > > > > from KVM and propagate it to userspace.
-> > > > 
-> > > > I was thinking more along the lines of KVM marking the VM as dead/bugged.  
-> > > 
-> > > In practice userspace will get an unhandled exit and kill the vcpu/guest,
-> > > but we could additionally flag the guest as dead.
-> > 
-> > Honest question, does it make sense from KVM to make the VM unusable?  E.g. is
-> > it feasible for userspace to keep running the VM?  Does the page that's in a bad
-> > state present any danger to the host?
-> 
-> If the reclaim fails (which it shouldn't), then KVM has a unique situation
-> where a non-gmem guest page is in a state. In theory, if the guest/userspace
-> could somehow induce a reclaim failure, then can they potentially trick the
-> host into trying to access that same page as a shared page and induce a
-> host RMP #PF.
-> 
-> So it does seem like a good idea to force the guest to stop executing. Then
-> once the guest is fully destroyed the bad page will stay leaked so it
-> won't affect subsequent activities.
-> 
-> > 
-> > > Is there a existing mechanism for this?
-> > 
-> > kvm_vm_dead()
-> 
-> Nice, that would do the trick. I'll modify the logic to also call that
-> after a reclaim failure.
+On Sat, May 18, 2024 at 2:04=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+> Disable KVM's "prove #VE" support by default, as it provides no functiona=
+l
+> value, and even its sanity checking benefits are relatively limited.  I.e=
+.
+> it should be fully opt-in even on debug kernels, especially since EPT
+> Violation #VE suppression appears to be buggy on some CPUs.
 
-Hmm, assuming there's no scenario where snp_page_reclaim() is expected fail, and
-such a failure is always unrecoverable, e.g. has similar potential for inducing
-host RMP #PFs, then KVM_BUG_ON() is more appropriate.
+More #VE trapping than #VE suppression.
 
-Ah, and there are already WARNs in the lower level helpers.  Those WARNs should
-be KVM_BUG_ON(), because AFAICT there's no scenario where letting the VM live on
-is safe/sensible.  And unless I'm missing something, snp_page_reclaim() should
-do the private=>shared conversion, because the only reason to reclaim a page is
-to move it back to shared state.
+I wouldn't go so far as making it *depend* on DEBUG_KERNEL.  EXPERT
+plus the scary help message is good enough.
 
-Lastly, I vote to rename host_rmp_make_shared() to kvm_rmp_make_shared() to make
-it more obvious that it's a KVM helper, whereas rmp_make_shared() is a generic
-kernel helper, i.e. _can't_ bug the VM because it doesn't (and shouldn't) have a
-pointer to the VM.
+What about this:
 
-E.g. end up with something like this:
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index b6831e17ec31..2864608c7016 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -97,14 +97,15 @@ config KVM_INTEL
 
-/*
- * Transition a page to hypervisor-owned/shared state in the RMP table. This
- * should not fail under normal conditions, but leak the page should that
- * happen since it will no longer be usable by the host due to RMP protections.
- */
-static int kvm_rmp_make_shared(struct kvm *kvm, u64 pfn, enum pg_level level)
-{
-	if (KVM_BUG_ON(rmp_make_shared(pfn, level), kvm)) {
-		snp_leak_pages(pfn, page_level_size(level) >> PAGE_SHIFT);
-		return -EIO;
-	}
+ config KVM_INTEL_PROVE_VE
+         bool "Check that guests do not receive #VE exceptions"
+-        depends on KVM_INTEL && DEBUG_KERNEL && EXPERT
++        depends on KVM_INTEL && EXPERT
+         help
+           Checks that KVM's page table management code will not incorrectl=
+y
+           let guests receive a virtualization exception.  Virtualization
+           exceptions will be trapped by the hypervisor rather than injecte=
+d
+           in the guest.
 
-	return 0;
-}
+-          This should never be enabled in a production environment.
++          Note that #VE trapping appears to be buggy on some CPUs.
++          This should never be enabled in a production environment!
 
-/*
- * Certain page-states, such as Pre-Guest and Firmware pages (as documented
- * in Chapter 5 of the SEV-SNP Firmware ABI under "Page States") cannot be
- * directly transitioned back to normal/hypervisor-owned state via RMPUPDATE
- * unless they are reclaimed first.
- *
- * Until they are reclaimed and subsequently transitioned via RMPUPDATE, they
- * might not be usable by the host due to being set as immutable or still
- * being associated with a guest ASID.
- *
- * Bug the VM and leak the page if reclaim fails, or if the RMP entry can't be
- * converted back to shared, as the page is no longer usable due to RMP
- * protections, and it's infeasible for the guest to continue on.
- */
-static int snp_page_reclaim(struct kvm *kvm, u64 pfn)
-{
-	struct sev_data_snp_page_reclaim data = {0};
-	int err;
+           If unsure, say N.
 
-	data.paddr = __sme_set(pfn << PAGE_SHIFT);
-	
-	if (KVM_BUG_ON(sev_do_cmd(SEV_CMD_SNP_PAGE_RECLAIM, &data, &err), kvm)) {
-		snp_leak_pages(pfn, 1);
-		return -EIO;
-	}
 
-	if (kvm_rmp_make_shared(kvm, pfn, PG_LEVEL_4K))
-		return -EIO;
+Paolo
 
-	return 0;
-}
+> Opportunistically add a line in the help text to make it abundantly clear
+> that KVM_INTEL_PROVE_VE should never be enabled in a production
+> environment.
+>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/Kconfig | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index 2a7f69abcac3..3468efc4be55 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -97,15 +97,15 @@ config KVM_INTEL
+>
+>  config KVM_INTEL_PROVE_VE
+>          bool "Check that guests do not receive #VE exceptions"
+> -        default KVM_PROVE_MMU || DEBUG_KERNEL
+> -        depends on KVM_INTEL
+> +        depends on KVM_INTEL && DEBUG_KERNEL && EXPERT
+>          help
+> -
+>            Checks that KVM's page table management code will not incorrec=
+tly
+>            let guests receive a virtualization exception.  Virtualization
+>            exceptions will be trapped by the hypervisor rather than injec=
+ted
+>            in the guest.
+>
+> +          This should never be enabled in a production environment.
+> +
+>            If unsure, say N.
+>
+>  config X86_SGX_KVM
+> --
+> 2.45.0.215.g3402c0e53f-goog
+>
+
 
