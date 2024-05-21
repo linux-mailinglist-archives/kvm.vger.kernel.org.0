@@ -1,204 +1,99 @@
-Return-Path: <kvm+bounces-17818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69BA8CA576
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 02:50:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17308CA583
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 03:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EB9CB22417
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 00:50:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8258A1F2153F
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 01:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E8EA955;
-	Tue, 21 May 2024 00:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7CCA955;
+	Tue, 21 May 2024 01:02:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g8nhCIoG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ngnLFSgM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705CAED9;
-	Tue, 21 May 2024 00:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834C07F
+	for <kvm@vger.kernel.org>; Tue, 21 May 2024 01:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716252613; cv=none; b=N5FxqQDPD+lU2nXlmIEsEFge1+qOVsuqj6PwbzmtkRgM/1aT02f+XqH5B80j53U4DZQbeGxcWuy2IQroo8KbGOwvHorllHdy5U0yXgSCZDH8DwjjvYYv2kJSmx1/qc+k2dASPoz/g9FHbK73yhIx11YC0JHZkIlWjXitQn2i/eg=
+	t=1716253357; cv=none; b=SQuiC7B04cXLnFKshzxoIwGGFMzjbrwS/bW3U705lvDFpPCCUR4W1R1dMssZKEJlCEPkHmkyvg4UQLPkCSGDgIwbRseCTJGeqL2a5cttuQp5+iSw8uD3ITLii2HJa7+qbnvQr+Pe7HqyiUQDd2BieS/cGVttu1K+zJOibBdJ9A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716252613; c=relaxed/simple;
-	bh=bmp8fr++SX2ZpALlJv3IjLJSzc2ON4Zni7XoFdvDuDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o+3yBssAhsyMUvth0e9yzQ/UZudwbi6A6ZXFimfPwIZIcGmcyYNPrcKmptBFr8kPcBB8uxNYhvzecoAGWGxFzenStD0psXoH0+dfCdErGFNxYH8Mq5GpFl5Dl61FuSUdEndU6v+uU4VWeU4ak2lwi4NtK+R1MRhI0vCdsULvqMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g8nhCIoG; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716252612; x=1747788612;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=bmp8fr++SX2ZpALlJv3IjLJSzc2ON4Zni7XoFdvDuDY=;
-  b=g8nhCIoGj53p5WyLh/KnRYXeptfXtd6QimTrfkW3vfDxadNEW0wizKjp
-   9BujN8mOjZyi1rGVHOyUHaz8kEHv4N7cBOME6Fasd3ICj66hLalw6VIIv
-   FK/Fwe5HrxXERgGEeX3qyZMX8oXUY/vE91WOMERcwxitBno+fCc2KG4S+
-   DUTwpopn4Q9wkYOeUPNssdxeqOsce4z04wwdHhyh4AJ8H1ABMV1d5DzUo
-   aOybnRX8Kc5uNivCcIHJetvvsZ5axAmGGq0CNZ9MAYf9H3P3ssDNLeOjw
-   1jH9tISpQOzP7KF9Hxgq6Tk3Mjnd2bc9TWBGV3h8PgIlYAx+plT7LBs/U
-   w==;
-X-CSE-ConnectionGUID: g4P7p4nmSXSE8GXx+y4zFQ==
-X-CSE-MsgGUID: CqwWUxrlR++jw0wIMLx/mg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11078"; a="12528644"
-X-IronPort-AV: E=Sophos;i="6.08,176,1712646000"; 
-   d="scan'208";a="12528644"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2024 17:50:11 -0700
-X-CSE-ConnectionGUID: qEl6I9APROCpPWpfMZ49fw==
-X-CSE-MsgGUID: k0zPN6EnRx2Q9MmHNETa3w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,176,1712646000"; 
-   d="scan'208";a="32618014"
-Received: from unknown (HELO [10.238.8.173]) ([10.238.8.173])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2024 17:50:02 -0700
-Message-ID: <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com>
-Date: Tue, 21 May 2024 08:49:59 +0800
+	s=arc-20240116; t=1716253357; c=relaxed/simple;
+	bh=62s9ZBQLECjqwaw8IyELeu4N6Gxe1GRRUiarSV+DbTA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=VHdnqNmQMh58gUAaxOS4qpB4Zdfjwey4OOLOSWIrDp1avFhzBtQOckghgptEZA/LXuDZdq87qemWGRe5DK3X6rHrRIXnu2MR+TLtUZnZEERI5MmR0juTVJWmv2b0N7+miE6djo9Wzp9fpUrRs2sVvJCYOi2o8wsJyUkTv9GB3MM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ngnLFSgM; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ece5eeb7c0so10761359b3a.2
+        for <kvm@vger.kernel.org>; Mon, 20 May 2024 18:02:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716253356; x=1716858156; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kj18FI+spxVo0wYyt5GLsAf9LnUaY68HrretgdhL1+Q=;
+        b=ngnLFSgMBYAqDnM+eXECVqCMKjSpijc4jSlWkGw5T2ec4kJG64E+oRuDhS5t1B6MkL
+         gDVNSvnk/OZqO3lw5Bknh66lBq23xfVujP6gY8JQ0LTOrK04gDP7QSfdE3YDCLaE/0f8
+         0uO+/nvEfhV6n7Lv3hDDcaITVTe/dOpZGdQX52tfJ8jDwpkAz0VBjPf5Vytu9+67Osjf
+         /GYqtinm8/UpkPqQFIuvegYwBU7PKbiWUOhv6lQvzJQ0guUjikqgfZbOnhhtcLouNAm1
+         fWA8Rjr7NjV0TUfJLCDGAB3TvouPDYRKBLSanh/U6E5UjsCAr7NEbDVhw7g5HiogOg/H
+         w4mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716253356; x=1716858156;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Kj18FI+spxVo0wYyt5GLsAf9LnUaY68HrretgdhL1+Q=;
+        b=e5wLepkFI5c0MDhEN5nVrReC2ZarL2q90w9xNgo22cLBZ849ZIg0xybKj6+i8aO6gb
+         FQ+sN9z5vkDS7pTeJ8koNFFn6ckKCyenwXWomlivwvQXBJwnTcRgynhXxdSi67Nlzmr/
+         KZ2H/84YWxzhCublWtdjXC0dMKBAy6NmxxYR8QOIUr0yQuctzNWiKhqrk3yzrn6dO3v4
+         L9gLPtTAxt/Lqafd2+lZxRLnEQWf8iwX7Gv2jZ2FddentIU0v7ACDpFVX42gDsUUcdVB
+         Z7ftmlFh3yYawCIdXqJQsF+U+iyBRQF3+0pqbnRKlPRUN2qBo9GjVfGGBP8tzZN4Jbtf
+         cL0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVrzjApZx8+7ehacBPxuaMiFckAdqoXCHpBI6JICDXsDc2Ivx9lgk+ozpXiZsmc6FR7Nyux6dn4NP3+fBEi5NWi3dts
+X-Gm-Message-State: AOJu0Yxw/gVw4ENT/s3tANzalonnj2iUtGi2lZEf8wHC1AaZs5afjQd4
+	PuOB4f+A6vYrkzOmdKVVxhCoTcRJKQFDMupvsKkTImo2s+pRR0x+1wUhR0J3mpwpAtrpY5EWisL
+	DCQ==
+X-Google-Smtp-Source: AGHT+IG2yAJanvKyU97focG/MqnEJX7x8reSfJL3QGZKYOWsxkzVO6QuYNNBaybkLhpdSDhQ/N8gw84H7eA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:a91:b0:6f4:d079:bb24 with SMTP id
+ d2e1a72fcca58-6f4e0296acamr1399421b3a.1.1716253355725; Mon, 20 May 2024
+ 18:02:35 -0700 (PDT)
+Date: Mon, 20 May 2024 18:02:34 -0700
+In-Reply-To: <3e7413b5-482a-4243-be6c-21a0ee232cc4@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
- State Change VMGEXIT
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, seanjc@google.com,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- Brijesh Singh <brijesh.singh@amd.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240501085210.2213060-10-michael.roth@amd.com>
- <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
- <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240518000430.1118488-1-seanjc@google.com> <20240518000430.1118488-3-seanjc@google.com>
+ <78b3a0ef-54dc-4f49-863e-fe8288a980a7@intel.com> <ZkvbUNGEZwUHgHV9@google.com>
+ <b1def408-f6e8-4ab5-ac7a-52f11f490337@intel.com> <ZkvpDkOTW8SwrO5g@google.com>
+ <3e7413b5-482a-4243-be6c-21a0ee232cc4@intel.com>
+Message-ID: <ZkvyqjLoGxuf-AdC@google.com>
+Subject: Re: [PATCH 2/9] KVM: nVMX: Initialize #VE info page for vmcs02 when
+ proving #VE support
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Tue, May 21, 2024, Kai Huang wrote:
+> But now L0 always handles #VE exits from L2, and AFAICT L0 will just kill
+> the L1, until the patch:
+> 
+> 	KVM: VMX: Don't kill the VM on an unexpected #VE
+> 
+> lands.
+> 
+> So looks that patch at least should be done first.  Otherwise it doesn't
+> make a lot sense to kill L1 for #VE exits from L2.
 
-
-On 5/17/2024 1:23 AM, Paolo Bonzini wrote:
-> On Thu, May 16, 2024 at 10:29 AM Binbin Wu <binbin.wu@linux.intel.com> wrote:
->>
->>
->> On 5/1/2024 4:51 PM, Michael Roth wrote:
->>> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
->>> table to be private or shared using the Page State Change MSR protocol
->>> as defined in the GHCB specification.
->>>
->>> When using gmem, private/shared memory is allocated through separate
->>> pools, and KVM relies on userspace issuing a KVM_SET_MEMORY_ATTRIBUTES
->>> KVM ioctl to tell the KVM MMU whether or not a particular GFN should be
->>> backed by private memory or not.
->>>
->>> Forward these page state change requests to userspace so that it can
->>> issue the expected KVM ioctls. The KVM MMU will handle updating the RMP
->>> entries when it is ready to map a private page into a guest.
->>>
->>> Use the existing KVM_HC_MAP_GPA_RANGE hypercall format to deliver these
->>> requests to userspace via KVM_EXIT_HYPERCALL.
->>>
->>> Signed-off-by: Michael Roth <michael.roth@amd.com>
->>> Co-developed-by: Brijesh Singh <brijesh.singh@amd.com>
->>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->>> ---
->>>    arch/x86/include/asm/sev-common.h |  6 ++++
->>>    arch/x86/kvm/svm/sev.c            | 48 +++++++++++++++++++++++++++++++
->>>    2 files changed, 54 insertions(+)
->>>
->>> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
->>> index 1006bfffe07a..6d68db812de1 100644
->>> --- a/arch/x86/include/asm/sev-common.h
->>> +++ b/arch/x86/include/asm/sev-common.h
->>> @@ -101,11 +101,17 @@ enum psc_op {
->>>        /* GHCBData[11:0] */                            \
->>>        GHCB_MSR_PSC_REQ)
->>>
->>> +#define GHCB_MSR_PSC_REQ_TO_GFN(msr) (((msr) & GENMASK_ULL(51, 12)) >> 12)
->>> +#define GHCB_MSR_PSC_REQ_TO_OP(msr) (((msr) & GENMASK_ULL(55, 52)) >> 52)
->>> +
->>>    #define GHCB_MSR_PSC_RESP           0x015
->>>    #define GHCB_MSR_PSC_RESP_VAL(val)                  \
->>>        /* GHCBData[63:32] */                           \
->>>        (((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
->>>
->>> +/* Set highest bit as a generic error response */
->>> +#define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
->>> +
->>>    /* GHCB Hypervisor Feature Request/Response */
->>>    #define GHCB_MSR_HV_FT_REQ          0x080
->>>    #define GHCB_MSR_HV_FT_RESP         0x081
->>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->>> index e1ac5af4cb74..720775c9d0b8 100644
->>> --- a/arch/x86/kvm/svm/sev.c
->>> +++ b/arch/x86/kvm/svm/sev.c
->>> @@ -3461,6 +3461,48 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u64 value)
->>>        svm->vmcb->control.ghcb_gpa = value;
->>>    }
->>>
->>> +static int snp_complete_psc_msr(struct kvm_vcpu *vcpu)
->>> +{
->>> +     struct vcpu_svm *svm = to_svm(vcpu);
->>> +
->>> +     if (vcpu->run->hypercall.ret)
->> Do we have definition of ret? I didn't find clear documentation about it.
->> According to the code, 0 means succssful. Is there any other error codes
->> need to or can be interpreted?
-> They are defined in include/uapi/linux/kvm_para.h
->
-> #define KVM_ENOSYS        1000
-> #define KVM_EFAULT        EFAULT /* 14 */
-> #define KVM_EINVAL        EINVAL /* 22 */
-> #define KVM_E2BIG        E2BIG /* 7 */
-> #define KVM_EPERM        EPERM /* 1*/
-> #define KVM_EOPNOTSUPP        95
->
-> Linux however does not expect the hypercall to fail for SEV/SEV-ES; and
-> it will terminate the guest if the PSC operation fails for SEV-SNP.  So
-> it's best for userspace if the hypercall always succeeds. :)
-Thanks for the info.
-
-For TDX, it wants to restrict the size of memory range for conversion in 
-one hypercall to avoid a too long latency.
-Previously, in TDX QEMU patchset v5, the limitation is in userspace and  
-if the size is too big, the status_code will set to TDG_VP_VMCALL_RETRY 
-and the failed GPA for guest to retry is updated.
-https://lore.kernel.org/all/20240229063726.610065-51-xiaoyao.li@intel.com/
-
-When TDX converts TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE, do you think 
-which is more reasonable to set the restriction? In KVM (TDX specific 
-code) or userspace?
-If userspace is preferred, then the interface needs to  be extended to 
-support it.
-
-
->
->> For TDX, it may also want to use KVM_HC_MAP_GPA_RANGE hypercall  to
->> userspace via KVM_EXIT_HYPERCALL.
-> Yes, definitely.
->
-> Paolo
->
-
+I have no objection to changing the order.
 
