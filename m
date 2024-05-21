@@ -1,164 +1,189 @@
-Return-Path: <kvm+bounces-17864-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17865-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0F38CB4BD
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 22:31:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4488C8CB4D9
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 22:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50DA71F22826
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 20:31:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFA65284821
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 20:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6761494B9;
-	Tue, 21 May 2024 20:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3357814901B;
+	Tue, 21 May 2024 20:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q8xTUZJh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AWGJg9jC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D738F50269
-	for <kvm@vger.kernel.org>; Tue, 21 May 2024 20:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D427F49F
+	for <kvm@vger.kernel.org>; Tue, 21 May 2024 20:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716323505; cv=none; b=Z6GR4LtEfoNkQAbvjJPlPanKJT1hytcFxiS2quj4FrlcFmH4A8pIfEWR4cRHpMRs+3iwxTbZcjwTGIwQkfWS0bZSI4x08oZ4g0kSYtot3gk6Z4AiFkBGgITmEikRMXT9o6Ifbm1wB4GlqiWmo05f7PUG3Th/B5xh3r9O2c4d9mw=
+	t=1716324438; cv=none; b=bwCCXBR8gXlpDwFU9l9je+aqD+7ZsaIHID6kTLh0wcTjzWMpz1S0jTjdeXqfpPsLJgSO17BdS9/KTZDlx7RuKS6PeRxa98dS1Bn7bLBxdef36Lg0thYi5AXJh+4bNp1S2CgqPui8291rjMPaFt5085YHm2mbJb5vu1F6fKPPSO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716323505; c=relaxed/simple;
-	bh=QuUd2WIszBgiRLRMwosQW3GxJBwnIuQ7/If73ZyYbfA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TTnMwaL6F8UB2E5Q4H/HdqjofHp2Ond8pXMe1Nh62Fy5klcN5GeOaiJw25EE/6db/FVFGn0nziqWeg8hJMNa6dhwdLIIOpN5i02ObaSGwwasz5UaXQUXs8woL4LOUtgfcvnBk0Xl7QpyhIcsK/Bm+Sidxuqr/v0Uqd72ugGnzlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q8xTUZJh; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6f46eb81892so12712911b3a.0
-        for <kvm@vger.kernel.org>; Tue, 21 May 2024 13:31:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716323503; x=1716928303; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIxYIUY6xfa0Z61X8hb/LG8bYVX3fiRC8Zg5CcwCluY=;
-        b=Q8xTUZJhveLvXkoO/x1fUOd7lVkYsmwGekVBSXOGvD7dOcNFBllInms6rwOKzACnzl
-         ET+wZ0hm5g0QORofywxELACZAF6GOVfvKiNobkumnvSLli7p2gMJh2qrrA5fULNzAdNK
-         gjqK4k11nClvwgtd2jHOeGYkurDSlZwJGoqhQPsViubV612do1xo1vGTSMKwvVsnJWSs
-         3f0Dw1VZwLPzH4QyfnNx0WSE221vP0WW3x9cagaa8raPCearALdajpMK7fIR7NpY/Ts3
-         jP8ruxTOZEoMVIXIKYJMFS4aAganq5VtCZNdcpCQ6iWwkIhMpRz4JhZqiOWqbnpXiKql
-         m6Pw==
+	s=arc-20240116; t=1716324438; c=relaxed/simple;
+	bh=/RrA+IkihiMWw6BwGKsHsXwxUySSG2WGe39iX7tOFL4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n3S9ga87rdilABt5LoJk0SAt2wU5U2ohnbYXVKsxObxwaG7TTdeT91LD99nU+UgQ7wMxnhUwTOekQYUhY+ZhxfLPgiCOqF1lzYUCQE+oGyrE5u+VQgNeR4SJd8/qFZI8BXuSrGMQBozn1NWU233hVxmBMqc/e0WgD3eKNrQVD6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AWGJg9jC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716324435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ASHds6F2Qt89jBYBISFH+hUHw17yTjB7XJcTzPoZFHU=;
+	b=AWGJg9jCm43qJN+O+MwnI/NHrExeB8ga9rbW268BPYH5pqSxQN7rU+eX4fkBVASh4f+J+d
+	qtBGZhamze/OMwKcAk6Cvxb63CgToNY8c9oaOBCiTLSUjSzWvzW89OahpPMSzVz+VdVaoJ
+	9m0jzPQ29B87hcVjgpdybIYUe3aQRK4=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-tbkysa8XNwahIVV-SRW2tQ-1; Tue, 21 May 2024 16:47:14 -0400
+X-MC-Unique: tbkysa8XNwahIVV-SRW2tQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-354cdfb204fso1162494f8f.1
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 13:47:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716323503; x=1716928303;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RIxYIUY6xfa0Z61X8hb/LG8bYVX3fiRC8Zg5CcwCluY=;
-        b=uE/MgoqFlfJiBgwZBvbD4adgt81AcXzDDGHWLZdUdwyFOGzC4irNMDlrcXESAruSIX
-         PAzISakkgfb5W5Co/LA3FeJFoCdk/jX/XKYPs9I2c1cY5D89xdLpez647kEc185VDavs
-         EzRludr4cblOWXuKibeReGBb3U0GDxO5ZdcfO5sTIEqCwLgBX7Sr3rbXmvG1BZaJHUMr
-         DSOXms9cIzY2/76gLI6WtR0jEYSK0KVAfedQO1G6bi6W47pEaehp9Ia8IuJXVbrjwE6/
-         Pvr2SNb/TUG5jW6kgvljDV4OJT6vEeSmNI4v9pVTuIrX+R1u9l5UVclqu1r2yWBMKDkw
-         lIkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVhKcRxVHdohr0oUgJu8xT8qT6RDMaoFWxbYmDVWUl5FTj239RxWLR4iZ/rzl7olWc/C40rXpeZEHUDxTeU3xMdA4/X
-X-Gm-Message-State: AOJu0YxlQB3jfKK8ETKpgXBrGWd3EY/SEfs7XXNfJEOuoGPgosDYAVYC
-	JSkp3nXNNFCwg/qYbp3+CrYXWhDXyY0aP921V84G3ZcPYkX4TRMgYMB4dBqYQXDd7c+/eXpHY3P
-	Y1w==
-X-Google-Smtp-Source: AGHT+IHh7glVSft5QaLCRrxXDi7uu5WLdc5qtZ1rOL0wAEurEIF+QY6zQhvvtTu4XmwUuxKFnuuMpe8K5ec=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2e8f:b0:6f3:f447:57e1 with SMTP id
- d2e1a72fcca58-6f6d6002b65mr392b3a.1.1716323502715; Tue, 21 May 2024 13:31:42
- -0700 (PDT)
-Date: Tue, 21 May 2024 13:31:41 -0700
-In-Reply-To: <b66ea07a-f57e-014c-68b4-729f893c2fbd@amd.com>
+        d=1e100.net; s=20230601; t=1716324433; x=1716929233;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ASHds6F2Qt89jBYBISFH+hUHw17yTjB7XJcTzPoZFHU=;
+        b=xUsUK1W1XsNNwG4vWS335xOBqWptF1eysXkZ79biWO3rnKXcwHsTFkNndKG0zoLMOg
+         mxiOkBeav8+/Y8yLgx6b3NcqVYOcqfq20xqDgi3o9XQ7HWBsQtKF/7sPwnTpT01TqEpw
+         XLS1qpUIh3JG3eoFBkFuw9C+W2qiN/otg6MbIu14nWnDqMgqK7wwoTXARsPucKdUa6SL
+         7wLMtNo/qaTS5ubPT4UXDpXZcCDgqr+NO3EtYktAldJoZhmyqZV/ira0CIZ5D/HEPwdi
+         0aqcNl9iw/UJim2UfjqG6Rrisyvq682rUF4Hf/x1uzbCQp5kzVf25VC7ZZH+lUG8ZeLu
+         PFZA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9dD98pHBDz9zKDADJ3UP/p453eTQWsgH+awrVaRA9t6aQr/7WZptE/dAKbxeBsdugOFOk38riBw6aJbN+nwF1iZts
+X-Gm-Message-State: AOJu0Yz4OeTQgcTsq0f8BHR5yygRGfd1NML2Z2lqs2QRlTZesiuanIwi
+	HLjVfUiMuOoD65Gd/hznqirVeEH5ULswz0iXvWV288Js+v1DJJj8UzXdKRMGzhDw6hvwj9Kr6iU
+	vkQQoYpu5kughExFRCRToEzc9xBncFz0XWXDYvCDaRbmA0+FyKvmskEZHrK4rQa7HLpi7MzHr5a
+	5h9R+VHe10mdI206fYytKL9Nru
+X-Received: by 2002:adf:db44:0:b0:34b:9cd5:76ae with SMTP id ffacd0b85a97d-354d8cc8fbemr47424f8f.8.1716324433267;
+        Tue, 21 May 2024 13:47:13 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEciNx0iM19slNMQ4HXnGJhE7jgh7LrOK8zYmVZz4vNdplHjhoIh1dd/caJ/D7gzzYeXDIvXiE2C+R8w8AY4R0=
+X-Received: by 2002:adf:db44:0:b0:34b:9cd5:76ae with SMTP id
+ ffacd0b85a97d-354d8cc8fbemr47417f8f.8.1716324432865; Tue, 21 May 2024
+ 13:47:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20240416050338.517-1-ravi.bangoria@amd.com> <ZjQnFO9Pf4OLZdLU@google.com>
  <9252b68e-2b6a-6173-2e13-20154903097d@amd.com> <Zjp8AIorXJ-TEZP0@google.com>
- <305b84aa-3897-40f4-873b-dc512a2da61f@amd.com> <ZkdqW8JGCrUUO3RA@google.com> <b66ea07a-f57e-014c-68b4-729f893c2fbd@amd.com>
-Message-ID: <Zk0ErRQt3XH7xK6O@google.com>
+ <305b84aa-3897-40f4-873b-dc512a2da61f@amd.com> <ZkdqW8JGCrUUO3RA@google.com>
+ <b66ea07a-f57e-014c-68b4-729f893c2fbd@amd.com> <Zk0ErRQt3XH7xK6O@google.com>
+In-Reply-To: <Zk0ErRQt3XH7xK6O@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 21 May 2024 22:47:01 +0200
+Message-ID: <CABgObfaXAERePMQrrpWg8PqM1TOq8TJT65i3WgU0n0-vePDGNg@mail.gmail.com>
 Subject: Re: [PATCH v2] KVM: SEV-ES: Don't intercept MSR_IA32_DEBUGCTLMSR for
  SEV-ES guests
-From: Sean Christopherson <seanjc@google.com>
-To: Ravi Bangoria <ravi.bangoria@amd.com>
-Cc: pbonzini@redhat.com, thomas.lendacky@amd.com, tglx@linutronix.de, 
+To: Sean Christopherson <seanjc@google.com>
+Cc: Ravi Bangoria <ravi.bangoria@amd.com>, thomas.lendacky@amd.com, tglx@linutronix.de, 
 	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
 	hpa@zytor.com, michael.roth@amd.com, nikunj.dadhania@amd.com, 
 	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, santosh.shukla@amd.com
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, May 20, 2024, Ravi Bangoria wrote:
-> On 17-May-24 8:01 PM, Sean Christopherson wrote:
-> > On Fri, May 17, 2024, Ravi Bangoria wrote:
-> >> On 08-May-24 12:37 AM, Sean Christopherson wrote:
-> >>> So unless I'm missing something, the only reason to ever disable LBRV would be
-> >>> for performance reasons.  Indeed the original commits more or less says as much:
-> >>>
-> >>>   commit 24e09cbf480a72f9c952af4ca77b159503dca44b
-> >>>   Author:     Joerg Roedel <joerg.roedel@amd.com>
-> >>>   AuthorDate: Wed Feb 13 18:58:47 2008 +0100
-> >>>
-> >>>     KVM: SVM: enable LBR virtualization
-> >>>     
-> >>>     This patch implements the Last Branch Record Virtualization (LBRV) feature of
-> >>>     the AMD Barcelona and Phenom processors into the kvm-amd module. It will only
-> >>>     be enabled if the guest enables last branch recording in the DEBUG_CTL MSR. So
-> >>>     there is no increased world switch overhead when the guest doesn't use these
-> >>>     MSRs.
-> >>>
-> >>> but what it _doesn't_ say is what the world switch overhead is when LBRV is
-> >>> enabled.  If the overhead is small, e.g. 20 cycles?, then I see no reason to
-> >>> keep the dynamically toggling.
-> >>>
-> >>> And if we ditch the dynamic toggling, then this patch is unnecessary to fix the
-> >>> LBRV issue.  It _is_ necessary to actually let the guest use the LBRs, but that's
-> >>> a wildly different changelog and justification.
-> >>
-> >> The overhead might be less for legacy LBR. But upcoming hw also supports
-> >> LBR Stack Virtualization[1]. LBR Stack has total 34 MSRs (two control and
-> >> 16*2 stack). Also, Legacy and Stack LBR virtualization both are controlled
-> >> through the same VMCB bit. So I think I still need to keep the dynamic
-> >> toggling for LBR Stack virtualization.
-> > 
-> > Please get performance number so that we can make an informed decision.  I don't
-> > want to carry complexity because we _think_ the overhead would be too high.
-> 
-> LBR Virtualization overhead for guest entry + exit roundtrip is ~450 cycles* on
+On Tue, May 21, 2024 at 10:31=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Mon, May 20, 2024, Ravi Bangoria wrote:
+> > On 17-May-24 8:01 PM, Sean Christopherson wrote:
+> > > On Fri, May 17, 2024, Ravi Bangoria wrote:
+> > >> On 08-May-24 12:37 AM, Sean Christopherson wrote:
+> > >>> So unless I'm missing something, the only reason to ever disable LB=
+RV would be
+> > >>> for performance reasons.  Indeed the original commits more or less =
+says as much:
+> > >>>
+> > >>>   commit 24e09cbf480a72f9c952af4ca77b159503dca44b
+> > >>>   Author:     Joerg Roedel <joerg.roedel@amd.com>
+> > >>>   AuthorDate: Wed Feb 13 18:58:47 2008 +0100
+> > >>>
+> > >>>     KVM: SVM: enable LBR virtualization
+> > >>>
+> > >>>     This patch implements the Last Branch Record Virtualization (LB=
+RV) feature of
+> > >>>     the AMD Barcelona and Phenom processors into the kvm-amd module=
+. It will only
+> > >>>     be enabled if the guest enables last branch recording in the DE=
+BUG_CTL MSR. So
+> > >>>     there is no increased world switch overhead when the guest does=
+n't use these
+> > >>>     MSRs.
+> > >>>
+> > >>> but what it _doesn't_ say is what the world switch overhead is when=
+ LBRV is
+> > >>> enabled.  If the overhead is small, e.g. 20 cycles?, then I see no =
+reason to
+> > >>> keep the dynamically toggling.
+> > >>>
+> > >>> And if we ditch the dynamic toggling, then this patch is unnecessar=
+y to fix the
+> > >>> LBRV issue.  It _is_ necessary to actually let the guest use the LB=
+Rs, but that's
+> > >>> a wildly different changelog and justification.
+> > >>
+> > >> The overhead might be less for legacy LBR. But upcoming hw also supp=
+orts
+> > >> LBR Stack Virtualization[1]. LBR Stack has total 34 MSRs (two contro=
+l and
+> > >> 16*2 stack). Also, Legacy and Stack LBR virtualization both are cont=
+rolled
+> > >> through the same VMCB bit. So I think I still need to keep the dynam=
+ic
+> > >> toggling for LBR Stack virtualization.
+> > >
+> > > Please get performance number so that we can make an informed decisio=
+n.  I don't
+> > > want to carry complexity because we _think_ the overhead would be too=
+ high.
+> >
+> > LBR Virtualization overhead for guest entry + exit roundtrip is ~450 cy=
+cles* on
+>
+> Ouch.  Just to clearify, that's for LBR Stack Virtualization, correct?
 
-Ouch.  Just to clearify, that's for LBR Stack Virtualization, correct?
+And they are all in the VMSA, triggered by LBR_CTL_ENABLE_MASK, for
+non SEV-ES guests?
 
-Ugh, I was going to say that we could always enable "legacy" LBR virtualization,
-and do the dynamic toggling iff DebugExtnCtl.LBRS=1, but they share an enabling
-flag.  What a mess.
+> Anyways, I agree that we need to keep the dynamic toggling.
+> But I still think we should delete the "lbrv" module param.  LBR Stack su=
+pport has
+> a CPUID feature flag, i.e. userspace can disable LBR support via CPUID in=
+ order
+> to avoid the overhead on CPUs with LBR Stack.
 
-> a Genoa machine. Also, LBR MSRs (except MSR_AMD_DBG_EXTN_CFG) are of swap type
-> C so this overhead is only for guest MSR save/restore.
+The "lbrv" module parameter is only there to test the logic for
+processors (including nested virt) that don't have LBR virtualization.
+But the only effect it has is to drop writes to
+MSR_IA32_DEBUGCTL_MSR...
 
-Lovely.
+>                 if (kvm_cpu_cap_has(X86_FEATURE_LBR_STACK) &&
+>                     !guest_cpuid_has(vcpu, X86_FEATURE_LBR_STACK)) {
+>                         kvm_pr_unimpl_wrmsr(vcpu, ecx, data);
+>                         break;
+>                 }
 
-Have I mentioned that the SEV-ES behavior of force-enabling every feature under
-the sun is really, really annoying?
+... and if you have this, adding an "!lbrv ||" is not a big deal, and
+allows testing the code on machines without LBR stack.
 
-Anyways, I agree that we need to keep the dynamic toggling.
+Paolo
 
-But I still think we should delete the "lbrv" module param.  LBR Stack support has
-a CPUID feature flag, i.e. userspace can disable LBR support via CPUID in order
-to avoid the overhead on CPUs with LBR Stack.  The logic for MSR_IA32_DEBUGCTLMSR
-will be bizarre, but I don't see a way around that since legacy LBR virtualization
-and LBR Stack virtualization share a control.
+>                 svm_get_lbr_vmcb(svm)->save.dbgctl =3D data;
+>                 svm_update_lbrv(vcpu);
+>                 break;
+>
 
-E.g. I think we'll want to end up with something like this?
-
-	case MSR_IA32_DEBUGCTLMSR:
-		if (data & DEBUGCTL_RESERVED_BITS)
-			return 1;
-
-		if (kvm_cpu_cap_has(X86_FEATURE_LBR_STACK) &&
-		    !guest_cpuid_has(vcpu, X86_FEATURE_LBR_STACK)) {
-		    	kvm_pr_unimpl_wrmsr(vcpu, ecx, data);
-			break;
-		}
-
-		svm_get_lbr_vmcb(svm)->save.dbgctl = data;
-		svm_update_lbrv(vcpu);
-		break;
 
