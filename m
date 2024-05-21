@@ -1,118 +1,139 @@
-Return-Path: <kvm+bounces-17829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2228CA8D9
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 09:21:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E13808CA97B
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 09:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BAF0282402
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 07:21:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F1A01C20EEC
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 07:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7A34F88A;
-	Tue, 21 May 2024 07:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DC45674E;
+	Tue, 21 May 2024 07:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Qx1mDMxV"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="tRSIHZVI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61F2F179BD;
-	Tue, 21 May 2024 07:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5698055C33
+	for <kvm@vger.kernel.org>; Tue, 21 May 2024 07:58:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716276074; cv=none; b=Qv2CVV/06o+MPbP+n2XRr8tOtRlhbrFvcPD5c3GdhtrORU0KWKp7/IMVgrmz1HqEthW1sI/ZFLpVMpmpiJ1Mx+kDiXX5sw4u3Ltu1lORwP2UDoBCpp5HGKS6p7L0BH01QNwpj/E7h1B9y6yVp9p6LgnlT2hxB0XqurQwm0hK4kk=
+	t=1716278311; cv=none; b=a1FsCJbnQquRxK5rUqpsLvt7OdEeSTCde5f2khHL1jhgaHwbnP6c8Q4OjM8pDVHquaBUexN4YyCJpRXqD9IEOfz6N7Q7HOmQxTCkBg89TS3jVMJm2kzIMuv3XHupAxsccapEEThqlSr7Fg0MrW6mnKY8PwdpApDRlkvIa9WrHkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716276074; c=relaxed/simple;
-	bh=NCuRqtf4hbaWEv2tg870lYe1vIfJnNGgszYy20WfbEE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O12mD9Y9UoAgvb05BAnRvW/9rp1AJpqZ8EtIt0QyRMxwp04NCY09UiF4ebORbkW3MOcEghTr2xhQNWFMkCwhBFnLuSfPwT1M28Osu8A5o3Uy+rTRPzHw5yX8xVZVhVMQQ35AsI4vKqygerOHjx7iAh1W77oargyIdWRNYv7tp24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Qx1mDMxV; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716276072; x=1747812072;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NCuRqtf4hbaWEv2tg870lYe1vIfJnNGgszYy20WfbEE=;
-  b=Qx1mDMxVIDQX1QlJJQ8Lesy/vQE+8EwCXkZp8DtYRJRYd+jdTAnHslPy
-   80ClkG0f6L+AuQSehbKTeakx46/xT7Egcov1RYcBtko3MpwSBscRy/zsi
-   k9JF8yXeAa/A8hnLi31y7Y9H49In1yeMeaZsB73xE60CHUAbO/q1ecssa
-   vRR4I+9bL2sJ2zkEfSpzPTX6MSvHIfCqSX2xz3r7Bd/LiAfWpEgKMOQwg
-   z27HLSgnnaWlzlnLc+FgsJ/epGtixmGxxfVeScNvzWab8WHyrYqDs8sIg
-   8r5Xs+nVp5SJbCnVnSJ936K9Fk7QbIkQsqq7mY8HrTah377Vsi+LO4oa/
-   w==;
-X-CSE-ConnectionGUID: RUddRDgSSRKLOBJMaBRpxA==
-X-CSE-MsgGUID: utmEdidcQWWzMEL2McwBgw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11078"; a="12673446"
-X-IronPort-AV: E=Sophos;i="6.08,177,1712646000"; 
-   d="scan'208";a="12673446"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2024 00:21:12 -0700
-X-CSE-ConnectionGUID: DdQXJ35BRhm3ehYXLG3OJA==
-X-CSE-MsgGUID: Ib5lFRWpRHOHmyGNrtsDeQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,177,1712646000"; 
-   d="scan'208";a="63652041"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2024 00:21:11 -0700
-Date: Tue, 21 May 2024 00:21:11 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@intel.com,
-	isaku.yamahata@linux.intel.com
-Subject: Re: [PATCH 1/9] KVM: x86/mmu: Use SHADOW_NONPRESENT_VALUE for atomic
- zap in TDP MMU
-Message-ID: <20240521072111.GA212599@ls.amr.corp.intel.com>
-References: <20240518000430.1118488-1-seanjc@google.com>
- <20240518000430.1118488-2-seanjc@google.com>
+	s=arc-20240116; t=1716278311; c=relaxed/simple;
+	bh=YbW/ijAGccFQlQTqAfJm9lN3VLgscw+sw3OGEMReWk8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JIHMETmBrAWXp1d98i5nuzJtBkrwq7PcxnhXSXLynwjwyeTP4lEX/a2J+MlYmidyEAiDfMKKaxzyJICr4Y1cXYEl5iQx6bsNCU98jtNV6wxNiApLGPFLM6xKP1Pik7EhnjkXT3S1M2jfZ34O7dbPEuGbCibqK58r1vJiNWQi4is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=tRSIHZVI; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-354c3a7f972so69459f8f.1
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 00:58:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1716278307; x=1716883107; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GBb6iShuxHaV7v6bJv2LipIX1/0KjJPEPWALv2DbLcM=;
+        b=tRSIHZVIGlH4zuEM4xjxevPKjIjyEAC7TRQMEzuN/x7oZnnoRXErQdwagNObslHH9Q
+         4o/O20kCD3/rOzIDpSRuQBNHLC6F0eKPsWpJ+j2bkiBL5mY5DtjNMGfrbxOWWUN9J2f9
+         SiK0EvVLTRBDnq8+NF3PKD/iE9F0ztId7AlHJc/k8DbgtdSeAPcYAWvCBR+N4vQirYg9
+         3bQ4Aj19SyPzZo9Rh5lhxH4VhCsCEpv9kCyh985X/wmyy4hXj/tpiBZyu0pQIJShKUQf
+         D2bj4QGrUQzjNCBXlVGxfM7OHMnIIyfaUW9MNRMpvgFuDHLRDQ+eJTqTJAuMS0A2v+Mh
+         /Jrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716278307; x=1716883107;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GBb6iShuxHaV7v6bJv2LipIX1/0KjJPEPWALv2DbLcM=;
+        b=SbLgZsGzQtRi1TN8Aq0uQ7DbdhuwMWZiLa8+cWPsrE3x+Euyt+17YUKMJ7bWsqBLtd
+         uGsV/coLTQQh7xxJAuEsWPH0pf/GUWBO9XtmW4CTQ7KuAlKPTvS33a6j/9jcKbq2SeFP
+         j4dxRN4EN1ZoUkwhbQ9RgypVGF8a9U+17E5WSTcYawuAm7tScqQ7l9kZ79SfnybYKJHg
+         jFAi4oCFOaKjHpdzpQzjnal8gwT1Ho0qx/V5fHylkZ/6hqp3yCIqGPRJWT+KvE2MYYhk
+         oRluNa6NWMVD/WLeuXb9e9MKOh0Hx7+HsCrV+fWJn7pvDP/WLSx/VTb18CmWIk9bSKb6
+         IKAg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKj5ru2dqH92xgnwZ5NqfPYz61I/JDXydg+54iAqD2+kIwdmD2AB6dAIpAmmhLk6xr5pckQfA5tQGnXerbvwA7tLBn
+X-Gm-Message-State: AOJu0YzJfx9Pa3RpjV+wvA53a7HvdmdYKOsBZCqPE1yPZqOsBc0ps1ta
+	Ag9gU0+hT1e0GAUSKhozuhJNl7a/P0lU0vA/49FERxbQe3rjyF+fl+F+52TzIGU=
+X-Google-Smtp-Source: AGHT+IHfRRdzTlFAebZ7wRlj20qZMeakja/n64TG1vwKypRDd/Ir6iJk3WrsYiVjjhgxZ9RFdOvn+A==
+X-Received: by 2002:adf:eed1:0:b0:34d:7201:460a with SMTP id ffacd0b85a97d-3504a10f308mr21256806f8f.0.1716278307420;
+        Tue, 21 May 2024 00:58:27 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:999:a3a0:813a:5863:97f7:aca7? ([2a01:e0a:999:a3a0:813a:5863:97f7:aca7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbbefdsm31017829f8f.94.2024.05.21.00.58.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 May 2024 00:58:26 -0700 (PDT)
+Message-ID: <6d2eb1ec-010d-4390-a25e-afd2fca0311d@rivosinc.com>
+Date: Tue, 21 May 2024 09:58:25 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240518000430.1118488-2-seanjc@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 07/16] riscv: add ISA extensions validation callback
+To: Conor Dooley <conor@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Paul Walmsley
+ <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+ Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org, kvm@vger.kernel.org,
+ kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+References: <20240517145302.971019-1-cleger@rivosinc.com>
+ <20240517145302.971019-8-cleger@rivosinc.com>
+ <20240517-scrunch-palace-2f83aa8cc3ce@spud>
+Content-Language: en-US
+From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
+In-Reply-To: <20240517-scrunch-palace-2f83aa8cc3ce@spud>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, May 17, 2024 at 05:04:22PM -0700,
-Sean Christopherson <seanjc@google.com> wrote:
 
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> Use SHADOW_NONPRESENT_VALUE when zapping TDP MMU SPTEs with mmu_lock held
-> for read, tdp_mmu_zap_spte_atomic() was simply missed during the initial
-> development.
-> 
-> Fixes: 7f01cab84928 ("KVM: x86/mmu: Allow non-zero value for non-present SPTE and removed SPTE")
-> Not-yet-signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> [sean: write changelog]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 1259dd63defc..36539c1b36cd 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -626,7 +626,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
->  	 * SPTEs.
->  	 */
->  	handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-> -			    0, iter->level, true);
-> +			    SHADOW_NONPRESENT_VALUE, iter->level, true);
->  
->  	return 0;
->  }
-> -- 
-> 2.45.0.215.g3402c0e53f-goog
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+On 17/05/2024 18:44, Conor Dooley wrote:
+> On Fri, May 17, 2024 at 04:52:47PM +0200, Clément Léger wrote:
+>> Since a few extensions (Zicbom/Zicboz) already needs validation and
+>> future ones will need it as well (Zc*) add a validate() callback to
+>> struct riscv_isa_ext_data. This require to rework the way extensions are
+>> parsed and split it in two phases. First phase is isa string or isa
+>> extension list parsing and consists in enabling all the extensions in a
+>> temporary bitmask (source isa) without any validation. The second step
+>> "resolves" the final isa bitmap, handling potential missing dependencies.
+>> The mechanism is quite simple and simply validate each extension
+>> described in the source bitmap before enabling it in the resolved isa
+>> bitmap. validate() callbacks can return either 0 for success,
+>> -EPROBEDEFER if extension needs to be validated again at next loop. A
+>> previous ISA bitmap is kept to avoid looping multiple times if an
+>> extension dependencies are never satisfied until we reach a stable
+>> state. In order to avoid any potential infinite looping, allow looping
+>> a maximum of the number of extension we handle. Zicboz and Zicbom
+>> extensions are modified to use this validation mechanism.
+> 
+> I wish we weren't doin' it at all, but since we have to, I think what
+> you've got here is good.
+
+Yup, this is what you got with a fast evolving architecture I guess ;)
+
+> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> 
+> Do you want me to send some patches for the F/V stuff we discussed
+> previously?
+
+Sure go ahead, I did not have anything written yet.
+
+Thanks,
+
+Clément
+
+> 
+> Cheers,
+> Conor.
 
