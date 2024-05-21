@@ -1,120 +1,163 @@
-Return-Path: <kvm+bounces-17870-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17871-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D22BF8CB64A
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 01:17:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF968CB653
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 01:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14AEE1C20BE5
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 23:17:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE2461F21DF5
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 23:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1429C149E1A;
-	Tue, 21 May 2024 23:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E38B149E1A;
+	Tue, 21 May 2024 23:29:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sO6x8+ui"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="e5XdSiOO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF56C2E859
-	for <kvm@vger.kernel.org>; Tue, 21 May 2024 23:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4FF836134
+	for <kvm@vger.kernel.org>; Tue, 21 May 2024 23:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716333410; cv=none; b=Dh1brHyu7yBHbUIdUsfLs21/XhWku2Yfcs3+ijxw8G4bT4kZUiPhVURgOcstrzP4u0Pqw9J0YcasHOxveBATdKoV2dkJgDG8vw6Whpim5+pJfDw4F4RrF5AAd24QB8Z3fAqiK3goRkFG7UXSyX0tV/4cpFyiMQchiPc4TdhGZ7M=
+	t=1716334198; cv=none; b=Mby1jt9vMQNp+lljtpDMJB8xGDXb6qcSstZEeJ1ogVltk2sd6Az/iG4JefTu3zcXJXgsMtpzwwJHVINrN3cfRkHoigT+jtY6fmuUzHlSRdHIdbFmpIf3AGw6S01I3SKA6EqTcMx7E+2jxSHoMzB+nf4JZDNTGV7RtpV59DEcSbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716333410; c=relaxed/simple;
-	bh=Ry2b6kPu+p8kFrAdVbxwjoeTuHCP60XH1ZnfrYTGACg=;
+	s=arc-20240116; t=1716334198; c=relaxed/simple;
+	bh=icORQk2+PbaJYEtENjA4tTy2RhkUjyDmCrWKszO1tTk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Gz3hCiku9N1BozFebTtKDax33YuCJ06qoIecWQPItzmZLVuh0GWIbPJFVSLOEkrlev30EO2M6J6UUOT6MkCHqD7zd4c4vxzND/5gR7jXZyIY1iSHQflt+90vsuHpx4xcsSl59Zno3hp+6sYw4jjAbWir3xZ4dRUn3gHhMaABxq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sO6x8+ui; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=kxM7oXFLo28atG6/DF/bqx9MiR7AOWS8cOu/ggUdiNVd31YPbrrltT4i8mNGjuryAn4f3lLh9OcuctnrF90rrYjguulKApIKoyr8LbvgFh1w6WCfR0e2QA9DmpxImZm6nPV3nKMYXjYwBVqzYlkhKqsGhJdoBmDA6R6Vp5rMBy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=e5XdSiOO; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8dd488e09so14002361a12.2
-        for <kvm@vger.kernel.org>; Tue, 21 May 2024 16:16:48 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61be325413eso5029217b3.1
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 16:29:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716333408; x=1716938208; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1716334196; x=1716938996; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QWx4tDap5TnZgWN5L1koc75NADyLaUKfEEEhuyV4lik=;
-        b=sO6x8+uicoxNklsL2/aYHgIbUc7fISL8tdierG5vn525pY0EBb/36Y87Lg6ztoDkqW
-         8fbVmUdn3cRbOB036HaCtrARvhgXCWmE68MAhJW2pTRnHN0GU33tWelogC/f9gw732VX
-         kBBtcyBbn0Jr7vUfj4UtOWMjv6D5kxIu6aUsSgStMqV1eTaWLjaeI2Zq8IvSPuJGi/x6
-         61poF7EXA4PEOV5DGK1GdalVBBg3RpatoxxeiGIpt8XKWnD7NcXvApC5JxKxEoIpgzBE
-         RDzgcTlVZ8e8tdCcScO54UqdP8V1d6988RjbFHmUzmUtZZw+3+6tWax3Q8QzgcUEq39n
-         NvEQ==
+        bh=+BzI0I7st4rXq5MwmbAV5Tzi38yIZZhUt1WvSYOgULQ=;
+        b=e5XdSiOOyUTSz4lrE1t7uEP1r4FBJzLAms5e+hXlhVhMK9/lM3nrhvaE+qQq3HBALp
+         f9dlNqy15ZKrwBn7tGFHnAVHCW3VYQ0UD4IjnsDC20jhiiuijzeD2mji7JIqzT8RJXr/
+         GRk6xMmJO31fOBUra6+S0azI2TF38V2xw3r/UoDC8B5yQUqSEzRF7lkelzS689xNqalP
+         eiQvPKOtaHe49n3jCchxfeSiOYj7SLT7dCl54m8KBI/a6Wwmj12j1rSDMsFhuw9cRyi2
+         dkvVish8ai9wUwEAEKKNd4JubImHrfRWuw6wZnvo71YzsO3TlUl6WoL4DYJVG5p4Bap3
+         Fdeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716333408; x=1716938208;
+        d=1e100.net; s=20230601; t=1716334196; x=1716938996;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QWx4tDap5TnZgWN5L1koc75NADyLaUKfEEEhuyV4lik=;
-        b=CuW8RVgRSbi1oSJZmXGRsqjkwu3nirp647CwwLj/XiQDsnk5F5N+Tt2n1+4Mf0s9GM
-         KokkyOt6Ul36s+MSuNT9lMfO9FsOAeXhQWr2EQGUBMFxiGUXElY8g5x8a3gpYnJOlsxy
-         vAvaSqVTu743Tzt0LHWbP+38vN+LwvQ3QdAsEm5sFjh/eSuFt6cqpYBzepZaXQgoHeD1
-         sjPPZ6amqc1FtbI4WVk25fjwplYo3sdnJ0gW5QswgzP9/Dqh/3FvmjRkEAcKTQKoh1uj
-         l1ZHl83xUCAHNpQWd8T8c7b7iJzZijKRt7KpjjmY6vhLwFpPBIQxMbvLb7+PMo4QE3vm
-         2kTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUY2Jr/FsnYoaG0vwPkfYMScLgKevYJUmltMIJWWwRExQygksEsF9h1kwlw+AUemYLHBUHAUQbK5U2mSCE8Kv5Bokan
-X-Gm-Message-State: AOJu0YzzKCFKEdVCUAIKDOYVmyJjV6QwjELXG81tm8O9d6Hada3qP8O6
-	70x3xk3vVjlL/PxXCAnrRfDtGWRQ1wBCTg+YnIfeYdxaQOxg/WU69E3ljJfOG4WoYxVrz8r9yys
-	ELQ==
-X-Google-Smtp-Source: AGHT+IHnzE+ZthCssIlHmxg20CnLlKr6bsQKxZ55A80mzM4vh3TMlx+g+JnYoV4TUMf74JNjUWU33z9Lcwc=
+        bh=+BzI0I7st4rXq5MwmbAV5Tzi38yIZZhUt1WvSYOgULQ=;
+        b=nMvSMoOQD9puEdj8g6Th1HlLPmzZaewADelEYx3B6/sKVdlArEOvUUcMyjlvO+ddJ+
+         Vj1J0wf4YJl5xt19qHovEJx9WnMFmX+ouHtcnMbPNk4RRQnmIeMJS/k9llp081WFAXeW
+         v/GuWv1E6FW8g2WIva7Z/XbfjkNEbv4CF+E707Gpi93Z/st6fAeZp9tGet6/IQHnJTOz
+         +6UW++LTyPmo5PqJsPmhRwQGRsm25O2qQlLovCx2gv5Qc831xycfuSCMHqW409DEEcpu
+         +0rJCBVOMBTdU73aWk7o0IeLihL8CbDoGeTJ3sy7DXeI/WQyKgq1nKjeAHJwQV84WDEK
+         Z4Mg==
+X-Gm-Message-State: AOJu0YwJoDHqGCZ0s6fiMX/rFBSQpXE9go0mnKPQ+ynIR8f7fSotanb+
+	7wIAFiwW+zGDMoQTnBGHODrUjpYkQoN5/tjvT7fWRVg79322h0AKDNg+VAQUxNK/mO1IgNG0XgS
+	uUw==
+X-Google-Smtp-Source: AGHT+IFdSbE18dHmXUZm+Ed94A9LAnG/1FtV6QIW3gxa+x5R7ywczK/so7v774Y5MGmKju/Uxz5TPDu07oo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f7cd:b0:1f3:97f:8f13 with SMTP id
- d9443c01a7336-1f31c975cd3mr10815ad.6.1716333408149; Tue, 21 May 2024 16:16:48
- -0700 (PDT)
-Date: Tue, 21 May 2024 16:16:46 -0700
-In-Reply-To: <00c59dce-e1e4-47cf-a109-722a033b00d8@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a81:49c3:0:b0:618:5009:cb71 with SMTP id
+ 00721157ae682-627e4892a8amr1387677b3.5.1716334195799; Tue, 21 May 2024
+ 16:29:55 -0700 (PDT)
+Date: Tue, 21 May 2024 16:29:54 -0700
+In-Reply-To: <7a46456d6750ea682ba321ad09541fa81677b81a.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240425233951.3344485-1-seanjc@google.com> <20240425233951.3344485-2-seanjc@google.com>
- <5dfc9eb860a587d1864371874bbf267fa0aa7922.camel@intel.com>
- <ZkI5WApAR6iqCgil@google.com> <6100e822-378b-422e-8ff8-f41b19785eea@intel.com>
- <1dbb09c5-35c7-49b9-8c6f-24b532511f0b@intel.com> <Zkz97y9VVAFgqNJB@google.com>
- <00c59dce-e1e4-47cf-a109-722a033b00d8@intel.com>
-Message-ID: <Zk0rXkXkchNnRxwQ@google.com>
-Subject: Re: [PATCH 1/4] x86/reboot: Unconditionally define
- cpu_emergency_virt_cb typedef
+References: <7a46456d6750ea682ba321ad09541fa81677b81a.camel@redhat.com>
+Message-ID: <Zk0uckIeAsb5ex4i@google.com>
+Subject: Re: access_tracking_perf_test kvm selftest doesn't work when
+ Multi-Gen LRU  is in use
 From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Henry Huang <henry.hj@antgroup.com>, linux-mm@kvack.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, May 22, 2024, Kai Huang wrote:
-> On 22/05/2024 8:02 am, Sean Christopherson wrote:
-> > On Wed, May 15, 2024, Kai Huang wrote:
-> > > How about we just make all emergency virtualization disable code
-> > > unconditional but not guided by CONFIG_KVM_INTEL || CONFIG_KVM_AMD, i.e.,
-> > > revert commit
-> > > 
-> > >     261cd5ed934e ("x86/reboot: Expose VMCS crash hooks if and only if
-> > > KVM_{INTEL,AMD} is enabled")
-> > > 
-> > > It makes sense anyway from the perspective that it allows the out-of-tree
-> > > kernel module hypervisor to use this mechanism w/o needing to have the
-> > > kernel built with KVM enabled in Kconfig.  Otherwise, strictly speaking,
-> > > IIUC, the kernel won't be able to support out-of-tree module hypervisor as
-> > > there's no other way the module can intercept emergency reboot.
-> > 
-> > Practically speaking, no one is running an out-of-tree hypervisor without either
-> > (a) KVM being enabled in the .config, or (b) non-trivial changes to the kernel.
+On Wed, May 15, 2024, Maxim Levitsky wrote:
+> Small note on why we started seeing this failure on RHEL 9 and only on some machines: 
 > 
-> Just for curiosity: why b) is required to support out-of-tree hypervisor
-> when KVM is disabled in Kconfig?  I am probably missing something.
+> 	- RHEL9 has MGLRU enabled, RHEL8 doesn't.
 
-A variety of hooks that are likely needed for any x86 hypervisor (especially on
-Intel) are guarded by CONFIG_KVM.  E.g. the posted interrupt vectors (though it's
-definitely possible to use a different model than KVM), the entry point for
-trampolining NMIs (though again, a hypervisor could just do "INT 2", at least
-until FRED comes along), and probably a few other things.
+For a stopgap in KVM selftests, or possibly even a long term solution in case the
+decision is that page_idle will simply have different behavior for MGLRU, couldn't
+we tweak the test to not assert if MGRLU is enabled?
 
-I'm sure it's possible to workaround any issues, but I would be quite surprised
-if out-of-tree code went through the effort of functioning with a kernel built
-to play nice with KVM.  Who knows, maybe I'm entirely wrong :-)
+E.g. refactor get_module_param_integer() and/or get_module_param() to add
+get_sysfs_value_integer() or so, and then do this?
+
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 3c7defd34f56..1e759df36098 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -123,6 +123,11 @@ static void mark_page_idle(int page_idle_fd, uint64_t pfn)
+                    "Set page_idle bits for PFN 0x%" PRIx64, pfn);
+ }
+ 
++static bool is_lru_gen_enabled(void)
++{
++       return !!get_sysfs_value_integer("/sys/kernel/mm/lru_gen/enabled");
++}
++
+ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
+                                  struct memstress_vcpu_args *vcpu_args)
+ {
+@@ -185,7 +190,8 @@ static void mark_vcpu_memory_idle(struct kvm_vm *vm,
+         */
+        if (still_idle >= pages / 10) {
+ #ifdef __x86_64__
+-               TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR),
++               TEST_ASSERT(this_cpu_has(X86_FEATURE_HYPERVISOR) ||
++                           is_lru_gen_enabled(),
+                            "vCPU%d: Too many pages still idle (%lu out of %lu)",
+                            vcpu_idx, still_idle, pages);
+ #endif
+
+> 	- machine needs to have more than one NUMA node because NUMA balancing 
+> 	  (enabled by default) tries apparently to write protect the primary PTEs 
+> 	  of (all?) processes every few seconds, and that causes KVM to flush the secondary PTEs:
+> 	  (at least with new tdp mmu)
+> 
+> access_tracking-3448    [091] ....1..  1380.244666: handle_changed_spte <-tdp_mmu_set_spte
+>  access_tracking-3448    [091] ....1..  1380.244667: <stack trace>
+>  => cdc_driver_init
+>  => handle_changed_spte
+>  => tdp_mmu_set_spte
+>  => tdp_mmu_zap_leafs
+>  => kvm_tdp_mmu_unmap_gfn_range
+>  => kvm_unmap_gfn_range
+>  => kvm_mmu_notifier_invalidate_range_start
+>  => __mmu_notifier_invalidate_range_start
+>  => change_p4d_range
+>  => change_protection
+>  => change_prot_numa
+>  => task_numa_work
+>  => task_work_run
+>  => exit_to_user_mode_prepare
+>  => syscall_exit_to_user_mode
+>  => do_syscall_64
+>  => entry_SYSCALL_64_after_hwframe
+> 
+> It's a separate question, if the NUMA balancing should do this, or if NUMA
+> balancing should be enabled by default,
+
+FWIW, IMO, enabling NUMA balancing on a system whose primary purpose is to run VMs
+is bad idea.  NUMA balancing operates under the assumption that a !PRESENT #PF is
+relatively cheap.  When secondary MMUs are involved, that is simply not the case,
+e.g. to honor the mmu_notifer event, KVM zaps _and_ does a remote TLB flush.  Even
+if we reworked KVM and/or the mmu_notifiers so that KVM didn't need to do such a
+heavy operation, the cost of page fault VM-Exit is significantly higher than the
+cost of a host #PF.
+
+> because there are other reasons that can force KVM to invalidate the
+> secondary mappings and trigger this issue.
+
+Ya.
 
