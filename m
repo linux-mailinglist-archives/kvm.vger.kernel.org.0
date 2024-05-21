@@ -1,139 +1,140 @@
-Return-Path: <kvm+bounces-17830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E13808CA97B
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 09:59:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E348CABD4
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 12:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F1A01C20EEC
-	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 07:59:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7211C21810
+	for <lists+kvm@lfdr.de>; Tue, 21 May 2024 10:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DC45674E;
-	Tue, 21 May 2024 07:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="tRSIHZVI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D477C097;
+	Tue, 21 May 2024 10:14:24 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5698055C33
-	for <kvm@vger.kernel.org>; Tue, 21 May 2024 07:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C54E71B4F;
+	Tue, 21 May 2024 10:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716278311; cv=none; b=a1FsCJbnQquRxK5rUqpsLvt7OdEeSTCde5f2khHL1jhgaHwbnP6c8Q4OjM8pDVHquaBUexN4YyCJpRXqD9IEOfz6N7Q7HOmQxTCkBg89TS3jVMJm2kzIMuv3XHupAxsccapEEThqlSr7Fg0MrW6mnKY8PwdpApDRlkvIa9WrHkk=
+	t=1716286463; cv=none; b=F11vOt5+3xVEIuLIQFS8WrhfJ6IJDW4nWXXofYp/fa7lk942W9wEe/+GggRw9soAk5SRSzfjaCIACl3MbZobeIr3b7cTSVof/fqD2W4YdnUt46y4+jUFxoJ9EhDXSt/XSHaeH4Jjl+fmmyFJnQ6pWiznWJ3P0Z0esU3Q9l65AG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716278311; c=relaxed/simple;
-	bh=YbW/ijAGccFQlQTqAfJm9lN3VLgscw+sw3OGEMReWk8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JIHMETmBrAWXp1d98i5nuzJtBkrwq7PcxnhXSXLynwjwyeTP4lEX/a2J+MlYmidyEAiDfMKKaxzyJICr4Y1cXYEl5iQx6bsNCU98jtNV6wxNiApLGPFLM6xKP1Pik7EhnjkXT3S1M2jfZ34O7dbPEuGbCibqK58r1vJiNWQi4is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=tRSIHZVI; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-354c3a7f972so69459f8f.1
-        for <kvm@vger.kernel.org>; Tue, 21 May 2024 00:58:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1716278307; x=1716883107; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GBb6iShuxHaV7v6bJv2LipIX1/0KjJPEPWALv2DbLcM=;
-        b=tRSIHZVIGlH4zuEM4xjxevPKjIjyEAC7TRQMEzuN/x7oZnnoRXErQdwagNObslHH9Q
-         4o/O20kCD3/rOzIDpSRuQBNHLC6F0eKPsWpJ+j2bkiBL5mY5DtjNMGfrbxOWWUN9J2f9
-         SiK0EvVLTRBDnq8+NF3PKD/iE9F0ztId7AlHJc/k8DbgtdSeAPcYAWvCBR+N4vQirYg9
-         3bQ4Aj19SyPzZo9Rh5lhxH4VhCsCEpv9kCyh985X/wmyy4hXj/tpiBZyu0pQIJShKUQf
-         D2bj4QGrUQzjNCBXlVGxfM7OHMnIIyfaUW9MNRMpvgFuDHLRDQ+eJTqTJAuMS0A2v+Mh
-         /Jrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716278307; x=1716883107;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GBb6iShuxHaV7v6bJv2LipIX1/0KjJPEPWALv2DbLcM=;
-        b=SbLgZsGzQtRi1TN8Aq0uQ7DbdhuwMWZiLa8+cWPsrE3x+Euyt+17YUKMJ7bWsqBLtd
-         uGsV/coLTQQh7xxJAuEsWPH0pf/GUWBO9XtmW4CTQ7KuAlKPTvS33a6j/9jcKbq2SeFP
-         j4dxRN4EN1ZoUkwhbQ9RgypVGF8a9U+17E5WSTcYawuAm7tScqQ7l9kZ79SfnybYKJHg
-         jFAi4oCFOaKjHpdzpQzjnal8gwT1Ho0qx/V5fHylkZ/6hqp3yCIqGPRJWT+KvE2MYYhk
-         oRluNa6NWMVD/WLeuXb9e9MKOh0Hx7+HsCrV+fWJn7pvDP/WLSx/VTb18CmWIk9bSKb6
-         IKAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKj5ru2dqH92xgnwZ5NqfPYz61I/JDXydg+54iAqD2+kIwdmD2AB6dAIpAmmhLk6xr5pckQfA5tQGnXerbvwA7tLBn
-X-Gm-Message-State: AOJu0YzJfx9Pa3RpjV+wvA53a7HvdmdYKOsBZCqPE1yPZqOsBc0ps1ta
-	Ag9gU0+hT1e0GAUSKhozuhJNl7a/P0lU0vA/49FERxbQe3rjyF+fl+F+52TzIGU=
-X-Google-Smtp-Source: AGHT+IHfRRdzTlFAebZ7wRlj20qZMeakja/n64TG1vwKypRDd/Ir6iJk3WrsYiVjjhgxZ9RFdOvn+A==
-X-Received: by 2002:adf:eed1:0:b0:34d:7201:460a with SMTP id ffacd0b85a97d-3504a10f308mr21256806f8f.0.1716278307420;
-        Tue, 21 May 2024 00:58:27 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:999:a3a0:813a:5863:97f7:aca7? ([2a01:e0a:999:a3a0:813a:5863:97f7:aca7])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3502bbbbefdsm31017829f8f.94.2024.05.21.00.58.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 21 May 2024 00:58:26 -0700 (PDT)
-Message-ID: <6d2eb1ec-010d-4390-a25e-afd2fca0311d@rivosinc.com>
-Date: Tue, 21 May 2024 09:58:25 +0200
+	s=arc-20240116; t=1716286463; c=relaxed/simple;
+	bh=S+wZXg5uTKAmZeL4zCJdXSkIvMKrrXSNrng1U4wro3c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FzI0gtfirjkzaC6pnJfEOjPMXhTGT3DtJaNKv9sv/Da0mLEmaIT0li7jRj/U7PwYw0umKe3JunIo5eSghSAvZSkE969sk95TqZfaY0L95NdEnyVN1ZQ7RKehX7wYJbjzo36Af6PCXTO25lMvg3LrTTK5zIC8vFAxF9AafOXqAn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E364EC4AF09;
+	Tue, 21 May 2024 10:14:19 +0000 (UTC)
+Date: Tue, 21 May 2024 11:14:17 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Steven Price <steven.price@arm.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 09/14] arm64: Enable memory encrypt for Realms
+Message-ID: <Zkxz-QfzUM_D0SAm@arm.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-10-steven.price@arm.com>
+ <ZkOmrMIMFCgEKuVw@arm.com>
+ <5b2db977-7f0f-4c3a-b278-f195c7ddbd80@arm.com>
+ <ZkuABQlGgtbzyQFT@arm.com>
+ <SN6PR02MB41578D7BFEDE33BD2E8246EFD4E92@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 07/16] riscv: add ISA extensions validation callback
-To: Conor Dooley <conor@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Paul Walmsley
- <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
- Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, kvm@vger.kernel.org,
- kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-References: <20240517145302.971019-1-cleger@rivosinc.com>
- <20240517145302.971019-8-cleger@rivosinc.com>
- <20240517-scrunch-palace-2f83aa8cc3ce@spud>
-Content-Language: en-US
-From: =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>
-In-Reply-To: <20240517-scrunch-palace-2f83aa8cc3ce@spud>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR02MB41578D7BFEDE33BD2E8246EFD4E92@SN6PR02MB4157.namprd02.prod.outlook.com>
 
-
-
-On 17/05/2024 18:44, Conor Dooley wrote:
-> On Fri, May 17, 2024 at 04:52:47PM +0200, Clément Léger wrote:
->> Since a few extensions (Zicbom/Zicboz) already needs validation and
->> future ones will need it as well (Zc*) add a validate() callback to
->> struct riscv_isa_ext_data. This require to rework the way extensions are
->> parsed and split it in two phases. First phase is isa string or isa
->> extension list parsing and consists in enabling all the extensions in a
->> temporary bitmask (source isa) without any validation. The second step
->> "resolves" the final isa bitmap, handling potential missing dependencies.
->> The mechanism is quite simple and simply validate each extension
->> described in the source bitmap before enabling it in the resolved isa
->> bitmap. validate() callbacks can return either 0 for success,
->> -EPROBEDEFER if extension needs to be validated again at next loop. A
->> previous ISA bitmap is kept to avoid looping multiple times if an
->> extension dependencies are never satisfied until we reach a stable
->> state. In order to avoid any potential infinite looping, allow looping
->> a maximum of the number of extension we handle. Zicboz and Zicbom
->> extensions are modified to use this validation mechanism.
+On Mon, May 20, 2024 at 08:32:43PM +0000, Michael Kelley wrote:
+> From: Catalin Marinas <catalin.marinas@arm.com> Sent: Monday, May 20, 2024 9:53 AM
+> > > > On Fri, Apr 12, 2024 at 09:42:08AM +0100, Steven Price wrote:
+> > > > >   static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
+> > > > > @@ -41,6 +45,7 @@ static int change_page_range(pte_t *ptep, unsigned long addr, void *data)
+> > > > >   	pte = clear_pte_bit(pte, cdata->clear_mask);
+> > > > >   	pte = set_pte_bit(pte, cdata->set_mask);
+> > > > > +	/* TODO: Break before make for PROT_NS_SHARED updates */
+> > > > >   	__set_pte(ptep, pte);
+> > > > >   	return 0;
+[...]
+> > Thanks for the clarification on RIPAS states and behaviour in one of
+> > your replies. Thinking about this, since the page is marked as
+> > RIPAS_EMPTY prior to changing the PTE, the address is going to fault
+> > anyway as SEA if accessed. So actually breaking the PTE, TLBI, setting
+> > the new PTE would not add any new behaviour. Of course, this assumes
+> > that set_memory_decrypted() is never called on memory being currently
+> > accessed (can we guarantee this?).
 > 
-> I wish we weren't doin' it at all, but since we have to, I think what
-> you've got here is good.
+> While I worked on CoCo VM support on Hyper-V for x86 -- both AMD
+> SEV-SNP and Intel TDX, I haven't ramped up on the ARM64 CoCo
+> VM architecture yet.  With that caveat in mind, the assumption is that callers
+> of set_memory_decrypted() and set_memory_encrypted() ensure that
+> the target memory isn't currently being accessed.   But there's a big
+> exception:  load_unaligned_zeropad() can generate accesses that the
+> caller can't control.  If load_unaligned_zeropad() touches a page that is
+> in transition between decrypted and encrypted, a SEV-SNP or TDX architectural
+> fault could occur.  On x86, those fault handlers detect this case, and
+> fix things up.  The Hyper-V case requires a different approach, and marks
+> the PTEs as "not present" before initiating a transition between decrypted
+> and encrypted, and marks the PTEs "present" again after the transition.
 
-Yup, this is what you got with a fast evolving architecture I guess ;)
+Thanks. The load_unaligned_zeropad() case is a good point. I thought
+we'd get away with this on arm64 since accessing such decrypted page
+would trigger a synchronous exception but looking at the code, the
+do_sea() path never calls fixup_exception(), so we just kill the whole
+kernel.
 
-> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> This approach causes a reference generated by load_unaligned_zeropad() 
+> to take the normal page fault route, and use the page-fault-based fixup for
+> load_unaligned_zeropad(). See commit 0f34d11234868 for the Hyper-V case.
+
+I think for arm64 set_memory_decrypted() (and encrypted) would have to
+first make the PTE invalid, TLBI, set the RIPAS_EMPTY state, set the new
+PTE. Any page fault due to invalid PTE would be handled by the exception
+fixup in load_unaligned_zeropad(). This way we wouldn't get any
+synchronous external abort (SEA) in standard uses. Not sure we need to
+do anything hyper-v specific as in the commit above.
+
+> > (I did come across the hv_uio_probe() which, if I read correctly, it
+> > ends up calling set_memory_decrypted() with a vmalloc() address; let's
+> > pretend this code doesn't exist ;))
 > 
-> Do you want me to send some patches for the F/V stuff we discussed
-> previously?
+> While the Hyper-V UIO driver is perhaps a bit of an outlier, the Hyper-V
+> netvsc driver also does set_memory_decrypted() on 16 Mbyte vmalloc()
+> allocations, and there's not really a viable way to avoid this. The
+> SEV-SNP and TDX code handles this case.   Support for this case will
+> probably also be needed for CoCo guests on Hyper-V on ARM64.
 
-Sure go ahead, I did not have anything written yet.
+Ah, I was hoping we can ignore it. So the arm64 set_memory_*() code will
+have to detect and change both the vmalloc map and the linear map.
+Currently this patchset assumes the latter only.
 
-Thanks,
+Such buffers may end up in user space as well but I think at the
+set_memory_decrypted() call there aren't any such mappings and
+subsequent remap_pfn_range() etc. would handle the permissions properly
+through the vma->vm_page_prot attributes (assuming that someone set
+those pgprot attributes).
 
-Clément
-
-> 
-> Cheers,
-> Conor.
+-- 
+Catalin
 
