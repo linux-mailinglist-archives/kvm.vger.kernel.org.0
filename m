@@ -1,218 +1,209 @@
-Return-Path: <kvm+bounces-17978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A4E28CC655
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 20:31:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B6D8CC736
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 21:33:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BC151C2133F
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 18:31:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A836B222EC
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 19:33:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1738B145B3E;
-	Wed, 22 May 2024 18:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0FE5146013;
+	Wed, 22 May 2024 19:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DUsXBXTN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N36bXLLY"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2054.outbound.protection.outlook.com [40.107.96.54])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E2F1BF2A;
-	Wed, 22 May 2024 18:30:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716402655; cv=fail; b=VIp5NQO124u8I9v6YjlBtkmAVT/ZqWh1zduWstSu89hmTNuQnJ1stWrtAxMUnhBDmKAAs99P2BYQEaoQzIstlgzxC3rdvcxVRNk7sd7MBJJve7n/75iS0fuwGDb3aDTuzVb2VvSroHOuWG6Kwj4Zw4jWCYa6Bygm3TCuZ2qdPxU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716402655; c=relaxed/simple;
-	bh=uSouPcXTrL1XftcND51/1vAKBo3MO9C/Cle//tbl7x4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=A0SFtH9C9oYKoTWpbOyz8rFdBKGbCIP/+IKPKWeNVxFx19mDF1ubqQ1mp9kC83C2SaoJ/eHpNj2cLYpRPe06WjuuHadjy7Mm7h5pa1e+05/mQnYDbeV5MslBpbnILypqZ3jIpJPoou+FRNeunVuAgI8P9Hn4bT8gY/IIl+XrD3Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DUsXBXTN; arc=fail smtp.client-ip=40.107.96.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kVR6yck6XCFcvfb33ohXaQkEfNe9cspK+Bo6NU0KkpUTnPIsUaqCJWw5ui9Er+OWAUqbrk3+87xVHp2OICAtR60lg+Ak21nd/QdcRPygwKpgcxaRdNzAmpIMX8+H+OOc6ClEa7WXm2aWeLvDbz/aQ6NpOS9bCV/urlY4jvv7gjsQ4BfugNiuLR/L1ZobFD7GhLM2UAtI5Ku41vyxlbS17Nyt+eUxUfgPmMX62DburL66o1Iu1j9EQqxafqYJlm99jwc4WDvs5Sp5sdMVyhOkYVoAh5DDBrs3x5a36txpcqXcmPIqK7glZ7Uu/jRgSRJwg072KjDDYQX104PoPQvBdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=i+NAT6Rw1Zm4BY2Y1xm9LCyTAA2TEYfg9nBxx/MFHd8=;
- b=Rf3OtxNA1deHki9Wni80jDvumR+AonqVamIICQ8VSCEric5BeIXjsGOALFkwcBOfOhF5PDRI4HhczfrL/+WSDwjI/eGQQozRBLL5s4Aj6j5wCBJ1WgQ84oTHBQdPu4y6CDIKpPS8VxM7xoEyeOCT5LoF6TW2dnUywi/hb3RFgnKI88lFdCijW2NHWd8md21B4C2tyNnX57bN6im/jvYN+adOc9aVpx7wDnuOwyI39TBy/6ChS8LSuCCKWeU8Mi6vqkgeeIW5LmH993y7+1+6JTJSsK6zGpxmBlvSnWisVdW3TXeGxO7GRetgLNZNsY4W6S4j1AEhF/hWgIBm5GhrYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i+NAT6Rw1Zm4BY2Y1xm9LCyTAA2TEYfg9nBxx/MFHd8=;
- b=DUsXBXTNLaLAY+wIzKdrxoauthXhWUCjtJiBLGwbAwH280u7HoXhfOb14Z4nTluchumG7mQHDLIuxb7ILF7VcBZhuPcVHUIRGIu5+yJiY+0wRIUxqBz326QKKKL0Y0ZDrHPXAFzxYMRY9XVZqQpnLndfi+ATy5nOk0ab8YDOn1h5XLIcnXqzaOauGs78MO0VtjxhySaDMlSZjmmnvFFpxgXDgwO1WJkcD+kB5XAorkhhb11Kwe3fq20cNGC19Z6adNIKIbCzdF04Ltrsk9TYWasmwV/uDz78grSpeU7ua8KHeitJ6GIoFkjuQLnzUXO2MyGyCn29GKqaxbQ2H0PTyg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by SJ0PR12MB6757.namprd12.prod.outlook.com (2603:10b6:a03:449::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.19; Wed, 22 May
- 2024 18:30:48 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7587.035; Wed, 22 May 2024
- 18:30:48 +0000
-Date: Wed, 22 May 2024 15:30:46 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Andrew Jones <ajones@ventanamicro.com>, Yan Zhao <yan.y.zhao@intel.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kevin.tian@intel.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH] vfio/pci: take mmap write lock for io_remap_pfn_range
-Message-ID: <20240522183046.GG20229@nvidia.com>
-References: <20230508125842.28193-1-yan.y.zhao@intel.com>
- <20240522-b1ef260c9d6944362c14c246@orel>
- <20240522115006.7746f8c8.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240522115006.7746f8c8.alex.williamson@redhat.com>
-X-ClientProxiedBy: BL1PR13CA0340.namprd13.prod.outlook.com
- (2603:10b6:208:2c6::15) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96995FBB3
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 19:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716406306; cv=none; b=GNSievzOd9cC69/lYa72E9AR937QpgDvPRpRfmgY0JCS5lc2YtfZgQQGpBtcqqvzzLFXwGI5tvuATfto0+R0m6Xwm4bZnC6OZ/6bAtMNA+s7oOqg4idIYYLWVFq28jWo0ePRkspXZpJFe7UKLHncRkFiuSbiWHABXC3g/hIfbYk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716406306; c=relaxed/simple;
+	bh=fjOk1xV6d3/dBjkUg/hJ1BXTcGqFqEvJlrwDsM76rnk=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=hoqNl2loH22RXP8bL/pAVT5Pni5M24Z4xh7vRQe77AG2/scnN8dfN30FAmiVMI6GwZjZMlk1Anh1SAzPZsgWZ2AG5p5FRd/KPYZ0EluC6rF+TVzXyotuKtNpvcarz/CgxyLnFBe4cb9JVI2rKxQ7sLD+Nzo4f7vpP4scQq3Eo+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N36bXLLY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7D4F0C4AF07
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 19:31:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716406305;
+	bh=fjOk1xV6d3/dBjkUg/hJ1BXTcGqFqEvJlrwDsM76rnk=;
+	h=From:To:Subject:Date:From;
+	b=N36bXLLYltcHn3kbvkV52EV3+eGN50/X7nvgIq4dI55PrNxq7r/RmBhVMfs3Xg43F
+	 9tMfv0fmSPERZ5//aTeE1DOGhrW8BkKBu5lCmEtTTykSMiK5QEB37FtluWtjze5PHP
+	 HVe7FCVimHFieSlHRajszf9/91Z1vaX4vuoGTX7sl54jAhsjRJJYS78dejshJBtEd3
+	 ZrsBIDEOPCJY3txnn3oRh3r7hxa5aib4AUlxbrSiaah0NG8cRqPQaPe8aQRK/usD4n
+	 81TrhRSr9XKNVPYo9ECiOwb4C1aUQ/Yr+qxwk2w4zv7kNdicCk/OiFH5ld+CzTFjKb
+	 RYpFfD/R60k/A==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 7213DC53B73; Wed, 22 May 2024 19:31:45 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218876] New: PCIE device crash when trying to pass through USB
+ Device to virtual machine
+Date: Wed, 22 May 2024 19:31:45 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: dan@danalderman.co.uk
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-218876-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SJ0PR12MB6757:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7aff4a2a-63e2-4bfb-ae09-08dc7a8d4d45
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oCNXjhYHYXiOj/EVWExc5ChKmOhI4QFPusgIZ5nCbuWdICzSoEodsGvj33FA?=
- =?us-ascii?Q?hSnbxSanlS9P0gIAex8L5JklaUvWw5cPWiNdct5SAf9xf07pfXVIbYT33P/u?=
- =?us-ascii?Q?Nl1jlUcTY8m5PF8iU+bUPVcX0ik/cUQDulJvsurYYkOo9Dhc5t8p/j+bTMxg?=
- =?us-ascii?Q?vzOrXAjUBERzVyUyxF5t0hGnw6tpkiST+/x7OEEsqzXNHUfSs0O31H3fHnQ8?=
- =?us-ascii?Q?A7uwKqRkEQVFgX7y88YfHUYZwhxPevbRuReOjDr1qit0ZbnNxpTqBY1+QIe+?=
- =?us-ascii?Q?p5zFWhrtMTgf/WjmRS/NCkPIjT132ZRznXp7HyZYtnfgAE3dO5Gmg7I/mde7?=
- =?us-ascii?Q?f/jYJNqGfuj+4tyhpQ6Uw3Uug2IpKuaKujxYI0k8WTqLibL/wWe7OT4i5KIu?=
- =?us-ascii?Q?UUOri7W5eBzY6FrI9y1KrU6Z7CN28XeaKP75YPMIT7f+67zIAIQYkh3gtbpt?=
- =?us-ascii?Q?1/l4lDljcWFvvty3nFrVrg3RyMyB39DvzsVkOeWF4ajCWkhm0HT/kLUNzEIA?=
- =?us-ascii?Q?DmDaYY3vw7MB3ZQgdj80phX7AYO1+l9fa6lXVcMmZX4CoPFAvdwgsIM5/qU5?=
- =?us-ascii?Q?njJoo8GjH4L9T9Gq4axlhmDmUE2Ca7SdN3scRmrXC3DsV9C2RddUgWtH0hsa?=
- =?us-ascii?Q?j0+Z96ItaOhI4OI4vDBVWYQryHvLn7HU0lwvIsfWudnB7gv0d2aeg0jo6iDy?=
- =?us-ascii?Q?AmBSMvA9chbzuoabdg3Q1b0YT7TXL3GWLsJcn1CtbWE9UEcYJylWmenHpRLD?=
- =?us-ascii?Q?M5F/m06g4f5BGfqVJPV+OUH5BEfArJ4aM4WGcVJjn7pZHcHO/dGRVPxrpC/e?=
- =?us-ascii?Q?B5RtwyrMrZeWbefI1NOK4GKCMrCC3z9Avcn5UCQDVYS0mMf7xua/xkR5i4Ly?=
- =?us-ascii?Q?qN72nhs/z2aMYSKUfKQDYxPr6rg6/ppOozuSGZdQePHevGbJGApe7w/SNEtd?=
- =?us-ascii?Q?3bLUcTAjcDho3qk6WdViSCtU+nlrBXZe2TUUhBpRgJYa4b9ybIPUU/ISM6Qy?=
- =?us-ascii?Q?LwYtt353BhKz/lF6v1oXaPjyDWp4Dv0xQqjXZZOmLIeZSWxv4dEcQXBvyc1h?=
- =?us-ascii?Q?8vAjp63CR4NNClKlYbNpwjF8xu8iWF868cZ3ig1ML5u023hblx1C/HJx65L9?=
- =?us-ascii?Q?y8fyhf459Rrv6v7m39cnpV/KFCNhtBj5V6PggESO50Tni/miS58UINobuMtM?=
- =?us-ascii?Q?sGKPFuLYhAyMEATBwWqaR0O1EJSeAbDqLrYqnMwyCL/eiQg+GQuzY8yRpYHD?=
- =?us-ascii?Q?jIpovMnv3U+wRcrqijd+aLiEkajPA5JWiiJBLOrUjw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Ts/je87qkGFkKqkpI/dgucj3P3dS7g14SVrK2kdpnXOFEvHKcjQj0sswP0L3?=
- =?us-ascii?Q?t1QzJPWxH+XycVULMChbF7r2alwF74dxWAvt1zR5ARJKumYO1BrpqhZMre8O?=
- =?us-ascii?Q?i2itjtPua23FmSDfntQHdMR2n0UE/63aL2a+I54mXac5PG6H85G+mkgbFr95?=
- =?us-ascii?Q?Dnu0UJfrkSwyM8ZB9Rjk6VcWGAFC8kuLbhuO0vddGDrkKWpxfDOiQ7zms1+E?=
- =?us-ascii?Q?8QUV2H6yK69Z2WL6reH09MjwYDuRWE+D2vl85hhGOi76TIU1Ekr8HIW618L6?=
- =?us-ascii?Q?Re/itWcNpNBgN0Kap17knm+JeUlr10o/iMGXO4V8OD5knDBC9G7PjNr6MtUM?=
- =?us-ascii?Q?Qwa9SJFJf35rLZC6Mu+bV2d8o5A+QlaShdH5R/Ve91HZ6x5qi6U0DSC+EjAx?=
- =?us-ascii?Q?M6mEtbGvXq5KyFlKbuK2kw6K1Cqepn77VzyfM5Y+SM0IPOTrNAdKUjbjfndd?=
- =?us-ascii?Q?QzEJa9C4LcyMD+kUEvnw1SmuG+8Z1Vp6X3UhIvniVyes2JSIc4fXUmYtuTZU?=
- =?us-ascii?Q?QjiZZs2u3h3kVfrozrtS1AJeVIVo9VYOijAqu+sAzyRAhKy1NWU+Ujo1wDP+?=
- =?us-ascii?Q?h8WONO4k7Y3CmUYdRmhA0sYecJNz4thAqgeGRTPInqUemjOINHZQH3F/saBP?=
- =?us-ascii?Q?xw29taDPPUPYp/UJUjY8oGUs3ZA+g8aex9vbTvR0EyKlziRpLwNNOeKs9m/D?=
- =?us-ascii?Q?5uXSHQm2z/wQOYeI1W7UbHzGsdsUoo75JUzO8VAx/itPgRd+1JCoqDgzmaN9?=
- =?us-ascii?Q?DmxbMh8+gT+S6auYxzAIPrDkqZnDkMLjiIg6PjisF9lhTGkxd9dbawhvaAQN?=
- =?us-ascii?Q?6CsDZsiwJ84GPKtOazlSBhFIPwU55fV8A4LBONDYWl8521eAD7ZIj9i2JbBP?=
- =?us-ascii?Q?4d4AQGkPLqRiptGUPrQWFxj7kEYsQNod5y0JaULfQN6KDrQHnX9mCMw/tLN+?=
- =?us-ascii?Q?1NGNhxcXTdIJkKLygJz5E7VTBYLVgG8R7HVbxREYLrJoCo1TPbsBHnuFMjnZ?=
- =?us-ascii?Q?rPdwBwvIvyeubxGardcmTc2SsaoHGPqhMLzC9qWIEwAy2TcNwRCTB8azqtdC?=
- =?us-ascii?Q?mLN4DajKn6s2gsosYsBAxYa8NxMBADOH/kA+0cb4exOXLOBWLhsI3n0GJZcb?=
- =?us-ascii?Q?ttAlRagqRNTRwWSYPNHhOGBUOJXO2Aueb5ssNGbIrYkeuTArKHoz5/4kpawF?=
- =?us-ascii?Q?6aXg91Ofn5I1m4qI1nngiPxe0T0mlFl1IqFXMQKUzGCfhRaHK9NI5yBuG9cX?=
- =?us-ascii?Q?23UYJQAFpMa/MC9XWHyGDBYKri8Pf0McZDVDCHQDo2DXh5MdVnZWcfhQ/M1E?=
- =?us-ascii?Q?+lWBc4AArU1pzQq8QLz+BL97t8KIr9T7lLnr1ky3WT+a51uVR4NtqoxHTO4j?=
- =?us-ascii?Q?k5QFArOUgDW2GZueU8Y0e3hJdNtuB03jmFcxgjoq5ISPZlwMuSbeFuvYbZKO?=
- =?us-ascii?Q?jLdwYcWV9bxEZkG2CRa3TOi/JX0gWup5cxqUqK1UkAyT81xMfzYuHbQAhueQ?=
- =?us-ascii?Q?ASI6FWLEUTdtJR2pZ7YiTIrRVRsYBs/HlFIVESvLd+u9MYKKXhGbtOy/WXC2?=
- =?us-ascii?Q?7VqTMa5HTviESOO8cWo=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7aff4a2a-63e2-4bfb-ae09-08dc7a8d4d45
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2024 18:30:48.6313
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: e5muDwOhkRljfq0SVgd+3oqdgSKIkR5v/9hvmXLjAiGsXATF3o6U6fDMlEpvINZr
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6757
 
-On Wed, May 22, 2024 at 11:50:06AM -0600, Alex Williamson wrote:
-> I'm not sure if there are any outstanding blockers on Peter's side, but
-> this seems like a good route from the vfio side.  If we're seeing this
-> now without lockdep, we might need to bite the bullet and take the hit
-> with vmf_insert_pfn() while the pmd/pud path learn about pfnmaps.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218876
 
-There is another alternative...
+            Bug ID: 218876
+           Summary: PCIE device crash when trying to pass through USB
+                    Device to virtual machine
+           Product: Virtualization
+           Version: unspecified
+          Hardware: Intel
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: dan@danalderman.co.uk
+        Regression: No
 
-Ideally we wouldn't use the fault handler.
+Hi.
 
-Instead when the MMIO becomes available again we'd iterate over all
-the VMA's and do remap_pfn_range(). When the MMIO becomes unavailable
-we do unmap_mapping_range() and remove it. This whole thing is
-synchronous and the fault handler should simply trigger SIGBUS if
-userspace races things.
+I'm running a Debian Bookworm host with Xanmod 6.9.1 kernel
 
-unmap_mapping_range() is easy, but the remap side doesn't have a
-helper today..
+This motherboard:
 
-Something grotesque like this perhaps?
+https://www.supermicro.com/en/products/motherboard/a2sdi-16c-tp8f
 
-	while (1) {
-		struct mm_struct *cur_mm = NULL;
+With this USB controller in the 4x PCIe slot.
 
-		i_mmap_lock_read(mapping);
-		vma_interval_tree_foreach(vma, mapping->i_mmap, 0, ULONG_MAX) {
-			if (vma_populated(vma))
-				continue;
+https://www.startech.com/en-gb/cards-adapters/pexusb3s2ei
 
-			cur_mm = vm->mm_struct;
-			mmgrab(cur_mm);
-		}
-		i_mmap_unlock_read(mapping);
+The USB card is based on the Renesas uPD720201 USB 3.0 Host Controller and
+reports the latest firmware.
 
-		if (!cur_mm)
-			return;
+I have a Debian Bookworm VM running on this host, which I intend to pass the
+entire PCIe card through to (Gnome+Plexamp->USB-SPDIF).  If I configure the=
+ VM
+to do this the VM fails to start and I get the following errors from the
+kernel.  The card then becomes seemingly unrecoverable without a warm reboo=
+t at
+least.
 
-		mmap_write_lock(cur_mm);
-		i_mmap_lock_read(mapping);
-		vma_interval_tree_foreach(vma, mapping->i_mmap, 0, ULONG_MAX) {
-			if (vma->mm_struct == mm)
-				vfio_remap_vma(vma);
-		}
-		i_mmap_unlock_read(mapping);
-		mmap_write_unlock(cur_mm);
-		mmdrop(cur_mm);
-	}
+I have tried many kernel and BIOS options regarding PCIe but nothing has he=
+lped
+so far.  I'll attach a boot log. This is the error when I start the VM:
 
-I'm pretty sure we need to hold the mmap_write lock to do the
-remap_pfn..
+May 19 09:24:46 kryten kernel: VFIO - User Level meta-driver version: 0.3
+May 19 09:24:46 kryten kernel: xhci_hcd 0000:02:00.0: remove, state 1
+May 19 09:24:46 kryten kernel: usb usb4: USB disconnect, device number 1
+May 19 09:24:46 kryten kernel: xhci_hcd 0000:02:00.0: USB bus 4 deregistered
+May 19 09:24:46 kryten kernel: xhci_hcd 0000:02:00.0: remove, state 1
+May 19 09:24:46 kryten kernel: usb usb3: USB disconnect, device number 1
+May 19 09:24:46 kryten kernel: usb 3-4: USB disconnect, device number 2
+May 19 09:24:46 kryten kernel: xhci_hcd 0000:02:00.0: USB bus 3 deregistered
+May 19 09:24:47 kryten kernel: usb 1-1.2: USB disconnect, device number 4
+May 19 09:24:53 kryten kernel: pcieport 0000:00:09.0: broken device, retrai=
+ning
+non-functional downstream link at 2.5GT/s
+May 19 09:24:54 kryten kernel: pcieport 0000:00:09.0: retraining failed
+May 19 09:24:55 kryten kernel: pcieport 0000:00:09.0: broken device, retrai=
+ning
+non-functional downstream link at 2.5GT/s
+May 19 09:24:56 kryten kernel: pcieport 0000:00:09.0: retraining failed
+May 19 09:24:56 kryten kernel: vfio-pci 0000:02:00.0: not ready 1023ms after
+bus reset; waiting
+May 19 09:24:57 kryten kernel: vfio-pci 0000:02:00.0: not ready 2047ms after
+bus reset; waiting
+May 19 09:24:59 kryten kernel: vfio-pci 0000:02:00.0: not ready 4095ms after
+bus reset; waiting
+May 19 09:25:04 kryten kernel: vfio-pci 0000:02:00.0: not ready 8191ms after
+bus reset; waiting
+May 19 09:25:12 kryten kernel: vfio-pci 0000:02:00.0: not ready 16383ms aft=
+er
+bus reset; waiting
+May 19 09:25:29 kryten kernel: vfio-pci 0000:02:00.0: not ready 32767ms aft=
+er
+bus reset; waiting
+May 19 09:26:05 kryten kernel: pcieport 0000:00:09.0: broken device, retrai=
+ning
+non-functional downstream link at 2.5GT/s
+May 19 09:26:06 kryten kernel: pcieport 0000:00:09.0: retraining failed
+May 19 09:26:08 kryten kernel: pcieport 0000:00:09.0: broken device, retrai=
+ning
+non-functional downstream link at 2.5GT/s
+May 19 09:26:09 kryten kernel: pcieport 0000:00:09.0: retraining failed
+May 19 09:26:09 kryten kernel: vfio-pci 0000:02:00.0: not ready 1023ms after
+bus reset; waiting
+May 19 09:26:10 kryten kernel: vfio-pci 0000:02:00.0: not ready 2047ms after
+bus reset; waiting
+May 19 09:26:12 kryten kernel: vfio-pci 0000:02:00.0: not ready 4095ms after
+bus reset; waiting
+May 19 09:26:16 kryten kernel: vfio-pci 0000:02:00.0: not ready 8191ms after
+bus reset; waiting
+May 19 09:26:25 kryten kernel: vfio-pci 0000:02:00.0: not ready 16383ms aft=
+er
+bus reset; waiting
+May 19 09:26:43 kryten kernel: vfio-pci 0000:02:00.0: not ready 32767ms aft=
+er
+bus reset; waiting
+May 19 09:27:18 kryten kernel: vfio-pci 0000:02:00.0: Unable to change power
+state from D0 to D3hot, device inaccessible
+May 19 09:27:19 kryten kernel: vfio-pci 0000:02:00.0: Unable to change power
+state from D3cold to D0, device inaccessible
+May 19 09:27:19 kryten kernel: vfio-pci 0000:02:00.0: Unable to change power
+state from D3cold to D0, device inaccessible
+May 19 09:27:19 kryten kernel: vfio-pci 0000:02:00.0: Unable to change power
+state from D3cold to D0, device inaccessible
+May 19 09:27:19 kryten kernel: vfio-pci 0000:02:00.0: Unable to change power
+state from D3cold to D0, device inaccessible
+May 19 09:27:19 kryten kernel: vfio-pci 0000:02:00.0: Unable to change power
+state from D3cold to D0, device inaccessible
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: Invalid ROM..
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: Unable to change power
+state from D3cold to D0, device inaccessible
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: xHCI Host Controller
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: new USB bus registere=
+d,
+assigned bus number 3
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: Host halt failed, -19
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: can't setup: -19
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: USB bus 3 deregistered
+May 19 09:27:19 kryten kernel: xhci_hcd 0000:02:00.0: init 0000:02:00.0 fai=
+l,
+-19
 
-vma_populated() would have to do a RCU read of the page table to check
-if the page 0 is present.
+Thanks for your time and help.
 
-Also there is a race in mmap if you call remap_pfn_range() from the
-mmap fops and also use unmap_mapping_range(). mmap_region() does
-call_mmap() before it does vma_link_file() which gives a window where
-the VMA is populated but invisible to unmap_mapping_range(). We'd need
-to add another fop to call after vma_link_file() to populate the mmap
-or rely exclusively on the fault handler to populate.
+--=20
+You may reply to this email to add a comment.
 
-Jason
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
