@@ -1,214 +1,141 @@
-Return-Path: <kvm+bounces-17985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43CDE8CC7F3
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 23:07:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A848CC81C
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 23:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C36391F20CC8
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 21:07:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07421F222FA
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 21:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62241465AD;
-	Wed, 22 May 2024 21:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB207146A67;
+	Wed, 22 May 2024 21:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZMsAi/rB";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="jLnOj0g4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOaFheRZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B6D182DB;
-	Wed, 22 May 2024 21:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A9E76048
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 21:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716412034; cv=none; b=NPLknpZhC8w3MoSz5CsFELX6HgYzUHAO2suT15ldQqBCWUEykws6diK+6q+CcRgHGI0hfQX38qELmZv5xU1AuxabogadDtSLw+7eevYNl/TBCCjx6fjrcIPIsnOvcCvrJYCzsVPjhqC6mjJN26N+7xL2xELDrsaOrw3/hrtk/a4=
+	t=1716412905; cv=none; b=st2eNnaRtwE53ZGHJsNwt7QXsMQxbjDsyq7Rcq+FJC5JiLe6saMBv6/bM95RTlBrP3c5ifxTspEF4+RBaShvPzPteKVkago5UB5OVXXsA4hZ2QnfURG+t8rMawmyQDmJrc7nZISDi5CVjR+ZvPfEMWfHzpk8AhTqWiA7hQWB59Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716412034; c=relaxed/simple;
-	bh=IXX192pD0raczuPL13k5ksQg23Qrdji8/ReRatFWZOY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=f1y+Dd9xL2Hce1pidZWyrsPEn8n4JJmE+V/x8tIx4mRig/nqnBtclRI/mNdl8IXE030rRITTCzq0qHaTMPG5BSeCQ04OYc7z1dJ9Q3DK5llAwL8MvSHfAt2DPT0+tRzyTFXD2TB0G7206hYxjTua9NYWdqC11gVDmAb1MKPVnmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZMsAi/rB; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=jLnOj0g4; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1716412030;
+	s=arc-20240116; t=1716412905; c=relaxed/simple;
+	bh=Qz9tt6pR5oDF6TcAN7hxYGGPefSmU4S9CgeaMIOuHpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eGzVNXvdm7hv4EDdYnMiCqkiB22KUvdoUUlIRwYwADuN29HIMepOnR27ydXES1AxebatkHJUA2UbS/YDscI+XEkBBmzGZc6dfmIjRE6eced9D04o85F9cGXxPcSBoA3li8pFpBklVvW7tIPnsMtqLGhJLzRsqFR0a473SrH2H7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FOaFheRZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716412902;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jLVxSCQfoVeR8U2ERh+IiooD/MtttiK7XavkulJ8Sz8=;
-	b=ZMsAi/rBw+STsdRVRyLD14gUdNDkd+kZfJcbn1yBmydUm4lwQV8f0h2lG+hlKfER2WUzqi
-	CGN8pdvwlTCC7srgMxwuL3Cn6yW9SyPBYq2MUox0pBYBmkLaLAYrDTUz+xhzexmQ/HgQBP
-	UOPsmgdENY8SpivY6JVeDwHOl0cOGcAYAvVmUMMweb8N0J17zKkXYK6SZlVgqA+asshM2j
-	QUYj9AB/0Nx7Y0cF+X8p56Rqjzrp1zrNepGKU/fq+59/8yiefjH0ys87MbEJD1Moxm2f3v
-	VIbom4CjiP1ozjmTONJTZSeET0ipafyLQ+4MeSFMCoBt1wiC0K39KJhwPVfMTA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1716412030;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jLVxSCQfoVeR8U2ERh+IiooD/MtttiK7XavkulJ8Sz8=;
-	b=jLnOj0g48+pWO/rtZVTMq1YU81uGsKgOYmL0kb6c0mTC927Zqax2FcBY6lOfP0+tCpETOV
-	gE0bEdFJPfICm7BA==
-To: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, Vitaly Kuznetsov
- <vkuznets@redhat.com>, Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Frederic Weisbecker <frederic@kernel.org>
-Subject: Re: RFC: NTP adjustments interfere with KVM emulation of TSC
- deadline timers
-In-Reply-To: <20c9c21619aa44363c2c7503db1581cb816a1c0f.camel@redhat.com>
-References: <20c9c21619aa44363c2c7503db1581cb816a1c0f.camel@redhat.com>
-Date: Wed, 22 May 2024 23:07:10 +0200
-Message-ID: <875xv5h7y9.ffs@tglx>
+	bh=/BUu4duYYbCSIQnv0ATgpzH3sdluqP4G2MqncwvuYRY=;
+	b=FOaFheRZj1rSbwmUDDaOyUUkRT0GfJkvDHcYhcya1SpYMtCxkcP/aliAczzrflMqW8rPOR
+	mDtGhmNUia3+SIVYPQvW5oT5UI007Q5ArgwToDDs3zG2EIM9pfKXuhD1+mC7NBXFEbmsVH
+	2DergJ+mhkEC6j4RPJ0GWQJvnS0S2TI=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-468-lJRg-21fO5iQGgNVPPfr6g-1; Wed, 22 May 2024 17:21:41 -0400
+X-MC-Unique: lJRg-21fO5iQGgNVPPfr6g-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-5b27bd802a7so104832eaf.0
+        for <kvm@vger.kernel.org>; Wed, 22 May 2024 14:21:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716412900; x=1717017700;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/BUu4duYYbCSIQnv0ATgpzH3sdluqP4G2MqncwvuYRY=;
+        b=QrYOgoqLBVxtDT1kj2AnSEez8e0JYtPDqJuP37dm4FK5b2NhbRNy+XVt1syXr9zIil
+         SIOYAdKSghPUcM6yNeC/3ICWJUlfmk+i7e1SCSbQrajpWpfV6mbDe33Qf+V2/6jyfWmt
+         5ZhMTgITK4DXlcO2l5y0LGSYeymRL4sTqU0yVAholPgRw8sPwjxGYiWQqC4E8j7Euogd
+         uTnME3wtYVepXexxxlrAUD1OM7y6ZyWIaYMB1MQolbWd3c8uFfjVTF3IykSvq09fcp0R
+         3cL4WiamphDv6WEZ4x8UqShhAtrTMeenHSZq+RvySKFJzWnZiSn+ge94sdjatBXfFh2A
+         6FCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVd2+9GBHbV64vD0/Bra06qmOWP08W0TDUD4xcewM71eHbV8ygb5VfpJpoLUzk+3QH9fcGVDSIM/t23O2duFI4raH9z
+X-Gm-Message-State: AOJu0YwIxsexjixFcZT/5eFxsXcJBMTteALaevWWqcQVNzGoXEn6pbTe
+	kWM8+H321LKxPgaFzQAxIQdb8kdA49cYQQoHm2teAAPNcADhlZr+gOJMkOF3nN0eVVtLZWtsRnv
+	8tKFEztKyCI7agz/r2nby907yqAjUC5GXOGpK9v0E+zRZReGySfIEH7Tyog==
+X-Received: by 2002:a05:6358:9489:b0:192:5236:b1d9 with SMTP id e5c5f4694b2df-1979193b80fmr316852355d.2.1716412899933;
+        Wed, 22 May 2024 14:21:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEwmCqt+xh/cZzgdi3/vI+4gv7akS2ZD5pP2sH4xzmrmjQTtwWo7DH2HtQpg4Y2yNagbT5Nkg==
+X-Received: by 2002:a05:6358:9489:b0:192:5236:b1d9 with SMTP id e5c5f4694b2df-1979193b80fmr316848555d.2.1716412899113;
+        Wed, 22 May 2024 14:21:39 -0700 (PDT)
+Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6aa3280f16fsm36409786d6.12.2024.05.22.14.21.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 May 2024 14:21:38 -0700 (PDT)
+Date: Wed, 22 May 2024 17:21:35 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Andrew Jones <ajones@ventanamicro.com>, Yan Zhao <yan.y.zhao@intel.com>,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kevin.tian@intel.com, jgg@nvidia.com, yishaih@nvidia.com,
+	shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH] vfio/pci: take mmap write lock for io_remap_pfn_range
+Message-ID: <Zk5h3yfuZzlo2VzN@x1n>
+References: <20230508125842.28193-1-yan.y.zhao@intel.com>
+ <20240522-b1ef260c9d6944362c14c246@orel>
+ <20240522115006.7746f8c8.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240522115006.7746f8c8.alex.williamson@redhat.com>
 
-On Thu, Dec 21 2023 at 18:51, Maxim Levitsky wrote:
-> The test usually fails because L2 observes TSC after the 
-> preemption timer deadline, before the VM exit happens.
+On Wed, May 22, 2024 at 11:50:06AM -0600, Alex Williamson wrote:
+> I'm not sure if there are any outstanding blockers on Peter's side, but
+> this seems like a good route from the vfio side.  If we're seeing this
+> now without lockdep, we might need to bite the bullet and take the hit
+> with vmf_insert_pfn() while the pmd/pud path learn about pfnmaps.
 
-That's an arguably silly failure condition.
+No immediate blockers, it's just that there're some small details that I
+may still need to look into.  The current one TBD is pfn tracking
+implications on PAT.  Here I see at least two issues to be investigated.
 
-Timer interrupt delivery can be late even on bare metal, so observing
-TSC ahead of the expected timer event is not really wrong.
+Firstly, when vfio zap bars it can try to remove VM_PAT flag.  To be
+explicit, unmap_single_vma() has:
 
-Btw, the kernel also handles it nicely when the timer event arrives
-_before_ the expected time. It simply reprograms the timer and is done
-with it. That's actually required because clocksource (which determines
-time) and clockevent (which expires timers) can be on different clocks
-which might drift against each other.
+	if (unlikely(vma->vm_flags & VM_PFNMAP))
+		untrack_pfn(vma, 0, 0, mm_wr_locked);
 
->     In particular, NTP performing a forward correction will result in
->     a timer expiring sooner than expected from a guest point of view.
->     Not a big deal, we kick the vcpu anyway.
->
->     But on wake-up, the vcpu thread is going to perform a check to
->     find out whether or not it should block. And at that point, the
->     timer check is going to say "timer has not expired yet, go back
->     to sleep". This results in the timer event being lost forever.
+I believe it'll also erase the entry on the memtype_rbroot.. I'm not sure
+whether that's correct at all, and if that's correct how we should
+re-inject that.  So far I feel like we should keep that pfn tracking stuff
+alone from tearing down pgtables only, but I'll need to double check.
+E.g. I at least checked MADV_DONTNEED won't allow to apply on PFNMAPs, so
+vfio zapping the vma should be the 1st one can do that besides munmap().
 
-That's obviously a real problem.
+The other thing is I just noticed very recently that the PAT bit on x86_64
+is not always the same one.. on 4K it's bit 7, but it's reused as PSE on
+higher levels, moving PAT to bit 12:
 
->     There are multiple ways to handle this. One would be record that
->     the timer has expired and let kvm_cpu_has_pending_timer return
->     true in that case, but that would be fairly invasive. Another is
->     to check for the "short sleep" condition in the hrtimer callback,
->     and restart the timer for the remaining time when the condition
->     is detected.
+#define _PAGE_BIT_PSE		7	/* 4 MB (or 2MB) page */
+#define _PAGE_BIT_PAT		7	/* on 4KB pages */
+#define _PAGE_BIT_PAT_LARGE	12	/* On 2MB or 1GB pages */
 
-:)
+We may need something like protval_4k_2_large() when injecting huge
+mappings.
 
-> So to solve this issue there are two options:
-
-There is a third option:
-
-   3. Unconditionally inject the timer interrupt into the guest when the
-      underlying hrtimer has expired
-
-      That's fine because timer interrupts can be early (see above) and
-      any sane OS has to be able to handle it.
-
-> 1. Have another go at implementing support for CLOCK_MONOTONIC_RAW timers. 
->    I don't know if that is feasible and I would be very happy to hear
->    a feedback from you.
-
-That's a non-trivial exercise.
-
-The charm of having all clocks related to CLOCK_MONOTONIC is that there
-is zero requirement to take NTP frequency adjustments into account,
-which makes the implementation reasonably simple and robust.
-
-Changing everything over in that area (hrtimers, clockevents, NOHZ) to
-be raw hardware frequency based would be an Herculean task and just a
-huge pile of horrors.
-
-So the only realistic way to do that is to correlate a
-CLOCK_MONOTONIC_RAW timer to CLOCK_MONOTONIC, which obviously has the
-same problem you are trying to solve :)
-
-But we could be smart about it. Let's look at the math:
-
-    mraw  = base_mraw + (tsc - base_r) * factor_r;
-    mono  = base_mono + (tsc - base_m) * factor_m;
-
-So converting a MONOTONIC_RAW time into MONOTONIC would be:
-
-   tsc = (mraw - base_mraw)/factor_r + base_r
-
-   mono = base_mono + ((mraw - base_mraw)/factor_r + base_r - base_m) * factor_m;
-
-It's guaranteed that base_r == base_m, so:
-
-   mono = base_mono + (mraw - base_mraw) * factor_m / factor_r;
-
-The conversion factors are actually implemented with scaled math:
-
-   mono = base_mono + (((delta_raw * mult_m) >> sft_m) << sft_r) / mult_r;
-
-As sft_m and sft_r are guaranteed to be identical:
-
-   mono = base_mono + (delta_raw * mult_m) / mult_r;
-
-That obviously only works correctly when mult_m is constant between the
-time the timer is enqueued and the time the timer is expired as you
-figured out.
-
-But even if mult_m changes this will be correct if we take NOHZ out of
-the picture for a moment. Why?
-
-In a NOHZ=n scenario the next expiring timer is at least reevaluated
-once every tick. As mult_m is stable between ticks any MONOTONIC_RAW
-timer which expires before the next tick will be pretty accurately
-mapped back onto MONOTONIC and therefore expire at the expected time.
-
-Now NOHZ comes into play and ruins everything under the following
-condition:
-
-   1) CPU takes an idle nap for a longer period of time
-   
-   2) Time synchronization (NTP/PTP/PPS) is adjusting mult_m during that
-      #1 period
-
-That's the only condition where the conversion fails. If NTP slows down
-the conversion then the timer is going to be late. If it speeds it up
-then the hrtimer core will take care of it and guarantee that the timer
-callback is never invoked early.
-
-But that's going to be a rare problem because it requires:
-
-    1) the CPU to be in idle for a longer period
-
-    2) the MONOTONIC_RAW timer to be the effective first timer to fire
-       after that idle period
-
-    3) Time synchronization adjusting right during that idle period
-
-Sure that can happen, but the question is whether it's really a
-problem. As I said before timer events coming late is to be expected
-even on bare metal (think SMI, NMI, long interrupt disabled regions).
-
-So the main benefit of such a change would be to spare the various
-architecture specific implementations the stupid exercise of
-implementing half baked workarounds which will suffer from
-the very same problems.
-
-If done right then the extra overhead of the division will be not really
-noticable and only take effect when there is a MONOTONIC_RAW timer
-queued. IOW, it's a penalty on virtualization hosts, but not for
-everyone. The facility will introduce some extra cycles due to
-conditionals vs. MONOTONIC_RAW in a few places, but that's probably
-something which can't even be measured.
+From the schedule POV, the plan is I'll continue work on this after I flush
+the inbox for the past two weeks and when I'll get some spare time.  Now
+~160 emails left.. but I'm getting there.  If there's comments for either
+of above, please shoot.
 
 Thanks,
 
-        tglx
+-- 
+Peter Xu
+
 
