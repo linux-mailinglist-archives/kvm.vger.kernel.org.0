@@ -1,113 +1,140 @@
-Return-Path: <kvm+bounces-17906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0DBB8CB8E7
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 04:28:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406978CB8EA
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 04:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 712301F2676F
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 02:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7185B1C22AE7
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 02:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FCEE5812B;
-	Wed, 22 May 2024 02:27:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5335057CB0;
+	Wed, 22 May 2024 02:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lYTrk8eK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JPwTSCAz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7D15476B;
-	Wed, 22 May 2024 02:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0694415C0
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 02:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716344868; cv=none; b=bYdkfiS5G7OduCpbUwGtE8H3E+1SjYVcJsMtAyDdtlf1eUq4AagY/d5dhHxZsVkiVWruKFTIEHOkLtCniTLXDyXHGw0zvlmNzVoP9slrUDOY+OS1eZGYlxVDposE0rjXA2V/fwZ16Pd/H30ivFTsKkg7YPxH/wPV1Hf5bgUmuNc=
+	t=1716344912; cv=none; b=cNL3FoG/E659iTHRIQMSl8zU/W45mh7bYGV7laAuI6sXq1/TGx7I7hzWubLYiKsnKoYwzD3xh5zAwf7Yo7FhpDTMVU2IoMtmP6H54WtLBA98IT5YoFQ2bOgRQA60483G3pxOZ9CKeU5Fo3LchOD7RNcoJ0yLsd7bFJdPIG8pc+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716344868; c=relaxed/simple;
-	bh=zv1bDCgDyK66NAyyXA3qwyVKDI4Dj0TjLmGIr7Tt64o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I8eB1s0blcskvCTktTQx3Z504Nva/MEoEnVopR9X3z6FbofXYwPg9lp1CWQQsW71NcjOKF6nRPQUC9bIPaAi6E+PgdHf1FZBW6ngwTZ89PA4Z0XSm1pTAcYmRqtjBuAPbPju8tC8ZwZou6inL9JHCxOcgcRHZRRERNnLWsmx5oE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lYTrk8eK; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716344867; x=1747880867;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zv1bDCgDyK66NAyyXA3qwyVKDI4Dj0TjLmGIr7Tt64o=;
-  b=lYTrk8eKeLtf80E21RKOHmaD7A+opYgD5RwJD4Rwv+WjGta5kdprMAIR
-   H3JWtIE+G0k7PQnjWeGFlwXeOtG5dKJ6MW93NXW2YPz8KhbQ5Pcc+v2RG
-   ao3PnlfC4j0DdgD/9hSr4fxlRXoq5pAEfbSHYnH7FkItK1JcuVzmEgH0y
-   6f7HMrgEJWapWBelsqoTmndLMRXyt1RISDMS6tg6u4jbEwoQqCZvC2MG7
-   xG5q5ReFDrkmhUBuCTbsSQ6LrMLB2zbNdepqZhsC5ZKh+qAUsZeykcYPC
-   dC8E4bXpy3iDO0QswD5ynhIkHzqlpqkCBakobQK5nK2Tq7Q/UhugshGAS
-   A==;
-X-CSE-ConnectionGUID: wSHoqzD3Sqq3CoZbtfifyg==
-X-CSE-MsgGUID: xWOZrB55RCqMFECgOXuKhA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11079"; a="16401381"
-X-IronPort-AV: E=Sophos;i="6.08,179,1712646000"; 
-   d="scan'208";a="16401381"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 May 2024 19:27:46 -0700
-X-CSE-ConnectionGUID: U4Z1vXzYTO6PdadMS/6+jQ==
-X-CSE-MsgGUID: KPgYSKr4TyeyHIP7REqcFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,179,1712646000"; 
-   d="scan'208";a="33107201"
-Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
-  by fmviesa008.fm.intel.com with ESMTP; 21 May 2024 19:27:43 -0700
-Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1s9bhb-0000xN-2q;
-	Wed, 22 May 2024 02:27:40 +0000
-Date: Wed, 22 May 2024 10:26:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bibo Mao <maobibo@loongson.cn>, Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: Paul Gazzillo <paul@pgazz.com>,
-	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-	oe-kbuild-all@lists.linux.dev, Juergen Gross <jgross@suse.com>,
-	kvm@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH v3 2/2] LoongArch: Add steal time support in guest side
-Message-ID: <202405221028.QrCEdMNQ-lkp@intel.com>
-References: <20240521024556.419436-3-maobibo@loongson.cn>
+	s=arc-20240116; t=1716344912; c=relaxed/simple;
+	bh=3gAy88p21L6Wk9rM/10Z4It1sofQrFGW8GYnqHBWB1g=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JUVagSoE6m7iu9HBez6iCPQjc5PL6ulGxlBPGvIXS5PDaTbzkHc31hCSWi1rOzzVrAWXRz+LzUY8QjxDG93suLaS+gMqLBgUwmfNItPc1QzjmvKrwISYTXW8jXsBhjwupVSthaHghLKsQB8Xx6jtS7ciJ37bKBpFXVH3k4JHiF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JPwTSCAz; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-627e6fe0303so3148157b3.2
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 19:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716344910; x=1716949710; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7V+Ka0fjINsI8Z4RPlt1zj8ARVt5k6DEGgyn88Anuto=;
+        b=JPwTSCAzawGYeL/otUQuh8sSBUi64GdyoRbPbXdRpP2nSQfS25JC7b7Q2DMzOiH00g
+         yWT2UJqcTDIaDC0fGdce6aoY7HMyehgz6j5OSt2bEfMFufqfoPpKiSCK/JoVs1VlBggh
+         ZuHugSfV1OhMTpK8DSZs+3yJL3uHhBc88WvdQiZOlYQdoVRm1lp5t/fanaUwaMMaX+cf
+         op2Unaph8MDjmHjQ9AvCTnGFHVO9d8D1e3ONk5/sb1PKFe8wTu2k+EvN6fyiyf+mmlv8
+         Zd9RW5lgiisFDxwkSnoKttlYXHWY09YG7dcEQbTeP4H7x3mGUs+cLPbTmd9Ub7fSD+KJ
+         yCRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716344910; x=1716949710;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7V+Ka0fjINsI8Z4RPlt1zj8ARVt5k6DEGgyn88Anuto=;
+        b=C6VrUvVG4E9n0S86rUdePzRfi85GMJGGKkV81pSn0Rj6f+z/b/H3TfsRkbFS8O3Lgn
+         q+0kEtpUpVam5v+daT+6WbUB7tPykMRHmJdFL5qJlzle2nu57uL+8RjVw1jrXXx2X9Cs
+         6qgG6Q2YBr0BynY3jD/+9uckxbqL+hYre2m2cs5tcVq6v+Fxfom2/ZmwBvjq5NsQ0Zc/
+         xsiC+W1eQyx6qtTK4CFFZub8OLQ1UbPLZ8N2w3eHzQs5CTp3SPcRX3Gc7D1Qm8zzhfs1
+         Jbe4YBnm6Vjru7nZmRN/d0xS9cjUokgs1ljKzePFhBctPf+Whh5AltWQ0Wj3ESjUKMtX
+         2Z3w==
+X-Gm-Message-State: AOJu0Ywol3ioK5gzl1LAr5UW+P9SLaTclmpFJlwscki2yV9Chb0UZ2iR
+	c0vscg+PP911BAE0qqCl4psyY5DS3cwbpU2+g/VvoBNsVBcr9l8HoiPy7ymuWzCUjWleyyIescY
+	+9A==
+X-Google-Smtp-Source: AGHT+IH/n4GXytNCOSFbsnT6ItllhNo6Jqx8JvHkCrwnClOG72WXl8cojbyFHcHm6SRI5VO4PWTRfvrC+58=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:d80d:0:b0:622:c964:a590 with SMTP id
+ 00721157ae682-627e46d40c7mr2134497b3.1.1716344909979; Tue, 21 May 2024
+ 19:28:29 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 21 May 2024 19:28:21 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240521024556.419436-3-maobibo@loongson.cn>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
+Message-ID: <20240522022827.1690416-1-seanjc@google.com>
+Subject: [PATCH v2 0/6] KVM: Register cpuhp/syscore callbacks when enabling virt
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Bibo,
+Register KVM's cpuhp and syscore callbacks when enabling virtualization in
+hardware, as the sole purpose of said callbacks is to disable and re-enable
+virtualization as needed.
 
-kernel test robot noticed the following build warnings:
+The primary motivation for this series is to simplify dealing with enabling
+virtualization for Intel's TDX, which needs to enable virtualization
+when kvm-intel.ko is loaded, i.e. long before the first VM is created.  TDX
+doesn't _need_ to keep virtualization enabled, but doing so is much simpler
+for KVM (see patch 3).
 
-[auto build test WARNING on 3c999d1ae3c75991902a1a7dad0cb62c2a3008b4]
+That said, this is a nice cleanup on its own, assuming I haven't broken
+something.  By registering the callbacks on-demand, the callbacks themselves
+don't need to check kvm_usage_count, because their very existence implies a
+non-zero count.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bibo-Mao/LoongArch-KVM-Add-steal-time-support-in-kvm-side/20240521-104902
-base:   3c999d1ae3c75991902a1a7dad0cb62c2a3008b4
-patch link:    https://lore.kernel.org/r/20240521024556.419436-3-maobibo%40loongson.cn
-patch subject: [PATCH v3 2/2] LoongArch: Add steal time support in guest side
-config: loongarch-kismet-CONFIG_PARAVIRT-CONFIG_PARAVIRT_TIME_ACCOUNTING-0-0 (https://download.01.org/0day-ci/archive/20240522/202405221028.QrCEdMNQ-lkp@intel.com/config)
-reproduce: (https://download.01.org/0day-ci/archive/20240522/202405221028.QrCEdMNQ-lkp@intel.com/reproduce)
+The meat is in patch 1.  Patches 2 renames the helpers so that patch 3 is
+less awkward.  Patch 3 adds a module param to enable virtualization when KVM
+is loaded.  Patches 4-6 are tangentially related x86 cleanups to registers
+KVM's "emergency disable" callback on-demand, same as the syscore callbacks.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202405221028.QrCEdMNQ-lkp@intel.com/
+Moderately well tested on x86, though I haven't (yet) done due dilegence on
+the suspend/resume and cphup paths.  Compile tested on other architectures,
+but that's all for this version.
 
-kismet warnings: (new ones prefixed by >>)
->> kismet: WARNING: unmet direct dependencies detected for PARAVIRT when selected by PARAVIRT_TIME_ACCOUNTING
-   
+v2:
+ - Use a dedicated mutex to avoid lock inversion issues between kvm_lock and
+   the cpuhp lock.
+ - Register emergency disable callbacks on-demand. [Kai]
+ - Drop an unintended s/junk/ign rename. [Kai]
+ - Decrement kvm_usage_count on failure. [Chao]
 
+v1: https://lore.kernel.org/all/20240425233951.3344485-1-seanjc@google.com
+
+Sean Christopherson (6):
+  KVM: Register cpuhp and syscore callbacks when enabling hardware
+  KVM: Rename functions related to enabling virtualization hardware
+  KVM: Add a module param to allow enabling virtualization when KVM is
+    loaded
+  KVM: Add arch hooks for enabling/disabling virtualization
+  x86/reboot: Unconditionally define cpu_emergency_virt_cb typedef
+  KVM: x86: Register "emergency disable" callbacks when virt is enabled
+
+ arch/x86/include/asm/kvm_host.h |   3 +
+ arch/x86/include/asm/reboot.h   |   2 +-
+ arch/x86/kvm/svm/svm.c          |   5 +-
+ arch/x86/kvm/vmx/main.c         |   2 +
+ arch/x86/kvm/vmx/vmx.c          |   6 +-
+ arch/x86/kvm/vmx/x86_ops.h      |   1 +
+ arch/x86/kvm/x86.c              |  10 ++
+ include/linux/kvm_host.h        |   2 +
+ virt/kvm/kvm_main.c             | 258 ++++++++++++++++----------------
+ 9 files changed, 150 insertions(+), 139 deletions(-)
+
+
+base-commit: 4aad0b1893a141f114ba40ed509066f3c9bc24b0
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.45.0.215.g3402c0e53f-goog
+
 
