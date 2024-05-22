@@ -1,141 +1,121 @@
-Return-Path: <kvm+bounces-17986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A848CC81C
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 23:21:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 005CA8CC862
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 23:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07421F222FA
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 21:21:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 961641F22415
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 21:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB207146A67;
-	Wed, 22 May 2024 21:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E57146D4F;
+	Wed, 22 May 2024 21:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOaFheRZ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FHmSWCZg"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8A9E76048
-	for <kvm@vger.kernel.org>; Wed, 22 May 2024 21:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D856C146D43
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 21:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716412905; cv=none; b=st2eNnaRtwE53ZGHJsNwt7QXsMQxbjDsyq7Rcq+FJC5JiLe6saMBv6/bM95RTlBrP3c5ifxTspEF4+RBaShvPzPteKVkago5UB5OVXXsA4hZ2QnfURG+t8rMawmyQDmJrc7nZISDi5CVjR+ZvPfEMWfHzpk8AhTqWiA7hQWB59Y=
+	t=1716415083; cv=none; b=tGmU/dVacKqAAijKQs+2XV18ZPoaQIDo1/unzaJLINln5wJQzNTCtwD0g0RGG3PEz3Bq9fZodlXkvR46G1DxGayQ5yxYW/mCjpwTWTPKxC67xtD9ILSteXWxeZN7c/tygAiOo904aOdy1WxxNZhhINW28nk0kdhvMODNDyNBZ/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716412905; c=relaxed/simple;
-	bh=Qz9tt6pR5oDF6TcAN7hxYGGPefSmU4S9CgeaMIOuHpI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eGzVNXvdm7hv4EDdYnMiCqkiB22KUvdoUUlIRwYwADuN29HIMepOnR27ydXES1AxebatkHJUA2UbS/YDscI+XEkBBmzGZc6dfmIjRE6eced9D04o85F9cGXxPcSBoA3li8pFpBklVvW7tIPnsMtqLGhJLzRsqFR0a473SrH2H7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FOaFheRZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716412902;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/BUu4duYYbCSIQnv0ATgpzH3sdluqP4G2MqncwvuYRY=;
-	b=FOaFheRZj1rSbwmUDDaOyUUkRT0GfJkvDHcYhcya1SpYMtCxkcP/aliAczzrflMqW8rPOR
-	mDtGhmNUia3+SIVYPQvW5oT5UI007Q5ArgwToDDs3zG2EIM9pfKXuhD1+mC7NBXFEbmsVH
-	2DergJ+mhkEC6j4RPJ0GWQJvnS0S2TI=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-468-lJRg-21fO5iQGgNVPPfr6g-1; Wed, 22 May 2024 17:21:41 -0400
-X-MC-Unique: lJRg-21fO5iQGgNVPPfr6g-1
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-5b27bd802a7so104832eaf.0
-        for <kvm@vger.kernel.org>; Wed, 22 May 2024 14:21:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716412900; x=1717017700;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/BUu4duYYbCSIQnv0ATgpzH3sdluqP4G2MqncwvuYRY=;
-        b=QrYOgoqLBVxtDT1kj2AnSEez8e0JYtPDqJuP37dm4FK5b2NhbRNy+XVt1syXr9zIil
-         SIOYAdKSghPUcM6yNeC/3ICWJUlfmk+i7e1SCSbQrajpWpfV6mbDe33Qf+V2/6jyfWmt
-         5ZhMTgITK4DXlcO2l5y0LGSYeymRL4sTqU0yVAholPgRw8sPwjxGYiWQqC4E8j7Euogd
-         uTnME3wtYVepXexxxlrAUD1OM7y6ZyWIaYMB1MQolbWd3c8uFfjVTF3IykSvq09fcp0R
-         3cL4WiamphDv6WEZ4x8UqShhAtrTMeenHSZq+RvySKFJzWnZiSn+ge94sdjatBXfFh2A
-         6FCg==
-X-Forwarded-Encrypted: i=1; AJvYcCVd2+9GBHbV64vD0/Bra06qmOWP08W0TDUD4xcewM71eHbV8ygb5VfpJpoLUzk+3QH9fcGVDSIM/t23O2duFI4raH9z
-X-Gm-Message-State: AOJu0YwIxsexjixFcZT/5eFxsXcJBMTteALaevWWqcQVNzGoXEn6pbTe
-	kWM8+H321LKxPgaFzQAxIQdb8kdA49cYQQoHm2teAAPNcADhlZr+gOJMkOF3nN0eVVtLZWtsRnv
-	8tKFEztKyCI7agz/r2nby907yqAjUC5GXOGpK9v0E+zRZReGySfIEH7Tyog==
-X-Received: by 2002:a05:6358:9489:b0:192:5236:b1d9 with SMTP id e5c5f4694b2df-1979193b80fmr316852355d.2.1716412899933;
-        Wed, 22 May 2024 14:21:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEwmCqt+xh/cZzgdi3/vI+4gv7akS2ZD5pP2sH4xzmrmjQTtwWo7DH2HtQpg4Y2yNagbT5Nkg==
-X-Received: by 2002:a05:6358:9489:b0:192:5236:b1d9 with SMTP id e5c5f4694b2df-1979193b80fmr316848555d.2.1716412899113;
-        Wed, 22 May 2024 14:21:39 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6aa3280f16fsm36409786d6.12.2024.05.22.14.21.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 14:21:38 -0700 (PDT)
-Date: Wed, 22 May 2024 17:21:35 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Andrew Jones <ajones@ventanamicro.com>, Yan Zhao <yan.y.zhao@intel.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kevin.tian@intel.com, jgg@nvidia.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com
-Subject: Re: [PATCH] vfio/pci: take mmap write lock for io_remap_pfn_range
-Message-ID: <Zk5h3yfuZzlo2VzN@x1n>
-References: <20230508125842.28193-1-yan.y.zhao@intel.com>
- <20240522-b1ef260c9d6944362c14c246@orel>
- <20240522115006.7746f8c8.alex.williamson@redhat.com>
+	s=arc-20240116; t=1716415083; c=relaxed/simple;
+	bh=29IUaPph125YTEEzyzSqhzqBpdvCD+GiSBZvclYW06Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=blfigHsROSmaCPKnSV2G3emt+yQ9FCP94TpL+cvirev31gS484InAmIed26wnp0ycx08v4ewyuYJne4DB7utore5MoPzbzm/RoA5TCKToBCpdeNpdAxL3NV5MtWCdcjBSi93LHMovzUitlPbhKXOCha9r1cCBCBejLDrd/gUdfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=FHmSWCZg; arc=none smtp.client-ip=205.220.165.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44MKdAhE026067;
+	Wed, 22 May 2024 21:57:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=yCiLDo+FpZv9qwONyqqzaSuz2eOmA7/A8abUICV/2NQ=;
+ b=FHmSWCZgMPx9I0VCASR8AXb1x+rDn374uDLEx94jGKYVGwSBpv3Cezi7MxvpIa6+yXQ0
+ z6uQxdenU+iUd7d+Xq1FwK5pCE/4kWtdddCN0E7qAt4akuchfZtkmzldEbi7QD0nsERb
+ Aw4OHbWfzUtnyzy8R0aBrJ9eZjn6sYxa0WXQ4QQzP1YBRx2mG6GLmogGG6wQD+Rff3gS
+ SF6cSyaLNvg6XCyoj04K26YmL6svnKIpcZbAjYBxgTycqEyuTZi+r0XrHipEtVEBHjFW
+ HRhTrcg240HDP8snZVsUzySsNERE/ocHHbX24gixwAZJsnNzZjyZ/COywSR2lW3NMPJ9 og== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3y6m7b8h32-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 22 May 2024 21:57:57 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44MLZoG3005058;
+	Wed, 22 May 2024 21:57:57 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3y6jsa40vc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 22 May 2024 21:57:57 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44MLvuG4007949;
+	Wed, 22 May 2024 21:57:56 GMT
+Received: from alaljime-dev-e4flex-vm.osdevelopmeniad.oraclevcn.com (alaljime-dev-e4flex-vm.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.106])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3y6jsa40ta-1;
+	Wed, 22 May 2024 21:57:56 +0000
+From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
+        alejandro.j.jimenez@oracle.com
+Subject: [kvm-unit-tests PATCH 1/1] x86: vmexit: Allow IPI test to be accelerated by SVM AVIC
+Date: Wed, 22 May 2024 21:57:55 +0000
+Message-Id: <20240522215755.197363-1-alejandro.j.jimenez@oracle.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240522115006.7746f8c8.alex.williamson@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-22_12,2024-05-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
+ suspectscore=0 mlxscore=0 adultscore=0 mlxlogscore=999 spamscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405220152
+X-Proofpoint-ORIG-GUID: _WqCb6-gISYxD2qlMYmr_E8_TpANtNIr
+X-Proofpoint-GUID: _WqCb6-gISYxD2qlMYmr_E8_TpANtNIr
 
-On Wed, May 22, 2024 at 11:50:06AM -0600, Alex Williamson wrote:
-> I'm not sure if there are any outstanding blockers on Peter's side, but
-> this seems like a good route from the vfio side.  If we're seeing this
-> now without lockdep, we might need to bite the bullet and take the hit
-> with vmf_insert_pfn() while the pmd/pud path learn about pfnmaps.
+The vmexit_ipi test can be used as a rough benchmark for IPI performance
+since commit 8a8c1fc3b1f8 ("vmexit: measure IPI and EOI cost") added
+reporting of the average number of cycles taken for IPI delivery. Avoid
+exposing a PIT to the guest so that SVM AVIC is not inhibited and IPI
+acceleration can be tested when available and enabled by the host.
 
-No immediate blockers, it's just that there're some small details that I
-may still need to look into.  The current one TBD is pfn tracking
-implications on PAT.  Here I see at least two issues to be investigated.
+Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+---
+ x86/unittests.cfg | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Firstly, when vfio zap bars it can try to remove VM_PAT flag.  To be
-explicit, unmap_single_vma() has:
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 867a8ea2..70cdda72 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -81,10 +81,13 @@ file = vmexit.flat
+ extra_params = -append 'inl_from_pmtimer'
+ groups = vmexit
+ 
++# To allow IPIs to be accelerated by SVM AVIC when the feature is available and
++# enabled, do not create a Programmable Interval Timer (PIT, a.k.a 8254), since
++# such device will disable/inhibit AVIC if exposed to the guest.
+ [vmexit_ipi]
+ file = vmexit.flat
+ smp = 2
+-extra_params = -append 'ipi'
++extra_params = -machine pit=off -append 'ipi'
+ groups = vmexit
+ 
+ [vmexit_ipi_halt]
 
-	if (unlikely(vma->vm_flags & VM_PFNMAP))
-		untrack_pfn(vma, 0, 0, mm_wr_locked);
-
-I believe it'll also erase the entry on the memtype_rbroot.. I'm not sure
-whether that's correct at all, and if that's correct how we should
-re-inject that.  So far I feel like we should keep that pfn tracking stuff
-alone from tearing down pgtables only, but I'll need to double check.
-E.g. I at least checked MADV_DONTNEED won't allow to apply on PFNMAPs, so
-vfio zapping the vma should be the 1st one can do that besides munmap().
-
-The other thing is I just noticed very recently that the PAT bit on x86_64
-is not always the same one.. on 4K it's bit 7, but it's reused as PSE on
-higher levels, moving PAT to bit 12:
-
-#define _PAGE_BIT_PSE		7	/* 4 MB (or 2MB) page */
-#define _PAGE_BIT_PAT		7	/* on 4KB pages */
-#define _PAGE_BIT_PAT_LARGE	12	/* On 2MB or 1GB pages */
-
-We may need something like protval_4k_2_large() when injecting huge
-mappings.
-
-From the schedule POV, the plan is I'll continue work on this after I flush
-the inbox for the past two weeks and when I'll get some spare time.  Now
-~160 emails left.. but I'm getting there.  If there's comments for either
-of above, please shoot.
-
-Thanks,
-
+base-commit: 00af1c849ced4e515f8659658d18652df2eb08fa
 -- 
-Peter Xu
+2.39.3
 
 
