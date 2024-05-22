@@ -1,166 +1,134 @@
-Return-Path: <kvm+bounces-17965-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17966-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D97E98CC3CD
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 17:07:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBD5D8CC3F1
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 17:16:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08F921C2317D
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 15:07:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2989D1C20A4C
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 15:16:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1D528DBF;
-	Wed, 22 May 2024 15:07:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC405FBB3;
+	Wed, 22 May 2024 15:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tGgP6d7+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MR8HfGt/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C98F91C6A8;
-	Wed, 22 May 2024 15:07:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D207F29422
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 15:16:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716390459; cv=none; b=lMdqJU7Z1XWmoLdQm1DLuJt+Kq1xmxx424QYhs7Jz7zTuq65/w+5Su7vsdMzXHVFYr4jnKXQMMjrDdSz1x8v+LrdZjgVIwQ1yBqrrTfQAwdMu642bcyo7MW4rLFJ5QSQWwWCYR35IflfGf/J7yPH1mR3muUgG66uCizl3x4qDW4=
+	t=1716390982; cv=none; b=uKNnBWec9xHE8DuN1U2T2j4luaH7XET/eA9bRjd2vTkiTz7llPQ6ef+Hb+Rb6JwGGutZ3jIROu6GgimEItk7KYG9DsDnMlnrf4R/s6JVwSw/8rLT+pVNpl2OH6aoz9YNAgKq8RTJFNG2ue8qrat3y+fg+/f5ACGkcuE1lySP+tQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716390459; c=relaxed/simple;
-	bh=WEpREqMhPkNihuBv6hEliRokd16yJnh08KjCemuD5qM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=k6UXft7vEIzLoUqY4hV7yZlV4oEcqizWYpycp1Z/2Z76RXw44x+nxrYTn0cki4lQ8mwqD/XyV+KM0InmMlKNbuywDBUNN6Ad7gO24XnQwO/ex48wTNlA2IydAw5MGzyI8luXJbLb5R43CNhQ4I/lfLDV4ygM5XC4ngLqFAx5NHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tGgP6d7+; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44MEIfuS015709;
-	Wed, 22 May 2024 15:07:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=otNFM9ZTgsXb8Ki7sw1G+IqMVuLkxn34jwHxXLoqCpQ=;
- b=tGgP6d7+LtYJZEWdA8jrEJYCBZHaBEt5o5hmhU5jhZR9BVS4r7BNVbmp3pUgiyqnA+IF
- o/vtwWiZNA/BWXdFV9VGY4QJdIhqMPCuz7iCfTwiATIox7EGQ2hb+cEDykrUd5Q8dsHQ
- M1gwGZen4pN4b/f++iOEYKB/d6XeRdHhbkaJfDIhtQEQuuhNyOT6ZeGX+rM5gtgCVdEt
- CbL8mvHEqp60T5A1DNy/WH5fs6Ro/EKGyq6Q5dVk2LDL7xKcOmhekPOh1XoLPxDOHpQn
- HFjfq1jctHWUVubrq9z1fyjTGFfjOPf6CMq+2/zhS0AGId11Hby+9HqNIHC27U4KatzC Xg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y9jbr83re-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 15:07:07 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44MF778u026428;
-	Wed, 22 May 2024 15:07:07 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y9jbr83rc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 15:07:07 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44MCFfcS008100;
-	Wed, 22 May 2024 15:07:06 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3y79c3452w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 15:07:06 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44MF70lR51773902
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 May 2024 15:07:02 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AB4C82005A;
-	Wed, 22 May 2024 15:07:00 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5899E2004F;
-	Wed, 22 May 2024 15:07:00 +0000 (GMT)
-Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 22 May 2024 15:07:00 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Ramesh Thomas <ramesh.thomas@intel.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Julian Ruess <julianr@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH v4 3/3] vfio/pci: Fix typo in macro to declare accessors
-Date: Wed, 22 May 2024 17:06:51 +0200
-Message-ID: <20240522150651.1999584-4-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240522150651.1999584-1-gbayer@linux.ibm.com>
-References: <20240522150651.1999584-1-gbayer@linux.ibm.com>
+	s=arc-20240116; t=1716390982; c=relaxed/simple;
+	bh=LBsuxRIt25iSTct1CaOFF4pb8q9+nLplzWcPNkULdk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p5YhSkKWqejiee7ekEq0w6WzHFDzfu3lzmJKx11i1PMD9gzUzIslBqv2onzQ7A7gB/842jXc0Jrib0LSDUMWv1ABPeZLJLENWGpikZtIWQ4n/QB05S6Gie5oO66LG1qYEREiTU93ei6MGy9usbrgdt9/zP2b2cMmXgTVc/eZ+Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MR8HfGt/; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: seanjc@google.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1716390977;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qPx5VBeAtVusPub5h8jjoS2Zp/k7LiSDo3T23EUz3Cc=;
+	b=MR8HfGt/7NWj1OeZKFuwxnVF9+ndS7xCoaOY+r1JI2bWBzf2MynLiEMDjC1DrcozAH8hei
+	TUnFiYL5Pyj+E10/+shwWi4h/9LVvu0Mc6mkr1yRH6n++3msAFiuDQVzo86zkrGkaVb0hH
+	6NbyKC1AGLafKPP8z0hv7d6a9IuqBaQ=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: zhaotianrui@loongson.cn
+X-Envelope-To: maobibo@loongson.cn
+X-Envelope-To: chenhuacai@kernel.org
+X-Envelope-To: mpe@ellerman.id.au
+X-Envelope-To: anup@brainfault.org
+X-Envelope-To: paul.walmsley@sifive.com
+X-Envelope-To: palmer@dabbelt.com
+X-Envelope-To: aou@eecs.berkeley.edu
+X-Envelope-To: borntraeger@linux.ibm.com
+X-Envelope-To: frankja@linux.ibm.com
+X-Envelope-To: imbrenda@linux.ibm.com
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: loongarch@lists.linux.dev
+X-Envelope-To: linux-mips@vger.kernel.org
+X-Envelope-To: linuxppc-dev@lists.ozlabs.org
+X-Envelope-To: kvm-riscv@lists.infradead.org
+X-Envelope-To: linux-riscv@lists.infradead.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+Date: Wed, 22 May 2024 08:16:07 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/6] KVM: Add a flag to track if a loaded vCPU is
+ scheduled out
+Message-ID: <Zk4MN49212SaW1_z@linux.dev>
+References: <20240522014013.1672962-1-seanjc@google.com>
+ <20240522014013.1672962-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Fzf6qxkIoti9WBbOigfF1ETSm6QYhEs7
-X-Proofpoint-ORIG-GUID: ZBRaPksNMD3CZrqLnyqy_zJVml1WPwd6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-22_08,2024-05-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- mlxlogscore=934 clxscore=1015 impostorscore=0 bulkscore=0 spamscore=0
- adultscore=0 malwarescore=0 lowpriorityscore=0 suspectscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405220102
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240522014013.1672962-2-seanjc@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-Correct spelling of DECLA[RA]TION
+On Tue, May 21, 2024 at 06:40:08PM -0700, Sean Christopherson wrote:
+> Add a kvm_vcpu.scheduled_out flag to track if a vCPU is in the process of
+> being scheduled out (vCPU put path), or if the vCPU is being reloaded
+> after being scheduled out (vCPU load path).  In the short term, this will
+> allow dropping kvm_arch_sched_in(), as arch code can query scheduled_out
+> during kvm_arch_vcpu_load().
+> 
+> Longer term, scheduled_out opens up other potential optimizations, without
+> creating subtle/brittle dependencies.  E.g. it allows KVM to keep guest
+> state (that is managed via kvm_arch_vcpu_{load,put}()) loaded across
+> kvm_sched_{out,in}(), if KVM knows the state isn't accessed by the host
+> kernel.  Forcing arch code to coordinate between kvm_arch_sched_{in,out}()
+> and kvm_arch_vcpu_{load,put}() is awkward, not reusable, and relies on the
+> exact ordering of calls into arch code.
+> 
+> Adding scheduled_out also obviates the need for a kvm_arch_sched_out()
+> hook, e.g. if arch code needs to do something novel when putting vCPU
+> state.
+> 
+> And even if KVM never uses scheduled_out for anything beyond dropping
+> kvm_arch_sched_in(), just being able to remove all of the arch stubs makes
+> it worth adding the flag.
+> 
+> Link: https://lore.kernel.org/all/20240430224431.490139-1-seanjc@google.com
+> Cc: Oliver Upton <oliver.upton@linux.dev>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Suggested-by: Ramesh Thomas <ramesh.thomas@intel.com>
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
- include/linux/vfio_pci_core.h | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 5f9b02d4a3e9..15d6d6da6e78 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -139,26 +139,26 @@ bool vfio_pci_core_range_intersect_range(loff_t buf_start, size_t buf_cnt,
- 					 loff_t *buf_offset,
- 					 size_t *intersect_count,
- 					 size_t *register_offset);
--#define VFIO_IOWRITE_DECLATION(size) \
-+#define VFIO_IOWRITE_DECLARATION(size) \
- int vfio_pci_core_iowrite##size(struct vfio_pci_core_device *vdev,	\
--			bool test_mem, u##size val, void __iomem *io);
-+			bool test_mem, u##size val, void __iomem *io)
- 
--VFIO_IOWRITE_DECLATION(8)
--VFIO_IOWRITE_DECLATION(16)
--VFIO_IOWRITE_DECLATION(32)
-+VFIO_IOWRITE_DECLARATION(8);
-+VFIO_IOWRITE_DECLARATION(16);
-+VFIO_IOWRITE_DECLARATION(32);
- #ifdef CONFIG_64BIT
--VFIO_IOWRITE_DECLATION(64)
-+VFIO_IOWRITE_DECLARATION(64);
- #endif
- 
--#define VFIO_IOREAD_DECLATION(size) \
-+#define VFIO_IOREAD_DECLARATION(size) \
- int vfio_pci_core_ioread##size(struct vfio_pci_core_device *vdev,	\
--			bool test_mem, u##size *val, void __iomem *io);
-+			bool test_mem, u##size *val, void __iomem *io)
- 
--VFIO_IOREAD_DECLATION(8)
--VFIO_IOREAD_DECLATION(16)
--VFIO_IOREAD_DECLATION(32)
-+VFIO_IOREAD_DECLARATION(8);
-+VFIO_IOREAD_DECLARATION(16);
-+VFIO_IOREAD_DECLARATION(32);
- #ifdef CONFIG_64BIT
--VFIO_IOREAD_DECLATION(64)
-+VFIO_IOREAD_DECLARATION(64);
- #endif
- 
- #endif /* VFIO_PCI_CORE_H */
 -- 
-2.45.0
-
+Thanks,
+Oliver
 
