@@ -1,249 +1,129 @@
-Return-Path: <kvm+bounces-17940-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17941-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538178CBD35
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 10:50:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7B578CBD69
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 11:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D18A61F220CF
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 08:50:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 148321C20D8B
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 09:00:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01FB680039;
-	Wed, 22 May 2024 08:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0E580607;
+	Wed, 22 May 2024 09:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aBpliW2R"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="O8RWc39r"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173947868B;
-	Wed, 22 May 2024 08:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AE278C65
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 09:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716367816; cv=none; b=cE3BXl6hV/cVkAilI+3dIxUtrAloJ5bn7EN8nUpn8BqXbnir0cAHkNsfF8cmkuD3b+5y6zE0P6rqbTnNzXH34nuLn1o6R+i/R+kMF1pzJ97tYDfRhrkiup849bzdF/LQXlO6HDKVD7BMXz3+buOtRAv81AIHrQefbqoil/QYE8Y=
+	t=1716368417; cv=none; b=nc6bSKZ2AYdDGpOynZ4uYFv3s71203KCT6fqPAP8g7tcU0r8fSY3hq7riSHN1zubnfZDvjtteBhLfgvA0hK2Bj0ClnZ2bAjVgeZqKDf1HM76eEi8e9PgxNUTwMKfaZioERdoJvEVewxyq4clPyxYw4yZgJf2apZ9/ywWbxFkHlM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716367816; c=relaxed/simple;
-	bh=yEeshlxO/0CfqQYE1FNW1skQXI/vD8pClNE0P6qCtH4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M/uhg1jmyx0bSQFJKfU25caJkEU2DW5bw0t8GU5Jw1oGmKIyT7cZNYcGXkVdBf2SH1HBDFHGjNn1TWDUr/erTEpCmohnUKL6W1krEBEQCmKaOuewR7RTJ1JYtdx3DR0mdwAT0Z/+HOz1W478HwbdqhsX14XeEsjuvp0sK2TkpkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aBpliW2R; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44M8Sooa030448;
-	Wed, 22 May 2024 08:50:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=Z+0PgAr/eLLew9MiU3rUy2s/5OX4IfXRIb2c/9wgeIg=;
- b=aBpliW2RTzOiUyqEmfaCatkLa8GwnGQSAVO+XxJIP1ukznkk/BoIPLez6VPju6jAnr3J
- RnmCvqORgNKVGdfF44O+PxODm2zvy/0pDrq3nXqIubFcckL4vgl4hvk4WazGiD8oW3JI
- 3fpV0N+9AddnT5CTkDRpS40VhZezfEJI50ZOBVlrSzPF83/qnTobe1xKcfZlaraTgsPz
- HVnncFk2opnI4+r1njPjFd5EQIUfc3qcxcEk+TeMCDzNadDj22WJZrrTnSC205vp+Gd9
- BB4oG++aBjir7liRqFrLhBK7EL8xASKBMUCmHVX0Qa1ZWryDRb1CuDwiUCHDogJzwTu2 zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y9d7gg22n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 08:50:01 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44M8o0PI000625;
-	Wed, 22 May 2024 08:50:01 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3y9d7gg22j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 08:50:00 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44M6P4cg023533;
-	Wed, 22 May 2024 08:50:00 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y77npb0v8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 22 May 2024 08:50:00 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44M8nsX432113390
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 May 2024 08:49:56 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4495B2004E;
-	Wed, 22 May 2024 08:49:54 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1261220043;
-	Wed, 22 May 2024 08:49:52 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.in.ibm.com (unknown [9.204.206.66])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 22 May 2024 08:49:51 +0000 (GMT)
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, corbet@lwn.net
-Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH v1 RESEND] arch/powerpc/kvm: Fix doorbell emulation by adding DPDES support
-Date: Wed, 22 May 2024 14:19:45 +0530
-Message-ID: <20240522084949.123148-1-gautam@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1716368417; c=relaxed/simple;
+	bh=kYOLY5Islms/P476NwRX1v9ZHFevROb1qpQI5RNmacU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LR63r8jFB+44PaXbgMorLkUCVB1FqMRFwy5J2tNSVn6aILYiL7P54qWCSiyqHSgmPMplxRGPTGVirCWfwrjxTnvMJR+dsTZBg4QDlqjaO6Uyv5HBra/wvScfWSzBQTE/M4atdsMSKjyxVoQllpyHZMi6ma2z6y0Xp3BimzG3h+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=O8RWc39r; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a59c448b44aso956431266b.2
+        for <kvm@vger.kernel.org>; Wed, 22 May 2024 02:00:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1716368414; x=1716973214; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJ5Hr3rLuHhBVJcgCy9JEFxvkpMRBY5L1Hcin1IIURI=;
+        b=O8RWc39rYkidxSXfT+BAilTg+tr0ZTGI+iiOn1ppQnOANVsGYhBjgv/MkXA3CAIOVS
+         qDH1LnU+P85U6meYx7pO298+VK1s/sO+EWAv7G5B96FGSo4PFPbvEjKuMuL8urxH8nSo
+         kUkeh1DO4ZQbxQ+hxT2TnQ4JJRKqhbKbVW0o2J2vW48FyB3HiW28QX5PuzJvCuHdi76x
+         GAF69w4ZNOnNaRhiPIrIz8YfCfRH4S//zPyoPhzG1s2isDaX1WNjPszzHzpCQbTMxzWf
+         pGSxKFfXG59bTtyrO2Rktvtgv+xiiluRlQPkcVECqA9E0KTYxO8A9z17/u/ivgo9n1pk
+         v80Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716368414; x=1716973214;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QJ5Hr3rLuHhBVJcgCy9JEFxvkpMRBY5L1Hcin1IIURI=;
+        b=ugYIPllkZV5IL3HoU2dsEIOoFTcu2TGFXz2rAibCyWwyWIJcQQkTCwonzMEFVGR2WP
+         kWR50zJI3Vk0EMS9seI6rQYUSeHCbbbv3YNNk7fVYcGuF2bcW03BHrlxRbwG/xpp0pzS
+         bfaL9mfGjFC8vqKORNbQpilyHITgDMhZWppx5tO/iRGhi3HoEhykYjS3IB0pbha8N6ko
+         4caMxkbzRQ2FvuhAf4J8bdG0RN/4rPHixxKDpcTCu9ZbIg/FVHJehIO3h0EMsk58GN8t
+         lanQEu7PgVjoMT0lVTkziumophcUGvmnnLPDnarRLuIR9K35C1K+BaiPsbeAyCJibmxC
+         E+JQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUMtltAvqMzI3mqMscx0gC2Q8rXXezv5a4CEdnc7t8Sp1SDJGhfFwz5ThxTZ6GIjx3PVbn608xM5e0rQCjb3VpNq6+q
+X-Gm-Message-State: AOJu0Yx+pszLzh+6WbecD6lh2hHLyw4wS3Ra4APD324LbXlsbogHg0i3
+	cppfnNYX2W6eonEqspFPYKV/hVJcitRXSjIvfnjjPu+bdsJvrLwpOCHKZ/JubEY=
+X-Google-Smtp-Source: AGHT+IEwdep8vQZ/ua7S5w4rCp0YCSyEUG5g9WHDPfQAhOr3vrC9k0evxDu/P938ceZsPJNhCgo6Ww==
+X-Received: by 2002:a17:906:4c56:b0:a59:ca33:683f with SMTP id a640c23a62f3a-a622807c04dmr84271866b.28.1716368413766;
+        Wed, 22 May 2024 02:00:13 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a5a1789247csm1741002666b.82.2024.05.22.02.00.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 May 2024 02:00:13 -0700 (PDT)
+Date: Wed, 22 May 2024 11:00:12 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
+	greentime.hu@sifive.com, vincent.chen@sifive.com, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] RISC-V: KVM: No need to use mask when hart-index-bit
+ is 0
+Message-ID: <20240522-74009df58fb51008bae6cbaf@orel>
+References: <20240415064905.25184-1-yongxuan.wang@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7twMTi4uoBrGCFf2IsEijlHqmFUwJa5t
-X-Proofpoint-ORIG-GUID: qdE9fAFu7Aqy0159yFHb6JtGiyF5pLuU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-22_03,2024-05-21_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- phishscore=0 lowpriorityscore=0 mlxlogscore=577 suspectscore=0
- adultscore=0 spamscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405220063
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415064905.25184-1-yongxuan.wang@sifive.com>
 
-Doorbell emulation is broken for KVM on PowerVM guests as support for
-DPDES was not added in the initial patch series. Due to this, a KVM on
-PowerVM guest cannot be booted with the XICS interrupt controller as
-doorbells are to be setup in the initial probe path when using XICS
-(pSeries_smp_probe()). Add DPDES support in the host KVM code to fix
-doorbell emulation.
+On Mon, Apr 15, 2024 at 02:49:04PM GMT, Yong-Xuan Wang wrote:
+> When the maximum hart number within groups is 1, hart-index-bit is set to
+> 0. Consequently, there is no need to restore the hart ID from IMSIC
+> addresses and hart-index-bit settings. Currently, QEMU and kvmtool do not
+> pass correct hart-index-bit values when the maximum hart number is a
+> power of 2, thereby avoiding this issue. Corresponding patches for QEMU
+> and kvmtool will also be dispatched.
+> 
+> Fixes: 89d01306e34d ("RISC-V: KVM: Implement device interface for AIA irqchip")
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> ---
+>  arch/riscv/kvm/aia_device.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/riscv/kvm/aia_device.c b/arch/riscv/kvm/aia_device.c
+> index 0eb689351b7d..5cd407c6a8e4 100644
+> --- a/arch/riscv/kvm/aia_device.c
+> +++ b/arch/riscv/kvm/aia_device.c
+> @@ -237,10 +237,11 @@ static gpa_t aia_imsic_ppn(struct kvm_aia *aia, gpa_t addr)
+>  
+>  static u32 aia_imsic_hart_index(struct kvm_aia *aia, gpa_t addr)
+>  {
+> -	u32 hart, group = 0;
+> +	u32 hart = 0, group = 0;
+>  
+> -	hart = (addr >> (aia->nr_guest_bits + IMSIC_MMIO_PAGE_SHIFT)) &
+> -		GENMASK_ULL(aia->nr_hart_bits - 1, 0);
+> +	if (aia->nr_hart_bits)
+> +		hart = (addr >> (aia->nr_guest_bits + IMSIC_MMIO_PAGE_SHIFT)) &
+> +		       GENMASK_ULL(aia->nr_hart_bits - 1, 0);
+>  	if (aia->nr_group_bits)
+>  		group = (addr >> aia->nr_group_shift) &
+>  			GENMASK_ULL(aia->nr_group_bits - 1, 0);
+> -- 
+> 2.17.1
+>
 
-Fixes: 6ccbbc33f06a ("KVM: PPC: Add helper library for Guest State Buffers")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
----
-v1 -> v1 resend:
-1. Add the stable tag
-
- Documentation/arch/powerpc/kvm-nested.rst     |  4 +++-
- arch/powerpc/include/asm/guest-state-buffer.h |  3 ++-
- arch/powerpc/include/asm/kvm_book3s.h         |  1 +
- arch/powerpc/kvm/book3s_hv.c                  | 14 +++++++++++++-
- arch/powerpc/kvm/book3s_hv_nestedv2.c         |  7 +++++++
- arch/powerpc/kvm/test-guest-state-buffer.c    |  2 +-
- 6 files changed, 27 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/arch/powerpc/kvm-nested.rst b/Documentation/arch/powerpc/kvm-nested.rst
-index 630602a8aa00..5defd13cc6c1 100644
---- a/Documentation/arch/powerpc/kvm-nested.rst
-+++ b/Documentation/arch/powerpc/kvm-nested.rst
-@@ -546,7 +546,9 @@ table information.
- +--------+-------+----+--------+----------------------------------+
- | 0x1052 | 0x08  | RW |   T    | CTRL                             |
- +--------+-------+----+--------+----------------------------------+
--| 0x1053-|       |    |        | Reserved                         |
-+| 0x1053 | 0x08  | RW |   T    | DPDES                            |
-++--------+-------+----+--------+----------------------------------+
-+| 0x1054-|       |    |        | Reserved                         |
- | 0x1FFF |       |    |        |                                  |
- +--------+-------+----+--------+----------------------------------+
- | 0x2000 | 0x04  | RW |   T    | CR                               |
-diff --git a/arch/powerpc/include/asm/guest-state-buffer.h b/arch/powerpc/include/asm/guest-state-buffer.h
-index 808149f31576..d107abe1468f 100644
---- a/arch/powerpc/include/asm/guest-state-buffer.h
-+++ b/arch/powerpc/include/asm/guest-state-buffer.h
-@@ -81,6 +81,7 @@
- #define KVMPPC_GSID_HASHKEYR			0x1050
- #define KVMPPC_GSID_HASHPKEYR			0x1051
- #define KVMPPC_GSID_CTRL			0x1052
-+#define KVMPPC_GSID_DPDES			0x1053
- 
- #define KVMPPC_GSID_CR				0x2000
- #define KVMPPC_GSID_PIDR			0x2001
-@@ -110,7 +111,7 @@
- #define KVMPPC_GSE_META_COUNT (KVMPPC_GSE_META_END - KVMPPC_GSE_META_START + 1)
- 
- #define KVMPPC_GSE_DW_REGS_START KVMPPC_GSID_GPR(0)
--#define KVMPPC_GSE_DW_REGS_END KVMPPC_GSID_CTRL
-+#define KVMPPC_GSE_DW_REGS_END KVMPPC_GSID_DPDES
- #define KVMPPC_GSE_DW_REGS_COUNT \
- 	(KVMPPC_GSE_DW_REGS_END - KVMPPC_GSE_DW_REGS_START + 1)
- 
-diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include/asm/kvm_book3s.h
-index 3e1e2a698c9e..10618622d7ef 100644
---- a/arch/powerpc/include/asm/kvm_book3s.h
-+++ b/arch/powerpc/include/asm/kvm_book3s.h
-@@ -594,6 +594,7 @@ static inline u##size kvmppc_get_##reg(struct kvm_vcpu *vcpu)		\
- 
- 
- KVMPPC_BOOK3S_VCORE_ACCESSOR(vtb, 64, KVMPPC_GSID_VTB)
-+KVMPPC_BOOK3S_VCORE_ACCESSOR(dpdes, 64, KVMPPC_GSID_DPDES)
- KVMPPC_BOOK3S_VCORE_ACCESSOR_GET(arch_compat, 32, KVMPPC_GSID_LOGICAL_PVR)
- KVMPPC_BOOK3S_VCORE_ACCESSOR_GET(lpcr, 64, KVMPPC_GSID_LPCR)
- KVMPPC_BOOK3S_VCORE_ACCESSOR_SET(tb_offset, 64, KVMPPC_GSID_TB_OFFSET)
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 35cb014a0c51..cf285e5153ba 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4116,6 +4116,11 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vcpu *vcpu, u64 time_limit,
- 	int trap;
- 	long rc;
- 
-+	if (vcpu->arch.doorbell_request) {
-+		vcpu->arch.doorbell_request = 0;
-+		kvmppc_set_dpdes(vcpu, 1);
-+	}
-+
- 	io = &vcpu->arch.nestedv2_io;
- 
- 	msr = mfmsr();
-@@ -4278,9 +4283,16 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *vcpu, u64 time_limit,
- 	if (kvmhv_on_pseries()) {
- 		if (kvmhv_is_nestedv1())
- 			trap = kvmhv_vcpu_entry_p9_nested(vcpu, time_limit, lpcr, tb);
--		else
-+		else {
- 			trap = kvmhv_vcpu_entry_nestedv2(vcpu, time_limit, lpcr, tb);
- 
-+			/* Remember doorbell if it is pending  */
-+			if (kvmppc_get_dpdes(vcpu)) {
-+				vcpu->arch.doorbell_request = 1;
-+				kvmppc_set_dpdes(vcpu, 0);
-+			}
-+		}
-+
- 		/* H_CEDE has to be handled now, not later */
- 		if (trap == BOOK3S_INTERRUPT_SYSCALL && !nested &&
- 		    kvmppc_get_gpr(vcpu, 3) == H_CEDE) {
-diff --git a/arch/powerpc/kvm/book3s_hv_nestedv2.c b/arch/powerpc/kvm/book3s_hv_nestedv2.c
-index 8e6f5355f08b..36863fff2a99 100644
---- a/arch/powerpc/kvm/book3s_hv_nestedv2.c
-+++ b/arch/powerpc/kvm/book3s_hv_nestedv2.c
-@@ -311,6 +311,10 @@ static int gs_msg_ops_vcpu_fill_info(struct kvmppc_gs_buff *gsb,
- 			rc = kvmppc_gse_put_u64(gsb, iden,
- 						vcpu->arch.vcore->vtb);
- 			break;
-+		case KVMPPC_GSID_DPDES:
-+			rc = kvmppc_gse_put_u64(gsb, iden,
-+						vcpu->arch.vcore->dpdes);
-+			break;
- 		case KVMPPC_GSID_LPCR:
- 			rc = kvmppc_gse_put_u64(gsb, iden,
- 						vcpu->arch.vcore->lpcr);
-@@ -543,6 +547,9 @@ static int gs_msg_ops_vcpu_refresh_info(struct kvmppc_gs_msg *gsm,
- 		case KVMPPC_GSID_VTB:
- 			vcpu->arch.vcore->vtb = kvmppc_gse_get_u64(gse);
- 			break;
-+		case KVMPPC_GSID_DPDES:
-+			vcpu->arch.vcore->dpdes = kvmppc_gse_get_u64(gse);
-+			break;
- 		case KVMPPC_GSID_LPCR:
- 			vcpu->arch.vcore->lpcr = kvmppc_gse_get_u64(gse);
- 			break;
-diff --git a/arch/powerpc/kvm/test-guest-state-buffer.c b/arch/powerpc/kvm/test-guest-state-buffer.c
-index 4720b8dc8837..91ae660cfe21 100644
---- a/arch/powerpc/kvm/test-guest-state-buffer.c
-+++ b/arch/powerpc/kvm/test-guest-state-buffer.c
-@@ -151,7 +151,7 @@ static void test_gs_bitmap(struct kunit *test)
- 		i++;
- 	}
- 
--	for (u16 iden = KVMPPC_GSID_GPR(0); iden <= KVMPPC_GSID_CTRL; iden++) {
-+	for (u16 iden = KVMPPC_GSID_GPR(0); iden <= KVMPPC_GSID_DPDES; iden++) {
- 		kvmppc_gsbm_set(&gsbm, iden);
- 		kvmppc_gsbm_set(&gsbm1, iden);
- 		KUNIT_EXPECT_TRUE(test, kvmppc_gsbm_test(&gsbm, iden));
--- 
-2.45.0
-
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
