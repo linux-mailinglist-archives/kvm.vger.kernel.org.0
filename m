@@ -1,141 +1,171 @@
-Return-Path: <kvm+bounces-17904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17905-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF6B8CB8A2
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 03:42:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B95A38CB8DF
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 04:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1DAF1F23A5F
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 01:42:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB75D1C22A0F
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 02:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E7842A9A;
-	Wed, 22 May 2024 01:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10E542A94;
+	Wed, 22 May 2024 02:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nY9OjUbo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cWGZLv6x"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19517339A1
-	for <kvm@vger.kernel.org>; Wed, 22 May 2024 01:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3780125776
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 02:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716342029; cv=none; b=FMi0czbxuyp9fIPAOLknUH/IhdxoNgc62qXdmHthxlYazBjfwIcDlTW1/w7LFLQonpVs2cbK4va3tdJ88AL3nFfMbUiF0x/bG54MflPtIxPMhM5dDwRvDqgmLJzVieT2Xp9H5GnPmmnSTW7Zn61jMM3i7fEsK8+r/xQlc4Op1Cs=
+	t=1716344081; cv=none; b=HEHj5RnLxLFirEmy/j7+8Z5szboKbdEXJWvu8CM0cMPpH8kJDEI82Hb+4uLOsE90CfJHmY40AyZVNwEx6oNR77AahM1M0KxZSPy3j7SjUr070cqlDPj+tampNWyUYUFInWmFD1K7P98swapjzLu7IUGftSHi1NSyd6n3ng5AQQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716342029; c=relaxed/simple;
-	bh=FJaY5ZXsWt+iV/k6HY2WFFz74BTaJg/mMtL9qyrhSP8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UxbrgjWIXe2lp9/1niz3662Bfc9VY7TXcY2cOgeZ8pX/H+Ep4jz+F5jDcncLqgiZUe4L5doSibPppzp7KEV+OEQCzrZ6Tpj5wA3dQ1s2BIRrJXO81g4dMFwi5Zd7gVCpZO964GXEXTwgzajKKD4RSK/aEk9gKCMTxbcqOSj9sTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nY9OjUbo; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1716344081; c=relaxed/simple;
+	bh=mOxTe+E++F8S2tbt0996WsV27us8k9WBI3OFKOjbFco=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ktbJat/HXlNLAHEA4X1BrkClp8+H/nC2Nk/pAOOpBldc9oObIJfihxX0ay+7usfLgvIcSDrxUqZlZl4ZjkISeDWyOB5jVN+2dA4sHllt/dU0d5tPtDPQMylZfIAEIctutoOTVvFGUMkQUsxDs1nmCHshTby9oYATTZBxEUt4c5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cWGZLv6x; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61be4b79115so261182517b3.1
-        for <kvm@vger.kernel.org>; Tue, 21 May 2024 18:40:27 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1edcfcaa2a4so129250745ad.0
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 19:14:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716342027; x=1716946827; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=N3tcdNqgpk0g0Qawt6D2SIU8FL4Y9j5vsBcc8xUlRY4=;
-        b=nY9OjUbo8J/1K6KSfmzP93ciQH1ZkN1SQFK0scAlnFw3BPsCHA9otMjPsJ4OdAzMr4
-         o4IODDP3MUjcpCtOgl99cJtvgDmDGnUMrs4LfvZhpr33t7NPZCH8J/QaOJLSkENEQy6Y
-         KsMTAISzXcD39VsGwgpk4yLv5X6ycrWn1VtXYWtMidCxgR+q0XP/9pQt51DP1L/dmUWs
-         YeKSQyQpM4NpTDjI0htXkmnrYh+vEt36G0QErbBgSQeY6kH2pnxwbKbOpX7+uLiUPvO0
-         C0zBkhAfKorQ/7n7e18+FRyIGS5E/w/4Mn5BuWbTN91OjRaJhxM7LfxtD1ceCnoKOM/S
-         /JDw==
+        d=google.com; s=20230601; t=1716344078; x=1716948878; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=j01ApSzLfLWeugLvYbNfycm5kQ8LSFPTpIZ3ydjqlb4=;
+        b=cWGZLv6x1pwZNUgscxUkRsppUzKeJ3wfXJSsogcii8yos5xlLvi138kiBIjSYX8YjM
+         GtcA2hoFyBlHTLdx9oFfx8SQ3klwlTOAZf0n4/X1ESQkvyf1+KXIyT8Hy1aZ/3ulL6z7
+         e1P77ntYVJDKQnWRKACm3jx9jo7PPBryg6YidHv07lQKQOgSBwP2c3srDOBcNcQVcTdg
+         VlZ/AXEUjzzZBY1zwvoNDN+hK9wyj5dUIjpd5Pvxge+/9P5zn1Ml66pJ7tLSik73Kzer
+         8jB6zexbcYOHgDwFKiZln3rrN4JYi91udOhggpYgLZPNFLhuunufs269YfS/0T3dsiHz
+         +IfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716342027; x=1716946827;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N3tcdNqgpk0g0Qawt6D2SIU8FL4Y9j5vsBcc8xUlRY4=;
-        b=K1xByvDnKNtvG9+2Hf4qXFsadjB8/vPxls8n5gF6ZRbfKj6iJij0gIsS3hF4rMrDqW
-         Bx1Ay2LRBWOgzYim0i60+3r4uHISSUWKKo6BIg0jMkAbtu70dCA17D3qaSFgY2WiRxB8
-         w9GDzzqzGhWeHm6GVCGjbFO9MRNpPKnVs1BxnIL3PINXxCfmawHGt2yhaFhmuOtrduCw
-         0UqOd4cqdw+AEXL/tumPfT8Hr/Xwc8BYSYnlrDTnypl3Om9ggZZ0B635ZjvFmND3Lolo
-         edeGPqgLqlMeFjkxCAbmkXsQKjhdcdIjMCiI9rvl2J8VBbDY9uHTLTSBWcaYrpuuwd7x
-         nzGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVD3zXpjRHSu6ooZKVAx2YYEwf3wKZgKKz2/8TEGtS5opW0aHlynu4QLu49/pAhuuM73jBUiNfC+b2iie+9C2rvmcnN
-X-Gm-Message-State: AOJu0Yw7h0flZtKiiCpVbb8cSzj/eD9iPFwc24w8ukBeGr/482RuSzrO
-	hmkPbjbmDTxnXlCXDluE1EjQzBxXKNONjeevMx7c6hWtuZOD26WvSgUJEMQy2yLPwim64ki8Cot
-	NhA==
-X-Google-Smtp-Source: AGHT+IFL81/qwy5rtkuJ10qcaRdu2JQbneM9E+pjVdbps1/0e/VA4O7XiaE6CliC0DQxJV6ImSRXVMyGgXw=
+        d=1e100.net; s=20230601; t=1716344078; x=1716948878;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j01ApSzLfLWeugLvYbNfycm5kQ8LSFPTpIZ3ydjqlb4=;
+        b=a5P3uKtMjvUiKabXpcJMUYFk4tTHtSZQj+GbZjGf1z8+gi8w1/nnnSpLoxrSY09wLf
+         hjRm5RIixadJZ3qJGT8WuRtMUADz1uIlSWxcXabgoJDjcQns5tjVy+46pYsbdJddlw1o
+         Ujof1KZjJcfqKugoG+udlx+9t670GpMMUpkWDgHow1uPB1t45laDSoWE8nq/fK9EhNV1
+         XvsoJ/7VuPk7F+GHWBqWFaMKu3oowBIsN+unPwcjw4Q7gQOm5D6xlmMgCQcruEZr5fuI
+         Rueh/+NMxK9R0FIEoOWtO22rhXmTL/ypN+yj8CnYVuqJ7q2P0x1kFjOLszBwI5vxm0Qg
+         vrJQ==
+X-Gm-Message-State: AOJu0Yx2noMFyniwcNekHbmD1x85mXdf2WICnJ3PRAF6cyGpEQRIstTw
+	lOO2LQtdpmfwn3GeDSinJxV72fViIiLNye2uiimx2TYobHWFEtd8h9kP8rMLrlkQHzEuj2ByIqz
+	imA==
+X-Google-Smtp-Source: AGHT+IGPAGDZRpMyhotaZ/4745P0uWuN2B/BfHgM4qU9Ete2kPvmY5A1Vp8n9S7/6Tl2UzGVsKwDBg8tHvM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:4984:0:b0:61b:e6d8:1c01 with SMTP id
- 00721157ae682-627e487fd2emr1914977b3.10.1716342027243; Tue, 21 May 2024
- 18:40:27 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ea0b:b0:1f3:1a5:bbab with SMTP id
+ d9443c01a7336-1f31c9cdad5mr563865ad.10.1716344078310; Tue, 21 May 2024
+ 19:14:38 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 21 May 2024 18:40:13 -0700
-In-Reply-To: <20240522014013.1672962-1-seanjc@google.com>
+Date: Tue, 21 May 2024 19:14:35 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240522014013.1672962-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240522014013.1672962-7-seanjc@google.com>
-Subject: [PATCH v2 6/6] KVM: x86: Drop now-superflous setting of
- l1tf_flush_l1d in vcpu_run()
+Message-ID: <20240522021435.1684366-1-seanjc@google.com>
+Subject: [PATCH] KVM: SVM: WARN on vNMI + NMI window iff NMIs are outright masked
 From: Sean Christopherson <seanjc@google.com>
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Santosh Shukla <Santosh.Shukla@amd.com>, Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Now that KVM unconditionally sets l1tf_flush_l1d in kvm_arch_vcpu_load(),
-drop the redundant store from vcpu_run().  The flag is cleared only when
-VM-Enter is imminent, deep below vcpu_run(), i.e. barring a KVM bug, it's
-impossible for l1tf_flush_l1d to be cleared between loading the vCPU and
-calling vcpu_run().
+When requesting an NMI window, WARN on vNMI support being enabled if and
+only if NMIs are actually masked, i.e. if the vCPU is already handling an
+NMI.  KVM's ABI for NMIs that arrive simultanesouly (from KVM's point of
+view) is to inject one NMI and pend the other.  When using vNMI, KVM pends
+the second NMI simply by setting V_NMI_PENDING, and lets the CPU do the
+rest (hardware automatically sets V_NMI_BLOCKING when an NMI is injected).
 
+However, if KVM can't immediately inject an NMI, e.g. because the vCPU is
+in an STI shadow or is running with GIF=0, then KVM will request an NMI
+window and trigger the WARN (but still function correctly).
+
+Whether or not the GIF=0 case makes sense is debatable, as the intent of
+KVM's behavior is to provide functionality that is as close to real
+hardware as possible.  E.g. if two NMIs are sent in quick succession, the
+probability of both NMIs arriving in an STI shadow is infinitesimally low
+on real hardware, but significantly larger in a virtual environment, e.g.
+if the vCPU is preempted in the STI shadow.  For GIF=0, the argument isn't
+as clear cut, because the window where two NMIs can collide is much larger
+in bare metal (though still small).
+
+That said, KVM should not have divergent behavior for the GIF=0 case based
+on whether or not vNMI support is enabled.  And KVM has allowed
+simultaneous NMIs with GIF=0 for over a decade, since commit 7460fb4a3400
+("KVM: Fix simultaneous NMIs").  I.e. KVM's GIF=0 handling shouldn't be
+modified without a *really* good reason to do so, and if KVM's behavior
+were to be modified, it should be done irrespective of vNMI support.
+
+Fixes: fa4c027a7956 ("KVM: x86: Add support for SVM's Virtual NMI")
+Cc: stable@vger.kernel.org
+Cc: Santosh Shukla <Santosh.Shukla@amd.com>
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 7 ++++---
- arch/x86/kvm/x86.c     | 1 -
- 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index da2f95385a12..552b6a9887a5 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6672,9 +6672,10 @@ static noinstr void vmx_l1d_flush(struct kvm_vcpu *vcpu)
- 		bool flush_l1d;
+This was kinda sorta found by inspection, and proved with a KVM-Unit-Test that
+sends multiple NMIs while a different vCPU does a CLGI+STGI loop.
+
+The WARN originally fired on an internal variant of the 6.6 kernel, which got
+me looking at the code, but it's hitting something different that I haven't
+fully debugged yet (the WARN still fires with this change, because KVM really
+is trying to inject an NMI with vNMI enabling and NMIs masked).
+
+ arch/x86/kvm/svm/svm.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 3d0549ca246f..32cd2f53b173 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3858,16 +3858,27 @@ static void svm_enable_nmi_window(struct kvm_vcpu *vcpu)
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
- 		/*
--		 * Clear the per-vcpu flush bit, it gets set again
--		 * either from vcpu_run() or from one of the unsafe
--		 * VMEXIT handlers.
-+		 * Clear the per-vcpu flush bit, it gets set again if the vCPU
-+		 * is reloaded, i.e. if the vCPU is scheduled out or if KVM
-+		 * exits to userspace, or if KVM reaches one of the unsafe
-+		 * VMEXIT handlers, e.g. if KVM calls into the emulator.
- 		 */
- 		flush_l1d = vcpu->arch.l1tf_flush_l1d;
- 		vcpu->arch.l1tf_flush_l1d = false;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 60fea297f91f..86ae7392cc59 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11264,7 +11264,6 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
- 	int r;
+ 	/*
+-	 * KVM should never request an NMI window when vNMI is enabled, as KVM
+-	 * allows at most one to-be-injected NMI and one pending NMI, i.e. if
+-	 * two NMIs arrive simultaneously, KVM will inject one and set
+-	 * V_NMI_PENDING for the other.  WARN, but continue with the standard
+-	 * single-step approach to try and salvage the pending NMI.
++	 * If NMIs are outright masked, i.e. the vCPU is already handling an
++	 * NMI, and KVM has not yet intercepted an IRET, then there is nothing
++	 * more to do at this time as KVM has already enabled IRET intercepts.
++	 * If KVM has already intercepted IRET, then single-step over the IRET,
++	 * as NMIs aren't architecturally unmasked until the IRET completes.
++	 *
++	 * If vNMI is enabled, KVM should never request an NMI window if NMIs
++	 * are masked, as KVM allows at most one to-be-injected NMI and one
++	 * pending NMI.  If two NMIs arrive simultaneously, KVM will inject one
++	 * NMI and set V_NMI_PENDING for the other, but if and only if NMIs are
++	 * unmasked.  KVM _will_ request an NMI window in some situations, e.g.
++	 * if the vCPU is in an STI shadow or if GIF=0, KVM can't immediately
++	 * inject the NMI.  In those situations, KVM needs to single-step over
++	 * the STI shadow or intercept STGI.
+ 	 */
+-	WARN_ON_ONCE(is_vnmi_enabled(svm));
++	if (svm_get_nmi_mask(vcpu)) {
++		WARN_ON_ONCE(is_vnmi_enabled(svm));
  
- 	vcpu->run->exit_reason = KVM_EXIT_UNKNOWN;
--	vcpu->arch.l1tf_flush_l1d = true;
+-	if (svm_get_nmi_mask(vcpu) && !svm->awaiting_iret_completion)
+-		return; /* IRET will cause a vm exit */
++		if (!svm->awaiting_iret_completion)
++			return; /* IRET will cause a vm exit */
++	}
  
- 	for (;;) {
- 		/*
+ 	/*
+ 	 * SEV-ES guests are responsible for signaling when a vCPU is ready to
+
+base-commit: 4aad0b1893a141f114ba40ed509066f3c9bc24b0
 -- 
 2.45.0.215.g3402c0e53f-goog
 
