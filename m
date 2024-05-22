@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-17995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17996-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 415818CC981
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 01:19:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CBD58CC984
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 01:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE6E6281FAB
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 23:19:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0C131F222CC
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 23:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC5D149C72;
-	Wed, 22 May 2024 23:18:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E62A71494AC;
+	Wed, 22 May 2024 23:19:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="hioXa44l"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="RC8GZmO8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC98F2C694
-	for <kvm@vger.kernel.org>; Wed, 22 May 2024 23:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67612C694
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 23:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716419936; cv=none; b=GHVMqnfCvEGozaUiFLc+6CdkCYrG1+mCXzwa5zZ137ixuNja6rRU7+01YhQ2GNC2Z5oNncJDjBjZQEkZULevZY0aZ0pcouMffRX34OmDarSVdQk4cnXHMAggXPlnrXbxCpcfUgDEiAg+uBNiRlmhsKakTgywXpARG172XzVsoAg=
+	t=1716419980; cv=none; b=fK0RfviEKQH5Q4i7C6kiFEoeBrw16lptk/S0CBOfeJmayChbU01pEkuLC1l8XRyuP+ErVLcauqSA43wOltIuLc3pEEiK6lq1KATVzRb9kYayN87cophXzui4BaXdm6hI1cx3/NBvlQFaY5eBzM1w2Xi6OQJqJoRUUvNxReN5ci8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716419936; c=relaxed/simple;
-	bh=a8AQZsl0hHp/MWuPJC+3jCzAsXNov1TbjZ4OUKXyAqw=;
+	s=arc-20240116; t=1716419980; c=relaxed/simple;
+	bh=n5slVlqOAykID9MEbfympq1Zg8oJL6MvLOqRwWH0S0c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mdpeAdNTcWrnGR75bM6DUednpVWX85TSL2h98BkkaRXbv8AUgPyzYb4IO+2+00jq2z6eemtwa11Shi+zZzBP+7SiY3o76ZYHbl280mDc6y0tkpX2gjy/2f36lvFnuJKT+v74GoXwUUEweo3m23ENJ1v83lMQi1pAsUq8bhM3OpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=hioXa44l; arc=none smtp.client-ip=209.85.210.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=P8y8cHR2Z1cabPyI/6GqTk41/H3E8ORkmaT3eeKbH1lycUYoOquh0erR35L2OBAXCV7iRhyl3eKCuxx8jXDN96sobWOvYP4AHiDMJ+cNiGT8hTksMK2nqfKHxuG+p9FogBKpLUVYf+osWkPMBy8WKJtwvwv2KwqcjvvrAWK291U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=RC8GZmO8; arc=none smtp.client-ip=209.85.222.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-6f0f80b780fso3471902a34.2
-        for <kvm@vger.kernel.org>; Wed, 22 May 2024 16:18:54 -0700 (PDT)
+Received: by mail-ua1-f43.google.com with SMTP id a1e0cc1a2514c-8032565174aso190524241.1
+        for <kvm@vger.kernel.org>; Wed, 22 May 2024 16:19:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1716419934; x=1717024734; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1716419977; x=1717024777; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9lEc0q0NFwchKt04aNPxLlVagWl6RQJdUVl1HVjQyus=;
-        b=hioXa44ltZN15LYNqtx5XNRjodlRtHndmCZ4Z9alzNul/62PAyCi+Xzw/2YZmIOPTJ
-         dj/9SUGKWskskvM/xlrOlaY/9HsaF1xDOCp/nrnnPkzf8jlFvqeb/o13ihL8hI0NVLjC
-         p8IqYndv/4hZ8rNfUBFyA/VVuy82mQkN+wsweY2tqXjZPVEF6AoEFX9A05fFFibCT84A
-         ZqUv32IxIGDzqWMYECtgFFGea67/7PhDo+ucN2bglz8jjqBaHcYLvWwo/ITOY69Fh+XW
-         bX40dr/iqXhbKAA+cT8mdfhKCKSLWGB6CyGI41AU3jiYyzYm7friZvphjpl+J9wSnH1S
-         xexw==
+        bh=UrSl/xjV6yIg0FZx3wy10QWpD7zCQXutDkJQvlsFhyU=;
+        b=RC8GZmO8+77ERwhYuEMryD/cl8rtQZawDw2HYLW8XTen9nrbK8vxSqj6OzlhTeeQ2T
+         jawz05EmY3+v2z5RoxovUwxOnf48Mlzect0tQxFz+kdsj8fuV2gSZ9DyUdIivBO7Tds4
+         KzG3B4xWjy3EWG3zPY387aHH2RFUtcyO+S+Xzkpf2w/gGLW3GzRmDNqSd6gu5TVbFmwy
+         WTni6m3nwNcMfuB7Kqu1pSXpt/2gB6AzzelnUx7QB3Z0Mhup1VR+CdQK0FjXZiGOjXqI
+         HIE4Zf8ds3kvMXrRq3wDgd/6Of9nT6hqYnQQyJR1kA2tGQea7BxYejRncy4vwAM6EZ1f
+         BueA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716419934; x=1717024734;
+        d=1e100.net; s=20230601; t=1716419977; x=1717024777;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9lEc0q0NFwchKt04aNPxLlVagWl6RQJdUVl1HVjQyus=;
-        b=R7CnmYTynJpMROl/eR9kprj5bpdNCdJ4/M7B50pyS20CqsCUtEKeVxEr0RIy/kJrHD
-         zyMAX5IKWBGY/FRfNn42RiURkI+3vQAI7/V5H+fxvIzdGIqk8Nl56wUA//sYRg58QMpu
-         pV7HsWrSvFEY4grdthhG69Q5VhQ4dq/M8sSsHaW8N2pHSlKBajmsRAO6YR7MlS6JjJxI
-         rij/YoRcsVYMNE0mkDZOSgTAlXtiZUQcQBp1HmvNQOHueLBlVdl0cvSXsMxwVuoSUSfr
-         7mjLc1Nv2Mwy372uQ3gwO5si9R63zfM1ihUBF8zFIM41jnSA7SZt72FkIWcQlVnYFGaI
-         Uxpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVmgBHNnlgat1pCJyTrJiBq6F+m8kCVxqwddo6pCLvlIwf8skZSflDRfU9NaoKOW45/iIk2ebLD3YCogZvI+n3f/qM0
-X-Gm-Message-State: AOJu0YxVBPjM7Thy4Wg8ypoPmyQCtMUX9QoXcnrFBCm9ClRbFoEvxUGb
-	sDIrAYL8ulASjcysIT2c2kAoDCGHPywhG5nWJ2hn3OfycyY0y43YTKOR7WQJpUQ=
-X-Google-Smtp-Source: AGHT+IGXTwA1P98f2K83E/XepnAUDe0bm40qM8+ZbtN36/xHnQTOXwlXxoFwX2cK74BW84EIAoMvyA==
-X-Received: by 2002:a05:6830:18ca:b0:6f0:4201:973a with SMTP id 46e09a7af769-6f665c2bafbmr3446974a34.13.1716419934009;
-        Wed, 22 May 2024 16:18:54 -0700 (PDT)
+        bh=UrSl/xjV6yIg0FZx3wy10QWpD7zCQXutDkJQvlsFhyU=;
+        b=a9wHqrvcCRTkAfkOZ5GdtNYWyi+oNC88FFSHguo/YvgZiBQcVAJAXb7gAte3GkLnlq
+         lVxvLp/Tj6wmyChFIqcfHdmBgy7KyyguzsrpJGuP+qWIABmzSmN8nHauw/uEOEsiO4sE
+         E0wPb38Te5mygk5WEzwikRbyW252tw/lO8NlE8/Bpiyr3e6fV573xKktu56embZMxX89
+         9h6l+iWLYzQEsvRulLcnr8Lwkjf3s/5GN1G6nZb9zb7Cw3NvZxnvH3ja5ElR+Jc7hPCh
+         jUOVAFFVI6ZBtg/43LgywOa4Y+HXdqySgHzANXTPGDizEVk3Vq7d2C9Qe7+SpclYizDF
+         wLdw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+B9jC1FzohHA1U8lymPsqa4dROAeJkwaGtiig/Rit7IQPNLshW9mXn+QtwJ0Q2XVO9FyEBjYkG0Zefgjnh1D4A2sH
+X-Gm-Message-State: AOJu0YzSaW1skJRgtixd3+SkYfLkptPvPKLQGH+TmgCfIMedvEVzV7bx
+	qE9+Tzus1qYNHSAM1o7RGCFuu8jnal0jGe5MXNBvrMNDwDq7RXxQqpkg4XP6qZA=
+X-Google-Smtp-Source: AGHT+IGensuS5Pk2fc/N9/agazTDQfEmFFa3e6WHotIo6avs9UZXDQxrWdOHLx2cieNHiAlEyTlUGA==
+X-Received: by 2002:a05:6102:a4a:b0:47b:b5a0:6708 with SMTP id ada2fe7eead31-4890a275ffdmr3677299137.23.1716419977636;
+        Wed, 22 May 2024 16:19:37 -0700 (PDT)
 Received: from ziepe.ca ([128.77.69.89])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-792eb3c1039sm956315885a.73.2024.05.22.16.18.53
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a15f1ce6b9sm137775086d6.83.2024.05.22.16.19.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 May 2024 16:18:53 -0700 (PDT)
+        Wed, 22 May 2024 16:19:37 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1s9vES-00DcAY-9Z;
-	Wed, 22 May 2024 20:18:52 -0300
-Date: Wed, 22 May 2024 20:18:52 -0300
+	id 1s9vF9-00DcH9-UV;
+	Wed, 22 May 2024 20:19:35 -0300
+Date: Wed, 22 May 2024 20:19:35 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: Niklas Schnelle <schnelle@linux.ibm.com>
 Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
@@ -83,11 +83,10 @@ Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
 	Gerd Bayer <gbayer@linux.ibm.com>,
 	Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org,
 	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/3] s390/pci: Fix s390_mmio_read/write syscall page
- fault handling
-Message-ID: <20240522231852.GF69273@ziepe.ca>
+Subject: Re: [PATCH 2/3] vfio/pci: Tolerate oversized BARs by disallowing mmap
+Message-ID: <20240522231935.GG69273@ziepe.ca>
 References: <20240521-vfio_pci_mmap-v1-0-2f6315e0054e@linux.ibm.com>
- <20240521-vfio_pci_mmap-v1-1-2f6315e0054e@linux.ibm.com>
+ <20240521-vfio_pci_mmap-v1-2-2f6315e0054e@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,20 +95,26 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240521-vfio_pci_mmap-v1-1-2f6315e0054e@linux.ibm.com>
+In-Reply-To: <20240521-vfio_pci_mmap-v1-2-2f6315e0054e@linux.ibm.com>
 
-On Tue, May 21, 2024 at 02:14:57PM +0200, Niklas Schnelle wrote:
-> The s390 MMIO syscalls when using the classic PCI instructions do not
-> cause a page fault when follow_pte() fails due to the page not being
-> present. Besides being a general deficiency this breaks vfio-pci's mmap()
-> handling once VFIO_PCI_MMAP gets enabled as this lazily maps on first
-> access. Fix this by following a failed follow_pte() with
-> fixup_user_page() and retrying the follow_pte().
+On Tue, May 21, 2024 at 02:14:58PM +0200, Niklas Schnelle wrote:
+> On s390 there is a virtual PCI device called ISM which has a few rather
+> annoying oddities. For one it claims to have a 256 TiB PCI BAR (not
+> a typo) which leads to any attempt to mmap() it failing during vmap.
+> 
+> Even if one tried to map this "BAR" only partially the mapping would not
+> be usable on systems with MIO support enabled however. This is because
+> of another oddity in that this virtual PCI device does not support the
+> newer memory I/O (MIO) PCI instructions and legacy PCI instructions are
+> not accessible by user-space when MIO is in use. If this device needs to
+> be accessed by user-space it will thus need a vfio-pci variant driver.
+> Until then work around both issues by excluding resources which don't
+> fit between IOREMAP_START and IOREMAP_END in vfio_pci_probe_mmaps().
 > 
 > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
 > ---
->  arch/s390/pci/pci_mmio.c | 18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
+>  drivers/vfio/pci/vfio_pci_core.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
