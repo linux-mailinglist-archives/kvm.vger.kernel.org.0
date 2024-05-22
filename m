@@ -1,121 +1,243 @@
-Return-Path: <kvm+bounces-17987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005CA8CC862
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 23:58:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E619D8CC90A
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 00:28:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 961641F22415
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 21:58:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4753CB213A6
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 22:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E57146D4F;
-	Wed, 22 May 2024 21:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7278148316;
+	Wed, 22 May 2024 22:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FHmSWCZg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FFLmzmEG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D856C146D43
-	for <kvm@vger.kernel.org>; Wed, 22 May 2024 21:58:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716415083; cv=none; b=tGmU/dVacKqAAijKQs+2XV18ZPoaQIDo1/unzaJLINln5wJQzNTCtwD0g0RGG3PEz3Bq9fZodlXkvR46G1DxGayQ5yxYW/mCjpwTWTPKxC67xtD9ILSteXWxeZN7c/tygAiOo904aOdy1WxxNZhhINW28nk0kdhvMODNDyNBZ/Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716415083; c=relaxed/simple;
-	bh=29IUaPph125YTEEzyzSqhzqBpdvCD+GiSBZvclYW06Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=blfigHsROSmaCPKnSV2G3emt+yQ9FCP94TpL+cvirev31gS484InAmIed26wnp0ycx08v4ewyuYJne4DB7utore5MoPzbzm/RoA5TCKToBCpdeNpdAxL3NV5MtWCdcjBSi93LHMovzUitlPbhKXOCha9r1cCBCBejLDrd/gUdfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=FHmSWCZg; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44MKdAhE026067;
-	Wed, 22 May 2024 21:57:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-11-20; bh=yCiLDo+FpZv9qwONyqqzaSuz2eOmA7/A8abUICV/2NQ=;
- b=FHmSWCZgMPx9I0VCASR8AXb1x+rDn374uDLEx94jGKYVGwSBpv3Cezi7MxvpIa6+yXQ0
- z6uQxdenU+iUd7d+Xq1FwK5pCE/4kWtdddCN0E7qAt4akuchfZtkmzldEbi7QD0nsERb
- Aw4OHbWfzUtnyzy8R0aBrJ9eZjn6sYxa0WXQ4QQzP1YBRx2mG6GLmogGG6wQD+Rff3gS
- SF6cSyaLNvg6XCyoj04K26YmL6svnKIpcZbAjYBxgTycqEyuTZi+r0XrHipEtVEBHjFW
- HRhTrcg240HDP8snZVsUzySsNERE/ocHHbX24gixwAZJsnNzZjyZ/COywSR2lW3NMPJ9 og== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3y6m7b8h32-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 May 2024 21:57:57 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 44MLZoG3005058;
-	Wed, 22 May 2024 21:57:57 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3y6jsa40vc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 22 May 2024 21:57:57 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44MLvuG4007949;
-	Wed, 22 May 2024 21:57:56 GMT
-Received: from alaljime-dev-e4flex-vm.osdevelopmeniad.oraclevcn.com (alaljime-dev-e4flex-vm.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.249.106])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3y6jsa40ta-1;
-	Wed, 22 May 2024 21:57:56 +0000
-From: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-To: kvm@vger.kernel.org
-Cc: seanjc@google.com, pbonzini@redhat.com, boris.ostrovsky@oracle.com,
-        alejandro.j.jimenez@oracle.com
-Subject: [kvm-unit-tests PATCH 1/1] x86: vmexit: Allow IPI test to be accelerated by SVM AVIC
-Date: Wed, 22 May 2024 21:57:55 +0000
-Message-Id: <20240522215755.197363-1-alejandro.j.jimenez@oracle.com>
-X-Mailer: git-send-email 2.39.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B1E148303;
+	Wed, 22 May 2024 22:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1716416888; cv=fail; b=Hj0S+AJHG3UnL6etGGh/5Nt9DBUFx9Fp8j1eI9dg7zHWY1tALwElRkbuNpH4LrLjtrl9omj9P5+x5QhiTfksg/w4pnh/WxhnhCV6uFLSeIWubwbcGjze3plhANyrKxeC3KU/kyZkdXarB634QpROItWbwrhpo59SHYQsH0ZgDwk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1716416888; c=relaxed/simple;
+	bh=4Z31vLTjN/S12BkII/URMJQnGrboNI6b6WQsSo+Ibjc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=SQhrl1Nawv7dZcNWHLLSTKXWA8ZWQcMtQy+fhvEKhU7LyICbBw8e9HiTtAS+pc8xnby0cQ/7CWFumzfCgnPEYxSPfnYjj0EesQxetDxXdaCa4zhTqzPggVq0VfZUCtjrxl6effHpg1M9rjmjsgUYsIFXJSkSCkxR8ZxQb+oRTTA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FFLmzmEG; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716416886; x=1747952886;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4Z31vLTjN/S12BkII/URMJQnGrboNI6b6WQsSo+Ibjc=;
+  b=FFLmzmEGj9lU2bjgOitUQypASPd7E1A5IB3k9bFa60VvKVhUKJcfsmRw
+   86X80G5V/z2k0K+U+W219yi+LRUeCtpHqzzRGn+8M5buXydWlvZ385JJm
+   Z31CNPhLxUzwIX4xsUckYc/v8iS/LLsnx71EHTcSW7hwrzo6E03Pq+Q37
+   6GCTeNq7CROrQobxKEzMr11sGKbQhmS1sPN/C8y4FvIxEGsnouYAgD1Ij
+   d9zFQiHfPBvK65j/Dn/vbZc0SZDj6vAc4cdxFf6AviKknAF6IIEpCYhTW
+   KeZgQv/nmgPPXH/bDFgDyo4SePiSuZvKQ67EWgsQ2tiJywKDpL57WLzbb
+   Q==;
+X-CSE-ConnectionGUID: mG62dZoxTJ2wKn+DNwnygA==
+X-CSE-MsgGUID: yOp19mmoSE+Ge41/iHpA9A==
+X-IronPort-AV: E=McAfee;i="6600,9927,11080"; a="12481933"
+X-IronPort-AV: E=Sophos;i="6.08,181,1712646000"; 
+   d="scan'208";a="12481933"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 May 2024 15:28:05 -0700
+X-CSE-ConnectionGUID: p3UBkDgKQQeG4aT1oKthPw==
+X-CSE-MsgGUID: Zb+icH01Rb2I394tUeS/gA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,181,1712646000"; 
+   d="scan'208";a="64678086"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 May 2024 15:28:05 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 22 May 2024 15:28:04 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 22 May 2024 15:28:04 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 22 May 2024 15:28:04 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 22 May 2024 15:28:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JWcyCf4Uj95lTeFx6vLN0ffLyDZIS9BEZ0Ng6NGJSg7yC9O9pHxkIQCBgQu9Xs7L7v8XPBMb6dJOvxpF4grKsEWPL5TbX03H69r6i+6c2hBug4TpfSw4F4WOWT84xssbY7Bo/UlHPYDcIyPGoKaqWuUca+Zmo/W4DgK0GYa0wWwON2DDKZa+79a/umz4fWqAI8lkxrKLaHPDhCkLxwW96TCMNopKcF37JiCqeIko2tsDwfjJhAvVdDAcK412umqKc/5YDZCbw7Yjeg+Q/OqMzr3aSPm+ATSSfxHlSAyqb7ajbgH9bhrg2VKY6ORTIPzDphLtXqi0Nlle78Rk7qiQ9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+NFPFa+kr2zCEiO7kmGuo4pMHe0siwiygJ3CD0PRFTU=;
+ b=hRqCpdgyHQUQJ9hV84fWlY0Y+8dT8m65d11FcdgttEoPxSoNsaww/+pfmQQP5ZKA04UJBJfA91LP+Xct7SzMRQHu7Pm1AYL1fHLMVWQZNgWDyuTSafVkfTi+aG2dCpQ82CLQ3qZmx4TZsxQpebBM/cC5FFSDn3lOxD6EFRdg9cmpAKsdS7W9QCa9aRuBtmBriLBrCwKkEJQttBtLBeZgee7HIOxCNyphXB2rGAUxNlZ0yVOx65tGIjmNk6bRIMEwhYoocACQz54C9i7AcbtklDhG7kiuhPaZ7AjCp9J/Z38N2YcoQmfQdwUoG/SjH8RDY2Dk4rodnxOXzglqMgfp9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH7PR11MB7122.namprd11.prod.outlook.com (2603:10b6:510:20d::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7587.35; Wed, 22 May
+ 2024 22:28:01 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.7611.016; Wed, 22 May 2024
+ 22:28:01 +0000
+Message-ID: <8b344a16-b28a-4f75-9c1a-a4edf2aa4a11@intel.com>
+Date: Thu, 23 May 2024 10:27:53 +1200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/6] KVM: Add a module param to allow enabling
+ virtualization when KVM is loaded
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+	<pbonzini@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Chao Gao
+	<chao.gao@intel.com>
+References: <20240522022827.1690416-1-seanjc@google.com>
+ <20240522022827.1690416-4-seanjc@google.com>
+Content-Language: en-US
+From: "Huang, Kai" <kai.huang@intel.com>
+In-Reply-To: <20240522022827.1690416-4-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY3PR05CA0046.namprd05.prod.outlook.com
+ (2603:10b6:a03:39b::21) To BL1PR11MB5978.namprd11.prod.outlook.com
+ (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-22_12,2024-05-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- suspectscore=0 mlxscore=0 adultscore=0 mlxlogscore=999 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405220152
-X-Proofpoint-ORIG-GUID: _WqCb6-gISYxD2qlMYmr_E8_TpANtNIr
-X-Proofpoint-GUID: _WqCb6-gISYxD2qlMYmr_E8_TpANtNIr
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|PH7PR11MB7122:EE_
+X-MS-Office365-Filtering-Correlation-Id: e973f8e4-b771-40b1-9046-08dc7aae70b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|376005|366007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?S05kSlVqMDR4YXJyV1FVV3FXNG9YSGlNVGlpRzYxdzNFMXVWeVdWbjQvRmtH?=
+ =?utf-8?B?cG1uTFVyWmVBMTRyendFei9QQVNPSFJJQUNDUy9JSVh2V3R6SWhPUmczVHkw?=
+ =?utf-8?B?VW5Vem9KWUVnckdKbG9BUXRPMlBQRkhvNnkrQ0FHWnQ0MTBLZ1REZlZlY0Nx?=
+ =?utf-8?B?SVh1ak5RTnZ2QW1paHFvcm5MSmlmTTdmVUtXdE0xc0FISENyNnRSVVlqVlFs?=
+ =?utf-8?B?N3F2UnllV1hGZ1ltQWlNT2hXQ2NwMXlwZDFtNVpwVUhMQUUyMG5VemVpMGVT?=
+ =?utf-8?B?Z052MGFvRWtRM3o1NWVaWUtENDhlQjViSG1UcGpkVmFtN2N1RURzVW1YYm5x?=
+ =?utf-8?B?VFU0RzBDOEwxYmFqZ2F2anRxa1Z1UGFCYW9LdHBCc2Frdi9ic0RnYzBMYllj?=
+ =?utf-8?B?SFBsdzJrek5rT0o2QnFoVjdSQlRRNnI3RHUxbG1sdHV6V1hqVDBFcCtBTFpP?=
+ =?utf-8?B?cnhYcjgyR0JoU0NnU2kxdVlIc0p4UC9Mc212aUZ0R0ltTFE1Wisxd1pKVmla?=
+ =?utf-8?B?VkZTUTI4eHllL2YwZjBaR1BRMlpaeEw4c056bWtnRWlvVjNyREdFSTdNQUo3?=
+ =?utf-8?B?MksvREJjQUxiYWdUbngwbTFqanYxeVRza1VRYVBCcVlaa3Z2eGxJSzFLUm9o?=
+ =?utf-8?B?dWRuME0rWEVVWFBoOENwR3ZlNDNuaFNDajA5cThJRXJjcUlKdjJvQW1mS2ts?=
+ =?utf-8?B?QVVPU2gyUTVZQktpU3g4dzIxb1BDZ2FyekU3UUJHVGExekRNSk9pQ2JpYXRN?=
+ =?utf-8?B?WW9wVDdRejd6dlpzMVlOT0pzTjFYaCtsWDVUV3hUQXVzUWdLU3Q5Z016RGtE?=
+ =?utf-8?B?S09UMmplTlduYlhJRlZObmNvT1BmUVdjbVNoWUppZTF5dGEyRW1NRnoycU5s?=
+ =?utf-8?B?cFoyWm8xWWhvSElqUmFDT2ltVXZsTi9CYy84T3hJMFJsUjk1UnI4OE5NS1BU?=
+ =?utf-8?B?UHZkeHRtR0EyK1hLVG1JbnJvRFJBMk9XOU9GRnBWdFVneE9mNnlhS3k4QnY1?=
+ =?utf-8?B?MlFTVFJMRHJhUnMyWkVYTUVQTnpRM3g2T3dXVmN2QnZNa3QwQU9PYVFhOGR1?=
+ =?utf-8?B?bkROZW9MREhBSXhIU2szbU9yaWh2OHNXRXZ5S2xVMnJQaUxjdnpqczVqdndx?=
+ =?utf-8?B?Z0VHblhmN21xWjNKc21CVDAvY05DWVhZaDIyS2picC9YVzFoVEFpcFhCTSto?=
+ =?utf-8?B?UGdrSW9RR3FrQUlJZGRYVUhrYW5kaVVHNURtNXhtOVUwTUNrd3VReFB0SFRz?=
+ =?utf-8?B?R2tyY25VVVUvYnZtTW5oU1FtbUcrd21ZWjg2ZzNERllpVm4yZXprSStlYXY2?=
+ =?utf-8?B?WkpNc2diRGJhZCtzOUpsOGZVRmtmeW4wMWU0cHZpVkp4aWFMZjhPOEZlc2d2?=
+ =?utf-8?B?R0xmNkYyS0ZoZ042WjI1Z1JtVEJ1WER6d0pHNEg3OGtFdW5XUGpzazE5Uko2?=
+ =?utf-8?B?czRjQTJ5eS9jSkMzbnB6MmlHZWhGWWVLTEM0RUM0b25lbmxZaGNYVytQd1dD?=
+ =?utf-8?B?TkNMdEt6QVA3ZWNUWGZ5VFAyZVJZZHY3cnduWmpTQTNaRnFrM3I3WGZCUllI?=
+ =?utf-8?B?bkl5eEg5dlpCUWlBaStxbnZnLzJHdk9zTjV3R0ZtUWZ2Z1FMcEZCYzRGNy9s?=
+ =?utf-8?B?TEI3VjVQUktqdzU0L3ltNmZCSnlDYWZxajByRzZDZUV2MHBkcElpSlY2eVRo?=
+ =?utf-8?B?QUNYTmw1S2NGY29JVFdzdThCQ1UzaWpGQzFiZ3pvaXFaaElqVHRWR1JnPT0=?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y2NreThUYVc3NVJWMGM4TEpNZHp0UXVuelMwS2JTOWtkKzhpUVQ5b0RYQzZi?=
+ =?utf-8?B?dXppeTg0RUI4clk5bGFLZE5TMkxqeGkzcHpVSFFLM1J0M2w5VWRrTW5oaXg3?=
+ =?utf-8?B?NUh1cTI2RjhxTmNackJtOXUzdGhLRzZSb2ZsNFBnb0k1RUozWG11bjFlLys5?=
+ =?utf-8?B?Qm9iQ09SYXZVTEFhUndoYVRoRFJidW05K28vd1lYV2ZaS2hGaHJZMm91b3RH?=
+ =?utf-8?B?TXJEcWVqWlh2ZHV2aTRyTWtOeHh4blgrcmtUUlE3Z00vOHh2V201dzZSSzZv?=
+ =?utf-8?B?eEMwOVBKdHV3WGFWdnRBVCtpM2U4OEJFd2ZZQVp0bVlaN2N3c05kWnpOK21r?=
+ =?utf-8?B?ZTJjazZZS0VFSGlEeGFKUWF4M0FOTVNuOUcvVFYwWHlKRmhFMlNkMkIzbFVK?=
+ =?utf-8?B?bjBSL3N0cjJzT1VsZlRqL05HcWRqSHlCcXVaWWF4VWlPb2xLNnNTZHlEc0Z3?=
+ =?utf-8?B?SXZhOFpETjN4WVpwUUJiMHQ3cjBvUHJsTHdxeVVaaXlVMW4zNjNCY3JNbUsv?=
+ =?utf-8?B?ZGRidUZsWHdQcWZKZjliYXc4ajczZGF3UHFIREJmOURDRDlLZzRSMEtCdnVY?=
+ =?utf-8?B?NHlZV29FU2lGMkEybHNpT1JLMno5RTNNSWg2MU5GMVloZ0pRQVBpRnQ5Z2dl?=
+ =?utf-8?B?eUZTbit1ZTgxOS84U1ZOK2tEbVJNaDZsQWUxclluT1E3WHdRYk9OL1NPdzlk?=
+ =?utf-8?B?ZC9sWm4xN3pOYXY3UmtSZmR3K0d4TVg5SjUrOU01czg3UzZMRVJqQzhtbGxO?=
+ =?utf-8?B?ZGUveXlGWEcyb2p6cnJ6Qk0zaUhmdlBNeHE0WEtKMUptM1dUV2p0WlVEVzVM?=
+ =?utf-8?B?ZXlIWDZMNDlpQ0xnTkJEWXlEZ3pTMnp6M3ZOV3BIa3FiSFZkaHE3MnFlaUxM?=
+ =?utf-8?B?ekVoNHpEbDFwOXNnRTZ4b0lEdTIwc1dvdWNUWUNjcjVwa2xoMVZNRlpqZXhv?=
+ =?utf-8?B?R3YvZTJpV24zaFRPY3FNdUVOOWpiRmVGNG91R3pwZGp6R1NWSWs1aVdpQzla?=
+ =?utf-8?B?d2syY1Zpd3JsWjlGTHNXNUNFK1E2RXlnWEtMeWVOTk9wNGJOVGgwdlpmZWor?=
+ =?utf-8?B?L1pod3JNNE40ZlMyWTBUUHIwMEN1WUJDMHc0VkdISzhudG5DZjZGRDRLejBu?=
+ =?utf-8?B?TjVKbTA1WWlnR3AxMWwzbnVLWEtmc0hyYUxwcFZvejZXa0lPUEM3NTJCbjV5?=
+ =?utf-8?B?dGlDMU1KbmQwa1RXdlhaY3hwNjcwNWxRZDY0bmJHUXBCZmpMTks3elJFakp5?=
+ =?utf-8?B?L2FEOE9nNHc5b2pFQ1BVOTJuemwrRTJSZzM5d2pXbXd5dGcvYlkvcE0wUGhq?=
+ =?utf-8?B?UzBFMUtuUnVuaFRTNXJybGZjaUl4ZEtkdG5GemRWcjFhWXdYVm1EbllkdlJQ?=
+ =?utf-8?B?aVRhdDBCTDZ4cmNiZFFrTmtuS1kxRWhBM0Z5T3graDBNaitlWVFPZjhaY2pM?=
+ =?utf-8?B?QWFDdGg1MUVsczdldU1lc2F0dGhYYmJ6S0NDenBjSHFTV1VWMzVPVVBBaGFO?=
+ =?utf-8?B?aisxdlR5ZTk1MisyUDRFMER6M2laakVDQXpNVWNlQUNRRGhQa2VtNTNMQ2VC?=
+ =?utf-8?B?cHMvZHlKMG0zSDUwY2thcmhZbGJMZlpUVG5CS3B6V0szemU3c2RuQ2pBaWxC?=
+ =?utf-8?B?dTdUeERQRHB3RENYUGVvRFN0Q1ZIK1dPUkMyNG9nSlgzYms1cEEzNEowaVd6?=
+ =?utf-8?B?cWx0T3I3UlFMREhneGEzdXI3UXFyRXRnK09uVWticWtvQnBuL2h5TTlWdlp4?=
+ =?utf-8?B?NVFCcHlZdXdlOVk4RGdxMGdwQURpN0U4NmhhVU42c0ZLdCtiWEEvN2QxU1du?=
+ =?utf-8?B?dlI4a2YzK0htNEsxOWIxNXBQajZtQmwyell1WTFubUw2KzlLb0hPdVZ1QkVH?=
+ =?utf-8?B?R2d3ckw5RTBYRVFMbUwwdXUwZWJ3U3QreUZkc3VsU1FSVkF6WnlOQllpbDg2?=
+ =?utf-8?B?SmVjbnFSbXVYNndxeDZuS0FqNnN6RnlobmxmM29rdXhSZkdQSUNNVGRET1BV?=
+ =?utf-8?B?SU1wbDk3V2Z5WHFWL2dhY0dFeGVKRnoxUzFnbTA5WnRmc21wZ1AxK1FTQVhY?=
+ =?utf-8?B?UG5VK3VmQVFGLzdXbVpvMW1qdGc0bkdLVVIrS01lRTNwa0txRHIzY2swcXlk?=
+ =?utf-8?Q?FeR89zcNJf0/BHtb/nBkWk9eB?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: e973f8e4-b771-40b1-9046-08dc7aae70b8
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 May 2024 22:28:01.5867
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vs7uA3XcvORExQtNZbOeVa0psFntvhu3tuw9ohMm6trcrh9rrEuAFv7okc4S6YLe8HOWTnZR64SrsrwfpbYTYQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7122
+X-OriginatorOrg: intel.com
 
-The vmexit_ipi test can be used as a rough benchmark for IPI performance
-since commit 8a8c1fc3b1f8 ("vmexit: measure IPI and EOI cost") added
-reporting of the average number of cycles taken for IPI delivery. Avoid
-exposing a PIT to the guest so that SVM AVIC is not inhibited and IPI
-acceleration can be tested when available and enabled by the host.
 
-Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
----
- x86/unittests.cfg | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 867a8ea2..70cdda72 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -81,10 +81,13 @@ file = vmexit.flat
- extra_params = -append 'inl_from_pmtimer'
- groups = vmexit
- 
-+# To allow IPIs to be accelerated by SVM AVIC when the feature is available and
-+# enabled, do not create a Programmable Interval Timer (PIT, a.k.a 8254), since
-+# such device will disable/inhibit AVIC if exposed to the guest.
- [vmexit_ipi]
- file = vmexit.flat
- smp = 2
--extra_params = -append 'ipi'
-+extra_params = -machine pit=off -append 'ipi'
- groups = vmexit
- 
- [vmexit_ipi_halt]
+On 22/05/2024 2:28 pm, Sean Christopherson wrote:
+> Add an off-by-default module param, enable_virt_at_load, to let userspace
+> force virtualization to be enabled in hardware when KVM is initialized,
+> i.e. just before /dev/kvm is exposed to userspace.  Enabling virtualization
+> during KVM initialization allows userspace to avoid the additional latency
+> when creating/destroying the first/last VM.  Now that KVM uses the cpuhp
+> framework to do per-CPU enabling, the latency could be non-trivial as the
+> cpuhup bringup/teardown is serialized across CPUs, e.g. the latency could
+> be problematic for use case that need to spin up VMs quickly.
 
-base-commit: 00af1c849ced4e515f8659658d18652df2eb08fa
--- 
-2.39.3
+How about we defer this until there's a real complain that this isn't 
+acceptable?  To me it doesn't sound "latency of creating the first VM" 
+matters a lot in the real CSP deployments.
+
+The concern of adding a new module param is once we add it, we need to 
+maintain it even it is no longer needed in the future for backward 
+compatibility.  Especially this param is in kvm.ko, and for all ARCHs.
+
+E.g., I think _IF_ the core cpuhp code is enhanced to call those 
+callbacks in parallel in cpuhp_setup_state(), then this issue could be 
+mitigated to an unnoticeable level.
+
+Or we just still do:
+
+	cpus_read_lock();
+	on_each_cpu(hardware_enable_nolock, ...);
+	cpuhp_setup_state_nocalls_cpuslocked(...);
+	cpus_read_unlock();
+
+I think the main benefit of series is to put all virtualization enabling 
+related things into one single function.  Whether using 
+cpuhp_setup_state() or using on_each_cpu() shouldn't be the main point.
 
 
