@@ -1,245 +1,131 @@
-Return-Path: <kvm+bounces-17913-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-17914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1AA78CB8F6
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 04:30:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04E9D8CB8FB
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 04:31:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A2671F268F0
-	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 02:30:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EDB5B236FF
+	for <lists+kvm@lfdr.de>; Wed, 22 May 2024 02:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FEE7D08F;
-	Wed, 22 May 2024 02:28:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6242657CB4;
+	Wed, 22 May 2024 02:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g0DwTBaD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dqVtVC50"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7F67580D
-	for <kvm@vger.kernel.org>; Wed, 22 May 2024 02:28:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C9015C0
+	for <kvm@vger.kernel.org>; Wed, 22 May 2024 02:31:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716344922; cv=none; b=ji6V5YavSJPqaHH3sjazR7xQT0lUrTpXiCjOx0yvq4W0eHCDXqmxcA8z57wvcSuytxkNvP8EDr184j/nVqRC9Jl2BFoFdl6VFjszsnh3tELw9aVOtnbGBeUkaVD/WFYswsiVqEF5/s7UP0kupxX7AMQXNL6kFGc7maA6mhbxldw=
+	t=1716345095; cv=none; b=arHgkPgrKyBxSPrsKg+k47UuRxkx6OSM1/JAFtL5BpppBxNuN4ptINxdu80acN7aCGSkYnHWW1ZjiBoLsOpptKBf815AcGRmOdXKiElcucRk7afIGrMDi+KAD8fNQ85tcdFS9I/z3+EGCBFDuGFUlloUMUzB0/TZyttC1T8MYag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716344922; c=relaxed/simple;
-	bh=bL1+vHMHhm9cMRQczr5G+NHO3Zy1qclzvEFtBGp3ICc=;
+	s=arc-20240116; t=1716345095; c=relaxed/simple;
+	bh=tak0JNHXgiWiJt06m1Iot07uFQvw2SbXkoQiZzW0bo0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZJLJksBmRHam9q7i132Le7qeyH/mDSKJrV4LtJhUd/ey39kxc4KodhdI0p64okneylswwdkuTo5cU02FcjngJw6orxPqgPUW9fKFYomXLPrtIAYEnt5lSYBqTbPjV1tLI0VqFxx8Kw/KkiOv3p88xIk0KIMWIf4eyOJcG2H7fZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g0DwTBaD; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=WDkvFleUUYfUTeGvqI1+4WNcIU/MfuCvlGJ5s5064gxiYshq0RwTwxdjgWsJph0eKce0UV+bKttxUIhaUhwbClskIUSe+2bT0KLkLsW2DFRP832f1p4WX4Bh+elIWx2QtsUEsNYIOu6flvTRn0DKQO1sKKUJunLyaUfQSBKoCtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dqVtVC50; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6efef492e79so12887634b3a.1
-        for <kvm@vger.kernel.org>; Tue, 21 May 2024 19:28:41 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc64f63d768so23470953276.2
+        for <kvm@vger.kernel.org>; Tue, 21 May 2024 19:31:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716344920; x=1716949720; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=3UQR7L7IeR8qz/nRM58REudhth61YMdGJiKJChX9kbI=;
-        b=g0DwTBaDEmunazG8orN0zzc096h3jZFKCyA3z3zAZscPkfk/g+2tETd7bpzHOsJ+aa
-         rIC9n6BWWtRATT7wJTL9Uskfz3FeR9QYg0JbKiXxzszUOs3iB/A/h2pTweo9Xfs7dgG/
-         Nz/6fL8T4kaDVCrtVmQV9+c5MD+nnQysxiHoMG5olk7E44CpOANl53DTVDEONZRSP9FT
-         +UDU7tWFy0sWj6mhZi2HjhTN95SkY0MCqzVeFs27wS5ivB1/CuhMWvzzwIPIXDaWyKHX
-         tkP7KoPV/Eq074iJE5wu3kdQmNbsyXyorEzoqJf9OufYKB1B3xa5HTTgQDCFlWR/AEev
-         vFew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716344920; x=1716949720;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=google.com; s=20230601; t=1716345093; x=1716949893; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3UQR7L7IeR8qz/nRM58REudhth61YMdGJiKJChX9kbI=;
-        b=iP7Ql9Tla68A2z+SL38Uy+jLM29jYlJBNwuUYZN15dBa75MBI8TQI8CRj3amC2YA04
-         1Bn3zuHf39A+sz2x7IYySeMHRJahUeUpGlcCOhtoTqpLJ9LQI8cRCdQNJogXHmaHv2X+
-         tKfe2xzQcTcymBGPfyuaqDrGXz9ZeK5bViY6c1yvedwYmD9iVFiAxVG4YhdFURPFMxgP
-         mxocfDrD9VlZ6UzVQbKpU41cgsd7b41MAtLmr1kTmQTsVNwo6GA27pD6OcDTV5OTg66K
-         vOeCNQnVRfM4URXI8Qugq6bYNki4hgvSORHQ/YG9zZWndam7d+Kmqvrf2GxrQHSlJzSk
-         MX5A==
-X-Gm-Message-State: AOJu0YzwKHOOg0AOIP2a+0ioDDeMkQB1naWi9Z5c9d/Q3sPBorreKZzh
-	N6U9Y3fN76G0TJ3l9RABe5w+ouI6Pep15Z+q+Dtpy9u036wh3ELbi8ZeNSij1KleAytPXrg0SAB
-	qkg==
-X-Google-Smtp-Source: AGHT+IFOo0EomRnvSty2EF4AepPhMj/lMUO8x2DSRQ64LdBqHmI5HFTl/IGL+l18xs+e4laGXFK2xAMdhpc=
+        bh=gOYDdieEO0SMEqqI4rHYaS0F69dZml7a9rO/mRwE3Yc=;
+        b=dqVtVC50iSxq4VQELbM6nAHkP/Wh8cRQb2jyNF5baHhYXcyIol18qtJr7X8aYGHl7O
+         VtsY3Fz72yDBUgukYlkgglcCPLa2DuwtWisjGZh7Cxbu+094x6Q0PCe+ar/V4A49RizW
+         RpwpuHccV2+ly66d8lYDk1tL4jD2qQT5kplPwhdL/cR1aD01ibv7kbuUMAFe3+fmkkh+
+         na7MwqH4PGi4F8kgvBMsUHoGdYkXXJONBLvYEOWjnICF33dBlfCjtskp3sWVZEawBpYb
+         7ca3xx9JRt+SGrYBYOgoPWPoHe0R8pb8OFy9apmgI6umWH3pozocHkN60i2hzv3ailpu
+         fnNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716345093; x=1716949893;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gOYDdieEO0SMEqqI4rHYaS0F69dZml7a9rO/mRwE3Yc=;
+        b=CprU7hblzXw79rsqf0usmItMl5FPJkCbj+883U1mfwWs6cK8b7k3R0/4zCiwJhRAHe
+         1RFuAvVuImC69FPenzDmm05+rurQeSZhK1KlhQ22tudXOV4bVmdRXcS5bqWoL9JhN3Q5
+         DGqkGmHyd6oSDXRzRM+eV3eeUTMyqjQrcLCO4Z+5pogYOsEO4/CfRKIJIH1BZtsRSZfU
+         mL9ZiIQJNft5bI+OKWNqWTzF/0nY9YVuqTu/2z5Qycl8t4TxNtJzGFdJK+NLWRuotGHU
+         RtYCV2Ll526tVOVq2r3L4yQxVMx8WNYfC8n+Jd0msXv2E32xEh6AgyJ/BdE4RoSgDvjn
+         HrfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVgUNgaoFIN8NrQZhPW6KeA1mUJmlYWeNTju7/T43r/WxsGOgXvpuXgIaNhJdyqtBWZvtcluOHCQuMjdY06HLRxKGkh
+X-Gm-Message-State: AOJu0Yz02FRMq5bz9wrBAT2ExoXKAj/jtePQ2oNVH8fxgc4HRexxmJzy
+	3+epBp9rF36KmdImtO6vD8IRqXNtMewoEP4RGqnjNSfeK+3OEJEvaMfNkcVLMjLoC0V8ZU9n1GU
+	q7Q==
+X-Google-Smtp-Source: AGHT+IGmJ0SvbLnKDHz/DAYY+qVuk91HRc2JW9lRvffWDQUBufCfe/OdwsfiVcHXEKW1MXdrv4UbappAeDQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d04:b0:6f3:ead3:c280 with SMTP id
- d2e1a72fcca58-6f6d60c1e1cmr35160b3a.2.1716344920604; Tue, 21 May 2024
- 19:28:40 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 21 May 2024 19:28:27 -0700
-In-Reply-To: <20240522022827.1690416-1-seanjc@google.com>
+ (user=seanjc job=sendgmr) by 2002:a25:aad4:0:b0:de5:8427:d66e with SMTP id
+ 3f1490d57ef6-df4e0dbb481mr238843276.11.1716345093234; Tue, 21 May 2024
+ 19:31:33 -0700 (PDT)
+Date: Tue, 21 May 2024 19:31:31 -0700
+In-Reply-To: <Zk1KZDStu/+CR0i4@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240522022827.1690416-1-seanjc@google.com>
-X-Mailer: git-send-email 2.45.0.215.g3402c0e53f-goog
-Message-ID: <20240522022827.1690416-7-seanjc@google.com>
-Subject: [PATCH v2 6/6] KVM: x86: Register "emergency disable" callbacks when
- virt is enabled
+References: <b89385e5c7f4c3e5bc97045ec909455c33652fb1.camel@intel.com>
+ <ZkUIMKxhhYbrvS8I@google.com> <1257b7b43472fad6287b648ec96fc27a89766eb9.camel@intel.com>
+ <ZkUVcjYhgVpVcGAV@google.com> <ac5cab4a25d3a1e022a6a1892e59e670e5fff560.camel@intel.com>
+ <ZkU7dl3BDXpwYwza@google.com> <175989e7-2275-4775-9ad8-65c4134184dd@intel.com>
+ <ZkVDIkgj3lWKymfR@google.com> <7df9032d-83e4-46a1-ab29-6c7973a2ab0b@redhat.com>
+ <Zk1KZDStu/+CR0i4@yzhao56-desk.sh.intel.com>
+Message-ID: <Zk1ZA-u9yYq0i15-@google.com>
+Subject: Re: [PATCH 02/16] KVM: x86/mmu: Introduce a slot flag to zap only
+ slot leafs on slot deletion
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kai Huang <kai.huang@intel.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "dmatlack@google.com" <dmatlack@google.com>, 
+	"sagis@google.com" <sagis@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Erdem Aktas <erdemaktas@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-Register the "disable virtualization in an emergency" callback just
-before KVM enables virtualization in hardware, as there is no functional
-need to keep the callbacks registered while KVM happens to be loaded, but
-is inactive, i.e. if KVM hasn't enabled virtualization.
+On Wed, May 22, 2024, Yan Zhao wrote:
+> On Fri, May 17, 2024 at 05:30:50PM +0200, Paolo Bonzini wrote:
+> > On 5/16/24 01:20, Sean Christopherson wrote:
+> > > Hmm, a quirk isn't a bad idea.  It suffers the same problems as a mem=
+slot flag,
+> > > i.e. who knows when it's safe to disable the quirk, but I would hope =
+userspace
+> > > would be much, much cautious about disabling a quirk that comes with =
+a massive
+> > > disclaimer.
+> > >=20
+> > > Though I suspect Paolo will shoot this down too =F0=9F=98=89
+> >=20
+> > Not really, it's probably the least bad option.  Not as safe as keying =
+it
+> > off the new machine types, but less ugly.
+> A concern about the quirk is that before identifying the root cause of th=
+e
+> issue, we don't know which one is a quirk, fast zapping all TDPs or slow =
+zapping
+> within memslot range.
 
-Note, unregistering the callback every time the last VM is destroyed could
-have measurable latency due to the synchronize_rcu() needed to ensure all
-references to the callback are dropped before KVM is unloaded.  But the
-latency should be a small fraction of the total latency of disabling
-virtualization across all CPUs, and userspace can set enable_virt_at_load
-to completely eliminate the runtime overhead.
+The quirk is specifically that KVM zaps SPTEs that aren't related to the me=
+mslot
+being deleted/moved.  E.g. the issue went away if KVM zapped a rather arbit=
+rary
+set of SPTEs.  IIRC, there was a specific gfn range that was "problematic",=
+ but
+we never figured out the correlation between the problematic range and the =
+memslot
+being deleted.
 
-Add a pointer in kvm_x86_ops to allow vendor code to provide its callback.
-There is no reason to force vendor code to do the registration, and either
-way KVM would need a new kvm_x86_ops hook.
-
-Suggested-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/include/asm/kvm_host.h |  3 +++
- arch/x86/kvm/svm/svm.c          |  5 +----
- arch/x86/kvm/vmx/main.c         |  2 ++
- arch/x86/kvm/vmx/vmx.c          |  6 +-----
- arch/x86/kvm/vmx/x86_ops.h      |  1 +
- arch/x86/kvm/x86.c              | 10 ++++++++++
- 6 files changed, 18 insertions(+), 9 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index aabf1648a56a..66698f5bcc85 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -36,6 +36,7 @@
- #include <asm/kvm_page_track.h>
- #include <asm/kvm_vcpu_regs.h>
- #include <asm/hyperv-tlfs.h>
-+#include <asm/reboot.h>
- 
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
- 
-@@ -1613,6 +1614,8 @@ struct kvm_x86_ops {
- 
- 	int (*hardware_enable)(void);
- 	void (*hardware_disable)(void);
-+	cpu_emergency_virt_cb *emergency_disable;
-+
- 	void (*hardware_unsetup)(void);
- 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
- 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 3d0549ca246f..9c55d0c9cb59 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4952,6 +4952,7 @@ static void svm_vcpu_unblocking(struct kvm_vcpu *vcpu)
- static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.name = KBUILD_MODNAME,
- 
-+	.emergency_disable = svm_emergency_disable,
- 	.check_processor_compatibility = svm_check_processor_compat,
- 
- 	.hardware_unsetup = svm_hardware_unsetup,
-@@ -5389,8 +5390,6 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
- static void __svm_exit(void)
- {
- 	kvm_x86_vendor_exit();
--
--	cpu_emergency_unregister_virt_callback(svm_emergency_disable);
- }
- 
- static int __init svm_init(void)
-@@ -5406,8 +5405,6 @@ static int __init svm_init(void)
- 	if (r)
- 		return r;
- 
--	cpu_emergency_register_virt_callback(svm_emergency_disable);
--
- 	/*
- 	 * Common KVM initialization _must_ come last, after this, /dev/kvm is
- 	 * exposed to userspace!
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 7c546ad3e4c9..3f423afc263b 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -24,6 +24,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 
- 	.hardware_enable = vmx_hardware_enable,
- 	.hardware_disable = vmx_hardware_disable,
-+	.emergency_disable = vmx_emergency_disable,
-+
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
- 	.vm_size = sizeof(struct kvm_vmx),
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 51b2cd13250a..eac505299a7b 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -753,7 +753,7 @@ static int kvm_cpu_vmxoff(void)
- 	return -EIO;
- }
- 
--static void vmx_emergency_disable(void)
-+void vmx_emergency_disable(void)
- {
- 	int cpu = raw_smp_processor_id();
- 	struct loaded_vmcs *v;
-@@ -8613,8 +8613,6 @@ static void __vmx_exit(void)
- {
- 	allow_smaller_maxphyaddr = false;
- 
--	cpu_emergency_unregister_virt_callback(vmx_emergency_disable);
--
- 	vmx_cleanup_l1d_flush();
- }
- 
-@@ -8661,8 +8659,6 @@ static int __init vmx_init(void)
- 		pi_init_cpu(cpu);
- 	}
- 
--	cpu_emergency_register_virt_callback(vmx_emergency_disable);
--
- 	vmx_check_vmcs12_offsets();
- 
- 	/*
-diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-index 502704596c83..afddfe3747dd 100644
---- a/arch/x86/kvm/vmx/x86_ops.h
-+++ b/arch/x86/kvm/vmx/x86_ops.h
-@@ -15,6 +15,7 @@ void vmx_hardware_unsetup(void);
- int vmx_check_processor_compat(void);
- int vmx_hardware_enable(void);
- void vmx_hardware_disable(void);
-+void vmx_emergency_disable(void);
- int vmx_vm_init(struct kvm *kvm);
- void vmx_vm_destroy(struct kvm *kvm);
- int vmx_vcpu_precreate(struct kvm *kvm);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d750546ec934..84b34696a76c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12464,6 +12464,16 @@ void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- }
- EXPORT_SYMBOL_GPL(kvm_vcpu_deliver_sipi_vector);
- 
-+void kvm_arch_enable_virtualization(void)
-+{
-+	cpu_emergency_register_virt_callback(kvm_x86_ops.emergency_disable);
-+}
-+
-+void kvm_arch_disable_virtualization(void)
-+{
-+	cpu_emergency_unregister_virt_callback(kvm_x86_ops.emergency_disable);
-+}
-+
- int kvm_arch_hardware_enable(void)
- {
- 	struct kvm *kvm;
--- 
-2.45.0.215.g3402c0e53f-goog
-
+Disabling the quirk would allow KVM to choose between a slow/precise/partia=
+l zap,
+and full/fast zap.
 
