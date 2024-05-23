@@ -1,139 +1,282 @@
-Return-Path: <kvm+bounces-18070-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18071-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0B308CD91E
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 19:22:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 190558CD93B
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 19:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E12C1C2162B
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 17:22:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F3191F22058
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 17:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0062976034;
-	Thu, 23 May 2024 17:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E302B7D3FA;
+	Thu, 23 May 2024 17:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dYq99Ek+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qjR0JJum"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82269208C3
-	for <kvm@vger.kernel.org>; Thu, 23 May 2024 17:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844222943F
+	for <kvm@vger.kernel.org>; Thu, 23 May 2024 17:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716484918; cv=none; b=CHaVYUF8jjb1zJgNIGsRC+oIqnw79zHOphtcLGNGe/ve4wS8oXZD/yTyZ/pm2boqp4+00Gg6gHXn7MkWVzvssYmZeoIXVW6rFclSK50G5siIrvpmF4P9P7rWtv0chh24CIlYM4wVvvS9raa71MCjbaOSE/luPvbWGkRehcZNGSI=
+	t=1716486083; cv=none; b=qFIPz84OAFURVDji+0cnqdpb67pyc07LmGW6aKX9YPAfPj5OxUQsemC91UdKdgkffwac+Ft1jjuIvCCX3pfQp3uF4RhX4802wqlts/StIP8kiobMEWD88vbdjtLPhDOB7nCGANv7QyyIAxJQo93Wt6Ak7sSzQaW7MN4sfwbwvEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716484918; c=relaxed/simple;
-	bh=p4l2t6I+lwT3BEpz+lNnMTPic01xwFiPS/KX8MJ/Md4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a+/nOAAXPhGJJrCer3E7J9Wv/MwxJ5WviRYOyhTB4W2TwqT3mdWfRWvtnVJ6SLD4mB/YZuDfr6k+6dSMW3EOlEsBZPjtPIWozAi1hv3VVt6knxCGrEbQOGIE/X67TVYx43cmOa28ajuQh16YpFnZGjpZBKKbTi09BnNDmFoLgOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dYq99Ek+; arc=none smtp.client-ip=209.85.208.47
+	s=arc-20240116; t=1716486083; c=relaxed/simple;
+	bh=mgcCj63r/rqJ9WAumHxvSQWYHZYpsmagWDbi6uVpq30=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dz8hKQe4F5mBTmureBi/a43C2+6dD4avc4W/3g3f07PE5acQvr5MNB95zFtNf1b8Lgy70J3H7WfeaDhm1sX5eDL0ZewMdAt1Wc+7WbWm7njWiVpLM6JG9RTQQtBllfS7aAUj6rgZCLEG1iCpuXsLf9geLAzod7u3Q8KFn0yk9+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qjR0JJum; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-572f6c56cdaso1057a12.0
-        for <kvm@vger.kernel.org>; Thu, 23 May 2024 10:21:56 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df771b5e942so22957276.2
+        for <kvm@vger.kernel.org>; Thu, 23 May 2024 10:41:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716484915; x=1717089715; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kguOkz8BBoxZq/59dTE1BE5v78wz8qUVU81MIvbz22g=;
-        b=dYq99Ek+2a1lDql+wYWGSwzyiWey+I0Pz5ghCrNs56V/zm2Ib36luuclnMPFkQJ9xp
-         U0+5LyMD807dTHNxPabjU5ePgJ8LnlTYEpZBl9pQf2VhZDJzMN5knBtmkoLIWoDfhOHQ
-         MiBS3XoqmahO7PaCVrwTkqOP9KjAkUsHj7WFkL+bEv3zLk3EnJLJTpBRM5Si1DC9QUdQ
-         S+nJbLlEreGJVW/JxVUZkK4FIPTXnv9i+kkEIVyTHwM9HXDm5Hz89k5d9jQuxroNAzKj
-         YsOSrjb4j/jepc8KQF4a+coKwSdVaRJxYVmtN+c8uVP7y1aGdVTuY3AnaHA/zaT0DqFr
-         7EkA==
+        d=google.com; s=20230601; t=1716486080; x=1717090880; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/Uryc1Ca/yfNSkrAtNfcb1TkId2P2HjsoQz4zGkthUc=;
+        b=qjR0JJumKNrZ7UwcPP3s3GetHd8W89GLTthgINDn8zXK2tp9xfYk8qBTbgZRmXoCFA
+         HLWfW0D2IZLwnnxs/HNLrQtkKFPdtoBv403UP4UnO1x0PCYvZEqokaSbQHvWzK7dxdjh
+         VJWXHVWdel+9kBDAo3bZyrjsyCZcwZORpeNixhRcrpf9aYANwwBUsj04IU5+pbmo3d5/
+         3EjHCeejdhp6Vy299A2P9ykhic6fVG5SGahZo3Vsa/zu8HrZiE1caS7chZYloNqedDIW
+         NL7m7UM5ROyaRVefbX/e+lPwVaB+AdPC/JsPu06JWh67JbJ+XyCsHjwfdvbMGwEO/9og
+         buOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716484915; x=1717089715;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kguOkz8BBoxZq/59dTE1BE5v78wz8qUVU81MIvbz22g=;
-        b=myzoi1oW9UUFUu0Jn+Q0ieZfhGQKvEutQ9nFF8cc44KYGtkyfelkxj77CROv1aqrz/
-         k90MsW+5RPjzQ/pp9iJR6hWxrrD6e7E/wc82Vy9u0zIz7zOj7HO4ge9E5wkGabKjr39P
-         /S5/HSZhg4+P5DlH7Zy5PRmBOmyXHom17mGTNy2HGv7S1c/9EzC96xsI3zvUFwHkcbG2
-         1+PchgHkMiq5uqtMOymT50sYb/eo/xtdV4QnvNvb/Db8MJfSFF+L7HtZgAI6YSR9AERw
-         vDark/Sqbut/0zvudEe9aWYVGCMMu/REkmA7HLs/qBWhzsWXlnk5gDSby47eRd2rUxfM
-         xi+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUfanu4rKvwIqemVcrM6cElDrz7pvNDnwX8OsjpyhQoQs2hfKQiToqYQnTmhcd4b4ypMQG/gFLz6/QdWAKTMusJyM8W
-X-Gm-Message-State: AOJu0YwaIqCsJELdvY8T7PdDy1aGmiqO/jAfHET7F44UmJGmaZWLqu/6
-	XKEUdMx243v7ICdHGE7WqzL/e9QeiJRIjOAfacB0d0uZwMkTpMacprqhFfsYmOaWCQAknoatMwz
-	xutcRBVaPJsao9nOmmgbr7xt1H3g9ZQQPnJOd
-X-Google-Smtp-Source: AGHT+IH+78xJj6jnX1rb2rKorVGrZ9GXUUGh5OuKw+d0r72nAyfAyGgJ+q4JesoTazL/0S+HDYKfZPbqF4LoZrYt1/g=
-X-Received: by 2002:a05:6402:254a:b0:573:4a04:619 with SMTP id
- 4fb4d7f45d1cf-57843f58ae3mr255037a12.4.1716484914607; Thu, 23 May 2024
- 10:21:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1716486080; x=1717090880;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/Uryc1Ca/yfNSkrAtNfcb1TkId2P2HjsoQz4zGkthUc=;
+        b=vLU5LP5G9+N4P334ARjSTrjuZycA2zR8C2yn3IlgYdHBCiZsX4RkbkM28b5d+slJRp
+         4kng0OMa2T+1zTlQyWha7LQgKct7dGH8xAC17adyg9wru6MPANHTtIvy/wNdBlKrzunD
+         rlPaq15H0mGv5I42KiqwPG5GYsgPAfsf98x8AMNsSE54pmPxPBHFGL3nY9WjKJXqHEtt
+         t4uAe4s1zNH1yi5TAqUwaqHZqesSf2GsV159Pa/FrXeIg2qN7I+rs9KXmepKxk/XnMq7
+         yuqfY93C9xBj4P1GFMgc0edRVyTcsY2nvF3XTNeYh/abdgkaoYOfRqUpkfeOyRG+00eD
+         0Axw==
+X-Gm-Message-State: AOJu0YwcpXEC9zGmzcjpI4lUb3NR1umEnE1Lz0xNmbeDh2T8U+lSxamP
+	cjVG0oxj3cvMvGLk/yT2LRHH0L9DSjRCVZXas40OjbMmCYHQ/XKcW1soYJLvuc2wpkSgppSEyOr
+	N4OfV/gXIloyq1YIkow5fTfnqexm0u8u1DlCDHhFth2fF8t72tpxAR82tHHM/IXW0HJf3TnWofD
+	bZ2tlr4JfXYfGX0a3GNb/AHVTq6qiLPasqTouiePjonSd8fqMFpa/YTp4=
+X-Google-Smtp-Source: AGHT+IFlRiZywpr57pi877qryPKiafj4uJohWbfZpe5cezs8n2FI0sD1i4QJM+bXmI8glD4J/d2mQ77lr+EZuSzvnQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6902:100a:b0:df7:66dd:5fbd with
+ SMTP id 3f1490d57ef6-df766dd6536mr116228276.3.1716486080473; Thu, 23 May 2024
+ 10:41:20 -0700 (PDT)
+Date: Thu, 23 May 2024 17:40:55 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20c9c21619aa44363c2c7503db1581cb816a1c0f.camel@redhat.com>
- <CALMp9eSy2r+iUzqHV+V2mbPaPWfn=Y=a1aM+9C65PGtE0=nGqA@mail.gmail.com>
- <481be19e33915804c855a55181c310dd8071b546.camel@redhat.com>
- <CALMp9eQcRF_oS2rc_xF1H3=pfHB7ggts44obZgvh-K03UYJLSQ@mail.gmail.com>
- <7cb1aec718178ee9effe1017dad2ef7ab8b2a714.camel@redhat.com>
- <CALMp9eSPXP-9u7Fd+QMmeKzO6+fbTfn3iAHUn83Og+F=SvcQ4A@mail.gmail.com> <87cypdha4i.ffs@tglx>
-In-Reply-To: <87cypdha4i.ffs@tglx>
-From: Jim Mattson <jmattson@google.com>
-Date: Thu, 23 May 2024 10:21:42 -0700
-Message-ID: <CALMp9eTCu0P79rX4f4j=9NFSy0L5DqoWqruAe95Qq9P1R=ucKA@mail.gmail.com>
-Subject: Re: RFC: NTP adjustments interfere with KVM emulation of TSC deadline timers
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
+Message-ID: <20240523174056.1565133-1-coltonlewis@google.com>
+Subject: [PATCH v6] KVM: arm64: Add early_param to control WFx trapping
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 22, 2024 at 1:20=E2=80=AFPM Thomas Gleixner <tglx@linutronix.de=
-> wrote:
->
-> On Thu, May 16 2024 at 09:53, Jim Mattson wrote:
-> > On Wed, May 15, 2024 at 2:03=E2=80=AFPM Maxim Levitsky <mlevitsk@redhat=
-.com> wrote:
-> >> > Today, I believe that we only use the hardware VMX-preemption timer =
-to
-> >> > deliver the virtual local APIC timer. However, it shouldn't be that
-> >> > hard to pick the first deadline of {VMX-preemption timer, local APIC
-> >> > timer} at each emulated VM-entry to L2.
-> >>
-> >> I assume that this is possible but it might add some complexity.
-> >>
-> >> AFAIK the design choice here was that L1 uses the hardware VMX preempt=
-ion timer always,
-> >> while L2 uses the software preemption timer which is relatively simple=
-.
-> >>
-> >> I do agree that this might work and if it does work it might be even w=
-orthwhile
-> >> change on its own.
-> >>
-> >> If you agree that this is a good idea, I can prepare a patch series fo=
-r that.
-> >
-> > I do think it would be worthwhile to provide the infrastructure for
-> > multiple clients of the VMX-preemption timer.
->
-> That only solves the problem when the guests are on the CPU, but it does
-> not solve anything when they are off the CPU because they are waiting
-> for a timer to expire. In that case you are back at square one, no?
+Add an early_params to control WFI and WFE trapping. This is to
+control the degree guests can wait for interrupts on their own without
+being trapped by KVM. Options for each param are trap and notrap. trap
+enables the trap. notrap disables the trap. Note that when enabled,
+traps are allowed but not guaranteed by the CPU architecture. Absent
+an explicitly set policy, default to current behavior: disabling the
+trap if only a single task is running and enabling otherwise.
 
-If the vCPU is in virtual VMX non-root operation while not running,
-and the timer fires late, then we just emulate a VM-exit from L2 to L1
-the next time the vCPU gets a chance to run. The L2 guest will not run
-past the deadline, nor will the L1 guest run before the deadline.
-That's all fine.
+Signed-off-by: Colton Lewis <coltonlewis@google.com>
+---
+v6:
+ * Rebase to v6.9.1
+ * Move decision to enable WFx traps back to vcpu load time
+ * Move policy enum to arm.c and mark variable as __read_mostly
+ * Add explicit disclaimer traps are not guaranteed even when setting enabled
+ * Remove explicit "default" case from early param handling as it is not needed
 
-> > (Better yet would be to provide a CLOCK_MONOTONIC_RAW hrtimer, but
-> > that's outwith our domain.)
->
-> That's a non-trivial exercise. I respond to that in a separate mail.
->
-> Thanks,
->
->         tglx
+v5:
+https://lore.kernel.org/kvmarm/20240430181444.670773-1-coltonlewis@google.com/
+
+v4:
+https://lore.kernel.org/kvmarm/20240422181716.237284-1-coltonlewis@google.com/
+
+v3:
+https://lore.kernel.org/kvmarm/20240410175437.793508-1-coltonlewis@google.com/
+
+v2:
+https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
+
+v1:
+https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
+
+ .../admin-guide/kernel-parameters.txt         | 18 +++++
+ arch/arm64/include/asm/kvm_emulate.h          | 16 -----
+ arch/arm64/kvm/arm.c                          | 68 ++++++++++++++++++-
+ 3 files changed, 83 insertions(+), 19 deletions(-)
+
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 396137ee018d..f334265a9cfa 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2693,6 +2693,24 @@
+ 			[KVM,ARM,EARLY] Allow use of GICv4 for direct
+ 			injection of LPIs.
+
++	kvm-arm.wfe_trap_policy=
++			[KVM,ARM] Control when to set WFE instruction trap for
++			KVM VMs. Traps are allowed but not guaranteed by the
++			CPU architecture.
++
++			trap: set WFE instruction trap
++
++			notrap: clear WFE instruction trap
++
++	kvm-arm.wfi_trap_policy=
++			[KVM,ARM] Control when to set WFI instruction trap for
++			KVM VMs. Traps are allowed but not guaranteed by the
++			CPU architecture.
++
++			trap: set WFI instruction trap
++
++			notrap: clear WFI instruction trap
++
+ 	kvm_cma_resv_ratio=n [PPC,EARLY]
+ 			Reserves given percentage from system memory area for
+ 			contiguous memory allocation for KVM hash pagetable
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 975af30af31f..68c4a170b871 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -109,22 +109,6 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+ 	return (unsigned long *)&vcpu->arch.hcr_el2;
+ }
+
+-static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
+-{
+-	vcpu->arch.hcr_el2 &= ~HCR_TWE;
+-	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
+-	    vcpu->kvm->arch.vgic.nassgireq)
+-		vcpu->arch.hcr_el2 &= ~HCR_TWI;
+-	else
+-		vcpu->arch.hcr_el2 |= HCR_TWI;
+-}
+-
+-static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
+-{
+-	vcpu->arch.hcr_el2 |= HCR_TWE;
+-	vcpu->arch.hcr_el2 |= HCR_TWI;
+-}
+-
+ static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
+ {
+ 	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index c4a0a35e02c7..1cd58ca5d410 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -47,6 +47,15 @@
+
+ static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
+
++enum kvm_wfx_trap_policy {
++	KVM_WFX_NOTRAP_SINGLE_TASK, /* Default option */
++	KVM_WFX_NOTRAP,
++	KVM_WFX_TRAP,
++};
++
++static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
++static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
++
+ DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
+
+ DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
+@@ -428,6 +437,24 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
+
+ }
+
++static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
++{
++	if (likely(kvm_wfi_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
++		return single_task_running() &&
++			(atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
++			 vcpu->kvm->arch.vgic.nassgireq);
++
++	return kvm_wfi_trap_policy == KVM_WFX_NOTRAP;
++}
++
++static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
++{
++	if (likely(kvm_wfe_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
++		return single_task_running();
++
++	return kvm_wfe_trap_policy == KVM_WFX_NOTRAP;
++}
++
+ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ {
+ 	struct kvm_s2_mmu *mmu;
+@@ -461,10 +488,15 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
+ 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
+
+-	if (single_task_running())
+-		vcpu_clear_wfx_traps(vcpu);
++	if (kvm_vcpu_should_clear_twe(vcpu))
++		vcpu->arch.hcr_el2 &= ~HCR_TWE;
++	else
++		vcpu->arch.hcr_el2 |= HCR_TWE;
++
++	if (kvm_vcpu_should_clear_twi(vcpu))
++		vcpu->arch.hcr_el2 &= ~HCR_TWI;
+ 	else
+-		vcpu_set_wfx_traps(vcpu);
++		vcpu->arch.hcr_el2 |= HCR_TWI;
+
+ 	if (vcpu_has_ptrauth(vcpu))
+ 		vcpu_ptrauth_disable(vcpu);
+@@ -2663,6 +2695,36 @@ static int __init early_kvm_mode_cfg(char *arg)
+ }
+ early_param("kvm-arm.mode", early_kvm_mode_cfg);
+
++static int __init early_kvm_wfx_trap_policy_cfg(char *arg, enum kvm_wfx_trap_policy *p)
++{
++	if (!arg)
++		return -EINVAL;
++
++	if (strcmp(arg, "trap") == 0) {
++		*p = KVM_WFX_TRAP;
++		return 0;
++	}
++
++	if (strcmp(arg, "notrap") == 0) {
++		*p = KVM_WFX_NOTRAP;
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
++static int __init early_kvm_wfi_trap_policy_cfg(char *arg)
++{
++	return early_kvm_wfx_trap_policy_cfg(arg, &kvm_wfi_trap_policy);
++}
++early_param("kvm-arm.wfi_trap_policy", early_kvm_wfi_trap_policy_cfg);
++
++static int __init early_kvm_wfe_trap_policy_cfg(char *arg)
++{
++	return early_kvm_wfx_trap_policy_cfg(arg, &kvm_wfe_trap_policy);
++}
++early_param("kvm-arm.wfe_trap_policy", early_kvm_wfe_trap_policy_cfg);
++
+ enum kvm_mode kvm_get_mode(void)
+ {
+ 	return kvm_mode;
+--
+2.45.1.288.g0e0cd299f1-goog
 
