@@ -1,169 +1,290 @@
-Return-Path: <kvm+bounces-18021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18022-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAEA08CCE27
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 10:24:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F828CCE93
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 10:48:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 35111B22279
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 08:24:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67D81281D22
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 08:48:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 022F013CFA5;
-	Thu, 23 May 2024 08:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C7713D253;
+	Thu, 23 May 2024 08:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aJCAlDQR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmS8w3D3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B575A13C9D4;
-	Thu, 23 May 2024 08:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1105729422
+	for <kvm@vger.kernel.org>; Thu, 23 May 2024 08:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716452681; cv=none; b=qGgUENc2vyowblreDznzmN4iJvC55lXiwEtM//GTjbcoGiZa48rJVWhtyuxPGO7hzAcDBX5qI/OWDqi0vVR1meCFWzs6ZmIFyGRpRlYVzHJV7EguxHTcw8cXhbbEeXMZhMP1yZIz7FhFeT19kpsUd3fTwORgZ5oGZjJ0ErHr6U8=
+	t=1716453943; cv=none; b=lVUxDmDiGEr84gnt/ySsQbHYOy1fio270PnXBxmZhuCn1lehVLP2FfxzFbgOfc2bXegcGVY16wBW5TWq/1qL2Ynp5O4t4Xvv2fiuD2Thg84sZUPCWczOKAHOCfFgB7tE94+VRBKy4Qgp7ehGX0FULDv27ku3Qz9KMSOLTP95S7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716452681; c=relaxed/simple;
-	bh=3qlDdehT04n5LtUDokggbO6BOSs9fryp1wn3H0zsHyc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XzXEGjAdYSO7VsoDEsMEvmfG0c8h2dbxzyF7OThMl+kvtffritPJ+fB5A4cgz0dicFISzv5Xe7EbEYi4DKREuDWDe0iHB6MVqrowIRHWntfZLUeASuP+T6zXgUc3UBXy/GDvzX23GNzTBPnzF/+Gok3Q/scDpUWYlNeI1jY6QEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aJCAlDQR; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44N8NSw5003912;
-	Thu, 23 May 2024 08:24:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=Xem2L4yusnSw6umhDeH93v7EviTSvRS2L1XD1cbMWV8=;
- b=aJCAlDQRUGvsVPfJWjMpYiHVbG0AfhIHxNusqazQ/S/+AatdTdlTnq6mmJf744qyShx8
- 5EW2WIqVH1WWjbtvwQs4nJ56G948HzKN2TWa8kY/GTH8Xnj3cI+VUrX/wWFVWLSxFOR/
- T2gBr6orzd3wmKqgRm3itF06K0LOONfpkY9rniB9b6qgDziq3miVyNnJEMJ2r5J7HiNZ
- 5KEtSPdjpTKBASPUPbHs5lo+OSs7psrBWlE1BOoxRP6nFVuH4ZsrA6OK5fG9IXbBUrz8
- 1tseHqzfxZqEq8sgk/C+Jk2yrutrUMSZMQuxRgoWhJc1/T59meJiNAtRCm8pERbHLKFz Nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya281804n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 08:24:37 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44N8NXW3003942;
-	Thu, 23 May 2024 08:24:36 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya281804k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 08:24:36 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44N6u6uK022144;
-	Thu, 23 May 2024 08:24:36 GMT
-Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3y76nu15xf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 08:24:36 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44N8OXng52625890
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2024 08:24:35 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4255358066;
-	Thu, 23 May 2024 08:24:33 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 65AA758051;
-	Thu, 23 May 2024 08:24:31 +0000 (GMT)
-Received: from [9.152.212.216] (unknown [9.152.212.216])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 23 May 2024 08:24:31 +0000 (GMT)
-Message-ID: <d29fa7b13e9179f3d7aae6b2113822c41080a898.camel@linux.ibm.com>
-Subject: Re: [PATCH 3/3] vfio/pci: Enable VFIO_PCI_MMAP for s390
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alex
- Williamson <alex.williamson@redhat.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date: Thu, 23 May 2024 10:24:30 +0200
-In-Reply-To: <20240522232025.GH69273@ziepe.ca>
-References: <20240521-vfio_pci_mmap-v1-0-2f6315e0054e@linux.ibm.com>
-	 <20240521-vfio_pci_mmap-v1-3-2f6315e0054e@linux.ibm.com>
-	 <20240522232025.GH69273@ziepe.ca>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 3L0v5o6F9dCtrQjwujLDpciiJOSAm9Ta
-X-Proofpoint-GUID: krR-xsN8nojtODz7zhBqlEqk6jAwn7oY
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1716453943; c=relaxed/simple;
+	bh=Klg5na3ir6Jo0XD2KlZcjnpaAqZv6WA9rKQrs/j+V6g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nTpHK9t9AdKTTMpfJB3Gt0iO5fb+usnF9xLlnjVp2oEGsH6r+8Hp2hQ5ji3zcKpBVbsGCf1CiHp8p4JowF6jbt5zIzqf+IdzL9hjBONAj39k4bcSpKmHShxtLNP9C9lTENw2hsPs57CC5yfAISE/nSeNfJvaU6tD1+wC0euan/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NmS8w3D3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716453940;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RpFPE8buedMm/3/WAIhw3hDkX+HooBF5TiKTfpx87wc=;
+	b=NmS8w3D3WiPucSAz36F0rjjqbdnTVlGVA6lQPjbcyZi1mBMmXSgyhlV7AHtTr8C79im5oX
+	l7voxiKrWXVQM9PmhucSn535xARH3yLtRFxPi32pQ2/YWHRTkuM/RuShfK/pg1s3VVF/bl
+	nn3RKNeRTB3tdG3YO/XA/cbyllp9iv0=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-52-yrvd-I27OpWzsTO6nOEJfQ-1; Thu, 23 May 2024 04:45:38 -0400
+X-MC-Unique: yrvd-I27OpWzsTO6nOEJfQ-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6ab6bc106fdso43579636d6.0
+        for <kvm@vger.kernel.org>; Thu, 23 May 2024 01:45:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716453938; x=1717058738;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RpFPE8buedMm/3/WAIhw3hDkX+HooBF5TiKTfpx87wc=;
+        b=lZ6c/Xddr3Y8UPzr5AwEWBaQ5z+7pFfhgwPg2+CNbt3DgdhdNA9P3K4suBPpvUa2jg
+         qtcLAvS5SEchh/0ztzlRUNtkVxT8jpDbfoHCpDIZO0MTEQJFFffukHeb0Dqa3sjuXXLX
+         GvPnPZyScqfobbevql9qVe8xfsJS9OQP1QB2SJWRcq093vR7wtQd0NChYQNXRFl0AcMH
+         y5CbznQZqJm6S6PSlAkGvqvwxvilPQCnOnwwazE0WISiqblS+Ob2R31l232yR8faGwwC
+         gNWBDcpNIolkX2phBLHfx6YxjbssZ6NV4H8LGxERwqCXPasACg1+ukmcFERz4UItvJZY
+         GSDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUIrC2Dbc3982RGXaGIWrulVLDBiU9kVz/uNTPLjc7spAOFNtIhdnIYmuNc98JFGFviN+bAmXeDpKYQj5vr46z6UPwb
+X-Gm-Message-State: AOJu0YwoZMwJVPpnfDtFoPrnaZPU0m+xquqBlDIPc8HsFTjN9/N43jIM
+	tfjbSddeiCrLFf9qftWppOnQfJExx0DphiNkJzvaWp76r3tLrqu2/my2Nqzhso+zj3o+Usogahp
+	HufJwzMBFujC6A1EUynVUEwlCLe4cDJaa96Nk/dWFfmiIUtYMTA==
+X-Received: by 2002:a05:6214:4905:b0:6ab:8e10:8125 with SMTP id 6a1803df08f44-6ab8e1082c5mr22234796d6.2.1716453938119;
+        Thu, 23 May 2024 01:45:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFloMOgtR73Qon0kqp6JglicbZzgw8fwbykGxI2ZjtqO7BGrJ2ZQZCtjJd5lr8hvXwBh4rS0g==
+X-Received: by 2002:a05:6214:4905:b0:6ab:8e10:8125 with SMTP id 6a1803df08f44-6ab8e1082c5mr22234746d6.2.1716453937791;
+        Thu, 23 May 2024 01:45:37 -0700 (PDT)
+Received: from sgarzare-redhat (host-79-53-30-109.retail.telecomitalia.it. [79.53.30.109])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6a35e6c34a1sm75492576d6.14.2024.05.23.01.45.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 May 2024 01:45:37 -0700 (PDT)
+Date: Thu, 23 May 2024 10:45:31 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Alexander Graf <agraf@csgraf.de>
+Cc: Dorjoy Chowdhury <dorjoychy111@gmail.com>, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	Alexander Graf <graf@amazon.com>, stefanha@redhat.com
+Subject: Re: How to implement message forwarding from one CID to another in
+ vhost driver
+Message-ID: <6wn6ikteeanqmds2i7ar4wvhgj42pxpo2ejwbzz5t2i5cw3kov@omiadvu6dv6n>
+References: <CAFfO_h7xsn7Gsy7tFZU2UKcg_LCHY3M26iTuSyhFG-k-24h6_g@mail.gmail.com>
+ <4i525r6irzjgibqqtrs3qzofqfifws2k3fmzotg37pyurs5wkd@js54ugamyyin>
+ <CAFfO_h7iNYc3jrDvnAxTyaGWMxM9YK29DAGYux9s1ve32tuEBw@mail.gmail.com>
+ <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-23_04,2024-05-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 impostorscore=0 phishscore=0 bulkscore=0 spamscore=0
- mlxscore=0 mlxlogscore=724 clxscore=1015 adultscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405230055
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3a62a9d1-5864-4f00-bcf0-2c64552ee90c@csgraf.de>
 
-On Wed, 2024-05-22 at 20:20 -0300, Jason Gunthorpe wrote:
-> On Tue, May 21, 2024 at 02:14:59PM +0200, Niklas Schnelle wrote:
-> > With the introduction of memory I/O (MIO) instructions enbaled in commit
-> > 71ba41c9b1d9 ("s390/pci: provide support for MIO instructions") s390
-> > gained support for direct user-space access to mapped PCI resources.
-> > Even without those however user-space can access mapped PCI resources
-> > via the s390 specific MMIO syscalls. Thus VFIO_PCI_MMAP can be enabled
-> > on all s390 systems with native PCI allowing vfio-pci user-space
-> > applications direct access to mapped resources.
-> >=20
-> > Link: https://lore.kernel.org/all/c5ba134a1d4f4465b5956027e6a4ea6f6beff=
-969.camel@linux.ibm.com/
-> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> > ---
-> >  drivers/vfio/pci/Kconfig | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> > index 15821a2d77d2..814aa0941d61 100644
-> > --- a/drivers/vfio/pci/Kconfig
-> > +++ b/drivers/vfio/pci/Kconfig
-> > @@ -8,7 +8,7 @@ config VFIO_PCI_CORE
-> >  	select IRQ_BYPASS_MANAGER
-> >=20=20
-> >  config VFIO_PCI_MMAP
-> > -	def_bool y if !S390
-> > +	def_bool y
-> >  	depends on VFIO_PCI_CORE
->=20
-> Should we just purge this kconfig entirely? It is never meaningfully n no=
-w?
->=20
-> Jason
+On Tue, May 21, 2024 at 08:50:22AM GMT, Alexander Graf wrote:
+>Howdy,
+>
+>On 20.05.24 14:44, Dorjoy Chowdhury wrote:
+>>Hey Stefano,
+>>
+>>Thanks for the reply.
+>>
+>>
+>>On Mon, May 20, 2024, 2:55 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>>Hi Dorjoy,
+>>>
+>>>On Sat, May 18, 2024 at 04:17:38PM GMT, Dorjoy Chowdhury wrote:
+>>>>Hi,
+>>>>
+>>>>Hope you are doing well. I am working on adding AWS Nitro Enclave[1]
+>>>>emulation support in QEMU. Alexander Graf is mentoring me on this work. A v1
+>>>>patch series has already been posted to the qemu-devel mailing list[2].
+>>>>
+>>>>AWS nitro enclaves is an Amazon EC2[3] feature that allows creating isolated
+>>>>execution environments, called enclaves, from Amazon EC2 instances, which are
+>>>>used for processing highly sensitive data. Enclaves have no persistent storage
+>>>>and no external networking. The enclave VMs are based on Firecracker microvm
+>>>>and have a vhost-vsock device for communication with the parent EC2 instance
+>>>>that spawned it and a Nitro Secure Module (NSM) device for cryptographic
+>>>>attestation. The parent instance VM always has CID 3 while the enclave VM gets
+>>>>a dynamic CID. The enclave VMs can communicate with the parent instance over
+>>>>various ports to CID 3, for example, the init process inside an enclave sends a
+>>>>heartbeat to port 9000 upon boot, expecting a heartbeat reply, letting the
+>>>>parent instance know that the enclave VM has successfully booted.
+>>>>
+>>>>The plan is to eventually make the nitro enclave emulation in QEMU standalone
+>>>>i.e., without needing to run another VM with CID 3 with proper vsock
+>>>If you don't have to launch another VM, maybe we can avoid vhost-vsock
+>>>and emulate virtio-vsock in user-space, having complete control over the
+>>>behavior.
+>>>
+>>>So we could use this opportunity to implement virtio-vsock in QEMU [4]
+>>>or use vhost-user-vsock [5] and customize it somehow.
+>>>(Note: vhost-user-vsock already supports sibling communication, so maybe
+>>>with a few modifications it fits your case perfectly)
+>>>
+>>>[4] https://gitlab.com/qemu-project/qemu/-/issues/2095
+>>>[5] https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock
+>>
+>>
+>>Thanks for letting me know. Right now I don't have a complete picture
+>>but I will look into them. Thank you.
+>>>
+>>>
+>>>>communication support. For this to work, one approach could be to teach the
+>>>>vhost driver in kernel to forward CID 3 messages to another CID N
+>>>So in this case both CID 3 and N would be assigned to the same QEMU
+>>>process?
+>>
+>>
+>>CID N is assigned to the enclave VM. CID 3 was supposed to be the
+>>parent VM that spawns the enclave VM (this is how it is in AWS, where
+>>an EC2 instance VM spawns the enclave VM from inside it and that
+>>parent EC2 instance always has CID 3). But in the QEMU case as we
+>>don't want a parent VM (we want to run enclave VMs standalone) we
+>>would need to forward the CID 3 messages to host CID. I don't know if
+>>it means CID 3 and CID N is assigned to the same QEMU process. Sorry.
+>
+>
+>There are 2 use cases here:
+>
+>1) Enclave wants to treat host as parent (default). In this scenario, 
+>the "parent instance" that shows up as CID 3 in the Enclave doesn't 
+>really exist. Instead, when the Enclave attempts to talk to CID 3, it 
+>should really land on CID 0 (hypervisor). When the hypervisor tries to 
+>connect to the Enclave on port X, it should look as if it originates 
+>from CID 3, not CID 0.
+>
+>2) Multiple parent VMs. Think of an actual cloud hosting scenario. 
+>Here, we have multiple "parent instances". Each of them thinks it's 
+>CID 3. Each can spawn an Enclave that talks to CID 3 and reach the 
+>parent. For this case, I think implementing all of virtio-vsock in 
+>user space is the best path forward. But in theory, you could also 
+>swizzle CIDs to make random "real" CIDs appear as CID 3.
+>
 
-Makes sense to me. Will change this for v2. I'll also add a Suggested-
-by for you if that's okay, should probably have been in this version
-already.
+Thank you for clarifying the use cases!
+
+Also for case 1, vhost-vsock doesn't support CID 0, so in my opinion 
+it's easier to go into user-space with vhost-user-vsock or the built-in 
+device.
+
+Maybe initially with vhost-user-vsock it's easier because we already 
+have some thing that works and supports sibling communication (for case 
+2).
+
+>
+>>
+>>>Do you have to allocate 2 separate virtio-vsock devices, one for the
+>>>parent and one for the enclave?
+>>
+>>
+>>If there is a parent VM, then I guess both parent and enclave VMs need
+>>virtio-vsock devices.
+>>
+>>>>(set to CID 2 for host) i.e., it patches CID from 3 to N on incoming messages
+>>>>and from N to 3 on responses. This will enable users of the
+>>>Will these messages have the VMADDR_FLAG_TO_HOST flag set?
+>>>
+>>>We don't support this in vhost-vsock yet, if supporting it helps, we
+>>>might, but we need to better understand how to avoid security issues, so
+>>>maybe each device needs to explicitly enable the feature and specify
+>>>from which CIDs it accepts packets.
+>>
+>>
+>>I don't know about the flag. So I don't know if it will be set. Sorry.
+>
+>
+>From the guest's point of view, the parent (CID 3) is just another VM. 
+>Since Linux as of
+>
+> https://patchwork.ozlabs.org/project/netdev/patch/20201204170235.84387-4-andraprs@amazon.com/#2594117
+>
+>always sets VMADDR_FLAG_TO_HOST when local_CID > 0 && remote_CID > 0, I 
+>would say the message has the flag set.
+>
+>How would you envision the host to implement the flag? Would the host 
+>allow user space to listen on any CID and hence receive the respective 
+>target connections? And wouldn't listening on CID 0 then mean you're 
+>effectively listening to "any" other CID? Thinking about that a bit 
+>more, that may be just what we need, yes :)
+
+No, wait. The flag I had guessed only to implement sibling 
+communication, so the host doesn't re-forward those packets to sockets 
+opened by applications in the host, but only to other VMs in the same 
+host. So the host would always only have CID 2 assigned (CID 0 is not 
+supported by vhost-vsock).
+
+>
+>
+>>
+>>
+>>>>nitro-enclave machine
+>>>>type in QEMU to run the necessary vsock server/clients in the host machine
+>>>>(some defaults can be implemented in QEMU as well, for example, sending a reply
+>>>>to the heartbeat) which will rid them of the cumbersome way of running another
+>>>>whole VM with CID 3. This way, users of nitro-enclave machine in QEMU, could
+>>>>potentially also run multiple enclaves with their messages for CID 3 forwarded
+>>>>to different CIDs which, in QEMU side, could then be specified using a new
+>>>>machine type option (parent-cid) if implemented. I guess in the QEMU side, this
+>>>>will be an ioctl call (or some other way) to indicate to the host kernel that
+>>>>the CID 3 messages need to be forwarded. Does this approach of
+>>>What if there is already a VM with CID = 3 in the system?
+>>
+>>
+>>Good question! I don't know what should happen in this case.
+>
+>
+>See case 2 above :). In a nutshell, I don't think it'd be legal to 
+>have a real CID 3 in that scenario.
+
+Yeah, with vhost-vsock we can't, but with vhost-user-vsock I think is 
+fine since the guest CID is local for each instance. The host only sees
+the unix socket (like with firecracker).
+
+>
+>
+>>
+>>
+>>>>forwarding CID 3 messages to another CID sound good?
+>>>It seems too specific a case, if we can generalize it maybe we could
+>>>make this change, but we would like to avoid complicating vhost-vsock
+>>>and keep it as simple as possible to avoid then having to implement
+>>>firewalls, etc.
+>>>
+>>>So first I would see if vhost-user-vsock or the QEMU built-in device is
+>>>right for this use-case.
+>>Thanks you! I will check everything out and reach out if I need
+>>further guidance about what needs to be done. And sorry as I wasn't
+>>able to answer some of your questions.
+>
+>
+>As mentioned above, I think there is merit for both. I personally care 
+>a lot more for case 1 over case 2: We already have a working 
+>implementation of Nitro Enclaves in a Cloud setup. What is missing is 
+>a way to easily run a Nitro Enclave locally for development.
+
+If both are fine, then I would go more on modifying vhost-user-vsock or 
+adding a built-in device in QEMU.
+We have more freedom and also easier to update/debug.
 
 Thanks,
-Niklas
+Stefano
+
 
