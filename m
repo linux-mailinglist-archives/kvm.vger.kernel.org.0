@@ -1,83 +1,83 @@
-Return-Path: <kvm+bounces-18035-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18037-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1320C8CD0F1
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 13:11:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95F518CD0F7
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 13:12:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 366481C21435
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 11:11:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C73A2808BE
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 11:12:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBDF1487F5;
-	Thu, 23 May 2024 11:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1794B1465A0;
+	Thu, 23 May 2024 11:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FVqZfOF3"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N8Cmuh5t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FCB147C63;
-	Thu, 23 May 2024 11:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE0E145A11;
+	Thu, 23 May 2024 11:11:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716462639; cv=none; b=X479UOB83W+QMjcgRIFUNkHAtuSorWDzWh0gRv8qS5YrPIq7mUG0D2Mp11/tpTAz1lHUlTN9XxMBs6DEe/MC533XO9FKhyQPELNVZTDtkzJchCoLHE9WUN0v/xQ925ydj8Z86vO+4GGOLV8U+fANbZxd4YHKuYlq2V2QROs68IM=
+	t=1716462669; cv=none; b=uhMJ/zk5ZaiTgZ4zIW7cv7KgPl4mbKPwfWUPxfyrldzfEqjfx0yXfqSOo+dwpYhHZ/Kg1m8XHOHhCQnbKXkxzi1fCyhlL31d4dN1v19YaISEFiIS1fU1xu1NOEjUCK7xuHiG2uxdB9HMqRzy/drmRFLiO3MV6MH6YxWYkXSrCCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716462639; c=relaxed/simple;
-	bh=V9p54K0J4aEM5NILVOof+HaaDipCamwYqPH+otYYUpU=;
+	s=arc-20240116; t=1716462669; c=relaxed/simple;
+	bh=9h92woMooMl3UnL2kypvfI8Bf7RkEfan6j2YoC/grP8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=b1s7y+q3N/xx3m9ozs0cpntvkcvM5ELdwcdorl8eZPNdrGCpWMpA0Zbibpz06O1bejc04+cU6WdAJ2mr6QGOC2RT35CCfC/gk+IyEh5av9X0ZKGPqft1ux2etNjiIpXoo/rNCNxWYJgJEqTW5ABJJD8BH3ZXm2w3O+fKNxgDGjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FVqZfOF3; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:To:Cc; b=ef2QCGLWUlju3prtv39mEoiPSf9OfVrgpJGVjjftnc4AlyCv+jZe3GliBhtANOsvgvbEDanSlpvrw6vhaOQz/euSe3X4LHnMUIusMfhjLRIUovlTCTbzdBWaqTk5cYeawlWUOVJKtmDJd4jvcs4/rnwUK7hTipptZvcAPZ7oFXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=N8Cmuh5t; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44NArGvC015420;
-	Thu, 23 May 2024 11:10:35 GMT
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44NAuVX4012736;
+	Thu, 23 May 2024 11:11:06 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : date : subject :
  mime-version : content-type : content-transfer-encoding : message-id :
  references : in-reply-to : to : cc; s=pp1;
- bh=bUFP5CycpZZ5HV22vNMvqpWdG4N/x0IfliF7CPJsewA=;
- b=FVqZfOF3nJnThkGQJrcB64nGcL2Kh0vG5+RSe5WyERbmaYx1ymox+Ar1Sb7a3UX6OJq2
- 2dNfDMGlaGj5JwILk90BqXWo9ntKn9inkR/RlOCYQmqLUn1EtYqAc+43+fYOggM/HkuO
- KxxgyLDW72D2HL2DiND6KVBFEI7SSV2FFAVlpbt53JNOlaXUkVRoIsEMMSlWuVoTB/d8
- bkbSqipuDiV91bFZzbWka+BPTmcC8EcxR9mt0jflCHVQ+9WTLzpYYWjuW9yiHO1aQnLj
- 3oJOYi6kP7JLkwcZ/yTKswlMqd638AimC7CH2TYuNfWtGUnSENNakGGucvjOLnZ8QrZv Qg== 
+ bh=4vhUEqiabPhzigiMYomjmv/L8qT55BUby37dsyFtlO4=;
+ b=N8Cmuh5tocDif4yvgGv1oFl64fCrepPJ9YTqMBVStaEbE8DCpWRJm4/gKSr7247gIj7Y
+ JtEi5c4HZ5oku6Md0ZGSLh4DUrJDGjyKdeb06IMZLwsjD6nCzEQPoJWHpOCJxvu3Eyqa
+ iXDXcJ18Me1NiNqPvPrLDRVWgRj6kP9mLDM+HU8xYstXMmMel6/zxwJwHLTbwx5moItC
+ LhKptwRoRZavb5hLSGNpLsNT98VMmHjbvNmTrfD4kP3iFN+phXEl6kc5e6/luE6T5xGx
+ fmfCzMyuknJ9gmv+7LVB0Rc/gQMNInGKUZCKpKeNmnwroxeyzIz/c9QQj95HuVuRJg8v Kg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya4edr1fu-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya20rrfh7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 11:10:35 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44NBAYau009744;
-	Thu, 23 May 2024 11:10:34 GMT
+	Thu, 23 May 2024 11:11:06 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44NBB5kV005709;
+	Thu, 23 May 2024 11:11:05 GMT
 Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya4edr1fr-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya20rrfg9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 11:10:34 +0000
+	Thu, 23 May 2024 11:10:38 +0000
 Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44N7oTtG026478;
-	Thu, 23 May 2024 11:10:34 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y785msghu-1
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44N8ADSP026474;
+	Thu, 23 May 2024 11:10:37 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y785msgj1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 11:10:34 +0000
+	Thu, 23 May 2024 11:10:37 +0000
 Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44NBAUvd27132424
+	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44NBAXFx8061468
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2024 11:10:33 GMT
+	Thu, 23 May 2024 11:10:35 GMT
 Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DADE458056;
-	Thu, 23 May 2024 11:10:30 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8C93658052;
+	Thu, 23 May 2024 11:10:33 +0000 (GMT)
 Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7E7EF58045;
-	Thu, 23 May 2024 11:10:28 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 324A658064;
+	Thu, 23 May 2024 11:10:31 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
 	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 23 May 2024 11:10:28 +0000 (GMT)
+	Thu, 23 May 2024 11:10:31 +0000 (GMT)
 From: Niklas Schnelle <schnelle@linux.ibm.com>
-Date: Thu, 23 May 2024 13:10:14 +0200
-Subject: [PATCH v2 1/3] s390/pci: Fix s390_mmio_read/write syscall page
- fault handling
+Date: Thu, 23 May 2024 13:10:15 +0200
+Subject: [PATCH v2 2/3] vfio/pci: Tolerate oversized BARs by disallowing
+ mmap
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,7 +86,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240523-vfio_pci_mmap-v2-1-0dc6c139a4f1@linux.ibm.com>
+Message-Id: <20240523-vfio_pci_mmap-v2-2-0dc6c139a4f1@linux.ibm.com>
 References: <20240523-vfio_pci_mmap-v2-0-0dc6c139a4f1@linux.ibm.com>
 In-Reply-To: <20240523-vfio_pci_mmap-v2-0-0dc6c139a4f1@linux.ibm.com>
 To: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
@@ -102,79 +102,73 @@ Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>,
         Jason Gunthorpe <jgg@ziepe.ca>
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1929;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1976;
  i=schnelle@linux.ibm.com; h=from:subject:message-id;
- bh=V9p54K0J4aEM5NILVOof+HaaDipCamwYqPH+otYYUpU=;
- b=owGbwMvMwCH2Wz534YHOJ2GMp9WSGNL8VRSVTt048ayW409BpsqFyI9GvTo1efy571dUmEv7i
- W7LWjS7o5SFQYyDQVZMkWVRl7PfuoIppnuC+jtg5rAygQxh4OIUgIlYGTMyPLf0YzE4l74tW/aL
- dLxZeDlvVr3kYbkbBzRmLOf+KOewlJFh++F9xXwaxx9e0t9U4Hj7UnGH38fnEj8NDe/JdYSrn6t
- mBAA=
+ bh=9h92woMooMl3UnL2kypvfI8Bf7RkEfan6j2YoC/grP8=;
+ b=owGbwMvMwCH2Wz534YHOJ2GMp9WSGNL8VRTvCRn+mx0Xeyb1W1YDF8OBwseuCkpPJmTVPhD9z
+ 2v80Ka8o5SFQYyDQVZMkWVRl7PfuoIppnuC+jtg5rAygQxh4OIUgImc4mb4X7Xy5ewvU85Vaz2s
+ OLjdMdyExfjhxmCX2vrKe3UCPabrbBkZZt1fvSNTL+6eI7vL4ulFk6ZWR5xY/MXFSbK9PX2pjUM
+ cLwA=
 X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
  fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: iGZWZvNzKYdq6YLi-4JCW5cmVp9v1HQP
-X-Proofpoint-ORIG-GUID: k7dGvF_7I8BFoeEYrO8o0_q_BADXgR94
+X-Proofpoint-GUID: n2Bhay_KVzIppJzu2WO6CADZYFHUvhnD
+X-Proofpoint-ORIG-GUID: p6NNyfaFozhoYhlDfarBpulVQ2-cNG6j
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
  definitions=2024-05-23_07,2024-05-23_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 adultscore=0 mlxscore=0 impostorscore=0 bulkscore=0
- phishscore=0 priorityscore=1501 clxscore=1015 spamscore=0 malwarescore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2405230075
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ spamscore=0 priorityscore=1501 mlxscore=0 bulkscore=0 impostorscore=0
+ clxscore=1015 phishscore=0 adultscore=0 mlxlogscore=999 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
+ definitions=main-2405230076
 
-The s390 MMIO syscalls when using the classic PCI instructions do not
-cause a page fault when follow_pte() fails due to the page not being
-present. Besides being a general deficiency this breaks vfio-pci's mmap()
-handling once VFIO_PCI_MMAP gets enabled as this lazily maps on first
-access. Fix this by following a failed follow_pte() with
-fixup_user_page() and retrying the follow_pte().
+On s390 there is a virtual PCI device called ISM which has a few rather
+annoying oddities. For one it claims to have a 256 TiB PCI BAR (not
+a typo) which leads to any attempt to mmap() it failing during vmap.
+
+Even if one tried to map this "BAR" only partially the mapping would not
+be usable on systems with MIO support enabled however. This is because
+of another oddity in that this virtual PCI device does not support the
+newer memory I/O (MIO) PCI instructions and legacy PCI instructions are
+not accessible by user-space when MIO is in use. If this device needs to
+be accessed by user-space it will thus need a vfio-pci variant driver.
+Until then work around both issues by excluding resources which don't
+fit between IOREMAP_START and IOREMAP_END in vfio_pci_probe_mmaps().
 
 Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
 ---
- arch/s390/pci/pci_mmio.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ drivers/vfio/pci/vfio_pci_core.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/s390/pci/pci_mmio.c b/arch/s390/pci/pci_mmio.c
-index a90499c087f0..217defbcb4f1 100644
---- a/arch/s390/pci/pci_mmio.c
-+++ b/arch/s390/pci/pci_mmio.c
-@@ -170,8 +170,12 @@ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
- 		goto out_unlock_mmap;
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index d94d61b92c1a..23961299b695 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -28,6 +28,7 @@
+ #include <linux/nospec.h>
+ #include <linux/sched/mm.h>
+ #include <linux/iommufd.h>
++#include <linux/ioremap.h>
+ #if IS_ENABLED(CONFIG_EEH)
+ #include <asm/eeh.h>
+ #endif
+@@ -129,9 +130,12 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+ 		/*
+ 		 * The PCI core shouldn't set up a resource with a
+ 		 * type but zero size. But there may be bugs that
+-		 * cause us to do that.
++		 * cause us to do that. There is also at least one
++		 * device which advertises a resource too large to
++		 * ioremap().
+ 		 */
+-		if (!resource_size(res))
++		if (!resource_size(res) ||
++		    resource_size(res) > (IOREMAP_END + 1 - IOREMAP_START))
+ 			goto no_mmap;
  
- 	ret = follow_pte(vma->vm_mm, mmio_addr, &ptep, &ptl);
--	if (ret)
--		goto out_unlock_mmap;
-+	if (ret) {
-+		fixup_user_fault(vma->vm_mm, mmio_addr, FAULT_FLAG_WRITE, NULL);
-+		ret = follow_pte(vma->vm_mm, mmio_addr, &ptep, &ptl);
-+		if (ret)
-+			goto out_unlock_mmap;
-+	}
- 
- 	io_addr = (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
- 			(mmio_addr & ~PAGE_MASK));
-@@ -305,12 +309,16 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
- 	if (!(vma->vm_flags & (VM_IO | VM_PFNMAP)))
- 		goto out_unlock_mmap;
- 	ret = -EACCES;
--	if (!(vma->vm_flags & VM_WRITE))
-+	if (!(vma->vm_flags & VM_READ))
- 		goto out_unlock_mmap;
- 
- 	ret = follow_pte(vma->vm_mm, mmio_addr, &ptep, &ptl);
--	if (ret)
--		goto out_unlock_mmap;
-+	if (ret) {
-+		fixup_user_fault(vma->vm_mm, mmio_addr, 0, NULL);
-+		ret = follow_pte(vma->vm_mm, mmio_addr, &ptep, &ptl);
-+		if (ret)
-+			goto out_unlock_mmap;
-+	}
- 
- 	io_addr = (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
- 			(mmio_addr & ~PAGE_MASK));
+ 		if (resource_size(res) >= PAGE_SIZE) {
 
 -- 
 2.40.1
