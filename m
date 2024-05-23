@@ -1,226 +1,145 @@
-Return-Path: <kvm+bounces-18047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3CF38CD5A9
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 16:25:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B81898CD5C6
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 16:29:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7977E28201E
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 14:25:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAB8C1C2156A
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 14:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0902514BF86;
-	Thu, 23 May 2024 14:25:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63A7D14E2F6;
+	Thu, 23 May 2024 14:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N9UVvaN9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DPoZ3Ezo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB891DFF7
-	for <kvm@vger.kernel.org>; Thu, 23 May 2024 14:25:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1738C14D702;
+	Thu, 23 May 2024 14:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716474342; cv=none; b=TJXO0WWcZu47KSewMR/djjoZCkihIXvayb09wrWfkXeeRc5dfWH0w/IwPMFaunsetyRZ+aOoSLjtCtXkQLpPTd3f8CMG8sIujdZxuiGbSdxuyyV3JzCESkkYjVAJDXTBCyw2gyMf9CAS9dNO98SWDD7G6PqXivNptWvvjWGpBBM=
+	t=1716474540; cv=none; b=LpVs7R+WhTIVXOnaUYOKo/UIKbgf/8oMoY5V+AMhtIzIRhBUjkSOcxEvHjtY1/dFJOeUDOEfb4+PQIB8GztbyreygM7pjdPsrgOyXu/YkGzDHlxPgKmq1d2Va7qzvP06/4LtxjuM/sziw+fPAGyJLwL+zNoECkwX2WPI2e6ggvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716474342; c=relaxed/simple;
-	bh=WuPaGTIYhYa0lrEbi1ktl5zLyKUvI4hHjVWMWuH9sjA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IUHZO2x6GBxBLxTj1w+G8l5SXlTej/l8D1p1Jy3zRzkOcYUdoUKOvtOpw+q+LppKHSs2AJ20ZbRZVNs5+Dueb1trNnUDqyQTa+aIH/aFB6OeU2ObWb53Ta4qX1toeRYDdb5LzdBbtLcLQJHAwwoerLEBUlZVN11Zc8wdYHuzMpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=N9UVvaN9; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44NEDBhR012525;
-	Thu, 23 May 2024 14:25:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=zVanIShsaKsEqSOZSk7Rv0o40KccDjs+kXnNjUAS+fs=;
- b=N9UVvaN9qSC1gM+688Ohqywor6pTeV2UfYlK42Du39ttfaQx6d6D3jf8Mocwfgibjz7f
- 8gPZEZZjEEvCRcQIjGax2JHWeu4qYNJmHarwC3lLuKexOunMqDKRp/kX6AR05p7FiVOa
- VIdbGOrD9oHAMBrxT826rp6/U9d0bPa471hSTFb64PwS876U/HHxscMTAon+bOG4i0r5
- KYaoSZd0sCtaf72WohQg6oo9ZBB8dhDWcEIScU82cgTzGPOGdANBfg3xZ2bM2GC1utVV
- uoL1oRVDFqF4T4EsKREcczkucSzM8JioVQUXyBpd9h4Jy2cC5iruYhsDpM0tt75QEZ09 Pw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya7c401ek-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 14:25:28 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44NEPR5S000346;
-	Thu, 23 May 2024 14:25:27 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya7c401ea-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 14:25:27 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44NEFdxp023469;
-	Thu, 23 May 2024 14:25:26 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y77npjgnq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 23 May 2024 14:25:26 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44NEPMC946399900
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 23 May 2024 14:25:24 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3AFF420043;
-	Thu, 23 May 2024 14:25:22 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E054D20040;
-	Thu, 23 May 2024 14:25:21 +0000 (GMT)
-Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.152.224.238])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 23 May 2024 14:25:21 +0000 (GMT)
-Message-ID: <66a7077c5df86d0a541237996382ae583d690a14.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 11/11] KVM: arm64: Get rid of the AArch32 register
- mapping code
-From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To: Marc Zyngier <maz@kernel.org>, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-        Julien Thierry
- <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Andrew Scull <ascull@google.com>, Will Deacon <will@kernel.org>,
-        Mark
- Rutland <mark.rutland@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        David
- Brazdil <dbrazdil@google.com>, kernel-team@android.com
-Date: Thu, 23 May 2024 16:25:21 +0200
-In-Reply-To: <20201102164045.264512-12-maz@kernel.org>
-References: <20201102164045.264512-1-maz@kernel.org>
-	 <20201102164045.264512-12-maz@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1716474540; c=relaxed/simple;
+	bh=72GHj4XW1iEFGCK3IQFxoVMONTgOnHEZr3WU2VBbvg4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lnbMDGQ1xvgvlZoawpI7jK3izdbsvIOaTcW9FwYuG0DMYfIjISjUEP8ZhDNNctrAIeLWGs9Gq80XhXFA4KMgRCZ+W1oiR4+xEPaQa8SClZDzMRZlyU26ao3uF5KsILoWQe1GGkrlx9CcnZVwPIse8bHeN+HBBdlm5ULwxQvwXws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DPoZ3Ezo; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716474539; x=1748010539;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=72GHj4XW1iEFGCK3IQFxoVMONTgOnHEZr3WU2VBbvg4=;
+  b=DPoZ3EzoFsP0T70tptpAUwembS1upyiU3szQx6lc3MKe9MlNR1UE2rWP
+   q6qIAf+L5ODsn6mRt87Jq6IKm++prmCRn+VSSfcFbRRbDeBrDxfTiGMnw
+   V5Xbtf89x4mqvBqwKOxsB+eqORsKe96X5yCVm6esqQoUr7hlRSq2srBEr
+   o9Hbbzm4CBAKmkKj+XsN1+a9BcX3e/RvRiA8PIK8tU8NM9+jiUT3SJhMp
+   DOX5Q8lgVplpYo7nMWH/Ub1Fx2cCFZ5o47qQLt9bNvF6y2jpWA4b21dkw
+   lIL4Z5Pg9sr8gXVLy4CfUuCpUQ2d6DdoIZbnpCH4EYVO/tbCGSfErjaA9
+   w==;
+X-CSE-ConnectionGUID: Oxukt8yMTWe+W5Vagg5B1A==
+X-CSE-MsgGUID: MDGD08nhSuOWqV3Pb1S9lQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11081"; a="12734297"
+X-IronPort-AV: E=Sophos;i="6.08,182,1712646000"; 
+   d="scan'208";a="12734297"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2024 07:28:45 -0700
+X-CSE-ConnectionGUID: WD8LuFjYQUKjwD9Pyw0wLw==
+X-CSE-MsgGUID: k7hMpS93Q32XpqOzupZxZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,182,1712646000"; 
+   d="scan'208";a="64521364"
+Received: from kinlongk-desk.amr.corp.intel.com (HELO [10.125.110.49]) ([10.125.110.49])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2024 07:28:44 -0700
+Message-ID: <a04d82be-a0d6-4e53-b47c-dba8402199e7@intel.com>
+Date: Thu, 23 May 2024 07:28:44 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: dIS4mzedkeYOUhEU40jF8cSIVctJGfFw
-X-Proofpoint-GUID: mDZJ3ICKHzZwW-sjSEVq4XxZ_Fr66Cxr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-05-23_09,2024-05-23_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
- adultscore=0 priorityscore=1501 suspectscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=999 clxscore=1011 phishscore=0 bulkscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2405230099
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] x86/bhi: BHI mitigation can trigger warning in #DB
+ handler
+To: Alexandre Chartre <alexandre.chartre@oracle.com>, x86@kernel.org,
+ kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, daniel.sneddon@linux.intel.com,
+ pawan.kumar.gupta@linux.intel.com, tglx@linutronix.de,
+ konrad.wilk@oracle.com, peterz@infradead.org, gregkh@linuxfoundation.org,
+ seanjc@google.com, andrew.cooper3@citrix.com, dave.hansen@linux.intel.com,
+ nik.borisov@suse.com, kpsingh@kernel.org, longman@redhat.com, bp@alien8.de,
+ pbonzini@redhat.com
+References: <20240523123322.3326690-1-alexandre.chartre@oracle.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <20240523123322.3326690-1-alexandre.chartre@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2020-11-02 at 16:40 +0000, Marc Zyngier wrote:
+On 5/23/24 05:33, Alexandre Chartre wrote:
+> The problem can be reproduced with the following sequence:
+> 
+>  $ cat sysenter_step.c
+>  int main()
+>  { asm("pushf; pop %ax; bts $8,%ax; push %ax; popf; sysenter"); }
+> 
+>  $ gcc -o sysenter_step sysenter_step.c
+> 
+>  $ ./sysenter_step
+>  Segmentation fault (core dumped)
+> 
+> The program is expected to crash, and the #DB handler will issue a warning.
 
-[...]
-
-> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> index dfb5218137ca..3f23f7478d2a 100644
-> --- a/arch/arm64/kvm/guest.c
-> +++ b/arch/arm64/kvm/guest.c
-> @@ -252,10 +252,32 @@ static int set_core_reg(struct kvm_vcpu *vcpu, cons=
-t struct kvm_one_reg *reg)
->  	memcpy(addr, valp, KVM_REG_SIZE(reg->id));
-
-I was looking at KVM_(G|S)ET_ONE_REG implementations and something looks of=
-f to me here:
-
-...
-
-	if (off =3D=3D KVM_REG_ARM_CORE_REG(regs.pstate)) {
-		u64 mode =3D (*(u64 *)valp) & PSR_AA32_MODE_MASK;
-		switch (mode) {
-
-Masking and switch over mode here...
-
-		case PSR_AA32_MODE_USR:
-			if (!kvm_supports_32bit_el0())
-				return -EINVAL;
-			break;
-		case PSR_AA32_MODE_FIQ:
-		case PSR_AA32_MODE_IRQ:
-...
-> =20
->  	if (*vcpu_cpsr(vcpu) & PSR_MODE32_BIT) {
-> -		int i;
-> +		int i, nr_reg;
-> +
-> +		switch (*vcpu_cpsr(vcpu)) {
-
-...but switching over mode without masking here.
-I don't know if this is as intended, but I thought I'd mention it.
-
-> +		/*
-> +		 * Either we are dealing with user mode, and only the
-> +		 * first 15 registers (+ PC) must be narrowed to 32bit.
-> +		 * AArch32 r0-r14 conveniently map to AArch64 x0-x14.
-> +		 */
-> +		case PSR_AA32_MODE_USR:
-> +		case PSR_AA32_MODE_SYS:
-> +			nr_reg =3D 15;
-> +			break;
-> +
-> +		/*
-> +		 * Otherwide, this is a priviledged mode, and *all* the
-> +		 * registers must be narrowed to 32bit.
-> +		 */
-> +		default:
-> +			nr_reg =3D 31;
-> +			break;
-> +		}
-> +
-> +		for (i =3D 0; i < nr_reg; i++)
-> +			vcpu_set_reg(vcpu, i, (u32)vcpu_get_reg(vcpu, i));
-> =20
-> -		for (i =3D 0; i < 16; i++)
-> -			*vcpu_reg32(vcpu, i) =3D (u32)*vcpu_reg32(vcpu, i);
-> +		*vcpu_pc(vcpu) =3D (u32)*vcpu_pc(vcpu);
->  	}
->  out:
->  	return err;
-> diff --git a/arch/arm64/kvm/regmap.c b/arch/arm64/kvm/regmap.c
-> deleted file mode 100644
-> index ae7e290bb017..000000000000
-> --- a/arch/arm64/kvm/regmap.c
-> +++ /dev/null
-> @@ -1,128 +0,0 @@
-
-[...]
-
-> -unsigned long *vcpu_reg32(const struct kvm_vcpu *vcpu, u8 reg_num)
-> -{
-> -	unsigned long *reg_array =3D (unsigned long *)&vcpu->arch.ctxt.regs;
-> -	unsigned long mode =3D *vcpu_cpsr(vcpu) & PSR_AA32_MODE_MASK;
-
-There used to be masking here at least.
-> -
-> -	switch (mode) {
-> -	case PSR_AA32_MODE_USR ... PSR_AA32_MODE_SVC:
-> -		mode &=3D ~PSR_MODE32_BIT; /* 0 ... 3 */
-> -		break;
-> -
-> -	case PSR_AA32_MODE_ABT:
-> -		mode =3D 4;
-> -		break;
-> -
-> -	case PSR_AA32_MODE_UND:
-> -		mode =3D 5;
-> -		break;
-> -
-> -	case PSR_AA32_MODE_SYS:
-> -		mode =3D 0;	/* SYS maps to USR */
-> -		break;
-> -
-> -	default:
-> -		BUG();
-> -	}
-> -
-> -	return reg_array + vcpu_reg_offsets[mode][reg_num];
-> -}
-
+Should we wrap up this gem and put it with the other entry selftests?
 
