@@ -1,127 +1,97 @@
-Return-Path: <kvm+bounces-18023-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18024-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFCEC8CCEBE
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 11:06:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A498CCFBD
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 11:57:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CEBA1C213A7
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 09:06:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1298B28401A
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 09:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A4313D276;
-	Thu, 23 May 2024 09:06:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="D2h6Gblt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC8CE13DDCB;
+	Thu, 23 May 2024 09:57:45 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D90DB13CF93
-	for <kvm@vger.kernel.org>; Thu, 23 May 2024 09:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795C013D521;
+	Thu, 23 May 2024 09:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716455168; cv=none; b=bb36v/dFQ/aQIXr7U4zKYnmlsHPyTMsusWFNOnglbfhlJ1/qP1Vb2IQIA7VdejUFsHyJLUJsFofgT36TWMx8oosZ0zWUs78bRAPAR5KC+4Ax0YnYxvDO88BjwkorkagM6UVP+A0KMvCHoPACPGLyaiaRSpix7wGwx0+kNK5FI6I=
+	t=1716458265; cv=none; b=d5/RhHGwJXZxl9396qqnNQDwtyY0Aj1xqmMOzNtoj5OhaIgHCu6A9GNiIlg6Kb6FLZTXChmCwir+Nb2dDULzNJDdd/gu8MmGpIlLVQ8D3AJkH8RF3KeA949f8D4Nklw/8cweFLftRZLNt3MAVoLBI7nwW9s+IFjBg+xjmibmdqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716455168; c=relaxed/simple;
-	bh=zAGC0q3zb/kUKLlN7+r/uiMOW4NzeKphfhi7MnVOhxo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/Hlai1PXT1d31c4CpHKu7m8T7gOdU3EKAdtOv41vuplKvMFpodQmuBhlNzZgXd0Kr+nryftHXYaHE04GAb20L5dbBKFLECSsXOC/w8Z4NjI3wDTnZ+S/2zBW1oozQgNdIiFbYmpbEV93dD2QZS59Dg8XxflwiS3GU6Z/AfH/iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=D2h6Gblt; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a59a0e4b773so1070512966b.2
-        for <kvm@vger.kernel.org>; Thu, 23 May 2024 02:06:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1716455165; x=1717059965; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4l5zU20cndw6hYAB3MUXx+3Gbe6LL2k71CJyaDseujw=;
-        b=D2h6GbltyI4M7OT8AraTGlHcftzZRO7aHGAy6Z6MLgISZUMLuEu+FzJnyYkF9/PHV3
-         +GMSpRc/rS+3Lpj3AW7hD9PqXfwMBB7G0yLDG6IR5WwUIUTOvoVPwYXzaCxJiMS1wZiE
-         GcP2/FbZVAvKgsvJl1lziTzSD1IN/vIpkpzCsx3B6MVuZECwlIoxisEUwXlz0eF+nW8Z
-         9cuzk2o3UpWqaqLQJbqoLYB51Gs9EImsOxGsqEnQc3zg+2bN67NKWkr4f5ilfakKPtgl
-         38WuAn4dLO9fGr+ajKoF/QZkvE3R9MGVG4KIVKpOWqbn+uuhRcfa1sDi0LXH3NR0vZda
-         bzag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716455165; x=1717059965;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4l5zU20cndw6hYAB3MUXx+3Gbe6LL2k71CJyaDseujw=;
-        b=kxBfT3AFScnj3klaSFiQwmwZnIyGloJj2Eoj6Wcx/I7mBqDGAmKmQzM5ID5rZq28fQ
-         YK6uiV5gjtQ913Zhw+ChW8fFRGUD5gUTjbfN5kqZxcWhz952N7Ga8HiFJt+fuoMz5e9B
-         +ZVlLWxDdDLq3xv+MKNTUxhyNHjejktDwVDcq5o49yP09eBVgNxQ8FG1I0PxaM5a9DT3
-         4rOuz5LG/yPO+XMfHvEVL5GZzGThmvlt/6I9TDZx+lZgELFDgNJ2QB5lSAOxhf9NDkB8
-         VR8Av700uky51P4PnQkah71LhxBwbCqWqZZ5WYrrqgmNHhEV1sp2k+gFTtIzon1CYZgf
-         sb4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU0oCiGeAmodIv+j/k2mKyZ7STF7v9RxpmBA0ibnX/+ntRr6IZ/I/ZvGeS4Y5tmCYfRki+5KXmuR9yitPJjH6NcAD5h
-X-Gm-Message-State: AOJu0Yygkf15lYDH/6XIZWSysjvhog+c92umsntdo3XpzH0KzDk4tPfo
-	C8oussnrkNEgX8ZG8jnYZ0ZjRBjP7QXQDd2bIRyAk0bWmBKjfWjXA7diA4c6i1A=
-X-Google-Smtp-Source: AGHT+IG/+kNSZwH/WitEGN5akql9DZcvaGdZF5htf4Rc1hKQs5Ev4o2xODzuMiJrZHse607olITOWA==
-X-Received: by 2002:a17:907:9148:b0:a59:a5c3:819e with SMTP id a640c23a62f3a-a622805e75cmr232911766b.11.1716455165190;
-        Thu, 23 May 2024 02:06:05 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a622bd91be5sm213204766b.33.2024.05.23.02.06.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 02:06:04 -0700 (PDT)
-Date: Thu, 23 May 2024 11:06:03 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: zhouquan@iscas.ac.cn
-Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] RISC-V: KVM: Fix incorrect reg_subtype labels in
- kvm_riscv_vcpu_set_reg_isa_ext function
-Message-ID: <20240523-9c0425e6b3c697abc1009123@orel>
-References: <ff1c6771a67d660db94372ac9aaa40f51e5e0090.1716429371.git.zhouquan@iscas.ac.cn>
+	s=arc-20240116; t=1716458265; c=relaxed/simple;
+	bh=pJ+B3e29HJAbTyYyZa4HUjzMSv5Rh0HroDPaliFp3ZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oKupF983S0+z5AWBCG6IDUtsR13Xt5XPGov8KcscIEA3AfkXqi7D1Nym12QNnUaFCf6UtJTMveLbarBX+DTusJ4edChX65UL1zI/PR2XHFs9QN8JZKZjV2atyc4XE0L6uyZliznM8FLFvmKNH3yzMTz5KgUpCOBJc2L9wxS5h6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9A3C82F4;
+	Thu, 23 May 2024 02:58:06 -0700 (PDT)
+Received: from [10.1.30.34] (e122027.cambridge.arm.com [10.1.30.34])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF8003F766;
+	Thu, 23 May 2024 02:57:39 -0700 (PDT)
+Message-ID: <c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com>
+Date: Thu, 23 May 2024 10:57:37 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff1c6771a67d660db94372ac9aaa40f51e5e0090.1716429371.git.zhouquan@iscas.ac.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, Marc Zyngier
+ <maz@kernel.org>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-13-steven.price@arm.com> <ZkSV7Z8QFQYLETzD@arm.com>
+ <74011ac1-34e0-4ee3-a00d-f78ad334fce2@arm.com> <Zk4l2xFBDW_3ImFD@arm.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <Zk4l2xFBDW_3ImFD@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 23, 2024 at 10:13:34AM GMT, zhouquan@iscas.ac.cn wrote:
-> From: Quan Zhou <zhouquan@iscas.ac.cn>
+On 22/05/2024 18:05, Catalin Marinas wrote:
+> On Wed, May 22, 2024 at 04:52:45PM +0100, Steven Price wrote:
+>> On 15/05/2024 12:01, Catalin Marinas wrote:
+>>> On Fri, Apr 12, 2024 at 09:42:11AM +0100, Steven Price wrote:
+>>>> @@ -3432,7 +3468,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>>>  	nr_ites = max(2, nvecs);
+>>>>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+>>>>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+>>>> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+>>>> +	itt_order = get_order(sz);
+>>>> +	page = its_alloc_shared_pages_node(its->numa_node,
+>>>> +					   GFP_KERNEL | __GFP_ZERO,
+>>>> +					   itt_order);
+>>>
+>>> How much do we waste by going for a full page always if this is going to
+>>> be used on the host?
+>>
+>> sz is a minimum of ITS_ITT_ALIGN*2-1 - which is 511 bytes. So
+>> potentially PAGE_SIZE-512 bytes could be wasted here (minus kmalloc
+>> overhead).
 > 
-> In the function kvm_riscv_vcpu_set_reg_isa_ext, the original code
-> used incorrect reg_subtype labels KVM_REG_RISCV_SBI_MULTI_EN/DIS.
-> These have been corrected to KVM_REG_RISCV_ISA_MULTI_EN/DIS respectively.
-> Although they are numerically equivalent, the actual processing
-> will not result in errors, but it may lead to ambiguous code semantics.
+> That I figured out as well but how many times is this path called with a
+> size smaller than a page?
 > 
-> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
-> ---
->  arch/riscv/kvm/vcpu_onereg.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-> index c676275ea0a0..62874fbca29f 100644
-> --- a/arch/riscv/kvm/vcpu_onereg.c
-> +++ b/arch/riscv/kvm/vcpu_onereg.c
-> @@ -724,9 +724,9 @@ static int kvm_riscv_vcpu_set_reg_isa_ext(struct kvm_vcpu *vcpu,
->  	switch (reg_subtype) {
->  	case KVM_REG_RISCV_ISA_SINGLE:
->  		return riscv_vcpu_set_isa_ext_single(vcpu, reg_num, reg_val);
-> -	case KVM_REG_RISCV_SBI_MULTI_EN:
-> +	case KVM_REG_RISCV_ISA_MULTI_EN:
->  		return riscv_vcpu_set_isa_ext_multi(vcpu, reg_num, reg_val, true);
-> -	case KVM_REG_RISCV_SBI_MULTI_DIS:
-> +	case KVM_REG_RISCV_ISA_MULTI_DIS:
->  		return riscv_vcpu_set_isa_ext_multi(vcpu, reg_num, reg_val, false);
->  	default:
->  		return -ENOENT;
-> 
-> base-commit: 29c73fc794c83505066ee6db893b2a83ac5fac63
-> -- 
-> 2.34.1
-> 
->
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+That presumably depends on the number of devices in the guest. For my
+test guest setup (using kvmtool) this is called 3 times each with sz=511.
+
+Steve
+
 
