@@ -1,279 +1,185 @@
-Return-Path: <kvm+bounces-18033-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18034-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 949ED8CD0A5
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 12:47:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A354D8CD0EC
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 13:11:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 079BF1F24213
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 10:47:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59675281A6A
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 11:11:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B81B7144D15;
-	Thu, 23 May 2024 10:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73051147C8B;
+	Thu, 23 May 2024 11:10:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GWlZ/vD6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="d6OCJ6BT"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AC08140394
-	for <kvm@vger.kernel.org>; Thu, 23 May 2024 10:46:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E284146D52;
+	Thu, 23 May 2024 11:10:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716461213; cv=none; b=p4sVdUR2RLA/8L4QW00+nqC4IAnFb7QUCjK8nOMVYUOMQA+uSxZx+FLJAra3vI2wtlgpUG0G/24XIPJbsm4rlrDkGwSfQh3coOwYJZG5sv90Z4jTAMwhf2BfMSMK4GEnIVBMczrNVSq571A0k/3VPvht4G4DtSUG7X87gbYl5TU=
+	t=1716462636; cv=none; b=BHoW8H8+fzeJZy6Sgva92S3Od1aeXN8S1Wl1mzxoa8OX5XAJ9p9Y4dVLWuAkH+bWUzBLD8ecA7rieB/+97v0QI/RDvW2L5g4fCrnVa/Z30A/eI2t3FYD+BcEqWSrrDM5SJYXt0r4FOz+k8ZZifEfc7rpCJDCtsHLv+ElAJkVE5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716461213; c=relaxed/simple;
-	bh=iQ3P7ytni9AIjalxjfPLxS1i4uht+yfn7fa1wRJhkPE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iqglufQOmaeKRhWgLWJKV1ChkiPPONSV6rShpTNeaKwLXBOYo9dno4G+n/faT7OZWfP/VRWvoV758Ot89uoRXEkoAOYQUqgtlR4arblvAJw08xhoN1ZpOOPbo1yvJyEQm+b5gnGfrZrn77xhMoaGxHdq/d550yzPRMkmygDiyuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GWlZ/vD6; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716461210;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZyjB8EQOWovyipEoWCgaFp7DoAbCqwJISn6BYO3MOco=;
-	b=GWlZ/vD6zXp96PEJlq5qkNbd3bgYR932mHdvmMo5kU8UBnOi7hRjpoo3ad7zEQwqPgsSzG
-	ExYpUWELsuhzNPFTbjkbx0DyOR95lRWqUo3j1HNy5yjkTqgJf3qjHuhf0Fs1iwariPS8Mh
-	PekWhj62qOYcDjdBIC60mrEXj5zyBoQ=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-ZiwaUbK6Pz25JwXMIaInVw-1; Thu, 23 May 2024 06:46:49 -0400
-X-MC-Unique: ZiwaUbK6Pz25JwXMIaInVw-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-43e23c9af5fso127563261cf.1
-        for <kvm@vger.kernel.org>; Thu, 23 May 2024 03:46:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716461209; x=1717066009;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZyjB8EQOWovyipEoWCgaFp7DoAbCqwJISn6BYO3MOco=;
-        b=ErnH1VtnMJbtJ5NIkeR3JQJy6t/R+8X4c8vUxGdjbIJDINIqYBeeRGbDl+/eeKZ6Bp
-         jqDuZYIaX7z+B0ul/C2+jd3OlToz0motJ01OgtuXDRCDyixCDTkHkM/X08jcRA0XRNKR
-         qMv70vxa+is6Z56dV8KRlxWUYFbEHtalL7Jwq1DudcB77pFKwTtm934HRQkO7i0dCopp
-         mMoEpq7Zw4Zr7yz+BhLHyZRHUUeg5cZc/+/0jfDOG+xzgqErxyXzyun8SClVdbU9pT6H
-         L4Ca4E3reJ8MTTcGr/3Ae/G1W/cBeG59wKkUjmJBS7cYio7jsjUFtkikPhh7JPw/Von/
-         9x+A==
-X-Forwarded-Encrypted: i=1; AJvYcCX5Sz0pK3FJZFdIIqK3OvIwqmLCu/7ztQvV8Z1wnVtSY5lNc8hxywkMfL+T46pw8HqZGronyeE/V/MxdeVDPuPgLFTB
-X-Gm-Message-State: AOJu0YzQsIYs2AIqe5rd6fEW06qzZL9mRyqk8HYo6OPi7eZHzYEZbuVj
-	kQRfKM4+4Z0+5yncnC3CJR0vrHPIpfIMalhQOgjO6W7qIyqQpMbDWdAt1i2+ZX2aESCa23TNY/i
-	IKcBNC2ukAWN10xekLVUxBVfxm4olGd281HawhQLz/n+TQoSbrg==
-X-Received: by 2002:ac8:5dd0:0:b0:434:5008:3bd3 with SMTP id d75a77b69052e-43f9e0c5b39mr62062401cf.23.1716461208546;
-        Thu, 23 May 2024 03:46:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHB/iXgse940hkckYv02XgQCMFgs44epPyBlQeySAf2cYExIFsi0YPz/luKMHz3Bh96Do23dw==
-X-Received: by 2002:ac8:5dd0:0:b0:434:5008:3bd3 with SMTP id d75a77b69052e-43f9e0c5b39mr62062221cf.23.1716461208092;
-        Thu, 23 May 2024 03:46:48 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-53-30-109.retail.telecomitalia.it. [79.53.30.109])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43e19256258sm139970761cf.49.2024.05.23.03.46.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 May 2024 03:46:47 -0700 (PDT)
-Date: Thu, 23 May 2024 12:46:44 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Xuewei Niu <niuxuewei97@gmail.com>
-Cc: stefanha@redhat.com, mst@redhat.com, davem@davemloft.net, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Xuewei Niu <niuxuewei.nxw@antgroup.com>
-Subject: Re: [RFC PATCH 0/5] vsock/virtio: Add support for multi-devices
-Message-ID: <hloqtbnyooawma2fhfvtblgabiebonskfkoky2invqasikhg42@gwvmreq2ysy6>
-References: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
+	s=arc-20240116; t=1716462636; c=relaxed/simple;
+	bh=QXGpVmmc87GQTcdZPyB/66d2yE9od87wnEMFzrw/peg=;
+	h=From:Subject:Date:Message-Id:Content-Type:To:Cc:MIME-Version; b=jsAxAwnTUmO/oTFMR4dkT2Q3g4NYRcqUvaUTOCAz8om+qUGdkkproGrfwoK4oh5yyTpogeWO+ODMAMzG3eb1r1DY6zwC5X5LF7Ynq3fZxMd2JEHlVKjcoOwaAoobCkKJDk5LQW2JuIrpGbvL9FlS/zfVnIj7l8LiSUXOBNAK3FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=d6OCJ6BT; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 44NArBvw015392;
+	Thu, 23 May 2024 11:10:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : subject : date :
+ message-id : content-type : to : cc : content-transfer-encoding :
+ mime-version; s=pp1; bh=L/1T+dGcEdjHWGsailh8UuaJJpxk3Txzg0SY1WbgxjQ=;
+ b=d6OCJ6BTWJkqGpnT5772o9msWRerisG24nGVx1+N08tphEIuIPW8u6UMrJEp/rVx6Gfe
+ 8v35M8CMSsoT595dzAiBd06F24lsCq/rMXH+KqvvtDwxXwrR5yRs5/Yud6YMA/IP6GUu
+ B9xUcAaYlE9wYR3MIGSu4f7ix9h6W7+TVzy3mKGvZbKiNUbQxtfVzX0KNMwY8akxS92M
+ 3h+fMZ+/a9yN3TlqjyefI6T6JPc5pyEzmrUaRQfE8WW2fhfgPeS4UOIFjSh8C7oOuJ/5
+ 214+EXWa3VshsIuodYHQ0GPLXDygLwI1LoU294MlFY7+89mv3afGIhLLTQJsAOydf6Wp pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya4edr1fm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 May 2024 11:10:32 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 44NBAV8e009724;
+	Thu, 23 May 2024 11:10:32 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ya4edr1fj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 May 2024 11:10:31 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 44N9vthX000893;
+	Thu, 23 May 2024 11:10:31 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3y7720ht00-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 23 May 2024 11:10:31 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 44NBASLN7471686
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 23 May 2024 11:10:30 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32E2158050;
+	Thu, 23 May 2024 11:10:28 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C97185806A;
+	Thu, 23 May 2024 11:10:25 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 23 May 2024 11:10:25 +0000 (GMT)
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+Subject: [PATCH v2 0/3] vfio/pci: s390: Fix issues preventing
+ VFIO_PCI_MMAP=y for s390 and enable it
+Date: Thu, 23 May 2024 13:10:13 +0200
+Message-Id: <20240523-vfio_pci_mmap-v2-0-0dc6c139a4f1@linux.ibm.com>
+Content-Type: text/plain; charset="utf-8"
+X-B4-Tracking: v=1; b=H4sIABUkT2YC/13MQQ6CMBCF4auQWVsyLVSjK+5hCMEyyCSWklYbD
+ OndrcSVy/8l79sgkGcKcCk28BQ5sJtzqEMBZurnOwkecoNCVaPGSsSRXbcY7qztFyF1faZqQGX
+ 6E+TP4mnkdfeube6Jw9P5985H+V1/kpJ/UpQChRqPldSEqGtqHjy/1pJvtjTOQptS+gCCY714r
+ gAAAA==
+To: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Niklas Schnelle <schnelle@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2571;
+ i=schnelle@linux.ibm.com; h=from:subject:message-id;
+ bh=QXGpVmmc87GQTcdZPyB/66d2yE9od87wnEMFzrw/peg=;
+ b=owGbwMvMwCH2Wz534YHOJ2GMp9WSGNL8VRQSfTzDm7q2MPuXn235FlT7I6UgIV5r2dJaj3yWG
+ 05H2IQ7SlkYxDgYZMUUWRZ1OfutK5hiuieovwNmDisTyBAGLk4BmMjxZYwML3Q1ttqd3aSrzy7O
+ MW/9rwm9vvmNLnWMhf/O5z6qldTuZ/inqlpsu2xe7kK9t0v26T7x4s+L3cN+TUvrRHLnm54jk0X
+ ZAQ==
+X-Developer-Key: i=schnelle@linux.ibm.com; a=openpgp;
+ fpr=9DB000B2D2752030A5F72DDCAFE43F15E8C26090
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Qrm_MNA7L3nwm3s0Kz2sAY7CkwonXMbu
+X-Proofpoint-ORIG-GUID: TVsveBPXB2bHcP5o0w6_6JRFlF_osAsP
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240517144607.2595798-1-niuxuewei.nxw@antgroup.com>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-23_07,2024-05-23_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=601
+ lowpriorityscore=0 adultscore=0 mlxscore=0 impostorscore=0 bulkscore=0
+ phishscore=0 priorityscore=1501 clxscore=1015 spamscore=0 malwarescore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2405230075
 
-Hi,
-thanks for this RFC!
+With the introduction of memory I/O (MIO) instructions enbaled in commit
+71ba41c9b1d9 ("s390/pci: provide support for MIO instructions") s390
+gained support for direct user-space access to mapped PCI resources.
+Even without those however user-space can access mapped PCI resources
+via the s390 specific MMIO syscalls. There is thus nothing fundamentally
+preventing s390 from supporting VFIO_PCI_MMAP allowing user-space drivers
+to access PCI resources without going through the pread() interface.
+To actually enable VFIO_PCI_MMAP a few issues need fixing however.
 
-On Fri, May 17, 2024 at 10:46:02PM GMT, Xuewei Niu wrote:
-># Motivition
->
->Vsock is a lightweight and widely used data exchange mechanism between host
->and guest. Kata Containers, a secure container runtime, leverages the
->capability to exchange control data between the shim and the kata-agent.
->
->The Linux kernel only supports one vsock device for virtio-vsock transport,
->resulting in the following limitations:
->
->* Poor performance isolation: All vsock connections share the same
->virtqueue.
+Firstly the s390 MMIO syscalls do not cause a page fault when
+follow_pte() fails due to the page not being present. This breaks
+vfio-pci's mmap() handling which lazily maps on first access.
 
-This might be fixed if we implement multi-queue in virtio-vsock.
+Secondly on s390 there is a virtual PCI device called ISM which has
+a few oddities. For one it claims to have a 256 TiB PCI BAR (not a typo)
+which leads to any attempt to mmap() it fail with the following message:
 
->* Cannot enable more than one backend: Virtio-vsock, vhost-vsock, and
->vhost-user-vsock cannot be enabled simultaneously on the transport.
->
->We’d like to transfer networking data, such as TSI (Transparent Socket
->Impersonation), over vsock via the vhost-user protocol to reduce overhead.
->However, by default, the vsock device is occupied by the kata-agent.
->
-># Usages
->
->Principle: **Supporting virtio-vsock multi-devices while also being
->compatible with existing ones.**
->
->## Connection from Guest to Host
->
->There are two valuable questions to take about:
->
->1. How to be compatible with the existing usages?
->2. How do we specify a virtio-vsock device?
->
->### Question 1
->
->Before we delve into question 1, I'd like to provide a piece of pseudocode
->as an example of one of the existing use cases from the guest's
->perspective.
->
->Assuming there is one virtio-vsock device with CID 4. One of existing
->usages to connect to host is shown as following.
->
->```
->fd = socket(AF_VSOCK);
->connect(fd, 2, 1234);
->n = write(fd, buffer);
->```
->
->The result is that a connection is established from the guest (4, ?) to the
->host (2, 1234), where "?" denotes a random port.
->
->In the context of multi-devices, there are more than two devices. If the
->users don’t specify one CID explicitly, the kernel becomes confused about
->which device to use. The new implementation should be compatible with the
->old one.
->
->We expanded the virtio-vsock specification to address this issue. The
->specification now includes a new field called "order".
->
->```
->struct virtio_vsock_config {
->  __le64 guest_cid;
->  __le64 order;
->} _attribute_((packed));
->```
->
->In the phase of virtio-vsock driver probing, the guest kernel reads 
->from
->VMM to get the order of each device. **We stipulate that the device with the
->smallest order is regarded as the default device**(this mechanism functions
->as a 'default gateway' in networking).
->
->Assuming there are three virtio-vsock devices: device1 (CID=3), device2
->(CID=4), and device3 (CID=5). The arrangement of the list is as follows
->from the perspective of the guest kernel:
->
->```
->virtio_vsock_list =
->virtio_vsock { cid: 4, order: 0 } -> virtio_vsock { cid: 3, order: 1 } -> virtio_vsock { cid: 5, order: 10 }
->```
->
->At this time, the guest kernel realizes that the device2 (CID=4) is the
->default device. Execute the same code as before.
->
->```
->fd = socket(AF_VSOCK);
->connect(fd, 2, 1234);
->n = write(fd, buffer);
->```
->
->A connection will be established from the guest (4, ?) to the host (2, 1234).
+    vmap allocation for size 281474976714752 failed: use vmalloc=<size> to increase size
 
-It seems that only the one with order 0 is used here though, so what is 
-the ordering for?
-Wouldn't it suffice to simply indicate the default device (e.g., like 
-the default gateway for networking)?
+Even if one tried to map this BAR only partially the mapping would not
+be usable on systems with MIO support enabled. So just block mapping
+BARs which don't fit between IOREMAP_START and IOREMAP_END.
 
->
->### Question 2
->
->Now, the user wants to specify a device instead of the default one. An
->explicit binding operation is required to be performed.
->
->Use the device (CID=3), where “-1” represents any port, the kernel will
-
-We have a macro: VMADDR_PORT_ANY (which is -1)
-
->search an available port automatically.
->
->```
->fd = socket(AF_VSOCK);
->bind(fd, 3, -1);
->connect(fd, 2, 1234);)
->n = write(fd, buffer);
->```
->
->Use the device (CID=4).
->
->```
->fd = socket(AF_VSOCK);
->bind(fd, 4, -1);
->connect(fd, 2, 1234);
->n = write(fd, buffer);
->```
->
->## Connection from Host to Guest
->
->Connection from host to guest is quite similar to the existing usages. The
->device’s CID is specified by the bind operation.
->
->Listen at the device (CID=3)’s port 10000.
->
->```
->fd = socket(AF_VSOCK);
->bind(fd, 3, 10000);
->listen(fd);
->new_fd = accept(fd, &host_cid, &host_port);
->n = write(fd, buffer);
->```
->
->Listen at the device (CID=4)’s port 10000.
->
->```
->fd = socket(AF_VSOCK);
->bind(fd, 4, 10000);
->listen(fd);
->new_fd = accept(fd, &host_cid, &host_port);
->n = write(fd, buffer);
->```
->
-># Use Cases
->
->We've completed a POC with Kata Containers, Ztunnel, which is a
->purpose-built per-node proxy for Istio ambient mesh, and TSI. Please refer
->to the following link for more details.
->
->Link: https://bit.ly/4bdPJbU
-
-Thank you for this RFC, I left several comments in the patches, we still 
-have some work to do, but I think it is something we can support :-)
-
-Here I summarize the things that I think we need to fix:
-1. Avoid adding transport-specific things in af_vsock.c
-    We need to have a generic API to allow other transports to implement
-    the same functionality.
-2. We need to add negotiation of a new feature in virtio/vhost transports
-    We need to enable or disable support depending on whether the
-    feature is negotiated, since guest and host may not support it.
-3. Re-work the patch order for bisectability (more detail on patches 3/4)
-4. Do we really need the order or just a default device?
-5. Check if we can add some tests in tools/testing/vsock
-6. When we agree on the RFC, we should discuss the spec changes in the
-    virtio ML before sending a non-RFC series on Linux
-
-These are the main things, but I left other comments in the patches.
+Note:
+For your convenience the code is also available in the tagged and signed
+b4/vfio_pci_mmap branch on my git.kernel.org site below:
+https: //git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/
 
 Thanks,
-Stefano
+Niklas
+
+Link: https://lore.kernel.org/all/c5ba134a1d4f4465b5956027e6a4ea6f6beff969.camel@linux.ibm.com/
+Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+---
+Changes in v2:
+- Changed last patch to remove VFIO_PCI_MMAP instead of just enabling it
+  for s390 as it is unconditionally true with s390 supporting PCI resource mmap() (Jason)
+- Collected R-bs from Jason
+- Link to v1: https://lore.kernel.org/r/20240521-vfio_pci_mmap-v1-0-2f6315e0054e@linux.ibm.com
+
+---
+Niklas Schnelle (3):
+      s390/pci: Fix s390_mmio_read/write syscall page fault handling
+      vfio/pci: Tolerate oversized BARs by disallowing mmap
+      vfio/pci: Enable PCI resource mmap() on s390 and remove VFIO_PCI_MMAP
+
+ arch/s390/pci/pci_mmio.c         | 18 +++++++++++++-----
+ drivers/vfio/pci/Kconfig         |  4 ----
+ drivers/vfio/pci/vfio_pci_core.c | 11 ++++++-----
+ 3 files changed, 19 insertions(+), 14 deletions(-)
+---
+base-commit: a38297e3fb012ddfa7ce0321a7e5a8daeb1872b6
+change-id: 20240503-vfio_pci_mmap-1549e3d02ca7
+
+Best regards,
+-- 
+Niklas Schnelle
 
 
