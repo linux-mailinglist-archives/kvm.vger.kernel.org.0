@@ -1,110 +1,85 @@
-Return-Path: <kvm+bounces-18049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35588CD5E7
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 16:36:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C308CD619
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 16:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4D5D1C21567
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 14:36:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18C271C21469
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 14:48:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2F013C670;
-	Thu, 23 May 2024 14:35:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEA77482;
+	Thu, 23 May 2024 14:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DFD6Rmyz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nslwjTgi"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA3F1EA74
-	for <kvm@vger.kernel.org>; Thu, 23 May 2024 14:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF47E6FB9
+	for <kvm@vger.kernel.org>; Thu, 23 May 2024 14:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716474958; cv=none; b=Z7ZowCgUvBLYmST30wqbabhK85jpp2f6qWCu3uOt3+BPw+vIWiGIu8zrNSxcTJt7T7k8l+Wd3t/i9wi4C8uMKO56k8xWLLbVxzxa8Z+SY70r/e+iATHCb8OGEJyHQP8paOSvJZSIxLdrV1yDRIGQsoh+LdqHxlXZXdP5ACrgFGw=
+	t=1716475692; cv=none; b=rO0MeE3eKNcHncK0RcRzAlxm3JYdw8R64dcOEjLJcdV1oVelzXsBoaFhinhbSxE62pA3zC9eyM3ZZK4KCzR5AA8628H31PqYqF9TKaCWgE45KjYS3nipPXrIJPEff1vPAY0ya7CucioUbmKqu+j7MoEfmecbMd8UI08JUMvOU/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716474958; c=relaxed/simple;
-	bh=hujLA40izkhkyk4cHbMtRAp8JZKr0b1Cbo1fGXhH2Gk=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uYxxWRS8QCSDH+FJ+xLTxEUrb/1snOpJEEymJvAtTkSVW/Y3GBOkGrbj+ObF+ExoBNT/Q0iPQlC+TmLttwK0bukNu3ix7NV1Ux5y5NL1pvNNF7qFfDIaAK1QJ01434GhJVoxxjPZIE4kg2AWUJuLhWsKAbJItqu28gj1Qab/3kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DFD6Rmyz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 663D2C32782
-	for <kvm@vger.kernel.org>; Thu, 23 May 2024 14:35:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716474957;
-	bh=hujLA40izkhkyk4cHbMtRAp8JZKr0b1Cbo1fGXhH2Gk=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=DFD6RmyzyBQ2K5fJgp1Nz8kL72/rX5gLKVGK4qFoJqxLuZd1APd+hoIaiXd/7TbLL
-	 sM3uXhXnHZFDaMS5hQJ2R8n6hZMUlcu6dzuCCVpIrN1E4pIF5pToJMnS1t1PaqSZ1m
-	 CCzHHFe4KlANVtZz9aoggOCOJtRyy+wYU9EwFNMJ7ocLF4KXZKmmEvI6ExVyxuoBtx
-	 khnMsLhLjd4kKgO9mQfeKQn5I2r+yL82JhiLfBh7QYwLml7zLbRCIV3wT08wPk0vjO
-	 WTVIgzeUU2PA042yFGOznZjKukcOKYp7wi8+jTVJNYawRI86yG0OnhIX+n/Kpzo22s
-	 CGgSaVIx4fOXA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 5A224C53B50; Thu, 23 May 2024 14:35:57 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218876] PCIE device crash when trying to pass through USB PCIe
- Card to virtual machine
-Date: Thu, 23 May 2024 14:35:57 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: linux@iam.tj
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-218876-28872-DcGxJThr5N@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218876-28872@https.bugzilla.kernel.org/>
-References: <bug-218876-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1716475692; c=relaxed/simple;
+	bh=qS7pITcL1jqH3SSLLQ8jEcdFPPRerIqWns9weFqn65o=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=CDOPt+DqR9WsVKUlLSWEIdjEdnlXI8QpmEfhIn5rD2CGj5yuLybH/Sq9rKAGB/ZFgKMiEKJNoGpJdWM0JWbeJFhybBXMQja2ad8Msx0Nwwmxdwcdrxgeh37WikB7rl180NyV56W0qpdVhsD4QPPHkVGPjQgNadpQdgTrjhABigY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nslwjTgi; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-51f99f9e0faso9435746e87.2
+        for <kvm@vger.kernel.org>; Thu, 23 May 2024 07:48:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716475688; x=1717080488; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qS7pITcL1jqH3SSLLQ8jEcdFPPRerIqWns9weFqn65o=;
+        b=nslwjTgizI1pgA0zm7UBQoR8vw1yj3FubtTO0EY5M36sDu45hZxQowuPo7zxHc/ILI
+         e60RLEX3oy0+w0VTmHeO6+EkZej9vWJ2u9ViQE1dLvSTOBYarjgV28C96U4YN4GlKHyx
+         7RkQAtZ+346NK3woi9wlLtTjPhS1LEaooQ/CvvbRjsdqaIssod1+05OR+xeVY6tiiG2a
+         N2vO6rKLWiABC5LR+X0Kn2xd511P7eCPxwF7dJvHEld7NndnE6LJeOaShWNvwK70Beqa
+         tnabz/r1q/5XQQPcQrE27SZ7EXy1L5T++VHh/Y7Vpi5Hc+zvdbusq73FQ4CoMGP0GnOY
+         niKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716475688; x=1717080488;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qS7pITcL1jqH3SSLLQ8jEcdFPPRerIqWns9weFqn65o=;
+        b=dblFaqy4dP8oE4+etMObjctcd40+gvyN3/sXvmkuo689GM7RYEBHtjFpC8ouRl3hjX
+         JZOZs19g9P0aeNVB4ImMV8NiERiLutfd5YkaDmPtV/jgOCmzFKmD1ED/pyI9gvgSBZh2
+         KwLqhQ0cy/+LLzQKtGqgPd1jcieIr80MvTHzMuE6m58RRCLJFaj7/VIkcRGbcfm7wO9T
+         Rz9L3mFkDSpn7TfIOzfkuQ3+clMQx/qGYeMYhQ/A1i5FUotDnLap+nunJnWmo0aXaPn2
+         0uTbtqC5KtFBNzPpN4iyiDoCMaBgn6X57lthweN92TInbc5FQKSzqbqG0nZ0YLZZz/bk
+         udkA==
+X-Gm-Message-State: AOJu0YyAGJtSw1zKGxDH8YUo8S7GbabEQY/VJpyoN8GAKs15alY13pET
+	y69QvAPMfgq/6g/+/iPDWrwnNQ9nyDNuEAN20DyrNt1R1SmwKGFYtJ7+XWrQQY4RzQ/3dMcmbiW
+	DuLRnKxItEza/0MKUo1LRLFFp3fokkg==
+X-Google-Smtp-Source: AGHT+IFVouHD4EyAzIw2E9SeslcmOol+Vm6WrVtkuz2J/m93aKkXqCn17FSv5z1S+w+vesyjxsZW/SVGJTwMtE6d554=
+X-Received: by 2002:a05:6512:3ca0:b0:528:d2da:d71d with SMTP id
+ 2adb3069b0e04-528d2dada3bmr842017e87.0.1716475688348; Thu, 23 May 2024
+ 07:48:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: "Y.G Kumar" <ygkumar17@gmail.com>
+Date: Thu, 23 May 2024 20:17:54 +0530
+Message-ID: <CAD4ZjH0oAfUDfbipQk2YHXwV3zKdNyGwpCyybA=y8_6g3LON0g@mail.gmail.com>
+Subject: Cpu steal
+To: kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218876
+Hi,
 
-TJ (linux@iam.tj) changed:
+Is there a way of measuring cpu steal time of a guest from the
+hypervisor ? Does it give accurate information ? What are some of the
+effective ways to find out the steal time from outside the vm
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |linux@iam.tj
-
---- Comment #2 from TJ (linux@iam.tj) ---
-This could be a power management issue:
-
-  vfio-pci 0000:02:00.0: Unable to change power state from D3cold to D0, de=
-vice
-inaccessible
-
-Could you add the outputs of these commands?
-
-# detailed PCI device info
-sudo lspci -vvnnk
-
-# power reset methods of PCI devices
-find /sys/devices/pci0000\:00/ -name reset_method | while read -r f; do ech=
-o -e
-"$f =3D $(cat $f)"; done
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Thanks
+Kumar
 
