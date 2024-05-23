@@ -1,282 +1,176 @@
-Return-Path: <kvm+bounces-18071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190558CD93B
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 19:41:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F48F8CD983
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 19:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F3191F22058
-	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 17:41:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C6AB8B21E24
+	for <lists+kvm@lfdr.de>; Thu, 23 May 2024 17:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E302B7D3FA;
-	Thu, 23 May 2024 17:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395708003F;
+	Thu, 23 May 2024 17:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qjR0JJum"
+	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="GFokNs26"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844222943F
-	for <kvm@vger.kernel.org>; Thu, 23 May 2024 17:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31287D086
+	for <kvm@vger.kernel.org>; Thu, 23 May 2024 17:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716486083; cv=none; b=qFIPz84OAFURVDji+0cnqdpb67pyc07LmGW6aKX9YPAfPj5OxUQsemC91UdKdgkffwac+Ft1jjuIvCCX3pfQp3uF4RhX4802wqlts/StIP8kiobMEWD88vbdjtLPhDOB7nCGANv7QyyIAxJQo93Wt6Ak7sSzQaW7MN4sfwbwvEA=
+	t=1716486821; cv=none; b=idlKA2C5xib4HZRhbUhpMhxVg0xQ3kmNizYgtybrgrixIn9Xy/YV0BDqBKSdmdGGKKl9loXX6eC8Y5TNHDqZi8wc4Z71ImvTc1gZB5cW4w44hELnzSeWVt1r6/Q0N/JClBaoVimnMoZhvF8FFP0vYfS0x6NqoiS8IlHKfCI6rSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716486083; c=relaxed/simple;
-	bh=mgcCj63r/rqJ9WAumHxvSQWYHZYpsmagWDbi6uVpq30=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dz8hKQe4F5mBTmureBi/a43C2+6dD4avc4W/3g3f07PE5acQvr5MNB95zFtNf1b8Lgy70J3H7WfeaDhm1sX5eDL0ZewMdAt1Wc+7WbWm7njWiVpLM6JG9RTQQtBllfS7aAUj6rgZCLEG1iCpuXsLf9geLAzod7u3Q8KFn0yk9+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qjR0JJum; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df771b5e942so22957276.2
-        for <kvm@vger.kernel.org>; Thu, 23 May 2024 10:41:21 -0700 (PDT)
+	s=arc-20240116; t=1716486821; c=relaxed/simple;
+	bh=1vlJyEbwuX0ZoN749JOIjA4u6/xlKVfxbDsvgdeX7zI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TeVeaEZr0foPkEEVVrl4DQyxLPcd1R9vWtegnXiUAvJsyd4wdwFa7BwRJNWUFxzmDpEWL4Vho7wRyHjxuLptpWb5AUSFVXmaKcw1gd1Boehv64eyQECgjPDitw+40Fv39gKRoiXfKSX1qlFmmtd7hgcUI0E0U0phrs7jPD6vzeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=GFokNs26; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-792ce7a2025so114416585a.0
+        for <kvm@vger.kernel.org>; Thu, 23 May 2024 10:53:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716486080; x=1717090880; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/Uryc1Ca/yfNSkrAtNfcb1TkId2P2HjsoQz4zGkthUc=;
-        b=qjR0JJumKNrZ7UwcPP3s3GetHd8W89GLTthgINDn8zXK2tp9xfYk8qBTbgZRmXoCFA
-         HLWfW0D2IZLwnnxs/HNLrQtkKFPdtoBv403UP4UnO1x0PCYvZEqokaSbQHvWzK7dxdjh
-         VJWXHVWdel+9kBDAo3bZyrjsyCZcwZORpeNixhRcrpf9aYANwwBUsj04IU5+pbmo3d5/
-         3EjHCeejdhp6Vy299A2P9ykhic6fVG5SGahZo3Vsa/zu8HrZiE1caS7chZYloNqedDIW
-         NL7m7UM5ROyaRVefbX/e+lPwVaB+AdPC/JsPu06JWh67JbJ+XyCsHjwfdvbMGwEO/9og
-         buOw==
+        d=citrix.com; s=google; t=1716486819; x=1717091619; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=1vlJyEbwuX0ZoN749JOIjA4u6/xlKVfxbDsvgdeX7zI=;
+        b=GFokNs2639blQKjNSCx44Qm73y5ZcwUf2/YV/8LmDzfVxmDxE98ehiRerYGcEYRSgV
+         vwiSD3+fvCwF25ibN74KRFZbXpAbPAkoOD83IFhXKriDQS+OKjfStj2xwsLMl4wYKfxc
+         F0k0YBn5V3+KDEDxm8shoIHJtcT4fa1IXDx/0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716486080; x=1717090880;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/Uryc1Ca/yfNSkrAtNfcb1TkId2P2HjsoQz4zGkthUc=;
-        b=vLU5LP5G9+N4P334ARjSTrjuZycA2zR8C2yn3IlgYdHBCiZsX4RkbkM28b5d+slJRp
-         4kng0OMa2T+1zTlQyWha7LQgKct7dGH8xAC17adyg9wru6MPANHTtIvy/wNdBlKrzunD
-         rlPaq15H0mGv5I42KiqwPG5GYsgPAfsf98x8AMNsSE54pmPxPBHFGL3nY9WjKJXqHEtt
-         t4uAe4s1zNH1yi5TAqUwaqHZqesSf2GsV159Pa/FrXeIg2qN7I+rs9KXmepKxk/XnMq7
-         yuqfY93C9xBj4P1GFMgc0edRVyTcsY2nvF3XTNeYh/abdgkaoYOfRqUpkfeOyRG+00eD
-         0Axw==
-X-Gm-Message-State: AOJu0YwcpXEC9zGmzcjpI4lUb3NR1umEnE1Lz0xNmbeDh2T8U+lSxamP
-	cjVG0oxj3cvMvGLk/yT2LRHH0L9DSjRCVZXas40OjbMmCYHQ/XKcW1soYJLvuc2wpkSgppSEyOr
-	N4OfV/gXIloyq1YIkow5fTfnqexm0u8u1DlCDHhFth2fF8t72tpxAR82tHHM/IXW0HJf3TnWofD
-	bZ2tlr4JfXYfGX0a3GNb/AHVTq6qiLPasqTouiePjonSd8fqMFpa/YTp4=
-X-Google-Smtp-Source: AGHT+IFlRiZywpr57pi877qryPKiafj4uJohWbfZpe5cezs8n2FI0sD1i4QJM+bXmI8glD4J/d2mQ77lr+EZuSzvnQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6902:100a:b0:df7:66dd:5fbd with
- SMTP id 3f1490d57ef6-df766dd6536mr116228276.3.1716486080473; Thu, 23 May 2024
- 10:41:20 -0700 (PDT)
-Date: Thu, 23 May 2024 17:40:55 +0000
+        d=1e100.net; s=20230601; t=1716486819; x=1717091619;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1vlJyEbwuX0ZoN749JOIjA4u6/xlKVfxbDsvgdeX7zI=;
+        b=sMhOtcD9X3BobbMQyd9plIUmpzNKuWyJsxErG2y0f//humjaI/gPr6Y3fBRkZMynzs
+         nX0zB9nX0VThyTyL8MsPDkTlx3KLowgjjbmbyg4R20MSu61K1OwI4wBlmzTxVctFdVoe
+         NRCgs5+eVtmykLzWUTSlvoGflCnQywY0LI88iso61qezJdlnuptRmm8sOxFTB8yfnMbH
+         rboIDWzBGLSckEWEHlYEDpKZWt+NrKX0piyfs3XESEkkpITUkAmccfIoE3LWrEUfnTpL
+         5hLFijXC6O6UnYJwdC629witZnDxQ7+dgWQ6kqbtu9vFOJR68z1NqRzAmVbojq+hcr87
+         uNuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpQHINq4G0adNXGcqjfHmiNJrYh3j02HDeaSG0yFA0AF1vwpfNGEgG+vtMjKroTZCuGsG3sHpLpqlIwrhhUNGsxS6N
+X-Gm-Message-State: AOJu0YxOOPpZ0ixUkHyfqHS2l3IeMIojgTMI8oShDSNsDswVrJZ4ipV0
+	/a59OfmrbPIfXfeiAgDxXWjylH55oX63UrzpcR8G5wMX5yV7E8VZhwN1ufWJggQ=
+X-Google-Smtp-Source: AGHT+IEyrXjRVTMHXi2p1He6w4MOb64tPMvvceUjvt4BggM/FGRRB/9P/aYFoq9Qo2ZNpSp/rwdk2g==
+X-Received: by 2002:ae9:e009:0:b0:792:bb55:906d with SMTP id af79cd13be357-79499455581mr571133085a.39.1716486818588;
+        Thu, 23 May 2024 10:53:38 -0700 (PDT)
+Received: from [10.125.231.30] ([217.156.233.157])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-792bf2a11e8sm1497940085a.58.2024.05.23.10.53.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 May 2024 10:53:37 -0700 (PDT)
+Message-ID: <0fcbfcba-9fe2-414c-8424-347364fcbf35@citrix.com>
+Date: Thu, 23 May 2024 18:53:34 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <20240523174056.1565133-1-coltonlewis@google.com>
-Subject: [PATCH v6] KVM: arm64: Add early_param to control WFx trapping
-From: Colton Lewis <coltonlewis@google.com>
-To: kvm@vger.kernel.org
-Cc: Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, Colton Lewis <coltonlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] x86/bhi: BHI mitigation can trigger warning in #DB
+ handler
+To: Alexandre Chartre <alexandre.chartre@oracle.com>,
+ Dave Hansen <dave.hansen@intel.com>, x86@kernel.org, kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, daniel.sneddon@linux.intel.com,
+ pawan.kumar.gupta@linux.intel.com, tglx@linutronix.de,
+ konrad.wilk@oracle.com, peterz@infradead.org, gregkh@linuxfoundation.org,
+ seanjc@google.com, dave.hansen@linux.intel.com, nik.borisov@suse.com,
+ kpsingh@kernel.org, longman@redhat.com, bp@alien8.de, pbonzini@redhat.com
+References: <20240523123322.3326690-1-alexandre.chartre@oracle.com>
+ <a04d82be-a0d6-4e53-b47c-dba8402199e7@intel.com>
+ <1c69f62e-0dee-4caa-9cbe-f43d8efd597b@oracle.com>
+ <93510641-9032-4612-9424-c048145e883e@intel.com>
+ <5ed7d3c8-63c3-48f3-aaeb-a19514f4ef5e@oracle.com>
+Content-Language: en-GB
+From: Andrew Cooper <andrew.cooper3@citrix.com>
+Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
+ 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
+ 6+ahAA==
+In-Reply-To: <5ed7d3c8-63c3-48f3-aaeb-a19514f4ef5e@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Add an early_params to control WFI and WFE trapping. This is to
-control the degree guests can wait for interrupts on their own without
-being trapped by KVM. Options for each param are trap and notrap. trap
-enables the trap. notrap disables the trap. Note that when enabled,
-traps are allowed but not guaranteed by the CPU architecture. Absent
-an explicitly set policy, default to current behavior: disabling the
-trap if only a single task is running and enabling otherwise.
+On 23/05/2024 6:03 pm, Alexandre Chartre wrote:
+>
+> On 5/23/24 17:36, Dave Hansen wrote:
+>> On 5/23/24 07:52, Alexandre Chartre wrote:
+>>>> Should we wrap up this gem and put it with the other entry selftests?
+>>>
+>>> It looks like tools/testing/selftests/x86/single_step_syscall.c tests
+>>> sysenter with TF set but it doesn't check if the kernel issues any
+>>> warning.
+>>
+>> Does it actually trip the warning though? I'm a bit surprised that
+>> nobody reported it if so.
+>
+> single_step_syscall does trigger the warning:
+>
+> $ ./single_step_syscall
+> [RUN]    Set TF and check nop
+> [OK]    Survived with TF set and 26 traps
+> [RUN]    Set TF and check syscall-less opportunistic sysret
+> [OK]    Survived with TF set and 30 traps
+> [RUN]    Set TF and check a fast syscall
+> [OK]    Survived with TF set and 40 traps
+> [RUN]    Fast syscall with TF cleared
+> [OK]    Nothing unexpected happened
+> [RUN]    Set TF and check SYSENTER
+>     Got SIGSEGV with RIP=ed7fe579, TF=256
+> [RUN]    Fast syscall with TF cleared
+> [OK]    Nothing unexpected happened
 
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
-v6:
- * Rebase to v6.9.1
- * Move decision to enable WFx traps back to vcpu load time
- * Move policy enum to arm.c and mark variable as __read_mostly
- * Add explicit disclaimer traps are not guaranteed even when setting enabled
- * Remove explicit "default" case from early param handling as it is not needed
+:-/
 
-v5:
-https://lore.kernel.org/kvmarm/20240430181444.670773-1-coltonlewis@google.com/
+What about the exit code?
 
-v4:
-https://lore.kernel.org/kvmarm/20240422181716.237284-1-coltonlewis@google.com/
+I find the absence of a [FAIL] concerning...
 
-v3:
-https://lore.kernel.org/kvmarm/20240410175437.793508-1-coltonlewis@google.com/
-
-v2:
-https://lore.kernel.org/kvmarm/20240319164341.1674863-1-coltonlewis@google.com/
-
-v1:
-https://lore.kernel.org/kvmarm/20240129213918.3124494-1-coltonlewis@google.com/
-
- .../admin-guide/kernel-parameters.txt         | 18 +++++
- arch/arm64/include/asm/kvm_emulate.h          | 16 -----
- arch/arm64/kvm/arm.c                          | 68 ++++++++++++++++++-
- 3 files changed, 83 insertions(+), 19 deletions(-)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 396137ee018d..f334265a9cfa 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2693,6 +2693,24 @@
- 			[KVM,ARM,EARLY] Allow use of GICv4 for direct
- 			injection of LPIs.
-
-+	kvm-arm.wfe_trap_policy=
-+			[KVM,ARM] Control when to set WFE instruction trap for
-+			KVM VMs. Traps are allowed but not guaranteed by the
-+			CPU architecture.
-+
-+			trap: set WFE instruction trap
-+
-+			notrap: clear WFE instruction trap
-+
-+	kvm-arm.wfi_trap_policy=
-+			[KVM,ARM] Control when to set WFI instruction trap for
-+			KVM VMs. Traps are allowed but not guaranteed by the
-+			CPU architecture.
-+
-+			trap: set WFI instruction trap
-+
-+			notrap: clear WFI instruction trap
-+
- 	kvm_cma_resv_ratio=n [PPC,EARLY]
- 			Reserves given percentage from system memory area for
- 			contiguous memory allocation for KVM hash pagetable
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 975af30af31f..68c4a170b871 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -109,22 +109,6 @@ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
- 	return (unsigned long *)&vcpu->arch.hcr_el2;
- }
-
--static inline void vcpu_clear_wfx_traps(struct kvm_vcpu *vcpu)
--{
--	vcpu->arch.hcr_el2 &= ~HCR_TWE;
--	if (atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
--	    vcpu->kvm->arch.vgic.nassgireq)
--		vcpu->arch.hcr_el2 &= ~HCR_TWI;
--	else
--		vcpu->arch.hcr_el2 |= HCR_TWI;
--}
--
--static inline void vcpu_set_wfx_traps(struct kvm_vcpu *vcpu)
--{
--	vcpu->arch.hcr_el2 |= HCR_TWE;
--	vcpu->arch.hcr_el2 |= HCR_TWI;
--}
--
- static inline void vcpu_ptrauth_enable(struct kvm_vcpu *vcpu)
- {
- 	vcpu->arch.hcr_el2 |= (HCR_API | HCR_APK);
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index c4a0a35e02c7..1cd58ca5d410 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -47,6 +47,15 @@
-
- static enum kvm_mode kvm_mode = KVM_MODE_DEFAULT;
-
-+enum kvm_wfx_trap_policy {
-+	KVM_WFX_NOTRAP_SINGLE_TASK, /* Default option */
-+	KVM_WFX_NOTRAP,
-+	KVM_WFX_TRAP,
-+};
-+
-+static enum kvm_wfx_trap_policy kvm_wfi_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
-+static enum kvm_wfx_trap_policy kvm_wfe_trap_policy __read_mostly = KVM_WFX_NOTRAP_SINGLE_TASK;
-+
- DECLARE_KVM_HYP_PER_CPU(unsigned long, kvm_hyp_vector);
-
- DEFINE_PER_CPU(unsigned long, kvm_arm_hyp_stack_page);
-@@ -428,6 +437,24 @@ void kvm_arch_vcpu_unblocking(struct kvm_vcpu *vcpu)
-
- }
-
-+static bool kvm_vcpu_should_clear_twi(struct kvm_vcpu *vcpu)
-+{
-+	if (likely(kvm_wfi_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
-+		return single_task_running() &&
-+			(atomic_read(&vcpu->arch.vgic_cpu.vgic_v3.its_vpe.vlpi_count) ||
-+			 vcpu->kvm->arch.vgic.nassgireq);
-+
-+	return kvm_wfi_trap_policy == KVM_WFX_NOTRAP;
-+}
-+
-+static bool kvm_vcpu_should_clear_twe(struct kvm_vcpu *vcpu)
-+{
-+	if (likely(kvm_wfe_trap_policy == KVM_WFX_NOTRAP_SINGLE_TASK))
-+		return single_task_running();
-+
-+	return kvm_wfe_trap_policy == KVM_WFX_NOTRAP;
-+}
-+
- void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	struct kvm_s2_mmu *mmu;
-@@ -461,10 +488,15 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 	if (kvm_arm_is_pvtime_enabled(&vcpu->arch))
- 		kvm_make_request(KVM_REQ_RECORD_STEAL, vcpu);
-
--	if (single_task_running())
--		vcpu_clear_wfx_traps(vcpu);
-+	if (kvm_vcpu_should_clear_twe(vcpu))
-+		vcpu->arch.hcr_el2 &= ~HCR_TWE;
-+	else
-+		vcpu->arch.hcr_el2 |= HCR_TWE;
-+
-+	if (kvm_vcpu_should_clear_twi(vcpu))
-+		vcpu->arch.hcr_el2 &= ~HCR_TWI;
- 	else
--		vcpu_set_wfx_traps(vcpu);
-+		vcpu->arch.hcr_el2 |= HCR_TWI;
-
- 	if (vcpu_has_ptrauth(vcpu))
- 		vcpu_ptrauth_disable(vcpu);
-@@ -2663,6 +2695,36 @@ static int __init early_kvm_mode_cfg(char *arg)
- }
- early_param("kvm-arm.mode", early_kvm_mode_cfg);
-
-+static int __init early_kvm_wfx_trap_policy_cfg(char *arg, enum kvm_wfx_trap_policy *p)
-+{
-+	if (!arg)
-+		return -EINVAL;
-+
-+	if (strcmp(arg, "trap") == 0) {
-+		*p = KVM_WFX_TRAP;
-+		return 0;
-+	}
-+
-+	if (strcmp(arg, "notrap") == 0) {
-+		*p = KVM_WFX_NOTRAP;
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static int __init early_kvm_wfi_trap_policy_cfg(char *arg)
-+{
-+	return early_kvm_wfx_trap_policy_cfg(arg, &kvm_wfi_trap_policy);
-+}
-+early_param("kvm-arm.wfi_trap_policy", early_kvm_wfi_trap_policy_cfg);
-+
-+static int __init early_kvm_wfe_trap_policy_cfg(char *arg)
-+{
-+	return early_kvm_wfx_trap_policy_cfg(arg, &kvm_wfe_trap_policy);
-+}
-+early_param("kvm-arm.wfe_trap_policy", early_kvm_wfe_trap_policy_cfg);
-+
- enum kvm_mode kvm_get_mode(void)
- {
- 	return kvm_mode;
---
-2.45.1.288.g0e0cd299f1-goog
+~Andrew
 
