@@ -1,77 +1,77 @@
-Return-Path: <kvm+bounces-18125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18126-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 245B78CE668
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 15:53:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 209FC8CE677
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 15:57:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D386D281CE9
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 13:53:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0882282056
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 13:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79C912C55D;
-	Fri, 24 May 2024 13:53:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CA3B12C471;
+	Fri, 24 May 2024 13:57:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HAs0q0N5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnv85tLf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBD512C53F;
-	Fri, 24 May 2024 13:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB46786120;
+	Fri, 24 May 2024 13:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716558792; cv=none; b=j1ZqqoNjQ4yffH3w8ClWoUDxqyW3DXt6MyKzj+mtq6OE6iBmstQslv6dQNuUqj3PaGHy7n5weVTDi0pTXUGZTQqiolfH/ngNGB47EFuvU6qBMyHmFqK2efbnDalRjR1/M6xgr7KEmykw8AdQLIPuj2vyyQtDi++Pj1/XGXFB0Lo=
+	t=1716559019; cv=none; b=MQJ0cUAdgvoeCosu1NNfYuzwLOHXX9t8pli1Ad3hx2x273T8Hj9gCKQDhfNBk0XEIajAKchxS2tQTkUcWkdXi563j9kGjmwB12a/sdazEc13srJ2+Gk64gO2ulj48gsrHDgN16ct555iEiJR8V312GMoonx46/YywaYbBCKE0vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716558792; c=relaxed/simple;
-	bh=48OxGlCWOzlUb31iNcUZkr3t9j9WApFJdpDC2NoybDI=;
+	s=arc-20240116; t=1716559019; c=relaxed/simple;
+	bh=TbI1b1nQhIM/TWlonzYbHmL/h2K+W+tquMtOW1q6Oto=;
 	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=d28wfECTT0WCS5hjjF/HG70uWug2Fe0raHp0wmit+lOrI6dM4z1ez9Gzhhr193DgL6Mi7In/dyoUWeuzJMbKMCfx3/2d04EQlHhdlk9AP6HWD7JWpJg5+5Ydu38Dyp+soMLt9bY1TnbYiTYQ+Bd+qlArlo2JeUaz2j9yEM3MJEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HAs0q0N5; arc=none smtp.client-ip=209.85.208.182
+	 In-Reply-To:Content-Type; b=BkW5+4RcdIIKfCLp/bFgbtR4vt0z0ePpA0NM5b//RtHWvSky7xH7y6+Tk4ZVCgqhTzUIFYONcUwR9OfhteLljbyYBGH2dF2Gougrewc/lMRLqiAbr/9itotpxF+F6UtK0btNi2N5aOWxCQEg1l7a+NqfpfSIXvc+PRe+Al6wvig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnv85tLf; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2e564cad1f1so100981551fa.0;
-        Fri, 24 May 2024 06:53:09 -0700 (PDT)
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2e538a264f7so101204591fa.0;
+        Fri, 24 May 2024 06:56:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716558787; x=1717163587; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1716559016; x=1717163816; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:content-language
          :references:cc:to:subject:reply-to:user-agent:mime-version:date
          :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=S569fFY4KqVx+EvriaPbjpFfvIMqzAUWJ6RqNzEZH0k=;
-        b=HAs0q0N5bmdezJK0/KUSixK2S63iy3jRfUGoQqHGrU/1WQ6Ybb6Q7upSby8FAjETTJ
-         8KEk2Ox63c/iP5a1t1Rdl3U7eg4YgyV8dn02btrLIfefTuJ2Hmmb4L81y5I/m/5I5EOf
-         7dn1q1CkaJuVNmNaTR8oI9Sn4Noyy+vntZacKnpkONwIH4rrAnJEOz/h1tFB8ibJfNMl
-         qRP0ZCw6jTQbLMx2T3Rg28Ua/ndIiwuzVCc7gKIynllrvW5YKjZ1Kd4QFiW0AVpl58DN
-         MxDhTzTIl+mvPBqNG/FY7jZecVZ9DbyHrlsb/JV8h9NbvMteM3UHgT7Os+lQkuxksPFw
-         4H8A==
+        bh=DnGCZeDgq06e4yJxv3zYBUOrTNbIwkOVZezg5gdIpJc=;
+        b=fnv85tLf9xERd7u1q6vWGyNstsJNAk/7uSIn0M+OBE2WXJizTBzl30vq06zZan7qQT
+         b5aeWNeRRzLfPCX7x0e9h/03AdIOR/k+qqdDN9RFw8rXAuiVeTFy9alegIduBNvEDy9v
+         6RpQKqMAVHSnuDvZB72eNjb6tlnss+ag/17rD6zHTucOkkirEGtYupw6gdH/NopCa8sR
+         JHsiUWRPLT0mQu4QQxt0Z0pyn5Vz8bjLzP4RCZ2y1Q2iDsqcd79WJSU5vY7T5EhwWuYs
+         LMS4ZhmTvenNP7j9hZIdVjnwa5npSJ+KJ6+zwlJzI1dNfKPXCnBjkC1HMlD43AXJA5ei
+         x3qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716558787; x=1717163587;
+        d=1e100.net; s=20230601; t=1716559016; x=1717163816;
         h=content-transfer-encoding:in-reply-to:organization:content-language
          :references:cc:to:subject:reply-to:user-agent:mime-version:date
          :message-id:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=S569fFY4KqVx+EvriaPbjpFfvIMqzAUWJ6RqNzEZH0k=;
-        b=nBLBlg0kdPJFrqT/m6KizKn2xZxW4jEYlh2rU655e22/Qu2/OPQedFVV+nT8ZsdUuW
-         ZjEiIb6jWDO4aa7fmlKRp9N3vMQ5CmnMZV82QzNC4sBW0Da81tm0xAg2wJ5v9ahFUXLP
-         HFFjilxHV2h7g4Cmtk9M+i6wR9b5gHdyN8CiN72ZdJj+Hhe+awnEygX4vjTriB3YizlT
-         2ZZDzC/XVo4R6HiPoRj3MtoUHpiDbtJn8ZOi6L+yTdkSnQVTJbF6qUsTZjggq9e1e2sV
-         GjISidhMOruYzXJTvHtheVH/HmVgG9k5nu5RG4P2pFxQWn6L2DcAXwtMihq2imHok27X
-         hHUg==
-X-Forwarded-Encrypted: i=1; AJvYcCULqCRcE00g/Vy6aQGWtN14vZ+eo/3VZh4q4fZsEAV2E2KzsllutjOeZWJYHIQkb0BZybE1WQkM0GlWNnbw3fvSxB9hKpd1w3aV0Xr9JljWD4gtd3ScvC7v3rKCT9mYMtH4As0+Gc4E1BUlsElV5guPCtas82jQBHWlWx8M
-X-Gm-Message-State: AOJu0YyBtd0jEM0dQIY/LkL9glGsFW+Jvvfjy+J4s4lK+2RZSlBON3gW
-	sdYPUQJh69be0YHSrXbLEVd+Oc9ExmZtiLk5CjKFB4xyj++SOvUY
-X-Google-Smtp-Source: AGHT+IGH/CmADwiQ9+iaEDrv+QH+ftV5NSAv+1nOxfTl5Jk7A54/oKiIi21wjyseui0jLKskLXVbxQ==
-X-Received: by 2002:a2e:84d5:0:b0:2e9:5cd5:cdab with SMTP id 38308e7fff4ca-2e95cd5cfa1mr11813391fa.49.1716558787369;
-        Fri, 24 May 2024 06:53:07 -0700 (PDT)
+        bh=DnGCZeDgq06e4yJxv3zYBUOrTNbIwkOVZezg5gdIpJc=;
+        b=OM8eIpSeZqucTMMOtW9BTlthLu3fb4foAU3uUGpM1ZQ7XgauCWbITIfM6tb7L4rV9G
+         3c5Us51WQOj8dy1v1oQeXYMkOCTlY5gbJFLPhWQ4XxCnWWvUrA0imuzdP7ZZVQxl1OSv
+         PazLOSHYMEZSaRzVx3o6Q6Fvunh/xRjrfj5TTJ1nG1+fhDtbgHqOK7xY6MrgNBJ2xjV9
+         MSNxXntm4phMiqtl+m8/QDGZLUHPyC4zsjfneNUIkqTxd96RKYWAEv6+vVrtPtLZVusJ
+         OO218CdeKliUjZBVOdna0hbg7fN/VNqhovBNBA44SZ20cumM7MPKbYi55V5lf1T+spGV
+         sM7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWKnzUgE7t8D/l+eq3Qda/U6UGehyU+1cLTtYibu35KMfrhUEa0sz46XyKMcJ4O//8Qm12qpTgITm8FD8Uclt+9F8nTQRi1S+3YLnXE97YnDtaPvyP6yMMFQZzvoCrYnm7VfaG8pvuYnFdCl3JKivRfMtX8QhEDBl6slde1
+X-Gm-Message-State: AOJu0Yz/Lx8RLEjxl1I5N3Le3GKdQfX8KbJ8fnTd5hSHnLxvRXfbY2j3
+	RNdTDSbD9V2atItzKkxMluw3rqhBhGxJoc2BTgQcBIxanE9drYEB
+X-Google-Smtp-Source: AGHT+IHetKRmg0p6ec20FHTRXCN/whjCZU8/Nl0XsjhlMJEnyWnCU0egaJ69kA4sx+zMiu/9CyYB0Q==
+X-Received: by 2002:a2e:b3c9:0:b0:2e1:2169:a5cc with SMTP id 38308e7fff4ca-2e95b0c2343mr12132001fa.15.1716559015865;
+        Fri, 24 May 2024 06:56:55 -0700 (PDT)
 Received: from [192.168.0.200] (54-240-197-234.amazon.com. [54.240.197.234])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100f5299dsm52751725e9.20.2024.05.24.06.53.05
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100fad970sm54296835e9.37.2024.05.24.06.56.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 May 2024 06:53:07 -0700 (PDT)
+        Fri, 24 May 2024 06:56:55 -0700 (PDT)
 From: Paul Durrant <xadimgnik@gmail.com>
 X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <a7f58b0d-6145-4f56-8d53-8a90bee84fe9@xen.org>
-Date: Fri, 24 May 2024 14:53:05 +0100
+Message-ID: <e62157f2-d691-4cf1-8cb0-717580b8a836@xen.org>
+Date: Fri, 24 May 2024 14:56:53 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,8 +80,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Reply-To: paul@xen.org
-Subject: Re: [RFC PATCH v3 11/21] KVM: x86: Simplify and comment
- kvm_get_time_scale()
+Subject: Re: [RFC PATCH v3 12/21] KVM: x86: Remove implicit rdtsc() from
+ kvm_compute_l1_tsc_offset()
 To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
  Sean Christopherson <seanjc@google.com>, Thomas Gleixner
@@ -99,36 +99,32 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
  zide.chen@intel.com, Dongli Zhang <dongli.zhang@oracle.com>,
  Chenyi Qiang <chenyi.qiang@intel.com>
 References: <20240522001817.619072-1-dwmw2@infradead.org>
- <20240522001817.619072-12-dwmw2@infradead.org>
+ <20240522001817.619072-13-dwmw2@infradead.org>
 Content-Language: en-US
 Organization: Xen Project
-In-Reply-To: <20240522001817.619072-12-dwmw2@infradead.org>
+In-Reply-To: <20240522001817.619072-13-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
 On 22/05/2024 01:17, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> Commit 3ae13faac400 ("KVM: x86: pass kvm_get_time_scale arguments in hertz")
-> made this function take 64-bit values in Hz rather than 32-bit kHz. Thus
-> making it entrely pointless to shadow its arguments into local 64-bit
-> variables. Just use scaled_hz and base_hz directly.
+> Let the callers pass the host TSC value in as an explicit parameter.
 > 
-> Also rename the 'tps32' variable to 'base32', having utterly failed to
-> think of any reason why it might have been called that in the first place.
-> This could probably have been eliminated too, but it helps to make the
-> code clearer and *might* just help a naïve 32-bit compiler realise that it
-> doesn't need to do full 64-bit shifts.
+> This leaves some fairly obviously stupid code, which using this function
+> to compare the guest TSC at some *other* time, with the newly-minted TSC
+> value from rdtsc(). Unless it's being used to measure *elapsed* time,
+> that isn't very sensible.
 > 
-> Having taken the time to reverse-engineer the function, add some comments
-> explaining it.
+> In this case, "obviously stupid" is an improvement over being non-obviously
+> so.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
->   arch/x86/kvm/x86.c | 60 ++++++++++++++++++++++++++++++++++++----------
->   1 file changed, 47 insertions(+), 13 deletions(-)
+>   arch/x86/kvm/x86.c | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
 > 
 
 Reviewed-by: Paul Durrant <paul@xen.org>
