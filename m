@@ -1,149 +1,137 @@
-Return-Path: <kvm+bounces-18140-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18141-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52C98CE6F2
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 16:25:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7756E8CE837
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 17:42:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A2E3281520
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 14:25:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2FA41F221BD
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 15:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E5D12C498;
-	Fri, 24 May 2024 14:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB03312DDB5;
+	Fri, 24 May 2024 15:42:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYQYwDMt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gs7Co7/g"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9168885266;
-	Fri, 24 May 2024 14:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B151DFFC;
+	Fri, 24 May 2024 15:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716560737; cv=none; b=TubRpTW+6ztE/KK2xdGl6Y2N7ctN7xmVPJ/oFrS9X8Yntmb+Ug3MDdfhCQKeS7g9BtGRr1OKGsrzldGphYO74iAamPEi7hrfxSRZNQ+u4Zfq9pE/hy20X9dzuuQpdzq7EQtiSnEhWLa1PslxRFJsr2LzdyElEpMRawteJav/f1M=
+	t=1716565356; cv=none; b=J6u8XEh73+a9V7Mnaozmpts6J0ZPmd4PL+uAYpJAClc4en99CBNb35bbmbhrk8pZZBDeJmF/YpOAq4VQlI4KdP99Yag5HIKqypvYGWTihKwu+euGsoCk3LTQbYGTMK0aQ4hgAVpD+hRH0q8vHue4Gz+lUaBLQi9ufmsaL5Qj2ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716560737; c=relaxed/simple;
-	bh=i5T8VMX6883AD5ny1iMp8S+d+BTgiK5gX6VGoj+n/ZQ=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fLm0iCKt4pjGcjmKw3rzbBXvi4Jh1qTsR1qKinMcB039uFCnss96SaoUpOZe3OcLA2SxPeGAKdwfV3rbuPOAVv6cz8qu/n0TBhYC9bULjBggUKcaMEB4JEl9z7IcWZVDUsb34PDUObSiC9KkDPxtuR1whT7qeCg5ML/tAlJZvCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYQYwDMt; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2e724bc466fso73794361fa.3;
-        Fri, 24 May 2024 07:25:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1716560734; x=1717165534; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=V+SbCl88kDWu5JpkM+zDsYPeWdf6fmH2eQbKUIgxY/c=;
-        b=dYQYwDMtTzgN7nTanA2cmoKu900z9FINwb1zCi3N5QOVIO0aKxtERDnQM4yBK6gVSi
-         7epuFhsm3Ydn93yu4+RVEdv+EJ6nKBOhp9vLXn4mQHaJNqYPP9UpQQ6YK6q3MGcPVtaC
-         1Y685Y3Nz9nE7dTfmgLUAKSLwVonzNJ+efacBwjCm+0wM+TGf/JjiucEPY9lkUsgCfuQ
-         rYnpMv88ISOI95LVEZZnZQriG5oQ5mcwKbbq2JnYadba8YkagZ9K7AmOeV+ds07XskC9
-         V3F3ZB+4Vp/BzVL1rtLHEGqC2OFDor14yoYV4cg8gztm4YqAGgBwVxuSLjzKVy4A1MTU
-         daXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716560734; x=1717165534;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V+SbCl88kDWu5JpkM+zDsYPeWdf6fmH2eQbKUIgxY/c=;
-        b=S4Nt+KXBAY0uqNk8gYDWpeLkw0DAbB5BPMqUBa97nA79TrMa7huDTtUsGKRZ4d3PTA
-         7KVGTG/lYj9+7i8UVY1+MfJxNqFWsJNPVQRukY5HVPrHrin6g/KZjiuPBp3xh1s1OIp2
-         rMUluZ1dK3ZMkZlGYe8r1BLWubAsd4S4ePyBxRq3YoHEggg3Xx7d77LHg83y5D7Iae7S
-         v6CmZF3lzUJl1T8askvuUZciWFvCcohAeGdQ4LnDsY9OmhvbChWQvWut0auAd85Ih3o6
-         oe2gWtCqb5vkVLoEydQwRr5DzCCE0tfT5Y9UMPe/eigjxI9yg6dN9OBPgM/RF+4pUeEx
-         tj+A==
-X-Forwarded-Encrypted: i=1; AJvYcCVtM5ULPEMiQb2zbZd/XpBlI7XSep/tG9T6MWmvwomUuEFGzm7azmA/IzebL40zERL/RedG/RzNx1RybsR3FRRzOT3USlE8Hr3uobvUQGCQDtiplK3i0XNp5h7Qp5IOSZkyoOzeyhPN22b2dxs0VlYaTNp1e1NU3IH8u3gO
-X-Gm-Message-State: AOJu0YyvbkS8nLKmfxQjaJF02wXeUimwYgeJ+PhkCHkG/2gdVIzbF4vl
-	kNfy7NSP9tUNDnYEa6hvsxz5v4Z/6wsbg/dVMPv07b6P6dnrT+kh
-X-Google-Smtp-Source: AGHT+IF65XQ0cUVmyUZKrF/14T3P1SnC/3B+ci8mfINEO6z/lWuS4ZdxUoexWOW1r9iA0cAXNnnNqg==
-X-Received: by 2002:a2e:ba14:0:b0:2df:1e3e:3280 with SMTP id 38308e7fff4ca-2e95b0c4febmr20430861fa.28.1716560733620;
-        Fri, 24 May 2024 07:25:33 -0700 (PDT)
-Received: from [192.168.0.200] (54-240-197-234.amazon.com. [54.240.197.234])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42100f15f66sm53951795e9.14.2024.05.24.07.25.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 May 2024 07:25:33 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <80f8ea7b-f767-4760-8a6e-b260da637903@xen.org>
-Date: Fri, 24 May 2024 15:25:31 +0100
+	s=arc-20240116; t=1716565356; c=relaxed/simple;
+	bh=k/cPA+LKz5A4pfe0FX/6LwhdaoxIeb1xH5HTKHqZYUY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j4vVh2eXLrWsUZM211kVm2vPrI5yne0VJFMnVNun2ZtdoQ7k2xnef31Qlk7SCs2tJkrmjMxxTxqYQHV8kgorxcJHrCeB3M/7vUpdy028KjqPWq2F6qUlEY0nlI2xZr1jWFK1+2pm/ssn9aDKHC2YXI/uYT+ilZZzCshs8OyqpIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gs7Co7/g; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1716565355; x=1748101355;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=k/cPA+LKz5A4pfe0FX/6LwhdaoxIeb1xH5HTKHqZYUY=;
+  b=gs7Co7/gkXsoaoRb/voCcZxgsbU8UE8EDRb7B/q+q2K8NnzjJHzNbLIS
+   pIA4VQDNjsCysu1PCUOifjOiqd/I2nHjBqQ319U3LS/QEx3C5nruwXmOg
+   xHPsw2Nydjz4DM9iytoYxPPQyJM3rpZpBbOvdeh4FWVq+mhwXz13CrWVN
+   Rk2fXeeKllRMIdinOhat+21A4IgbT1g1y+rj7s9rhtziyEz5SvxPV8P/s
+   ZdlZ7Ov43xtr+9qNaAV3zHAMN7cOm62h0qEIA+I1Noi76J0mp0uwRBz9x
+   VyF1niChZM5ZBW6ACmy4s1Xv1rhc0f1xMGeKdjONVf+5fLF9ErnQPBBxf
+   w==;
+X-CSE-ConnectionGUID: 2j+FCD2hSDi9oMRmgCEHOQ==
+X-CSE-MsgGUID: CWDSrL14TJil7lL8aMse/w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11082"; a="23612705"
+X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
+   d="scan'208";a="23612705"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2024 08:42:34 -0700
+X-CSE-ConnectionGUID: emd1RlWyRzGQ+zpqHhgIHA==
+X-CSE-MsgGUID: zLT++Fc9RaKw+woc5OgaGw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,185,1712646000"; 
+   d="scan'208";a="38486696"
+Received: from ssuppiah-mobl.gar.corp.intel.com (HELO desk) ([10.209.68.49])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2024 08:42:33 -0700
+Date: Fri, 24 May 2024 08:42:26 -0700
+From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To: Alexandre Chartre <alexandre.chartre@oracle.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	daniel.sneddon@linux.intel.com, tglx@linutronix.de,
+	konrad.wilk@oracle.com, peterz@infradead.org, seanjc@google.com,
+	andrew.cooper3@citrix.com, dave.hansen@linux.intel.com,
+	nik.borisov@suse.com, kpsingh@kernel.org, longman@redhat.com,
+	bp@alien8.de, pbonzini@redhat.com
+Subject: Re: [PATCH v2] x86/bhi: BHI mitigation can trigger warning in #DB
+ handler
+Message-ID: <20240524154226.dpwoqjuxhzc47ntk@desk>
+References: <20240524070459.3674025-1-alexandre.chartre@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [RFC PATCH v3 21/21] sched/cputime: Cope with steal time going
- backwards or negative
-To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Sean Christopherson <seanjc@google.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>,
- Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,
- Mel Gorman <mgorman@suse.de>, Daniel Bristot de Oliveira
- <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>,
- Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, jalliste@amazon.co.uk, sveith@amazon.de,
- zide.chen@intel.com, Dongli Zhang <dongli.zhang@oracle.com>,
- Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20240522001817.619072-1-dwmw2@infradead.org>
- <20240522001817.619072-22-dwmw2@infradead.org>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <20240522001817.619072-22-dwmw2@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240524070459.3674025-1-alexandre.chartre@oracle.com>
 
-On 22/05/2024 01:17, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Fri, May 24, 2024 at 09:04:59AM +0200, Alexandre Chartre wrote:
+> When BHI mitigation is enabled, if sysenter is invoked with the TF flag
+> set then entry_SYSENTER_compat uses CLEAR_BRANCH_HISTORY and calls the
+> clear_bhb_loop() before the TF flag is cleared. This causes the #DB
+> handler (exc_debug_kernel) to issue a warning because single-step is
+> used outside the entry_SYSENTER_compat function.
 > 
-> In steal_account_process_time(), a delta is calculated between the value
-> returned by paravirt_steal_clock(), and this_rq()->prev_steal_time which
-> is assumed to be the *previous* value returned by paravirt_steal_clock().
+> To address this issue, entry_SYSENTER_compat() should use
+> CLEAR_BRANCH_HISTORY after making sure flag the TF flag is cleared.
 > 
-> However, instead of just assigning the newly-read value directly into
-> ->prev_steal_time for use in the next iteration, ->prev_steal_time is
-> *incremented* by the calculated delta.
+> The problem can be reproduced with the following sequence:
 > 
-> This used to be roughly the same, modulo conversion to jiffies and back,
-> until commit 807e5b80687c0 ("sched/cputime: Add steal time support to
-> full dynticks CPU time accounting") started clamping that delta to a
-> maximum of the actual time elapsed. So now, if the value returned by
-> paravirt_steal_clock() jumps by a large amount, instead of a *single*
-> period of reporting 100% steal time, the system will report 100% steal
-> time for as long as it takes to "catch up" with the reported value.
-> Which is up to 584 years.
+>  $ cat sysenter_step.c
+>  int main()
+>  { asm("pushf; pop %ax; bts $8,%ax; push %ax; popf; sysenter"); }
 > 
-> But there is a benefit to advancing ->prev_steal_time only by the time
-> which was *accounted* as having been stolen. It means that any extra
-> time truncated by the clamping will be accounted in the next sample
-> period rather than lost. Given the stochastic nature of the sampling,
-> that is more accurate overall.
+>  $ gcc -o sysenter_step sysenter_step.c
 > 
-> So, continue to advance ->prev_steal_time by the accounted value as
-> long as the delta isn't egregiously large (for which, use maxtime * 2).
-> If the delta is more than that, just set ->prev_steal_time directly to
-> the value returned by paravirt_steal_clock().
+>  $ ./sysenter_step
+>  Segmentation fault (core dumped)
 > 
-> Fixes: 807e5b80687c0 ("sched/cputime: Add steal time support to full dynticks CPU time accounting")
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->   kernel/sched/cputime.c | 20 ++++++++++++++------
->   1 file changed, 14 insertions(+), 6 deletions(-)
+> The program is expected to crash, and the #DB handler will issue a warning.
 > 
+> Kernel log:
+> 
+>   WARNING: CPU: 27 PID: 7000 at arch/x86/kernel/traps.c:1009 exc_debug_kernel+0xd2/0x160
+>   ...
+>   RIP: 0010:exc_debug_kernel+0xd2/0x160
+>   ...
+>   Call Trace:
+>   <#DB>
+>    ? show_regs+0x68/0x80
+>    ? __warn+0x8c/0x140
+>    ? exc_debug_kernel+0xd2/0x160
+>    ? report_bug+0x175/0x1a0
+>    ? handle_bug+0x44/0x90
+>    ? exc_invalid_op+0x1c/0x70
+>    ? asm_exc_invalid_op+0x1f/0x30
+>    ? exc_debug_kernel+0xd2/0x160
+>    exc_debug+0x43/0x50
+>    asm_exc_debug+0x1e/0x40
+>   RIP: 0010:clear_bhb_loop+0x0/0xb0
+>   ...
+>   </#DB>
+>   <TASK>
+>    ? entry_SYSENTER_compat_after_hwframe+0x6e/0x8d
+>   </TASK>
+> 
+> Fixes: 7390db8aea0d ("x86/bhi: Add support for clearing branch history at syscall entry")
+> Reported-by: Suman Maity <suman.m.maity@oracle.com>
+> Signed-off-by: Alexandre Chartre <alexandre.chartre@oracle.com>
 
-Reviewed-by: Paul Durrant <paul@xen.org>
-
+Reviewed-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 
