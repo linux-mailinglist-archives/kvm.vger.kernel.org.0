@@ -1,136 +1,138 @@
-Return-Path: <kvm+bounces-18138-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20E5C8CE6E2
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 16:20:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FF1E8CE6E7
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 16:22:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA2A4281E60
-	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 14:20:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9E7E1F22682
+	for <lists+kvm@lfdr.de>; Fri, 24 May 2024 14:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 683B012C814;
-	Fri, 24 May 2024 14:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DED712C496;
+	Fri, 24 May 2024 14:21:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XyEO5d+C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gs0lSSQI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AF812C528;
-	Fri, 24 May 2024 14:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4878624F;
+	Fri, 24 May 2024 14:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716560413; cv=none; b=Bx5SBT6G1RhiFnUZ+EEbM10Mt4rrvTD6TSONbDdVKzJPCinh/nKVRckIw6sjOrmcYbZsoRqQzB8RC+2RDqWoi7fDrFSIyF2p0T98cHPfb/vm86f1SwQEyAvWeE8RUTJ879DZLycwBRvklqNsTZSlF/n/GLhM3J7TcyF5Sen1+X0=
+	t=1716560513; cv=none; b=S6/VCEpAfqWUShQw+c16pQI1s71+VBFw5eDpCUPZsb5VS5N7QT0JLAYE2t0J1OVlkBKv95NA8VG+WNZIoqJxxVNUO+16rx/UQI5RLVXqSi/zZrEvFEnksVODs1E7J4D0iqdaiTMZKQFOujbE3V74n5YKbXyV3hJML9e/aEpX5Kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716560413; c=relaxed/simple;
-	bh=xU072VGyeAHT1DAYktQWseuVolvnjzRb0w0T1x/SsfE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FAAPEQfjIyjDI3JUOQ8tqk2tQ40UlTC7aqT78qY6A/Svs1lXJZ1chvglQL1RqH0iAPlIz3vt0mv3FZCRyFGTgw/5nZi0GxIkam7IrBEaSYk3hgwkuF7WxY/E1SIF8g9UlmFrep9kI8P/DQfEPbv6gfVy5+fditeXah0BcUmoVp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XyEO5d+C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C8EAC32789;
-	Fri, 24 May 2024 14:20:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716560413;
-	bh=xU072VGyeAHT1DAYktQWseuVolvnjzRb0w0T1x/SsfE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XyEO5d+CsXAivITK9xTi9dn8/WtNYTJw5jpxXG5r0yGjOywMWPE7G/kVPC+4oZdye
-	 cTYgT697wzfyv+el/4e3z3vC9YgcKC8KW2jrkcDvJk+usF6diuYVup0N7cVa8mA0vf
-	 cC4BDaaN101b+WwI/4TD1xwuQ3Ebcx7rJWzvjXTYh2t8sYkgbUwbLF7Wn5jWoLC7Nh
-	 qX2Y9ML270+Udkcrupp1xbiXb6SAADoQGXyfUw7G3/01w5N2D5scWz10mc9VUnvhdq
-	 rFiLzMj+1FBRd3AwKPTYNJ1EWrhoUwNriLpE229kwVO3gZCVFUL8fJuFwrlfH+buJq
-	 9osT0Zwvl0z3A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sAVmF-00FRdK-8k;
-	Fri, 24 May 2024 15:20:11 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 3/3] KVM: arm64: AArch32: Fix spurious trapping of conditional instructions
-Date: Fri, 24 May 2024 15:19:56 +0100
-Message-Id: <20240524141956.1450304-4-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240524141956.1450304-1-maz@kernel.org>
-References: <20240524141956.1450304-1-maz@kernel.org>
+	s=arc-20240116; t=1716560513; c=relaxed/simple;
+	bh=I1fVQ8aruzVXFejrnCOpq85Ssr3vo69cTffIdP7BZpc=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=p3RLFEb+pqg4W4SvYECC+ftts/lxL0IrisrokQXh2NPnjXtLBkkKYSyqYduQu6bn/KCWAdQ97Xk/K6ZuHuZ/s0jBv3/kUqkqdK4ytY07E23/D/d5eV3UbaBZdCY0AcgG/Bcze0TGVaWtu/8gh8DZqwdRinFDSAdyXteuDF1pA/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gs0lSSQI; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2e95a7545bdso10951111fa.2;
+        Fri, 24 May 2024 07:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1716560510; x=1717165310; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EO6JyY37GyM7MbMeX101SjHOud1jj3bTq3LVAy1mWdM=;
+        b=Gs0lSSQInsS9FCmkM1tvp1o0bo7sz/lHlcDykFQ5R/J6gb0aQqmv45T518rsdIVUa8
+         vs1kN9n8S57Wmax8Nvs62rZByToKCHxTdXOqxHtH7mWid2aQD9XF6TY5wIsueIOf7caE
+         FT47DY0i9bx2qa5yWHdQQRSpHqD0wo76TyGXkkFqqYuxjN1ndd8TYAyd9KgjRYcXPy3a
+         M8KgvCex2LmCoUyY4F8SUna9xWFYrAomZ/KO+vHs/g1AhAT8eKlH7QcqLZulsvlii93a
+         fWrBi8MNjB+0Q8AfxcRXCEMXxfgUYG0N6Z5NPYRIEwx0lssR5DS2bwq29brqzzAQa3ni
+         sTKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716560510; x=1717165310;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EO6JyY37GyM7MbMeX101SjHOud1jj3bTq3LVAy1mWdM=;
+        b=O3zeqhCA36RuTPxAvCb3q2ttKexu+N1vMVf/9eT9Puu9PpHzKk2afb4u6wcVAy5gQ2
+         YfaaEQ+dAOUFBncwG6ZBtlRKL93b1YMYCJ9W1n0wSH460uFHl/nOrXaf8b5icSyiceWt
+         VAPvuxImG1fFyTHGEFS489s7NwPWPw08I8uvoTJyUEgikwuLi263Jqb8qfenEfzoXSK4
+         tKroSQPEKdA3addU1QggnUbN2GYxTtq2r7SpQQ5T4+x/RNqzfkKB9/gTJBf6QkJ4gh22
+         IgXmOTTCjd7/kSse0eF3U5wKcYn4x08WVgPVsKgPrySvBf9HJs24DRmN7cyag+3LFd/2
+         v7Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCXsz/6XNC968+e1gBW+MwNDD1WkX5Mbpu4LoRA8MKw+42kYglJOoBAe9Lo0egtNKPmxxDpAWGxGbqOaDbjXS+1Etc7/GzUCr8Y1yoqpJcb+p1cLe/fFzP4Wu9XisimJgodStZ7yGZIDccDmTc/hyFKrEMAoMDnH+VQNDfzh
+X-Gm-Message-State: AOJu0YxKH/kh3UJL+SpOws1/98tAUPxMUWTb6I1sB5+My3AI/DnRWyvP
+	axvgz4vSV9/NVFrMS0afP8fbqewrrpM+M+LGSAHlfbJ7vw3aMwFF
+X-Google-Smtp-Source: AGHT+IFaM5cCCStOymrSMk1BCIm0WOr58TUeWH/uU5BPxIKAbgFTc7roakKxooYtc8e5UIaxLJNLfQ==
+X-Received: by 2002:a2e:7e12:0:b0:2e9:53fc:4434 with SMTP id 38308e7fff4ca-2e95b256643mr14752221fa.42.1716560510085;
+        Fri, 24 May 2024 07:21:50 -0700 (PDT)
+Received: from [192.168.0.200] (54-240-197-234.amazon.com. [54.240.197.234])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421089b0410sm21761915e9.29.2024.05.24.07.21.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 May 2024 07:21:49 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <7d318473-a16f-455f-9ea0-0c0b2d919ff2@xen.org>
+Date: Fri, 24 May 2024 15:21:47 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, nsg@linux.ibm.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, stable@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [RFC PATCH v3 20/21] KVM: x86/xen: Prevent runstate times from
+ becoming negative
+To: David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Sean Christopherson <seanjc@google.com>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>,
+ Vincent Guittot <vincent.guittot@linaro.org>,
+ Dietmar Eggemann <dietmar.eggemann@arm.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,
+ Mel Gorman <mgorman@suse.de>, Daniel Bristot de Oliveira
+ <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jalliste@amazon.co.uk, sveith@amazon.de,
+ zide.chen@intel.com, Dongli Zhang <dongli.zhang@oracle.com>,
+ Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20240522001817.619072-1-dwmw2@infradead.org>
+ <20240522001817.619072-21-dwmw2@infradead.org>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <20240522001817.619072-21-dwmw2@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-We recently upgraded the view of ESR_EL2 to 64bit, in keeping with
-the requirements of the architecture.
+On 22/05/2024 01:17, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> When kvm_xen_update_runstate() is invoked to set a vCPU's runstate, the
+> time spent in the previous runstate is accounted. This is based on the
+> delta between the current KVM clock time, and the previous value stored
+> in vcpu->arch.xen.runstate_entry_time.
+> 
+> If the KVM clock goes backwards, that delta will be negative. Or, since
+> it's an unsigned 64-bit integer, very *large*. Linux guests deal with
+> that particularly badly, reporting 100% steal time for ever more (well,
+> for *centuries* at least, until the delta has been consumed).
+> 
+> So when a negative delta is detected, just refrain from updating the
+> runstates until the KVM clock catches up with runstate_entry_time again.
+> 
+> The userspace APIs for setting the runstate times do not allow them to
+> be set past the current KVM clock, but userspace can still adjust the
+> KVM clock *after* setting the runstate times, which would cause this
+> situation to occur.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>   arch/x86/kvm/xen.c | 18 ++++++++++++++----
+>   1 file changed, 14 insertions(+), 4 deletions(-)
+> 
 
-However, the AArch32 emulation code was left unaudited, and the
-(already dodgy) code that triages whether a trap is spurious or not
-(because the condition code failed) broke in a subtle way:
-
-If ESR_EL2.ISS2 is ever non-zero (unlikely, but hey, this is the ARM
-architecture we're talking about), the hack that tests the top bits
-of ESR_EL2.EC will break in an interesting way.
-
-Instead, use kvm_vcpu_trap_get_class() to obtain the EC, and list
-all the possible ECs that can fail a condition code check.
-
-While we're at it, add SMC32 to the list, as it is explicitly listed
-as being allowed to trap despite failing a condition code check (as
-described in the HCR_EL2.TSC documentation).
-
-Fixes: 0b12620fddb8 ("KVM: arm64: Treat ESR_EL2 as a 64-bit register")
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Cc: stable@vger.kernel.org
----
- arch/arm64/kvm/hyp/aarch32.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
-
-diff --git a/arch/arm64/kvm/hyp/aarch32.c b/arch/arm64/kvm/hyp/aarch32.c
-index 8d9670e6615d..449fa58cf3b6 100644
---- a/arch/arm64/kvm/hyp/aarch32.c
-+++ b/arch/arm64/kvm/hyp/aarch32.c
-@@ -50,9 +50,23 @@ bool kvm_condition_valid32(const struct kvm_vcpu *vcpu)
- 	u32 cpsr_cond;
- 	int cond;
- 
--	/* Top two bits non-zero?  Unconditional. */
--	if (kvm_vcpu_get_esr(vcpu) >> 30)
-+	/*
-+	 * These are the exception classes that could fire with a
-+	 * conditional instruction.
-+	 */
-+	switch (kvm_vcpu_trap_get_class(vcpu)) {
-+	case ESR_ELx_EC_CP15_32:
-+	case ESR_ELx_EC_CP15_64:
-+	case ESR_ELx_EC_CP14_MR:
-+	case ESR_ELx_EC_CP14_LS:
-+	case ESR_ELx_EC_FP_ASIMD:
-+	case ESR_ELx_EC_CP10_ID:
-+	case ESR_ELx_EC_CP14_64:
-+	case ESR_ELx_EC_SVC32:
-+		break;
-+	default:
- 		return true;
-+	}
- 
- 	/* Is condition field valid? */
- 	cond = kvm_vcpu_get_condition(vcpu);
--- 
-2.39.2
+Reviewed-by: Paul Durrant <paul@xen.org>
 
 
