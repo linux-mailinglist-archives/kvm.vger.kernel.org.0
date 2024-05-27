@@ -1,111 +1,134 @@
-Return-Path: <kvm+bounces-18178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3926A8D0017
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 14:33:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F2F8D05D7
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 17:20:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC551B23317
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 12:33:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 218062887D3
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 15:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1FD15E5D6;
-	Mon, 27 May 2024 12:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5061973463;
+	Mon, 27 May 2024 15:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xzdbb6fq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbtSOJS5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2249313B2A4
-	for <kvm@vger.kernel.org>; Mon, 27 May 2024 12:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFDC1E868;
+	Mon, 27 May 2024 15:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716813189; cv=none; b=T4u0Gw9+81XYrx0I9YjB6H8PUILJtYXShnT68bPderd5YCtn6Jt2SGGp22NXC91QWnFCjQsCIOpwyKgPUIoO7kPRdjmH8zViBq7/fIGaB+1FGp10mbRyBbVT6cdg22dP+VvP/RF3/ffFttR5Qbvg3DIni3ZP66hwKSKcZcIXBFU=
+	t=1716822558; cv=none; b=c174cK6ovm4KQIhdXZKnQbldXRyUfMrBWrneLzgE3E7lgFgtSKiHWyp1GTUignG3WjAFlapxtKWCtFTTAUJWnhW48PILQ/OGB1ZHtP5t+1GlvCu+ECE/HhjBbzfgj0jARNdr5U905/S7ekUjvOSfnQvhQJJPi3moyR7KViyeDYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716813189; c=relaxed/simple;
-	bh=6gpy4QnlXfn+3VfnJIdKkS3eQTcH5CkCvAbl/LBAL7Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rubrhJ4vLZSSJ3ypBHrTXuaqMq6sc+nRWn/iJEkTGZlNH9RRoTaporveCo/kZNNnsLdfJJkKSLmGbs/KfIo6z5tNAIfYjRmZ6t2NAkF2KyPcQz1z4P4C2iWkVHol+L8o7/Cs+zjfUXj+nho09rdG8lnAwSV8xUG/mZ3zs4jJh9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xzdbb6fq; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-354de97586cso6494521f8f.0
-        for <kvm@vger.kernel.org>; Mon, 27 May 2024 05:33:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1716813186; x=1717417986; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4PbKr6F4qyJEGh68m1meo5rRQR6WxkeJ7FMZXKENRV0=;
-        b=xzdbb6fq0LJntuZkZBwLuTISb20CAGSt8MJhSIqpmOu0fbKFrJBjur2YzKCkG/3zlF
-         BieO76tfiki5EqA4MN6au6YEbknU+cWfL5ElLfvjUsfgWmSndXJn3IjbWeH0FTxTXto1
-         6b/j3y7CSxSspyexMO3FV8dqakGw6w8kN5MUjDSSSZJaF8+JppoAeYKklOjZVq+xqk/b
-         sLoKvZqjE9pf4cwpxEkwrFiqm6B/dEjLB1O/EcDzO3sunHSD7gISnWUIWaUphIkNZYK1
-         oOl7tpzlZxe2iuoNgrvVeNLiTyHlyu/HMZy/beD6Vm1ssbxsd1ZPHSKqhoUTSM7I1T0L
-         ciCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716813186; x=1717417986;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4PbKr6F4qyJEGh68m1meo5rRQR6WxkeJ7FMZXKENRV0=;
-        b=a3BCbWZk/BP2k2npRaog0A3mVU7DaUbvC2dIOxuTBH3FSvs1QOfrkT+lfThufQ6h3s
-         wAUEvLHxKfNdKfw37oTPkgS4FSnCPXreVEXGy/z6LGk2bdJLY5PpbQHE3e5fMslM90iS
-         guCEq8nuNuCv80RXMlIU3fhcTzU/5Scyhi+/oyv7IeqHUPCIxB1rJTy9071a6sdVFWnj
-         V9tjzmUZSvdcsVDID9XJ8qQal/9PdRiAVDBWNhr5rR6mCdSQBCxu3zg93hU/Em4Ywun2
-         Vs94MwYcsKbEdhL3NDvbDTmk5OqBwFBCtzXS4RfBEz3DtbqmDT9HJMbEKRCE4aWTRFQp
-         iweQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXs0agL6L6J07s0aAUCLYnbYUuDfUGX9LPunPQhMJBce1DK/p46583QcbZYRJImzi4ZAXSa3KTCLL+eZG1C8cY9sGGL
-X-Gm-Message-State: AOJu0Yx94CKXqmhxbdYXx4X3Ni+9eNp0kAkh+qmjMZrfZNXpHe7zH2k8
-	lo1qN2ZvLc0Fs1NFM3vJYWFWb8xt24FZ6o6GZ0Vbk2mZBXgiFUU+VBY+j4ngVUE=
-X-Google-Smtp-Source: AGHT+IF3YzofNuY7fs0Qc1CTGRPqO/DtJKUbJFULuqF8piYQueCYqw+R3VAn7929Wkj5lhKwclJHmw==
-X-Received: by 2002:adf:eccf:0:b0:349:eb59:c188 with SMTP id ffacd0b85a97d-35526d67290mr6935711f8f.5.1716813186518;
-        Mon, 27 May 2024 05:33:06 -0700 (PDT)
-Received: from [192.168.69.100] ([176.176.152.134])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3557a08cc1bsm9025986f8f.45.2024.05.27.05.33.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 May 2024 05:33:06 -0700 (PDT)
-Message-ID: <bcca84a0-f12b-490c-a61f-b10a9fa0395d@linaro.org>
-Date: Mon, 27 May 2024 14:33:04 +0200
+	s=arc-20240116; t=1716822558; c=relaxed/simple;
+	bh=YuKxD3bWQ8aYWzULrWddjuARczonPYhNEB+CaCLpbT0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pYu4V9TaJD1K4HTenRYP9bpXnac4BQlBRyL/TOtmDQjO2b3/7O7TxmpJFnpDCAULxYWYhgAJG/PKLl4bCwdIZY+pcR2Yk5oXcLpMOI4IGKFTDC0OvvDyo8XSX5O0kOLNRLL93B2G0wruxYKNr2psd0Fh5u88F03cGzSZHRN73U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbtSOJS5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10D29C2BBFC;
+	Mon, 27 May 2024 15:09:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716822558;
+	bh=YuKxD3bWQ8aYWzULrWddjuARczonPYhNEB+CaCLpbT0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RbtSOJS5A0pxbhhg/T2QRACi/3qELIIl8uDyGzpJ3dNKNbzcNWSr1VSk3Bq+S71KQ
+	 //wLknjrjCT3MPDI9Z0TuqVRrwd/nAllBflc5Cfs+g1CtRc2di7xgxJ8reDR+HBrNT
+	 h1z5IIKT5V919t72iKuNeAElyVwOr3G0ya5mWiRnl8GsZ49TLpZR8o7zHsMwVw2IRG
+	 zmEtR3AG5NgtNbxL9EQU1kBUYNLUk2qaHg8a9dn6GRJ0KNBfcetBxHw2nIkqmDCJuE
+	 04Ho9cLZezkdeoXMGmPJzXkX4ck/JWvbCk4UC4PIJg6NtfsdE9IWJm7EYiO68i5jLD
+	 nMsUxBi+WcFSA==
+Date: Mon, 27 May 2024 16:09:12 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org, greentime.hu@sifive.com,
+	vincent.chen@sifive.com, cleger@rivosinc.com, alex@ghiti.fr,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v4 2/5] dt-bindings: riscv: Add Svadu Entry
+Message-ID: <20240527-widely-goatskin-bb5575541aed@spud>
+References: <20240524103307.2684-1-yongxuan.wang@sifive.com>
+ <20240524103307.2684-3-yongxuan.wang@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] MIPS: Loongson64: Include bootinfo.h in dma.c
-To: Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen
- <chenhuacai@kernel.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Cc: linux-mips@vger.kernel.org, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240507-loongson64-warnings-v1-0-2cad88344e9e@flygoat.com>
- <20240507-loongson64-warnings-v1-2-2cad88344e9e@flygoat.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20240507-loongson64-warnings-v1-2-2cad88344e9e@flygoat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="39tUOd5aicq+YFEC"
+Content-Disposition: inline
+In-Reply-To: <20240524103307.2684-3-yongxuan.wang@sifive.com>
 
-On 7/5/24 20:51, Jiaxun Yang wrote:
-> dma.c defined function plat_swiotlb_setup, which is declared in
-> bootinfo.h.
-> 
-> Fixes warning:
-> arch/mips/loongson64/dma.c:25:13: warning: no previous prototype for ‘plat_swiotlb_setup’ [-Wmissing-prototypes]
->     25 | void __init plat_swiotlb_setup(void)
->        |             ^~~~~~~~~~~~~~~~~~
-> 
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+
+--39tUOd5aicq+YFEC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, May 24, 2024 at 06:33:02PM +0800, Yong-Xuan Wang wrote:
+> Add an entry for the Svadu extension to the riscv,isa-extensions property.
+>=20
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> Acked-by: Conor Dooley <conor.dooley@microchip.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+I'm going to un-ack this, not because you did something wrong per se,
+but because there's some discussion on the OpenSBI list about what is
+and what is not backwards compatible and how an OS should interpret
+svade and svadu:
+https://lists.infradead.org/pipermail/opensbi/2024-May/006949.html
+
+Thanks,
+Conor.
+
 > ---
->   arch/mips/loongson64/dma.c | 1 +
->   1 file changed, 1 insertion(+)
+>  Documentation/devicetree/bindings/riscv/extensions.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Do=
+cumentation/devicetree/bindings/riscv/extensions.yaml
+> index 468c646247aa..598a5841920f 100644
+> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> @@ -153,6 +153,12 @@ properties:
+>              ratified at commit 3f9ed34 ("Add ability to manually trigger
+>              workflow. (#2)") of riscv-time-compare.
+> =20
+> +        - const: svadu
+> +          description: |
+> +            The standard Svadu supervisor-level extension for hardware u=
+pdating
+> +            of PTE A/D bits as ratified at commit c1abccf ("Merge pull r=
+equest
+> +            #25 from ved-rivos/ratified") of riscv-svadu.
+> +
+>          - const: svinval
+>            description:
+>              The standard Svinval supervisor-level extension for fine-gra=
+ined
+> --=20
+> 2.17.1
+>=20
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+--39tUOd5aicq+YFEC
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZlSiGAAKCRB4tDGHoIJi
+0rsyAQDVctvH18CS7Wmm09E45EARmF5ZCi1dVq5wi3eKs6RM2gEA4XNa7WqLM3B8
+qQI+GhZGvFqrbLnnav9sXWDnIHogkQU=
+=AIHm
+-----END PGP SIGNATURE-----
+
+--39tUOd5aicq+YFEC--
 
