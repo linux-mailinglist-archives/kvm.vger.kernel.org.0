@@ -1,127 +1,204 @@
-Return-Path: <kvm+bounces-18153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18157-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66E448CF733
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 02:57:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B8D48CF90D
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 08:28:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1796528177B
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 00:57:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71C611C20B57
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 06:28:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BA63211;
-	Mon, 27 May 2024 00:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 916E417C79;
+	Mon, 27 May 2024 06:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nSBEmYo7"
+	dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b="WnWYpRk8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D81E64D;
-	Mon, 27 May 2024 00:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD99117BB6
+	for <kvm@vger.kernel.org>; Mon, 27 May 2024 06:28:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716771457; cv=none; b=bJ1Fxrp6F0lLVmZrBGnAqf/rBYHtiwHs1VqjHmM7g0Aoa5DJpglOVYQBhvxNbF3LjJXYELhOS0dp2XX7DLpStrdwoBhF7ldPZmP7kATVEVKMkmK5mLz5DvDXxFo4rc/RJBFkR06fq2KsEnFzv9PwhD2lbG3LxucoZYg/kLP/JVQ=
+	t=1716791288; cv=none; b=qUFhGHR5ibv/ztuP0QSuCUiMSHTsf73VNiTNqXujaj5zSQHH5sIfjtZBwxw3fyYMLqBlZH8twv5nZoiFVQUuDu7oqEKjBLYjXJyo2Bzv2p4i1/sqCVPJlB1B5gJswx4JLzHSvGK96lKP2v/dp/GdGWigxscJocDA4hP91GXpv3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716771457; c=relaxed/simple;
-	bh=rsK1IsML/UxFu1xXGLPPqKz0eHkBTwAPomJ3dUFEjqk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yu3LfPZoI8CDsP74ATuAnhQmTWIwSkaRRDktW5acIhJpQPoRtR4LGQWVXsk9fccjLZHd9zVzxLl2VUhM/NGbysl0H/CR2MLbGEjXxrCmdKUObine4Wyo/M2sySik5lJ9F3xot4RUCLbL5c2KUHarnMhwLPlfP9aB4lz7zU0hJws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nSBEmYo7; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716771455; x=1748307455;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rsK1IsML/UxFu1xXGLPPqKz0eHkBTwAPomJ3dUFEjqk=;
-  b=nSBEmYo7d7zbnXPcgUAUYgto3cMUZrZW8kjLUaRAcqJp32EdNgXksCUg
-   o/8iUmi5raQKl7tHZAmmc8lpn7E1uMXv9YdCqneo+q52KBM8IFnFRE+py
-   XZc7lz0YHyvU8k6+uc2GnWBcjZy++CV6i/1qVJKC724oCowvDINr1CbBi
-   3rPKZzBkEVc5wivme7wMuImHOGyPhdo+7YU3i1hMLWM+M8nJiZddCCkYv
-   VEnJtEKpGvFFlc85wRZIhLW5eVc4R0hlhHMTUs9UbyqpUpXvFaORgJf//
-   yUdNQ+/cE1vI66Q+ynnan8SCGVEg5cm/BCZECh+dWXajEcHfCEAGRaoNo
-   g==;
-X-CSE-ConnectionGUID: Lm5m4kXsQ423fiQbQh1/4A==
-X-CSE-MsgGUID: HUF8mqFGTjq3mnhxW3FI7A==
-X-IronPort-AV: E=McAfee;i="6600,9927,11084"; a="30598555"
-X-IronPort-AV: E=Sophos;i="6.08,191,1712646000"; 
-   d="scan'208";a="30598555"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2024 17:57:34 -0700
-X-CSE-ConnectionGUID: FRvCXjwUSQW/K585oeZSCw==
-X-CSE-MsgGUID: lYDdnMVtSFGieYRfZHKRzg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,191,1712646000"; 
-   d="scan'208";a="34503825"
-Received: from unknown (HELO [10.238.8.173]) ([10.238.8.173])
-  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 May 2024 17:57:30 -0700
-Message-ID: <6a7b865f-9513-4dd2-9aff-e8f19dea6d90@linux.intel.com>
-Date: Mon, 27 May 2024 08:57:28 +0800
+	s=arc-20240116; t=1716791288; c=relaxed/simple;
+	bh=jS5+tWV1ahyUgtn/S1gImAhsQfwDBISaxk4G8lxGqTc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cG/T8XnI0Lflr9hCNMyfgdYG75Czk0ilqctG/sSHXD6mCogx9Y3/EfdilGSLLKhnMFOn4LCymio95LC7YQn1FhqwAE05eXpPaZvDdywTLxaABPm/SIbdazQ3dcMFI4L+p+IqgwpbIdZDV2+Z1BolTxZKxGD3+7c/PC7lukd2ZIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de; spf=pass smtp.mailfrom=t-8ch.de; dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b=WnWYpRk8; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-8ch.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=t-8ch.de; s=mail;
+	t=1716791283; bh=jS5+tWV1ahyUgtn/S1gImAhsQfwDBISaxk4G8lxGqTc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=WnWYpRk8Gh7omZF+DL/NlfWABvlT8Qi0npBawdDMDN8kgb6Uu3HTdbCvulODMLWC0
+	 OPUD8B0gKu8QoBpc3Ga9B7I/N1AvZC9Elr10SMeNivKiSynF83j6NKD0YacHMMJig5
+	 bRZ1/WiFa64NPZEdYL/Lhf8w9LTX9g31CH49U6LI=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+Subject: [PATCH v8 0/8] update linux headers to v6.10-rc1 and shutdown
+ support for pvpanic
+Date: Mon, 27 May 2024 08:27:46 +0200
+Message-Id: <20240527-pvpanic-shutdown-v8-0-5a28ec02558b@t-8ch.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 105/130] KVM: TDX: handle KVM hypercall with
- TDG.VP.VMCALL
-To: Isaku Yamahata <isaku.yamahata@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
-Cc: Chao Gao <chao.gao@intel.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
- erdemaktas@google.com, Sagi Shahar <sagis@google.com>,
- Kai Huang <kai.huang@intel.com>, chen.bo@intel.com, hang.yuan@intel.com,
- tina.zhang@intel.com, isaku.yamahata@linux.intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <ab54980da397e6e9b7b8d6636dc88c11c303364f.1708933498.git.isaku.yamahata@intel.com>
- <ZgvHXk/jiWzTrcWM@chao-email>
- <20240404012726.GP2444378@ls.amr.corp.intel.com>
- <8d489a08-784b-410d-8714-3c0ffc8dfb39@linux.intel.com>
- <20240417070240.GF3039520@ls.amr.corp.intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240417070240.GF3039520@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAOInVGYC/33QzWrEIBQF4FcZXNdy1Xv96arvMXShxjRukpCk6
+ ZQh714zUCYE6fJc+M5B72xOU04ze7vc2ZTWPOehL8G+XFjsfP+ZeG5KZhKkEgKQj+vo+xz53H0
+ tzfDdc5AJA8aADh0rbJxSm2+PyutHyV2el2H6eSysYr/+U7YKDqVRkRJkrBPhfeE2dq9NYnvXK
+ g9e2oqXxVsFyqmAFIM+eXX0ruJV8dF5aZ1sI0l18vjnEQSYisd9XxCANwnBipOng6/uU/EtedA
+ QrIkGT14/vYTa+3XxThNZ8BHInP/PPL2SquJN8eijaBtC3ej24Ldt+wVpmDKGLwIAAA==
+To: "Michael S. Tsirkin" <mst@redhat.com>, 
+ Cornelia Huck <cohuck@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+ Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, 
+ Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, 
+ Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1716791282; l=5638;
+ i=thomas@t-8ch.de; s=20221212; h=from:subject:message-id;
+ bh=jS5+tWV1ahyUgtn/S1gImAhsQfwDBISaxk4G8lxGqTc=;
+ b=8xPidmDShbYSEsGFCGCOFycfN1dSSfrWfdM2iqWYT9aHS2rq/T5UPD5TkX5b3+9dFeZK8YT9z
+ lLmVEEoyC/xDVHo4jfC9YWMo/3QKW7Pzic5t2y+8lKpuZ4G0RYRgy5V
+X-Developer-Key: i=thomas@t-8ch.de; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
+Shutdown requests are normally hardware dependent.
+By extending pvpanic to also handle shutdown requests, guests can
+submit such requests with an easily implementable and cross-platform
+mechanism.
 
+The background is the usage of minimal Linux kernels with different
+architectures for testing purposes.
+Poweroff support varies highly per architecture and requires a bunch of
+code to be compiled to work.
+pvpanic on the other hand is very small and uniform.
 
-On 4/17/2024 3:02 PM, Isaku Yamahata wrote:
-> On Wed, Apr 17, 2024 at 02:16:57PM +0800,
-> Binbin Wu <binbin.wu@linux.intel.com> wrote:
->
->>
->> On 4/4/2024 9:27 AM, Isaku Yamahata wrote:
->>> On Tue, Apr 02, 2024 at 04:52:46PM +0800,
->>> Chao Gao <chao.gao@intel.com> wrote:
->>>
->>>>> +static int tdx_emulate_vmcall(struct kvm_vcpu *vcpu)
->>>>> +{
->>>>> +	unsigned long nr, a0, a1, a2, a3, ret;
->>>>> +
->>>> do you need to emulate xen/hyper-v hypercalls here?
->>> No. kvm_emulate_hypercall() handles xen/hyper-v hypercalls,
->>> __kvm_emulate_hypercall() doesn't.
->> So for TDX, kvm doesn't support xen/hyper-v, right?
->>
->> Then, should KVM_CAP_XEN_HVM and KVM_CAP_HYPERV be filtered out for TDX?
-> That's right. We should update kvm_vm_ioctl_check_extension() and
-> kvm_vcpu_ioctl_enable_cap().  I didn't pay attention to them.
-Currently, QEMU checks the capabilities for Hyper-v/Xen via 
-kvm_check_extension(), which is the global version.
-Only modifications in KVM can't hide these capabilities. It needs 
-userspace to use VM or vCPU version to check the capabilities for 
-Hyper-v and Xen.
-Is it a change of ABI when the old global version is still workable, but 
-userspace switches to use VM/vCPU version to check capabilities for 
-Hyper-v and Xen?
-Are there objections if both QEMU and KVM are modified in order to 
-hide Hyper-v/Xen capabilities for TDX?
+Patch 1 is a fix for scripts/update-linux-headers.sh
+Patch 2 updates the bundled linux headers to Linux v6.10-rc1.
 
+Patch 3 and 4 are general cleanups, which seem useful even without this
+proposal being implemented.
+They should also be ready to be picked up from the series on their own.
 
+The remaining patches implement the new functionality and update the
+docs.
+
+The matching driver for Linux is part of Linux v6.10-rc1.
+
+To: Michael S. Tsirkin <mst@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org
+Cc: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Cc: kvm@vger.kernel.org
+Signed-off-by: Thomas Weißschuh <thomas@t-8ch.de>
+
+Changes in v8:
+- Import linux headers from v6.10-rc1 (and update series subject)
+- Use PVPANIC_SHUTDOWN from new linux headers
+- Update Since: tag in QAPI to 9.1
+- Link to v7: https://lore.kernel.org/r/20240323-pvpanic-shutdown-v7-0-4ac1fd546d6f@t-8ch.de
+
+Changes in v7:
+- Keep standard-header/pvpanic.h
+- Predefine PVPANIC_SHUTDOWN in include/hw/misc/pvpanic.h
+- Fix alignment in QAPI to comply with newly enforced layout
+- Update Since: tag in QAPI to 9.0
+- Drop note from pvpanic spec about missing implementation
+- Link to v6: https://lore.kernel.org/r/20240208-pvpanic-shutdown-v6-0-965580ac057b@t-8ch.de
+
+Changes in v6:
+- Replace magic constant "4" in tests with PVPANIC_SHUTDOWN
+- Link to v5: https://lore.kernel.org/r/20240129-pvpanic-shutdown-v5-0-f5a060b87c74@t-8ch.de
+
+Changes in v5:
+- Add patch from Alejandro to emit a QMP event.
+- Update cover letter.
+- Add tests.
+- Link to v4: https://lore.kernel.org/r/20240107-pvpanic-shutdown-v4-0-81500a7e4081@t-8ch.de
+
+Changes in v4:
+- Rebase on 8.2 master
+- Resend after tree reopened and holidays
+- Link to v3: https://lore.kernel.org/r/20231129-pvpanic-shutdown-v3-0-c9a2892fc523@t-8ch.de
+
+Changes in v3:
+- Drop from Linux imported pvpanic header as discussed with Cornelia and
+  requested by Greg
+- Link to v2: https://lore.kernel.org/r/20231128-pvpanic-shutdown-v2-0-830393b45cb6@t-8ch.de
+
+Changes in v2:
+- Remove RFC status
+- Add Ack from Thomas to 2nd patch
+- Fix typo in title of 2nd patch
+- Link to v1: https://lore.kernel.org/r/20231104-pvpanic-shutdown-v1-0-02353157891b@t-8ch.de
+
+---
+Alejandro Jimenez (1):
+      pvpanic: Emit GUEST_PVSHUTDOWN QMP event on pvpanic shutdown signal
+
+Thomas Weißschuh (7):
+      scripts/update-linux-headers: Copy setup_data.h to correct directory
+      linux-headers: update to 6.10-rc1
+      hw/misc/pvpanic: centralize definition of supported events
+      tests/qtest/pvpanic: use centralized definition of supported events
+      hw/misc/pvpanic: add support for normal shutdowns
+      tests/qtest/pvpanic: add tests for pvshutdown event
+      Revert "docs/specs/pvpanic: mark shutdown event as not implemented"
+
+ docs/specs/pvpanic.rst                      |   2 +-
+ hw/misc/pvpanic-isa.c                       |   3 +-
+ hw/misc/pvpanic-pci.c                       |   3 +-
+ hw/misc/pvpanic.c                           |   8 +-
+ include/hw/misc/pvpanic.h                   |   4 +
+ include/standard-headers/linux/ethtool.h    |  55 +++++++++++
+ include/standard-headers/linux/pci_regs.h   |   6 ++
+ include/standard-headers/linux/pvpanic.h    |   7 +-
+ include/standard-headers/linux/virtio_bt.h  |   1 -
+ include/standard-headers/linux/virtio_mem.h |   2 +
+ include/standard-headers/linux/virtio_net.h | 143 ++++++++++++++++++++++++++++
+ include/sysemu/runstate.h                   |   1 +
+ linux-headers/asm-generic/unistd.h          |   5 +-
+ linux-headers/asm-loongarch/kvm.h           |   4 +
+ linux-headers/asm-mips/unistd_n32.h         |   1 +
+ linux-headers/asm-mips/unistd_n64.h         |   1 +
+ linux-headers/asm-mips/unistd_o32.h         |   1 +
+ linux-headers/asm-powerpc/unistd_32.h       |   1 +
+ linux-headers/asm-powerpc/unistd_64.h       |   1 +
+ linux-headers/asm-riscv/kvm.h               |   1 +
+ linux-headers/asm-s390/unistd_32.h          |   1 +
+ linux-headers/asm-s390/unistd_64.h          |   1 +
+ linux-headers/asm-x86/kvm.h                 |   4 +-
+ linux-headers/asm-x86/unistd_32.h           |   1 +
+ linux-headers/asm-x86/unistd_64.h           |   1 +
+ linux-headers/asm-x86/unistd_x32.h          |   2 +
+ linux-headers/linux/kvm.h                   |   4 +-
+ linux-headers/linux/stddef.h                |   8 ++
+ linux-headers/linux/vhost.h                 |  15 +--
+ qapi/run-state.json                         |  14 +++
+ scripts/update-linux-headers.sh             |   2 +-
+ system/runstate.c                           |   6 ++
+ tests/qtest/pvpanic-pci-test.c              |  44 ++++++++-
+ tests/qtest/pvpanic-test.c                  |  34 ++++++-
+ 34 files changed, 361 insertions(+), 26 deletions(-)
+---
+base-commit: 60b54b67c63d8f076152e0f7dccf39854dfc6a77
+change-id: 20231104-pvpanic-shutdown-02e4b4cb4949
+
+Best regards,
+-- 
+Thomas Weißschuh <thomas@t-8ch.de>
 
 
