@@ -1,144 +1,105 @@
-Return-Path: <kvm+bounces-18183-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18184-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D0B8D0898
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 18:30:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 490798D08F2
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 18:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5713C1F23777
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 16:30:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB82C2823A4
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 16:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBA615D5D2;
-	Mon, 27 May 2024 16:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D695B15A86A;
+	Mon, 27 May 2024 16:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="VRGTBMug"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gihk2WUd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD3F73467
-	for <kvm@vger.kernel.org>; Mon, 27 May 2024 16:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0700C1E4BF;
+	Mon, 27 May 2024 16:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716827390; cv=none; b=Dkr52xdaixlQWQ1Tmgm4wl8BIFfKbO91S3u0ZZUBMl1tHXFKg82qulQV9vWb8ZbCNouBwmfECCDeIy7SHXfo60MxMwLyH1BByIsMNAAhuO0PRAe8aCKQirkFbrPrAT8BcCIdIE+g5iwazJz+eMsSaBkzc2ErKxlamHg/tfZvmRI=
+	t=1716828530; cv=none; b=Qq2ZLZnnaJuHta33Qxk1owt18xo7cbR0VH3SGq1rrBluZTTg0in8mzh8kAf1pCNTaX8+jR25caQ0GH17Erk2gLoSofBSoxNErOxnZvvlIPty14Gb/4wHae7HDc06PPhNupBESOf7P2h6Sl7XhdGJWCmVfoIpacjjVungikGb8OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716827390; c=relaxed/simple;
-	bh=IZXMCQ1FxdHmcAoyzX6sKL0KJwelX3zrJhQyguv/6zQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pBIAyQdS1b9iPtQyrikgWbi0WKv4386txG6h8LJiIBdJ+1mqbRu0pc3rR9+hOCL86lso7ylLJjqDeI1h9p34amURdx4ZFRGaYFCWjUJYbCQ9mk7ca4ZClD7iKjqAS7/Dg2Vjt/AHEVGmSizW6fTgRiXiBdhWko0gh3U7B9+s+MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=VRGTBMug; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42101a2ac2cso35455695e9.0
-        for <kvm@vger.kernel.org>; Mon, 27 May 2024 09:29:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1716827387; x=1717432187; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=H2zB37FLsCEU3qcA1K5WX2J0t5s2Si0hkv34drQge/E=;
-        b=VRGTBMug1gSv8vjl/tROma6MvCo78uj2HSQn3sHTSWsXLYl6l7hMD9dHoDr2X6WN09
-         d+q0nmxqPtS6LgFLlyieBFwdHnpH3pvwQRXsX9DYeOS2L5eKAGroVIVC6pQlpGc8ER0+
-         gq7pyVN0obXHDwrVTqg0O/vWN1OPyx2knBTTrbxv69wNLBXQfU/jkGinsNw/0EeUL8S3
-         Fqfi8WaLPlwYYYwR2r335tHyKHDBRk81GKiCxlAuQ6nZxMqvoTsI0h7WzLYVEJMCEFIy
-         1lMM60M2HltGR80sB1JiwJXE2UUxfiLDiCrYhPVVVGkwDDNh91MQpwh8NsEjRcCzQTrc
-         WBJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716827387; x=1717432187;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H2zB37FLsCEU3qcA1K5WX2J0t5s2Si0hkv34drQge/E=;
-        b=Y1GO4KKnyEVhImIV7N4nffRZ3kP6Gf6vAR5GTgnaHRWxbs02idxvLtU5RjrdvNCRuQ
-         xKkcs/n90ZEpq2Zg71q4xFbh1DIb6nfi7V9cHz698GYlXI1pyVFOpqtAhvm28bg41z/n
-         c1rGaVWrCyQbGWmH6dCa1bxu7VZT3BIwnVZJA84HZ8dHXJq0ieBXTq2AwSu+KEouve/X
-         oniIIUzU84TXpT3HZs54n17XBjsfAvEkK4h9aQMRfQ1vwB4n1W1UXHH6t83d4gOn/Q6h
-         D+UvuONrcPWVtzJqiXiyQAMFT4mSYgRONfKgpQ0Ur8VOfsAMQ38ZC88XTtWfoaiegto0
-         BlCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHK8unm+PpiFgTVmaufhZkyylR0F8MDyDRcz8wkiqiKhWNJZjWIC6K63EBE71pI3gs17tqxkwIy8Rla5HSUMJhpoHS
-X-Gm-Message-State: AOJu0YwMaN/oBempkJ/jTiNeDeXoOiqTOyuNmSs8q8HCkM8tf4ZIreUo
-	zfx0zSRoZv3DlwZPWIw347mCDqK7PGcHzSzaqe1pfu+15naLKCm99ZCBeQFZ+t8=
-X-Google-Smtp-Source: AGHT+IHINXCkiw2NUljFrgeUFwhaZdwQ+fb2vuaNPpG8uSuGOg50lvCQavB66BSGklf0wD2Hp15QoA==
-X-Received: by 2002:a7b:cbd8:0:b0:420:11cd:d302 with SMTP id 5b1f17b1804b1-421089d7682mr64769185e9.9.1716827386761;
-        Mon, 27 May 2024 09:29:46 -0700 (PDT)
-Received: from localhost ([176.74.158.132])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4210896f442sm113388455e9.11.2024.05.27.09.29.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 May 2024 09:29:46 -0700 (PDT)
-Date: Mon, 27 May 2024 18:29:45 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	cleger@rivosinc.com, alex@ghiti.fr, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v4 5/5] KVM: riscv: selftests: Add Svadu Extension to
- get-reg-list testt
-Message-ID: <20240527-e9845c06619bca5cd285098c@orel>
-References: <20240524103307.2684-1-yongxuan.wang@sifive.com>
- <20240524103307.2684-6-yongxuan.wang@sifive.com>
+	s=arc-20240116; t=1716828530; c=relaxed/simple;
+	bh=Vxt4wZu1D8rsoBLveSFL22Ki4caTFHV/R39xu/DzFY0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rHXWzuqR3CxdcBhZr/w92Djaw8YdJOuivq/LhQKDKDJt52jWp74pfF2g2mO233vAdEXicDUHLN6Xtjj9THQdDVc8C7hKv1zBaQ0sslby0Ye49nD8Pz1AT0s0GqGVkP1VVd2WIu1+dovdX67G6D6bItkNP9lsJMuzAvfvFAaoscQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gihk2WUd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7AD31C2BBFC;
+	Mon, 27 May 2024 16:48:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716828529;
+	bh=Vxt4wZu1D8rsoBLveSFL22Ki4caTFHV/R39xu/DzFY0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=gihk2WUdbo4BHbXXN22Ub/e8biVwtYDRP8uK4K0r5I762uFUeHkh6B8cjbV6rP1Vm
+	 LulFHUmdC8mWefFqcgMQT+HU6KRWf16Na64Mjm4eZur2bo3hFhKwOrLqeiuphmeW6D
+	 +WM7HE/hQ6AAZ9zaH6YB5RI2AEjhJxlvySzIazkb1w7aM4zYLMTvGg1Xqr3mM1Sli1
+	 0SFeUFpxBm1/lUhba1tHyj8/L+ek9QX0oqjwFYtCjSRNWiU5WKROYfV+7b4jQUvMtJ
+	 S1Z8hT0WjqpFMZK3BJ3WKLd799JXQFdm1kJItLwv5IJLo6ZYOJqZ6ba1DvsYPFSJ/9
+	 04l802U0sGEqQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sBdWh-00FyEn-6j;
+	Mon, 27 May 2024 17:48:47 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Marc Zyngier <maz@kernel.org>
+Cc: Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 0/3] KVM/arm64 fixes for AArch32 handling
+Date: Mon, 27 May 2024 17:48:33 +0100
+Message-Id: <171682850243.1823849.5447352038599596772.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240524141956.1450304-1-maz@kernel.org>
+References: <20240524141956.1450304-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240524103307.2684-6-yongxuan.wang@sifive.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, maz@kernel.org, nsg@linux.ibm.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, May 24, 2024 at 06:33:05PM GMT, Yong-Xuan Wang wrote:
-> Update the get-reg-list test to test the Svadu Extension is available for
-> guest OS.
+On Fri, 24 May 2024 15:19:53 +0100, Marc Zyngier wrote:
+> The (very much unloved) AArch32 handling has recently been found
+> lacking in a number of ways:
 > 
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> ---
->  tools/testing/selftests/kvm/riscv/get-reg-list.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> - Nina spotted a brown paper-bag quality bug in the register narrowing
+>   code when writing one of the core registers (GPRs, PSTATE) from
+>   userspace
 > 
-> diff --git a/tools/testing/selftests/kvm/riscv/get-reg-list.c b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> index b882b7b9b785..3e71b7e40dbf 100644
-> --- a/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/riscv/get-reg-list.c
-> @@ -44,6 +44,7 @@ bool filter_reg(__u64 reg)
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SMSTATEEN:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SSAIA:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SSTC:
-> +	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVADU:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVINVAL:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVNAPOT:
->  	case KVM_REG_RISCV_ISA_EXT | KVM_REG_RISCV_ISA_SINGLE | KVM_RISCV_ISA_EXT_SVPBMT:
-> @@ -409,6 +410,7 @@ static const char *isa_ext_single_id_to_str(__u64 reg_off)
->  		KVM_ISA_EXT_ARR(SMSTATEEN),
->  		KVM_ISA_EXT_ARR(SSAIA),
->  		KVM_ISA_EXT_ARR(SSTC),
-> +		KVM_ISA_EXT_ARR(SVADU),
->  		KVM_ISA_EXT_ARR(SVINVAL),
->  		KVM_ISA_EXT_ARR(SVNAPOT),
->  		KVM_ISA_EXT_ARR(SVPBMT),
-> @@ -932,6 +934,7 @@ KVM_ISA_EXT_SUBLIST_CONFIG(fp_d, FP_D);
->  KVM_ISA_EXT_SIMPLE_CONFIG(h, H);
->  KVM_ISA_EXT_SUBLIST_CONFIG(smstateen, SMSTATEEN);
->  KVM_ISA_EXT_SIMPLE_CONFIG(sstc, SSTC);
-> +KVM_ISA_EXT_SIMPLE_CONFIG(svadu, SVADU);
->  KVM_ISA_EXT_SIMPLE_CONFIG(svinval, SVINVAL);
->  KVM_ISA_EXT_SIMPLE_CONFIG(svnapot, SVNAPOT);
->  KVM_ISA_EXT_SIMPLE_CONFIG(svpbmt, SVPBMT);
-> @@ -987,6 +990,7 @@ struct vcpu_reg_list *vcpu_configs[] = {
->  	&config_h,
->  	&config_smstateen,
->  	&config_sstc,
-> +	&config_svadu,
->  	&config_svinval,
->  	&config_svnapot,
->  	&config_svpbmt,
-> -- 
-> 2.17.1
->
+> [...]
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Applied to fixes, thanks!
+
+[1/3] KVM: arm64: Fix AArch32 register narrowing on userspace write
+      commit: 947051e361d551e0590777080ffc4926190f62f2
+[2/3] KVM: arm64: Allow AArch32 PSTATE.M to be restored as System mode
+      commit: dfe6d190f38fc5df5ff2614b463a5195a399c885
+[3/3] KVM: arm64: AArch32: Fix spurious trapping of conditional instructions
+      commit: c92e8b9eacebb4060634ebd9395bba1b29aadc68
+
+Cheers,
+
+	M.
+-- 
+Without deviation from the norm, progress is not possible.
+
+
 
