@@ -1,45 +1,46 @@
-Return-Path: <kvm+bounces-18160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3D278CF911
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 08:28:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A35D8CF913
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 08:28:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D53B11C20C59
-	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 06:28:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E95EB22383
+	for <lists+kvm@lfdr.de>; Mon, 27 May 2024 06:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A56D224D6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F272A2837A;
 	Mon, 27 May 2024 06:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b="p7tFZb0A"
+	dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b="fyjyrEEv"
 X-Original-To: kvm@vger.kernel.org
 Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8E31AAA5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55F11BC59
 	for <kvm@vger.kernel.org>; Mon, 27 May 2024 06:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716791291; cv=none; b=nNzu3lEMfEvszQdnIx7MS2id8XImablo38CrZlEnLemBEM0zo0s66cL9fshYOHOzHrw+bsG/HOzwMOSfCd2aiQM8p0V0l3g8qsOk0f357hEaY+phQOpqKjmBWqbsLxaOortwOVINAE5kSxTdMpqcX1iT7VjE1Cnf4YzdurbyMb0=
+	t=1716791292; cv=none; b=Mwp5IWKUyDPdbfYzZSpxOOpUy/0JBaFtzMw7lqcRyG5VOrD9C/eUJbN/dOs7d1jhgvxhlYAibdyIFNswiW3/yx0yvev35/q7bNybV8uPDdv+er8mNgty5dAKWKHmQT7fZQjT7SWmBSmADYft60EBGcPPKMz7/IesdOeWiz6J9eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716791291; c=relaxed/simple;
-	bh=nvP7F4VxPNMc/SNZJF33wZUxcxPGJ/J2rujhhRh8opM=;
+	s=arc-20240116; t=1716791292; c=relaxed/simple;
+	bh=1eaMEvqrTr9Qry/T0VQGvj1cGq5NTM5j6w8zUdC8Ums=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jDfg+P0bBK7fwyDCKiGcVGLs3ExDN9DGn1fAQ+oFmEweasA4GNir4Tgs9EZ+fQTqgqEc43raD0kE0DrALBS91yle2+RHigYBmEqn6XfWcgsTDt8FJKtiDF8QBHNfVIbwtdZjRB/pcyNhNDNsif3VT8BbMp6LerysTwh0zLg0r6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de; spf=pass smtp.mailfrom=t-8ch.de; dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b=p7tFZb0A; arc=none smtp.client-ip=159.69.126.157
+	 In-Reply-To:To:Cc; b=UBoKVTbXVhoKz/NTtPIdS4FOjS/+Xqd94wEhQNzhBKR+newtKA1267BvQK4GT1y9u/4S2SWTrWFNB0bSx77OlgBY306MGgsuivWpZGkhwKsZKJI4/4dJn9u4ckTG11QcVkQlZ/ejq/mJQ3aAW6Laja/7zfk51SqFusy81aPII8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de; spf=pass smtp.mailfrom=t-8ch.de; dkim=pass (1024-bit key) header.d=t-8ch.de header.i=@t-8ch.de header.b=fyjyrEEv; arc=none smtp.client-ip=159.69.126.157
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=t-8ch.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-8ch.de
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=t-8ch.de; s=mail;
-	t=1716791283; bh=nvP7F4VxPNMc/SNZJF33wZUxcxPGJ/J2rujhhRh8opM=;
+	t=1716791283; bh=1eaMEvqrTr9Qry/T0VQGvj1cGq5NTM5j6w8zUdC8Ums=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=p7tFZb0AWPvRuigJBwX2UnkSoHt++5d9rV8Kw6O6KZmxU8nl0FGHEhC93bm+YRFdl
-	 nNzR46QerKIiVDXFVTkCrx51oZGfApcwGxekDVYWJVg3d8hxliKQaLx1YJ9ibPKy29
-	 SPvdgaCY5uw+WXAPEV2TMm11d4zchkUEw0qdecVs=
+	b=fyjyrEEv9cxcGn7h1MumJ7xsstXiAj60WHVitkAb8Idq+aCZscE2TMmANHBqdlp3l
+	 wmiS0jY8FuJNJ3p+FBkpLyIARZvdNZ4gZAjK7ho9bCcUwjuKJp5xyMwrkABl378A71
+	 8rmMtQxboQJWuQf/59/LXnVl8W9E/u7DiT7heMRk=
 From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>
-Date: Mon, 27 May 2024 08:27:53 +0200
-Subject: [PATCH v8 7/8] tests/qtest/pvpanic: add tests for pvshutdown event
+Date: Mon, 27 May 2024 08:27:54 +0200
+Subject: [PATCH v8 8/8] Revert "docs/specs/pvpanic: mark shutdown event as
+ not implemented"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -48,7 +49,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20240527-pvpanic-shutdown-v8-7-5a28ec02558b@t-8ch.de>
+Message-Id: <20240527-pvpanic-shutdown-v8-8-5a28ec02558b@t-8ch.de>
 References: <20240527-pvpanic-shutdown-v8-0-5a28ec02558b@t-8ch.de>
 In-Reply-To: <20240527-pvpanic-shutdown-v8-0-5a28ec02558b@t-8ch.de>
 To: "Michael S. Tsirkin" <mst@redhat.com>, 
@@ -59,124 +60,36 @@ Cc: qemu-devel@nongnu.org,
  Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, kvm@vger.kernel.org, 
  =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <thomas@t-8ch.de>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1716791282; l=3527;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1716791282; l=758;
  i=thomas@t-8ch.de; s=20221212; h=from:subject:message-id;
- bh=nvP7F4VxPNMc/SNZJF33wZUxcxPGJ/J2rujhhRh8opM=;
- b=rR7Ory6xINrf5WzUwHjV1sNa+8ZV6FwIlGJ3+JmTsHGjl1uDafNWInJ3Ap2YtfnAfh0VbvWwV
- IuxAq5Kz58nCxRzg0LONyNEZsSlk67eLyVDncIcLhr63cdLqHA8SbIL
+ bh=1eaMEvqrTr9Qry/T0VQGvj1cGq5NTM5j6w8zUdC8Ums=;
+ b=29ddf2XPk6nMBU3TUnSVHLZYxIpTipDvwho24GLV8iag0trjYdFA5GG4iL1dTSu/6fodNc7UA
+ yhtoLIZnGuHAisXJYYWvHogFDJi9cSU6GHJrn0ur1aiebVDFfihVkFJ
 X-Developer-Key: i=thomas@t-8ch.de; a=ed25519;
  pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-Validate that a shutdown via the pvpanic device emits the correct
-QMP events.
+The missing functionality has been implemented now.
+
+This reverts commit e739d1935c461d0668057e9dbba9d06f728d29ec.
 
 Signed-off-by: Thomas Weißschuh <thomas@t-8ch.de>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qtest/pvpanic-pci-test.c | 39 +++++++++++++++++++++++++++++++++++++++
- tests/qtest/pvpanic-test.c     | 29 +++++++++++++++++++++++++++++
- 2 files changed, 68 insertions(+)
+ docs/specs/pvpanic.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qtest/pvpanic-pci-test.c b/tests/qtest/pvpanic-pci-test.c
-index b372caf41dc0..dc021c2fdf77 100644
---- a/tests/qtest/pvpanic-pci-test.c
-+++ b/tests/qtest/pvpanic-pci-test.c
-@@ -85,11 +85,50 @@ static void test_panic(void)
-     qtest_quit(qts);
- }
+diff --git a/docs/specs/pvpanic.rst b/docs/specs/pvpanic.rst
+index b0f27860ec3b..61a80480edb8 100644
+--- a/docs/specs/pvpanic.rst
++++ b/docs/specs/pvpanic.rst
+@@ -29,7 +29,7 @@ bit 1
+   a guest panic has happened and will be handled by the guest;
+   the host should record it or report it, but should not affect
+   the execution of the guest.
+-bit 2 (to be implemented)
++bit 2
+   a regular guest shutdown has happened and should be processed by the host
  
-+static void test_pvshutdown(void)
-+{
-+    uint8_t val;
-+    QDict *response, *data;
-+    QTestState *qts;
-+    QPCIBus *pcibus;
-+    QPCIDevice *dev;
-+    QPCIBar bar;
-+
-+    qts = qtest_init("-device pvpanic-pci,addr=04.0");
-+    pcibus = qpci_new_pc(qts, NULL);
-+    dev = qpci_device_find(pcibus, QPCI_DEVFN(0x4, 0x0));
-+    qpci_device_enable(dev);
-+    bar = qpci_iomap(dev, 0, NULL);
-+
-+    qpci_memread(dev, bar, 0, &val, sizeof(val));
-+    g_assert_cmpuint(val, ==, PVPANIC_EVENTS);
-+
-+    val = PVPANIC_SHUTDOWN;
-+    qpci_memwrite(dev, bar, 0, &val, sizeof(val));
-+
-+    response = qtest_qmp_eventwait_ref(qts, "GUEST_PVSHUTDOWN");
-+    qobject_unref(response);
-+
-+    response = qtest_qmp_eventwait_ref(qts, "SHUTDOWN");
-+    g_assert(qdict_haskey(response, "data"));
-+    data = qdict_get_qdict(response, "data");
-+    g_assert(qdict_haskey(data, "guest"));
-+    g_assert(qdict_get_bool(data, "guest"));
-+    g_assert(qdict_haskey(data, "reason"));
-+    g_assert_cmpstr(qdict_get_str(data, "reason"), ==, "guest-shutdown");
-+    qobject_unref(response);
-+
-+    g_free(dev);
-+    qpci_free_pc(pcibus);
-+    qtest_quit(qts);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/pvpanic-pci/panic", test_panic);
-     qtest_add_func("/pvpanic-pci/panic-nopause", test_panic_nopause);
-+    qtest_add_func("/pvpanic-pci/pvshutdown", test_pvshutdown);
- 
-     return g_test_run();
- }
-diff --git a/tests/qtest/pvpanic-test.c b/tests/qtest/pvpanic-test.c
-index ccc603472f5d..d49d2ba9313e 100644
---- a/tests/qtest/pvpanic-test.c
-+++ b/tests/qtest/pvpanic-test.c
-@@ -58,11 +58,40 @@ static void test_panic(void)
-     qtest_quit(qts);
- }
- 
-+static void test_pvshutdown(void)
-+{
-+    uint8_t val;
-+    QDict *response, *data;
-+    QTestState *qts;
-+
-+    qts = qtest_init("-device pvpanic");
-+
-+    val = qtest_inb(qts, 0x505);
-+    g_assert_cmpuint(val, ==, PVPANIC_EVENTS);
-+
-+    qtest_outb(qts, 0x505, PVPANIC_SHUTDOWN);
-+
-+    response = qtest_qmp_eventwait_ref(qts, "GUEST_PVSHUTDOWN");
-+    qobject_unref(response);
-+
-+    response = qtest_qmp_eventwait_ref(qts, "SHUTDOWN");
-+    g_assert(qdict_haskey(response, "data"));
-+    data = qdict_get_qdict(response, "data");
-+    g_assert(qdict_haskey(data, "guest"));
-+    g_assert(qdict_get_bool(data, "guest"));
-+    g_assert(qdict_haskey(data, "reason"));
-+    g_assert_cmpstr(qdict_get_str(data, "reason"), ==, "guest-shutdown");
-+    qobject_unref(response);
-+
-+    qtest_quit(qts);
-+}
-+
- int main(int argc, char **argv)
- {
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/pvpanic/panic", test_panic);
-     qtest_add_func("/pvpanic/panic-nopause", test_panic_nopause);
-+    qtest_add_func("/pvpanic/pvshutdown", test_pvshutdown);
- 
-     return g_test_run();
- }
+ PCI Interface
 
 -- 
 2.45.1
