@@ -1,116 +1,182 @@
-Return-Path: <kvm+bounces-18205-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18204-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCA638D1881
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 12:25:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E63A8D1873
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 12:23:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 728FA287EBA
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 10:25:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEFF21F25B1C
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 10:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43FB816B732;
-	Tue, 28 May 2024 10:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3462616B72F;
+	Tue, 28 May 2024 10:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IstFOatD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bsGLn1Y7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BF316ABFD
-	for <kvm@vger.kernel.org>; Tue, 28 May 2024 10:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8673416ABC6
+	for <kvm@vger.kernel.org>; Tue, 28 May 2024 10:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716891884; cv=none; b=joTcvKdrorwcTxjIQp4tPDKmoS31wht4/iORfX9bT1WHpYyK9bXlYJJA0Qpz+aQoU8VLqD4jZnYUVOpgzJNCmt+KegUaqiPFEyEc+SYUNOEXQtfNEOtciOkuMWpfJf9B0Mt105CX9FYJVx0lefVsuiWSBr7DZvbOw1mTb9vsa3w=
+	t=1716891790; cv=none; b=HYEusFV0yiz4GYag/Xa9QNmPO5Ve/3pCPwwaKiHdIRCIwr67zrCkkQC1dhKrX+DyleyvYXv/w/6Wvp/5hOZieodY1mJhva/Wn/BkijAM8FB7UXrr87QFqNb8imSGM/+CYdI6fRzEVJEhjfIwiplUj4IxTKa9wx0M/WYFtz7ccZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716891884; c=relaxed/simple;
-	bh=YjJ0k+pOAS44d5nj8lm5HLkettkpCAfbZHsZZjd9+Ek=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YnkxUERg/2HHbkVg+r6XIOc2OIAIBq2tSNxwBwGgqvtDVlext6jhp6X03LbNPeLc0c3snU2Ulk7hk/GoQSBfFxZMwAP0i2b/b5BIkOs4W+XxxWIwSsgHEqvIqBzjrWUg07iVwdj9wWKMUtzTdT9u4bkRRbkgcJ9GPfjjNBjBzWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IstFOatD; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716891883; x=1748427883;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=YjJ0k+pOAS44d5nj8lm5HLkettkpCAfbZHsZZjd9+Ek=;
-  b=IstFOatDDJee9T7Q0yxSRcHUGE2s9sda5ZiCK4DwJsRAOmV09asnBp+K
-   jBg0qFXQlcCilB1pV13GB9kxKd1D1Cjrd5Fb+Og+6RiTv5poAczFD66ki
-   0+nPppjtYWdabb7L1AFWH0YsQ+y/UiVMyAKJz5280BzbGh7uImctshQQl
-   1xSovVQyaEYzXfA7mxD5IwtDFcZDSHbbtN3jIH0cPs5K2NnREagouZzHV
-   1UKH4HeEQcp8vq7rIC0LyOZ7NAIjF5SFSA95s2fzR/oc9fnyQmPbLtOve
-   DD2YxHH+iMmM8Uy8Y8OB6CeAsPL5H+f7XPw9+sPjw/udLfLJ1xvJLgAMM
-   A==;
-X-CSE-ConnectionGUID: VmRBeMW3Tte94aHcPM1/wA==
-X-CSE-MsgGUID: WMxEwsMsRIOfL51meqNDFg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="24643325"
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="24643325"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 03:24:42 -0700
-X-CSE-ConnectionGUID: JuXG3OPlTQGyf3S3nN74Bw==
-X-CSE-MsgGUID: 2LWP5zEQQmiHzrW0zQhURQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,195,1712646000"; 
-   d="scan'208";a="35644895"
-Received: from unknown (HELO st-server.bj.intel.com) ([10.240.193.102])
-  by orviesa007.jf.intel.com with ESMTP; 28 May 2024 03:24:40 -0700
-From: Tao Su <tao1.su@linux.intel.com>
-To: kvm@vger.kernel.org
-Cc: seanjc@google.com,
-	pbonzini@redhat.com,
-	chao.gao@intel.com,
-	xiaoyao.li@intel.com,
-	tao1.su@linux.intel.com
-Subject: [PATCH] KVM: x86/mmu: Don't save mmu_invalidate_seq after checking private attr
-Date: Tue, 28 May 2024 18:22:34 +0800
-Message-Id: <20240528102234.2162763-1-tao1.su@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1716891790; c=relaxed/simple;
+	bh=6HygncVEzNRf7eiLycKCAN8lb4+Vt1or8KDjZEkYLIQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=f4f/JkGbdnV+EsGQ14jDcTmzvmpHJDpWHW97Mw910ihPSzc4+Rqid7YBE9r3u6qWgRUa8w/6CeK/50cW4zPXDFmNluMOJWX8Km2pw0LvRVnyrUZ4woOrfQJXP9GegQoWc3az50ztBhDiOY3XyhuohWrKe9CtCdvkdC6eoe/Lw6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bsGLn1Y7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1716891787;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4JlPtnJK4Wc+1UEGNtg5G4FKrqpfno/sxU9Ww+Z7CRE=;
+	b=bsGLn1Y7VChbxvCwBt5ryY8B46Blj2qg+yj2FRNPy9XwOG0O9jsTwHF6DOhbyabwJLs2V9
+	Fjn3e3/5iHl9iSAgyfPmSWNVpeI72tRWpqKD8izxJmVYl34oNOEYWHOdEFQRYW9z8t0lqM
+	Akf3HwAadWwnbZ7uE1SMK307Up3rvhQ=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-248-ZPfq2KAWMkOm61R2HVMncQ-1; Tue, 28 May 2024 06:23:05 -0400
+X-MC-Unique: ZPfq2KAWMkOm61R2HVMncQ-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2e95a2fc8e3so7622261fa.0
+        for <kvm@vger.kernel.org>; Tue, 28 May 2024 03:23:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1716891784; x=1717496584;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4JlPtnJK4Wc+1UEGNtg5G4FKrqpfno/sxU9Ww+Z7CRE=;
+        b=AtNiQCyEuuTOVRMImYAI8bPFaFD3dRyyhzGaLoJxJHqm4cYE1xf96Ql5tHB591J8Wq
+         h/eylg9KzYqB6HHj8ynlGWLoujzY/YCKDJUO7WKimAyLG8rpLvGHhTWnaDHc+ZHgn6ae
+         ivmbdm8lfkAZFYRzNmpKL48d9HKT7LM+S7iicuf4mS2HqATYmBOxZB/F8pyngO8TUA4C
+         oer/bkzymTO/AQf5Biv4yfOMvnlDFnaIh1JaIeMbfqnns95inaOTOTUJjvB6RwnuSMKG
+         f0SXHV9p8NMKjWHaiCFxQB/Y/pPiucHHmbfSi/9gEJ+bDVl4TitQhtnHMEQOP5yQhNNX
+         1onw==
+X-Gm-Message-State: AOJu0YzBiAcf6ikdYmTk5Z0432Cq9RWLjfYw3YP3JUqU9+9NX8WEDFW+
+	TY1hA1kRXc/VWUM69gzfOfKnmtYX3QW6FV4xJD98OGLmyboM9TIa/ZjxTwWcFGPgfaDmNusho5F
+	kIBYl0YdJiNnQqj5yNkQZQSbd3VDj4hO6C2nYSH6WA67PY1ijPgW4RuxbF3Bkln92Ux69HGl2eu
+	jAoADnR/9LdJ5KvBsvuN46tZMV
+X-Received: by 2002:a2e:a289:0:b0:2e4:7996:f9f0 with SMTP id 38308e7fff4ca-2e95b0c0f7dmr66995631fa.17.1716891784377;
+        Tue, 28 May 2024 03:23:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFagdU0lrm3adrwao69Qv89jjLARq8eA9baEqhKcOEZD1RrTFH9Zv4Avy23rRgqwTm4Dx2B6GF5Co/8Z/IaoUU=
+X-Received: by 2002:a2e:a289:0:b0:2e4:7996:f9f0 with SMTP id
+ 38308e7fff4ca-2e95b0c0f7dmr66995461fa.17.1716891783855; Tue, 28 May 2024
+ 03:23:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240528041926.3989-1-manali.shukla@amd.com>
+In-Reply-To: <20240528041926.3989-1-manali.shukla@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 28 May 2024 12:22:51 +0200
+Message-ID: <CABgObfbz5kZZObu9dO=KPu8_mZvGmV1752SQzQckkrj5jPaTQg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] Add support for the Idle HLT intercept feature
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, seanjc@google.com, 
+	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
+	vkuznets@redhat.com, bp@alien8.de, ajones@ventanamicro.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Drop the second snapshot of mmu_invalidate_seq in kvm_faultin_pfn().
-Before checking the mismatch of private vs. shared, mmu_invalidate_seq is
-saved to fault->mmu_seq, which can be used to detect an invalidation
-related to the gfn occurred, i.e. KVM will not install a mapping in page
-table if fault->mmu_seq != mmu_invalidate_seq.
+On Tue, May 28, 2024 at 6:19=E2=80=AFAM Manali Shukla <manali.shukla@amd.co=
+m> wrote:
+>
+> The upcoming new Idle HLT Intercept feature allows for the HLT
+> instruction execution by a vCPU to be intercepted by the hypervisor
+> only if there are no pending V_INTR and V_NMI events for the vCPU.
+> When the vCPU is expected to service the pending V_INTR and V_NMI
+> events, the Idle HLT intercept won=E2=80=99t trigger. The feature allows =
+the
+> hypervisor to determine if the vCPU is actually idle and reduces
+> wasteful VMEXITs.
 
-Currently there is a second snapshot of mmu_invalidate_seq, which may not
-be same as the first snapshot in kvm_faultin_pfn(), i.e. the gfn attribute
-may be changed between the two snapshots, but the gfn may be mapped in
-page table without hindrance. Therefore, drop the second snapshot as it
-has no obvious benefits.
+Does this have an effect on the number of vmexits for KVM, unless AVIC
+is enabled? Can you write a testcase for kvm-unit-tests' vmexit.flat
+that shows an improvement?
 
-Fixes: f6adeae81f35 ("KVM: x86/mmu: Handle no-slot faults at the beginning of kvm_faultin_pfn()")
-Signed-off-by: Tao Su <tao1.su@linux.intel.com>
----
- arch/x86/kvm/mmu/mmu.c | 3 ---
- 1 file changed, 3 deletions(-)
+The reason I am wondering is because KVM does not really use V_INTR
+injection. The "idle HLT" intercept basically differs from the basic
+HLT trigger only in how it handles an STI;HLT sequence, as in that
+case the interrupt can be injected directly and the HLT vmexit is
+suppressed. But in that circumstance KVM would anyway use a V_INTR
+intercept to detect the opening of the interrupt injection window (and
+then the interrupt uses event injection rather than V_INTR). Again,
+this is only true if AVIC is disabled, but that is the default.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 662f62dfb2aa..4372df109aff 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4400,9 +4400,6 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 			return RET_PF_EMULATE;
- 	}
- 
--	fault->mmu_seq = vcpu->kvm->mmu_invalidate_seq;
--	smp_rmb();
--
- 	/*
- 	 * Check for a relevant mmu_notifier invalidation event before getting
- 	 * the pfn from the primary MMU, and before acquiring mmu_lock.
+So unless I'm wrong in my analysis above, I'm not sure this series,
+albeit small, is really worth it. As things stand, it would be more
+interesting to enable this for nested VMs, especially Hyper-V which
+does use V_INTR and V_TPL; even better, _emulating_ it on older
+processors would reduce the L2->L0->L1->L0->L2 path to a
+less-expensive L2->L0->L2 vmexit.
 
-base-commit: 2bfcfd584ff5ccc8bb7acde19b42570414bf880b
--- 
-2.34.1
+
+Paolo
+
+> Presence of the Idle HLT Intercept feature is indicated via CPUID
+> function Fn8000_000A_EDX[30].
+>
+> Document for the Idle HLT intercept feature is available at [1].
+>
+> [1]: AMD64 Architecture Programmer's Manual Pub. 24593, April 2024,
+>      Vol 2, 15.9 Instruction Intercepts (Table 15-7: IDLE_HLT).
+>      https://bugzilla.kernel.org/attachment.cgi?id=3D306250
+>
+> Testing Done:
+> - Added a selftest to test the Idle HLT intercept functionality.
+> - Compile and functionality testing for the Idle HLT intercept selftest
+>   are only done for x86_64.
+> - Tested SEV and SEV-ES guest for the Idle HLT intercept functionality.
+>
+> v2 -> v3
+> - Incorporated Andrew's suggestion to structure vcpu_stat_types in
+>   a way that each architecture can share the generic types and also
+>   provide its own.
+>
+> v1 -> v2
+> - Done changes in svm_idle_hlt_test based on the review comments from Sea=
+n.
+> - Added an enum based approach to get binary stats in vcpu_get_stat() whi=
+ch
+>   doesn't use string to get stat data based on the comments from Sean.
+> - Added self_halt() and cli() helpers based on the comments from Sean.
+>
+> Manali Shukla (5):
+>   x86/cpufeatures: Add CPUID feature bit for Idle HLT intercept
+>   KVM: SVM: Add Idle HLT intercept support
+>   KVM: selftests: Add safe_halt() and cli() helpers to common code
+>   KVM: selftests: Add an interface to read the data of named vcpu stat
+>   KVM: selftests: KVM: SVM: Add Idle HLT intercept test
+>
+>  arch/x86/include/asm/cpufeatures.h            |  1 +
+>  arch/x86/include/asm/svm.h                    |  1 +
+>  arch/x86/include/uapi/asm/svm.h               |  2 +
+>  arch/x86/kvm/svm/svm.c                        | 11 ++-
+>  tools/testing/selftests/kvm/Makefile          |  1 +
+>  .../testing/selftests/kvm/include/kvm_util.h  | 44 +++++++++
+>  .../kvm/include/x86_64/kvm_util_arch.h        | 40 +++++++++
+>  .../selftests/kvm/include/x86_64/processor.h  | 18 ++++
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 32 +++++++
+>  .../selftests/kvm/x86_64/svm_idle_hlt_test.c  | 89 +++++++++++++++++++
+>  10 files changed, 236 insertions(+), 3 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_idle_hlt_test.=
+c
+>
+>
+> base-commit: d91a9cc16417b8247213a0144a1f0fd61dc855dd
+> --
+> 2.34.1
+>
 
 
