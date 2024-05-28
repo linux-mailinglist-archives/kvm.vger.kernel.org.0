@@ -1,96 +1,132 @@
-Return-Path: <kvm+bounces-18196-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18197-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCE848D148C
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 08:37:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 804A38D1570
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 09:42:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 531BCB21485
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 06:37:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 011A5B22A1D
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 07:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47A516A33F;
-	Tue, 28 May 2024 06:37:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A143B73469;
+	Tue, 28 May 2024 07:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Fv+XcrYn"
+	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="CVQ1GlzN"
 X-Original-To: kvm@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EF061FD7;
-	Tue, 28 May 2024 06:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827E52629C;
+	Tue, 28 May 2024 07:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716878258; cv=none; b=mDlT6VEp8Z1+rF4zz3iHehqUhRmLsRbmYgtOZgG8gW/pq4Yug1u1rm4azfgCKUX+G9kMJG07uQARh6Z1yrJ3yx02S8jPov5OBOx1kFfbxaMQa1rp/PDoFwxqjal9WeoY34kJTpo5PNRbjzv32MpoIpEtYu2jgNrqBv6i3Z/emD0=
+	t=1716882160; cv=none; b=IfOx6WxC7KKwUUrMObt3Lcb6+jkrw/sh195UhslPaxKtZ/SgjwoeK7+Srj9Pkl1mbGoNUazD8Xp4SdzvPZWOv5810A/OeekoFGoqB6xqM1yVaSNznTqJmDuSqc5vVq7CLHIbvaGYYNi+A6nc+DAaq0HcJUkl4jIxqsDKub+WSKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716878258; c=relaxed/simple;
-	bh=jyDL4zz5q8jj+/c7ouLHGKNSvOKvSPQog+4PVAaGQ/w=;
+	s=arc-20240116; t=1716882160; c=relaxed/simple;
+	bh=O+SJh11x24oVG0LRa1hpJ0RJyBL1icWzCjOnJC5jTD8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKnKst110mU1GhX3YoOdzzYBAYkAHxMUTQ/UmLd3rgn9o2gF5UmeZ6o5udukJoyX+U8qj7xe5kpEpx5TyFNQ7DQbmK35LLYJmnizfXdgPPYFxmLUx/1IVey+wtjtgmajp7oc4WLPFaY4nYVw/WHQG/Kf1F/ydkMbOg4gUvSbTgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Fv+XcrYn; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=87n+7vGposB3DHFhm3eVtYVHQH6pkIsF9l1YK27pW5Q=; b=Fv+XcrYnhndpCI1RvGWvylRtyZ
-	CPYNqlFqK4cynFTdXwsuIGbcxDBee8vCmtDj0T6/jph2iCLI5YrLVEshUfmXIPsDrALT5llwbDnJc
-	lO8+SOb64g4LEHowumn8D2W4mbS+A8trU2NHZ/IAhh38UWUkVs4mq+BRWNzIRxHA+Khxb15Q78c6A
-	M7k6SLsoC5LtvheJJ5jVqi5IGT7y/unfSZy0qQ/36qLYHkxv3ctNov0kV8J+nXsp4HmrCn0Ohsyeg
-	uHa2Myzb1RuK9nmV5e8MkBtVEHRMuIohHuNaqazKXsS6Y8XA/q7TtwbOoDF8daCPd//Q4s9ZjtqeT
-	y6zWMqXw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sBqSk-0000000HDpm-1ovw;
-	Tue, 28 May 2024 06:37:34 +0000
-Date: Mon, 27 May 2024 23:37:34 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Christoph Hellwig <hch@infradead.org>, Yan Zhao <yan.y.zhao@intel.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-	alex.williamson@redhat.com, kevin.tian@intel.com,
-	iommu@lists.linux.dev, pbonzini@redhat.com, seanjc@google.com,
-	dave.hansen@linux.intel.com, luto@kernel.org, peterz@infradead.org,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-	corbet@lwn.net, joro@8bytes.org, will@kernel.org,
-	robin.murphy@arm.com, baolu.lu@linux.intel.com, yi.l.liu@intel.com,
-	Russell King <linux@armlinux.org.uk>
-Subject: Re: [PATCH 3/5] x86/mm: Introduce and export interface
- arch_clean_nonsnoop_dma()
-Message-ID: <ZlV7rlmWdU7dJZKo@infradead.org>
-References: <20240507061802.20184-1-yan.y.zhao@intel.com>
- <20240507062044.20399-1-yan.y.zhao@intel.com>
- <ZktZDmcNnsHhp4Tm@infradead.org>
- <20240521154939.GH20229@nvidia.com>
- <20240521160016.GA2513156@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PSBRhTtuu41U2XXa3G4bxPiuInhZ4/cc5j3mKD1jOBxtyJfvFDCZh3TphQ8JDYD3QXcKclZDC8rqY4rZo/8oIhku7HOaogixCLGQpm54SGCwINDxCywl2zFpna8vZP/vxw+xTTJQLtvVCfi5QuG5gOmhZd1ZPlkMiOCbWlQpErs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=CVQ1GlzN reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id D957A40E0244;
+	Tue, 28 May 2024 07:42:34 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
+	reason="fail (body has been altered)" header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id N3d_IMW0tLtI; Tue, 28 May 2024 07:42:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1716882151; bh=iTw1v9mA7GB/WhSSmXpBEKADLAPXWnBE1YHmBrlKZ5Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CVQ1GlzNJvxMahfCNH1om6Qk5OdDgB+W2fMOljjk2OvkHyhnUSnGsHWYpdvHc8SmA
+	 BOXLOrteKLMiV/9T4Hlx+suwDYknpGIv/IDvNQWDPFrBe/Ru/EudjlxZax37++bABY
+	 m55ustNO+tel9oiHyp9Z/UH5Cv99tceGSPWuyoRmHfU/v3Ud2J0M8ZxIX/K6Avt0g2
+	 FtS4YEHWUs3L9t6WkUOqntPBvnU9FMnNfS6RMvrsRDEiwUv9+IgNpwnspUOqrm588p
+	 sc0Lwu6LjgR/CVUGSKW7QlFjgrT5MS9nLloJ0BMG12aOMWUBXMNMs+wLfzQgHJd/3D
+	 Eifm52fYW7ciqwjt2owPMuObwAPHZF1B7O1x0eP+mAjla9cib/uOJ+wT74u85MVo2n
+	 nlr0Rx6v3WaPn0JKm6WRdb7CmeE5e0Mj8dQ99QlXCAI4xx81BGLsKUTnEDAM+YekeB
+	 zAZdwxXEYp86K9W5IG/9+BJcuwtEKdA+v7NaIETq0STpcrcwoNgyLn40udTi1R1hiA
+	 P/KSCZkRG6BsO99TZhBX6+JXJFvkKWxtdITfCCkPMrN7t/8nEJmQOwMtufcPtwizKb
+	 pZDoN4Lry7XgmYhRTRnWI6Ef7QjU0HjclfGjmC4lKxeYHpIKwvUnYfg5894FeEwSRM
+	 tDYpycYOcEDfkdu4CL7DUVcw=
+Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id D544B40E01E8;
+	Tue, 28 May 2024 07:42:20 +0000 (UTC)
+Date: Tue, 28 May 2024 09:42:14 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org,
+	nikunj@amd.com, thomas.lendacky@amd.com, vkuznets@redhat.com,
+	ajones@ventanamicro.com
+Subject: Re: [PATCH v3 1/5] x86/cpufeatures: Add CPUID feature bit for Idle
+ HLT intercept
+Message-ID: <20240528074214.GBZlWK1gslLYbBSkX0@fat_crate.local>
+References: <20240528041926.3989-1-manali.shukla@amd.com>
+ <20240528041926.3989-2-manali.shukla@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240521160016.GA2513156@nvidia.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20240528041926.3989-2-manali.shukla@amd.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 21, 2024 at 01:00:16PM -0300, Jason Gunthorpe wrote:
-> > > Err, no.  There should really be no exported cache manipulation macros,
-> > > as drivers are almost guaranteed to get this wrong.  I've added
-> > > Russell to the Cc list who has been extremtly vocal about this at least
-> > > for arm.
-> > 
-> > We could possibly move this under some IOMMU core API (ie flush and
-> > map, unmap and flush), the iommu APIs are non-modular so this could
-> > avoid the exported symbol.
-> 
-> Though this would be pretty difficult for unmap as we don't have the
-> pfns in the core code to flush. I don't think we have alot of good
-> options but to make iommufd & VFIO handle this directly as they have
-> the list of pages to flush on the unmap side. Use a namespace?
+On Tue, May 28, 2024 at 04:19:22AM +0000, Manali Shukla wrote:
+> From: Manali Shukla <Manali.Shukla@amd.com>
+>=20
+> The Idle HLT Intercept feature allows for the HLT instruction execution
+> by a vCPU to be intercepted by the hypervisor only if there are no
+> pending events (V_INTR and V_NMI) for the vCPU. When the vCPU is
+> expected to service the pending events (V_INTR and V_NMI), the Idle HLT
+> intercept won=E2=80=99t trigger. The feature allows the hypervisor to d=
+etermine
+> if the vCPU is idle and reduces wasteful VMEXITs.
+>=20
+> Presence of Idle HLT intercept feature for guests is indicated via CPUI=
+D
+> function 0x8000000A_EDX[30].
+>=20
+> Signed-off-by: Manali Shukla <Manali.Shukla@amd.com>
+> ---
+>  arch/x86/include/asm/cpufeatures.h | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/=
+cpufeatures.h
+> index a38f8f9ba657..a8c5dec042dc 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -381,6 +381,7 @@
+>  #define X86_FEATURE_V_SPEC_CTRL		(15*32+20) /* Virtual SPEC_CTRL */
+>  #define X86_FEATURE_VNMI		(15*32+25) /* Virtual NMI */
+>  #define X86_FEATURE_SVME_ADDR_CHK	(15*32+28) /* "" SVME addr check */
+> +#define X86_FEATURE_IDLE_HLT		(15*32+30) /* "" IDLE HLT intercept */
+> =20
+>  /* Intel-defined CPU features, CPUID level 0x00000007:0 (ECX), word 16=
+ */
+>  #define X86_FEATURE_AVX512VBMI		(16*32+ 1) /* AVX512 Vector Bit Manipu=
+lation instructions*/
+>=20
+> base-commit: d91a9cc16417b8247213a0144a1f0fd61dc855dd
+> --=20
 
-Just have a unmap version that also takes a list of PFNs that you'd
-need for non-coherent mappings?
+Acked-by: Borislav Petkov (AMD) <bp@alien8.de>
 
+--=20
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
