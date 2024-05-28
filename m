@@ -1,163 +1,99 @@
-Return-Path: <kvm+bounces-18199-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18200-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959548D1620
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 10:19:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45ED98D181B
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 12:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01A161F25155
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 08:19:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 723B11C2195F
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 10:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21E913C3ED;
-	Tue, 28 May 2024 08:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195041667FE;
+	Tue, 28 May 2024 10:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eofvSYDU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1XQ+8OY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F6D6F079;
-	Tue, 28 May 2024 08:19:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE2271743;
+	Tue, 28 May 2024 10:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716884372; cv=none; b=lbVRV5zQ8Gegmv2kUbphfOSN46dy5/nh4TZGDx6rG6l42uT58owvCWNrpxhk2z7lf/BSjAN0zpApfHe/iXQyw7Z+gw9O02dIhn5Cgv4Rjn3CZsJT2foUzy0t8TOXy5q0u0FW7iQjkEyj1L35WxTHaAMk45SlMNUsXvCRuX9Yu1s=
+	t=1716890809; cv=none; b=kTDhjX2Sb271OAXogw12rkzMG+2Wcp7QnNM/UdjdOxgcn7rQzeRMQtXzX8DF8EkxL8M9nQ5OcVQTjaHpBrZ2qn9dqgb+WsdzD42F65FGM78EXzEOyoGP2g4yF/7vHfOF3xlqP4ATsE8HCAGMhmhmqMcBuEKs2Gzf5Ql0F+16B5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716884372; c=relaxed/simple;
-	bh=Oc8QGTkURsUqafymwekWRoZjg0nWpLr6CloEAujioeo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B3XRWB1jQh7Rr1LijYNt3raJZdI76yffu/bhmGmJdkXK6alGFZKpnWeLhVgQoiVW/2kiDU+WrgSj2kpbKX9+lt9CCBeYzH11ifCmrpDfvKmHIypxFW5rtR4dLcEbffYnDgOlHh/Lz6l9bB/wXoZSg4igukMuSO8sKKeE/jwzyDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eofvSYDU; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1716884370; x=1748420370;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=Oc8QGTkURsUqafymwekWRoZjg0nWpLr6CloEAujioeo=;
-  b=eofvSYDUCqV0gy9K7Ts8XC56NPW2jgklP5h2qW8GWL2IRzl4z7r6HQCU
-   9BCi+AilaDIT1T5O2HMGle5HtBA3OW4U9wvt+Zl0KMhiDuo2cHFKqqh2D
-   i/z75ky+ARBd/OqAV7M8Lwc4rSB0wRmyuFaFCLS6Me+cj5xrF5zM7IgTo
-   AscibwGak8WuNYDBIOffcDkN+OMicnptXiV5zZGeieN+TQl2RUIOKw/Wu
-   Gx+Zdrz1jYXfn6GizZrnEb5+7ViNiuTG3T7HC8Rk59dQ8QZQuKGfKEIIE
-   6Kgp1Hng4QJiyng9XXPE28lg+ctbmmaR57wokdtsArxDi8OvOx45m8l5d
-   g==;
-X-CSE-ConnectionGUID: 00mZGMnuTvadWRGpV41Uag==
-X-CSE-MsgGUID: taHGjtM5QhekTMkO36HPvQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11085"; a="11723371"
-X-IronPort-AV: E=Sophos;i="6.08,194,1712646000"; 
-   d="scan'208";a="11723371"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 May 2024 01:19:29 -0700
-X-CSE-ConnectionGUID: EW6srXeGSdGt2Mn9vIXugg==
-X-CSE-MsgGUID: mC0outMrRpiGofdXme4ReA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,194,1712646000"; 
-   d="scan'208";a="35071106"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa009.fm.intel.com with ESMTP; 28 May 2024 01:19:27 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id B751B184; Tue, 28 May 2024 11:19:25 +0300 (EEST)
-Date: Tue, 28 May 2024 11:19:25 +0300
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: =?utf-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>, 
-	"Yamahata, Isaku" <isaku.yamahata@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, "Aktas, Erdem" <erdemaktas@google.com>, 
-	Sean Christopherson <seanjc@google.com>, Sagi Shahar <sagis@google.com>, "Chen, Bo2" <chen.bo@intel.com>, 
-	"Yuan, Hang" <hang.yuan@intel.com>, "Zhang, Tina" <tina.zhang@intel.com>, 
-	"Li, Xiaoyao" <Xiaoyao.Li@intel.com>
-Subject: Re: [PATCH v19 039/130] KVM: TDX: initialize VM with TDX specific
- parameters
-Message-ID: <fagj35jsiktyxegcyb6jujq2tkwzgnvqjfebka2eybdmzhpxej@m4ycvcqow5kt>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <5eca97e6a3978cf4dcf1cff21be6ec8b639a66b9.1708933498.git.isaku.yamahata@intel.com>
- <46mh5hinsv5mup2x7jv4iu2floxmajo2igrxb3haru3cgjukbg@v44nspjozm4h>
- <de344d2c-6790-49c5-85be-180bc4d92ea4@suse.com>
- <etso5bvvs2gq3parvzukujgbatwqfb6lhzoxhenrapav6obbgl@o6lowhrcbucp>
- <e8b36230-d59f-44f1-ba48-5a0533238d8e@suse.com>
- <pfbphwefaefxw2l2u26qr6ptq7rtdmnihjmxvk34zv4srlnsum@qyjumzzdnfxo>
- <46713df6-d73e-4816-bbda-a3b2dc723438@intel.com>
+	s=arc-20240116; t=1716890809; c=relaxed/simple;
+	bh=C0Lc9f035MeY02CMX3n2ZTaZkVQ6TuRa0sQ8hl6Jz1M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jTsGHYtmLOCaxW704e4il2GunjUWWpae6U51TmnL9+D8wgB1ZUt/cctsfEKTcz1dvgmTQOBnf+pNXygdhh7Q9NSOSHtc8TjQvI4jHIkhDJBBlPPQVfcKK2xTg9qlP1osOhmY0HxB0YwiYR7XVBemsdOGIPQVfk9X990IHvY7HxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1XQ+8OY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6529C3277B;
+	Tue, 28 May 2024 10:06:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1716890808;
+	bh=C0Lc9f035MeY02CMX3n2ZTaZkVQ6TuRa0sQ8hl6Jz1M=;
+	h=From:To:Cc:Subject:Date:From;
+	b=M1XQ+8OYLp9ia8ZBVNx2Lnpxhz/WbcvhIquqEMknhzUgOR7NtikVDLeqNdObyvaC3
+	 mUtzyR/1mKhM/avJ780EWNuTehJp8GkYd2VEiH+vRO5s5yjBxZ6zDvsxJ3L0Oayqth
+	 2GRECXkfFfWNkqH2v//YGzqNg7CcZRcARGCCDfxEWadvh4Uc0Sent1hOW4FhuB3SJX
+	 mQlRW/rRm3ArOculCfc7214ya8eA0mn2eCfzbKVHmhlWHiXYvbi0kPF6R2SI2mpRPa
+	 GbS8nveyT3fOCaEFT5MJx6d7GnmB+4HE3bcAoj30tjJ6xjnFsJ32NiFmnhM5lYfZT9
+	 IQ+Kvcl9IVy8Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sBtjC-00GFdz-S0;
+	Tue, 28 May 2024 11:06:46 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: [PATCH 0/2] KVM/arm64 fixes for NV PAC support
+Date: Tue, 28 May 2024 11:06:30 +0100
+Message-Id: <20240528100632.1831995-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <46713df6-d73e-4816-bbda-a3b2dc723438@intel.com>
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, May 24, 2024 at 11:37:15AM +1200, Huang, Kai wrote:
-> 
-> 
-> On 18/05/2024 4:25 am, Kirill A. Shutemov wrote:
-> > On Fri, May 17, 2024 at 05:00:19PM +0200, Jürgen Groß wrote:
-> > > On 17.05.24 16:53, Kirill A. Shutemov wrote:
-> > > > On Fri, May 17, 2024 at 04:37:16PM +0200, Juergen Gross wrote:
-> > > > > On 17.05.24 16:32, Kirill A. Shutemov wrote:
-> > > > > > On Mon, Feb 26, 2024 at 12:25:41AM -0800, isaku.yamahata@intel.com wrote:
-> > > > > > > @@ -725,6 +967,17 @@ static int __init tdx_module_setup(void)
-> > > > > > >     	tdx_info->nr_tdcs_pages = tdcs_base_size / PAGE_SIZE;
-> > > > > > > +	/*
-> > > > > > > +	 * Make TDH.VP.ENTER preserve RBP so that the stack unwinder
-> > > > > > > +	 * always work around it.  Query the feature.
-> > > > > > > +	 */
-> > > > > > > +	if (!(tdx_info->features0 & MD_FIELD_ID_FEATURES0_NO_RBP_MOD) &&
-> > > > > > > +	    !IS_ENABLED(CONFIG_FRAME_POINTER)) {
-> > > > > > 
-> > > > > > I think it supposed to be IS_ENABLED(CONFIG_FRAME_POINTER). "!" shouldn't
-> > > > > > be here.
-> > > > > 
-> > > > > No, I don't think so.
-> > > > > 
-> > > > > With CONFIG_FRAME_POINTER %rbp is being saved and restored, so there is no
-> > > > > problem in case the seamcall is clobbering it.
-> > > > 
-> > > > Could you check setup_tdparams() in your tree?
-> > > > 
-> > > > Commit
-> > > > 
-> > > > [SEAM-WORKAROUND] KVM: TDX: Don't use NO_RBP_MOD for backward compatibility
-> > > > 
-> > > > in my tree comments out the setting TDX_CONTROL_FLAG_NO_RBP_MOD.
-> > > > 
-> > > > I now remember there was problem in EDK2 using RBP. So the patch is
-> > > > temporary until EDK2 is fixed.
-> > > > 
-> > > 
-> > > I have the following line in setup_tdparams() (not commented out):
-> > > 
-> > > 	td_params->exec_controls = TDX_CONTROL_FLAG_NO_RBP_MOD;
-> > 
-> > Could you check if it is visible from the guest side?
-> > 
-> > It is zero for me.
-> > 
-> > diff --git a/arch/x86/coco/tdx/tdx.c b/arch/x86/coco/tdx/tdx.c
-> > index c1cb90369915..f65993a6066d 100644
-> > --- a/arch/x86/coco/tdx/tdx.c
-> > +++ b/arch/x86/coco/tdx/tdx.c
-> > @@ -822,13 +822,33 @@ static bool tdx_enc_status_change_finish(unsigned long vaddr, int numpages,
-> >   	return true;
-> >   }
-> > +#define TDG_VM_RD			7
-> > +
-> > +#define TDCS_CONFIG_FLAGS		0x1110000300000016
-> > +
-> 
-> Hi Kirill,
-> 
-> Where did you get this metadata field ID value from?  I assume you meant
-> below one, from which the ID is 0x9110000300000016?
+Here's a small series of fixes following the introduction of NV PAuth
+support in 6.10:
 
-The ID has changed in recent JSON ABI definitions. Looks fishy. I will
-find out what is going on.
+- address the relative priorities of Instruction abort, Illegal
+  Execution state, and PAC failure (already posted)
+
+- Expose BTI to a NV guest now that we have PAC up and running
+
+Unless someone shouts, I'll take these patches in the next batch of
+fixes.
+
+	M.
+
+Marc Zyngier (2):
+  KVM: arm64: nv: Fix relative priorities of exceptions generated by
+    ERETAx
+  KVM: arm64: nv: Expose BTI and CSV_frac to a guest hypervisor
+
+ arch/arm64/kvm/emulate-nested.c | 21 +++++++++++----------
+ arch/arm64/kvm/nested.c         |  6 ++++--
+ 2 files changed, 15 insertions(+), 12 deletions(-)
 
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.39.2
+
 
