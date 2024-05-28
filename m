@@ -1,170 +1,117 @@
-Return-Path: <kvm+bounces-18234-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18235-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97BDB8D235B
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 20:43:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1CAA8D2389
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 20:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 122391F23B80
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 18:43:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2451F2453C
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 18:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5ED16D4FC;
-	Tue, 28 May 2024 18:43:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2227F171661;
+	Tue, 28 May 2024 18:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czboGkmi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uRbUt9YL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C877F1C6A5
-	for <kvm@vger.kernel.org>; Tue, 28 May 2024 18:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12CD616F291
+	for <kvm@vger.kernel.org>; Tue, 28 May 2024 18:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716921779; cv=none; b=CW0LZ4ei11dikKTE0I1mvq9FYMvMQ2JXtaiXCx/9JNPucVzOMq5HaJ9Bp6IPARE5VkXlTlv3OEgJs7HKMA15kaT2HAxOoZz22hqUk7p0ENQnWhZQZZRQnikiBnhr8CeNzGsxuubi7FWyp2xuJBfAQLrF3Wd3t3snWVPAknh9rEI=
+	t=1716922465; cv=none; b=CBhTG4Z3xyd0CmkpiTGDRRkRA/eRFpicjFLVJ4V+VloGw4/p2dBmhkxUJVEGlpUmHHEJ0kiKYSJEuVChPpmfrvo0BpU1fSdwnDvPSZX6ARs40UTmmpz58VC10bjm3HKq4Qf0s467qreRMdN9b0onZFjf3/lOm3hkP7qDl7HloK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716921779; c=relaxed/simple;
-	bh=cuzWl4p1dgcX9rpAmO18y4ZhXaYWa8YOK62YyIjj3+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gui+8pHdWRMttA7SesDDDp/RYnRWQcMdpL6+0mFnBe9m+8Lt7OypCTIC3MndlQIQJo04ssXw/8v4DVDSaWpYe3khDxM6dznCngJg1wwB3a17UZenYAe/DQ2V729JdPKhTC1LmUrtguTuh/pzRY6Yizin6mpapndV/o7AdipNrAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=czboGkmi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716921776;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uQJSlbygfAYZXEQwuyM1FB4RBJG+zbsu5xfgtQXaTMk=;
-	b=czboGkmityCtB3UxDe1xN+6g27eChEtas1ZIMBZIhP6YN8Ngzn+13RbLsxClTSFfeeDmqn
-	mV+2vwPbiCIy3VDDKx0GFyhBQDxUIqNSiCt48rap3WRDJ4p2edjN9ZiEiKbgMjr8KlYqV7
-	KWVvJJiiJvJGX8v823ezCPnpVN1DHdE=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-UIoKnNwRPN6epl7l15iuUw-1; Tue, 28 May 2024 14:42:55 -0400
-X-MC-Unique: UIoKnNwRPN6epl7l15iuUw-1
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-37456dcde30so11327155ab.2
-        for <kvm@vger.kernel.org>; Tue, 28 May 2024 11:42:55 -0700 (PDT)
+	s=arc-20240116; t=1716922465; c=relaxed/simple;
+	bh=XjKB9lMK3weOkRqQznxEfeDYvHTiHYFA26fDuZyRHLU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Qv29BCIttS3YqKaYnFYRbGIkTkbed54eML1CFG+nquySZ2XASUMJTaRn5UCewCLMX/RnmeRlcl4etj/+Yt2EZ42NbO84HKKliT7NQYOa9btPqOBuXdRDZWtxK10kWlbjbOzn9mumXeuDxf+XmdiypvQS61XHC894Z2VfdX0axiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uRbUt9YL; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6819735bfc4so1150909a12.2
+        for <kvm@vger.kernel.org>; Tue, 28 May 2024 11:54:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1716922463; x=1717527263; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vF5iO2/CLnl6BCwM18Rm/a6cGRlrHRV+x/d0GOpSVW4=;
+        b=uRbUt9YLagloMhdkm6dV0Vo6AtTRPxZf1nnGH5X/3zaoB24JeN81XVTFgLsiosh/Qk
+         oaW0RwTL/V5gqimd7kyZCzU8OkpMtWvrjGXJ5kZ/SuYYRsDIkrSG+1y2rwlJyYgLt/8j
+         hbBpH6ZO51eDqhvmu6x1/WWTywgr6Wnow+fXKxDWr3xU+CxwSeT4Q7NuOV1arE1XJpAO
+         Nq+HwwTdSwt6aTZSp6w6WwY7bsc95Q9FhunT81zxiI7LBqLhD16BtKbnnuhBTbXJZADO
+         UliZHn33A64tqZcLht6EfoIAeYjjE4b+iLizaW3IvpkOY7MLRwz7Iws23dxJIaLWS2nR
+         1MfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716921774; x=1717526574;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uQJSlbygfAYZXEQwuyM1FB4RBJG+zbsu5xfgtQXaTMk=;
-        b=I6JsUuqdO4rpjYhqbLhohRjO148l2uLIH7GwT9qwJED70SKqmojPEPYg8FiGlWJ7t+
-         eVc5yF5aRzrEPLHEz1MCtkrrBTc9OZc9SP+EmodKL5pNj4+mIkDfzNm8jIBEm7IHv/q9
-         FyuVyfWSV37SwAocjvYWaJePVJFtSjt0AZfLcn41puMHZhQHWIhZKexeWSg6cydiUy12
-         rxdxD04OY66zIaL7xQnNJbNrlj51tEUI8kaN1zAc90t1fdrshq6VVOjhhNF2tQ6KyIY9
-         6QjB8lI3c5iyUBLNth2GD1O/kfBxAvWTDxK1Z/I8vGbOWOSTY6gOK6ezYUGQhQeWM8KX
-         1CmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXce8NsYqRFvsnAvf0TZO0+oEn+/IHsSvm2zOex62dkoNRKDl0JPAsJE+kpHeuKi5+ssncNaTP4YBczoINroBR8nFtI
-X-Gm-Message-State: AOJu0YyqgKY1wkauUwLtw6PjVFp2CDWJHqBUvvrLIoFxJbMnhtUjA6UX
-	x+TpWfrmE02tiosGvP4UBv4s5iJQtWxqhqPMfC3vNzTgpylw/Uol0Ov+r92dZNtpBXuVJFdAr6I
-	ItwO2KASCbhWGOZ1ydPvme8jy12I3Y3wll2CWkM8IEuh7L0oI4A==
-X-Received: by 2002:a05:6e02:1a84:b0:374:5641:bb8f with SMTP id e9e14a558f8ab-3745641be1emr75563985ab.27.1716921774312;
-        Tue, 28 May 2024 11:42:54 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFaU/zRAeXJ2LyHBGjCFh4fLUqJ9164ighhCyGDJxOwCOu9pgoeBcg44g9d/rGkbA3Xv3Ch9w==
-X-Received: by 2002:a05:6e02:1a84:b0:374:5641:bb8f with SMTP id e9e14a558f8ab-3745641be1emr75563765ab.27.1716921773552;
-        Tue, 28 May 2024 11:42:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4b107766667sm290672173.79.2024.05.28.11.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 May 2024 11:42:52 -0700 (PDT)
-Date: Tue, 28 May 2024 12:42:51 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: Peter Xu <peterx@redhat.com>, <kvm@vger.kernel.org>,
- <ajones@ventanamicro.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>
-Subject: Re: [PATCH 2/2] vfio/pci: Use unmap_mapping_range()
-Message-ID: <20240528124251.3c3dcfe4.alex.williamson@redhat.com>
-In-Reply-To: <Zk/xlxpsDTYvCSUK@yzhao56-desk.sh.intel.com>
-References: <20240523195629.218043-1-alex.williamson@redhat.com>
-	<20240523195629.218043-3-alex.williamson@redhat.com>
-	<Zk/hye296sGU/zwy@yzhao56-desk.sh.intel.com>
-	<Zk_j_zVp_0j75Zxr@x1n>
-	<Zk/xlxpsDTYvCSUK@yzhao56-desk.sh.intel.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1716922463; x=1717527263;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vF5iO2/CLnl6BCwM18Rm/a6cGRlrHRV+x/d0GOpSVW4=;
+        b=rySGaAb2IBLMOG0/jnRFpah/7fz6O+vjdxDmfeFXQEqWfaA8Bt1A+nHQK0bSjDXu1v
+         X3adS1F2XGT49EMHWsrnVxwiZ+0ndcL76Z5F/pjWtTCZyfYWIilbeAPy7Dn93xiTgR6n
+         Q2vo/fbXv0GI0nhhVv94WMBisqseBVWvkfx7JMybRDnGPCJPAnNezgORKEybFSghVdED
+         gN/QHsNXQh2KtviRUclMeVCSWmih1AwmIONNuisx0QwKm0Y+pA7h4BLXzItmObuBZhDw
+         rp5tx7ZSwdxvvmeqTxCHdgYx2LcRy2b6LL+VC5lXrmPzSPdQqUVg9Dm5BwVseOqqkuvk
+         lV9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU9ymKsWkfI9P4nM1jbGpn77VY+07p3+gtAoVF3h5/l1rySiIVu5dHLrLypMSlfHOa7ASGkV4p3N+kWGHpvLuBSWfE6
+X-Gm-Message-State: AOJu0YwplZPpCj4k/gQLMLjp3Vv7XDBtV13rVAm1oXe3/W/Kw/5lEHne
+	PAjt6AEPaAulPX3ii1Dgl6s2aXAHYr3oOe7hQdXfaUwK2Y45ZdVHvJPia6hx8bLLlJ8TPYvXieb
+	miA==
+X-Google-Smtp-Source: AGHT+IHZ8xHJVep2OJ2nfEnf3wxs4HlLEBkQLwwY9dzNuA2RoPiVORZFKSEwyGSnVgAX+c5WpSrZJsRNY3g=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:778c:0:b0:65c:2c22:111 with SMTP id
+ 41be03b00d2f7-681ad64b81dmr36484a12.8.1716922463270; Tue, 28 May 2024
+ 11:54:23 -0700 (PDT)
+Date: Tue, 28 May 2024 11:54:21 -0700
+In-Reply-To: <7ed7f3b7-4970-4723-8969-6452aed41b01@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-21-seanjc@google.com>
+ <7ed7f3b7-4970-4723-8969-6452aed41b01@linux.intel.com>
+Message-ID: <ZlYoXYzW70gbljHk@google.com>
+Subject: Re: [PATCH v2 20/49] KVM: x86: Rename kvm_cpu_cap_mask() to kvm_cpu_cap_init()
+From: Sean Christopherson <seanjc@google.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, 24 May 2024 09:47:03 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
-
-> On Thu, May 23, 2024 at 08:49:03PM -0400, Peter Xu wrote:
-> > Hi, Yan,
+On Wed, May 22, 2024, Binbin Wu wrote:
+> On 5/18/2024 1:38 AM, Sean Christopherson wrote:
+> > Rename kvm_cpu_cap_mask() to kvm_cpu_cap_init() in anticipation of merging
+> > it with kvm_cpu_cap_init_kvm_defined(), and in anticipation of _setting_
+> > bits in the helper (a future commit will play macro games to set emulated
+> > feature flags via kvm_cpu_cap_init()).
 > > 
-> > On Fri, May 24, 2024 at 08:39:37AM +0800, Yan Zhao wrote:  
-> > > On Thu, May 23, 2024 at 01:56:27PM -0600, Alex Williamson wrote:  
-> > > > With the vfio device fd tied to the address space of the pseudo fs
-> > > > inode, we can use the mm to track all vmas that might be mmap'ing
-> > > > device BARs, which removes our vma_list and all the complicated lock
-> > > > ordering necessary to manually zap each related vma.
-> > > > 
-> > > > Note that we can no longer store the pfn in vm_pgoff if we want to use
-> > > > unmap_mapping_range() to zap a selective portion of the device fd
-> > > > corresponding to BAR mappings.
-> > > > 
-> > > > This also converts our mmap fault handler to use vmf_insert_pfn()  
-> > > Looks vmf_insert_pfn() does not call memtype_reserve() to reserve memory type
-> > > for the PFN on x86 as what's done in io_remap_pfn_range().
-> > > 
-> > > Instead, it just calls lookup_memtype() and determine the final prot based on
-> > > the result from this lookup, which might not prevent others from reserving the
-> > > PFN to other memory types.  
+> > No functional change intended.
 > > 
-> > I didn't worry too much on others reserving the same pfn range, as that
-> > should be the mmio region for this device, and this device should be owned
-> > by vfio driver.
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/cpuid.c | 36 ++++++++++++++++++------------------
+> >   1 file changed, 18 insertions(+), 18 deletions(-)
 > > 
-> > However I share the same question, see:
-> > 
-> > https://lore.kernel.org/r/20240523223745.395337-2-peterx@redhat.com
-> > 
-> > So far I think it's not a major issue as VFIO always use UC- mem type, and
-> > that's also the default.  But I do also feel like there's something we can  
-> Right, but I feel that it may lead to inconsistency in reserved mem type if VFIO
-> (or the variant driver) opts to use WC for certain BAR as mem type in future.
-> Not sure if it will be true though :)
-
-Does Kevin's comment[1] satisfy your concern?  vfio_pci_core_mmap()
-needs to make sure the PCI BAR region is requested before the mmap,
-which is tracked via the barmap.  Therefore the barmap is always setup
-via pci_iomap() which will call memtype_reserve() with UC- attribute.
-
-If there are any additional comments required to make this more clear
-or outline steps for WC support in the future, please provide
-suggestions.  Thanks,
-
-Alex
-
-[1]https://lore.kernel.org/all/BN9PR11MB52764E958E6481A112649B5D8CF52@BN9PR11MB5276.namprd11.prod.outlook.com/
-
-> > > Does that matter?  
-> > > > because we no longer have a vma_list to avoid the concurrency problem
-> > > > with io_remap_pfn_range().  The goal is to eventually use the vm_ops
-> > > > huge_fault handler to avoid the additional faulting overhead, but
-> > > > vmf_insert_pfn_{pmd,pud}() need to learn about pfnmaps first.
-> > > >
-> > > > Also, Jason notes that a race exists between unmap_mapping_range() and
-> > > > the fops mmap callback if we were to call io_remap_pfn_range() to
-> > > > populate the vma on mmap.  Specifically, mmap_region() does call_mmap()
-> > > > before it does vma_link_file() which gives a window where the vma is
-> > > > populated but invisible to unmap_mapping_range().
-> > > >   
-> > >   
-> > 
-> > -- 
-> > Peter Xu
-> >   
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index a802c09b50ab..5a4d6138c4f1 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -74,7 +74,7 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
+> >    * Raw Feature - For features that KVM supports based purely on raw host CPUID,
+> >    * i.e. that KVM virtualizes even if the host kernel doesn't use the feature.
+> >    * Simply force set the feature in KVM's capabilities, raw CPUID support will
+> > - * be factored in by kvm_cpu_cap_mask().
+> > + * be factored in by __kvm_cpu_cap_mask().
 > 
+> kvm_cpu_cap_init()?
 
+Drat, yes.  IIRC, I tried to get clever to avoid having to update this comment a
+second time, but then I ended up removing __kvm_cpu_cap_mask() entirely.
 
