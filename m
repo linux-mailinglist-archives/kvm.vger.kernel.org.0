@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-18222-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18223-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 470B48D21A5
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 18:31:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 347BD8D21AA
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 18:33:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 735131C2336E
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 16:31:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B86DE1F248F9
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 16:33:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B260C171E44;
-	Tue, 28 May 2024 16:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4199C172BA6;
+	Tue, 28 May 2024 16:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YaShId9Y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E7HyPM8L"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D298F9D6
-	for <kvm@vger.kernel.org>; Tue, 28 May 2024 16:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104001EB3D
+	for <kvm@vger.kernel.org>; Tue, 28 May 2024 16:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716913868; cv=none; b=d6QQhHyjRhOsWRyOe3KRXtM65nIQoiuwRWbnPqbv75rAmdwMLftuxwRcWx8krG4Hyzcxkxs03Yg4MN77D77iWCy33WQr6ln08EX6z87vVR5gvhCgzx4jRLwVpnrcs8H28sSe0mSjRqGtQ2vMF9DOWKVzbtXTLLmooOcEKmsXCR4=
+	t=1716913992; cv=none; b=VVMEB0Z8cGK0RxlY66YtXFQeBB7/5OmumNkm4ZRypX6V/ix3MfpbM0Dmu+FrgaSda+K9xY9rZmSh6Xu/4Nx7eBscqSC4Snfrnu0MkuqwMX0nwwXBpJG640IGOIrz8O6xuD5FMvWLArKeamvZpWojSwefzC2hPTrraUXFArRbKLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716913868; c=relaxed/simple;
-	bh=Mz/StU4wUt+3b/KQuEZ6HR4Rd1ua4nPPdh3/iUwgfog=;
+	s=arc-20240116; t=1716913992; c=relaxed/simple;
+	bh=Y3IeOlopAAI95IiEoENHSZ9iQzcKrxtetwlnH07VNeo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i0TYieg1FGJVccCMz1TWeGImj1+Qpg8DX04a3kic/FipYAVKX/z3PkR8ivhWPAszr1+DzLXR2Y32Kcm9pXjSqSqy0LacHtMDqMKlGkIxlIXWNFJ2F/b+erIUMR8rnL2A0BH4hZf9HdNQlcUyuWgMeFPPAfMMo6qu3/37jqnxEC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YaShId9Y; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=cHkyfOY5VNK1+FoBTQWMw6IZn6SJeRm9qNvcV62BZIsJkXOAeNWDn58HOTOA3Thpi+eytY0k0X5m4M+zCmeG3lYNQLoG0G9neiICJQLFvsHTq2kEmzQIEC62yyoqcWgRQL7IZDR+IOnVtaXF0o+oczsFjJM4ZUtaM83XBv5V6MY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E7HyPM8L; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716913866;
+	s=mimecast20190719; t=1716913990;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=KOijGqYwatsRHcZFWC3eapxDqv1fMEWcXNilAW1npbM=;
-	b=YaShId9YNp5Hc+0jZ4eDJGaYPz/IZz9w1vbx61lSm54CFy1iWtw01uUr6lDJGicrVAqfTR
-	ZXkE1a/84rHWgEaKUenaZ75WL6USu/ajLT6GFjPjwI4RBI+fM4SsigXrdKulMpxHDuogKW
-	ZT1JU+QJaMHQKVkxQ828qB3sSuf98VI=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=o5rbBnotOGv3YE0/3Cgz+9VtslNbF6EOnYPi4Gp56T4=;
+	b=E7HyPM8LPEDm1liW0ACk1ueIQvcBOLn/c/5Jz71KdGpHCTX6MDmPjestSG8bjhjavbNL4Y
+	nYcXdDfMs0E+NlFZMblXW/HgYQ2OkQTZ5x+UCoWaXmtu15tomBJ4tHXLDpLa9bRwaFiI+M
+	A6SauinsAxGRHic5gdN8tsE8OR4wRAM=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-281--_j3yVjRNmmfiVkmzKDjqA-1; Tue, 28 May 2024 12:31:04 -0400
-X-MC-Unique: -_j3yVjRNmmfiVkmzKDjqA-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5785b36c703so585639a12.2
-        for <kvm@vger.kernel.org>; Tue, 28 May 2024 09:31:04 -0700 (PDT)
+ us-mta-584-mVMnvMkXNmGYAkWMSeXUVg-1; Tue, 28 May 2024 12:33:08 -0400
+X-MC-Unique: mVMnvMkXNmGYAkWMSeXUVg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a6266ffd474so59435066b.1
+        for <kvm@vger.kernel.org>; Tue, 28 May 2024 09:33:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716913863; x=1717518663;
+        d=1e100.net; s=20230601; t=1716913987; x=1717518787;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KOijGqYwatsRHcZFWC3eapxDqv1fMEWcXNilAW1npbM=;
-        b=cZNjazupJuOqL7m0A2dACD6wgM5wNQ4Ub8BrUFiWkVOoX/w5Cg9vzOsB5Ae/gCpIEC
-         9LzLoJpyoqSYwp3m081R5JAgMyuLCsWySit0nDXzXD5foi6s8z5tAispjDMCMaFcJb6g
-         4UHB7/pnNY3z+WZ6zVIaMAiCg9zQ2dsK1d1HUT6qg5mGhmk9tlzth8lk23gWOQ45eDry
-         kDwFFpz7kmkt3sKZFTQ3pLZh9ZpKb8F+IDclMnChBoLiny9KuNXJZvIB8cBxcNlLwKHr
-         zcfaEv3FahthaDTzdrrDXqHnLElrcAQH56mOE8e5EkH3Px7P5GDP2EeYJIXbMjUGOopJ
-         hrBg==
-X-Forwarded-Encrypted: i=1; AJvYcCW4TqJKk+Ra0LIH8vQ+AvS0ZRPI1qSsz/7XDfSjgf3tO9edoY1iyfXq6gv83lSe7QmZYdEYokvp9emQs/Zpa27obveQ
-X-Gm-Message-State: AOJu0YxdfLTFEYV08PGAQfXBqsUBcgT5FUr5xQZxxuaN9bC72+qOhVYC
-	g6KVteV6zeONUguOfUm8K0a796gfk30YTCJuBIb8S3vDGaY8w3V1dViqs5psBXczGIP7r/LnagZ
-	t7hJC8BOHRFvZ3R8WThuN0isYqDDHc8Ivb2WiGSJc+xrVtNh0zQ==
-X-Received: by 2002:a50:cd9d:0:b0:579:1f36:603a with SMTP id 4fb4d7f45d1cf-5791f366111mr8898133a12.17.1716913863614;
-        Tue, 28 May 2024 09:31:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGlPv5GaFsn+dFXp7P++pq1zvNnUcp4Z3tgLurZbE/g/iCsp27FCIP84TPuqKbEVDkaL7lO3A==
-X-Received: by 2002:a50:cd9d:0:b0:579:1f36:603a with SMTP id 4fb4d7f45d1cf-5791f366111mr8898107a12.17.1716913863205;
-        Tue, 28 May 2024 09:31:03 -0700 (PDT)
+        bh=o5rbBnotOGv3YE0/3Cgz+9VtslNbF6EOnYPi4Gp56T4=;
+        b=BIMsGzF4ioeNrDs6imNNf7h1I+x6fn2j13FfRH4GGXmzAOIjBpUKxtBwJzHBwomCuK
+         o0vBeGx8rOJuifcjchGhs4w569cx40bYuvK096EviYDizrQsot6F3H5AW+Z+jD/VvUuR
+         jTbt8QTj1V5pSfyRenKbUdNWfb56NKICPVTqbM+0NbaNSrX+9vVf6DD9gmzkU3D3r8hb
+         bHhB1Y06o/dX+hacftQVYi+NPza6F2e9b1xZ6scz6Xh83se273JfeHlN3m7MBOEKcHmh
+         5pCbUHaX/uySUauuJSYc82o/sUncMYrVAKMgXAaAwTjTcrEBJ4YD6IkxKsBeBq42Jqiv
+         O7Ug==
+X-Forwarded-Encrypted: i=1; AJvYcCX61HdxNlW8XaoK4h2ue7o9QP6U1m981wwfhkmtaqjdPe7U0rmcJur7xTQVU2B20k/ncyVhwIH+4PhUEY1ZnQjwah6p
+X-Gm-Message-State: AOJu0Yx8VAYYWDzcHSEj9UZi7ucAY4gpPOGylLLNnn1IgTJSmNH0WVVv
+	o+2VwK8UnBygVVAp+u715PjAFkzGmLT9RPzaVIHCJUkZw4CGFCk5LEELtg18gdgAJ89PZoOibbB
+	98x75QrU5yAqWwhUkejK9x4hfjG9H1S2h4e3dNAwxLpyzyMDO+g==
+X-Received: by 2002:a17:906:3104:b0:a59:c23d:85ce with SMTP id a640c23a62f3a-a626511b0c9mr1278595966b.51.1716913987593;
+        Tue, 28 May 2024 09:33:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEomPpdyLhHHN2mbD5AC45hBSp7q69Ft30B3Cje2wT/LJg0L8j/hbtGHYBkpjl+hS2DfRqpBQ==
+X-Received: by 2002:a17:906:3104:b0:a59:c23d:85ce with SMTP id a640c23a62f3a-a626511b0c9mr1278593566b.51.1716913987183;
+        Tue, 28 May 2024 09:33:07 -0700 (PDT)
 Received: from [192.168.10.48] ([151.95.155.52])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-579c73c771esm4166377a12.65.2024.05.28.09.31.02
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a626c937716sm629352366b.51.2024.05.28.09.33.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 May 2024 09:31:02 -0700 (PDT)
-Message-ID: <3eca1e7e-9ddc-47a2-b214-d8788a069222@redhat.com>
-Date: Tue, 28 May 2024 18:31:01 +0200
+        Tue, 28 May 2024 09:33:06 -0700 (PDT)
+Message-ID: <9626063d-40ed-4caa-8ac5-ba2e88b6e398@redhat.com>
+Date: Tue, 28 May 2024 18:33:05 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] KVM: SEV-ES: Prevent MSR access post VMSA
- encryption
+Subject: Re: [PATCH v3 2/3] KVM: SEV-ES: Disallow SEV-ES guests when
+ X86_FEATURE_LBRV is absent
 To: Ravi Bangoria <ravi.bangoria@amd.com>, seanjc@google.com,
  nikunj.dadhania@amd.com
 Cc: thomas.lendacky@amd.com, tglx@linutronix.de, mingo@redhat.com,
@@ -92,7 +92,7 @@ Cc: thomas.lendacky@amd.com, tglx@linutronix.de, mingo@redhat.com,
  michael.roth@amd.com, pankaj.gupta@amd.com, kvm@vger.kernel.org,
  linux-kernel@vger.kernel.org, santosh.shukla@amd.com
 References: <20240523121828.808-1-ravi.bangoria@amd.com>
- <20240523121828.808-2-ravi.bangoria@amd.com>
+ <20240523121828.808-3-ravi.bangoria@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -130,71 +130,36 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240523121828.808-2-ravi.bangoria@amd.com>
+In-Reply-To: <20240523121828.808-3-ravi.bangoria@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 5/23/24 14:18, Ravi Bangoria wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
-> 
-> KVM currently allows userspace to read/write MSRs even after the VMSA is
-> encrypted. This can cause unintentional issues if MSR access has side-
-> effects. For ex, while migrating a guest, userspace could attempt to
-> migrate MSR_IA32_DEBUGCTLMSR and end up unintentionally disabling LBRV on
-> the target. Fix this by preventing access to those MSRs which are context
-> switched via the VMSA, once the VMSA is encrypted.
-> 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
-> ---
->   arch/x86/kvm/svm/svm.c | 18 ++++++++++++++++++
->   1 file changed, 18 insertions(+)
-> 
 > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 3d0549ca246f..489b0183f37d 100644
+> index 489b0183f37d..dcb5eb00a4f5 100644
 > --- a/arch/x86/kvm/svm/svm.c
 > +++ b/arch/x86/kvm/svm/svm.c
-> @@ -2834,10 +2834,24 @@ static int svm_get_msr_feature(struct kvm_msr_entry *msr)
->   	return 0;
->   }
+> @@ -5308,11 +5308,17 @@ static __init int svm_hardware_setup(void)
 >   
-> +static bool
-> +sev_es_prevent_msr_access(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-> +{
-> +	return sev_es_guest(vcpu->kvm) &&
-> +	       vcpu->arch.guest_state_protected &&
-> +	       svm_msrpm_offset(msr_info->index) != MSR_INVALID &&
-> +	       !msr_write_intercepted(vcpu, msr_info->index);
-> +}
-> +
->   static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   {
->   	struct vcpu_svm *svm = to_svm(vcpu);
+>   	nrips = nrips && boot_cpu_has(X86_FEATURE_NRIPS);
 >   
-> +	if (sev_es_prevent_msr_access(vcpu, msr_info)) {
-> +		msr_info->data = 0;
-> +		return 0;
+> +	if (lbrv) {
+> +		if (!boot_cpu_has(X86_FEATURE_LBRV))
+> +			lbrv = false;
+> +		else
+> +			pr_info("LBR virtualization supported\n");
+> +	}
+>   	/*
+>   	 * Note, SEV setup consumes npt_enabled and enable_mmio_caching (which
+>   	 * may be modified by svm_adjust_mmio_mask()), as well as nrips.
+>   	 */
 
-This should return -EINVAL, not 0.  Likewise below in svm_set_msr().
+Since it consumes nrips, just make lbrv non-static:
+
+/* enable/disable Next RIP Save */
+int nrips = true;
+module_param(nrips, int, 0444);
 
 Paolo
-
-> +	}
-> +
->   	switch (msr_info->index) {
->   	case MSR_AMD64_TSC_RATIO:
->   		if (!msr_info->host_initiated &&
-> @@ -2988,6 +3002,10 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->   
->   	u32 ecx = msr->index;
->   	u64 data = msr->data;
-> +
-> +	if (sev_es_prevent_msr_access(vcpu, msr))
-> +		return 0;
-> +
->   	switch (ecx) {
->   	case MSR_AMD64_TSC_RATIO:
->   
 
 
