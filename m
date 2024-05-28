@@ -1,182 +1,161 @@
-Return-Path: <kvm+bounces-18204-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18206-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E63A8D1873
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 12:23:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7808D18C3
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 12:40:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEFF21F25B1C
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 10:23:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8419C288D5D
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 10:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3462616B72F;
-	Tue, 28 May 2024 10:23:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A2516B753;
+	Tue, 28 May 2024 10:39:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bsGLn1Y7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FgXHIgvp"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8673416ABC6
-	for <kvm@vger.kernel.org>; Tue, 28 May 2024 10:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784CF16ABFA
+	for <kvm@vger.kernel.org>; Tue, 28 May 2024 10:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716891790; cv=none; b=HYEusFV0yiz4GYag/Xa9QNmPO5Ve/3pCPwwaKiHdIRCIwr67zrCkkQC1dhKrX+DyleyvYXv/w/6Wvp/5hOZieodY1mJhva/Wn/BkijAM8FB7UXrr87QFqNb8imSGM/+CYdI6fRzEVJEhjfIwiplUj4IxTKa9wx0M/WYFtz7ccZg=
+	t=1716892793; cv=none; b=rWmbH6Ie0bixg45bjKAPankGXNjcfGGfL1PZqRW2bCf1zDQffZKj1lSRURr668WDgp7zvYUeqCwGomg9GKk3YbLXEC3wGzhJJk3jmF5LOPnw1FdbKBRAjVMczXf2txWfjeFzpyTYHgaN6ygJzt6gLjVIwxSY17XIGT8STYx0fYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716891790; c=relaxed/simple;
-	bh=6HygncVEzNRf7eiLycKCAN8lb4+Vt1or8KDjZEkYLIQ=;
+	s=arc-20240116; t=1716892793; c=relaxed/simple;
+	bh=aj45SEB7D9ldygzhYKXe3HytaBUsioM0atiT5UJiPD4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=f4f/JkGbdnV+EsGQ14jDcTmzvmpHJDpWHW97Mw910ihPSzc4+Rqid7YBE9r3u6qWgRUa8w/6CeK/50cW4zPXDFmNluMOJWX8Km2pw0LvRVnyrUZ4woOrfQJXP9GegQoWc3az50ztBhDiOY3XyhuohWrKe9CtCdvkdC6eoe/Lw6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bsGLn1Y7; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=kmNqeq3xrMmJp+eIN0EnJtbSxwSfpRHq4zz9qHOE/S/iWjejvVFpgZHGFOFwzM3tVcny82IJVcymfvRZvSokt7DLEJjuea1zmICUMQ+GBlF240LK6Q1E0VUONclbd4ZprVleopsjjPE+3Oh6e5MYtyf5PmAwJqiTunXhswQ3EuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FgXHIgvp; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1716891787;
+	s=mimecast20190719; t=1716892791;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4JlPtnJK4Wc+1UEGNtg5G4FKrqpfno/sxU9Ww+Z7CRE=;
-	b=bsGLn1Y7VChbxvCwBt5ryY8B46Blj2qg+yj2FRNPy9XwOG0O9jsTwHF6DOhbyabwJLs2V9
-	Fjn3e3/5iHl9iSAgyfPmSWNVpeI72tRWpqKD8izxJmVYl34oNOEYWHOdEFQRYW9z8t0lqM
-	Akf3HwAadWwnbZ7uE1SMK307Up3rvhQ=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=cWr5rLzhCiKZuwW7h7YBmazKG48r0xrDo/cGy6it0/4=;
+	b=FgXHIgvpyvHDZWIsSmKyDS3a9nnCVwIQFMXRIVQqjjKEhoNRYWMQKgYaRmdfMenuTYNG9V
+	87/GUy1r/gI2fRU0fi8NxSz3yXYiW/YJOLiB2LCrVjIckVxrO7JWKFipLZp4av+ZCOzAzA
+	Pxj9pnrcXKkUNTS/avqyaJNhzZp7WS4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-248-ZPfq2KAWMkOm61R2HVMncQ-1; Tue, 28 May 2024 06:23:05 -0400
-X-MC-Unique: ZPfq2KAWMkOm61R2HVMncQ-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2e95a2fc8e3so7622261fa.0
-        for <kvm@vger.kernel.org>; Tue, 28 May 2024 03:23:05 -0700 (PDT)
+ us-mta-630-O31F0iwDOXOQ9_kIhzV-Eg-1; Tue, 28 May 2024 06:39:49 -0400
+X-MC-Unique: O31F0iwDOXOQ9_kIhzV-Eg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-354f44ebfe7so479136f8f.2
+        for <kvm@vger.kernel.org>; Tue, 28 May 2024 03:39:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716891784; x=1717496584;
+        d=1e100.net; s=20230601; t=1716892789; x=1717497589;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4JlPtnJK4Wc+1UEGNtg5G4FKrqpfno/sxU9Ww+Z7CRE=;
-        b=AtNiQCyEuuTOVRMImYAI8bPFaFD3dRyyhzGaLoJxJHqm4cYE1xf96Ql5tHB591J8Wq
-         h/eylg9KzYqB6HHj8ynlGWLoujzY/YCKDJUO7WKimAyLG8rpLvGHhTWnaDHc+ZHgn6ae
-         ivmbdm8lfkAZFYRzNmpKL48d9HKT7LM+S7iicuf4mS2HqATYmBOxZB/F8pyngO8TUA4C
-         oer/bkzymTO/AQf5Biv4yfOMvnlDFnaIh1JaIeMbfqnns95inaOTOTUJjvB6RwnuSMKG
-         f0SXHV9p8NMKjWHaiCFxQB/Y/pPiucHHmbfSi/9gEJ+bDVl4TitQhtnHMEQOP5yQhNNX
-         1onw==
-X-Gm-Message-State: AOJu0YzBiAcf6ikdYmTk5Z0432Cq9RWLjfYw3YP3JUqU9+9NX8WEDFW+
-	TY1hA1kRXc/VWUM69gzfOfKnmtYX3QW6FV4xJD98OGLmyboM9TIa/ZjxTwWcFGPgfaDmNusho5F
-	kIBYl0YdJiNnQqj5yNkQZQSbd3VDj4hO6C2nYSH6WA67PY1ijPgW4RuxbF3Bkln92Ux69HGl2eu
-	jAoADnR/9LdJ5KvBsvuN46tZMV
-X-Received: by 2002:a2e:a289:0:b0:2e4:7996:f9f0 with SMTP id 38308e7fff4ca-2e95b0c0f7dmr66995631fa.17.1716891784377;
-        Tue, 28 May 2024 03:23:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFagdU0lrm3adrwao69Qv89jjLARq8eA9baEqhKcOEZD1RrTFH9Zv4Avy23rRgqwTm4Dx2B6GF5Co/8Z/IaoUU=
-X-Received: by 2002:a2e:a289:0:b0:2e4:7996:f9f0 with SMTP id
- 38308e7fff4ca-2e95b0c0f7dmr66995461fa.17.1716891783855; Tue, 28 May 2024
- 03:23:03 -0700 (PDT)
+        bh=cWr5rLzhCiKZuwW7h7YBmazKG48r0xrDo/cGy6it0/4=;
+        b=n7tEa2Rxp4AKX8uuCNaq8vfzyMByYneyE0m09wFvA3vunPsf+hiA8hg5UBz7fIVOIE
+         y9+5Vv6/sFKBbdv/0Tyn5vvAHxptNhGzim0yOJuqw2e//5zM+TVqdNuHnr6ana8EGXml
+         GJphAXejgRx2Q7tPj7/RNHmy3Vc4h7Z+Y9IdsOZzAV73r/N2HqliknVSyaA7CnVs6THw
+         7Cfg7pMyMQBLUP1sM103grgS5SBZn1ACSA4scnIfeK+uaRBFO6JJBPFhMUUWnoXBU7he
+         HuOk4K+0RddKetphgSq6uq/8D0bRqXdVmwMQXOUjILQRlIaO4ZXEIUn95Gyte0cpSbSE
+         AwSA==
+X-Forwarded-Encrypted: i=1; AJvYcCWf6FBWLngmiheAkWLPW68QDuf5GCDdkWY5YdNg5K99wy7NWNxuYJrw0Q7uCD8srrLnyDKczjnbodA6EF7ap0m4nPY5
+X-Gm-Message-State: AOJu0YxLbuelo9fWpsLwJXVLzIsV2CoIm52NoB0ZygwyoO6ZFZYukr3m
+	A5LtxOaklMU4zoYqzxiny+Onh1GS6AIQXYWbMcgtpFqcflDiSGOgN7PDcF1KnqNQ6x6Z8WGW6z2
+	2giiwAd5P+tY1lGcMsp6KcOUtsrLEPj2IgT5AufhJYuhb0BUIFBskY7w71GizhUQY+GhLIm2HeM
+	F0hWXCgCqZtSe/URJTc+s0aamM
+X-Received: by 2002:adf:f605:0:b0:351:d78e:875e with SMTP id ffacd0b85a97d-35526c271e2mr7836485f8f.14.1716892788872;
+        Tue, 28 May 2024 03:39:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG4hqokdTCBlYq+yxpXGdOajfvNiw6vsJ+NmirTpEeZTh+x8A7CTg2keuO9ed6PBfJTW5YEfW34ZoQ5qL3Gp5w=
+X-Received: by 2002:adf:f605:0:b0:351:d78e:875e with SMTP id
+ ffacd0b85a97d-35526c271e2mr7836445f8f.14.1716892788425; Tue, 28 May 2024
+ 03:39:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240528041926.3989-1-manali.shukla@amd.com>
-In-Reply-To: <20240528041926.3989-1-manali.shukla@amd.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com> <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+ <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
+ <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com> <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
+ <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com>
+In-Reply-To: <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 28 May 2024 12:22:51 +0200
-Message-ID: <CABgObfbz5kZZObu9dO=KPu8_mZvGmV1752SQzQckkrj5jPaTQg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/5] Add support for the Idle HLT intercept feature
-To: Manali Shukla <manali.shukla@amd.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, seanjc@google.com, 
-	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
-	vkuznets@redhat.com, bp@alien8.de, ajones@ventanamicro.com
+Date: Tue, 28 May 2024 12:39:36 +0200
+Message-ID: <CABgObfajCDkbDbK6-QyZABGTh=5rmE5q3ifvHfZD1A2Z+u0v3A@mail.gmail.com>
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	seanjc@google.com, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 28, 2024 at 6:19=E2=80=AFAM Manali Shukla <manali.shukla@amd.co=
+On Mon, May 27, 2024 at 2:26=E2=80=AFPM Binbin Wu <binbin.wu@linux.intel.co=
 m> wrote:
->
-> The upcoming new Idle HLT Intercept feature allows for the HLT
-> instruction execution by a vCPU to be intercepted by the hypervisor
-> only if there are no pending V_INTR and V_NMI events for the vCPU.
-> When the vCPU is expected to service the pending V_INTR and V_NMI
-> events, the Idle HLT intercept won=E2=80=99t trigger. The feature allows =
-the
-> hypervisor to determine if the vCPU is actually idle and reduces
-> wasteful VMEXITs.
+> > It seems like TDX should be able to do something similar by limiting th=
+e
+> > size of each KVM_HC_MAP_GPA_RANGE to TDX_MAP_GPA_MAX_LEN, and then
+> > returning TDG_VP_VMCALL_RETRY to guest if the original size was greater
+> > than TDX_MAP_GPA_MAX_LEN. But at that point you're effectively done wit=
+h
+> > the entire request and can return to guest, so it actually seems a litt=
+le
+> > more straightforward than the SNP case above. E.g. TDX has a 1:1 mappin=
+g
+> > between TDG_VP_VMCALL_MAP_GPA and KVM_HC_MAP_GPA_RANGE events. (And eve=
+n
+> > similar names :))
+> >
+> > So doesn't seem like there's a good reason to expose any of these
+> > throttling details to userspace,
 
-Does this have an effect on the number of vmexits for KVM, unless AVIC
-is enabled? Can you write a testcase for kvm-unit-tests' vmexit.flat
-that shows an improvement?
-
-The reason I am wondering is because KVM does not really use V_INTR
-injection. The "idle HLT" intercept basically differs from the basic
-HLT trigger only in how it handles an STI;HLT sequence, as in that
-case the interrupt can be injected directly and the HLT vmexit is
-suppressed. But in that circumstance KVM would anyway use a V_INTR
-intercept to detect the opening of the interrupt injection window (and
-then the interrupt uses event injection rather than V_INTR). Again,
-this is only true if AVIC is disabled, but that is the default.
-
-So unless I'm wrong in my analysis above, I'm not sure this series,
-albeit small, is really worth it. As things stand, it would be more
-interesting to enable this for nested VMs, especially Hyper-V which
-does use V_INTR and V_TPL; even better, _emulating_ it on older
-processors would reduce the L2->L0->L1->L0->L2 path to a
-less-expensive L2->L0->L2 vmexit.
-
+I think userspace should never be worried about throttling. I would
+say it's up to the guest to split the GPA into multiple ranges, but
+that's not how arch/x86/coco/tdx/tdx.c is implemented so instead we
+can do the split in KVM instead. It can be a module parameter or VM
+attribute, establishing the size that will be processed in a single
+TDVMCALL.
 
 Paolo
 
-> Presence of the Idle HLT Intercept feature is indicated via CPUID
-> function Fn8000_000A_EDX[30].
 >
-> Document for the Idle HLT intercept feature is available at [1].
+> The reasons I want to put the throttling in userspace are:
+> 1. Hardcode the TDX_MAP_GPA_MAX_LEN in kernel may not be preferred.
+> 2. The throttling thing doesn't need to be TDX specific, it can be
+> generic in userspace.
 >
-> [1]: AMD64 Architecture Programmer's Manual Pub. 24593, April 2024,
->      Vol 2, 15.9 Instruction Intercepts (Table 15-7: IDLE_HLT).
->      https://bugzilla.kernel.org/attachment.cgi?id=3D306250
->
-> Testing Done:
-> - Added a selftest to test the Idle HLT intercept functionality.
-> - Compile and functionality testing for the Idle HLT intercept selftest
->   are only done for x86_64.
-> - Tested SEV and SEV-ES guest for the Idle HLT intercept functionality.
->
-> v2 -> v3
-> - Incorporated Andrew's suggestion to structure vcpu_stat_types in
->   a way that each architecture can share the generic types and also
->   provide its own.
->
-> v1 -> v2
-> - Done changes in svm_idle_hlt_test based on the review comments from Sea=
-n.
-> - Added an enum based approach to get binary stats in vcpu_get_stat() whi=
-ch
->   doesn't use string to get stat data based on the comments from Sean.
-> - Added self_halt() and cli() helpers based on the comments from Sean.
->
-> Manali Shukla (5):
->   x86/cpufeatures: Add CPUID feature bit for Idle HLT intercept
->   KVM: SVM: Add Idle HLT intercept support
->   KVM: selftests: Add safe_halt() and cli() helpers to common code
->   KVM: selftests: Add an interface to read the data of named vcpu stat
->   KVM: selftests: KVM: SVM: Add Idle HLT intercept test
->
->  arch/x86/include/asm/cpufeatures.h            |  1 +
->  arch/x86/include/asm/svm.h                    |  1 +
->  arch/x86/include/uapi/asm/svm.h               |  2 +
->  arch/x86/kvm/svm/svm.c                        | 11 ++-
->  tools/testing/selftests/kvm/Makefile          |  1 +
->  .../testing/selftests/kvm/include/kvm_util.h  | 44 +++++++++
->  .../kvm/include/x86_64/kvm_util_arch.h        | 40 +++++++++
->  .../selftests/kvm/include/x86_64/processor.h  | 18 ++++
->  tools/testing/selftests/kvm/lib/kvm_util.c    | 32 +++++++
->  .../selftests/kvm/x86_64/svm_idle_hlt_test.c  | 89 +++++++++++++++++++
->  10 files changed, 236 insertions(+), 3 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_idle_hlt_test.=
-c
+> I think we can set a reasonable value in userspace, so that for SNP, it
+> doesn't trigger the throttling since the large request will be split to
+> multiple userspace requests.
 >
 >
-> base-commit: d91a9cc16417b8247213a0144a1f0fd61dc855dd
-> --
-> 2.34.1
+> > in which case existing
+> > KVM_HC_MAP_GPA_RANGE interface seems like it should be sufficient.
+> >
+> > -Mike
+> >
+> >>
+> >>>> For TDX, it may also want to use KVM_HC_MAP_GPA_RANGE hypercall  to
+> >>>> userspace via KVM_EXIT_HYPERCALL.
+> >>> Yes, definitely.
+> >>>
+> >>> Paolo
+> >>>
 >
 
 
