@@ -1,51 +1,52 @@
-Return-Path: <kvm+bounces-18200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18201-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45ED98D181B
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 218BD8D181A
 	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 12:07:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 723B11C2195F
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5AAB1F21D5D
 	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 10:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195041667FE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194C71667F7;
 	Tue, 28 May 2024 10:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1XQ+8OY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wq2ipwc0"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE2271743;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDE917E8F4;
 	Tue, 28 May 2024 10:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716890809; cv=none; b=kTDhjX2Sb271OAXogw12rkzMG+2Wcp7QnNM/UdjdOxgcn7rQzeRMQtXzX8DF8EkxL8M9nQ5OcVQTjaHpBrZ2qn9dqgb+WsdzD42F65FGM78EXzEOyoGP2g4yF/7vHfOF3xlqP4ATsE8HCAGMhmhmqMcBuEKs2Gzf5Ql0F+16B5Q=
+	t=1716890809; cv=none; b=VCpS6+k+XXc85448qnwi7mlJa1/haUWf6VHYJRWi9A6XKRShXSgB0K1WWS/98qRHu/5TO9meczF5f+rprUKSznJjUhXRmqFJJjnfLYYAVQyixMpFslVe7dy35O01oMWuKnMWQBhSRARpMrS8RheM9BDr8wfxixjkfNud19R8Myo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1716890809; c=relaxed/simple;
-	bh=C0Lc9f035MeY02CMX3n2ZTaZkVQ6TuRa0sQ8hl6Jz1M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jTsGHYtmLOCaxW704e4il2GunjUWWpae6U51TmnL9+D8wgB1ZUt/cctsfEKTcz1dvgmTQOBnf+pNXygdhh7Q9NSOSHtc8TjQvI4jHIkhDJBBlPPQVfcKK2xTg9qlP1osOhmY0HxB0YwiYR7XVBemsdOGIPQVfk9X990IHvY7HxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1XQ+8OY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6529C3277B;
+	bh=RPq4l8wKvYlXeHYmhj8r/m8AdUmE1Arj5xOYZhuRmZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Y0zYCr2dKKcyPf8ZS+5+5ZioiY4326uh2Y71ZFNJaIoPLK09pQsO9dHLrf7a1EH4F1q+1AZeZ5ujRw2iy5tKdSH3MU06GN74KDcTDDzmjnF0jlcwJrKUeaD7O9Q1Qg9eo9GZsOBGdf8Yvna/9wCnVohWc9WbKrdHX5caX9dbpSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wq2ipwc0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8EB3C32782;
 	Tue, 28 May 2024 10:06:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1716890808;
-	bh=C0Lc9f035MeY02CMX3n2ZTaZkVQ6TuRa0sQ8hl6Jz1M=;
-	h=From:To:Cc:Subject:Date:From;
-	b=M1XQ+8OYLp9ia8ZBVNx2Lnpxhz/WbcvhIquqEMknhzUgOR7NtikVDLeqNdObyvaC3
-	 mUtzyR/1mKhM/avJ780EWNuTehJp8GkYd2VEiH+vRO5s5yjBxZ6zDvsxJ3L0Oayqth
-	 2GRECXkfFfWNkqH2v//YGzqNg7CcZRcARGCCDfxEWadvh4Uc0Sent1hOW4FhuB3SJX
-	 mQlRW/rRm3ArOculCfc7214ya8eA0mn2eCfzbKVHmhlWHiXYvbi0kPF6R2SI2mpRPa
-	 GbS8nveyT3fOCaEFT5MJx6d7GnmB+4HE3bcAoj30tjJ6xjnFsJ32NiFmnhM5lYfZT9
-	 IQ+Kvcl9IVy8Q==
+	bh=RPq4l8wKvYlXeHYmhj8r/m8AdUmE1Arj5xOYZhuRmZo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Wq2ipwc0RcVwlSHuN/R9V0XSzZL9LOjJdhnNkrvQu1VtsHxAzTeYHc8+tpesitbR7
+	 i05WiRJS1Oc7jHJ0fiXrZIttXU86S6iDTJDWox+CATL1erXY79b/61bidKCEm10H0U
+	 kMN1foTytXN62r82wdYa5X6WgFma8JzHU8LAlvS5rjC70an9t22toXt5JkCBhGp7rw
+	 EoGBWVRE1M1Tg2AfFzbk+xsqzdKdiNIwSrmBt38FK9hCqKccqseBZKivVUeVyThJsE
+	 0gDT9kupOMXVianWuX86ku0V8fp8JdLCSkNdThsCSVQqVP58tUGt8UVPga/KUidSl1
+	 kMHD9yCINPsTA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sBtjC-00GFdz-S0;
-	Tue, 28 May 2024 11:06:46 +0100
+	id 1sBtjD-00GFdz-1O;
+	Tue, 28 May 2024 11:06:47 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -55,10 +56,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 0/2] KVM/arm64 fixes for NV PAC support
-Date: Tue, 28 May 2024 11:06:30 +0100
-Message-Id: <20240528100632.1831995-1-maz@kernel.org>
+Subject: [PATCH 1/2] KVM: arm64: nv: Fix relative priorities of exceptions generated by ERETAx
+Date: Tue, 28 May 2024 11:06:31 +0100
+Message-Id: <20240528100632.1831995-2-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240528100632.1831995-1-maz@kernel.org>
+References: <20240528100632.1831995-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,28 +74,88 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Here's a small series of fixes following the introduction of NV PAuth
-support in 6.10:
+ERETAx can fail in multiple ways:
 
-- address the relative priorities of Instruction abort, Illegal
-  Execution state, and PAC failure (already posted)
+(1) ELR_EL2 points lalaland
+(2) we get a PAC failure
+(3) SPSR_EL2 has the wrong mode
 
-- Expose BTI to a NV guest now that we have PAC up and running
+(1) is easy, as we just let the CPU do its thing and deliver an
+Instruction Abort. However, (2) and (3) are interesting, because
+the PAC failure priority is way below that of the Illegal Execution
+State exception.
 
-Unless someone shouts, I'll take these patches in the next batch of
-fixes.
+Which means that if we have detected a PAC failure (and that we have
+FPACCOMBINE), we must be careful to give priority to the Illegal
+Execution State exception, should one be pending.
 
-	M.
+Solving this involves hoisting the SPSR calculation earlier and
+testing for the IL bit before injecting the FPAC exception.
 
-Marc Zyngier (2):
-  KVM: arm64: nv: Fix relative priorities of exceptions generated by
-    ERETAx
-  KVM: arm64: nv: Expose BTI and CSV_frac to a guest hypervisor
+In the extreme case of a ERETAx returning to an invalid mode *and*
+failing its PAC check, we end up with an Instruction Abort (due
+to the new PC being mangled by the failed Auth) *and* PSTATE.IL
+being set. Which matches the requirements of the architecture.
 
+Whilst we're at it, remove a stale comment that states the obvious
+and only confuses the reader.
+
+Fixes: 213b3d1ea161 ("KVM: arm64: nv: Handle ERETA[AB] instructions")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
  arch/arm64/kvm/emulate-nested.c | 21 +++++++++++----------
- arch/arm64/kvm/nested.c         |  6 ++++--
- 2 files changed, 15 insertions(+), 12 deletions(-)
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 72d733c74a38..54090967a335 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -2181,16 +2181,23 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	if (forward_traps(vcpu, HCR_NV))
+ 		return;
+ 
++	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
++	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
++
+ 	/* Check for an ERETAx */
+ 	esr = kvm_vcpu_get_esr(vcpu);
+ 	if (esr_iss_is_eretax(esr) && !kvm_auth_eretax(vcpu, &elr)) {
+ 		/*
+-		 * Oh no, ERETAx failed to authenticate.  If we have
+-		 * FPACCOMBINE, deliver an exception right away.  If we
+-		 * don't, then let the mangled ELR value trickle down the
++		 * Oh no, ERETAx failed to authenticate.
++		 *
++		 * If we have FPACCOMBINE and we don't have a pending
++		 * Illegal Execution State exception (which has priority
++		 * over FPAC), deliver an exception right away.
++		 *
++		 * Otherwise, let the mangled ELR value trickle down the
+ 		 * ERET handling, and the guest will have a little surprise.
+ 		 */
+-		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE)) {
++		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR_IL_BIT)) {
+ 			esr &= ESR_ELx_ERET_ISS_ERETA;
+ 			esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_FPAC);
+ 			kvm_inject_nested_sync(vcpu, esr);
+@@ -2201,17 +2208,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
+ 	preempt_disable();
+ 	kvm_arch_vcpu_put(vcpu);
+ 
+-	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
+-	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
+ 	if (!esr_iss_is_eretax(esr))
+ 		elr = __vcpu_sys_reg(vcpu, ELR_EL2);
+ 
+ 	trace_kvm_nested_eret(vcpu, elr, spsr);
+ 
+-	/*
+-	 * Note that the current exception level is always the virtual EL2,
+-	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
+-	 */
+ 	*vcpu_pc(vcpu) = elr;
+ 	*vcpu_cpsr(vcpu) = spsr;
+ 
 -- 
 2.39.2
 
