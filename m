@@ -1,110 +1,123 @@
-Return-Path: <kvm+bounces-18236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA7B48D2391
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 20:57:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6472E8D2471
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 21:17:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16F471C23280
-	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 18:57:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16EAC28BBBF
+	for <lists+kvm@lfdr.de>; Tue, 28 May 2024 19:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0614B174EC6;
-	Tue, 28 May 2024 18:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E89A176FD2;
+	Tue, 28 May 2024 19:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BvKLadwi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="viVzdojg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9FF816F916
-	for <kvm@vger.kernel.org>; Tue, 28 May 2024 18:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D6C8174EFA
+	for <kvm@vger.kernel.org>; Tue, 28 May 2024 19:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716922607; cv=none; b=Mxs5x7Fbt6NnbzbUE64SR8kiWLY4LeOo8yJWYrhidydxe4D0HD+nfAxDpdikxH8VCqEOunU5GY6nZajK9GBpWVyP8AbW5fbkkJjNLwuq7Ywg61IWJLPWdHTbCrwI0yDM7BWDqp3Eoh0zZToHjvEaleSYVJiXZim3vRAzi3d+1Ms=
+	t=1716923775; cv=none; b=lCH5AFMwFHzZiSpX5Y1aG/Q8JywZZu/E+Tn1+adEmfIhQ0LQzj4j7we0aFPlOqO4dWEkjprG5xzzlQ0//KKYoZFEmX9PZmAPn2HEPj9y8IDdZArOE0794ydn6FmVq8YdptQ0evBE4zoG3HeE/CCX+uMIf1JrCaF9KLi1tZBosWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716922607; c=relaxed/simple;
-	bh=7VzGZDtBSooFkxUd9OAZGtectfy+uwG4/bUmSmiL7y4=;
+	s=arc-20240116; t=1716923775; c=relaxed/simple;
+	bh=ag7+h70RDNCub6CI9FhMvv9doD/tLeJlJWjTiOiUnAE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hqIWXWJQfI1HjOGrlzIc2AAKx6+A0cX9WuwLChiBTvE1cuaH9GHMv7D2aNaEM1+KKVkknB+Coy4FqAYWcGEjy5Xa/U9fREgFByT85xrAq0vhhNd7hrnf4XXQjuBRKXBoyonFev6PT4ykG2TKSVvV5K8wAlbxMTELFSxyLrzyWwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BvKLadwi; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=Mzn8QAst0DgPIr0YSMwqqGnbp4dt8rcNGDKS/4ScrraPq4OIv/jgjQmVGfZhD6WoBXrGs1lpjrnZoqUlb2o6CKM6mlGw/vqoL5ptUZhR0tSPLTHJtgJMgCTdmcp1mUFtLrUUtO+LEoJtoid/eSzkb1pchclPHM3DpaYKn6XUjBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=viVzdojg; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6819568d854so1039181a12.2
-        for <kvm@vger.kernel.org>; Tue, 28 May 2024 11:56:45 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df52a2535d5so1629094276.0
+        for <kvm@vger.kernel.org>; Tue, 28 May 2024 12:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716922605; x=1717527405; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1716923773; x=1717528573; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=S4Hp5OPdGF5QAC5ejV2ec7ZNjyRf7XQzcBDRWuz3U2Q=;
-        b=BvKLadwiu1EUp6B/W7QzDf0vC1qmVA4xA9GlGAhJTIYmUKR4aXx37KdHJfazVVcYXD
-         LLY9oCg8xuQPAia6vvNwmi1CCDxqQJSO1yTVcISCtOoGx9SDFcCC/IP48sK3kwIWB5d2
-         DgdKyyPXggomEr1PFGIzaciu026AyQHfCJvMeigaEaxyk3QadlQnJD4B32EX5d+6Otxx
-         tzwLKy0NSNrGJ+3tkXscX7t3VocrA/StXLCGgiqbAerBwXMNqGREOfD/GX+pGSr4jRQm
-         5z8kyuogd933XlZzGOAeuaAf7Y76xitBVzPHskHuqoJ8rksyBLfnOwwVb23u7//VuZbo
-         4Aew==
+        bh=aN1FoCckBsPH3nlr2F+fxU8+3rgvDDBf83ZZTupmDzY=;
+        b=viVzdojgJrWKjqTJr5Izw239q1ePp6TGp5Ng4+2J1ZBKYzp1Q5vdvLiaPr+X+zsujL
+         OenUB1emtOYJB40+qpa9UulYOpd//+GI6WTtyFKPru4x/E4X5IuLATSB+5pVXE2We5gZ
+         X4kojHm4A9VvBmbKwT6iPtnBsWLBak9V6I5BR1qUzfYBF0LJj2Jzh1gNml1u4saDvued
+         EOj4eHTt+pr56Gl/LzD1hJUzUusxiiGQ97hVG62ed8Yu+UX57r21cJIKRV+VDlwjMEdH
+         L0t910eLNg7jRLgk8BefxA7L7r5I2kC0KSWPX7FnLSmWFck+WIq+HZxCOIxSG9NzzoSX
+         dMdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716922605; x=1717527405;
+        d=1e100.net; s=20230601; t=1716923773; x=1717528573;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S4Hp5OPdGF5QAC5ejV2ec7ZNjyRf7XQzcBDRWuz3U2Q=;
-        b=u/add3KIAH2l1osCf17NYAOboZCEIg1LbPnlVOQgsvEWKOqS4LyAtCljInZPbCKFrQ
-         Q/ZQa08VGP7WPgz4e0f1Iu5PCy3F1rFo/TQ5xwBxPFSt9TajsTCEQmVUQod2CV2aPai1
-         8EQ8MUug9I+tId4GXGvT4xTpaU6lglEzeVPeqdcy7o+G1kin21NTycD/tMhD9Sq6fntb
-         mhDiZ2qpqBF2rprzuR1VN27B7SkLT43x0NhRT7yVFKzbVT1Gn/cMOixGM/bQ4hAOhD/S
-         vibeBdNRbZttXctbnVmcX9z5JGisivq8zujx+KgojN8Z0DndqJbE7TcdHKtMDECE8uTJ
-         9GZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV6plMSlcK3BiYlCT03LbmhcE6132+ZMMAOGCJXD1zrtxUDiiKBYwo5/ZTRX7ZOnkejj6Kw3vXb+yauQhgz0uq0vZmF
-X-Gm-Message-State: AOJu0YwpwAQ02mc32OkX0FELoXN9Uej6UP7MTG8qaI9/vUm3Ilmk0JRb
-	cuG+CsOdZ15lPx09T4IvWBgSfhiYA/gRu/YbzwqpMxsej9zoSdxICcO74dbm4/9tXe7dp3gAMKC
-	QfQ==
-X-Google-Smtp-Source: AGHT+IHoqr+ISQcH8/FCagbfJ2nL98ZUcD/8qvK2Uon7Hq2ULc+/vLDNTGE1sbxP/IfziOZcYq1e9FeGTCM=
+        bh=aN1FoCckBsPH3nlr2F+fxU8+3rgvDDBf83ZZTupmDzY=;
+        b=rwqpUyuKh3Qd1iT+POaj6AW+ar962zTRiz7mQivqr5avyBbhpkrBlLIh3/to3rBg8x
+         XOIbXeqinA/eP26axqjXMXGNTjTo+Gdi8hCssG/b2WTyJaUi5UyDFarBYDY2gwZlQmy1
+         DibrLVXVZhXxF1ZQmGWGROmpZGb8LTiheDZPNVXWLYY75jSmtxR63PlVcjQL8z73zSpU
+         8eot0BCmi+cmsZUdZdFrBSqxlCN21RQLzfoX4IcwMfnpuI78P1NmLLO7c29+/3Cg2mru
+         3/TBvSCeFNdh5G0FP1+N/m/W/i/gxEJBefoaRBF7uOOpRFth9EtyloezkzqUFGAXTgqw
+         AkrA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+sFcLd+g5zk4AgUm12fUb4nx1+AkXt+9tN8HTdcaJWhDc51hRSr+6gK/H/mAl8/ZQ7/p2Ep/EjeVw7Lp5UnK78bPr
+X-Gm-Message-State: AOJu0YyAy1OJGytCixfpqhheknioKducW5+j2JpcJQAS87kb3fYnwKlf
+	f6vFxGCNm0o/x8n9HGNGEory+XZ65vGBlevRXeSPeFbcR/xlhk94b0b+labV+NOvgjG+pwvz2K9
+	xcw==
+X-Google-Smtp-Source: AGHT+IEYffSoUdZ4cg7KX8v+KoP4uvokISlIeu5qUtxtXAQ85EyWGJZei7jVgr6jZvnufr8gfWsoMUgR1K8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:19ce:b0:2bd:6abb:e9f7 with SMTP id
- 98e67ed59e1d1-2bf5e09d490mr35783a91.0.1716922605104; Tue, 28 May 2024
- 11:56:45 -0700 (PDT)
-Date: Tue, 28 May 2024 11:56:43 -0700
-In-Reply-To: <18f52be4-6449-4761-a178-1ca87124c28d@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c3:b0:df7:943d:f935 with SMTP id
+ 3f1490d57ef6-df7943e55a0mr788014276.2.1716923773190; Tue, 28 May 2024
+ 12:16:13 -0700 (PDT)
+Date: Tue, 28 May 2024 12:16:11 -0700
+In-Reply-To: <c77f3931-31b2-4695-bd74-c69cba9b96c1@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-13-seanjc@google.com>
- <18f52be4-6449-4761-a178-1ca87124c28d@linux.intel.com>
-Message-ID: <ZlYo67vO5JJ6aCAK@google.com>
-Subject: Re: [PATCH v2 12/49] KVM: x86: Reject disabling of MWAIT/HLT
- interception when not allowed
+References: <20240522014013.1672962-1-seanjc@google.com> <20240522014013.1672962-4-seanjc@google.com>
+ <c77f3931-31b2-4695-bd74-c69cba9b96c1@intel.com>
+Message-ID: <ZlYte16cvQpPGHkx@google.com>
+Subject: Re: [PATCH v2 3/6] KVM: x86: Fold kvm_arch_sched_in() into kvm_arch_vcpu_load()
 From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, Yang Weijiang <weijiang.yang@intel.com>, 
-	Robert Hoo <robert.hoo.linux@gmail.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, May 22, 2024, Binbin Wu wrote:
-> On 5/18/2024 1:38 AM, Sean Christopherson wrote:
-> > @@ -4726,15 +4740,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >   		r = KVM_CLOCK_VALID_FLAGS;
-> >   		break;
-> >   	case KVM_CAP_X86_DISABLE_EXITS:
-> > -		r = KVM_X86_DISABLE_EXITS_PAUSE;
-> > -
-> > -		if (!mitigate_smt_rsb) {
-> > -			r |= KVM_X86_DISABLE_EXITS_HLT |
-> > -			     KVM_X86_DISABLE_EXITS_CSTATE;
-> > -
-> > -			if (kvm_can_mwait_in_guest())
-> > -				r |= KVM_X86_DISABLE_EXITS_MWAIT;
-> > -		}
-> > +		r |= kvm_get_allowed_disable_exits();
+On Fri, May 24, 2024, Kai Huang wrote:
+> > @@ -1548,6 +1548,9 @@ static void svm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> >   	struct vcpu_svm *svm = to_svm(vcpu);
+> >   	struct svm_cpu_data *sd = per_cpu_ptr(&svm_data, cpu);
+> > +	if (vcpu->scheduled_out && !kvm_pause_in_guest(vcpu->kvm))
+> > +		shrink_ple_window(vcpu);
+> > +
 > 
-> Nit: Just use "=".
+> [...]
+> 
+> > @@ -1517,6 +1517,9 @@ void vmx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+> >   {
+> >   	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> > +	if (vcpu->scheduled_out && !kvm_pause_in_guest(vcpu->kvm))
+> > +		shrink_ple_window(vcpu);
+> > +
+> 
+> Nit:  Perhaps we need a kvm_x86_ops::shrink_ple_window()?  :-)
 
-Yowsers, that's more than a nit, that's downright bad code, it just happens to be
-functionally ok.  Thanks again for the reviews!
+Heh, that duplicate code annoys me too.  The problem is the "old" window value
+comes from the VMCS/VMCB, so either we'd end up with multiple kvm_x86_ops, or
+we'd only be able to consolidate the scheduled_out + kvm_pause_in_guest() code,
+which isn't all that interesting.
+
+Aha!  Actually, VMX already open codes the functionality provided by VCPU_EXREG_*,
+e.g. has vmx->ple_window_dirty.  If we add VCPU_EXREG_PLE_WINDOW, then the info
+get be made available to common x86 code without having to add new hooks.  And
+that would also allow moving the guts of handle_pause()/pause_interception() to
+common code, i.e. will also allow deduplicating the "grow" side of things.
 
