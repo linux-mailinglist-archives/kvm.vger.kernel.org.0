@@ -1,84 +1,85 @@
-Return-Path: <kvm+bounces-18297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DBEF8D365A
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 14:26:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF418D366C
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 14:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 098FE1F22FE7
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 12:26:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1A1EB24944
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 12:30:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B07C181301;
-	Wed, 29 May 2024 12:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8853E181312;
+	Wed, 29 May 2024 12:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mRhZOhf9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IIW5e/z+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03B813B295
-	for <kvm@vger.kernel.org>; Wed, 29 May 2024 12:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFC0363
+	for <kvm@vger.kernel.org>; Wed, 29 May 2024 12:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716985599; cv=none; b=cbckEpXoRXMGz7CL0WtU4Ux8h8cw0VOoLQcLYAJuaxPu5fZRomQXkx2RjIcG9ekich9j1HbRcygaymfwZBMLsk3qLSkw6ALuKxp9rf6AAupAXdvti+KhMKtE8DZb8qYGEUKaDDaJM6ZPBUbCmfiSCrEV7bimIyMWRcjGZhsMH+4=
+	t=1716985822; cv=none; b=Z7fJ4I3AmyglQzGsSj8xsGedZCnH7ebdydj/KlS/gHF8yWk/jurw5BvQaPAonGC6q/xNE189GwgrMHwKvAQVA+PTHK0atLEg15QRTVovb+AomDV9IDDw2nQM6mrbdw/qLc1pWvhr91PJx2gM+DEgxh7vYXRIsSS3gYR02OvAZzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716985599; c=relaxed/simple;
-	bh=kZQZy3UXOQtFDUQs6mTBRIk0y6wOsa82ETCziHZRuAY=;
+	s=arc-20240116; t=1716985822; c=relaxed/simple;
+	bh=gcXS9jLJSZWjAWlbQbdUOaZ2nz7/IfF2IriZ5nAD9xg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Eem/vlit16cXvagOoDtkYpFLcUNmH+LZza3vEc87wfen0Ytdp2V8XBZc0dMipTdYFZ45HfZBDtYGen2Wbdi1e6FtTgvvfhgru7k4+zImNdHjm+T7f3gSA+zmXYq/BXrWXdseWAhwpH669DOqOdB7C+sdfN1w0RAZd490zdjxDTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mRhZOhf9; arc=none smtp.client-ip=209.85.208.47
+	 Content-Type:Content-Disposition:In-Reply-To; b=cCzImSqltb1RnSH7Rwl7iqbc37hhivXkLQvqX5cTHbp3rMcCobP1lx1IQe0ItoW8S8kM2mnw0exL7CnerwjsdA3s5uV9SVOgSCMC6u8u11aJ86/6OQezuykEsWkRE8oH63tIZ/MVGMQNcspj6GuAsv3+ZzllOYHQ3jKZehmtU1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IIW5e/z+; arc=none smtp.client-ip=209.85.218.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5751bcb3139so2208476a12.1
-        for <kvm@vger.kernel.org>; Wed, 29 May 2024 05:26:37 -0700 (PDT)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a634e03339dso238396466b.3
+        for <kvm@vger.kernel.org>; Wed, 29 May 2024 05:30:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1716985596; x=1717590396; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1716985819; x=1717590619; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=nnfvDp8Ca+cO5mfydJDgPxJYtD8QE7kVqh+o+Vt+wto=;
-        b=mRhZOhf9b9BYhLU1ARAQvXw4gd1UadC/K/w7D1KlGFd00RGra8SzKqVE9ZQYxIhEgY
-         FvyuTagRAP/a/fKSJOLqLOdAlvxkne4NT7sO9ENPozkh2hEw+CgqDUT/V9F8UNk7VqNH
-         4/1oEIGOYiGK+UTEZr4K76fHyOifNqmQ0HNtftnwDMVbtCSoDlUwWUjiCe58SXxKf76i
-         QZ/fELMpI0AfvYeV4+YO/JqdGXCpA+EM4WZKnyTqiqnWwQU/0sw1Y+nO6b7CIpelzBGv
-         3qCI92TllDCDLSkiFCFiGvrycuwc7NryOM8RXOidrewEMKlWRWXFqaEXVCl1xCypY6bi
-         HcJw==
+        bh=2LXZ9wqthbTQhc7QRlnA0utzKwKCI8VLIKqeGLoEf8o=;
+        b=IIW5e/z+1iTjp3pOJf1IqiVWIvC2Zyd+guqNuZNs8IdPxliWmgzAc63iwqO6uugMfi
+         F3bOdLUgenoax1NRVU3It5zwaIj4EBocnqQuoyUOqsm7VDl9j5isaWC6oYIxp0+E18Sq
+         FRU8F3ZztdQzAgCfduis+jwyWbKeryCaKShMKm2i3gAZf01RDcv3RIrT7osxT3j4/miH
+         McgL8Fj72A8VpQ0+zuFlF5AZXhFc4hb0EkIrow3YLCIYeW+sWSKD6M2WBkfbvzaE0iPW
+         NkHJMxNISuSviXNU9qn2DR2jx03QHIwWhlZc/wGobvW6xYZSR/4jK5nNKhDJDXTppLpE
+         mlHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1716985596; x=1717590396;
+        d=1e100.net; s=20230601; t=1716985819; x=1717590619;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nnfvDp8Ca+cO5mfydJDgPxJYtD8QE7kVqh+o+Vt+wto=;
-        b=Jnb2dzI6WXwAIgkqxqmh7Ns98xj2VNYi2n2sC11a0D91Z/77Y9zekNCMgWOvYKWk1v
-         TvvejYFv8hauyZEn5ypv7dOQeNcHhME0elqs3KtRLvnm/Q3kezgSMUPMycZFRpN7n52D
-         GMiVPxb2TCN7ixbXqSEjUE8Hqlk118ZQl5vSpA447Bqig8ZkyR8LAfWSNllZk82/FHNd
-         zYJlObAh/nvgvEHBVKCpwXgSK9zwjbwNnM2QMC2HIzyPReei5aKSncDCWcNKhRviL1jj
-         BHzTlNUJfQVar1GMIFj2wjo/1+W4ndOaePIZ6EWIpp6giCqvGvd5IE4nm5Lw43vYWjCn
-         NbdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWU9Axg97U7xw4EDR9W3oyJxnddR9vVQQ6/FsnT6Ax0wWyc5DmV+JB/dwcRaIDOrylur5aI2UYzIfbCbWtnhc5ySXG1
-X-Gm-Message-State: AOJu0Yw+mUsiOewnCsbXmO6aML8TmImu7YAaKn1++sNsk0ovqanhUGAz
-	YGDtT2hn9WZna7Y2ulnTa/wQ+xFTMlbfdZ9fcb2THE9d803jPd/Yp2d7m2PPhw==
-X-Google-Smtp-Source: AGHT+IEIhgoMvjQtqWRqs5ft4wQaxQbE3US+pusOZbtpO2oOEwEyMTcvFFPNr7mWOSx9p/0KOE2IiQ==
-X-Received: by 2002:a17:907:6d07:b0:a62:e281:4e4c with SMTP id a640c23a62f3a-a62e2814f08mr809481266b.50.1716985596108;
-        Wed, 29 May 2024 05:26:36 -0700 (PDT)
+        bh=2LXZ9wqthbTQhc7QRlnA0utzKwKCI8VLIKqeGLoEf8o=;
+        b=cszpwbAMZRHUkwEMGiMvqfe64fgWPk+gEyfyJncmEq6xjVBolHVZXbL5t65wYKC88u
+         8kuX5LeoDjiAmWqPsXU3ivDeqxsFrLLouBkP9F74YrEQ6ZplhOkxfPOi2nZ4JnOEqZi5
+         QWr3nT74q6mj564WwhsdrGlfwCIhbAAOJkTKQUNYvidnIuzu99ARwR96yW2uP0xPI6hS
+         H0003S0LLLJGp7bgEsl1AbURXyX8dEbVwT0H4/10ScWumsZvFjE0NevSZG7vJg4A/a79
+         1V7zl5h+h7wopOloQ0WOjbH+2sHWsvi7bc+gjy3q6KRb5blDxYnWjXat4OeMQlvt1ycE
+         yIkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVbeQsFuE/0eJZN1HyKnlq2Gdsxlb0J/45R9mfMWWKc5CiTamcM7a0ON2sffKYW2iubF6vM6rOqyvKeiKVwqvj/7KJT
+X-Gm-Message-State: AOJu0YzZiTlhYABVTro6bY5/niNGSvHgfZlehwempw5SsX7sYgfWwIH7
+	+iaCQIVCTCCyzv/lt9hGiO2uYWnI5a5KeK2FmA1TvbQUaS0KzEbj98MqxNC0AQ==
+X-Google-Smtp-Source: AGHT+IFROfs0Pam4Y1EffkR7Vgq8UzsI4afoBVYuqf4XpoEh6dk7KzH/TKYs/1/Lt8AHYYLxKWPW/g==
+X-Received: by 2002:a17:906:a391:b0:a65:ab74:1e8d with SMTP id a640c23a62f3a-a65ab743299mr47596066b.59.1716985819350;
+        Wed, 29 May 2024 05:30:19 -0700 (PDT)
 Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a626c93a83esm714768966b.58.2024.05.29.05.26.35
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a626cc4fedesm703808866b.118.2024.05.29.05.30.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 May 2024 05:26:35 -0700 (PDT)
-Date: Wed, 29 May 2024 13:26:31 +0100
+        Wed, 29 May 2024 05:30:18 -0700 (PDT)
+Date: Wed, 29 May 2024 13:30:15 +0100
 From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v3 09/12] KVM: arm64: VHE: Add test module for hyp kCFI
-Message-ID: <lsb5l4ee4unh76r25x6lx5lgncoxsjfy3q6xeuncv3efhs7jzm@bzdwf6j274et>
+Subject: Re: [PATCH v3 10/12] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at
+ EL2
+Message-ID: <vk4jfrmlxyoav365rti4rent5ptmxis5d6vjlynr6xs3s4k7h7@2j2dyv6lhcbr>
 References: <20240510112645.3625702-1-ptosi@google.com>
- <20240510112645.3625702-10-ptosi@google.com>
- <20240513172120.GA29051@willie-the-truck>
+ <20240510112645.3625702-11-ptosi@google.com>
+ <20240513173005.GB29051@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -88,166 +89,60 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240513172120.GA29051@willie-the-truck>
+In-Reply-To: <20240513173005.GB29051@willie-the-truck>
 
 Hi Will,
 
-Thanks for the review!
-
-I've addressed all your comments in v4, except for the one below.
-
-On Mon, May 13, 2024 at 06:21:21PM +0100, Will Deacon wrote:
-> On Fri, May 10, 2024 at 12:26:38PM +0100, Pierre-Clément Tosi wrote:
-> > In order to easily periodically (and potentially automatically) validate
-> > that the hypervisor kCFI feature doesn't bitrot, introduce a way to
-> > trigger hypervisor kCFI faults from userspace on test builds of KVM.
+On Mon, May 13, 2024 at 06:30:05PM +0100, Will Deacon wrote:
+> On Fri, May 10, 2024 at 12:26:39PM +0100, Pierre-Clément Tosi wrote:
+> > [...]
 > > 
-> > Add hooks in the hypervisor code to call registered callbacks (intended
-> > to trigger kCFI faults either for the callback call itself of from
-> > within the callback function) when running with guest or host VBAR_EL2.
-> > As the calls are issued from the KVM_RUN ioctl handling path, userspace
-> > gains control over when the actual triggering of the fault happens
-> > without needing to modify the KVM uAPI.
-> > 
-> > Export kernel functions to register these callbacks from modules and
-> > introduce a kernel module intended to contain any testing logic. By
-> > limiting the changes to the core kernel to a strict minimum, this
-> > architectural split allows tests to be updated (within the module)
-> > without the need to redeploy (or recompile) the kernel (hyp) under test.
-> > 
-> > Use the module parameters as the uAPI for configuring the fault
-> > condition being tested (i.e. either at insertion or post-insertion
-> > using /sys/module/.../parameters), which naturally makes it impossible
-> > for userspace to test kCFI without the module (and, inversely, makes
-> > the module only - not KVM - responsible for exposing said uAPI).
-> > 
-> > As kCFI is implemented with a caller-side check of a callee-side value,
-> > make the module support 4 tests based on the location of the caller and
-> > callee (built-in or in-module), for each of the 2 hypervisor contexts
-> > (host & guest), selected by userspace using the 'guest' or 'host' module
-> > parameter. For this purpose, export symbols which the module can use to
-> > configure the callbacks for in-kernel and module-to-built-in kCFI
-> > faulting calls.
-> > 
-> > Define the module-to-kernel API to allow the module to detect that it
-> > was loaded on a kernel built with support for it but which is running
-> > without a hypervisor (-ENXIO) or with one that doesn't use the VHE CPU
-> > feature (-EOPNOTSUPP), which is currently the only mode for which KVM
-> > supports hypervisor kCFI.
-> > 
-> > Allow kernel build configs to set CONFIG_HYP_CFI_TEST to only support
-> > the in-kernel hooks (=y) or also build the test module (=m). Use
-> > intermediate internal Kconfig flags (CONFIG_HYP_SUPPORTS_CFI_TEST and
-> > CONFIG_HYP_CFI_TEST_MODULE) to simplify the Makefiles and #ifdefs. As
-> > the symbols for callback registration are only exported to modules when
-> > CONFIG_HYP_CFI_TEST != n, it is impossible for the test module to be
-> > non-forcefully inserted on a kernel that doesn't support it.
-> > 
-> > Note that this feature must NOT result in any noticeable change
-> > (behavioral or binary size) when HYP_CFI_TEST_MODULE = n.
-> > 
-> > CONFIG_HYP_CFI_TEST is intentionally independent of CONFIG_CFI_CLANG, to
-> > avoid arbitrarily limiting the number of flag combinations that can be
-> > tested with the module.
-> > 
-> > Also note that, as VHE aliases VBAR_EL1 to VBAR_EL2 for the host,
-> > testing hypervisor kCFI in VHE and in host context is equivalent to
-> > testing kCFI support of the kernel itself i.e. EL1 in non-VHE and/or in
-> > non-virtualized environments. For this reason, CONFIG_CFI_PERMISSIVE
-> > **will** prevent the test module from triggering a hyp panic (although a
-> > warning still gets printed) in that context.
+> > Use SYM_TYPED_FUNC_START() for __pkvm_init_switch_pgd, as nVHE can't
+> > call it directly and must use a PA function pointer from C (because it
+> > is part of the idmap page), which would trigger a kCFI failure if the
+> > type ID wasn't present.
 > > 
 > > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
 > > ---
-> >  arch/arm64/include/asm/kvm_cfi.h     |  36 ++++++++
-> >  arch/arm64/kvm/Kconfig               |  22 +++++
-> >  arch/arm64/kvm/Makefile              |   3 +
-> >  arch/arm64/kvm/hyp/include/hyp/cfi.h |  47 ++++++++++
-> >  arch/arm64/kvm/hyp/vhe/Makefile      |   1 +
-> >  arch/arm64/kvm/hyp/vhe/cfi.c         |  37 ++++++++
-> >  arch/arm64/kvm/hyp/vhe/switch.c      |   7 ++
-> >  arch/arm64/kvm/hyp_cfi_test.c        |  43 +++++++++
-> >  arch/arm64/kvm/hyp_cfi_test_module.c | 133 +++++++++++++++++++++++++++
-> >  9 files changed, 329 insertions(+)
-> >  create mode 100644 arch/arm64/include/asm/kvm_cfi.h
-> >  create mode 100644 arch/arm64/kvm/hyp/include/hyp/cfi.h
-> >  create mode 100644 arch/arm64/kvm/hyp/vhe/cfi.c
-> >  create mode 100644 arch/arm64/kvm/hyp_cfi_test.c
-> >  create mode 100644 arch/arm64/kvm/hyp_cfi_test_module.c
+> >  arch/arm64/include/asm/esr.h       |  6 ++++++
+> >  arch/arm64/kvm/handle_exit.c       | 11 +++++++++++
+> >  arch/arm64/kvm/hyp/nvhe/Makefile   |  6 +++---
+> >  arch/arm64/kvm/hyp/nvhe/hyp-init.S |  6 +++++-
+> >  4 files changed, 25 insertions(+), 4 deletions(-)
 > > 
-> > diff --git a/arch/arm64/include/asm/kvm_cfi.h b/arch/arm64/include/asm/kvm_cfi.h
-> > new file mode 100644
-> > index 000000000000..13cc7b19d838
-> > --- /dev/null
-> > +++ b/arch/arm64/include/asm/kvm_cfi.h
-> > @@ -0,0 +1,36 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +/*
-> > + * Copyright (C) 2024 - Google Inc
-> > + * Author: Pierre-Clément Tosi <ptosi@google.com>
-> > + */
-> > +
-> > +#ifndef __ARM64_KVM_CFI_H__
-> > +#define __ARM64_KVM_CFI_H__
-> > +
-> > +#include <asm/kvm_asm.h>
-> > +#include <linux/errno.h>
-> > +
-> > +#ifdef CONFIG_HYP_SUPPORTS_CFI_TEST
-> > +
-> > +int kvm_cfi_test_register_host_ctxt_cb(void (*cb)(void));
-> > +int kvm_cfi_test_register_guest_ctxt_cb(void (*cb)(void));
+> >  [...]
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > index 5a15737b4233..33fb5732ab83 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > @@ -5,6 +5,7 @@
+> >   */
+> >  
+> >  #include <linux/arm-smccc.h>
+> > +#include <linux/cfi_types.h>
+> >  #include <linux/linkage.h>
+> >  
+> >  #include <asm/alternative.h>
+> > @@ -268,8 +269,11 @@ SYM_CODE_END(__kvm_handle_stub_hvc)
+> >  /*
+> >   * void __pkvm_init_switch_pgd(struct kvm_nvhe_init_params *params,
+> >   *                             void (*finalize_fn)(void));
+> > + *
+> > + * SYM_TYPED_FUNC_START() allows C to call this ID-mapped function indirectly
+> > + * using a physical pointer without triggering a kCFI failure.
+> >   */
+> > -SYM_FUNC_START(__pkvm_init_switch_pgd)
+> > +SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
+> >  	/* Load the inputs from the VA pointer before turning the MMU off */
+> >  	ldr	x5, [x0, #NVHE_INIT_PGD_PA]
+> >  	ldr	x0, [x0, #NVHE_INIT_STACK_HYP_VA]
 > 
-> Hmm, I tend to think this indirection is a little over the top for a test
-> module that only registers a small handful of handlers:
-> 
-> > +static int set_param_mode(const char *val, const struct kernel_param *kp,
-> > +			 int (*register_cb)(void (*)(void)))
-> > +{
-> > +	unsigned int *mode = kp->arg;
-> > +	int err;
-> > +
-> > +	err = param_set_uint(val, kp);
-> > +	if (err)
-> > +		return err;
-> > +
-> > +	switch (*mode) {
-> > +	case 0:
-> > +		return register_cb(NULL);
-> > +	case 1:
-> > +		return register_cb(hyp_trigger_builtin_cfi_fault);
-> > +	case 2:
-> > +		return register_cb((void *)hyp_cfi_builtin2module_test_target);
-> > +	case 3:
-> > +		return register_cb(trigger_module2builtin_cfi_fault);
-> > +	case 4:
-> > +		return register_cb(trigger_module2module_cfi_fault);
-> > +	default:
-> > +		return -EINVAL;
-> > +	}
-> > +}
-> 
-> Why not just have a hyp selftest that runs through all of this behind a
-> static key? I think it would simplify the code quite a bit, and you could
-> move the registration and indirection logic.
+> Unrelated hunk?
 
-I agree that the code would be simpler but note that the resulting tests would
-have a more limited coverage compared to what this currently implements. In
-particular, they would likely miss issues with the failure path itself (e.g.
-[1]) as the synchronous exception would need to be "handled" to let the selftest
-complete. OTOH, that would have the benefit of not triggering a kernel panic,
-making the test easier to integrate into existing CI suites.
+No, this is needed to prevent a kCFI failure at EL2.
 
-However, as the original request for those tests [2] was specifically about
-testing the failure path, I've held off from modifying the test module (in v4)
-until I get confirmation that Marc would be happy with your suggestion.
-
-[1]: https://lore.kernel.org/kvmarm/20240529121251.1993135-2-ptosi@google.com/
-[2]: https://lore.kernel.org/kvmarm/867ci10zv6.wl-maz@kernel.org/
-
-Thanks,
-
-Pierre
+Please let me know if the comment and commit message aren't clear enough.
 
 > 
 > Will
