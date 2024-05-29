@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-18313-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18316-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8826E8D3A08
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 16:57:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B33B48D3A0B
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 16:57:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EC451F26D9A
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 14:57:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A9661F2625E
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 14:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E36181BAC;
-	Wed, 29 May 2024 14:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA32181CE7;
+	Wed, 29 May 2024 14:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1mITdJ1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roNxI5pD"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69AD717BB3A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0827417F39E;
 	Wed, 29 May 2024 14:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716994595; cv=none; b=RuyNiq4P6eXYy2DRqswZbAmsexVR5lZFQvottXZtB+WcGRJQX2/kF0W5+of3nhziYAzkLYlu8FcAAae2cQnlVe1K9c4OWY8pqLn357hPvxX/6cbONuAILVBlLJ/ytyOnkF53ML1ijTNY+KubP6zlyNIz9E5N5QwOX5ewP9sTYlE=
+	t=1716994596; cv=none; b=YakXOEkY++IzWg1BIgk0ehrhlPlDZSyqxpMOdn2Sb/nevYAeCqjxGmJXjaWwozM+9/ajbfXFUlVnMnxeCutYztsLHJiLhg4MKApqB70uta8s4s70Z65Zgi4n9ZxHpHsiOkfsxfV1gp3J6YHx3OkDKWO6Zd1ILfv52hRbheyZJVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716994595; c=relaxed/simple;
-	bh=zThmFMxqyRGTd2EyTdXNaJlwBgk404JIryLF4a688iA=;
+	s=arc-20240116; t=1716994596; c=relaxed/simple;
+	bh=R248gaby0XedPY/sNz9iwnTRy32Bls10nlswI1GHrQY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=hyUXwmFU9XJw/b43ilaeBTCthYjYlccfeuzq2kKoZYMG4FPk8HIb5+jqdSUi9QHDukGF00kAcrWcQODm+AaieT1dL8qfCZHVw6eEo76z158fBDgSvMEwfwVnxzj8S4EjIEpzgHjUkl/qREk9lWIVnnuMpz3mImQRuggiQoEDaxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1mITdJ1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D38BC116B1;
+	 MIME-Version; b=gnUEiC8Sh8qyEhhxs26Fo20vC2PuZPxS7aIW4CSHc+wRvlJNta/OpIWeV7gFb7ALurlbhLb6odGL9Njq70sv1UIJIY2idcZpoWH+wY7BNb3oFx+7YEkG61LKmw1FviqdUd516O1Ir55eyR/gKKt0rPuofw2o4uZD9kh9BlV7+Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roNxI5pD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DB8EC113CC;
 	Wed, 29 May 2024 14:56:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1716994595;
-	bh=zThmFMxqyRGTd2EyTdXNaJlwBgk404JIryLF4a688iA=;
+	bh=R248gaby0XedPY/sNz9iwnTRy32Bls10nlswI1GHrQY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=n1mITdJ1Qs3cjqHS0pMqbFkgh5L+hTy8Du8XGCiZ0uLytBxjstQhL2mZjAW2rMQuY
-	 CJY6yCElUzXAl9tAS9Ch5eoAUqNtTrfFs6RHnCYt1ppZQMbMw9qoIExYJsGFiBKoeR
-	 ATRHmQd4g6cmzTWV8FHHDr+eOmDjGLm3Lfmxma27z9A4V1DZAJE+0SWmkufIzq2sBp
-	 4fSdJHi1Zz+pHZQ1CxAIxM5RymHUPLwv8fm8CUpMGDXR+19h229BwXNOVtiAqb806g
-	 zzsBb8BVzICv4ONecWLBN0ld2Zod217myGEPjxS/YYxKWlPCSEmU0saADf/1t6GO7s
-	 PiI13etMfxoWw==
+	b=roNxI5pDSWMSsaBRBpiN2WxEJhNqr+c/D6CZ7IVoQ/GKUEtUUt0JwI5+GB548XrMr
+	 wuiudtLpPTjIPsGa8tp+hkg50sUw6mbVxAhnv1piJT8ropXsk8UeI1qnBDlC8SiyRH
+	 8CiFgLkJRENma//i7V6Rzaz+tX5UVZ/Ur2E3rYGRrXrEDCJ5n7YPfpmUbhO40AsK3n
+	 JHsPVrJtnVMb4uaXa7riw+MGFCpuH+I99b7eg0GaCUJqdNtfnjNDPZpK9ozq1FClXr
+	 ZFyvOzrsxdxAS05wPjnbBHvUmQ2y8Qu11LLr+nNlT6raxBMUwyDPw3Qk+8SMUoP0t3
+	 r8q2ICsP2a2zA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sCKjB-00GekF-JJ;
+	id 1sCKjB-00GekF-Pd;
 	Wed, 29 May 2024 15:56:33 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -59,9 +59,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: [PATCH v2 08/16] KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
-Date: Wed, 29 May 2024 15:56:20 +0100
-Message-Id: <20240529145628.3272630-9-maz@kernel.org>
+Subject: [PATCH v2 09/16] KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+Date: Wed, 29 May 2024 15:56:21 +0100
+Message-Id: <20240529145628.3272630-10-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240529145628.3272630-1-maz@kernel.org>
 References: <20240529145628.3272630-1-maz@kernel.org>
@@ -77,14 +77,10 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Emulating TLBI VMALLS12E1* results in tearing down all the shadow
-S2 PTs that match the current VMID, since our shadow S2s are just
-some form of SW-managed TLBs. That teardown itself results in a
-full TLB invalidation for both S1 and S2.
+TLBI ALLE1* is a pretty big hammer that invalides all S1/S2 TLBs.
 
-This can result in over-invalidation if two vcpus use the same VMID
-to tag private S2 PTs, but this is still correct from an architecture
-perspective.
+This translates into the unmapping of all our shadow S2 PTs, itself
+resulting in the corresponding TLB invalidations.
 
 Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
 Co-developed-by: Christoffer Dall <christoffer.dall@arm.com>
@@ -92,29 +88,36 @@ Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 51 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b22309fca3a7..22a3691ce248 100644
+index 22a3691ce248..d8d6380b7c66 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2741,6 +2741,22 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
- };
+@@ -2757,6 +2757,29 @@ static bool kvm_supported_tlbi_s12_op(struct kvm_vcpu *vpcu, u32 instr)
+ 	return true;
+ }
  
-+static bool kvm_supported_tlbi_s12_op(struct kvm_vcpu *vpcu, u32 instr)
++static bool handle_alle1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			   const struct sys_reg_desc *r)
 +{
-+	struct kvm *kvm = vpcu->kvm;
-+	u8 CRm = sys_reg_CRm(instr);
++	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
 +
-+	if (sys_reg_CRn(instr) == TLBI_CRn_nXS &&
-+	    !kvm_has_feat(kvm, ID_AA64ISAR1_EL1, XS, IMP))
++	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding)) {
++		kvm_inject_undefined(vcpu);
 +		return false;
++	}
 +
-+	if (CRm == TLBI_CRm_nROS &&
-+	    !kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
-+		return false;
++	write_lock(&vcpu->kvm->mmu_lock);
++
++	/*
++	 * Drop all shadow S2s, resulting in S1/S2 TLBIs for each of the
++	 * corresponding VMIDs.
++	 */
++	kvm_nested_s2_unmap(vcpu->kvm);
++
++	write_unlock(&vcpu->kvm->mmu_lock);
 +
 +	return true;
 +}
@@ -122,55 +125,16 @@ index b22309fca3a7..22a3691ce248 100644
  /* Only defined here as this is an internal "abstraction" */
  union tlbi_info {
  	struct {
-@@ -2758,6 +2774,38 @@ union tlbi_info {
- 	} va;
- };
- 
-+static void s2_mmu_unmap_range(struct kvm_s2_mmu *mmu,
-+			       const union tlbi_info *info)
-+{
-+	kvm_stage2_unmap_range(mmu, info->range.start, info->range.size);
-+}
-+
-+static bool handle_vmalls12e1is(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
-+				const struct sys_reg_desc *r)
-+{
-+	u32 sys_encoding = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
-+	u64 limit, vttbr;
-+
-+	if (!kvm_supported_tlbi_s12_op(vcpu, sys_encoding)) {
-+		kvm_inject_undefined(vcpu);
-+		return false;
-+	}
-+
-+	vttbr = vcpu_read_sys_reg(vcpu, VTTBR_EL2);
-+	limit = BIT_ULL(kvm_get_pa_bits(vcpu->kvm));
-+
-+	kvm_s2_mmu_iterate_by_vmid(vcpu->kvm, get_vmid(vttbr),
-+				   &(union tlbi_info) {
-+					   .range = {
-+						   .start = 0,
-+						   .size = limit,
-+					   },
-+				   },
-+				   s2_mmu_unmap_range);
-+
-+	return true;
-+}
-+
- static void s2_mmu_tlbi_s1e1(struct kvm_s2_mmu *mmu,
- 			     const union tlbi_info *info)
- {
-@@ -2831,6 +2879,9 @@ static struct sys_reg_desc sys_insn_descs[] = {
- 	SYS_INSN(TLBI_VAAE1, handle_tlbi_el1),
+@@ -2880,7 +2903,9 @@ static struct sys_reg_desc sys_insn_descs[] = {
  	SYS_INSN(TLBI_VALE1, handle_tlbi_el1),
  	SYS_INSN(TLBI_VAALE1, handle_tlbi_el1),
-+
-+	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
-+	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
+ 
++	SYS_INSN(TLBI_ALLE1IS, handle_alle1is),
+ 	SYS_INSN(TLBI_VMALLS12E1IS, handle_vmalls12e1is),
++	SYS_INSN(TLBI_ALLE1, handle_alle1is),
+ 	SYS_INSN(TLBI_VMALLS12E1, handle_vmalls12e1is),
  };
  
- static const struct sys_reg_desc *first_idreg;
 -- 
 2.39.2
 
