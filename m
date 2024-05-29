@@ -1,138 +1,179 @@
-Return-Path: <kvm+bounces-18339-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18340-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E0F8D40B3
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 00:00:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D93E8D4118
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 00:08:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38CF8B2345E
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 22:00:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 040A82895E4
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 22:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F86A1C9EDE;
-	Wed, 29 May 2024 22:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w0+ZgNTP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0911C9EDE;
+	Wed, 29 May 2024 22:08:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B241C9EB2
-	for <kvm@vger.kernel.org>; Wed, 29 May 2024 21:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10861C233B
+	for <kvm@vger.kernel.org>; Wed, 29 May 2024 22:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717019999; cv=none; b=qg5F3IKr4gqMKlEYUuwAC1wH3xtmW0lAXI5DMDaJtrUHdQDP+TfRKIjjtjO6xpimv4rXj3fQN1LqIVJk/MilPsQO/9G/rHpyblBceqI63Gym2l0a980N8MQtrJazQpLunPkKiBOnqA9a7oHhpOK9oRIcBQK6dw+30nNVVI30E2E=
+	t=1717020510; cv=none; b=bjmtuYDsHNXdQkz6DfZxaAqnifgfugrj9karGJqq1/Mlp2o1XqBOjGisOS+yLd9jITZ5y5JXXcnVcgxRtcHPsPsFws8NnM7Na66cyy4Ou8V0fUZ1GaSCaZMeMI2XrsPek6K2vJqi19FviGYq19wVxXAJGKITYkJlI1a/JnmWWoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717019999; c=relaxed/simple;
-	bh=VygQSYtgJkxGCNbSiB1TmlrjiVcPo9FASZn5iwrGyKo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XmulC1OppKJsjE7neqWbiKGLT8K1zgFSG6gQHmuLUtbZ6rxHRVozUcNurLXyM8MeQIY1ELoPkCNg/VXJwnFcUGMoI8asCXj4t7OdS1ev7lsLsQzoqRN4s6KjyWvfZy7BQFFzJS2PX2EIoLbM0/uZwDNkwW5Z9jo0eFKlLbyOD7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w0+ZgNTP; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6f8f34babd4so354074b3a.1
-        for <kvm@vger.kernel.org>; Wed, 29 May 2024 14:59:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717019997; x=1717624797; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VygQSYtgJkxGCNbSiB1TmlrjiVcPo9FASZn5iwrGyKo=;
-        b=w0+ZgNTPQb9aX0poHvtDZZm3p4fR7g6y3BVn38ULDgIF+EmfrNCDJoZ13Y8UVFQzSv
-         ZgxhWa+OCPlMPluvNLQOmLNOpf0ub1w6SQ9We5NrhY81fiU39R+ao5v2my1gqzr6nDp3
-         9/Qh9tLRT+1lmz1zmtwnJ8QY4gZWd8JwxPHdQBPSUpYXOrKJlCrFNSvDiBQMH5r7D1Yt
-         2rg8dDI0c2aupjqnlC0vKxC8L0D4+O6KWvhVYb1HavK3VfsdxNo5duPaaaYoWzrVvmRQ
-         AoEjFqsR/ASHBJm3nuRdUknt8abriWdhUWXfKv+DNrIuBVJLiBZutYH59fEM8t7P6zD9
-         veig==
+	s=arc-20240116; t=1717020510; c=relaxed/simple;
+	bh=qlTTWGw8g4V5EQGOqrQjz4puCme7kPOvgv7L6YSc4Bk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=O6XvtaqQ5Q+2unm+arwKYsOKmA2NcdE7xk+DvI8H1h/ohAtWdiWY2FlZMHBUjypWmw/duvFbpNopIMH0AEmeCcGTXqI6hTacetm4zv0EEoKzI57I0LAH+mNYjdls3vSy0hAvfFsAA/g5vJJWRQP//98pMaxd/NJeC0Fw4Er4Rdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3737b3ee909so1942085ab.2
+        for <kvm@vger.kernel.org>; Wed, 29 May 2024 15:08:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717019997; x=1717624797;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VygQSYtgJkxGCNbSiB1TmlrjiVcPo9FASZn5iwrGyKo=;
-        b=qkHkHp9if1lhrtpsNxFAKBoTGzX5WufBtrL05uynKKkoEfy5bngqnWFkkV2ztdz4Y7
-         ZESBmd482WyQgOsaYeZYTH/l7RxDuPWZz0Qt+B0brCUPt+NiQM/Epm46dtQW13Llamzl
-         Eq4ay5hhxiw8PVudLH2RF/IA8S3cCH3mMI0nhXGiJTu6tGf/Vt+rRbKIWjgTruzVG1tf
-         Z1eGMIAFZmjyJ7uaZcm1/ZwpN+fTQL8orF2C9YZ5UN2wv0L2tB/0YAWahdYy+AcZdoeJ
-         7tJ64dXYRpJnsjCX60PBYuncHJLrWFHHueUxXsWMMl1sSjvk7PsNDFIHrIaw7eb9Uyum
-         843g==
-X-Forwarded-Encrypted: i=1; AJvYcCXRt00epA22bkCOJoGmsC4nwQ7VEWC2o4nvoN6xf4SJSD5bw1i9JAf4teeqoQcIaE7FKqiN1AEIa5XG5Yb2QYPq4S54
-X-Gm-Message-State: AOJu0Yy+KpoGb+nmPu1KFTsqeW9j2GOb9X7ss1LSTje41IPegZspIzp3
-	AmOW89xFNWKuebknZbpU2ewNhMmPdKxMuz5RMhCjI/1crUrlXSK5J7I3MNKGdTOxY5q8rZZs9aG
-	0EA==
-X-Google-Smtp-Source: AGHT+IErfD3/6U7Yg0vFWmN+JznLDOE9vgR2lO1JhTGk52Ll6iOJE5uAx2O1dqENYjCcQTLMPcB8oRdC9wY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:8607:b0:702:1e25:a47c with SMTP id
- d2e1a72fcca58-70231a8676amr343b3a.1.1717019996755; Wed, 29 May 2024 14:59:56
- -0700 (PDT)
-Date: Wed, 29 May 2024 14:59:55 -0700
-In-Reply-To: <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1717020508; x=1717625308;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=y2TP+cVoXsWGxaPYDHxSt3opPN7Ye6m5B6CFDizYDNQ=;
+        b=auGCppWL3u0+DGcAA/3VoEbAHVdlf5WpLIPTtUZPH4UlTl/VpWO/Xg7CJ8yRKinFrB
+         bWXKR/b+xTr02b5AeR8AtZ5NfcKr3I02GpLJdJkKLUoH1Ivv5zuv0QWWL/QniWTzf8y/
+         pPEW0GOs+1ADS+NsY5RzCt1XNbEbAnWNHHJCjVNVf7gjaX9CSqXUXJ1mNzz1B3fykfOH
+         eqjkXJRlFgCn0jMp62rNvtzXVyiFCXc0aBo4F95k8+sslyQbUwXdJOIbu9/vjvafKgo8
+         JAOJv9Xgvc0dOFa16mp4vewLJqxt2rmeUrSvwVS2OIPGRb7rkDfXygtUl30lcf7ueX9O
+         1x+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWpIV/Fq/s5DZkqm94RHTK+yDdzPFuftDmgVcCS1h0XswyGRcy6PlvwPI7jgoIodNzFPxl1pIvBP20cPdsfg30n2yeA
+X-Gm-Message-State: AOJu0YwbyvFj17QjD+pFrpAW4jQwyLVmLRPO3PvxcDtZbo4excHcONqZ
+	MfDlNElZrUaqDRVGRYNER9c8F9twHfNueY3UqOtDKM3ev0qU2FgJYMoLprOe/t9lPUGiCtMDh4q
+	N2kGBt9G1JmKTNWX3To40/jng24oAh5CSRwrm3By5Fw+Vl49mgL9RPms=
+X-Google-Smtp-Source: AGHT+IGscVBJk0L7gvnjqMs1VFcnHllRu/Y7i65SekTk48C2yUUMzF11fi2fL9bYsUdKqxSOL4NNyNmdsZB9Aqg2DPLUaJARJBVj
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240529180510.2295118-1-jthoughton@google.com>
- <20240529180510.2295118-3-jthoughton@google.com> <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
-Message-ID: <ZlelW93_T6P-ZuSZ@google.com>
-Subject: Re: [PATCH v4 2/7] mm: multi-gen LRU: Have secondary MMUs participate
- in aging
-From: Sean Christopherson <seanjc@google.com>
-To: Yu Zhao <yuzhao@google.com>
-Cc: James Houghton <jthoughton@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Ankit Agrawal <ankita@nvidia.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Bibo Mao <maobibo@loongson.cn>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, James Morse <james.morse@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
-	loongarch@lists.linux.dev
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:160e:b0:374:5382:72be with SMTP id
+ e9e14a558f8ab-3747dfcae56mr115275ab.3.1717020508088; Wed, 29 May 2024
+ 15:08:28 -0700 (PDT)
+Date: Wed, 29 May 2024 15:08:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000074ff7b06199efd7b@google.com>
+Subject: [syzbot] [kvm?] [net?] [virt?] INFO: task hung in __vhost_worker_flush
+From: syzbot <syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com>
+To: eperezma@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, May 29, 2024, Yu Zhao wrote:
-> On Wed, May 29, 2024 at 12:05=E2=80=AFPM James Houghton <jthoughton@googl=
-e.com> wrote:
-> >
-> > Secondary MMUs are currently consulted for access/age information at
-> > eviction time, but before then, we don't get accurate age information.
-> > That is, pages that are mostly accessed through a secondary MMU (like
-> > guest memory, used by KVM) will always just proceed down to the oldest
-> > generation, and then at eviction time, if KVM reports the page to be
-> > young, the page will be activated/promoted back to the youngest
-> > generation.
->=20
-> Correct, and as I explained offline, this is the only reasonable
-> behavior if we can't locklessly walk secondary MMUs.
->=20
-> Just for the record, the (crude) analogy I used was:
-> Imagine a large room with many bills ($1, $5, $10, ...) on the floor,
-> but you are only allowed to pick up 10 of them (and put them in your
-> pocket). A smart move would be to survey the room *first and then*
-> pick up the largest ones. But if you are carrying a 500 lbs backpack,
-> you would just want to pick up whichever that's in front of you rather
-> than walk the entire room.
->=20
-> MGLRU should only scan (or lookaround) secondary MMUs if it can be
-> done lockless. Otherwise, it should just fall back to the existing
-> approach, which existed in previous versions but is removed in this
-> version.
+Hello,
 
-IIUC, by "existing approach" you mean completely ignore secondary MMUs that=
- don't
-implement a lockless walk?
+syzbot found the following issue on:
+
+HEAD commit:    9b62e02e6336 Merge tag 'mm-hotfixes-stable-2024-05-25-09-1..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16cb0eec980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3e73beba72b96506
+dashboard link: https://syzkaller.appspot.com/bug?extid=7f3bbe59e8dd2328a990
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/61b507f6e56c/disk-9b62e02e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/6991f1313243/vmlinux-9b62e02e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/65f88b96d046/bzImage-9b62e02e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com
+
+INFO: task syz-executor.2:9163 blocked for more than 143 seconds.
+      Not tainted 6.9.0-syzkaller-12393-g9b62e02e6336 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.2  state:D stack:27024 pid:9163  tgid:9163  ppid:8496   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5408 [inline]
+ __schedule+0xf15/0x5d00 kernel/sched/core.c:6745
+ __schedule_loop kernel/sched/core.c:6822 [inline]
+ schedule+0xe7/0x350 kernel/sched/core.c:6837
+ schedule_timeout+0x258/0x2a0 kernel/time/timer.c:2557
+ do_wait_for_common kernel/sched/completion.c:95 [inline]
+ __wait_for_common+0x3de/0x5f0 kernel/sched/completion.c:116
+ __vhost_worker_flush+0x1aa/0x1e0 drivers/vhost/vhost.c:288
+ vhost_worker_flush drivers/vhost/vhost.c:295 [inline]
+ vhost_dev_flush+0xad/0x120 drivers/vhost/vhost.c:305
+ vhost_vsock_flush drivers/vhost/vsock.c:694 [inline]
+ vhost_vsock_dev_release+0x1a5/0x400 drivers/vhost/vsock.c:746
+ __fput+0x408/0xbb0 fs/file_table.c:422
+ __fput_sync+0x47/0x50 fs/file_table.c:507
+ __do_sys_close fs/open.c:1555 [inline]
+ __se_sys_close fs/open.c:1540 [inline]
+ __x64_sys_close+0x86/0x100 fs/open.c:1540
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f910027bdda
+RSP: 002b:00007ffc83a68930 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000007 RCX: 00007f910027bdda
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000006
+RBP: 00007f91003ad980 R08: 0000001b2ec20000 R09: 00000000000003f6
+R10: 000000008ae9c606 R11: 0000000000000293 R12: 0000000000056292
+R13: 00007f91003abf8c R14: 00007ffc83a68a30 R15: 0000000000000032
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/30:
+ #0: ffffffff8dbb18e0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
+ #0: ffffffff8dbb18e0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
+ #0: ffffffff8dbb18e0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x75/0x340 kernel/locking/lockdep.c:6614
+2 locks held by kworker/u8:3/51:
+ #0: ffff8880196fe948 ((wq_completion)iou_exit){+.+.}-{0:0}, at: process_one_work+0x12bf/0x1b60 kernel/workqueue.c:3206
+ #1: ffffc90000bc7d80 ((work_completion)(&ctx->exit_work)){+.+.}-{0:0}, at: process_one_work+0x957/0x1b60 kernel/workqueue.c:3207
+3 locks held by kworker/u8:6/1041:
+ #0: ffff888029f54148 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work+0x12bf/0x1b60 kernel/workqueue.c:3206
+ #1: ffffc90004507d80 ((work_completion)(&(&ifa->dad_work)->work)){+.+.}-{0:0}, at: process_one_work+0x957/0x1b60 kernel/workqueue.c:3207
+ #2: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_dad_work+0xcf/0x1500 net/ipv6/addrconf.c:4193
+2 locks held by kworker/u8:8/1261:
+2 locks held by getty/4844:
+ #0: ffff88802b1860a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x24/0x80 drivers/tty/tty_ldisc.c:243
+ #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xfc8/0x1490 drivers/tty/n_tty.c:2201
+2 locks held by syz-fuzzer/7666:
+3 locks held by syz-executor.1/9466:
+ #0: ffff88802ce84d88 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x26/0x90 net/bluetooth/hci_core.c:554
+ #1: ffff88802ce84078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x339/0x1100 net/bluetooth/hci_sync.c:5050
+ #2: ffffffff8dbbd078 (rcu_state.exp_mutex){+.+.}-{3:3}, at: exp_funnel_lock+0x1a4/0x3b0 kernel/rcu/tree_exp.h:323
+1 lock held by syz-executor.3/11000:
+ #0: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x250 drivers/net/tun.c:3500
+1 lock held by syz-executor.3/11005:
+ #0: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x250 drivers/net/tun.c:3500
+1 lock held by syz-executor.4/11002:
+ #0: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x250 drivers/net/tun.c:3500
+1 lock held by syz-executor.1/11013:
+ #0: ffffffff8f74afa8 (rtnl_mutex){+.+.}-{3:3}, at: __tun_chr_ioctl+0x4fc/0x4770 drivers/net/tun.c:3110
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
