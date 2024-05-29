@@ -1,212 +1,131 @@
-Return-Path: <kvm+bounces-18304-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18305-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88E5F8D399B
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 16:45:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 854098D3A01
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 16:56:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 013C91F24397
-	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 14:45:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3559B1F232D5
+	for <lists+kvm@lfdr.de>; Wed, 29 May 2024 14:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF11C15ADAB;
-	Wed, 29 May 2024 14:44:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA9B17BB15;
+	Wed, 29 May 2024 14:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yl15wPgr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cj1FZJEQ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20D9915AD99;
-	Wed, 29 May 2024 14:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFD7158201;
+	Wed, 29 May 2024 14:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1716993893; cv=none; b=l45x+KmXkoTBZTjWwmX6RWXim7muuqs9MWgYXk3GlXPEjkhpReWnTxA2phqGK+wsHhSaGTY6uhmXMqhnDmCwRWZWdMdh0T0FVHOvoMPn+TLItL/uuaCfEokD8Js4ghj2fXlPqRKkzjxTXH6MsHhof+3kVrzBrlwOxKnVLW47jhI=
+	t=1716994594; cv=none; b=rH+c2rGA8ORBCUHWQUSixu651LA3hWmQWWYAqdd4yxQ/ziMZfxsssvUVKup7mtoWT402SShyW38l9Rf+yO+ZMN9xLfWAkx0ypZ5ZhBPhh3vCr8OHVVYwcl+7Eq1ZfyZEaT/VuP/P4zQk9rprxwEb6hpr0NDG/vIwGvnqi2LelWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1716993893; c=relaxed/simple;
-	bh=IBwxOd5lJ8HVS/TkS0TxTcWs6CiVq5/atr1iw1kaySg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VCXrep6PIHOJXMa0zq1hDf58JwjToKZ16ZywrL69R8OxQbHDEdiV/AgINOpkIrFlgcQ3T1bD0AncIJo/F+KhnNYcWsPBQTHpmV7wAnxpXaFJse+dFobZErXrlzSSMV8X0jRJMVqCWru5tmO5cTJQLgQW87n/xUNs8uHl9aluoRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yl15wPgr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADD3CC2BD10;
-	Wed, 29 May 2024 14:44:52 +0000 (UTC)
+	s=arc-20240116; t=1716994594; c=relaxed/simple;
+	bh=mzzpY2WDUEdT5O0hM4sNQHoxuJb2hV42TrdHN6NeMXM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ut7n1qGhCUyZvhaaGQyvyafobKRbSvn6PxXQP6S8/jl3N65peDeYTVp6y4MFWK7E/zxsNXeUhLnJquP3WdDBSscBVRimGPApAwgRj8H0gSWIhsUXSAMYXyKs3Hhsc9ECmtN/+vUhv/EAejb7wzxXHG4xfrt6nQtpzDr+ISovOzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cj1FZJEQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E946DC113CC;
+	Wed, 29 May 2024 14:56:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1716993892;
-	bh=IBwxOd5lJ8HVS/TkS0TxTcWs6CiVq5/atr1iw1kaySg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Yl15wPgrYOYI0RJDmFreWdaiCyh5ygtmidkptNwsvue1rQItu5Oln6HXp141ESjol
-	 rG/UTZxgv81b3YIfmubUVZAaWRDmimq7eX6fd5cj5M+F1b0qzxbzy/1vE8PcGs9iIU
-	 N5wjxwAzZjU1XCoDuDSvIYqOpH8MPD9AXgF0ABRnCJJswVu3BnLZhSNqQAVA0a7IGu
-	 yrFPSh3FSFrGz3YYD8hSZNH7yhg8NThW1dwR9Db9eBzNeSQSKZUZg0zGlSTIn4Xrl3
-	 mdTJsMyeVFVWn+PuV0WuRErte3sTjtoza16cG2seSKKJLt6SqNJCEoIUOhD9ScBGSS
-	 yB4jR/os1pRXA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	s=k20201202; t=1716994594;
+	bh=mzzpY2WDUEdT5O0hM4sNQHoxuJb2hV42TrdHN6NeMXM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cj1FZJEQCC7h2MvPAh0vgcPUDiPEg28hhIEp/P+508Cl4T2uxTVu+ZN/QJGe5wx2I
+	 LM2AONmqpdCvXDL6+5sTrilCRW7+iAh10/RssIaVoX/LJUXvfQXqGnGBzO+yckyIej
+	 9hNvjUfhzu5//KU1cTwXODJ4TwI1kQpKohDYuVoPeZZjjksQaw9/VPbTzUjT1tQkQh
+	 w3/BEuesJGKJk4/UEYZdMfpnoKZWeh1y1e1TNOSSkc8REAcYFAMHMEkT29iJhHDqjW
+	 eYULaxh/M/getvzZL/2aKAkk17rubV6DyFOQeHyVY12YxIn5F3gboKyx+09bncplov
+	 i6Mfqfj7V10kA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sCKXq-00GeTX-JN;
-	Wed, 29 May 2024 15:44:50 +0100
-Date: Wed, 29 May 2024 15:44:50 +0100
-Message-ID: <865xuwn0d9.wl-maz@kernel.org>
+	id 1sCKj9-00GekF-UL;
+	Wed, 29 May 2024 15:56:32 +0100
 From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
+To: kvmarm@lists.linux.dev,
 	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 1/2] KVM: arm64: nv: Fix relative priorities of exceptions generated by ERETAx
-In-Reply-To: <20240529142727.GA1357631@e124191.cambridge.arm.com>
-References: <20240528100632.1831995-1-maz@kernel.org>
-	<20240528100632.1831995-2-maz@kernel.org>
-	<20240529142727.GA1357631@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH v2 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
+Date: Wed, 29 May 2024 15:56:12 +0100
+Message-Id: <20240529145628.3272630-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Joey,
+Here's the second version of the shadow stage-2 handling for NV
+support on arm64.
 
-On Wed, 29 May 2024 15:27:27 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> Hi Marc,
-> 
-> These references are from ARM DDI 0487 J.a.
+* From v1 [1]
 
-Ah, you have an upgrade pending! ;-)
+  - Reworked the allocation of shadow S2 structures at init time to be
+    slightly clearer
 
-> 
-> On Tue, May 28, 2024 at 11:06:31AM +0100, Marc Zyngier wrote:
-> > ERETAx can fail in multiple ways:
-> > 
-> > (1) ELR_EL2 points lalaland
-> > (2) we get a PAC failure
-> > (3) SPSR_EL2 has the wrong mode
-> > 
-> > (1) is easy, as we just let the CPU do its thing and deliver an
-> > Instruction Abort. However, (2) and (3) are interesting, because
-> > the PAC failure priority is way below that of the Illegal Execution
-> > State exception.
-> > 
-> > Which means that if we have detected a PAC failure (and that we have
-> > FPACCOMBINE), we must be careful to give priority to the Illegal
-> > Execution State exception, should one be pending.
-> 
-> This is IZFGJP Prioritization of Synchronous exceptions taken to
-> AArch64 state.
->
+  - Lots of small cleanups
 
-Indeed.
+  - Rebased on v6.10-rc1
 
-> > 
-> > Solving this involves hoisting the SPSR calculation earlier and
-> > testing for the IL bit before injecting the FPAC exception.
-> > 
-> > In the extreme case of a ERETAx returning to an invalid mode *and*
-> > failing its PAC check, we end up with an Instruction Abort (due
-> > to the new PC being mangled by the failed Auth) *and* PSTATE.IL
-> > being set. Which matches the requirements of the architecture.
-> 
-> And this is IGPPXQ, which says "which causes the next instruction to
-> generate an Illegal State exception. The exception return
-> instruction does not generate the exception."
-> 
-> Which matches since Instruction Abort has a higher priority than
-> Illegal Exception.
+[1] https://lore.kernel.org/r/20240409175448.3507472-1-maz@kernel.org
 
-Spot on. Although it is a bit surprising that in all cases, the CPU
-has to attempt fetching the next instruction before delivering the IL
-exception so that it can prioritise the Abort. I guess it simplifies
-some HW implementations, but makes SW suffer a bit.
+Christoffer Dall (2):
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
 
-> 
-> > 
-> > Whilst we're at it, remove a stale comment that states the obvious
-> > and only confuses the reader.
-> > 
-> > Fixes: 213b3d1ea161 ("KVM: arm64: nv: Handle ERETA[AB] instructions")
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/emulate-nested.c | 21 +++++++++++----------
-> >  1 file changed, 11 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-> > index 72d733c74a38..54090967a335 100644
-> > --- a/arch/arm64/kvm/emulate-nested.c
-> > +++ b/arch/arm64/kvm/emulate-nested.c
-> > @@ -2181,16 +2181,23 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> >  	if (forward_traps(vcpu, HCR_NV))
-> >  		return;
-> >  
-> > +	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
-> > +	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
-> > +
-> >  	/* Check for an ERETAx */
-> >  	esr = kvm_vcpu_get_esr(vcpu);
-> >  	if (esr_iss_is_eretax(esr) && !kvm_auth_eretax(vcpu, &elr)) {
-> >  		/*
-> > -		 * Oh no, ERETAx failed to authenticate.  If we have
-> > -		 * FPACCOMBINE, deliver an exception right away.  If we
-> > -		 * don't, then let the mangled ELR value trickle down the
-> > +		 * Oh no, ERETAx failed to authenticate.
-> > +		 *
-> > +		 * If we have FPACCOMBINE and we don't have a pending
-> > +		 * Illegal Execution State exception (which has priority
-> > +		 * over FPAC), deliver an exception right away.
-> > +		 *
-> > +		 * Otherwise, let the mangled ELR value trickle down the
-> >  		 * ERET handling, and the guest will have a little surprise.
-> >  		 */
-> > -		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE)) {
-> > +		if (kvm_has_pauth(vcpu->kvm, FPACCOMBINE) && !(spsr & PSR_IL_BIT)) {
-> >  			esr &= ESR_ELx_ERET_ISS_ERETA;
-> >  			esr |= FIELD_PREP(ESR_ELx_EC_MASK, ESR_ELx_EC_FPAC);
-> >  			kvm_inject_nested_sync(vcpu, esr);
-> > @@ -2201,17 +2208,11 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
-> >  	preempt_disable();
-> >  	kvm_arch_vcpu_put(vcpu);
-> >  
-> > -	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
-> > -	spsr = kvm_check_illegal_exception_return(vcpu, spsr);
-> >  	if (!esr_iss_is_eretax(esr))
-> >  		elr = __vcpu_sys_reg(vcpu, ELR_EL2);
-> >  
-> >  	trace_kvm_nested_eret(vcpu, elr, spsr);
-> >  
-> > -	/*
-> > -	 * Note that the current exception level is always the virtual EL2,
-> > -	 * since we set HCR_EL2.NV bit only when entering the virtual EL2.
-> > -	 */
-> >  	*vcpu_pc(vcpu) = elr;
-> >  	*vcpu_cpsr(vcpu) = spsr;
-> >  
-> 
-> Those references were just me checking it, not suggesting you edit
-> the commit message.
+Marc Zyngier (14):
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+  KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+  KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+  KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+  KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+  KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+  KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+  KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+  KVM: arm64: nv: Add handling of range-based TLBI operations
+  KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
 
-Well, that's excellent detective work!
-
->
-> Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-Thanks again,
-
-	M.
+ arch/arm64/include/asm/esr.h         |   1 +
+ arch/arm64/include/asm/kvm_asm.h     |   2 +
+ arch/arm64/include/asm/kvm_emulate.h |   1 +
+ arch/arm64/include/asm/kvm_host.h    |  36 ++
+ arch/arm64/include/asm/kvm_mmu.h     |  26 +
+ arch/arm64/include/asm/kvm_nested.h  | 127 +++++
+ arch/arm64/include/asm/sysreg.h      |  17 +
+ arch/arm64/kvm/arm.c                 |  11 +
+ arch/arm64/kvm/hyp/vhe/switch.c      |  51 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c         | 147 +++++
+ arch/arm64/kvm/mmu.c                 | 211 ++++++--
+ arch/arm64/kvm/nested.c              | 780 ++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c               |   6 +
+ arch/arm64/kvm/sys_regs.c            | 398 ++++++++++++++
+ 14 files changed, 1773 insertions(+), 41 deletions(-)
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.39.2
+
 
