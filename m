@@ -1,75 +1,79 @@
-Return-Path: <kvm+bounces-18414-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18415-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 756608D4A48
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:19:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF5DF8D4A49
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:19:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D592E1F21A6A
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:19:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64D80281FB2
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4350174EF4;
-	Thu, 30 May 2024 11:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAC41822FD;
+	Thu, 30 May 2024 11:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zFISbCgf"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BmpF6A2W"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2088.outbound.protection.outlook.com [40.107.93.88])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2053.outbound.protection.outlook.com [40.107.102.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB5C1822C2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1941822CD
 	for <kvm@vger.kernel.org>; Thu, 30 May 2024 11:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.88
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717067826; cv=fail; b=VvnVDhuyKkKMcQVaCgRo281GdPg/9CEAqcL8eQK1iE5RevxTYpZfP1qRc/KuIT/QQmA/TD9uq5lXTSccYF7pnKtms6nqGUWdPpm7FWZa5LSHOgx+N+AxvJRMrSoGCoPuBvEY3yguS/sl2ivLUV7+KZ8EV4drg0s4Oo9f9Stel68=
+	t=1717067826; cv=fail; b=nAMqlfYy0EUg9fHB5pXzNGSHW++lAFrNBrJj5BTc/ueIG4R1aiFoLLeFbNjfTlDTXVawGsLWVYcd/vIIQK7hlISKClQEYwPsLnWEvUw2xjDb8mcRvW3ZcHpAL81IMMX8rcn1wGKFnazbN73QTq8C83DZyCShCg+d2gLjSySv8JE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717067826; c=relaxed/simple;
-	bh=ILtW3Z0OCyD1YgNmg84z7sHpvoCogTL4y34jhDSiPqE=;
+	bh=aCc4kG/GLQ467Vo3iqYG2jipQsEdf4KBy2m9NL7iqac=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sa8mNGXlaUiDML+kZVSgn4nIbAP5HH6v3g8zndMRmJbi1XXzhwE1wZxt22UrkzAr10jgv51nC1G+nC0rZUipiGDuv2xyhwPA/esvtO2N1s4sf/n0GnH5mkuBvCKHJ+42CtLUY/C7Tk/Xshh7vVyscYlsCbfiX37eR9fMXotyWvE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zFISbCgf; arc=fail smtp.client-ip=40.107.93.88
+	 MIME-Version:Content-Type; b=uDP6mN25/YFjOdEPr84izaRFcmCcAoHmnQpz77SBvLE+dw96Ll8YKIftVCE7JOgdwL6WQiBTa5GPqy4MVtJmSkK6Rk4EIaAZnW1uper9EZv7S7+b392wBuLHHRhQTWqvDBsAn77riAJKm0MrgBebDmWRJHp0QmGUyUBldIyuR5g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BmpF6A2W; arc=fail smtp.client-ip=40.107.102.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XtpMXZpGIc3oplYgyC1KbZ0h4Refes5lfC5E7qNeNBJZsZ8pW7sgbu+84kUoq3Q5MvDAyF9Hmk4YYvjX+h4HOkgjYo/6QxvObywlkjT/3jhUmrVSRvzThqc3ztrp8ddZ2lDN5DCSL9856sRy3JMvPFyEBpcN+Bi6K2E3L2WnfXRxj+aal6tGEJ08tOfBfLjByXGfiSVKQhkUMcXxgBLnvTTa3K71aUbeQAUqrRUyFYh53A5YZiNro5ad3gpk8tpZSznXRIO1kTb+hPy7AcVpZ5cQrntPhqYlxsWGsdOWTpGVtb431xHWMOExz9mU+HxQebZY2IJYfz0HsEa5PrLpZg==
+ b=Ikt3GdTpKCAHiLx8ozTxSpnzsMz9XNQbQ+4HK2d/j3k/9w1g9hF3RK9KtTL5wXC9TabHNSmm46avRbaISWq1qNTqaXdvrXQtkB8JMWgUtg15f//aIo0wP3AlW/JOl3oeQrn1V8dzOE2CDKe1VgbnYdiVXin4VZsDCPuFkvztP15hIbygYU1NZsMIQgAEH9nTsUzbVij30Ir9ogTuVsgMgUppio1MDWLJ6yhmWIk/XgWpvL8z+1iz2PQHayW6v6HtG2cBFonM48gA6NH5SBcJ5dWd8msuyz+icG/vVD5HpqW+/NVpkL3511g5rYSRIQwuBOtI73gEhAfpm0G5fwJHCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=91QkMbXQQW9VkoJrrFc6mXK72hrtmnB4NuTd0ujUGoM=;
- b=NIy4XkoG2wpaVETNjhNFvGn2GZs3fYdcOgNSc0wSGFLRt3asZpGib3B5jLTHBXZ06QsxrIAcm/sW948iPMWA/RGC/iiiRJuSlpAgVEWS2DWjXs5jz48njxYAcsdezcbKjKhMyRWGeDRK7fSB/ydhD2EpblXr13GCl5NSLDeK58k4/84tFDv8hdAaaJySoDkquewXD9+8/bJTL7cf1P5krL5XVMJxt976MhOEM0irif+BpaSnaaQatWR3oeUXotcz7SaEe+c22oZdiiQS8OEBYGiJqtwUucAnGv+e0+AjlYku+Du8KMZufpjbskJLcxuYqZMrxF9yq7z6u4Y9fL+0ag==
+ bh=E6lss2Hg9OxWRNKdJdzyXq7LJ3ceSxLzrC+ts+YdeIg=;
+ b=h6e1dYB9yJ26hSZV0KdYD3YKfJ0sTlFYKv4rRqKRRUytmYqk+grtUsN9sHv3ARaugnv0nVA2PVEqxjm7sbHE1YvgTItPpeFGzLMDSIgYZeIEkZwP3xvyLqxHmbTWED+VUfp5x1ygkKDn1CCbZUV/+KeNxtd8cZVTtdCEFg5RoBk30cXfEsbPOriBxT5c/6q7xV+L1FwCg1TNMgQRiAby4GiXEAkynE1mNpvQq9Ura1U0kTl5cU2jGpQrsWzmux+sClVjl7eJmS6741lglr5Ap1eP6ccQx2q3/lKnmneXbStntvvTxsUMw5JObg5M1350ir5la34PFRW47p7GB9wcVg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=91QkMbXQQW9VkoJrrFc6mXK72hrtmnB4NuTd0ujUGoM=;
- b=zFISbCgf3s1wo6dCdcsiZOCP3iwKLcNe9UiMeP6Fr0IB4zTId9W5nGM0ROVmeE7bepeVaCeCCF2QG0+szki86NcaQJUkmSZrYDVT63ArxTr0LTbrJPQJlR5GcTc3nJsytiKs5IdbnN7Frq0iKp0oxZjYx+ROGigOZEGHF1voG9w=
-Received: from BN9PR03CA0677.namprd03.prod.outlook.com (2603:10b6:408:10e::22)
- by PH7PR12MB5902.namprd12.prod.outlook.com (2603:10b6:510:1d6::8) with
+ bh=E6lss2Hg9OxWRNKdJdzyXq7LJ3ceSxLzrC+ts+YdeIg=;
+ b=BmpF6A2WbnA1Chavg1NueMcHYoYAeJ6CMxnMXlgExfuRvBH7Gp1uWBO+PiKJlmOb7cfNV4VF1JYH0iWLsklAhtQbMjheyfUuYi5Hz6ve+i8Zb/0KJyYzVZSHPvN7iMKU+GluXKaFcuS5dHqqgo33h7I0Iquiur3hBlnvcNguLlg=
+Received: from BN9PR03CA0761.namprd03.prod.outlook.com (2603:10b6:408:13a::16)
+ by PH7PR12MB6934.namprd12.prod.outlook.com (2603:10b6:510:1b8::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.21; Thu, 30 May
- 2024 11:17:01 +0000
-Received: from BN3PEPF0000B077.namprd04.prod.outlook.com
- (2603:10b6:408:10e:cafe::d) by BN9PR03CA0677.outlook.office365.com
- (2603:10b6:408:10e::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.20 via Frontend
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.19; Thu, 30 May
+ 2024 11:17:02 +0000
+Received: from BN2PEPF00004FBF.namprd04.prod.outlook.com
+ (2603:10b6:408:13a:cafe::e5) by BN9PR03CA0761.outlook.office365.com
+ (2603:10b6:408:13a::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.18 via Frontend
  Transport; Thu, 30 May 2024 11:17:01 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B077.mail.protection.outlook.com (10.167.243.122) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ BN2PEPF00004FBF.mail.protection.outlook.com (10.167.243.185) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.20.7633.15 via Frontend Transport; Thu, 30 May 2024 11:17:01 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
- 2024 06:17:00 -0500
+ 2024 06:17:01 -0500
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
+ (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
+ 2024 06:17:01 -0500
 Received: from pankaj-M75q.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
  Transport; Thu, 30 May 2024 06:17:00 -0500
@@ -79,9 +83,9 @@ CC: <brijesh.singh@amd.com>, <dovmurik@linux.ibm.com>, <armbru@redhat.com>,
 	<michael.roth@amd.com>, <xiaoyao.li@intel.com>, <pbonzini@redhat.com>,
 	<thomas.lendacky@amd.com>, <isaku.yamahata@intel.com>, <berrange@redhat.com>,
 	<kvm@vger.kernel.org>, <anisinha@redhat.com>, <pankaj.gupta@amd.com>
-Subject: [PATCH v4 26/31] i386/sev: Invoke launch_updata_data() for SNP class
-Date: Thu, 30 May 2024 06:16:38 -0500
-Message-ID: <20240530111643.1091816-27-pankaj.gupta@amd.com>
+Subject: [PATCH v4 27/31] hw/i386/sev: Use guest_memfd for legacy ROMs
+Date: Thu, 30 May 2024 06:16:39 -0500
+Message-ID: <20240530111643.1091816-28-pankaj.gupta@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240530111643.1091816-1-pankaj.gupta@amd.com>
 References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
@@ -93,89 +97,140 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB04.amd.com: pankaj.gupta@amd.com does not
+Received-SPF: None (SATLEXMB05.amd.com: pankaj.gupta@amd.com does not
  designate permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B077:EE_|PH7PR12MB5902:EE_
-X-MS-Office365-Filtering-Correlation-Id: 58bfb315-a9dc-4630-1208-08dc809a073f
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBF:EE_|PH7PR12MB6934:EE_
+X-MS-Office365-Filtering-Correlation-Id: b7e5f545-cf03-45b9-6b2b-08dc809a0779
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|376005|36860700004|1800799015|82310400017;
+	BCL:0;ARA:13230031|1800799015|82310400017|36860700004|376005;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?BlWZLDa5ghDtJPzZSeew2LmctDFxgqZuGTzMJA0MG9C++kkAe7Lik+XCPJU7?=
- =?us-ascii?Q?NaEQIAltmT0P5hrWrsQV94/7w9Fp3NH+s4vO7vip0absHxDXw+rCZsIWGG8U?=
- =?us-ascii?Q?DX2+lCmMan6yztdHoI6FpgC8AQZkF3VapwX7aE5o3RBRijNPF4iqfPvUC8zX?=
- =?us-ascii?Q?j5RTyjcBFuMSAX6XFZWx6JfdoHi959lvIbzD43KGi1HezMKOQM4210iwClJV?=
- =?us-ascii?Q?598coUPHyx6m+jw2jKCHZkrgMj0iRgqPmmtf0CMtjz95r4RXmfUNt7168s9K?=
- =?us-ascii?Q?g3z0I44Y6qer0wccUeUxKLMQ5vExBSZe3X8QHYwRY3pjbPPFyFv0nP5rMLzz?=
- =?us-ascii?Q?AGZYPCOIu91z8ZNm3LPl7eVozPqjy/4K8Tvb9eJUt8juDLStPSOOqnyDocH4?=
- =?us-ascii?Q?OI4rmvvqK+ZBx/p85zBtEE7YTduv3Boh85HrPTmLcVaZIyqW21TGAo3P4K2X?=
- =?us-ascii?Q?RQ5q55QCxccQMEgRXnZTnIgUR8fuJvjuTPN45gCZNAoD4+EnpRtFw55yv9SJ?=
- =?us-ascii?Q?cRT/iOayAHfXpkh6SSwdtuX7MRA5rl5Wg2hJ4Q4bka6zFVx2H2cXwmLFUsem?=
- =?us-ascii?Q?12wYXRqKgUrj2uNjfojBGhFUekk9ufyufRH58k7QXqmQEB4s0qZWPqJHHGlF?=
- =?us-ascii?Q?vya9m0E6C6zStwZ29f644oqd2cUQkLns0mkfbLXT2lr0jbcwhncYohZg7gef?=
- =?us-ascii?Q?IsGxHKcynsjx2XsLTFAtCdgqBaRMPdWu8xdCqh9HN0YEiokME5Mjrtv5+m1L?=
- =?us-ascii?Q?xf4IymnvJ8FxiADw4ldq4izbA5DyK5iosEmYZ89Qdw/jP6pInM5gam8hw/mX?=
- =?us-ascii?Q?rwPKi6GWNaAXh2RoHhQOEf4QKTgdtMhPVE5PA3l7PfK/k+HtJBLwPRczhQwC?=
- =?us-ascii?Q?f4gDvl9ZSgvjrkc4lSTQ62cWke6yGw6mSAb8ixdgehr7YruZwH4isx5vRC2C?=
- =?us-ascii?Q?SvBg41BKRMPJ08E8N7fSdQ0gX2m18/f+VxGeWXKVP87fn/PVk4zxxHvO1m+a?=
- =?us-ascii?Q?h53f46QyKMFj6UIODSEQCC/TeI3f2NDV/MYYuivD2aNgNJxH+cBfFBXg5l3N?=
- =?us-ascii?Q?qXZOMOqnFsk3/IXbk/LZboTHTmeDSBfbH1BeV+09CZ6y2djgayTyKd3rNxTs?=
- =?us-ascii?Q?e5ODypKS1pASc1oef7Gru8bGpHuE2Okqrt1m/Wc1heIjGv/uYiru1jP/n/88?=
- =?us-ascii?Q?Ux0vF34zzRK5kewTfn+L3g10cVaXVNVdWXUytbQ2rm2RTrtn+pKd98G8HQoh?=
- =?us-ascii?Q?QLkCnZEyzp3Zx7xAty3Nxp/v5GmznJmpv406m8rELaiI1NqAoB6gsV7FoIQn?=
- =?us-ascii?Q?kRQ561Nc3/2CP668wwDEW/flNofkbyWVYEAVqoJDHh45Q1NzhhnZPvHdqzIa?=
- =?us-ascii?Q?g1P09v68RJHU4lNscgATg3GsfSSh?=
+	=?us-ascii?Q?xMzsJqpZD+6+QHzbhcTR4Lhfd7l5Xvs2UObFprFDgpH4Pjs2qBLLOgv3m0rk?=
+ =?us-ascii?Q?5bY7BKtl8+vVqBsS87oxHjw8LSjbRzFAR/1gagc5QZftN84bZeLtaN+/kpHQ?=
+ =?us-ascii?Q?067C0TQ91Px5RCrDmUoi+I8migWgF33fV7IGUOpxX855c6yWKwhJI0Yrwyww?=
+ =?us-ascii?Q?ctKhtyLLbMtamwU8bXtLwhsuNCbzURGyQtZOz6TpAi0zHt168CWp7hWgqTpi?=
+ =?us-ascii?Q?At4tXgTaWvyA460zeInOw2unp9NbXtbCCy4KcjKzGRGkGEZXhmIm5GFDdp6U?=
+ =?us-ascii?Q?BfKyidWpHBS4HnoBcRr34mqR0R3vr0EPYaVzuXRpemM/n+rZmhwvgs1yk5MJ?=
+ =?us-ascii?Q?RpXble2+vfxX9luAVXpvhltWhK//86XMN0U3VL/G6TfRXBfR1y5FDnl0aMM7?=
+ =?us-ascii?Q?tipMmhoKVZhdWQJndm/Mm36A0C1TZpOC0Y1StM8274EkWPyhbOggo3UKdKVP?=
+ =?us-ascii?Q?sEVOPOqdRe7n94whYcBU7nrgEzGdtDOQkmOz2JBO52Rjx8D5eZCCbGgafSFV?=
+ =?us-ascii?Q?6tiin/GtwygmgqaZ/SaX9cEFoLzT9DnoHQIlB/39qyEtk+A8qYgFzXRBU6v0?=
+ =?us-ascii?Q?EYCUS6doVFzhgjj6nDxz/0d1kxsi/jbREoj4DOVZeObw592QlQcks+VdTvXK?=
+ =?us-ascii?Q?rJUmuyhQ+hGo/f7oFz/ByU6SnbPcwGsQAgJ+K8Dm5sIwqkqpJEAhhFrkAO/8?=
+ =?us-ascii?Q?LgoQxgCWdiWGT1/6yZN6hxi0LTDx0Tkn9I1O9mohqntCdxaaVvYsBYAWFCBH?=
+ =?us-ascii?Q?rztYBTz24UViquOg+gFa2F+RwE46eMDO3Vy+Ut6TyFtE3/8rRwjPO+qk/TQj?=
+ =?us-ascii?Q?mBxzy1RfSjOgv2p8OaIW6haXPSIrvE86JflD0WqkZ3QOfti4SE05G1kUGj13?=
+ =?us-ascii?Q?pcYnFHMCYQvvt2tDT5MP7zu4tey2Ps2meSV2JwAHlwlBJMK4E+RZldYQ7TNe?=
+ =?us-ascii?Q?eWeRarFoZ8A/IyOvfcV1rmv++wnOCuJLHd0a6kcfLSmNHa3M2m8RzbkxTJk3?=
+ =?us-ascii?Q?St9ZQa1t+RG9+fWjTZW8o2rGw4ps5q/3b5YbJV9WMaKa6kXFRsC5BGunlkTM?=
+ =?us-ascii?Q?Xs14mTIwC2IZvAmSvbFGd0W7wHbMawYd8P6WDGmBUX+FckwbkNLU6t7IC7UH?=
+ =?us-ascii?Q?wpabIWqWdrH8q1cWn9PVousubikagn/3KHil13HmpDRGE9goaw7eGhJjI8eL?=
+ =?us-ascii?Q?vAUv+Ih2x8pZ05fzDE28K7TD8MA3SU5BVhzMZZ6XSSELrwm/EL2XbofF1ePa?=
+ =?us-ascii?Q?f8amRshFGnrcJYBYplXSXWVFn9LKBfaJ9TOJRUtqA5xcF2yx7OOoyxDFva4i?=
+ =?us-ascii?Q?Orb3swIFepsd39OtEQgTY1vMfx9hdlMXhdpRtgO/m6ImFlCVxU6HUB3lb8mE?=
+ =?us-ascii?Q?j/5kl1EkhJp0PcN/hFQ6+EkujIHh?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(1800799015)(82310400017);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(82310400017)(36860700004)(376005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:17:01.4191
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:17:01.8015
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58bfb315-a9dc-4630-1208-08dc809a073f
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7e5f545-cf03-45b9-6b2b-08dc809a0779
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B077.namprd04.prod.outlook.com
+	BN2PEPF00004FBF.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5902
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6934
 
-Invoke as sev_snp_launch_update_data() for SNP object.
+From: Michael Roth <michael.roth@amd.com>
 
+Current SNP guest kernels will attempt to access these regions with
+with C-bit set, so guest_memfd is needed to handle that. Otherwise,
+kvm_convert_memory() will fail when the guest kernel tries to access it
+and QEMU attempts to call KVM_SET_MEMORY_ATTRIBUTES to set these ranges
+to private.
+
+Whether guests should actually try to access ROM regions in this way (or
+need to deal with legacy ROM regions at all), is a separate issue to be
+addressed on kernel side, but current SNP guest kernels will exhibit
+this behavior and so this handling is needed to allow QEMU to continue
+running existing SNP guest kernels.
+
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+[pankaj: Added sev_snp_enabled() check]
 Signed-off-by: Pankaj Gupta <pankaj.gupta@amd.com>
 ---
- target/i386/sev.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ hw/i386/pc.c       | 14 ++++++++++----
+ hw/i386/pc_sysfw.c | 13 ++++++++++---
+ 2 files changed, 20 insertions(+), 7 deletions(-)
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 7a0c2ee10f..7d2f67e2f3 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -1108,6 +1108,14 @@ snp_launch_update_data(uint64_t gpa, void *hva,
-     return 0;
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 7b638da7aa..62c25ea1e9 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -62,6 +62,7 @@
+ #include "hw/mem/memory-device.h"
+ #include "e820_memory_layout.h"
+ #include "trace.h"
++#include "sev.h"
+ #include CONFIG_DEVICES
+ 
+ #ifdef CONFIG_XEN_EMU
+@@ -1022,10 +1023,15 @@ void pc_memory_init(PCMachineState *pcms,
+     pc_system_firmware_init(pcms, rom_memory);
+ 
+     option_rom_mr = g_malloc(sizeof(*option_rom_mr));
+-    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+-                           &error_fatal);
+-    if (pcmc->pci_enabled) {
+-        memory_region_set_readonly(option_rom_mr, true);
++    if (sev_snp_enabled()) {
++        memory_region_init_ram_guest_memfd(option_rom_mr, NULL, "pc.rom",
++                                           PC_ROM_SIZE, &error_fatal);
++    } else {
++        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
++                               &error_fatal);
++        if (pcmc->pci_enabled) {
++            memory_region_set_readonly(option_rom_mr, true);
++        }
+     }
+     memory_region_add_subregion_overlap(rom_memory,
+                                         PC_ROM_MIN_VGA,
+diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
+index 00464afcb4..def77a442d 100644
+--- a/hw/i386/pc_sysfw.c
++++ b/hw/i386/pc_sysfw.c
+@@ -51,8 +51,13 @@ static void pc_isa_bios_init(MemoryRegion *isa_bios, MemoryRegion *rom_memory,
+ 
+     /* map the last 128KB of the BIOS in ISA space */
+     isa_bios_size = MIN(flash_size, 128 * KiB);
+-    memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
+-                           &error_fatal);
++    if (sev_snp_enabled()) {
++        memory_region_init_ram_guest_memfd(isa_bios, NULL, "isa-bios",
++                                           isa_bios_size, &error_fatal);
++    } else {
++        memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
++                               &error_fatal);
++    }
+     memory_region_add_subregion_overlap(rom_memory,
+                                         0x100000 - isa_bios_size,
+                                         isa_bios,
+@@ -65,7 +70,9 @@ static void pc_isa_bios_init(MemoryRegion *isa_bios, MemoryRegion *rom_memory,
+            ((uint8_t*)flash_ptr) + (flash_size - isa_bios_size),
+            isa_bios_size);
+ 
+-    memory_region_set_readonly(isa_bios, true);
++    if (!machine_require_guest_memfd(current_machine)) {
++        memory_region_set_readonly(isa_bios, true);
++    }
  }
  
-+static int
-+sev_snp_launch_update_data(hwaddr gpa, uint8_t *ptr, uint64_t len)
-+{
-+       int ret = snp_launch_update_data(gpa, ptr, len,
-+                                         KVM_SEV_SNP_PAGE_TYPE_NORMAL);
-+       return ret;
-+}
-+
- static int
- sev_snp_cpuid_info_fill(SnpCpuidInfo *snp_cpuid_info,
-                         const KvmCpuidInfo *kvm_cpuid_info)
-@@ -2282,6 +2290,7 @@ sev_snp_guest_class_init(ObjectClass *oc, void *data)
- 
-     klass->launch_start = sev_snp_launch_start;
-     klass->launch_finish = sev_snp_launch_finish;
-+    klass->launch_update_data = sev_snp_launch_update_data;
-     klass->kvm_init = sev_snp_kvm_init;
-     x86_klass->kvm_type = sev_snp_kvm_type;
- 
+ static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
 -- 
 2.34.1
 
