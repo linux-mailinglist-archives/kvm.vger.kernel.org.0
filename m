@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-18410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 043D28D4A42
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:19:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C3948D4A41
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:19:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B01C92827A7
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:19:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5423D28250F
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C411822CC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD671822C6;
 	Thu, 30 May 2024 11:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4jhal/t5"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DutMLkzM"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2049.outbound.protection.outlook.com [40.107.93.49])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2056.outbound.protection.outlook.com [40.107.236.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C78F17FAC7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB4E17FAC2
 	for <kvm@vger.kernel.org>; Thu, 30 May 2024 11:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.49
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.56
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717067824; cv=fail; b=TQ+rTfBIc6XSyfTwFOnNBVbRZ1cFJJnNb0BPKU0RNBxtXpaYGhqPIrFVvoMBx/pfsqGrxMCpbnXyGQ51kmbhr4znmHoiIXJBsnFMK/ysQ0drI5o3BSy+uESahq+TEOnFnWnTXE3aq8t+EQJCdGmLA6DjM8b3wOSOobdk7eSR+e4=
+	t=1717067823; cv=fail; b=jnFwz0URaRkggt2YQgHq8mF0Jzd5WIHyfQMl9UYKfreoeNpHoN6edRbPCDpmsJ+84Ineu+pEwOJV6szccAaWp4lHu5bC120/JFbRz4N1ZTn6N8hYTwsoxyC8ggPqde9Uts63wlv6n7v6QTlqKH/t6v0oiUnkPYvVeEhUihoXSTA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717067824; c=relaxed/simple;
-	bh=vLXXfpKgUOuJsDYlYvUMLPrKNLn7gMPFAmnT0X97dp0=;
+	s=arc-20240116; t=1717067823; c=relaxed/simple;
+	bh=0FJj5k82qCTHFWCHpCHu2dEVuQ0zjvp5fr+ASN0QT5E=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n39+F3GcAIoc+feF9LuD960b75FxNUWQQCWzqPOMT8b0c4/0ClBnyFcgFtwqA+vlf3hPxuGL+WPgR9LzspiCA9Xrw3ojYdVu9dNM2uGgPdlI4n6KhhM5hZB/eKJhMRaA1nKfTSx61jqFutcFbkcFCnFrgSsorLPIN7ArVJXEQNY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4jhal/t5; arc=fail smtp.client-ip=40.107.93.49
+	 MIME-Version:Content-Type; b=tvmUEG/wpmON0A/h+E72A6Mrd4U01QnuhAV3sWGXd24Q62IV6YXa67BrUTVfUDfRkDgFfe+7Xl99UyZbkQ2mIOwPwMq+8yXgYOBxmT37aSiu2XLPTq3YyDH4HxBbKy90RmZVwLd2r4WDHwPX2EDDQtz4bWw9SJbjouF2OxBK5d4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DutMLkzM; arc=fail smtp.client-ip=40.107.236.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YaurlcbBov9RxFIUpyEeg7DR/U12pmvUNP1sl91sMw3SHv3SkJu1lgE+jlX6uN0E4aXLkZ4Nr3NkL7sgALJuLy+FZdDWT2GpRDNKhS81vor5F9uPJe8eaNyLAY6UB7PO7lnDan6YYKFfgKj8lpZatb+lKVf/CsHaSFac0EByGf/ON97C62PgjW6yJ89F/L0QVMalmHQSeKszPAO6Rpkj/i61AG5U/H8ltF6O99zL5jWE2dg2xdiYBDpj0hHpmh+wgS6GiKeQEfRcX30D1Isi0KqUR6y+zClCb4Sgk/6B+r7jG0Xj7z44dWaFlLKomAzwH1nNf5LgN2nfZp6jK7Eq2g==
+ b=ZQnYN7ZvzyI6TqlGBSniwd1QGFqELh2J+lrIgHiTNXZYpF6gOwTHUK2Qvey/VkTiF76aPF9AiYpCajxXI3LRxOvfZjPgszDhQodSKECLz2wzInjEscdXuAkY3EXswW1e/y1l5WipUMCK/zRrEM57qgzF+lWeEX1wg0BNHYydJafohdbcvMMleqrZCdPIxei9rJxqLWbC01SnCxDdnbHzrG1rbQ12R2QzfjAfV28ZupKFLU7teTNoKVThc1mgPqhf536G11WHELkF38XWRsw/+KIXqa+L5Bz8PGgNtimFinjTCPNyaMkzVhguEdOQjFyl8OLJ8XVSJBXH5Pbg4qDHEw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gTmz5Y+I5Y3Cfre/deyExTeyRcr++l+yG61WncPA2zo=;
- b=BpBQJYqRolZex2xEic4+n8tc23TVknHMmXaDP4jl2tzucG8uTaAkTTi/NJXlemsJ/kembNuHdgeYHjsghdirKwnxeRRnon00bvwloVl9fOjkZTvixWhAKW0S5HScHuZ+/f69rMLwOIKnHtm2NmAkLFa71DTAyYgfEtx8EWSgcY8NNdL8F2zaT1P6fwNl3h5UOdjYezPYNHhZYBl8LG9L5a+4uYHStLf2JjYvulWjsTWZPZA9DHg3UA62HQw+W9+BcrXQ93RAcoIFQ+RhvvEMCCQbtesDlHJfTp7UUKXuZDXeU5xulrmLKYHoTMQcwYL3UsoJIX/DfvJ6nrE79xh3bQ==
+ bh=t8k002xUHSucSBrrK2ENNznXzTQLG5q5MC+/4YN/Sno=;
+ b=h9ph1aMmLU2SXPyEf/vFl/loeahyDOKIAvR5QeQsToJZO8WD9spBz4RJJ3BF3SwkEVbefsCIsr9eXwU4u48Bku4aP5Qm/90roBhXSGzXT9Q797w5Us+Xta3fVGfpUxFyqa/LOETe1/HxSTVQHFtDNrFdNzB+L1mbP1sziQ69j7iklxwqhs31OoZRPLG9pvjo3iJ2UbN6aQnOfktyVD++JwgjQue/Ukf4GZtTMqSoXdJCANnwYufGn8vz7S7psSqjiANAwggsyL7+98DoE4E89j32XSdBOMmWQtXxJdJVWnPc8PGs/a6I9FfXsH7iWW8qFQjui3szVsj6jRrNhtAoDg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gTmz5Y+I5Y3Cfre/deyExTeyRcr++l+yG61WncPA2zo=;
- b=4jhal/t5SRgQLeSVtPYnGaH6GTxgAj1ZZF27mAw/3xF32lFYhqhQ3EazlrLjRxHux2gwqBUnIdjSrt+JRLrJ1wjUrUvEqL3b7bzj/4bXProQvupla6YTAzOERJiBX+WYo1CEJzl1uh6+eQm4xHqod5S/uDHldul+TKINTCiUdZ4=
-Received: from BN1PR14CA0016.namprd14.prod.outlook.com (2603:10b6:408:e3::21)
- by SN7PR12MB7201.namprd12.prod.outlook.com (2603:10b6:806:2a8::22) with
+ bh=t8k002xUHSucSBrrK2ENNznXzTQLG5q5MC+/4YN/Sno=;
+ b=DutMLkzM3Y7NulVNVOmkmvVPDXXg2TpuBlqe4DK3I6Fe2dsOM55GrbQP/5ISaHrlzf+tUTRX+ns95YZWGUTwOl/ErvqozW156w++jgoriby4fn4CXTm+UPWoSmPUrM4EgwXoPgx3izh6rutGvWMEBd+Zge89+WfGXAgIBcihnKg=
+Received: from BN9PR03CA0680.namprd03.prod.outlook.com (2603:10b6:408:10e::25)
+ by SJ1PR12MB6364.namprd12.prod.outlook.com (2603:10b6:a03:452::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.35; Thu, 30 May
- 2024 11:16:56 +0000
-Received: from BN2PEPF00004FBC.namprd04.prod.outlook.com
- (2603:10b6:408:e3:cafe::d6) by BN1PR14CA0016.outlook.office365.com
- (2603:10b6:408:e3::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.31; Thu, 30 May
+ 2024 11:16:57 +0000
+Received: from BN3PEPF0000B077.namprd04.prod.outlook.com
+ (2603:10b6:408:10e:cafe::b6) by BN9PR03CA0680.outlook.office365.com
+ (2603:10b6:408:10e::25) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.30 via Frontend
- Transport; Thu, 30 May 2024 11:16:56 +0000
+ Transport; Thu, 30 May 2024 11:16:57 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- BN2PEPF00004FBC.mail.protection.outlook.com (10.167.243.182) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN3PEPF0000B077.mail.protection.outlook.com (10.167.243.122) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.20.7633.15 via Frontend Transport; Thu, 30 May 2024 11:16:56 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
  2024 06:16:56 -0500
 Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
  (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
- 2024 06:16:55 -0500
+ 2024 06:16:56 -0500
 Received: from pankaj-M75q.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
  Transport; Thu, 30 May 2024 06:16:55 -0500
@@ -83,9 +83,9 @@ CC: <brijesh.singh@amd.com>, <dovmurik@linux.ibm.com>, <armbru@redhat.com>,
 	<michael.roth@amd.com>, <xiaoyao.li@intel.com>, <pbonzini@redhat.com>,
 	<thomas.lendacky@amd.com>, <isaku.yamahata@intel.com>, <berrange@redhat.com>,
 	<kvm@vger.kernel.org>, <anisinha@redhat.com>, <pankaj.gupta@amd.com>
-Subject: [PATCH v4 18/31] hw/i386/sev: Add function to get SEV metadata from OVMF header
-Date: Thu, 30 May 2024 06:16:30 -0500
-Message-ID: <20240530111643.1091816-19-pankaj.gupta@amd.com>
+Subject: [PATCH v4 19/31] i386/sev: Add support for populating OVMF metadata pages
+Date: Thu, 30 May 2024 06:16:31 -0500
+Message-ID: <20240530111643.1091816-20-pankaj.gupta@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240530111643.1091816-1-pankaj.gupta@amd.com>
 References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
@@ -99,176 +99,159 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBC:EE_|SN7PR12MB7201:EE_
-X-MS-Office365-Filtering-Correlation-Id: 58954654-5eaf-4d24-bd20-08dc809a0442
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B077:EE_|SJ1PR12MB6364:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2bc05110-137c-4097-58cd-08dc809a049c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|1800799015|376005|82310400017|36860700004;
+	BCL:0;ARA:13230031|376005|82310400017|1800799015|36860700004;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8p8Om6+h39y+KRV1DrXHJqpARG1avIjTNq57hHN5Qnm0IpMAx1y97hjhIpOT?=
- =?us-ascii?Q?G7+eRMeCAiYU7RmlYRW7tw9LBPHbGweg5KVt6fUwjEXWzuMDY1m6ygR6DsGL?=
- =?us-ascii?Q?4RNWfzgZEKBgW09BxSyk8LK8JzB85z67WKbNC50okuezfjH7HTx8vY+rsNxC?=
- =?us-ascii?Q?y4D/cWirM/0dHxGp9hEkTRM6B3lBCJaVYWByquSkm52qk3B+N6VUJjK5Bsv1?=
- =?us-ascii?Q?8d6Hw2m2Iu13Zzr8nqVDz2yv36th3fNNSTGHJAeOK9U4i1KNK9lD8cuMBl16?=
- =?us-ascii?Q?LmtgGS2z7UzLHU3yNfK+Je5qSm5DO9slqJEjocbRUpePgj+vXaxX9Lhli54b?=
- =?us-ascii?Q?ZdsCUeNwS61uxu3yrj4FQc5DIyf2VwdgyX8G+TBKvoUHJrEM4boslsbMIoe1?=
- =?us-ascii?Q?O4SlRahoAl7uvm7qfeYeljrzhI3tkeyuhG+Rbn9X9l4/UKXugUPti47Lfs9+?=
- =?us-ascii?Q?yoOa3SpYT6NIaccDviBP7uoxZoFehosfJlsgUlNDuDn9/tHRXCBlOKCc8gw3?=
- =?us-ascii?Q?+H5ABt7ZAVr9zQCG64mZQZof5STX2STCuVVxbfphi1yA6aflMNxOrVH3KQk2?=
- =?us-ascii?Q?dHwyWWJoqMmDcfTEK9bF2U9Vs7bkhGcffhh5euEQHRbAShYR1BysZ1q9ImqX?=
- =?us-ascii?Q?HFxxe+fejn+lEP/Qi1KNujVO46JwmgdBHctGhR1vNPK08Z3Fj0VzjAUbWPX0?=
- =?us-ascii?Q?KDpdb4Yy/6Mj/SvclswpCoyJKab2YOn8u+BPHWcIr9eysDO/M2ExnzRL3oTD?=
- =?us-ascii?Q?J6bSBYmSe/98RIqvKqZUrBAXYS3XQKIxymft9ZKzGcNWG5SRXUp4fNInbjaj?=
- =?us-ascii?Q?JH/+i0wy58LTUx76ttBCjKkzGkoWgaNyusmkePGEvIrOR5CVAIdPygYFgP4L?=
- =?us-ascii?Q?/T86WpiB7hSbzJScFwEWJF4LuJkxmqVk6SeuhwERqxB+V7qlQQFtTzR/pdw7?=
- =?us-ascii?Q?xEzJasLFykvQCEa9TDblW6sMQlupM/nhwtbCyRskWJlEL84ieXS8nN5OY9wJ?=
- =?us-ascii?Q?xrSApbIUot9JnCGm9NOYUGshOxY3Z+b65CtvRJwfSiKdJlq7nKL0G4mWKIMT?=
- =?us-ascii?Q?OQIBoYmY2bC+vvSZ6trolKrh9j/Gc64+fDRyhn1Ir0598XVZbs3/raH4Uvvn?=
- =?us-ascii?Q?sqv4UTMqBC7YFHqsQLqhIdAL4o0t1h1PRBRGYyew4PAM87gL33G23ii8EHKU?=
- =?us-ascii?Q?yUle5THkO3sHpDh1nEXo+wTW+tCrKgBktxQFt1CKkswTz6ot7FRZB6rszqQW?=
- =?us-ascii?Q?64sYU+AJT8hgYochXbKuz0GS6DivCNXlhUclzOiYURYUu5K3PNp8Fw0C5LhH?=
- =?us-ascii?Q?3wxWtWknShefykEIqvWk2BmsRrW+0MdXJ6BLv/fdQOhswnx7kQGR0D8mxROE?=
- =?us-ascii?Q?NEDVUNE=3D?=
+	=?us-ascii?Q?gmRoaL0VZ6JFZkxq/kxOYFfMs+kNqwjbaq6V49L8jeyvu+/uxlpGxLKJfsA/?=
+ =?us-ascii?Q?ZxS2lGSm9iYVXtBu6+qZnBQwkSzrkzr+CpBZbUrYcQ729klgh8YQ4n4oPlvJ?=
+ =?us-ascii?Q?YFzSeM67ofeYopygKTJs1I7LgOWxSgNueMXdQppG8cvHcgRE5UtLJ1M995e+?=
+ =?us-ascii?Q?h9DPFcBJz7T1V3jscUpfcmQqkzEkdfBNpS4+0RtnZBWpjZg5Z6wK7AoOTT3j?=
+ =?us-ascii?Q?Meo4TyVS+HaP9CpK7FwmN9WX0vdmRA9mKfMbQH6PgWcCXe+tqt+RZ8scbney?=
+ =?us-ascii?Q?hc4SlEl18umV7Ld7pwwT7TwEUU02s+Evp+ym3v5+bgrmTkj2lNEpYKiwQCOQ?=
+ =?us-ascii?Q?t+as07Te9CmMMKaIe2Pb+xOT3X0C3J9vx9V2pzScRrGzG8PzKwi168FPhL5K?=
+ =?us-ascii?Q?JNNwZ0eNnxmGGxg/EQecjV61s5RnsSsbXHlHAToceC4PNr3WWm25zCGBAjKo?=
+ =?us-ascii?Q?4iFHQT/Dy/4cIzA1xaJ0uIn0KICoNYUeZv1OBZvj7DYzHra7G59dff8twens?=
+ =?us-ascii?Q?z3VQhiMghOT8GHR8+BwodjeQIWIISa4y72dbsCRjE0bWuOSDICPVeZwcPf29?=
+ =?us-ascii?Q?7QQFraV+3XH1DIA0gVZ8N85ZAo/fduO1p/504YCMR4SxZm/N4OlG/hlM4VTW?=
+ =?us-ascii?Q?cty4pEpEM6pG9+DCpcaATkjp3bFzmcV58677PhAJKysCetMfkQ3tzHR9T7I7?=
+ =?us-ascii?Q?WbX0+uAiiMAHIFe1QXiRDzrwKAy5YscOxHC4IV66wUUHRW8K6Igj9Di/cjIG?=
+ =?us-ascii?Q?N/XpAn9ZB9jQo8/foDHarzBnFkwO4NfQCEmINIRh/YIBKmt3RpxUJ1Eor4tH?=
+ =?us-ascii?Q?hDX/Gb5JUFffzvGGG38ed7tfzafWQECb/LImigE8/ukioWFdmTLB9pHNKSZ6?=
+ =?us-ascii?Q?RDqGQ0mkSkZ3CsUcs4Ir6eX6uwVjJzgodcWQQ3WeuBwq/cH+ldxSNIdqulVu?=
+ =?us-ascii?Q?kHysdT4vrel8N+4K2E96M2JUKviiAXmR1yXq/Y3EQJtNxP2HOI64pQyA/m+v?=
+ =?us-ascii?Q?Z0I32ZkgL/BuZwOIZ9XGwMvNggqcGJM148S3nQLhXNMmu2JouOftd7Iah6Lr?=
+ =?us-ascii?Q?qxsjbZIHO1Cwz2VJ0Oq/pGE+jHqIEgNBjSLJ/mxDtHEnw/6qaA0tc11ugEAN?=
+ =?us-ascii?Q?LaRivlDO0IsHxWeb7azDLsz6JmH0U4HAfqyWpeBcxJYBBn3imCc9giwGXHSc?=
+ =?us-ascii?Q?/9InA5xYPxrOipz+THFQghPidYZNiAVCBinhvAkIxJsirZUtsPE2CJW1SO1F?=
+ =?us-ascii?Q?Q0X91L7NAWj9dxEIZJaY5LCzbV8s3C5XxkdLzM/5qpppJkaUEFPQ3W4ku8QA?=
+ =?us-ascii?Q?n/bSXZM6674zVSQDxnMK1oSuAdSYQHIEt03p9WazoNM5emZaN/pFbgLIQDaM?=
+ =?us-ascii?Q?dg3rWdHtyTncfoSYk154aNnvUCdM?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(376005)(82310400017)(36860700004);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(82310400017)(1800799015)(36860700004);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:16:56.4100
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:16:56.9973
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58954654-5eaf-4d24-bd20-08dc809a0442
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2bc05110-137c-4097-58cd-08dc809a049c
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF00004FBC.namprd04.prod.outlook.com
+	BN3PEPF0000B077.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7201
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6364
 
 From: Brijesh Singh <brijesh.singh@amd.com>
 
-A recent version of OVMF expanded the reset vector GUID list to add
-SEV-specific metadata GUID. The SEV metadata describes the reserved
-memory regions such as the secrets and CPUID page used during the SEV-SNP
-guest launch.
-
-The pc_system_get_ovmf_sev_metadata_ptr() is used to retieve the SEV
-metadata pointer from the OVMF GUID list.
+OVMF reserves various pages so they can be pre-initialized/validated
+prior to launching the guest. Add support for populating these pages
+with the expected content.
 
 Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
+Co-developed-by: Pankaj Gupta <pankaj.gupta@amd.com>
 Signed-off-by: Pankaj Gupta <pankaj.gupta@amd.com>
 ---
- hw/i386/pc_sysfw.c   |  4 ++++
- include/hw/i386/pc.h | 26 ++++++++++++++++++++++++++
- target/i386/sev.c    | 31 +++++++++++++++++++++++++++++++
- target/i386/sev.h    |  2 ++
- 4 files changed, 63 insertions(+)
+ target/i386/sev.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index ac88ad4eb9..048d0919c1 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -260,6 +260,10 @@ void x86_firmware_configure(void *ptr, int size)
-     pc_system_parse_ovmf_flash(ptr, size);
- 
-     if (sev_enabled()) {
-+
-+        /* Copy the SEV metadata table (if exist) */
-+        pc_system_parse_sev_metadata(ptr, size);
-+
-         ret = sev_es_save_reset_vector(ptr, size);
-         if (ret) {
-             error_report("failed to locate and/or save reset vector");
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index ad9c3d9ba8..c653b8eeb2 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -164,6 +164,32 @@ void pc_acpi_smi_interrupt(void *opaque, int irq, int level);
- #define PCI_HOST_ABOVE_4G_MEM_SIZE     "above-4g-mem-size"
- #define PCI_HOST_PROP_SMM_RANGES       "smm-ranges"
- 
-+typedef enum {
-+    SEV_DESC_TYPE_UNDEF,
-+    /* The section contains the region that must be validated by the VMM. */
-+    SEV_DESC_TYPE_SNP_SEC_MEM,
-+    /* The section contains the SNP secrets page */
-+    SEV_DESC_TYPE_SNP_SECRETS,
-+    /* The section contains address that can be used as a CPUID page */
-+    SEV_DESC_TYPE_CPUID,
-+
-+} ovmf_sev_metadata_desc_type;
-+
-+typedef struct __attribute__((__packed__)) OvmfSevMetadataDesc {
-+    uint32_t base;
-+    uint32_t len;
-+    ovmf_sev_metadata_desc_type type;
-+} OvmfSevMetadataDesc;
-+
-+typedef struct __attribute__((__packed__)) OvmfSevMetadata {
-+    uint8_t signature[4];
-+    uint32_t len;
-+    uint32_t version;
-+    uint32_t num_desc;
-+    OvmfSevMetadataDesc descs[];
-+} OvmfSevMetadata;
-+
-+OvmfSevMetadata *pc_system_get_ovmf_sev_metadata_ptr(void);
- 
- void pc_pci_as_mapping_init(MemoryRegion *system_memory,
-                             MemoryRegion *pci_address_space);
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 2ca9a86bf3..d9d1d97f0c 100644
+index d9d1d97f0c..504f641038 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -611,6 +611,37 @@ SevCapability *qmp_query_sev_capabilities(Error **errp)
-     return sev_get_capabilities(errp);
+@@ -1016,15 +1016,89 @@ sev_launch_finish(SevCommonState *sev_common)
+     migrate_add_blocker(&sev_mig_blocker, &error_fatal);
  }
  
-+static OvmfSevMetadata *ovmf_sev_metadata_table;
-+
-+#define OVMF_SEV_META_DATA_GUID "dc886566-984a-4798-A75e-5585a7bf67cc"
-+typedef struct __attribute__((__packed__)) OvmfSevMetadataOffset {
-+    uint32_t offset;
-+} OvmfSevMetadataOffset;
-+
-+OvmfSevMetadata *pc_system_get_ovmf_sev_metadata_ptr(void)
++static int
++snp_launch_update_data(uint64_t gpa, void *hva, uint32_t len, int type)
 +{
-+    return ovmf_sev_metadata_table;
++    SevLaunchUpdateData *data;
++
++    data = g_new0(SevLaunchUpdateData, 1);
++    data->gpa = gpa;
++    data->hva = hva;
++    data->len = len;
++    data->type = type;
++
++    QTAILQ_INSERT_TAIL(&launch_update, data, next);
++
++    return 0;
 +}
 +
-+void pc_system_parse_sev_metadata(uint8_t *flash_ptr, size_t flash_size)
++static int
++snp_metadata_desc_to_page_type(int desc_type)
 +{
-+    OvmfSevMetadata     *metadata;
-+    OvmfSevMetadataOffset  *data;
-+
-+    if (!pc_system_ovmf_table_find(OVMF_SEV_META_DATA_GUID, (uint8_t **)&data,
-+                                   NULL)) {
-+        return;
++    switch (desc_type) {
++    /* Add the umeasured prevalidated pages as a zero page */
++    case SEV_DESC_TYPE_SNP_SEC_MEM: return KVM_SEV_SNP_PAGE_TYPE_ZERO;
++    case SEV_DESC_TYPE_SNP_SECRETS: return KVM_SEV_SNP_PAGE_TYPE_SECRETS;
++    case SEV_DESC_TYPE_CPUID: return KVM_SEV_SNP_PAGE_TYPE_CPUID;
++    default:
++         return KVM_SEV_SNP_PAGE_TYPE_ZERO;
 +    }
-+
-+    metadata = (OvmfSevMetadata *)(flash_ptr + flash_size - data->offset);
-+    if (memcmp(metadata->signature, "ASEV", 4) != 0) {
-+        return;
-+    }
-+
-+    ovmf_sev_metadata_table = g_malloc(metadata->len);
-+    memcpy(ovmf_sev_metadata_table, metadata, metadata->len);
 +}
 +
- static SevAttestationReport *sev_get_attestation_report(const char *mnonce,
-                                                         Error **errp)
++static void
++snp_populate_metadata_pages(SevSnpGuestState *sev_snp,
++                            OvmfSevMetadata *metadata)
++{
++    OvmfSevMetadataDesc *desc;
++    int type, ret, i;
++    void *hva;
++    MemoryRegion *mr = NULL;
++
++    for (i = 0; i < metadata->num_desc; i++) {
++        desc = &metadata->descs[i];
++
++        type = snp_metadata_desc_to_page_type(desc->type);
++
++        hva = gpa2hva(&mr, desc->base, desc->len, NULL);
++        if (!hva) {
++            error_report("%s: Failed to get HVA for GPA 0x%x sz 0x%x",
++                         __func__, desc->base, desc->len);
++            exit(1);
++        }
++
++        ret = snp_launch_update_data(desc->base, hva, desc->len, type);
++        if (ret) {
++            error_report("%s: Failed to add metadata page gpa 0x%x+%x type %d",
++                         __func__, desc->base, desc->len, desc->type);
++            exit(1);
++        }
++    }
++}
++
+ static void
+ sev_snp_launch_finish(SevCommonState *sev_common)
  {
-diff --git a/target/i386/sev.h b/target/i386/sev.h
-index 5dc4767b1e..cc12824dd6 100644
---- a/target/i386/sev.h
-+++ b/target/i386/sev.h
-@@ -66,4 +66,6 @@ int sev_inject_launch_secret(const char *hdr, const char *secret,
- int sev_es_save_reset_vector(void *flash_ptr, uint64_t flash_size);
- void sev_es_set_reset_vector(CPUState *cpu);
+     int ret, error;
+     Error *local_err = NULL;
++    OvmfSevMetadata *metadata;
+     SevLaunchUpdateData *data;
+     SevSnpGuestState *sev_snp = SEV_SNP_GUEST(sev_common);
+     struct kvm_sev_snp_launch_finish *finish = &sev_snp->kvm_finish_conf;
  
-+void pc_system_parse_sev_metadata(uint8_t *flash_ptr, size_t flash_size);
++    /*
++     * To boot the SNP guest, the hypervisor is required to populate the CPUID
++     * and Secrets page before finalizing the launch flow. The location of
++     * the secrets and CPUID page is available through the OVMF metadata GUID.
++     */
++    metadata = pc_system_get_ovmf_sev_metadata_ptr();
++    if (metadata == NULL) {
++        error_report("%s: Failed to locate SEV metadata header", __func__);
++        exit(1);
++    }
 +
- #endif
++    /* Populate all the metadata pages */
++    snp_populate_metadata_pages(sev_snp, metadata);
++
+     QTAILQ_FOREACH(data, &launch_update, next) {
+         ret = sev_snp_launch_update(sev_snp, data);
+         if (ret) {
 -- 
 2.34.1
 
