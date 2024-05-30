@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-18382-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18383-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0398D8D4912
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 12:00:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4628D4913
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 12:00:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B3C71C21B85
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 10:00:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 568851F2482A
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 10:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA4C1761AB;
-	Thu, 30 May 2024 10:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29879176AAA;
+	Thu, 30 May 2024 10:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OTgs4dQH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LsvaZVh1"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 804BE176190
-	for <kvm@vger.kernel.org>; Thu, 30 May 2024 10:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606701761AD
+	for <kvm@vger.kernel.org>; Thu, 30 May 2024 10:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717063240; cv=none; b=KpiTsBeYS7CfvRiomToPCPql2d578FHCnai5Przjj2RRUL20Jhfd77Ej0qN+CgCZCH3i6QUB4B/foamMLB8HH8LKNR4wH4r6XdRjO9/sJZ3cIBJEq2bEhvGOrNjpuvn2TlBvduPRbU9VyNM5p2SVB6n0R3+YFTNqrU3TEK+/dFg=
+	t=1717063243; cv=none; b=NIgBFQAm/h7tKZnQmlf8ZeToJBcO4Ai5yNO/6JD91pPINiF1xkfCs/lXGVyDyE/S6RR2fGEjKDBfEhccGGsji/pUvR3mUUCumAWYQgnqUOPTBviptbC32K0MzdDyxvvdCjfF3xBhIFTU1PtilldaL+OmDvMCdNOeBzFf+SyqJpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717063240; c=relaxed/simple;
-	bh=OUEY1PzrLtaJGQxKv2sq6ylcBSILR8gNfsV/1RqA31Y=;
+	s=arc-20240116; t=1717063243; c=relaxed/simple;
+	bh=DM8SHXAESp5cUPfmMy9YxorSHMNJrW8VYCNoamCx3L0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eAiYayAPHbEclUunP2qiNW7DiB/KaFN+h+/yNSUBE/JcoC/HwU/X1RgILvVBcODAvYmk+xxhHbwGOOJa9SbpY4wSIHCi/qIi6l9H+sLEJkDDTpl0AHZBtLwdqtIFm407vWVGp38eLdIImmaAMwVRYxeOXTMOzYMm1mVNjN7FfBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OTgs4dQH; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=trpRpi7eutV3Olu8ejZDII8s/JcXh55z3yXERcLc0/P3vCRDupIWnYTzLZGYUG47RfQQfPgTSCagtc85Y1xZOYfilH/V5phAn58IXf8ythdYqq7v5zK6Wc+/lIHebOATKvl9wAnL3PnVzKxwSGm50lfnb3iWd6IW4S4VF1zr7RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LsvaZVh1; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717063239; x=1748599239;
+  t=1717063242; x=1748599242;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OUEY1PzrLtaJGQxKv2sq6ylcBSILR8gNfsV/1RqA31Y=;
-  b=OTgs4dQHcvafOiHpuQhWTjgDImFc67+wa1w8c4orsv6b8aUutgN0BwVQ
-   cktnHri7cK96VB/OVWh0FkyxAnJT15H4uQI5Wzqm9+ugDjrLCn9Z6Cb0j
-   N8bcx6RzNi+bRnGbF+R3ZbJUxaecQRGLz75+KrQ/Cl2y3+kQmn/jO2tGe
-   p+JrDC//BmfdNRCZh/2fjqFl/HabKp7/G5wWf9BJr0MhGz83NoMsSWe45
-   BSgQU14ghXy3HreXOB013iArBELVpOEoij4jQqaId7X5rzOAytUdKb44C
-   PdYFM7R6NhdjVFXFWga0hzr9nhAyhV4qD74myK//pngVef5p2l0F5+gmn
-   A==;
-X-CSE-ConnectionGUID: 8WUFXgwnSkS4shkgZaTCLA==
-X-CSE-MsgGUID: wuM5jJ/JQf+57ezZSE1BUg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11087"; a="31032448"
+  bh=DM8SHXAESp5cUPfmMy9YxorSHMNJrW8VYCNoamCx3L0=;
+  b=LsvaZVh1O0VnlSFp76CTi4I9T+GsBFDtj4CyJ99fidLDUp60bGuYD1g6
+   g+zZT5IO0O1lgWzi3KlISeEI+6JXPyXyhBPKE192Q0e7JKKHCiEn4rMOs
+   W3r54ExEyf340xxHwjKuybhVx9hqkrvnekEqDqqr6KtgEK1oLYzMVwP3e
+   ypRl4AJBVBvBBleQdLafr73HVUSzD1k6/6mroTxmseB1NkQRAHZqK+7v0
+   pzvEq/NxXjQdKf2v8d3egXQeR34M1+RfX7/GV5JWV/03XtOcF2orw4knj
+   tAECAyrcBUhmc0zXwlPrXR1dxvquZi2S9ClthM2es2wjvKmU2ACEg31wS
+   w==;
+X-CSE-ConnectionGUID: 9C7dSUjPRUW3iMtvvYRKCA==
+X-CSE-MsgGUID: pfSetHCDQRWr4DjqQ92U9Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11087"; a="31032465"
 X-IronPort-AV: E=Sophos;i="6.08,201,1712646000"; 
-   d="scan'208";a="31032448"
+   d="scan'208";a="31032465"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 03:00:37 -0700
-X-CSE-ConnectionGUID: TKXLj6QZRxOqLu9u46k3EQ==
-X-CSE-MsgGUID: dl3u8jibTlSRrNV7RvOg9g==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 03:00:41 -0700
+X-CSE-ConnectionGUID: /NjwT4NcRqGZr2YKdyF1wQ==
+X-CSE-MsgGUID: t6VNuZuoRAKAcrDirpQULA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,201,1712646000"; 
-   d="scan'208";a="35705007"
+   d="scan'208";a="35705049"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orviesa010.jf.intel.com with ESMTP; 30 May 2024 03:00:29 -0700
+  by orviesa010.jf.intel.com with ESMTP; 30 May 2024 03:00:36 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Eduardo Habkost <eduardo@habkost.net>,
@@ -82,9 +82,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC v2 2/7] hw/core: Define cache topology for machine
-Date: Thu, 30 May 2024 18:15:34 +0800
-Message-Id: <20240530101539.768484-3-zhao1.liu@intel.com>
+Subject: [RFC v2 3/7] hw/core: Add cache topology options in -smp
+Date: Thu, 30 May 2024 18:15:35 +0800
+Message-Id: <20240530101539.768484-4-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240530101539.768484-1-zhao1.liu@intel.com>
 References: <20240530101539.768484-1-zhao1.liu@intel.com>
@@ -96,112 +96,300 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Define the cache topology based on CPU topology level for two reasons:
-
-1. In practice, a cache will always be bound to the CPU container
-   (either private in the CPU container or shared among multiple
-   containers), and CPU container is often expressed in terms of CPU
-   topology level.
-2. The x86's cache-related CPUIDs encode cache topology based on APIC
-   ID's CPU topology layout. And the ACPI PPTT table that ARM/RISCV
-   relies on also requires CPU containers to help indicate the private
-   shared hierarchy of the cache. Therefore, for SMP systems, it is
-   natural to use the CPU topology hierarchy directly in QEMU to define
-   the cache topology.
-
-Currently, separated L1 cache (L1 data cache and L1 instruction cache)
-with unified higher-level cache (e.g., unified L2 and L3 caches), is the
-most common cache architectures.
-
-Therefore, define the topology for L1 D-cache, L1 I-cache, L2 cache and
-L3 cache in machine as the basic cache topology support.
+Add "l1d-cache", "l1i-cache". "l2-cache", and "l3-cache" options in
+-smp to define the cache topology for SMP system.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- hw/core/machine.c   |  5 +++++
- include/hw/boards.h | 25 +++++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+Changes since RFC v1:
+ * Set has_*_cache field in machine_get_smp(). (JeeHeng)
+ * Adjust string breaking style in error_setg() for more semantic
+   sentence breaking conventions. (Jonathan)
+ * Add more description about cache options. (Markus)
+ * Now in v2, config->*_cache field stores topology enumeration instead
+   of string, no need to parse, so just make machine_check_cache_topo()
+   return boolean.
+---
+ hw/core/machine-smp.c  | 146 +++++++++++++++++++++++++++++++++++++++++
+ hw/core/machine.c      |  20 ++++++
+ qapi/machine.json      |  23 ++++++-
+ system/vl.c            |  12 ++++
+ tests/unit/meson.build |   3 +-
+ 5 files changed, 202 insertions(+), 2 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 8087026b45da..e31d0f3cb4b0 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -1175,6 +1175,11 @@ static void machine_initfn(Object *obj)
-     ms->smp.cores = 1;
-     ms->smp.threads = 1;
- 
-+    ms->smp_cache.l1d = CPU_TOPO_LEVEL_INVALID;
-+    ms->smp_cache.l1i = CPU_TOPO_LEVEL_INVALID;
-+    ms->smp_cache.l2 = CPU_TOPO_LEVEL_INVALID;
-+    ms->smp_cache.l3 = CPU_TOPO_LEVEL_INVALID;
-+
-     machine_copy_boot_config(ms, &(BootConfiguration){ 0 });
+diff --git a/hw/core/machine-smp.c b/hw/core/machine-smp.c
+index 5d8d7edcbd3f..c79464cf3d2c 100644
+--- a/hw/core/machine-smp.c
++++ b/hw/core/machine-smp.c
+@@ -61,6 +61,150 @@ static char *cpu_hierarchy_to_string(MachineState *ms)
+     return g_string_free(s, false);
  }
  
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index c1737f2a5736..e70b2a1bdca2 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -10,6 +10,7 @@
- #include "qemu/module.h"
- #include "qom/object.h"
- #include "hw/core/cpu.h"
-+#include "hw/core/cpu-topology.h"
- 
- #define TYPE_MACHINE_SUFFIX "-machine"
- 
-@@ -145,6 +146,12 @@ typedef struct {
-  * @books_supported - whether books are supported by the machine
-  * @drawers_supported - whether drawers are supported by the machine
-  * @modules_supported - whether modules are supported by the machine
-+ * @l1_separated_cache_supported - whether l1 data and instruction cache
-+ *                                 topology are supported by the machine
-+ * @l2_unified_cache_supported - whether l2 unified cache topology are
-+ *                               supported by the machine
-+ * @l3_unified_cache_supported - whether l3 unified cache topology are
-+ *                               supported by the machine
-  */
- typedef struct {
-     bool prefer_sockets;
-@@ -154,6 +161,9 @@ typedef struct {
-     bool books_supported;
-     bool drawers_supported;
-     bool modules_supported;
-+    bool l1_separated_cache_supported;
-+    bool l2_unified_cache_supported;
-+    bool l3_unified_cache_supported;
- } SMPCompatProps;
- 
- /**
-@@ -359,6 +369,20 @@ typedef struct CPUTopology {
-     unsigned int max_cpus;
- } CPUTopology;
- 
-+/**
-+ * CPUTopology:
-+ * @l1d: the CPU topology hierarchy the L1 data cache is shared at.
-+ * @l1i: the CPU topology hierarchy the L1 instruction cache is shared at.
-+ * @l2: the CPU topology hierarchy the L2 (unified) cache is shared at.
-+ * @l3: the CPU topology hierarchy the L3 (unified) cache is shared at.
-+ */
-+typedef struct CacheTopology {
-+    CPUTopoLevel l1d;
-+    CPUTopoLevel l1i;
-+    CPUTopoLevel l2;
-+    CPUTopoLevel l3;
-+} CacheTopology;
++static bool machine_check_topo_support(MachineState *ms,
++                                       CPUTopoLevel topo)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
 +
- /**
-  * MachineState:
-  */
-@@ -410,6 +434,7 @@ struct MachineState {
-     AccelState *accelerator;
-     CPUArchIdList *possible_cpus;
-     CPUTopology smp;
-+    CacheTopology smp_cache;
-     struct NVDIMMState *nvdimms_state;
-     struct NumaState *numa_state;
- };
++    if (topo == CPU_TOPO_LEVEL_MODULE && !mc->smp_props.modules_supported) {
++        return false;
++    }
++
++    if (topo == CPU_TOPO_LEVEL_CLUSTER && !mc->smp_props.clusters_supported) {
++        return false;
++    }
++
++    if (topo == CPU_TOPO_LEVEL_DIE && !mc->smp_props.dies_supported) {
++        return false;
++    }
++
++    if (topo == CPU_TOPO_LEVEL_BOOK && !mc->smp_props.books_supported) {
++        return false;
++    }
++
++    if (topo == CPU_TOPO_LEVEL_DRAWER && !mc->smp_props.drawers_supported) {
++        return false;
++    }
++
++    return true;
++}
++
++static bool machine_check_cache_topo(MachineState *ms,
++                                     CPUTopoLevel topo,
++                                     Error **errp)
++{
++    if (topo == CPU_TOPO_LEVEL__MAX || topo == CPU_TOPO_LEVEL_INVALID) {
++        error_setg(errp,
++                   "Invalid cache topology level: %s. "
++                   "The cache topology should match the "
++                   "valid CPU topology level",
++                   cpu_topo_to_string(topo));
++        return false;
++    }
++
++    if (!machine_check_topo_support(ms, topo)) {
++        error_setg(errp,
++                   "Invalid cache topology level: %s. "
++                   "The topology level is not supported by this machine",
++                   cpu_topo_to_string(topo));
++        return false;
++    }
++
++    return true;
++}
++
++static void machine_parse_smp_cache_config(MachineState *ms,
++                                           const SMPConfiguration *config,
++                                           Error **errp)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++
++    /*
++     * The cache topology does not support a default entry similar to
++     * CPU topology with parameters=1. So when the machine explicitly
++     * does not support cache topology, return the error.
++     */
++    if (config->has_l1d_cache) {
++        if (!mc->smp_props.l1_separated_cache_supported) {
++            error_setg(errp,
++                       "L1 D-cache topology not supported by this machine");
++            return;
++        }
++
++        if (!machine_check_cache_topo(ms, config->l1d_cache, errp)) {
++            return;
++        }
++
++        ms->smp_cache.l1d = config->l1d_cache;
++    }
++
++    if (config->has_l1i_cache) {
++        if (!mc->smp_props.l1_separated_cache_supported) {
++            error_setg(errp,
++                       "L1 I-cache topology not supported by this machine");
++            return;
++        }
++
++        if (!machine_check_cache_topo(ms, config->l1i_cache, errp)) {
++            return;
++        }
++
++        ms->smp_cache.l1i = config->l1i_cache;
++    }
++
++    if (config->has_l2_cache) {
++        if (!mc->smp_props.l2_unified_cache_supported) {
++            error_setg(errp,
++                       "L2 cache topology not supported by this machine");
++            return;
++        }
++
++        if (!machine_check_cache_topo(ms, config->l2_cache, errp)) {
++            return;
++        }
++
++        ms->smp_cache.l2 = config->l2_cache;
++
++        /*
++         * Cache topology is initialized by default to CPU_TOPO_LEVEL_INVALID,
++         * which is the lowest level, so such a check is OK, even if the config
++         * doesn't override that field.
++         */
++        if (ms->smp_cache.l1d > ms->smp_cache.l2 ||
++            ms->smp_cache.l1i > ms->smp_cache.l2) {
++            error_setg(errp,
++                       "Invalid L2 cache topology. "
++                       "L2 cache topology level should not be lower than "
++                       "L1 D-cache/L1 I-cache");
++            return;
++        }
++    }
++
++    if (config->has_l3_cache) {
++        if (!mc->smp_props.l2_unified_cache_supported) {
++            error_setg(errp,
++                       "L3 cache topology not supported by this machine");
++            return;
++        }
++
++        if (!machine_check_cache_topo(ms, config->l3_cache, errp)) {
++            return;
++        }
++
++        ms->smp_cache.l3 = config->l3_cache;
++
++        if (ms->smp_cache.l1d > ms->smp_cache.l3 ||
++            ms->smp_cache.l1i > ms->smp_cache.l3 ||
++            ms->smp_cache.l2 > ms->smp_cache.l3) {
++            error_setg(errp,
++                       "Invalid L3 cache topology. "
++                       "L3 cache topology level should not be lower than "
++                       "L1 D-cache/L1 I-cache/L2 cache");
++            return;
++        }
++    }
++}
++
+ /*
+  * machine_parse_smp_config: Generic function used to parse the given
+  *                           SMP configuration
+@@ -259,6 +403,8 @@ void machine_parse_smp_config(MachineState *ms,
+                    mc->name, mc->max_cpus);
+         return;
+     }
++
++    machine_parse_smp_cache_config(ms, config, errp);
+ }
+ 
+ unsigned int machine_topo_get_cores_per_socket(const MachineState *ms)
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index e31d0f3cb4b0..f705485f83c0 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -900,6 +900,26 @@ static void machine_get_smp(Object *obj, Visitor *v, const char *name,
+         .has_maxcpus = true, .maxcpus = ms->smp.max_cpus,
+     };
+ 
++    if (ms->smp_cache.l1d != CPU_TOPO_LEVEL_INVALID) {
++        config->has_l1d_cache = true;
++        config->l1d_cache = ms->smp_cache.l1d;
++    }
++
++    if (ms->smp_cache.l1i != CPU_TOPO_LEVEL_INVALID) {
++        config->has_l1i_cache = true;
++        config->l1i_cache = ms->smp_cache.l1i;
++    }
++
++    if (ms->smp_cache.l2 != CPU_TOPO_LEVEL_INVALID) {
++        config->has_l2_cache = true;
++        config->l2_cache = ms->smp_cache.l2;
++    }
++
++    if (ms->smp_cache.l3 != CPU_TOPO_LEVEL_INVALID) {
++        config->has_l3_cache = true;
++        config->l3_cache = ms->smp_cache.l3;
++    }
++
+     if (!visit_type_SMPConfiguration(v, name, &config, &error_abort)) {
+         return;
+     }
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 7ac5a05bb9c9..8fa5af69b1bf 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -1746,6 +1746,23 @@
+ #
+ # @threads: number of threads per core
+ #
++# @l1d-cache: topology hierarchy of L1 data cache. It accepts the CPU
++#     topology enumeration as the parameter, i.e., CPUs in the same
++#     topology container share the same L1 data cache. (since 9.1)
++#
++# @l1i-cache: topology hierarchy of L1 instruction cache. It accepts
++#     the CPU topology enumeration as the parameter, i.e., CPUs in the
++#     same topology container share the same L1 instruction cache.
++#     (since 9.1)
++#
++# @l2-cache: topology hierarchy of L2 unified cache. It accepts the CPU
++#     topology enumeration as the parameter, i.e., CPUs in the same
++#     topology container share the same L2 unified cache. (since 9.1)
++#
++# @l3-cache: topology hierarchy of L3 unified cache. It accepts the CPU
++#     topology enumeration as the parameter, i.e., CPUs in the same
++#     topology container share the same L3 unified cache. (since 9.1)
++#
+ # Since: 6.1
+ ##
+ { 'struct': 'SMPConfiguration', 'data': {
+@@ -1758,7 +1775,11 @@
+      '*modules': 'int',
+      '*cores': 'int',
+      '*threads': 'int',
+-     '*maxcpus': 'int' } }
++     '*maxcpus': 'int',
++     '*l1d-cache': 'CPUTopoLevel',
++     '*l1i-cache': 'CPUTopoLevel',
++     '*l2-cache': 'CPUTopoLevel',
++     '*l3-cache': 'CPUTopoLevel' } }
+ 
+ ##
+ # @x-query-irq:
+diff --git a/system/vl.c b/system/vl.c
+index a3eede5fa5b8..c7c94d41bd01 100644
+--- a/system/vl.c
++++ b/system/vl.c
+@@ -753,6 +753,18 @@ static QemuOptsList qemu_smp_opts = {
+         }, {
+             .name = "maxcpus",
+             .type = QEMU_OPT_NUMBER,
++        }, {
++            .name = "l1d-cache",
++            .type = QEMU_OPT_STRING,
++        }, {
++            .name = "l1i-cache",
++            .type = QEMU_OPT_STRING,
++        }, {
++            .name = "l2-cache",
++            .type = QEMU_OPT_STRING,
++        }, {
++            .name = "l3-cache",
++            .type = QEMU_OPT_STRING,
+         },
+         { /*End of list */ }
+     },
+diff --git a/tests/unit/meson.build b/tests/unit/meson.build
+index 26c109c968ce..8877dbbc00c9 100644
+--- a/tests/unit/meson.build
++++ b/tests/unit/meson.build
+@@ -138,7 +138,8 @@ if have_system
+     'test-util-sockets': ['socket-helpers.c'],
+     'test-base64': [],
+     'test-bufferiszero': [],
+-    'test-smp-parse': [qom, meson.project_source_root() / 'hw/core/machine-smp.c'],
++    'test-smp-parse': [qom, meson.project_source_root() / 'hw/core/machine-smp.c',
++                       meson.project_source_root() / 'hw/core/cpu-topology.c'],
+     'test-vmstate': [migration, io],
+     'test-yank': ['socket-helpers.c', qom, io, chardev]
+   }
 -- 
 2.34.1
 
