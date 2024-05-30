@@ -1,75 +1,79 @@
-Return-Path: <kvm+bounces-18402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18405-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97E558D4A34
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:18:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5EA28D4A39
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAEFA1C20A93
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:18:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FEB42827A7
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B243B17E46D;
-	Thu, 30 May 2024 11:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D9617FAAC;
+	Thu, 30 May 2024 11:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V/zkpIDV"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2bnEgYDF"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2056.outbound.protection.outlook.com [40.107.223.56])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2053.outbound.protection.outlook.com [40.107.94.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E598171658
-	for <kvm@vger.kernel.org>; Thu, 30 May 2024 11:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC74F17D352
+	for <kvm@vger.kernel.org>; Thu, 30 May 2024 11:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717067817; cv=fail; b=L4NK9dv6q8hc3ak/a4nF1zU1VsRo47gjZ9cwffh4Vhq+++0NIpUi/uz/axSBaOySEQgFZz9H8NSzePLK8HMBBO8zh2dq5tXKd1hi4w8zt3f+kbm4y/qhvPq7CkDeZhXVCmb/nxdD8wzen+42iZxE3G4IRPcaBWrfq62dE1M9hVE=
+	t=1717067820; cv=fail; b=giFFejccGhgrPb8PfueMV30fowKu0tzvDH7kg2Rex8vdjKNLYtDwmOOp5tZb3k8Rf0rBKnj9k04c3wMulVZM//VFYxAOvbVLvchdYlqHmZmoMvFhwccWLmQXlSt2OV7fM5+E+35+Oq7mRu3xB4tM55SR4Gk+da19xMUByyAYtBo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717067817; c=relaxed/simple;
-	bh=5aZt+CHlBJLu84arZWJL/fAUg+05ZGyWQPlwCsGfgq4=;
+	s=arc-20240116; t=1717067820; c=relaxed/simple;
+	bh=ojqv6/oXEnyhA2IUP0tV0HMwD9JwQksvBmmv1dNLvIk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lYnlMARny+rZcoezWHRoSgvybZyb7MMujN7B4hfOoMBDZsViM0R677B+ZnxnqrXwOv9lAGiy1rXGOE5/AW0Xa3EE5iJQa8bCLnBaUWOVLQ/t8BaGK703UxqFEvox3j0L9mlrDOxXulo+94mcBYWvj7/sWhFYl0u+5l4DcFI/YcY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=V/zkpIDV; arc=fail smtp.client-ip=40.107.223.56
+	 MIME-Version:Content-Type; b=SiKClxWYLasSjlFCHD5P9sqmi5wD/yVoMcJSWA+/WXsimgCQfEj/6G8UZ00Xpe/LAE8xbU6frbhK/HqDk3xa9yIvzolVM6+xaypnIJ0zH1tfFLOOiPaWNqIigH2xd1iEhzrPwPmujjqtd0NZLOLaL0k3/HQffsVMKGFXKz3qwHw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2bnEgYDF; arc=fail smtp.client-ip=40.107.94.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fmOdtJt2gRyCeg2vfp4TTZB4sgev4CkAzFJx63V3IWjVvgDHRvkIdp0oNPZxPA1/eGO03w7BGKZY463V0VUvJdlCHJOnrpoi+R8jwMroyUngq7OtvOE87IQc4TFfCrK6XEnNeEZKP8Cekvo9xEkZFykXHMBlUIyt/EUwrDQilmH0gtVHhDI81T+OAuVTa5f5zT3NbbijUtg56MHOcWM5A2yviI6LV5Ml+p2VQ+9j2SnMaREvjDTyo1mR4bNgenAJZuP2Sby4hmxsEroWQEvgsFShtExtNwLwTXRJVkDVY161VtYcdFkUP3sTTduHxevhOcrA37Y5k4jxrkfA1plLzQ==
+ b=m6q2GJnwhzU9+iE9504rzXfazGKW71gvVTu91bw4C6WE6P1+S0JAOrn8AB9ugjmUwwpXxaQA8m/0t3EpPNepe0VDXn64UnYj8JlbuBq8M3AO/Ut9oMV5Hz9cRu8xqPpt0xH0XY+p769Xi9NY50jAmH3kcILAi0hKfdGYgO7DeNwoERQ0GBrUXclEyC83qlDC6LdbzAO9SDMR8atnV/YE6WZH2e9vAqAzQv8dEo70mPXqKBUuwTCry9Z0IWolwwmVIEpMRzpcoZakMOUvsK6TuOqYwatwQzkMINAd62uKwVEf9hi54srgx+eI3QdM3/jn4any9aeCEdSsdfL3A9kFNQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jPt2T6cryWo9KjhitSay5ciELP8aw3+zeHDLWWGJf2A=;
- b=dyxfglWpHJPzHg50hHES/aL8UdTwMW5Udcz6hlGHi/VbRVnayYn7yIrf7a0joE1TvQIcV5Pr3/y4ah6lAJaK/Y9pxyrrlYl7UVkboS+/0kTeN9qn+mR4wBBrPM19PSn/ozJ/gNRPDP3jNRtDr7zmAgoysRRoquOzECV44E94Yw85xA9AnGdjCRimh5t0Hc+J5WST07mg90joalW4AY0EG2NZmZLytgI6Pnfcumi8Qor+8NDsn7TpIbSRmb1Q1pABvoeIZsdLt09zdieOgud+ZeTEvOFdQmJWf86FIWN4bFYzpMgtPwLqEMEm2V1suQDLv0hUimwLmLxM6NK4sScNfg==
+ bh=i4N2QE8nZbmvRULIPkR4fibQE16sS5tOuiopYo9eqHo=;
+ b=F85KuEOqfS180uX7+E5E7uk+SxUcgxMGJihzFiEztOUJ0ccfGrUT2Wc+4i9v5pcg8Sxw0Bpg10Ce0C0ovM4L95+ysHupqNgN2kyxVpigJg7zW99uDZGlyrXmgL8KKy9ewqEg7W99SreCiRO0RRVaVQDFG4nlSgKja47qvkLExP1PZSPkuTXCfmCdtMdqhgWzIsdEwrzlHkPfeEGOBVDPO2BpLKC5YV/g476yglJZX/3Yb/5ST/sJZtU8dhHF/0Sb2OA58HrXUOLTorgCjX4fU1lB86mqBENyyjwalPs1uvjKDcBQHKV+XSmHoTcpt61yP3D99dujxEgtQ9abWAcdeA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jPt2T6cryWo9KjhitSay5ciELP8aw3+zeHDLWWGJf2A=;
- b=V/zkpIDVw0/MgSn5Z6d8H5L1J50UElIqECdrhQ6Ch5DQpJrlDBJ4FXKNRrjY4AINKu40TKwliqx+0vaUcKm2C7292laXT+SPLPjxq9FImmaIcDmkSsLhWcBC7VQypWQh1RE84I9GEpI79of1csjEpPJ7wn0SJR+BxFbkQ7jffWQ=
-Received: from BL1PR13CA0112.namprd13.prod.outlook.com (2603:10b6:208:2b9::27)
- by SJ2PR12MB8009.namprd12.prod.outlook.com (2603:10b6:a03:4c7::10) with
+ bh=i4N2QE8nZbmvRULIPkR4fibQE16sS5tOuiopYo9eqHo=;
+ b=2bnEgYDFfTt8NYicbr9GGHHEdgCccv71pnCMnLT2r/AucMYyOpUWbIZpG0haKoLMN/mVmannldBYPiMnhH6hkhiVrjSOZB61lagMp+R7s6Bes+MWpwleWc/RqPwwO6RQQgdEjAM7fkdHqOsZYLuPzjvZkMhmzMQ/LjiqVWJu7nQ=
+Received: from BN1PR14CA0021.namprd14.prod.outlook.com (2603:10b6:408:e3::26)
+ by SJ1PR12MB6051.namprd12.prod.outlook.com (2603:10b6:a03:48a::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7611.33; Thu, 30 May
- 2024 11:16:53 +0000
-Received: from BN3PEPF0000B072.namprd04.prod.outlook.com
- (2603:10b6:208:2b9:cafe::ac) by BL1PR13CA0112.outlook.office365.com
- (2603:10b6:208:2b9::27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Thu, 30 May
+ 2024 11:16:54 +0000
+Received: from BN2PEPF00004FBC.namprd04.prod.outlook.com
+ (2603:10b6:408:e3:cafe::ef) by BN1PR14CA0021.outlook.office365.com
+ (2603:10b6:408:e3::26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.20 via Frontend
- Transport; Thu, 30 May 2024 11:16:53 +0000
+ Transport; Thu, 30 May 2024 11:16:54 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B072.mail.protection.outlook.com (10.167.243.117) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ BN2PEPF00004FBC.mail.protection.outlook.com (10.167.243.182) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7633.15 via Frontend Transport; Thu, 30 May 2024 11:16:53 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.7633.15 via Frontend Transport; Thu, 30 May 2024 11:16:54 +0000
+Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
- 2024 06:16:52 -0500
+ 2024 06:16:53 -0500
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
+ (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
+ 2024 06:16:53 -0500
 Received: from pankaj-M75q.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
  Transport; Thu, 30 May 2024 06:16:52 -0500
@@ -79,9 +83,9 @@ CC: <brijesh.singh@amd.com>, <dovmurik@linux.ibm.com>, <armbru@redhat.com>,
 	<michael.roth@amd.com>, <xiaoyao.li@intel.com>, <pbonzini@redhat.com>,
 	<thomas.lendacky@amd.com>, <isaku.yamahata@intel.com>, <berrange@redhat.com>,
 	<kvm@vger.kernel.org>, <anisinha@redhat.com>, <pankaj.gupta@amd.com>
-Subject: [PATCH v4 13/31] i386/sev: Add a class method to determine KVM VM type for SNP guests
-Date: Thu, 30 May 2024 06:16:25 -0500
-Message-ID: <20240530111643.1091816-14-pankaj.gupta@amd.com>
+Subject: [PATCH v4 14/31] i386/sev: Update query-sev QAPI format to handle SEV-SNP
+Date: Thu, 30 May 2024 06:16:26 -0500
+Message-ID: <20240530111643.1091816-15-pankaj.gupta@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240530111643.1091816-1-pankaj.gupta@amd.com>
 References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
@@ -93,156 +97,276 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB04.amd.com: pankaj.gupta@amd.com does not
+Received-SPF: None (SATLEXMB05.amd.com: pankaj.gupta@amd.com does not
  designate permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B072:EE_|SJ2PR12MB8009:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4bf1467-3181-4306-1595-08dc809a0240
+X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBC:EE_|SJ1PR12MB6051:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8e57bc75-3b5a-467b-1d08-08dc809a02dd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|376005|36860700004|1800799015|82310400017;
+	BCL:0;ARA:13230031|376005|36860700004|82310400017|1800799015;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LP/HBjsh9aYyauFMNmFy4uLVEgmc3/S/imfQxSCt7xCQ1wxBU6SRQMfOj7lc?=
- =?us-ascii?Q?isXhMMO6ppmvq6FxbYYJ5Vv+j68Xyu1npu9SrDOJPNJhDPOuHK6zd0e5GfZZ?=
- =?us-ascii?Q?pZPPcj4rp0wZ16Lb+0HKadk9ihpRTn0nWr0KNC1fGV+EuKLZ17MEJhEoWxSt?=
- =?us-ascii?Q?gqs6GPPZj/kpGDefwE4c5t+Y6RuKQpcx20zuj5HvrmUPe53emnJ2FkwMi6a0?=
- =?us-ascii?Q?7eQvNtxvNPwxtXdXNNGBRDhxR90vwezDmVTHGbhgorjVJNBYeKPV2HvXrV4U?=
- =?us-ascii?Q?TVrmmDX1w7c/cLcuip0oDzcQl5VBpbHyQgTLwpf03E9cuHgFlIm1y1Izmztc?=
- =?us-ascii?Q?utnH9hX+Y0Uf2fKm1LlVEGj/7LnPRJSOW6UdqNVNsyF3aDHqOGxdQRKGoXh7?=
- =?us-ascii?Q?KvFEB2tS74/ob6+gIP+82HTndUXARyZt7+Y0D2haNYR9CLpTS726ADoh02Qu?=
- =?us-ascii?Q?JtD1y+lQZtB8gt2aQfBcdkjBYfzMC9MCFhP7CczYvUUaTdSa4h6CZgdEAC15?=
- =?us-ascii?Q?nVHW+bndkKkkBhpySwOQXre2hMRwB9ySEWV/dQB4GDFlJNxN+A0S9bAD/NuT?=
- =?us-ascii?Q?48lM6H2mvEVRAf8BWzpoLGc9Ebuup+x37EvLF5WwhIPNCndyiq75kd57fDpI?=
- =?us-ascii?Q?6ZSbLMxIZw+AQJNR43KZPcaS5M40WvNrOoCXuQbqFOfB2ZK95ZQcfhbxbn5R?=
- =?us-ascii?Q?1aa4xDdeeR1B/WY+9gEwwfcTdIFArMxyChtqv5tTYQ9265o9rw+1wX32PO4F?=
- =?us-ascii?Q?ysNNkz0Wy7Q8oJx0WW04qeDPwciVu2Tcfp32P+f84j+OUZM19BCUrMp7eTF1?=
- =?us-ascii?Q?V4IpfoqfCyUSHq0hMYHElZyDeQc0bL4wo8d1FWTwUUsgiGjvnx/DQeV9PNT1?=
- =?us-ascii?Q?XJFZW1e7ZBOZgyiMzfodQB2T1qSoJEd/9QED9MXL0p5pn4IT8TRTSVnceHbl?=
- =?us-ascii?Q?Q5ODIxwzGlt3doQPhsAPPP63lrrwVKK7aB0rMAeT0SddiL9sLYB0zulaZuQX?=
- =?us-ascii?Q?+dBd9sgncJ+eBDaTN2oyE9M/j0NYnFRDAu9z8k+oYEdyBjzWWkuSQ0YhNxdI?=
- =?us-ascii?Q?FI2jysxtSOiZzJ3ssy/rd8TC6For/qujV9L2lKsMy5K2oAQLf2lOIULroUjE?=
- =?us-ascii?Q?XWwwSYCHNjB+sgqwwgjiItAzsGQPe9IR/HQE5es7kbauvpL3UsvFHS17KEDv?=
- =?us-ascii?Q?tmkdp0xGJ5Dd1TtwvTWLMcG9ueYXMAC4dToTqMQCap2jwTIjTpFWnV5tNqfm?=
- =?us-ascii?Q?tycMJ9zGb74fZAp+QClbU39nvfBS2cbHz+8r1IcekhwyKYfP8j49MnM0M1+f?=
- =?us-ascii?Q?L81dyfSYOWTjTiUxjU3M8ynPNv8yVhYY4WTwf1SsHTD13Mii0sZTpHR8AVEH?=
- =?us-ascii?Q?ui5CPno=3D?=
+	=?us-ascii?Q?CnVdhMeEzTFTxQh63AGoFkV+ajxQaxYTUcumdx8Oic3ml9rrYFHeYU3x2UGU?=
+ =?us-ascii?Q?1iZAPjwdA4dzGM3Zyopk2kOAWC8sgIbYKZINCnJK+GfZ0I75E82A/mF9h2IR?=
+ =?us-ascii?Q?zgu2Jfy3mQjCbVwdqYaSt79RwwPH9F9U9XV0cd+rL1p67sRITCdM5KnJStWU?=
+ =?us-ascii?Q?Zm+oo2Dh0sCjLqxWCLGKcS0fjIDAvbZR31iHDX/8bdYFxfwfbWItoWX2+732?=
+ =?us-ascii?Q?WJ8/JAodqxcpNri5ApCeCoSk1v54j0h6bqjG6zwqFCA5Uk5TGDbmTndpjZPf?=
+ =?us-ascii?Q?YF0UbulfhS0KJ3pGnf4yHlS/kA9TH9QtU/rglXIzx7FdlgxxfVkcj711QHg5?=
+ =?us-ascii?Q?tPBZzWWvxqzq+l5Gj1kj4EmfqAwGbXJTHQDE92zWMLmk/EPW6HwH3gbrnI3I?=
+ =?us-ascii?Q?KGH40W7YCtaq/aGRUieXK+TE5cN+tSwZUVoeQUPPc7+UZGwHBTcSSXM5/4GZ?=
+ =?us-ascii?Q?6M4hCq2QgvjIt1mTIhbx6RWI/unPbYnS8iG0rkSc2k68x7ah2tyxdBRlJ/4q?=
+ =?us-ascii?Q?RICwtKolXgpLzmF9o7T++V+zymVPy4/ayQgEykx7/F+E3UIeNCNVa/5vtVVN?=
+ =?us-ascii?Q?E5hkRJUiWm09KkwGHhYz3l2GwJNbuTC3LAX61/RvrlgxaRI4kt4/+Vixx1D2?=
+ =?us-ascii?Q?RsbgEYZ1rRlHcKE2PLMn7Yl3oyUWG9X6EBSfbbDalJ+DQdN4mMpK21c6App+?=
+ =?us-ascii?Q?4m2Q/lpxwOeV/ri6PQ1MU+Vac1g6SG2+c0CuFTmVjhZOvq00/kW5YiCir1uJ?=
+ =?us-ascii?Q?NaNAjd5a5QcFD67K49kqc0kKtqrgsS6Fdjwv1tu1cpQ/HDGLdJ5KJ3+6gjCs?=
+ =?us-ascii?Q?BmrsDqvaRXPdRfQJCl6Qj/VdYWXyDCa3W3mWBRL9Lb8YIdcp1JsJ5StNCs80?=
+ =?us-ascii?Q?FNRPEtXGLU0GnIruHJKgRgAro01By8yMwG4tVgAO9Xck0jRB3XOrajNZCJgX?=
+ =?us-ascii?Q?ZVxhJXPU/DN7q7nxcPIgJL1zNPvkdttOrtjzglAWaEsI8vaQrjtIxlRaAfvn?=
+ =?us-ascii?Q?xU0x5dcWV0aI6+owvzjj1NwKfgaa7CuLlf5wq1a+EiF8aRpD0ZavBnfsCLnA?=
+ =?us-ascii?Q?/KpWEK6QhR60HCv2BQER9Ewx2SbpyQHe4vyVS7vDEJymZ7MZJMhmy2reZ1ji?=
+ =?us-ascii?Q?/08BJbbUZteHoKqsMf+BdGnPhNygCzM4fl0NCdtcZGT+Afy5/gIEP4YROI1K?=
+ =?us-ascii?Q?1yVQuG71adkZujy1VmBqtW+66tCjEFfJP7YQtR6QGmTA5CmIDv40HvBBb5Pj?=
+ =?us-ascii?Q?fODoEdrhXaQdzT75MPYdpFi4FqfbHb4dE3bLRjxWiwArlSaFmlL8myRXKyXb?=
+ =?us-ascii?Q?54wciKuGLTiGaUCmHQ5FmxU/ebVLIRi1+26jRsMc1GbfwTxfTnPDQux/bHMb?=
+ =?us-ascii?Q?fnUcPXZkdCAGEqPovCoW8x4Yg6Sr?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(1800799015)(82310400017);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400017)(1800799015);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:16:53.0372
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:16:54.0663
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4bf1467-3181-4306-1595-08dc809a0240
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8e57bc75-3b5a-467b-1d08-08dc809a02dd
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B072.namprd04.prod.outlook.com
+	BN2PEPF00004FBC.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8009
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6051
 
-SEV guests can use either KVM_X86_DEFAULT_VM, KVM_X86_SEV_VM,
-or KVM_X86_SEV_ES_VM depending on the configuration and what
-the host kernel supports. SNP guests on the other hand can only
-ever use KVM_X86_SNP_VM, so split determination of VM type out
-into a separate class method that can be set accordingly for
-sev-guest vs. sev-snp-guest objects and add handling for SNP.
+From: Michael Roth <michael.roth@amd.com>
 
+Most of the current 'query-sev' command is relevant to both legacy
+SEV/SEV-ES guests and SEV-SNP guests, with 2 exceptions:
+
+  - 'policy' is a 64-bit field for SEV-SNP, not 32-bit, and
+    the meaning of the bit positions has changed
+  - 'handle' is not relevant to SEV-SNP
+
+To address this, this patch adds a new 'sev-type' field that can be
+used as a discriminator to select between SEV and SEV-SNP-specific
+fields/formats without breaking compatibility for existing management
+tools (so long as management tools that add support for launching
+SEV-SNP guest update their handling of query-sev appropriately).
+
+The corresponding HMP command has also been fixed up similarly.
+
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+Co-developed-by:Pankaj Gupta <pankaj.gupta@amd.com>
 Signed-off-by: Pankaj Gupta <pankaj.gupta@amd.com>
 ---
- target/i386/sev.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ qapi/misc-target.json | 72 ++++++++++++++++++++++++++++++++++---------
+ target/i386/sev.c     | 55 +++++++++++++++++++++------------
+ target/i386/sev.h     |  3 ++
+ 3 files changed, 96 insertions(+), 34 deletions(-)
 
+diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+index 4e0a6492a9..2d7d4d89bd 100644
+--- a/qapi/misc-target.json
++++ b/qapi/misc-target.json
+@@ -47,6 +47,50 @@
+            'send-update', 'receive-update' ],
+   'if': 'TARGET_I386' }
+ 
++##
++# @SevGuestType:
++#
++# An enumeration indicating the type of SEV guest being run.
++#
++# @sev: The guest is a legacy SEV or SEV-ES guest.
++#
++# @sev-snp: The guest is an SEV-SNP guest.
++#
++# Since: 6.2
++##
++{ 'enum': 'SevGuestType',
++  'data': [ 'sev', 'sev-snp' ],
++  'if': 'TARGET_I386' }
++
++##
++# @SevGuestInfo:
++#
++# Information specific to legacy SEV/SEV-ES guests.
++#
++# @policy: SEV policy value
++#
++# @handle: SEV firmware handle
++#
++# Since: 2.12
++##
++{ 'struct': 'SevGuestInfo',
++  'data': { 'policy': 'uint32',
++            'handle': 'uint32' },
++  'if': 'TARGET_I386' }
++
++##
++# @SevSnpGuestInfo:
++#
++# Information specific to SEV-SNP guests.
++#
++# @snp-policy: SEV-SNP policy value
++#
++# Since: 9.1
++##
++{ 'struct': 'SevSnpGuestInfo',
++  'data': { 'snp-policy': 'uint64' },
++  'if': 'TARGET_I386' }
++
+ ##
+ # @SevInfo:
+ #
+@@ -60,25 +104,25 @@
+ #
+ # @build-id: SEV FW build id
+ #
+-# @policy: SEV policy value
+-#
+ # @state: SEV guest state
+ #
+-# @handle: SEV firmware handle
++# @sev-type: Type of SEV guest being run
+ #
+ # Since: 2.12
+ ##
+-{ 'struct': 'SevInfo',
+-    'data': { 'enabled': 'bool',
+-              'api-major': 'uint8',
+-              'api-minor' : 'uint8',
+-              'build-id' : 'uint8',
+-              'policy' : 'uint32',
+-              'state' : 'SevState',
+-              'handle' : 'uint32'
+-            },
+-  'if': 'TARGET_I386'
+-}
++{ 'union': 'SevInfo',
++  'base': { 'enabled': 'bool',
++            'api-major': 'uint8',
++            'api-minor' : 'uint8',
++            'build-id' : 'uint8',
++            'state' : 'SevState',
++            'sev-type' : 'SevGuestType' },
++  'discriminator': 'sev-type',
++  'data': {
++      'sev': 'SevGuestInfo',
++      'sev-snp': 'SevSnpGuestInfo' },
++  'if': 'TARGET_I386' }
++
+ 
+ ##
+ # @query-sev:
 diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 458ff5040d..8ca486f5d2 100644
+index 8ca486f5d2..101661bf71 100644
 --- a/target/i386/sev.c
 +++ b/target/i386/sev.c
-@@ -100,6 +100,9 @@ struct SevGuestState {
- 
- struct SevGuestStateClass {
-     SevCommonStateClass parent_class;
-+
-+    /* public */
-+    int (*kvm_type)(X86ConfidentialGuest *cg);
- };
- 
- struct SevSnpGuestState {
-@@ -117,6 +120,9 @@ struct SevSnpGuestState {
- 
- struct SevSnpGuestStateClass {
-     SevCommonStateClass parent_class;
-+
-+    /* public */
-+    int (*kvm_type)(X86ConfidentialGuest *cg);
- };
- 
- #define DEFAULT_GUEST_POLICY    0x1 /* disable debug */
-@@ -893,6 +899,11 @@ out:
-     return sev_common->kvm_type;
- }
- 
-+static int sev_snp_kvm_type(X86ConfidentialGuest *cg)
-+{
-+    return KVM_X86_SNP_VM;
-+}
-+
- static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+@@ -377,25 +377,27 @@ static SevInfo *sev_get_info(void)
  {
-     char *devname;
-@@ -902,6 +913,8 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
-     struct sev_user_data_status status = {};
-     SevCommonState *sev_common = SEV_COMMON(cgs);
-     SevCommonStateClass *klass = SEV_COMMON_GET_CLASS(cgs);
-+    X86ConfidentialGuestClass *x86_klass =
-+                               X86_CONFIDENTIAL_GUEST_GET_CLASS(cgs);
+     SevInfo *info;
+     SevCommonState *sev_common = SEV_COMMON(MACHINE(qdev_get_machine())->cgs);
+-    SevGuestState *sev_guest =
+-        (SevGuestState *)object_dynamic_cast(OBJECT(sev_common),
+-                                             TYPE_SEV_GUEST);
  
-     sev_common->state = SEV_STATE_UNINIT;
+     info = g_new0(SevInfo, 1);
+     info->enabled = sev_enabled();
  
-@@ -972,7 +985,7 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     if (info->enabled) {
+-        if (sev_guest) {
+-            info->handle = sev_guest->handle;
+-        }
+         info->api_major = sev_common->api_major;
+         info->api_minor = sev_common->api_minor;
+         info->build_id = sev_common->build_id;
+         info->state = sev_common->state;
+-        /* we only report the lower 32-bits of policy for SNP, ok for now... */
+-        info->policy =
+-            (uint32_t)object_property_get_uint(OBJECT(sev_common),
+-                                               "policy", NULL);
++
++        if (sev_snp_enabled()) {
++            info->sev_type = SEV_GUEST_TYPE_SEV_SNP;
++            info->u.sev_snp.snp_policy =
++                object_property_get_uint(OBJECT(sev_common), "policy", NULL);
++        } else {
++            info->sev_type = SEV_GUEST_TYPE_SEV;
++            info->u.sev.handle = SEV_GUEST(sev_common)->handle;
++            info->u.sev.policy =
++                (uint32_t)object_property_get_uint(OBJECT(sev_common),
++                                                   "policy", NULL);
++        }
      }
  
-     trace_kvm_sev_init();
--    if (sev_kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) == KVM_X86_DEFAULT_VM) {
-+    if (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) == KVM_X86_DEFAULT_VM) {
-         cmd = sev_es_enabled() ? KVM_SEV_ES_INIT : KVM_SEV_INIT;
- 
-         ret = sev_ioctl(sev_common->sev_fd, cmd, NULL, &fw_error);
-@@ -1451,10 +1464,8 @@ static void
- sev_common_class_init(ObjectClass *oc, void *data)
+     return info;
+@@ -418,20 +420,33 @@ void hmp_info_sev(Monitor *mon, const QDict *qdict)
  {
-     ConfidentialGuestSupportClass *klass = CONFIDENTIAL_GUEST_SUPPORT_CLASS(oc);
--    X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
+     SevInfo *info = sev_get_info();
  
-     klass->kvm_init = sev_common_kvm_init;
--    x86_klass->kvm_type = sev_kvm_type;
+-    if (info && info->enabled) {
+-        monitor_printf(mon, "handle: %d\n", info->handle);
+-        monitor_printf(mon, "state: %s\n", SevState_str(info->state));
+-        monitor_printf(mon, "build: %d\n", info->build_id);
+-        monitor_printf(mon, "api version: %d.%d\n",
+-                       info->api_major, info->api_minor);
++    if (!info || !info->enabled) {
++        monitor_printf(mon, "SEV is not enabled\n");
++        goto out;
++    }
++
++    monitor_printf(mon, "SEV type: %s\n", SevGuestType_str(info->sev_type));
++    monitor_printf(mon, "state: %s\n", SevState_str(info->state));
++    monitor_printf(mon, "build: %d\n", info->build_id);
++    monitor_printf(mon, "api version: %d.%d\n", info->api_major,
++                   info->api_minor);
++
++    if (sev_snp_enabled()) {
+         monitor_printf(mon, "debug: %s\n",
+-                       info->policy & SEV_POLICY_NODBG ? "off" : "on");
+-        monitor_printf(mon, "key-sharing: %s\n",
+-                       info->policy & SEV_POLICY_NOKS ? "off" : "on");
++                       info->u.sev_snp.snp_policy & SEV_SNP_POLICY_DBG ? "on"
++                                                                       : "off");
++        monitor_printf(mon, "SMT allowed: %s\n",
++                       info->u.sev_snp.snp_policy & SEV_SNP_POLICY_SMT ? "on"
++                                                                       : "off");
+     } else {
+-        monitor_printf(mon, "SEV is not enabled\n");
++        monitor_printf(mon, "handle: %d\n", info->u.sev.handle);
++        monitor_printf(mon, "debug: %s\n",
++                       info->u.sev.policy & SEV_POLICY_NODBG ? "off" : "on");
++        monitor_printf(mon, "key-sharing: %s\n",
++                       info->u.sev.policy & SEV_POLICY_NOKS ? "off" : "on");
+     }
  
-     object_class_property_add_str(oc, "sev-device",
-                                   sev_common_get_sev_device,
-@@ -1539,10 +1550,12 @@ static void
- sev_guest_class_init(ObjectClass *oc, void *data)
- {
-     SevCommonStateClass *klass = SEV_COMMON_CLASS(oc);
-+    X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
++out:
+     qapi_free_SevInfo(info);
+ }
  
-     klass->launch_start = sev_launch_start;
-     klass->launch_finish = sev_launch_finish;
-     klass->kvm_init = sev_kvm_init;
-+    x86_klass->kvm_type = sev_kvm_type;
+diff --git a/target/i386/sev.h b/target/i386/sev.h
+index 94295ee74f..5dc4767b1e 100644
+--- a/target/i386/sev.h
++++ b/target/i386/sev.h
+@@ -31,6 +31,9 @@
+ #define SEV_POLICY_DOMAIN       0x10
+ #define SEV_POLICY_SEV          0x20
  
-     object_class_property_add_str(oc, "dh-cert-file",
-                                   sev_guest_get_dh_cert_file,
-@@ -1781,8 +1794,10 @@ static void
- sev_snp_guest_class_init(ObjectClass *oc, void *data)
- {
-     SevCommonStateClass *klass = SEV_COMMON_CLASS(oc);
-+    X86ConfidentialGuestClass *x86_klass = X86_CONFIDENTIAL_GUEST_CLASS(oc);
- 
-     klass->kvm_init = sev_snp_kvm_init;
-+    x86_klass->kvm_type = sev_snp_kvm_type;
- 
-     object_class_property_add(oc, "policy", "uint64",
-                               sev_snp_guest_get_policy,
++#define SEV_SNP_POLICY_SMT      0x10000
++#define SEV_SNP_POLICY_DBG      0x80000
++
+ typedef struct SevKernelLoaderContext {
+     char *setup_data;
+     size_t setup_size;
 -- 
 2.34.1
 
