@@ -1,91 +1,87 @@
-Return-Path: <kvm+bounces-18415-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18420-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5DF8D4A49
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:19:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F18B88D4A4F
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 13:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64D80281FB2
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:19:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FF501F22426
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 11:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAC41822FD;
-	Thu, 30 May 2024 11:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE75183A84;
+	Thu, 30 May 2024 11:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="BmpF6A2W"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LcnQOpN7"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2053.outbound.protection.outlook.com [40.107.102.53])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2069.outbound.protection.outlook.com [40.107.93.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1941822CD
-	for <kvm@vger.kernel.org>; Thu, 30 May 2024 11:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F16183A61
+	for <kvm@vger.kernel.org>; Thu, 30 May 2024 11:17:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717067826; cv=fail; b=nAMqlfYy0EUg9fHB5pXzNGSHW++lAFrNBrJj5BTc/ueIG4R1aiFoLLeFbNjfTlDTXVawGsLWVYcd/vIIQK7hlISKClQEYwPsLnWEvUw2xjDb8mcRvW3ZcHpAL81IMMX8rcn1wGKFnazbN73QTq8C83DZyCShCg+d2gLjSySv8JE=
+	t=1717067834; cv=fail; b=oAIIYBaqoYpVstCD9inEh4Wxa0SV3R2GV0gzoa35L5dq6DDC1cAGi/wytXibdqLlPLJ7Q0FeR5NQwdiHZFEC4dh+6a7BwpvZcBrpMxzS8BDvGL48v/0xV2x7fysbhiL59u/bVql7XGVjoHNsbnD3RIVbORfXaYVgYzKDuoJMN+4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717067826; c=relaxed/simple;
-	bh=aCc4kG/GLQ467Vo3iqYG2jipQsEdf4KBy2m9NL7iqac=;
+	s=arc-20240116; t=1717067834; c=relaxed/simple;
+	bh=W515XK7kSrlQmu4G4GsiAjVd6l++ieoRjR9iNtjq+qg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uDP6mN25/YFjOdEPr84izaRFcmCcAoHmnQpz77SBvLE+dw96Ll8YKIftVCE7JOgdwL6WQiBTa5GPqy4MVtJmSkK6Rk4EIaAZnW1uper9EZv7S7+b392wBuLHHRhQTWqvDBsAn77riAJKm0MrgBebDmWRJHp0QmGUyUBldIyuR5g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=BmpF6A2W; arc=fail smtp.client-ip=40.107.102.53
+	 MIME-Version:Content-Type; b=nkt/R/XmkFin5LPySKfCSUKT+SFQmq1M9jqX9btNUu42t7GR+gYjMBisg+MDX6UcwueWYJt3/hUPQXr0Wuo67cRwPJrBoOSx2jdEd2Gnfa6eTa8ILbTYPFPKeFXk8ATYrhdUYFXP/joGq9YXmp5RIJC+S0dwkEjmEqK8XZNP9Jw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LcnQOpN7; arc=fail smtp.client-ip=40.107.93.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ikt3GdTpKCAHiLx8ozTxSpnzsMz9XNQbQ+4HK2d/j3k/9w1g9hF3RK9KtTL5wXC9TabHNSmm46avRbaISWq1qNTqaXdvrXQtkB8JMWgUtg15f//aIo0wP3AlW/JOl3oeQrn1V8dzOE2CDKe1VgbnYdiVXin4VZsDCPuFkvztP15hIbygYU1NZsMIQgAEH9nTsUzbVij30Ir9ogTuVsgMgUppio1MDWLJ6yhmWIk/XgWpvL8z+1iz2PQHayW6v6HtG2cBFonM48gA6NH5SBcJ5dWd8msuyz+icG/vVD5HpqW+/NVpkL3511g5rYSRIQwuBOtI73gEhAfpm0G5fwJHCw==
+ b=QVBy77h31i9uKs3hRYSQP9w2xcSCroDL9SRh90fTzmibgv4A0peMeW5/Uc2jXFEU4x9Bk8hk2Fmz+CnD1zFQ6u/gM8Nu0eLVzaeUjD9MJIiiYGUJylF6604yrP/T1riPhtdTlC836g9rpHOjIFqlik9YWRqtDVQ0MopdFftyon+Vf4QX39p3Z1O/Tdjkr2q8T1jG2bEeQ4WhuxZjOn1nXdy/anCG3bUfA5geG/U8of2x+8JQy/duHPkGxyhJ1h9s5PnnFWHCQqq6nhV2qu+aKo0qCWpJctF3KzOxGcW9CSrfuwVGiaiUuQU3gXGqxi9wFBB5Fz5jfFm+FKrtGK6XJw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E6lss2Hg9OxWRNKdJdzyXq7LJ3ceSxLzrC+ts+YdeIg=;
- b=h6e1dYB9yJ26hSZV0KdYD3YKfJ0sTlFYKv4rRqKRRUytmYqk+grtUsN9sHv3ARaugnv0nVA2PVEqxjm7sbHE1YvgTItPpeFGzLMDSIgYZeIEkZwP3xvyLqxHmbTWED+VUfp5x1ygkKDn1CCbZUV/+KeNxtd8cZVTtdCEFg5RoBk30cXfEsbPOriBxT5c/6q7xV+L1FwCg1TNMgQRiAby4GiXEAkynE1mNpvQq9Ura1U0kTl5cU2jGpQrsWzmux+sClVjl7eJmS6741lglr5Ap1eP6ccQx2q3/lKnmneXbStntvvTxsUMw5JObg5M1350ir5la34PFRW47p7GB9wcVg==
+ bh=gQmGneEGIQyCeB+hP5aEHRwAi8ISVe3UdrZExegunhA=;
+ b=ZNyMw2d22qlTrKS/YhiNgTaZydESplIAWHuchGeaC3xuZlJi3O4czt48+jcFXsBMf2g+yPyg3JMbNHSdwXTNJV0DptwyH7N0gFZ4TmybRfr2c0fOQt1s7cYe14WHq7ZMd4L7yZtOoPa65X7CC3cRpPcCLHwbHJC5DYgSDY+q+tJswBymIe4PKU8ihZM86Uu/kITIbuUFXLo7s7I3w/UhIHiVFxeeqfFoR4H/c5t0WvkW+W8+IfUVRo6LNKqTUfL1dtLTPZI7lHiv/hCXf8wcm4F6j731NB9N+H8uO8JgGcMa16rKr8WzkeXTTqlyNm4xHqLoF81JSJsHIz9NwnVhrg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=nongnu.org smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E6lss2Hg9OxWRNKdJdzyXq7LJ3ceSxLzrC+ts+YdeIg=;
- b=BmpF6A2WbnA1Chavg1NueMcHYoYAeJ6CMxnMXlgExfuRvBH7Gp1uWBO+PiKJlmOb7cfNV4VF1JYH0iWLsklAhtQbMjheyfUuYi5Hz6ve+i8Zb/0KJyYzVZSHPvN7iMKU+GluXKaFcuS5dHqqgo33h7I0Iquiur3hBlnvcNguLlg=
-Received: from BN9PR03CA0761.namprd03.prod.outlook.com (2603:10b6:408:13a::16)
- by PH7PR12MB6934.namprd12.prod.outlook.com (2603:10b6:510:1b8::17) with
+ bh=gQmGneEGIQyCeB+hP5aEHRwAi8ISVe3UdrZExegunhA=;
+ b=LcnQOpN7s8FCb7FeAQfJJEcX7tor0/nZcxMHZVbupN1Zp2DzGp+ogV6qRHRBMIIsWEiqzqCZIu1kcD2Vi7NW5kgp9wY1i743/Iw5bJKqX5hykVzKac31URhJv5szmIyMwSXM5IQ0SOjsRSpkp6sDXbYJes4oUWimNB9dx0XnDKA=
+Received: from BN9PR03CA0557.namprd03.prod.outlook.com (2603:10b6:408:138::22)
+ by DM4PR12MB7502.namprd12.prod.outlook.com (2603:10b6:8:112::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.19; Thu, 30 May
- 2024 11:17:02 +0000
-Received: from BN2PEPF00004FBF.namprd04.prod.outlook.com
- (2603:10b6:408:13a:cafe::e5) by BN9PR03CA0761.outlook.office365.com
- (2603:10b6:408:13a::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.17; Thu, 30 May
+ 2024 11:17:09 +0000
+Received: from BN3PEPF0000B076.namprd04.prod.outlook.com
+ (2603:10b6:408:138:cafe::9b) by BN9PR03CA0557.outlook.office365.com
+ (2603:10b6:408:138::22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.18 via Frontend
- Transport; Thu, 30 May 2024 11:17:01 +0000
+ Transport; Thu, 30 May 2024 11:17:09 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- BN2PEPF00004FBF.mail.protection.outlook.com (10.167.243.185) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN3PEPF0000B076.mail.protection.outlook.com (10.167.243.121) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7633.15 via Frontend Transport; Thu, 30 May 2024 11:17:01 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
- 2024 06:17:01 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.7633.15 via Frontend Transport; Thu, 30 May 2024 11:17:08 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
  2024 06:17:01 -0500
 Received: from pankaj-M75q.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 30 May 2024 06:17:00 -0500
+ Transport; Thu, 30 May 2024 06:17:01 -0500
 From: Pankaj Gupta <pankaj.gupta@amd.com>
 To: <qemu-devel@nongnu.org>
 CC: <brijesh.singh@amd.com>, <dovmurik@linux.ibm.com>, <armbru@redhat.com>,
 	<michael.roth@amd.com>, <xiaoyao.li@intel.com>, <pbonzini@redhat.com>,
 	<thomas.lendacky@amd.com>, <isaku.yamahata@intel.com>, <berrange@redhat.com>,
 	<kvm@vger.kernel.org>, <anisinha@redhat.com>, <pankaj.gupta@amd.com>
-Subject: [PATCH v4 27/31] hw/i386/sev: Use guest_memfd for legacy ROMs
-Date: Thu, 30 May 2024 06:16:39 -0500
-Message-ID: <20240530111643.1091816-28-pankaj.gupta@amd.com>
+Subject: [PATCH v4 28/31] hw/i386: Add support for loading BIOS using guest_memfd
+Date: Thu, 30 May 2024 06:16:40 -0500
+Message-ID: <20240530111643.1091816-29-pankaj.gupta@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240530111643.1091816-1-pankaj.gupta@amd.com>
 References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
@@ -97,140 +93,115 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB05.amd.com: pankaj.gupta@amd.com does not
+Received-SPF: None (SATLEXMB04.amd.com: pankaj.gupta@amd.com does not
  designate permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF00004FBF:EE_|PH7PR12MB6934:EE_
-X-MS-Office365-Filtering-Correlation-Id: b7e5f545-cf03-45b9-6b2b-08dc809a0779
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B076:EE_|DM4PR12MB7502:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59d19acf-2aca-4483-622d-08dc809a0b73
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|1800799015|82310400017|36860700004|376005;
+	BCL:0;ARA:13230031|36860700004|376005|1800799015|82310400017;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xMzsJqpZD+6+QHzbhcTR4Lhfd7l5Xvs2UObFprFDgpH4Pjs2qBLLOgv3m0rk?=
- =?us-ascii?Q?5bY7BKtl8+vVqBsS87oxHjw8LSjbRzFAR/1gagc5QZftN84bZeLtaN+/kpHQ?=
- =?us-ascii?Q?067C0TQ91Px5RCrDmUoi+I8migWgF33fV7IGUOpxX855c6yWKwhJI0Yrwyww?=
- =?us-ascii?Q?ctKhtyLLbMtamwU8bXtLwhsuNCbzURGyQtZOz6TpAi0zHt168CWp7hWgqTpi?=
- =?us-ascii?Q?At4tXgTaWvyA460zeInOw2unp9NbXtbCCy4KcjKzGRGkGEZXhmIm5GFDdp6U?=
- =?us-ascii?Q?BfKyidWpHBS4HnoBcRr34mqR0R3vr0EPYaVzuXRpemM/n+rZmhwvgs1yk5MJ?=
- =?us-ascii?Q?RpXble2+vfxX9luAVXpvhltWhK//86XMN0U3VL/G6TfRXBfR1y5FDnl0aMM7?=
- =?us-ascii?Q?tipMmhoKVZhdWQJndm/Mm36A0C1TZpOC0Y1StM8274EkWPyhbOggo3UKdKVP?=
- =?us-ascii?Q?sEVOPOqdRe7n94whYcBU7nrgEzGdtDOQkmOz2JBO52Rjx8D5eZCCbGgafSFV?=
- =?us-ascii?Q?6tiin/GtwygmgqaZ/SaX9cEFoLzT9DnoHQIlB/39qyEtk+A8qYgFzXRBU6v0?=
- =?us-ascii?Q?EYCUS6doVFzhgjj6nDxz/0d1kxsi/jbREoj4DOVZeObw592QlQcks+VdTvXK?=
- =?us-ascii?Q?rJUmuyhQ+hGo/f7oFz/ByU6SnbPcwGsQAgJ+K8Dm5sIwqkqpJEAhhFrkAO/8?=
- =?us-ascii?Q?LgoQxgCWdiWGT1/6yZN6hxi0LTDx0Tkn9I1O9mohqntCdxaaVvYsBYAWFCBH?=
- =?us-ascii?Q?rztYBTz24UViquOg+gFa2F+RwE46eMDO3Vy+Ut6TyFtE3/8rRwjPO+qk/TQj?=
- =?us-ascii?Q?mBxzy1RfSjOgv2p8OaIW6haXPSIrvE86JflD0WqkZ3QOfti4SE05G1kUGj13?=
- =?us-ascii?Q?pcYnFHMCYQvvt2tDT5MP7zu4tey2Ps2meSV2JwAHlwlBJMK4E+RZldYQ7TNe?=
- =?us-ascii?Q?eWeRarFoZ8A/IyOvfcV1rmv++wnOCuJLHd0a6kcfLSmNHa3M2m8RzbkxTJk3?=
- =?us-ascii?Q?St9ZQa1t+RG9+fWjTZW8o2rGw4ps5q/3b5YbJV9WMaKa6kXFRsC5BGunlkTM?=
- =?us-ascii?Q?Xs14mTIwC2IZvAmSvbFGd0W7wHbMawYd8P6WDGmBUX+FckwbkNLU6t7IC7UH?=
- =?us-ascii?Q?wpabIWqWdrH8q1cWn9PVousubikagn/3KHil13HmpDRGE9goaw7eGhJjI8eL?=
- =?us-ascii?Q?vAUv+Ih2x8pZ05fzDE28K7TD8MA3SU5BVhzMZZ6XSSELrwm/EL2XbofF1ePa?=
- =?us-ascii?Q?f8amRshFGnrcJYBYplXSXWVFn9LKBfaJ9TOJRUtqA5xcF2yx7OOoyxDFva4i?=
- =?us-ascii?Q?Orb3swIFepsd39OtEQgTY1vMfx9hdlMXhdpRtgO/m6ImFlCVxU6HUB3lb8mE?=
- =?us-ascii?Q?j/5kl1EkhJp0PcN/hFQ6+EkujIHh?=
+	=?us-ascii?Q?sM5jLii9Ebf4bsilYj2nRpVpogIdPW1vOgnsu32635DA1Zlie1z7SN7i6U4I?=
+ =?us-ascii?Q?wOZit1cQHdm34feyaxQe+tEftE9IuzaNTC9+TzOxX1ddocFbBitsoFgRd3a8?=
+ =?us-ascii?Q?Dq1Z3rZ72faEre6LQz669UrpA9GpD4Mn2pVUEsOURnei9T+SQOngFLT2BO6q?=
+ =?us-ascii?Q?KSmxHTdr7YSmKBkknOrSoTxWVSmi8GYMP6vFzFBkD3yAosdRRx0hTEV8QvJU?=
+ =?us-ascii?Q?xDMO4XT9UY31QzyiUAyqv7hxrzns39IzRNc+FapQ2622I0weGMCKqPCxHxJV?=
+ =?us-ascii?Q?YRhJ4NlvNZUW/ehmmfLh825qNcfd5Ya+yvYDjnwahSzxEULGfmQIhbY5Ax5p?=
+ =?us-ascii?Q?17FPyrONyzzpTgwZrqAuRPINm92EcvkBSdId7KhlcHbLigZfypRwTCBSAA1L?=
+ =?us-ascii?Q?L6m7wFmPTKdRgcQgorHcBYIHA5s8A4gcQh3dQs7Kz1mIrvCCbQC9t2T53WdX?=
+ =?us-ascii?Q?LWznV0LLNP5Ouhn6RgMhDuLVxw+FcoyXNS297zka0k5HXTmqFjQm9fdbgpEV?=
+ =?us-ascii?Q?UzSjP1jsB2H0020Qn4vAlhfEw5G8bXFkpznKskI+uHSmIzvcEXWW8raDySzO?=
+ =?us-ascii?Q?U4PgPEyXjM0Rr+H4T31/8m0cKP1uuS3rqGDEppLKaz1+tl95L+WptEanEQij?=
+ =?us-ascii?Q?jFuWGYI97N7IEYrXPo2VAP2lyvuMGYzP25BsGf4yIekP8rgHx1m2B7CcAB+m?=
+ =?us-ascii?Q?mXvaSRm/f6HiiyD8Q1NmlmgFmFwGDJbzlKAx555Rfd65D4D9+W7+DLFQiOED?=
+ =?us-ascii?Q?iGmqzxpR6t3l2w4NvOxjQCv8amLqye8LG85TQL+gt9Y5gCdHI2eUMdhxcS2h?=
+ =?us-ascii?Q?thMjvIvBwNKT8SB+hxj3PELUMVJteeAYvMKXdawkDPEZT21ZwiAMM7saJa3A?=
+ =?us-ascii?Q?If4yT1dHDSbWGiT5r/QSDCI3iOIFgRXOawx1tiHtr1SNrAeMiqEQQJhBnT7T?=
+ =?us-ascii?Q?G/cjeVtYA7zY4OKgQZ3uJ9kJ6zVwjTIkEv1f8wlxguQYCMJut4OCxvU6eW1d?=
+ =?us-ascii?Q?LQGFH1X7EfqPO27YiII7nJWioh758uFLjGeUFqtCXGx/VBqcqTbHBEOrWyDc?=
+ =?us-ascii?Q?N+64jZ4/8yniZ/a1l2/DF5zxz5MGujDZVRLv6WrPWSq4/HBDK8CtbbS17ISI?=
+ =?us-ascii?Q?52b2JnEjPQg7zU4i9/lXGx0KRGf/KmFtJF/PAonnyY+hBJtqQqllPWhh5nBc?=
+ =?us-ascii?Q?UySslhbmg9OnAhQYyDX+jqgCXLBhoeFbJD/iP7ZkCTF7sYuXpcRBg7M9BmUS?=
+ =?us-ascii?Q?wHLiksUMKzQcMSpuPhGuhLSGAfaJzBRhBdvdBNk37wlQRJ8mBn3uioJZREuu?=
+ =?us-ascii?Q?9Tj7VhCdjRZJ0oTdxKMtVDEYXW/99D/xFJ5l4CVYM6ccmvQSpQnsroqIBYpA?=
+ =?us-ascii?Q?SYpeVzQ=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(82310400017)(36860700004)(376005);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015)(82310400017);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:17:01.8015
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 May 2024 11:17:08.4729
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b7e5f545-cf03-45b9-6b2b-08dc809a0779
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59d19acf-2aca-4483-622d-08dc809a0b73
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF00004FBF.namprd04.prod.outlook.com
+	BN3PEPF0000B076.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6934
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7502
 
 From: Michael Roth <michael.roth@amd.com>
 
-Current SNP guest kernels will attempt to access these regions with
-with C-bit set, so guest_memfd is needed to handle that. Otherwise,
-kvm_convert_memory() will fail when the guest kernel tries to access it
-and QEMU attempts to call KVM_SET_MEMORY_ATTRIBUTES to set these ranges
-to private.
+When guest_memfd is enabled, the BIOS is generally part of the initial
+encrypted guest image and will be accessed as private guest memory. Add
+the necessary changes to set up the associated RAM region with a
+guest_memfd backend to allow for this.
 
-Whether guests should actually try to access ROM regions in this way (or
-need to deal with legacy ROM regions at all), is a separate issue to be
-addressed on kernel side, but current SNP guest kernels will exhibit
-this behavior and so this handling is needed to allow QEMU to continue
-running existing SNP guest kernels.
+Current support centers around using -bios to load the BIOS data.
+Support for loading the BIOS via pflash requires additional enablement
+since those interfaces rely on the use of ROM memory regions which make
+use of the KVM_MEM_READONLY memslot flag, which is not supported for
+guest_memfd-backed memslots.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
-[pankaj: Added sev_snp_enabled() check]
 Signed-off-by: Pankaj Gupta <pankaj.gupta@amd.com>
 ---
- hw/i386/pc.c       | 14 ++++++++++----
- hw/i386/pc_sysfw.c | 13 ++++++++++---
- 2 files changed, 20 insertions(+), 7 deletions(-)
+ hw/i386/x86-common.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 7b638da7aa..62c25ea1e9 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -62,6 +62,7 @@
- #include "hw/mem/memory-device.h"
- #include "e820_memory_layout.h"
- #include "trace.h"
-+#include "sev.h"
- #include CONFIG_DEVICES
- 
- #ifdef CONFIG_XEN_EMU
-@@ -1022,10 +1023,15 @@ void pc_memory_init(PCMachineState *pcms,
-     pc_system_firmware_init(pcms, rom_memory);
- 
-     option_rom_mr = g_malloc(sizeof(*option_rom_mr));
--    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
--                           &error_fatal);
--    if (pcmc->pci_enabled) {
--        memory_region_set_readonly(option_rom_mr, true);
-+    if (sev_snp_enabled()) {
-+        memory_region_init_ram_guest_memfd(option_rom_mr, NULL, "pc.rom",
-+                                           PC_ROM_SIZE, &error_fatal);
-+    } else {
-+        memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
-+                               &error_fatal);
-+        if (pcmc->pci_enabled) {
-+            memory_region_set_readonly(option_rom_mr, true);
-+        }
+diff --git a/hw/i386/x86-common.c b/hw/i386/x86-common.c
+index f41cb0a6a8..059de65f36 100644
+--- a/hw/i386/x86-common.c
++++ b/hw/i386/x86-common.c
+@@ -999,10 +999,18 @@ void x86_bios_rom_init(X86MachineState *x86ms, const char *default_firmware,
      }
-     memory_region_add_subregion_overlap(rom_memory,
-                                         PC_ROM_MIN_VGA,
-diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-index 00464afcb4..def77a442d 100644
---- a/hw/i386/pc_sysfw.c
-+++ b/hw/i386/pc_sysfw.c
-@@ -51,8 +51,13 @@ static void pc_isa_bios_init(MemoryRegion *isa_bios, MemoryRegion *rom_memory,
- 
-     /* map the last 128KB of the BIOS in ISA space */
-     isa_bios_size = MIN(flash_size, 128 * KiB);
--    memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
--                           &error_fatal);
-+    if (sev_snp_enabled()) {
-+        memory_region_init_ram_guest_memfd(isa_bios, NULL, "isa-bios",
-+                                           isa_bios_size, &error_fatal);
+     if (bios_size <= 0 ||
+         (bios_size % 65536) != 0) {
+-        goto bios_error;
++        if (!machine_require_guest_memfd(MACHINE(x86ms))) {
++                g_warning("%s: Unaligned BIOS size %d", __func__, bios_size);
++                goto bios_error;
++        }
++    }
++    if (machine_require_guest_memfd(MACHINE(x86ms))) {
++        memory_region_init_ram_guest_memfd(&x86ms->bios, NULL, "pc.bios",
++                                           bios_size, &error_fatal);
 +    } else {
-+        memory_region_init_ram(isa_bios, NULL, "isa-bios", isa_bios_size,
-+                               &error_fatal);
-+    }
-     memory_region_add_subregion_overlap(rom_memory,
-                                         0x100000 - isa_bios_size,
-                                         isa_bios,
-@@ -65,7 +70,9 @@ static void pc_isa_bios_init(MemoryRegion *isa_bios, MemoryRegion *rom_memory,
-            ((uint8_t*)flash_ptr) + (flash_size - isa_bios_size),
-            isa_bios_size);
++        memory_region_init_ram(&x86ms->bios, NULL, "pc.bios",
++                               bios_size, &error_fatal);
+     }
+-    memory_region_init_ram(&x86ms->bios, NULL, "pc.bios", bios_size,
+-                           &error_fatal);
+     if (sev_enabled()) {
+         /*
+          * The concept of a "reset" simply doesn't exist for
+@@ -1023,9 +1031,11 @@ void x86_bios_rom_init(X86MachineState *x86ms, const char *default_firmware,
+     }
+     g_free(filename);
  
--    memory_region_set_readonly(isa_bios, true);
-+    if (!machine_require_guest_memfd(current_machine)) {
-+        memory_region_set_readonly(isa_bios, true);
+-    /* map the last 128KB of the BIOS in ISA space */
+-    x86_isa_bios_init(&x86ms->isa_bios, rom_memory, &x86ms->bios,
+-                      !isapc_ram_fw);
++    if (!machine_require_guest_memfd(MACHINE(x86ms))) {
++        /* map the last 128KB of the BIOS in ISA space */
++        x86_isa_bios_init(&x86ms->isa_bios, rom_memory, &x86ms->bios,
++                          !isapc_ram_fw);
 +    }
- }
  
- static PFlashCFI01 *pc_pflash_create(PCMachineState *pcms,
+     /* map all the bios at the top of memory */
+     memory_region_add_subregion(rom_memory,
 -- 
 2.34.1
 
