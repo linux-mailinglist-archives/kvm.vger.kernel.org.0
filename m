@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-18384-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18385-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D6488D4914
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 12:01:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D98D8D4915
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 12:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A54081C219EE
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 10:01:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DC11283234
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 10:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DD87176AC5;
-	Thu, 30 May 2024 10:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E67A1761A7;
+	Thu, 30 May 2024 10:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lx+aizFs"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YDRMQE0D"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BE46F2FB
-	for <kvm@vger.kernel.org>; Thu, 30 May 2024 10:00:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573056F2FB
+	for <kvm@vger.kernel.org>; Thu, 30 May 2024 10:00:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717063248; cv=none; b=lwB/cmGxqHHvVvHbpBOv2KPKCsUosOBFArzVJB2BYfZzE1dHXoofwieF7tgcxfz6GWpAy9WoXP5H4s4kE9SRHQTZlhxPpiCF1I+IOicbZMvYh+RN4BOH2LDlGlzk0r+vsOFkE7VYAeMTa8BQCZJxEEqR+cN7+qWy3b3IogqWmDQ=
+	t=1717063253; cv=none; b=hDP2P+2Qt7OJlqPphTTrurdqXvvGml9yKvxfkZiLpWvxWxOD8Nu9+ygue13fAxlB64pA/TY1nosDjl0hgbd0wXHDoC4lytdyzEvwUKSrR4Zn8dxfKkjdnewdu4G1nfgpgm7LXivbsUdccrFGVjDUd/11GWKW1drTwwcXUe01Nk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717063248; c=relaxed/simple;
-	bh=iUVuwDv8IlCBNKOZ1ofL/GWf0HNwQI4LTyFUGM4Cs7g=;
+	s=arc-20240116; t=1717063253; c=relaxed/simple;
+	bh=TkFL4JGvaBtqT8WMIo99wxT4H70mghAQsEG6xdgy1EE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=btt3SRSrCWo1Z12tX7cEj5OYSzgtUpNB+jzg+C0jn6vuopZzj+JAB1o8vo/SUSkMCFcTlIssOsmGUG6PaVXE0wdMUDoQuTmS1mw40HG5CftEIPi+k17b7dYVQit+t6zhB+aWCthMfJ3IFWisDCdqYkdPlonFW0Z/96hoZRPitM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lx+aizFs; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=OMfriFCddonGaU7/LQ+ENQnNcahUvtYtDjMkIuPilqGHfHCGq1X8fZOFimD7DVeclCd64BrBkRoFrcAF05qwTG/5OlsU5sADx6O/pt58NnXSV0eKvNn99VZyBVX7XGqb//BR3k2vSpiXQXL9B3EWRr07FT2U9o1LOwCZ9Vt1uU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YDRMQE0D; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717063247; x=1748599247;
+  t=1717063253; x=1748599253;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=iUVuwDv8IlCBNKOZ1ofL/GWf0HNwQI4LTyFUGM4Cs7g=;
-  b=Lx+aizFs8WI99xcR0QfELw3tldteGxOrJIjnepDsk+XJk/9EOAdwlvVz
-   riKNb/uiktfLP1sYxxch5NPu4Ra+zgFk9HgeFsd5tnZb6bybpgZtZc7m5
-   lCdmAK0tD5vruQsFpyW+xaG9PFg9FBT+tcFZb4yCy7anVAIMRHpGbqyoM
-   pDl3HA4YA7ZmkXHIDzkaoiqyj4LrNgy8OGrSsK36ZNSHWd0MAQbgft11o
-   Hec018Yzu32kcVyVISUlF4jnXUoViGJW5L6cHWi5RGbHykbjxtw2jCXNe
-   SSCFRf0nvFgIcndaQ4V/QhLAAOUV2Pv8s7nSp6UkHXbud3AgIJ+4N/pte
-   g==;
-X-CSE-ConnectionGUID: vBIEqF1+TPanKFkKLBNjRQ==
-X-CSE-MsgGUID: RzklqnwcSLaJ6PABT8gt/w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11087"; a="31032540"
+  bh=TkFL4JGvaBtqT8WMIo99wxT4H70mghAQsEG6xdgy1EE=;
+  b=YDRMQE0D0rsUaWlKQXn6E1OBHsxarrJ8oH6kzIguY3SZx3GhtaFwNIku
+   BU4uia9Q+xKETIW393kpWM8zyigdqT5c+BhHPAhlLEtH0YJgM4TcUnmTK
+   nYaTTLbjuTtRgsy8EiBVwH2GX4jNoZm79E7UA+Fl8TN4kppff828/5LtH
+   QI009mtdVnGQT+p4bsPiIp+z5HvnVXd2lNWrEFnisjOFZEhMfl9SxwBXh
+   zE72s2AC1M/5mpwrSTmCDC+p+czFjTUbZfwbwwY0EjypxcHXEkeuyDkcx
+   uL15/qOmLlmYdI/SgaimBj0/s8+2wSgcFhcTMHJkXHVpk6zYJq1evUIZE
+   A==;
+X-CSE-ConnectionGUID: nJxJl0aoSfKGYJajJmpYqA==
+X-CSE-MsgGUID: rfipyUKOQTOm4mDMwVaJhw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11087"; a="31032560"
 X-IronPort-AV: E=Sophos;i="6.08,201,1712646000"; 
-   d="scan'208";a="31032540"
+   d="scan'208";a="31032560"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 03:00:47 -0700
-X-CSE-ConnectionGUID: 9uWka8WTQZqxrJEPByh1OA==
-X-CSE-MsgGUID: 5Q3UyZ3qRfeH+DYgEY/FpQ==
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 03:00:52 -0700
+X-CSE-ConnectionGUID: /YQgvYFURk+y03VbFGoVyw==
+X-CSE-MsgGUID: DC+EoqJ5R4+XMosDINLHMg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,201,1712646000"; 
-   d="scan'208";a="35705073"
+   d="scan'208";a="35705107"
 Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orviesa010.jf.intel.com with ESMTP; 30 May 2024 03:00:42 -0700
+  by orviesa010.jf.intel.com with ESMTP; 30 May 2024 03:00:47 -0700
 From: Zhao Liu <zhao1.liu@intel.com>
 To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
 	Eduardo Habkost <eduardo@habkost.net>,
@@ -82,9 +82,9 @@ Cc: qemu-devel@nongnu.org,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>,
 	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC v2 4/7] i386/cpu: Support thread and module level cache topology
-Date: Thu, 30 May 2024 18:15:36 +0800
-Message-Id: <20240530101539.768484-5-zhao1.liu@intel.com>
+Subject: [RFC v2 5/7] i386/cpu: Update cache topology with machine's configuration
+Date: Thu, 30 May 2024 18:15:37 +0800
+Message-Id: <20240530101539.768484-6-zhao1.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240530101539.768484-1-zhao1.liu@intel.com>
 References: <20240530101539.768484-1-zhao1.liu@intel.com>
@@ -96,45 +96,48 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allows cache to be defined at the thread and module level. This
-increases flexibility for x86 users to customize their cache topology.
+User will configure SMP cache topology via -smp.
+
+For this case, update the x86 CPUs' cache topology with user's
+configuration in MachineState.
 
 Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 ---
- target/i386/cpu.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ target/i386/cpu.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index b11097b5bafd..3a2dadb4bce0 100644
+index 3a2dadb4bce0..1bd1860ae625 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -241,9 +241,15 @@ static uint32_t max_thread_ids_for_cache(X86CPUTopoInfo *topo_info,
-     uint32_t num_ids = 0;
+@@ -7764,6 +7764,27 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
  
-     switch (share_level) {
-+    case CPU_TOPO_LEVEL_THREAD:
-+        num_ids = 1;
-+        break;
-     case CPU_TOPO_LEVEL_CORE:
-         num_ids = 1 << apicid_core_offset(topo_info);
-         break;
-+    case CPU_TOPO_LEVEL_MODULE:
-+        num_ids = 1 << apicid_module_offset(topo_info);
-+        break;
-     case CPU_TOPO_LEVEL_DIE:
-         num_ids = 1 << apicid_die_offset(topo_info);
-         break;
-@@ -251,10 +257,6 @@ static uint32_t max_thread_ids_for_cache(X86CPUTopoInfo *topo_info,
-         num_ids = 1 << apicid_pkg_offset(topo_info);
-         break;
-     default:
--        /*
--         * Currently there is no use case for THREAD and MODULE, so use
--         * assert directly to facilitate debugging.
--         */
-         g_assert_not_reached();
-     }
+ #ifndef CONFIG_USER_ONLY
+     MachineState *ms = MACHINE(qdev_get_machine());
++
++    if (ms->smp_cache.l1d != CPU_TOPO_LEVEL_INVALID) {
++        env->cache_info_cpuid4.l1d_cache->share_level = ms->smp_cache.l1d;
++        env->cache_info_amd.l1d_cache->share_level = ms->smp_cache.l1d;
++    }
++
++    if (ms->smp_cache.l1i != CPU_TOPO_LEVEL_INVALID) {
++        env->cache_info_cpuid4.l1i_cache->share_level = ms->smp_cache.l1i;
++        env->cache_info_amd.l1i_cache->share_level = ms->smp_cache.l1i;
++    }
++
++    if (ms->smp_cache.l2 != CPU_TOPO_LEVEL_INVALID) {
++        env->cache_info_cpuid4.l2_cache->share_level = ms->smp_cache.l2;
++        env->cache_info_amd.l2_cache->share_level = ms->smp_cache.l2;
++    }
++
++    if (ms->smp_cache.l3 != CPU_TOPO_LEVEL_INVALID) {
++        env->cache_info_cpuid4.l3_cache->share_level = ms->smp_cache.l3;
++        env->cache_info_amd.l3_cache->share_level = ms->smp_cache.l3;
++    }
++
+     qemu_register_reset(x86_cpu_machine_reset_cb, cpu);
  
+     if (cpu->env.features[FEAT_1_EDX] & CPUID_APIC || ms->smp.cpus > 1) {
 -- 
 2.34.1
 
