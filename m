@@ -1,143 +1,130 @@
-Return-Path: <kvm+bounces-18359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869458D442F
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 05:28:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25F3B8D4474
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 06:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CBAF2867A9
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 03:28:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD7F4285715
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 04:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B5B58217;
-	Thu, 30 May 2024 03:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891F0143880;
+	Thu, 30 May 2024 04:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yD0l2WJW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g/bI36lK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C0456475
-	for <kvm@vger.kernel.org>; Thu, 30 May 2024 03:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4AB28E7
+	for <kvm@vger.kernel.org>; Thu, 30 May 2024 04:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717039704; cv=none; b=LixAs2tVQddjVUoybCVeusnfQyZpUN7SD75qcXMPg3QH36A8yqUGzb9HKN9Ab+8rhZd6XrJTNGx/1CpAbFjmo8e1BF0uwIDHXWa3UqIzYMZ8bJ1s2AFesleMabvKV3lDgT51qOmZ1cSSwvxuFbgVKz8xMwymmyJ0qZsNWsJYZw8=
+	t=1717042813; cv=none; b=FlfSu9azviSeQhAuULL2kjxXGvI9u3iHct2EwOvmD3gRW/0IeNZrdrPJWNp4PnYTk65HG6+0YsY8gugBqrSuDpf1XhFgLlQW8w4Ka0aswSD6IuqFwGbgc6SGvCbGsoJvRojh0GtR6sbSDxLsTJc4Fq9oi6YpyaGpNGsu+EyXTfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717039704; c=relaxed/simple;
-	bh=lj90chMb5O0KncpLqzXDubS3cuPfyVvzEjua9aYNaYA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n3X3+tFmy0aBmPd2nDqQ6l2vS0m7Np48OUOF3p1QZmCHTkZGeSQAWOXpJwEtdQ0nj5LLRpJTEDp3aWxlPOs2bc5rORq1v5cXIm5xiIJKL0LY+AxuKDfguy22Ub4hb50OadCGBpOCUvi0JWbrTW8Km10tntW9vGAVv8q3H913/90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yD0l2WJW; arc=none smtp.client-ip=209.85.160.169
+	s=arc-20240116; t=1717042813; c=relaxed/simple;
+	bh=ScqQnDhIZzazEaKjt9igUl5O8hNKM9pHSKP3vMPQWRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I+2JlsRK1guHwtW6UyzQgAzRVCS8IyVD0rXluWD56jTXzzXkmJta4kdFGp8ST8S8Tk9RxvoVlNPnCTCbDDMpr3YIGm9ul3isOMY+IXRgvjgcv+Ef9EXPg5IdP3EeqhhZpUHIbF+aBIYDKfzT9IiGtIfxwwZRvbUBS+ugzEufXW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g/bI36lK; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-43fe3289fc5so118551cf.1
-        for <kvm@vger.kernel.org>; Wed, 29 May 2024 20:28:23 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1f48bd643a0so3305015ad.3
+        for <kvm@vger.kernel.org>; Wed, 29 May 2024 21:20:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717039702; x=1717644502; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CyFUQdvGKe8UpOcfXmkz33OD4v6xcNcft6Wk6HjbLrw=;
-        b=yD0l2WJWsKOG1zMBscp/d+Uwbn7OEEGaETPRVGgBkPKMriKH1UX96/wnam4Nfm+FFh
-         fn9E2HHZG3aZ7+XyQdrRAqJlWSV86ARq4sg6iXkapBSUFWrj+S3pPINPwje6cHKTeENq
-         3ZYii34TdqQcBtd54afejudEW3D7apxROWnpmlhUWw7brozFBYa2CGl7dkLn2kAeOGzU
-         de35IAwvGIIwLJ86QCVBOttVDrMb1JG7GlfZk/cpeeiGF+HAE4QX5kY8R4NkG0TwF2P+
-         1V5i3O0kufjodFjqkNfHzfT0dAkaTnmcMcxwsli2zYO4tiK38yZGxx2stwXN4QPm/PFW
-         l91w==
+        d=google.com; s=20230601; t=1717042812; x=1717647612; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C4WJSvfiaNoa/0OJgyCquaiLAw0pNXvsnSprBpQ0sIk=;
+        b=g/bI36lKjBZRM5Pzk5xwDfbeKdd8a+OHQmQLwDNZceoYzQadTeAF0pKd4KCRrxcNi8
+         WQZjUtOimOUiya9xIY56qbrsckjfJ3LtnYKyT4l3yptZo7OSlujTvXOO8gXMdkc2rTLG
+         jtK0EFL3qip9t0pRJNscAAWAznSWQx8/X/fePYZqNiMwdgGlIZKdr6Qo7G9314XAdrx+
+         BwD0xeu+btX2uhnWJ5maO5hGglyVVTa4bX9UHOtkiOtxBRXwYogU1k0we0gi5qODN5+y
+         a/nPb4HIKeRWtVD+sY0XmDKiuRNZiI0pr6yCK6WaV2lHJQun9nOlgmsqzhsbx4H584KQ
+         h5cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717039702; x=1717644502;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CyFUQdvGKe8UpOcfXmkz33OD4v6xcNcft6Wk6HjbLrw=;
-        b=Skh6dWvmy4o32nuZnzrmsY0Ry7qIgtiyseSda3cwGLvkzq3+lFZKYnWfpgbfevmrM8
-         eY7BaEhu74CXUFFItElSkt/XH8W1V9t2rANmDvYj9k6gsV3YJJu8oZRygClktjPwhGeB
-         mOgcSxsFUu0+3beleXvI+wpT7hMQbW2r2pZWuhbO6HgQJMycjYHeOQhRe4bDtgDkzEIi
-         5dS+tIWLOR97Y9DV1HPS34nGw4WosLO7LalTTywpGyT2qKeY+CfFrWRAVn0jDtPUZq6V
-         tByH02gxbjQUKgSb3EhYSZG1IxalwzrJSzFLb3DwlNss4NptKQCa+p9TSeZZGrKThu6O
-         04jg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4CdW0HKbeRZ24QCgUr8EgIQ2zfLKu7gwiE1sM5Uw38OXxGyGzF0dbN1FNb1xOl6xTygnnx6jDq5D8rdZm/6VeHWMP
-X-Gm-Message-State: AOJu0Yy3FHA0mEGRdGZbaZgCFpDNz5OiMgitrOOuXP+wcLfpGF6gFtht
-	tj7+HPkz0eYNPxoHzfW22g5ANA6KbOVVWTNb7qoQ6o3wbbMKEkmkPSzuaX7llUg3f/OMRCxXJqh
-	AGNAY0wA3a2Bt7haaHyEobNN7x4JMMBxI0c/V
-X-Google-Smtp-Source: AGHT+IGBhNbFRaaD0WOEIsVSMflxCvd13kkSSK1hcGeX1B4TzLlXvTq7xC3rTsBmGx8uhqPHEIa2GYmfEXsD+JkYxAs=
-X-Received: by 2002:a05:622a:90e:b0:43e:cb4:1d10 with SMTP id
- d75a77b69052e-43fe8e5f830mr1851431cf.14.1717039701993; Wed, 29 May 2024
- 20:28:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717042812; x=1717647612;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C4WJSvfiaNoa/0OJgyCquaiLAw0pNXvsnSprBpQ0sIk=;
+        b=GzId2gu85KRlSedpFaO+difuibSq7OxZryj8XqENbO1gRgUefPKuPUgJ5ZMNlOtcyR
+         YeGpv0GzxoHqCi+4/p7gR/MlY+zYF8eBX+2qE+51fqqQEx4MrexV5GXG+ojkKDeTBLfC
+         yKWpDzmvswYYOfO1dNjd4bF6kjNz+fkYf82aqtYyQeBIPe8/CzF3a3xBFJ/2nFZJQP5g
+         Z/XatI/DszF53MUVHXNP7x/zz/pfMw60rO3fttXEYUdaS1m0Hz99basbCSDmX8HR8tKI
+         y462MNE9Qk9fdljXm7rOsVcHlW455Jp7cfRfuiKus2YVp3HtbwdYkCXgTIALEK89thPR
+         u+EQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU3daAsSd19aCadyGhg2CpO63GgMcDjAaVxJP44p/N0DkPW8Uv435o/9du8P1dRxaS2YNmFjORFsy/++uy3XQUPh61S
+X-Gm-Message-State: AOJu0YzpEfW4+eKylHM+3R9N/4HN7dJtwONF1S/5klX4HMiFRM/GV1Vl
+	m7HHHtLGWML92QIlHdHeparYTo9agWRhqnMYCYNPVbatIDKw3SbzcVX2fdWgEQ==
+X-Google-Smtp-Source: AGHT+IHcHdJN5a1tCHgmcM6XidNqutFz/wGDogXr9yfTIAKOQU98fE+WRy4+w4q6LGuowy6wzly2wA==
+X-Received: by 2002:a17:902:ce90:b0:1f4:64d6:919d with SMTP id d9443c01a7336-1f619b2d1e4mr10272365ad.66.1717042811349;
+        Wed, 29 May 2024 21:20:11 -0700 (PDT)
+Received: from google.com (60.89.247.35.bc.googleusercontent.com. [35.247.89.60])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f44c7b7d3csm107899505ad.93.2024.05.29.21.20.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 May 2024 21:20:10 -0700 (PDT)
+Date: Thu, 30 May 2024 04:20:07 +0000
+From: Mingwei Zhang <mizhang@google.com>
+To: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+Cc: "Chen, Zide" <zide.chen@intel.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
+	Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org,
+	linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v2 42/54] KVM: x86/pmu: Implement emulated counter
+ increment for passthrough PMU
+Message-ID: <Zlf-d8p2yzNFOr0-@google.com>
+References: <20240506053020.3911940-1-mizhang@google.com>
+ <20240506053020.3911940-43-mizhang@google.com>
+ <8da387e4-0c44-4402-8103-fc232600cb02@intel.com>
+ <7c17fd63-d3b1-4438-b6d8-11417321c56e@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240529180510.2295118-1-jthoughton@google.com>
- <20240529180510.2295118-5-jthoughton@google.com> <ZlekYljG7KJwblUj@google.com>
-In-Reply-To: <ZlekYljG7KJwblUj@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Wed, 29 May 2024 20:27:45 -0700
-Message-ID: <CADrL8HVZxoO33F2UJBoTjF_SXpxyZmH=RTM5G3stgo_kRPjazA@mail.gmail.com>
-Subject: Re: [PATCH v4 4/7] KVM: Move MMU lock acquisition for
- test/clear_young to architecture
-To: Sean Christopherson <seanjc@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Ankit Agrawal <ankita@nvidia.com>, 
-	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Bibo Mao <maobibo@loongson.cn>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Tianrui Zhao <zhaotianrui@loongson.cn>, Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, 
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org, 
-	linux-mm@kvack.org, linux-riscv@lists.infradead.org, 
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7c17fd63-d3b1-4438-b6d8-11417321c56e@linux.intel.com>
 
-On Wed, May 29, 2024 at 2:55=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Wed, May 29, 2024, James Houghton wrote:
-> > For implementation mmu_notifier_{test,clear}_young, the KVM memslot
-> > walker used to take the MMU lock for us. Now make the architectures
-> > take it themselves.
->
-> Hmm, *forcing* architectures to take mmu_lock is a step backwards.  Rathe=
-r than
-> add all of this churn, what about adding CONFIG_KVM_MMU_NOTIFIER_LOCKLESS=
-, e.g.
->
-> static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_notif=
-ier *mn,
->                                                          unsigned long st=
-art,
->                                                          unsigned long en=
-d,
->                                                          gfn_handler_t ha=
-ndler)
-> {
->         struct kvm *kvm =3D mmu_notifier_to_kvm(mn);
->         const struct kvm_mmu_notifier_range range =3D {
->                 .start          =3D start,
->                 .end            =3D end,
->                 .handler        =3D handler,
->                 .on_lock        =3D (void *)kvm_null_fn,
->                 .flush_on_ret   =3D false,
->                 .may_block      =3D false,
->                 .lockless       =3D IS_ENABLED(CONFIG_KVM_MMU_NOTIFIER_LO=
-CKLESS),
->         };
->
->         return __kvm_handle_hva_range(kvm, &range).ret;
-> }
-
-Thanks Sean, yes this is a lot better. I will do this for v5.
+On Thu, May 09, 2024, Mi, Dapeng wrote:
+> 
+> On 5/9/2024 2:28 AM, Chen, Zide wrote:
+> >
+> > On 5/5/2024 10:30 PM, Mingwei Zhang wrote:
+> >> @@ -896,6 +924,12 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
+> >>  		return;
+> >>  
+> >>  	kvm_for_each_pmc(pmu, pmc, i, bitmap) {
+> >> +		if (is_passthrough)
+> >> +			is_pmc_allowed = pmc_speculative_in_use(pmc) &&
+> >> +					 check_pmu_event_filter(pmc);
+> >> +		else
+> >> +			is_pmc_allowed = pmc_event_is_allowed(pmc);
+> >> +
+> > Why don't need to check pmc_is_globally_enabled() in PMU passthrough
+> > case? Sorry if I missed something.
+> 
+> Not sure if it's because the historical reason. Since pmu->global_ctrl
+> would be updated in each vm-exit right now, we may not need to skip
+> pmc_is_globally_enabled() anymore. Need Mingwei to confirm.
+> 
+yeah, this is a historical reason and how it becomes a bug. I will fix
+that in next version.
 
