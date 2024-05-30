@@ -1,93 +1,70 @@
-Return-Path: <kvm+bounces-18387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FA478D4917
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 12:01:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF2D38D4976
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 12:18:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FF69283B9E
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 10:01:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DB8C1F23E3B
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 10:18:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21D6176195;
-	Thu, 30 May 2024 10:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8FA1176AC8;
+	Thu, 30 May 2024 10:18:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SEnRcd1h"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="RI3cpM8B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25926F2E6
-	for <kvm@vger.kernel.org>; Thu, 30 May 2024 10:01:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C11D183998
+	for <kvm@vger.kernel.org>; Thu, 30 May 2024 10:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717063266; cv=none; b=GydcRALoWY3oSlyajVaskJuRZtbVpVeTs+SnM5+2Fzlcsi6rynHXuyIaVfwUt8pV1+gVSjjeIzbOeMSmYpYyZSvvecE8PN4AVIMCWbLS5xsOUlDAlLZalGmccHOaT4xyItSvnmz696UnlyOkBTgc+HXoKUUdbzqMgWA1LJDTBYQ=
+	t=1717064327; cv=none; b=s88OOaMpnUcOxaG69HDH8eSEnLvtpgOecmmQGHDmdw3MHfdZ8xQ/LUxytlTHsSlG76Qyg5Q237iqJnKig7Wi8nsnV+6L2azlCrkgWZBs9gX0MFQ+2nL+KVgr/68FSozEDFHZoWNJ3k+qBXE8O/25gvy2YdF7GwzkWBRZ7KneM48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717063266; c=relaxed/simple;
-	bh=kd8Iqz6IxYjau87nIpOYyMS3R+5juiDyGSjeB2FuXwE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YzBsfejl4xsJM8FEzJ7v5NOQJzPgfSDuaML2eByPrI5ViaxdnyMQ6NW05uHnJ/RHFyvuwCQM8Rz6wUfVyQ5/YY6DDUtbg+fupq/+Z5ggMya11vyGYSEZHtjFEb0z7RQfFzNj6zk9O+Nr7HeY+mycUes0RnZuhyzGP9v8fw4DxxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SEnRcd1h; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717063264; x=1748599264;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kd8Iqz6IxYjau87nIpOYyMS3R+5juiDyGSjeB2FuXwE=;
-  b=SEnRcd1hqUHNdT6aSEyj7j8KIYEEtEPZSHVoSBXobY3Xovo2sROBkIPH
-   Ek3Ox21ZyuNVFvKkkZoCx9+ZCR/dkdf7ZV4LId3I3YIhQ4iej9CJEX6de
-   wMLLacM9O7vIb5BZ9jmr9EXvRUaIXfyzLl4TfruZlkPqPcCnEBoKK1fzV
-   Byicw4bkcHAkug/ueS/f2Iap4IxZL3yUNv8Ew8lwMwstPYbg55TaIZxxi
-   KZWXTnoYnd8ep+Di20jClZ7N5AFGGl8bog5gIEku+VyM3BdmMKKUU6c8J
-   DAlheBvlPUcqHbOEJq6mKzlES6uBfKaWDzsKr5W9D00zV1f1pct26tWqr
-   Q==;
-X-CSE-ConnectionGUID: ULvn4H3IQbWDOtpLi9OxAQ==
-X-CSE-MsgGUID: R01b5odOQFy9fhOQaLbI1g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11087"; a="31032641"
-X-IronPort-AV: E=Sophos;i="6.08,201,1712646000"; 
-   d="scan'208";a="31032641"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 03:01:04 -0700
-X-CSE-ConnectionGUID: SyRY+RB0TV6YokdKL/13XA==
-X-CSE-MsgGUID: aFRS7jt6QPWbeEZPIX3Qmw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,201,1712646000"; 
-   d="scan'208";a="35705172"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by orviesa010.jf.intel.com with ESMTP; 30 May 2024 03:00:58 -0700
-From: Zhao Liu <zhao1.liu@intel.com>
-To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	qemu-riscv@nongnu.org,
-	qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [RFC v2 7/7] qemu-options: Add the cache topology description of -smp
-Date: Thu, 30 May 2024 18:15:39 +0800
-Message-Id: <20240530101539.768484-8-zhao1.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240530101539.768484-1-zhao1.liu@intel.com>
-References: <20240530101539.768484-1-zhao1.liu@intel.com>
+	s=arc-20240116; t=1717064327; c=relaxed/simple;
+	bh=9VPP4cFzW7OB2wpzRs4cJL1MWhCQUMLbiwnAK8S1ARc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OGDyOFyqiALCA4kBnksD4dCQz5payFMHKb5B2PsfUap/lwd5kbfoGMcMHhYMUsQUpKQixa+W1Wxx2LEI7nJxhU+0nwxzQgVswvFGC4Dv3C4AvzLmbM1ceRQJVI9gaSQXiPSKxRiS2gQr6Y8hAbLd9hiwY37Hr6vJaXBl+irrjBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=RI3cpM8B; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 44U9aJld026823;
+	Thu, 30 May 2024 03:18:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=rI8Lk20/T5VuF13OA+HsAw1
+	eU5DkDiqyf3+vvz2FfnA=; b=RI3cpM8BfRfKBdrJYw7cJWsOjDsGrkxbkQEuRWJ
+	SFeT19kaXlALNqmXGpjrBUsrCOWg3gn/Wi5LmbekBqR0hTHVNHg+CmW3ca/Oi6uV
+	ddjdEsVCLxYZzuN5prEMrR2RskT4YZoqPt5DF52ibzYwtfaTunLS6TABIDOEy1xv
+	6vOA7QKBUxS1V0DN9/d73CVe6LIhLMxTvMN3T1bOE0Z5IR7LMoLHuVhtoy6cpy1F
+	MV8eWX2XmVKMI+gyxPfIdVebKYQPC+01sGeiQEJr5T5gWB0GnxVtwXd1ziOg1kcu
+	Si8FD42LTJxBkUGuY1eCJ3SDNjD9lk+mKAjnb8ZN3FNsDcA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3yegkn1a40-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 30 May 2024 03:18:41 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 30 May 2024 03:18:27 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 30 May 2024 03:18:27 -0700
+Received: from localhost.localdomain (unknown [10.28.36.175])
+	by maili.marvell.com (Postfix) with ESMTP id 7B1553F70B7;
+	Thu, 30 May 2024 03:18:24 -0700 (PDT)
+From: Srujana Challa <schalla@marvell.com>
+To: <virtualization@lists.linux.dev>, <kvm@vger.kernel.org>, <mst@redhat.com>,
+        <jasowang@redhat.com>
+CC: <schalla@marvell.com>, <vattunuru@marvell.com>, <sthotton@marvell.com>,
+        <ndabilpuram@marvell.com>, <jerinj@marvell.com>
+Subject: [PATCH] vdpa: Add support for no-IOMMU mode
+Date: Thu, 30 May 2024 15:48:23 +0530
+Message-ID: <20240530101823.1210161-1-schalla@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,112 +72,105 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: lWiBYN_zV-f78z6lES96ZvgOLlwnQRH6
+X-Proofpoint-GUID: lWiBYN_zV-f78z6lES96ZvgOLlwnQRH6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-05-30_07,2024-05-28_01,2024-05-17_01
 
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
----
-Changes since RFC v1:
- * Use "*_cache=topo_level" as -smp example as the original "level"
-   term for a cache has a totally different meaning. (Jonathan)
----
- qemu-options.hx | 50 +++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 44 insertions(+), 6 deletions(-)
+This commit introduces support for an UNSAFE, no-IOMMU mode in the
+vhost-vdpa driver. When enabled, this mode provides no device isolation,
+no DMA translation, no host kernel protection, and cannot be used for
+device assignment to virtual machines. It requires RAWIO permissions
+and will taint the kernel.
+This mode requires enabling the "enable_vhost_vdpa_unsafe_noiommu_mode"
+option on the vhost-vdpa driver. This mode would be useful to get
+better performance on specifice low end machines and can be leveraged
+by embedded platforms where applications run in controlled environment.
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 8ca7f34ef0c8..29d8a4b9b68b 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -282,7 +282,8 @@ ERST
- DEF("smp", HAS_ARG, QEMU_OPTION_smp,
-     "-smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books][,sockets=sockets]\n"
-     "               [,dies=dies][,clusters=clusters][,modules=modules][,cores=cores]\n"
--    "               [,threads=threads]\n"
-+    "               [,threads=threads][,l1d-cache=topo_level][,l1i-cache=topo_level]\n"
-+    "               [,l2-cache=topo_level][,l3-cache=topo_level]\n"
-     "                set the number of initial CPUs to 'n' [default=1]\n"
-     "                maxcpus= maximum number of total CPUs, including\n"
-     "                offline CPUs for hotplug, etc\n"
-@@ -294,7 +295,11 @@ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
-     "                modules= number of modules in one cluster\n"
-     "                cores= number of cores in one module\n"
-     "                threads= number of threads in one core\n"
--    "Note: Different machines may have different subsets of the CPU topology\n"
-+    "                l1d-cache= topology level of L1 D-cache\n"
-+    "                l1i-cache= topology level of L1 I-cache\n"
-+    "                l2-cache= topology level of L2 cache\n"
-+    "                l3-cache= topology level of L3 cache\n"
-+    "Note: Different machines may have different subsets of the CPU and cache topology\n"
-     "      parameters supported, so the actual meaning of the supported parameters\n"
-     "      will vary accordingly. For example, for a machine type that supports a\n"
-     "      three-level CPU hierarchy of sockets/cores/threads, the parameters will\n"
-@@ -308,7 +313,7 @@ DEF("smp", HAS_ARG, QEMU_OPTION_smp,
-     "      must be set as 1 in the purpose of correct parsing.\n",
-     QEMU_ARCH_ALL)
- SRST
--``-smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books][,sockets=sockets][,dies=dies][,clusters=clusters][,modules=modules][,cores=cores][,threads=threads]``
-+``-smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books][,sockets=sockets][,dies=dies][,clusters=clusters][,modules=modules][,cores=cores][,threads=threads][,l1d-cache=topo_level][,l1i-cache=topo_level][,l2-cache=topo_level][,l3-cache=topo_level]``
-     Simulate a SMP system with '\ ``n``\ ' CPUs initially present on
-     the machine type board. On boards supporting CPU hotplug, the optional
-     '\ ``maxcpus``\ ' parameter can be set to enable further CPUs to be
-@@ -322,15 +327,34 @@ SRST
-     Both parameters are subject to an upper limit that is determined by
-     the specific machine type chosen.
+Signed-off-by: Srujana Challa <schalla@marvell.com>
+---
+ drivers/vhost/vdpa.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index bc4a51e4638b..d071c30125aa 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -36,6 +36,11 @@ enum {
  
-+    CPU topology parameters include '\ ``drawers``\ ', '\ ``books``\ ',
-+    '\ ``sockets``\ ', '\ ``dies``\ ', '\ ``clusters``\ ', '\ ``modules``\ ',
-+    '\ ``cores``\ ' and '\ ``threads``\ '. These CPU parameters accept only
-+    integers and are used to specify the number of specific topology domains
-+    under the corresponding topology level.
-+
-     To control reporting of CPU topology information, values of the topology
-     parameters can be specified. Machines may only support a subset of the
--    parameters and different machines may have different subsets supported
--    which vary depending on capacity of the corresponding CPU targets. So
--    for a particular machine type board, an expected topology hierarchy can
-+    CPU topology parameters and different machines may have different subsets
-+    supported which vary depending on capacity of the corresponding CPU targets.
-+    So for a particular machine type board, an expected topology hierarchy can
-     be defined through the supported sub-option. Unsupported parameters can
-     also be provided in addition to the sub-option, but their values must be
-     set as 1 in the purpose of correct parsing.
+ #define VHOST_VDPA_IOTLB_BUCKETS 16
  
-+    Cache topology parameters include '\ ``l1d-cache``\ ', '\ ``l1i-cache``\ ',
-+    '\ ``l2-cache``\ ' and '\ ``l3-cache``\ '. These cache topology parameters
-+    accept the strings of CPU topology levels (such as '\ ``drawer``\ ', '\ ``book``\ ',
-+    '\ ``socket``\ ', '\ ``die``\ ', '\ ``cluster``\ ', '\ ``module``\ ',
-+    '\ ``core``\ ' or '\ ``thread``\ '). Exactly which topology level strings
-+    could be accepted as the parameter depends on the machine's support for the
-+    corresponding CPU topology level.
++bool vhost_vdpa_noiommu;
++module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
++		   vhost_vdpa_noiommu, bool, 0644);
++MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode, "Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the kernel.  If you do not know what this is for, step away. (default: false)");
 +
-+    Machines may also only support a subset of the cache topology parameters.
-+    Unsupported cache topology parameters will be omitted, and correspondingly,
-+    the target CPU's cache topology will use the its default cache topology
-+    setting.
-+
-     Either the initial CPU count, or at least one of the topology parameters
-     must be specified. The specified parameters must be greater than zero,
-     explicit configuration like "cpus=0" is not allowed. Values for any
-@@ -356,6 +380,20 @@ SRST
+ struct vhost_vdpa_as {
+ 	struct hlist_node hash_link;
+ 	struct vhost_iotlb iotlb;
+@@ -60,6 +65,7 @@ struct vhost_vdpa {
+ 	struct vdpa_iova_range range;
+ 	u32 batch_asid;
+ 	bool suspended;
++	bool noiommu_en;
+ };
  
-         -smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32
+ static DEFINE_IDA(vhost_vdpa_ida);
+@@ -887,6 +893,10 @@ static void vhost_vdpa_general_unmap(struct vhost_vdpa *v,
+ {
+ 	struct vdpa_device *vdpa = v->vdpa;
+ 	const struct vdpa_config_ops *ops = vdpa->config;
++
++	if (v->noiommu_en)
++		return;
++
+ 	if (ops->dma_map) {
+ 		ops->dma_unmap(vdpa, asid, map->start, map->size);
+ 	} else if (ops->set_map == NULL) {
+@@ -980,6 +990,9 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
+ 	if (r)
+ 		return r;
  
-+    The following sub-option defines a CPU topology hierarchy (2 sockets
-+    totally on the machine, 2 dies per socket, 2 modules per die, 2 cores per
-+    module, 2 threads per core) with 3-level cache topology hierarchy (L1
-+    D-cache per core, L1 I-cache per core, L2 cache per core and L3 cache per
-+    die) for PC machines which support sockets/dies/modules/cores/threads.
-+    Some members of the CPU topology option can be omitted but their values
-+    will be automatically computed. Some members of the cache topology
-+    option can also be omitted and target CPU will use the default topology.:
++	if (v->noiommu_en)
++		goto skip_map;
 +
-+    ::
-+
-+        -smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32,\
-+             l1d-cache=core,l1i-cache=core,l2-cache=core,l3-cache=die
-+
-     The following sub-option defines a CPU topology hierarchy (2 sockets
-     totally on the machine, 2 clusters per socket, 2 cores per cluster,
-     2 threads per core) for ARM virt machines which support sockets/clusters
+ 	if (ops->dma_map) {
+ 		r = ops->dma_map(vdpa, asid, iova, size, pa, perm, opaque);
+ 	} else if (ops->set_map) {
+@@ -995,6 +1008,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
+ 		return r;
+ 	}
+ 
++skip_map:
+ 	if (!vdpa->use_va)
+ 		atomic64_add(PFN_DOWN(size), &dev->mm->pinned_vm);
+ 
+@@ -1298,6 +1312,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ 	struct vdpa_device *vdpa = v->vdpa;
+ 	const struct vdpa_config_ops *ops = vdpa->config;
+ 	struct device *dma_dev = vdpa_get_dma_dev(vdpa);
++	struct iommu_domain *domain;
+ 	const struct bus_type *bus;
+ 	int ret;
+ 
+@@ -1305,6 +1320,14 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ 	if (ops->set_map || ops->dma_map)
+ 		return 0;
+ 
++	domain = iommu_get_domain_for_dev(dma_dev);
++	if ((!domain || domain->type == IOMMU_DOMAIN_IDENTITY) &&
++	    vhost_vdpa_noiommu && capable(CAP_SYS_RAWIO)) {
++		add_taint(TAINT_USER, LOCKDEP_STILL_OK);
++		dev_warn(&v->dev, "Adding kernel taint for noiommu on device\n");
++		v->noiommu_en = true;
++		return 0;
++	}
+ 	bus = dma_dev->bus;
+ 	if (!bus)
+ 		return -EFAULT;
 -- 
-2.34.1
+2.25.1
 
 
