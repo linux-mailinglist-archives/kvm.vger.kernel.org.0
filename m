@@ -1,172 +1,130 @@
-Return-Path: <kvm+bounces-18460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375AB8D5600
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 01:07:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A0D8D5610
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 01:12:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A6EA1C2473D
-	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 23:07:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AEA01F27511
+	for <lists+kvm@lfdr.de>; Thu, 30 May 2024 23:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2726618412B;
-	Thu, 30 May 2024 23:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9927A18413D;
+	Thu, 30 May 2024 23:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kRb1Cgbw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mb9IFab9"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF31113B290;
-	Thu, 30 May 2024 23:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A39C183991
+	for <kvm@vger.kernel.org>; Thu, 30 May 2024 23:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717110441; cv=none; b=dri+55zDO2Vngj6qx89CAJjPTZ/wngBy21cDmPLnOJ2FrIbG0buKvaMTO7Ri6o77TIqTcKlu/Qna9xjMm4/9XtHgpcZx4rb8Q3yJdfBS3JXr2u+s/eMZ2U3mwjf4C95+GRH+nOt63FLS415aavq3EolBr0r6n7fTyiO172BBC7s=
+	t=1717110768; cv=none; b=ESq8Tz71Zcw7e/2hqwWu8Ml7uuhzfaVUiPVvizNN/i+uBD6utjbdxTu2A9m4UdyKzXHa1FJ6Yi+0KEAnBJuqN90knukZt9b7B6c8yLyi/iaZj5ddw4iW99EFy65qG3pF8D0DaHBAD/pi0aUz4EeYzxtPqcTzlCOgCvEq0JLI5no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717110441; c=relaxed/simple;
-	bh=UXgFUVzVSDMMvUX7mRD7oyLSyRc2yEC9lDBRlpoEZZo=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YW2AY4zCIWxD7QikkrajPBMGUit4fRP9+h+G/xEbgK+kGuUFzd7L0Gx9buHuInW0IRFC5+LIhlk5+NTugXXgvSZAPZzA8Aj3JufBhlWLdaUuCBWaKKJgfjDxe2eOB2rtqKnitpfvpxv6hntNVyLgr64yo4MjU0sBMC9xc1In5dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kRb1Cgbw; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1717110768; c=relaxed/simple;
+	bh=eTliIFmIq5hD6o87LUn9o7uoz31PWHrz5z33kKfUKVw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=t14Zjhonuk/2EFgmbQm3il9kPUXilfZ0017l7lzt+rv3ya57ILBOFZnhRPS9pumMqBm5H/yT41NgQEXCV9uhvPndkzLjwQadizIZJEMi7JHqLIjIaTk/nAWt4cCm0U9k5AHY5bnxg5GoggibVG5/ix49z0NfWpPiKSRhpuR7WNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Mb9IFab9; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-df78b56f6caso2196117276.2
+        for <kvm@vger.kernel.org>; Thu, 30 May 2024 16:12:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717110440; x=1748646440;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=UXgFUVzVSDMMvUX7mRD7oyLSyRc2yEC9lDBRlpoEZZo=;
-  b=kRb1Cgbw5pH4rdsnw0f7WMVCw3dwX+ZOfIrrb3XNCl59FCBbRnxHJsaV
-   /WeSuyxUKiCDDYZVtdx3f23VnHcUyK1YTwU+AnuKF8KCeISH6zaACwJtS
-   Rcdcmn6ZxzSchzbm3zlc/pQ5zrMX6tUxa2OR3F0qzZvY2DEtiQhWD2ZSD
-   U=;
-X-IronPort-AV: E=Sophos;i="6.08,202,1712620800"; 
-   d="scan'208";a="299904217"
-Subject: Re: [PATCH 8/9] arm64: support cpuidle-haltpoll
-Thread-Topic: [PATCH 8/9] arm64: support cpuidle-haltpoll
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 23:07:19 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:13629]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.22.28:2525] with esmtp (Farcaster)
- id e9f696c0-703f-49e5-9889-2e0bf8db9fb1; Thu, 30 May 2024 23:07:18 +0000 (UTC)
-X-Farcaster-Flow-ID: e9f696c0-703f-49e5-9889-2e0bf8db9fb1
-Received: from EX19D001UWA002.ant.amazon.com (10.13.138.236) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 30 May 2024 23:07:18 +0000
-Received: from EX19D001UWA003.ant.amazon.com (10.13.138.211) by
- EX19D001UWA002.ant.amazon.com (10.13.138.236) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Thu, 30 May 2024 23:07:18 +0000
-Received: from EX19D001UWA003.ant.amazon.com ([fe80::256a:26de:3ee6:48a2]) by
- EX19D001UWA003.ant.amazon.com ([fe80::256a:26de:3ee6:48a2%7]) with mapi id
- 15.02.1258.028; Thu, 30 May 2024 23:07:18 +0000
-From: "Okanovic, Haris" <harisokn@amazon.com>
-To: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"ankur.a.arora@oracle.com" <ankur.a.arora@oracle.com>
-CC: "joao.m.martins@oracle.com" <joao.m.martins@oracle.com>,
-	"boris.ostrovsky@oracle.com" <boris.ostrovsky@oracle.com>,
-	"konrad.wilk@oracle.com" <konrad.wilk@oracle.com>, "wanpengli@tencent.com"
-	<wanpengli@tencent.com>, "mingo@redhat.com" <mingo@redhat.com>,
-	"catalin.marinas@arm.com" <catalin.marinas@arm.com>, "pbonzini@redhat.com"
-	<pbonzini@redhat.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
-	"daniel.lezcano@linaro.org" <daniel.lezcano@linaro.org>, "lenb@kernel.org"
-	<lenb@kernel.org>, "arnd@arndb.de" <arnd@arndb.de>, "will@kernel.org"
-	<will@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "peterz@infradead.org"
-	<peterz@infradead.org>, "vkuznets@redhat.com" <vkuznets@redhat.com>,
-	"bp@alien8.de" <bp@alien8.de>, "Okanovic, Haris" <harisokn@amazon.com>,
-	"rafael@kernel.org" <rafael@kernel.org>, "x86@kernel.org" <x86@kernel.org>,
-	"mark.rutland@arm.com" <mark.rutland@arm.com>
-Thread-Index: AQHamy2ih2zHEXQ7TU2Y0lcrXsZX2LGwld+A
-Date: Thu, 30 May 2024 23:07:18 +0000
-Message-ID: <41a184a3f5695061487e86a6da5eb87c140dbe3c.camel@amazon.com>
-References: <20240430183730.561960-1-ankur.a.arora@oracle.com>
-	 <20240430183730.561960-9-ankur.a.arora@oracle.com>
-In-Reply-To: <20240430183730.561960-9-ankur.a.arora@oracle.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E9896794B0B406479E6B08FBFE80755D@amazon.com>
-Content-Transfer-Encoding: base64
+        d=google.com; s=20230601; t=1717110766; x=1717715566; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ujQILWXT37aY3kE457ngW3RW7Zg+FC2HbFYHJC4pvU=;
+        b=Mb9IFab9AbS7uPGRhsGuyWeIM2h975b5GA4RLtTqQyW62Fe2XkrI1v9tfxcfjm5PN1
+         UNs4CQqax3Ipr9l47lxRCibKuSZtzbH1j8CZasFYgCr8NwImBmkRiB3SSMTo3W+tUHDH
+         lQGp7thJIWMItWVWuMrP4VH7pIjW4vFFkXE7EY0iJYHhAYdZH1IRGsIVttV2S0uvPGbH
+         VgazKCrggw+PXMvFy5LSEWS6x1VMvUr9HhFDmJvjCoTWZ8Hs0Jprj0EKvM6P4U1nsmUK
+         eKDbjZvjPTJpZM6PMkwcWeXenw8oYxJ5LTEzdbxlEUNK1pNxWM9E0HseEV/OITDDh0Ly
+         FQeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717110766; x=1717715566;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4ujQILWXT37aY3kE457ngW3RW7Zg+FC2HbFYHJC4pvU=;
+        b=kaOJ7dyGws2VRw+PdCd2e1v2v80DXx+yP3Zg2kDhdjVklMrxySQ3ObyCHBt4PoUV6A
+         15pnWP6jXNv6EDJ/m1t5NjQOjmNZjO265o25X01ZQZUSXSs/uGfE7xXmYWkrPOF2HRJ8
+         KCaDX12+lFB+9/6lYZ9+rVQnbbfhp/XYXkUybtczuat2BZnMbSEp/JdUPXr5np68ihhI
+         l5zHwHXTw9kaCcgIHryr+g3sfYCnMSoBKXUOI5eKfyq7EMojTcn77kbA+AZHCw1oitxo
+         TR8TQPq52kXyL6PG14xq5XdrU9mXZKeOjNR4/nNHRy0hWK1wTkrAt49Ai4H1EOCbhYzx
+         +zyw==
+X-Forwarded-Encrypted: i=1; AJvYcCXv+Yg2T7gE8CEft8nWCuq3NX6xgtiNr0IXGIUErHB02yqspoMVf4+1A7u/vjrFofB6M4IzDQp6+A4Lqc2lZf1qsPZf
+X-Gm-Message-State: AOJu0Yxo4ZRAnEgwQthjBCiBwlMQKWPzaIAJBKMwHCp8P7B4vo0kuuWC
+	KxRBpxMLlhdOQjVBynhvMP7h2RuaMiGu4cZLag7K2Tq6eXwJjkkSzJF2DmRkXI2LHiudsMXr3re
+	9Xg==
+X-Google-Smtp-Source: AGHT+IEAQHQsziEnFHzzDoTXb1hDyQWDXePK8y3omtZyZP05+3DME7KShTXce2KWXPCtCEuE7AfCdcVqpzc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1003:b0:df7:62ec:c517 with SMTP id
+ 3f1490d57ef6-dfa73dba365mr10840276.11.1717110766469; Thu, 30 May 2024
+ 16:12:46 -0700 (PDT)
+Date: Thu, 30 May 2024 16:12:44 -0700
+In-Reply-To: <f2952ae37a2bdaf3eb53858e54e6cc4986c62528.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+References: <9bd868a287599eb2a854f6983f13b4500f47d2ae.1708933498.git.isaku.yamahata@intel.com>
+ <Zjz7bRcIpe8nL0Gs@google.com> <5ba2b661-0db5-4b49-9489-4d3e72adf7d2@intel.com>
+ <Zj1Ty6bqbwst4u_N@google.com> <49b7402c-8895-4d53-ad00-07ce7863894d@intel.com>
+ <20240509235522.GA480079@ls.amr.corp.intel.com> <Zj4phpnqYNoNTVeP@google.com>
+ <50e09676-4dfc-473f-8b34-7f7a98ab5228@intel.com> <Zle29YsDN5Hff7Lo@google.com>
+ <f2952ae37a2bdaf3eb53858e54e6cc4986c62528.camel@intel.com>
+Message-ID: <ZliUecH-I1EhN7Ke@google.com>
+Subject: Re: [PATCH v19 037/130] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend specific
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: Tina Zhang <tina.zhang@intel.com>, 
+	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>, Hang Yuan <hang.yuan@intel.com>, 
+	Bo Chen <chen.bo@intel.com>, "sagis@google.com" <sagis@google.com>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, Erdem Aktas <erdemaktas@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-T24gVHVlLCAyMDI0LTA0LTMwIGF0IDExOjM3IC0wNzAwLCBBbmt1ciBBcm9yYSB3cm90ZToNCj4g
-Q0FVVElPTjogVGhpcyBlbWFpbCBvcmlnaW5hdGVkIGZyb20gb3V0c2lkZSBvZiB0aGUgb3JnYW5p
-emF0aW9uLiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91
-IGNhbiBjb25maXJtIHRoZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4NCj4g
-DQo+IA0KPiANCj4gQWRkIGFyY2hpdGVjdHVyYWwgc3VwcG9ydCBmb3IgdGhlIGNwdWlkbGUtaGFs
-dHBvbGwgZHJpdmVyIGJ5IGRlZmluaW5nDQo+IGFyY2hfaGFsdHBvbGxfKigpLiBBbHNvIHNlbGVj
-dCBBUkNIX0hBU19PUFRJTUlaRURfUE9MTCBzaW5jZSB3ZSBoYXZlDQo+IGFuIG9wdGltaXplZCBw
-b2xsaW5nIG1lY2hhbmlzbSB2aWEgc21wX2NvbmRfbG9hZCooKS4NCj4gDQo+IEFkZCB0aGUgY29u
-ZmlndXJhdGlvbiBvcHRpb24sIEFSQ0hfQ1BVSURMRV9IQUxUUE9MTCB0byBhbGxvdw0KPiBjcHVp
-ZGxlLWhhbHRwb2xsIHRvIGJlIHNlbGVjdGVkLg0KPiANCj4gTm90ZSB0aGF0IHdlIGxpbWl0IGNw
-dWlkbGUtaGFsdHBvbGwgc3VwcG9ydCB0byB3aGVuIHRoZSBldmVudC1zdHJlYW0gaXMNCj4gYXZh
-aWxhYmxlLiBUaGlzIGlzIG5lY2Vzc2FyeSBiZWNhdXNlIHBvbGxpbmcgdmlhIHNtcF9jb25kX2xv
-YWRfcmVsYXhlZCgpDQo+IHVzZXMgV0ZFIHRvIHdhaXQgZm9yIGEgc3RvcmUgd2hpY2ggbWlnaHQg
-bm90IGhhcHBlbiBmb3IgYW4gcHJvbG9uZ2VkDQo+IHBlcmlvZCBvZiB0aW1lLiBTbywgZW5zdXJl
-IHRoZSBldmVudC1zdHJlYW0gaXMgYXJvdW5kIHRvIHByb3ZpZGUgYQ0KPiB0ZXJtaW5hdGluZyBj
-b25kaXRpb24uDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBBbmt1ciBBcm9yYSA8YW5rdXIuYS5hcm9y
-YUBvcmFjbGUuY29tPg0KPiAtLS0NCj4gIGFyY2gvYXJtNjQvS2NvbmZpZyAgICAgICAgICAgICAg
-ICAgICAgICAgIHwgMTAgKysrKysrKysrKw0KPiAgYXJjaC9hcm02NC9pbmNsdWRlL2FzbS9jcHVp
-ZGxlX2hhbHRwb2xsLmggfCAyMSArKysrKysrKysrKysrKysrKysrKysNCj4gIDIgZmlsZXMgY2hh
-bmdlZCwgMzEgaW5zZXJ0aW9ucygrKQ0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0IGFyY2gvYXJtNjQv
-aW5jbHVkZS9hc20vY3B1aWRsZV9oYWx0cG9sbC5oDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC9h
-cm02NC9LY29uZmlnIGIvYXJjaC9hcm02NC9LY29uZmlnDQo+IGluZGV4IDdiMTFjOThiM2U4NC4u
-NmYyZGYxNjJiMTBlIDEwMDY0NA0KPiAtLS0gYS9hcmNoL2FybTY0L0tjb25maWcNCj4gKysrIGIv
-YXJjaC9hcm02NC9LY29uZmlnDQo+IEBAIC0zNCw2ICszNCw3IEBAIGNvbmZpZyBBUk02NA0KPiAg
-ICAgICAgIHNlbGVjdCBBUkNIX0hBU19NRU1CQVJSSUVSX1NZTkNfQ09SRQ0KPiAgICAgICAgIHNl
-bGVjdCBBUkNIX0hBU19OTUlfU0FGRV9USElTX0NQVV9PUFMNCj4gICAgICAgICBzZWxlY3QgQVJD
-SF9IQVNfTk9OX09WRVJMQVBQSU5HX0FERFJFU1NfU1BBQ0UNCj4gKyAgICAgICBzZWxlY3QgQVJD
-SF9IQVNfT1BUSU1JWkVEX1BPTEwNCj4gICAgICAgICBzZWxlY3QgQVJDSF9IQVNfUFRFX0RFVk1B
-UA0KPiAgICAgICAgIHNlbGVjdCBBUkNIX0hBU19QVEVfU1BFQ0lBTA0KPiAgICAgICAgIHNlbGVj
-dCBBUkNIX0hBU19IV19QVEVfWU9VTkcNCj4gQEAgLTIzMzEsNiArMjMzMiwxNSBAQCBjb25maWcg
-QVJDSF9ISUJFUk5BVElPTl9IRUFERVINCj4gIGNvbmZpZyBBUkNIX1NVU1BFTkRfUE9TU0lCTEUN
-Cj4gICAgICAgICBkZWZfYm9vbCB5DQo+IA0KPiArY29uZmlnIEFSQ0hfQ1BVSURMRV9IQUxUUE9M
-TA0KPiArICAgICAgIGJvb2wgIkVuYWJsZSBzZWxlY3Rpb24gb2YgdGhlIGNwdWlkbGUtaGFsdHBv
-bGwgZHJpdmVyIg0KPiArICAgICAgIGRlZmF1bHQgbg0KPiArICAgICAgIGhlbHANCj4gKyAgICAg
-ICAgIGNwdWlkbGUtaGFsdHBvbGwgYWxsb3dzIGZvciBhZGFwdGl2ZSBwb2xsaW5nIGJhc2VkIG9u
-DQo+ICsgICAgICAgICBjdXJyZW50IGxvYWQgYmVmb3JlIGVudGVyaW5nIHRoZSBpZGxlIHN0YXRl
-Lg0KPiArDQo+ICsgICAgICAgICBTb21lIHZpcnR1YWxpemVkIHdvcmtsb2FkcyBiZW5lZml0IGZy
-b20gdXNpbmcgaXQuDQo+ICsNCj4gIGVuZG1lbnUgIyAiUG93ZXIgbWFuYWdlbWVudCBvcHRpb25z
-Ig0KPiANCj4gIG1lbnUgIkNQVSBQb3dlciBNYW5hZ2VtZW50Ig0KPiBkaWZmIC0tZ2l0IGEvYXJj
-aC9hcm02NC9pbmNsdWRlL2FzbS9jcHVpZGxlX2hhbHRwb2xsLmggYi9hcmNoL2FybTY0L2luY2x1
-ZGUvYXNtL2NwdWlkbGVfaGFsdHBvbGwuaA0KPiBuZXcgZmlsZSBtb2RlIDEwMDY0NA0KPiBpbmRl
-eCAwMDAwMDAwMDAwMDAuLmE3OWJkZWM3ZjUxNg0KPiAtLS0gL2Rldi9udWxsDQo+ICsrKyBiL2Fy
-Y2gvYXJtNjQvaW5jbHVkZS9hc20vY3B1aWRsZV9oYWx0cG9sbC5oDQo+IEBAIC0wLDAgKzEsMjEg
-QEANCj4gKy8qIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wICovDQo+ICsjaWZuZGVm
-IF9BU01fSEFMVFBPTExfSA0KPiArI2RlZmluZSBfQVNNX0hBTFRQT0xMX0gNCj4gKw0KPiArc3Rh
-dGljIGlubGluZSB2b2lkIGFyY2hfaGFsdHBvbGxfZW5hYmxlKHVuc2lnbmVkIGludCBjcHUpDQo+
-ICt7DQo+ICt9DQo+ICsNCj4gK3N0YXRpYyBpbmxpbmUgdm9pZCBhcmNoX2hhbHRwb2xsX2Rpc2Fi
-bGUodW5zaWduZWQgaW50IGNwdSkNCj4gK3sNCj4gK30NCj4gKw0KPiArc3RhdGljIGlubGluZSBi
-b29sIGFyY2hfaGFsdHBvbGxfc3VwcG9ydGVkKHZvaWQpDQo+ICt7DQo+ICsgICAgICAgLyoNCj4g
-KyAgICAgICAgKiBFbnN1cmUgdGhlIGV2ZW50IHN0cmVhbSBpcyBhdmFpbGFibGUgdG8gcHJvdmlk
-ZSBhIHRlcm1pbmF0aW5nDQo+ICsgICAgICAgICogY29uZGl0aW9uIHRvIHRoZSBXRkUgaW4gdGhl
-IHBvbGwgbG9vcC4NCj4gKyAgICAgICAgKi8NCj4gKyAgICAgICByZXR1cm4gYXJjaF90aW1lcl9l
-dnRzdHJtX2F2YWlsYWJsZSgpOw0KDQpOb3RlIHRoaXMgZmFpbHMgYnVpbGQgd2hlbiBDT05GSUdf
-SEFMVFBPTExfQ1BVSURMRT1tIChtb2R1bGUpOg0KDQpFUlJPUjogbW9kcG9zdDogImFyY2hfY3B1
-X2lkbGUiIFtkcml2ZXJzL2NwdWlkbGUvY3B1aWRsZS1oYWx0cG9sbC5rb10NCnVuZGVmaW5lZCEg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAN
-CkVSUk9SOiBtb2Rwb3N0OiAiYXJjaF90aW1lcl9ldnRzdHJtX2F2YWlsYWJsZSINCltkcml2ZXJz
-L2NwdWlkbGUvY3B1aWRsZS1oYWx0cG9sbC5rb10gdW5kZWZpbmVkISAgICAgICAgICAgICAgICAg
-ICAgICANCm1ha2VbMl06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5tb2Rwb3N0OjE0NTogTW9kdWxl
-LnN5bXZlcnNdIEVycm9yIDENCm1ha2VbMV06ICoqKiBbL2hvbWUvdWJ1bnR1L2xpbnV4L01ha2Vm
-aWxlOjE4ODY6IG1vZHBvc3RdIEVycm9yIDINCm1ha2U6ICoqKiBbTWFrZWZpbGU6MjQwOiBfX3N1
-Yi1tYWtlXSBFcnJvciAyDQoNCllvdSBjb3VsZCBhZGQgRVhQT1JUX1NZTUJPTF8qKCkncyBvbiB0
-aGUgYWJvdmUgaGVscGVycyBvciByZXN0cmljdA0KSEFMVFBPTExfQ1BVSURMRSBtb2R1bGUgdG8g
-YnVpbHQtaW4gKHJlbW92ZSAidHJpc3RhdGUiIEtjb25maWcpLg0KDQpPdGhlcndpc2UsIGV2ZXJ5
-dGhpbmcgd29ya2VkIGZvciBtZSB3aGVuIGJ1aWx0LWluICg9eSkgYXRvcCA2LjEwLjANCig0YTRi
-ZTFhKS4gSSBzZWUgc2ltaWxhciBwZXJmb3JtYW5jZSBnYWlucyBpbiBgcGVyZiBiZW5jaGAgb24g
-QVdTDQpHcmF2aXRvbjMgYzdnLjE2eGxhcmdlLg0KDQpSZWdhcmRzLA0KSGFyaXMgT2thbm92aWMN
-Cg0KPiArfQ0KPiArI2VuZGlmDQo+IC0tDQo+IDIuMzkuMw0KPiANCg0K
+On Thu, May 30, 2024, Kai Huang wrote:
+> On Wed, 2024-05-29 at 16:15 -0700, Sean Christopherson wrote:
+> > In the unlikely event there is a legitimate reason for max_vcpus_per_td being
+> > less than KVM's minimum, then we can update KVM's minimum as needed.  But AFAICT,
+> > that's purely theoretical at this point, i.e. this is all much ado about nothing.
+> 
+> I am afraid we already have a legitimate case: TD partitioning.  Isaku
+> told me the 'max_vcpus_per_td' is lowed to 512 for the modules with TD
+> partitioning supported.  And again this is static, i.e., doesn't require
+> TD partitioning to be opt-in to low to 512.
+
+So what's Intel's plan for use cases that creates TDs with >512 vCPUs?
+
+> So AFAICT this isn't a theoretical thing now.
+> 
+> Also, I want to say I was wrong about "MAX_VCPUS" in the TD_PARAMS is part
+> of attestation.  It is not.  TDREPORT dosen't include the "MAX_VCPUS", and
+> it is not involved in the calculation of the measurement of the guest.
+> 
+> Given "MAX_VCPUS" is not part of attestation, I think there's no need to
+> allow user to change kvm->max_vcpus by enabling KVM_ENABLE_CAP ioctl() for
+> KVM_CAP_MAX_VCPUS.
+
+Sure, but KVM would still need to advertise the reduced value for KVM_CAP_MAX_VCPUS
+when queried via KVM_CHECK_EXTENSION.  And userspace needs to be conditioned to
+do a VM-scoped check, not a system-scoped check.
+
+> So we could just once for all adjust kvm->max_vcpus for TDX in the
+> tdx_vm_init() for TDX guest:
+> 
+> 	kvm->max_vcpus = min(kvm->max_vcpus, tdx_info->max_vcpus_per_td);
+> 
+> AFAICT no other change is needed.
+> 
+> And in KVM_TDX_VM_INIT (where TDH.MNG.INIT is done) we can just use kvm-
+> >max_vcpus to fill the "MAX_VCPUS" in TD_PARAMS.
 
