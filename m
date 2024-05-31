@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-18484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6998D597D
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 06:36:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8543F8D597F
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 06:37:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0CBA1C23BF7
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 04:36:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 359962896B0
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 04:37:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24BCB7FBAE;
-	Fri, 31 May 2024 04:34:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44C6B81AB1;
+	Fri, 31 May 2024 04:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gogVyGb+"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="D4YyPTRV"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2057.outbound.protection.outlook.com [40.107.237.57])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00FF2135B;
-	Fri, 31 May 2024 04:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A9781730;
+	Fri, 31 May 2024 04:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.66
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717130075; cv=fail; b=m0jrfe+FssqvlyHykFqcolLFpgmrmZaQwtDXcOH1cYmB6VrjcFtwTkk7Cd35jYlhK2phIt93JXNddeblgjC6a6PuX8A36cYTPUad/k40h2gf8yl0dBs9MUux1BH7yBL65KgS6zEfPHSh3Gd6qW2AjK77X04igeR1wLIPoYLsb88=
+	t=1717130078; cv=fail; b=fx2QaxYAL1rTbAt7ix6FoejcIFvzM9C3gTt16vdBRnc/82IXb5adIVXJsQkCdfmvSXswpQfBaWYhYr2+7NOZdisW+1blrAXOsAaisAaOX6x36fe/YnsB4bDbrzaJxtrEOK5NiiFXOncWAtjadhlUYdjhIjk1FjlfITfo4AeTRiA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717130075; c=relaxed/simple;
-	bh=7RatBNCnIbDRhEKO1UiiuqJEpLxL39hIQkT7wV0TAJw=;
+	s=arc-20240116; t=1717130078; c=relaxed/simple;
+	bh=cQGOlved0tQmJKoUYAdNx2BMn1EbWhqcNlTE0N0mVI0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QKJZUoNn9Kj4qfLC5ZRRqgf9k2OEQyIf2iZjReagK2ZaLwMLyOINC54hSoPz11/3HAnc14ZNP/PfHmYaVbylDgZ/cy7PTcocdfd+DNE4pXw88C2PBTPpxUbaGapSo31yUvYklJYjaLGeJJt8iyMJDzYegmtwG0Hz6NRIMklU0cc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gogVyGb+; arc=fail smtp.client-ip=40.107.237.57
+	 MIME-Version:Content-Type; b=BSj/ZwQtXymEBQf5zdX6nn74WL/MpwU6ElYibcbK+Y5Ue7ZLE3Ybm53E1N6C6ZZhnUWj/6JrJucDjedfMpK1pafhHxJAUt4nuE8IUpv4JRTIKgbS+E5Sn75qUrh8dIVsMr9+1yJqYlSTAL2LCPaPNQ5+PLwXfCRX0W9kwzn7Hzg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=D4YyPTRV; arc=fail smtp.client-ip=40.107.244.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j37lGsRfELBG8p5AIOwFGecRoEI7qnR46YIothLtZBSrnhwvDRRybS3MaAhD5MODKCqbqL+wgAkKUXkCbTpfzc8J3dRYeSPM/g+PXGAxSefu/y6uN8wKAkN92b1TJ5HHL2wqewMM40vC5rQ4Sf9Y87N1kS744gKMoFwVo46fpVLvWVAEFrIZS3DB4rOTCgv80WipnAZh9amD8uAq2ISmTymFeDUZjFli1cg0PEZgVa/zI+fKwxrH0qyU2DzjHSNLdc27wfYmQ2ZR0KOb8SK5YJePEPPICfsVYFzKFZheNvA6xx8BRf+oqaaozeolV/mfx0BrPkCrtVEdnhvKLdJTcg==
+ b=bM20h0yyZvmvhiI44rp215zV/6JOBKZgooCCHPnwuM1qEo/kxNvWQEjOuVJHdtH+JFUHWOujY90I6yFBGan9arvryE9XOVOvNCaZtc0478XNXe8WoQswklnnz0CSaJsQgJ/8vXbnO21P6XgyB2RgIzu/Jk2jpQkrGnWT05LeLaF2TKsjqK9A1DBZAv39wwKCE1DAxxmIFfktnb6YTP5+ny/ru7GJSEVRK6Q1bUqPIJSVc1ogTXViwBx5dola3FZ0K5KvEyyRiODc+jEl1GJ1YSye6K1mZf5x4i59y8AULDlbdT4hYP4Xji8nh2KgK8aEm/02OioF6jYdUIY/0blfHw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8FW1kVb2HUuaBogO5Iihlfq+YjSLq/wBGzEKbi3itwQ=;
- b=ZQJiD3NLjQwOFlljMeNZm1Nb6HkO/k81h9aHMSmlsF+sSaMheG9uNjWw9qjeC/j1L35IkM8E13xdovW01CMTkYWzR8mTPniSGZNbED1K0I0xJjI2keo1ku8Zjnx7AvWbQ01wuaLFDRSmlajhhJCgDaezzHlUOTLN7zc3p7DZ3ia10AXGmCkOQhz45klEY/1ZmwWRbWHv46OVoR9XdprrVOXmJ7ecH3hc4monhYDFgYo1mS/UhfLDewJaO5LYAso57h870KAoR0uxxVib43blXNEyLsMg4bjPMuO2wxxXvRFdHmjvrJTSCzv+H7g3txu365+B0smRfBBVQSlEVBcJEw==
+ bh=BJGPFCKzNEwl3egjrviH4RCpCB7V93sRbJj49WF3LQM=;
+ b=APYlB4n6pUyO+imFUppInP8ciC1BDBcbFoDsXLGYrz0UwSDZgjgO8+EcPsniDluleMIEvfzV8Irqh5LZGx7gSvrYLCdUTQo9QjfcMyo1S+HgQMMWi/srk/dFFvVsnTxVLEyVadetc1on2r98aZ7TDujN9h88QN6Yuo6PfylDMVhuD5Qj2SMUpEe8LSyPihXw4+c0/zpCX8mDb7nMbsJpRzqK9zaWAeUpQVV32fxzoIAsz6a4hX3VkoqyVxXKIhYTAuMzY5fX3MzXrziGoitmaIeJmjVelo3kopCtEmGMcm/guOc1cBnQWufvZrgeBsfaWopQqA7jFZMzgtRFbolpwg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8FW1kVb2HUuaBogO5Iihlfq+YjSLq/wBGzEKbi3itwQ=;
- b=gogVyGb+x7v31ArH5MSBHXy1u1EhlQ4VlI0/RYGcuI4FPISzOjpc7dReCzkSeuvhhXlLmCxOGFg3QZLJ2vsehKwiBVrJsYLYLTP8j/S6mKNNuokt15wNQropcYaAHmSd+ieq0hqNWK8fbjBDC3fj1QT70/ieDw1ljdQfIM0RLII=
-Received: from CH2PR07CA0058.namprd07.prod.outlook.com (2603:10b6:610:5b::32)
- by DM6PR12MB4042.namprd12.prod.outlook.com (2603:10b6:5:215::11) with
+ bh=BJGPFCKzNEwl3egjrviH4RCpCB7V93sRbJj49WF3LQM=;
+ b=D4YyPTRV+IkrCI9hx4bYiinYInhrEpCudBjNSWb+h065KjBNVFVEKwAPrrja0iK6kBRmcNKkY/Y4H1jEIyjX1IdFZpbKLLTKrDttki1EiBMwRuRLoS4NOKpVNLUS8Btd4tXfJseaaMWudO4vzgI/gAKvjXqKfBfbO/R0Li5xRlE=
+Received: from CH2PR17CA0019.namprd17.prod.outlook.com (2603:10b6:610:53::29)
+ by IA0PR12MB7676.namprd12.prod.outlook.com (2603:10b6:208:432::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.22; Fri, 31 May
- 2024 04:34:29 +0000
-Received: from DS3PEPF000099D8.namprd04.prod.outlook.com
- (2603:10b6:610:5b:cafe::21) by CH2PR07CA0058.outlook.office365.com
- (2603:10b6:610:5b::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7544.28 via Frontend
- Transport; Fri, 31 May 2024 04:34:29 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.25; Fri, 31 May
+ 2024 04:34:32 +0000
+Received: from DS3PEPF000099D5.namprd04.prod.outlook.com
+ (2603:10b6:610:53:cafe::b3) by CH2PR17CA0019.outlook.office365.com
+ (2603:10b6:610:53::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.18 via Frontend
+ Transport; Fri, 31 May 2024 04:34:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,22 +63,22 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099D8.mail.protection.outlook.com (10.167.17.9) with Microsoft SMTP
+ DS3PEPF000099D5.mail.protection.outlook.com (10.167.17.6) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7633.15 via Frontend Transport; Fri, 31 May 2024 04:34:03 +0000
+ 15.20.7633.15 via Frontend Transport; Fri, 31 May 2024 04:34:32 +0000
 Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 30 May
- 2024 23:33:59 -0500
+ 2024 23:34:03 -0500
 From: Nikunj A Dadhania <nikunj@amd.com>
 To: <linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>, <bp@alien8.de>,
 	<x86@kernel.org>, <kvm@vger.kernel.org>
 CC: <mingo@redhat.com>, <tglx@linutronix.de>, <dave.hansen@linux.intel.com>,
 	<pgonda@google.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
 	<nikunj@amd.com>
-Subject: [PATCH v9 15/24] x86/sev: Cache the secrets page address
-Date: Fri, 31 May 2024 10:00:29 +0530
-Message-ID: <20240531043038.3370793-16-nikunj@amd.com>
+Subject: [PATCH v9 16/24] x86/sev: Drop sev_guest_platform_data structure
+Date: Fri, 31 May 2024 10:00:30 +0530
+Message-ID: <20240531043038.3370793-17-nikunj@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240531043038.3370793-1-nikunj@amd.com>
 References: <20240531043038.3370793-1-nikunj@amd.com>
@@ -94,153 +94,164 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099D8:EE_|DM6PR12MB4042:EE_
-X-MS-Office365-Filtering-Correlation-Id: da6abbc3-0884-434c-82c0-08dc812af5e2
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099D5:EE_|IA0PR12MB7676:EE_
+X-MS-Office365-Filtering-Correlation-Id: 71de84fb-8915-46cb-5437-08dc812af7da
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|7416005|1800799015|376005|36860700004|82310400017;
+	BCL:0;ARA:13230031|36860700004|376005|7416005|1800799015|82310400017;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?2Kq+m/pCm2g3gkTQpcTIhbARQ5ZWSVIW6OFWVSHbrJTO8A4zCr/yoh+s+RUA?=
- =?us-ascii?Q?nDOvLr2yCn8QdN3ytKaAyoReN8TQ1rWyQipAgSPPuQMkoHaTCqtHfXOjDaTa?=
- =?us-ascii?Q?mT20LS27+iSMjGORqrifjq5jRte3zjbvPQj5qg4qQueYKccDkRBdleS8JWWs?=
- =?us-ascii?Q?Jc7uZr0UDy0BycEeDqjSSnhDMwbvG9NTtcjVHC6pimwe+6sQGiwSn/V5gzwl?=
- =?us-ascii?Q?V1HmwXcbnfusTob0uVpqq0MrhUpsHFKOmNW0Li3Mk83BMTjG9Za+zAZrGhBQ?=
- =?us-ascii?Q?r4THFy+bUDT2QtwRcZd9zbg25ibe3hTDyN0HdzHcM2K7NafscolYsYBEKt52?=
- =?us-ascii?Q?q9rnpca4DCTFc2hUtpou4wzYtH6FlzUpzCDLAyL0iE3Hd3nvQvp14PuZ/EAc?=
- =?us-ascii?Q?d/RQ0CPdRdd/4VAV261cfZhqZUin99kqKDBJMueu45tAtqlFG2drtDY0NzLp?=
- =?us-ascii?Q?KmAKddCX/aojOzypdOSwVShasWOA3xs3POw4ZaLXtO8EVKBs7oejKfnAGzlE?=
- =?us-ascii?Q?wDjdXXF096zCrHbbCNVuSkJJQjZh7GjNlVg/IYJvte++8cMhAyd2HV3Vg0Fo?=
- =?us-ascii?Q?7IddF0yGVbEd4O7QxLWw/Kf7Gf7AyDpr3wRldguKrNfI3O16nl95vMKlPruv?=
- =?us-ascii?Q?zyAATouHewHglfyvqmhNrE58A2Ui7Mri+0nqiRemStZjG4ZU/uL/972KnJ3Y?=
- =?us-ascii?Q?NUlFcZH8dkDSz2uDZ/D+nFbMUlT1CDxp/AcFw2hlRuc0bNNhNpXnnAEQx0Yo?=
- =?us-ascii?Q?MufHXxdw3tFNENJrqO7E1hKjYFBkLwe2rn7BbQi2jVmvxtxdaXODYl+mIIV2?=
- =?us-ascii?Q?HZSGzctSksZmB6v/Wvrj+HCZkrbP2QvC4JuCdxNc8To4TXidl+b4jC/83GfJ?=
- =?us-ascii?Q?kRUUg0d+cVyJZ7oChqFvcXs+DxqaAHISDalEs19UduHD/W4j0bxBcQ4/cLAe?=
- =?us-ascii?Q?7gr1VujBAcU6pE5x6SHDtzjI1O9dAUrnCEjMAosRzN/7S8TLF0SqHwMnVI51?=
- =?us-ascii?Q?sQ1lN9yJyDSPnoOhGP1mE4DAwI9t7tcpk2KIiHKcKtL6T1T7RIxks5o586JO?=
- =?us-ascii?Q?G5P8ZSVWr8FVD3Jk2/NN9XbhDjxa5TuqmGKQlfwkXfXpSzoSId9klf4soL6e?=
- =?us-ascii?Q?OfW2UY4xyTXY3b3rcZCl/vH73/4rVbQHAmsxm2cfIRsXkR+DtYBI52EO5ylI?=
- =?us-ascii?Q?sKo7R7kwick/h3TJBQIOysKJqF1M/aalP1DDKyQt1l5+u8ZSHjTJq4jLZqmm?=
- =?us-ascii?Q?uOyYaZTt/IRkg3FIVUPQpFGaG7flcNDz7apBm1Vi+8Taeen1U+sxQmO8uDs/?=
- =?us-ascii?Q?zSenN5L1ow6rViOuTjD6LQ9LfJEZUTQ1phOhQreGBL+U1QdgdTdiFVPHZBOQ?=
- =?us-ascii?Q?0vPerKNmLdmuUiz469O1QHav8xs+?=
+	=?us-ascii?Q?mNCday6T2p5gKxF4RKv1jPVN8gBsVjO6CTo4QAOErve5XUGpKuIKsWp4qgEC?=
+ =?us-ascii?Q?p51/pLKUHyOAcGVBsjZf5W5UlksH+n9WuRD6E56ohjLSQy126menS303fk6z?=
+ =?us-ascii?Q?EU/BuG4/b2GM47v+WI0v7WaNj34TmOk0v8fEWDoUFRPAtBW0R7uNo3Fi/J/6?=
+ =?us-ascii?Q?qxPmFpD3LjDAjEO+rPsw+KXJNvLcv0qVZ90txsPfhpuE0T/kDYXj23+sbNQl?=
+ =?us-ascii?Q?uChp7TYKQREbVlbHS3ZdoYd4EyGLmnaz9DUa5HOLe5j1yD7Ofui2VU10Knpg?=
+ =?us-ascii?Q?NgMonFXPLG3h5MZg60Sz+8FsruHmmi2Y/Z0M3pFpTPjHqFA2k30NTOx8IvNX?=
+ =?us-ascii?Q?0K5z0FINL7r59tyzX2YHK15fHU5zvl9V+BSccSJpMDf7ZFLzhf9rDydw4J/o?=
+ =?us-ascii?Q?vAZ/O5zixF3Fgv4z/ZB9VmRAJ7FB4wWixbTl5YIqezjLQtU8ju7T6d/pWGGf?=
+ =?us-ascii?Q?nMXUzDTu7CejO2nvN3BgAqgZYFeJMwo3P7i4M2hk5k65Pec29cffLJhb2MT4?=
+ =?us-ascii?Q?YE7Q1cTo8r2nkDgqFB31/a56CEC5CZLfaaA4XGj6LQpQp0ubtXfsMNAPk8Xf?=
+ =?us-ascii?Q?SuI4hyKU/0uxjYnPsPHsx26I5ez/puxsM0LKEABkMeODEzoV9k1fl280wcWm?=
+ =?us-ascii?Q?cC/LkezMswZ8KSFCcNPkr/aJTSLXLEhVVkkWfH9kii52vb93nv5qx2eP9I2A?=
+ =?us-ascii?Q?PkSFI/Sm7E3eKR8nxOspo8Hf3QjY/O0itHv+swNs7peKdsBTDzr+PpSvb1I/?=
+ =?us-ascii?Q?YShradNYXjklkIx2iuCVCPwCP4i/2oB2/kNIAleLvgP+Zds3/iZ6CjvZx07H?=
+ =?us-ascii?Q?oluTGlTuLNVuJ6ParRrAJc48qjk1h5QKiqPqXNlFG1W5N7nU8qmV5055dC9n?=
+ =?us-ascii?Q?E5DeYQsjk7wWnvBFfLjMKGZNaxJlS33p3iO0Jg2ynVHbSHPN6E56sYDxbdo0?=
+ =?us-ascii?Q?QSuwfEW36v9fS7Q2dkvqqWfZuqiIb+VZ7JpZllpVh42OmdzZWDVQcPSbjblD?=
+ =?us-ascii?Q?Kx69N2eCubhgVU5lgWkNmF7V20z2okGOcmT2IXngJ7EFPwrKn+X0LpPtdLun?=
+ =?us-ascii?Q?VGb+g6v83YqyBqjCJHniFHxV9fh65dToXahdGG5KPMhCpYCJjOWz+lGDf0YS?=
+ =?us-ascii?Q?FGT6GwwuM4HcSy4Wz+u23/oaObeWnVtk+yAzry3w2EJoLBl9K76B8uGC3ylF?=
+ =?us-ascii?Q?tjM5ecnBkwfuqL1OPhbRjelyeeUFOqXxKGr1B4rYf1etDJjzvbh+ze/fqgmI?=
+ =?us-ascii?Q?MxQtCb7xJ/+1f71zoDNIFJgDOkcTS9LtP3C+qfc1uEExJQ3mclAHATi+eLMi?=
+ =?us-ascii?Q?9LG7iuzmaeGjTY8B1kdw3SszAG3hHw36LwS86oKmg2xpwWStSJXR76wkut2T?=
+ =?us-ascii?Q?zdz0N3/uqXO8X2lIp7fCdTr8LlS6?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(36860700004)(82310400017);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(36860700004)(376005)(7416005)(1800799015)(82310400017);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2024 04:34:03.8952
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 May 2024 04:34:32.5720
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: da6abbc3-0884-434c-82c0-08dc812af5e2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 71de84fb-8915-46cb-5437-08dc812af7da
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099D8.namprd04.prod.outlook.com
+	DS3PEPF000099D5.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4042
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB7676
 
-Instead of calling get_secrets_page() that parses the CC blob every time
-for getting the secrets page physical address(secrets_pa), save the secrets
-page physical address during snp_init() from the CC blob. Now that there
-are no users of get_secrets_page() drop the function.
+SEV guest platform data structure was used to pass the secrets page
+physical address. As the SNP guest messaging initialization routines are
+local and secrets page address is cached in sev.c, use that instead of
+sending it to the SEV guest driver and getting the same address back.
 
 Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 ---
- arch/x86/kernel/sev.c | 51 ++++++++++---------------------------------
- 1 file changed, 11 insertions(+), 40 deletions(-)
+ arch/x86/include/asm/sev.h              |  9 ++-------
+ arch/x86/kernel/sev.c                   | 10 ++--------
+ drivers/virt/coco/sev-guest/sev-guest.c |  8 +-------
+ 3 files changed, 5 insertions(+), 22 deletions(-)
 
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index f58052fd6cb3..128bf71302a3 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -116,10 +116,6 @@ struct snp_req_data {
+ 	unsigned long resp_gpa;
+ };
+ 
+-struct sev_guest_platform_data {
+-	u64 secrets_gpa;
+-};
+-
+ #define VMPCK_MAX_NUM		4
+ 
+ /*
+@@ -324,7 +320,7 @@ u64 sev_get_status(void);
+ void sev_show_status(void);
+ bool snp_assign_vmpck(struct snp_guest_dev *snp_dev, unsigned int vmpck_id);
+ bool snp_is_vmpck_empty(struct snp_guest_dev *snp_dev);
+-int snp_guest_messaging_init(struct snp_guest_dev *snp_dev, u64 secrets_gpa);
++int snp_guest_messaging_init(struct snp_guest_dev *snp_dev);
+ void snp_guest_messaging_exit(struct snp_guest_dev *snp_dev);
+ int snp_send_guest_request(struct snp_guest_dev *snp_dev, struct snp_guest_req *req,
+ 			   struct snp_guest_request_ioctl *rio);
+@@ -393,8 +389,7 @@ static inline void sev_show_status(void) { }
+ static inline bool snp_assign_vmpck(struct snp_guest_dev *snp_dev,
+ 				    unsigned int vmpck_id) { return false; }
+ static inline bool snp_is_vmpck_empty(struct snp_guest_dev *snp_dev) { return true; }
+-static inline int
+-snp_guest_messaging_init(struct snp_guest_dev *snp_dev, u64 secrets_gpa) { return -EINVAL; }
++static inline int snp_guest_messaging_init(struct snp_guest_dev *snp_dev) { return -EINVAL; }
+ static inline void snp_guest_messaging_exit(struct snp_guest_dev *snp_dev) { }
+ static inline int snp_send_guest_request(struct snp_guest_dev *snp_dev, struct snp_guest_req *req,
+ 					 struct snp_guest_request_ioctl *rio) { return -EINVAL; }
 diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-index 878575b05b2d..141a670d2a85 100644
+index 141a670d2a85..c56cb2f15ec7 100644
 --- a/arch/x86/kernel/sev.c
 +++ b/arch/x86/kernel/sev.c
-@@ -93,6 +93,9 @@ static struct ghcb *boot_ghcb __section(".data");
- /* Bitmap of SEV features supported by the hypervisor */
- static u64 sev_hv_features __ro_after_init;
+@@ -2239,15 +2239,9 @@ static struct platform_device sev_guest_device = {
  
-+/* Secrets page physical address from the CC blob */
-+static u64 secrets_pa __ro_after_init;
-+
- /* #VC handler runtime per-CPU data */
- struct sev_es_runtime_data {
- 	struct ghcb ghcb_page;
-@@ -619,45 +622,13 @@ void noinstr __sev_es_nmi_complete(void)
- 	__sev_put_ghcb(&state);
- }
- 
--static u64 __init get_secrets_page(void)
--{
--	u64 pa_data = boot_params.cc_blob_address;
--	struct cc_blob_sev_info info;
--	void *map;
--
--	/*
--	 * The CC blob contains the address of the secrets page, check if the
--	 * blob is present.
--	 */
--	if (!pa_data)
--		return 0;
--
--	map = early_memremap(pa_data, sizeof(info));
--	if (!map) {
--		pr_err("Unable to locate SNP secrets page: failed to map the Confidential Computing blob.\n");
--		return 0;
--	}
--	memcpy(&info, map, sizeof(info));
--	early_memunmap(map, sizeof(info));
--
--	/* smoke-test the secrets page passed */
--	if (!info.secrets_phys || info.secrets_len != PAGE_SIZE)
--		return 0;
--
--	return info.secrets_phys;
--}
--
- static u64 __init get_snp_jump_table_addr(void)
- {
- 	struct snp_secrets_page *secrets;
- 	void __iomem *mem;
--	u64 pa, addr;
--
--	pa = get_secrets_page();
--	if (!pa)
--		return 0;
-+	u64 addr;
- 
--	mem = ioremap_encrypted(pa, PAGE_SIZE);
-+	mem = ioremap_encrypted(secrets_pa, PAGE_SIZE);
- 	if (!mem) {
- 		pr_err("Unable to locate AP jump table address: failed to map the SNP secrets page.\n");
- 		return 0;
-@@ -2107,6 +2078,11 @@ bool __head snp_init(struct boot_params *bp)
- 	if (!cc_info)
- 		return false;
- 
-+	if (cc_info->secrets_phys && cc_info->secrets_len == PAGE_SIZE)
-+		secrets_pa = cc_info->secrets_phys;
-+	else
-+		return false;
-+
- 	setup_cpuid_table(cc_info);
- 
- 	/*
-@@ -2264,16 +2240,11 @@ static struct platform_device sev_guest_device = {
  static int __init snp_init_platform_device(void)
  {
- 	struct sev_guest_platform_data data;
--	u64 gpa;
- 
+-	struct sev_guest_platform_data data;
+-
  	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
  		return -ENODEV;
  
--	gpa = get_secrets_page();
--	if (!gpa)
+-	data.secrets_gpa = secrets_pa;
+-	if (platform_device_add_data(&sev_guest_device, &data, sizeof(data)))
 -		return -ENODEV;
 -
--	data.secrets_gpa = gpa;
-+	data.secrets_gpa = secrets_pa;
- 	if (platform_device_add_data(&sev_guest_device, &data, sizeof(data)))
+ 	if (platform_device_register(&sev_guest_device))
  		return -ENODEV;
  
+@@ -2597,11 +2591,11 @@ int snp_send_guest_request(struct snp_guest_dev *snp_dev,
+ }
+ EXPORT_SYMBOL_GPL(snp_send_guest_request);
+ 
+-int snp_guest_messaging_init(struct snp_guest_dev *snp_dev, u64 secrets_gpa)
++int snp_guest_messaging_init(struct snp_guest_dev *snp_dev)
+ {
+ 	int ret = -ENOMEM;
+ 
+-	snp_dev->secrets = (__force void *)ioremap_encrypted(secrets_gpa, PAGE_SIZE);
++	snp_dev->secrets = (__force void *)ioremap_encrypted(secrets_pa, PAGE_SIZE);
+ 	if (!snp_dev->secrets) {
+ 		pr_err("Failed to map SNP secrets page.\n");
+ 		return ret;
+diff --git a/drivers/virt/coco/sev-guest/sev-guest.c b/drivers/virt/coco/sev-guest/sev-guest.c
+index 41878bd968d5..8d026d485028 100644
+--- a/drivers/virt/coco/sev-guest/sev-guest.c
++++ b/drivers/virt/coco/sev-guest/sev-guest.c
+@@ -406,7 +406,6 @@ static void unregister_sev_tsm(void *data)
+ 
+ static int __init sev_guest_probe(struct platform_device *pdev)
+ {
+-	struct sev_guest_platform_data *data;
+ 	struct device *dev = &pdev->dev;
+ 	struct snp_guest_dev *snp_dev;
+ 	struct miscdevice *misc;
+@@ -415,11 +414,6 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+ 	if (!cc_platform_has(CC_ATTR_GUEST_SEV_SNP))
+ 		return -ENODEV;
+ 
+-	if (!dev->platform_data)
+-		return -ENODEV;
+-
+-	data = (struct sev_guest_platform_data *)dev->platform_data;
+-
+ 	snp_dev = devm_kzalloc(&pdev->dev, sizeof(struct snp_guest_dev), GFP_KERNEL);
+ 	if (!snp_dev)
+ 		return -ENOMEM;
+@@ -430,7 +424,7 @@ static int __init sev_guest_probe(struct platform_device *pdev)
+ 		return ret;
+ 	}
+ 
+-	if (snp_guest_messaging_init(snp_dev, data->secrets_gpa)) {
++	if (snp_guest_messaging_init(snp_dev)) {
+ 		dev_err(dev, "Unable to setup SNP Guest messaging using VMPCK%u\n",
+ 			snp_dev->vmpck_id);
+ 		return ret;
 -- 
 2.34.1
 
