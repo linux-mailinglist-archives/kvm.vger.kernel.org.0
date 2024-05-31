@@ -1,146 +1,118 @@
-Return-Path: <kvm+bounces-18534-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18535-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4976F8D61D0
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 14:34:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 239498D6278
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 15:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 040EF285A56
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 12:34:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC64B283320
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 13:11:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A65158859;
-	Fri, 31 May 2024 12:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26BF158A14;
+	Fri, 31 May 2024 13:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZzfHS6AP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avsy/iqc"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978EB1586C4
-	for <kvm@vger.kernel.org>; Fri, 31 May 2024 12:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82163158A12
+	for <kvm@vger.kernel.org>; Fri, 31 May 2024 13:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717158838; cv=none; b=q6xO2x+A+DSuACrYKQkPDDtCmFoEht8m2bQfXYovKjprpfRtqL92asle1a4W/iKfYHZ9h5PicRF0e4iwQw9v018ExJBA+1q8Ytff6PbTktK5Ltby05dKlFRDObEPZD9t+Y17/GR41vpCwOUEZv7BZqqCt6na8w8Q874I8OBeX3Y=
+	t=1717161062; cv=none; b=qwbQ+Z9MSpCGIR8qgmPHUtGvxlSqIQd6Hg7wIlVZcCF0YYXJO6D3XUzAUdsnjW9H/ifIfzZifvOu75A2CcKwW4yTRDVwsEY9SYmXIUvRlxuHc95hrhMbNgw2Vs25L3Q+ibpqUQXZMMGyCer/z3d5vvgSImQndtpShNapAP5vovg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717158838; c=relaxed/simple;
-	bh=FWgECsGfJI9v74xMXI+WJ3NI1fwkq1VdiaF/g31OUbs=;
+	s=arc-20240116; t=1717161062; c=relaxed/simple;
+	bh=CqLmmdZ2wecXUVkHp+HXQRJLjMCpZYdCiUOYNmrEQ+o=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZQ5pbSF2oZJmTnYDmMdx8UijRhsZsgARdfUdKb8nSg0N3AxCVnN9sRpPkp9QxWWWOfQWOsERnVBiJM0lcD+FIzwsrTU3c1MMFeoBB7uHQ75GnYwTboGrDhB4SecYFleYrV3IsKjRgM43plXj7F+Jg/g5IQrqP7Oj2wSamvNzuR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZzfHS6AP; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=UbNst+hTYpVmuXbuSQaSUoAgSiOVQkZo9aG3Leu42cPrCeXMKbXVj6bbHbSi89kxZm1yTndf2OWd3uS3NgZUkI3NBNA73Ns9SJXs6kzcyvaRYBgL9v6lOeQjYhYJ3Te8fdx3rRzxJJmz0wZA7iEtd1JhTxrlBnvFWXNog6CRtE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=avsy/iqc; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717158835;
+	s=mimecast20190719; t=1717161059;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=A0Up6NdBkRgjmDLWyJob6XY0DIAMH1Tn7MWcPIWCuTY=;
-	b=ZzfHS6APiQn1h05EYcSi0Zwbb2dBWbF53VletLIi6Rpmb6eAQa6S7uK6vJf4lswrRvNJ/C
-	N2MfXnSAp+jFBcgDLRJXk68CFSAOj8/MUAJ9rmitxHf+p+TzXxr6cPEAyMgqE7gip0ML/A
-	ge+Gtbc2MJ1yvX4STd8QFj7ZXhfoDV0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=CqLmmdZ2wecXUVkHp+HXQRJLjMCpZYdCiUOYNmrEQ+o=;
+	b=avsy/iqcjV14RBcHBxlLBdgoRdsEUarlefrW9J6f5M4/LlKD+Ox9ECL/wANBTJwJ6hpHzs
+	KekWSiv4iFQbdIwizRk4jowc7PYLbpvE6yEn6ApmtLuNdKnourO78CjplLyc3iSjPUxGMa
+	+4+bu7D7HyLYPLDHfGhxa3YRvhr7t+0=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-311-GTduY3mIOziuCOhbYrkHhA-1; Fri, 31 May 2024 08:33:54 -0400
-X-MC-Unique: GTduY3mIOziuCOhbYrkHhA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-35dcb574515so984625f8f.0
-        for <kvm@vger.kernel.org>; Fri, 31 May 2024 05:33:53 -0700 (PDT)
+ us-mta-335-V73oEPSiMxCwp2F3zY1wfA-1; Fri, 31 May 2024 09:10:57 -0400
+X-MC-Unique: V73oEPSiMxCwp2F3zY1wfA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35dd0cc1a7bso528371f8f.1
+        for <kvm@vger.kernel.org>; Fri, 31 May 2024 06:10:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717158833; x=1717763633;
+        d=1e100.net; s=20230601; t=1717161057; x=1717765857;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=A0Up6NdBkRgjmDLWyJob6XY0DIAMH1Tn7MWcPIWCuTY=;
-        b=U46+egu/KG7WaUd0t++whFynD1uUKkOcPTzSrtmyboJhrDrG5ovwojtK1MaZpsv06v
-         lIAZXsj6Ky4CKHGZl67fn1QWdpW79oMLwoF0/Jy4ZCBfNZSGktZoPhPcMTbTtC/jYLVp
-         ndUiiWadPcxkUkNwW231v+1iIoL6KOG/giaikzO3QJhlrXra9cdpQmEJFmLxYPAiLEZj
-         sr3o2702JzyXF3FWVuHq9JilgRwp1Fl05yL/yeGjgIX96CEzFuG/A6MoXXJPflwrH0Fb
-         GgjL0F05IzXUa9j7ZGUMBLLIdHi1nBe8CwLaSuukRHkM48gbbDLwFn3P6IdviGyGL1IF
-         C1Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkT0Li1npVFctmNgJVD41WMPdhbB5dHCyuZ2/etqoRTUkmzogbi6Y51OlgkRar5IeecpctuGSdRuAe72jYwChQcCJ8
-X-Gm-Message-State: AOJu0Yxn6cSujhT6ZR/ZbGElBa98XiaNNHNmyGIafZl6S0kdx9we5irL
-	0gvgnV9TrfgKHa4tL2RHnnN0l/pWO9Z9fsC+80Xq3ahATHsYmA/kaymsWBIwxV9hrOMsL7kCjH9
-	N70kNl97NbBYQGYBNy5IcL1SXdmdiXzLwMq45jqqbk4Lf34QgbJaUsuo+MPDUpjNDMsT7JfJzhq
-	qen8KG/yjULL2S+8hbOLTXZgoZ
-X-Received: by 2002:adf:cd8b:0:b0:355:161:b7e6 with SMTP id ffacd0b85a97d-35e0f2879abmr1254336f8f.41.1717158833060;
-        Fri, 31 May 2024 05:33:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGAbWZ++3Kxz8loXJ5rJzTrFeHLsmVYmj/RgQdDDla4kiYPvCN4bCqa/jqdkI7z3R7Gfzt/kunUuX4KP22LeBw=
-X-Received: by 2002:adf:cd8b:0:b0:355:161:b7e6 with SMTP id
- ffacd0b85a97d-35e0f2879abmr1254316f8f.41.1717158832634; Fri, 31 May 2024
- 05:33:52 -0700 (PDT)
+        bh=CqLmmdZ2wecXUVkHp+HXQRJLjMCpZYdCiUOYNmrEQ+o=;
+        b=JsBOM6Tw3AsiemHw04wI7b0KxT6VqlhMJzq38pMqkQ0RrLclQAN2A/oSgnHU9lbgXn
+         9Jp1DTpFD8MTeNTb6rJsvkZ+Er39OgwGXGl8VjJSwGaakTEd2228GLAkPzyxAPHbjtb1
+         FBN5sEgemSu7RVv8Tbs//WEjwN0cTDHYQYzAm1iU98HnD/2icClL446IKRh+v1NW4XTg
+         2VsHw/ipmAMNpjlWXg38kcgpTXdbjKbGIkqN6w29iJqr9+RqMpfQQllDv6+OXYBaw3RI
+         rdq92l1DnQmdEUeELcS1RJ/qm7ohniOH9eQEtNWW0Ew/FRm0udPMru4C5XOtTAgszsAZ
+         kwNw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+M0NJ1vN+1R7dn5aBVuZvQMdw70J+G6jE2F2kl+zpr+aOixtZHVwdjjIIEXwvhzS7IG9J3An2ZWHyWm4wjVAp7eO6
+X-Gm-Message-State: AOJu0Yyv8wgOy62a01upvNEg4hmSphe9EdS9yxiK6dcbQQQyKpGMWpLl
+	SHfgQ/eBAWQrnMsjixJkMfFXy7ChpfK/Z+7X7kJV4Mw6hbXhWoNo0yqcZcJqMF+GXSa6Rjdn753
+	8oQJoDT8/H7qUm24oDVUBr6/ti9qcKiUCp9m0/aA1z3+S2PYBIT/iMRoyK62biWOY9bH9iXLh2a
+	ofGj36MlY302IKASRF7bg1CvdA
+X-Received: by 2002:a5d:4bd1:0:b0:354:e0e8:33ea with SMTP id ffacd0b85a97d-35e0f37119cmr1303096f8f.66.1717161056772;
+        Fri, 31 May 2024 06:10:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG3gzv4GfxGaWcm8XMVixs3+MtMYgeFKTzpnPkZZHcTWqGRUOOsjVrY6Fxl3SCwOqZe8dfStn6ygQ2HzwmiDVA=
+X-Received: by 2002:a5d:4bd1:0:b0:354:e0e8:33ea with SMTP id
+ ffacd0b85a97d-35e0f37119cmr1303068f8f.66.1717161056377; Fri, 31 May 2024
+ 06:10:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530111643.1091816-1-pankaj.gupta@amd.com> <20240530111643.1091816-30-pankaj.gupta@amd.com>
-In-Reply-To: <20240530111643.1091816-30-pankaj.gupta@amd.com>
+References: <20240501085210.2213060-1-michael.roth@amd.com>
+ <20240501085210.2213060-10-michael.roth@amd.com> <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
+ <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
+ <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com> <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
+ <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com> <CABgObfajCDkbDbK6-QyZABGTh=5rmE5q3ifvHfZD1A2Z+u0v3A@mail.gmail.com>
+ <ZleJvmCawKqmpFIa@google.com> <3999aadf-92a8-43f9-8d9d-84aa47e7d1ae@linux.intel.com>
+In-Reply-To: <3999aadf-92a8-43f9-8d9d-84aa47e7d1ae@linux.intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 31 May 2024 14:33:39 +0200
-Message-ID: <CABgObfbMBdm5_vr36aX9cYYRaaLWp6+Y1AKo9YtUbVbKX897sQ@mail.gmail.com>
-Subject: Re: [PATCH v4 29/31] hw/i386/sev: Allow use of pflash in conjunction
- with -bios
-To: Pankaj Gupta <pankaj.gupta@amd.com>
-Cc: qemu-devel@nongnu.org, brijesh.singh@amd.com, dovmurik@linux.ibm.com, 
-	armbru@redhat.com, michael.roth@amd.com, xiaoyao.li@intel.com, 
-	thomas.lendacky@amd.com, isaku.yamahata@intel.com, berrange@redhat.com, 
-	kvm@vger.kernel.org, anisinha@redhat.com
+Date: Fri, 31 May 2024 15:10:43 +0200
+Message-ID: <CABgObfZZsJxQ5AKve+GYJiUB0cFc70qkDbvRB82KrvHvM0k3jg@mail.gmail.com>
+Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
+ State Change VMGEXIT
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
+	linux-coco@lists.linux.dev, linux-mm@kvack.org, linux-crypto@vger.kernel.org, 
+	x86@kernel.org, linux-kernel@vger.kernel.org, tglx@linutronix.de, 
+	mingo@redhat.com, jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, 
+	ardb@kernel.org, vkuznets@redhat.com, jmattson@google.com, luto@kernel.org, 
+	dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com, 
+	peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Isaku Yamahata <isaku.yamahata@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 30, 2024 at 1:17=E2=80=AFPM Pankaj Gupta <pankaj.gupta@amd.com>=
- wrote:
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index def77a4429fb24e62748
-> +static void pc_system_flash_map(PCMachineState *pcms,
-> +                                MemoryRegion *rom_memory)
-> +{
-> +    pc_system_flash_map_partial(pcms, rom_memory, 0, false);
-> +}
-> +
->  void pc_system_firmware_init(PCMachineState *pcms,
->                               MemoryRegion *rom_memory)
->  {
-> @@ -238,9 +248,12 @@ void pc_system_firmware_init(PCMachineState *pcms,
->          }
->      }
->
-> -    if (!pflash_blk[0]) {
-> +    if (!pflash_blk[0] || sev_snp_enabled()) {
->          /* Machine property pflash0 not set, use ROM mode */
->          x86_bios_rom_init(X86_MACHINE(pcms), "bios.bin", rom_memory, fal=
-se);
-> +        if (sev_snp_enabled()) {
-> +            pc_system_flash_map_partial(pcms, rom_memory, 3653632, true)=
-;
-> +        }
+On Fri, May 31, 2024 at 3:23=E2=80=AFAM Binbin Wu <binbin.wu@linux.intel.co=
+m> wrote:
+> About the chunk size, if it is too small, it will increase the cost of
+> kernel/userspace context switches.
+> Maybe 2MB?
 
-This number is a bit too specific. :)
-
-The main issue here is that we want to have both a ROM and a
-non-executable pflash device.
-
-I think in this case (which should be gated by
-machine_require_guest_memfd(MACHINE(pcms)), just like in earlier
-patches), we need to:
-
-1) give an error if pflash_blk[1] is specified, i.e. support only one
-flash device
-
-2) possibly, give a warning if -bios is _not_ specified.
-
-3) map pflash_blk[0] below the BIOS ROM and expect it to be just the variab=
-les
-
-The need to use -bios for code and pflash0 (if desired) for variables
-also needs to be documented of course.
-
-Some parts of this patch can be salvaged, others are not needed
-anymore... I'll let you figure it out. :)
+Yeah, 2MB sounds right.
 
 Paolo
 
