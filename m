@@ -1,49 +1,46 @@
-Return-Path: <kvm+bounces-18549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9FD8D691B
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 20:41:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 766A38D6979
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 21:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F09F51C23525
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 18:41:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 318A1283684
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 19:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7689E17C223;
-	Fri, 31 May 2024 18:41:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3958C17CA1D;
+	Fri, 31 May 2024 19:11:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Btrcptra"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="c+stuysy"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE3967E0F4
-	for <kvm@vger.kernel.org>; Fri, 31 May 2024 18:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6899178369
+	for <kvm@vger.kernel.org>; Fri, 31 May 2024 19:11:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717180890; cv=none; b=ufo/ETbyhWW7rK4q21kDtYbXLoFyCCVGBfakzYmSCJFTPodAMktX6AM8AB5T9iYYOiPVOYK7CfbtfWYoGWzIJ3wrSfR4O9aTM05zqnaa5XvJClFLJi+OMlonWf5qm3w+WTTUOLZolej5UP0j/BP5VzLOn2Bhd6FJJ4lHYCWnJok=
+	t=1717182710; cv=none; b=NJq3iz8HPIq4qahITxfsNnau9sHjSbDuIi1tUEErFT+0Kd06G9Hh3nONSnDyB/9mmalHMUaAgAmVfNO0alt8MO5T9xaekOEE+AYXQjO2eJn9YuEP+06FaMARC1AXsYvwruvvm9lUSM6KYFocNnhoFnhEUjuT9D/a1JRAGpZ6syI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717180890; c=relaxed/simple;
-	bh=N/Blbd63m9rqy+z4+yPkchYJqSbPLzT+F1ELjIofaUg=;
+	s=arc-20240116; t=1717182710; c=relaxed/simple;
+	bh=sgtQujDi/xwJoTvozQThnGUOv2FF51IL2+0TqRg8OEA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q3VSEk7jpizypP1zSk+l8/BLcwXl2fydTEju2F7j8OfVV8JEpyrKC3S0TMXLMLCunzF6oj+dbFM9ZGKz4F3D7t9PqnJF6ACof5PUl/csE+lNPlrM0QqYbL7+yxceA1rpTtUJWUGlMjVHvdqnVA07tjGTyiLh3SUD/1Vnox8lBEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Btrcptra; arc=none smtp.client-ip=95.215.58.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=IPM7zAMpmtpcQBPt6g1fn+63YZ2LtT0YxOeEKPB7Zb7L1rjLmqKHkvP3lKXny6hv0LhkK7geoEI2F4g7/9jQ9d0vEootbRFXwRBnjo5xhkp8iSMXH6CVggbUta3eyafgMUdQXbwJCxgT3fCJCB/dI3zQxHYnttcVacSSuqMiuRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=c+stuysy; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: yuzhao@google.com
+X-Envelope-To: jthoughton@google.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717180886;
+	t=1717182706;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZrkvQ09UVgsdWxfCoZpOjcpYyls+3WTdBXC7IWp+Dfo=;
-	b=BtrcptrahIHMY/n9/AZA3DXzcLGC2SGPLvU4nGpmgpexhmeAxDztnyub/a9ACk3LuYD+jI
-	LdluBPvSaCSCX0KVcSV8bu/k0Ua9VEQflTkBfxkmAhE+NkAnYBC/j5woXAspbTVxmRtrc9
-	MlzHXFSR+9wI8QbERC3hyyKRlZW/w/A=
-X-Envelope-To: jthoughton@google.com
-X-Envelope-To: seanjc@google.com
+	bh=H/R5IQbpE5t+x2dR39LRiJBqiBXfmFPbwxdtpnn5hGs=;
+	b=c+stuysyrYtChztUjj8bfOLa+pidnwFeuWOXm8J8IFP59C7O1SPwkzhQYX7vXUlN1P6bs5
+	FvYG4eEtw8I3Z1F5NDtIKLP4wlgV4ZNL+EPxaYtUlojUk2IX9MNoL7r3xWNfltbQiD1hec
+	SsERK6rU5wdZ1zfN5Rp0Z+kjvAVliNw=
 X-Envelope-To: akpm@linux-foundation.org
 X-Envelope-To: pbonzini@redhat.com
 X-Envelope-To: aou@eecs.berkeley.edu
@@ -65,11 +62,13 @@ X-Envelope-To: palmer@dabbelt.com
 X-Envelope-To: paul.walmsley@sifive.com
 X-Envelope-To: rananta@google.com
 X-Envelope-To: ryan.roberts@arm.com
+X-Envelope-To: seanjc@google.com
 X-Envelope-To: shahuang@redhat.com
 X-Envelope-To: shuah@kernel.org
 X-Envelope-To: suzuki.poulose@arm.com
 X-Envelope-To: zhaotianrui@loongson.cn
 X-Envelope-To: will@kernel.org
+X-Envelope-To: yuzhao@google.com
 X-Envelope-To: yuzenghui@huawei.com
 X-Envelope-To: kvm-riscv@lists.infradead.org
 X-Envelope-To: kvm@vger.kernel.org
@@ -83,13 +82,11 @@ X-Envelope-To: linux-mm@kvack.org
 X-Envelope-To: linux-riscv@lists.infradead.org
 X-Envelope-To: linuxppc-dev@lists.ozlabs.org
 X-Envelope-To: loongarch@lists.linux.dev
-Date: Fri, 31 May 2024 11:41:14 -0700
+Date: Fri, 31 May 2024 12:11:33 -0700
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Oliver Upton <oliver.upton@linux.dev>
-To: Yu Zhao <yuzhao@google.com>
-Cc: James Houghton <jthoughton@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
+To: James Houghton <jthoughton@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Albert Ou <aou@eecs.berkeley.edu>,
 	Ankit Agrawal <ankita@nvidia.com>, Anup Patel <anup@brainfault.org>,
@@ -108,139 +105,59 @@ Cc: James Houghton <jthoughton@google.com>,
 	Paul Walmsley <paul.walmsley@sifive.com>,
 	Raghavendra Rao Ananta <rananta@google.com>,
 	Ryan Roberts <ryan.roberts@arm.com>,
+	Sean Christopherson <seanjc@google.com>,
 	Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-riscv@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev
-Subject: Re: [PATCH v4 2/7] mm: multi-gen LRU: Have secondary MMUs
- participate in aging
-Message-ID: <ZloZysAPL0ePk3bY@linux.dev>
+	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+	loongarch@lists.linux.dev
+Subject: Re: [PATCH v4 6/7] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+Message-ID: <Zlog5Yk_Pjq0jQhC@linux.dev>
 References: <20240529180510.2295118-1-jthoughton@google.com>
- <20240529180510.2295118-3-jthoughton@google.com>
- <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
- <ZlelW93_T6P-ZuSZ@google.com>
- <CAOUHufZdEpY6ra73SMHA33DegKxKaUM=Os7A7aDBFND6NkbUmQ@mail.gmail.com>
- <Zley-u_dOlZ-S-a6@google.com>
- <CADrL8HXHWg_MkApYQTngzmN21NEGNWC6KzJDw_Lm63JHJkR=5A@mail.gmail.com>
- <CAOUHufZq6DwpStzHtjG+TOiHaQ6FFbkTfHMCe8Yy0n_M9MKdqw@mail.gmail.com>
- <Zll2ILUNWE-JPi9U@linux.dev>
- <CAOUHufb_-w=B+NfHAUAo=O8bDXZBdXeeGRZD6kY=krN07srbGA@mail.gmail.com>
+ <20240529180510.2295118-7-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOUHufb_-w=B+NfHAUAo=O8bDXZBdXeeGRZD6kY=krN07srbGA@mail.gmail.com>
+In-Reply-To: <20240529180510.2295118-7-jthoughton@google.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, May 31, 2024 at 10:45:04AM -0600, Yu Zhao wrote:
-> On Fri, May 31, 2024 at 1:03 AM Oliver Upton <oliver.upton@linux.dev> wrote:
-> >
-> > On Fri, May 31, 2024 at 12:05:48AM -0600, Yu Zhao wrote:
-> 
-> Let me add back what I said earlier:
-> 
->   I'm not convinced, but it doesn't mean your point of view is
->   invalid. If you fully understand the implications of your design
->   choice and document them, I will not object.
+On Wed, May 29, 2024 at 06:05:09PM +0000, James Houghton wrote:
 
-Thanks, I appreciate the sentiment. Hopefully we can align here.
+[...]
 
-> > > All optimizations in v2 were measured step by step. Even that bitmap,
-> > > which might be considered overengineered, brought a readily
-> > > measuarable 4% improvement in memcached throughput on Altra Max
-> > > swapping to Optane:
-> >
-> > That's great, but taking an iterative approach to the problem allows
-> > the reviewers and maintainers to come to their own conclusions about
-> > each optimization independently. Squashing all of that together and
-> > posting the result doesn't allow for this.
-> 
-> That's your methodology, which I respect: as I said I won't stand in your way.
-> 
-> But mine is backed by data, please do respect that as well,
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index 9e2bbee77491..eabb07c66a07 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -1319,10 +1319,8 @@ static int stage2_age_walker(const struct kvm_pgtable_visit_ctx *ctx,
+>  	data->young = true;
+>  
+>  	/*
+> -	 * stage2_age_walker() is always called while holding the MMU lock for
+> -	 * write, so this will always succeed. Nonetheless, this deliberately
+> -	 * follows the race detection pattern of the other stage-2 walkers in
+> -	 * case the locking mechanics of the MMU notifiers is ever changed.
+> +	 * This walk may not be exclusive; the PTE is permitted to change
+> +	 * from under us.
+>  	 */
+>  	if (data->mkold && !stage2_try_set_pte(ctx, new))
+>  		return -EAGAIN;
 
-Data is useful and expected for changes that aim to improve the
-performance of a system in one way or another. That is, after all, the
-sole intention of the work, no?
-
-What I'm also looking for is a controlled experiment, where a single
-independent variable (e.g. locking) can be evaluated against the
-baseline. All-or-nothing data has limited usefulness.
-
-> by doing what I asked: document your justifications.
-
-The justification for a series is against the upstream tree, not some
-out-of-tree stuff. The cover letter explicitly calls out the decision
-to simplify the patch series along with performance data I can reproduce
-on my own systems.
-
-This is a perfect example of how to contribute changes upstream.
-
-> > > What I don't think is acceptable is simplifying those optimizations
-> > > out without documenting your justifications (I would even call it a
-> > > design change, rather than simplification, from v3 to v4).
-> >
-> > No, sorry, there's nothing wrong with James' approach here.
-> 
-> Sorry, are you saying "without documenting your justifications" is
-> nothing wrong? If so, please elaborate.
-
-As I mentioned above, the reasoning is adequately documented and the
-discussion that led to v4 is public. OTOH...
-
-> > The discussion that led to the design of v4 happened on list; you were
-> > on CC. The general consensus on the KVM side was that the bitmap was
-> > complicated and lacked independent justification. There was ample
-> > opportunity to voice your concerns before he spent the time on v4.
-> 
-> Please re-read my previous emails -- I never object to the removal of
-> the bitmap or James' approach.
-> 
-> And please stop making assumptions -- I did voice my concerns with
-> James privately.
-        ^~~~~~~~~
-
-If it happened in private then its no better than having said nothing at
-all.
-
-Please, keep the conversation on-list next time so we can iron out any
-disagreements there. Otherwise contributors are put in a *very* awkward
-situation of mediating the on- and off-list dialogue.
-
-> > You seriously cannot fault a contributor for respinning their work based
-> > on the provided feedback.
-> 
-> Are you saying I faulted James for taking others' feedback?
-
-No. Sufficient justification is captured in the public review feedback +
-series cover letter. Your statement that the approach was changed without
-justification is unsubstantiated.
-
-> Also what do you think about the technical flaws and inaccurate
-> understandings I pointed out? You seem to have a strong opinion on
-> your iterate approach, but I hope you didn't choose to overlook the
-> real meat of this discussion.
-
-Serious question: are you not receiving my mail or something?
-
-I re-raised my question to you from ages ago about locking on the arm64
-MMU. You didn't answer last time, I'd appreciate a reply this time
-around.
-
-Otherwise I couldn't be bothered about the color of the Kconfig bikeshed
-and don't have anything meaningful to add there. I think the three of
-you are trending in the right direction.
+It is probably worth mentioning that if there was a race to update the
+PTE then the GFN is most likely young, so failing to clear AF probably
+isn't even consequential.
 
 -- 
 Thanks,
