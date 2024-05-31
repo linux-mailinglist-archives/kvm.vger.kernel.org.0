@@ -1,148 +1,212 @@
-Return-Path: <kvm+bounces-18463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE4328D57B9
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 03:23:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41EA68D589E
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 04:26:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 105541C2446B
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 01:23:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAE39B23AAA
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 02:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E414EAE9;
-	Fri, 31 May 2024 01:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB1178283;
+	Fri, 31 May 2024 02:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gctc3cpe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Znxtn8q6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16AE7483;
-	Fri, 31 May 2024 01:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 345E877F13
+	for <kvm@vger.kernel.org>; Fri, 31 May 2024 02:26:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717118584; cv=none; b=L/vNuUVWoEnZpV795cM53uOwssywO8YdZCv9an+kdtZEKVcNelFQwAlAziTIHXUqIcGbgtMafG1logrSsLYNV0E65dehXrdkcPPhCc9T8ob/vtl65VbGi7f/4CxDQxLD9aU8wGkT/4FI4zpBBio0p3CDeWSkY6g7bv50yioAiZk=
+	t=1717122408; cv=none; b=qx9JsI3q2QEtoyWE0genJ7bOa8aeiFhdveJ3Fj4qIFwh8JHp/OdYrnMD0EnahvPBTy14DYAz0fqvFmlu968t5sjjpxRK6HxcxaHXASL7CZ9qQ4ZnhsOhoWE0sjd+SrOBzFtFwbJNOTfqTNj/P9S5/9tFVm+FlOgFe8sZPDnK66k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717118584; c=relaxed/simple;
-	bh=nlJxlGmynhU7KREnzEbXx6DTgU2f7pwNSzsU+KcONRc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jR7EnXNoRPR3czusByXxDheyzstM9xfAkEp7KnumzPN2PjcRW7FKGms5YQYEJQQFq0QZ4oQ5e8ARupFcRjSOrV9aVjtCxENo0gQeVEMN0ZJlamrfTzCF1UcCkt42Mxyiw56H5efDptVfxnMe4PZgzBNP0A3H03slMHxxlcNy0JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gctc3cpe; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717118582; x=1748654582;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=nlJxlGmynhU7KREnzEbXx6DTgU2f7pwNSzsU+KcONRc=;
-  b=Gctc3cpe6JcGNm4yd1wve0ZwGc6ksMgZ1q8nMoN7/0NUvyjdcck0mcLF
-   QTdHd+EQDKNNByUYC7oPHSPwQgcNUtrWLZJkHAs+UlaiM6gUJeQKa6n9i
-   8ONn8NxzXPpu/ljg+CLJhcg76zJE+BnyIKXOgwQOl5UKIQz/yu4ex3PCa
-   kQkQfxQtMkpHLJSOiGsgvcrOIsuARUMoA9HWTMrWknBoK4hCAduEoL4c3
-   q03g9mNhHoEunL/7m+oqM6JXuTbVuzYxRwwDwmMDpODpzOi2FpYTPkw2e
-   GBCii+P3pJsFXDhz+OXfG3cgCmzfMAxJIUHmJ/0wdST5VUxEbqEgg9veR
-   Q==;
-X-CSE-ConnectionGUID: AffI23o3RU2EH1pTXQsM0g==
-X-CSE-MsgGUID: aQsD+GwnRwWG+DzhioaLqQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="13813789"
-X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
-   d="scan'208";a="13813789"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 18:23:02 -0700
-X-CSE-ConnectionGUID: JYIBlf2GTXWPxN7j2kb+Tw==
-X-CSE-MsgGUID: 0jVmIHa9Re2o9ypgdTRyTg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,202,1712646000"; 
-   d="scan'208";a="67200458"
-Received: from unknown (HELO [10.238.8.173]) ([10.238.8.173])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2024 18:22:53 -0700
-Message-ID: <3999aadf-92a8-43f9-8d9d-84aa47e7d1ae@linux.intel.com>
-Date: Fri, 31 May 2024 09:22:51 +0800
+	s=arc-20240116; t=1717122408; c=relaxed/simple;
+	bh=35WEjbgLVZS1pKIK8NnG1amUaoWURjkhYh8vVNp3wXk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aYfkKHpe3nB+IJKSSFCQ2hh2tdODpyg8W2YA9mxyLP+N+QKB/Ja2NoQGsrjSnJRMiX75wD5r0fpDlsPtenHGXUg4vL/XSuKA6dPehVjrEEJ0wl1r/ZjkKhP6U4qX5Pj/ROv/iuJhGqTJjliZii3wt56QpcMcj7MqVAw7euW/GZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Znxtn8q6; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717122406;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V6+r8/5ml9bFpRWeX23vbPsrO7yANdn/tKxq98VOVM4=;
+	b=Znxtn8q6IyyFmbCWAMAb71kg3pNCaheuyhl0j2QtsDPYOezWylFGVYWnCJ5P4BdF1WFv+M
+	/apAwThTQiuMv+Tn9SbPlhdgfmVybIhmmb3kR8HOklFvtX8j01qilzyemfBVyzLLxitsga
+	8Ki11yck0RCcAgl89wNkgzzzNtXwYEU=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-617-P6tugnIVNwO1RrN7g9bcIw-1; Thu, 30 May 2024 22:26:44 -0400
+X-MC-Unique: P6tugnIVNwO1RrN7g9bcIw-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2c19469036fso1295405a91.1
+        for <kvm@vger.kernel.org>; Thu, 30 May 2024 19:26:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717122404; x=1717727204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V6+r8/5ml9bFpRWeX23vbPsrO7yANdn/tKxq98VOVM4=;
+        b=gDpmaaoFbR+ANLst1rl+w5fGjo7w2doBg9r64UjTTcC9b18IWtk9lAyrAvLlMqOvZ+
+         9Xj+frL1wT5l7XAsuBpYBHKbGyF2WjMio2Oe01UYrJS1Ku5r9CuoIB7hnefJOdGFDeHW
+         vowAPCXz8t2fk7gGt4Wy1xxXnGArTDgp4nu2ehtoMrJghrOdMsayIDLZ9MVOV87vrx6l
+         kRMNgbbiyZ7jaNF+e8RPQQxlsg2jk/dAAjhFc5j3SA1CnEJEKpnR5XkB1MuTKf96SFZc
+         kfIS5P00hREe6oZm5fkyWWmrhK3Dplv7/J25md24TEoKZtQxB+dJHSMZWjSXEz8YZADq
+         WWhg==
+X-Forwarded-Encrypted: i=1; AJvYcCU4UUAS8pMZ+ptFCzn38xFYsDeFO3X0marE6y1MkJBgq7SYWwZD+3e91O3ETXpoOw+jelWRJBjagGH/ry1zXtsUbKI9
+X-Gm-Message-State: AOJu0YysWBcClB3ntCiRK4SEFO0NqOOZUuvCmTAhTEGWv2L8+u6IOucR
+	DgD328YKFRlXfkmEFObel1pmNyuptK/eOklxIXROG9WdrcPDC33rFgGvfWSpuTRkt7e7tU4HcyD
+	+NgPo2BYuaI9WF2ssHdlFVZvVu7T+CzFY6oJ3GG9UZt1kjwpr6C2vq1nWj1zat1SRBhq18dL0l0
+	kJlSXi8Lq3OPagBfFtHFdNCicI
+X-Received: by 2002:a17:90a:d995:b0:2bd:f4ba:fc3 with SMTP id 98e67ed59e1d1-2c1c43ed42cmr1010985a91.7.1717122403340;
+        Thu, 30 May 2024 19:26:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFbfNxAZHvHY+GFiEiCc3TwtoqI7vEt/8vV86jPBkD4OaWIozGm6iBZRjVzDvMqMahmLxbB/QZlcTXmPXARnBQ=
+X-Received: by 2002:a17:90a:d995:b0:2bd:f4ba:fc3 with SMTP id
+ 98e67ed59e1d1-2c1c43ed42cmr1010944a91.7.1717122402392; Thu, 30 May 2024
+ 19:26:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v15 09/20] KVM: SEV: Add support to handle MSR based Page
- State Change VMGEXIT
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
- linux-coco@lists.linux.dev, linux-mm@kvack.org,
- linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
- tglx@linutronix.de, mingo@redhat.com, jroedel@suse.de,
- thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org,
- vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
- dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
- peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
- rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
- vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
- tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
- alpergun@google.com, jarkko@kernel.org, ashish.kalra@amd.com,
- nikunj.dadhania@amd.com, pankaj.gupta@amd.com, liam.merwick@oracle.com,
- Brijesh Singh <brijesh.singh@amd.com>,
- Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20240501085210.2213060-1-michael.roth@amd.com>
- <20240501085210.2213060-10-michael.roth@amd.com>
- <84e8460d-f8e7-46d7-a274-90ea7aec2203@linux.intel.com>
- <CABgObfaXmMUYHEuK+D+2E9pybKMJqGZsKB033X1aOSQHSEqqVA@mail.gmail.com>
- <7d6a4320-89f5-48ce-95ff-54b00e7e9597@linux.intel.com>
- <rczrxq3lhqguarwh4cwxwa35j5riiagbilcw32oaxd7aqpyaq7@6bqrqn6ontba>
- <7da9c4a3-8597-44aa-a7ad-cc2bd2a85024@linux.intel.com>
- <CABgObfajCDkbDbK6-QyZABGTh=5rmE5q3ifvHfZD1A2Z+u0v3A@mail.gmail.com>
- <ZleJvmCawKqmpFIa@google.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZleJvmCawKqmpFIa@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240530101823.1210161-1-schalla@marvell.com>
+In-Reply-To: <20240530101823.1210161-1-schalla@marvell.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 31 May 2024 10:26:31 +0800
+Message-ID: <CACGkMEsxPfck-Ww6CHSod5wP5xLOpS3t2B8qhTL0=PoE3koCGQ@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: Add support for no-IOMMU mode
+To: Srujana Challa <schalla@marvell.com>
+Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org, mst@redhat.com, 
+	vattunuru@marvell.com, sthotton@marvell.com, ndabilpuram@marvell.com, 
+	jerinj@marvell.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 5/30/2024 4:02 AM, Sean Christopherson wrote:
-> On Tue, May 28, 2024, Paolo Bonzini wrote:
->> On Mon, May 27, 2024 at 2:26 PM Binbin Wu <binbin.wu@linux.intel.com> wrote:
->>>> It seems like TDX should be able to do something similar by limiting the
->>>> size of each KVM_HC_MAP_GPA_RANGE to TDX_MAP_GPA_MAX_LEN, and then
->>>> returning TDG_VP_VMCALL_RETRY to guest if the original size was greater
->>>> than TDX_MAP_GPA_MAX_LEN. But at that point you're effectively done with
->>>> the entire request and can return to guest, so it actually seems a little
->>>> more straightforward than the SNP case above. E.g. TDX has a 1:1 mapping
->>>> between TDG_VP_VMCALL_MAP_GPA and KVM_HC_MAP_GPA_RANGE events. (And even
->>>> similar names :))
->>>>
->>>> So doesn't seem like there's a good reason to expose any of these
->>>> throttling details to userspace,
->> I think userspace should never be worried about throttling. I would
->> say it's up to the guest to split the GPA into multiple ranges,
-> I agree in principle, but in practice I can understand not wanting to split up
-> the conversion in the guest due to the additional overhead of the world switches.
+On Thu, May 30, 2024 at 6:18=E2=80=AFPM Srujana Challa <schalla@marvell.com=
+> wrote:
 >
->>   but that's not how arch/x86/coco/tdx/tdx.c is implemented so instead we can
->>   do the split in KVM instead. It can be a module parameter or VM attribute,
->>   establishing the size that will be processed in a single TDVMCALL.
-> Is it just interrupts that are problematic for conversions?  I assume so, because
-> I can't think of anything else where telling the guest to retry would be appropriate
-> and useful.
+> This commit introduces support for an UNSAFE, no-IOMMU mode in the
+> vhost-vdpa driver. When enabled, this mode provides no device isolation,
+> no DMA translation, no host kernel protection, and cannot be used for
+> device assignment to virtual machines. It requires RAWIO permissions
+> and will taint the kernel.
+> This mode requires enabling the "enable_vhost_vdpa_unsafe_noiommu_mode"
+> option on the vhost-vdpa driver. This mode would be useful to get
+> better performance on specifice low end machines and can be leveraged
+> by embedded platforms where applications run in controlled environment.
 
-The concern was the lockup detection in guest.
+I wonder if it's better to do it per driver:
+
+1) we have device that use its own IOMMU, one example is the mlx5 vDPA devi=
+ce
+2) we have software devices which doesn't require IOMMU at all (but
+still with protection)
+
+Thanks
 
 >
-> If so, KVM shouldn't need to unconditionally restrict the size for a single
-> TDVMCALL, KVM just needs to ensure interrupts are handled soonish.  To do that,
-> KVM could use a much smaller chunk size, e.g. 64KiB (completely made up number),
-> and keep processing the TDVMCALL as long as there is no interrupt pending.
-> Hopefully that would obviate the need for a tunable.
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
+> ---
+>  drivers/vhost/vdpa.c | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index bc4a51e4638b..d071c30125aa 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -36,6 +36,11 @@ enum {
+>
+>  #define VHOST_VDPA_IOTLB_BUCKETS 16
+>
+> +bool vhost_vdpa_noiommu;
+> +module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
+> +                  vhost_vdpa_noiommu, bool, 0644);
+> +MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode, "Enable UNSAFE, =
+no-IOMMU mode.  This mode provides no device isolation, no DMA translation,=
+ no host kernel protection, cannot be used for device assignment to virtual=
+ machines, requires RAWIO permissions, and will taint the kernel.  If you d=
+o not know what this is for, step away. (default: false)");
+> +
+>  struct vhost_vdpa_as {
+>         struct hlist_node hash_link;
+>         struct vhost_iotlb iotlb;
+> @@ -60,6 +65,7 @@ struct vhost_vdpa {
+>         struct vdpa_iova_range range;
+>         u32 batch_asid;
+>         bool suspended;
+> +       bool noiommu_en;
+>  };
+>
+>  static DEFINE_IDA(vhost_vdpa_ida);
+> @@ -887,6 +893,10 @@ static void vhost_vdpa_general_unmap(struct vhost_vd=
+pa *v,
+>  {
+>         struct vdpa_device *vdpa =3D v->vdpa;
+>         const struct vdpa_config_ops *ops =3D vdpa->config;
+> +
+> +       if (v->noiommu_en)
+> +               return;
+> +
+>         if (ops->dma_map) {
+>                 ops->dma_unmap(vdpa, asid, map->start, map->size);
+>         } else if (ops->set_map =3D=3D NULL) {
+> @@ -980,6 +990,9 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struc=
+t vhost_iotlb *iotlb,
+>         if (r)
+>                 return r;
+>
+> +       if (v->noiommu_en)
+> +               goto skip_map;
+> +
+>         if (ops->dma_map) {
+>                 r =3D ops->dma_map(vdpa, asid, iova, size, pa, perm, opaq=
+ue);
+>         } else if (ops->set_map) {
+> @@ -995,6 +1008,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, stru=
+ct vhost_iotlb *iotlb,
+>                 return r;
+>         }
+>
+> +skip_map:
+>         if (!vdpa->use_va)
+>                 atomic64_add(PFN_DOWN(size), &dev->mm->pinned_vm);
+>
+> @@ -1298,6 +1312,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdp=
+a *v)
+>         struct vdpa_device *vdpa =3D v->vdpa;
+>         const struct vdpa_config_ops *ops =3D vdpa->config;
+>         struct device *dma_dev =3D vdpa_get_dma_dev(vdpa);
+> +       struct iommu_domain *domain;
+>         const struct bus_type *bus;
+>         int ret;
+>
+> @@ -1305,6 +1320,14 @@ static int vhost_vdpa_alloc_domain(struct vhost_vd=
+pa *v)
+>         if (ops->set_map || ops->dma_map)
+>                 return 0;
+>
+> +       domain =3D iommu_get_domain_for_dev(dma_dev);
+> +       if ((!domain || domain->type =3D=3D IOMMU_DOMAIN_IDENTITY) &&
+> +           vhost_vdpa_noiommu && capable(CAP_SYS_RAWIO)) {
+> +               add_taint(TAINT_USER, LOCKDEP_STILL_OK);
+> +               dev_warn(&v->dev, "Adding kernel taint for noiommu on dev=
+ice\n");
+> +               v->noiommu_en =3D true;
+> +               return 0;
+> +       }
+>         bus =3D dma_dev->bus;
+>         if (!bus)
+>                 return -EFAULT;
+> --
+> 2.25.1
+>
 
-Thanks for the suggestion.
-By this way, interrupt can be injected to guest in time and the lockup 
-detection should not be a problem.
-
-About the chunk size, if it is too small, it will increase the cost of 
-kernel/userspace context switches.
-Maybe 2MB?
 
