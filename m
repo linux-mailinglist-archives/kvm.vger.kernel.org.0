@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-18541-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18542-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041558D6643
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 18:04:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5C758D66D3
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 18:29:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEF8929091F
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 16:04:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 630BF28DA2C
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 16:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D0115887C;
-	Fri, 31 May 2024 16:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C4315B978;
+	Fri, 31 May 2024 16:29:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A8432C8C;
-	Fri, 31 May 2024 16:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8DA158DD3;
+	Fri, 31 May 2024 16:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717171442; cv=none; b=B6gaa13HQmbt1v0U4qHhaS4djNuNMxfm+KdOaBZUu3W/8C2u/sBlu3r+P9WbLL/8VHeCfHut+0X3M/f04n5pBjeXUIfPg55W0SKrMJjlQqI52nUDabChEL6RR2pSt2oud49/uY3Y0OATAcTQITYx8QqzkpWBt0h79pmQGqtefWc=
+	t=1717172971; cv=none; b=S1NaBt+QrlR6nCZ+Ju8ytVarUdY6lNdVfDTrhmh7xcE3/LVepuTije4cRVTmKJOpUORI7W+E8N18dMPNzMW/jgJ0cxkT+lGpwHzrQeqz8ZxspGv+HEmYh+Bmrr9TIuCIWpU2pvhVIGK8bTKA45cFTOoETg09+eZsBCKpj31/Lk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717171442; c=relaxed/simple;
-	bh=IFUjXMQpAq5HwdlN0F4Ro/EwDdykkZC4cPHBidBAlvw=;
+	s=arc-20240116; t=1717172971; c=relaxed/simple;
+	bh=ojtrrpN1OarLx49BhUQv9ID6AunPCtGWlhkKeZU2fRc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OZfMmBduE8GkzDx1D6m1HCUZoZKKl3elO9Foeg5Tq0mVZeesZFus7Sq/zbisTsToXxkyIHa/PpdeAkAmAjcThSz/7zrxyjtnAtmzD3O2Cg6dJoFdUn8baaEC4wAYFGwtwE22/wpCcFSvBNx5msDyQcc3YTTr9K7FwPctA4XUxzs=
+	 In-Reply-To:Content-Type; b=XaCK6yy5QMgz/kp2qecD2TNtywubM4Hj8BffkBwUL6NPq/AkDLVhjpVabmhlRoRp3dY3/1na1Y1SsQnjSl75vqH118qjzMzuQSsFPonfn0ICgGi4OETQUwGIwhoJf8nG94LGU3/fLwcwfpElE7jA5tbchEb3J3I0AkbH2LLNaio=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6A6631424;
-	Fri, 31 May 2024 09:04:24 -0700 (PDT)
-Received: from [10.1.27.19] (e122027.cambridge.arm.com [10.1.27.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7A9A33F792;
-	Fri, 31 May 2024 09:03:56 -0700 (PDT)
-Message-ID: <ab2ac224-ec8f-423a-80ce-0d7b18a7a173@arm.com>
-Date: Fri, 31 May 2024 17:03:54 +0100
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5EBEE1424;
+	Fri, 31 May 2024 09:29:53 -0700 (PDT)
+Received: from [10.57.40.150] (unknown [10.57.40.150])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C07F3F792;
+	Fri, 31 May 2024 09:29:26 -0700 (PDT)
+Message-ID: <19650d71-2421-4cef-a858-9639a5537dbe@arm.com>
+Date: Fri, 31 May 2024 17:29:24 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,109 +42,72 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 21/43] arm64: RME: Runtime faulting of memory
-To: Fuad Tabba <tabba@google.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240412084056.1733704-1-steven.price@arm.com>
- <20240412084309.1733783-1-steven.price@arm.com>
- <20240412084309.1733783-22-steven.price@arm.com>
- <CA+EHjTyr1swQ4ONE2oVnWU5uPkcq2WDNYDRA8eK29-4BQDcCLw@mail.gmail.com>
-From: Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v2 13/14] arm64: rsi: Interfaces to query attestation
+ token
 Content-Language: en-GB
-In-Reply-To: <CA+EHjTyr1swQ4ONE2oVnWU5uPkcq2WDNYDRA8eK29-4BQDcCLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To: Steven Price <steven.price@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Sami Mujawar <sami.mujawar@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240412084213.1733764-1-steven.price@arm.com>
+ <20240412084213.1733764-14-steven.price@arm.com> <ZkSYCYOWxKSV9t8S@arm.com>
+ <fe1e3793-a413-42b6-b368-619aae277cb6@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <fe1e3793-a413-42b6-b368-619aae277cb6@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 25/04/2024 11:43, Fuad Tabba wrote:
-> Hi,
-
-Hi,
-
-Thanks for the review. Sorry I didn't respond earlier.
-
-> On Fri, Apr 12, 2024 at 9:44 AM Steven Price <steven.price@arm.com> wrote:
+On 22/05/2024 16:52, Steven Price wrote:
+> On 15/05/2024 12:10, Catalin Marinas wrote:
+>> On Fri, Apr 12, 2024 at 09:42:12AM +0100, Steven Price wrote:
+>>> diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
+>>> index b4cbeafa2f41..c1850aefe54e 100644
+>>> --- a/arch/arm64/include/asm/rsi_cmds.h
+>>> +++ b/arch/arm64/include/asm/rsi_cmds.h
+>>> @@ -10,6 +10,9 @@
+>>>   
+>>>   #include <asm/rsi_smc.h>
+>>>   
+>>> +#define GRANULE_SHIFT		12
+>>> +#define GRANULE_SIZE		(_AC(1, UL) << GRANULE_SHIFT)
 >>
-<snip>
->> +static int private_memslot_fault(struct kvm_vcpu *vcpu,
->> +                                phys_addr_t fault_ipa,
->> +                                struct kvm_memory_slot *memslot)
->> +{
->> +       struct kvm *kvm = vcpu->kvm;
->> +       gpa_t gpa_stolen_mask = kvm_gpa_stolen_bits(kvm);
->> +       gfn_t gfn = (fault_ipa & ~gpa_stolen_mask) >> PAGE_SHIFT;
->> +       bool is_priv_gfn = !((fault_ipa & gpa_stolen_mask) == gpa_stolen_mask);
->> +       bool priv_exists = kvm_mem_is_private(kvm, gfn);
->> +       struct kvm_mmu_memory_cache *memcache = &vcpu->arch.mmu_page_cache;
->> +       int order;
->> +       kvm_pfn_t pfn;
->> +       int ret;
->> +
->> +       if (priv_exists != is_priv_gfn) {
->> +               kvm_prepare_memory_fault_exit(vcpu,
->> +                                             fault_ipa & ~gpa_stolen_mask,
->> +                                             PAGE_SIZE,
->> +                                             kvm_is_write_fault(vcpu),
->> +                                             false, is_priv_gfn);
->> +
->> +               return 0;
->> +       }
->> +
->> +       if (!is_priv_gfn) {
->> +               /* Not a private mapping, handling normally */
->> +               return -EAGAIN;
->> +       }
->> +
->> +       if (kvm_gmem_get_pfn(kvm, memslot, gfn, &pfn, &order))
->> +               return 1; /* Retry */
+>> The name is too generic and it goes into a header file. Also maybe move
+>> it to rsi.h, and use it for other definitions like rsi_config struct
+>> size and alignment.
+>>
 > 
-> You don't need to pass a variable to hold the order if you don't need
-> it. You can pass NULL.
+> The realm config structure although it 'happens to be' granule sized
+> isn't really required to be - so I think it would be a bit confusing to
+> specify that.
 
-Ah, good point - that simplifies things.
+The struct realm_config must be aligned to GRANULE_SIZE and the argument
+must be as such aligned.
 
-> I am also confused about the return, why do you return 1 regardless of
-> the reason kvm_gmem_get_pfn() fails?
-
-Thinking about this, I don't think we actually expect kvm_gmem_get_pfn()
-to fail, so it's actually more appropriate to just pass return any error
-value.
-
->> +       ret = kvm_mmu_topup_memory_cache(memcache,
->> +                                        kvm_mmu_cache_min_pages(vcpu->arch.hw_mmu));
->> +       if (ret)
->> +               return ret;
 > 
-> If this fails you should release the page you got earlier (e.g.,
-> kvm_release_pfn_clean()), or you could move it before
-> kvm_gmem_get_pfn().
-
-Good point, however...
-
->> +       /* FIXME: Should be able to use bigger than PAGE_SIZE mappings */
->> +       ret = realm_map_ipa(kvm, fault_ipa, pfn, PAGE_SIZE, KVM_PGTABLE_PROT_W,
->> +                            memcache);
->> +       if (!ret)
->> +               return 1; /* Handled */
+> There are only two other interfaces that require this:
+>   * RSI_IPA_STATE_GET - completely unused so far
+>   * RSI_ATTESTATION_TOKEN_CONTINUE - the buffer has to be contained with
+>     a granule, so it affects the maximum length per operation.
 > 
-> Should also release the page if it fails. Speaking of which,
-> where/when do you eventually release the page?
+> I'll rename to RSI_GRANULE_{SHIFT,SIZE}, but I'm not sure it really
 
-... I messed this up ;) It seems I'm managing to leak all guestmem
-pages. I'm not sure what I was thinking but I think I'd got it into my
-head guestmem wasn't reference counting the pages. I'll fix this up in
-the next version.
+That looks good to me.
 
-Thanks,
+Suzuki
 
-Steve
+
+> belongs in rsi.h because none of that functionality cares about the
+> granule size (indeed the driver in the following patch doesn't include
+> rsi.h).
+> 
+> Thanks,
+> Steve
 
 
