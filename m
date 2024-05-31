@@ -1,125 +1,155 @@
-Return-Path: <kvm+bounces-18532-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18533-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F058D609B
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 13:26:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBE6B8D60B2
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 13:28:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 314ED285BBE
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 11:26:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DF181F23C8C
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 11:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C81A915749C;
-	Fri, 31 May 2024 11:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDEBB15748B;
+	Fri, 31 May 2024 11:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="ppd2+7hU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XDiK3siC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1645E156F5B
-	for <kvm@vger.kernel.org>; Fri, 31 May 2024 11:25:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBBD156654
+	for <kvm@vger.kernel.org>; Fri, 31 May 2024 11:27:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717154753; cv=none; b=L29lEMOl1a3SFtowNAoQxy/XvgsD0kdbdkLl9KwFpatIyQz5prVCOORwfNyv43KammwKbCKiJZFsJiYV9bU7IzIBjVghSjXWQljnKnyuk0a2XnSmnWBVJqXBd/CNiHn3t2ROl32oPgzj0cWgC5Xdy/C9/Jb4VHgoeXNWN7sfPtY=
+	t=1717154875; cv=none; b=axptM2NKuWpKDtL4iG25SRrejGZncVffYieeaXQjnbAgBL6AicS9MwHQcxFxcz09TTTpyHVP/HG+3wQl3sAhja4CJfjk0RhOoldMQz30EWC9DFo/n7HIsFD0hO0LFUrBD4bF62JCFkV3Q++vyZlVBymJEXiYgm7FGb9AZOhVRPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717154753; c=relaxed/simple;
-	bh=PTcYzuOXIlbRXgshrnBY0/SLFiYOVAKnmSmP2I+XI48=;
+	s=arc-20240116; t=1717154875; c=relaxed/simple;
+	bh=VHUrpfLuGlDmZC0wF7t0YayAlCmwVqvB0TLYMVJT7cY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NSZPj0WP0RjHCEIfLkH2jFlP5m3LBYXyw0eGn9G/sA4jMXjRDVS8HAuxUs6u8DvoMaCLYCu73svFtbd1x8BgsDezJdI9aNzCTjGgOs5JmCLBj+fUB4sm3lEHUMVh0j8in9fQfUeL09hwX/4WCpQnXIOCDeKdcmMIzApqfqejoTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=ppd2+7hU; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3748ca2a21eso1996725ab.0
-        for <kvm@vger.kernel.org>; Fri, 31 May 2024 04:25:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1717154750; x=1717759550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iRu+fvt96wDh21HWdZk+AUFYcHjCXJ/UFo9OhBPmYL4=;
-        b=ppd2+7hUDcVX+OqQVYDt/gOrV3Ych2vIDHqsq/VJGLEMQLSxadOLha38PrzIb2nMhq
-         GSd1F5hpyOaN/aVIp5wzxtoLWzqTRRAJvznVf4zGd9QqRYopUaYt8AjPmF0gNsx9+QXF
-         Xdfhpn+GOWY41auXSJ18PcHrLQ5lakkp/d0cE7EzuR7qlGvpfZXIir0U6JDD/Eu71772
-         xnfNlMcfur3vXZZa526DQRPn4hc+IYgOJNAou1V5dsbFmInswVZDrRQOYjZF1h/JiM5c
-         IKbHRnfeRjVV7lB1VLNWBnABw40Lmtuf+S2s8tmna2efutfUCrSJIZg4OcXQA/GCg5L3
-         s3uA==
+	 To:Cc:Content-Type; b=EQrNZedmwYjO12KT7FZUu+5cuJmKrzCeMNXlT2GtxmZJnWOyZLEO0onr/PISChYXlfZNBOmfsKzuCo6oiWqjzgFXoRDYLiw1bsppEveFsim16RYDXROla7h629gqKJ93pO4SX3SxXEO9rUAuwZR1h8Px2I7hRTDRP+oorxXthQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XDiK3siC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717154872;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uQXLkmaihewQQ+Q3DK3T/I1QdWmZfEA3y+2sPA08/tU=;
+	b=XDiK3siC4+WHNeu/eyppdmiG5fCLhC/pbhtNvXu1dAnSgk+V1HZc4SX9mjOkBLQr5+MziU
+	wQpnRtD4U3MQV+/Etuf7bQECACEJEvj46Gdp6RbeRzIAjnI+FC3sowd5m0/ecO9h+9gske
+	j3PWfvdP/5Loibc64/T8RpAYlkFodww=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-509-Tvh3d5p1P1KSGwh2qwe4Zw-1; Fri, 31 May 2024 07:27:51 -0400
+X-MC-Unique: Tvh3d5p1P1KSGwh2qwe4Zw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-35dca4a8f2dso990195f8f.3
+        for <kvm@vger.kernel.org>; Fri, 31 May 2024 04:27:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717154750; x=1717759550;
+        d=1e100.net; s=20230601; t=1717154870; x=1717759670;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iRu+fvt96wDh21HWdZk+AUFYcHjCXJ/UFo9OhBPmYL4=;
-        b=YNSUPyK3GnFGiGAtael6TAG7bEAI57eI6pEZ5nmbKRZwYL1dTJS7r2mqqeF66qk6Jw
-         o9fnPxaQo8d6nYzHf0NUJL9n958bLY4N+Nd9VTkIsQfNl0cVkoVq1x81Nf8hd5fqhGr/
-         7rqjrdQ2y0qKaxkIPTE+ZDLpuvcheGQT4fWx8BVycCUN+Vw42SB/ttnLeSmsn8xqYNrj
-         zG8/nUnSVhlzN/8T6Mq4iX5tSrNRMmgVuiKOVJYJwWCPHin7uXF8C2h5BdnOou1TpIO2
-         dY+QB4vNfnSuHKC4ITFT21+1VStag6rFP3+2aVUJDwSi6jMqPvb684fx0lacujsgOwdq
-         Wlqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWC2PBdRoNvV/J6ZVEQJm0F7R6X9rJtP3Wp0zRO1O1f/3OjQK73H8TsTojrUeOoBGMgy2KYEiJJ4iMVHsMQzHq1wlWc
-X-Gm-Message-State: AOJu0YyWumaPv77HBqGxKPUl4tspQiYa+h5ishsMMTTfwBLqGZ4/6sZa
-	zPerZ+unxXA9fHTAmuwACQ4q/yhKJ6LZjGTEao3hSOToFf2MaFCUk1N1vkm73ldigFoPUNgmQUH
-	vTErH++07elvrRvX1Cph4cIzT8oSZCp1QfrNkKg==
-X-Google-Smtp-Source: AGHT+IERmtusbSx5VguMq+IRGISAME3Fo9I1nHszmWxBFaYwO8ur28ukLLI5CchbhXRWskUNyQH3RjcBWJXIgZMDsHc=
-X-Received: by 2002:a05:6e02:b27:b0:374:6472:d923 with SMTP id
- e9e14a558f8ab-3748b8fd182mr18921045ab.0.1717154750045; Fri, 31 May 2024
- 04:25:50 -0700 (PDT)
+        bh=uQXLkmaihewQQ+Q3DK3T/I1QdWmZfEA3y+2sPA08/tU=;
+        b=cHoDjT+wpSVoZX+MrTvz5AbUeARmYSeCliD8fOaDGkxIYfS0i/W/t0aAhDcWJLqFEn
+         oeqi0FQZQJMKx0lCG2baaHQLaxh4mUm5Ive89BRQn8/SWUFIdEPy2zuaqfBU6kUIV7kv
+         QQYrEKfTc8jPVOM25KlW7tRTNKXkgoe6QbbCUkRFM4RNXZWghpwJ9gPBe9xYZpCxeig8
+         8H0Wc69OJi6mLBvvGeHZtkHcfsuz21wPj9fQcNPTx/AjY/YZDBqcXxy3u/mXRvvoP8WM
+         kxeELrvztVAGYn1j4BSiAtoc9exKbZGq9dVrV55CQRfBFVVN9B9sUxHoFlVaeqedxF9O
+         7C3w==
+X-Forwarded-Encrypted: i=1; AJvYcCUe0XmIc931uoFj/MwEWinDAuAyQ1AP8oVT57x4baFetHKIV0FW1xu7IicDYOzu+qYakkm8XSFJ5lMnPKW/dW23gsmX
+X-Gm-Message-State: AOJu0YzGMCPnlrK9DnLf29Kv/s0Jb2IZxdIZnLniZvNOEbYITFusNIZK
+	zi8qCWIbp/62TDF2PGzPkwOENXF5/5CBISBCboX+7SZAS+fsPRMBLRnt5FDxW+8+oN6iGLyA2AN
+	FFiXpah8UrHqqees0IhAPse0ybo3uOkOMomHifwVe5EnzyLvhupNXyBN7+4o6DHGbUo4Nz6rSOp
+	YkcSWebvdYBUjvV3dIk+v8eoA6
+X-Received: by 2002:a5d:5388:0:b0:355:3cc:485f with SMTP id ffacd0b85a97d-35e0f26e9bfmr1067081f8f.21.1717154869820;
+        Fri, 31 May 2024 04:27:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEh2AwYrrRRWkZx282BhkBX/chfbWOE/90tS5yY6z39+zH4RCTmIFYdxi76wrQjyOesvxCcffaKzl7ahUeX8LE=
+X-Received: by 2002:a5d:5388:0:b0:355:3cc:485f with SMTP id
+ ffacd0b85a97d-35e0f26e9bfmr1067061f8f.21.1717154869422; Fri, 31 May 2024
+ 04:27:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411090639.237119-1-apatel@ventanamicro.com>
-In-Reply-To: <20240411090639.237119-1-apatel@ventanamicro.com>
-From: Anup Patel <anup@brainfault.org>
-Date: Fri, 31 May 2024 16:55:37 +0530
-Message-ID: <CAAhSdy3+q1aLgTro5N_UerXjaW7fTGxjpOPKkyR+-GMru-gZMw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] KVM RISC-V HW IMSIC guest files
-To: Anup Patel <apatel@ventanamicro.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Atish Patra <atishp@atishpatra.org>, Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org, 
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
+References: <20240530111643.1091816-1-pankaj.gupta@amd.com> <20240530111643.1091816-28-pankaj.gupta@amd.com>
+In-Reply-To: <20240530111643.1091816-28-pankaj.gupta@amd.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 31 May 2024 13:27:36 +0200
+Message-ID: <CABgObfZ48ukQ5UaLqi01Xc7Rs+Lo+iiKkFcSMd4qq_RFz1+-TA@mail.gmail.com>
+Subject: Re: [PATCH v4 27/31] hw/i386/sev: Use guest_memfd for legacy ROMs
+To: Pankaj Gupta <pankaj.gupta@amd.com>
+Cc: qemu-devel@nongnu.org, brijesh.singh@amd.com, dovmurik@linux.ibm.com, 
+	armbru@redhat.com, michael.roth@amd.com, xiaoyao.li@intel.com, 
+	thomas.lendacky@amd.com, isaku.yamahata@intel.com, berrange@redhat.com, 
+	kvm@vger.kernel.org, anisinha@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2024 at 2:36=E2=80=AFPM Anup Patel <apatel@ventanamicro.com=
-> wrote:
+On Thu, May 30, 2024 at 1:17=E2=80=AFPM Pankaj Gupta <pankaj.gupta@amd.com>=
+ wrote:
 >
-> This series extends the HWACCEL and AUTO modes of AIA in-kernel irqchip
-> to use HW IMSIC guest files whenever underlying host supports it.
+> From: Michael Roth <michael.roth@amd.com>
 >
-> This series depends upon the "Linux RISC-V AIA support" series which
-> is already queued for Linux-6.10.
-> (Refer, https://lore.kernel.org/lkml/20240307140307.646078-1-apatel@venta=
-namicro.com/)
+> Current SNP guest kernels will attempt to access these regions with
+> with C-bit set, so guest_memfd is needed to handle that. Otherwise,
+> kvm_convert_memory() will fail when the guest kernel tries to access it
+> and QEMU attempts to call KVM_SET_MEMORY_ATTRIBUTES to set these ranges
+> to private.
 >
-> These patches can also be found in the riscv_kvm_aia_hwaccel_v1 branch
-> at: https://github.com/avpatel/linux.git
->
-> Anup Patel (2):
->   RISC-V: KVM: Share APLIC and IMSIC defines with irqchip drivers
->   RISC-V: KVM: Use IMSIC guest files when available
+> Whether guests should actually try to access ROM regions in this way (or
+> need to deal with legacy ROM regions at all), is a separate issue to be
+> addressed on kernel side, but current SNP guest kernels will exhibit
+> this behavior and so this handling is needed to allow QEMU to continue
+> running existing SNP guest kernels.
 
-Queued this series for Linux-6.11
+[...]
 
-Regards,
-Anup
+>  #ifdef CONFIG_XEN_EMU
+> @@ -1022,10 +1023,15 @@ void pc_memory_init(PCMachineState *pcms,
+>      pc_system_firmware_init(pcms, rom_memory);
+>
+>      option_rom_mr =3D g_malloc(sizeof(*option_rom_mr));
+> -    memory_region_init_ram(option_rom_mr, NULL, "pc.rom", PC_ROM_SIZE,
+> -                           &error_fatal);
+> -    if (pcmc->pci_enabled) {
+> -        memory_region_set_readonly(option_rom_mr, true);
+> +    if (sev_snp_enabled()) {
 
->
->  arch/riscv/include/asm/kvm_aia_aplic.h | 58 --------------------------
->  arch/riscv/include/asm/kvm_aia_imsic.h | 38 -----------------
->  arch/riscv/kvm/aia.c                   | 35 +++++++++-------
->  arch/riscv/kvm/aia_aplic.c             |  2 +-
->  arch/riscv/kvm/aia_device.c            |  2 +-
->  arch/riscv/kvm/aia_imsic.c             |  2 +-
->  6 files changed, 24 insertions(+), 113 deletions(-)
->  delete mode 100644 arch/riscv/include/asm/kvm_aia_aplic.h
->  delete mode 100644 arch/riscv/include/asm/kvm_aia_imsic.h
->
-> --
-> 2.34.1
->
+Using sev_snp_enabled() here however is pretty ugly...
+
+Fortunately we can fix machine_require_guest_memfd(), which I think is
+initialized later (?), so that it is usable here too (and the code is
+cleaner). To do so, just delegate machine_require_guest_memfd() to the
+ConfidentialGuestSupport object (see patch at
+https://patchew.org/QEMU/20240531112636.80097-1-pbonzini@redhat.com/)
+and then initialize the new field in SevSnpGuest's instance_init
+function:
+
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 1c5e2e7a1f9..a7574d1c707 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -2328,8 +2328,11 @@ sev_snp_guest_class_init(ObjectClass *oc, void *data=
+)
+ static void
+ sev_snp_guest_instance_init(Object *obj)
+ {
++    ConfidentialGuestSupport *cgs =3D CONFIDENTIAL_GUEST_SUPPORT(obj);
+     SevSnpGuestState *sev_snp_guest =3D SEV_SNP_GUEST(obj);
+
++    cgs->require_guest_memfd =3D true;
++
+     /* default init/start/finish params for kvm */
+     sev_snp_guest->kvm_start_conf.policy =3D DEFAULT_SEV_SNP_POLICY;
+ }
+
+
+Paolo
+
 
