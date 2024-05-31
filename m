@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-18563-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18564-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 911DB8D6CC7
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 01:15:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E4368D6CC8
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 01:15:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C31731C23E7E
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 23:15:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03AC7285D44
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 23:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3710384FCD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EED084FD0;
 	Fri, 31 May 2024 23:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ghl/Iskz"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IKyOHz3D"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE208130A4D
-	for <kvm@vger.kernel.org>; Fri, 31 May 2024 23:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48422131E2D
+	for <kvm@vger.kernel.org>; Fri, 31 May 2024 23:14:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717197268; cv=none; b=GdhtbnG5KtvXefZXcTjzuZ5egcRPI7QasKQlH8A/eqo8nR/+YjP2d3Rake6nJ70Un2fz2L4iBjxwuYahowaFbqX4If9RCF4teDz71O5OMyW66LNanu6lnOdnJmwQedyGX+SemDg1hpAzdY4GTsmtCiTIDyrqPYrlfmPUe9uPf4w=
+	t=1717197268; cv=none; b=GO89phhP366RaPSomoC5s6plAre8aZD7Xaj0g5SQl1xle7ugcAd+0I4SHS40MOgK2Do2Vw8V77bt0r9Z+FIVg82KXOSR0+5M9XPaCOIOIZ1Pd9TcUqLtDc9uQ1kX21FiAorT/kJOZzrklv8vQ3woBnTuUss8V1EwLr+ONA3h4nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717197268; c=relaxed/simple;
-	bh=ZYqCChw0hfWIeJR9KxVug6g2WJ+ytT95ljLL0/noKvg=;
+	bh=nMYzFR2GeW5jABgWn0vERxXMPr2OBYm1bZSnsEWweRw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=f71vA0DBCGiAXvQsBbmwW3xdjr287u5Gwv0+X2NWsm/JfikXh5x1AuFnZ1cRx2KkVj2zT9KgK/DwpzlzqTbOLQCLH6waEa395YTOGXCMd/AoUWJC1HA7/vnkNK2iANQmrd1kWKxQvNImK7KaCH8Zmq4ZUKLejQPkTjU+IPtOz9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ghl/Iskz; arc=none smtp.client-ip=91.218.175.170
+	 MIME-Version; b=D7WgJBGgNCPG6u9QE1hN9cFuze/wbc2/BCWQINyHCwQTiZdOkqqwdEcYASyu0i3hiYX7Mh7wLbYQ+8UBjGngToEAV9SSieBBv0qav5xhb1DQHivSnhk1HgwcxhJn2W/mgZL1MhQ4KinRkn9SsjjldTocPMlF7fh/ftsM0//TR+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IKyOHz3D; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717197264;
+	t=1717197265;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=QihSmQoz0iowSjFRYFy48HKQHNUekF/0Bi4J8iGu+ks=;
-	b=ghl/Iskz6sOklQTuwb1xCLhhyeG62isYKB8zqePtNtgsUh3OXjaj8LhQrQz1QbLDBdCBHB
-	TZJNKRobvDJopV1f+1jCh1tK7598MqG3SVvR0Ocwh6c2bmzSMXIEKLLRrjOCrga8AnJkK8
-	w2ROOHBisH0hrbKsjVkRZkWROjytPbg=
+	bh=g4BHYD2b8D9Lda/PSro18tcaFWkJMsLX9PrrgsuerwE=;
+	b=IKyOHz3DCgiWZNiYe9L9GrJ95rnlDHFr6cIsRcJeqY/pfWXL+Es7gCHlcZcrDDgFDtluHv
+	VyycjykXVAeQzEeoYSFGA5EVEGBTWT20hzenNOiCKXk33DWBO1SyHgHqUTnsxOdrZuvpcZ
+	ShJyzlRqk0/8yCgL+6/ACpJWgdgYK8A=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -57,9 +57,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	kvm@vger.kernel.org,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH 06/11] KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
-Date: Fri, 31 May 2024 23:13:53 +0000
-Message-ID: <20240531231358.1000039-7-oliver.upton@linux.dev>
+Subject: [PATCH 07/11] KVM: arm64: nv: Use guest hypervisor's max VL when running nested guest
+Date: Fri, 31 May 2024 23:13:54 +0000
+Message-ID: <20240531231358.1000039-8-oliver.upton@linux.dev>
 In-Reply-To: <20240531231358.1000039-1-oliver.upton@linux.dev>
 References: <20240531231358.1000039-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -71,36 +71,46 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-When running a guest hypervisor, ZCR_EL2 is an alias for the counterpart
-EL1 state.
+The max VL for nested guests is additionally constrained by the max VL
+selected by the guest hypervisor. Use that instead of KVM's max VL when
+running a nested guest.
+
+Note that the guest hypervisor's ZCR_EL2 is sanitised against the VM's
+max VL at the time of access, so there's no additional handling required
+at the time of use.
 
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/fpsimd.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
-index 1807d3a79a8a..53168bbea8a7 100644
---- a/arch/arm64/kvm/fpsimd.c
-+++ b/arch/arm64/kvm/fpsimd.c
-@@ -173,7 +173,16 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e1e888340739..d806a0c1d556 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -314,10 +314,22 @@ static bool kvm_hyp_handle_mops(struct kvm_vcpu *vcpu, u64 *exit_code)
  
- 	if (guest_owns_fp_regs()) {
- 		if (vcpu_has_sve(vcpu)) {
--			__vcpu_sys_reg(vcpu, ZCR_EL1) = read_sysreg_el1(SYS_ZCR);
-+			u64 zcr = read_sysreg_el1(SYS_ZCR);
+ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+ {
++	/*
++	 * The vCPU's saved SVE state layout always matches the max VL of the
++	 * vCPU. Start off with the max VL so we can load the SVE state.
++	 */
+ 	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
+ 	__sve_restore_state(vcpu_sve_pffr(vcpu),
+ 			    &vcpu->arch.ctxt.fp_regs.fpsr);
+ 
++	/*
++	 * The effective VL for a VM could differ from the max VL when running a
++	 * nested guest, as the guest hypervisor could select a smaller VL. Slap
++	 * that into hardware before wrapping up.
++	 */
++	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu))
++		sve_cond_update_zcr_vq(__vcpu_sys_reg(vcpu, ZCR_EL2), SYS_ZCR_EL2);
 +
-+			/*
-+			 * If the vCPU is in the hyp context then ZCR_EL1 is
-+			 * loaded with its vEL2 counterpart.
-+			 */
-+			if (is_hyp_ctxt(vcpu))
-+				__vcpu_sys_reg(vcpu, ZCR_EL2) = zcr;
-+			else
-+				__vcpu_sys_reg(vcpu, ZCR_EL1) = zcr;
+ 	write_sysreg_el1(vcpu_sve_zcr_el1(vcpu), SYS_ZCR);
+ }
  
- 			/*
- 			 * Restore the VL that was saved when bound to the CPU,
 -- 
 2.45.1.288.g0e0cd299f1-goog
 
