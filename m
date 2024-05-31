@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-18514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 507398D5D90
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 11:06:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 505158D5D92
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 11:06:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D298F1F233ED
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 09:05:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E33A01F263A5
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 09:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FEB6157462;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5629015746F;
 	Fri, 31 May 2024 09:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JNQsHtvS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EL7e6Pya"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1A0156228;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5AA15689B;
 	Fri, 31 May 2024 09:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717146244; cv=none; b=Zo8cxXjOZg5YnjKRQEM+Q4OOuCvj7Ugl1FZIoDgd24dy7/IvjT/WoEwVhNKxqj3nHcl73QVzWMbeVUWslWMfDXUnXQBrYpP+wyhlzPJFYjSsx3FAtwJSyr1PAn/5FrCssxkXsp3XRt4VAalqaeMLRQ+ejSdjCF+Rhthjbb4owDw=
+	t=1717146244; cv=none; b=BosxhM7c3VeteZYaM2g6aMn1OEnpV68MnGVFJpjq7pSeSvIV+OQ+kmMRraidwuJsldtp3G2ZjxmpgxwItJwvu+nT9IF6sBeYPIp1WupdrcEYLIRjEnNk0skvdnE1pYTJrTyILAEsdi+Srb7AVs9b9Mre9f5WdBl00FkmgE38wfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717146244; c=relaxed/simple;
-	bh=OHVq25vZLsqyLTtyp75ZE0G7ZNYjK4i/SyW0ERPfjvA=;
+	bh=XHJjqKGhN585X7aLvVu2CbdGCurM4gt6+uoq5Ic29mQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S5vlRZc0eWOVluLxfkh2P/0i4bOCDvy8E85a4t4dL77/4JXgg35sSsxFJWaJ5Fo4ehIxR2sSyT3F73N3MaI8NtBMoQVEf3lFR4hbv/887drVt9DkXCsTYGg0Nd0XPuc4goc07XMwfrCPoE4CPwDRRrW5al8MDZJ32tdfEJoqSho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JNQsHtvS; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=I4NQQg+4XzXwD8y85KxsRkLFU7/HXOiSf5Goffg3EDgClIjbzym5ZWky87YB8wfMXws2jGv5rXLnteVNZNV3ECwzkgGBEslpOxT4JGfrN3pk/67ouBoF63GKLX8Jr5fKJYKD5lojhBA2xXL2cV3/KNEGHkzDizC+2SqivHwJHh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EL7e6Pya; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717146242; x=1748682242;
+  t=1717146243; x=1748682243;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OHVq25vZLsqyLTtyp75ZE0G7ZNYjK4i/SyW0ERPfjvA=;
-  b=JNQsHtvSK3n8FkSccktvt3IICxcZLmkrQqXNqGiptSj+QF5p3hlQFgd3
-   NAOsyMymi6EN4pDuKaqJo4W26eP0GFBHzJPb6yD/vNN7V80v+5Vycmm6P
-   oXiiPeI7ysP6YgqRJTu7CDQfreoXqcS0lg2n01hd6958dDmxCinEcAHdq
-   GkHTZkavB46SaB+GnIsW+xqLhg1/4W8MrRANbO9macI9hzXI2bd0pK5nW
-   Njlt1fveBe1CGa7AW/3f0wkPFMgyyaNUFZnOEBgSOZ+h4gJx6/IX7fDkn
-   sz3R3sD5O9Z5dvTpSg8t7pfCpM8reDCy70WJw3aME4OUkquARsV3d4nLs
-   Q==;
-X-CSE-ConnectionGUID: YFiEU1KkQme+JfK8rNcI0Q==
-X-CSE-MsgGUID: lELhkIdgQeKppo4SWVy8OQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="17480605"
+  bh=XHJjqKGhN585X7aLvVu2CbdGCurM4gt6+uoq5Ic29mQ=;
+  b=EL7e6PyayPUmhQ0x1F9zgxKiCFWxCfRA7OvVTI+FtO7fZEvxVv7zpoga
+   TCK46WYVuOrteoZD3YJXOzAN5IzLqZGWJoQRxBKr/PYWWuPqrIQ+ugtQ1
+   dL7VcKXSNm3/bh8oE7LkrGzNX1AfqRA8c4IxP+55l4gh+TBDyxIIUzQpg
+   RN5Og18ATgwnuhV0Lb57rLHx9nF/Pm/ASGKRCXecYSNVYQp55wkFmwrph
+   bXYyvJLT590tv4a3SCssQyF3WcFgVKmeLp0q1mI4FQ7ca+V7jcILxOBxZ
+   ArA2zq+hhIMubCWPp0hpXig2USswRFv1A712NsLk0iSKLkXZCtLT2mtXz
+   g==;
+X-CSE-ConnectionGUID: KD1FglHsTEOdTYBfD/ROPQ==
+X-CSE-MsgGUID: KX72JwJ9QVmo0GUF5NbTFQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11088"; a="17480614"
 X-IronPort-AV: E=Sophos;i="6.08,203,1712646000"; 
-   d="scan'208";a="17480605"
+   d="scan'208";a="17480614"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 02:03:59 -0700
-X-CSE-ConnectionGUID: FkvDbV+FTbOWVqeGkMwdiQ==
-X-CSE-MsgGUID: 0qNeSv2bSImIGUYhFKgxFg==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 02:04:00 -0700
+X-CSE-ConnectionGUID: pHRfIuaaTOisDoUHZY+0XA==
+X-CSE-MsgGUID: kUyLSYosQE+CVKNchuXdgw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,203,1712646000"; 
-   d="scan'208";a="36102750"
+   d="scan'208";a="36102754"
 Received: from jf.jf.intel.com ([10.165.9.183])
   by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 May 2024 02:04:00 -0700
 From: Yang Weijiang <weijiang.yang@intel.com>
@@ -72,9 +72,9 @@ Cc: peterz@infradead.org,
 	mlevitsk@redhat.com,
 	weijiang.yang@intel.com,
 	john.allen@amd.com
-Subject: [PATCH 4/6] x86/fpu/xstate: Introduce fpu_guest_cfg for guest FPU configuration
-Date: Fri, 31 May 2024 02:03:29 -0700
-Message-ID: <20240531090331.13713-5-weijiang.yang@intel.com>
+Subject: [PATCH 5/6] x86/fpu/xstate: Create guest fpstate with guest specific config
+Date: Fri, 31 May 2024 02:03:30 -0700
+Message-ID: <20240531090331.13713-6-weijiang.yang@intel.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240531090331.13713-1-weijiang.yang@intel.com>
 References: <20240531090331.13713-1-weijiang.yang@intel.com>
@@ -86,162 +86,100 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Define new fpu_guest_cfg to hold all guest FPU settings so that it can
-differ from generic kernel FPU settings, e.g., enabling CET supervisor
-xstate by default for guest fpstate while it's remained disabled in
-kernel FPU config.
+Use fpu_guest_cfg to calculate guest fpstate settings, open code for
+__fpstate_reset() to avoid using kernel FPU config.
 
-The kernel dynamic xfeatures are specifically used by guest fpstate now,
-add the mask for guest fpstate so that guest_perm.__state_perm ==
-(fpu_kernel_cfg.default_xfeature | XFEATURE_MASK_KERNEL_DYNAMIC). And
-if guest fpstate is re-allocated to hold user dynamic xfeatures, the
-resulting permissions are consumed before calculate new guest fpstate.
+Below configuration steps are currently enforced to get guest fpstate:
+1) Kernel sets up guest FPU settings in fpu__init_system_xstate().
+2) User space sets vCPU thread group xstate permits via arch_prctl().
+3) User space creates guest fpstate via __fpu_alloc_init_guest_fpstate()
+   for vcpu thread.
+4) User space enables guest dynamic xfeatures and re-allocate guest
+   fpstate.
 
-With new guest FPU config added, there're 3 categories of FPU configs in
-kernel, the usages and key fields are recapped as below.
+By adding kernel dynamic xfeatures in above #1 and #2, guest xstate area
+size is expanded to hold (fpu_kernel_cfg.default_features | kernel dynamic
+xfeatures | user dynamic xfeatures), then host xsaves/xrstors can operate
+for all guest xfeatures.
 
-kernel FPU config:
-  @fpu_kernel_cfg.max_features
-  - all known and CPU supported user and supervisor features except
-    independent kernel features
-
-  @fpu_kernel_cfg.default_features
-  - all known and CPU supported user and supervisor features except
-    dynamic kernel features, independent kernel features and dynamic
-    userspace features.
-
-  @fpu_kernel_cfg.max_size
-  - size of compacted buffer with 'fpu_kernel_cfg.max_features'
-
-  @fpu_kernel_cfg.default_size
-  - size of compacted buffer with 'fpu_kernel_cfg.default_features'
-
-user FPU config:
-  @fpu_user_cfg.max_features
-  - all known and CPU supported user features
-
-  @fpu_user_cfg.default_features
-  - all known and CPU supported user features except dynamic userspace
-    features.
-
-  @fpu_user_cfg.max_size
-  - size of non-compacted buffer with 'fpu_user_cfg.max_features'
-
-  @fpu_user_cfg.default_size
-  - size of non-compacted buffer with 'fpu_user_cfg.default_features'
-
-guest FPU config:
-  @fpu_guest_cfg.max_features
-  - all known and CPU supported user and supervisor features except
-    independent kernel features.
-
-  @fpu_guest_cfg.default_features
-  - all known and CPU supported user and supervisor features except
-    independent kernel features and dynamic userspace features.
-
-  @fpu_guest_cfg.max_size
-  - size of compacted buffer with 'fpu_guest_cfg.max_features'
-
-  @fpu_guest_cfg.default_size
-  - size of compacted buffer with 'fpu_guest_cfg.default_features'
+The user_* fields remain unchanged for compatibility with KVM uAPIs.
 
 Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 Reviewed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
- arch/x86/include/asm/fpu/types.h |  2 +-
- arch/x86/kernel/fpu/core.c       | 14 +++++++++++---
- arch/x86/kernel/fpu/xstate.c     | 10 ++++++++++
- 3 files changed, 22 insertions(+), 4 deletions(-)
+ arch/x86/kernel/fpu/core.c | 39 +++++++++++++++++++++++++++++---------
+ 1 file changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
-index d633cf833411..0ad17b0ffbe8 100644
---- a/arch/x86/include/asm/fpu/types.h
-+++ b/arch/x86/include/asm/fpu/types.h
-@@ -604,6 +604,6 @@ struct fpu_state_config {
- };
- 
- /* FPU state configuration information */
--extern struct fpu_state_config fpu_kernel_cfg, fpu_user_cfg;
-+extern struct fpu_state_config fpu_kernel_cfg, fpu_user_cfg, fpu_guest_cfg;
- 
- #endif /* _ASM_X86_FPU_TYPES_H */
 diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 1209c7aebb21..9e2e5c46cf28 100644
+index 9e2e5c46cf28..00d7dcf45b34 100644
 --- a/arch/x86/kernel/fpu/core.c
 +++ b/arch/x86/kernel/fpu/core.c
-@@ -33,9 +33,10 @@ DEFINE_STATIC_KEY_FALSE(__fpu_state_size_dynamic);
- DEFINE_PER_CPU(u64, xfd_state);
- #endif
- 
--/* The FPU state configuration data for kernel and user space */
-+/* The FPU state configuration data for kernel, user space and guest. */
- struct fpu_state_config	fpu_kernel_cfg __ro_after_init;
- struct fpu_state_config fpu_user_cfg __ro_after_init;
-+struct fpu_state_config fpu_guest_cfg __ro_after_init;
- 
- /*
-  * Represents the initial FPU state. It's mostly (but not completely) zeroes,
-@@ -536,8 +537,15 @@ void fpstate_reset(struct fpu *fpu)
- 	fpu->perm.__state_perm		= fpu_kernel_cfg.default_features;
- 	fpu->perm.__state_size		= fpu_kernel_cfg.default_size;
- 	fpu->perm.__user_state_size	= fpu_user_cfg.default_size;
--	/* Same defaults for guests */
--	fpu->guest_perm = fpu->perm;
-+
-+	/* Guest permission settings */
-+	fpu->guest_perm.__state_perm	= fpu_guest_cfg.default_features;
-+	fpu->guest_perm.__state_size	= fpu_guest_cfg.default_size;
-+	/*
-+	 * Set guest's __user_state_size to fpu_user_cfg.default_size so that
-+	 * existing uAPIs can still work.
-+	 */
-+	fpu->guest_perm.__user_state_size = fpu_user_cfg.default_size;
+@@ -194,8 +194,6 @@ void fpu_reset_from_exception_fixup(void)
  }
  
- static inline void fpu_inherit_perms(struct fpu *dst_fpu)
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index 1a8a187351d3..392f3ba3aa27 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -683,6 +683,7 @@ static int __init init_xstate_size(void)
+ #if IS_ENABLED(CONFIG_KVM)
+-static void __fpstate_reset(struct fpstate *fpstate, u64 xfd);
+-
+ static void fpu_init_guest_permissions(struct fpu_guest *gfpu)
  {
- 	/* Recompute the context size for enabled features: */
- 	unsigned int user_size, kernel_size, kernel_default_size;
-+	unsigned int guest_default_size;
- 	bool compacted = cpu_feature_enabled(X86_FEATURE_XCOMPACTED);
+ 	struct fpu_state_perm *fpuperm;
+@@ -216,25 +214,48 @@ static void fpu_init_guest_permissions(struct fpu_guest *gfpu)
+ 	gfpu->perm = perm & ~FPU_GUEST_PERM_LOCKED;
+ }
  
- 	/* Uncompacted user space size */
-@@ -704,13 +705,18 @@ static int __init init_xstate_size(void)
- 	kernel_default_size =
- 		xstate_calculate_size(fpu_kernel_cfg.default_features, compacted);
+-bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu)
++static struct fpstate *__fpu_alloc_init_guest_fpstate(struct fpu_guest *gfpu)
+ {
+ 	struct fpstate *fpstate;
+ 	unsigned int size;
  
-+	guest_default_size =
-+		xstate_calculate_size(fpu_guest_cfg.default_features, compacted);
+-	size = fpu_user_cfg.default_size + ALIGN(offsetof(struct fpstate, regs), 64);
++	/*
++	 * fpu_guest_cfg.default_size is initialized to hold all enabled
++	 * xfeatures except the user dynamic xfeatures. If the user dynamic
++	 * xfeatures are enabled, the guest fpstate will be re-allocated to
++	 * hold all guest enabled xfeatures, so omit user dynamic xfeatures
++	 * here.
++	 */
++	size = fpu_guest_cfg.default_size + ALIGN(offsetof(struct fpstate, regs), 64);
 +
- 	if (!paranoid_xstate_size_valid(kernel_size))
- 		return -EINVAL;
+ 	fpstate = vzalloc(size);
+ 	if (!fpstate)
+-		return false;
++		return NULL;
++	/*
++	 * Initialize sizes and feature masks, use fpu_user_cfg.*
++	 * for user_* settings for compatibility of exiting uAPIs.
++	 */
++	fpstate->size		= fpu_guest_cfg.default_size;
++	fpstate->xfeatures	= fpu_guest_cfg.default_features;
++	fpstate->user_size	= fpu_user_cfg.default_size;
++	fpstate->user_xfeatures	= fpu_user_cfg.default_features;
++	fpstate->xfd		= 0;
  
- 	fpu_kernel_cfg.max_size = kernel_size;
- 	fpu_user_cfg.max_size = user_size;
-+	fpu_guest_cfg.max_size = kernel_size;
+-	/* Leave xfd to 0 (the reset value defined by spec) */
+-	__fpstate_reset(fpstate, 0);
+ 	fpstate_init_user(fpstate);
+ 	fpstate->is_valloc	= true;
+ 	fpstate->is_guest	= true;
  
- 	fpu_kernel_cfg.default_size = kernel_default_size;
-+	fpu_guest_cfg.default_size = guest_default_size;
- 	fpu_user_cfg.default_size =
- 		xstate_calculate_size(fpu_user_cfg.default_features, false);
- 
-@@ -823,6 +829,10 @@ void __init fpu__init_system_xstate(unsigned int legacy_size)
- 	fpu_user_cfg.default_features = fpu_user_cfg.max_features;
- 	fpu_user_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
- 
-+	fpu_guest_cfg.max_features = fpu_kernel_cfg.max_features;
-+	fpu_guest_cfg.default_features = fpu_guest_cfg.max_features;
-+	fpu_guest_cfg.default_features &= ~XFEATURE_MASK_USER_DYNAMIC;
+ 	gfpu->fpstate		= fpstate;
+-	gfpu->xfeatures		= fpu_user_cfg.default_features;
+-	gfpu->perm		= fpu_user_cfg.default_features;
++	gfpu->xfeatures		= fpu_guest_cfg.default_features;
++	gfpu->perm		= fpu_guest_cfg.default_features;
 +
- 	/* Store it for paranoia check at the end */
- 	xfeatures = fpu_kernel_cfg.max_features;
++	return fpstate;
++}
++
++bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu)
++{
++	if (!__fpu_alloc_init_guest_fpstate(gfpu))
++		return false;
  
+ 	/*
+ 	 * KVM sets the FP+SSE bits in the XSAVE header when copying FPU state
 -- 
 2.43.0
 
