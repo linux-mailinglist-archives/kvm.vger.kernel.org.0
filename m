@@ -1,88 +1,88 @@
-Return-Path: <kvm+bounces-18524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18525-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8350A8D603C
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 13:06:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 469F38D6043
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 13:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 378081F24CB7
-	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 11:06:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01CFB2832E8
+	for <lists+kvm@lfdr.de>; Fri, 31 May 2024 11:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39212156F5B;
-	Fri, 31 May 2024 11:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182FB15747D;
+	Fri, 31 May 2024 11:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cvdBpv7K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VSkmh9p8"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E146B156F46
-	for <kvm@vger.kernel.org>; Fri, 31 May 2024 11:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD7BF156F46
+	for <kvm@vger.kernel.org>; Fri, 31 May 2024 11:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717153582; cv=none; b=rqmQKonsbFg+Vx2lJxayu+tCAc0/LqZKdioXoLqj9LJVGTr9dtjXKtwPCCrcL4+o26rZAPlpclsgHOY8wnECPhugDcDANRRDuvQ+7fO4YAY101e7FWypIQbYaGmlH8MXnxp2EkX1dvnfpdkduIfgB/J7xQ7l7KDzderIRT3TFAQ=
+	t=1717153636; cv=none; b=cF3rrmw7M6kwC7FvLSIu/Q6pV6knxB0aM8aCEK/SnS6yif8IYdY6MRX6+cnJd+A5k5DiHKGRHpEFeguiIx6IHvcMXVQOTa1RX2YQomQg6bx8RUKAF3wvn+R8nMm0LhICH3m71TV6S/zQsjgbsJsHgWruTFop1/vW7OQzlgQQjv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717153582; c=relaxed/simple;
-	bh=YBf0IapRAGeH4U9EkZTRJyClYUbpIhn1WOO52mODM0U=;
+	s=arc-20240116; t=1717153636; c=relaxed/simple;
+	bh=h41e7/O4Pohznmf3PUM6NQc+m0hegoY4EqYAFmWKYGY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rsxVcyLBK7hlDWIh/aHysawCPMIkPcngxe7S+h+hE3+UVYwykwxZYEsxgH3CSnHV1zijTGH+nVYa1sw8+ltb/OyIlRborgemUmTSe8ibCJaqSdYYNOqew9X5s+ExQn9RfANnA38W/UuugE7fBgStXxYHbHN65oQamknIsPm1e5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cvdBpv7K; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=Iig/iZ5UWKNW4ACAFmfxmIgq0MIBDX8LdO1YamN1iizWfjbbh3UpAliOL/mTJ9ZVJSduVVN5b+e+ylKBT2CmCT2ccThX/XLAb+yKxw5mvQqmjTHgFiR7metRbqcxeuaHYx2QtE1WPN2Pw/8pkzgiSQ0k4CEoB66Ow4/jG5yJ+WY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VSkmh9p8; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717153579;
+	s=mimecast20190719; t=1717153633;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vRRVsxgJ+xlaVE1gMPFs21sTlE+PJ7PzZr1qcVkiRno=;
-	b=cvdBpv7Ku90jRfFbzFaY3mRYDjTJv08qcErS52XU+ddGBBEDkW8B0z6qQRM8bPDQOZ8uoi
-	2Y/dknm4dSEYDETy8uQnN3ECpbvXDdupuc5V41BUh/v45PCzGv6GCPcthyt4qtet5AVFU+
-	LOt2f9P9lUSkDzFkeOBlqOIhJyoClis=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=KxPgW5AkJNB4ekRDOYHVb71yhNg3xNwdWM1TWklaq1c=;
+	b=VSkmh9p8UVknL8/B5aGK4pu33OewizTVEz1R+Vi6n2At8Teu1tocPAMZh/6KcVd5Kdjew8
+	QqZJcO2vIePGeFacp1BNUUMcT5UR6flc+7K9FIHx2e+18U8y6zqXJq9jwuTeqq+n5I/yTo
+	zB0jUwG3GI2a2FVP5tL+m2Cfim0D6UQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-TU34xe4jPAOOHcXavXiXWA-1; Fri, 31 May 2024 07:06:18 -0400
-X-MC-Unique: TU34xe4jPAOOHcXavXiXWA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3580f213373so1315949f8f.3
-        for <kvm@vger.kernel.org>; Fri, 31 May 2024 04:06:18 -0700 (PDT)
+ us-mta-581-MS4gAmAFO2uAfEGn_CDRNQ-1; Fri, 31 May 2024 07:07:10 -0400
+X-MC-Unique: MS4gAmAFO2uAfEGn_CDRNQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-35dc7e6e859so1125566f8f.2
+        for <kvm@vger.kernel.org>; Fri, 31 May 2024 04:07:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717153577; x=1717758377;
+        d=1e100.net; s=20230601; t=1717153629; x=1717758429;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vRRVsxgJ+xlaVE1gMPFs21sTlE+PJ7PzZr1qcVkiRno=;
-        b=IBCVDqFzzlzGnY5nE5PfXFp5VxiEkLPoDHuJNjey49ObIZGGnimm+fEbmXCsl6psRu
-         FAUmzz0t5agBwhPa5cnFIUnvO/6gVG4V6+UWvU9sBkww28EaO0yqU1+P+6xJlazfUgv7
-         MIxD2XTRYnbq73OCr0cqbPXPcm7EQpIeQJZJru8Txt4pilIrmjlIT77/NwAF/RPJkC/D
-         deQAmOeWYhb9BYaI1EEvI77AVVOdaPeJSpJVq0aT8z1OVtWPdqeAkN6OH4QU8f2bCpcv
-         3K+tWhyZhgnzmR+/Ij8BFWWtBl+ELK4XuFqZSTMUVUrxM3vD5QC8vOctBtPzzBXQBy2s
-         l/OA==
-X-Forwarded-Encrypted: i=1; AJvYcCXH8K1VRYSTMKJuQWoyl/5pjev+4SWfTXSkcU7qLcWzPn5ubyIuR4xhC7AIW1xg/+6XBcjfbFiGI8nob/yNHxGOc+4/
-X-Gm-Message-State: AOJu0YxWUHkCzZeKke008bpwDVDF5MuPfNhedEtLyn5/dHV8lCz3Z3p2
-	729HhcyASGfr7y10MrsIHKxe014CaJkm1Zs95ZI7GtyicXvATLTDK9yssHhaWxpCoMQj3NNIJ0/
-	kfQWxCQX0CzzXWEtFRUJwCaq/8uH6dOxwFpCpEK/JpqyRJWTyfQni1iZ6GLnYKV/uNLAJKgwiMt
-	og5TGdDORdcaACnEEjnz6EVpJm
-X-Received: by 2002:a05:6000:4598:b0:351:c2c1:3682 with SMTP id ffacd0b85a97d-35e0f333d40mr885470f8f.62.1717153577366;
-        Fri, 31 May 2024 04:06:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9LhlxVxdWcPVZ7UT4uT/GzA+K2roO4rSI5/qG3wo0fDKKrOV8w5n7Xh5wepQ95vSEE0IxZBrPYOCvWtrXD18=
-X-Received: by 2002:a05:6000:4598:b0:351:c2c1:3682 with SMTP id
- ffacd0b85a97d-35e0f333d40mr885454f8f.62.1717153577024; Fri, 31 May 2024
- 04:06:17 -0700 (PDT)
+        bh=KxPgW5AkJNB4ekRDOYHVb71yhNg3xNwdWM1TWklaq1c=;
+        b=u+6eDcR6ohp+vaR7NGb5pHfiusYs/MxZId/o/8upph8Fg8gKRvx3125PVtQBFBnpB+
+         FUwt1uziDjvZ20oV1BVblQXRn10s+2gOAq9WBzcum/exBHHgC8K+k8tfM0qD64grJjSE
+         /AGz3pE/++PuKdrzyhipbEhRvJRatzUpFf+kxrV5ov2TTXISUwapBh0hpeZlMpSqMG/7
+         PMwbXDwevIM4mCN0KeEtsKovCTL+ZLdkw3566BnF24eXkFJY1Um9w5+u3lvU2TiaaiyR
+         +DnotRxu0+F6jHz7RNeoKXV4C7z69LUD47/Ezd/ujmsJLMuZn3LNhnqRPw/7T9UlWEAF
+         31sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWRO2tNQ5iKH0AgW/2nwLjkg6qwzEcSyMo37gW6MKSf38f8On9f1ODjUuu4N80d6T9qXq/STUTSb3iWN0kQAa1kFuF6
+X-Gm-Message-State: AOJu0YzRA/7BBL25+IaLtTGp1jPsv9P+mh5MTtWez9gXJUV5x6GfI3ih
+	82xP93tkZ6OG6aL5qPjV//dBEdyzuddIdBBseLX1zBo1334Tl+CRB48AxwXAZrC1NeFd8z5f7Zf
+	UQWtz/hinXxQ64Fw2KWq1suJYYEsAkyGoH4Z+ag7drSIq3ZAE1Cbx4fLSjL15rlNdaECpWq92d6
+	i5LpkjCkkoxRsO47yY33uBcBSF
+X-Received: by 2002:adf:f7c4:0:b0:349:8ba8:e26d with SMTP id ffacd0b85a97d-35e0f25ade5mr1127944f8f.13.1717153628907;
+        Fri, 31 May 2024 04:07:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGKF8DUeAzyTLmkxUc/s/BL3e7Mfc2JhCDsrVEl9JqjeXyX2YUJeVpauWo8dvgyTY6BAjEL7a7hs6T6R7faTFI=
+X-Received: by 2002:adf:f7c4:0:b0:349:8ba8:e26d with SMTP id
+ ffacd0b85a97d-35e0f25ade5mr1127921f8f.13.1717153628524; Fri, 31 May 2024
+ 04:07:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530111643.1091816-1-pankaj.gupta@amd.com> <20240530111643.1091816-8-pankaj.gupta@amd.com>
-In-Reply-To: <20240530111643.1091816-8-pankaj.gupta@amd.com>
+References: <20240530111643.1091816-1-pankaj.gupta@amd.com> <20240530111643.1091816-10-pankaj.gupta@amd.com>
+In-Reply-To: <20240530111643.1091816-10-pankaj.gupta@amd.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 31 May 2024 13:06:05 +0200
-Message-ID: <CABgObfZQHq0NOs1BV60-hV=9SLBu+ZfBKTnH4WVg5Vk5LcSxpw@mail.gmail.com>
-Subject: Re: [PATCH v4 07/31] i386/sev: Introduce 'sev-snp-guest' object
+Date: Fri, 31 May 2024 13:06:57 +0200
+Message-ID: <CABgObfYvQdLJTv-sc-HfJ1ib6Bsp5=bfgdToWf89s3US3acAnA@mail.gmail.com>
+Subject: Re: [PATCH v4 09/31] i386/sev: Add sev_kvm_init() override for SEV class
 To: Pankaj Gupta <pankaj.gupta@amd.com>
 Cc: qemu-devel@nongnu.org, brijesh.singh@amd.com, dovmurik@linux.ibm.com, 
 	armbru@redhat.com, michael.roth@amd.com, xiaoyao.li@intel.com, 
@@ -93,33 +93,15 @@ Content-Transfer-Encoding: quoted-printable
 
 On Thu, May 30, 2024 at 1:17=E2=80=AFPM Pankaj Gupta <pankaj.gupta@amd.com>=
  wrote:
-> +++ b/qapi/qom.json
-> @@ -928,6 +928,61 @@
->              '*policy': 'uint32',
->              '*handle': 'uint32',
->              '*legacy-vm-type': 'bool' } }
+> +    /*
+> +     * SEV uses these notifiers to register/pin pages prior to guest use=
+,
+> +     * but SNP relies on guest_memfd for private pages, which has it's
+> +     * own internal mechanisms for registering/pinning private memory.
+> +     */
+> +    ram_block_notifier_add(&sev_ram_notifier);
 
-Nit, missing empty line here.
-
-> +##
-> +# @SevSnpGuestProperties:
-> +#
-
-
-[...]
-
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index c141f4fed4..841b45f59b 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -42,6 +42,7 @@
->
->  OBJECT_DECLARE_TYPE(SevCommonState, SevCommonStateClass, SEV_COMMON)
->  OBJECT_DECLARE_TYPE(SevGuestState, SevGuestStateClass, SEV_GUEST)
-> +OBJECT_DECLARE_TYPE(SevSnpGuestState, SevSnpGuestStateClass, SEV_SNP_GUE=
-ST)
-
-This separate struct is also unnecessary.
+"it's" should be "its".
 
 Paolo
 
