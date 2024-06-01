@@ -1,130 +1,115 @@
-Return-Path: <kvm+bounces-18574-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18575-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF0ED8D6F5A
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 12:25:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1428A8D7132
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 18:47:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EBA41F227AE
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 10:25:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB7461F21E5C
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 16:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9667314EC40;
-	Sat,  1 Jun 2024 10:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B9515350B;
+	Sat,  1 Jun 2024 16:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JoF/Lvb7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PrlnCk5k"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C02ECAD59;
-	Sat,  1 Jun 2024 10:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A6D1534EB
+	for <kvm@vger.kernel.org>; Sat,  1 Jun 2024 16:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717237492; cv=none; b=aECX3L3eo/sytDY2wTvTgC7SiROf8Zh5NdAuyJtGpVVpiDS29/rEXmh283nm9v9eiKZjhqmgeEaCGKXVfMQAp/+Yprz1zMZxqvIj9N2+RVgOmubPWL8K1T/Mdm6J8Ss3VD2B1ZD3TTA010wC8B2mgcnBn7lSLvCHzRqmR6m1OQY=
+	t=1717260453; cv=none; b=s48ChsumXG3GRmChbjEFAcBK0CCz+xfcQiVwC/juT2sluxybQggtDxJrqB3PNK+R2uGeXeQGqcD2qwHeFsesTpkYz0iJI3sTyHCRO+MuMYswibNRgPEq1F2//ri5D/mStDsYl8oyo4ul3XMYV4LuamW/cTTyoNe3ggmpPQuJOrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717237492; c=relaxed/simple;
-	bh=2bLc5BemzdRY0odLxllEa8Oj/5o5CSdq65VCuf7cwSo=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hSZH8CU+EKd+/P6EbQoUMCPEDbUUqIG2YSbAwvrrUgvuxpYVrQvI+kI9xNtWQQ2p447qRsgbMX/uFsrMdvtShrYb2PxqbabXQlB6qkoe4bCvA05OGgZhUIS82Bl8ML+JgjZbzPax/diaJVi/LDAvOI1AVpfozdSjcGAfWxr97Hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JoF/Lvb7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51A1AC116B1;
-	Sat,  1 Jun 2024 10:24:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717237492;
-	bh=2bLc5BemzdRY0odLxllEa8Oj/5o5CSdq65VCuf7cwSo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JoF/Lvb7omn8vrNETem+oO0Z9OAEdtp5gVVU1c+nfR2+NZ+424QQajWy6ZK5XmsAa
-	 M1rRvhA3db8vrqD6/pVtPF4v70Xh/H6lVTzJBP7RvDqq9t6KyfrxZACttwUd5gCT/d
-	 PMqfqk/LDKP4i47TFN8EjrFdfdDBrvkbQzwAP+ZrZKK2Qev54ZcOD4/ZoKkhfCPAks
-	 LaZ7Vx7maeWdjGW6a0eRlJtM8x7bcVp2lpMRVGR3R9X6X9ZtqCFMw0znoe/VJbrXw0
-	 LqF88JQsWjo4WWAElhy1pAra4fXbdIuhwDDf7hayJPvEO/Bd24Ho/Fng3Q5jDwlM6T
-	 V5VMpkmV7xHrA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sDLus-00HO1S-AQ;
-	Sat, 01 Jun 2024 11:24:50 +0100
-Date: Sat, 01 Jun 2024 11:24:49 +0100
-Message-ID: <87jzj92c5q.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1717260453; c=relaxed/simple;
+	bh=hcEKQjFR+BDHEaDgJvrNjjER+d6AUCCf9SO7wlCq5TM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P0cARAFM8/W8nrHsSHKe3ajINbal00e9i9Q3NHVg0UDCNI2997rv/dcSFonNzXYF+b+zJbZmdAB8SugBX9ebAiIS2DMDH3sOEgnZA1zYqoMjWzLRBvFKiqGulkJTd0WxwgtM/N69hA51biRs3UAsl9g9zHoqdSGl111dHHyoWLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PrlnCk5k; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: maz@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1717260449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HftneTOpLCAadUKPhKOwEoi7rTto1zNpLVNsoOs4x/0=;
+	b=PrlnCk5k6vLw7X94ebIoV2LgLdldxYG+fz/LmaAWknrUvh06Fn3fyIdzFbnOB3zux+Hg/O
+	9G+kylB7U+fD1/9iLTfsnK6MwJttAEY9hNNaex0RAUj80KukyhWbujfbue1OaKQdw0x3Bh
+	3c3n+huzFU/pQ1GinLHnHezd9e1ZwRQ=
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm@vger.kernel.org
+Date: Sat, 1 Jun 2024 09:47:23 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 00/11] KVM: arm64: nv: FPSIMD/SVE support
-In-Reply-To: <20240531231358.1000039-1-oliver.upton@linux.dev>
+	Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH 03/11] KVM: arm64: nv: Load guest FP state for ZCR_EL2
+ trap
+Message-ID: <ZltQm5a8CFtX1emJ@linux.dev>
 References: <20240531231358.1000039-1-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+ <20240531231358.1000039-4-oliver.upton@linux.dev>
+ <87le3p2dvg.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87le3p2dvg.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 01 Jun 2024 00:13:47 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Sat, Jun 01, 2024 at 10:47:47AM +0100, Marc Zyngier wrote:
+> On Sat, 01 Jun 2024 00:13:50 +0100, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > +static bool kvm_hyp_handle_zcr(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > +{
+> > +	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
+> > +
+> > +	if (!vcpu_has_nv(vcpu))
+> > +		return false;
+> > +
+> > +	if (sysreg != SYS_ZCR_EL2)
+> > +		return false;
+> > +
+> > +	if (guest_owns_fp_regs())
+> > +		return false;
+> > +
+> > +	return kvm_hyp_handle_fpsimd(vcpu, exit_code);
 > 
-> Hey!
+> For my own understanding of the flow: let's say the L1 guest accesses
+> ZCR_EL2 while the host own the FP regs:
 > 
-> I've decided to start messing around with nested and have SVE support
-> working for a nested guest. For the sake of landing a semi-complete
-> feature upstream, I've also picked up the FPSIMD patches from the NV
-> series Marc is carrying.
+> - ZCR_EL2 traps
+> - we restore the guest's state, enable SVE
+> - ZCR_EL2 traps again
+> - emulate the access on the slow path
 > 
-> The most annoying part about this series (IMO) is that ZCR_EL2 traps
-> behave differently from what needs to be virtualized for the guest when
-> HCR_EL2.NV = 1, as it takes a sysreg trap (EC = 0x18) instead of an SVE
-> trap (EC = 0x19). So, we need to synthesize the ESR value when
-> reflecting back into the guest hypervisor.
-
-That's unfortunately not a unique case. The ERETAx emulation already
-requires us to synthesise the ESR on PAC check failure, and I'm afraid
-ZCR_EL2 might not be the last case.
-
-In general, we'll see this problem for any instruction or sysreg that
-can generate multiple exception classes.
-
->
-> Otherwise, some care is required to slap the guest hypervisor's ZCR_EL2
-> into the right place depending on whether or not the vCPU is in a hyp
-> context, since it affects the hyp's usage of SVE in addition to the VM.
+> In contrast, the same thing using ZCR_EL1 in L1 results in:
 > 
-> There's more work to be done for honoring the L1's CPTR traps, as this
-> series only focuses on getting SVE and FPSIMD traps right. We'll get
-> there one day.
-
-I have patches for that in my NV series, which would take the place of
-patches 9 and 10 in your series (or supplement them, depending on how
-we want to slice this).
-
+> - ZCR_EL1 traps
+> - we restore the guest's state, enable SVE
 > 
-> I tested this using a mix of the fpsimd-test and sve-test selftests
-> running at L0, L1, and L2 concurrently on Neoverse V2.
+> and we're done.
+> 
+> Is that correct? If so, a comment would help... ;-)
 
-Thanks a lot for tackling this. It'd be good to put together a series
-that has the EL2 sysreg save/restore patches as a prefix of this, plus
-the CPTR_EL2 changes. That way, we'd have something that can be merged
-as a consistent set.
-
-I'll try to take this into my branch and see what explodes!
-
-Cheers,
-
-	M.
+Yeah, and I agree having a comment for this would be a good idea. Now
+that I'm looking at this code again, I had wanted to avoid the second
+trap on ZCR_EL2, so I'll probably fold in a change to bounce out to the
+slow path after loading SVE state.
 
 -- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Oliver
 
