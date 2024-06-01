@@ -1,132 +1,162 @@
-Return-Path: <kvm+bounces-18572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A84F88D6E00
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 07:18:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 933F58D6F33
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 11:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E9B21F229CD
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 05:18:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30AE0B22092
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 09:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84127BE78;
-	Sat,  1 Jun 2024 05:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7404E14E2D7;
+	Sat,  1 Jun 2024 09:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JkbDjkMP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ST5NmhQA"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321E91FA1
-	for <kvm@vger.kernel.org>; Sat,  1 Jun 2024 05:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93426450F2;
+	Sat,  1 Jun 2024 09:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717219103; cv=none; b=FLQ1VlQKVs19i6NQrjrJte62Q95q/WSDFSMEbjtB467x9CEBXsdtrUmeon2++sOMbvz5+VOpy/q4NPrWPztPEEVZW/oNTd4g/1/pWx/5p26yYMYd6Qhw7WN2VlrlbsjPPRRoWqHxc8ZdjPnUV6cckmUsQoghsNQqkgo3If1WBx0=
+	t=1717235271; cv=none; b=Yc3bHK346LaSbdF+9GZ1opjwGAxvzL6vvK35hvNhIXuvxgUtXS36YCHtvPS89k+zjd8w0BxLxifQvDdYXPpAUwSg2rHglsJ1LEiztn1hkG+wH6rBB0huM0ir9eZ8BM+HyMdKeXDO6jFpbPDBfcjHLquybOIIWCVqSc67p4Kwc5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717219103; c=relaxed/simple;
-	bh=0kHr9aThd0MTDmhKYlvXiMU4cPaUFyOFUgQLXAeH5yI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qCPsDO/qeDkyDDKGauURryQ9zw4/hnnfcUQMeyHUh7In8C5LnUBxCBAGashWJWNdiDjgkRJ3dHSWtzoj6yWSWhgY30tOKdThCMd5ElytzJ7egaEBFIrGWtIdyHh2d3YtB6ZYgh6JMZOFqB9qhjhcurGRwuAtz4As3YrQCfrjSoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JkbDjkMP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717219101;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bv8aR/J5h5qbZV/3DPgOI7hLYt0Y0SySq28fCihRSNw=;
-	b=JkbDjkMPAYljVDe/uRubvmwRBM7LXmx7YgkVk0+Tj4DdrrIi5whoJJXuXxWAzFrkOhZqgB
-	aukX4y4ui8mbpN3361Bt7a5V4hxSdsbzrC+LTrkQDMgQ8Kj5rp3C7RRU/0Fxun5r6kk+Me
-	+k0Tx39eVyKROLbYnSNeCdnx9Vr6Z9U=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-18-mNcXUqOGPn6pgdvr_kfT7Q-1; Sat, 01 Jun 2024 01:18:20 -0400
-X-MC-Unique: mNcXUqOGPn6pgdvr_kfT7Q-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7eac412397cso297725039f.0
-        for <kvm@vger.kernel.org>; Fri, 31 May 2024 22:18:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717219099; x=1717823899;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bv8aR/J5h5qbZV/3DPgOI7hLYt0Y0SySq28fCihRSNw=;
-        b=Aa4sIEQLka4sgKVb2qVGQHes7VUihuaoQJAtf3Q+vFKlmbP9KHH99aAZsJ8lC86KAT
-         V99F+3QXEcJz4CWNsI7/6Svz85T3nYcoKdW8hXn3dFcV+jZA1QTsrwcz5rUHtmynN00i
-         fgf6f6NOpe8YF/U/l2JZ/ipWw9xQUspVKXFpyy5ujPZN38Dsdkq/cG0OZpVUqwQZn1kq
-         SVoGZuXLCdq2zoT0QqxIikxVOwARJdY2/OMAOVXDtEbpreLu2j/oANqddhUPrqRkzmj6
-         FnkArquvIlWpAwTMiFVoH3WX59omOQKO3G6G4lceDuOo1zCWpc0Cyz8dMjgMx5QSOBJO
-         +baQ==
-X-Gm-Message-State: AOJu0YwkxbjCEfrinR8fE9rZeNINaydQNl4iU+vXZmXJv68mboS5BY+g
-	ybr4stI3axqbb+iYi4nfkRRZJ7WNis7lObCMPFlwFywWBjOpa1HqMcCaRcxIs1gqS5ZCeFDc8n4
-	lW04SjrJiWWQx5HQ+qyM8ktfhIlmXT+5QJRCNrXmIrXFQZNEUhL9bq1aPEQ==
-X-Received: by 2002:a05:6602:2d88:b0:7ea:fadb:1cd5 with SMTP id ca18e2360f4ac-7eafff2b8e1mr519857639f.18.1717219099015;
-        Fri, 31 May 2024 22:18:19 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGNtyU5+S2DeL02WOxWjFJyd07EtK3twlIvqFWbJR/pMiMiqYQZeT0KV0QV5WcJH9sTZuAzqA==
-X-Received: by 2002:a05:6602:2d88:b0:7ea:fadb:1cd5 with SMTP id ca18e2360f4ac-7eafff2b8e1mr519855839f.18.1717219098663;
-        Fri, 31 May 2024 22:18:18 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4b48764e0e4sm836012173.30.2024.05.31.22.18.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 May 2024 22:18:18 -0700 (PDT)
-Date: Fri, 31 May 2024 23:18:15 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: <kvm@vger.kernel.org>, <ajones@ventanamicro.com>,
- <kevin.tian@intel.com>, <jgg@nvidia.com>, <peterx@redhat.com>
-Subject: Re: [PATCH v2 2/2] vfio/pci: Use unmap_mapping_range()
-Message-ID: <20240531231815.60f243fd.alex.williamson@redhat.com>
-In-Reply-To: <ZlpgJ6aO+4xCF1+b@yzhao56-desk.sh.intel.com>
-References: <20240530045236.1005864-1-alex.williamson@redhat.com>
-	<20240530045236.1005864-3-alex.williamson@redhat.com>
-	<ZlpgJ6aO+4xCF1+b@yzhao56-desk.sh.intel.com>
-Organization: Red Hat
+	s=arc-20240116; t=1717235271; c=relaxed/simple;
+	bh=drVh/+lxaskPqg1aE87XG7HZa1lWAJu1imrCeGPPdbM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cNA9AAMAGSqeiU5IaY4QAkInwPeEHhJ63slA3op2I93RToSGKUQZ7uVMay+vHWrY805+BBnoh0vqIUGOwAFjtL5X3UmYBKbnIooqG320mPrKKXbhp17tXWxt9/+88UnSP4OaP+9z5uA9ZCgFWfuWSb19uWpLhsQuUGiWHdB6vzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ST5NmhQA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 047D3C116B1;
+	Sat,  1 Jun 2024 09:47:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717235271;
+	bh=drVh/+lxaskPqg1aE87XG7HZa1lWAJu1imrCeGPPdbM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ST5NmhQALpCDV8RPRgJ9uChcaS0d17uezFdF5Uja7M2nubaqPOi6qQoqUzl0Vz67k
+	 d283SIrbiHhQ+wtUbjMJWRN87NPjs6be7ecbw65aTcMy5YypXz0ZjmcEMrKBVI/j0v
+	 CowwTXIZMvB0MnygDtv6sQUJil4jz3ICZxFyrS+CAvpYSWpieBdWCEtzcs6YOs2FJO
+	 PA91gExG4K/vaHcTt9+f02a4ApBa/RKKSbrjPLzvCKVBolRNAOISPF0q8ymXCgEmld
+	 AKy59t2occgmol+CAk75dAHim6phPsHSXMNgbDgz1n6dFd989q/+QH7iRkPP+xQ+go
+	 G89mRmQ1hZB4A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sDLL2-00HNlY-MI;
+	Sat, 01 Jun 2024 10:47:48 +0100
+Date: Sat, 01 Jun 2024 10:47:47 +0100
+Message-ID: <87le3p2dvg.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 03/11] KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
+In-Reply-To: <20240531231358.1000039-4-oliver.upton@linux.dev>
+References: <20240531231358.1000039-1-oliver.upton@linux.dev>
+	<20240531231358.1000039-4-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sat, 1 Jun 2024 07:41:27 +0800
-Yan Zhao <yan.y.zhao@intel.com> wrote:
+On Sat, 01 Jun 2024 00:13:50 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> Round out the ZCR_EL2 gymnastics by loading SVE state in the fast path
+> when the guest hypervisor tries to access SVE state.
+> 
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 428ee15dd6ae..5872eaafc7f0 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -345,6 +345,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  		if (guest_hyp_fpsimd_traps_enabled(vcpu))
+>  			return false;
+>  		break;
+> +	case ESR_ELx_EC_SYS64:
+> +		if (WARN_ON_ONCE(!is_hyp_ctxt(vcpu)))
+> +			return false;
+> +		fallthrough;
+>  	case ESR_ELx_EC_SVE:
+>  		if (!sve_guest)
+>  			return false;
+> @@ -520,6 +524,22 @@ static bool handle_ampere1_tcr(struct kvm_vcpu *vcpu)
+>  	return true;
+>  }
+>  
+> +static bool kvm_hyp_handle_zcr(struct kvm_vcpu *vcpu, u64 *exit_code)
+> +{
+> +	u32 sysreg = esr_sys64_to_sysreg(kvm_vcpu_get_esr(vcpu));
+> +
+> +	if (!vcpu_has_nv(vcpu))
+> +		return false;
+> +
+> +	if (sysreg != SYS_ZCR_EL2)
+> +		return false;
+> +
+> +	if (guest_owns_fp_regs())
+> +		return false;
+> +
+> +	return kvm_hyp_handle_fpsimd(vcpu, exit_code);
 
-> On Wed, May 29, 2024 at 10:52:31PM -0600, Alex Williamson wrote:
-> > With the vfio device fd tied to the address space of the pseudo fs
-> > inode, we can use the mm to track all vmas that might be mmap'ing
-> > device BARs, which removes our vma_list and all the complicated lock
-> > ordering necessary to manually zap each related vma.
-> > 
-> > Note that we can no longer store the pfn in vm_pgoff if we want to use
-> > unmap_mapping_range() to zap a selective portion of the device fd
-> > corresponding to BAR mappings.
-> > 
-> > This also converts our mmap fault handler to use vmf_insert_pfn()
-> > because we no longer have a vma_list to avoid the concurrency problem
-> > with io_remap_pfn_range().  The goal is to eventually use the vm_ops
-> > huge_fault handler to avoid the additional faulting overhead, but
-> > vmf_insert_pfn_{pmd,pud}() need to learn about pfnmaps first.
-> >  
-> Do we also consider looped vmf_insert_pfn() in mmap fault handler? e.g.
-> for (i = vma->vm_start; i < vma->vm_end; i += PAGE_SIZE) {
-> 	offset = (i - vma->vm_start) >> PAGE_SHIFT;
-> 	ret = vmf_insert_pfn(vma, i, base_pfn + offset);
-> 	if (ret != VM_FAULT_NOPAGE) {
-> 		zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);
-> 		goto up_out;
-> 	}
-> }
+For my own understanding of the flow: let's say the L1 guest accesses
+ZCR_EL2 while the host own the FP regs:
 
-We can have concurrent faults, so doing this means that we need to
-continue to maintain a locked list of vmas that have faulted to avoid
-duplicate insertions and all the nasty lock gymnastics that go along
-with it.  I'd rather we just support huge_fault.  Thanks,
+- ZCR_EL2 traps
+- we restore the guest's state, enable SVE
+- ZCR_EL2 traps again
+- emulate the access on the slow path
 
-Alex
+In contrast, the same thing using ZCR_EL1 in L1 results in:
 
+- ZCR_EL1 traps
+- we restore the guest's state, enable SVE
+
+and we're done.
+
+Is that correct? If so, a comment would help... ;-)
+
+> +}
+> +
+>  static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+>  	if (cpus_have_final_cap(ARM64_WORKAROUND_CAVIUM_TX2_219_TVM) &&
+> @@ -537,6 +557,9 @@ static bool kvm_hyp_handle_sysreg(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	if (kvm_hyp_handle_cntpct(vcpu))
+>  		return true;
+>  
+> +	if (kvm_hyp_handle_zcr(vcpu, exit_code))
+> +		return true;
+> +
+>  	return false;
+>  }
+>  
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
