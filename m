@@ -1,62 +1,77 @@
-Return-Path: <kvm+bounces-18577-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18578-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C8478D7143
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 18:58:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B41A28D71A1
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 21:15:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A8392826E6
-	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 16:58:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665051F21A0F
+	for <lists+kvm@lfdr.de>; Sat,  1 Jun 2024 19:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F4B15442B;
-	Sat,  1 Jun 2024 16:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64C3125DE;
+	Sat,  1 Jun 2024 19:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="LH4oHneY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ui+iMp0B"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791FC1527A0
-	for <kvm@vger.kernel.org>; Sat,  1 Jun 2024 16:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734A233EA
+	for <kvm@vger.kernel.org>; Sat,  1 Jun 2024 19:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717261064; cv=none; b=MgvEhm3l++rDBj99DBTrtttnBAP4MQqxeURoI4W7gBY8UctrqAavAJWMSwQgj6vupKKsPdm/FWyTWtsyQra1mfuqCG3DL7aw00rF5hukoemn0iUIcgyQnIxnV1QiYVJz0dDgAkO+NoAi/aPB80LKiXrTVJ9OtU8AwRO6cJPHmmc=
+	t=1717269335; cv=none; b=fQTtG02J9ELWG7y30Xqhp+DTp23S/Wy+RE/cdpaEa6jG/q74Fr29ps3olDFqoAr8dY4kfRXNeLpqXF2vp289vmQYZZPIuBDHeTJK8ZV5v2qjKjdgVP3JMmvgW1jb/bx9cNhup2zBE6NgLcZW1TGESbokr/6n75uVgwdK1u08CqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717261064; c=relaxed/simple;
-	bh=wVotdO9j7tE4AWW7SQJUOkpiSWjoHozRLSzU4NvGP0A=;
+	s=arc-20240116; t=1717269335; c=relaxed/simple;
+	bh=TCNSPxPns4EhFR9yBjsnQhWnMT3BTaZJ5LndNteH2Ns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SWzS1iDgIx23WpBY73D1f5zM0J6Az/Ui0+rfgghgpdGnO3QD/rq5hJdXDO8kMbkl9bGJOF3nmtUdHVQ0op9nAyfm20AtRlVWkV2tX6l4X75WAOE97ZiK3kBxouPAulCfYwljUsBSnskIbGJ54xV3zFXwsNhEn9V8hrkYwPSAJP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=LH4oHneY; arc=none smtp.client-ip=91.218.175.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: maz@kernel.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1717261059;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Eu63+ui3NCNu/cbwzFZGKRgGHoolaynM1Ff68oWiYRs=;
-	b=LH4oHneYCEKESsjPUtWSAEG6b6cW49IqWf/sdyIQXyJ5cXUSHuNCVOCJ4CfFKB2qKsRSCx
-	etXHC+W4DQ90aQ8iL4O75p5dvTrgo31uwVu3Iv6C9WjR9ZJN3a7Vb2leugU2k+xLutKRw6
-	fJL0kYbBCEITF12vafrBWJ326x5zaoA=
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-Date: Sat, 1 Jun 2024 09:57:31 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 00/11] KVM: arm64: nv: FPSIMD/SVE support
-Message-ID: <ZltS-7c4cSBdMqfh@linux.dev>
-References: <20240531231358.1000039-1-oliver.upton@linux.dev>
- <87jzj92c5q.wl-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nxKnODVyXs6JIJUIalLaJ6CWYOKwkvVS2A1UrB0n94fvgjLO8HpdytRt0f/YYeKFMaAjjoGjMV+rH7LEhp5/EzYwQTZpiPwc197Mu3cGBWimXeqVujyJewE6+qjP/Joj7LvxcVHqUIzjivRJELOsjZX++C9h/QvFCvCbZLNyeGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ui+iMp0B; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717269333; x=1748805333;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=TCNSPxPns4EhFR9yBjsnQhWnMT3BTaZJ5LndNteH2Ns=;
+  b=Ui+iMp0BHJMsejzYibXW9WxN99pEPm0eMyteNW8X6z63pAC6hDFyoHuO
+   Y9DTIfcrbfErbyXaLC4eLCPlcaS4QPQdd4FZjsRHGAZ6OdWW8wv2lm1fq
+   1KrhpYodValK+0edcHnyelso89FXlFuji06TDerVDYtgEmX1k/3GCA5bv
+   H6Jds7A6OIqAOW7qOV+XbtAUYM5i0jIAAcLzxkfaVRHWugpLFCND4XaAN
+   /GZdk+pLMZrucDu7SAfUfGIGnbeX5xSo9KYHAkZmVbnjtwj83iOkDin37
+   5TxYSLcv5rTc/fB53t60z2Yg4iEm3jFOww6OMt11lPZ29rBQOUzv6xrVl
+   Q==;
+X-CSE-ConnectionGUID: rIhVR0dwRFKjA3YKL1+0MA==
+X-CSE-MsgGUID: m4ARZbuoRXyO4HsqaXmu5g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11090"; a="14024366"
+X-IronPort-AV: E=Sophos;i="6.08,207,1712646000"; 
+   d="scan'208";a="14024366"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2024 12:15:31 -0700
+X-CSE-ConnectionGUID: rWV/KU92STmxbEjmvCR7Zw==
+X-CSE-MsgGUID: bgxV5EY2QLGvKJagxrtxBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,207,1712646000"; 
+   d="scan'208";a="41560131"
+Received: from unknown (HELO 0610945e7d16) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 01 Jun 2024 12:15:29 -0700
+Received: from kbuild by 0610945e7d16 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sDUBq-000JHH-06;
+	Sat, 01 Jun 2024 19:15:21 +0000
+Date: Sun, 2 Jun 2024 03:13:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Srujana Challa <schalla@marvell.com>, virtualization@lists.linux.dev,
+	kvm@vger.kernel.org, mst@redhat.com, jasowang@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, schalla@marvell.com,
+	vattunuru@marvell.com, sthotton@marvell.com,
+	ndabilpuram@marvell.com, jerinj@marvell.com
+Subject: Re: [PATCH] vdpa: Add support for no-IOMMU mode
+Message-ID: <202406020255.Xp36fzlp-lkp@intel.com>
+References: <20240530101823.1210161-1-schalla@marvell.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,69 +80,44 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87jzj92c5q.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240530101823.1210161-1-schalla@marvell.com>
 
-On Sat, Jun 01, 2024 at 11:24:49AM +0100, Marc Zyngier wrote:
-> On Sat, 01 Jun 2024 00:13:47 +0100,
-> Oliver Upton <oliver.upton@linux.dev> wrote:
-> > 
-> > Hey!
-> > 
-> > I've decided to start messing around with nested and have SVE support
-> > working for a nested guest. For the sake of landing a semi-complete
-> > feature upstream, I've also picked up the FPSIMD patches from the NV
-> > series Marc is carrying.
-> > 
-> > The most annoying part about this series (IMO) is that ZCR_EL2 traps
-> > behave differently from what needs to be virtualized for the guest when
-> > HCR_EL2.NV = 1, as it takes a sysreg trap (EC = 0x18) instead of an SVE
-> > trap (EC = 0x19). So, we need to synthesize the ESR value when
-> > reflecting back into the guest hypervisor.
-> 
-> That's unfortunately not a unique case. The ERETAx emulation already
-> requires us to synthesise the ESR on PAC check failure, and I'm afraid
-> ZCR_EL2 might not be the last case.
-> 
-> In general, we'll see this problem for any instruction or sysreg that
-> can generate multiple exception classes.
+Hi Srujana,
 
-Right, I didn't have a good feel yet for whether or not we could add
-some generalized infrastructure for 'remapping' ESR values for the guest
-hypervisor. Of course, not needed for this, but cooking up an ISS is
-likely to require a bit of manual intervention.
+kernel test robot noticed the following build warnings:
 
-> > Otherwise, some care is required to slap the guest hypervisor's ZCR_EL2
-> > into the right place depending on whether or not the vCPU is in a hyp
-> > context, since it affects the hyp's usage of SVE in addition to the VM.
-> > 
-> > There's more work to be done for honoring the L1's CPTR traps, as this
-> > series only focuses on getting SVE and FPSIMD traps right. We'll get
-> > there one day.
-> 
-> I have patches for that in my NV series, which would take the place of
-> patches 9 and 10 in your series (or supplement them, depending on how
-> we want to slice this).
+[auto build test WARNING on mst-vhost/linux-next]
+[also build test WARNING on linus/master v6.10-rc1 next-20240531]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-That'd be great, I just wanted to post something focused on FP/SVE to
-start but...
+url:    https://github.com/intel-lab-lkp/linux/commits/Srujana-Challa/vdpa-Add-support-for-no-IOMMU-mode/20240530-182129
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20240530101823.1210161-1-schalla%40marvell.com
+patch subject: [PATCH] vdpa: Add support for no-IOMMU mode
+config: powerpc64-randconfig-r123-20240601 (https://download.01.org/0day-ci/archive/20240602/202406020255.Xp36fzlp-lkp@intel.com/config)
+compiler: powerpc64-linux-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240602/202406020255.Xp36fzlp-lkp@intel.com/reproduce)
 
-> > 
-> > I tested this using a mix of the fpsimd-test and sve-test selftests
-> > running at L0, L1, and L2 concurrently on Neoverse V2.
-> 
-> Thanks a lot for tackling this. It'd be good to put together a series
-> that has the EL2 sysreg save/restore patches as a prefix of this, plus
-> the CPTR_EL2 changes. That way, we'd have something that can be merged
-> as a consistent set.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406020255.Xp36fzlp-lkp@intel.com/
 
-I'd be happy to stitch together something like this to round out the
-feature. I deliberately left out the handling of vEL2 registers because
-of the CPACR_EL1 v. CPTR_EL2 mess, but we may as well sort that out.
+sparse warnings: (new ones prefixed by >>)
+>> drivers/vhost/vdpa.c:39:6: sparse: sparse: symbol 'vhost_vdpa_noiommu' was not declared. Should it be static?
 
-Did you want to post your CPTR bits when you have a chance?
+vim +/vhost_vdpa_noiommu +39 drivers/vhost/vdpa.c
+
+    38	
+  > 39	bool vhost_vdpa_noiommu;
+    40	module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
+    41			   vhost_vdpa_noiommu, bool, 0644);
+    42	MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode, "Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the kernel.  If you do not know what this is for, step away. (default: false)");
+    43	
 
 -- 
-Thanks,
-Oliver
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
