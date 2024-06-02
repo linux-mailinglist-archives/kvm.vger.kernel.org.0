@@ -1,154 +1,98 @@
-Return-Path: <kvm+bounces-18589-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18590-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F42008D7638
-	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2024 16:29:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADA688D793D
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 01:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 922C91F224A7
-	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2024 14:29:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6733C281BD3
+	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2024 23:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50C141C73;
-	Sun,  2 Jun 2024 14:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A6C7F481;
+	Sun,  2 Jun 2024 23:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3IPs/mC"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="lq69jgkA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16D12C684;
-	Sun,  2 Jun 2024 14:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7D27B3C1;
+	Sun,  2 Jun 2024 23:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717338540; cv=none; b=c+r2Mk37kxiFweIvD8V22GOdUqpH/LXC37vzAomf+7sbWHNunMnuXl6De8hZNQEY1dNChxVrkmTaYi2nsRPtH5T/xj0+X5FCpOqi6jV0MIJNnc/N/qxFaZ/kjjWdoiVh3kuw/lg2+K+wLuE4uzfafkqR7OorUs7+wv1LfzKyzSM=
+	t=1717372538; cv=none; b=un8q7Qx6Ft3R/Vq4NbRBpnV9uppJZsIFBtwRa7FHlTVncqvfV8ke4Af0Nd8ID5UFH4icaPHziXLWrHbpl/iK21qd/r6zdlVhdr3velocy63ZQYHm64qARG5RP4XrV6MOod77EBEvq97UJv58VaKnBH4IxdcSogeAfbTAAG5oJUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717338540; c=relaxed/simple;
-	bh=Twk0OIW4aPIuat1Dyyqvbm3ZkGFMwoyV7gbfv2DR/Gs=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C0Tf2uU3y/E6kp6VOUI/6XJckE3ixN/vcurjkhdA6RxlleT3mqyqH16XuYkxWeIduU7CmuVmHORXoUrzwSmS1qi2QKIk/mFmwWCKWQoovKZuIbP2zgoPHEXVzP+uGcJ44bCqqGkMD+r7IApWQmTH7J0ToePAAaAI5IxLcI+A+D4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3IPs/mC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A9DBC2BBFC;
-	Sun,  2 Jun 2024 14:28:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717338539;
-	bh=Twk0OIW4aPIuat1Dyyqvbm3ZkGFMwoyV7gbfv2DR/Gs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l3IPs/mCDdpqgZed7VnyEpm1iWftTc+CLOvNJ6S7NEEwlhV9XM+DHXeJeMQrg+ryZ
-	 rhG7oCzoRcfc2TQj/Tal7Fu4RThLp9SUGpiGmLZ6jic4amGn7dtYA36WN3KgEGGnbs
-	 UiFGvqPM73mvf4+WEhvLIo7A9CKwXST7MoS6iW/zct9T1C+h5pPZfocJIArA3eapp1
-	 XlPg9HAZvybMMZQs3GK3F0w1q35wogexsia/QBfD6A6y+8KTutYEsAS+K1s+ZHMIaP
-	 bSLCkasJXN4H/aMq1eAOCsBQBzz3rvkBkyYHiOWwZswljBISQZfsliWRwvvTnK+ubA
-	 9uHdeUDErqk8g==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sDmCf-00HZqB-8w;
-	Sun, 02 Jun 2024 15:28:57 +0100
-Date: Sun, 02 Jun 2024 15:28:56 +0100
-Message-ID: <87h6eb2zbr.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 00/11] KVM: arm64: nv: FPSIMD/SVE support
-In-Reply-To: <ZltS-7c4cSBdMqfh@linux.dev>
-References: <20240531231358.1000039-1-oliver.upton@linux.dev>
-	<87jzj92c5q.wl-maz@kernel.org>
-	<ZltS-7c4cSBdMqfh@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1717372538; c=relaxed/simple;
+	bh=mJ+euakUnp3ZzmgPrN7Solq3UvQbB1ZApxbo6oK7Zro=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rL0b8htf/4gDEzVOOeE5wtBPbeulrZOm0+m9b3ITaPpmVGy/xEouYuiNGS/IDzDgwDCeV190EgekGWfuMpaX4ASckhAmN1PqdW2sGGj3vinKmiiLRQ2RuGgZpAaX8fG/SGbm9a1449jOj2Su9Z/Z+L1N0B0kXMmxdwAb8YW79x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=lq69jgkA; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=Dk2v/z9ECEt0zuLXLB/J689XlPsnFjnI00VCdDWthTQ=; b=lq69jgkA4A1xBl4K
+	OQruK7wotMH+d1Edn1B93/qcsJCLGtc70+ZcKp+Dp9iEgOTUBuWf586EIT+puDlh1jO7MI0XF8V1d
+	sgaHcnaRx8SsEP1M9nqdmsSzqfI5mmkXmbTiPSOeWe6WRVkB8ycATX8wk+T/x6VgGPxi31rqWFv35
+	VJwRS/t/JWLn4hoRk20qTNlq9rMV8kfWqV62FQas8d9mRUV2W8QnhiI0iD+2nV/GanMo3CO295l63
+	krC0ZT3j5ASnjUhUw444/ijBhca/ZoaQfT9aS1qfBXhtmSr3d6AWNo8aqoei/uUJAJVk0ksN1IByY
+	arVymfZ0X72Aa+DWAw==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1sDv2w-003r8b-1i;
+	Sun, 02 Jun 2024 23:55:31 +0000
+From: linux@treblig.org
+To: pbonzini@redhat.com,
+	shuah@kernel.org
+Cc: kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH] KVM: selftests: remove unused struct 'memslot_antagonist_args'
+Date: Mon,  3 Jun 2024 00:55:29 +0100
+Message-ID: <20240602235529.228204-1-linux@treblig.org>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Sat, 01 Jun 2024 17:57:31 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Sat, Jun 01, 2024 at 11:24:49AM +0100, Marc Zyngier wrote:
-> > On Sat, 01 Jun 2024 00:13:47 +0100,
-> > Oliver Upton <oliver.upton@linux.dev> wrote:
-> > > 
-> > > Hey!
-> > > 
-> > > I've decided to start messing around with nested and have SVE support
-> > > working for a nested guest. For the sake of landing a semi-complete
-> > > feature upstream, I've also picked up the FPSIMD patches from the NV
-> > > series Marc is carrying.
-> > > 
-> > > The most annoying part about this series (IMO) is that ZCR_EL2 traps
-> > > behave differently from what needs to be virtualized for the guest when
-> > > HCR_EL2.NV = 1, as it takes a sysreg trap (EC = 0x18) instead of an SVE
-> > > trap (EC = 0x19). So, we need to synthesize the ESR value when
-> > > reflecting back into the guest hypervisor.
-> > 
-> > That's unfortunately not a unique case. The ERETAx emulation already
-> > requires us to synthesise the ESR on PAC check failure, and I'm afraid
-> > ZCR_EL2 might not be the last case.
-> > 
-> > In general, we'll see this problem for any instruction or sysreg that
-> > can generate multiple exception classes.
-> 
-> Right, I didn't have a good feel yet for whether or not we could add
-> some generalized infrastructure for 'remapping' ESR values for the guest
-> hypervisor. Of course, not needed for this, but cooking up an ISS is
-> likely to require a bit of manual intervention.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-So far, it is pretty limited, only takes a couple of lines of code,
-and is likely to always be coupled with some more complicated handling
-(I don't see this being *only* a quick ESR remapping).
+'memslot_antagonist_args' is unused since the original
+commit f73a3446252e ("KVM: selftests: Add memslot modification stress
+test").
 
-> > > Otherwise, some care is required to slap the guest hypervisor's ZCR_EL2
-> > > into the right place depending on whether or not the vCPU is in a hyp
-> > > context, since it affects the hyp's usage of SVE in addition to the VM.
-> > > 
-> > > There's more work to be done for honoring the L1's CPTR traps, as this
-> > > series only focuses on getting SVE and FPSIMD traps right. We'll get
-> > > there one day.
-> > 
-> > I have patches for that in my NV series, which would take the place of
-> > patches 9 and 10 in your series (or supplement them, depending on how
-> > we want to slice this).
-> 
-> That'd be great, I just wanted to post something focused on FP/SVE to
-> start but...
-> 
-> > > 
-> > > I tested this using a mix of the fpsimd-test and sve-test selftests
-> > > running at L0, L1, and L2 concurrently on Neoverse V2.
-> > 
-> > Thanks a lot for tackling this. It'd be good to put together a series
-> > that has the EL2 sysreg save/restore patches as a prefix of this, plus
-> > the CPTR_EL2 changes. That way, we'd have something that can be merged
-> > as a consistent set.
-> 
-> I'd be happy to stitch together something like this to round out the
-> feature. I deliberately left out the handling of vEL2 registers because
-> of the CPACR_EL1 v. CPTR_EL2 mess, but we may as well sort that out.
-> 
-> Did you want to post your CPTR bits when you have a chance?
+Remove it.
 
-Yup, I'll rework that on top of your series and we'll take it from
-there.
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ .../selftests/kvm/memslot_modification_stress_test.c        | 6 ------
+ 1 file changed, 6 deletions(-)
 
-Thanks,
-
-	M.
-
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 05fcf902e067..49f162573126 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -53,12 +53,6 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
+ 	}
+ }
+ 
+-struct memslot_antagonist_args {
+-	struct kvm_vm *vm;
+-	useconds_t delay;
+-	uint64_t nr_modifications;
+-};
+-
+ static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
+ 			       uint64_t nr_modifications)
+ {
 -- 
-Without deviation from the norm, progress is not possible.
+2.45.1
+
 
