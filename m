@@ -1,79 +1,83 @@
-Return-Path: <kvm+bounces-18581-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18582-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 109328D7552
-	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2024 14:26:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7A168D7553
+	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2024 14:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCD6A281E0B
-	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2024 12:26:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62438281E34
+	for <lists+kvm@lfdr.de>; Sun,  2 Jun 2024 12:26:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4255E3A1DC;
-	Sun,  2 Jun 2024 12:26:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E333B7AC;
+	Sun,  2 Jun 2024 12:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TTVCmb9p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L1Oqg/tp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3792A38394
-	for <kvm@vger.kernel.org>; Sun,  2 Jun 2024 12:26:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A897C38394
+	for <kvm@vger.kernel.org>; Sun,  2 Jun 2024 12:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717331171; cv=none; b=uBRXWiAfqgybl+EGt/cnfRRCjb//VlSxzQ5o4CgFtmGUzwt8QaaBMnRATPxLutXazmW1gqx+V0tosOE21a0e/L7MPLQLYkx6Uc4MoIbszNx1ZcsbS0xRpPxV99Hk9KbQwTRP7eVVhi/ywIMIS6xr2rlgUtQg9eobYPJu+7dGqWg=
+	t=1717331174; cv=none; b=oiK7fIXw/V9FQHn6fEmxTjOa/4zX8UJOnTyrCIWQQ/3Il8JJdzrw1vtGI2c/6wqZbhNYgCXnCtY79xnxPUmnEnCmhOjAHYNO/uHEMDsnaUeUiCTN4mfEJo4HbsiaM5XIxRXhja2Uqqw7DO/08NwfOLC9zAq4ax6Juke+7sTJrvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717331171; c=relaxed/simple;
-	bh=NnCCxGtfqAS6Di79imZop7ntNX5zazZtpYFYg3MrJdM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NpMRgD4iAr+YH6RZfDfO257XVGaVG15YENmDT4t+HOwWlnQ2x+hcvGSE+Rla+z4S9bP8lGr/6Wb/5tQkPn4nCV4At4bxDiAwoOlJnZR8SmoSsU8i/rYMmMNQzv6IdPPpL+epy2/uIWZAzQXDIgHTfSoFGCr5GbYdbi8q6ks4f7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TTVCmb9p; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1717331174; c=relaxed/simple;
+	bh=lFOCyger+Cvum4USeOZwnOs5mMMmHZ6zekex9/cU82c=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=fnQ1WOrSPTEkFQ/D56alcWxkqicRkpjJyHVqTSTxBVn7SeOHGxtmv4el5Thhhhl69sCjnDvKscPVQ83y5dKfKyPQu0QIwc1S02WXqXvugHoo6BXAxbt6Gfoc73gwwmOGUQfj7ZRJLOQ7uTauMuXmsyF/fvaxvTjZJ7FN4pDobDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L1Oqg/tp; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f661450af5so5817135ad.3
-        for <kvm@vger.kernel.org>; Sun, 02 Jun 2024 05:26:09 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-1f44b4404dfso30961535ad.0
+        for <kvm@vger.kernel.org>; Sun, 02 Jun 2024 05:26:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717331169; x=1717935969; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJoB4HYVwuB6cyjM+/u46B3SgOikV+0V6UNV7IIxS4Y=;
-        b=TTVCmb9pueJ7j9JlpBeRANpX2iJnvYRi0wlWfOLUWB4rqAo9dGjh7EArrjEOLOXWoC
-         IZwl5gEZhR3/VZygv5DbV0mOmPCRGTpSPWC7K9SEo2a6HHUhFk+cUpGF9OoDlwnVy0/r
-         HvAqMzgtLmUjeqc6CGkUQ+LRKJScG7rnzhJtz/KuqmLuQzNyGTViFo9MZLVHlfgH4ADk
-         1hPx82hnLKUTvvNEtngPhcuKK+xWOvubVyC52MoFyY30IUt9DKcVB7p98P6od1iMNPUf
-         +dvETfdGbgasO7uvcIwOumQaLDHbjEOoMjitPGT5OcAhEUScqcAjPjbr7Kif9Z7oWZzx
-         yHRg==
+        d=gmail.com; s=20230601; t=1717331173; x=1717935973; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J0+Rqr5O31VyBP3nYRYAZ1XPI1Uu1EEL5+3UerSfcLk=;
+        b=L1Oqg/tpvFWHcoauuZw+ma3Agf5h2uJexOks9PG3SOwE05SCMFzOXp7z3Yxt6BLhIF
+         LKrWKRE2Ggs07s3j3+GH18O5oLDY46DJpxYAlvvvFfCBIrCfFlAbl3Q0Ep2s/9/1ki4o
+         Jf2HKILPtlcJR9m+WmtCTQXsBiZeASaRbm/25s85RArQ+gHuBaBNCJyt8LRfv6LkS/sO
+         xv5awJp21RKx3QY5GVypBRTDI9FDMkAR7tRBa2svBal37GDp0XUY2rZkbnfWZDp87WcP
+         P6RPGJFnaua2SLOIZ1qJZsCGBNN7gRF0CISnjXEjRahBfUzZeV/HeoPARrDQ3XgYd/SV
+         nudw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717331169; x=1717935969;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PJoB4HYVwuB6cyjM+/u46B3SgOikV+0V6UNV7IIxS4Y=;
-        b=S2P7PN2jE5pU+Vfsd7FHqqj/xhJCJVMkBNnVPDaErZSMw9gvBQqSXVOhJl9TlAOSpK
-         PReF5TAJF2hov65ECqlGm8fWJ1A0p/In1EGRZX8aKOhjZh6+X2OFFPBvv3Uvn+wKDt+0
-         O1y9uLR8pqoDqD5xzOmhjE/15hzwDDagsBljcBcIKmoYqKxZvRU8BjG1m0AR7jGHr5Sj
-         W5L3GsIhX9zVLQxFfZWl6V3Rz5cH+z6rNtJ55AAeKUZr6ttTVgRVBlojSj4qd4JAslYU
-         YZVa8kkwrfnMNktpUglfmX3SRSJ+8BO14sbDEVCkw4tVAfmghP1bXLcSxASlgJzevqtF
-         Og1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWPEbMZsx0LExDWEVz8y7TP4f/V+0Jvcrpd8dWKGkEGYocZYU9sf3owToakQhL2fKGAaXVbOmAYwO4vaFZuEO3fLYK1
-X-Gm-Message-State: AOJu0YxmEYkPPU+BDCynFGiuUVq5LwrvWcS465JGVSZMRXaRAK0LhYmC
-	G/l74OmnWkJ/n2/k/k77JCMnQNgp3KLL+JNZ0+iuAwSVUwCHkMdS
-X-Google-Smtp-Source: AGHT+IHCK9Rb4hzA3jSYGxYdvup1nb/7vvknM27CAp0wmMOC4Np5rCIqWbabkD9e9KFWEpZiORQZWA==
-X-Received: by 2002:a17:902:dac3:b0:1f6:6c9b:b22c with SMTP id d9443c01a7336-1f66c9bb3femr13919025ad.65.1717331169321;
-        Sun, 02 Jun 2024 05:26:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717331173; x=1717935973;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J0+Rqr5O31VyBP3nYRYAZ1XPI1Uu1EEL5+3UerSfcLk=;
+        b=qwyGGLMbdt2cL5cDGaS2Qw/OosTtwnsjsu8LZJM1YY4HWlTvvB5nWea5ueUoJEZYN8
+         kXbV8TDHdWDsa3rEeR+1enM+xsR0sDBReC59xs6GkMX7cFlSnHNbis4sQvCKmNomsROc
+         y/9EOl8a8akwO86pAiJlELggt34CfiW+n61DkRDm21HRFcfCo1e6uLaJbKZhoDyGdMVq
+         FEeYsd0bP514OByZzhzu7sGhL+ywSsO6VZPyn6cUbTCfG9b2k3DVuXmwFEc31IDE3uiP
+         ZQCAA6DVUhYxU/m9ugIlhvez0r0BAybPqgacfBcn9UZUEoWWIDQKToJMn+BSnCrw2ada
+         LWUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/aLmcbq2vbAcriyKYkF0w7ec2cz6sNfMMpIRfGKFgiEW+gJwgq6R1Dty6PBalueQZK0L6TTA7GJP8/ELy/kJUWvmc
+X-Gm-Message-State: AOJu0YyYCFjFeHyOQA6VGCDGID9185s9ZXH3xYZ3FFz8iakk7vyu0UBi
+	yGf3nHpFo0cWHdER25+lFtEZwXeQkd5DzWrTewu8/QJqYxDbpc4X
+X-Google-Smtp-Source: AGHT+IHIciwb566nl0u55CKEkBnjZ9tl7Rifm+VvXDKA5BRrgV7+AfpURO1apfagzPrJSssT2em99w==
+X-Received: by 2002:a17:902:f94d:b0:1ec:e3c2:790e with SMTP id d9443c01a7336-1f63700392amr57225025ad.19.1717331172769;
+        Sun, 02 Jun 2024 05:26:12 -0700 (PDT)
 Received: from wheely.local0.net (110-175-65-7.tpgi.com.au. [110.175.65.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6703f7673sm7834145ad.210.2024.06.02.05.26.06
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6703f7673sm7834145ad.210.2024.06.02.05.26.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jun 2024 05:26:08 -0700 (PDT)
+        Sun, 02 Jun 2024 05:26:12 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH 0/4] powerpc fix and misc docs/build/CI improvements
-Date: Sun,  2 Jun 2024 22:25:54 +1000
-Message-ID: <20240602122559.118345-1-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH 1/4] powerpc/sprs: Fix report_kfail call
+Date: Sun,  2 Jun 2024 22:25:55 +1000
+Message-ID: <20240602122559.118345-2-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240602122559.118345-1-npiggin@gmail.com>
+References: <20240602122559.118345-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,45 +86,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This is some fixes and odd bits before I was going to resubmit the
-remains of the powerpc series.
+Parameters to report_kfail are wrong. String to bool conversion is not
+warned by gcc, and printf format did not catch it due to string variable
+being passed at the format location.
 
-Patch 1 is a silly rebase bug. I thought I must have missed a warning
-in the build noise, but no gcc just doesn't warn for string literal to
-bool conversion.
+Fixes: 8f6290f0e6 ("powerpc/sprs: Specify SPRs with data rather than code")
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ powerpc/sprs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Patch 2 is the doc fix updated according to feedback from Thomas
-(main change, enumerate the other special groups).
-
-Patch 3 is a quick hack to make build warnings more obvious. Thoughts?
-Results can be seen here
-https://gitlab.com/npiggin/kvm-unit-tests/-/pipelines/1314895857
-
-Patch 4, after debugging something with CI, it doesn't seem to save the
-test logs on failure. I can't drive gitlab CI very well but this seemed
-to fix it.
-
-Thanks,
-Nick
-
-Nicholas Piggin (4):
-  powerpc/sprs: Fix report_kfail call
-  doc: update unittests doc
-  build: Make build output pretty
-  gitlab-ci: Always save artifacts
-
- .gitlab-ci.yml          |  5 +++++
- Makefile                | 14 ++++++++++++++
- arm/Makefile.common     |  7 +++++++
- docs/unittests.txt      | 11 ++++++++---
- powerpc/Makefile.common | 11 +++++++----
- powerpc/sprs.c          |  2 +-
- riscv/Makefile          |  5 +++++
- s390x/Makefile          | 18 +++++++++++++++++-
- scripts/mkstandalone.sh |  2 +-
- x86/Makefile.common     |  5 +++++
- 10 files changed, 70 insertions(+), 10 deletions(-)
-
+diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+index de9e87a21..33872136d 100644
+--- a/powerpc/sprs.c
++++ b/powerpc/sprs.c
+@@ -590,7 +590,7 @@ int main(int argc, char **argv)
+ 
+ 		if (sprs[i].width == 32 && !(before[i] >> 32) && !(after[i] >> 32)) {
+ 			/* known failure KVM migration of CTRL */
+-			report_kfail(true && i == 136,
++			report_kfail(i == 136, pass,
+ 				"%-10s(%4d):\t        0x%08lx <==>         0x%08lx",
+ 				sprs[i].name, i,
+ 				before[i], after[i]);
 -- 
 2.43.0
 
