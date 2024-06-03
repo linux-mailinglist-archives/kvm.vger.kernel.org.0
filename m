@@ -1,231 +1,162 @@
-Return-Path: <kvm+bounces-18640-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18641-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC40F8D81B1
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:56:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D1D8D81B3
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43A641F22923
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 11:56:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6A25B235E1
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 11:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8564086AC4;
-	Mon,  3 Jun 2024 11:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED88D86ADE;
+	Mon,  3 Jun 2024 11:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UKMomCzy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+uQHyXv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04CF284A49
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 11:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81DB84A49
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 11:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717415754; cv=none; b=MNhukMNbbhQscuRXjxx8N0h4X5yn1Sjk9Tf1e2DdLkFh53T485TvuT/I7Udfmldfngc876KA3d6hHeJQm83GfFMxpJjQ+hql+Rk6dM0Tdn5B1H3cbg0GMZGES+K7f6IbzN7acn9bvnPfurBX5FXI/xoLII0z3Fcx3ukXgmr6lcA=
+	t=1717415774; cv=none; b=T3ePdWZ6PkG0XSJiPw3eb9APkUP2yx82/cIl+H5909zsN7PoHXuwgK5w21Ht6B2NW38sN36zilTP3Sm2Av9i8aZDo/MEH8samqJvUqemaIBR+3XkqzfkKGZQAiyoBiz1ntysOcazT5+jNhR3mrKJXYON0sRYuZ1Hnnyq5s75j4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717415754; c=relaxed/simple;
-	bh=AflJJBYuqHFcXzhY+0Ydj07HD0UoJoFDoHEHguGvC5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GG1GlBRUnnTaupvCylC6TvOwxHwyTto9P5OrNcLL9RTl90vsfocfJ9jvOYq6kPEwlsRcTx1aXULRuwldjPYeZEniQmoi6gKdecj7G0UN1OQoSwAETA8ZceWN0pPT75VdESUFIkjk95Fqc63K2YqGAzmD8pb0PHiX2ZrrOukhW8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UKMomCzy; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1717415774; c=relaxed/simple;
+	bh=XJEC/B4uhAgLk6EAxMOUwh3tuLIakX/Zi7ywfYEhcVM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TINfdOmMQIcHU+S4qZzywJRceSiYfPB7FnzAjvOvM5oq7Fagx24UMVvb3ZO5wNSad8tUGHUiaN+aRx/EDrc9LoU0b+Fxt5/OHCn/rTc8YXkKZq5vOh2HuPY1M+6fmP4/b5xE0pfQxlDFiEonxcM6HC8AMDg3XkOrbtRBZq7EBA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A+uQHyXv; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717415751;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
-	bh=W62f82UZMHf0uefYVTTrEL80HQVAl8hkE/O4iaXRMVs=;
-	b=UKMomCzyGqEQb8v5dbL1G223P5XJhO+wFIgsdTirvRKaq9823TvWh0GVDBG+bfTmHlqIvs
-	nuVSSgDUal5wKGYbDpuHnqYgEN6/Ir/a2Mr/+0Va1yKimucM1HekYsP8LhoOKZEdpIQ+uW
-	qZyl8EWHGHRsPqdmnSqSuRD3qiDllfc=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-q5seXqRnOj6S-ekv4jK37Q-1; Mon,
- 03 Jun 2024 07:55:47 -0400
-X-MC-Unique: q5seXqRnOj6S-ekv4jK37Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E75371C0512B;
-	Mon,  3 Jun 2024 11:55:46 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.80])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AD76C15C04;
-	Mon,  3 Jun 2024 11:55:45 +0000 (UTC)
-Date: Mon, 3 Jun 2024 12:55:43 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Pankaj Gupta <pankaj.gupta@amd.com>
-Cc: qemu-devel@nongnu.org, brijesh.singh@amd.com, dovmurik@linux.ibm.com,
-	armbru@redhat.com, michael.roth@amd.com, xiaoyao.li@intel.com,
-	pbonzini@redhat.com, thomas.lendacky@amd.com,
-	isaku.yamahata@intel.com, kvm@vger.kernel.org, anisinha@redhat.com
-Subject: Re: [PATCH v4 29/31] hw/i386/sev: Allow use of pflash in conjunction
- with -bios
-Message-ID: <Zl2vP9hohrgaPMTs@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
- <20240530111643.1091816-30-pankaj.gupta@amd.com>
+	s=mimecast20190719; t=1717415769;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=O8e5+PKQhh8KirLRZQvLEvNDQfhGdSve44+Cczu7Yxk=;
+	b=A+uQHyXvDtC+knMGYoG4/EQRxEUtyPNCLJ2x8WTbqw8fsfhISVHt+SU8742VKUgmfDVG20
+	L/lCWPGGwf/bseR1HhP6flpT6wVqXMMAsqXjcloEd52EjB4kaa0M49mS0aUxcoWn+NJiKb
+	QjlPhbEotp1Kd0CAf7Tlessf9oEdpIg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-34-Z-delFAOMLOilNEQ-Waxgw-1; Mon, 03 Jun 2024 07:56:08 -0400
+X-MC-Unique: Z-delFAOMLOilNEQ-Waxgw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-35dc02b991eso2289875f8f.0
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 04:56:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717415765; x=1718020565;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O8e5+PKQhh8KirLRZQvLEvNDQfhGdSve44+Cczu7Yxk=;
+        b=NY0DcouCu4iTznFIsTVkDw3iNyLQZ83YwUZ/liWfOfJhmKawlzvyeD9n5fkvg/BVi2
+         hP6Y9IbLNz7TCeywvHWDiCGRadSxSUDsgPU3y9L2Cj9iA4K7yVb/6QdxOlVe7coBpm1N
+         jw+/B1p1ys83a+EJgtA0h2DuSJH/VUJmGhTD2LDTVc48282bArqNptTL3P/3dbqAGFfK
+         aAfAON5vQvjeOT2SdJo4OWkWhf6++h515XjVhkwQV0Uq+J63G6NigIATOAw/fhj04xqD
+         hT5jgNERyTRC8KIHPKjojzqTd/y6iFOuXvazv8dBIYDoRWNDoDgYqPNdA9nl7PwoFEyo
+         BHiA==
+X-Forwarded-Encrypted: i=1; AJvYcCWtAenD/zB6AXLk+PJyFuGaiaXJrzWEY9+0x59KfaFp/6R/hKwBElJktNVeMJiodXPxnQN7a7cjmCl6Yxa3bmRxYB8Y
+X-Gm-Message-State: AOJu0Ywggc28oO6ArSxpcuGM2J7aWO3VCeJQgvbPjnp99FJFuOP9OBuv
+	2nPkIvBoIOadNMvAj9x7wdBLQ/uTSxda6rodOYamGN8itiZYWLMZutEgtVnfKHRVT+apqDeU3/e
+	CKQBVThGwCuLdn5H7MALHsWp7p8hQ3CdowJ1+FfOiW77dXktuVQ==
+X-Received: by 2002:adf:a189:0:b0:346:92d2:a496 with SMTP id ffacd0b85a97d-35e0f2852f6mr6150352f8f.29.1717415764859;
+        Mon, 03 Jun 2024 04:56:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFuWqIirAQ+VHnp40beRP4/AfgO/I/Awh5FXaoVZpoFOgAsvmH14g2EzP1NeRHPVksYNF9cGw==
+X-Received: by 2002:adf:a189:0:b0:346:92d2:a496 with SMTP id ffacd0b85a97d-35e0f2852f6mr6150336f8f.29.1717415764470;
+        Mon, 03 Jun 2024 04:56:04 -0700 (PDT)
+Received: from [192.168.0.4] (ip-109-43-176-229.web.vodafone.de. [109.43.176.229])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd04c4388sm8692285f8f.14.2024.06.03.04.56.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jun 2024 04:56:04 -0700 (PDT)
+Message-ID: <cebdd4e9-4754-47a6-86c8-283eddd797f8@redhat.com>
+Date: Mon, 3 Jun 2024 13:56:02 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240530111643.1091816-30-pankaj.gupta@amd.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH] scripts/s390x: Fix the execution of the PV
+ tests
+To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org,
+ =?UTF-8?Q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, linux-s390@vger.kernel.org,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ Marc Hartmayer <mhartmay@linux.ibm.com>
+References: <20240603075944.150445-1-thuth@redhat.com>
+ <b3444016-91b5-40cc-a4f2-9cb0f5c0cc28@linux.ibm.com>
+Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <b3444016-91b5-40cc-a4f2-9cb0f5c0cc28@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 30, 2024 at 06:16:41AM -0500, Pankaj Gupta wrote:
-> From: Michael Roth <michael.roth@amd.com>
+On 03/06/2024 13.05, Janosch Frank wrote:
+> On 6/3/24 09:59, Thomas Huth wrote:
+>> Commit ccb37496 ("scripts: allow machine option to be specified in
+>> unittests.cfg") added an additonal parameter (the "machine"), but
+>> we forgot to add it to the spot that runs the PV test cases, so
+>> those are currently broken without this fix.
+>>
+>> Fixes: ccb37496 ("scripts: allow machine option to be specified in 
+>> unittests.cfg")
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > 
-> SEV-ES and SEV-SNP support OVMF images with non-volatile storage in
-> cases where the storage area is generated as a separate image as part
-> of the OVMF build process.
+> LGTM
+> Has this issue come up in the Gitlab CI or in your internal CI?
 
-IIUC, right now all OVMF builds for SEV/-ES/-SNP should be done as so
-called "stateless" image. ie *without* any separate NVRAM image, because
-that image will not be covered by the VM boot measurement and thus the
-NVRAM state is liable to undermine  trust of the VM.
+Gitlab CI does not run the PV tests yet - I just noticed it while running 
+the tests on the s390x machine that I've got access to.
 
-Using NVRAM for SNP is theoretically possible in future but would be
-reliant on SVSM providing a secure encryption mechanism on the storage.
-
-
-
-> 
-> Currently these are exposed with unit=0 corresponding to the actual BIOS
-> image, and unit=1 corresponding to the storage image. However, pflash
-> images are mapped guest memory using read-only memslots, which are not
-> allowed in conjunction with guest_memfd-backed ranges. This makes that
-> approach unusable for SEV-SNP, where the BIOS range will be encrypted
-> and mapped as private guest_memfd-backed memory. For this reason,
-> SEV-SNP will instead rely on -bios to handle loading the BIOS image.
-> 
-> To allow for pflash to still be used for the storage image, rework the
-> existing logic to remove assumptions that unit=0 contains the BIOS image
-> when SEV-SNP, so that it can instead be used to handle only the storage
-> image.
-
-Mixing both BIOS and pflash is pretty undesirable, not least because
-that setup cannot be currently represented by the firmware descriptor
-format described by docs/interop/firmware.json.
-
-So at the very least this patch is incomplete, as it would need to
-propose changes to the firmware.json to allow this setup to be expressed.
-
-I really wish we didn't have to introduce this though - is there really
-no way to make it possible to use pflash for both CODE & VARS with SNP,
-as is done with traditional VMs, so we don't diverge in setup, needing
-yet more changes up the mgmt stack ?
-
-> 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> Signed-off-by: Pankaj Gupta <pankaj.gupta@amd.com>
-> ---
->  hw/i386/pc_sysfw.c | 47 +++++++++++++++++++++++++++++-----------------
->  1 file changed, 30 insertions(+), 17 deletions(-)
-> 
-> diff --git a/hw/i386/pc_sysfw.c b/hw/i386/pc_sysfw.c
-> index def77a442d..7f97e62b16 100644
-> --- a/hw/i386/pc_sysfw.c
-> +++ b/hw/i386/pc_sysfw.c
-> @@ -125,21 +125,10 @@ void pc_system_flash_cleanup_unused(PCMachineState *pcms)
->      }
->  }
->  
-> -/*
-> - * Map the pcms->flash[] from 4GiB downward, and realize.
-> - * Map them in descending order, i.e. pcms->flash[0] at the top,
-> - * without gaps.
-> - * Stop at the first pcms->flash[0] lacking a block backend.
-> - * Set each flash's size from its block backend.  Fatal error if the
-> - * size isn't a non-zero multiple of 4KiB, or the total size exceeds
-> - * pcms->max_fw_size.
-> - *
-> - * If pcms->flash[0] has a block backend, its memory is passed to
-> - * pc_isa_bios_init().  Merging several flash devices for isa-bios is
-> - * not supported.
-> - */
-> -static void pc_system_flash_map(PCMachineState *pcms,
-> -                                MemoryRegion *rom_memory)
-> +static void pc_system_flash_map_partial(PCMachineState *pcms,
-> +                                        MemoryRegion *rom_memory,
-> +                                        hwaddr offset,
-> +                                        bool storage_only)
->  {
->      X86MachineState *x86ms = X86_MACHINE(pcms);
->      PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-> @@ -154,6 +143,8 @@ static void pc_system_flash_map(PCMachineState *pcms,
->  
->      assert(PC_MACHINE_GET_CLASS(pcms)->pci_enabled);
->  
-> +    total_size = offset;
-> +
->      for (i = 0; i < ARRAY_SIZE(pcms->flash); i++) {
->          hwaddr gpa;
->  
-> @@ -192,7 +183,7 @@ static void pc_system_flash_map(PCMachineState *pcms,
->          sysbus_realize_and_unref(SYS_BUS_DEVICE(system_flash), &error_fatal);
->          sysbus_mmio_map(SYS_BUS_DEVICE(system_flash), 0, gpa);
->  
-> -        if (i == 0) {
-> +        if (i == 0 && !storage_only) {
->              flash_mem = pflash_cfi01_get_memory(system_flash);
->              if (pcmc->isa_bios_alias) {
->                  x86_isa_bios_init(&x86ms->isa_bios, rom_memory, flash_mem,
-> @@ -211,6 +202,25 @@ static void pc_system_flash_map(PCMachineState *pcms,
->      }
->  }
->  
-> +/*
-> + * Map the pcms->flash[] from 4GiB downward, and realize.
-> + * Map them in descending order, i.e. pcms->flash[0] at the top,
-> + * without gaps.
-> + * Stop at the first pcms->flash[0] lacking a block backend.
-> + * Set each flash's size from its block backend.  Fatal error if the
-> + * size isn't a non-zero multiple of 4KiB, or the total size exceeds
-> + * pcms->max_fw_size.
-> + *
-> + * If pcms->flash[0] has a block backend, its memory is passed to
-> + * pc_isa_bios_init().  Merging several flash devices for isa-bios is
-> + * not supported.
-> + */
-> +static void pc_system_flash_map(PCMachineState *pcms,
-> +                                MemoryRegion *rom_memory)
-> +{
-> +    pc_system_flash_map_partial(pcms, rom_memory, 0, false);
-> +}
-> +
->  void pc_system_firmware_init(PCMachineState *pcms,
->                               MemoryRegion *rom_memory)
->  {
-> @@ -238,9 +248,12 @@ void pc_system_firmware_init(PCMachineState *pcms,
->          }
->      }
->  
-> -    if (!pflash_blk[0]) {
-> +    if (!pflash_blk[0] || sev_snp_enabled()) {
->          /* Machine property pflash0 not set, use ROM mode */
->          x86_bios_rom_init(X86_MACHINE(pcms), "bios.bin", rom_memory, false);
-> +        if (sev_snp_enabled()) {
-> +            pc_system_flash_map_partial(pcms, rom_memory, 3653632, true);
-> +        }
->      } else {
->          if (kvm_enabled() && !kvm_readonly_mem_enabled()) {
->              /*
-> -- 
-> 2.34.1
-> 
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+  Thomas
 
 
