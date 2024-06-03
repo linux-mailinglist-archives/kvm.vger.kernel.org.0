@@ -1,187 +1,163 @@
-Return-Path: <kvm+bounces-18628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18629-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C9158D80C0
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:17:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D19B8D8136
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA185B26670
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 11:17:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87CF61F25D0F
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 11:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5672B84E1C;
-	Mon,  3 Jun 2024 11:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE9484A41;
+	Mon,  3 Jun 2024 11:28:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qHq0Pcu2"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OnVgnRZ7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F45D824B7;
-	Mon,  3 Jun 2024 11:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B5F84A35
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 11:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717413330; cv=none; b=qhUTlpM8Vd/iJEC3Nc7HAhye3COK3JI6jSwan9KTrUHYcmP8cKS22V6qZBtHEpBAvOYgoiOq+A7SN2w9tuSXXgHCkCT9lGcIGTVTj07IUIKxU9DiuU4w3E+1CEGczPvSRMY+dGeSGpwRYg0q0MyhdM2aZfr4Hrj77K2/RVQdsho=
+	t=1717414105; cv=none; b=rAFROrqkbzLSf5aot7hzP5R5IvD8qB2pJPZ17d1CHgjsWVrsZbSV1m6gP+inPTR8jMMn5qJ3fAeb81hDw1PjwGt8Thqx4PIGw61RIit3vWS4CcY2iD4EW36HB8zLGmEDZv4cfGbxd+rnY4GOAk1svdH1R9eddznWy2dS1ZC86C8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717413330; c=relaxed/simple;
-	bh=wjY7xN+n0h0w5smNZ4qyZ35IsRg8ogOp205fTzMkm2Q=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f6yYAyJnHT4LEmeD3rHntNzN1MiAFu5w0opf5CJR84EAYmQDBsUEVEYiAOoC36k5GtiRU6dAbQ542Ua02I0TRMsLzGmcNYqph06Nis/RSqE2aTLDm2nGEphm3HmSkOzKGwO0xGwZhnpReuTzX0po996JYCg9yFS2sG/YFxDszu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qHq0Pcu2; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 453Atsk2003882;
-	Mon, 3 Jun 2024 11:15:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=QKlzMAtuKYDhNnuCA4sugLEiF2TGv+CbdEPUoVFV1CE=;
- b=qHq0Pcu2Vj56uf3re+7Q0dAEbfjEieH+SkB+QM4h54sfOnAKaGrU9N7jDwDDC1ghJM9Y
- XszJqI32SZw7CHZLdZmQnOKdHCUPAMm9oSV7i5qvLggTOxJCMSNJprWBgz05zeEEWDey
- JUyqJjOyj+wcmuCkr8aAW0XNDi9fG5Au9tt0E5Av4HPvA0a5GPHSuYA28Q0Yp/PxkNM0
- jWj8mpPJGt7FoH4pdeX9X7Zqvf7qANoq2VnSQIudkqt8sCC+VQVzg9iYvKfBuP9zI/Dg
- AjavNJQupUug4F3DcSHM8zb0EE/8vLzrfGkK9FDXoc4vPFQtL27sH04fwwEehQ2vc+V9 GQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhccng222-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 11:15:19 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 453BFIwt008485;
-	Mon, 3 Jun 2024 11:15:19 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhccng21v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 11:15:18 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4538eiAv008474;
-	Mon, 3 Jun 2024 11:15:17 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygec0fnh5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Jun 2024 11:15:17 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 453BFBVQ52429076
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Jun 2024 11:15:13 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 75F0D2005A;
-	Mon,  3 Jun 2024 11:15:11 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 540FC20063;
-	Mon,  3 Jun 2024 11:15:09 +0000 (GMT)
-Received: from [172.17.0.2] (unknown [9.3.101.175])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Jun 2024 11:15:09 +0000 (GMT)
-Subject: [PATCH 6/6] KVM: PPC: Book3S HV: Add one-reg interface for HASHKEYR
- register
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Cc: pbonzini@redhat.com, naveen.n.rao@linux.ibm.com,
-        christophe.leroy@csgroup.eu, corbet@lwn.net, mpe@ellerman.id.au,
-        namhyung@kernel.org, npiggin@gmail.com, pbonzini@redhat.com,
-        sbhat@linux.ibm.com, jniethe5@gmail.com, atrajeev@linux.vnet.ibm.com,
-        linux-kernel@vger.kernel.org
-Date: Mon, 03 Jun 2024 11:15:08 +0000
-Message-ID: <171741330411.6631.10739157625274499060.stgit@linux.ibm.com>
-In-Reply-To: <171741323521.6631.11242552089199677395.stgit@linux.ibm.com>
-References: <171741323521.6631.11242552089199677395.stgit@linux.ibm.com>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1717414105; c=relaxed/simple;
+	bh=/lZp6cbdqazTOI7WwPb91MawHQrqeY/GM5UaDsGasBA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QeVTMwVNBdgK2+gZNi2QxRBCV6ucP3XxCpd4xXUPW3W8QclCtXd2cQ+i4gLQXfV8Rrkvv3h3ZMCpJH918yCRVh2jMu4QoGpujlP4Dea27e5gqtoUCEY9Z1McEkTPrsYbUeVtfi9JLyYMwPs1bV1bZIPI1jhzDr+jTnCkly7Pxfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OnVgnRZ7; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4eb0f04c138so555025e0c.2
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 04:28:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1717414103; x=1718018903; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PV0NIx7Msfph2Sw7+O4LVA2pjGlK/npIVQHcru0BTpM=;
+        b=OnVgnRZ7Fkc5HhLi0Qm/R0dzdECiSdt1ITb/Z3Ixc8I14xTv/Rrmm9ykxg9YYl0J+n
+         Nzxqe6cG+gtLUzA4oYJfkvuIldEfKX4XdPsHGR69M3KBLtq6YHAGPg26a4+Q+cHSLMYj
+         KqF9F7M9s2M4InT53fEEYso4fINShPwU8rMp2u4U4S/nRBzOd5L72ehcOFY0TVJsCdpJ
+         zWFUR9iJWaU+U/i8IQQhBM3H2EWmGVx70D52QXB8UA9gczENs9jwqUqew+irXH7rPgq7
+         xmNcKlpH1X0ANzgRfBEO6/LS4i1RHf3SjF8zbZjiwEc2eLvkxK41gGMJhD1KvW77T3to
+         /qnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717414103; x=1718018903;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PV0NIx7Msfph2Sw7+O4LVA2pjGlK/npIVQHcru0BTpM=;
+        b=wZoURdl+dYfG3thWWDrcdAiifsw/zKY3JUZVYD0npG2f9qlyx4zgikHmOLvwk22edX
+         J5Zl4IHsUm/KdrRgFEyeuYzZGmrgRl8c7tEiXYGpJmIkl2Yt/brlQXjgseHnrV9fKf93
+         mt7t31uE4Y+gcdc8gya4eDEwzaTAwTziWO4j1pxqDqzvS1055eko8KPwaEQH9fSYxKBH
+         a3cIFREhqr6p7BqkyT2Xg4FBy4BtpG031OfVo7iLprkuc5ssXhT8bgCtCJk+FBAJgNAE
+         YPcvAH3OhU9GcHDG2jWvo+4GwrHD/DShEPpEsnMZ35nar8U7f0dH8N+H8aRiIu2h25NG
+         IodA==
+X-Forwarded-Encrypted: i=1; AJvYcCWr4Ay6DwZWGLlKWU2kMU9rYcSvzPoenUA8FgQfvfRkkkoI1P527Qfz7aUhE+QXRVcIeuGMvWBpGIJfdH62vsMcdnZP
+X-Gm-Message-State: AOJu0YxZPvon0AawwUOLAwyJ9h2HTX35DaJ0XaDQyvbEs/e1c6H3Mm2G
+	KElvU1w7eTT58Plc6cnsx+a6O7zLaYxMH75eM3DPXLKMUZL+eDDIsVHwfdYNEnk=
+X-Google-Smtp-Source: AGHT+IH3UzMfTEg5uALlw06eeywZZ8pnfUgmvRVvZ7WisLDIs1Ne/ayWwQ/nY/MTIqQlgI+qTALHjw==
+X-Received: by 2002:a1f:f8ce:0:b0:4df:1d06:eeb7 with SMTP id 71dfb90a1353d-4eb02d9aef7mr8189394e0c.1.1717414102707;
+        Mon, 03 Jun 2024 04:28:22 -0700 (PDT)
+Received: from [192.168.69.100] ([176.176.177.241])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-794f901a818sm235096785a.80.2024.06.03.04.28.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jun 2024 04:28:21 -0700 (PDT)
+Message-ID: <a13883da-fa6a-4ada-b75d-42ffa0bcb20b@linaro.org>
+Date: Mon, 3 Jun 2024 13:28:16 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 68JkJxxICiLPUA3bCEbfjicCU0X1byGH
-X-Proofpoint-ORIG-GUID: BW3v26K-pv9usNapJah6wXNG0H35-Gcx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-03_07,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- bulkscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0 adultscore=0
- impostorscore=0 priorityscore=1501 spamscore=0 suspectscore=0
- mlxlogscore=654 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406030094
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/5] cpu: move Qemu[Thread|Cond] setup into common code
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ Cameron Esfahani <dirty@apple.com>, Alexandre Iooss <erdnaxe@crans.org>,
+ Yanan Wang <wangyanan55@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+ Mahmoud Mandour <ma.mandourr@gmail.com>, Reinoud Zandijk
+ <reinoud@netbsd.org>, kvm@vger.kernel.org,
+ Roman Bolshakov <rbolshakov@ddn.com>
+References: <20240530194250.1801701-1-alex.bennee@linaro.org>
+ <20240530194250.1801701-3-alex.bennee@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20240530194250.1801701-3-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-The patch adds a one-reg register identifier which can be used to
-read and set the virtual HASHKEYR for the guest during enter/exit
-with KVM_REG_PPC_HASHKEYR. The specific SPR KVM API documentation
-too updated.
+On 30/5/24 21:42, Alex Bennée wrote:
+> Aside from the round robin threads this is all common code. By
+> moving the halt_cond setup we also no longer need hacks to work around
+> the race between QOM object creation and thread creation.
+> 
+> It is a little ugly to free stuff up for the round robin thread but
+> better it deal with its own specialises than making the other
+> accelerators jump through hoops.
+> 
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>   include/hw/core/cpu.h             |  4 ++++
+>   accel/dummy-cpus.c                |  3 ---
+>   accel/hvf/hvf-accel-ops.c         |  4 ----
+>   accel/kvm/kvm-accel-ops.c         |  3 ---
+>   accel/tcg/tcg-accel-ops-mttcg.c   |  4 ----
+>   accel/tcg/tcg-accel-ops-rr.c      | 14 +++++++-------
+>   hw/core/cpu-common.c              |  5 +++++
+>   target/i386/nvmm/nvmm-accel-ops.c |  3 ---
+>   target/i386/whpx/whpx-accel-ops.c |  3 ---
+>   9 files changed, 16 insertions(+), 27 deletions(-)
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
- Documentation/virt/kvm/api.rst            |    1 +
- arch/powerpc/include/uapi/asm/kvm.h       |    1 +
- arch/powerpc/kvm/book3s_hv.c              |    6 ++++++
- tools/arch/powerpc/include/uapi/asm/kvm.h |    1 +
- 4 files changed, 9 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 81077c654281..0c22cb4196d8 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -2439,6 +2439,7 @@ registers, find a list below:
-   PPC     KVM_REG_PPC_PSSCR               64
-   PPC     KVM_REG_PPC_DEC_EXPIRY          64
-   PPC     KVM_REG_PPC_PTCR                64
-+  PPC     KVM_REG_PPC_HASHKEYR            64
-   PPC     KVM_REG_PPC_DAWR1               64
-   PPC     KVM_REG_PPC_DAWRX1              64
-   PPC     KVM_REG_PPC_DEXCR               64
-diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/uapi/asm/kvm.h
-index fcb947f65667..23a0af739c78 100644
---- a/arch/powerpc/include/uapi/asm/kvm.h
-+++ b/arch/powerpc/include/uapi/asm/kvm.h
-@@ -646,6 +646,7 @@ struct kvm_ppc_cpu_char {
- #define KVM_REG_PPC_DAWR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc4)
- #define KVM_REG_PPC_DAWRX1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc5)
- #define KVM_REG_PPC_DEXCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc6)
-+#define KVM_REG_PPC_HASHKEYR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc7)
- 
- /* Transactional Memory checkpointed state:
-  * This is all GPRs, all VSX regs and a subset of SPRs
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 1294c6839d37..ccc9564c5a31 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2352,6 +2352,9 @@ static int kvmppc_get_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
- 	case KVM_REG_PPC_DEXCR:
- 		*val = get_reg_val(id, kvmppc_get_dexcr_hv(vcpu));
- 		break;
-+	case KVM_REG_PPC_HASHKEYR:
-+		*val = get_reg_val(id, kvmppc_get_hashkeyr_hv(vcpu));
-+		break;
- 	case KVM_REG_PPC_CIABR:
- 		*val = get_reg_val(id, kvmppc_get_ciabr_hv(vcpu));
- 		break;
-@@ -2598,6 +2601,9 @@ static int kvmppc_set_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
- 	case KVM_REG_PPC_DEXCR:
- 		kvmppc_set_dexcr_hv(vcpu, set_reg_val(id, *val));
- 		break;
-+	case KVM_REG_PPC_HASHKEYR:
-+		kvmppc_set_hashkeyr_hv(vcpu, set_reg_val(id, *val));
-+		break;
- 	case KVM_REG_PPC_CIABR:
- 		kvmppc_set_ciabr_hv(vcpu, set_reg_val(id, *val));
- 		/* Don't allow setting breakpoints in hypervisor code */
-diff --git a/tools/arch/powerpc/include/uapi/asm/kvm.h b/tools/arch/powerpc/include/uapi/asm/kvm.h
-index fcb947f65667..23a0af739c78 100644
---- a/tools/arch/powerpc/include/uapi/asm/kvm.h
-+++ b/tools/arch/powerpc/include/uapi/asm/kvm.h
-@@ -646,6 +646,7 @@ struct kvm_ppc_cpu_char {
- #define KVM_REG_PPC_DAWR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc4)
- #define KVM_REG_PPC_DAWRX1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc5)
- #define KVM_REG_PPC_DEXCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc6)
-+#define KVM_REG_PPC_HASHKEYR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc7)
- 
- /* Transactional Memory checkpointed state:
-  * This is all GPRs, all VSX regs and a subset of SPRs
+> diff --git a/accel/tcg/tcg-accel-ops-rr.c b/accel/tcg/tcg-accel-ops-rr.c
+> index 894e73e52c..84c36c1450 100644
+> --- a/accel/tcg/tcg-accel-ops-rr.c
+> +++ b/accel/tcg/tcg-accel-ops-rr.c
+> @@ -317,22 +317,22 @@ void rr_start_vcpu_thread(CPUState *cpu)
+>       tcg_cpu_init_cflags(cpu, false);
+>   
+>       if (!single_tcg_cpu_thread) {
+> -        cpu->thread = g_new0(QemuThread, 1);
+> -        cpu->halt_cond = g_new0(QemuCond, 1);
+> -        qemu_cond_init(cpu->halt_cond);
+> +        single_tcg_halt_cond = cpu->halt_cond;
+> +        single_tcg_cpu_thread = cpu->thread;
+>   
+>           /* share a single thread for all cpus with TCG */
+>           snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
+>           qemu_thread_create(cpu->thread, thread_name,
+>                              rr_cpu_thread_fn,
+>                              cpu, QEMU_THREAD_JOINABLE);
+> -
+> -        single_tcg_halt_cond = cpu->halt_cond;
+> -        single_tcg_cpu_thread = cpu->thread;
+>       } else {
+> -        /* we share the thread */
+> +        /* we share the thread, dump spare data */
 
+/* we share the thread, release allocations from cpu_common_initfn() */
+
+> +        g_free(cpu->thread);
+> +        qemu_cond_destroy(cpu->halt_cond);
+>           cpu->thread = single_tcg_cpu_thread;
+>           cpu->halt_cond = single_tcg_halt_cond;
+> +
+> +        /* copy the stuff done at start of rr_cpu_thread_fn */
+>           cpu->thread_id = first_cpu->thread_id;
+>           cpu->neg.can_do_io = 1;
+>           cpu->created = true;
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 
 
