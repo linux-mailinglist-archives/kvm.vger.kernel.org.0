@@ -1,141 +1,177 @@
-Return-Path: <kvm+bounces-18645-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18646-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F61B8D8221
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:21:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F9F78D8232
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:25:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C21DFB24FE2
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 12:21:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C1B6284588
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 12:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD3C12D205;
-	Mon,  3 Jun 2024 12:20:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310F812BF3A;
+	Mon,  3 Jun 2024 12:25:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="QDs10sRc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajMUk+kZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4137112CD90
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 12:20:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F0F12BF1C
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 12:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717417250; cv=none; b=nHOStS8Ay993c+1GpGrIhv5YCpZVCK6h+bHQJEWidEfXUSiCy90xy7wVj7a46tY4fLec0GG/BTFvUlm2VJo+pmK2MRsT8KfFT5ycVKf6ZPkeLDNqRqAEZfUjNSY1ff3h+my1XvH0J0AIVCetVha/SUvgcnKNC5rQFZkF6lWsN+U=
+	t=1717417546; cv=none; b=oA1dyYTDZBLE/1SBgXM0WmTAujpLhaYFeEvv4IgFRllNhk4udxpW12GKXCjIrBNadgMFDrR5shKwGjyK8uWJYoTIwQScDdsfOtoRzaTRGBYolgYL5SasnqiXms9fHpSJ1GbTRZU1VSTeE6hobSkF292F/5mA4E4p6amV8pDWRDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717417250; c=relaxed/simple;
-	bh=0OTl7piyZBsnWVf//teBd1PS5I2DMLJjR2HcQPklrts=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DPxqsEIabtgHBcqKM7cJ+hxrj7T+vWurgCOSPpd4SryD8fT6iWRpdAPp3989c0vAxhWOkJV3V8C3hPGKCMV67NUUzrzebHez4lgw5C5Kr1lI+xxp+0l02MV5w6eB/NsIaXoVxYdOKaSdSJ5YXRh6rmiXbrZt2d/GjmBz2YyOvYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=QDs10sRc; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57a50fecbadso1957938a12.3
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 05:20:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1717417246; x=1718022046; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=27rKdg359rdAsUT0jKrlkOxqEm84mxGFROFso13NE9E=;
-        b=QDs10sRcmM0B3enMMIdYjvSLTk2ijDyWf14oUnOfhCz1d+xTs2x6GvsbezhUSkMiSY
-         c6PktU8qVgvF0kX0OL20sQYjtjHGbGVVKaMfIKzd7sNEEoR5fsaimPg0m1A/jDF8NAHW
-         nO8wqw6GvCxZfdagqxPpQ782onxWb+1XlSosJpsezf8bi7V2hvMFiwiUrzmitTvGLRxP
-         tXQ0mS77ey7228QW9x98i4t99IL/ODbKANfjxQHDQZlrJzcll+npZUGcYJVgTRDTH3oD
-         nDeGUNXb2k3j3ef3vrTobEl2mNL+sdGmWXwhA8dE9uTlnM0+0gbk+0A94taeQstGWLRK
-         kEWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717417246; x=1718022046;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=27rKdg359rdAsUT0jKrlkOxqEm84mxGFROFso13NE9E=;
-        b=RSY+DgMWElFSlrksNFpcPCOAK6i3YK0leYOU1p6R24i88tu6X4xlQwoZ0EUgnABjTN
-         1x78Ol8zD0R7SwlSDKJMtjRk7o/EJ7/v4w4rLSmOqMi+I08VznWlvbEdxs8xBMzJr51O
-         rwals17AsN4lTmbRpxgL7EyuDYBLU06hTFmORLAY9gxgfGKjF041hM49GtPUyDf8V/np
-         sEe6GHn0TuL3DzjjDspkx7kCwqzw9DwaW3IQh/PHnBmTfv7mEa/aeR52ZJmcfdN93B3K
-         WHhv18VR7wwXbRMeXKoWGNym7dJJBrYxa1NHg5eJgLmnH8pncFpxUOEgDsrp9cbTDpwy
-         QnXQ==
-X-Gm-Message-State: AOJu0YwAvgH8aWhM5DdjDClZe08O2N4zE0CXU5VXe0ktiOATlKK0F6/+
-	pnyyDv4tH9URxcsT/wN9sO5swWhNDqeTb1O4XQklVDWoygfeUQzzBGr/orvzgCyTRxpJZL3y7cw
-	mOo8=
-X-Google-Smtp-Source: AGHT+IEgtrEMMThYOBaPONRCHaninn6lbzBd4MKREZ7U/9lXgHUSpw2KICuz08vw/4KuVYTIw++ILg==
-X-Received: by 2002:a50:ccd3:0:b0:57a:21ac:cffc with SMTP id 4fb4d7f45d1cf-57a365a9e33mr4774756a12.41.1717417246390;
-        Mon, 03 Jun 2024 05:20:46 -0700 (PDT)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a6b05b199sm525492a12.45.2024.06.03.05.20.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 05:20:46 -0700 (PDT)
-From: Andrew Jones <ajones@ventanamicro.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: pbonzini@redhat.com,
-	seanjc@google.com,
-	anup@brainfault.org,
-	atishp@atishpatra.org
-Subject: [PATCH] KVM: selftests: Fix RISC-V compilation
-Date: Mon,  3 Jun 2024 14:20:46 +0200
-Message-ID: <20240603122045.323064-2-ajones@ventanamicro.com>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1717417546; c=relaxed/simple;
+	bh=3/YA9IJDao+5PAJYiTyJtRoCNZhz4nw/tVLRev+dLws=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=qji/nojqBasn67tL1cZRMuh8xpQwtZo3pKKEb1to3Zab0BmSOuIdaIIR/rB+Ro88wZxF8SHt4ykzotuZXKnWKY7pGoRYR+CI2uUXqxDIxNfqk2i6NOTXDb1j7iJDM4Ge/hyXt4TIarFdu8qZSoQwLbbOKrMB9AOLEV7MosLz+dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ajMUk+kZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717417543;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Efb5Ek9FsC2ECwoOU3U6omc2wMgF8Ch8l1dKcamqGD4=;
+	b=ajMUk+kZEJJwabOWmTajF64rPpaT4EKeqtURD6/ZL834Bey/ncML8koXncU25gWottjKQ9
+	6BjYIZjv4wnUwsYgzFTRoIkla95x2g+eiyKxWe6ykNNcr0MzGOyRKqEDb8DsDSiuLLYG4z
+	rUZGzWclRnzYuh6yCgB1efMNTXXcWlU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-9n3jOQJNMxmz9d8CAE3qzw-1; Mon, 03 Jun 2024 08:25:38 -0400
+X-MC-Unique: 9n3jOQJNMxmz9d8CAE3qzw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 64875101A54F;
+	Mon,  3 Jun 2024 12:25:37 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.93])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 18AFD40147E;
+	Mon,  3 Jun 2024 12:25:37 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 3F38D21E66E5; Mon,  3 Jun 2024 14:25:36 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Daniel P . =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>,  Eduardo
+ Habkost
+ <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Yanan Wang
+ <wangyanan55@huawei.com>,  "Michael S . Tsirkin" <mst@redhat.com>,  Paolo
+ Bonzini <pbonzini@redhat.com>,  Richard Henderson
+ <richard.henderson@linaro.org>,  Eric Blake <eblake@redhat.com>,  Markus
+ Armbruster <armbru@redhat.com>,  Marcelo Tosatti <mtosatti@redhat.com>,
+  Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,  Peter Maydell
+ <peter.maydell@linaro.org>,  Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>,  Sia Jee Heng
+ <jeeheng.sia@starfivetech.com>,  qemu-devel@nongnu.org,
+  kvm@vger.kernel.org,  qemu-riscv@nongnu.org,  qemu-arm@nongnu.org,
+  Zhenyu Wang <zhenyu.z.wang@intel.com>,  Dapeng Mi
+ <dapeng1.mi@linux.intel.com>,  Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [RFC v2 1/7] hw/core: Make CPU topology enumeration arch-agnostic
+In-Reply-To: <20240530101539.768484-2-zhao1.liu@intel.com> (Zhao Liu's message
+	of "Thu, 30 May 2024 18:15:33 +0800")
+References: <20240530101539.768484-1-zhao1.liu@intel.com>
+	<20240530101539.768484-2-zhao1.liu@intel.com>
+Date: Mon, 03 Jun 2024 14:25:36 +0200
+Message-ID: <87plsyfc1r.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-Due to commit 2b7deea3ec7c ("Revert "kvm: selftests: move base
-kvm_util.h declarations to kvm_util_base.h"") kvm selftests now
-requires implicitly including ucall_common.h when needed. The commit
-added the directives everywhere they were needed at the time, but, by
-merge time, new places had been merged for RISC-V. Add those now to
-fix RISC-V's compilation.
+Zhao Liu <zhao1.liu@intel.com> writes:
 
-Fixes: dee7ea42a1eb ("Merge tag 'kvm-x86-selftests_utils-6.10' of https://github.com/kvm-x86/linux into HEAD")
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
----
- tools/testing/selftests/kvm/lib/riscv/ucall.c    | 1 +
- tools/testing/selftests/kvm/riscv/ebreak_test.c  | 1 +
- tools/testing/selftests/kvm/riscv/sbi_pmu_test.c | 1 +
- 3 files changed, 3 insertions(+)
+> Cache topology needs to be defined based on CPU topology levels. Thus,
+> define CPU topology enumeration in qapi/machine.json to make it generic
+> for all architectures.
+>
+> To match the general topology naming style, rename CPU_TOPO_LEVEL_SMT
+> and CPU_TOPO_LEVEL_PACKAGE to CPU_TOPO_LEVEL_THREAD and
+> CPU_TOPO_LEVEL_SOCKET.
+>
+> Also, enumerate additional topology levels for non-i386 arches, and add
+> helpers for topology enumeration and string conversion.
+>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 
-diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-index 14ee17151a59..b5035c63d516 100644
---- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-+++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-@@ -9,6 +9,7 @@
- 
- #include "kvm_util.h"
- #include "processor.h"
-+#include "sbi.h"
- 
- void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
- {
-diff --git a/tools/testing/selftests/kvm/riscv/ebreak_test.c b/tools/testing/selftests/kvm/riscv/ebreak_test.c
-index 823c132069b4..0e0712854953 100644
---- a/tools/testing/selftests/kvm/riscv/ebreak_test.c
-+++ b/tools/testing/selftests/kvm/riscv/ebreak_test.c
-@@ -6,6 +6,7 @@
-  *
-  */
- #include "kvm_util.h"
-+#include "ucall_common.h"
- 
- #define LABEL_ADDRESS(v) ((uint64_t)&(v))
- 
-diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-index 69bb94e6b227..f299cbfd23ca 100644
---- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-+++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-@@ -15,6 +15,7 @@
- #include "processor.h"
- #include "sbi.h"
- #include "arch_timer.h"
-+#include "ucall_common.h"
- 
- /* Maximum counters(firmware + hardware) */
- #define RISCV_MAX_PMU_COUNTERS 64
--- 
-2.45.1
+[...]
+
+> diff --git a/qapi/machine.json b/qapi/machine.json
+> index bce6e1bbc412..7ac5a05bb9c9 100644
+> --- a/qapi/machine.json
+> +++ b/qapi/machine.json
+> @@ -1667,6 +1667,46 @@
+>       '*reboot-timeout': 'int',
+>       '*strict': 'bool' } }
+>  
+> +##
+> +# @CPUTopoLevel:
+
+I understand you're moving existing enum CPUTopoLevel into the QAPI
+schema.  I think the idiomatic QAPI name would be CpuTopologyLevel.
+Would you be willing to rename it, or would that be too much churn?
+
+> +#
+> +# An enumeration of CPU topology levels.
+> +#
+> +# @invalid: Invalid topology level, used as a placeholder.
+> +#
+> +# @thread: thread level, which would also be called SMT level or logical
+> +#     processor level. The @threads option in -smp is used to configure
+> +#     the topology of this level.
+> +#
+> +# @core: core level. The @cores option in -smp is used to configure the
+> +#     topology of this level.
+> +#
+> +# @module: module level. The @modules option in -smp is used to
+> +#     configure the topology of this level.
+> +#
+> +# @cluster: cluster level. The @clusters option in -smp is used to
+> +#     configure the topology of this level.
+> +#
+> +# @die: die level. The @dies option in -smp is used to configure the
+> +#     topology of this level.
+> +#
+> +# @socket: socket level, which would also be called package level. The
+> +#     @sockets option in -smp is used to configure the topology of this
+> +#     level.
+> +#
+> +# @book: book level. The @books option in -smp is used to configure the
+> +#     topology of this level.
+> +#
+> +# @drawer: drawer level. The @drawers option in -smp is used to
+> +#     configure the topology of this level.
+
+docs/devel/qapi-code-gen.rst section Documentation markup:
+
+    For legibility, wrap text paragraphs so every line is at most 70
+    characters long.
+
+    Separate sentences with two spaces.
+
+> +#
+> +# Since: 9.1
+> +##
+> +{ 'enum': 'CPUTopoLevel',
+> +  'prefix': 'CPU_TOPO_LEVEL',
+> +  'data': [ 'invalid', 'thread', 'core', 'module', 'cluster',
+> +            'die', 'socket', 'book', 'drawer' ] }
+> +
+>  ##
+>  # @SMPConfiguration:
+>  #
+
+[...]
 
 
