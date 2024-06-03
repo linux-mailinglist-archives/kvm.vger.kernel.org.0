@@ -1,140 +1,146 @@
-Return-Path: <kvm+bounces-18660-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18662-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 335C48D84CB
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 16:20:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEEFC8D84D3
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 16:22:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 522DC1C21C6C
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CAB41C2168F
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA55A12EBC6;
-	Mon,  3 Jun 2024 14:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845ED12EBE7;
+	Mon,  3 Jun 2024 14:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZoM53N+z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VXt2TIsx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F7A757E0
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 14:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F64E12E1DC
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 14:22:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717424403; cv=none; b=GnkFnHDd3JxhmT/OVfZ/6IsJo6VwpP7/WsWYj/ThKpR/cFeUZtiH3lwHclJuo6pElrla6AW0q6RaBlibnRG2SN2/9ZAb1hjWe4QR9DWS/N4zQyJhpqUgNU8LpTF/pnzvXC7wf4Dm+v3rFoVK1ob+u0uY2SOdat2B+Ht+wRXXbZ0=
+	t=1717424549; cv=none; b=DuSu0fbxxBRDZOob0G6/fnDgMBHYhKQjR8X6Qk54YDa5wwDXqwhMytCNScRxRSqYIQ2PYFfYXhVRZKB2NW3eP3WGcdOIU+0VxSSetuSyM1jgAyfx0naPLd0Qglg2ezL59vN29briLaznmB6+qsIMzRp06Hj9CVY4VQR6qEZJPzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717424403; c=relaxed/simple;
-	bh=YGTEQ6nmz5y0KplpDlBxxuNWRh8CAUPnbwUoc4LIThs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=WF//ClIuEc4ER2bxFFz75LOi5xI6MeM7iESw1+IKAieDHeQAlsg2A7CORTOrW3vve0TFZ8FHzrd3OCBV8ySHiV42PXakk2TWB3IeZsT1fbw+DOfBGA3yQjgKa5Esbh2OGnFUafiXiLSm2m4CBU2QR1m/hPK827bXz9Eron/EIwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZoM53N+z; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57a52dfd081so1529544a12.2
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 07:20:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1717424400; x=1718029200; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fcPdkpRWp56Gkr8DQ3RfeedzRUWF4Qj2aToRrp6ZnS0=;
-        b=ZoM53N+zUSkYbXOef3N9Bfz754Y9dqoWWiDV9fVrSaIrgE/pjqOKTbVSdRsj+/gCTb
-         qVjSHKuznFkNAToLhp6j+VrA0Z5HbM/C5JtNkfQ6AIOliWOh4C0I0J8aDkTXxLb2aObi
-         /iw4jICSYOpDqdtcVXPao2mkJAzbuLMmQdb3U6ssdPj8T7y36VsTHsLtIcv3hULbp5f4
-         T4wzIvH7XvxWzw8MkLsN8E4QspopSe//84Gvbja06Iv5h/9sqwNFuVMahp0C3e69ATve
-         gWPpDRJhZUndh5jON4RlYGo97BQFoAIQYNaxDnR0j6q7C2EdevYNumnCePOYqI4QvXUf
-         HxEQ==
+	s=arc-20240116; t=1717424549; c=relaxed/simple;
+	bh=KQvYYPZVusE+Uvlt8F63g/RCDoWSfgOSxIlNUzzcSQg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HXYMvcKXihGtGMBm7r8pwI8+nfkdD3fQQLiNFlQ4ew3fvRdEU9dgkx6OZjFQn/PS/WM4CV7js9ax1sfNg9+CHxn5J5jVssF5bx6lLIprzCUXJvZt8Z1FldmHGRparGlfs+c0VJc3ZWx42R5ranxH/HSxeVuI287v1d+taaNHYJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VXt2TIsx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717424547;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=efLqh7H5R1H2MCstarX4MnmJFfDoGl/LnoB3y6f71Jo=;
+	b=VXt2TIsx8UHO3laOEdmErNj89gV8b4GLohyIKPJgX9Oid7dmW6QaeEgEZGKz/2mJTTPAgh
+	T4TNS8GaFDNfndde/CYvRYFx6bYG6Hh0ksOulhSD4ZT5fpMcGRh3ivma1DeEoT8u9yU5cm
+	h+hsoOZPoncgx5PukQPAWW5AkzSDAik=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-497-A2HAInZIPR--HyCWigzi-w-1; Mon, 03 Jun 2024 10:22:25 -0400
+X-MC-Unique: A2HAInZIPR--HyCWigzi-w-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3580f213373so2931552f8f.3
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 07:22:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717424400; x=1718029200;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1717424544; x=1718029344;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fcPdkpRWp56Gkr8DQ3RfeedzRUWF4Qj2aToRrp6ZnS0=;
-        b=dEcElmXJF/dXFXuSBF5qiM44u3EsLRVLoh/MnR23FkAtURxkhqtG6sK3BuXaDUxU/K
-         v/ZkH03oGChUDEtE+0uddB2d9ZmGpDVp+Fd7h+bQf8dVumLPoQBlDlls4CikUY1AM5LR
-         XyFAWKRyty3PbgPYDHNywtwbT6Cwsp8GNZbcJQbGkbAQWA9EDPE1I8mFPSRI12I/shMi
-         A0+qD4e/CKK3RCsu0k+upN71qyMqj3OUmkO9923KGXGLRsmvCDXi6+i+mLMV4ZHVcfNH
-         exYf1zNWIeni/6OZoEwM0YZdZdmRQBVm6FGL/z81xG8hbIHdYK7majv5P0ERtLxbkDA3
-         9Dbg==
-X-Forwarded-Encrypted: i=1; AJvYcCUm9hxwYTm233Qei0U1QcXapoCx9Az9NljKKOX5+nDR3wUcYK6Xoa8bb8MI6n4NKFeUc9RNSJ33DCFGK0x9fPIqli6K
-X-Gm-Message-State: AOJu0YyQmx64Y17j+E6pUePv0PVigbA2WzKK2V4JQpLid6KrWSErbfvP
-	A8xqgBVT+hQ84qPEDAWZKwnxONXQQ9COvSPY71xLelSB7q1de64L8EQME6MBbAQ=
-X-Google-Smtp-Source: AGHT+IGtxUcz5Jn3s4N4L7hQt1Rb6KtzRJuNUUTb5gXSMDjmOSvQ4MZJrc68H8z6sbOUSEFfMNAzRg==
-X-Received: by 2002:a17:907:7241:b0:a67:910d:1b4a with SMTP id a640c23a62f3a-a6821982261mr681149066b.62.1717424400410;
-        Mon, 03 Jun 2024 07:20:00 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a68fcb85d66sm219983266b.34.2024.06.03.07.19.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 07:19:59 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 4732A5F860;
-	Mon,  3 Jun 2024 15:19:59 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Cameron Esfahani <dirty@apple.com>,  Alexandre Iooss <erdnaxe@crans.org>,
-  Yanan Wang <wangyanan55@huawei.com>,  Paolo Bonzini
- <pbonzini@redhat.com>,  Eduardo Habkost <eduardo@habkost.net>,  Sunil
- Muthuswamy <sunilmut@microsoft.com>,  Richard Henderson
- <richard.henderson@linaro.org>,  Pierrick Bouvier
- <pierrick.bouvier@linaro.org>,  Mahmoud Mandour <ma.mandourr@gmail.com>,
-  Reinoud Zandijk <reinoud@netbsd.org>,  kvm@vger.kernel.org,  Roman
- Bolshakov <rbolshakov@ddn.com>
-Subject: Re: [PATCH 4/5] plugins: remove special casing for cpu->realized
-In-Reply-To: <0a76250f-db5b-4c94-941a-cbec1f2e1db6@linaro.org> ("Philippe
-	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 3 Jun 2024 13:31:07
- +0200")
-References: <20240530194250.1801701-1-alex.bennee@linaro.org>
-	<20240530194250.1801701-5-alex.bennee@linaro.org>
-	<0a76250f-db5b-4c94-941a-cbec1f2e1db6@linaro.org>
-Date: Mon, 03 Jun 2024 15:19:59 +0100
-Message-ID: <87bk4iglbk.fsf@draig.linaro.org>
+        bh=efLqh7H5R1H2MCstarX4MnmJFfDoGl/LnoB3y6f71Jo=;
+        b=N9H7TfPj9qg4+srWoYjOXx2JWl/DzJw2TtYLOWR2fCHWeV0lkI4zsVhfv2TvNZ8EfH
+         qPaIemQ38EUHgM1kkZdu6RPhiKy82hL852P+2/Guy/DH5lFFu+cPKy0THf5m/QXXdYRP
+         8HQlStdaYQXIPCkp3T0SjPMDUccnsiTK2LCjKxnbFu+sgBKAyoE1njs/69lyh1iGtoPV
+         dL8FzIlY9Ck1H+wULNoXblfTAobCyXJEC2t5lj6XRxqb0JIqQ/tZ4n3dE5tsQ5alB/GN
+         rQF4kMv2DW74lV74l7xRYZRVphQpgXxKuBjcCTZnSZwNEd2+h75ix0wZETXwSTUlI6Ar
+         lChw==
+X-Forwarded-Encrypted: i=1; AJvYcCVK5zvSFIv3JSnIdN0mNrkjRPhQE/ph5TA/idB5uRTC39rXox9gqpKzTKOLcTrji2vAQ+BOlHybKila7L6QJXKP50bn
+X-Gm-Message-State: AOJu0Yxy1DeRj30B56fxBaCuVt51S9Ceu+zFygPs1W7om+7zbGUzhstC
+	0k40E1j6peM30sc1XJWd6oBs7IGMJ3mue0dwkw/nMqTcQnr47I0RW5tMZ4cuAEO3hlLOFvWDlXX
+	3ovQAKo6oOOn8N341KTLsz3nYhxEITAFdCo+BOar33tjh1X9GS+ffL9UyaM82d0bm20e+axMOAv
+	ervznlJtx4NaUF9rzuvdTIsdJZ
+X-Received: by 2002:adf:fecb:0:b0:357:ff92:aae7 with SMTP id ffacd0b85a97d-35e0f25c3e6mr6739795f8f.2.1717424544717;
+        Mon, 03 Jun 2024 07:22:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH67uOr9eOqicMCPNEhJhZpPzutpMuvtEFRvQ9siWY62a4sbnmkxWF/LwmjxcRZntnhm0yGRx+NDnbedJ/adBI=
+X-Received: by 2002:adf:fecb:0:b0:357:ff92:aae7 with SMTP id
+ ffacd0b85a97d-35e0f25c3e6mr6739776f8f.2.1717424544320; Mon, 03 Jun 2024
+ 07:22:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
+ <CABgObfYFryXwEtVkMH-F6kw8hrivpQD6USMQ9=7fVikn5-mAhQ@mail.gmail.com>
+ <CABgObfbwr6CJK1XCmmVhp83AsC2YcQfSsfuPFWDuxzCB_R4GoQ@mail.gmail.com>
+ <621a8792-5b19-0861-0356-fb2d05caffa1@amd.com> <CABgObfbrWNB4-UzHURF-iO9dTTS4CkJXODE0wNEKOA_fk790_w@mail.gmail.com>
+ <05d89881-bdbd-8b85-3330-37eae03e6632@amd.com> <3j2llxlh3gzyn33n6uo7o5jdx4dmi4rzbax5buluof5ru2paii@2ze452jtocth>
+In-Reply-To: <3j2llxlh3gzyn33n6uo7o5jdx4dmi4rzbax5buluof5ru2paii@2ze452jtocth>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 3 Jun 2024 16:22:10 +0200
+Message-ID: <CABgObfa5Bnm2vNcHqyo+DbXET2aZrmH5C6h7HV=6Qio7bKVTsw@mail.gmail.com>
+Subject: Re: [PATCH v4 00/31] Add AMD Secure Nested Paging (SEV-SNP) support
+To: Michael Roth <michael.roth@amd.com>
+Cc: "Gupta, Pankaj" <pankaj.gupta@amd.com>, qemu-devel@nongnu.org, brijesh.singh@amd.com, 
+	dovmurik@linux.ibm.com, armbru@redhat.com, xiaoyao.li@intel.com, 
+	thomas.lendacky@amd.com, isaku.yamahata@intel.com, berrange@redhat.com, 
+	kvm@vger.kernel.org, anisinha@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
-
-> On 30/5/24 21:42, Alex Benn=C3=A9e wrote:
->> Now the condition variable is initialised early on we don't need to go
->> through hoops to avoid calling async_run_on_cpu.
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>   plugins/core.c | 6 +-----
->>   1 file changed, 1 insertion(+), 5 deletions(-)
->> diff --git a/plugins/core.c b/plugins/core.c
->> index 0726bc7f25..badede28cf 100644
->> --- a/plugins/core.c
->> +++ b/plugins/core.c
->> @@ -65,11 +65,7 @@ static void plugin_cpu_update__locked(gpointer k, gpo=
-inter v, gpointer udata)
->>       CPUState *cpu =3D container_of(k, CPUState, cpu_index);
->>       run_on_cpu_data mask =3D RUN_ON_CPU_HOST_ULONG(*plugin.mask);
->>   -    if (DEVICE(cpu)->realized) {
+On Mon, Jun 3, 2024 at 4:16=E2=80=AFPM Michael Roth <michael.roth@amd.com> =
+wrote:
+> Paolo mentioned he dropped the this hunk from:
 >
-> We could assert() this to protect future refactors.
-
-No because the CPU can still not be realized but it will be able to
-queue async work.
-
+>   hw/i386: Add support for loading BIOS using guest_memfd
 >
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org>
+>   diff --git a/hw/i386/x86.c b/hw/i386/x86.c
+>   index de606369b0..d076b30ccb 100644
+>   --- a/hw/i386/x86.c
+>   +++ b/hw/i386/x86.c
+>   @@ -1147,10 +1147,18 @@ void x86_bios_rom_init(MachineState *ms, const =
+char *default_firmware,
+>        }
+>        if (bios_size <=3D 0 ||
+>            (bios_size % 65536) !=3D 0) {
+>   -        goto bios_error;
+>   +        if (!machine_require_guest_memfd(ms)) {
+>   +            g_warning("%s: Unaligned BIOS size %d", __func__, bios_siz=
+e);
+>   +            goto bios_error;
+>   +        }
 >
->> -        async_run_on_cpu(cpu, plugin_cpu_update__async, mask);
->> -    } else {
->> -        plugin_cpu_update__async(cpu, mask);
->> -    }
->> +    async_run_on_cpu(cpu, plugin_cpu_update__async, mask);
->>   }
->>     void plugin_unregister_cb__locked(struct qemu_plugin_ctx *ctx,
+> without that, OVMF with split CODE/VARS won't work because the CODE
+> portion is not 64KB aligned.
+>
+> If I add that back the split builds work for qemu-coco-queue as well.
+>
+> We need to understand why the 64KB alignment exists in the first place, w=
+hy
+> it's not necessary for SNP, and then resubmit the above change with prope=
+r
+> explanation.
 
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
+I think it was only needed to make sure that people weren't using
+"unpadded" BIOS (not OVMF) binaries. I think we can delete it
+altogether, and it can be submitted separately from this series.
+
+> However, if based on Daniel's comments we decide not to support split
+> CODE/VARS for SNP, then the above change won't be needed. But if we do,
+> then it goes make sense that the above change is grouped with (or
+> submitted as a fix-up for):
+
+Yes, I think we want to go for a variable store that is not "right
+below BIOS". The advantage of something that isn't pflash-based is
+that it can be used by any code-only firmware binary.
+
+Paolo
+
 
