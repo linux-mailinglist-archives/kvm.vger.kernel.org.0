@@ -1,125 +1,103 @@
-Return-Path: <kvm+bounces-18691-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18692-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9B58D8AFA
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 22:38:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7452C8FA56F
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:17:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADD4A1F25000
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 20:38:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19BC41F264BB
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 22:17:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7EB13BAC3;
-	Mon,  3 Jun 2024 20:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F49413C902;
+	Mon,  3 Jun 2024 22:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cyfWXK4q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3clAKt+c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE75313B582
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 20:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25AB8522E
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 22:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717447115; cv=none; b=cbvnvUmw0F/l1+/DJbPFv0tQ/teXOEdPW5w0397ts4f0GtaHLjlE6rXO3kwFvyPwm6XlJsZTvTfzkvEO6xYbf6Pm6fGiLlBH9AXQpkcZd/Cdpz3uxIOdeoHRM7onb21Wwlgpbm4uwP9DZ8ZxiE18rH/HZJxDJSTweQSBveRB49A=
+	t=1717453040; cv=none; b=uXF0JYCsiYQm8nYN6/Yl92TFd8QIVX4a+VjHJFIxA6FPzf6cvZMn5AD2o1NsVMMjbkt7hybAM49ishC16Rp/UJE55Df57NZypzS4uibY98zm4vQaTy+Htz13oyIVgHZN6tUWORtinSS7w3LiVpqG0sKIS+fV8Z5eveNDOYawt9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717447115; c=relaxed/simple;
-	bh=nOajvElT2YxRSgkUc7uVk4PH7rZHafyM7iXn3jIYzKs=;
+	s=arc-20240116; t=1717453040; c=relaxed/simple;
+	bh=/UlXxhes5QRLTrr9SDQzAvFobSCW8cEFBwgADTpNo10=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DeYL61Vx9zoDutdYmnHJjwa5DBHsP641w7mRcOQ2ButadkEzr9dxfMj6aO4MugCTcWQ7WZWk9s0eRb3FlKJYWGWndP7JEMNdPUgb20WE26clYzHHuBGctkP+aZeVdl8SBJjfpn1daeo56EccpvH/8j08AqQiUtBnkiCUDL8VpPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cyfWXK4q; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=EADeAkcUSVYA+Z+zYrlHLFetF7wxDig2/froU8cd2QWjoTEQ/Yh4FgJ8G87aWhIIwvw4GRJQwDNW1/kVjYAOdUTNTlX1cCJgJEIoUG14ttSzXzbwAVtPtgncdrQJegnJ3KF533YzFtbnPMSqivmtU0xd6GKtzepuwHTWWrgyAA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3clAKt+c; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1f682e70799so7393545ad.1
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 13:38:33 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfa7464759cso528626276.0
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 15:17:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717447113; x=1718051913; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XO5yZdhwE2fDtj4hYaOddgQwqaOtsUzsgmBHSrtqiuw=;
-        b=cyfWXK4qp6dry/mYPzxtFdlZALtIbi1ldCrYVnFDDMFQ/bwDXefEB57jEfIP0Qqh9o
-         6jIhgYfxNCaSZ93iWvofZQAyF9nuK7CoJC2iC+XiCMTUexnQ6FGY9MO0xtiVya+wsVju
-         80/VbOCL+3PkzHqQr0NRB8SfsQca8Qr5C2HR18qmXy4yF1grCNHSZmvoMs9kMLpQl33a
-         WJ9iPQdKU6WIoRNyo/6Z1ScNNmHoz3CJ0LXhchX3+ZlmPgJaYo9PtHgTxVTLSdfcIuf1
-         mwD+1gpbGdq7TNR0AHxgr/bHdRhr1T4zjwTcazmwCIfsCw3MrpA6JCfKH1um/TLn+WMl
-         Hu+A==
+        d=google.com; s=20230601; t=1717453038; x=1718057838; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lTWK+TvN0EB0WUHYF/GtEEl064LANQ6E3omFwaKMPyc=;
+        b=3clAKt+ckM56PvpGVHHtjKfxgSSl1l1pzd2jnq3Yp4wz/dGy9xyEVhM+BNFYJhZXtl
+         n3LpOgR8eiKtiS/llpV2dLwj/8PEZVdYI9vv6YavRvIPFBe+cK+HS3+Giflw6qRcagAB
+         L/1+WwBVq/+4tmRBK43swfWO1OkeSFzvP40LVTKROZc5MpQ6azKc6Z4nGUrilwd3uuVb
+         aXN1AVttS7yk6Nw/pG7LLDGHoHE5vnkU5UO6QEIucOGXJApJl0zTye9dfDOC1Tt5mcpb
+         C+WsbGYYzaQql/4n6cqSOzg1mVHM/Ni/eiVlYrU2ggty8n0D9bzXrJ+uvOLGVReA9puU
+         lPNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717447113; x=1718051913;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XO5yZdhwE2fDtj4hYaOddgQwqaOtsUzsgmBHSrtqiuw=;
-        b=NTX4cMsMIjIsITTE1vFnlO2fpiis9F43tlPPN045L0LS0zKAn53vPfja6kooHqNyP2
-         b3tDZvernEj1ZF9T4uDB0YapVMaF3Gc1rX5UO7gAVFrtKyJ7l9CmjCUCVFfttoa3oPo9
-         S+e3haCDUwo1r/bepGa/5whW12qnzC9cSSwssvfJ0nnN63PI4fEjmgM1G7cRLh0kF8eH
-         JRZHu2twgr2LcKXccw6NrANCAZkw/M52PUM2wvsicA5SKD3xbAve26qk8cF6PDkmNkVy
-         PCUmfhaUjr8awPfUyCh/wvltdx2fTtlzQPLUSIOhZJUdPr17V/Oegy9yMzK7V6ZDabDf
-         8Ytw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrvd/CZ06o4nU7F9IClU4brG4po/rBxZvLf0fGNW2Wi4FaheoJ1sJm0qDdGQWVHO/6K86VVPRWR5rJDw0MlTMccwU/
-X-Gm-Message-State: AOJu0YzqyQ65XtmpUZtLEwCTeFCSoZwb1LkYxBHcmt0wGse7Zs96tnGh
-	fazQ3B6A/TQ+/OwcXYt23E2IJz56fS7xtuS6FtI+4oT4gYDASydPm7GweTIVjL/D0ZxCTdikhtA
-	m9g==
-X-Google-Smtp-Source: AGHT+IExdolKE/hY98W+ja0EGqBrXw6wGDQhTRxEkbZVRfK2Y4yJSHL+gAUKdUpiFhN7lu/Fxb6BAhUIS8Y=
+        d=1e100.net; s=20230601; t=1717453038; x=1718057838;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lTWK+TvN0EB0WUHYF/GtEEl064LANQ6E3omFwaKMPyc=;
+        b=HomcLRYv00GJchDGwaHgSmdLf8B678LNNoJcJiTBRWit9fX3VsH2lw1SMIz0TPQp5W
+         a7UTnkwVk8YJ06JiHYKC0zEReG9YX0wxKPUGCaJTn09MnDKAGGh0d7PcXT1qOCjFFK4S
+         mCrSVsVfcoTGOhyCq2pwAO35sdZ9VmoDZmrIY2f3QCfoOechFrhHxSghrmh9xgOD+UuQ
+         ulszaWCBZ5fKYaip/P6SQxe8l22BvauLHm+x2kAy6m7D5rH5pj+bMEwXV7asoMH8mA1X
+         iL6c8HQtURKmq5YNItmrXJ4F5lx6dRCAFN5uvPpCFC7yTx0wQ6sprndZq9jya8ATEVq/
+         CKnA==
+X-Gm-Message-State: AOJu0YyVEmFrgxA7d6qc4qV9b8KGmEikv1hDBWESWl4t/WSYkNH/mD5W
+	4du7dq9zSRpKU37BDIeMrfBCS7mJV0RecGwD+c6DSdSSu6HtY8KfmoBwjSefcj8fENuFFrTYDKX
+	lOQ==
+X-Google-Smtp-Source: AGHT+IEXTdV0kJQaVce5PqLrH3fwi9yEgelcuoXat9IeKBfWoeQ96uS74NPqg5c88j/27hSzy0tzc6U5sPc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:124a:b0:1f6:d4b:3507 with SMTP id
- d9443c01a7336-1f6370c132dmr287075ad.13.1717447112817; Mon, 03 Jun 2024
- 13:38:32 -0700 (PDT)
-Date: Mon, 3 Jun 2024 13:38:31 -0700
-In-Reply-To: <CABgObfY5athiQKdV8LQt3b=yKEgydOXRdfXeLz1C8Ho=ZrqOaQ@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2b09:b0:dfa:6ea5:c8dd with SMTP id
+ 3f1490d57ef6-dfa73bc1496mr1061571276.3.1717453038191; Mon, 03 Jun 2024
+ 15:17:18 -0700 (PDT)
+Date: Mon, 3 Jun 2024 15:17:16 -0700
+In-Reply-To: <7a5ffaa2-9b18-4700-b4b6-da414333d894@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <98ad0dab3a2c66834e50e6d465dcae47dd80758b.1717436464.git.babu.moger@amd.com>
- <Zl4DQauIgkrjuBjg@google.com> <CABgObfY5athiQKdV8LQt3b=yKEgydOXRdfXeLz1C8Ho=ZrqOaQ@mail.gmail.com>
-Message-ID: <Zl4px2yauHdvDUbR@google.com>
-Subject: Re: [PATCH] KVM: Fix Undefined Behavior Sanitizer(UBSAN) error
+References: <20240501152451.4458-1-manali.shukla@amd.com> <ZjJghQ25H-ttaV4b@google.com>
+ <7a5ffaa2-9b18-4700-b4b6-da414333d894@amd.com>
+Message-ID: <Zl5A7GuqAKCZ7I5M@google.com>
+Subject: Re: [PATCH] KVM: selftest: Add family and model check for zen4 in PMU
+ filter test
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Babu Moger <babu.moger@amd.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Manali Shukla <manali.shukla@amd.com>
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
+	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jun 03, 2024, Paolo Bonzini wrote:
-> On Mon, Jun 3, 2024 at 7:54=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > > However, VM boots up fine without any issues and operational.
->=20
-> Yes, the caller uses kvm_handle_hva_range() as if it returned void.
->=20
-> > Ah, the "break" will only break out of the memslot loop, it won't break=
- out of
-> > the address space loop.  Stupid SMM.
-> >
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index b312d0cbe60b..70f5a39f8302 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -651,7 +651,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hv=
-a_range(struct kvm *kvm,
-> >                                         range->on_lock(kvm);
-> >
-> >                                 if (IS_KVM_NULL_FN(range->handler))
-> > -                                       break;
-> > +                                       goto mmu_unlock;
-> >                         }
-> >                         r.ret |=3D range->handler(kvm, &gfn_range);
-> >                 }
-> > @@ -660,6 +660,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hv=
-a_range(struct kvm *kvm,
-> >         if (range->flush_on_ret && r.ret)
-> >                 kvm_flush_remote_tlbs(kvm);
-> >
-> > +mmu_unlock:
-> >         if (r.found_memslot)
-> >                 KVM_MMU_UNLOCK(kvm);
->=20
-> Yep. If you want to just reply with Signed-off-by I'll mix the
-> original commit message and your patch.
+On Tue, May 28, 2024, Manali Shukla wrote:
+> On 5/1/2024 9:02 PM, Sean Christopherson wrote:
+> > On Wed, May 01, 2024, Manali Shukla wrote:
+> >> PMU event filter test fails on zen4 architecture because of
+> >> unavailability of family and model check for zen4 in use_amd_pmu().
+> >> So, add family and model check for zen4 architecture in use_amd_pmu().
+> > 
+> > Is there a less ugly way to detect that 0xc2,0 == "branch instructions retired"?
+> > E.g. can we instead check for v2 PMU support, or are there no guarantees going
+> > forward?  Pivoting on FMS is so painful :-(
+> 
+> We have confirmed with the hardware team that 0xc2,0 == "branch instructions retired"
+> is always true going forward, we intend to maintain backward compatibility for branch
+> instruction retired. Since event 0xc2 is supported on all currently released F17h+ 
+> processors as branch instructions retired, we can check for "family >= 0x17" for all
+> Zen and its successors instead of checking them individually in pmu_event_filter_test.c.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Can you send a patch for this?  Please :-)
 
