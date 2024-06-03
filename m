@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-18657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A2B8D84A3
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 16:11:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036778D84A5
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 16:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C77F1F239B9
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:11:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8A0B1F23A34
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A44712E1CE;
-	Mon,  3 Jun 2024 14:11:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C509D12E1CA;
+	Mon,  3 Jun 2024 14:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qmI6WpFm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NGoGh6EE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B66A1E504
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 14:11:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54CC05664
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 14:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717423877; cv=none; b=QligBuK4d+KgcrOzA3HLoc8y/QTTyO1kfw+1IUHRb5l+1DaNgl2leo5ONtGEARNssnXDxsixwSyMzkEJ8hcYkU4v91MZkG4h4vbd+tIqr6IFhx/MU2tNzASPELoOPX2apHbA0J0H8y6+Ljvh9YxiRnaTk8RHvuQLsubt/VGXjDc=
+	t=1717423921; cv=none; b=r+hPTiKB13vTncVv1S57Fk/fHALGBSm0sHNj3SmJRbu+1HEW26Boz19bP0qkgaGQZ+VJvbByTn6BSz9TmJlZ6DU/lFPcMew2t0t9c0vzdZfHtZDW2FVFNnS54bp48lo8tH1AW6Hf4/uoW9ogsUkFop7DahlmhsZMQGz9BjbXJEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717423877; c=relaxed/simple;
-	bh=FymS1W1LswR15xdUj78Z+LxnsxJf6xbG8xxHQ4EyC4o=;
+	s=arc-20240116; t=1717423921; c=relaxed/simple;
+	bh=9+jJQeLxtbwh3GVN0JWN6czUwWGprSlkF9d/8DKi/FQ=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=oIWtkI6BWymu7K9wqmylmRAQoD0Sse0lz5UtwGbDxUsLW+OychKnNHVXjI0j7f4+Flxqi9HJzgbNmBtcel8vs3s7HOaXHs+1xtlSueBYRrlHJDNhp1zSP7JHJxznWjOW2QrKA90LKKhlpnK8PKmk8X1tkXpeDCpDJUvJ8aMpPrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qmI6WpFm; arc=none smtp.client-ip=209.85.218.41
+	 In-Reply-To:Content-Type; b=WQHIWVC3+qp5mAFK+JNy2nlopgkJZaVa9Q/Xe204qE+hKf5UI4d4tIcIWElfGic25CxJzdYKg0RslLAhlspM7AG/pF8Uuub8ynuS1toKlLqNNtcVTgjWvgarT5SOUP2Yat0RNmPVQoM18z1rq8hMFDcLv1XuWNmVGfdtyidWj5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NGoGh6EE; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a68ca4d6545so292994666b.0
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 07:11:15 -0700 (PDT)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-57a32b0211aso3895063a12.2
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 07:11:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1717423874; x=1718028674; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1717423918; x=1718028718; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=dRaDiAL64sssMvTWiBBzGvj163oLeurAnHe5X3Opa24=;
-        b=qmI6WpFmntZHLc3f/hzpoV8jQVc7CIw8pvp0MoAD+uw4AP7m/HawxnlUz9n/KIBR5a
-         9CuwiRy5Dvb0toXhQABaZmI7os7axW1o3vGZNk6cN0gjOozpGIdK65nclHuqdFoQLupt
-         il5Hhj8keTWtZHVBSEyN1Ju+tRVp969psQr5F1BC3FsBc7IcbOyuS2Kq99G237iU/jHm
-         HK6NFDKFlBOR+ccmHb4UgzBDgNWGmoDpMKTF2pQ4+XSigdstlqEsfQfUdRUZ7Mj12sAR
-         HOnRHEaf12+XNGonaTvQrtORBEoI5cqNU2fQRLY7R/Oa6o93zgYFW3DKwud6oyp/LWvP
-         aTAQ==
+        bh=DlSUWfEVLvtJdjyRCcCPS1n94AQWY9Us2l2aMVIJj7Y=;
+        b=NGoGh6EEZAF5ay8ZEwtz+na4dbf62xS7X8FnuRRQOzGAYawOkHsyF9CdcefiSDbFbx
+         BCZxWqk8KZ7e13/Q0gYbJNhZ2y952qjwn7pc4Tcshsno5jvdZVH2F7Wy4eUxx4CZgyv3
+         KjmWVqNGWxFqdKeOB6XSP9IejHtRohlm/3gMdQLLzXVFtTyYoTXFgG1WiUzC8SPWJC8q
+         GCMJSIb++JURyS9EVTyz6xjFbbzPlK9mEdE1GhptFaLt2vlIQ48KdOvgavfkHe53y3rU
+         AM88uAZsMLdPtiKt+p/haW9qe3wpT7ohd0EL+cGqb6zIqpx2UvydHUiZ8EAXj4J/aq0B
+         OrEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717423874; x=1718028674;
+        d=1e100.net; s=20230601; t=1717423918; x=1718028718;
         h=content-transfer-encoding:in-reply-to:content-language:references
          :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dRaDiAL64sssMvTWiBBzGvj163oLeurAnHe5X3Opa24=;
-        b=epJGhYn4OPnNcfItsxuBgmEyB2vGTiSttAMPf8ZsfRuOiBQ5VA/qhyooauraXNgI+2
-         CphH5y//sp0ENQCw1+ZX/adISwEUMhRPoF1bo6nwjU5xv0kTSFDxEN9Z7/+NoDbu/R3y
-         splHIxBYr7OnK7TfZ18IFdCio9tXr920vjBm3jJIjLZAUFZMJqbBKMRP+mwNnDowTqp/
-         yD/07IJ/wPCHRbPN5/ZvBkxBX1sVPVSROxeyz1Z9U+X9WiFTqoyy9U/4qu9cdlaD++fB
-         5lRHkGhc1XhGrW82Ya2GDkWILTWq1raJq3wsB+TYsWbWqDZfOdHLdh07Fi384Q1JvoEh
-         AOFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKJE1hsgWkfGvl+5CJsj79F8fbiUiRkSUzXa5euiMUdRxyEjRuCPEe4/EtOj7CPhncrvBr8yyNveHMrOIbWUxCSLMT
-X-Gm-Message-State: AOJu0YzpyKhmJtFumXfyrrpQcooEVDh6gtWY64vTVVxEtumMt6G5JWtc
-	a7RqbFtXrRBVnoM9mTn+HayFfRVUFafWPnOzE9Gud6SLst//ZE7ucdSqPQKdcR4=
-X-Google-Smtp-Source: AGHT+IEoRgPQWyBF9W1moLh8VT4BX2L5l2kefHO9O6pdlrBS8/sUQ5nmxIPLbYEDqFdEuHeLaWcadw==
-X-Received: by 2002:a17:906:36cf:b0:a68:5fb6:1a7f with SMTP id a640c23a62f3a-a685fb61d23mr728743066b.21.1717423874419;
-        Mon, 03 Jun 2024 07:11:14 -0700 (PDT)
+        bh=DlSUWfEVLvtJdjyRCcCPS1n94AQWY9Us2l2aMVIJj7Y=;
+        b=LlbDofzmDToQekSSgB0uL5CL58dMKyvRJJ6zMJcz8SACqPAprE/vT61COleS6EIfpn
+         UKwpEivT6gDSSqlQEjzu5zx+MRpiUgf/D0bG9KlFt7fIAJDVK7NOjX3Pc2xMP3vjO9zx
+         Aqqol+oVN0r6sEIIF8KAUPngET2T8x0pdDdDOcjdqzQh3pvjl8tfWi5S55o0W5hqob+A
+         /cNi9mdu2eOKYHkA4WWYr68WbA8AluPVdBHMLdcDFmPomtnC3EHZP6a888eKJKpdpWGb
+         8CqyqfMkMhUdtRyeQ4cjt2YR21lpTn5HDurWj5o23YjJ90D58mZRqbdeoHF3WCCUMtCz
+         uGZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKaSdKa294Us28iPyvpAOMBP8R9sT2j1PxUGhg7MI9fMGipOeUWIWYBsVLr2FoHTSfjxtE5tfLdXXz98b5AFxoaPPy
+X-Gm-Message-State: AOJu0Yy/qvKRULxfY1sKXWSledmoIa7pvjX0U0VUfZlox54SAH6K6CgA
+	+yKbZANIPJpBd3bvGXi0Wij5lrGyUj5WwEP3Hnwkls8ExKjCYDcWxQVaqqeuLlc=
+X-Google-Smtp-Source: AGHT+IGdr5CBYOZFF6Lat26v/7tlPWLGgyXS6UBb1RiZVlrTdk8rnBJQ5k0EYqfvZ4PIW3CG1qkc9A==
+X-Received: by 2002:a50:bac6:0:b0:572:6846:b899 with SMTP id 4fb4d7f45d1cf-57a3658b28fmr5068095a12.41.1717423917639;
+        Mon, 03 Jun 2024 07:11:57 -0700 (PDT)
 Received: from [192.168.69.100] ([176.176.177.241])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a67eac7a340sm489040666b.159.2024.06.03.07.11.12
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a61b4e36dsm1653858a12.75.2024.06.03.07.11.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jun 2024 07:11:14 -0700 (PDT)
-Message-ID: <329a02e4-724a-4579-ade2-99e3ad2688de@linaro.org>
-Date: Mon, 3 Jun 2024 16:11:11 +0200
+        Mon, 03 Jun 2024 07:11:57 -0700 (PDT)
+Message-ID: <750b1cd7-6b16-464d-8229-46a4b5f4e022@linaro.org>
+Date: Mon, 3 Jun 2024 16:11:54 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,7 +76,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/5] cpus: a few tweaks to CPU realization
+Subject: Re: [PATCH 4/5] plugins: remove special casing for cpu->realized
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
  qemu-devel@nongnu.org
@@ -91,31 +91,46 @@ Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  <reinoud@netbsd.org>, kvm@vger.kernel.org,
  Roman Bolshakov <rbolshakov@ddn.com>
 References: <20240530194250.1801701-1-alex.bennee@linaro.org>
- <988e580d-6121-4f7f-b7b8-d12cee39be35@linaro.org>
+ <20240530194250.1801701-5-alex.bennee@linaro.org>
+ <0a76250f-db5b-4c94-941a-cbec1f2e1db6@linaro.org>
 Content-Language: en-US
-In-Reply-To: <988e580d-6121-4f7f-b7b8-d12cee39be35@linaro.org>
+In-Reply-To: <0a76250f-db5b-4c94-941a-cbec1f2e1db6@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 3/6/24 14:47, Philippe Mathieu-Daudé wrote:
+On 3/6/24 13:31, Philippe Mathieu-Daudé wrote:
 > On 30/5/24 21:42, Alex Bennée wrote:
->> The recent IPS plugin exposed a race condition between vcpu_init
->> callbacks and the other vcpu state callbacks. I originally thought
->> there was some wider re-factoring to be done to clean this up but it
->> turns out things are broadly where they should be. However some of the
->> stuff allocated in the vCPU threads can clearly be done earlier so
->> I've moved enough from cpu_common_realizefn to cpu_common_initfn to
->> allow plugins to queue work before the threads start solving the race.
+>> Now the condition variable is initialised early on we don't need to go
+>> through hoops to avoid calling async_run_on_cpu.
 >>
->> Please review.
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>   plugins/core.c | 6 +-----
+>>   1 file changed, 1 insertion(+), 5 deletions(-)
 >>
->> Alex Bennée (5):
->>    hw/core: expand on the alignment of CPUState
->>    cpu: move Qemu[Thread|Cond] setup into common code
->>    cpu-target: don't set cpu->thread_id to bogus value
->>    plugins: remove special casing for cpu->realized
+>> diff --git a/plugins/core.c b/plugins/core.c
+>> index 0726bc7f25..badede28cf 100644
+>> --- a/plugins/core.c
+>> +++ b/plugins/core.c
+>> @@ -65,11 +65,7 @@ static void plugin_cpu_update__locked(gpointer k, 
+>> gpointer v, gpointer udata)
+>>       CPUState *cpu = container_of(k, CPUState, cpu_index);
+>>       run_on_cpu_data mask = RUN_ON_CPU_HOST_ULONG(*plugin.mask);
+>> -    if (DEVICE(cpu)->realized) {
 > 
-> Thanks, patches 1-4 queued so far.
+> We could assert() this to protect future refactors.
 
-Now patch 5 also queued ;)
+(No we can't because vCPU can still be unrealized at this point).
+
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> 
+>> -        async_run_on_cpu(cpu, plugin_cpu_update__async, mask);
+>> -    } else {
+>> -        plugin_cpu_update__async(cpu, mask);
+>> -    }
+>> +    async_run_on_cpu(cpu, plugin_cpu_update__async, mask);
+>>   }
+>>   void plugin_unregister_cb__locked(struct qemu_plugin_ctx *ctx,
+> 
+
 
