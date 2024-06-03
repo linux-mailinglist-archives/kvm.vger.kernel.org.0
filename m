@@ -1,280 +1,240 @@
-Return-Path: <kvm+bounces-18596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B70C8D7B06
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 07:42:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C488D7BD1
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 08:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89621B217FE
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 05:42:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70D81282397
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 06:43:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DF423769;
-	Mon,  3 Jun 2024 05:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B3E138DF9;
+	Mon,  3 Jun 2024 06:41:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a/2ZQwXd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i87x0iIX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017DD19BDC;
-	Mon,  3 Jun 2024 05:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A7B2942A
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 06:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717393353; cv=none; b=ry+6gn+pG4zB8WWXyU38dWlis/LeF0Wf2MycDeOklXM1z33Zy5VXJ590ttJz8mJZYaxw7euBxCq8t86VZEr10mYXVmj4W/42PleElg+5iaaNrIJh+kxW5BXav1Lv9kxy/iSF5v7AuBa+KFqcmo9CdUp8rfG63zqebscwE168S0s=
+	t=1717396918; cv=none; b=mgxsZrpayXHYA0vZ0iUxTchHN6F460BgY9QUn4m57lHRRlohkNYjFAnxPOGbZno/kHlIrTkkuuuECy8P3JFHEQWe++z9ZG+/8XdRhGa0BM70ZQ8rAYg5tdQBa9g5/o6cFCxWMicwTPsN/wk8WDsxNQEpNTrqHrFjmsKCq1e3CdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717393353; c=relaxed/simple;
-	bh=pKs8QoJWRmox7R0ZKcwyWP16f75KVw08okCpMXGmJcg=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=OYY4GSB7uLfbIwprcSWgPx+tVY2uNwIVL6H10nXbksXddON26CA472ugPyqdOqhBu9xxuXJ0WaIurJ2ETC7opsjGiV2/wNDIGxlv1YltbUpFWLSBq4cPaLnX6ruv7dVcdS5v46eiWIL19f7RR4hLp7HYK80D0U8PhcUB0BzgtQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a/2ZQwXd; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1f658800344so9922125ad.0;
-        Sun, 02 Jun 2024 22:42:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717393351; x=1717998151; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vqYAbxXcZiC2cItjTqmcXMDzdjrchjWHaH7w9GA8zDM=;
-        b=a/2ZQwXdotUvKR+V7EGSvSAl2jP6tYpsbW7kvMlf2GeRSGQg/iPIB2fPJ+gdaMEM8M
-         5toeKkBqWU+rLBLw1UtLnGjjtA/SDZy/9QHle8PUNNeG8s/Gm7Q5scbpIShpiXEt7qJ3
-         z4qYfG7HB+e+RNRTv/ZBcHauGYwlQSDwVB9Mfgpb1U216crnXk+4+GuAsedrJeknM9lE
-         g4zi7vI3Gm0Xs4/xwAr7O9kE7kjC+p8bN9yVlFW0HNBMUu1J1UB8jF8GuwnIGRVFTyoh
-         yEA4pSlOn1NZCZKsIezx/rFwHZz8RiaVzOwnKR3dHeJyTJwfUQuM/JZe4hc12NBEIDGd
-         dvFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717393351; x=1717998151;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vqYAbxXcZiC2cItjTqmcXMDzdjrchjWHaH7w9GA8zDM=;
-        b=IQ1euGHYIW0IpQwIdI40lzF5F3sXMggJZC1xY4U8tGxw8iTI3stZ1SY33BFeoNnti/
-         igzxzha5vOfuzNW22o0Y4R4VwQhCiAPzA7ETwqNG86cEW/Xqxvo6xErjP/STpdmGeCzb
-         /uhR1EzSOfUvorzbuFZy3OpL+4w4Ky0wraN3TgEnAcC6STsDvOL5ZAdnCq2Fqe6+xziw
-         4gJqvjCKJFAH4E8ZjE/2eM8asY9/UECO7MNlYojHRWRaK2k0Nn6sLTswB9D8l7WR0UgW
-         1LcZ8Egp+WZVTt4Fxzd52DQgr8gd+fpXfR/dRyvEyn6zVCrTkv/DBAxq0FEabEYXCGh2
-         d8aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWmsegF23C/YeiqxwCBsglBf43ExAaPO3CcjZayKe4wEFVaHoUMXEaIE1ajQG03ix3YEKEWzcFj1OZp+EHJxPWMTGyxaX8krHCxfUOWAmD3MKKEcDcxIPRIwHODy8O+QjcBsOqJgi9DCoLz4QPEasWBmm/BVRKHjJU5PkQ+9c5odXxp81mLgvWVS5tp8B19QXsrkDQ
-X-Gm-Message-State: AOJu0YzbSrlZHO4mqdv2QwW0z77eVlCv3ib3n9S12AJhNVN6Op5S5e/P
-	TONm9tHJR4zt8YLUg1fjxlw+yXyXeBQZ7zQTXavm79oDi0uum0CP
-X-Google-Smtp-Source: AGHT+IFbKOdWWXidloqwMZDBr31ClzFKnCfuvB525mbYLqAvqHSEPBkL0Qe8xxXnrIDsvWatGYYa3A==
-X-Received: by 2002:a17:903:2c6:b0:1f4:b18a:3f25 with SMTP id d9443c01a7336-1f6370a3163mr101095265ad.60.1717393351163;
-        Sun, 02 Jun 2024 22:42:31 -0700 (PDT)
-Received: from localhost ([1.128.202.53])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f63232dcb6sm55868575ad.61.2024.06.02.22.42.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Jun 2024 22:42:30 -0700 (PDT)
+	s=arc-20240116; t=1717396918; c=relaxed/simple;
+	bh=cPYvHVW9vmAhPZl/2mWovZH34s4ezLVnYM8VYmx3Pcc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=iM0y5LdYpGfjGnS7mRFZ86YqGrjnViSGXB3pstUHshe8cNvOF6u3gTOOWh4QCkl4uygXEVlKEc5X2K8YRnNLA9SABNnkCZ7GivHh4LC0eomrQbsXbF306zFct7M6xM1XGtj21Bhzg68HyiAZIdfo7QE4MFKCUfIwZ1enTzyURuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i87x0iIX; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717396917; x=1748932917;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cPYvHVW9vmAhPZl/2mWovZH34s4ezLVnYM8VYmx3Pcc=;
+  b=i87x0iIXxvVQYbuZ83AHrTDC81yrJbCjaqe8+gI6d1SC2svgTnrqteUk
+   IGto8OzDwPYzQHgbduPhiPfTS+pva1oM63Efes9Gnfcnqo9YUko0NUmgo
+   fWhCFeeGyFHAf2ZxiXQwdQHo5DyC9ZxU+HEWaIYjI/PiO5z1bwjymaGD+
+   VOGycwL48Y4AD9lI4kt3HEbJypSFedg7oUTnzgaUzER49G9OBHnsVzIGK
+   hRdJlHB9GYZdhxs2wFCHqY31yAwgR9YucBJZX8ZEv/gPZlDn5mn2xf/9E
+   S5JlZlxtl0nj1lHxbnM4pY4FArQqZxwxCPX4wWZxnxUtgdueYK9HPZ4e8
+   Q==;
+X-CSE-ConnectionGUID: fRapJjhoSnaEHA20VxNz9A==
+X-CSE-MsgGUID: 9rnu9VKdTTGxKazch3mUZg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11091"; a="13723253"
+X-IronPort-AV: E=Sophos;i="6.08,210,1712646000"; 
+   d="scan'208";a="13723253"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2024 23:41:56 -0700
+X-CSE-ConnectionGUID: Utgkcnd+RWmNKuQFQcYkzw==
+X-CSE-MsgGUID: 7TfLIFeVR5idNbH1l885kA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,210,1712646000"; 
+   d="scan'208";a="41869800"
+Received: from unknown (HELO st-server.bj.intel.com) ([10.240.193.102])
+  by orviesa004.jf.intel.com with ESMTP; 02 Jun 2024 23:41:54 -0700
+From: Tao Su <tao1.su@linux.intel.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	chao.gao@intel.com,
+	xiaoyao.li@intel.com,
+	tao1.su@linux.intel.com
+Subject: [PATCH v2] KVM: x86: Advertise AVX10.1 CPUID to userspace
+Date: Mon,  3 Jun 2024 14:40:02 +0800
+Message-Id: <20240603064002.266116-1-tao1.su@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date: Mon, 03 Jun 2024 15:42:22 +1000
-Message-Id: <D1Q54PY40E3B.22QS5DMQRA58N@gmail.com>
-Cc: <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
- <stable@vger.kernel.org>
-Subject: Re: [PATCH v1 RESEND] arch/powerpc/kvm: Fix doorbell emulation by
- adding DPDES support
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Gautam Menghani" <gautam@linux.ibm.com>, <mpe@ellerman.id.au>,
- <christophe.leroy@csgroup.eu>, <aneesh.kumar@kernel.org>,
- <naveen.n.rao@linux.ibm.com>, <corbet@lwn.net>
-X-Mailer: aerc 0.17.0
-References: <20240522084949.123148-1-gautam@linux.ibm.com>
-In-Reply-To: <20240522084949.123148-1-gautam@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed May 22, 2024 at 6:49 PM AEST, Gautam Menghani wrote:
-> Doorbell emulation is broken for KVM on PowerVM guests as support for
-> DPDES was not added in the initial patch series. Due to this, a KVM on
-> PowerVM guest cannot be booted with the XICS interrupt controller as
-> doorbells are to be setup in the initial probe path when using XICS
-> (pSeries_smp_probe()). Add DPDES support in the host KVM code to fix
-> doorbell emulation.
+Advertise AVX10.1 related CPUIDs, i.e. report AVX10 support bit via
+CPUID.(EAX=07H, ECX=01H):EDX[bit 19] and new CPUID leaf 0x24H so that
+guest OS and applications can query the AVX10.1 CPUIDs directly. Intel
+AVX10 represents the first major new vector ISA since the introduction of
+Intel AVX512, which will establish a common, converged vector instruction
+set across all Intel architectures[1].
 
-This is broken when the KVM guest has SMT > 1? Or is it broken for SMT=3D1
-as well? Can you explain a bit more of what breaks if it's the latter?
+AVX10.1 is an early version of AVX10, that enumerates the Intel AVX512
+instruction set at 128, 256, and 512 bits which is enabled on
+Granite Rapids. I.e., AVX10.1 is only a new CPUID enumeration with no
+VMX capability, Embedded rounding and Suppress All Exceptions (SAE),
+which will be introduced in AVX10.2.
 
-> Fixes: 6ccbbc33f06a ("KVM: PPC: Add helper library for Guest State Buffer=
-s")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
-> ---
-> v1 -> v1 resend:
-> 1. Add the stable tag
->
->  Documentation/arch/powerpc/kvm-nested.rst     |  4 +++-
->  arch/powerpc/include/asm/guest-state-buffer.h |  3 ++-
->  arch/powerpc/include/asm/kvm_book3s.h         |  1 +
->  arch/powerpc/kvm/book3s_hv.c                  | 14 +++++++++++++-
->  arch/powerpc/kvm/book3s_hv_nestedv2.c         |  7 +++++++
->  arch/powerpc/kvm/test-guest-state-buffer.c    |  2 +-
->  6 files changed, 27 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/arch/powerpc/kvm-nested.rst b/Documentation/ar=
-ch/powerpc/kvm-nested.rst
-> index 630602a8aa00..5defd13cc6c1 100644
-> --- a/Documentation/arch/powerpc/kvm-nested.rst
-> +++ b/Documentation/arch/powerpc/kvm-nested.rst
-> @@ -546,7 +546,9 @@ table information.
->  +--------+-------+----+--------+----------------------------------+
->  | 0x1052 | 0x08  | RW |   T    | CTRL                             |
->  +--------+-------+----+--------+----------------------------------+
-> -| 0x1053-|       |    |        | Reserved                         |
-> +| 0x1053 | 0x08  | RW |   T    | DPDES                            |
-> ++--------+-------+----+--------+----------------------------------+
-> +| 0x1054-|       |    |        | Reserved                         |
->  | 0x1FFF |       |    |        |                                  |
->  +--------+-------+----+--------+----------------------------------+
->  | 0x2000 | 0x04  | RW |   T    | CR                               |
-> diff --git a/arch/powerpc/include/asm/guest-state-buffer.h b/arch/powerpc=
-/include/asm/guest-state-buffer.h
-> index 808149f31576..d107abe1468f 100644
-> --- a/arch/powerpc/include/asm/guest-state-buffer.h
-> +++ b/arch/powerpc/include/asm/guest-state-buffer.h
-> @@ -81,6 +81,7 @@
->  #define KVMPPC_GSID_HASHKEYR			0x1050
->  #define KVMPPC_GSID_HASHPKEYR			0x1051
->  #define KVMPPC_GSID_CTRL			0x1052
-> +#define KVMPPC_GSID_DPDES			0x1053
-> =20
->  #define KVMPPC_GSID_CR				0x2000
->  #define KVMPPC_GSID_PIDR			0x2001
-> @@ -110,7 +111,7 @@
->  #define KVMPPC_GSE_META_COUNT (KVMPPC_GSE_META_END - KVMPPC_GSE_META_STA=
-RT + 1)
-> =20
->  #define KVMPPC_GSE_DW_REGS_START KVMPPC_GSID_GPR(0)
-> -#define KVMPPC_GSE_DW_REGS_END KVMPPC_GSID_CTRL
-> +#define KVMPPC_GSE_DW_REGS_END KVMPPC_GSID_DPDES
->  #define KVMPPC_GSE_DW_REGS_COUNT \
->  	(KVMPPC_GSE_DW_REGS_END - KVMPPC_GSE_DW_REGS_START + 1)
-> =20
-> diff --git a/arch/powerpc/include/asm/kvm_book3s.h b/arch/powerpc/include=
-/asm/kvm_book3s.h
-> index 3e1e2a698c9e..10618622d7ef 100644
-> --- a/arch/powerpc/include/asm/kvm_book3s.h
-> +++ b/arch/powerpc/include/asm/kvm_book3s.h
-> @@ -594,6 +594,7 @@ static inline u##size kvmppc_get_##reg(struct kvm_vcp=
-u *vcpu)		\
-> =20
-> =20
->  KVMPPC_BOOK3S_VCORE_ACCESSOR(vtb, 64, KVMPPC_GSID_VTB)
-> +KVMPPC_BOOK3S_VCORE_ACCESSOR(dpdes, 64, KVMPPC_GSID_DPDES)
->  KVMPPC_BOOK3S_VCORE_ACCESSOR_GET(arch_compat, 32, KVMPPC_GSID_LOGICAL_PV=
-R)
->  KVMPPC_BOOK3S_VCORE_ACCESSOR_GET(lpcr, 64, KVMPPC_GSID_LPCR)
->  KVMPPC_BOOK3S_VCORE_ACCESSOR_SET(tb_offset, 64, KVMPPC_GSID_TB_OFFSET)
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index 35cb014a0c51..cf285e5153ba 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4116,6 +4116,11 @@ static int kvmhv_vcpu_entry_nestedv2(struct kvm_vc=
-pu *vcpu, u64 time_limit,
->  	int trap;
->  	long rc;
-> =20
-> +	if (vcpu->arch.doorbell_request) {
-> +		vcpu->arch.doorbell_request =3D 0;
-> +		kvmppc_set_dpdes(vcpu, 1);
-> +	}
+Advertising AVX10.1 is safe because kernel doesn't enable AVX10.1 which is
+on KVM-only leaf now, just the CPUID checking is changed when using AVX512
+related instructions, e.g. if using one AVX512 instruction needs to check
+(AVX512 AND AVX512DQ), it can check ((AVX512 AND AVX512DQ) OR AVX10.1)
+after checking XCR0[7:5].
 
-This probably looks okay... hmm, is the v1 KVM emulating doorbells
-correctly for SMT L2 guests? I wonder if doorbell emulation isn't
-broken there too because the L1 code looks to be passing in vc->dpdes
-but all the POWER9 emulation code uses doorbell_request.
+The versions of AVX10 are expected to be inclusive, e.g. version N+1 is
+a superset of version N. Per the spec, the version can never be 0, just
+advertise AVX10.1 if it's supported in hardware.
 
-> +
->  	io =3D &vcpu->arch.nestedv2_io;
-> =20
->  	msr =3D mfmsr();
-> @@ -4278,9 +4283,16 @@ static int kvmhv_p9_guest_entry(struct kvm_vcpu *v=
-cpu, u64 time_limit,
->  	if (kvmhv_on_pseries()) {
->  		if (kvmhv_is_nestedv1())
->  			trap =3D kvmhv_vcpu_entry_p9_nested(vcpu, time_limit, lpcr, tb);
-> -		else
-> +		else {
->  			trap =3D kvmhv_vcpu_entry_nestedv2(vcpu, time_limit, lpcr, tb);
-> =20
-> +			/* Remember doorbell if it is pending  */
-> +			if (kvmppc_get_dpdes(vcpu)) {
-> +				vcpu->arch.doorbell_request =3D 1;
-> +				kvmppc_set_dpdes(vcpu, 0);
-> +			}
+As more and more AVX related CPUIDs are added (it would have resulted in
+around 40-50 CPUID flags when developing AVX10), the versioning approach
+is introduced. But incrementing version numbers are bad for virtualization.
+E.g. if AVX10.2 has a feature that shouldn't be enumerated to guests for
+whatever reason, then KVM can't enumerate any "later" features either,
+because the only way to hide the problematic AVX10.2 feature is to set the
+version to AVX10.1 or lower[2]. But most AVX features are just passed
+through and don’t have virtualization controls, so AVX10 should not be
+problematic in practice.
 
-This is adding an extra get state for every entry, not good. I don't
-think it's actually needed though. I don't think the L1 cares at this
-stage what the L2 DPDES state is. So you sholud be able to drop this
-hunk.
+[1] https://cdrdv2.intel.com/v1/dl/getContent/784267
+[2] https://lore.kernel.org/all/Zkz5Ak0PQlAN8DxK@google.com/
 
-> +		}
-> +
->  		/* H_CEDE has to be handled now, not later */
->  		if (trap =3D=3D BOOK3S_INTERRUPT_SYSCALL && !nested &&
->  		    kvmppc_get_gpr(vcpu, 3) =3D=3D H_CEDE) {
-> diff --git a/arch/powerpc/kvm/book3s_hv_nestedv2.c b/arch/powerpc/kvm/boo=
-k3s_hv_nestedv2.c
-> index 8e6f5355f08b..36863fff2a99 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nestedv2.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nestedv2.c
-> @@ -311,6 +311,10 @@ static int gs_msg_ops_vcpu_fill_info(struct kvmppc_g=
-s_buff *gsb,
->  			rc =3D kvmppc_gse_put_u64(gsb, iden,
->  						vcpu->arch.vcore->vtb);
->  			break;
-> +		case KVMPPC_GSID_DPDES:
-> +			rc =3D kvmppc_gse_put_u64(gsb, iden,
-> +						vcpu->arch.vcore->dpdes);
-> +			break;
->  		case KVMPPC_GSID_LPCR:
->  			rc =3D kvmppc_gse_put_u64(gsb, iden,
->  						vcpu->arch.vcore->lpcr);
-> @@ -543,6 +547,9 @@ static int gs_msg_ops_vcpu_refresh_info(struct kvmppc=
-_gs_msg *gsm,
->  		case KVMPPC_GSID_VTB:
->  			vcpu->arch.vcore->vtb =3D kvmppc_gse_get_u64(gse);
->  			break;
-> +		case KVMPPC_GSID_DPDES:
-> +			vcpu->arch.vcore->dpdes =3D kvmppc_gse_get_u64(gse);
-> +			break;
->  		case KVMPPC_GSID_LPCR:
->  			vcpu->arch.vcore->lpcr =3D kvmppc_gse_get_u64(gse);
->  			break;
+Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+---
+Changelog:
+v1 -> v2:
+ - Directly advertise version 1 because version can never be 0.
+ - Add and advertise feature bits for the supported vector sizes.
 
-I would split all the wiring up of the DPDES GSID stuff into its own
-patch, it obviously looks fine.
+v1: https://lore.kernel.org/all/20240520022002.1494056-1-tao1.su@linux.intel.com/
+---
+ arch/x86/include/asm/cpuid.h |  1 +
+ arch/x86/kvm/cpuid.c         | 21 +++++++++++++++++++--
+ arch/x86/kvm/reverse_cpuid.h |  8 ++++++++
+ 3 files changed, 28 insertions(+), 2 deletions(-)
 
-> diff --git a/arch/powerpc/kvm/test-guest-state-buffer.c b/arch/powerpc/kv=
-m/test-guest-state-buffer.c
-> index 4720b8dc8837..91ae660cfe21 100644
-> --- a/arch/powerpc/kvm/test-guest-state-buffer.c
-> +++ b/arch/powerpc/kvm/test-guest-state-buffer.c
-> @@ -151,7 +151,7 @@ static void test_gs_bitmap(struct kunit *test)
->  		i++;
->  	}
-> =20
-> -	for (u16 iden =3D KVMPPC_GSID_GPR(0); iden <=3D KVMPPC_GSID_CTRL; iden+=
-+) {
-> +	for (u16 iden =3D KVMPPC_GSID_GPR(0); iden <=3D KVMPPC_GSID_DPDES; iden=
-++) {
->  		kvmppc_gsbm_set(&gsbm, iden);
->  		kvmppc_gsbm_set(&gsbm1, iden);
->  		KUNIT_EXPECT_TRUE(test, kvmppc_gsbm_test(&gsbm, iden));
+diff --git a/arch/x86/include/asm/cpuid.h b/arch/x86/include/asm/cpuid.h
+index 6b122a31da06..aa21c105eef1 100644
+--- a/arch/x86/include/asm/cpuid.h
++++ b/arch/x86/include/asm/cpuid.h
+@@ -179,6 +179,7 @@ static __always_inline bool cpuid_function_is_indexed(u32 function)
+ 	case 0x1d:
+ 	case 0x1e:
+ 	case 0x1f:
++	case 0x24:
+ 	case 0x8000001d:
+ 		return true;
+ 	}
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index f2f2be5d1141..6717a5b7d9cd 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -693,7 +693,7 @@ void kvm_set_cpu_caps(void)
+ 
+ 	kvm_cpu_cap_init_kvm_defined(CPUID_7_1_EDX,
+ 		F(AVX_VNNI_INT8) | F(AVX_NE_CONVERT) | F(PREFETCHITI) |
+-		F(AMX_COMPLEX)
++		F(AMX_COMPLEX) | F(AVX10)
+ 	);
+ 
+ 	kvm_cpu_cap_init_kvm_defined(CPUID_7_2_EDX,
+@@ -709,6 +709,10 @@ void kvm_set_cpu_caps(void)
+ 		SF(SGX1) | SF(SGX2) | SF(SGX_EDECCSSA)
+ 	);
+ 
++	kvm_cpu_cap_init_kvm_defined(CPUID_24_0_EBX,
++		F(AVX10_128) | F(AVX10_256) | F(AVX10_512)
++	);
++
+ 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
+ 		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
+ 		F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
+@@ -937,7 +941,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 	switch (function) {
+ 	case 0:
+ 		/* Limited to the highest leaf implemented in KVM. */
+-		entry->eax = min(entry->eax, 0x1fU);
++		entry->eax = min(entry->eax, 0x24U);
+ 		break;
+ 	case 1:
+ 		cpuid_entry_override(entry, CPUID_1_EDX);
+@@ -1162,6 +1166,19 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 			break;
+ 		}
+ 		break;
++	case 0x24: {
++		if (!kvm_cpu_cap_has(X86_FEATURE_AVX10)) {
++			entry->eax = entry->ebx = entry->ecx = entry->edx = 0;
++			break;
++		}
++		entry->eax = 0;
++		cpuid_entry_override(entry, CPUID_24_0_EBX);
++		/* EBX[7:0] hold the AVX10 version; KVM supports version '1'. */
++		entry->ebx |= 1;
++		entry->ecx = 0;
++		entry->edx = 0;
++		break;
++	}
+ 	case KVM_CPUID_SIGNATURE: {
+ 		const u32 *sigptr = (const u32 *)KVM_SIGNATURE;
+ 		entry->eax = KVM_CPUID_FEATURES;
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index 2f4e155080ba..0d17d6b70639 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -17,6 +17,7 @@ enum kvm_only_cpuid_leafs {
+ 	CPUID_8000_0007_EDX,
+ 	CPUID_8000_0022_EAX,
+ 	CPUID_7_2_EDX,
++	CPUID_24_0_EBX,
+ 	NR_KVM_CPU_CAPS,
+ 
+ 	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+@@ -46,6 +47,7 @@ enum kvm_only_cpuid_leafs {
+ #define X86_FEATURE_AVX_NE_CONVERT      KVM_X86_FEATURE(CPUID_7_1_EDX, 5)
+ #define X86_FEATURE_AMX_COMPLEX         KVM_X86_FEATURE(CPUID_7_1_EDX, 8)
+ #define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
++#define X86_FEATURE_AVX10               KVM_X86_FEATURE(CPUID_7_1_EDX, 19)
+ 
+ /* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX) */
+ #define X86_FEATURE_INTEL_PSFD		KVM_X86_FEATURE(CPUID_7_2_EDX, 0)
+@@ -55,6 +57,11 @@ enum kvm_only_cpuid_leafs {
+ #define KVM_X86_FEATURE_BHI_CTRL	KVM_X86_FEATURE(CPUID_7_2_EDX, 4)
+ #define X86_FEATURE_MCDT_NO		KVM_X86_FEATURE(CPUID_7_2_EDX, 5)
+ 
++/* Intel-defined sub-features, CPUID level 0x00000024:0 (EBX) */
++#define X86_FEATURE_AVX10_128		KVM_X86_FEATURE(CPUID_24_0_EBX, 16)
++#define X86_FEATURE_AVX10_256		KVM_X86_FEATURE(CPUID_24_0_EBX, 17)
++#define X86_FEATURE_AVX10_512		KVM_X86_FEATURE(CPUID_24_0_EBX, 18)
++
+ /* CPUID level 0x80000007 (EDX). */
+ #define KVM_X86_FEATURE_CONSTANT_TSC	KVM_X86_FEATURE(CPUID_8000_0007_EDX, 8)
+ 
+@@ -90,6 +97,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+ 	[CPUID_8000_0021_EAX] = {0x80000021, 0, CPUID_EAX},
+ 	[CPUID_8000_0022_EAX] = {0x80000022, 0, CPUID_EAX},
+ 	[CPUID_7_2_EDX]       = {         7, 2, CPUID_EDX},
++	[CPUID_24_0_EBX]      = {      0x24, 0, CPUID_EBX},
+ };
+ 
+ /*
 
-It would be good to have a  _LAST define for such loops. It's very easy
-to miss when adding KVMPPC_GSID_DPDES that you need to grep for
-KVMPPC_GSID_CTRL. Very easy to see that you need to update _LAST.
+base-commit: c3f38fa61af77b49866b006939479069cd451173
+-- 
+2.34.1
 
-You just need to work out a good name for it since there's a few
-"namespaces" of numbers with similar prefix. Good luck :)
-
-Thanks,
-Nick
 
