@@ -1,213 +1,162 @@
-Return-Path: <kvm+bounces-18696-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18697-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 805CE8FA64E
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 01:17:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02BFB8FA65D
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 01:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA53CB2393B
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 23:17:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B56CC286399
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 23:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B80584038;
-	Mon,  3 Jun 2024 23:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF6E84A24;
+	Mon,  3 Jun 2024 23:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TsCD3X39"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GAqKdLum"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3B481AC7
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 23:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC4F1E49B;
+	Mon,  3 Jun 2024 23:22:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717456640; cv=none; b=XfR7M1qksv/sHpTWml+Q5NvfB9ysRjJqFAFR2IbhTTDqWhGhGiCmTMWEvaksECAM9yksWTqUQ6v0W50ujxPsSjp8YNrz1kf3d7KotbM5im4kN2993F1UFFryN4JgMfAuRH6XjUZhHPECJZiAOYBAx0ehSJIHuRkNwKiL98FwmAg=
+	t=1717456930; cv=none; b=nqj7MYH8N3we7ftJgF4KP7GlpWJxMwGIWebv7gyOO3nfrvQF5sZk0fPcgOTewF6ZmPsGOb6K8dzlVripfNY0nWFsMyC4dcy1zzfWfbFEF8Z0w8ViPQKkpQQfEef00xBjOYwL7NNe1Z/UmC43japykATzSw4VjybSfs13Eca8lKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717456640; c=relaxed/simple;
-	bh=4jxu/JsmVRXCfHV8AURZSjnWZ5s+7pAtAjdq2rTVOys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m2/PX2ycyP29hXbZS/EAlosc8kenQk2rBX7qDgIG/OwEWRGkK2cLFnZ/GUCx48Yg+GkD4paALQvnTNmbFr/wH4ZYuSYaY3h3/+OCZrUmeUT6hhOuboT33LdrMCQXDwSlwwB/2/nHAn0ehQNm5o5q8sRMEcFk52BfyRmjNuHRups=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TsCD3X39; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-43dfe020675so127141cf.0
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 16:17:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717456638; x=1718061438; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KDykUGLfvL3M1lWs+oKStYngTbEIAr5rRwVrwRKKurY=;
-        b=TsCD3X39LP8tV3l7f2iR3mcypPK7mKBvNY7Yb1kno6zjCY+ahkEdZH+Tb3ZXeX8y9V
-         QlTZqhb9FU2anXOZ4UKsKSq+hKW4yHQdoH3g3w4jpGi9YAGUKUlPlc8SJKzTk6kFFJ0i
-         ofCiVWu5IVdLJDFyaYt9T1PGYzMxtTvOR7XzK4z5oIbM6V/SOm9hCqP+1GyLvrVnFTai
-         M4pz06qrW9UEFY52eV61AHq9jmY4xIlYsH31lXecxPK+wpc4oMmR6cBaT2MorErS6uDB
-         Co6PuvnRmwSKmuc/CKVTVXPKBlC61gzo6R++VZ4l99yA7xmQoLnUQI+rvzuJMJOfnXG+
-         8G1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717456638; x=1718061438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KDykUGLfvL3M1lWs+oKStYngTbEIAr5rRwVrwRKKurY=;
-        b=eEcE80z1KuvNa0dWhV+0ymcE7tS63mgu2ZvpJsYe/jL7fAgwdDpSW87Ck/b3j9NkKU
-         FurtzUF9utu8360w/BgBHyBLro9E0Unvqq/xNcrJXwlEgXn1VXzN1Qmn7lx4TIjvNaki
-         cB82HatdOjJUY9K22l2sTw4MXPV5kqb4BFC84CvJenrTpE5wf63cvwpgqg/LWs6styM+
-         NBkNetDuyMMoShwbD7SkVGgRhbrsnq6O9GesHew8skIvokBDIOTFHNiasvgdSJ6Op+0Y
-         r2w+X0EE+pjgoLJod9f+WAg9ZkQs9pktBpzIw0FtsaTm2lk2dbojWBB80Psbosj7qbbn
-         gIdg==
-X-Forwarded-Encrypted: i=1; AJvYcCWo710xpnQhC+/LUr7edaFLzQYU+AflqfrrhNcQUZiAo8d44tm3lXVjAFj6AtAR5XWJe+NdVUIyqReCWdpUHxyWgtk/
-X-Gm-Message-State: AOJu0Yw2hzb/RIbpfODbCU1uZ+F+Yvpx5i/EIEtAgMEB7KXgq0j14K8n
-	jzrVvat5EtRvJ2IlpcTlUJtyS6eSy4DynKO2uKAFk3c7i9ovTApfFolrFeYCc6HRCTIEgDWC0g6
-	2kdEI56pvHgCfCTpx5DVhH+Tf5YTGNwjQ6YGR
-X-Google-Smtp-Source: AGHT+IERlDy+7BDKGdKU12nHNHCd2TlJ06DKBFhjKpTdcIQ5T8pyrt6cuvlCSmsOxFEEGgqtt5PP7LKTO7CDtdLxk+8=
-X-Received: by 2002:a05:622a:4ccc:b0:43a:aa3f:917a with SMTP id
- d75a77b69052e-4401e68c145mr1144381cf.27.1717456637692; Mon, 03 Jun 2024
- 16:17:17 -0700 (PDT)
+	s=arc-20240116; t=1717456930; c=relaxed/simple;
+	bh=3BvPeKQe5a05MFgsaDP+dEEwoRS2G62azHt+NDky8Sw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bUu+ndpuffAuafQliw1fIC7st6p83WOIxPoJvAlKDbxENOQempUkovCERVWQ+HBYUTILo5eAAxHBeuD7Ml/++2z7P8hxbwGRS6NqHk4zQ3paxDCaDEyUMulnPqFDqCPcbmHgjo/Y0WzwENCPueOxJIrFXsLQoCb5izSQLuAxI4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=GAqKdLum; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 453JI9Ph020432;
+	Mon, 3 Jun 2024 23:21:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	kLdqMdDOIQnOzb4FG912hEb7C0NlaDeafqYv15akPZE=; b=GAqKdLumxtkfX/d4
+	h4lqDf8at3ejw5MM5z0XWPPTbVHeLBtWQszOgStCY+al5hnBURUHIIWxY7rw80gI
+	FTvXbzEAgC11zbs6JvU5TpE7HdcsQhSQOGgjsSXizg4fbUSbto2iTwenIX5l7dsz
+	Wlx69N6lIGq0yYFr2RrZljZvCP8JRTov0jScgvJ5/h36jijTqMWpx62K58o0a7m0
+	Xu0pJ2yo+0bX+QKraY4PCuQslYKE4nvALJkPDNIXsES0pgIEC9NH1gqi5YgOFQ3T
+	k2ugFTfs/In9sXG0NXxJnbjg+nCq+VvFejVOMAFjsiAksB6/WymYCwg8K65IMIQ4
+	yyOTWg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yfw5kne7q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jun 2024 23:21:31 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 453NLUl9026335
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 3 Jun 2024 23:21:30 GMT
+Received: from [10.48.241.139] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 3 Jun 2024
+ 16:21:28 -0700
+Message-ID: <022bf315-9ec2-4cc9-b007-922d7b95d5dd@quicinc.com>
+Date: Mon, 3 Jun 2024 16:21:28 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240529180510.2295118-1-jthoughton@google.com>
- <20240529180510.2295118-3-jthoughton@google.com> <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
- <ZlelW93_T6P-ZuSZ@google.com> <CAOUHufZdEpY6ra73SMHA33DegKxKaUM=Os7A7aDBFND6NkbUmQ@mail.gmail.com>
- <Zley-u_dOlZ-S-a6@google.com> <CADrL8HXHWg_MkApYQTngzmN21NEGNWC6KzJDw_Lm63JHJkR=5A@mail.gmail.com>
- <CAOUHufZq6DwpStzHtjG+TOiHaQ6FFbkTfHMCe8Yy0n_M9MKdqw@mail.gmail.com>
- <CADrL8HW44Hx_Ejx_6+FVKt1V17PdgT6rw+sNtKzumqc9UCVDfA@mail.gmail.com> <Zl5LqcusZ88QOGQY@google.com>
-In-Reply-To: <Zl5LqcusZ88QOGQY@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Mon, 3 Jun 2024 16:16:41 -0700
-Message-ID: <CADrL8HU734C_OQhzszWJWMXEXLN6HkBo4yweN2fX4BbOegXrFA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/7] mm: multi-gen LRU: Have secondary MMUs participate
- in aging
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86: add missing MODULE_DESCRIPTION() macros
+Content-Language: en-US
 To: Sean Christopherson <seanjc@google.com>
-Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Ankit Agrawal <ankita@nvidia.com>, Anup Patel <anup@brainfault.org>, 
-	Atish Patra <atishp@atishpatra.org>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Bibo Mao <maobibo@loongson.cn>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	Huacai Chen <chenhuacai@kernel.org>, James Morse <james.morse@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-mm@kvack.org, 
-	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
-	loongarch@lists.linux.dev
+CC: Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>,
+        "H. Peter Anvin"
+	<hpa@zytor.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20240528-md-kvm-v1-1-c1b86f0f5112@quicinc.com>
+ <Zl5NM5S4Trrqog_t@google.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <Zl5NM5S4Trrqog_t@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: g4_lv3xrzoGy6bSJykiagsBV1Ptow3CT
+X-Proofpoint-ORIG-GUID: g4_lv3xrzoGy6bSJykiagsBV1Ptow3CT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-06-03_17,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 suspectscore=0 malwarescore=0 clxscore=1015 phishscore=0
+ mlxscore=0 priorityscore=1501 adultscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=818 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406030189
 
-On Mon, Jun 3, 2024 at 4:03=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> On Mon, Jun 03, 2024, James Houghton wrote:
-> > On Thu, May 30, 2024 at 11:06=E2=80=AFPM Yu Zhao <yuzhao@google.com> wr=
-ote:
-> > > What I don't think is acceptable is simplifying those optimizations
-> > > out without documenting your justifications (I would even call it a
-> > > design change, rather than simplification, from v3 to v4).
-> >
-> > I'll put back something similar to what you had before (like a
-> > test_clear_young() with a "fast" parameter instead of "bitmap"). I
-> > like the idea of having a new mmu notifier, like
-> > fast_test_clear_young(), while leaving test_young() and clear_young()
-> > unchanged (where "fast" means "prioritize speed over accuracy").
->
-> Those two statements are contradicting each other, aren't they?
+On 6/3/2024 4:09 PM, Sean Christopherson wrote:
+> On Tue, May 28, 2024, Jeff Johnson wrote:
+>> Fix the following allmodconfig 'make W=1' warnings when building for x86:
+>> WARNING: modpost: missing MODULE_DESCRIPTION() in arch/x86/kvm/kvm.o
+>> WARNING: modpost: missing MODULE_DESCRIPTION() in arch/x86/kvm/kvm-intel.o
+>> WARNING: modpost: missing MODULE_DESCRIPTION() in arch/x86/kvm/kvm-amd.o
+>>
+>> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+>> ---
+>>  arch/x86/kvm/svm/svm.c | 1 +
+>>  arch/x86/kvm/vmx/vmx.c | 1 +
+>>  virt/kvm/kvm_main.c    | 1 +
+>>  3 files changed, 3 insertions(+)
+>>
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index c8dc25886c16..bdd39931720c 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -53,6 +53,7 @@
+>>  #include "svm_onhyperv.h"
+>>  
+>>  MODULE_AUTHOR("Qumranet");
+>> +MODULE_DESCRIPTION("KVM SVM (AMD-V) extensions");
+> 
+> How about "KVM support for SVM (AMD-V) extensions"?
+> 
+>>  MODULE_LICENSE("GPL");
+>>  
+>>  #ifdef MODULE
+>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>> index 6051fad5945f..956e6062f311 100644
+>> --- a/arch/x86/kvm/vmx/vmx.c
+>> +++ b/arch/x86/kvm/vmx/vmx.c
+>> @@ -74,6 +74,7 @@
+>>  #include "posted_intr.h"
+>>  
+>>  MODULE_AUTHOR("Qumranet");
+>> +MODULE_DESCRIPTION("KVM VMX (Intel VT-x) extensions");
+> 
+> And then a similar thing here.
+> 
+>>  MODULE_LICENSE("GPL");
+>>  
+>>  #ifdef MODULE
+>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>> index 14841acb8b95..b03d06ca29c4 100644
+>> --- a/virt/kvm/kvm_main.c
+>> +++ b/virt/kvm/kvm_main.c
+>> @@ -74,6 +74,7 @@
+>>  #define ITOA_MAX_LEN 12
+>>  
+>>  MODULE_AUTHOR("Qumranet");
+>> +MODULE_DESCRIPTION("Kernel-based Virtual Machine driver for Linux");
+> 
+> Maybe "Kernel-based Virtual Machine (KVM) Hypervisor"?  I personally never think
+> of KVM as a "driver", though I know it's been called that in the past.  And having
+> "Hypervisor" in the name might help unfamiliar users.
 
-I guess it depends on how you define "similar". :)
+Thanks for the suggestions since my first past was just gleaned from existing
+code headers and Kconfig help text. Will spin a v2 after waiting for any
+further comments.
 
-> Anyways, I vote
-> for a "fast only" variant, e.g. test_clear_young_fast_only() or so.  gup(=
-) has
-> already established that terminology in mm/, so hopefully it would be fam=
-iliar
-> to readers.  We could pass a param, but then the MGLRU code would likely =
-end up
-> doing a bunch of useless indirect calls into secondary MMUs, whereas a de=
-dicated
-> hook allows implementations to nullify the pointer if the API isn't suppo=
-rted
-> for whatever reason.
->
-> And pulling in Oliver's comments about locking, I think it's important th=
-at the
-> mmu_notifier API express it's requirement that the operation be "fast", n=
-ot that
-> it be lockless.  E.g. if a secondary MMU can guarantee that a lock will b=
-e
-> contented only in rare, slow cases, then taking a lock is a-ok.  Or a sec=
-ondary
-> MMU could do try-lock and bail if the lock is contended.
->
-> That way KVM can honor the intent of the API with an implementation that =
-works
-> best for KVM _and_ for MGRLU.  I'm sure there will be future adjustments =
-and fixes,
-> but that's just more motivation for using something like "fast only" inst=
-ead of
-> "lockless".
-
-Yes, thanks, this is exactly what I meant. I really should have "only"
-in the name to signify that it is a requirement that it be fast.
-Thanks for wording it so clearly.
-
->
-> > > > I made this logic change as part of removing batching.
-> > > >
-> > > > I'd really appreciate guidance on what the correct thing to do is.
-> > > >
-> > > > In my mind, what would work great is: by default, do aging exactly
-> > > > when KVM can do it locklessly, and then have a Kconfig to always ha=
-ve
-> > > > MGLRU to do aging with KVM if a user really cares about proactive
-> > > > reclaim (when the feature bit is set). The selftest can check the
-> > > > Kconfig + feature bit to know for sure if aging will be done.
-> > >
-> > > I still don't see how that Kconfig helps. Or why the new static branc=
-h
-> > > isn't enough?
-> >
-> > Without a special Kconfig, the feature bit just tells us that aging
-> > with KVM is possible, not that it will necessarily be done. For the
-> > self-test, it'd be good to know exactly when aging is being done or
-> > not, so having a Kconfig like LRU_GEN_ALWAYS_WALK_SECONDARY_MMU would
-> > help make the self-test set the right expectations for aging.
-> >
-> > The Kconfig would also allow a user to know that, no matter what,
-> > we're going to get correct age data for VMs, even if, say, we're using
-> > the shadow MMU.
->
-> Heh, unless KVM flushes, you won't get "correct" age data.
->
-> > This is somewhat important for me/Google Cloud. Is that reasonable? May=
-be
-> > there's a better solution.
->
-> Hmm, no?  There's no reason to use a Kconfig, e.g. if we _really_ want to=
- prioritize
-> accuracy over speed, then a KVM (x86?) module param to have KVM walk nest=
-ed TDP
-> page tables would give us what we want.
->
-> But before we do that, I think we need to perform due dilegence (or provi=
-de data)
-> showing that having KVM take mmu_lock for write in the "fast only" API pr=
-ovides
-> better total behavior.  I.e. that the additional accuracy is indeed worth=
- the cost.
-
-That sounds good to me. I'll drop the Kconfig. I'm not really sure
-what to do about the self-test, but that's not really all that
-important.
+/jeff
 
