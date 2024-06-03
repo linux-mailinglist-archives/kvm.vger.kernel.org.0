@@ -1,241 +1,165 @@
-Return-Path: <kvm+bounces-18634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B7B78D816C
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:40:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2692F8D8198
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A481F1F245AB
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 11:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49AAF1C21519
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 11:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9370184DE8;
-	Mon,  3 Jun 2024 11:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0933E86146;
+	Mon,  3 Jun 2024 11:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="VaId9LVd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XBCrS6+d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466BB84A51
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 11:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0198594E
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 11:51:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717414824; cv=none; b=lGBaSLHplSzTVFs4Jv1SOWsmTnc7J2qC29oQAWk1UPpEPUG8XrG5AWBjo8mKkj5pKWkUG95k2roBwB6lLEXpoWwvBcXyAnowxmu1KXVx/nv6KTXjXfgyic050JDI0GnP1mLqLL4wh6uyWn+PaWNo6Xvrr+RoQQZK8ZZzHeVIYKE=
+	t=1717415490; cv=none; b=s40jcTO6OrtmTv841rfo83faoAXOF0FBxSdmjpqjmdZewaN7CDUDQMZwSCNgsVSl+2TCd6dPrsKoqo3mPX9i+AGjyPjg3/VEFDRWyBMpUBQz1mtpEV8amzoEfj9aIlcHzVrp1+MdzQHNI9hg9D+vvlrXUJobIDfrzeg12x7Ghak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717414824; c=relaxed/simple;
-	bh=RRaEqV7B8iSS7qa/pDOAH3MqYofRF4D4b2oFQnNTQJ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DIp416/vIhSQSLxkCPjvo1RH/h4jcAAtfyTVh4jAqmKDj/dFTTRHFzdaGXw5dpP0k9e5EOWZd46KxvRbO+N2DG8my8qQChg3AMQ9EYQdA+XENaM/kNWm6B1V/fhxqOCTpcO+iOUd3ALYcaPcWEZGO4Met0aOyJGLa49B2Vk6Rpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=VaId9LVd; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7eae92e7b5aso191580739f.1
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 04:40:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1717414822; x=1718019622; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jznY1UA7/SXmEB87TeYXPvswNX7BAys1PkdQILLo1MY=;
-        b=VaId9LVdcP8LsNBrkeurRiOKNXEeqoKTLyB33jLyIdn7O6HtYPBK04OiLmDKAy8Lvl
-         6XK1tuQtJ5WlNjFpJJ1Xv7+PWr+J1vN5IWD6wp3oOhvx0+jQKCyLkelGK/r9yA09NkRG
-         NqOdZ0QaB+F3JaJmlsxspw/4SDd5kmNb/TMCk344ElII/IND2ynqo8KyTfSZDrhv719B
-         OuSiUqmbgCYkNtH0JHvMMupYxEoO2IesBrecObvfRp2OmtiXPQDcIw8K/asHrpcafQ8h
-         5a0jtAWJ1xt8XIemoN+ldxTsCVBeIK7Cy9touYQwr717IUjBq0E0jBdXMg4VDJxNwQHC
-         usVg==
+	s=arc-20240116; t=1717415490; c=relaxed/simple;
+	bh=XRYal3GTCirFOUCbbloZD4Dz8bpTJ45+mdxjcDXQPeU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SAOtV+TtGsXwtJWSGRZ7Ud2OrWGDtWMVBv9phpCLwGRkZCNZdzVTAT7wNw5vvM4TEjeI34MivClk6SJmlW9/azCgFNW4VyRRiYcrQv6WH+hEQIvCrILMy4vd6fZ3eUoDRTmOlWe8LW/js5iaog8WwNXQJufAFbD2Udd/9puJrsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XBCrS6+d; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717415487;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=vIMhCI/l2CqzYTRvd3bD3lxf2NZCjkM04umQtpaDJMo=;
+	b=XBCrS6+diftDISTSfg3mblJE2H3GOG7oGQF8lVEgElP646NgBh8RTR1gIl68cTF39MwQ2t
+	WHDPsbzkvre+RM6WUxeuVtpg4Te6Ps7TZt1yFirYxmmatgi/0+gj4XYMIUrpSgXtt2Or2B
+	qwrT9eSUaYMEFRAFwingOXKuqJSWM5A=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-581--MzHdH3HMMGbj3xH7Az10w-1; Mon, 03 Jun 2024 07:51:23 -0400
+X-MC-Unique: -MzHdH3HMMGbj3xH7Az10w-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4212e2a3a1bso20059365e9.3
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 04:51:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717414822; x=1718019622;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jznY1UA7/SXmEB87TeYXPvswNX7BAys1PkdQILLo1MY=;
-        b=LP72YZXDsOQwsss29A6p1HbHwTgOE5A5ZgXgDaRua+BbbUJWeRerQH+yaMTJdYDpQW
-         VEHerhDr3mTJbuenFdNd3BYWQOs5COzNztHIIwz/saCcq0qdjbruQrYhJch/ZT8VkNmE
-         lib4Wl2IAWO9XAUnlEBD+KsLCLlwzgDcd97jghtHWIFhiAPCFpKoUKlyS8XLkMTyZSZ6
-         k0VNOxHHsi3gOWyVQuy9MFf9MzFnMrolfRWPUg0gacXSBlUw5aNiEyH81gtdVOEYhNM5
-         2JILpNOugVTxgbLGHxkm33IC8k9rpTc6KDiVb8TO1YrC673OkwHW+nGqVO9CAPjHWf+h
-         VCaA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0xIkA7AnhjzJe6UpDvNwz9mzVQau5RTiQGwgxuSbUnX3H0couTobc8Zj+TiCQV3CuzIlRrxmischTF4Za2GKjsu94
-X-Gm-Message-State: AOJu0YxFS/szzkQGqsE2QiwVX/ZHOmfN8q9k1DGVjMzRafgN79mSQWsx
-	QgPvMhIbeAg/f9cfH46BVYzK5J+LVIz6ZyNqgbe4i6yrNke2YwUvhvwCJ88tO/h42YrFM8WStbn
-	Db/y6CVpSSLIdw6z7GEqSFxY7XFf71xtIpJTuvg==
-X-Google-Smtp-Source: AGHT+IGJ9Mvf8z85SE/NFg8HuQmyPGDBsDk+Yroy5ITFqpG+kRyKvmd5ME6X9GIu0azVzqIEgdBbQinMEvImFyXLYtw=
-X-Received: by 2002:a05:6e02:216a:b0:374:9995:b369 with SMTP id
- e9e14a558f8ab-3749995b506mr46562275ab.4.1717414822141; Mon, 03 Jun 2024
- 04:40:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717415483; x=1718020283;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vIMhCI/l2CqzYTRvd3bD3lxf2NZCjkM04umQtpaDJMo=;
+        b=LLONkKH+L7VjbMiT35JMnjc09fCShtz9OjHegfsJDo2GSE/5DVzn1MqSdKInkh4s3x
+         Nc1ObWy6YES+ifIYN0oaWgK9wREueE3x9KQYxWmjppY+BrmSU8pNf9n4iRw/ACIeOgJX
+         VAoKXWkHWC/d961xCdhGFpeJDNM8ARJKOw8jyOu6W/uC7JPKqlXtikuUW+4SiVsjbtrw
+         nH/ZrDBk0VhLs52onsS2fcFWfDRcJpbzAffe1wzV1sXMG3wYjxxJlXiIblW2YwFaaK81
+         RDs7DuORShv+7LcZTif1/UGEYRKNaOmIPlSHzelv7v8EltA+mo2PdOAb/m91nj7d6ihX
+         63Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ+7eah9retbJpb6H6552Zbgcs6GMC5qf9PESYojw8vrXgN1vcVy9upVkDnQhig0R+3uYuj9KVcr3Ws/Cm9yEW03B+
+X-Gm-Message-State: AOJu0YzyfOEh1ht+0/XrZE8yu+nMcazsBJcFl9O+JP2KgWTTOoTsEFPD
+	q4x6HMl2P1TdYrpwxjHlbw8U72KmqVpGQGBwBInQ5J6gbETmGbT9dSyreWxwZ21Zs3Op1/d68/K
+	E0HecVN5zyEV5qkV/Jt4yhEE4/kV+y4QzXevK3k8gPlkTrhAxgQ==
+X-Received: by 2002:a05:600c:1383:b0:418:ed23:a9f0 with SMTP id 5b1f17b1804b1-4212e0764d9mr79443525e9.18.1717415482759;
+        Mon, 03 Jun 2024 04:51:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjOTKEBtduQRwHaxc2H2U2E0Ga88ec/0WKy2eHj7g9ArTnnrBPoKPXBaGQLDexxlvyF+cwfA==
+X-Received: by 2002:a05:600c:1383:b0:418:ed23:a9f0 with SMTP id 5b1f17b1804b1-4212e0764d9mr79443375e9.18.1717415482370;
+        Mon, 03 Jun 2024 04:51:22 -0700 (PDT)
+Received: from [192.168.0.4] (ip-109-43-176-229.web.vodafone.de. [109.43.176.229])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4212eb6ddf6sm106960815e9.45.2024.06.03.04.51.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jun 2024 04:51:22 -0700 (PDT)
+Message-ID: <3214310a-1202-4fb6-a51d-bf6f7e73a84e@redhat.com>
+Date: Mon, 3 Jun 2024 13:51:20 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524103307.2684-1-yongxuan.wang@sifive.com>
- <20240524103307.2684-2-yongxuan.wang@sifive.com> <20240527-41b376a2bfedb3b9cf7e9c7b@orel>
- <ec110587-d557-439b-ae50-f3472535ef3a@ghiti.fr> <20240530-3e5538b8e4dea932e2d3edc4@orel>
- <3b76c46f-c502-4245-ae58-be3bd3f8a41f@ghiti.fr> <20240530-de1fde9735e6648dc34654f3@orel>
- <f2016305-e24b-41ea-8c48-cfdeb8ee6b48@ghiti.fr>
-In-Reply-To: <f2016305-e24b-41ea-8c48-cfdeb8ee6b48@ghiti.fr>
-From: Anup Patel <anup@brainfault.org>
-Date: Mon, 3 Jun 2024 17:10:10 +0530
-Message-ID: <CAAhSdy2dJaNWYH88RhjiUktX5n4-ZfFuXsjyYeJ-+Y8qOf7zRA@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 1/5] RISC-V: Detect and Enable Svadu Extension Support
-To: Alexandre Ghiti <alex@ghiti.fr>
-Cc: Andrew Jones <ajones@ventanamicro.com>, Yong-Xuan Wang <yongxuan.wang@sifive.com>, 
-	linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, greentime.hu@sifive.com, vincent.chen@sifive.com, 
-	cleger@rivosinc.com, Jinyu Tang <tjytimi@163.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor.dooley@microchip.com>, 
-	Mayuresh Chitale <mchitale@ventanamicro.com>, Samuel Holland <samuel.holland@sifive.com>, 
-	Samuel Ortiz <sameo@rivosinc.com>, Evan Green <evan@rivosinc.com>, 
-	Xiao Wang <xiao.w.wang@intel.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Kemeng Shi <shikemeng@huaweicloud.com>, 
-	"Mike Rapoport (IBM)" <rppt@kernel.org>, Jisheng Zhang <jszhang@kernel.org>, 
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Charlie Jenkins <charlie@rivosinc.com>, 
-	Leonardo Bras <leobras@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: xave kvm-unit-test sometimes failing in CI
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, KVM <kvm@vger.kernel.org>
+References: <11311ff6-9214-4ead-91f9-c114b6aaf5c6@redhat.com>
+ <CABgObfY4SCxXCyb8JJtyJ+0j2QLCutB0SU8vKKifEHakEu88pw@mail.gmail.com>
+ <CABgObfaSCXyqvfAgqn5kpR6nChqpuUiMmBj9kG4rgcm83yhXJg@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
+ yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
+ 4CflIyFqjCpfDM4MuTmzTjXq4Uov1giGE9X6viNo1pxyEpd7PanlKNnf4PqEQp06X4IgUacW
+ tSGj6Gcns1bCuHV8OPWLkf4hkRnu8hdL6i60Yxz4E6TqlrpxsfYwLXgEeswPHOA6Mn4Cso9O
+ 0lewVYfFfsmokfAVMKWzOl1Sr0KGI5T9CpmRfAiSHpthhHWnECcJFwl72NTi6kUcUzG4se81
+ O6n9d/kTj7pzTmBdfwuOZ0YUSqcqs0W+l1NcASSYZQaDoD3/SLk+nqVeCBB4OnYOGhgmIHNW
+ 0CwMRO/GK+20alxzk//V9GmIM2ACElbfF8+Uug3pqiHkVnKqM7W9/S1NH2qmxB6zMiJUHlTH
+ gnVeZX0dgH27mzstcF786uPcdEqS0KJuxh2kk5IvUSL3Qn3ZgmgdxBMyCPciD/1cb7/Ahazr
+ 3ThHQXSHXkH/aDXdfLsKVuwDzHLVSkdSnZdt5HHh75/NFHxwaTlydgfHmFFwodK8y/TjyiGZ
+ zg2Kje38xnz8zKn9iesFBCcONXS7txENTzX0z80WKBhK+XSFJwARAQABzR5UaG9tYXMgSHV0
+ aCA8dGh1dGhAcmVkaGF0LmNvbT7CwXgEEwECACIFAlVgX6oCGwMGCwkIBwMCBhUIAgkKCwQW
+ AgMBAh4BAheAAAoJEC7Z13T+cC21EbIP/ii9cvT2HHGbFRl8HqGT6+7Wkb+XLMqJBMAIGiQK
+ QIP3xk1HPTsLfVG0ao4hy/oYkGNOP8+ubLnZen6Yq3zAFiMhQ44lvgigDYJo3Ve59gfe99KX
+ EbtB+X95ODARkq0McR6OAsPNJ7gpEUzfkQUUJTXRDQXfG/FX303Gvk+YU0spm2tsIKPl6AmV
+ 1CegDljzjycyfJbk418MQmMu2T82kjrkEofUO2a24ed3VGC0/Uz//XCR2ZTo+vBoBUQl41BD
+ eFFtoCSrzo3yPFS+w5fkH9NT8ChdpSlbNS32NhYQhJtr9zjWyFRf0Zk+T/1P7ECn6gTEkp5k
+ ofFIA4MFBc/fXbaDRtBmPB0N9pqTFApIUI4vuFPPO0JDrII9dLwZ6lO9EKiwuVlvr1wwzsgq
+ zJTPBU3qHaUO4d/8G+gD7AL/6T4zi8Jo/GmjBsnYaTzbm94lf0CjXjsOX3seMhaE6WAZOQQG
+ tZHAO1kAPWpaxne+wtgMKthyPLNwelLf+xzGvrIKvLX6QuLoWMnWldu22z2ICVnLQChlR9d6
+ WW8QFEpo/FK7omuS8KvvopFcOOdlbFMM8Y/8vBgVMSsK6fsYUhruny/PahprPbYGiNIhKqz7
+ UvgyZVl4pBFjTaz/SbimTk210vIlkDyy1WuS8Zsn0htv4+jQPgo9rqFE4mipJjy/iboDzsFN
+ BFH7eUwBEAC2nzfUeeI8dv0C4qrfCPze6NkryUflEut9WwHhfXCLjtvCjnoGqFelH/PE9NF4
+ 4VPSCdvD1SSmFVzu6T9qWdcwMSaC+e7G/z0/AhBfqTeosAF5XvKQlAb9ZPkdDr7YN0a1XDfa
+ +NgA+JZB4ROyBZFFAwNHT+HCnyzy0v9Sh3BgJJwfpXHH2l3LfncvV8rgFv0bvdr70U+On2XH
+ 5bApOyW1WpIG5KPJlDdzcQTyptOJ1dnEHfwnABEfzI3dNf63rlxsGouX/NFRRRNqkdClQR3K
+ gCwciaXfZ7ir7fF0u1N2UuLsWA8Ei1JrNypk+MRxhbvdQC4tyZCZ8mVDk+QOK6pyK2f4rMf/
+ WmqxNTtAVmNuZIwnJdjRMMSs4W4w6N/bRvpqtykSqx7VXcgqtv6eqoDZrNuhGbekQA0sAnCJ
+ VPArerAZGArm63o39me/bRUQeQVSxEBmg66yshF9HkcUPGVeC4B0TPwz+HFcVhheo6hoJjLq
+ knFOPLRj+0h+ZL+D0GenyqD3CyuyeTT5dGcNU9qT74bdSr20k/CklvI7S9yoQje8BeQAHtdV
+ cvO8XCLrpGuw9SgOS7OP5oI26a0548M4KldAY+kqX6XVphEw3/6U1KTf7WxW5zYLTtadjISB
+ X9xsRWSU+Yqs3C7oN5TIPSoj9tXMoxZkCIHWvnqGwZ7JhwARAQABwsFfBBgBAgAJBQJR+3lM
+ AhsMAAoJEC7Z13T+cC21hPAQAIsBL9MdGpdEpvXs9CYrBkd6tS9mbaSWj6XBDfA1AEdQkBOn
+ ZH1Qt7HJesk+qNSnLv6+jP4VwqK5AFMrKJ6IjE7jqgzGxtcZnvSjeDGPF1h2CKZQPpTw890k
+ fy18AvgFHkVk2Oylyexw3aOBsXg6ukN44vIFqPoc+YSU0+0QIdYJp/XFsgWxnFIMYwDpxSHS
+ 5fdDxUjsk3UBHZx+IhFjs2siVZi5wnHIqM7eK9abr2cK2weInTBwXwqVWjsXZ4tq5+jQrwDK
+ cvxIcwXdUTLGxc4/Z/VRH1PZSvfQxdxMGmNTGaXVNfdFZjm4fz0mz+OUi6AHC4CZpwnsliGV
+ ODqwX8Y1zic9viSTbKS01ZNp175POyWViUk9qisPZB7ypfSIVSEULrL347qY/hm9ahhqmn17
+ Ng255syASv3ehvX7iwWDfzXbA0/TVaqwa1YIkec+/8miicV0zMP9siRcYQkyTqSzaTFBBmqD
+ oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
+ IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
+ yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
+In-Reply-To: <CABgObfaSCXyqvfAgqn5kpR6nChqpuUiMmBj9kG4rgcm83yhXJg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 3, 2024 at 4:59=E2=80=AFPM Alexandre Ghiti <alex@ghiti.fr> wrot=
-e:
->
-> On 30/05/2024 11:24, Andrew Jones wrote:
-> > On Thu, May 30, 2024 at 11:01:20AM GMT, Alexandre Ghiti wrote:
-> >> Hi Andrew,
-> >>
-> >> On 30/05/2024 10:47, Andrew Jones wrote:
-> >>> On Thu, May 30, 2024 at 10:19:12AM GMT, Alexandre Ghiti wrote:
-> >>>> Hi Yong-Xuan,
-> >>>>
-> >>>> On 27/05/2024 18:25, Andrew Jones wrote:
-> >>>>> On Fri, May 24, 2024 at 06:33:01PM GMT, Yong-Xuan Wang wrote:
-> >>>>>> Svadu is a RISC-V extension for hardware updating of PTE A/D bits.
-> >>>>>>
-> >>>>>> In this patch we detect Svadu extension support from DTB and enabl=
-e it
-> >>>>>> with SBI FWFT extension. Also we add arch_has_hw_pte_young() to en=
-able
-> >>>>>> optimization in MGLRU and __wp_page_copy_user() if Svadu extension=
- is
-> >>>>>> available.
-> >>>> So we talked about this yesterday during the linux-riscv patchwork m=
-eeting.
-> >>>> We came to the conclusion that we should not wait for the SBI FWFT e=
-xtension
-> >>>> to enable Svadu but instead, it should be enabled by default by open=
-SBI if
-> >>>> the extension is present in the device tree. This is because we did =
-not find
-> >>>> any backward compatibility issues, meaning that enabling Svadu shoul=
-d not
-> >>>> break any S-mode software.
-> >>> Unfortunately I joined yesterday's patchwork call late and missed thi=
-s
-> >>> discussion. I'm still not sure how we avoid concerns with S-mode soft=
-ware
-> >>> expecting exceptions by purposely not setting A/D bits, but then not
-> >>> getting those exceptions.
-> >>
-> >> Most other architectures implement hardware A/D updates, so I don't se=
-e
-> >> what's specific in riscv. In addition, if an OS really needs the excep=
-tions,
-> >> it can always play with the page table permissions to achieve such
-> >> behaviour.
-> > Hmm, yeah we're probably pretty safe since sorting this out is just one=
- of
-> > many things an OS will have to learn to manage when getting ported. Als=
-o,
-> > handling both svade and svadu at boot is trivial since the OS simply ne=
-eds
-> > to set the A/D bits when creating the PTEs or have exception handlers
-> > which do nothing but set the bits ready just in case.
-> >
-> >>
-> >>>> This is what you did in your previous versions of
-> >>>> this patchset so the changes should be easy. This behaviour must be =
-added to
-> >>>> the dtbinding description of the Svadu extension.
-> >>>>
-> >>>> Another thing that we discussed yesterday. There exist 2 schemes to =
-manage
-> >>>> the A/D bits updates, Svade and Svadu. If a platform supports both
-> >>>> extensions and both are present in the device tree, it is M-mode fir=
-mware's
-> >>>> responsibility to provide a "sane" device tree to the S-mode softwar=
-e,
-> >>>> meaning the device tree can not contain both extensions. And because=
- on such
-> >>>> platforms, Svadu is more performant than Svade, Svadu should be enab=
-led by
-> >>>> the M-mode firmware and only Svadu should be present in the device t=
-ree.
-> >>> I'm not sure firmware will be able to choose svadu when it's availabl=
-e.
-> >>> For example, platforms which want to conform to the upcoming "Server
-> >>> Platform" specification must also conform to the RVA23 profile, which
-> >>> mandates Svade and lists Svadu as an optional extension. This implies=
- to
-> >>> me that S-mode should be boot with both svade and svadu in the DT and=
- with
-> >>> svade being the active one. Then, S-mode can choose to request switch=
-ing
-> >>> to svadu with FWFT.
-> >>
-> >> The problem is that FWFT is not there and won't be there for ~1y (acco=
-rding
-> >> to Anup). So in the meantime, we prevent all uarchs that support Svadu=
- to
-> >> take advantage of this.
-> > I think we should have documented behaviors for all four possibilities
-> >
-> >   1. Neither svade nor svadu in DT -- current behavior
-> >   2. Only svade in DT -- current behavior
-> >   3. Only svadu in DT -- expect hardware A/D updating
-> >   4. Both svade and svadu in DT -- current behavior, but, if we have FW=
-FT,
-> >      then use it to switch to svadu. If we don't have FWFT, then, oh we=
-ll...
-> >
-> > Platforms/firmwares that aren't concerned with the profiles can choose =
-(3)
-> > and Linux is fine. Those that do want to conform to the profile will
-> > choose (4) but Linux won't get the benefit of svadu until it also gets
-> > FWFT.
->
->
-> I think this solution pleases everyone so I'd say we should go for it,
-> thanks Andrew!
+On 03/06/2024 11.56, Paolo Bonzini wrote:
+> On Mon, Jun 3, 2024 at 11:55 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> On Mon, Jun 3, 2024 at 11:11 AM Thomas Huth <thuth@redhat.com> wrote:
+>>>
+>>>
+>>>    Hi Paolo!
+>>>
+>>> FYI, looks like the "xsave" kvm-unit-test is sometimes failing in the CI, e.g.:
+>>>
+>>>    https://gitlab.com/thuth/kvm-unit-tests/-/jobs/7000623436
+>>>    https://gitlab.com/thuth/kvm-unit-tests/-/jobs/7000705993
+>>
+>> Is this running nested?
+> 
+> Ah no it's TCG - so it must be a recent regression.
 
-Yes, this looks good to me as well. The key aspect is documenting
-the behaviour of these four possibilities.
+Oh, stupid me, I just noticed that I had a "update CI to Fedora 39" patch 
+sitting in one of my branches that I had completely forgot about. So it was 
+failing with F39, while it still worked fine with F37 from the master 
+branch. Makes sense now, finally :-)
 
-Regards,
-Anup
+  Thomas
 
->
-> @Yong-Xuan do you think you can prepare another spin with Andrew's
-> proposal implemented?
->
-> Thanks,
->
-> Alex
->
->
-> >
-> > IOW, I think your proposal is fine except for wanting to document in th=
-e
-> > DT bindings that only svade or svadu may be provided, since I think we'=
-ll
-> > want both to be allowed eventually.
-> >
-> > Thanks,
-> > drew
-> >
-> > _______________________________________________
-> > linux-riscv mailing list
-> > linux-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-riscv
+
 
