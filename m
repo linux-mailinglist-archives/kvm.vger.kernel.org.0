@@ -1,147 +1,114 @@
-Return-Path: <kvm+bounces-18652-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18653-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF53C8D838C
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 15:10:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8859B8D8423
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 15:38:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E0AD1C224A6
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:10:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D81F28968C
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 13:38:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244F912C814;
-	Mon,  3 Jun 2024 13:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7178D12D776;
+	Mon,  3 Jun 2024 13:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niL7G3te"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W6f5+YUF"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D3312C528;
-	Mon,  3 Jun 2024 13:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A4415C3
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 13:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717420237; cv=none; b=FxELW0R1udcwi/xAgZAgC3Ed6Qn5KcQ4Mk9gpTchWG/1Rzs+rq/tAdxWXQcULwXzgbeWj7d6l6SwA/pBeHGqoLBEx+QV0yp0O72DpiwiPblWHKzimlcmmLSZOTz49HEf8uUGO0YHfxKBn0evau1VB94DuYTQEkpV8/jE67wW7u8=
+	t=1717421903; cv=none; b=isc3X5VtxAuPKf39FFG1GEGlo5oj0WNmPGQEYWCi0V5P4McznaMhOCaD3DrN+d6Ohu9ixsWjp1ETgv2agbiHefnSixn0FD5KqnNmvEdsRQu6z0nazI/exSsGgs9kmwlKV1EKNrwsgFUgvMKz1oj69H8aYlW18vIOe3u2Yj8+cnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717420237; c=relaxed/simple;
-	bh=/U+/VxmSixKZ9uDr/+sYfe+DKCQqxNMHObH457JSDVY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F43QYfgXqELhb9BWkfK17iw/5JEmmbS+XSdMoa1igHE/J5MUfdGszICFs/W9O2J7aFeGpO+gijRWa5bLTugKBVzF6jDe9eQlzqd+GTmun07Ft4CUcYtc2I4yOS+o/QWpp4vXI1sgODK0plHDj4BVTSTwH6EYdjy7iZ0TkKipyRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niL7G3te; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D258C2BD10;
-	Mon,  3 Jun 2024 13:10:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717420236;
-	bh=/U+/VxmSixKZ9uDr/+sYfe+DKCQqxNMHObH457JSDVY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=niL7G3teA3ZpMeqqGERZKifChBdGxIzUii/571g4IMuK3na3aK3RTt6aCs1ybtmCO
-	 UKc4dyis8hBygdPykI50IiqTFGRS0ZXt6jRGdCfFSc/H+ot84DL/s2xneWGftP4jPP
-	 4b1Ca1+KzFwHMykS1fnN3a2OAisg588BzCMtiNlz8wXarV5HdrvdfsGcYpLmBwzup1
-	 sfMIb5/8cnGMSyR9pRyMPsxU8ny/BCccFbwk4iPziTv0Kozei1Sn3hUc1dREPYceqi
-	 81bHSmEvOL1fGpoomE1LgjXElTMyGHFjf1UW7IOIBRjPPQ1SDuR166XvtMRWV62XtP
-	 IcGkkCZfLVg7A==
-Date: Mon, 3 Jun 2024 14:10:32 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v3 09/12] KVM: arm64: VHE: Add test module for hyp kCFI
-Message-ID: <20240603131031.GB18991@willie-the-truck>
-References: <20240510112645.3625702-1-ptosi@google.com>
- <20240510112645.3625702-10-ptosi@google.com>
- <20240513172120.GA29051@willie-the-truck>
- <lsb5l4ee4unh76r25x6lx5lgncoxsjfy3q6xeuncv3efhs7jzm@bzdwf6j274et>
+	s=arc-20240116; t=1717421903; c=relaxed/simple;
+	bh=pjMv9CFvpHk7tfifO6Qm6g2Eis2FqvFOwC0BzsjHgnE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nTsiooARroALD6RSdC9+BZqRBxWpV38oK2UbmI+HlziUuGuoLCuOJHployaCKnYChyVE8N5XseH3JfFzw9vtK98sg3BDkAlha6mjcBd5gsuGjg4UEQ4M0aBKJDU0+SViXT/VBbZMyAMmqzbpboDiI+G4yp5yAQ5Lu0iT6vqNPeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W6f5+YUF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717421901;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pjMv9CFvpHk7tfifO6Qm6g2Eis2FqvFOwC0BzsjHgnE=;
+	b=W6f5+YUFLEJ8PA5XWD+F9obXPTN1y55XlBrrgZulqEV+dStfRUQyCFLyg5krRcpVHeiQwh
+	ghvVqCkbrMZJq0TlQhwt3PTgDOjfi24vTV8WjrzaDLwbI8Dj2/Dsrtt20zmJW2O9XtI6sZ
+	HN3dSp/VvkJlRdph3oph593XBU9WBJE=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-HGo9q0A5NDeWb-i3Nk63fw-1; Mon, 03 Jun 2024 09:38:20 -0400
+X-MC-Unique: HGo9q0A5NDeWb-i3Nk63fw-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2c1a559a0e8so3572153a91.1
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 06:38:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717421899; x=1718026699;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pjMv9CFvpHk7tfifO6Qm6g2Eis2FqvFOwC0BzsjHgnE=;
+        b=DzzTgsKjTaDPaxWUBkSAC3GjQAIqfk1lP9FpTTW401koD1bpfad+Aa1w3RuggKRcdM
+         r5BY3nvAUpdMpaeR2n+AbccyWbQmR733PbbR3jmiTrqoEVR6yeB4WFoAY72bKllsoBXh
+         C/1q0A2Fifgs/qhCUpOLSRatAXf9GBsFq2S6euWHDwMj8w/59xEpYvwRFxAkKasfezsS
+         jUrulLSnqRgm46+jTBTKa6USKYcxZ0FDLP0jHpvGNFdVWf1kGc04UtKy74GvOzsSAjXA
+         +oOE0ZHU3qFWTlIvUUcNockzmH8ECwXJshQId+pzfcgFmjpHpUxaojuMs+I91JB+mlZv
+         3OXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXaeVyoCQ/GAAuvBTfCef2VhXDNj9sK8S5ZhVN0dh7TkViyt9y1EXX8mH3/ux1CrN9Hr61t+C3W3RI/aIlaNc5KJui5
+X-Gm-Message-State: AOJu0YyuhIBo9p2iwQqTG7KWnTpjXpmWGDpmBWEZyz24iMx0z+Ldbh4Y
+	5InaubaWUviyenNzc+xXRHpr3gKsqLK/ANyOd0Hq4gkZW1Q5Yt13pXvY2R3FqIXuG8CeL8QASL6
+	fSSDzdlRUjaT+Puli43RMlAkCTCRw0xRFZu3jDQVZwqiiKIYTTILy6yz5Fsdwf/Rhicog9R/lWB
+	Hk72YpV05wyBHTvqZZns9yBneX
+X-Received: by 2002:a17:90a:d243:b0:2c2:53f:132e with SMTP id 98e67ed59e1d1-2c2053f135emr8436188a91.13.1717421898850;
+        Mon, 03 Jun 2024 06:38:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IER4XLCvU+B4tTVK/M8kIPNe//eWnQO5yFMNUEPRxUbXBqnAJ6G0Q/SYq0FNt1Q54CXUqKiF03D6Ea4otyOXS8=
+X-Received: by 2002:a17:90a:d243:b0:2c2:53f:132e with SMTP id
+ 98e67ed59e1d1-2c2053f135emr8436157a91.13.1717421898412; Mon, 03 Jun 2024
+ 06:38:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <lsb5l4ee4unh76r25x6lx5lgncoxsjfy3q6xeuncv3efhs7jzm@bzdwf6j274et>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
+ <20240530111643.1091816-30-pankaj.gupta@amd.com> <Zl2vP9hohrgaPMTs@redhat.com>
+In-Reply-To: <Zl2vP9hohrgaPMTs@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 3 Jun 2024 15:38:05 +0200
+Message-ID: <CABgObfapGXenv8MZv5wnMkESQMJveZvP-kqUj=EwMszTkg0EsA@mail.gmail.com>
+Subject: Re: [PATCH v4 29/31] hw/i386/sev: Allow use of pflash in conjunction
+ with -bios
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	"Hoffmann, Gerd" <kraxel@redhat.com>
+Cc: Pankaj Gupta <pankaj.gupta@amd.com>, qemu-devel@nongnu.org, brijesh.singh@amd.com, 
+	dovmurik@linux.ibm.com, armbru@redhat.com, michael.roth@amd.com, 
+	xiaoyao.li@intel.com, thomas.lendacky@amd.com, isaku.yamahata@intel.com, 
+	kvm@vger.kernel.org, anisinha@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 29, 2024 at 01:26:31PM +0100, Pierre-Clément Tosi wrote:
-> On Mon, May 13, 2024 at 06:21:21PM +0100, Will Deacon wrote:
-> > On Fri, May 10, 2024 at 12:26:38PM +0100, Pierre-Clément Tosi wrote:
-> > > diff --git a/arch/arm64/include/asm/kvm_cfi.h b/arch/arm64/include/asm/kvm_cfi.h
-> > > new file mode 100644
-> > > index 000000000000..13cc7b19d838
-> > > --- /dev/null
-> > > +++ b/arch/arm64/include/asm/kvm_cfi.h
-> > > @@ -0,0 +1,36 @@
-> > > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > > +/*
-> > > + * Copyright (C) 2024 - Google Inc
-> > > + * Author: Pierre-Clément Tosi <ptosi@google.com>
-> > > + */
-> > > +
-> > > +#ifndef __ARM64_KVM_CFI_H__
-> > > +#define __ARM64_KVM_CFI_H__
-> > > +
-> > > +#include <asm/kvm_asm.h>
-> > > +#include <linux/errno.h>
-> > > +
-> > > +#ifdef CONFIG_HYP_SUPPORTS_CFI_TEST
-> > > +
-> > > +int kvm_cfi_test_register_host_ctxt_cb(void (*cb)(void));
-> > > +int kvm_cfi_test_register_guest_ctxt_cb(void (*cb)(void));
-> > 
-> > Hmm, I tend to think this indirection is a little over the top for a test
-> > module that only registers a small handful of handlers:
-> > 
-> > > +static int set_param_mode(const char *val, const struct kernel_param *kp,
-> > > +			 int (*register_cb)(void (*)(void)))
-> > > +{
-> > > +	unsigned int *mode = kp->arg;
-> > > +	int err;
-> > > +
-> > > +	err = param_set_uint(val, kp);
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > > +	switch (*mode) {
-> > > +	case 0:
-> > > +		return register_cb(NULL);
-> > > +	case 1:
-> > > +		return register_cb(hyp_trigger_builtin_cfi_fault);
-> > > +	case 2:
-> > > +		return register_cb((void *)hyp_cfi_builtin2module_test_target);
-> > > +	case 3:
-> > > +		return register_cb(trigger_module2builtin_cfi_fault);
-> > > +	case 4:
-> > > +		return register_cb(trigger_module2module_cfi_fault);
-> > > +	default:
-> > > +		return -EINVAL;
-> > > +	}
-> > > +}
-> > 
-> > Why not just have a hyp selftest that runs through all of this behind a
-> > static key? I think it would simplify the code quite a bit, and you could
-> > move the registration and indirection logic.
-> 
-> I agree that the code would be simpler but note that the resulting tests would
-> have a more limited coverage compared to what this currently implements. In
-> particular, they would likely miss issues with the failure path itself (e.g.
-> [1]) as the synchronous exception would need to be "handled" to let the selftest
-> complete. OTOH, that would have the benefit of not triggering a kernel panic,
-> making the test easier to integrate into existing CI suites.
-> 
-> However, as the original request for those tests [2] was specifically about
-> testing the failure path, I've held off from modifying the test module (in v4)
-> until I get confirmation that Marc would be happy with your suggestion.
-> 
-> [1]: https://lore.kernel.org/kvmarm/20240529121251.1993135-2-ptosi@google.com/
-> [2]: https://lore.kernel.org/kvmarm/867ci10zv6.wl-maz@kernel.org/
+On Mon, Jun 3, 2024 at 1:55=E2=80=AFPM Daniel P. Berrang=C3=A9 <berrange@re=
+dhat.com> wrote:
+> I really wish we didn't have to introduce this though - is there really
+> no way to make it possible to use pflash for both CODE & VARS with SNP,
+> as is done with traditional VMs, so we don't diverge in setup, needing
+> yet more changes up the mgmt stack ?
 
-In which case, I think I'd drop the tests for now because I think the cure
-is worse than the disease with the current implementation.
+No, you cannot use pflash for CODE in either SNP or TDX. The hardware
+does not support it.
 
-Will
+One possibility is to only support non-pflash-based variable store.
+This is not yet in QEMU, but it is how both AWS and Google implemented
+UEFI variables and I think Gerd was going to work on it for QEMU.
+
+
+Paolo
+
 
