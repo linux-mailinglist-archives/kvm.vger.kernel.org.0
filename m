@@ -1,120 +1,113 @@
-Return-Path: <kvm+bounces-18664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD9C8D8510
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 16:31:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 146198D8512
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 16:32:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 264B228624A
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:31:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 456451C2159A
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 14:32:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B3512FB15;
-	Mon,  3 Jun 2024 14:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044F512EBCC;
+	Mon,  3 Jun 2024 14:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fg49YqSE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b35BPGj1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812CF57C9A;
-	Mon,  3 Jun 2024 14:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B7857C9A
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 14:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717425036; cv=none; b=jSTHXD7MwNTQF7k5dlOAT5LFiEo78WNGkeN8zE1s17oF3ECGYw7kFMxnSxjB/XB2+SoNHsF3XOhlvFgQ5U8Wzg4AGfIQ+J6vqRctqS4ZkNFiNbeiVpLy5ARyEcqIKyYCXtO/+58tIzRlUZ2dVbQXMYYNpWmONK+QOnr6Sqhj9NU=
+	t=1717425123; cv=none; b=u8rVJaqqh5AdoDfv7YGHN5gOqXwPvRy+dmde9Y11e4lqWPSSZufn6+v8CALuB3q28nayxd2TAk/56bV5IDMq5qZ2hmk4dhogKIeidsgOfqvEqgb+PF0jmPNcFrl+XlVgS9ZafbHFcc7TAjeDQDoiYqrgC8+OWROdjSWdwra9YJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717425036; c=relaxed/simple;
-	bh=zew+uG4r68QwYLUFKAKzwIzu32pc5sfFcOmdOWTc4V8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JR5/tmW101azAnLdj9tSMrMUcRSHXCpis0b4lhFhCvZ24DSB4KqOeQ55lD1V1NlkNyOv04X1GMFTe3JpM7MX+TEAqhFKguB0AqDDZ+mXVK/AgKY0s4YQomk4Sq7zFX/NJAl1OxX4yU8EqDozr/H9cZyZGv6aZwqsWcOVumjqgvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fg49YqSE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6214AC4AF09;
-	Mon,  3 Jun 2024 14:30:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717425036;
-	bh=zew+uG4r68QwYLUFKAKzwIzu32pc5sfFcOmdOWTc4V8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fg49YqSESADLCHTZ8owxyuJbUfacYZM3r8mgmhN8iWK80vEK48+LWPLhqnBDJekrv
-	 NvNtSSfeDBOSsKqdNIU4kJdtC2pTX2z+PYNzzkK/UwF3AXlTdD9PAmROp8EC5nJUMG
-	 TUsh6ruqRtWpD6ECVJLujfnNAuTJl/iVhf1uEwqiEINIWbGejej7Ft/O+arqXaQwD3
-	 Px4AZYeQj9veYg5u712HacUI//gJG0acajSga3m1HELZhp/DhuKrbgVPaOG7G87jll
-	 rh22LBxo/Y7DEILknNRpDSK+BZSvat0BomoClfcWgChgE9EkPyqlkVNb+63esoLjb5
-	 EDbw6l75Cxs+w==
-Date: Mon, 3 Jun 2024 15:30:30 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 03/13] KVM: arm64: nVHE: Simplify __guest_exit_panic
- path
-Message-ID: <20240603143030.GD19151@willie-the-truck>
-References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-4-ptosi@google.com>
+	s=arc-20240116; t=1717425123; c=relaxed/simple;
+	bh=uMnGCaUCOJM5udsLF47byKKqJDKb1E5kZ3laZqy4Wr8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Vfs3T5z7zoRcNx8tgsMFvVko1TyvZcAOX2r5OpbjjmQfH9oHbg3j1t5i2ihXHVfkjALz92WG/6V1qSL5NwuYORpX1CybdD6auSEX9xfOdOhE3Oy4s5oBADacLHsNBBcd+lQlmCZ7JFMfgffe6TLTE36fB6Q3IeJ5acNB884T+iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b35BPGj1; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717425120;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uMnGCaUCOJM5udsLF47byKKqJDKb1E5kZ3laZqy4Wr8=;
+	b=b35BPGj1ivaM/xtQPuSHTS2vlwcQtP2jRMfHIWN1UJ0+6XJ17spW+wVUvh9Rd5C72ajYmQ
+	8HlJVSXkojBwJugNZpplwvcUfFJ7X3FXvelyB7c2omDrhPDk7gU+0Ti5A7VDpvkdOX0zgG
+	Nt8D47QUMsLS2nVE8+q52X+P4Jonfuc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-502-3B3k4NlYOYiSK0XqUhuxDg-1; Mon, 03 Jun 2024 10:31:58 -0400
+X-MC-Unique: 3B3k4NlYOYiSK0XqUhuxDg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4212b505781so19592005e9.0
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 07:31:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717425117; x=1718029917;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uMnGCaUCOJM5udsLF47byKKqJDKb1E5kZ3laZqy4Wr8=;
+        b=JjSlyNahoil5g5006MuwEN0S+epYyLDyu9t2Bv7rkwyInQjzEGSuPW0FFA8pwRDcNU
+         tAjHgO5o6+T7eD/ZGF3121+fopLvgrabK4kcA8aXb040cu07m3cpAwCA4jeihx3q5LgN
+         bQDFaA9dbnyQ3+9hfoWx1nUpzm1sofv4pJ7dIlfO1Rm5UPBWGYVkg/HLNoZu5iq2pEtw
+         ihyi2MmoREPhLQ5ZmMWglK5zqRpqNAJrRajFiwzd8xY3G54jrclY9GmTOnIv46QO+q6n
+         vWX1V+9mNQwnboEuCFodqpDOKuWM4SbncrWLnEPRlEjEpdtOeT5VrzQEPT2afeT05ewM
+         pkKA==
+X-Forwarded-Encrypted: i=1; AJvYcCWbmg6VDW1ExalmICO3mfIzaYfLjfQj8JKLOHNAcZHD8olIAL9Unp2dcQCuhllpvrdqfuR+XDGXM0AqAoNt9QX0inDc
+X-Gm-Message-State: AOJu0YzA9q+bW62AHuxScsuMbXHJOsTw/jEMsnRIZggijWmJtJcmf7JD
+	IYY0mPttIjRNnJzistd0Mj6OshKa2HLqo0Dkr8HbusyyVUiJ5st8rDsFgLmSE6DVvMBFQDYwmWE
+	6+XQUDfvKdUjSyxMmEnAKWARiffvFAM7Vdb/38nCJN6+RwX0enyJoPzVBG3VJ++MldoZfvCaB79
+	StYy/XCkHiH2fa1eetkjDR60hz
+X-Received: by 2002:a05:600c:3b03:b0:421:37fa:e4c8 with SMTP id 5b1f17b1804b1-42137fae759mr47275395e9.1.1717425117187;
+        Mon, 03 Jun 2024 07:31:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIqVgMiZETokwx4bnQfwEuYfXGJ9+dX3tDZuMpzrYFYkEGfDNRhvdAm2VeKVBzxGhk2RlybO7OquqkEUsJj0M=
+X-Received: by 2002:a05:600c:3b03:b0:421:37fa:e4c8 with SMTP id
+ 5b1f17b1804b1-42137fae759mr47275195e9.1.1717425116846; Mon, 03 Jun 2024
+ 07:31:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240529121251.1993135-4-ptosi@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
+ <20240530111643.1091816-30-pankaj.gupta@amd.com> <Zl2vP9hohrgaPMTs@redhat.com>
+ <wfu7az7ofb5lxciw2ewxoyf5xggex5npr7j2qookddfuaioikk@3lf2nzapab5c>
+In-Reply-To: <wfu7az7ofb5lxciw2ewxoyf5xggex5npr7j2qookddfuaioikk@3lf2nzapab5c>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 3 Jun 2024 16:31:45 +0200
+Message-ID: <CABgObfa1ha1MXYWLRTfBtMCTh0n=wNO=9jbRgbO10ksuzMO9hQ@mail.gmail.com>
+Subject: Re: [PATCH v4 29/31] hw/i386/sev: Allow use of pflash in conjunction
+ with -bios
+To: Michael Roth <michael.roth@amd.com>
+Cc: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	Pankaj Gupta <pankaj.gupta@amd.com>, qemu-devel@nongnu.org, brijesh.singh@amd.com, 
+	dovmurik@linux.ibm.com, armbru@redhat.com, xiaoyao.li@intel.com, 
+	thomas.lendacky@amd.com, isaku.yamahata@intel.com, kvm@vger.kernel.org, 
+	anisinha@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, May 29, 2024 at 01:12:09PM +0100, Pierre-Clément Tosi wrote:
-> In invalid_host_el2_vect (i.e. EL2{t,h} handlers in nVHE guest context),
+On Mon, Jun 3, 2024 at 4:28=E2=80=AFPM Michael Roth <michael.roth@amd.com> =
+wrote:
+> So for now maybe we should plan to drop it from qemu-coco-queue and
+> focus on the stateless builds for the initial code merge.
 
-*guest* context? Are you sure?
+Yes, I included it in qemu-coco-queue to ensure that other things
+didn't break split firmware (or they were properly identified), but
+basically everything else in qemu-coco-queue is ready for merge.
 
-> remove the duplicate vCPU context check that __guest_exit_panic also
-> performs, allowing an unconditional branch to it.
-> 
-> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> ---
->  arch/arm64/kvm/hyp/nvhe/host.S | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.S
-> index 135cfb294ee5..71fb311b4c0e 100644
-> --- a/arch/arm64/kvm/hyp/nvhe/host.S
-> +++ b/arch/arm64/kvm/hyp/nvhe/host.S
-> @@ -197,18 +197,13 @@ SYM_FUNC_END(__host_hvc)
->  	sub	x0, sp, x0			// x0'' = sp' - x0' = (sp + x0) - sp = x0
->  	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
->  
-> -	/* If a guest is loaded, panic out of it. */
-> -	stp	x0, x1, [sp, #-16]!
-> -	get_loaded_vcpu x0, x1
-> -	cbnz	x0, __guest_exit_panic
-> -	add	sp, sp, #16
+Please double check "i386/sev: Allow measured direct kernel boot on
+SNP" as well, as I did some reorganization of the code into a new
+class method for sev-guest and sev-snp-guest objects.
 
-I think this is actually dead code and we should just remove it. AFAICT,
-invalid_host_el2_vect is only used for the host vectors and the loaded
-vCPU will always be NULL, so this is pointless. set_loaded_vcpu() is
-only called by the low-level guest entry/exit code and with the guest
-EL2 vectors installed.
+Paolo
 
-> -
->  	/*
->  	 * The panic may not be clean if the exception is taken before the host
->  	 * context has been saved by __host_exit or after the hyp context has
->  	 * been partially clobbered by __host_enter.
->  	 */
-> -	b	hyp_panic
-> +	stp	x0, x1, [sp, #-16]!
-> +	b	__guest_exit_panic
-
-In which case, this should just be:
-
-	add	sp, sp, #16
-	b	hyp_panic
-
-Did I miss something?
-
-Will
 
