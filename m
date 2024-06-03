@@ -1,103 +1,269 @@
-Return-Path: <kvm+bounces-18692-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18693-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7452C8FA56F
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:17:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 543C18FA601
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19BC41F264BB
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 22:17:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E77EB227A3
+	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 22:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F49413C902;
-	Mon,  3 Jun 2024 22:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E388713CF9F;
+	Mon,  3 Jun 2024 22:46:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3clAKt+c"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2YEB+x82"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25AB8522E
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 22:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B7E57333
+	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 22:46:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717453040; cv=none; b=uXF0JYCsiYQm8nYN6/Yl92TFd8QIVX4a+VjHJFIxA6FPzf6cvZMn5AD2o1NsVMMjbkt7hybAM49ishC16Rp/UJE55Df57NZypzS4uibY98zm4vQaTy+Htz13oyIVgHZN6tUWORtinSS7w3LiVpqG0sKIS+fV8Z5eveNDOYawt9g=
+	t=1717454799; cv=none; b=fO9verYxuei6zBcaCbKtTFBWJ/YOkOvd8KItt/IKHssqb2zAxYeYBtmDTKo9GNQrHeTubkerhrJ3EFuW+vI/yY9avPffdh+1q9hKxmnd6hIR6pz4/qmrOmKwNnyEgGqf7lCCOAYGZkBJkb8ZUjCfjDxFv3xxWCYsgR4rX8O9fNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717453040; c=relaxed/simple;
-	bh=/UlXxhes5QRLTrr9SDQzAvFobSCW8cEFBwgADTpNo10=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EADeAkcUSVYA+Z+zYrlHLFetF7wxDig2/froU8cd2QWjoTEQ/Yh4FgJ8G87aWhIIwvw4GRJQwDNW1/kVjYAOdUTNTlX1cCJgJEIoUG14ttSzXzbwAVtPtgncdrQJegnJ3KF533YzFtbnPMSqivmtU0xd6GKtzepuwHTWWrgyAA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3clAKt+c; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1717454799; c=relaxed/simple;
+	bh=0SDC8BkbIu6webNUXhyFkkBsSVcdj+Sq6u/l89WhDUU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JrKeRcdDK/tX7jHWU2MS250TyZuaWDDGjXEsTe9xK7RgROJgEJIOtNR7qLgBlQr0Ft2XsSWS24K8pqOdWGTITPNFdQJeYSQrvU5AXLFUNnpz4Pjxdl3O967lu8k4X542axF288cH0o7WL9PfnlB8Tg6Dy3u9FEayJozTacovsjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2YEB+x82; arc=none smtp.client-ip=209.85.160.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfa7464759cso528626276.0
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 15:17:18 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-43fe3289fc5so50491cf.1
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 15:46:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717453038; x=1718057838; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lTWK+TvN0EB0WUHYF/GtEEl064LANQ6E3omFwaKMPyc=;
-        b=3clAKt+ckM56PvpGVHHtjKfxgSSl1l1pzd2jnq3Yp4wz/dGy9xyEVhM+BNFYJhZXtl
-         n3LpOgR8eiKtiS/llpV2dLwj/8PEZVdYI9vv6YavRvIPFBe+cK+HS3+Giflw6qRcagAB
-         L/1+WwBVq/+4tmRBK43swfWO1OkeSFzvP40LVTKROZc5MpQ6azKc6Z4nGUrilwd3uuVb
-         aXN1AVttS7yk6Nw/pG7LLDGHoHE5vnkU5UO6QEIucOGXJApJl0zTye9dfDOC1Tt5mcpb
-         C+WsbGYYzaQql/4n6cqSOzg1mVHM/Ni/eiVlYrU2ggty8n0D9bzXrJ+uvOLGVReA9puU
-         lPNA==
+        d=google.com; s=20230601; t=1717454796; x=1718059596; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zwApvMmCxi6kRvhFpeZNrHVjs/fSYi202Vq8O0y7Pvc=;
+        b=2YEB+x82iaPcRGgd758Wy0mcQv/zPOKnypfOsXwRqgtxaDBACdtrIJl9FVHN7nGTyB
+         ev9S31pkK8Blef/fm/dVZ5QuTEmXM0RBQRF0tFNYF3D1fJ8EsNW5ww+rFKGaWTD6g5Fz
+         az9/wdiJrTuQLUfBBMB/+9tMrh+WDScVdUwHEthj+IKVYorJQtKUYJLOXMmYDl5T5+p4
+         92iG8gHWXb794e/vtE7iyZZnFTFD+QDzoMPnzSFbIiqL3qRIyYOyDLok+SrYmnaYX66Y
+         1J0f383XKM8jo/SdztHum0F5latvbmw0xnnn6jZeBJN9V54Hw10OS40G9eqbjlzCcTxZ
+         M9Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717453038; x=1718057838;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lTWK+TvN0EB0WUHYF/GtEEl064LANQ6E3omFwaKMPyc=;
-        b=HomcLRYv00GJchDGwaHgSmdLf8B678LNNoJcJiTBRWit9fX3VsH2lw1SMIz0TPQp5W
-         a7UTnkwVk8YJ06JiHYKC0zEReG9YX0wxKPUGCaJTn09MnDKAGGh0d7PcXT1qOCjFFK4S
-         mCrSVsVfcoTGOhyCq2pwAO35sdZ9VmoDZmrIY2f3QCfoOechFrhHxSghrmh9xgOD+UuQ
-         ulszaWCBZ5fKYaip/P6SQxe8l22BvauLHm+x2kAy6m7D5rH5pj+bMEwXV7asoMH8mA1X
-         iL6c8HQtURKmq5YNItmrXJ4F5lx6dRCAFN5uvPpCFC7yTx0wQ6sprndZq9jya8ATEVq/
-         CKnA==
-X-Gm-Message-State: AOJu0YyVEmFrgxA7d6qc4qV9b8KGmEikv1hDBWESWl4t/WSYkNH/mD5W
-	4du7dq9zSRpKU37BDIeMrfBCS7mJV0RecGwD+c6DSdSSu6HtY8KfmoBwjSefcj8fENuFFrTYDKX
-	lOQ==
-X-Google-Smtp-Source: AGHT+IEXTdV0kJQaVce5PqLrH3fwi9yEgelcuoXat9IeKBfWoeQ96uS74NPqg5c88j/27hSzy0tzc6U5sPc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2b09:b0:dfa:6ea5:c8dd with SMTP id
- 3f1490d57ef6-dfa73bc1496mr1061571276.3.1717453038191; Mon, 03 Jun 2024
- 15:17:18 -0700 (PDT)
-Date: Mon, 3 Jun 2024 15:17:16 -0700
-In-Reply-To: <7a5ffaa2-9b18-4700-b4b6-da414333d894@amd.com>
+        d=1e100.net; s=20230601; t=1717454796; x=1718059596;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zwApvMmCxi6kRvhFpeZNrHVjs/fSYi202Vq8O0y7Pvc=;
+        b=rLDPwozRDeLsWhloXZQYxWUxLVqEenk7EEV1ssIt5r09SPbPUv9M0lUHWP7pPbmx+C
+         z8uBCjP319l5R7B+PDrlIxtTO72u1oKHsfqq2RlGRYxkk2NQMGrKm89xPDpjUZzXI/Vb
+         5sR/6EiZ5s48woJW9s/Dd4Zd+RK2Iz8CI/B8eN16ZYvDCYuTw72ZFRYw/5Wch/EaoU2P
+         4+/wvABTrzTCqQADjJ1yIHpcucI3Xj2exhhGu8999JaKhLPvR/u8S0c/aTIQ2nIzzhKE
+         FfTkNeECYm0HudS4ibdsErmF91YEMrzQTxnI7TCk2ZJpWsC2fJzddTl78WF7DcQiPZQT
+         w63g==
+X-Forwarded-Encrypted: i=1; AJvYcCX/I2xH6AVuV1kEpMFbhRAlf3PNX/f/gN9bXdOhAJsRr87BrBGwRndW1xCj1Z1X8eZP2HFP5Ued4FNew5NSUDVgKhqP
+X-Gm-Message-State: AOJu0Yytz+YjREeLSiDRZ1FwHjqU59/PPe/hy2pex6O76YmGbwbOuxak
+	FAl0JChAXUuEhufB2B3f4I3cTqq/iQ5n3Smixh2Qhd0E+PhTLZx3RI9vPqOl2oO3gRNlgBW6/NW
+	6UjIEL4CtvS3zsjTFH7E5Wu/EahEGUEjsbJbD
+X-Google-Smtp-Source: AGHT+IFNqO3Eeca3fb/gjbGejzk9epZFQKuRMTX94UERp2ub7SAJHzg0ElHPjQ2U8grOlDfvsiNhgYwFk5rOK4wQGMU=
+X-Received: by 2002:a05:622a:59ce:b0:43f:ff89:dfb9 with SMTP id
+ d75a77b69052e-4401bd281f4mr1732131cf.6.1717454795966; Mon, 03 Jun 2024
+ 15:46:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240501152451.4458-1-manali.shukla@amd.com> <ZjJghQ25H-ttaV4b@google.com>
- <7a5ffaa2-9b18-4700-b4b6-da414333d894@amd.com>
-Message-ID: <Zl5A7GuqAKCZ7I5M@google.com>
-Subject: Re: [PATCH] KVM: selftest: Add family and model check for zen4 in PMU
- filter test
-From: Sean Christopherson <seanjc@google.com>
-To: Manali Shukla <manali.shukla@amd.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240529180510.2295118-1-jthoughton@google.com>
+ <20240529180510.2295118-3-jthoughton@google.com> <CAOUHufYFHKLwt1PWp2uS6g174GZYRZURWJAmdUWs5eaKmhEeyQ@mail.gmail.com>
+ <ZlelW93_T6P-ZuSZ@google.com> <CAOUHufZdEpY6ra73SMHA33DegKxKaUM=Os7A7aDBFND6NkbUmQ@mail.gmail.com>
+ <Zley-u_dOlZ-S-a6@google.com> <CADrL8HXHWg_MkApYQTngzmN21NEGNWC6KzJDw_Lm63JHJkR=5A@mail.gmail.com>
+ <CAOUHufZq6DwpStzHtjG+TOiHaQ6FFbkTfHMCe8Yy0n_M9MKdqw@mail.gmail.com>
+In-Reply-To: <CAOUHufZq6DwpStzHtjG+TOiHaQ6FFbkTfHMCe8Yy0n_M9MKdqw@mail.gmail.com>
+From: James Houghton <jthoughton@google.com>
+Date: Mon, 3 Jun 2024 15:45:59 -0700
+Message-ID: <CADrL8HW44Hx_Ejx_6+FVKt1V17PdgT6rw+sNtKzumqc9UCVDfA@mail.gmail.com>
+Subject: Re: [PATCH v4 2/7] mm: multi-gen LRU: Have secondary MMUs participate
+ in aging
+To: Yu Zhao <yuzhao@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Ankit Agrawal <ankita@nvidia.com>, Anup Patel <anup@brainfault.org>, 
+	Atish Patra <atishp@atishpatra.org>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Bibo Mao <maobibo@loongson.cn>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	Huacai Chen <chenhuacai@kernel.org>, James Morse <james.morse@arm.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nicholas Piggin <npiggin@gmail.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvm-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-mm@kvack.org, 
+	linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, 
+	loongarch@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, May 28, 2024, Manali Shukla wrote:
-> On 5/1/2024 9:02 PM, Sean Christopherson wrote:
-> > On Wed, May 01, 2024, Manali Shukla wrote:
-> >> PMU event filter test fails on zen4 architecture because of
-> >> unavailability of family and model check for zen4 in use_amd_pmu().
-> >> So, add family and model check for zen4 architecture in use_amd_pmu().
-> > 
-> > Is there a less ugly way to detect that 0xc2,0 == "branch instructions retired"?
-> > E.g. can we instead check for v2 PMU support, or are there no guarantees going
-> > forward?  Pivoting on FMS is so painful :-(
-> 
-> We have confirmed with the hardware team that 0xc2,0 == "branch instructions retired"
-> is always true going forward, we intend to maintain backward compatibility for branch
-> instruction retired. Since event 0xc2 is supported on all currently released F17h+ 
-> processors as branch instructions retired, we can check for "family >= 0x17" for all
-> Zen and its successors instead of checking them individually in pmu_event_filter_test.c.
+On Thu, May 30, 2024 at 11:06=E2=80=AFPM Yu Zhao <yuzhao@google.com> wrote:
+>
+> On Wed, May 29, 2024 at 7:08=E2=80=AFPM James Houghton <jthoughton@google=
+.com> wrote:
+> >
+> > Hi Yu, Sean,
+> >
+> > Perhaps I "simplified" this bit of the series a little bit too much.
+> > Being able to opportunistically do aging with KVM (even without
+> > setting the Kconfig) is valuable.
+> >
+> > IIUC, we have the following possibilities:
+> > - v4: aging with KVM is done if the new Kconfig is set.
+> > - v3: aging with KVM is always done.
+>
+> This is not true -- in v3, MGLRU only scans secondary MMUs if it can
+> be done locklessly on x86. It uses a bitmap to imply this requirement.
+>
+> > - v2: aging with KVM is done when the architecture reports that it can
+> > probably be done locklessly, set at KVM MMU init time.
+>
+> Not really -- it's only done if it can be done locklessly on both x86 and=
+ arm64.
+>
+> > - Another possibility?: aging with KVM is only done exactly when it
+> > can be done locklessly (i.e., mmu_notifier_test/clear_young() called
+> > such that it will not grab any locks).
+>
+> This is exactly the case for v2.
 
-Can you send a patch for this?  Please :-)
+Thanks for clarifying; sorry for getting this wrong.
+
+>
+> > I like the v4 approach because:
+> > 1. We can choose whether or not to do aging with KVM no matter what
+> > architecture we're using (without requiring userspace be aware to
+> > disable the feature at runtime with sysfs to avoid regressing
+> > performance if they don't care about proactive reclaim).
+> > 2. If we check the new feature bit (0x8) in sysfs, we can know for
+> > sure if aging is meant to be working or not. The selftest changes I
+> > made won't work properly unless there is a way to be sure that aging
+> > is working with KVM.
+>
+> I'm not convinced, but it doesn't mean your point of view is invalid.
+> If you fully understand the implications of your design choice and
+> document them, I will not object.
+>
+> All optimizations in v2 were measured step by step. Even that bitmap,
+> which might be considered overengineered, brought a readily
+> measuarable 4% improvement in memcached throughput on Altra Max
+> swapping to Optane:
+>
+> Using the bitmap (64 KVM PTEs for each call)
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Type         Ops/sec     Hits/sec   Misses/sec    Avg. Latency     p50
+> Latency     p99 Latency   p99.9 Latency       KB/sec
+> -------------------------------------------------------------------------=
+---------------------------------------------------
+> Sets            0.00          ---          ---             ---
+>     ---             ---             ---         0.00
+> Gets      1012801.92    431436.92     14965.11         0.06246
+> 0.04700         0.16700         4.31900     39635.83
+> Waits           0.00          ---          ---             ---
+>     ---             ---             ---          ---
+> Totals    1012801.92    431436.92     14965.11         0.06246
+> 0.04700         0.16700         4.31900     39635.83
+>
+>
+> Not using the bitmap (1 KVM PTEs for each call)
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Type         Ops/sec     Hits/sec   Misses/sec    Avg. Latency     p50
+> Latency     p99 Latency   p99.9 Latency       KB/sec
+> -------------------------------------------------------------------------=
+---------------------------------------------------
+> Sets            0.00          ---          ---             ---
+>     ---             ---             ---         0.00
+> Gets       968210.02    412443.85     14303.89         0.06517
+> 0.04700         0.15900         7.42300     37890.74
+> Waits           0.00          ---          ---             ---
+>     ---             ---             ---          ---
+> Totals     968210.02    412443.85     14303.89         0.06517
+> 0.04700         0.15900         7.42300     37890.74
+>
+>
+> FlameGraphs with bitmap (1.svg) and without bitmap (2.svg) attached.
+>
+> What I don't think is acceptable is simplifying those optimizations
+> out without documenting your justifications (I would even call it a
+> design change, rather than simplification, from v3 to v4).
+
+I'll put back something similar to what you had before (like a
+test_clear_young() with a "fast" parameter instead of "bitmap"). I
+like the idea of having a new mmu notifier, like
+fast_test_clear_young(), while leaving test_young() and clear_young()
+unchanged (where "fast" means "prioritize speed over accuracy"). It
+seems a little more straightforward that way.
+
+>
+> > For look-around at eviction time:
+> > - v4: done if the main mm PTE was young and no MMU notifiers are subscr=
+ibed.
+> > - v2/v3: done if the main mm PTE was young or (the SPTE was young and
+> > the MMU notifier was lockless/fast).
+>
+> The host and secondary MMUs are two *independent* cases, IMO:
+> 1. lookaround the host MMU if the PTE mapping the folio under reclaim is =
+young.
+> 2. lookaround the secondary MMU if it can be done locklessly.
+>
+> So the v2/v3 behavior sounds a lot more reasonable to me.
+
+I'll restore the v2/v3 behavior. I initially removed it because,
+without batching, we (mostly) lose the spatial locality that, IIUC,
+look-around is designed to exploit.
+
+>
+> Also a nit -- don't use 'else' in the following case (should_look_around(=
+)):
+>
+>   if (foo)
+>     return bar;
+>   else
+>     do_something();
+
+Oh, yes, sorry. I wrote and rewrote should_look_around() quite a few
+times while trying to figure out what made sense in a no-batching
+series. I'll fix this.
+
+>
+> > I made this logic change as part of removing batching.
+> >
+> > I'd really appreciate guidance on what the correct thing to do is.
+> >
+> > In my mind, what would work great is: by default, do aging exactly
+> > when KVM can do it locklessly, and then have a Kconfig to always have
+> > MGLRU to do aging with KVM if a user really cares about proactive
+> > reclaim (when the feature bit is set). The selftest can check the
+> > Kconfig + feature bit to know for sure if aging will be done.
+>
+> I still don't see how that Kconfig helps. Or why the new static branch
+> isn't enough?
+
+Without a special Kconfig, the feature bit just tells us that aging
+with KVM is possible, not that it will necessarily be done. For the
+self-test, it'd be good to know exactly when aging is being done or
+not, so having a Kconfig like LRU_GEN_ALWAYS_WALK_SECONDARY_MMU would
+help make the self-test set the right expectations for aging.
+
+The Kconfig would also allow a user to know that, no matter what,
+we're going to get correct age data for VMs, even if, say, we're using
+the shadow MMU. This is somewhat important for me/Google Cloud. Is
+that reasonable? Maybe there's a better solution.
 
