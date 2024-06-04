@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-18751-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18752-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBFA78FB05F
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 12:50:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E7E58FB084
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 12:53:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A2CB1F22423
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 10:50:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F761283464
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 10:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F03F145343;
-	Tue,  4 Jun 2024 10:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026B8145353;
+	Tue,  4 Jun 2024 10:53:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fX3MrB35"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPBb9PH/"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCAE144D1A
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 10:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8956145347
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 10:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717498198; cv=none; b=S+k+izL0itOHeas1lBcNnIFL0ob/0H84W0Z9w8au3cJG0qEg0ZnkkCorJFsSPL3brUcylKMtMfnAxT6iirN8razdEo6f2C/s1v2XEqU/y3c3gTWAuLNRRQ2Ns6D7I+9RLLRpTrYLGqZyzqrHOieiyRBSurdgW8GzcT8/4Mwpz5Y=
+	t=1717498416; cv=none; b=pHwB4UjWINuQtxK/6owaWoR7qIAu2FML3AhENptbRiT9LtDmt2hPm+1nVfWTbacoJgf6TsbcDDDvDgvTQMOWLiE1IhV9u1/CIgFO0/LcjKm7IvF18cj2ABwLxYc5Q8LHml+EaU3UiJQS1g6WBl7UAYiEP/GFq7B54vB4OjOCfn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717498198; c=relaxed/simple;
-	bh=Ytv9S5j5vsCsWvzRxEId5F4Qttd+ltQwIJt04kdcokA=;
+	s=arc-20240116; t=1717498416; c=relaxed/simple;
+	bh=UH8l1aOHKNfS3HrTqJTIU17OVXp7137QYEG358YqoLw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uLe1nkKKwTEY1Qwz0beX5AKdLkUfwLLkwnmSCSBm/i9QpLxw8+ps1v6CA8dP5sCCmE6AOXlxPceY3yWX9D0kt3bkntQsRfT4VAN4oOd32KrSBc9yrigfDtjUtDYYayf1hYeh/2E/ckC8+QMANxYIDUzkb0TrbJXLmWE3ZUcaXGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fX3MrB35; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=eiQbtbu+tdjTsSqAOu/Ca7ngvBjyqGu/Td9zT4xqjfCP8aV8wMcrxZLq2+gRhFuLbnTiMY+pTLeTzjM4vjDEnga3Qq77es9zn2UjH1dJiX/JPVhKYr2YN/oD8yXhbO0DMEN9F/2StvFuio2YTvfZJb3MmH/n1rKZ5L3t3QQo9Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DPBb9PH/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717498196;
+	s=mimecast20190719; t=1717498413;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=U1w2bG5lPOfWEVpr4xHtf9bwg5SohkWgMrHEQtHuoCA=;
-	b=fX3MrB35JfygwFsUucpi8ywMHWD3S5wp2+i4fEBi5fBPGdKScaoMzjRW2qDJaMnDgG+NPs
-	LopmfvWe94LAeBGNk0oaOaxAeoYQw0mPmBquk8xxYOCBZnb5DlXm5j0I0f/6O9GgsuI4OI
-	a6InJPrhT67VB4xepdQX7Py/BrVKkgs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=khLXT47kqpcrtDLU6hojN1Y8iwI4i0MMg0kRPkLwAKQ=;
+	b=DPBb9PH/0RwAVdbaamqAn2Gy1ikGFRPkjGeyLdjl5Jo7JYXUix95Rxy8RGoCdvyWQKABUv
+	ePaUs/L/W5tJvUbWWMDrfS+RsJ764j3H5N9KP+l+0j4GGExurXDG+k7ZENun/szwjGXFWg
+	+DVtNp6KTMyqnLQqQ1RP+6+O7Jok3uQ=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-404-CQcluX7PNDWCMF_E0tZrtg-1; Tue, 04 Jun 2024 06:49:55 -0400
-X-MC-Unique: CQcluX7PNDWCMF_E0tZrtg-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4212e3418b1so25498785e9.0
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 03:49:54 -0700 (PDT)
+ us-mta-442-5MOm1CFNMpeCn66PcEggsQ-1; Tue, 04 Jun 2024 06:53:32 -0400
+X-MC-Unique: 5MOm1CFNMpeCn66PcEggsQ-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-794c059f55eso465573585a.2
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 03:53:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717498194; x=1718102994;
+        d=1e100.net; s=20230601; t=1717498412; x=1718103212;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=U1w2bG5lPOfWEVpr4xHtf9bwg5SohkWgMrHEQtHuoCA=;
-        b=VGcN8SIZ1NgzCs7XEVrruZv2qvSS4cmdkDtyVm9n7pHr/LKThO+LeaIh63L2Nfd8mf
-         JU7ZmfW1GPlUzqqKv18LCrHsVFa6a4Kwc1OiWZJbFw3MjZPmwWB8vDLU6071jioMnpzp
-         0Jy3kejdXbM6OXwuroSyIBbxkYMu71EaMyC0lF+tgaYffeFRoBkEvLLWig68LZGcJzuF
-         pTzpvoiR57qnrn3l9I3XGwNR6WFfqfmd5470zduWqkP6gkJioS2fmWSdfPO79mZL8qls
-         +H/1RqSwXHYznD7Y4NHcfexxDTRMgMg7LO/E6f89XTeX5S4gut8NH6TWZXsbt06ufIZ1
-         1GVA==
-X-Forwarded-Encrypted: i=1; AJvYcCXVIRQYD1udlZsNruH9NFAQENihWavWVENl3qGihYT9MWup1MDqsy+ifqyKzdDJRtTychtICvIJTDMGhCaYuQZKb14F
-X-Gm-Message-State: AOJu0YxQ3eLgce66xu1pZ2aDXR0MZGJ1VQll+ljnQKGKqOARp4jrWdXf
-	PDvXluB/iDezQiMmkUZiTjiOhCjRj1eB7Nn/m3+NhvAUlOuki/1SaPp2t12+N3g5FfmqVHcyAgd
-	NwoLRS7TlB3Su+the46OcD6bBaJwDpDFOyp7bnKpvfVTcqGN4Og==
-X-Received: by 2002:a05:600c:3ba5:b0:421:2065:3799 with SMTP id 5b1f17b1804b1-4212e0addecmr98197825e9.29.1717498193923;
-        Tue, 04 Jun 2024 03:49:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHolKe0OTesc59eKyR5Tl4T4Nj5Xg2kbayiJShosCk0JGDK4I2jUvKZhoSBsne4+vdw1UBVxg==
-X-Received: by 2002:a05:600c:3ba5:b0:421:2065:3799 with SMTP id 5b1f17b1804b1-4212e0addecmr98197695e9.29.1717498193554;
-        Tue, 04 Jun 2024 03:49:53 -0700 (PDT)
+        bh=khLXT47kqpcrtDLU6hojN1Y8iwI4i0MMg0kRPkLwAKQ=;
+        b=IW3J6WDHmrP2nZWsBWeYSE6sPCyVcF9W0YMcuOwjT9RItYGQKg73nSROFXMYaCI9+W
+         oBq+XGdiensw0vY0UZ+aTK9wYbHOOcfYYoOkPGTL7ynX5e45ruqkt835Uy2S6hqgLzeX
+         C4LvGvSlDrx5abgRm3abAjW+b1pmcUGtJlTf3FiaLfnMm/1cWwuiMDwoTECLTRYTTT6V
+         TlzSI2VZnoDno/8lT5P2PqyLeYR/sfXjWKkq7pcX0mcYhKcuUBdc5RgmTyAWDlTxRnsw
+         4rL/pBhAC248eUEYI5tK3NFChi1kKecQbbDFT47HgXX1TF1hPlmx1f/L7lbptzXZ8W/B
+         Ng8A==
+X-Forwarded-Encrypted: i=1; AJvYcCXs7K1UujrJBJ+/oc+Yqo8biPXFsRc4tNY1sdBRLQt7KKZzo9uZ2quWGZvz+uhM1bY1GbUWUG0O6whOr1JICO1jFSjE
+X-Gm-Message-State: AOJu0Ywlrhn2MiPnbgkbAV+lwiNfwdivIZ+r31fuUKp2UKgH1gwe/goA
+	ALXaE6E4ahh/Cp5M0oVBnGhQ//oa42l7jETQdGeYJBk02RBmuwYyD9M2c1zFqcESjylY9c82cDq
+	4vgQ5q5eRUNbXPhsifDrcOi2XFaLOWax8CKXrn6Nxi4+SXC1Ej/Uc6mJm4A==
+X-Received: by 2002:a05:620a:46a6:b0:794:f011:7a30 with SMTP id af79cd13be357-794f5c669c0mr1562812385a.14.1717498411888;
+        Tue, 04 Jun 2024 03:53:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHymc98QpftOUqvFlvr/bYlT6Z8NbMKWzQR6dsIzYHNQdoHJ2RUVlPg2ortFt5CFWmtmRCzbQ==
+X-Received: by 2002:a05:620a:46a6:b0:794:f011:7a30 with SMTP id af79cd13be357-794f5c669c0mr1562810185a.14.1717498411452;
+        Tue, 04 Jun 2024 03:53:31 -0700 (PDT)
 Received: from [192.168.0.4] (ip-109-43-178-97.web.vodafone.de. [109.43.178.97])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421526593cfsm12414475e9.42.2024.06.04.03.49.52
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-794f2efc653sm352278885a.18.2024.06.04.03.53.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jun 2024 03:49:53 -0700 (PDT)
-Message-ID: <15d6ae85-a46e-4a99-a3b9-6aa6420e0639@redhat.com>
-Date: Tue, 4 Jun 2024 12:49:51 +0200
+        Tue, 04 Jun 2024 03:53:30 -0700 (PDT)
+Message-ID: <4938edb7-c057-4f92-b59b-31f0b7ba6f54@redhat.com>
+Date: Tue, 4 Jun 2024 12:53:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +83,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 29/31] powerpc: Remove remnants of ppc64
- directory and build structure
-To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: Laurent Vivier <lvivier@redhat.com>, linuxppc-dev@lists.ozlabs.org,
- kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v9 30/31] powerpc: Add facility to query
+ TCG or KVM host
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
+ <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
 References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-30-npiggin@gmail.com>
+ <20240504122841.1177683-31-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -134,35 +134,44 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240504122841.1177683-30-npiggin@gmail.com>
+In-Reply-To: <20240504122841.1177683-31-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 04/05/2024 14.28, Nicholas Piggin wrote:
-> This moves merges ppc64 directories and files into powerpc, and
-> merges the 3 makefiles into one.
+> Use device tree properties to determine whether KVM or TCG is in
+> use.
 > 
-> The configure --arch=powerpc option is aliased to ppc64 for
-> good measure.
+> Logically these are not the inverse of one another, because KVM can be
+> used on top of a TCG processor (if TCG is emulating HV mode, or if it
+> provides a nested hypervisor interface with spapr). This can be a
+> problem because some issues relate to TCG CPU emulation, and some to
+> the spapr hypervisor implementation. At the moment there is no way to
+> determine TCG is running a KVM host that is running the tests, but the
+> two independent variables are added in case that is able to be
+> determined in future. For now that case is just incorrectly considered
+> to be kvm && !tcg.
+> 
+> Use this facility to restrict some of the known test failures to TCG.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
-...
-> diff --git a/powerpc/Makefile b/powerpc/Makefile
-> index 8a007ab54..e4b5312a2 100644
-> --- a/powerpc/Makefile
-> +++ b/powerpc/Makefile
-> @@ -1 +1,111 @@
-> -include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
-> +#
-> +# powerpc makefile
-> +#
-> +# Authors: Andrew Jones <drjones@redhat.com>
+>   lib/powerpc/asm/processor.h |  3 +++
+>   lib/powerpc/setup.c         | 25 +++++++++++++++++++++++++
+>   powerpc/atomics.c           |  2 +-
+>   powerpc/interrupts.c        |  6 ++++--
+>   powerpc/mmu.c               |  2 +-
+>   powerpc/pmu.c               |  6 +++---
+>   powerpc/sprs.c              |  2 +-
+>   powerpc/timebase.c          |  4 ++--
+>   powerpc/tm.c                |  2 +-
+>   9 files changed, 41 insertions(+), 11 deletions(-)
 
-I'd maybe drop that e-mail address now since it it not valid anymore. 
-Andrew, do want to see your new mail address here?
+As mentioned elsewhere, it would be nice to have this earlier in the series 
+so you could use the conditions in the earlier patches already (but if it is 
+too cumbersome to rework, I don't insist on that).
 
-Apart from that:
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
 
