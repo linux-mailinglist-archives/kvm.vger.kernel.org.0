@@ -1,112 +1,111 @@
-Return-Path: <kvm+bounces-18822-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18823-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BBF38FBFFE
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 01:39:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B45208FBFFF
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 01:39:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1D1828618D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 23:39:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 720E2282B3A
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 23:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8877114F10E;
-	Tue,  4 Jun 2024 23:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF2714D703;
+	Tue,  4 Jun 2024 23:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IuOSeUJZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XgmDUgQV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D508F14EC66
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 23:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874EF14B061
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 23:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717544308; cv=none; b=Dr6FxW/e/yHGALQtEl9u5RYnXdxVZrb8kmMO50dJgX2OjuG8wGE89YaplhpyNzvtqnC8aJ4WY7PnZDj1gRkpk8prpSBDQX8ArsSNcigC9TwB+g/vTMpZAQP9vG+5XZSQFt3miuHFLBM/Nxa2nm7RJ+q2O6HPNCIQUiwCQxm9rZg=
+	t=1717544318; cv=none; b=lpxdASzKbu0BDwo2QN/assS9oDakWgZKSj720ShZECQSSI3JdRI8N6X5cMJXmew/E8y6roe4X3OyWCf7Edwb/l5FVqgVMJSXCNlspG47tln4egLQe9Sz85PrEEDs/dAVwOGIaoEjWz+ZtzIXZIkESxGOL9/STvpXN4MdoTzOnyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717544308; c=relaxed/simple;
-	bh=BwM/Os4KBTmVspcHVSCHvte4rPtpmmrdzsSMdfB8t54=;
+	s=arc-20240116; t=1717544318; c=relaxed/simple;
+	bh=4F8pZ57BLKSPOg0dC7ifh8ipWL6/ST+th0aJ7rMuLGg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NQ70UEFQjRuoBC5O8cdJov3qg7mdPVK2JraM54sc+pTarl+WIXd4OzXcHu+sBhBHs6Zh7Yu1VRB2UBIKM71m2i6NWlbbksr4ipWZmDYZNZWr6mUWzSjLfauw6BmZvfXUcCftDQVi8NsAQ2mv85kfuB7HEuaNyDCUtELrJdR3d60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IuOSeUJZ; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=nE3ck66p5cZ4b5aXnk1FHwx6g3MmrdUzMltvDtZ3hegjxbfTeHMfas9VaoNg3cON3qOtGeYJEaYDnaldCTz1gYNlRpcC+QVgm/6uUd7io/eRVEB/bi7jk09ah/YHxTdMTRdLSGqO3royWdWDbFNiV675IkObs3pMdDfBeb+4Bvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XgmDUgQV; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1f6174d0421so27337715ad.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 16:38:26 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6c554776d0fso322989a12.0
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 16:38:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717544306; x=1718149106; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717544317; x=1718149117; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ErQRA4AMy3XWNUVtztRHO4ECy31oAB3jfpLBipdw7ZE=;
-        b=IuOSeUJZWZLs1rZM7UGBAWvyrYtiqqK29uaXyOVxhzSr4bz/ZKW/owGBaCYc0x3a78
-         PcCfH1JEMCXVIiBuGQzmcnZ4G0wo+W9eUD3JVRH53njLrVlM5HAPVgS26dYq0r/ZZyla
-         AZWGstH7cGJueRCVITVhCIUzuLE7nVPbjYEsVYGJ2KD2cM0NWtDXa27OX6qG8WuKIHUw
-         dCFUEXLC/FhzV9pOsm5oNNCMJPILS48913GL6POCZAZmd3GNKsMWLwofqKQfhHyWJWXk
-         mO81JECfCyjgHf6fGmwpKIRRdVwmFkiwD4lkB3n9Axza6mdZXctpLMG8UFuXKlZ4M8A+
-         Rl5g==
+        bh=9mbTpsLfEktMeOXsmxxA2gpvF0wwozR5+EDvFmfQ7ts=;
+        b=XgmDUgQVqhYNcoyd8An6LyRGkyA90bSe9uSczVyiY1Il54Wp2THuKWPEArWjuU3eqB
+         8N4aoVr6SkQCH6oWYqjFOPpNZETy8PrN4Ps87Z9oUPz+RS08gV6S57rkyA0kxZFeYjaf
+         CqWGxOX1TEjbY0heJWBWSkclDHlzvVsakWPNzAC+ZaaUdRtC5SuISqGLs2C5DAhSeAFJ
+         +M3/uA6cxv18/tB9VN4eB4YuD1i6MXB1X96jEGyrlnzpQi/TyeLz6mNIUaPbXr2shHH1
+         Ow0DqVwZeMX2GXtwPWsBmhQZ4bdPfq64S1Zv2I4WMA2bbjpy+gcc6dAgVL19G6eN6wba
+         xm8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717544306; x=1718149106;
+        d=1e100.net; s=20230601; t=1717544317; x=1718149117;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ErQRA4AMy3XWNUVtztRHO4ECy31oAB3jfpLBipdw7ZE=;
-        b=Is3yq4LJTYXagqzWmGKv8BG0q7Ats7ndv27e9vlwmWGtdM/FG4kYbSGGz7v/cxQ+Lt
-         A/glpgQg+MDjBETAWLdDKOHMkg5lfyHQ8sxplsH7tvHG8WejrjR7XcuCiGSg4mqljUBW
-         xqHLoYqeKeUjQWjgeXap9lH1wm3IN9aqRPIrwPlPyEK3ehy0mjL3D03I7uiTYw+7BD0g
-         9R50RgJeNDmKjS2mLT2NPg8vvkDa0Nxu4O3H0MK0GIk++/G6ghZ4CQPsZZFtIDMkhTFr
-         Z0njH/6RL42O0Oa1uo6ds1ZlOGqqZO2SLRW2f6wz48Q4mIe1rtb7T4i+8L7/y2HJexTQ
-         53Wg==
-X-Gm-Message-State: AOJu0Yw8Kb0V5RfawixOGLz9p9rBrVxppUiz94eRYne9Vq+4BtAiz08e
-	eKxhclr/nHUurIPFKi93WRT5bWT+ttk8onFpMn+BsMWZgnRet4LhUVkrY9eWFXOFIBw7NrmYtva
-	PRQ==
-X-Google-Smtp-Source: AGHT+IHN3cqzNcnm3C3UZ1Isf/IVeA2/aICMXKNKfdksQ1tq7WWRpJ2J61he5DBCW5Wt08nJcw0DRAMYOyg=
+        bh=9mbTpsLfEktMeOXsmxxA2gpvF0wwozR5+EDvFmfQ7ts=;
+        b=uEEoOQ9f6Xoow4II67nkT0DBECzWmkjEalruHR70uMnOhXYi8AXpcJ0tIhfair160q
+         xbJVVeCK2pwgkhHAvPHjC/R7ub1u2o4UqrqtiYvKa2k7V+X7/Rj3B2I1Nywuz3yS43QF
+         9KfyCIuyCYd3zoDwDfUHomMm9DqRPuXhdbOpq4Uev03bKMOnrS5XtcjsqAQPZY3FZi+T
+         9M3jPtpOMB0iPrbJo1zl3hU6z7Vz1Z640QyaCTZifYFPchLRG9c4rc1JkRwVZHRPOb2D
+         QrEQX4jo6Eytlfj2m87e2SFmHciTLGN2jJZ3o7TExiI1dvehqoP3448s81xkoQQzrrgg
+         MP1w==
+X-Gm-Message-State: AOJu0YypO3+nhnUimiA6gfqX+8Em2dLoDBHp1DfTWh4bow8+INGiTB/t
+	C5cZTeF4jKTs+ckPHN/2Nu38uZSFslsPQ3BCK/+cp7FoORgIRHcYW8MibjrNRWVUKaLjqbDJfOa
+	7aQ==
+X-Google-Smtp-Source: AGHT+IFquzPD2lzjLhm17gQSbKN5QrbdeOKywzZQZb9ynG7yQ8wD/Isj+DDXyMQUMK7YtLMy69bDCZNbFS4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ec81:b0:1f6:8033:f361 with SMTP id
- d9443c01a7336-1f6a5a12dcbmr287285ad.6.1717544306034; Tue, 04 Jun 2024
- 16:38:26 -0700 (PDT)
-Date: Tue,  4 Jun 2024 16:29:35 -0700
-In-Reply-To: <cover.1714081725.git.reinette.chatre@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:da8e:b0:1f4:8ba7:72c0 with SMTP id
+ d9443c01a7336-1f6a572fd0bmr742735ad.5.1717544316849; Tue, 04 Jun 2024
+ 16:38:36 -0700 (PDT)
+Date: Tue,  4 Jun 2024 16:29:37 -0700
+In-Reply-To: <20240423221521.2923759-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1714081725.git.reinette.chatre@intel.com>
+References: <20240423221521.2923759-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <171754361450.2780320.9936421038178572773.b4-ty@google.com>
-Subject: Re: [PATCH V5 0/4] KVM: x86: Make bus clock frequency for vAPIC timer configurable
+Message-ID: <171754330706.2779254.12749909442900108234.b4-ty@google.com>
+Subject: Re: [PATCH 0/4] KVM: x86: Collect host state snapshots into a struct
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, isaku.yamahata@intel.com, pbonzini@redhat.com, 
-	erdemaktas@google.com, vkuznets@redhat.com, vannapurve@google.com, 
-	jmattson@google.com, mlevitsk@redhat.com, xiaoyao.li@intel.com, 
-	chao.gao@intel.com, rick.p.edgecombe@intel.com, 
-	Reinette Chatre <reinette.chatre@intel.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 25 Apr 2024 15:06:58 -0700, Reinette Chatre wrote:
-> Changes from v4:
-> - v4: https://lore.kernel.org/lkml/cover.1711035400.git.reinette.chatre@intel.com/
-> - Rename capability from KVM_CAP_X86_APIC_BUS_FREQUENCY to
->   KVM_CAP_X86_APIC_BUS_CYCLES_NS. (Xiaoyao Li).
-> - Include "Testing" section in cover letter.
-> - Add Rick's Reviewed-by tags.
-> - Rebased on latest of "next" branch of https://github.com/kvm-x86/linux.git
+On Tue, 23 Apr 2024 15:15:17 -0700, Sean Christopherson wrote:
+> Add a global "kvm_host" structure to hold various host values, e.g. for
+> EFER, XCR0, raw MAXPHYADDR etc., instead of having a bunch of one-off
+> variables that inevitably need to be exported, or in the case of
+> shadow_phys_bits, are buried in a random location and are awkward to use,
+> leading to duplicate code.
+> 
+> Sean Christopherson (4):
+>   KVM: x86: Add a struct to consolidate host values, e.g. EFER, XCR0,
+>     etc...
+>   KVM: SVM: Use KVM's snapshot of the host's XCR0 for SEV-ES host state
+>   KVM: x86/mmu: Snapshot shadow_phys_bits when kvm.ko is loaded
+>   KVM: x86: Move shadow_phys_bits into "kvm_host", as "maxphyaddr"
 > 
 > [...]
 
-Applied the KVM changes to kvm-x86 misc (I'm feeling lucky).  Please prioritize
-refreshing the selftests patch, I'd like to get it applied sooner than later
-for obvious reasons (I'm not feeling _that_ lucky).
+Applied to kvm-x86 misc, thanks!
 
-[1/4] KVM: x86: hyper-v: Calculate APIC bus frequency for Hyper-V
-      https://github.com/kvm-x86/linux/commit/41c7b1bb656c
-[2/4] KVM: x86: Make nsec per APIC bus cycle a VM variable
-      https://github.com/kvm-x86/linux/commit/01de6ce03b1e
-[3/4] KVM: x86: Add a capability to configure bus frequency for APIC timer
-      https://github.com/kvm-x86/linux/commit/937296fd3deb
-[4/4] KVM: selftests: Add test for configure of x86 APIC bus frequency
-      (not applied)
+[1/4] KVM: x86: Add a struct to consolidate host values, e.g. EFER, XCR0, etc...
+      https://github.com/kvm-x86/linux/commit/7974c0643ee3
+[2/4] KVM: SVM: Use KVM's snapshot of the host's XCR0 for SEV-ES host state
+      https://github.com/kvm-x86/linux/commit/52c47f5897b6
+[3/4] KVM: x86/mmu: Snapshot shadow_phys_bits when kvm.ko is loaded
+      https://github.com/kvm-x86/linux/commit/c043eaaa6be0
+[4/4] KVM: x86: Move shadow_phys_bits into "kvm_host", as "maxphyaddr"
+      https://github.com/kvm-x86/linux/commit/82897db91215
 
 --
 https://github.com/kvm-x86/linux/tree/next
