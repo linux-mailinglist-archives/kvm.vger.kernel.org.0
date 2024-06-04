@@ -1,225 +1,277 @@
-Return-Path: <kvm+bounces-18742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D62168FAEBE
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 11:28:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E17F8FAEC2
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 11:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F374D1C20D3D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 09:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81F061C210A8
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 09:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC687143C5F;
-	Tue,  4 Jun 2024 09:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1CF143C47;
+	Tue,  4 Jun 2024 09:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MeJXKTTl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ePiq7Jhq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A4683CD8;
-	Tue,  4 Jun 2024 09:28:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E685143724
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 09:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717493284; cv=none; b=e6+xawip2wAC+NZc76GddpPP1jWcCNhFKCdZY0n2Hxe/ZqskJuP28XL4CKzaYi4TuD6c1gLwbI+wTexIgM008oGrRgsOxq7xy5+yEixlGg+VJL1A1MR9quRjW6ZG3Lho2T4phPP/Ru006aqK0c1y+DVag1VzOkGPRv99F1I/1yk=
+	t=1717493368; cv=none; b=owzJm34qnVy6Om4k56WshfSkwp1InjtsrhuVKnVB0yxOD0vdvAjef/dt340OYv2Klkz5VWauhpnI+XWLStlayTpR7NeVvD+v9bMJ1qawEtted0yF9QA7Ihm3dNIp+7Sx1DjYOl6uSrHrH9dChvsLritX/nvOjThz7qcUyCdaXOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717493284; c=relaxed/simple;
-	bh=qtV6WkWEV85Gwke+5sDv0lGuSW3BGovIvI6AmpxP6eI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Z8Zbefn1SRZtlcew0HRplR9jugwzAeXvFGEx2blHMdUvFB0tvfpNXEXTCMwdyxhn1HxOXj31g+O634Ws/1OEyrL0bXpZrEHOKJNVkAsiBGTfrspTYdN/oCBk4hS/pqn984kSh+peaxEkhcgSeNrXOU4gVbmsPXJ1GgL3mpDDY8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MeJXKTTl; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4549HY7t001747;
-	Tue, 4 Jun 2024 09:28:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=+PBvxOT9WIZi0i2wHiWHGNA6bgAo22c3cf6fHA4qwao=;
- b=MeJXKTTlYwrL+5cKPN6czrU8CiNmuKpQy8m/s6mw1bmtN61pz9wy94xbw20QJZ6ZYOAo
- KxUzJyqVNf+MHWRYSv2EYd44Oo8vs6EYXk/Z/O7NebAIba3OTjI5fGSWcgfzIdIwvCqK
- IgNznFsKItWwzIE8JGElCyH3z9ch0FKGesPXLIQE7eFxYcFwZ72Or2Xp/GBHt1nrRO1U
- qfInxjBPkc84pMsIV+SBApcJXiZuh9hhtm2QfKdvtSB4Y4P1m49nIiFX31xNqgtvQsRl
- d2fNFZa+BDw9S/1KBjIYDS6DgfGf26GoSpDFFbuaKbuVufE/temoJz92BTyXDnr8pA5b ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj05ng0xg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 09:28:00 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4549OeoW015142;
-	Tue, 4 Jun 2024 09:28:00 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj05ng0xd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 09:28:00 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4548QNPR008458;
-	Tue, 4 Jun 2024 09:27:59 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygec0negy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 09:27:59 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4549Rusc40829440
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Jun 2024 09:27:58 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1688058065;
-	Tue,  4 Jun 2024 09:27:56 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3D0575805A;
-	Tue,  4 Jun 2024 09:27:54 +0000 (GMT)
-Received: from oc-fedora.boeblingen.de.ibm.com (unknown [9.152.212.216])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Jun 2024 09:27:54 +0000 (GMT)
-Message-ID: <b816efd7dd3d5f6fead3433d8a800c7f4372a091.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 0/3] vfio/pci: s390: Fix issues preventing
- VFIO_PCI_MMAP=y for s390 and enable it
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Gerald Schaefer
- <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily
- Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alex Williamson
- <alex.williamson@redhat.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        Matthew
- Rosato <mjrosato@linux.ibm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Date: Tue, 04 Jun 2024 11:27:53 +0200
-In-Reply-To: <0a4622ce-3826-4b08-ab81-375887ab6a46@linux.ibm.com>
-References: <20240529-vfio_pci_mmap-v3-0-cd217d019218@linux.ibm.com>
-	 <0a4622ce-3826-4b08-ab81-375887ab6a46@linux.ibm.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k
- /ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc
- 3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/
- 2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVS
- XQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9a
- UlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1d
- w75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakY
- tK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19
- /N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZ
- dVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQ
- JXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/Fej
- CYJAFAmWVooIFCQWP+TMACgkQr+Q/FejCYJCmLg/+OgZD6wTjooE77/ZHmW6Egb5nUH6DU+2nMHMH
- UupkE3dKuLcuzI4aEf/6wGG2xF/LigMRrbb1iKRVk/VG/swyLh/OBOTh8cJnhdmURnj3jhaefzslA
- 1wTHcxeH4wMGJWVRAhOfDUpMMYV2J5XoroiA1+acSuppelmKAK5voVn9/fNtrVr6mgBXT5RUnmW60
- UUq5z6a1zTMOe8lofwHLVvyG9zMgv6Z9IQJc/oVnjR9PWYDUX4jqFL3yO6DDt5iIQCN8WKaodlNP6
- 1lFKAYujV8JY4Ln+IbMIV2h34cGpIJ7f76OYt2XR4RANbOd41+qvlYgpYSvIBDml/fT2vWEjmncm7
- zzpVyPtCZlijV3npsTVerGbh0Ts/xC6ERQrB+rkUqN/fx+dGnTT9I7FLUQFBhK2pIuD+U1K+A+Egw
- UiTyiGtyRMqz12RdWzerRmWFo5Mmi8N1jhZRTs0yAUn3MSCdRHP1Nu3SMk/0oE+pVeni3ysdJ69Sl
- kCAZoaf1TMRdSlF71oT/fNgSnd90wkCHUK9pUJGRTUxgV9NjafZy7sx1Gz11s4QzJE6JBelClBUiF
- 6QD4a+MzFh9TkUcpG0cPNsFfEGyxtGzuoeE86sL1tk3yO6ThJSLZyqFFLrZBIJvYK2UiD+6E7VWRW
- 9y1OmPyyFBPBosOvmrkLlDtAtyfYInO0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQ
- GlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y
- 3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJB7oxAAksHYU+myhSZD0YSuYZl3oLDUEFP
- 3fm9m6N9zgtiOg/GGI0jHc+Tt8qiQaLEtVeP/waWKgQnje/emHJOEDZTb0AdeXZk+T5/ydrKRLmYC
- 6rPge3ue1yQUCiA+T72O3WfjZILI2yOstNwd1f0epQ32YaAvM+QbKDloJSmKhGWZlvdVUDXWkS6/m
- aUtUwZpddFY8InXBxsYCbJsqiKF3kPVD515/6keIZmZh1cTIFQ+Kc+UZaz0MxkhiCyWC4cH6HZGKR
- fiXLhPlmmAyW9FiZK9pwDocTLemfgMR6QXOiB0uisdoFnjhXNfp6OHSy7w7LTIHzCsJoHk+vsyvSp
- +fxkjCXgFzGRQaJkoX33QZwQj1mxeWl594QUfR4DIZ2KERRNI0OMYjJVEtB5jQjnD/04qcTrSCpJ5
- ZPtiQ6Umsb1c9tBRIJnL7gIslo/OXBe/4q5yBCtCZOoD6d683XaMPGhi/F6+fnGvzsi6a9qDBgVvt
- arI8ybayhXDuS6/StR8qZKCyzZ/1CUofxGVIdgkseDhts0dZ4AYwRVCUFQULeRtyoT4dKfEot7hPE
- /4wjm9qZf2mDPRvJOqss6jObTNuw1YzGlpe9OvDYtGeEfHgcZqEmHbiMirwfGLaTG2xKDx4g2jd2z
- Ocf83TCERFKJEhvZxB3tRiUQTd3dZ1TIaisv/o+y0K05pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNj
- aG5lbGxlQGdtYWlsLmNvbT6JAlQEEwEIAD4CGwEFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQSds
- ACy0nUgMKX3Ldyv5D8V6MJgkAUCZZWiiwUJBY/5MwAKCRCv5D8V6MJgkNVuEACo12niyoKhnXLQFt
- NaqxNZ+8p/MGA7g2XcVJ1bYMPoZ2Wh8zwX0sKX/dLlXVHIAeqelL5hIv6GoTykNqQGUN2Kqf0h/z7
- b85o3tHiqMAQV0dAB0y6qdIwdiB69SjpPNK5KKS1+AodLzosdIVKb+LiOyqUFKhLnablni1hiKlqY
- yDeD4k5hePeQdpFixf1YZclGZLFbKlF/A/0Q13USOHuAMYoA/iSgJQDMSUWkuC0mNxdhfVt/gVJnu
- Kq+uKUghcHflhK+yodqezlxmmRxg6HrPVqRG4pZ6YNYO7YXuEWy9JiEH7MmFYcjNdgjn+kxx4IoYU
- O0MJ+DjLpVCV1QP1ZvMy8qQxScyEn7pMpQ0aW6zfJBsvoV3EHCR1emwKYO6rJOfvtu1rElGCTe3sn
- sScV9Z1oXlvo8pVNH5a2SlnsuEBQe0RXNXNJ4RAls8VraGdNSHi4MxcsYEgAVHVaAdTLfJcXZNCIU
- cZejkOE+U2talW2n5sMvx+yURAEVsT/50whYcvomt0y81ImvCgUz4xN1axZ3PCjkgyhNiqLe+vzge
- xq7B2Kx2++hxIBDCKLUTn8JUAtQ1iGBZL9RuDrBy2rR7xbHcU2424iSbP0zmnpav5KUg4F1JVYG12
- vDCi5tq5lORCL28rjOQqE0aLHU1M1D2v51kjkmNuc2pgLDFzpvgLQhTmlrbGFzIFNjaG5lbGxlIDx
- uaWtzQGtlcm5lbC5vcmc+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAA
- stJ1IDCl9y3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJAglRAAihbDxiGLOWhJed5cF
- kOwdTZz6MyYgazbr+2sFrfAhX3hxPFoG4ogY/BzsjkN0cevWpSigb2I8Y1sQD7BFWJ2OjpEpVQd0D
- sk5VbJBXEWIVDBQ4VMoACLUKgfrb0xiwMRg9C2h6KlwrPBlfgctfvrWWLBq7+oqx73CgxqTcGpfFy
- tD87R4ovR9W1doZbh7pjsH5Ae9xX5PnQFHruib3y35zC8+tvSgvYWv3Eg/8H4QWlrjLHHy2AfZDVl
- 9F5t5RfGL8NRsiTdVg9VFYg/GDdck9WPEgdO3L/qoq3Iuk0SZccGl+Nj8vtWYPKNlu2UvgYEbB8cl
- UoWhg+SjjYQka7/p6tc+CCPZ8JUpkgkAdt7yXt6370wP1gct2VztS6SEGcmAE1qxtGhi5Kuln4ZJ/
- UO2yxhPHgoW99OuZw3IRHe0+mNR67JbIpSuFWDFNjZ0nckQcU1taSEUi0euWs7i4MEkm0NsOsVhbs
- 4D2vMiC6kO/FqWOPmWZeAjyJw/KRUG4PaJAr5zJUx57nhKWgeTniW712n4DwCUh77D/PHY0nqBTG/
- B+QQCR/FYGpTFkO4DRVfapT8njDrsWyVpP9o64VNZP42S+DuRGWfUKCMAXsM/wPzRiDEVfnZMcUR9
- vwLSHeoV7MiIFC0xIrp5ES9R00t4UFgqtGc36DV71qjR+66Im0=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.1 (3.52.1-1.fc40) 
+	s=arc-20240116; t=1717493368; c=relaxed/simple;
+	bh=du9JYxStMhvPl6Mg+TBJMIxibcHL8lHfhi/EYHgT9Rk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z/MrjaAi6ptOryiZmlYqkoimSzfI4E4CzMc5xZaxE1/g8dC2mdMiZNjGnkiZPU/AFKxGRmRPpeXHGkLrEId0anNAPXp2SHLzch6gaIHujo6/UctZe/d/Xco71OfW000I/b+ekofptlHdN5+94solV3rhyVz5dFPx0RBFKdlFD7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ePiq7Jhq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717493365;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hZ6BR7ZP0R1ebLkNmGoehN6rlFVKuR/AxIITl0TNwfA=;
+	b=ePiq7JhqqDPYLr5bq7LnDQPjMgtd7Gph1+gbhFjDZuxE6JdYBS0AwGONUITuAhSkByFl/p
+	hZBrA4p7UfcvvGON/KrAHb76S5tU1ZVUlN+6WPRE5L8RcjxhDq1f1bS+5xatWPv/r2nI8Q
+	aw7ZKVzwfw/jItKEUSPQVwEVnyRM9o8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-436-ryezyYoeOaegVds3xkxEaw-1; Tue, 04 Jun 2024 05:29:21 -0400
+X-MC-Unique: ryezyYoeOaegVds3xkxEaw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CCF16803C81;
+	Tue,  4 Jun 2024 09:29:20 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.51])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 25571492BCD;
+	Tue,  4 Jun 2024 09:29:17 +0000 (UTC)
+Date: Tue, 4 Jun 2024 10:29:15 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [RFC v2 0/7] Introduce SMP Cache Topology
+Message-ID: <Zl7ea2o2aaxXMj9X@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240530101539.768484-1-zhao1.liu@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: yE8rqb7HLFBblCStVzGjDJG42WSTd8dO
-X-Proofpoint-ORIG-GUID: A2vWTWj028cwHTWVJppbX6H87F1MjySW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-04_03,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 adultscore=0 spamscore=0 priorityscore=1501
- malwarescore=0 suspectscore=0 mlxscore=0 bulkscore=0 impostorscore=0
- phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2405010000 definitions=main-2406040076
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240530101539.768484-1-zhao1.liu@intel.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-On Mon, 2024-06-03 at 17:50 +0200, Christian Borntraeger wrote:
-> Am 29.05.24 um 13:36 schrieb Niklas Schnelle:
-> > With the introduction of memory I/O (MIO) instructions enbaled in commi=
-t
-> > 71ba41c9b1d9 ("s390/pci: provide support for MIO instructions") s390
-> > gained support for direct user-space access to mapped PCI resources.
-> > Even without those however user-space can access mapped PCI resources
-> > via the s390 specific MMIO syscalls. There is thus nothing fundamentall=
-y
-> > preventing s390 from supporting VFIO_PCI_MMAP allowing user-space drive=
-rs
-> > to access PCI resources without going through the pread() interface.
-> > To actually enable VFIO_PCI_MMAP a few issues need fixing however.
-> >=20
-> > Firstly the s390 MMIO syscalls do not cause a page fault when
-> > follow_pte() fails due to the page not being present. This breaks
-> > vfio-pci's mmap() handling which lazily maps on first access.
-> >=20
-> > Secondly on s390 there is a virtual PCI device called ISM which has
-> > a few oddities. For one it claims to have a 256 TiB PCI BAR (not a typo=
-)
-> > which leads to any attempt to mmap() it fail with the following message=
-:
-> >=20
-> >      vmap allocation for size 281474976714752 failed: use vmalloc=3D<si=
-ze> to increase size
-> >=20
-> > Even if one tried to map this BAR only partially the mapping would not
-> > be usable on systems with MIO support enabled. So just block mapping
-> > BARs which don't fit between IOREMAP_START and IOREMAP_END.
-> >=20
-> > Note:
-> > For your convenience the code is also available in the tagged
-> > b4/vfio_pci_mmap branch on my git.kernel.org site below:
-> > https: //git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/
->=20
->=20
-> I guess its now mostly a question of who picks those patches? Alex?
+On Thu, May 30, 2024 at 06:15:32PM +0800, Zhao Liu wrote:
+> Hi,
+> 
+> Now that the i386 cache model has been able to define the topology
+> clearly, it's time to move on to discussing/advancing this feature about
+> configuring the cache topology with -smp as the following example:
+> 
+> -smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32,\
+>      l1d-cache=core,l1i-cache=core,l2-cache=core,l3-cache=die
+> 
+> With the new cache topology options ("l1d-cache", "l1i-cache",
+> "l2-cache" and "l3-cache"), we could adjust the cache topology via -smp.
 
-That matches my understanding as well.
+Switching to QAPI for a second, your proposal is effectively
 
->=20
-> Any patch suitable for stable?
+    { 'enum': 'SMPCacheTopo',
+      'data': [ 'default','socket','die','cluster','module','core','thread'] }
 
-I'd almost say all but the last one may be candidates for stable. I
-found it hard to pinpoint a specific commit they fix though, hence the
-lack of Fixes tag. For the first one I'm actually not sure if e.g.
-rdma-core users could also run into this problem when they get swapped
-out as I'm not sure if the mapping is pinned there.
+   { 'struct': 'SMPConfiguration',
+     'data': {
+       '*cpus': 'int',
+       '*drawers': 'int',
+       '*books': 'int',
+       '*sockets': 'int',
+       '*dies': 'int',
+       '*clusters': 'int',
+       '*modules': 'int',
+       '*cores': 'int',
+       '*threads': 'int',
+       '*maxcpus': 'int',
+       '*l1d-cache': 'SMPCacheTopo',
+       '*l1i-cache': 'SMPCacheTopo',
+       '*l2-cache': 'SMPCacheTopo',
+       '*l3-cache': 'SMPCacheTopo',
+     } }
+
+I think that would be more natural to express as an array of structs
+thus:
+
+    { 'enum': 'SMPCacheTopo',
+      'data': [ 'default','socket','die','cluster','module','core','thread'] }
+
+    { 'enum': 'SMPCacheType',
+      'data': [ 'l1d', 'l1i', 'l2', 'l3' ] }
+     
+    { 'struct': 'SMPCache',
+      'data': {
+        'type': 'SMPCacheType',
+        'topo': 'SMPCacheTopo',
+      } }
+
+   { 'struct': 'SMPConfiguration',
+     'data': {
+       '*cpus': 'int',
+       '*drawers': 'int',
+       '*books': 'int',
+       '*sockets': 'int',
+       '*dies': 'int',
+       '*clusters': 'int',
+       '*modules': 'int',
+       '*cores': 'int',
+       '*threads': 'int',
+       '*maxcpus': 'int',
+       'caches': [ 'SMPCache' ]
+     } }
+
+Giving an example in (hypothetical) JSON cli syntax of:
+
+  -smp  "{'cpus':32,'sockets':2,'dies':2,'modules':2,
+          'cores':2,'threads':2,'maxcpus':32,'caches': [
+	    {'type':'l1d','topo':'core' },
+	    {'type':'l1i','topo':'core' },
+	    {'type':'l2','topo':'core' },
+	    {'type':'l3','topo':'die' },
+	  ]}"
+
+
+> Open about How to Handle the Default Options
+> ============================================
+> 
+> (For the detailed description of this series, pls skip this "long"
+> section and review the subsequent content.)
+> 
+> 
+> Background of OPEN
+> ------------------
+> 
+> Daniel and I discussed initial thoughts on cache topology, and there was
+> an idea that the default *cache_topo is on the CORE level [3]:
+> 
+> > simply preferring "cores" for everything is a reasonable
+> > default long term plan for everything, unless the specific
+> > architecture target has no concept of "cores".
+
+FYI, when I wrote that I wasn't specifically thinking about cache
+mappings. I just meant that when exposing SMP topology to guests,
+'cores' is a good default, compared to 'sockets', or 'threads',etc.
+
+Defaults for cache <-> topology  mappings should be whatever makes
+most sense to the architecture target/cpu.
+
+> Problem with this OPEN
+> ----------------------
+> 
+> Some arches have their own arch-specific cache topology, such as l1 per
+> core/l2 per core/l3 per die for i386. And as Jeehang proposed for
+> RISC-V, the cache topologies are like: l1/l2 per core and l3 per
+> cluster. 
+> 
+> Taking L3 as an example, logically there is a difference between the two
+> starting points of user-specified core level and with the default core
+> level.
+> 
+> For example,
+> 
+> "(user-specified) l3-cache-topo=core" should override i386's default l3
+> per core, but i386's default l3 per core should also override
+> "(default) l3-cache-topo=core" because this default value is like a
+> placeholder that specifies nothing.
+> 
+> However, from a command line parsing perspective, it's impossible to
+> tell what the “l3-cache-topo=core” setting is for...
+
+Yes, we need to explicitly distinguish built-in defaults from
+user specified data, otherwise we risk too many mistakes.
+
+> Options to solve OPEN
+> ---------------------
+> 
+> So, I think we have the following options:
+> 
+> 
+> 1. Can we avoid such default parameters?
+> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> This would reduce the pain in QEMU, but I'm not sure if it's possible to
+> make libvirt happy?
+
+I think having an explicit "defualt" value is inevitable, not simply
+because of libvirt. Long experiance with QEMU shows that we need to
+be able to reliably distinguish direct user input from  built-in
+defaults in cases like this.
+
+> 
+> It is also possible to expose Cache topology information as the CPU
+> properties in “query-cpu-model-expansion type=full”, but that adds
+> arch-specific work.
+> 
+> If omitted, I think it's just like omitting “cores”/“sockets”,
+> leaving it up to the machine to decide based on the specific CPU model
+> (and now the cache topology is indeed determined by the CPU model as
+> well).
+> 
+> 
+> 2. If default is required, can we use a specific abstract word?
+> ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> 
+> That is, is it possible to use a specific word like “auto”/“invalid”
+> /“default” and avoid a specific topology level?
+
+"invalid" feels a bit wierd, but 'auto' or 'default' are fine,
+and possibly "unspecified"
+
+> Like setting “l3-cache-topo=invalid” (since I've only added the invalid
+> hierarchy so far ;-) ).
+> 
+> I found the cache topology of arches varies so much that I'm sorry to
+> say it's hard to have a uniform default cache topology.
+> 
+> 
+> I apologize for the very lengthy note and appreciate you reviewing it
+> here as well as your time!
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
