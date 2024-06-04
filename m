@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-18712-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18713-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580808FA976
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:05:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D433A8FA9CE
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13B4D28900F
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:05:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 750DD1F24C9E
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D761413D516;
-	Tue,  4 Jun 2024 05:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 121E313D897;
+	Tue,  4 Jun 2024 05:13:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jzax1NTB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O66PS6JO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA32813DDA3
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01ED12A8D0
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717477517; cv=none; b=msVBgJWDpQHTOih+9qiMcYHGZc39jPYxckaHb+AGPgwhpbE0+twRbWLZ2S4puI2wFdwrj/ajIpGsurBhdzDbccTxvB74NOFzXySIcCW++p6hc0P3UU1NOTmx/s1vifJzyxhJUb8Gg+9R97ZY+kDRwIRdhwlI+wvr+bsXdM5LBVE=
+	t=1717478013; cv=none; b=UY656l6OHYRRypVOBIkgeJpP/dxLNpHeoElZLGey2V6ZN0q+PV2UPT5K5Evj4THOs81W7i4wQysoTAdSTvLTfrVmD6DMZ8zny0Jx/5zL5IBOPJmhsKWOz7F+2L8pBHoBW4OoL1Tpcdm3uxQ4mJzMhcqnhP0qeoPpwSPrFU9A2ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717477517; c=relaxed/simple;
-	bh=ST1aT+ZIOQZIJsJpJM5SeKpqVlsON/qQlVZ1f1tgIlk=;
+	s=arc-20240116; t=1717478013; c=relaxed/simple;
+	bh=va0UFpIASYHPfbzqO5kjm+RfiMFz0r0LowL8jG4pqzI=;
 	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=FoOnzst72iXa7Fj65D0I+ESgQGZWclXJFlQxEDgsN8OWs7K8kPOC6ZShszcdOxPTxP7Lr/Zz2EKq1VdyP/hvvwORgMczV53d3DNeUZfaMGH/NVNZoNFnnlYo2x3+UWhZEdGO0vqKnIWhVrx8OreJ+YtMjaapfStpmMAST7c9DWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jzax1NTB; arc=none smtp.client-ip=209.85.214.170
+	 References:In-Reply-To; b=T0bWseYH2b21XJIdUNDzIeZg7GpytyCvaHGDOR/Lcl+URnUpFmI+x2g4VUvg5OusjVQDNaCogixNirtugym/pj4lx6MzRQXecSyCtpX2bSm9Jn2Ok+AmkQkT5a4Ex9OmEUl7rDlm+diYO44YXT2lgiidOqA2yIdDNEOn3gmJJrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O66PS6JO; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1f6262c0a22so28560985ad.1
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:05:15 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1f44b594deeso37236795ad.2
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:13:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717477515; x=1718082315; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717478011; x=1718082811; darn=vger.kernel.org;
         h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MP9ddSZIJDyxzHcDOPGE2whW95Q+sS0DCZmdXFauqkg=;
-        b=Jzax1NTB8dMdaRYmQ8hCR+NgipHEsCxJ1XYxofOqUYfQao27AIPJ4jY4aVsevADlpw
-         +HvEKyGkWySrH2uQy4yQi3Sc5UKYR+d6Dz2yiavQT+XaaLQKcoOmtbNAIyUWnqJxpD5c
-         PwHI3tMzEfzYa57nu58bJxdvKOKrJ9m5VfmNYyb+rr1VIFO7kstUrW+yPwo0AZKACiTO
-         T1XthHVmO7qw8eRrs1x8dT+BZLSf6aef7IeSCmHyIS9qw9oH5fEZoz7UIikTpsVadJKO
-         xx5oI+ll1VIBIznwlIKsieekpmpZ8MJ/ysG3EO0RTybmJAz5JdP3BX1o1O/sCL3wy52x
-         vzXg==
+        bh=GT7SfBTLOwpc/YXnH4XWcLEq77fXjMD17/6UtGiAP8o=;
+        b=O66PS6JObnjfPQGQbBVwI500yzXa3xAruOeWgjCu+Rej9CyjnVrszdSvdul6kvJHjn
+         uJk3Ihrqrt1/fy9o8mLAOLsHnI/539ZwL/rRdtx8zqmHCYRs7sEUgEnSfa2bz9gR1EnC
+         soTpiHna2jSeOoFKv0HanaaRyKa/ZaduYz5c5lGyKKikxBhgprqQcCLx/r0y2q0YkBIb
+         lHOoP8RE0zfh6zVMDjH7mBwj4VKpLGwLTGXouDL4uLVZVDQhCbiBOm5sK0dRkUOrI21Y
+         qlRFc7qnNrk4gLuNo02JI0ryuosPcazfPnVcvFEuoYHVE1zRkqCwpBDHQ0TWL/o6M2Rw
+         LFVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717477515; x=1718082315;
+        d=1e100.net; s=20230601; t=1717478011; x=1718082811;
         h=in-reply-to:references:from:subject:cc:to:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=MP9ddSZIJDyxzHcDOPGE2whW95Q+sS0DCZmdXFauqkg=;
-        b=oZUV0dB4RbXhUAWLf+uiXYnzk+VxMFFbo5hNJLzPxxDtCcOXXNSNFxCtR9UeJaY6mh
-         2Ivw9ZEdny6A26tQvvgaV3e4dBNsXeD+EwpaHWzcttAcLiwNF9RlUmUJTigVwCpm4lLx
-         Tkp+dYwJQC54Kr0Sqgfxv8QTXEARGM+k+uhe/MKPTtqjdLQ/6Ju6cN5yamHugRFVWYLM
-         8oo/bHpXpMqDzTqiEJrLZtdBisepTfVaZ1oRtZRvVDgLo+kQVDjzhX/8+rpb1duFx6r6
-         DUwSdG52dTTC7v63/x+NttfC9vs2iLqrmIAwNvQiVZcZFB3PeVgSuO/7+5qLemhY4Lir
-         dPJg==
-X-Forwarded-Encrypted: i=1; AJvYcCXN8ZT1WTKoj00zHFvPbIz/K4cnm06GafeXMd1FI5wQErOvOBZteqA93sgIj1OdathSd4JNYOuLJ6xVzoTtmGwbXn/+
-X-Gm-Message-State: AOJu0YxQDpz/+ik850Auy9p0JknkZZBS3Di8Z2eCnspLdS6on/Gd8cWc
-	YejIZtLKnPrjKR+YL17XVmFd5qcnI912jcssm1Vj8qbyG9AHSxR0
-X-Google-Smtp-Source: AGHT+IHMk0DwnulW19nrV+PVxI9lED/KpaMqNXJxX2JEgXQmpOrUclrcB2VmQxzD0BobQPJNUcfIrg==
-X-Received: by 2002:a17:902:f545:b0:1f6:53d5:3d89 with SMTP id d9443c01a7336-1f6937bd2bfmr26400915ad.11.1717477514898;
-        Mon, 03 Jun 2024 22:05:14 -0700 (PDT)
+        bh=GT7SfBTLOwpc/YXnH4XWcLEq77fXjMD17/6UtGiAP8o=;
+        b=AC0qN8X10MYLsjFgsVwrWfuIR1GRdPpT5XCi2CYgTKTyExdfYLA8ICweAspdB0O5M7
+         LraCszIOF0hApUALFcD2x2uZo58r372iN0BPwuO7OnznDiZre0ulYAuXEEVRiQ4+eNPP
+         Jzaac7DdK4P3Rxw6hSGa9zVXmRAs6L0d3wiBihURYmKntVIVtbN+9ycZRXY8KIObWRNW
+         dCyKoFJyvuhBs5DbGYKgNTjfeSsq00HExwVfzh6NUoyWY3MgU0Xl16EnNOjW5tHJIRAP
+         t8RaacvWdjw7cz18CLEAXK9kJU9goXQ+JqeyvrjLzHgP2DAAWg1FmRaeFhbpddyFGmyV
+         2Ycw==
+X-Forwarded-Encrypted: i=1; AJvYcCXIG2VkQY6ONnvgN03WmUhGJg77HexAewyrJd+2HkBlVpLRqlxLB4YVtAZVgj95DDKaBNE8mSAiPSMHWpuMVABSqyzG
+X-Gm-Message-State: AOJu0YzrZOPS67ljrSpvsnk83tOKHriYfKmtopQKv9e2vOD5zCc0pws3
+	JcEUgB6ouTb08oBsPRsczalPpbrW1seFpvLPjCJVVpdVrYITIyA3
+X-Google-Smtp-Source: AGHT+IFKbc5LjfirCcL45hrRasbp0xZlyYx9lCORURuAdAoEsU4e3Bn/DyFE6rfUbq7e8XuWC9Sp8w==
+X-Received: by 2002:a17:903:1109:b0:1f4:b7ff:ac4a with SMTP id d9443c01a7336-1f6370453a9mr122074735ad.37.1717478011071;
+        Mon, 03 Jun 2024 22:13:31 -0700 (PDT)
 Received: from localhost ([1.146.11.115])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f63240c8ebsm74241155ad.267.2024.06.03.22.05.12
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6323dd918sm73910735ad.164.2024.06.03.22.13.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jun 2024 22:05:14 -0700 (PDT)
+        Mon, 03 Jun 2024 22:13:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,54 +75,48 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 04 Jun 2024 15:05:10 +1000
-Message-Id: <D1QYYRZ0LMAR.26MRLHMK0MFDT@gmail.com>
+Date: Tue, 04 Jun 2024 15:13:26 +1000
+Message-Id: <D1QZ53WOLR1C.1QGLYWZV6QFFD@gmail.com>
 To: "Thomas Huth" <thuth@redhat.com>
-Cc: "Andrew Jones" <andrew.jones@linux.dev>, <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH 3/4] build: Make build output pretty
+Cc: "Laurent Vivier" <lvivier@redhat.com>, "Andrew Jones"
+ <andrew.jones@linux.dev>, <linuxppc-dev@lists.ozlabs.org>,
+ <kvm@vger.kernel.org>
+Subject: Re: [kvm-unit-tests PATCH v9 14/31] powerpc: Remove broken SMP
+ exception stack setup
 From: "Nicholas Piggin" <npiggin@gmail.com>
 X-Mailer: aerc 0.17.0
-References: <20240602122559.118345-1-npiggin@gmail.com>
- <20240602122559.118345-4-npiggin@gmail.com>
- <448757a4-46c8-4761-bc51-32ee39f39b97@redhat.com>
-In-Reply-To: <448757a4-46c8-4761-bc51-32ee39f39b97@redhat.com>
+References: <20240504122841.1177683-1-npiggin@gmail.com>
+ <20240504122841.1177683-15-npiggin@gmail.com>
+ <7059d458-048a-40a5-b21e-4e15568d1f54@redhat.com>
+In-Reply-To: <7059d458-048a-40a5-b21e-4e15568d1f54@redhat.com>
 
-On Mon Jun 3, 2024 at 6:26 PM AEST, Thomas Huth wrote:
-> On 02/06/2024 14.25, Nicholas Piggin wrote:
-> > Unless make V=3D1 is specified, silence make recipe echoing and print
-> > an abbreviated line for major build steps.
-> >=20
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >   Makefile                | 14 ++++++++++++++
-> >   arm/Makefile.common     |  7 +++++++
-> >   powerpc/Makefile.common | 11 +++++++----
-> >   riscv/Makefile          |  5 +++++
-> >   s390x/Makefile          | 18 +++++++++++++++++-
-> >   scripts/mkstandalone.sh |  2 +-
-> >   x86/Makefile.common     |  5 +++++
-> >   7 files changed, 56 insertions(+), 6 deletions(-)
+On Mon Jun 3, 2024 at 7:30 PM AEST, Thomas Huth wrote:
+> On 04/05/2024 14.28, Nicholas Piggin wrote:
+> > The exception stack setup does not work correctly for SMP, because
+> > it is the boot processor that calls cpu_set() which sets SPRG2 to
+> > the exception stack, not the target CPU itself. So secondaries
+> > never got their SPRG2 set to a valid exception stack.
 >
-> The short lines look superfluous in verbose mode, e.g.:
->
->   [OBJCOPY] s390x/memory-verify.bin
-> objcopy -O binary  s390x/memory-verify.elf s390x/memory-verify.bin
->
-> Could we somehow suppress the echo lines in verbose mode, please?
->
-> For example in the SLOF project, it's done like this:
->
-> https://gitlab.com/slof/slof/-/blob/master/make.rules?ref_type=3Dheads#L4=
-8
->
-> By putting the logic into $CC and friends, you also don't have to add=20
-> "@echo" statements all over the place.
+> So secondary CPUs currently must not run into any exceptions?
 
-I'll could try a bit harder at it, this was a pretty quick hack.
+Yes, at the moment. It was broken anyway.
 
-I probably prefer the cmd_cc style that Linux uses rather than
-overloading CC. But maybe that's more work.
+Patch 16 creates a proper environment for secondaries, including
+taking interrupts.
 
 Thanks,
 Nick
+
+>
+> > Remove the SMP code and just set an exception stack for the boot
+> > processor. Make the stack 64kB while we're here, to match the
+> > size of the regular stack.
+> >=20
+> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> > ---
+> >   lib/powerpc/setup.c | 16 ++++++++--------
+> >   1 file changed, 8 insertions(+), 8 deletions(-)
+>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
