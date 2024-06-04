@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-18788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86A98FB5B4
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 16:40:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A46488FB5D6
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 16:44:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A6C7284F4E
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 14:40:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9FA6B28496
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 14:43:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499F9143C76;
-	Tue,  4 Jun 2024 14:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C1E13CA9A;
+	Tue,  4 Jun 2024 14:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFL072f8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2YHr8HI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C2D12BEA4
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 14:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E55B2AEFE
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 14:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717511893; cv=none; b=Mn0P9+/IQk1KrNOOs20GCnPFjWUrDK0bIg9xqTJjpI9e1nM/xZMyZVECf1jGH3IH5v9xAMqOBnUbhvpv28XmhuPGmeQpGwooOWLFko74r9NLRwLMPFupIUEU9RDbvdSwcdyE+qsbyOFGrFVjXKFLeSSEoV+8yT7XGSJd21TBGBU=
+	t=1717512028; cv=none; b=BJ5OHp8yqouIPmwrgOufrL4jMynxgxG6Pw3YCJFfXNH2IcNfUQiqeps9fgyIO2gpZbT/5etmkJABJ+q/cUscJL4hqoUKqP2V7uxFBjy+b0F7qT/OXpBOCrB/XQ8AuVCIlTMQ/Myfv9Mpver4ZZOIFND04UITxPqe0Ij/OlYWx6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717511893; c=relaxed/simple;
-	bh=SvOAcx3aRIAzgWn6aB+3plUYPLK3g5l35N4V2ElfFpM=;
+	s=arc-20240116; t=1717512028; c=relaxed/simple;
+	bh=eJmwqjsUKsWhtzK90nBzNbQq4qK7w/iW9NxVjBDr3gY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=BZ8f/OOKFdMZH/VE7qDQyrfn8ElVz19XSIpSVXRAtwM1kyJxW4niFuDpGeXp3gQRJNh6EWzKycFaZTk7P0Sic88cQWS+6ZaTpjPgDijiQydSTwz2DjQzzj5YvTm67y9ju4Yr0o1qVprZF92C3+n9Zze6Xaauio1qNqDD3d9Mnjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dFL072f8; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=uMCOrtEODX10HMAGTvX807oE6SvkQMGX5BbBmhE2qusiJd+c7RBiGrZ49GxOyLVFvu8dWF1b1LfamAyJY5SQdq4wUGm9GkthoW5GABOAXhDmiwZOI0BTIAdRVyFv5W3GXqUVBvIipSFV91fxbbCG4UVqcqhuPlXBJv/tRc0keIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O2YHr8HI; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717511891;
+	s=mimecast20190719; t=1717512026;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=xr9ylOu+Ho5X2V/wdxDEgy8q3HmQW5Mgx7cCtDimHFg=;
-	b=dFL072f8g3czEe3wbdMQVLdJahMzMphB4XbMSACgdVP9Wp/DKZS+vXTLtC8NGgy1cCDNbc
-	Ck+9O7T5EgJgdjXmbLVV30i9/D6zobUgPubkC2966Txnpyjc6HohHqslAivEjcDngkYYsg
-	1oa6d5V8PzGQENuEeXdF8ry0TCwI3Kk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=MQJRjVOdwq/5l2ECcTuzOVGaF9yzfEN7cDYfkvzC2lY=;
+	b=O2YHr8HIvaF3creCvdSI/z2bL6cOKd2KHgzSCF57AdP8uYEeL+WzZ6B0VfNo5k4f7wY/Od
+	HrRHjki2VCYL2ZeSaTPLojNNuOoBB3Gp47CaRdm/rQjqlU+VOEP+p3ufpbjERj8RKMNsvz
+	K15hgsphSvMkEKxohKQK+YDn7vBCbEE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-2CuYiclqMlGr7ZXp10hG8g-1; Tue, 04 Jun 2024 10:38:08 -0400
-X-MC-Unique: 2CuYiclqMlGr7ZXp10hG8g-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35dceae6283so913868f8f.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 07:38:07 -0700 (PDT)
+ us-mta-661-d8JIO1LaNNKUB3OcwKF5oQ-1; Tue, 04 Jun 2024 10:40:23 -0400
+X-MC-Unique: d8JIO1LaNNKUB3OcwKF5oQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42135f6012fso24423545e9.3
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 07:40:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717511887; x=1718116687;
+        d=1e100.net; s=20230601; t=1717512022; x=1718116822;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xr9ylOu+Ho5X2V/wdxDEgy8q3HmQW5Mgx7cCtDimHFg=;
-        b=geWG/i6NbpKf/Vqu9RdynRhoCK1vG9fF2eWE9hT9x8RMAUadAiL6Kibj+fr28lExav
-         jXqJTUpHKTPjpH9qKQQJyNVvPvuWdKMl1XbrrqUhZ0Rf/gn4FTz+3996gd/8EcvbUqmG
-         gu3fYVj2zx7sDYKnzUhPXzCjfiyFPm0eVz5jm2a+jKejmh1UgecE1YCT/3QQFiZmckX7
-         Ith4h3JVuc2olp9s/mRsx3GF7agskgx8KVx++e1j0i15+TMGP15nLDwZt5gc/DpZmyyJ
-         qxZI44b8QM7y6OuhD+oPjpuXAbhLD8/J9eq0LzbJiAwFY/a8UaPGcxesbUxNsEKP6/cw
-         F8tA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/suGTX/sJEx4ycvZ4G50ttl+5Qv5hDF2/RQtmnyJpdo1muHQN0iKSWD1N2jSQrz2yFWUCico+wYrpTzrTsS8lOM9s
-X-Gm-Message-State: AOJu0YzoxwTDmF0QnqQcHtLLtDyD2eLtFsctONw0R9/iz8T1IheT8Npj
-	HTtym7pcRxi3Xs0n47sl57wd+733E6RuM+eRCg7BeCOLxQimx3sVFWmSM5SjwMcdMRM9D7Lpe2e
-	5nevRpqMfsLrYT/6501faan5tF5Bry7Vm7jS33gDGVM63/SYxs2i6HmjWZw==
-X-Received: by 2002:adf:ee92:0:b0:34d:99ac:dcd0 with SMTP id ffacd0b85a97d-35e0f30bd45mr7878772f8f.49.1717511887116;
-        Tue, 04 Jun 2024 07:38:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHN4bWmB4zrEw4LkQdOIOiJIZYvvoljaMoLThP+COkwyWdXi2Y1Rams+YgbdLdHMIHif/HSiw==
-X-Received: by 2002:adf:ee92:0:b0:34d:99ac:dcd0 with SMTP id ffacd0b85a97d-35e0f30bd45mr7878762f8f.49.1717511886743;
-        Tue, 04 Jun 2024 07:38:06 -0700 (PDT)
+        bh=MQJRjVOdwq/5l2ECcTuzOVGaF9yzfEN7cDYfkvzC2lY=;
+        b=NQVgi1o5q3u/B4WCtajOmRRK5DWgZU//qQEKOJZb96q3vwkwKZDK+q5ohzaM5pnwJB
+         SZxZmTFDzkGOlskszzbAzzLRcNOESE6IIRF+HiYlLT+nA3g2AQ2kQCTo1n3J7OnbtVxt
+         Gra78gL4qlZr5ZGzz2zuxETfJ8h0GmKGzMnNtMSargcxlUsABqzf0rVmjRDAEN7IjCct
+         kDYILlDVm6cCMqmygf1Hy98km00IwnrsNVNrkylfePzMggtK09ladQHJEnaj9A3b4xWm
+         zYVgQpT8pfHsNC52R1Iw5G8CuHhk92PCg3VjSVucRyF/Xoq5G1wnHRDtgJXw5Q0Ukt6K
+         chzA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOPp4NNToUJg69/0DaEdjTFT54Xjp0SIAIAA8aTMWR2G7p+pdMfplaSsQlm0pljMK2JVUZweGdwY7gOfzJM+VzB39s
+X-Gm-Message-State: AOJu0YwN2GskV4uDOcdTEH/RX13VXmO20wajszINvMr8OH5E8fS5H6Bv
+	EdgaHy2SefItw5UxP7c9tBFj+fEbmoYC/NHjU4anylAb7RjL6UZZQqHjjG92+a7qjVQQfPSrvXo
+	h5FzZ2TC6NOMAzSgxa2n7Jr03/AEu0O0IMjDPa9O0AWNdtC/b4Q==
+X-Received: by 2002:a05:600c:4fd4:b0:421:3700:5904 with SMTP id 5b1f17b1804b1-42137005aa9mr80876675e9.34.1717512022324;
+        Tue, 04 Jun 2024 07:40:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhHl78/jb8ifvt56t3EzBp1DUr7DSPO/bLiJJF5wo9dUKWodqn57aiBiHg2YL4ozPGtTw5Nw==
+X-Received: by 2002:a05:600c:4fd4:b0:421:3700:5904 with SMTP id 5b1f17b1804b1-42137005aa9mr80876525e9.34.1717512021953;
+        Tue, 04 Jun 2024 07:40:21 -0700 (PDT)
 Received: from [192.168.0.4] (ip-109-43-178-97.web.vodafone.de. [109.43.178.97])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35dd04c0d6csm11829254f8f.1.2024.06.04.07.38.05
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4214186ccdcsm47515985e9.16.2024.06.04.07.40.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jun 2024 07:38:06 -0700 (PDT)
-Message-ID: <8dffe7fe-3a2e-4030-812e-89827266bc43@redhat.com>
-Date: Tue, 4 Jun 2024 16:38:05 +0200
+        Tue, 04 Jun 2024 07:40:21 -0700 (PDT)
+Message-ID: <49f8aadf-6e3f-4d2b-a32a-8ba941a3a2a1@redhat.com>
+Date: Tue, 4 Jun 2024 16:40:20 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,10 +83,9 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH kvm-unit-tests] realmode: rebuild when realmode.lds
- changes
+Subject: Re: [PATCH kvm-unit-tests] realmode: load above stack
 To: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20240604143507.1041901-2-pbonzini@redhat.com>
+References: <20240604143507.1041901-1-pbonzini@redhat.com>
 Content-Language: en-US
 From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -131,31 +130,71 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240604143507.1041901-2-pbonzini@redhat.com>
+In-Reply-To: <20240604143507.1041901-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 04/06/2024 16.35, Paolo Bonzini wrote:
+> The bottom 32K of memory are generally reserved for use by the BIOS;
+> for example, traditionally the boot loader is placed at 0x7C00 and
+> the stack grows below that address.
+> 
+> It turns out that with some versions of clang, realmode.flat has
+> become big enough that it overlaps the stack used by the multiboot
+> option ROM loader.  The result is that a couple instructions are
+> overwritten.  Typically one or two tests fail and that's it...
+> 
+> Move the code above the forbidden region, in real 90s style.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->   x86/Makefile.common | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   x86/realmode.lds | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/x86/Makefile.common b/x86/Makefile.common
-> index 4ae9a557..c5dd4970 100644
-> --- a/x86/Makefile.common
-> +++ b/x86/Makefile.common
-> @@ -103,9 +103,9 @@ test_cases: $(tests-common) $(tests)
->   
->   $(TEST_DIR)/%.o: CFLAGS += -std=gnu99 -ffreestanding -I $(SRCDIR)/lib -I $(SRCDIR)/lib/x86 -I lib
->   
-> -$(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o
-> +$(TEST_DIR)/realmode.elf: $(TEST_DIR)/realmode.o $(SRCDIR)/$(TEST_DIR)/realmode.lds
->   	$(LD) -m elf_i386 -nostdlib -o $@ \
-> -	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $^
-> +	      -T $(SRCDIR)/$(TEST_DIR)/realmode.lds $(filter %.o, $^)
+> diff --git a/x86/realmode.lds b/x86/realmode.lds
+> index 0ed3063b..e4782a98 100644
+> --- a/x86/realmode.lds
+> +++ b/x86/realmode.lds
+> @@ -1,6 +1,6 @@
+>   SECTIONS
+>   {
+> -    . = 16K;
+> +    . = 32K;
+>       stext = .;
+>       .text : { *(.init) *(.text) }
+>       . = ALIGN(4K);
 
+This fails for me with:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+ld -m elf_i386 -nostdlib -o x86/realmode.elf \
+       -T /home/thuth/devel/kvm-unit-tests/x86/realmode.lds x86/realmode.o
+x86/realmode.o: in function `init_inregs':
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0x79): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0x82): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0x8b): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0x94): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0x9d): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0xa6): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0xaf): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0xb8): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0xc1): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:176:(.text+0xca): relocation 
+truncated to fit: R_386_16 against `.bss'
+/home/thuth/devel/kvm-unit-tests/x86/realmode.c:180:(.text+0xda): additional 
+relocation overflows omitted from the output
+make: *** [/home/thuth/devel/kvm-unit-tests/x86/Makefile.common:107: 
+x86/realmode.elf] Error 1
+
+  Thomas
 
 
