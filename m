@@ -1,203 +1,188 @@
-Return-Path: <kvm+bounces-18734-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18735-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A8558FACFA
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 10:00:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A81858FAD57
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 10:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 335141C20FAB
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 08:00:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B99A1F226C1
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 08:18:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2701422A7;
-	Tue,  4 Jun 2024 07:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8B31422C3;
+	Tue,  4 Jun 2024 08:18:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LtodnuPO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LsNhnrJb"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236398F4E;
-	Tue,  4 Jun 2024 07:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA70F139CFF
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 08:18:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717487996; cv=none; b=cklapmV7UmehUbF7eC+4MegE9Yj6ETOL4Ox/ZFG+x7KfXLOMesuofUAERCAbQPxG4CF7y4Asq4htX9tv5QpFLSDLciiYs7opsqDjIJqEy8RUlHTvTPu+L2cEdt4gFohEO108PGbyjSBUFM3HxOz3QGW/aFgQMiFFG/D28gpIuk0=
+	t=1717489112; cv=none; b=IFORB0Ek60fBGwpZ3oVrYh3gaMf3TLBPM8CI8waR3ro0BRMlRmeV1IvNKSpopE2BP4mVZk92BCZlDLAZBxF3ybU+s5q8kb2bRfwP/Pemv3dtLroQ9l4eiEjhUvNwUnjMX0ASCk+jkKWJp0BzK48a7cpkpZeTX2DkjKnskMt213A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717487996; c=relaxed/simple;
-	bh=vdxauOmzSboHFnDF9buP0En7vyb3RHtdFdbq9LJy4mc=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iDaGWdj07DWOXobG3NE0FMmmIVW2UVo+m8+X2VFUlWf4rN+NAPewX0VKt3F6lYojm6OqnTfrYrK4LxBO2UI5QHoPBoCI8nSYXvHvjU+/g8AArCKR+k6hUdGWPoBDidUMTSTKXlY8EbzQzuINuvcrluQX/rQwxeJs0yWWa/qoN44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LtodnuPO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9999FC2BBFC;
-	Tue,  4 Jun 2024 07:59:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717487995;
-	bh=vdxauOmzSboHFnDF9buP0En7vyb3RHtdFdbq9LJy4mc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LtodnuPO2CS14uvj48kFDapRADhNtETdT+ND/y+TtmLXzQn4lPjTT3tm/Q/hKcoKA
-	 CvJ+G7kzzidAN4yghffCb6DJHqrR+YG7a5EHxqkq1DzBg2dljr94xAwmLwWQcHoqx5
-	 hSqo95an3+3BSbOBxJxfCqLGtAE/SKmKXcTVO5nCuQgsqRIO0bwMPB6VtQa0WQDN7n
-	 +pjXqUASWMxrGcjy7DqPVnmz+PmonLjr3src34RmbtqgO66qbMpjvp/1fWWepraxIZ
-	 3kD3m2FfJUr9+f06knLUYKEVlhiKLb9ZNj8znUMXERgeC6HCdtlihLFPEYid8WfdvM
-	 96S/e775jkdTw==
-Received: from 82-132-216-203.dab.02.net ([82.132.216.203] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sEP5E-000Tse-LN;
-	Tue, 04 Jun 2024 08:59:53 +0100
-Date: Tue, 04 Jun 2024 08:59:49 +0100
-Message-ID: <87frtt2l56.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 13/16] KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
-In-Reply-To: <Zl4NScV0E_YV7GR2@linux.dev>
-References: <20240529145628.3272630-1-maz@kernel.org>
-	<20240529145628.3272630-14-maz@kernel.org>
-	<Zl4NScV0E_YV7GR2@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1717489112; c=relaxed/simple;
+	bh=T6qZEH63FFuFYtelDyLGAv9Vpeeu3+M490fJp4SljgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ap2l+p9CTSdCfoHHyOtkwC+bbtDxuwf4rFdF8eWoiI4TtvdVEvfS9t70OCCcn4DZ32EKB31JUu7L1lU7NzKeKNXop+PwDlJaScyeMlGAMhC5hUsRdLTKmMTykQ72mHlUpkB8pGxO3k5Q1ziYJsHkE6UZ4gX29HXjggE2eo33+1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LsNhnrJb; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717489110; x=1749025110;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=T6qZEH63FFuFYtelDyLGAv9Vpeeu3+M490fJp4SljgU=;
+  b=LsNhnrJb+eYm3VJmPC09GugQtpQMRRoCNgkxhcrws2F66H2jrmC91ixm
+   Lcd8+ekilDBfhX5LlVJGsloTpKv79D2qIiXALXtkXAUA1n+C52HWNypOO
+   XbtcBh0OF6jk/MZZVmg7RaOYTfcGe6Vb6trikBh3Kf1LuvmYCy3adow0R
+   UQcCw312e1mRr2udxllP8VQKvhmg/lPWx01SCrsIo8r7rSHrDH1Uml458
+   cuJPZtIaT4ai3+jFs1gC2GUjYzpxdqk7XBz+plaqsX6etAmtAyyg8520I
+   QMeIolrZxiptj5KiefB6e/f7DhnsYkRCynnjKgclNbjM0aW0yI633qMrJ
+   g==;
+X-CSE-ConnectionGUID: rXR8ZLNVSDKnpGaaliDs8A==
+X-CSE-MsgGUID: 2qdbgjy8QR6rNhePBqYCSg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="31518820"
+X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
+   d="scan'208";a="31518820"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 01:18:27 -0700
+X-CSE-ConnectionGUID: ZLkK9vr3Qi6T22a7gQdEpw==
+X-CSE-MsgGUID: WIUIwbV2QBChE1vi6Mj3Kw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
+   d="scan'208";a="37027956"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa007.fm.intel.com with ESMTP; 04 Jun 2024 01:18:22 -0700
+Date: Tue, 4 Jun 2024 16:33:48 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [RFC v2 1/7] hw/core: Make CPU topology enumeration arch-agnostic
+Message-ID: <Zl7RbLrYUN0cg+t4@intel.com>
+References: <20240530101539.768484-1-zhao1.liu@intel.com>
+ <20240530101539.768484-2-zhao1.liu@intel.com>
+ <87plsyfc1r.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 82.132.216.203
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87plsyfc1r.fsf@pond.sub.org>
 
-On Mon, 03 Jun 2024 19:36:57 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+Hi Markus,
+
+On Mon, Jun 03, 2024 at 02:25:36PM +0200, Markus Armbruster wrote:
+> Date: Mon, 03 Jun 2024 14:25:36 +0200
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [RFC v2 1/7] hw/core: Make CPU topology enumeration
+>  arch-agnostic
 > 
-> On Wed, May 29, 2024 at 03:56:25PM +0100, Marc Zyngier wrote:
-
-[...]
-
-> > +/*
-> > + * Compute the equivalent of the TTL field by parsing the shadow PT.  The
-> > + * granule size is extracted from the cached VTCR_EL2.TG0 while the level is
-> > + * retrieved from first entry carrying the level as a tag.
-> > + */
-> > +static u8 get_guest_mapping_ttl(struct kvm_s2_mmu *mmu, u64 addr)
-> > +{
+> Zhao Liu <zhao1.liu@intel.com> writes:
 > 
-> Can you add a lockdep assertion that the MMU lock is held for write
-> here? At least for me this is far enough away from the 'real' page table
-> walk that it wasn't clear what locks were held at this point.
-
-Sure thing.
-
+> > Cache topology needs to be defined based on CPU topology levels. Thus,
+> > define CPU topology enumeration in qapi/machine.json to make it generic
+> > for all architectures.
+> >
+> > To match the general topology naming style, rename CPU_TOPO_LEVEL_SMT
+> > and CPU_TOPO_LEVEL_PACKAGE to CPU_TOPO_LEVEL_THREAD and
+> > CPU_TOPO_LEVEL_SOCKET.
+> >
+> > Also, enumerate additional topology levels for non-i386 arches, and add
+> > helpers for topology enumeration and string conversion.
+> >
+> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 > 
-> > +	u64 tmp, sz = 0, vtcr = mmu->tlb_vtcr;
-> > +	kvm_pte_t pte;
-> > +	u8 ttl, level;
-> > +
-> > +	switch (vtcr & VTCR_EL2_TG0_MASK) {
-> > +	case VTCR_EL2_TG0_4K:
-> > +		ttl = (TLBI_TTL_TG_4K << 2);
-> > +		break;
-> > +	case VTCR_EL2_TG0_16K:
-> > +		ttl = (TLBI_TTL_TG_16K << 2);
-> > +		break;
-> > +	case VTCR_EL2_TG0_64K:
-> > +	default:	    /* IMPDEF: treat any other value as 64k */
-> > +		ttl = (TLBI_TTL_TG_64K << 2);
-> > +		break;
-> > +	}
-> > +
-> > +	tmp = addr;
-> > +
-> > +again:
-> > +	/* Iteratively compute the block sizes for a particular granule size */
-> > +	switch (vtcr & VTCR_EL2_TG0_MASK) {
-> > +	case VTCR_EL2_TG0_4K:
-> > +		if	(sz < SZ_4K)	sz = SZ_4K;
-> > +		else if (sz < SZ_2M)	sz = SZ_2M;
-> > +		else if (sz < SZ_1G)	sz = SZ_1G;
-> > +		else			sz = 0;
-> > +		break;
-> > +	case VTCR_EL2_TG0_16K:
-> > +		if	(sz < SZ_16K)	sz = SZ_16K;
-> > +		else if (sz < SZ_32M)	sz = SZ_32M;
-> > +		else			sz = 0;
-> > +		break;
-> > +	case VTCR_EL2_TG0_64K:
-> > +	default:	    /* IMPDEF: treat any other value as 64k */
-> > +		if	(sz < SZ_64K)	sz = SZ_64K;
-> > +		else if (sz < SZ_512M)	sz = SZ_512M;
-> > +		else			sz = 0;
-> > +		break;
-> > +	}
-> > +
-> > +	if (sz == 0)
-> > +		return 0;
-> > +
-> > +	tmp &= ~(sz - 1);
-> > +	if (kvm_pgtable_get_leaf(mmu->pgt, tmp, &pte, NULL))
-> > +		goto again;
+> [...]
 > 
-> Assuming we're virtualizing a larger TG than what's in use at L0 this
-> may not actually find a valid leaf that exists within the span of a
-> single virtual TLB entry.
+> > diff --git a/qapi/machine.json b/qapi/machine.json
+> > index bce6e1bbc412..7ac5a05bb9c9 100644
+> > --- a/qapi/machine.json
+> > +++ b/qapi/machine.json
+> > @@ -1667,6 +1667,46 @@
+> >       '*reboot-timeout': 'int',
+> >       '*strict': 'bool' } }
+> >  
+> > +##
+> > +# @CPUTopoLevel:
 > 
-> For example, if we're using 4K at L0 and 16K at L1, we could have:
+> I understand you're moving existing enum CPUTopoLevel into the QAPI
+> schema.  I think the idiomatic QAPI name would be CpuTopologyLevel.
+> Would you be willing to rename it, or would that be too much churn?
+
+Sure, I'll rename it as you suggested.
+
+> > +#
+> > +# An enumeration of CPU topology levels.
+> > +#
+> > +# @invalid: Invalid topology level, used as a placeholder.
+> > +#
+> > +# @thread: thread level, which would also be called SMT level or logical
+> > +#     processor level. The @threads option in -smp is used to configure
+> > +#     the topology of this level.
+> > +#
+> > +# @core: core level. The @cores option in -smp is used to configure the
+> > +#     topology of this level.
+> > +#
+> > +# @module: module level. The @modules option in -smp is used to
+> > +#     configure the topology of this level.
+> > +#
+> > +# @cluster: cluster level. The @clusters option in -smp is used to
+> > +#     configure the topology of this level.
+> > +#
+> > +# @die: die level. The @dies option in -smp is used to configure the
+> > +#     topology of this level.
+> > +#
+> > +# @socket: socket level, which would also be called package level. The
+> > +#     @sockets option in -smp is used to configure the topology of this
+> > +#     level.
+> > +#
+> > +# @book: book level. The @books option in -smp is used to configure the
+> > +#     topology of this level.
+> > +#
+> > +# @drawer: drawer level. The @drawers option in -smp is used to
+> > +#     configure the topology of this level.
 > 
-> 	[ ----- valid 16K entry ------- ]
+> docs/devel/qapi-code-gen.rst section Documentation markup:
 > 
-> mapped as:
+>     For legibility, wrap text paragraphs so every line is at most 70
+>     characters long.
 > 
-> 	[ ----- | ----- | valid | ----- ]
-> 
-> in the shadow S2. kvm_pgtable_get_leaf() will always return the first
-> splintered page, which could be invalid.
-> 
-> What I'm getting at is: should this use a bespoke table walker that
-> scans for a valid TTL in the range of [addr, addr + sz)? It may make
-> sense to back off a bit more aggressively and switch to a conservative,
-> unscoped TLBI to avoid visiting too many PTEs.
+>     Separate sentences with two spaces.
 
-I had something along those lines at some point (circa 2019), and
-quickly dropped it as it had a horrible "look-around" behaviour,
-specially if the L1 S2 granule size is much larger than L0's (64k vs
-4k). As you pointed out, it needs heuristics to limit the look-around,
-which I don't find very satisfying.
+Thank you for pointing this.
 
-Which is why the current code limits the search to be in depth only,
-hoping for the head descriptor to be valid, and quickly backs off to
-do a level-0 invalidation.
+About separating sentences, is this what I should be doing?
 
-My preferred option would be to allow the use of non-valid entries to
-cache the level (always using the first L0 entry that would map the L1
-descriptor), but this opens another can of worms: you could end-up
-with page table pages containing only invalid descriptors, except for
-the presence of a level annotation, which screws the refcounting. I'd
-very much like to see this rather than the look-around option.
+# @drawer: drawer level. The @drawers option in -smp is used to
+#  configure the topology of this level.
 
-Now, it is important to consider how useful this is. I expect modern
-hypervisors to use either TTL-hinted (which we emulate even if the HW
-doesn't support it) or Range-based invalidation in the vast majority
-of the cases, so this would only help SW that hasn't got on with the
-program.
 
-Thoughts?
+Thanks,
+Zhao
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
