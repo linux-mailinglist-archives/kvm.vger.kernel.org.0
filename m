@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-18798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F158FB8C1
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 18:21:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 187898FB87C
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 18:07:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46443B3221B
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 16:05:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64E8F1F21265
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 16:07:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DED514600B;
-	Tue,  4 Jun 2024 16:04:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED45F1482ED;
+	Tue,  4 Jun 2024 16:06:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZZ8VS9n9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R4b7JnJd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E283413D619
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 16:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794CF8BFA
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 16:06:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717517088; cv=none; b=L3SJ6L24PPixjk5CbDyEOZzrr6diMnFQcww+nLRLGe0FwntbXiXJJUithP2MbkEnSTUZEBP3de3+cPC9t28Wn8yyPT2DsqopBn0yME6Q7xezvhk2m6D3//wAY7Cyrhrh/UvTU5BWQ6ecV1PsGO0FcJc0D/0rdtHlqBcQ0wKrzLQ=
+	t=1717517168; cv=none; b=QFGOgxUurnBBYpRFG9lXP2NTDx4EspIMdRQI5Hu0G5KySeV/f6vkm5EJxBgYpZpAqjsISezW2qpgFfwLBPP/vDHTFLSC9qdqjdLG+aaKphYsyufNu+Cwfj5qlvRj3emmuT2ojFZ4a8ovomWiXpMqOhJ2YkNYQcxWkRLwFamN92E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717517088; c=relaxed/simple;
-	bh=TuVYZmXd02wbEklbfC5WAvOqMWKiRbjiXfc+JoeuUhg=;
+	s=arc-20240116; t=1717517168; c=relaxed/simple;
+	bh=hM/TP5fuBd2nzlsu3f+H7WQfS62CCwe8Vjt+N5ynidE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E4JEhLZ7L5tyn8J3NgO1IKg2pQBFSx8ymbFXKKkTM8vNgV0siOhWN7X2RSz/XDQshqxcD+ZBL3JnxO9qzOZr9UEWmQhFd1T2iqiTe8/yUTD+SeKJuJDxH3rBoO+WReyl7SXkuAj5KtYaKD6pOkrEnheTBjdH7yXwv+5Ymnutwd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZZ8VS9n9; arc=none smtp.client-ip=209.85.218.54
+	 Content-Type:Content-Disposition:In-Reply-To; b=UB3nnGXd5+fRl6H6tL9uldE2o0/nF8cqSVpdBkmHqVYJPaOZy2Pt2XZd8ml+bNF6W5Xr+qKMsB0D3N8zSTnCaV4CRgcdh5jna4oRsCq7If1Vl9rdEr2M5gyPiZsmnSkYB5MayTTkKJW2vtmqFNm31Vqf7sffcgu9GfVIGVbFwes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R4b7JnJd; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a63359aaaa6so747228366b.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 09:04:46 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-57a6985ab58so1261672a12.2
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 09:06:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717517085; x=1718121885; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717517165; x=1718121965; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=Cruorfn7NoREOjiMGGn/cp+VaqblM1rLgighQuS1JLA=;
-        b=ZZ8VS9n9v4cVVW55QkbmTOJUAPwGng48FGLZ9H8wqNM5FzYY7fDZNfaD4CHDYbjjDy
-         CGx8peOVZSydNtD/XEzA/uuHMLyB6hfZtF4wM0QMBbr8OJg8+datX8Bpod5dl+AQKSsF
-         zsgcSeOWN6WtRx7lK8X7Mn9DgifoWmIccZiJHu5qBJxAnwf+MECt25jBBQIYyrUjvkq1
-         XzwMGoxeZE+acARx151IzmXrdMaQYTPMa8YS7oxp2kNcMnNZO2B3SXwodoksBvxXYLR3
-         Nje0F6+bAhIF/NpceCHEcqjj/9hwW7qfnsPZbHf0iV1TlHQ21P9FTIyxZPLgafpJRzcI
-         ZFiQ==
+        bh=O5VQrFzKXcacSK2dpPQ1zSM+Xmxoug7aPj+YM5MTTIM=;
+        b=R4b7JnJdf6E3bkaGPFwaSGHaoK7ksgMPRSxzGVQLpgOAaQlvBDnTR21YWyJth7Rg7c
+         8B21dd/DOl/31/BldJwWed5u+o+LifteSZ0VEuFgir51gmsyhMfSxCw8AkUcdia8/+i5
+         teUy1+sZEXTGzoizTBPlxw6E02nfoTJbyNqoHQLRVQe0Sk3tACSbmcl8AFhbbfqAHRZD
+         sniIMSc2WaHRQOdm38jVSmdzxy7FzqnogxgngQpzl+SokfwKYsD6hgqU60KCftLbRiFT
+         8TKA2jewzXqIkvlMwTWdO4/DqtuGLy3vleiUdp/53erGf2nLkBfI7np6jKFDz0InMsI0
+         nALA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717517085; x=1718121885;
+        d=1e100.net; s=20230601; t=1717517165; x=1718121965;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cruorfn7NoREOjiMGGn/cp+VaqblM1rLgighQuS1JLA=;
-        b=pYmnaQo3ypttVXXbu+gyWcllL2X13dZg+6D098PZzslfeSJI+yFsJTcm2hgik4UDp/
-         VskkmX2qzcL8ZGUqa6N36MImSddmFCrAUZejjubg7h5bOvoxowGHEjQou90KwV6zdQxd
-         vQF4Ty9rQqB/otUVeUkMUM1mQJ8vqT4IdhgQugmLQEi8TT6sV3bzT99C6wE66Ra/A4J1
-         Lc6AzdEHzqLnJqtHV2jeWsEFfvVGYoQzc7atHmI9N8YU5UX5Ryt8Iw+zonSZGSjLwOj8
-         0CllVIl/DN1LV3grv2Usb14fZccIuf9xSs6buz2L04KRAgSAyNq+s4b53psNpWy2IpEX
-         y0jw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyOeSkRXb8OpcJNr/TrZsyVBuBpAso4x/i6Zi5Xt+nUd61kPIQUs94JV97e0jV5AlbAx4+c4jixIvXVLyThOyQp61y
-X-Gm-Message-State: AOJu0YzhL26w1eo6QnSaSGk201ciRZsIHsOz5rdhWWms8zFeXUVhm8/+
-	8q5qresww4f4vLKzGHeQOz9VLlU2L8xMaVvvQniGqrn2swUQmReu8Rr0j+VmSg==
-X-Google-Smtp-Source: AGHT+IGInW6fKvSmBsK5Zli+h9BQYP14HAX01lASA3eX37L7IrTgDRmIzyPqKYNdoRF2r9nIA1b23g==
-X-Received: by 2002:a17:907:b010:b0:a59:c209:3e33 with SMTP id a640c23a62f3a-a681fe4bc4bmr607698766b.15.1717517084985;
-        Tue, 04 Jun 2024 09:04:44 -0700 (PDT)
+        bh=O5VQrFzKXcacSK2dpPQ1zSM+Xmxoug7aPj+YM5MTTIM=;
+        b=E0gqtLTz/6uRl52E84Okfk597sMzQPDPDPqwl3vkzAi2hixxUbcLRHoG+VVgqT6YwO
+         7+kzUZBTXG6opZKihMJqxbo6Qwgavdhe+UvfSaXumpmpRznj/Em2mvIbL3l5iEQLo6Wu
+         /dHQfjUufsIdElajclEAdbGnvo6KKsbO2QFpzS4B0o9QlpKFUMwpuf+ZQ3sImPJ7tJoC
+         4pt4RpLnZSynvrb6nnllFy4zmisNjo2HBAZYfLUU06O+pXPc0RFgUe0FCicGAEvn1Bvl
+         jl+IH78m4RAnc8+Uosvd4UQ1Y33blsAYCiVfqN0R6idwcy2AoWLn64EvfbmzmIUJuQYo
+         exEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUtYR27HdbRPG1QXCp1n6r6fzDbchuV9kzPqkut356jTrAnkA9uhDwQI2uZ5Edq7zWwHaeCCr2R/mEzRhQPYJ4y3DIA
+X-Gm-Message-State: AOJu0Yzf2VIfzBozavOix0V7KYOf5gKJq27UdxO3HBQjXxArjb2dxJNy
+	Qogp1aYEPi2bRkggJ5Kr3eYR7anVDdim7diLFLQlgRswEWCpYt7bUjaNbZ5fdg==
+X-Google-Smtp-Source: AGHT+IHjTOc77+v/hrh0//KfOPrghR8jLt/wXqgk/viqeRim9KBVvb5lrLhNkC2Y9ObA7kv+S1+hbA==
+X-Received: by 2002:a50:cd9a:0:b0:57a:30fb:576 with SMTP id 4fb4d7f45d1cf-57a8b69704fmr73029a12.8.1717517164535;
+        Tue, 04 Jun 2024 09:06:04 -0700 (PDT)
 Received: from google.com (64.227.90.34.bc.googleusercontent.com. [34.90.227.64])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a68c5c523b4sm478543266b.11.2024.06.04.09.04.44
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57a31c6d270sm7488617a12.60.2024.06.04.09.06.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jun 2024 09:04:44 -0700 (PDT)
-Date: Tue, 4 Jun 2024 17:04:40 +0100
+        Tue, 04 Jun 2024 09:06:03 -0700 (PDT)
+Date: Tue, 4 Jun 2024 17:05:59 +0100
 From: =?utf-8?Q?Pierre-Cl=C3=A9ment?= Tosi <ptosi@google.com>
 To: Will Deacon <will@kernel.org>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
 	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 10/13] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at
- EL2
-Message-ID: <ucvvmwiur2qhagm4tcsbffftzaktthqnryi74k5ajtolhx4qor@via5txfexwlc>
+Subject: Re: [PATCH v4 11/13] KVM: arm64: Improve CONFIG_CFI_CLANG error
+ message
+Message-ID: <whzwqltolrms4ct35az5eif5rg25e2km23cztypgikallbcxoj@wtwfckujzcrf>
 References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-11-ptosi@google.com>
- <20240603144530.GK19151@willie-the-truck>
+ <20240529121251.1993135-12-ptosi@google.com>
+ <20240603144808.GL19151@willie-the-truck>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -89,57 +89,54 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240603144530.GK19151@willie-the-truck>
+In-Reply-To: <20240603144808.GL19151@willie-the-truck>
 
-On Mon, Jun 03, 2024 at 03:45:30PM +0100, Will Deacon wrote:
-> On Wed, May 29, 2024 at 01:12:16PM +0100, Pierre-Clément Tosi wrote:
-> > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > index d859c4de06b6..b1c8977e2812 100644
-> > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
-> > @@ -5,6 +5,7 @@
-> >   */
-> >  
-> >  #include <linux/arm-smccc.h>
-> > +#include <linux/cfi_types.h>
-> >  #include <linux/linkage.h>
-> >  
-> >  #include <asm/alternative.h>
-> > @@ -267,8 +268,11 @@ SYM_CODE_END(__kvm_handle_stub_hvc)
-> >  
-> >  /*
-> >   * void __pkvm_init_switch_pgd(phys_addr_t pgd, void *sp, void (*fn)(void));
-> > + *
-> > + * SYM_TYPED_FUNC_START() allows C to call this ID-mapped function indirectly
-> > + * using a physical pointer without triggering a kCFI failure.
-> >   */
-> > -SYM_FUNC_START(__pkvm_init_switch_pgd)
-> > +SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
-> >  	/* Turn the MMU off */
-> >  	pre_disable_mmu_workaround
-> >  	mrs	x9, sctlr_el2
+On Mon, Jun 03, 2024 at 03:48:08PM +0100, Will Deacon wrote:
+> On Wed, May 29, 2024 at 01:12:17PM +0100, Pierre-Clément Tosi wrote:
+> > For kCFI, the compiler encodes in the immediate of the BRK (which the
+> > CPU places in ESR_ELx) the indices of the two registers it used to hold
+> > (resp.) the function pointer and expected type. Therefore, the kCFI
+> > handler must be able to parse the contents of the register file at the
+> > point where the exception was triggered.
+> > 
+> > To achieve this, introduce a new hypervisor panic path that first stores
+> > the CPU context in the per-CPU kvm_hyp_ctxt before calling (directly or
+> > indirectly) hyp_panic() and execute it from all EL2 synchronous
+> > exception handlers i.e.
+> > 
+> > - call it directly in host_el2_sync_vect (__kvm_hyp_host_vector, EL2t&h)
+> > - call it directly in el2t_sync_invalid (__kvm_hyp_vector, EL2t)
+> > - set ELR_EL2 to it in el2_sync (__kvm_hyp_vector, EL2h), which ERETs
+> > 
+> > Teach hyp_panic() to decode the kCFI ESR and extract the target and type
+> > from the saved CPU context. In VHE, use that information to panic() with
+> > a specialized error message. In nVHE, only report it if the host (EL1)
+> > has access to the saved CPU context i.e. iff CONFIG_NVHE_EL2_DEBUG=y,
+> > which aligns with the behavior of CONFIG_PROTECTED_NVHE_STACKTRACE.
+> > 
+> > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
+> > ---
+> >  arch/arm64/kvm/handle_exit.c            | 30 +++++++++++++++++++++++--
+> >  arch/arm64/kvm/hyp/entry.S              | 24 +++++++++++++++++++-
+> >  arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
+> >  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
+> >  arch/arm64/kvm/hyp/nvhe/host.S          |  2 +-
+> >  arch/arm64/kvm/hyp/vhe/switch.c         | 26 +++++++++++++++++++--
+> >  6 files changed, 79 insertions(+), 9 deletions(-)
 > 
-> I still think this last hunk should be merged with the earlier patch
-> fixing up the prototype of __pkvm_init_switch_pgd().
+> This quite a lot of work just to print out some opaque type numbers
+> when CONFIG_NVHE_EL2_DEBUG=y. Is it really worth it? How would I use
+> this information to debug an otherwise undebuggable kcfi failure at EL2?
 
-Unfortunately, this is not possible because
+The type ID alone might not be worth it but what about the target?
 
-  SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
+In my experience, non-malicious kCFI failures are often caused by an issue with
+the callee, not the caller. Without this patch, only the source of the exception
+is reported but, with it, the panic handler also prints the kCFI target (i.e.
+value of the function pointer) as a symbol.
 
-makes the assembler generate an unresolved symbol for the function type, which
-the compiler only generates (from the C declaration) if it compiles with kCFI so
-that moving this hunk to an earlier patch results in a linker error:
-
-  ld.lld: error: undefined symbol: __kvm_nvhe___kcfi_typeid___pkvm_init_switch_pgd
-
-OTOH, moving it to a later patch triggers a kCFI (runtime) panic.
-
-As a result, this hunk *must* be part of this patch.
-
-> 
-> With that:
-> 
-> Acked-by: Will Deacon <will@kernel.org>
-
-As I haven't followed your suggestion, I'll ignore this.
+With the infrastructure for the target in place, it isn't much more work to also
+report the type ID. Although it is rarely informative (as you noted), there are
+some situations where it can still be useful e.g. if reported as zero and/or has
+been corrupted and does not match its value from the ELF.
 
