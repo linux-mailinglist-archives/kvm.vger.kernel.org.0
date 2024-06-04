@@ -1,171 +1,126 @@
-Return-Path: <kvm+bounces-18706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA868FA71E
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 02:45:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AADCB8FA72B
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 02:48:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A48231C22466
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:45:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 490C81F2063E
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B94C78494;
-	Tue,  4 Jun 2024 00:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F29108494;
+	Tue,  4 Jun 2024 00:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="POQizCQL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="34O6ibuk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDBC5680
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 00:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88FA7462
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 00:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717461937; cv=none; b=VAePGgbpGVcb4V5orTsgkBM4nP16R6r5fkSugswq67puQd4ntb4eiUoo0bhetmps3SACvp6dWLA9zoPfzdqcWzzZW5EwsDwEyp/v+NXLWkfSmIK2PZek82D5HXi21B9V0geblUdA+K10kK5vQo6YNPTBe7SyiGGCdGx7bu2VLpU=
+	t=1717462074; cv=none; b=eqrG9UYEwJWa7UH44rzcv8YQvfvxcKKnNn0nksNAv4QPMfsoQiYfE2pnt9EypotDeqMLQss3hoVUIFtJ1p0yQ+C20qLaD+ETsyLaqwvskYc1uDF5ezeGnV2FcFGVuw51ZqojJVcLceSm5v16XecjXDIXuIkF1XAAV0sO73Wki4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717461937; c=relaxed/simple;
-	bh=0feO/7C+CrLgGRjOb5ae1CaJ7O4SHCcHI6Yy37sOBhI=;
+	s=arc-20240116; t=1717462074; c=relaxed/simple;
+	bh=5bxoVBLLjPBD7SoG7jPQ2z8Gy8DmUiseDIdQ47ZP27Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VeidZ9NAw8k1J66y5fgBewv3APUVw5AB8OGcI6fOTM9Dx2w4JRUSYX3xZlFhCQGFAJ0UnaHz5iNF399pq/BDUkcKk1W5rCDK713kUNktoJfVUIDmZSfvjo9zqJHXqlq/9YZbLkNYNUL2g22S9T/0ZDzwDzK0NNkgkKrUMG0pXsU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=POQizCQL; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=J/7lCJ3t4zCNstz0Mi3Q2Sf7K+y+da3KlAV4KowXp5RqI93MiNIZqkcn+NxrACYtL7KuZl2P/HFwPog8XGkSpYMibKCGY78v4p6PQhLdOKGTLQAKzU+i+DcleUWgbADxGjOqhaN8q03hvnrlER0lGO4IFa8yBZlXo/2rs4tEi8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=34O6ibuk; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70244a8998bso2509830b3a.2
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 17:45:34 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfa74b3e6cbso6371092276.2
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 17:47:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717461934; x=1718066734; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Bm5sO14VbwMd1xIPVmZquFgInZWUqDJbdvBe8VoG78=;
-        b=POQizCQLBooCYBuuAVFjMjuPaUY6s0WvhqBuNap7OOV6sTO+diQg4pU1S5cLtFwt2l
-         tKx86irXweu37F6G+lGQa+WBW+pqFYJKMRXOpn25hcS6TvMSoiMWGTbhn7LpxSevKtvn
-         79H97BLzw5NgSSdRH6mTQKnIDrb4YOGLIL+ucg0hcag2L3Ab+ktFeRp6e5+kXhse8wi5
-         9tSBARBRo5np0avYWAu4GXzeRKzGm9Eb2jaO/VX7rhqaiKL54hHz+Di9Xd3oY8Vh/nHT
-         kALnedrWrOKl+78HqUcbVboxsXHP0NY2ZFzApluLvr8dJWdnPPBFM3fdx/jcUCM1vPEC
-         vNxA==
+        d=google.com; s=20230601; t=1717462072; x=1718066872; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5bxoVBLLjPBD7SoG7jPQ2z8Gy8DmUiseDIdQ47ZP27Q=;
+        b=34O6ibuktDpjSk1rfFS6BkYWDmfAqr8RCk5lvNv9dTB9fgcDvxy5xoAU/tH0D/rwsl
+         mHYwBFjTZyQFbuDpXF+GzYSjSSzDtamvQeO7G/wIh0zOtSIckIY1gYb6B4LLJVeTDs1l
+         dfpL9bGixODKjqwr+KmUNpOaFptQcciyp5nsWYw5M0JJPqjDFY39jvcRkjoKHjXsxCi5
+         RM/rkXdEvtPlBi3OaKM/bO3iARsotl4IZ/kk2kCAoSJm6HY0WAD44m0tV9LDBTPT5Y6W
+         nke1KINVpldGCfommXCa1GzPn/eKFIhCWgH4jCXGFeZJ//yesER5jyFyJ8yKPCQY+Ibs
+         2VWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717461934; x=1718066734;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Bm5sO14VbwMd1xIPVmZquFgInZWUqDJbdvBe8VoG78=;
-        b=byNzVvx20hK1Md8er/E2LAXCmRAxNURA2ND5wUKGZVOm5iCFbNiTcBJyMaKZBwY5iw
-         Sc89iVyALBTUUZxvpEZNjfEwD3ktfudLBOY67AGufnypt6/Qr9ZoAwSn4K4IlsiiuPuj
-         R65t6sBac/qujQ97hNmyz4IogcSE5QH0Nwr1/9o4vHh3wMMvzs2tt9s3QmREaQnCiSwj
-         c64Ju3Ne4FFrfgPA8KddqbSAFInbaZPbGARZhgSnLAJP5bC+FL/D6gtn40kbjrs1yYsd
-         fY6OVwVU9JyN5aCSVR1kSZFp5LFwvFZA0mu6bANpNlvW8hZXJyb2gIBx1ZidX2l3454I
-         DrRA==
-X-Forwarded-Encrypted: i=1; AJvYcCXcgZSK9edx21+ogc2Jy/I6ptl6ErUCwZAbNvCSR1H8LGe6nSytKcFkqj3eZhfK1QFxc0rzSR3JT9P+1zPB1AfJZHlA
-X-Gm-Message-State: AOJu0YwCMvGaXPsq69zCpmtuBnjlN/GL2kx4utTxYfJrOZfaI/JQz1Tg
-	9N+WJfGcG85gCKFNWRUx4wqa8QOYhwMaua3A5RnyhfKP2nHM9Km3B5mmm/kbmLKAripzWZRWwBe
-	MYw==
-X-Google-Smtp-Source: AGHT+IFJPIM5O78GbEgTJkoYIbaMsDfaMyloYqJ1aZGLTAMlZeqHlKfhFkYbfVbqXlLT1sYbBZGJlR/eHek=
+        d=1e100.net; s=20230601; t=1717462072; x=1718066872;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5bxoVBLLjPBD7SoG7jPQ2z8Gy8DmUiseDIdQ47ZP27Q=;
+        b=doCJUJ9xXiQ0RkxEmGqANCNySjIZar4Y6GQhi0JHljp1M5d0uyMLgvKUdo3SEDpLQI
+         oSSY+d28gtOAg4s9DPbnDUj7OMd2O/+TciiEnlwXUOar1w12Ec33HiMsprutvbeIu9t5
+         ubBPlFdOzX9WD2l3wt0JfHL4QL61+cnu+uMM++1YavBYc69YrfelSgTBCGnMv1AU9//3
+         nz5M+F+3aPbv3qOS+bzgSLsvk/jF52juBzI1Lf2F+WopojnvGaLylYWJWl17hAMdN0b5
+         ktIyny9/laxsa2e+l/Hb/hUMkmt/U/GUuk0ndcPFfs9iIyeuqu5JbyuUtsr8Lq1WDIiF
+         PdnA==
+X-Forwarded-Encrypted: i=1; AJvYcCWiTj3wNSWLN1J0sY3Uyp3GhpELX+e9FokVJXWdar3r9EasVMhav3Ox7tGFLfn/JY8pIsWl5yubGI4yLS7anUivs6Iz
+X-Gm-Message-State: AOJu0YxiK55ujEIHve5A+NqdoO+1ChEPOBTJky1Mfe5LY1ga13V4A1VX
+	WKplpaK2VtmJLEIUFSsUGy7bXB1AuIkrIDUvafvxeC0ZW0Ubrf/ThH8Yy2UqIJqXvrYX0CgT5B0
+	B2Q==
+X-Google-Smtp-Source: AGHT+IEZ+F10ts8rccgAdQGGDmSLAqgaKz+peOBMZ9RGjYbuAWzb6oeWRNwl3+lBO73cv7KAkKC8yy8gBso=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:27a1:b0:6ec:f407:ec0c with SMTP id
- d2e1a72fcca58-7024785a3ccmr349295b3a.2.1717461933286; Mon, 03 Jun 2024
- 17:45:33 -0700 (PDT)
-Date: Mon, 3 Jun 2024 17:45:31 -0700
-In-Reply-To: <20240429060643.211-4-ravi.bangoria@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:154d:b0:df7:b717:10c2 with SMTP id
+ 3f1490d57ef6-dfa73bda088mr1660141276.2.1717462071759; Mon, 03 Jun 2024
+ 17:47:51 -0700 (PDT)
+Date: Mon, 3 Jun 2024 17:47:50 -0700
+In-Reply-To: <CABgObfbz5kZZObu9dO=KPu8_mZvGmV1752SQzQckkrj5jPaTQg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240429060643.211-1-ravi.bangoria@amd.com> <20240429060643.211-4-ravi.bangoria@amd.com>
-Message-ID: <Zl5jqwWO4FyawPHG@google.com>
-Subject: Re: [PATCH 3/3] KVM SVM: Add Bus Lock Detect support
+References: <20240528041926.3989-1-manali.shukla@amd.com> <CABgObfbz5kZZObu9dO=KPu8_mZvGmV1752SQzQckkrj5jPaTQg@mail.gmail.com>
+Message-ID: <Zl5kNh8znAYHHYuC@google.com>
+Subject: Re: [PATCH v3 0/5] Add support for the Idle HLT intercept feature
 From: Sean Christopherson <seanjc@google.com>
-To: Ravi Bangoria <ravi.bangoria@amd.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, pbonzini@redhat.com, thomas.lendacky@amd.com, 
-	hpa@zytor.com, rmk+kernel@armlinux.org.uk, peterz@infradead.org, 
-	james.morse@arm.com, lukas.bulwahn@gmail.com, arjan@linux.intel.com, 
-	j.granados@samsung.com, sibs@chinatelecom.cn, nik.borisov@suse.com, 
-	michael.roth@amd.com, nikunj.dadhania@amd.com, babu.moger@amd.com, 
-	x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	santosh.shukla@amd.com, ananth.narayan@amd.com, sandipan.das@amd.com
-Content-Type: text/plain; charset="us-ascii"
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, shuah@kernel.org, nikunj@amd.com, 
+	thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de, 
+	ajones@ventanamicro.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 29, 2024, Ravi Bangoria wrote:
-> Upcoming AMD uarch will support Bus Lock Detect. Add support for it
-> in KVM. Bus Lock Detect is enabled through MSR_IA32_DEBUGCTLMSR and
-> MSR_IA32_DEBUGCTLMSR is virtualized only if LBR Virtualization is
-> enabled. Add this dependency in the KVM.
+On Tue, May 28, 2024, Paolo Bonzini wrote:
+> On Tue, May 28, 2024 at 6:19=E2=80=AFAM Manali Shukla <manali.shukla@amd.=
+com> wrote:
+> >
+> > The upcoming new Idle HLT Intercept feature allows for the HLT
+> > instruction execution by a vCPU to be intercepted by the hypervisor
+> > only if there are no pending V_INTR and V_NMI events for the vCPU.
+> > When the vCPU is expected to service the pending V_INTR and V_NMI
+> > events, the Idle HLT intercept won=E2=80=99t trigger. The feature allow=
+s the
+> > hypervisor to determine if the vCPU is actually idle and reduces
+> > wasteful VMEXITs.
+>=20
+> Does this have an effect on the number of vmexits for KVM, unless AVIC
+> is enabled? Can you write a testcase for kvm-unit-tests' vmexit.flat
+> that shows an improvement?
+>=20
+> The reason I am wondering is because KVM does not really use V_INTR
+> injection. The "idle HLT" intercept basically differs from the basic
+> HLT trigger only in how it handles an STI;HLT sequence, as in that
+> case the interrupt can be injected directly and the HLT vmexit is
+> suppressed. But in that circumstance KVM would anyway use a V_INTR
+> intercept to detect the opening of the interrupt injection window (and
+> then the interrupt uses event injection rather than V_INTR). Again,
+> this is only true if AVIC is disabled, but that is the default.
+>=20
+> So unless I'm wrong in my analysis above, I'm not sure this series,
+> albeit small, is really worth it.
 
-This is woefully incomplete, e.g. db_interception() needs to be updated to decipher
-whether the #DB is the responsbility of the host or of the guest.
+But aren't we hoping to enable x2AVIC by default sooner than later?
 
-Honestly, I don't see any point in virtualizing this in KVM.  As Jim alluded to,
-what's far, far more interesting for KVM is "Bus Lock Threshold".  Virtualizing
-this for the guest would have been nice to have during the initial split-lock #AC
-support, but now I'm skeptical the complexity is worth the payoff.
-
-I suppose we could allow it if #DB isn't interecepted, at which point the enabling
-required is minimal?
-
-> Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
-> ---
->  arch/x86/kvm/svm/nested.c |  3 ++-
->  arch/x86/kvm/svm/svm.c    | 16 +++++++++++++++-
->  2 files changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-> index 55b9a6d96bcf..6e93c2d9e7df 100644
-> --- a/arch/x86/kvm/svm/nested.c
-> +++ b/arch/x86/kvm/svm/nested.c
-> @@ -586,7 +586,8 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
->  	/* These bits will be set properly on the first execution when new_vmc12 is true */
->  	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DR))) {
->  		vmcb02->save.dr7 = svm->nested.save.dr7 | DR7_FIXED_1;
-> -		svm->vcpu.arch.dr6  = svm->nested.save.dr6 | DR6_ACTIVE_LOW;
-> +		/* DR6_RTM is not supported on AMD as of now. */
-> +		svm->vcpu.arch.dr6  = svm->nested.save.dr6 | DR6_FIXED_1 | DR6_RTM;
->  		vmcb_mark_dirty(vmcb02, VMCB_DR);
->  	}
->  
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index d1a9f9951635..60f3af9bdacb 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -1038,7 +1038,8 @@ void svm_update_lbrv(struct kvm_vcpu *vcpu)
->  {
->  	struct vcpu_svm *svm = to_svm(vcpu);
->  	bool current_enable_lbrv = svm->vmcb->control.virt_ext & LBR_CTL_ENABLE_MASK;
-> -	bool enable_lbrv = (svm_get_lbr_vmcb(svm)->save.dbgctl & DEBUGCTLMSR_LBR) ||
-> +	u64 dbgctl_buslock_lbr = DEBUGCTLMSR_BUS_LOCK_DETECT | DEBUGCTLMSR_LBR;
-> +	bool enable_lbrv = (svm_get_lbr_vmcb(svm)->save.dbgctl & dbgctl_buslock_lbr) ||
->  			    (is_guest_mode(vcpu) && guest_can_use(vcpu, X86_FEATURE_LBRV) &&
->  			    (svm->nested.ctl.virt_ext & LBR_CTL_ENABLE_MASK));
->  
-> @@ -3119,6 +3120,10 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
->  		if (data & DEBUGCTL_RESERVED_BITS)
->  			return 1;
->  
-> +		if ((data & DEBUGCTLMSR_BUS_LOCK_DETECT) &&
-> +		    !guest_cpuid_has(vcpu, X86_FEATURE_BUS_LOCK_DETECT))
-> +			return 1;
-> +
->  		svm_get_lbr_vmcb(svm)->save.dbgctl = data;
->  		svm_update_lbrv(vcpu);
->  		break;
-> @@ -5157,6 +5162,15 @@ static __init void svm_set_cpu_caps(void)
->  
->  	/* CPUID 0x8000001F (SME/SEV features) */
->  	sev_set_cpu_caps();
-> +
-> +	/*
-> +	 * LBR Virtualization must be enabled to support BusLockTrap inside the
-> +	 * guest, since BusLockTrap is enabled through MSR_IA32_DEBUGCTLMSR and
-> +	 * MSR_IA32_DEBUGCTLMSR is virtualized only if LBR Virtualization is
-> +	 * enabled.
-> +	 */
-> +	if (!lbrv)
-> +		kvm_cpu_cap_clear(X86_FEATURE_BUS_LOCK_DETECT);
->  }
->  
->  static __init int svm_hardware_setup(void)
-> -- 
-> 2.44.0
-> 
+> As things stand, it would be more interesting to enable this for nested V=
+Ms,
+> especially Hyper-V which does use V_INTR and V_TPL; even better, _emulati=
+ng_
+> it on older processors would reduce the L2->L0->L1->L0->L2 path to a
+> less-expensive L2->L0->L2 vmexit.
 
