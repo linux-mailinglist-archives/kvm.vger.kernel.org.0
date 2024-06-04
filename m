@@ -1,173 +1,92 @@
-Return-Path: <kvm+bounces-18754-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18755-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 215038FB0E2
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 13:16:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 222E28FB11F
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 13:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB1FB1F231F5
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 11:16:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCABE282DFB
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 11:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F92145A03;
-	Tue,  4 Jun 2024 11:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EB0145FEE;
+	Tue,  4 Jun 2024 11:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rYkp8xuF"
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="cgZVxJ/I"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928B8145326;
-	Tue,  4 Jun 2024 11:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C114145339;
+	Tue,  4 Jun 2024 11:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717499686; cv=none; b=C65gtlfcO2u5UsHTykxDPrsik/VRaiMinWa1nQBPKbuYcwM9JQNW3dq9IQ8JlTSoJDKrRwQQd1s8TPo+zzBVmO6W/ZLDN9EN5nU7+0OlMZA2qadFHTWZO3TkUdhHopyd04azx1ojU6Fm/HJ+23VPl6MFiaGAUGC++6sc3i7UgSc=
+	t=1717500403; cv=none; b=largmorjDHY2HKsujptxlt0/hOSTMozevnG6yle7Akwz1UrRuNENqyNih/cJ/ANxryukveTZPPlkfxFik/ZnfezdhW6MKPIQIQ42IWkhwarBwV/ssHa1O3YgvINHpf/lwWdbEVCXX/w4aijktuHT5tmb3T8jCblis+WsS79ZKaQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717499686; c=relaxed/simple;
-	bh=Vv4txNsMXhv+sJ10aOVoCZZU7rO5OvyNAtfI7FRXEwU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y63vI+CRj6M2rfsQTQlgiuv0jR+1e5rbakoJSF2otIP6J9Q14wQFWE6olsaomjN2IKrDdrgPLCvji7QzYQWKYjJTbgaQWcE+lzhEQlZNtGCrET2a1AlMo7R8j6cbRT6X4dQJdT9LuLCAcSG8JCDzsk3MkUgkd8KoLUq1gyo1FAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rYkp8xuF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A5CC2BBFC;
-	Tue,  4 Jun 2024 11:14:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717499685;
-	bh=Vv4txNsMXhv+sJ10aOVoCZZU7rO5OvyNAtfI7FRXEwU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rYkp8xuF4wH/gm8nhIezTORqNaq6vnDmSw7zIrNqXb0ar8oj2yR0+zZIsEgiLlwsM
-	 EHTJiIZjV3NDjmRyTtfrN+a7/6aSHtQNhPxTWhg6CvHkIpuwtzG6ZLZ/3PPSumygJQ
-	 DuO33iwqwcN19Fgsa4L5HuE64TFzXUxQP1wMWGFrMIa8gtiOqNR8RRgPYSw69K4hgi
-	 nbwx51NG6JiowZkdWQKTm5RPwN6nnzzYGA4qK4AiWwhX4LIr1xdQsKfy12YYMvyKSr
-	 h6Y2CuKnC0fJVNKzLmT+fJC3GtULipbUILxpuMeqc7aoFD3tqri5128JEpRlht2bFg
-	 rPwuwHWL93psg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sES7n-000X68-6U;
-	Tue, 04 Jun 2024 12:14:43 +0100
-Date: Tue, 04 Jun 2024 12:14:42 +0100
-Message-ID: <86frttkli5.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 10/11] KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
-In-Reply-To: <Zl39WCKpyaDmccgY@linux.dev>
-References: <20240531231358.1000039-1-oliver.upton@linux.dev>
-	<20240531231358.1000039-11-oliver.upton@linux.dev>
-	<86le3mkxsp.wl-maz@kernel.org>
-	<Zl39WCKpyaDmccgY@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1717500403; c=relaxed/simple;
+	bh=oL8M6qgTb/wgbH/ov5kWUJvU9JDEZKsp2ohmacVuXdE=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fVz6nAGwIbIhuv7K70Mzhcxzit/kOyk7l0Jgz+MvdOD2jxjGAISJ3QjXK6Qa6BSpO1mzX8bhSNOOI7FeL6H9JaeMRMYIEiCp7J8bLTXZw6248hsY0n/lAqDE+E1j1scvkyxdeOGPThVVtcWEAOLvnoHO03xRbigI4PXdDPR51sE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=cgZVxJ/I; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1717500397;
+	bh=t+rduEbfoUs0dyalxeI4cE9kdl/8hw6YLtlweC8/mmU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=cgZVxJ/IkfjcygyfjaxKzIN6nXEks1+/rN8K8kQC6kV9KOUB/5jRXuLrYvjL+I+vk
+	 Omx8HBYUidKGjWDSRBt/aSwhY07m/X0W6F3R2iFWlG4PMhRWYNBnu7cO1TLIZlb2fE
+	 KnGvYSou/YepCcoQGUo7i7+zJcKDjOTrIFzQi7DtsguCqDGX0bCmf2enFrNQUFD72y
+	 H0DEcVA3Hp9YCIyo8hQPI2pR8LJFrBkCK+I1Wm5had/4lKaL5otgv9gX94ZfDipBji
+	 UL3oBzjRp2SB4/q/G4O2/0nmG1HnaXIQb/DqLHgFRnwoVhho6Vqr6M0R5iEG7JHrmA
+	 vsINwfgMCYe0g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VtpFm2NqBz4x12;
+	Tue,  4 Jun 2024 21:26:36 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>, kvm@vger.kernel.org,
+ linux-doc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc: pbonzini@redhat.com, naveen.n.rao@linux.ibm.com,
+ christophe.leroy@csgroup.eu, corbet@lwn.net, namhyung@kernel.org,
+ npiggin@gmail.com, pbonzini@redhat.com, sbhat@linux.ibm.com,
+ jniethe5@gmail.com, atrajeev@linux.vnet.ibm.com,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/6] KVM: PPC: Book3S HV: Add one-reg interface for
+ DEXCR register
+In-Reply-To: <171741327891.6631.10339033341166150910.stgit@linux.ibm.com>
+References: <171741323521.6631.11242552089199677395.stgit@linux.ibm.com>
+ <171741327891.6631.10339033341166150910.stgit@linux.ibm.com>
+Date: Tue, 04 Jun 2024 21:26:34 +1000
+Message-ID: <87cyox2bkl.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Mon, 03 Jun 2024 18:28:56 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> Hey,
-> 
-> On Mon, Jun 03, 2024 at 01:36:54PM +0100, Marc Zyngier wrote:
-> 
-> [...]
-> 
-> > > +	/*
-> > > +	 * Layer the guest hypervisor's trap configuration on top of our own if
-> > > +	 * we're in a nested context.
-> > > +	 */
-> > > +	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-> > > +		goto write;
-> > > +
-> > > +	if (guest_hyp_fpsimd_traps_enabled(vcpu))
-> > > +		val &= ~CPACR_ELx_FPEN;
-> > > +	if (guest_hyp_sve_traps_enabled(vcpu))
-> > > +		val &= ~CPACR_ELx_ZEN;
-> > 
-> > I'm afraid this isn't quite right. You are clearing both FPEN (resp
-> > ZEN) bits based on any of the two bits being clear, while what we want
-> > is to actually propagate the 0 bits (and only those).
-> 
-> An earlier version of the series I had was effectively doing this,
-> applying the L0 trap configuration on top of L1's CPTR_EL2. Unless I'm
-> missing something terribly obvious, I think this is still correct, as:
-> 
->  - If we're in a hyp context, vEL2's CPTR_EL2 is loaded into CPACR_EL1.
->    The independent EL0/EL1 enable bits are handled by hardware. All this
->    junk gets skipped and we go directly to writing CPTR_EL2.
+Shivaprasad G Bhat <sbhat@linux.ibm.com> writes:
+> The patch adds a one-reg register identifier which can be used to
+> read and set the DEXCR for the guest during enter/exit with
+> KVM_REG_PPC_DEXCR. The specific SPR KVM API documentation
+> too updated.
+>
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> ---
+>  Documentation/virt/kvm/api.rst            |    1 +
+>  arch/powerpc/include/uapi/asm/kvm.h       |    1 +
+>  arch/powerpc/kvm/book3s_hv.c              |    6 ++++++
+>  tools/arch/powerpc/include/uapi/asm/kvm.h |    1 +
+ 
+Headers under tools/ are not supposed to be updated directly, they're
+synced later by the perf developers.
 
-Yup.
+See: https://lore.kernel.org/all/ZlYxAdHjyAkvGtMW@x1/
 
-> 
->  - If we are not in a hyp context, vEL2's CPTR_EL2 gets folded into the
->    hardware value for CPTR_EL2. TGE must be 0 in this case, so there is
->    no conditional trap based on what EL the vCPU is in. There's only two
->    functional trap states at this point, hence the all-or-nothing
->    approach.
-
-Ah, I see it now. Only bit[0] of each 2-bit field matters in that
-case. This thing is giving me a headache.
-
-> 
-> > What I have in my tree is something along the lines of:
-> > 
-> > 	cptr = vcpu_sanitised_cptr_el2(vcpu);
-> > 	tmp = cptr & (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK);
-> > 	val &= ~(tmp ^ (CPACR_ELx_ZEN_MASK | CPACR_ELx_FPEN_MASK));
-> 
-> My hesitation with this is it gives the impression that both trap bits
-> are significant, but in reality only the LSB is useful. Unless my
-> understanding is disastrously wrong, of course :)
-
-No, you are absolutely right. Although you *are* clearing both bits
-anyway ;-).
-
-> 
-> Anyway, my _slight_ preference is towards keeping what I have if
-> possible, with a giant comment explaining the reasoning behind it. But I
-> can take your approach instead too.
-
-I think the only arguments for my own solution are:
-
-- slightly better codegen (no function call or inlining), and a
-  smaller .text section in switch.o, because the helpers are not
-  cheap:
-
-  LLVM:
-
-	0 .text         00003ef8 (guest_hyp_*_traps_enabled)
-	0 .text         00003d48 (bit ops)
-
-  GCC:
-	0 .text         00002624 (guest_hyp_*_traps_enabled)
-	0 .text         000024b4 (bit ops)
-
-
-  Yes, LLVM is an absolute pig because of BTI...
-
-- tracking the guest's bits more precisely may make it easier to debug
-
-but these are pretty weak arguments, and I don't really care either
-way at this precise moment.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+cheers
 
