@@ -1,64 +1,64 @@
-Return-Path: <kvm+bounces-18735-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18736-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A81858FAD57
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 10:18:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F096D8FAD7E
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 10:24:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B99A1F226C1
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 08:18:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FE2C1C22D47
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 08:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8B31422C3;
-	Tue,  4 Jun 2024 08:18:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF888142652;
+	Tue,  4 Jun 2024 08:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LsNhnrJb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XceCHVZN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA70F139CFF
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 08:18:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E0413C672
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 08:24:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717489112; cv=none; b=IFORB0Ek60fBGwpZ3oVrYh3gaMf3TLBPM8CI8waR3ro0BRMlRmeV1IvNKSpopE2BP4mVZk92BCZlDLAZBxF3ybU+s5q8kb2bRfwP/Pemv3dtLroQ9l4eiEjhUvNwUnjMX0ASCk+jkKWJp0BzK48a7cpkpZeTX2DkjKnskMt213A=
+	t=1717489467; cv=none; b=XY6wtEDPYh3tTJR78R86l79eLL6thL8yvj4xsbbDNjn/N2YQtnfjuMrW3oD7A1NuHJsuqzjXNFB3CEyz+z75/NFb56zwPZBq6XXRJa8BEOaPGvYnGiI9N4+5htTQrIEmU7QQkpWhnZhfcNiKZ2SdokQMNOUEEEk0WJydJNKpO9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717489112; c=relaxed/simple;
-	bh=T6qZEH63FFuFYtelDyLGAv9Vpeeu3+M490fJp4SljgU=;
+	s=arc-20240116; t=1717489467; c=relaxed/simple;
+	bh=atOfj9kWdFuVI1HtcdHLArsthwrM8mfXmtw15855REQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ap2l+p9CTSdCfoHHyOtkwC+bbtDxuwf4rFdF8eWoiI4TtvdVEvfS9t70OCCcn4DZ32EKB31JUu7L1lU7NzKeKNXop+PwDlJaScyeMlGAMhC5hUsRdLTKmMTykQ72mHlUpkB8pGxO3k5Q1ziYJsHkE6UZ4gX29HXjggE2eo33+1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LsNhnrJb; arc=none smtp.client-ip=198.175.65.10
+	 Content-Type:Content-Disposition:In-Reply-To; b=HWGXd9sjTn6Qhbc11TFo7FJ79gI6TwpYIPAS5ZRwmR4FqYQbNQfAT9B5UJQ9AaDK/bEL2qO0MwNAQWH2D/P70pBDmAkUBn4NKPN8lGdBLPEaB+1I6kQr3MrBK/b9ZEwiEsr4s8ZsoF65t2L0RP+4YGEAIVaFNrk3cElOAPIal1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XceCHVZN; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1717489110; x=1749025110;
+  t=1717489466; x=1749025466;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=T6qZEH63FFuFYtelDyLGAv9Vpeeu3+M490fJp4SljgU=;
-  b=LsNhnrJb+eYm3VJmPC09GugQtpQMRRoCNgkxhcrws2F66H2jrmC91ixm
-   Lcd8+ekilDBfhX5LlVJGsloTpKv79D2qIiXALXtkXAUA1n+C52HWNypOO
-   XbtcBh0OF6jk/MZZVmg7RaOYTfcGe6Vb6trikBh3Kf1LuvmYCy3adow0R
-   UQcCw312e1mRr2udxllP8VQKvhmg/lPWx01SCrsIo8r7rSHrDH1Uml458
-   cuJPZtIaT4ai3+jFs1gC2GUjYzpxdqk7XBz+plaqsX6etAmtAyyg8520I
-   QMeIolrZxiptj5KiefB6e/f7DhnsYkRCynnjKgclNbjM0aW0yI633qMrJ
-   g==;
-X-CSE-ConnectionGUID: rXR8ZLNVSDKnpGaaliDs8A==
-X-CSE-MsgGUID: 2qdbgjy8QR6rNhePBqYCSg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="31518820"
+  bh=atOfj9kWdFuVI1HtcdHLArsthwrM8mfXmtw15855REQ=;
+  b=XceCHVZNpIUmWHijqoi5/HuJ4VuBvsZ8cmMUEBd9YGD5X/ZMtkVIYjXm
+   CSyQ37rEa/rfYPifLb7ZIFxkbQZ27C6PciUD0OHuus1mPvEGnGKPFv7bc
+   3lNMb9mOh6OOnxBsCM5cr3kYkeOSNoU+tlRjPZhWcZCIy0/U90hxnvQis
+   h3tVxZAcMp7IhWswnxF88s8VBg1ZWzdlphWy+3HWUxLMG1AhFjQim360Z
+   WRTdCxc7Bal1oHSvOmKv5x5yQ7iHASqpa6ZeHOzTP5VsQTYEgU6sqY4uR
+   9ZND3KUaUZK8bNu/+pQ1NcgTlKo7j3qduLldPbdAKoTN1kwO9gP2D7p7C
+   A==;
+X-CSE-ConnectionGUID: uHmM5tIAS6+Q+cVX0Hsx9A==
+X-CSE-MsgGUID: KO7Xx3BLQKadd1NQVBUwAg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="24644302"
 X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="31518820"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 01:18:27 -0700
-X-CSE-ConnectionGUID: ZLkK9vr3Qi6T22a7gQdEpw==
-X-CSE-MsgGUID: WIUIwbV2QBChE1vi6Mj3Kw==
+   d="scan'208";a="24644302"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 01:24:24 -0700
+X-CSE-ConnectionGUID: zjJrKqpcS86f3Y2Vz9QwYA==
+X-CSE-MsgGUID: jwlQwP8FTJCMn3VANeHNmw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
-   d="scan'208";a="37027956"
+   d="scan'208";a="37152758"
 Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa007.fm.intel.com with ESMTP; 04 Jun 2024 01:18:22 -0700
-Date: Tue, 4 Jun 2024 16:33:48 +0800
+  by fmviesa008.fm.intel.com with ESMTP; 04 Jun 2024 01:24:19 -0700
+Date: Tue, 4 Jun 2024 16:39:44 +0800
 From: Zhao Liu <zhao1.liu@intel.com>
 To: Markus Armbruster <armbru@redhat.com>
 Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
@@ -80,10 +80,10 @@ Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>,
 	Yongwei Ma <yongwei.ma@intel.com>
 Subject: Re: [RFC v2 1/7] hw/core: Make CPU topology enumeration arch-agnostic
-Message-ID: <Zl7RbLrYUN0cg+t4@intel.com>
+Message-ID: <Zl7S0IOlLvnua319@intel.com>
 References: <20240530101539.768484-1-zhao1.liu@intel.com>
  <20240530101539.768484-2-zhao1.liu@intel.com>
- <87plsyfc1r.fsf@pond.sub.org>
+ <87y17mfccp.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -92,54 +92,67 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87plsyfc1r.fsf@pond.sub.org>
+In-Reply-To: <87y17mfccp.fsf@pond.sub.org>
 
-Hi Markus,
+[snip]
 
-On Mon, Jun 03, 2024 at 02:25:36PM +0200, Markus Armbruster wrote:
-> Date: Mon, 03 Jun 2024 14:25:36 +0200
-> From: Markus Armbruster <armbru@redhat.com>
-> Subject: Re: [RFC v2 1/7] hw/core: Make CPU topology enumeration
->  arch-agnostic
+> > +CPUTopoInfo cpu_topo_descriptors[] = {
+> > +    [CPU_TOPO_LEVEL_INVALID] = { .name = "invalid", },
+> > +    [CPU_TOPO_LEVEL_THREAD]  = { .name = "thread",  },
+> > +    [CPU_TOPO_LEVEL_CORE]    = { .name = "core",    },
+> > +    [CPU_TOPO_LEVEL_MODULE]  = { .name = "module",  },
+> > +    [CPU_TOPO_LEVEL_CLUSTER] = { .name = "cluster", },
+> > +    [CPU_TOPO_LEVEL_DIE]     = { .name = "die",     },
+> > +    [CPU_TOPO_LEVEL_SOCKET]  = { .name = "socket",  },
+> > +    [CPU_TOPO_LEVEL_BOOK]    = { .name = "book",    },
+> > +    [CPU_TOPO_LEVEL_DRAWER]  = { .name = "drawer",  },
+> > +    [CPU_TOPO_LEVEL__MAX]    = { .name = NULL,      },
+> > +};
 > 
-> Zhao Liu <zhao1.liu@intel.com> writes:
+> This looks redundant with generated
 > 
-> > Cache topology needs to be defined based on CPU topology levels. Thus,
-> > define CPU topology enumeration in qapi/machine.json to make it generic
-> > for all architectures.
-> >
-> > To match the general topology naming style, rename CPU_TOPO_LEVEL_SMT
-> > and CPU_TOPO_LEVEL_PACKAGE to CPU_TOPO_LEVEL_THREAD and
-> > CPU_TOPO_LEVEL_SOCKET.
-> >
-> > Also, enumerate additional topology levels for non-i386 arches, and add
-> > helpers for topology enumeration and string conversion.
-> >
-> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+>     const QEnumLookup CPUTopoLevel_lookup = {
+>         .array = (const char *const[]) {
+>             [CPU_TOPO_LEVEL_INVALID] = "invalid",
+>             [CPU_TOPO_LEVEL_THREAD] = "thread",
+>             [CPU_TOPO_LEVEL_CORE] = "core",
+>             [CPU_TOPO_LEVEL_MODULE] = "module",
+>             [CPU_TOPO_LEVEL_CLUSTER] = "cluster",
+>             [CPU_TOPO_LEVEL_DIE] = "die",
+>             [CPU_TOPO_LEVEL_SOCKET] = "socket",
+>             [CPU_TOPO_LEVEL_BOOK] = "book",
+>             [CPU_TOPO_LEVEL_DRAWER] = "drawer",
+>         },
+>         .size = CPU_TOPO_LEVEL__MAX
+>     };
 > 
-> [...]
+> > +
+> > +const char *cpu_topo_to_string(CPUTopoLevel topo)
+> > +{
+> > +    return cpu_topo_descriptors[topo].name;
+> > +}
 > 
-> > diff --git a/qapi/machine.json b/qapi/machine.json
-> > index bce6e1bbc412..7ac5a05bb9c9 100644
-> > --- a/qapi/machine.json
-> > +++ b/qapi/machine.json
-> > @@ -1667,6 +1667,46 @@
-> >       '*reboot-timeout': 'int',
-> >       '*strict': 'bool' } }
-> >  
+> And this with generated CPUTopoLevel_str().
+
+Thanks! I missed these generated helpers.
+
+[snip]
+
 > > +##
 > > +# @CPUTopoLevel:
-> 
-> I understand you're moving existing enum CPUTopoLevel into the QAPI
-> schema.  I think the idiomatic QAPI name would be CpuTopologyLevel.
-> Would you be willing to rename it, or would that be too much churn?
-
-Sure, I'll rename it as you suggested.
-
 > > +#
 > > +# An enumeration of CPU topology levels.
 > > +#
 > > +# @invalid: Invalid topology level, used as a placeholder.
+> 
+> Placeholder for what?
+
+I was trying to express that when no specific topology level is
+specified, it will be initialized to this value by default.
+
+Or what about just deleting this placeholder related words and just
+saying it's "Invalid topology level"?
+
 > > +#
 > > +# @thread: thread level, which would also be called SMT level or logical
 > > +#     processor level. The @threads option in -smp is used to configure
@@ -167,20 +180,11 @@ Sure, I'll rename it as you suggested.
 > > +# @drawer: drawer level. The @drawers option in -smp is used to
 > > +#     configure the topology of this level.
 > 
-> docs/devel/qapi-code-gen.rst section Documentation markup:
-> 
->     For legibility, wrap text paragraphs so every line is at most 70
->     characters long.
-> 
->     Separate sentences with two spaces.
+> As far as I can tell, -smp is sugar for machine property "smp" of QAPI
+> type SMPConfiguration.  Should we refer to SMPConfiguration instead of
+> -smp?
 
-Thank you for pointing this.
-
-About separating sentences, is this what I should be doing?
-
-# @drawer: drawer level. The @drawers option in -smp is used to
-#  configure the topology of this level.
-
+Yes, SMPConfiguration is better.
 
 Thanks,
 Zhao
