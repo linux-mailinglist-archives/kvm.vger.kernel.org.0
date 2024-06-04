@@ -1,203 +1,121 @@
-Return-Path: <kvm+bounces-18699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18700-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93C058FA6AB
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 01:55:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C12B8FA6B3
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 02:00:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C606A1C22513
-	for <lists+kvm@lfdr.de>; Mon,  3 Jun 2024 23:55:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E2FA1C225D8
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:00:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5277A13CFB7;
-	Mon,  3 Jun 2024 23:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067222A8D0;
+	Tue,  4 Jun 2024 00:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P7A4gCMe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZQONQF2Q"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21D9081736
-	for <kvm@vger.kernel.org>; Mon,  3 Jun 2024 23:55:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A37A5382
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 00:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717458941; cv=none; b=LwVqBdcWBCkGMwtQP68gBKdKwrdajBpVZSr/qX6KJsdxQFN6omNPxN5sUYwGboZw2sl5/4RY6qxlWqo5HdEkToXWEjtvjOOm19Nt80Ei/u+KdnpTigDZJb/xP14NI1zO9MU5hWtfd8xUcRyE+3QXk9+OWaCH12NH6DCV+cUKkXE=
+	t=1717459238; cv=none; b=Fmy1wWYDbEaGT09QShGjz48evhP/eGQYWzNj7TylSMv729DxL0nmyv06MSmwqj2c5OF5TWMDjO5luE/XzSvxH2wg2nPH2KAz4BUIHLwnJ4oVGut4mNS9hD6xEUA/yvhj9pJX3ps/XWWaehw1x4YQRNXSe+6P/EB5nGPeSiXtxjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717458941; c=relaxed/simple;
-	bh=FtElGgpsSSae4yBq/bi6DGunDESHxh82nwAJEBZ9Jnw=;
+	s=arc-20240116; t=1717459238; c=relaxed/simple;
+	bh=qmzipbdBY6KqUjrHfBG3VzqriXpHdWHYlYyt1ENKvq0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F759tdJeeRU6Xg5OmImo9Zs7aV/HI0uS3tfcxO5//jfscBe6rW9EBTcpAslJygOwBCD7isj6+gB1VDODhRVch0lbO7Mrn0qFsyJ/7OBTEFTwcVzkiDXsinjRIrBPDTBDclXTAIGo6rXxBupL+l10MPPyxQt8LrT703CoSByFUQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P7A4gCMe; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=IfDq3YB9vzIPclX2DgxABrF9wnzxYyZPYXjvsFzQTFc+tRgUR35Kz9bbvJAMtECTXNPCdn+Q5qWG7TnliCZHE0JJxR+Ak4Bp3wbQAaJs2ZzaWIYBKV9ggdqO8KY10Y9r6jgUugInD6Bs3jtd3w5/frZGE57cvxwZH2v+TbrhOH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZQONQF2Q; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6ca1d5c4153so2128055a12.3
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 16:55:39 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6507e2f0615so4508138a12.1
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 17:00:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717458939; x=1718063739; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eyc3iUgsnRj2ylOv5YkMm98nGXjn6+X+INgnV8xLY/I=;
-        b=P7A4gCMeTbiGSmwRjOOKCx6Uc7PaIGkwgzHSkyabB9m88gom/t7jFlBzQ5cXjlTpr1
-         sZCRXXP/5iHnq3PeGqbH8gh9Sb8MFadqsAcnmBHoOLMFpc77EL1L3ZSmxiKBTpTWqqZ3
-         81103mg6bdWV/dSXDhww8o7szGSQuGdSY3HXI4ASUkSLj4jcz+C9wdfFz3qhhB3LNGhz
-         ubLt+LveEQbBAgvjnfDgv5BiF/CeDvNKJaJNQO+4468XONVO2eSDYP4JDlkYn8UWfMDe
-         V/RlPUwl+ViSWcIPVraIKCIXE93tvKz65cK3Xp2c33Kuq7WbZ8o88iK4WeMB6xvFfnkp
-         H6hQ==
+        d=google.com; s=20230601; t=1717459235; x=1718064035; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=X9TixsbS4vucV54Qx239yWNe5AZLJZTOJio74oth8eo=;
+        b=ZQONQF2Q2Ikl2ID4JAuRYwoHQfqUopTTl/zUGiyTUrHa5N+CygYEQJfppVAknkh9JK
+         j4pSYXk2Hj2u08iVxR5KtOtFuRJ6KdTiunVZaN2o/pz5rd/zqUT2X1UQfnsWAS7uP6zi
+         p8TysO9hDHEC8w0abnkcA62D0Yow4EYV7fclW9euO7hCQ5AOot0J3OoBdT0aa4IHP3hK
+         hFISuSwdOQSIXsXozSsbkKHf2sI0kptG6kv/9njKgg/QsrDgH+0StnqCMh4ZBvti0S1w
+         GHX1Qk0G0eyLSuB53miE2svmCkK6VM7Jz55TRxGhatv7v6o1pbfL6b8WRGx3z/nVAl/G
+         eteQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717458939; x=1718063739;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=eyc3iUgsnRj2ylOv5YkMm98nGXjn6+X+INgnV8xLY/I=;
-        b=CRUgo83vPh9JFDa71Z73/gJQpiJu2iXsYNox3cm1V0f0J36lncbNJ09t41wCBe//m9
-         Ei+OQS90AVk/NAfpyDc7CaIpNYVwfIPf/VJt49+KKdkPIb0GeLSypZ9Syytze/jKiWgb
-         x/3LShRUfxbJCInwfb4/0a8xZC/sLGLBhi19lV4gRJT679AKgK8JbS3cs90Sh3fz7Tns
-         PCn9YN6eR+ZdvTDCufhO/Z6AoOYOA2c+x7o34CpCYzT2CE5HMN2sw2o3gs0GQCo8fB/n
-         fFFEnPlFgNDXs79R+DXHc3J/jh9ynDMkQ5TIxNM/aIgvgcHHdZwmzO6FaT1x9qeMKa3j
-         5lTw==
-X-Forwarded-Encrypted: i=1; AJvYcCW8lm3nNLoCBF+xeyDfniJV/IjViibRS7jqWdPSR/ZKx/4LKUDPyP8xHbcnpS5LfWBu87uQdsnCOaKbzcJNex8WwnKZ
-X-Gm-Message-State: AOJu0YwZacF6x4u9q99w8iyNQv8pEyMp/GxAh5oJan0DxK845WW35VDD
-	Q96trE6ihhdhA3wIetb99N/VrGssULlGRVGzc/3Glr3IJICEI85uRRh4e2yrakyxsNOt4X0CZpo
-	Ndw==
-X-Google-Smtp-Source: AGHT+IHvGku2IN33k/AODaXK54zHq/P8X6Cha2dno1rLoXXrfnJJHDtnIbcRuwwzpgSt5TkILSo1ZXTh8Yo=
+        d=1e100.net; s=20230601; t=1717459235; x=1718064035;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X9TixsbS4vucV54Qx239yWNe5AZLJZTOJio74oth8eo=;
+        b=cD2hJeh3qnED6BHdqg9wBGaPjqZ3C4GHXcZ24lHG1m/5LXb2x6wbBPIxcEsekf8iUK
+         1dLyxtCjMp8HhhvfvmPGFctdPkE7ttDBpzTh1yXGDbdBm09YdiUaot7Cdw1AgEhcpwdk
+         x+T32aNFBcQHgvBFWWezLzsTOJVPi3TbwOzStZRIOK5z/VFsFb6cAXKPjxW3rTmK0+/V
+         3a+ZEaJMGiWeb/5cN04+J4i22xCjUyqOD3wh8Ce0O1mBfbosq8z/cfbfr5x1hQ4yCIH6
+         z7JjB5QTZlWx90s3t1CQz9L0prhvL/3Z5hbEVDprh1tP3/HC50T9ITLEyuyJtp5obK4E
+         gzTA==
+X-Forwarded-Encrypted: i=1; AJvYcCVqxJZCT802yOjKdVwcabnSNOSzUIFNDn1olepSuYOoKQpEPsAPA67gaI8T4sLKyypcFvO1tfM0WUYT0rUURiOrnXIb
+X-Gm-Message-State: AOJu0Yy7BshrQ/5LWQfjiQv3ZAM+vydjJ/Fj/aHo7CZYKoFNf8Vr4Lvb
+	BvW9ITxwEUhNQpmrITWtBMSFspYLhP3QWUrhWhbouIjR7gfh9WqV3ekNKdlE08jV527Us0XTja1
+	UQQ==
+X-Google-Smtp-Source: AGHT+IEZPsEeD1Zd/VZMKCyFxGi7l593WU5W4++SYV2nnpe1UGIt5x3H32mkoIcyVAOGihn5nlLRW2Z7atY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:3752:0:b0:6bf:6fc7:53c5 with SMTP id
- 41be03b00d2f7-6c411b757afmr27306a12.6.1717458939174; Mon, 03 Jun 2024
- 16:55:39 -0700 (PDT)
-Date: Mon, 3 Jun 2024 16:55:37 -0700
-In-Reply-To: <ZhkKb+lgPDNRsYXa@chao-email>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:ab0a:b0:2c2:4117:2409 with SMTP id
+ 98e67ed59e1d1-2c241172c69mr8738a91.8.1717459234737; Mon, 03 Jun 2024 17:00:34
+ -0700 (PDT)
+Date: Mon, 3 Jun 2024 17:00:33 -0700
+In-Reply-To: <20240520143220.340737-2-julian.stecklina@cyberus-technology.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240410143446.797262-1-chao.gao@intel.com> <20240410143446.797262-2-chao.gao@intel.com>
- <CALMp9eR294v_2-yXagKR8HM_WbqihJ5JcRwD1NTGvJxsOFsnyw@mail.gmail.com> <ZhkKb+lgPDNRsYXa@chao-email>
-Message-ID: <Zl5X-YHQL-tIUb4h@google.com>
-Subject: Re: [RFC PATCH v3 01/10] KVM: VMX: Virtualize Intel IA32_SPEC_CTRL
+References: <20240520143220.340737-1-julian.stecklina@cyberus-technology.de> <20240520143220.340737-2-julian.stecklina@cyberus-technology.de>
+Message-ID: <Zl5ZIXOXzaTryibL@google.com>
+Subject: Re: [PATCH 2/2] KVM: fix spelling of KVM_RUN_X86_BUS_LOCK in docs
 From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	daniel.sneddon@linux.intel.com, pawan.kumar.gupta@linux.intel.com, 
-	Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Julian Stecklina <julian.stecklina@cyberus-technology.de>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Apr 12, 2024, Chao Gao wrote:
-> On Thu, Apr 11, 2024 at 09:07:31PM -0700, Jim Mattson wrote:
-> >On Wed, Apr 10, 2024 at 7:35=E2=80=AFAM Chao Gao <chao.gao@intel.com> wr=
-ote:
-> >>
-> >> From: Daniel Sneddon <daniel.sneddon@linux.intel.com>
-> >>
-> >> Currently KVM disables interception of IA32_SPEC_CTRL after a non-0 is
-> >> written to IA32_SPEC_CTRL by guest. The guest is allowed to write any
-> >> value directly to hardware. There is a tertiary control for
-> >> IA32_SPEC_CTRL. This control allows for bits in IA32_SPEC_CTRL to be
-> >> masked to prevent guests from changing those bits.
-> >>
-> >> Add controls setting the mask for IA32_SPEC_CTRL and desired value for
-> >> masked bits.
-> >>
-> >> These new controls are especially helpful for protecting guests that
-> >> don't know about BHI_DIS_S and that are running on hardware that
-> >> supports it. This allows the hypervisor to set BHI_DIS_S to fully
-> >> protect the guest.
-> >>
-> >> Suggested-by: Sean Christopherson <seanjc@google.com>
-> >> Signed-off-by: Daniel Sneddon <daniel.sneddon@linux.intel.com>
-> >> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> >> [ add a new ioctl to report supported bits. Fix the inverted check ]
-> >> Signed-off-by: Chao Gao <chao.gao@intel.com>
-> >
-> >This looks quite Intel-centric. Isn't this feature essentially the
-> >same as AMD's V_SPEC_CTRL?
+On Mon, May 20, 2024, Julian Stecklina wrote:
+> The documentation refers to KVM_RUN_BUS_LOCK, but the constant is
+> actually called KVM_RUN_X86_BUS_LOCK.
+> 
+> Signed-off-by: Julian Stecklina <julian.stecklina@cyberus-technology.de>
+> ---
+>  Documentation/virt/kvm/api.rst | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 2d45b21b0288..5050535140ab 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -6418,7 +6418,7 @@ affect the device's behavior. Current defined flags::
+>    /* x86, set if the VCPU is in system management mode */
+>    #define KVM_RUN_X86_SMM     (1 << 0)
+>    /* x86, set if bus lock detected in VM */
+> -  #define KVM_RUN_BUS_LOCK    (1 << 1)
+> +  #define KVM_RUN_X86_BUS_LOCK    (1 << 1)
+>    /* arm64, set for KVM_EXIT_DEBUG */
+>    #define KVM_DEBUG_ARCH_HSR_HIGH_VALID  (1 << 0)
+>  
+> @@ -7776,10 +7776,10 @@ its own throttling or other policy based mitigations.
+>  This capability is aimed to address the thread that VM can exploit bus locks to
+>  degree the performance of the whole system. Once the userspace enable this
+>  capability and select the KVM_BUS_LOCK_DETECTION_EXIT mode, KVM will set the
+> -KVM_RUN_BUS_LOCK flag in vcpu-run->flags field and exit to userspace. Concerning
+> +KVM_RUN_X86_BUS_LOCK flag in vcpu-run->flags field and exit to userspace. Concerning
+>  the bus lock vm exit can be preempted by a higher priority VM exit, the exit
+>  notifications to userspace can be KVM_EXIT_BUS_LOCK or other reasons.
+> -KVM_RUN_BUS_LOCK flag is used to distinguish between them.
+> +KVM_RUN_X86_BUS_LOCK flag is used to distinguish between them.
 
-In spirit, yes.  In practice, not really.  The implementations required for=
- each
-end up being quite different.  I think the only bit of code that could be r=
-eused
-by SVM, and isn't already, is the generation of supported_force_spec_ctrl.
+There's a patch[*] that does this clean-up and more, which I'm going to grab for
+6.11.  I am planning on grabbing patch 1 though.  Thanks!
 
-+       kvm_caps.supported_force_spec_ctrl =3D 0;
-+
-+       if (cpu_has_spec_ctrl_shadow()) {
-+               kvm_caps.supported_force_spec_ctrl |=3D SPEC_CTRL_IBRS;
-+
-+               if (boot_cpu_has(X86_FEATURE_STIBP))
-+                       kvm_caps.supported_force_spec_ctrl |=3D SPEC_CTRL_S=
-TIBP;
-+
-+               if (boot_cpu_has(X86_FEATURE_SSBD))
-+                       kvm_caps.supported_force_spec_ctrl |=3D SPEC_CTRL_S=
-SBD;
-+
-+               if (boot_cpu_has(X86_FEATURE_RRSBA_CTRL) &&
-+                   (host_arch_capabilities & ARCH_CAP_RRSBA))
-+                       kvm_caps.supported_force_spec_ctrl |=3D SPEC_CTRL_R=
-RSBA_DIS_S;
-+
-+               if (boot_cpu_has(X86_FEATURE_BHI_CTRL))
-+                       kvm_caps.supported_force_spec_ctrl |=3D SPEC_CTRL_B=
-HI_DIS_S;
-+       }
-
-> Yes. they are almost the same. one small difference is intel's version ca=
-n
-> force some bits off though I don't see how forcing bits off can be useful=
-.
-
-Another not-so-small difference is that Intel's version can also force bits=
- *on*,
-and force them on only for the guest with minimal overhead.
-
-> >Can't we consolidate the code, rather than
-> >having completely independent implementations for AMD and Intel?
->=20
-> We surely can consolidate the code. I will do this.
->=20
-> I have a question about V_SPEC_CTRL. w/ V_SPEC_CTRL, the SPEC_CTRL MSR re=
-tains
-> the host's value on VM-enter:
->=20
-> .macro RESTORE_GUEST_SPEC_CTRL
->         /* No need to do anything if SPEC_CTRL is unset or V_SPEC_CTRL is=
- set */
->         ALTERNATIVE_2 "", \
->                 "jmp 800f", X86_FEATURE_MSR_SPEC_CTRL, \
->                 "", X86_FEATURE_V_SPEC_CTRL
->=20
-> Does this mean all mitigations used by the host will be enabled for the g=
-uest
-> and guests cannot disable them?
-
-Yes.
-
-> Is this intentional? this looks suboptimal. Why not set SPEC_CTRL value t=
-o 0 and
-> let guest decide which features to enable? On the VMX side, we need host =
-to
-> apply certain hardware mitigations (i.e., BHI_DIS_S and RRSBA_DIS_S) for =
-guest
-> because BHI's software mitigation may be ineffective. I am not sure why S=
-VM is
-> enabling all mitigations used by the host for guests. Wouldn't it be bett=
-er to
-> enable them on an as-needed basis?
-
-AMD's V_SPEC_CTRL doesn't provide a fast context switch of SPEC_CTRL, it pe=
-rforms
-a bitwise-OR of the host and guest values.  So to load a subset (or superse=
-t) of
-the host protections, KVM would need to do an extra WRMSR before VMRUN, and=
- again
-after VMRUN.
-
-That said, I have no idea whether or not avoiding WRMSR on AMD is optimal.
+[*] https://lore.kernel.org/all/20231116133628.5976-1-clopez@suse.de
 
