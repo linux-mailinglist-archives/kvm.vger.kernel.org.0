@@ -1,159 +1,180 @@
-Return-Path: <kvm+bounces-18719-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18720-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 763778FAA04
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:32:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D246A8FAA12
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB6CC1F221FD
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:32:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED1871C235B4
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B6E313DDA6;
-	Tue,  4 Jun 2024 05:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E8A13DDDB;
+	Tue,  4 Jun 2024 05:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OcKFvKlI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mffh8IOo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16D013D2AB
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C3B27735;
+	Tue,  4 Jun 2024 05:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717479153; cv=none; b=EI0SWbw+AheP3UZJv8lUGDJJtHC5+OXWrDDUWwmp3zBb+Mo5gwK/Nmfm+55DEPHBjr5lawjApnUQ6uhlJytxxhJPW2lvjnGN+tTGISrC12SWqo1VLSHGfDtbkTO9cZd54PJ9o3f21jrrf5gRiYcagnBX3oe6VKMt9wpRfh5k46g=
+	t=1717479796; cv=none; b=AC4YzeO+Pn9+XUKTI5nNeYupy5jp+yHXlba0Yo900G/ARqBBIw6VLTy7szx0QG6yBAYjAto88SFNPQsdgxiADRa+HMxdoB9htsfjmX1lvXVSjdl42EsiB3Z2FOXw+lQfUZhko6eNJgoAvToUoo1MZKItINjNF/AF2iv1jdm5NY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717479153; c=relaxed/simple;
-	bh=gSkLZUbj+hY+zPitT1Z80EwzQFv54UajjQE4BIUsGqI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mCaSre8Q1Sz98aJiW5L+jtVoiLEmcuqJflSu13Q15bBK0Ix93a69QA3cOwe/u3dou74Py/b0EWgCGH3SBZAsWWs6NBTRnHWKI7GSrfMknrP3ez8UfOQCW9RnRVpqm94jY8xj0mUGhGv8lZ5IgZQ4EJNd3HLPXC/ls8Lo4i+b95E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OcKFvKlI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717479150;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=iLcI+kyTAVcvV633tbUK4P5csgI4BduppvW67gAgjyQ=;
-	b=OcKFvKlIwIkG5EV3Wg+S9hJiesd4q5awXSusJScweQdx69j5ceXv2IHC009pQk5ec3syAA
-	HGmapgIMjXDs/HaZGppkDSHJ+X5rZkciGGr8V6l+p8MQ5x9Z2sudAvE9oBqY6EzMvfHr47
-	J9geNfLyH6KZavn3itI+2+jUGF5NZFQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-488-sDcXcH9vOMiTziW33g0Q-w-1; Tue, 04 Jun 2024 01:32:28 -0400
-X-MC-Unique: sDcXcH9vOMiTziW33g0Q-w-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4212b505781so23109865e9.0
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:32:28 -0700 (PDT)
+	s=arc-20240116; t=1717479796; c=relaxed/simple;
+	bh=Wc7N0BP4LUwBJNjgaM5afps9asVwOI8idTvrQObY+LM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Rayco40fIY3dKhLNzSr6NTB6n1iLfJrjrxYsw4L8ZDH8Cl7RUv1aPGOI+aq4s/sLYKF/gDZvRK98Dkngdd+hESr2kQ4c1+Q6OnFzXlXporGKcBeOAHZNFBauwamHvLmlEsrjwcixgm3/raxht5HkNsf9KUGh5Esiu0EixtAUBcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mffh8IOo; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1f44b42d1caso39051295ad.0;
+        Mon, 03 Jun 2024 22:43:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1717479794; x=1718084594; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1cPsbNHYB/deYy9oBYDkilLDFLxslyD43geIq+u0ocg=;
+        b=mffh8IOoIFqaTjCGH1k5fxmdXn2NKXTrjgkrTllwfHVi4myOwmpohZxmdj73xFWGlT
+         CaTaN1FnOrQfpm2Xjv3mNraIgsLiehV/Z5vPscLNLbO2OpALNMiJAeKPn7QMMbhuVRk9
+         nTknUe+07dnm0blrsUErPu81HHQ2r3Q+NY9sjOwO+S47WonQkfol2vgeVc/iL8vq9XSy
+         mfuAGJERWpsMpKjB0I6WbfD7WlMlLwNicCVujKeUwbJJEe9k7wx6VP3Cc3j3Uijeim+8
+         QtUR56Z96OUFVCB3D6/4nRkXvdYi49py3JrJXg3pj8UHzZbCwDbVrdqq9qYgROwYKvhJ
+         dfGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717479147; x=1718083947;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iLcI+kyTAVcvV633tbUK4P5csgI4BduppvW67gAgjyQ=;
-        b=hwxtW6dSWJoR71XzbNb9YSbRnstApZseuf02BrxMfSeonjIGIbn2uOJT9G04rPiC1L
-         ttlIJFtJIQNvoLxkj0zfGXsSnyvMB1C8xDfdJbdTvnfMM5ooKONlH9Y0FkHKp8B36tMn
-         RzTByg8pGR2M972xE6cbL0ccs6JsYv7WE1DNZNAjncCYOcgpSUcSxOCykZOTPrcjeVW5
-         +F4lOC4xcMx2l0ilMvsjXbTvXTD/KTxgP8Ty0cA5RHAnkABySsR22Zac7oWaTHi8Y7e6
-         fLuekgUsGGY1SQJlkljxohUjqO7IvuW2Qwss7xjJdZWmQHxs+tAKl1ziGgu7MFZVUM81
-         44+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVMdAhqd4xG7N/6i/3voJN7D2Fv2LoyJoMFfcWMJXKUgtmgKGNq8tnSR6GFHFs8JbDgsxwv0GOgwWOgKhMAXXX9ZGww
-X-Gm-Message-State: AOJu0YxqCzZ36kIxJmGl+2BfiypyVyv8Y28kiLiSS6+UyLKJirTq2h0I
-	MaY2li4lnMspI0cUjnPBcra1LYFXjfWzCmgFzb30vedrMxUrU4KnuOJFEc0v0zZ+EV+JKHBveRF
-	0VpZo9fCDRnaTibwpKsJi8tQuwrG1fy5GJUzbvl8zSnxzoAbhLA==
-X-Received: by 2002:a05:600c:3ba9:b0:421:2a54:2f22 with SMTP id 5b1f17b1804b1-4214511b763mr12634375e9.9.1717479147468;
-        Mon, 03 Jun 2024 22:32:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGnJ3KPRT7ng0O8UyK86E0pZ8h3l8VtU4REoNfIN/XcocGoazQCYg1AgHxvvzrvU7lxBBXCog==
-X-Received: by 2002:a05:600c:3ba9:b0:421:2a54:2f22 with SMTP id 5b1f17b1804b1-4214511b763mr12634215e9.9.1717479147060;
-        Mon, 03 Jun 2024 22:32:27 -0700 (PDT)
-Received: from [192.168.0.4] (ip-109-43-178-97.web.vodafone.de. [109.43.178.97])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4213f3abf1dsm44589215e9.44.2024.06.03.22.32.26
+        d=1e100.net; s=20230601; t=1717479794; x=1718084594;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1cPsbNHYB/deYy9oBYDkilLDFLxslyD43geIq+u0ocg=;
+        b=flczFdX/1bYVnc/btbFDqu7pBaQbfdGJ5YbBl/hNojnoJT4CGLcjxpeUDr+0WcDWvy
+         XJ/IFjUZqFE1EMv/xnPZ+CYwfUu83DJxhD+JbjRTAju9rYZ/yFJgB8t9Uqnyb85bbMJ6
+         ckwuouqkVKe464afpuL9FMYVAb1VIYaVu5+3F2+hRePsVAdxiAL5595Zll0NaYz1HHga
+         A6YfVbROB2OuuQAJbjrXFDRy+1mpDZCy2fSFSKv8aW+Z9BX8s4y8yOt57mjrtQIjT68U
+         a2wT9H85HkybcuwS4fH8/2e1LcVxNVKOoZBMqE++OrVRwEo1hNU41y6rN6u+tZh6revI
+         jtog==
+X-Forwarded-Encrypted: i=1; AJvYcCWCm8PaZWILsc0wYwTBzB0th8Ci3oCrFRFsNfwMjN+YNOCXgplkzGb5kydftIn5r4iEQM92Gj7cIjGVw8j8ty+vDZVlrvGU92hiG8QQbcELlPEW33vrHvf+NBfn0k74egS+PMQjMFKjgWPWQLB/adYBXeIckx/tEy4v/dzI
+X-Gm-Message-State: AOJu0Yx/g9GHFVNa9g2Ohksp5K2FSEqGH2SKkAKmfAkmFgwkR6QkcBcE
+	8UPzvTIlR/ZH4wWrPvD0Uh6KCMeFgkbs8/9ycTYqlGHULWkd26AG
+X-Google-Smtp-Source: AGHT+IHdULvM/UoX71VpmSro0BVG2S25hAJs5rPoN0XzL1Vuyeuwb3p6V/lc/pV9Udr55ns8zfQHzw==
+X-Received: by 2002:a17:902:d2d2:b0:1f6:857b:b5c with SMTP id d9443c01a7336-1f6857b4df3mr34853835ad.32.1717479794361;
+        Mon, 03 Jun 2024 22:43:14 -0700 (PDT)
+Received: from localhost ([1.146.11.115])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f683d1a770sm21936025ad.13.2024.06.03.22.43.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jun 2024 22:32:26 -0700 (PDT)
-Message-ID: <0c987c3d-1fff-4eb0-a0c0-e710f06d47a2@redhat.com>
-Date: Tue, 4 Jun 2024 07:32:25 +0200
+        Mon, 03 Jun 2024 22:43:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 0/2] s390x: Fix build error messages
-To: Nicholas Piggin <npiggin@gmail.com>, linux-s390@vger.kernel.org
-Cc: Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, =?UTF-8?Q?Nico_B=C3=B6hr?=
- <nrb@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
- kvm@vger.kernel.org
-References: <20240602130656.120866-1-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240602130656.120866-1-npiggin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 04 Jun 2024 15:43:06 +1000
+Message-Id: <D1QZRTRK2WWI.20TJKC3RK1K9C@gmail.com>
+Cc: <pbonzini@redhat.com>, <naveen.n.rao@linux.ibm.com>,
+ <christophe.leroy@csgroup.eu>, <corbet@lwn.net>, <mpe@ellerman.id.au>,
+ <namhyung@kernel.org>, <pbonzini@redhat.com>, <jniethe5@gmail.com>,
+ <atrajeev@linux.vnet.ibm.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 4/6] KVM: PPC: Book3S HV: Add one-reg interface for
+ DEXCR register
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Shivaprasad G Bhat" <sbhat@linux.ibm.com>, <kvm@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
+X-Mailer: aerc 0.17.0
+References: <171741323521.6631.11242552089199677395.stgit@linux.ibm.com>
+ <171741327891.6631.10339033341166150910.stgit@linux.ibm.com>
+In-Reply-To: <171741327891.6631.10339033341166150910.stgit@linux.ibm.com>
 
-On 02/06/2024 15.06, Nicholas Piggin wrote:
-> This fixes some non-fatal error messages during build. I have only
-> tested TCG with no PV, so it's not intended for merge before
-> that at least.
-> 
-> Thanks,
-> Nick
-> 
-> Nicholas Piggin (2):
->    s390x: Only run genprotimg if necessary
->    s390x: Specify program headers with flags to avoid linker warnings
+On Mon Jun 3, 2024 at 9:14 PM AEST, Shivaprasad G Bhat wrote:
+> The patch adds a one-reg register identifier which can be used to
+> read and set the DEXCR for the guest during enter/exit with
+> KVM_REG_PPC_DEXCR. The specific SPR KVM API documentation
+> too updated.
 
-Thanks, I reviewed and tested the patches, and all looks fine. Thus I went 
-ahead and merged the two patches now.
+I wonder if the uapi and documentation parts should go in their
+own patch in a ppc kvm uapi topic branch? Otherwise looks okay.
 
-  Thomas
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 
+>
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> ---
+>  Documentation/virt/kvm/api.rst            |    1 +
+>  arch/powerpc/include/uapi/asm/kvm.h       |    1 +
+>  arch/powerpc/kvm/book3s_hv.c              |    6 ++++++
+>  tools/arch/powerpc/include/uapi/asm/kvm.h |    1 +
+>  4 files changed, 9 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index a71d91978d9e..81077c654281 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2441,6 +2441,7 @@ registers, find a list below:
+>    PPC     KVM_REG_PPC_PTCR                64
+>    PPC     KVM_REG_PPC_DAWR1               64
+>    PPC     KVM_REG_PPC_DAWRX1              64
+> +  PPC     KVM_REG_PPC_DEXCR               64
+>    PPC     KVM_REG_PPC_TM_GPR0             64
+>    ...
+>    PPC     KVM_REG_PPC_TM_GPR31            64
+> diff --git a/arch/powerpc/include/uapi/asm/kvm.h b/arch/powerpc/include/u=
+api/asm/kvm.h
+> index 1691297a766a..fcb947f65667 100644
+> --- a/arch/powerpc/include/uapi/asm/kvm.h
+> +++ b/arch/powerpc/include/uapi/asm/kvm.h
+> @@ -645,6 +645,7 @@ struct kvm_ppc_cpu_char {
+>  #define KVM_REG_PPC_SIER3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc3)
+>  #define KVM_REG_PPC_DAWR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc4)
+>  #define KVM_REG_PPC_DAWRX1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc5)
+> +#define KVM_REG_PPC_DEXCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc6)
+> =20
+>  /* Transactional Memory checkpointed state:
+>   * This is all GPRs, all VSX regs and a subset of SPRs
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index b576781d58d5..1294c6839d37 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -2349,6 +2349,9 @@ static int kvmppc_get_one_reg_hv(struct kvm_vcpu *v=
+cpu, u64 id,
+>  	case KVM_REG_PPC_DAWRX1:
+>  		*val =3D get_reg_val(id, kvmppc_get_dawrx1_hv(vcpu));
+>  		break;
+> +	case KVM_REG_PPC_DEXCR:
+> +		*val =3D get_reg_val(id, kvmppc_get_dexcr_hv(vcpu));
+> +		break;
+>  	case KVM_REG_PPC_CIABR:
+>  		*val =3D get_reg_val(id, kvmppc_get_ciabr_hv(vcpu));
+>  		break;
+> @@ -2592,6 +2595,9 @@ static int kvmppc_set_one_reg_hv(struct kvm_vcpu *v=
+cpu, u64 id,
+>  	case KVM_REG_PPC_DAWRX1:
+>  		kvmppc_set_dawrx1_hv(vcpu, set_reg_val(id, *val) & ~DAWRX_HYP);
+>  		break;
+> +	case KVM_REG_PPC_DEXCR:
+> +		kvmppc_set_dexcr_hv(vcpu, set_reg_val(id, *val));
+> +		break;
+>  	case KVM_REG_PPC_CIABR:
+>  		kvmppc_set_ciabr_hv(vcpu, set_reg_val(id, *val));
+>  		/* Don't allow setting breakpoints in hypervisor code */
+> diff --git a/tools/arch/powerpc/include/uapi/asm/kvm.h b/tools/arch/power=
+pc/include/uapi/asm/kvm.h
+> index 1691297a766a..fcb947f65667 100644
+> --- a/tools/arch/powerpc/include/uapi/asm/kvm.h
+> +++ b/tools/arch/powerpc/include/uapi/asm/kvm.h
+> @@ -645,6 +645,7 @@ struct kvm_ppc_cpu_char {
+>  #define KVM_REG_PPC_SIER3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc3)
+>  #define KVM_REG_PPC_DAWR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc4)
+>  #define KVM_REG_PPC_DAWRX1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc5)
+> +#define KVM_REG_PPC_DEXCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc6)
+> =20
+>  /* Transactional Memory checkpointed state:
+>   * This is all GPRs, all VSX regs and a subset of SPRs
 
 
