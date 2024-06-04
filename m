@@ -1,241 +1,249 @@
-Return-Path: <kvm+bounces-18708-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18709-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 354728FA848
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 04:26:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EADB68FA931
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 06:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 582111C226A7
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 02:26:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EEF8B220D9
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 04:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ECC113D608;
-	Tue,  4 Jun 2024 02:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C36B13D602;
+	Tue,  4 Jun 2024 04:27:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="maPZTs53"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AIDE97aU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED254206C
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 02:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717467992; cv=none; b=W+Xpt9U1ORJxZ+Ra3cW2fDnug1DpyjXnsSusbUEu16tf2oCIE6bbyAt+pgCxqJlD7+TVJDBp7KlTBL/MrdTB9rjhjgNhpIcpNp+eEWcshvxiQ4Gc3RRpRPHlxXM9u5Vmn0qA0zsRqvFqS1Fkr8slSu4BslzVqAZXtL9409JEzUA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717467992; c=relaxed/simple;
-	bh=8t+bbxOFKb/Tsr+2UziLXGE7C3Zx9/gJZQQEdwduWRY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AaN43lBbwydddEK+UQDs1ZrrFMWAzmJzUfOcWW8vgdnuf399iPRt3EIivkE1EruBFsEv8dYsI/ConitxvCpX+G63rT69fJHEsEnbo1g10cO8UPpolupj40s4XiK+pwVxgM1r3LbiReH75RRF57ZcQ/MIGDuSCoyqTLReI+T6C74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=maPZTs53; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6f935c8758fso592080a34.2
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 19:26:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1717467990; x=1718072790; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N4PmXD5MowMat90zUSKPgQAiN+HLbim4SCmw5MkJujg=;
-        b=maPZTs53VO1pUbUoupdvqbSq9LfqqPk9mCjCZ1zNCOdkAvKPbKdwU2pXsNVIzmfy+w
-         R7zl9AyoAJC0FJgMj+4BCZ9RUcaXLJqoyfD3IcpX2F28WbHkW4OCBRXVY4ztoHkoTMpA
-         /frTGybb4kdLr+lfD+40YTHBaz3sSe/KxhqaWQ2nXSFC3nZIpD1QXOTkfJ9i1AKalVta
-         XWLtwipXiq/SnTDw0OAeaw8unUtobRc4kBYNLH53AVDjY9nrBSBYFrryq40qVVO1kSU9
-         ioyhVIcbDcqFoWoX0UminNMyUbMWUghyGDdysHXD7eOy29u5sqzrCbPMgPw9sRyBGozJ
-         EZ+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717467990; x=1718072790;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N4PmXD5MowMat90zUSKPgQAiN+HLbim4SCmw5MkJujg=;
-        b=PIrO+72/He9bxCAdKz55NmbLlRlR04cKmrhEEKVCEgMdfwW6SLnlHyxhVwd0JLW+pc
-         ybiFxrKnjwlth+Qtp3h/ETEDGaz7t5utuMFGhKYeQFU1nkHPTWmaMxwcjy22uQnzFoA5
-         KglSS+UK11IcyX5wvVIWIttMN4hePe3ifrx13BdtSrkpo5dyzIoO3LUrACOtVOAEW2w4
-         jm5y9Tywc6FwajlqM5k+lM0sjJFB2xPyg+797nd9vB0SDMyzP4Gvbrt7Ud4S+wbcyyyM
-         ksdummxsPw9wBVnRH2fthf6nqm5tH1qITJrDaaE0c1CGSkeTuKksEExC25hBBYigPAZg
-         gCCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXrMUl9xK6JOGuJLH4o2OQgci7Toywtu9dvoqj/9hTM01jpOs2ABCnTRybDuBiOAfDNjivcwvNcglG/C30hPkzns4q4
-X-Gm-Message-State: AOJu0Yxwmhx0IdepsY3ZrsGydfz9VoW3n56vXNtYHGqmGikICDGpAAeJ
-	DTIJWqk8ekzHMxbiXPgh/t0XLKl11uMIolIhtO3kRYbtQ/YGGv8LUGSYkOsVcEpY78ibp2gMecL
-	x06wUqL39qANmGwvBNblrVd72Uyj0XZl3uLl/kQ==
-X-Google-Smtp-Source: AGHT+IF8osrWQw9+CtjSacKGaxmnj6mLifvKaK2i0qkCZu+VsezKa8w3LpXFIRo/H5fvWDp3fsIXnpfMZDYhhmvEt7A=
-X-Received: by 2002:a05:6830:3a0f:b0:6f0:e381:77b1 with SMTP id
- 46e09a7af769-6f911fa42d3mr11510807a34.27.1717467989658; Mon, 03 Jun 2024
- 19:26:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA576FC3
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 04:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717475251; cv=fail; b=hWx8YCrqcTFmWe/jKpy7Ob1sT+51liykoIiDJZAJ7O8Hl+AbPt24OVc9t7o9/ugCtrwK1JoH05FXZDfJTBzw+vSvumCNb7XhgLSZA7yGCpDX6CuhbudN2pl44/rpujnUkCNtYZoShDBhHM987AkuRoxwVL09yTgUCKUwdDUUSVA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717475251; c=relaxed/simple;
+	bh=qa2KsP392AxZpAieWR74Ef34sWAPCrMaD/2Q8EASQxI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=UnqyOKBwQiynIF1OHGob6+JFHOfCgEH8x6sNi2akAq0Jqohm+8sMjHloxHSATPb7Ilfsh4LBijs2+fSNvV/kAVcVYXUvgpmYSt6O1DIHPsVu4IDPQTzuYoGM8wICWjnkRiVRC3c+s3CdSlnwvFgTnWWFV/raH41EjJ80V4182Ec=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AIDE97aU; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717475249; x=1749011249;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=qa2KsP392AxZpAieWR74Ef34sWAPCrMaD/2Q8EASQxI=;
+  b=AIDE97aUOp/fIHRHW4Ep8g0LOcrrtGS0pI7U/9f+3PK6HFLkAUsw9ptn
+   u5hW+JhNYkocNhzUKPoWL6ikia4gs0PbBVO3FdEWfK9LF5/wEa9ltfQzF
+   3o5RPAuP7bxPr7JPdZ7dbtzVvsytv2JjxNdbfpX8etGXTxyvGEnveBIil
+   XXSy5KAagKfogSohkULA168MvdOiMHu6Hv2xoEdYOx2Snl1pQCmZWG56R
+   kNamtjWcZ7kYDxPSXjtQPX2VpYEEMXpxCyvqJkx9saXevUN/7S1iBmSPw
+   8HES6osMdj904+T0APAD1Fyiy0DfhXoCaxtJIkFGxH2EqfRVgk1zrT7HA
+   g==;
+X-CSE-ConnectionGUID: 4mis/3M5Q92w/5lXlw4FZw==
+X-CSE-MsgGUID: Mo/kkjQORT+ZsLDmPS2FqQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11092"; a="13834052"
+X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
+   d="scan'208";a="13834052"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2024 21:27:29 -0700
+X-CSE-ConnectionGUID: OkC3Gy5tQ1iCRZWmcc/1IA==
+X-CSE-MsgGUID: WPPmlizlQ3KsaR26xKys4g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,213,1712646000"; 
+   d="scan'208";a="37689600"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Jun 2024 21:27:29 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 3 Jun 2024 21:27:28 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 3 Jun 2024 21:27:28 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 3 Jun 2024 21:27:28 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 3 Jun 2024 21:27:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RqiykY9Dyh+IeFkYOYKZpAGLlpaGedyFwB3cfSucvd9+plMIgCSoJywBQI9hh+bmvqx6hf7dyrlZEqci3z56vlZnKD5wwZHFVEoueTk6P328Dzs9kUOsFih0DwDSitLB4LRX33P4EiSJyBIaS3w/9+Mz/fWRtDsEP1JnKimvbM1x9zqp1nh5E8z/wqhDUZj5YLg3+Uhtp4XjZQ08jUjlG7QrBrawxRNJ/76sUd4IEALa6QzwZ0DHraQnsnHTW0x7pAtOF2gXNCNRCNT5Kpg4gGqsbvDJwXcGTC34RuOGqUqGsQTn+ris3wFA96PXRvHX4gdAZZUty6Tjesj4jfBNiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S5CPv6XTs1FkdRv45WhS/y9QpJ044zm5wSj4GII8oOc=;
+ b=UlGVf85KuXSS5CGKtJUYVGiZQEbVF6e8QyheqkH3aBvXHG7kKD9XWsJU/0PArOp7lCx4O4d2Y1upgi1LSbWQN0udTpX8tJM1F9NNfTZIruExPabcR9kafiRj8hIbfE6Rm4WJ6A/itHFBmCOTQrPw3L53NDD6Wr22H+JlOG/0O/mXHR0oQUXYV9wheunDPk1SkZYteABVLjWpVmvPtqb+Lmv5jnUqW9fo29Yx5Gc1YZAf0XWRDLqr1gMNDKgV80kz6VR5sNRZkm0uWIEFRDX8QF+gfcnCazbyOSCGEQx9/7yzM13XxlajRkJ+QgYAPtDryj04s8DC0TuwA526QGqyZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ CY8PR11MB6987.namprd11.prod.outlook.com (2603:10b6:930:55::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7633.22; Tue, 4 Jun 2024 04:27:26 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.7633.021; Tue, 4 Jun 2024
+ 04:27:26 +0000
+Date: Tue, 4 Jun 2024 12:26:29 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+CC: <kvm@vger.kernel.org>, <ajones@ventanamicro.com>, <kevin.tian@intel.com>,
+	<jgg@nvidia.com>, <peterx@redhat.com>
+Subject: Re: [PATCH v2 2/2] vfio/pci: Use unmap_mapping_range()
+Message-ID: <Zl6XdUkt/zMMGOLF@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20240530045236.1005864-1-alex.williamson@redhat.com>
+ <20240530045236.1005864-3-alex.williamson@redhat.com>
+ <ZlpgJ6aO+4xCF1+b@yzhao56-desk.sh.intel.com>
+ <20240531231815.60f243fd.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240531231815.60f243fd.alex.williamson@redhat.com>
+X-ClientProxiedBy: SG2PR01CA0140.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:8f::20) To DS7PR11MB5966.namprd11.prod.outlook.com
+ (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524103307.2684-1-yongxuan.wang@sifive.com>
- <20240524103307.2684-2-yongxuan.wang@sifive.com> <20240527-41b376a2bfedb3b9cf7e9c7b@orel>
- <ec110587-d557-439b-ae50-f3472535ef3a@ghiti.fr> <20240530-3e5538b8e4dea932e2d3edc4@orel>
- <3b76c46f-c502-4245-ae58-be3bd3f8a41f@ghiti.fr> <20240530-de1fde9735e6648dc34654f3@orel>
- <f2016305-e24b-41ea-8c48-cfdeb8ee6b48@ghiti.fr>
-In-Reply-To: <f2016305-e24b-41ea-8c48-cfdeb8ee6b48@ghiti.fr>
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Date: Tue, 4 Jun 2024 10:26:18 +0800
-Message-ID: <CAMWQL2htSNer6zZe2SNoRfmF1wF7EVGHeqwNE3pkfSnS3sa7=Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 1/5] RISC-V: Detect and Enable Svadu Extension Support
-To: Alexandre Ghiti <alex@ghiti.fr>
-Cc: Andrew Jones <ajones@ventanamicro.com>, linux-riscv@lists.infradead.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, greentime.hu@sifive.com, 
-	vincent.chen@sifive.com, cleger@rivosinc.com, Jinyu Tang <tjytimi@163.com>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>, 
-	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
-	Samuel Holland <samuel.holland@sifive.com>, Samuel Ortiz <sameo@rivosinc.com>, 
-	Evan Green <evan@rivosinc.com>, Xiao Wang <xiao.w.wang@intel.com>, 
-	Alexandre Ghiti <alexghiti@rivosinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Kemeng Shi <shikemeng@huaweicloud.com>, "Mike Rapoport (IBM)" <rppt@kernel.org>, 
-	Jisheng Zhang <jszhang@kernel.org>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
-	Charlie Jenkins <charlie@rivosinc.com>, Leonardo Bras <leobras@redhat.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|CY8PR11MB6987:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61761670-6065-42f9-05f0-08dc844ea325
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|1800799015|366007|376005;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?HVaZPlEVkm7nxlt1O8UwrajyujSsGstyMIWQzzYLINhNf6MI1MHwvkCfROFF?=
+ =?us-ascii?Q?oJCeS6aqSAuX3ES/cZk+eWFt94XxXxcLJlm3JRHhYDbXJ+usPc21m9tg14v0?=
+ =?us-ascii?Q?K8tF3BrwepwnHgXUHn2Sna8zQCZFTqYU6qIv5u57it/0KpnbyPwxn7GgzdqQ?=
+ =?us-ascii?Q?is2UBnb4nymURquKmfi3yWv+ewzRC27KA2tueLawwRTTXRudB5SxVbj6lOlH?=
+ =?us-ascii?Q?A7T4+JV4tWX14jUXFoRebI7DL1u5bRX8BfACYD1vQ00ZMXd0XR3TGuxQ25ry?=
+ =?us-ascii?Q?uETbZ6aXPmqRG00o5BBRWb1BZ4izu1zORVoY3Nc+Wv2usiCotL7YuTs9Qz8l?=
+ =?us-ascii?Q?5lf93mzRqK95ff9tyQBgX99oTzVFMRou+fzeo2q0CcIJs3eTUeLq+Dn4ISre?=
+ =?us-ascii?Q?usk5dnynNWKc0nSEs61dzbRsTJhvriBIXKmyFVD0R9e7TC43J920mjbdOQGw?=
+ =?us-ascii?Q?SGpr1HjeaZUi8XGR5XNXn36ira+Ye0OcpH63VFrQ+TfZkEVLuq9+hDkNJ0EU?=
+ =?us-ascii?Q?hiYUecEdFCSuxl8t7tN1IQf6sZxSkuClqKklM8Bn3sR+pgJ+v+NG0fpirgT5?=
+ =?us-ascii?Q?nhS7wp3YF5bfBoT64IqylDnjWiVSvyBcc7YnCLRH+VivWm8PO09Ona4tQ4rf?=
+ =?us-ascii?Q?kisWJtdlVMixs3dD/pkfqq25k2DeI8drY886rpjCVgYA+/tLEPh/jH57Ie58?=
+ =?us-ascii?Q?vwhE8MWuWfxOsjfVJCIu+1HaFs2eMP/BpvPfnkM7YdlHxOAUj/9WPuIEqWhU?=
+ =?us-ascii?Q?1omrNznxyPAhusRPIGY7NBjzEvwKLE0PjfZX8QX0wsOPdXadbQ841Otj1rM5?=
+ =?us-ascii?Q?AwIhy4jUYMN+S850D6wmI0V3bRQUUN135JACQ0Ui2zWsCTEysfRaAVZ4xECC?=
+ =?us-ascii?Q?pggtpD6oQNtxUKvI/aqoqjxJ/EZ9Gdusx8MPfGrLftXxgAlC0qPaSxSHg8gk?=
+ =?us-ascii?Q?owHIGh5iCo41wb0FTkkcGClQnHJszz3jzeZsriwiAI7/8eMuGyYGERnoN1Rg?=
+ =?us-ascii?Q?eIgYzQexw1sBlgkfsjuIfVsDrSonQIxlO5h239dQ46Yo1N3WcpFdPinrRQhN?=
+ =?us-ascii?Q?Go3Jf+Kvx/8I6b99Orxfm1Bqf4iDzOGo0Irk4INfRdvJFYRxBmDqbXoVm5LD?=
+ =?us-ascii?Q?WCNObkMxDSlWUVzT2RuxLqavGqmJqyiaxUd3ZeeI3mLeVdFke+qbO3juMSX2?=
+ =?us-ascii?Q?h+6az762Hd89v1+ATAUJRyMp7PXMoq2atdVE8mpPaUOhmuSQykzDcG1+CZba?=
+ =?us-ascii?Q?Km3w+lqohToYq1oweOm2AdyT1EAxUa5mOqrUtklCIQ=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mjvZCEDBwUWJ/oG0DpBxFxMwsHFPRjgrtIQbg+CJRwM4szxLjLYTst7qV/DT?=
+ =?us-ascii?Q?AFuM5old594Q1FyZDRCU+sCUBsS4Y+nKW2smuwio21QtgIPetwWcDGkMYPaj?=
+ =?us-ascii?Q?gGope/4RviTJaPsL0cJm4CfE0uAB1XOMnOig3XZc1obOvo0g4x+tBkUQuibI?=
+ =?us-ascii?Q?iaUqaBOO+ilbctLtkpcGgimje4ZDnqlWYJdnU6Kf6CmwpvDflLj6E90magxE?=
+ =?us-ascii?Q?9X0JYC3x7plidYl+g2z+V/q5ZITaj93mprildej9lMPWfaYEh51zGJ+OS8zz?=
+ =?us-ascii?Q?elldSWHLyt51Yoj2tEr7HZcL4RLAoVuyG3IIvGvBlWBXt/uv8fF+rQonGFof?=
+ =?us-ascii?Q?PXFtWMa2mRZqwJFRZFaO4iH049TTAo9uREmknf4x+oghWKNwpUQAgrSL+Cty?=
+ =?us-ascii?Q?8c95CvjW1WL4AsUFKn/RNHq0CXwnfabhFWuvSnWcScymLtRW1LgLHSMuBeeI?=
+ =?us-ascii?Q?OQ5VcaRYsBceM0iRuxagtmADZCeAqoAv8w3SwD3rk9pRH7NbwmlWvme3/2NK?=
+ =?us-ascii?Q?noHYAS3KYDrT+3kUjsafkZkjK3OPYI4mtr3W+6kPXP5K4N078KbkDnZWiBBi?=
+ =?us-ascii?Q?ZJ/vP1hSSG/quL/cdA2/emNN+g+tHXDh5zvp1iKe6j1Y1i+LrGsFFMaiKcn/?=
+ =?us-ascii?Q?85ky5dZSHxJNLX9ueGLEPxI1JmNWTua7cjpWq9LHmbNtaTygSC6JnL6mMbAy?=
+ =?us-ascii?Q?Ze1zgEvhFcW6DUUC+Ne9XK98zhuKAxtq4AGtQAsqmwx5Vr5qyjIW69/4SvrQ?=
+ =?us-ascii?Q?7w+2Sw2m2PGWdrQuTDCmvTUeEcP/hRuKD93WFdu++bzLPcBgxwINEJtgsUcl?=
+ =?us-ascii?Q?Fobmzht1Y4Rso2iGejSY5YDduMhTKLFAoBpht+ku35JWf5wPbJ+5wA/K1Ecw?=
+ =?us-ascii?Q?YFkg79Im4S9J+6FwCWp8GB2Kk++r8NxIj1mdMMd8vqyhSY8HqYuHGAOHiV5Y?=
+ =?us-ascii?Q?D0lIN5/lXkb18AfItM22PHvy+o8uUscgwGeNH49jZNYdva5k7livHBvQgdxn?=
+ =?us-ascii?Q?yQSm7u3C2nIPQSkrYK1DIFl6T1I//bvFgyIrtJpPf5V8+TlBrxMfVOchDAnV?=
+ =?us-ascii?Q?2b3oNfFtruJRueNbaENs4li5l2Dk52WKgQmh0xfrVAfdCXgNfNocmh3zfISm?=
+ =?us-ascii?Q?YUlRn2WrhG0FNlJcBuBKzyvMuBOQ5OlSiUVnj00aCtSlec9V0/OuaDansKj+?=
+ =?us-ascii?Q?CMXGybyASXoPC5a/90+eb1g30m0NTwCStn023nFuYcmrykCFCCOjurBx7iFr?=
+ =?us-ascii?Q?IIYxrJw8Y28I7I1UG5dFrhBeaoojblyBRTXr80/CQe/kMQ0DbKYxOlmKDw6Z?=
+ =?us-ascii?Q?w6t7TfTOW4E5JLJQeq2F1q/2hbOTZb6Bys4psVoa7dZQEh86goRvBMdUP9Sm?=
+ =?us-ascii?Q?UoXDBFTO5FgkxaJ61J/A7GRWnHGjn7J2AeUVOcwcQ6rx8xaDAwiuzsJ9jN05?=
+ =?us-ascii?Q?sGphUV8Y1Lj5pFDrZ3sGYhWK7Nl7BYGSIOL+idf2lWW3RFeCXJ4AwAZcJw9r?=
+ =?us-ascii?Q?o88BfzewVZJNmt55wxr4rTBHNHRLmx/Zxeik/kx/8PKMScTw6fhXALZZLXMu?=
+ =?us-ascii?Q?2eHdQje0z+BOiz14kCm7aMJk044X/fTaSpXyAF54?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61761670-6065-42f9-05f0-08dc844ea325
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jun 2024 04:27:26.0159
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IEulrs0emebxvap2QwdHt8/RROJ5r8ZjRNSLIOgJoIHVXrNmRW8noi4OKP9LNH6S3dydrNFkqfQ/qPp6f/ccNQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6987
+X-OriginatorOrg: intel.com
 
-Hi Alexandre,
+On Fri, May 31, 2024 at 11:18:15PM -0600, Alex Williamson wrote:
+> On Sat, 1 Jun 2024 07:41:27 +0800
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
+> 
+> > On Wed, May 29, 2024 at 10:52:31PM -0600, Alex Williamson wrote:
+> > > With the vfio device fd tied to the address space of the pseudo fs
+> > > inode, we can use the mm to track all vmas that might be mmap'ing
+> > > device BARs, which removes our vma_list and all the complicated lock
+> > > ordering necessary to manually zap each related vma.
+> > > 
+> > > Note that we can no longer store the pfn in vm_pgoff if we want to use
+> > > unmap_mapping_range() to zap a selective portion of the device fd
+> > > corresponding to BAR mappings.
+> > > 
+> > > This also converts our mmap fault handler to use vmf_insert_pfn()
+> > > because we no longer have a vma_list to avoid the concurrency problem
+> > > with io_remap_pfn_range().  The goal is to eventually use the vm_ops
+> > > huge_fault handler to avoid the additional faulting overhead, but
+> > > vmf_insert_pfn_{pmd,pud}() need to learn about pfnmaps first.
+> > >  
+> > Do we also consider looped vmf_insert_pfn() in mmap fault handler? e.g.
+> > for (i = vma->vm_start; i < vma->vm_end; i += PAGE_SIZE) {
+> > 	offset = (i - vma->vm_start) >> PAGE_SHIFT;
+> > 	ret = vmf_insert_pfn(vma, i, base_pfn + offset);
+> > 	if (ret != VM_FAULT_NOPAGE) {
+> > 		zap_vma_ptes(vma, vma->vm_start, vma->vm_end - vma->vm_start);
+> > 		goto up_out;
+> > 	}
+> > }
+>
+What about the prefault version? e.g.
 
-On Mon, Jun 3, 2024 at 7:29=E2=80=AFPM Alexandre Ghiti <alex@ghiti.fr> wrot=
-e:
->
-> On 30/05/2024 11:24, Andrew Jones wrote:
-> > On Thu, May 30, 2024 at 11:01:20AM GMT, Alexandre Ghiti wrote:
-> >> Hi Andrew,
-> >>
-> >> On 30/05/2024 10:47, Andrew Jones wrote:
-> >>> On Thu, May 30, 2024 at 10:19:12AM GMT, Alexandre Ghiti wrote:
-> >>>> Hi Yong-Xuan,
-> >>>>
-> >>>> On 27/05/2024 18:25, Andrew Jones wrote:
-> >>>>> On Fri, May 24, 2024 at 06:33:01PM GMT, Yong-Xuan Wang wrote:
-> >>>>>> Svadu is a RISC-V extension for hardware updating of PTE A/D bits.
-> >>>>>>
-> >>>>>> In this patch we detect Svadu extension support from DTB and enabl=
-e it
-> >>>>>> with SBI FWFT extension. Also we add arch_has_hw_pte_young() to en=
-able
-> >>>>>> optimization in MGLRU and __wp_page_copy_user() if Svadu extension=
- is
-> >>>>>> available.
-> >>>> So we talked about this yesterday during the linux-riscv patchwork m=
-eeting.
-> >>>> We came to the conclusion that we should not wait for the SBI FWFT e=
-xtension
-> >>>> to enable Svadu but instead, it should be enabled by default by open=
-SBI if
-> >>>> the extension is present in the device tree. This is because we did =
-not find
-> >>>> any backward compatibility issues, meaning that enabling Svadu shoul=
-d not
-> >>>> break any S-mode software.
-> >>> Unfortunately I joined yesterday's patchwork call late and missed thi=
-s
-> >>> discussion. I'm still not sure how we avoid concerns with S-mode soft=
-ware
-> >>> expecting exceptions by purposely not setting A/D bits, but then not
-> >>> getting those exceptions.
-> >>
-> >> Most other architectures implement hardware A/D updates, so I don't se=
-e
-> >> what's specific in riscv. In addition, if an OS really needs the excep=
-tions,
-> >> it can always play with the page table permissions to achieve such
-> >> behaviour.
-> > Hmm, yeah we're probably pretty safe since sorting this out is just one=
- of
-> > many things an OS will have to learn to manage when getting ported. Als=
-o,
-> > handling both svade and svadu at boot is trivial since the OS simply ne=
-eds
-> > to set the A/D bits when creating the PTEs or have exception handlers
-> > which do nothing but set the bits ready just in case.
-> >
-> >>
-> >>>> This is what you did in your previous versions of
-> >>>> this patchset so the changes should be easy. This behaviour must be =
-added to
-> >>>> the dtbinding description of the Svadu extension.
-> >>>>
-> >>>> Another thing that we discussed yesterday. There exist 2 schemes to =
-manage
-> >>>> the A/D bits updates, Svade and Svadu. If a platform supports both
-> >>>> extensions and both are present in the device tree, it is M-mode fir=
-mware's
-> >>>> responsibility to provide a "sane" device tree to the S-mode softwar=
-e,
-> >>>> meaning the device tree can not contain both extensions. And because=
- on such
-> >>>> platforms, Svadu is more performant than Svade, Svadu should be enab=
-led by
-> >>>> the M-mode firmware and only Svadu should be present in the device t=
-ree.
-> >>> I'm not sure firmware will be able to choose svadu when it's availabl=
-e.
-> >>> For example, platforms which want to conform to the upcoming "Server
-> >>> Platform" specification must also conform to the RVA23 profile, which
-> >>> mandates Svade and lists Svadu as an optional extension. This implies=
- to
-> >>> me that S-mode should be boot with both svade and svadu in the DT and=
- with
-> >>> svade being the active one. Then, S-mode can choose to request switch=
-ing
-> >>> to svadu with FWFT.
-> >>
-> >> The problem is that FWFT is not there and won't be there for ~1y (acco=
-rding
-> >> to Anup). So in the meantime, we prevent all uarchs that support Svadu=
- to
-> >> take advantage of this.
-> > I think we should have documented behaviors for all four possibilities
-> >
-> >   1. Neither svade nor svadu in DT -- current behavior
-> >   2. Only svade in DT -- current behavior
-> >   3. Only svadu in DT -- expect hardware A/D updating
-> >   4. Both svade and svadu in DT -- current behavior, but, if we have FW=
-FT,
-> >      then use it to switch to svadu. If we don't have FWFT, then, oh we=
-ll...
-> >
-> > Platforms/firmwares that aren't concerned with the profiles can choose =
-(3)
-> > and Linux is fine. Those that do want to conform to the profile will
-> > choose (4) but Linux won't get the benefit of svadu until it also gets
-> > FWFT.
->
->
-> I think this solution pleases everyone so I'd say we should go for it,
-> thanks Andrew!
->
-> @Yong-Xuan do you think you can prepare another spin with Andrew's
-> proposal implemented?
->
+        ret = vmf_insert_pfn(vma, vmf->address, pfn + pgoff);
++       if (ret & VM_FAULT_ERROR)
++               goto out_disabled;
++
++       /* prefault */
++       for (i = vma->vm_start; i < vma->vm_end; i += PAGE_SIZE, pfn++) {
++               if (i == vmf->address)
++                       continue;
++
++               /* Don't return error on prefault */
++               if (vmf_insert_pfn(vma, i, pfn) & VM_FAULT_ERROR)
++                       break;
++       }
++
+ out_disabled:
+        up_read(&vdev->memory_lock);
 
-Ok, the next version will be based on this proposal.
 
-Regards,
-Yong-Xuan
+> We can have concurrent faults, so doing this means that we need to
+> continue to maintain a locked list of vmas that have faulted to avoid
+But looks vfio_pci_zap_bars() always zap full PCI BAR ranges for vmas in
+core_vdev->inode->i_mapping.
+So, it doesn't matter whether a vma is fully mapped or partly mapped?
 
-> Thanks,
->
-> Alex
->
->
-> >
-> > IOW, I think your proposal is fine except for wanting to document in th=
-e
-> > DT bindings that only svade or svadu may be provided, since I think we'=
-ll
-> > want both to be allowed eventually.
-> >
-> > Thanks,
-> > drew
-> >
-> > _______________________________________________
-> > linux-riscv mailing list
-> > linux-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-riscv
+> duplicate insertions and all the nasty lock gymnastics that go along
+> with it.  I'd rather we just support huge_fault.  Thanks,
+huge_fault is better. But before that, is this prefault one good?
 
