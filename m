@@ -1,96 +1,291 @@
-Return-Path: <kvm+bounces-18794-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18793-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D79928FB795
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 17:38:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2638B8FB6BF
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 17:16:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB09CB22412
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 15:33:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D6451F22933
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 15:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38FF148FE1;
-	Tue,  4 Jun 2024 15:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE0213A3F7;
+	Tue,  4 Jun 2024 15:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jacq7ET1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QBFFR4TH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3150143C7B
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 15:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17332BE4A
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 15:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717515054; cv=none; b=FDF7dtSSXbBGdrH1CSiVOBpRmSEIrVaLJDhrB/eYVHJWh/E8Jfmc0dwhKYFznAxfcqr0OjoXmYp7itjwTe5tu6O1SeUTn/H5Nq1SZHOlOU9kK8JfeWYNDcDGQFKKNTPpm3OgJwoI7cK9oU+uwK66oNLdtU4OAPc5vwLmqGYNTx8=
+	t=1717514152; cv=none; b=lExHWGjW0iaoZUzP0RpFlR5StXm9Zza8IWbTRCvPVkUbXArWIeYxa9YmwjG3h09ga4FvosvdhHyIkDf6dq92nbWreAk151BldiynxYb6qy9/iZfLGEfOYxur+TCAIZNWJEoBMaifOlikk52OiWiMr8tvajGhbjhclcsjUuOTKVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717515054; c=relaxed/simple;
-	bh=2lWMKqsHItwhHTzuVJ/0FS6TZogDUllZ/+2lC0bCC1Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pQlfJfQZVjV8jYosuTZvVdnCwdmMkYwZWmu9pIAjnI40hVWjjETqpnwZjUKelRg2emKSLMN6o4/8CS2RTremXxZCClHFMkvkvFPQBKKPvwyjlORYkW8e+GfTKOh6Upy/jB6fMeNody3oSZxAAFyqxRgJGtTwP8eTAkCZM8twsBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jacq7ET1; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c2093beba8so2373084a91.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 08:30:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717515052; x=1718119852; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lvsnC3tNwAIKV52NgJ9GA/qBx6iHWNynLL2JkVVL2Lc=;
-        b=jacq7ET1w0T5KqTvs+jaxl9hSvCuKtfGo4kpU28Ovqm7eRqZmqAhYk0Hbgmozay9ap
-         y5vN/+NuADKMUq2JXn57xPtAGEN2D5sdlsaacQN0QMx/zY309rlBco6XGF6cW5kiEbe9
-         mb9c14opxYHv8p2+kHOnrwqWmwpEQowUnpnBrr5bl4B1ho0z60o7KkN+ywRuFlsx5A1o
-         diNTFiPIy89Dn1uQTNH1PVhvmOaK5Pu8Ixx8m7SM3jVsHnBASAWMYBNC9xWB2ODSabpQ
-         uP+RMZTi4AVIgqEMY1ATHgkeSSmjxpiyqI6UI+8pOJaMWHHzncmBddw4zVVl+VuNrTBc
-         PREQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717515052; x=1718119852;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lvsnC3tNwAIKV52NgJ9GA/qBx6iHWNynLL2JkVVL2Lc=;
-        b=Gb3DsChnCaV0x++hEZAuOWoue22uimNraYDAnevlbXlbQfcVjDScFXiCLW1KkcX9M7
-         nSeH3h16PH3322Fpv/tcLqa4qRcK1hpQ3sI43dcr5oqb3uHlKPbVZlY/DrJ04UKN1Pef
-         wrtzrOFzM+5DlF9bDiFoWHl3UsUZRqcq/zqg1OL5a9YYVK39RdLZmfuTabb9TzYM1Hw3
-         PxnrEjnVCeO4Wh+51ZMWr4/BuRFikcF/+pzYKx/YFxOfsvW7K1ayqEDzz06uMewpw0MI
-         2V5Brv3sgVWpzH32yfLBpB1vGgC83ZAfCyCSgiiom/mf7yQXznzvuJEX0G07DnkH4Vl4
-         ewdQ==
-X-Gm-Message-State: AOJu0YxhEi1ZDFFXwh/hQcRZjl/O7xnOyRM7gNNdpGdmDnfmWxfYFVQ2
-	w8PnVGFpZn6JtUF08zLwKjV69QIoUlGuugDi7UgmCwy4aNb2HzTqz1l8NsHv8fstjrOuskVrbD/
-	PCw==
-X-Google-Smtp-Source: AGHT+IG55CsdKvJLqIt2DP2Sho4C8gykfvO7tuxsdpp3dLgoXFdlHLWqrpf8vh9e8qa4+WyBBCEnJkhDaws=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:354:b0:2bd:6abb:e9f7 with SMTP id
- 98e67ed59e1d1-2c1dc4b118cmr36083a91.0.1717515051411; Tue, 04 Jun 2024
- 08:30:51 -0700 (PDT)
-Date: Tue, 4 Jun 2024 08:30:49 -0700
-In-Reply-To: <20240604-e11569f6e3aa7675774628ed@orel>
+	s=arc-20240116; t=1717514152; c=relaxed/simple;
+	bh=qXPxwp4Krxnak53hDhODVhsVAD6HPOWoEFdGvkvs9S0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CA/0Dj/438pUOPxDZdGfx37Id8Dmml6O0UgixbnSTdvzPJ+UejB6aibMJ4mIrDzm4sXzqyCsDmsAU6OABC1AcVlTfodYiQTeCYdG9WlyTWU/96iaPUGp8VNXus0UxJaOXQE6BEFHpz/wpWe5qNZBTrTU2jZWMM4sHzWUte1m71M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QBFFR4TH; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1717514151; x=1749050151;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=qXPxwp4Krxnak53hDhODVhsVAD6HPOWoEFdGvkvs9S0=;
+  b=QBFFR4THq5kuMEATwCvXomBxb7tgOVUYaTsdaOkfU2pm6cA2z1EPdhiH
+   2B4SZsytnb0/4sF0D1+XUyK+jLoL+ndXE0XY/2PpB+1Sz6cJNMNVHqk/+
+   KIeTawHlv2c2icRLWSuArg9p/lJ3Y2gVrbfERwEQmNss/1+koK6nakEMZ
+   CXFUiVUrKMekZetvChuzO3y1NPDbgZznLlj5W6fr0gHsczV1fy8SHxvbJ
+   mpjZBmLzQoF863hpK8OR001mo215DEFlVrnroEBTfxp8v1zKaDEkm/csO
+   JlWl3D8+Du3e6yCi1W8ydhIOI7nVLfxXu1cAywyXZXN9i6qypoVD3ULqn
+   w==;
+X-CSE-ConnectionGUID: kesc8zqVTXKLUhUGPxnWxg==
+X-CSE-MsgGUID: S7ZBVpA/S5mj7xEcj5WsbA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11093"; a="25468250"
+X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
+   d="scan'208";a="25468250"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2024 08:15:50 -0700
+X-CSE-ConnectionGUID: zIy4auewSF6TmnhNZjiSLg==
+X-CSE-MsgGUID: rDc0TgSUTsGt7J+8QTX8CA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,214,1712646000"; 
+   d="scan'208";a="42379247"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa004.jf.intel.com with ESMTP; 04 Jun 2024 08:15:45 -0700
+Date: Tue, 4 Jun 2024 23:31:11 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Markus Armbruster <armbru@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [RFC v2 0/7] Introduce SMP Cache Topology
+Message-ID: <Zl8zP4pXjRmVs3VP@intel.com>
+References: <20240530101539.768484-1-zhao1.liu@intel.com>
+ <Zl7ea2o2aaxXMj9X@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240603122045.323064-2-ajones@ventanamicro.com> <20240604-e11569f6e3aa7675774628ed@orel>
-Message-ID: <Zl8zKYynz1rgg1OX@google.com>
-Subject: Re: [PATCH] KVM: selftests: Fix RISC-V compilation
-From: Sean Christopherson <seanjc@google.com>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, pbonzini@redhat.com, 
-	anup@brainfault.org, atishp@atishpatra.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=gb2312
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zl7ea2o2aaxXMj9X@redhat.com>
 
-On Tue, Jun 04, 2024, Andrew Jones wrote:
-> On Mon, Jun 03, 2024 at 02:20:46PM GMT, Andrew Jones wrote:
-> > Due to commit 2b7deea3ec7c ("Revert "kvm: selftests: move base
-> > kvm_util.h declarations to kvm_util_base.h"") kvm selftests now
-> > requires implicitly including ucall_common.h when needed. The commit
->            ^ of course I meant 'explicitly' here. Gota love brain inversions
-> and not reviewing commit messages closely until after posting... Should I
-> post a v2 or just promise to buy a beer in exchange for a fixup-on-merge?
+Hi Daniel,
 
-LOL, what kind of question is that?  Beer must be a lot cheaper in your neck of
-the woods :-)
+On Tue, Jun 04, 2024 at 10:29:15AM +0100, Daniel P. Berrang¨¦ wrote:
+> Date: Tue, 4 Jun 2024 10:29:15 +0100
+> From: "Daniel P. Berrang¨¦" <berrange@redhat.com>
+> Subject: Re: [RFC v2 0/7] Introduce SMP Cache Topology
+> 
+> On Thu, May 30, 2024 at 06:15:32PM +0800, Zhao Liu wrote:
+> > Hi,
+> > 
+> > Now that the i386 cache model has been able to define the topology
+> > clearly, it's time to move on to discussing/advancing this feature about
+> > configuring the cache topology with -smp as the following example:
+> > 
+> > -smp 32,sockets=2,dies=2,modules=2,cores=2,threads=2,maxcpus=32,\
+> >      l1d-cache=core,l1i-cache=core,l2-cache=core,l3-cache=die
+> > 
+> > With the new cache topology options ("l1d-cache", "l1i-cache",
+> > "l2-cache" and "l3-cache"), we could adjust the cache topology via -smp.
+> 
+> Switching to QAPI for a second, your proposal is effectively
+> 
+>     { 'enum': 'SMPCacheTopo',
+>       'data': [ 'default','socket','die','cluster','module','core','thread'] }
+> 
+>    { 'struct': 'SMPConfiguration',
+>      'data': {
+>        '*cpus': 'int',
+>        '*drawers': 'int',
+>        '*books': 'int',
+>        '*sockets': 'int',
+>        '*dies': 'int',
+>        '*clusters': 'int',
+>        '*modules': 'int',
+>        '*cores': 'int',
+>        '*threads': 'int',
+>        '*maxcpus': 'int',
+>        '*l1d-cache': 'SMPCacheTopo',
+>        '*l1i-cache': 'SMPCacheTopo',
+>        '*l2-cache': 'SMPCacheTopo',
+>        '*l3-cache': 'SMPCacheTopo',
+>      } }
+> 
+> I think that would be more natural to express as an array of structs
+> thus:
+> 
+>     { 'enum': 'SMPCacheTopo',
+>       'data': [ 'default','socket','die','cluster','module','core','thread'] }
+> 
+>     { 'enum': 'SMPCacheType',
+>       'data': [ 'l1d', 'l1i', 'l2', 'l3' ] }
+>      
+>     { 'struct': 'SMPCache',
+>       'data': {
+>         'type': 'SMPCacheType',
+>         'topo': 'SMPCacheTopo',
+>       } }
+> 
+>    { 'struct': 'SMPConfiguration',
+>      'data': {
+>        '*cpus': 'int',
+>        '*drawers': 'int',
+>        '*books': 'int',
+>        '*sockets': 'int',
+>        '*dies': 'int',
+>        '*clusters': 'int',
+>        '*modules': 'int',
+>        '*cores': 'int',
+>        '*threads': 'int',
+>        '*maxcpus': 'int',
+>        'caches': [ 'SMPCache' ]
+>      } }
+> 
+> Giving an example in (hypothetical) JSON cli syntax of:
+> 
+>   -smp  "{'cpus':32,'sockets':2,'dies':2,'modules':2,
+>           'cores':2,'threads':2,'maxcpus':32,'caches': [
+> 	    {'type':'l1d','topo':'core' },
+> 	    {'type':'l1i','topo':'core' },
+> 	    {'type':'l2','topo':'core' },
+> 	    {'type':'l3','topo':'die' },
+> 	  ]}"
+ 
+Thanks! Looks clean to me and I think it is ok.
 
-I'll grab this if no one jumps on it by tomorrow.
+Just one further question, for this case where it must be expressed in a
+raw JSON string, is there any requirement in QEMU that a simple
+command-line friendly variant must be provided that corresponds to it?
+
+> > Open about How to Handle the Default Options
+> > ============================================
+> > 
+> > (For the detailed description of this series, pls skip this "long"
+> > section and review the subsequent content.)
+> > 
+> > 
+> > Background of OPEN
+> > ------------------
+> > 
+> > Daniel and I discussed initial thoughts on cache topology, and there was
+> > an idea that the default *cache_topo is on the CORE level [3]:
+> > 
+> > > simply preferring "cores" for everything is a reasonable
+> > > default long term plan for everything, unless the specific
+> > > architecture target has no concept of "cores".
+> 
+> FYI, when I wrote that I wasn't specifically thinking about cache
+> mappings. I just meant that when exposing SMP topology to guests,
+> 'cores' is a good default, compared to 'sockets', or 'threads',etc.
+> 
+> Defaults for cache <-> topology  mappings should be whatever makes
+> most sense to the architecture target/cpu.
+
+Thank you for the additional clarification!
+
+> > Problem with this OPEN
+> > ----------------------
+> > 
+> > Some arches have their own arch-specific cache topology, such as l1 per
+> > core/l2 per core/l3 per die for i386. And as Jeehang proposed for
+> > RISC-V, the cache topologies are like: l1/l2 per core and l3 per
+> > cluster. 
+> > 
+> > Taking L3 as an example, logically there is a difference between the two
+> > starting points of user-specified core level and with the default core
+> > level.
+> > 
+> > For example,
+> > 
+> > "(user-specified) l3-cache-topo=core" should override i386's default l3
+> > per core, but i386's default l3 per core should also override
+> > "(default) l3-cache-topo=core" because this default value is like a
+> > placeholder that specifies nothing.
+> > 
+> > However, from a command line parsing perspective, it's impossible to
+> > tell what the ¡°l3-cache-topo=core¡± setting is for...
+> 
+> Yes, we need to explicitly distinguish built-in defaults from
+> user specified data, otherwise we risk too many mistakes.
+> 
+> > Options to solve OPEN
+> > ---------------------
+> > 
+> > So, I think we have the following options:
+> > 
+> > 
+> > 1. Can we avoid such default parameters?
+> > ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > This would reduce the pain in QEMU, but I'm not sure if it's possible to
+> > make libvirt happy?
+> 
+> I think having an explicit "defualt" value is inevitable, not simply
+> because of libvirt. Long experiance with QEMU shows that we need to
+> be able to reliably distinguish direct user input from  built-in
+> defaults in cases like this.
+
+Thanks, that gives me an answer to that question!
+
+> > 
+> > It is also possible to expose Cache topology information as the CPU
+> > properties in ¡°query-cpu-model-expansion type=full¡±, but that adds
+> > arch-specific work.
+> > 
+> > If omitted, I think it's just like omitting ¡°cores¡±/¡°sockets¡±,
+> > leaving it up to the machine to decide based on the specific CPU model
+> > (and now the cache topology is indeed determined by the CPU model as
+> > well).
+> > 
+> > 
+> > 2. If default is required, can we use a specific abstract word?
+> > ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > That is, is it possible to use a specific word like ¡°auto¡±/¡°invalid¡±
+> > /¡°default¡± and avoid a specific topology level?
+> 
+> "invalid" feels a bit wierd, but 'auto' or 'default' are fine,
+> and possibly "unspecified"
+
+I prefer the "default" like you listed in your QAPI example. :)
+
+> > Like setting ¡°l3-cache-topo=invalid¡± (since I've only added the invalid
+> > hierarchy so far ;-) ).
+> > 
+> > I found the cache topology of arches varies so much that I'm sorry to
+> > say it's hard to have a uniform default cache topology.
+> > 
+> > 
+> > I apologize for the very lengthy note and appreciate you reviewing it
+> > here as well as your time!
+
+Thanks,
+Zhao
+
 
