@@ -1,149 +1,141 @@
-Return-Path: <kvm+bounces-18725-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18726-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 679C98FAA45
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:54:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C59118FAA5A
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:59:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C2A91F22790
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:54:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B1061F23336
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:59:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9009413DDA3;
-	Tue,  4 Jun 2024 05:54:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0835B13DDC3;
+	Tue,  4 Jun 2024 05:58:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="CBf5Io1O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PiF7iLVb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B65F199BC
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27FC847B
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717480457; cv=none; b=bOH1gkFgMYvy3MHZX6VKRVrSuXSVoV0Lfj/gcNLr3Mhml7eeKqpMDcXA6LuTr8PvV/54wmc2+mtqa6KKCrxuvA41P+EVfhutr1Bo1/iv0E1aFSn+DgIhE3WTTOJrgdCSIoECPgO1MRpNRk/bYHSDjYvTlslxEHx3jPa4dTzIVlg=
+	t=1717480738; cv=none; b=ZGK44reI0Yh9IfxifDKl1sPc5WrcPULsGs5fZz9sMwRAlyblptyyXwJWOs0/qxdaxBwIAhCKUMcQFOGEOwXOu3+7wFPZEh+7tHs9ONSEZTqL5eAcBvG0BBEpoRaNtqj1IYx2+zfXz4PidHQKpARlZ0CmHmaI2ODIjjjNIXSu3Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717480457; c=relaxed/simple;
-	bh=v9Zgv8nkfaxkOkFGYe/TwSXUE8Wzb96dEh0iNm8PB/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AHbn7rOOyw2F1mZzcABDX0a5IY8GFrwAFYCPmCnl2kAXcZ31EfofyUumyzClNc5VPGWCkhymvPToN9OHZIm0ndc9GscgR619TyMLmpUcj3a5TSJoF7G7byuEDZzxo4WhVYrKwpqvv9DtfDXkVkF9nsEy2DGv+m0qX1BbdJGAkUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=CBf5Io1O; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-421392b8156so6627545e9.3
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:54:11 -0700 (PDT)
+	s=arc-20240116; t=1717480738; c=relaxed/simple;
+	bh=bdEet59TQTyTVbSK//LkGfuAXacPoFmV4TWl20G9Am0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=D+0AZ2RP+dEmrLACzfjvkiWeaLP2iCUGY1tj/NDL3kfDY+RAd4HZlw/uQ+OFhIcBTYRNLMfyhKLS1hDuumOy3hlZe+RyuLmmZGan7eaBUJAWUJbajBJ/z9QZbuEttvfMxgEquIHFp/B4gB7+hXzd5g5wi4NkvFPjbjy7zzKmS74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PiF7iLVb; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7024cd9dd3dso2800061b3a.3
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:58:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1717480450; x=1718085250; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PxA0a9OaTWEd+DB03KWEhTOxvmFwfmuNhF5UOcsXrno=;
-        b=CBf5Io1Oc+EkSwkw2F0HYQwtvG6wpdmMPbM2bPfhRgVSb7sgOuUE3KeEwWi2KoXxwV
-         lJi2fsH1stemnJufpRQmagyF74g42OXknHz8sURaw/dAOuPc4HPizClYS/K7AXOyK+7V
-         wUex1iajrUpSxEKu3Cjs3ob7QoN3UOX22wPXotL1KoQv6H4R5r3Gw3ZBU7jLy6JfoYtT
-         xzMDOc990fxvkP6uREiYdd3ernVRCoNRzWeCAO0ntri+qv/HNV6fUvWEg36lcVyMZ9jh
-         2EhciHKA32bU67VMI186evml2k+yKG9GzB2evKytT8mrZXEhE9KV/etzOE6NGpW18NfQ
-         DSNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717480450; x=1718085250;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1717480736; x=1718085536; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PxA0a9OaTWEd+DB03KWEhTOxvmFwfmuNhF5UOcsXrno=;
-        b=nPXLxFMEDhuoIFP+T7DMGBPZm6CnSojP+vAX5VKYiZSMKZ6Gtz6c0IffSPLbWmu3wg
-         9N5CPPrudloKyp9X4zlmL4BmmxuQ8yI8v6rPvOwuhtrpuqWesfPDqHUT+7COprIG7uYI
-         C+YR+FlUYgllkGWnzP6HUMb4C8OvhpXo79mB3BC5RMz4kOIN6ZY6BP8gIADKUOnn1rZ0
-         k1q13bfpoueNecAvhN0aw3r245MbE0wRuPSaxlo+TtQZe44/R6yxs3nqzPZ9TqLtH/Lw
-         vv2K2IjczGlELv3yfXxim9yVRGOBIzFTsAURnXuuqL53+qi5E8ZyVUSjgDwYdiIhcTA6
-         n9YA==
-X-Gm-Message-State: AOJu0YwaHp5iPV5m2xq0pNHTF6WxeEUtz9cwce9EKsjXB+eOKAakCW8g
-	q9DRyqxsg3Bez5incfS/cz1fbBjDa6cVg9LUSKaY0ZJN5bLPIq8zSogHQ2NJUvPTz66qqfQE4mP
-	0jyM=
-X-Google-Smtp-Source: AGHT+IEXn7MFRfI5diPXzQxtUHrhv+UuANbqBBvKCQrWWuzX+BCLuLiLwWVudjO5zjZliNRE8R5Yzg==
-X-Received: by 2002:a05:600c:190b:b0:417:fbc2:caf8 with SMTP id 5b1f17b1804b1-4212e0768cemr79119775e9.23.1717480450477;
-        Mon, 03 Jun 2024 22:54:10 -0700 (PDT)
-Received: from localhost (cst2-173-81.cust.vodafone.cz. [31.30.173.81])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-421385b1c1csm93343885e9.39.2024.06.03.22.54.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jun 2024 22:54:10 -0700 (PDT)
-Date: Tue, 4 Jun 2024 07:54:09 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Cc: pbonzini@redhat.com, seanjc@google.com, anup@brainfault.org, 
-	atishp@atishpatra.org
-Subject: Re: [PATCH] KVM: selftests: Fix RISC-V compilation
-Message-ID: <20240604-e11569f6e3aa7675774628ed@orel>
-References: <20240603122045.323064-2-ajones@ventanamicro.com>
+        bh=gl8nhqFsYbY5YUB00tLeYqld+esrzmjcXavcX0Ll0gA=;
+        b=PiF7iLVbrJoJL7maosTgxLeekmSFuRtYFUTX/yjeHIoucEEARFgi042RaHGZuUiFGL
+         E69R1Ll5qnvz2QQVLqn2Dxo7TNPtjr2Tuqg2pu7t25L6dzS+l9UHZXSo7suRdkeuoQIJ
+         s/Een4fGGkvgYYzkIS6VjUtfjuQUNzjLDgefqxZshzVfS3+f8v5NbCjDqhty0iyB31ql
+         lxrd7iLSl0S+e5RXy0IUFior4a6fT1WWLADac7rUWPBJ0tzvCucvUx+hP1/HLIN5l1ej
+         EIFdFzZptI13NRb08D3y5VGN74U6rCCxZQhr1BNNFRFqLRl0AVsyRWNrxFPH9xlJ1f+M
+         Ddjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717480736; x=1718085536;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=gl8nhqFsYbY5YUB00tLeYqld+esrzmjcXavcX0Ll0gA=;
+        b=bi/hfTJXVzYaz8vTV7f6xqvRHA/eSh2ZxAtWfyJoPNh4F5ofB8Jsd55yozpoqXiPL4
+         5zON//KB+cLqPKF0eN7SjmSQeh9Xjy39OffDNhSd3xJ4QBprRPLisidFJcLKj/1mIeJJ
+         WVF9DYbMMoPLd6lHitW1B5Cm1HB2HZE9i4ryNDwS8icYeC4ucMA60nXsOH8tQtW/IsO/
+         u6cXkX6Zw7mIybra6yRUUrOBGssySZjlgqRqlTex+oJRNkfRTAlCkXehEvggUiISn/Nn
+         FEcB2mPpJ+dE4QiySSFLIEnl9K/mlVoadcBV19abFaD9qfQ100TKqup6KxiHLJ1N6/SB
+         R/WA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9VB5K8B1Si8EmHRiPYILgi+dh3dbUX/m0+RQHj9N6jSx09H71MWD4ZbXOATszgTooTr6oiQzM8uHYUbL6SGimucFA
+X-Gm-Message-State: AOJu0YxYoOhG1Kl5hS05DlBerrlr2051ejABHUqnnGmjbnM/1crtTdax
+	XaODGcgs3qZUSCn4xEDJBzCGL/1f+VpgxO3I5+ZZtr+yj7uFDaKE
+X-Google-Smtp-Source: AGHT+IEUimO7kKL5JzPZ4X9UjN4s4Rov2b/FPNTv9+n2YcOTF0OmtGxebNsWC6ZgEm82JBiWDYR9bw==
+X-Received: by 2002:a05:6a00:23c6:b0:6ed:41f3:431d with SMTP id d2e1a72fcca58-70247666e1bmr12408633b3a.0.1717480736101;
+        Mon, 03 Jun 2024 22:58:56 -0700 (PDT)
+Received: from localhost ([1.146.11.115])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-702425d9aeasm6373462b3a.50.2024.06.03.22.58.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jun 2024 22:58:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240603122045.323064-2-ajones@ventanamicro.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 04 Jun 2024 15:58:49 +1000
+Message-Id: <D1R03V1KZTWF.2BW5FQ7M7SGZ9@gmail.com>
+To: "Shivaprasad G Bhat" <sbhat@linux.ibm.com>, <cohuck@redhat.com>,
+ <pbonzini@redhat.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>
+Cc: <mst@redhat.com>, <danielhb413@gmail.com>, <qemu-ppc@nongnu.org>
+Subject: Re: [PATCH 2/2] target/ppc/cpu_init: Synchronize HASHKEYR with KVM
+ for migration
+From: "Nicholas Piggin" <npiggin@gmail.com>
+X-Mailer: aerc 0.17.0
+References: <171741555734.11675.17428208097186191736.stgit@c0c876608f2d>
+ <171741557432.11675.11683958406314165970.stgit@c0c876608f2d>
+In-Reply-To: <171741557432.11675.11683958406314165970.stgit@c0c876608f2d>
 
-On Mon, Jun 03, 2024 at 02:20:46PM GMT, Andrew Jones wrote:
-> Due to commit 2b7deea3ec7c ("Revert "kvm: selftests: move base
-> kvm_util.h declarations to kvm_util_base.h"") kvm selftests now
-> requires implicitly including ucall_common.h when needed. The commit
-           ^ of course I meant 'explicitly' here. Gota love brain inversions
-and not reviewing commit messages closely until after posting... Should I
-post a v2 or just promise to buy a beer in exchange for a fixup-on-merge?
+On Mon Jun 3, 2024 at 9:53 PM AEST, Shivaprasad G Bhat wrote:
+> The patch enables HASHKEYR migration by hooking with the
+> "KVM one reg" ID KVM_REG_PPC_HASHKEYR.
+>
+> Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
+> ---
+>  linux-headers/asm-powerpc/kvm.h |    1 +
+>  target/ppc/cpu_init.c           |    4 ++--
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/=
+kvm.h
+> index fcb947f656..23a0af739c 100644
+> --- a/linux-headers/asm-powerpc/kvm.h
+> +++ b/linux-headers/asm-powerpc/kvm.h
+> @@ -646,6 +646,7 @@ struct kvm_ppc_cpu_char {
+>  #define KVM_REG_PPC_DAWR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc4)
+>  #define KVM_REG_PPC_DAWRX1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc5)
+>  #define KVM_REG_PPC_DEXCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc6)
+> +#define KVM_REG_PPC_HASHKEYR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc7)
+> =20
+>  /* Transactional Memory checkpointed state:
+>   * This is all GPRs, all VSX regs and a subset of SPRs
+> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
+> index b1422c2eab..cee0a609eb 100644
+> --- a/target/ppc/cpu_init.c
+> +++ b/target/ppc/cpu_init.c
+> @@ -5805,10 +5805,10 @@ static void register_power10_hash_sprs(CPUPPCStat=
+e *env)
+>          ((uint64_t)g_rand_int(rand) << 32) | (uint64_t)g_rand_int(rand);
+>      g_rand_free(rand);
+>  #endif
+> -    spr_register(env, SPR_HASHKEYR, "HASHKEYR",
+> +    spr_register_kvm(env, SPR_HASHKEYR, "HASHKEYR",
+>              SPR_NOACCESS, SPR_NOACCESS,
+>              &spr_read_generic, &spr_write_generic,
+> -            hashkeyr_initial_value);
+> +            KVM_REG_PPC_HASHKEYR, hashkeyr_initial_value);
+>      spr_register_hv(env, SPR_HASHPKEYR, "HASHPKEYR",
+>              SPR_NOACCESS, SPR_NOACCESS,
+>              SPR_NOACCESS, SPR_NOACCESS,
+
+Hmm... now that I look at it, the hashpkey value also needs to be set
+in the machine and migrated, right? That looks broken. I *think* if we
+make this spr_register_kvm_hv, and you will also need to add a KVM
+API for the register, that should get it working becuse SPRs will
+be migrated for us.
 
 Thanks,
-drew
-
-> added the directives everywhere they were needed at the time, but, by
-> merge time, new places had been merged for RISC-V. Add those now to
-> fix RISC-V's compilation.
-> 
-> Fixes: dee7ea42a1eb ("Merge tag 'kvm-x86-selftests_utils-6.10' of https://github.com/kvm-x86/linux into HEAD")
-> Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  tools/testing/selftests/kvm/lib/riscv/ucall.c    | 1 +
->  tools/testing/selftests/kvm/riscv/ebreak_test.c  | 1 +
->  tools/testing/selftests/kvm/riscv/sbi_pmu_test.c | 1 +
->  3 files changed, 3 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/riscv/ucall.c b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> index 14ee17151a59..b5035c63d516 100644
-> --- a/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> +++ b/tools/testing/selftests/kvm/lib/riscv/ucall.c
-> @@ -9,6 +9,7 @@
->  
->  #include "kvm_util.h"
->  #include "processor.h"
-> +#include "sbi.h"
->  
->  void *ucall_arch_get_ucall(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/tools/testing/selftests/kvm/riscv/ebreak_test.c b/tools/testing/selftests/kvm/riscv/ebreak_test.c
-> index 823c132069b4..0e0712854953 100644
-> --- a/tools/testing/selftests/kvm/riscv/ebreak_test.c
-> +++ b/tools/testing/selftests/kvm/riscv/ebreak_test.c
-> @@ -6,6 +6,7 @@
->   *
->   */
->  #include "kvm_util.h"
-> +#include "ucall_common.h"
->  
->  #define LABEL_ADDRESS(v) ((uint64_t)&(v))
->  
-> diff --git a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-> index 69bb94e6b227..f299cbfd23ca 100644
-> --- a/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-> +++ b/tools/testing/selftests/kvm/riscv/sbi_pmu_test.c
-> @@ -15,6 +15,7 @@
->  #include "processor.h"
->  #include "sbi.h"
->  #include "arch_timer.h"
-> +#include "ucall_common.h"
->  
->  /* Maximum counters(firmware + hardware) */
->  #define RISCV_MAX_PMU_COUNTERS 64
-> -- 
-> 2.45.1
-> 
+Nick
 
