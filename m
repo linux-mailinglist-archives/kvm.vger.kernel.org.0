@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-18714-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18715-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA6158FA9D0
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:15:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C298FA9DA
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94ECC28E32D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:15:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D932B21A02
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA46A13DDBA;
-	Tue,  4 Jun 2024 05:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D0B13D62F;
+	Tue,  4 Jun 2024 05:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bpl/QkdM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cz9CWPrU"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A66413DBAA
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA3B2F30
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717478090; cv=none; b=aCMWK2IrpG1tm07hRTuG+9W78U45cK7I7RefNcisVMxS9NFG//TKlmySq7bkQV25TmN+66J484euNKpLur6if/vZq1kD6/OKDVyfD1emw4iqZhy/D/o8G27YfXfpZjddDqU6CkAEa5KQnt2r9o49HiHSy56Gduio2YnNlqCMapc=
+	t=1717478233; cv=none; b=IT5ffIqPADsIJv6leJjGIc6aIWIZwZvIurWMNeYaIyPdhet0+7CzbiC4W3LD9EBRcWTs/GW0iG61FqzF/kWUyoKfkJlF6lOXoeIYtrBLg0QK35I0UWC2NgnA5s/fAQWu388uybu1C8AjbDxVc5Rfwn1lECggDI+qctqpF5l2hsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717478090; c=relaxed/simple;
-	bh=THxdGleHkrLLht/CM1g/ZC8zPjxLlyyuAZ8Lf7THhks=;
+	s=arc-20240116; t=1717478233; c=relaxed/simple;
+	bh=eihqnsXh3IV0F5UCOZIhFW74mQ02DSqjodPVkvpLESo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GqjejN/ML1SWXJznX+YMhW67QYV2G1oUfkZCQbE0kpp9ZHGIH+yEuSvw+wbWstkDg9aligjyW0mrsCzSWo1pGl68JSmUdBtYCHrQjjdCckozUnCFgi7fRzozvyhHEr/Y3ZKh82SgZYPK63TmBcEhk7C5UF6iN3mLGD9iFB0l/t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bpl/QkdM; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=Oy3baz06heKeMHNRSHPNfdpq7lV0ug/PhO2TUxzwvb0xJpm7nCCMS8yXnZNmMVr7edslOxSe0UO6O4yWDQCD/8eQV7Li1SsdCX2J9GYyGZBqiyaXwUhy6dJRYZSKCtxl7DOajGPA8K582orebvbpVr3G0ldZQ0cfnv1x2g2fHh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cz9CWPrU; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717478087;
+	s=mimecast20190719; t=1717478231;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kStgNUlwxbTa4YCTYJ5zuzRi1YAJ7VZ5qO1Uor7dBsQ=;
-	b=bpl/QkdMkGKNmK/TCB+jc2YMleHPxaq93t7irARRBufc+PsA9MEJFq4497qnwFpqgm348t
-	mY3lWDr448hB+Vf4J8DZEQtkwYxTNYYLlH0ayYNA0unHCcGQyPaXbXyb3+4NU0XGIfymtR
-	HYu8NWlZPVnVqIC4ltlCt/+6qSLTQxs=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=sItYE5SDrjmmSrcaPekbOE2hTX2/cDPnD8JDUK8gias=;
+	b=Cz9CWPrUfNWEQFLeGyqUIZiKplRCSjTclXCVdyN6bMnT4shaY8OcRIiEdbKr1XO0M7V0/x
+	evSRM9YTN6Trbxm1g8I4wmG+Fhhde2Z4eS6OVbdBF36CzYT020vzeaP6cg0fso+FR20Fbi
+	r9NaXmrMugBY7XuGbN53WhtYUylmwbU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-krDAy6-BNTat6XlaKsQSNg-1; Tue, 04 Jun 2024 01:14:45 -0400
-X-MC-Unique: krDAy6-BNTat6XlaKsQSNg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-35dcb574515so434581f8f.0
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:14:45 -0700 (PDT)
+ us-mta-594-iQ6vln5LPA-UfDm11qbm7g-1; Tue, 04 Jun 2024 01:17:09 -0400
+X-MC-Unique: iQ6vln5LPA-UfDm11qbm7g-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42108822a8eso28023935e9.0
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:17:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717478084; x=1718082884;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kStgNUlwxbTa4YCTYJ5zuzRi1YAJ7VZ5qO1Uor7dBsQ=;
-        b=sOU4RyihY03QPMOyOXJn+SHMqEz8qw9FzRrqtG0G0X1VI/ZFTTzD1nux4EK9sOcKzK
-         sQ0DaF9A7K0+OL+NULDhUmB80zX9effDUEf0AeEElvQaKqPv5AAWT6EJiE/otsiIzKEV
-         KUYj/OuC92fbfh0PXLtzwHD6PnA+iNobm86SGAh4dklxE34qz0smWvHaqj4IWY4DX39B
-         cx30QnkyqkzBLjvySix8wonA4yp2/JoWFqyN9PldWJVxTFUe6uhjeMnTQHXQJEOCFOsu
-         5I5vTZetvsi5WPgNHLwUb4uhvGME+cSCRx1hf4mt7Bwr4SybYjEHc4ULLWtVznm4CYEb
-         U7yA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfIouvFvU+J9ojqY6Th3kGbZZOnf+F86am15Bwaf9yRojTcErNLuZql72AiYCVnM7MS7B0QG823h0652WR+q0PdOXK
-X-Gm-Message-State: AOJu0Yyxn2lLTDPLKkT78biDgIbK6zWr9F4GazUbjkaElon9H/oj1XMC
-	4e69x1ky2ulbmzp5/wuT+Ov/+6DiKr/+ocTRQx07cxabYE6gfjT0P6+Y4L+fKcYYiOqboNVaGcO
-	YmcisWO+5z/Y1Adxp2VFEdyCZVIWyzahBrhuIMBNIOns6ytNGDA==
-X-Received: by 2002:a05:6000:1281:b0:354:df8e:d72b with SMTP id ffacd0b85a97d-35e0f271598mr8542688f8f.21.1717478084528;
-        Mon, 03 Jun 2024 22:14:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGh8tKFfZdnDFBcZvr/SEuFGJDBUAbOUzKGNI7IVcZaUv1MqjgxQ4B30mVv1leLkRcI3pAm5g==
-X-Received: by 2002:a05:6000:1281:b0:354:df8e:d72b with SMTP id ffacd0b85a97d-35e0f271598mr8542677f8f.21.1717478084161;
-        Mon, 03 Jun 2024 22:14:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1717478228; x=1718083028;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sItYE5SDrjmmSrcaPekbOE2hTX2/cDPnD8JDUK8gias=;
+        b=gWxCRUUK4RYbvAtModQuxEO9BxuPlan1VRyMtU14q7Vf+oBiPZw96/ybY77VVdjiNo
+         /kolvRW8A/tDm29pd6h6/jG1ygyuOe29r2v1I2SWYz239a4ggWo9nKWPmj2d08vXU7fW
+         GrvcBXBtziPnIFYNXo2g5UC8OUAx9ug00yRZ38p3SqwJN1oBKNA7zKfahd8e9gsyWd6N
+         E6GGzv05WLlHWHqAG0tGmjzKl7k2Fw1oG3G07Ni6G93GiaGGtewprNSBXcBIKjHS/x8J
+         kaKIt8dXDWwkAJ0pFcqkR09ybN5ZkJCtyOPmCScCUEnnB1xlCg1uThhiXGrBSqn3iUML
+         QTMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgN4+MyK26/osTuXxcUj3XN/ILvqa12HqRg53ABOcFG3gHGEQuAGi9nPjz+dklNTTlDzK3hSuUGz7IF27ozRNjqYYF
+X-Gm-Message-State: AOJu0YykjntUXZ2musujBonmjgTjCMVwJVm9EJKr/z32Db9MIUQ8hwkN
+	Q4/2v3W7uet2UBZJzli3xgIG4nkj4cQkUFHqsncOyZz4xt8KmIHZEmsr29jVN+r7xZ8upzm0jS4
+	ipcN1tOV12+wbZ7zP9Lz4UwbGEhw/XJBfWA+MHd1U8HrAgtdang==
+X-Received: by 2002:a05:600c:3581:b0:421:3860:1013 with SMTP id 5b1f17b1804b1-4214513b9d0mr13553435e9.17.1717478228478;
+        Mon, 03 Jun 2024 22:17:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF0Iha8vo4YMqb39tLg3KctFRPFOh5jIpbChsGJO/Pj3OMxiqDhgZNDQZNmLVzCvXXqp1+VYQ==
+X-Received: by 2002:a05:600c:3581:b0:421:3860:1013 with SMTP id 5b1f17b1804b1-4214513b9d0mr13553245e9.17.1717478228100;
+        Mon, 03 Jun 2024 22:17:08 -0700 (PDT)
 Received: from [192.168.0.4] (ip-109-43-178-97.web.vodafone.de. [109.43.178.97])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35e5260d400sm6564120f8f.77.2024.06.03.22.14.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4212b83d479sm140496855e9.3.2024.06.03.22.17.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jun 2024 22:14:43 -0700 (PDT)
-Message-ID: <f1a7b4e0-5349-40d4-8f54-2861de7a3587@redhat.com>
-Date: Tue, 4 Jun 2024 07:14:42 +0200
+        Mon, 03 Jun 2024 22:17:07 -0700 (PDT)
+Message-ID: <247b979c-1a42-46e3-aa02-45ed5a9ca81d@redhat.com>
+Date: Tue, 4 Jun 2024 07:17:06 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,14 +83,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 16/31] powerpc: add SMP and IPI support
+Subject: Re: [kvm-unit-tests PATCH v9 18/31] powerpc: Permit
+ ACCEL=tcg,thread=single
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
  <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
 References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-17-npiggin@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
+ <20240504122841.1177683-19-npiggin@gmail.com>
 Content-Language: en-US
+From: Thomas Huth <thuth@redhat.com>
 Autocrypt: addr=thuth@redhat.com; keydata=
  xsFNBFH7eUwBEACzyOXKU+5Pcs6wNpKzrlJwzRl3VGZt95VCdb+FgoU9g11m7FWcOafrVRwU
  yYkTm9+7zBUc0sW5AuPGR/dp3pSLX/yFWsA/UB4nJsHqgDvDU7BImSeiTrnpMOTXb7Arw2a2
@@ -133,22 +134,20 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240504122841.1177683-17-npiggin@gmail.com>
+In-Reply-To: <20240504122841.1177683-19-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 04/05/2024 14.28, Nicholas Piggin wrote:
-> powerpc SMP support is very primitive and does not set up a first-class
-> runtime environment for secondary CPUs.
-> 
-> This reworks SMP support, and provides a complete C and harness
-> environment for the secondaries, including interrupt handling, as well
-> as IPI support.
+> Modify run script to permit single vs mttcg threading, add a
+> thread=single smp case to unittests.cfg.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+>   powerpc/run           | 4 ++--
+>   powerpc/unittests.cfg | 6 ++++++
+>   2 files changed, 8 insertions(+), 2 deletions(-)
 
-I now skimmed through the patch and it looks fine so far:
-
-Acked-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
