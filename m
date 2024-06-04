@@ -1,213 +1,124 @@
-Return-Path: <kvm+bounces-18757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C3B88FB17C
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 13:55:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE278FB19E
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 14:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A603B22C1D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 11:55:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5CC91F2390F
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 12:00:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BE6145A07;
-	Tue,  4 Jun 2024 11:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B815145B16;
+	Tue,  4 Jun 2024 12:00:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PL3k+5Jz"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V0a4CpxP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98D4145A06
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 11:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD03B144D21;
+	Tue,  4 Jun 2024 11:59:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717502143; cv=none; b=juVgaj8pBOpc5io+4AJ44hFsJeCSaFUjJHOYBqNAU35dayHu7JLQJlEsbOh5ZEW8eD0Oh2n6Kj1tKy1I75ObSdDTUvxstFh5JKMUAaYt9A006c7o2IinDA+3CvCkI/qK2mgAmxJZV8+z7UzkT0kiop5SvdEjgtsfw8n/CheL35I=
+	t=1717502399; cv=none; b=APo2fRiZhhfkzJM3CUXCO8mUmiKe1ICOHyTfYi84atxLsLPhxZM1z7jM4pnEhHLUtpHY0bWKLcWpvJfC0EkiOFwq3U9z2iqXeVn6St8zRsBYml0rIRthwcacCdTZT3ccdUKJ4ZCe9ibvU8sU3XUtCX7Z3Ua8k6oCS46yUBzl+RA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717502143; c=relaxed/simple;
-	bh=F1drlEwszPU9F0tuO69yMHTYmBReoRJFrrPImhmczTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=memAVVjx4pzBlYAkjc1OmlJk4/NSK+W1eVbtF6ceDyZ1h+3njheCTT7NnfqZ3TnswQ2RjTcYdNjahaxwUBcj+itDd7meg46RuATMXxDfImshZ61FJxzypns88oO+OuuEc1RGZ3i/n1M40M7sowQCGXc2HBZiByq8/HAx7SNmIwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PL3k+5Jz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717502140;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UPK651wHYrkYBCXh8jpOOzyZoFpupY8aSft7y4xq4W8=;
-	b=PL3k+5Jz+yA8jTivcoIPBdarf40RJFXD9Y1q4LayQVf/9y6rNqddZ8Jp3nG7nwvD+F3q7g
-	urbRBJoXsRGk6l6uLVAXlUfns3ZnFlpKWxwmpltWPWN89BDVhiBlpwY3fUFoJWRtZceUOv
-	t4PvYnGbUcv5B6dCEvlCXeeBnbDEQ3U=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-526-oDXWrP3CPN-kB9dWnrWvMQ-1; Tue, 04 Jun 2024 07:55:39 -0400
-X-MC-Unique: oDXWrP3CPN-kB9dWnrWvMQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-35dca4922a4so2975450f8f.0
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 04:55:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717502138; x=1718106938;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UPK651wHYrkYBCXh8jpOOzyZoFpupY8aSft7y4xq4W8=;
-        b=sM6bByQiWGpzEomlBmmTRjNsXj4oiMpqUNRjkrbRTeMYHDcycTa/+dQDX9yeqaCKSK
-         QIMwJ6UXre3R144rXLCvHrwFW7b1om+7KCFtdiuWFVPXgVkssSmH/7gvidb3f/mT3BKj
-         Aa8x5EUOK+ZpDBFWdXdtt0WAKrKP3rh3/Wq2ePsts8qw+oyRkw81KdtMoStI8XpntKdl
-         OzItRu4gWcetfEQAbCLLpfGNvnG6Ii7ydyzhX/hR7YK1CPtKil16iX+r211uM7IYraHs
-         MdhkbV3wHzIn9CXMxC1lNp0Ff5TxDpe/S3TsQxaGTu3g7h2619G2PP9rtXQYmtj4fTf7
-         rDow==
-X-Forwarded-Encrypted: i=1; AJvYcCWZNX1YhYdthvk0T/FEmiOL5/ijCAjVRB4g1tnxHOMmsqNXjQjeRSvgcP4dK2kfAjx8VJBi036q+YAMScr28gltzuAi
-X-Gm-Message-State: AOJu0YxicQDhORs1qd83Bmw8yifqP39oUPp1jca0rdNGcQ6Vufex5vfr
-	b8jZA5ACY87CYSVHs232ZxCJMpXJdFR38NF6IjnH117pwQfcO5JfaTbXmz73R+12W8qgcH4E3dE
-	r9fFI0mnh7UJwV+4UMy0ZuHW608Qm0PyWi/275fsCdtlSz5ZXEw==
-X-Received: by 2002:a5d:400e:0:b0:351:b130:45c2 with SMTP id ffacd0b85a97d-35e7c54b270mr2388399f8f.14.1717502138504;
-        Tue, 04 Jun 2024 04:55:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF5YmUTkrAQDfHoDcyYwJ45C3sk3mPdapxdGOCihWWjx8N1UxmvRgBSSSw0kLMmoTen9a9x3Q==
-X-Received: by 2002:a5d:400e:0:b0:351:b130:45c2 with SMTP id ffacd0b85a97d-35e7c54b270mr2388383f8f.14.1717502138120;
-        Tue, 04 Jun 2024 04:55:38 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-53-134-171.retail.telecomitalia.it. [82.53.134.171])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35e0f97ba3csm10968582f8f.73.2024.06.04.04.55.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jun 2024 04:55:37 -0700 (PDT)
-Date: Tue, 4 Jun 2024 13:55:33 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Srujana Challa <schalla@marvell.com>, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, mst@redhat.com, vattunuru@marvell.com, sthotton@marvell.com, 
-	ndabilpuram@marvell.com, jerinj@marvell.com
-Subject: Re: [PATCH] vdpa: Add support for no-IOMMU mode
-Message-ID: <s5tkqdls55n535tvrlalsej44hvrzqgcdqkspyxrvnl4muard6@nyvdw7xptoze>
-References: <20240530101823.1210161-1-schalla@marvell.com>
- <CACGkMEsxPfck-Ww6CHSod5wP5xLOpS3t2B8qhTL0=PoE3koCGQ@mail.gmail.com>
+	s=arc-20240116; t=1717502399; c=relaxed/simple;
+	bh=fXrHI4BzqsQAhwCXnAdCByAXJJYZjx3+aQqINuAeZME=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lDUt8XlJP2DtSn68C2I1TFbl8ZvEHVQvatc0hcLDhOWjRjHPOXqrDNVwBRDpqUQ7NarFSCcHe4pNTbmLNIy9i86Pf2RokNC+1V6TFGLxnX3mPXqd1w/YjkbZ2lPZmcrX8mZtqjxjc2Cl+gffK7A3czBcn/wDe/lylnIEDzjuVOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V0a4CpxP; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 454Bh9x5017153;
+	Tue, 4 Jun 2024 11:59:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : date : from : message-id : mime-version :
+ subject : to; s=pp1; bh=SuA7ayyT4mpatcRJoJEtVcKRdmma5oXzraV0R6pV4Ts=;
+ b=V0a4CpxPRra8hiw6dYeErdtKZkssuIv4inUm299STkfhfOu/MdcYdgRiZJAMawoPVQhe
+ fOOcZ7RAnfLxeCrOIz9hX+Lot7aaJGhT6Oh42x71RV6NLYwySgPFhGduYRFPhmjVGRgc
+ x9jmvICOEzO/Gcwf4sP2A4OsSxzmrHwz69AFboYwIqUHeoSrbQee9pJkz7Vaw8UkZGyb
+ EzAfmMchNBupy+f4X0EGTJpzrgODmXswNA4r2kMjfW9gHpq510BsJFvRazBLEWIv4ynh
+ HuKD/vrIymn/pPBvMhAG4NZO5I+CYpJtMikKe5IDwDHP9Saqxunyut4x23aCQaEHbB5M TA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj29qg2ef-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jun 2024 11:59:56 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 454Bxusw012474;
+	Tue, 4 Jun 2024 11:59:56 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yj29qg2ee-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jun 2024 11:59:55 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4549FfB1031142;
+	Tue, 4 Jun 2024 11:59:55 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygeypduk1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jun 2024 11:59:55 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 454Bxndg33882838
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Jun 2024 11:59:51 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 875BE20040;
+	Tue,  4 Jun 2024 11:59:49 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 031582004B;
+	Tue,  4 Jun 2024 11:59:49 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.fritz.box (unknown [9.171.63.147])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Jun 2024 11:59:48 +0000 (GMT)
+From: Marc Hartmayer <mhartmay@linux.ibm.com>
+To: <linux-s390@vger.kernel.org>, Thomas Huth <thuth@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>
+Cc: <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, Steffen Eiden <seiden@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v1 0/3] s390x: small Makefile improvements
+Date: Tue,  4 Jun 2024 13:59:29 +0200
+Message-ID: <20240604115932.86596-1-mhartmay@linux.ibm.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEsxPfck-Ww6CHSod5wP5xLOpS3t2B8qhTL0=PoE3koCGQ@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9eEywCTZwc17AcCCrgd3YzroZKzu9Mn-
+X-Proofpoint-ORIG-GUID: EMf2CJzz5gdd4uOFVF2lV9E-NA6iyte7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
+ definitions=2024-06-04_05,2024-05-30_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 lowpriorityscore=0 malwarescore=0 phishscore=0
+ spamscore=0 impostorscore=0 mlxscore=0 bulkscore=0 suspectscore=0
+ mlxlogscore=570 clxscore=1011 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2405010000 definitions=main-2406040097
 
-On Fri, May 31, 2024 at 10:26:31AM GMT, Jason Wang wrote:
->On Thu, May 30, 2024 at 6:18 PM Srujana Challa <schalla@marvell.com> wrote:
->>
->> This commit introduces support for an UNSAFE, no-IOMMU mode in the
->> vhost-vdpa driver. When enabled, this mode provides no device isolation,
->> no DMA translation, no host kernel protection, and cannot be used for
->> device assignment to virtual machines. It requires RAWIO permissions
->> and will taint the kernel.
->> This mode requires enabling the "enable_vhost_vdpa_unsafe_noiommu_mode"
->> option on the vhost-vdpa driver. This mode would be useful to get
->> better performance on specifice low end machines and can be leveraged
->> by embedded platforms where applications run in controlled environment.
->
->I wonder if it's better to do it per driver:
->
->1) we have device that use its own IOMMU, one example is the mlx5 vDPA device
->2) we have software devices which doesn't require IOMMU at all (but
->still with protection)
+The first patch is useful anyway, the third could be dropped to be consistent
+with the other architectures.
 
-It worries me even if the module parameter is the best thing.
-What about a sysfs entry?
+Marc Hartmayer (2):
+  s390x/Makefile: snippets: Add separate target for the ELF snippets
+  s390x/Makefile: snippets: Avoid creation of .eh_frame and
+    .eh_frame_hdr sections
 
-Thanks,
-Stefano
+Super User (1):
+  Revert "s390x: Specify program headers with flags to avoid linker
+    warnings"
 
->
->Thanks
->
->>
->> Signed-off-by: Srujana Challa <schalla@marvell.com>
->> ---
->>  drivers/vhost/vdpa.c | 23 +++++++++++++++++++++++
->>  1 file changed, 23 insertions(+)
->>
->> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> index bc4a51e4638b..d071c30125aa 100644
->> --- a/drivers/vhost/vdpa.c
->> +++ b/drivers/vhost/vdpa.c
->> @@ -36,6 +36,11 @@ enum {
->>
->>  #define VHOST_VDPA_IOTLB_BUCKETS 16
->>
->> +bool vhost_vdpa_noiommu;
->> +module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
->> +                  vhost_vdpa_noiommu, bool, 0644);
->> +MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode, "Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the kernel.  If you do not know what this is for, step away. (default: false)");
->> +
->>  struct vhost_vdpa_as {
->>         struct hlist_node hash_link;
->>         struct vhost_iotlb iotlb;
->> @@ -60,6 +65,7 @@ struct vhost_vdpa {
->>         struct vdpa_iova_range range;
->>         u32 batch_asid;
->>         bool suspended;
->> +       bool noiommu_en;
->>  };
->>
->>  static DEFINE_IDA(vhost_vdpa_ida);
->> @@ -887,6 +893,10 @@ static void vhost_vdpa_general_unmap(struct vhost_vdpa *v,
->>  {
->>         struct vdpa_device *vdpa = v->vdpa;
->>         const struct vdpa_config_ops *ops = vdpa->config;
->> +
->> +       if (v->noiommu_en)
->> +               return;
->> +
->>         if (ops->dma_map) {
->>                 ops->dma_unmap(vdpa, asid, map->start, map->size);
->>         } else if (ops->set_map == NULL) {
->> @@ -980,6 +990,9 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->>         if (r)
->>                 return r;
->>
->> +       if (v->noiommu_en)
->> +               goto skip_map;
->> +
->>         if (ops->dma_map) {
->>                 r = ops->dma_map(vdpa, asid, iova, size, pa, perm, opaque);
->>         } else if (ops->set_map) {
->> @@ -995,6 +1008,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->>                 return r;
->>         }
->>
->> +skip_map:
->>         if (!vdpa->use_va)
->>                 atomic64_add(PFN_DOWN(size), &dev->mm->pinned_vm);
->>
->> @@ -1298,6 +1312,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->>         struct vdpa_device *vdpa = v->vdpa;
->>         const struct vdpa_config_ops *ops = vdpa->config;
->>         struct device *dma_dev = vdpa_get_dma_dev(vdpa);
->> +       struct iommu_domain *domain;
->>         const struct bus_type *bus;
->>         int ret;
->>
->> @@ -1305,6 +1320,14 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->>         if (ops->set_map || ops->dma_map)
->>                 return 0;
->>
->> +       domain = iommu_get_domain_for_dev(dma_dev);
->> +       if ((!domain || domain->type == IOMMU_DOMAIN_IDENTITY) &&
->> +           vhost_vdpa_noiommu && capable(CAP_SYS_RAWIO)) {
->> +               add_taint(TAINT_USER, LOCKDEP_STILL_OK);
->> +               dev_warn(&v->dev, "Adding kernel taint for noiommu on device\n");
->> +               v->noiommu_en = true;
->> +               return 0;
->> +       }
->>         bus = dma_dev->bus;
->>         if (!bus)
->>                 return -EFAULT;
->> --
->> 2.25.1
->>
->
->
+ s390x/Makefile              | 16 ++++++++++------
+ s390x/snippets/c/flat.lds.S | 12 +++---------
+ 2 files changed, 13 insertions(+), 15 deletions(-)
+
+
+base-commit: 31f2cece1db4175869ca3fe4cbe229c0e15fdaf0
+-- 
+2.34.1
 
 
