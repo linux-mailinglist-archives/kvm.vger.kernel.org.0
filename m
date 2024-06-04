@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-18752-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18753-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7E58FB084
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 12:53:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7538FB0B1
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 13:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F761283464
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 10:53:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF9CB28233C
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 11:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026B8145353;
-	Tue,  4 Jun 2024 10:53:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADF914532B;
+	Tue,  4 Jun 2024 11:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DPBb9PH/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hjb0Mk5K"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8956145347
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 10:53:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1B31420D7
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 11:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717498416; cv=none; b=pHwB4UjWINuQtxK/6owaWoR7qIAu2FML3AhENptbRiT9LtDmt2hPm+1nVfWTbacoJgf6TsbcDDDvDgvTQMOWLiE1IhV9u1/CIgFO0/LcjKm7IvF18cj2ABwLxYc5Q8LHml+EaU3UiJQS1g6WBl7UAYiEP/GFq7B54vB4OjOCfn4=
+	t=1717498920; cv=none; b=IH1PZDE3l0LPE0s74N/VxIB0LJB/CrY3rBcB170M2qAl2eJgFSoeVHBbGCWRkPFbLim7ygbYfUZs0KpAEZf4vDgABPZggadP0xIbz3R4y1Lpl+4tJiLyZUmFSMAhjJrgH+nRO1iEmLXBFPSgpy70GZ0atMgk0IUhniuHDdq6fr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717498416; c=relaxed/simple;
-	bh=UH8l1aOHKNfS3HrTqJTIU17OVXp7137QYEG358YqoLw=;
+	s=arc-20240116; t=1717498920; c=relaxed/simple;
+	bh=/1Kk+y0LJ/zd7lxNFLkw5ItNrAqI/6PCuS26WZi2J60=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eiQbtbu+tdjTsSqAOu/Ca7ngvBjyqGu/Td9zT4xqjfCP8aV8wMcrxZLq2+gRhFuLbnTiMY+pTLeTzjM4vjDEnga3Qq77es9zn2UjH1dJiX/JPVhKYr2YN/oD8yXhbO0DMEN9F/2StvFuio2YTvfZJb3MmH/n1rKZ5L3t3QQo9Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DPBb9PH/; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=Wohj4CSSsFPeLKsd79SqryUDZQOZbN3mRpz2DWAfToqjSAWN/Wid4n6d2KVUFqndGy8PSm5HbVouZ00gvuJ9hnrIDrjNIoFOXvkdKA2KJc7W3l53/7U4sFTgKxYwGGNOdoo8SHqEw+9dkzsF3Qm/gVOS1ic2AX0qfAeNpeOaiHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hjb0Mk5K; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717498413;
+	s=mimecast20190719; t=1717498918;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=khLXT47kqpcrtDLU6hojN1Y8iwI4i0MMg0kRPkLwAKQ=;
-	b=DPBb9PH/0RwAVdbaamqAn2Gy1ikGFRPkjGeyLdjl5Jo7JYXUix95Rxy8RGoCdvyWQKABUv
-	ePaUs/L/W5tJvUbWWMDrfS+RsJ764j3H5N9KP+l+0j4GGExurXDG+k7ZENun/szwjGXFWg
-	+DVtNp6KTMyqnLQqQ1RP+6+O7Jok3uQ=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wJUOI9qxtQ1g8vuGBmXdc1ny/8UHvRPp/bfXx3Q0EnE=;
+	b=Hjb0Mk5KEKUla9g8e8X+5HuVlyTsidH18tgSfQdoOCJyKjmoqyOpw8Ec41blcuCxSacpwo
+	lROhFb7SlL7ctpkbGw4Sh17zqwPhn0YGuRwJgT3VmdBoJF2WZ2+Tw6NWATYBVPVXUtwjzr
+	SYuU50mkPo2ZLQI5BeuQj1nQn8FIkZg=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-442-5MOm1CFNMpeCn66PcEggsQ-1; Tue, 04 Jun 2024 06:53:32 -0400
-X-MC-Unique: 5MOm1CFNMpeCn66PcEggsQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-794c059f55eso465573585a.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 03:53:32 -0700 (PDT)
+ us-mta-654-xTgSp0LpOtijP8HFVZiH4A-1; Tue, 04 Jun 2024 07:01:57 -0400
+X-MC-Unique: xTgSp0LpOtijP8HFVZiH4A-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-795106b7c6dso179781285a.2
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 04:01:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717498412; x=1718103212;
+        d=1e100.net; s=20230601; t=1717498916; x=1718103716;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=khLXT47kqpcrtDLU6hojN1Y8iwI4i0MMg0kRPkLwAKQ=;
-        b=IW3J6WDHmrP2nZWsBWeYSE6sPCyVcF9W0YMcuOwjT9RItYGQKg73nSROFXMYaCI9+W
-         oBq+XGdiensw0vY0UZ+aTK9wYbHOOcfYYoOkPGTL7ynX5e45ruqkt835Uy2S6hqgLzeX
-         C4LvGvSlDrx5abgRm3abAjW+b1pmcUGtJlTf3FiaLfnMm/1cWwuiMDwoTECLTRYTTT6V
-         TlzSI2VZnoDno/8lT5P2PqyLeYR/sfXjWKkq7pcX0mcYhKcuUBdc5RgmTyAWDlTxRnsw
-         4rL/pBhAC248eUEYI5tK3NFChi1kKecQbbDFT47HgXX1TF1hPlmx1f/L7lbptzXZ8W/B
-         Ng8A==
-X-Forwarded-Encrypted: i=1; AJvYcCXs7K1UujrJBJ+/oc+Yqo8biPXFsRc4tNY1sdBRLQt7KKZzo9uZ2quWGZvz+uhM1bY1GbUWUG0O6whOr1JICO1jFSjE
-X-Gm-Message-State: AOJu0Ywlrhn2MiPnbgkbAV+lwiNfwdivIZ+r31fuUKp2UKgH1gwe/goA
-	ALXaE6E4ahh/Cp5M0oVBnGhQ//oa42l7jETQdGeYJBk02RBmuwYyD9M2c1zFqcESjylY9c82cDq
-	4vgQ5q5eRUNbXPhsifDrcOi2XFaLOWax8CKXrn6Nxi4+SXC1Ej/Uc6mJm4A==
-X-Received: by 2002:a05:620a:46a6:b0:794:f011:7a30 with SMTP id af79cd13be357-794f5c669c0mr1562812385a.14.1717498411888;
-        Tue, 04 Jun 2024 03:53:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHymc98QpftOUqvFlvr/bYlT6Z8NbMKWzQR6dsIzYHNQdoHJ2RUVlPg2ortFt5CFWmtmRCzbQ==
-X-Received: by 2002:a05:620a:46a6:b0:794:f011:7a30 with SMTP id af79cd13be357-794f5c669c0mr1562810185a.14.1717498411452;
-        Tue, 04 Jun 2024 03:53:31 -0700 (PDT)
+        bh=wJUOI9qxtQ1g8vuGBmXdc1ny/8UHvRPp/bfXx3Q0EnE=;
+        b=tBlPPnOlr3Z028eAZzs70RMOhKUqJR3OZlnZnio5YVmDiwHbdSp5oI468GwqB789bb
+         G80NCQ5F4oMTl8L7wReoFcX+uDLK6cCpVLlvadfCnjnB+vuX8bbDoIHBW0NR/Z2ID3Bz
+         1elsvMwXCknpW8fBHDODedx9EuWJOjwvMSsHagPbsb+GGKVbcuGnbYlwmi14tXfLyQhV
+         fzISg2xkHFGKKZt7JuNmwZ5y2r/iq/yrb4UDYqLTJDP83+rJJaD8O3ZieDgz85COGzkm
+         PzY7oofKJpTcQjzqUUoHf89JxMAmFI2r/7bg4S5QkzLhKrJfMUH/eB/gYNhEb1Hrud9I
+         PqRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVsnugwZqUXKx8WODnds8bbkjW2fKAZ2h8kA7ZKtGsYSYRbCp8EIoGPo9I6l6GOFdPPgm/o2LNcuoaRiWJcAIlAT+go
+X-Gm-Message-State: AOJu0Yz3WyR0O/AnPe3Z69OGfnYJaGY2lxS8xaw3qWdnqiQT70Q8O2RM
+	Y8wtXRpsJqhrCFm8yP5G2ntAhdzmav86l0ANkCLpNgEgC0pnNUlev41BBF4JqNdcMYHWxA5gf4N
+	kwHW9XAGntsYWekAd1reEsy3iMMd/f5LV8wJUFxUWEqCTgcQ0dVuXIN9RZg==
+X-Received: by 2002:a05:620a:21cd:b0:792:bbdb:2520 with SMTP id af79cd13be357-794f5c594f0mr1157072385a.9.1717498916310;
+        Tue, 04 Jun 2024 04:01:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFbuRLQ/x8ZpVwQLYMnCiiydmKpKjQCV1Q8TnRddHRYCHBQ64GyGOW2qV/cmyHNiP8mX3L1Eg==
+X-Received: by 2002:a05:620a:21cd:b0:792:bbdb:2520 with SMTP id af79cd13be357-794f5c594f0mr1157069785a.9.1717498915651;
+        Tue, 04 Jun 2024 04:01:55 -0700 (PDT)
 Received: from [192.168.0.4] (ip-109-43-178-97.web.vodafone.de. [109.43.178.97])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-794f2efc653sm352278885a.18.2024.06.04.03.53.29
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-43ff23e0dddsm48244621cf.41.2024.06.04.04.01.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jun 2024 03:53:30 -0700 (PDT)
-Message-ID: <4938edb7-c057-4f92-b59b-31f0b7ba6f54@redhat.com>
-Date: Tue, 4 Jun 2024 12:53:27 +0200
+        Tue, 04 Jun 2024 04:01:55 -0700 (PDT)
+Message-ID: <54623658-23c8-4a51-8365-a983b230740a@redhat.com>
+Date: Tue, 4 Jun 2024 13:01:50 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +83,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v9 30/31] powerpc: Add facility to query
- TCG or KVM host
+Subject: Re: [kvm-unit-tests PATCH v9 31/31] powerpc: gitlab CI update
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
  <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
 References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-31-npiggin@gmail.com>
+ <20240504122841.1177683-32-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -134,44 +133,218 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240504122841.1177683-31-npiggin@gmail.com>
+In-Reply-To: <20240504122841.1177683-32-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 04/05/2024 14.28, Nicholas Piggin wrote:
-> Use device tree properties to determine whether KVM or TCG is in
-> use.
-> 
-> Logically these are not the inverse of one another, because KVM can be
-> used on top of a TCG processor (if TCG is emulating HV mode, or if it
-> provides a nested hypervisor interface with spapr). This can be a
-> problem because some issues relate to TCG CPU emulation, and some to
-> the spapr hypervisor implementation. At the moment there is no way to
-> determine TCG is running a KVM host that is running the tests, but the
-> two independent variables are added in case that is able to be
-> determined in future. For now that case is just incorrectly considered
-> to be kvm && !tcg.
-> 
-> Use this facility to restrict some of the known test failures to TCG.
+> This adds testing for the powernv machine, and adds a gitlab-ci test
+> group instead of specifying all tests in .gitlab-ci.yml, and adds a
+> few new tests (smp, atomics) that are known to work in CI.
 > 
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   lib/powerpc/asm/processor.h |  3 +++
->   lib/powerpc/setup.c         | 25 +++++++++++++++++++++++++
->   powerpc/atomics.c           |  2 +-
->   powerpc/interrupts.c        |  6 ++++--
->   powerpc/mmu.c               |  2 +-
->   powerpc/pmu.c               |  6 +++---
->   powerpc/sprs.c              |  2 +-
->   powerpc/timebase.c          |  4 ++--
->   powerpc/tm.c                |  2 +-
->   9 files changed, 41 insertions(+), 11 deletions(-)
+>   .gitlab-ci.yml        | 30 ++++++++----------------------
+>   powerpc/unittests.cfg | 32 ++++++++++++++++++++++++++------
+>   2 files changed, 34 insertions(+), 28 deletions(-)
+> 
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index 23bb69e24..31a2a4e34 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -97,17 +97,10 @@ build-ppc64be:
+>    - cd build
+>    - ../configure --arch=ppc64 --endian=big --cross-prefix=powerpc64-linux-gnu-
+>    - make -j2
+> - - ACCEL=tcg ./run_tests.sh
+> -      selftest-setup
+> -      selftest-migration
+> -      selftest-migration-skip
+> -      spapr_hcall
+> -      rtas-get-time-of-day
+> -      rtas-get-time-of-day-base
+> -      rtas-set-time-of-day
+> -      emulator
+> -      | tee results.txt
+> - - if grep -q FAIL results.txt ; then exit 1 ; fi
+> + - ACCEL=tcg MAX_SMP=8 ./run_tests.sh -g gitlab-ci | tee results.txt
+> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
+> + - ACCEL=tcg MAX_SMP=8 MACHINE=powernv ./run_tests.sh -g gitlab-ci | tee results.txt
+> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
+>   
+>   build-ppc64le:
+>    extends: .intree_template
+> @@ -115,17 +108,10 @@ build-ppc64le:
+>    - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
+>    - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
+>    - make -j2
+> - - ACCEL=tcg ./run_tests.sh
+> -      selftest-setup
+> -      selftest-migration
+> -      selftest-migration-skip
+> -      spapr_hcall
+> -      rtas-get-time-of-day
+> -      rtas-get-time-of-day-base
+> -      rtas-set-time-of-day
+> -      emulator
+> -      | tee results.txt
+> - - if grep -q FAIL results.txt ; then exit 1 ; fi
+> + - ACCEL=tcg MAX_SMP=8 ./run_tests.sh -g gitlab-ci | tee results.txt
+> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
+> + - ACCEL=tcg MAX_SMP=8 MACHINE=powernv ./run_tests.sh -g gitlab-ci | tee results.txt
+> + - grep -q PASS results.txt && ! grep -q FAIL results.txt
+>   
+>   # build-riscv32:
+>   # Fedora doesn't package a riscv32 compiler for QEMU. Oh, well.
+> diff --git a/powerpc/unittests.cfg b/powerpc/unittests.cfg
+> index d767f5d68..6fae688a8 100644
+> --- a/powerpc/unittests.cfg
+> +++ b/powerpc/unittests.cfg
+> @@ -16,17 +16,25 @@
+>   file = selftest.elf
+>   smp = 2
+>   extra_params = -m 1g -append 'setup smp=2 mem=1024'
+> -groups = selftest
+> +groups = selftest gitlab-ci
+>   
+>   [selftest-migration]
+>   file = selftest-migration.elf
+>   machine = pseries
+>   groups = selftest migration
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI has known migration bugs in TCG, so
+> +# make a kvm-only version for CI
+> +[selftest-migration-ci]
+> +file = selftest-migration.elf
+> +machine = pseries
+> +groups = nodefault selftest migration gitlab-ci
+> +accel = kvm
+> +
+>   [selftest-migration-skip]
+>   file = selftest-migration.elf
+>   machine = pseries
+> -groups = selftest migration
+> +groups = selftest migration gitlab-ci
+>   extra_params = -append "skip"
+>   
+>   [migration-memory]
+> @@ -37,6 +45,7 @@ groups = migration
+>   [spapr_hcall]
+>   file = spapr_hcall.elf
+>   machine = pseries
+> +groups = gitlab-ci
+>   
+>   [spapr_vpa]
+>   file = spapr_vpa.elf
+> @@ -47,38 +56,43 @@ file = rtas.elf
+>   machine = pseries
+>   timeout = 5
+>   extra_params = -append "get-time-of-day date=$(date +%s)"
+> -groups = rtas
+> +groups = rtas gitlab-ci
+>   
+>   [rtas-get-time-of-day-base]
+>   file = rtas.elf
+>   machine = pseries
+>   timeout = 5
+>   extra_params = -rtc base="2006-06-17" -append "get-time-of-day date=$(date --date="2006-06-17 UTC" +%s)"
+> -groups = rtas
+> +groups = rtas gitlab-ci
+>   
+>   [rtas-set-time-of-day]
+>   file = rtas.elf
+>   machine = pseries
+>   extra_params = -append "set-time-of-day"
+>   timeout = 5
+> -groups = rtas
+> +groups = rtas gitlab-ci
+>   
+>   [emulator]
+>   file = emulator.elf
+> +groups = gitlab-ci
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI fails this
+>   [interrupts]
+>   file = interrupts.elf
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI fails this
+>   [mmu]
+>   file = mmu.elf
+>   smp = $MAX_SMP
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI fails this
+>   [pmu]
+>   file = pmu.elf
+>   
+>   [smp]
+>   file = smp.elf
+>   smp = 2
+> +groups = gitlab-ci
+>   
+>   [smp-smt]
+>   file = smp.elf
+> @@ -92,16 +106,19 @@ accel = tcg,thread=single
+>   
+>   [atomics]
+>   file = atomics.elf
+> +groups = gitlab-ci
+>   
+>   [atomics-migration]
+>   file = atomics.elf
+>   machine = pseries
+>   extra_params = -append "migration -m"
+> -groups = migration
+> +groups = migration gitlab-ci
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI fails this
+>   [timebase]
+>   file = timebase.elf
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI fails this
+>   [timebase-icount]
+>   file = timebase.elf
+>   accel = tcg
+> @@ -115,14 +132,17 @@ smp = 2,threads=2
+>   extra_params = -machine cap-htm=on -append "h_cede_tm"
+>   groups = h_cede_tm
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI fails this
+>   [sprs]
+>   file = sprs.elf
+>   
+> +# QEMU 7.0 (Fedora 37) in gitlab CI fails this
+>   [sprs-migration]
+>   file = sprs.elf
+>   machine = pseries
+>   extra_params = -append '-w'
+>   groups = migration
 
-As mentioned elsewhere, it would be nice to have this earlier in the series 
-so you could use the conditions in the earlier patches already (but if it is 
-too cumbersome to rework, I don't insist on that).
+Have any of the failures been fixed in newer versions of QEMU?
+If so, you could also update the ppc jobs to fedora:40:
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -91,6 +91,7 @@ build-arm:
+  
+  build-ppc64be:
+   extends: .outoftree_template
++ image: fedora:40
+   script:
+   - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
+   - mkdir build
+@@ -111,6 +112,7 @@ build-ppc64be:
+  
+  build-ppc64le:
+   extends: .intree_template
++ image: fedora:40
+   script:
+   - dnf install -y qemu-system-ppc gcc-powerpc64-linux-gnu nmap-ncat
+   - ./configure --arch=ppc64 --endian=little --cross-prefix=powerpc64-linux-gnu-
 
+I also had a patch somewhere that updates all jobs, it just needs some
+polishing to get finished ...  maybe a good point in time to do this now.
+
+  Thomas
 
 
