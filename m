@@ -1,95 +1,98 @@
-Return-Path: <kvm+bounces-18829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3092D8FC00A
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 01:40:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96D818FC00E
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 01:41:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E203E28493D
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 23:40:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9BA31C22885
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 23:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BA814F127;
-	Tue,  4 Jun 2024 23:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E2C14F13C;
+	Tue,  4 Jun 2024 23:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yuMgg5vQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oJW1vHPG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA40414D708
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 23:39:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2353B14D28E
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 23:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717544376; cv=none; b=IxIVgRIcw0EfOJ8M/zBAFkBd+aeRW7F3Hft5WlAG4H2Ux2vuIOjTBhOW0stNCP/MyH1COKzCMJCtXvkHzfJwdu2LCz88V5ai1IMgvL3YJ4Yos33oEP/LsxG+L4R870kN45PehaNhc7PmO3AarLa8t43lY8QeoCDHqr/MGcxufFE=
+	t=1717544401; cv=none; b=oPQ/a7QFxSG4Q5rPO9egkISXw8siFS8w8WvO9YUKXBowbdiEcaVFUrheOYD3vQ7ma4P6/Z4iI6OzS9BqVa62pTzXFyOSaSOpP7WdZy5CVBgBYbNFWEGulH+cJs8CwmX139aP75QtXFkf5H7Y1i4BPc/lxtAm8EEiMHrf05rZPak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717544376; c=relaxed/simple;
-	bh=IQEVEtIxbfQM6ENckYvGL40F/W3ZSaC5jAvCGcvKzaE=;
+	s=arc-20240116; t=1717544401; c=relaxed/simple;
+	bh=ZkUU2s7YT2yjYFDYrFKN0OyDTFEWJ3XnBoulxDsjwm0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Content-Type; b=gHfqIcJ6pzjhQesiAQiX/Q1w0liFUjK0kuzsMImRvJOX4ZLXe7g3gxTf3ZAG4Cu8+nSL+kGCBceRrKKzkLzOpK1hI6Zy/MQPGtuR0JBma79Se2t6EBdb8ic+t2+nc0EEu6UmuVwHEyDICwS4wqEszmplbDGYIBc/RLj9edIZFps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yuMgg5vQ; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=Mp37t7oGrUeQWAgviYpdhQd4CCkh5uK8mzahni+04HQ2JA7Onnt728RdGfw5STCPuTCVrJ5PEn7B/SZtFcouZCev7Fw52sVHoVA+F9Inl9F69VvQq6U0+mot3LoGqoPTcb0tQeBj44B8wh8+1JtUtqKi1lGrvDKDl1UHU6ggSLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oJW1vHPG; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-702543bf7bbso3946813b3a.2
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 16:39:34 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62a3dec382eso5165187b3.1
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 16:39:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717544374; x=1718149174; darn=vger.kernel.org;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k06g+hYmhmCFGjGVcPlzYbiauQW9CrfWOrVFdOU10GE=;
-        b=yuMgg5vQIgW93vh0rvhi8M1tEY4C0RF1ExWYP04UaSYSLFg7wCr58jyy8mUhHRt9Cl
-         ek5B2LfjUE4A0EPjs5a6r/PIZgtIGZTAkK9I1TjIVCulZ7Ntvrs+MXdpLJNgpxH8aRxs
-         stlFQEISBYJE1waNyXBgptW40t1kLn696217FqQe7wRK9JEA/jesfQGkgNzn9mzwCqff
-         5vjjcdszi7JW22DB5TVGcS928m+WdAZVOG+rb517SAg0JuJGywQjGS/aJAZrsK951llu
-         x5C4J5E8Vx+aniobWscwL6IvxZZ/eg0Z0Hk5KIxpEuZ22qQSAaUOqzMfpgvn9Fp3zgAp
-         8hGQ==
+        d=google.com; s=20230601; t=1717544399; x=1718149199; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SE7huESKi5HuBouKDmqrLhttjeAwWKTCKSgfCkXoz4M=;
+        b=oJW1vHPG8NiO3anCS5PKnK3QeAGkt4/Kw32b+mkuzMsFDXuZG9Vulnp77K5EgOOhJB
+         T8ewBZb/FIAeamk/vkCU65HATC/AH5mamtY5qxphMYLiNjvY4qKFJpkXmmoQMeF5Zo9Y
+         t+YeKHA2Gjcyq2OCvuiB0O8nkQBdGb7SeWfNRbJjckMAxYUm5euSN35GNCQhn3hh4bwt
+         fgqL4c7Wq+iPAcV3h3fAnCtHD1Amgc5E18zy3JKNcTFmt9JCmfGdGwzpGEAeBDtgz6kN
+         FwVTqaLiWRd01crOT+uNnJXVnudzWEdmB8UuuNxo/7A3HGuRA8tg26ozpCUBMCevmNXJ
+         dVVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717544374; x=1718149174;
-        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k06g+hYmhmCFGjGVcPlzYbiauQW9CrfWOrVFdOU10GE=;
-        b=cYnBZJpFIYA/jYprmXIpEeRnKrvg7V2SzsZyxn8rvAgSUE8vvX8iqI9bRTSCUxN0ty
-         ni3ByvDbpOYPXpJqxYH2gnCFbTjhwUqZ7qhVE+Ml10sTPJJVh1SpzRsR1s1pagmA4D7R
-         b1n9Mp3/JvVf5XRAVU5RTmixeF1uGRNVJQ/4uqsRYfbRo5eZXoOzsESF/amSnZrewPCY
-         7JT3PPAzTDTAOJc8iEB4/fvFVyvP7l3np2A0fUjx3qqaTGLEn718a5li5aVeqf3GEO3v
-         e9nRiqZ0l4Uv6Kc1ISCiBPtSTj0FdjfK2LqgkVjeuNklRv0UEWmn7nmAxdf8NaXbm9EU
-         kVzA==
-X-Forwarded-Encrypted: i=1; AJvYcCUIg2MkpyyaFP9XuHGW5t0TJ4CobApOhrTuVO8KyvfIZBbywJdBM4kcdp3S9D9B82naTsr31AljNL58MPH67rdpSiGG
-X-Gm-Message-State: AOJu0Yyn9UGyhBgGiiyxsFOv/zUuvGc8cVbzoZqJcMcYXDZaNQKGyfrM
-	82HmejGuuk4vMiRFIo4sKIfvTMNHMib8b/mfj8QiKrSBOQHIXmP1lJElLPjY7IQWOBLoxHPV4jz
-	wAA==
-X-Google-Smtp-Source: AGHT+IGamQjOb0IZyRGbmB/EhtRFFW5qCMkNgngKqeoU/E0W+g9mnv1fH0Rl3UFyzO9QBNrXqH0BKn3aqqE=
+        d=1e100.net; s=20230601; t=1717544399; x=1718149199;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SE7huESKi5HuBouKDmqrLhttjeAwWKTCKSgfCkXoz4M=;
+        b=LefwVezg788C+eB+eB4xSHu8PAts/r+sLbXKGZJadUv5y28YTiRSatqdR8rnK/RBX8
+         LpWmns7fuhi7eNWCEzrI4bJkUD5TLCCZeGWll5GxisMaBjhdoLXhJhmlSG6n1TyJ2uWi
+         CZpzKQw8YmpZr8gwrCMRrtyltLfKVEkStUg14WLyNXMxKK4Yy3wcaZR7HEzRps7pO1Yv
+         ocpekic/mIO1sDwUIpC6Kt0vf83sag+T8zSlMv5drVOiQXQEpJXcfZVgzXNsToO1aY52
+         SkKqJzegYBOO12pJUg6BuR033n3cs6paRwQb1ISVu8lKpQLEBzH0IFDZXbvZjCcOvawo
+         2ziQ==
+X-Gm-Message-State: AOJu0YwtsaHAKsQts2dDS4+ybl18ItgZxigcQK+cagbWIAyWxL5g67Ja
+	9Efq8+g5u8A5lhXcwwMEJAi/cLVqQFTVPQytqYnKooxFfwD/vN+QN06HeWY7S3gyJ1B3Bj8EOLl
+	8XQ==
+X-Google-Smtp-Source: AGHT+IFEUfCRDeqFSOjfCbxwRuJDNVLj1qRCvp9i4iWFvxVDCc1hcitsMhTyH4opoA5K/hQxiokX37nuRys=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2d1d:b0:6ea:8a0d:185f with SMTP id
- d2e1a72fcca58-703e596fbcdmr20834b3a.2.1717544374129; Tue, 04 Jun 2024
- 16:39:34 -0700 (PDT)
-Date: Tue,  4 Jun 2024 16:29:49 -0700
-In-Reply-To: <20231113184854.2344416-1-jmattson@google.com>
+ (user=seanjc job=sendgmr) by 2002:a81:c906:0:b0:618:9348:6b92 with SMTP id
+ 00721157ae682-62cabc4cd34mr9648967b3.1.1717544399227; Tue, 04 Jun 2024
+ 16:39:59 -0700 (PDT)
+Date: Tue,  4 Jun 2024 16:29:53 -0700
+In-Reply-To: <20240602235529.228204-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20231113184854.2344416-1-jmattson@google.com>
+References: <20240602235529.228204-1-linux@treblig.org>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <171754334605.2779503.16864225158478390974.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: x86: Remove IA32_PERF_GLOBAL_OVF_CTRL from KVM_GET_MSR_INDEX_LIST
+Message-ID: <171754329970.2779150.530235553362373493.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: selftests: remove unused struct 'memslot_antagonist_args'
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	"'Paolo Bonzini '" <pbonzini@redhat.com>, Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, shuah@kernel.org, 
+	linux@treblig.org
+Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 13 Nov 2023 10:48:54 -0800, Jim Mattson wrote:
-> This MSR reads as 0, and any host-initiated writes are ignored, so
-> there's no reason to enumerate it in KVM_GET_MSR_INDEX_LIST.
+On Mon, 03 Jun 2024 00:55:29 +0100, linux@treblig.org wrote:
+> 'memslot_antagonist_args' is unused since the original
+> commit f73a3446252e ("KVM: selftests: Add memslot modification stress
+> test").
+> 
+> Remove it.
 
-Applied to kvm-x86 pmu, time to find out the hard way if this makes QEMU
-unhappy.  Thanks!
+Applied to kvm-x86 selftests, thanks!
 
-[1/1] KVM: x86: Remove IA32_PERF_GLOBAL_OVF_CTRL from KVM_GET_MSR_INDEX_LIST
-      https://github.com/kvm-x86/linux/commit/ea19f7d0bf46
+[1/1] KVM: selftests: remove unused struct 'memslot_antagonist_args'
+      https://github.com/kvm-x86/linux/commit/f626279dea33
 
 --
 https://github.com/kvm-x86/linux/tree/next
