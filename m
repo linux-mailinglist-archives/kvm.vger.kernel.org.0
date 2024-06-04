@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-18726-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59118FAA5A
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:59:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D0598FAA7D
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 08:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B1061F23336
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 05:59:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E15E1C219F9
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 06:08:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0835B13DDC3;
-	Tue,  4 Jun 2024 05:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52A1140396;
+	Tue,  4 Jun 2024 06:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PiF7iLVb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CMO1xokr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27FC847B
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 05:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7DA13E3EF;
+	Tue,  4 Jun 2024 06:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717480738; cv=none; b=ZGK44reI0Yh9IfxifDKl1sPc5WrcPULsGs5fZz9sMwRAlyblptyyXwJWOs0/qxdaxBwIAhCKUMcQFOGEOwXOu3+7wFPZEh+7tHs9ONSEZTqL5eAcBvG0BBEpoRaNtqj1IYx2+zfXz4PidHQKpARlZ0CmHmaI2ODIjjjNIXSu3Qw=
+	t=1717481261; cv=none; b=Y5cbp6ZXMVm7iOZwKwO0of5B36SErrY/qazlWNJXp563BgS7QnFWU7iXJs+DKHDaKpmPVo1IVnD/wuOePU2D2en/m7gcnPgPLxWuoBW/Dp2RauATWMIkMIcjURRdAmGjLwRTQdcn4/sotSy+81xvZC2hWUrx26jWS9d9NtellRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717480738; c=relaxed/simple;
-	bh=bdEet59TQTyTVbSK//LkGfuAXacPoFmV4TWl20G9Am0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=D+0AZ2RP+dEmrLACzfjvkiWeaLP2iCUGY1tj/NDL3kfDY+RAd4HZlw/uQ+OFhIcBTYRNLMfyhKLS1hDuumOy3hlZe+RyuLmmZGan7eaBUJAWUJbajBJ/z9QZbuEttvfMxgEquIHFp/B4gB7+hXzd5g5wi4NkvFPjbjy7zzKmS74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PiF7iLVb; arc=none smtp.client-ip=209.85.210.180
+	s=arc-20240116; t=1717481261; c=relaxed/simple;
+	bh=iwbFjTc6NZx/ChktlGyF4zKAy/jsfhbthZdM4AE3Gj4=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=EZXLmV6AfHhEgcWJsN8wqVkcjERVTz/Nwm7aA7RtbcySi2NTdUYcjyaGtIix4c314wY+umsmdyWinKnvgy4lfKMypIKalwYQN7O+ozxlFw3WVyfag+Ldi74SNseCccozRcA1Dz13TPHmzg79Y/r/fohlMpvaCUA99yB8hvQHGMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CMO1xokr; arc=none smtp.client-ip=209.85.216.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7024cd9dd3dso2800061b3a.3
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 22:58:56 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2bfffa3c748so4143710a91.3;
+        Mon, 03 Jun 2024 23:07:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717480736; x=1718085536; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
+        d=gmail.com; s=20230601; t=1717481259; x=1718086059; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gl8nhqFsYbY5YUB00tLeYqld+esrzmjcXavcX0Ll0gA=;
-        b=PiF7iLVbrJoJL7maosTgxLeekmSFuRtYFUTX/yjeHIoucEEARFgi042RaHGZuUiFGL
-         E69R1Ll5qnvz2QQVLqn2Dxo7TNPtjr2Tuqg2pu7t25L6dzS+l9UHZXSo7suRdkeuoQIJ
-         s/Een4fGGkvgYYzkIS6VjUtfjuQUNzjLDgefqxZshzVfS3+f8v5NbCjDqhty0iyB31ql
-         lxrd7iLSl0S+e5RXy0IUFior4a6fT1WWLADac7rUWPBJ0tzvCucvUx+hP1/HLIN5l1ej
-         EIFdFzZptI13NRb08D3y5VGN74U6rCCxZQhr1BNNFRFqLRl0AVsyRWNrxFPH9xlJ1f+M
-         Ddjw==
+        bh=KHKS9jT7MB7hE/EEMjAH9yW7M5wSwmZc93mWcC255Cs=;
+        b=CMO1xokrMBPY8m5ES6UXrCXC0cIcLFn1h6p00thREyUEcuKBJ/axlnIvn6ORPA+O65
+         7kDDffeM1mZD4m8W/inSjiKtGSNMBJRDTbGpSySJFJYD1LF1AiemyAprDjgm5z/z8O+g
+         wa1AmVZm8np58nTJZQG4wn8zhHBtKH2liHeXt9UaEq8G7M3AI2JQBlIbWz0UcShhHQ5N
+         DlB6EqEErESkOrvOHrYXuWYkyCcgFuyN8+xaNuXxT6klXJ6SOTlouEH4T/RIOgAHZl0G
+         Rh29MIiu+WlZ1sgpbf8R0qA0XJac428wQe5P6vttCoikr0KHU4egDROfns6E/E1PxmuL
+         oHzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717480736; x=1718085536;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
+        d=1e100.net; s=20230601; t=1717481259; x=1718086059;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=gl8nhqFsYbY5YUB00tLeYqld+esrzmjcXavcX0Ll0gA=;
-        b=bi/hfTJXVzYaz8vTV7f6xqvRHA/eSh2ZxAtWfyJoPNh4F5ofB8Jsd55yozpoqXiPL4
-         5zON//KB+cLqPKF0eN7SjmSQeh9Xjy39OffDNhSd3xJ4QBprRPLisidFJcLKj/1mIeJJ
-         WVF9DYbMMoPLd6lHitW1B5Cm1HB2HZE9i4ryNDwS8icYeC4ucMA60nXsOH8tQtW/IsO/
-         u6cXkX6Zw7mIybra6yRUUrOBGssySZjlgqRqlTex+oJRNkfRTAlCkXehEvggUiISn/Nn
-         FEcB2mPpJ+dE4QiySSFLIEnl9K/mlVoadcBV19abFaD9qfQ100TKqup6KxiHLJ1N6/SB
-         R/WA==
-X-Forwarded-Encrypted: i=1; AJvYcCV9VB5K8B1Si8EmHRiPYILgi+dh3dbUX/m0+RQHj9N6jSx09H71MWD4ZbXOATszgTooTr6oiQzM8uHYUbL6SGimucFA
-X-Gm-Message-State: AOJu0YxYoOhG1Kl5hS05DlBerrlr2051ejABHUqnnGmjbnM/1crtTdax
-	XaODGcgs3qZUSCn4xEDJBzCGL/1f+VpgxO3I5+ZZtr+yj7uFDaKE
-X-Google-Smtp-Source: AGHT+IEUimO7kKL5JzPZ4X9UjN4s4Rov2b/FPNTv9+n2YcOTF0OmtGxebNsWC6ZgEm82JBiWDYR9bw==
-X-Received: by 2002:a05:6a00:23c6:b0:6ed:41f3:431d with SMTP id d2e1a72fcca58-70247666e1bmr12408633b3a.0.1717480736101;
-        Mon, 03 Jun 2024 22:58:56 -0700 (PDT)
+        bh=KHKS9jT7MB7hE/EEMjAH9yW7M5wSwmZc93mWcC255Cs=;
+        b=bL8/WqJt5lla8FYcSwWWxHmKrObz+JCEa2LS9oL31NYkrYwzbzlIxrnJ/oK+KskDwm
+         6eVtiASuLTfoHWZFFNYqFyN8DXf3oas2Aa6qF98OShJ9W+lNZcgEzw4vDjY1tIdPjv+P
+         CQg00+MTSGXpBGHAOGf96a81hqz/1AKekT7jdZie7K5+5jUdZkvhowJJuz2qah0BUDZD
+         OkwzZupI3vBD5wt/Q7paQcLjyvROcqboI95kIeXbwbmKCZkqXCrFVTKYllrkK72Jr+Kq
+         FzndgIu/xz7tzVhlK0F8o2t2ZT2g19O/hndCfxAp21itNrQJxNMVVKMXtdpW+4DQCZgE
+         znDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4FK551GKvqLoyLr919WtmaUkO4q9kGff45Jq1a0lzEexa8Qfk5Z6bxKmNG/9z9n547svLoY295Md61MVcUMxZGAzJgR55gOHv/FmR182L6+m/7fkoMpPOH1FDt5159SfSjND/t6zhk9+O2Hoa0zGKoy+bYnhjifGyeCAk
+X-Gm-Message-State: AOJu0Yyn942LHViEan8RSpEkqh+H2oMa+Gt2Yyd3qED0dVjQxqEpvwKo
+	eFlgBvQ4UyRoxiQ9HHkqpckEEwAen65jQDhYKpcPT8cAK5SJHRgH
+X-Google-Smtp-Source: AGHT+IGgduKGfFqGFxTIMZY4kIpEo9UbSeOpJKQ2EBgCxLKHZbKJzMZPFI7lJBVexL750l4Obga0Eg==
+X-Received: by 2002:a17:90b:d95:b0:2be:9549:799e with SMTP id 98e67ed59e1d1-2c1dc56db3bmr10075761a91.9.1717481259042;
+        Mon, 03 Jun 2024 23:07:39 -0700 (PDT)
 Received: from localhost ([1.146.11.115])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-702425d9aeasm6373462b3a.50.2024.06.03.22.58.51
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c2411633e0sm2535857a91.30.2024.06.03.23.07.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jun 2024 22:58:55 -0700 (PDT)
+        Mon, 03 Jun 2024 23:07:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,66 +75,52 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 04 Jun 2024 15:58:49 +1000
-Message-Id: <D1R03V1KZTWF.2BW5FQ7M7SGZ9@gmail.com>
-To: "Shivaprasad G Bhat" <sbhat@linux.ibm.com>, <cohuck@redhat.com>,
- <pbonzini@redhat.com>, <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>
-Cc: <mst@redhat.com>, <danielhb413@gmail.com>, <qemu-ppc@nongnu.org>
-Subject: Re: [PATCH 2/2] target/ppc/cpu_init: Synchronize HASHKEYR with KVM
- for migration
+Date: Tue, 04 Jun 2024 16:07:29 +1000
+Message-Id: <D1R0AHN2MCOS.BPHUJKSV7YSO@gmail.com>
+Cc: <pbonzini@redhat.com>, <naveen.n.rao@linux.ibm.com>,
+ <christophe.leroy@csgroup.eu>, <corbet@lwn.net>, <mpe@ellerman.id.au>,
+ <namhyung@kernel.org>, <pbonzini@redhat.com>, <jniethe5@gmail.com>,
+ <atrajeev@linux.vnet.ibm.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 6/6] KVM: PPC: Book3S HV: Add one-reg interface for
+ HASHKEYR register
 From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Shivaprasad G Bhat" <sbhat@linux.ibm.com>, <kvm@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
 X-Mailer: aerc 0.17.0
-References: <171741555734.11675.17428208097186191736.stgit@c0c876608f2d>
- <171741557432.11675.11683958406314165970.stgit@c0c876608f2d>
-In-Reply-To: <171741557432.11675.11683958406314165970.stgit@c0c876608f2d>
+References: <171741323521.6631.11242552089199677395.stgit@linux.ibm.com>
+ <171741330411.6631.10739157625274499060.stgit@linux.ibm.com>
+In-Reply-To: <171741330411.6631.10739157625274499060.stgit@linux.ibm.com>
 
-On Mon Jun 3, 2024 at 9:53 PM AEST, Shivaprasad G Bhat wrote:
-> The patch enables HASHKEYR migration by hooking with the
-> "KVM one reg" ID KVM_REG_PPC_HASHKEYR.
+On Mon Jun 3, 2024 at 9:15 PM AEST, Shivaprasad G Bhat wrote:
+> The patch adds a one-reg register identifier which can be used to
+> read and set the virtual HASHKEYR for the guest during enter/exit
+> with KVM_REG_PPC_HASHKEYR. The specific SPR KVM API documentation
+> too updated.
 >
 > Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 > ---
->  linux-headers/asm-powerpc/kvm.h |    1 +
->  target/ppc/cpu_init.c           |    4 ++--
->  2 files changed, 3 insertions(+), 2 deletions(-)
+>  Documentation/virt/kvm/api.rst            |    1 +
+>  arch/powerpc/include/uapi/asm/kvm.h       |    1 +
+>  arch/powerpc/kvm/book3s_hv.c              |    6 ++++++
+>  tools/arch/powerpc/include/uapi/asm/kvm.h |    1 +
+>  4 files changed, 9 insertions(+)
 >
-> diff --git a/linux-headers/asm-powerpc/kvm.h b/linux-headers/asm-powerpc/=
-kvm.h
-> index fcb947f656..23a0af739c 100644
-> --- a/linux-headers/asm-powerpc/kvm.h
-> +++ b/linux-headers/asm-powerpc/kvm.h
-> @@ -646,6 +646,7 @@ struct kvm_ppc_cpu_char {
->  #define KVM_REG_PPC_DAWR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc4)
->  #define KVM_REG_PPC_DAWRX1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc5)
->  #define KVM_REG_PPC_DEXCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc6)
-> +#define KVM_REG_PPC_HASHKEYR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc7)
-> =20
->  /* Transactional Memory checkpointed state:
->   * This is all GPRs, all VSX regs and a subset of SPRs
-> diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
-> index b1422c2eab..cee0a609eb 100644
-> --- a/target/ppc/cpu_init.c
-> +++ b/target/ppc/cpu_init.c
-> @@ -5805,10 +5805,10 @@ static void register_power10_hash_sprs(CPUPPCStat=
-e *env)
->          ((uint64_t)g_rand_int(rand) << 32) | (uint64_t)g_rand_int(rand);
->      g_rand_free(rand);
->  #endif
-> -    spr_register(env, SPR_HASHKEYR, "HASHKEYR",
-> +    spr_register_kvm(env, SPR_HASHKEYR, "HASHKEYR",
->              SPR_NOACCESS, SPR_NOACCESS,
->              &spr_read_generic, &spr_write_generic,
-> -            hashkeyr_initial_value);
-> +            KVM_REG_PPC_HASHKEYR, hashkeyr_initial_value);
->      spr_register_hv(env, SPR_HASHPKEYR, "HASHPKEYR",
->              SPR_NOACCESS, SPR_NOACCESS,
->              SPR_NOACCESS, SPR_NOACCESS,
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.=
+rst
+> index 81077c654281..0c22cb4196d8 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -2439,6 +2439,7 @@ registers, find a list below:
+>    PPC     KVM_REG_PPC_PSSCR               64
+>    PPC     KVM_REG_PPC_DEC_EXPIRY          64
+>    PPC     KVM_REG_PPC_PTCR                64
+> +  PPC     KVM_REG_PPC_HASHKEYR            64
 
-Hmm... now that I look at it, the hashpkey value also needs to be set
-in the machine and migrated, right? That looks broken. I *think* if we
-make this spr_register_kvm_hv, and you will also need to add a KVM
-API for the register, that should get it working becuse SPRs will
-be migrated for us.
+Just looking at the QEMU side of this change made me think... AFAIKS
+we need to also set and get and migrate the HASHPKEY SPR.
+
+The hashst/hashchk test cases might be "working" by chance if the SPR
+is always zero :/
 
 Thanks,
 Nick
