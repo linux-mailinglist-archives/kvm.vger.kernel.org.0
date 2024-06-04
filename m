@@ -1,121 +1,192 @@
-Return-Path: <kvm+bounces-18700-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18701-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C12B8FA6B3
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 02:00:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95F508FA6D9
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 02:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E2FA1C225D8
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:00:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1316B251EC
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 00:14:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067222A8D0;
-	Tue,  4 Jun 2024 00:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAB19EC4;
+	Tue,  4 Jun 2024 00:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZQONQF2Q"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X9XptLrH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A37A5382
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 00:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EDF63E
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 00:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717459238; cv=none; b=Fmy1wWYDbEaGT09QShGjz48evhP/eGQYWzNj7TylSMv729DxL0nmyv06MSmwqj2c5OF5TWMDjO5luE/XzSvxH2wg2nPH2KAz4BUIHLwnJ4oVGut4mNS9hD6xEUA/yvhj9pJX3ps/XWWaehw1x4YQRNXSe+6P/EB5nGPeSiXtxjU=
+	t=1717460055; cv=none; b=A+AXJqze2OvP0JxMboiq39ozPmwKzbDv3qd1OOQ3qf/8Pn/Qri+VgghJm+b39Z6zDxuIacTDWCzIC473CtuQCRBDtuKicpupcIVCxOaIFNapz+9JwRGBxWmyJJjoB+ALVmbLrzmWej3E4K+Fa8uUw/TEk35r7ZxLgGTGzCC6UJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717459238; c=relaxed/simple;
-	bh=qmzipbdBY6KqUjrHfBG3VzqriXpHdWHYlYyt1ENKvq0=;
+	s=arc-20240116; t=1717460055; c=relaxed/simple;
+	bh=O7IEydvJikvy1VRybXHIgo7DsDUOiB9JWN05ebOrWWE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IfDq3YB9vzIPclX2DgxABrF9wnzxYyZPYXjvsFzQTFc+tRgUR35Kz9bbvJAMtECTXNPCdn+Q5qWG7TnliCZHE0JJxR+Ak4Bp3wbQAaJs2ZzaWIYBKV9ggdqO8KY10Y9r6jgUugInD6Bs3jtd3w5/frZGE57cvxwZH2v+TbrhOH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZQONQF2Q; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=IHP8cioBIyB5R+V7FFpJLJDHFmuLGMUHGmcQOXeE3UkFRHeYjT25Kc9CELt+x2C9HIcw1q4ehNC84ua3R29bZGv4wZacC/hSOETCumpxUBQH/fc9yo2rAXvLbtLXgAgPoaoin1FZUYHxkUl9B10Ef14GJuipbwGdDzyhOVTRkgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X9XptLrH; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6507e2f0615so4508138a12.1
-        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 17:00:36 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62ca03fc1ceso21892627b3.1
+        for <kvm@vger.kernel.org>; Mon, 03 Jun 2024 17:14:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717459235; x=1718064035; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717460053; x=1718064853; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X9TixsbS4vucV54Qx239yWNe5AZLJZTOJio74oth8eo=;
-        b=ZQONQF2Q2Ikl2ID4JAuRYwoHQfqUopTTl/zUGiyTUrHa5N+CygYEQJfppVAknkh9JK
-         j4pSYXk2Hj2u08iVxR5KtOtFuRJ6KdTiunVZaN2o/pz5rd/zqUT2X1UQfnsWAS7uP6zi
-         p8TysO9hDHEC8w0abnkcA62D0Yow4EYV7fclW9euO7hCQ5AOot0J3OoBdT0aa4IHP3hK
-         hFISuSwdOQSIXsXozSsbkKHf2sI0kptG6kv/9njKgg/QsrDgH+0StnqCMh4ZBvti0S1w
-         GHX1Qk0G0eyLSuB53miE2svmCkK6VM7Jz55TRxGhatv7v6o1pbfL6b8WRGx3z/nVAl/G
-         eteQ==
+        bh=6ccoeN8AjVVO4XJ0biqZf4iXVDLjkh53CRVPkhtuV/k=;
+        b=X9XptLrHrFkIYZlPmilaKLHsQBTqhE2zNUyKiRS7SGdFCM23kPCm4Uw5dXIpVPfCEZ
+         fSN5hmksS1uFQjE7BuKMosCP4IjDp8C9+hgy7vNvgcOEgNmklLyQtwGUZVoqk+aZBS1M
+         JGBQfj5fNkTZhI6aErI/y8ipLA2YIz+UfuZT0cmJUrHXwzB03JxwmKo4Co/BJE0f2Zd/
+         k2aw5y8QhU3NspXOJYBvkXiJMPIiEmMqJoaz368d+QqwNGB/fL6UF3d2Uu6o+fWSGWoN
+         Xe1AC0KQtHElahdWpR2dvIRm4kk1jLlr60c52BLcM6xHl10zkTmH4inlq18dlgemGB4w
+         Kw3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717459235; x=1718064035;
+        d=1e100.net; s=20230601; t=1717460053; x=1718064853;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=X9TixsbS4vucV54Qx239yWNe5AZLJZTOJio74oth8eo=;
-        b=cD2hJeh3qnED6BHdqg9wBGaPjqZ3C4GHXcZ24lHG1m/5LXb2x6wbBPIxcEsekf8iUK
-         1dLyxtCjMp8HhhvfvmPGFctdPkE7ttDBpzTh1yXGDbdBm09YdiUaot7Cdw1AgEhcpwdk
-         x+T32aNFBcQHgvBFWWezLzsTOJVPi3TbwOzStZRIOK5z/VFsFb6cAXKPjxW3rTmK0+/V
-         3a+ZEaJMGiWeb/5cN04+J4i22xCjUyqOD3wh8Ce0O1mBfbosq8z/cfbfr5x1hQ4yCIH6
-         z7JjB5QTZlWx90s3t1CQz9L0prhvL/3Z5hbEVDprh1tP3/HC50T9ITLEyuyJtp5obK4E
-         gzTA==
-X-Forwarded-Encrypted: i=1; AJvYcCVqxJZCT802yOjKdVwcabnSNOSzUIFNDn1olepSuYOoKQpEPsAPA67gaI8T4sLKyypcFvO1tfM0WUYT0rUURiOrnXIb
-X-Gm-Message-State: AOJu0Yy7BshrQ/5LWQfjiQv3ZAM+vydjJ/Fj/aHo7CZYKoFNf8Vr4Lvb
-	BvW9ITxwEUhNQpmrITWtBMSFspYLhP3QWUrhWhbouIjR7gfh9WqV3ekNKdlE08jV527Us0XTja1
-	UQQ==
-X-Google-Smtp-Source: AGHT+IEZPsEeD1Zd/VZMKCyFxGi7l593WU5W4++SYV2nnpe1UGIt5x3H32mkoIcyVAOGihn5nlLRW2Z7atY=
+        bh=6ccoeN8AjVVO4XJ0biqZf4iXVDLjkh53CRVPkhtuV/k=;
+        b=spZuvxyQquAvbx6qehbSVpzhFRNlrHkSpDWi7syfv3nZGGyUH3mSr9LaNeeNUx7xX3
+         xHAmbp2EGIkjxPAKi1xMFobgQUi4IUq59w4kkL0jcFjzttREfjpKiAZvotxHoA9hk4Jp
+         c6lS4lgwwvhfiMqjg5CeHJSIyTPkLHfdprB0frcCfgGi6xtGakH2YdUA6s29b0rGIwdC
+         vpm5afyyM3BBvT6po/rBboEwjYBHLc6/bloujJZcHpnMkHPO3A3+ZxhwDgDUfhmLlKsX
+         WU5mGw6IG3O3YnZd197yH/8VDjY45HbWuRMh+adw4vvyZaxVhguOI7kw68IXP3jFnkRq
+         935A==
+X-Gm-Message-State: AOJu0YwdsTW0JF8oaxvDUgSI8D4yiiXNw1YkyIDhbh5kVIVuLPXV+NeR
+	7dhFCgK+DjoVn+BF1NHv7D5ESAKHTNudlruhT7L/WmkkzCYDGCxFgBLcl6Nbv4FOhGL6BJ3U/Ur
+	ExA==
+X-Google-Smtp-Source: AGHT+IEGlXU3eqZFi3/wWkMmZ6JRkzJxAr6p48aczYpJlaUe0U2DQ7zSm8aeZ4clwGvABR+Cj03lEkg+wUg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:ab0a:b0:2c2:4117:2409 with SMTP id
- 98e67ed59e1d1-2c241172c69mr8738a91.8.1717459234737; Mon, 03 Jun 2024 17:00:34
- -0700 (PDT)
-Date: Mon, 3 Jun 2024 17:00:33 -0700
-In-Reply-To: <20240520143220.340737-2-julian.stecklina@cyberus-technology.de>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:3506:b0:627:a962:4252 with SMTP id
+ 00721157ae682-62c7983febcmr26991967b3.7.1717460053326; Mon, 03 Jun 2024
+ 17:14:13 -0700 (PDT)
+Date: Mon, 3 Jun 2024 17:14:11 -0700
+In-Reply-To: <20240429155738.990025-5-alejandro.j.jimenez@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240520143220.340737-1-julian.stecklina@cyberus-technology.de> <20240520143220.340737-2-julian.stecklina@cyberus-technology.de>
-Message-ID: <Zl5ZIXOXzaTryibL@google.com>
-Subject: Re: [PATCH 2/2] KVM: fix spelling of KVM_RUN_X86_BUS_LOCK in docs
+References: <20240429155738.990025-1-alejandro.j.jimenez@oracle.com> <20240429155738.990025-5-alejandro.j.jimenez@oracle.com>
+Message-ID: <Zl5cUwGiMrng2zcc@google.com>
+Subject: Re: [PATCH 4/4] KVM: x86: Add vCPU stat for APICv interrupt
+ injections causing #VMEXIT
 From: Sean Christopherson <seanjc@google.com>
-To: Julian Stecklina <julian.stecklina@cyberus-technology.de>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
+	suravee.suthikulpanit@amd.com, vashegde@amd.com, mlevitsk@redhat.com, 
+	joao.m.martins@oracle.com, boris.ostrovsky@oracle.com, mark.kanda@oracle.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, May 20, 2024, Julian Stecklina wrote:
-> The documentation refers to KVM_RUN_BUS_LOCK, but the constant is
-> actually called KVM_RUN_X86_BUS_LOCK.
+On Mon, Apr 29, 2024, Alejandro Jimenez wrote:
+> Even when APICv/AVIC is active, certain guest accesses to its local APIC(s)
+> cannot be fully accelerated, and cause a #VMEXIT to allow the VMM to
+> emulate the behavior and side effects. Expose a counter stat for these
+> specific #VMEXIT types.
 > 
-> Signed-off-by: Julian Stecklina <julian.stecklina@cyberus-technology.de>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
 > ---
->  Documentation/virt/kvm/api.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  arch/x86/include/asm/kvm_host.h | 1 +
+>  arch/x86/kvm/svm/avic.c         | 7 +++++++
+>  arch/x86/kvm/vmx/vmx.c          | 2 ++
+>  arch/x86/kvm/x86.c              | 1 +
+>  4 files changed, 11 insertions(+)
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 2d45b21b0288..5050535140ab 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -6418,7 +6418,7 @@ affect the device's behavior. Current defined flags::
->    /* x86, set if the VCPU is in system management mode */
->    #define KVM_RUN_X86_SMM     (1 << 0)
->    /* x86, set if bus lock detected in VM */
-> -  #define KVM_RUN_BUS_LOCK    (1 << 1)
-> +  #define KVM_RUN_X86_BUS_LOCK    (1 << 1)
->    /* arm64, set for KVM_EXIT_DEBUG */
->    #define KVM_DEBUG_ARCH_HSR_HIGH_VALID  (1 << 0)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index e7e3213cefae..388979dfe9f3 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1576,6 +1576,7 @@ struct kvm_vcpu_stat {
+>  	u64 guest_mode;
+>  	u64 notify_window_exits;
+>  	u64 apicv_active;
+> +	u64 apicv_unaccelerated_inj;
+
+The stat name doesn't match the changelog or the code.  The AVIC updates in
+avic_incomplete_ipi_interception() are unaccelerated _injection_, they're
+unaccelarated _delivery_.  And in those cases, the fact that delivery wasn't
+accelerated is relatively uninteresting in most cases.
+
+And avic_unaccelerated_access_interception() and handle_apic_write() don't
+necessarily have anything to do with injection.
+
+On the flip side, the slow paths for {svm,vmx}_deliver_interrupt() are very
+explicitly unnaccelerated injection.
+
+It's not entirely clear from the changelog what the end goal of this stat is.
+A singular stat for all APICv/AVIC access VM-Exits seems uninteresting, as such
+a stat essentially just captures that the guest is active.  Maaaybe someone could
+glean info from comparing two VMs, but even that is dubious.  E.g. if a guest is
+doing something function and generating a lot of avic_incomplete_ipi_interception()
+exits, those will likely be in the noise due to the total volume of other AVIC
+exits.
+
+>  };
 >  
-> @@ -7776,10 +7776,10 @@ its own throttling or other policy based mitigations.
->  This capability is aimed to address the thread that VM can exploit bus locks to
->  degree the performance of the whole system. Once the userspace enable this
->  capability and select the KVM_BUS_LOCK_DETECTION_EXIT mode, KVM will set the
-> -KVM_RUN_BUS_LOCK flag in vcpu-run->flags field and exit to userspace. Concerning
-> +KVM_RUN_X86_BUS_LOCK flag in vcpu-run->flags field and exit to userspace. Concerning
->  the bus lock vm exit can be preempted by a higher priority VM exit, the exit
->  notifications to userspace can be KVM_EXIT_BUS_LOCK or other reasons.
-> -KVM_RUN_BUS_LOCK flag is used to distinguish between them.
-> +KVM_RUN_X86_BUS_LOCK flag is used to distinguish between them.
-
-There's a patch[*] that does this clean-up and more, which I'm going to grab for
-6.11.  I am planning on grabbing patch 1 though.  Thanks!
-
-[*] https://lore.kernel.org/all/20231116133628.5976-1-clopez@suse.de
+>  struct x86_instruction_info;
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 4b74ea91f4e6..274041d3cf66 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -517,6 +517,8 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
+>  			kvm_apic_write_nodecode(vcpu, APIC_ICR);
+>  		else
+>  			kvm_apic_send_ipi(apic, icrl, icrh);
+> +
+> +		++vcpu->stat.apicv_unaccelerated_inj;
+>  		break;
+>  	case AVIC_IPI_FAILURE_TARGET_NOT_RUNNING:
+>  		/*
+> @@ -525,6 +527,8 @@ int avic_incomplete_ipi_interception(struct kvm_vcpu *vcpu)
+>  		 * vcpus. So, we just need to kick the appropriate vcpu.
+>  		 */
+>  		avic_kick_target_vcpus(vcpu->kvm, apic, icrl, icrh, index);
+> +
+> +		++vcpu->stat.apicv_unaccelerated_inj;
+>  		break;
+>  	case AVIC_IPI_FAILURE_INVALID_BACKING_PAGE:
+>  		WARN_ONCE(1, "Invalid backing page\n");
+> @@ -704,6 +708,9 @@ int avic_unaccelerated_access_interception(struct kvm_vcpu *vcpu)
+>  
+>  	trace_kvm_avic_unaccelerated_access(vcpu->vcpu_id, offset,
+>  					    trap, write, vector);
+> +
+> +	++vcpu->stat.apicv_unaccelerated_inj;
+> +
+>  	if (trap) {
+>  		/* Handling Trap */
+>  		WARN_ONCE(!write, "svm: Handling trap read.\n");
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index f10b5f8f364b..a7487f12ded1 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -5657,6 +5657,8 @@ static int handle_apic_write(struct kvm_vcpu *vcpu)
+>  {
+>  	unsigned long exit_qualification = vmx_get_exit_qual(vcpu);
+>  
+> +	++vcpu->stat.apicv_unaccelerated_inj;
+> +
+>  	/*
+>  	 * APIC-write VM-Exit is trap-like, KVM doesn't need to advance RIP and
+>  	 * hardware has done any necessary aliasing, offset adjustments, etc...
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 03cb933920cb..c8730b0fac87 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -307,6 +307,7 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+>  	STATS_DESC_IBOOLEAN(VCPU, guest_mode),
+>  	STATS_DESC_COUNTER(VCPU, notify_window_exits),
+>  	STATS_DESC_IBOOLEAN(VCPU, apicv_active),
+> +	STATS_DESC_COUNTER(VCPU, apicv_unaccelerated_inj),
+>  };
+>  
+>  const struct kvm_stats_header kvm_vcpu_stats_header = {
+> -- 
+> 2.39.3
+> 
 
