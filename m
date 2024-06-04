@@ -1,98 +1,106 @@
-Return-Path: <kvm+bounces-18830-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18831-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D818FC00E
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 01:41:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E970E8FC00F
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 01:41:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9BA31C22885
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 23:41:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7885E1F2264C
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 23:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E2C14F13C;
-	Tue,  4 Jun 2024 23:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B352515218B;
+	Tue,  4 Jun 2024 23:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oJW1vHPG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GxAcxGNE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2353B14D28E
-	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 23:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A637C14D71C
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 23:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717544401; cv=none; b=oPQ/a7QFxSG4Q5rPO9egkISXw8siFS8w8WvO9YUKXBowbdiEcaVFUrheOYD3vQ7ma4P6/Z4iI6OzS9BqVa62pTzXFyOSaSOpP7WdZy5CVBgBYbNFWEGulH+cJs8CwmX139aP75QtXFkf5H7Y1i4BPc/lxtAm8EEiMHrf05rZPak=
+	t=1717544406; cv=none; b=JiC0a7r0KN204bXiysU6CR/5DaldEEPSo9fRJTq8CLfeMsGkqWaXuOfL35Wmgc8V33vMbM3Xb6PXzftwXHAc43Uf4IvLfgKAkwNvsfg7Kv3QxiC5g3wxM+RCsmrsREvAImz8ybyA8CKyb8jTkmuUTvmqAiRbwCaZIW3jTflBcHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717544401; c=relaxed/simple;
-	bh=ZkUU2s7YT2yjYFDYrFKN0OyDTFEWJ3XnBoulxDsjwm0=;
+	s=arc-20240116; t=1717544406; c=relaxed/simple;
+	bh=K20674vbTA6e4Mc8a4eEWVOJb8WC1M5eduSCbUsHEfI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Mp37t7oGrUeQWAgviYpdhQd4CCkh5uK8mzahni+04HQ2JA7Onnt728RdGfw5STCPuTCVrJ5PEn7B/SZtFcouZCev7Fw52sVHoVA+F9Inl9F69VvQq6U0+mot3LoGqoPTcb0tQeBj44B8wh8+1JtUtqKi1lGrvDKDl1UHU6ggSLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oJW1vHPG; arc=none smtp.client-ip=209.85.128.202
+	 To:Content-Type; b=n379EHAX1JzWyH+ejyrIhq1/aDqmAvja/Sxnu2sSOj6WV4vjisV8SqLXwh8BVy44e0FuTuEma5ANQB51XkmqePT3/iuBoS8oIejm9q6kAGi74T+mJGDiM0UbGbdbk2+VQSir3NNWJWKbNNfbUygS03+HTYUZ4M6AvrnoPBEK5mk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GxAcxGNE; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62a3dec382eso5165187b3.1
-        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 16:39:59 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c1bb32d87eso5183909a91.2
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 16:40:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717544399; x=1718149199; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SE7huESKi5HuBouKDmqrLhttjeAwWKTCKSgfCkXoz4M=;
-        b=oJW1vHPG8NiO3anCS5PKnK3QeAGkt4/Kw32b+mkuzMsFDXuZG9Vulnp77K5EgOOhJB
-         T8ewBZb/FIAeamk/vkCU65HATC/AH5mamtY5qxphMYLiNjvY4qKFJpkXmmoQMeF5Zo9Y
-         t+YeKHA2Gjcyq2OCvuiB0O8nkQBdGb7SeWfNRbJjckMAxYUm5euSN35GNCQhn3hh4bwt
-         fgqL4c7Wq+iPAcV3h3fAnCtHD1Amgc5E18zy3JKNcTFmt9JCmfGdGwzpGEAeBDtgz6kN
-         FwVTqaLiWRd01crOT+uNnJXVnudzWEdmB8UuuNxo/7A3HGuRA8tg26ozpCUBMCevmNXJ
-         dVVQ==
+        d=google.com; s=20230601; t=1717544405; x=1718149205; darn=vger.kernel.org;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lfqZkxWiUFXs+Smpv5BhGJvVqEtSydrq8RLVlLN70tw=;
+        b=GxAcxGNEIuml64fSSEdlRcqocLFy9+zX2F1KYitJ5JB89tfDk2H0WiHajHBdk5raIV
+         xBLAdYV5XurNWaw/Wp7yqiHeZHYwuEFK58n2KQAQKUa4tq9yISdK+4k2ax9XY85yekou
+         9lFbMYWKbNGBxEZWOze7MMd3UwEEcEdH3Y8/kSWSoME//M6RelDVvQcDqHqS4mVjTjDV
+         2pjpJHtKc0iL6Tn00Bzgk3WcISBOMxhL83rr70eNgKto2VSDRT2Xbxkd47bGH1mPrNcl
+         P64YH0kS0nZOmxaimWqqubO/ueABrFFIL473ddUmQ4DuaQ7PkMF+vW0KdtDd06h1a300
+         Zung==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717544399; x=1718149199;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SE7huESKi5HuBouKDmqrLhttjeAwWKTCKSgfCkXoz4M=;
-        b=LefwVezg788C+eB+eB4xSHu8PAts/r+sLbXKGZJadUv5y28YTiRSatqdR8rnK/RBX8
-         LpWmns7fuhi7eNWCEzrI4bJkUD5TLCCZeGWll5GxisMaBjhdoLXhJhmlSG6n1TyJ2uWi
-         CZpzKQw8YmpZr8gwrCMRrtyltLfKVEkStUg14WLyNXMxKK4Yy3wcaZR7HEzRps7pO1Yv
-         ocpekic/mIO1sDwUIpC6Kt0vf83sag+T8zSlMv5drVOiQXQEpJXcfZVgzXNsToO1aY52
-         SkKqJzegYBOO12pJUg6BuR033n3cs6paRwQb1ISVu8lKpQLEBzH0IFDZXbvZjCcOvawo
-         2ziQ==
-X-Gm-Message-State: AOJu0YwtsaHAKsQts2dDS4+ybl18ItgZxigcQK+cagbWIAyWxL5g67Ja
-	9Efq8+g5u8A5lhXcwwMEJAi/cLVqQFTVPQytqYnKooxFfwD/vN+QN06HeWY7S3gyJ1B3Bj8EOLl
-	8XQ==
-X-Google-Smtp-Source: AGHT+IFEUfCRDeqFSOjfCbxwRuJDNVLj1qRCvp9i4iWFvxVDCc1hcitsMhTyH4opoA5K/hQxiokX37nuRys=
+        d=1e100.net; s=20230601; t=1717544405; x=1718149205;
+        h=to:from:subject:message-id:references:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lfqZkxWiUFXs+Smpv5BhGJvVqEtSydrq8RLVlLN70tw=;
+        b=chKbPGY/WQes9gOKqa6bG/TU+jSuYMhkXMka5164s5qodadPzqqgqe6BkG315kVra3
+         udgFNgXwjhPWCy8etHtTnb0KR1o8PEFW8KUdybl5Cnm0Yd8FjhptHe3CoiVteR7116c+
+         sufuQ+CSCjqpKkma0xzuX1005VrdstZLga4t/XKVuZ30OixkNpQ61eGKGMp7cmuNXL/f
+         krrmwSUGuO6/aIejVjtQuTfhmTP3v2FTPLtnp/p4ZYyZKyug7p/nmoYjGxRa7417Ri4g
+         CXyyiM0a5pfxeUexhX5a6lMu7GvgfIy02wO1XmriJB2HLtaKrofXIF5AQCfh39cqGmLY
+         H1Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCWuNLxmop2Jo/bL3/xSbUzj2uc85C0XkYFNGh8LKMCyEIVZZu6erReIjvMT0AjdO7Jt4OsnQvpWYH01uecAL09cLPf2
+X-Gm-Message-State: AOJu0Yw776kDzcim2C8bFDAeQf0mjqfYvJWNmudRbZgMeP0O+cyBrmmc
+	97jj0iq/TSw9NXrSZ33vWyv4unWJcFzLQ4725iEDzDQPN2tE+emxnqFnIiZTguAjbmf9tbsiGXO
+	O4g==
+X-Google-Smtp-Source: AGHT+IFxtxEqjmVp8/kH2Qth4/863K555VQ5O4vmSNtNdXp/quRdJ22+vGKICOD8/uHgcqggI9XTX3xlIMU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:c906:0:b0:618:9348:6b92 with SMTP id
- 00721157ae682-62cabc4cd34mr9648967b3.1.1717544399227; Tue, 04 Jun 2024
- 16:39:59 -0700 (PDT)
-Date: Tue,  4 Jun 2024 16:29:53 -0700
-In-Reply-To: <20240602235529.228204-1-linux@treblig.org>
+ (user=seanjc job=sendgmr) by 2002:a17:90b:784:b0:2c2:4109:6a5f with SMTP id
+ 98e67ed59e1d1-2c27db65874mr6079a91.6.1717544404810; Tue, 04 Jun 2024 16:40:04
+ -0700 (PDT)
+Date: Tue,  4 Jun 2024 16:29:55 -0700
+In-Reply-To: <20240520120858.13117-1-lirongqing@baidu.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240602235529.228204-1-linux@treblig.org>
+References: <20240520120858.13117-1-lirongqing@baidu.com>
 X-Mailer: git-send-email 2.45.1.288.g0e0cd299f1-goog
-Message-ID: <171754329970.2779150.530235553362373493.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: selftests: remove unused struct 'memslot_antagonist_args'
+Message-ID: <171754376695.2781015.3069627762821218444.b4-ty@google.com>
+Subject: Re: [PATCH v3 0/3] KVM: SVM: refine snp_safe_alloc_page() implementation
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, shuah@kernel.org, 
-	linux@treblig.org
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, kvm@vger.kernel.org, 
+	thomas.lendacky@amd.com, yosryahmed@google.com, pgonda@google.com, 
+	Li RongQing <lirongqing@baidu.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Mon, 03 Jun 2024 00:55:29 +0100, linux@treblig.org wrote:
-> 'memslot_antagonist_args' is unused since the original
-> commit f73a3446252e ("KVM: selftests: Add memslot modification stress
-> test").
+On Mon, 20 May 2024 20:08:55 +0800, Li RongQing wrote:
+> This series include three changes for snp_safe_alloc_page:
+> 1. remove useless input parameter
+> 2. not account memory allocation for per-CPU svm_data
+> 3. Consider NUMA affinity when allocating per-CPU save_area
 > 
-> Remove it.
+> Diff V3: rebase
+> Diff V2: remove useless input parameter and not account per-CPU svm_data
+> 
+> [...]
 
-Applied to kvm-x86 selftests, thanks!
+Applied to kvm-x86 svm, thanks!
 
-[1/1] KVM: selftests: remove unused struct 'memslot_antagonist_args'
-      https://github.com/kvm-x86/linux/commit/f626279dea33
+[1/3] KVM: SVM: remove useless input parameter in snp_safe_alloc_page
+      https://github.com/kvm-x86/linux/commit/f51af3468688
+[2/3] KVM: SVM: not account memory allocation for per-CPU svm_data
+      https://github.com/kvm-x86/linux/commit/9f44286d77ac
+[3/3] KVM: SVM: Consider NUMA affinity when allocating per-CPU save_area
+      https://github.com/kvm-x86/linux/commit/99a49093ce92
 
 --
 https://github.com/kvm-x86/linux/tree/next
