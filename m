@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-18731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18732-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D41238FABCE
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 09:25:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 349AA8FAC09
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 09:31:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D44F1F22382
-	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:25:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CB531F215E5
+	for <lists+kvm@lfdr.de>; Tue,  4 Jun 2024 07:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639AD140E5B;
-	Tue,  4 Jun 2024 07:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37AA1411E0;
+	Tue,  4 Jun 2024 07:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ezn05q3A"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QdabIpcC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61C483CB4;
-	Tue,  4 Jun 2024 07:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED5EA140386
+	for <kvm@vger.kernel.org>; Tue,  4 Jun 2024 07:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717485901; cv=none; b=VaP2PEwh2XifzwfZBI/bnCv6QIyPvZjS4ZZ9bxxVXKIA9NujHAIsMtv21jsRyar8MusOP9fN4S08YxS631ttS4RNbo5IO/R5A434d+sxeA67VaPT5b4ZkME6nlVmROXHlWVYjGrcnW54yoUOkK82e94HWDYBbMj7KSch70+xRh8=
+	t=1717486261; cv=none; b=bGOVc3MNxivLa/tlLSQodrrC5cHmG4n5cRqFGgpG/29O+DseqT0+RTP4asVIOWnEqqCCHNU0yg15HisCba9ZvhLa2UgnDs1orIv0VpzVy6rKn5kJck4pdnUmG+JtSZUXQCj2PBj0TJ8W5hYzy8/3STlqtrytZr3VHB5N6iAXGd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717485901; c=relaxed/simple;
-	bh=DpEH2NbFw1m9Pv6+h2HbMRW9uEXYC1Z3v4mpBVv5ld4=;
+	s=arc-20240116; t=1717486261; c=relaxed/simple;
+	bh=e2vV495oOf1tWzFWTYfuPQ1TenxgP8oqGwvrWwV6Koc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rKrp1roSKMhyM2MPZJ0NMuvZ54hCEZ+cDrm2opZ/ITS1qGUzTI6bheuTIiaiTRLFthVwdHE0B23qX18ihK8pYRQ6y2Xr9zU4OId1slj/8Uehn9lrldOpmQHxW+pqdg0BfmC4WA7rPQIfNp+1a9lvQSxQXlFLYJUtx3W08my6iXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ezn05q3A; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4546oZFa012250;
-	Tue, 4 Jun 2024 07:24:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=TtL2QBVjGNwMRr4Cw76yWWTalIAKrI0zspJ0pw5e688=;
- b=Ezn05q3AMgqIJ0Jx09VQAWnNbkfe+E0vIlDzRC0fd6IgWKzAcEZkDq245UgzlXUjkuN1
- 43iRkAMASj04GxCNALAEIGpcUNb+SoGV6uLst2skFclSa7U8vHzYPrA2fjY8SSEIIb1f
- IBO4kIu5j6H/bKpmUO0+HTmVwsrJ2fC1dX/W2IZYiBzGNMdXHIr6XHZ3IXRerVpma1ZB
- FoZ+ipI4pS+lm4q3atu37JAbLu6bv5uQ18eMaM8imTUeuNOf4YvAb4FKZTyK8fV0tDKF
- qK494Adcv/dufcj0qNQ6OAmUJUrE90y2jxF8hl94L98r0I3DHFpDsjyZbC8PlLjZab8j 6w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhw35r7av-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 07:24:55 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4547MAZd008349;
-	Tue, 4 Jun 2024 07:24:54 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yhw35r7at-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 07:24:54 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4546xZga022840;
-	Tue, 4 Jun 2024 07:24:53 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ygg6m4dgw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Jun 2024 07:24:53 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4547Om7u46858632
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Jun 2024 07:24:50 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 16E4A2004F;
-	Tue,  4 Jun 2024 07:24:48 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 94AE82004B;
-	Tue,  4 Jun 2024 07:24:47 +0000 (GMT)
-Received: from [9.171.41.81] (unknown [9.171.41.81])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Jun 2024 07:24:47 +0000 (GMT)
-Message-ID: <211b39ae-af0c-4db9-8931-a1446f34c832@linux.ibm.com>
-Date: Tue, 4 Jun 2024 09:24:47 +0200
+	 In-Reply-To:Content-Type; b=VcmyrVQq8+qIWkhO4/SM/GmFclRXbQT8R7rMpNVUws45NCiKhMRI6uEBJ+Vr01WHh6qDHFYzjQns5jKiyHooZOW7toUcUE6coiKEII6vIFG9Ntym3JZgzouUmkD3yt0wZT78Qj60E1supMbxKDS7CqMB7mbalZooL91iSFw6rsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QdabIpcC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717486257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=TsL19mGL2R17JenZwmF+AzwbMkbWhCiBk2OX/4KYHpk=;
+	b=QdabIpcC1u6qCVP3hmx3ZnFHZ2uSlSetM0nzE0Isow3K/u8Jh03HHbDofNhGgHRjaviKSD
+	qYUaOovvI5kfaebQh5qZzDzXZd5EBm3qakLWbC/ODURoTbLbtARvO6cFaudffxJdWc6uvV
+	eeTj6i3tiJYk849s1C4sCu2/Kfq+f48=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-267-1LUuXaBWN4iguWB8RFg_1A-1; Tue, 04 Jun 2024 03:30:56 -0400
+X-MC-Unique: 1LUuXaBWN4iguWB8RFg_1A-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a6917eb045bso65628966b.3
+        for <kvm@vger.kernel.org>; Tue, 04 Jun 2024 00:30:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717486255; x=1718091055;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TsL19mGL2R17JenZwmF+AzwbMkbWhCiBk2OX/4KYHpk=;
+        b=YLbRC2vHGOccKXb2x2Piyqau7iqbYdRz9zNpBwGP9DuNRB7aliZvgW/6FzAIUALdD9
+         WzM3IkTfDXBVDgoI3I/vKhoaO0QK2xRHHcvbi0rvI0SOk8WxkDmLpzzZ66Zx2E5i3Dp1
+         iJiDGrOBuzKgKTKnKh/LhCXBAdYwAUXQUXEmGBfvwW9oplaKP9ybNkiLvZR3v7zltE6Y
+         C84BJrxtgw9sErnf+26AokilRxpS1RPGm4Os3ADzr4FzVo8uXqhXcw2Cbvef3o/dhqPH
+         +mSzmkvVO+LbbZwEGOb6aSFxNyGVlGVFTjE2XEpDiZ/UHHedrs8boa2ol4p2raVR2X3C
+         fdQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUv2kBOmMF5q1xxSoHYCcF55uWlyx8MNjJUf6j1PoPBxVzhJJ5t2CByPl/tc+iL1hGwgNgsg1Wc9sPvUmkWNNPU7c7
+X-Gm-Message-State: AOJu0YyfquGVdiHXx7nEO3qnFJO4tgp7Z9lZU0N66wnK+/bqyP9x+1Yw
+	DWi5U4ERn51zzu5tG+a+feNoKGcSdXHyknqSMSXphTbA9UWZk4iZx0VfNjBC/0FD/VEWFl2e0jb
+	C04W3u3v/E9Ag7J3OetKDPb8Pt0V1KwAZ+/B3MCLmaZMnEXYqBw==
+X-Received: by 2002:a17:906:3411:b0:a68:f6c7:fed5 with SMTP id a640c23a62f3a-a68f6c7ffffmr333746266b.34.1717486255376;
+        Tue, 04 Jun 2024 00:30:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFl4u9DCCzR7ZL9ZSxjy8x1q2NwB/erh1Hb52yDr4RfsMA8vvObCE0FdOfURN/kSozOxH7c5A==
+X-Received: by 2002:a17:906:3411:b0:a68:f6c7:fed5 with SMTP id a640c23a62f3a-a68f6c7ffffmr333744466b.34.1717486254987;
+        Tue, 04 Jun 2024 00:30:54 -0700 (PDT)
+Received: from [192.168.0.4] (ip-109-43-178-97.web.vodafone.de. [109.43.178.97])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a68fbf068fesm315229066b.26.2024.06.04.00.30.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jun 2024 00:30:54 -0700 (PDT)
+Message-ID: <75adb602-7ccc-4dcd-916e-5f79fcd1cdd3@redhat.com>
+Date: Tue, 4 Jun 2024 09:30:52 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,93 +83,183 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] selftests: drivers/s390x: Use SKIP() during FIXTURE_SETUP
-To: Kees Cook <keescook@chromium.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Masahiro Yamada <masahiroy@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, Steffen Eiden <seiden@linux.ibm.com>
-References: <20240518001806.work.381-kees@kernel.org>
+Subject: Re: [kvm-unit-tests PATCH v9 22/31] powerpc: Add MMU support
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
+ <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
+References: <20240504122841.1177683-1-npiggin@gmail.com>
+ <20240504122841.1177683-23-npiggin@gmail.com>
+From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240518001806.work.381-kees@kernel.org>
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240504122841.1177683-23-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: F1D71ipIsyXGVV7YisShVYtUIgHGDYPE
-X-Proofpoint-ORIG-GUID: 8UteM9o0JBq9NV-bJRO4cCVimPRh_KlO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.650,FMLib:17.12.28.16
- definitions=2024-06-04_03,2024-05-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- impostorscore=0 suspectscore=0 malwarescore=0 phishscore=0
- lowpriorityscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=393
- clxscore=1011 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406040059
 
-On 5/18/24 02:18, Kees Cook wrote:
-> Instead of mixing selftest harness and ksft helpers, perform SKIP
-> testing from the FIXTURE_SETUPs. This also means TEST_HARNESS_MAIN does
-> not need to be open-coded.
+On 04/05/2024 14.28, Nicholas Piggin wrote:
+> Add support for radix MMU, 4kB and 64kB pages.
 > 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> This also adds MMU interrupt test cases, and runs the interrupts
+> test entirely with MMU enabled if it is available (aside from
+> machine check tests).
+> 
+> Acked-by: Andrew Jones <andrew.jones@linux.dev> (configure changes)
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
+...
+> diff --git a/lib/ppc64/mmu.c b/lib/ppc64/mmu.c
+> new file mode 100644
+> index 000000000..5307cd862
+> --- /dev/null
+> +++ b/lib/ppc64/mmu.c
+> @@ -0,0 +1,281 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Radix MMU support
+> + *
+> + * Copyright (C) 2024, IBM Inc, Nicholas Piggin <npiggin@gmail.com>
+> + *
+> + * Derived from Linux kernel MMU code.
+> + */
+> +#include <asm/mmu.h>
+> +#include <asm/setup.h>
+> +#include <asm/smp.h>
+> +#include <asm/page.h>
+> +#include <asm/io.h>
+> +#include <asm/processor.h>
+> +#include <asm/hcall.h>
+> +
+> +#include "alloc_page.h"
+> +#include "vmalloc.h"
+> +#include <asm/pgtable-hwdef.h>
+> +#include <asm/pgtable.h>
+> +
+> +#include <linux/compiler.h>
+> +
+> +static pgd_t *identity_pgd;
+> +
+> +bool vm_available(void)
+> +{
+> +	return cpu_has_radix;
+> +}
+> +
+> +bool mmu_enabled(void)
+> +{
+> +	return current_cpu()->pgtable != NULL;
+> +}
+> +
+> +void mmu_enable(pgd_t *pgtable)
+> +{
+> +	struct cpu *cpu = current_cpu();
+> +
+> +	if (!pgtable)
+> +		pgtable = identity_pgd;
+> +
+> +	cpu->pgtable = pgtable;
+> +
+> +	mtmsr(mfmsr() | (MSR_IR|MSR_DR));
+> +}
+> +
+> +void mmu_disable(void)
+> +{
+> +	struct cpu *cpu = current_cpu();
+> +
+> +	cpu->pgtable = NULL;
+> +
+> +	mtmsr(mfmsr() & ~(MSR_IR|MSR_DR));
+> +}
+> +
+> +static inline void tlbie(unsigned long rb, unsigned long rs, int ric, int prs, int r)
+> +{
+> +	asm volatile(".machine push ; .machine power9; ptesync ; tlbie %0,%1,%2,%3,%4 ; eieio ; tlbsync ; ptesync ; .machine pop" :: "r"(rb), "r"(rs), "i"(ric), "i"(prs), "i"(r) : "memory");
 
-Adding the author in CC.
+That's a very long line, please split it up after every assembly instruction 
+(using \n for new lines).
 
+> +}
+...
+> diff --git a/powerpc/mmu.c b/powerpc/mmu.c
+> new file mode 100644
+> index 000000000..fef790506
+> --- /dev/null
+> +++ b/powerpc/mmu.c
+> @@ -0,0 +1,283 @@
+> +/* SPDX-License-Identifier: LGPL-2.0-only */
+> +/*
+> + * MMU Tests
+> + *
+> + * Copyright 2024 Nicholas Piggin, IBM Corp.
+> + */
+> +#include <libcflat.h>
+> +#include <asm/atomic.h>
+> +#include <asm/barrier.h>
+> +#include <asm/processor.h>
+> +#include <asm/mmu.h>
+> +#include <asm/smp.h>
+> +#include <asm/setup.h>
+> +#include <asm/ppc_asm.h>
+> +#include <vmalloc.h>
+> +#include <devicetree.h>
+> +
+> +static inline void tlbie(unsigned long rb, unsigned long rs, int ric, int prs, int r)
+> +{
+> +	asm volatile(".machine push ; .machine power9; ptesync ; tlbie %0,%1,%2,%3,%4 ; eieio ; tlbsync ; ptesync ; .machine pop" :: "r"(rb), "r"(rs), "i"(ric), "i"(prs), "i"(r) : "memory");
+> +}
 
-This changes the skip behavior from one single skip to a skip per test.
-Not an issue, but a change.
+Same function again? Maybe it could go into mmu.h instead?
 
-But also we're generating invalid TAP AFAIK which we also have been 
-before but we can fix that in this patch.
+> +static inline void tlbiel(unsigned long rb, unsigned long rs, int ric, int prs, int r)
+> +{
+> +	asm volatile(".machine push ; .machine power9; ptesync ; tlbiel %0,%1,%2,%3,%4 ; ptesync ; .machine pop" :: "r"(rb), "r"(rs), "i"(ric), "i"(prs), "i"(r) : "memory");
+> +}
 
- From what I understand this line should have a "#" prefix to show that 
-it's a comment:
-Enable CONFIG_S390_UV_UAPI and check the access rights on /dev/uv.
+Please also split up the above long line.
+
+It would also be cool if you could get one of the other ppc guys at IBM to 
+review this patch, since I don't have a clue about this MMU stuff at all.
+
+  Thanks,
+   Thomas
 
 
