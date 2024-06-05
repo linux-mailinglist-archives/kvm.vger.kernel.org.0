@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-18901-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18902-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB50B8FCF5E
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:33:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E79738FD029
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:55:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 717E9281FCC
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 13:33:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A6D7B242B2
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 13:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D5A6196DB8;
-	Wed,  5 Jun 2024 13:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5CB197521;
+	Wed,  5 Jun 2024 13:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pjCUvnoe"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="i0QwmtSk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB0E13AD29;
-	Wed,  5 Jun 2024 13:06:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272CC14BF99;
+	Wed,  5 Jun 2024 13:06:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717592800; cv=none; b=IsmZE8qP7beDesIaG/2GqyFLql1BI2WdCAo5KKCumTjk8QVCoj/xmXeWg7heTiW6drLPYCL0lGEbWQ+3QcIj5ZncKJH/aMfxd1Lc3FsNx2VUUgwle4JvE3reWkTNHp4kIe1578eRbjY/+FvtGqiBXtuV7TgJ7Q2Vio/e2I7JNqg=
+	t=1717592810; cv=none; b=bb2GvrDFrpLbDQihKdIPPsaGsFPs00stA6KGdwW3DSZjqZc7m9FMofd+eBei2M66BdMrbLniiDS0KZscWEW2mMxkdPQ8RZvD7RlCwgBWmVDBpGKQedwf7eV9mdFakKIz91rT6zIPFK0a6NBBYeT+75sJN0P+W7Th/wYqlOmF220=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717592800; c=relaxed/simple;
-	bh=bFODH12hHt4ra0Lgx2QerhZko1YMpQke631INN2+Xis=;
+	s=arc-20240116; t=1717592810; c=relaxed/simple;
+	bh=gh570KNSCoGTloofXXJgP8M/IG5ml6UIGK3blzJH8Ec=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N9KF0cOrSN8czWr2yaTR6D3xENAVoPoaQZfGXXPm4SA4uIZI7rBs/huL/HKf6QShzLdxvCK8IZ/RZbhx0BCjYXubKt9ENtrCBSa7YJmbtU3UZ8BHiHAU4aHkOibtuy27v8+59bPn4/dj+4IhuUgqFwPNA4QwhxaRpcnMB4zoB68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pjCUvnoe; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version:Content-Type; b=Wl9euKx3JrS+SbqnytXZK1kenaPVijL/ZIk/i0kUx49cCsydTazJrkSea3zX0BJsWr2UQXFg4Itp/v8NEKs4f27j9h554LDSi1m2ytKU5EB8qXMrtGqHRBSFZnq5HEZzxHxgP2LmjxRoJnUtfUrMKM2c8Wkqt03uLYq8cPzFdgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=i0QwmtSk; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455BwRkO013318;
-	Wed, 5 Jun 2024 13:06:26 GMT
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455CdOEe007319;
+	Wed, 5 Jun 2024 13:06:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
  content-transfer-encoding : content-type : date : from : in-reply-to :
  message-id : mime-version : references : subject : to; s=pp1;
- bh=vdD2kV2ciIb0bdEkPikaucEiFf7CKhySLdmRLgn4sA4=;
- b=pjCUvnoeKkFeuZIukHmQc8sDQYQtVVQjhAbl5BCOJ/T7GTK4HnGm8GDE5crGg+Lem6Ey
- JlzUAOIw0x+wvh9SrDo6MMcEb454iBgeQ0x5qFJnc3IT0+sgzvD8jEVve4RFTytjBQFL
- pZ64cjK7KykZDsXqi3avd7hwftSLBwnj5Dm00VpJQYybmOrNECc5Gv4kT3b740axt7u7
- gGO3AJv3SFLRgaikwj7rs+nqHgb+83JBhjYGChXc6JWCS1g+7Du2M5uhxXMsi3PwAq1o
- OUqNbOqT8edfd82ZCJWaiFjpyyVDvTTORaV3AFJ8hZ82+72ubyr3slPzUlU+43MUpngf Bw== 
+ bh=q5FvJzhb5nLV1oH9/w5ayFd7+TAjNgxMSRPcWAmJp+w=;
+ b=i0QwmtSkYkGB5Np+kW+I/e4JB+5xHf2JkJX/SnAlI0a7US53rzu9Zdx9keUkMz28B2gV
+ tHgLUtvGimefXxquPcGiq4iJfxCpnNuwQHp9UdPc/amjNR4hxfRH/bSH8Tbv9vmBzdYp
+ bwpkkT8RmY4aXObdS+mMXXosaUlVqaQ538UyG5h+2kl8ZiV1mrt7KMuYEMUX/u7c5pBX
+ lxv/YMr0BTuYzee7ZoWW7JDAFDTCIB0TWLQLKErA/G8l9tM171FeRshfzrivwrphxeWx
+ 8pYDiP4Lu880zntKpFOyB3KmkQLaapaQSz7igF/d9tkkIIHaViCQKn21dYhjOpvjGTI1 Hg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjqksg5wy-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjr6rr2hc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 13:06:25 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 455D6Pwe020642;
-	Wed, 5 Jun 2024 13:06:25 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjqksg5wu-1
+	Wed, 05 Jun 2024 13:06:37 +0000
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 455D32tu013027;
+	Wed, 5 Jun 2024 13:06:37 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjr6rr2h8-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 13:06:25 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 455CuXSF008483;
-	Wed, 5 Jun 2024 13:06:24 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygec0ve4h-1
+	Wed, 05 Jun 2024 13:06:37 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4559mbLA031142;
+	Wed, 5 Jun 2024 13:06:36 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygeypm7wx-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 13:06:24 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 455D6Ie543123166
+	Wed, 05 Jun 2024 13:06:36 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 455D6U7O43843926
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Jun 2024 13:06:20 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CC48F20043;
-	Wed,  5 Jun 2024 13:06:18 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D522E20040;
-	Wed,  5 Jun 2024 13:06:16 +0000 (GMT)
+	Wed, 5 Jun 2024 13:06:33 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D2FDC20040;
+	Wed,  5 Jun 2024 13:06:30 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B177320043;
+	Wed,  5 Jun 2024 13:06:28 +0000 (GMT)
 Received: from [172.17.0.2] (unknown [9.3.101.175])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Jun 2024 13:06:16 +0000 (GMT)
-Subject: [PATCH v2 1/8] KVM: PPC: Book3S HV: Fix the set_one_reg for MMCR3
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  5 Jun 2024 13:06:28 +0000 (GMT)
+Subject: [PATCH v2 2/8] KVM: PPC: Book3S HV: Fix the get_one_reg of SDAR
 From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 To: kvm@vger.kernel.org, linux-doc@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
@@ -83,8 +83,8 @@ Cc: pbonzini@redhat.com, naveen.n.rao@linux.ibm.com,
         namhyung@kernel.org, npiggin@gmail.com, pbonzini@redhat.com,
         sbhat@linux.ibm.com, jniethe5@gmail.com, atrajeev@linux.vnet.ibm.com,
         linux-kernel@vger.kernel.org
-Date: Wed, 05 Jun 2024 13:06:16 +0000
-Message-ID: <171759276847.1480.16387950124201117847.stgit@linux.ibm.com>
+Date: Wed, 05 Jun 2024 13:06:28 +0000
+Message-ID: <171759278410.1480.16404209606556979576.stgit@linux.ibm.com>
 In-Reply-To: <171759276071.1480.9356137231993600304.stgit@linux.ibm.com>
 References: <171759276071.1480.9356137231993600304.stgit@linux.ibm.com>
 User-Agent: StGit/1.5
@@ -97,21 +97,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _uroXx4SWxJkaUHZX35i31gmaoA9GpPf
-X-Proofpoint-ORIG-GUID: NDXqzQ_AWnsL6Z9fVkZnBgbEm4yKKCZK
+X-Proofpoint-GUID: ib8xQCiLpwIpmCuNewKVB8bvPbFNUqQ-
+X-Proofpoint-ORIG-GUID: jhkd-epoNR96V4rinoQHznG5uACL4Pqg
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-06-05_02,2024-06-05_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- suspectscore=0 phishscore=0 priorityscore=1501 lowpriorityscore=0
- impostorscore=0 mlxlogscore=637 spamscore=0 adultscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406050099
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
+ impostorscore=0 mlxlogscore=619 adultscore=0 suspectscore=0 malwarescore=0
+ lowpriorityscore=0 priorityscore=1501 mlxscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
+ definitions=main-2406050099
 
-The kvmppc_set_one_reg_hv() wrongly get() the value
-instead of set() for MMCR3. Fix the same.
+The kvmppc_get_one_reg_hv() for SDAR is wrongly getting the SIAR
+instead of SDAR, possibly a paste error emanating from the previous
+refactoring.
 
-Fixes: 5752fe0b811b ("KVM: PPC: Book3S HV: Save/restore new PMU registers")
+Patch fixes the wrong get_one_reg() for the same.
+
+Fixes: ebc88ea7a6ad ("KVM: PPC: Book3S HV: Use accessors for VCPU registers")
 Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
 Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
 ---
@@ -119,18 +122,18 @@ Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index daaf7faf21a5..a4f34f94c86f 100644
+index a4f34f94c86f..b576781d58d5 100644
 --- a/arch/powerpc/kvm/book3s_hv.c
 +++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -2540,7 +2540,7 @@ static int kvmppc_set_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
- 		vcpu->arch.mmcrs = set_reg_val(id, *val);
+@@ -2305,7 +2305,7 @@ static int kvmppc_get_one_reg_hv(struct kvm_vcpu *vcpu, u64 id,
+ 		*val = get_reg_val(id, kvmppc_get_siar_hv(vcpu));
  		break;
- 	case KVM_REG_PPC_MMCR3:
--		*val = get_reg_val(id, vcpu->arch.mmcr[3]);
-+		kvmppc_set_mmcr_hv(vcpu, 3, set_reg_val(id, *val));
+ 	case KVM_REG_PPC_SDAR:
+-		*val = get_reg_val(id, kvmppc_get_siar_hv(vcpu));
++		*val = get_reg_val(id, kvmppc_get_sdar_hv(vcpu));
  		break;
- 	case KVM_REG_PPC_PMC1 ... KVM_REG_PPC_PMC8:
- 		i = id - KVM_REG_PPC_PMC1;
+ 	case KVM_REG_PPC_SIER:
+ 		*val = get_reg_val(id, kvmppc_get_sier_hv(vcpu, 0));
 
 
 
