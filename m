@@ -1,182 +1,142 @@
-Return-Path: <kvm+bounces-18853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F90F8FC53B
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 09:56:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32C128FC551
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 10:04:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9399FB2375D
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 07:56:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A524C1F24512
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 08:04:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AE418F2D0;
-	Wed,  5 Jun 2024 07:56:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5952E18F2C4;
+	Wed,  5 Jun 2024 08:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKNsysE+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IxLxnyLC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266AE15E5A2;
-	Wed,  5 Jun 2024 07:56:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7530D1922FC;
+	Wed,  5 Jun 2024 08:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717574200; cv=none; b=hZl+49KvgqFldwIhMNUHp3fUGblS/UwzJjfUSbFh1eKC6CE3Trsufj0jTJYX6diG+l/XxYR+jg6DlYexwwFVYBLcoCN113jG72EvWTLhDo3Hx6XvAyPIBSurbvBDNn5eYg+7GtG+6EWnmqQG7haKN7kVIQif9lHjcAIkNAtYQL4=
+	t=1717574651; cv=none; b=FOmM6ch9g7aQtcEb4b1BcTSBhIHnVDyb9yjtPUVuvwUj8ZqkOAArE+GIOzBU3TN0pRRJZukGjN3L9Bo35V8RMeTeunKnVaw7JxRFs1+NF6dmdsO+uRmb1c7CF3dZfGs0tmmlEoKIRP5zmHhnZ69iO0VQveHX5P0kgOOxqjAOxOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717574200; c=relaxed/simple;
-	bh=SrMwiri/fv5VbxUe1nm98++rbHYD+JdlXdKw90ZRXqU=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=szwTpBlEcvn8shVam0LTTLUrxbs6VNDmGvfG2aKSK2LfEgTxJShYDIPrxNXQT+NZ5KeFlzCakkb2Av8thr4oDCknNXlQg+i1qbxr/NWNtxfhzDnC4IoHSlkoiafmZXeLCMrmMjz61FS7OREq21Iyl+4HHO0DTe1caV2MbQlVaAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKNsysE+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F12BFC3277B;
-	Wed,  5 Jun 2024 07:56:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717574200;
-	bh=SrMwiri/fv5VbxUe1nm98++rbHYD+JdlXdKw90ZRXqU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BKNsysE+JPMhfwHiglgXg1P2pg4cgyhhcDpjTikJsgvI9MwiyJgEQIQjP+HtbSfW5
-	 XzprlmBIbicEHCa86FUXRCLVu0cDxYF5Gj7r/lK1MwjgXTMRLhBEMwd1bsJ2Syh2rC
-	 iqa1BZyczGT7fZZfeJtMfEpWqRfQAzG5MsOyLXGwYniVhGizK9iJxw3kUKH9nLf/pJ
-	 3VRkAXpnOV5qqdIy0B+nbfMSc1Y8iRROqnf54oA4sH1AcQ2W0NcJ8fFNC9TbESmxY6
-	 neLnaRSCAS1TX0Gv2vf8Hl6XDscT4c7TI/Wb4CJSBSREZBd+vIa8IqIsWjiDtQ/Pnf
-	 wNeJ113H4IAQQ==
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sElVd-000q4X-Sq;
-	Wed, 05 Jun 2024 08:56:38 +0100
-Date: Wed, 05 Jun 2024 08:56:36 +0100
-Message-ID: <87ed9b3jrf.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v2 12/16] KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
-In-Reply-To: <Zl4F45W_FoVr89zl@linux.dev>
-References: <20240529145628.3272630-1-maz@kernel.org>
-	<20240529145628.3272630-13-maz@kernel.org>
-	<Zl4F45W_FoVr89zl@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1717574651; c=relaxed/simple;
+	bh=WKQnc3QTe0PxphsvXKC79sDS7wi3IedNFAMTiPs5h0c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Lx1f5gYg1FkqW2WzQoY7ADF3S3n3ngqVO3MaWvnvSuqXiAV7PpkgaoVPjHXaTZ21FDzdjptdekDd8ClyBHk1SfTvtSquhFpqylsN5buhVeF5wZ6jngwYa3xw3Z/zrp+Br6jIX4HhDxK9vGc+ySiyw1i7RvHDJwpJ2O0JUwLsnws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IxLxnyLC; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4557ol44019906;
+	Wed, 5 Jun 2024 08:04:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
+ content-transfer-encoding : content-type : date : from : in-reply-to :
+ message-id : mime-version : references : subject : to; s=pp1;
+ bh=Lktxp1xHnwpzLetO0Bqvbde0xJLvKLX2c4YkPCMknos=;
+ b=IxLxnyLCh+eeegt+nH9oyhu3ZMVxyzQfL8qIM6dooKDuwCi2XZKWHC040kjFpFK1y1ED
+ m/5Bkjar2RIBwaUGCzmpW+DTxSeyQUfBbwEGgLDRmoq9RYbCEMJJtuNr35Sx5oLWOIFz
+ W3TrlLg7kJTd3SY91vu9v2p0A/rEi5zNsmX40faOSy6nsQJgGOZLYkIBrP85Rcd9q5O3
+ a1C57G2+HD/B7MQ9dKYvQhX5Olq2XpqKpCnaKJrrJaSG5/pq9y6twhTQaqzFxegNmf2g
+ 98n5jqaW3wbyNuiO5NAdMi9jGIzlbzdo2g2NXNOjK7Ee2kbJe/oVS0qZHAYOo04dt+0D RA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjjm5g97m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 08:04:08 +0000
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4558476u010748;
+	Wed, 5 Jun 2024 08:04:07 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjjm5g97j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 08:04:07 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 455828SJ026652;
+	Wed, 5 Jun 2024 08:04:06 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yggp32hfg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jun 2024 08:04:06 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4558402a22282692
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Jun 2024 08:04:03 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E19EF2004B;
+	Wed,  5 Jun 2024 08:04:00 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6918920040;
+	Wed,  5 Jun 2024 08:04:00 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.49.245])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Wed,  5 Jun 2024 08:04:00 +0000 (GMT)
+From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
+To: Nicholas Piggin <npiggin@gmail.com>, linux-s390@vger.kernel.org,
+        Thomas
+ Huth <thuth@redhat.com>
+Cc: kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        Nico Boehr
+ <nrb@linux.ibm.com>, Steffen Eiden <seiden@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v1 0/3] s390x: small Makefile improvements
+In-Reply-To: <D1RP1BC65XW5.NC0D2AFAL0TD@gmail.com>
+References: <20240604115932.86596-1-mhartmay@linux.ibm.com>
+ <D1RP1BC65XW5.NC0D2AFAL0TD@gmail.com>
+Date: Wed, 05 Jun 2024 10:03:59 +0200
+Message-ID: <87jzj3eryo.fsf@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: UZ6VEKp1wLGlkQ3dbfSa_qSUy9Pi-i3C
+X-Proofpoint-GUID: VC39B002tDEYLwsmX__CWuK-v7zZ1J-v
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-04_11,2024-06-05_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 adultscore=0 malwarescore=0 mlxscore=0 suspectscore=0
+ phishscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=731
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2405010000 definitions=main-2406050059
 
-On Mon, 03 Jun 2024 19:05:23 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Wed, May 29, 2024 at 03:56:24PM +0100, Marc Zyngier wrote:
-> > Populate bits [56:55] of the leaf entry with the level provided
-> > by the guest's S2 translation. This will allow us to better scope
-> > the invalidation by remembering the mapping size.
-> > 
-> > Of course, this assume that the guest will issue an invalidation
-> > with an address that falls into the same leaf. If the guest doesn't,
-> > we'll over-invalidate.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_nested.h |  8 ++++++++
-> >  arch/arm64/kvm/mmu.c                | 17 +++++++++++++++--
-> >  2 files changed, 23 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> > index fcb0de3a93fe..971dbe533730 100644
-> > --- a/arch/arm64/include/asm/kvm_nested.h
-> > +++ b/arch/arm64/include/asm/kvm_nested.h
-> > @@ -5,6 +5,7 @@
-> >  #include <linux/bitfield.h>
-> >  #include <linux/kvm_host.h>
-> >  #include <asm/kvm_emulate.h>
-> > +#include <asm/kvm_pgtable.h>
-> >  
-> >  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
-> >  {
-> > @@ -195,4 +196,11 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
-> >  }
-> >  #endif
-> >  
-> > +#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
-> > +
-> > +static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
-> > +{
-> > +	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
-> > +}
-> > +
-> 
-> It might be nice to keep all of the software fields for (in)valid in
-> a central place so we can add some documentation. I fear this is going
-> to get rather complicated as more pieces of pKVM land upstream and we
-> find new and fun ways to cram data into stage-2.
+On Wed, Jun 05, 2024 at 11:30 AM +1000, "Nicholas Piggin" <npiggin@gmail.co=
+m> wrote:
+> On Tue Jun 4, 2024 at 9:59 PM AEST, Marc Hartmayer wrote:
+>> The first patch is useful anyway, the third could be dropped to be consi=
+stent
+>> with the other architectures.
+>
+> Interesting. Is this the reason for the warning on all the other
+> archs?
 
-I had that at some point, but it then became clear that pKVM and NV
-were pretty much incompatible in their current respective incarnation.
-To get them to play together, you'd need to reinvent the NV wheel
-solely at EL2, something that nobody is looking forward to.
+Could be, but the .eh_frame and .eh_frame_hdr sections are sometimes
+required, e.g for __builtin_return_address(n),=E2=80=A6. Another fix would =
+be to
+specify the sections in the linker scripts explicitly - but I=E2=80=99ve to=
+ ask
+whether this has other side effects=E2=80=A6
 
-What I'm aiming at with this digression is that although they use the
-same bits, NV and pKVM are never using them at the same time. If we
-shove them at the same location, we make it less clear what is used
-when (hence pKVM keeping its toys in mem_protect.h).
+> Maybe they should all use the same options and all remove the explicit
+> PHDR specification?
+>
+> Thanks,
+> Nick
+>
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
 
-But maybe you had a scheme in mind that would avoid this situation?
-
-> 
-> >  #endif /* __ARM64_KVM_NESTED_H */
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 4ed93a384255..f3a8ec70bd29 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1598,11 +1598,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >  	 * Potentially reduce shadow S2 permissions to match the guest's own
-> >  	 * S2. For exec faults, we'd only reach this point if the guest
-> >  	 * actually allowed it (see kvm_s2_handle_perm_fault).
-> > +	 *
-> > +	 * Also encode the level of the nested translation in the SW bits of
-> > +	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
-> > +	 * the guest.
-> 
-> typo: retrieved
-> 
-> Also, it might be helpful to add some color here to indicate the encoded
-> TTL is used to represent the span of a single virtual TLB entry,
-> providing scope to the TLBI by address.
-> 
-> Before I actually read what was going on, I thought the TTL in the PTE
-> was used for matching invalidation scopes that have a valid TTL.
-
-How about this:
-
-/*
- * Also encode the level of the original translation in the SW bits of
- * the leaf entry as a proxy for the span of that translation. This will
- * be retrieved on TLB invalidation from the guest and used to limit
- * the invalidation scope if a TTL hint or a range isn't provided.
- */
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Wolfgang Wendt
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
 
