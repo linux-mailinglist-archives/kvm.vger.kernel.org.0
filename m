@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-18888-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F341C8FCB95
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 14:03:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 244588FCBE4
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 14:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2E401C20310
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 12:03:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FEAE1F22415
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 12:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E40A1993B7;
-	Wed,  5 Jun 2024 11:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAE81AD9FD;
+	Wed,  5 Jun 2024 11:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XNrPJHRQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBjP+psr"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD7F1993A2;
-	Wed,  5 Jun 2024 11:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED211AE202;
+	Wed,  5 Jun 2024 11:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588315; cv=none; b=geXW870VoYen957WVzl4wbT8H+gtDFaEeguBG/X76kajo9EQTm3ak0uZ6proeJs6pUcOy4ZbhMwS/cAAu8r+2ZbPNxAbLGL2a55lmiPFOiToM0xhYLwJWLuAQ80Vp7c5fmAxf9LAz4EjvTURsh0959D/XvYQnu8ytDWwAWc/+o8=
+	t=1717588391; cv=none; b=SNJIYlNkFglzalosvCr5IMpFcRVbVy7JKC8elchPa1mKgbfb+QKXqoDU6LBzjRD71mKXV8xKqTHw4kjLyVNutVjbkh0T8JGfp1oWMfekV/0MI+tEqZjZWg3J7S0N/Gu0w+m/L7IlzaxgiTYJa77VgPuMlQk1StRs6SWZAtDTbgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588315; c=relaxed/simple;
-	bh=wTGxpeMDl7ktLsRwwZCmnIq5NY9bLgG0v1h1i6JifvY=;
+	s=arc-20240116; t=1717588391; c=relaxed/simple;
+	bh=gKGbnWUlK45gYr4mXM1Dq31RmR2fixXLcrY5HjbP03c=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WWYs4d0HcTLdunSCVEVnyirHfjLS1EuXeRXAPMvfvLaWOS2uUf6yLdtMBUuPM/j7FkmBnKq8Mwk3Z3jdTZb65WMWscyxJoMlIWz9C94UwUbPN5ACckjLrBd/OTrP94efxpaZmzYMp7n1rkfgkauFgmlf7IpmUxCKQ2tXvR1CFVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XNrPJHRQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCCB8C32786;
-	Wed,  5 Jun 2024 11:51:53 +0000 (UTC)
+	 MIME-Version; b=IH+MYcAKxbOQOhWem4ZUWKNEbxAMdq4X846tSYcN0UrLwp8GHjjAEkIo+pqS1DV3bRMvALHQW142v7XcPA1rnWU/1wq0OZ2kenEPcq1LSxQOerosUd2vYrUyB8SOU2H3ku9Ufb/+rTraqbYoeCDxxys2CJRQjXINdqWdoqZckGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBjP+psr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D01BEC32781;
+	Wed,  5 Jun 2024 11:53:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717588315;
-	bh=wTGxpeMDl7ktLsRwwZCmnIq5NY9bLgG0v1h1i6JifvY=;
+	s=k20201202; t=1717588391;
+	bh=gKGbnWUlK45gYr4mXM1Dq31RmR2fixXLcrY5HjbP03c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=XNrPJHRQTeQNh7ZpZqIZbN5ELV6CpssyrO2kEDwz3taeSgJryFDewKYm+06Y6j8dT
-	 t4osimWZeaBlEaXn0czpB2/8x+7J8P6Cw0rwPNDQ4qTyfJK5P4ZMEKyhOzQzINfpqw
-	 5rK3X/igj130lJW6IAHonsu3IW+lYuw0DUcAFN8fqEPNHNylX8/YJwE+y4DL3U4Lup
-	 LPnweotZLX17mIMkAKU+so/enUhBF0Hn7cGELKiuOW16Id8bGFNtYGdRW+52kKIKUb
-	 b3wZ6vgtr3ytcJBrKu5W11SQzhTeIPunqRuoqjzP650SWIlvyVp2MntubKshHXz7I4
-	 iySPKGQaHL3lA==
+	b=oBjP+psrHevZMbDsP2xNA6WEFGwa9Dhq+XkX9yeUF9654wZFUUzHIh7ArGWoXns1C
+	 gahP/tv2p8qUAtr/XcWJaKsvRPFq1kIAepfJB2OOmDuMQKjKG3rD0H1Td2eF6AwJEV
+	 QdHeqkQlNgmEFZXckVdnbkg4w3WTlS4cYDDPGHxFZXWFdEPQSguKe/DhtWFqcjHDjR
+	 rqYZESDPxQk4fj/Rc7+ZVn/rHQmibd+zyc5abPES1r/H3vNqeydDAZtIJ6cEZGcKZs
+	 zPA/2Vo0vQOOTB734JsosiVe/zOB3bUp4jdF4uIl7IEtF5zprTV1C98duWMAtLnK31
+	 VUDamNjPcsYBQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -52,15 +52,16 @@ Cc: Alex Williamson <alex.williamson@redhat.com>,
 	kevin.tian@intel.com,
 	eric.auger@redhat.com,
 	stefanha@redhat.com,
-	ankita@nvidia.com,
+	chentao@kylinos.cn,
 	brauner@kernel.org,
+	ankita@nvidia.com,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 20/24] vfio/pci: Collect hot-reset devices to local buffer
-Date: Wed,  5 Jun 2024 07:50:30 -0400
-Message-ID: <20240605115101.2962372-20-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 17/20] vfio/pci: Collect hot-reset devices to local buffer
+Date: Wed,  5 Jun 2024 07:52:00 -0400
+Message-ID: <20240605115225.2963242-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240605115101.2962372-1-sashal@kernel.org>
-References: <20240605115101.2962372-1-sashal@kernel.org>
+In-Reply-To: <20240605115225.2963242-1-sashal@kernel.org>
+References: <20240605115225.2963242-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -69,7 +70,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.8.12
+X-stable-base: Linux 6.6.32
 Content-Transfer-Encoding: 8bit
 
 From: Alex Williamson <alex.williamson@redhat.com>
@@ -251,7 +252,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 49 insertions(+), 29 deletions(-)
 
 diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 1cbc990d42e07..142c9e494e506 100644
+index 1929103ee59a3..a3c545dd174ee 100644
 --- a/drivers/vfio/pci/vfio_pci_core.c
 +++ b/drivers/vfio/pci/vfio_pci_core.c
 @@ -778,25 +778,26 @@ static int vfio_pci_count_devs(struct pci_dev *pdev, void *data)
