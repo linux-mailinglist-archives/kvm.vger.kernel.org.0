@@ -1,129 +1,182 @@
-Return-Path: <kvm+bounces-18852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8368FC518
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 09:52:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F90F8FC53B
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 09:56:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D9A81C2228A
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 07:52:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9399FB2375D
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 07:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D26318F2C7;
-	Wed,  5 Jun 2024 07:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AE418F2D0;
+	Wed,  5 Jun 2024 07:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWESh61V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKNsysE+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47B1018C350
-	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 07:52:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266AE15E5A2;
+	Wed,  5 Jun 2024 07:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717573948; cv=none; b=h8PrgOJ9lNuH4WTTLDEZU1IsWEWi9XciZ1JY+4kqocayb7s9mh8LC9T14lkCGxY+TbCBlvguKB21AHszyjhCxhjC4KSCxgoqfLajSKTjvHtijmLmPKAffBTQti72LXNrtmyMyCWFueJs8fJqg03RE0GP5B5uzt38hhUP+q4UxIw=
+	t=1717574200; cv=none; b=hZl+49KvgqFldwIhMNUHp3fUGblS/UwzJjfUSbFh1eKC6CE3Trsufj0jTJYX6diG+l/XxYR+jg6DlYexwwFVYBLcoCN113jG72EvWTLhDo3Hx6XvAyPIBSurbvBDNn5eYg+7GtG+6EWnmqQG7haKN7kVIQif9lHjcAIkNAtYQL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717573948; c=relaxed/simple;
-	bh=6lIh0cLxT50JftfUA2rP85KmtIiPU5OgAnjec/yxyuM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=DACkcES10UKypjVxcJnxDzpPwxOOJukWleknUlSNuEiw0E5dm6vKakWUjjXJmj2G50S3WvcdHBtvOsKbDEpfh+24ErGu33f7oy3gTC9C4y3QZncbxJNee31VuEazWrGUDIRyb9YYAO2jv22AQb19k2k6x8zhdpqK6TSUeEoDZ68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CWESh61V; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-6c702226b0aso490877a12.1
-        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 00:52:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717573946; x=1718178746; darn=vger.kernel.org;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6lIh0cLxT50JftfUA2rP85KmtIiPU5OgAnjec/yxyuM=;
-        b=CWESh61V5nAXS/Ca7kfTIO+dc3zH41gs2JkJPw7avsekKCeHeP3GrKZUO4ZMtqU2RL
-         wcT/oC0tfskuiuKdxxzmvLjl2zDzQD6mxojcTcwgKZBrzxqMC0IwlwLJItNobbYeL9v4
-         chQCBwksngt7Bl54GXM+MNazxL/S/0+xVHvd0sud5XK7orgPUE2xsfSRuyhihpxhK/iq
-         F7uYPclXIgOSGXYgdGs7OGkAAe08gtgk8z8Y9D9gv8XRgtX5tTc69YrKxYdvS3JFzk3l
-         URTDns0L+pQXM3qs8vn1Mf0HCsPvFE1cz1U3qiQe/c+ulqHFEzGFdBS3sPL2NC0agmXQ
-         NETQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717573946; x=1718178746;
-        h=in-reply-to:references:from:subject:cc:to:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6lIh0cLxT50JftfUA2rP85KmtIiPU5OgAnjec/yxyuM=;
-        b=BfFSKUe/vVTkNSkJjFEJfLUhyYIUS9bSXZjtM/q0BXogfnUSPa3xREFHmNW9wCJ005
-         XXrW8sGLzneAtDMCDf2d1DZUYln4iMh+d2roi+PXZu0pE7XK6H1PoJrMnHdMghJ1HHwI
-         lSbjmJroKLAAvV8gZ/+lc8SaXzR7uPZRj1qlmT1FVE/bunzZjdOFCPZDhjmulmPhhw+m
-         djeigx/zGytR9m46RcejRtoqBkZ37Jq9biVdbf/W2rmYkfH3Q4yboNvRN3qWowVEXNAY
-         Nsb+30Cw3+yRp7opTi+3vqgmx34tJREY3lqF8z4VirmoNj60U8BrEMohFZDf2I//NiAb
-         pYvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWd36Z7YRPJvzS+F555NfUigJnQxqJiRn/dy8DgYA4GHFCvp3AL5kCH1IZZALJpflqquc3K8W22OQaF05ZKUwSOEo9
-X-Gm-Message-State: AOJu0Yz5cEhbCKqmXpFyfIBToS0WDEYZW8nhEPjTaG0q1kQiio7xMoZ1
-	Qgsd4E9Of7cc4RxZCjtKZ9o4+k3692+jtVhVcxdIZ3Calryfg1kI
-X-Google-Smtp-Source: AGHT+IGVXr6rfnVkKCl0GmHT+vD4oUSiqy+kJKn93c2WNj3b48AyYPWXn64ejBs975pM51aCZ89pow==
-X-Received: by 2002:a17:90a:ca90:b0:2bf:e473:7045 with SMTP id 98e67ed59e1d1-2c2530ec9e1mr7144931a91.21.1717573946277;
-        Wed, 05 Jun 2024 00:52:26 -0700 (PDT)
-Received: from localhost ([1.146.96.134])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c2806398afsm798842a91.1.2024.06.05.00.52.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jun 2024 00:52:25 -0700 (PDT)
+	s=arc-20240116; t=1717574200; c=relaxed/simple;
+	bh=SrMwiri/fv5VbxUe1nm98++rbHYD+JdlXdKw90ZRXqU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=szwTpBlEcvn8shVam0LTTLUrxbs6VNDmGvfG2aKSK2LfEgTxJShYDIPrxNXQT+NZ5KeFlzCakkb2Av8thr4oDCknNXlQg+i1qbxr/NWNtxfhzDnC4IoHSlkoiafmZXeLCMrmMjz61FS7OREq21Iyl+4HHO0DTe1caV2MbQlVaAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKNsysE+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F12BFC3277B;
+	Wed,  5 Jun 2024 07:56:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717574200;
+	bh=SrMwiri/fv5VbxUe1nm98++rbHYD+JdlXdKw90ZRXqU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BKNsysE+JPMhfwHiglgXg1P2pg4cgyhhcDpjTikJsgvI9MwiyJgEQIQjP+HtbSfW5
+	 XzprlmBIbicEHCa86FUXRCLVu0cDxYF5Gj7r/lK1MwjgXTMRLhBEMwd1bsJ2Syh2rC
+	 iqa1BZyczGT7fZZfeJtMfEpWqRfQAzG5MsOyLXGwYniVhGizK9iJxw3kUKH9nLf/pJ
+	 3VRkAXpnOV5qqdIy0B+nbfMSc1Y8iRROqnf54oA4sH1AcQ2W0NcJ8fFNC9TbESmxY6
+	 neLnaRSCAS1TX0Gv2vf8Hl6XDscT4c7TI/Wb4CJSBSREZBd+vIa8IqIsWjiDtQ/Pnf
+	 wNeJ113H4IAQQ==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sElVd-000q4X-Sq;
+	Wed, 05 Jun 2024 08:56:38 +0100
+Date: Wed, 05 Jun 2024 08:56:36 +0100
+Message-ID: <87ed9b3jrf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v2 12/16] KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+In-Reply-To: <Zl4F45W_FoVr89zl@linux.dev>
+References: <20240529145628.3272630-1-maz@kernel.org>
+	<20240529145628.3272630-13-maz@kernel.org>
+	<Zl4F45W_FoVr89zl@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 05 Jun 2024 17:52:19 +1000
-Message-Id: <D1RX5B3PN2W3.26UX3M4SW8MLL@gmail.com>
-To: "Andrew Jones" <andrew.jones@linux.dev>, "Thomas Huth"
- <thuth@redhat.com>
-Cc: "Laurent Vivier" <lvivier@redhat.com>, <linuxppc-dev@lists.ozlabs.org>,
- <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH v9 29/31] powerpc: Remove remnants of
- ppc64 directory and build structure
-From: "Nicholas Piggin" <npiggin@gmail.com>
-X-Mailer: aerc 0.17.0
-References: <20240504122841.1177683-1-npiggin@gmail.com>
- <20240504122841.1177683-30-npiggin@gmail.com>
- <15d6ae85-a46e-4a99-a3b9-6aa6420e0639@redhat.com>
- <20240604-92e3b6502a920717bec7d780@orel>
-In-Reply-To: <20240604-92e3b6502a920717bec7d780@orel>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue Jun 4, 2024 at 11:36 PM AEST, Andrew Jones wrote:
-> On Tue, Jun 04, 2024 at 12:49:51PM GMT, Thomas Huth wrote:
-> > On 04/05/2024 14.28, Nicholas Piggin wrote:
-> > > This moves merges ppc64 directories and files into powerpc, and
-> > > merges the 3 makefiles into one.
-> > >=20
-> > > The configure --arch=3Dpowerpc option is aliased to ppc64 for
-> > > good measure.
-> > >=20
-> > > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > > ---
-> > ...
-> > > diff --git a/powerpc/Makefile b/powerpc/Makefile
-> > > index 8a007ab54..e4b5312a2 100644
-> > > --- a/powerpc/Makefile
-> > > +++ b/powerpc/Makefile
-> > > @@ -1 +1,111 @@
-> > > -include $(SRCDIR)/$(TEST_DIR)/Makefile.$(ARCH)
-> > > +#
-> > > +# powerpc makefile
-> > > +#
-> > > +# Authors: Andrew Jones <drjones@redhat.com>
-> >=20
-> > I'd maybe drop that e-mail address now since it it not valid anymore.
-> > Andrew, do want to see your new mail address here?
->
-> No need to change to my new email address. We can either keep it as is fo=
-r
-> historical records, and as part of faithful code move, or just drop it.
+On Mon, 03 Jun 2024 19:05:23 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, May 29, 2024 at 03:56:24PM +0100, Marc Zyngier wrote:
+> > Populate bits [56:55] of the leaf entry with the level provided
+> > by the guest's S2 translation. This will allow us to better scope
+> > the invalidation by remembering the mapping size.
+> > 
+> > Of course, this assume that the guest will issue an invalidation
+> > with an address that falls into the same leaf. If the guest doesn't,
+> > we'll over-invalidate.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_nested.h |  8 ++++++++
+> >  arch/arm64/kvm/mmu.c                | 17 +++++++++++++++--
+> >  2 files changed, 23 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> > index fcb0de3a93fe..971dbe533730 100644
+> > --- a/arch/arm64/include/asm/kvm_nested.h
+> > +++ b/arch/arm64/include/asm/kvm_nested.h
+> > @@ -5,6 +5,7 @@
+> >  #include <linux/bitfield.h>
+> >  #include <linux/kvm_host.h>
+> >  #include <asm/kvm_emulate.h>
+> > +#include <asm/kvm_pgtable.h>
+> >  
+> >  static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+> >  {
+> > @@ -195,4 +196,11 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
+> >  }
+> >  #endif
+> >  
+> > +#define KVM_NV_GUEST_MAP_SZ	(KVM_PGTABLE_PROT_SW1 | KVM_PGTABLE_PROT_SW0)
+> > +
+> > +static inline u64 kvm_encode_nested_level(struct kvm_s2_trans *trans)
+> > +{
+> > +	return FIELD_PREP(KVM_NV_GUEST_MAP_SZ, trans->level);
+> > +}
+> > +
+> 
+> It might be nice to keep all of the software fields for (in)valid in
+> a central place so we can add some documentation. I fear this is going
+> to get rather complicated as more pieces of pKVM land upstream and we
+> find new and fun ways to cram data into stage-2.
 
-I'll leave it, and leave it up to you to send an update email address
-patch if and when you decide.
+I had that at some point, but it then became clear that pKVM and NV
+were pretty much incompatible in their current respective incarnation.
+To get them to play together, you'd need to reinvent the NV wheel
+solely at EL2, something that nobody is looking forward to.
+
+What I'm aiming at with this digression is that although they use the
+same bits, NV and pKVM are never using them at the same time. If we
+shove them at the same location, we make it less clear what is used
+when (hence pKVM keeping its toys in mem_protect.h).
+
+But maybe you had a scheme in mind that would avoid this situation?
+
+> 
+> >  #endif /* __ARM64_KVM_NESTED_H */
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 4ed93a384255..f3a8ec70bd29 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -1598,11 +1598,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+> >  	 * Potentially reduce shadow S2 permissions to match the guest's own
+> >  	 * S2. For exec faults, we'd only reach this point if the guest
+> >  	 * actually allowed it (see kvm_s2_handle_perm_fault).
+> > +	 *
+> > +	 * Also encode the level of the nested translation in the SW bits of
+> > +	 * the PTE/PMD/PUD. This will be retrived on TLB invalidation from
+> > +	 * the guest.
+> 
+> typo: retrieved
+> 
+> Also, it might be helpful to add some color here to indicate the encoded
+> TTL is used to represent the span of a single virtual TLB entry,
+> providing scope to the TLBI by address.
+> 
+> Before I actually read what was going on, I thought the TTL in the PTE
+> was used for matching invalidation scopes that have a valid TTL.
+
+How about this:
+
+/*
+ * Also encode the level of the original translation in the SW bits of
+ * the leaf entry as a proxy for the span of that translation. This will
+ * be retrieved on TLB invalidation from the guest and used to limit
+ * the invalidation scope if a TTL hint or a range isn't provided.
+ */
 
 Thanks,
-Nick
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
