@@ -1,408 +1,210 @@
-Return-Path: <kvm+bounces-18890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18889-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 244588FCBE4
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D73C8FCBE5
 	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 14:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FEAE1F22415
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 12:08:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 298C21F21F84
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 12:08:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BAE81AD9FD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BDAF1AED20;
 	Wed,  5 Jun 2024 11:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oBjP+psr"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ncxAkJkC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2070.outbound.protection.outlook.com [40.107.96.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BED211AE202;
-	Wed,  5 Jun 2024 11:53:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588391; cv=none; b=SNJIYlNkFglzalosvCr5IMpFcRVbVy7JKC8elchPa1mKgbfb+QKXqoDU6LBzjRD71mKXV8xKqTHw4kjLyVNutVjbkh0T8JGfp1oWMfekV/0MI+tEqZjZWg3J7S0N/Gu0w+m/L7IlzaxgiTYJa77VgPuMlQk1StRs6SWZAtDTbgo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACC71AE215;
+	Wed,  5 Jun 2024 11:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717588391; cv=fail; b=DsyhpqBYEq9ggLR7HB6tmGWTtc2f5DqYfqE5rfRrl6j3YFkms1e6kok3VrvWegFey+vMejpIz5KKDHqV2zb7bZSMXsdxjf6sOizPdfzAleL9j9lgZFODJIRDj8lZ9pPDYTGLLDmBdhqzPfxBJMI7a0kiPsBMtBsM+Iql/AQqlC8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1717588391; c=relaxed/simple;
-	bh=gKGbnWUlK45gYr4mXM1Dq31RmR2fixXLcrY5HjbP03c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IH+MYcAKxbOQOhWem4ZUWKNEbxAMdq4X846tSYcN0UrLwp8GHjjAEkIo+pqS1DV3bRMvALHQW142v7XcPA1rnWU/1wq0OZ2kenEPcq1LSxQOerosUd2vYrUyB8SOU2H3ku9Ufb/+rTraqbYoeCDxxys2CJRQjXINdqWdoqZckGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oBjP+psr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D01BEC32781;
-	Wed,  5 Jun 2024 11:53:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717588391;
-	bh=gKGbnWUlK45gYr4mXM1Dq31RmR2fixXLcrY5HjbP03c=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=oBjP+psrHevZMbDsP2xNA6WEFGwa9Dhq+XkX9yeUF9654wZFUUzHIh7ArGWoXns1C
-	 gahP/tv2p8qUAtr/XcWJaKsvRPFq1kIAepfJB2OOmDuMQKjKG3rD0H1Td2eF6AwJEV
-	 QdHeqkQlNgmEFZXckVdnbkg4w3WTlS4cYDDPGHxFZXWFdEPQSguKe/DhtWFqcjHDjR
-	 rqYZESDPxQk4fj/Rc7+ZVn/rHQmibd+zyc5abPES1r/H3vNqeydDAZtIJ6cEZGcKZs
-	 zPA/2Vo0vQOOTB734JsosiVe/zOB3bUp4jdF4uIl7IEtF5zprTV1C98duWMAtLnK31
-	 VUDamNjPcsYBQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Sasha Levin <sashal@kernel.org>,
-	jgg@ziepe.ca,
-	yi.l.liu@intel.com,
-	kevin.tian@intel.com,
-	eric.auger@redhat.com,
-	stefanha@redhat.com,
-	chentao@kylinos.cn,
-	brauner@kernel.org,
-	ankita@nvidia.com,
-	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 17/20] vfio/pci: Collect hot-reset devices to local buffer
-Date: Wed,  5 Jun 2024 07:52:00 -0400
-Message-ID: <20240605115225.2963242-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240605115225.2963242-1-sashal@kernel.org>
-References: <20240605115225.2963242-1-sashal@kernel.org>
+	bh=w+eGZz8YHpzTSCmQlOZR8r31jIbGhMCbbtubiO3Miuc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=HfeMar+9i3jZ2BQhm2NpPi/5JOvRaVukbX1IxMOKVYQppH++GLAA/kNbr3+XaYwGMHBhcZRVzazClyEgwqkGscU1ZG4RAjQxuXvoROiiu8HHhmZyqmX54Lx/dwIoxiuG6+qGrlZVJAMcQv0F0fRuyhH45YR3Hk1J5TxtWhCUo/Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ncxAkJkC; arc=fail smtp.client-ip=40.107.96.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ydau//CIHC7nDWCP8TTrGoWxRhNCrlRg+H15qDaR810oFXwPiTp/WkUjmwdWBWJ3Sz8v4712YCexFNhAU/cX1s3evxOPgf7n3aJOWitV33uGz2V63pvLr1T2Nq0ny6jV80QSkrld5wHuDMw00m7HCHJ48iwiuIKBwXp0zmb7avwKoyfOiqRR7HpvB5p75TK1V4N0ikYIgc97XmdlgYMVhrbiVJWhy031hMV5g1321ci2qx6xX5ftt05VzXp5dinqNYD9GLFCzD9Ot1cPLOPGJ94g9facTEI5mYw7tMzsZQLPRggR73zQ7pjiOYcZrQA5m2ZReSQ0NKutXtM2N/rWYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q7SDZnJ9Od9Pj+vTk/dmciuTZUv0g/O2QLIyejfzh0U=;
+ b=N42lvJ0vyRnmNEQiBHdJ3sOwzkRXPIbEoxOgzAKdB1GoUXv7A2xO1NADKMaO2VaWZt6WVeH/U5t2/ESrNvyIfO4G/zQZ/CpeA5Ucxtl/YMhPcxdRhtwGg+m0o32T8yCqKbk59FZw49AZKlwZ3txwb6ftvbY/206XFgpqg0UmZOa5hmTAx6cGksWjyKryoL/HCE6Ma65FysUFlZwJ31LYGkB32VXyCApOBuNFC7O4G4Xn1uX6yGE5eLWDfB0EVWmaOHPHtCMEuT9giHoiogsyp8XwRGjzlkfZG2+B6Zyoo5BVAexW5T3NimcOnDLoEgiD8CvFhIDqDglrCmRAa/P37w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q7SDZnJ9Od9Pj+vTk/dmciuTZUv0g/O2QLIyejfzh0U=;
+ b=ncxAkJkC620v0LEqxm6DpB5aABbkJYz9+nTRKMwGiRrRRBt+8149sRRTeJr1moNKPVvH8YL15pi5RJlpf6j/8nz3exzNfhrfwXH8fROuFFRcUC3ES8Yxg64trnWtRCAuSM4bAUFI/quY4UTSclaRN2GPisY6+30H+mfdS79734A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB6460.namprd12.prod.outlook.com (2603:10b6:208:3a8::13)
+ by PH7PR12MB7795.namprd12.prod.outlook.com (2603:10b6:510:278::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.33; Wed, 5 Jun
+ 2024 11:53:05 +0000
+Received: from IA1PR12MB6460.namprd12.prod.outlook.com
+ ([fe80::c819:8fc0:6563:aadf]) by IA1PR12MB6460.namprd12.prod.outlook.com
+ ([fe80::c819:8fc0:6563:aadf%5]) with mapi id 15.20.7633.021; Wed, 5 Jun 2024
+ 11:53:05 +0000
+Message-ID: <fc6a2fb6-4762-4d5b-aa65-8588914221ce@amd.com>
+Date: Wed, 5 Jun 2024 17:22:55 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: SNP: Fix LBR Virtualization for SNP guest
+Content-Language: en-US
+To: Ravi Bangoria <ravi.bangoria@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, nikunj.dadhania@amd.com
+Cc: thomas.lendacky@amd.com, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ michael.roth@amd.com, pankaj.gupta@amd.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, santosh.shukla@amd.com
+References: <20240531044644.768-4-ravi.bangoria@amd.com>
+ <20240605114810.1304-1-ravi.bangoria@amd.com>
+From: "Aithal, Srikanth" <sraithal@amd.com>
+In-Reply-To: <20240605114810.1304-1-ravi.bangoria@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: PN3PR01CA0001.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:95::7) To IA1PR12MB6460.namprd12.prod.outlook.com
+ (2603:10b6:208:3a8::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.32
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB6460:EE_|PH7PR12MB7795:EE_
+X-MS-Office365-Filtering-Correlation-Id: a9caf9a4-6d0a-4b65-06ac-08dc85560f7b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230031|366007|7416005|1800799015|376005;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?K1F2MnZpU1dNT2E2cUcvOXlLalRoQURXQ28zZ0ZiS21vSnFCRXA4aGtOYVE1?=
+ =?utf-8?B?SXVuN1QxRFhVVFFxWW9nUll6RWNaNnFZNTZOQk1yMXUxYUFkcHBDN1NhZ0hH?=
+ =?utf-8?B?dlZLNDNVSitkM1MvbWt4TWN0MWlRMHhUdGNCVXB1bGdGS3dkYXdsc1hFcWhF?=
+ =?utf-8?B?YVV5eDlMR3VWc2xLVlUvaGN6bklhRFVrRDBDRlF6Uk05NVZWSVJFUzFxTk5p?=
+ =?utf-8?B?WWQ5YVE5dThVYlJGSktBSmdlVHY4elNSMUFlWEZxdkljTS9ENmx4K2ZBVzhX?=
+ =?utf-8?B?bFJhbVFzYUttRFFiMnFMRndJZUFjS2NOaU5acFRKbU41MW01eDVYZFZhU1Zm?=
+ =?utf-8?B?d0t0YnpsQm5vVTJPMW5OQXZ6ZkZYQ2JpRVg2dmlibEdwaGpOYi9abnVCSUVM?=
+ =?utf-8?B?SlJTKytnQjRRQnRlcm81YzkyV1VhdEpSUE9CbU5uQXFlbnJwMEhicFQ4QWhj?=
+ =?utf-8?B?ckhXWGE5bWhuSTZPSjBjOW1saXJtWFhON0x3YjRPSVplMnZETnFXV2kraVpi?=
+ =?utf-8?B?UmNSL3l4TlBlVzVic1Ava3NPZ09ncytvV2hFcEdVV2hFWnZwWUI2Qndsemxj?=
+ =?utf-8?B?UEQ3SzRNUWFyWW9CTExQZnJTSGFNQklZVE85eFpSOENveDdJVWFjOUpSYzZh?=
+ =?utf-8?B?Z0Y1Si9rLzJjWnZmYTdHRmQ1UG8vVW1LUW9Ja1hLZGZ4MlRWa29YSENLNzFX?=
+ =?utf-8?B?OGtUZndMYTBndEExUmo3TXM2b3p3ZVBZZkRaZ3ZNWGZKSmo1QnhLWVpZSmkw?=
+ =?utf-8?B?aFlUdjhaZXZRQlN0YjlrSnlxdFdiVGRJZ2Y3cVE3ZVhaNFErb2JMWXJDMENS?=
+ =?utf-8?B?S3dzcE9RYkZZTE5pcHpjUkVKbnJwaTNGNExsL3FEcUhseDZnZnlJdG5hSC9a?=
+ =?utf-8?B?TXdQdjhpRDNYVm5mbUpXS3ZMWmFKV2U4b21BNVBsYU9VVmIzN0JpUFp1UHVG?=
+ =?utf-8?B?bjVYU1UxVlYrUy9OVi83ZUpPSXNWVy9oWnZSUmk2NmZ3RDFoRGlRRGRnZjN3?=
+ =?utf-8?B?VlpXSUVxM0RSN1lWcEZOeUQwWkxGaEN0WXd0cDlHN1RmcDFMcGRleDNjTzI3?=
+ =?utf-8?B?TFowRlNZeGFnamIwUDVneG5LTmxHYTVvY2l5M0xhK1huMDhCYnFsL0w0dGg0?=
+ =?utf-8?B?NUJFRmJsbUkwck9xLzMyR2RoV0Z4NmVJWVVGUEpXc29UeDlNejJFcklzQXVo?=
+ =?utf-8?B?RVhkZHArdHpQM2w2dnRQV1dCUWhFWUFETExxaHZKemNjeEV4T21DZ0VzNGlC?=
+ =?utf-8?B?bkRnTWRBK2xXb3ljL0pmSEJkMjd4Q2w4eDNyL2lCV2NRQmdrQk1ld1ZrRGJX?=
+ =?utf-8?B?SVNNbjVwSStxM3NzUVdNQlRoNktiZ244K3dVY1RmVW9RU3N0b1RGZVdQRFNy?=
+ =?utf-8?B?akNucFRoR09MU1hmdmF5ZHF4c2xrRWNCSG1QWWFpUmNmZ3JmZnB3Y1JoR1li?=
+ =?utf-8?B?OFlEYzZDMWlPRHNNSytIK0ZTRytWeEpCb20zbmZidENDWVRBQTBoTUUwOGVq?=
+ =?utf-8?B?Zjk2ODVyV3YyUGhqejJXL0RuSi9CRkFaRndjMmt3RzZLWWJaN0pvV04xSFB2?=
+ =?utf-8?B?YXVYeTNwUFVzMWlqajNHRlNvNDhZb2lSYWlwSHNGSDVybVhJUGZhUlNJSURM?=
+ =?utf-8?B?OEg0Zzc5V29iejdiSHRsdFlma2JlUVh2V0pnSWw3aGJRdWtON0RMZ1M5c3Ey?=
+ =?utf-8?B?MGxrUUpnMktqMXVGa1dqK0oxL3h5K0c4OWVlNjBUZHJPMUQ2UHpXT2x3PT0=?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB6460.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TWgwOEhDWHNyNTA3N3ppd3ZjN0dqT2poTytBTVc0VTQ0NXJYK0JXMFJFOU5E?=
+ =?utf-8?B?YUkwL0xOSXlaTVpRZGJtaHNTRWhKZ0crWHlqYjdjaVFmK2pzNzMxa296bkp4?=
+ =?utf-8?B?MmlxbnFYdHNMYkpoeStDcDBQTDBWcUcvOHRWbHVTYmEyaEtnSVdJbGJ4SitE?=
+ =?utf-8?B?djhOUklpUEM0eHA1SnYxTnRLNXFFYWhCdmJPQlY4aWhNSThxZ3JJcFhnY0VG?=
+ =?utf-8?B?amRDY083Tlk1enlCcUVHRkdYbHE3Z1d0VXFTcVhoaC9SdUxpclRPKzgzUkRQ?=
+ =?utf-8?B?b01qRXpBZUpnbDNPcGpXQU9jbzJNdkR0Rmtza0hEc3V3ejBTWmdZZHhTZmdX?=
+ =?utf-8?B?WVdPN2tmZjhJM2xuMmdQZ1ZJRWJzdmdWeUFDOCs0NGloWWlrSmV5cGdocEsv?=
+ =?utf-8?B?SXJqbEJsWXFROVVXMkxSbzhacWl2UVZ1U01YbXlwZW9KRXhKZE1JcERwMFlL?=
+ =?utf-8?B?M2M5WkRua3lyNFVvNDhFT1NBUFVJLzhSWnBwcFhSTnZRZ1Viajd2RFJTcklO?=
+ =?utf-8?B?QWQ2eTN2S3BRMGxVN21aUG5MVzczUDUydjEzVjg2OHdOVjkxYkxxR2ZrK2pC?=
+ =?utf-8?B?SlluLy85eG1pN2tUZTBpTS80VlhJK0dvamluNVllOURXYStMRk9BcFJuR1lo?=
+ =?utf-8?B?dVU2b3pFNnZpbGQ5RzFtVjBiOVppNGlndW5qeUZDS3pEOG9qNXo3TGQ5U1F6?=
+ =?utf-8?B?VVdKKzFnQ0Fibk84ekJKbzJzdGpaT0t0ZlREbGVUYm5uNW90SUt3UHNZY3JJ?=
+ =?utf-8?B?enFuakwrTlVhbU4vc1FlblMwdWYrUSt1MGRzRk44K2NqMktGVWloMU1NRzdp?=
+ =?utf-8?B?SHpOR3dwTDBLZ29Xekt3US9ubWFiMHhKQnE1SzBUSFM5eDNTTkkwb2FUNUxp?=
+ =?utf-8?B?TWdDV0V6ZXB0NHNZN1NyeTFxUWpSTEZndFk3ZGRwUTFOeWhXUndSODBvcGY1?=
+ =?utf-8?B?OGpYRHB5QVBLbDlqYW55M0xrdnY2SWt5dU9ITU8xcXFMQ21OQTd5d1l6eVVh?=
+ =?utf-8?B?eU5mSTJLSmF2NDRaMnFHbXdLcTBEaXVaT2NyQis1bU9SZWNDejFiUDRjZzds?=
+ =?utf-8?B?NVE2U01wQkNvaVNTMTNyWDc4MEJFYURmZW9RMU9hUENvRHNkTmtCY3ltbzJt?=
+ =?utf-8?B?bFIrSkRtRWRkbzV6UCtkT1pRNkF4UklQSjYyclptamxOOTVod3lqY3RiOG1p?=
+ =?utf-8?B?YVZaMTFDYlloV1NYb29rUEJjWnBHZ3NTZjBrWDE0QWNWNjc1aXFIQmYrSWpO?=
+ =?utf-8?B?aFZuK2U2WU9LSlJuTjNJT0VIY1VYbk01bWZMTTJLYTd6RmsvMG9TQi92MTlV?=
+ =?utf-8?B?ZlYwSjVJeWMreEx5N0NCRVBzQ1FQSVRFTTkyRHMvaWxXKzY0VUo4RVVPWDZY?=
+ =?utf-8?B?bEtqN0EweXF4OGFGZ0srWC9Ra2lTU1V0ZFJMaHNLSU5nUW4zR3J1VnhYWXJQ?=
+ =?utf-8?B?WERCa0gxOWJNZGJld2U3QmZwYVNtdnpPK05YL3Q3VjRUcTVTWGs5aTJ4aisx?=
+ =?utf-8?B?aXBPMENVR2xyZTUvKzQ3dWIybUxMOVEzeXBBNW9aMW01UmU1ZTVCQTdOSFNQ?=
+ =?utf-8?B?Y2NGYWFLa24vbXF5a3A2bWJYdEZFUjg3aTJIQjlMZ0YrdTBPM1dlZGszZWcz?=
+ =?utf-8?B?YU5PcVNpZURsNEdUQkV2d0ZJOXV1SFMzQTNHcXFGVlVzV08ybXFRZGNYWk9L?=
+ =?utf-8?B?TnpDbjhRTnAvNHN2UUdZb0hvTHRpVkpqVnJ5TkYvRVowQXhLYmw2djJESEky?=
+ =?utf-8?B?RjNWOUllQjFKZUI2c0x4WWF6UjNaYkpkNjJrc1QxYXY5M1ZJMG9aRDJIRjVt?=
+ =?utf-8?B?cENRaVNidEpzT2R5UUxSeU1RN0k2WUl6WXlLRDdsZG9QUkkvNE80YllNNXM0?=
+ =?utf-8?B?M2YzSmZaQmY3Q3c4bTdHMjhHaVlCeEVXVmRyQlZFUGFxT3hPMjZkV3AvNWVW?=
+ =?utf-8?B?Z2tqL3RmeGs2WWtrZGFtWmZneldlcElMdldDcWIzTEUwNHE2UlBuSWZza2Ju?=
+ =?utf-8?B?TDJRYmNBNDQzRnFDR0wwM3puVWl0eGJSMnM4b05IWVZvMGgzQmUrQ2d6TTRG?=
+ =?utf-8?B?ZlVWaElCeDQyK0pxTTlFZzU3VGhzRlozR29GYVlsWUNxaE9HNVBCdlBabW4r?=
+ =?utf-8?Q?M0XPS446+K7mSQWc+TGol2RG9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9caf9a4-6d0a-4b65-06ac-08dc85560f7b
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB6460.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 11:53:05.6245
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qydye2ADMlk9kQEZT/TKdsYbp+JGe2WQ6ou2DWRR7C9UOnsAKDPXYfXW3EXDgnk16dtHp5B2hyKtv+HakrBPsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7795
 
-From: Alex Williamson <alex.williamson@redhat.com>
 
-[ Upstream commit f6944d4a0b87c16bc34ae589169e1ded3d4db08e ]
-
-Lockdep reports the below circular locking dependency issue.  The
-mmap_lock acquisition while holding pci_bus_sem is due to the use of
-copy_to_user() from within a pci_walk_bus() callback.
-
-Building the devices array directly into the user buffer is only for
-convenience.  Instead we can allocate a local buffer for the array,
-bounded by the number of devices on the bus/slot, fill the device
-information into this local buffer, then copy it into the user buffer
-outside the bus walk callback.
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.9.0-rc5+ #39 Not tainted
-------------------------------------------------------
-CPU 0/KVM/4113 is trying to acquire lock:
-ffff99a609ee18a8 (&vdev->vma_lock){+.+.}-{4:4}, at: vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
-
-but task is already holding lock:
-ffff99a243a052a0 (&mm->mmap_lock){++++}-{4:4}, at: vaddr_get_pfns+0x3f/0x170 [vfio_iommu_type1]
-
-which lock already depends on the new lock.
-
-the existing dependency chain (in reverse order) is:
-
--> #3 (&mm->mmap_lock){++++}-{4:4}:
-       __lock_acquire+0x4e4/0xb90
-       lock_acquire+0xbc/0x2d0
-       __might_fault+0x5c/0x80
-       _copy_to_user+0x1e/0x60
-       vfio_pci_fill_devs+0x9f/0x130 [vfio_pci_core]
-       vfio_pci_walk_wrapper+0x45/0x60 [vfio_pci_core]
-       __pci_walk_bus+0x6b/0xb0
-       vfio_pci_ioctl_get_pci_hot_reset_info+0x10b/0x1d0 [vfio_pci_core]
-       vfio_pci_core_ioctl+0x1cb/0x400 [vfio_pci_core]
-       vfio_device_fops_unl_ioctl+0x7e/0x140 [vfio]
-       __x64_sys_ioctl+0x8a/0xc0
-       do_syscall_64+0x8d/0x170
-       entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
--> #2 (pci_bus_sem){++++}-{4:4}:
-       __lock_acquire+0x4e4/0xb90
-       lock_acquire+0xbc/0x2d0
-       down_read+0x3e/0x160
-       pci_bridge_wait_for_secondary_bus.part.0+0x33/0x2d0
-       pci_reset_bus+0xdd/0x160
-       vfio_pci_dev_set_hot_reset+0x256/0x270 [vfio_pci_core]
-       vfio_pci_ioctl_pci_hot_reset_groups+0x1a3/0x280 [vfio_pci_core]
-       vfio_pci_core_ioctl+0x3b5/0x400 [vfio_pci_core]
-       vfio_device_fops_unl_ioctl+0x7e/0x140 [vfio]
-       __x64_sys_ioctl+0x8a/0xc0
-       do_syscall_64+0x8d/0x170
-       entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
--> #1 (&vdev->memory_lock){+.+.}-{4:4}:
-       __lock_acquire+0x4e4/0xb90
-       lock_acquire+0xbc/0x2d0
-       down_write+0x3b/0xc0
-       vfio_pci_zap_and_down_write_memory_lock+0x1c/0x30 [vfio_pci_core]
-       vfio_basic_config_write+0x281/0x340 [vfio_pci_core]
-       vfio_config_do_rw+0x1fa/0x300 [vfio_pci_core]
-       vfio_pci_config_rw+0x75/0xe50 [vfio_pci_core]
-       vfio_pci_rw+0xea/0x1a0 [vfio_pci_core]
-       vfs_write+0xea/0x520
-       __x64_sys_pwrite64+0x90/0xc0
-       do_syscall_64+0x8d/0x170
-       entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
--> #0 (&vdev->vma_lock){+.+.}-{4:4}:
-       check_prev_add+0xeb/0xcc0
-       validate_chain+0x465/0x530
-       __lock_acquire+0x4e4/0xb90
-       lock_acquire+0xbc/0x2d0
-       __mutex_lock+0x97/0xde0
-       vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
-       __do_fault+0x31/0x160
-       do_pte_missing+0x65/0x3b0
-       __handle_mm_fault+0x303/0x720
-       handle_mm_fault+0x10f/0x460
-       fixup_user_fault+0x7f/0x1f0
-       follow_fault_pfn+0x66/0x1c0 [vfio_iommu_type1]
-       vaddr_get_pfns+0xf2/0x170 [vfio_iommu_type1]
-       vfio_pin_pages_remote+0x348/0x4e0 [vfio_iommu_type1]
-       vfio_pin_map_dma+0xd2/0x330 [vfio_iommu_type1]
-       vfio_dma_do_map+0x2c0/0x440 [vfio_iommu_type1]
-       vfio_iommu_type1_ioctl+0xc5/0x1d0 [vfio_iommu_type1]
-       __x64_sys_ioctl+0x8a/0xc0
-       do_syscall_64+0x8d/0x170
-       entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-other info that might help us debug this:
-
-Chain exists of:
-  &vdev->vma_lock --> pci_bus_sem --> &mm->mmap_lock
-
- Possible unsafe locking scenario:
-
-block dm-0: the capability attribute has been deprecated.
-       CPU0                    CPU1
-       ----                    ----
-  rlock(&mm->mmap_lock);
-                               lock(pci_bus_sem);
-                               lock(&mm->mmap_lock);
-  lock(&vdev->vma_lock);
-
- *** DEADLOCK ***
-
-2 locks held by CPU 0/KVM/4113:
- #0: ffff99a25f294888 (&iommu->lock#2){+.+.}-{4:4}, at: vfio_dma_do_map+0x60/0x440 [vfio_iommu_type1]
- #1: ffff99a243a052a0 (&mm->mmap_lock){++++}-{4:4}, at: vaddr_get_pfns+0x3f/0x170 [vfio_iommu_type1]
-
-stack backtrace:
-CPU: 1 PID: 4113 Comm: CPU 0/KVM Not tainted 6.9.0-rc5+ #39
-Hardware name: Dell Inc. PowerEdge T640/04WYPY, BIOS 2.15.1 06/16/2022
-Call Trace:
- <TASK>
- dump_stack_lvl+0x64/0xa0
- check_noncircular+0x131/0x150
- check_prev_add+0xeb/0xcc0
- ? add_chain_cache+0x10a/0x2f0
- ? __lock_acquire+0x4e4/0xb90
- validate_chain+0x465/0x530
- __lock_acquire+0x4e4/0xb90
- lock_acquire+0xbc/0x2d0
- ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
- ? lock_is_held_type+0x9a/0x110
- __mutex_lock+0x97/0xde0
- ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
- ? lock_acquire+0xbc/0x2d0
- ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
- ? find_held_lock+0x2b/0x80
- ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
- vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
- __do_fault+0x31/0x160
- do_pte_missing+0x65/0x3b0
- __handle_mm_fault+0x303/0x720
- handle_mm_fault+0x10f/0x460
- fixup_user_fault+0x7f/0x1f0
- follow_fault_pfn+0x66/0x1c0 [vfio_iommu_type1]
- vaddr_get_pfns+0xf2/0x170 [vfio_iommu_type1]
- vfio_pin_pages_remote+0x348/0x4e0 [vfio_iommu_type1]
- vfio_pin_map_dma+0xd2/0x330 [vfio_iommu_type1]
- vfio_dma_do_map+0x2c0/0x440 [vfio_iommu_type1]
- vfio_iommu_type1_ioctl+0xc5/0x1d0 [vfio_iommu_type1]
- __x64_sys_ioctl+0x8a/0xc0
- do_syscall_64+0x8d/0x170
- ? rcu_core+0x8d/0x250
- ? __lock_release+0x5e/0x160
- ? rcu_core+0x8d/0x250
- ? lock_release+0x5f/0x120
- ? sched_clock+0xc/0x30
- ? sched_clock_cpu+0xb/0x190
- ? irqtime_account_irq+0x40/0xc0
- ? __local_bh_enable+0x54/0x60
- ? __do_softirq+0x315/0x3ca
- ? lockdep_hardirqs_on_prepare.part.0+0x97/0x140
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7f8300d0357b
-Code: ff ff ff 85 c0 79 9b 49 c7 c4 ff ff ff ff 5b 5d 4c 89 e0 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 75 68 0f 00 f7 d8 64 89 01 48
-RSP: 002b:00007f82ef3fb948 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f8300d0357b
-RDX: 00007f82ef3fb990 RSI: 0000000000003b71 RDI: 0000000000000023
-RBP: 00007f82ef3fb9c0 R08: 0000000000000000 R09: 0000561b7e0bcac2
-R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
-R13: 0000000200000000 R14: 0000381800000000 R15: 0000000000000000
- </TASK>
-
-Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-Link: https://lore.kernel.org/r/20240503143138.3562116-1-alex.williamson@redhat.com
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vfio/pci/vfio_pci_core.c | 78 ++++++++++++++++++++------------
- 1 file changed, 49 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 1929103ee59a3..a3c545dd174ee 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -778,25 +778,26 @@ static int vfio_pci_count_devs(struct pci_dev *pdev, void *data)
- }
- 
- struct vfio_pci_fill_info {
--	struct vfio_pci_dependent_device __user *devices;
--	struct vfio_pci_dependent_device __user *devices_end;
- 	struct vfio_device *vdev;
-+	struct vfio_pci_dependent_device *devices;
-+	int nr_devices;
- 	u32 count;
- 	u32 flags;
- };
- 
- static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
- {
--	struct vfio_pci_dependent_device info = {
--		.segment = pci_domain_nr(pdev->bus),
--		.bus = pdev->bus->number,
--		.devfn = pdev->devfn,
--	};
-+	struct vfio_pci_dependent_device *info;
- 	struct vfio_pci_fill_info *fill = data;
- 
--	fill->count++;
--	if (fill->devices >= fill->devices_end)
--		return 0;
-+	/* The topology changed since we counted devices */
-+	if (fill->count >= fill->nr_devices)
-+		return -EAGAIN;
-+
-+	info = &fill->devices[fill->count++];
-+	info->segment = pci_domain_nr(pdev->bus);
-+	info->bus = pdev->bus->number;
-+	info->devfn = pdev->devfn;
- 
- 	if (fill->flags & VFIO_PCI_HOT_RESET_FLAG_DEV_ID) {
- 		struct iommufd_ctx *iommufd = vfio_iommufd_device_ictx(fill->vdev);
-@@ -809,19 +810,19 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
- 		 */
- 		vdev = vfio_find_device_in_devset(dev_set, &pdev->dev);
- 		if (!vdev) {
--			info.devid = VFIO_PCI_DEVID_NOT_OWNED;
-+			info->devid = VFIO_PCI_DEVID_NOT_OWNED;
- 		} else {
- 			int id = vfio_iommufd_get_dev_id(vdev, iommufd);
- 
- 			if (id > 0)
--				info.devid = id;
-+				info->devid = id;
- 			else if (id == -ENOENT)
--				info.devid = VFIO_PCI_DEVID_OWNED;
-+				info->devid = VFIO_PCI_DEVID_OWNED;
- 			else
--				info.devid = VFIO_PCI_DEVID_NOT_OWNED;
-+				info->devid = VFIO_PCI_DEVID_NOT_OWNED;
- 		}
- 		/* If devid is VFIO_PCI_DEVID_NOT_OWNED, clear owned flag. */
--		if (info.devid == VFIO_PCI_DEVID_NOT_OWNED)
-+		if (info->devid == VFIO_PCI_DEVID_NOT_OWNED)
- 			fill->flags &= ~VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED;
- 	} else {
- 		struct iommu_group *iommu_group;
-@@ -830,13 +831,10 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
- 		if (!iommu_group)
- 			return -EPERM; /* Cannot reset non-isolated devices */
- 
--		info.group_id = iommu_group_id(iommu_group);
-+		info->group_id = iommu_group_id(iommu_group);
- 		iommu_group_put(iommu_group);
- 	}
- 
--	if (copy_to_user(fill->devices, &info, sizeof(info)))
--		return -EFAULT;
--	fill->devices++;
- 	return 0;
- }
- 
-@@ -1258,10 +1256,11 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
- {
- 	unsigned long minsz =
- 		offsetofend(struct vfio_pci_hot_reset_info, count);
-+	struct vfio_pci_dependent_device *devices = NULL;
- 	struct vfio_pci_hot_reset_info hdr;
- 	struct vfio_pci_fill_info fill = {};
- 	bool slot = false;
--	int ret = 0;
-+	int ret, count;
- 
- 	if (copy_from_user(&hdr, arg, minsz))
- 		return -EFAULT;
-@@ -1277,9 +1276,23 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
- 	else if (pci_probe_reset_bus(vdev->pdev->bus))
- 		return -ENODEV;
- 
--	fill.devices = arg->devices;
--	fill.devices_end = arg->devices +
--			   (hdr.argsz - sizeof(hdr)) / sizeof(arg->devices[0]);
-+	ret = vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_count_devs,
-+					    &count, slot);
-+	if (ret)
-+		return ret;
-+
-+	if (count > (hdr.argsz - sizeof(hdr)) / sizeof(*devices)) {
-+		hdr.count = count;
-+		ret = -ENOSPC;
-+		goto header;
-+	}
-+
-+	devices = kcalloc(count, sizeof(*devices), GFP_KERNEL);
-+	if (!devices)
-+		return -ENOMEM;
-+
-+	fill.devices = devices;
-+	fill.nr_devices = count;
- 	fill.vdev = &vdev->vdev;
- 
- 	if (vfio_device_cdev_opened(&vdev->vdev))
-@@ -1291,16 +1304,23 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
- 					    &fill, slot);
- 	mutex_unlock(&vdev->vdev.dev_set->lock);
- 	if (ret)
--		return ret;
-+		goto out;
-+
-+	if (copy_to_user(arg->devices, devices,
-+			 sizeof(*devices) * fill.count)) {
-+		ret = -EFAULT;
-+		goto out;
-+	}
- 
- 	hdr.count = fill.count;
- 	hdr.flags = fill.flags;
--	if (copy_to_user(arg, &hdr, minsz))
--		return -EFAULT;
- 
--	if (fill.count > fill.devices - arg->devices)
--		return -ENOSPC;
--	return 0;
-+header:
-+	if (copy_to_user(arg, &hdr, minsz))
-+		ret = -EFAULT;
-+out:
-+	kfree(devices);
-+	return ret;
- }
- 
- static int
--- 
-2.43.0
-
+On 6/5/2024 5:18 PM, Ravi Bangoria wrote:
+> SEV-ES and thus SNP guest mandates LBR Virtualization to be _always_ ON.
+> Although commit b7e4be0a224f ("KVM: SEV-ES: Delegate LBR virtualization
+> to the processor") did the correct change for SEV-ES guests, it missed
+> the SNP. Fix it.
+>
+> Reported-by: Srikanth Aithal <sraithal@amd.com>
+> Fixes: b7e4be0a224f ("KVM: SEV-ES: Delegate LBR virtualization to the processor")
+> Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
+> ---
+> - SNP support was not present while I prepared the original patches and
+>    that lead to this confusion. Sorry about that.
+>
+>   arch/x86/kvm/svm/sev.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 7d401f8a3001..57291525e084 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -2395,6 +2395,14 @@ static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>   		}
+>   
+>   		svm->vcpu.arch.guest_state_protected = true;
+> +		/*
+> +		 * SEV-ES (and thus SNP) guest mandates LBR Virtualization to
+> +		 * be _always_ ON. Enable it only after setting
+> +		 * guest_state_protected because KVM_SET_MSRS allows dynamic
+> +		 * toggling of LBRV (for performance reason) on write access to
+> +		 * MSR_IA32_DEBUGCTLMSR when guest_state_protected is not set.
+> +		 */
+> +		svm_enable_lbrv(vcpu);
+>   	}
+>   
+>   	return 0;
+Tested-by: Srikanth Aithal <sraithal@amd.com>
 
