@@ -1,137 +1,110 @@
-Return-Path: <kvm+bounces-18918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18919-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C5B98FD166
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:09:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F4CE8FD168
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:10:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0AB4B24336
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:09:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D0EC1C20B53
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4831474A2;
-	Wed,  5 Jun 2024 15:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C70B481C4;
+	Wed,  5 Jun 2024 15:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LOWxch2K"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4MOZBMGV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375EF143722
-	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 15:08:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B813D548
+	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 15:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717600138; cv=none; b=SJnfJ7y++UXfvPjQyK6JKFbYW374+JqQqLR9d+uiIPa4i9hWUUnYNKDQAYUMuuLTlwtt/2fK51XmobNfkypq2+TU6SzpjWqFpyMYSHfDMDyVen4lKbl1XA6qpa3rs5GrwA3ekC/Igi2+feRtzI+yMZ6Cei9GP9Q9AQ6ZHLC4NRI=
+	t=1717600210; cv=none; b=rKzDjRinRsPBcEk2JXi5EONEJIwmITa7wXfTb5croLTd9Q2YCObq8+97e1W+H/DDRPolzEGGLyZIY7pyTm9SgJIo0y4TKLfPK6CbVY9MHl+PovrEBZa1N8XxmU216iogZBOhsyh1hU8ECJPnV9YfLFonG7VQApX5LyTlkZiKmbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717600138; c=relaxed/simple;
-	bh=4JyuwwyC3HBCATZsuMSNx2NdgBe2Rb9+OjQPFT0wds8=;
+	s=arc-20240116; t=1717600210; c=relaxed/simple;
+	bh=XIVQPDWD64eYeYQKjEF3OnoyWC3wyS3XLFk9t2rDyRY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LVRjEREJ2WMuvq+PMwJha8MoBKY6UBZ3uUPzlumGuxPMlQxrmZSG+FElou4KXqhT8s8p9tQWP+jg+OoyEsOBQSWTkCEIcd+CkPPtBaIjHSijI5Kth+a8s3MN2U4+thPtY3/8QkD74gClsnPvjGomrnSSZHwajbC7F366FaIUJ3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LOWxch2K; arc=none smtp.client-ip=209.85.214.201
+	 To:Cc:Content-Type; b=Ip6oNlo79nwVICmCZ1Wwh73ozQ/Y85GX4XB0PsHYISu74ILPm2SNi2/Qn5J+agC70NtuW/fIALkWV7gN2/3muu31kbDzTPt+LHfz1rNVv3Zx501sQBXW+mw+PAf3MAXWLPZzsL6HtZ2BH0WzL3rlX12C8N7xMxNKh/mLPr+8CS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4MOZBMGV; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1f66f2e4cc7so41810855ad.3
-        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 08:08:57 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6c380e03048so6205272a12.3
+        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 08:10:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717600136; x=1718204936; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717600208; x=1718205008; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9QZ+vKQP5mDiEMq7aC/1ssTDMAZfDe/7jI56fqmifes=;
-        b=LOWxch2KH2LSl24kClKFEev2bvld6zvWHKktwiAXfuFZHiEm9p6R3z+1tqHE/79YAY
-         0O39tlclUMgkUIpRZeNZ1RazIG3qh6fwl7feJWpFiHHTRAOv3sV1r684cdT1DqyoGOxO
-         hxdPpWO3F7AVETIK+YnxmbN8ATDsSt8b6bN/aBGzPKVBHu1NKjDe1b9JZv/QtSaZL8CS
-         l5+lLXJu7dZMRvoHN8v2o7KdaNJD45vbBcn99Wa8WkqMdxJaXKS2yWTx6G+a1TvqQN4f
-         EM2YiWx5WJwci9clhu9NjTnJXrNg1AoNklD4ybr1rKTfvA2FVk99IObdOco76mG3GKD1
-         BPuA==
+        bh=zMdlMnpu2rLutfBaZ7FjrKi42VwaFOFSjyMRzM4+P80=;
+        b=4MOZBMGVu35L8cS5muRGkq2DamvgMxz6TbaR3N8vyDB+bdhXPZuvoJ2iFm6lCaWv5/
+         EpbT20gJ1E8C2REEfztlObNNGaJZhoOd8tjMvtnuJysEJbRqE2qNetGFPUI82lIX/vas
+         5UD56x5AB2bxeqs70WnRUf6R97t7oKwmuVsm/gHKygj6h/SQoARAkYi2KHkcvoPTrdv2
+         TEdxD/4r8J1xhuKGI+KKh6s6KD7Nyls5iWFCAS3JEWvbGGbgtSbyrrcb7fjh82YxrBhg
+         Z+wW+gGt/vOOEs2sFW5fPqO6UKelpTsv6E/fLvBVAzdFl1ruSIcoxbnOnwRjHKxSs7qR
+         PaQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717600136; x=1718204936;
+        d=1e100.net; s=20230601; t=1717600208; x=1718205008;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9QZ+vKQP5mDiEMq7aC/1ssTDMAZfDe/7jI56fqmifes=;
-        b=ubfY4Ms6FGkTPwgrIND8jNx47TXT/Hw3R9S+mxYqv5eHgQrSkwhfz6JbToQnGuM7a5
-         Sbu2GX6g9t5qH4dOGOD3nUjuOurNkDod18G88/BKjq27TTw04QUYaWBk0EyEpMg3RaQS
-         NQwF7FGIH4JSZlaF0snvHl85w8pCMPEng6cSPRR507smWc9CJhkruwk0qsStWIPj/AVq
-         77eM3FRJEOmGngu/9yYAEEP8JC3btdtYHIuN3vw7DDwCbx22Zw0EBTixxd5DA4/3b8Cn
-         EAJXHP/Jmx4MI54jtoHXp5c5XotmNS5q6uZFaOsRd5W9m2PwKr6CmHat8GHkMSHS0McZ
-         jxjA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTdO9ksSL/hV1JHb19C0mQ1AINt7l/rmxMgqytwiPwAeun1zBapCmUCyTtAuKRzVooySGqs6DhFn6MWhzmhiOISTzQ
-X-Gm-Message-State: AOJu0Yxajqu/vMFYpx9ZVxxrEnE/xHdl7MAUa68l3sCCZOAb/iF2t6cM
-	+IuuIv6vry2f05pKoxgQG+MUtPizC6ITDNN5YtPO8/dh6mWVr5J8FylY9YooUn1R6WMX0EJiLMB
-	giQ==
-X-Google-Smtp-Source: AGHT+IFOWIAW8rQZeqIoAhkK9HfGTM8iAboRiyRWXoj3LvZaRP7jP/VaJALlP/KwviDZ8VgTtBwOJCi8oYs=
+        bh=zMdlMnpu2rLutfBaZ7FjrKi42VwaFOFSjyMRzM4+P80=;
+        b=fxLfRDrQpeCFlD7A9bgevUWarCibLVpjZdr1Gz8ybMhjuIWfIECMPHA1aEW5oEobDQ
+         xsrrZs0MNGdak+pUqYSmuo8n9MpIEQVR6Agw7mXbPuf5+j2wxHakR0XaE29pyOBPTJaV
+         afXPIWOOsUERcWC5uay/em7wbsg3rWlyN72jP0U0rBe6o01b+aaTwGHFSfC32GEwR8t/
+         Ys22GW+AAo8eoQSUQD4nNiqrpXnKlXI0TjZYe8S72foxV8GnheKK/gG2SCtOK8MZulio
+         YMnrU+7mt+J74c3jRwyDomcanUuiDdoapHpEbsjtoDnJRFjsv2ZNMXWLsrsPyjJyIbdO
+         1cGA==
+X-Gm-Message-State: AOJu0YwF0CeKhXkCK0cRgY0HR+M3o8NceQnDqx2q/viziywcieOw/cU+
+	P64ZivfZltFHdRx+MQ2BxYLSPj4/pEMERuk/iwoB6TM8d5JPH/m/HH9i9FdzgmDDtDAk+1JJGb9
+	nzKJXJFTVs7zDrsfT4y8517aCKtSlbpzO/unJL7H48LZtU2u1JKxo/kN1z4spBsq6Daep6r41Ft
+	PJT5lL/MyGocmVxMsbQ32ySYlb2he0
+X-Google-Smtp-Source: AGHT+IEey3wmkUpf69Avkqmye51ogQqEPgRMRLIp2jlDpff17NiOASAUjHxDUtnJ8BIMPggZX5XlnZeHMo8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:1cc:b0:1f3:e88:a6a0 with SMTP id
- d9443c01a7336-1f6a5a1b926mr1528685ad.7.1717600136208; Wed, 05 Jun 2024
- 08:08:56 -0700 (PDT)
-Date: Wed, 5 Jun 2024 08:08:54 -0700
-In-Reply-To: <e1c29dd4-2eb9-44fe-abf2-f5ca0e84e2a6@amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:452:b0:659:fa27:f2a7 with SMTP id
+ 41be03b00d2f7-6d952ec43ebmr7263a12.11.1717600206172; Wed, 05 Jun 2024
+ 08:10:06 -0700 (PDT)
+Date: Wed, 5 Jun 2024 08:10:04 -0700
+In-Reply-To: <171754374489.2780783.15684128983475310982.b4-ty@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240429060643.211-1-ravi.bangoria@amd.com> <20240429060643.211-4-ravi.bangoria@amd.com>
- <Zl5jqwWO4FyawPHG@google.com> <e1c29dd4-2eb9-44fe-abf2-f5ca0e84e2a6@amd.com>
-Message-ID: <ZmB_hl7coZ_8KA8Q@google.com>
-Subject: Re: [PATCH 3/3] KVM SVM: Add Bus Lock Detect support
+References: <20240506225321.3440701-1-alejandro.j.jimenez@oracle.com> <171754374489.2780783.15684128983475310982.b4-ty@google.com>
+Message-ID: <ZmB_zGGqhwMh2jOH@google.com>
+Subject: Re: [PATCH v2 0/2] Print names of apicv inhibit reasons in traces
 From: Sean Christopherson <seanjc@google.com>
-To: Ravi Bangoria <ravi.bangoria@amd.com>
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, pbonzini@redhat.com, thomas.lendacky@amd.com, 
-	hpa@zytor.com, rmk+kernel@armlinux.org.uk, peterz@infradead.org, 
-	james.morse@arm.com, lukas.bulwahn@gmail.com, arjan@linux.intel.com, 
-	j.granados@samsung.com, sibs@chinatelecom.cn, nik.borisov@suse.com, 
-	michael.roth@amd.com, nikunj.dadhania@amd.com, babu.moger@amd.com, 
-	x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	santosh.shukla@amd.com, ananth.narayan@amd.com, sandipan.das@amd.com
+To: kvm@vger.kernel.org, vasant.hegde@amd.com, 
+	Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
+Cc: pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
+	joao.m.martins@oracle.com, boris.ostrovsky@oracle.com, 
+	suravee.suthikulpanit@amd.com, mlevitsk@redhat.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jun 05, 2024, Ravi Bangoria wrote:
-> Hi Sean,
-> 
-> On 6/4/2024 6:15 AM, Sean Christopherson wrote:
-> > On Mon, Apr 29, 2024, Ravi Bangoria wrote:
-> >> Upcoming AMD uarch will support Bus Lock Detect. Add support for it
-> >> in KVM. Bus Lock Detect is enabled through MSR_IA32_DEBUGCTLMSR and
-> >> MSR_IA32_DEBUGCTLMSR is virtualized only if LBR Virtualization is
-> >> enabled. Add this dependency in the KVM.
+On Tue, Jun 04, 2024, Sean Christopherson wrote:
+> On Mon, 06 May 2024 22:53:19 +0000, Alejandro Jimenez wrote:
+> > v2:
+> > - Use Sean's implementation/patch from v1: https://lore.kernel.org/all/ZjVQOFLXWrZvoa-Y@google.com/
+> > - Fix typo in commit message (s/inhbit/inhibit).
+> > - Add patch renaming APICV_INHIBIT_REASON_DISABLE to APICV_INHIBIT_REASON_DISABLED.
+> > - Drop Vasant's R-b from v1 since implementation was refined, even though the
+> > general approach and behavior remains the same.
 > > 
-> > This is woefully incomplete, e.g. db_interception() needs to be updated to decipher
-> > whether the #DB is the responsbility of the host or of the guest.
+> > [...]
 > 
-> Can you please elaborate. Are you referring to vcpu->guest_debug thingy?
-
-Yes.  More broadly, all of db_interception().
-
-> > Honestly, I don't see any point in virtualizing this in KVM.  As Jim alluded to,
-> > what's far, far more interesting for KVM is "Bus Lock Threshold".  Virtualizing
-> > this for the guest would have been nice to have during the initial split-lock #AC
-> > support, but now I'm skeptical the complexity is worth the payoff.
+> Applied to kvm-x86 misc, thanks!
 > 
-> This has a valid usecase of penalizing offending processes. I'm not sure
-> how much it's really used in the production though.
+> [1/2] KVM: x86: Print names of apicv inhibit reasons in traces
+>       https://github.com/kvm-x86/linux/commit/8b5bf6b80eb3
+> [2/2] KVM: x86: Keep consistent naming for APICv/AVIC inhibit reasons
+>       https://github.com/kvm-x86/linux/commit/f9979c52eb02
 
-Yeah, but split-lock #AC and #DB have existed on Intel for years, and no one has
-put in the effort to land KVM support, despite the series getting as far as v9[*].
-Some of the problems on Intel were due to the awful FMS-based feature detection,
-but those weren't the only hiccups.  E.g. IIRC, we never sorted out what should
-happen if both the host and guest want bus-lock #DBs.
+FYI, hashes changed due to dropping an unrelated commit.
 
-Anyways, my point is that, except for SEV-ES+ where there's no good reason NOT to
-virtualize Bus Lock Detect, I'm not convinced that it's worth virtualizing bus-lock
-#DBs.
-
-[*] https://lore.kernel.org/all/20200509110542.8159-1-xiaoyao.li@intel.com
-
-> > I suppose we could allow it if #DB isn't interecepted, at which point the enabling
-> > required is minimal?
-> 
-> The feature uses DEBUG_CTL MSR, #DB and DR6 register. Do you mean expose
-> it when all three are accelerated or just #DB?
-
-I mean that if KVM isn't intercepting #DB, then there's no extra complexity needed
-to sort out whether the #DB "belongs" to the host or the guest.  See commit
-90cbf6d914ad ("KVM: SEV-ES: Eliminate #DB intercept when DebugSwap enabled").
+[1/2] KVM: x86: Print names of apicv inhibit reasons in traces
+      https://github.com/kvm-x86/linux/commit/69148ccec679
+[2/2] KVM: x86: Keep consistent naming for APICv/AVIC inhibit reasons
+      https://github.com/kvm-x86/linux/commit/f992572120fb
 
