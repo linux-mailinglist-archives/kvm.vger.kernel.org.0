@@ -1,112 +1,195 @@
-Return-Path: <kvm+bounces-18946-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18947-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 346A08FD61A
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 20:57:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B0F3D8FD663
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 21:23:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A59B91F2349B
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 18:57:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CADB81F24DD8
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 19:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357AB13AA3F;
-	Wed,  5 Jun 2024 18:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C0F14D704;
+	Wed,  5 Jun 2024 19:23:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yi7qOD43"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B4Ix76RS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC205228
-	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 18:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C9941C79
+	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 19:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717613827; cv=none; b=t9urw5LSYEpTSG/jTvsxLxqS7DnnQCeV5yar7bjyXnMUrjC1qnCwE1q0kbS2oiE0rLFvsB0HKugIj9H16z8IlrJUNNDdLpYh+qFN6434D1PpbrkO1MgdM6BCI5r3GHS/wjBg0ltlCiWFRY+qMYnL7xmfPCOYEugR/zhH5lnV/us=
+	t=1717615408; cv=none; b=lwA12UxfVPCzVwG6qbSpS53Ah+2ozato3rrCVGSTexvfuJfaMpztnbeg6mq9hXEObafpZLlP7GAbz22d/ikQPfhuTHJgvzFJ5PNkTxlwO0Aa9KUvRtq8RRljuu1VPr0mYyGoGm9tXvEj07UvbdC8V2r1FD0q1Ua1x8AYrk+dAZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717613827; c=relaxed/simple;
-	bh=5zIIt4AbDwIqDg6azuqj6I2To+6q2KO4TXJiL/Owjfs=;
+	s=arc-20240116; t=1717615408; c=relaxed/simple;
+	bh=xNUmRVBbmLabH02EGVqYiDi8R5t5o+k1GtkwwSRV3cw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MrAUoW4zFQlgKNFrhGheYhtBQ2Bxsg2HD7wDnjTKEIRf7rWnagrhuYmdIRnv/CP6q+VghCtBKiUX3gFLQz8S1uHPfu+IIP1hShppKIOKfQMH1N0WHnxgbsx5rKI1di6tMG0+Nd+soWHpZurtEP30ZMxGFrV7Y+Oeb9vxU6Zt3Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yi7qOD43; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=eR/HSLWJFCf48VmeZhTXggKwNEwIxWle9AUAKnsr4lMxdAipscL2wi6L6KYKCR8MCCJ77+20q4tlnknu+IZmXhlVUcEbp9iqkqxfiiwNcREIWPI+CZlP+8pP/B7TLjvE265Ud3qm6Un+bHOMBCDABfWC7hkd60f8lZWHYQuyKEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B4Ix76RS; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6c8f99fef10so106478a12.3
-        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 11:57:05 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1f6238a6c2eso1828025ad.3
+        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 12:23:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717613825; x=1718218625; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717615406; x=1718220206; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Fm4EAowOR0P7Rb4PgjTwhoVaVYlufFtSZqjfn+LkrU=;
-        b=yi7qOD43BmdUsK7ZgChfw3++d8uPzCGEoIBa4ih9VqmG37iGxlwyOMMQvkjF4twrDq
-         NDoI8t+HhIsvN2/5GBOzDo5IiURwYwmpspUth7SoQG5Nwww5ZkItUQLBTamhE7MwUjku
-         E/5tx+uwHk+k8fqBXsUXgRmerpj8e6khdRi8S3oTtLF/Am8wCYg1/kgnfoiCq96cIiMu
-         Z6D/U93rgGh2p+E3zR/QswvSOapwkujHqQ/0FhE2t9pbGfqwcg0wsVh/owsUlBqdSg7m
-         0GZxmqPahA/rZ1+UXWUSuAvOJhDq0ysFIGWakC5fioTaTEn2eicFBdHnyTRpCLukNYyB
-         SXxA==
+        bh=HezPimuT7DFljRqo9XN5Xky8zEqqwviG0WSUPHBG4qk=;
+        b=B4Ix76RSqkv+y4i6v4gQVjkMddLbco/BePGAvfNwGduqYiCtOi7DpcAfHVcDP3RXxK
+         jvVuVr1OdJ+sxVBUSoaRnKyQ6hlHmvO9g88mVTXu4ahbvwF6dK6L75jVzKZ33hUZCoDF
+         nWm4Ln3587vrqHGM70E3Gek9aTRbu6ISNxOHLS//X43k3QOKwHAVZThF6G4AaryYIrIo
+         wf0UzCVWhb70lF1rdSbW3siZKL/a3zu9Y/MP9SRf2q1eKJas1CZg5XO5Wtr+bLLIMXa+
+         0i+A012BHpkfnrwb7avJyVNRj5dkc5b1Z2sueQJOmtYzCy+S94oCN213q5RqOLGv9Ac7
+         L11Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717613825; x=1718218625;
+        d=1e100.net; s=20230601; t=1717615406; x=1718220206;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Fm4EAowOR0P7Rb4PgjTwhoVaVYlufFtSZqjfn+LkrU=;
-        b=kifF4OPq8xumYd4860Ov6oBreAsOMKJlZlGxIw+mDeglCjwYepkgeNMEn690PXuDCC
-         F9T+Y1tYGjgCMXpsNPk4Nu1nz1tCLaci+rA4zOc80BJlL1B9+c6+5ce8n0ea0+GqQ2BL
-         V2i9lBygmLlosrh0vv3lBudF0d4Hzw3Me+ek0QF8Xk0Jrrm5BMa/zPBeYQefUQHgUjFm
-         nMUaptSc/EfiAcDZ/reNIVtGVEejhaieLZvs21JTu2zXFit9sVGFGFTcOxe66NsD1Iws
-         KbwBCmp5h3zikbfLVmIfBQSLqv5a7TuwXX4752frLq7n5MEJKH4WGM04bdYrQmphPndd
-         /IRQ==
-X-Gm-Message-State: AOJu0YwfprwPoMYkd5ydlrk1JRnQa0KugK4JMwxoE6L6joWBfLWgw8aM
-	3aR/kXw6HmmprwQMAphWztqbeROCbJTYl33WSU75sz31jn5br26WfwSo0IFTseW26RmurL+FbDq
-	Ukg==
-X-Google-Smtp-Source: AGHT+IEYy2BJzai/JnxtkoVdyjHFX00gy762SPLZuwZjOk2ur8Pwwe/4l39n5XGr0737THlm1Ca+j4WJN2g=
+        bh=HezPimuT7DFljRqo9XN5Xky8zEqqwviG0WSUPHBG4qk=;
+        b=ssdQVACt++54ES4bywBF7ObLy8o1vQAVNAWXIJlxtrT/pOy8uTtG8H1msxmGRL3O6K
+         CRg/SlydHmXzKLhEKCV4G7/HA3q7m5Ga/ACvq2el4KQGHd7qHn/ZCVfjhZre+U2lWo6h
+         4Oi71INVvnV5SdwtgQEPifJwptPh54qc2vG2/1jU3YIwKbmmzNfFZ8K5fBr9+k2uz388
+         3YJGCQ3WaXdSis9H0OcVZ72ksKsddzrHJYcWgxVCzUApz0kxtYK3F2rmwh1aS84CeNtC
+         fwkJDr1k+bjOopBwivYYOIUBpjrAsCtFWnKRCxLeV9CGR3snohA3UB4Y0qBaIHiGxbnt
+         ZGcQ==
+X-Gm-Message-State: AOJu0Yz9OGWgxjaAjlkjqhetsqApvuYtbZPzI8/T3QsG4XODCLbGUd3k
+	3BiX45/iprmLNKzZ+UN7tflKlJlIW49ZJdFDGFlhlq4Ufj8PMx4/hS03TJgdoyl85WvAUbRm17f
+	d9Q==
+X-Google-Smtp-Source: AGHT+IFzrEmr5nF2FZTs3UrZy2ZIxgWCOEy7JH3ZPIKTEhCKIdSOG35K1jMzGLeDgwa2kOlSDu4OyValsPg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2442:b0:1f3:453:2c89 with SMTP id
- d9443c01a7336-1f6a5a5e522mr2228595ad.9.1717613825133; Wed, 05 Jun 2024
- 11:57:05 -0700 (PDT)
-Date: Wed, 5 Jun 2024 11:57:03 -0700
-In-Reply-To: <20240122085354.9510-5-binbin.wu@linux.intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:d50e:b0:1f6:6900:5947 with SMTP id
+ d9443c01a7336-1f6a5a0c1a4mr2050405ad.5.1717615405861; Wed, 05 Jun 2024
+ 12:23:25 -0700 (PDT)
+Date: Wed, 5 Jun 2024 12:23:24 -0700
+In-Reply-To: <20230504134908.830041-1-rkagan@amazon.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240122085354.9510-1-binbin.wu@linux.intel.com> <20240122085354.9510-5-binbin.wu@linux.intel.com>
-Message-ID: <ZmC0_4ZN---IZEdk@google.com>
-Subject: Re: [kvm-unit-tests PATCH v6 4/4] x86: Add test case for INVVPID with LAM
+References: <20230504134908.830041-1-rkagan@amazon.de>
+Message-ID: <ZmC7LB6e8nXkMo7G@google.com>
+Subject: Re: [kvm-unit-tests] x86/pmu: add testcase for WRMSR to counter in
+ PMI handler
 From: Sean Christopherson <seanjc@google.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com, 
-	robert.hu@linux.intel.com
+To: Roman Kagan <rkagan@amazon.de>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jan 22, 2024, Binbin Wu wrote:
-> +	if (this_cpu_has(X86_FEATURE_LA57) && read_cr4() & X86_CR4_LA57)
+On Thu, May 04, 2023, Roman Kagan wrote:
+> Add a testcase where the PMI handler writes a negative value to the perf
+> counter whose overflow would trigger that PMI.
+> 
+> It's meant specifically to cover the KVM bug where every negative value
+> written to the counter caused an immediate overflow; in that case the
+> vCPU would never leave PMI loop.
+> 
+> The bug is addressed in
+> https://lore.kernel.org/kvm/20230504120042.785651-1-rkagan@amazon.de;
+> until this (or some alternative) fix is merged the test will hang on
+> this testcase.
+> 
+> Signed-off-by: Roman Kagan <rkagan@amazon.de>
+> ---
+>  x86/pmu.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 42 insertions(+), 3 deletions(-)
+> 
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 72c2c9cfd8b0..cdf9093722fb 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -74,6 +74,7 @@ static void cnt_overflow(isr_regs_t *regs)
+>  static bool check_irq(void)
+>  {
+>  	int i;
+> +	apic_write(APIC_LVTPC, PMI_VECTOR);
+>  	irq_received = 0;
+>  	irq_enable();
+>  	for (i = 0; i < 100000 && !irq_received; i++)
+> @@ -156,7 +157,6 @@ static void __start_event(pmu_counter_t *evt, uint64_t count)
+>  	    wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl);
+>      }
+>      global_enable(evt);
+> -    apic_write(APIC_LVTPC, PMI_VECTOR);
+>  }
+>  
+>  static void start_event(pmu_counter_t *evt)
+> @@ -474,6 +474,45 @@ static void check_running_counter_wrmsr(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void cnt_overflow_with_wrmsr(isr_regs_t *regs)
+> +{
+> +	cnt_overflow(regs);
+> +	/* write negative value that won't cause immediate overflow */
+> +	wrmsr(MSR_GP_COUNTERx(0),
+> +	      ((-1ull) << 31) & ((1ull << pmu.gp_counter_width) - 1));
+> +}
 
-Checking for feature support seems superfluous, e.g. LA57 should never be set if
-it's unsupported.  Then you can do
+This seems way more complicated than it needs to be.  Linux does the write in its
+PMI, but that isn't relevant to hitting the bug, it only makes the bug visible,
+i.e. hangs the guest.
 
-	lam_mask = is_la57_enabled() ? LAM57_MASK : LAM48_MASK;
+Wouldn't it suffice to write a negative value that isn't supposed to overflow,
+and then assert that overflow doesn't happen?
 
-> +		lam_mask = LAM57_MASK;
-> +
-> +	vaddr = alloc_vpage();
-> +	install_page(current_page_table(), virt_to_phys(alloc_page()), vaddr);
-> +	/*
-> +	 * Since the stack memory address in KUT doesn't follow kernel address
-> +	 * space partition rule, reuse the memory address for descriptor and
-> +	 * the target address in the descriptor of invvpid.
-> +	 */
-> +	operand = (struct invvpid_operand *)vaddr;
+If the the PMI shenanigans are needed for some reason, I would vote to just switch
+out the handler, not change the vector, which I find weird and unintuitive, e.g.
 
-Why bother backing the virtual address?  MOV needs a valid translation, but
-INVVPID does not (ditto for INVLPG and INVPCID, though it might be simpler and
-easier to just use the allocated address for those).
+diff --git a/x86/pmu.c b/x86/pmu.c
+index f67da863..6cdd644c 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -159,6 +159,7 @@ static void __start_event(pmu_counter_t *evt, uint64_t count)
+            wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl);
+     }
+     global_enable(evt);
++    apic_write(APIC_LVTPC, PMI_VECTOR);
+ }
+ 
+ static void start_event(pmu_counter_t *evt)
+@@ -493,9 +494,9 @@ static void check_running_counter_wrmsr_in_pmi(void)
+        };
+ 
+        report_prefix_push("running counter wrmsr in PMI");
++       handle_irq(PMI_VECTOR, cnt_overflow_with_wrmsr);
+ 
+        start_event(&evt);
+-       apic_write(APIC_LVTPC, PMI_VECTOR + 1);
+ 
+        irq_received = 0;
+        irq_enable();
+@@ -509,6 +510,9 @@ static void check_running_counter_wrmsr_in_pmi(void)
+        loop();
+        stop_event(&evt);
+        irq_disable();
++
++       handle_irq(PMI_VECTOR, cnt_overflow);
++
+        report(evt.count >= gp_events[1].min, "cntr");
+        report(irq_received, "irq");
+ 
+@@ -755,7 +759,6 @@ int main(int ac, char **av)
+ {
+        setup_vm();
+        handle_irq(PMI_VECTOR, cnt_overflow);
+-       handle_irq(PMI_VECTOR + 1, cnt_overflow_with_wrmsr);
+        buf = malloc(N*64);
+ 
+        check_invalid_rdpmc_gp();
+@@ -782,6 +785,8 @@ int main(int ac, char **av)
+        printf("Fixed counters:      %d\n", pmu.nr_fixed_counters);
+        printf("Fixed counter width: %d\n", pmu.fixed_counter_width);
+ 
++       apic_write(APIC_LVTPC, PMI_VECTOR);
++
+        check_counters();
+ 
+        if (pmu_has_full_writes()) {
 
-> +	operand->vpid = 0xffff;
-> +	operand->gla = (u64)vaddr;
-> +	operand = (struct invvpid_operand *)set_la_non_canonical((u64)operand,
-> +								 lam_mask);
-> +	fault = test_for_exception(GP_VECTOR, ds_invvpid, operand);
-> +	report(!fault, "INVVPID (LAM on): tagged operand");
+
 
