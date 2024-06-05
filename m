@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-18860-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18861-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FE178FC7CE
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 11:31:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FA48FC7D2
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 11:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 573FA1C2309F
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 09:31:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78100B28E23
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 09:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1F2190050;
-	Wed,  5 Jun 2024 09:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B334019048C;
+	Wed,  5 Jun 2024 09:30:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE449190047;
-	Wed,  5 Jun 2024 09:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83161946CB;
+	Wed,  5 Jun 2024 09:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717579826; cv=none; b=M2hEQwwLwMM6uuchylZ36N8EP1yikRALNTwXg75tl9PZH2wslv1xzpVTGRmsQrvfimhuP0hXVB+gJaifGPyUFp/nZxuNfuoJTay2R41KfO7dL0zaCg0ql7gy11sIBWgw3DclPzCTppjdAsj8YL4OSrB3BUmFEV6NtYjlXOf1WnE=
+	t=1717579830; cv=none; b=aQuB1AZjCyh4zOz54bsn+6AZUy4jKgwhTvYnCQxF9fGV4egGAo1O51KRJoLWYG82VzNDljb3KNkhs1CAyRkHea35RPIiWmAD23HuoLXUhFE9kegbS1BiLjgs2UcyXSne5qzmKoIzxNvLyDxZaukX1eW9Hw7mECCD7BN0tezrfFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717579826; c=relaxed/simple;
-	bh=rMoN44z5LutEo0HuQoHyLi2DUsPeZi0hAOBJOhtN9Uc=;
+	s=arc-20240116; t=1717579830; c=relaxed/simple;
+	bh=SDyUn4kx6hDKzj28ha22l3vD1vbdQvyJPCpcxph6WH0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=T0tKCuRhDbLP78WOSt6KaLiHNlPrAicajWuJb/OhCSjw0nPtRkYpiwMOLWI9J8Fqld7CpGi69PIuPcNrIr4E9RxeyUj71qawNeCo09mhIAgfvH8RNCJFqPslyosz1YLYKAs1YdoCxo6B30yxWZdapIaVALeW0vLB7v/nJwQOPnk=
+	 MIME-Version; b=X8Om+OOiJSVcQJrKzIIBGALJF29kLsB/zz1vAL4x3VY6pfXU4tvCks75vAItG0zKFEp+FAMQ/X/ftK6CAR8MBhPw0nncu/WLGRaBDSqZzR/F4FfDoAODlUJT3DG+vLQ3JDS4HNsJ+iWMIc/Nbd7g8ow31sJtpN/fsy/V15pbxwE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 87F3FFEC;
-	Wed,  5 Jun 2024 02:30:47 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C67321063;
+	Wed,  5 Jun 2024 02:30:51 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.39.129])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E4403F792;
-	Wed,  5 Jun 2024 02:30:19 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7DC5A3F792;
+	Wed,  5 Jun 2024 02:30:23 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -52,9 +52,9 @@ Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
 	linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
 	Steven Price <steven.price@arm.com>
-Subject: [PATCH v3 01/14] arm64: rsi: Add RSI definitions
-Date: Wed,  5 Jun 2024 10:29:53 +0100
-Message-Id: <20240605093006.145492-2-steven.price@arm.com>
+Subject: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
+Date: Wed,  5 Jun 2024 10:29:54 +0100
+Message-Id: <20240605093006.145492-3-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240605093006.145492-1-steven.price@arm.com>
 References: <20240605093006.145492-1-steven.price@arm.com>
@@ -68,227 +68,267 @@ Content-Transfer-Encoding: 8bit
 
 From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-The RMM (Realm Management Monitor) provides functionality that can be
-accessed by a realm guest through SMC (Realm Services Interface) calls.
+Detect that the VM is a realm guest by the presence of the RSI
+interface.
 
-The SMC definitions are based on DEN0137[1] version A-eac5.
-
-[1] https://developer.arm.com/documentation/den0137/latest
+If in a realm then all memory needs to be marked as RIPAS RAM initially,
+the loader may or may not have done this for us. To be sure iterate over
+all RAM and mark it as such. Any failure is fatal as that implies the
+RAM regions passed to Linux are incorrect - which would mean failing
+later when attempting to access non-existent RAM.
 
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+Co-developed-by: Steven Price <steven.price@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
 Changes since v2:
- * Rename rsi_get_version() to rsi_request_version()
- * Fix size/alignment of struct realm_config
+ * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
+   static_key_false".
+ * Rename set_memory_range() to rsi_set_memory_range().
+ * Downgrade some BUG()s to WARN()s and handle the condition by
+   propagating up the stack. Comment the remaining case that ends in a
+   BUG() to explain why.
+ * Rely on the return from rsi_request_version() rather than checking
+   the version the RMM claims to support.
+ * Rename the generic sounding arm64_setup_memory() to
+   arm64_rsi_setup_memory() and move the call site to setup_arch().
 ---
- arch/arm64/include/asm/rsi_cmds.h |  47 ++++++++++
- arch/arm64/include/asm/rsi_smc.h  | 142 ++++++++++++++++++++++++++++++
- 2 files changed, 189 insertions(+)
- create mode 100644 arch/arm64/include/asm/rsi_cmds.h
- create mode 100644 arch/arm64/include/asm/rsi_smc.h
+ arch/arm64/include/asm/rsi.h      | 48 +++++++++++++++++++++
+ arch/arm64/include/asm/rsi_cmds.h | 22 ++++++++++
+ arch/arm64/kernel/Makefile        |  3 +-
+ arch/arm64/kernel/rsi.c           | 69 +++++++++++++++++++++++++++++++
+ arch/arm64/kernel/setup.c         |  8 ++++
+ arch/arm64/mm/init.c              |  1 +
+ 6 files changed, 150 insertions(+), 1 deletion(-)
+ create mode 100644 arch/arm64/include/asm/rsi.h
+ create mode 100644 arch/arm64/kernel/rsi.c
 
-diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
+diff --git a/arch/arm64/include/asm/rsi.h b/arch/arm64/include/asm/rsi.h
 new file mode 100644
-index 000000000000..ad425c5d6f1b
+index 000000000000..ce2cdb501d84
 --- /dev/null
-+++ b/arch/arm64/include/asm/rsi_cmds.h
-@@ -0,0 +1,47 @@
++++ b/arch/arm64/include/asm/rsi.h
+@@ -0,0 +1,48 @@
 +/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * Copyright (C) 2023 ARM Ltd.
++ * Copyright (C) 2024 ARM Ltd.
 + */
 +
-+#ifndef __ASM_RSI_CMDS_H
-+#define __ASM_RSI_CMDS_H
++#ifndef __ASM_RSI_H_
++#define __ASM_RSI_H_
 +
-+#include <linux/arm-smccc.h>
++#include <linux/jump_label.h>
++#include <asm/rsi_cmds.h>
 +
-+#include <asm/rsi_smc.h>
++DECLARE_STATIC_KEY_FALSE(rsi_present);
 +
-+static inline void invoke_rsi_fn_smc_with_res(unsigned long function_id,
-+					      unsigned long arg0,
-+					      unsigned long arg1,
-+					      unsigned long arg2,
-+					      unsigned long arg3,
-+					      struct arm_smccc_res *res)
++void __init arm64_rsi_init(void);
++void __init arm64_rsi_setup_memory(void);
++static inline bool is_realm_world(void)
 +{
-+	arm_smccc_smc(function_id, arg0, arg1, arg2, arg3, 0, 0, 0, res);
++	return static_branch_unlikely(&rsi_present);
 +}
 +
-+static inline unsigned long rsi_request_version(unsigned long req,
-+						unsigned long *out_lower,
-+						unsigned long *out_higher)
++static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t end,
++				       enum ripas state)
 +{
-+	struct arm_smccc_res res;
++	unsigned long ret;
++	phys_addr_t top;
 +
-+	invoke_rsi_fn_smc_with_res(SMC_RSI_ABI_VERSION, req, 0, 0, 0, &res);
++	while (start != end) {
++		ret = rsi_set_addr_range_state(start, end, state, &top);
++		if (WARN_ON(ret || top < start || top > end))
++			return -EINVAL;
++		start = top;
++	}
 +
-+	if (out_lower)
-+		*out_lower = res.a1;
-+	if (out_higher)
-+		*out_higher = res.a2;
-+
-+	return res.a0;
++	return 0;
 +}
 +
-+static inline unsigned long rsi_get_realm_config(struct realm_config *cfg)
++static inline int rsi_set_memory_range_protected(phys_addr_t start,
++						 phys_addr_t end)
 +{
-+	struct arm_smccc_res res;
-+
-+	invoke_rsi_fn_smc_with_res(SMC_RSI_REALM_CONFIG, virt_to_phys(cfg), 0, 0, 0, &res);
-+	return res.a0;
++	return rsi_set_memory_range(start, end, RSI_RIPAS_RAM);
 +}
 +
++static inline int rsi_set_memory_range_shared(phys_addr_t start,
++					      phys_addr_t end)
++{
++	return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY);
++}
 +#endif
-diff --git a/arch/arm64/include/asm/rsi_smc.h b/arch/arm64/include/asm/rsi_smc.h
+diff --git a/arch/arm64/include/asm/rsi_cmds.h b/arch/arm64/include/asm/rsi_cmds.h
+index ad425c5d6f1b..ab8ad435f10e 100644
+--- a/arch/arm64/include/asm/rsi_cmds.h
++++ b/arch/arm64/include/asm/rsi_cmds.h
+@@ -10,6 +10,11 @@
+ 
+ #include <asm/rsi_smc.h>
+ 
++enum ripas {
++	RSI_RIPAS_EMPTY,
++	RSI_RIPAS_RAM,
++};
++
+ static inline void invoke_rsi_fn_smc_with_res(unsigned long function_id,
+ 					      unsigned long arg0,
+ 					      unsigned long arg1,
+@@ -44,4 +49,21 @@ static inline unsigned long rsi_get_realm_config(struct realm_config *cfg)
+ 	return res.a0;
+ }
+ 
++static inline unsigned long rsi_set_addr_range_state(phys_addr_t start,
++						     phys_addr_t end,
++						     enum ripas state,
++						     phys_addr_t *top)
++{
++	struct arm_smccc_res res;
++
++	invoke_rsi_fn_smc_with_res(SMC_RSI_IPA_STATE_SET,
++				   start, end, state, RSI_NO_CHANGE_DESTROYED,
++				   &res);
++
++	if (top)
++		*top = res.a1;
++
++	return res.a0;
++}
++
+ #endif
+diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+index 763824963ed1..a483b916ed11 100644
+--- a/arch/arm64/kernel/Makefile
++++ b/arch/arm64/kernel/Makefile
+@@ -33,7 +33,8 @@ obj-y			:= debug-monitors.o entry.o irq.o fpsimd.o		\
+ 			   return_address.o cpuinfo.o cpu_errata.o		\
+ 			   cpufeature.o alternative.o cacheinfo.o		\
+ 			   smp.o smp_spin_table.o topology.o smccc-call.o	\
+-			   syscall.o proton-pack.o idle.o patching.o pi/
++			   syscall.o proton-pack.o idle.o patching.o pi/	\
++			   rsi.o
+ 
+ obj-$(CONFIG_COMPAT)			+= sys32.o signal32.o			\
+ 					   sys_compat.o
+diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
 new file mode 100644
-index 000000000000..c0a65caa3ab3
+index 000000000000..3a992bdfd6bb
 --- /dev/null
-+++ b/arch/arm64/include/asm/rsi_smc.h
-@@ -0,0 +1,142 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
++++ b/arch/arm64/kernel/rsi.c
+@@ -0,0 +1,69 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
 + * Copyright (C) 2023 ARM Ltd.
 + */
 +
-+#ifndef __SMC_RSI_H_
-+#define __SMC_RSI_H_
++#include <linux/jump_label.h>
++#include <linux/memblock.h>
++#include <asm/rsi.h>
 +
-+/*
-+ * This file describes the Realm Services Interface (RSI) Application Binary
-+ * Interface (ABI) for SMC calls made from within the Realm to the RMM and
-+ * serviced by the RMM.
-+ */
++DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
++EXPORT_SYMBOL(rsi_present);
 +
-+#define SMC_RSI_CALL_BASE		0xC4000000
++static bool rsi_version_matches(void)
++{
++	unsigned long ver_lower, ver_higher;
++	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
++						&ver_lower,
++						&ver_higher);
 +
-+/*
-+ * The major version number of the RSI implementation.  Increase this whenever
-+ * the binary format or semantics of the SMC calls change.
-+ */
-+#define RSI_ABI_VERSION_MAJOR		1
++	if (ret == SMCCC_RET_NOT_SUPPORTED)
++		return false;
 +
-+/*
-+ * The minor version number of the RSI implementation.  Increase this when
-+ * a bug is fixed, or a feature is added without breaking binary compatibility.
-+ */
-+#define RSI_ABI_VERSION_MINOR		0
++	if (ret != RSI_SUCCESS) {
++		pr_err("RME: RMM doesn't support RSI version %u.%u. Supported range: %lu.%lu-%lu.%lu\n",
++		       RSI_ABI_VERSION_MAJOR, RSI_ABI_VERSION_MINOR,
++		       RSI_ABI_VERSION_GET_MAJOR(ver_lower),
++		       RSI_ABI_VERSION_GET_MINOR(ver_lower),
++		       RSI_ABI_VERSION_GET_MAJOR(ver_higher),
++		       RSI_ABI_VERSION_GET_MINOR(ver_higher));
++		return false;
++	}
 +
-+#define RSI_ABI_VERSION			((RSI_ABI_VERSION_MAJOR << 16) | \
-+					 RSI_ABI_VERSION_MINOR)
++	pr_info("RME: Using RSI version %lu.%lu\n",
++		RSI_ABI_VERSION_GET_MAJOR(ver_lower),
++		RSI_ABI_VERSION_GET_MINOR(ver_lower));
 +
-+#define RSI_ABI_VERSION_GET_MAJOR(_version) ((_version) >> 16)
-+#define RSI_ABI_VERSION_GET_MINOR(_version) ((_version) & 0xFFFF)
++	return true;
++}
 +
-+#define RSI_SUCCESS			0
-+#define RSI_ERROR_INPUT			1
-+#define RSI_ERROR_STATE			2
-+#define RSI_INCOMPLETE			3
++void __init arm64_rsi_setup_memory(void)
++{
++	u64 i;
++	phys_addr_t start, end;
 +
-+#define SMC_RSI_FID(_x)			(SMC_RSI_CALL_BASE + (_x))
++	if (!is_realm_world())
++		return;
 +
-+#define SMC_RSI_ABI_VERSION			SMC_RSI_FID(0x190)
++	/*
++	 * Iterate over the available memory ranges
++	 * and convert the state to protected memory.
++	 *
++	 * BUG_ON is used because if the attempt to switch the memory to
++	 * protected has failed here, then future accesses to the memory are
++	 * simply going to be reflected as a fault which we can't handle.
++	 * Bailing out early prevents the guest limping on and dieing later.
++	 */
++	for_each_mem_range(i, &start, &end) {
++		BUG_ON(rsi_set_memory_range_protected(start, end));
++	}
++}
 +
-+/*
-+ * arg1 == Challenge value, bytes:  0 -  7
-+ * arg2 == Challenge value, bytes:  7 - 15
-+ * arg3 == Challenge value, bytes: 16 - 23
-+ * arg4 == Challenge value, bytes: 24 - 31
-+ * arg5 == Challenge value, bytes: 32 - 39
-+ * arg6 == Challenge value, bytes: 40 - 47
-+ * arg7 == Challenge value, bytes: 48 - 55
-+ * arg8 == Challenge value, bytes: 56 - 63
-+ * ret0 == Status / error
-+ * ret1 == Upper bound of token size in bytes
-+ */
-+#define SMC_RSI_ATTESTATION_TOKEN_INIT		SMC_RSI_FID(0x194)
++void __init arm64_rsi_init(void)
++{
++	if (!rsi_version_matches())
++		return;
 +
-+/*
-+ * arg1 == The IPA of token buffer
-+ * arg2 == Offset within the granule of the token buffer
-+ * arg3 == Size of the granule buffer
-+ * ret0 == Status / error
-+ * ret1 == Length of token bytes copied to the granule buffer
-+ */
-+#define SMC_RSI_ATTESTATION_TOKEN_CONTINUE	SMC_RSI_FID(0x195)
++	static_branch_enable(&rsi_present);
++}
 +
-+/*
-+ * arg1  == Index, which measurements slot to extend
-+ * arg2  == Size of realm measurement in bytes, max 64 bytes
-+ * arg3  == Measurement value, bytes:  0 -  7
-+ * arg4  == Measurement value, bytes:  7 - 15
-+ * arg5  == Measurement value, bytes: 16 - 23
-+ * arg6  == Measurement value, bytes: 24 - 31
-+ * arg7  == Measurement value, bytes: 32 - 39
-+ * arg8  == Measurement value, bytes: 40 - 47
-+ * arg9  == Measurement value, bytes: 48 - 55
-+ * arg10 == Measurement value, bytes: 56 - 63
-+ * ret0  == Status / error
-+ */
-+#define SMC_RSI_MEASUREMENT_EXTEND		SMC_RSI_FID(0x193)
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index a096e2451044..143f87615af0 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -43,6 +43,7 @@
+ #include <asm/cpu_ops.h>
+ #include <asm/kasan.h>
+ #include <asm/numa.h>
++#include <asm/rsi.h>
+ #include <asm/scs.h>
+ #include <asm/sections.h>
+ #include <asm/setup.h>
+@@ -293,6 +294,11 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+ 	 * cpufeature code and early parameters.
+ 	 */
+ 	jump_label_init();
++	/*
++	 * Init RSI before early param so that "earlycon" console uses the
++	 * shared alias when in a realm
++	 */
++	arm64_rsi_init();
+ 	parse_early_param();
+ 
+ 	dynamic_scs_init();
+@@ -328,6 +334,8 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+ 
+ 	arm64_memblock_init();
+ 
++	arm64_rsi_setup_memory();
 +
-+/*
-+ * arg1 == Index, which measurements slot to read
-+ * ret0 == Status / error
-+ * ret1 == Measurement value, bytes:  0 -  7
-+ * ret2 == Measurement value, bytes:  7 - 15
-+ * ret3 == Measurement value, bytes: 16 - 23
-+ * ret4 == Measurement value, bytes: 24 - 31
-+ * ret5 == Measurement value, bytes: 32 - 39
-+ * ret6 == Measurement value, bytes: 40 - 47
-+ * ret7 == Measurement value, bytes: 48 - 55
-+ * ret8 == Measurement value, bytes: 56 - 63
-+ */
-+#define SMC_RSI_MEASUREMENT_READ		SMC_RSI_FID(0x192)
-+
-+#ifndef __ASSEMBLY__
-+
-+struct realm_config {
-+	union {
-+		struct {
-+			unsigned long ipa_bits; /* Width of IPA in bits */
-+			unsigned long hash_algo; /* Hash algorithm */
-+		};
-+		u8 pad[0x1000];
-+	};
-+} __aligned(0x1000);
-+
-+#endif /* __ASSEMBLY__ */
-+
-+/*
-+ * arg1 == struct realm_config addr
-+ * ret0 == Status / error
-+ */
-+#define SMC_RSI_REALM_CONFIG			SMC_RSI_FID(0x196)
-+
-+/*
-+ * arg1 == Base IPA address of target region
-+ * arg2 == Top of the region
-+ * arg3 == RIPAS value
-+ * arg4 == flags
-+ * ret0 == Status / error
-+ * ret1 == Top of modified IPA range
-+ */
-+#define SMC_RSI_IPA_STATE_SET			SMC_RSI_FID(0x197)
-+
-+#define RSI_NO_CHANGE_DESTROYED			0
-+#define RSI_CHANGE_DESTROYED			1
-+
-+/*
-+ * arg1 == IPA of target page
-+ * ret0 == Status / error
-+ * ret1 == RIPAS value
-+ */
-+#define SMC_RSI_IPA_STATE_GET			SMC_RSI_FID(0x198)
-+
-+/*
-+ * arg1 == IPA of host call structure
-+ * ret0 == Status / error
-+ */
-+#define SMC_RSI_HOST_CALL			SMC_RSI_FID(0x199)
-+
-+#endif /* __SMC_RSI_H_ */
+ 	paging_init();
+ 
+ 	acpi_table_upgrade();
+diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+index 9b5ab6818f7f..9d8d38e3bee2 100644
+--- a/arch/arm64/mm/init.c
++++ b/arch/arm64/mm/init.c
+@@ -41,6 +41,7 @@
+ #include <asm/kvm_host.h>
+ #include <asm/memory.h>
+ #include <asm/numa.h>
++#include <asm/rsi.h>
+ #include <asm/sections.h>
+ #include <asm/setup.h>
+ #include <linux/sizes.h>
 -- 
 2.34.1
 
