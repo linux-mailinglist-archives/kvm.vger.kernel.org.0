@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-18937-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18938-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4E48FD284
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 18:10:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B908FD288
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 18:11:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1C2F1F2A3A8
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 16:10:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26D9E1C23FC6
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 16:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB7B15351A;
-	Wed,  5 Jun 2024 16:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CC115351A;
+	Wed,  5 Jun 2024 16:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntmflBvK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9cXwPAA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2F86CDA1;
-	Wed,  5 Jun 2024 16:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8762575A;
+	Wed,  5 Jun 2024 16:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717603839; cv=none; b=DjYu0qlQQK9n3hlBDpsWDALf3wDSz0JRQuUMEeM0tKSSUvim28gnjALt1IiLglfoV+F9IzgYcRNAG31E1N3Xbhbj/AKFgl7Q9wV1WnoVFevwuxKd+NnWRM7ZDxOBPxVxVEuLRygzWoAlHKUvKFoc+n+0JfcmAXIZnnGh740+yOE=
+	t=1717603902; cv=none; b=OIRogY1obECqaWx7sOPf6l/ZLujfSaLI+/Xh8Z6/7xnmp3XcSf4o9gop9XBEHcAjwPzHJnOhR4Db347wU0s5kAEWGakrC9K+sIMwCidMMnQ9LX50zHi99S04n/iq1uLh8i5WrWjQeT/XVVP4rJiFRXI3WkwhBfyEBRpBmE42ZJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717603839; c=relaxed/simple;
-	bh=X5RZYapwOzHyVtyD+jrPDIxhEjidh1wFJDBAWgYemWA=;
+	s=arc-20240116; t=1717603902; c=relaxed/simple;
+	bh=simTZ+nEbAiDmV4Z9GCTmA+TawwRkQwEDt4QYzfCKwg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JNP9B4TvLJIu8WSEmLiHI79QgZfy+sf5X5kVJgbNbom0twmFhMGNtL6rkXxEQUUh4muqmDYYfUYcJ1p/Bm7myM46PDl5TT5z5qoAvj+IK2MzH+N5zXskVAUN4xRj6EzGpPWpwJzEFfcwHQuE6SE1GQ/49wP0oBM0+93LQypDxJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntmflBvK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E782DC2BD11;
-	Wed,  5 Jun 2024 16:10:36 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=jcZeDpabOwSeIGv4P0txRNfnzaI/a16UQtiirLks778h3DVlWyoA0vXpNw4fP9Z1/gOjKJfbmY6Hnp+X8jayjfqkGo3Ui4RtI/rCKyT7igsaMeiVDoLVULmhtkrdEW3F0YClv5zRiE6QOiNaXi7LMvyvCVA1T/ej9ErRt71oZNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9cXwPAA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7550C2BD11;
+	Wed,  5 Jun 2024 16:11:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717603838;
-	bh=X5RZYapwOzHyVtyD+jrPDIxhEjidh1wFJDBAWgYemWA=;
+	s=k20201202; t=1717603902;
+	bh=simTZ+nEbAiDmV4Z9GCTmA+TawwRkQwEDt4QYzfCKwg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ntmflBvKFTXlT0X/B2Z7CDSlMkwUkkYRrKYpVpp4a3Y+OnfsyrEumUDkgVZW7WchY
-	 c1piDTJ2Pq+ey2BLEH/IDujkg16zTaD+/W1LsZJMSJkDoqHiiKkbb01B+g9FMg6m9Y
-	 KMH6Vd9V8NoZto08wRxT3dBnbbz2tUjwezi9rlGOmkCwiSDz1Mkf7mmJuMCcB/DAm3
-	 Ukgj3Fir0MZITOZJ7YVeuyPtBc+sHK0UA8m3YY3soWENouGgmVb5B14vdAoI/eqDB5
-	 g5qAesN8LhQaccWFiWamJitHdSVHc1Z4Qg/xqJ/FHLqgqLVKWK2E/r01fH1WrhSeow
-	 VHQGpDXdMoVuw==
-Date: Wed, 5 Jun 2024 17:10:33 +0100
+	b=d9cXwPAAA5mgiKYXiSVaJKv8htQWMAmJEk1PP14iYT4l4cV6B9LVnghU1IIE9fUXt
+	 hSBiqXOmy94oqiaQ+NRgQHtrPsnars5Jr0oTNA3Wh8BMok/38X01QFUVHh83hIhJS8
+	 OKFZ59BM8q4j67oC8xGNZgTSrFP4wtkVnMkKv3+lAL2cS30e5FYSIXhhDqsZl2Ix7w
+	 ZsymXVoinJcv0qADpNXqkIxGByKe22c6OUqzhUXwME5/5BzdGNXpenID0SBUOaVuid
+	 9KlqlcbpAaiWfL4YCn87Vx8FEZ/LD2ceQ8K5F27sdkOXhPejw+uzGaQwDlsvPyJktE
+	 70doRkqkl8Pnw==
+Date: Wed, 5 Jun 2024 17:11:37 +0100
 From: Will Deacon <will@kernel.org>
 To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
 Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
@@ -49,13 +49,13 @@ Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 05/13] KVM: arm64: Rename __guest_exit_panic
- __hyp_panic
-Message-ID: <20240605161033.GB22199@willie-the-truck>
+Subject: Re: [PATCH v4 10/13] KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at
+ EL2
+Message-ID: <20240605161137.GC22199@willie-the-truck>
 References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-6-ptosi@google.com>
- <20240603143424.GF19151@willie-the-truck>
- <42h74rlklrenekak6dzl6mpi2b37peir6o55tnawvvf3kt6idn@53svu2uxcxk5>
+ <20240529121251.1993135-11-ptosi@google.com>
+ <20240603144530.GK19151@willie-the-truck>
+ <ucvvmwiur2qhagm4tcsbffftzaktthqnryi74k5ajtolhx4qor@via5txfexwlc>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,44 +65,68 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <42h74rlklrenekak6dzl6mpi2b37peir6o55tnawvvf3kt6idn@53svu2uxcxk5>
+In-Reply-To: <ucvvmwiur2qhagm4tcsbffftzaktthqnryi74k5ajtolhx4qor@via5txfexwlc>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Jun 04, 2024 at 04:51:58PM +0100, Pierre-Clément Tosi wrote:
-> On Mon, Jun 03, 2024 at 03:34:24PM +0100, Will Deacon wrote:
-> > On Wed, May 29, 2024 at 01:12:11PM +0100, Pierre-Clément Tosi wrote:
-> > > Use a name that expresses the fact that the routine might not exit
-> > > through the guest but will always (directly or indirectly) end up
-> > > executing hyp_panic().
-> > > 
-> > > Use CPU_LR_OFFSET to clarify that the routine returns to hyp_panic().
-> > > 
-> > > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> > > ---
-> > >  arch/arm64/kvm/hyp/entry.S              | 6 +++---
-> > >  arch/arm64/kvm/hyp/hyp-entry.S          | 2 +-
-> > >  arch/arm64/kvm/hyp/include/hyp/switch.h | 4 ++--
-> > >  arch/arm64/kvm/hyp/nvhe/host.S          | 4 ++--
-> > >  4 files changed, 8 insertions(+), 8 deletions(-)
+On Tue, Jun 04, 2024 at 05:04:40PM +0100, Pierre-Clément Tosi wrote:
+> On Mon, Jun 03, 2024 at 03:45:30PM +0100, Will Deacon wrote:
+> > On Wed, May 29, 2024 at 01:12:16PM +0100, Pierre-Clément Tosi wrote:
+> > > diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-init.S b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > index d859c4de06b6..b1c8977e2812 100644
+> > > --- a/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > +++ b/arch/arm64/kvm/hyp/nvhe/hyp-init.S
+> > > @@ -5,6 +5,7 @@
+> > >   */
+> > >  
+> > >  #include <linux/arm-smccc.h>
+> > > +#include <linux/cfi_types.h>
+> > >  #include <linux/linkage.h>
+> > >  
+> > >  #include <asm/alternative.h>
+> > > @@ -267,8 +268,11 @@ SYM_CODE_END(__kvm_handle_stub_hvc)
+> > >  
+> > >  /*
+> > >   * void __pkvm_init_switch_pgd(phys_addr_t pgd, void *sp, void (*fn)(void));
+> > > + *
+> > > + * SYM_TYPED_FUNC_START() allows C to call this ID-mapped function indirectly
+> > > + * using a physical pointer without triggering a kCFI failure.
+> > >   */
+> > > -SYM_FUNC_START(__pkvm_init_switch_pgd)
+> > > +SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
+> > >  	/* Turn the MMU off */
+> > >  	pre_disable_mmu_workaround
+> > >  	mrs	x9, sctlr_el2
 > > 
-> > Hmm, I'm not sure about this. When is __guest_exit_panic() called outside
-> > of guest context?
+> > I still think this last hunk should be merged with the earlier patch
+> > fixing up the prototype of __pkvm_init_switch_pgd().
 > 
-> AFAICT, it is also called from
+> Unfortunately, this is not possible because
 > 
-> - the early __kvm_hyp_host_vector, installed by cpu_hyp_init_context()
+>   SYM_TYPED_FUNC_START(__pkvm_init_switch_pgd)
+> 
+> makes the assembler generate an unresolved symbol for the function type, which
+> the compiler only generates (from the C declaration) if it compiles with kCFI so
+> that moving this hunk to an earlier patch results in a linker error:
+> 
+>   ld.lld: error: undefined symbol: __kvm_nvhe___kcfi_typeid___pkvm_init_switch_pgd
+> 
+> OTOH, moving it to a later patch triggers a kCFI (runtime) panic.
+> 
+> As a result, this hunk *must* be part of this patch.
 
-Well, we've just agreed to remove that one :)
+Argh, thanks for the explanation. I thought CONFIG_CFI_CLANG would save
+us here, but that's already enabled for the rest of the kernel so now I
+understand what you mean.
 
-> - the flavors of __kvm_hyp_vector, installed by cpu_hyp_init_features()
+> > With that:
+> > 
+> > Acked-by: Will Deacon <will@kernel.org>
+> 
+> As I haven't followed your suggestion, I'll ignore this.
 
-cpu_hyp_init_features() doesn't actually plumb the vector into VBAR,
-though, so I still think that __guest_exit_panic() is only reachable
-in guest context.
+You can keep the Ack.
 
-> which start handling exceptions long before the first guest can even be spawned.
-
-I don't see how :/
+Cheers,
 
 Will
 
