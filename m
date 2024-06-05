@@ -1,195 +1,294 @@
-Return-Path: <kvm+bounces-18947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F3D8FD663
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 21:23:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E07F68FD742
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 22:11:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CADB81F24DD8
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 19:23:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E73AC1C22A33
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 20:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C0F14D704;
-	Wed,  5 Jun 2024 19:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3696215E5C9;
+	Wed,  5 Jun 2024 20:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B4Ix76RS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SF/wRUlx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C9941C79
-	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 19:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6DB15D5D9
+	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 20:10:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717615408; cv=none; b=lwA12UxfVPCzVwG6qbSpS53Ah+2ozato3rrCVGSTexvfuJfaMpztnbeg6mq9hXEObafpZLlP7GAbz22d/ikQPfhuTHJgvzFJ5PNkTxlwO0Aa9KUvRtq8RRljuu1VPr0mYyGoGm9tXvEj07UvbdC8V2r1FD0q1Ua1x8AYrk+dAZA=
+	t=1717618234; cv=none; b=YH717xjpQzWg1dOOwKSE1K9RwlZyFOCgRSxl56dWW29Em0m3Yq6gFEcpr1IgMw9xRRz+wBGkl7S67swzWuplAug9XxMamuKQhOj917jGbx2N84kBAFOEM043JBcb84snRBTiqJrzoFlbXfLDI65Z3Ldu5fUkCPry/WBn1mBBL9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717615408; c=relaxed/simple;
-	bh=xNUmRVBbmLabH02EGVqYiDi8R5t5o+k1GtkwwSRV3cw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=eR/HSLWJFCf48VmeZhTXggKwNEwIxWle9AUAKnsr4lMxdAipscL2wi6L6KYKCR8MCCJ77+20q4tlnknu+IZmXhlVUcEbp9iqkqxfiiwNcREIWPI+CZlP+8pP/B7TLjvE265Ud3qm6Un+bHOMBCDABfWC7hkd60f8lZWHYQuyKEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B4Ix76RS; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1717618234; c=relaxed/simple;
+	bh=P/ULyAJHmdP8+weQdNuK68L1c0m3M09m6gLP50TY3jI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=trE0Br810JTHzztODRmTNv+QznHwNMlYTnbkVQ6bD8msegiCih6283SyuvbOXsTW/eeiLsw18metaToICOMn/K4Z7iJSBiGDqeDsidh7qpHsrEalGB60Y4NKKqvnjh8eRTezOaaYdVuAe0OUAOarZtKZ9itRhjckImUEPBHUM44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SF/wRUlx; arc=none smtp.client-ip=209.85.208.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1f6238a6c2eso1828025ad.3
-        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 12:23:26 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2eab0bc74caso1593501fa.0
+        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 13:10:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717615406; x=1718220206; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HezPimuT7DFljRqo9XN5Xky8zEqqwviG0WSUPHBG4qk=;
-        b=B4Ix76RSqkv+y4i6v4gQVjkMddLbco/BePGAvfNwGduqYiCtOi7DpcAfHVcDP3RXxK
-         jvVuVr1OdJ+sxVBUSoaRnKyQ6hlHmvO9g88mVTXu4ahbvwF6dK6L75jVzKZ33hUZCoDF
-         nWm4Ln3587vrqHGM70E3Gek9aTRbu6ISNxOHLS//X43k3QOKwHAVZThF6G4AaryYIrIo
-         wf0UzCVWhb70lF1rdSbW3siZKL/a3zu9Y/MP9SRf2q1eKJas1CZg5XO5Wtr+bLLIMXa+
-         0i+A012BHpkfnrwb7avJyVNRj5dkc5b1Z2sueQJOmtYzCy+S94oCN213q5RqOLGv9Ac7
-         L11Q==
+        d=google.com; s=20230601; t=1717618230; x=1718223030; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oBwUpUZb8gh3eQHfueITt2ZJwiwMmdwZoHaq8+wmWqI=;
+        b=SF/wRUlxdwAsSXab2VlochVUdc4kXfmrJBgQpZK99mS3KDlbusff5hEH18qtDK2/Iz
+         Tv7K/8P/MNo/V0Jtcp9k301mAvOPeEiPnVFPffgxt+4E1CtqcCPAeBfPe7lJM493ZP6q
+         gonqLgti3C0m7vO0MdxSe5SaDnZGOm8ZFFsk+5hEqODsT6sRhzLgXyqioLraS1WJYW/c
+         qgrF8YKjoHaEmevd7Sfux8at6kNEzF8bPkOUG3ErSPlCO4vAdyAnK100knLvcC6RW0NY
+         Q6eW9Td74LwvdHISX3ZDSU4hMNOEqtzjHrUH3O3pAS0ozBfthZOSzXi9es0l2YQK5fXF
+         iBRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717615406; x=1718220206;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HezPimuT7DFljRqo9XN5Xky8zEqqwviG0WSUPHBG4qk=;
-        b=ssdQVACt++54ES4bywBF7ObLy8o1vQAVNAWXIJlxtrT/pOy8uTtG8H1msxmGRL3O6K
-         CRg/SlydHmXzKLhEKCV4G7/HA3q7m5Ga/ACvq2el4KQGHd7qHn/ZCVfjhZre+U2lWo6h
-         4Oi71INVvnV5SdwtgQEPifJwptPh54qc2vG2/1jU3YIwKbmmzNfFZ8K5fBr9+k2uz388
-         3YJGCQ3WaXdSis9H0OcVZ72ksKsddzrHJYcWgxVCzUApz0kxtYK3F2rmwh1aS84CeNtC
-         fwkJDr1k+bjOopBwivYYOIUBpjrAsCtFWnKRCxLeV9CGR3snohA3UB4Y0qBaIHiGxbnt
-         ZGcQ==
-X-Gm-Message-State: AOJu0Yz9OGWgxjaAjlkjqhetsqApvuYtbZPzI8/T3QsG4XODCLbGUd3k
-	3BiX45/iprmLNKzZ+UN7tflKlJlIW49ZJdFDGFlhlq4Ufj8PMx4/hS03TJgdoyl85WvAUbRm17f
-	d9Q==
-X-Google-Smtp-Source: AGHT+IFzrEmr5nF2FZTs3UrZy2ZIxgWCOEy7JH3ZPIKTEhCKIdSOG35K1jMzGLeDgwa2kOlSDu4OyValsPg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:d50e:b0:1f6:6900:5947 with SMTP id
- d9443c01a7336-1f6a5a0c1a4mr2050405ad.5.1717615405861; Wed, 05 Jun 2024
- 12:23:25 -0700 (PDT)
-Date: Wed, 5 Jun 2024 12:23:24 -0700
-In-Reply-To: <20230504134908.830041-1-rkagan@amazon.de>
+        d=1e100.net; s=20230601; t=1717618230; x=1718223030;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oBwUpUZb8gh3eQHfueITt2ZJwiwMmdwZoHaq8+wmWqI=;
+        b=Zuwa5UEaIVcOjMwosw7ra1qKwe84O3GvXq65jePwMQMEImXFhNn2sGbBf7QF7ejVjW
+         GNJQHIkiRYrqaYtFGTQLqIARtRXghgZZdBxKE1Wp1kl3A90f1afXDGdkuuDwgxmxdNxP
+         Py9hw512a0yonGMOe+VG9XbPLZff63nEODabSqvWRcRLLBjtOR144UBw0mHFyQLggeVi
+         nG+0LhEMoY44FltjW1cLtIu7d5SiE6Twj7FONLssOlOovQfDjno8t7ACaFU9pz/S1JI4
+         YSUILvyy8AI1AtrxiRTPsaU57yAjdLNoux3b0fKBQCgtkS2FleHVGSN/GXljrSGOS/5V
+         fDjg==
+X-Forwarded-Encrypted: i=1; AJvYcCVQq/9tGiT/KES0V0r34hiOTQJsa6GTaZbxauun9KfBiMuiKIZMpb3uoR2j9XnAd5FGDeB9+lQxpXFIM7V7fxzuOm6y
+X-Gm-Message-State: AOJu0YxUVKuUieTEt9wFU8ivpSIU0MWbCBnkgtUmy7IxzRU9xEyjBiVS
+	44CZHkl8otUsKPyYlhwyFJUbxtJuZXfY5XEpY9MB/v4tEgfzNyN9twgB89mUn+KQy4f/YOey1wD
+	TVsd9HLhZotRGixo7Qqbk2H2EDSiBVUwSxW8Y
+X-Google-Smtp-Source: AGHT+IGksIwyimMNtUjcaJJe0ywzHDsW40IeRamyOlbcwZdT+OnlzNT/xV8FemA/U28w4/kuuedLzSZsJnzH6N1zXBo=
+X-Received: by 2002:a2e:908e:0:b0:2e2:59c7:a922 with SMTP id
+ 38308e7fff4ca-2ead00b9e81mr1751531fa.15.1717618230256; Wed, 05 Jun 2024
+ 13:10:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230504134908.830041-1-rkagan@amazon.de>
-Message-ID: <ZmC7LB6e8nXkMo7G@google.com>
-Subject: Re: [kvm-unit-tests] x86/pmu: add testcase for WRMSR to counter in
- PMI handler
-From: Sean Christopherson <seanjc@google.com>
-To: Roman Kagan <rkagan@amazon.de>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20231212204647.2170650-1-sagis@google.com> <ce967287157e830303fdd3d4a37e7d62a1698747.camel@intel.com>
+In-Reply-To: <ce967287157e830303fdd3d4a37e7d62a1698747.camel@intel.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Wed, 5 Jun 2024 15:10:18 -0500
+Message-ID: <CAAhR5DFmT0n9KWRMtO=FkWbm9_tXy1gP-mpbyF05mmLUph2dPA@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 00/29] TDX KVM selftests
+To: "Verma, Vishal L" <vishal.l.verma@intel.com>
+Cc: "ackerleytng@google.com" <ackerleytng@google.com>, 
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Aktas, Erdem" <erdemaktas@google.com>, 
+	"Afranji, Ryan" <afranji@google.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"jmattson@google.com" <jmattson@google.com>, "pgonda@google.com" <pgonda@google.com>, 
+	"seanjc@google.com" <seanjc@google.com>, "runanwang@google.com" <runanwang@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Annapurve, Vishal" <vannapurve@google.com>, 
+	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>, "shuah@kernel.org" <shuah@kernel.org>, 
+	"vipinsh@google.com" <vipinsh@google.com>, "Xu, Haibo1" <haibo1.xu@intel.com>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "dmatlack@google.com" <dmatlack@google.com>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, May 04, 2023, Roman Kagan wrote:
-> Add a testcase where the PMI handler writes a negative value to the perf
-> counter whose overflow would trigger that PMI.
-> 
-> It's meant specifically to cover the KVM bug where every negative value
-> written to the counter caused an immediate overflow; in that case the
-> vCPU would never leave PMI loop.
-> 
-> The bug is addressed in
-> https://lore.kernel.org/kvm/20230504120042.785651-1-rkagan@amazon.de;
-> until this (or some alternative) fix is merged the test will hang on
-> this testcase.
-> 
-> Signed-off-by: Roman Kagan <rkagan@amazon.de>
-> ---
->  x86/pmu.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 42 insertions(+), 3 deletions(-)
-> 
-> diff --git a/x86/pmu.c b/x86/pmu.c
-> index 72c2c9cfd8b0..cdf9093722fb 100644
-> --- a/x86/pmu.c
-> +++ b/x86/pmu.c
-> @@ -74,6 +74,7 @@ static void cnt_overflow(isr_regs_t *regs)
->  static bool check_irq(void)
->  {
->  	int i;
-> +	apic_write(APIC_LVTPC, PMI_VECTOR);
->  	irq_received = 0;
->  	irq_enable();
->  	for (i = 0; i < 100000 && !irq_received; i++)
-> @@ -156,7 +157,6 @@ static void __start_event(pmu_counter_t *evt, uint64_t count)
->  	    wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl);
->      }
->      global_enable(evt);
-> -    apic_write(APIC_LVTPC, PMI_VECTOR);
->  }
->  
->  static void start_event(pmu_counter_t *evt)
-> @@ -474,6 +474,45 @@ static void check_running_counter_wrmsr(void)
->  	report_prefix_pop();
->  }
->  
-> +static void cnt_overflow_with_wrmsr(isr_regs_t *regs)
-> +{
-> +	cnt_overflow(regs);
-> +	/* write negative value that won't cause immediate overflow */
-> +	wrmsr(MSR_GP_COUNTERx(0),
-> +	      ((-1ull) << 31) & ((1ull << pmu.gp_counter_width) - 1));
-> +}
+On Wed, Jun 5, 2024 at 1:38=E2=80=AFPM Verma, Vishal L <vishal.l.verma@inte=
+l.com> wrote:
+>
+> On Tue, 2023-12-12 at 12:46 -0800, Sagi Shahar wrote:
+> > Hello,
+> >
+> > This is v4 of the patch series for TDX selftests.
+> >
+> > It has been updated for Intel=E2=80=99s v17 of the TDX host patches whi=
+ch was
+> > proposed here:
+> > https://lore.kernel.org/all/cover.1699368322.git.isaku.yamahata@intel.c=
+om/
+> >
+> > The tree can be found at:
+> > https://github.com/googleprodkernel/linux-cc/tree/tdx-selftests-rfc-v5
+>
+> Hello,
+>
+> I wanted to check if there were any plans from Google to refresh this
+> series for the current TDX patches and the kvm-coco-queue baseline?
+>
+I'm going to work on it soon and was planning on using Isaku's V19 of
+the TDX host patches
 
-This seems way more complicated than it needs to be.  Linux does the write in its
-PMI, but that isn't relevant to hitting the bug, it only makes the bug visible,
-i.e. hangs the guest.
+> I'm setting up a CI system that the team is using to test updates to
+> the different TDX patch series, and it currently runs the KVM Unit
+> tests, and kvm selftests, and we'd like to be able to add these three
+> new TDX tests to that as well.
+>
+> I tried to take a quick shot at rebasing it, but ran into several
+> conflicts since kvm-coco-queue has in the meantime made changes e.g. in
+> tools/testing/selftests/kvm/lib/x86_64/processor.c vcpu_setup().
+>
+> If you can help rebase this, Rick's MMU prep series might be a good
+> baseline to use:
+> https://lore.kernel.org/all/20240530210714.364118-1-rick.p.edgecombe@inte=
+l.com/
 
-Wouldn't it suffice to write a negative value that isn't supposed to overflow,
-and then assert that overflow doesn't happen?
-
-If the the PMI shenanigans are needed for some reason, I would vote to just switch
-out the handler, not change the vector, which I find weird and unintuitive, e.g.
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index f67da863..6cdd644c 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -159,6 +159,7 @@ static void __start_event(pmu_counter_t *evt, uint64_t count)
-            wrmsr(MSR_CORE_PERF_FIXED_CTR_CTRL, ctrl);
-     }
-     global_enable(evt);
-+    apic_write(APIC_LVTPC, PMI_VECTOR);
- }
- 
- static void start_event(pmu_counter_t *evt)
-@@ -493,9 +494,9 @@ static void check_running_counter_wrmsr_in_pmi(void)
-        };
- 
-        report_prefix_push("running counter wrmsr in PMI");
-+       handle_irq(PMI_VECTOR, cnt_overflow_with_wrmsr);
- 
-        start_event(&evt);
--       apic_write(APIC_LVTPC, PMI_VECTOR + 1);
- 
-        irq_received = 0;
-        irq_enable();
-@@ -509,6 +510,9 @@ static void check_running_counter_wrmsr_in_pmi(void)
-        loop();
-        stop_event(&evt);
-        irq_disable();
-+
-+       handle_irq(PMI_VECTOR, cnt_overflow);
-+
-        report(evt.count >= gp_events[1].min, "cntr");
-        report(irq_received, "irq");
- 
-@@ -755,7 +759,6 @@ int main(int ac, char **av)
- {
-        setup_vm();
-        handle_irq(PMI_VECTOR, cnt_overflow);
--       handle_irq(PMI_VECTOR + 1, cnt_overflow_with_wrmsr);
-        buf = malloc(N*64);
- 
-        check_invalid_rdpmc_gp();
-@@ -782,6 +785,8 @@ int main(int ac, char **av)
-        printf("Fixed counters:      %d\n", pmu.nr_fixed_counters);
-        printf("Fixed counter width: %d\n", pmu.fixed_counter_width);
- 
-+       apic_write(APIC_LVTPC, PMI_VECTOR);
-+
-        check_counters();
- 
-        if (pmu_has_full_writes()) {
-
-
+This patch series only includes the basic TDX MMU changes and is
+missing a lot of the TDX support. Not sure how this can be used as a
+baseline without the rest of the TDX patches. Are there other patch
+series that were posted based on this series which provides the rest
+of the TDX support?
+>
+> This is also available in a tree at:
+> https://github.com/intel/tdx/tree/tdx_kvm_dev-2024-05-30
+>
+> Thank you,
+> Vishal
+>
+> >
+> > Changes from RFC v4:
+> >
+> > Added patch to propagate KVM_EXIT_MEMORY_FAULT to userspace.
+> >
+> > Minor tweaks to align the tests to the new TDX 1.5 spec such as changes
+> > in the expected values in TDG.VP.INFO.
+> >
+> > In RFCv5, TDX selftest code is organized into:
+> >
+> > + headers in tools/testing/selftests/kvm/include/x86_64/tdx/
+> > + common code in tools/testing/selftests/kvm/lib/x86_64/tdx/
+> > + selftests in tools/testing/selftests/kvm/x86_64/tdx_*
+> >
+> > Dependencies
+> >
+> > + Peter=E2=80=99s patches, which provide functions for the host to allo=
+cate
+> >   and track protected memory in the guest.
+> >   https://lore.kernel.org/all/20230110175057.715453-1-pgonda@google.com=
+/
+> >
+> > Further work for this patch series/TODOs
+> >
+> > + Sean=E2=80=99s comments for the non-confidential UPM selftests patch =
+series
+> >   at https://lore.kernel.org/lkml/Y8dC8WDwEmYixJqt@google.com/T/#u appl=
+y
+> >   here as well
+> > + Add ucall support for TDX selftests
+> >
+> > I would also like to acknowledge the following people, who helped
+> > review or test patches in previous versions:
+> >
+> > + Sean Christopherson <seanjc@google.com>
+> > + Zhenzhong Duan <zhenzhong.duan@intel.com>
+> > + Peter Gonda <pgonda@google.com>
+> > + Andrew Jones <drjones@redhat.com>
+> > + Maxim Levitsky <mlevitsk@redhat.com>
+> > + Xiaoyao Li <xiaoyao.li@intel.com>
+> > + David Matlack <dmatlack@google.com>
+> > + Marc Orr <marcorr@google.com>
+> > + Isaku Yamahata <isaku.yamahata@gmail.com>
+> > + Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> >
+> > Links to earlier patch series
+> >
+> > + RFC v1: https://lore.kernel.org/lkml/20210726183816.1343022-1-erdemak=
+tas@google.com/T/#u
+> > + RFC v2: https://lore.kernel.org/lkml/20220830222000.709028-1-sagis@go=
+ogle.com/T/#u
+> > + RFC v3: https://lore.kernel.org/lkml/20230121001542.2472357-1-ackerle=
+ytng@google.com/T/#u
+> > + RFC v4: https://lore.kernel.org/lkml/20230725220132.2310657-1-afranji=
+@google.com/
+> >
+> > *** BLURB HERE ***
+> >
+> > Ackerley Tng (12):
+> >   KVM: selftests: Add function to allow one-to-one GVA to GPA mappings
+> >   KVM: selftests: Expose function that sets up sregs based on VM's mode
+> >   KVM: selftests: Store initial stack address in struct kvm_vcpu
+> >   KVM: selftests: Refactor steps in vCPU descriptor table initializatio=
+n
+> >   KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES to validate TDs'
+> >     attribute configuration
+> >   KVM: selftests: TDX: Update load_td_memory_region for VM memory backe=
+d
+> >     by guest memfd
+> >   KVM: selftests: Add functions to allow mapping as shared
+> >   KVM: selftests: Expose _vm_vaddr_alloc
+> >   KVM: selftests: TDX: Add support for TDG.MEM.PAGE.ACCEPT
+> >   KVM: selftests: TDX: Add support for TDG.VP.VEINFO.GET
+> >   KVM: selftests: TDX: Add TDX UPM selftest
+> >   KVM: selftests: TDX: Add TDX UPM selftests for implicit conversion
+> >
+> > Erdem Aktas (3):
+> >   KVM: selftests: Add helper functions to create TDX VMs
+> >   KVM: selftests: TDX: Add TDX lifecycle test
+> >   KVM: selftests: TDX: Adding test case for TDX port IO
+> >
+> > Roger Wang (1):
+> >   KVM: selftests: TDX: Add TDG.VP.INFO test
+> >
+> > Ryan Afranji (2):
+> >   KVM: selftests: TDX: Verify the behavior when host consumes a TD
+> >     private memory
+> >   KVM: selftests: TDX: Add shared memory test
+> >
+> > Sagi Shahar (11):
+> >   KVM: selftests: TDX: Add report_fatal_error test
+> >   KVM: selftests: TDX: Add basic TDX CPUID test
+> >   KVM: selftests: TDX: Add basic get_td_vmcall_info test
+> >   KVM: selftests: TDX: Add TDX IO writes test
+> >   KVM: selftests: TDX: Add TDX IO reads test
+> >   KVM: selftests: TDX: Add TDX MSR read/write tests
+> >   KVM: selftests: TDX: Add TDX HLT exit test
+> >   KVM: selftests: TDX: Add TDX MMIO reads test
+> >   KVM: selftests: TDX: Add TDX MMIO writes test
+> >   KVM: selftests: TDX: Add TDX CPUID TDVMCALL test
+> >   KVM: selftests: Propagate KVM_EXIT_MEMORY_FAULT to userspace
+> >
+> >  tools/testing/selftests/kvm/Makefile          |    8 +
+> >  .../selftests/kvm/include/kvm_util_base.h     |   30 +
+> >  .../selftests/kvm/include/x86_64/processor.h  |    4 +
+> >  .../kvm/include/x86_64/tdx/td_boot.h          |   82 +
+> >  .../kvm/include/x86_64/tdx/td_boot_asm.h      |   16 +
+> >  .../selftests/kvm/include/x86_64/tdx/tdcall.h |   59 +
+> >  .../selftests/kvm/include/x86_64/tdx/tdx.h    |   65 +
+> >  .../kvm/include/x86_64/tdx/tdx_util.h         |   19 +
+> >  .../kvm/include/x86_64/tdx/test_util.h        |  164 ++
+> >  tools/testing/selftests/kvm/lib/kvm_util.c    |  101 +-
+> >  .../selftests/kvm/lib/x86_64/processor.c      |   77 +-
+> >  .../selftests/kvm/lib/x86_64/tdx/td_boot.S    |  101 ++
+> >  .../selftests/kvm/lib/x86_64/tdx/tdcall.S     |  158 ++
+> >  .../selftests/kvm/lib/x86_64/tdx/tdx.c        |  262 ++++
+> >  .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   |  558 +++++++
+> >  .../selftests/kvm/lib/x86_64/tdx/test_util.c  |  101 ++
+> >  .../kvm/x86_64/tdx_shared_mem_test.c          |  135 ++
+> >  .../selftests/kvm/x86_64/tdx_upm_test.c       |  469 ++++++
+> >  .../selftests/kvm/x86_64/tdx_vm_tests.c       | 1319 +++++++++++++++++
+> >  19 files changed, 3693 insertions(+), 35 deletions(-)
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/td_b=
+oot.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/td_b=
+oot_asm.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdca=
+ll.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.=
+h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx_=
+util.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test=
+_util.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/td_boot.=
+S
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util=
+.c
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_uti=
+l.c
+> >  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_shared_mem_t=
+est.c
+> >  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_upm_test.c
+> >  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> >
+>
 
