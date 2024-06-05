@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-18856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 274A28FC56D
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 10:10:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A1AA8FC56E
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 10:10:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 493721F2157D
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 08:10:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAA181C20EFC
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 08:10:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C8318F2EA;
-	Wed,  5 Jun 2024 08:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AFF818F2F4;
+	Wed,  5 Jun 2024 08:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBYMcFti"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="idWyKkRp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEEF18F2E4
-	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 08:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CC4413B5AE
+	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 08:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717574996; cv=none; b=d7TG0fJKdIR2eqKc/w+6rZqS0E9zcMQ4C/ff701WsyWdCHhlUKKYrt0TIXiBOwuHnY99wJPAd+C85r1u/oApIIy0KR+7LbohDkJJZTifhH9V5cRG89j6LlJxCFVp77G3vmBQBvNUPcnavJckp896baQZfXis1/APyURHi9QoPuI=
+	t=1717574999; cv=none; b=AMYXFliH6tggKmXH7XnywrE3WbklJ93wjXlek00YfjgJ482kRk1eBNGv3Pqv2NcJhZKEjzvFRfj+psq53pk9Zi21JWdYupjjft/43q6minFoqSNHLIsUj4LUDNwCaBnM/u4Av7JTZsGAeERnIjNFafjgtEpfzqsOoZ79jJQKSeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717574996; c=relaxed/simple;
-	bh=bnOQqI//3TW77ODN2dIMoc+AGy0B19ITR5PqEDsRhQ4=;
+	s=arc-20240116; t=1717574999; c=relaxed/simple;
+	bh=I8O2WXKVIOLjd5F1Vhff1FtvhtGZI8T4U6sBgbpLFoM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bNZGqiJhRgnDDMzpWRyfR8IwS/T6DBNFJzR6AAYIVgi7WsttWdC8mzcPdDPuClNqyEe1YaWn6iTiWanppbg1TFTCANQfSTm2MX3mQSzvUux2hpQVAUYSjieiWy63krDglZzr3HhKIe0Amg2IFUbPe9zc+g64rmgEOd0cDFDGfKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBYMcFti; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=pWeJ3X1EemHtQ2CCSMRPb53xR6CbMnLPgcCSoRkw+Hm/tl+TUwGIS22Jp/i2ykfeCVtmfvAhgVczwvCqVJACWMraogyUWFRZQxYtRC13ybEWWax6bsMftgwhgEmGu4QJnAEzPwwccaDzxQisqN0WVjrNJ+qvczIhhaYcxkZhdbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=idWyKkRp; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f6342c5fa8so39072705ad.1
-        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 01:09:54 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1f480624d0fso48554075ad.1
+        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 01:09:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717574994; x=1718179794; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1717574998; x=1718179798; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3bS5X+2iRCqKghZHw7j8sOuL2938EX8uAkbCu/GgW6g=;
-        b=UBYMcFticiKRpXaiASjnV+fMJXd3/Nf3TU5YrvEz3snLseAiPwypOlWDwIxiR22j18
-         4xyOgLO/MGLQDz6Sznr3g6bXv6wwUNEhsH7Kq3ZG3k3T/I8spWPMKG31tdJY08XW2ue0
-         bbcdY8qOSFHSb/f5sNFhv3tWUzj16y457qBT3TuOIJ1FFMIVI/2LQH6lYbS1qcomg6XW
-         qAErgned31o5b1cT+Ja9iMM4gG9aJDZa89OOK+YksoFexp0AACC+UKtUWiXzaTYWnyj5
-         znjeOEnnKOj2K6nyUweidqcxT3yJiZlW5u4/qbtXGCbz4dsy8S/ksMl8LLDyfo/Kslqs
-         h1GA==
+        bh=y1yP+3UldxiuTRJaKYzGddUQNVqEP584eUuxDOZAmb4=;
+        b=idWyKkRpPOXjxV5Heb/kojbQdXeJ4MYoAv3ANNXqGH2oP0M8Zc0WcV/ghlG/zZvSGM
+         x6wFYppcTmPxt4FDqL5zCCy0NWSFNY5f5q44iwkwdzLgedVWVvK1XtbmvGhhj3CxS6Yq
+         shTLgClgry3+Zqf8caoFEmLObZ7zmrUsiNVslRFivd5P74KaGcrGAPHaDxK+yJ8EjU4W
+         ZpVNrkJka5EFAw8bil1ohfXSb7eTrU+ECViXRidUlcHojubVp61QZNK6Xo9OWIRcnrJV
+         Fk98hGzRnqmu7RKSl+YOn+tA1ETG5MNHEU5TWT48+MsCbN+Pbmc6d3RCbzR0cBHQubW8
+         CHQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717574994; x=1718179794;
+        d=1e100.net; s=20230601; t=1717574998; x=1718179798;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3bS5X+2iRCqKghZHw7j8sOuL2938EX8uAkbCu/GgW6g=;
-        b=eXzzkWbnBE/eYGADgiBKHA4Qvj+M/u3u1ZYAKbDNXeQR8xAogwRIFPWAjsd7n7PuvV
-         ozD5TU3jgB8L8ug/hlf8/nSRA8po28wp3uNEkqx2jhIdYsMFn4kOQr1jPYl6j07PQ575
-         mo91G4GXjhSCX2RhhRD+6mdH9NzI00kVCDypGmbFcP+NnWHgEMHONIai17ZDwtS8hIa7
-         UaG8OH8Q/g29EF9XISmjLCQifoWhN/UAnMST9DHKIVwOjsQbibSSe5NxmOFhKwug2A7J
-         22WgjXuawWx6ucrTMYisGFOzPhP4v7aothPDocDExeoSBNipQ6ExN0NjIl/5KLztFaRU
-         Qy0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXWNIEjWMSL9Du4Tf37xeWx7Rroon1OwoBc31ABPHMTGVyKf4L2B5dWkQnsdLEwnFDH909JTmVPlL1j52FDX+EkcQw9
-X-Gm-Message-State: AOJu0YzPAVJrnoHjY+4kao79hk1lwBTRRwMxPiXCY+AleF9oBUFP4HRp
-	LI2xLldVoK/FsYodMPv/KEvXrrUU8vwPdbaZiUbHF/m/wcDJU1s1
-X-Google-Smtp-Source: AGHT+IEqpgy1Fyef+LREZRqVaVILaMrE8+YblNRBKpimM6I3l8JidJCvI5L1l/U5HTvAkznhJ7pcjA==
-X-Received: by 2002:a17:902:ea08:b0:1f2:fe60:2d80 with SMTP id d9443c01a7336-1f6a5901ff5mr22091845ad.6.1717574994127;
-        Wed, 05 Jun 2024 01:09:54 -0700 (PDT)
+        bh=y1yP+3UldxiuTRJaKYzGddUQNVqEP584eUuxDOZAmb4=;
+        b=mW5jWI/ws5Qr1o5N50m/6Pv79+4KQ4Xzy+JlzeN0WIO3C74EBXdRZ7x3bazjpVmoKL
+         dBQo6VP1huLUxDRpOwnJNpDjDP9IPfx1cVVry9vtpHlqPQ9LfwW1s+lhs37GyZjGWPIS
+         wuKKaerQRHiu5olxHMdTIbLoE1fXhiNgBmSootP4Yb8PECQ1tQkzGaIMmSoOnnjy+P0E
+         HpuIIceMEe76rqACB0Oc33ZQ0SlrSljjkY57nyueTMOuqXsA9GGX+NCc+qFzESDAEyQ7
+         M22HUgZB3RYW7BvElfrHlYt3+HBKqINtr+esds8p5PJ+pI6WhNK3MrMgPSba5SWtiTW+
+         j9nw==
+X-Forwarded-Encrypted: i=1; AJvYcCXuLhs5oKK9m30DQE7IKMkFFln33e8QHwHa4F9FfSW4l7qEHjrNQryty9E0+VPykH3Pxs06mF6Lc8IqvMpm37wxtOQW
+X-Gm-Message-State: AOJu0YzyB5SIsdKIM06nbxQEtc36JeqYMfIR+QnWx9zjvD2MpJXZav6Y
+	Qf+cT8Yl+Zq4IqOxAoObNg7O6Rih2hFtSTR36MU796y3Gd9omCUe
+X-Google-Smtp-Source: AGHT+IFtBIXap92TkugwEUW60252MvIGWkn9nxjEj7DT4LAlMD2u5BVWVMyn92U1chFxvF1O7htF5Q==
+X-Received: by 2002:a17:903:1c5:b0:1f6:7d0c:e932 with SMTP id d9443c01a7336-1f6a5a19144mr20842775ad.34.1717574997632;
+        Wed, 05 Jun 2024 01:09:57 -0700 (PDT)
 Received: from wheely.local0.net ([1.146.96.134])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f64cff7166sm78662035ad.160.2024.06.05.01.09.51
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f64cff7166sm78662035ad.160.2024.06.05.01.09.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jun 2024 01:09:53 -0700 (PDT)
+        Wed, 05 Jun 2024 01:09:57 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v2 1/2] doc: update unittests doc
-Date: Wed,  5 Jun 2024 18:09:40 +1000
-Message-ID: <20240605080942.7675-2-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v2 2/2] gitlab-ci: Always save artifacts
+Date: Wed,  5 Jun 2024 18:09:41 +1000
+Message-ID: <20240605080942.7675-3-npiggin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240605080942.7675-1-npiggin@gmail.com>
 References: <20240605080942.7675-1-npiggin@gmail.com>
@@ -86,45 +86,38 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Document the special groups, check path restrictions, and a small fix
-for check option syntax.
+The unit test logs are important to have when a test fails so
+mark these as always save.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- docs/unittests.txt | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ .gitlab-ci.yml | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/docs/unittests.txt b/docs/unittests.txt
-index 6ff9872cf..c4269f623 100644
---- a/docs/unittests.txt
-+++ b/docs/unittests.txt
-@@ -69,8 +69,11 @@ groups
- groups = <group_name1> <group_name2> ...
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+index 23bb69e24..0e4d6205f 100644
+--- a/.gitlab-ci.yml
++++ b/.gitlab-ci.yml
+@@ -4,14 +4,18 @@ before_script:
+  - dnf update -y
+  - dnf install -y make python
  
- Used to group the test cases for the `run_tests.sh -g ...` run group
--option. Adding a test to the nodefault group will cause it to not be
--run by default.
-+option. The group name is arbitrary, except for these special groups:
-+- Tests in the "nodefault" group are not run by default (with no -g option).
-+- Tests in the "migration" group are run with the migration harness and
-+  are expected to make migrate_*() calls.
-+- Tests in the "panic" group expect QEMU to enter the GUEST_PANICKED state.
++# By default artifacts are only saved on success. This uses when:always
++# because the test logs are important to help diagnose failures.
+ .intree_template:
+  artifacts:
++  when: always
+   expire_in: 2 days
+   paths:
+    - logs
  
- accel
- -----
-@@ -89,8 +92,10 @@ Optional timeout in seconds, after which the test will be killed and fail.
- 
- check
- -----
--check = <path>=<<value>
-+check = <path>=<value>
- 
- Check a file for a particular value before running a test. The check line
- can contain multiple files to check separated by a space, but each check
- parameter needs to be of the form <path>=<value>
-+
-+The path and value cannot contain space, =, or shell wildcard characters.
+ .outoftree_template:
+  artifacts:
++  when: always
+   expire_in: 2 days
+   paths:
+    - build/logs
 -- 
 2.43.0
 
