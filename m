@@ -1,137 +1,79 @@
-Return-Path: <kvm+bounces-18926-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18927-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3338FD234
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:58:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9EBE8FD23A
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA8D428244B
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:58:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45C1D1F23180
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C5F1494BD;
-	Wed,  5 Jun 2024 15:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B7715216F;
+	Wed,  5 Jun 2024 15:59:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bfIlWYIY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SnAMLMmu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A7614D2AE
-	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 15:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF9645005;
+	Wed,  5 Jun 2024 15:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717603117; cv=none; b=rZET+v4ra1Rh195BSNfqOgnRvqgOXBFGhGniD3xmZI6M2pPsjCHiTU4Ewm+ZGkQFS4xki1DnC7+0V0RoqwTBQSWAgZ2gaFwgDIrO5tlN2gO14u7/Bvv2UzewlmALccbLpb4/edRUWEJq7UJDPw9uNZSpvbppiSb5ZohMpl38xPk=
+	t=1717603144; cv=none; b=RGSycrYmPGouQ5t6mYYhbGw84E+PYkwUs2Tx7diFDQokFd6NQ6azyhfCCz7OPBU2GJcthbhMSJcUnP2xXmp24u+myDCQ/axfD+A2961hdpw5Hk8u62iph3a67d+5z5/pjrS2LKoHD/8WlvopA9/yXlprqUIpawkryx+YBJwoFbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717603117; c=relaxed/simple;
-	bh=gXBVoq6Xs7gQ0DJdX1zfdzuLYW3eKW3tWium6g8U0pQ=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bVeVy4KqAt58qet2yqG+ko7TZUSJTC0iZdlBZ2Huak0FlBkp1QEtjN3jK7cSwKoU31N3HjYbMRQ3chpqYb9eHI/I2jyT/ttqgV5NCMU6YloUc89BsQAz5B6ejU4pppEbQyto6hhL6oPijhdPK1eL5Rh5RLL2YplNQrHyRH9EIAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bfIlWYIY; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455FVQMU005873;
-	Wed, 5 Jun 2024 15:58:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=0b0i85d6kI1uu7ZwoBRm+u/PV/OnUj+nyPs8qzet/D0=;
- b=bfIlWYIYVmfy20e4CyQWVzSfP7L+b/JBESeYwhdVry2CVeqihbQoWlKjc/myN8WP9V3m
- sFr0+pwLwWmMXLz9HUn2wIsSQE93BfRNAyMva1/9H81BXx5q/FY2PxClH/iadPD9C7oW
- 0Y+Aj1Fr3A16FKEUudfQ2AI2RLAVuN+cP3nFSFQeND1ZWVCVVgzO2sXgxub3pRcrIM9y
- hx8vwQJMFRIt9bia/Ol/u1WVqae7XgIPVvhD64CA/chdf+WwE0L8PTxIqeXb9Tu0d9Fs
- YOYlC7NIloPWPWv66p+pSW/dDU+Kbiiu40+9xdM+a6eF1g/5n6mksKEBFF2NQjS5mNLz 1w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjsta084k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 15:58:31 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 455FwU7P017530;
-	Wed, 5 Jun 2024 15:58:30 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjsta084h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 15:58:30 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 455F12lS026652;
-	Wed, 5 Jun 2024 15:58:30 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yggp34jvm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 15:58:29 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 455FwOqB51380720
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Jun 2024 15:58:26 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6658E2004F;
-	Wed,  5 Jun 2024 15:58:24 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E2C332004D;
-	Wed,  5 Jun 2024 15:58:22 +0000 (GMT)
-Received: from [172.17.0.2] (unknown [9.3.101.175])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Jun 2024 15:58:22 +0000 (GMT)
-Subject: [PATCH v2 4/4] target/ppc/cpu_init: Synchronize HASHPKEYR with KVM
- for migration
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To: cohuck@redhat.com, pbonzini@redhat.com, npiggin@gmail.com,
-        kvm@vger.kernel.org, qemu-devel@nongnu.org
-Cc: mst@redhat.com, danielhb413@gmail.com, qemu-ppc@nongnu.org,
-        sbhat@linux.ibm.com, harshpb@linux.ibm.com, vaibhav@linux.ibm.com
-Date: Wed, 05 Jun 2024 15:58:22 +0000
-Message-ID: <171760309939.1127.5764216864720185982.stgit@ad1b393f0e09>
-In-Reply-To: <171760304518.1127.12881297254648658843.stgit@ad1b393f0e09>
-References: <171760304518.1127.12881297254648658843.stgit@ad1b393f0e09>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1717603144; c=relaxed/simple;
+	bh=kJA6RCQe59gNhyFE5vMGx7WY/pIvBmdhj6ZGWBW3ICk=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=mZ97TiU59zUZgnuIoj+5sCxWQEovaI/BKE/S3d6lYRjEQ6DfIhvSxomLZIienQZlnMIGfvr/OSxJTHGu2bf/nvcXswPblMsVsQa61RVEKdFZ+Zz1V+phmlYmCKKZ+EteSQzl46gbFkj3XiM+LN/CoUVTIpkJokezjyPTrAcz00A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SnAMLMmu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9ED44C32781;
+	Wed,  5 Jun 2024 15:59:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717603144;
+	bh=kJA6RCQe59gNhyFE5vMGx7WY/pIvBmdhj6ZGWBW3ICk=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=SnAMLMmu+oyRAIgx2NAOHXCQtQ5GcSYmmoEruoa1ivceAzWr84AS7h2x1D9hrzTR1
+	 hix887ByU6/y6QU9tVHTfsVVfYUWvXz1lh8KyNllFNwpGRUlVNjSyV5aZ8i9suARDO
+	 VMW8CL3bN59kgo98wvL5oXyVkKxZMoq7WamqJQoFAH2FYaHGe6hVIEYdgU9qjTiIzE
+	 QUhOTnb6vUOeAU5AzKs77nOKza8o8Sl0TwQbR0Em3YCnMnfuOOMwvAlpydMTS0+skM
+	 JUrGA/DuRWyl5D/bdO2Nob2A7rmENoSCRMaUpwwZHBCdlRl1nnco4x9NWJotC6IIwC
+	 HoHhvCJ+lDNpw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 89A54D3E997;
+	Wed,  5 Jun 2024 15:59:04 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM fixes for Linux 6.10-rc3
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240605115644.8573-1-pbonzini@redhat.com>
+References: <20240605115644.8573-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240605115644.8573-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: db574f2f96d0c9a245a9e787e3d9ec288fb2b445
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 71d7b52cc33bc3b6697cce8a0a5ac9032f372e47
+Message-Id: <171760314455.19032.4936003001185258170.pr-tracker-bot@kernel.org>
+Date: Wed, 05 Jun 2024 15:59:04 +0000
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: U1X47I4HOOXKslKVUKzwQID3BTVmx6AX
-X-Proofpoint-ORIG-GUID: -f5HJWz56xkbr8ogHkHQKcsFLLtbfLWM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-05_02,2024-06-05_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
- mlxlogscore=863 priorityscore=1501 malwarescore=0 phishscore=0 bulkscore=0
- impostorscore=0 lowpriorityscore=0 mlxscore=0 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2406050121
 
-The patch enables HASHPKEYR migration by hooking with the
-"KVM one reg" ID KVM_REG_PPC_HASHPKEYR.
+The pull request you sent on Wed,  5 Jun 2024 07:56:44 -0400:
 
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
- target/ppc/cpu_init.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-diff --git a/target/ppc/cpu_init.c b/target/ppc/cpu_init.c
-index cee0a609eb..e6ebc0cef0 100644
---- a/target/ppc/cpu_init.c
-+++ b/target/ppc/cpu_init.c
-@@ -5809,11 +5809,11 @@ static void register_power10_hash_sprs(CPUPPCState *env)
-             SPR_NOACCESS, SPR_NOACCESS,
-             &spr_read_generic, &spr_write_generic,
-             KVM_REG_PPC_HASHKEYR, hashkeyr_initial_value);
--    spr_register_hv(env, SPR_HASHPKEYR, "HASHPKEYR",
-+    spr_register_kvm_hv(env, SPR_HASHPKEYR, "HASHPKEYR",
-             SPR_NOACCESS, SPR_NOACCESS,
-             SPR_NOACCESS, SPR_NOACCESS,
-             &spr_read_generic, &spr_write_generic,
--            hashpkeyr_initial_value);
-+            KVM_REG_PPC_HASHPKEYR, hashpkeyr_initial_value);
- }
- 
- static void register_power10_dexcr_sprs(CPUPPCState *env)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/71d7b52cc33bc3b6697cce8a0a5ac9032f372e47
 
+Thank you!
 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
