@@ -1,176 +1,351 @@
-Return-Path: <kvm+bounces-18916-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18917-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DED18FD15F
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:08:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B828FD162
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:09:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E800B28B21A
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:08:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D4D91F220DD
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1604AEC3;
-	Wed,  5 Jun 2024 15:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="E4ja2QlG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF7A4D5A0;
+	Wed,  5 Jun 2024 15:08:54 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B6510979
-	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 15:07:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B4647F69;
+	Wed,  5 Jun 2024 15:08:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717600068; cv=none; b=QiClKPpSaxrIyD/5tg5hfFNgK2fAtYKv6N6ZBHOQ/FusEwJUY1bV41ABuCSclyUzS3XoVPOjBswEMOfNXfbqb87IrDmQVu+yHxFFxZxhx4XBFV5NdI+ad99o4PBS7KLIQ/iSOCEDtxh3qyW49vLzZ8aG9qusJBqO0hVyKnUTTf0=
+	t=1717600133; cv=none; b=A8eanyPTLvw+C64jU0SoLrRNpC822fIF4MZo8WPbbWCH03WQyJkiPISsT9vBPCtFsSKFTap0rfjg8L0PIzbpu8E2dYkKiWhvwQAbows/gJGyhQ3Ldx4pdUC+Bbnw06P2ltWyCVbqa29RFdoX3TptmybiD/SqhPB//0t1SuZCLSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717600068; c=relaxed/simple;
-	bh=tCuFgmcyBKTA6ce2TnGe5FrR0qVYckLxSpJnlqSLjMI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MAy157ZZkcGx0DuCD0jy35DB1Ac+9krZeox+uV34II/ausAxTtoaR7M3vpKcgMy2SE0etx3mYx2nHkO/xvFTksCW7K8LgtaltNTBEzOmFvy/VKq1Sym31BI7/vnuDsYdnBT/3NVx3CMx3/v2edFaOrYCDUXXU2DSRK0Tl2kq/Tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=E4ja2QlG; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 455EcJrL000689;
-	Wed, 5 Jun 2024 15:07:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=4k/AAagxkPpWcMb4FSM7gqLjZEucpohunmS22Vi3ObI=;
- b=E4ja2QlGStyeBxtOseONe7f611bopz2qeR3+Ansg62Kr/3FWU7lfErPkjZ5yt30kmQs4
- TxPf/woOVY4WkkJ23hg+Jc2hJ65SsbakFuAkAoet4jjVXNChQDqnBbO2aGZKRJtj7yNF
- E0sVp8wQ4CTXKbqZ0HsQM3ic6DfzwFwCabwNn+CywwWqno6N+PcA681ep6f3kc06HmQR
- y6Yim00Yxxbf0tL0lMXzXuqVZPnezhZj3BlLZH0OJbU4HfEMKxvszBRuAmZZydfnM08A
- QiiLiPTjUiHI30SZbo0QqgGsxvhncn12Pn+EjNw4n/zcc/GKbwszvkwEkmyTrTHxm11c Fw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjsxyg2ve-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 15:07:37 +0000
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 455F7bVQ014883;
-	Wed, 5 Jun 2024 15:07:37 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yjsxyg2vc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 15:07:37 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 455CGefv000800;
-	Wed, 5 Jun 2024 15:07:36 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ygdyu51q2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jun 2024 15:07:36 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 455F7Wkr43581782
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Jun 2024 15:07:34 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C321B2004D;
-	Wed,  5 Jun 2024 15:07:32 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 79B132004B;
-	Wed,  5 Jun 2024 15:07:32 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.49.132])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed,  5 Jun 2024 15:07:32 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org
-Subject: Re: [RFC kvm-unit-tests PATCH] build: fix .aux.o target building
-In-Reply-To: <D1S0ZSXXGJFC.2IE9N2O8K9ETJ@gmail.com>
-References: <20240605081623.8765-1-npiggin@gmail.com>
- <87cyovekmh.fsf@linux.ibm.com> <D1S0ZSXXGJFC.2IE9N2O8K9ETJ@gmail.com>
-Date: Wed, 05 Jun 2024 17:07:31 +0200
-Message-ID: <87frtrh1ho.fsf@linux.ibm.com>
+	s=arc-20240116; t=1717600133; c=relaxed/simple;
+	bh=4aEIt++Ih7LHuORmU/+95bpdtFQCe8Oh7tumk4SKzZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oPE40hhcXCP5PC1w5Ve3S/LDW0dyG8BX4c1FYV2/bumbd4e8rDWKt74jyo2J2YiUAvBDWmyoIjqfQOu1N7WRqK9CpSU7FcZy+ifyuOpGydFQkxOXnT9jMOiTcD9bUPXJKUea0EamMDt5pMF0EZ4qIiyFFo8Mis7cRJ0B0cjMXqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2192B339;
+	Wed,  5 Jun 2024 08:09:14 -0700 (PDT)
+Received: from [10.57.39.129] (unknown [10.57.39.129])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB6EE3F64C;
+	Wed,  5 Jun 2024 08:08:46 -0700 (PDT)
+Message-ID: <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
+Date: Wed, 5 Jun 2024 16:08:49 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0RifkHj7MCPlcjPgQ97qXSf0hjJusaeU
-X-Proofpoint-ORIG-GUID: rM_zAYRYyMixhDEF2kX3NhPIWWdUJ1Ht
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-05_02,2024-06-05_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- priorityscore=1501 malwarescore=0 clxscore=1015 lowpriorityscore=0
- suspectscore=0 mlxscore=0 adultscore=0 spamscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406050114
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-13-steven.price@arm.com>
+ <86a5jzld9g.wl-maz@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <86a5jzld9g.wl-maz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 05, 2024 at 08:53 PM +1000, "Nicholas Piggin" <npiggin@gmail.co=
-m> wrote:
-> On Wed Jun 5, 2024 at 8:42 PM AEST, Marc Hartmayer wrote:
->> On Wed, Jun 05, 2024 at 06:16 PM +1000, Nicholas Piggin <npiggin@gmail.c=
-om> wrote:
->> > Here's another oddity I ran into with the build system. Try run make
->> > twice. With arm64 and ppc64, the first time it removes some intermedia=
-te
->> > files and the second causes another rebuild of several files. After
->> > that it's fine. s390x seems to follow a similar pattern but does not
->> > suffer from the problem. Also, the .PRECIOUS directive is not preventi=
-ng
->> > them from being deleted inthe first place. So... that probably means I
->> > haven't understood it properly and the fix may not be correct, but it
->> > does appear to DTRT... Anybody with some good Makefile knowledge might
->> > have a better idea.
->> >
+Hi Marc,
+
+On 05/06/2024 14:39, Marc Zyngier wrote:
+> The subject line is... odd. I'd expect something like:
+> 
+> "irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor"
+> 
+> because nothing here should be CCA specific.
+
+Good point - that's a much better subject.
+
+> On Wed, 05 Jun 2024 10:30:04 +0100,
+> Steven Price <steven.price@arm.com> wrote:
 >>
->> $ make clean -j &>/dev/null && make -d
->> =E2=80=A6
->> Successfully remade target file 'all'.
->> Removing intermediate files...
->> rm powerpc/emulator.aux.o powerpc/tm.aux.o powerpc/spapr_hcall.aux.o pow=
-erpc/interrupts.aux.o powerpc/selftest.aux.o powerpc/smp.aux.o powerpc/self=
-test-migration.aux.o powerpc/spapr_vpa.aux.o powerpc/sprs.aux.o powerpc/rta=
-s.aux.o powerpc/memory-verify.aux.o
+>> Within a realm guest the ITS is emulated by the host. This means the
+>> allocations must have been made available to the host by a call to
+>> set_memory_decrypted(). Introduce an allocation function which performs
+>> this extra call.
+> 
+> This doesn't mention that this patch radically changes the allocation
+> of some tables.
+
+I guess that depends on your definition of radical, see below.
+
 >>
->> So an easier fix would be to add %.aux.o to .PRECIOUS (but that=E2=80=99=
-s probably still not clean).
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Drop 'shared' from the new its_xxx function names as they are used
+>>    for non-realm guests too.
+>>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
+>>    should do the right thing.
+>>  * Drop a pointless (void *) cast.
+>> ---
+>>  drivers/irqchip/irq-gic-v3-its.c | 90 ++++++++++++++++++++++++--------
+>>  1 file changed, 67 insertions(+), 23 deletions(-)
 >>
->> .PRECIOUS: %.o %.aux.o
->
-> Ah, so %.o does not match %.aux.o. That answers that. Did you see
-> why s390x is immune? Maybe it defines the target explicitly somewhere.
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index 40ebf1726393..ca72f830f4cc 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -18,6 +18,7 @@
+>>  #include <linux/irqdomain.h>
+>>  #include <linux/list.h>
+>>  #include <linux/log2.h>
+>> +#include <linux/mem_encrypt.h>
+>>  #include <linux/memblock.h>
+>>  #include <linux/mm.h>
+>>  #include <linux/msi.h>
+>> @@ -27,6 +28,7 @@
+>>  #include <linux/of_pci.h>
+>>  #include <linux/of_platform.h>
+>>  #include <linux/percpu.h>
+>> +#include <linux/set_memory.h>
+>>  #include <linux/slab.h>
+>>  #include <linux/syscore_ops.h>
+>>  
+>> @@ -163,6 +165,7 @@ struct its_device {
+>>  	struct its_node		*its;
+>>  	struct event_lpi_map	event_map;
+>>  	void			*itt;
+>> +	u32			itt_order;
+>>  	u32			nr_ites;
+>>  	u32			device_id;
+>>  	bool			shared;
+>> @@ -198,6 +201,30 @@ static DEFINE_IDA(its_vpeid_ida);
+>>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+>>  
+>> +static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>> +					 unsigned int order)
+>> +{
+>> +	struct page *page;
+>> +
+>> +	page = alloc_pages_node(node, gfp, order);
+>> +
+>> +	if (page)
+>> +		set_memory_decrypted((unsigned long)page_address(page),
+>> +				     1 << order);
+> 
+> Please use BIT(order).
 
-Not yet :/ But what was also interesting is that if I=E2=80=99m using multi=
-ple
-jobs I don=E2=80=99t see the issue.
+Sure.
 
-make clean -j; make -j; make -j # <- the last make has nothing to do
+>> +	return page;
+>> +}
+>> +
+>> +static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
+>> +{
+>> +	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
+>> +}
+>> +
+>> +static void its_free_pages(void *addr, unsigned int order)
+>> +{
+>> +	set_memory_encrypted((unsigned long)addr, 1 << order);
+>> +	free_pages((unsigned long)addr, order);
+>> +}
+>> +
+>>  /*
+>>   * Skip ITSs that have no vLPIs mapped, unless we're on GICv4.1, as we
+>>   * always have vSGIs mapped.
+>> @@ -2212,7 +2239,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+>>  {
+>>  	struct page *prop_page;
+>>  
+>> -	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
+>> +	prop_page = its_alloc_pages(gfp_flags,
+>> +				    get_order(LPI_PROPBASE_SZ));
+>>  	if (!prop_page)
+>>  		return NULL;
+>>  
+>> @@ -2223,8 +2251,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
+>>  
+>>  static void its_free_prop_table(struct page *prop_page)
+>>  {
+>> -	free_pages((unsigned long)page_address(prop_page),
+>> -		   get_order(LPI_PROPBASE_SZ));
+>> +	its_free_pages(page_address(prop_page),
+>> +		       get_order(LPI_PROPBASE_SZ));
+>>  }
+>>  
+>>  static bool gic_check_reserved_range(phys_addr_t addr, unsigned long size)
+>> @@ -2346,7 +2374,8 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+>>  		order = get_order(GITS_BASER_PAGES_MAX * psz);
+>>  	}
+>>  
+>> -	page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO, order);
+>> +	page = its_alloc_pages_node(its->numa_node,
+>> +				    GFP_KERNEL | __GFP_ZERO, order);
+>>  	if (!page)
+>>  		return -ENOMEM;
+>>  
+>> @@ -2359,7 +2388,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+>>  		/* 52bit PA is supported only when PageSize=64K */
+>>  		if (psz != SZ_64K) {
+>>  			pr_err("ITS: no 52bit PA support when psz=%d\n", psz);
+>> -			free_pages((unsigned long)base, order);
+>> +			its_free_pages(base, order);
+>>  			return -ENXIO;
+>>  		}
+>>  
+>> @@ -2415,7 +2444,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
+>>  		pr_err("ITS@%pa: %s doesn't stick: %llx %llx\n",
+>>  		       &its->phys_base, its_base_type_string[type],
+>>  		       val, tmp);
+>> -		free_pages((unsigned long)base, order);
+>> +		its_free_pages(base, order);
+>>  		return -ENXIO;
+>>  	}
+>>  
+>> @@ -2554,8 +2583,8 @@ static void its_free_tables(struct its_node *its)
+>>  
+>>  	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
+>>  		if (its->tables[i].base) {
+>> -			free_pages((unsigned long)its->tables[i].base,
+>> -				   its->tables[i].order);
+>> +			its_free_pages(its->tables[i].base,
+>> +				       its->tables[i].order);
+>>  			its->tables[i].base = NULL;
+>>  		}
+>>  	}
+>> @@ -2821,7 +2850,8 @@ static bool allocate_vpe_l2_table(int cpu, u32 id)
+>>  
+>>  	/* Allocate memory for 2nd level table */
+>>  	if (!table[idx]) {
+>> -		page = alloc_pages(GFP_KERNEL | __GFP_ZERO, get_order(psz));
+>> +		page = its_alloc_pages(GFP_KERNEL | __GFP_ZERO,
+>> +				       get_order(psz));
+>>  		if (!page)
+>>  			return false;
+>>  
+>> @@ -2940,7 +2970,8 @@ static int allocate_vpe_l1_table(void)
+>>  
+>>  	pr_debug("np = %d, npg = %lld, psz = %d, epp = %d, esz = %d\n",
+>>  		 np, npg, psz, epp, esz);
+>> -	page = alloc_pages(GFP_ATOMIC | __GFP_ZERO, get_order(np * PAGE_SIZE));
+>> +	page = its_alloc_pages(GFP_ATOMIC | __GFP_ZERO,
+>> +			       get_order(np * PAGE_SIZE));
+>>  	if (!page)
+>>  		return -ENOMEM;
+>>  
+>> @@ -2986,8 +3017,8 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
+>>  {
+>>  	struct page *pend_page;
+>>  
+>> -	pend_page = alloc_pages(gfp_flags | __GFP_ZERO,
+>> -				get_order(LPI_PENDBASE_SZ));
+>> +	pend_page = its_alloc_pages(gfp_flags | __GFP_ZERO,
+>> +				    get_order(LPI_PENDBASE_SZ));
+>>  	if (!pend_page)
+>>  		return NULL;
+>>  
+>> @@ -2999,7 +3030,7 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
+>>  
+>>  static void its_free_pending_table(struct page *pt)
+>>  {
+>> -	free_pages((unsigned long)page_address(pt), get_order(LPI_PENDBASE_SZ));
+>> +	its_free_pages(page_address(pt), get_order(LPI_PENDBASE_SZ));
+>>  }
+>>  
+>>  /*
+>> @@ -3334,8 +3365,9 @@ static bool its_alloc_table_entry(struct its_node *its,
+>>  
+>>  	/* Allocate memory for 2nd level table */
+>>  	if (!table[idx]) {
+>> -		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
+>> -					get_order(baser->psz));
+>> +		page = its_alloc_pages_node(its->numa_node,
+>> +					    GFP_KERNEL | __GFP_ZERO,
+>> +					    get_order(baser->psz));
+>>  		if (!page)
+>>  			return false;
+>>  
+>> @@ -3418,7 +3450,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>  	unsigned long *lpi_map = NULL;
+>>  	unsigned long flags;
+>>  	u16 *col_map = NULL;
+>> +	struct page *page;
+>>  	void *itt;
+>> +	int itt_order;
+>>  	int lpi_base;
+>>  	int nr_lpis;
+>>  	int nr_ites;
+>> @@ -3430,7 +3464,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>  	if (WARN_ON(!is_power_of_2(nvecs)))
+>>  		nvecs = roundup_pow_of_two(nvecs);
+>>  
+>> -	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+>>  	/*
+>>  	 * Even if the device wants a single LPI, the ITT must be
+>>  	 * sized as a power of two (and you need at least one bit...).
+>> @@ -3438,7 +3471,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+>>  	nr_ites = max(2, nvecs);
+>>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+>>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+>> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+>> +	itt_order = get_order(sz);
+>> +	page = its_alloc_pages_node(its->numa_node,
+>> +				    GFP_KERNEL | __GFP_ZERO,
+>> +				    itt_order);
+> 
+> So we go from an allocation that was so far measured in *bytes* to
+> something that is now at least a page. Per device. This seems a bit
+> excessive to me, specially when it isn't conditioned on anything and
+> is now imposed on all platforms, including the non-CCA systems (which
+> are exactly 100% of the machines).
 
-if I=E2=80=99m using:
+Catalin asked about this in v2:
+https://lore.kernel.org/lkml/c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com/
 
-make clean -j; make; make -j # <- the last make has something to do=E2=80=A6
-                                  that something that irritates me
+To be honest, I don't have a great handle on how much memory is being
+wasted here. Within the realm guest I was testing this is rounding up an
+otherwise 511 byte allocation to a 4k page, and there are 3 of them.
+Which seems reasonable from a realm guest perspective.
 
->
-> Is it better to define explicit targets if we want to keep them, or
-> add to .PRECIOUS? Your patch would be simpler.
+I can see two options to improve here:
 
-Normally, I would say without .PRECIOUS it=E2=80=99s cleaner, but there is
-already a .PRECIOUS for %.so=E2=80=A6 So as Andrew has already written
+1. Add a !is_realm_world() check and return to the previous behaviour
+when not running in a realm. It's ugly, and doesn't deal with any other
+potential future memory encryption. cc_platform_has(CC_ATTR_MEM_ENCRYPT)
+might be preferable? But this means no impact to non-realm guests.
 
-.PRECIOUS: %.so %.aux.o
+2. Use a special (global) memory allocator that does the
+set_memory_decrypted() dance on the pages that it allocates but allows
+packing the allocations. I'm not aware of an existing kernel API for
+this, so it's potentially quite a bit of code. The benefit is that it
+reduces memory consumption in a realm guest, although fragmentation
+still means we're likely to see a (small) growth.
 
-should also be fine.
+Any thoughts on what you think would be best?
 
->
-> Thanks,
-> Nick
->
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
+> Another thing is that if we go with page alignment, then the 256 byte
+> alignment can obviously be removed everywhere (hint: MAPD needs to
+> change).
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+Ah, good point - I'll need to look into that, my GIC-foo isn't quite up
+to speed on that.
+
+Thanks,
+
+Steve
+
 
