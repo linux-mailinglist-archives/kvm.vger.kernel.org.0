@@ -1,181 +1,408 @@
-Return-Path: <kvm+bounces-18885-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18886-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDB988FCADC
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 13:49:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 609818FCB41
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 13:56:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E230C1C2145F
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 11:49:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FE172830A5
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 11:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EB119007B;
-	Wed,  5 Jun 2024 11:49:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF34019AD83;
+	Wed,  5 Jun 2024 11:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NyztrFS4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QbvTl8cd"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2073.outbound.protection.outlook.com [40.107.92.73])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C2C27459;
-	Wed,  5 Jun 2024 11:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717588153; cv=fail; b=NLDbaxvSe9IBdcFut9W0pi0IRhOMf7h5ujtTDUG29veHKOgM+FVuVdpMmbm5wv2f6W58ZdIAFS5ipv9MtT+vTT/Sc4NIs58EBTu09C2r/cuEsIwPPhwSHE6OSAvYef4O8aYwR41bHmOvbEPzg/2aRm9QkHUdk/cMXxPfe3MDQ5Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717588153; c=relaxed/simple;
-	bh=Pl7VrNg6r8jRG6Euk3BO2Gu1aJujI21dQ3wxD2mES9s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DVVxbdx3S8xuEtpffZp+xbAvYE0tYAhBWTr4lF/23L/lACk7WM+U/pld7kc2shZ1Zms76cjKb8tIHbdqak638Yw++/9Fa6mKSptr5EIB4d1y8BL/H4c1ZRVkoq7ur/ttPyiAlcwxk22KKJk8kSlFz+a5WPllKdwvjpibZLnH+tc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NyztrFS4; arc=fail smtp.client-ip=40.107.92.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DP+K8rCun5C1/BClJCcwE5M98iQ8j2aEP16M216RCycYBVPtF1zob7jdN1NX0YJxp2oDwyl1AjbkC9xOq/xapZX0xSFDf3xGVYSmLsDwj8mqwy6XmlyZFDVJRmVAdSa/PHrwn1BQlJU1XE8BhSs+OTxwhlz82at0ElPirZm4ewnnxBfclfumphjBQpPAGKorjpG12HRUfCXlYbXwz8Vbvn2OAXcPGt1FdZp7fnr2leqT0yju9A3JGA0vUWl8Az1Q3liEIzJAdS/rN3+i/oIXtn5V20yaL0X0t8eJlRnDt9fSD/7kk59OBIvQCtjp8Z608KI2zIQRPFkaDfa3PHpAXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=c/6aNdu5QBu/Ycn53szS9/KFT6NBIsdQArj1nrSV/Yg=;
- b=jXYqhe6a+cs+89/r63rfCxk4LlmDcFF2FPQC2aDjlCEDfswDB8Zm9bVfdVoiv/4i5zhSoU0MWDz6PyRsjd7GHydVkdLLMqGCR3RzsemkSoz0Yp1fRpGUo+/pGUhw+w+z9X3JVpAuO5l9nYukyhB04DxihJbuWl4jBWhm4s4dPQPsl394CqEYFe+BeL8ajFlFI/iXXR7JoSF3WegyhALO5ylyYtXbfuL9DxG5rPtCb2L/n8cv2pynfiiNP4a4B2RX1YmxGKI7q8bva4+Iy8TVcWDb4wIbm+DVQ/Ugdf5hTRrlIiIfT3Z2ZYPM7fGvSTA5V3o4wRC1gNl+lOc8gXLugA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c/6aNdu5QBu/Ycn53szS9/KFT6NBIsdQArj1nrSV/Yg=;
- b=NyztrFS4t86xSX7J8w+dwB2qaaoUFEA3CjVpbcjZlLu3RMLzOipoyg2mvolot0qJPvqtbsQSb7wJH5n3gYkFNts++ejVka6u7eEwArTQQktutFIKJFwwv1FPP5h9GXuqukoqceBzAK/BtUqO9pnVj1Gf/ZOBcNBbYuBrP3vh6bg=
-Received: from BLAPR03CA0082.namprd03.prod.outlook.com (2603:10b6:208:329::27)
- by SA3PR12MB8048.namprd12.prod.outlook.com (2603:10b6:806:31e::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.32; Wed, 5 Jun
- 2024 11:49:08 +0000
-Received: from BN3PEPF0000B06B.namprd21.prod.outlook.com
- (2603:10b6:208:329:cafe::28) by BLAPR03CA0082.outlook.office365.com
- (2603:10b6:208:329::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.31 via Frontend
- Transport; Wed, 5 Jun 2024 11:49:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN3PEPF0000B06B.mail.protection.outlook.com (10.167.243.70) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.0 via Frontend Transport; Wed, 5 Jun 2024 11:49:07 +0000
-Received: from BLR-L-RBANGORI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 5 Jun
- 2024 06:48:58 -0500
-From: Ravi Bangoria <ravi.bangoria@amd.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>, <nikunj.dadhania@amd.com>,
-	<sraithal@amd.com>
-CC: <ravi.bangoria@amd.com>, <thomas.lendacky@amd.com>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <michael.roth@amd.com>,
-	<pankaj.gupta@amd.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <santosh.shukla@amd.com>
-Subject: [PATCH] KVM: SNP: Fix LBR Virtualization for SNP guest
-Date: Wed, 5 Jun 2024 11:48:10 +0000
-Message-ID: <20240605114810.1304-1-ravi.bangoria@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6663194156;
+	Wed,  5 Jun 2024 11:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717588226; cv=none; b=eJVg8S8KTHtT5JoWrej9TIaeMZ8WzBCPjspe9/pU18gzDKbTfNDGxV2y3GLdQv4XpfWA7FRyGvJDPc4o6ZAuYIGKxkFaNYvLCeKlw16w5grSKkj2gAGBS11EJTgctZ44qjSZJSsyuXkhVMLq+JnbyAkjhw5LdOFngUwnpj8X5DA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717588226; c=relaxed/simple;
+	bh=NmPPebvdjZQx5FqDblIOGS7xlqa6cs7NqHOeKASQdzo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Qau7eBZh1vq8+D7l4RSK1p/7lqFyh+jMpDQJJVGJhAugyEjifBTTZrO3G9xLcR5qae8lreU703IJRITRiHuyh2YVqTrN7th0Ox0LcRp0/vVs9rWStTAN3wajiUI5GzvcpR03dSD5/y91MJMfouh9nEZ5zzLLZK6EJV8BpDQCIzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QbvTl8cd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E02C4AF08;
+	Wed,  5 Jun 2024 11:50:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717588224;
+	bh=NmPPebvdjZQx5FqDblIOGS7xlqa6cs7NqHOeKASQdzo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=QbvTl8cdRCMqdq/k8yrOQv5w1j57NEJvw6dEYE3OxYH3SmQ0PCck0Z8UgpvtGxPlY
+	 mYZwkq9H6FbahmQ8XTT3afc4L+Ey6nm3ROWul3tL6RlSHK7V7qtNiQLL0TTInOo91N
+	 qZDdToWWtKEKYeKZ2LsX9UTQIzzUitOcgLvsTE7AANNPKAILMYF9/2QmDhP9BT+K9a
+	 4mH4VIC+MdOCAaa2I0HStvs45rP19VVi+qFxD+hUcZ+u1t+C6KaDfZElQqTyEKJW5s
+	 kv1i1ETs8ylNcsfBuATXOp94o+3XGiAUxBHgg/EroEndYsU773i07cyRSyh16NNYn8
+	 ASTxXQ3K9xwVg==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Sasha Levin <sashal@kernel.org>,
+	jgg@ziepe.ca,
+	yi.l.liu@intel.com,
+	kevin.tian@intel.com,
+	eric.auger@redhat.com,
+	ankita@nvidia.com,
+	chentao@kylinos.cn,
+	brauner@kernel.org,
+	stefanha@redhat.com,
+	kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 23/28] vfio/pci: Collect hot-reset devices to local buffer
+Date: Wed,  5 Jun 2024 07:48:52 -0400
+Message-ID: <20240605114927.2961639-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240531044644.768-4-ravi.bangoria@amd.com>
-References: <20240531044644.768-4-ravi.bangoria@amd.com>
+In-Reply-To: <20240605114927.2961639-1-sashal@kernel.org>
+References: <20240605114927.2961639-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.3
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06B:EE_|SA3PR12MB8048:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4138d9ad-737c-424e-c688-08dc855581b7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230031|82310400017|36860700004|1800799015|7416005|376005;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?IKsR7EzsyxHMqOrHWiCNMqqvA6DoUKj7dcJ2H/v6WkUDZsIJBtoBQ/P0qdw1?=
- =?us-ascii?Q?ATMKCiQo05qlHiBO1pAr5yZTDcOp7f0jfReJSuqqY4nVKFzREicqPA3M6pbZ?=
- =?us-ascii?Q?BcNaNA8jjIyLOXVEhznCINtQfzD7ywGM11yrD6oUoDYMU+KoLdkC2YVVEcND?=
- =?us-ascii?Q?pj0o/MgGTQNxlZ2od7RQTPeA4Tq1lc18RKeplYibz5INNloDs28ObdVT6Gkh?=
- =?us-ascii?Q?SbizDUP49ifYuScGSe1z7wN8MFqVnc3imlIYKqdXgrhcHW5O8WmkKc87Lsmo?=
- =?us-ascii?Q?UJPrOGADGL1qsx3pOsBXYSmjkCTaK91gV9NZi3OGc9oLciwsKyus7tlQ+PVJ?=
- =?us-ascii?Q?5J7We+z2hXIEoxlg/orZ4r4T43ihPr3CGHXTD6pbMn4MIri0GzdeSFQPgdn5?=
- =?us-ascii?Q?FDuKZOiNzQPbgIPgSLFpidZUmhfSoR5hQwwCcjej9jw80M2Cn4LijYAQBPL4?=
- =?us-ascii?Q?RMPXUsyT+dHBb5bjwynU/AjJTcLmr6jCh3xdbuYA5CsJKxgHQFnBWI94HgTd?=
- =?us-ascii?Q?1GgIYPTIiiaf9yTqz8epJmQjDsGb/5lp38CHyejbMpm/Mrr3D+4X4EGscfjO?=
- =?us-ascii?Q?Zk8qzTgIjlEW7tTdmNITRTyXo6cZ2GNlBjl2lZwo8Ddl0puLKAOI6BXiiaqC?=
- =?us-ascii?Q?nXDxsR43bX7TmcDeI/YdW7uBL86yl1+LPjIAUVa6XCg+MowdT1Hda/3F9edb?=
- =?us-ascii?Q?C/OgDpJ+bobxuhRRiP7JMfn1PeLtF97R72t9U31pJU+g7BnVPkigNUnVDhpg?=
- =?us-ascii?Q?Sm6zJJWTJWtm0B1xF7V1cOnBs7PIDT8c4MO+kBh1pLcj/Y9cdrsW5goJzJl9?=
- =?us-ascii?Q?2xtBOXo6iAWTtroOeKNpYSa7JtVlvH+6+32XCzDGbeKLJcvCNYo8FpkCxhV0?=
- =?us-ascii?Q?oKh73SJZ6A/SdpmSEcmF4qzCEO882Gw32zXLUlDam2rx/6d/NUPIe57EjWB+?=
- =?us-ascii?Q?ZtyGQ7xDaPnYXtmZtOMtAvXpSX8C7t2wjxPCkFMfqvN9TmMhmtcz4aZDgl1j?=
- =?us-ascii?Q?Q43tt2JJmU3/ibZhnGnUVdTabrOT0pWKhS3ygSZHtxfLNGe/Ag7FjNEUBbDH?=
- =?us-ascii?Q?iB3ZnR94s/4XKD4CdkNjDHIPBtkaxX8BasI6WewxAJRMLG4CHOjdjWpbcf+i?=
- =?us-ascii?Q?HmDvR4hByFm8gpOYTmcc0SA03TCxhfy284AKHIBk4GBr+vIpExXMZYdMD5Ws?=
- =?us-ascii?Q?UaPD8pZM7QGzGfJSyR+/kW4gVgIyXIDF7IRIxlMiUuUX+T5nxJuhHV8fX9I7?=
- =?us-ascii?Q?eyvlV0Y2CgQufZl3Ng3Xu6W6/HOR0DEOvcZPsIa09JR/dCWYUCnNrL7uFblS?=
- =?us-ascii?Q?tV8el5/LPD8FOyE42XvoXaBPh5QZP1jmRsT9rL+NDuP6tYvF6PRLovnXl4s+?=
- =?us-ascii?Q?cZwlE8bKAE17wd3Cg6sYYflx8JC42sL5fQ6VaGv8fZYrqplM8w=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(82310400017)(36860700004)(1800799015)(7416005)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jun 2024 11:49:07.4161
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4138d9ad-737c-424e-c688-08dc855581b7
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B06B.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8048
 
-SEV-ES and thus SNP guest mandates LBR Virtualization to be _always_ ON.
-Although commit b7e4be0a224f ("KVM: SEV-ES: Delegate LBR virtualization
-to the processor") did the correct change for SEV-ES guests, it missed
-the SNP. Fix it.
+From: Alex Williamson <alex.williamson@redhat.com>
 
-Reported-by: Srikanth Aithal <sraithal@amd.com>
-Fixes: b7e4be0a224f ("KVM: SEV-ES: Delegate LBR virtualization to the processor")
-Signed-off-by: Ravi Bangoria <ravi.bangoria@amd.com>
+[ Upstream commit f6944d4a0b87c16bc34ae589169e1ded3d4db08e ]
+
+Lockdep reports the below circular locking dependency issue.  The
+mmap_lock acquisition while holding pci_bus_sem is due to the use of
+copy_to_user() from within a pci_walk_bus() callback.
+
+Building the devices array directly into the user buffer is only for
+convenience.  Instead we can allocate a local buffer for the array,
+bounded by the number of devices on the bus/slot, fill the device
+information into this local buffer, then copy it into the user buffer
+outside the bus walk callback.
+
+======================================================
+WARNING: possible circular locking dependency detected
+6.9.0-rc5+ #39 Not tainted
+------------------------------------------------------
+CPU 0/KVM/4113 is trying to acquire lock:
+ffff99a609ee18a8 (&vdev->vma_lock){+.+.}-{4:4}, at: vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
+
+but task is already holding lock:
+ffff99a243a052a0 (&mm->mmap_lock){++++}-{4:4}, at: vaddr_get_pfns+0x3f/0x170 [vfio_iommu_type1]
+
+which lock already depends on the new lock.
+
+the existing dependency chain (in reverse order) is:
+
+-> #3 (&mm->mmap_lock){++++}-{4:4}:
+       __lock_acquire+0x4e4/0xb90
+       lock_acquire+0xbc/0x2d0
+       __might_fault+0x5c/0x80
+       _copy_to_user+0x1e/0x60
+       vfio_pci_fill_devs+0x9f/0x130 [vfio_pci_core]
+       vfio_pci_walk_wrapper+0x45/0x60 [vfio_pci_core]
+       __pci_walk_bus+0x6b/0xb0
+       vfio_pci_ioctl_get_pci_hot_reset_info+0x10b/0x1d0 [vfio_pci_core]
+       vfio_pci_core_ioctl+0x1cb/0x400 [vfio_pci_core]
+       vfio_device_fops_unl_ioctl+0x7e/0x140 [vfio]
+       __x64_sys_ioctl+0x8a/0xc0
+       do_syscall_64+0x8d/0x170
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #2 (pci_bus_sem){++++}-{4:4}:
+       __lock_acquire+0x4e4/0xb90
+       lock_acquire+0xbc/0x2d0
+       down_read+0x3e/0x160
+       pci_bridge_wait_for_secondary_bus.part.0+0x33/0x2d0
+       pci_reset_bus+0xdd/0x160
+       vfio_pci_dev_set_hot_reset+0x256/0x270 [vfio_pci_core]
+       vfio_pci_ioctl_pci_hot_reset_groups+0x1a3/0x280 [vfio_pci_core]
+       vfio_pci_core_ioctl+0x3b5/0x400 [vfio_pci_core]
+       vfio_device_fops_unl_ioctl+0x7e/0x140 [vfio]
+       __x64_sys_ioctl+0x8a/0xc0
+       do_syscall_64+0x8d/0x170
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #1 (&vdev->memory_lock){+.+.}-{4:4}:
+       __lock_acquire+0x4e4/0xb90
+       lock_acquire+0xbc/0x2d0
+       down_write+0x3b/0xc0
+       vfio_pci_zap_and_down_write_memory_lock+0x1c/0x30 [vfio_pci_core]
+       vfio_basic_config_write+0x281/0x340 [vfio_pci_core]
+       vfio_config_do_rw+0x1fa/0x300 [vfio_pci_core]
+       vfio_pci_config_rw+0x75/0xe50 [vfio_pci_core]
+       vfio_pci_rw+0xea/0x1a0 [vfio_pci_core]
+       vfs_write+0xea/0x520
+       __x64_sys_pwrite64+0x90/0xc0
+       do_syscall_64+0x8d/0x170
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+-> #0 (&vdev->vma_lock){+.+.}-{4:4}:
+       check_prev_add+0xeb/0xcc0
+       validate_chain+0x465/0x530
+       __lock_acquire+0x4e4/0xb90
+       lock_acquire+0xbc/0x2d0
+       __mutex_lock+0x97/0xde0
+       vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
+       __do_fault+0x31/0x160
+       do_pte_missing+0x65/0x3b0
+       __handle_mm_fault+0x303/0x720
+       handle_mm_fault+0x10f/0x460
+       fixup_user_fault+0x7f/0x1f0
+       follow_fault_pfn+0x66/0x1c0 [vfio_iommu_type1]
+       vaddr_get_pfns+0xf2/0x170 [vfio_iommu_type1]
+       vfio_pin_pages_remote+0x348/0x4e0 [vfio_iommu_type1]
+       vfio_pin_map_dma+0xd2/0x330 [vfio_iommu_type1]
+       vfio_dma_do_map+0x2c0/0x440 [vfio_iommu_type1]
+       vfio_iommu_type1_ioctl+0xc5/0x1d0 [vfio_iommu_type1]
+       __x64_sys_ioctl+0x8a/0xc0
+       do_syscall_64+0x8d/0x170
+       entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+other info that might help us debug this:
+
+Chain exists of:
+  &vdev->vma_lock --> pci_bus_sem --> &mm->mmap_lock
+
+ Possible unsafe locking scenario:
+
+block dm-0: the capability attribute has been deprecated.
+       CPU0                    CPU1
+       ----                    ----
+  rlock(&mm->mmap_lock);
+                               lock(pci_bus_sem);
+                               lock(&mm->mmap_lock);
+  lock(&vdev->vma_lock);
+
+ *** DEADLOCK ***
+
+2 locks held by CPU 0/KVM/4113:
+ #0: ffff99a25f294888 (&iommu->lock#2){+.+.}-{4:4}, at: vfio_dma_do_map+0x60/0x440 [vfio_iommu_type1]
+ #1: ffff99a243a052a0 (&mm->mmap_lock){++++}-{4:4}, at: vaddr_get_pfns+0x3f/0x170 [vfio_iommu_type1]
+
+stack backtrace:
+CPU: 1 PID: 4113 Comm: CPU 0/KVM Not tainted 6.9.0-rc5+ #39
+Hardware name: Dell Inc. PowerEdge T640/04WYPY, BIOS 2.15.1 06/16/2022
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x64/0xa0
+ check_noncircular+0x131/0x150
+ check_prev_add+0xeb/0xcc0
+ ? add_chain_cache+0x10a/0x2f0
+ ? __lock_acquire+0x4e4/0xb90
+ validate_chain+0x465/0x530
+ __lock_acquire+0x4e4/0xb90
+ lock_acquire+0xbc/0x2d0
+ ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
+ ? lock_is_held_type+0x9a/0x110
+ __mutex_lock+0x97/0xde0
+ ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
+ ? lock_acquire+0xbc/0x2d0
+ ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
+ ? find_held_lock+0x2b/0x80
+ ? vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
+ vfio_pci_mmap_fault+0x35/0x1a0 [vfio_pci_core]
+ __do_fault+0x31/0x160
+ do_pte_missing+0x65/0x3b0
+ __handle_mm_fault+0x303/0x720
+ handle_mm_fault+0x10f/0x460
+ fixup_user_fault+0x7f/0x1f0
+ follow_fault_pfn+0x66/0x1c0 [vfio_iommu_type1]
+ vaddr_get_pfns+0xf2/0x170 [vfio_iommu_type1]
+ vfio_pin_pages_remote+0x348/0x4e0 [vfio_iommu_type1]
+ vfio_pin_map_dma+0xd2/0x330 [vfio_iommu_type1]
+ vfio_dma_do_map+0x2c0/0x440 [vfio_iommu_type1]
+ vfio_iommu_type1_ioctl+0xc5/0x1d0 [vfio_iommu_type1]
+ __x64_sys_ioctl+0x8a/0xc0
+ do_syscall_64+0x8d/0x170
+ ? rcu_core+0x8d/0x250
+ ? __lock_release+0x5e/0x160
+ ? rcu_core+0x8d/0x250
+ ? lock_release+0x5f/0x120
+ ? sched_clock+0xc/0x30
+ ? sched_clock_cpu+0xb/0x190
+ ? irqtime_account_irq+0x40/0xc0
+ ? __local_bh_enable+0x54/0x60
+ ? __do_softirq+0x315/0x3ca
+ ? lockdep_hardirqs_on_prepare.part.0+0x97/0x140
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7f8300d0357b
+Code: ff ff ff 85 c0 79 9b 49 c7 c4 ff ff ff ff 5b 5d 4c 89 e0 41 5c c3 66 0f 1f 84 00 00 00 00 00 f3 0f 1e fa b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 75 68 0f 00 f7 d8 64 89 01 48
+RSP: 002b:00007f82ef3fb948 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f8300d0357b
+RDX: 00007f82ef3fb990 RSI: 0000000000003b71 RDI: 0000000000000023
+RBP: 00007f82ef3fb9c0 R08: 0000000000000000 R09: 0000561b7e0bcac2
+R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000000000
+R13: 0000000200000000 R14: 0000381800000000 R15: 0000000000000000
+ </TASK>
+
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Link: https://lore.kernel.org/r/20240503143138.3562116-1-alex.williamson@redhat.com
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
-- SNP support was not present while I prepared the original patches and
-  that lead to this confusion. Sorry about that.
+ drivers/vfio/pci/vfio_pci_core.c | 78 ++++++++++++++++++++------------
+ 1 file changed, 49 insertions(+), 29 deletions(-)
 
- arch/x86/kvm/svm/sev.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 7d401f8a3001..57291525e084 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2395,6 +2395,14 @@ static int snp_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
- 		}
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index d94d61b92c1ac..d8c95cc16be81 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -778,25 +778,26 @@ static int vfio_pci_count_devs(struct pci_dev *pdev, void *data)
+ }
  
- 		svm->vcpu.arch.guest_state_protected = true;
-+		/*
-+		 * SEV-ES (and thus SNP) guest mandates LBR Virtualization to
-+		 * be _always_ ON. Enable it only after setting
-+		 * guest_state_protected because KVM_SET_MSRS allows dynamic
-+		 * toggling of LBRV (for performance reason) on write access to
-+		 * MSR_IA32_DEBUGCTLMSR when guest_state_protected is not set.
-+		 */
-+		svm_enable_lbrv(vcpu);
+ struct vfio_pci_fill_info {
+-	struct vfio_pci_dependent_device __user *devices;
+-	struct vfio_pci_dependent_device __user *devices_end;
+ 	struct vfio_device *vdev;
++	struct vfio_pci_dependent_device *devices;
++	int nr_devices;
+ 	u32 count;
+ 	u32 flags;
+ };
+ 
+ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ {
+-	struct vfio_pci_dependent_device info = {
+-		.segment = pci_domain_nr(pdev->bus),
+-		.bus = pdev->bus->number,
+-		.devfn = pdev->devfn,
+-	};
++	struct vfio_pci_dependent_device *info;
+ 	struct vfio_pci_fill_info *fill = data;
+ 
+-	fill->count++;
+-	if (fill->devices >= fill->devices_end)
+-		return 0;
++	/* The topology changed since we counted devices */
++	if (fill->count >= fill->nr_devices)
++		return -EAGAIN;
++
++	info = &fill->devices[fill->count++];
++	info->segment = pci_domain_nr(pdev->bus);
++	info->bus = pdev->bus->number;
++	info->devfn = pdev->devfn;
+ 
+ 	if (fill->flags & VFIO_PCI_HOT_RESET_FLAG_DEV_ID) {
+ 		struct iommufd_ctx *iommufd = vfio_iommufd_device_ictx(fill->vdev);
+@@ -809,19 +810,19 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ 		 */
+ 		vdev = vfio_find_device_in_devset(dev_set, &pdev->dev);
+ 		if (!vdev) {
+-			info.devid = VFIO_PCI_DEVID_NOT_OWNED;
++			info->devid = VFIO_PCI_DEVID_NOT_OWNED;
+ 		} else {
+ 			int id = vfio_iommufd_get_dev_id(vdev, iommufd);
+ 
+ 			if (id > 0)
+-				info.devid = id;
++				info->devid = id;
+ 			else if (id == -ENOENT)
+-				info.devid = VFIO_PCI_DEVID_OWNED;
++				info->devid = VFIO_PCI_DEVID_OWNED;
+ 			else
+-				info.devid = VFIO_PCI_DEVID_NOT_OWNED;
++				info->devid = VFIO_PCI_DEVID_NOT_OWNED;
+ 		}
+ 		/* If devid is VFIO_PCI_DEVID_NOT_OWNED, clear owned flag. */
+-		if (info.devid == VFIO_PCI_DEVID_NOT_OWNED)
++		if (info->devid == VFIO_PCI_DEVID_NOT_OWNED)
+ 			fill->flags &= ~VFIO_PCI_HOT_RESET_FLAG_DEV_ID_OWNED;
+ 	} else {
+ 		struct iommu_group *iommu_group;
+@@ -830,13 +831,10 @@ static int vfio_pci_fill_devs(struct pci_dev *pdev, void *data)
+ 		if (!iommu_group)
+ 			return -EPERM; /* Cannot reset non-isolated devices */
+ 
+-		info.group_id = iommu_group_id(iommu_group);
++		info->group_id = iommu_group_id(iommu_group);
+ 		iommu_group_put(iommu_group);
  	}
  
+-	if (copy_to_user(fill->devices, &info, sizeof(info)))
+-		return -EFAULT;
+-	fill->devices++;
  	return 0;
+ }
+ 
+@@ -1258,10 +1256,11 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+ {
+ 	unsigned long minsz =
+ 		offsetofend(struct vfio_pci_hot_reset_info, count);
++	struct vfio_pci_dependent_device *devices = NULL;
+ 	struct vfio_pci_hot_reset_info hdr;
+ 	struct vfio_pci_fill_info fill = {};
+ 	bool slot = false;
+-	int ret = 0;
++	int ret, count;
+ 
+ 	if (copy_from_user(&hdr, arg, minsz))
+ 		return -EFAULT;
+@@ -1277,9 +1276,23 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+ 	else if (pci_probe_reset_bus(vdev->pdev->bus))
+ 		return -ENODEV;
+ 
+-	fill.devices = arg->devices;
+-	fill.devices_end = arg->devices +
+-			   (hdr.argsz - sizeof(hdr)) / sizeof(arg->devices[0]);
++	ret = vfio_pci_for_each_slot_or_bus(vdev->pdev, vfio_pci_count_devs,
++					    &count, slot);
++	if (ret)
++		return ret;
++
++	if (count > (hdr.argsz - sizeof(hdr)) / sizeof(*devices)) {
++		hdr.count = count;
++		ret = -ENOSPC;
++		goto header;
++	}
++
++	devices = kcalloc(count, sizeof(*devices), GFP_KERNEL);
++	if (!devices)
++		return -ENOMEM;
++
++	fill.devices = devices;
++	fill.nr_devices = count;
+ 	fill.vdev = &vdev->vdev;
+ 
+ 	if (vfio_device_cdev_opened(&vdev->vdev))
+@@ -1291,16 +1304,23 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+ 					    &fill, slot);
+ 	mutex_unlock(&vdev->vdev.dev_set->lock);
+ 	if (ret)
+-		return ret;
++		goto out;
++
++	if (copy_to_user(arg->devices, devices,
++			 sizeof(*devices) * fill.count)) {
++		ret = -EFAULT;
++		goto out;
++	}
+ 
+ 	hdr.count = fill.count;
+ 	hdr.flags = fill.flags;
+-	if (copy_to_user(arg, &hdr, minsz))
+-		return -EFAULT;
+ 
+-	if (fill.count > fill.devices - arg->devices)
+-		return -ENOSPC;
+-	return 0;
++header:
++	if (copy_to_user(arg, &hdr, minsz))
++		ret = -EFAULT;
++out:
++	kfree(devices);
++	return ret;
+ }
+ 
+ static int
 -- 
-2.45.1
+2.43.0
 
 
