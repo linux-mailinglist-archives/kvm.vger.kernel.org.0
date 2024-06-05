@@ -1,351 +1,137 @@
-Return-Path: <kvm+bounces-18917-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18918-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B828FD162
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:09:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C5B98FD166
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 17:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D4D91F220DD
-	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:09:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0AB4B24336
+	for <lists+kvm@lfdr.de>; Wed,  5 Jun 2024 15:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF7A4D5A0;
-	Wed,  5 Jun 2024 15:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E4831474A2;
+	Wed,  5 Jun 2024 15:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LOWxch2K"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B4647F69;
-	Wed,  5 Jun 2024 15:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375EF143722
+	for <kvm@vger.kernel.org>; Wed,  5 Jun 2024 15:08:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717600133; cv=none; b=A8eanyPTLvw+C64jU0SoLrRNpC822fIF4MZo8WPbbWCH03WQyJkiPISsT9vBPCtFsSKFTap0rfjg8L0PIzbpu8E2dYkKiWhvwQAbows/gJGyhQ3Ldx4pdUC+Bbnw06P2ltWyCVbqa29RFdoX3TptmybiD/SqhPB//0t1SuZCLSI=
+	t=1717600138; cv=none; b=SJnfJ7y++UXfvPjQyK6JKFbYW374+JqQqLR9d+uiIPa4i9hWUUnYNKDQAYUMuuLTlwtt/2fK51XmobNfkypq2+TU6SzpjWqFpyMYSHfDMDyVen4lKbl1XA6qpa3rs5GrwA3ekC/Igi2+feRtzI+yMZ6Cei9GP9Q9AQ6ZHLC4NRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717600133; c=relaxed/simple;
-	bh=4aEIt++Ih7LHuORmU/+95bpdtFQCe8Oh7tumk4SKzZY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oPE40hhcXCP5PC1w5Ve3S/LDW0dyG8BX4c1FYV2/bumbd4e8rDWKt74jyo2J2YiUAvBDWmyoIjqfQOu1N7WRqK9CpSU7FcZy+ifyuOpGydFQkxOXnT9jMOiTcD9bUPXJKUea0EamMDt5pMF0EZ4qIiyFFo8Mis7cRJ0B0cjMXqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2192B339;
-	Wed,  5 Jun 2024 08:09:14 -0700 (PDT)
-Received: from [10.57.39.129] (unknown [10.57.39.129])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AB6EE3F64C;
-	Wed,  5 Jun 2024 08:08:46 -0700 (PDT)
-Message-ID: <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
-Date: Wed, 5 Jun 2024 16:08:49 +0100
+	s=arc-20240116; t=1717600138; c=relaxed/simple;
+	bh=4JyuwwyC3HBCATZsuMSNx2NdgBe2Rb9+OjQPFT0wds8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LVRjEREJ2WMuvq+PMwJha8MoBKY6UBZ3uUPzlumGuxPMlQxrmZSG+FElou4KXqhT8s8p9tQWP+jg+OoyEsOBQSWTkCEIcd+CkPPtBaIjHSijI5Kth+a8s3MN2U4+thPtY3/8QkD74gClsnPvjGomrnSSZHwajbC7F366FaIUJ3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LOWxch2K; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1f66f2e4cc7so41810855ad.3
+        for <kvm@vger.kernel.org>; Wed, 05 Jun 2024 08:08:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1717600136; x=1718204936; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9QZ+vKQP5mDiEMq7aC/1ssTDMAZfDe/7jI56fqmifes=;
+        b=LOWxch2KH2LSl24kClKFEev2bvld6zvWHKktwiAXfuFZHiEm9p6R3z+1tqHE/79YAY
+         0O39tlclUMgkUIpRZeNZ1RazIG3qh6fwl7feJWpFiHHTRAOv3sV1r684cdT1DqyoGOxO
+         hxdPpWO3F7AVETIK+YnxmbN8ATDsSt8b6bN/aBGzPKVBHu1NKjDe1b9JZv/QtSaZL8CS
+         l5+lLXJu7dZMRvoHN8v2o7KdaNJD45vbBcn99Wa8WkqMdxJaXKS2yWTx6G+a1TvqQN4f
+         EM2YiWx5WJwci9clhu9NjTnJXrNg1AoNklD4ybr1rKTfvA2FVk99IObdOco76mG3GKD1
+         BPuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717600136; x=1718204936;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9QZ+vKQP5mDiEMq7aC/1ssTDMAZfDe/7jI56fqmifes=;
+        b=ubfY4Ms6FGkTPwgrIND8jNx47TXT/Hw3R9S+mxYqv5eHgQrSkwhfz6JbToQnGuM7a5
+         Sbu2GX6g9t5qH4dOGOD3nUjuOurNkDod18G88/BKjq27TTw04QUYaWBk0EyEpMg3RaQS
+         NQwF7FGIH4JSZlaF0snvHl85w8pCMPEng6cSPRR507smWc9CJhkruwk0qsStWIPj/AVq
+         77eM3FRJEOmGngu/9yYAEEP8JC3btdtYHIuN3vw7DDwCbx22Zw0EBTixxd5DA4/3b8Cn
+         EAJXHP/Jmx4MI54jtoHXp5c5XotmNS5q6uZFaOsRd5W9m2PwKr6CmHat8GHkMSHS0McZ
+         jxjA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTdO9ksSL/hV1JHb19C0mQ1AINt7l/rmxMgqytwiPwAeun1zBapCmUCyTtAuKRzVooySGqs6DhFn6MWhzmhiOISTzQ
+X-Gm-Message-State: AOJu0Yxajqu/vMFYpx9ZVxxrEnE/xHdl7MAUa68l3sCCZOAb/iF2t6cM
+	+IuuIv6vry2f05pKoxgQG+MUtPizC6ITDNN5YtPO8/dh6mWVr5J8FylY9YooUn1R6WMX0EJiLMB
+	giQ==
+X-Google-Smtp-Source: AGHT+IFOWIAW8rQZeqIoAhkK9HfGTM8iAboRiyRWXoj3LvZaRP7jP/VaJALlP/KwviDZ8VgTtBwOJCi8oYs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:1cc:b0:1f3:e88:a6a0 with SMTP id
+ d9443c01a7336-1f6a5a1b926mr1528685ad.7.1717600136208; Wed, 05 Jun 2024
+ 08:08:56 -0700 (PDT)
+Date: Wed, 5 Jun 2024 08:08:54 -0700
+In-Reply-To: <e1c29dd4-2eb9-44fe-abf2-f5ca0e84e2a6@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
- shared
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-13-steven.price@arm.com>
- <86a5jzld9g.wl-maz@kernel.org>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <86a5jzld9g.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240429060643.211-1-ravi.bangoria@amd.com> <20240429060643.211-4-ravi.bangoria@amd.com>
+ <Zl5jqwWO4FyawPHG@google.com> <e1c29dd4-2eb9-44fe-abf2-f5ca0e84e2a6@amd.com>
+Message-ID: <ZmB_hl7coZ_8KA8Q@google.com>
+Subject: Re: [PATCH 3/3] KVM SVM: Add Bus Lock Detect support
+From: Sean Christopherson <seanjc@google.com>
+To: Ravi Bangoria <ravi.bangoria@amd.com>
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, pbonzini@redhat.com, thomas.lendacky@amd.com, 
+	hpa@zytor.com, rmk+kernel@armlinux.org.uk, peterz@infradead.org, 
+	james.morse@arm.com, lukas.bulwahn@gmail.com, arjan@linux.intel.com, 
+	j.granados@samsung.com, sibs@chinatelecom.cn, nik.borisov@suse.com, 
+	michael.roth@amd.com, nikunj.dadhania@amd.com, babu.moger@amd.com, 
+	x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	santosh.shukla@amd.com, ananth.narayan@amd.com, sandipan.das@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Marc,
-
-On 05/06/2024 14:39, Marc Zyngier wrote:
-> The subject line is... odd. I'd expect something like:
+On Wed, Jun 05, 2024, Ravi Bangoria wrote:
+> Hi Sean,
 > 
-> "irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor"
+> On 6/4/2024 6:15 AM, Sean Christopherson wrote:
+> > On Mon, Apr 29, 2024, Ravi Bangoria wrote:
+> >> Upcoming AMD uarch will support Bus Lock Detect. Add support for it
+> >> in KVM. Bus Lock Detect is enabled through MSR_IA32_DEBUGCTLMSR and
+> >> MSR_IA32_DEBUGCTLMSR is virtualized only if LBR Virtualization is
+> >> enabled. Add this dependency in the KVM.
+> > 
+> > This is woefully incomplete, e.g. db_interception() needs to be updated to decipher
+> > whether the #DB is the responsbility of the host or of the guest.
 > 
-> because nothing here should be CCA specific.
+> Can you please elaborate. Are you referring to vcpu->guest_debug thingy?
 
-Good point - that's a much better subject.
+Yes.  More broadly, all of db_interception().
 
-> On Wed, 05 Jun 2024 10:30:04 +0100,
-> Steven Price <steven.price@arm.com> wrote:
->>
->> Within a realm guest the ITS is emulated by the host. This means the
->> allocations must have been made available to the host by a call to
->> set_memory_decrypted(). Introduce an allocation function which performs
->> this extra call.
+> > Honestly, I don't see any point in virtualizing this in KVM.  As Jim alluded to,
+> > what's far, far more interesting for KVM is "Bus Lock Threshold".  Virtualizing
+> > this for the guest would have been nice to have during the initial split-lock #AC
+> > support, but now I'm skeptical the complexity is worth the payoff.
 > 
-> This doesn't mention that this patch radically changes the allocation
-> of some tables.
+> This has a valid usecase of penalizing offending processes. I'm not sure
+> how much it's really used in the production though.
 
-I guess that depends on your definition of radical, see below.
+Yeah, but split-lock #AC and #DB have existed on Intel for years, and no one has
+put in the effort to land KVM support, despite the series getting as far as v9[*].
+Some of the problems on Intel were due to the awful FMS-based feature detection,
+but those weren't the only hiccups.  E.g. IIRC, we never sorted out what should
+happen if both the host and guest want bus-lock #DBs.
 
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v2:
->>  * Drop 'shared' from the new its_xxx function names as they are used
->>    for non-realm guests too.
->>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
->>    should do the right thing.
->>  * Drop a pointless (void *) cast.
->> ---
->>  drivers/irqchip/irq-gic-v3-its.c | 90 ++++++++++++++++++++++++--------
->>  1 file changed, 67 insertions(+), 23 deletions(-)
->>
->> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
->> index 40ebf1726393..ca72f830f4cc 100644
->> --- a/drivers/irqchip/irq-gic-v3-its.c
->> +++ b/drivers/irqchip/irq-gic-v3-its.c
->> @@ -18,6 +18,7 @@
->>  #include <linux/irqdomain.h>
->>  #include <linux/list.h>
->>  #include <linux/log2.h>
->> +#include <linux/mem_encrypt.h>
->>  #include <linux/memblock.h>
->>  #include <linux/mm.h>
->>  #include <linux/msi.h>
->> @@ -27,6 +28,7 @@
->>  #include <linux/of_pci.h>
->>  #include <linux/of_platform.h>
->>  #include <linux/percpu.h>
->> +#include <linux/set_memory.h>
->>  #include <linux/slab.h>
->>  #include <linux/syscore_ops.h>
->>  
->> @@ -163,6 +165,7 @@ struct its_device {
->>  	struct its_node		*its;
->>  	struct event_lpi_map	event_map;
->>  	void			*itt;
->> +	u32			itt_order;
->>  	u32			nr_ites;
->>  	u32			device_id;
->>  	bool			shared;
->> @@ -198,6 +201,30 @@ static DEFINE_IDA(its_vpeid_ida);
->>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
->>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
->>  
->> +static struct page *its_alloc_pages_node(int node, gfp_t gfp,
->> +					 unsigned int order)
->> +{
->> +	struct page *page;
->> +
->> +	page = alloc_pages_node(node, gfp, order);
->> +
->> +	if (page)
->> +		set_memory_decrypted((unsigned long)page_address(page),
->> +				     1 << order);
+Anyways, my point is that, except for SEV-ES+ where there's no good reason NOT to
+virtualize Bus Lock Detect, I'm not convinced that it's worth virtualizing bus-lock
+#DBs.
+
+[*] https://lore.kernel.org/all/20200509110542.8159-1-xiaoyao.li@intel.com
+
+> > I suppose we could allow it if #DB isn't interecepted, at which point the enabling
+> > required is minimal?
 > 
-> Please use BIT(order).
+> The feature uses DEBUG_CTL MSR, #DB and DR6 register. Do you mean expose
+> it when all three are accelerated or just #DB?
 
-Sure.
-
->> +	return page;
->> +}
->> +
->> +static struct page *its_alloc_pages(gfp_t gfp, unsigned int order)
->> +{
->> +	return its_alloc_pages_node(NUMA_NO_NODE, gfp, order);
->> +}
->> +
->> +static void its_free_pages(void *addr, unsigned int order)
->> +{
->> +	set_memory_encrypted((unsigned long)addr, 1 << order);
->> +	free_pages((unsigned long)addr, order);
->> +}
->> +
->>  /*
->>   * Skip ITSs that have no vLPIs mapped, unless we're on GICv4.1, as we
->>   * always have vSGIs mapped.
->> @@ -2212,7 +2239,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
->>  {
->>  	struct page *prop_page;
->>  
->> -	prop_page = alloc_pages(gfp_flags, get_order(LPI_PROPBASE_SZ));
->> +	prop_page = its_alloc_pages(gfp_flags,
->> +				    get_order(LPI_PROPBASE_SZ));
->>  	if (!prop_page)
->>  		return NULL;
->>  
->> @@ -2223,8 +2251,8 @@ static struct page *its_allocate_prop_table(gfp_t gfp_flags)
->>  
->>  static void its_free_prop_table(struct page *prop_page)
->>  {
->> -	free_pages((unsigned long)page_address(prop_page),
->> -		   get_order(LPI_PROPBASE_SZ));
->> +	its_free_pages(page_address(prop_page),
->> +		       get_order(LPI_PROPBASE_SZ));
->>  }
->>  
->>  static bool gic_check_reserved_range(phys_addr_t addr, unsigned long size)
->> @@ -2346,7 +2374,8 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->>  		order = get_order(GITS_BASER_PAGES_MAX * psz);
->>  	}
->>  
->> -	page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO, order);
->> +	page = its_alloc_pages_node(its->numa_node,
->> +				    GFP_KERNEL | __GFP_ZERO, order);
->>  	if (!page)
->>  		return -ENOMEM;
->>  
->> @@ -2359,7 +2388,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->>  		/* 52bit PA is supported only when PageSize=64K */
->>  		if (psz != SZ_64K) {
->>  			pr_err("ITS: no 52bit PA support when psz=%d\n", psz);
->> -			free_pages((unsigned long)base, order);
->> +			its_free_pages(base, order);
->>  			return -ENXIO;
->>  		}
->>  
->> @@ -2415,7 +2444,7 @@ static int its_setup_baser(struct its_node *its, struct its_baser *baser,
->>  		pr_err("ITS@%pa: %s doesn't stick: %llx %llx\n",
->>  		       &its->phys_base, its_base_type_string[type],
->>  		       val, tmp);
->> -		free_pages((unsigned long)base, order);
->> +		its_free_pages(base, order);
->>  		return -ENXIO;
->>  	}
->>  
->> @@ -2554,8 +2583,8 @@ static void its_free_tables(struct its_node *its)
->>  
->>  	for (i = 0; i < GITS_BASER_NR_REGS; i++) {
->>  		if (its->tables[i].base) {
->> -			free_pages((unsigned long)its->tables[i].base,
->> -				   its->tables[i].order);
->> +			its_free_pages(its->tables[i].base,
->> +				       its->tables[i].order);
->>  			its->tables[i].base = NULL;
->>  		}
->>  	}
->> @@ -2821,7 +2850,8 @@ static bool allocate_vpe_l2_table(int cpu, u32 id)
->>  
->>  	/* Allocate memory for 2nd level table */
->>  	if (!table[idx]) {
->> -		page = alloc_pages(GFP_KERNEL | __GFP_ZERO, get_order(psz));
->> +		page = its_alloc_pages(GFP_KERNEL | __GFP_ZERO,
->> +				       get_order(psz));
->>  		if (!page)
->>  			return false;
->>  
->> @@ -2940,7 +2970,8 @@ static int allocate_vpe_l1_table(void)
->>  
->>  	pr_debug("np = %d, npg = %lld, psz = %d, epp = %d, esz = %d\n",
->>  		 np, npg, psz, epp, esz);
->> -	page = alloc_pages(GFP_ATOMIC | __GFP_ZERO, get_order(np * PAGE_SIZE));
->> +	page = its_alloc_pages(GFP_ATOMIC | __GFP_ZERO,
->> +			       get_order(np * PAGE_SIZE));
->>  	if (!page)
->>  		return -ENOMEM;
->>  
->> @@ -2986,8 +3017,8 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
->>  {
->>  	struct page *pend_page;
->>  
->> -	pend_page = alloc_pages(gfp_flags | __GFP_ZERO,
->> -				get_order(LPI_PENDBASE_SZ));
->> +	pend_page = its_alloc_pages(gfp_flags | __GFP_ZERO,
->> +				    get_order(LPI_PENDBASE_SZ));
->>  	if (!pend_page)
->>  		return NULL;
->>  
->> @@ -2999,7 +3030,7 @@ static struct page *its_allocate_pending_table(gfp_t gfp_flags)
->>  
->>  static void its_free_pending_table(struct page *pt)
->>  {
->> -	free_pages((unsigned long)page_address(pt), get_order(LPI_PENDBASE_SZ));
->> +	its_free_pages(page_address(pt), get_order(LPI_PENDBASE_SZ));
->>  }
->>  
->>  /*
->> @@ -3334,8 +3365,9 @@ static bool its_alloc_table_entry(struct its_node *its,
->>  
->>  	/* Allocate memory for 2nd level table */
->>  	if (!table[idx]) {
->> -		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
->> -					get_order(baser->psz));
->> +		page = its_alloc_pages_node(its->numa_node,
->> +					    GFP_KERNEL | __GFP_ZERO,
->> +					    get_order(baser->psz));
->>  		if (!page)
->>  			return false;
->>  
->> @@ -3418,7 +3450,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->>  	unsigned long *lpi_map = NULL;
->>  	unsigned long flags;
->>  	u16 *col_map = NULL;
->> +	struct page *page;
->>  	void *itt;
->> +	int itt_order;
->>  	int lpi_base;
->>  	int nr_lpis;
->>  	int nr_ites;
->> @@ -3430,7 +3464,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->>  	if (WARN_ON(!is_power_of_2(nvecs)))
->>  		nvecs = roundup_pow_of_two(nvecs);
->>  
->> -	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
->>  	/*
->>  	 * Even if the device wants a single LPI, the ITT must be
->>  	 * sized as a power of two (and you need at least one bit...).
->> @@ -3438,7 +3471,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->>  	nr_ites = max(2, nvecs);
->>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
->>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
->> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
->> +	itt_order = get_order(sz);
->> +	page = its_alloc_pages_node(its->numa_node,
->> +				    GFP_KERNEL | __GFP_ZERO,
->> +				    itt_order);
-> 
-> So we go from an allocation that was so far measured in *bytes* to
-> something that is now at least a page. Per device. This seems a bit
-> excessive to me, specially when it isn't conditioned on anything and
-> is now imposed on all platforms, including the non-CCA systems (which
-> are exactly 100% of the machines).
-
-Catalin asked about this in v2:
-https://lore.kernel.org/lkml/c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com/
-
-To be honest, I don't have a great handle on how much memory is being
-wasted here. Within the realm guest I was testing this is rounding up an
-otherwise 511 byte allocation to a 4k page, and there are 3 of them.
-Which seems reasonable from a realm guest perspective.
-
-I can see two options to improve here:
-
-1. Add a !is_realm_world() check and return to the previous behaviour
-when not running in a realm. It's ugly, and doesn't deal with any other
-potential future memory encryption. cc_platform_has(CC_ATTR_MEM_ENCRYPT)
-might be preferable? But this means no impact to non-realm guests.
-
-2. Use a special (global) memory allocator that does the
-set_memory_decrypted() dance on the pages that it allocates but allows
-packing the allocations. I'm not aware of an existing kernel API for
-this, so it's potentially quite a bit of code. The benefit is that it
-reduces memory consumption in a realm guest, although fragmentation
-still means we're likely to see a (small) growth.
-
-Any thoughts on what you think would be best?
-
-> Another thing is that if we go with page alignment, then the 256 byte
-> alignment can obviously be removed everywhere (hint: MAPD needs to
-> change).
-
-Ah, good point - I'll need to look into that, my GIC-foo isn't quite up
-to speed on that.
-
-Thanks,
-
-Steve
-
+I mean that if KVM isn't intercepting #DB, then there's no extra complexity needed
+to sort out whether the #DB "belongs" to the host or the guest.  See commit
+90cbf6d914ad ("KVM: SEV-ES: Eliminate #DB intercept when DebugSwap enabled").
 
