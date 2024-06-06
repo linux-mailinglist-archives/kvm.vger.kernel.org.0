@@ -1,218 +1,178 @@
-Return-Path: <kvm+bounces-19021-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19023-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B6F8FF198
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 18:07:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1CFF8FF1F0
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 18:14:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FB011F25846
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 16:07:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5557A1F265B6
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 16:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EBA2198841;
-	Thu,  6 Jun 2024 16:06:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0CA619AA7C;
+	Thu,  6 Jun 2024 16:11:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MoKq+Bje"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G6uWyA8D"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A0A196D9C
-	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 16:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20C119AA40
+	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 16:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717690011; cv=none; b=D//E7/u6VW7HH/AfE+wrtlQ6XhdEULXEiQr8zwLTjGL2GpWzK6s33bPwDbgfIjkfDKPMEyCeHVeW+BpYZVSyVsgtgf7WCJJxomFhG4eLisAlm/xZjA+85mYjo9g7n3YWVjWuDQ98sumZvh79sebMLbiw/EpRCyJFI8ZnqUQgrdM=
+	t=1717690271; cv=none; b=gvW9cYfK+b0EL4Q7PepuQOGUu3CCAl7ADJPftRvsLcZNEL4GVa3ClEoo38ntHlBMpfm1vrUkhPQRkU1E8CVI/E3KcD8eCkt9a0pnCVqV6k0nUOPSPF4cR9Ckw3NNxq4NjwqZlAUdN9XQq3xcV4xRHv3U50GvVY+ertoR2G/YZ2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717690011; c=relaxed/simple;
-	bh=xtP+8AIj85C1/WgIWPRNG4p8BLG3rnAPCNR1vfpZHEk=;
+	s=arc-20240116; t=1717690271; c=relaxed/simple;
+	bh=C6xOxQ9P1I2nAifuPJPu4NYJEtpJMNEvDpiLCEcU+FU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n0BuYI2qkhNxopqUiJV1rs4J3QQd2T+I3Sv0QMqm6XYJHoYYPcjEN/4LoMsJlv++DqNWbX7Z1eFExqKvpgxTiAWbLLWL7q6Fri+huRDET85U4DZbHVLgfpsP+cQuAWdz7s6KPvvpzvNtxedJuKX108l7DHGxsFe83rLQqo5Rh8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MoKq+Bje; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=jp8K7Mkvcw6UTYwWU2u/i0eZ22suPn1SjRh8HvU4BCM6b4KINrSKlvMO6hVCoa1xAieyRuch1ZGlhj4Aclvz0PdbHqia1Xm3Iw/rge7CaoCyoP7Gw2PRf6D+3hqEWCeWNH4q7GdxnNq+wwoNnt5UXnkBbtc9MVUmLvnEGKZUheA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G6uWyA8D; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717690008;
+	s=mimecast20190719; t=1717690268;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AqdpCvnzMbEvDLDb+VyMlSvq06RVNzNNqxG9y9taPwg=;
-	b=MoKq+BjeGWkKrxSLukD+ZdnRl/j02wRGTHQOam/vngTdjRKUdQUcukZ6PP9fpOd3Cqg5Jo
-	nULTz/bNrClte54VqFRMTVUKeDoRvNr9VeDECQj6QsOT2G6TdTQBZXZHWRCHx8lkcG7rSi
-	cDhsnHX6ceIuI5na6o1XOV+O3MqgLzg=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bMxHuzTNqwoExnxxNXUTJ+We8jv8Inb+JPwzg5VCJYY=;
+	b=G6uWyA8DtcP7zlhbNL9P9ZGVDsnOPiTpL7epzU19i8pchr17h8A6zptLExh23iCgh8Acea
+	rEaYZevs24SFuePhO4m5lQ1L5lVOt4YAbmh8Bwzs8uIELoZP2f7Ps/BP7LvslDh8uliOim
+	V0S8LYTxUwpE99mAWTVLrgr/+TGQLJE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-359-HZaJMrrPORCn37ohg_eD0Q-1; Thu, 06 Jun 2024 12:06:47 -0400
-X-MC-Unique: HZaJMrrPORCn37ohg_eD0Q-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-35dceae6283so1064164f8f.2
-        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 09:06:47 -0700 (PDT)
+ us-mta-173-M5doPWGdPWSt6m3oEi7UcQ-1; Thu, 06 Jun 2024 12:11:07 -0400
+X-MC-Unique: M5doPWGdPWSt6m3oEi7UcQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-35e521885e5so873832f8f.3
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 09:11:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717690005; x=1718294805;
+        d=1e100.net; s=20230601; t=1717690261; x=1718295061;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AqdpCvnzMbEvDLDb+VyMlSvq06RVNzNNqxG9y9taPwg=;
-        b=LdZ4m5rpQxBY45rpjXtfDDiiL2RVHrTvTtW/6psrLGNN9pjanDIh3TlpO4+7JK6pWM
-         EhqNawGE9V0W+qUqaPA7M70rW/u0vj5/bCrCNnRwKCVoB7LEzLBtUAs7KZaHOk2yrdCb
-         ngyaI/mF58mh6uQnCYhmjJ02rzleebeLDH1RrPQxLIDJ/+FeJvjGnsyVqIFqDHvAgIGt
-         KS2gYxnmiaaLu3YpgE+qqeqtdtrUhMEGTkoKj8uwfnX6D00aruwVje7vdgN0xQEsfvUV
-         kwiRlkyqQn9W98372cizygTFd6OOA1ClSCLpmd6TSVUC+IKQxxgbhJo+dUziU8s7EeTj
-         wzlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVoaQptcbn7xa1MB7PwXlROJM8UWuqkWfTG7uoiLwstupj+ZdOAKZ/Qsj+xsQfhzvL/NdDIoITmCXIixZgOd6vkFGMo
-X-Gm-Message-State: AOJu0YwMiP8sRJ2dvIGgeliT1IgxENCsPniTAeAF603GfpOY87WOa+Lh
-	WkbFcTSw9DVyqcFym+B+zRr2puRnfaefINIxRo9hIe1FHKZ3hK9kEU5EeaNIZSSqoKYsjOnA4Hg
-	xoIGV4QevmpdYVvWsmYNOX+0AKHqOpo2kwdXne78aDvFa7SWnHsxh6gnQSpjXlcM1DlTY8sTvaO
-	HPP7MDIKUuTItc4IM0ZXJp821Hhx+GBDc9
-X-Received: by 2002:a5d:5750:0:b0:356:49a8:7e0a with SMTP id ffacd0b85a97d-35efed1d686mr56107f8f.11.1717690005381;
-        Thu, 06 Jun 2024 09:06:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHtuK4uojIq+VZLW+UvPNBI/OVsp0turKI0UvFa+AeYkiz/Gn3dzwmCpJcFa5pu3JCGHmlZTb7NXLe0DqqOEt8=
-X-Received: by 2002:a5d:5750:0:b0:356:49a8:7e0a with SMTP id
- ffacd0b85a97d-35efed1d686mr56090f8f.11.1717690004987; Thu, 06 Jun 2024
- 09:06:44 -0700 (PDT)
+        bh=bMxHuzTNqwoExnxxNXUTJ+We8jv8Inb+JPwzg5VCJYY=;
+        b=c78S4flFZD6zT1tg5Gzsrw89BH3qjI6MFgT28bjm6ZaMTgQ+bnTqjkfdBoRD2IV3sn
+         g1BMY+NrMtLhc34iR0sb/QkGD2WMtbkwdbW9IbD0fMZrzjCVz2ZFL/OYVgNXDLKb6v1r
+         bO/70Wpn8uLffUjGI1KIz33bx7mTPorzhJy+tS81Mj4nmOPqYe696ZesJ3IIDywo/KYi
+         nLAunSiAYG+KPGFVke+AtbJYLdez9LPrR6RipfqnmjwfyalXOyxsoNxAsPG9irfJkmNd
+         lSNz4M1UUn1d3TE0P3A/lZm0pGFoddCaYXuSXjzAwxJRi2a2+yDRK8lwOczLTJlDSqt3
+         3Pjw==
+X-Forwarded-Encrypted: i=1; AJvYcCXNi3Dyi2v3cX0s24XEBBDQ/5hPCm0/KFZlVjNnuA6fx5r/nLpjUlCcaEasE3DU53uJSZSRlNILf4mGg04prtMz76RX
+X-Gm-Message-State: AOJu0YwHt1qe0nXwPmrU6/JHv+cWJ+lkS2UW6wXOZDEZkNV8fDuDVXjF
+	3F0DU8n24SfVRRgt17KWd0nlFuaEDNdMNWDhKow3/j+oeqRMUZNrU3HOk6P3aBXS1hCNA5Zmv8B
+	VufvsAbm+7ZGjDoTWXTCfAqyzvgtffNxzvNmlRxfQr8zOLmI4GLfpc7B9uQZsEN8+bzanOf59EA
+	/w2Ice7xZuU+wil2ykhwQPtW4A
+X-Received: by 2002:a5d:4a10:0:b0:35e:f25f:6c9 with SMTP id ffacd0b85a97d-35efea7e179mr96640f8f.0.1717690261394;
+        Thu, 06 Jun 2024 09:11:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF1Es/YGWhv/S13Xa529CXDzdBf9/542vQsdMCXTwyiGCXBRAw5/xXSrsUeTWLoCWoMiQ8MJfY8HjgEvFhux/g=
+X-Received: by 2002:a5d:4a10:0:b0:35e:f25f:6c9 with SMTP id
+ ffacd0b85a97d-35efea7e179mr96619f8f.0.1717690261123; Thu, 06 Jun 2024
+ 09:11:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530210714.364118-1-rick.p.edgecombe@intel.com> <20240530210714.364118-5-rick.p.edgecombe@intel.com>
-In-Reply-To: <20240530210714.364118-5-rick.p.edgecombe@intel.com>
+References: <20240530210714.364118-1-rick.p.edgecombe@intel.com> <20240530210714.364118-6-rick.p.edgecombe@intel.com>
+In-Reply-To: <20240530210714.364118-6-rick.p.edgecombe@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 6 Jun 2024 18:06:33 +0200
-Message-ID: <CABgObfa1xtZkGizNf=YrMYSo29v==qijMQJ-mZvobniS6-7OLw@mail.gmail.com>
-Subject: Re: [PATCH v2 04/15] KVM: x86/mmu: Add a new mirror_pt member for
- union kvm_mmu_page_role
+Date: Thu, 6 Jun 2024 18:10:49 +0200
+Message-ID: <CABgObfYgF9gcokAg2gOjXqfuxj_oDBmEu4HfDaRc0CLSkmWhoA@mail.gmail.com>
+Subject: Re: [PATCH v2 05/15] KVM: x86/mmu: Make kvm_tdp_mmu_alloc_root()
+ return void
 To: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Cc: seanjc@google.com, kvm@vger.kernel.org, kai.huang@intel.com, 
 	dmatlack@google.com, erdemaktas@google.com, isaku.yamahata@gmail.com, 
-	linux-kernel@vger.kernel.org, sagis@google.com, yan.y.zhao@intel.com, 
-	Isaku Yamahata <isaku.yamahata@intel.com>
+	linux-kernel@vger.kernel.org, sagis@google.com, yan.y.zhao@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Thu, May 30, 2024 at 11:07=E2=80=AFPM Rick Edgecombe
 <rick.p.edgecombe@intel.com> wrote:
 >
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> The kvm_tdp_mmu_alloc_root() function currently always returns 0. This
+> allows for the caller, mmu_alloc_direct_roots(), to call
+> kvm_tdp_mmu_alloc_root() and also return 0 in one line:
+>    return kvm_tdp_mmu_alloc_root(vcpu);
 >
-> Introduce a "mirror_pt" member to the kvm_mmu_page_role union to identify
-> SPTEs associated with the mirrored EPT.
+> So it is useful even though the return value of kvm_tdp_mmu_alloc_root()
+> is always the same. However, in future changes, kvm_tdp_mmu_alloc_root()
+> will be called twice in mmu_alloc_direct_roots(). This will force the
+> first call to either awkwardly handle the return value that will always
+> be zero or ignore it. So change kvm_tdp_mmu_alloc_root() to return void.
+> Do it in a separate change so the future change will be cleaner.
 >
-> The TDX module maintains the private half of the EPT mapped in the TD in
-> its protected memory. KVM keeps a copy of the private GPAs in a mirrored
-> EPT tree within host memory. This "mirror_pt" attribute enables vCPUs to
-> find and get the root page of mirrored EPT from the MMU root list for a
-> guest TD. This also allows KVM MMU code to detect changes in mirrored EPT
-> according to the "mirror_pt" mmu page role and propagate the changes to
-> the private EPT managed by TDX module.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 > Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+
 > ---
-> TDX MMU Prep v2:
->  - Rename private -> mirrored
->
 > TDX MMU Prep:
-> - Remove warning and NULL check in is_private_sptep() (Rick)
-> - Update commit log (Yan)
->
-> v19:
-> - Fix is_private_sptep() when NULL case.
-> - drop CONFIG_KVM_MMU_PRIVATE
+>  - New patch
 > ---
->  arch/x86/include/asm/kvm_host.h | 13 ++++++++++++-
->  arch/x86/kvm/mmu/mmu_internal.h |  5 +++++
->  arch/x86/kvm/mmu/spte.h         |  5 +++++
->  3 files changed, 22 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/mmu/mmu.c     | 6 ++++--
+>  arch/x86/kvm/mmu/tdp_mmu.c | 3 +--
+>  arch/x86/kvm/mmu/tdp_mmu.h | 2 +-
+>  3 files changed, 6 insertions(+), 5 deletions(-)
 >
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
-ost.h
-> index 250899a0239b..084f4708aff1 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -351,7 +351,8 @@ union kvm_mmu_page_role {
->                 unsigned ad_disabled:1;
->                 unsigned guest_mode:1;
->                 unsigned passthrough:1;
-> -               unsigned :5;
-> +               unsigned mirror_pt:1;
-
-"is_mirror".
-
-> +               unsigned :4;
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 5070ba7c6e89..12178945922f 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -3700,8 +3700,10 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu =
+*vcpu)
+>         unsigned i;
+>         int r;
 >
->                 /*
->                  * This is left at the top of the word so that
-> @@ -363,6 +364,16 @@ union kvm_mmu_page_role {
->         };
->  };
+> -       if (tdp_mmu_enabled)
+> -               return kvm_tdp_mmu_alloc_root(vcpu);
+> +       if (tdp_mmu_enabled) {
+> +               kvm_tdp_mmu_alloc_root(vcpu);
+> +               return 0;
+> +       }
 >
-> +static inline bool kvm_mmu_page_role_is_mirror(union kvm_mmu_page_role r=
-ole)
-> +{
-> +       return !!role.mirror_pt;
-> +}
-> +
-> +static inline void kvm_mmu_page_role_set_mirrored(union kvm_mmu_page_rol=
-e *role)
-> +{
-> +       role->mirror_pt =3D 1;
-> +}
-
-Not needed, remove it.
-
->  /*
->   * kvm_mmu_extended_role complements kvm_mmu_page_role, tracking propert=
-ies
->   * relevant to the current MMU configuration.   When loading CR0, CR4, o=
-r EFER,
-> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
-nal.h
-> index faef40a561f9..6d82e389cd65 100644
-> --- a/arch/x86/kvm/mmu/mmu_internal.h
-> +++ b/arch/x86/kvm/mmu/mmu_internal.h
-> @@ -157,6 +157,11 @@ static inline int kvm_mmu_page_as_id(struct kvm_mmu_=
-page *sp)
->         return kvm_mmu_role_as_id(sp->role);
+>         write_lock(&vcpu->kvm->mmu_lock);
+>         r =3D make_mmu_pages_available(vcpu);
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index e7cd4921afe7..2770230a5636 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -224,7 +224,7 @@ static void tdp_mmu_init_child_sp(struct kvm_mmu_page=
+ *child_sp,
+>         tdp_mmu_init_sp(child_sp, iter->sptep, iter->gfn, role);
 >  }
 >
-> +static inline bool is_mirror_sp(const struct kvm_mmu_page *sp)
-> +{
-> +       return kvm_mmu_page_role_is_mirror(sp->role);
-> +}
-
-e.g. "return sp->role.is_mirror".
-
->  static inline void *kvm_mmu_mirrored_spt(struct kvm_mmu_page *sp)
+> -int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
+> +void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
 >  {
->         return sp->mirrored_spt;
-
-This one is also unnecessary BTW.
-
-Otherwise looks good.
-
-Paolo
-
-> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> index 5dd5405fa07a..b3c065280ba1 100644
-> --- a/arch/x86/kvm/mmu/spte.h
-> +++ b/arch/x86/kvm/mmu/spte.h
-> @@ -265,6 +265,11 @@ static inline struct kvm_mmu_page *root_to_sp(hpa_t =
-root)
->         return spte_to_child_sp(root);
+>         struct kvm_mmu *mmu =3D vcpu->arch.mmu;
+>         union kvm_mmu_page_role role =3D mmu->root_role;
+> @@ -285,7 +285,6 @@ int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu)
+>          */
+>         mmu->root.hpa =3D __pa(root->spt);
+>         mmu->root.pgd =3D 0;
+> -       return 0;
 >  }
 >
-> +static inline bool is_mirror_sptep(u64 *sptep)
-> +{
-> +       return is_mirror_sp(sptep_to_sp(sptep));
-> +}
-> +
->  static inline bool is_mmio_spte(struct kvm *kvm, u64 spte)
+>  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> index 58b55e61bd33..437ddd4937a9 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> @@ -10,7 +10,7 @@
+>  void kvm_mmu_init_tdp_mmu(struct kvm *kvm);
+>  void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
+>
+> -int kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu);
+> +void kvm_tdp_mmu_alloc_root(struct kvm_vcpu *vcpu);
+>
+>  __must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page=
+ *root)
 >  {
->         return (spte & shadow_mmio_mask) =3D=3D kvm->arch.shadow_mmio_val=
-ue &&
 > --
 > 2.34.1
 >
