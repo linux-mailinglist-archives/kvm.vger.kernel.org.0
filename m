@@ -1,167 +1,189 @@
-Return-Path: <kvm+bounces-18998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18999-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCAE8FE052
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 09:59:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 616D08FE202
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 11:05:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E3A31C24ABF
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 07:59:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DDEB1C2580F
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 09:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230A713BC30;
-	Thu,  6 Jun 2024 07:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE00214A4E0;
+	Thu,  6 Jun 2024 09:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qWFcqMsT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S6kUPq2G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496AD13AD22
-	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 07:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9C313B7A9
+	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 09:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717660743; cv=none; b=RiUZqGfkfvP26R7FZRL2G6LNyUVIgIxUcF5nWh24Fafixu8bM19xkIZP6X1dOk3ZOSkOW5+NkPKUPVUermEynW7qarBoeqHab4A3WFfs3ikjYpwj40PVtBjR+VXRY9xlDKzuBakbUF7dXVTlBBFerCbgYAqTWdzVkV623RhbE/s=
+	t=1717664466; cv=none; b=iiZbGROG8FElWGIo8iTf58m/A8Zl8xYQuSCFu6OJ70yvilbSIaSGjQ7EyURlLxOmX8dPKuVbpbaHh6ALYHzNlKzo7WZd3ZV5zFiqXXjEzo4TeWfJVSvJId/TEvBHmG4dKVnk/UHiLGLA0faX/PFMxrLLYw3ugmMyXOV3yvUDYnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717660743; c=relaxed/simple;
-	bh=nk7+3Hqvff2edRi1b8P0ZrA2TyIVvk62hbw8Ro+JfUw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SNlczswN0RUMgYXdtfLKA+XGsmoWFetBO/nksyr9/Uy6ChHryeTSDWawoOVPDNYsK11Le6qJkUY8HYaspVq2FWv0xjkklHOLfLEToHRsCJ8Ysu5tYlgMnvydOTGeCtM6nY31R6ywo9sqnkb/cEodGSB7yB5UA4LTz9lUMG9CfNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qWFcqMsT; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4567oP3o005719;
-	Thu, 6 Jun 2024 07:58:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc :
- content-transfer-encoding : content-type : date : from : in-reply-to :
- message-id : mime-version : references : subject : to; s=pp1;
- bh=w+V5nS5ccoaYF288cuPrSfCZKP3xIt82fxdgWpPbnPY=;
- b=qWFcqMsTN5MFbLrfm/SvQgFgLoTFZ9RID5L2lGCeQ21WkYtP5crJpij0EToRifk517qd
- 4a+5c5cc9Kdmt/mK29jw7nfUl7PVznjmEaN4W3ZaRg15P0OI/SrRCCk8kzOEsYfH4SRm
- BdvZXPfDMouy7/wzP2gp6JWQA4iFGE9w+HiRtbKcD56CnBOGdPGC9ftMZBb1jEEOVqsG
- EUzjV4fWKHxhezDcAFugic7ZT+RrJ9Azsf5xZahudvkaFnK62qVvu2L+OvRUJSdcmb6D
- wwQ9DVX7ry3NMMfXrrWdoEOhCBZ+cfN3eClxQPXN9AKQHp/JNbSQNMk1zjCnuJ3CEB4x SA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yk5tc0j6g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Jun 2024 07:58:52 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4567wpj7017798;
-	Thu, 6 Jun 2024 07:58:51 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yk5tc0j6e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Jun 2024 07:58:51 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4565VfZD031204;
-	Thu, 6 Jun 2024 07:58:51 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ygeypsaub-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Jun 2024 07:58:50 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4567wlfS51642670
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Jun 2024 07:58:49 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 02EFD20043;
-	Thu,  6 Jun 2024 07:58:47 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DADF120040;
-	Thu,  6 Jun 2024 07:58:46 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.152.224.248])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  6 Jun 2024 07:58:46 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: Nicholas Piggin <npiggin@gmail.com>, Thomas Huth <thuth@redhat.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>, kvm@vger.kernel.org
-Subject: Re: [RFC kvm-unit-tests PATCH] build: fix .aux.o target building
-In-Reply-To: <D1SMM4C3H27B.2VWTDLUIB7RU3@gmail.com>
-References: <20240605081623.8765-1-npiggin@gmail.com>
- <87cyovekmh.fsf@linux.ibm.com> <D1S0ZSXXGJFC.2IE9N2O8K9ETJ@gmail.com>
- <87frtrh1ho.fsf@linux.ibm.com> <D1SMM4C3H27B.2VWTDLUIB7RU3@gmail.com>
-Date: Thu, 06 Jun 2024 09:58:45 +0200
-Message-ID: <87h6e6sdsa.fsf@linux.ibm.com>
+	s=arc-20240116; t=1717664466; c=relaxed/simple;
+	bh=wzYswM+GOyzbFfFr5riWwzWKHixp6VYngI7o0vMd8bA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Pwh8Imu2FCEAfXq/ZUGU1IZD4DfDjet2fvoYISEBCzuhwXdLsEBc8vf2mSvgU8+k0mI3k8rfmZepmUbNYQDetHs77SdRlxU0OZgWyRtj8+wlaX19KXUE9LH5hH9vhRYP1jV9ImxKPqYRYoUtkZt+Bk0u/fP72hooWjTNJDnmVOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S6kUPq2G; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717664464;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hTyBkHfOUJ9uxF1C9hwpYjJJ5ZfdYCgdDu/nl255Im0=;
+	b=S6kUPq2G5NR2MKDKTXkTnkBv8q13opwL6SrXx3OQsR8cMEdPVpqwk1By45q/0hIkrRiccb
+	1j/R3NogKqQN7Aen9iIwXAomrusKkFeQLj7ESQxk+rnKubkITKKSuSKYwrc7K32IzrrCWV
+	Sh8/mwXaB0THXBgFFAkPN7D60oPNOVg=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-556-0FU-Bh1UPQym4ebyPC72Dg-1; Thu, 06 Jun 2024 05:01:02 -0400
+X-MC-Unique: 0FU-Bh1UPQym4ebyPC72Dg-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a68ccd15540so33598766b.3
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 02:01:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717664461; x=1718269261;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hTyBkHfOUJ9uxF1C9hwpYjJJ5ZfdYCgdDu/nl255Im0=;
+        b=I4ryzIkQaWXt2keVBcX4Zx8NbPyr4lfNCX6sDMBTgDuCBnOEN3C2xv9Y7u+/6fw7g7
+         Iv+XAoadTPe4H412KhSAnsZV3Ag/Gz6Pl6crJTJtbuHoysbweGCgwPNuXRK6JdcC2dYt
+         lJgwTXvwGk9QMXxWs3p+HOuhx5GxbiYA+tLQWZnERPCg/DMURyue12oUotyXiEqbUyuX
+         FPSOlwaZ8REZDf65XdZTOSnpINPMIT7d0Y4Pnqcm0wH4SkuB0g0mtDUhq+kQvSPmve2F
+         ZuKldPzX1kRG0lCl/UbTwqUdU5V03qEtYSNE3yfzFrijqYMpYNVIySXyWoN5oLQ31KH3
+         X5KA==
+X-Gm-Message-State: AOJu0YznhMEHng6kwaHVklaEf56drd4xf0Mkv2hOgUsOh20ZvmkoiQW8
+	edhZUpQOxj9PahCfJy859onxY2e4dANwya3SVQXMbF/1YzG7HgaSlZG9zVzeRKibAv9HuFwoKpM
+	P2V9BPOza4+g5GxUlYhf/QTDtbWM1kDdGIvmwnPi7q0laMnp8Jg==
+X-Received: by 2002:a17:906:50b:b0:a6c:6fac:f1ff with SMTP id a640c23a62f3a-a6c6fad1464mr198293366b.12.1717664461359;
+        Thu, 06 Jun 2024 02:01:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGMGQE7XUl40zUD7peELEaXzGUsB73fs884FprBoYCJ5e5eKQfRB6K05jDAFqxikuBBYvakyA==
+X-Received: by 2002:a17:906:50b:b0:a6c:6fac:f1ff with SMTP id a640c23a62f3a-a6c6fad1464mr198291366b.12.1717664460837;
+        Thu, 06 Jun 2024 02:01:00 -0700 (PDT)
+Received: from [192.168.10.81] ([151.81.115.112])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a6c806ebd21sm66634266b.100.2024.06.06.02.00.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Jun 2024 02:01:00 -0700 (PDT)
+Message-ID: <bc9560e2-39e6-4391-9fb8-b972f3605c80@redhat.com>
+Date: Thu, 6 Jun 2024 11:00:59 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: pspc1nSHF5GbLVmst8J7Zc-qj6KThRkY
-X-Proofpoint-ORIG-GUID: vRYqkQ76xHymYFmXnn4MiBDSY4PN7Kgs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-06_01,2024-06-06_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
- malwarescore=0 lowpriorityscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
- phishscore=0 priorityscore=1501 impostorscore=0 bulkscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2405010000
- definitions=main-2406060057
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 4/6] target/i386: add support for VMX FRED controls
+To: Xin Li <xin3.li@intel.com>, qemu-devel@nongnu.org
+Cc: kvm@vger.kernel.org, richard.henderson@linaro.org, eduardo@habkost.net,
+ seanjc@google.com, chao.gao@intel.com, hpa@zytor.com, xiaoyao.li@intel.com,
+ weijiang.yang@intel.com
+References: <20231109072012.8078-1-xin3.li@intel.com>
+ <20231109072012.8078-5-xin3.li@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20231109072012.8078-5-xin3.li@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 06, 2024 at 01:49 PM +1000, "Nicholas Piggin" <npiggin@gmail.co=
-m> wrote:
-> On Thu Jun 6, 2024 at 1:07 AM AEST, Marc Hartmayer wrote:
->> On Wed, Jun 05, 2024 at 08:53 PM +1000, "Nicholas Piggin" <npiggin@gmail=
-.com> wrote:
->> > On Wed Jun 5, 2024 at 8:42 PM AEST, Marc Hartmayer wrote:
->> >> On Wed, Jun 05, 2024 at 06:16 PM +1000, Nicholas Piggin <npiggin@gmai=
-l.com> wrote:
+On 11/9/23 08:20, Xin Li wrote:
+> Add VMX FRED controls used to enable save/load of FRED MSRs.
+> 
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> Signed-off-by: Xin Li <xin3.li@intel.com>
+> ---
+>   scripts/kvm/vmxcap | 3 +++
+>   target/i386/cpu.c  | 2 +-
+>   2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/kvm/vmxcap b/scripts/kvm/vmxcap
+> index 7da1e00ca8..44898d73c2 100755
+> --- a/scripts/kvm/vmxcap
+> +++ b/scripts/kvm/vmxcap
+> @@ -229,6 +229,8 @@ controls = [
+>       Allowed1Control(
+>           name = 'secondary VM-Exit controls',
+>           bits = {
+> +            0: 'Save IA32 FRED MSRs',
+> +            1: 'Load IA32 FRED MSRs',
+>               },
+>           cap_msr = MSR_IA32_VMX_EXIT_CTLS2,
+>           ),
+> @@ -246,6 +248,7 @@ controls = [
+>               16: 'Load IA32_BNDCFGS',
+>               17: 'Conceal VM entries from PT',
+>               18: 'Load IA32_RTIT_CTL',
+> +            23: 'Load IA32 FRED MSRs',
+>               },
+>           cap_msr = MSR_IA32_VMX_ENTRY_CTLS,
+>           true_cap_msr = MSR_IA32_VMX_TRUE_ENTRY_CTLS,
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 227ee1c759..dcf914a7ec 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -1285,7 +1285,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+>               NULL, "vmx-entry-ia32e-mode", NULL, NULL,
+>               NULL, "vmx-entry-load-perf-global-ctrl", "vmx-entry-load-pat", "vmx-entry-load-efer",
+>               "vmx-entry-load-bndcfgs", NULL, "vmx-entry-load-rtit-ctl", NULL,
+> -            NULL, NULL, "vmx-entry-load-pkrs", NULL,
+> +            NULL, NULL, "vmx-entry-load-pkrs", "vmx-entry-load-fred",
+>               NULL, NULL, NULL, NULL,
+>               NULL, NULL, NULL, NULL,
+>           },
 
-[=E2=80=A6snip=E2=80=A6]
+The bits in the secondary vmexit controls are not supported, and in 
+general the same is true for the secondary vmexit case.  I think it's 
+better to not include the vmx-entry-load-fred bit either, and only do 
+the vmxcap changes.
 
->
->
->> But what was also interesting is that if I=E2=80=99m using multiple
->> jobs I don=E2=80=99t see the issue.
->>
->> make clean -j; make -j; make -j # <- the last make has nothing to do
->>
->> if I=E2=80=99m using:
->>
->> make clean -j; make; make -j # <- the last make has something to do=E2=
-=80=A6
->>                                   that something that irritates me
->
-> This is with s390x? Maybe with parallel make, the target is getting
+Also, in patch 1 there should be a dependency from LM to FRED.
 
-No, it=E2=80=99s a ppc64 cross-build on x86.
+I applied these changes and queued the series, thanks.
 
-> rebuilt via a different prerequisite that is not a .SECONDARY target?
-> Adding %.aux.o in PRECIOUS there should help in that case.
+Paolo
 
-Yes, it helps - that was the reason for my fix :)
-
->
->> >
->> > Is it better to define explicit targets if we want to keep them, or
->> > add to .PRECIOUS? Your patch would be simpler.
->>
->> Normally, I would say without .PRECIOUS it=E2=80=99s cleaner, but there =
-is
->> already a .PRECIOUS for %.so=E2=80=A6 So as Andrew has already written
->>
->> .PRECIOUS: %.so %.aux.o
->>
->> should also be fine.
->
-> Okay, for a minimal fix I will do that.
->
-> Thanks,
-> Nick
->
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
 
