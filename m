@@ -1,80 +1,40 @@
-Return-Path: <kvm+bounces-18999-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19000-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616D08FE202
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 11:05:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D848FE2CA
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 11:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DDEB1C2580F
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 09:05:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A54DBB2B0EA
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 09:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE00214A4E0;
-	Thu,  6 Jun 2024 09:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S6kUPq2G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8538915688F;
+	Thu,  6 Jun 2024 09:03:33 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9C313B7A9
-	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 09:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F4013E035;
+	Thu,  6 Jun 2024 09:03:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717664466; cv=none; b=iiZbGROG8FElWGIo8iTf58m/A8Zl8xYQuSCFu6OJ70yvilbSIaSGjQ7EyURlLxOmX8dPKuVbpbaHh6ALYHzNlKzo7WZd3ZV5zFiqXXjEzo4TeWfJVSvJId/TEvBHmG4dKVnk/UHiLGLA0faX/PFMxrLLYw3ugmMyXOV3yvUDYnE=
+	t=1717664613; cv=none; b=XxfYK52rsm2eVdOJaVus6lFiEjq4K089/5Q218G3gOpc4z5CHj4yoglUUk6kIABkUnbBmmbfMs7S6lQMWZqEbJY/wyEIRDeK3uUL1J3+oBy6da0fmavtI87IhrtKydGXtBirgXsaKfPb+xeBp6wM5wfzmAuEhQFOcvo+Kq68hbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717664466; c=relaxed/simple;
-	bh=wzYswM+GOyzbFfFr5riWwzWKHixp6VYngI7o0vMd8bA=;
+	s=arc-20240116; t=1717664613; c=relaxed/simple;
+	bh=zGINutsNe6MmQp12y68+cEwLXsIuxll5jEDC/d7keK4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pwh8Imu2FCEAfXq/ZUGU1IZD4DfDjet2fvoYISEBCzuhwXdLsEBc8vf2mSvgU8+k0mI3k8rfmZepmUbNYQDetHs77SdRlxU0OZgWyRtj8+wlaX19KXUE9LH5hH9vhRYP1jV9ImxKPqYRYoUtkZt+Bk0u/fP72hooWjTNJDnmVOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S6kUPq2G; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717664464;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hTyBkHfOUJ9uxF1C9hwpYjJJ5ZfdYCgdDu/nl255Im0=;
-	b=S6kUPq2G5NR2MKDKTXkTnkBv8q13opwL6SrXx3OQsR8cMEdPVpqwk1By45q/0hIkrRiccb
-	1j/R3NogKqQN7Aen9iIwXAomrusKkFeQLj7ESQxk+rnKubkITKKSuSKYwrc7K32IzrrCWV
-	Sh8/mwXaB0THXBgFFAkPN7D60oPNOVg=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-556-0FU-Bh1UPQym4ebyPC72Dg-1; Thu, 06 Jun 2024 05:01:02 -0400
-X-MC-Unique: 0FU-Bh1UPQym4ebyPC72Dg-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a68ccd15540so33598766b.3
-        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 02:01:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717664461; x=1718269261;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hTyBkHfOUJ9uxF1C9hwpYjJJ5ZfdYCgdDu/nl255Im0=;
-        b=I4ryzIkQaWXt2keVBcX4Zx8NbPyr4lfNCX6sDMBTgDuCBnOEN3C2xv9Y7u+/6fw7g7
-         Iv+XAoadTPe4H412KhSAnsZV3Ag/Gz6Pl6crJTJtbuHoysbweGCgwPNuXRK6JdcC2dYt
-         lJgwTXvwGk9QMXxWs3p+HOuhx5GxbiYA+tLQWZnERPCg/DMURyue12oUotyXiEqbUyuX
-         FPSOlwaZ8REZDf65XdZTOSnpINPMIT7d0Y4Pnqcm0wH4SkuB0g0mtDUhq+kQvSPmve2F
-         ZuKldPzX1kRG0lCl/UbTwqUdU5V03qEtYSNE3yfzFrijqYMpYNVIySXyWoN5oLQ31KH3
-         X5KA==
-X-Gm-Message-State: AOJu0YznhMEHng6kwaHVklaEf56drd4xf0Mkv2hOgUsOh20ZvmkoiQW8
-	edhZUpQOxj9PahCfJy859onxY2e4dANwya3SVQXMbF/1YzG7HgaSlZG9zVzeRKibAv9HuFwoKpM
-	P2V9BPOza4+g5GxUlYhf/QTDtbWM1kDdGIvmwnPi7q0laMnp8Jg==
-X-Received: by 2002:a17:906:50b:b0:a6c:6fac:f1ff with SMTP id a640c23a62f3a-a6c6fad1464mr198293366b.12.1717664461359;
-        Thu, 06 Jun 2024 02:01:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMGQE7XUl40zUD7peELEaXzGUsB73fs884FprBoYCJ5e5eKQfRB6K05jDAFqxikuBBYvakyA==
-X-Received: by 2002:a17:906:50b:b0:a6c:6fac:f1ff with SMTP id a640c23a62f3a-a6c6fad1464mr198291366b.12.1717664460837;
-        Thu, 06 Jun 2024 02:01:00 -0700 (PDT)
-Received: from [192.168.10.81] ([151.81.115.112])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a6c806ebd21sm66634266b.100.2024.06.06.02.00.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jun 2024 02:01:00 -0700 (PDT)
-Message-ID: <bc9560e2-39e6-4391-9fb8-b972f3605c80@redhat.com>
-Date: Thu, 6 Jun 2024 11:00:59 +0200
+	 In-Reply-To:Content-Type; b=PtZVjU3ibjWp3EHuQfNEtgoJbjRY3CSkFbbKtTOnd3CwTwkw56OWP3lzG4daXzRRDUDYdOD61mlHYdE0XhKh1dDuBgT6uKzs2blDWvsDosqIeoGkPwHZx2ZmFZS+GWL7YkkmmT3fDlswW5SS49HXVrk4IihWApJokFJ46k51LEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 637B6339;
+	Thu,  6 Jun 2024 02:03:55 -0700 (PDT)
+Received: from [10.1.33.29] (e122027.cambridge.arm.com [10.1.33.29])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9994E3F762;
+	Thu,  6 Jun 2024 02:03:27 -0700 (PDT)
+Message-ID: <c7db4f52-3d14-4d45-8352-d6d9f9e3b286@arm.com>
+Date: Thu, 6 Jun 2024 10:03:25 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,108 +42,136 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 4/6] target/i386: add support for VMX FRED controls
-To: Xin Li <xin3.li@intel.com>, qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, richard.henderson@linaro.org, eduardo@habkost.net,
- seanjc@google.com, chao.gao@intel.com, hpa@zytor.com, xiaoyao.li@intel.com,
- weijiang.yang@intel.com
-References: <20231109072012.8078-1-xin3.li@intel.com>
- <20231109072012.8078-5-xin3.li@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20231109072012.8078-5-xin3.li@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
+To: Itaru Kitayama <itaru.kitayama@linux.dev>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <ZmAj26Q2aHj-U9hw@vm3>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <ZmAj26Q2aHj-U9hw@vm3>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/9/23 08:20, Xin Li wrote:
-> Add VMX FRED controls used to enable save/load of FRED MSRs.
+On 05/06/2024 09:37, Itaru Kitayama wrote:
+> Hi Steven,
+> On Wed, Jun 05, 2024 at 10:29:52AM +0100, Steven Price wrote:
+>> This series adds support for running Linux in a protected VM under the
+>> Arm Confidential Compute Architecture (CCA). This has been updated
+>> following the feedback from the v2 posting[1]. Thanks for the feedback!
+>> Individual patches have a change log for v3.
+>>
+>> The biggest change from v2 is fixing set_memory_{en,de}crypted() to
+>> perform a break-before-make sequence. Note that only the virtual address
+>> supplied is flipped between shared and protected, so if e.g. a vmalloc()
+>> address is passed the linear map will still point to the (now invalid)
+>> previous IPA. Attempts to access the wrong address may trigger a
+>> Synchronous External Abort. However any code which attempts to access
+>> the 'encrypted' alias after set_memory_decrypted() is already likely to
+>> be broken on platforms that implement memory encryption, so I don't
+>> expect problems.
+>>
+>> The ABI to the RMM from a realm (the RSI) is based on the final RMM v1.0
+>> (EAC 5) specification[2]. Future RMM specifications will be backwards
+>> compatible so a guest using the v1.0 specification (i.e. this series)
+>> will be able to run on future versions of the RMM without modification.
+>>
+>> Arm plans to set up a CI system to perform at a minimum boot testing of
+>> Linux as a guest within a realm.
+>>
+>> This series is based on v6.10-rc1. It is also available as a git
+>> repository:
+>>
+>> https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v3
+>>
+>> This series (the guest side) should be in a good state so please review
+>> with the intention that this could be merged soon. The host side (KVM
+>> changes) is likely to require some more iteration and I'll post that as
+>> a separate series shortly - note that there is no tie between the series
+>> (i.e. you can mix and match v2 and v3 postings of the host and guest).
+>>
+>> Introduction (unchanged from v2 posting)
+>> ============
+>> A more general introduction to Arm CCA is available on the Arm
+>> website[3], and links to the other components involved are available in
+>> the overall cover letter.
+>>
+>> Arm Confidential Compute Architecture adds two new 'worlds' to the
+>> architecture: Root and Realm. A new software component known as the RMM
+>> (Realm Management Monitor) runs in Realm EL2 and is trusted by both the
+>> Normal World and VMs running within Realms. This enables mutual
+>> distrust between the Realm VMs and the Normal World.
+>>
+>> Virtual machines running within a Realm can decide on a (4k)
+>> page-by-page granularity whether to share a page with the (Normal World)
+>> host or to keep it private (protected). This protection is provided by
+>> the hardware and attempts to access a page which isn't shared by the
+>> Normal World will trigger a Granule Protection Fault.
+>>
+>> Realm VMs can communicate with the RMM via another SMC interface known
+>> as RSI (Realm Services Interface). This series adds wrappers for the
+>> full set of RSI commands and uses them to manage the Realm IPA State
+>> (RIPAS) and to discover the configuration of the realm.
+>>
+>> The VM running within the Realm needs to ensure that memory that is
+>> going to use is marked as 'RIPAS_RAM' (i.e. protected memory accessible
+>> only to the guest). This could be provided by the VMM (and subject to
+>> measurement to ensure it is setup correctly) or the VM can set it
+>> itself.  This series includes a patch which will iterate over all
+>> described RAM and set the RIPAS. This is a relatively cheap operation,
+>> and doesn't require memory donation from the host. Instead, memory can
+>> be dynamically provided by the host on fault. An alternative would be to
+>> update booting.rst and state this as a requirement, but this would
+>> reduce the flexibility of the VMM to manage the available memory to the
+>> guest (as the initial RIPAS state is part of the guest's measurement).
+>>
+>> Within the Realm the most-significant active bit of the IPA is used to
+>> select whether the access is to protected memory or to memory shared
+>> with the host. This series treats this bit as if it is attribute bit in
+>> the page tables and will modify it when sharing/unsharing memory with
+>> the host.
+>>
+>> This top bit usage also necessitates that the IPA width is made more
+>> dynamic in the guest. The VMM will choose a width (and therefore which
+>> bit controls the shared flag) and the guest must be able to identify
+>> this bit to mask it out when necessary. PHYS_MASK_SHIFT/PHYS_MASK are
+>> therefore made dynamic.
+>>
+>> To allow virtio to communicate with the host the shared buffers must be
+>> placed in memory which has this top IPA bit set. This is achieved by
+>> implementing the set_memory_{encrypted,decrypted} APIs for arm64 and
+>> forcing the use of bounce buffers. For now all device access is
+>> considered to required the memory to be shared, at this stage there is
+>> no support for real devices to be assigned to a realm guest - obviously
+>> if device assignment is added this will have to change.
+>>
+>> Finally the GIC is (largely) emulated by the (untrusted) host. The RMM
+>> provides some management (including register save/restore) but the
+>> ITS buffers must be placed into shared memory for the host to emulate.
+>> There is likely to be future work to harden the GIC driver against a
+>> malicious host (along with any other drivers used within a Realm guest).
+>>
+>> [1] https://lore.kernel.org/r/20240412084213.1733764-1-steven.price%40arm.com
+>> [2] https://developer.arm.com/documentation/den0137/1-0eac5/
+>> [3] https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+>>
 > 
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> Signed-off-by: Xin Li <xin3.li@intel.com>
-> ---
->   scripts/kvm/vmxcap | 3 +++
->   target/i386/cpu.c  | 2 +-
->   2 files changed, 4 insertions(+), 1 deletion(-)
+> The v3 guest built with clang booted fine on FVP backed by v2 host kernel.
 > 
-> diff --git a/scripts/kvm/vmxcap b/scripts/kvm/vmxcap
-> index 7da1e00ca8..44898d73c2 100755
-> --- a/scripts/kvm/vmxcap
-> +++ b/scripts/kvm/vmxcap
-> @@ -229,6 +229,8 @@ controls = [
->       Allowed1Control(
->           name = 'secondary VM-Exit controls',
->           bits = {
-> +            0: 'Save IA32 FRED MSRs',
-> +            1: 'Load IA32 FRED MSRs',
->               },
->           cap_msr = MSR_IA32_VMX_EXIT_CTLS2,
->           ),
-> @@ -246,6 +248,7 @@ controls = [
->               16: 'Load IA32_BNDCFGS',
->               17: 'Conceal VM entries from PT',
->               18: 'Load IA32_RTIT_CTL',
-> +            23: 'Load IA32 FRED MSRs',
->               },
->           cap_msr = MSR_IA32_VMX_ENTRY_CTLS,
->           true_cap_msr = MSR_IA32_VMX_TRUE_ENTRY_CTLS,
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 227ee1c759..dcf914a7ec 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -1285,7 +1285,7 @@ FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->               NULL, "vmx-entry-ia32e-mode", NULL, NULL,
->               NULL, "vmx-entry-load-perf-global-ctrl", "vmx-entry-load-pat", "vmx-entry-load-efer",
->               "vmx-entry-load-bndcfgs", NULL, "vmx-entry-load-rtit-ctl", NULL,
-> -            NULL, NULL, "vmx-entry-load-pkrs", NULL,
-> +            NULL, NULL, "vmx-entry-load-pkrs", "vmx-entry-load-fred",
->               NULL, NULL, NULL, NULL,
->               NULL, NULL, NULL, NULL,
->           },
+> Tested-by: Itaru Kitayama <itaru.kitayama@fujitsu.com>
 
-The bits in the secondary vmexit controls are not supported, and in 
-general the same is true for the secondary vmexit case.  I think it's 
-better to not include the vmx-entry-load-fred bit either, and only do 
-the vmxcap changes.
+Thanks for testing!
 
-Also, in patch 1 there should be a dependency from LM to FRED.
-
-I applied these changes and queued the series, thanks.
-
-Paolo
+Steve
 
 
