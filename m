@@ -1,105 +1,217 @@
-Return-Path: <kvm+bounces-19004-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19005-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF5F8FE36F
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 11:52:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24CB48FE40E
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 12:17:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03D30281412
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 09:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A7161C24267
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 10:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF33717E8F9;
-	Thu,  6 Jun 2024 09:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D09B194AF1;
+	Thu,  6 Jun 2024 10:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="gtk1a9bp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uiEWhhEz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F7F178CDF
-	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 09:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B873158848;
+	Thu,  6 Jun 2024 10:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717667533; cv=none; b=WXjNG1oibGQ4tmEZFDdD3t40Xs2bet1rqk0ymKwgAQ0YW1HiBFPjX9HCB5ndITCjl15LCItcPDzSHei4t1d0FCRsRurjPu5Uyd1F3pYE25erUa3d7GrMbAesD85fU0mLyOFNtFKnWjwKu4DMJlA+ML/nvfUtfIELXx6Frfrlix4=
+	t=1717669060; cv=none; b=FV3/lPzwqTvHWWXqqSmh51ImAbajYrnBfPn++1ZgUweBk0kuAlf38cknp7PRPQSxHScZ88tEOLgaSW/kNSHDysIudbsTd/pEY10X5n185VXmr4wCvqqSqyDkmvACO5WapIRLzshiAtuenHqFkXbiJqhr70gu5BB/1INEhXOhgQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717667533; c=relaxed/simple;
-	bh=hzMInXZBrq08VfXm9EodIoLXJ2qNXwWHpR/vSZpB+as=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XcoJHho3tbUPdyNSeOnPGDhGMcpBtr3xR2n8e2c1geblnEkly+0qdcMeIkxNWHz5FuZJO8e+Ih+kqaUGUT2euJARCwKh1h5H4TaQJcpuGP1bbQIpdfnz4DJAwDHXHB7/Dd0RhpB9sGqOPPpR8k9r5OuOaDiP4sZtvreX6Dso088=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=gtk1a9bp; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2e95a75a90eso7630801fa.2
-        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 02:52:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1717667531; x=1718272331; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hzMInXZBrq08VfXm9EodIoLXJ2qNXwWHpR/vSZpB+as=;
-        b=gtk1a9bpnVtDocVdEOLvEOtSatyS73dq6dJfgs1U+WASwtsiqzSuVhHfb0c2T6rklL
-         HEBfmgXDL587gyb6sDVbecdU7maBaPvdxalvbmUw4sBKfUY8EXlOtU+hzixVOJiw1Z1t
-         iVw58P5FR2jo1hocr6P6kJCmL9NRP5QSG28dofAGZiMyFrUjBqtV6fQbxEP+PprfUYmn
-         b00b1+BLLIOROzaImz6CTvHi4mN3qzotw+BiFqecf0LMDG3TQ0t7plzlq9usP4L5CWsg
-         FEhh6cFj8JH7pmSvVSFy5LjBuer4lKhswukaCZDnFfBR5XwmuSjeXKTQO36uWCzQ10b0
-         JiMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717667531; x=1718272331;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hzMInXZBrq08VfXm9EodIoLXJ2qNXwWHpR/vSZpB+as=;
-        b=TKf4vHKELnxLGf48BbmRqXNLhOcisHOsH19iXdB3tzU1BZU52GwZxZOzxADPyYIpjg
-         KyJDFTPPwOIqBHFUrnDJwuwtfXvqDl84VegkvPslHnkyCJesZAl9E5q+zMNmVfGVPpsW
-         a3+3a38HBmgI5qylllG2uCpohj1n65zpqvPE++4RDjaPovBmqW7Hc44gMJvRxnUrMDPi
-         DdpImHIeHr/QiscblmHfsn5igzdFvC/ju+Xp2ETlbE4/WTVtlTbOqcb3JOuD80MDmZhc
-         3gEunf05usqdB8HUd3CTEFqXq6M12IEfxnR20RFqVGVnyHEAY7WhFulcxFn7dDPlVNos
-         53AA==
-X-Forwarded-Encrypted: i=1; AJvYcCXU7Z1XM41WPj3sTJgRAg/8wOhE9qOsKgGB8YvSwMulySPaDD9OZzNskiUABwzRwswxWQi4UkZRnLlysfbIx+pE7cVe
-X-Gm-Message-State: AOJu0YxMGTYXLUj4vhrz8S21ZCb8IKnFYpVv4+kfh1z/po5e/Gvh5mXn
-	5xW8rMTkbKlv58dLfLA+wreS1QsvYPJ92rLdswdf7lFVvY2yg/yVcKe+TLIEw5oTkig8byAoaIM
-	ux8PTHS4a+9+5f5e7xRPHAfsIp6Qvt7KF3yEpBQ==
-X-Google-Smtp-Source: AGHT+IGRjxg5JxSkcZ0TIa9nvKzj+6js95PShzriLgFiyIk8WZvSEOxoci54ygHxxx3XlK6Ngc3iCOMpgDTyPLdieC0=
-X-Received: by 2002:a2e:9617:0:b0:2d8:3e60:b9c9 with SMTP id
- 38308e7fff4ca-2eac7a82898mr28203101fa.33.1717667530690; Thu, 06 Jun 2024
- 02:52:10 -0700 (PDT)
+	s=arc-20240116; t=1717669060; c=relaxed/simple;
+	bh=W9kbQ3pOCWummTxiokP7SZcsLeHBrYY6Qzq/MV72KTU=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ll5e/OPt2kAbbBDKs6l2nqrJiWbc0ASdP7a8Eki37HA2vrxdkiL+Fm0/7lfXRkeePgYbRGY+r3lzZX6OYiaKOE1aqjwzufpgipqPLZzP7pybbmhI/bpvQnW7+ZtbrWhfb5V0xEyE1Jaiczai9LoOXeGK1YzjYMviJEgIUmLhsEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uiEWhhEz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D96D3C32782;
+	Thu,  6 Jun 2024 10:17:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717669059;
+	bh=W9kbQ3pOCWummTxiokP7SZcsLeHBrYY6Qzq/MV72KTU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uiEWhhEzoZzCIGqYIZyzZELj/haUQGSJYnc/PlYcDgqUSC+04XGE+M+Tzy36Jqpso
+	 I4B8nKfrhcD+XTJPPvcyuINb4gGoyzJipMtkwRp7X0fqGZw7thxFDzT+qaAd6DOc9T
+	 QBvq9FMfIsHUTsjV38OTk1T8r1ewNiaQYBW/7WFHcCJfVMrArKP4FF2eUjYCCgPsA1
+	 6Tjjgrm9HSl+IZVOcW3vsUHWvSXPOXJA894X2JupawEqiGdJ2N8+LVKJqegLeNFow3
+	 7R9xEkjRyNPAxeI84GiTRczFdUBT8YJCJnuGxyakUMHsf4RiuMWtgfuQ+vATZ5VKwV
+	 C39dwBzegKSSQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sFABd-001G9O-CB;
+	Thu, 06 Jun 2024 11:17:37 +0100
+Date: Thu, 06 Jun 2024 11:17:36 +0100
+Message-ID: <867cf2l6in.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu
+ <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation shared
+In-Reply-To: <4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+	<20240605093006.145492-13-steven.price@arm.com>
+	<86a5jzld9g.wl-maz@kernel.org>
+	<4c363476-e5b5-42ff-9f30-a02a92b6751b@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240422080833.8745-1-liangshenlin@eswincomputing.com>
- <20240422080833.8745-3-liangshenlin@eswincomputing.com> <mvmr0das93i.fsf@suse.de>
-In-Reply-To: <mvmr0das93i.fsf@suse.de>
-From: Anup Patel <apatel@ventanamicro.com>
-Date: Thu, 6 Jun 2024 15:21:59 +0530
-Message-ID: <CAK9=C2Ug2gcS5Rbqc9EQ6mVwrJkoeLscOm6wtgqGKHdqEdSpSA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] perf kvm/riscv: Port perf kvm stat to RISC-V
-To: Andreas Schwab <schwab@suse.de>
-Cc: Shenlin Liang <liangshenlin@eswincomputing.com>, anup@brainfault.org, 
-	atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
-	aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	peterz@infradead.org, mingo@redhat.com, acme@kernel.org, namhyung@kernel.org, 
-	mark.rutland@arm.com, alexander.shishkin@linux.intel.com, jolsa@kernel.org, 
-	irogers@google.com, adrian.hunter@intel.com, linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: steven.price@arm.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, catalin.marinas@arm.com, will@kernel.org, james.morse@arm.com, oliver.upton@linux.dev, suzuki.poulose@arm.com, yuzenghui@huawei.com, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, tabba@google.com, linux-coco@lists.linux.dev, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, Jun 6, 2024 at 3:10=E2=80=AFPM Andreas Schwab <schwab@suse.de> wrot=
-e:
->
-> On Apr 22 2024, Shenlin Liang wrote:
->
-> > \ No newline at end of file
->
-> Please fix that.
+On Wed, 05 Jun 2024 16:08:49 +0100,
+Steven Price <steven.price@arm.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 05/06/2024 14:39, Marc Zyngier wrote:
+> > The subject line is... odd. I'd expect something like:
+> > 
+> > "irqchip/gic-v3-its: Share ITS tables with a non-trusted hypervisor"
+> > 
+> > because nothing here should be CCA specific.
+> 
+> Good point - that's a much better subject.
+> 
+> > On Wed, 05 Jun 2024 10:30:04 +0100,
+> > Steven Price <steven.price@arm.com> wrote:
+> >>
+> >> Within a realm guest the ITS is emulated by the host. This means the
+> >> allocations must have been made available to the host by a call to
+> >> set_memory_decrypted(). Introduce an allocation function which performs
+> >> this extra call.
+> > 
+> > This doesn't mention that this patch radically changes the allocation
+> > of some tables.
+> 
+> I guess that depends on your definition of radical, see below.
 
-Fixed in KVM RISC-V queue.
+It's election time, I'm all about making bold statements!
+
+[...]
+
+> >> @@ -3334,8 +3365,9 @@ static bool its_alloc_table_entry(struct its_node *its,
+> >>  
+> >>  	/* Allocate memory for 2nd level table */
+> >>  	if (!table[idx]) {
+> >> -		page = alloc_pages_node(its->numa_node, GFP_KERNEL | __GFP_ZERO,
+> >> -					get_order(baser->psz));
+> >> +		page = its_alloc_pages_node(its->numa_node,
+> >> +					    GFP_KERNEL | __GFP_ZERO,
+> >> +					    get_order(baser->psz));
+> >>  		if (!page)
+> >>  			return false;
+> >>  
+> >> @@ -3418,7 +3450,9 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+> >>  	unsigned long *lpi_map = NULL;
+> >>  	unsigned long flags;
+> >>  	u16 *col_map = NULL;
+> >> +	struct page *page;
+> >>  	void *itt;
+> >> +	int itt_order;
+> >>  	int lpi_base;
+> >>  	int nr_lpis;
+> >>  	int nr_ites;
+> >> @@ -3430,7 +3464,6 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+> >>  	if (WARN_ON(!is_power_of_2(nvecs)))
+> >>  		nvecs = roundup_pow_of_two(nvecs);
+> >>  
+> >> -	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+> >>  	/*
+> >>  	 * Even if the device wants a single LPI, the ITT must be
+> >>  	 * sized as a power of two (and you need at least one bit...).
+> >> @@ -3438,7 +3471,16 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
+> >>  	nr_ites = max(2, nvecs);
+> >>  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
+> >>  	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
+> >> -	itt = kzalloc_node(sz, GFP_KERNEL, its->numa_node);
+> >> +	itt_order = get_order(sz);
+> >> +	page = its_alloc_pages_node(its->numa_node,
+> >> +				    GFP_KERNEL | __GFP_ZERO,
+> >> +				    itt_order);
+> > 
+> > So we go from an allocation that was so far measured in *bytes* to
+> > something that is now at least a page. Per device. This seems a bit
+> > excessive to me, specially when it isn't conditioned on anything and
+> > is now imposed on all platforms, including the non-CCA systems (which
+> > are exactly 100% of the machines).
+> 
+> Catalin asked about this in v2:
+> https://lore.kernel.org/lkml/c329ae18-2b61-4851-8d6a-9e691a2007c8@arm.com/
+> 
+> To be honest, I don't have a great handle on how much memory is being
+> wasted here. Within the realm guest I was testing this is rounding up an
+> otherwise 511 byte allocation to a 4k page, and there are 3 of them.
+> Which seems reasonable from a realm guest perspective.
+
+And not that reasonable on a smaller system, such as my own router VM
+that has a whole lot of devices and very little memory. Not to mention
+that while CCA is stuck with 4k pages (duh!), the world is moving
+towards larger pages, meaning that this is wasting even more memory.
+
+> 
+> I can see two options to improve here:
+> 
+> 1. Add a !is_realm_world() check and return to the previous behaviour
+> when not running in a realm. It's ugly, and doesn't deal with any other
+> potential future memory encryption. cc_platform_has(CC_ATTR_MEM_ENCRYPT)
+> might be preferable? But this means no impact to non-realm guests.
+
+No, this is way too ugly, and doesn't help with things like pKVM.
+
+> 
+> 2. Use a special (global) memory allocator that does the
+> set_memory_decrypted() dance on the pages that it allocates but allows
+> packing the allocations. I'm not aware of an existing kernel API for
+> this, so it's potentially quite a bit of code. The benefit is that it
+> reduces memory consumption in a realm guest, although fragmentation
+> still means we're likely to see a (small) growth.
+> 
+> Any thoughts on what you think would be best?
+
+I would expect that something similar to kmem_cache could be of help,
+only with the ability to deal with variable object sizes (in this
+case: minimum of 256 bytes, in increments defined by the
+implementation, and with a 256 byte alignment).
+
+I don't think the ITS is particularly special here, and we should come
+up with something that is generic enough to support sharing of
+non-page-sized objects.
 
 Thanks,
-Anup
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
