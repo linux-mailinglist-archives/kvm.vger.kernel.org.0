@@ -1,159 +1,481 @@
-Return-Path: <kvm+bounces-19019-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19020-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD0088FF15A
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 17:56:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6107C8FF184
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 18:04:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D2E42841B0
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 15:56:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D919E288667
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 16:04:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766C6197A77;
-	Thu,  6 Jun 2024 15:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781E7197A8C;
+	Thu,  6 Jun 2024 16:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BnZtsX6t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T8B89E+/"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE62197A6A
-	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 15:55:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC37196C68
+	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 16:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717689339; cv=none; b=QJNNh0XXKREaY4F1Qr7x6u2nZlTq9z4jWsF7k3EEEjRehPlODgwSzHx10JlwB0P/oP0Pd8UloQQ0+xhkjrk7bkTJUbcdzCijHy90TPuw+OBheLnQ+kdy/S1BFPSnLLT/dr/h97ZjLRlPMTZ9OyX71zCmTbVhwTUvlR7rpmlJWuo=
+	t=1717689875; cv=none; b=KXyBjOPIorYcs87B5+doAoJraeh4ebpywLWEeSZYoVhv4Bbps18xLSYu7FlODE7pmqDODbqPerLKS0AYzzCYswXmL2dxI38abhWunRwtDfdpWjVDdz3Wfb/vMlxJmN9mniMhTCCbN31RwrrEzPM0GvgVe1c2l68HTgDCoBDKkqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717689339; c=relaxed/simple;
-	bh=sYwMXyFF5ixGHvNGo97vEq7NFrrcLjDHWZL8/TD1lOU=;
+	s=arc-20240116; t=1717689875; c=relaxed/simple;
+	bh=VB4ZT7y7ubhEcNdi+Z6RBcm06BWgu2STwBI8AxU5xtw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Znh9ykmc2/QWpG44ItKZjJZYM7qXXWlI5Qqai23BXrlY5H9Ck1T/Dc00ZNaBDuCcm3OkqsU53PYcSr7CxyqEGgRPlq66g9jkEK4CyT/trAxWX5TLkaG+nTw1wqn+4VDx+qJAbUlvHZPm1U39eRdTPPISKWm8CGUqfj3jKcIrseM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BnZtsX6t; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=AUiLndU466QyrGUX5F2djb8wIZdYApXLrY+lIsTOqxc7H/dS7P8kESD25FJofDESxNuXV468e+HlN8eMWoQT+xINZF0oa56O7NfY2Rng9XJJLp3keCMoC+cAEW5pZ4gueO2AOQZfMvcj5EUW1aNDOeFJVwu3HSmmy0uoYhgHbD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T8B89E+/; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717689337;
+	s=mimecast20190719; t=1717689872;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VAS3T4eIlsBeIGJQaMBH344OaeO565Bp+YWQvYSRJRg=;
-	b=BnZtsX6tvw4XtMyCVF6t7dWkRdrfJiQCSTNdO6TzwSDXxkMmtMUlTD9QEdv8zrU39KEYXL
-	C+bOqbqkI3632h0jCujQtj7IJPCRUmx7GNIrabdq03bwKebpfSZGOiGoGBOWmrWb+HPJNr
-	FKRxx3YwQbpu6RMnD0k6z3L21gOSMIY=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=pfA3Qnw2+eAYJOpoaCDqBDsNQKqj0hc7AnbxZ6IN4PE=;
+	b=T8B89E+/d1sFIsn9zjPMN5vMak/J/PK+CWuPgDKgYvohzhwu9xq1BM74L2e006HXd1e58H
+	wbSkCZL6552juSFherYEaKN6/BPERFsBGpQT5AIYZsi5VShA3ad3yZXWaaDsEAKaJShojs
+	8CtvHXjLKyzJ95G7YYYM8Ko+MN8Dyig=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-652-yYPZFIrEMcSf03yLs6BLwQ-1; Thu, 06 Jun 2024 11:55:34 -0400
-X-MC-Unique: yYPZFIrEMcSf03yLs6BLwQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-35e7d4f4243so791090f8f.1
-        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 08:55:34 -0700 (PDT)
+ us-mta-682-rWii4-PjOt2GRVmANHtEZA-1; Thu, 06 Jun 2024 12:04:30 -0400
+X-MC-Unique: rWii4-PjOt2GRVmANHtEZA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42155e1f0aaso11308115e9.2
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 09:04:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717689333; x=1718294133;
+        d=1e100.net; s=20230601; t=1717689869; x=1718294669;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VAS3T4eIlsBeIGJQaMBH344OaeO565Bp+YWQvYSRJRg=;
-        b=sYtWlHCfyEkluRDv5hj9hrULLQ6o1UXVJglTrWx5mRle6kvjCjdrgoHBGOxA/wuCpj
-         8RHZTrgSo6oFg9SFrho8i4gHdpURDTHEmjrTYpXKM/o/3+X8r/7ap8v5gb35V8e21mQw
-         6e/2GnuEf92+jR/jRhWNci+aJ4x08tgOHhP5fvQdcDKfBBcyNthw0n2uogsEJrOHZt0C
-         lpuDnJLRKxjhjlHlv1dKbKOZnnzkkM16K3xoNdcTtFMUUomfBr7/ZFz0D+vQyrPyVMo1
-         pCJoM7Zd7eisEwVgVgUYwYgwnFHc4Cgfwgls1iMnhJk7h+hW3z9UnaqQy18e9Zuc//FO
-         kR2g==
-X-Forwarded-Encrypted: i=1; AJvYcCWREHAuj5EaJjvBrIkwJIwciWIjHrMAaHjRrwc6N2nf5XU7nim+sX01Ie61VJu1GRDxKBdW35HHA9/lxF5d6fHpTYyU
-X-Gm-Message-State: AOJu0YwGI7dbpq4hbgFJfKqFtxrR4orIDXvcaEKOhUelW69kEIxpKq+3
-	68VLhnmtZxkGVwTPR8+XF/NBSuLxgKafU75xlvpMD7qTGhovimFCo+qHqmptk6uiRkIIOzhQ1WZ
-	9QejF8mDkiieQU9tEsUZdlED7PD5D/JAGBtf0/7S8G+b21lIrBl5Hk7huMs2H4PDCWEWT1WpHZz
-	Drpf1tBWo6xEAvMx5hrjSsaaxl
-X-Received: by 2002:adf:ed86:0:b0:355:451:df52 with SMTP id ffacd0b85a97d-35efed7287emr30396f8f.34.1717689333254;
-        Thu, 06 Jun 2024 08:55:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2Y8tswbPAEDMxvcnWmmCT8GpIPg0n2c4bvuPyToo4YuEroQzgcRPSS7Py1HooVbVd0cTca+l6fSiY5takNSY=
-X-Received: by 2002:adf:ed86:0:b0:355:451:df52 with SMTP id
- ffacd0b85a97d-35efed7287emr30378f8f.34.1717689332948; Thu, 06 Jun 2024
- 08:55:32 -0700 (PDT)
+        bh=pfA3Qnw2+eAYJOpoaCDqBDsNQKqj0hc7AnbxZ6IN4PE=;
+        b=V3GyQCKxWIO5ueSzUZCUIXZUzvDApv5VXfiPZxQqg2NoRRjCz9HtgeG/KuUPL6JxZu
+         e46ZVlGAW/tww8pEhB+jqHRpLPdiGYEkEwX4kSnWkISqQ1pKbrtvJpJrLdqBPRWH1JnB
+         DhISw60YcOcnpVFIy2ehJuxMPCa/jajOEXcD9sL0njIxKj6YoBWASRvyniYjqfbC7lgE
+         +2QxKUU9CrXlSMSBhx217QwA8uV+IumQeIpBvNUleV8qI/9/I7zAEFR0mXfsSmkg0xk7
+         p0hyW66VJGB4NolLpCv2L0PcMFUQ6iMMwE35WSGcuc9YqbO1RHmuhc7DEE2Aqhu+p++x
+         zBLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWU8brdFt7oYZRGp4vUvp0tZkLCKz9/5Ql7DSX6gz7Htw2IAX/OpPfSqWNNTCFPgBvxglFvareEs5BbTas/FV29AlPG
+X-Gm-Message-State: AOJu0YwDM7qXdPY1oV9IT0H+/96aZzupB5CojQU9ica38zQYAfR/Z49W
+	DXEHqcS1Qcn9M5bFfg5xPPA+o6k+q2RuFtKb5geuAaMBGzJk1pZ9G2/DOSKCK3pZoInwrsi9IGp
+	/TqT3NKsLJcWgKhW5Q0RGGWKHFV3B5dirCX41/JStcUBJVwQtIR7Df4T4eF0th0qNJfElaLWXLa
+	USZm9UmEK55Oqur3swtfAN8IX8
+X-Received: by 2002:a05:600c:34d5:b0:420:fed7:2903 with SMTP id 5b1f17b1804b1-421649fbfa9mr1534405e9.15.1717689868985;
+        Thu, 06 Jun 2024 09:04:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEEtcMoC8e263ZOq7Zpku7n6tvwSu52vSZNIEAlnH04yVgG8by9a1+rNrcAr3RoPs3nnSCahP04ezzjzcdHBHA=
+X-Received: by 2002:a05:600c:34d5:b0:420:fed7:2903 with SMTP id
+ 5b1f17b1804b1-421649fbfa9mr1534125e9.15.1717689868482; Thu, 06 Jun 2024
+ 09:04:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530210714.364118-1-rick.p.edgecombe@intel.com> <20240530210714.364118-2-rick.p.edgecombe@intel.com>
-In-Reply-To: <20240530210714.364118-2-rick.p.edgecombe@intel.com>
+References: <20240530210714.364118-1-rick.p.edgecombe@intel.com> <20240530210714.364118-4-rick.p.edgecombe@intel.com>
+In-Reply-To: <20240530210714.364118-4-rick.p.edgecombe@intel.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 6 Jun 2024 17:55:21 +0200
-Message-ID: <CABgObfZ8qOJtui9ozU4sd-hnjNM_33qwA-jcJEeDc=RY5EoqfA@mail.gmail.com>
-Subject: Re: [PATCH v2 01/15] KVM: Add member to struct kvm_gfn_range for
- target alias
+Date: Thu, 6 Jun 2024 18:04:17 +0200
+Message-ID: <CABgObfYO2FgAOpvp-9jexp5fMh2xoYyE1CNs526z9S7i2Gao_g@mail.gmail.com>
+Subject: Re: [PATCH v2 03/15] KVM: x86/mmu: Add a mirrored pointer to struct kvm_mmu_page
 To: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Cc: seanjc@google.com, kvm@vger.kernel.org, kai.huang@intel.com, 
 	dmatlack@google.com, erdemaktas@google.com, isaku.yamahata@gmail.com, 
 	linux-kernel@vger.kernel.org, sagis@google.com, yan.y.zhao@intel.com, 
-	Isaku Yamahata <isaku.yamahata@intel.com>
+	Isaku Yamahata <isaku.yamahata@intel.com>, Binbin Wu <binbin.wu@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Thu, May 30, 2024 at 11:07=E2=80=AFPM Rick Edgecombe
 <rick.p.edgecombe@intel.com> wrote:
-> +       /* Unmmap the old attribute page. */
-
-Unmap
-
-> +       if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
-> +               range->process =3D KVM_PROCESS_SHARED;
-> +       else
-> +               range->process =3D KVM_PROCESS_PRIVATE;
-> +
->         return kvm_unmap_gfn_range(kvm, range);
->  }
 >
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index c3c922bf077f..f92c8b605b03 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -260,11 +260,19 @@ union kvm_mmu_notifier_arg {
->         unsigned long attributes;
->  };
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
-> +enum kvm_process {
-> +       BUGGY_KVM_INVALIDATION          =3D 0,
-> +       KVM_PROCESS_SHARED              =3D BIT(0),
-> +       KVM_PROCESS_PRIVATE             =3D BIT(1),
-> +       KVM_PROCESS_PRIVATE_AND_SHARED  =3D KVM_PROCESS_SHARED | KVM_PROC=
-ESS_PRIVATE,
-> +};
+> Add a mirrored pointer to struct kvm_mmu_page for the private page table =
+and
+> add helper functions to allocate/initialize/free a private page table pag=
+e.
+> Because KVM TDP MMU doesn't use unsync_children and write_flooding_count,
+> pack them to have room for a pointer and use a union to avoid memory
+> overhead.
+>
+> For private GPA, CPU refers to a private page table whose contents are
+> encrypted. The dedicated APIs to operate on it (e.g. updating/reading its
+> PTE entry) are used, and their cost is expensive.
+>
+> When KVM resolves the KVM page fault, it walks the page tables. To reuse
+> the existing KVM MMU code and mitigate the heavy cost of directly walking
+> the private page table, allocate one more page for the mirrored page tabl=
+e
+> for the KVM MMU code to directly walk. Resolve the KVM page fault with
+> the existing code, and do additional operations necessary for the private
+> page table. To distinguish such cases, the existing KVM page table is
+> called a shared page table (i.e., not associated with a private page
+> table), and the page table with a private page table is called a mirrored
+> page table. The relationship is depicted below.
+>
+>               KVM page fault                     |
+>                      |                           |
+>                      V                           |
+>         -------------+----------                 |
+>         |                      |                 |
+>         V                      V                 |
+>      shared GPA           private GPA            |
+>         |                      |                 |
+>         V                      V                 |
+>     shared PT root      mirror PT root           |    private PT root
+>         |                      |                 |           |
+>         V                      V                 |           V
+>      shared PT           mirror PT     --propagate-->  private/mirrored P=
+T
+>         |                      |                 |           |
+>         |                      \-----------------+------\    |
+>         |                                        |      |    |
+>         V                                        |      V    V
+>   shared guest page                              |    private guest page
+>                                                  |
+>                            non-encrypted memory  |    encrypted memory
+>                                                  |
+> PT: Page table
+> Shared PT: visible to KVM, and the CPU uses it for shared mappings.
+> Private/mirrored PT: the CPU uses it, but it is invisible to KVM.  TDX
+>                      module updates this table to map private guest pages=
+.
+> Mirror PT: It is visible to KVM, but the CPU doesn't use it.  KVM uses it
+>              to propagate PT change to the actual private PT.
 
-Only KVM_PROCESS_SHARED and KVM_PROCESS_PRIVATE are needed.
+Which one is the "Mirror" and which one is the "Mirrored" PT is
+uncomfortably confusing.
+
+I hate to bikeshed even more, but while I like "Mirror PT" (a lot), I
+would stick with "Private" or perhaps "External" for the pages owned
+by the TDX module.
 
 > +       /*
-> +        * If/when KVM supports more attributes beyond private .vs shared=
-, this
-> +        * _could_ set exclude_{private,shared} appropriately if the enti=
-re target
+> +        * This cache is to allocate private page table. E.g. private EPT=
+ used
+> +        * by the TDX module.
+> +        */
+> +       struct kvm_mmu_memory_cache mmu_mirrored_spt_cache;
 
-this could mask away KVM_PROCESS_{SHARED,PRIVATE} if the entire target...
+So this would be "mmu_external_spt_cache".
+
+> -       unsigned int unsync_children;
+> +       union {
+> +               /* Those two members aren't used for TDP MMU */
+
+s/Those/These/
+
+> +               struct {
+> +                       unsigned int unsync_children;
+> +                       /*
+> +                        * Number of writes since the last time traversal
+> +                        * visited this page.
+> +                        */
+> +                       atomic_t write_flooding_count;
+> +               };
+> +               /*
+> +                * Page table page of private PT.
+> +                * Passed to TDX module, not accessed by KVM.
+> +                */
+> +               void *mirrored_spt;
+
+external_spt
+
+> +static inline void kvm_mmu_alloc_mirrored_spt(struct kvm_vcpu *vcpu, str=
+uct kvm_mmu_page *sp)
+> +{
+> +       /*
+> +        * mirrored_spt is allocated for TDX module to hold private EPT m=
+appings,
+> +        * TDX module will initialize the page by itself.
+> +        * Therefore, KVM does not need to initialize or access mirrored_=
+spt.
+> +        * KVM only interacts with sp->spt for mirrored EPT operations.
+> +        */
+> +       sp->mirrored_spt =3D kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_m=
+irrored_spt_cache);
+> +}
+> +
+> +static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu, stru=
+ct kvm_mmu_page *sp)
+> +{
+> +       /*
+> +        * private_spt is allocated for TDX module to hold private EPT ma=
+ppings,
+> +        * TDX module will initialize the page by itself.
+> +        * Therefore, KVM does not need to initialize or access private_s=
+pt.
+> +        * KVM only interacts with sp->spt for mirrored EPT operations.
+> +        */
+> +       sp->mirrored_spt =3D kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_m=
+irrored_spt_cache);
+> +}
+
+Duplicate function.
+
+Naming aside, looks good.
 
 Paolo
 
-> +        * range already has the desired private vs. shared state (it's u=
-nclear
-> +        * if that is a net win).  For now, KVM reaches this point if and=
- only
-> +        * if the private flag is being toggled, i.e. all mappings are in=
- play.
-> +        */
-> +
->         for (i =3D 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
->                 slots =3D __kvm_memslots(kvm, i);
+On Thu, May 30, 2024 at 11:07=E2=80=AFPM Rick Edgecombe
+<rick.p.edgecombe@intel.com> wrote:
 >
-> @@ -2506,6 +2519,7 @@ static int kvm_vm_set_mem_attributes(struct kvm *kv=
-m, gfn_t start, gfn_t end,
->         struct kvm_mmu_notifier_range pre_set_range =3D {
->                 .start =3D start,
->                 .end =3D end,
-> +               .arg.attributes =3D attributes,
->                 .handler =3D kvm_pre_set_memory_attributes,
->                 .on_lock =3D kvm_mmu_invalidate_begin,
->                 .flush_on_ret =3D true,
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> Add a mirrored pointer to struct kvm_mmu_page for the private page table =
+and
+> add helper functions to allocate/initialize/free a private page table pag=
+e.
+> Because KVM TDP MMU doesn't use unsync_children and write_flooding_count,
+> pack them to have room for a pointer and use a union to avoid memory
+> overhead.
+>
+> For private GPA, CPU refers to a private page table whose contents are
+> encrypted. The dedicated APIs to operate on it (e.g. updating/reading its
+> PTE entry) are used, and their cost is expensive.
+>
+> When KVM resolves the KVM page fault, it walks the page tables. To reuse
+> the existing KVM MMU code and mitigate the heavy cost of directly walking
+> the private page table, allocate one more page for the mirrored page tabl=
+e
+> for the KVM MMU code to directly walk. Resolve the KVM page fault with
+> the existing code, and do additional operations necessary for the private
+> page table. To distinguish such cases, the existing KVM page table is
+> called a shared page table (i.e., not associated with a private page
+> table), and the page table with a private page table is called a mirrored
+> page table. The relationship is depicted below.
+>
+>               KVM page fault                     |
+>                      |                           |
+>                      V                           |
+>         -------------+----------                 |
+>         |                      |                 |
+>         V                      V                 |
+>      shared GPA           private GPA            |
+>         |                      |                 |
+>         V                      V                 |
+>     shared PT root      mirror PT root           |    private PT root
+>         |                      |                 |           |
+>         V                      V                 |           V
+>      shared PT           mirror PT     --propagate-->  private/mirrored P=
+T
+>         |                      |                 |           |
+>         |                      \-----------------+------\    |
+>         |                                        |      |    |
+>         V                                        |      V    V
+>   shared guest page                              |    private guest page
+>                                                  |
+>                            non-encrypted memory  |    encrypted memory
+>                                                  |
+> PT: Page table
+> Shared PT: visible to KVM, and the CPU uses it for shared mappings.
+> Private/mirrored PT: the CPU uses it, but it is invisible to KVM.  TDX
+>                      module updates this table to map private guest pages=
+.
+> Mirror PT: It is visible to KVM, but the CPU doesn't use it.  KVM uses it
+>              to propagate PT change to the actual private PT.
+>
+> Add a helper kvm_has_mirrored_tdp() to trigger this behavior and wire it
+> to the TDX vm type.
+>
+> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+> ---
+> TDX MMU Prep v2:
+>  - Rename private->mirror
+>  - Don't trigger off of shared mask
+>
+> TDX MMU Prep:
+> - Rename terminology, dummy PT =3D> mirror PT. and updated the commit mes=
+sage
+>   By Rick and Kai.
+> - Added a comment on union of private_spt by Rick.
+> - Don't handle the root case in kvm_mmu_alloc_private_spt(), it will not
+>   be needed in future patches. (Rick)
+> - Update comments (Yan)
+> - Remove kvm_mmu_init_private_spt(), open code it in later patches (Yan)
+>
+> v19:
+> - typo in the comment in kvm_mmu_alloc_private_spt()
+> - drop CONFIG_KVM_MMU_PRIVATE
+> ---
+>  arch/x86/include/asm/kvm_host.h |  5 ++++
+>  arch/x86/kvm/mmu.h              |  5 ++++
+>  arch/x86/kvm/mmu/mmu.c          |  7 +++++
+>  arch/x86/kvm/mmu/mmu_internal.h | 47 ++++++++++++++++++++++++++++++---
+>  arch/x86/kvm/mmu/tdp_mmu.c      |  1 +
+>  5 files changed, 61 insertions(+), 4 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index aabf1648a56a..250899a0239b 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -817,6 +817,11 @@ struct kvm_vcpu_arch {
+>         struct kvm_mmu_memory_cache mmu_shadow_page_cache;
+>         struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
+>         struct kvm_mmu_memory_cache mmu_page_header_cache;
+> +       /*
+> +        * This cache is to allocate private page table. E.g. private EPT=
+ used
+> +        * by the TDX module.
+> +        */
+> +       struct kvm_mmu_memory_cache mmu_mirrored_spt_cache;
+>
+>         /*
+>          * QEMU userspace and the guest each have their own FPU state.
+> diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+> index dc80e72e4848..0c3bf89cf7db 100644
+> --- a/arch/x86/kvm/mmu.h
+> +++ b/arch/x86/kvm/mmu.h
+> @@ -318,4 +318,9 @@ static inline gpa_t kvm_translate_gpa(struct kvm_vcpu=
+ *vcpu,
+>                 return gpa;
+>         return translate_nested_gpa(vcpu, gpa, access, exception);
+>  }
+> +
+> +static inline bool kvm_has_mirrored_tdp(const struct kvm *kvm)
+> +{
+> +       return kvm->arch.vm_type =3D=3D KVM_X86_TDX_VM;
+> +}
+>  #endif
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b97241945596..5070ba7c6e89 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -685,6 +685,12 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *=
+vcpu, bool maybe_indirect)
+>                                        1 + PT64_ROOT_MAX_LEVEL + PTE_PREF=
+ETCH_NUM);
+>         if (r)
+>                 return r;
+> +       if (kvm_has_mirrored_tdp(vcpu->kvm)) {
+> +               r =3D kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_mirrored=
+_spt_cache,
+> +                                              PT64_ROOT_MAX_LEVEL);
+> +               if (r)
+> +                       return r;
+> +       }
+>         r =3D kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cach=
+e,
+>                                        PT64_ROOT_MAX_LEVEL);
+>         if (r)
+> @@ -704,6 +710,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *v=
+cpu)
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
+> +       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_mirrored_spt_cache);
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+>  }
+>
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_inter=
+nal.h
+> index 706f0ce8784c..faef40a561f9 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -101,7 +101,22 @@ struct kvm_mmu_page {
+>                 int root_count;
+>                 refcount_t tdp_mmu_root_count;
+>         };
+> -       unsigned int unsync_children;
+> +       union {
+> +               /* Those two members aren't used for TDP MMU */
+> +               struct {
+> +                       unsigned int unsync_children;
+> +                       /*
+> +                        * Number of writes since the last time traversal
+> +                        * visited this page.
+> +                        */
+> +                       atomic_t write_flooding_count;
+> +               };
+> +               /*
+> +                * Page table page of private PT.
+> +                * Passed to TDX module, not accessed by KVM.
+> +                */
+> +               void *mirrored_spt;
+> +       };
+>         union {
+>                 struct kvm_rmap_head parent_ptes; /* rmap pointers to par=
+ent sptes */
+>                 tdp_ptep_t ptep;
+> @@ -124,9 +139,6 @@ struct kvm_mmu_page {
+>         int clear_spte_count;
+>  #endif
+>
+> -       /* Number of writes since the last time traversal visited this pa=
+ge.  */
+> -       atomic_t write_flooding_count;
+> -
+>  #ifdef CONFIG_X86_64
+>         /* Used for freeing the page asynchronously if it is a TDP MMU pa=
+ge. */
+>         struct rcu_head rcu_head;
+> @@ -145,6 +157,33 @@ static inline int kvm_mmu_page_as_id(struct kvm_mmu_=
+page *sp)
+>         return kvm_mmu_role_as_id(sp->role);
+>  }
+>
+> +static inline void *kvm_mmu_mirrored_spt(struct kvm_mmu_page *sp)
+> +{
+> +       return sp->mirrored_spt;
+> +}
+> +
+> +static inline void kvm_mmu_alloc_mirrored_spt(struct kvm_vcpu *vcpu, str=
+uct kvm_mmu_page *sp)
+> +{
+> +       /*
+> +        * mirrored_spt is allocated for TDX module to hold private EPT m=
+appings,
+> +        * TDX module will initialize the page by itself.
+> +        * Therefore, KVM does not need to initialize or access mirrored_=
+spt.
+> +        * KVM only interacts with sp->spt for mirrored EPT operations.
+> +        */
+> +       sp->mirrored_spt =3D kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_m=
+irrored_spt_cache);
+> +}
+> +
+> +static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu, stru=
+ct kvm_mmu_page *sp)
+> +{
+> +       /*
+> +        * private_spt is allocated for TDX module to hold private EPT ma=
+ppings,
+> +        * TDX module will initialize the page by itself.
+> +        * Therefore, KVM does not need to initialize or access private_s=
+pt.
+> +        * KVM only interacts with sp->spt for mirrored EPT operations.
+> +        */
+> +       sp->mirrored_spt =3D kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_m=
+irrored_spt_cache);
+> +}
+> +
+>  static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_pag=
+e *sp)
+>  {
+>         /*
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 1259dd63defc..e7cd4921afe7 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -53,6 +53,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+>
+>  static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
+>  {
+> +       free_page((unsigned long)sp->mirrored_spt);
+>         free_page((unsigned long)sp->spt);
+>         kmem_cache_free(mmu_page_header_cache, sp);
+>  }
 > --
 > 2.34.1
 >
