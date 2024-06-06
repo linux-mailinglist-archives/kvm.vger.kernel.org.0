@@ -1,229 +1,208 @@
-Return-Path: <kvm+bounces-18995-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18996-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E25848FDF7A
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 09:21:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7DE18FE024
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 09:49:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C2AB283450
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 07:21:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2905728416B
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 07:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A082413BC30;
-	Thu,  6 Jun 2024 07:21:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="HSS0B2KA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30AF613B28F;
+	Thu,  6 Jun 2024 07:48:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E348713C900
-	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 07:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885E131A89;
+	Thu,  6 Jun 2024 07:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717658460; cv=none; b=dI+YT+EghB+94vzd6UsLwn+ojAHeGinqLrvhw+UpciXlW0nzSijfjbBLFCfbvMfRNIIoNglXBNUXpsVxRHM9AIlpyELJB96qkpkWb21zlSBWXt2HW802OY1+qRAD9KXcKlBBnNt8ixJF66IVs5N7A+RDK3wMvGZsFaQAg1OiSJs=
+	t=1717660137; cv=none; b=pGAK5ZY4Mba0nw6TcbVdbIh06HGWFyr/LykcATK4wzbmOV7dEISzpM/6aommfxUM1o+pCEpGsX1+w6SzwGbUNs0YSn76sFItz5kTIcVKl+jJy+XsD8A2iZOY+C/PiLItcENM5N2KZqntfDbtULj3pXzMXVKblQE3SQ4PZ+n7Ws4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717658460; c=relaxed/simple;
-	bh=mliXY5sIxBsMshC+ps+y8ArEmQKnT1810y+w/xufWe4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jjjxHVw/EVYu6hMHLk/Y7rzrLZkP/ZAlJgI0CE6+Hj/B156Cq61n7bmzdCxYr5xkYbbEc/VqT0xxfcdRmmCFW/GR0Qg8/Iqtotx24q/EMjkqrJoP1aipGwlaU9wSpByV3xp5bfUaO+hQ16eMZ3Cob9qIQPT/HB8uou4RSwrtB/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=HSS0B2KA; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a6c8537bfa0so18732566b.3
-        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 00:20:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1717658457; x=1718263257; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=0m+ab+gLKKaW9Mc4WMihPYHQB2Qad8u+hXpAjUNN8Gw=;
-        b=HSS0B2KAvgNdVDh0X7YZvnf15ZcuGpsx8TJnE/bGTruYM951BISc+7BMpVjfVBCbba
-         SG4BUdahvohHTEARBw+IVDJpEocHuItS9i2yN6n3fi2uH1mM6FAgXXkowRn+o8n2bHMg
-         9pBJSf7fyTt+QFbsQPLli57qH/3+jxPyueoPPtdwZaQawp0EFKeSr4gMSKQAKubFGDZP
-         n3Vf9ofYd6AN9NvKeZ7Als6agnvw7e4Je+5/9A7z8nCGgTZrylbA3UBp5RUHUfsJ1Mvu
-         NQmPT3J8H7hTpg+V6kzoT38wkafIMuZQoxctv9oKDOjJ02oiQLl/bWF4dU5xpWOwMWXH
-         5bSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717658457; x=1718263257;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0m+ab+gLKKaW9Mc4WMihPYHQB2Qad8u+hXpAjUNN8Gw=;
-        b=sw8gDLrtSUv6sg3US4zcVk53iTOOFOB5MSkBqJ1v+u4azp2J3pWxez5Y4o7TW5WPsk
-         bKQJFLrYDD1FHX5ftjL/z5Xcv4FSYi5Y+wQotbILFUZ4OIKBlRnF3UA/IC7mvxERDIuz
-         Pg32gy7MvXJCy38C8+HyBaIQwlIstTHnsFLLVMWDeNkT+omV4Z8L0XNyCSRlxNvsTlia
-         zRCtJK98TcE8KwRsn+secLJ2jS8kWGmtNcAIbHvJBk0VWBgHvGzlLZv4zUrRl4gcp0hG
-         8aHnurXmgKDn09Ed8gJEv4Y8gknrYFK1xWHp1xdZG0baYIqQQQlsuq/0mO2jWyY2qCgc
-         B8bA==
-X-Forwarded-Encrypted: i=1; AJvYcCWlqjBKw+Qzw8tQBdTRrc1dCVfAICMCbSJA6nwBNBtbz+g7NjlaMY52/CqZ7ZYOS6CsjIODleH1uCsXlrfbN4UHa0IL
-X-Gm-Message-State: AOJu0YzAouOctoMM9qEEuzH/VMYQ2tsvu7d7eceVMbbwCERy3PykONDD
-	rb9uU/pwjUul+OtzgnhtF8WhCUhVKT3VFfbIHGb6eqwiLCYbyNmDgqOG9spJiPc=
-X-Google-Smtp-Source: AGHT+IGPK/F3At6Fetg5ad1RbAV50hRoBuy7v0+srBAHf6k3VwugZy/3CvlGG4IkWqOcqoALwuGFgw==
-X-Received: by 2002:a17:906:3146:b0:a6c:73fe:4aaa with SMTP id a640c23a62f3a-a6c73fe6444mr145393466b.7.1717658457033;
-        Thu, 06 Jun 2024 00:20:57 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af22:bc00:4b8d:639a:480e:4db? (p200300f6af22bc004b8d639a480e04db.dip0.t-ipconnect.de. [2003:f6:af22:bc00:4b8d:639a:480e:4db])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57aae13faccsm598697a12.54.2024.06.06.00.20.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jun 2024 00:20:56 -0700 (PDT)
-Message-ID: <0ef7c46b-669b-4f46-9bb8-b7904d4babea@grsecurity.net>
-Date: Thu, 6 Jun 2024 09:20:55 +0200
+	s=arc-20240116; t=1717660137; c=relaxed/simple;
+	bh=vvKAQj9A9a25UiDJC3KL5MSzdfTdK8owek4RnM6UtrM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M7Y2vRKA1kg0khKERNqhkBQvjaDHPuxvyCqsY7LmLaznoY5dxPq9kZ0y7gmFMZCFdjqsmF+7QNt3SVuM18OjGS3JQU6VwezMDRVW30iMEH63yTZfWG1ECiBR4MdBndQ9uQ202wvGClVnyCF64mWH4jPHdjAdMth8YS7Y/GBvoDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8CxcPDkaWFmAyAEAA--.17638S3;
+	Thu, 06 Jun 2024 15:48:52 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Axw8TjaWFmGaIWAA--.45782S2;
+	Thu, 06 Jun 2024 15:48:51 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] LoongArch: KVM: Add feature passing from user space
+Date: Thu,  6 Jun 2024 15:48:50 +0800
+Message-Id: <20240606074850.2651896-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: Reject overly excessive IDs in KVM_CREATE_VCPU
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- Emese Revfy <re.emese@gmail.com>, PaX Team <pageexec@freemail.hu>
-References: <20240605220504.2941958-1-minipli@grsecurity.net>
- <20240605220504.2941958-2-minipli@grsecurity.net>
- <ZmDnQkNL5NYUmyMN@google.com>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <ZmDnQkNL5NYUmyMN@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Axw8TjaWFmGaIWAA--.45782S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On 06.06.24 00:31, Sean Christopherson wrote:
-> On Thu, Jun 06, 2024, Mathias Krause wrote:
->> If, on a 64 bit system, a vCPU ID is provided that has the upper 32 bits
->> set to a non-zero value, it may get accepted if the truncated to 32 bits
->> integer value is below KVM_MAX_VCPU_IDS and 'max_vcpus'. This feels very
->> wrong and triggered the reporting logic of PaX's SIZE_OVERFLOW plugin.
->>
->> Instead of silently truncating and accepting such values, pass the full
->> value to kvm_vm_ioctl_create_vcpu() and make the existing limit checks
->> return an error.
->>
->> Even if this is a userland ABI breaking change, no sane userland could
->> have ever relied on that behaviour.
->>
->> Reported-by: PaX's SIZE_OVERFLOW plugin running on grsecurity's syzkaller
->> Fixes: 6aa8b732ca01 ("[PATCH] kvm: userspace interface")
->> Cc: Emese Revfy <re.emese@gmail.com>
->> Cc: PaX Team <pageexec@freemail.hu>
->> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
->> ---
->>  virt/kvm/kvm_main.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 14841acb8b95..9f18fc42f018 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -4200,7 +4200,7 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
->>  /*
->>   * Creates some virtual cpus.  Good luck creating more than one.
->>   */
->> -static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
->> +static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
-> 
-> Hmm, I don't love that KVM subtly relies on the KVM_MAX_VCPU_IDS check to guard
-> against truncation when passing @id to kvm_arch_vcpu_precreate(), kvm_vcpu_init(),
-> etc.  I doubt that it will ever be problematic, but it _looks_ like a bug.
+Currently features defined in cpucfg CPUCFG_KVM_FEATURE comes from
+kvm kernel mode only. Some features are defined in user space VMM,
+however KVM module does not know. Here interface is added to update
+register CPUCFG_KVM_FEATURE from user space, only bit 24 - 31 is valid.
 
-It's not subtle but very explicit. KVM_MAX_VCPU_IDS is a small positive
-number, depending on some arch specific #define, but with x86 allowing
-for the largest value of 4 * 4096. That value, for sure, cannot exceed
-U32_MAX, so an explicit truncation isn't needed as the upper bits will
-already be zero if the limit check passes.
+Feature KVM_LOONGARCH_VCPU_FEAT_VIRT_EXTIOI is added from user mdoe.
+FEAT_VIRT_EXTIOI is virt EXTIOI extension which can route interrupt
+to 256 VCPUs rather than 4 CPUs like real hw.
 
-While subtile integer truncation is the bug that my patch is actually
-fixing, it is for the *userland* facing part of it, as in clarifying the
-ABI to work on "machine-sized words", i.e. a ulong, and doing the limit
-checks on these.
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+---
+ arch/loongarch/include/asm/kvm_host.h  |  4 +++
+ arch/loongarch/include/asm/loongarch.h |  5 ++++
+ arch/loongarch/include/uapi/asm/kvm.h  |  2 ++
+ arch/loongarch/kvm/exit.c              |  1 +
+ arch/loongarch/kvm/vcpu.c              | 36 +++++++++++++++++++++++---
+ 5 files changed, 44 insertions(+), 4 deletions(-)
 
-*In-kernel* APIs truncate / sign extend / mix signed/unsigned values all
-the time. The kernel is full of these. Trying to "fix" them all is an
-uphill battle not worth fighting, imho.
-
-> 
-> If we really care enough to fix this, my vote is for something like so:
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4965196cad58..08adfdb2817e 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4200,13 +4200,14 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
->  /*
->   * Creates some virtual cpus.  Good luck creating more than one.
->   */
-> -static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
-> +static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long __id)
->  {
->         int r;
->         struct kvm_vcpu *vcpu;
->         struct page *page;
-> +       u32 id = __id;
->  
-> -       if (id >= KVM_MAX_VCPU_IDS)
-> +       if (id != __id || id >= KVM_MAX_VCPU_IDS)
->                 return -EINVAL;
->  
->         mutex_lock(&kvm->lock);
-
-I'd rather suggest to add a build time assert instead, as the existing
-runtime check is sufficient (with my u32->ulong change). Something like
-this:
-
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4200,12 +4200,13 @@ static void kvm_create_vcpu_debugfs(struct
-kvm_vcpu *vcpu)
- /*
-  * Creates some virtual cpus.  Good luck creating more than one.
-  */
--static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
-+static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
+index 88023ab59486..8fa50d757247 100644
+--- a/arch/loongarch/include/asm/kvm_host.h
++++ b/arch/loongarch/include/asm/kvm_host.h
+@@ -135,6 +135,9 @@ enum emulation_result {
+ #define KVM_LARCH_HWCSR_USABLE	(0x1 << 4)
+ #define KVM_LARCH_LBT		(0x1 << 5)
+ 
++#define KVM_LOONGARCH_USR_FEAT_MASK			\
++	BIT(KVM_LOONGARCH_VCPU_FEAT_VIRT_EXTIOI)
++
+ struct kvm_vcpu_arch {
+ 	/*
+ 	 * Switch pointer-to-function type to unsigned long
+@@ -210,6 +213,7 @@ struct kvm_vcpu_arch {
+ 		u64 last_steal;
+ 		struct gfn_to_hva_cache cache;
+ 	} st;
++	unsigned int usr_features;
+ };
+ 
+ static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, int reg)
+diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
+index 7a4633ef284b..4d9837512c19 100644
+--- a/arch/loongarch/include/asm/loongarch.h
++++ b/arch/loongarch/include/asm/loongarch.h
+@@ -167,9 +167,14 @@
+ 
+ #define CPUCFG_KVM_SIG			(CPUCFG_KVM_BASE + 0)
+ #define  KVM_SIGNATURE			"KVM\0"
++/*
++ * BIT 24 - 31 is features configurable by user space vmm
++ */
+ #define CPUCFG_KVM_FEATURE		(CPUCFG_KVM_BASE + 4)
+ #define  KVM_FEATURE_IPI		BIT(1)
+ #define  KVM_FEATURE_STEAL_TIME		BIT(2)
++/* With VIRT_EXTIOI feature, interrupt can route to 256 VCPUs */
++#define  KVM_FEATURE_VIRT_EXTIOI	BIT(24)
+ 
+ #ifndef __ASSEMBLY__
+ 
+diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+index ed12e509815c..dd141259de48 100644
+--- a/arch/loongarch/include/uapi/asm/kvm.h
++++ b/arch/loongarch/include/uapi/asm/kvm.h
+@@ -99,6 +99,8 @@ struct kvm_fpu {
+ 
+ /* Device Control API on vcpu fd */
+ #define KVM_LOONGARCH_VCPU_CPUCFG	0
++/* For CPUCFG_KVM_FEATURE register */
++#define  KVM_LOONGARCH_VCPU_FEAT_VIRT_EXTIOI	24
+ #define KVM_LOONGARCH_VCPU_PVTIME_CTRL	1
+ #define  KVM_LOONGARCH_VCPU_PVTIME_GPA	0
+ 
+diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+index e1bd81d27fd8..ab2dcc76784a 100644
+--- a/arch/loongarch/kvm/exit.c
++++ b/arch/loongarch/kvm/exit.c
+@@ -53,6 +53,7 @@ static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
+ 		ret = KVM_FEATURE_IPI;
+ 		if (sched_info_on())
+ 			ret |= KVM_FEATURE_STEAL_TIME;
++		ret |= vcpu->arch.usr_features;
+ 		vcpu->arch.gprs[rd] = ret;
+ 		break;
+ 	default:
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index 3783151fde32..26f2b22b6a62 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -832,6 +832,8 @@ static int kvm_loongarch_cpucfg_has_attr(struct kvm_vcpu *vcpu,
+ 	switch (attr->attr) {
+ 	case 2:
+ 		return 0;
++	case CPUCFG_KVM_FEATURE:
++		return 0;
+ 	default:
+ 		return -ENXIO;
+ 	}
+@@ -865,9 +867,18 @@ static int kvm_loongarch_get_cpucfg_attr(struct kvm_vcpu *vcpu,
+ 	uint64_t val;
+ 	uint64_t __user *uaddr = (uint64_t __user *)attr->addr;
+ 
+-	ret = _kvm_get_cpucfg_mask(attr->attr, &val);
+-	if (ret)
+-		return ret;
++	switch (attr->attr) {
++	case 0 ... (KVM_MAX_CPUCFG_REGS - 1):
++		ret = _kvm_get_cpucfg_mask(attr->attr, &val);
++		if (ret)
++			return ret;
++		break;
++	case CPUCFG_KVM_FEATURE:
++		val = vcpu->arch.usr_features & KVM_LOONGARCH_USR_FEAT_MASK;
++		break;
++	default:
++		return -ENXIO;
++	}
+ 
+ 	put_user(val, uaddr);
+ 
+@@ -896,7 +907,24 @@ static int kvm_loongarch_vcpu_get_attr(struct kvm_vcpu *vcpu,
+ static int kvm_loongarch_cpucfg_set_attr(struct kvm_vcpu *vcpu,
+ 					 struct kvm_device_attr *attr)
  {
-        int r;
-        struct kvm_vcpu *vcpu;
-        struct page *page;
+-	return -ENXIO;
++	u64 __user *user = (u64 __user *)attr->addr;
++	u64 val, valid_flags;
++
++	switch (attr->attr) {
++	case CPUCFG_KVM_FEATURE:
++		if (get_user(val, user))
++			return -EFAULT;
++
++		valid_flags = KVM_LOONGARCH_USR_FEAT_MASK;
++		if (val & ~valid_flags)
++			return -EINVAL;
++
++		vcpu->arch.usr_features |= val;
++		return 0;
++
++	default:
++		return -ENXIO;
++	}
+ }
+ 
+ static int kvm_loongarch_vcpu_set_attr(struct kvm_vcpu *vcpu,
 
-+       BUILD_BUG_ON(KVM_MAX_VCPU_IDS > INT_MAX);
-        if (id >= KVM_MAX_VCPU_IDS)
-                return -EINVAL;
+base-commit: 2df0193e62cf887f373995fb8a91068562784adc
+-- 
+2.39.3
 
-Thanks,
-Mathias
 
