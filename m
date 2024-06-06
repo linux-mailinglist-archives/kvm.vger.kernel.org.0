@@ -1,135 +1,151 @@
-Return-Path: <kvm+bounces-19026-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19027-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE3828FF268
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 18:24:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89C608FF3B2
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 19:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDC1F1C2227D
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 16:24:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FCCA28904D
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 17:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8981991AE;
-	Thu,  6 Jun 2024 16:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395AC199220;
+	Thu,  6 Jun 2024 17:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZ0Nhn5w"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OldNq88M"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43BC1990A1;
-	Thu,  6 Jun 2024 16:22:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1481990D8
+	for <kvm@vger.kernel.org>; Thu,  6 Jun 2024 17:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717690955; cv=none; b=boegV0zHhYJRXZS45IWSoph0Ej3hQwWf5R85nHlyDKE/ppDxRA+Q/zypY+Z//MEp1wg+txi0i+yCTdjqV9mVSB5gJHry2medLgJ/wIeptzJDDf/q3eEGjWWA/RVtTOpa9mijOByvyv7mN7q46WLb+8+K5WPK8XfkgcQjjcqXacU=
+	t=1717694845; cv=none; b=Xw+QEqr4Gx6FYhy3APkFy+7Y6BbI8BVbfsS5PqQTauw7d1vDUJE+0KD3GQ/6zQ3Wbr9/a5B3JEe9F0HChyc7tQA3WG7ySEMZ/4WiHJghxoSy/VyqN7L5WFCuNe0amPUdzQTNSMdMUrzoTqdOS5e2fwJhPvO3AmHf89NVxQa4ey4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717690955; c=relaxed/simple;
-	bh=Q+vrgTBGO4uoIOOe7S/ANwtcnFISMpO8zG4tv8qihJs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MFo0xQDRCEtxAz9MWc8UXflYhZgNvRWAA1ZGrKJWRm43ZACVXk/vBgVrmprIBD1JoRRbnszy4lqTigQP2B4fAeW8i6lAejn7FKbGm28A/W9tYHL9UlC9tOrjNL+ZsTn33DhIPK1LkDh4K4ofY4KFKmB9oXA+swCmpy4P6azwkOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZ0Nhn5w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9EF7C2BD10;
-	Thu,  6 Jun 2024 16:22:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717690955;
-	bh=Q+vrgTBGO4uoIOOe7S/ANwtcnFISMpO8zG4tv8qihJs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RZ0Nhn5wVlF93tjBwFq8HsyrTnvto9/1TGU4wvK3s1CMwRqNYAVPuPjvFn6e02gYn
-	 PlPJDfj+AIdI4RtXo6A3n+4ROqzf8faGiM6qdPbwrfH7KnDlARvp1KhAEsJ/RYi9DS
-	 np6kEpAn0ky2D44t8U+9G/wVQYvAXxsPC/JKzo4VrYI8dSskEhqM0z9dcBporrJj3m
-	 A3u2Z65TWapU00op5WOU8VDcwy/Kz+nkauRj4tfXf1wTn0aWOlhPo7Tk3FwjItkRAo
-	 hV2xSOQ4FrTDXZby9lFrrX57r1XWOGcIw3Qh4MqWBI7gMqVcZcbl2PxjIe6kGU3GSE
-	 gP0ueFkuunGtQ==
-Date: Thu, 6 Jun 2024 17:22:26 +0100
-From: Will Deacon <will@kernel.org>
-To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Vincent Donnefort <vdonnefort@google.com>
-Subject: Re: [PATCH v4 11/13] KVM: arm64: Improve CONFIG_CFI_CLANG error
- message
-Message-ID: <20240606162226.GA23425@willie-the-truck>
-References: <20240529121251.1993135-1-ptosi@google.com>
- <20240529121251.1993135-12-ptosi@google.com>
- <20240603144808.GL19151@willie-the-truck>
- <whzwqltolrms4ct35az5eif5rg25e2km23cztypgikallbcxoj@wtwfckujzcrf>
+	s=arc-20240116; t=1717694845; c=relaxed/simple;
+	bh=Vrj6by7HZ5znl+cZYgtRvTbs4mioHISFswzBIkufzzw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q6oMePMtijSg2x1hf+CXqeqesbV2JDd7pU3G7dw2nSq7YRgLvn4L3//k8+tJZVm3lpwEV4fOChD+CRSLE/yvBcQ5gVoKHZdnZlQa/fGxdziW+7VZfkZ86dCyJrZwM3cwCr3FB/98aWpGpK2nHlDdmudwy/B0DbOHSUOvqBQwnJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OldNq88M; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717694842;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Sz0RERWk5Ecm+O3n3osXuRqBMwh86v1zD3ET+YEnd50=;
+	b=OldNq88MjcP6wkIoMum+VFpMKTeJGxuqrBgpa39Alj6NM31UkWAdc7JsNXadqVwv61F0cj
+	Z6RVNI16ionKyZrR5t91Nhwj1ka1xB6jkWsmFH3xg6j/bJVpFyiGUqgPjmH5CGB2D3Kgre
+	sr1klHOGtAHmfYJ/ABTBvTopjeifY1Y=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-180-P6jeybkMO2aBRmqtARjgUA-1; Thu, 06 Jun 2024 13:27:21 -0400
+X-MC-Unique: P6jeybkMO2aBRmqtARjgUA-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7eb3d17daebso124519339f.1
+        for <kvm@vger.kernel.org>; Thu, 06 Jun 2024 10:27:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717694840; x=1718299640;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Sz0RERWk5Ecm+O3n3osXuRqBMwh86v1zD3ET+YEnd50=;
+        b=B5kt9I5qjF0iNUEWabSCPV02bZ97JS66P8acsIflZOyAwAfcRuyRE9d9KnSr1iNuFS
+         cgktu+D/EENS1Lek6QW1qvo7B7O6CiLOYF6Hj5E0gG7SmCn9rFcUqg4StQyR2VMYtrLT
+         fI2L9pLP1c/4wbUncXb6oo3V7Ij6eFDdtbnejLsDlZ2GpbntGmaBVV6PwsJYlWtzJBf9
+         DeAnMMlDg41qfuSaBNe3jrnrSKplsXWBS8DoV6Tjd5oxPKnmgfOOVEvwOdfrtKGwbTu/
+         gzlNSGsEHy4wG3xBx72uiSs5ZvgD90KYx80+63UPv9PXlF0VuchR5IkXt+ARUjKaLXlL
+         Jf9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWCIBX3S2Ky8c5UkoIWG0lrLWi4qVHWEZLhAv0AHoOIcFBKNnDhj1B7Yxp4yEh8jIj3UpuYa3fs+LnOSiCiTJJOU2J9
+X-Gm-Message-State: AOJu0YyCV9D8iX3H6Fohr+axXealKEixUkz992QNnGgNEwybZczl6wm9
+	7LfkokINc1lsthbfsjSM+NlygwaH7+SF2fR8cuMrW852AGLXIuwQYfLeXdv0pfzKM5hdwjG8mdc
+	VK2S5U+FiRRe6UHyfadVlr5NjbyLbQo79jFpGmzTGEKDH8qWMnQ==
+X-Received: by 2002:a05:6e02:218b:b0:374:a667:fc06 with SMTP id e9e14a558f8ab-37580309f62mr4417585ab.8.1717694840600;
+        Thu, 06 Jun 2024 10:27:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFckJLvv9jZB8litqQUIqmCS99LH6RC9Z9rWoLoaNkdTMJWgv2uggN2xOA/AH43OBZbA27vbg==
+X-Received: by 2002:a05:6e02:218b:b0:374:a667:fc06 with SMTP id e9e14a558f8ab-37580309f62mr4417285ab.8.1717694840192;
+        Thu, 06 Jun 2024 10:27:20 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-374bc15dca5sm3869215ab.49.2024.06.06.10.27.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jun 2024 10:27:19 -0700 (PDT)
+Date: Thu, 6 Jun 2024 11:27:18 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>, Gerald Schaefer
+ <gerald.schaefer@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, Vasily
+ Gorbik <gor@linux.ibm.com>, Alexander Gordeev <agordeev@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+Subject: Re: [PATCH v3 0/3] vfio/pci: s390: Fix issues preventing
+ VFIO_PCI_MMAP=y for s390 and enable it
+Message-ID: <20240606112718.0171f5b3.alex.williamson@redhat.com>
+In-Reply-To: <0a4622ce-3826-4b08-ab81-375887ab6a46@linux.ibm.com>
+References: <20240529-vfio_pci_mmap-v3-0-cd217d019218@linux.ibm.com>
+	<0a4622ce-3826-4b08-ab81-375887ab6a46@linux.ibm.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <whzwqltolrms4ct35az5eif5rg25e2km23cztypgikallbcxoj@wtwfckujzcrf>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jun 04, 2024 at 05:05:59PM +0100, Pierre-Clément Tosi wrote:
-> On Mon, Jun 03, 2024 at 03:48:08PM +0100, Will Deacon wrote:
-> > On Wed, May 29, 2024 at 01:12:17PM +0100, Pierre-Clément Tosi wrote:
-> > > For kCFI, the compiler encodes in the immediate of the BRK (which the
-> > > CPU places in ESR_ELx) the indices of the two registers it used to hold
-> > > (resp.) the function pointer and expected type. Therefore, the kCFI
-> > > handler must be able to parse the contents of the register file at the
-> > > point where the exception was triggered.
-> > > 
-> > > To achieve this, introduce a new hypervisor panic path that first stores
-> > > the CPU context in the per-CPU kvm_hyp_ctxt before calling (directly or
-> > > indirectly) hyp_panic() and execute it from all EL2 synchronous
-> > > exception handlers i.e.
-> > > 
-> > > - call it directly in host_el2_sync_vect (__kvm_hyp_host_vector, EL2t&h)
-> > > - call it directly in el2t_sync_invalid (__kvm_hyp_vector, EL2t)
-> > > - set ELR_EL2 to it in el2_sync (__kvm_hyp_vector, EL2h), which ERETs
-> > > 
-> > > Teach hyp_panic() to decode the kCFI ESR and extract the target and type
-> > > from the saved CPU context. In VHE, use that information to panic() with
-> > > a specialized error message. In nVHE, only report it if the host (EL1)
-> > > has access to the saved CPU context i.e. iff CONFIG_NVHE_EL2_DEBUG=y,
-> > > which aligns with the behavior of CONFIG_PROTECTED_NVHE_STACKTRACE.
-> > > 
-> > > Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
-> > > ---
-> > >  arch/arm64/kvm/handle_exit.c            | 30 +++++++++++++++++++++++--
-> > >  arch/arm64/kvm/hyp/entry.S              | 24 +++++++++++++++++++-
-> > >  arch/arm64/kvm/hyp/hyp-entry.S          |  2 +-
-> > >  arch/arm64/kvm/hyp/include/hyp/switch.h |  4 ++--
-> > >  arch/arm64/kvm/hyp/nvhe/host.S          |  2 +-
-> > >  arch/arm64/kvm/hyp/vhe/switch.c         | 26 +++++++++++++++++++--
-> > >  6 files changed, 79 insertions(+), 9 deletions(-)
+On Mon, 3 Jun 2024 17:50:13 +0200
+Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
+
+> Am 29.05.24 um 13:36 schrieb Niklas Schnelle:
+> > With the introduction of memory I/O (MIO) instructions enbaled in commit
+> > 71ba41c9b1d9 ("s390/pci: provide support for MIO instructions") s390
+> > gained support for direct user-space access to mapped PCI resources.
+> > Even without those however user-space can access mapped PCI resources
+> > via the s390 specific MMIO syscalls. There is thus nothing fundamentally
+> > preventing s390 from supporting VFIO_PCI_MMAP allowing user-space drivers
+> > to access PCI resources without going through the pread() interface.
+> > To actually enable VFIO_PCI_MMAP a few issues need fixing however.
 > > 
-> > This quite a lot of work just to print out some opaque type numbers
-> > when CONFIG_NVHE_EL2_DEBUG=y. Is it really worth it? How would I use
-> > this information to debug an otherwise undebuggable kcfi failure at EL2?
+> > Firstly the s390 MMIO syscalls do not cause a page fault when
+> > follow_pte() fails due to the page not being present. This breaks
+> > vfio-pci's mmap() handling which lazily maps on first access.
+> > 
+> > Secondly on s390 there is a virtual PCI device called ISM which has
+> > a few oddities. For one it claims to have a 256 TiB PCI BAR (not a typo)
+> > which leads to any attempt to mmap() it fail with the following message:
+> > 
+> >      vmap allocation for size 281474976714752 failed: use vmalloc=<size> to increase size
+> > 
+> > Even if one tried to map this BAR only partially the mapping would not
+> > be usable on systems with MIO support enabled. So just block mapping
+> > BARs which don't fit between IOREMAP_START and IOREMAP_END.
+> > 
+> > Note:
+> > For your convenience the code is also available in the tagged
+> > b4/vfio_pci_mmap branch on my git.kernel.org site below:
+> > https: //git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git/  
 > 
-> The type ID alone might not be worth it but what about the target?
 > 
-> In my experience, non-malicious kCFI failures are often caused by an issue with
-> the callee, not the caller. Without this patch, only the source of the exception
-> is reported but, with it, the panic handler also prints the kCFI target (i.e.
-> value of the function pointer) as a symbol.
+> I guess its now mostly a question of who picks those patches? Alex?
+> 
+> Any patch suitable for stable?
 
-I think it's less of an issue for EL2, as we don't have tonnes of
-indirections, but I agree that the target is nice to have.
+Nothing here looks like stable material to me.  1/ only becomes an
+issue when mmap of MMIO is allowed on s390 (ie. 3/), 2/ is generic, but
+only really targets a device found on s390, and finally 3/ is
+essentially enabling a new feature.
 
-> With the infrastructure for the target in place, it isn't much more work to also
-> report the type ID. Although it is rarely informative (as you noted), there are
-> some situations where it can still be useful e.g. if reported as zero and/or has
-> been corrupted and does not match its value from the ELF.
+If we expect any conflicts with 1/ in the next merge window I can take
+a branch for it and apply 2/ and 3/ through the vfio tree, otherwise I
+can bring them all through the vfio tree if the s390 folks agree.
+Thanks,
 
-So looking at the implementation, I'm not a huge fan of saving off all
-the GPRs and then relying on the stage-2 being disabled so that the host
-can fish out the registers it cares about. I think I'd prefer to provide
-the target as an additional argument to nvhe_hyp_panic_handler(), meaning
-that we could even print the VA when CONFIG_NVHE_EL2_DEBUG is disabled.
+Alex
 
-But for now, I suggest we drop this patch along with the testing patches
-because I think the rest of the series is nearly there and it's a useful
-change on its own.
-
-Will
 
