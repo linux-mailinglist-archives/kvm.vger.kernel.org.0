@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-18990-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-18991-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B0248FDD17
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 05:00:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B5FB8FDD2B
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 05:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F8C41C22240
-	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 03:00:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 204141F23754
+	for <lists+kvm@lfdr.de>; Thu,  6 Jun 2024 03:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382281E893;
-	Thu,  6 Jun 2024 03:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB461F93E;
+	Thu,  6 Jun 2024 03:06:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M5HwNvyt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TIMvQRHV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1426F17C68;
-	Thu,  6 Jun 2024 03:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671E51C68E;
+	Thu,  6 Jun 2024 03:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717642829; cv=none; b=oXpHVCX4iqeTYjO10N1C9hS9beX+6LIVjR+gf+Ye/bmDAII0Gn7IXjFUngPCsmmzx/Yd2sjs75nMyRNQe7zVsduYS2kR0K/6WSMBBoM3JYdkvGuvOQiQNkHFOXYYOBSzOlccO2oiTxF65lAaDMIhOGakbH3W3OVQaIJ6z+DO8Fk=
+	t=1717643196; cv=none; b=U5yIqSOxQU1oyQVQCLxWpRfqCyDJosPdClljwdRruPCzq4efEwnn0rqNFNZVIxmTa2lwkrC6t13SIdcB5CLeMEZ6qvcE8wbC05+Ze28rTkBTJVDzTY1Zss8KkddIP/g8vVY8d3xJJfFeyNzKWE4Sc7HnfgQ4jkLxsA0yYUKvqlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717642829; c=relaxed/simple;
-	bh=13zMeLIVd4+RgfMY41lwQyVfbYR6qBJ+QUYp/aU0PQw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=vFx9X6LUFfSMB82lViujo8Y1iB/HjjiPmNSKs5VTOoUkP1H9JpZNhYEWiy7ITR3KeDzY8iU03p3V0iyV691JaF7/7h4L59nM2rzyZa1Tlr8HzBMz6tVEYg9L9EyaIguHCgkxA5KjrWDLKKnux7q2EdzvH3HhJHrDobYWaInsNOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M5HwNvyt; arc=none smtp.client-ip=209.85.210.173
+	s=arc-20240116; t=1717643196; c=relaxed/simple;
+	bh=DvrsBmGuwD2ImyPbsOpP7Kxt6pcNYk1wwR6Wgnw6MGk=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Pjikv+jnzFdkYLnTt+PJ2j5w7Ip6DryeOUtizZ6ojz/eop4E5X6MBZ0ijyO6oF1L/hNySmXsK8EpapTu5iyxw/3T6Cx7fI7OeOvZCNpG5esAQ+zHz8r/okMFJrKSNcKTGADM7tmX1n7w9WEFc9U+q+qUD0JjS67NsQh+1QDC0Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TIMvQRHV; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7025b253f64so402203b3a.3;
-        Wed, 05 Jun 2024 20:00:27 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1f65a3abd01so4718425ad.3;
+        Wed, 05 Jun 2024 20:06:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1717642827; x=1718247627; darn=vger.kernel.org;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
+        d=gmail.com; s=20230601; t=1717643195; x=1718247995; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ULW+2oU3rQhVwjAM90zTIQPs8hm5yJ6yXFIdCR2GhYU=;
-        b=M5HwNvyt7VD54858rOxQIclK/dGPsFFj1VBVbxG95auAnTXXRrHq5Gq/xSavBPSc18
-         D5XPyeGyovknLN6rq7/GlQm1cIo1LdfGBwWVoWUNqvTO+iOP51RVOaS9ro5kXmsBQOKI
-         Ka+jD7kqj1LxZNZUm3Uc+5R9zYNPkH4nirrSmSwq+iFSL/0LPIM/iYhuacMAcO7LLGwi
-         jwwNWZMOiMc4s04sRdoSdSojXpkd/SwcRbiAE6B3PJU6Bewv5kQoFSVjlybfpOB2XMPP
-         kGK8kqvaUqgt8Y6//QyERV9Rpu81CgsuSbe99kmrBsATIAMJu5uD4VPI9QuY6nDeRFN8
-         xUOw==
+        bh=HjMuvcnH30KoyWBjd5euk3EXjF9nRQlbcgZhgbXTZgk=;
+        b=TIMvQRHVzromOxD7n7W6qMyegpAmxqHHi6Z4En3Vhg1oyNeY9JqPiC1PDcCDuWNuy+
+         7xxLd0OqgK2TFvlyXwAUDbG2nby6YHcKQoojHFX0OuVp2/C3FnQ/9ZXh0M3EUPuzpem2
+         xu6IGspiutS6BPmeBqZqSP/lt535Jop1VUcJwswOVRIbnjwjRfXoZ1BAM71N1ORuaGGs
+         8h9gnfYxQwjKLpSNNsllvmKGOaYjmIhITWnv3Z+52USsJa5s31+6Zta24pttdi/OO4vJ
+         LR57qtoriPIS84/Qg9CrsUi6nFM2ngxazXmIxq3wzambEhXn/A/1eC2HD0+LC2jV9S0d
+         hT6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717642827; x=1718247627;
-        h=in-reply-to:references:subject:cc:to:from:message-id:date
+        d=1e100.net; s=20230601; t=1717643195; x=1718247995;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ULW+2oU3rQhVwjAM90zTIQPs8hm5yJ6yXFIdCR2GhYU=;
-        b=mRWWXmMhVGfb/dzLXQCZgN/1Rr8W36VdNQcuBgyWKEF+807YH0K+ygNtR+ExABIfKo
-         iQqPNG5bj+1S1BX7LOiPu3YfqKplBkC6yv9qVpZMPi9flBxBH1v8tNioDo61VukLXrMG
-         Of7pfZN2iRb99iKCIFr8b5wlylAf3HsoSwEKpShnhOVOzSibS91xphK7+EgM8F0BaAS/
-         RWAV3pDO9TrXP0xDimTVEIXpI0woasvNqiLbr1grpwMZJsjH6Z6L0IbMRdhjFVB1Hjs/
-         vHqzG3+VVm7llszOjNaHQ7ikt+PBPnxNg2iOLSa97MV1Z0kW+3HgLd6DzPCPoCulgBkg
-         7pMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXybnEbmcwKAza2i1ohyW4ppzC53Ff753kM2YYZyAqOb3Lghxq1Uk4v+ZZALNw/V2azAR5v5+wdVbT1lCWuHoy25hdBIQnRaZF8zCzh1noihG5D67KFRzI1hBH5WQ8u21CYLB1eqJ8fE/3hr3bgjT8hPuveKo039Jx0ps9UShHfrHEyuB3tLu4FLTKbUvsa5n1zyIS3
-X-Gm-Message-State: AOJu0Yy33ydwazUpm8WGRLFZxVv+TCfaa0KppPoWkhg7BE5dnA5NWHri
-	+ckPVfXXu7WaIbSUgQrs5nBNUlvG4F6igE2f3BRvsUGoGP2/cQnl
-X-Google-Smtp-Source: AGHT+IFwZO9iXZrSZ7eiieLv2g0azsGpXlp5ks3oSLXWkKXxnEw8h9uCN3zGrnxcvFbRPe9VPVGm/Q==
-X-Received: by 2002:a05:6a20:6a26:b0:1b0:1a02:4131 with SMTP id adf61e73a8af0-1b2b6e59824mr5312544637.2.1717642827073;
-        Wed, 05 Jun 2024 20:00:27 -0700 (PDT)
+        bh=HjMuvcnH30KoyWBjd5euk3EXjF9nRQlbcgZhgbXTZgk=;
+        b=eNWrTrGomem8XiB6kbiKdLTXeh0wLVoy0Uhf0RAM33Ng+cMpNWNlKcmqR069LbBx1H
+         ZSS31DR78IL6ptMd9NpGOp5sPao/g0gNDECKrE7k9C3hWKNPiWLcsJ3e+wotk+oUdrcT
+         yWJ0tCzZuDO0LflyElYTU7ilezEgvP7+EjXiR/cq3cp92P5dK8iuQMvEkJFoN1P+egpP
+         uqVckcxVYyhojMP6NKLsAMUNX2tUngr8tmuJEKd5bexB3/dPme0PtLWYWOfEDQsqE5ZV
+         FVXgpJR5Ii41ky8NB+am3FoxEh2STyFxE3in4jTtVFiTOAZU4BbNPiLM7A02lYsVfVO0
+         +2jg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYTDuZvzHgBWns4ocFuCWpi5/B9ZXgxoqKi4vUmPhUuIQLC4njp7anRaJsltQEW86Iutcfkhxx/lOSEaMy5x8lN8QKAPHA5cPBMT/JiCT6s/u6P+0zEUKxeP3j2Z5u+kf5Xmlb4ZLUpYQ6QncufYT+pAyvVughX2PD21/O
+X-Gm-Message-State: AOJu0YzZub5He2d9Sfnoq9lgTyq2/Kk8VeHjtX2S0sxMHwsVuaF3tcOW
+	HccCv4YUhbwlu4Zem0fQFj9q8kUXuNiBHwBhgomGTTIps79ArzrC
+X-Google-Smtp-Source: AGHT+IFZESfAMwBlJNHmCynL0DhPXDEYi3w27GieK3vEDPShijCOjqUcQk+TWV8ZF55Do87jKArwPQ==
+X-Received: by 2002:a17:902:e850:b0:1eb:fc2:1eed with SMTP id d9443c01a7336-1f6a5a33a69mr54209595ad.41.1717643194601;
+        Wed, 05 Jun 2024 20:06:34 -0700 (PDT)
 Received: from localhost (110-175-65-7.tpgi.com.au. [110.175.65.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7cd7f6sm2642725ad.122.2024.06.05.20.00.21
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd7e07edsm2702695ad.214.2024.06.05.20.06.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jun 2024 20:00:26 -0700 (PDT)
+        Wed, 05 Jun 2024 20:06:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,48 +75,74 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 06 Jun 2024 13:00:19 +1000
-Message-Id: <D1SLK9T4ODZO.11N6J5D94530R@gmail.com>
+Date: Thu, 06 Jun 2024 13:06:26 +1000
+Message-Id: <D1SLOYCQGIQ6.17Y5C9XJDHX33@gmail.com>
+Cc: <pbonzini@redhat.com>, <naveen.n.rao@linux.ibm.com>,
+ <christophe.leroy@csgroup.eu>, <corbet@lwn.net>, <mpe@ellerman.id.au>,
+ <namhyung@kernel.org>, <pbonzini@redhat.com>, <jniethe5@gmail.com>,
+ <atrajeev@linux.vnet.ibm.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 0/8] KVM: PPC: Book3S HV: Nested guest migration
+ fixes
 From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Gautam Menghani" <gautam@linux.ibm.com>, <mpe@ellerman.id.au>,
- <christophe.leroy@csgroup.eu>, <aneesh.kumar@kernel.org>,
- <naveen.n.rao@linux.ibm.com>, <corbet@lwn.net>
-Cc: <linuxppc-dev@lists.ozlabs.org>, <linux-doc@vger.kernel.org>,
- <kvm@vger.kernel.org>, <stable@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 0/2] Fix doorbell emulation for v2 API on PPC
+To: "Shivaprasad G Bhat" <sbhat@linux.ibm.com>, <kvm@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>
 X-Mailer: aerc 0.17.0
-References: <20240605113913.83715-1-gautam@linux.ibm.com>
-In-Reply-To: <20240605113913.83715-1-gautam@linux.ibm.com>
+References: <171759276071.1480.9356137231993600304.stgit@linux.ibm.com>
+In-Reply-To: <171759276071.1480.9356137231993600304.stgit@linux.ibm.com>
 
-On Wed Jun 5, 2024 at 9:39 PM AEST, Gautam Menghani wrote:
-> Doorbell emulation for KVM on PAPR guests is broken as support for DPDES
-> was not added in initial patch series [1].
-> Add DPDES support and doorbell handling support for V2 API.=20
+On Wed Jun 5, 2024 at 11:06 PM AEST, Shivaprasad G Bhat wrote:
+> The series fixes the issues exposed by the kvm-unit-tests[1]
+> sprs-migration test.
+>
+> The SDAR, MMCR3 were seen to have some typo/refactoring bugs.
+> The first two patches fix them.
+>
+> The remaining patches take care of save-restoring the guest
+> state elements for DEXCR, HASHKEYR and HASHPKEYR SPRs with PHYP
+> during entry-exit. The KVM_PPC_REG too for them are missing which
+> are added for use by the QEMU.
 
-Looks good, thanks. So fix for v1 doorbells is coming?
+These and the qemu patches all look good now. I'll give them
+some testing and send R-B in the next day or two. I'm trying
+to write a k-u-t for the hashpkey migration case...
 
 Thanks,
 Nick
 
 >
-> [1] lore.kernel.org/linuxppc-dev/20230914030600.16993-1-jniethe5@gmail.co=
-m
+> References:
+> [1]: https://github.com/kvm-unit-tests/kvm-unit-tests
 >
-> Changes in v2:
-> 1. Split DPDES support into its own patch
+> ---
 >
-> Gautam Menghani (2):
->   arch/powerpc/kvm: Add DPDES support in helper library for Guest state
->     buffer
->   arch/powerpc/kvm: Fix doorbell emulation for v2 API
+> Changelog:
+> v1: https://lore.kernel.org/kvm/171741555734.11675.17428208097186191736.s=
+tgit@c0c876608f2d/
+>  - Reordered the patches in a way to introduce the SPRs first as
+>    suggested.
+>  - Added Reviewed-bys to the reviewed ones.
+>  - Added 2 more patches to handle the hashpkeyr state
 >
->  Documentation/arch/powerpc/kvm-nested.rst     | 4 +++-
->  arch/powerpc/include/asm/guest-state-buffer.h | 3 ++-
->  arch/powerpc/include/asm/kvm_book3s.h         | 1 +
->  arch/powerpc/kvm/book3s_hv.c                  | 5 +++++
->  arch/powerpc/kvm/book3s_hv_nestedv2.c         | 7 +++++++
->  arch/powerpc/kvm/test-guest-state-buffer.c    | 2 +-
->  6 files changed, 19 insertions(+), 3 deletions(-)
+> Shivaprasad G Bhat (8):
+>       KVM: PPC: Book3S HV: Fix the set_one_reg for MMCR3
+>       KVM: PPC: Book3S HV: Fix the get_one_reg of SDAR
+>       KVM: PPC: Book3S HV: Add one-reg interface for DEXCR register
+>       KVM: PPC: Book3S HV nestedv2: Keep nested guest DEXCR in sync
+>       KVM: PPC: Book3S HV: Add one-reg interface for HASHKEYR register
+>       KVM: PPC: Book3S HV nestedv2: Keep nested guest HASHKEYR in sync
+>       KVM: PPC: Book3S HV: Add one-reg interface for HASHPKEYR register
+>       KVM: PPC: Book3S HV nestedv2: Keep nested guest HASHPKEYR in sync
+>
+>
+>  Documentation/virt/kvm/api.rst        |  3 +++
+>  arch/powerpc/include/asm/kvm_host.h   |  3 +++
+>  arch/powerpc/include/uapi/asm/kvm.h   |  3 +++
+>  arch/powerpc/kvm/book3s_hv.c          | 22 ++++++++++++++++++++--
+>  arch/powerpc/kvm/book3s_hv.h          |  3 +++
+>  arch/powerpc/kvm/book3s_hv_nestedv2.c | 18 ++++++++++++++++++
+>  6 files changed, 50 insertions(+), 2 deletions(-)
+>
+> --
+> Signature
 
 
