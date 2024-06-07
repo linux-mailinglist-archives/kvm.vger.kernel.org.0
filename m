@@ -1,134 +1,147 @@
-Return-Path: <kvm+bounces-19053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0764E8FFC7E
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 08:52:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0D18FFCC5
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 09:10:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF49C1F21D8A
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 06:52:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AE9B1F2BDFC
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 07:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12CF153565;
-	Fri,  7 Jun 2024 06:52:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D89155727;
+	Fri,  7 Jun 2024 07:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R/X4i8Uq"
+	dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b="dz4Wbqm4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B583F1847
-	for <kvm@vger.kernel.org>; Fri,  7 Jun 2024 06:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAF59153565
+	for <kvm@vger.kernel.org>; Fri,  7 Jun 2024 07:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717743151; cv=none; b=TOFkrPHKoyJWsryREePc228WylmUmM37Fo3NpFiYCOjSROV/tynOpq9TkCPnH8rdykyL0o0W8NaOtWc4d4cfEBxB9GgC3oRo9bsFDMGr439rSx+XALqynQ9X/Caam5RJL8a9VmQ3wNEqNBp56wpearvtyRU1oCe17DkbgogarZ8=
+	t=1717744034; cv=none; b=dIYFj0j7t7462vX6BxtaJJXzfJi/WqMudhNFSJFLG47XD42iATRyt58jqNTowAXPMbeZQO2v+UgRi/4+qdieUV28HJFA3qy3R4+q9gF8e/qoDAM+KTLF6yKBkkB75tOPuA/Nguez5aSnof8KU3lY9ZxmaFhIl9sF48mDHlR5dxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717743151; c=relaxed/simple;
-	bh=say0nCCt7hqDtN1L3soE819364JYKFcAh35R7okjzpY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SYktPnSDo0kPK66XSitW/+pBcNBcqTGBQI1xjTEX0cWkqTIfUqmji0jQuplJLGtpCozmBW9SNdDHzfoHZ7ZitC+XrjI9tXmXHjpFwYLYeu5E6l1jpXn75VHdLgngQES2s/jlWXaTW5rXaTSnsU4CFcsRskfTwYW+jDCaCzjAetY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R/X4i8Uq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1717743148;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fDuvNyUUQJJeHkRGOgjdd0RDBjCz7mkEiq2Gc1+aryU=;
-	b=R/X4i8UqTZkMJqZOHhM57KGdGjVkUtx45q45Om1F0ElXE8Z4luqybwAUCIHArXcxSD/kYW
-	xb6pzJZvRn01sFpCERsjpAQGXhjasjX+JbjpO4XWBD3e/NIiqCbcw1HsyMaE7b5440h5RK
-	59JpPvm1LcyXlTS02/+oxfHJN3I2xwA=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-609-jw00deEvOJ6EsvN3Xv45lQ-1; Fri,
- 07 Jun 2024 02:51:55 -0400
-X-MC-Unique: jw00deEvOJ6EsvN3Xv45lQ-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2687219772D1;
-	Fri,  7 Jun 2024 06:51:54 +0000 (UTC)
-Received: from thuth-p1g4.redhat.com (unknown [10.39.192.105])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 400C71955F14;
-	Fri,  7 Jun 2024 06:51:49 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: kvm@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>
-Cc: Andrew Jones <andrew.jones@linux.dev>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	=?UTF-8?q?Nico=20B=C3=B6hr?= <nrb@linux.ibm.com>
-Subject: [kvm-unit-tests PATCH] Bump Fedora version to 40
-Date: Fri,  7 Jun 2024 08:51:47 +0200
-Message-ID: <20240607065147.63226-1-thuth@redhat.com>
+	s=arc-20240116; t=1717744034; c=relaxed/simple;
+	bh=uDKsXWnZBq8B1TZSbGrBofUZF8hvuJaCCCMe9c3tno4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j8gKL0TZMd07BkgjrjVFJbPiRVTHqdh6a2S7XdsGxd+AeHoXwaUyX2A5iKAtc3eoUk5Ny6vTv38Jr3goqu2pegp6fs0SLxWu94pECCTuVxTH86mSLzgUAJkwMIYLgdub/E9ohyUEVm5oI+TRrktG7ILztdUg1tbq6AzDuBw9tuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org; spf=none smtp.mailfrom=brainfault.org; dkim=pass (2048-bit key) header.d=brainfault-org.20230601.gappssmtp.com header.i=@brainfault-org.20230601.gappssmtp.com header.b=dz4Wbqm4; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=brainfault.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=brainfault.org
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-374528b81ddso7447085ab.2
+        for <kvm@vger.kernel.org>; Fri, 07 Jun 2024 00:07:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20230601.gappssmtp.com; s=20230601; t=1717744032; x=1718348832; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8CLx8I7uIS4yN2qY8IP79uDVs9k1SwxKuZrHLU/16hk=;
+        b=dz4Wbqm42Bp05zD47ZT5UJX5xNZD2rHUqo2J5ey6CCNtibMXbhYzHBZhM80zEb+Ed+
+         moeaEH16tN8wYgyesy/ZoccwkUTa+FLo3f8GcBTC4VEkTmeIe+0TwZP0m/l2LPkcp0sb
+         MxpCYALqvOj9FGaWdZBJpDqQ9qlaHJTak7pfs6NZVlwGdE+8t3kAKd0BS15gI9WO1Xsv
+         rxAWmqvR5XYIkKZkUfQ4Lkz7CO7jdHrZkG7YoRGtbQN2PXmx0zPp3BALadVJN2xhMsVN
+         +72etnPkar/szOeg7ZxdkLwuoOaol71KoJHlj4ZoJXFNKjWHsxroguMsbr/6rSdDPrhm
+         hqDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1717744032; x=1718348832;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8CLx8I7uIS4yN2qY8IP79uDVs9k1SwxKuZrHLU/16hk=;
+        b=VSww0Fqr7LVnNyr2UHqH6sMXJJVjDKpQVobl8VqBgVffZUe4npZ1zzCko//1OihRbg
+         ICYb5NVx/X8+ZgjfgEraP7iz4IATQ1VdJH21/fOeZalCPjawaW+sXVOr083ArfJOa540
+         VuuZq/nKPrmLV9E8R0IJCBjkf4btJetP7QYv52x2i49cLAPS2nrZ5gVnHj6ZRaiNshVz
+         GMdipXOYL8/criTG5zogtkvbJuJXmYBa/N+pbDj7uiR3xKrf2jbDJNMSocmDgJEgz7GD
+         6OYyOXIP0Wd96hT/kgqDMIomy2UkzZ40b8JaWxrQ54sz5mfRUP/2Yx4tc0mXU91t0FyB
+         kfxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXKzRjm59BMsNK/QUsj5tzgM210/4dxiMoy0vWTIM0gEy85fQ74t2pJJ2g6i+lUxHuHQljp2exqpeSMwKRO17GK86wT
+X-Gm-Message-State: AOJu0YwfzhORJRwFZxYXIEloeyeXtnlaezpMBST8LBttEKyVjJ8vhMx4
+	IcGQHklfliscd1rBvRgclKlZ+8uCmh+COVrBCuJ7r3HWMetBA2W0TshYsxlo9dZBK/Te6zEPNgk
+	TFqh3v1MD0yExXXB86DIvYndQDJHiWEF9sHywAg==
+X-Google-Smtp-Source: AGHT+IFE09PTLjj0080/0bN8m/3yMGgMYsDcLZaSLR2FjJm1yUQBETVhznGnzF1DLd7cgzFg+hOq9wxArotyxseBiWU=
+X-Received: by 2002:a05:6e02:20e8:b0:374:9e82:7b51 with SMTP id
+ e9e14a558f8ab-375802fcc9bmr22082355ab.9.1717744031764; Fri, 07 Jun 2024
+ 00:07:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <20240429092113.70695-1-betterman5240@gmail.com>
+In-Reply-To: <20240429092113.70695-1-betterman5240@gmail.com>
+From: Anup Patel <anup@brainfault.org>
+Date: Fri, 7 Jun 2024 12:37:01 +0530
+Message-ID: <CAAhSdy3HPGS48TeG5LxiECAtNyzmzsJPzo+_eicgxL28nAgoHg@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V:KVM: Add AMO load/store access fault traps to
+ redirect to guest
+To: Yu-Wei Hsu <betterman5240@gmail.com>
+Cc: atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, 
+	aou@eecs.berkeley.edu, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Version 37 is out of date, let's use a supported one instead.
+On Mon, Apr 29, 2024 at 2:51=E2=80=AFPM Yu-Wei Hsu <betterman5240@gmail.com=
+> wrote:
+>
+> When unhandled AMO load/store access fault traps are not delegated to
+> VS mode (hedeleg), M mode redirects them back to S mode.
+> However, upon returning from M mode,the KVM executed in HS mode terminate=
+s
+> VS mode software.
+> KVM should redirect traps back to VS mode and let the VS mode trap handle=
+r
+> determine the next steps.
+> This is one approach to handling access fault traps in KVM,
+> not only redirecting them to VS mode or terminating it.
+>
+> Signed-off-by: Yu-Wei Hsu <betterman5240@gmail.com>
 
-The "xsave" test now tries to execute more tests with TCG, but one
-of them is failing with the QEMU from Fedora 40, so we have to
-disable the xsave test for now.
-The problem will be fixed in QEMU 9.1 with this patch here:
-https://lore.kernel.org/qemu-devel/20240603100405.619418-1-pbonzini@redhat.com/
+Overall this patch looks good to me but the patch subject and
+description can further simplified as follows:
 
-And there is also an additional problem with the "realmode" test. As
-diagnosed by Paolo: "It turns out that with some versions of clang,
-realmode.flat has become big enough that it overlaps the stack used
-by the multiboot option ROM loader. The result is that a couple
-instructions are overwritten." Thus disable the realmode test in the
-Clang build until the problem is fixed.
+    RISC-V: KVM: Redirect AMO load/store access fault traps to guest
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- .gitlab-ci.yml | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+    The KVM RISC-V does not delegate AMO load/store access fault traps to
+    VS-mode (hedeleg) so typically M-mode takes these traps and redirects
+    them back to HS-mode. However, upon returning from M-mode, the KVM
+    RISC-V running in HS-mode terminates VS-mode software.
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 2af47328..b689a0c9 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -1,4 +1,4 @@
--image: fedora:37
-+image: fedora:40
- 
- before_script:
-  - dnf update -y
-@@ -216,7 +216,6 @@ build-x86_64:
-       vmexit_ple_round_robin
-       vmexit_tscdeadline
-       vmexit_tscdeadline_immed
--      xsave
-       | tee results.txt
-  - if grep -q FAIL results.txt ; then exit 1 ; fi
- 
-@@ -268,7 +267,6 @@ build-clang:
-       pks
-       pku
-       rdpru
--      realmode
-       rmap_chain
-       setjmp
-       sieve
-@@ -289,7 +287,6 @@ build-clang:
-       vmexit_ple_round_robin
-       vmexit_tscdeadline
-       vmexit_tscdeadline_immed
--      xsave
-       | tee results.txt
-  - grep -q PASS results.txt && ! grep -q FAIL results.txt
- 
--- 
-2.45.1
+    The KVM RISC-V should redirect AMO load/store access fault traps back
+    to VS-mode and let the VS-mode trap handler determine the next steps.
 
+I have taken care of the above at the time of queuing this patch.
+
+Reviewed-by: Anup Patel <anup@brainfault.org>
+
+Queued this patch for Linux-6.11
+
+Thanks,
+Anup
+
+> ---
+>  arch/riscv/kvm/vcpu_exit.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index 2415722c01b8..ef8c5e3ec8a0 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -185,6 +185,8 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct=
+ kvm_run *run,
+>         case EXC_INST_ILLEGAL:
+>         case EXC_LOAD_MISALIGNED:
+>         case EXC_STORE_MISALIGNED:
+> +       case EXC_LOAD_ACCESS:
+> +       case EXC_STORE_ACCESS:
+>                 if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV) {
+>                         kvm_riscv_vcpu_trap_redirect(vcpu, trap);
+>                         ret =3D 1;
+> --
+> 2.25.1
+>
 
