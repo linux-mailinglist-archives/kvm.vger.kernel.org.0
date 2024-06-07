@@ -1,183 +1,103 @@
-Return-Path: <kvm+bounces-19073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B333B90084D
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 17:11:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D65900853
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 17:12:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BFEB1F27C7D
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 15:11:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47F38287336
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 15:12:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED8D71922F2;
-	Fri,  7 Jun 2024 15:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SvCJ05FJ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63E271940A5;
+	Fri,  7 Jun 2024 15:12:49 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A245F25740
-	for <kvm@vger.kernel.org>; Fri,  7 Jun 2024 15:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D441825740;
+	Fri,  7 Jun 2024 15:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717773091; cv=none; b=iILxNlyRKuHTz86Xja7IEFe5v+pZrpHkMdAUYryUUm9AKzunNkiSUK77odGL4JRXe8izNKo3EkyZCiaf2YhahWqUzGo6wSnQoPURuTBC4fbqgGpa2clCLzSlDZQ/Y1i126OP8pHYTxwNQ/ciBtfs8QE17a76CEtD6pHZU7r7uDM=
+	t=1717773168; cv=none; b=emYSv6F/OLdBQui1NKGdl7mvvoFO8on3QseSDszFSBgyZG8jRV3tk3TrTlzcoLhPCNCBTznYYp9TpQJxM2qNsvg5iX8zxZ4yC+q88qFphZQn7T6Ax37RkgVBZtTp58qqYpW5fASYxYAsKq85IYM34A82CmaEg5TSijEOS7OCaRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717773091; c=relaxed/simple;
-	bh=t9H8jpD3p11qwd7sytuCB98EQ9NueIlYwx4Tt8/psKA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qfg2wXNfyBLRI4dgmIlZAkCz2RRMYdE9v7081yE6fMws/T8+5wblmE0WcWi0WKnUDJvrhLtTXWjSFlFUIA50sqqyo7JZRLymjK1bHGx294FAubtoL2IKb/VnQjryOeOiQACjI7Nkc80kXeW41lx1aj0+OJBWJn8DgcPBFFusCXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SvCJ05FJ; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62a08273919so34368987b3.1
-        for <kvm@vger.kernel.org>; Fri, 07 Jun 2024 08:11:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717773089; x=1718377889; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ex2nZHRLv3gtg4nC8Gp/3+MSsGZYhmqvJ3bWYCD2SdY=;
-        b=SvCJ05FJlC8gyIyJJNlEX750hi5r1vsRvgrDDw31bITazF6vK0fo7PjcaZ3ku3SwmA
-         Yxd8rf/lBiYwO/p0p736gt/Csz7Xs5l/WKV6hTMR4yhpDgmihJCvuWxFNGdC45oQPK7Y
-         LkGbrsmxpUSCD7yJlwMMuQE+4GPRKtUTnwLQM8PnbHty6LsFuE+r2c3BmxzY8lbQpxlc
-         oBlVVefERlCzuVaEWYQRrzShud77IBPFjBiW3famyoCoC4kqIMz8C88IanotOeM6orqL
-         ODeCekp2AHV17f4yp2HsBHJnynxVsK1ed7zR0TDYsTRQofzdfRVwYDPkODHw3i9Uc3e5
-         GdUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717773089; x=1718377889;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ex2nZHRLv3gtg4nC8Gp/3+MSsGZYhmqvJ3bWYCD2SdY=;
-        b=qKlnz2vUFRpezDO1pWGr5WOvSch/ScqdkD27W8wsPUfDxegqAlZc/BUFxhK6Hz+Wrl
-         his0jpO9dkQtiNlJkKGif86hM/G2KSYZfM2JrAZiZsRzkVMe4XJLMsUNagYVBL0tmnmc
-         sfNXjCYGo3itsee0x2C2eoX6XfLFzvgYhPHj5D4pXB8n8Q+hFP6rtEoyvY7k9d0AX9Ig
-         bVD9Q8eTZeGfc0eGPVeWs+XOPTW8miEFvuDw47bGWLKnRfLjYnEmDwF6XMlL3OrNPiWv
-         b/5cd007Z/S0zg/wHhGRS2bqaTHNGLvQO8sOiMLGybrFERcC9cAhLxEO0Or1c9gQPudg
-         eBKw==
-X-Gm-Message-State: AOJu0Yw6TvTyHPQ2X0EMuCifFc/3e/NRNuM1yFnIS1nCDxZiycsP5IBy
-	Imn09of/pMaF+NEYo04eSLY6K4A5iGKNPpM7wtkhndE0IhZ6QYveuElKEiwFfHJfKy2Ppk9Ttv0
-	xBA==
-X-Google-Smtp-Source: AGHT+IHhAdfZH4OI2iNJh44mDt2T7ugxfQWP/zFMFnsGk76Nup/Du4ZDAUM5QiFXi8YCO8DJ1unaelYyyBI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1248:b0:df4:a393:8769 with SMTP id
- 3f1490d57ef6-dfaf65ba959mr237734276.9.1717773088585; Fri, 07 Jun 2024
- 08:11:28 -0700 (PDT)
-Date: Fri, 7 Jun 2024 08:11:27 -0700
-In-Reply-To: <06e6b7c6-ba5d-4fb0-9a77-30ac44f6935a@oracle.com>
+	s=arc-20240116; t=1717773168; c=relaxed/simple;
+	bh=cAI7qnCyUWL53klNBARNIYIAmGI2f8rwVGyKdWH1ehE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nqApd+zv50x0SsgwQAk3HjCHt9IRFEM0AoaylidxJbHXoUy2k2LQEN5oZ342Hh0oF3orXbRBXdncbQuhu3xhW2BWaIZD+6dfwkV3acZBl1ealmsLnzyjBPIrYvHZAJ85NCMiwiol6UpyypXIaWdB7WnqY1hPLkoIUqwm8V9v4nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37809C2BBFC;
+	Fri,  7 Jun 2024 15:12:45 +0000 (UTC)
+Date: Fri, 7 Jun 2024 16:12:42 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Michael Kelley <mhklinux@outlook.com>
+Cc: Steven Price <steven.price@arm.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
+Message-ID: <ZmMjam3-L807AFR-@arm.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240429155738.990025-1-alejandro.j.jimenez@oracle.com>
- <20240429155738.990025-5-alejandro.j.jimenez@oracle.com> <Zl5cUwGiMrng2zcc@google.com>
- <06e6b7c6-ba5d-4fb0-9a77-30ac44f6935a@oracle.com>
-Message-ID: <ZmMjHwavCLk0lRd7@google.com>
-Subject: Re: [PATCH 4/4] KVM: x86: Add vCPU stat for APICv interrupt
- injections causing #VMEXIT
-From: Sean Christopherson <seanjc@google.com>
-To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, linux-kernel@vger.kernel.org, 
-	suravee.suthikulpanit@amd.com, vashegde@amd.com, mlevitsk@redhat.com, 
-	joao.m.martins@oracle.com, boris.ostrovsky@oracle.com, mark.kanda@oracle.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
 
-On Thu, Jun 06, 2024, Alejandro Jimenez wrote:
-> On 6/3/24 20:14, Sean Christopherson wrote:
-> > On Mon, Apr 29, 2024, Alejandro Jimenez wrote:
-> > > Even when APICv/AVIC is active, certain guest accesses to its local APIC(s)
-> > > cannot be fully accelerated, and cause a #VMEXIT to allow the VMM to
-> > > emulate the behavior and side effects. Expose a counter stat for these
-> > > specific #VMEXIT types.
-> > > 
-> > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > Signed-off-by: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>
-> > > ---
-> > >   arch/x86/include/asm/kvm_host.h | 1 +
-> > >   arch/x86/kvm/svm/avic.c         | 7 +++++++
-> > >   arch/x86/kvm/vmx/vmx.c          | 2 ++
-> > >   arch/x86/kvm/x86.c              | 1 +
-> > >   4 files changed, 11 insertions(+)
-> > > 
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index e7e3213cefae..388979dfe9f3 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1576,6 +1576,7 @@ struct kvm_vcpu_stat {
-> > >   	u64 guest_mode;
-> > >   	u64 notify_window_exits;
-> > >   	u64 apicv_active;
-> > > +	u64 apicv_unaccelerated_inj;
+On Fri, Jun 07, 2024 at 01:38:15AM +0000, Michael Kelley wrote:
+> From: Steven Price <steven.price@arm.com> Sent: Wednesday, June 5, 2024 2:30 AM
+> > This series adds support for running Linux in a protected VM under the
+> > Arm Confidential Compute Architecture (CCA). This has been updated
+> > following the feedback from the v2 posting[1]. Thanks for the feedback!
+> > Individual patches have a change log for v3.
 > > 
-> > The stat name doesn't match the changelog or the code.  The AVIC updates in
-> > avic_incomplete_ipi_interception() are unaccelerated _injection_, they're
-> > unaccelarated _delivery_.  And in those cases, the fact that delivery wasn't
-> > accelerated is relatively uninteresting in most cases.
-> > 
+> > The biggest change from v2 is fixing set_memory_{en,de}crypted() to
+> > perform a break-before-make sequence. Note that only the virtual address
+> > supplied is flipped between shared and protected, so if e.g. a vmalloc()
+> > address is passed the linear map will still point to the (now invalid)
+> > previous IPA. Attempts to access the wrong address may trigger a
+> > Synchronous External Abort. However any code which attempts to access
+> > the 'encrypted' alias after set_memory_decrypted() is already likely to
+> > be broken on platforms that implement memory encryption, so I don't
+> > expect problems.
 > 
-> Yeah, this was my flawed attempt to interpret/implement Paolo's comment in
-> the RFC thread:
+> In the case of a vmalloc() address, load_unaligned_zeropad() could still
+> make an access to the underlying pages through the linear address. In
+> CoCo guests on x86, both the vmalloc PTE and the linear map PTE are
+> flipped, so the load_unaligned_zeropad() problem can occur only during
+> the transition between decrypted and encrypted. But even then, the
+> exception handlers have code to fixup this case and allow everything to
+> proceed normally.
 > 
-> "... for example I'd add an interrupt_injections stat for unaccelerated
-> injections causing a vmexit or otherwise hitting lapic.c"
+> I haven't looked at the code in your patches, but do you handle that case,
+> or somehow prevent it?
 
-KVM essentially already has this stat, irq_injections.  Sort of.  The problem is
-that the stat isn't bumped when APICv is enabled because the IRQ isn't *directly*
-injected.  KVM does "inject" the IRQ into the IRR (and RVI on Intel), but KVM
-doesn't go through .inject_irq().
+If we can guarantee that only full a vm_struct area is changed at a
+time, the vmap guard page would prevent this issue (not sure we can
+though). Otherwise I think we either change the set_memory_*() code to
+deal with the other mappings or we handle the exception.
 
-For APICv, KVM could bump the stat when manually moving the IRQ from the IRR to
-RVI, but that'd be more than a bit misleading with respect to AVIC.  With AVIC,
-the CPU itself processes the IRR on VMRUN, i.e. there's no software intervention
-needed to get the CPU to inject the IRQ.  But practically speaking, there's no
-meaningful difference between the two flows; in both cases an IRQ arrived while
-the target vCPU wasn't actively running the guest.  And that means KVM would need
-to parse the IRR on AMD just to bump a stat.
+We also have potential user mappings, do we need to do anything about
+them?
 
-It'd also be misleading to some extent in general, because when the target vCPU
-is in its inner run loop, but not actually post-VM-Enter, KVM doesn't kick the
-vCPU because either KVM or the CPU will automatically process the pending IRQ.
-I.e. KVM would bump the stat cases where the injection isn't fully accelerated,
-but that's somewhat disingenuous because KVM didn't need to slow down the vCPU
-in order to deliver the interrupt.
-
-And KVM already has an irq_exits stat, which can be used to get a rough feel for
-how often KVM is kicking a vCPU (though timer ticks likely dominate the stat).
-
-> > And avic_unaccelerated_access_interception() and handle_apic_write() don't
-> > necessarily have anything to do with injection.
-> 
-> apicv_unaccelerated_acccess is perhaps a better name (assuming stat is
-> updated in handle_apic_access() as well)?
-
-This is again not super interesting.  If we were to add this stat, I would lobby
-hard for turning "exits" into an array that accounts each individual VM-Exit,
-though with some massaging to reconcile differences between VMX and SVM.
-
-Unaccelerated APIC exits aren't completely uninteresting, but they suffer similar
-issues to the "exits" stat: a few flavors of APIC exits would dominate the stats,
-and _those_ exits aren't very interesting.
-
-> > On the flip side, the slow paths for {svm,vmx}_deliver_interrupt() are very
-> > explicitly unnaccelerated injection.
-> 
-> Now that you highlight this, I think it might be closer to Paolo's idea. i.e.
-> a stat for the slow path on these can be contrasted/compared with the
-> kvm_apicv_accept_irq tracepoint that is hit on the fast path.  My initial
-> reaction would be to update a stat for the fast path, as a confirmation that
-> apicv is active which is how/why I typically use the kvm_apicv_accept_irq
-> tracepoint, but that becomes redundant by having the apicv_active stat on
-> PATCH 1.
-> 
-> So, if you don't think it is useful to have a general
-> apicv_unaccelerated_acccess counter, I can drop this patch.
-
-The one thing I can think of that might be somewhat interesting is when
-kvm_apic_send_ipi() is invoked to deliver an IPI.  If KVM manually sends the IPI,
-and IPI virtualization is enabled (on-by-default in AVIC, and an add-on feature
-for APICv), then it means IPI virtualization isn't doing it's job for whatever
-reason.  But even then, I'm doubt it's worth a stat, because it likely just means
-the guest is doing something weird, not that there's a problem in KVM.
+-- 
+Catalin
 
