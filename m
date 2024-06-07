@@ -1,250 +1,169 @@
-Return-Path: <kvm+bounces-19043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 605F18FF8A8
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 02:28:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1067D8FF9A3
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 03:38:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A89A7B2336F
-	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 00:28:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 087791C216FE
+	for <lists+kvm@lfdr.de>; Fri,  7 Jun 2024 01:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD9A4C80;
-	Fri,  7 Jun 2024 00:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B871610A24;
+	Fri,  7 Jun 2024 01:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+r1MyX3"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="l7LXbRY5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10olkn2056.outbound.protection.outlook.com [40.92.41.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA32C4C83;
-	Fri,  7 Jun 2024 00:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717720075; cv=none; b=lttYQID9tq9oOIlc1VYcBf79+kX2vu3RK25JYItHQoITQt/P3KGOclB8AtmWpSdxS9vc/jVgcev9nT4XW6zNKzsiNzqc2iKK6rYIzaJJ1IoIBnjQsGuJ89xGXgO/AF6idQnUpYcY10YMLK5RenHPHrPWbTYWWOjofq2VryVGA34=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717720075; c=relaxed/simple;
-	bh=FQTqwYknv8JIZqJzJar6YMQ0/CLZjse4O5WXBBaPRL0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nLyq69rdJcbKPeqXQwt5aP3A440Ue0uWmue++VUQqusmTWUsDgWQXyoXDlpAySf8p+XdSyxK0MjraT1RZT+giv1fwfLxHaZpgoZU7dbSvwWXH11UTjrH1tgNmp6zE88rHtxSSDdb7BWRCtFVhGJOjK6XF9MYKveOr4qJ5PjCbjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+r1MyX3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9061C2BD10;
-	Fri,  7 Jun 2024 00:27:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1717720074;
-	bh=FQTqwYknv8JIZqJzJar6YMQ0/CLZjse4O5WXBBaPRL0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A+r1MyX3DI9NOoncuFmLLFlvelMwJ4dRnFUGBcft7113VpTMnbRXrbRugLD+xjLoQ
-	 hVlly304fyXaMWlsk+r4AuIvuwNpnGDuB2cWQSLiQL1MvivwUEBKxN9lylgEB8j/U4
-	 PQOSnpZN+7+p/EB+SCem3gdr74mPo3NWVYi4/Jj9ooLP7jxdQ8K5sHPfULU41fG3cQ
-	 1u5yKMADsLAsBvb/oUdYBWAvsnolCGhhFqenE8o5ewWeTOv9QdbjoLtPv1V5K1jRUS
-	 s72yzQemjiN9VlcyrQgWsXRAhEdo8M+G1aHVz+LI1O/Q1l9S8P2KiAuyelH2UMnaTZ
-	 yzUr6Z3I7giKg==
-Date: Thu, 6 Jun 2024 17:27:52 -0700
-From: Namhyung Kim <namhyung@kernel.org>
-To: Shenlin Liang <liangshenlin@eswincomputing.com>
-Cc: anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com,
-	palmer@dabbelt.com, aou@eecs.berkeley.edu, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org, peterz@infradead.org,
-	mingo@redhat.com, acme@kernel.org, mark.rutland@arm.com,
-	alexander.shishkin@linux.intel.com, jolsa@kernel.org,
-	irogers@google.com, adrian.hunter@intel.com,
-	linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] perf kvm/riscv: Port perf kvm stat to RISC-V
-Message-ID: <ZmJUCJwavWXsesKn@google.com>
-References: <20240422080833.8745-1-liangshenlin@eswincomputing.com>
- <20240422080833.8745-3-liangshenlin@eswincomputing.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E22611184;
+	Fri,  7 Jun 2024 01:38:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.41.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1717724299; cv=fail; b=Xu9oV0MQfRXYkSEkbbCeVX0z/HrnpjyoY/8yP/wVcPBxKm7uzn1G9veadlyHWmdHV2IGv4xFGeC4oVJz4WR4qy7bPUp4l61NUyPP3w9iUQd2ajpPyjJISmPJPmio6NIlGpHCmh1GnlVr/6t6QfoapWutvWPRiuHlP8HVYnZtBpk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1717724299; c=relaxed/simple;
+	bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=o8AciQ9v7bhz/QOa7N/nkod/94u4d1c6buj0ggH+HQ7/MpFMPHihkf43aXNRjC6ZHKpxDb04gy+lW3VBP1Zq7G+EZbUNUHLny/UW8o4cDI/Qwdb8vhnqthsKPkFD3OhJj5Zov/dpkY/i6w3o8IeDYPxP3y5Tiqhtfls0bjeTurE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=l7LXbRY5; arc=fail smtp.client-ip=40.92.41.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ntot2qAoCvUZUDiWNXpgqWBl/jHX58QzQZFoeFnI1bnAGRQlgD19FgmABoEyX0IER3YuVKMEXyo2XKHRT8r30zTlEHfo7fbi6nPIeyuRlmNmLnTtahEkvPy0fWtEhykW7JWGWYRqfEj7D7l+0vXme21IwZThRWg+cGqbd60AG2TI9h+yIa6giDgqRPVfnBIW8ftuh/1NrYNDe7/qZZinz/YlTRuIExlBGVluMSwkhuKNotdc1/aNOxTwSr55xkfWpsmaJAYGmO+hj8zACLBxb2TdEJE4hB+7L7GLtKNuZ1VPY+cswNI1REh1pGHNyhIV6HLsYPZWcy4Eh+vVw2NvXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
+ b=VNo1uwdvngjG3eqLQVoMOvEQYG+HBsotenfgV4d95VJ56Nfw+O2hlEC5m2XYHpzRyj3lF5wuN2/p/Kd8P5/UGWcxmHjR8EsVQ4rIJzSQ4UkJxNxQ1IMdWj7wRaA+qAqxdcHbsErzL7ySEo/yxgdG+2EBN3gq6r6FW1nom38fHJ+lDSSYJPR3qdn8QqTNeJIkMn2gDGKW/xswz6qmOdZ5eUztFMh3fJFwhVBRkMSlZgMgaOUZHeZFzW5sQbt/j6qFMSiXP+cVoiNm2+8NSu061XLTDxKPijdYKEQJDP43xzyczbq+ghxCIdsyAZjXQ4L9+FNIapGPYkxtJA9E/ofFYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5XpPkbvngXUaPP3NdW8EPhNhmfOtRtSATCoMfb//js4=;
+ b=l7LXbRY5JOQtaAO60NcHt2Y+aFAtzLWwjdpZBoUmwxW/G936nOSIkFQqcI+eROdX7cxuBeragUK3EcgEuVGb/9EIgOAN4+e+aY3F0/+E+Ntaz1tngUiqpWsFRxk+qnuCzIPmgMmQHYxqE3WZOZB4li77BTccH1xz49sOMpy/CCR3f0+gmF7sJ3SMfr/k3YJJy6Z5rGFaMzh3IAy/0xOwtz6v22sf4uwZn5/Ch3G8OzkFc0TtG0DygkLwRL3cgN0Lrz6ExKtTgLmAa8cE6AQAlwS/u0WSrPpL9LxqLHMgmr9ViE/Oz3xCdjEp7EP45SwltzXpq9c7a/32QgqMrUzDFg==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by CO1PR02MB8444.namprd02.prod.outlook.com (2603:10b6:303:157::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.34; Fri, 7 Jun
+ 2024 01:38:15 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df%2]) with mapi id 15.20.7633.033; Fri, 7 Jun 2024
+ 01:38:15 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Steven Price <steven.price@arm.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+CC: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>, Oliver
+ Upton <oliver.upton@linux.dev>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Alexandru
+ Elisei <alexandru.elisei@arm.com>, Christoffer Dall
+	<christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Ganapatrao
+ Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: RE: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
+Thread-Topic: [PATCH v3 00/14] arm64: Support for running as a guest in Arm
+ CCA
+Thread-Index: AQHatysPRYaUedD8SEOOWptuNOqVvrG7hVGQ
+Date: Fri, 7 Jun 2024 01:38:15 +0000
+Message-ID:
+ <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+In-Reply-To: <20240605093006.145492-1-steven.price@arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-tmn: [/7FyMFN+y6wC9bfMlT+Cd92p6p6XTb/g]
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|CO1PR02MB8444:EE_
+x-ms-office365-filtering-correlation-id: 22786f91-1838-422e-9d70-08dc86927fff
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|461199019|440099019|102099023|3412199016;
+x-microsoft-antispam-message-info:
+ x/I/eIR+yY3VrxuEnEJw313RHYshF9LluWWy8KY3jwWYFo3GkGqicEvvR7yj9gDtdJvnHYF+GrvDT1K8cUsoO6wxaCDJxlH2rgxWRjHodMx8hf/wYKQsae14V4gB8T66dscsEqrow0tl7jAnd6Zbq5WwaIlaWuHrCDZ8hJ5OXIatdcHHdqisxEmOiLT/6jxBBMe/2h3dodSW5wVXDgmxjxnazSUB+QxUGBk9eWtNqgVsneStb9Ni1y4BHpKhpmBz1U5WqmoPw/n2bCSVF9LL+4h4EdfeMNkVoBg86z6NquXLBJ0i7zHfQKgd++S22SVFcxrfpOgrHNMEyj12MjfPbwA1YLTw5k5EsEdp0CvKVnSfNCUCRjQ2GwWILcig7yIRosVpfzJLtyVXi5qEHEpLOQpVl9yWNv3UvuH6eRZU/ERNOynn1hJHA+dB+f70XLP8BAaD8/LnqHrpJrC2h5Bh4JvGnv3OC+zEdpGt0m/lzIz/TUqqvr3QLT28HEVjwlV+JiwPMI3z/3KQNj/LKesV5kat61LSwVO8uJKf6FJUbqzrbSt6JCXR22bGdHWsz67E
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?b1WVjQngpjHiXVDKPGCvthQx4dWxcjWRnsCSfwDSCgVvR4qRcDCqKNJkqnaz?=
+ =?us-ascii?Q?LsLqwQa7AjeD8lns1CLyxNbYj5GbgYDRWOduoNxwB23bDlGQHqF3eW5bsF8S?=
+ =?us-ascii?Q?5B7XS1CBcz6p38wIEU82JeWoYCxQARc0y7P58C3CjMefp8G98L1xH3Sc3oX6?=
+ =?us-ascii?Q?G8Lp3s/u1l34+1pcEw77mwr2wRbD8xIA/DOB/Ole2akVp445wG7NxZK8621I?=
+ =?us-ascii?Q?pbqW7ONlK2Rg58Uy7h9IuMFWhr/VKftI5aeyylNWBbyhD2WX7PQ+MWL/SVGb?=
+ =?us-ascii?Q?7pbSh7UQdnzjN0Oqa8huOi65KjrH4rUrcNyw2/dHZCMlGFyygKyV+jZ9JGC+?=
+ =?us-ascii?Q?swnU1lNEF1qquTBFNM1bgnrK//nhKkGF6Tt3UOjBE52zhylWHISoklnd38J8?=
+ =?us-ascii?Q?kP5nanAvpWuUiMPv8p7pwWBEP3igRuXnuU9b2YZWJtHQXwc2rcmmITUoEFLd?=
+ =?us-ascii?Q?EoVB/Zm/rF4CnZ86FN+zwVW21ixFHeXaFjnGdN+h/tMEAHY9hg1xjR7ReaJd?=
+ =?us-ascii?Q?J8yHqgm8zazezfiUilZJ3vkIcE5OhAx17v8p1ggxIwQcTGnyCe+x8EwKbCbH?=
+ =?us-ascii?Q?avScC35I2LfvdotwBWBlH2GG/VrYurFvtikLJ+novib1aNoPBrG57RzNaT1t?=
+ =?us-ascii?Q?9TvhTsdyAkW4QnNdoag9YR9HQIitd8DRhIma4PVSn44kPyLHLP0fVC7xDPQS?=
+ =?us-ascii?Q?/QKjU304A7hyxDvqskhulH6g9eJQRrpECWr2N+Sf9EQ0VBjpw0UM0Deh9e5E?=
+ =?us-ascii?Q?1Aorj4GPIHpG+XBUw+GR/mIHDm4MJULbUd/xUFe5KcD8DA0+UnvI9Ola9+ZY?=
+ =?us-ascii?Q?zlpDf/WOrNVpunYqcI5MdLQQgsVCzQ9ibg34/0w2/y/sJA+J/8Y20YuCy7Eh?=
+ =?us-ascii?Q?58vFY32EkelIMxz89FX8D3wOv3MHli/jzZy7YA99F/CIPY9tV2iJiWdRn8Zo?=
+ =?us-ascii?Q?2wFzvfAvvOtuXLX3s2RdS6bPBmpg2k6fC+wCZ1umnxBg01XHqLat6A2WV9BG?=
+ =?us-ascii?Q?18a4U4U5NqW0WME18+FTQ1GR/GwG5B5HFAPLVD0waeie8EQBBsUil9MlYHXx?=
+ =?us-ascii?Q?HM/+afdwmwBXG4nGglkD/6SB8HYM9iJ+LFryRFWbAGib5yqcVByzIjkrA6if?=
+ =?us-ascii?Q?x/dVsEg63Id+Kci8Omd/N/nYnVSYHiMrTzAjBUvhcfhH3V3kqy/6ZhDSl5tF?=
+ =?us-ascii?Q?XfldcyJEQLbnZxfiQF9wNTKC9azoaVIIlDG4dkCLHuN/znY6urlZHxV/MB8?=
+ =?us-ascii?Q?=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240422080833.8745-3-liangshenlin@eswincomputing.com>
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22786f91-1838-422e-9d70-08dc86927fff
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2024 01:38:15.0530
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR02MB8444
 
-Hello,
+From: Steven Price <steven.price@arm.com> Sent: Wednesday, June 5, 2024 2:3=
+0 AM
+>=20
+> This series adds support for running Linux in a protected VM under the
+> Arm Confidential Compute Architecture (CCA). This has been updated
+> following the feedback from the v2 posting[1]. Thanks for the feedback!
+> Individual patches have a change log for v3.
+>=20
+> The biggest change from v2 is fixing set_memory_{en,de}crypted() to
+> perform a break-before-make sequence. Note that only the virtual address
+> supplied is flipped between shared and protected, so if e.g. a vmalloc()
+> address is passed the linear map will still point to the (now invalid)
+> previous IPA. Attempts to access the wrong address may trigger a
+> Synchronous External Abort. However any code which attempts to access
+> the 'encrypted' alias after set_memory_decrypted() is already likely to
+> be broken on platforms that implement memory encryption, so I don't
+> expect problems.
 
-On Mon, Apr 22, 2024 at 08:08:33AM +0000, Shenlin Liang wrote:
-> 'perf kvm stat report/record' generates a statistical analysis of KVM
-> events and can be used to analyze guest exit reasons.
-> 
-> "report" reports statistical analysis of guest exit events.
-> 
-> To record kvm events on the host:
->  # perf kvm stat record -a
-> 
-> To report kvm VM EXIT events:
->  # perf kvm stat report --event=vmexit
-> 
-> Signed-off-by: Shenlin Liang <liangshenlin@eswincomputing.com>
-> ---
->  tools/perf/arch/riscv/Makefile                |  1 +
->  tools/perf/arch/riscv/util/Build              |  1 +
->  tools/perf/arch/riscv/util/kvm-stat.c         | 79 +++++++++++++++++++
->  .../arch/riscv/util/riscv_exception_types.h   | 35 ++++++++
->  4 files changed, 116 insertions(+)
->  create mode 100644 tools/perf/arch/riscv/util/kvm-stat.c
->  create mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
-> 
-> diff --git a/tools/perf/arch/riscv/Makefile b/tools/perf/arch/riscv/Makefile
-> index a8d25d005207..e1e445615536 100644
-> --- a/tools/perf/arch/riscv/Makefile
-> +++ b/tools/perf/arch/riscv/Makefile
-> @@ -3,3 +3,4 @@ PERF_HAVE_DWARF_REGS := 1
->  endif
->  PERF_HAVE_ARCH_REGS_QUERY_REGISTER_OFFSET := 1
->  PERF_HAVE_JITDUMP := 1
-> +HAVE_KVM_STAT_SUPPORT := 1
-> \ No newline at end of file
-> diff --git a/tools/perf/arch/riscv/util/Build b/tools/perf/arch/riscv/util/Build
-> index 603dbb5ae4dc..d72b04f8d32b 100644
-> --- a/tools/perf/arch/riscv/util/Build
-> +++ b/tools/perf/arch/riscv/util/Build
-> @@ -1,5 +1,6 @@
->  perf-y += perf_regs.o
->  perf-y += header.o
->  
-> +perf-$(CONFIG_LIBTRACEEVENT) += kvm-stat.o
->  perf-$(CONFIG_DWARF) += dwarf-regs.o
->  perf-$(CONFIG_LIBDW_DWARF_UNWIND) += unwind-libdw.o
-> diff --git a/tools/perf/arch/riscv/util/kvm-stat.c b/tools/perf/arch/riscv/util/kvm-stat.c
-> new file mode 100644
-> index 000000000000..58813049fc45
-> --- /dev/null
-> +++ b/tools/perf/arch/riscv/util/kvm-stat.c
-> @@ -0,0 +1,79 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Arch specific functions for perf kvm stat.
-> + *
-> + * Copyright 2024 Beijing ESWIN Computing Technology Co., Ltd.
-> + *
-> + */
-> +#include <errno.h>
-> +#include <memory.h>
-> +#include "../../../util/evsel.h"
-> +#include "../../../util/kvm-stat.h"
-> +#include "riscv_exception_types.h"
-> +#include "debug.h"
-> +
-> +define_exit_reasons_table(riscv_exit_reasons, kvm_riscv_exception_class);
-> +
-> +const char *vcpu_id_str = "id";
-> +const char *kvm_exit_reason = "scause";
-> +const char *kvm_entry_trace = "kvm:kvm_entry";
-> +const char *kvm_exit_trace = "kvm:kvm_exit";
-> +
-> +const char *kvm_events_tp[] = {
-> +	"kvm:kvm_entry",
-> +	"kvm:kvm_exit",
-> +	NULL,
-> +};
-> +
-> +static void event_get_key(struct evsel *evsel,
-> +			  struct perf_sample *sample,
-> +			  struct event_key *key)
-> +{
-> +	key->info = 0;
-> +	key->key = evsel__intval(evsel, sample, kvm_exit_reason);
-> +	key->key = (int)key->key;
+In the case of a vmalloc() address, load_unaligned_zeropad() could still
+make an access to the underlying pages through the linear address. In
+CoCo guests on x86, both the vmalloc PTE and the linear map PTE are
+flipped, so the load_unaligned_zeropad() problem can occur only during
+the transition between decrypted and encrypted. But even then, the
+exception handlers have code to fixup this case and allow everything to
+proceed normally.
 
-Looks unnecessary..
+I haven't looked at the code in your patches, but do you handle that case,
+or somehow prevent it?
 
 Thanks,
-Namhyung
+
+Michael
 
 
-> +	key->exit_reasons = riscv_exit_reasons;
-> +}
-> +
-> +static bool event_begin(struct evsel *evsel,
-> +			struct perf_sample *sample __maybe_unused,
-> +			struct event_key *key __maybe_unused)
-> +{
-> +	return evsel__name_is(evsel, kvm_entry_trace);
-> +}
-> +
-> +static bool event_end(struct evsel *evsel,
-> +		      struct perf_sample *sample,
-> +		      struct event_key *key)
-> +{
-> +	if (evsel__name_is(evsel, kvm_exit_trace)) {
-> +		event_get_key(evsel, sample, key);
-> +		return true;
-> +	}
-> +	return false;
-> +}
-> +
-> +static struct kvm_events_ops exit_events = {
-> +	.is_begin_event = event_begin,
-> +	.is_end_event	= event_end,
-> +	.decode_key	= exit_event_decode_key,
-> +	.name		= "VM-EXIT"
-> +};
-> +
-> +struct kvm_reg_events_ops kvm_reg_events_ops[] = {
-> +	{
-> +		.name	= "vmexit",
-> +		.ops	= &exit_events,
-> +	},
-> +	{ NULL, NULL },
-> +};
-> +
-> +const char * const kvm_skip_events[] = {
-> +	NULL,
-> +};
-> +
-> +int cpu_isa_init(struct perf_kvm_stat *kvm, const char *cpuid __maybe_unused)
-> +{
-> +	kvm->exit_reasons_isa = "riscv64";
-> +	return 0;
-> +}
-> diff --git a/tools/perf/arch/riscv/util/riscv_exception_types.h b/tools/perf/arch/riscv/util/riscv_exception_types.h
-> new file mode 100644
-> index 000000000000..c49b8fa5e847
-> --- /dev/null
-> +++ b/tools/perf/arch/riscv/util/riscv_exception_types.h
-> @@ -0,0 +1,35 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#ifndef ARCH_PERF_RISCV_EXCEPTION_TYPES_H
-> +#define ARCH_PERF_RISCV_EXCEPTION_TYPES_H
-> +
-> +#define EXC_INST_MISALIGNED 0
-> +#define EXC_INST_ACCESS 1
-> +#define EXC_INST_ILLEGAL 2
-> +#define EXC_BREAKPOINT 3
-> +#define EXC_LOAD_MISALIGNED 4
-> +#define EXC_LOAD_ACCESS 5
-> +#define EXC_STORE_MISALIGNED 6
-> +#define EXC_STORE_ACCESS 7
-> +#define EXC_SYSCALL 8
-> +#define EXC_HYPERVISOR_SYSCALL 9
-> +#define EXC_SUPERVISOR_SYSCALL 10
-> +#define EXC_INST_PAGE_FAULT 12
-> +#define EXC_LOAD_PAGE_FAULT 13
-> +#define EXC_STORE_PAGE_FAULT 15
-> +#define EXC_INST_GUEST_PAGE_FAULT 20
-> +#define EXC_LOAD_GUEST_PAGE_FAULT 21
-> +#define EXC_VIRTUAL_INST_FAULT 22
-> +#define EXC_STORE_GUEST_PAGE_FAULT 23
-> +
-> +#define EXC(x) {EXC_##x, #x }
-> +
-> +#define kvm_riscv_exception_class                                         \
-> +	EXC(INST_MISALIGNED), EXC(INST_ACCESS), EXC(INST_ILLEGAL),         \
-> +	EXC(BREAKPOINT), EXC(LOAD_MISALIGNED), EXC(LOAD_ACCESS),           \
-> +	EXC(STORE_MISALIGNED), EXC(STORE_ACCESS), EXC(SYSCALL),            \
-> +	EXC(HYPERVISOR_SYSCALL), EXC(SUPERVISOR_SYSCALL),                  \
-> +	EXC(INST_PAGE_FAULT), EXC(LOAD_PAGE_FAULT), EXC(STORE_PAGE_FAULT), \
-> +	EXC(INST_GUEST_PAGE_FAULT), EXC(LOAD_GUEST_PAGE_FAULT),            \
-> +	EXC(VIRTUAL_INST_FAULT), EXC(STORE_GUEST_PAGE_FAULT)
-> +
-> +#endif /* ARCH_PERF_RISCV_EXCEPTION_TYPES_H */
-> -- 
-> 2.37.2
-> 
 
