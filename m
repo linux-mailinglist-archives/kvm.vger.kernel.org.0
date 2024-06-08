@@ -1,117 +1,126 @@
-Return-Path: <kvm+bounces-19113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19114-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6097D900EC4
-	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 02:11:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 648F2901092
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 10:52:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C91682811F7
-	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 00:11:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7990281789
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 08:52:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658EA28E7;
-	Sat,  8 Jun 2024 00:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B50C176FC6;
+	Sat,  8 Jun 2024 08:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TILMNDrX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JciWSY2g"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE7A17C8
-	for <kvm@vger.kernel.org>; Sat,  8 Jun 2024 00:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DE12BAE9
+	for <kvm@vger.kernel.org>; Sat,  8 Jun 2024 08:52:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717805472; cv=none; b=YCYWJdBv8IGdRx6wSHd8mBBSOzjfsNZZn1/F+ZLBUORnG0BWsQnwXFxuKbS+7JHSaeULbPIP5yIJxwmYhZ4ZwWmngvRsnzIMMzrN2pNL/3PEGOpofmLmw8+kk3C93dnr9nWZThjlrVkx0vMJ2z1DjR7XuHtsmbRiNnWS6LPBErE=
+	t=1717836763; cv=none; b=V2pBpZse5yod+DWDauUhyDoTOqcPT0STFi5kdEQj8hKC45fwtfBXgAigBRxo3LIqMkQgKgnUv1zhSWiLsF8WQan4jlMB7j72bq7k45VqAA84pYkNZO/cXfHfUd6Oo3v+0tTMVp4WAA/4E5sY7CKn+F0B/gxmWl8KE6NliJ8OpGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717805472; c=relaxed/simple;
-	bh=vWPGDr0VAOnNNuqxYO9KemOUnDeq1bzz8spYQseOLoQ=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=csB1+dOGBC+9FpFOeCwlqULdY6/iGbm4zwjqg1CqX3s2USI3/4SOLTKRtKJWfsvJA92N5+5qVyKANUapY9goDgORztwooMBBGXxI5bHCjfHGgCEjnFcbutu7HKoMaIYk73s1m3jvlf6zzlNSpN9rGT3uSxOKg1MbVq13V+pujIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TILMNDrX; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6fc395e8808so2542877b3a.0
-        for <kvm@vger.kernel.org>; Fri, 07 Jun 2024 17:11:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717805471; x=1718410271; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z1D7CxmQOWEB+afJq8q/LjLb1nA3G9jvJYdupVYkAuw=;
-        b=TILMNDrXFVEhm9Rf/NiMcpZDXlaxqwagc4Dy3EtW0YecdSVAJxCtfkLMScMHs6Z8Da
-         +5X19Y0Af64RxgVLOcxT9Ajq8z2j2oJD85YvL0WPYWqsFjBfUqHjdA6Sg6dJI2MsaA94
-         /0wlQ9HS+c6uh5nz/vUiHMQYBz6P/A4KDdwyxhPYHpu8c4VlVREEWV66i7Tj9NvgyeoD
-         MDg3Sv56PiNuHtg4SPlzvqKqa+wUCLYb75Ux4ZA3rzUGRJdhnqSuZepwnljAw7/Ws5A3
-         n1KfiiJDIgTb4ChRfiNf9QYONZilLYwLh0MMsIuG9G+RF6b/HeC+tWqOdf3WWsB6Ebh2
-         sZmA==
+	s=arc-20240116; t=1717836763; c=relaxed/simple;
+	bh=j/pc0aDSaoMD5Z4FefrtiCAvHYjnJdayUYaFlXoI2g8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ArBBbziEKAfkkkiQrpjYZl3i+6j69cVVQQtnP0W+nok/6a7S9ikMFrjhGieBtBp3wfJwj1tzLkyJVL59rMa8vihJP1YoGZGdcIIffsR378OitAwl6JM4XjL7TrUrjqO/SrtPkFTAKVrK8lBVIlez+Zik4ZrOBn/zVG1qe6sx5ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JciWSY2g; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1717836760;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JE0Afv2+MSIgjGY50KIS26TxZdTfOBnblGzJXPbJMP0=;
+	b=JciWSY2ghwTGS23T6lpVfZnfiB0E23r0SrSZ2J60kymSZGINlMdZ7KX3APsYjp3ggwGM/a
+	jP/nPZ59LIv9GOtDxzFixBCiAX3YHWrqcvXjmKMgWijeEQ9lWvc6dTxkoyMlrmBo8cHZuC
+	2vFu4iQDWQc5HiUdA94o2wf4FJU0ZHU=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-94-fBHy992DMwyiXa6zBL5AKg-1; Sat, 08 Jun 2024 04:52:39 -0400
+X-MC-Unique: fBHy992DMwyiXa6zBL5AKg-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso2277751a12.0
+        for <kvm@vger.kernel.org>; Sat, 08 Jun 2024 01:52:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717805471; x=1718410271;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z1D7CxmQOWEB+afJq8q/LjLb1nA3G9jvJYdupVYkAuw=;
-        b=i+VF/CWZtVb5sBCPXCGDTFpNE9tNS9CX46ry3tjKv9hd/acRwCEIWAFzEXRwoFsbcL
-         FpQQm/joJmIJVWA5JBq3YePNiQv+kvfXy4BlL6xQXU/vb0bfxK1Y80A+6Rev8rgEJa3c
-         75nNL2sq9bcp9hVsq/MVBseTo8H5A6EzOZ+f6zuFGVpGL722KJcZgu3Xz3uLQQGYLbRm
-         1Hgue/evthuEyfI8Zdwyf098RqvMMZIbFAPy5TXBGb1j70VyoTX0KUVmDEHl8teIvFOg
-         n7EJGkmgICUt2K963fh8IJVafvIHcmArPgPLBF4RyB3G+GjOq2NSp9umf45XU9S0U2iU
-         UtQw==
-X-Gm-Message-State: AOJu0YxXotfUa6OV5gIzBbXuQRtXRTGIWy+b9ozjQV3HZggaKihixh7Y
-	bo0vqosaHMw+W5rMglQvJe4bgYOa0mOtwWlINn0Z1hx8uf2lsn3zySyvnLvRpcxfQ0tv4pAljf+
-	RQQ==
-X-Google-Smtp-Source: AGHT+IG9PBzMAAZoiZyf0Ifd3jc9ODlYrgfiGByUvwS7iZ7SJgKLrOSsaQR9jZWzB7+o1o0N9vRC0QHSiDE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:2e9c:b0:702:2ab4:b12f with SMTP id
- d2e1a72fcca58-7040c708fa2mr16072b3a.2.1717805470628; Fri, 07 Jun 2024
- 17:11:10 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  7 Jun 2024 17:11:08 -0700
+        d=1e100.net; s=20230601; t=1717836758; x=1718441558;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JE0Afv2+MSIgjGY50KIS26TxZdTfOBnblGzJXPbJMP0=;
+        b=k/8HWicOolVML8rJZxlqrBlQTQeKheZ0xja+x3USLZ/PJJPR0ZGOpmhs7vZh8rEBq8
+         mtS2fXvIxCDE1jtS5wLyRzCd0WQRJMhwaZSlzEX1gR7LFXCv8H8kPjp6dcX+RueLsw/O
+         Uwt+jmDSmj5ELzp2G8Fds4KkitUQeG0BMoM2eruvJzysIOFbJMS8sSlt4Q3ekyewdJ8R
+         aoBjpS2uebfD2aAuoZE/ogPZPgOGchXlXsqGv44L1Wl9SQHHGjVqGfxqBZlKrF6/eNVp
+         fQzAAS/vEE1wqTd4J2oZ2xqL50asxwlp7JjE50x5uoO3aNxy1r530oTfPetdCnYeFlcx
+         Hn4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVfU4QmPACJQ/I32UMs2xXv3IB5YMGjdIMl1TYZNUD0wpNGPrdooOklu5TFHXeXy282YQNLjHbocknUXp6jVkYTpUl3
+X-Gm-Message-State: AOJu0YziUpMz4DBs8+JFrHOkR1C2yueTHUxGbGu/YlJj/ns0bQ7TZkuY
+	6eWDC8CK4cerkyQIosgMnYs6Y3bB+BBfmBhaZU+sUzgIAiEM4Ne8y/y+85E2EK6EuDwmRfE103S
+	Xhfsb02YuXBc9Yw7Guo8FTxHrIXtjLQsP30Wok2fki2SrrznVISHg6rfzsDoGDEEpJSH1WcgEvq
+	zi1/pR75sPBdnOZZrtwjqHp1i9
+X-Received: by 2002:a17:90a:528e:b0:2c0:d4d:837 with SMTP id 98e67ed59e1d1-2c2b89aadbemr6759879a91.12.1717836758247;
+        Sat, 08 Jun 2024 01:52:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEvKkEGPHZgVnVRswnvyZIOkK63ksDBuLzbYBh/cydVgzI1vSizf/xTfkrdJb3on2BinrUqcswJtL+NkIA7mUs=
+X-Received: by 2002:a17:90a:528e:b0:2c0:d4d:837 with SMTP id
+ 98e67ed59e1d1-2c2b89aadbemr6759862a91.12.1717836757895; Sat, 08 Jun 2024
+ 01:52:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
-Message-ID: <20240608001108.3296879-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86/mmu: Rephrase comment about synthetic PFERR flags in
- #PF handler
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Xiaoyao Li <xiaoyao.li@intel.com>
+MIME-Version: 1.0
+References: <20240530210714.364118-1-rick.p.edgecombe@intel.com>
+ <20240530210714.364118-7-rick.p.edgecombe@intel.com> <CABgObfZuv45Bphz=VLCO4AF=W+iQbmMbNVk4Q0CAsVd+sqfJLw@mail.gmail.com>
+ <9423e6b83523c0a3828a88f38ffc3275a08e11dd.camel@intel.com>
+In-Reply-To: <9423e6b83523c0a3828a88f38ffc3275a08e11dd.camel@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 8 Jun 2024 10:52:24 +0200
+Message-ID: <CABgObfYmt+U5O4eawBqFudSCz8PBZMYs4vv=qRQzOc7+Htnr7w@mail.gmail.com>
+Subject: Re: [PATCH v2 06/15] KVM: x86/mmu: Support GFN direct mask
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai" <kai.huang@intel.com>, 
+	"sagis@google.com" <sagis@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Aktas, Erdem" <erdemaktas@google.com>, 
+	"Zhao, Yan Y" <yan.y.zhao@intel.com>, "dmatlack@google.com" <dmatlack@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reword the BUILD_BUG_ON() comment in the legacy #PF handler to explicitly
-describe how asserting that synthetic PFERR flags are limited to bits 31:0
-protects KVM against inadvertently passing a synthetic flag to the common
-page fault handler.
+On Fri, Jun 7, 2024 at 8:39=E2=80=AFPM Edgecombe, Rick P
+<rick.p.edgecombe@intel.com> wrote:
+> > > +       return kvm_gfn_direct_mask(kvm);
+> >
+> > Ok, please excuse me again for being fussy on the naming. Typically I
+> > think of a "mask" as something that you check against, or something
+> > that you do x &~ mask, not as something that you add. Maybe
+> > kvm_gfn_root_offset and gfn_direct_offset?
+>
+> As for the name, I guess I'd be less keen on "offset" because it's not cl=
+ear
+> that it is a power-of-two value that can be used with bitwise operations.
+>
+> I'm not sure what the "fixed" adds and it makes it longer. Also, many PTE=
+ bits
+> cannot be moved and they are not referred to as fixed, where the shared b=
+it
+> actually *can* be moved via GPAW (not that the MMU code cares about that
+> though).
+>
+> Just "bits" sounds better to me, so maybe I'll try?
+> kvm_gfn_direct_bits()
+> kvm_gfn_root_bits()
 
-No functional change intended.
+Yep, kvm_gfn_direct_bits and kvm_gfn_root_bits are good.
 
-Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8d7115230739..2421d971ce1b 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4599,7 +4599,10 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 	if (WARN_ON_ONCE(error_code >> 32))
- 		error_code = lower_32_bits(error_code);
- 
--	/* Ensure the above sanity check also covers KVM-defined flags. */
-+	/*
-+	 * Restrict KVM-defined flags to bits 63:32 so that it's impossible for
-+	 * them to conflict with #PF error codes, which are limited to 32 bits.
-+	 */
- 	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
- 
- 	vcpu->arch.l1tf_flush_l1d = true;
-
-base-commit: b9adc10edd4e14e66db4f7289a88fdbfa45ae7a8
--- 
-2.45.2.505.gda0bf45e8d-goog
+Paolo
 
 
