@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-19112-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19113-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184AE900EBC
-	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 02:10:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6097D900EC4
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 02:11:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A50B4B220BB
-	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 00:10:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C91682811F7
+	for <lists+kvm@lfdr.de>; Sat,  8 Jun 2024 00:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA251FDA;
-	Sat,  8 Jun 2024 00:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658EA28E7;
+	Sat,  8 Jun 2024 00:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zGMjgRM0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TILMNDrX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9737F
-	for <kvm@vger.kernel.org>; Sat,  8 Jun 2024 00:10:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE7A17C8
+	for <kvm@vger.kernel.org>; Sat,  8 Jun 2024 00:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717805408; cv=none; b=qvdElCNR5yM9gIM32Z3cbT4+6IrdX7Qd8AlMFjfxZI6Almn7oNLiNucEyLSbBglTVqDEhmp8tXOxyg1nY/kkZMKvlqicnay/7psyx572wAZHNZAupsk4IY+s9rmfJM86Bq1AoroAZ26OzPCiwnTBizWkwqsYcCgF0zk5+2+muQA=
+	t=1717805472; cv=none; b=YCYWJdBv8IGdRx6wSHd8mBBSOzjfsNZZn1/F+ZLBUORnG0BWsQnwXFxuKbS+7JHSaeULbPIP5yIJxwmYhZ4ZwWmngvRsnzIMMzrN2pNL/3PEGOpofmLmw8+kk3C93dnr9nWZThjlrVkx0vMJ2z1DjR7XuHtsmbRiNnWS6LPBErE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717805408; c=relaxed/simple;
-	bh=W4obiWieTwX8XIqKNFsDLPnp7HqRk5M9sGKeUadzy3I=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=JkQT9pv466aUkeXecuEhTQRc82AHqKot3XyruFJPzqOZasd1iKV+88gSEZu55iupmvyly9N3TMWdvaxqZxtjNGTHiBVbpK62ILsHTe6d+4XhpF9y7wzYt//NcKRw7HK6aUsDbC8I+1Pun6bJYaLJe0JSL3cqmM/RNYeOgsWNVYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zGMjgRM0; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1717805472; c=relaxed/simple;
+	bh=vWPGDr0VAOnNNuqxYO9KemOUnDeq1bzz8spYQseOLoQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=csB1+dOGBC+9FpFOeCwlqULdY6/iGbm4zwjqg1CqX3s2USI3/4SOLTKRtKJWfsvJA92N5+5qVyKANUapY9goDgORztwooMBBGXxI5bHCjfHGgCEjnFcbutu7HKoMaIYk73s1m3jvlf6zzlNSpN9rGT3uSxOKg1MbVq13V+pujIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TILMNDrX; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62a27e501d4so45149557b3.3
-        for <kvm@vger.kernel.org>; Fri, 07 Jun 2024 17:10:06 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6fc395e8808so2542877b3a.0
+        for <kvm@vger.kernel.org>; Fri, 07 Jun 2024 17:11:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1717805405; x=1718410205; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1717805471; x=1718410271; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ovNDgtVbmisuBeW7HmpFAvacvLNy1ePjizPveBsLPr4=;
-        b=zGMjgRM0JVdzKI3YauzLyVFHID61kfaD4ZAmvVlRbwmc4uP+n+mt+U5v+r6dgU0x2T
-         /MuQxz/hFgGRF/ANZbC3J3+BaRoxnxgZv9QZNAflTn6M4C3fGVYo2GDt6UnhEoEDJiAc
-         UtZ30tXXyE6hFzIpkqcfyAg6UVKV8QvWMTinCfFT0LwL0PZirTdDlu8hP8zPUa5RpXp9
-         wVlbcaSCCwqi87E3CiuCcYKoNie/PJ4sowXFfEnsWqlt9z2SlCBE/2m60w06FRqx0rSb
-         VUyDLjZytxeUYOkzd1LIOvqzb9Qv1i2Isl/jbM3FRL6oA6/v4a/u9o6dx3B9KRYZ6224
-         mMVw==
+        bh=Z1D7CxmQOWEB+afJq8q/LjLb1nA3G9jvJYdupVYkAuw=;
+        b=TILMNDrXFVEhm9Rf/NiMcpZDXlaxqwagc4Dy3EtW0YecdSVAJxCtfkLMScMHs6Z8Da
+         +5X19Y0Af64RxgVLOcxT9Ajq8z2j2oJD85YvL0WPYWqsFjBfUqHjdA6Sg6dJI2MsaA94
+         /0wlQ9HS+c6uh5nz/vUiHMQYBz6P/A4KDdwyxhPYHpu8c4VlVREEWV66i7Tj9NvgyeoD
+         MDg3Sv56PiNuHtg4SPlzvqKqa+wUCLYb75Ux4ZA3rzUGRJdhnqSuZepwnljAw7/Ws5A3
+         n1KfiiJDIgTb4ChRfiNf9QYONZilLYwLh0MMsIuG9G+RF6b/HeC+tWqOdf3WWsB6Ebh2
+         sZmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1717805405; x=1718410205;
+        d=1e100.net; s=20230601; t=1717805471; x=1718410271;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ovNDgtVbmisuBeW7HmpFAvacvLNy1ePjizPveBsLPr4=;
-        b=TP+++prGsvPhziAcsXBFNX4QluUox59WTXLZu+fPhjiFgSkPn9NRdjbP94A/UfEQ55
-         fG199fEXXuEQHxsb0XG6wjbTCsfO8l8qKbyCLZzZUfNVNo1/lK3hPqhwfPwaIXvz03WJ
-         oyDq+Y3dt7kWNlNXvaYQbDkFPXxwwEj16FIu3uJHa/MH/tKzCjPGAutgaXq7OPVumV0Q
-         2f+6kvkDIfcxlgHZm4U3YbnIrzI8XJNR3O0SogYwSUuAqFzbdNRrIe5TeKK/vTu9NtPv
-         eIQiWgqiHlhtN/2vUz6bFiu2sFD0LRwuTi8oIVAxw69IFEwbphkJneq3dRWWw9J04SwT
-         qMvQ==
-X-Gm-Message-State: AOJu0YzKBb378+3hsgLUWtqG5D42Y/yWM+iIl4oP0+YQfpPpugKy5bbG
-	cY+RsY/5tjpC5wsoRavH0rfyTgT9bECt5TkZM324ThBQr7ANj7Pj0J8/UkVCKSfGxiozkFOOxm4
-	ogw==
-X-Google-Smtp-Source: AGHT+IGCFQlXppceAobvWJ0ws2hb75J4/DwIiNLGsm2o8FxFFflMMK+TT9IocPOq0aInmGSc//ZDlrCDb2o=
+        bh=Z1D7CxmQOWEB+afJq8q/LjLb1nA3G9jvJYdupVYkAuw=;
+        b=i+VF/CWZtVb5sBCPXCGDTFpNE9tNS9CX46ry3tjKv9hd/acRwCEIWAFzEXRwoFsbcL
+         FpQQm/joJmIJVWA5JBq3YePNiQv+kvfXy4BlL6xQXU/vb0bfxK1Y80A+6Rev8rgEJa3c
+         75nNL2sq9bcp9hVsq/MVBseTo8H5A6EzOZ+f6zuFGVpGL722KJcZgu3Xz3uLQQGYLbRm
+         1Hgue/evthuEyfI8Zdwyf098RqvMMZIbFAPy5TXBGb1j70VyoTX0KUVmDEHl8teIvFOg
+         n7EJGkmgICUt2K963fh8IJVafvIHcmArPgPLBF4RyB3G+GjOq2NSp9umf45XU9S0U2iU
+         UtQw==
+X-Gm-Message-State: AOJu0YxXotfUa6OV5gIzBbXuQRtXRTGIWy+b9ozjQV3HZggaKihixh7Y
+	bo0vqosaHMw+W5rMglQvJe4bgYOa0mOtwWlINn0Z1hx8uf2lsn3zySyvnLvRpcxfQ0tv4pAljf+
+	RQQ==
+X-Google-Smtp-Source: AGHT+IG9PBzMAAZoiZyf0Ifd3jc9ODlYrgfiGByUvwS7iZ7SJgKLrOSsaQR9jZWzB7+o1o0N9vRC0QHSiDE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:64c9:b0:627:a6f7:899e with SMTP id
- 00721157ae682-62cd566d549mr8431987b3.9.1717805405666; Fri, 07 Jun 2024
- 17:10:05 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:2e9c:b0:702:2ab4:b12f with SMTP id
+ d2e1a72fcca58-7040c708fa2mr16072b3a.2.1717805470628; Fri, 07 Jun 2024
+ 17:11:10 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  7 Jun 2024 17:10:03 -0700
+Date: Fri,  7 Jun 2024 17:11:08 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,60 +71,46 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
-Message-ID: <20240608001003.3296640-1-seanjc@google.com>
-Subject: [PATCH] KVM: VMX: Remove unnecessary INVEPT[GLOBAL] from hardware
- enable path
+Message-ID: <20240608001108.3296879-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Rephrase comment about synthetic PFERR flags in
+ #PF handler
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Xiaoyao Li <xiaoyao.li@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Remove the completely pointess global INVEPT, i.e. EPT TLB flush, from
-KVM's VMX enablement path.  KVM always does a targeted TLB flush when
-using a "new" EPT root, in quotes because "new" simply means a root that
-isn't currently being used by the vCPU.
+Reword the BUILD_BUG_ON() comment in the legacy #PF handler to explicitly
+describe how asserting that synthetic PFERR flags are limited to bits 31:0
+protects KVM against inadvertently passing a synthetic flag to the common
+page fault handler.
 
-KVM also _deliberately_ runs with stale TLB entries for defunct roots,
-i.e. doesn't do a TLB flush when vCPUs stop using roots, precisely because
-KVM does the flush on first use.  As called out by the comment in
-kvm_mmu_load(), the reason KVM flushes on first use is because KVM can't
-guarantee the correctness of past hypervisors.
+No functional change intended.
 
-Jumping back to the global INVEPT, when the painfully terse commit
-1439442c7b25 ("KVM: VMX: Enable EPT feature for KVM") was added, the
-effective TLB flush being performed was:
-
-  static void vmx_flush_tlb(struct kvm_vcpu *vcpu)
-  {
-          vpid_sync_vcpu_all(to_vmx(vcpu));
-  }
-
-I.e. KVM was not flushing EPT TLB entries when allocating a "new" root,
-which very strongly suggests that the global INVEPT during hardware
-enabling was a misguided hack that addressed the most obvious symptom,
-but failed to fix the underlying bug.
-
+Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 3 ---
- 1 file changed, 3 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 0e3aaf520db2..21dbe20f50ba 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2832,9 +2832,6 @@ int vmx_hardware_enable(void)
- 		return r;
- 	}
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 8d7115230739..2421d971ce1b 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4599,7 +4599,10 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+ 	if (WARN_ON_ONCE(error_code >> 32))
+ 		error_code = lower_32_bits(error_code);
  
--	if (enable_ept)
--		ept_sync_global();
--
- 	return 0;
- }
+-	/* Ensure the above sanity check also covers KVM-defined flags. */
++	/*
++	 * Restrict KVM-defined flags to bits 63:32 so that it's impossible for
++	 * them to conflict with #PF error codes, which are limited to 32 bits.
++	 */
+ 	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
  
+ 	vcpu->arch.l1tf_flush_l1d = true;
 
-base-commit: af0903ab52ee6d6f0f63af67fa73d5eb00f79b9a
+base-commit: b9adc10edd4e14e66db4f7289a88fdbfa45ae7a8
 -- 
 2.45.2.505.gda0bf45e8d-goog
 
