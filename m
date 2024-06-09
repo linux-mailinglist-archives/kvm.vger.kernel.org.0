@@ -1,264 +1,207 @@
-Return-Path: <kvm+bounces-19143-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19144-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B505B9016EC
-	for <lists+kvm@lfdr.de>; Sun,  9 Jun 2024 17:59:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B4790184B
+	for <lists+kvm@lfdr.de>; Sun,  9 Jun 2024 23:27:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 411D6283B73
-	for <lists+kvm@lfdr.de>; Sun,  9 Jun 2024 15:59:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69761C20976
+	for <lists+kvm@lfdr.de>; Sun,  9 Jun 2024 21:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A36046B91;
-	Sun,  9 Jun 2024 15:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9252550249;
+	Sun,  9 Jun 2024 21:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ifS5c22+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPd5D5JP"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF6547773;
-	Sun,  9 Jun 2024 15:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FAFB4DA0C
+	for <kvm@vger.kernel.org>; Sun,  9 Jun 2024 21:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717948778; cv=none; b=atkusyu5NpocCa3iKj1XziDW8kGMPkjP5kw3kqYR9tiU9dqSLOeiqSvxXRqfv+EMHUsqABGctDo4ragGZHFmne2qpgZlG1R7vXLZnYygvXhVn6cKEKTce5mC3VwddvG3/5JB3pHSfEdjKivLJtkSp6h7CuSixgGVuqH2fdjoC6w=
+	t=1717968445; cv=none; b=uKGfI4W1B1c69mPmacIToBOON2lYOeRIgJUV8ZMWPp8zHd2/Wj7fXoWOqmqa61uJi/svGhxXjHgsrGF5KDdDGLsa9Bv+kEDv8PO40xSTHaOSHd8GKmvRYwCx2/Sd4nBksaqiHOUupY78rdX7D2fgjo1lXfKmps/XZMVY6ZTzqy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717948778; c=relaxed/simple;
-	bh=CCy4O8Rajex09opnQ3cvR+y3w5z+7/dgktja4ZDmCrI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cr1TsqD2ux+PAAcBWpPBEaFYY2JxiBDLenNRntzBn2Jqnk02RRQMEO/KMq097JmoESuQdmlQRGk2Upk+G1IVQhpHia0aEcZyMzrteKCTqFPvhWFcgUt9bzdemQqDy/IbqjxwQ/z6Q/crU9SowODLTFPgJdmHviF0kiLDDrtl7ss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ifS5c22+; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1717948776; x=1749484776;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2xpbGXjdiYfY57DmPTq+vnmg1VxAdFdiWMT93+NIDeg=;
-  b=ifS5c22+s/cWFkPc1/QzMoMblBlavMUAK6bTzAa752YhXWJ6J2QCy7cl
-   GUcNZh0svaPDpNRjTVgktgNvATAZPCY8x/wzQ5+HcgciLQqBy8GkR8wve
-   wP+etzD/8j8IKnb9qCIpX9I5Qeoo1Om91FyFVFly40wUQ6u1e8Hy2mcsi
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.08,225,1712620800"; 
-   d="scan'208";a="95498928"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2024 15:59:34 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.17.79:35948]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.26.236:2525] with esmtp (Farcaster)
- id b1c7cef1-ac9e-43a8-b2c2-8d9cfffadc0c; Sun, 9 Jun 2024 15:59:33 +0000 (UTC)
-X-Farcaster-Flow-ID: b1c7cef1-ac9e-43a8-b2c2-8d9cfffadc0c
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Sun, 9 Jun 2024 15:59:33 +0000
-Received: from dev-dsk-nsaenz-1b-189b39ae.eu-west-1.amazon.com (10.13.235.138)
- by EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Sun, 9 Jun 2024 15:59:26 +0000
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <vkuznets@redhat.com>,
-	<linux-doc@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
-	<graf@amazon.de>, <dwmw2@infradead.org>, <paul@amazon.com>,
-	<nsaenz@amazon.com>, <mlevitsk@redhat.com>, <jgowans@amazon.com>,
-	<corbet@lwn.net>, <decui@microsoft.com>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <amoorthy@google.com>
-Subject: [PATCH 18/18] KVM: x86: hyper-v: Handle VSM hcalls in user-space
-Date: Sun, 9 Jun 2024 15:49:47 +0000
-Message-ID: <20240609154945.55332-19-nsaenz@amazon.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240609154945.55332-1-nsaenz@amazon.com>
-References: <20240609154945.55332-1-nsaenz@amazon.com>
+	s=arc-20240116; t=1717968445; c=relaxed/simple;
+	bh=If1bhvO3Y9Z5Gs8QUAyMh4SR5rxxOnQUmer64UJoU7Y=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=dN2f3t8Tb8xClw7ohbsVUQKPAz+8JGSRs5I+EOzwoYDkt1CrNEja44bpKQtUAVOznzmC0C2LjMgHCPzajiE2V397YTyixMeFzBvHTqY7wl9hHPCagv2162Wpu905+ImKcUxkQpls7SQFBMw1o/e8Tr1gpf7uyjsRwsavjLNERo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPd5D5JP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2B3B3C4AF1C
+	for <kvm@vger.kernel.org>; Sun,  9 Jun 2024 21:27:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717968445;
+	bh=If1bhvO3Y9Z5Gs8QUAyMh4SR5rxxOnQUmer64UJoU7Y=;
+	h=From:To:Subject:Date:From;
+	b=mPd5D5JPKLZNs1VA68JMZXBt4OmBJhTSjb1GH4B6EmmzxQWicSafP/AVFPzhsEk9k
+	 md8h/6SCvCjtG25gb2HNrqWc8PmuDzFn/z2vXX0KSkUEhrxkkot+DBf/tB4gEsYXr2
+	 ikBZpXSHmZcaB6lywPsoeMRL5U0HPU2pnmnifxvl55u9FjMXONB8mCX63CZ8KlbD+B
+	 ZNA9SAWH0/ypBC2/pK6ylcfB1Nd8MpCpFjCgRX2I4Z3aYGuy1Ty9LSOjmN6quECe4z
+	 A12JIa1s4jRm9ECdaAZuUR0IDj6QeZr4McNEp1byuSZT94v7FJ+/roF6KxzEdU+FpJ
+	 sq2rN1SpUx9Qg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1F494C53BB8; Sun,  9 Jun 2024 21:27:25 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218949] New: Kernel panic after upgrading to 6.10-rc2
+Date: Sun, 09 Jun 2024 21:27:24 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: badouri.g@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression attachments.created
+Message-ID: <bug-218949-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA003.ant.amazon.com (10.13.139.46) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
 
-Let user-space handle all hypercalls that fall under the AccessVsm
-partition privilege flag. That is:
- - HvCallModifyVtlProtectionMask
- - HvCallEnablePartitionVtl
- - HvCallEnableVpVtl
- - HvCallVtlCall
- - HvCallVtlReturn
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218949
 
-All these are VTL aware and as such need to be handled in user-space.
-Additionally, select KVM_GENERIC_MEMORY_ATTRIBUTES when
-CONFIG_KVM_HYPERV is enabled, as it's necessary in order to implement
-VTL memory protections.
+            Bug ID: 218949
+           Summary: Kernel panic after upgrading to 6.10-rc2
+           Product: Virtualization
+           Version: unspecified
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: badouri.g@gmail.com
+        Regression: No
 
-Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
----
- Documentation/virt/kvm/api.rst    | 23 +++++++++++++++++++++++
- arch/x86/kvm/Kconfig              |  1 +
- arch/x86/kvm/hyperv.c             | 29 +++++++++++++++++++++++++----
- include/asm-generic/hyperv-tlfs.h |  6 +++++-
- 4 files changed, 54 insertions(+), 5 deletions(-)
+Created attachment 306446
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306446&action=3Dedit
+full logfile (zipped)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 6d3bc5092ea63..77af2ccf49a30 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -8969,3 +8969,26 @@ HvCallGetVpIndexFromApicId. Currently, it is only used in conjunction with
- HV_ACCESS_VSM, and immediately exits to userspace with KVM_EXIT_HYPERV_HCALL as
- the reason. Userspace is expected to complete the hypercall before resuming
- execution.
-+
-+10.4 HV_ACCESS_VSM
-+------------------
-+
-+:Location: CPUID.40000003H:EBX[bit 16]
-+
-+This CPUID indicates that KVM supports HvCallModifyVtlProtectionMask,
-+HvCallEnablePartitionVtl, HvCallEnableVpVtl, HvCallVtlCall, and
-+HvCallVtlReturn.  Additionally, as a prerequirsite to being able to implement
-+Hyper-V VSM, it also identifies the availability of HvTranslateVirtualAddress,
-+as well as the VTL-aware aspects of HvCallSendSyntheticClusterIpi and
-+HvCallSendSyntheticClusterIpiEx.
-+
-+All these hypercalls immediately exit with KVM_EXIT_HYPERV_HCALL as the reason.
-+Userspace is expected to complete the hypercall before resuming execution.
-+Note that both IPI hypercalls will only exit to userspace if the request is
-+VTL-aware, which will only happen if HV_ACCESS_VSM is exposed to the guest.
-+
-+Access restriction memory attributes (4.141) are available to simplify
-+HvCallModifyVtlProtectionMask's implementation.
-+
-+Ultimately this CPUID also indicates that KVM_MP_STATE_HV_INACTIVE_VTL is
-+available.
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index fec95a7702703..8d851fe3b8c25 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -157,6 +157,7 @@ config KVM_SMM
- config KVM_HYPERV
- 	bool "Support for Microsoft Hyper-V emulation"
- 	depends on KVM
-+	select KVM_GENERIC_MEMORY_ATTRIBUTES
- 	default y
- 	help
- 	  Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index dd64f41dc835d..1158c59a92790 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2388,7 +2388,12 @@ static void kvm_hv_hypercall_set_result(struct kvm_vcpu *vcpu, u64 result)
- 	}
- }
- 
--static int kvm_hv_hypercall_complete(struct kvm_vcpu *vcpu, u64 result)
-+static inline bool kvm_hv_is_vtl_call_return(u16 code)
-+{
-+	return code == HVCALL_VTL_CALL || code == HVCALL_VTL_RETURN;
-+}
-+
-+static int kvm_hv_hypercall_complete(struct kvm_vcpu *vcpu, u16 code, u64 result)
- {
- 	u32 tlb_lock_count = 0;
- 	int ret;
-@@ -2400,9 +2405,12 @@ static int kvm_hv_hypercall_complete(struct kvm_vcpu *vcpu, u64 result)
- 		result = HV_STATUS_INVALID_HYPERCALL_INPUT;
- 
- 	trace_kvm_hv_hypercall_done(result);
--	kvm_hv_hypercall_set_result(vcpu, result);
- 	++vcpu->stat.hypercalls;
- 
-+	/* VTL call and return don't set a hcall result */
-+	if (!kvm_hv_is_vtl_call_return(code))
-+		kvm_hv_hypercall_set_result(vcpu, result);
-+
- 	ret = kvm_skip_emulated_instruction(vcpu);
- 
- 	if (tlb_lock_count)
-@@ -2459,7 +2467,7 @@ static int kvm_hv_hypercall_complete_userspace(struct kvm_vcpu *vcpu)
- 		kvm_hv_write_xmm(vcpu->run->hyperv.u.hcall.xmm);
- 	}
- 
--	return kvm_hv_hypercall_complete(vcpu, result);
-+	return kvm_hv_hypercall_complete(vcpu, code, result);
- }
- 
- static u16 kvm_hvcall_signal_event(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
-@@ -2513,6 +2521,7 @@ static bool is_xmm_fast_hypercall(struct kvm_hv_hcall *hc)
- 	case HVCALL_SEND_IPI_EX:
- 	case HVCALL_GET_VP_REGISTERS:
- 	case HVCALL_SET_VP_REGISTERS:
-+	case HVCALL_MODIFY_VTL_PROTECTION_MASK:
- 	case HVCALL_TRANSLATE_VIRTUAL_ADDRESS:
- 		return true;
- 	}
-@@ -2552,6 +2561,12 @@ static bool hv_check_hypercall_access(struct kvm_vcpu_hv *hv_vcpu, u16 code)
- 		 */
- 		return !kvm_hv_is_syndbg_enabled(hv_vcpu->vcpu) ||
- 			hv_vcpu->cpuid_cache.features_ebx & HV_DEBUGGING;
-+	case HVCALL_MODIFY_VTL_PROTECTION_MASK:
-+	case HVCALL_ENABLE_PARTITION_VTL:
-+	case HVCALL_ENABLE_VP_VTL:
-+	case HVCALL_VTL_CALL:
-+	case HVCALL_VTL_RETURN:
-+		return hv_vcpu->cpuid_cache.features_ebx & HV_ACCESS_VSM;
- 	case HVCALL_GET_VP_REGISTERS:
- 	case HVCALL_SET_VP_REGISTERS:
- 		return hv_vcpu->cpuid_cache.features_ebx &
-@@ -2744,6 +2759,11 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- 			break;
- 		}
- 		goto hypercall_userspace_exit;
-+	case HVCALL_MODIFY_VTL_PROTECTION_MASK:
-+	case HVCALL_ENABLE_PARTITION_VTL:
-+	case HVCALL_ENABLE_VP_VTL:
-+	case HVCALL_VTL_CALL:
-+	case HVCALL_VTL_RETURN:
- 	case HVCALL_GET_VP_REGISTERS:
- 	case HVCALL_SET_VP_REGISTERS:
- 	case HVCALL_TRANSLATE_VIRTUAL_ADDRESS:
-@@ -2765,7 +2785,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- 	}
- 
- hypercall_complete:
--	return kvm_hv_hypercall_complete(vcpu, ret);
-+	return kvm_hv_hypercall_complete(vcpu, hc.code, ret);
- 
- hypercall_userspace_exit:
- 	vcpu->run->exit_reason = KVM_EXIT_HYPERV;
-@@ -2921,6 +2941,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 			ent->ebx |= HV_POST_MESSAGES;
- 			ent->ebx |= HV_SIGNAL_EVENTS;
- 			ent->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
-+			ent->ebx |= HV_ACCESS_VSM;
- 			ent->ebx |= HV_ACCESS_VP_REGISTERS;
- 			ent->ebx |= HV_START_VIRTUAL_PROCESSOR;
- 
-diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
-index e24b88ec4ec00..6b12e5818292c 100644
---- a/include/asm-generic/hyperv-tlfs.h
-+++ b/include/asm-generic/hyperv-tlfs.h
-@@ -149,9 +149,13 @@ union hv_reference_tsc_msr {
- /* Declare the various hypercall operations. */
- #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE	0x0002
- #define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST	0x0003
--#define HVCALL_ENABLE_VP_VTL			0x000f
- #define HVCALL_NOTIFY_LONG_SPIN_WAIT		0x0008
- #define HVCALL_SEND_IPI				0x000b
-+#define HVCALL_MODIFY_VTL_PROTECTION_MASK	0x000c
-+#define HVCALL_ENABLE_PARTITION_VTL		0x000d
-+#define HVCALL_ENABLE_VP_VTL			0x000f
-+#define HVCALL_VTL_CALL				0x0011
-+#define HVCALL_VTL_RETURN			0x0012
- #define HVCALL_FLUSH_VIRTUAL_ADDRESS_SPACE_EX	0x0013
- #define HVCALL_FLUSH_VIRTUAL_ADDRESS_LIST_EX	0x0014
- #define HVCALL_SEND_IPI_EX			0x0015
--- 
-2.40.1
+I've decided to try out 6.10-rc2 on my proxmox machine running on a Zen2
+Threadripiper because of all the amd-pstate improvements.
+During bootup I notice it prints a lot of kernel panics in the logs.
 
+They mostly look like this:
+
+Jun 09 23:11:23 pve kernel: ------------[ cut here ]------------
+Jun 09 23:11:23 pve kernel: WARNING: CPU: 9 PID: 1870 at
+include/linux/rwsem.h:85 remap_pfn_range_notrack+0x4a5/0x590
+Jun 09 23:11:23 pve kernel: Modules linked in: rpcsec_gss_krb5 auth_rpcgss
+nfsv4 nfs lockd grace netfs veth ebtable_filter ebtables ip_set ip6table_raw
+iptable_raw ip6table_filter ip6_tables iptable_filter scsi_transport_iscsi
+nf_tables bonding tls softdog sunrpc nfnetl>
+Jun 09 23:11:23 pve kernel:  xhci_hcd i2c_piix4 wmi
+Jun 09 23:11:23 pve kernel: CPU: 9 PID: 1870 Comm: CPU 0/KVM Tainted: G=20=
+=20=20=20=20=20=20
+W  OE      6.10.0-rc2 #3
+Jun 09 23:11:23 pve kernel: Hardware name: ASUS System Product Name/ROG ZEN=
+ITH
+II EXTREME, BIOS 2102 02/16/2024
+Jun 09 23:11:23 pve kernel: RIP: 0010:remap_pfn_range_notrack+0x4a5/0x590
+Jun 09 23:11:23 pve kernel: Code: 45 31 d2 45 31 db e9 2a f2 d2 00 48 8b 7d=
+ b8
+48 89 c6 e8 ce 95 ff ff 85 c0 0f 84 66 fe ff ff eb a6 0f 0b b9 ea ff ff ff =
+eb
+a2 <0f> 0b e9 e9 fb ff ff 0f 0b 48 8b 7d b8 4c 89 fa 4c 89 ce 4c 89 4d
+Jun 09 23:11:23 pve kernel: RSP: 0018:ffffb640c103f900 EFLAGS: 00010246
+Jun 09 23:11:23 pve kernel: RAX: 000000802d0644fb RBX: ffff9485c89ea730 RCX:
+0000000000100000
+Jun 09 23:11:23 pve kernel: RDX: 0000000000000000 RSI: ffff9485e489bc80 RDI:
+ffff9485c89ea730
+Jun 09 23:11:23 pve kernel: RBP: ffffb640c103f9b8 R08: 8000000000000037 R09:
+0000000000000000
+Jun 09 23:11:23 pve kernel: R10: 0000000000000000 R11: 0000000000000000 R12:
+00000000000c2100
+Jun 09 23:11:23 pve kernel: R13: 00007f8a50200000 R14: 8000000000000037 R15:
+00007f8a50100000
+Jun 09 23:11:23 pve kernel: FS:  00007f8a4aa006c0(0000)
+GS:ffff94a47dc80000(0000) knlGS:0000000000000000
+Jun 09 23:11:23 pve kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 00000000800500=
+33
+Jun 09 23:11:23 pve kernel: CR2: 00007f8a352ae000 CR3: 0000000117588000 CR4:
+0000000000350ef0
+Jun 09 23:11:23 pve kernel: Call Trace:
+Jun 09 23:11:23 pve kernel:  <TASK>
+Jun 09 23:11:23 pve kernel:  ? show_regs+0x6c/0x80
+Jun 09 23:11:23 pve kernel:  ? __warn+0x88/0x140
+Jun 09 23:11:23 pve kernel:  ? remap_pfn_range_notrack+0x4a5/0x590
+Jun 09 23:11:23 pve kernel:  ? report_bug+0x182/0x1b0
+Jun 09 23:11:23 pve kernel:  ? handle_bug+0x46/0x90
+Jun 09 23:11:23 pve kernel:  ? exc_invalid_op+0x18/0x80
+Jun 09 23:11:23 pve kernel:  ? asm_exc_invalid_op+0x1b/0x20
+Jun 09 23:11:23 pve kernel:  ? remap_pfn_range_notrack+0x4a5/0x590
+Jun 09 23:11:23 pve kernel:  ? track_pfn_remap+0x139/0x140
+Jun 09 23:11:23 pve kernel:  ? down_write+0x12/0x80
+Jun 09 23:11:23 pve kernel:  remap_pfn_range+0x5c/0xc0
+Jun 09 23:11:23 pve kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 09 23:11:23 pve kernel:  vfio_pci_mmap_fault+0xb1/0x180 [vfio_pci_core]
+Jun 09 23:11:23 pve kernel:  __do_fault+0x3b/0x130
+Jun 09 23:11:23 pve kernel:  do_fault+0xc5/0x490
+Jun 09 23:11:23 pve kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 09 23:11:23 pve kernel:  __handle_mm_fault+0x842/0x1100
+Jun 09 23:11:23 pve kernel:  handle_mm_fault+0x197/0x340
+Jun 09 23:11:23 pve kernel:  fixup_user_fault+0x91/0x1e0
+Jun 09 23:11:23 pve kernel:  vaddr_get_pfns+0x10e/0x280 [vfio_iommu_type1]
+Jun 09 23:11:23 pve kernel:  vfio_pin_pages_remote+0x39f/0x520
+[vfio_iommu_type1]
+Jun 09 23:11:23 pve kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 09 23:11:23 pve kernel:  ? alloc_pages_mpol_noprof+0xd9/0x1f0
+Jun 09 23:11:23 pve kernel:  vfio_iommu_type1_ioctl+0x10ad/0x1ad0
+[vfio_iommu_type1]
+Jun 09 23:11:23 pve kernel:  vfio_fops_unl_ioctl+0x6b/0x380 [vfio]
+Jun 09 23:11:23 pve kernel:  __x64_sys_ioctl+0xa3/0xf0
+Jun 09 23:11:23 pve kernel:  x64_sys_call+0xa68/0x24d0
+Jun 09 23:11:23 pve kernel:  do_syscall_64+0x70/0x160
+Jun 09 23:11:23 pve kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 09 23:11:23 pve kernel:  ? irqentry_exit+0x43/0x50
+Jun 09 23:11:23 pve kernel:  ? srso_return_thunk+0x5/0x5f
+Jun 09 23:11:23 pve kernel:  ? exc_page_fault+0x93/0x1b0
+Jun 09 23:11:23 pve kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+Jun 09 23:11:23 pve kernel: RIP: 0033:0x7f8a5cb8cc5b
+Jun 09 23:11:23 pve kernel: Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7=
+ 04
+24 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 =
+0f
+05 <89> c2 3d 00 f0 ff ff 77 1c 48 8b 44 24 18 64 48 2b 04 25 28 00 00
+Jun 09 23:11:23 pve kernel: RSP: 002b:00007f8a4a9faa40 EFLAGS: 00000246
+ORIG_RAX: 0000000000000010
+Jun 09 23:11:23 pve kernel: RAX: ffffffffffffffda RBX: 0000560ed91739b0 RCX:
+00007f8a5cb8cc5b
+Jun 09 23:11:23 pve kernel: RDX: 00007f8a4a9faaa0 RSI: 0000000000003b71 RDI:
+000000000000003e
+Jun 09 23:11:23 pve kernel: RBP: 0000000081c00000 R08: 0000000000000000 R09:
+0000000000000000
+Jun 09 23:11:23 pve kernel: R10: 00000000000fe000 R11: 0000000000000246 R12:
+00000000000fe000
+Jun 09 23:11:23 pve kernel: R13: 00000000000fe000 R14: 00007f8a4a9faaa0 R15:
+00007f8a4a9fabf0
+Jun 09 23:11:23 pve kernel:  </TASK>
+Jun 09 23:11:23 pve kernel: ---[ end trace 0000000000000000 ]---
+
+But I've attached a full log containing all the panics.
+The systems seems to run stable otherwise.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
