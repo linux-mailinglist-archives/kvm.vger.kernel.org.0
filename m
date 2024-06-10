@@ -1,137 +1,236 @@
-Return-Path: <kvm+bounces-19164-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19165-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F47901E16
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 11:24:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 800CA901F2A
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 12:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21C54283563
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 09:24:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFA641F21790
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 10:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A537580D;
-	Mon, 10 Jun 2024 09:24:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A11E7BB13;
+	Mon, 10 Jun 2024 10:21:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IbWg1Wkk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qye8Fdwq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2856D745E7
-	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 09:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB3C79DC7;
+	Mon, 10 Jun 2024 10:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718011442; cv=none; b=N6JAWoJ51INGS1M2QLBYuMtvij9e6IO7oZuCYMOc8+1ZmtFXDwJ45M4vuljJLF8vIvpiHiQqaWSp9aib0lFpamxbN8CepPFO3/xyX1wHtyR11MrJMeMaZmm7ltkeM8LM+Mm0pdhxCxbPLDRza1x4hfueU3lLtK23cvoUSI1eSbw=
+	t=1718014887; cv=none; b=QrNR70LmNpu+H/K/woQ/+7e2pLatC7a6QXRSBPQbsBxvkKpNU9zUsvhucQwL7KyjiRzf8EqckInAiHnrJM1NSkXGXhJQKwB93cGaLQlqpEoGflnVslKyjryziALt4LrAyhcp3RnaL9QgUf6nhk9VUWl2BYwkIxPVGzv8yRcsC30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718011442; c=relaxed/simple;
-	bh=nBZ9dF+0OABWdV1iqoE6bc8ju4Dqou9rPp9kvXoJsYU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rSr4NBJ0BdW5Jsw7OYHRxekIeCIKVew5EUjKtML7T0YrVRMxr64LCRJMVcF8djDAxsAVFG/j604WUoNJIjMBsLEn33FiTlMXftQnDIeapC3ZRdlOghIN4x67YhrhqbnPX7QDik28ACZJ189Xk77DxGmXR9DhQ4YyTsTllg/bqAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IbWg1Wkk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718011440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nBZ9dF+0OABWdV1iqoE6bc8ju4Dqou9rPp9kvXoJsYU=;
-	b=IbWg1WkkljKQLcpEj92QZcrRKANyNd7trmM3NwAHUfuwg3Mm918IJn2tFKkXAAomWsP6h8
-	zxFzmq9yxLXfVQ8NNMEdAyZD7NuaM28olIDUmvqEYcFvYfr5pcQgpvjb2R4kHzAANJb7M5
-	76AfaDYFEZFBtZ03WAcpULu6pYhpcFc=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-XXKpyAo4Mb6UW_zpkMbMlQ-1; Mon, 10 Jun 2024 05:23:58 -0400
-X-MC-Unique: XXKpyAo4Mb6UW_zpkMbMlQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-358f9dffbedso2469411f8f.3
-        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 02:23:58 -0700 (PDT)
+	s=arc-20240116; t=1718014887; c=relaxed/simple;
+	bh=y4nHq92fBK7Hncw18w6FXPEZgY5S+YepShIVlJ1gXTo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rpCXigv38qJWeLbCSnYHYgP358Rml1yilYiATnkIR5PJYJMI4TIwNuYGUffuiO5PcErE3rYv4JsWUN9CjTnv/PwR03bnzd0+5m4x8ScK7d4yTxQdL/KeqWPsPz/+MBnDFPGMFkAGRmr9zsMnOnU+fgfn7VsBzZ+8cBus6sXLsSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qye8Fdwq; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a6267778b3aso426123266b.3;
+        Mon, 10 Jun 2024 03:21:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718014883; x=1718619683; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LwHIHsN6FOqMaJ0QvL4YUcdXJqzusyELWmCpBOJ4s7U=;
+        b=Qye8Fdwqj0A0ZPLlNASvJhV5GBUKeZp2LCtE7XHE1D1h+WZQwhCo6EgS0A5lrj5QMD
+         4HfhVphzYKMD/Vhk3wBn8px+DyuCpJdDPpKLJHMhSsxgG5dcDwkPnnYpkJmIgCV7aE0V
+         ZhU6EkfeP6rdpqQjXT1hvWqaSTyWQECbO4qubrAstLzJX0TmoZJ8EHjHoNkQXk9JdjPp
+         qdiuSVQlk87O3tSjGa5NcEBrsRe2d3KiawG/xBisP10v2suG/iNE/eFTGr95EYCr8J0Y
+         AkZde9Cs7qFGEzmkJbWMCAo0w7XupTy1gaE44JpBVi20HeY+y/ijfZK/DrG4wgQgiojn
+         Sf/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718011437; x=1718616237;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nBZ9dF+0OABWdV1iqoE6bc8ju4Dqou9rPp9kvXoJsYU=;
-        b=YyEfb9JcN9Xk+NgWg+AA4fvBdhvKM5usmcA4q/vzjsNgx83MlSn79bt9r1F3Eszap8
-         dTEOZgGcnQ5SzwBrKj6i8ivAzqBHZRFLSa75UmEDRvDbnxasiWc0Sgvq7Ou429b59/ju
-         6TIlLWzoudI5nAWcw2XXLaxSZ4zZlG+E10oG0tJ1GAIiH6MlaLfEk5J+4jzwoMSKqde5
-         QkKU2c0gl49xzwlb+3ADnXo0MA6prnPYsCxE4VToF98FkK3BERqr01jT2sz7Xax+29b7
-         TyTWvjE57v3seDLeklz0A5BIsGzpf47yuGqS6aZduwvuHYGW4cFKiLT8S/HJUm1nh93m
-         YCdA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEQXA3n7yhfnU7oYrYjsE8QGmnq3UlGbEdf+EarDn6er1n22ADJEExzEFeUo7QqSzSjFjSzdaA/tsMVyKSc7lRL3D1
-X-Gm-Message-State: AOJu0YyfeN/cqmLudvQ93D7DjMybE36HsZALDa50nq8elfeuwoLEvr0w
-	Zj6/45pMCI6PPK7kqu23Zm/QtjsUzQ8lK/UDqa6zpXI/5KOxU9zlFcJ/x2l8DeqRzwizsPmECH5
-	QMAdVKDqQn9S8Tb0MJmsgJShLl3j/Ds1N8auqXY5aXu+xcplH75IOoQRB9qVI18Om0MosgcoYPA
-	B7gnDkBoYzth8bmbmmSrqYu4tk
-X-Received: by 2002:a05:6000:b0b:b0:35f:20e6:43b7 with SMTP id ffacd0b85a97d-35f20e64490mr3111352f8f.46.1718011437383;
-        Mon, 10 Jun 2024 02:23:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnD4OricjHIzeZrQUhiUfQSyNi2612qbHoQWqNdACOC0oufkWPT8VkmnBnvIprzUGJFTPIyjwrWV8EUkAWz2I=
-X-Received: by 2002:a05:6000:b0b:b0:35f:20e6:43b7 with SMTP id
- ffacd0b85a97d-35f20e64490mr3111338f8f.46.1718011437042; Mon, 10 Jun 2024
- 02:23:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718014884; x=1718619684;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LwHIHsN6FOqMaJ0QvL4YUcdXJqzusyELWmCpBOJ4s7U=;
+        b=JZ4zt0AeHCwGCc9fjt+OoV3qmzTmWBgZV+ngrPcJscwTiUQDRDMSjUXNjNU5qT2clb
+         XnMKgyrfxzcKqNfSoRtt7LYi80oadnaFHXlfAuZMk7OxpamZN/3GCQEulnx2u+RMeThu
+         oy0M2WpkEkgyOE6OgWULPmWyggBi7x4skR1vZhtIu7Owd+Hz2eaDA03N0C528kXMaaQm
+         UAXGFFnqGGVazLANuB+7dzBKrwPp1ea7mMRGPb3oiNBTbJGkbhaUlpX+pUpYRXtuGGHS
+         3g3fiVP+BWLsdpEAKzFWQ5/UfesTNigLPRfO59TmywkK0Cn9GgEtJeeFdeEN5Oy+YxkG
+         3CDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUCp4K6qH0t7k0Bx83BQkgoyVF2KfzH/bSHuJfkAl11JmM5zIteEHW3Loyzq0zP2b2kpKHcUDHIhvYOnjCoEibAj+TrQzqSy/i0QLVgdF1ZgjgVexYFMVKQ+vS/Qgj2Rp1aBthPS9LfQqylhrqyKk0ZxnzpStTMXbq4
+X-Gm-Message-State: AOJu0YzuPzEkfBxi+OCkPSFHXkjdec9DOyLQpRVPVllJOtlid4JE1mA0
+	hfNtF7uAR7ipnWWRCUVB93BiFxIq38HBLWiXe/k8/c26UkTmQY5N
+X-Google-Smtp-Source: AGHT+IHYtZnMWrJ0IkdZ+MyDgpngsD09lt7KGhzA4zeGHE5BqNwD2tXuke8ut6t0IoCcbB5ZC+9Wmg==
+X-Received: by 2002:a17:906:f198:b0:a6f:e36:aba8 with SMTP id a640c23a62f3a-a6f0e36acd5mr316798066b.33.1718014883287;
+        Mon, 10 Jun 2024 03:21:23 -0700 (PDT)
+Received: from vasant-suse.fritz.box ([2001:9e8:ab68:af00:6f43:17ee:43bd:e0a9])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f0d7b35d5sm290887766b.192.2024.06.10.03.21.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Jun 2024 03:21:22 -0700 (PDT)
+From: vsntk18@gmail.com
+To: vsntk18@gmail.com
+Cc: x86@kernel.org,
+	Borislav.Petkov@amd.com,
+	Dhaval.Giani@amd.com,
+	ashish.kalra@amd.com,
+	cfir@google.com,
+	dan.j.williams@intel.com,
+	dave.hansen@linux.intel.com,
+	ebiederm@xmission.com,
+	erdemaktas@google.com,
+	hpa@zytor.com,
+	jgross@suse.com,
+	jroedel@suse.de,
+	jslaby@suse.cz,
+	keescook@chromium.org,
+	kexec@lists.infradead.org,
+	kvm@vger.kernel.org,
+	linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	luto@kernel.org,
+	martin.b.radev@gmail.com,
+	mhiramat@kernel.org,
+	michael.roth@amd.com,
+	mstunes@vmware.com,
+	nivedita@alum.mit.edu,
+	peterz@infradead.org,
+	rientjes@google.com,
+	seanjc@google.com,
+	stable@vger.kernel.org,
+	thomas.lendacky@amd.com,
+	virtualization@lists.linux-foundation.org,
+	vkarasulli@suse.de
+Subject: [PATCH v6 00/10] x86/sev: KEXEC/KDUMP support for SEV-ES guests
+Date: Mon, 10 Jun 2024 12:21:03 +0200
+Message-Id: <20240610102113.20969-1-vsntk18@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240530210714.364118-1-rick.p.edgecombe@intel.com>
- <20240530210714.364118-10-rick.p.edgecombe@intel.com> <CABgObfbzjLtzFX9wC_FU2GKGF_Wq8og+O=pSnG_yD8j1Dn3jAg@mail.gmail.com>
- <b1306914ee4ca844f9963fcd77b8bf9a30d05249.camel@intel.com>
- <CABgObfb1L4SLGLOPwUKTBusN9bVKACJp7cyvgL8LPhGz0QTNAA@mail.gmail.com> <9c5f7aae312325c0e880baf411f956d4cce3c6d1.camel@intel.com>
-In-Reply-To: <9c5f7aae312325c0e880baf411f956d4cce3c6d1.camel@intel.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 10 Jun 2024 11:23:43 +0200
-Message-ID: <CABgObfYd4TWq4ObUzkDruj_e111cTniWtXckzB_Ft7SOdv7YMQ@mail.gmail.com>
-Subject: Re: [PATCH v2 09/15] KVM: x86/tdp_mmu: Support mirror root for TDP MMU
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-Cc: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai" <kai.huang@intel.com>, 
-	"sagis@google.com" <sagis@google.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
-	"Aktas, Erdem" <erdemaktas@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"dmatlack@google.com" <dmatlack@google.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jun 10, 2024 at 2:09=E2=80=AFAM Edgecombe, Rick P
-<rick.p.edgecombe@intel.com> wrote:
-> Agreed that this is less TDX specific and it means that this part of the =
-generic
-> MMU code doesn't need to know that the mirror/direct matches to private v=
-s
-> shared. I don't love that it has such a complicated conditional for the n=
-ormal
-> VM case, though. Just for readability.
->
-> The previous versions checked kvm_gfn_shared_mask() more readily in vario=
-us open
-> coded spots. In this v2 we tried to reduce this and instead always rely o=
-n
-> the "private" concept to switch between the roots in the generic code. I =
-think
-> it's arguably a little easier to understand if we stick to a single way o=
-f
-> deciding which root to use.
+From: Vasant Karasulli <vkarasulli@suse.de>
 
-But there isn't any other place that relies on is_private, right? So...
+Hi,
 
-> But I don't feel like any of these solutions discussed is perfectly clean=
-. So
-> I'm ok taking the benefits you prefer. I guess doing bitwise operations w=
-hen
-> possible is kind of the KVM way, haha. :)
+here are changes to enable kexec/kdump in SEV-ES guests. The biggest
+problem for supporting kexec/kdump under SEV-ES is to find a way to
+hand the non-boot CPUs (APs) from one kernel to another.
 
-... while I'm definitely guilty of that, :) it does seem the cleanest
-option to use fault->addr to go from struct kvm_page_fault to the kind
-of root.
+Without SEV-ES the first kernel parks the CPUs in a HLT loop until
+they get reset by the kexec'ed kernel via an INIT-SIPI-SIPI sequence.
+For virtual machines the CPU reset is emulated by the hypervisor,
+which sets the vCPU registers back to reset state.
 
-If you prefer, you can introduce a bool kvm_is_addr_direct(struct kvm
-*kvm, gpa_t gpa), and use it here as kvm_is_addr_direct(kvm,
-fault->addr). Maybe that's the best of both worlds.
+This does not work under SEV-ES, because the hypervisor has no access
+to the vCPU registers and can't make modifications to them. So an
+SEV-ES guest needs to reset the vCPU itself and park it using the
+AP-reset-hold protocol. Upon wakeup the guest needs to jump to
+real-mode and to the reset-vector configured in the AP-Jump-Table.
 
-Paolo
+The code to do this is the main part of this patch-set. It works by
+placing code on the AP Jump-Table page itself to park the vCPU and for
+jumping to the reset vector upon wakeup. The code on the AP Jump Table
+runs in 16-bit protected mode with segment base set to the beginning
+of the page. The AP Jump-Table is usually not within the first 1MB of
+memory, so the code can't run in real-mode.
+
+The AP Jump-Table is the best place to put the parking code, because
+the memory is owned, but read-only by the firmware and writeable by
+the OS. Only the first 4 bytes are used for the reset-vector, leaving
+the rest of the page for code/data/stack to park a vCPU. The code
+can't be in kernel memory because by the time the vCPU wakes up the
+memory will be owned by the new kernel, which might have overwritten it
+already.
+
+The other patches add initial GHCB Version 2 protocol support, because
+kexec/kdump need the MSR-based (without a GHCB) AP-reset-hold VMGEXIT,
+which is a GHCB protocol version 2 feature.
+
+The kexec'ed kernel is also entered via the decompressor and needs
+MMIO support there, so this patch-set also adds MMIO #VC support to
+the decompressor and support for handling CLFLUSH instructions.
+
+Finally there is also code to disable kexec/kdump support at runtime
+when the environment does not support it (e.g. no GHCB protocol
+version 2 support or AP Jump Table over 4GB).
+
+The diffstat looks big, but most of it is moving code for MMIO #VC
+support around to make it available to the decompressor.
+
+The previous version of this patch-set can be found here:
+
+	https://lore.kernel.org/kvm/20240408074049.7049-1-vsntk18@gmail.com/
+
+Please review.
+
+Thanks,
+   Vasant
+
+Changes v5->v6:
+        - Rebased to v6.10-rc3 kernel
+   
+Changes v4->v5:
+        - Rebased to v6.9-rc2 kernel
+	- Applied review comments by Tom Lendacky
+	  - Exclude the AP jump table related code for SEV-SNP guests
+
+Changes v3->v4:
+        - Rebased to v6.8 kernel
+	- Applied review comments by Sean Christopherson
+	- Combined sev_es_setup_ap_jump_table() and sev_setup_ap_jump_table()
+          into a single function which makes caching jump table address
+          unnecessary
+        - annotated struct sev_ap_jump_table_header with __packed attribute
+	- added code to set up real mode data segment at boot time instead of
+          hardcoding the value.
+
+Joerg Roedel (9):
+  x86/kexec/64: Disable kexec when SEV-ES is active
+  x86/sev: Save and print negotiated GHCB protocol version
+  x86/sev: Set GHCB data structure version
+  x86/sev: Setup code to park APs in the AP Jump Table
+  x86/sev: Park APs on AP Jump Table with GHCB protocol version 2
+  x86/sev: Use AP Jump Table blob to stop CPU
+  x86/sev: Add MMIO handling support to boot/compressed/ code
+  x86/sev: Handle CLFLUSH MMIO events
+  x86/kexec/64: Support kexec under SEV-ES with AP Jump Table Blob
+
+Vasant Karasulli (1):
+  x86/sev: Exclude AP jump table related code for SEV-SNP guests
+
+ arch/x86/boot/compressed/sev.c          |  45 +-
+ arch/x86/include/asm/insn-eval.h        |   1 +
+ arch/x86/include/asm/realmode.h         |   5 +
+ arch/x86/include/asm/sev-ap-jumptable.h |  30 +
+ arch/x86/include/asm/sev.h              |   7 +
+ arch/x86/kernel/machine_kexec_64.c      |  12 +
+ arch/x86/kernel/process.c               |   8 +
+ arch/x86/kernel/sev-shared.c            | 234 +++++-
+ arch/x86/kernel/sev.c                   | 376 +++++-----
+ arch/x86/lib/insn-eval-shared.c         | 921 ++++++++++++++++++++++++
+ arch/x86/lib/insn-eval.c                | 911 +----------------------
+ arch/x86/realmode/Makefile              |   9 +-
+ arch/x86/realmode/init.c                |   5 +-
+ arch/x86/realmode/rm/Makefile           |  11 +-
+ arch/x86/realmode/rm/header.S           |   3 +
+ arch/x86/realmode/rm/sev.S              |  85 +++
+ arch/x86/realmode/rmpiggy.S             |   6 +
+ arch/x86/realmode/sev/Makefile          |  33 +
+ arch/x86/realmode/sev/ap_jump_table.S   | 131 ++++
+ arch/x86/realmode/sev/ap_jump_table.lds |  24 +
+ 20 files changed, 1711 insertions(+), 1146 deletions(-)
+ create mode 100644 arch/x86/include/asm/sev-ap-jumptable.h
+ create mode 100644 arch/x86/lib/insn-eval-shared.c
+ create mode 100644 arch/x86/realmode/rm/sev.S
+ create mode 100644 arch/x86/realmode/sev/Makefile
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.S
+ create mode 100644 arch/x86/realmode/sev/ap_jump_table.lds
+
+
+base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
+-- 
+2.34.1
 
 
