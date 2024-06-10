@@ -1,317 +1,261 @@
-Return-Path: <kvm+bounces-19186-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19187-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01C8990222F
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 14:58:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2551D9022CF
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 15:42:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77B631F23D1F
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 12:58:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A772827F4
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 13:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FBB7824AF;
-	Mon, 10 Jun 2024 12:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="WHBeDpKY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FEEA8286D;
+	Mon, 10 Jun 2024 13:42:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 220378249B;
-	Mon, 10 Jun 2024 12:58:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBD326AF6;
+	Mon, 10 Jun 2024 13:42:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718024287; cv=none; b=ThAgZxt7Yd6t2bC+iavO6+j9ulbjhEofvxVrrZtXRyPjbWcjfI8emWj87irQVKvDz//XmEru56Bz/cjnNCmV0SdXmh5UohP2AbaWyBMRshmrEw9sDrLaywc5TBlTOY2upD4TQp8jPZWpFdrz79krrXf2U2WNhovI5fYM2C3t0zM=
+	t=1718026941; cv=none; b=Goi7RLiQlsywrFjb2K0oZRenrzoE/R2hkZYt0KupISU1JKhN1lWUsSwIQJ3Q23d+akPGj98hT8rdp60VQYhAYyfIPCPds0LwnN92mNV6Jt8WvwATacyz+ELkiUJ3/o9mW+T1wKuw2w+Cr3Hrl2xerS90JH+sN5jTX4izrRurMA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718024287; c=relaxed/simple;
-	bh=cF0E+B4FPxCw3NIksfU88VpweuvV/RgdxQYyL+4mq08=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GkhvVOy/DIsY3cN9s5PAYfg/xK2x+58gsBnmD6syN8WBZsXuWtAaWHEKP26sYvcjM6Ex9UYygsBym6/2oANjm0v2BeiG4nf/7CQUQzB+gZqpmNl/j67w2GzCtziRZo7a+7hEIj5VWlStSOZRCptb4o3OxCLP4amu5dRQX1glKE0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=WHBeDpKY; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1718024286; x=1749560286;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=6Nf6ZLgbfMQjavUbn1ucKixnNPi219iSyqSVZoondaE=;
-  b=WHBeDpKYK7kx74ODFfNqzuhr6BWxaq1ra3etcxnhAI/pKZ6NqIzUhG6B
-   5HZR0JgWnP/MgD8RpeRNXcbTU/Y2GrnV/RxDgvcGpAkHUlwnSNXG7V2og
-   hLcizaQ4TbD3muN58id5gOVKgPlqfSlXtntl8Iy1S1RA51CGek+yPVQwO
-   M=;
-X-IronPort-AV: E=Sophos;i="6.08,227,1712620800"; 
-   d="scan'208";a="95641674"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 12:58:01 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.10.100:27556]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.0.45:2525] with esmtp (Farcaster)
- id 0bb2c816-ac3a-4ec2-a296-3d9a6dc8de2e; Mon, 10 Jun 2024 12:58:00 +0000 (UTC)
-X-Farcaster-Flow-ID: 0bb2c816-ac3a-4ec2-a296-3d9a6dc8de2e
-Received: from EX19D007EUA001.ant.amazon.com (10.252.50.133) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 10 Jun 2024 12:57:54 +0000
-Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
- EX19D007EUA001.ant.amazon.com (10.252.50.133) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 10 Jun 2024 12:57:53 +0000
-Received: from dev-dsk-fgriffo-1c-69b51a13.eu-west-1.amazon.com
- (10.13.244.152) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34 via Frontend Transport; Mon, 10 Jun 2024 12:57:49 +0000
-From: Fred Griffoul <fgriffo@amazon.co.uk>
-To: <griffoul@gmail.com>
-CC: Fred Griffoul <fgriffo@amazon.co.uk>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Alex Williamson
-	<alex.williamson@redhat.com>, Waiman Long <longman@redhat.com>, Zefan Li
-	<lizefan.x@bytedance.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner
-	<hannes@cmpxchg.org>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier
-	<maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Mark Brown
-	<broonie@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Joey Gouly
-	<joey.gouly@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, Jeremy Linton
-	<jeremy.linton@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
-	<yi.l.liu@intel.com>, Kevin Tian <kevin.tian@intel.com>, Eric Auger
-	<eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Christian
- Brauner" <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, "Reinette
- Chatre" <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: [PATCH v5 2/2] vfio/pci: add msi interrupt affinity support
-Date: Mon, 10 Jun 2024 12:57:08 +0000
-Message-ID: <20240610125713.86750-3-fgriffo@amazon.co.uk>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240610125713.86750-1-fgriffo@amazon.co.uk>
-References: <20240610125713.86750-1-fgriffo@amazon.co.uk>
+	s=arc-20240116; t=1718026941; c=relaxed/simple;
+	bh=CEUlyeHbL/OFV0uTnSbSzGQH4b6WsppEET6oTsS5oiI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Tmy5Rb6FdjenBLQbaIDm0sfrR2sDe+gOU9Gq6b2Ui43xN7WE2Hx7TO4AqNvbOn5pj+nCZ4Wga9OYdNk1s9BtlKKdhIaH0PxykOVRJN19Flcc+EAWuUWEkK9cTlJPfaQ3++/3rXev737MEVdWBO7/wUmSrtDUKBXf5f+QDkGw9tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 79F79106F;
+	Mon, 10 Jun 2024 06:42:42 -0700 (PDT)
+Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.41])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 32EA93F58B;
+	Mon, 10 Jun 2024 06:42:14 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev
+Cc: Steven Price <steven.price@arm.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>,
+	linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH v3 00/43] arm64: Support for Arm CCA in KVM
+Date: Mon, 10 Jun 2024 14:41:19 +0100
+Message-Id: <20240610134202.54893-1-steven.price@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-The usual way to configure a device interrupt from userland is to write
-the /proc/irq/<irq>/smp_affinity or smp_affinity_list files. When using
-vfio to implement a device driver or a virtual machine monitor, this may
-not be ideal: the process managing the vfio device interrupts may not be
-granted root privilege, for security reasons. Thus it cannot directly
-control the interrupt affinity and has to rely on an external command.
+This series adds support for running protected VMs using KVM under the
+Arm Confidential Compute Architecture (CCA).
 
-This patch extends the VFIO_DEVICE_SET_IRQS ioctl() with a new data flag
-to specify the affinity of interrupts of a vfio pci device.
+The related guest support was posted[1] last week but the two series are
+separate (i.e. you can mix-and-match v2/v3 between the two series).
+Unlike the guest series this one is a bit more "work in progress" and
+there are some rough edges (see below). The aim is to focus on merging
+the guest support first before moving onto the host side patches for
+KVM. Review comments are very welcome though!
 
-The CPU affinity mask argument must be a subset of the process cpuset,
-otherwise an error -EPERM is returned.
+Individual patches have their own changelog, but the bulk of the changes
+(from v2) are updating to match more closely with the spec and making
+the code more readable. There's also the 'minor' fix to prevent leaking
+all the guest's pages which v2 suffered from! ;) Thanks for all the
+review comments on v2 - I've attempted to address everything that was
+raised.
 
-The vfio_irq_set argument shall be set-up in the following way:
+Major limitations:
+ * Only supports 4k host PAGE_SIZE (if PAGE_SIZE != 4k then the realm
+   extensions are disabled).
+ * No support for huge pages when mapping the guest's pages. There is
+   some 'dead' code left over from before guest_mem was supported. This
+   is partly a current limitation of guest_memfd.
 
-- the 'flags' field have the new flag VFIO_IRQ_SET_DATA_AFFINITY set
-as well as VFIO_IRQ_SET_ACTION_TRIGGER.
+The ABI to the RMM (the RMI) is based on the final RMM v1.0 (EAC 5)
+specification[2].
 
-- the variable-length 'data' field is a cpu_set_t structure, as
-for the sched_setaffinity() syscall, the size of which is derived
-from 'argsz'.
+This series is based on v6.10-rc1. It is also available as a git
+repository:
 
-Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
----
- drivers/vfio/pci/vfio_pci_core.c  | 27 +++++++++++++++++----
- drivers/vfio/pci/vfio_pci_intrs.c | 39 +++++++++++++++++++++++++++++++
- drivers/vfio/vfio_main.c          | 13 +++++++----
- include/uapi/linux/vfio.h         | 10 +++++++-
- 4 files changed, 80 insertions(+), 9 deletions(-)
+https://gitlab.arm.com/linux-arm/linux-cca cca-host/v3
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 80cae87fff36..2e3419560480 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1192,6 +1192,7 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_pci_core_device *vdev,
- {
- 	unsigned long minsz = offsetofend(struct vfio_irq_set, count);
- 	struct vfio_irq_set hdr;
-+	cpumask_var_t mask;
- 	u8 *data = NULL;
- 	int max, ret = 0;
- 	size_t data_size = 0;
-@@ -1207,9 +1208,22 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_pci_core_device *vdev,
- 		return ret;
- 
- 	if (data_size) {
--		data = memdup_user(&arg->data, data_size);
--		if (IS_ERR(data))
--			return PTR_ERR(data);
-+		if (hdr.flags & VFIO_IRQ_SET_DATA_AFFINITY) {
-+			if (!zalloc_cpumask_var(&mask, GFP_KERNEL))
-+				return -ENOMEM;
-+
-+			if (copy_from_user(mask, &arg->data, data_size)) {
-+				ret = -EFAULT;
-+				goto out;
-+			}
-+
-+			data = (u8 *)mask;
-+
-+		} else {
-+			data = memdup_user(&arg->data, data_size);
-+			if (IS_ERR(data))
-+				return PTR_ERR(data);
-+		}
- 	}
- 
- 	mutex_lock(&vdev->igate);
-@@ -1218,7 +1232,12 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_pci_core_device *vdev,
- 				      hdr.count, data);
- 
- 	mutex_unlock(&vdev->igate);
--	kfree(data);
-+
-+out:
-+	if (hdr.flags & VFIO_IRQ_SET_DATA_AFFINITY && data_size)
-+		free_cpumask_var(mask);
-+	else
-+		kfree(data);
- 
- 	return ret;
- }
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-index 8382c5834335..fe01303cf94e 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -19,6 +19,7 @@
- #include <linux/vfio.h>
- #include <linux/wait.h>
- #include <linux/slab.h>
-+#include <linux/cpuset.h>
- 
- #include "vfio_pci_priv.h"
- 
-@@ -675,6 +676,41 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
- 	return 0;
- }
- 
-+static int vfio_pci_set_msi_affinity(struct vfio_pci_core_device *vdev,
-+				     unsigned int start, unsigned int count,
-+				     struct cpumask *irq_mask)
-+{
-+	struct vfio_pci_irq_ctx *ctx;
-+	cpumask_var_t allowed_mask;
-+	unsigned int i;
-+	int err = 0;
-+
-+	if (!alloc_cpumask_var(&allowed_mask, GFP_KERNEL))
-+		return -ENOMEM;
-+
-+	cpuset_cpus_allowed(current, allowed_mask);
-+	if (!cpumask_subset(irq_mask, allowed_mask)) {
-+		err = -EPERM;
-+		goto finish;
-+	}
-+
-+	for (i = start; i < start + count; i++) {
-+		ctx = vfio_irq_ctx_get(vdev, i);
-+		if (!ctx) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		err = irq_set_affinity(ctx->producer.irq, irq_mask);
-+		if (err)
-+			break;
-+	}
-+
-+finish:
-+	free_cpumask_var(allowed_mask);
-+	return err;
-+}
-+
- static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
- 				    unsigned index, unsigned start,
- 				    unsigned count, uint32_t flags, void *data)
-@@ -713,6 +749,9 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
- 	if (!irq_is(vdev, index))
- 		return -EINVAL;
- 
-+	if (flags & VFIO_IRQ_SET_DATA_AFFINITY)
-+		return vfio_pci_set_msi_affinity(vdev, start, count, data);
-+
- 	for (i = start; i < start + count; i++) {
- 		ctx = vfio_irq_ctx_get(vdev, i);
- 		if (!ctx)
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index e97d796a54fb..e75c5d66681c 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -1505,23 +1505,28 @@ int vfio_set_irqs_validate_and_prepare(struct vfio_irq_set *hdr, int num_irqs,
- 		size = 0;
- 		break;
- 	case VFIO_IRQ_SET_DATA_BOOL:
--		size = sizeof(uint8_t);
-+		size = hdr->count * sizeof(uint8_t);
- 		break;
- 	case VFIO_IRQ_SET_DATA_EVENTFD:
--		size = sizeof(int32_t);
-+		size = size_mul(hdr->count, sizeof(int32_t));
-+		break;
-+	case VFIO_IRQ_SET_DATA_AFFINITY:
-+		size = hdr->argsz - minsz;
-+		if (size > cpumask_size())
-+			size = cpumask_size();
- 		break;
- 	default:
- 		return -EINVAL;
- 	}
- 
- 	if (size) {
--		if (hdr->argsz - minsz < hdr->count * size)
-+		if (hdr->argsz - minsz < size)
- 			return -EINVAL;
- 
- 		if (!data_size)
- 			return -EINVAL;
- 
--		*data_size = hdr->count * size;
-+		*data_size = size;
- 	}
- 
- 	return 0;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 2b68e6cdf190..5ba2ca223550 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -580,6 +580,12 @@ struct vfio_irq_info {
-  *
-  * Note that ACTION_[UN]MASK specify user->kernel signaling (irqfds) while
-  * ACTION_TRIGGER specifies kernel->user signaling.
-+ *
-+ * DATA_AFFINITY specifies the affinity for the range of interrupt vectors.
-+ * It must be set with ACTION_TRIGGER in 'flags'. The variable-length 'data'
-+ * array is a CPU affinity mask 'cpu_set_t' structure, as for the
-+ * sched_setaffinity() syscall argument: the 'argsz' field is used to check
-+ * the actual cpu_set_t size.
-  */
- struct vfio_irq_set {
- 	__u32	argsz;
-@@ -587,6 +593,7 @@ struct vfio_irq_set {
- #define VFIO_IRQ_SET_DATA_NONE		(1 << 0) /* Data not present */
- #define VFIO_IRQ_SET_DATA_BOOL		(1 << 1) /* Data is bool (u8) */
- #define VFIO_IRQ_SET_DATA_EVENTFD	(1 << 2) /* Data is eventfd (s32) */
-+#define VFIO_IRQ_SET_DATA_AFFINITY	(1 << 6) /* Data is cpu_set_t */
- #define VFIO_IRQ_SET_ACTION_MASK	(1 << 3) /* Mask interrupt */
- #define VFIO_IRQ_SET_ACTION_UNMASK	(1 << 4) /* Unmask interrupt */
- #define VFIO_IRQ_SET_ACTION_TRIGGER	(1 << 5) /* Trigger interrupt */
-@@ -599,7 +606,8 @@ struct vfio_irq_set {
- 
- #define VFIO_IRQ_SET_DATA_TYPE_MASK	(VFIO_IRQ_SET_DATA_NONE | \
- 					 VFIO_IRQ_SET_DATA_BOOL | \
--					 VFIO_IRQ_SET_DATA_EVENTFD)
-+					 VFIO_IRQ_SET_DATA_EVENTFD | \
-+					 VFIO_IRQ_SET_DATA_AFFINITY)
- #define VFIO_IRQ_SET_ACTION_TYPE_MASK	(VFIO_IRQ_SET_ACTION_MASK | \
- 					 VFIO_IRQ_SET_ACTION_UNMASK | \
- 					 VFIO_IRQ_SET_ACTION_TRIGGER)
+Work in progress changes for kvmtool are available from the git
+repository below, these changes are based on Fuad Tabba's repository for
+pKVM to provide some alignment with the ongoing pKVM work:
+
+https://gitlab.arm.com/linux-arm/kvmtool-cca cca/v2
+
+Introduction (unchanged from v2)
+============
+A more general introduction to Arm CCA is available on the Arm
+website[3], and links to the other components involved are available in
+the overall cover letter.
+
+Arm Confidential Compute Architecture adds two new 'worlds' to the
+architecture: Root and Realm. A new software component known as the RMM
+(Realm Management Monitor) runs in Realm EL2 and is trusted by both the
+Normal World and VMs running within Realms. This enables mutual
+distrust between the Realm VMs and the Normal World.
+
+Virtual machines running within a Realm can decide on a (4k)
+page-by-page granularity whether to share a page with the (Normal World)
+host or to keep it private (protected). This protection is provided by
+the hardware and attempts to access a page which isn't shared by the
+Normal World will trigger a Granule Protection Fault. The series starts
+by adding handling for these; faults within user space can be handled by
+killing the process, faults within kernel space are considered fatal.
+
+The Normal World host can communicate with the RMM via an SMC interface
+known as RMI (Realm Management Interface), and Realm VMs can communicate
+with the RMM via another SMC interface known as RSI (Realm Services
+Interface). This series adds wrappers for the full set of RMI commands
+and uses them to manage the realm guests.
+
+The Normal World can use RMI commands to delegate pages to the Realm
+world and to create, manage and run Realm VMs. Once delegated the pages
+are inaccessible to the Normal World (unless explicitly shared by the
+guest). However the Normal World may destroy the Realm VM at any time to
+be able to reclaim (undelegate) the pages.
+
+Realm VMs are identified by the KVM_CREATE_VM command, where the 'type'
+argument has a new field to describe whether the guest is 'normal' or a
+'realm'.
+
+Entry/exit of a Realm VM attempts to reuse the KVM infrastructure, but
+ultimately the final mechanism is different. So this series has a bunch
+of commits handling the differences. As much as possible is placed in a
+two new files: rme.c and rme-exit.c.
+
+KVM also handles some of the PSCI requests for a realm and helps the RMM
+complete the PSCI service requests.
+
+Interrupts are managed by KVM, and are injected into the Realm with the
+help of the RMM.
+
+The RMM specification provides a new mechanism for a guest to
+communicate with host which goes by the name "Host Call". This is simply
+hooked up to the existing support for HVC calls from a normal
+guest.
+
+[1] https://lore.kernel.org/r/20240605093006.145492-1-steven.price%40arm.com
+[2] https://developer.arm.com/documentation/den0137/1-0eac5/
+[3] https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
+
+Jean-Philippe Brucker (7):
+  arm64: RME: Propagate number of breakpoints and watchpoints to
+    userspace
+  arm64: RME: Set breakpoint parameters through SET_ONE_REG
+  arm64: RME: Initialize PMCR.N with number counter supported by RMM
+  arm64: RME: Propagate max SVE vector length from RMM
+  arm64: RME: Configure max SVE vector length for a Realm
+  arm64: RME: Provide register list for unfinalized RME RECs
+  arm64: RME: Provide accurate register list
+
+Joey Gouly (2):
+  arm64: rme: allow userspace to inject aborts
+  arm64: rme: support RSI_HOST_CALL
+
+Sean Christopherson (1):
+  KVM: Prepare for handling only shared mappings in mmu_notifier events
+
+Steven Price (29):
+  arm64: RME: Handle Granule Protection Faults (GPFs)
+  arm64: RME: Add SMC definitions for calling the RMM
+  arm64: RME: Add wrappers for RMI calls
+  arm64: RME: Check for RME support at KVM init
+  arm64: RME: Define the user ABI
+  arm64: RME: ioctls to create and configure realms
+  arm64: kvm: Allow passing machine type in KVM creation
+  arm64: RME: Keep a spare page delegated to the RMM
+  arm64: RME: RTT tear down
+  arm64: RME: Allocate/free RECs to match vCPUs
+  arm64: RME: Support for the VGIC in realms
+  KVM: arm64: Support timers in realm RECs
+  arm64: RME: Allow VMM to set RIPAS
+  arm64: RME: Handle realm enter/exit
+  KVM: arm64: Handle realm MMIO emulation
+  arm64: RME: Allow populating initial contents
+  arm64: RME: Runtime faulting of memory
+  KVM: arm64: Handle realm VCPU load
+  KVM: arm64: Validate register access for a Realm VM
+  KVM: arm64: Handle Realm PSCI requests
+  KVM: arm64: WARN on injected undef exceptions
+  arm64: Don't expose stolen time for realm guests
+  arm64: RME: Always use 4k pages for realms
+  arm64: rme: Prevent Device mappings for Realms
+  arm_pmu: Provide a mechanism for disabling the physical IRQ
+  arm64: rme: Enable PMU support with a realm guest
+  kvm: rme: Hide KVM_CAP_READONLY_MEM for realm guests
+  arm64: kvm: Expose support for private memory
+  KVM: arm64: Allow activating realms
+
+Suzuki K Poulose (4):
+  kvm: arm64: pgtable: Track the number of pages in the entry level
+  kvm: arm64: Include kvm_emulate.h in kvm/arm_psci.h
+  kvm: arm64: Expose debug HW register numbers for Realm
+  arm64: rme: Allow checking SVE on VM instance
+
+ Documentation/virt/kvm/api.rst       |    3 +
+ arch/arm64/include/asm/kvm_emulate.h |   35 +
+ arch/arm64/include/asm/kvm_host.h    |   15 +-
+ arch/arm64/include/asm/kvm_pgtable.h |    2 +
+ arch/arm64/include/asm/kvm_rme.h     |  155 +++
+ arch/arm64/include/asm/rmi_cmds.h    |  508 ++++++++
+ arch/arm64/include/asm/rmi_smc.h     |  251 ++++
+ arch/arm64/include/asm/virt.h        |    1 +
+ arch/arm64/include/uapi/asm/kvm.h    |   49 +
+ arch/arm64/kvm/Kconfig               |    1 +
+ arch/arm64/kvm/Makefile              |    3 +-
+ arch/arm64/kvm/arch_timer.c          |   45 +-
+ arch/arm64/kvm/arm.c                 |  166 ++-
+ arch/arm64/kvm/guest.c               |   99 +-
+ arch/arm64/kvm/hyp/pgtable.c         |    5 +-
+ arch/arm64/kvm/hypercalls.c          |    4 +-
+ arch/arm64/kvm/inject_fault.c        |    2 +
+ arch/arm64/kvm/mmio.c                |   10 +-
+ arch/arm64/kvm/mmu.c                 |  177 ++-
+ arch/arm64/kvm/pmu-emul.c            |    7 +-
+ arch/arm64/kvm/psci.c                |   29 +
+ arch/arm64/kvm/reset.c               |   23 +-
+ arch/arm64/kvm/rme-exit.c            |  212 ++++
+ arch/arm64/kvm/rme.c                 | 1620 ++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |   83 +-
+ arch/arm64/kvm/vgic/vgic-v3.c        |    8 +-
+ arch/arm64/kvm/vgic/vgic.c           |   37 +-
+ arch/arm64/mm/fault.c                |   31 +-
+ drivers/perf/arm_pmu.c               |   15 +
+ include/kvm/arm_arch_timer.h         |    2 +
+ include/kvm/arm_pmu.h                |    4 +
+ include/kvm/arm_psci.h               |    2 +
+ include/linux/kvm_host.h             |    2 +
+ include/linux/perf/arm_pmu.h         |    5 +
+ include/uapi/linux/kvm.h             |   30 +-
+ virt/kvm/kvm_main.c                  |    7 +
+ 36 files changed, 3550 insertions(+), 98 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kvm_rme.h
+ create mode 100644 arch/arm64/include/asm/rmi_cmds.h
+ create mode 100644 arch/arm64/include/asm/rmi_smc.h
+ create mode 100644 arch/arm64/kvm/rme-exit.c
+ create mode 100644 arch/arm64/kvm/rme.c
+
 -- 
-2.40.1
+2.34.1
 
 
