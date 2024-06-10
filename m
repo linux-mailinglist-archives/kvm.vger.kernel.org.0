@@ -1,262 +1,137 @@
-Return-Path: <kvm+bounces-19163-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34F1D901CDA
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 10:22:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88F47901E16
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 11:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CEAFB21C63
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 08:21:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21C54283563
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 09:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD136F2E7;
-	Mon, 10 Jun 2024 08:21:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A537580D;
+	Mon, 10 Jun 2024 09:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FyOi6n7q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IbWg1Wkk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BD84D8BC;
-	Mon, 10 Jun 2024 08:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2856D745E7
+	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 09:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718007705; cv=none; b=sNUDLFbacqTvES4i6s+RYUU/bHINp/FQ2EurzgdmE5ofb+2gsiyd24QM050hQQA9312GNy9vKpDJKTBxDRxEIfZcuGvlrNc0pr0TjyURlkDzFTNtIHy01opDQkriJySIYvVwVthHJHF5JZK/3sxU/KTtZrCTIi9IV+4zQT4uoTU=
+	t=1718011442; cv=none; b=N6JAWoJ51INGS1M2QLBYuMtvij9e6IO7oZuCYMOc8+1ZmtFXDwJ45M4vuljJLF8vIvpiHiQqaWSp9aib0lFpamxbN8CepPFO3/xyX1wHtyR11MrJMeMaZmm7ltkeM8LM+Mm0pdhxCxbPLDRza1x4hfueU3lLtK23cvoUSI1eSbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718007705; c=relaxed/simple;
-	bh=68qVpkivRPu/UqBy8a5aM/GcH3KxSp5sMnJQNIuc4FU=;
+	s=arc-20240116; t=1718011442; c=relaxed/simple;
+	bh=nBZ9dF+0OABWdV1iqoE6bc8ju4Dqou9rPp9kvXoJsYU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aAnVIOkLeTdxTC9XrNjddvIfr/5z7VXTFSUWEEF80VZkf7BV1+mHKLEMXMvfwLAwUbDSQsZqIutR0TFnX0hJX233xfqeJ0pwSV+Q/LnuEdl/+4k9X37P6mh2D/S9RGC6QzhaYePhSgZ8pm7YH5NcazxetC+z0XAlpB+1Qssz8Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FyOi6n7q; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57a4d7ba501so5286457a12.2;
-        Mon, 10 Jun 2024 01:21:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718007702; x=1718612502; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JwKWNr3+SkhJYsnRjSQdpuuiDdqh1Y+N1jlC0TkNGnY=;
-        b=FyOi6n7qTs2M1acOLHUKYVCxHR4o/phgVvtAmExnQSPtNfhK6kJipVRXWs7uYAYteT
-         CVvmCviyBqjz8rgbyJ43MIMeJST0eP1GQB1NBMYzrhYvB1fS1cQ/NfPRz5eAKj7MTCPa
-         ZNskFw+WKm3Mf0LG16W+RlgpkFBfbY+t+wwMX2i0OF4MfOCyZ1KO/LrF5IPD85TZ4oeK
-         YczC3QsT/kBynFGYHS7cfjJ+f72TPPOZFxO34QtJBIx605DmNvB1ZzXWcSbnXiwP8yNH
-         TA5ttEolrGdUeEdD/kS+QJZm2q0XEVeTUlo7mwhLyMa8K98cMbPep5UrxfAqheu+d+eF
-         7WLw==
+	 To:Cc:Content-Type; b=rSr4NBJ0BdW5Jsw7OYHRxekIeCIKVew5EUjKtML7T0YrVRMxr64LCRJMVcF8djDAxsAVFG/j604WUoNJIjMBsLEn33FiTlMXftQnDIeapC3ZRdlOghIN4x67YhrhqbnPX7QDik28ACZJ189Xk77DxGmXR9DhQ4YyTsTllg/bqAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IbWg1Wkk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718011440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nBZ9dF+0OABWdV1iqoE6bc8ju4Dqou9rPp9kvXoJsYU=;
+	b=IbWg1WkkljKQLcpEj92QZcrRKANyNd7trmM3NwAHUfuwg3Mm918IJn2tFKkXAAomWsP6h8
+	zxFzmq9yxLXfVQ8NNMEdAyZD7NuaM28olIDUmvqEYcFvYfr5pcQgpvjb2R4kHzAANJb7M5
+	76AfaDYFEZFBtZ03WAcpULu6pYhpcFc=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-48-XXKpyAo4Mb6UW_zpkMbMlQ-1; Mon, 10 Jun 2024 05:23:58 -0400
+X-MC-Unique: XXKpyAo4Mb6UW_zpkMbMlQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-358f9dffbedso2469411f8f.3
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 02:23:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718007702; x=1718612502;
+        d=1e100.net; s=20230601; t=1718011437; x=1718616237;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JwKWNr3+SkhJYsnRjSQdpuuiDdqh1Y+N1jlC0TkNGnY=;
-        b=oCMGVxxCVlZAVWA367MBqRGyxPBxP31f7dLGx6lbpVyI/abARJs7WYiIDctUr5D4tY
-         raHDS296glKkFW7vEuq2b6nbHjkeVutj5/ngHktv/wP/rBKNKbMLryg3iAbD2J1effts
-         GCLSNwdweJ/GVu55haMXUvHp+RCHIRqRJHFqFmSD3Ae6nlJ3xkq2lDFlZ6nWVCFoONBC
-         Rq7ahI0jl9pSPjmZmKrtJ9HkEPvYlbPX7d+k1GY4Xbz95l1CD6GlMuh8z1vRIoyxqp13
-         C7kNeWCiju27IkigLQfM3hBnyqi2SD915RxBDVFlZkFrlbwkYU99BoLAv27LqH0z6FPS
-         bFtg==
-X-Forwarded-Encrypted: i=1; AJvYcCUAXChbb5P/x5zrg6qe7Fzag7uuYJLPrmfkHfN+FISRqWiY6tKDszVRzJHMhjMVBeOtV5rqon7AK7nsmasn5ulPflv4Y7y1NJNPIanp7ZW3LhzaAf51LxRPezzYZzk66bilU5CQi/YfIYG6OuGmS3sJhKEu7Y1YUPUwiw==
-X-Gm-Message-State: AOJu0YyJaTJ5fjxAe656RU6SwuZ7Ou6uSrpCqqsoVdF8FZYkbw3aFAVn
-	IiD+d+HCIwOxtDKxmp5MsVly+qIYQlgRoJpKcVv+uKDc+acJ6fx4xb65MVPjDkOhsH5+2C1dGpP
-	L0JfEsi+Or2bV7eHq0arnLZ4OBl8=
-X-Google-Smtp-Source: AGHT+IFoeL0ZvocmrGv43whyPh4WdDBovgyiR6rzdf6LIdVEfBJkv89u568WYmQekhY/GtCxdAuSJSZUaxZnt6i/1Cc=
-X-Received: by 2002:a17:907:174d:b0:a6e:f8d6:f61d with SMTP id
- a640c23a62f3a-a6ef8d6f7e5mr399407866b.50.1718007701813; Mon, 10 Jun 2024
- 01:21:41 -0700 (PDT)
+        bh=nBZ9dF+0OABWdV1iqoE6bc8ju4Dqou9rPp9kvXoJsYU=;
+        b=YyEfb9JcN9Xk+NgWg+AA4fvBdhvKM5usmcA4q/vzjsNgx83MlSn79bt9r1F3Eszap8
+         dTEOZgGcnQ5SzwBrKj6i8ivAzqBHZRFLSa75UmEDRvDbnxasiWc0Sgvq7Ou429b59/ju
+         6TIlLWzoudI5nAWcw2XXLaxSZ4zZlG+E10oG0tJ1GAIiH6MlaLfEk5J+4jzwoMSKqde5
+         QkKU2c0gl49xzwlb+3ADnXo0MA6prnPYsCxE4VToF98FkK3BERqr01jT2sz7Xax+29b7
+         TyTWvjE57v3seDLeklz0A5BIsGzpf47yuGqS6aZduwvuHYGW4cFKiLT8S/HJUm1nh93m
+         YCdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWEQXA3n7yhfnU7oYrYjsE8QGmnq3UlGbEdf+EarDn6er1n22ADJEExzEFeUo7QqSzSjFjSzdaA/tsMVyKSc7lRL3D1
+X-Gm-Message-State: AOJu0YyfeN/cqmLudvQ93D7DjMybE36HsZALDa50nq8elfeuwoLEvr0w
+	Zj6/45pMCI6PPK7kqu23Zm/QtjsUzQ8lK/UDqa6zpXI/5KOxU9zlFcJ/x2l8DeqRzwizsPmECH5
+	QMAdVKDqQn9S8Tb0MJmsgJShLl3j/Ds1N8auqXY5aXu+xcplH75IOoQRB9qVI18Om0MosgcoYPA
+	B7gnDkBoYzth8bmbmmSrqYu4tk
+X-Received: by 2002:a05:6000:b0b:b0:35f:20e6:43b7 with SMTP id ffacd0b85a97d-35f20e64490mr3111352f8f.46.1718011437383;
+        Mon, 10 Jun 2024 02:23:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEnD4OricjHIzeZrQUhiUfQSyNi2612qbHoQWqNdACOC0oufkWPT8VkmnBnvIprzUGJFTPIyjwrWV8EUkAWz2I=
+X-Received: by 2002:a05:6000:b0b:b0:35f:20e6:43b7 with SMTP id
+ ffacd0b85a97d-35f20e64490mr3111338f8f.46.1718011437042; Mon, 10 Jun 2024
+ 02:23:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240607190955.15376-3-fgriffo@amazon.co.uk> <714268da-d199-4371-8360-500e7165119c@moroto.mountain>
-In-Reply-To: <714268da-d199-4371-8360-500e7165119c@moroto.mountain>
-From: Frederic Griffoul <griffoul@gmail.com>
-Date: Mon, 10 Jun 2024 09:21:31 +0100
-Message-ID: <CAF2vKzPWANE8DBcN8mvpk2fwRRL2kF0-VXP5EygY2tBGJgDjrA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] vfio/pci: add msi interrupt affinity support
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: oe-kbuild@lists.linux.dev, Fred Griffoul <fgriffo@amazon.co.uk>, lkp@intel.com, 
-	oe-kbuild-all@lists.linux.dev, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Alex Williamson <alex.williamson@redhat.com>, 
-	Waiman Long <longman@redhat.com>, Zefan Li <lizefan.x@bytedance.com>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Mark Brown <broonie@kernel.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Jeremy Linton <jeremy.linton@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kevin Tian <kevin.tian@intel.com>, 
-	Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, cgroups@vger.kernel.org
+References: <20240530210714.364118-1-rick.p.edgecombe@intel.com>
+ <20240530210714.364118-10-rick.p.edgecombe@intel.com> <CABgObfbzjLtzFX9wC_FU2GKGF_Wq8og+O=pSnG_yD8j1Dn3jAg@mail.gmail.com>
+ <b1306914ee4ca844f9963fcd77b8bf9a30d05249.camel@intel.com>
+ <CABgObfb1L4SLGLOPwUKTBusN9bVKACJp7cyvgL8LPhGz0QTNAA@mail.gmail.com> <9c5f7aae312325c0e880baf411f956d4cce3c6d1.camel@intel.com>
+In-Reply-To: <9c5f7aae312325c0e880baf411f956d4cce3c6d1.camel@intel.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 10 Jun 2024 11:23:43 +0200
+Message-ID: <CABgObfYd4TWq4ObUzkDruj_e111cTniWtXckzB_Ft7SOdv7YMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 09/15] KVM: x86/tdp_mmu: Support mirror root for TDP MMU
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
+Cc: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai" <kai.huang@intel.com>, 
+	"sagis@google.com" <sagis@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Zhao, Yan Y" <yan.y.zhao@intel.com>, 
+	"Aktas, Erdem" <erdemaktas@google.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"dmatlack@google.com" <dmatlack@google.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Pff. Thanks Dan,
+On Mon, Jun 10, 2024 at 2:09=E2=80=AFAM Edgecombe, Rick P
+<rick.p.edgecombe@intel.com> wrote:
+> Agreed that this is less TDX specific and it means that this part of the =
+generic
+> MMU code doesn't need to know that the mirror/direct matches to private v=
+s
+> shared. I don't love that it has such a complicated conditional for the n=
+ormal
+> VM case, though. Just for readability.
+>
+> The previous versions checked kvm_gfn_shared_mask() more readily in vario=
+us open
+> coded spots. In this v2 we tried to reduce this and instead always rely o=
+n
+> the "private" concept to switch between the roots in the generic code. I =
+think
+> it's arguably a little easier to understand if we stick to a single way o=
+f
+> deciding which root to use.
 
-I will post a v5 to address the two issues you mentioned.
+But there isn't any other place that relies on is_private, right? So...
 
-Br,
+> But I don't feel like any of these solutions discussed is perfectly clean=
+. So
+> I'm ok taking the benefits you prefer. I guess doing bitwise operations w=
+hen
+> possible is kind of the KVM way, haha. :)
 
-Fred
+... while I'm definitely guilty of that, :) it does seem the cleanest
+option to use fault->addr to go from struct kvm_page_fault to the kind
+of root.
 
-On Sun, Jun 9, 2024 at 4:29=E2=80=AFPM Dan Carpenter <dan.carpenter@linaro.=
-org> wrote:
->
-> Hi Fred,
->
-> kernel test robot noticed the following build warnings:
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Fred-Griffoul/cgro=
-up-cpuset-export-cpuset_cpus_allowed/20240608-031332
-> base:   cbb325e77fbe62a06184175aa98c9eb98736c3e8
-> patch link:    https://lore.kernel.org/r/20240607190955.15376-3-fgriffo%4=
-0amazon.co.uk
-> patch subject: [PATCH v4 2/2] vfio/pci: add msi interrupt affinity suppor=
-t
-> config: mips-randconfig-r081-20240609 (https://download.01.org/0day-ci/ar=
-chive/20240609/202406092245.Hgx6MqK9-lkp@intel.com/config)
-> compiler: mips-linux-gcc (GCC) 13.2.0
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> | Closes: https://lore.kernel.org/r/202406092245.Hgx6MqK9-lkp@intel.com/
->
-> New smatch warnings:
-> drivers/vfio/pci/vfio_pci_core.c:1241 vfio_pci_ioctl_set_irqs() warn: may=
-be return -EFAULT instead of the bytes remaining?
->
-> vim +1241 drivers/vfio/pci/vfio_pci_core.c
->
-> 2ecf3b58ed7bc5 drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1190  static int vfio_pci_ioctl_set_irqs(struct vfio_pci_core_device *v=
-dev,
-> 663eab456e072b drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1191                                  struct vfio_irq_set __user *arg)
-> 2ecf3b58ed7bc5 drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1192  {
-> 2ecf3b58ed7bc5 drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1193       unsigned long minsz =3D offsetofend(struct vfio_irq_set, cou=
-nt);
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1194       struct vfio_irq_set hdr;
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1195       cpumask_var_t mask;
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1196       u8 *data =3D NULL;
-> 05692d7005a364 drivers/vfio/pci/vfio_pci.c      Vlad Tsyrklevich 2016-10-=
-12  1197       int max, ret =3D 0;
-> ef198aaa169c61 drivers/vfio/pci/vfio_pci.c      Kirti Wankhede   2016-11-=
-17  1198       size_t data_size =3D 0;
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1199
-> 663eab456e072b drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1200       if (copy_from_user(&hdr, arg, minsz))
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1201               return -EFAULT;
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1202
-> 05692d7005a364 drivers/vfio/pci/vfio_pci.c      Vlad Tsyrklevich 2016-10-=
-12  1203       max =3D vfio_pci_get_irq_count(vdev, hdr.index);
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1204
-> ea3fc04d4fad2d drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1205       ret =3D vfio_set_irqs_validate_and_prepare(&hdr, max, VFIO_P=
-CI_NUM_IRQS,
-> ea3fc04d4fad2d drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1206                                                &data_size);
-> ef198aaa169c61 drivers/vfio/pci/vfio_pci.c      Kirti Wankhede   2016-11-=
-17  1207       if (ret)
-> ef198aaa169c61 drivers/vfio/pci/vfio_pci.c      Kirti Wankhede   2016-11-=
-17  1208               return ret;
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1209
-> ef198aaa169c61 drivers/vfio/pci/vfio_pci.c      Kirti Wankhede   2016-11-=
-17  1210       if (data_size) {
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1211               if (hdr.flags & VFIO_IRQ_SET_DATA_AFFINITY) {
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1212                       if (!zalloc_cpumask_var(&mask, GFP_KERNEL))
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1213                               return -ENOMEM;
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1214
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1215                       ret =3D copy_from_user(mask, &arg->data, dat=
-a_size);
->
-> copy_from_user() returns the number of bytes remaining to be copied.
-> This should be:
->
->         if (copy_from_user(mask, &arg->data, data_size)) {
->                 ret =3D -EFAULT;
->                 goto out;
->         }
->
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1216                       if (ret)
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1217                               goto out;
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1218
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1219                       data =3D (u8 *)mask;
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1220
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1221               } else {
-> 663eab456e072b drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1222                       data =3D memdup_user(&arg->data, data_size);
-> 3a1f7041ddd59e drivers/vfio/pci/vfio_pci.c      Fengguang Wu     2012-12-=
-07  1223                       if (IS_ERR(data))
-> 3a1f7041ddd59e drivers/vfio/pci/vfio_pci.c      Fengguang Wu     2012-12-=
-07  1224                               return PTR_ERR(data);
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1225               }
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1226       }
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1227
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1228       mutex_lock(&vdev->igate);
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1229
-> ea3fc04d4fad2d drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1230       ret =3D vfio_pci_set_irqs_ioctl(vdev, hdr.flags, hdr.index, =
-hdr.start,
-> ea3fc04d4fad2d drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1231                                     hdr.count, data);
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1232
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1233       mutex_unlock(&vdev->igate);
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1234
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1235  out:
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1236       if (hdr.flags & VFIO_IRQ_SET_DATA_AFFINITY && data_size)
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1237               free_cpumask_var(mask);
-> 66c926fb7b2507 drivers/vfio/pci/vfio_pci_core.c Fred Griffoul    2024-06-=
-07  1238       else
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1239               kfree(data);
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31  1240
-> 89e1f7d4c66d85 drivers/vfio/pci/vfio_pci.c      Alex Williamson  2012-07-=
-31 @1241       return ret;
-> 2ecf3b58ed7bc5 drivers/vfio/pci/vfio_pci_core.c Jason Gunthorpe  2022-08-=
-31  1242  }
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
->
+If you prefer, you can introduce a bool kvm_is_addr_direct(struct kvm
+*kvm, gpa_t gpa), and use it here as kvm_is_addr_direct(kvm,
+fault->addr). Maybe that's the best of both worlds.
+
+Paolo
+
 
