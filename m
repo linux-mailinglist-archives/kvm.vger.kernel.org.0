@@ -1,167 +1,93 @@
-Return-Path: <kvm+bounces-19152-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19153-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04C4C901A36
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 07:35:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05432901A37
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 07:36:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8743F2818DB
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 05:35:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F1A828157B
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 05:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACC510A0A;
-	Mon, 10 Jun 2024 05:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C28101D4;
+	Mon, 10 Jun 2024 05:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="ik0ekPw0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XgMeKwP7"
 X-Original-To: kvm@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69A41852;
-	Mon, 10 Jun 2024 05:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C730EB64C
+	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 05:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1717997726; cv=none; b=kUNrlE9VG2jkWjmT90I3jDsBGRefsuFjhFpdXuYEM8OPd0sSLmUblJrb1WBnTPJUUrdGdlLHziuLhVEy2XSb2gmO7MTjL3HuYOFK7z2Qkm9CMiXgNlneUzoFX2LTzgFFfdy6/nP+9NxoFiVIM7xtOktoAcPNx+G05BbgpZxZfpY=
+	t=1717997806; cv=none; b=cxNfN8cJOZYRTojtrOQJq0aWqWWqDvQVfzM1rUWIJ9I6U6J03DtQ6ZWuC2D72STEXLIQA9B0FsNFLuD4//AJz9mJcrJxKlBEDwpmvg84MtqPQljSdQvs5HUcUaB9VyI9rWaeU+SPowflX+PTTGVsrjnk8Fry+9wtcIel8zATwqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1717997726; c=relaxed/simple;
-	bh=j5JDaMwuzJvc73EGL77K10m92BLzD8OND8bZM7llTHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UErLXw1Ye3M+azkMHVH5zU6fEoJfN5eN8lv7kmHK82Z1HWuc9cVbM+jE1u1aEXUz98UJd1l0ZqloJ5AbH5KbOA7fY5q48bDDtWELuC1UcRfH70FnaaeCopyOEXd+m2P75y07CJ0+9kmqR1Ctl0v79sJV+2kmQsvtuIv+OPsmgQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=ik0ekPw0; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=eB0NMMEEXOM2b2CYR7Yv3NlVBKULaZ5fvEsvZRl6UCM=; b=ik0ekPw0EQjtiH+5BdPz5Qlw0V
-	A3zpcoqkjm5sVEpkhsXBjpZmMuDQZcyg53ghnS07iwAryrgCNLW1zLyZN76Hjy20YLyjGBIEuFOm3
-	9q6JDb3ljqbkNabzfM6WV63r/a8j7CILx72udH4IznkNlgxrt6ORWj9kn/GnIxOmMdd8KBeAxYYN/
-	BPEwYDrM4u2Brqj7tFV2XfljfIa97FE45o0iZBVpnbSYJpuj36GDelA/ISCemX8NZ/U282I6SFJPP
-	zGyTt4o1oJboeFg2ykrsQMjlvmh3V1U+a+8DoVQ7bmLdQqPzmZvg/1kuyTW4xEINYrgNBzvXxmtCd
-	VvZNhxNw==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1sGXKA-006dpp-0V;
-	Mon, 10 Jun 2024 05:12:06 +0000
-Date: Mon, 10 Jun 2024 06:12:06 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Fei Li <fei1.li@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [RFC] UAF in acrn_irqfd_assign() and vfio_virqfd_enable()
-Message-ID: <20240610051206.GD1629371@ZenIV>
-References: <20240607015656.GX1629371@ZenIV>
- <20240607015957.2372428-1-viro@zeniv.linux.org.uk>
- <20240607015957.2372428-11-viro@zeniv.linux.org.uk>
- <20240607-gelacht-enkel-06a7c9b31d4e@brauner>
- <20240607161043.GZ1629371@ZenIV>
- <20240607210814.GC1629371@ZenIV>
+	s=arc-20240116; t=1717997806; c=relaxed/simple;
+	bh=ITtXZGENWjoI0Fg7PAbVhcUoLbGw5ExnOvejqXNKdZM=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZOU/NcemNKh+tWtC5+eCMa4thF3KXqY2GQDG7sAFOoq1QeWwIv1kJeq6VeoFEfX8i6f7oqfv9msYK2cL+myi8qwo0SIUxRHrJhPqgcMPjftRQHLQ12Zc4hGzaRTpYVogP3pprA1zGG+/CWRfFiLEkOvmBaIbuCmDTkfC8/khkHo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XgMeKwP7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BFC56C4AF1C
+	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 05:36:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1717997805;
+	bh=ITtXZGENWjoI0Fg7PAbVhcUoLbGw5ExnOvejqXNKdZM=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=XgMeKwP7gkPMpNvCOUPqamCfL7T60AqGRQgUG9uL1UZH5JP72rg25/IoFSTx76B7u
+	 Z58H61rb8Ko/S85waHSd4Zsqa0CLQ35dKuFmydI0HIAIxhQ01nOzoqHmhg2Ebpw2uH
+	 IEESw0zuh7B2sJ+gqDkkWGcoIUZTm9zuRosY3jADdWJyUeA5K4jVjrUznaLQqOk2O6
+	 hJT+bZCPMa5vIu072pGr190FL0Y66vX/rWcP1cgnfDKrcQ/yT7v0mEsS6w7YXxBdyY
+	 WH+RM1x+KKQKp+WD3zqPdJW7iDNPTpkNxaPS3OWLM0xVmQSTW57kQVMmTS8H8yn+g6
+	 hZhM5AEB4fRFQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id ACB84C53BB8; Mon, 10 Jun 2024 05:36:45 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218949] Kernel panic after upgrading to 6.10-rc2
+Date: Mon, 10 Jun 2024 05:36:45 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cf_kernel_version cf_regression
+Message-ID: <bug-218949-28872-Yc62AD234U@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218949-28872@https.bugzilla.kernel.org/>
+References: <bug-218949-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240607210814.GC1629371@ZenIV>
-Sender: Al Viro <viro@ftp.linux.org.uk>
 
-In acrn_irqfd_assign():
-	irqfd = kzalloc(sizeof(*irqfd), GFP_KERNEL);
-	...
-	set it up
-	...
-        mutex_lock(&vm->irqfds_lock);
-        list_for_each_entry(tmp, &vm->irqfds, list) {
-                if (irqfd->eventfd != tmp->eventfd)
-                        continue;
-                ret = -EBUSY;
-                mutex_unlock(&vm->irqfds_lock);
-                goto fail;
-        }
-        list_add_tail(&irqfd->list, &vm->irqfds);
-        mutex_unlock(&vm->irqfds_lock);
-Now irqfd is visible in vm->irqfds.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218949
 
-        /* Check the pending event in this stage */
-        events = vfs_poll(f.file, &irqfd->pt);
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-        if (events & EPOLLIN)
-                acrn_irqfd_inject(irqfd);
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+     Kernel Version|                            |6.10-rc2
+         Regression|No                          |Yes
 
-OTOH, in
+--=20
+You may reply to this email to add a comment.
 
-static int acrn_irqfd_deassign(struct acrn_vm *vm,
-                               struct acrn_irqfd *args)
-{
-        struct hsm_irqfd *irqfd, *tmp;
-        struct eventfd_ctx *eventfd;
-
-        eventfd = eventfd_ctx_fdget(args->fd);
-        if (IS_ERR(eventfd))
-                return PTR_ERR(eventfd);
-
-        mutex_lock(&vm->irqfds_lock);
-        list_for_each_entry_safe(irqfd, tmp, &vm->irqfds, list) {
-                if (irqfd->eventfd == eventfd) {
-                        hsm_irqfd_shutdown(irqfd);
-
-and
-
-static void hsm_irqfd_shutdown(struct hsm_irqfd *irqfd)
-{
-        u64 cnt;
-
-        lockdep_assert_held(&irqfd->vm->irqfds_lock);
-
-        /* remove from wait queue */
-        list_del_init(&irqfd->list);
-        eventfd_ctx_remove_wait_queue(irqfd->eventfd, &irqfd->wait, &cnt);
-        eventfd_ctx_put(irqfd->eventfd);
-        kfree(irqfd);
-}
-
-Both acrn_irqfd_assign() and acrn_irqfd_deassign() are callable via
-ioctl(2), with no serialization whatsoever.  Suppose deassign hits
-as soon as we'd inserted the damn thing into the list.  By the
-time we call vfs_poll() irqfd might have been freed.  The same
-can happen if hsm_irqfd_wakeup() gets called with EPOLLHUP as a key
-(incidentally, it ought to do
-	__poll_t poll_bits = key_to_poll(key);
-instead of
-        unsigned long poll_bits = (unsigned long)key;
-and check for EPOLLIN and EPOLLHUP instead of POLLIN and POLLHUP).
-
-AFAICS, that's a UAF...
-
-We could move vfs_poll() under vm->irqfds_lock, but that smells
-like asking for deadlocks ;-/
-
-vfio_virqfd_enable() has the same problem, except that there we
-definitely can't move vfs_poll() under the lock - it's a spinlock.
-
-Could we move vfs_poll() + inject to _before_ making the thing
-public?  We'd need to delay POLLHUP handling there, but then
-we need it until the moment with do inject anyway.  Something
-like replacing
-        if (!list_empty(&irqfd->list))
-		hsm_irqfd_shutdown(irqfd);
-in hsm_irqfd_shutdown_work() with
-        if (!list_empty(&irqfd->list))
-		hsm_irqfd_shutdown(irqfd);
-	else
-		irqfd->need_shutdown = true;
-and doing
-	if (unlikely(irqfd->need_shutdown))
-		hsm_irqfd_shutdown(irqfd);
-	else
-		list_add_tail(&irqfd->list, &vm->irqfds);
-when the sucker is made visible.
-
-I'm *not* familiar with the area, though, so that might be unfeasible
-for any number of reasons.
-
-Suggestions?
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
