@@ -1,35 +1,35 @@
-Return-Path: <kvm+bounces-19231-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19232-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3419023B8
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:11:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 531249023CA
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:14:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1F0F1F239E2
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 14:11:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 070761F21104
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 14:14:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2C412BE91;
-	Mon, 10 Jun 2024 14:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2066781729;
+	Mon, 10 Jun 2024 14:14:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16DC423B0;
-	Mon, 10 Jun 2024 14:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADD271B45;
+	Mon, 10 Jun 2024 14:14:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718028704; cv=none; b=GC9nExaNrXC6eIwAVh7x/fm+djuG7eHYGFxRhFCjoQVEk2zKMEM5wLWih2LES6MWullRbsRirRUOHjwYNsf9myF7ffrTmP2SoPgZu9c4CXutmEEqLK/tQjnHxD0FiKeOmgBDL+x3wIBSxO6x7m54Isq9mD6dFYGO3M+HYn/1d1I=
+	t=1718028870; cv=none; b=L29jjmfkQ+ur8fBwiOYp1TjiEhp8an7nxTU54E2gHuO4nrkOnjUeDWb5aE0BYCqSZ5SPAWwKsDKAkOzHNd4a4BO/bRPGFdZbSTHdMqjt/8WcBJ8O+X3zV28W9AXhWxDqlRJ4RskZm5tUxVCKkotQtx992zKrzL1Qvi1kT6c1ADs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718028704; c=relaxed/simple;
-	bh=FsdkyzDBDHbWmLBrCoH0qjW/NNd5YeFXroFLBck/y8I=;
+	s=arc-20240116; t=1718028870; c=relaxed/simple;
+	bh=/RnFbqFrkgtxJGH9Ucg1ZU3e+IiD8Bt8Skqc2diIr0A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T/tGp3QKA7lufi97kIRadmAJ9VC10X+aVhvnWmCR/68MkPu0dVo+etAvmgbrxyrk1uk/1fotffPsw/L8SDdtS/kqfUNWclFCF8rGo5UF6zvDUYC16YTc1xk1tG6tcZlnSSG9I4BI5d2S0n0NTnLfF0SNfSKuWGlyPZ+V5Xs2dK0=
+	 Content-Type:Content-Disposition:In-Reply-To; b=JONyyoXRDcROpYgMtgHt23Lq0Cgls9Zn6DGmAr1d4/AFwpmOmQCS60rVBg4P7bhjQESrAS9E/DfZdST74z6QOSaGnxhTzq7H7uM75xS70y6PKA7Oh2S/v8Wf5dAvNgXEqSOKt7XJimbIwoCbSvc8kS+mIJmX5vt0HHD8j7bLo6M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D56AC2BBFC;
-	Mon, 10 Jun 2024 14:11:40 +0000 (UTC)
-Date: Mon, 10 Jun 2024 15:11:38 +0100
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED8A2C2BBFC;
+	Mon, 10 Jun 2024 14:14:26 +0000 (UTC)
+Date: Mon, 10 Jun 2024 15:14:24 +0100
 From: Catalin Marinas <catalin.marinas@arm.com>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -44,10 +44,10 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
-Message-ID: <ZmcJmvBDtjaLay5k@arm.com>
+Subject: Re: [PATCH v3 01/14] arm64: rsi: Add RSI definitions
+Message-ID: <ZmcKQHvqYmuDTNTf@arm.com>
 References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-3-steven.price@arm.com>
+ <20240605093006.145492-2-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,24 +56,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240605093006.145492-3-steven.price@arm.com>
+In-Reply-To: <20240605093006.145492-2-steven.price@arm.com>
 
-On Wed, Jun 05, 2024 at 10:29:54AM +0100, Steven Price wrote:
-> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-> index 9b5ab6818f7f..9d8d38e3bee2 100644
-> --- a/arch/arm64/mm/init.c
-> +++ b/arch/arm64/mm/init.c
-> @@ -41,6 +41,7 @@
->  #include <asm/kvm_host.h>
->  #include <asm/memory.h>
->  #include <asm/numa.h>
-> +#include <asm/rsi.h>
->  #include <asm/sections.h>
->  #include <asm/setup.h>
->  #include <linux/sizes.h>
+On Wed, Jun 05, 2024 at 10:29:53AM +0100, Steven Price wrote:
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rsi_cmds.h
+> @@ -0,0 +1,47 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#ifndef __ASM_RSI_CMDS_H
+> +#define __ASM_RSI_CMDS_H
+[...]
+> --- /dev/null
+> +++ b/arch/arm64/include/asm/rsi_smc.h
+> @@ -0,0 +1,142 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Copyright (C) 2023 ARM Ltd.
+> + */
+> +
+> +#ifndef __SMC_RSI_H_
+> +#define __SMC_RSI_H_
 
-What's this random include here? It looks like a leftover from the
-previous version.
+A small nitpick if you respin some patches - please make the header
+guards consistent. We tend to to use the top variant above, so the
+rsi_smc.h would be __ASM_RSI_SMC_H. The same throughout this series.
 
 -- 
 Catalin
