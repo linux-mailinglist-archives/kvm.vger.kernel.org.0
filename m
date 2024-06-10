@@ -1,166 +1,111 @@
-Return-Path: <kvm+bounces-19244-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19245-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E83C79026C5
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 18:32:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 897019026D2
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 18:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72C1E1F225F4
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:32:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17B39281BB5
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B221474DA;
-	Mon, 10 Jun 2024 16:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A2391482EE;
+	Mon, 10 Jun 2024 16:34:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Cmozzbsw";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Xc3cTz4m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WC4i6hb1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D89F839E4;
-	Mon, 10 Jun 2024 16:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 044E91422CF
+	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 16:34:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718037116; cv=none; b=Dtlh4L9PRhxNAK8aQ8TONGEgPWnFXHirm2Nd7Z2lGNi1LBppVq026x4t4NJDl/sSAo8w9jYikOK4FvnHJuH7HP6Jai2jVF/T1qNU05AI5OXxJwOQz7Eil3yyGNuSvKg/BEm8Mz2MxaoHPn6/u/0+tAb82T/X0/CNHHAVNfLn2a0=
+	t=1718037275; cv=none; b=vEaiw2zeu2FAh19jCADKQJdUP5UxuJQMjOFnO8XzRgy4NNMurQYo8A2Dz/o5tPk8vYVOEp/5n1haq1zqixLyyyVdbOl3EMXL/+5zBTrkEK1Dgpp18rif+Pxgn+XPHJojjJCHl0zFEtEfZAcGJpveFyMgNYidSnqfj2OKvv2nIW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718037116; c=relaxed/simple;
-	bh=N3di2r23JypfAl5MTEhPDveOqgwx+6z3BLi27InIyAA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VGyCXurktb9g4PDtnHeHnyHKsApplA+Fd/TfHnT4f7ymZlb9JJYTHhtGDE/qDp8xQdlxKHkMHOF1gj7tntca97VbvV86tAPDTpaNGHOro92PT6hwmS9pjSvO2VNVgJLjhg+Iug/Eap5EbnQxiZ4PIlilYFw8Y0PNrR7i5iwyr9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=Cmozzbsw; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=Xc3cTz4m; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 18AFE21E75;
-	Mon, 10 Jun 2024 16:31:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1718037112; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N3di2r23JypfAl5MTEhPDveOqgwx+6z3BLi27InIyAA=;
-	b=Cmozzbsw8dV1XhI5Ks/8pK8BSluXi+OZg8CcCAE7eORnAlnB7JhWkbTp79fwDr6w3+BLPn
-	oekUCJhU3Hgu3N/YohopicxhsF9XcLGSgjPkYwe666OKoYOz008LUhCvBLAex4n0+i00v3
-	QO10vUIpdXip9VjYnrNhk8rHjHW0kxY=
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1718037111; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N3di2r23JypfAl5MTEhPDveOqgwx+6z3BLi27InIyAA=;
-	b=Xc3cTz4m+/u/dVB+/E49W0F3wsFj/S4HLX2u49jTj887YXt9dInjbC0l/Hjsns4kQZ2IjY
-	nz8u26uZyFDM42ruVw4YPoL2RSp6oCDgIW8wuAtiukqaTeJYkplr5/uC0YW3LLQjb8htVt
-	CQqXRSQnzTQi7icrg/cpYdzTdgYAufQ=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EFFA713A7F;
-	Mon, 10 Jun 2024 16:31:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id YDxpOnYqZ2bqaQAAD6G6ig
-	(envelope-from <mkoutny@suse.com>); Mon, 10 Jun 2024 16:31:50 +0000
-Date: Mon, 10 Jun 2024 18:31:49 +0200
-From: Michal =?utf-8?Q?Koutn=C3=BD?= <mkoutny@suse.com>
-To: Fred Griffoul <fgriffo@amazon.co.uk>
-Cc: griffoul@gmail.com, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Alex Williamson <alex.williamson@redhat.com>, 
-	Waiman Long <longman@redhat.com>, Zefan Li <lizefan.x@bytedance.com>, Tejun Heo <tj@kernel.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Mark Brown <broonie@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
-	Joey Gouly <joey.gouly@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Jeremy Linton <jeremy.linton@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, 
-	Kevin Tian <kevin.tian@intel.com>, Eric Auger <eric.auger@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Christian Brauner <brauner@kernel.org>, 
-	Ankit Agrawal <ankita@nvidia.com>, Reinette Chatre <reinette.chatre@intel.com>, 
-	Ye Bin <yebin10@huawei.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, cgroups@vger.kernel.org
-Subject: Re: [PATCH v5 0/2] vfio/pci: add msi interrupt affinity support
-Message-ID: <k4r7ngm7cyctnyjcwbbscvprhj3oid6wv3cqobkwt4p4j4ibfy@pvmb35lmvdlz>
-References: <20240610125713.86750-1-fgriffo@amazon.co.uk>
+	s=arc-20240116; t=1718037275; c=relaxed/simple;
+	bh=yllP6g2dm2MsE2mnC1k07LPpw9VCtTWLM/HdffmDV2I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=NBE86jtJ0zMES69MMvjDJ4iyga+MO8EBAqyp3PYgxl4TfYrwPifPxwrPAsMIzgkbdZ89KnDproDFdpGdnv1fPm87Lh/zdLHrY5wQv733lw+4h+48aNMqJtHfWT+jgZFFrlGMHvS9fs5SmPFuYMx2IyTw09OZobzk2HetwALGkbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WC4i6hb1; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62a08273919so69391137b3.1
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 09:34:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718037273; x=1718642073; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jZSb9+rs2usNZeKaqhewTAKIWQtnKpWPlA0PtSeTiJQ=;
+        b=WC4i6hb1UOexv2yMtF70U7Mr+7bVg3/h5iGO+NyFEHpJt1dQ52ujTP2PHrzH5KnDC3
+         VWN/py+nwntPscfcIP6xnnycbmJPaLVZtnw8PxgZaaMoRzbhuSOrWNkpQ76fO9ks/j+2
+         vZJATnZLe7ukiOC815CPtAl0xsxUVpmMCUP4w9lgvezGpSdeFfY8yXrugZwf+2MIeRak
+         qrPq0x8cVH3IW8MIf43zcSibGDGwygALEu/ZduaS2Xk3hGkeVmmNe50GMzQoJHwHOGKv
+         fC1c89n++y6/xupaHYUpx+Ju9PMrmMd4gWzpkRZigLizSh6MPTm8W8sPGPYwEp7rvyAR
+         ODoA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718037273; x=1718642073;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jZSb9+rs2usNZeKaqhewTAKIWQtnKpWPlA0PtSeTiJQ=;
+        b=f6HfVeiXOKkBIX+fdle5bqIeHisI0Ix/t1MPG6cYW+QHCpR9glFY0wBp0oV2dnr+UW
+         aFDXO5GDknrXKHR53+03HaVe08YUBtUfMktSMj3rXDI4kZ+GUayf2PUDDFNEE2g6PHqC
+         GNB2FI1BdCHuM2vsKlVLE3StNpL/4vFTTqVc0kux6pwV5Ry/h4q/wD2jU/czOhko6BMO
+         BZeUupWcgEjnm77JxbxsYSPKfHqwMF91z6PKZFEb7MRAGuie864PIppK80nq/CeCABlB
+         vRaUvHuYmzfgUKtmKZnPtu1KTPkOlP1TjqTla4FOWzDTjnr5QuEetLSWB3E2FWF0tkUC
+         YzQA==
+X-Gm-Message-State: AOJu0YwQrawEDzH4RdHRIe4FXL82LRxXiKoRJrIfEmKla8DIAHSlnJ/5
+	QRMGtq2my+fZCrQ7bEccP07MFaC7IR+TSi3CqMhYOezxgdIdTxA0Symdlr7NIYWDJ2HQsv/BwjS
+	h9A==
+X-Google-Smtp-Source: AGHT+IHHh2RNmvVunFf6h0xc9IRdVIUXMt65AfZopDDW5pG8LuS4lbSICFSmAFOGHkb/0UN6udVF9yYpz8g=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:10c3:b0:dfb:335:427f with SMTP id
+ 3f1490d57ef6-dfb0335481emr683064276.4.1718037272968; Mon, 10 Jun 2024
+ 09:34:32 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon, 10 Jun 2024 09:34:27 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rbxiec5rtsu2tqmi"
-Content-Disposition: inline
-In-Reply-To: <20240610125713.86750-1-fgriffo@amazon.co.uk>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.87 / 50.00];
-	BAYES_HAM(-2.97)[99.89%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[30];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TO_DN_SOME(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[gmail.com,arm.com,kernel.org,redhat.com,bytedance.com,cmpxchg.org,linux.dev,ziepe.ca,intel.com,nvidia.com,huawei.com,lists.infradead.org,vger.kernel.org];
-	R_RATELIMIT(0.00)[to_ip_from(RLs4bg81ntywruwbpnkcfhozwy)];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[amazon.co.uk:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -5.87
-X-Spam-Flag: NO
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240610163427.3359426-1-seanjc@google.com>
+Subject: [PATCH] MAINTAINERS: Drop Wanpeng Li as a Reviewer for KVM Paravirt support
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+Drop Wanpeng as a KVM PARAVIRT reviewer as his @tencent.com email is
+bouncing, and according to lore[*], the last activity from his @gmail.com
+address was almost two years ago.
 
---rbxiec5rtsu2tqmi
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+[*] https://lore.kernel.org/all/CANRm+Cwj29M9HU3=JRUOaKDR+iDKgr0eNMWQi0iLkR5THON-bg@mail.gmail.com
 
-Hello Fred.
+Cc: Wanpeng Li <kernellwp@gmail.com>
+Cc: Like Xu <like.xu.linux@gmail.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-On Mon, Jun 10, 2024 at 12:57:06PM GMT, Fred Griffoul <fgriffo@amazon.co.uk> wrote:
-> The usual way to configure a device interrupt from userland is to write
-> the /proc/irq/<irq>/smp_affinity or smp_affinity_list files. When using
-> vfio to implement a device driver or a virtual machine monitor, this may
-> not be ideal: the process managing the vfio device interrupts may not be
-> granted root privilege, for security reasons. Thus it cannot directly
-> control the interrupt affinity and has to rely on an external command.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index aacccb376c28..2c48b67449f5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12382,7 +12382,6 @@ F:	drivers/video/backlight/ktz8866.c
+ 
+ KVM PARAVIRT (KVM/paravirt)
+ M:	Paolo Bonzini <pbonzini@redhat.com>
+-R:	Wanpeng Li <wanpengli@tencent.com>
+ R:	Vitaly Kuznetsov <vkuznets@redhat.com>
+ L:	kvm@vger.kernel.org
+ S:	Supported
 
-External commands something privileged? (I'm curious of an example how
-this is setup.)
+base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
+-- 
+2.45.2.505.gda0bf45e8d-goog
 
-> The affinity argument must be a subset of the process cpuset, otherwise
-> an error -EPERM is returned.
-
-I'm not sure you want to look at task's cpuset mask for this purposes.
-
-Consider setups without cpuset or a change of (cpuset) mask anytime
-during lifetime of the task...
-
-Michal
-
---rbxiec5rtsu2tqmi
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQQpEWyjXuwGT2dDBqAGvrMr/1gcjgUCZmcqcwAKCRAGvrMr/1gc
-jmkBAQCja3OL36wbZrX33f/BCxgTsGyEe2Buh2DsgnbWTikxCAEAguitmv3gNJZj
-PWDNgoj9nHp+v218OHZhAu8PFmSWXAA=
-=9DxI
------END PGP SIGNATURE-----
-
---rbxiec5rtsu2tqmi--
 
