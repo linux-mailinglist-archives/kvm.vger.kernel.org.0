@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-19157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19158-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72378901B4B
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 08:33:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C4314901B4C
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 08:33:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 117DF281402
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 06:33:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60D52281288
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 06:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D73420DC3;
-	Mon, 10 Jun 2024 06:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E05BC224F6;
+	Mon, 10 Jun 2024 06:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4P5KDlEO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bfJ1hRhg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA54200C7
-	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 06:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F57A10A22
+	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 06:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718001190; cv=none; b=CJKurXGem8NREKDSrLXbuGhRsj2o8DrRLvL0HIoIC3uMlr6w89DH9OjuCfnCKX4JWfvi3P0omsFANcIMsYwWGpAdnNf2bBmd3TsxSv62c5Mq8NOHoTRBcPSGWumztP7Ilm1ekOSbWH8cdx8p2r1yi59X1xL0/PVr+WDN2bo9XzQ=
+	t=1718001194; cv=none; b=FOCxCFa04EPTE/MKSn3Gn6IH4U7q1qxlpFk5ZWtrap6thTm6w7crAS5w95YgIJKNBxs9QPA3VzjaKkGeal452xeBA/A64T9u6STpqeyfLiq2UoxyZqBg2HY558uORVaOxA+N4pCU7GhluUjY9ztvvw5Eh/pVQ3Lipxvqih32US0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718001190; c=relaxed/simple;
-	bh=4sBy4q9o+2XAwUMDPYKyMJ3gbWzk4GYah5sqC1TOQ/c=;
+	s=arc-20240116; t=1718001194; c=relaxed/simple;
+	bh=gHt8zqUvDCjK16BTv1X5Tnkv3fxtChncwef6D10cFcA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=k7lRfBd2R4sGzc+eexyJHJROtmkMnbVu2rU3UmU2ugDI0qLU7d7yH85fZ7vvv1REKPP3iQr/K4anTn/6uS4+gRoir9cJ4L+EipjDS538iKc+vNLjnslri2j6bMc7YHUSmd55anPZOrzqGvSBPzdscSy16XRvZamzq1GzzFmXod8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4P5KDlEO; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=NHeTm0mlHnoj4hujLH1AnmROcuykKygXNaY96P5y+WN8mRu8i3HwofmsHmmoUU7bgzHFR3Q5UPnfEcSYJeuC2NIinBuPu6V7DiLcPdJOY/hTdX24XTtMh2kFQPAglkX9BEYAxhypol4XSybD9bSrAgbzXGGDKJHdGw9vxtL2Rng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bfJ1hRhg; arc=none smtp.client-ip=209.85.218.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ptosi.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfb0acdf0c6so3815494276.3
-        for <kvm@vger.kernel.org>; Sun, 09 Jun 2024 23:33:08 -0700 (PDT)
+Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-a6f1e2404ecso35752766b.3
+        for <kvm@vger.kernel.org>; Sun, 09 Jun 2024 23:33:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718001188; x=1718605988; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718001191; x=1718605991; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=FAg4zwCV0ETMYk7uJAuzLLD4Wj6HS+UWIuwSFsyOCeM=;
-        b=4P5KDlEOtBhnk0MWsHkv64l6GlsgWsGxGk9Kf92a68Ze2O33lFG7CVe1LcAKOqYJFI
-         5K7CI0lp/IVPhPyzLvdraHEJ4BwRGME3KecvDdDE0nSTJSZdH4YPg2ZF4rrL9jcmyez8
-         +SDtzQpIpiJ+sorhVZzGD+PUnfVXJmtQhlOW4buqdojGj8Z8qrGYxbbZgFHZF8nmOHBv
-         D8GmuJDxLn/6GYtHTq81Z0RaLMI455hHl8OBdRt3nWAmCZzZrZSlm0dYBkzcgIWqn+bq
-         zGCyY4cyEa1lgvKWLdpaitBGQamg1XZkKwOkac40JATfXXAkgi+3scxRG+IKrQfVtF3k
-         aZWw==
+        bh=z0udD/PdRvQwx4wKxPuf11kZ4dOxHkqKwOOLvcn5nZA=;
+        b=bfJ1hRhgiESgLCusZ8JBJC3ces8P9x+3B1VJ7e/IJt+KM5iPimW7rsyrD8UGDC4un7
+         lslZPuzuG8BeUhuyOsO1PsAiNV0lnSFqKbtXdTV9HRJfOaxPjEvWKWombhRzyh9m0DZo
+         ytbo7+YAGmTDxbZ6BKUvJVFSMFf0Ak1YqY8TT6HUlN0tlY7qsVUCSMt6AkCGDQDl/0Rb
+         RZf/IRAIfO6p1eRl+KwgVAcyAqPjQXPRbJadb1n2gM6Y8ByJkhpFH1EQ/2MHYlUp64ZG
+         li9BI+qVM4DvEt6LfzpPG1p/GfjLcmAsnJE7fwZgejDTZbQ0/NjdDng2hugfZOtaXpkJ
+         Vq1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718001188; x=1718605988;
+        d=1e100.net; s=20230601; t=1718001191; x=1718605991;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=FAg4zwCV0ETMYk7uJAuzLLD4Wj6HS+UWIuwSFsyOCeM=;
-        b=UWJXMeNuDNWHbMAwRsZhgMiXPDQmadva1J27kHvnFQLcbrRzMDVpkXT2loKgAH3xer
-         dfEXjGfCwgpCalG+XNUfWXYAnwkgfj0am7CqQtkCOttaLnVaATdOWfTRyISW8b2k4xVZ
-         O/eBrCGarSsjfttGk4LyfEppEyqZRa1NEpubXPgD5WSGQwXHdX86HS5P8c0hIy4fypmY
-         fw2NHFwuWBQsU0dsPlrNcIjnXZNtA3FCiDdklyuEWed4YUpc/+yG9JtxprTMmSR5l9EP
-         wRjshKeQ9qfUoL3get5d2PNDvdGsDIpYuBnSc/RQuvz5Qmtocor6F6MWSbtoOUmEXUIf
-         3Tsg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5cGD3CG4uFbAP//XX3PUJXeqLu1iVvl65O699X4hhFiVPTVAAajPGSpFbFUnS2AN0BZSH+4ufm0W3qm1J3MZeem+l
-X-Gm-Message-State: AOJu0YxrymxuQPAiMR+QiOzK34UYl4Erca2BkYib0Ms4nnON/nfRNNB+
-	K7Jqly+hVP/dXgVMYLW0q6ko3Lus/YgrWWaMLTaHegG7x5cqfNeNlAnUwTRz3soSVUiqP327bg=
+        bh=z0udD/PdRvQwx4wKxPuf11kZ4dOxHkqKwOOLvcn5nZA=;
+        b=QqsLO7gnvwmTMIZTAPHAb4dUAN/Y7+5W5LAXvh3sfnr2rQjObdPecxi2cRESz9fnh4
+         F1Ja70u/l+VJE0Lln2hMf1nLJKldw035VdeemVZ3zQw1AnSX1NVICUIEddC04POjzCQ9
+         hZUN1TLoyo/h0WIDRaUXA9rpVuBL+F9yndUbQ+q6G+p8fFQVSyK/S23Ne3InG49g9aKo
+         yWOJRyjsS6ZnKHfsiH3ejeGzdGDe7ARJVZp7lB9wMEcW6u/g9Kfprl88lrJxy/RRKh1X
+         82GQoo2iqetEocZqNenrlV1+Ij5kH4OEIHr3CvHpmOBGbyQTmvX64ndTLfafAr7OeQBF
+         uhTw==
+X-Forwarded-Encrypted: i=1; AJvYcCX6TCDvfPzD8CfKLBpgPHE6FWtbBPoyiCM8zhdtwgroIKIX0aMRdXfz1mmmcAxNHiGOKYUIDfOPjOah/gNvp0XQd76r
+X-Gm-Message-State: AOJu0Ywg9mhewpaYKgSKnsliUMKxYXf6sb9J/kfp9Ro3zLR9KZIyW1bo
+	5Vwl6OwXFlAtWLOhrlhUa5C6rNvt9DGLbspSdtm4Mt7DOXjFKoxy7BM6HtxV/LKC0bmtSwS/hg=
 	=
-X-Google-Smtp-Source: AGHT+IFreq9wyxrRYtilc13+BKJ6v9CVdYWcuPyBidJggSdMr5wZPl1j8+ICTd1AZf0bVymxH29Mv4wpGg==
+X-Google-Smtp-Source: AGHT+IGv+s66RkOnG2No4QDLJnAjBEudC4CdDJBYCyTNdZf9o4rJX0PEOZM4CVBe0sIJilA7BZCLdN9lgQ==
 X-Received: from ptosi.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:11ec])
- (user=ptosi job=sendgmr) by 2002:a05:6902:20c5:b0:df7:b717:10c2 with SMTP id
- 3f1490d57ef6-dfaf6524ed6mr2518522276.2.1718001188121; Sun, 09 Jun 2024
- 23:33:08 -0700 (PDT)
-Date: Mon, 10 Jun 2024 07:32:32 +0100
+ (user=ptosi job=sendgmr) by 2002:a17:906:1cc5:b0:a6e:f44d:3c65 with SMTP id
+ a640c23a62f3a-a6ef44d6407mr655866b.0.1718001190442; Sun, 09 Jun 2024 23:33:10
+ -0700 (PDT)
+Date: Mon, 10 Jun 2024 07:32:33 +0100
 In-Reply-To: <20240610063244.2828978-1-ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240610063244.2828978-1-ptosi@google.com>
 X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
-Message-ID: <20240610063244.2828978-4-ptosi@google.com>
-Subject: [PATCH v5 3/8] KVM: arm64: nVHE: Simplify invalid_host_el2_vect
+Message-ID: <20240610063244.2828978-5-ptosi@google.com>
+Subject: [PATCH v5 4/8] KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
 From: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>
 To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
 	kvm@vger.kernel.org
@@ -87,34 +87,45 @@ Cc: "=?UTF-8?q?Pierre-Cl=C3=A9ment=20Tosi?=" <ptosi@google.com>, Will Deacon <wi
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-The invalid_host_el2_vect macro is used by EL2{t,h} handlers in nVHE
-*host* context, which should never run with a guest context loaded.
-Therefore, remove the superfluous vCPU context check and branch
-unconditionally to hyp_panic.
+Ignore R_AARCH64_ABS32 relocations, instead of panicking, when emitting
+the relocation table of the hypervisor. The toolchain might produce them
+when generating function calls with kCFI to represent the 32-bit type ID
+which can then be resolved across compilation units at link time.  These
+are NOT actual 32-bit addresses and are therefore not needed in the
+final (runtime) relocation table (which is unlikely to use 32-bit
+absolute addresses for arm64 anyway).
 
 Signed-off-by: Pierre-Cl=C3=A9ment Tosi <ptosi@google.com>
+Acked-by: Will Deacon <will@kernel.org>
 ---
- arch/arm64/kvm/hyp/nvhe/host.S | 6 ------
- 1 file changed, 6 deletions(-)
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/nvhe/host.S b/arch/arm64/kvm/hyp/nvhe/host.=
-S
-index 135cfb294ee5..3d610fc51f4d 100644
---- a/arch/arm64/kvm/hyp/nvhe/host.S
-+++ b/arch/arm64/kvm/hyp/nvhe/host.S
-@@ -197,12 +197,6 @@ SYM_FUNC_END(__host_hvc)
- 	sub	x0, sp, x0			// x0'' =3D sp' - x0' =3D (sp + x0) - sp =3D x0
- 	sub	sp, sp, x0			// sp'' =3D sp' - x0 =3D (sp + x0) - x0 =3D sp
-=20
--	/* If a guest is loaded, panic out of it. */
--	stp	x0, x1, [sp, #-16]!
--	get_loaded_vcpu x0, x1
--	cbnz	x0, __guest_exit_panic
--	add	sp, sp, #16
--
- 	/*
- 	 * The panic may not be clean if the exception is taken before the host
- 	 * context has been saved by __host_exit or after the hyp context has
+diff --git a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c b/arch/arm64/kvm/hyp/nvhe=
+/gen-hyprel.c
+index 6bc88a756cb7..b63f4e1c1033 100644
+--- a/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
++++ b/arch/arm64/kvm/hyp/nvhe/gen-hyprel.c
+@@ -50,6 +50,9 @@
+ #ifndef R_AARCH64_ABS64
+ #define R_AARCH64_ABS64			257
+ #endif
++#ifndef R_AARCH64_ABS32
++#define R_AARCH64_ABS32			258
++#endif
+ #ifndef R_AARCH64_PREL64
+ #define R_AARCH64_PREL64		260
+ #endif
+@@ -383,6 +386,9 @@ static void emit_rela_section(Elf64_Shdr *sh_rela)
+ 		case R_AARCH64_ABS64:
+ 			emit_rela_abs64(rela, sh_orig_name);
+ 			break;
++		/* Allow 32-bit absolute relocation, for kCFI type hashes. */
++		case R_AARCH64_ABS32:
++			break;
+ 		/* Allow position-relative data relocations. */
+ 		case R_AARCH64_PREL64:
+ 		case R_AARCH64_PREL32:
 --=20
 2.45.2.505.gda0bf45e8d-goog
 
