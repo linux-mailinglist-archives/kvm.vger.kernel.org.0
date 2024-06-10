@@ -1,119 +1,53 @@
-Return-Path: <kvm+bounces-19250-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19251-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825149027B6
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 19:25:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 213F39027C1
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 19:27:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7489EB22CB1
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 17:25:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 313101C21C9C
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 17:27:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C049114B96F;
-	Mon, 10 Jun 2024 17:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="S+TKeib5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92787147C89;
+	Mon, 10 Jun 2024 17:27:28 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B09145B09
-	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 17:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2A714532C;
+	Mon, 10 Jun 2024 17:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718040306; cv=none; b=BMbDpwOyJNtUcsDL347LHAYmm97gZ5iBxDmbL5L1p7VLYN0+5QAc0W2Pr8ez7APn9Iqu21vpXArfDu8PltyG39/qnj8RyGnSnFSw2gXZ2r3CErl/dD+IqsbS983Wyrl+SmS4BXa98KnxKksnar6mwCYlRDs0Q6q/5UzlUDwMgZ4=
+	t=1718040448; cv=none; b=YLx63nASStJKPVcJViCOegmaPVF4pAwT2u2TFhbMhes0WSbDHSpHgdfbu3JA5aNhwpCRLH8/gts7y0+LtunVipgSEiEUYhZN5Qt7zTWplqG3M8TvgzLoSwe0oa92uTU82r4gxTL11XEFuDQb7lawpAFQcthb7g29HuY4Dxr8BKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718040306; c=relaxed/simple;
-	bh=mTYg2I3WuTkpyh/+o64UPh2Y+YNRCZ3wV9gBi8Zm0Qc=;
+	s=arc-20240116; t=1718040448; c=relaxed/simple;
+	bh=wJYRldg3T8FDmjjLK/CGxgQ4cydiTmDEgBrsTZOAVPA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CsxR7ODwwKT9/m/UgKl47RmJirwxJBZ5RPkT0QlrMGcP+3bynBMimLMB095/gtpiYdFBAo5r+Q3lqP9Zl+Emd1JFoXaBYNbkMOXcT3wqyd022YhpbAO2JV1dvtWxFI2Odem2jhRbXpi+a8UPDK2PNq8DGsyiQfI7GFtCpimMEtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=S+TKeib5; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7953f1dcb01so7277885a.3
-        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 10:25:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1718040304; x=1718645104; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=25m3KIGLmguUC8/pQLLfTfUUYokxVK5unna2aPd6ENo=;
-        b=S+TKeib5I+1Dkq43acjA8a7FUUSahJRBvyI1FIbAZUhYFHySf9FerIeM4YULmQ1ara
-         9DLhZxEzHbFUJwT7vlqjva+4TupaEfrc8S7+8Fce/VJifBnfg0vC6DM7++mXeUxS6rLb
-         ZnunedLMoKK3aiBwdBuPDB1/Fyu5+DjSKBw/ePkoBhdxm+BC84meFPlGaEczdhhO73Ab
-         Pn5pIy/wIVUepSpk/reK4qYuYosNezVLoQhBcm69YeCim9DxhJBPSb6b50TtnhmhrH1n
-         iaA98DDKAnmDiVbFTsr+VsRP8mhavrlXXGovRyFOvGmGMTq77owyS6goh4dZEOwMBJjF
-         hDPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718040304; x=1718645104;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=25m3KIGLmguUC8/pQLLfTfUUYokxVK5unna2aPd6ENo=;
-        b=CYQ5T6L6TJ32tV9cS34hiyTKNcfAaNLGOnjwlRCutght1mlTqs4BSo7D6wNA+W3kym
-         Z7IkbE68gbWoTRv3vNfZJMvYqiElSzbgmrpA612SgVPKh4mxKLSbyjdCr08vLcip5F1A
-         TJe2I5KPnnv0whUxOhZpkehsxAEnMe9LxGJoBDik6i9/LxUX9fTLHen5tlggeC6fTzEv
-         oi+9v/L8ExKqG7u3uBHMxb3DerzHtQeBWEr1WRSsAOwghYycGAflixAP+t8jTJjSsjEV
-         BPA57ZdHYdDGSJicfsgeQ0V8ILkTSMMNkWOcTKXniOBoxgj2GDZzugx2qI51sGOZPb1j
-         Qoag==
-X-Forwarded-Encrypted: i=1; AJvYcCVMAUG26LIjuVDHRQq76Oq7Vep0FOgxKX1vS7ZtHkuSpvglpzPu8ENd/h5Bpo+Z1VV+6qz/h91NBLoZEvIZlKNt3Kst
-X-Gm-Message-State: AOJu0YwS/cYXfrJzx9STNuo51zgz0EIU94fHLh5YxFPOxAypx71HXQgP
-	A1bhlOTiD2X7+JNTV65VPWktyYfRJXVsgDX0Ahz4s1iYhrMnjsoEamJv5koiCcg=
-X-Google-Smtp-Source: AGHT+IERiQrm9SUSeQMdKlpq1AJrD/6cpiXXPM5R7XiNqEGctS72ZsZ7Qn7LPR52HM49FztB2xw/bQ==
-X-Received: by 2002:a05:620a:2949:b0:795:60ba:76a3 with SMTP id af79cd13be357-79560ba7949mr495154685a.12.1718040304159;
-        Mon, 10 Jun 2024 10:25:04 -0700 (PDT)
-Received: from ziepe.ca ([128.77.69.89])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7958e85b6b3sm134283285a.100.2024.06.10.10.25.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Jun 2024 10:25:03 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sGilR-00EocS-4l;
-	Mon, 10 Jun 2024 14:25:01 -0300
-Date: Mon, 10 Jun 2024 14:25:01 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: "Zeng, Oak" <oak.zeng@intel.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-	"Brost, Matthew" <matthew.brost@intel.com>,
-	"Hellstrom, Thomas" <thomas.hellstrom@intel.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	"Tian, Kevin" <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"josef@toxicpanda.com" <josef@toxicpanda.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"Williams, Dan J" <dan.j.williams@intel.com>,
-	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>,
-	"Bommu, Krishnaiah" <krishnaiah.bommu@intel.com>,
-	"Ghimiray, Himal Prasad" <himal.prasad.ghimiray@intel.com>
-Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
-Message-ID: <20240610172501.GJ791043@ziepe.ca>
-References: <cover.1709635535.git.leon@kernel.org>
- <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
- <20240503164239.GB901876@ziepe.ca>
- <PH7PR11MB70047236290DC1CFF9150B8592C62@PH7PR11MB7004.namprd11.prod.outlook.com>
- <20240610161826.GA4966@unreal>
- <PH7PR11MB7004A071F27B4CF45740B87E92C62@PH7PR11MB7004.namprd11.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FKl2WC3imrOGQG/+VEJFOgUNF9GO/zU93mXDN8n7MhMsCcWX4aS0UBLxnuyQIb4tkqiMgunLzsgv7DX6q3T+81hpXzHbFjSUnA3knIWTsUhwHObrjVNjE49VLZMiF6iqTiwS+CqWL1eA2/iAdbLxB1ovgnrBWO6hcUK6yuPQV3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E42C4AF1C;
+	Mon, 10 Jun 2024 17:27:24 +0000 (UTC)
+Date: Mon, 10 Jun 2024 18:27:22 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH v3 09/14] arm64: Enable memory encrypt for Realms
+Message-ID: <Zmc3euO2YGh-g9Th@arm.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-10-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -122,17 +56,61 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PH7PR11MB7004A071F27B4CF45740B87E92C62@PH7PR11MB7004.namprd11.prod.outlook.com>
+In-Reply-To: <20240605093006.145492-10-steven.price@arm.com>
 
-On Mon, Jun 10, 2024 at 04:40:19PM +0000, Zeng, Oak wrote:
-> Thanks Leon and Yanjun for the reply!
-> 
-> Based on the reply, we will continue use the current version for
-> test (as it is tested for vfio and rdma). We will switch to v1 once
-> it is fully tested/reviewed.
+On Wed, Jun 05, 2024 at 10:30:01AM +0100, Steven Price wrote:
+> +static int __set_memory_encrypted(unsigned long addr,
+> +				  int numpages,
+> +				  bool encrypt)
+> +{
+> +	unsigned long set_prot = 0, clear_prot = 0;
+> +	phys_addr_t start, end;
+> +	int ret;
+> +
+> +	if (!is_realm_world())
+> +		return 0;
+> +
+> +	if (!__is_lm_address(addr))
+> +		return -EINVAL;
+> +
+> +	start = __virt_to_phys(addr);
+> +	end = start + numpages * PAGE_SIZE;
+> +
+> +	/*
+> +	 * Break the mapping before we make any changes to avoid stale TLB
+> +	 * entries or Synchronous External Aborts caused by RIPAS_EMPTY
+> +	 */
+> +	ret = __change_memory_common(addr, PAGE_SIZE * numpages,
+> +				     __pgprot(0),
+> +				     __pgprot(PTE_VALID));
+> +
+> +	if (encrypt) {
+> +		clear_prot = PROT_NS_SHARED;
+> +		ret = rsi_set_memory_range_protected(start, end);
+> +	} else {
+> +		set_prot = PROT_NS_SHARED;
+> +		ret = rsi_set_memory_range_shared(start, end);
+> +	}
+> +
+> +	if (ret)
+> +		return ret;
+> +
+> +	set_prot |= PTE_VALID;
+> +
+> +	return __change_memory_common(addr, PAGE_SIZE * numpages,
+> +				      __pgprot(set_prot),
+> +				      __pgprot(clear_prot));
+> +}
 
-I'm glad you are finding it useful, one of my interests with this work
-is to improve all the HMM users.
+This works, does break-before-make and also rejects vmalloc() ranges
+(for the time being).
 
-Jason
+One particular aspect I don't like is doing the TLBI twice. It's
+sufficient to do it when you first make the pte invalid. We could guess
+this in __change_memory_common() if set_mask has PTE_VALID. The call
+sites are restricted to this file, just add a comment. An alternative
+would be to add a bool flush argument to this function.
+
+-- 
+Catalin
 
