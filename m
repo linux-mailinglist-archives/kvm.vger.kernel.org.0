@@ -1,107 +1,252 @@
-Return-Path: <kvm+bounces-19241-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19242-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BCA3902671
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 18:18:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72207902676
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 18:18:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E746FB2943D
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:17:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 775FB1C20BF6
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:18:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFE0142E9F;
-	Mon, 10 Jun 2024 16:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F26143746;
+	Mon, 10 Jun 2024 16:18:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QSroMZ/Q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txBNSTf1"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF5B1DFF7
-	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 16:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD7C81754;
+	Mon, 10 Jun 2024 16:18:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718036263; cv=none; b=hHbGTsDqf7V8joknxdhHfn6rEWCOWSV42DQHQgsfU35WTUnmiFGvgIuLmhzfpD0moaJEmPe9GSMe6nT6eRmVqrZRNMNFkC5UdZ6J+VfUUyjFAOT+Kp6tHiN9Fid2g1zkH4QJpdtjAbLfgkcnFVkqwrrR0UbRcka2EIBxfi0vHZ8=
+	t=1718036311; cv=none; b=Hpx/d+XIxJIJnoHKvEItSCOMNlZgHu+5Bj6VjwGMF6uL22mwQH8m+IxD2USJHuVEm0QRTTsbrFaFiglPVMsDzfzGXDmh9sxAPWdNKlrMnOnDceEFjvgKrV0TNrX9XXRw4xc7nHS0d8OZqsyPwxxo3RIqBMNnM0FG+CTTnqT4MbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718036263; c=relaxed/simple;
-	bh=5ZwY3hICG4tjhdbDj5CnMG/Xe/Gddx3aXzHbmUVc/jo=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uyhQ2oox+BEf5sPOhfPhxyM1ATflp5lv6UQxfnAI6K8tJSC9/FymxZ+OsWIbmf8ADTaKavrFRib00oLnQgoeYfPK8AY8dSCVS1B4nTuEdYZaGgZkIli6wsYiQ0PddV0LoqYKrD/2P4+jE3z72LVOpgyKHexBRKyns8r3gCd5xCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QSroMZ/Q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2699EC2BBFC
-	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 16:17:43 +0000 (UTC)
+	s=arc-20240116; t=1718036311; c=relaxed/simple;
+	bh=uZtlK/h+IV89qKq/D7HEEGiIqU3n+5uR+aMUW6bSTYI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h/X3C/8uf1aNsfF0tFg64gVY3KVSVlLsifbWJkTOcVd5fwa5wPVm4y1M1sZCGz2uF2kvnNj5WlVosE0leE5wtvv2F9ndrHSVUnxQqFHnlXNEGQczE0UXXu4pnPHFeudCIE0LI9es+epw0rhZ9zFMIo1vMNBmlDsncgd7R2xslqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txBNSTf1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270DCC2BBFC;
+	Mon, 10 Jun 2024 16:18:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718036263;
-	bh=5ZwY3hICG4tjhdbDj5CnMG/Xe/Gddx3aXzHbmUVc/jo=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=QSroMZ/Q3bjtpIJWETYiCAjG+RW1cAj44Lot7wdQJ0zvWp1VS3Y3N/wPnnJdUcTf0
-	 oKhK8uNTVhqpOzdQ8Z2bO6a5Tvj9RPDxMLXfLGQdzwBQcTJY8w1qV8GAVcx8ZV7Sjk
-	 barbI/SP5mQeAzD0srfswQ2ZfJeFHixnvpzdGmSXeyU6jN/uQ66cCXlWukhCdK7nL9
-	 c4GfQRIBaivf9zZm59MheCNONTMW8BX0nBqAxBnbQIXoEh6+IGj7y3zklbKYiULxua
-	 v08OM8Cs9S7lK1sjnd7q4thqL9iKVVGVb2dIXdCiZIVGsalI3sQNqNLSLejBj4QFYz
-	 b94jpLgnMV4eA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 12DA6C53BB8; Mon, 10 Jun 2024 16:17:43 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218949] Kernel panic after upgrading to 6.10-rc2
-Date: Mon, 10 Jun 2024 16:17:42 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: badouri.g@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-218949-28872-8yuhoyGcH9@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218949-28872@https.bugzilla.kernel.org/>
-References: <bug-218949-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1718036311;
+	bh=uZtlK/h+IV89qKq/D7HEEGiIqU3n+5uR+aMUW6bSTYI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=txBNSTf1+1t4Xc9gPPh5vQRc5XfFN8nPv3Ro8SB/Yq/j5yEFp8jrN0I+5Vvp5KhOC
+	 31eIcQtv4gSFNYkJWu5tiUYcRsGWbQIFh2b2tiBQYfLYxsJieRJiOTdFhWwTvQJF/M
+	 fUzjRO+rL2bVJQVsXagyKG+uCYHiF1TBWgw463NfDzmu1rm2XEkNCph2ZdlBvKMPM0
+	 Gr/XbPplhRTbNTmuXHWyp/dAQvRpoJf5jrDLG/1hP72FEcChZfoVi0qm5BQFx6ewcw
+	 vpY5DbRGJh+Zpb2hIoVs4KxbjfSUVKLSS1z59lmFu0jrgvvdpMja9j94fZRFY7GnNT
+	 znfhgKqB0z4zQ==
+Date: Mon, 10 Jun 2024 19:18:26 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: "Zeng, Oak" <oak.zeng@intel.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+	Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+	"Brost, Matthew" <matthew.brost@intel.com>,
+	"Hellstrom, Thomas" <thomas.hellstrom@intel.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	"Tian, Kevin" <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+	Amir Goldstein <amir73il@gmail.com>,
+	"josef@toxicpanda.com" <josef@toxicpanda.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"Williams, Dan J" <dan.j.williams@intel.com>,
+	"jack@suse.com" <jack@suse.com>, Zhu Yanjun <zyjzyj2000@gmail.com>,
+	"Bommu, Krishnaiah" <krishnaiah.bommu@intel.com>,
+	"Ghimiray, Himal Prasad" <himal.prasad.ghimiray@intel.com>
+Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to two steps
+Message-ID: <20240610161826.GA4966@unreal>
+References: <cover.1709635535.git.leon@kernel.org>
+ <SA1PR11MB6991CB2B1398948F4241E51992182@SA1PR11MB6991.namprd11.prod.outlook.com>
+ <20240503164239.GB901876@ziepe.ca>
+ <PH7PR11MB70047236290DC1CFF9150B8592C62@PH7PR11MB7004.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <PH7PR11MB70047236290DC1CFF9150B8592C62@PH7PR11MB7004.namprd11.prod.outlook.com>
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218949
+On Mon, Jun 10, 2024 at 03:12:25PM +0000, Zeng, Oak wrote:
+> Hi Jason, Leon,
+> 
+> I come back to this thread to ask a question. Per the discussion in another thread, I have integrated the new dma-mapping API (the first 6 patches of this series) to DRM subsystem. The new API seems fit pretty good to our purpose, better than scatter-gather dma-mapping. So we want to continue work with you to adopt this new API.
 
---- Comment #4 from Gino Badouri (badouri.g@gmail.com) ---
-Hi Sean!
+Sounds great, thanks for the feedback.
 
-It always amazes me how fast you guys can find the patches/reports for cert=
-ain
-bug reports :)
+> 
+> Did you test the new API in RDMA subsystem? 
 
-The WARNING happened on 6.9.0-rc1 (so before the final release).
+This version was tested in our regression tests, but there is a chance
+that you are hitting flows that were not relevant for RDMA case.
 
-For the pfn warnings I've applied the patchset from
-https://lore.kernel.org/all/20240530045236.1005864-1-alex.williamson@redhat=
-.com
-on top of 6.10-rc3 and it's completely fixed, they're gone now.
+> Or this RFC series was just some untested codes sending out to get people's design feedback? 
 
-I've tested Call of Duty MW3 in Windows 11 with the NVIDIA GPU passed throu=
-gh
-the VM and I didn't notice any performance or stability difference with or
-without the patch.
+RFC was fully tested in VFIO and RDMA paths, but not NVMe patch.
 
-Thanks a lot!
+> Do you have refined version for us to try? I ask because we are seeing some issues but not sure whether it is caused by the new API. We are debugging but it would be good to also ask at the same time.
 
---=20
-You may reply to this email to add a comment.
+Yes, as an outcome of the feedback in this thread, I implemented a new
+version. Unfortunately, there are some personal matters that are preventing
+from me to send it right away.
+https://git.kernel.org/pub/scm/linux/kernel/git/leon/linux-rdma.git/log/?h=dma-split-v1
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+There are some differences in the API, but the main idea is the same.
+This version is not fully tested yet.
+
+Thanks
+
+> 
+> Cc Himal/Krishna who are also working/testing the new API.
+> 
+> Thanks,
+> Oak
+> 
+> > -----Original Message-----
+> > From: Jason Gunthorpe <jgg@ziepe.ca>
+> > Sent: Friday, May 3, 2024 12:43 PM
+> > To: Zeng, Oak <oak.zeng@intel.com>
+> > Cc: leon@kernel.org; Christoph Hellwig <hch@lst.de>; Robin Murphy
+> > <robin.murphy@arm.com>; Marek Szyprowski
+> > <m.szyprowski@samsung.com>; Joerg Roedel <joro@8bytes.org>; Will
+> > Deacon <will@kernel.org>; Chaitanya Kulkarni <chaitanyak@nvidia.com>;
+> > Brost, Matthew <matthew.brost@intel.com>; Hellstrom, Thomas
+> > <thomas.hellstrom@intel.com>; Jonathan Corbet <corbet@lwn.net>; Jens
+> > Axboe <axboe@kernel.dk>; Keith Busch <kbusch@kernel.org>; Sagi
+> > Grimberg <sagi@grimberg.me>; Yishai Hadas <yishaih@nvidia.com>;
+> > Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>; Tian, Kevin
+> > <kevin.tian@intel.com>; Alex Williamson <alex.williamson@redhat.com>;
+> > Jérôme Glisse <jglisse@redhat.com>; Andrew Morton <akpm@linux-
+> > foundation.org>; linux-doc@vger.kernel.org; linux-kernel@vger.kernel.org;
+> > linux-block@vger.kernel.org; linux-rdma@vger.kernel.org;
+> > iommu@lists.linux.dev; linux-nvme@lists.infradead.org;
+> > kvm@vger.kernel.org; linux-mm@kvack.org; Bart Van Assche
+> > <bvanassche@acm.org>; Damien Le Moal
+> > <damien.lemoal@opensource.wdc.com>; Amir Goldstein
+> > <amir73il@gmail.com>; josef@toxicpanda.com; Martin K. Petersen
+> > <martin.petersen@oracle.com>; daniel@iogearbox.net; Williams, Dan J
+> > <dan.j.williams@intel.com>; jack@suse.com; Leon Romanovsky
+> > <leonro@nvidia.com>; Zhu Yanjun <zyjzyj2000@gmail.com>
+> > Subject: Re: [RFC RESEND 00/16] Split IOMMU DMA mapping operation to
+> > two steps
+> > 
+> > On Thu, May 02, 2024 at 11:32:55PM +0000, Zeng, Oak wrote:
+> > 
+> > > > Instead of teaching DMA to know these specific datatypes, let's separate
+> > > > existing DMA mapping routine to two steps and give an option to
+> > advanced
+> > > > callers (subsystems) perform all calculations internally in advance and
+> > > > map pages later when it is needed.
+> > >
+> > > I looked into how this scheme can be applied to DRM subsystem and GPU
+> > drivers.
+> > >
+> > > I figured RDMA can apply this scheme because RDMA can calculate the
+> > > iova size. Per my limited knowledge of rdma, user can register a
+> > > memory region (the reg_user_mr vfunc) and memory region's sized is
+> > > used to pre-allocate iova space. And in the RDMA use case, it seems
+> > > the user registered region can be very big, e.g., 512MiB or even GiB
+> > 
+> > In RDMA the iova would be linked to the SVA granual we discussed
+> > previously.
+> > 
+> > > In GPU driver, we have a few use cases where we need dma-mapping. Just
+> > name two:
+> > >
+> > > 1) userptr: it is user malloc'ed/mmap'ed memory and registers to gpu
+> > > (in Intel's driver it is through a vm_bind api, similar to mmap). A
+> > > userptr can be of any random size, depending on user malloc
+> > > size. Today we use dma-map-sg for this use case. The down side of
+> > > our approach is, during userptr invalidation, even if user only
+> > > munmap partially of an userptr, we invalidate the whole userptr from
+> > > gpu page table, because there is no way for us to partially
+> > > dma-unmap the whole sg list. I think we can try your new API in this
+> > > case. The main benefit of the new approach is the partial munmap
+> > > case.
+> > 
+> > Yes, this is one of the main things it will improve.
+> > 
+> > > We will have to pre-allocate iova for each userptr, and we have many
+> > > userptrs of random size... So we might be not as efficient as RDMA
+> > > case where I assume user register a few big memory regions.
+> > 
+> > You are already doing this. dma_map_sg() does exactly the same IOVA
+> > allocation under the covers.
+> > 
+> > > 2) system allocator: it is malloc'ed/mmap'ed memory be used for GPU
+> > > program directly, without any other extra driver API call. We call
+> > > this use case system allocator.
+> > 
+> > > For system allocator, driver have no knowledge of which virtual
+> > > address range is valid in advance. So when GPU access a
+> > > malloc'ed/mmap'ed address, we have a page fault. We then look up a
+> > > CPU vma which contains the fault address. I guess we can use the CPU
+> > > vma size to allocate the iova space of the same size?
+> > 
+> > No. You'd follow what we discussed in the other thread.
+> > 
+> > If you do a full SVA then you'd split your MM space into granuals and
+> > when a fault hits a granual you'd allocate the IOVA for the whole
+> > granual. RDMA ODP is using a 512M granual currently.
+> > 
+> > If you are doing sub ranges then you'd probably allocate the IOVA for
+> > the well defined sub range (assuming the typical use case isn't huge)
+> > 
+> > > But there will be a true difficulty to apply your scheme to this use
+> > > case. It is related to the STICKY flag. As I understand it, the
+> > > sticky flag is designed for driver to mark "this page/pfn has been
+> > > populated, no need to re-populate again", roughly...Unlike userptr
+> > > and RDMA use cases where the backing store of a buffer is always in
+> > > system memory, in the system allocator use case, the backing store
+> > > can be changing b/t system memory and GPU's device private
+> > > memory. Even worse, we have to assume the data migration b/t system
+> > > and GPU is dynamic. When data is migrated to GPU, we don't need
+> > > dma-map. And when migration happens to a pfn with STICKY flag, we
+> > > still need to repopulate this pfn. So you can see, it is not easy to
+> > > apply this scheme to this use case. At least I can't see an obvious
+> > > way.
+> > 
+> > You are already doing this today, you are keeping the sg list around
+> > until you unmap it.
+> > 
+> > Instead of keeping the sg list you'd keep a much smaller datastructure
+> > per-granual. The sticky bit is simply a convient way for ODP to manage
+> > the smaller data structure, you don't have to use it.
+> > 
+> > But you do need to keep track of what pages in the granual have been
+> > DMA mapped - sg list was doing this before. This could be a simple
+> > bitmap array matching the granual size.
+> > 
+> > Looking (far) forward we may be able to have a "replace" API that
+> > allows installing a new page unconditionally regardless of what is
+> > already there.
+> > 
+> > Jason
 
