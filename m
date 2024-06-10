@@ -1,136 +1,127 @@
-Return-Path: <kvm+bounces-19236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19234-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5502C90248B
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:50:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BAD4902462
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 16:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53C981C22B53
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 14:49:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41C411C20E9A
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 14:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79D01139579;
-	Mon, 10 Jun 2024 14:48:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173C0130AFC;
+	Mon, 10 Jun 2024 14:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AKOG+uIB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1UXYZgOg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D9D135A7E;
-	Mon, 10 Jun 2024 14:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0442438FA8
+	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 14:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718030889; cv=none; b=XxPePH3mAgnRMZmpL5LQwtl0rUYaIZNSI/TGaXcP0+nFxR29JPWZps9Ns+hBEg1c0GWIB1nli9hwjN12QomOXhE6c/N0bgNyt5ikf+nh1i+7ag/+hpgcWh9WX5HFF8ryNsP03FCOdaPgG7w2UBLixsw09JP2qryP6C9EEIjHJqk=
+	t=1718030730; cv=none; b=EHF3bj90CRzBrEKHFcwZJs8e4iYbZo8f+OaPGpUnxEqRawPJSzhtHn9Ty3kZQrV0sydAwBSBodx0fwxbFJZOJ0+Prk8dns8TDyjI+OLHumV6ZgkLh5+PcbLRMzNwftbMgwo0IGn7wQoFFaOU4OlfUISUwVsmjY19PiiFA3GpBZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718030889; c=relaxed/simple;
-	bh=Id0eYrZGL0JaBkLoeHCoTfXGUS8qKGnKHyCnt698f2I=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=KsjQjrdFY0lmhkxUAYSaDX198A0PVmGnB7lgXkQ6KfQ51D9dsfQMnoY3onDi0Zl2gdL/kxoR7dYTgkLdGqDGzhy1nThPTXyrWmfM3pgP9S895zwA7UvEBoCtm8K4gvdCNti6QOHl5TN0qNfBktgEo6ie7j7RmMbnsDMs6HGSxXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AKOG+uIB; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718030888; x=1749566888;
-  h=from:to:cc:subject:date:message-id;
-  bh=Id0eYrZGL0JaBkLoeHCoTfXGUS8qKGnKHyCnt698f2I=;
-  b=AKOG+uIB+0BtuhOaY50HaIOfWHWu80y8ekkoqNmpI87czxMv9BPcsV+z
-   MxJYm6bPD/mNST9FOs5ghBhuyYmkAKvhnkqAFinJiA4Aoe0urU7L0Ng2x
-   pzEJHrI5e6Eri++azLxFH9GQZVlSLbFsulfkBM+XWvg3DpMhdd7RdwP6x
-   8naE2NpyUIV7L/C7+M2iiIHhypkCpqzIl7O14fBaLRwLkPbqNNbsxfDP4
-   0RzI+ze4w3OF4SjRUZqzvjqmjzP/L2BEpsG2oAXP5+ZjqBfXDnMceRc2u
-   r3jmdYciKFaM1iho1LEnp/vm8zvsD294X6w1EscQXhsAlTXVNzAQJ+eoQ
-   Q==;
-X-CSE-ConnectionGUID: N0xAUsp3SBiYXCACr+U0Ow==
-X-CSE-MsgGUID: Kg/cXSZhTGqXOPwUEhLUfw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="18526047"
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="18526047"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 07:48:07 -0700
-X-CSE-ConnectionGUID: R6NIT3N/REm6/vaBn7aj7A==
-X-CSE-MsgGUID: iOVXeQxiQ8WFAzyIrK8ziw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="69872049"
-Received: from qat-server-archercity1.sh.intel.com ([10.67.111.115])
-  by orviesa002.jf.intel.com with ESMTP; 10 Jun 2024 07:48:04 -0700
-From: Xin Zeng <xin.zeng@intel.com>
-To: herbert@gondor.apana.org.au,
-	alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com,
-	kevin.tian@intel.com,
-	arnd@arndb.de
-Cc: linux-crypto@vger.kernel.org,
-	kvm@vger.kernel.org,
-	qat-linux@intel.com,
-	Xin Zeng <xin.zeng@intel.com>
-Subject: [PATCH] crypto: qat - fix linking errors when PCI_IOV is disabled
-Date: Mon, 10 Jun 2024 22:37:56 +0800
-Message-Id: <20240610143756.2031626-1-xin.zeng@intel.com>
-X-Mailer: git-send-email 2.18.2
+	s=arc-20240116; t=1718030730; c=relaxed/simple;
+	bh=zEV4hRPa0VisXlSFGCDQxZpseDwnqKy1zCauCMHUIqA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=QPrtvzuVRsKyfQFt8mdLw37xTnxOl7nWric7VCCaFhjBxan6ZoEv7ute+Lt9Jn8qVa3ymUrDc3TmxgaHWL5g6Zb3pYaEpOEGU6hQx+gLQ0yE+hncUz2Js2hsFZzzdA5LJ5z8OCHc/pzBl4WWmj4KRkkTRPWlUUzDcZDMsRZ5MJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1UXYZgOg; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70428cb18c3so10512b3a.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 07:45:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718030728; x=1718635528; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AxX572g9fq1hp8pzJA8MiUyiwis0L08+XjPHETBqvV0=;
+        b=1UXYZgOg0Ei876ifHam7sACPUIiJwknrKjw+VIlIqcHSQsWttt8DaIuYtGnySYGAcY
+         s4QEYpsCuG47Sbhg9XH3u+phZoS91Bu90mspV6t/hx5wr5UrweW67+kg6uMRNFak5rHL
+         626gwsJVSolg5eEkGHZ6JkDoyc8h6XZPQTznwlf8hyzLzxBZA+I3ZdIRp9gzSdLr3gT3
+         I7X+c+263LxAe/IHI4gN5yZ02OpF0ciW7zdvPR6APV3/0WGRsh108gH9SlETtuxGqKbM
+         7G20yN+tXHplT82fZYTvdytX3nc2oGKwIiOX3sSjTxHdSw9wdWtixZTB1GEPBmHTZsJJ
+         xOew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718030728; x=1718635528;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AxX572g9fq1hp8pzJA8MiUyiwis0L08+XjPHETBqvV0=;
+        b=sRDWFNiiAIK8syC2amk7cDBVQisvW6PQUnkjL+lu2xTOIJ9J29jN1Rf3AVahHUOGdq
+         ZkC/E79trHEbFnc82KddqcUtp+Y+jOQy6WxklbrUinvw1iwz/V++klnhFEDpC40RxFps
+         B2o9RXjxb/Pi4CaWR+jNoKuhlBgb2e4YGLb8/PbfM1fNHK8X0WtSB6bUmvCtFpcWeOXs
+         UW6+IVepW/f5tnfmlQ3J4hElMTSEkMmncclIu/u/sRI5n9Fhl04TZMKtjHMBzZ+eSVX0
+         izeLqH05iOL5fPFBe6Kbu/Zs9PJt1Vodu2A7OuMzum1hKgR5wnX0pqrZYGdX52ErTF3o
+         eMmQ==
+X-Gm-Message-State: AOJu0YwAVwfX11LvUpGFmKODWxw/ZcnpkWGZfH5tDzEDreTuzN3XJ/QY
+	8gq+aveYNNv+oGXnTVtwC47ubQ8/880MSS/+hjrsor8UhNZebEH9Iq3xLxTZwjaw1VCMPk/MYvA
+	Www==
+X-Google-Smtp-Source: AGHT+IFc+sttX2d0C1ytlDc6iPCgiRszclD3UtAGzJd/5nvPEjXfdvPQ6G7vbSyTPmVN+zUoKvLjgnfhBgw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:9297:b0:704:231a:c3fd with SMTP id
+ d2e1a72fcca58-704231ac784mr55088b3a.1.1718030728154; Mon, 10 Jun 2024
+ 07:45:28 -0700 (PDT)
+Date: Mon, 10 Jun 2024 07:45:26 -0700
+In-Reply-To: <bug-218949-28872-vNF0xS1i0R@https.bugzilla.kernel.org/>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+References: <bug-218949-28872@https.bugzilla.kernel.org/> <bug-218949-28872-vNF0xS1i0R@https.bugzilla.kernel.org/>
+Message-ID: <ZmcOCPprnmn1vYyn@google.com>
+Subject: Re: [Bug 218949] Kernel panic after upgrading to 6.10-rc2
+From: Sean Christopherson <seanjc@google.com>
+To: bugzilla-daemon@kernel.org
+Cc: kvm@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-When CONFIG_PCI_IOV=n, the build of the QAT vfio pci variant driver
-fails reporting the following linking errors:
+On Mon, Jun 10, 2024, bugzilla-daemon@kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=218949
+> 
+> --- Comment #2 from Gino Badouri (badouri.g@gmail.com) ---
+> Alright, it's not a regression in the kernel but caused by a bios update (I
+> guess).
+> I get the same on my previous kernel 6.9.0-rc1.
 
-    ERROR: modpost: "qat_vfmig_open" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_resume" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_save_state" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_suspend" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_load_state" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_reset" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_save_setup" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_destroy" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_close" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    ERROR: modpost: "qat_vfmig_cleanup" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
-    WARNING: modpost: suppressed 1 unresolved symbol warnings because there were too many)
+The WARNs are not remotely the same.  The below issue in svm_vcpu_enter_exit()
+was resolved in v6.9 final[1].
 
-Make live migration helpers provided by QAT PF driver always available
-even if CONFIG_PCI_IOV is not selected. This does not cause any side
-effect.
+The lockdep warnings in track_pfn_remap() and remap_pfn_range_notrack() is a
+known issue in vfio_pci_mmap_fault(), with an in-progress fix[2] that is destined
+for 6.10.
 
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Closes: https://lore.kernel.org/lkml/20240607153406.60355e6c.alex.williamson@redhat.com/T/
-Fixes: bb208810b1ab ("vfio/qat: Add vfio_pci driver for Intel QAT SR-IOV VF devices")
-Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
- drivers/crypto/intel/qat/qat_common/Makefile | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+[1] https://lore.kernel.org/all/1d10cd73-2ae7-42d5-a318-2f9facc42bbe@alu.unizg.hr
+[2] https://lore.kernel.org/all/20240530045236.1005864-1-alex.williamson@redhat.com
 
-diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 6f9266edc9f1..eac73cbfdd38 100644
---- a/drivers/crypto/intel/qat/qat_common/Makefile
-+++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -39,7 +39,8 @@ intel_qat-objs := adf_cfg.o \
- 	adf_sysfs_rl.o \
- 	qat_uclo.o \
- 	qat_hal.o \
--	qat_bl.o
-+	qat_bl.o \
-+	qat_mig_dev.o
- 
- intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
- 				adf_fw_counters.o \
-@@ -56,6 +57,6 @@ intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
- intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
- 			       adf_pfvf_pf_msg.o adf_pfvf_pf_proto.o \
- 			       adf_pfvf_vf_msg.o adf_pfvf_vf_proto.o \
--			       adf_gen2_pfvf.o adf_gen4_pfvf.o qat_mig_dev.o
-+			       adf_gen2_pfvf.o adf_gen4_pfvf.o
- 
- intel_qat-$(CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION) += adf_heartbeat_inject.o
+> Both my 6.9.0-rc1 6.10.0-rc2 kernels are vanilla builds from kernel.org
+> (unpatched).
+> 
+> After updating the bios/firmware of my mainboard Asus ROG Zenith II Extreme
+> from 1802 to 2102, it always seems to spawn the error:
+> 
+> [ 1150.380137] ------------[ cut here ]------------
+> [ 1150.380141] Unpatched return thunk in use. This should not happen!
+> [ 1150.380144] WARNING: CPU: 3 PID: 4849 at arch/x86/kernel/cpu/bugs.c:2935
+> __warn_thunk+0x40/0x50
 
-base-commit: ed00b94dc9e7befd6a77038bd351e0370f73f22c
--- 
-2.18.2
+...
 
+> [ 1150.380266] CPU: 3 PID: 4849 Comm: CPU 0/KVM Not tainted 6.9.0-rc1 #1
+> [ 1150.380269] Hardware name: ASUS System Product Name/ROG ZENITH II EXTREME,
+> BIOS 2102 02/16/2024
+> [ 1150.380271] RIP: 0010:__warn_thunk+0x40/0x50
+
+...
+
+> [ 1150.380298] Call Trace:
+> [ 1150.380300]  <TASK>
+> [ 1150.380344]  warn_thunk_thunk+0x16/0x30
+> [ 1150.380351]  svm_vcpu_enter_exit+0x71/0xc0 [kvm_amd]
+> [ 1150.380364]  svm_vcpu_run+0x1e7/0x850 [kvm_amd]
+> [ 1150.380377]  kvm_arch_vcpu_ioctl_run+0xca3/0x16d0 [kvm]
+> [ 1150.380458]  kvm_vcpu_ioctl+0x295/0x800 [kvm]
 
