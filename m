@@ -1,180 +1,181 @@
-Return-Path: <kvm+bounces-19266-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19267-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8659902BB9
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 00:33:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A3B1902C86
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 01:36:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6133E1F229DE
-	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 22:33:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A69C6284CD5
+	for <lists+kvm@lfdr.de>; Mon, 10 Jun 2024 23:36:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045C377107;
-	Mon, 10 Jun 2024 22:33:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE50315253B;
+	Mon, 10 Jun 2024 23:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Px3Jzu4o"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xEqyr6GH"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78DD9770F6
-	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 22:33:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B041414F9F4
+	for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 23:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718058828; cv=none; b=AY0A72LdzfCPLAK369dUJB/bqL3zWqZXj038QMWfBS/gt5pWq+jlEKJHSjrqZHpSIMu+Fo9QrTliWaWKtbaBOg2YvntApo9RhGPB08l86p3JzYc5H5kTy91SPZjN3gGh1TpyWd1Fdi+A9K66+f/gRKO2IA8ucykX9t6s4rxeLDQ=
+	t=1718062577; cv=none; b=hoC3V5fvysjMn2OEZ1oR6It6hVi5dBtdTNc7J6pKknhkOIzSA7BkBchjX9RYR4+Im3ywdwxTZZR0uYn1BqcXaY/aQyQolqCv+JbJWvf/tlQlOGZdqPlrMG3LBJHdXM8GDs3qXOl1SJ3Mxm0xhfnVnfXNmHRE5C/YTXmZtWwfuog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718058828; c=relaxed/simple;
-	bh=StWthvCB4BWxmd4dRGMLU9X00xEfwcSw8x1oBCp/b5U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EUlzDYCViKcjb1xsSKFfYtGwMLbYLckUm+Jvo+7VtSl+Mj2amRqctEp/yr7WuO6jNbi6kP+1isVu/RrqtQ7pdQvD3wvE0eiEXJryU19iXgt62PH0Np9VLbJ7/l5BMRz0DqdfnZa0oj6Bj7IkEsYdHe1JB3NlrEQLgu9TnHpflMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Px3Jzu4o; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718058825;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q9TFdXKjxmBDmUtAvwNpPufPPKk1ACaOTKSpv7Hr7Go=;
-	b=Px3Jzu4octdy2S0xzgaWQx7Rj7QK215k9NSHSumUpdDmDbV6OGlzlutXGznSUJvuy/f7xT
-	ZtFr4b8V0+KT3yaOiXGnawRlQIVK42dB/2O1snkfYQIq8M1VTjoh1oL1f91nvPxOB1XAOH
-	+LAvEc7qVkzRd/JyXd5mrLG8L20phVo=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-542-4CpgA_bEPpite-6_UiZt3Q-1; Mon, 10 Jun 2024 18:33:43 -0400
-X-MC-Unique: 4CpgA_bEPpite-6_UiZt3Q-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-35f06558bc3so437592f8f.1
-        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 15:33:43 -0700 (PDT)
+	s=arc-20240116; t=1718062577; c=relaxed/simple;
+	bh=RaFo9p2vr0yi6PvWY5taq73VQiLHnMofL6lua0rlctA=;
+	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=kryMeBybQgLAxg5dHKTawhVmUZUoLEuciAVYIpQu59Fdd8c2BhPjQ2VkKZsrvt0+tgSFOfkh3+8L+GlZIsvKX/ZzUb/4ebc73oJ2tSD44nbtlmlFxWxoWiyJ2kEbRlsjBjdnHsZJ+hfAUu3/s+C7Hu7dfZnSk7ast3/Nbg9fPZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xEqyr6GH; arc=none smtp.client-ip=209.85.166.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-7ead7796052so572319239f.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 16:36:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718062575; x=1718667375; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=n6RIv5Wk00aelTMjAMoL6h8M+vMWiQfB3B1hJLzK2nI=;
+        b=xEqyr6GH16icJM6rYyj/Csyccs1fBWQR8XVYrdIQDHVVVFOxefHdT3PcB31cR3KmUt
+         ybR0v6lMl/qnyj5YxHf15pmFil52uMjaMYq+MKFSApYKEGHRKF8qxX9KCIz7bRroVl7+
+         ZQ9DimmI8bGaNQ4U10oQDpyR2i8nd3oVmJ5CPtoEesWlF2d0QySFeM4m23pgFDK1K262
+         CGqGbt9vX4shoqDxRrQa+aakXaWqUz18TINTlYA6dbVsqglOkutBqXTyrcboqFE/ggIt
+         XnvHcpwHbqt8FmqcloCHpvCNVJrB1LoHfTiMoAWdBziPMo20mEMzKjO2Cp3Fcg2OU25g
+         ux4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718058822; x=1718663622;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q9TFdXKjxmBDmUtAvwNpPufPPKk1ACaOTKSpv7Hr7Go=;
-        b=Uad5tPum+epNkiX+a06VM5tfOXabonJzNlyR0OPkOnBCCP3D5+51d70RMSwWPXTWC1
-         vxqIszzyWuj5L+dqbqwMb+kiCjlX813JyNqJavRsulHI3YO/aBJRriZRc2HsU8GQ4f3F
-         dZyi7qEZq9xcDWxc9Ln+eGzDgAZARk4RFgCefj17WmFCHUmYhk0yvZKlUlkyOCRuYM6n
-         sR/X7qMdG+CgHNath69Ka9N9Gx4993ewQYZYJrN5H0xmG0qREiPXY9sMS/v3mh7oF9qy
-         ewY8VFUcHI3LuRq7qcjasm9v8m0df5idMQdEeDsn8eGbKpkA1qgb2Q7zZHo5UQWjvsk3
-         /5hw==
-X-Forwarded-Encrypted: i=1; AJvYcCXE+1rXbckmioIj9HE70GltPkzP+Hh/zsfbDTf+SA4ljwp1lJhjf1Uy1eimBiu+RZJmChmZxd98YJm7aJf99G6+un5H
-X-Gm-Message-State: AOJu0Yy08sC2268B1M9oR+tBVM9OQf2Fn/xuRSpoygMyfIia8y2LaW5l
-	7+LM3RWNe0mD4Zs8cY7yJnclDBOe3lFHrUmMGnIZ4s5mLavnLcTMrC5FHc+j2kYDd+CFJe0YWWL
-	P9MDhVKh3yx3jK9MO3Kr/pfEcnybzpobV9EeewxT8qjrz2czgnQjBcevT2oeii5IuBw6u4ouo4B
-	VdaGRCCXiU3v/3eerzEC7KyVmV
-X-Received: by 2002:a5d:49c6:0:b0:35f:f21:3ac0 with SMTP id ffacd0b85a97d-35f0f214485mr4886773f8f.63.1718058822676;
-        Mon, 10 Jun 2024 15:33:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHlQ56aJmWNAm4Cul5RfaGegtdeN4dbrj0iP6I14Ju4f7YtKDBGFWKqPnM6v6124tzBC9GjNKzXRW3pSI7Mu9E=
-X-Received: by 2002:a5d:49c6:0:b0:35f:f21:3ac0 with SMTP id
- ffacd0b85a97d-35f0f214485mr4886764f8f.63.1718058822352; Mon, 10 Jun 2024
- 15:33:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718062575; x=1718667375;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n6RIv5Wk00aelTMjAMoL6h8M+vMWiQfB3B1hJLzK2nI=;
+        b=AFZyG5rourSh8xHKQs39RCXFQCPT0z26y3UmVCK31g+8ml+c3UmFs83e+oyEO5NgFd
+         cmWmPyzmgEzYXMIehDuaEuWKVkxh6/3oqHFEt1HnSNFGL6hy9RPej7rZHKkw1AgdFyvr
+         Gvk+WNDOIeh6hrqvoAc5dE3UXi5FZLaKn+RJiMaVTStY/KBcpHGx4p/KiCdZiVKEICPF
+         hmT7rV7NhPdXpGVELmhVxjuXg+zNQw8BgGk/l/NHXAANqyNVjErJgkERQpuEhTlVXT7r
+         Ww+kP7SVSho9tl4J/4HNtLsMvnR9Q63ZVa5rpQkQysiYxyKjEK4A9qCCTidKmi1flRMu
+         ZSnw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpw1ojKd18msE5VbreqK+6MMm+X+XOxKJl2/ESB+glFJRWQXLItIfNnVIvYskndHslYklNd1FtoD65cktKJsdn8KHg
+X-Gm-Message-State: AOJu0YwqZynjR5CEmNsDJk1KWfCiatBr62mwG/FY8MPYSyZ8fR/ecAnh
+	IDAz/dFbXvKDoOCzSBfZlfO277xd4k/yC5n4M/D+cbvcCy1ijzFL7pjJJLwpd0jD2UoedmKikso
+	Jzm1WnGR4/iSNXk0jWagvWQ==
+X-Google-Smtp-Source: AGHT+IFaWG97newKoPARMJJXkqNHX3EvcvQU27HHiDPa9QcNLP4f0dZdBbdhInvH4XEh3wXFnqEcoohV1SKPGZXXVg==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6602:6d17:b0:7eb:7e0c:d172 with
+ SMTP id ca18e2360f4ac-7eb7e0cd4fbmr32583039f.3.1718062574945; Mon, 10 Jun
+ 2024 16:36:14 -0700 (PDT)
+Date: Mon, 10 Jun 2024 23:36:14 +0000
+In-Reply-To: <20231121115457.76269-1-cloudliang@tencent.com> (message from
+ Jinrong Liang on Tue, 21 Nov 2023 19:54:48 +0800)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <c0122f66-f428-417e-a360-b25fc0f154a0@p183> <Zmd148whQzsuIzm_@google.com>
-In-Reply-To: <Zmd148whQzsuIzm_@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 11 Jun 2024 00:33:30 +0200
-Message-ID: <CABgObfZ=_CN24v_VBz+fD1OLBSb=i_Li2cmZ-bHPkY-LFunmUQ@mail.gmail.com>
-Subject: Re: [PATCH] kvm: do not account temporary allocations to kmem
-To: Sean Christopherson <seanjc@google.com>
-Cc: Alexey Dobriyan <adobriyan@gmail.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Message-ID: <gsntzfrs9xqp.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [PATCH 0/9] Test the consistency of AMD PMU counters and their features
+From: Colton Lewis <coltonlewis@google.com>
+To: Jinrong Liang <ljr.kernel@gmail.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, likexu@tencent.com, 
+	jmattson@google.com, aaronlewis@google.com, wanpengli@tencent.com, 
+	cloudliang@tencent.com, ljr.kernel@gmail.com, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 
-On Mon, Jun 10, 2024 at 11:53=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Mon, Jun 10, 2024, Alexey Dobriyan wrote:
-> > Some allocations done by KVM are temporary, they are created as result
-> > of program actions, but can't exists for arbitrary long times.
-> >
-> > They should have been GFP_TEMPORARY (rip!).
->
-> Wouldn't GFP_USER be more appropriate for all of these?  E.g. KVM_SET_REG=
-S uses
-> memdup_user() and thus GFP_USER.
+Hi Jinrong,
 
-The only difference between GFP_KERNEL and GFP_USER (worst name
-ever...) is that the latter strictly respects the cpuset policy, see
-cpuset_node_allowed(). It's not needed for allocations such as these
-ones, which are bounded in both size and lifetime.
+Sorry if this is repeating myself, but I only replied to you before
+when I should have included the list.
 
-Paolo
+Sean may have something useful to add as well.
 
->
-> > OTOH, kvm-nx-lpage-recovery and kvm-pit kernel threads exist for as lon=
-g
-> > as VM exists but their task_struct memory is not accounted.
-> > This is story for another day.
-> >
-> > Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
-> > ---
-> >
-> >  virt/kvm/kvm_main.c |   11 +++++------
-> >  1 file changed, 5 insertions(+), 6 deletions(-)
-> >
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4427,7 +4427,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >               struct kvm_regs *kvm_regs;
-> >
-> >               r =3D -ENOMEM;
-> > -             kvm_regs =3D kzalloc(sizeof(struct kvm_regs), GFP_KERNEL_=
-ACCOUNT);
-> > +             kvm_regs =3D kzalloc(sizeof(struct kvm_regs), GFP_KERNEL)=
-;
-> >               if (!kvm_regs)
-> >                       goto out;
-> >               r =3D kvm_arch_vcpu_ioctl_get_regs(vcpu, kvm_regs);
-> > @@ -4454,8 +4454,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >               break;
-> >       }
-> >       case KVM_GET_SREGS: {
-> > -             kvm_sregs =3D kzalloc(sizeof(struct kvm_sregs),
-> > -                                 GFP_KERNEL_ACCOUNT);
-> > +             kvm_sregs =3D kzalloc(sizeof(struct kvm_sregs), GFP_KERNE=
-L);
-> >               r =3D -ENOMEM;
-> >               if (!kvm_sregs)
-> >                       goto out;
-> > @@ -4547,7 +4546,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
-> >               break;
-> >       }
-> >       case KVM_GET_FPU: {
-> > -             fpu =3D kzalloc(sizeof(struct kvm_fpu), GFP_KERNEL_ACCOUN=
-T);
-> > +             fpu =3D kzalloc(sizeof(struct kvm_fpu), GFP_KERNEL);
-> >               r =3D -ENOMEM;
-> >               if (!fpu)
-> >                       goto out;
-> > @@ -6210,7 +6209,7 @@ static void kvm_uevent_notify_change(unsigned int=
- type, struct kvm *kvm)
-> >       active =3D kvm_active_vms;
-> >       mutex_unlock(&kvm_lock);
-> >
-> > -     env =3D kzalloc(sizeof(*env), GFP_KERNEL_ACCOUNT);
-> > +     env =3D kzalloc(sizeof(*env), GFP_KERNEL);
-> >       if (!env)
-> >               return;
-> >
-> > @@ -6226,7 +6225,7 @@ static void kvm_uevent_notify_change(unsigned int=
- type, struct kvm *kvm)
-> >       add_uevent_var(env, "PID=3D%d", kvm->userspace_pid);
-> >
-> >       if (!IS_ERR(kvm->debugfs_dentry)) {
-> > -             char *tmp, *p =3D kmalloc(PATH_MAX, GFP_KERNEL_ACCOUNT);
-> > +             char *tmp, *p =3D kmalloc(PATH_MAX, GFP_KERNEL);
-> >
-> >               if (p) {
-> >                       tmp =3D dentry_path_raw(kvm->debugfs_dentry, p, P=
-ATH_MAX);
->
+Jinrong Liang <ljr.kernel@gmail.com> writes:
 
+> Hi,
+
+> This series is an addition to below patch set:
+> KVM: x86/pmu: selftests: Fixes and new tests
+> https://lore.kernel.org/all/20231110021306.1269082-1-seanjc@google.com/
+
+Since this is a few months old and v10 of Sean's patch has been applied
+here [1], have you done any further work on this series? No pressure if
+not, but Mingwei and I are interested in covering AMD for some PMU
+testing we are working on and we want to make sure we know the latest
+work.
+
+> Add selftests for AMD PMU counters, including tests for basic  
+> functionality
+> of AMD PMU counters, numbers of counters, AMD PMU versions, PerfCtrExtCore
+> and AMD PerfMonV2 features. Also adds PMI tests for Intel gp and fixed  
+> counters.
+
+> All patches have been tested on both Intel and AMD machines, with one  
+> exception
+> AMD Guest PerfMonV2 has not been tested on my AMD machine, as does not  
+> support
+> PerfMonV2.
+
+> If Sean fixed the issue of not enabling forced emulation to generate #UD  
+> when
+> applying the "KVM: x86/pmu: selftests: Fixes and new tests" patch set,  
+> then the
+> patch "KVM: selftests: Add forced emulation check to fix #UD" can be  
+> dropped.
+
+> Any feedback or suggestions are greatly appreciated.
+
+I'll happily review once my question above is answered.
+
+> Sincerely,
+
+> Jinrong
+
+> Jinrong Liang (9):
+>    KVM: selftests: Add forced emulation check to fix #UD
+>    KVM: selftests: Test gp counters overflow interrupt handling
+>    KVM: selftests: Test fixed counters overflow interrupt handling
+>    KVM: selftests: Add x86 feature and properties for AMD PMU in
+>      processor.h
+>    KVM: selftests: Test AMD PMU performance counters basic functions
+>    KVM: selftests: Test consistency of AMD PMU counters num
+>    KVM: selftests: Test consistency of PMU MSRs with AMD PMU version
+>    KVM: selftests: Test AMD Guest PerfCtrExtCore
+>    KVM: selftests: Test AMD Guest PerfMonV2
+
+>   .../selftests/kvm/include/x86_64/processor.h  |   3 +
+>   .../selftests/kvm/x86_64/pmu_counters_test.c  | 446 ++++++++++++++++--
+>   2 files changed, 400 insertions(+), 49 deletions(-)
+
+
+> base-commit: c076acf10c78c0d7e1aa50670e9cc4c91e8d59b4
+> prerequisite-patch-id: e33e3cd1ff495ffdccfeca5c8247dc8af9996b08
+> prerequisite-patch-id: a46a885c36e440f09701b553d5b27cb53f6b660f
+> prerequisite-patch-id: a9ac79bbf777b3824f0c61c45a68f1308574ab79
+> prerequisite-patch-id: cd7b82618866160b5ac77199b681148dfb96e341
+> prerequisite-patch-id: df5d1c23dd98d83ba3606e84eb5f0a4cd834f52c
+> prerequisite-patch-id: e374d7ce66c66650f23c066690ab816f81e6c3e3
+> prerequisite-patch-id: 11f133be9680787fe69173777ef1ae448b23168c
+> prerequisite-patch-id: eea75162480ca828fb70395d5c224003ea5ae246
+> prerequisite-patch-id: 6b7b22b6b56dd28bd80404e1a295abef60ecfa9a
+> prerequisite-patch-id: 2a078271ce109bb526ded7d6eec12b4adbe26cff
+> prerequisite-patch-id: e51c5c2f34fc9fe587ce0eea6f11dc84af89a946
+> prerequisite-patch-id: 8c1c276fc6571a99301d18aa00ad8280d5a29faf
+> prerequisite-patch-id: 37d2f2895e22bae420401e8620410cd628e4fb39
+> prerequisite-patch-id: 1abba01ee49d71c38386afa9abf1794130e32a2c
+> prerequisite-patch-id: a7486fd15be405a864527090d473609d44a99c3b
+> prerequisite-patch-id: 41993b2eef8d1e2286ec04b3c1aa1a757792bafe
+> prerequisite-patch-id: 9442b1b4c370b1a68c32eaa6ce3ee4c5d549efd0
+> prerequisite-patch-id: 89b2e89917a89713d6a63cbd594f6979f4d06578
+> prerequisite-patch-id: 1e9fe564790f41cfd52ebafc412434608187d8db
+> prerequisite-patch-id: 7d0b2b4af888fe09eae85ebfe56b4daed71aa08c
+> prerequisite-patch-id: 4e6910c90ae769b7556f6aec40f5d600285fe4d0
+> prerequisite-patch-id: 5248bc19b00c94188b803a4f41fa19172701d7b0
+> prerequisite-patch-id: f9310c716dbdcbe9e3672e29d9e576064845d917
+> prerequisite-patch-id: 21b2c6b4878d2ce5a315627efa247240335ede1e
+> prerequisite-patch-id: e01570f8ff40aacba38f86454572803bd68a1d59
+> prerequisite-patch-id: 65eea4f11ce5e8f9836651c593b7e563b0404459
+
+[1]  
+https://lore.kernel.org/kvm/170666267480.3861961.1911322891711579495.b4-ty@google.com/
 
