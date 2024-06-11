@@ -1,114 +1,201 @@
-Return-Path: <kvm+bounces-19292-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19293-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54EC9902F31
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 05:47:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FBD9902F33
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 05:49:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D37011F22E31
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 03:47:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F179D1F2274E
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 03:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58BF016F915;
-	Tue, 11 Jun 2024 03:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA5A16F918;
+	Tue, 11 Jun 2024 03:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PnVtCIp4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JdBwBiGt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-lf1-f65.google.com (mail-lf1-f65.google.com [209.85.167.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1285264B
-	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 03:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424CA64B;
+	Tue, 11 Jun 2024 03:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718077660; cv=none; b=irXFJ2R/PGc7fRHvsXKKIosApWG/3GrwxBAFR4CRGxN6tJKEwgRu7bVJ29zaVH7vmrDYutE4FvTDH/HtTXP8QE5j3V4A4CkE3Qqoy6BEge1/aIoW0cpnzCu/+HSyX54BcEz9Q0izcaLwYn3CxmUJzIbNdJ/RUTbznv+WSlQbjk0=
+	t=1718077738; cv=none; b=dczE15tUbeTZ1RcRPviJ0HkhjR+gu/elTUnBkroHUgVEFuIxv307qnZX3bSoMwI29zC9fRpBKQr3aH5QzTOmeewsnDoLw0p2TRKiR2alTIu9pRHrwvFWFSplzNam2YrmE6wwxLKSmqxI3MC3UT70t3eCEXoHptD/oIsPTcJE7UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718077660; c=relaxed/simple;
-	bh=ImC9OdLsLq5zNZ6vdjGWmQM6DDhoKVkf/yl46Ae7Og8=;
+	s=arc-20240116; t=1718077738; c=relaxed/simple;
+	bh=4bRj6TsecIphPgJOPJ9cAYvpa6UNiuELaeuFMUXXMoQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TdgS0WnJ+bfhGioqXSa2SYp1PPdr36E1dCiII5nurjpNkwIWH9Jf0lVogzN/xrX+/VIej7uBRMdJqdN5iu/WH5OjdvMoWn5zU1QKRpaoUP/P6bH06X/x5YfWEMW3D2+sOMtnBxupioDUzo78hmac7LfIzqIZSfPDucX8Ud3QjUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PnVtCIp4; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57c8bd6b655so10642a12.0
-        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 20:47:38 -0700 (PDT)
+	 To:Cc:Content-Type; b=jSwDEWn0EyZfydnf6kdUO7gID8zFH5nSItjdSE9GquMuPIbiKKIRs3o1wK104bMjVg2bBWfU9KC6pg0Pc5ti/7S1KNdN7gUNexG82PrM7zj7iLC7ugsjwIl92X44yXFSowRLBbPnOl7V+l7Cn7q1EHav9ncDys8Bs1meDTqtolk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JdBwBiGt; arc=none smtp.client-ip=209.85.167.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f65.google.com with SMTP id 2adb3069b0e04-52c815e8e9eso2589883e87.0;
+        Mon, 10 Jun 2024 20:48:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718077657; x=1718682457; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718077734; x=1718682534; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Gl/RVYtUWAmdJmYhx3bWwluPkKF6eTc3z6iPlXxf8LE=;
-        b=PnVtCIp4on/k1VCDLATSzAf8Pi1yHfxD3sgK9nJ9Ttt9I+hGWN0u+OR5GhpcngKuBM
-         mbVjoo182IPxj3/AFLt/C44x5XKeC+IjZlJQYfameC9AsKT2codr2GAfEgjfpCqPUgXp
-         a1KnuUPXypcs8eVV9gQhEI/IRZjI2TAPMDlFs/lFFcBi1rgDdhUBmHPDMieV/S+z/oun
-         G8gwUFvGK1F44WnplhT2I4yZ9O9/gb9oE4epK9amAW/KPCeo1H9m+DREZqxFBCWuFHIi
-         lUQbMmnyLlJ8pZqOl95jKomVshiTRFbHzdDtdxoxkRH00CSlhhtHEL0Tpni1S/XWEcWq
-         gAww==
+        bh=EeURxhgiQoYCCJH8wV3+dknCqUQ9gQWVawbH/GCc3eE=;
+        b=JdBwBiGtRtkA1ReUFTxq5UANcD3qlFSBb3mAZhA49MKb0zoRV3UWa5N3ixL4km6MPG
+         H0/xIzUVki96jnn3HrDCqJ6jbXjmhpX5l/VNe3zOuKW1Wgjxl9UnIHvuj8Kt0GYn8VqW
+         oncTMzDF5dDagSj5BNIXip/p/wgPf3JSBm0OqXfTavDcWOl9YCtLdEaFVrkAaiteLIml
+         Oyb145I6SQSuJpozEBXPkb1iluSja3dS2H/IudtFXRawwuJFsTpa13S+Utp+u6EYjh7u
+         gMOWVJlsfv2yVW/+juOoa9QECS7y7tRvLLrftzDp9awpwtydmY8Pyruaq2VmXia2ee/6
+         alGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718077657; x=1718682457;
+        d=1e100.net; s=20230601; t=1718077734; x=1718682534;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Gl/RVYtUWAmdJmYhx3bWwluPkKF6eTc3z6iPlXxf8LE=;
-        b=PJJlTMRVRf+KHW3dzi2bU7dYxJz86YDKpUkSFClO8vNPCmoKzwle9phL7duzh5JR6B
-         +j9l3AlQyARoOCwTPMXfDtzOOflTsNqL1LeWuuB3PuqA698jSuH4kY5yCiJIl319pTuK
-         yUt4XnuzXUggLbMpvc0BTbLGLgO/eesKFCGTL0U9oQECn2BlsgWvVorFNAHPhbBR3CGA
-         IvArIi6Qw0enj+u0kq0HWzwPxDslA7S+eHRAsRqKBO3w+r88iy0NnOCCLBkeTHtP8DjS
-         8LTFYCpCBnxZmBtkOaslUM6r42tPcl0A8XCqiRgIQRihrKK8zZFddGkJhnbOAHidJyyf
-         HuZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUFkAsIDGtDSHdPNMiOvp4MLtcR1wdIBUDzTDLMrkXoZi2GvU1ASv2cwi177KCablkuIAKOrJ0epIeBbJPMyU3VI8Wr
-X-Gm-Message-State: AOJu0YyOtqYnv0I7nzuWHRS63P+QYbFxXTIAKPoL4AkHUBalJDTUVNBB
-	l4Pza4S7uQBV/g1FtPB7rLlL88QZtZ2B7QRRCzvKcbw38SCfRRasFZybhclGiJK8qT70BNW/wOl
-	WZ3ram+HS2HEIM7ZXaMw576ZX31FOWq8+xP1h
-X-Google-Smtp-Source: AGHT+IHrnelPx4R7r3XsfzngPJ9pvyQM/0CUQ9e4Z0bbrPV0pjxrPvjnITInnIVugp2O/RUIuuEIazoy4vH18TduMQY=
-X-Received: by 2002:a05:6402:b74:b0:572:988f:2f38 with SMTP id
- 4fb4d7f45d1cf-57c92510457mr152515a12.6.1718077657109; Mon, 10 Jun 2024
- 20:47:37 -0700 (PDT)
+        bh=EeURxhgiQoYCCJH8wV3+dknCqUQ9gQWVawbH/GCc3eE=;
+        b=TfCSPRtRG0dfs+pCKYPnrrles5XhCbNGH4VVhrJdPngOwp8ag8wIducVYeEbmT9S7D
+         AtvepUL60qTKJKe51etYyghDO5js165xztutm+za5ZuuSKV32kCLHbQuSMEROUBBLBqv
+         Cta55kfMuuoKyZhwLglmCYWAYhUSucOG0ltD23YzQ4xQuebBsGca+gUTZlHAqWMmlT19
+         wZexpDIrtnJGIcoAbeqveRM+eItwLdG8sM8FSeF/JvFEDRZleExct5+sIDgHlfhOwmtG
+         kur9OxYy8SIVs13nDC0e+nDqkdFFO1xu1QBFwBbtBwWP28ntaV1SiR8lqcjQc79OIAj9
+         4rmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/GHYw3YoXwvm2IV+PspFsQoQ+gb0asZoDaMhx1tXMj8STd8lVkwCN9MKNHAZ/zW+tr/BECpADM1qR7Hv0RT3XWwGdeq2xjwUDxLCNlE9sOreUEtIQtAYrFuEVLxdS/OHi
+X-Gm-Message-State: AOJu0Yyr3LQQzPPNRXRZv1EaP3pgggodubAkqj6tBR7Kebbflc2JqCUl
+	NOtfqY2QHf0wkj34LrBYV2PjN+myErqEaIidQrVWO258NJ3gv2k6i79PCzYhXVOlEj2w2LYzU9E
+	/gGNRxhCRGD7F6AnZivDxumTLDa4=
+X-Google-Smtp-Source: AGHT+IF04T7zbC8N5zlMa29YiDaf22w1ifIGqkmzcoGxgZVg+8srWa3Y+uUWvLtgQp51gpO9FasZVRcj8tvXWXNcCuI=
+X-Received: by 2002:ac2:5142:0:b0:529:b734:ebc9 with SMTP id
+ 2adb3069b0e04-52bb9f8ef21mr6461781e87.38.1718077733920; Mon, 10 Jun 2024
+ 20:48:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240611014845.82795-1-seanjc@google.com>
-In-Reply-To: <20240611014845.82795-1-seanjc@google.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Mon, 10 Jun 2024 20:47:21 -0700
-Message-ID: <CALMp9eQBd1yFA+w8X4EK1M+Dmh_MaEG=7POd-pexgA-wHWJBSQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Always sync PIR to IRR prior to scanning I/O
- APIC routes
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Adamos Ttofari <attofari@amazon.de>, Raghavendra Rao Ananta <rananta@google.com>
+References: <20231121115457.76269-1-cloudliang@tencent.com> <gsntzfrs9xqp.fsf@coltonlewis-kvm.c.googlers.com>
+In-Reply-To: <gsntzfrs9xqp.fsf@coltonlewis-kvm.c.googlers.com>
+From: Jinrong Liang <ljr.kernel@gmail.com>
+Date: Tue, 11 Jun 2024 11:48:43 +0800
+Message-ID: <CAFg_LQWoBrg_ANF4SA-rOuZLtNxLijWNRKcvVR_FZp6yy6kRXQ@mail.gmail.com>
+Subject: Re: [PATCH 0/9] Test the consistency of AMD PMU counters and their features
+To: Colton Lewis <coltonlewis@google.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, likexu@tencent.com, 
+	jmattson@google.com, aaronlewis@google.com, wanpengli@tencent.com, 
+	cloudliang@tencent.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 10, 2024 at 6:48=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+Colton Lewis <coltonlewis@google.com> =E4=BA=8E2024=E5=B9=B46=E6=9C=8811=E6=
+=97=A5=E5=91=A8=E4=BA=8C 07:36=E5=86=99=E9=81=93=EF=BC=9A
 >
-> Sync pending posted interrupts to the IRR prior to re-scanning I/O APIC
-> routes, irrespective of whether the I/O APIC is emulated by userspace or
-> by KVM.  If a level-triggered interrupt routed through the I/O APIC is
-> pending or in-service for a vCPU, KVM needs to intercept EOIs on said
-> vCPU even if the vCPU isn't the destination for the new routing, e.g. if
-> servicing an interrupt using the old routing races with I/O APIC
-> reconfiguration.
+> Hi Jinrong,
 >
-> Commit fceb3a36c29a ("KVM: x86: ioapic: Fix level-triggered EOI and
-> userspace I/OAPIC reconfigure race") fixed the common cases, but
-> kvm_apic_pending_eoi() only checks if an interrupt is in the local
-> APIC's IRR or ISR, i.e. misses the uncommon case where an interrupt is
-> pending in the PIR.
+> Sorry if this is repeating myself, but I only replied to you before
+> when I should have included the list.
 >
-> Failure to intercept EOI can manifest as guest hangs with Windows 11 if
-> the guest uses the RTC as its timekeeping source, e.g. if the VMM doesn't
-> expose a more modern form of time to the guest.
+> Sean may have something useful to add as well.
 >
-> Cc: stable@vger.kernel.org
-> Cc: Adamos Ttofari <attofari@amazon.de>
-> Cc: Raghavendra Rao Ananta <rananta@google.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+> Jinrong Liang <ljr.kernel@gmail.com> writes:
+>
+> > Hi,
+>
+> > This series is an addition to below patch set:
+> > KVM: x86/pmu: selftests: Fixes and new tests
+> > https://lore.kernel.org/all/20231110021306.1269082-1-seanjc@google.com/
+>
+> Since this is a few months old and v10 of Sean's patch has been applied
+> here [1], have you done any further work on this series? No pressure if
+> not, but Mingwei and I are interested in covering AMD for some PMU
+> testing we are working on and we want to make sure we know the latest
+> work.
+
+Hi Colton,
+
+There are no further updates to this series. I appreciate your
+interest in covering AMD for PMU testing purposes.
+
+Please feel free to modify this patch series to suit your requirements
+and make any necessary adjustments. If you have any questions or need
+assistance, please don't hesitate to contact me.
+
+Thanks
+
+>
+> > Add selftests for AMD PMU counters, including tests for basic
+> > functionality
+> > of AMD PMU counters, numbers of counters, AMD PMU versions, PerfCtrExtC=
+ore
+> > and AMD PerfMonV2 features. Also adds PMI tests for Intel gp and fixed
+> > counters.
+>
+> > All patches have been tested on both Intel and AMD machines, with one
+> > exception
+> > AMD Guest PerfMonV2 has not been tested on my AMD machine, as does not
+> > support
+> > PerfMonV2.
+>
+> > If Sean fixed the issue of not enabling forced emulation to generate #U=
+D
+> > when
+> > applying the "KVM: x86/pmu: selftests: Fixes and new tests" patch set,
+> > then the
+> > patch "KVM: selftests: Add forced emulation check to fix #UD" can be
+> > dropped.
+>
+> > Any feedback or suggestions are greatly appreciated.
+>
+> I'll happily review once my question above is answered.
+>
+> > Sincerely,
+>
+> > Jinrong
+>
+> > Jinrong Liang (9):
+> >    KVM: selftests: Add forced emulation check to fix #UD
+> >    KVM: selftests: Test gp counters overflow interrupt handling
+> >    KVM: selftests: Test fixed counters overflow interrupt handling
+> >    KVM: selftests: Add x86 feature and properties for AMD PMU in
+> >      processor.h
+> >    KVM: selftests: Test AMD PMU performance counters basic functions
+> >    KVM: selftests: Test consistency of AMD PMU counters num
+> >    KVM: selftests: Test consistency of PMU MSRs with AMD PMU version
+> >    KVM: selftests: Test AMD Guest PerfCtrExtCore
+> >    KVM: selftests: Test AMD Guest PerfMonV2
+>
+> >   .../selftests/kvm/include/x86_64/processor.h  |   3 +
+> >   .../selftests/kvm/x86_64/pmu_counters_test.c  | 446 ++++++++++++++++-=
+-
+> >   2 files changed, 400 insertions(+), 49 deletions(-)
+>
+>
+> > base-commit: c076acf10c78c0d7e1aa50670e9cc4c91e8d59b4
+> > prerequisite-patch-id: e33e3cd1ff495ffdccfeca5c8247dc8af9996b08
+> > prerequisite-patch-id: a46a885c36e440f09701b553d5b27cb53f6b660f
+> > prerequisite-patch-id: a9ac79bbf777b3824f0c61c45a68f1308574ab79
+> > prerequisite-patch-id: cd7b82618866160b5ac77199b681148dfb96e341
+> > prerequisite-patch-id: df5d1c23dd98d83ba3606e84eb5f0a4cd834f52c
+> > prerequisite-patch-id: e374d7ce66c66650f23c066690ab816f81e6c3e3
+> > prerequisite-patch-id: 11f133be9680787fe69173777ef1ae448b23168c
+> > prerequisite-patch-id: eea75162480ca828fb70395d5c224003ea5ae246
+> > prerequisite-patch-id: 6b7b22b6b56dd28bd80404e1a295abef60ecfa9a
+> > prerequisite-patch-id: 2a078271ce109bb526ded7d6eec12b4adbe26cff
+> > prerequisite-patch-id: e51c5c2f34fc9fe587ce0eea6f11dc84af89a946
+> > prerequisite-patch-id: 8c1c276fc6571a99301d18aa00ad8280d5a29faf
+> > prerequisite-patch-id: 37d2f2895e22bae420401e8620410cd628e4fb39
+> > prerequisite-patch-id: 1abba01ee49d71c38386afa9abf1794130e32a2c
+> > prerequisite-patch-id: a7486fd15be405a864527090d473609d44a99c3b
+> > prerequisite-patch-id: 41993b2eef8d1e2286ec04b3c1aa1a757792bafe
+> > prerequisite-patch-id: 9442b1b4c370b1a68c32eaa6ce3ee4c5d549efd0
+> > prerequisite-patch-id: 89b2e89917a89713d6a63cbd594f6979f4d06578
+> > prerequisite-patch-id: 1e9fe564790f41cfd52ebafc412434608187d8db
+> > prerequisite-patch-id: 7d0b2b4af888fe09eae85ebfe56b4daed71aa08c
+> > prerequisite-patch-id: 4e6910c90ae769b7556f6aec40f5d600285fe4d0
+> > prerequisite-patch-id: 5248bc19b00c94188b803a4f41fa19172701d7b0
+> > prerequisite-patch-id: f9310c716dbdcbe9e3672e29d9e576064845d917
+> > prerequisite-patch-id: 21b2c6b4878d2ce5a315627efa247240335ede1e
+> > prerequisite-patch-id: e01570f8ff40aacba38f86454572803bd68a1d59
+> > prerequisite-patch-id: 65eea4f11ce5e8f9836651c593b7e563b0404459
+>
+> [1]
+> https://lore.kernel.org/kvm/170666267480.3861961.1911322891711579495.b4-t=
+y@google.com/
 
