@@ -1,156 +1,137 @@
-Return-Path: <kvm+bounces-19285-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19286-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10F4902E0A
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 03:46:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 950AA902E12
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 03:49:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5060C1F22CB6
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 01:46:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3E5B1C2209B
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 01:49:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F277AD4C;
-	Tue, 11 Jun 2024 01:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5815FAD55;
+	Tue, 11 Jun 2024 01:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fw5u6aKf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dtl5AVTB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23DCDEDF;
-	Tue, 11 Jun 2024 01:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 480B88467
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 01:48:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718070350; cv=none; b=D2Lf7ZoIAhodGlO7Ogbg1N/X2i634r1jcTREQaV76EG3B/F8Iw548Uw/hzd6pF6nKyLvVA9OBJu85fTD6a1ncaa6NEAOL/19yQOD07cs0rKsq3OtdEGFMu9Nf4cObi+MkY3ko52Awl/pOWftRMQGLnMORJjDuCjOF5HKnkt7rn8=
+	t=1718070530; cv=none; b=jp5p5zUzpIf6KRw5c+4q1eTijKrhcE6yQr3cfqjU88igToAwra/ytIywTdkFTMRGJRNSagoBW7qUJsyxDAadMbssBbMHhc2gwgJItzqptbN1vWvUhkFVOXk4BHtJSs3LUZeShLcPVo/yj7K4a2OP380JrjleGkx02WvpU8g4I5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718070350; c=relaxed/simple;
-	bh=Rt1ouXIhwMJ1m4R+0fkOGUiXqAnmFxrVnekcV4kzSic=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YtZlWnyIf6HfzidSMIU84yI2TkozgvWFDsAx+cOQnw8YU5iJr8YNzQchoA0YWoEJCEA9bFWT+dkaXKBFw80qkE9yBkKwYCh8eLi7GLuSWTtnrIyc0bO8OpYQi7uofwT/ffrisSqXzElEhLqt0b0uZ7uccVBe0ppoVozpLE7mV8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fw5u6aKf; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718070349; x=1749606349;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Rt1ouXIhwMJ1m4R+0fkOGUiXqAnmFxrVnekcV4kzSic=;
-  b=fw5u6aKfws35Ha6YagemycgDrotzxtP0M/BVEVxIsnuO4nhhXni/ZK4P
-   46lqrUBy01zTf7N+M4/qoKWdWn12It0DHlsOLRbJ13pSe+7+a7/1bEyLy
-   cBBCLymZqS2FZZiC7/9OfGWP5dLA5Z4FsooD2AKStaesLFBJZxqNIrtAr
-   UfI6YxxGMvF0jQVucQiLXKbFD3gPJPNJf0EWN9+k6hlwrNrcQ79gmtvA8
-   2ku/2C0IaiYwE7z4D5l7K+OgZ2tWI10vkt1ZqiV4jjYFbQNIg+/HRca27
-   RHKqa1vwhty7DuP2ZcGwckScKvUTOv//pUf6sCFcA6H44zP66kb+uxuGA
-   w==;
-X-CSE-ConnectionGUID: OcIKM/j4Tv+b6xFCd3MMrQ==
-X-CSE-MsgGUID: anDxSpH9RtiiCDgrsZrJAw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="25333946"
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="25333946"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 18:45:48 -0700
-X-CSE-ConnectionGUID: 5P26nJYeSCS1oWvCtWsn+A==
-X-CSE-MsgGUID: CBle/kBxRFyglXbu/R/q2w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,227,1712646000"; 
-   d="scan'208";a="44202807"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.239.60]) ([10.124.239.60])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jun 2024 18:45:48 -0700
-Message-ID: <e41fd2bc-26f0-4811-927b-3e94d13d5dac@linux.intel.com>
-Date: Tue, 11 Jun 2024 09:45:44 +0800
+	s=arc-20240116; t=1718070530; c=relaxed/simple;
+	bh=wl+V6pxR8NYQMEO4cSIeFOpU8DdHxYn8iGsc8lsby2c=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ksYiwQuCpla4sQkubgGQmnChwG81Hw+rvHkj4gCWB5XQ980xLjUuVfjbiTJ0c4OWMQ9TXwfGx/KMJRPOEdgn3om0ZzAmPDCqiyJlv20OckOm1A2fe8Q/ETN177tKW5JR0w0XW8zjAUrYBsvFRJx0C4D3C9x38gGoVhGL9BloYCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dtl5AVTB; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6e3341c8865so3268124a12.1
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 18:48:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718070528; x=1718675328; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IujQsYojV/JdU3ox2fNDmOq+JhEUEkoTs1HPTwTybmA=;
+        b=dtl5AVTBR0+OsvApgnUoRnRZg6cPTiB7tH7OUKiZUdqmU+mwKnEDsgVfnTMp10Un10
+         V75WzA/LQnx7tQqucPLW/ghEmzNlGN4D9CQt07399FwbZRWj5c3FUCH1cRa7Cs2VxjaM
+         ZpqH92q6XhkkDbP4K9/82VxtzFLdY6nBM3pbQqWXvKsMyiAQfR4ALNWx5+9gZnUv2GLe
+         Ahf+WUI6Fy685Gr6PT1M0MTUIOUr+r+Hu4uT5jJYu9dEqj93JwIcm7Zs1+2dq1W6SXgB
+         KqCqc76Zalthn3oFybjP2CqjUaty22mg9I+EPHTJdbfdillDb35FGMk6llD6XkgBaljh
+         5v/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718070528; x=1718675328;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IujQsYojV/JdU3ox2fNDmOq+JhEUEkoTs1HPTwTybmA=;
+        b=hmpipNXBvlcp00m1SjVgXW/OhnPbbfkZisWR8NcVwv2hge/xYc2/pMYtARZjj82pri
+         bIrSUitGlsELSxzmd1Ux9ucsVROsUgTD54RIewlSSQG/oWldp6iHRDxA+SfhTypPUpsj
+         DDfxWSLuiuTYvPreeg3MdHpiIppc6ozrSC+ivzLbN3lyN4yPGO0jclx1V02cNdtNPeNy
+         +tF0hgtfwg6jFdCRQQjv0lJsKPUWO4djB4U0SFCtO2uvSEZOnKquOknsYo6cmJPVIZSM
+         R7rva2oE00PQh5gm2omd3GjsWoF/dSeqcHnvehdL5eeZSDFKtvxEplMIXbOv7n05tr3d
+         M+Ow==
+X-Gm-Message-State: AOJu0YyY6IxLDT4/9LXNcBluGPiXqFu0x0HfmQf9oNw9C+M3jbMxPlup
+	kcE9q7nyv0MsgnBkQyFQs36vag753Ye9/qOzx4U3aVmvqyKNBLjjBMUlMKWDre7yDNXXo6bnJqM
+	ObA==
+X-Google-Smtp-Source: AGHT+IFjnsXaXaCah0afjleJHFBmdlDr4s6g7i3DVWeWFHIpMsaJO+Kb4zX4oCIquO7XtZI3OHT+chZpglI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:3f82:0:b0:6e5:1191:1900 with SMTP id
+ 41be03b00d2f7-6e511beeee7mr21262a12.2.1718070528145; Mon, 10 Jun 2024
+ 18:48:48 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Mon, 10 Jun 2024 18:48:45 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/pmu: Add a helper to enable bits in
- FIXED_CTR_CTRL
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240608000819.3296176-1-seanjc@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20240608000819.3296176-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240611014845.82795-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Always sync PIR to IRR prior to scanning I/O APIC routes
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Adamos Ttofari <attofari@amazon.de>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Sync pending posted interrupts to the IRR prior to re-scanning I/O APIC
+routes, irrespective of whether the I/O APIC is emulated by userspace or
+by KVM.  If a level-triggered interrupt routed through the I/O APIC is
+pending or in-service for a vCPU, KVM needs to intercept EOIs on said
+vCPU even if the vCPU isn't the destination for the new routing, e.g. if
+servicing an interrupt using the old routing races with I/O APIC
+reconfiguration.
 
-On 6/8/2024 8:08 AM, Sean Christopherson wrote:
-> Add a helper, intel_pmu_enable_fixed_counter_bits(), to dedup code that
-> enables fixed counter bits, i.e. when KVM clears bits in the reserved mask
-> used to detect invalid MSR_CORE_PERF_FIXED_CTR_CTRL values.
->
-> No functional change intended.
->
-> Cc: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/vmx/pmu_intel.c | 22 ++++++++++++----------
->  1 file changed, 12 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index e01c87981927..fb5cbd6cbeff 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -448,6 +448,14 @@ static __always_inline u64 intel_get_fixed_pmc_eventsel(unsigned int index)
->  	return eventsel;
->  }
->  
-> +static void intel_pmu_enable_fixed_counter_bits(struct kvm_pmu *pmu, u64 bits)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
-> +		pmu->fixed_ctr_ctrl_rsvd &= ~intel_fixed_bits_by_idx(i, bits);
-> +}
-> +
->  static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> @@ -457,7 +465,6 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	union cpuid10_edx edx;
->  	u64 perf_capabilities;
->  	u64 counter_rsvd;
-> -	int i;
->  
->  	memset(&lbr_desc->records, 0, sizeof(lbr_desc->records));
->  
-> @@ -501,12 +508,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  			((u64)1 << edx.split.bit_width_fixed) - 1;
->  	}
->  
-> -	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
-> -		pmu->fixed_ctr_ctrl_rsvd &=
-> -			 ~intel_fixed_bits_by_idx(i,
-> -						  INTEL_FIXED_0_KERNEL |
-> -						  INTEL_FIXED_0_USER |
-> -						  INTEL_FIXED_0_ENABLE_PMI);
-> +	intel_pmu_enable_fixed_counter_bits(pmu, INTEL_FIXED_0_KERNEL |
-> +						 INTEL_FIXED_0_USER |
-> +						 INTEL_FIXED_0_ENABLE_PMI);
->  
->  	counter_rsvd = ~(((1ull << pmu->nr_arch_gp_counters) - 1) |
->  		(((1ull << pmu->nr_arch_fixed_counters) - 1) << KVM_FIXED_PMC_BASE_IDX));
-> @@ -551,10 +555,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  		if (perf_capabilities & PERF_CAP_PEBS_BASELINE) {
->  			pmu->pebs_enable_rsvd = counter_rsvd;
->  			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
-> -			for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
-> -				pmu->fixed_ctr_ctrl_rsvd &=
-> -					~intel_fixed_bits_by_idx(i, ICL_FIXED_0_ADAPTIVE);
->  			pmu->pebs_data_cfg_rsvd = ~0xff00000full;
-> +			intel_pmu_enable_fixed_counter_bits(pmu, ICL_FIXED_0_ADAPTIVE);
->  		} else {
->  			pmu->pebs_enable_rsvd =
->  				~((1ull << pmu->nr_arch_gp_counters) - 1);
->
-> base-commit: b9adc10edd4e14e66db4f7289a88fdbfa45ae7a8
+Commit fceb3a36c29a ("KVM: x86: ioapic: Fix level-triggered EOI and
+userspace I/OAPIC reconfigure race") fixed the common cases, but
+kvm_apic_pending_eoi() only checks if an interrupt is in the local
+APIC's IRR or ISR, i.e. misses the uncommon case where an interrupt is
+pending in the PIR.
 
-Reviewed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Failure to intercept EOI can manifest as guest hangs with Windows 11 if
+the guest uses the RTC as its timekeeping source, e.g. if the VMM doesn't
+expose a more modern form of time to the guest.
+
+Cc: stable@vger.kernel.org
+Cc: Adamos Ttofari <attofari@amazon.de>
+Cc: Raghavendra Rao Ananta <rananta@google.com>
+Cc: Jim Mattson <jmattson@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4157602c964e..f2322af38242 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10736,13 +10736,12 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+ 
+ 	bitmap_zero(vcpu->arch.ioapic_handled_vectors, 256);
+ 
++	static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
++
+ 	if (irqchip_split(vcpu->kvm))
+ 		kvm_scan_ioapic_routes(vcpu, vcpu->arch.ioapic_handled_vectors);
+-	else {
+-		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
+-		if (ioapic_in_kernel(vcpu->kvm))
+-			kvm_ioapic_scan_entry(vcpu, vcpu->arch.ioapic_handled_vectors);
+-	}
++	else if (ioapic_in_kernel(vcpu->kvm))
++		kvm_ioapic_scan_entry(vcpu, vcpu->arch.ioapic_handled_vectors);
+ 
+ 	if (is_guest_mode(vcpu))
+ 		vcpu->arch.load_eoi_exitmap_pending = true;
+
+base-commit: af0903ab52ee6d6f0f63af67fa73d5eb00f79b9a
+-- 
+2.45.2.505.gda0bf45e8d-goog
 
 
