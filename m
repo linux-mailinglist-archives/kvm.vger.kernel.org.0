@@ -1,432 +1,223 @@
-Return-Path: <kvm+bounces-19303-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19304-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536D1903749
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 10:59:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83FCF903806
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 11:41:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C4521C233E7
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 08:59:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DA8D1C219D1
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 09:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 449CF17623B;
-	Tue, 11 Jun 2024 08:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420F2176ADC;
+	Tue, 11 Jun 2024 09:41:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XDTgesuQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dfJE/att"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE8F174EEB;
-	Tue, 11 Jun 2024 08:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718096343; cv=none; b=TLJ9p288APe+qUV12N4LjBd1ZByXVrKw7adzPWEs71/xhu5xv7WTNJ5VajQbfCMYXjy3jChD/I12E3YbEKWwOeEpF8ctkXcMhdVLMEGmRPSuVfEmx7u7loyR41Jek0UAiOXivC1BsJHBXOI2BTSUvQLW5ZLxcX9lEbUIaMbXtG4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718096343; c=relaxed/simple;
-	bh=7qdVuppVYC28bq9ftKsexVE1MdCnmqhCkcPqyPRINqY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kkZOqlB54iQA83G4qVhm4arC+7gn6RtcjGIsrXNMoG2CRrwRmxfCT0w6cjvvnNwCtA/sa3iwB9uBvK6DCjjNY3B6EVNJTTB1CsCJccdMlteXrY7onbWpr4VFhUG4fI7grsu1RxdWJwthT2ApJnSvwVUSPVc4iOvV+uMNx/OnXDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XDTgesuQ; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57c681dd692so3932082a12.3;
-        Tue, 11 Jun 2024 01:59:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718096340; x=1718701140; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ta5gs6XiSzNP6Nqlq/7WpwLKj34EW0SB5yZl9DbAxWA=;
-        b=XDTgesuQjOmsBnSN7CZtOLYY5WgvLeFhdWfhNV7FbPUNe+Rykppl1yod38rEb2DNBi
-         Da9D82TbPlgg7VSqJu1TPxsnZSecYKXM/WEr/78HfSmpjjPqPoBdP3GzGwIAtva3sRYM
-         9Fj+shRYsPpVLaSwXeNwfdOCLk8UFqOIZVxhLdAz86PB2INN74zzzIJ6ZeHtvHuMJmzg
-         8hjZG9yHSBeim7eneQeeDPu9PJmHw2DTjveVgfRaglaw9PBYPTIRjpVMkgrAUpPfnAIB
-         CSTGibxPbAOYJoWan6+PFtF+kWA8SFQGdv9J0xXGavc+Zj1oR9sZrxtv7bYZQqPaV6uj
-         yGXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718096340; x=1718701140;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ta5gs6XiSzNP6Nqlq/7WpwLKj34EW0SB5yZl9DbAxWA=;
-        b=EnlyUsEaz/tp1Gh79/r/HUYBsb8fVcWvJJ/xwnxocHhDMG2qUeFZFjzTc0l6YXkBSC
-         UIW1f/2mbrcrtHKdf/R3RWXTPTKAIbVfqv+MUBPKfXilhdF0DdJD0FEAmYCDb+WxUJCE
-         hawG9Qq2GNoHBN+tL+GQ09hPsxTVRXlmEy3PMab++z7UyVEkrxZe5mITlBNGOjJ6ELBH
-         5oEPrAVnVWzB4Td+7M7HZ3JZvyrMqcPvt6e9+D0cMMRPalJz1P3x5Ft9I5eGGGcxwWSB
-         GnXVDbUcJvy5HmYlK+vii2a4ciwwe6OSES0Ktl8EMEOjf94eCTIBfYOvJg0M+gj1Kcp0
-         WKeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWeMiMJluuyU/euBljWa/GCozjIK4HtmiDA6ms7rr9qE0NjqZksV4IyTT6c0YDJImM2/Bnn2N4pKmYaJPgeu91O8OYVbA3LwVOcSZzjTw2N/zxNAcN+rszHKhtNxBU5JpHYQ78lgnHrKjWLvkkH+bASsMB0jcleyVeh0Q==
-X-Gm-Message-State: AOJu0Yzvuw/FuSrTJdWgoCbJwQcG8YDOg6MeY2fuos0Tbi17u1gbj+YN
-	AlgzjSg/YBGuUJKc8UzCmZ42WZGx/9a7Riz0I2/JuwpC1KWCV6FwTwFNm5Sy03OiShSWADd8qqI
-	QSU78mE4DsmMiE/Kw91gi/Buox88=
-X-Google-Smtp-Source: AGHT+IEo5DhDHwQd10uwT+cXN3yc9yNMwVncY2l6k8Hog93c5mTUPs5asV+L5bNs6vwj+PAnYC30zmEbmh5kjuwerQo=
-X-Received: by 2002:a50:9e4b:0:b0:57c:5637:b2ae with SMTP id
- 4fb4d7f45d1cf-57c5637c846mr7035785a12.12.1718096339374; Tue, 11 Jun 2024
- 01:58:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9E12230F;
+	Tue, 11 Jun 2024 09:41:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718098879; cv=fail; b=QUv8777ENp+hdI7t14KOkBLj4aSHxjSuAbCI3WOiOMh+k0XKjEntfhNDitboKGMdVffw3Mg109uMQg2JDBkDCZstH9QgthLkG3AIFJ2W+6yl/85aDLyVPOy4yIKZ+GCmunEPh7xPV/xd1sFmQCRfzYcgQpnPRqCWZ3ydmyQQWZs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718098879; c=relaxed/simple;
+	bh=T58avZRbt6UX+3Q1nX9tL/zvLC3RrTLN8UudBNH5RFo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=F/f1ai6yuE6Y0f6IcTs1O5i6SwMZN1wqGw1PeoHlGFgQM84VdlIdtPokWfb4hELXiMIbIaluNMaVF9w4kngUnvQGqTBsL6WEfSaTpu+rOE0i00PDZ/mv7cWeYu+ju3IA2AlEH4reVnlXwGdK5Qij5cZap99atEoclP2j3YV8Ihw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dfJE/att; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718098877; x=1749634877;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=T58avZRbt6UX+3Q1nX9tL/zvLC3RrTLN8UudBNH5RFo=;
+  b=dfJE/att0BNHAM/JfDeY/LdnlSuMsP99dCpUrrkYxAY2HZpnsi+28HsT
+   xyR7TDSjLEuxC/PqqBUfrt5mUdTBv7AcL+JQKZANPh7s4nQSYLydP/BS3
+   EsXMQAPlzme4DFflxXqUp6BVMITwC6JMmUSCaDTY6JNNUpNoQSC2rDDUi
+   dvLl6cYpECm6Rjw+YWbYNZIX0duEC5wS+q7bUFImYCwSdraG07rSpAhwD
+   v4HGvlkCcTmz1x3D2L4QNjX5EKVGwjzgqD0rQi0HgCA/bksh3AWOwwwwp
+   L7Tm8p3ubMJMvNMQdSYUSinDVp5Zn8eoDIb24yOVIPiwzFvt1wr0qzOwN
+   Q==;
+X-CSE-ConnectionGUID: y0LqWckTQqKuSBte/bnosw==
+X-CSE-MsgGUID: jgzUJDhRTGqZRdQGYb50cw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="25375842"
+X-IronPort-AV: E=Sophos;i="6.08,229,1712646000"; 
+   d="scan'208";a="25375842"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 02:41:17 -0700
+X-CSE-ConnectionGUID: WLzU9UXlQhyGvh6DWS6q5Q==
+X-CSE-MsgGUID: v7YdHYdFTR67iEDC0IMaMw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,229,1712646000"; 
+   d="scan'208";a="39458426"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jun 2024 02:41:17 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 11 Jun 2024 02:41:16 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 11 Jun 2024 02:41:16 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.172)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 11 Jun 2024 02:41:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e2g2lJdq+fIMLow+OtsQwQ84fvRnZTgrmChBSX1CEvx5KrB9bNrLn9wc3MNnncmOL6Eoq04zJhPbjDkBeT5ahsa5snMj1U72FiQ5MqZVyf8IA4etMghzlfypXTeLUZlbxQ0PCwqUqFJICDqyOHWxFey7nrzxSQt3yBS6N5plTbQjXMIPk2+01t4sWgPZmv2nR5+AYJc53zN2Hq4UV5jmWvo1yjgxNSL3rds5FXvjpccctm9uZnr69mwPiJAWUTS5YGYam66UIAy5m4OJ98wObJm2WlxgV2IXzvOl+6MY8snapZvLVcjRqaNr+eZMbcDYF0Uej7zYF6u5DfPq9vIwjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T58avZRbt6UX+3Q1nX9tL/zvLC3RrTLN8UudBNH5RFo=;
+ b=Prmo3ZR7Ud2YG6ibDeIpejughVXuXdvtLLIxxsRvcb+6wmOEigeQlh8JSyY/G5hN/WLZOud5RHVw3Q7zarYyJPuWSt1DyimOl9XTCkrFLAcWkQWMQPdCBKp7STIWn+3urGtU7EGRgWWkKa+Uw18bDoWbLT8AkgM81FvXMcnkNvpaXZfnrmucq4VHbzJsD1Y3prRtRgI7MDdkepr0lovr6Mk6CNt4IS49dlmnhuXgF8NvuArp8CzZBIZJCQar/wTAI1gvAFeyMYinZBM8jByRaVGiSGr9hGffyvcJy/lEYT5hJKlcf3xoQgfEeWs20e4gqL4npEQ0Of8+kGFRLNa3OA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by DM3PR11MB8734.namprd11.prod.outlook.com (2603:10b6:8:1af::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Tue, 11 Jun
+ 2024 09:41:14 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b%4]) with mapi id 15.20.7633.036; Tue, 11 Jun 2024
+ 09:41:14 +0000
+From: "Huang, Kai" <kai.huang@intel.com>
+To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Yamahata, Isaku"
+	<isaku.yamahata@intel.com>
+Subject: Re: [PATCH] KVM: x86/tdp_mmu: Sprinkle __must_check
+Thread-Topic: [PATCH] KVM: x86/tdp_mmu: Sprinkle __must_check
+Thread-Index: AQHau9cMOldcGp1CmkWtUVIlfjByOLHCT06A
+Date: Tue, 11 Jun 2024 09:41:14 +0000
+Message-ID: <4552458c1441e3805868fbcf3e95bee4b0d1f2d9.camel@intel.com>
+References: <20240611081124.18170-1-pbonzini@redhat.com>
+In-Reply-To: <20240611081124.18170-1-pbonzini@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|DM3PR11MB8734:EE_
+x-ms-office365-filtering-correlation-id: a8d8fd76-46a1-4a86-c695-08dc89faa27f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230031|376005|366007|1800799015|38070700009;
+x-microsoft-antispam-message-info: =?utf-8?B?Unh0eVA3c2ZNTmZYMHlSU0x0dFNhOGFpUXZLUFRaSUtNcWJTb2lzL1Z2Y21o?=
+ =?utf-8?B?ZUhsdlN3M1VXeVpocVdIMHlzS29FSk5GbUsxN1pudVFXQnlsVnhQWFdpTmVv?=
+ =?utf-8?B?cTBIM2tlMjRMaG5qeURnSGZmL1FPcjVwekh6d2U5MWVaelZsNHBMdEk5UmFB?=
+ =?utf-8?B?ODlySGR3MDNuUmVlcVNpNzdNRjhJUTFuNEpidFlBbk9qQlpSM0k0WXdvRjVV?=
+ =?utf-8?B?WTNqMkNTeWRnbEFCL3d5Rmgvdk5wZXZjWThxS3FlQkhhZTJsUldZKzVGdnU4?=
+ =?utf-8?B?Y0MwbWR6ekI5akp2N09OenRJNTh6THBNa09aVThOS3pDdTRUZzlibCtkbll3?=
+ =?utf-8?B?c0tZajJCQ3BCblYwWHFReXhENTJJYVZ1aG9LRmUyMmNFV215c01ZVWd3ajgr?=
+ =?utf-8?B?dzdNMGp2L2dFamZ1c25JNGlwZitrRGZJeGpGUnk4VVZPbUNxbmVjakdkZDdu?=
+ =?utf-8?B?S0sxaU9ZckoyMTNCZmNaUDhHMy9pUGlmTjhzblpjQWdjSnd0WDRuZFRmY3BN?=
+ =?utf-8?B?RGtYV3lWRytmT0xoUVI5VHNlcm1oYXVpVWdaL0gyaTVwUDVqK2NITFRoVFBo?=
+ =?utf-8?B?eG9OeHhQRmszMEhYc2dQc0lrUDBWazRIdDhtL3A4OWtNV0FSRG1aZysxTG9x?=
+ =?utf-8?B?RzBlU1NMU3VsNHdaVS9tT2FlYkRmRk0xQ3poV0hIVWpDNnRYbUJtejI4T0N0?=
+ =?utf-8?B?d0dRMGJXdnVqbUp0M2d2OFo1NmdYeXdONnB5UTlpWndjM0V2eTlCenNaTWdZ?=
+ =?utf-8?B?anN5R2twbldqR0c5eGFjbzNtRHFEYWNjSHFWKzJYSGlCUUhQUm5uOEZ1eG1y?=
+ =?utf-8?B?RktObC9TUnBwU3R5bUhBZWwzdWJJTEJGK3M3YVpBZVIwRlExckdoU3ZCOUlC?=
+ =?utf-8?B?ZHVSVFRWQ2VMMVNmVGEvNUtCcFhWVllnZ0xScXdUUDJTdkt0djl6OURBQjlG?=
+ =?utf-8?B?SVlBVFR2ZTJ3VzRtVUVxWEpCcTFpanZLUnVZRTVRWlRJNGRWdVloNjgxd2NC?=
+ =?utf-8?B?UXQ2aklIbTlSR2ZyeXNrT016dmRqWHpWZ0NtRnJkY0w2UWdranI0bnJaQ3dZ?=
+ =?utf-8?B?UFBCd1JEN3o1bitKNE5NZEVPK1hYSTN6aERSQUxzb0cvQm9YeWY2WnN5NE1D?=
+ =?utf-8?B?ZGN0RFY0NzJDNWF0d1NRVjZXbDFSRERlL2hiRkJHRnltK2E3ZWJ5WVJwUlRN?=
+ =?utf-8?B?VXhqdndOL0xwbnZydmo2L3BLdmkxeVppeWJHMytRbllZVGV5YTk2K1BMbGli?=
+ =?utf-8?B?WEZ6WnlPcExGdElaV0tyWUFxMllKVGdzZ1k3UUlML1VqaUtHem81S1U1TW1W?=
+ =?utf-8?B?WEJheWp3YjFiTXgyMlRUWldEYmNXVk92dlIzK0tKdWYxQzJ6c2Y4eU9Mdit2?=
+ =?utf-8?B?VWsrSWlLRDE0T1ZWQVJZOHRaYWtGVDA4ZHE1SEpPUnhva1hMQVVwVk11Sy9O?=
+ =?utf-8?B?TjBsVldtWkR6Vnh5Mld4WEpCS01Wb2IyS0JKeENlRndjK25TMjhXWk9pbko4?=
+ =?utf-8?B?dGxNUlpEeERHc1VqZmkvWlI3VytVdVZhQ25ueWtUNzlnOTF6VjNWdTZ2N1Zu?=
+ =?utf-8?B?cnlSdnBYQWhNZWxISmFaV1hQMXppZ1NQTXo5cWRDRDVORURGUDlxSEE1UVZJ?=
+ =?utf-8?B?dHpkVmxXVnBQYzFxTUtGTlZhSDF3QzNKa3BOYXY1eDMzZVhHVDBFOFZwSEU5?=
+ =?utf-8?B?SVZMRUhTTDQwWDRNRExMM292S2hHZDh4a0lHNUpTVGZDVjhEZmxONnB2RHRu?=
+ =?utf-8?B?U0RkVGV1cGUrSGRRNWtWYlBMNGNLa2pRUEpGOGQvTXhMQ1kzb1BYaCsrMUc0?=
+ =?utf-8?Q?MWd+gE5M1X0CzAcEb1r2iQ0KQ6NZEVQpnSPAQ=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?TjVXWDh1eDd1MmJSb3ZXa3VKV3R0VzQySTJrN215Y0pEQ1BUY3dCYlY1UzV5?=
+ =?utf-8?B?alJiVkdGMWFuTzdlUlh0N0srb0VQeEgvQ09BanJPQlNueHlBWk5VYTcxTjlY?=
+ =?utf-8?B?RzVNWVNjd2Evc3grVHI4aGZxQnNmOUpKemRoWTRnakRjTUJXSUtFY0dvWElv?=
+ =?utf-8?B?dzRJbm9mckI0WGw2VVowb3hiSUxaV2FLMXloYU42MjRKV29iMGZBTDJsT05z?=
+ =?utf-8?B?ejcwUFhQbGt3dzZlRktUcm56VEJEOUhzZ2JrMFZsSnNESDlIcGpwNTlHclBH?=
+ =?utf-8?B?eVlHOXgyTnBhdnlkeDFSc0tnb3E2WkduNnpBTWxwdmc2ejBaTlVUeHk1d3d3?=
+ =?utf-8?B?aHZmOUpuSGh6UFRZaGM5RWs3WVA0cFVLS2w2RS83ZUs2U3N3T2MxS1FtRG9q?=
+ =?utf-8?B?UENHL3luVEhCRW1OUCswMG9OMGV1MjF0aVdCV2xZWSt5MlFkUWZ2Q1Q1ck1C?=
+ =?utf-8?B?ekd5SlJPYTVDQ29HTHhqTmV1V2VaMUpZYUhtNWZVRVE1anFSR25ldkNvVzgr?=
+ =?utf-8?B?MkRhZmpEUFdtbTREZzQ5eXhpSERja0N2dElXWWZNMWtMNkdKMUJreHkvNXhD?=
+ =?utf-8?B?bVcwWjluVWhUbldYeGpqSTVrdmNYY0U2TXk4VktFWElabTNlL2JYWWhFUk03?=
+ =?utf-8?B?bkZnWGI1enpsSkc3TlV2TEtrRk51NzhHZ3RBQmxWdENWemNtb0hQTjNaaktL?=
+ =?utf-8?B?cTVDazRVOU5JcmNpYU81aXpyWW5sbDI2NFhsY0NSeC9sYWhSMWZhTG5vNEpC?=
+ =?utf-8?B?ZnlEQnhkaWZTR1pDQzNjSTJZUk1GckxSb2lwbHNhRysrUWxuYThIRjh1ZWtF?=
+ =?utf-8?B?S2JwQ1JBTVFhZG1QQytiQ0tXRUtldEhUaFlzdmQ4Ynh6cWdCVHBaZCtLeUMz?=
+ =?utf-8?B?MVhJYlJhbVRQMlArd1pqUnJwbTlYdUpnTlBWUGhmK04zUDV3R0NMY3YxUUg4?=
+ =?utf-8?B?QmpseURwU1RUR3haU1J1OXorYU1CZWY3ZG9hNHY5VTFBN1dpZTdnWTBUOW5a?=
+ =?utf-8?B?UG9KQkVmOTN5M3ZRcWtRMzFHWkZwTGdDUzlWbTdSZHRjSVlUemU5SnJKbnBK?=
+ =?utf-8?B?alc5S0FtOW1KdjBEV2F6U1hTeWFISklHNEhCblVYMEFmbU0zRTY1bGRQemZj?=
+ =?utf-8?B?cW9tb1YweU1HR2xSTWJ2bjJoZzNURW9McmJJcFFpMG9JRXFHSUlOaldIdkdW?=
+ =?utf-8?B?Qm9vbnVETmpBQWdWM09zNjcyNmw3ZitJOEFkelpXUFJJTWNJejkrdjRab1Uy?=
+ =?utf-8?B?SURSN3FtNit0cWRSNTZqU2dwcFkvYnI3SFAveWJsaFVMbjU0dnpLVmM0bGNJ?=
+ =?utf-8?B?azEzb3AyTFl3VEpKQUMyb0xvWDBGb1pOTTNhTVYwMEtaTVdXUkJkbk9INXBv?=
+ =?utf-8?B?SEIzeVpMeUhtd0JlaXUxMWZHamw5THJ5WHZOTUFnbnNzS1RaTXliLzlLLzBX?=
+ =?utf-8?B?RlB4UWdRcWlNU29iUDIyRVIyOWVEWTlUNG1GbmlTYnQ5U2ZmMzlhQktVc0li?=
+ =?utf-8?B?aDVIeiszWWZaZVkrdWg0ZXhuMUJ0eEozOUxtU3g3U0tSbTNDeFZhVVp3bC9s?=
+ =?utf-8?B?L2FxdXVCcWxrRE5PN2lyM3dFcFhQNkpIWTdFOXlCZEhMVDRkbUNYZE9ON25x?=
+ =?utf-8?B?T3FxUDZWVUUvU2dicjNPQTJSR2tlTXFuejdZSTVrM2QrUmpGa2pvWitsNDFp?=
+ =?utf-8?B?WEdCdHk3Vk9MSmNLZnQxOStSZXRYOGhqaEtxZUxKOVlKTW90clVERkNCdkVC?=
+ =?utf-8?B?enZid0h2cG1mSWJiRmpjMnY3WkZWUUdWb3pPSzczRTNsbVk1Y2RBZVlubXNx?=
+ =?utf-8?B?YXUxSVFwc2lhQndNZ2dqSTlQS2xLMVVuQ0pXNjROSE1IK2thN1lLWWE5ajlq?=
+ =?utf-8?B?bkZDZkFRVjlvNjJza1RUQVhFcUpvQVR6WDE5TEd2UGZkNUJJaUh5VWEzajJt?=
+ =?utf-8?B?OVNxNERtVWdNOVZJTzU5cS9nMFEyMUpuaGhhMkxDdnI2R2wySWdkQ1J5Q1lE?=
+ =?utf-8?B?Rnk3c0dSQ3NObVlac2JUVWJrblk3Nld6Y2NLSTYwNkNSRjB1RFlHUjZ1c01l?=
+ =?utf-8?B?YWg5ZUdXZVlPL1BzbkdXbzNRbTVkZDhGV2lPV01BcDRLNUh0cERvNXVGU29l?=
+ =?utf-8?Q?KEFwDGl3QI1OV8im3HzCLeLZ/?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FAC4E8A5CD8D724484964E64DFA6E7EF@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240610125713.86750-1-fgriffo@amazon.co.uk> <20240610125713.86750-3-fgriffo@amazon.co.uk>
- <20240610133207.7d039dab.alex.williamson@redhat.com>
-In-Reply-To: <20240610133207.7d039dab.alex.williamson@redhat.com>
-From: Frederic Griffoul <griffoul@gmail.com>
-Date: Tue, 11 Jun 2024 09:58:48 +0100
-Message-ID: <CAF2vKzMnr7LGvo6T3mrNoLQxXr3o04PQjiosNEcQfce2DgDM1g@mail.gmail.com>
-Subject: Re: [PATCH v5 2/2] vfio/pci: add msi interrupt affinity support
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Fred Griffoul <fgriffo@amazon.co.uk>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, Zefan Li <lizefan.x@bytedance.com>, 
-	Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Mark Brown <broonie@kernel.org>, 
-	Ard Biesheuvel <ardb@kernel.org>, Joey Gouly <joey.gouly@arm.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Jeremy Linton <jeremy.linton@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Kevin Tian <kevin.tian@intel.com>, 
-	Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Christian Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org, cgroups@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a8d8fd76-46a1-4a86-c695-08dc89faa27f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2024 09:41:14.0654
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: BnObz4PaHUguIS/7G+uItrnhE6dUqJd5m1jy1htLEh1eOopZKcdqQqMi6PSxHVfxg51GsVF+3X0s9a42EQbukw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8734
+X-OriginatorOrg: intel.com
 
-On Mon, Jun 10, 2024 at 8:32=E2=80=AFPM Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> On Mon, 10 Jun 2024 12:57:08 +0000
-> Fred Griffoul <fgriffo@amazon.co.uk> wrote:
->
-> > The usual way to configure a device interrupt from userland is to write
-> > the /proc/irq/<irq>/smp_affinity or smp_affinity_list files. When using
-> > vfio to implement a device driver or a virtual machine monitor, this ma=
-y
-> > not be ideal: the process managing the vfio device interrupts may not b=
-e
-> > granted root privilege, for security reasons. Thus it cannot directly
-> > control the interrupt affinity and has to rely on an external command.
-> >
-> > This patch extends the VFIO_DEVICE_SET_IRQS ioctl() with a new data fla=
-g
-> > to specify the affinity of interrupts of a vfio pci device.
-> >
-> > The CPU affinity mask argument must be a subset of the process cpuset,
-> > otherwise an error -EPERM is returned.
-> >
-> > The vfio_irq_set argument shall be set-up in the following way:
-> >
-> > - the 'flags' field have the new flag VFIO_IRQ_SET_DATA_AFFINITY set
-> > as well as VFIO_IRQ_SET_ACTION_TRIGGER.
-> >
-> > - the variable-length 'data' field is a cpu_set_t structure, as
-> > for the sched_setaffinity() syscall, the size of which is derived
-> > from 'argsz'.
-> >
-> > Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
-> > ---
-> >  drivers/vfio/pci/vfio_pci_core.c  | 27 +++++++++++++++++----
-> >  drivers/vfio/pci/vfio_pci_intrs.c | 39 +++++++++++++++++++++++++++++++
-> >  drivers/vfio/vfio_main.c          | 13 +++++++----
-> >  include/uapi/linux/vfio.h         | 10 +++++++-
-> >  4 files changed, 80 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_p=
-ci_core.c
-> > index 80cae87fff36..2e3419560480 100644
-> > --- a/drivers/vfio/pci/vfio_pci_core.c
-> > +++ b/drivers/vfio/pci/vfio_pci_core.c
-> > @@ -1192,6 +1192,7 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_pc=
-i_core_device *vdev,
-> >  {
-> >       unsigned long minsz =3D offsetofend(struct vfio_irq_set, count);
-> >       struct vfio_irq_set hdr;
-> > +     cpumask_var_t mask;
-> >       u8 *data =3D NULL;
-> >       int max, ret =3D 0;
-> >       size_t data_size =3D 0;
-> > @@ -1207,9 +1208,22 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_p=
-ci_core_device *vdev,
-> >               return ret;
-> >
-> >       if (data_size) {
-> > -             data =3D memdup_user(&arg->data, data_size);
-> > -             if (IS_ERR(data))
-> > -                     return PTR_ERR(data);
-> > +             if (hdr.flags & VFIO_IRQ_SET_DATA_AFFINITY) {
-> > +                     if (!zalloc_cpumask_var(&mask, GFP_KERNEL))
-> > +                             return -ENOMEM;
-> > +
-> > +                     if (copy_from_user(mask, &arg->data, data_size)) =
-{
-> > +                             ret =3D -EFAULT;
-> > +                             goto out;
-> > +                     }
-> > +
-> > +                     data =3D (u8 *)mask;
->
-> Seems like this could just use the memdup_user() path, why do we care
-> to copy it into a cpumask_var_t here?  If we do care, wouldn't we
-> implement something like get_user_cpu_mask() used by
-> sched_setaffinity(2)?
->
-
-A valid cpu_set_t argument could be smaller than a cpumask_var_t so we
-have to allocate a cpumask_var_t and zero it if the argument size is smalle=
-r.
-Moreover depending on the kernel configuration the cpumask_var_t could
-be allocated on the stack, avoiding an actual memory allocation.
-
-Exporting get_user_cpu_mask() may be better, although here the size
-is checked in a separate function, as there are other explicit user
-cpumask handling (in io_uring for instance).
-
-> > +
-> > +             } else {
-> > +                     data =3D memdup_user(&arg->data, data_size);
-> > +                     if (IS_ERR(data))
-> > +                             return PTR_ERR(data);
-> > +             }
-> >       }
-> >
-> >       mutex_lock(&vdev->igate);
-> > @@ -1218,7 +1232,12 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_p=
-ci_core_device *vdev,
-> >                                     hdr.count, data);
-> >
-> >       mutex_unlock(&vdev->igate);
-> > -     kfree(data);
-> > +
-> > +out:
-> > +     if (hdr.flags & VFIO_IRQ_SET_DATA_AFFINITY && data_size)
-> > +             free_cpumask_var(mask);
-> > +     else
-> > +             kfree(data);
-> >
-> >       return ret;
-> >  }
-> > diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_=
-pci_intrs.c
-> > index 8382c5834335..fe01303cf94e 100644
-> > --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> > +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> > @@ -19,6 +19,7 @@
-> >  #include <linux/vfio.h>
-> >  #include <linux/wait.h>
-> >  #include <linux/slab.h>
-> > +#include <linux/cpuset.h>
-> >
-> >  #include "vfio_pci_priv.h"
-> >
-> > @@ -675,6 +676,41 @@ static int vfio_pci_set_intx_trigger(struct vfio_p=
-ci_core_device *vdev,
-> >       return 0;
-> >  }
-> >
-> > +static int vfio_pci_set_msi_affinity(struct vfio_pci_core_device *vdev=
-,
-> > +                                  unsigned int start, unsigned int cou=
-nt,
-> > +                                  struct cpumask *irq_mask)
->
-> Aside from the name, what makes this unique to MSI vectors?
->
-
-Actually nothing, I had a use case for VFIO msi and msi-x based devices onl=
-y.
-
-> > +{
-> > +     struct vfio_pci_irq_ctx *ctx;
-> > +     cpumask_var_t allowed_mask;
-> > +     unsigned int i;
-> > +     int err =3D 0;
-> > +
-> > +     if (!alloc_cpumask_var(&allowed_mask, GFP_KERNEL))
-> > +             return -ENOMEM;
-> > +
-> > +     cpuset_cpus_allowed(current, allowed_mask);
-> > +     if (!cpumask_subset(irq_mask, allowed_mask)) {
-> > +             err =3D -EPERM;
-> > +             goto finish;
-> > +     }
-> > +
-> > +     for (i =3D start; i < start + count; i++) {
-> > +             ctx =3D vfio_irq_ctx_get(vdev, i);
-> > +             if (!ctx) {
-> > +                     err =3D -EINVAL;
-> > +                     break;
-> > +             }
-> > +
-> > +             err =3D irq_set_affinity(ctx->producer.irq, irq_mask);
-> > +             if (err)
-> > +                     break;
-> > +     }
->
-> Is this typical/userful behavior to set a series of vectors to the same
-> cpu_set_t?  It's unusual behavior for this ioctl to apply the same data
-> across multiple vectors.  Should the DATA_AFFINITY case support an
-> array of cpu_set_t?
->
-
-My main use case is to configure NVMe queues in a virtual machine monitor
-to interrupt only the physical CPUs assigned to that vmm. Then we can
-set the same cpu_set_t to all the admin and I/O queues with a single ioctl(=
-).
-
-I reckon another usage would be to assign a specific CPU for each interrupt
-vector: with this interface it requires multiple ioctl().
-
-I'm worried about the size of the argument if we allow an array of cpu_set_=
-t
-for a device with many interrupt vectors.
-
-> > +
-> > +finish:
-> > +     free_cpumask_var(allowed_mask);
-> > +     return err;
-> > +}
-> > +
-> >  static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
-> >                                   unsigned index, unsigned start,
-> >                                   unsigned count, uint32_t flags, void =
-*data)
-> > @@ -713,6 +749,9 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci=
-_core_device *vdev,
-> >       if (!irq_is(vdev, index))
-> >               return -EINVAL;
-> >
-> > +     if (flags & VFIO_IRQ_SET_DATA_AFFINITY)
-> > +             return vfio_pci_set_msi_affinity(vdev, start, count, data=
-);
-> > +
-> >       for (i =3D start; i < start + count; i++) {
-> >               ctx =3D vfio_irq_ctx_get(vdev, i);
-> >               if (!ctx)
-> > diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> > index e97d796a54fb..e75c5d66681c 100644
-> > --- a/drivers/vfio/vfio_main.c
-> > +++ b/drivers/vfio/vfio_main.c
-> > @@ -1505,23 +1505,28 @@ int vfio_set_irqs_validate_and_prepare(struct v=
-fio_irq_set *hdr, int num_irqs,
-> >               size =3D 0;
-> >               break;
-> >       case VFIO_IRQ_SET_DATA_BOOL:
-> > -             size =3D sizeof(uint8_t);
-> > +             size =3D hdr->count * sizeof(uint8_t);
-> >               break;
-> >       case VFIO_IRQ_SET_DATA_EVENTFD:
-> > -             size =3D sizeof(int32_t);
-> > +             size =3D size_mul(hdr->count, sizeof(int32_t));
->
-> Why use size_mul() in one place and not the other?
->
-
-Right. The DATA_BOOL cannot overflow this `hdr->count` has been checked
-already but it would be more consistent to use it there too.
-
-> > +             break;
-> > +     case VFIO_IRQ_SET_DATA_AFFINITY:
-> > +             size =3D hdr->argsz - minsz;
-> > +             if (size > cpumask_size())
-> > +                     size =3D cpumask_size();
->
-> Or just set size =3D (hdr->argsz - minsz) / count?
->
-> Generate an error if (hdr->argsz - minsz) % count?
->
-> It seems like all the cpumask'items can be contained to the set affinity
-> function.
->
-
-Ok. Indeed we can just copy the hdr->argz - minsz, then allocate and copy
-the cpumask_var_t only in the set affinity function. It only costs 1 memory
-allocation but the patch will be less intrusive in the generic ioctl()) cod=
-e.
-
-> >               break;
-> >       default:
-> >               return -EINVAL;
-> >       }
-> >
-> >       if (size) {
-> > -             if (hdr->argsz - minsz < hdr->count * size)
-> > +             if (hdr->argsz - minsz < size)
-> >                       return -EINVAL;
-> >
-> >               if (!data_size)
-> >                       return -EINVAL;
-> >
-> > -             *data_size =3D hdr->count * size;
-> > +             *data_size =3D size;
-> >       }
-> >
-> >       return 0;
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index 2b68e6cdf190..5ba2ca223550 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -580,6 +580,12 @@ struct vfio_irq_info {
-> >   *
-> >   * Note that ACTION_[UN]MASK specify user->kernel signaling (irqfds) w=
-hile
-> >   * ACTION_TRIGGER specifies kernel->user signaling.
-> > + *
-> > + * DATA_AFFINITY specifies the affinity for the range of interrupt vec=
-tors.
-> > + * It must be set with ACTION_TRIGGER in 'flags'. The variable-length =
-'data'
-> > + * array is a CPU affinity mask 'cpu_set_t' structure, as for the
-> > + * sched_setaffinity() syscall argument: the 'argsz' field is used to =
-check
-> > + * the actual cpu_set_t size.
-> >   */
->
-> DATA_CPUSET?
->
-> The IRQ_INFO ioctl should probably also report support for this
-> feature.
->
-
-Ok, I will do it in the next revision.
-
-> Is there any proposed userspace code that takes advantage of this
-> interface?  Thanks,
->
-
-Not yet but I will work on it.
-
-Thanks for your review.
-
-Fred
-
-
-> Alex
->
-> >  struct vfio_irq_set {
-> >       __u32   argsz;
-> > @@ -587,6 +593,7 @@ struct vfio_irq_set {
-> >  #define VFIO_IRQ_SET_DATA_NONE               (1 << 0) /* Data not pres=
-ent */
-> >  #define VFIO_IRQ_SET_DATA_BOOL               (1 << 1) /* Data is bool =
-(u8) */
-> >  #define VFIO_IRQ_SET_DATA_EVENTFD    (1 << 2) /* Data is eventfd (s32)=
- */
-> > +#define VFIO_IRQ_SET_DATA_AFFINITY   (1 << 6) /* Data is cpu_set_t */
-> >  #define VFIO_IRQ_SET_ACTION_MASK     (1 << 3) /* Mask interrupt */
-> >  #define VFIO_IRQ_SET_ACTION_UNMASK   (1 << 4) /* Unmask interrupt */
-> >  #define VFIO_IRQ_SET_ACTION_TRIGGER  (1 << 5) /* Trigger interrupt */
-> > @@ -599,7 +606,8 @@ struct vfio_irq_set {
-> >
-> >  #define VFIO_IRQ_SET_DATA_TYPE_MASK  (VFIO_IRQ_SET_DATA_NONE | \
-> >                                        VFIO_IRQ_SET_DATA_BOOL | \
-> > -                                      VFIO_IRQ_SET_DATA_EVENTFD)
-> > +                                      VFIO_IRQ_SET_DATA_EVENTFD | \
-> > +                                      VFIO_IRQ_SET_DATA_AFFINITY)
-> >  #define VFIO_IRQ_SET_ACTION_TYPE_MASK        (VFIO_IRQ_SET_ACTION_MASK=
- | \
-> >                                        VFIO_IRQ_SET_ACTION_UNMASK | \
-> >                                        VFIO_IRQ_SET_ACTION_TRIGGER)
->
+T24gVHVlLCAyMDI0LTA2LTExIGF0IDA0OjExIC0wNDAwLCBQYW9sbyBCb256aW5pIHdyb3RlOg0K
+PiBGcm9tOiBJc2FrdSBZYW1haGF0YSA8aXNha3UueWFtYWhhdGFAaW50ZWwuY29tPg0KPiANCj4g
+VGhlIFREUCBNTVUgZnVuY3Rpb24gX190ZHBfbW11X3NldF9zcHRlX2F0b21pYyB1c2VzIGEgY21w
+eGNoZzY0IHRvIHJlcGxhY2UNCj4gdGhlIFNQVEUgdmFsdWUgYW5kIHJldHVybnMgLUVCVVNZIG9u
+IGZhaWx1cmUuICBUaGUgY2FsbGVyIG11c3QgY2hlY2sgdGhlDQo+IHJldHVybiB2YWx1ZSBhbmQg
+cmV0cnkuICBBZGQgX19tdXN0X2NoZWNrIHRvIGl0LCBhcyB3ZWxsIGFzIHRvIHR3byBtb3JlDQo+
+IGZ1bmN0aW9ucyB0aGF0IGZvcndhcmQgdGhlIHJldHVybiB2YWx1ZSBvZiBfX3RkcF9tbXVfc2V0
+X3NwdGVfYXRvbWljIHRvDQo+IHRoZWlyIGNhbGxlci4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IElz
+YWt1IFlhbWFoYXRhIDxpc2FrdS55YW1haGF0YUBpbnRlbC5jb20+DQo+IFJldmlld2VkLWJ5OiBC
+aW5iaW4gV3UgPGJpbmJpbi53dUBsaW51eC5pbnRlbC5jb20+DQo+IE1lc3NhZ2UtSWQ6IDw4Zjdk
+NWExYjI0MWJmNTM1MWVhYWI4MjhkMWExZWZlNWMxNzY5OWNhLjE3MDU5NjU2MzUuZ2l0LmlzYWt1
+LnlhbWFoYXRhQGludGVsLmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogUGFvbG8gQm9uemluaSA8cGJv
+bnppbmlAcmVkaGF0LmNvbT4NCj4gLS0tDQo+IA0KDQpBY2tlZC1ieTogS2FpIEh1YW5nIDxrYWku
+aHVhbmdAaW50ZWwuY29tPg0K
 
