@@ -1,82 +1,86 @@
-Return-Path: <kvm+bounces-19357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19358-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0357E904643
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 23:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A9F904645
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 23:35:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A3951C234B0
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 21:34:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5FE781C235A4
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 21:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA0315382E;
-	Tue, 11 Jun 2024 21:34:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C4715382E;
+	Tue, 11 Jun 2024 21:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NV7b20SP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jovIkY36"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D376171C4;
-	Tue, 11 Jun 2024 21:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04F8171C4;
+	Tue, 11 Jun 2024 21:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718141639; cv=fail; b=cnhMahebEzKdA7/MtY3AiRmTqHmGczGv5eZuqxZXDVZleFu3GwEysQg11r7vekIfL6R2SAGe52ArAqCmTC4vj3Wg1qSAMjmdrS9nuaVh2/R+sReq7DHCCx+pnmOnkdEnYBOmCLgm/uzZ7HSFJRnQX7XipU99TqfxXOFeDOVNGuI=
+	t=1718141711; cv=fail; b=mrHNfgtdxZHq9655AMlI4v7gAorMd5pi7Rqtc94GYYQ9TH00vtd79p6y2gFU2PYPZ43XNtDT97QN3JYo3JAs0FBk+mY0JR05L2wsXFp5bYpmwwp/P1C/SrWNIRiGAizS37UEuwZ0pnyL8QWYPyWq4b9A56AoEAXBuiFYhdFu00Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718141639; c=relaxed/simple;
-	bh=vEBIY0y4mPQMMCQcy+0AFSPgb0jvwHbDta/Yq1blLPc=;
+	s=arc-20240116; t=1718141711; c=relaxed/simple;
+	bh=UequNdfAsVjPOAe7JeOKc0kpJc3Ba1TO8KXN+CeB8+8=;
 	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kbJfWkVt5u4sCgbS3unyXVov/oYeFtVNxvWqYyxJcQX90rUgfbPzQJz3BpWJpCuc2aZ6/A/Fjisr1kaBUTHDFJ4HdSr+R1zZPE/4t7f37hHqzKDXhcYOtcSOPARKlu7qsnmJjBB387ZHdMJSQRbPhSNkr1Xw308AXiz+O8jhJHo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NV7b20SP; arc=fail smtp.client-ip=198.175.65.19
+	 Content-Type:MIME-Version; b=ASIO37sgfWuRRbm7R1sierhqZikVKuGPuabYXyYDpGkNMpb9XpdAMpZ15yKhNY/ApHiFjZ9Krvh1oownBM6CkXnWg5tLnKYNEZeJl7dd731EC+XWdF7Y5nTEOCpt2Hh++XmEv9jTO7CcUzrO4nv6XqHxnEDVAgUIoKO/dx6fbVI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jovIkY36; arc=fail smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718141638; x=1749677638;
+  t=1718141709; x=1749677709;
   h=message-id:date:subject:to:cc:references:from:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=vEBIY0y4mPQMMCQcy+0AFSPgb0jvwHbDta/Yq1blLPc=;
-  b=NV7b20SPnvHoQLKOFgUqErMcg2IXW7+Ijfl/9/qNMahY6JbDOmrtP9Jm
-   WsWBxorgFexVw/OrV0qbpGrlPm/mJDFH6jWhK4Itud/eZjiV0zlkYhpXN
-   lx70mUapl4Tpug14++aoPqCF03i+liaIXDkh0GEgzgVkYaZyFV+xb/2YM
-   om4GLssORAAYjtJIkHAhswdF8yBdj1+obezUOdBxFik2mlJtyrwIi41F7
-   U+VbfRiFFHRs1M0Mrc/Llej0eNy3KEdpB68jxwz/IObJwbkDFNmOvVq0R
-   VFfpeALbxNY9Xqt2K5klQ6uw5Ab+TECNTNsHgq7XferoCZqvH4Hs2XhJN
-   Q==;
-X-CSE-ConnectionGUID: u6ANbQSZR4eCigRhfgrWhQ==
-X-CSE-MsgGUID: cF5qi6OURGCpdCow3womUQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="14713236"
+  bh=UequNdfAsVjPOAe7JeOKc0kpJc3Ba1TO8KXN+CeB8+8=;
+  b=jovIkY36h7nSwyOfcuArJjw/v0jaRAuxy7E0DNRZmENGHpzLMUKnoAev
+   GqNqysWwXKV7jTdy9WuC1X9OsYGUhWXwERULcaxD99I/0q5Qx+WTinK0R
+   m8jBPvpjKsV8QgYd6i/FiEPErpEB+xYKUeVdiMfaquuIaQfgFOnohAcKr
+   mNh6K6BG6yV67tebIOnBPYIoEyU2p47Z4OPoBHezd0r2oTf1Viid6nuJi
+   CC0DFbZRXmMG9O4UiT2iQXvbAvz3APqLkjpV86cwjMu7n0i8CYj6S4zRl
+   KDvry4JegKDm4sn3BqD2asGRIUkOtxoilHoedbBZoNRZC4i4ZeMfFO2vn
+   g==;
+X-CSE-ConnectionGUID: 8+WVWyk2RQGR33yimypFnQ==
+X-CSE-MsgGUID: b4dmuyOPRrGYBc5MOGWpfw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="14839653"
 X-IronPort-AV: E=Sophos;i="6.08,231,1712646000"; 
-   d="scan'208";a="14713236"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 14:33:57 -0700
-X-CSE-ConnectionGUID: FZ+NYHPKRIyqQMsu/IFO4A==
-X-CSE-MsgGUID: vbT3zFegR0e7yjBNWDOK7g==
+   d="scan'208";a="14839653"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 14:35:06 -0700
+X-CSE-ConnectionGUID: VofApyfWTOuyQxNkr3xHmA==
+X-CSE-MsgGUID: PcmHJy6GT7u+YNlfVpLLxA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,231,1712646000"; 
-   d="scan'208";a="44114909"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jun 2024 14:33:57 -0700
+   d="scan'208";a="39501245"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jun 2024 14:35:06 -0700
 Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 11 Jun 2024 14:33:56 -0700
+ 15.1.2507.39; Tue, 11 Jun 2024 14:35:05 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 11 Jun 2024 14:35:05 -0700
 Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 11 Jun 2024 14:33:56 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.40) by
+ 15.1.2507.39 via Frontend Transport; Tue, 11 Jun 2024 14:35:05 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.41) by
  edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 11 Jun 2024 14:33:56 -0700
+ 15.1.2507.39; Tue, 11 Jun 2024 14:35:04 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ewzit4OpfvLMqDayQ4z6ZnbyPv1uNIt91bH4jCpEuWvpuqHlx+nXqEBz960xEHDFsiDsdtCYmXZUDLj2TYWLhDYj2K+a8V+ZMDfbeaPMVIK0krrlXj3GLzyOPRUX90mFIfAH9dTa2sLw/GH6OJHDA+0PWIk/N8K4CQnWtV6aFCHlpHdbQLCUMLAPFN4KK7pT3sMVfbHaL9OnEaxHmqWnbSrsRacNDKe21wzbDpdSeuONV46OIhgsErUS1/vFLRYz2A/D9iaDcx1fwSuhBsiimkhtU55lnLvj/2LULx1CNoBOkA8OB5uX0tUgl0dEAPgOecX7mfHgEbTLtgygssHYwQ==
+ b=Z340hEAULlpqoKt0ampQEkyBVTKdX88/CdMexiEhm3dX7u4UOIdRXqiWlD0kl8CXP1s58MDPaYdiXxISUL/QauH2NuYORFEeT8alxKht8xyGA6khureG1nEHojwA5aw+UFm2ZSUKiqt+pb4NMoAphJtMWa24ZlHWq98QEzhHxZeQbngbYDnxa8x4uG/eoqr9CsA4L9NGFoSRvXRhafVP4h9n1sddaCABWWJEsJaRuW7v2tAb8/Xr6I6Np1R0P4Nn/eSxP3YH0a4ylGlwzp2IEA3AXDItBlO7G1kr6n1as/vzrOR5xtZbyUqXOSuh/B/QMsPqT+eRbbI/FTZ03OFCuA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VONLMqnJYLf7SIKaEqZ0dVYF77s9u+3YyE+ixi8gwoA=;
- b=EOTdTGxtViG7+Lb20CErlWy0KYlVkJ0EnxDLwyxKXm4tOGOXewZWff9XAHzkbNdMvA/1BFUj5MU0pu5p7C8DdNdr429SIS+g1Lsgz+SJGJpYBhK5d5gqRlrF1ZvtBF34IgeqXv2cUY3vJLEmSm2PxIfqAJcQmQIF4xYHwdEgf9X89UXum9JqrU8HW9bQz2oLZoypPLO9cPGkbiTB3sf/YkpcFIVmTTKdeXxtEE3V1Bzip7besLQAs9uUV8jxAHUYeccdeGwKEVVXYDmGCLjokODzJ4JQnS0VqCADMbyLrux3A4SmPWVb2oLSji3K192A4u0EyyT8CM6ww9oBuE/+Aw==
+ bh=oXys8otXHLVeqA8XIQ3e/VL0SiyW6GuR+QfnwdBDnCM=;
+ b=MpMoYGMX5X9sfro5qdcoaMV35CnZ6XewJXSbrBADcBmvli1RTfD2SzxCQQvLupl2NY8yyT8XAFoQ4HyhECNdOgCfxe9vQ7oApgN6bEKRs6RttjaXTHEQzeYEyZ5MCx8ZztF7CKpQFqNd1IcXlvNnL8GKidFDZD7GpDPwuOgOCz06z75X8+m6fJxNuwh3vWXI2qgJ4qzus9HXyQ++TSg5rgLYSV0GuPuk0G2TX3MoU6MWc0V8PjOnX8/bkzxETcjVroSM+y1trLNE7A69NEBYeQCS23nEcf5o8jawXhogsYQSsqDxoPy578gf8X0ygtm+RdRE21xiDSrbSbptJbepwA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -86,15 +90,16 @@ Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
  by SN7PR11MB8025.namprd11.prod.outlook.com (2603:10b6:806:2dc::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Tue, 11 Jun
- 2024 21:33:53 +0000
+ 2024 21:35:00 +0000
 Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
  ([fe80::61a:aa57:1d81:a9cf]) by SJ2PR11MB7573.namprd11.prod.outlook.com
  ([fe80::61a:aa57:1d81:a9cf%3]) with mapi id 15.20.7633.036; Tue, 11 Jun 2024
- 21:33:53 +0000
-Message-ID: <a44d4534-3ba1-4bee-b06d-bb2a77fe3856@intel.com>
-Date: Tue, 11 Jun 2024 14:33:50 -0700
+ 21:35:00 +0000
+Message-ID: <fba4628f-9786-4e76-84cb-178508d90fd8@intel.com>
+Date: Tue, 11 Jun 2024 14:34:58 -0700
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V8 1/2] KVM: selftests: Add x86_64 guest udelay() utility
+Subject: Re: [PATCH V8 2/2] KVM: selftests: Add test for configure of x86 APIC
+ bus frequency
 To: Sean Christopherson <seanjc@google.com>
 CC: <isaku.yamahata@intel.com>, <pbonzini@redhat.com>,
 	<erdemaktas@google.com>, <vkuznets@redhat.com>, <vannapurve@google.com>,
@@ -102,15 +107,15 @@ CC: <isaku.yamahata@intel.com>, <pbonzini@redhat.com>,
 	<chao.gao@intel.com>, <rick.p.edgecombe@intel.com>, <yuan.yao@intel.com>,
 	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 References: <cover.1718043121.git.reinette.chatre@intel.com>
- <ad03cb58323158c1ea14f485f834c5dfb7bf9063.1718043121.git.reinette.chatre@intel.com>
- <ZmeYp8Sornz36ZkO@google.com>
+ <09b11d24e957056c621e3bf2d6c9d78bd4f7461b.1718043121.git.reinette.chatre@intel.com>
+ <ZmefjsFArRSnC71I@google.com>
 From: Reinette Chatre <reinette.chatre@intel.com>
 Content-Language: en-US
-In-Reply-To: <ZmeYp8Sornz36ZkO@google.com>
+In-Reply-To: <ZmefjsFArRSnC71I@google.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0294.namprd04.prod.outlook.com
- (2603:10b6:303:89::29) To SJ2PR11MB7573.namprd11.prod.outlook.com
+X-ClientProxiedBy: MW4PR04CA0273.namprd04.prod.outlook.com
+ (2603:10b6:303:89::8) To SJ2PR11MB7573.namprd11.prod.outlook.com
  (2603:10b6:a03:4d2::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -120,219 +125,287 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|SN7PR11MB8025:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f38d228-bf81-47cb-3c60-08dc8a5e3105
+X-MS-Office365-Filtering-Correlation-Id: 4099f691-036f-47e5-04c5-08dc8a5e5903
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230032|376006|366008|1800799016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?ckRlRjBSVzRMYi85TkVIZklyNTYveFE1SGFCbWFqTjcza3RYRTZEak9vMXJw?=
- =?utf-8?B?bGwwcytOaFhrb3dJTWNGM252Z2I2ZjNPdEpHcFBuQlZXYkd2QU1kR0V6dVph?=
- =?utf-8?B?eGNKekVTdHVMbTVzTmthU0V1VjVEbHNZcHpQYk83R1J6K2E0Qyt2alFNM2xW?=
- =?utf-8?B?a3pnVGt5RWJ3V2Z3YWxxcnhtZENYNEplM0F3a3dFam5oL1IzR0lXK2RiOWQv?=
- =?utf-8?B?ODkvRm9FWkV1djhoM2hlMHY5aGt2aDRYV1hOenJnZERFeWpLSUtHNTlob0ov?=
- =?utf-8?B?S3lmRXBTOHVoK3BKYjhSenhCcEZ5WlNTWmwrT1psbEExL1ppQmFxcDJLcHlS?=
- =?utf-8?B?b1FRMnRVNURGMVhET3lHWkNHWEw0ZitrcFZVblN0UkNFcldoZS85djNUQVRs?=
- =?utf-8?B?dkxjMnNzdEJtM0N2SnJGQUNFK0lGSDRrL0pRUU1BZnVNNDIvM3JNU1VVWXUz?=
- =?utf-8?B?TjdTMU8yQXZFa2dDZk5pQlBQQTFOUVpaSFYvcnZ3VGpQQTlqSjQxTGhMei9i?=
- =?utf-8?B?YkdRbzZXTnhkZG5yWE9VOVpzN3c4UjhIVUxRUlVmVHVsYjBVQnVwZy9jT1Vp?=
- =?utf-8?B?OFBqK01CU0h3U3I5Znd6Nkx1WnVZTjRkWXZlTURxem9mY0NJS1RpdzFrNFZE?=
- =?utf-8?B?YW1HbE1FT21zcGdxWmxWWDhxeVViVnovQjRuT2FvZlorRnBNM2Juem1jV3hU?=
- =?utf-8?B?ZU50U0xsbklaQU1BdnJVRzlSSGNDdFBMZFNHYlU5VzV1djF6eklPclpyT3d3?=
- =?utf-8?B?OTZkQklVdmJXemJJQzkvdUFkb0Q0d1plTmRIdzNPS2Q1ajVDSW9zMDdFMjFB?=
- =?utf-8?B?Tm5DeVpmamoySHYvQkFiOE82V00xdEl4Vk84T1RTWXlYQnlEUGhGU2kwRTZ3?=
- =?utf-8?B?UDJKa0dNSVA0SWV5OTVIZTQ0L0xsSTdZVE1pVlVSMmt5V3ZzeGRYRlR6SlNz?=
- =?utf-8?B?WU9acHRpRGVZS1lZZHJwQzYwOXZkdkk2cnhaZG5RT1FicmdPMlFRNWxTTGhy?=
- =?utf-8?B?ZElORmt4NjVFTWRSakpzT29kaVBuQlFVZXVSVW9xOWFwQ0NicnpKNGFkbDlZ?=
- =?utf-8?B?N3VhN0NBdklPRkRycGJLWW9hS3A4Ny9MZWtXTkR0L1RJWHVCRUNFOWY5SDNt?=
- =?utf-8?B?TFJ5ZmlhSWI4Q25TWTN0RnFJVjNENHhDbE45azZwaWdDQ3J5UnQ1TWFqSitT?=
- =?utf-8?B?TllqMzdhM2xTTTJ3MHNKTCtkVUpaTlJsek1xcElqTTdBcWpjc3ZDb1hYR1hN?=
- =?utf-8?B?SlBwSVFWV1dCdlVpMENBYVdqNTRrWm5iZDliQ2RGNFo1dUt3Ylh2ZEJJaC9M?=
- =?utf-8?B?SlBXaHZ3MVM0U0V3blRRWkg3MG0zdGV2R3hkZ3lOTTRJRHN5a2kwdXRQYmp2?=
- =?utf-8?B?azVMU1NaWFFyNENIMitPREJCWVptRWpVVkhZN0VUeFJmbldqdUJWenR4K1hF?=
- =?utf-8?B?Vy9Ldi9STjlxa3NTUkxneklLbjV0azkrZHpDc09Eb21zS2RWb295YWd1VFRh?=
- =?utf-8?B?ay8yVktnWXk1R0F1Rmowai8xMDJnRTZCLzVma3M1QjV2N3lXNkJCM2VnTWF0?=
- =?utf-8?B?b3QwLzVpU1QrbU9URlFKWjZOODVrcCtuQUFQSi91QklxWkNnc1BGdEZmRk5y?=
- =?utf-8?B?WmRlYzdidjRkMmt0a0lEVE1lcDJXRXF5MkF2V09CNW1IMDg5eHBCUjhYVTJN?=
- =?utf-8?B?REJ6cHYzVWhLMktvUHBUdllodTNVRlpmaU1vR2ZEYVc0bFZnZ2VJNmtiYUd1?=
- =?utf-8?Q?0lga2MAUBlBVsio/nsIX44mx+Q4WQrPfeYpoG8B?=
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NDU4dXdOMHpDdWMxZEl4U25Vd2h5SzdIY2JZL0NlSytoVCsxOWYxbjdCVTRO?=
+ =?utf-8?B?SThzZEQraWc3ZC84VEJqZFVKMjNiK3N0VWNoNkhBZHNmWjBiTGo4ZnVrZFRa?=
+ =?utf-8?B?SkEralhDRzNueHJEaE1MNU1LTTJybkZ2U0RZMnJidWlqS1Z0WTE0eUVZRTRs?=
+ =?utf-8?B?ZytabVUrVStYTnZGY2t1US9kc3huYWo4STF4bnVIc3JJVTBhRWtRNllqejBN?=
+ =?utf-8?B?amY5eTM2OSt0NTNSL214SHlPdlUzQUFsbjEvdVJKWnNvSUF0eDNvaytROW1z?=
+ =?utf-8?B?clRFaXJsanhQVFpET042LzhEdGFaOUtXUTNBUE1LSlZnbGdYV3ZKVXNNRE1s?=
+ =?utf-8?B?OFZvbHBuUVV5Uno0TUFvcmlvY2FkT0N5TWZBN2R5SVpZMVVSL09UYytXdDFp?=
+ =?utf-8?B?RWg1VzlLNGt5dUI0Z25nUXNrS1Bub1FNUTJvZmlTQVZEUlZJS3RyYUwzYjUw?=
+ =?utf-8?B?OTg4Y3NjR1o2aFpyZGx5NE5ucnp1Y2E5OU9za3VtUWx4a3B0d2crZmR3Mmtr?=
+ =?utf-8?B?N3VZVTREeFBPWW1WWmlyU2Z6UjN4T0srV1g2bXFTNmdoZnlpNUQ4eHgrUzlu?=
+ =?utf-8?B?MWM5TWxidmVkRzZPM25QZG1vd0NXM1NaY2I0NWdTUnV4MC9OZGxwdmU1WldE?=
+ =?utf-8?B?VzFPMVdYWlZLVmNCa2JpT09WNEREditDQWFKc0R0QmpXWVJWUUxhOFkzOEFZ?=
+ =?utf-8?B?Mkg4TUpXZklkUkFEZE5WOFBwM1BVV3pzZGV6VVRvazFtVitxWEl2OWIrbWMx?=
+ =?utf-8?B?WG9oVDFNY29DMzJibnFyWjNnd0JDR2ZkWnd0QU5wQWZ1QWplWjVSUjlFUUw5?=
+ =?utf-8?B?eHhoc3dmVDFvY0VSM1AvREJhVlpXNFRRak5jbU1uUmhIRWFoNDE2VEFMQUtZ?=
+ =?utf-8?B?ZGdDZ1lKYVBhdkUvVEVBd1JFeUVvZUtDbm1iTGNKUThaRzRMS05Ia0dIRXVY?=
+ =?utf-8?B?WC9JaGhIa3lFZFNzcEY3eFoxRWg1aVppSWVJdFR2aVp4UC9SVUVIREFKd2NK?=
+ =?utf-8?B?aWlINU8ycnBVNEp5SGRKQ0k2Sk1vYVZZVkpjVWJBTzdiQ3ZJT2VIbWRMdEJ2?=
+ =?utf-8?B?Z2ZDMFY2cVViNDc4eVlrcndpZGpqY3dDanJMUVAzejBzUGRhcVBpL0RON0hT?=
+ =?utf-8?B?MnRpZUx2WWVmYklQbFlxSVJ1dG9RR3dUbXBqVmpKaXdQNVZvTmFlUDRrNUhD?=
+ =?utf-8?B?aXhCbFVVZy9ITS9lc1JlMHAzdzdIMFpBVm9INmlDTU44NHdsK1pOZUY1Nzd4?=
+ =?utf-8?B?WXR2V2s0UFpuTVB1Nm40RTE0akFoSE9DZTkwNjR1bnhTeHUyQUplSE5LTFVE?=
+ =?utf-8?B?RThidnVzYjZjRXRRWWhKN2tuMEcxMGQ3aE9FNzZ0WXNXaW9RSmdVRXBvMkg3?=
+ =?utf-8?B?dmNGRVh6VmcvaHZVMWM5NWJBMDRqWWtrUDEwdXE1bkhIc3phWEhNVk1XU00x?=
+ =?utf-8?B?M1ZzQlMvL1VCNVN6bXliRjNDOEdxWmpjMk83aXQ4WWNDRFRhNmdrOWMwQ21F?=
+ =?utf-8?B?cllJT0xqdkIwRk92cHJ6QjFrN2tnZkUzenJFSTdsekcrTnRyQzlmVnc3Mm1q?=
+ =?utf-8?B?enZURFNnWnhRUkxURmFJS3RVWGpUb1YrMnFmeGFUZDhCWEFyaE9GUll6UWtR?=
+ =?utf-8?B?VVN2ZlE3QlBiQUx0Q3dMYlc3blZWZ2FhejIwN1JuN3N0WWRYVHhJK21JVXBG?=
+ =?utf-8?B?SVJBejl2aWwxMEczZ01neTdKajRVQkxCS0NuSWxPOExCd29yb1d5WXlRVTJs?=
+ =?utf-8?Q?6aIWSrvQ3PUP4Y8NSJq0kPt+pEjNwZhACM33f9b?=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230032)(376006)(366008)(1800799016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a09GdVphMk4zZG1UZ28zcG9FWjVuVmhuWmw2R0NwL3JteGgvQU1Ldk4wNXRa?=
- =?utf-8?B?eG9IODJYWkxGaHJWK2tiRytJbGhVZ2N4L25INExEQUpidW1SMUVSTGRHY1h4?=
- =?utf-8?B?bmxTQ3ZFNVJDNWVycUN4aTlDUVJZNVdtaFB0MDU5T294bTNLblBwV3RmRm4x?=
- =?utf-8?B?NUc2TXdkbTBpc2FWWUNMejdTdStTSGNUQVNMMzBIcEc4NmpXSHB6UmdwN01W?=
- =?utf-8?B?cGtuZXQvb1pTZ2lVczhJNHhrelYzR3BrV3MxeTZnYkZxWC9oZGs1Z09kZHVk?=
- =?utf-8?B?cXdiU08ybmJVOHhET3EzdVo2S1YzTmdHL0xvUkh5ZUNKWURpMnQrYkJkbjhQ?=
- =?utf-8?B?Zm96ck1JK3hsWXdDKzhDM21DdzJmMm8xOWJBOWhKTEl1U25RaDdvZWZTc0RC?=
- =?utf-8?B?UE1qaitibjA2dGdZUFErbmhrQnZCb1E4RElucnJxM0JiWldTS1FZM3dOSHBH?=
- =?utf-8?B?cnBPbWVDSVY2Ynd6MG84NVdTTmxzbkNCdkVsTVNKbVpOSGxqQWZPbkRxTGxT?=
- =?utf-8?B?K1FXcTZVT1BsbUw0SW5WYktYUXA0aVU2QkNDNk1Xb2kyOUFIbk5CS2Z6MGRO?=
- =?utf-8?B?V1lJTEh3eUVwQ1J5S2F2bXlOb3VJK0o2ZHZpTFFIWk9GQVNKNjlyNHNRK1RN?=
- =?utf-8?B?NS93Mm5ERzdrWDVwdU5wWkUrK0lFeVgxOWtWWVQ3WTQ0eCthWExJTDZjbDRB?=
- =?utf-8?B?bDI1SkxxZVp6eS9KUHVVNmNPaGpBcnphR2ZFYUNYOUhJRlZGc0lGZjFib0Vv?=
- =?utf-8?B?NTZ1OVFhZVF2ZG1GRmdFZG0yNmNtY1JjTmNjZk9zMjBEdDlBS3EvSUk0TUJL?=
- =?utf-8?B?ZUl2SVZxdXl1NW9LV2ljbWFZWlMzN09oaHlOd0l5SUYzVkdYMkNTczlPNDMz?=
- =?utf-8?B?aXJObXZ0b2QySzZKWnJxRmkvUGF4OFFFUnBPT3RHQmQvVXJYWVU4L0NzcmtU?=
- =?utf-8?B?a01SbFZ1U2pxbk93YTM4a1VnNFFqS2hGQnRONFRrUzRHak9KM2QwbGU3RXNs?=
- =?utf-8?B?RCttbzlFUmNrNWFIRVFLSUxHZVpSOFc0OXBidURseTJ2YXNLNVB5b2ttRnZR?=
- =?utf-8?B?UlZENkhlWEFXd2dCSEJJWkFIbE4yaGo0bDBmbFl2WkdlWkNRM1dJbnZOYnFF?=
- =?utf-8?B?SmY0RDJ3M09SK04zRnlLd1g4am1nTXNkbnhKaStEYTVZclkxQWp0ZzVmVnFO?=
- =?utf-8?B?SHlOSmpmbFJSekxTV1FTakgrWC94LzJCd2lNbnJZYUQ5OUkvSTkvMTVjeUts?=
- =?utf-8?B?ejdsSlYxS214ODBOK3BzWms5THJnVWNFYzNyMm9Oa2pBTXB4cDJxcVBtTzVG?=
- =?utf-8?B?eFNVaFNzUW50SkxuNFI0d1V6TThkNEpSOENCMjVadGlRT2s5VW9venRBNmtI?=
- =?utf-8?B?RFVoRDUrM3hkSGtrUXQ1ZVhDS2JkRTcrS0FRZlVaNmczT3pjUytjZzFoMjU4?=
- =?utf-8?B?VkR2dVNzVjdKUExacEpJZTMzWFRXTGtZU3FHUHB0V2wxUkpHTk1xOGtTQmFp?=
- =?utf-8?B?TXZzMCtvbmROL1FKOUJxTVFqanFhSlhMbmhsOHZQM2R4UEZJMng3NVJ4aFBl?=
- =?utf-8?B?ZjlXMThzYmpva1pnMTJQMkhrVGFYNGw5eC9IV1VGSXowMFYwY3gwTVo4Yndm?=
- =?utf-8?B?Y3RYVWFBTFN6bFEvcWdVRnRaYVEvdnA5aHNKTG9zemJTSmJFUjdudmZzQm94?=
- =?utf-8?B?dXlGblY0YmRJakE1THdaS2ZhclcvV1FDS2dmTzVXUVZvaW1PdmxpOG03S0hk?=
- =?utf-8?B?M2ZWS1N1WUo1dGl6bVA0Z2U3elBrQVZKTjBsa01VWEU3WnlGeGloUWlLVkRq?=
- =?utf-8?B?YnZEV2ZrWTNEc0Iva3RtRlBCd3JUNVJQL3NZdVN3TGhicDc2YzhyeFc2bzln?=
- =?utf-8?B?OUU1TG92bDdaeU1QcFI2YVZkc0xwbWR2VFpOVFQ1WnVIZVZsWko1SzdzOGF6?=
- =?utf-8?B?bW8vZk9JazIwbmxXb2k5dEdTWTA3QitBQ01qREdrTFJBTjNtem1tZllUN1Yy?=
- =?utf-8?B?RE5Kb2ljUTlqVmlXVGRWWEhHL1ZCS3dXM3FrOUZoN1lhaXpsVkxvRDBlb3VG?=
- =?utf-8?B?ODV1aHpWMk5wKzFkbFduUm9lSWtQVVZJRTJHSWZTWmpoY3hrTVc4S0tDQ0k0?=
- =?utf-8?B?WThXQlJVM0NqMU9TS25JNzR6clY4K3FKWFh4MUF3YnI3MU5wYWViWTVWNUhj?=
- =?utf-8?B?UUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f38d228-bf81-47cb-3c60-08dc8a5e3105
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S1dMcEdCLzEvQjZ3U2YvTXhMMExzMUVtQjhORW5leDQ3QWFIcnNGV2xxck9G?=
+ =?utf-8?B?UDJqVXhqWDBtSVFuTUZpMVp4ZjBucHFzY085MHNhU2pOdGV4d0dQcVZRUHFv?=
+ =?utf-8?B?SE81U3NFaE0xeml3WHZHQlh6eXBldDB5R2F2S1FsZ1RRblhNQlZlc05RRWJo?=
+ =?utf-8?B?c1Mwb2liRkFCSWJpN2VKZ2VVeDJqTVJMb3Q3bEo4M2lzVGFvYVJhenVxeUhh?=
+ =?utf-8?B?YmV6VEVDdUlnNG4wWEFORFd2NitOTUIwOXFhN1B0WHhqUHFjaTBzdktYT3Jl?=
+ =?utf-8?B?dVdBdW5EcmY5c1ZPVHQzVUhKNFgvVlJrRmVMaWVBL1g0QVBCTGpQR1g5TUU1?=
+ =?utf-8?B?SUV3SG9aaDl6d3lZK01zalZmb2oreG9oTFljdkZjUnQ3Mk1YTzVEd1puaStQ?=
+ =?utf-8?B?aERhQlZpQnZzZHZWVnJIS2VJb0NwWllRSklCOC9IWk9JSkF5M0orTDFYenVL?=
+ =?utf-8?B?ai9qN2g0MlJiYTNvRzNYcERjOWRvODRpaUxJaEpESzJFZjAyUTlvTnh6aE9P?=
+ =?utf-8?B?dm5WWHJpSUJHRUNBVjVUZU5MalBQY1BwMUdSdzE3NEZXTHBPQkZYUGl3TkhU?=
+ =?utf-8?B?VXhTOVA3RFY0YUZibXZPeWxXQWlxRC96QjZBN0VEeHEvVTNtR29HTmNMREdH?=
+ =?utf-8?B?ZGV0eEV3ajBySW9sNk1vK3Q5blRYK1dXUjhvUngvLytxeHEwQVprMVpBYlA2?=
+ =?utf-8?B?K1d2Y3NwWml2NG5zSjFMbUtsZHdlMGVZK1JwVlhjY2cxRkwrWXJrcGxVSHVo?=
+ =?utf-8?B?VFhnbnh1ZHBwT01oWHV0VnRIUTVXb0F4U2lwdEtac0JJUjV4UUV5K29BajMy?=
+ =?utf-8?B?ZnVNc0JNN1AxMU1pWnBjckN5RUZVVWxsMDkrei9CdUV1eWFUZGRjQnhjVGxh?=
+ =?utf-8?B?VjJPVEhFTHpKZzdjc2l3cUMzQk9vRlNIRzJ5aEJnQ0tPUW9vQkZpdktHNVpo?=
+ =?utf-8?B?K3VreERzY3pQbWVqc2xSK05KendrRzFpb3grODQ1c3REUEl4NGZKVHVmVFpP?=
+ =?utf-8?B?OTcyMGNzbEpKbnV2N0t6L1ZtdG9kSG54cmxJMUJiMjB5MFNSMWJId1F0V0Nh?=
+ =?utf-8?B?Z1JGWGxPSjEzTjBiNjgvWThpelBLQUprVkJuc203Z2RKOXBKUkZiVVloZTVS?=
+ =?utf-8?B?ME94T3c2Y0E0M1FTbmpIQmxuYjVLeXpVbXh6WndPVmZPZUkwcENwMytLdHJB?=
+ =?utf-8?B?VEdaSWkzOCtVTndYMUNWN2ZxemsrbExXMm9oeGw4c2JYd1pmOXlrQ0w1Rm16?=
+ =?utf-8?B?OWtnbFdWMFQvdG90ZW1yWnI3a1R1dzhpVWhESkswM0R1b1dHakl2YnN6b0Q1?=
+ =?utf-8?B?UDlHYko5cDU0UjljMFVsTGZlVTArK2tHb3NjQ0VPVjQveUtYQlc3ZjJLT2dM?=
+ =?utf-8?B?aXZQcEwrQ29yeTluMnhicTIzdkE3TGVlS04rdloraWkzN2tPb1UyeEp2am5M?=
+ =?utf-8?B?dndNUmNPeGVMb290eDcybUQxTXBkWCtHMG9TNjZ3UjN6N3Z2UmoxQ2FweUhz?=
+ =?utf-8?B?bFhLeDFHMGFRTlNzQmhIbU85K2VyUmNkK1RLNk9zWHNwdHJwVUNxaWJDT1Vi?=
+ =?utf-8?B?dXJBZFJQQm5CTHRBbHpoWTBFTWNZUS93S01qdnV5K2tQMTVkOWlKTFJlRm1J?=
+ =?utf-8?B?R2R2YkRUd1A2czNua0c0Nm82empzYlNQcVpxREFQSkwxZ2xpVlR4NGNlMTB1?=
+ =?utf-8?B?SlluS2FkbWt4OWU4WkxKK0MrMlpIcFhKeVJkRXNxZDAwS0NmaEhsWVU0Z0NR?=
+ =?utf-8?B?VW9rUFQ1K1p0VjE5QXkvditKamxNcFRKdkZXakpEN1lIeGxtZlU3SUwzMllp?=
+ =?utf-8?B?MFAybkJwVUp5c2phQ1JiUFNxcTdrNjRYbU5yZ2V5NjVxRGh4YUFDNWREMHcx?=
+ =?utf-8?B?eHFWZ3JKbnBaZngxeGdUbVdDU09wUWl3ajlITUxDdS9YRWlQMVVkeUtKSllE?=
+ =?utf-8?B?bXRLTm5CSG4yNEkzN3BSTytXMytKYVg1SzdQcEZmbm5mUlU1em05NmdTSGJv?=
+ =?utf-8?B?YWNNQ3RJY3E2dnpUZEkwb29KZFhxMmxmM3Nla294SHNqV2x4bjQzMCsrc0Fy?=
+ =?utf-8?B?aXpla0ZrUTloeTl5ejJoTnB1TnY2azUycVhKeDI4YlJHRlpKUDlzWVNmNFJw?=
+ =?utf-8?B?ODYyNjFSRjF0RzcrWTQ4bHJXYnBMYWJ0NVk3dFIyV2xtd0gwZCtZSGVuTXNr?=
+ =?utf-8?B?OFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4099f691-036f-47e5-04c5-08dc8a5e5903
 X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2024 21:33:53.5776
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2024 21:35:00.5862
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Y3JWHaI1A+/eBdoHuV7R2rJcu6j1dgNivqmgBKfUr2sTblv7cR5HwcbMz2kf1raWEOZ1oSlksS55GcQa4lkNXiUFi9aOvJvgaGukyahV4Lg=
+X-MS-Exchange-CrossTenant-UserPrincipalName: u6bC30/fiqa1dPj3nsypoEQDeX++TNRg/rMoLWYoCAygi7arwwJAD3dGPNL4ugc6ATtPTsfgL07O6aulK4Vm439CRHgFztrvUhYsbz5/wVI=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB8025
 X-OriginatorOrg: intel.com
 
 Hi Sean,
 
-Thank you very much for your detailed feedback.
-
-On 6/10/24 5:21 PM, Sean Christopherson wrote:
+On 6/10/24 5:51 PM, Sean Christopherson wrote:
 > On Mon, Jun 10, 2024, Reinette Chatre wrote:
->> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
->> index 8eb57de0b587..b473f210ba6c 100644
->> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
->> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
->> @@ -23,6 +23,7 @@
->>   
->>   extern bool host_cpu_is_intel;
->>   extern bool host_cpu_is_amd;
->> +extern unsigned int tsc_khz;
->>   
->>   /* Forced emulation prefix, used to invoke the emulator unconditionally. */
->>   #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
->> @@ -815,6 +816,20 @@ static inline void cpu_relax(void)
->>   	asm volatile("rep; nop" ::: "memory");
->>   }
->>   
->> +static inline void udelay(unsigned long usec)
+>> diff --git a/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
+>> new file mode 100644
+>> index 000000000000..602cec91d8ee
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/kvm/x86_64/apic_bus_clock_test.c
+>> @@ -0,0 +1,219 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Copyright (c) 2024 Intel Corporation
+>> + *
+>> + * Verify KVM correctly emulates the APIC bus frequency when the VMM configures
+>> + * the frequency via KVM_CAP_X86_APIC_BUS_CYCLES_NS.  Start the APIC timer by
+>> + * programming TMICT (timer initial count) to the largest value possible (so
+>> + * that the timer will not expire during the test).  Then, after an arbitrary
+>> + * amount of time has elapsed, verify TMCCT (timer current count) is within 1%
+>> + * of the expected value based on the time elapsed, the APIC bus frequency, and
+>> + * the programmed TDCR (timer divide configuration register).
+>> + */
+>> +
+>> +#include "apic.h"
+>> +#include "test_util.h"
+>> +
+>> +/*
+>> + * Pick 25MHz for APIC bus frequency. Different enough from the default 1GHz.
+>> + * User can override via command line.
+>> + */
+>> +unsigned long apic_hz = 25 * 1000 * 1000;
 > 
-> uint64_t instead of unsigned long?  Practically speaking it doesn't change anything,
-> but I don't see any reason to mix "unsigned long" and "uint64_t", e.g. the max
-> delay isn't a property of the address space.
+> static, and maybe a uint64_t to match the other stuff?
 
-I assume that you refer to "cycles" below. Will do.
+Sure. Also moved all other globals and functions back to static.
+
+> 
+>> +/*
+>> + * Possible TDCR values with matching divide count. Used to modify APIC
+>> + * timer frequency.
+>> + */
+>> +struct {
+>> +	uint32_t tdcr;
+>> +	uint32_t divide_count;
+>> +} tdcrs[] = {
+>> +	{0x0, 2},
+>> +	{0x1, 4},
+>> +	{0x2, 8},
+>> +	{0x3, 16},
+>> +	{0x8, 32},
+>> +	{0x9, 64},
+>> +	{0xa, 128},
+>> +	{0xb, 1},
+>> +};
+>> +
+>> +void guest_verify(uint64_t tsc_cycles, uint32_t apic_cycles, uint32_t divide_count)
+> 
+> uin64_t for apic_cycles?  And maybe something like guest_check_apic_count(), to
+> make it more obvious what is being verified?  Actually, it should be quite easy
+> to have the two flavors share the bulk of the code.
+
+I now plan to drop this function and instead just open code the
+checks in what has now become a shared function between xAPIC and x2APIC.
 
 > 
 >> +{
->> +	unsigned long cycles = tsc_khz / 1000 * usec;
->> +	uint64_t start, now;
+>> +	unsigned long tsc_hz = tsc_khz * 1000;
+>> +	uint64_t freq;
 >> +
->> +	start = rdtsc();
->> +	for (;;) {
->> +		now = rdtsc();
->> +		if (now - start >= cycles)
->> +			break;
->> +		cpu_relax();
->> +	}
+>> +	GUEST_ASSERT(tsc_cycles > 0);
+> 
+> Is this necessary?  Won't the "freq < ..." check fail?  I love me some paranoia,
+> but this seems unnecessary.
+
+Sure. After needing to field reports from static checkers not able to determine
+that a denominator can never be zero I do tend to add these checks just to
+pre-emptively placate them. I did run the code through a static checker after making
+all planned changes and it had no complaints so it is now gone.
+
+> 
+>> +	freq = apic_cycles * divide_count * tsc_hz / tsc_cycles;
+>> +	/* Check if measured frequency is within 1% of configured frequency. */
+>> +	GUEST_ASSERT(freq < apic_hz * 101 / 100);
+>> +	GUEST_ASSERT(freq > apic_hz * 99 / 100);
 >> +}
 >> +
->>   #define ud2()			\
->>   	__asm__ __volatile__(	\
->>   		"ud2\n"	\
->> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
->> index c664e446136b..ff579674032f 100644
->> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
->> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
->> @@ -25,6 +25,7 @@ vm_vaddr_t exception_handlers;
->>   bool host_cpu_is_amd;
->>   bool host_cpu_is_intel;
->>   bool is_forced_emulation_enabled;
->> +unsigned int tsc_khz;
-> 
-> Slight preference for uint32_t, mostly because KVM stores its version as a u32.
-
-Changed it to uint32_t.
-
-> 
->>   static void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent)
->>   {
->> @@ -616,6 +617,8 @@ void assert_on_unhandled_exception(struct kvm_vcpu *vcpu)
->>   
->>   void kvm_arch_vm_post_create(struct kvm_vm *vm)
->>   {
->> +	int r;
+>> +void x2apic_guest_code(void)
+>> +{
+>> +	uint32_t tmict, tmcct;
+>> +	uint64_t tsc0, tsc1;
+>> +	int i;
 >> +
->>   	vm_create_irqchip(vm);
->>   	vm_init_descriptor_tables(vm);
->>   
->> @@ -628,6 +631,15 @@ void kvm_arch_vm_post_create(struct kvm_vm *vm)
->>   
->>   		vm_sev_ioctl(vm, KVM_SEV_INIT2, &init);
->>   	}
+>> +	x2apic_enable();
 >> +
->> +	if (kvm_has_cap(KVM_CAP_GET_TSC_KHZ)) {
+>> +	/*
+>> +	 * Setup one-shot timer.  The vector does not matter because the
+>> +	 * interrupt should not fire.
+>> +	 */
+>> +	x2apic_write_reg(APIC_LVTT, APIC_LVT_TIMER_ONESHOT | APIC_LVT_MASKED);
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(tdcrs); i++) {
+>> +		x2apic_write_reg(APIC_TDCR, tdcrs[i].tdcr);
+>> +
+>> +		/* Set the largest value to not trigger the interrupt. */
 > 
-> I think we should make this a TEST_REQUIRE(), or maybe even a TEST_ASSERT().
-> Support for KVM_GET_TSC_KHZ predates KVM selftests by 7+ years.
+> Nit, the goal isn't to avoid triggering the interrupt, e.g. the above masking
+> takes care of that.  The goal is to prevent the timer from expiring, because if
+> the timer expires it stops counting and will trigger a false failure because the
+> TSC doesn't stop counting.
+> 
+> Honestly, I would just delete the comment.  Same with the "busy wait for 100 msec"
+> and "Read APIC timer and TSC" comments.  They state the obvious.  Loading the max
+> TMICT is mildly interesting, but that's covered by the file-level comment.
+> 
+>> +		tmict = ~0;
+> 
+> This really belongs outside of the loop, e.g.
+> 
+> 	const uint32_t tmict = ~0u;
+> 
+>> +		x2apic_write_reg(APIC_TMICT, tmict);
+>> +
+>> +		/* Busy wait for 100 msec. */
+> 
+> Hmm, should this be configurable?
 
-Changed it to a TEST_ASSERT() right at the beginning of kvm_arch_vm_post_create().
+Will do.
 
 > 
->> +		r = __vm_ioctl(vm, KVM_GET_TSC_KHZ, NULL);
->> +		if (r < 0)
+>> +		tsc0 = rdtsc();
+>> +		udelay(100000);
+>> +		/* Read APIC timer and TSC. */
+>> +		tmcct = x2apic_read_reg(APIC_TMCCT);
+>> +		tsc1 = rdtsc();
+>> +
+>> +		/* Stop timer. */
 > 
-> Heh, the docs are stale.  KVM hasn't returned an error since commit cc578287e322
-> ("KVM: Infrastructure for software and hardware based TSC rate scaling"), which
-> again predates selftests by many years (6+ in this case).  To make our lives
-> much simpler, I think we should assert that KVM_GET_TSC_KHZ succeeds, and maybe
-> throw in a GUEST_ASSERT(thz_khz) in udelay()?
-
-I added the GUEST_ASSERT() but I find that it comes with a caveat (more below).
-
-I plan an assert as below that would end up testing the same as what a
-GUEST_ASSERT(tsc_khz) would accomplish:
-
-	r = __vm_ioctl(vm, KVM_GET_TSC_KHZ, NULL);
-	TEST_ASSERT(r > 0, "KVM_GET_TSC_KHZ did not provide a valid TSC freq.");
-	tsc_khz = r;
-
-
-Caveat is: the additional GUEST_ASSERT() requires all tests that use udelay() in
-the guest to now subtly be required to implement a ucall (UCALL_ABORT) handler.
-I did a crude grep check to see and of the 69 x86_64 tests there are 47 that do
-indeed have a UCALL_ABORT handler. If any of the other use udelay() then the
-GUEST_ASSERT() will of course still trigger, but will be quite cryptic. For
-example, "Unhandled exception '0xe' at guest RIP '0x0'" vs. "tsc_khz".
-  
-> E.g. as is, if KVM_GET_TSC_KHZ is allowed to fail, then we risk having to deal
-> with weird failures due to udelay() unexpectedly doing nothing.
+> This comment is a bit more interesting, as readers might not know writing '0'
+> stops the timer.  But that's even more interesting is the ordering, e.g. it's
+> not at all unreasonable to think that the timer should be stopped _before_ reading
+> the current count.  E.g. something like:
 > 
+> 		/*
+> 		 * Stop the timer _after_ reading the current, final count, as
+> 		 * writing the initial counter also modifies the current count.
+> 		 */
 > 
->> +			tsc_khz = 0;
->> +		else
->> +			tsc_khz = r;
->> +		sync_global_to_guest(vm, tsc_khz);
+>> +		x2apic_write_reg(APIC_TMICT, 0);
+>> +
+>> +		guest_verify(tsc1 - tsc0, tmict - tmcct, tdcrs[i].divide_count);
 >> +	}
->>   }
->>   
->>   void vcpu_arch_set_entry_point(struct kvm_vcpu *vcpu, void *guest_code)
->> -- 
->> 2.34.1
->>
+>> +
+>> +	GUEST_DONE();
+>> +}
+>> +
+>> +void xapic_guest_code(void)
+>> +{
+>> +	uint32_t tmict, tmcct;
+>> +	uint64_t tsc0, tsc1;
+>> +	int i;
+>> +
+>> +	xapic_enable();
+>> +
+>> +	/*
+>> +	 * Setup one-shot timer.  The vector does not matter because the
+>> +	 * interrupt should not fire.
+>> +	 */
+>> +	xapic_write_reg(APIC_LVTT, APIC_LVT_TIMER_ONESHOT | APIC_LVT_MASKED);
+>> +
+>> +	for (i = 0; i < ARRAY_SIZE(tdcrs); i++) {
+>> +		xapic_write_reg(APIC_TDCR, tdcrs[i].tdcr);
+>> +
+>> +		/* Set the largest value to not trigger the interrupt. */
+>> +		tmict = ~0;
+>> +		xapic_write_reg(APIC_TMICT, tmict);
+>> +
+>> +		/* Busy wait for 100 msec. */
+>> +		tsc0 = rdtsc();
+>> +		udelay(100000);
+>> +		/* Read APIC timer and TSC. */
+>> +		tmcct = xapic_read_reg(APIC_TMCCT);
+>> +		tsc1 = rdtsc();
+>> +
+>> +		/* Stop timer. */
+>> +		xapic_write_reg(APIC_TMICT, 0);
+>> +
+>> +		guest_verify(tsc1 - tsc0, tmict - tmcct, tdcrs[i].divide_count);
+> 
+> That's some nice copy+paste :-)
+> 
+> This test isn't writing ICR, so the whole 32-bit vs. 64-bit weirdness with xAPIC
+> vs X2APIC is irrevelant.  Two tiny helpers, a global flag, and you can avoid a
+> pile of copy+paste, and the need to find a better name than guest_verify().
+
+Will do. Thank you very much for your detailed and valuable feedback.
 
 Reinette
 
