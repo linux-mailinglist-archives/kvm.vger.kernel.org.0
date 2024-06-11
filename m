@@ -1,310 +1,832 @@
-Return-Path: <kvm+bounces-19325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3FA8903D3B
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 15:27:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9182F903D4E
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 15:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F13E286A8F
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 13:27:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E58221F23FEF
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 13:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263D917CA1F;
-	Tue, 11 Jun 2024 13:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D0D217D378;
+	Tue, 11 Jun 2024 13:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cjs9pIZ2"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AG915C4e"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD39C1802CF;
-	Tue, 11 Jun 2024 13:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C258B17C7DA;
+	Tue, 11 Jun 2024 13:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718112216; cv=none; b=rD1z0bsGggvMBDfPaHVVKjUfrQJkGYnFlzrGwhf5URoZ4TjoDRdlCG4kaMELoYs1NQ6sNADDnM/tykr1qqWX6E2ehrhOuScw0uvPciZHRT/fjdkZ9QamD554fm4X4PHBzVOLyLuYnjWE32YVCEHFR2OrOYcZvnKQDhDRC5yurfs=
+	t=1718112474; cv=none; b=pKCmPsrraVOTnzELDGWggbGdyMLJAQWSdoNAo9J1GPmX561qvL3vEpSRrQ4JHAFSACmOXLMpcasC9dBAsXwbYSKCxU/tuhDYVFJh5fQq+obAUnr3LGHhwd6TntsZNiETY2gSvQhrr0/jd7pYPLxL9eTRp7+tf7HaS6eBFS+uPMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718112216; c=relaxed/simple;
-	bh=Oj8hTpHqRt5Wv8Za1TW2g+HdJy6YR5bszvzFPxAunV4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Pq++WV1sDxFRz5n0J7gn+FNDMRQMb13fjH/ALqjQjiySAeNb0AafH9eABIlot1fkfFNZZe/+bCIpZ5g9BxLQ5aHkfc/iZe9hChtRHhUQNOxY29pRoNASp/7gGWVnDditnVqqHi/yxn5+f+MCGaPIruApvcAefQxHL6/47OQrhVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cjs9pIZ2; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45BBSilx015944;
-	Tue, 11 Jun 2024 13:23:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:subject:from:to:cc:date:in-reply-to:references
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	GUDLAz90LJa54aUdAoi/lqQUowtLtFY+JLWY7HYgIWs=; b=cjs9pIZ239FI+GrY
-	AM7G9tFmtgOiJb4X+lPcXLDvfC7qCUuf6bfKS9mQ3IY4ke9lcHbvPcahSrkFe4ms
-	NN/BNW/rRjOJ9WYW0OcHy5KVhn2vBhieCL+S8sGts95QUtWCPPryWU6kr80VJreQ
-	+1fxilLMEr5+uoHANaWclYSvQnbpmZWXnZD+LGGNpwEdjwRF/y9LgidJr2ZHnR7V
-	PoFZNhbusKGdSI5fqafs9sHH8M6PqNFuH7CsQpBc9IfGdTPcvgfs+pXCfCDTndew
-	h2TYpu0Mr6OR0G7R84Y4cJp6zOwhZ/cyLlK2WbbrQVkYe5nxUKuhEmuxCAEq4Rd9
-	Gk7yjQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ypnr0r8x3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jun 2024 13:23:32 +0000 (GMT)
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45BDNWTi030894;
-	Tue, 11 Jun 2024 13:23:32 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ypnr0r8wy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jun 2024 13:23:32 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45BAAKef027243;
-	Tue, 11 Jun 2024 13:23:31 GMT
-Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yn210p3gy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jun 2024 13:23:31 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45BDNRnI61473112
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Jun 2024 13:23:29 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BEC445804B;
-	Tue, 11 Jun 2024 13:23:27 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EF77B5805B;
-	Tue, 11 Jun 2024 13:23:24 +0000 (GMT)
-Received: from [9.179.8.185] (unknown [9.179.8.185])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 11 Jun 2024 13:23:24 +0000 (GMT)
-Message-ID: <db10735e74d5a89aed73ad3268e0be40394efc31.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 1/3] s390/pci: Fix s390_mmio_read/write syscall page
- fault handling
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Alex
- Williamson <alex.williamson@redhat.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>
-Cc: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, David Hildenbrand <david@redhat.com>
-Date: Tue, 11 Jun 2024 15:23:24 +0200
-In-Reply-To: <30ecb17b7a3414aeb605c51f003582c7f2cf6444.camel@linux.ibm.com>
-References: <20240529-vfio_pci_mmap-v3-0-cd217d019218@linux.ibm.com>
-	 <20240529-vfio_pci_mmap-v3-1-cd217d019218@linux.ibm.com>
-	 <98de56b1ba37f51639b9a2c15a745e19a45961a0.camel@linux.ibm.com>
-	 <30ecb17b7a3414aeb605c51f003582c7f2cf6444.camel@linux.ibm.com>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=mQINBGHm3M8BEAC+MIQkfoPIAKdjjk84OSQ8erd2OICj98+GdhMQpIjHXn/RJdCZLa58k
- /ay5x0xIHkWzx1JJOm4Lki7WEzRbYDexQEJP0xUia0U+4Yg7PJL4Dg/W4Ho28dRBROoJjgJSLSHwc
- 3/1pjpNlSaX/qg3ZM8+/EiSGc7uEPklLYu3gRGxcWV/944HdUyLcnjrZwCn2+gg9ncVJjsimS0ro/
- 2wU2RPE4ju6NMBn5Go26sAj1owdYQQv9t0d71CmZS9Bh+2+cLjC7HvyTHKFxVGOznUL+j1a45VrVS
- XQ+nhTVjvgvXR84z10bOvLiwxJZ/00pwNi7uCdSYnZFLQ4S/JGMs4lhOiCGJhJ/9FR7JVw/1t1G9a
- UlqVp23AXwzbcoV2fxyE/CsVpHcyOWGDahGLcH7QeitN6cjltf9ymw2spBzpRnfFn80nVxgSYVG1d
- w75ksBAuQ/3e+oTQk4GAa2ShoNVsvR9GYn7rnsDN5pVILDhdPO3J2PGIXa5ipQnvwb3EHvPXyzakY
- tK50fBUPKk3XnkRwRYEbbPEB7YT+ccF/HioCryqDPWUivXF8qf6Jw5T1mhwukUV1i+QyJzJxGPh19
- /N2/GK7/yS5wrt0Lwxzevc5g+jX8RyjzywOZGHTVu9KIQiG8Pqx33UxZvykjaqTMjo7kaAdGEkrHZ
- dVHqoPZwhCsgQARAQABtChOaWtsYXMgU2NobmVsbGUgPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+iQ
- JXBBMBCABBAhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAhkBFiEEnbAAstJ1IDCl9y3cr+Q/Fej
- CYJAFAmWVooIFCQWP+TMACgkQr+Q/FejCYJCmLg/+OgZD6wTjooE77/ZHmW6Egb5nUH6DU+2nMHMH
- UupkE3dKuLcuzI4aEf/6wGG2xF/LigMRrbb1iKRVk/VG/swyLh/OBOTh8cJnhdmURnj3jhaefzslA
- 1wTHcxeH4wMGJWVRAhOfDUpMMYV2J5XoroiA1+acSuppelmKAK5voVn9/fNtrVr6mgBXT5RUnmW60
- UUq5z6a1zTMOe8lofwHLVvyG9zMgv6Z9IQJc/oVnjR9PWYDUX4jqFL3yO6DDt5iIQCN8WKaodlNP6
- 1lFKAYujV8JY4Ln+IbMIV2h34cGpIJ7f76OYt2XR4RANbOd41+qvlYgpYSvIBDml/fT2vWEjmncm7
- zzpVyPtCZlijV3npsTVerGbh0Ts/xC6ERQrB+rkUqN/fx+dGnTT9I7FLUQFBhK2pIuD+U1K+A+Egw
- UiTyiGtyRMqz12RdWzerRmWFo5Mmi8N1jhZRTs0yAUn3MSCdRHP1Nu3SMk/0oE+pVeni3ysdJ69Sl
- kCAZoaf1TMRdSlF71oT/fNgSnd90wkCHUK9pUJGRTUxgV9NjafZy7sx1Gz11s4QzJE6JBelClBUiF
- 6QD4a+MzFh9TkUcpG0cPNsFfEGyxtGzuoeE86sL1tk3yO6ThJSLZyqFFLrZBIJvYK2UiD+6E7VWRW
- 9y1OmPyyFBPBosOvmrkLlDtAtyfYInO0KU5pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNjaG5lbGxlQ
- GlibS5jb20+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAAstJ1IDCl9y
- 3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJB7oxAAksHYU+myhSZD0YSuYZl3oLDUEFP
- 3fm9m6N9zgtiOg/GGI0jHc+Tt8qiQaLEtVeP/waWKgQnje/emHJOEDZTb0AdeXZk+T5/ydrKRLmYC
- 6rPge3ue1yQUCiA+T72O3WfjZILI2yOstNwd1f0epQ32YaAvM+QbKDloJSmKhGWZlvdVUDXWkS6/m
- aUtUwZpddFY8InXBxsYCbJsqiKF3kPVD515/6keIZmZh1cTIFQ+Kc+UZaz0MxkhiCyWC4cH6HZGKR
- fiXLhPlmmAyW9FiZK9pwDocTLemfgMR6QXOiB0uisdoFnjhXNfp6OHSy7w7LTIHzCsJoHk+vsyvSp
- +fxkjCXgFzGRQaJkoX33QZwQj1mxeWl594QUfR4DIZ2KERRNI0OMYjJVEtB5jQjnD/04qcTrSCpJ5
- ZPtiQ6Umsb1c9tBRIJnL7gIslo/OXBe/4q5yBCtCZOoD6d683XaMPGhi/F6+fnGvzsi6a9qDBgVvt
- arI8ybayhXDuS6/StR8qZKCyzZ/1CUofxGVIdgkseDhts0dZ4AYwRVCUFQULeRtyoT4dKfEot7hPE
- /4wjm9qZf2mDPRvJOqss6jObTNuw1YzGlpe9OvDYtGeEfHgcZqEmHbiMirwfGLaTG2xKDx4g2jd2z
- Ocf83TCERFKJEhvZxB3tRiUQTd3dZ1TIaisv/o+y0K05pa2xhcyBTY2huZWxsZSA8bmlrbGFzLnNj
- aG5lbGxlQGdtYWlsLmNvbT6JAlQEEwEIAD4CGwEFCwkIBwIGFQoJCAsCBBYCAwECHgECF4AWIQSds
- ACy0nUgMKX3Ldyv5D8V6MJgkAUCZZWiiwUJBY/5MwAKCRCv5D8V6MJgkNVuEACo12niyoKhnXLQFt
- NaqxNZ+8p/MGA7g2XcVJ1bYMPoZ2Wh8zwX0sKX/dLlXVHIAeqelL5hIv6GoTykNqQGUN2Kqf0h/z7
- b85o3tHiqMAQV0dAB0y6qdIwdiB69SjpPNK5KKS1+AodLzosdIVKb+LiOyqUFKhLnablni1hiKlqY
- yDeD4k5hePeQdpFixf1YZclGZLFbKlF/A/0Q13USOHuAMYoA/iSgJQDMSUWkuC0mNxdhfVt/gVJnu
- Kq+uKUghcHflhK+yodqezlxmmRxg6HrPVqRG4pZ6YNYO7YXuEWy9JiEH7MmFYcjNdgjn+kxx4IoYU
- O0MJ+DjLpVCV1QP1ZvMy8qQxScyEn7pMpQ0aW6zfJBsvoV3EHCR1emwKYO6rJOfvtu1rElGCTe3sn
- sScV9Z1oXlvo8pVNH5a2SlnsuEBQe0RXNXNJ4RAls8VraGdNSHi4MxcsYEgAVHVaAdTLfJcXZNCIU
- cZejkOE+U2talW2n5sMvx+yURAEVsT/50whYcvomt0y81ImvCgUz4xN1axZ3PCjkgyhNiqLe+vzge
- xq7B2Kx2++hxIBDCKLUTn8JUAtQ1iGBZL9RuDrBy2rR7xbHcU2424iSbP0zmnpav5KUg4F1JVYG12
- vDCi5tq5lORCL28rjOQqE0aLHU1M1D2v51kjkmNuc2pgLDFzpvgLQhTmlrbGFzIFNjaG5lbGxlIDx
- uaWtzQGtlcm5lbC5vcmc+iQJUBBMBCAA+AhsBBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAFiEEnbAA
- stJ1IDCl9y3cr+Q/FejCYJAFAmWVoosFCQWP+TMACgkQr+Q/FejCYJAglRAAihbDxiGLOWhJed5cF
- kOwdTZz6MyYgazbr+2sFrfAhX3hxPFoG4ogY/BzsjkN0cevWpSigb2I8Y1sQD7BFWJ2OjpEpVQd0D
- sk5VbJBXEWIVDBQ4VMoACLUKgfrb0xiwMRg9C2h6KlwrPBlfgctfvrWWLBq7+oqx73CgxqTcGpfFy
- tD87R4ovR9W1doZbh7pjsH5Ae9xX5PnQFHruib3y35zC8+tvSgvYWv3Eg/8H4QWlrjLHHy2AfZDVl
- 9F5t5RfGL8NRsiTdVg9VFYg/GDdck9WPEgdO3L/qoq3Iuk0SZccGl+Nj8vtWYPKNlu2UvgYEbB8cl
- UoWhg+SjjYQka7/p6tc+CCPZ8JUpkgkAdt7yXt6370wP1gct2VztS6SEGcmAE1qxtGhi5Kuln4ZJ/
- UO2yxhPHgoW99OuZw3IRHe0+mNR67JbIpSuFWDFNjZ0nckQcU1taSEUi0euWs7i4MEkm0NsOsVhbs
- 4D2vMiC6kO/FqWOPmWZeAjyJw/KRUG4PaJAr5zJUx57nhKWgeTniW712n4DwCUh77D/PHY0nqBTG/
- B+QQCR/FYGpTFkO4DRVfapT8njDrsWyVpP9o64VNZP42S+DuRGWfUKCMAXsM/wPzRiDEVfnZMcUR9
- vwLSHeoV7MiIFC0xIrp5ES9R00t4UFgqtGc36DV71qjR+66Im0=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+	s=arc-20240116; t=1718112474; c=relaxed/simple;
+	bh=fjgEDqR45MSMTMNGKpBI2WAy1U0O3ya4ljsGk4mt3y4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RwkTljyJspgiQmoJuc38Fp/Es0QZEiXqDA+66UEY9sgguRkj17kEr075OasBRzmm4jesXvkMDXajnu3DVZcInDblwg5CP6cmRM+hO7D/Px5hSHOdJ2CPPjYedVOopgMiPvQKLFwFbumzbh998Ds0VYlctrccPpw4DtUljyLNPWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AG915C4e; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718112472; x=1749648472;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=fjgEDqR45MSMTMNGKpBI2WAy1U0O3ya4ljsGk4mt3y4=;
+  b=AG915C4e5WNZytkvtODplUWC0MwlIheFUE8l5xMS8D/h+8Nveh+QCMKJ
+   c+L3WXrti96tNY4SseoA2eTsQzJuBxNhbW21qlbg9yIg9hsGB4iuvOgIb
+   fFL8ZcSXrpGeLnmaFJwyOn9XHOYb6o5r/ZFjzFHkz4G+YBuJW4WdKjRGw
+   IJUK/AP70ovPUFi0oJFm+SR3peMlgkBMaoK5eREZjyo6rz8QLnM52gxDi
+   LVuRnMCp9YWH7awlF+rlWjImRrtRAqAOIHE3woQwsUc6Xww4EAvqscbfd
+   HDVZu69H6qcKKinMFhvP+nUgxKrq9HT3byrgDbzl/jfPNu2BMmfv5uXEc
+   w==;
+X-CSE-ConnectionGUID: 7wJzA/kGTV+gZM1RIy1SuQ==
+X-CSE-MsgGUID: eAoDKXT/R1SjPoSo8NZ71g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11099"; a="18680787"
+X-IronPort-AV: E=Sophos;i="6.08,230,1712646000"; 
+   d="scan'208";a="18680787"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 06:27:51 -0700
+X-CSE-ConnectionGUID: HW2viWxdSDeNE41xrnpv7Q==
+X-CSE-MsgGUID: IcKtAS1VSPeEQ/oYhbDAZQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,230,1712646000"; 
+   d="scan'208";a="39549205"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 06:27:50 -0700
+Received: from [10.209.186.83] (kliang2-mobl1.ccr.corp.intel.com [10.209.186.83])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id AE0B820B5703;
+	Tue, 11 Jun 2024 06:27:47 -0700 (PDT)
+Message-ID: <0a403a6c-8d55-42cb-a90c-c13e1458b45e@linux.intel.com>
+Date: Tue, 11 Jun 2024 09:27:46 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aY4gU-zkfQ-ro1uJhQ6bnF4PWlgiYKNk
-X-Proofpoint-ORIG-GUID: RuNS6Dv8-1LyqhTOBG3mUOgTCqMaB-uQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-11_07,2024-06-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
- priorityscore=1501 mlxscore=0 lowpriorityscore=0 phishscore=0 adultscore=0
- malwarescore=0 mlxlogscore=999 spamscore=0 suspectscore=0 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2406110097
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/54] perf: Add generic exclude_guest support
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
+ <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
+ Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
+References: <20240506053020.3911940-1-mizhang@google.com>
+ <20240506053020.3911940-8-mizhang@google.com>
+ <20240507085807.GS40213@noisy.programming.kicks-ass.net>
+ <902c40cc-6e0b-4b2f-826c-457f533a0a76@linux.intel.com>
+ <20240611120641.GF8774@noisy.programming.kicks-ass.net>
+Content-Language: en-US
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <20240611120641.GF8774@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-06-11 at 14:08 +0200, Niklas Schnelle wrote:
-> On Tue, 2024-06-11 at 13:21 +0200, Niklas Schnelle wrote:
-> > On Wed, 2024-05-29 at 13:36 +0200, Niklas Schnelle wrote:
-> > > The s390 MMIO syscalls when using the classic PCI instructions do not
-> > > cause a page fault when follow_pte() fails due to the page not being
-> > > present. Besides being a general deficiency this breaks vfio-pci's mm=
-ap()
-> > > handling once VFIO_PCI_MMAP gets enabled as this lazily maps on first
-> > > access. Fix this by following a failed follow_pte() with
-> > > fixup_user_page() and retrying the follow_pte().
-> > >=20
-> > > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> > > Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> > > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> > > ---
-> > >  arch/s390/pci/pci_mmio.c | 18 +++++++++++++-----
-> > >  1 file changed, 13 insertions(+), 5 deletions(-)
-> > >=20
-> > > diff --git a/arch/s390/pci/pci_mmio.c b/arch/s390/pci/pci_mmio.c
-> > > index 5398729bfe1b..80c21b1a101c 100644
-> > > --- a/arch/s390/pci/pci_mmio.c
-> > > +++ b/arch/s390/pci/pci_mmio.c
-> > > @@ -170,8 +170,12 @@ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned lo=
-ng, mmio_addr,
-> > >  		goto out_unlock_mmap;
-> > > =20
-> > >  	ret =3D follow_pte(vma, mmio_addr, &ptep, &ptl);
-> > > -	if (ret)
-> > > -		goto out_unlock_mmap;
-> > > +	if (ret) {
-> > > +		fixup_user_fault(current->mm, mmio_addr, FAULT_FLAG_WRITE, NULL);
-> > > +		ret =3D follow_pte(vma, mmio_addr, &ptep, &ptl);
-> > > +		if (ret)
-> > > +			goto out_unlock_mmap;
-> > > +	}
-> > > =20
-> > >  	io_addr =3D (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
-> > >  			(mmio_addr & ~PAGE_MASK));
-> > > @@ -305,12 +309,16 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned lo=
-ng, mmio_addr,
-> > >  	if (!(vma->vm_flags & (VM_IO | VM_PFNMAP)))
-> > >  		goto out_unlock_mmap;
-> > >  	ret =3D -EACCES;
-> > > -	if (!(vma->vm_flags & VM_WRITE))
-> > > +	if (!(vma->vm_flags & VM_READ))
-> > >  		goto out_unlock_mmap;
-> > > =20
-> > >  	ret =3D follow_pte(vma, mmio_addr, &ptep, &ptl);
-> > > -	if (ret)
-> > > -		goto out_unlock_mmap;
-> > > +	if (ret) {
-> > > +		fixup_user_fault(current->mm, mmio_addr, 0, NULL);
-> > > +		ret =3D follow_pte(vma, mmio_addr, &ptep, &ptl);
-> > > +		if (ret)
-> > > +			goto out_unlock_mmap;
-> > > +	}
-> > > =20
-> > >  	io_addr =3D (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
-> > >  			(mmio_addr & ~PAGE_MASK));
-> > >=20
-> >=20
-> > Ughh, I think I just stumbled over a problem with this. This is a
-> > failing lock held assertion via __is_vma_write_locked() in
-> > remap_pfn_range_notrack() but I'm not sure yet what exactly causes this
-> >=20
-> > [   67.338855] ------------[ cut here ]------------
-> > [   67.338865] WARNING: CPU: 15 PID: 2056 at include/linux/rwsem.h:85 r=
-emap_pfn_range_notrack+0x596/0x5b0
-> > [   67.338874] Modules linked in: <--- 8< --->
-> > [   67.338931] CPU: 15 PID: 2056 Comm: vfio-test Not tainted 6.10.0-rc1=
--pci-pfault-00004-g193e3a513cee #5
-> > [   67.338934] Hardware name: IBM 3931 A01 701 (LPAR)
-> > [   67.338935] Krnl PSW : 0704c00180000000 000003e54c9730ea (remap_pfn_=
-range_notrack+0x59a/0x5b0)
-> > [   67.338940]            R:0 T:1 IO:1 EX:1 Key:0 M:1 W:0 P:0 AS:3 CC:0=
- PM:0 RI:0 EA:3
-> > [   67.338944] Krnl GPRS: 0000000000000100 000003655915fb78 000002d80b9=
-a5928 000003ff7fa00000
-> > [   67.338946]            0004008000000000 0000000000004000 00000000000=
-00711 000003ff7fa04000
-> > [   67.338948]            000002d80c533f00 000002d800000100 000002d81bb=
-e6c28 000002d80b9a5928
-> > [   67.338950]            000003ff7fa00000 000002d80c533f00 000003e54c9=
-73120 000003655915fab0
-> > [   67.338956] Krnl Code: 000003e54c9730de: a708ffea            lhi    =
- %r0,-22
-> >                           000003e54c9730e2: a7f4fff6            brc    =
- 15,000003e54c9730ce
-> >                          #000003e54c9730e6: af000000            mc     =
- 0,0
-> >                          >000003e54c9730ea: a7f4fd6e            brc    =
- 15,000003e54c972bc6
-> >                           000003e54c9730ee: af000000            mc     =
- 0,0
-> >                           000003e54c9730f2: af000000            mc     =
- 0,0
-> >                           000003e54c9730f6: 0707                bcr    =
- 0,%r7
-> >                           000003e54c9730f8: 0707                bcr    =
- 0,%r7
-> > [   67.339025] Call Trace:
-> > [   67.339027]  [<000003e54c9730ea>] remap_pfn_range_notrack+0x59a/0x5b=
-0
-> > [   67.339032]  [<000003e54c973120>] remap_pfn_range+0x20/0x30
-> > [   67.339035]  [<000003e4cce5396c>] vfio_pci_mmap_fault+0xec/0x1d0 [vf=
-io_pci_core]
-> > [   67.339043]  [<000003e54c977240>] handle_mm_fault+0x6b0/0x25a0
-> > [   67.339046]  [<000003e54c966328>] fixup_user_fault+0x138/0x310
-> > [   67.339048]  [<000003e54c63a91c>] __s390x_sys_s390_pci_mmio_read+0x2=
-8c/0x3a0
-> > [   67.339051]  [<000003e54c5e200a>] do_syscall+0xea/0x120
-> > [   67.339055]  [<000003e54d5f9954>] __do_syscall+0x94/0x140
-> > [   67.339059]  [<000003e54d611020>] system_call+0x70/0xa0
-> > [   67.339063] Last Breaking-Event-Address:
-> > [   67.339065]  [<000003e54c972bc2>] remap_pfn_range_notrack+0x72/0x5b0
-> > [   67.339067] ---[ end trace 0000000000000000 ]---
-> >=20
->=20
-> This has me a bit confused so far as __is_vma_write_locked() checks
-> mmap_assert_write_locked(vma->vm_mm) but most other users of
-> fixup_user_fault() hold mmap_read_lock() just like this code and
-> clearly in the non page fault case we only need the read lock.
->=20
 
-And it gets weirder, as I could have sworn that I properly tested this
-on v1, I retested with v1 (tags/sent/vfio_pci_mmap-v1 on my
-git.kernel.org/niks and based on v6.9) and there I don't get the above
-warning. I also made sure that it's not caused by my change to
-"current->mm" for v2. But I'm also not hitting the checks David moved
-into follow_pte() so yeah not sure what's going on here.
+
+On 2024-06-11 8:06 a.m., Peter Zijlstra wrote:
+> On Mon, Jun 10, 2024 at 01:23:04PM -0400, Liang, Kan wrote:
+>> On 2024-05-07 4:58 a.m., Peter Zijlstra wrote:
+> 
+>>> Bah, this is a ton of copy-paste from the normal scheduling code with
+>>> random changes. Why ?
+>>>
+>>> Why can't this use ctx_sched_{in,out}() ? Surely the whole
+>>> CAP_PASSTHROUGHT thing is but a flag away.
+>>>
+>>
+>> Not just a flag. The time has to be updated as well, since the ctx->time
+>> is shared among PMUs. Perf shouldn't stop it while other PMUs is still
+>> running.
+> 
+> Obviously the original changelog didn't mention any of that.... :/
+
+Yes, the time issue was a newly found bug when we test the uncore PMUs.
+
+> 
+>> A timeguest will be introduced to track the start time of a guest.
+>> The event->tstamp of an exclude_guest event should always keep
+>> ctx->timeguest while a guest is running.
+>> When a guest is leaving, update the event->tstamp to now, so the guest
+>> time can be deducted.
+>>
+>> The below patch demonstrate how the timeguest works.
+>> (It's an incomplete patch. Just to show the idea.)
+>>
+>> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+>> index 22d3e56682c9..2134e6886e22 100644
+>> --- a/include/linux/perf_event.h
+>> +++ b/include/linux/perf_event.h
+>> @@ -953,6 +953,7 @@ struct perf_event_context {
+>>  	u64				time;
+>>  	u64				timestamp;
+>>  	u64				timeoffset;
+>> +	u64				timeguest;
+>>
+>>  	/*
+>>  	 * These fields let us detect when two contexts have both
+>> diff --git a/kernel/events/core.c b/kernel/events/core.c
+>> index 14fd881e3e1d..2aed56671a24 100644
+>> --- a/kernel/events/core.c
+>> +++ b/kernel/events/core.c
+>> @@ -690,12 +690,31 @@ __perf_update_times(struct perf_event *event, u64
+>> now, u64 *enabled, u64 *runnin
+>>  		*running += delta;
+>>  }
+>>
+>> +static void perf_event_update_time_guest(struct perf_event *event)
+>> +{
+>> +	/*
+>> +	 * If a guest is running, use the timestamp while entering the guest.
+>> +	 * If the guest is leaving, reset the event timestamp.
+>> +	 */
+>> +	if (!__this_cpu_read(perf_in_guest))
+>> +		event->tstamp = event->ctx->time;
+>> +	else
+>> +		event->tstamp = event->ctx->timeguest;
+>> +}
+> 
+> This conditional seems inverted, without a good reason. Also, in another
+> thread you talk about some PMUs stopping time in a guest, while other
+> PMUs would keep ticking. I don't think the above captures that.
+> 
+>>  static void perf_event_update_time(struct perf_event *event)
+>>  {
+>> -	u64 now = perf_event_time(event);
+>> +	u64 now;
+>> +
+>> +	/* Never count the time of an active guest into an exclude_guest event. */
+>> +	if (event->ctx->timeguest &&
+>> +	    event->pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU)
+>> +		return perf_event_update_time_guest(event);
+> 
+> Urgh, weird split. The PMU check is here. Please just inline the above
+> here, this seems to be the sole caller anyway.
+>
+
+Sure
+
+>>
+>> +	now = perf_event_time(event);
+>>  	__perf_update_times(event, now, &event->total_time_enabled,
+>>  					&event->total_time_running);
+>> +
+>>  	event->tstamp = now;
+>>  }
+>>
+>> @@ -3398,7 +3417,14 @@ ctx_sched_out(struct perf_event_context *ctx,
+>> enum event_type_t event_type)
+>>  			cpuctx->task_ctx = NULL;
+>>  	}
+>>
+>> -	is_active ^= ctx->is_active; /* changed bits */
+>> +	if (event_type & EVENT_GUEST) {
+> 
+> Patch doesn't introduce EVENT_GUEST, lost a hunk somewhere?
+
+Sorry, there is a prerequisite patch to factor out the EVENT_CGROUP.
+I thought it will be complex and confusion to paste both. Some details
+are lost.
+I will post both two patches at the end.
+
+> 
+>> +		/*
+>> +		 * Schedule out all !exclude_guest events of PMU
+>> +		 * with PERF_PMU_CAP_PASSTHROUGH_VPMU.
+>> +		 */
+>> +		is_active = EVENT_ALL;
+>> +	} else
+>> +		is_active ^= ctx->is_active; /* changed bits */
+>>
+>>  	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
+>>  		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
+> 
+>> @@ -5894,14 +5933,18 @@ void perf_guest_enter(u32 guest_lvtpc)
+>>  	}
+>>
+>>  	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+>> -	ctx_sched_out(&cpuctx->ctx, EVENT_ALL | EVENT_GUEST);
+>> +	ctx_sched_out(&cpuctx->ctx, EVENT_GUEST);
+>> +	/* Set the guest start time */
+>> +	cpuctx->ctx.timeguest = cpuctx->ctx.time;
+>>  	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+>>  	if (cpuctx->task_ctx) {
+>>  		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
+>> -		task_ctx_sched_out(cpuctx->task_ctx, EVENT_ALL | EVENT_GUEST);
+>> +		task_ctx_sched_out(cpuctx->task_ctx, EVENT_GUEST);
+>> +		cpuctx->task_ctx->timeguest = cpuctx->task_ctx->time;
+>>  		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+>>  	}
+>>
+>>  	__this_cpu_write(perf_in_guest, true);
+>> @@ -5925,14 +5968,17 @@ void perf_guest_exit(void)
+>>
+>>  	__this_cpu_write(perf_in_guest, false);
+>>
+>>  	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
+>> -	ctx_sched_in(&cpuctx->ctx, EVENT_ALL | EVENT_GUEST);
+>> +	ctx_sched_in(&cpuctx->ctx, EVENT_GUEST);
+>> +	cpuctx->ctx.timeguest = 0;
+>>  	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
+>>  	if (cpuctx->task_ctx) {
+>>  		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
+>> -		ctx_sched_in(cpuctx->task_ctx, EVENT_ALL | EVENT_GUEST);
+>> +		ctx_sched_in(cpuctx->task_ctx, EVENT_GUEST);
+>> +		cpuctx->task_ctx->timeguest = 0;
+>>  		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
+>>  	}
+> 
+> I'm thinking EVENT_GUEST should cause the ->timeguest updates, no point
+> in having them explicitly duplicated here, hmm?
+
+We have to add a EVENT_GUEST check and update the ->timeguest at the end
+of the ctx_sched_out/in functions after the pmu_ctx_sched_out/in().
+Because the ->timeguest also be used to check if it's leaving the guest
+in the perf_event_update_time().
+
+Since the EVENT_GUEST only be used by perf_guest_enter/exit(), I thought
+maybe it's better to move it to where it is used rather than the generic
+ctx_sched_out/in(). It will minimize the impact on the
+non-virtualization user.
+
+Here are the two complete patches.
+
+The first one is to factor out the EVENT_CGROUP.
+
+
+From c508f2b0e11a2eea71fe3ff16d1d848359ede535 Mon Sep 17 00:00:00 2001
+From: Kan Liang <kan.liang@linux.intel.com>
+Date: Mon, 27 May 2024 06:58:29 -0700
+Subject: [PATCH 1/2] perf: Skip pmu_ctx based on event_type
+
+To optimize the cgroup context switch, the perf_event_pmu_context
+iteration skips the PMUs without cgroup events. A bool cgroup was
+introduced to indicate the case. It can work, but this way is hard to
+extend for other cases, e.g. skipping non-passthrough PMUs. It doesn't
+make sense to keep adding bool variables.
+
+Pass the event_type instead of the specific bool variable. Check both
+the event_type and related pmu_ctx variables to decide whether skipping
+a PMU.
+
+Event flags, e.g., EVENT_CGROUP, should be cleard in the ctx->is_active.
+Add EVENT_FLAGS to indicate such event flags.
+
+No functional change.
+
+Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+---
+ kernel/events/core.c | 70 +++++++++++++++++++++++---------------------
+ 1 file changed, 37 insertions(+), 33 deletions(-)
+
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index abd4027e3859..95d1d5a5addc 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -376,6 +376,7 @@ enum event_type_t {
+ 	/* see ctx_resched() for details */
+ 	EVENT_CPU = 0x8,
+ 	EVENT_CGROUP = 0x10,
++	EVENT_FLAGS = EVENT_CGROUP,
+ 	EVENT_ALL = EVENT_FLEXIBLE | EVENT_PINNED,
+ };
+
+@@ -699,23 +700,32 @@ do {									\
+ 	___p;								\
+ })
+
+-static void perf_ctx_disable(struct perf_event_context *ctx, bool cgroup)
++static bool perf_skip_pmu_ctx(struct perf_event_pmu_context *pmu_ctx,
++			      enum event_type_t event_type)
++{
++	if ((event_type & EVENT_CGROUP) && !pmu_ctx->nr_cgroups)
++		return true;
++
++	return false;
++}
++
++static void perf_ctx_disable(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ {
+ 	struct perf_event_pmu_context *pmu_ctx;
+
+ 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
+-		if (cgroup && !pmu_ctx->nr_cgroups)
++		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
+ 			continue;
+ 		perf_pmu_disable(pmu_ctx->pmu);
+ 	}
+ }
+
+-static void perf_ctx_enable(struct perf_event_context *ctx, bool cgroup)
++static void perf_ctx_enable(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ {
+ 	struct perf_event_pmu_context *pmu_ctx;
+
+ 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
+-		if (cgroup && !pmu_ctx->nr_cgroups)
++		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
+ 			continue;
+ 		perf_pmu_enable(pmu_ctx->pmu);
+ 	}
+@@ -877,7 +887,7 @@ static void perf_cgroup_switch(struct task_struct *task)
+ 		return;
+
+ 	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
+-	perf_ctx_disable(&cpuctx->ctx, true);
++	perf_ctx_disable(&cpuctx->ctx, EVENT_CGROUP);
+
+ 	ctx_sched_out(&cpuctx->ctx, EVENT_ALL|EVENT_CGROUP);
+ 	/*
+@@ -893,7 +903,7 @@ static void perf_cgroup_switch(struct task_struct *task)
+ 	 */
+ 	ctx_sched_in(&cpuctx->ctx, EVENT_ALL|EVENT_CGROUP);
+
+-	perf_ctx_enable(&cpuctx->ctx, true);
++	perf_ctx_enable(&cpuctx->ctx, EVENT_CGROUP);
+ 	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
+ }
+
+@@ -2729,9 +2739,9 @@ static void ctx_resched(struct perf_cpu_context
+*cpuctx,
+
+ 	event_type &= EVENT_ALL;
+
+-	perf_ctx_disable(&cpuctx->ctx, false);
++	perf_ctx_disable(&cpuctx->ctx, 0);
+ 	if (task_ctx) {
+-		perf_ctx_disable(task_ctx, false);
++		perf_ctx_disable(task_ctx, 0);
+ 		task_ctx_sched_out(task_ctx, event_type);
+ 	}
+
+@@ -2749,9 +2759,9 @@ static void ctx_resched(struct perf_cpu_context
+*cpuctx,
+
+ 	perf_event_sched_in(cpuctx, task_ctx);
+
+-	perf_ctx_enable(&cpuctx->ctx, false);
++	perf_ctx_enable(&cpuctx->ctx, 0);
+ 	if (task_ctx)
+-		perf_ctx_enable(task_ctx, false);
++		perf_ctx_enable(task_ctx, 0);
+ }
+
+ void perf_pmu_resched(struct pmu *pmu)
+@@ -3296,9 +3306,6 @@ ctx_sched_out(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+ 	struct perf_event_pmu_context *pmu_ctx;
+ 	int is_active = ctx->is_active;
+-	bool cgroup = event_type & EVENT_CGROUP;
+-
+-	event_type &= ~EVENT_CGROUP;
+
+ 	lockdep_assert_held(&ctx->lock);
+
+@@ -3333,7 +3340,7 @@ ctx_sched_out(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ 		barrier();
+ 	}
+
+-	ctx->is_active &= ~event_type;
++	ctx->is_active &= ~(event_type & ~EVENT_FLAGS);
+ 	if (!(ctx->is_active & EVENT_ALL))
+ 		ctx->is_active = 0;
+
+@@ -3346,7 +3353,7 @@ ctx_sched_out(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ 	is_active ^= ctx->is_active; /* changed bits */
+
+ 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
+-		if (cgroup && !pmu_ctx->nr_cgroups)
++		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
+ 			continue;
+ 		__pmu_ctx_sched_out(pmu_ctx, is_active);
+ 	}
+@@ -3540,7 +3547,7 @@ perf_event_context_sched_out(struct task_struct
+*task, struct task_struct *next)
+ 		raw_spin_lock_nested(&next_ctx->lock, SINGLE_DEPTH_NESTING);
+ 		if (context_equiv(ctx, next_ctx)) {
+
+-			perf_ctx_disable(ctx, false);
++			perf_ctx_disable(ctx, 0);
+
+ 			/* PMIs are disabled; ctx->nr_pending is stable. */
+ 			if (local_read(&ctx->nr_pending) ||
+@@ -3560,7 +3567,7 @@ perf_event_context_sched_out(struct task_struct
+*task, struct task_struct *next)
+ 			perf_ctx_sched_task_cb(ctx, false);
+ 			perf_event_swap_task_ctx_data(ctx, next_ctx);
+
+-			perf_ctx_enable(ctx, false);
++			perf_ctx_enable(ctx, 0);
+
+ 			/*
+ 			 * RCU_INIT_POINTER here is safe because we've not
+@@ -3584,13 +3591,13 @@ perf_event_context_sched_out(struct task_struct
+*task, struct task_struct *next)
+
+ 	if (do_switch) {
+ 		raw_spin_lock(&ctx->lock);
+-		perf_ctx_disable(ctx, false);
++		perf_ctx_disable(ctx, 0);
+
+ inside_switch:
+ 		perf_ctx_sched_task_cb(ctx, false);
+ 		task_ctx_sched_out(ctx, EVENT_ALL);
+
+-		perf_ctx_enable(ctx, false);
++		perf_ctx_enable(ctx, 0);
+ 		raw_spin_unlock(&ctx->lock);
+ 	}
+ }
+@@ -3887,12 +3894,12 @@ static void pmu_groups_sched_in(struct
+perf_event_context *ctx,
+
+ static void ctx_groups_sched_in(struct perf_event_context *ctx,
+ 				struct perf_event_groups *groups,
+-				bool cgroup)
++				enum event_type_t event_type)
+ {
+ 	struct perf_event_pmu_context *pmu_ctx;
+
+ 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
+-		if (cgroup && !pmu_ctx->nr_cgroups)
++		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
+ 			continue;
+ 		pmu_groups_sched_in(ctx, groups, pmu_ctx->pmu);
+ 	}
+@@ -3909,9 +3916,6 @@ ctx_sched_in(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ {
+ 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
+ 	int is_active = ctx->is_active;
+-	bool cgroup = event_type & EVENT_CGROUP;
+-
+-	event_type &= ~EVENT_CGROUP;
+
+ 	lockdep_assert_held(&ctx->lock);
+
+@@ -3929,7 +3933,7 @@ ctx_sched_in(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ 		barrier();
+ 	}
+
+-	ctx->is_active |= (event_type | EVENT_TIME);
++	ctx->is_active |= ((event_type & ~EVENT_FLAGS) | EVENT_TIME);
+ 	if (ctx->task) {
+ 		if (!is_active)
+ 			cpuctx->task_ctx = ctx;
+@@ -3944,11 +3948,11 @@ ctx_sched_in(struct perf_event_context *ctx,
+enum event_type_t event_type)
+ 	 * in order to give them the best chance of going on.
+ 	 */
+ 	if (is_active & EVENT_PINNED)
+-		ctx_groups_sched_in(ctx, &ctx->pinned_groups, cgroup);
++		ctx_groups_sched_in(ctx, &ctx->pinned_groups, event_type);
+
+ 	/* Then walk through the lower prio flexible groups */
+ 	if (is_active & EVENT_FLEXIBLE)
+-		ctx_groups_sched_in(ctx, &ctx->flexible_groups, cgroup);
++		ctx_groups_sched_in(ctx, &ctx->flexible_groups, event_type);
+ }
+
+ static void perf_event_context_sched_in(struct task_struct *task)
+@@ -3963,11 +3967,11 @@ static void perf_event_context_sched_in(struct
+task_struct *task)
+
+ 	if (cpuctx->task_ctx == ctx) {
+ 		perf_ctx_lock(cpuctx, ctx);
+-		perf_ctx_disable(ctx, false);
++		perf_ctx_disable(ctx, 0);
+
+ 		perf_ctx_sched_task_cb(ctx, true);
+
+-		perf_ctx_enable(ctx, false);
++		perf_ctx_enable(ctx, 0);
+ 		perf_ctx_unlock(cpuctx, ctx);
+ 		goto rcu_unlock;
+ 	}
+@@ -3980,7 +3984,7 @@ static void perf_event_context_sched_in(struct
+task_struct *task)
+ 	if (!ctx->nr_events)
+ 		goto unlock;
+
+-	perf_ctx_disable(ctx, false);
++	perf_ctx_disable(ctx, 0);
+ 	/*
+ 	 * We want to keep the following priority order:
+ 	 * cpu pinned (that don't need to move), task pinned,
+@@ -3990,7 +3994,7 @@ static void perf_event_context_sched_in(struct
+task_struct *task)
+ 	 * events, no need to flip the cpuctx's events around.
+ 	 */
+ 	if (!RB_EMPTY_ROOT(&ctx->pinned_groups.tree)) {
+-		perf_ctx_disable(&cpuctx->ctx, false);
++		perf_ctx_disable(&cpuctx->ctx, 0);
+ 		ctx_sched_out(&cpuctx->ctx, EVENT_FLEXIBLE);
+ 	}
+
+@@ -3999,9 +4003,9 @@ static void perf_event_context_sched_in(struct
+task_struct *task)
+ 	perf_ctx_sched_task_cb(cpuctx->task_ctx, true);
+
+ 	if (!RB_EMPTY_ROOT(&ctx->pinned_groups.tree))
+-		perf_ctx_enable(&cpuctx->ctx, false);
++		perf_ctx_enable(&cpuctx->ctx, 0);
+
+-	perf_ctx_enable(ctx, false);
++	perf_ctx_enable(ctx, 0);
+
+ unlock:
+ 	perf_ctx_unlock(cpuctx, ctx);
+
+
+Here are the second patch to introduce EVENT_GUEST and
+perf_guest_exit/enter().
+
+
+From c052e673dc3e0e7ebacdce23f2b0d50ec98401b3 Mon Sep 17 00:00:00 2001
+From: Kan Liang <kan.liang@linux.intel.com>
+Date: Tue, 11 Jun 2024 06:04:20 -0700
+Subject: [PATCH 2/2] perf: Add generic exclude_guest support
+
+Current perf doesn't explicitly schedule out all exclude_guest events
+while the guest is running. There is no problem with the current
+emulated vPMU. Because perf owns all the PMU counters. It can mask the
+counter which is assigned to an exclude_guest event when a guest is
+running (Intel way), or set the corresponding HOSTONLY bit in evsentsel
+(AMD way). The counter doesn't count when a guest is running.
+
+However, either way doesn't work with the introduced passthrough vPMU.
+A guest owns all the PMU counters when it's running. The host should not
+mask any counters. The counter may be used by the guest. The evsentsel
+may be overwritten.
+
+Perf should explicitly schedule out all exclude_guest events to release
+the PMU resources when entering a guest, and resume the counting when
+exiting the guest.
+
+Expose two interfaces to KVM. The KVM should notify the perf when
+entering/exiting a guest.
+
+Introduce a new event type EVENT_CGUEST to indicate that perf should
+check and skip the PMUs which doesn't support the passthrough mode.
+
+It's possible that an exclude_guest event is created when a guest is
+running. The new event should not be scheduled in as well.
+
+The ctx->time is used to calculated the running/enabling time of an
+event, which is shared among PMUs. The ctx_sched_in/out() with
+EVENT_CGUEST doesn't stop the ctx->time. A timeguest is introduced to
+track the start time of a guest. For an exclude_guest event, the time in
+the guest mode is deducted.
+
+Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+---
+ include/linux/perf_event.h |   5 ++
+ kernel/events/core.c       | 119 +++++++++++++++++++++++++++++++++++--
+ 2 files changed, 120 insertions(+), 4 deletions(-)
+
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index dd4920bf3d1b..68c8b93c4e5c 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -945,6 +945,7 @@ struct perf_event_context {
+ 	u64				time;
+ 	u64				timestamp;
+ 	u64				timeoffset;
++	u64				timeguest;
+
+ 	/*
+ 	 * These fields let us detect when two contexts have both
+@@ -1734,6 +1735,8 @@ extern int perf_event_period(struct perf_event
+*event, u64 value);
+ extern u64 perf_event_pause(struct perf_event *event, bool reset);
+ extern int perf_get_mediated_pmu(void);
+ extern void perf_put_mediated_pmu(void);
++void perf_guest_enter(void);
++void perf_guest_exit(void);
+ #else /* !CONFIG_PERF_EVENTS: */
+ static inline void *
+ perf_aux_output_begin(struct perf_output_handle *handle,
+@@ -1826,6 +1829,8 @@ static inline int perf_get_mediated_pmu(void)
+ }
+
+ static inline void perf_put_mediated_pmu(void)			{ }
++static inline void perf_guest_enter(void)			{ }
++static inline void perf_guest_exit(void)			{ }
+ #endif
+
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 95d1d5a5addc..cd3a89672b14 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -376,7 +376,8 @@ enum event_type_t {
+ 	/* see ctx_resched() for details */
+ 	EVENT_CPU = 0x8,
+ 	EVENT_CGROUP = 0x10,
+-	EVENT_FLAGS = EVENT_CGROUP,
++	EVENT_GUEST = 0x20,
++	EVENT_FLAGS = EVENT_CGROUP | EVENT_GUEST,
+ 	EVENT_ALL = EVENT_FLEXIBLE | EVENT_PINNED,
+ };
+
+@@ -407,6 +408,7 @@ static atomic_t nr_include_guest_events __read_mostly;
+
+ static atomic_t nr_mediated_pmu_vms;
+ static DEFINE_MUTEX(perf_mediated_pmu_mutex);
++static DEFINE_PER_CPU(bool, perf_in_guest);
+
+ /* !exclude_guest event of PMU with PERF_PMU_CAP_PASSTHROUGH_VPMU */
+ static inline bool is_include_guest_event(struct perf_event *event)
+@@ -651,10 +653,26 @@ __perf_update_times(struct perf_event *event, u64
+now, u64 *enabled, u64 *runnin
+
+ static void perf_event_update_time(struct perf_event *event)
+ {
+-	u64 now = perf_event_time(event);
++	u64 now;
++
++	/* Never count the time of an active guest into an exclude_guest event. */
++	if (event->ctx->timeguest &&
++	    event->pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU) {
++		/*
++		 * If a guest is running, use the timestamp while entering the guest.
++		 * If the guest is leaving, reset the event timestamp.
++		 */
++		if (__this_cpu_read(perf_in_guest))
++			event->tstamp = event->ctx->timeguest;
++		else
++			event->tstamp = event->ctx->time;
++		return;
++	}
+
++	now = perf_event_time(event);
+ 	__perf_update_times(event, now, &event->total_time_enabled,
+ 					&event->total_time_running);
++
+ 	event->tstamp = now;
+ }
+
+@@ -706,6 +724,10 @@ static bool perf_skip_pmu_ctx(struct
+perf_event_pmu_context *pmu_ctx,
+ 	if ((event_type & EVENT_CGROUP) && !pmu_ctx->nr_cgroups)
+ 		return true;
+
++	if ((event_type & EVENT_GUEST) &&
++	    !(pmu_ctx->pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU))
++		return true;
++
+ 	return false;
+ }
+
+@@ -3350,7 +3372,14 @@ ctx_sched_out(struct perf_event_context *ctx,
+enum event_type_t event_type)
+ 			cpuctx->task_ctx = NULL;
+ 	}
+
+-	is_active ^= ctx->is_active; /* changed bits */
++	if (event_type & EVENT_GUEST) {
++		/*
++		 * Schedule out all !exclude_guest events of PMU
++		 * with PERF_PMU_CAP_PASSTHROUGH_VPMU.
++		 */
++		is_active = EVENT_ALL;
++	} else
++		is_active ^= ctx->is_active; /* changed bits */
+
+ 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
+ 		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
+@@ -3860,6 +3889,15 @@ static int merge_sched_in(struct perf_event
+*event, void *data)
+ 	if (!event_filter_match(event))
+ 		return 0;
+
++	/*
++	 * Don't schedule in any exclude_guest events of PMU with
++	 * PERF_PMU_CAP_PASSTHROUGH_VPMU, while a guest is running.
++	 */
++	if (__this_cpu_read(perf_in_guest) &&
++	    event->pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU &&
++	    event->attr.exclude_guest)
++		return 0;
++
+ 	if (group_can_go_on(event, *can_add_hw)) {
+ 		if (!group_sched_in(event, ctx))
+ 			list_add_tail(&event->active_list, get_event_list(event));
+@@ -3941,7 +3979,20 @@ ctx_sched_in(struct perf_event_context *ctx, enum
+event_type_t event_type)
+ 			WARN_ON_ONCE(cpuctx->task_ctx != ctx);
+ 	}
+
+-	is_active ^= ctx->is_active; /* changed bits */
++	if (event_type & EVENT_GUEST) {
++		/*
++		 * Schedule in all !exclude_guest events of PMU
++		 * with PERF_PMU_CAP_PASSTHROUGH_VPMU.
++		 */
++		is_active = EVENT_ALL;
++
++		/*
++		 * Update ctx time to set the new start time for
++		 * the exclude_guest events.
++		 */
++		update_context_time(ctx);
++	} else
++		is_active ^= ctx->is_active; /* changed bits */
+
+ 	/*
+ 	 * First go through the list and put on any pinned groups
+@@ -5788,6 +5839,66 @@ void perf_put_mediated_pmu(void)
+ }
+ EXPORT_SYMBOL_GPL(perf_put_mediated_pmu);
+
++/* When entering a guest, schedule out all exclude_guest events. */
++void perf_guest_enter(void)
++{
++	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
++
++	lockdep_assert_irqs_disabled();
++
++	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
++
++	if (WARN_ON_ONCE(__this_cpu_read(perf_in_guest))) {
++		perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
++		return;
++	}
++
++	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
++	ctx_sched_out(&cpuctx->ctx, EVENT_GUEST);
++	/* Set the guest start time */
++	cpuctx->ctx.timeguest = cpuctx->ctx.time;
++	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
++	if (cpuctx->task_ctx) {
++		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
++		task_ctx_sched_out(cpuctx->task_ctx, EVENT_GUEST);
++		cpuctx->task_ctx->timeguest = cpuctx->task_ctx->time;
++		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
++	}
++
++	__this_cpu_write(perf_in_guest, true);
++
++	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
++}
++
++void perf_guest_exit(void)
++{
++	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
++
++	lockdep_assert_irqs_disabled();
++
++	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
++
++	if (WARN_ON_ONCE(!__this_cpu_read(perf_in_guest))) {
++		perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
++		return;
++	}
++
++	__this_cpu_write(perf_in_guest, false);
++
++	perf_ctx_disable(&cpuctx->ctx, EVENT_GUEST);
++	ctx_sched_in(&cpuctx->ctx, EVENT_GUEST);
++	cpuctx->ctx.timeguest = 0;
++	perf_ctx_enable(&cpuctx->ctx, EVENT_GUEST);
++	if (cpuctx->task_ctx) {
++		perf_ctx_disable(cpuctx->task_ctx, EVENT_GUEST);
++		ctx_sched_in(cpuctx->task_ctx, EVENT_GUEST);
++		cpuctx->task_ctx->timeguest = 0;
++		perf_ctx_enable(cpuctx->task_ctx, EVENT_GUEST);
++	}
++
++	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
++}
++
+ /*
+  * Holding the top-level event's child_mutex means that any
+  * descendant process that has inherited this event will block
+
+
+Thanks,
+Kan
 
 
