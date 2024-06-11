@@ -1,201 +1,235 @@
-Return-Path: <kvm+bounces-19293-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19294-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FBD9902F33
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 05:49:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F98A90313F
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 07:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F179D1F2274E
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 03:49:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9BED1F2B138
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 05:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA5A16F918;
-	Tue, 11 Jun 2024 03:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F730172BD5;
+	Tue, 11 Jun 2024 05:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JdBwBiGt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b3NbzL7z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f65.google.com (mail-lf1-f65.google.com [209.85.167.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 424CA64B;
-	Tue, 11 Jun 2024 03:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF98A171083
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 05:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718077738; cv=none; b=dczE15tUbeTZ1RcRPviJ0HkhjR+gu/elTUnBkroHUgVEFuIxv307qnZX3bSoMwI29zC9fRpBKQr3aH5QzTOmeewsnDoLw0p2TRKiR2alTIu9pRHrwvFWFSplzNam2YrmE6wwxLKSmqxI3MC3UT70t3eCEXoHptD/oIsPTcJE7UE=
+	t=1718083976; cv=none; b=e7KdndVRVqOLZ1GdYKfsPw6Jx0mPYtFEvRU3PAQMK4D2OUnY3r0KQAJ0qesPV1W02yDifyDciC/7gxIW/LUGeniD/MAUY0Nw4U6hexdvz1dE0Z9sT/99m+DjqkhhTOf0kOKJnMQBJ86lMQr5fDTU6e8wNBFBU7MyEJtu2ReN9Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718077738; c=relaxed/simple;
-	bh=4bRj6TsecIphPgJOPJ9cAYvpa6UNiuELaeuFMUXXMoQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jSwDEWn0EyZfydnf6kdUO7gID8zFH5nSItjdSE9GquMuPIbiKKIRs3o1wK104bMjVg2bBWfU9KC6pg0Pc5ti/7S1KNdN7gUNexG82PrM7zj7iLC7ugsjwIl92X44yXFSowRLBbPnOl7V+l7Cn7q1EHav9ncDys8Bs1meDTqtolk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JdBwBiGt; arc=none smtp.client-ip=209.85.167.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f65.google.com with SMTP id 2adb3069b0e04-52c815e8e9eso2589883e87.0;
-        Mon, 10 Jun 2024 20:48:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718077734; x=1718682534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EeURxhgiQoYCCJH8wV3+dknCqUQ9gQWVawbH/GCc3eE=;
-        b=JdBwBiGtRtkA1ReUFTxq5UANcD3qlFSBb3mAZhA49MKb0zoRV3UWa5N3ixL4km6MPG
-         H0/xIzUVki96jnn3HrDCqJ6jbXjmhpX5l/VNe3zOuKW1Wgjxl9UnIHvuj8Kt0GYn8VqW
-         oncTMzDF5dDagSj5BNIXip/p/wgPf3JSBm0OqXfTavDcWOl9YCtLdEaFVrkAaiteLIml
-         Oyb145I6SQSuJpozEBXPkb1iluSja3dS2H/IudtFXRawwuJFsTpa13S+Utp+u6EYjh7u
-         gMOWVJlsfv2yVW/+juOoa9QECS7y7tRvLLrftzDp9awpwtydmY8Pyruaq2VmXia2ee/6
-         alGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718077734; x=1718682534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EeURxhgiQoYCCJH8wV3+dknCqUQ9gQWVawbH/GCc3eE=;
-        b=TfCSPRtRG0dfs+pCKYPnrrles5XhCbNGH4VVhrJdPngOwp8ag8wIducVYeEbmT9S7D
-         AtvepUL60qTKJKe51etYyghDO5js165xztutm+za5ZuuSKV32kCLHbQuSMEROUBBLBqv
-         Cta55kfMuuoKyZhwLglmCYWAYhUSucOG0ltD23YzQ4xQuebBsGca+gUTZlHAqWMmlT19
-         wZexpDIrtnJGIcoAbeqveRM+eItwLdG8sM8FSeF/JvFEDRZleExct5+sIDgHlfhOwmtG
-         kur9OxYy8SIVs13nDC0e+nDqkdFFO1xu1QBFwBbtBwWP28ntaV1SiR8lqcjQc79OIAj9
-         4rmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/GHYw3YoXwvm2IV+PspFsQoQ+gb0asZoDaMhx1tXMj8STd8lVkwCN9MKNHAZ/zW+tr/BECpADM1qR7Hv0RT3XWwGdeq2xjwUDxLCNlE9sOreUEtIQtAYrFuEVLxdS/OHi
-X-Gm-Message-State: AOJu0Yyr3LQQzPPNRXRZv1EaP3pgggodubAkqj6tBR7Kebbflc2JqCUl
-	NOtfqY2QHf0wkj34LrBYV2PjN+myErqEaIidQrVWO258NJ3gv2k6i79PCzYhXVOlEj2w2LYzU9E
-	/gGNRxhCRGD7F6AnZivDxumTLDa4=
-X-Google-Smtp-Source: AGHT+IF04T7zbC8N5zlMa29YiDaf22w1ifIGqkmzcoGxgZVg+8srWa3Y+uUWvLtgQp51gpO9FasZVRcj8tvXWXNcCuI=
-X-Received: by 2002:ac2:5142:0:b0:529:b734:ebc9 with SMTP id
- 2adb3069b0e04-52bb9f8ef21mr6461781e87.38.1718077733920; Mon, 10 Jun 2024
- 20:48:53 -0700 (PDT)
+	s=arc-20240116; t=1718083976; c=relaxed/simple;
+	bh=RxfXH2ZFb7Id4zlG5fVIVyfD9EzHBt+idquBieWGYcw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=MY8z1Lsce0iXlalGPc9IVup+AsQo11ql/SmKV0pMtTDycF7flWyxkjDfK9DUnQJytR85IyM8MD2TMTcMEGA+ghGCjt/iLI1lh1LPcgTN1+sHO9soqlhlijusluEP8WC34Nl6Z8j4G+oPK3PHsBm6OChE0o7FnDXODwuYAINZVBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b3NbzL7z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718083973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=rjMLPcN4lf4hILs75qKFb2X8tj4fMICRG7d9Mi8k40Q=;
+	b=b3NbzL7zyEWC28fAQjEA1wnAZKX+AwcCcWSaBOrpUrTXOU+NQcJ9gpYLHqLvVQcgWGy4kC
+	OqK6y44uZh/h7PzmRiX8wAaCrbcwVqhs4hbd4bkQHWFoXIFrAzfuwn+8yjkBFuiH5Ck3MS
+	UFVml2I059cfcibEoT9JodiQr6p91vA=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-111-_V8BYhHVPAey9ah6ri3acA-1; Tue,
+ 11 Jun 2024 01:32:50 -0400
+X-MC-Unique: _V8BYhHVPAey9ah6ri3acA-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 199A719560BD;
+	Tue, 11 Jun 2024 05:32:49 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.77])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7CAC11956048;
+	Tue, 11 Jun 2024 05:32:42 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	dtatulea@nvidia.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Date: Tue, 11 Jun 2024 13:32:32 +0800
+Message-ID: <20240611053239.516996-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231121115457.76269-1-cloudliang@tencent.com> <gsntzfrs9xqp.fsf@coltonlewis-kvm.c.googlers.com>
-In-Reply-To: <gsntzfrs9xqp.fsf@coltonlewis-kvm.c.googlers.com>
-From: Jinrong Liang <ljr.kernel@gmail.com>
-Date: Tue, 11 Jun 2024 11:48:43 +0800
-Message-ID: <CAFg_LQWoBrg_ANF4SA-rOuZLtNxLijWNRKcvVR_FZp6yy6kRXQ@mail.gmail.com>
-Subject: Re: [PATCH 0/9] Test the consistency of AMD PMU counters and their features
-To: Colton Lewis <coltonlewis@google.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, likexu@tencent.com, 
-	jmattson@google.com, aaronlewis@google.com, wanpengli@tencent.com, 
-	cloudliang@tencent.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Colton Lewis <coltonlewis@google.com> =E4=BA=8E2024=E5=B9=B46=E6=9C=8811=E6=
-=97=A5=E5=91=A8=E4=BA=8C 07:36=E5=86=99=E9=81=93=EF=BC=9A
->
-> Hi Jinrong,
->
-> Sorry if this is repeating myself, but I only replied to you before
-> when I should have included the list.
->
-> Sean may have something useful to add as well.
->
-> Jinrong Liang <ljr.kernel@gmail.com> writes:
->
-> > Hi,
->
-> > This series is an addition to below patch set:
-> > KVM: x86/pmu: selftests: Fixes and new tests
-> > https://lore.kernel.org/all/20231110021306.1269082-1-seanjc@google.com/
->
-> Since this is a few months old and v10 of Sean's patch has been applied
-> here [1], have you done any further work on this series? No pressure if
-> not, but Mingwei and I are interested in covering AMD for some PMU
-> testing we are working on and we want to make sure we know the latest
-> work.
+Add new UAPI to support the mac address from vdpa tool
+Function vdpa_nl_cmd_dev_config_set_doit() will get the
+MAC address from the vdpa tool and then set it to the device.
 
-Hi Colton,
+The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
 
-There are no further updates to this series. I appreciate your
-interest in covering AMD for PMU testing purposes.
+Here is sample:
+root@L1# vdpa -jp dev config show vdpa0
+{
+    "config": {
+        "vdpa0": {
+            "mac": "82:4d:e9:5d:d7:e6",
+            "link ": "up",
+            "link_announce ": false,
+            "mtu": 1500
+        }
+    }
+}
 
-Please feel free to modify this patch series to suit your requirements
-and make any necessary adjustments. If you have any questions or need
-assistance, please don't hesitate to contact me.
+root@L1# vdpa dev set name vdpa0 mac 00:11:22:33:44:55
 
-Thanks
+root@L1# vdpa -jp dev config show vdpa0
+{
+    "config": {
+        "vdpa0": {
+            "mac": "00:11:22:33:44:55",
+            "link ": "up",
+            "link_announce ": false,
+            "mtu": 1500
+        }
+    }
+}
 
->
-> > Add selftests for AMD PMU counters, including tests for basic
-> > functionality
-> > of AMD PMU counters, numbers of counters, AMD PMU versions, PerfCtrExtC=
-ore
-> > and AMD PerfMonV2 features. Also adds PMI tests for Intel gp and fixed
-> > counters.
->
-> > All patches have been tested on both Intel and AMD machines, with one
-> > exception
-> > AMD Guest PerfMonV2 has not been tested on my AMD machine, as does not
-> > support
-> > PerfMonV2.
->
-> > If Sean fixed the issue of not enabling forced emulation to generate #U=
-D
-> > when
-> > applying the "KVM: x86/pmu: selftests: Fixes and new tests" patch set,
-> > then the
-> > patch "KVM: selftests: Add forced emulation check to fix #UD" can be
-> > dropped.
->
-> > Any feedback or suggestions are greatly appreciated.
->
-> I'll happily review once my question above is answered.
->
-> > Sincerely,
->
-> > Jinrong
->
-> > Jinrong Liang (9):
-> >    KVM: selftests: Add forced emulation check to fix #UD
-> >    KVM: selftests: Test gp counters overflow interrupt handling
-> >    KVM: selftests: Test fixed counters overflow interrupt handling
-> >    KVM: selftests: Add x86 feature and properties for AMD PMU in
-> >      processor.h
-> >    KVM: selftests: Test AMD PMU performance counters basic functions
-> >    KVM: selftests: Test consistency of AMD PMU counters num
-> >    KVM: selftests: Test consistency of PMU MSRs with AMD PMU version
-> >    KVM: selftests: Test AMD Guest PerfCtrExtCore
-> >    KVM: selftests: Test AMD Guest PerfMonV2
->
-> >   .../selftests/kvm/include/x86_64/processor.h  |   3 +
-> >   .../selftests/kvm/x86_64/pmu_counters_test.c  | 446 ++++++++++++++++-=
--
-> >   2 files changed, 400 insertions(+), 49 deletions(-)
->
->
-> > base-commit: c076acf10c78c0d7e1aa50670e9cc4c91e8d59b4
-> > prerequisite-patch-id: e33e3cd1ff495ffdccfeca5c8247dc8af9996b08
-> > prerequisite-patch-id: a46a885c36e440f09701b553d5b27cb53f6b660f
-> > prerequisite-patch-id: a9ac79bbf777b3824f0c61c45a68f1308574ab79
-> > prerequisite-patch-id: cd7b82618866160b5ac77199b681148dfb96e341
-> > prerequisite-patch-id: df5d1c23dd98d83ba3606e84eb5f0a4cd834f52c
-> > prerequisite-patch-id: e374d7ce66c66650f23c066690ab816f81e6c3e3
-> > prerequisite-patch-id: 11f133be9680787fe69173777ef1ae448b23168c
-> > prerequisite-patch-id: eea75162480ca828fb70395d5c224003ea5ae246
-> > prerequisite-patch-id: 6b7b22b6b56dd28bd80404e1a295abef60ecfa9a
-> > prerequisite-patch-id: 2a078271ce109bb526ded7d6eec12b4adbe26cff
-> > prerequisite-patch-id: e51c5c2f34fc9fe587ce0eea6f11dc84af89a946
-> > prerequisite-patch-id: 8c1c276fc6571a99301d18aa00ad8280d5a29faf
-> > prerequisite-patch-id: 37d2f2895e22bae420401e8620410cd628e4fb39
-> > prerequisite-patch-id: 1abba01ee49d71c38386afa9abf1794130e32a2c
-> > prerequisite-patch-id: a7486fd15be405a864527090d473609d44a99c3b
-> > prerequisite-patch-id: 41993b2eef8d1e2286ec04b3c1aa1a757792bafe
-> > prerequisite-patch-id: 9442b1b4c370b1a68c32eaa6ce3ee4c5d549efd0
-> > prerequisite-patch-id: 89b2e89917a89713d6a63cbd594f6979f4d06578
-> > prerequisite-patch-id: 1e9fe564790f41cfd52ebafc412434608187d8db
-> > prerequisite-patch-id: 7d0b2b4af888fe09eae85ebfe56b4daed71aa08c
-> > prerequisite-patch-id: 4e6910c90ae769b7556f6aec40f5d600285fe4d0
-> > prerequisite-patch-id: 5248bc19b00c94188b803a4f41fa19172701d7b0
-> > prerequisite-patch-id: f9310c716dbdcbe9e3672e29d9e576064845d917
-> > prerequisite-patch-id: 21b2c6b4878d2ce5a315627efa247240335ede1e
-> > prerequisite-patch-id: e01570f8ff40aacba38f86454572803bd68a1d59
-> > prerequisite-patch-id: 65eea4f11ce5e8f9836651c593b7e563b0404459
->
-> [1]
-> https://lore.kernel.org/kvm/170666267480.3861961.1911322891711579495.b4-t=
-y@google.com/
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ drivers/vdpa/vdpa.c       | 71 +++++++++++++++++++++++++++++++++++++++
+ include/linux/vdpa.h      |  2 ++
+ include/uapi/linux/vdpa.h |  1 +
+ 3 files changed, 74 insertions(+)
+
+diff --git a/drivers/vdpa/vdpa.c b/drivers/vdpa/vdpa.c
+index a7612e0783b3..347ae6e7749d 100644
+--- a/drivers/vdpa/vdpa.c
++++ b/drivers/vdpa/vdpa.c
+@@ -1149,6 +1149,72 @@ static int vdpa_nl_cmd_dev_config_get_doit(struct sk_buff *skb, struct genl_info
+ 	return err;
+ }
+ 
++static int vdpa_nl_cmd_dev_config_set_doit(struct sk_buff *skb,
++					   struct genl_info *info)
++{
++	struct vdpa_dev_set_config set_config = {};
++	struct nlattr **nl_attrs = info->attrs;
++	struct vdpa_mgmt_dev *mdev;
++	const u8 *macaddr;
++	const char *name;
++	int err = 0;
++	struct device *dev;
++	struct vdpa_device *vdev;
++
++	if (!info->attrs[VDPA_ATTR_DEV_NAME])
++		return -EINVAL;
++
++	name = nla_data(info->attrs[VDPA_ATTR_DEV_NAME]);
++
++	down_write(&vdpa_dev_lock);
++	dev = bus_find_device(&vdpa_bus, NULL, name, vdpa_name_match);
++	if (!dev) {
++		NL_SET_ERR_MSG_MOD(info->extack, "device not found");
++		err = -ENODEV;
++		goto dev_err;
++	}
++	vdev = container_of(dev, struct vdpa_device, dev);
++	if (!vdev->mdev) {
++		NL_SET_ERR_MSG_MOD(
++			info->extack,
++			"Fail to find the specified management device");
++		err = -EINVAL;
++		goto mdev_err;
++	}
++	mdev = vdev->mdev;
++	if (nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]) {
++		if (!(mdev->supported_features & BIT_ULL(VIRTIO_NET_F_MAC))) {
++			NL_SET_ERR_MSG_FMT_MOD(
++				info->extack,
++				"Missing features 0x%llx for provided attributes",
++				BIT_ULL(VIRTIO_NET_F_MAC));
++			err = -EINVAL;
++			goto mdev_err;
++		}
++		macaddr = nla_data(nl_attrs[VDPA_ATTR_DEV_NET_CFG_MACADDR]);
++		memcpy(set_config.net.mac, macaddr, ETH_ALEN);
++		set_config.mask |= BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR);
++		if (mdev->ops->set_mac) {
++			err = mdev->ops->set_mac(mdev, vdev, &set_config);
++		} else {
++			NL_SET_ERR_MSG_FMT_MOD(
++				info->extack,
++				"%s device not support set mac address ", name);
++		}
++
++	} else {
++		NL_SET_ERR_MSG_FMT_MOD(info->extack,
++				       "%s device not support this config ",
++				       name);
++	}
++
++mdev_err:
++	put_device(dev);
++dev_err:
++	up_write(&vdpa_dev_lock);
++	return err;
++}
++
+ static int vdpa_dev_config_dump(struct device *dev, void *data)
+ {
+ 	struct vdpa_device *vdev = container_of(dev, struct vdpa_device, dev);
+@@ -1285,6 +1351,11 @@ static const struct genl_ops vdpa_nl_ops[] = {
+ 		.doit = vdpa_nl_cmd_dev_stats_get_doit,
+ 		.flags = GENL_ADMIN_PERM,
+ 	},
++	{
++		.cmd = VDPA_CMD_DEV_CONFIG_SET,
++		.doit = vdpa_nl_cmd_dev_config_set_doit,
++		.flags = GENL_ADMIN_PERM,
++	},
+ };
+ 
+ static struct genl_family vdpa_nl_family __ro_after_init = {
+diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
+index db15ac07f8a6..c97f4f1da753 100644
+--- a/include/linux/vdpa.h
++++ b/include/linux/vdpa.h
+@@ -581,6 +581,8 @@ struct vdpa_mgmtdev_ops {
+ 	int (*dev_add)(struct vdpa_mgmt_dev *mdev, const char *name,
+ 		       const struct vdpa_dev_set_config *config);
+ 	void (*dev_del)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev);
++	int (*set_mac)(struct vdpa_mgmt_dev *mdev, struct vdpa_device *dev,
++		       const struct vdpa_dev_set_config *config);
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/vdpa.h b/include/uapi/linux/vdpa.h
+index 54b649ab0f22..53f249fb26bc 100644
+--- a/include/uapi/linux/vdpa.h
++++ b/include/uapi/linux/vdpa.h
+@@ -19,6 +19,7 @@ enum vdpa_command {
+ 	VDPA_CMD_DEV_GET,		/* can dump */
+ 	VDPA_CMD_DEV_CONFIG_GET,	/* can dump */
+ 	VDPA_CMD_DEV_VSTATS_GET,
++	VDPA_CMD_DEV_CONFIG_SET,
+ };
+ 
+ enum vdpa_attr {
+-- 
+2.45.0
+
 
