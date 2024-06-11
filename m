@@ -1,115 +1,156 @@
-Return-Path: <kvm+bounces-19342-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19343-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEF79904172
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 18:35:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62E489041AE
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 18:52:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5957F286247
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 16:35:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D461E289F66
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 16:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8A83BB48;
-	Tue, 11 Jun 2024 16:35:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C09E50A62;
+	Tue, 11 Jun 2024 16:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HPav3AZk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YNu+MZQc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3621138FA0
-	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 16:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7248F41A84
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 16:50:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718123737; cv=none; b=dXoOgF9VqEMTRzXZUWyI9DQ527awjOARPevihVXqzWCTsnYLZj76nrSIHvxtvOSv+ZYncJTPBYSqRwr34Qv4zb+yym+ORhaXC+Ql/OtwIUBESmTTx7AcgutJnee3GvYoROkHfiKt6KIuEK1OrS1IlQgEkGarWoimmTFOoIK5gVY=
+	t=1718124641; cv=none; b=lzqai19Cekgv6UJKxl+YyELvWInMdj9qXB5A3VSoRkvgsRt/8OXs0cUHJmtkjYD7lf4YhhOj2NTBmLK86/MiNDz1hBdWOgC+BGMfL5jlLep6taJWBsCULiwzv2fcTzJEEAwz0mRM5ZwVJJXRX4NnLkOAZ4woDYbu3ZSdYkxq/kU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718123737; c=relaxed/simple;
-	bh=3HM6i6zrhqS92eFX0rcBTaE34IL7ONn3eX6LnpwKS8Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gyowaCk98/laS+QKZt3XC3XjBFnwRJTL/vFD1O07Q5ISP1oBuwiE/Fs53b9GQxO2GpicxvkpZi685WY+vC6O+5kZi8/6x8ArV3Fg9jR8FgfKt4kNzAxnVNsSAlP+rLZOFCCl80Zx6594u6fdsKBMLoX9vez+3wpPNlFm3+aBa6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HPav3AZk; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1718124641; c=relaxed/simple;
+	bh=ud1eQBnt2jG1UKvvjxzK8+sntVYqlePqwphUbWfbcqQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GjvBOcA0mCc9m2ZBwnhRZWRQrzoEbnM10W01qvDsGOgwJNVwgNhws+3vnVnVjoNTTHX3Eb+KNV49ciSpkXlT2N89iNgarwuOwpmztTzi5V0ZHal+zCS7/ar/UcwmHU3vspWw4Cj0vAOQpiBTEPoGPP4Iif0M28/LXCL1diMVUB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YNu+MZQc; arc=none smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1f656692564so10886425ad.2
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 09:35:36 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4405dffca81so224321cf.1
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 09:50:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718123735; x=1718728535; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sy8cYUcbFFJWNmfBV4hjqU10SqwSRoXFxmzf2bgnVG8=;
-        b=HPav3AZkAkfqsescJX/g6FEn6DO6q/l8p4OOm9U0LrmGve7dAxbbtol2Do+VZPg3KY
-         FzI/kuY52lbpUQ8U/xIPwrexWNibNIHtLC0hBL2qtKJyxGaxWNeW8z0gkMNuGhCw/n3w
-         CEfh29CCxif7FFj2eXwhj4HUWr4m2x4EwOG7XrmMwlMAwV7bkwKeaw/VAqbGZLDI69+u
-         ijnGslh70VDUptr5AKMHVLfcwKsgYJz5QRXzZvjCVccB/sgcHlqS49Sfvz/sKCHhjSd1
-         HpsoqytjcVtOtr02zXAqsWwQOxyq41wD1ox1Z3zBEXyQzCn0LoPgjfhzj4k7YdlZaoDg
-         8RWw==
+        d=google.com; s=20230601; t=1718124637; x=1718729437; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ud1eQBnt2jG1UKvvjxzK8+sntVYqlePqwphUbWfbcqQ=;
+        b=YNu+MZQcgIrm0zCG3Jv14XK1IEdrEhrZAZ0xQyOSVwkVruaIvgvxITwe1gzMr+h3bq
+         tAIkglRY9ZZSywqkFFzpyWYAOd+6JiY4bFTKwIq4MDjscU7mn9ldDtva2JYzK6f3G0s6
+         dbCKw29LXoB0f1WiHSXwOPE0pY+7fzC2jiUfg782JRh12i+azV8VwlyFIWDLivBcYwb3
+         XT3YueKhACKth9Lz6eCmUpw282X99EaVRmhDOi3ROQDx8F9EloquYpeM9Yc0bVOBJeRG
+         WZTrKOEAq/f0xsQI3aHud0FP5nhz2i02aGuoI62i0HK1K/ii1jMkDCmdInIIJhqlg0Ws
+         AncA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718123735; x=1718728535;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sy8cYUcbFFJWNmfBV4hjqU10SqwSRoXFxmzf2bgnVG8=;
-        b=tYeN904A0cHX9o7i05S4BHpZcGTs8PT8OhFzq5eLDIw/q5Z5v6XbruI4Ybr1qUbMAb
-         I5lc6+qAXrkCM03aMsm0gCy6GASh2yy85Ot9VZJqJdqP3QPEPJtRb5XeI5nhj5QkxO4R
-         Vsxc+ZGODL+IoqgZFFgGzQRqHowRIalSjBtQTYr9Vz0CkMy/ab+FGMavtB2R97PM862D
-         YPgiNZNXFYuWDn21uJCbB2Ma2ECLjQmd+QaMpjFYZTGzLnU1GwdeJdTRaP+//86XB26d
-         z9l7Ns6nkeL6MOAcg1jy6j6+1T+LscLuP9bZDtZV5Swxkn9aeh4NNUev12QhjL7yt56N
-         up4g==
-X-Forwarded-Encrypted: i=1; AJvYcCV39VYqulyhLt/NckPAyCCLOUxgz00Ngv9tIxWP1XgLl7Sqsv96wjVyuaj494HJWwDGdaT9kIo7swaVkcTbvzSbvYYW
-X-Gm-Message-State: AOJu0Yzsd82yTTLWURXgPzwr53os7dQ4AfUuEI3aPT68zcj/qZgNHvTu
-	ighuiXx3t++izyYHY1LAG5ZrzJ/KIxLYPlXlVNsV+E9i5FEINy1R+JeVRqzpSTz7s6TXEg4ifAi
-	boQ==
-X-Google-Smtp-Source: AGHT+IFqXchqKKKSOXvmsXF4dzM7UtKtVZ8RsUC4UyrsKBXtHV0YGZj0BXlb8PWK7cGM8Xh3b9rpS7Epjko=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ea03:b0:1f3:f8c:55d5 with SMTP id
- d9443c01a7336-1f6d02be357mr2172085ad.2.1718123735342; Tue, 11 Jun 2024
- 09:35:35 -0700 (PDT)
-Date: Tue, 11 Jun 2024 09:35:32 -0700
-In-Reply-To: <ZmhtYqtAou031wjV@google.com>
+        d=1e100.net; s=20230601; t=1718124637; x=1718729437;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ud1eQBnt2jG1UKvvjxzK8+sntVYqlePqwphUbWfbcqQ=;
+        b=Nkah0yBMvQfiRS0jECjDUqbps8PhKdRpPngExF2oUxETHbCBwEabxxQyma/Mk3X+iB
+         YaTZnidrJgghEkhRo+I5X3lBMj2IOSIpUMhKGnvWMj6xXSAOLkwNt1QMjng2pBYgU0a0
+         ptDqqG6J2+8KMhxo30YPVqoHGDryts6vv7JtPvGRo9h4yFMuv95/vCgwWQL46DkCtTyN
+         m2xMulu9ZZXttU3k6zGcp6EIwPQQvI+SRyEVqPmyWLzlTHp1/dTGDhPX6dXwiYxbQrZ8
+         kafD6FbmjdLJD71pIJGS/TQmypC+auc5E1NoRNEwrZMLuK9tSOCSawn2MZeIFeyg7KGf
+         od0g==
+X-Forwarded-Encrypted: i=1; AJvYcCW5WznofigIpi3hfHrOhRrOWKd0+pvQtiwjZlVk5Z5eFXh7BmhEFRnzsmQCsSpmb8WHNukKpxWvrmQjSZ9MBSLAyiI3
+X-Gm-Message-State: AOJu0YxjafsA9Nd/CFGzeNQ6gqra6qjIkuYatbqU5Ib0gcACHRgIV2T/
+	W9nKnCDEg6Hor9zUHoP3Itrb1yZjBdNdGKBfhr65j65VqSjs6O+fFo4JfUQlX7w8x3TW7N0SKEr
+	oy+JSGysPJm1EEUz+VSwSYf9e4wwlez6pwVbR
+X-Google-Smtp-Source: AGHT+IFTRKU/IN2oUvb5h39ozwdgDveDjgoFuty1h8DKtr2zokbWin06W/kJ4wicF03AaijkmKBkMyI8RF9KtoZUsSE=
+X-Received: by 2002:a05:622a:6103:b0:43e:3833:c5e3 with SMTP id
+ d75a77b69052e-44146f10983mr2981601cf.11.1718124637169; Tue, 11 Jun 2024
+ 09:50:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240509181133.837001-1-dmatlack@google.com> <Zl4H0xVkkq5p507k@google.com>
- <ZmhtYqtAou031wjV@google.com>
-Message-ID: <Zmh81J7eflG-aj4X@google.com>
-Subject: Re: [PATCH v3] KVM: x86/mmu: Always drop mmu_lock to allocate TDP MMU
- SPs for eager splitting
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Bibo Mao <maobibo@loongson.cn>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-5-jthoughton@google.com> <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
+In-Reply-To: <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 11 Jun 2024 09:49:59 -0700
+Message-ID: <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
+Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
+To: Yu Zhao <yuzhao@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Sean Christopherson <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 11, 2024, David Matlack wrote:
-> On 2024-06-03 11:13 AM, Sean Christopherson wrote:
-> > On Thu, May 09, 2024, David Matlack wrote:
-> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > index aaa2369a9479..2089d696e3c6 100644
-> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > @@ -1385,11 +1385,11 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
-> > >  	return spte_set;
-> > >  }
-> > >  
-> > > -static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
-> > > +static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(void)
-> > >  {
-> > > +	gfp_t gfp = GFP_KERNEL_ACCOUNT | __GFP_ZERO;
-> > >  	struct kvm_mmu_page *sp;
-> > >  
-> > > -	gfp |= __GFP_ZERO;
-> > >  
-> > >  	sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
-> > 
-> > This can more simply and cleary be:
-> > 
-> > 	sp = kmem_cache_zalloc(mmu_page_header_cache, GFP_KERNEL_ACCOUNT);
-> 
-> Will do. And I assume you'd prefer get_zeroed_page(GFP_KERNEL_ACCOUNT)
-> as well below?
+On Mon, Jun 10, 2024 at 10:34=E2=80=AFPM Yu Zhao <yuzhao@google.com> wrote:
+>
+> On Mon, Jun 10, 2024 at 6:22=E2=80=AFPM James Houghton <jthoughton@google=
+.com> wrote:
+> >
+> > This new notifier is for multi-gen LRU specifically
+>
+> Let me call it out before others do: we can't be this self-serving.
+>
+> > as it wants to be
+> > able to get and clear age information from secondary MMUs only if it ca=
+n
+> > be done "fast".
+> >
+> > By having this notifier specifically created for MGLRU, what "fast"
+> > means comes down to what is "fast" enough to improve MGLRU's ability to
+> > reclaim most of the time.
+> >
+> > Signed-off-by: James Houghton <jthoughton@google.com>
+>
+> If we'd like this to pass other MM reviewers, especially the MMU
+> notifier maintainers, we'd need to design a generic API that can
+> benefit all the *existing* users: idle page tracking [1], DAMON [2]
+> and MGLRU.
+>
+> Also I personally prefer to extend the existing callbacks by adding
+> new parameters, and on top of that, I'd try to consolidate the
+> existing callbacks -- it'd be less of a hard sell if my changes result
+> in less code, not more.
+>
+> (v2 did all these, btw.)
 
-Ah, yeah, good catch!
+I think consolidating the callbacks is cleanest, like you had it in
+v2. I really wasn't sure about this change honestly, but it was my
+attempt to incorporate feedback like this[3] from v4. I'll consolidate
+the callbacks like you had in v2.
+
+Instead of the bitmap like you had, I imagine we'll have some kind of
+flags argument that has bits like MMU_NOTIFIER_YOUNG_CLEAR,
+MMU_NOTIFIER_YOUNG_FAST_ONLY, and other ones as they come up. Does
+that sound ok?
+
+Do idle page tracking and DAMON need this new "fast-only" notifier? Or
+do they benefit from a generic API in other ways? Sorry if I missed
+this from some other mail.
+
+I've got feedback saying that tying the definition of "fast" to MGLRU
+specifically is helpful. So instead of MMU_NOTIFIER_YOUNG_FAST_ONLY,
+maybe MMU_NOTIFIER_YOUNG_LRU_GEN_FAST to mean "do fast-for-MGLRU
+notifier". It sounds like you'd prefer the more generic one.
+
+Thanks for the feedback -- I don't want to keep this series lingering
+on the list, so I'll try and get newer versions out sooner rather than
+later.
+
+[3]: https://lore.kernel.org/linux-mm/Zl5LqcusZ88QOGQY@google.com/
+
+>
+> [1] https://docs.kernel.org/admin-guide/mm/idle_page_tracking.html
+> [2] https://www.kernel.org/doc/html/latest/mm/damon/index.html
 
