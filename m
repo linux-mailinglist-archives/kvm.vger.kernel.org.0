@@ -1,123 +1,115 @@
-Return-Path: <kvm+bounces-19341-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19342-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97CD6904160
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 18:33:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF79904172
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 18:35:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AD951F239CB
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 16:33:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5957F286247
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 16:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3923FBA4;
-	Tue, 11 Jun 2024 16:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F8A83BB48;
+	Tue, 11 Jun 2024 16:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qLd0phHN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HPav3AZk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FBB39FE4
-	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 16:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3621138FA0
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 16:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718123577; cv=none; b=cxUM5Hc8zUv7F4NTeqnfezbw+fI0BWti+lkDufgv31roulidTU14gR4tvzraKAc5PaX8m9QSRcbWGQJ+aJgCaAu0tGj6K7r+oUwoZOAAaIuVNpUZfk8z2nF/N1XmoV88N5uLCiv4tI7BwUkkPtd77VsE9XVwPX3LVkWwDivYSq0=
+	t=1718123737; cv=none; b=dXoOgF9VqEMTRzXZUWyI9DQ527awjOARPevihVXqzWCTsnYLZj76nrSIHvxtvOSv+ZYncJTPBYSqRwr34Qv4zb+yym+ORhaXC+Ql/OtwIUBESmTTx7AcgutJnee3GvYoROkHfiKt6KIuEK1OrS1IlQgEkGarWoimmTFOoIK5gVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718123577; c=relaxed/simple;
-	bh=PfL/6AgJasVkbCS8dVXqo5yRf1/3Wobmr0iuiQOC/Dg=;
+	s=arc-20240116; t=1718123737; c=relaxed/simple;
+	bh=3HM6i6zrhqS92eFX0rcBTaE34IL7ONn3eX6LnpwKS8Q=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=P79FkuaRZ2HGw8oIP9pdIKVh58MwZB+/SKR5lOFxRf61S/vS+CrbmSKPsigVMiw7YySJVCqipeQdIwxDls9ZBy0qWjQGDB3dRjcFiBjjB5QvJOufJZ5Ehwxpnu6b2G8eZ8EcqKGLpzxLZf46VI+dXpIxNAmE0XhRzUncBBF99T0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qLd0phHN; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=gyowaCk98/laS+QKZt3XC3XjBFnwRJTL/vFD1O07Q5ISP1oBuwiE/Fs53b9GQxO2GpicxvkpZi685WY+vC6O+5kZi8/6x8ArV3Fg9jR8FgfKt4kNzAxnVNsSAlP+rLZOFCCl80Zx6594u6fdsKBMLoX9vez+3wpPNlFm3+aBa6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HPav3AZk; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6c7e13b6a62so983811a12.0
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 09:32:55 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1f656692564so10886425ad.2
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 09:35:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718123575; x=1718728375; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718123735; x=1718728535; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c4xBvCLscNy4YUa29ei3FsIjxDWpzTmRoOerBpLD1P4=;
-        b=qLd0phHNv1lZYJU+KCPtfLnW27S9VcZvh31IhDtCElrYfr19En09w3FgB1w6szsVH+
-         uIFNIXIlrNpoVVQgI+L7PueLBrF3EcECmsqY+VM6qTL4N9N0aq//FFRndn/bD+fJ2Wx3
-         aq5M6Ba1kmyaU3jRg5hVsx3CqEbJKYPY/2QRmaxMHqeml1PIkBh8s3IGb/oDBxgDRkSv
-         Nr0Jx8FgDopvRVSBvjDRSp7L0yk5Y6NXlWJEN534WZB9G09JVCe8DtiHbz+XmrXxt4Us
-         fU44963FMEBV0Zv4ZqD6nEzkgLZs11NxL05lj9+bxaXwEvz3CWGqwPDdsKRru7sUB9fZ
-         /+Pw==
+        bh=sy8cYUcbFFJWNmfBV4hjqU10SqwSRoXFxmzf2bgnVG8=;
+        b=HPav3AZkAkfqsescJX/g6FEn6DO6q/l8p4OOm9U0LrmGve7dAxbbtol2Do+VZPg3KY
+         FzI/kuY52lbpUQ8U/xIPwrexWNibNIHtLC0hBL2qtKJyxGaxWNeW8z0gkMNuGhCw/n3w
+         CEfh29CCxif7FFj2eXwhj4HUWr4m2x4EwOG7XrmMwlMAwV7bkwKeaw/VAqbGZLDI69+u
+         ijnGslh70VDUptr5AKMHVLfcwKsgYJz5QRXzZvjCVccB/sgcHlqS49Sfvz/sKCHhjSd1
+         HpsoqytjcVtOtr02zXAqsWwQOxyq41wD1ox1Z3zBEXyQzCn0LoPgjfhzj4k7YdlZaoDg
+         8RWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718123575; x=1718728375;
+        d=1e100.net; s=20230601; t=1718123735; x=1718728535;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c4xBvCLscNy4YUa29ei3FsIjxDWpzTmRoOerBpLD1P4=;
-        b=aYAShrRr7s/1Q4tOsTqe+00sHfIJL7k1T9qFZFaRN9tYRpqKRPelA2z1bRHYWJKmza
-         JVomDu1+z3ehd4RI0PaggqbwubXPouMUJ2mvAP796j4tbB37zaOijD6BnMk7Bz+3oU3/
-         ZuW0wI86zONDGJkNIaMB26v2wBLm2nYeOiho+//t+Uo5/l3ztRsVRsSdSV3f9r+UVQTm
-         BIXETDwnJy3S23FLtTGSi+vCtr6R2I/sO0NVpB7D2ppeQc1AxUKVKHeeszNvxOkI7Ykc
-         n1Dm5rT+XHt0cDSgP3AsjjJcoY62XgDKh1DeZeIeurJTa7qf+LSFdIj09BEBsVsBgHeY
-         WVLQ==
-X-Gm-Message-State: AOJu0YwHX5PwRWeGeChin5+iS0uXbvplzqWNRCDx4quwHeSB9yg2fpnS
-	9P1YQ561GxtE9efSACjFLyPkmby4ExWGoNxBFzv7bW9UZN7bkVuPK6IUEqwMaW9V+Nh3t/xI0+a
-	eHw==
-X-Google-Smtp-Source: AGHT+IE50t/ZHsq1AIZB33K6XZDZtywKxE9M5cylfsZLOz1Oan4m5rBZ+Vk8rt4fL4gs+UygXTLU7vZVMGE=
+        bh=sy8cYUcbFFJWNmfBV4hjqU10SqwSRoXFxmzf2bgnVG8=;
+        b=tYeN904A0cHX9o7i05S4BHpZcGTs8PT8OhFzq5eLDIw/q5Z5v6XbruI4Ybr1qUbMAb
+         I5lc6+qAXrkCM03aMsm0gCy6GASh2yy85Ot9VZJqJdqP3QPEPJtRb5XeI5nhj5QkxO4R
+         Vsxc+ZGODL+IoqgZFFgGzQRqHowRIalSjBtQTYr9Vz0CkMy/ab+FGMavtB2R97PM862D
+         YPgiNZNXFYuWDn21uJCbB2Ma2ECLjQmd+QaMpjFYZTGzLnU1GwdeJdTRaP+//86XB26d
+         z9l7Ns6nkeL6MOAcg1jy6j6+1T+LscLuP9bZDtZV5Swxkn9aeh4NNUev12QhjL7yt56N
+         up4g==
+X-Forwarded-Encrypted: i=1; AJvYcCV39VYqulyhLt/NckPAyCCLOUxgz00Ngv9tIxWP1XgLl7Sqsv96wjVyuaj494HJWwDGdaT9kIo7swaVkcTbvzSbvYYW
+X-Gm-Message-State: AOJu0Yzsd82yTTLWURXgPzwr53os7dQ4AfUuEI3aPT68zcj/qZgNHvTu
+	ighuiXx3t++izyYHY1LAG5ZrzJ/KIxLYPlXlVNsV+E9i5FEINy1R+JeVRqzpSTz7s6TXEg4ifAi
+	boQ==
+X-Google-Smtp-Source: AGHT+IFqXchqKKKSOXvmsXF4dzM7UtKtVZ8RsUC4UyrsKBXtHV0YGZj0BXlb8PWK7cGM8Xh3b9rpS7Epjko=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:3342:0:b0:6f8:2594:7ca6 with SMTP id
- 41be03b00d2f7-6f825947dbdmr3071a12.2.1718123574775; Tue, 11 Jun 2024 09:32:54
- -0700 (PDT)
-Date: Tue, 11 Jun 2024 09:32:53 -0700
-In-Reply-To: <ZmhaRr5Lr4pOHcm7@chao-email>
+ (user=seanjc job=sendgmr) by 2002:a17:902:ea03:b0:1f3:f8c:55d5 with SMTP id
+ d9443c01a7336-1f6d02be357mr2172085ad.2.1718123735342; Tue, 11 Jun 2024
+ 09:35:35 -0700 (PDT)
+Date: Tue, 11 Jun 2024 09:35:32 -0700
+In-Reply-To: <ZmhtYqtAou031wjV@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240410143446.797262-1-chao.gao@intel.com> <20240410143446.797262-10-chao.gao@intel.com>
- <ZmepkZfLIvj_st5W@google.com> <ZmgrkMLuComwPl1X@chao-email>
- <ZmhSeZpyoYxACs-n@google.com> <ZmhaRr5Lr4pOHcm7@chao-email>
-Message-ID: <Zmh8NSzd5xK-6urr@google.com>
-Subject: Re: [RFC PATCH v3 09/10] KVM: VMX: Advertise MITI_CTRL_BHB_CLEAR_SEQ_S_SUPPORT
+References: <20240509181133.837001-1-dmatlack@google.com> <Zl4H0xVkkq5p507k@google.com>
+ <ZmhtYqtAou031wjV@google.com>
+Message-ID: <Zmh81J7eflG-aj4X@google.com>
+Subject: Re: [PATCH v3] KVM: x86/mmu: Always drop mmu_lock to allocate TDP MMU
+ SPs for eager splitting
 From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	daniel.sneddon@linux.intel.com, pawan.kumar.gupta@linux.intel.com, 
-	Zhang Chen <chen.zhang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Bibo Mao <maobibo@loongson.cn>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jun 11, 2024, Chao Gao wrote:
-> On Tue, Jun 11, 2024 at 06:34:49AM -0700, Sean Christopherson wrote:
-> >> As said, this requires some tweaks to KVM_CAP_FORCE_SPEC_CTRL, such as making
-> >> the mask and shadow values adjustable and applicable on a per-vCPU basis. The
-> >> tweaks are not necessarily for Intel-defined virtual MSRs; if there were other
-> >> preferable interfaces, they could also benefit from these changes.
-> >> 
-> >> Any objections to these tweaks to KVM_CAP_FORCE_SPEC_CTRL?
-> >
-> >Why does KVM_CAP_FORCE_SPEC_CTRL need to be per-vCPU?  Won't the CPU bugs and
-> >mitigations be system-wide / VM-wide?
+On Tue, Jun 11, 2024, David Matlack wrote:
+> On 2024-06-03 11:13 AM, Sean Christopherson wrote:
+> > On Thu, May 09, 2024, David Matlack wrote:
+> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > index aaa2369a9479..2089d696e3c6 100644
+> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > > @@ -1385,11 +1385,11 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
+> > >  	return spte_set;
+> > >  }
+> > >  
+> > > -static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
+> > > +static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(void)
+> > >  {
+> > > +	gfp_t gfp = GFP_KERNEL_ACCOUNT | __GFP_ZERO;
+> > >  	struct kvm_mmu_page *sp;
+> > >  
+> > > -	gfp |= __GFP_ZERO;
+> > >  
+> > >  	sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
+> > 
+> > This can more simply and cleary be:
+> > 
+> > 	sp = kmem_cache_zalloc(mmu_page_header_cache, GFP_KERNEL_ACCOUNT);
 > 
-> Because spec_ctrl is per-vCPU and Intel-defined virtual MSRs are also per-vCPU.
+> Will do. And I assume you'd prefer get_zeroed_page(GFP_KERNEL_ACCOUNT)
+> as well below?
 
-I figured that was the answer, but part of me was hopeful :-)
-
-> i.e., a guest __can__ configure different values to virtual MSRs on different
-> vCPUs even though a sane guest won't do this. If KVM doesn't want to rule out
-> the possibility of supporting Intel-defined virtual MSRs in userspace or any
-> other per-vCPU interfaces, KVM_CAP_FORCE_SPEC_CTRL needs to be per-vCPU.
-> 
-> implementation-wise, being per-vCPU is simpler because, otherwise, once userspace
-> adjusts the hardware mitigations to enforce, KVM needs to kick all vCPUs. This
-> will add more complexity.
-
-+1, I even typed up as much before reading this paragraph.
-
-> And IMO, requiring guests to deploy same mitigations on vCPUs is an unnecessary
-> limitation.
-
-Yeah, I can see how it would make things weird for no good reason.
- 
-So yeah, if the only thing stopping us from letting userspace deal with the virtual
-MSRs is converting to a vCPU-scoped ioctl(), then by all means, lets do that.
+Ah, yeah, good catch!
 
