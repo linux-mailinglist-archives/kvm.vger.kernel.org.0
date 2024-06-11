@@ -1,169 +1,181 @@
-Return-Path: <kvm+bounces-19359-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19360-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3588904664
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 23:48:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D60990468C
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 23:58:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C99451C22472
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 21:48:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7A4B1C22F45
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 21:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA59B155300;
-	Tue, 11 Jun 2024 21:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2D6154C09;
+	Tue, 11 Jun 2024 21:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LIH7Ycb9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X2e+Rm1Z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A9D415444F;
-	Tue, 11 Jun 2024 21:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05BF23774
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 21:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718142470; cv=none; b=LBTLoz/4CBDhVGRwqklusiq5CUzZedfRCOmsbmek9u3vY5lHnBSADdA5HEfS6MU/8B87DGYPxAql3mKMbEI4E5bJhswSqOAB9BlYoYIJoGafUa0KJESkq61wWgNSaM5n/xchZ+1m6qt6L5hcVo7qOFnCXyvZa31IhxU5tzX+3os=
+	t=1718143090; cv=none; b=iazXfeviU6mkqyvIFDZCxyZndSmM1c43iGmtgqIsJKW2dOyoviOeVp9h+GubkVHbrH5R/kfR/yIq5hnwG/8Wljm0iTZFlFyHxpdgvD6QvdOfzYCUBzhXtl+vkuMjUpywqzX1cyegmMfZdAG8/Rwvtd3b5Q0vTWYBRbYCO0x15Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718142470; c=relaxed/simple;
-	bh=Ehq8/IZNDfsi3peqk0Yh7gAgFUTkVobt/ARHwtkD0fs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mYVpmdEl4TzWSUQoEKrWz3bf2SczmpTj7U/61qD0bPfs1s6IqZaHqt27HjYvbjPdu/ujSSgpcgq2SYeCLBvVCwYwK1N4v9ouIkk5pjFTRDpAh0rgjdFoGhb1uHlnuXHmXHzWNKwX8S/QHmbqT5EMdlrt9wynjqGYlmCnLbM9ZMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LIH7Ycb9; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45BLRjWE024941;
-	Tue, 11 Jun 2024 21:47:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=pp1; bh=VjP68oGVm6iHuk2iiz3FujUs9s
-	fk6Hx1GoeUGywuxao=; b=LIH7Ycb984tmQxdURdA8D6Quo5TTBLhS3JfN/hGNvF
-	TgF0kzWsIWV44u9ASFtt37nHUOGmL40WwKdCRNJ5FfBwk2Cx71u/Zy9sACJHyBjr
-	eQ9hCtUmen93SNs/9GIVfYgFQFE7s4dak/NEXP6aklbuLZjRjE1ZHvRFM+EBKE7O
-	J6vV+mZt34VOkJsgxrd45HURJR8997OtUFpHxnJbuDMGjVQvPEH3++i+ZhDU4f6f
-	4UlbKb7AE6tNXFTop01KdXJTKzhcihBsiG23Xo7SuOa8sSPrEdQ2xzz+Uydw3q/9
-	E5NN+n4QgWl9HbIa3aIQ1XmGWAbeHUMCaWgPmeKdV2Vw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ypx3603tq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jun 2024 21:47:46 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45BLljJc026317;
-	Tue, 11 Jun 2024 21:47:45 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ypx3603tm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jun 2024 21:47:45 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45BK3Mbi004368;
-	Tue, 11 Jun 2024 21:47:44 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yn2mpre2t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Jun 2024 21:47:44 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45BLlcG414745950
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Jun 2024 21:47:40 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5C5A620043;
-	Tue, 11 Jun 2024 21:47:38 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0B16720040;
-	Tue, 11 Jun 2024 21:47:38 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 11 Jun 2024 21:47:37 +0000 (GMT)
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: Boqiao Fu <bfu@redhat.com>, Sebastian Mitterle <smitterl@redhat.com>
-Subject: [PATCH 1/1] s390/virtio_ccw: fix config change notifications
-Date: Tue, 11 Jun 2024 23:47:16 +0200
-Message-Id: <20240611214716.1002781-1-pasic@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1718143090; c=relaxed/simple;
+	bh=IkcUZXxfZfGtEuqDFEfXjk5PL0kaTZTimAtsOntwH0c=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=LZ39EKW9t4pU2Qh2uTXsz3Qll3A/TFnDSzeQuvTHpXgGOdSiFXnN8v0bOknDG6zOWjn96pc2zP3RQhTihFy1tsGN7BHduru6pQx8sU3WFHSWSD/YHW5A/DlzWm1mVzUphl0waXY0pSysBqZjJveetyGia3i1kWzoN982wWA1fNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X2e+Rm1Z; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6658818ad5eso4876920a12.0
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 14:58:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718143088; x=1718747888; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cgBsV7Qs18R7dQFA6CLfjwo4Hn5qZ69LouFSR8EeMz8=;
+        b=X2e+Rm1Z4AYIyOONo0fQObTg78gRczxK5LKf2oFsZuuY1iqW9OCdCWIvw94ZwzzK40
+         VYbCDMZ4BLXnb11C5/QPSaWqCtlUwRoUqirEqeOg22biTLW33l60ikeXclRAB1MVivEg
+         43URBiIb9mdYD71PHDRTyU/nGFxqYqAGALCE+2SCQXd2+lJFQ1tJtWXRevC8gMB7LHQX
+         3rOYFsgQaJFdfWwpUFsoJZCHEXUYC8Qc0wWNkNykGmXZaweDOwDVrG1Ck6e3WPBehJtk
+         xOtMjujU+Ifpc60uK7UJ6uX1F0kaUFBgsXpT68bOkAoZ+ui+76PgrP4+uFHS6kzXpp7X
+         9kGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718143088; x=1718747888;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cgBsV7Qs18R7dQFA6CLfjwo4Hn5qZ69LouFSR8EeMz8=;
+        b=tQbJB1Ub18Ql/bGnfFFEsoX6bcTy9l+M2BhAJ5OP5YIiOoBKgwCKyFOjHWoB1r3ML9
+         dBrOheoO4J+SCb+Lln7G0Px9z7R6c1I1j6bCwUIPLnPa0K9prTWnCiH7mXpjP8tYmHbL
+         hD7nJXu6y2l3dmsT1LH7FeFqk5LCgUn8Ii+zTjRatwRTGtqVQhfaj9+O0L3Q926AOUAm
+         WGlo1Rp6Ef2OcZn9NbtqA/Z1Fn9npfyE+L8gKUXC4ObuzJ5VZDSeQFBQF41AOAy41p71
+         4bumYGgQq1Cp5UpI2Ot5PUsmTRPaljNyAUGZ42Y0Wr+U9Rw98P3SeDdUFFFFivLdlqR4
+         BxIQ==
+X-Gm-Message-State: AOJu0YxGJxj4d/hhN+bn5AbsNTTXxNw8pwvr+7udyFd2Cf3ikRH5U7MS
+	fTHWrXGGlL1sm7cnTU7Lz57LVm2L0n1uC04YOLd3mkgzLhbqj3YJgP3AdSczUug3mJSvvCPA7v2
+	Sxg==
+X-Google-Smtp-Source: AGHT+IEmldGTIkv1T4o9/PiXtoC4rZne+Dg326PKnj69O+oEtuDXipai7Z86wWOiFzxP3tEmhS691Edp3UQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:bb97:b0:1f6:8033:f361 with SMTP id
+ d9443c01a7336-1f83b5df050mr4825ad.6.1718143088022; Tue, 11 Jun 2024 14:58:08
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 11 Jun 2024 14:58:05 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IB-ygfj5wSJhE-ZsTfj4HUom5pI0BZ4g
-X-Proofpoint-ORIG-GUID: 2XFA4JZYbJ9ICPrnlQ8fL292oEluDiMp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-11_10,2024-06-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
- suspectscore=0 phishscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0
- impostorscore=0 spamscore=0 mlxscore=0 priorityscore=1501 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2406110145
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
+Message-ID: <20240611215805.340664-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Clean up function comments for dirty logging APIs
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Commit e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-broke configuration change notifications for virtio-ccw by putting the
-DMA address of *indicatorp directly into ccw->cda disregarding the fact
-that if !!(vcdev->is_thinint) then the function
-virtio_ccw_register_adapter_ind() will overwrite that ccw->cda value
-with the address of the virtio_thinint_area so it can actually set up
-the adapter interrupts via CCW_CMD_SET_IND_ADAPTER.  Thus we end up
-pointing to the wrong object for both CCW_CMD_SET_IND if setting up the
-adapter interrupts fails, and for CCW_CMD_SET_CONF_IND regardless
-whether it succeeds or fails.
+Rework the function comment for kvm_arch_mmu_enable_log_dirty_pt_masked(),
+as it has gotten a bit stale, and is the last source of warnings for W=1
+builds in KVM x86 due to using a kernel-doc comment without documenting
+all parameters.
 
-To fix this, let us save away the dma address of *indicatorp in a local
-variable, and copy it to ccw->cda after the "vcdev->is_thinint" branch.
+Opportunistically subsume the functions comments for
+kvm_mmu_write_protect_pt_masked() and kvm_mmu_clear_dirty_pt_masked(), as
+there is no value in regurgitating the same parameter information, and
+capturing the differences between write-protection and PML-based dirty
+logging is best done in a common location.
 
-Reported-by: Boqiao Fu <bfu@redhat.com>
-Reported-by: Sebastian Mitterle <smitterl@redhat.com>
-Fixes: e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+No functional change intended.
+
+Cc: David Matlack <dmatlack@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
-I know that checkpatch.pl complains about a missing 'Closes' tag.
-Unfortunately I don't have an appropriate URL at hand. @Sebastian,
-@Boqiao: do you have any suggetions?
----
- drivers/s390/virtio/virtio_ccw.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-index d7569f395559..d6491fc84e8c 100644
---- a/drivers/s390/virtio/virtio_ccw.c
-+++ b/drivers/s390/virtio/virtio_ccw.c
-@@ -698,6 +698,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 	dma64_t *indicatorp = NULL;
- 	int ret, i, queue_idx = 0;
- 	struct ccw1 *ccw;
-+	dma32_t indicatorp_dma = 0;
+I don't actually care too much about the comment itself, I really just want to
+get rid of the annoying warnings (I was *very* tempted to just delete the extra
+asterisk), so if anyone has any opinion whatsoever...
+
+ arch/x86/kvm/mmu/mmu.c | 43 ++++++++++++++++++------------------------
+ 1 file changed, 18 insertions(+), 25 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index f2c9580d9588..7eb87d473223 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1307,15 +1307,6 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 	return flush;
+ }
  
- 	ccw = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*ccw), NULL);
- 	if (!ccw)
-@@ -725,7 +726,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 	*/
- 	indicatorp = ccw_device_dma_zalloc(vcdev->cdev,
- 					   sizeof(*indicatorp),
--					   &ccw->cda);
-+					   &indicatorp_dma);
- 	if (!indicatorp)
- 		goto out;
- 	*indicatorp = indicators_dma(vcdev);
-@@ -735,6 +736,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
- 			/* no error, just fall back to legacy interrupts */
- 			vcdev->is_thinint = false;
+-/**
+- * kvm_mmu_write_protect_pt_masked - write protect selected PT level pages
+- * @kvm: kvm instance
+- * @slot: slot to protect
+- * @gfn_offset: start of the BITS_PER_LONG pages we care about
+- * @mask: indicates which pages we should protect
+- *
+- * Used when we do not need to care about huge page mappings.
+- */
+ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 				     struct kvm_memory_slot *slot,
+ 				     gfn_t gfn_offset, unsigned long mask)
+@@ -1339,16 +1330,6 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
  	}
-+	ccw->cda = indicatorp_dma;
- 	if (!vcdev->is_thinint) {
- 		/* Register queue indicators with host. */
- 		*indicators(vcdev) = 0;
+ }
+ 
+-/**
+- * kvm_mmu_clear_dirty_pt_masked - clear MMU D-bit for PT level pages, or write
+- * protect the page if the D-bit isn't supported.
+- * @kvm: kvm instance
+- * @slot: slot to clear D-bit
+- * @gfn_offset: start of the BITS_PER_LONG pages we care about
+- * @mask: indicates which pages we should clear D-bit
+- *
+- * Used for PML to re-log the dirty GPAs after userspace querying dirty_bitmap.
+- */
+ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 					 struct kvm_memory_slot *slot,
+ 					 gfn_t gfn_offset, unsigned long mask)
+@@ -1373,14 +1354,26 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ }
+ 
+ /**
+- * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
+- * PT level pages.
++ * kvm_arch_mmu_enable_log_dirty_pt_masked - (Re)Enable dirty logging for a set
++ * of GFNs
+  *
+- * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
+- * enable dirty logging for them.
++ * @kvm: kvm instance
++ * @slot: slot to containing the gfns to dirty log
++ * @gfn_offset: start of the BITS_PER_LONG pages we care about
++ * @mask: indicates which gfns to dirty log (1 == enable)
+  *
+- * We need to care about huge page mappings: e.g. during dirty logging we may
+- * have such mappings.
++ * (Re)Enable dirty logging for the set of GFNs indicated by the slot,
++ * gfn_offset, and mask, e.g. after userspace has harvested dirty information
++ * and wants to re-log dirty GFNs for the next round of migration.
++ *
++ * If the slot was assumed to be "initially all dirty", write-protect hugepages
++ * to ensure they are split to 4KiB on the first write (KVM dirty logs at 4KiB
++ * granularity).  If eager page splitting is enabled, immediately try to split
++ * hugepages, e.g. so that vCPUs don't get saddled with the cost of the split.
++ *
++ * If Page-Modification Logging (PML) is enabled and the GFN doesn't need to be
++ * write-protected for other reasons, e.g. shadow paging, clear the Dirty Bit.
++ * Otherwise write-protect the GFN, i.e. clear the Writable Bit.
+  */
+ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 				struct kvm_memory_slot *slot,
 
-base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
+base-commit: f99b052256f16224687e5947772f0942bff73fc1
 -- 
-2.40.1
+2.45.2.505.gda0bf45e8d-goog
 
 
