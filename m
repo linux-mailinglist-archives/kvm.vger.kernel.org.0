@@ -1,177 +1,248 @@
-Return-Path: <kvm+bounces-19334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E243903FE8
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 17:24:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76FE0903FFA
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 17:29:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E17AEB2579B
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 15:23:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE2E71F24838
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 15:29:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52C123767;
-	Tue, 11 Jun 2024 15:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849DF28399;
+	Tue, 11 Jun 2024 15:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHWIUIPn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SF/dJXus"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B66D2868D
-	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 15:23:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47217219E7
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 15:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718119420; cv=none; b=F3+TF1YjNZgg/kvEnGaFI+aELOqUz47rg0qTqwWFD37+s0Qeh4zQliLnDNQg89qZv+ytbdT5efzGF62VHrhk0LpmT92AFtUbLaFLsW8Km7qA7X6NUOCGdzs7kCjttEfhQ7qeH5EZ0I0WZaNawbhgSmx2ZxUDgGZVGk8LX7Z6f6Y=
+	t=1718119785; cv=none; b=lwaPHKMcLhDGneRNXO2kQ9yLefBglfdn3WZAJlTO6Smb37OjGZ9k0sGPA9r+22Y8obIhu78K1kFLz6R7rEuBnjVj17f2vNluSBmLkSk4BYW8F+jT720Opr+TWALL2G9kL+T2JcalKkONGW/moKV4Gaf73j2Ot1xFoFq0zQRL29E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718119420; c=relaxed/simple;
-	bh=CLqayj/eoP55ht9EHGxDvGtiEOGO5GEyYgOJG3OyT64=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bRwe8nqum/pJyXOzJd1pbRuqMFMnwARkiKNCPkXbwFGEYOO0q2jyPLasRQukU5dfNvYkImxHYm7tutCoaki9K6Ih+rDYbsfbeAs7CPwZE5slEsEUYN810ulQEpir7cPWUsU2F6xKdEB7iwCXGaD9e9kRIrVxHZg2wQEvr0fEddA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EHWIUIPn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718119418;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/rPwA5aUtzeOBHVbOLrnc2+mNR/AAUcToDFcJjdNUBQ=;
-	b=EHWIUIPnwLs63+r9iUQmTX0poW0fndbgEXH9ksc3zqvnmKbsWGlp3/VteLQKNTku8f/cE9
-	oxywD3g+vUmOBIrAG5w0QIpiCPi97RdsSXB6GwINb8MphXc82a5niWHLzZA+OtdLXML5Cn
-	J2UFTJKEIrZup77mnhNOvLOo1vIp1fI=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-1pUpYEd2ODCE8YSFM7dY7Q-1; Tue, 11 Jun 2024 11:23:37 -0400
-X-MC-Unique: 1pUpYEd2ODCE8YSFM7dY7Q-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7eb50e42c6aso628151839f.1
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 08:23:37 -0700 (PDT)
+	s=arc-20240116; t=1718119785; c=relaxed/simple;
+	bh=T+Cs38GodB7c/ewzzK5qBPSKX7B+tGe1OV5rLrfag9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I4KCQTDTvC446FoNIj3hIBbD/q+zayLdXfYx8cMzw4ROkoF/lZBRQKruQBaQmLqHj6oDgyT0WKul3lyo65P1omBQLYI662CXGcIfQe58+wzqNdrgq3lUngaH7il/j12Z8ttDGQG3GAdZOEhxFxnu+sbAXAMZXtmNw6R++ng3S4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SF/dJXus; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-6e7b121be30so2420089a12.1
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 08:29:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718119783; x=1718724583; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zs1Y+P/OCeIwDzwRVFXM1DFGmf1RZvZNOI/6sndKdQ0=;
+        b=SF/dJXusiXf2d2ynZLFbtgrghrv5CVvGanzel/eR1yzPMH0tWdXRAdjO7Y/k0ODUbx
+         6jHAeLTAFkPVjoWJn+Hb5GevtxQwbIs1MrIRjQ9lVcSMDxzyBDgQ8kJZ/jI47ykp+X+5
+         LX74OEdWkGkLL+NGUFADIiEWwpIrkVKxcFsLqNUb0Ttm5uPNfW0pZdsnLfgzn9lTCPP1
+         BCZbzhlavJt2/G+1bCZOQXzh3/mzOiUFgsNlhEXXxHwwv5EbNm88d3fDdBXg15YTNW8X
+         MgDKvuwt7ejfD9iFi1hfSTfq4W9euL19PTQoXvPLXzKP74gipO7zvdWWGPneQ5hmtmGc
+         014Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718119416; x=1718724216;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/rPwA5aUtzeOBHVbOLrnc2+mNR/AAUcToDFcJjdNUBQ=;
-        b=OBO5iv7SWw2I9aiEUdRwMGODB4TgLmEHISES9iurV/RsrXwxDnbVMM+YecB1ccDRd8
-         iDc90l0YXJuQY3quJGxa9rOPx92OO23Y+iAxiqH+3+f3qtqZcWF9l3s3o0CExcYCDxEn
-         /A8rZazTLPm0TSHn+b4diMFfawcAebhUwpEhlVeM9ZN1O3if9YnBgK3w2kLCEZwpBjLR
-         /0PfY5kiSJpAATPiqeMkR/z9/wMgYewzqo3zYCtnA09a7qweDHV0EYIdF8rNVLQLUTIQ
-         TLh0SYeQbWlx4tR5fuNI5YORRKADnlnFzZJNmhTkRkwi3Zs4NTwABIvWvQhvQ3Hzthcw
-         HPxw==
-X-Gm-Message-State: AOJu0YzmlbryrYbp7lJPS1YwdoxR180qjB71qx/5tfj6J/YU3TBQn2LS
-	DSUIoJ9gdPERkfmX3aEOdashZ3weZ6FLuiihU3jcetOVqtbRSgaFDFQvUnH/iDtcJlLgPzouIJT
-	1o3Vsv8ibawRM1A0IbwLC+2SLvV2kWZBT0KZVBxNmXHLEiPsTlOCXDzW2DJdJgO0CdfKTU/cTa8
-	uI2ff08s9LqNYjzYXWhiK2WFAl3GM76Tw2qI6HP766BrA=
-X-Received: by 2002:a05:6602:3fd1:b0:7eb:7bc9:7fc7 with SMTP id ca18e2360f4ac-7eb7bc98248mr841158139f.14.1718119415921;
-        Tue, 11 Jun 2024 08:23:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGA12wKH+v+OUoBx2hrv3993oYUfPx6zM9SWmPIIcpHt/wXBT8bwzCM/mOywERWrMbfvG2rjQ==
-X-Received: by 2002:a05:6602:3fd1:b0:7eb:7bc9:7fc7 with SMTP id ca18e2360f4ac-7eb7bc98248mr841153739f.14.1718119415338;
-        Tue, 11 Jun 2024 08:23:35 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-7eb7c6c4994sm150917839f.19.2024.06.11.08.23.34
+        d=1e100.net; s=20230601; t=1718119783; x=1718724583;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zs1Y+P/OCeIwDzwRVFXM1DFGmf1RZvZNOI/6sndKdQ0=;
+        b=rofPiblczGnQj5hIH2CK4xGevDkPvADgjhGxHI98yDEceLVcdm+/N+p9BO7hnV7vHp
+         lCe16rqWF8uk3BYqjlzO8C7ClPe9iquygt6C99lnDBAPJmVBl7KGu6fEysh1Zs1BfI3+
+         bAuzx7nL97PbvEx3YmqVa1yIutwfBHb/mYnrbImNHTLWr2CtEMbHMSKrg0NK18A/19So
+         Y+c5Jrt2uPR8VhLLyxAHcaIfuszg51DLkHc9vULgsAzcMJAFclMij8M/vUnpE48HmQOx
+         GJBT9YjQgzgltyUGzfcspGWixK2Uo6/PaTR92r798NfsH9emk6rsYVZLgHsF4ghoPS7X
+         K0mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtRPXgma0kgzXW2+cpcZ/2mCBn7lGlmvXYAcIX6eVRv4oXqlu8bnnGHbBgtcOTdEK4KIz39d/hUZ6GRlxjUQixd0G4
+X-Gm-Message-State: AOJu0YyPrw7ZlCs5B68qvjxsh80OuJz4DncoHJtxqkKH5AGgMqwYaFzn
+	ZRWLlNAmkSW95JWz91NiH9Ock9Y3cbjs9gJHRmJQE81Hui5XhDN2+5We04gWHLgcNlJrRls1uuA
+	MRQ==
+X-Google-Smtp-Source: AGHT+IGa90YRqiUPiiVTbR/fQ1GxPq+RWr0B9LHZwLQ/J9DWsFNnnm8VT/DVi6NUGggqsMaoIEkGNQ==
+X-Received: by 2002:a05:6a20:d80f:b0:1b5:ecc:a964 with SMTP id adf61e73a8af0-1b50eccab24mr9895034637.31.1718119783200;
+        Tue, 11 Jun 2024 08:29:43 -0700 (PDT)
+Received: from google.com (210.145.16.34.bc.googleusercontent.com. [34.16.145.210])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-6de27605dcasm7928820a12.79.2024.06.11.08.29.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 08:23:34 -0700 (PDT)
-Date: Tue, 11 Jun 2024 09:23:33 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: kvm@vger.kernel.org
-Cc: ajones@ventanamicro.com, yan.y.zhao@intel.com, kevin.tian@intel.com,
- jgg@nvidia.com, peterx@redhat.com
-Subject: Re: [PATCH] vfio/pci: Insert full vma on mmap'd MMIO fault
-Message-ID: <20240611092333.6bb17d60.alex.williamson@redhat.com>
-In-Reply-To: <20240607035213.2054226-1-alex.williamson@redhat.com>
-References: <20240607035213.2054226-1-alex.williamson@redhat.com>
-Organization: Red Hat
+        Tue, 11 Jun 2024 08:29:42 -0700 (PDT)
+Date: Tue, 11 Jun 2024 08:29:38 -0700
+From: David Matlack <dmatlack@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	Bibo Mao <maobibo@loongson.cn>
+Subject: Re: [PATCH v3] KVM: x86/mmu: Always drop mmu_lock to allocate TDP
+ MMU SPs for eager splitting
+Message-ID: <ZmhtYqtAou031wjV@google.com>
+References: <20240509181133.837001-1-dmatlack@google.com>
+ <Zl4H0xVkkq5p507k@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zl4H0xVkkq5p507k@google.com>
 
+On 2024-06-03 11:13 AM, Sean Christopherson wrote:
+> On Thu, May 09, 2024, David Matlack wrote:
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index aaa2369a9479..2089d696e3c6 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -1385,11 +1385,11 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
+> >  	return spte_set;
+> >  }
+> >  
+> > -static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
+> > +static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(void)
+> >  {
+> > +	gfp_t gfp = GFP_KERNEL_ACCOUNT | __GFP_ZERO;
+> >  	struct kvm_mmu_page *sp;
+> >  
+> > -	gfp |= __GFP_ZERO;
+> >  
+> >  	sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
+> 
+> This can more simply and cleary be:
+> 
+> 	sp = kmem_cache_zalloc(mmu_page_header_cache, GFP_KERNEL_ACCOUNT);
 
-Any support for this or should we just go with the v2 series[1] by
-itself for v6.10?  Thanks,
+Will do. And I assume you'd prefer get_zeroed_page(GFP_KERNEL_ACCOUNT)
+as well below?
 
-Alex
+> 
+> >  	if (!sp)
+> > @@ -1412,19 +1412,6 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+> >  
+> >  	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
+> >  
+> > -	/*
+> > -	 * Since we are allocating while under the MMU lock we have to be
+> > -	 * careful about GFP flags. Use GFP_NOWAIT to avoid blocking on direct
+> > -	 * reclaim and to avoid making any filesystem callbacks (which can end
+> > -	 * up invoking KVM MMU notifiers, resulting in a deadlock).
+> > -	 *
+> > -	 * If this allocation fails we drop the lock and retry with reclaim
+> > -	 * allowed.
+> > -	 */
+> > -	sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT);
+> > -	if (sp)
+> > -		return sp;
+> > -
+> >  	rcu_read_unlock();
+> >  
+> >  	if (shared)
+> > @@ -1433,7 +1420,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+> >  		write_unlock(&kvm->mmu_lock);
+> >  
+> >  	iter->yielded = true;
+> 
+> Now that yielding is unconditional, this really should be in the loop itself.
+> The bare continue looks weird, and it's unnecessarily hard to see that "yielded"
+> is being set.
+> 
+> And there's definitely no reason to have two helpers.
+> 
+> Not sure how many patches it'll take, but I think we should end up with:
+> 
+> static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(void)
+> {
+> 	struct kvm_mmu_page *sp;
+> 
+> 	sp = kmem_cache_zalloc(mmu_page_header_cache, GFP_KERNEL_ACCOUNT);
+> 	if (!sp)
+> 		return NULL;
+> 
+> 	sp->spt = (void *)__get_free_page(gfp);
+> 	if (!sp->spt) {
+> 		kmem_cache_free(mmu_page_header_cache, sp);
+> 		return NULL;
+> 	}
+> 
+> 	return sp;
+> }
+> 
+> static int tdp_mmu_split_huge_pages_root(struct kvm *kvm,
+> 					 struct kvm_mmu_page *root,
+> 					 gfn_t start, gfn_t end,
+> 					 int target_level, bool shared)
+> {
+> 	struct kvm_mmu_page *sp = NULL;
+> 	struct tdp_iter iter;
+> 
+> 	rcu_read_lock();
+> 
+> 	/*
+> 	 * Traverse the page table splitting all huge pages above the target
+> 	 * level into one lower level. For example, if we encounter a 1GB page
+> 	 * we split it into 512 2MB pages.
+> 	 *
+> 	 * Since the TDP iterator uses a pre-order traversal, we are guaranteed
+> 	 * to visit an SPTE before ever visiting its children, which means we
+> 	 * will correctly recursively split huge pages that are more than one
+> 	 * level above the target level (e.g. splitting a 1GB to 512 2MB pages,
+> 	 * and then splitting each of those to 512 4KB pages).
+> 	 */
+> 	for_each_tdp_pte_min_level(iter, root, target_level + 1, start, end) {
+> retry:
+> 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
+> 			continue;
+> 
+> 		if (!is_shadow_present_pte(iter.old_spte) || !is_large_pte(iter.old_spte))
+> 			continue;
+> 
+> 		if (!sp) {
+> 			rcu_read_unlock();
+> 
+> 			if (shared)
+> 				read_unlock(&kvm->mmu_lock);
+> 			else
+> 				write_unlock(&kvm->mmu_lock);
+> 
+> 			sp = tdp_mmu_alloc_sp_for_split(kvm, &iter, shared);
+> 
+> 			if (shared)
+> 				read_lock(&kvm->mmu_lock);
+> 			else
+> 				write_lock(&kvm->mmu_lock);
+> 
+> 			if (!sp) {
+> 				trace_kvm_mmu_split_huge_page(iter.gfn,
+> 							      iter.old_spte,
+> 							      iter.level, -ENOMEM);
+> 				return -ENOMEM;
+> 			}
+> 
+> 			rcu_read_lock();
+> 
+> 			iter->yielded = true;
+> 			continue;
+> 		}
+> 
+> 		tdp_mmu_init_child_sp(sp, &iter);
+> 
+> 		if (tdp_mmu_split_huge_page(kvm, &iter, sp, shared))
+> 			goto retry;
+> 
+> 		sp = NULL;
+> 	}
+> 
+> 	rcu_read_unlock();
+> 
+> 	/*
+> 	 * It's possible to exit the loop having never used the last sp if, for
+> 	 * example, a vCPU doing HugePage NX splitting wins the race and
+> 	 * installs its own sp in place of the last sp we tried to split.
+> 	 */
+> 	if (sp)
+> 		tdp_mmu_free_sp(sp);
+> 
+> 	return 0;
+> }
 
-[1]https://lore.kernel.org/all/20240530045236.1005864-1-alex.williamson@redhat.com/
-
-On Thu,  6 Jun 2024 21:52:07 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
-
-> In order to improve performance of typical scenarios we can try to insert
-> the entire vma on fault.  This accelerates typical cases, such as when
-> the MMIO region is DMA mapped by QEMU.  The vfio_iommu_type1 driver will
-> fault in the entire DMA mapped range through fixup_user_fault().
-> 
-> In synthetic testing, this improves the time required to walk a PCI BAR
-> mapping from userspace by roughly 1/3rd.
-> 
-> This is likely an interim solution until vmf_insert_pfn_{pmd,pud}() gain
-> support for pfnmaps.
-> 
-> Suggested-by: Yan Zhao <yan.y.zhao@intel.com>
-> Link: https://lore.kernel.org/all/Zl6XdUkt%2FzMMGOLF@yzhao56-desk.sh.intel.com/
-> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-> ---
-> 
-> I'm sending this as a follow-on patch to the v2 series[1] because this
-> is largely a performance optimization, and one that we may want to
-> revert when we can introduce huge_fault support.  In the meantime, I
-> can't argue with the 1/3rd performance improvement this provides to
-> reduce the overall impact of the series below.  Without objection I'd
-> therefore target this for v6.10 as well.  Thanks,
-> 
-> Alex
-> 
-> [1]https://lore.kernel.org/all/20240530045236.1005864-1-alex.williamson@redhat.com/
-> 
->  drivers/vfio/pci/vfio_pci_core.c | 19 +++++++++++++++++--
->  1 file changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index db31c27bf78b..987c7921affa 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1662,6 +1662,7 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
->  	struct vm_area_struct *vma = vmf->vma;
->  	struct vfio_pci_core_device *vdev = vma->vm_private_data;
->  	unsigned long pfn, pgoff = vmf->pgoff - vma->vm_pgoff;
-> +	unsigned long addr = vma->vm_start;
->  	vm_fault_t ret = VM_FAULT_SIGBUS;
->  
->  	pfn = vma_to_pfn(vma);
-> @@ -1669,11 +1670,25 @@ static vm_fault_t vfio_pci_mmap_fault(struct vm_fault *vmf)
->  	down_read(&vdev->memory_lock);
->  
->  	if (vdev->pm_runtime_engaged || !__vfio_pci_memory_enabled(vdev))
-> -		goto out_disabled;
-> +		goto out_unlock;
->  
->  	ret = vmf_insert_pfn(vma, vmf->address, pfn + pgoff);
-> +	if (ret & VM_FAULT_ERROR)
-> +		goto out_unlock;
->  
-> -out_disabled:
-> +	/*
-> +	 * Pre-fault the remainder of the vma, abort further insertions and
-> +	 * supress error if fault is encountered during pre-fault.
-> +	 */
-> +	for (; addr < vma->vm_end; addr += PAGE_SIZE, pfn++) {
-> +		if (addr == vmf->address)
-> +			continue;
-> +
-> +		if (vmf_insert_pfn(vma, addr, pfn) & VM_FAULT_ERROR)
-> +			break;
-> +	}
-> +
-> +out_unlock:
->  	up_read(&vdev->memory_lock);
->  
->  	return ret;
-
+Ack, will do.
 
