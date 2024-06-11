@@ -1,152 +1,173 @@
-Return-Path: <kvm+bounces-19283-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19284-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A91C8902DE6
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 03:17:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D83D902DF9
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 03:34:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4960A1F2294C
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 01:17:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 226611C21AAE
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 01:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4671D79C8;
-	Tue, 11 Jun 2024 01:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B7FA945;
+	Tue, 11 Jun 2024 01:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="okUFOnC5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lfpWBALP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4466FCC
-	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 01:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FC6EDF
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 01:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718068648; cv=none; b=SEsNricIMrkVqKD6/qZssbyj8IstregDEtEE7Vf4l/HMUGSDr1llOLvN9+Q1I0+EHzKCxfkvrB11u0d68EMr7E7hV5V12dh59yKur0kFnaTXGg8EBUtAuY8WhPlPAoD5xuSlctemn7Mg6jOMASGvfOdIJCbmnJeKklsJarnB04Y=
+	t=1718069653; cv=none; b=lXcsOJndvPETRga2lcSGkFUAVVRN1iNahX2Fw489oQsxmUqdCmqDAG7TxstekmoiqF3LVFwnx9I+J7g/lDiVmR1WcybU2KVgYdSkUUsXyl2/Deag+YLt3SBxMEeWYnTIsg5FiDaba8RaTDPKPJ9nI5cBZk2hWKXPu+7xYjaN07w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718068648; c=relaxed/simple;
-	bh=cDG4sBmtaLwX3BcWuqNAVreT/h9JlC27J2E+qHFs6b4=;
+	s=arc-20240116; t=1718069653; c=relaxed/simple;
+	bh=rb7uB0KSLonwOCypbMgQCXHkOIQyUrxXAXZTMWGn8N8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lhU0MaM2sh358n94+S9oHSKhhygqZrZimXacbnM4kwbqqgNPIpudOy3Wx/1nlGzAEfQv8cCL+RJEaacN+x5z8nYBvRou/9pns6+eHEjFJBMSW0nWEFPU4DLzLc4HiGQ3sb18kGQpDGyoeyumoV9kaZy1RMGhuwsCklgwGHahAtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=okUFOnC5; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=UuUYT2K0d7AqYTLqq9AJ9fA+0XKpVc6CuN1LwtCp9P5C4m0rlEPRx2XK2+vNPuWSR+RC/Toze3Sytvcuquae8JjVyB7cwWmrCZy3kmp43WXWvpq4FJcrkTssul4shPUGT4UfrLj3WSQ8F/dcSfrDAA9i69qfPwELu21BX6TXj/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lfpWBALP; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c2c5bf70f7so3380578a91.3
-        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 18:17:27 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6cdc904ae4aso4063414a12.2
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 18:34:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718068646; x=1718673446; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718069651; x=1718674451; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lD/LO/gxXCIGTZKmzDO3IySUcSGm5VYiE8jvdtRhgQQ=;
-        b=okUFOnC5kQPxvERe3gp1C9v8dcFAFH/DpCyD5cqahTmZW9If8wno8KTBmLyKgjfO2a
-         s412FXhgyXXreAcq9Ot1nF7g5LKP1HZXs+SpBf9IMioUrlJ8tOcARhgW+g/JJbYe8v/7
-         b5hP1L44HQwt9S+C8v2ZESy+MLKA4NBCnH39WdgbMuRP2SO7h44eBQxr5ijzux2iFd/y
-         jJ/JPlX4c/YNekGgqc87OQAx6z4T34RFQaIxbU242nSd6GJvqpivwL1lam7bWgeJRJTb
-         LNRHGsqoviW6o6Fn0Oo8+hJzotLYIVo3xZg8slxLlY9TO2tthQnYZQOBqwpNO+E/gHKg
-         Oteg==
+        bh=x5baEhBF9sOr8kVhYoFhuMjx/1QvP9In6UP3EAvA/gw=;
+        b=lfpWBALPKKbJ0nvNnAafLHdtC3vkR9fjFuZirGDnppApei9avDemevenEJYvBPxMqs
+         OVWiPFirV4+Ksvnr4DsWrSF2edU+8V4Xwu5gLTQzlxEV1XssXK5m1DFJDjomNzY3Fruw
+         g1IVBakk5NynOgXOcaPXylBCvyjgdxBM8Ylbc0lon+eKUoqO75k/FyXMbs0H52bAABlT
+         zS09UbVOj4RYIibkRpKW0qwhh6e5SoLYxYGBtw2NAGiuO08MLonNo7id/RffQ+ndDPBd
+         XgoD0FAF2jpi21U261nzLvUNhGv/RbZDM8xZTQgNblCKO8waWPOEDME0kVXPob6tcr0y
+         rxqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718068646; x=1718673446;
+        d=1e100.net; s=20230601; t=1718069651; x=1718674451;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lD/LO/gxXCIGTZKmzDO3IySUcSGm5VYiE8jvdtRhgQQ=;
-        b=Mca4L98znPd7m79zzNvRO+qHvdqvgRhvJEuqHyodbIWLfmhQobkxY4qGJIuy8Bg1ii
-         QbE0sqUdGXYpitvsiDjSzbixUsE4pIv2D8E/tBT3CNulhu2/0G0fQYzxN8mrKLlUkmOS
-         nqBYZyiGEgtDaAf6DXAS9dFG2s8o74qSK2ml7RW+3KPH+rk250+FZ3iSmcPyrkFyP0ch
-         4oofthZ240sofmcV7QpAiVwdamUrbWJBr2GwOZx3eMdCtCYN8ICwV8nYcHzgi4VHdvlp
-         Bymn9wS4jHwE8YCiM4uRIQBJZMHfEM3Mh8X6Ox9eOzFSHSsJkLYrXW+rXbkdF5uHfwS3
-         aqsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVK17jLtA8g9g1x5+lmTmlrTdWOpbA27dqNoHULRICZNyP/39iU1PctELQZsFuomZ8tX18iHs0UoorLNQ/4cW73ai/Q
-X-Gm-Message-State: AOJu0Yxa0GnJ2GNx+w623KU1HjYB3QPjp2G6IVmoaDLfGjBz39aHGjic
-	UfQslE4hihi5kvc574cq7t6qQPyNgTuyLQzroBg+QwrgrnbxhZQkbqX4xa9T5Pk1e/RYIgLZJtq
-	+Ig==
-X-Google-Smtp-Source: AGHT+IHhAcgd3utbJYDRGxgrLzP9SGACR5u04abW5bR8SQQdYf0g+W+AAgne/wgHvaBuqh1i70Q6FxoEe/M=
+        bh=x5baEhBF9sOr8kVhYoFhuMjx/1QvP9In6UP3EAvA/gw=;
+        b=O/uDBh7AMj+tp7vwzWbXANImXjrYlFtuXp0Gj5rLuG14L0Xb9CzNUcaxqac2Mn9TGM
+         6mrRcfiFZFohTvAG73KUDI7FYLU3PUbk6v8YehWeYc5f35rU+jEqoNt933Nl/sKFnlo2
+         O7kLGtzYoSmsSFI1uP+DjjwmiRLw1mCAUn2b/SPykIpg9ych/MJ9usolKEDb3oDCoEqG
+         UBe+deWOVmy05exu4Gi5pab+8FwphFSTOUUijocGe/Mnk54ljzrFwMcMiTV8DbJGp8xM
+         Gz7Ti9PKBHvzmIdMYDrnXcVC6g6zPI3fZRxPjT64ZPO8EhHZTJDgOxY7vf3yueuQNzfl
+         Y7Cw==
+X-Gm-Message-State: AOJu0YxBYJeN9CwIcSc/dw1jh1dY1yN5BWUYTD8xbWr6kXyj7bPKGVTM
+	rYHJ6yAKkwFkJahx2YnIvcorxFSrFstjmCDK/9G7FRy8lTG7Voz25n81Q7lm1ILI0RX36Ue3nhv
+	2zw==
+X-Google-Smtp-Source: AGHT+IFMaS9Am3bSlTU0F3mWYL1AS7eAnC4jgCiDVFw71uqftz9MC4EnYM40IdvQeCJizG9IRIDTSD2POts=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:807:b0:2c3:2e2:8391 with SMTP id
- 98e67ed59e1d1-2c302e283cdmr13494a91.0.1718068646422; Mon, 10 Jun 2024
- 18:17:26 -0700 (PDT)
-Date: Mon, 10 Jun 2024 18:17:24 -0700
-In-Reply-To: <20240509075423.156858-2-weijiang.yang@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e54c:b0:1f6:21e5:c6e5 with SMTP id
+ d9443c01a7336-1f6d02e0820mr8602725ad.5.1718069651014; Mon, 10 Jun 2024
+ 18:34:11 -0700 (PDT)
+Date: Mon, 10 Jun 2024 18:34:09 -0700
+In-Reply-To: <20240410143446.797262-10-chao.gao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240509075423.156858-1-weijiang.yang@intel.com> <20240509075423.156858-2-weijiang.yang@intel.com>
-Message-ID: <ZmelpPm5YfGifhIj@google.com>
-Subject: Re: [RFC PATCH 2/2] KVM: x86: Enable guest SSP read/write interface
- with new uAPIs
+References: <20240410143446.797262-1-chao.gao@intel.com> <20240410143446.797262-10-chao.gao@intel.com>
+Message-ID: <ZmepkZfLIvj_st5W@google.com>
+Subject: Re: [RFC PATCH v3 09/10] KVM: VMX: Advertise MITI_CTRL_BHB_CLEAR_SEQ_S_SUPPORT
 From: Sean Christopherson <seanjc@google.com>
-To: Yang Weijiang <weijiang.yang@intel.com>
-Cc: pbonzini@redhat.com, mlevitsk@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
+To: Chao Gao <chao.gao@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	daniel.sneddon@linux.intel.com, pawan.kumar.gupta@linux.intel.com, 
+	Zhang Chen <chen.zhang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Thu, May 09, 2024, Yang Weijiang wrote:
-> Enable guest shadow stack pointer(SSP) access interface with new uAPIs.
-> CET guest SSP is HW register which has corresponding VMCS field to save
-> /restore guest values when VM-{Exit,Entry} happens. KVM handles SSP as
-> a synthetic MSR for userspace access.
+On Wed, Apr 10, 2024, Chao Gao wrote:
+> From: Zhang Chen <chen.zhang@intel.com>
 > 
-> Use a translation helper to set up mapping for SSP synthetic index and
-> KVM-internal MSR index so that userspace doesn't need to take care of
-> KVM's management for synthetic MSRs and avoid conflicts.
+> Allow guest to report if the short BHB-clearing sequence is in use.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> KVM will deploy BHI_DIS_S for the guest if the short BHB-clearing
+> sequence is in use and the processor doesn't enumerate BHI_NO.
+> 
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> Signed-off-by: Chao Gao <chao.gao@intel.com>
 > ---
->  arch/x86/include/uapi/asm/kvm.h |  3 +++
->  arch/x86/kvm/x86.c              |  7 +++++++
->  arch/x86/kvm/x86.h              | 10 ++++++++++
->  3 files changed, 20 insertions(+)
+>  arch/x86/kvm/vmx/vmx.c | 31 ++++++++++++++++++++++++++++---
+>  1 file changed, 28 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index ca2a47a85fa1..81c8d9ea2e58 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -420,6 +420,9 @@ struct kvm_x86_reg_id {
->  	__u16 rsvd16;
->  };
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index cc260b14f8df..c5ceaebd954b 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1956,8 +1956,8 @@ static inline bool is_vmx_feature_control_msr_valid(struct vcpu_vmx *vmx,
+>  }
 >  
-> +/* KVM synthetic MSR index staring from 0 */
-> +#define MSR_KVM_GUEST_SSP	0
+>  #define VIRTUAL_ENUMERATION_VALID_BITS	VIRT_ENUM_MITIGATION_CTRL_SUPPORT
+> -#define MITI_ENUM_VALID_BITS		0ULL
+> -#define MITI_CTRL_VALID_BITS		0ULL
+> +#define MITI_ENUM_VALID_BITS		MITI_ENUM_BHB_CLEAR_SEQ_S_SUPPORT
+> +#define MITI_CTRL_VALID_BITS		MITI_CTRL_BHB_CLEAR_SEQ_S_USED
+>  
+>  static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+>  {
+> @@ -2204,7 +2204,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	struct vmx_uret_msr *msr;
+>  	int ret = 0;
+>  	u32 msr_index = msr_info->index;
+> -	u64 data = msr_info->data;
+> +	u64 data = msr_info->data, spec_ctrl_mask = 0;
+>  	u32 index;
+>  
+>  	switch (msr_index) {
+> @@ -2508,6 +2508,31 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (data & ~MITI_CTRL_VALID_BITS)
+>  			return 1;
+>  
+> +		if (data & MITI_CTRL_BHB_CLEAR_SEQ_S_USED &&
+> +		    kvm_cpu_cap_has(X86_FEATURE_BHI_CTRL) &&
+> +		    !(host_arch_capabilities & ARCH_CAP_BHI_NO))
+> +			spec_ctrl_mask |= SPEC_CTRL_BHI_DIS_S;
+> +
+> +		/*
+> +		 * Intercept IA32_SPEC_CTRL to disallow guest from changing
+> +		 * certain bits if "virtualize IA32_SPEC_CTRL" isn't supported
+> +		 * e.g., in nested case.
+> +		 */
+> +		if (spec_ctrl_mask && !cpu_has_spec_ctrl_shadow())
+> +			vmx_enable_intercept_for_msr(vcpu, MSR_IA32_SPEC_CTRL, MSR_TYPE_RW);
+> +
+> +		/*
+> +		 * KVM_CAP_FORCE_SPEC_CTRL takes precedence over
+> +		 * MSR_VIRTUAL_MITIGATION_CTRL.
+> +		 */
+> +		spec_ctrl_mask &= ~vmx->vcpu.kvm->arch.force_spec_ctrl_mask;
+> +
+> +		vmx->force_spec_ctrl_mask = vmx->vcpu.kvm->arch.force_spec_ctrl_mask |
+> +					    spec_ctrl_mask;
+> +		vmx->force_spec_ctrl_value = vmx->vcpu.kvm->arch.force_spec_ctrl_value |
+> +					    spec_ctrl_mask;
+> +		vmx_set_spec_ctrl(&vmx->vcpu, vmx->spec_ctrl_shadow);
+> +
+>  		vmx->msr_virtual_mitigation_ctrl = data;
+>  		break;
 
-Do we want to have "SYNTHETIC" in the name?  E.g. to try and differentiate from
-KVM's paravirtual MSRs?
+I continue find all of this unpalatable.  The guest tells KVM what software
+mitigations the guest is using, and then KVM is supposed to translate that into
+some hardware functionality?  And merge that with userspace's own overrides?
 
-Hmm, but the PV MSRs are synthetic too.  Maybe it's the MSR part that's bad, e.g.
-the whole point of these shenanigans is to let KVM use its internal MSR framework
-without exposing those details to userspace.
+Blech.
 
-So rather than, KVM_X86_REG_SYNTHETIC_MSR, what if we go with KVM_X86_REG_SYNTHETIC?
-And then this becomes something like KVM_SYNTHETIC_GUEST_SSP?
+With KVM_CAP_FORCE_SPEC_CTRL, I don't see any reason for KVM to support the
+Intel-defined virtual MSRs.  If the userspace VMM wants to play nice with the
+Intel-defined stuff, then userspace can advertise the MSRs and use an MSR filter
+to intercept and "emulate" the MSRs.  They should be set-and-forget MSRs, so
+there's no need for KVM to handle them for performance reasons.
 
-Aha!  And then to prepare for a future where we add synthetic registers that
-aren't routed through the MSR framework (which seems unlikely, but its trivially
-easy to handle, so why not):
-
-static int kvm_translate_synthetic_reg(struct kvm_x86_reg_id *reg)
-{
-	switch (reg->index) {
-	case MSR_KVM_GUEST_SSP:
-		reg->type = KVM_X86_REG_MSR;
-		reg->index = MSR_KVM_INTERNAL_GUEST_SSP;
-		break;
-	default:
-		return -EINVAL;
-	}
-	return 0;
-}
-
-and then the caller would have slightly different ordering:
-
-        if (id->type == KVM_X86_REG_SYNTHETIC_MSR) {
-                r = kvm_translate_synthetic_msr(&id->index);
-                if (r)
-                        break;
-        }
-
-        r = -EINVAL;
-        if (id->type != KVM_X86_REG_MSR)
-                break;
+That way KVM doesn't need to deal with the the virtual MSRs, userspace can make
+an informed decision when deciding how to set KVM_CAP_FORCE_SPEC_CTRL, and as a
+bonus, rollouts for new mitigation thingies should be faster as updating userspace
+is typically easier than updating the kernel/KVM.
 
