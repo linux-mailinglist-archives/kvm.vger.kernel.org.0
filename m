@@ -1,200 +1,176 @@
-Return-Path: <kvm+bounces-19297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D688B9031E5
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 07:58:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D922990323B
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 08:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B531F1C23F19
-	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 05:58:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD93D1C234FB
+	for <lists+kvm@lfdr.de>; Tue, 11 Jun 2024 06:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2EF17107F;
-	Tue, 11 Jun 2024 05:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E0517108F;
+	Tue, 11 Jun 2024 06:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cyEhHRmu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="alGWbjtX"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2EBB8488
-	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 05:58:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEFE079C2
+	for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 06:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718085491; cv=none; b=nSyji67VomtxUXvH8lpscqQnM1XqtxTEJMFXKrMFC0knRvovUCl7SKZ+6GDj8drqR6ZXFVXVuVAu6LfZ8mzmLespW2lTc03qcUrFZOgkxEIaCNucC9UMp0NB8UTTHYy5OwTR2sHIM2GtdpFBhkLpNI2NgQoVZfNnpSeCo2xCUfQ=
+	t=1718086183; cv=none; b=pFx2lbJBY/48w/EvcpkWl9Ojq97nKXB+uYV/8DnhN99ftCCLKml3iGtgycF/h5+wRHkA5mLJYcDYvvduZgKRx0ZbbejDGS8/7iGxcQ3Kn+4/gFeIDrLxMptBmcQY6uXSwEW3vqwC9sCDK8vwQiAUyLhtM/T2luNeR3IW0riXEyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718085491; c=relaxed/simple;
-	bh=GBB/Uk8+cudk122GvBiogfdSb49xEZ/DJt19Rw07vxE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bKlVgLYXd6cuuVBYaHs0024CFxVtEQQs2PfMYeA6mUjdufFCCzSRhMnYWBT96vdzF91tJ75H6gWjtCiCFLv5XiCVNqzdk+M3VW9A+4I96U5rvoR/9IMlBUwGosi0e21sZts61F5uqyS/SRMOZ5vVfrbhiA1CGu9v3wdcFhjXokM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cyEhHRmu; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: jthoughton@google.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718085486;
+	s=arc-20240116; t=1718086183; c=relaxed/simple;
+	bh=eR96Qh/5iRQhSkLZ49faQ1/ZfLRyT1ZDLdu0PUbUwIc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nMdOtYKG5VX9VqW2F+4PCT0jXCpV713u+nRBJ2x+qh+FHJS9CRUyjJyKsuCQoBB62qR7ja7oLfn3HP9ycjfo114FQ4mEVH3BYRZxwW5zvQMaIeGaHgcuJhaq3QtyXmumZQPETkKSuQSMwDLNGt1Qdb94g00kofkGYX5NGQ8T/JE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=alGWbjtX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718086180;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=aqiWe39MZdeODszfKFW0wTFxaRO6NFFUSNnRgYQUTLg=;
-	b=cyEhHRmuHeeS06ZjBXNkPufgh3B8leCOaQ+2mkGJsxw/fHVbVvUbyAUlYdvNZ9xfM9HCHm
-	m4wplQ7pMuC8Dp8TGrb57W3hgjukde4F/i3k4080Q2Pj9PRiHNda6b2hjDUS8A2WB9ueZh
-	mwDKUBEjSMLvLDQO1P+3kvVaJ2uaU30=
-X-Envelope-To: akpm@linux-foundation.org
-X-Envelope-To: pbonzini@redhat.com
-X-Envelope-To: ankita@nvidia.com
-X-Envelope-To: axelrasmussen@google.com
-X-Envelope-To: catalin.marinas@arm.com
-X-Envelope-To: dmatlack@google.com
-X-Envelope-To: rientjes@google.com
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: corbet@lwn.net
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: rananta@google.com
-X-Envelope-To: ryan.roberts@arm.com
-X-Envelope-To: seanjc@google.com
-X-Envelope-To: shahuang@redhat.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: weixugc@google.com
-X-Envelope-To: will@kernel.org
-X-Envelope-To: yuzhao@google.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: linux-doc@vger.kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: linux-mm@kvack.org
-Date: Mon, 10 Jun 2024 22:57:54 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: James Houghton <jthoughton@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ankit Agrawal <ankita@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	David Matlack <dmatlack@google.com>,
-	David Rientjes <rientjes@google.com>,
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
-	Marc Zyngier <maz@kernel.org>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Ryan Roberts <ryan.roberts@arm.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shaoqin Huang <shahuang@redhat.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
-	Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v5 3/9] KVM: arm64: Relax locking for kvm_test_age_gfn
- and kvm_age_gfn
-Message-ID: <ZmfnYnm3K_rHX_VB@linux.dev>
-References: <20240611002145.2078921-1-jthoughton@google.com>
- <20240611002145.2078921-4-jthoughton@google.com>
+	bh=wRVRX12wifRb77ucqxD8SoxcD6QmCklA7Z5uOhaawh8=;
+	b=alGWbjtX06LOfXJshq1mdrz52RwF7NEqsNrwmL2lAwoPpTr2CHQsPNvvu0/0BiubLuhHG1
+	IyxTvCkUM1ZLtkmJPQ5Y/NGe+aMnZnypGUOVXzXhMagFOWxDBfsc3kwUuI6Zl+mr5TOSlb
+	T3fuy4dWl3iADQ7oeV9R3sARuIS5PSY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-589-Z-o5xYCXPpOU9WaxMhevuA-1; Tue, 11 Jun 2024 02:09:39 -0400
+X-MC-Unique: Z-o5xYCXPpOU9WaxMhevuA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4217104c425so22646025e9.0
+        for <kvm@vger.kernel.org>; Mon, 10 Jun 2024 23:09:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718086177; x=1718690977;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wRVRX12wifRb77ucqxD8SoxcD6QmCklA7Z5uOhaawh8=;
+        b=jiuWK61oZe98+FEktQtYRzydCDzhtURFaN7jKSEAfS4YvfBb99LRjgJUf/+FOGITIw
+         IuqiYbxB5GomQAzA/xBp39tRbe5YidoWNxY+ES7IrK0sJ0Gg9GhI9Y4LSZidU/kKcTxx
+         MfMoWVI9vMJbUDntBXC3vgW4pyOK5PuYKWo0rng8x+L25D66t4ysaU5VCqrweQGCzPlq
+         gLEEws0PKVXxO6L1YRUbF+BwCaFRbKPl8Tjgv1repZDPd/CH9MMIAVaNKUj1tZ54cT9b
+         zy+znn/ARj4mgw29V5sgILhKhfErcBa8hCll+OfT7dQSpYgC4qjDyPgm8y0yt5693wru
+         Azpw==
+X-Forwarded-Encrypted: i=1; AJvYcCUwyypYu9JxsnwePpRjCJCDMnnw7GYYD1/uoiV0dnQwV1R6CDfB7s0TnaoyDFCa9f6+EMazYSDdz0JGJHkYGbcdd4wI
+X-Gm-Message-State: AOJu0YxX3WC5yMRth8hwT4H3+WOKgq1NWQbWMxeEYlGmuJ83m5+gS/l1
+	J3G5/CIgqfU/jyOYyYUXgyab/ts+fDcjUY7ghSuba2lms8kOkbKgFq8g3WHvfE+kyOUSBLEpQwf
+	2D8xr2FCsHBM7Zxd/0pqQBz2caQVJdclnBJO0trV/InW6VqosFaBK5Qul6xU5YsNXIki0eOLNXy
+	nX/kawVk6nwlEO1F5hwg3OzQzx
+X-Received: by 2002:a05:600c:3544:b0:421:7b9d:5b9b with SMTP id 5b1f17b1804b1-4217b9d5c65mr60564955e9.15.1718086177716;
+        Mon, 10 Jun 2024 23:09:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG+n+/GQx5Q2Plr7xS1cjRck09sfOnGE3ZBQ7ZXSoS1tggqh8IRk2hnXH6/xd9Hk313u99VaVhOTNpTiufCh/Y=
+X-Received: by 2002:a05:600c:3544:b0:421:7b9d:5b9b with SMTP id
+ 5b1f17b1804b1-4217b9d5c65mr60564835e9.15.1718086177335; Mon, 10 Jun 2024
+ 23:09:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240611002145.2078921-4-jthoughton@google.com>
-X-Migadu-Flow: FLOW_OUT
+References: <20240423235013.GO3596705@ls.amr.corp.intel.com>
+ <ZimGulY6qyxt6ylO@google.com> <20240425011248.GP3596705@ls.amr.corp.intel.com>
+ <CABgObfY2TOb6cJnFkpxWjkAmbYSRGkXGx=+-241tRx=OG-yAZQ@mail.gmail.com>
+ <Zip-JsAB5TIRDJVl@google.com> <CABgObfaxAd_J5ufr+rOcND=-NWrOzVsvavoaXuFw_cwDd+e9aA@mail.gmail.com>
+ <ZivFbu0WI4qx8zre@google.com> <ZmORqYFhE73AdQB6@google.com>
+ <CABgObfYD+RaLwGgC_nhkP81OMy3-NvLVqu9MKFM3LcNzc7MCow@mail.gmail.com>
+ <de1b0bbc-b781-4372-88ad-81f26c9152c2@redhat.com> <ZmeOxAtwfTsDCi1x@google.com>
+In-Reply-To: <ZmeOxAtwfTsDCi1x@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 11 Jun 2024 08:09:24 +0200
+Message-ID: <CABgObfbvhz10ikVbeguUwSDpxFr+wm73cTZCKU9JRDyZdUJapQ@mail.gmail.com>
+Subject: Re: [PATCH 09/11] KVM: guest_memfd: Add interface for populating gmem
+ pages with user data
+To: Sean Christopherson <seanjc@google.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, michael.roth@amd.com, isaku.yamahata@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 11, 2024 at 12:21:39AM +0000, James Houghton wrote:
-> Replace the MMU write locks (taken in the memslot iteration loop) for
-> read locks.
-> 
-> Grabbing the read lock instead of the write lock is safe because the
-> only requirement we have is that the stage-2 page tables do not get
-> deallocated while we are walking them. The stage2_age_walker() callback
-> is safe to race with itself; update the comment to reflect the
-> synchronization change.
-> 
-> Signed-off-by: James Houghton <jthoughton@google.com>
-> ---
->  arch/arm64/kvm/Kconfig       |  1 +
->  arch/arm64/kvm/hyp/pgtable.c | 15 +++++++++------
->  arch/arm64/kvm/mmu.c         | 26 ++++++++++++++++++++------
->  3 files changed, 30 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/Kconfig b/arch/arm64/kvm/Kconfig
-> index 58f09370d17e..7a1af8141c0e 100644
-> --- a/arch/arm64/kvm/Kconfig
-> +++ b/arch/arm64/kvm/Kconfig
-> @@ -22,6 +22,7 @@ menuconfig KVM
->  	select KVM_COMMON
->  	select KVM_GENERIC_HARDWARE_ENABLING
->  	select KVM_GENERIC_MMU_NOTIFIER
-> +	select KVM_MMU_NOTIFIER_YOUNG_LOCKLESS
->  	select HAVE_KVM_CPU_RELAX_INTERCEPT
->  	select KVM_MMIO
->  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> index 9e2bbee77491..b1b0f7148cff 100644
-> --- a/arch/arm64/kvm/hyp/pgtable.c
-> +++ b/arch/arm64/kvm/hyp/pgtable.c
-> @@ -1319,10 +1319,10 @@ static int stage2_age_walker(const struct kvm_pgtable_visit_ctx *ctx,
->  	data->young = true;
->  
->  	/*
-> -	 * stage2_age_walker() is always called while holding the MMU lock for
-> -	 * write, so this will always succeed. Nonetheless, this deliberately
-> -	 * follows the race detection pattern of the other stage-2 walkers in
-> -	 * case the locking mechanics of the MMU notifiers is ever changed.
-> +	 * This walk may not be exclusive; the PTE is permitted to change
+On Tue, Jun 11, 2024 at 1:41=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Tue, Jun 11, 2024, Paolo Bonzini wrote:
+> > On 6/10/24 23:48, Paolo Bonzini wrote:
+> > > On Sat, Jun 8, 2024 at 1:03=E2=80=AFAM Sean Christopherson <seanjc@go=
+ogle.com> wrote:
+> > > > SNP folks and/or Paolo, what's the plan for this?  I don't see how =
+what's sitting
+> > > > in kvm/next can possibly be correct without conditioning population=
+ on the folio
+> > > > being !uptodate.
+> > >
+> > > I don't think I have time to look at it closely until Friday; but
+> > > thanks for reminding me.
+> >
+> > Ok, I'm officially confused.  I think I understand what you did in your
+> > suggested code.  Limiting it to the bare minimum (keeping the callback
+> > instead of CONFIG_HAVE_KVM_GMEM_INITIALIZE) it would be something
+> > like what I include at the end of the message.
+> >
+> > But the discussion upthread was about whether to do the check for
+> > RMP state in sev.c, or do it in common code using folio_mark_uptodate()=
+.
+> > I am not sure what you mean by "cannot possibly be correct", and
+> > whether it's referring to kvm_gmem_populate() in general or the
+> > callback in sev_gmem_post_populate().
+>
+> Doing fallocate() before KVM_SEV_SNP_LAUNCH_UPDATE will cause the latter =
+to fail.
+> That likely works for QEMU, at least for now, but it's unnecessarily rest=
+rictive
+> and IMO incorrect/wrong.
 
-s/may not/is not/
+Ok, I interpreted incorrect as if it caused incorrect initialization
+or something similarly fatal.  Being too restrictive can (almost)
+always be lifted.
 
-> +	 * from under us. If there is a race to update this PTE, then the
-> +	 * GFN is most likely young, so failing to clear the AF is likely
-> +	 * to be inconsequential.
->  	 */
->  	if (data->mkold && !stage2_try_set_pte(ctx, new))
->  		return -EAGAIN;
-> @@ -1345,10 +1345,13 @@ bool kvm_pgtable_stage2_test_clear_young(struct kvm_pgtable *pgt, u64 addr,
->  	struct kvm_pgtable_walker walker = {
->  		.cb		= stage2_age_walker,
->  		.arg		= &data,
-> -		.flags		= KVM_PGTABLE_WALK_LEAF,
-> +		.flags		= KVM_PGTABLE_WALK_LEAF |
-> +				  KVM_PGTABLE_WALK_SHARED,
->  	};
-> +	int r;
->  
-> -	WARN_ON(kvm_pgtable_walk(pgt, addr, size, &walker));
-> +	r = kvm_pgtable_walk(pgt, addr, size, &walker);
-> +	WARN_ON(r && r != -EAGAIN);
+> E.g. a more convoluted, fallocate() + PUNCH_HOLE + KVM_SEV_SNP_LAUNCH_UPD=
+ATE will
+> work (I think?  AFAICT adding and removing pages directly to/from the RMP=
+ doesn't
+> affect SNP's measurement, only pages that are added via SNP_LAUNCH_UPDATE=
+ affect
+> the measurement).
 
-I could've been more explicit last time around, could you please tone
-this down to WARN_ON_ONCE() as well?
+So the starting point is writing testcases (for which indeed I have to
+wait until Friday).  It's not exactly a rewrite but almost.
 
->  	return data.young;
->  }
->  
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 8bcab0cc3fe9..a62c27a347ed 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1773,25 +1773,39 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->  bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->  {
->  	u64 size = (range->end - range->start) << PAGE_SHIFT;
-> +	bool young = false;
-> +
-> +	read_lock(&kvm->mmu_lock);
->  
->  	if (!kvm->arch.mmu.pgt)
->  		return false;
+> Punting the sanity check to vendor code is also gross and will make it ha=
+rder to
+> provide a consistent, unified ABI for all architectures.  E.g. SNP return=
+s -EINVAL
+> if the page is already assigned, which is quite misleading.
+>
+> > The change below looks like just an optimization to me, which
+> > suggests that I'm missing something glaring.
+>
+> I really dislike @prepare.  There are two paths that should actually init=
+ialize
+> the contents of the folio, and they are mutually exclusive and have meani=
+ngfully
+> different behavior.  Faulting in memory via kvm_gmem_get_pfn() explicitly=
+ zeros
+> the folio _if necessary_, whereas kvm_gmem_populate() initializes the fol=
+io with
+> user-provided data _and_ requires that the folio be !uptodate.
 
-I'm guessing you meant to have 'goto out' here, since this early return
-fails to drop the mmu_lock.
+No complaints there, I just wanted to start with the minimal change to
+use the uptodate flag in kvm_gmem_populate(). And yeah,
+kvm_gmem_get_folio() at this point can be basically replaced by
+filemap_grab_folio() in the kvm_gmem_populate() path. What I need to
+think about, is that there is still quite a bit of code in
+__kvm_gmem_get_pfn() that is common to both paths.
 
--- 
-Thanks,
-Oliver
+Paolo
+
 
