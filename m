@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-19515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB2A2905E07
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:54:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77CD8905E08
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:54:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 012C0B20FDE
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:54:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759001C213A5
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943C812A14C;
-	Wed, 12 Jun 2024 21:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30D3712BF3D;
+	Wed, 12 Jun 2024 21:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="DJTf9oMc"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="I08DF1+j"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AA5B82488
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01D6127E3F
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718229271; cv=none; b=KbOyJ+V0wBreKGwcqQdfjnG/Wy+Gl74WsyQvoCZlzcJ4+JVWcPSW2VfVONYonLRNNpCkSnSNDCr9YkmDnq1vEWzzHoR2Q72knU0ZcfPhlscuiuTTmcxvBRlFgUWU4y9TlZVykEuqZtt+KNdY/QTj9G0J92EKPeka5dtRC9p3W8g=
+	t=1718229273; cv=none; b=uUIImx0nZkGq8j5+7IYL5uf+mx4YsXAGl27tvJSTN4Mr2bQirFiKUVA/GTzJcoKQNQxb53IfaVZ/OHUHGsTW27hSqkzg9TGLDgIC9ZLNJqw6nSeBmUTjl7pOWsbZ1MZTg/UXx2tziswI6I/7LCn+ldheY1Wc6KaizaIUoAAkOFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718229271; c=relaxed/simple;
-	bh=YYK68WFDRsw2ngRpORU4BvMiRT9JZvHsdKs2lAAvwXA=;
+	s=arc-20240116; t=1718229273; c=relaxed/simple;
+	bh=Mef8+WrFLjcRWTeyr7/n9NEG+tIXc2iTFCcmhv9M4po=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=twgzKqKE3ipd+ss0mA8zojKrvUeUwPWsXzSraSQyptOfMtRyjNrCQ9r5nPRQ1h8usBZ3kNGcZmRM/nl20xuFz1aoLZQOtnf6D5tdI//Icg2bN3ALFnL8vCieQ8KkVVVuKeoxONEXQ2eylAv8Q58nP8k0qqPCI3Tar7EHtKQd/E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=DJTf9oMc; arc=none smtp.client-ip=209.85.218.50
+	 MIME-Version; b=J/ZOj88d+vb7XqqdGBtJ26V9erDwR+D38OMnhq9PO9ySrOC8SxrjtcU5/9+Uxy2tyFrBMXBIFy+sgV3Z8//CHVZOamyqYUnkS8B5Mh+eQB3x4zpa8dNJC14x6itj90mPHCIUkP20SQStOIAg1TLTWC+Vn02+iqly1IHqelswEQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=I08DF1+j; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a6265d48ec3so51218566b.0
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:54:29 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a6f0e153eddso48134866b.0
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:54:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1718229268; x=1718834068; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1718229269; x=1718834069; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GpnIlzasRXPDrLHeFqpUbRMekE5s61RRbf6mIjmfyP4=;
-        b=DJTf9oMcqUxWfdBt8xMpcgOHk9lYG/+i1sEK1fpIoH7HZFacGC7qdWNEY5Ujdy/EwB
-         cz4lExLNT4zOOdfVwCEz4QxuaogCsUqm3QxnzKRSX+UhUTaAMFBTKL9PVdiQfM786LhO
-         SFIwV/sP4EKlxrz9+r/6jv9eJvL7rtvQGeWTCCgoE4GU3DX94AOG96XVYJehXYrBEHID
-         nNyuAUCtCL0mvb/tLt9/OnLXZf/ZHm022VyCVpqBJ6emNqZlNczpBzgms6uSBTeMEjjL
-         9VrZ9HX9Cpl3GG8PbF3sGlEJYh/N1iq95RvnjNTOR84qaJxSg+kl6M+Ds+6XQGCsLz7o
-         RAHg==
+        bh=rZbb2eMSSDdlpeUuW/bDuyvE9odB04iaefVgLAtvy4k=;
+        b=I08DF1+j26wO+mmceoQ53IGTDam+i+TSNh8FfpM5wci8+2Gaa5t8cQ0/HVDdD6Gmq7
+         MImETVAUWKAAVhOy+8Kh2WvAQGfg3S0HQtOm94MqsCQYtgINJX+boBv9pmQdRJ/IsvS8
+         7auiP4bZ/dmEZJamJNU7xvdGiM/6vQUReFWrF3vk6HikmELqDdhCaoqICxWRJP3fymW2
+         8eejqFxj7SNZPxF74wzyMHSaRXovtMXisxSRJt6bE3QdKA3M5Q1z4WNTR6tFmeppSuwG
+         qFiDL2DedkKz383tpEVfQxObdc/TSsRNHk5zpDM604ayDfjLqfgN2ASd7lka0LxpcX3K
+         t9jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718229268; x=1718834068;
+        d=1e100.net; s=20230601; t=1718229269; x=1718834069;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GpnIlzasRXPDrLHeFqpUbRMekE5s61RRbf6mIjmfyP4=;
-        b=ByNn/jRs5ITwCRxPMYoDwP4nVNHOjlP7o6sOEqi5CBo2ak0YvQw7/p2h9aDbgwSndU
-         WpwqdP94bg33oVwy4DteIMwPpv/1/uZv4WnrStPSgY6c7kLga+OoM/nX9NQBnixnofiP
-         jiFNT/szlyOInRZNvnN/zLYagdRFVboK/VkZQ+HdCVpqhR1xNuqVdkURRn+Bx9yRYyU/
-         QPvRfcEL4BWj/1udhR3o5t1fYE/S/yh8ndnvZwdNrGRyrmewRnk2CtdoBcE4RyfUAlSl
-         mE4JzfmoWD/boQ2rc4/OQ+IHxbDKqcuGGQTfcH0hLbGkSKlYn7PL35xRY7P05TH44vPY
-         bz0g==
-X-Gm-Message-State: AOJu0YznqrMtrCqtuMzSyfxLV+UvP1lKUqv2ZoiV1A214rBPgVT5xWkL
-	uB/zoWYgId4DFONAAYF5FhOOu8g0Yrf0hMgu65e4M6ci4iRrO4rT722MOp+Eo+Y=
-X-Google-Smtp-Source: AGHT+IFAP2dxYnk5y5m6tXMhQr8qkxgEQ7fuY4uqCUeHAYT2sEziLS32qJpOa3tt50BpR+y1tQlqHg==
-X-Received: by 2002:a17:907:2d28:b0:a6f:1f4a:dfba with SMTP id a640c23a62f3a-a6f47cc0dcemr205356466b.43.1718229268191;
-        Wed, 12 Jun 2024 14:54:28 -0700 (PDT)
+        bh=rZbb2eMSSDdlpeUuW/bDuyvE9odB04iaefVgLAtvy4k=;
+        b=FSGmT4+iXLjT4KwK+ktps8cIuiG+GWpnJ459DYvXQ84Rmtvga2rZDtg6mIroNoa+jo
+         NR8ldVU0Pe0K7+leUFy44HlDe0ZXa+9fWbYoRJ2uUtXoupftemW+or68H0EfuW2TFsPI
+         fWkyU0RLlo2TeJtpVfdss3QiclFMYUy7eIlZEg1Q79fFIHL4cNp4vnSz37IZV8C2/JV5
+         CrodTv1Agwp9xNt2AMEDNSR43Bgx72cZGQOY4OHEcnvqsAcGKEVQn24dQlVtkjDw3qDB
+         qPMqtJyQBFpLWICfbDNHFVJP0EHvlW5fDQdTfPlvIinifcYKuOOfeJhJNHi7U7i9TWFO
+         3yHA==
+X-Gm-Message-State: AOJu0YwssNwkd+MU6Zs7E4Djo8IS23tVv7eKyi9zzYkLhc9pPve9j1gU
+	eoRzLSK6Tj7ZX5B+WwvI85rT9swrgvQN+hO8FMgf7bRtXZqp6JS6HnyQEW31iLU/8kN05r02K6K
+	+wRk=
+X-Google-Smtp-Source: AGHT+IFaXOJZmuW4RC6vvWftRaxf9A4ltZOMTTHSaCEYvTy6FkXgvBXAw0m/VsSCO2SYYloQijxCLg==
+X-Received: by 2002:a17:907:7e87:b0:a6f:4b7d:599b with SMTP id a640c23a62f3a-a6f4b7d6bf0mr173495966b.33.1718229269312;
+        Wed, 12 Jun 2024 14:54:29 -0700 (PDT)
 Received: from bell.fritz.box (p200300f6af372f000c444b1ebcbc1017.dip0.t-ipconnect.de. [2003:f6:af37:2f00:c44:4b1e:bcbc:1017])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6dff0247a4sm785359966b.147.2024.06.12.14.54.27
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6dff0247a4sm785359966b.147.2024.06.12.14.54.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 14:54:27 -0700 (PDT)
+        Wed, 12 Jun 2024 14:54:28 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org,
-	Mathias Krause <minipli@grsecurity.net>,
-	Emese Revfy <re.emese@gmail.com>,
-	PaX Team <pageexec@freemail.hu>
-Subject: [PATCH v2 1/4] KVM: Reject overly excessive IDs in KVM_CREATE_VCPU
-Date: Wed, 12 Jun 2024 23:54:12 +0200
-Message-Id: <20240612215415.3450952-2-minipli@grsecurity.net>
+	Mathias Krause <minipli@grsecurity.net>
+Subject: [PATCH v2 2/4] KVM: selftests: Test vCPU IDs above 2^32
+Date: Wed, 12 Jun 2024 23:54:13 +0200
+Message-Id: <20240612215415.3450952-3-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240612215415.3450952-1-minipli@grsecurity.net>
 References: <20240612215415.3450952-1-minipli@grsecurity.net>
@@ -87,55 +86,42 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If, on a 64 bit system, a vCPU ID is provided that has the upper 32 bits
-set to a non-zero value, it may get accepted if the truncated to 32 bits
-integer value is below KVM_MAX_VCPU_IDS and 'max_vcpus'. This feels very
-wrong and triggered the reporting logic of PaX's SIZE_OVERFLOW plugin.
+The KVM_CREATE_VCPU ioctl ABI had an implicit integer truncation bug,
+allowing 2^32 aliases for a vCPU ID by setting the upper 32 bits of a 64
+bit ioctl() argument.
 
-Instead of silently truncating and accepting such values, pass the full
-value to kvm_vm_ioctl_create_vcpu() and make the existing limit checks
-return an error.
+Verify this no longer works and gets rejected with an error.
 
-Even if this is a userland ABI breaking change, no sane userland could
-have ever relied on that behaviour.
-
-Reported-by: PaX's SIZE_OVERFLOW plugin running on grsecurity's syzkaller
-Fixes: 6aa8b732ca01 ("[PATCH] kvm: userspace interface")
-Cc: Emese Revfy <re.emese@gmail.com>
-Cc: PaX Team <pageexec@freemail.hu>
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
-v2:
-- add comment and build bug to make truncation check more obvious (Sean)
- virt/kvm/kvm_main.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ .../selftests/kvm/x86_64/max_vcpuid_cap_test.c        | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 14841acb8b95..b04e87f6568f 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4200,12 +4200,20 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
- /*
-  * Creates some virtual cpus.  Good luck creating more than one.
-  */
--static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
-+static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- {
- 	int r;
- 	struct kvm_vcpu *vcpu;
- 	struct page *page;
+diff --git a/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c b/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
+index 3cc4b86832fe..92cb2f4aef6d 100644
+--- a/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
++++ b/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
+@@ -35,10 +35,19 @@ int main(int argc, char *argv[])
+ 	TEST_ASSERT(ret < 0,
+ 		    "Setting KVM_CAP_MAX_VCPU_ID multiple times should fail");
  
-+	/*
-+	 * KVM tracks vCPU IDs as 'int', be kind to userspace and reject
-+	 * too-large values instead of silently truncating.
-+	 *
-+	 * Also ensure we're not breaking this assumption by accidentally
-+	 * pushing KVM_MAX_VCPU_IDS above INT_MAX.
-+	 */
-+	BUILD_BUG_ON(KVM_MAX_VCPU_IDS > INT_MAX);
- 	if (id >= KVM_MAX_VCPU_IDS)
- 		return -EINVAL;
+-	/* Create vCPU with id beyond KVM_CAP_MAX_VCPU_ID cap*/
++	/* Create vCPU with id beyond KVM_CAP_MAX_VCPU_ID cap */
+ 	ret = __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)MAX_VCPU_ID);
+ 	TEST_ASSERT(ret < 0, "Creating vCPU with ID > MAX_VCPU_ID should fail");
  
++	/* Create vCPU with id beyond UINT_MAX */
++	ret = __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)(1L << 32));
++	TEST_ASSERT(ret < 0, "Creating vCPU with ID > UINT_MAX should fail");
++
++	/* Create vCPU with id within bounds */
++	ret = __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)0);
++	TEST_ASSERT(ret >= 0, "Creating vCPU with ID 0 should succeed");
++
++	close(ret);
+ 	kvm_vm_free(vm);
+ 	return 0;
+ }
 -- 
 2.30.2
 
