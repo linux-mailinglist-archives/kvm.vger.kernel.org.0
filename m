@@ -1,191 +1,135 @@
-Return-Path: <kvm+bounces-19432-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19433-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC1790506D
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 12:32:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0753D90508B
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 12:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F223F1F23129
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 10:32:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A24A21F23C54
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 10:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB6B216EBE6;
-	Wed, 12 Jun 2024 10:32:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C59316EBFA;
+	Wed, 12 Jun 2024 10:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iStnx/NX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MvCBZd1i"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D7C1C6AE
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 10:32:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D81236B17
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 10:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718188336; cv=none; b=lsSq+RxEZHSvTtxwbXgxLJYcLZNv0A6Dy4eBpL2jJ8nSwupLn/I/oKMi56t93llGzFeovuukcN2+7tpaMlNaKDuuIJYwVuDSbEpLBh3YoiUQfl3L8yM8xAdJLAthoHlhYCHNu5d+aFAEUbKLYI9TjOpAJVR03bAUkNcMn8kLBMo=
+	t=1718188751; cv=none; b=ewNB4bOSGX1p/y2tKMGN/VlTokyE1rqXLrLMAN+8STS3+Lxpq2uhoGhmO3uS4sdrWHsPq/K/xou/mpPI1tYblyQmP8djZFNqJxpITLbROq40+F7WRrJzCm6UjPHyjDTfsR4QJoiEijhRYEiPy8cO6/h2Dwn/XnT6ULkI9ix1ANc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718188336; c=relaxed/simple;
-	bh=RJOuGzUDz6GiaWaWds0kqjNdNympIykUXnU8SI5ODMw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AzHpf8ZIAmOjTVNrFD+44XSOgOiUz2va4p8UMJ6VZu6ovxNpzxq7PPIqcJCBAbKzjg5OhH3k3sLQC7BlmBkXtjNHyDwyDd2lAcxHxdxGpO9CEH+FwEJrn3m4JMNykz7sTbBCJ547Ac1TI/h6E87oYtUTbBH0yzEM02WSLxBsrtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iStnx/NX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718188334;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Xk4Ph2OIUlpFb1LCpnRhSDu6OaIUiqefP2RNDbhPaog=;
-	b=iStnx/NXFi/pKNczWZ+vDJdhSu/D9I4bU+mC3QngOBP3g06aTbqskMQOSO077el6yo3U4y
-	GWQN5csuDd285xxkSorgk0saeFQqdfEmOujGBsXt1LV/thU9e7vHpzdo/EFyHPhxKrt24f
-	91LFVKs6CqJSH0QLcMh8eBSEcjRdXio=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-395-DwpdW_6zOdSqCS5WcpVU1w-1; Wed, 12 Jun 2024 06:32:12 -0400
-X-MC-Unique: DwpdW_6zOdSqCS5WcpVU1w-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42108822a8eso3928605e9.0
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 03:32:12 -0700 (PDT)
+	s=arc-20240116; t=1718188751; c=relaxed/simple;
+	bh=S7LtIdD6IXZq293yndaSK73zT2xsNSO2FJIRnwsGoSk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dgfOFraBDbYif9JCfkY9lgE5xN6GY6xcEQ6NU5ywR6gDwUt/VsZx7FnVDmdOvOYJj4i3lN6C9EybOd2b3D22zbILeS63FY5vQcOpYDC5+t+WvGW/EBH1j/idyOTLJc1JsISBe5yh4hyf7Mjw4FYcWSd7VJiLxu090dVADRfkmTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=MvCBZd1i; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4217990f997so35610595e9.2
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 03:39:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718188748; x=1718793548; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YfD1VqZzELeuz1QNMdGkPvLMyqAG2nm5+OL8OY4ucSM=;
+        b=MvCBZd1iUZj+GBzwm3H7aLVSjFfRgGdpxKzrhL9lVV85VZT8XXQVGd/X84Pioo9r/G
+         WR01sXSGqxQrcXvRhxSfODSqwbcXf5UmsFEIfkI/8KCNNZY5atlg0zUlClNSrT9G9lf0
+         qA6r2UxpuaFeux3JbB4xlsYlP37K7YDlYXZhexRY/JFMZM6ioSd1klBe5KqwFEMsjEIS
+         CUehnKOXiWRN7J3hPfpMdvnCBSlYSp5ZQirBKZB340C0nkrEOdqWKqSfQzzk1x8aUKPD
+         q7TfGiOy1NKb21q5954i4x40e5GnofYHbtipdy9XhfXLha21DAEt/GQr/qoAcNopsJra
+         lO6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718188331; x=1718793131;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xk4Ph2OIUlpFb1LCpnRhSDu6OaIUiqefP2RNDbhPaog=;
-        b=DRVKLvsQlMH1DV8iT3lde+ytKJprePHARBsOYhK+crf1pqCq4FXr3nLcbMqg4Y0Hxs
-         5yKDUlC/ftuAk9LOSAm32cH0PiUafn7Ht3nToQrhWLDHApe/mUaZXgC7Sv2GjMFt8JPz
-         EIy+TV+YJIbVXxGTJxOnQOlolT1c9XxcJ9SzVPSejc4OvnirAtTo5nXDyg00vhr8jwYB
-         MQ6Bf4QOVDAUw6DWGBx4qxkKvbr9ZZ86PjC7goEPPUzXCjwklsVjzUhbxDx4R6GuTeFi
-         nuRP8UYzBHH8Rl3GZQ274sI3IKEMmarumnG/hpnjjWpO0A/RC8/cFpXvNyYz9nNPxXFX
-         OTEw==
-X-Gm-Message-State: AOJu0Yx29ZJnNMX8ijTPNp1ARW6rYifRFIjRHQRefscu8motH42TlgHa
-	8cMJYuS/iOTnp9ykzsTc8HQtuWUWNKv/nx8GRfcta31djOXPfHn1TDIvgahnn1WmTLPSx+tQYEa
-	HZvtcfokep1YXPYeihuw99PxHRRhgUCFErs5xc68H81Rth/8RxysHnkZAzw==
-X-Received: by 2002:a05:600c:3ba5:b0:421:7dc3:9a15 with SMTP id 5b1f17b1804b1-4223c53b3dcmr52772745e9.11.1718188331539;
-        Wed, 12 Jun 2024 03:32:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGHlPbpcvE5QF7ZmnpWhp/eayJK6IKXHYAMvreeKwvOzWgFit3EioTrinNEEmrozxhletdx5g==
-X-Received: by 2002:a05:600c:3ba5:b0:421:7dc3:9a15 with SMTP id 5b1f17b1804b1-4223c53b3dcmr52772485e9.11.1718188331187;
-        Wed, 12 Jun 2024 03:32:11 -0700 (PDT)
-Received: from [192.168.0.4] (ip-109-43-176-68.web.vodafone.de. [109.43.176.68])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286ff387csm20583335e9.12.2024.06.12.03.32.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jun 2024 03:32:10 -0700 (PDT)
-Message-ID: <36a997ac-324f-4fd9-9607-d81bd378be33@redhat.com>
-Date: Wed, 12 Jun 2024 12:32:09 +0200
+        d=1e100.net; s=20230601; t=1718188748; x=1718793548;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YfD1VqZzELeuz1QNMdGkPvLMyqAG2nm5+OL8OY4ucSM=;
+        b=X45CEJs8B3FMnyBPZvEA62Ymrq1pV53F+rAsEMuogvfsAn6+dY8ZUfW7nXKi8XXeYP
+         U3J4ecXKPmRkG4hMl66UiVqJwBVHqQ92V9PQiSzNRuWQFjcMwgPpGSDeGfwvb02XT6G9
+         qdXskjate1/8DXt79VZhwtk1l2/PJYib9J5uFoUoX9IjvaAzlFbY3Z1OtneeKN4hhf2v
+         NXbVlX8jk3e+DjP56Ef+uZ1v5gThoi4aHMW/WjW2mmZiC07x8QAfawHUz4YUs9xg4ObA
+         Ybfpw5+GrG2DH1fJXcqyDOER+fgfADuOkd8xFsVilW7FwTYErIxec3+eRjT0svovBRpg
+         cCCg==
+X-Forwarded-Encrypted: i=1; AJvYcCWBntnZzGuVkJ7yxNaDpvkfiaqbqHXCWDmRbov0adcaptIuM6jLMkadtDsTpwq9ivJ8CqsczDyjX0vWZzVWmsnw3Fyg
+X-Gm-Message-State: AOJu0YzU9DuX9/WzQ7mkRk9j/GSKQf8iDlyAVKMkAH4qlONIaeCjEl+y
+	VM4y+XbaxYwULucsyLZQutkrUE19Qg588rQ/iGVfr9QtPvJIWdwXZ7YBEfB7TWI=
+X-Google-Smtp-Source: AGHT+IG2sRx7mMogUgoJ8iAYjE31Oo5aulgtpW+ZCzhac5XAxW0N3ug26Of695k4kA7aaQpaEzc6kQ==
+X-Received: by 2002:a05:600c:418b:b0:421:cc89:dd5d with SMTP id 5b1f17b1804b1-422863b4c15mr9051705e9.9.1718188747645;
+        Wed, 12 Jun 2024 03:39:07 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42286fe9184sm20619335e9.13.2024.06.12.03.39.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 03:39:06 -0700 (PDT)
+Date: Wed, 12 Jun 2024 13:39:02 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>, kvm@vger.kernel.org
+Subject: Re: [bug report] KVM: SEV: Add KVM_SEV_SNP_LAUNCH_START command
+Message-ID: <f3cc08d7-bf74-4094-ac70-1fb1b4cb8992@moroto.mountain>
+References: <d9c16deb-6fad-4ecd-a783-4c4e9f518725@moroto.mountain>
+ <76e66fa2-4a36-4de1-96a3-b8893130ed74@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH 3/4] build: Make build output pretty
-To: Nicholas Piggin <npiggin@gmail.com>, Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org
-References: <20240602122559.118345-1-npiggin@gmail.com>
- <20240602122559.118345-4-npiggin@gmail.com>
- <448757a4-46c8-4761-bc51-32ee39f39b97@redhat.com>
- <20240603-20454ab2bca28b2a4b119db6@orel>
- <D1RNX51NOJV5.31CE9AGI74SKP@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <D1RNX51NOJV5.31CE9AGI74SKP@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <76e66fa2-4a36-4de1-96a3-b8893130ed74@redhat.com>
 
-On 05/06/2024 02.38, Nicholas Piggin wrote:
-> On Mon Jun 3, 2024 at 6:56 PM AEST, Andrew Jones wrote:
->> On Mon, Jun 03, 2024 at 10:26:50AM GMT, Thomas Huth wrote:
->>> On 02/06/2024 14.25, Nicholas Piggin wrote:
->>>> Unless make V=1 is specified, silence make recipe echoing and print
->>>> an abbreviated line for major build steps.
->>>>
->>>> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->>>> ---
->>>>    Makefile                | 14 ++++++++++++++
->>>>    arm/Makefile.common     |  7 +++++++
->>>>    powerpc/Makefile.common | 11 +++++++----
->>>>    riscv/Makefile          |  5 +++++
->>>>    s390x/Makefile          | 18 +++++++++++++++++-
->>>>    scripts/mkstandalone.sh |  2 +-
->>>>    x86/Makefile.common     |  5 +++++
->>>>    7 files changed, 56 insertions(+), 6 deletions(-)
->>>
->>> The short lines look superfluous in verbose mode, e.g.:
->>>
->>>   [OBJCOPY] s390x/memory-verify.bin
->>> objcopy -O binary  s390x/memory-verify.elf s390x/memory-verify.bin
->>>
->>> Could we somehow suppress the echo lines in verbose mode, please?
->>>
->>> For example in the SLOF project, it's done like this:
->>>
->>> https://gitlab.com/slof/slof/-/blob/master/make.rules?ref_type=heads#L48
->>>
->>> By putting the logic into $CC and friends, you also don't have to add
->>> "@echo" statements all over the place.
->>
->> And I presume make will treat the printing and compiling as one unit, so
->> parallel builds still get the summary above the error messages when
->> compilation fails. The way this patch is now a parallel build may show
->> the summary for the last successful build and then error messages for
->> a build that hasn't output its summary yet, which can be confusing.
->>
->> So I agree that something more like SLOF's approach would be better.
+On Wed, Jun 12, 2024 at 12:17:19PM +0200, Paolo Bonzini wrote:
+> Thanks for the report!
 > 
-> Hmm... kbuild type commands is a pretty big patch. I like it though.
-> Thoughts?
+> >     2134         /* Don't allow userspace to allocate memory for more than 1 SNP context. */
+> >     2135         if (sev->snp_context)
+> >     2136                 return -EINVAL;
+> >     2137     2138         sev->snp_context = snp_context_create(kvm,
+> > argp);
+> >                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > What this static checker warning is about is that "argp->sev_fd" points
+> > to a file and we create some context here and send a
+> > SEV_CMD_SNP_GCTX_CREATE command using that file.
+> 
+> ...
+> 
+> >     2156         start.gctx_paddr = __psp_pa(sev->snp_context);
+> >     2157         start.policy = params.policy;
+> >     2158         memcpy(start.gosvw, params.gosvw, sizeof(params.gosvw));
+> > --> 2159         rc = __sev_issue_cmd(argp->sev_fd, SEV_CMD_SNP_LAUNCH_START, &start, &argp->error);
+> >                                       ^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^
+> > The user controls which file the ->sev_fd points to so now we're doing
+> > SEV_CMD_SNP_LAUNCH_START command but the file could be different from
+> > what we expected.  Does this matter?  I don't know KVM well enough to
+> > say.  It doesn't seem very safe, but it might be fine.
+> 
+> It is safe, all file descriptors for /dev/sev are basically equivalent,
+> as they have no file-specific data.
+> 
+> __sev_issue_cmd ends up here:
+> 
+> int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
+>                                 void *data, int *error)
+> {
+>         if (!filep || filep->f_op != &sev_fops)
+>                 return -EBADF;
+> 
+>         return sev_do_cmd(cmd, data, error);
+> }
+> EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+> 
+> and you can see that the filep argument is only used to check that
+> the file has the right file_operations.
 
-Looks pretty complex to me ... do we really need this complexity in the 
-k-u-t? If not, I think I'd rather prefer to go with a more simple approach 
-like the one from SLOF.
+Ah.  That works.  Thanks!
 
-  Thomas
-
+regards,
+dan carpenter
 
 
