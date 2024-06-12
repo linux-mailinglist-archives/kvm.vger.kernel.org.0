@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-19458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6495690558E
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 16:46:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42703905590
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 16:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 107AC281229
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:46:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B9731C20336
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6710A17FAA5;
-	Wed, 12 Jun 2024 14:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA7317FAC2;
+	Wed, 12 Jun 2024 14:46:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k9B3Av6H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FlEassWS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB0617E8F6
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3143417F514
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718203558; cv=none; b=R9RNpJVRFdi8Y3WluA9ox8j+41GQL1nfOUNu1Dt5oy6oyKKxvTXwWJE+UniwjvDB7APaZ9UK0vRy7siXuy2hrOYoJxpry1HC1GGWofCKH2ZvJuBBVx7LX5Idpx9FGDSWmZCU6KC03775p+cVQ+wspLVm3lQi2K81KJkusQIq8Po=
+	t=1718203559; cv=none; b=axr/WB3yQXGl5exgQr8RsJVGsSeb9OmdQOSAr4vrx8K5FH5BRma8aLEUO/Y2UmdP9LETBoHQEsds5jiEaoWDKZ+9imVCUtvT7e0PLrqkZrpWMqyJZJnFr2oRm0Mz1YJb5wTisQOX+kqu1EkHj8bzi51pxkGh8HZkGsKkz30ZeCE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718203558; c=relaxed/simple;
-	bh=yqVIQaYfrIrHTNK3OkFmaV+HIjIKWjhtnBb+BAqytCA=;
+	s=arc-20240116; t=1718203559; c=relaxed/simple;
+	bh=pWEo4rehcTpG5+D1JR3lXzd0VUms7x1yeKkMzdClPaE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H7p9p+y3HEJ7O7NCTcwbRBeF/rYGhpsnNwkJE3KnsEASMD3WRJPC9jdnoiSTa7enVbWqb7TfbC1WEbR2ts9Fc+9iQqgNm19vdQH08g4N9YfbB8XnlAtzrHVZKZj+96fkQUMZ+rrReyTN0SruTfj/E7NgHnJMy6EBkSCL+/y84lQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k9B3Av6H; arc=none smtp.client-ip=209.85.218.46
+	 MIME-Version; b=t3hiJAam9kupMZHU9mZ/A1so5DXUZ+u2kw9eE8n6NhT1NMcShL9mY3/TEqa96QNZXM3KhMJjf+EAh67BpxeHb0q+NTzneYCpqCDVcFjDmXskvDHufrs/tthjfon82ZLa2W2PUtVxrtZqN+QAYWOycypeY0cBlXeo9vG9ZQJbjmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FlEassWS; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a6269885572so177179966b.1
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 07:45:56 -0700 (PDT)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a6f3efa1cc7so179301466b.0
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 07:45:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718203555; x=1718808355; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718203556; x=1718808356; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=txPdngU7ZvAHKIsUQF4Or85ok4oAkjD81XgTYTjxzhA=;
-        b=k9B3Av6Hu6DttWSjFkqx8eQo2orNsEfp6LcLgvUoi38kR77BcgrG3KBt7BuvyO86Yw
-         4BQgo0BPqilZa7GmumE51pEZNoJ/ZV/Mpz8iVQbzIwpRw/pxdDybyilzgzY4C+tzRv6G
-         WaGwUBT1ZW0Rc6Y5xNeONtOxkBCPxNv29lY1hRoW6qxOs9Uv2fMMx2kS2bbSzTScGqQV
-         I6mcuHFVNAEHyrcgr/eST+DLkXDuWTxgAPZeHghU4CBzpa+VrK5K94AWACZAZxMnvJE0
-         UA4ulSc+T6+z9IMe246F9Wv/50DFWopMA5cLRkV2m25BpAKywhNtD2EJijX26K00SFeB
-         it7w==
+        bh=VPmf+ULw9UxGqX77U4KfH0lMoJbFqr1mImBQcazrTZk=;
+        b=FlEassWS/fRwqgvqRLGm03fNyPAbT0JSlVDXtMT+gz4DHPPHmMvspWvg9Tzh5CwN/C
+         P3x+bvS+98SKjJAOCmiNfae3n6mCfQeovtFp8EvztqGCisrbq52nqfEm2C07/7Qf+uNc
+         yo5qiWpLcMd9R3uduwf1Yh6APpv6/EcVrwYxMqG1n3EZzNizY75eso+imU6upCK756+s
+         D1W3DebYjX85vF3wLkewC7WE3JazzjcC8IQXk1XgUfx4TBA2sMqWrPCF4NnEaolRCSDM
+         xh/ATu95JJKzId2/xdibrT2+2Y6UgaIIlCa27UZq9ND/WfRUWGYu0LqLzAO5WI5EB4mG
+         fUSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718203555; x=1718808355;
+        d=1e100.net; s=20230601; t=1718203556; x=1718808356;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=txPdngU7ZvAHKIsUQF4Or85ok4oAkjD81XgTYTjxzhA=;
-        b=H3sImt2pWbjFrw3hXOOYLi8dcdIgH2VAzHF8B+P4adfn9yNOn2MoefMcT6adv8J7Hi
-         gSnrtUMMqxDgTp4eExcGH9FAVEH1/jAQbxN+ihggYFPQuH0DaF9M7yFBkDT9G2uWgKkz
-         YUuA+os76gDkQB7O9+MY2/2cVwZDbpIdLJ2mycNwDQiJ91c3NyGMG5OwiYEmVmi3zf07
-         mBkcPksjEinrFTG7HqoASu4xEJG0cMnFYH+A9eak1HqciUFVVBiY7l3F3YK3hdQhzbXC
-         aeaKlvpZZE2qjVwAVfr5nbfK8ouMftVQNxcJljj6y+nwxi8I6oq1nslAH0T6Ueoj/8ai
-         jzNA==
-X-Gm-Message-State: AOJu0YxGCkH9/b2GQR9Ynd+HFEHTRs6fHLeCzinALiSQ/3a3Qfr4tuWi
-	G65mk8ADahp36Z1xr69AUrCtmLO3860yumrQ56oqEZCV2eG6v5wcFPAwTKao
-X-Google-Smtp-Source: AGHT+IGtfRMppDEgNRdntb1Mk4m3/ezyjhd5RVMXoPm+oZs2xzoLVjtEDJM6D+wsWb9qoo/5wsklTQ==
-X-Received: by 2002:a17:907:1186:b0:a6f:2000:9811 with SMTP id a640c23a62f3a-a6f46800881mr143188266b.13.1718203554848;
-        Wed, 12 Jun 2024 07:45:54 -0700 (PDT)
+        bh=VPmf+ULw9UxGqX77U4KfH0lMoJbFqr1mImBQcazrTZk=;
+        b=ZUl8E6ELQXpurXRT1K8HEMz7ynuRmSE4buv9ch8PzAb+0Zh513sYc4B45f9SdAkizp
+         BFcOE0uowQMntP/d/BUqGh7q2+Hw7vBV1l3sAXrTQTqQyxe3X7TlbOnaHef3x924JHUX
+         RBH0eruTEvUFtMizbtQlQm0FHqi8ePc/Nf2bdIwDpjjpYe15YBr1p5X4nSCXf++49u9x
+         X/maysIyg2E2/lxErSRLTHrxMc/vmA/AjmMLkjutDzFQWBuYRfbvWQWV2IlBYefIfWmn
+         Rugy8YFFN7NwtotNGkk/Ahg56Wxy0+KNWnVyu1Ybx5Sf0nTNkbCsoehP8TtINL2gYvCr
+         ap4A==
+X-Gm-Message-State: AOJu0YzFUsvu90qijz0Q6P3qtFnLhILKC/mDJSUf15fbGX4W77QqHcWT
+	bZVdPS09DkwMV5nThDFuSXpuhrC16zSo+AR36snp13E2cjMZVE8yaYVr8IPs
+X-Google-Smtp-Source: AGHT+IHgyh+3DozoxpWdiGogxIKvfwBWYPSgnUbnEigcpdB/MdyPoWhFal9G9AzFsz1t4A2XkLIyaQ==
+X-Received: by 2002:a17:906:328f:b0:a6f:4ebd:1463 with SMTP id a640c23a62f3a-a6f4ebd1d37mr46815266b.20.1718203555952;
+        Wed, 12 Jun 2024 07:45:55 -0700 (PDT)
 Received: from vasant-suse.suse.cz ([2001:9e8:ab7c:f800:473b:7cbe:2ac7:effa])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f18bbf3cbsm456440366b.1.2024.06.12.07.45.53
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f18bbf3cbsm456440366b.1.2024.06.12.07.45.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 07:45:54 -0700 (PDT)
+        Wed, 12 Jun 2024 07:45:55 -0700 (PDT)
 From: vsntk18@gmail.com
 To: kvm@vger.kernel.org
 Cc: vsntk18@gmail.com,
@@ -75,9 +75,9 @@ Cc: vsntk18@gmail.com,
 	pbonzini@redhat.com,
 	seanjc@google.com,
 	vkarasulli@suse.de
-Subject: [kvm-unit-tests PATCH v8 07/12] lib/x86: Move xsave helpers to lib/
-Date: Wed, 12 Jun 2024 16:45:34 +0200
-Message-Id: <20240612144539.16147-8-vsntk18@gmail.com>
+Subject: [kvm-unit-tests PATCH v8 08/12] x86: AMD SEV-ES: Handle CPUID #VC
+Date: Wed, 12 Jun 2024 16:45:35 +0200
+Message-Id: <20240612144539.16147-9-vsntk18@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240612144539.16147-1-vsntk18@gmail.com>
 References: <20240612144539.16147-1-vsntk18@gmail.com>
@@ -91,53 +91,140 @@ Content-Transfer-Encoding: 8bit
 
 From: Vasant Karasulli <vkarasulli@suse.de>
 
-Processing CPUID #VC for AMD SEV-ES requires copying xcr0 into GHCB.
-Move the xsave read/write helpers used by xsave testcase to lib/x86
-to share as common code.
+Using Linux's CPUID #VC processing logic.
 
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
 ---
- lib/x86/processor.h | 8 ++++++++
- x86/xsave.c         | 7 -------
- 2 files changed, 8 insertions(+), 7 deletions(-)
+ lib/x86/amd_sev.h    |  5 ++-
+ lib/x86/amd_sev_vc.c | 85 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 89 insertions(+), 1 deletion(-)
 
-diff --git a/lib/x86/processor.h b/lib/x86/processor.h
-index b324cbf0..e85f9e0e 100644
---- a/lib/x86/processor.h
-+++ b/lib/x86/processor.h
-@@ -477,6 +477,14 @@ static inline uint64_t rdpmc(uint32_t index)
- 	return val;
+diff --git a/lib/x86/amd_sev.h b/lib/x86/amd_sev.h
+index b6b7a13f..efd439fb 100644
+--- a/lib/x86/amd_sev.h
++++ b/lib/x86/amd_sev.h
+@@ -71,7 +71,7 @@ struct ghcb {
+ 	u8 shared_buffer[GHCB_SHARED_BUF_SIZE];
+
+ 	u8 reserved_0xff0[10];
+-	u16 protocol_version;	/* negotiated SEV-ES/GHCB protocol version */
++	u16 version;	/* version of the GHCB data structure */
+ 	u32 ghcb_usage;
+ } __packed;
+
+@@ -79,6 +79,9 @@ struct ghcb {
+ #define GHCB_PROTOCOL_MAX	1ULL
+ #define GHCB_DEFAULT_USAGE	0ULL
+
++/* Version of the GHCB data structure */
++#define GHCB_VERSION		1
++
+ #define	VMGEXIT()			{ asm volatile("rep; vmmcall\n\r"); }
+
+ enum es_result {
+diff --git a/lib/x86/amd_sev_vc.c b/lib/x86/amd_sev_vc.c
+index 30b892f9..39bca09e 100644
+--- a/lib/x86/amd_sev_vc.c
++++ b/lib/x86/amd_sev_vc.c
+@@ -58,6 +58,88 @@ static void vc_finish_insn(struct es_em_ctxt *ctxt)
+ 	ctxt->regs->rip += ctxt->insn.length;
  }
 
-+/* XCR0 related definitions */
-+#define XCR_XFEATURE_ENABLED_MASK       0x00000000
-+#define XCR_XFEATURE_ILLEGAL_MASK       0x00000010
++static enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
++					  struct es_em_ctxt *ctxt,
++					  u64 exit_code, u64 exit_info_1,
++					  u64 exit_info_2)
++{
++	enum es_result ret;
 +
-+#define XSTATE_FP       0x1
-+#define XSTATE_SSE      0x2
-+#define XSTATE_YMM      0x4
++	/* Fill in protocol and format specifiers */
++	ghcb->version = GHCB_VERSION;
++	ghcb->ghcb_usage       = GHCB_DEFAULT_USAGE;
 +
- static inline int xgetbv_safe(u32 index, u64 *result)
- {
- 	return rdreg64_safe(".byte 0x0f,0x01,0xd0", index, result);
-diff --git a/x86/xsave.c b/x86/xsave.c
-index 5d80f245..feb8db28 100644
---- a/x86/xsave.c
-+++ b/x86/xsave.c
-@@ -17,13 +17,6 @@ static uint64_t get_supported_xcr0(void)
-     return r.a + ((u64)r.d << 32);
- }
++	ghcb_set_sw_exit_code(ghcb, exit_code);
++	ghcb_set_sw_exit_info_1(ghcb, exit_info_1);
++	ghcb_set_sw_exit_info_2(ghcb, exit_info_2);
++
++	wrmsr(MSR_AMD64_SEV_ES_GHCB, __pa(ghcb));
++	VMGEXIT();
++
++	if ((ghcb->save.sw_exit_info_1 & 0xffffffff) == 1) {
++		u64 info = ghcb->save.sw_exit_info_2;
++		unsigned long v;
++
++		v = info & SVM_EVTINJ_VEC_MASK;
++
++		/* Check if exception information from hypervisor is sane. */
++		if ((info & SVM_EVTINJ_VALID) &&
++		    ((v == GP_VECTOR) || (v == UD_VECTOR)) &&
++		    ((info & SVM_EVTINJ_TYPE_MASK) == SVM_EVTINJ_TYPE_EXEPT)) {
++			ctxt->fi.vector = v;
++			if (info & SVM_EVTINJ_VALID_ERR)
++				ctxt->fi.error_code = info >> 32;
++			ret = ES_EXCEPTION;
++		} else {
++			ret = ES_VMM_ERROR;
++		}
++	} else if (ghcb->save.sw_exit_info_1 & 0xffffffff) {
++		ret = ES_VMM_ERROR;
++	} else {
++		ret = ES_OK;
++	}
++
++	return ret;
++}
++
++static enum es_result vc_handle_cpuid(struct ghcb *ghcb,
++				      struct es_em_ctxt *ctxt)
++{
++	struct ex_regs *regs = ctxt->regs;
++	u32 cr4 = read_cr4();
++	enum es_result ret;
++
++	ghcb_set_rax(ghcb, regs->rax);
++	ghcb_set_rcx(ghcb, regs->rcx);
++
++	if (cr4 & X86_CR4_OSXSAVE) {
++		/* Safe to read xcr0 */
++		u64 xcr0;
++		xgetbv_safe(XCR_XFEATURE_ENABLED_MASK, &xcr0);
++		ghcb_set_xcr0(ghcb, xcr0);
++	} else {
++		/* xgetbv will cause #GP - use reset value for xcr0 */
++		ghcb_set_xcr0(ghcb, 1);
++	}
++
++	ret = sev_es_ghcb_hv_call(ghcb, ctxt, SVM_EXIT_CPUID, 0, 0);
++	if (ret != ES_OK)
++		return ret;
++
++	if (!(ghcb_rax_is_valid(ghcb) &&
++	      ghcb_rbx_is_valid(ghcb) &&
++	      ghcb_rcx_is_valid(ghcb) &&
++	      ghcb_rdx_is_valid(ghcb)))
++		return ES_VMM_ERROR;
++
++	regs->rax = ghcb->save.rax;
++	regs->rbx = ghcb->save.rbx;
++	regs->rcx = ghcb->save.rcx;
++	regs->rdx = ghcb->save.rdx;
++
++	return ES_OK;
++}
++
+ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+ 					 struct ghcb *ghcb,
+ 					 unsigned long exit_code)
+@@ -65,6 +147,9 @@ static enum es_result vc_handle_exitcode(struct es_em_ctxt *ctxt,
+ 	enum es_result result;
 
--#define XCR_XFEATURE_ENABLED_MASK       0x00000000
--#define XCR_XFEATURE_ILLEGAL_MASK       0x00000010
--
--#define XSTATE_FP       0x1
--#define XSTATE_SSE      0x2
--#define XSTATE_YMM      0x4
--
- static void test_xsave(void)
- {
-     unsigned long cr4;
+ 	switch (exit_code) {
++	case SVM_EXIT_CPUID:
++		result = vc_handle_cpuid(ghcb, ctxt);
++		break;
+ 	default:
+ 		/*
+ 		 * Unexpected #VC exception
 --
 2.34.1
 
