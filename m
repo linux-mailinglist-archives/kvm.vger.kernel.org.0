@@ -1,123 +1,177 @@
-Return-Path: <kvm+bounces-19485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19486-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C4159059BB
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 19:17:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4E29059D0
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 19:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 114FE1F23354
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 17:17:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DC5AB24954
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 17:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF26181D1D;
-	Wed, 12 Jun 2024 17:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61740183062;
+	Wed, 12 Jun 2024 17:23:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="XN8gxad6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ED6QTUpf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E9A6EB74;
-	Wed, 12 Jun 2024 17:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1831822D9
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 17:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718212655; cv=none; b=IiLUXnLmVnJh03folGur1Swy+zIHtslwyi3PWWtQDymGSAujlNcbQmgnnxQc0CppsJglIN2Up6Hg7QAaGuIU690mIFGN8POoAUGBCAgNNkJiul8Z0r+0G10fBSkYCBGCQEpEkSJJKnsEpbmlwBWNBfiEod9jFPljp5dLycrejfU=
+	t=1718213023; cv=none; b=raRoPPjuVROPUs/wq36S7IQOZ72M6M2IKdBohiXUM/+IuLjvv9vVH9O32YKK3Tl/xAvoiGY8PC3f/Pokioh4mrJ3SkiTorNdXK/4YngrKD5yTkEmfgDELkHUjOSsMxCtmksT8iQhbHaKM55VACdsjTPHVA7BITsyVwgQiccSdbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718212655; c=relaxed/simple;
-	bh=NJQMBQRil58ND6OFo6p92d10MzwhfVEBtzsvz5Bo+ZM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qQygiJp+qppwDpnaJfx36rLYK9vp6Kx9hYr4f5RKO1Bf8buOZGQVFdcwEUSs4rYjipJGwWCOc2yM0X5JaZ+oA61eyxB8oPlq3EpXkpWRCFR10MlYHMa7CJFIbZcYeHrv5saxNiqWVI6hT08JT/yGeGJyVZZjIAueVqkBs3xwwHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=XN8gxad6; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id C36C740E016C;
-	Wed, 12 Jun 2024 17:17:30 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 5M2K0XrWouNU; Wed, 12 Jun 2024 17:17:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1718212647; bh=4k1pYfkT1S0YudCsGUl2eGS93cevs5Njco0yazIY5Pc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XN8gxad6ao+pXDaG6rRqdCedtjTtnJ52hyH8meG72hsLzB/APF3GZuzJpfkzdgAq1
-	 4Uj7fhU5UVOd+vCMgOcHd9Tts3VjqUo5o+Q2bJv/+rit/qYUY0H9Z0gSMsasSqsSuM
-	 mAD4tmG+47kEjPdtT6UoUQuuxyb/8PmoVjI5GGgsqWulqIZ5arjYaGJc8VHnHAsSNg
-	 RJpwDB0LvuH9DX19+SM9bpKmJHhzARYIHzqkrs/rLEdzZRSbe6OPtUJl9q1fyucR71
-	 KTiIlhQOKbGDn64VIyQvSz9VorGOebFNFYJO9SRz9mqpnEGMGGSx+b5NxxT/UaK07o
-	 UvnbpjEfATB9xZDnhf9yRmmXnUQietv1nC/jOjeECpcIYiQ1DfymB4w42IKT+kvPaP
-	 pWZqItHq/WGpycqTJo86b5cHsqmbvIwglAeprm/eY02JWfKAzyDItHVYdTLhKGriEO
-	 aoxTuz+65EcycNoqLVaL2expunHkPYylBulX/nFibTkQ6X2vaxF8nWXR78SYMyDf9u
-	 S3RG2G+ksk2i2LUcwKJ0O5eHY3bczhvHSTrktak2+L5DsXYCtcknEgzGqmueX1Oc0s
-	 IxqPsRvXZFAMzWhpYReaY8kPLYe9ksH3P3ZFw5nxHGY8EztcUJT4lbo9kKWXWZp831
-	 KJAHaqfW6Yw4N/j/CxaBHlW8=
-Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7BE7840E0081;
-	Wed, 12 Jun 2024 17:17:16 +0000 (UTC)
-Date: Wed, 12 Jun 2024 19:17:10 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v9 01/24] virt: sev-guest: Use AES GCM crypto library
-Message-ID: <20240612171710.GDZmnYFizmJoS5nMS1@fat_crate.local>
-References: <20240531043038.3370793-1-nikunj@amd.com>
- <20240531043038.3370793-2-nikunj@amd.com>
+	s=arc-20240116; t=1718213023; c=relaxed/simple;
+	bh=qvzOGVZF1aFjcNNXoWdAyWZv4lQeSovWWQTrEs6pNdw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Z8sz0X2WLLDv8aORh9x0UDqc2jZ2HVuLfAePR9PjjtOm4OenNlE+6u9wZbS9dzDp7vSKosateft6Z6hvG+pr50wYwl/b31LlBfyNUTr5/4uj/v4r1sAgneZVSkTDPrYmaQTn4R5pDxQ8iza4BpodFWaW8WfERtHWTEL8bD6XKHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ED6QTUpf; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfb0e59ac7cso181587276.0
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 10:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718213020; x=1718817820; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v0uZvClGSP7b0LMzzAPVM0AhM29ZDe2y2D54OZuyJ4o=;
+        b=ED6QTUpflG01XxDwADpCTuUCb3My1wmNO1KRIabL/mB6J08kl5ENGX51vmpVHsg6xR
+         jFv33Xhk3VXxWTVvpGKAaIotK7Zksj8HAw0XHs6pGvPnVz+1x1dCCWPEFUm/SJy06FLi
+         BpuEPZLYakQWef9qNxKBc3A3XsNZbfd6mt7/jBNk0WSx8e0xYM5diG+B74Wd60h/dixp
+         Ae7x+VxLhJaqlumRqtc3pPayDW5jcNJHxwn3EmaYD3cAVYZ7BtagZ8ZPWqNrRQf8GGOR
+         qUscLQNTNlkm6MS3vd2OpolLDv7GKWif+u6p98TUEVHK9IwK5SEi6mXOlkhAKEmwzS4n
+         qyAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718213020; x=1718817820;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=v0uZvClGSP7b0LMzzAPVM0AhM29ZDe2y2D54OZuyJ4o=;
+        b=eyZjcKwQzzeJ5KQmq0Kw9tcIZ35fh93IyaRB1C0XOXT+8G7i9Qf4EwhIKXZ6eU+17H
+         uXcN3enWTGNqbBt1R/60oGDXetjpE+yKC9KqegvrxSlne/uMfKe4Jktq1U9WIAVLQpoF
+         g/mSvw4r+/wjK+axx7JVeZKXeJ9nX+YzLzF8CtJWwHytotKzDm9PICJv+YpmmFD7dXPI
+         DQh5J4Ogi83hwM4MuOBn6pG89AjCY/0hZR9SNp3MsG9DGXVhO7gKsMEFszBo0tSu858r
+         44bYIYREW4JeHNixNKLRrxTLmfsdxAxoKm8YjROhGFsQZTgkB2IXZhRAfg47bPGq50dn
+         5F/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXIrwbEaWStwV29lnEEaSpZz2kfgaDOiVcg58Nu9alkviegeWHwJ3gv04EAOsM1jjRjsQImHxvChnBUa6t4nXUzvNCm
+X-Gm-Message-State: AOJu0YzsxgMVrRDWvOhb9tmYKNXbK0WOLkv68prwnmsHyln9TSQZE91X
+	sXLQiJEcH8YzVSSLmPxkVMWxGCvIfhUKjsIyHKx4i/fAokWR6ulndUQPCAmwYQgrgsD4s7E9Uem
+	bHg==
+X-Google-Smtp-Source: AGHT+IHsuziTjwu8H3LsGOZG3nq2ECdUkM7fJ/s+9lw1k304/SuAsQ64WUp2lf97WzRuhz9PeWwlSE0Bo58=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:729:b0:dfb:b4e:407a with SMTP id
+ 3f1490d57ef6-dfe68035fbemr647880276.9.1718213020117; Wed, 12 Jun 2024
+ 10:23:40 -0700 (PDT)
+Date: Wed, 12 Jun 2024 10:23:38 -0700
+In-Reply-To: <CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240531043038.3370793-2-nikunj@amd.com>
+Mime-Version: 1.0
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-9-jthoughton@google.com> <ZmnGlpBR91TyI3Lt@google.com>
+ <CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com>
+Message-ID: <ZmnZmj8iVmcLf8fo@google.com>
+Subject: Re: [PATCH v5 8/9] mm: multi-gen LRU: Have secondary MMUs participate
+ in aging
+From: Sean Christopherson <seanjc@google.com>
+To: Yu Zhao <yuzhao@google.com>
+Cc: James Houghton <jthoughton@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, May 31, 2024 at 10:00:15AM +0530, Nikunj A Dadhania wrote:
-> The sev-guest driver encryption code uses Crypto API for SNP guest
-> messaging to interact with AMD Security processor. For enabling SecureTSC,
-> SEV-SNP guests need to send a TSC_INFO request guest message before the
-> smpboot phase starts. Details from the TSC_INFO response will be used to
-> program the VMSA before the secondary CPUs are brought up. The Crypto API
-> is not available this early in the boot phase.
-> 
-> In preparation of moving the encryption code out of sev-guest driver to
-> support SecureTSC and make reviewing the diff easier, start using AES GCM
-> library implementation instead of Crypto API.
-> 
-> Drop __enc_payload() and dec_payload() helpers as both are pretty small and
-> can be moved to the respective callers.
+On Wed, Jun 12, 2024, Yu Zhao wrote:
+> On Wed, Jun 12, 2024 at 10:02=E2=80=AFAM Sean Christopherson <seanjc@goog=
+le.com> wrote:
+> >
+> > On Tue, Jun 11, 2024, James Houghton wrote:
+> > > diff --git a/mm/rmap.c b/mm/rmap.c
+> > > index e8fc5ecb59b2..24a3ff639919 100644
+> > > --- a/mm/rmap.c
+> > > +++ b/mm/rmap.c
+> > > @@ -870,13 +870,10 @@ static bool folio_referenced_one(struct folio *=
+folio,
+> > >                       continue;
+> > >               }
+> > >
+> > > -             if (pvmw.pte) {
+> > > -                     if (lru_gen_enabled() &&
+> > > -                         pte_young(ptep_get(pvmw.pte))) {
+> > > -                             lru_gen_look_around(&pvmw);
+> > > +             if (lru_gen_enabled() && pvmw.pte) {
+> > > +                     if (lru_gen_look_around(&pvmw))
+> > >                               referenced++;
+> > > -                     }
+> > > -
+> > > +             } else if (pvmw.pte) {
+> > >                       if (ptep_clear_flush_young_notify(vma, address,
+> > >                                               pvmw.pte))
+> > >                               referenced++;
+> >
+> > Random question not really related to KVM/secondary MMU participation. =
+ AFAICT,
+> > the MGLRU approach doesn't flush TLBs after aging pages.  How does MGLR=
+U mitigate
+> > false negatives on pxx_young() due to the CPU not setting Accessed bits=
+ because
+> > of stale TLB entries?
+>=20
+> I do think there can be false negatives but we have not been able to
+> measure their practical impacts since we disabled the flush on some
+> host MMUs long ago (NOT by MGLRU), e.g., on x86 and ppc,
+> ptep_clear_flush_young() is just ptep_test_andclear_young().
 
-Please use this streamlined commit message for your next submission:
+Aha!  That's what I was missing, I somehow didn't see x86's ptep_clear_flus=
+h_young().
 
-"The sev-guest driver encryption code uses the crypto API for SNP guest messaging
-with the AMD Security processor. In order to enable secure TSC, SEV-SNP guests
-need to send such a TSC_INFO message before the APs are booted. Details from the 
-TSC_INFO response will then be used to program the VMSA before the APs are 
-brought up.
+That begs the question, why does KVM flush TLBs on architectures that don't=
+ need
+to?  And since kvm_mmu_notifier_clear_young() explicitly doesn't flush, are=
+ there
+even any KVM-supported architectures for which the flush is mandatory?
 
-However, the crypto API is not available this early in the boot process.
+Skipping the flush on KVM x86 seems like a complete no-brainer.
 
-In preparation for moving the encryption code out of sev-guest to support secure
-TSC and to ease review, switch to using the AES GCM library implementation
-instead.
+Will, Marc and/or Oliver, what are arm64's requirements in this area?  E.g.=
+ I see
+that arm64's version of __ptep_clear_flush_young() does TLBI but not DSB.  =
+Should
+KVM be doing something similar?  Can KVM safely skip even the TBLI?
 
-Drop __enc_payload() and dec_payload() helpers as both are small and can be
-moved to the respective callers."
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> theoretical basis is that, given the TLB coverage trend (Figure 1 in
+> [1]), when a system is running out of memory, it's unlikely to have
+> many long-lived entries in its TLB. IOW, if that system had a stable
+> working set (hot memory) that can fit into its TLB, it wouldn't hit
+> page reclaim. Again, this is based on the theory (proposition) that
+> for most systems, their TLB coverages are much smaller than their
+> memory sizes.
+>=20
+> If/when the above proposition doesn't hold, the next step in the page
+> reclaim path, which is to unmap the PTE, will cause a page fault. The
+> fault can be minor or major (requires IO), depending on the race
+> between the reclaiming and accessing threads. In this case, the
+> tradeoff, in a steady state, is between the PF cost of pages we
+> shouldn't reclaim and the flush cost of pages we scan. The PF cost is
+> higher than the flush cost per page. But we scan many pages and only
+> reclaim a few of them; pages we shouldn't reclaim are a (small)
+> portion of the latter.
+>=20
+> [1] https://www.usenix.org/legacy/events/osdi02/tech/full_papers/navarro/=
+navarro.pdf
 
