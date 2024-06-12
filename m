@@ -1,328 +1,164 @@
-Return-Path: <kvm+bounces-19504-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19505-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE8B905D4D
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:02:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 824C1905D60
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2660CB220DD
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:02:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5821C20326
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BE884E07;
-	Wed, 12 Jun 2024 21:02:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1A885923;
+	Wed, 12 Jun 2024 21:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="MuY9bWZS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bW+jOPvr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12E24315D
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:02:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC44012D752
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:02:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718226149; cv=none; b=jGq2pmz8HFOmuRmFKbDdp4Vg9qZ3QywYQf/fstIRTEMvsx49rWogXhRFR+EYyPibedb+8hez5SSZQIk8Kncoo6CzL9tNN+uUUUgZg+FQCBkqLEu9zNgQXuUWtzJaPLWnOH/ql8brLMJUFkCEohp12jerDUvxepLgpMHmA53qvg8=
+	t=1718226181; cv=none; b=fCwVkieEuqZ2/nUNkuMJArVIprRIcTrsavFQ2SxblppREWDcko9k2C14AYj6kbjlXcMJzrwvqWeNWrXxf34BDAuljVPhPNDr/YBSt2j7RZxERUvYxN1s5jyO/BzDgZgFa5mQ663bGaH8BPUbEnY1of9COfNpZF8ZcDcENG29dXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718226149; c=relaxed/simple;
-	bh=gKChfnxxPaEOVOb26Sbf8eqwiOWKEI/u/Tb4Zma/iZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AffvFKuOAHY5+YWXo4l+t4Ak1nR8kSYoHlL6UwEfJoPkBdDd/ysWKGDVPnBrgCn8LJFsmPBYhm61wzQDNbH+qtnONKuj5FE0+K0kXO5EFdsmrwSeamYkV2wcCEBGaQRH92ED4kiyNCVPj6mIF/K5Tjsv/rfuYxUbODQIyFTrvEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=MuY9bWZS; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=CIYr5tZFHJifDHaa+y+tLJ6gq1EMh6hOggCv06CK6ew=; b=MuY9bWZSX+wotZDy
-	KyUWhK/zbYJqwXi4Rw5p+b5cTxSoODS4JPqhTUgSJ7L91MG/0gOenKykxyYyGy5LrG8h74sP8GM9l
-	IDuAEJD7cOh717EQT4ezzwDay4dzkgA4bBvQeDHz6ekxd92RgrvZc698rN6Cd0oh289NIMGV3w+lI
-	rDgnCh+hGobXtlamQxVXDFWrWeqVazSqhS6Q7CKIXTB6akmtnQYnue8zXTesY+3XMwhLDFS9WMrbs
-	a1jg2NV7kjIRHoTfO9YKIk+XTuWjtGDv6nPYG9gPnnts6aGe7pUo4YmZETRm7oPnlgSYkHekXYuRF
-	2abDct+A5XnMVNzwzQ==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1sHV6n-005tz7-2O;
-	Wed, 12 Jun 2024 21:02:17 +0000
-Date: Wed, 12 Jun 2024 21:02:17 +0000
-From: "Dr. David Alan Gilbert" <dave@treblig.org>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Mark Burton <mburton@qti.qualcomm.com>, qemu-s390x@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
-	Laurent Vivier <lvivier@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Alexandre Iooss <erdnaxe@crans.org>, qemu-arm@nongnu.org,
-	Alexander Graf <agraf@csgraf.de>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Marco Liebel <mliebel@qti.qualcomm.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Roman Bolshakov <rbolshakov@ddn.com>, qemu-ppc@nongnu.org,
-	Mahmoud Mandour <ma.mandourr@gmail.com>,
-	Cameron Esfahani <dirty@apple.com>,
-	Jamie Iles <quic_jiles@quicinc.com>,
-	Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 9/9] contrib/plugins: add ips plugin example for cost
- modeling
-Message-ID: <ZmoM2Sac97PdXWcC@gallifrey>
-References: <20240612153508.1532940-1-alex.bennee@linaro.org>
- <20240612153508.1532940-10-alex.bennee@linaro.org>
+	s=arc-20240116; t=1718226181; c=relaxed/simple;
+	bh=1TYIkyImVcWQGBXXHpL6wbMEynsMIkTMy8d3F8mZSP0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=f2aO5NMrcRBuuJBdrYKqz4XVOg8b5gPQ/gW3Vf48lz30B5hDd92+ooRGXIaO/zoZyw76nXO9rscRatKmeJv5G7vesMt1idncbeL2OkwuDFL0wppoBwwydGaOv4ZSKNnaRZYoDZkL4SQs2W3H5jo5LXR6Vy2XBYTMNsoD/3wiG3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bW+jOPvr; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c2fe3c4133so181169a91.3
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:02:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718226179; x=1718830979; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=J3xgWRxCgfKePUIQRk1/bOVRKkSjNiVa6+ku2rMooqI=;
+        b=bW+jOPvrXWc2sN7IGlpVQaq8Zx9w7YW/aPk2UtDiT5Ev/7RR4PBWThSAVJj2YUDWRc
+         DzZPTEKxCvRVYPLZhpe3TtAKgdcGC/+/RHJzfhYp+pGRQpTghRtTT2JI8UaX1Sd76jLV
+         vr/A8JrJkoMVkydXTRobtq8LpBQAdfymeE6FfSXk3PszR5JUMX+vyYxe1CDeZIuZ48bs
+         LDauAl6Lh25UP03oml8RjZFoEpfLnxRNBjTscaAZmDGCu2M6+7GL6c+vDyl34WHNY/lB
+         5OWD3pd0J/Tt+xyWyh+m2PSJr4I4h69C5Q+hTk+rr69c0qnSUiF/Uoh18pmMixeO0aF0
+         43ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718226179; x=1718830979;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J3xgWRxCgfKePUIQRk1/bOVRKkSjNiVa6+ku2rMooqI=;
+        b=I8T3o3f6HwzxkBoaA4NOE3ERhN/vFeX8pGlpKLrSW/VmF2uAgq60Fxpg4qZxrIUZ9t
+         RWSopMF0gOpNxwIPso1e1c5QAPhmqC29EAiFCpDUifSZK1kJ0pu336t7GX6pnaGbPMFk
+         QygHhdndl5jNE3ghaRqEXJx/lhfK2VeQKRB+FDTWO7dANHNbBGlJh4Nmd8pTLRuACGGw
+         yOUG9CefQ42skMwIPIUwFv2Cc78tTVCzqkfwxAYIy0dxfgZYVSiMNUGVX3ikZermTKr/
+         6VPaqKoaSGi93B0u2M7sroA4/gyO9vp5fVlU/sfr/KAjydFiFZ1RDVOQrFD457lcHNfH
+         6XTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXBq4krHqs7McdDzt0f4iPnIdYMXKd15px0JtZw0M2B/vuDhwCm1apQGqHmrRi2eiQpR/JyO+33SRkmDzyXDVCuJnNh
+X-Gm-Message-State: AOJu0Ywf/xhpZbtA89qj62Lp/T7sg1KlOO9lw9du9U/B/Fi5EHY5TQ0o
+	6WroIL/ERYw8yZce51LuDFswKFNs9xqWP+d5QCIhb2SbC29Q9mbZJq/7Y7cGGzb9u/3wGwd4DNd
+	/iw==
+X-Google-Smtp-Source: AGHT+IHtBONcZJ3ua6rr9KF0YTE06FmHu2WTAWj/KJP5w7j/Ttnoq6SE0bp0Q5inkEDQ0elbifO9mus7g/Y=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:62c9:b0:2c2:c65f:52dc with SMTP id
+ 98e67ed59e1d1-2c4a770e8f6mr8383a91.6.1718226179078; Wed, 12 Jun 2024 14:02:59
+ -0700 (PDT)
+Date: Wed, 12 Jun 2024 14:02:57 -0700
+In-Reply-To: <d5a6e125-bff4-4d82-ae65-b99d9cb10e90@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240612153508.1532940-10-alex.bennee@linaro.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 20:58:18 up 35 days,  8:12,  1 user,  load average: 0.00, 0.00, 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Mime-Version: 1.0
+References: <20240419085927.3648704-1-pbonzini@redhat.com> <20240419085927.3648704-6-pbonzini@redhat.com>
+ <d5a6e125-bff4-4d82-ae65-b99d9cb10e90@intel.com>
+Message-ID: <ZmoNAQmwIH5tigyv@google.com>
+Subject: Re: [PATCH 5/6] KVM: x86: Implement kvm_arch_vcpu_pre_fault_memory()
+From: Sean Christopherson <seanjc@google.com>
+To: Xiaoyao Li <xiaoyao.li@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	isaku.yamahata@intel.com, binbin.wu@linux.intel.com, 
+	rick.p.edgecombe@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-* Alex Bennée (alex.bennee@linaro.org) wrote:
-> From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> 
-> This plugin uses the new time control interface to make decisions
-> about the state of time during the emulation. The algorithm is
-> currently very simple. The user specifies an ips rate which applies
-> per core. If the core runs ahead of its allocated execution time the
-> plugin sleeps for a bit to let real time catch up. Either way time is
-> updated for the emulation as a function of total executed instructions
-> with some adjustments for cores that idle.
+On Mon, Apr 22, 2024, Xiaoyao Li wrote:
+> On 4/19/2024 4:59 PM, Paolo Bonzini wrote:
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 10e90788b263..a045b23964c0 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4647,6 +4647,78 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+> >   	return direct_page_fault(vcpu, fault);
+> >   }
+> > +static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+> > +		     u8 *level)
 
-A few random thoughts:
-  a) Are there any definitions of what a plugin that controls time
-     should do with a live migration?
-  b) The sleep in migration/dirtyrate.c points out g_usleep might
-     sleep for longer, so reads the actual wall clock time to
-     figure out a new 'now'.
-  c) A fun thing to do with this would be to follow an external simulation
-     or 2nd qemu, trying to keep the two from running too far past
-     each other.
+Align parameters:
 
-Dave
+static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
+			    u8 *level)
 
-> Examples
-> --------
-> 
-> Slow down execution of /bin/true:
-> $ num_insn=$(./build/qemu-x86_64 -plugin ./build/tests/plugin/libinsn.so -d plugin /bin/true |& grep total | sed -e 's/.*: //')
-> $ time ./build/qemu-x86_64 -plugin ./build/contrib/plugins/libips.so,ips=$(($num_insn/4)) /bin/true
-> real 4.000s
-> 
-> Boot a Linux kernel simulating a 250MHz cpu:
-> $ /build/qemu-system-x86_64 -kernel /boot/vmlinuz-6.1.0-21-amd64 -append "console=ttyS0" -plugin ./build/contrib/plugins/libips.so,ips=$((250*1000*1000)) -smp 1 -m 512
-> check time until kernel panic on serial0
-> 
-> Tested in system mode by booting a full debian system, and using:
-> $ sysbench cpu run
-> Performance decrease linearly with the given number of ips.
-> 
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> Message-Id: <20240530220610.1245424-7-pierrick.bouvier@linaro.org>
-> ---
->  contrib/plugins/ips.c    | 164 +++++++++++++++++++++++++++++++++++++++
->  contrib/plugins/Makefile |   1 +
->  2 files changed, 165 insertions(+)
->  create mode 100644 contrib/plugins/ips.c
-> 
-> diff --git a/contrib/plugins/ips.c b/contrib/plugins/ips.c
-> new file mode 100644
-> index 0000000000..db77729264
-> --- /dev/null
-> +++ b/contrib/plugins/ips.c
-> @@ -0,0 +1,164 @@
-> +/*
-> + * ips rate limiting plugin.
-> + *
-> + * This plugin can be used to restrict the execution of a system to a
-> + * particular number of Instructions Per Second (ips). This controls
-> + * time as seen by the guest so while wall-clock time may be longer
-> + * from the guests point of view time will pass at the normal rate.
-> + *
-> + * This uses the new plugin API which allows the plugin to control
-> + * system time.
-> + *
-> + * Copyright (c) 2023 Linaro Ltd
-> + *
-> + * SPDX-License-Identifier: GPL-2.0-or-later
-> + */
-> +
-> +#include <stdio.h>
-> +#include <glib.h>
-> +#include <qemu-plugin.h>
-> +
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-> +
-> +/* how many times do we update time per sec */
-> +#define NUM_TIME_UPDATE_PER_SEC 10
-> +#define NSEC_IN_ONE_SEC (1000 * 1000 * 1000)
-> +
-> +static GMutex global_state_lock;
-> +
-> +static uint64_t max_insn_per_second = 1000 * 1000 * 1000; /* ips per core, per second */
-> +static uint64_t max_insn_per_quantum; /* trap every N instructions */
-> +static int64_t virtual_time_ns; /* last set virtual time */
-> +
-> +static const void *time_handle;
-> +
-> +typedef struct {
-> +    uint64_t total_insn;
-> +    uint64_t quantum_insn; /* insn in last quantum */
-> +    int64_t last_quantum_time; /* time when last quantum started */
-> +} vCPUTime;
-> +
-> +struct qemu_plugin_scoreboard *vcpus;
-> +
-> +/* return epoch time in ns */
-> +static int64_t now_ns(void)
-> +{
-> +    return g_get_real_time() * 1000;
-> +}
-> +
-> +static uint64_t num_insn_during(int64_t elapsed_ns)
-> +{
-> +    double num_secs = elapsed_ns / (double) NSEC_IN_ONE_SEC;
-> +    return num_secs * (double) max_insn_per_second;
-> +}
-> +
-> +static int64_t time_for_insn(uint64_t num_insn)
-> +{
-> +    double num_secs = (double) num_insn / (double) max_insn_per_second;
-> +    return num_secs * (double) NSEC_IN_ONE_SEC;
-> +}
-> +
-> +static void update_system_time(vCPUTime *vcpu)
-> +{
-> +    int64_t elapsed_ns = now_ns() - vcpu->last_quantum_time;
-> +    uint64_t max_insn = num_insn_during(elapsed_ns);
-> +
-> +    if (vcpu->quantum_insn >= max_insn) {
-> +        /* this vcpu ran faster than expected, so it has to sleep */
-> +        uint64_t insn_advance = vcpu->quantum_insn - max_insn;
-> +        uint64_t time_advance_ns = time_for_insn(insn_advance);
-> +        int64_t sleep_us = time_advance_ns / 1000;
-> +        g_usleep(sleep_us);
-> +    }
-> +
-> +    vcpu->total_insn += vcpu->quantum_insn;
-> +    vcpu->quantum_insn = 0;
-> +    vcpu->last_quantum_time = now_ns();
-> +
-> +    /* based on total number of instructions, what should be the new time? */
-> +    int64_t new_virtual_time = time_for_insn(vcpu->total_insn);
-> +
-> +    g_mutex_lock(&global_state_lock);
-> +
-> +    /* Time only moves forward. Another vcpu might have updated it already. */
-> +    if (new_virtual_time > virtual_time_ns) {
-> +        qemu_plugin_update_ns(time_handle, new_virtual_time);
-> +        virtual_time_ns = new_virtual_time;
-> +    }
-> +
-> +    g_mutex_unlock(&global_state_lock);
-> +}
-> +
-> +static void vcpu_init(qemu_plugin_id_t id, unsigned int cpu_index)
-> +{
-> +    vCPUTime *vcpu = qemu_plugin_scoreboard_find(vcpus, cpu_index);
-> +    vcpu->total_insn = 0;
-> +    vcpu->quantum_insn = 0;
-> +    vcpu->last_quantum_time = now_ns();
-> +}
-> +
-> +static void vcpu_exit(qemu_plugin_id_t id, unsigned int cpu_index)
-> +{
-> +    vCPUTime *vcpu = qemu_plugin_scoreboard_find(vcpus, cpu_index);
-> +    update_system_time(vcpu);
-> +}
-> +
-> +static void every_quantum_insn(unsigned int cpu_index, void *udata)
-> +{
-> +    vCPUTime *vcpu = qemu_plugin_scoreboard_find(vcpus, cpu_index);
-> +    g_assert(vcpu->quantum_insn >= max_insn_per_quantum);
-> +    update_system_time(vcpu);
-> +}
-> +
-> +static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-> +{
-> +    size_t n_insns = qemu_plugin_tb_n_insns(tb);
-> +    qemu_plugin_u64 quantum_insn =
-> +        qemu_plugin_scoreboard_u64_in_struct(vcpus, vCPUTime, quantum_insn);
-> +    /* count (and eventually trap) once per tb */
-> +    qemu_plugin_register_vcpu_tb_exec_inline_per_vcpu(
-> +        tb, QEMU_PLUGIN_INLINE_ADD_U64, quantum_insn, n_insns);
-> +    qemu_plugin_register_vcpu_tb_exec_cond_cb(
-> +        tb, every_quantum_insn,
-> +        QEMU_PLUGIN_CB_NO_REGS, QEMU_PLUGIN_COND_GE,
-> +        quantum_insn, max_insn_per_quantum, NULL);
-> +}
-> +
-> +static void plugin_exit(qemu_plugin_id_t id, void *udata)
-> +{
-> +    qemu_plugin_scoreboard_free(vcpus);
-> +}
-> +
-> +QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-> +                                           const qemu_info_t *info, int argc,
-> +                                           char **argv)
-> +{
-> +    for (int i = 0; i < argc; i++) {
-> +        char *opt = argv[i];
-> +        g_auto(GStrv) tokens = g_strsplit(opt, "=", 2);
-> +        if (g_strcmp0(tokens[0], "ips") == 0) {
-> +            max_insn_per_second = g_ascii_strtoull(tokens[1], NULL, 10);
-> +            if (!max_insn_per_second && errno) {
-> +                fprintf(stderr, "%s: couldn't parse %s (%s)\n",
-> +                        __func__, tokens[1], g_strerror(errno));
-> +                return -1;
-> +            }
-> +        } else {
-> +            fprintf(stderr, "option parsing failed: %s\n", opt);
-> +            return -1;
-> +        }
-> +    }
-> +
-> +    vcpus = qemu_plugin_scoreboard_new(sizeof(vCPUTime));
-> +    max_insn_per_quantum = max_insn_per_second / NUM_TIME_UPDATE_PER_SEC;
-> +
-> +    time_handle = qemu_plugin_request_time_control();
-> +    g_assert(time_handle);
-> +
-> +    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-> +    qemu_plugin_register_vcpu_init_cb(id, vcpu_init);
-> +    qemu_plugin_register_vcpu_exit_cb(id, vcpu_exit);
-> +    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-> +
-> +    return 0;
-> +}
-> diff --git a/contrib/plugins/Makefile b/contrib/plugins/Makefile
-> index 0b64d2c1e3..449ead1130 100644
-> --- a/contrib/plugins/Makefile
-> +++ b/contrib/plugins/Makefile
-> @@ -27,6 +27,7 @@ endif
->  NAMES += hwprofile
->  NAMES += cache
->  NAMES += drcov
-> +NAMES += ips
->  
->  ifeq ($(CONFIG_WIN32),y)
->  SO_SUFFIX := .dll
-> -- 
-> 2.39.2
-> 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+> > +{
+> > +	int r;
+> > +
+> > +	/* Restrict to TDP page fault. */
+
+This is fairly obvious from the code, what might not be obvious is _why_.  I'm
+also ok dropping the comment entirely, but it's easy enough to provide a hint to
+the reader.
+
+> > +	if (vcpu->arch.mmu->page_fault != kvm_tdp_page_fault)
+> > +		return -EOPNOTSUPP;
+> > +
+> > +retry:
+> > +	r = __kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level);
+> > +	if (r < 0)
+> > +		return r;
+> > +
+> > +	switch (r) {
+> > +	case RET_PF_RETRY:
+> > +		if (signal_pending(current))
+> > +			return -EINTR;
+> > +		cond_resched();
+> > +		goto retry;
+
+Rather than a goto+retry from inside a switch statement, what about:
+
+	int r;
+
+	/* 
+	 * Pre-faulting a GPA is supported only non-nested TDP, as indirect
+	 * MMUs map either GVAs or L2 GPAs, not L1 GPAs.
+	 */
+	if (vcpu->arch.mmu->page_fault != kvm_tdp_page_fault)
+		return -EOPNOTSUPP;
+
+	do {
+		if (signal_pending(current))
+			return -EINTR;
+
+		cond_resched();
+
+		r = kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level);
+	} while (r == RET_PF_RETRY);
+
+	switch (r) {
+	case RET_PF_FIXED:
+	case RET_PF_SPURIOUS:
+		break;
+
+	case RET_PF_EMULATE:
+		return -ENOENT;
+
+	case RET_PF_CONTINUE:
+	case RET_PF_INVALID:
+	case RET_PF_RETRY:
+	default:
+		WARN_ON_ONCE(r >= 0);
+		return -EIO;
+	}
+
+	return 0;
 
