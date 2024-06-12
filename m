@@ -1,164 +1,133 @@
-Return-Path: <kvm+bounces-19505-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824C1905D60
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:04:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D9B905D7E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:12:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D5821C20326
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:04:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CE8EB220F9
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:12:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F1A885923;
-	Wed, 12 Jun 2024 21:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FED586136;
+	Wed, 12 Jun 2024 21:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bW+jOPvr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KXj1+zWA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC44012D752
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F85384E00
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:12:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718226181; cv=none; b=fCwVkieEuqZ2/nUNkuMJArVIprRIcTrsavFQ2SxblppREWDcko9k2C14AYj6kbjlXcMJzrwvqWeNWrXxf34BDAuljVPhPNDr/YBSt2j7RZxERUvYxN1s5jyO/BzDgZgFa5mQ663bGaH8BPUbEnY1of9COfNpZF8ZcDcENG29dXQ=
+	t=1718226736; cv=none; b=EzQpcBpsT2Bgcx2ggjsOTvD0gYQkHPfGZBeizytAr+oosdWIcg/K3gh2h5xUmFmwGvDehCKvl3QxWvJV3N9oMGR9RTFRlYjPRGKwSvDNmJUJ6UoSpM4fz6bhrv9lU2woYFlgNAiEZX7PS8bhHrB3uY563XZC/QSpq5tgtk1pE+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718226181; c=relaxed/simple;
-	bh=1TYIkyImVcWQGBXXHpL6wbMEynsMIkTMy8d3F8mZSP0=;
+	s=arc-20240116; t=1718226736; c=relaxed/simple;
+	bh=mZ1gVsscLnoQrhu6DUaN86+gh4C4z0/alorNn55aWOU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=f2aO5NMrcRBuuJBdrYKqz4XVOg8b5gPQ/gW3Vf48lz30B5hDd92+ooRGXIaO/zoZyw76nXO9rscRatKmeJv5G7vesMt1idncbeL2OkwuDFL0wppoBwwydGaOv4ZSKNnaRZYoDZkL4SQs2W3H5jo5LXR6Vy2XBYTMNsoD/3wiG3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bW+jOPvr; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=FREFLDbCGx1jfhYyhlthobPRLkDN7Td6uOrM7EbbzY54MaI/PUazFpXWGC1CGNAVke/wyUPEaEH+IoPOxjVhpTX1SMuTggl69a+pha5LAUc2bOmc/JuUeXJqHgwwDMBqZ/Jap+9RyuROQtGxUcv6EatjX7mD/kNH0Soucq6UZDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KXj1+zWA; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c2fe3c4133so181169a91.3
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:02:59 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-df7bdb0455bso444736276.2
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:12:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718226179; x=1718830979; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718226734; x=1718831534; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J3xgWRxCgfKePUIQRk1/bOVRKkSjNiVa6+ku2rMooqI=;
-        b=bW+jOPvrXWc2sN7IGlpVQaq8Zx9w7YW/aPk2UtDiT5Ev/7RR4PBWThSAVJj2YUDWRc
-         DzZPTEKxCvRVYPLZhpe3TtAKgdcGC/+/RHJzfhYp+pGRQpTghRtTT2JI8UaX1Sd76jLV
-         vr/A8JrJkoMVkydXTRobtq8LpBQAdfymeE6FfSXk3PszR5JUMX+vyYxe1CDeZIuZ48bs
-         LDauAl6Lh25UP03oml8RjZFoEpfLnxRNBjTscaAZmDGCu2M6+7GL6c+vDyl34WHNY/lB
-         5OWD3pd0J/Tt+xyWyh+m2PSJr4I4h69C5Q+hTk+rr69c0qnSUiF/Uoh18pmMixeO0aF0
-         43ww==
+        bh=OQnTUkcCD7nk2Vw7ExeAQaoK3gWIegL46mSfNzj2DMU=;
+        b=KXj1+zWAF/3cHUvUtvrZxNbygxmzl80WhX2rgC4OTqdHqJxEzXMOwvRai0agp4baAJ
+         GnG2+7oEt4mxhsCUVx40mKDeHRczaAwQgID+X/j9kDG59bD4Bn15hag58/YkSV37cES5
+         4Gwirc8/dIifUYDtwzCeLA+ELcCMgkzS18PPaPa1oNFGsA5PW6Jkg4RaA/A1dBuBa1fP
+         QOogVN53Y8J0KPz82U/reO8bj0xMV92B4dh1Ltv+Lt+cDCcxGZwsqm/vY8M+2Q9sh2w0
+         jsbcq0r7NU8XxbZ61ubxGpVN4AAUQKmMOFKoddAUrzybn/GhSLtiFEKSHdplZKVS7F7l
+         RHVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718226179; x=1718830979;
+        d=1e100.net; s=20230601; t=1718226734; x=1718831534;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J3xgWRxCgfKePUIQRk1/bOVRKkSjNiVa6+ku2rMooqI=;
-        b=I8T3o3f6HwzxkBoaA4NOE3ERhN/vFeX8pGlpKLrSW/VmF2uAgq60Fxpg4qZxrIUZ9t
-         RWSopMF0gOpNxwIPso1e1c5QAPhmqC29EAiFCpDUifSZK1kJ0pu336t7GX6pnaGbPMFk
-         QygHhdndl5jNE3ghaRqEXJx/lhfK2VeQKRB+FDTWO7dANHNbBGlJh4Nmd8pTLRuACGGw
-         yOUG9CefQ42skMwIPIUwFv2Cc78tTVCzqkfwxAYIy0dxfgZYVSiMNUGVX3ikZermTKr/
-         6VPaqKoaSGi93B0u2M7sroA4/gyO9vp5fVlU/sfr/KAjydFiFZ1RDVOQrFD457lcHNfH
-         6XTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXBq4krHqs7McdDzt0f4iPnIdYMXKd15px0JtZw0M2B/vuDhwCm1apQGqHmrRi2eiQpR/JyO+33SRkmDzyXDVCuJnNh
-X-Gm-Message-State: AOJu0Ywf/xhpZbtA89qj62Lp/T7sg1KlOO9lw9du9U/B/Fi5EHY5TQ0o
-	6WroIL/ERYw8yZce51LuDFswKFNs9xqWP+d5QCIhb2SbC29Q9mbZJq/7Y7cGGzb9u/3wGwd4DNd
-	/iw==
-X-Google-Smtp-Source: AGHT+IHtBONcZJ3ua6rr9KF0YTE06FmHu2WTAWj/KJP5w7j/Ttnoq6SE0bp0Q5inkEDQ0elbifO9mus7g/Y=
+        bh=OQnTUkcCD7nk2Vw7ExeAQaoK3gWIegL46mSfNzj2DMU=;
+        b=g4PCzEe4AeJnSzV+t0Kp+Y7stj9RkxyQ6W04xuFJWdZyNXCxudwCLUTdbgvhJgZxbJ
+         HDC0hKERSGe6lxqrYsE9HidYNNIXqO2xPCc8y58thyw54uQjQbKYFK8MvTNH/BDEKmNr
+         8KC3AWH5q7nc1E4kCqaWx1JhXd7oIKbnoAbH/boiw96+36iS/KyDHJ2QPRP4UYafUI72
+         3Q29xswIW896Hh8UALPZPI4QyziFZPY5m/EVdzLaoeLw4WOB3Sf/OMpwvc0OyUdR+/xM
+         ho0mpW++731Blu8Pami+/BoOOZv/aoCF5vVky8rJjXPE32ONSPs7uQRTEsV/ZHZ/8FJm
+         tg4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU6Y/RdlQcLAij/9uAg5vlENDaGsswnmHTIZ4gZjt8q/njpR02BEqMEg4cfEOLRp/FcI4yWyrjCR7rGKTV6tRrKf+Ak
+X-Gm-Message-State: AOJu0YzmZWd5BMe/HIxdNn7iGNPdwRZWXadXSpvkTwIuBAiDPtekXykp
+	SVFDmNkwG4HWq/19PzqS9NWEl2vZ1hvJzR95TDvaJi86lQG2xhao144jW+Clx9rCfTk+9/sk8WE
+	Iyw==
+X-Google-Smtp-Source: AGHT+IHsV28eaC2THrd7M7nGgltqa0kTEglruuHJgRHKPTTyPjjhrN5LKu8lrwbv6iFMvLbV9hefC3OsmFA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:62c9:b0:2c2:c65f:52dc with SMTP id
- 98e67ed59e1d1-2c4a770e8f6mr8383a91.6.1718226179078; Wed, 12 Jun 2024 14:02:59
- -0700 (PDT)
-Date: Wed, 12 Jun 2024 14:02:57 -0700
-In-Reply-To: <d5a6e125-bff4-4d82-ae65-b99d9cb10e90@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:120c:b0:df4:920f:3192 with SMTP id
+ 3f1490d57ef6-dfe68036303mr137279276.8.1718226733624; Wed, 12 Jun 2024
+ 14:12:13 -0700 (PDT)
+Date: Wed, 12 Jun 2024 14:12:12 -0700
+In-Reply-To: <20240207172646.3981-5-xin3.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240419085927.3648704-1-pbonzini@redhat.com> <20240419085927.3648704-6-pbonzini@redhat.com>
- <d5a6e125-bff4-4d82-ae65-b99d9cb10e90@intel.com>
-Message-ID: <ZmoNAQmwIH5tigyv@google.com>
-Subject: Re: [PATCH 5/6] KVM: x86: Implement kvm_arch_vcpu_pre_fault_memory()
+References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-5-xin3.li@intel.com>
+Message-ID: <ZmoPLOx8sujVsGIS@google.com>
+Subject: Re: [PATCH v2 04/25] KVM: x86: Mark CR4.FRED as not reserved
 From: Sean Christopherson <seanjc@google.com>
-To: Xiaoyao Li <xiaoyao.li@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
-	isaku.yamahata@intel.com, binbin.wu@linux.intel.com, 
-	rick.p.edgecombe@intel.com
+To: Xin Li <xin3.li@intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	shuah@kernel.org, vkuznets@redhat.com, peterz@infradead.org, 
+	ravi.v.shankar@intel.com, xin@zytor.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Apr 22, 2024, Xiaoyao Li wrote:
-> On 4/19/2024 4:59 PM, Paolo Bonzini wrote:
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index 10e90788b263..a045b23964c0 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -4647,6 +4647,78 @@ int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> >   	return direct_page_fault(vcpu, fault);
-> >   }
-> > +static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
-> > +		     u8 *level)
+On Wed, Feb 07, 2024, Xin Li wrote:
+> The CR4.FRED bit, i.e., CR4[32], is no longer a reserved bit when a guest
+> enumerates FRED, otherwise it is still a reserved bit.
 
-Align parameters:
+This isn't quite correct, as __cr4_reserved_bits() is used with kvm_cpu_caps too,
+i.e. to compute CR4 bits that are reserved from the host's perspective.  And that
+matters, because if this check was done _only_ on guest CPUID, then KVM would
+allow CR4.FRED=1 before all of KVM support is in place.
 
-static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
-			    u8 *level)
-
-> > +{
-> > +	int r;
-> > +
-> > +	/* Restrict to TDP page fault. */
-
-This is fairly obvious from the code, what might not be obvious is _why_.  I'm
-also ok dropping the comment entirely, but it's easy enough to provide a hint to
-the reader.
-
-> > +	if (vcpu->arch.mmu->page_fault != kvm_tdp_page_fault)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +retry:
-> > +	r = __kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level);
-> > +	if (r < 0)
-> > +		return r;
-> > +
-> > +	switch (r) {
-> > +	case RET_PF_RETRY:
-> > +		if (signal_pending(current))
-> > +			return -EINTR;
-> > +		cond_resched();
-> > +		goto retry;
-
-Rather than a goto+retry from inside a switch statement, what about:
-
-	int r;
-
-	/* 
-	 * Pre-faulting a GPA is supported only non-nested TDP, as indirect
-	 * MMUs map either GVAs or L2 GPAs, not L1 GPAs.
-	 */
-	if (vcpu->arch.mmu->page_fault != kvm_tdp_page_fault)
-		return -EOPNOTSUPP;
-
-	do {
-		if (signal_pending(current))
-			return -EINTR;
-
-		cond_resched();
-
-		r = kvm_mmu_do_page_fault(vcpu, gpa, error_code, true, NULL, level);
-	} while (r == RET_PF_RETRY);
-
-	switch (r) {
-	case RET_PF_FIXED:
-	case RET_PF_SPURIOUS:
-		break;
-
-	case RET_PF_EMULATE:
-		return -ENOENT;
-
-	case RET_PF_CONTINUE:
-	case RET_PF_INVALID:
-	case RET_PF_RETRY:
-	default:
-		WARN_ON_ONCE(r >= 0);
-		return -EIO;
-	}
-
-	return 0;
+> Signed-off-by: Xin Li <xin3.li@intel.com>
+> Tested-by: Shan Kang <shan.kang@intel.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 2 +-
+>  arch/x86/kvm/x86.h              | 2 ++
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index b5b2d0fde579..0d88873eba63 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -134,7 +134,7 @@
+>  			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
+>  			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
+>  			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP \
+> -			  | X86_CR4_LAM_SUP))
+> +			  | X86_CR4_LAM_SUP | X86_CR4_FRED))
+>  
+>  #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
+>  
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 2f7e19166658..9a52016ebf5a 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -532,6 +532,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+>  		__reserved_bits |= X86_CR4_PCIDE;       \
+>  	if (!__cpu_has(__c, X86_FEATURE_LAM))           \
+>  		__reserved_bits |= X86_CR4_LAM_SUP;     \
+> +	if (!__cpu_has(__c, X86_FEATURE_FRED))          \
+> +		__reserved_bits |= X86_CR4_FRED;        \
+>  	__reserved_bits;                                \
+>  })
+>  
+> -- 
+> 2.43.0
+> 
 
