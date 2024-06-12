@@ -1,70 +1,72 @@
-Return-Path: <kvm+bounces-19394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F523904AC7
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 07:23:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 744D2904AC8
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 07:23:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B369B1F21624
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 05:23:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAC381F22087
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 05:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FDE374E9;
-	Wed, 12 Jun 2024 05:23:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48DC23770C;
+	Wed, 12 Jun 2024 05:23:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Eiw7gR54"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZo77Jad"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247E1374C4
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 05:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1309C15BB
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 05:23:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718169812; cv=none; b=lblD1XiJmqOuYAZaMl9iZyt5ch+EutgIizLGAzr9qqo8Z1UuXR1vck8KibF6lyrZheqQTY1vmqXeeWNj/k5WQlv9GKGPxhTre5mp2Xi7gNiBjH6g4S0+765DpRkfbBNySrcTM9yaJcg2y/5nQTecs6cy4B5p8iWOf/ZuS2vtXnw=
+	t=1718169816; cv=none; b=MYth9+Rp0Z6s8l6bnajMu5AyIB+EDZHMesLM7bdG153ZW414/OMZB50IS5V/WhVi/ny3x4plwKEjEpUIy+JNOVkP/CZzfa8nWudE8L4nvytbW7bVBOGeOY8IRE4cf4J/wGBUUuyHVg2vbaEYsvZKVdjsFzWtnKj2Fh3D9Z/Qink=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718169812; c=relaxed/simple;
-	bh=feSY9BewnFGp5aeHCjBQGAbaPgejrx3qUPSDPE6Vtak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VI+mzEl/3g9Yhhv1ytZ22rn/msfnoqyMQiVDREUERnGPUqR7J0oYI4IQLK5cXUW1N6KYr3kNAKFWn6NYXSCivU7tdQxtXHIoiiM7eLwheg+zkw6YQtQ8YAnNyNVftiXQFFFYxbYTg0OoCxgmaF2gvgSKdV/+G3tTH74pugt57ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Eiw7gR54; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1718169816; c=relaxed/simple;
+	bh=izqDl4kXsZEuJhy3PRwmpOV9WGA9iKHbBfjl4oEXfZ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=V0f7dZKjTGtAi4URMh0isNZPZdIyyzcwcoVc/ehnoW/Jh0e1KuwwO+9TNKFkywJkfscJlG457gG0wSM66+Z3tO9Y/WVzUB6SmOe1+bp8E9LTLoOT7ckUyTttKt7SqOAqjHnP23Ut/ldOszxNJ1oji/eU0Ad7vImemWDlLZhyktU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZo77Jad; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f6fd08e0f2so27014915ad.3
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 22:23:31 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-6e41550ae5bso3430928a12.3
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 22:23:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718169810; x=1718774610; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uklboiDlNq1iAwrNweEzsuHAT7xa1yfgd/xlZey1tHA=;
-        b=Eiw7gR543Q0TptWp0vGIL1/HRseOZn36AqWE0HzC67wBAnRoeIGkBj3j4R/Bf2IRFl
-         aGq7Ayw9ybGVWvbCDn9mKxIgfN35ECUzu+qHHMl2sxH+GRO1NMkHhNp6xBIXQdP2RFZR
-         CBiqwOv91YXbApDB8HVlOVusKL+BYn6NBDGYzmM7obG4Mb6s9H6KwfXQDyDz9YDF2ZW0
-         0ak96d15Z8t9pQ6CkNPTbC2fNSfDmcaH5YeOVRzb2X5kUz+TXsStEZyg+lyCWMreypa7
-         9wntn1y1rCjnrKU+2hSki0wJnSkZ+FkMsl23KY+NfoqKWAA+GUi/iCWTdOpWqsoc1W84
-         JPyw==
+        d=gmail.com; s=20230601; t=1718169814; x=1718774614; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3LYx9pWe+IXQn9iXJjFIm9X9Ha+gW+XiixBi0YYKAco=;
+        b=TZo77JadVft9ZwMj0eFgiXZljPwmJYZ/hGE65prn8rC65PxG4IXN5YWoBvpktKJ/T/
+         UZvMBnyTqtADrHnTN5WE1cd8GboRHWN2fLFtInLXrEv1v/h6uJ5iqpkhqiBRJmKtZxLz
+         QEbYR09hBWxgI+IZkgp8ihka41Q2knzXDYj/r7FtBVm+cZWnPqCoVwOKaz+eMgP5mkPo
+         wuPQH1cqb1OGqZTxxmDxuzij5WVQOTk/zngv/OsbuLb1n0X03MmZ9gN36oH69DRYGtAe
+         7R6Elu1kyb+7RauKJU5/dEtJqkwEDu/BBNXxm4yG375NPV4HmXDnZoo/sCEdh5+Mj6dy
+         Gn0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718169810; x=1718774610;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uklboiDlNq1iAwrNweEzsuHAT7xa1yfgd/xlZey1tHA=;
-        b=eH7jUbPXYUp1m2+ykTnpbq4/Kx/fflSg+1wXeV2XVGR5CAfyOj8cn5nk6XKfYIHvPu
-         OLCwVCiMkUMeEDtadU9o26JUirQN6cP8q7jOFtglKW2KC2bglmnuTS7kp6gLAbLbWr5i
-         TyJn5z//OjBV1QkVZYgiDEfAawBhipgXNrTabjA7DIh26hZX46OWEDc0crMP1G+ZSgWL
-         PLgjJLB39MxQ21feYcIuQ/b9P8jl0h5WlDk2Cz3Uo8m6FBn0ZoSv3VSqfp6AP9zApGCT
-         h/zyygByX6KoXOlx2eI9+4jZMAKWHUtGFU55ycf38cCFgjN72tje/EmgfiFTnVPV+eX6
-         OG8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWa7uz0OXOWpvfovpbZ9AmE33U5dV9aYwBhkgeqoDCuxbT2HrdDQGk3qh4SZ8ZD57HP8tywi4YL5QHT5cBY6ZaTWctU
-X-Gm-Message-State: AOJu0YypRJW3Nyj08EwErlRxJZfk1hSp5Xp0fal/TgKhbB6PQ+tk0pnt
-	NGvawdnwjhotQ2CalH0vssgiO1swIp8zyXMhi6LXv50jf3AIWC0F
-X-Google-Smtp-Source: AGHT+IE4vm1HhOzouG/uIh/DRBNze8adNK7qarnodBymmGDRMyM7awIkvEKZM90J4HFguoStJlqvwA==
-X-Received: by 2002:a17:902:dac7:b0:1f8:3d1d:b398 with SMTP id d9443c01a7336-1f83d1db6b3mr7146505ad.19.1718169810320;
-        Tue, 11 Jun 2024 22:23:30 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718169814; x=1718774614;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3LYx9pWe+IXQn9iXJjFIm9X9Ha+gW+XiixBi0YYKAco=;
+        b=ROoBLivbjQXyahBAUuidpPhVL5MZLPxr29pjDTuR8KCOaUPFEGw0xD9sJmIMTPnrKe
+         5kh3RoFknj15pEY86kbjGR10mFlli/zyqCMFRI2NH3Z+mh/LGhq3cK15IoNkcEAVu5pp
+         a09hipiAeVDYoTEkwtGZe2dDt7AqQLK3RSwrn/YZlAIX2ZyaliF561+WRiDPxposgmFH
+         8ZhY5gzT1EaYZNlSmT1N+4kXNIcxH1ZrWtFjVCWZWt+0SNKQRT2DDxQoB49x6os5AkK9
+         AFHNWUwFglD99h1BoA9LrtMfQtBoivcumPlfFHMABsTqjXWNUDHnpbHYC7SBTmMnxb0N
+         vQyg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+7bSkXEDL5D3O94bORP7CVenRptendqN3GWjHWI5mSWjeKfFdn/bHgCdKQhCMmfzWqo6q+IZN6vVQk2DSqrcD+Zyl
+X-Gm-Message-State: AOJu0YwPcl1M7G3qKXzCI/VoYuZYWsNTgUEy6gcwkhk4BJ+NfR6i2SeQ
+	BBUGhInj7bSyID8EVuLhxefiIrDakSnCfpPkrDCK8t9Wkhez47ez
+X-Google-Smtp-Source: AGHT+IFKLAKOMwGgrW3gptnRK9NG8WToNY0soeikvGZ3tFM78QRkaQ5c6Eratbtmd2B75aByNiO65g==
+X-Received: by 2002:a05:6a20:8402:b0:1b5:8d94:907a with SMTP id adf61e73a8af0-1b8a9b9e15amr986922637.14.1718169814157;
+        Tue, 11 Jun 2024 22:23:34 -0700 (PDT)
 Received: from wheely.local0.net (220-235-199-47.tpgi.com.au. [220.235.199.47])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd75f711sm112170705ad.11.2024.06.11.22.23.27
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f6bd75f711sm112170705ad.11.2024.06.11.22.23.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Jun 2024 22:23:30 -0700 (PDT)
+        Tue, 11 Jun 2024 22:23:33 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
 To: Thomas Huth <thuth@redhat.com>
 Cc: Nicholas Piggin <npiggin@gmail.com>,
@@ -72,163 +74,154 @@ Cc: Nicholas Piggin <npiggin@gmail.com>,
 	Andrew Jones <andrew.jones@linux.dev>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v10 00/15] powerpc improvements
-Date: Wed, 12 Jun 2024 15:23:05 +1000
-Message-ID: <20240612052322.218726-1-npiggin@gmail.com>
+Subject: [kvm-unit-tests PATCH v10 01/15] powerpc: Add facility to query TCG or KVM host
+Date: Wed, 12 Jun 2024 15:23:06 +1000
+Message-ID: <20240612052322.218726-2-npiggin@gmail.com>
 X-Mailer: git-send-email 2.45.1
+In-Reply-To: <20240612052322.218726-1-npiggin@gmail.com>
+References: <20240612052322.218726-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Tree here
+Use device tree properties to determine whether KVM or TCG is in
+use.
 
-https://gitlab.com/npiggin/kvm-unit-tests/-/tree/powerpc
+Logically these are not the inverse of one another, because KVM can run
+on a TCG processor (if TCG is emulating HV mode, or it is using the
+nested hypervisor APIs in pseries / spapr). And kvm-unit-tests can run
+on that KVM.
 
-Since v9:
-- Rebase after a good chunk of patches were merged.
-- Review from Thomas:
-  - TCG/KVM host query is moved to the start of the series.
-  - Changelog for atomics test.
-  - Dropped spinlock patch change for now.
-  - Fixed tlbie assembly long lines in mmu patch.
-  - Use fdt64 accessor for 64-bit dt value.
-  - Upgrade powerpc gitlab CI to Fedora 40 and enable more tests
-  - Several other improvements.
-- Reduced some long lines.
-- Fixed some SPDX headers.
-- New patch for adding a panic test. s390x is the only other panic
-  test user but it requires KVM so I couldn't see if run_tests.sh
-  looks sane there, but the harness needed a fix to work on powerpc.
+This can be a problem because some issues relate to TCG CPU emulation
+some to the spapr hypervisor implementation, some to KVM, some to real
+hardware, so the TCG test is best-effort for now and is set to the
+opposite of KVM. The two independent variables are added because we may
+be able to more accurately determine this in future.
 
-Thanks,
-Nick
+Use this facility to restrict some of the known test failures to TCG.
 
-Nicholas Piggin (15):
-  powerpc: Add facility to query TCG or KVM host
-  powerpc: Add atomics tests
-  powerpc: Add timebase tests
-  powerpc: Add MMU support
-  common/sieve: Support machines without MMU
-  powerpc: Add sieve.c common test
-  powerpc: add usermode support
-  powerpc: add pmu tests
-  configure: Make arch_libdir a first-class entity
-  powerpc: Remove remnants of ppc64 directory and build structure
-  powerpc: gitlab CI update
-  scripts/arch-run.bash: Fix run_panic() success exit status
-  powerpc: Add a panic test
-  powerpc/gitlab-ci: Upgrade powerpc to Fedora 40
-  powerpc/gitlab-ci: Enable more tests with Fedora 40
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ lib/powerpc/asm/processor.h |  3 +++
+ lib/powerpc/setup.c         | 26 ++++++++++++++++++++++++++
+ powerpc/interrupts.c        |  6 ++++--
+ powerpc/sprs.c              |  2 +-
+ powerpc/tm.c                |  2 +-
+ 5 files changed, 35 insertions(+), 4 deletions(-)
 
- .gitlab-ci.yml                           |  36 +-
- MAINTAINERS                              |   1 -
- Makefile                                 |   2 +-
- common/sieve.c                           |  14 +-
- configure                                |  63 ++-
- lib/{ppc64 => powerpc}/asm-offsets.c     |   0
- lib/{ppc64 => powerpc}/asm/asm-offsets.h |   0
- lib/{ppc64 => powerpc}/asm/atomic.h      |   0
- lib/{ppc64 => powerpc}/asm/barrier.h     |   4 +-
- lib/{ppc64 => powerpc}/asm/bitops.h      |   4 +-
- lib/powerpc/asm/hcall.h                  |   6 +
- lib/{ppc64 => powerpc}/asm/io.h          |   4 +-
- lib/powerpc/asm/mmu.h                    |  86 ++++
- lib/{ppc64 => powerpc}/asm/opal.h        |   4 +-
- lib/powerpc/asm/page.h                   |  65 +++
- lib/powerpc/asm/pgtable-hwdef.h          |  66 +++
- lib/powerpc/asm/pgtable.h                | 125 +++++
- lib/powerpc/asm/processor.h              |  15 +
- lib/{ppc64 => powerpc}/asm/ptrace.h      |   6 +-
- lib/powerpc/asm/reg.h                    |  14 +
- lib/powerpc/asm/rtas.h                   |   1 +
- lib/powerpc/asm/setup.h                  |   1 +
- lib/powerpc/asm/smp.h                    |   3 +
- lib/powerpc/asm/spinlock.h               |   6 +
- lib/powerpc/asm/stack.h                  |   3 +
- lib/{ppc64 => powerpc}/asm/vpa.h         |   0
- lib/powerpc/io.c                         |   7 +
- lib/powerpc/mmu.c                        | 260 +++++++++++
- lib/{ppc64 => powerpc}/opal-calls.S      |   4 +-
- lib/{ppc64 => powerpc}/opal.c            |   0
- lib/powerpc/processor.c                  |  47 ++
- lib/powerpc/rtas.c                       |  19 +
- lib/powerpc/setup.c                      |  61 ++-
- lib/{ppc64 => powerpc}/stack.c           |   0
- lib/ppc64/.gitignore                     |   1 -
- lib/ppc64/asm/handlers.h                 |   1 -
- lib/ppc64/asm/hcall.h                    |   1 -
- lib/ppc64/asm/memory_areas.h             |   6 -
- lib/ppc64/asm/page.h                     |   1 -
- lib/ppc64/asm/ppc_asm.h                  |   1 -
- lib/ppc64/asm/processor.h                |   1 -
- lib/ppc64/asm/reg.h                      |   1 -
- lib/ppc64/asm/rtas.h                     |   1 -
- lib/ppc64/asm/setup.h                    |   1 -
- lib/ppc64/asm/smp.h                      |   1 -
- lib/ppc64/asm/spinlock.h                 |   6 -
- lib/ppc64/asm/stack.h                    |  11 -
- lib/vmalloc.c                            |   7 +
- lib/vmalloc.h                            |   2 +
- powerpc/Makefile                         | 111 ++++-
- powerpc/Makefile.common                  |  89 ----
- powerpc/Makefile.ppc64                   |  30 --
- powerpc/atomics.c                        | 386 ++++++++++++++++
- powerpc/interrupts.c                     | 129 +++++-
- powerpc/mmu.c                            | 225 +++++++++
- powerpc/pmu.c                            | 562 +++++++++++++++++++++++
- powerpc/run                              |   2 +-
- powerpc/selftest.c                       |  18 +-
- powerpc/sieve.c                          |   1 +
- powerpc/sprs.c                           |   2 +-
- powerpc/timebase.c                       | 350 ++++++++++++++
- powerpc/tm.c                             |   2 +-
- powerpc/unittests.cfg                    |  64 ++-
- scripts/arch-run.bash                    |   1 +
- 64 files changed, 2696 insertions(+), 245 deletions(-)
- rename lib/{ppc64 => powerpc}/asm-offsets.c (100%)
- rename lib/{ppc64 => powerpc}/asm/asm-offsets.h (100%)
- rename lib/{ppc64 => powerpc}/asm/atomic.h (100%)
- rename lib/{ppc64 => powerpc}/asm/barrier.h (83%)
- rename lib/{ppc64 => powerpc}/asm/bitops.h (69%)
- rename lib/{ppc64 => powerpc}/asm/io.h (50%)
- create mode 100644 lib/powerpc/asm/mmu.h
- rename lib/{ppc64 => powerpc}/asm/opal.h (90%)
- create mode 100644 lib/powerpc/asm/page.h
- create mode 100644 lib/powerpc/asm/pgtable-hwdef.h
- create mode 100644 lib/powerpc/asm/pgtable.h
- rename lib/{ppc64 => powerpc}/asm/ptrace.h (89%)
- create mode 100644 lib/powerpc/asm/spinlock.h
- rename lib/{ppc64 => powerpc}/asm/vpa.h (100%)
- create mode 100644 lib/powerpc/mmu.c
- rename lib/{ppc64 => powerpc}/opal-calls.S (88%)
- rename lib/{ppc64 => powerpc}/opal.c (100%)
- rename lib/{ppc64 => powerpc}/stack.c (100%)
- delete mode 100644 lib/ppc64/.gitignore
- delete mode 100644 lib/ppc64/asm/handlers.h
- delete mode 100644 lib/ppc64/asm/hcall.h
- delete mode 100644 lib/ppc64/asm/memory_areas.h
- delete mode 100644 lib/ppc64/asm/page.h
- delete mode 100644 lib/ppc64/asm/ppc_asm.h
- delete mode 100644 lib/ppc64/asm/processor.h
- delete mode 100644 lib/ppc64/asm/reg.h
- delete mode 100644 lib/ppc64/asm/rtas.h
- delete mode 100644 lib/ppc64/asm/setup.h
- delete mode 100644 lib/ppc64/asm/smp.h
- delete mode 100644 lib/ppc64/asm/spinlock.h
- delete mode 100644 lib/ppc64/asm/stack.h
- delete mode 100644 powerpc/Makefile.common
- delete mode 100644 powerpc/Makefile.ppc64
- create mode 100644 powerpc/atomics.c
- create mode 100644 powerpc/mmu.c
- create mode 100644 powerpc/pmu.c
- create mode 120000 powerpc/sieve.c
- create mode 100644 powerpc/timebase.c
-
+diff --git a/lib/powerpc/asm/processor.h b/lib/powerpc/asm/processor.h
+index a3859b5d4..a660344cb 100644
+--- a/lib/powerpc/asm/processor.h
++++ b/lib/powerpc/asm/processor.h
+@@ -10,6 +10,9 @@ void handle_exception(int trap, void (*func)(struct pt_regs *, void *), void *);
+ void do_handle_exception(struct pt_regs *regs);
+ #endif /* __ASSEMBLY__ */
+ 
++extern bool host_is_tcg;
++extern bool host_is_kvm;
++
+ extern bool cpu_has_hv;
+ extern bool cpu_has_power_mce;
+ extern bool cpu_has_siar;
+diff --git a/lib/powerpc/setup.c b/lib/powerpc/setup.c
+index 622b99e5d..86e2e144c 100644
+--- a/lib/powerpc/setup.c
++++ b/lib/powerpc/setup.c
+@@ -208,6 +208,9 @@ void cpu_init(struct cpu *cpu, int cpu_id)
+ 	cpu->exception_stack += SZ_64K - 64;
+ }
+ 
++bool host_is_tcg;
++bool host_is_kvm;
++
+ void setup(const void *fdt)
+ {
+ 	void *freemem = &stacktop;
+@@ -259,6 +262,29 @@ void setup(const void *fdt)
+ 	assert(ret == 0);
+ 	freemem += fdt_size;
+ 
++	if (!fdt_node_check_compatible(fdt, 0, "qemu,pseries")) {
++		assert(!cpu_has_hv);
++
++		/*
++		 * host_is_tcg incorrectly does not get set when running
++		 * KVM on a TCG host (using powernv HV emulation or spapr
++		 * nested HV).
++		 */
++		ret = fdt_subnode_offset(fdt, 0, "hypervisor");
++		if (ret < 0) {
++			host_is_tcg = true;
++			host_is_kvm = false;
++		} else {
++			/* KVM is the only supported hypervisor */
++			assert(!fdt_node_check_compatible(fdt, ret, "linux,kvm"));
++			host_is_tcg = false;
++			host_is_kvm = true;
++		}
++	} else {
++		assert(cpu_has_hv);
++		host_is_tcg = true;
++		host_is_kvm = false;
++	}
+ 	ret = dt_get_initrd(&tmp, &initrd_size);
+ 	assert(ret == 0 || ret == -FDT_ERR_NOTFOUND);
+ 	if (ret == 0) {
+diff --git a/powerpc/interrupts.c b/powerpc/interrupts.c
+index 552c48ef2..3e3622e59 100644
+--- a/powerpc/interrupts.c
++++ b/powerpc/interrupts.c
+@@ -72,7 +72,8 @@ static void test_mce(void)
+ 	is_fetch = false;
+ 	asm volatile("lbz %0,0(%1)" : "=r"(tmp) : "r"(addr));
+ 
+-	report(got_interrupt, "MCE on access to invalid real address");
++	/* KVM does not MCE on access outside partition scope */
++	report_kfail(host_is_kvm, got_interrupt, "MCE on access to invalid real address");
+ 	if (got_interrupt) {
+ 		report(mfspr(SPR_DAR) == addr, "MCE sets DAR correctly");
+ 		if (cpu_has_power_mce)
+@@ -82,7 +83,8 @@ static void test_mce(void)
+ 
+ 	is_fetch = true;
+ 	asm volatile("mtctr %0 ; bctrl" :: "r"(addr) : "ctr", "lr");
+-	report(got_interrupt, "MCE on fetch from invalid real address");
++	/* KVM does not MCE on access outside partition scope */
++	report_kfail(host_is_kvm, got_interrupt, "MCE on fetch from invalid real address");
+ 	if (got_interrupt) {
+ 		report(recorded_regs.nip == addr, "MCE sets SRR0 correctly");
+ 		if (cpu_has_power_mce)
+diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+index a85011ad5..dc810b8da 100644
+--- a/powerpc/sprs.c
++++ b/powerpc/sprs.c
+@@ -590,7 +590,7 @@ int main(int argc, char **argv)
+ 
+ 		if (sprs[i].width == 32 && !(before[i] >> 32) && !(after[i] >> 32)) {
+ 			/* known failure KVM migration of CTRL */
+-			report_kfail(i == 136, pass,
++			report_kfail(host_is_kvm && i == 136, pass,
+ 				"%-10s(%4d):\t        0x%08lx <==>         0x%08lx",
+ 				sprs[i].name, i,
+ 				before[i], after[i]);
+diff --git a/powerpc/tm.c b/powerpc/tm.c
+index 507eaf492..d4f436147 100644
+--- a/powerpc/tm.c
++++ b/powerpc/tm.c
+@@ -135,7 +135,7 @@ int main(int argc, char **argv)
+ 	}
+ 	/* kvm-unit-tests can limit number of CPUs present */
+ 	/* KVM does not report TM in secondary threads in POWER9 */
+-	report_kfail(true, cpus_with_tm >= nr_cpus_present,
++	report_kfail(host_is_kvm, cpus_with_tm >= nr_cpus_present,
+ 	       "TM available in all 'ibm,pa-features' properties");
+ 
+ 	all = argc == 1 || !strcmp(argv[1], "all");
 -- 
 2.45.1
 
