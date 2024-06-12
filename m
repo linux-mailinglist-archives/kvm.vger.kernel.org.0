@@ -1,177 +1,174 @@
-Return-Path: <kvm+bounces-19486-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19487-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4E29059D0
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 19:24:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61A289059F7
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 19:31:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DC5AB24954
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 17:24:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E98DE285B7A
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 17:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61740183062;
-	Wed, 12 Jun 2024 17:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124B01822DA;
+	Wed, 12 Jun 2024 17:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ED6QTUpf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yZgdmIRv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1831822D9
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 17:23:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA80EBB
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 17:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718213023; cv=none; b=raRoPPjuVROPUs/wq36S7IQOZ72M6M2IKdBohiXUM/+IuLjvv9vVH9O32YKK3Tl/xAvoiGY8PC3f/Pokioh4mrJ3SkiTorNdXK/4YngrKD5yTkEmfgDELkHUjOSsMxCtmksT8iQhbHaKM55VACdsjTPHVA7BITsyVwgQiccSdbA=
+	t=1718213492; cv=none; b=Epnrb+IwUn0KoMspkeFWwQgawb+baYZ1usk1O3cjZ+m+jl6exHFFvJroTxyB4XoawizfqZugkT/Qzhs+o4/caAo0tCm76z5pAZ2frfcCyapHmQlFqj9EeNjU7HSTup3HfR58A1umlvdLA+E1gl5Hs/reSaMAlJma0O6orx19aYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718213023; c=relaxed/simple;
-	bh=qvzOGVZF1aFjcNNXoWdAyWZv4lQeSovWWQTrEs6pNdw=;
+	s=arc-20240116; t=1718213492; c=relaxed/simple;
+	bh=BVxVglBu/aJdIm8zaMwOg3iRpiLrT6XOkxr2cN79Qtg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z8sz0X2WLLDv8aORh9x0UDqc2jZ2HVuLfAePR9PjjtOm4OenNlE+6u9wZbS9dzDp7vSKosateft6Z6hvG+pr50wYwl/b31LlBfyNUTr5/4uj/v4r1sAgneZVSkTDPrYmaQTn4R5pDxQ8iza4BpodFWaW8WfERtHWTEL8bD6XKHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ED6QTUpf; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=e4HgCJZvdnYayysDROLD96eQZoz8Yc6zspl4ud88fYhWhVIVffpRgdxm54zih0j/klw/wACAxlWVc6GzhKdMqrhRQX5cXlhtatYw0vy03zFakqczQcVM08Y9S6N0pQFCyH1ap+Zibj9i9jUGkg+FD45kQio993kWAUTpbVE5hZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yZgdmIRv; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfb0e59ac7cso181587276.0
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 10:23:40 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1f71d5a85f9so1532995ad.0
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 10:31:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718213020; x=1718817820; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=v0uZvClGSP7b0LMzzAPVM0AhM29ZDe2y2D54OZuyJ4o=;
-        b=ED6QTUpflG01XxDwADpCTuUCb3My1wmNO1KRIabL/mB6J08kl5ENGX51vmpVHsg6xR
-         jFv33Xhk3VXxWTVvpGKAaIotK7Zksj8HAw0XHs6pGvPnVz+1x1dCCWPEFUm/SJy06FLi
-         BpuEPZLYakQWef9qNxKBc3A3XsNZbfd6mt7/jBNk0WSx8e0xYM5diG+B74Wd60h/dixp
-         Ae7x+VxLhJaqlumRqtc3pPayDW5jcNJHxwn3EmaYD3cAVYZ7BtagZ8ZPWqNrRQf8GGOR
-         qUscLQNTNlkm6MS3vd2OpolLDv7GKWif+u6p98TUEVHK9IwK5SEi6mXOlkhAKEmwzS4n
-         qyAQ==
+        d=google.com; s=20230601; t=1718213489; x=1718818289; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZttrWbEybPZrU6j9LIdJZge1/Pd2kmv/UPX9FdzbJ4o=;
+        b=yZgdmIRv2moEI8Zld6u/VkhMeDaPNBowLD5mqzgUawyckf+6uKgiEpnvneIfP4v8FV
+         WOmAWW33+keA4TocyR7SUMJNYlJpph+hMQPsIC1mrHssbSFAHZTXAqQI2k+94Z3JGRZn
+         ssrk2ZmjVaV6UA0nwa0tJ4gqdz4iSiDj1mEE2QfORsmHVs/vuIIHBKIISR8+YIwFMihi
+         uWyFttAx4xGdHXoGdh0ZviEmhP6pdwqNgaKk7Jk1eMhE78nW8BaFAkeky4PAgXWNl+0N
+         cPERpKsYDxaqxIt6hjIe2mhbLo4cc0aMRh490Ha3fAaChpygl6QgWdjucY1jWosdeXr3
+         b4Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718213020; x=1718817820;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=v0uZvClGSP7b0LMzzAPVM0AhM29ZDe2y2D54OZuyJ4o=;
-        b=eyZjcKwQzzeJ5KQmq0Kw9tcIZ35fh93IyaRB1C0XOXT+8G7i9Qf4EwhIKXZ6eU+17H
-         uXcN3enWTGNqbBt1R/60oGDXetjpE+yKC9KqegvrxSlne/uMfKe4Jktq1U9WIAVLQpoF
-         g/mSvw4r+/wjK+axx7JVeZKXeJ9nX+YzLzF8CtJWwHytotKzDm9PICJv+YpmmFD7dXPI
-         DQh5J4Ogi83hwM4MuOBn6pG89AjCY/0hZR9SNp3MsG9DGXVhO7gKsMEFszBo0tSu858r
-         44bYIYREW4JeHNixNKLRrxTLmfsdxAxoKm8YjROhGFsQZTgkB2IXZhRAfg47bPGq50dn
-         5F/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXIrwbEaWStwV29lnEEaSpZz2kfgaDOiVcg58Nu9alkviegeWHwJ3gv04EAOsM1jjRjsQImHxvChnBUa6t4nXUzvNCm
-X-Gm-Message-State: AOJu0YzsxgMVrRDWvOhb9tmYKNXbK0WOLkv68prwnmsHyln9TSQZE91X
-	sXLQiJEcH8YzVSSLmPxkVMWxGCvIfhUKjsIyHKx4i/fAokWR6ulndUQPCAmwYQgrgsD4s7E9Uem
-	bHg==
-X-Google-Smtp-Source: AGHT+IHsuziTjwu8H3LsGOZG3nq2ECdUkM7fJ/s+9lw1k304/SuAsQ64WUp2lf97WzRuhz9PeWwlSE0Bo58=
+        d=1e100.net; s=20230601; t=1718213490; x=1718818290;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZttrWbEybPZrU6j9LIdJZge1/Pd2kmv/UPX9FdzbJ4o=;
+        b=TSh/y7SRrpwkTBC7H8H1dcWikt+SR43dTIwzR1tLOemiMy5jfl3sYyT9vZFJ5QGT8K
+         2c4LE/WoRGkzbGgNz81zH2UfrEE4TxlRjSUNUb1JydDBc7h5L2JGDXT1bQ9y3IaZgcJa
+         AvbclE4GDqU0YCqYm+JnwUEzM0FdhLt8AG5HzY1Blapb5ZG7HpDOTFPq1z7wh0aFuytI
+         TCmcnTsfdIXH4dzDKPgIbKaULj4JTaiK/cqKT4NVCEtQmWQgSSquh5cV/9PojsoG6B1V
+         8sF1vEnSjMOkTwSMkiQybWV1UoRjrQ8mN/JzW2eLo0a8mZDuzZIddxwSi0PHdXzfdx54
+         1PiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWgWcLLlczk8fa8i5ChZgcwVDSLJZWNig7DRzMpALHJkH1D7SLPaSWYTrHb4rP4WyxT4yOmkWeR+i4Rt4QgbTSCy7Gx
+X-Gm-Message-State: AOJu0YxqlXYXz9kR4okjJgWWvjQ9aiOo0KVUu9OmXwpMZbwTdtXz5+w2
+	peXG/4oRE8fEduho2tIQ1hV/W6qm5/gd4vVgh0yoOQkMjPWwrbEHCprX31PfQ6+zS7JOeweMCSB
+	Tkg==
+X-Google-Smtp-Source: AGHT+IEfEUqjAJd5HwtcI3SellD9wJyKICC45AOG2hDSPfUBXvAeRlQriWUGwdY0fjJOl8E1dOYOBVVBc8s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:729:b0:dfb:b4e:407a with SMTP id
- 3f1490d57ef6-dfe68035fbemr647880276.9.1718213020117; Wed, 12 Jun 2024
- 10:23:40 -0700 (PDT)
-Date: Wed, 12 Jun 2024 10:23:38 -0700
-In-Reply-To: <CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a17:903:182:b0:1f3:4b2a:1acb with SMTP id
+ d9443c01a7336-1f83b23ddb1mr79315ad.0.1718213489334; Wed, 12 Jun 2024 10:31:29
+ -0700 (PDT)
+Date: Wed, 12 Jun 2024 10:31:27 -0700
+In-Reply-To: <Zmm9SdVfg18RECT5@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240611002145.2078921-1-jthoughton@google.com>
- <20240611002145.2078921-9-jthoughton@google.com> <ZmnGlpBR91TyI3Lt@google.com>
- <CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com>
-Message-ID: <ZmnZmj8iVmcLf8fo@google.com>
-Subject: Re: [PATCH v5 8/9] mm: multi-gen LRU: Have secondary MMUs participate
- in aging
+References: <20240405115815.3226315-2-pbonzini@redhat.com> <20240412104408.GA27645@willie-the-truck>
+ <86jzl2sovz.wl-maz@kernel.org> <ZhlLHtfeSHk9gRRO@google.com>
+ <86h6g5si0m.wl-maz@kernel.org> <Zh1d94Pl6gneVoDd@google.com>
+ <20240418141932.GA1855@willie-the-truck> <ZiF6NgGYLSsPNEOg@google.com>
+ <20240419112432.GB2972@willie-the-truck> <Zmm9SdVfg18RECT5@google.com>
+Message-ID: <Zmnbb-Xlyz4VXNHI@google.com>
+Subject: Re: [PATCH 1/4] KVM: delete .change_pte MMU notifier callback
 From: Sean Christopherson <seanjc@google.com>
-To: Yu Zhao <yuzhao@google.com>
-Cc: James Houghton <jthoughton@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Will Deacon <will@kernel.org>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Nicholas Piggin <npiggin@gmail.com>, 
+	Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-mm@kvack.org, linux-trace-kernel@vger.kernel.org, 
+	linux-perf-users@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jun 12, 2024, Yu Zhao wrote:
-> On Wed, Jun 12, 2024 at 10:02=E2=80=AFAM Sean Christopherson <seanjc@goog=
-le.com> wrote:
-> >
-> > On Tue, Jun 11, 2024, James Houghton wrote:
-> > > diff --git a/mm/rmap.c b/mm/rmap.c
-> > > index e8fc5ecb59b2..24a3ff639919 100644
-> > > --- a/mm/rmap.c
-> > > +++ b/mm/rmap.c
-> > > @@ -870,13 +870,10 @@ static bool folio_referenced_one(struct folio *=
-folio,
-> > >                       continue;
-> > >               }
-> > >
-> > > -             if (pvmw.pte) {
-> > > -                     if (lru_gen_enabled() &&
-> > > -                         pte_young(ptep_get(pvmw.pte))) {
-> > > -                             lru_gen_look_around(&pvmw);
-> > > +             if (lru_gen_enabled() && pvmw.pte) {
-> > > +                     if (lru_gen_look_around(&pvmw))
-> > >                               referenced++;
-> > > -                     }
-> > > -
-> > > +             } else if (pvmw.pte) {
-> > >                       if (ptep_clear_flush_young_notify(vma, address,
-> > >                                               pvmw.pte))
-> > >                               referenced++;
-> >
-> > Random question not really related to KVM/secondary MMU participation. =
- AFAICT,
-> > the MGLRU approach doesn't flush TLBs after aging pages.  How does MGLR=
-U mitigate
-> > false negatives on pxx_young() due to the CPU not setting Accessed bits=
- because
-> > of stale TLB entries?
->=20
-> I do think there can be false negatives but we have not been able to
-> measure their practical impacts since we disabled the flush on some
-> host MMUs long ago (NOT by MGLRU), e.g., on x86 and ppc,
-> ptep_clear_flush_young() is just ptep_test_andclear_young().
+On Wed, Jun 12, 2024, Sean Christopherson wrote:
+> On Fri, Apr 19, 2024, Will Deacon wrote:
+> > On Thu, Apr 18, 2024 at 12:53:26PM -0700, Sean Christopherson wrote:
+> > > On Thu, Apr 18, 2024, Will Deacon wrote:
+> > > > > I assume the idea would be to let arch code do single-page invalidations of
+> > > > > stage-2 entries for each gfn?
+> > > > 
+> > > > Right, as it's the only code which knows which ptes actually ended up
+> > > > being aged.
+> > > > 
+> > > > > Unless I'm having a brain fart, x86 can't make use of that functionality.  Intel
+> > > > > doesn't provide any way to do targeted invalidation of stage-2 mappings.  AMD
+> > > > > provides an instruction to do broadcast invalidations, but it takes a virtual
+> > > > > address, i.e. a stage-1 address.  I can't tell if it's a host virtual address or
+> > > > > a guest virtual address, but it's a moot point because KVM doen't have the guest
+> > > > > virtual address, and if it's a host virtual address, there would need to be valid
+> > > > > mappings in the host page tables for it to work, which KVM can't guarantee.
+> > > > 
+> > > > Ah, so it sounds like it would need to be an arch opt-in then.
+> > > 
+> > > Even if x86 (or some other arch code) could use the precise tracking, I think it
+> > > would make sense to have the behavior be arch specific.  Adding infrastructure
+> > > to get information from arch code, only to turn around and give it back to arch
+> > > code would be odd.
+> > 
+> > Sorry, yes, that's what I had in mind. Basically, a way for the arch code
+> > to say "I've handled the TLBI, don't worry about it."
+> > 
+> > > Unless arm64 can't do the invalidation immediately after aging the stage-2 PTE,
+> > > the best/easiest solution would be to let arm64 opt out of the common TLB flush
+> > > when a SPTE is made young.
+> > > 
+> > > With the range-based flushing bundled in, this?
+> > > 
+> > > ---
+> > >  include/linux/kvm_host.h |  2 ++
+> > >  virt/kvm/kvm_main.c      | 40 +++++++++++++++++++++++++---------------
+> > >  2 files changed, 27 insertions(+), 15 deletions(-)
+> > > 
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index afbc99264ffa..8fe5f5e16919 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -2010,6 +2010,8 @@ extern const struct kvm_stats_header kvm_vcpu_stats_header;
+> > >  extern const struct _kvm_stats_desc kvm_vcpu_stats_desc[];
+> > >  
+> > >  #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
+> > > +int kvm_arch_flush_tlb_if_young(void);
+> > > +
+> > >  static inline int mmu_invalidate_retry(struct kvm *kvm, unsigned long mmu_seq)
+> > >  {
+> > >  	if (unlikely(kvm->mmu_invalidate_in_progress))
+> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> > > index 38b498669ef9..5ebef8ef239c 100644
+> > > --- a/virt/kvm/kvm_main.c
+> > > +++ b/virt/kvm/kvm_main.c
+> > > @@ -595,6 +595,11 @@ static void kvm_null_fn(void)
+> > >  }
+> > >  #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
+> > >  
+> > > +int __weak kvm_arch_flush_tlb_if_young(void)
+> > > +{
+> > > +	return true;
+> > > +}
+> > 
+> > I tend to find __weak functions a little ugly, but I think the gist of the
+> > diff looks good to me. Thanks for putting it together!
+> 
+> Circling back to this, I don't think we should pursue this specific tweak, at
+> least not without hard data for a concrete use case.
 
-Aha!  That's what I was missing, I somehow didn't see x86's ptep_clear_flus=
-h_young().
+Ha, I spoke too soon.  Based on the learning from the KVM+MGLRU thread[*], it
+looks like KVM should omit the TLB flush when aging pages whenever possible.  If
+that's not doable on all architectures for whatever reason, then something like
+this is probably the way to go.
 
-That begs the question, why does KVM flush TLBs on architectures that don't=
- need
-to?  And since kvm_mmu_notifier_clear_young() explicitly doesn't flush, are=
- there
-even any KVM-supported architectures for which the flush is mandatory?
-
-Skipping the flush on KVM x86 seems like a complete no-brainer.
-
-Will, Marc and/or Oliver, what are arm64's requirements in this area?  E.g.=
- I see
-that arm64's version of __ptep_clear_flush_young() does TLBI but not DSB.  =
-Should
-KVM be doing something similar?  Can KVM safely skip even the TBLI?
-
-> theoretical basis is that, given the TLB coverage trend (Figure 1 in
-> [1]), when a system is running out of memory, it's unlikely to have
-> many long-lived entries in its TLB. IOW, if that system had a stable
-> working set (hot memory) that can fit into its TLB, it wouldn't hit
-> page reclaim. Again, this is based on the theory (proposition) that
-> for most systems, their TLB coverages are much smaller than their
-> memory sizes.
->=20
-> If/when the above proposition doesn't hold, the next step in the page
-> reclaim path, which is to unmap the PTE, will cause a page fault. The
-> fault can be minor or major (requires IO), depending on the race
-> between the reclaiming and accessing threads. In this case, the
-> tradeoff, in a steady state, is between the PF cost of pages we
-> shouldn't reclaim and the flush cost of pages we scan. The PF cost is
-> higher than the flush cost per page. But we scan many pages and only
-> reclaim a few of them; pages we shouldn't reclaim are a (small)
-> portion of the latter.
->=20
-> [1] https://www.usenix.org/legacy/events/osdi02/tech/full_papers/navarro/=
-navarro.pdf
+[*] https://lore.kernel.org/all/CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com
 
