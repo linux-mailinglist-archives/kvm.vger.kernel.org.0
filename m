@@ -1,74 +1,72 @@
-Return-Path: <kvm+bounces-19528-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19529-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA447905F41
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 01:32:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FC20905F4A
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 01:36:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA45B1C213DD
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:32:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41B4B28536B
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5732812DDA7;
-	Wed, 12 Jun 2024 23:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3669C12D742;
+	Wed, 12 Jun 2024 23:36:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KuRtSsoX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dnsOlQDN"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3344022092;
-	Wed, 12 Jun 2024 23:32:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB8E2A34;
+	Wed, 12 Jun 2024 23:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718235128; cv=none; b=qNMAxb0SjeLRMjfxtNNj1iZIZjrMPrpLEcM4NkT5CNG8kBNZbIuOqWLZMpUNUuFDO10GkFu+j2a2C6ORg3Bp+kY8qE72n4WkUKM3aRLb5QzSRrTpUVUdgvxEPn427RRStRRzO3g/ZSmFuEb2Mchz3O39cFh1T4kX85sIhmHrKhI=
+	t=1718235396; cv=none; b=fZjQoeilu48rCDOqjuzi91AnscthxS3ftsRrOY0esw5I6epyGdergWxKWDE0HWH3q6ocaYRiW67ygr02bLbDDSXEOL3vBuWzSN6Fmpcl+Nt1gK1k/ozqtEaxNSbZtWxZCHYysX4htw2yj+gI3vD6VTYDw9gQOAhrpYtb0qmUvnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718235128; c=relaxed/simple;
-	bh=vXTin2RE5LVdNvEj9vXYTNfzeL/DBSh7hlukwrm3jM8=;
+	s=arc-20240116; t=1718235396; c=relaxed/simple;
+	bh=/ot1u8+j6JBXYp+ET8FmSCXU3q6m7Kz9DNeH/nvc5aQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KZWP7+Ef1VbQgeAFP9ulJCdFEyHoYp6q4EIpy4GZcbTEzkWkW4TbgPdIiF64VadtQFT8WnEsSJIQ+vdUKSoua9Xyc038ups93MZreOhMgQWD5ktikCEQDK+ox2Fr9LVMJMcy0p9iFX1nzwWK65SwhTWtnyZ4VmDkY5U7tcLQhzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=KuRtSsoX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79393C116B1;
-	Wed, 12 Jun 2024 23:32:05 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KuRtSsoX"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718235123;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qSAYPgRWQjgO94CvH8azZnzUEXB1002L22u56bSmdYM=;
-	b=KuRtSsoXnhoWtj8ILW+HbvJl66iT9qTq9bSBLEsqlgbz+NueejOfai90fuwt9YC44f1xei
-	hmuw3gt1QJJwUC0wpdH+Cc3bGwXliu0JUoPBoQ3fEIPyMnLEjglwvNilIrEYYHTX8Rku8B
-	FH2QYFekE0pqYf5XHoYxT03jyvV2YLs=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7c292bc0 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 12 Jun 2024 23:32:03 +0000 (UTC)
-Date: Thu, 13 Jun 2024 01:31:57 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zmov7ZaL-54T9GiM@zx2c4.com>
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tr+NKX0WaqY1OsUHol0fd6cOD7PtqFKGnuH1yGCy8k3u3QO6M6iJZUxfswRulwDIB+xaF1e1MBIrArqCg8h64W+jte5sjUyNdIjK6YsZX5ZfByM9Nr7HxLlFP4VUuZKWlfOM1WSGksyAQSm1/vzFiuoU3rfw1nGY9KwcySUm09s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dnsOlQDN; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718235395; x=1749771395;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/ot1u8+j6JBXYp+ET8FmSCXU3q6m7Kz9DNeH/nvc5aQ=;
+  b=dnsOlQDNhu43zGATn1opV0AqQWO0sSRjZhAq2/1cjsXl71PIoZ0hgruT
+   YfvjTv2UfGd4uuKTc0v9PMd6Eud6rgK3ZJVkxigHBu0p28K3Szn5lgos8
+   jP44fXYQ8jHEWSE7FTMxkCgXel0Dl7XJN5eSgBbpO6NVk6bLCajHvda+J
+   i8f+Z50f/wBGE0UrGdz99L1hWFp/Ql1hCVTacZkTVKTiv38rhfhTr42WW
+   csOLMxfcpTHCDSL+onMRu+yMUhxCjbDtWkJ6f0IHQpwVJdLJjfqi0g1VO
+   iJnGVej54y3mZXN1qHcyA8dVyG0k1jK/WznGjWXQRBWgK6vCcs32YYbxi
+   A==;
+X-CSE-ConnectionGUID: L7nIl811Qu2ubL3NZpvOwQ==
+X-CSE-MsgGUID: jjGG/jqwTTmwEYTkc4FoVw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11101"; a="17951603"
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="17951603"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 16:36:33 -0700
+X-CSE-ConnectionGUID: QJUdnfmMR3mkQluVZ708Eg==
+X-CSE-MsgGUID: YFkjvzwHRTWoHdsP7JHVhg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,234,1712646000"; 
+   d="scan'208";a="40578318"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 16:36:33 -0700
+Date: Wed, 12 Jun 2024 16:36:32 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	stable@vger.kernel.org, rick.p.edgecombe@intel.com
+Subject: Re: [PATCH v2] virt: guest_memfd: fix reference leak on hwpoisoned
+ page
+Message-ID: <20240612233632.GB1900928@ls.amr.corp.intel.com>
+References: <20240611102515.48048-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,41 +75,21 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+In-Reply-To: <20240611102515.48048-1-pbonzini@redhat.com>
 
-On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > when the callback only performs kmem_cache_free. Use
-> > > kfree_rcu() directly.
-> > > 
-> > > The changes were done using the following Coccinelle semantic patch.
-> > > This semantic patch is designed to ignore cases where the callback
-> > > function is used in another way.
-> > 
-> > How does the discussion on:
-> >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > reflect on this series? IIUC we should hold off..
+On Tue, Jun 11, 2024 at 06:25:15AM -0400,
+Paolo Bonzini <pbonzini@redhat.com> wrote:
+
+> If __kvm_gmem_get_pfn() detects an hwpoisoned page, it returns -EHWPOISON
+> but it does not put back the reference that kvm_gmem_get_folio() had
+> grabbed.  Add the forgotten folio_put().
 > 
-> We do need to hold off for the ones in kernel modules (such as 07/14)
-> where the kmem_cache is destroyed during module unload.
-> 
-> OK, I might as well go through them...
-> 
-> [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> 	Needs to wait, see wg_allowedips_slab_uninit().
+> Fixes: a7800aa80ea4 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-specific backing memory")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Right, this has exactly the same pattern as the batman-adv issue:
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 
-    void wg_allowedips_slab_uninit(void)
-    {
-            rcu_barrier();
-            kmem_cache_destroy(node_cache);
-    }
-
-I'll hold off on sending that up until this matter is resolved.
-
-Jason
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
