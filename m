@@ -1,145 +1,134 @@
-Return-Path: <kvm+bounces-19427-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19428-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 848A9904F28
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 11:24:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB7190500E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 12:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3154C286C2C
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 09:24:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8A901F24B92
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 10:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDD616D9DA;
-	Wed, 12 Jun 2024 09:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2356016F0D1;
+	Wed, 12 Jun 2024 10:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LwAbxx58"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCDtxszx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F306CA34
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 09:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFC816E89E;
+	Wed, 12 Jun 2024 10:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718184259; cv=none; b=JQwT4w8ac2bjWMTKNxF6CzhXFgup2bZudCnY3u/QV98DWGh7cMSXZUihgOpyRkq3Zx9OG1SWZM/NzsX8cUIXVueLPn7haCeGVTbApAtXMVmDRlDI+Bqupzp5P3XNYqo/eL2ZFVhckS04g2ZEA+Bj2toJ466zLxezLViFjz9UeEc=
+	t=1718186845; cv=none; b=NLcO/dv2Ppg5YFTY1rjKKcYP6fhN2jsiZ8f0soIwT2pvfugvx3QadikG/V8lwxlMsgHIOWrfninSQeisOFFLXvIxRoMfufIynmD/9TyEPc/gwgkKL/MEKKCDgrc9sDXooVlYVVIPbr7ahBvGva2Y74kxiTzl2YrjYiIb+VuaLPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718184259; c=relaxed/simple;
-	bh=ytPB7o3sNt3WkmYesD0N7871LrdUiavykFcGUZgCd3s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cVz6vT4hOjzMdG6hBqkI/eCsVFXl1GHvfc4GIxkhoWjCY99y52WOgxt4gBLOxedUIPoTpFiE1CtSyFSwl3FGi0tvtBdz7kMs6x2JlHOMuqxx0pj0lnacXeaHExx8FYSaSi3eXUar5EUYwplAkIm+tpWocTJtWtEumUmzDXb1r5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LwAbxx58; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718184258; x=1749720258;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ytPB7o3sNt3WkmYesD0N7871LrdUiavykFcGUZgCd3s=;
-  b=LwAbxx58BVRv149Y/7ebD1qaO9eLGAzu5cmRKCK90tKsMad2U+sdYT4z
-   W0cm+NqpkIq88D1yRGhF7R0f6Vez1IDtqWXH9FY4hY8M1NwFe1ZfYKkom
-   8DBI3nqwTExARrcRzD+xeSqaxecIjAlenEsVTfSfw5S1+83XZnY7bQb2v
-   63gHG+NE9MTWuZZFwV1+Lj8kjQnWXSHyFA20Tq/sEGi533eZSK/Cr/yFO
-   +u3cxJMW2NnaxlyLb76doOkqaOsVpYycRZV4X9xU96oAMI34uBBUWc5EX
-   P7P7QUbNLd0HTqP90jJ89sRuQx7JdvuVHxkEVb6Ugr/545xF1NhZRDimE
-   A==;
-X-CSE-ConnectionGUID: 6dy+f7ocRyiuyK844BH4xg==
-X-CSE-MsgGUID: GKtiV2EaRX2n9gLRz4GSKw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="14732142"
-X-IronPort-AV: E=Sophos;i="6.08,232,1712646000"; 
-   d="scan'208";a="14732142"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 02:24:17 -0700
-X-CSE-ConnectionGUID: SWx+sngdQ7iyekGkwC68SA==
-X-CSE-MsgGUID: bBfcdBtsTui+Tf8O3iArZA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,232,1712646000"; 
-   d="scan'208";a="39839863"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.51]) ([10.124.227.51])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 02:24:11 -0700
-Message-ID: <3315d483-cdc0-44cd-af56-9fee612de054@intel.com>
-Date: Wed, 12 Jun 2024 17:24:08 +0800
+	s=arc-20240116; t=1718186845; c=relaxed/simple;
+	bh=wijopm0nhucG+7m8+AH2LAOLzwedkcVS1zjeQR1rbGE=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kWtwmJyAHDZpQo3I090ZMx7GPYH93lzY30w2EbYQtl1a+EXmTbRkmeOX7p4RC6m8qNwfXi387ZmnbEhclwqFresxXPE68C4cjPXykAw1mXc1zJ2CC1h/YXkWPTTj/0CLN78hCs2v/OxBUpt5jWa1rg+Fyka8oRRAyH9NifaAZpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCDtxszx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAD94C32789;
+	Wed, 12 Jun 2024 10:07:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718186844;
+	bh=wijopm0nhucG+7m8+AH2LAOLzwedkcVS1zjeQR1rbGE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eCDtxszxNoB0piqxLuB/bD6m5JPZBy2liC/2ayWxt71f4cTQCaPFw/Wr6S6U81R0/
+	 WB5Brgoy4oB+3lpQCkkBTJQ2h/PvJV051cwaoluv4tGNAtFW4516zoYm1aPXz/LmWP
+	 S5OD1m1AYqm2/T8w9SUKCHOebT4JUcGaGTX4FzoiMIKmn9+qlnkv0UEayd5tFMIq3v
+	 AL5CkssPTZLYThiIaEKcHOfFheTV8ziG414PmBVrwH2j6Yky4ACVfxH4nv553eLh8L
+	 Cb52Tvaqm0beIXCv5AdDhIdwwmsdCIrP92H2CGWk6zjgglufiPb9p16AakkQrh+Srb
+	 PnscSM29EsFpw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sHKt0-0037CS-An;
+	Wed, 12 Jun 2024 11:07:22 +0100
+Date: Wed, 12 Jun 2024 11:07:21 +0100
+Message-ID: <8634pilbja.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	kvmarm@lists.linux.dev,
+	Eric Auger <eauger@redhat.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [RFC PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1 writable
+In-Reply-To: <Zmkyi39Pz6Wqll-7@linux.dev>
+References: <20240612023553.127813-1-shahuang@redhat.com>
+	<Zmkyi39Pz6Wqll-7@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 18/65] i386/tdx: Make Intel-PT unsupported for TD guest
-To: "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org,
- Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-19-xiaoyao.li@intel.com>
- <59fec569-95e1-9024-77fb-b6d2f89b3951@intel.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <59fec569-95e1-9024-77fb-b6d2f89b3951@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, shahuang@redhat.com, kvmarm@lists.linux.dev, eauger@redhat.com, sebott@redhat.com, cohuck@redhat.com, catalin.marinas@arm.com, james.morse@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 5/31/2024 5:27 PM, Duan, Zhenzhong wrote:
+On Wed, 12 Jun 2024 06:30:51 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> On 2/29/2024 2:36 PM, Xiaoyao Li wrote:
->> Due to the fact that Intel-PT virtualization support has been broken in
->> QEMU since Sapphire Rapids generation[1], below warning is triggered when
->> luanching TD guest:
->>
->>    warning: host doesn't support requested feature: 
->> CPUID.07H:EBX.intel-pt [bit 25]
->>
->> Before Intel-pt is fixed in QEMU, just make Intel-PT unsupported for TD
->> guest, to avoid the confusing warning.
+> Hi Shaoqin,
 > 
-> I guess normal guest has same issue.
+> On Tue, Jun 11, 2024 at 10:35:50PM -0400, Shaoqin Huang wrote:
+> > Hi guys,
+> > 
+> > I'm trying to enable migration from MtCollins(Ampere Altra, ARMv8.2+) to
+> > AmpereOne(AmpereOne, ARMv8.6+), the migration always fails when migration from
+> > MtCollins to AmpereOne due to some register fields differing between the
+> > two machines.
+> > 
+> > In this patch series, we try to make more register fields writable like
+> > ID_AA64PFR1_EL1.BT. This is first step towards making the migration possible.
+> > Some other hurdles need to be overcome. This is not sufficient to make the
+> > migration successful from MtCollins to AmpereOne.
+> 
+> It isn't possible to transparently migrate between these systems. The
+> former has a cntfrq of 25MHz, and the latter has a cntfrq of 1GHz. There
+> isn't a mechanism for scaling the counter frequency, and I have zero
+> appetite for a paravirt interface.
 
-yeah, just the bug referenced by [1]
+Note that there *is* an architectural workaround in the form of
+FEAT_CNTSC. But of course:
 
-> Thanks
-> 
-> Zhenzhong
-> 
->>
->> [1] 
->> https://lore.kernel.org/qemu-devel/20230531084311.3807277-1-xiaoyao.li@intel.com/
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> ---
->> Changes in v4:
->>   - newly added patch;
->> ---
->>   target/i386/kvm/tdx.c | 5 +++++
->>   1 file changed, 5 insertions(+)
->>
->> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
->> index 85d96140b450..239170142e4f 100644
->> --- a/target/i386/kvm/tdx.c
->> +++ b/target/i386/kvm/tdx.c
->> @@ -292,6 +292,11 @@ void tdx_get_supported_cpuid(uint32_t function, 
->> uint32_t index, int reg,
->>       if (function == 1 && reg == R_ECX && !enable_cpu_pm) {
->>           *ret &= ~CPUID_EXT_MONITOR;
->>       }
->> +
->> +    /* QEMU Intel-pt support is broken, don't advertise Intel-PT */
->> +    if (function == 7 && reg == R_EBX) {
->> +        *ret &= ~CPUID_7_0_EBX_INTEL_PT;
->> +    }
->>   }
->>   enum tdx_ioctl_level{
+- it is optional (and likely not implemented)
+- it is global (hence affecting all SW running on the machine)
+- it invalidates the requirements of ARMv8.6 (who cares?)
+- KVM has nothing to do with it (yay!)
 
+So if the two systems (from the same manufacturer) were ever designed
+to allow migration between the two, they would have at least baked
+some of that in.
+
+As for the paravirt interface, I agree that this is a non-starter
+(been there, done that, dumped it in the bin).
+
+The patch itself is interesting and may be of use once it has been put
+to a compiler and not just dumped on the list without any testing.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
