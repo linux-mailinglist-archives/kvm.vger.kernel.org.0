@@ -1,72 +1,74 @@
-Return-Path: <kvm+bounces-19467-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19468-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF629056FB
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 852879056FC
 	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 17:35:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B26D7281F7C
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 15:35:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB5E1C20E00
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 15:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F658180A6B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F840180A6C;
 	Wed, 12 Jun 2024 15:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gUcc01e/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="plXVGwHM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2FF918622
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED60F1802CA
 	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 15:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718206512; cv=none; b=tmMsosJQXpCvnO3NhpMTF4NGlY/ZkAwBXLyT2H1AT6kJD4QdyT25Nqfw5twtt5LWoJfBJ9FjUqTh/ScWuryHKCadu10Xh5cK6WCr92tmqTgwK+D4qKgzez2bgmXlFtWTds77E8R1FlEJ9zQRqpKs3UzMUUtfiz/wsW6+u8Pnn1M=
+	t=1718206512; cv=none; b=qG+SrgBZ9v4/4nHWP/fVTpuBfch+TAFnQBITl3PkNnXXgrMLZb5myIYIGSxAkf3l9tPTSBCPzgoFl7qQo10zbIDSPJgDva4SdVDZx3QPPu1O4gSePMh56Y99xlVtnEMawIWoCZ/reFQJWPxftXFm242MvqojE+uFuYsxpRa4cf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718206512; c=relaxed/simple;
-	bh=E+Hbk/hmtOzU7TT+zfxQKRwq7esr2uDrO1s3yBDGySQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=PX4QuGImAvunnAqzdo5P6SlgdE/U4QCKePS25XgsD8wCYoyDiwlZKJLHQV0Sh3jGpugA1+BzXmF7tqCA04IYNyUcVIbVPrSk6Z4xm/ZeMbrKJlsnOiXqhdnTrfL2rpTcJ/whBRowgNX/ZiJg0BF3YHbNgG3zEg1ypbwbZUzMTPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gUcc01e/; arc=none smtp.client-ip=209.85.208.48
+	bh=hhjtL1KZNh7s4H+vCr+InjMK7eqyjYHSrl0IyEe67G8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gdM1thvDKIoDEsrI55vHoIpI7I/21T8Lc28VOUYnybN1eqYPTrN2CCDZgRmWKdtInPlmBoqjqwB2SF0sw6LHLVTCONy5G6tT8RVWmh8wMcJlunvma0E3veabowUaanWzE2yT2AA7azPb0KL/giy1nBgY6ZmXjz/X4KcPrBimhpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=plXVGwHM; arc=none smtp.client-ip=209.85.218.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57a1fe63a96so9291892a12.0
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a6f11a2d18aso471466b.2
         for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 08:35:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1718206509; x=1718811309; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+qqLWSg7tRM2gGCJAJtzdTrDQlMzenU32kd2gKR8s2c=;
-        b=gUcc01e/OP3bo8oHoYUtlz0kWL6MJ6+a9wKe919mDYKjgRoKOANvFfsxKrpXwLAuUH
-         HjjF2VCwZC9AfyB2usJlmobO7kt9SzLz/cC52LpxhQ6pCwgb9EA8yAOokf1gVxZPbrgl
-         0Jk5nDu1VbXisM06FwvEBxmLfVBvmkhJRIoljM3dpGmVTaqyQXhhQWsWG25lXX7gxcPb
-         kTxMKj7WLV9lZRwSz4LjQGBG3Sy4JwoJkzI3IJVZlWtcpadPOOmSuizS/bzX9CQi0NOb
-         JSGZy1ne/DiWznrL+9IE1OLpzWqruIIzl9CC80vQy0tzk7ARMO8sPeM+0PH/mOGq98it
-         3oQg==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kJAQlF/zpzEh6ZUd/TIoqAhEJRcTvj1Vbf876k6aGf8=;
+        b=plXVGwHM9vPlfNB4kCoBEhZkdoruX2eiBWdqn56i2XQAW/CMUZlGn7KR6g6j5IQQ4I
+         6sP38KM4vEUQYYW0OPWo2RIJjw47LfymM+ghgUraSvd2G4bZO3VTSzYUX4cyZPNV3a9q
+         VXaDQnNN4srjZ+hfqLL/i/eG4F3VC4HuQmJlKJ3e6kUk1utA1PCJz354pKjY5uLh728M
+         aS4gg6594udjomGzRwiw6EOPX5qPhoVupljCv+YnPrU1/CAFE+1LCc1z9NIIRGJ1+g9t
+         Vf4VG5Ca2eBAdUAm1yzAXaUyZgy5Yhin+922tTdIQFXonjePj+E/glL/Q569obzOiuFK
+         K/cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1718206509; x=1718811309;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+qqLWSg7tRM2gGCJAJtzdTrDQlMzenU32kd2gKR8s2c=;
-        b=ChyeSHRJW1yuqM//c20+T9gcJW/3TFdVFZDVVATkH+2HcQbo+YYeM1Ud5I+eG2serh
-         /qQTInsD5UXug70EYi9cdaQRPDTnpR1Ufhyd0oso8+By2DDuAaCUlpPGJxJOO63TztrC
-         zTVEuRIWWOYJcdlvILu1WKLvy/ORgKf01psiRqTimMNNfpHzHVjIbYZnGrmGbtC+v+Gu
-         dg36aUpuZzSirRIV+6GFiD+zCm+kkOG1dtKET6l6+lr9i07Mhh8POTNE8Uoejkhz6VlA
-         vkZKPrBh/6vYfPfdO5XtB3A3YYC0clDlkKjRXtBleTxfD3O/tvAHHYF2EvvVMJg40xY/
-         n04g==
-X-Forwarded-Encrypted: i=1; AJvYcCXAMoZyAH72v/K3o7f19uTjjxp97SQMqQfHK2bTaLZ/TYFb91n1QjCPrbc/mqFGqxxuxaMo++iqLkXoNyDidDGCeF+h
-X-Gm-Message-State: AOJu0Yy6I2YHVJcMaHYZ8iCWyFKPK/ha/HkMMxyp24JTvs6u9UJz6Tit
-	UMR4aQxSO03VHYTkCnfhPWP60TFg73NX5QiaS4Rya1V4MOw1ViJjoaR5PNgVfTQ=
-X-Google-Smtp-Source: AGHT+IERL/2jvHutLftjXOxlHqfrdjG3j3FdZVVa7m1ZXHMLA/R2foTn5KoIJagMPECFajcOPxgGQg==
-X-Received: by 2002:a50:ab18:0:b0:57c:5764:15f1 with SMTP id 4fb4d7f45d1cf-57caa9ba475mr1540370a12.29.1718206508979;
-        Wed, 12 Jun 2024 08:35:08 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kJAQlF/zpzEh6ZUd/TIoqAhEJRcTvj1Vbf876k6aGf8=;
+        b=Yq+wjlSVgkEoFGEXisAuHtabfJowBT9cTkg3zmg8GnqQaiq0cKC+wByhdSrmnR8A1c
+         83SD5CW8prMD/Das3uR8FMV0R28SfN5nUcYiXlphY/rPH3YjJYni+/wFT4h0LX0vzOUy
+         K3rF6RQjJUUKTDMSjqARkszNmEmisId1lpfl1X/6/9V+AOfNuQ68ZP0hzU4Z1Iu7nuX9
+         Wv+tBYDvC/e3Zz4viHLM18BerRQGJNFkJjH9ymKLcFMtnDBLJznoWq1MLBgUvyTUvy0h
+         x6kvgqv0pxM2w2fe0odAFNyERdxvitdY0yjDSMugDEAgM2RrhfvsXDwJKPRTR+B8lF3h
+         MPVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVzpwj5mN8jX9+/n/eDMcOVAvf6qa3R0RTtneJhY+XC+P6W5wADGFZ9PXKwPygICD9Nfg9xAtAFxBCc/QBWimrUIUFk
+X-Gm-Message-State: AOJu0YxwRGzPoSlVQluNbwfE2ybo0NrK+YSGuXS/ytzbQWPE97cFnsIw
+	rT8UUYzOR3P9cNDzEsf078n2/bmBZaJoLZ2CesK0Jrbsq8JrUzDEo/gkeF1zBW0=
+X-Google-Smtp-Source: AGHT+IEUiek7G0JZYXLhDU7k/lAdd2/r6kUwG039veuUiD6xxCOyuZljXlDyYhWaBzPy7woxoD/XUw==
+X-Received: by 2002:a17:906:898:b0:a6f:23b9:4e5f with SMTP id a640c23a62f3a-a6f4800a19emr122891766b.70.1718206509163;
+        Wed, 12 Jun 2024 08:35:09 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57c855b959bsm5045462a12.38.2024.06.12.08.35.08
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6c805f9f3dsm910164966b.95.2024.06.12.08.35.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 12 Jun 2024 08:35:08 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 2563B5F893;
+	by draig.lan (Postfix) with ESMTP id 3A48F5F939;
 	Wed, 12 Jun 2024 16:35:08 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -98,80 +100,36 @@ Cc: David Hildenbrand <david@redhat.com>,
 	Jamie Iles <quic_jiles@quicinc.com>,
 	"Dr. David Alan Gilbert" <dave@treblig.org>,
 	Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH 0/9] maintainer updates (gdbstub, plugins, time control)
-Date: Wed, 12 Jun 2024 16:34:59 +0100
-Message-Id: <20240612153508.1532940-1-alex.bennee@linaro.org>
+Subject: [PATCH 1/9] include/exec: add missing include guard comment
+Date: Wed, 12 Jun 2024 16:35:00 +0100
+Message-Id: <20240612153508.1532940-2-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240612153508.1532940-1-alex.bennee@linaro.org>
+References: <20240612153508.1532940-1-alex.bennee@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/exec/gdbstub.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This is the current state of my maintainer trees. The gdbstub patches
-are just minor clean-ups. The main feature this brings in is the
-ability for plugins to control time. This has been discussed before
-but represents the first time plugins can "control" the execution of
-the core. The idea would be to eventually deprecate the icount auto
-modes in favour of a plugin and just use icount for deterministic
-execution and record/replay.
-
-Alex.
-
-Akihiko Odaki (1):
-  plugins: Ensure register handles are not NULL
-
-Alex Bennée (6):
-  include/exec: add missing include guard comment
-  gdbstub: move enums into separate header
-  sysemu: add set_virtual_time to accel ops
-  qtest: use cpu interface in qtest_clock_warp
-  sysemu: generalise qtest_warp_clock as qemu_clock_advance_virtual_time
-  plugins: add time control API
-
-Pierrick Bouvier (2):
-  qtest: move qtest_{get, set}_virtual_clock to accel/qtest/qtest.c
-  contrib/plugins: add ips plugin example for cost modeling
-
- include/exec/gdbstub.h                        |  11 +-
- include/gdbstub/enums.h                       |  21 +++
- include/qemu/qemu-plugin.h                    |  25 +++
- include/qemu/timer.h                          |  15 ++
- include/sysemu/accel-ops.h                    |  18 +-
- include/sysemu/cpu-timers.h                   |   3 +-
- include/sysemu/qtest.h                        |   2 -
- accel/hvf/hvf-accel-ops.c                     |   2 +-
- accel/kvm/kvm-all.c                           |   2 +-
- accel/qtest/qtest.c                           |  13 ++
- accel/tcg/tcg-accel-ops.c                     |   2 +-
- contrib/plugins/ips.c                         | 164 ++++++++++++++++++
- gdbstub/user.c                                |   1 +
- monitor/hmp-cmds.c                            |   3 +-
- plugins/api.c                                 |  39 ++++-
- ...t-virtual-clock.c => cpus-virtual-clock.c} |   5 +
- system/cpus.c                                 |  11 ++
- system/qtest.c                                |  37 +---
- system/vl.c                                   |   1 +
- target/arm/hvf/hvf.c                          |   2 +-
- target/arm/hyp_gdbstub.c                      |   2 +-
- target/arm/kvm.c                              |   2 +-
- target/i386/kvm/kvm.c                         |   2 +-
- target/ppc/kvm.c                              |   2 +-
- target/s390x/kvm/kvm.c                        |   2 +-
- util/qemu-timer.c                             |  26 +++
- contrib/plugins/Makefile                      |   1 +
- plugins/qemu-plugins.symbols                  |   2 +
- stubs/meson.build                             |   2 +-
- 29 files changed, 357 insertions(+), 61 deletions(-)
- create mode 100644 include/gdbstub/enums.h
- create mode 100644 contrib/plugins/ips.c
- rename stubs/{cpus-get-virtual-clock.c => cpus-virtual-clock.c} (68%)
-
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index eb14b91139..008a92198a 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -144,4 +144,4 @@ void gdb_set_stop_cpu(CPUState *cpu);
+ /* in gdbstub-xml.c, generated by scripts/feature_to_c.py */
+ extern const GDBFeature gdb_static_features[];
+ 
+-#endif
++#endif /* GDBSTUB_H */
 -- 
 2.39.2
 
