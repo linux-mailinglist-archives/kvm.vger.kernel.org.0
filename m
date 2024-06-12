@@ -1,219 +1,272 @@
-Return-Path: <kvm+bounces-19444-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19445-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA75590524B
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:21:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70641905286
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6AE921F22076
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 12:21:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7095B23CE8
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 12:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4ED16F846;
-	Wed, 12 Jun 2024 12:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F0E16FF3E;
+	Wed, 12 Jun 2024 12:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Prlok0PO";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="KFziH4DU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ma5MvMZA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDAA5374D3;
-	Wed, 12 Jun 2024 12:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718194896; cv=fail; b=SB0Pqd4BjAOMhQCCJm+qKql+a7cCw48gNGHUEzYP3/Fs7Ea1dkTGynNGBSbyFwbIzyKU8gtxZiU4FX+9oqCW31NKIoIT4m+sbDP3maffzGHLA9ek/5afm2BjD4V5jSy4uH1bkBDvDHjEbIWBKMGkvqH2a/txQEQHhrru9w+Tah4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718194896; c=relaxed/simple;
-	bh=JmPfq0Z1dLp5ZpXIUrwDoVpajUMPcOaFDLVI8SBuObo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rmIUu3WbBzzbco1UARtBo/k3C1EFjCEPnSAlggY7W529d5C1/sMAJ7rtsod/f1c5jmWgJSrbqgKe8LKt95GUT0VluUhCH3R44KpuG9ug//DaVf3xACZL8R+WaqKT0FHQq4EWCpKL+WrMDLDaPn70cn0v930Cut210l4ZJsT9IoI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Prlok0PO; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=KFziH4DU; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45C7BNcg019458;
-	Wed, 12 Jun 2024 12:21:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:references:in-reply-to
-	:content-type:content-id:content-transfer-encoding:mime-version;
-	 s=corp-2023-11-20; bh=jdwaYHIycws7JJ9LZ0iwg8yCQvei7MRsVwseRBHEX
-	cM=; b=Prlok0POtImQ/ehREvFxLZhMv5U8gSh6ZOieJkIidnyM8ekr4la+oeD4P
-	nfwsffKhwnvfViKM3NP6ls2C5zT6lA/VEhhuFhwRFXlilJI06E9EreuinxuiN7rY
-	pB8mKePZ93KdzvwaNqp6Brln7Mjxg2Q+4wtt+IsKNb0XSl5yYF0CsI6Be4WlXtQC
-	aO2PfN2zCweMKoq1e1cz8kdbYwbyD/LW/j4nK219bhhp/UBMAMOgLCfyX6Ut0kPo
-	LIFjqbbMtdqlqG48RXjJIip3ogigLHgKWEPzoLI5hVtigvSM0WNNpqzLL0PloL7O
-	WCoNJtTPdc1zzwcyGPrnm/fkCRL3Q==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3ymh1mf1xc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Jun 2024 12:21:32 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 45CBeO5x027087;
-	Wed, 12 Jun 2024 12:21:31 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2040.outbound.protection.outlook.com [104.47.57.40])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3yncdung0y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Jun 2024 12:21:31 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W1mAd4VR8Ps6Bp82JXDFvEvyJ9/olS07wWZsSPAA9dGi3qtHSVB1aCvgBNbHV7aywmkJ8L5b3ZkZb6iTJB0l1JZ9Gh3l/3fhaNLqCOp8LlQM62ewe2xNeuJdeTc2L3pCf00Ezy3jV1H1lFkwpa2lSdghytyBcBgZn1lh3gyQa/emzgpJFBb46NebrMMMbD069ZNWQMSIMOzn4hkqTlCYzUQ+8TTzGAZzExc6vzOobjZLRdrd5LbBcbjMCIOqYhmmvtbk1QNbqFLe25UFpfwEw1nQ4gbO75vQ5HAosoLaXbEO7OiN9Mtn4YmKxVoY7XFfvfNF+P3y4mjAcMKrBbMcKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jdwaYHIycws7JJ9LZ0iwg8yCQvei7MRsVwseRBHEXcM=;
- b=TP+kbHmawIhfNzGBdfWQQsrSrcp2zyGgQtrMx+kG7v0OArjLOAqqb/hKoV9RiSkbvfqNA4DoQ4lhvZ++B8UX8DWH3yrSaQRkdK9uw20dHZnQChELOvorvy/7X/mr+CCPCJIgJR3nI1ZLnsTwKNcKjQWHzJkgeRyKSWKlav2Rt4oLmqGgbNHAlU4BndM/XNng3+LSMHAsxg4VWthcAfhJRnpuA79N3HaxKLf/hxmaXFOW6TZCpTVrD609zuGXC4Y9GBn++wQW9B33xw++3F9suQVtg+MiGo48GdEH3zwOkySBCCP01+q+wcrTUuE3jVvJ2CWyXRQnzLIsZ521q2AJGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jdwaYHIycws7JJ9LZ0iwg8yCQvei7MRsVwseRBHEXcM=;
- b=KFziH4DUE7yFsTphk+NXyMKQnzMiAd8dAJc9taKdNbcnGXFAZlEUXsWo/1dU5QcyamLISswwP5rlawvassodbB7MxGNw7d9OiP5nm9y1BZ39JN2EoP5ZqbQZvUkk2IL+aeqbC7WnN99NzXf+10XugBSkVMcb7sBiT3e7zQ10b4c=
-Received: from BN0PR10MB5030.namprd10.prod.outlook.com (2603:10b6:408:12a::18)
- by PH0PR10MB7062.namprd10.prod.outlook.com (2603:10b6:510:283::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Wed, 12 Jun
- 2024 12:21:29 +0000
-Received: from BN0PR10MB5030.namprd10.prod.outlook.com
- ([fe80::44db:1978:3a20:4237]) by BN0PR10MB5030.namprd10.prod.outlook.com
- ([fe80::44db:1978:3a20:4237%4]) with mapi id 15.20.7633.037; Wed, 12 Jun 2024
- 12:21:29 +0000
-From: Liam Merwick <liam.merwick@oracle.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        Liam Merwick
-	<liam.merwick@oracle.com>
-Subject: Re: [PATCH v2] virt: guest_memfd: fix reference leak on hwpoisoned
- page
-Thread-Topic: [PATCH v2] virt: guest_memfd: fix reference leak on hwpoisoned
- page
-Thread-Index: AQHau+mxihI7n/iY+EeIbA2JtpN3sbHEHMeA
-Date: Wed, 12 Jun 2024 12:21:29 +0000
-Message-ID: <033dc666-2158-473d-8ce0-a1f172a77a0c@oracle.com>
-References: <20240611102515.48048-1-pbonzini@redhat.com>
-In-Reply-To: <20240611102515.48048-1-pbonzini@redhat.com>
-Accept-Language: en-IE, en-US
-Content-Language: en-IE
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: 
-x-ms-exchange-imapappendstamp: BN0PR10MB5030.namprd10.prod.outlook.com
- (15.20.7633.034)
-user-agent: Mozilla Thunderbird
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN0PR10MB5030:EE_|PH0PR10MB7062:EE_
-x-ms-office365-filtering-correlation-id: 229123b1-58d7-4485-cc9f-08dc8ada3039
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230032|1800799016|366008|376006|38070700010;
-x-microsoft-antispam-message-info: 
- =?iso-8859-1?Q?spkYNTMvtjIQbCw9/XeDkBSc+ma2TAOfaC30tKAHPws3aewA8wb65713sf?=
- =?iso-8859-1?Q?yyagO5LUdF4N7HbTnth6gb01Wl0LOMs8LsC9ncQQAsJiAMvwUhp4eumoV7?=
- =?iso-8859-1?Q?Ozl8vok0MFJnrVvn3x1NuqKEXFBauQMuE8bJiHQFgZmHFY+7hCrhLzgeJL?=
- =?iso-8859-1?Q?fCfdOBb3wY7XOX+WznX4bFJffcfNvHGLgoutJVZFhEh8U3C2egUDNWguSf?=
- =?iso-8859-1?Q?OeIwkOQswniHpNhZWR1Nu14ADlTBt4blEAcuLUvI+uRziitaZzHOsuPPlv?=
- =?iso-8859-1?Q?wLAloUvXKIxUUiV9ppxus8jTMmZAW6rIhjBNQ0QusFjglKXzizlUGHxwRF?=
- =?iso-8859-1?Q?eSRJSDNgFTVv4+wza1rBMJXRNrP9/X1KM+vLZ5DQjM/+OQHyalCqAVgyqJ?=
- =?iso-8859-1?Q?hIkMseNJk0hFeh1XrQVT/C22yKLVDSHp9gS3tYjW2ZQaNXpfpOkm0t5WGt?=
- =?iso-8859-1?Q?P1vLr97xKNhQqqqLjW29wkSv6Ruo6UEn+F/qDShMtYidvHoi3oyZBh6e37?=
- =?iso-8859-1?Q?c47wcfPPdm8lpRCImNVnGeqYAdch8uhGT936IfO+CS2xd2yjbM5Uvx2kdQ?=
- =?iso-8859-1?Q?ELonObeT7A0uV/NDJ+hd/Ij/JMZrID49oIkqsa/CrRc/VkZDpRwUpDqmmS?=
- =?iso-8859-1?Q?EbFx/XCJggpXqQS+mg7OadUuIuXihmo9v1r3ZNTSmWMfPny+Lk+CZYyQxa?=
- =?iso-8859-1?Q?ezx0FKR1G2LPtRX3pV5xkiuPzECwQy0bdsK10gEdo5jlO9LqXIR1VhBcsm?=
- =?iso-8859-1?Q?hnwBp+iwrgqHuHZgCWt5l7QXzXrIzbTPvwooA9iGrpbU9Vh/J4b/bJHNmk?=
- =?iso-8859-1?Q?70SUFZu/knMgNBucwaexnoQBNAmejkzpcI68vV2fTp7bfltmXup2By5aQB?=
- =?iso-8859-1?Q?Vv+teLjbEa+2FACb8V0fBvHEqu5AncMD9bT3vUxOu+MVp8ExqRMyDm6w2Z?=
- =?iso-8859-1?Q?mr0jiyyYGeVQvG7z2S1zcqvbKZKOrGvJFhDqtjvru9e2u7FfDRAy3GCtNV?=
- =?iso-8859-1?Q?7+sCV2d+2YGPTb8SrJqw58nQZciJNyU9Lz414W8Vn5RfeLft0WnOLEt3ly?=
- =?iso-8859-1?Q?s62N5IlFPPMDoE0UX984Uk5mIFZZBpxpRPiCs2pvNv1cHofUqoOKlZyTLx?=
- =?iso-8859-1?Q?UOhlokze97KlIXwXoSn4YyjhU5F+rOnTuf9euEo5AtXpAVGCd0grlnA64F?=
- =?iso-8859-1?Q?nXyBdQbzhtG8VGEcvX2WXBnloYkM4TUZAXPkTEEvR127bWQGNRzOjvHB4a?=
- =?iso-8859-1?Q?l7UpSGg9qiXfQ2uiYQtw76QrQPczlMCmS6LhpzBeyFJa4OHO9ROYIdQovH?=
- =?iso-8859-1?Q?mQ3cbwSm2K1/1JqciTqGFBMECQpf2gFZARbypMntZIRYddCtmVNHdtpst9?=
- =?iso-8859-1?Q?lOgdN0vBAEEZuc7nxBhLWTmC5Po18DRwJrxqUBthNKR+czPNMRnDw=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5030.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230032)(1800799016)(366008)(376006)(38070700010);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?iso-8859-1?Q?ibXFGjOpEp5Vq7bnnxe1Iu5KLpB0LcyXQYV6VTDIzCroDRG6OXtSPy2c6h?=
- =?iso-8859-1?Q?CRk91hU9zbc4rf/ON9dV485/FbnFnAoJMkviTW6JKbffjznCWh4v8/orKu?=
- =?iso-8859-1?Q?p1zcZnao5zmQt+cnMavMmbN5byhB3RfYNN1dKImH1zo/epzCQNVghAlnOv?=
- =?iso-8859-1?Q?2Xp9iH37t2A+gGOTXKklFsUkoRZDa0aRdFHNqtkndamEc0J84Mxu0Ste9h?=
- =?iso-8859-1?Q?T6kzjEnw573wUG4ELQS1f23PzCP+SAIhe4kyUWLtprWyVosU9DaG1TqKIf?=
- =?iso-8859-1?Q?qsdeaTyE4dasJNYsCijKuGbvv5Xw0/xXxAVDKNm5slffBVxw8gP/eAkejq?=
- =?iso-8859-1?Q?6UjxkPAPnnZ4ksqpLC6sWGZiUIwqin3M7awZTMs3t+WEvPTufD9whDWJ0T?=
- =?iso-8859-1?Q?M1GIntADMX4EADxiAhCdVOwFqoDHujH0BjGxofendNqc0kyA2LaPl5+osw?=
- =?iso-8859-1?Q?ZCp5n67cACI6UV8aN86md9zsBhXi3MMTs0ijXYoHbKQF/PT7wlDfxgt55+?=
- =?iso-8859-1?Q?fdp2oGrZTYFnCQ+Beiu6tcoCC9qrzeOisfokUIPvGUNfw7P8aC/wHgE3B6?=
- =?iso-8859-1?Q?rPkZaxAPXNF/nnFmFHJuaXk79qmLGusuQbWLlMQXog3lFqmmdhIXnh9z55?=
- =?iso-8859-1?Q?cQdwDNrzJGCvrpljB/1qAM+URzmoU5fq4RjVtTRoj1U2y1Y4ggZf25Ex1a?=
- =?iso-8859-1?Q?0925XG6YuGlVJY9SyYOgfkfHYv8jdRtN4hNhgQMIvVeD2YvB29aLB/OyqT?=
- =?iso-8859-1?Q?U/+WNQF/UUtoSlGn5+ktwoVPHExJdv13fAU3XGcQjGcwyflUrFau6jyV4F?=
- =?iso-8859-1?Q?aIoUzfkDJ0HMD/BsMAYwOn1FTR+UHVSiHc3g5lCVQskKEjWIbvv+9v17FK?=
- =?iso-8859-1?Q?vMT3abMmYRRmwRfNYwHcv8iFHxaudIEAqSU5mnZg3ob4Qt81o4eLQGgu7b?=
- =?iso-8859-1?Q?kel7/Sm39clyWGTC1fWnBz5gcJfxo453/BoZvfE9Vq3os6quftdA9cKomv?=
- =?iso-8859-1?Q?FngoArLpIazuetcyMlP5sqCLlh8gajEmFfFmdovj/rk5Es07wloV7/OOhv?=
- =?iso-8859-1?Q?tBXB6Bqh8T4PltmM/0Tm/5SqTwFBhyqDihzXakPVzNS8EVwktnbmiaDSH6?=
- =?iso-8859-1?Q?0oSeM3/dLTUNPXi60gzKCuB7YVp8ACRAW0NUO6y9OfPKenT939dkZX9Okw?=
- =?iso-8859-1?Q?yR1Ztix8eGscoUju20BIDOvZEMuhpiXeX3YPVfuUxqKgBhF9VTl9zrqctI?=
- =?iso-8859-1?Q?2bV0dfAXK64s/UeEch05J6oKPnR1gqb+QQEyGH65Ca0yRMdk4vwMzfH6TK?=
- =?iso-8859-1?Q?3xEU9173ozzdk1Hird627xDT26kvdeGXy/R/rf5iu7a8biCjJj/+cU+3Lx?=
- =?iso-8859-1?Q?ey6UTMJVKZa2ZDVT8mhEIGgIThTUQuHzDgjvGVXSVv9TmXCbdEhxfc4dpA?=
- =?iso-8859-1?Q?0R+IPGSpbOsUNr6bRZOvWM+pwE6fD855w//xmaxhhiJSSPM4CTeshePmr7?=
- =?iso-8859-1?Q?96fsurbQRzLNKT4aAhUAux5ovE17Kogj4coDi9WHgPJJceHDr2gWWEj+4N?=
- =?iso-8859-1?Q?vc/qwG0C/QZUQ209nJsfeagpOGmQj2QZLG6gngReutL5l6KOf3JL+49dpA?=
- =?iso-8859-1?Q?h1KPmUYE4H+ldOmE0Eya7XEqlPRfLymtgV?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <CFB03160B1718C43A8F80FABD5FB27A6@oracle.onmicrosoft.com>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25F316D4E0
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 12:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718195568; cv=none; b=h+wBOw5W61Yr7E8BAAwVbYE2+chloFpxOnUQmiBIJKhaBpHN3SMgR35Qob6emJ13/l9HuXDmknVaZla83UiHONoLi9hVHbt/m8YVDDNm5VobfMHGLhx2NIMUFRY5W739wrJNbNki3FNUEqu+EdofKARVRiEFT6iUPFz7MR1XFnU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718195568; c=relaxed/simple;
+	bh=fT/rUz7KLw47ie7gQBlOBi/uaQUpPAuVBwYVvWuy8mw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gRFhPMNOWWB8Lq6J2bp0+1riDZ6kxPMNTY0AR4Jshofy9wU/dmEmIq0v94oHb9yC2WYdvOMFQ07kLgAJ1Sw1pbNx8AuDhhfXwQYbYN/4q39Hx3QhXD6U/HZlIG0/yAGsvOFN2GisGvfsxLfPKMs6ngtiOMTT+F/wgZe6RzjK8s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ma5MvMZA; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718195564;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XfQZDtLT+q+ZIAPC3OZ+JW6AZ+Ih2QY45mLdNIYr7/k=;
+	b=Ma5MvMZATYTO5SOTYqMLhidwofYJ4uoTxQU7LvZ3NI/EKn/p4MwQSEGUEuqlMAKEoGaX7n
+	6UHGo/UI0Sq5PEFFSrHE3XmWk8JCnVcOfVFYWnuN0akPcbEY5gAVWgEzzf/svmUsjdkEs+
+	ONXTHc7O2njxG38Y8/Z4U0Vi2ShlrMc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-eh4YPkroPIyW1KcCDCqxPw-1; Wed, 12 Jun 2024 08:32:43 -0400
+X-MC-Unique: eh4YPkroPIyW1KcCDCqxPw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4227e29cd39so4584945e9.1
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 05:32:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718195562; x=1718800362;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XfQZDtLT+q+ZIAPC3OZ+JW6AZ+Ih2QY45mLdNIYr7/k=;
+        b=IBb9+XeWCbDxHWcfyhDK1d03/1bcoZEUko0KTOXR1c8oSt0CojBUVsI7pAhT3RVX2U
+         gIyvKRBI5azgv40PZwY027MbKeM4SjvM3zhgbNZLYsE7kHaq0B4F4dWOOb02zUkKuNbS
+         Ouq0/i2fAfjmKy+zv/u6sgYJ3Rg8ER8SKUV/9kMaTEAPi52SLIEKzSenGMvGLWOZ3//d
+         8y7wr7TZ4NadTphJiciHEENudRTrsFl2s+jfYNONzEzZNPZpMa6HwhUpLBtoz8gYBXwO
+         iiJY5ubgTxNZFpMTZVnE3ico7MHPxRDatr5l4pm/VQfe72HrdOJefitFvivm/3ScYLQR
+         8/hw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqHr4AqJekn7qVV0gtaIwIpfN9D1Tc9ybCn9Ki6XbXRTNw2oNis285uuH/ew4psi0jhu0RxKd/UiGejQvRRk8AofgQ
+X-Gm-Message-State: AOJu0YwLy7MbsPrjAhskn++FNnPH9Sf6zeZRufh7iKRqcP3cv7Rkdc1s
+	8JylFBWsvEKeV7OUbEINPCmsiH9bWAJPqDbPX/tnRHe10J88fy9GWcddOXbd3YJZjXNguO1kXjf
+	6YAq7yISQ9aDSmyYKpxwoVucBGI9Mpd6FrlNEzALWj/PUUnDI9A==
+X-Received: by 2002:a05:600c:5008:b0:421:81c1:65fa with SMTP id 5b1f17b1804b1-422862a749fmr18009455e9.13.1718195562047;
+        Wed, 12 Jun 2024 05:32:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGX1J/727VlQKp+bnqlzO56bmec4Mvp/egLF2T+bKHvyiF7Rt8TUW+mf2Itz3LGm+3KTeWuYg==
+X-Received: by 2002:a05:600c:5008:b0:421:81c1:65fa with SMTP id 5b1f17b1804b1-422862a749fmr18009125e9.13.1718195561469;
+        Wed, 12 Jun 2024 05:32:41 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:178:39eb:4161:d39d:43e6:41f8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4229447eaa5sm18672645e9.48.2024.06.12.05.32.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 05:32:40 -0700 (PDT)
+Date: Wed, 12 Jun 2024 08:32:37 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Srujana Challa <schalla@marvell.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	Vamsi Krishna Attunuru <vattunuru@marvell.com>,
+	Shijith Thotton <sthotton@marvell.com>,
+	Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>
+Subject: Re: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mode
+Message-ID: <20240612083001-mutt-send-email-mst@kernel.org>
+References: <20240530101823.1210161-1-schalla@marvell.com>
+ <CACGkMEsxPfck-Ww6CHSod5wP5xLOpS3t2B8qhTL0=PoE3koCGQ@mail.gmail.com>
+ <DS0PR18MB5368E02C4DE7AA96CCD299E0A0F82@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <CACGkMEs+s7JEvLXBdyQbj36Y8WSbHXqF2d9HNP3v7CPRPoocXg@mail.gmail.com>
+ <DS0PR18MB5368CD9E8E3432A9D19D8C8FA0C02@DS0PR18MB5368.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	9w45TtbQLuezsBspmTgq+5XCjSmZ71AZ7q7cCTulKQgB8V4MeLAO7cf0zB7Sq0yJ1uHfB/SpsDWCeJhpZGvtOcGIgZcsOIwXugDrnlOKxoLKXDBoea/ReJZcBvPP7r5rXQq3D+BLhlAo7ITbVoLsieO6IF2DGvXGI1yqhmisX6wP/R5l1Inco52PSUxxakdC2VKMjx8908M8WE1oEp9IJLQkJSb1ZTNEQ6nuC5RTyxjkxm6tPvrHHUVQveO+NbE72Js/1eXSwKg/2JDuQ+8Ih9IvISo2mQTPRW+CGeoslj44lG/guzBViGECkqiY+mEDy/Mit+1h3rP83/Z21Wc8wL7n2/5PDmJcuDYZSFgPwNyxWgJhyDxofxOnUiMrrqjrk+2m3CbZGGuvGyHjEtpy8nj7XXQSZu2k0bM4mZkn6beaJDxzvbfUrz88a9UwaELAH4dDATiFJ35X60U3SW8LZCJa9c/Plp4gwRvTnK008NamwB4qV3gKgqXBxWA0/fSzQsTVLwyNlPXT00RNpL1mUR8as2r1LB7LX2xxydZEz0Gv/lvVOU+qqQdyKNy9Oc5hHdELRJ1w7GaYPrMvZ1FC5gCLfN2Jhf9wk+HesdXBJBM=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5030.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 229123b1-58d7-4485-cc9f-08dc8ada3039
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2024 12:21:29.6242
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dmA8DBy9twL1lXV3RSskO2XQIURHd9NBSMFIUB2w+QSi5a5R0j+dIKH6PhSJHpszDs2ELb1T6N0lexlVSIFpNw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB7062
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-12_06,2024-06-12_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 suspectscore=0 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2405010000 definitions=main-2406120090
-X-Proofpoint-ORIG-GUID: fvrBzYq-dCEFJPGCdX0HRynRi6-ZVuNf
-X-Proofpoint-GUID: fvrBzYq-dCEFJPGCdX0HRynRi6-ZVuNf
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DS0PR18MB5368CD9E8E3432A9D19D8C8FA0C02@DS0PR18MB5368.namprd18.prod.outlook.com>
 
-On 11/06/2024 11:25, Paolo Bonzini wrote:=0A=
-> If __kvm_gmem_get_pfn() detects an hwpoisoned page, it returns -EHWPOISON=
-=0A=
-> but it does not put back the reference that kvm_gmem_get_folio() had=0A=
-> grabbed.  Add the forgotten folio_put().=0A=
-> =0A=
-> Fixes: a7800aa80ea4 ("KVM: Add KVM_CREATE_GUEST_MEMFD ioctl() for guest-s=
-pecific backing memory")=0A=
-> Cc: stable@vger.kernel.org=0A=
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>=0A=
-=0A=
-=0A=
-Reviewed-by: Liam Merwick <liam.merwick@oracle.com>=0A=
-=0A=
-=0A=
+On Wed, Jun 12, 2024 at 09:22:43AM +0000, Srujana Challa wrote:
+> 
+> > Subject: Re: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mode
+> > 
+> > On Tue, Jun 4, 2024 at 5:29 PM Srujana Challa <schalla@marvell.com> wrote:
+> > >
+> > > > Subject: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mode
+> > > >
+> > > > Prioritize security for external emails: Confirm sender and content
+> > > > safety before clicking links or opening attachments
+> > > >
+> > > > --------------------------------------------------------------------
+> > > > -- On Thu, May 30, 2024 at 6:18 PM Srujana Challa
+> > > > <schalla@marvell.com>
+> > > > wrote:
+> > > > >
+> > > > > This commit introduces support for an UNSAFE, no-IOMMU mode in the
+> > > > > vhost-vdpa driver. When enabled, this mode provides no device
+> > > > > isolation, no DMA translation, no host kernel protection, and
+> > > > > cannot be used for device assignment to virtual machines. It
+> > > > > requires RAWIO permissions and will taint the kernel.
+> > > > > This mode requires enabling the
+> > > > "enable_vhost_vdpa_unsafe_noiommu_mode"
+> > > > > option on the vhost-vdpa driver. This mode would be useful to get
+> > > > > better performance on specifice low end machines and can be
+> > > > > leveraged by embedded platforms where applications run in controlled
+> > environment.
+> > > >
+> > > > I wonder if it's better to do it per driver:
+> > > >
+> > > > 1) we have device that use its own IOMMU, one example is the mlx5
+> > > > vDPA device
+> > > > 2) we have software devices which doesn't require IOMMU at all (but
+> > > > still with
+> > > > protection)
+> > >
+> > > If I understand correctly, you’re suggesting that we create a module
+> > > parameter specific to the vdpa driver. Then, we can add a flag to the ‘struct
+> > vdpa_device’
+> > > and set that flag within the vdpa driver based on the module parameter.
+> > > Finally, we would use this flag to taint the kernel and go in no-iommu
+> > > path in the vhost-vdpa driver?
+> > 
+> > If it's possible, I would like to avoid changing the vDPA core.
+> > 
+> > Thanks
+> According to my understanding of the discussion at the
+> https://lore.kernel.org/all/20240422164108-mutt-send-email-mst@kernel.org,
+> Michael has suggested focusing on implementing a no-IOMMU mode in vdpa.
+> Michael, could you please confirm if it's fine to transfer all these relevant
+> modifications to Marvell's vdpa driver?
+> 
+> Thanks.
+
+
+All I said is that octeon driver can be merged without this support.
+Then work on no-iommu can start separately.
+
+
+Whether this belongs in the driver or the core would depend on
+what the use-case is. I have not figured it out yet.
+What you describe seems generic not card-specific though.
+Jason why do you  want this in the driver?
+
+> > 
+> > > >
+> > > > Thanks
+> > > >
+> > > > >
+> > > > > Signed-off-by: Srujana Challa <schalla@marvell.com>
+> > > > > ---
+> > > > >  drivers/vhost/vdpa.c | 23 +++++++++++++++++++++++
+> > > > >  1 file changed, 23 insertions(+)
+> > > > >
+> > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c index
+> > > > > bc4a51e4638b..d071c30125aa 100644
+> > > > > --- a/drivers/vhost/vdpa.c
+> > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > @@ -36,6 +36,11 @@ enum {
+> > > > >
+> > > > >  #define VHOST_VDPA_IOTLB_BUCKETS 16
+> > > > >
+> > > > > +bool vhost_vdpa_noiommu;
+> > > > > +module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
+> > > > > +                  vhost_vdpa_noiommu, bool, 0644);
+> > > > > +MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode,
+> > > > "Enable
+> > > > > +UNSAFE, no-IOMMU mode.  This mode provides no device isolation,
+> > > > > +no DMA translation, no host kernel protection, cannot be used for
+> > > > > +device assignment to virtual machines, requires RAWIO
+> > > > > +permissions, and will taint the kernel.  If you do not know what this is
+> > for, step away.
+> > > > > +(default: false)");
+> > > > > +
+> > > > >  struct vhost_vdpa_as {
+> > > > >         struct hlist_node hash_link;
+> > > > >         struct vhost_iotlb iotlb;
+> > > > > @@ -60,6 +65,7 @@ struct vhost_vdpa {
+> > > > >         struct vdpa_iova_range range;
+> > > > >         u32 batch_asid;
+> > > > >         bool suspended;
+> > > > > +       bool noiommu_en;
+> > > > >  };
+> > > > >
+> > > > >  static DEFINE_IDA(vhost_vdpa_ida); @@ -887,6 +893,10 @@ static
+> > > > > void vhost_vdpa_general_unmap(struct vhost_vdpa *v,  {
+> > > > >         struct vdpa_device *vdpa = v->vdpa;
+> > > > >         const struct vdpa_config_ops *ops = vdpa->config;
+> > > > > +
+> > > > > +       if (v->noiommu_en)
+> > > > > +               return;
+> > > > > +
+> > > > >         if (ops->dma_map) {
+> > > > >                 ops->dma_unmap(vdpa, asid, map->start, map->size);
+> > > > >         } else if (ops->set_map == NULL) { @@ -980,6 +990,9 @@
+> > > > > static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb
+> > *iotlb,
+> > > > >         if (r)
+> > > > >                 return r;
+> > > > >
+> > > > > +       if (v->noiommu_en)
+> > > > > +               goto skip_map;
+> > > > > +
+> > > > >         if (ops->dma_map) {
+> > > > >                 r = ops->dma_map(vdpa, asid, iova, size, pa, perm, opaque);
+> > > > >         } else if (ops->set_map) { @@ -995,6 +1008,7 @@ static int
+> > > > > vhost_vdpa_map(struct vhost_vdpa *v,
+> > > > struct vhost_iotlb *iotlb,
+> > > > >                 return r;
+> > > > >         }
+> > > > >
+> > > > > +skip_map:
+> > > > >         if (!vdpa->use_va)
+> > > > >                 atomic64_add(PFN_DOWN(size), &dev->mm->pinned_vm);
+> > > > >
+> > > > > @@ -1298,6 +1312,7 @@ static int vhost_vdpa_alloc_domain(struct
+> > > > vhost_vdpa *v)
+> > > > >         struct vdpa_device *vdpa = v->vdpa;
+> > > > >         const struct vdpa_config_ops *ops = vdpa->config;
+> > > > >         struct device *dma_dev = vdpa_get_dma_dev(vdpa);
+> > > > > +       struct iommu_domain *domain;
+> > > > >         const struct bus_type *bus;
+> > > > >         int ret;
+> > > > >
+> > > > > @@ -1305,6 +1320,14 @@ static int vhost_vdpa_alloc_domain(struct
+> > > > vhost_vdpa *v)
+> > > > >         if (ops->set_map || ops->dma_map)
+> > > > >                 return 0;
+> > > > >
+> > > > > +       domain = iommu_get_domain_for_dev(dma_dev);
+> > > > > +       if ((!domain || domain->type == IOMMU_DOMAIN_IDENTITY) &&
+> > > > > +           vhost_vdpa_noiommu && capable(CAP_SYS_RAWIO)) {
+> > > > > +               add_taint(TAINT_USER, LOCKDEP_STILL_OK);
+> > > > > +               dev_warn(&v->dev, "Adding kernel taint for noiommu
+> > > > > + on
+> > > > device\n");
+> > > > > +               v->noiommu_en = true;
+> > > > > +               return 0;
+> > > > > +       }
+> > > > >         bus = dma_dev->bus;
+> > > > >         if (!bus)
+> > > > >                 return -EFAULT;
+> > > > > --
+> > > > > 2.25.1
+> > > > >
+> > >
+> 
+
 
