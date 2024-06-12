@@ -1,71 +1,81 @@
-Return-Path: <kvm+bounces-19449-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19450-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD6159053E9
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 15:38:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31B339054B7
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 16:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 619082839BA
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 13:38:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B16FC1F223CE
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B901217BB31;
-	Wed, 12 Jun 2024 13:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B74817DE1E;
+	Wed, 12 Jun 2024 14:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eDZJ9c9r"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6LYRqwY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596FA178398;
-	Wed, 12 Jun 2024 13:38:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFACF17C221
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718199492; cv=none; b=J3qq+/T7aRiLCqa+OAUEvGJqmu9lkIx0sbl9uC+WUfR8K+Q4s/ybV/5pOAF2bRdEbyVdTj7EAStlnzqdAyc3oDRNdsrA0NA2bev+WY8fTvbch1tCckRl3Pfyf6EU2XHX8x+swij7cDNg/F6RjJUGykzmFmhnHu9mxO59cfdedTs=
+	t=1718201069; cv=none; b=ZWX3+AHnjvhcPJF4fPJ2bljbDl3H7Ku0cDst61z/z1C6OvVh8bHZK5mIDTGubUiB1W/9fgcuUoY2UFwDYz+DqVUP5nSkpEZpfW4ovUjLuGunVTq9oFpZ9ZGTozAU+H2Do0sLl6dpMFi8dvYkch7omzkqyQ9kLUZsv/uH94bOA2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718199492; c=relaxed/simple;
-	bh=GAIDHXecjjeCcaH4nBavfTaUc1opIy56ggHhblmAVmg=;
+	s=arc-20240116; t=1718201069; c=relaxed/simple;
+	bh=n6rQcdlTzLyq3J1ACt2i5X2K8jWLz6x7Pyg6vl9BQmw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xirekp/mSYZUvHD0Zb5Lvhy90FJUD4hNT98qV5U3efnfaT3bfB2PyTa/kijh1hK0AdeU3wBtbaRTP8lVV/at6MsyRtnt0duBKsy/OptcE+d/C5uFvAtoE6WL27ZMOKCLmmRUkg0uRhT9Dt19SM+KTVrxrvP6SNaMmdciJBBXQPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eDZJ9c9r; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718199491; x=1749735491;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GAIDHXecjjeCcaH4nBavfTaUc1opIy56ggHhblmAVmg=;
-  b=eDZJ9c9rivjeQ1oDPyMZznrUDrjZPEoxxe0B8Uo+sCUQvrC3OLXt653g
-   P4cJZ0kXUdOipGEfyGJLlwhMogDr1Gk1WNruoldficO12QHX4DA3BI5LJ
-   vmQNy2sr1by1ykjZGi4RcWYwOYyWrg7xB7CYfmwihqkhw1qevz14Nn8hp
-   CRLq7TNuu+jjxIsH/OJTKnBSxVC7Q81Vod8hEdY9u05SW3UJzuQFgYWjb
-   /MLXssnpJDDFUNjgKFvkwUFr/OccNxTxcMF2ZdnlzmJ1EQNSXjOvUIgk4
-   31FBYrTYlIYzm4UHiTQ3GOyQiUdWKfhkFUd3+gnWNjGK6DHzLqtoP29hW
-   A==;
-X-CSE-ConnectionGUID: Eryf/IheTGOtwVSMSO02LQ==
-X-CSE-MsgGUID: /ZMp4jSNQXW9Y2WeEblWbw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11101"; a="14764586"
-X-IronPort-AV: E=Sophos;i="6.08,233,1712646000"; 
-   d="scan'208";a="14764586"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 06:38:10 -0700
-X-CSE-ConnectionGUID: zf8r4UJYRBu/ogolF/JApw==
-X-CSE-MsgGUID: jnNGnMJsRAm7j+bosk4lzA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,233,1712646000"; 
-   d="scan'208";a="39856133"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 06:38:10 -0700
-Received: from [10.212.10.32] (kliang2-mobl1.ccr.corp.intel.com [10.212.10.32])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id 6718920B5703;
-	Wed, 12 Jun 2024 06:38:07 -0700 (PDT)
-Message-ID: <e72c847f-a069-43e4-9e49-37c0bf9f0a8b@linux.intel.com>
-Date: Wed, 12 Jun 2024 09:38:06 -0400
+	 In-Reply-To:Content-Type; b=jG+myaUG3MKRQcYxFmGCF6ARXt9v8ADqc41tpjYfsmtnJTpH9l0dJBSHuYDQWfMTV8pqDYdeuM7gpUa/ZNNee5rmvklEJx88YXu/eJQofLiuF6/OVy9SMakanRMSjBDLPsGeMD9zNUk/66migb1LaZ1UjAZlwBn169YLlQZu5qU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U6LYRqwY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718201066;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=VHS87YElUOWkANf6E72nxalS03lPC9WT8JCafxHD7gY=;
+	b=U6LYRqwYxyWLr04hHswdwO9ZRdR4ZPeKdGsOIvYw8tIjPgK9bZjFFfK7i2gXaqtGafnZzp
+	9WAX8Z3i4FteN5dRfLxylxZFWhUeYyQZsr4LPB9n8UpOOdthccdFNryLL9/zwO405fyr6W
+	AwDsj9uwkqTPSYjNdcPdD8Td5t4d2dM=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-287-_NhRRhR9ObOufsA6rturtQ-1; Wed, 12 Jun 2024 10:04:23 -0400
+X-MC-Unique: _NhRRhR9ObOufsA6rturtQ-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b06ce632b3so23454756d6.3
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 07:04:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718201063; x=1718805863;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VHS87YElUOWkANf6E72nxalS03lPC9WT8JCafxHD7gY=;
+        b=VaXPbLw5VxMTMP/+u9w0Rr9C6Q+f8q+4CXenofWhaEuQDK4ybIsItJFXSQNDy5RgIB
+         qZTxHLNJ/+sbWypSJYLcui913zfXZpd0LkZw72S+dDJQiyUV+eXuMc9/COrsq46Tqtk+
+         ms3y2xGlTyKFMY0r27zmyOcbBbOmLeFwQqZfT3VwJmT+7EE2Kj6Mg48knJVRbV/xX0m6
+         sA3dq8MezZuojyBhF4NnJcKR/8XyNSUmUfkRbDHddAJ9aUTyVLNUWAsQyT/pyCjHvl1D
+         ux3Ld3s8AYbk7wIqfTcZHpqaqrpWqjwLONIv7i5GKl4wXBEOv1XhiM+6oB2NzV0QINf6
+         Cmvw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4GucGDrxeIF55DooDLrLQG7+epRQ+9oJV1Gv0gAW79s1RzAf3HF57W49/2HwNAqouN0NmkrTSFbbUDDG4W6ACm0k/
+X-Gm-Message-State: AOJu0YyHW2A9bF56gxL4ezWCpN6aQNtXB3iMVLteK9o++nqCJfSnuQmD
+	CeBdWq3hvMvP7wZzx4Wy3BRHY17fkSHedfkY5joXDuTex4oacbz2nmbbshTsZYg+19Gr6nyBYn7
+	RJ8SYGyHU+iTWKTaDlZGbB8Qzpm9fO1OQNol+08XQ/lUNIY26nw==
+X-Received: by 2002:a05:6214:2b90:b0:6b0:7821:4026 with SMTP id 6a1803df08f44-6b1a6c57871mr20407266d6.52.1718201062945;
+        Wed, 12 Jun 2024 07:04:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHis29s85ghN1wCvWNHSB3z3fEhPObl0T66oMycOn7F9OWRQIQYakS2Z/8aehOyVDRyZ6GOEQ==
+X-Received: by 2002:a05:6214:2b90:b0:6b0:7821:4026 with SMTP id 6a1803df08f44-6b1a6c57871mr20406306d6.52.1718201062563;
+        Wed, 12 Jun 2024 07:04:22 -0700 (PDT)
+Received: from [192.168.0.4] (ip-109-43-176-68.web.vodafone.de. [109.43.176.68])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a1515903sm958436d6.58.2024.06.12.07.04.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Jun 2024 07:04:22 -0700 (PDT)
+Message-ID: <6086ef5e-48e7-40f3-b0a7-ff67b20aeae3@redhat.com>
+Date: Wed, 12 Jun 2024 16:04:15 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,112 +83,94 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/54] perf: Add generic exclude_guest support
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Mingwei Zhang <mizhang@google.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
- <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
- Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
- kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
-References: <20240506053020.3911940-1-mizhang@google.com>
- <20240506053020.3911940-8-mizhang@google.com>
- <20240507085807.GS40213@noisy.programming.kicks-ass.net>
- <902c40cc-6e0b-4b2f-826c-457f533a0a76@linux.intel.com>
- <20240611120641.GF8774@noisy.programming.kicks-ass.net>
- <0a403a6c-8d55-42cb-a90c-c13e1458b45e@linux.intel.com>
- <20240612111732.GW40213@noisy.programming.kicks-ass.net>
+Subject: Re: [PATCH 1/1] s390/virtio_ccw: fix config change notifications
+To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
+ virtualization@lists.linux.dev, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Boqiao Fu <bfu@redhat.com>, Sebastian Mitterle <smitterl@redhat.com>
+References: <20240611214716.1002781-1-pasic@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20240612111732.GW40213@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240611214716.1002781-1-pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 2024-06-12 7:17 a.m., Peter Zijlstra wrote:
-> On Tue, Jun 11, 2024 at 09:27:46AM -0400, Liang, Kan wrote:
->> diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
->> index dd4920bf3d1b..68c8b93c4e5c 100644
->> --- a/include/linux/perf_event.h
->> +++ b/include/linux/perf_event.h
->> @@ -945,6 +945,7 @@ struct perf_event_context {
->>  	u64				time;
->>  	u64				timestamp;
->>  	u64				timeoffset;
->> +	u64				timeguest;
->>
->>  	/*
->>  	 * These fields let us detect when two contexts have both
+On 11/06/2024 23.47, Halil Pasic wrote:
+> Commit e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
+> broke configuration change notifications for virtio-ccw by putting the
+> DMA address of *indicatorp directly into ccw->cda disregarding the fact
+> that if !!(vcdev->is_thinint) then the function
+> virtio_ccw_register_adapter_ind() will overwrite that ccw->cda value
+> with the address of the virtio_thinint_area so it can actually set up
+> the adapter interrupts via CCW_CMD_SET_IND_ADAPTER.  Thus we end up
+> pointing to the wrong object for both CCW_CMD_SET_IND if setting up the
+> adapter interrupts fails, and for CCW_CMD_SET_CONF_IND regardless
+> whether it succeeds or fails.
 > 
->> @@ -651,10 +653,26 @@ __perf_update_times(struct perf_event *event, u64
->> now, u64 *enabled, u64 *runnin
->>
->>  static void perf_event_update_time(struct perf_event *event)
->>  {
->> -	u64 now = perf_event_time(event);
->> +	u64 now;
->> +
->> +	/* Never count the time of an active guest into an exclude_guest event. */
->> +	if (event->ctx->timeguest &&
->> +	    event->pmu->capabilities & PERF_PMU_CAP_PASSTHROUGH_VPMU) {
->> +		/*
->> +		 * If a guest is running, use the timestamp while entering the guest.
->> +		 * If the guest is leaving, reset the event timestamp.
->> +		 */
->> +		if (__this_cpu_read(perf_in_guest))
->> +			event->tstamp = event->ctx->timeguest;
->> +		else
->> +			event->tstamp = event->ctx->time;
->> +		return;
->> +	}
->>
->> +	now = perf_event_time(event);
->>  	__perf_update_times(event, now, &event->total_time_enabled,
->>  					&event->total_time_running);
->> +
->>  	event->tstamp = now;
->>  }
+> To fix this, let us save away the dma address of *indicatorp in a local
+> variable, and copy it to ccw->cda after the "vcdev->is_thinint" branch.
 > 
-> So I really don't like this much, 
+> Reported-by: Boqiao Fu <bfu@redhat.com>
+> Reported-by: Sebastian Mitterle <smitterl@redhat.com>
+> Fixes: e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
+> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+> ---
+> I know that checkpatch.pl complains about a missing 'Closes' tag.
+> Unfortunately I don't have an appropriate URL at hand. @Sebastian,
+> @Boqiao: do you have any suggetions?
 
-An alternative way I can imagine may maintain a dedicated timeline for
-the PASSTHROUGH PMUs. For that, we probably need two new timelines for
-the normal events and the cgroup events. That sounds too complex.
+Closes: https://issues.redhat.com/browse/RHEL-39983
+?
 
-> and AFAICT this is broken. At the very
-> least this doesn't work right for cgroup events, because they have their
-> own timeline.
+Anyway, I've tested the patch and it indeed fixes the problem with 
+virtio-balloon and the link state for me:
 
-I think we just need a new start time for an event. So we may use
-perf_event_time() to replace the ctx->time for the cgroup events.
+Tested-by: Thomas Huth <thuth@redhat.com>
 
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 019c237dd456..6c46699c6752 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -665,7 +665,7 @@ static void perf_event_update_time(struct perf_event
-*event)
- 		if (__this_cpu_read(perf_in_guest))
- 			event->tstamp = event->ctx->timeguest;
- 		else
--			event->tstamp = event->ctx->time;
-+			event->tstamp = perf_event_time(event);
- 		return;
- 	}
-
-
-> 
-> Let me have a poke...
-
-Sure.
-
-Thanks,
-Kan
 
