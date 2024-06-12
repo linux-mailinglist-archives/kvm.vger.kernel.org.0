@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-19506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19507-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D9B905D7E
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:12:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B444C905D8D
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:19:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CE8EB220F9
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:12:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 619CA283C50
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FED586136;
-	Wed, 12 Jun 2024 21:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075DE86AE3;
+	Wed, 12 Jun 2024 21:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KXj1+zWA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G5pqxlWO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F85384E00
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:12:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC082839F1
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718226736; cv=none; b=EzQpcBpsT2Bgcx2ggjsOTvD0gYQkHPfGZBeizytAr+oosdWIcg/K3gh2h5xUmFmwGvDehCKvl3QxWvJV3N9oMGR9RTFRlYjPRGKwSvDNmJUJ6UoSpM4fz6bhrv9lU2woYFlgNAiEZX7PS8bhHrB3uY563XZC/QSpq5tgtk1pE+g=
+	t=1718227146; cv=none; b=mvcwBpHFkBH6+5KC5AYIy9syHRC/WV2uTXrWccMJbT4uLvCU2H55Atu05Ql+6E5C7pePoMClL8PatXEuOjGcm26wB/EscRQcPuqZlarfrv+ekbin7FSZBVVIBIEjVwrgkX/ed6YmRqtkn2VZ80xg6o0T8LBzr5g03BBtCW7gEBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718226736; c=relaxed/simple;
-	bh=mZ1gVsscLnoQrhu6DUaN86+gh4C4z0/alorNn55aWOU=;
+	s=arc-20240116; t=1718227146; c=relaxed/simple;
+	bh=MLQYv2BaMO1JDh6FRxrn0183u2i/RhneG1bZBn24Djw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FREFLDbCGx1jfhYyhlthobPRLkDN7Td6uOrM7EbbzY54MaI/PUazFpXWGC1CGNAVke/wyUPEaEH+IoPOxjVhpTX1SMuTggl69a+pha5LAUc2bOmc/JuUeXJqHgwwDMBqZ/Jap+9RyuROQtGxUcv6EatjX7mD/kNH0Soucq6UZDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KXj1+zWA; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=Elyp2zE24N9tof/8SLhnVBfEMmFoHs9i1MPXo3hIWUkPF3stwOUk+LnZ+EhDTesITU0syK3W+GJhc0fJnBfg5PIiwz777TRPxKV1EP2S8wuRQ0SuicjQZwnQjNN8kEYhqZNHZyyTJoM38QgO8fn4p0Af4Zvs7wjCKiLBf/wHVOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G5pqxlWO; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-df7bdb0455bso444736276.2
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:12:14 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6f18f1ec8d8so261368a12.3
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:19:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718226734; x=1718831534; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718227144; x=1718831944; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQnTUkcCD7nk2Vw7ExeAQaoK3gWIegL46mSfNzj2DMU=;
-        b=KXj1+zWAF/3cHUvUtvrZxNbygxmzl80WhX2rgC4OTqdHqJxEzXMOwvRai0agp4baAJ
-         GnG2+7oEt4mxhsCUVx40mKDeHRczaAwQgID+X/j9kDG59bD4Bn15hag58/YkSV37cES5
-         4Gwirc8/dIifUYDtwzCeLA+ELcCMgkzS18PPaPa1oNFGsA5PW6Jkg4RaA/A1dBuBa1fP
-         QOogVN53Y8J0KPz82U/reO8bj0xMV92B4dh1Ltv+Lt+cDCcxGZwsqm/vY8M+2Q9sh2w0
-         jsbcq0r7NU8XxbZ61ubxGpVN4AAUQKmMOFKoddAUrzybn/GhSLtiFEKSHdplZKVS7F7l
-         RHVA==
+        bh=ZgahXDJi4rwKNqUUVFC+2hJQOZ9hbHHAlaLc98a2hms=;
+        b=G5pqxlWOVTlPvxIPYTb6ajek2CMU9ErhvUwqRFJ98IjN9n4GVFiqbemxT4129b9puw
+         dUnJ+7k7avpS5B/6VXMJLbrbkOVSuuDBYxpKHk0AnTyy1CC5oL315PbVcPB8iFpuQcLc
+         9uSjNDPPhxVHpINbPujkEq9OvSWd3Z2c6smuTXPDUMeUy+vPSy+W/aUFQD0XKMGk0IVq
+         51xIfLhIxNaVeEBFate14JJsLqDm1YLI7Pqg/EYbOUZWlsVkZzsb28YdLr4Vw5uzCN1O
+         9MIXrZG8OqsAbLdfkQzrzW4ixYOGNEHNrHq9YR/oXdwzpMRpFbfb+VRlh4wVLAzOUstq
+         ZPZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718226734; x=1718831534;
+        d=1e100.net; s=20230601; t=1718227144; x=1718831944;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQnTUkcCD7nk2Vw7ExeAQaoK3gWIegL46mSfNzj2DMU=;
-        b=g4PCzEe4AeJnSzV+t0Kp+Y7stj9RkxyQ6W04xuFJWdZyNXCxudwCLUTdbgvhJgZxbJ
-         HDC0hKERSGe6lxqrYsE9HidYNNIXqO2xPCc8y58thyw54uQjQbKYFK8MvTNH/BDEKmNr
-         8KC3AWH5q7nc1E4kCqaWx1JhXd7oIKbnoAbH/boiw96+36iS/KyDHJ2QPRP4UYafUI72
-         3Q29xswIW896Hh8UALPZPI4QyziFZPY5m/EVdzLaoeLw4WOB3Sf/OMpwvc0OyUdR+/xM
-         ho0mpW++731Blu8Pami+/BoOOZv/aoCF5vVky8rJjXPE32ONSPs7uQRTEsV/ZHZ/8FJm
-         tg4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU6Y/RdlQcLAij/9uAg5vlENDaGsswnmHTIZ4gZjt8q/njpR02BEqMEg4cfEOLRp/FcI4yWyrjCR7rGKTV6tRrKf+Ak
-X-Gm-Message-State: AOJu0YzmZWd5BMe/HIxdNn7iGNPdwRZWXadXSpvkTwIuBAiDPtekXykp
-	SVFDmNkwG4HWq/19PzqS9NWEl2vZ1hvJzR95TDvaJi86lQG2xhao144jW+Clx9rCfTk+9/sk8WE
-	Iyw==
-X-Google-Smtp-Source: AGHT+IHsV28eaC2THrd7M7nGgltqa0kTEglruuHJgRHKPTTyPjjhrN5LKu8lrwbv6iFMvLbV9hefC3OsmFA=
+        bh=ZgahXDJi4rwKNqUUVFC+2hJQOZ9hbHHAlaLc98a2hms=;
+        b=ppQkBzrBSNP4U+YQxSxI+Pyfi4E9iUgnWy+U0ox7kN88RgW3Dypj78XGP/432tetpe
+         C3ktnuboLsn7M8BC0pcowyMafVRNcem7UCG8FhhFs33bpCzxcmJyIHRvFRW9q8KSWkd0
+         Tcrh2czQOrYryftoJoo7pSLllKiLlU0KKIMS0JpdoKT1sEmWoD+HJ07A06QzbLx/eNjk
+         IHOau6YX2pfNX/GXSHbv0MZJnGk8zT5fknqRJ7isBYsWggFAJg5+8UHPM48Z0H56/5pF
+         8Ox3ASjRQBUlcFK4xyqrPV3UwgPRZdQefdjFgqyV6AkQe/ctLIwiiRbiooybRg2zXprz
+         aYcg==
+X-Forwarded-Encrypted: i=1; AJvYcCWaSzJ/04Ua4rBhZ71kkz2hY5YTiBspT1FXaCRGdFsLu4qT2mxUuWlXLrbWQrDx821APUBfegBTTTdNcsF3afz8MMEg
+X-Gm-Message-State: AOJu0YyVKuY85PpimwslxT/tLJWytMUSyRrh/Uw9bBVV2Uo9hOLKOcwv
+	/KTFcVieu5f4GNzAvD+iVj83LXvJiPc8urwQK9RJbeVXop772dMvOLRiwjK11URQa1zKNg5cO7I
+	fRA==
+X-Google-Smtp-Source: AGHT+IEyX+BvqryxMRr9G0bMzgAJHpudMNKKmYw7eyQeJ8a3uw3AhkQsT+dsqu7wlsIWbs8crlNnEDE965o=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:120c:b0:df4:920f:3192 with SMTP id
- 3f1490d57ef6-dfe68036303mr137279276.8.1718226733624; Wed, 12 Jun 2024
- 14:12:13 -0700 (PDT)
-Date: Wed, 12 Jun 2024 14:12:12 -0700
-In-Reply-To: <20240207172646.3981-5-xin3.li@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:451:b0:6e9:66a5:408d with SMTP id
+ 41be03b00d2f7-6fae27627b0mr6025a12.1.1718227144135; Wed, 12 Jun 2024 14:19:04
+ -0700 (PDT)
+Date: Wed, 12 Jun 2024 14:19:02 -0700
+In-Reply-To: <20240207172646.3981-7-xin3.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-5-xin3.li@intel.com>
-Message-ID: <ZmoPLOx8sujVsGIS@google.com>
-Subject: Re: [PATCH v2 04/25] KVM: x86: Mark CR4.FRED as not reserved
+References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-7-xin3.li@intel.com>
+Message-ID: <ZmoQxjksn5bWhlBA@google.com>
+Subject: Re: [PATCH v2 06/25] KVM: VMX: Defer enabling FRED MSRs save/load
+ until after set CPUID
 From: Sean Christopherson <seanjc@google.com>
 To: Xin Li <xin3.li@intel.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
@@ -86,48 +87,18 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Feb 07, 2024, Xin Li wrote:
-> The CR4.FRED bit, i.e., CR4[32], is no longer a reserved bit when a guest
-> enumerates FRED, otherwise it is still a reserved bit.
-
-This isn't quite correct, as __cr4_reserved_bits() is used with kvm_cpu_caps too,
-i.e. to compute CR4 bits that are reserved from the host's perspective.  And that
-matters, because if this check was done _only_ on guest CPUID, then KVM would
-allow CR4.FRED=1 before all of KVM support is in place.
-
-> Signed-off-by: Xin Li <xin3.li@intel.com>
-> Tested-by: Shan Kang <shan.kang@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 2 +-
->  arch/x86/kvm/x86.h              | 2 ++
->  2 files changed, 3 insertions(+), 1 deletion(-)
+> Clear FRED VM entry/exit controls when initializing a vCPU, and set
+> these controls only if FRED is enumerated after set CPUID.
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b5b2d0fde579..0d88873eba63 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -134,7 +134,7 @@
->  			  | X86_CR4_OSXSAVE | X86_CR4_SMEP | X86_CR4_FSGSBASE \
->  			  | X86_CR4_OSXMMEXCPT | X86_CR4_LA57 | X86_CR4_VMXE \
->  			  | X86_CR4_SMAP | X86_CR4_PKE | X86_CR4_UMIP \
-> -			  | X86_CR4_LAM_SUP))
-> +			  | X86_CR4_LAM_SUP | X86_CR4_FRED))
->  
->  #define CR8_RESERVED_BITS (~(unsigned long)X86_CR8_TPR)
->  
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 2f7e19166658..9a52016ebf5a 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -532,6 +532,8 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
->  		__reserved_bits |= X86_CR4_PCIDE;       \
->  	if (!__cpu_has(__c, X86_FEATURE_LAM))           \
->  		__reserved_bits |= X86_CR4_LAM_SUP;     \
-> +	if (!__cpu_has(__c, X86_FEATURE_FRED))          \
-> +		__reserved_bits |= X86_CR4_FRED;        \
->  	__reserved_bits;                                \
->  })
->  
-> -- 
-> 2.43.0
-> 
+> FRED VM entry/exit controls need to be set to establish context
+> sufficient to support FRED event delivery immediately after VM entry
+> and exit.  However it is not required to save/load FRED MSRs for
+> a non-FRED guest, which aren't supposed to access FRED MSRs.
+
+Does this actually provide a measurable performance boost?  If not, just do the
+unnecessary load/store on entry/exit.
+
+Generally speaking, the only time KVM dynamically toggles entry/exit controls is
+when KVM wants to run the guest with a host value, e.g. with the host's
+PERF_GLOBAL_CTRL.
 
