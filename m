@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-19469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19471-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86F679056FD
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 17:35:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE84E9056FF
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 17:35:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 880681C213BB
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 15:35:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52B2F281A8F
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 15:35:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F70180A8C;
-	Wed, 12 Jun 2024 15:35:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053C11802CE;
+	Wed, 12 Jun 2024 15:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GdsMQ9k8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SnRqwwB+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 376A51802CF
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 15:35:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D698180A74
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 15:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718206513; cv=none; b=Non6ZY6Ssc/F0ojcV3gHD4UGk2iANyHFZi0ZS4FYx1lnGz3JXl4xAvElm+LN3+VhDH1qWvmtF/IeQTHJu7Kbgo/dKHbCVFmz+l0gqWldc++OfVIgblgVCFrNu7mYF8MmAj7KeH6RTIZLmSCYozdaRVINHnPvTBzNMYujAaWRFd8=
+	t=1718206515; cv=none; b=ZOJvKUdw8D0mOXen7TodZITo4SudRifT8LlVqAkIgkVkiyWuGuw+iSmAip8YFlqof9KWSY0+3m5TcV6auU9bH22AzOE8GcGfkPN39lGDcvv7rkggcaLoejA57CTD3gXTaC3xY7cAg+qRZ4DXBbVzosPvrgiHltEzrfPqvJ346qY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718206513; c=relaxed/simple;
-	bh=3c9FMNwJhtbTnUw1RldYkOZFlC7TgkN6n66QyDSqkUw=;
+	s=arc-20240116; t=1718206515; c=relaxed/simple;
+	bh=0M00rXsrO6MkSaLCtF/pVIWAbiHGBLpMU9mQ4Bs4H7I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XTCCXG1D9r8KAA9+Gu6fiVt4lCoMNzP1B8j3Tsgb4RzDnsZ8I0c9f91Y0v0rrtYxeAAemF4AUdoLNPc73FtP3dAD59lQcnzs6RPu2jYVpvYYxWSZHqgrpglQl2IGkgSDN48WS+Px8P8sWHRa0N+GDvcIlF6fPFvL5Gnx0PRnc5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=GdsMQ9k8; arc=none smtp.client-ip=209.85.208.45
+	 MIME-Version:Content-Type; b=RvkOFeKy9Lsv3UHDh0pEzgXlDf0BiA1vsk2Y5snQrYKbFWaLDxiq/jvTsZtXb9+kirE3FapKK8AV8lYRUI6xcb/5dcTMnp3qqcWp1ZQEFYQPW0sKodYy2fkbPRn+Mv9gLLMit0fHgvSdPN3KRl9LnsuXB8AFYOiMsr0cNkL2OUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SnRqwwB+; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-57cad452f8bso959239a12.2
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 08:35:10 -0700 (PDT)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a62ef52e837so106466b.3
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 08:35:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718206509; x=1718811309; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1718206512; x=1718811312; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1KVKwzv6PSKKY2fr+KeYYMd1xy6tDc4gIj3OlrlQ7yw=;
-        b=GdsMQ9k8l1FFZcXftkXlFKkoFF9SzF7DcCtYCGGiU0l4q/XIz233RpGn8LcCtLswQI
-         LYmV7pbET5cA1aQLdgMxpDoJDd1QSJXZmKyrutCDstIuOC2pUJWn9IQr7wf7xB4pcIUd
-         9xXPcjxEfOqYzL3gg9GOS0P10LcaFcXIQyxXCHdZt0zgmiplLlU6/ZhsR8pYtT9Kf+/X
-         nh19cLQphD6U65johxAd76MqJ3PTEgHanJfan3/V9sPJJbzOohOEBBYpQMrWVkdvAc++
-         lJHxsSLggX5IwMOf2icuFIM07UaD6gwhBO/FYiLqnIZn1GYpkbrlSRnC0zzBfwozPWS+
-         mZlQ==
+        bh=0UFHAsoemA/1ZyFVkieFp/Fehtdb65Sq2hGoqSQrpDk=;
+        b=SnRqwwB+pVL2DthNgouwYjz6Aq+jGH36oaQKVyG1bihxbnYwqc+figjvj8TJhTDVoh
+         wKPJT8XNYI19F1AUyD19AkTqEMPnvaULe+r5iCa3w+NOLxpiIAAGeYYcWmLFn9idEC/3
+         1GN+aTUbVAO8ZxIavKRkuX2Rh5zP4WppeHsMmjuRRmik3wGVhx9Fsxkn6SOsbgnP3v2e
+         NKUei4t/UU5uAvlsIuzhp8tDq6hkeS0UV2djU/w39gpRU9jdt60/J3dgzTm6BXrQrYhp
+         kbPZZ2dE+LuMV4CPPa4+ZuY7dpHVJQw4Djk0X60fpyvU8DXQvQfCw3ftY26eTzmfgvec
+         bjtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718206509; x=1718811309;
+        d=1e100.net; s=20230601; t=1718206512; x=1718811312;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1KVKwzv6PSKKY2fr+KeYYMd1xy6tDc4gIj3OlrlQ7yw=;
-        b=jlb3o1Ijx3PaTqKJ1YNjw1a0LhEvGKcU2d9AxsaLViywO3b8XYJG6fFrH4GmE6qoqk
-         fs0BEHF+MwLHMDM2jyXy8PAi00PGRBoEqHho4CPcQGi9Js4Mi4BHgT2ehtpHcNklTag3
-         Y5MN31+UhJpvOge2a3LlpAPNtetBBUSgbZWpSw95aUT4eVZNJzaJXpuNWTNZnZWYaOIZ
-         TdH+Wa0KhotE0c4xgDjzWATsDjmvZ0F+s8O4rXmmM2brNFG6DYpfqKtxz1jsNWmsPnf6
-         eCqK+eAjo+eE/bJqe6z2iBdxgS9rggDa3oX620ycrZ4msAN9h94AIcQuZMHppyvC9iuV
-         5PHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqT0/mn9yxhBBB6ort+PGLukH6SRLVeAiUJsrU8xw3s6PLdHf+x+e/R1JN0Fg/uZCtmV7rnoCy71m54yuWMJY/6iod
-X-Gm-Message-State: AOJu0Yy8x0hYAHggCPvgHqgFTd/ghCBBUGY/3hGwZBKQWp0zp10EUShn
-	Z0RHVLUreVDwYiawrYozmxvwrkbSEeIZk/Z24doEcAJO9+7kTTwY9dRrl5+0Zes=
-X-Google-Smtp-Source: AGHT+IHdD1zUvLC5libXDtJeYvV0M22MB4IFlxxI8NI0tRbpAFP6x9W6SyugUDKf6QoX0qd+4pE2SA==
-X-Received: by 2002:a50:d6dc:0:b0:57c:5b7a:87e7 with SMTP id 4fb4d7f45d1cf-57ca976c727mr1437158a12.14.1718206509408;
-        Wed, 12 Jun 2024 08:35:09 -0700 (PDT)
+        bh=0UFHAsoemA/1ZyFVkieFp/Fehtdb65Sq2hGoqSQrpDk=;
+        b=pnBmgobt3HZ0eijrj5USh2TxH5YC4X9ov0t3Je+6fQwVkFW/M63styJ65Ja8fe0gKb
+         OyhUHhdxHkaBLyfHgPjmrqKw9FULlZo4crRKppskui2g43VRd78OTulEq/CW+ECr2kRm
+         S+WnVC7wq6LEW+cRig1QAweqvGTSF4s2N7Ds+cB7g3HML1fcHimwQ50jx1NTgWlJ06gV
+         o76d246xPl58ZfrtdpRADhE/TWtHOa2XiRfUHDvIYPKJbZVEpAm2Z1r1zHblA9sm/6D2
+         B8ns+l9V7MJxZf8Loy2p9ldDDIZ7Da54Vauv/d/KRa4cIJqWY9X0eYeIYJp171ruhasQ
+         ivdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXGbSSlVSF0rdbEG2S8E12kQvyIUgj2IRby082BdoMSzifZevPbYZjilXuC32w3qfnNZHY3ZbEZrToCRI6GHw+UHR+Q
+X-Gm-Message-State: AOJu0Ywe4RwRQt+dzUSw/iVvjQxxknu5WdhUwjIuowCIrcBjWNbQpyCU
+	mN7HpTwlww7jrlFECUnPFh6pjzPKBMEogkVg4DhkLaNnVbqRv86jTQhn07eVfwM=
+X-Google-Smtp-Source: AGHT+IGNS2xktjqcOrTpVg66Qr2sh2nrR4+EQZaLWm4leOeKKyIa1XGx1bZYYSow5mTnEGpMAhUn6Q==
+X-Received: by 2002:a17:907:7756:b0:a6f:4f3f:e6d8 with SMTP id a640c23a62f3a-a6f4f3fe75emr48893466b.20.1718206511842;
+        Wed, 12 Jun 2024 08:35:11 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57c8f3a0c33sm3824158a12.82.2024.06.12.08.35.08
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f2195a2a3sm370298966b.99.2024.06.12.08.35.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 12 Jun 2024 08:35:09 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 5FD225F93C;
+	by draig.lan (Postfix) with ESMTP id 784465F93D;
 	Wed, 12 Jun 2024 16:35:08 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -99,10 +99,11 @@ Cc: David Hildenbrand <david@redhat.com>,
 	Cameron Esfahani <dirty@apple.com>,
 	Jamie Iles <quic_jiles@quicinc.com>,
 	"Dr. David Alan Gilbert" <dave@treblig.org>,
-	Richard Henderson <richard.henderson@linaro.org>
-Subject: [PATCH 2/9] gdbstub: move enums into separate header
-Date: Wed, 12 Jun 2024 16:35:01 +0100
-Message-Id: <20240612153508.1532940-3-alex.bennee@linaro.org>
+	Richard Henderson <richard.henderson@linaro.org>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: [PATCH 3/9] plugins: Ensure register handles are not NULL
+Date: Wed, 12 Jun 2024 16:35:02 +0100
+Message-Id: <20240612153508.1532940-4-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240612153508.1532940-1-alex.bennee@linaro.org>
 References: <20240612153508.1532940-1-alex.bennee@linaro.org>
@@ -115,232 +116,40 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This is an experiment to further reduce the amount we throw into the
-exec headers. It might not be as useful as I initially thought because
-just under half of the users also need gdbserver_start().
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
 
+Ensure register handles are not NULL so that a plugin can assume NULL is
+invalid as a register handle.
+
+Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+Message-Id: <20240229-null-v1-1-e716501d981e@daynix.com>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/exec/gdbstub.h    |  9 ---------
- include/gdbstub/enums.h   | 21 +++++++++++++++++++++
- accel/hvf/hvf-accel-ops.c |  2 +-
- accel/kvm/kvm-all.c       |  2 +-
- accel/tcg/tcg-accel-ops.c |  2 +-
- gdbstub/user.c            |  1 +
- monitor/hmp-cmds.c        |  3 ++-
- system/vl.c               |  1 +
- target/arm/hvf/hvf.c      |  2 +-
- target/arm/hyp_gdbstub.c  |  2 +-
- target/arm/kvm.c          |  2 +-
- target/i386/kvm/kvm.c     |  2 +-
- target/ppc/kvm.c          |  2 +-
- target/s390x/kvm/kvm.c    |  2 +-
- 14 files changed, 34 insertions(+), 19 deletions(-)
- create mode 100644 include/gdbstub/enums.h
+ plugins/api.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
-index 008a92198a..1bd2c4ec2a 100644
---- a/include/exec/gdbstub.h
-+++ b/include/exec/gdbstub.h
-@@ -1,15 +1,6 @@
- #ifndef GDBSTUB_H
- #define GDBSTUB_H
+diff --git a/plugins/api.c b/plugins/api.c
+index 5a0a7f8c71..6bdb26bbe3 100644
+--- a/plugins/api.c
++++ b/plugins/api.c
+@@ -507,7 +507,7 @@ static GArray *create_register_handles(GArray *gdbstub_regs)
+         }
  
--#define DEFAULT_GDBSTUB_PORT "1234"
--
--/* GDB breakpoint/watchpoint types */
--#define GDB_BREAKPOINT_SW        0
--#define GDB_BREAKPOINT_HW        1
--#define GDB_WATCHPOINT_WRITE     2
--#define GDB_WATCHPOINT_READ      3
--#define GDB_WATCHPOINT_ACCESS    4
--
- typedef struct GDBFeature {
-     const char *xmlname;
-     const char *xml;
-diff --git a/include/gdbstub/enums.h b/include/gdbstub/enums.h
-new file mode 100644
-index 0000000000..c4d54a1d08
---- /dev/null
-+++ b/include/gdbstub/enums.h
-@@ -0,0 +1,21 @@
-+/*
-+ * gdbstub enums
-+ *
-+ * Copyright (c) 2024 Linaro Ltd
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+
-+#ifndef GDBSTUB_ENUMS_H
-+#define GDBSTUB_ENUMS_H
-+
-+#define DEFAULT_GDBSTUB_PORT "1234"
-+
-+/* GDB breakpoint/watchpoint types */
-+#define GDB_BREAKPOINT_SW        0
-+#define GDB_BREAKPOINT_HW        1
-+#define GDB_WATCHPOINT_WRITE     2
-+#define GDB_WATCHPOINT_READ      3
-+#define GDB_WATCHPOINT_ACCESS    4
-+
-+#endif /* GDBSTUB_ENUMS_H */
-diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
-index b2a37a2229..ac08cfb9f3 100644
---- a/accel/hvf/hvf-accel-ops.c
-+++ b/accel/hvf/hvf-accel-ops.c
-@@ -52,7 +52,7 @@
- #include "qemu/main-loop.h"
- #include "exec/address-spaces.h"
- #include "exec/exec-all.h"
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "sysemu/cpus.h"
- #include "sysemu/hvf.h"
- #include "sysemu/hvf_int.h"
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 009b49de44..5680cd157e 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -27,7 +27,7 @@
- #include "hw/pci/msi.h"
- #include "hw/pci/msix.h"
- #include "hw/s390x/adapter.h"
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "sysemu/kvm_int.h"
- #include "sysemu/runstate.h"
- #include "sysemu/cpus.h"
-diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
-index 1433e38f40..3c19e68a79 100644
---- a/accel/tcg/tcg-accel-ops.c
-+++ b/accel/tcg/tcg-accel-ops.c
-@@ -35,7 +35,7 @@
- #include "exec/exec-all.h"
- #include "exec/hwaddr.h"
- #include "exec/tb-flush.h"
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
+         /* Create a record for the plugin */
+-        desc.handle = GINT_TO_POINTER(grd->gdb_reg);
++        desc.handle = GINT_TO_POINTER(grd->gdb_reg + 1);
+         desc.name = g_intern_string(grd->name);
+         desc.feature = g_intern_string(grd->feature_name);
+         g_array_append_val(find_data, desc);
+@@ -528,7 +528,7 @@ int qemu_plugin_read_register(struct qemu_plugin_register *reg, GByteArray *buf)
+ {
+     g_assert(current_cpu);
  
- #include "hw/core/cpu.h"
+-    return gdb_read_register(current_cpu, buf, GPOINTER_TO_INT(reg));
++    return gdb_read_register(current_cpu, buf, GPOINTER_TO_INT(reg) - 1);
+ }
  
-diff --git a/gdbstub/user.c b/gdbstub/user.c
-index edeb72efeb..e34b58b407 100644
---- a/gdbstub/user.c
-+++ b/gdbstub/user.c
-@@ -18,6 +18,7 @@
- #include "exec/gdbstub.h"
- #include "gdbstub/syscalls.h"
- #include "gdbstub/user.h"
-+#include "gdbstub/enums.h"
- #include "hw/core/cpu.h"
- #include "trace.h"
- #include "internals.h"
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index ea79148ee8..067152589b 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -15,8 +15,9 @@
- 
- #include "qemu/osdep.h"
- #include "exec/address-spaces.h"
--#include "exec/gdbstub.h"
- #include "exec/ioport.h"
-+#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "monitor/hmp.h"
- #include "qemu/help_option.h"
- #include "monitor/monitor-internal.h"
-diff --git a/system/vl.c b/system/vl.c
-index a3eede5fa5..cfcb674425 100644
---- a/system/vl.c
-+++ b/system/vl.c
-@@ -68,6 +68,7 @@
- #include "sysemu/numa.h"
- #include "sysemu/hostmem.h"
- #include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "qemu/timer.h"
- #include "chardev/char.h"
- #include "qemu/bitmap.h"
-diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index 45e2218be5..ef9bc42738 100644
---- a/target/arm/hvf/hvf.c
-+++ b/target/arm/hvf/hvf.c
-@@ -33,7 +33,7 @@
- #include "trace/trace-target_arm_hvf.h"
- #include "migration/vmstate.h"
- 
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- 
- #define MDSCR_EL1_SS_SHIFT  0
- #define MDSCR_EL1_MDE_SHIFT 15
-diff --git a/target/arm/hyp_gdbstub.c b/target/arm/hyp_gdbstub.c
-index ebde2899cd..f120d55caa 100644
---- a/target/arm/hyp_gdbstub.c
-+++ b/target/arm/hyp_gdbstub.c
-@@ -12,7 +12,7 @@
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "internals.h"
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- 
- /* Maximum and current break/watch point counts */
- int max_hw_bps, max_hw_wps;
-diff --git a/target/arm/kvm.c b/target/arm/kvm.c
-index 7cf5cf31de..70f79eda33 100644
---- a/target/arm/kvm.c
-+++ b/target/arm/kvm.c
-@@ -31,7 +31,7 @@
- #include "hw/pci/pci.h"
- #include "exec/memattrs.h"
- #include "exec/address-spaces.h"
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "hw/boards.h"
- #include "hw/irq.h"
- #include "qapi/visitor.h"
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 912f5d5a6b..a666129f41 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -38,7 +38,7 @@
- #include "hyperv.h"
- #include "hyperv-proto.h"
- 
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "qemu/host-utils.h"
- #include "qemu/main-loop.h"
- #include "qemu/ratelimit.h"
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 005f2239f3..2c3932200b 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -39,7 +39,7 @@
- #include "migration/qemu-file-types.h"
- #include "sysemu/watchdog.h"
- #include "trace.h"
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "exec/memattrs.h"
- #include "exec/ram_addr.h"
- #include "sysemu/hostmem.h"
-diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-index 1b494ecc20..94181d9281 100644
---- a/target/s390x/kvm/kvm.c
-+++ b/target/s390x/kvm/kvm.c
-@@ -40,7 +40,7 @@
- #include "sysemu/hw_accel.h"
- #include "sysemu/runstate.h"
- #include "sysemu/device_tree.h"
--#include "exec/gdbstub.h"
-+#include "gdbstub/enums.h"
- #include "exec/ram_addr.h"
- #include "trace.h"
- #include "hw/s390x/s390-pci-inst.h"
+ struct qemu_plugin_scoreboard *qemu_plugin_scoreboard_new(size_t element_size)
 -- 
 2.39.2
 
