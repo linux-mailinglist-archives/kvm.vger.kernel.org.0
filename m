@@ -1,290 +1,317 @@
-Return-Path: <kvm+bounces-19434-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19435-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 443C990508F
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 12:40:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4279050A3
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 12:45:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25AAC1C211CF
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 10:40:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 721171C20F40
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 10:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51E4816EC0B;
-	Wed, 12 Jun 2024 10:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E9816EC15;
+	Wed, 12 Jun 2024 10:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Bm5vK1gs"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="qhKumtty"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5903B16EBFA
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 10:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D11C16C685;
+	Wed, 12 Jun 2024 10:45:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718188812; cv=none; b=t/q9t596jHBmffL9tTuFbZHB/ZpRwh5EbLKd22HwapyqA5CggCSLQ5Wz/b1iLnR9vZSApwnobL8t25ua4GwFotwLUFvWL17Ylk6UkMMqOjJsrHr9t0xAj0K30T36mGN0KyGzI5zxWs1zekKRF+F6u1NAVP0Kj36cyOZm2n/y9to=
+	t=1718189111; cv=none; b=LA/26Y+l7xqr5qZ9QeOkOkQA/RnZVTXAuhpBLZXZY48ObxPVBQYbjnRU9WTN/Bf6vu1oRrkaIQBXsXgvaOL2NcJvBH7iFv8Kc5K2FAmxW/86yW9fVxUn5OCsXxNVEKFXaeG1+A+EjwqiYFZDGWsJWiH6/Rl/qzQ9nZ7V1Kjm36M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718188812; c=relaxed/simple;
-	bh=tvEptQHY+WeN4YvID509DhHGbCd1y8DDqVwSzqixeUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GacDwBJca/hXrFNr2DU4RGnE1f4pnzo9tBwf5kNJ/kCL+t5XTMu/x5jR5FkOwBU46IhGH7ESN3AbDlCZZNz3Iu5QfAGVA0gnJtzosHYncMNrP2eUucqjjLwqD58GtqL+rnaysriTghCn93dIUvRjZrAm+clBPc0/HHLc/AXRLsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Bm5vK1gs; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-35fdf7aa8a1so347795f8f.2
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 03:40:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718188808; x=1718793608; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ACWLaJj/sO7FE/x9hMeKNNuOBgDiWPG8HyrO4oVecec=;
-        b=Bm5vK1gsUstuAFdf5Gf2RYTOm3WB/OHNZMahsoSQ2mI943hL/Bz3NKQmm6PUWsktFh
-         kKWIA8gU7Y1JTjNh/PBxgw9K19YAvYT+z1iT+qCS+xdmNu661niRt9TfA5FqVBAK9UKl
-         8wIPpEjrH8ncFZIupUpdIM3gLx1V0/dWZT05pie0oAGRaTR4QLwFMWgIrsZ8MbA67OR6
-         36N8kw3p9No8O4kK0Q5FpB/1vV2+TWyT0JvBccKYzx7i2hXU3wNhinC+N7/Q4OXqr4fD
-         w8wSGMnIdWnBSACTzFIHg0b/iJTVQ/efT8qf2nVsXXCeSVYNRkhjbE//4Kxm9fdtPrOn
-         fZjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718188808; x=1718793608;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ACWLaJj/sO7FE/x9hMeKNNuOBgDiWPG8HyrO4oVecec=;
-        b=hNyCdP57GrWPE+QR7grBnWu+bAIxkM/G155rlbARP5MJCB5oJ1EinkyR1+t4JdWaf3
-         DkyVfPqyy/46mVRguH6a8cECWXjrY5vYCvFDMJDrAkH0NSMhwc63buNvcwcH7iI2EqNB
-         mDDoo355TX83EpPnh2ZAfUPUptw4IHJZNU2k6NWiMdpQ/iAfvq8EgKVk4YMXew65Jy8l
-         kQnc9jcgH6zck4v9/QjgD9yTb+7n3jXwZuFkGczqmlNhs5HFpsxSjwlPpzOSY5aDg3fa
-         C5uIDmioTY6UlqJ4Un4RWotf8xMwtZdxC05guWuHLqEe1+OqIC455Hm3KX4/5HeigXJ/
-         JdmQ==
-X-Gm-Message-State: AOJu0YzCs69mQ2YcrkL2lbMpWa05x+s5HRKMyX2x+qwumjvNliqo/WkC
-	iRlfk5fDAgY0llrkRjQiruWR/qXgFN/+OX2vrOq1nyesrmEm/okecXSA1aXTRn4=
-X-Google-Smtp-Source: AGHT+IFajuOTDnrq2pHCCq72kII5joVpB6r6hgB9X0A1ac5/NT6lJbaYlvsP7mzlklqXw70Hx30DVg==
-X-Received: by 2002:a5d:47a9:0:b0:35f:1f49:f784 with SMTP id ffacd0b85a97d-35fdf779c98mr953464f8f.12.1718188807568;
-        Wed, 12 Jun 2024 03:40:07 -0700 (PDT)
-Received: from myrica ([2.221.137.100])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-35f1aa8d4f3sm10874877f8f.99.2024.06.12.03.40.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 03:40:06 -0700 (PDT)
-Date: Wed, 12 Jun 2024 11:40:23 +0100
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1718189111; c=relaxed/simple;
+	bh=mGIzQ5ew1VIe645IAxdq+2P+BLh9Fz+FTEcGLy6hS1U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U5xpEDBbidLMcMAmAHS13djV6NLKcd65WjcsCjl/ejvO596g7NFoCTwxzXSPCcMQYSh0G+TaAVzG53xWwnToCrDi0HC3Jq8bvPTE6GVoizXsr/RNiiDWq6lKthdyHYYQMQHIC1SKe/E8tWvjRkFoNELkgAhdvm1yLQNqvKZ79Hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=qhKumtty; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1718189107;
+	bh=mGIzQ5ew1VIe645IAxdq+2P+BLh9Fz+FTEcGLy6hS1U=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qhKumttyixzROJAaVyga+0WqyXI1mxmnyD5t3dQ1T804gSvUYNNFQRvbTF+Mf/tLX
+	 Z0oJQpmqGJ4tIJ/6d5KaAWO9b+VPA58OTjVuDKzvFPD6eAl4B9+GQ0Q0Fd6Km+JkTB
+	 wADIsBkU5HtY1BZ2JQV6+3dcf15qVKeOg9SyKnkbhTi7AjEMKKoDy9J8k/eutTCY70
+	 SVpccrD9JFdyWSJqHMYp5OcwSy7A+8A6w4/TDRstbMSrO26xADqrJ9HVvb0ANK2JXK
+	 h84cxCGIgBUWRuWUwpyZxizqAz+JeVickxRyDpVi5T+27gwjaXbzGX0CruK55qyuW0
+	 12Y0zUCY8tLUQ==
+Received: from localhost.localdomain (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 510333782199;
+	Wed, 12 Jun 2024 10:45:01 +0000 (UTC)
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+To: Marc Zyngier <maz@kernel.org>,
 	Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
-Message-ID: <20240612104023.GB4602@myrica>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <20240605093006.145492-3-steven.price@arm.com>
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Haibo Xu <haibo1.xu@intel.com>,
+	Anup Patel <anup@brainfault.org>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Aaron Lewis <aaronlewis@google.com>,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kernel@collabora.com,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] selftests: kvm: remove print_skip()
+Date: Wed, 12 Jun 2024 15:44:53 +0500
+Message-Id: <20240612104500.425012-1-usama.anjum@collabora.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="/N5098jZq9Eqa4T2"
-Content-Disposition: inline
-In-Reply-To: <20240605093006.145492-3-steven.price@arm.com>
+Content-Transfer-Encoding: 8bit
 
+Replace print_skip() with ksft_exit_skip() to simplify the code and
+directly use the skip API provided by kselftest.h.
 
---/N5098jZq9Eqa4T2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Wed, Jun 05, 2024 at 10:29:54AM +0100, Steven Price wrote:
-> From: Suzuki K Poulose <suzuki.poulose@arm.com>
-> 
-> Detect that the VM is a realm guest by the presence of the RSI
-> interface.
-> 
-> If in a realm then all memory needs to be marked as RIPAS RAM initially,
-> the loader may or may not have done this for us. To be sure iterate over
-> all RAM and mark it as such. Any failure is fatal as that implies the
-> RAM regions passed to Linux are incorrect - which would mean failing
-> later when attempting to access non-existent RAM.
-> 
-> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-> Co-developed-by: Steven Price <steven.price@arm.com>
-> Signed-off-by: Steven Price <steven.price@arm.com>
-
-> +static bool rsi_version_matches(void)
-> +{
-> +	unsigned long ver_lower, ver_higher;
-> +	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
-> +						&ver_lower,
-> +						&ver_higher);
-
-There is a regression on QEMU TCG (in emulation mode, not running under KVM):
-
-  qemu-system-aarch64 -M virt -cpu max -kernel Image -nographic
-
-This doesn't implement EL3 or EL2, so SMC is UNDEFINED (DDI0487J.a R_HMXQS),
-and we end up with an undef instruction exception. So this patch would
-also break hardware that only implements EL1 (I don't know if it exists).
-
-The easiest fix is to detect the SMC conduit through the PSCI node in DT.
-SMCCC helpers already do this, but we can't use them this early in the
-boot. I tested adding an early probe to the PSCI driver to check this, see
-attached patches.
-
-Note that we do need to test the conduit after finding a PSCI node,
-because even though it doesn't implement EL2 in this configuration, QEMU
-still accepts PSCI HVCs in order to support SMP.
-
-Thanks,
-Jean
-
-
---/N5098jZq9Eqa4T2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-firmware-psci-Add-psci_early_test_conduit.patch"
-
-From 788bfd45e7ce521666a19dba99277106e4d33c80 Mon Sep 17 00:00:00 2001
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Date: Tue, 11 Jun 2024 19:15:30 +0100
-Subject: [PATCH 1/2] firmware/psci: Add psci_early_test_conduit()
-
-Add a function to test early if PSCI is present and what conduit it
-uses. Because the PSCI conduit corresponds to the SMCCC one, this will
-let the kernel know whether it can use SMC instructions to discuss with
-the Realm Management Monitor (RMM), early enough to enable RAM and
-serial access when running in a Realm.
-
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
 ---
- include/linux/psci.h         |  5 +++++
- drivers/firmware/psci/psci.c | 25 +++++++++++++++++++++++++
- 2 files changed, 30 insertions(+)
+ .../testing/selftests/kvm/aarch64/vgic_init.c  |  4 ++--
+ .../testing/selftests/kvm/demand_paging_test.c |  3 +--
+ tools/testing/selftests/kvm/dirty_log_test.c   |  8 +++-----
+ .../testing/selftests/kvm/include/test_util.h  |  1 -
+ tools/testing/selftests/kvm/lib/assert.c       |  6 ++----
+ tools/testing/selftests/kvm/lib/test_util.c    | 11 -----------
+ tools/testing/selftests/kvm/s390x/memop.c      | 18 ++++++------------
+ .../selftests/kvm/x86_64/hyperv_cpuid.c        | 13 +++++--------
+ .../kvm/x86_64/hyperv_extended_hypercalls.c    |  6 ++----
+ .../selftests/kvm/x86_64/ucna_injection_test.c |  6 ++----
+ 10 files changed, 23 insertions(+), 53 deletions(-)
 
-diff --git a/include/linux/psci.h b/include/linux/psci.h
-index 4ca0060a3fc4..a1fc1703ba20 100644
---- a/include/linux/psci.h
-+++ b/include/linux/psci.h
-@@ -45,8 +45,13 @@ struct psci_0_1_function_ids get_psci_0_1_function_ids(void);
+diff --git a/tools/testing/selftests/kvm/aarch64/vgic_init.c b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+index b3b5fb0ff0a9a..556c3230eb093 100644
+--- a/tools/testing/selftests/kvm/aarch64/vgic_init.c
++++ b/tools/testing/selftests/kvm/aarch64/vgic_init.c
+@@ -757,8 +757,8 @@ int main(int ac, char **av)
+ 	}
  
- #if defined(CONFIG_ARM_PSCI_FW)
- int __init psci_dt_init(void);
-+bool __init psci_early_test_conduit(enum arm_smccc_conduit conduit);
- #else
- static inline int psci_dt_init(void) { return 0; }
-+static inline bool psci_early_test_conduit(enum arm_smccc_conduit conduit)
-+{
-+	return false;
-+}
- #endif
+ 	if (!cnt_impl) {
+-		print_skip("No GICv2 nor GICv3 support");
+-		exit(KSFT_SKIP);
++		ksft_exit_skip("No GICv2 nor GICv3 support\n");
+ 	}
++
+ 	return 0;
+ }
+diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+index 0202b78f8680a..ae60b3a5fb9e5 100644
+--- a/tools/testing/selftests/kvm/demand_paging_test.c
++++ b/tools/testing/selftests/kvm/demand_paging_test.c
+@@ -353,8 +353,7 @@ int main(int argc, char *argv[])
  
- #if defined(CONFIG_ARM_PSCI_FW) && defined(CONFIG_ACPI)
-diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
-index d9629ff87861..a40dcaf17822 100644
---- a/drivers/firmware/psci/psci.c
-+++ b/drivers/firmware/psci/psci.c
-@@ -13,6 +13,7 @@
- #include <linux/errno.h>
- #include <linux/linkage.h>
- #include <linux/of.h>
-+#include <linux/of_fdt.h>
- #include <linux/pm.h>
- #include <linux/printk.h>
- #include <linux/psci.h>
-@@ -767,6 +768,30 @@ int __init psci_dt_init(void)
- 	return ret;
+ int main(void)
+ {
+-	print_skip("__NR_userfaultfd must be present for userfaultfd test");
+-	return KSFT_SKIP;
++	ksft_exit_skip("__NR_userfaultfd must be present for userfaultfd test\n");
  }
  
-+/*
-+ * Test early if PSCI is supported, and if its conduit matches @conduit
-+ */
-+bool __init psci_early_test_conduit(enum arm_smccc_conduit conduit)
-+{
-+	int len;
-+	int psci_node;
-+	const char *method;
-+	unsigned long dt_root;
-+
-+	/* DT hasn't been unflattened yet, we have to work with the flat blob */
-+	dt_root = of_get_flat_dt_root();
-+	psci_node = of_get_flat_dt_subnode_by_name(dt_root, "psci");
-+	if (psci_node <= 0)
-+		return false;
-+
-+	method = of_get_flat_dt_prop(psci_node, "method", &len);
-+	if (!method)
-+		return false;
-+
-+	return  (conduit == SMCCC_CONDUIT_SMC && strncmp(method, "smc", len) == 0) ||
-+		(conduit == SMCCC_CONDUIT_HVC && strncmp(method, "hvc", len) == 0);
-+}
-+
- #ifdef CONFIG_ACPI
- /*
-  * We use PSCI 0.2+ when ACPI is deployed on ARM64 and it's
--- 
-2.45.2
-
-
---/N5098jZq9Eqa4T2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0002-squash-arm64-Detect-if-in-a-realm-and-set-RIPAS-RAM.patch"
-
-From fcb16e1eb494d2ce21792495955d6d3f26c319c9 Mon Sep 17 00:00:00 2001
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Date: Wed, 12 Jun 2024 09:08:17 +0100
-Subject: [PATCH 2/2] squash! arm64: Detect if in a realm and set RIPAS RAM
-
-Before issuing an SMC, detect whether SMCCC is available through this
-conduit. On platforms that do not implement EL3 nor EL2, the SMC
-instruction is UNDEFINED. SMCCC advises probing the SMCCC availability
-by first looking for a PSCI node in DT (or in ACPI, but we expect a
-realm to boot with DT at the moment). Since RMM requires using the SMC
-conduit for both PSCI and RSI, we rely on the PSCI method property to
-ensure SMC is available.  We could also check that the SMCCC version is
-at least 1.2 as required by RMM, but no platform requires this extra
-step at the moment, and we can't use the SMCCC helpers this early in
-boot.
-
-Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
----
- arch/arm64/kernel/rsi.c | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index 898952d135b0..21fc261a1d26 100644
---- a/arch/arm64/kernel/rsi.c
-+++ b/arch/arm64/kernel/rsi.c
-@@ -7,6 +7,7 @@
- #include <linux/memblock.h>
- #include <linux/swiotlb.h>
- #include <linux/cc_platform.h>
-+#include <linux/psci.h>
+ #endif /* __NR_userfaultfd */
+diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+index aacf80f574391..e5d3b01ec9508 100644
+--- a/tools/testing/selftests/kvm/dirty_log_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_test.c
+@@ -692,11 +692,9 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ 	uint32_t ring_buf_idx = 0;
+ 	int sem_val;
  
- #include <asm/rsi.h>
+-	if (!log_mode_supported()) {
+-		print_skip("Log mode '%s' not supported",
+-			   log_modes[host_log_mode].name);
+-		return;
+-	}
++	if (!log_mode_supported())
++		ksft_exit_skip("Log mode '%s' not supported\n",
++			       log_modes[host_log_mode].name);
  
-@@ -82,6 +83,12 @@ void __init arm64_rsi_setup_memory(void)
+ 	/*
+ 	 * We reserve page table for 2 times of extra dirty mem which
+diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+index 3e473058849ff..472fce41737e0 100644
+--- a/tools/testing/selftests/kvm/include/test_util.h
++++ b/tools/testing/selftests/kvm/include/test_util.h
+@@ -35,7 +35,6 @@ static inline int _no_printf(const char *format, ...) { return 0; }
+ #define pr_info(...) _no_printf(__VA_ARGS__)
+ #endif
  
- void __init arm64_rsi_init(void)
+-void __printf(1, 2) print_skip(const char *fmt, ...);
+ #define __TEST_REQUIRE(f, fmt, ...)				\
+ do {								\
+ 	if (!(f))						\
+diff --git a/tools/testing/selftests/kvm/lib/assert.c b/tools/testing/selftests/kvm/lib/assert.c
+index b49690658c606..33651f5b3a7fd 100644
+--- a/tools/testing/selftests/kvm/lib/assert.c
++++ b/tools/testing/selftests/kvm/lib/assert.c
+@@ -85,10 +85,8 @@ test_assert(bool exp, const char *exp_str,
+ 		}
+ 		va_end(ap);
+ 
+-		if (errno == EACCES) {
+-			print_skip("Access denied - Exiting");
+-			exit(KSFT_SKIP);
+-		}
++		if (errno == EACCES)
++			ksft_exit_skip("Access denied - Exiting\n");
+ 		exit(254);
+ 	}
+ 
+diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
+index 8ed0b74ae8373..6e8ac25403bb3 100644
+--- a/tools/testing/selftests/kvm/lib/test_util.c
++++ b/tools/testing/selftests/kvm/lib/test_util.c
+@@ -121,17 +121,6 @@ struct timespec timespec_div(struct timespec ts, int divisor)
+ 	return timespec_add_ns((struct timespec){0}, ns);
+ }
+ 
+-void print_skip(const char *fmt, ...)
+-{
+-	va_list ap;
+-
+-	assert(fmt);
+-	va_start(ap, fmt);
+-	vprintf(fmt, ap);
+-	va_end(ap);
+-	puts(", skipping test");
+-}
+-
+ bool thp_configured(void)
  {
-+	/*
-+	 * If PSCI isn't using SMC, RMM isn't present. Don't try to execute an
-+	 * SMC as it could be UNDEFINED.
-+	 */
-+	if (!psci_early_test_conduit(SMCCC_CONDUIT_SMC))
-+		return;
- 	if (!rsi_version_matches())
- 		return;
- 	if (rsi_get_realm_config(&config))
+ 	int ret;
+diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+index f2df7416be847..d7cd4b4eb6228 100644
+--- a/tools/testing/selftests/kvm/s390x/memop.c
++++ b/tools/testing/selftests/kvm/s390x/memop.c
+@@ -884,10 +884,8 @@ static void test_copy_key_fetch_prot_override(void)
+ 
+ 	guest_0_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, 0);
+ 	guest_last_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, last_page_addr);
+-	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
+-		print_skip("did not allocate guest pages at required positions");
+-		goto out;
+-	}
++	if (guest_0_page != 0 || guest_last_page != last_page_addr)
++		ksft_exit_skip("did not allocate guest pages at required positions\n");
+ 
+ 	HOST_SYNC(t.vcpu, STAGE_INITED);
+ 	t.run->s.regs.crs[0] |= CR0_FETCH_PROTECTION_OVERRIDE;
+@@ -923,10 +921,8 @@ static void test_errors_key_fetch_prot_override_not_enabled(void)
+ 
+ 	guest_0_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, 0);
+ 	guest_last_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, last_page_addr);
+-	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
+-		print_skip("did not allocate guest pages at required positions");
+-		goto out;
+-	}
++	if (guest_0_page != 0 || guest_last_page != last_page_addr)
++		ksft_exit_skip("did not allocate guest pages at required positions\n");
+ 	HOST_SYNC(t.vcpu, STAGE_INITED);
+ 	HOST_SYNC(t.vcpu, STAGE_SKEYS_SET);
+ 
+@@ -944,10 +940,8 @@ static void test_errors_key_fetch_prot_override_enabled(void)
+ 
+ 	guest_0_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, 0);
+ 	guest_last_page = vm_vaddr_alloc(t.kvm_vm, PAGE_SIZE, last_page_addr);
+-	if (guest_0_page != 0 || guest_last_page != last_page_addr) {
+-		print_skip("did not allocate guest pages at required positions");
+-		goto out;
+-	}
++	if (guest_0_page != 0 || guest_last_page != last_page_addr)
++		ksft_exit_skip("did not allocate guest pages at required positions");
+ 	HOST_SYNC(t.vcpu, STAGE_INITED);
+ 	t.run->s.regs.crs[0] |= CR0_FETCH_PROTECTION_OVERRIDE;
+ 	t.run->kvm_dirty_regs = KVM_SYNC_CRS;
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+index 4f5881d4ef66d..695c45635d257 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+@@ -144,10 +144,9 @@ int main(int argc, char *argv[])
+ 	free((void *)hv_cpuid_entries);
+ 
+ 	if (!kvm_cpu_has(X86_FEATURE_VMX) ||
+-	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
+-		print_skip("Enlightened VMCS is unsupported");
+-		goto do_sys;
+-	}
++	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS))
++		ksft_exit_skip("Enlightened VMCS is unsupported\n");
++
+ 	vcpu_enable_evmcs(vcpu);
+ 	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
+ 	test_hv_cpuid(hv_cpuid_entries, true);
+@@ -155,10 +154,8 @@ int main(int argc, char *argv[])
+ 
+ do_sys:
+ 	/* Test system ioctl version */
+-	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID)) {
+-		print_skip("KVM_CAP_SYS_HYPERV_CPUID not supported");
+-		goto out;
+-	}
++	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID))
++		ksft_exit_skip("KVM_CAP_SYS_HYPERV_CPUID not supported\n");
+ 
+ 	test_hv_cpuid_e2big(vm, NULL);
+ 
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+index 949e08e98f315..d37212a27990b 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+@@ -47,10 +47,8 @@ int main(void)
+ 
+ 	/* Verify if extended hypercalls are supported */
+ 	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
+-			   HV_ENABLE_EXTENDED_HYPERCALLS)) {
+-		print_skip("Extended calls not supported by the kernel");
+-		exit(KSFT_SKIP);
+-	}
++			   HV_ENABLE_EXTENDED_HYPERCALLS))
++		ksft_exit_skip("Extended calls not supported by the kernel\n");
+ 
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+ 	run = vcpu->run;
+diff --git a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+index 57f157c06b393..1dcb37a1f0be9 100644
+--- a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
++++ b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+@@ -273,10 +273,8 @@ int main(int argc, char *argv[])
+ 	kvm_ioctl(vm->kvm_fd, KVM_X86_GET_MCE_CAP_SUPPORTED,
+ 		  &supported_mcg_caps);
+ 
+-	if (!(supported_mcg_caps & MCG_CMCI_P)) {
+-		print_skip("MCG_CMCI_P is not supported");
+-		exit(KSFT_SKIP);
+-	}
++	if (!(supported_mcg_caps & MCG_CMCI_P))
++		ksft_exit_skip("MCG_CMCI_P is not supported\n");
+ 
+ 	ucna_vcpu = create_vcpu_with_mce_cap(vm, 0, true, ucna_injection_guest_code);
+ 	cmcidis_vcpu = create_vcpu_with_mce_cap(vm, 1, false, cmci_disabled_guest_code);
 -- 
-2.45.2
+2.39.2
 
-
---/N5098jZq9Eqa4T2--
 
