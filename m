@@ -1,71 +1,118 @@
-Return-Path: <kvm+bounces-19388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F699048A3
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 03:58:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 529AB9048AB
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 03:59:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8A6428560E
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 01:58:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1A04B21C4C
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 01:59:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D968F72;
-	Wed, 12 Jun 2024 01:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADE38C1E;
+	Wed, 12 Jun 2024 01:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lZBjx/gT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CJ+Kjvpv"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC388E566;
-	Wed, 12 Jun 2024 01:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195F44696;
+	Wed, 12 Jun 2024 01:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718157492; cv=none; b=h3O6thv2YYoEV32LcAzRwAOBIDvHc+BYwoAnZnQpKlEtnzTHCRTOUuYbhQWZy/PkDvhSOk2uRH4SfJNxyoLGoJE7cvn8ubR7K9Y0jsxfvUbjjFy+pIO6MewbZFJb2PIkrvFs0akaBsnb77YYEY7W0hd6ANvOzTZJbOWnR07ZDhg=
+	t=1718157585; cv=none; b=tmZRSIScfyBI7+yyeGkCJElQAk2e5PvZuAreCgsSCAn9tyjpbfxaJ4EgDXzm97YV+WGdeRokPqXBaYdwUF0JflsfpLuZS2iAC+/h7OoQuUNpoolvr2ush+Px9V5jpsZQ27/kmpRTu28uVVOHUH0NqPINZvYW2BfFZIRanQ/fiXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718157492; c=relaxed/simple;
-	bh=2bnaKdaynOx054pD82xWQVJDxU3JbEDxOintaWbN69s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I7lVTl+3cB7SVH+H3nwLAM0Df2A2jMENf8DbbGAb3WmQnkKnNLjxR8zPLqiyLta7xHRqF1dCteb92cJosWjd+2/qALQ9EYYwRIbaXhckcqL2aZr6YngfajUJWjqPLErYX6uWT5GhItFBUUZRbIdJNmYqU4tpBWLuUoWkwYmxm28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lZBjx/gT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA76CC2BD10;
-	Wed, 12 Jun 2024 01:58:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718157492;
-	bh=2bnaKdaynOx054pD82xWQVJDxU3JbEDxOintaWbN69s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lZBjx/gTHx9YKarrC8CvdwhFfBSzSxbGQip/VEVCmFRnPMWL635PuFcqkRgZJA9o6
-	 xZt7O0tH6JvN+axGo9BD/RG9hdsVMnU4LIFc4+xp7Ya8f0w1c0nBs8uZKeBw1hO/KQ
-	 vZBW6OXTQJRrdu460dZ/Y962uISetM+gYupq07A1+LUPoknCQpDPfUVzf2Ox9wrJQw
-	 rDpj0uFoREv52sd8+/s+OuX/fhgl06Hz5XPS8pqM2wBb4jUAtvtwn5wuRNQS66+L1Z
-	 cce51eJM25kJNW3YFSk/LpEy+Unmn9KR3ouo4JZK4MdCTgyrvb/JL2gFXBVx6jdpaK
-	 Gb6qbKG2XLlRg==
-Date: Tue, 11 Jun 2024 18:58:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Cindy Lu <lulu@redhat.com>
-Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com,
- virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
-Message-ID: <20240611185810.14b63d7d@kernel.org>
-In-Reply-To: <20240611053239.516996-1-lulu@redhat.com>
-References: <20240611053239.516996-1-lulu@redhat.com>
+	s=arc-20240116; t=1718157585; c=relaxed/simple;
+	bh=864XpaVKILlfYw0eJqI5Z58BDDy0cJ3P9fgW1Ko95xQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hGhs1pVRD8KkgLTT2c+D19O9kdfexofKDDojsu05fZqI7SiVZUlaXT6fCmKQdLneuMv8i2JnHELZfGKrczXDmttf6NLX+vp1ZIu/D9ltXN/wmDJnpkeABFTZ9l/8Ov8mTAPh4urvvCOaNHJGS2PXXiwdvETz9i72Y5+SIXmDpRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CJ+Kjvpv; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718157584; x=1749693584;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=864XpaVKILlfYw0eJqI5Z58BDDy0cJ3P9fgW1Ko95xQ=;
+  b=CJ+Kjvpv/UlJU6uyJU4p+G94fgmXaNPnHuQHlKyTJhTg5VDEhIoI58b1
+   qBejoTKzXA5kTNJAjeIOQECmNLofsVDbhpr5dP8WRZKdJMnGLSLZVsDu9
+   DKE4MM+tIG5AzpCsTreQGrVNm7r3nZnkXnKtuPdNtnEyORmzKWJ2wNbqu
+   VeHTyB5oqZmnZNZdmgwaM0arxJsUuwinuw3KBHvSgSUvti5hftOUM5va3
+   mHHDyBdGyudKF16vXgVFhFbusAC1GkXGI1FkgpRumTKA+/AIrdwSlXSZ2
+   Y4WJlfOm4g3geQ0mnWEdoh08BdT30Rnrqa+7G4Rai0AvRR7G9ExwwNvxA
+   w==;
+X-CSE-ConnectionGUID: XbRW/3pFTFqdChYHGM07RQ==
+X-CSE-MsgGUID: ir+f7X/VR9ezAEGMn3BJrA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="14627031"
+X-IronPort-AV: E=Sophos;i="6.08,231,1712646000"; 
+   d="scan'208";a="14627031"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 18:59:44 -0700
+X-CSE-ConnectionGUID: 5HB6WzFSSMGKudJkHqD1gA==
+X-CSE-MsgGUID: yNpNGTL4TJCH+F1tV7HboQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,231,1712646000"; 
+   d="scan'208";a="39688397"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.51]) ([10.124.227.51])
+  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jun 2024 18:59:42 -0700
+Message-ID: <04b27f2d-5509-4fd0-ac97-ae61d6105b4d@intel.com>
+Date: Wed, 12 Jun 2024 09:59:39 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86/mmu: Rephrase comment about synthetic PFERR
+ flags in #PF handler
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240608001108.3296879-1-seanjc@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20240608001108.3296879-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
-> Add new UAPI to support the mac address from vdpa tool
-> Function vdpa_nl_cmd_dev_config_set_doit() will get the
-> MAC address from the vdpa tool and then set it to the device.
+On 6/8/2024 8:11 AM, Sean Christopherson wrote:
+> Reword the BUILD_BUG_ON() comment in the legacy #PF handler to explicitly
+> describe how asserting that synthetic PFERR flags are limited to bits 31:0
+> protects KVM against inadvertently passing a synthetic flag to the common
+> page fault handler.
 > 
-> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
+> No functional change intended.
+> 
+> Suggested-by: Xiaoyao Li <xiaoyao.li@intel.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Why don't you use devlink?
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 8d7115230739..2421d971ce1b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4599,7 +4599,10 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+>   	if (WARN_ON_ONCE(error_code >> 32))
+>   		error_code = lower_32_bits(error_code);
+>   
+> -	/* Ensure the above sanity check also covers KVM-defined flags. */
+> +	/*
+> +	 * Restrict KVM-defined flags to bits 63:32 so that it's impossible for
+> +	 * them to conflict with #PF error codes, which are limited to 32 bits.
+> +	 */
+>   	BUILD_BUG_ON(lower_32_bits(PFERR_SYNTHETIC_MASK));
+>   
+>   	vcpu->arch.l1tf_flush_l1d = true;
+> 
+> base-commit: b9adc10edd4e14e66db4f7289a88fdbfa45ae7a8
+
 
