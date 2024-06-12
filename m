@@ -1,305 +1,627 @@
-Return-Path: <kvm+bounces-19425-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19426-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F243904F1F
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 11:23:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7522D904F24
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 11:23:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7D491F220AD
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 09:23:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFD591F27215
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 09:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DAD16D9D7;
-	Wed, 12 Jun 2024 09:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F7916D9CC;
+	Wed, 12 Jun 2024 09:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="LHXvOlFG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dhLUvhJN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DD816D9CA
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 09:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718184176; cv=fail; b=mNPOyNPmhJgrVTjQ/7jmdrwwryPugAyJljUYRY+bb8fSyBQPMx6IQI3v+CTJazyjMvy07drKh19qDPMaA6ogWUzJYhcQeBWMPk+F1cowtO+nap9NS0fG4WHJWd5QrEvE7NKJzowa/adKWv2i/mV11VUBKgYAygRKNnfbFwF+SXU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718184176; c=relaxed/simple;
-	bh=qo6RlgT5X8XetEWZfhU87798wQqena7l6Kqj9c9UQXg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ASrDRddOuBt5WcE7yUIRyT2BsMdRWE/fwgsTMUFMsWezL+M/4nngDKzldp5zo1AY3DrqUEUdLJ0MBtR0XWuT31aXwxj9oSNy4EvTsVMUWMEVaBUzBoY07R1VvOv9tk2G9UHXQijX7OijOyPxkTd4+6WSUnHTwKho5rVATchQqJg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=LHXvOlFG; arc=fail smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45C95U0H027498;
-	Wed, 12 Jun 2024 02:22:49 -0700
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2044.outbound.protection.outlook.com [104.47.66.44])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3yq8qx021s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Jun 2024 02:22:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UKEf5K26FL/wzkdhZp7SaGvewN9H5UyV1uutDDnFMIEsQuL+f1E2UdmZUXuEyixe8HAOa+oqvl8lFsZQL4m3e3Zm32Au90BrX92SA7g4IdA1PV6SvZ88YIpABUxRxboBAk1GRwOI+eW/byBsAsM7XpXBLMF6/3dXCmQxTZq06CSJ9Ernuybt4RKHaNIYU7H6QdDiBaD9xbwmXosqJTFCZY44xUM8Zc6po5edvZXCBZnJA73GwUodBjzPzvLoFPy3PGkYQ6eyWTEVk9BPGrS7++XJXhx0oycvPuiZHlZwhLZnYd872bvK0BJg4PVJEYNfPwB0gM0d+llALZ3R5EscFw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qo6RlgT5X8XetEWZfhU87798wQqena7l6Kqj9c9UQXg=;
- b=CIL3x6+rb/JJE4bqodKM+PjTZ/6inPAHGNTEDA/dmHogKKhGHPOTkZ1HH3L1rjsSwQf8FM+zOp9Zjv0nOaU2WHAmWVbhW55sdzBnz5S8vBG2AqCNx3x/rwSqgSEf0Xj3MV85cozSlnJdc6UBH3Vzy1MdcQFZO/FCmOuxSDsoXdjR/DxUYIbl5S5OOoHmdXngtAMHKkFlgRimqTgVhzN6dZ1w05/kf5lQiBeACTONET3ZXk/8jcnbwP0uiHyU2zUSqJs3aPMXYZaxICUxJo7CWlBbuGhOsnBFK3Qa5hG85T10qMipo3q3d4/Y/x9IgFuk7sqX6hWs9l4MCjhqm3FhDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qo6RlgT5X8XetEWZfhU87798wQqena7l6Kqj9c9UQXg=;
- b=LHXvOlFGkTiIjjraCd6Ery2pwpW5XkUbvYqxxI5LEZTH6D3yQRaYGWbisldDRahVikxoKQFpyYmdCzgvU09qGXPG3iVAe6D0Ve60yXmveDScSHjpFLvlwuKMyBlx4LVnbPiWZY6J49yp4QiZQDo2g5Jq8j+puoqidZSGH4p8tgU=
-Received: from DS0PR18MB5368.namprd18.prod.outlook.com (2603:10b6:8:12f::17)
- by DM8PR18MB4518.namprd18.prod.outlook.com (2603:10b6:8:3f::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7677.21; Wed, 12 Jun 2024 09:22:44 +0000
-Received: from DS0PR18MB5368.namprd18.prod.outlook.com
- ([fe80::ad53:bef2:cc17:13ac]) by DS0PR18MB5368.namprd18.prod.outlook.com
- ([fe80::ad53:bef2:cc17:13ac%3]) with mapi id 15.20.7633.036; Wed, 12 Jun 2024
- 09:22:43 +0000
-From: Srujana Challa <schalla@marvell.com>
-To: Jason Wang <jasowang@redhat.com>
-CC: "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mst@redhat.com"
-	<mst@redhat.com>,
-        Vamsi Krishna Attunuru <vattunuru@marvell.com>,
-        Shijith
- Thotton <sthotton@marvell.com>,
-        Nithin Kumar Dabilpuram
-	<ndabilpuram@marvell.com>,
-        Jerin Jacob <jerinj@marvell.com>
-Subject: RE: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mode
-Thread-Topic: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mode
-Thread-Index: AQHasnq4Ve/zJa91a0mQb+nM4LHR9bGwnvCAgAa0y7CAApScgIAKA5Iw
-Date: Wed, 12 Jun 2024 09:22:43 +0000
-Message-ID: 
- <DS0PR18MB5368CD9E8E3432A9D19D8C8FA0C02@DS0PR18MB5368.namprd18.prod.outlook.com>
-References: <20240530101823.1210161-1-schalla@marvell.com>
- <CACGkMEsxPfck-Ww6CHSod5wP5xLOpS3t2B8qhTL0=PoE3koCGQ@mail.gmail.com>
- <DS0PR18MB5368E02C4DE7AA96CCD299E0A0F82@DS0PR18MB5368.namprd18.prod.outlook.com>
- <CACGkMEs+s7JEvLXBdyQbj36Y8WSbHXqF2d9HNP3v7CPRPoocXg@mail.gmail.com>
-In-Reply-To: 
- <CACGkMEs+s7JEvLXBdyQbj36Y8WSbHXqF2d9HNP3v7CPRPoocXg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR18MB5368:EE_|DM8PR18MB4518:EE_
-x-ms-office365-filtering-correlation-id: 734ac1fd-cc0f-46d7-8cce-08dc8ac13712
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230032|366008|376006|1800799016|38070700010;
-x-microsoft-antispam-message-info: 
- =?utf-8?B?aHB1THdlWGtSWjluMEMwK0VtOXliK3FFUHB0aGF5TUoyWjk4UnJ5R1NFY2lw?=
- =?utf-8?B?SXhHd2dORXpiNVJuREpEdXJxZnhQek1VSk1ZWXYxVG9VTDBFWU5ZS1hwMVFE?=
- =?utf-8?B?WG5TMWVYRkIxRCtUL3lIZ0JzTUdNcjZqWk1yc1p1RitZTHp2N21DTGdSUjRx?=
- =?utf-8?B?MnlPQVpJbXRJR2I1NVNiZkJoMitQaWlSM2svMXg2ZEpHQVVkMzh1RFVsMFZU?=
- =?utf-8?B?aHhyaVpzTTBzNzJYYWZqdS93TURXMkNYN0Z5WUc4ZlV5Rk5iRy94ajBtY3M2?=
- =?utf-8?B?dlpSS0lIVzZ1MEFRN1pvRXowTmFheEx5MlBwNjdYZmk4V1M2SU9vQ3lTYVJG?=
- =?utf-8?B?TEYzb0lQUWZocTlJSTFUdjFRR21xOStmT0J0YWRhQTdSMTZOQXZjcy90YkJr?=
- =?utf-8?B?N2RXK0Q2bi9tOW5zUjRRTFV5amUzODFRZFpOY0pLaUYwaHRoTExmZDFpR3NP?=
- =?utf-8?B?OXAvQTkwcEF3dTdnSU5ha3NCd0dUK0wyTjNqZ0VRelJYdzd5M2M0Z1NJUGZ4?=
- =?utf-8?B?MHl0Y2c2dUo3Qm9PekljOXBCMjBZSGZRaG5TdW5uRzNhR0RxU2xjM3J4WDcw?=
- =?utf-8?B?U09tQkY1ZGwyWS80RFN4QU9KMXBPZVBKcjNUTnVCVWJDVFV2OWdaeXNCeXVD?=
- =?utf-8?B?bmlOTXJrRkd2N3llV3hUNytaTk5FaW5LTExsZzlwc2E5QkhNbUoyVzB4RDNH?=
- =?utf-8?B?NFZOWU0vODF0cElKYmQzUEdzcFdxZStzUGxvSUs5M1pUSytadDBwUHRpd1g2?=
- =?utf-8?B?UnBlNVloM2J3ay91bmRQc1dQWExabW5KU1ZvT0R0NU50bFM1MVFNa042N2tK?=
- =?utf-8?B?TUpSaE1tUHdHTzZaVHhvdXdDbjhFYW9JcmlKMjFPM01JM1Z3dGdUTkpJWml6?=
- =?utf-8?B?Nm1RQS9lSmxGd2NUVkRSWXBQQkE4RC8rWlJMcUFjUmh0eGp0LzRXMXVkRGsv?=
- =?utf-8?B?dVhRUkdIT2pyRTc4emFZSFE3U2FlZDBVRVN5MHRGVzRhY1plMFl4aHF4bGZB?=
- =?utf-8?B?S00xb1d1V25KOHBGa2VRZm92VFpKcm1nOWxGR3hwZWxyS1hlaGpqUXVsT2xZ?=
- =?utf-8?B?eTBEMU8vSXIwcEdPdGZBSVZ3QW9kTW96U2t2N1N3RXB6RmVaM0VHRkRGVDFI?=
- =?utf-8?B?ZWlzRU4xcko0c0dJalZ5SmVOejdKV0c3VmZ3U1dFZFQ5dnEyQnZwTTlMZDNz?=
- =?utf-8?B?YkEvQkY3L3pOcDYwak1wcnA5TUt4YmRJam9OK2lwQ0VudnEyUHlTSzYzdS9h?=
- =?utf-8?B?UEVsWmdPZTdSNmdGWXVyT3FBbWZGa0J3QmRldzFtQzVjYmJRV3ZHM2c4OVVX?=
- =?utf-8?B?Rm9MdEJVNTFSbDh1M1l3SXdpUnh2ZldOOXZXK1pJbHJ0ak9KQnFtRXpNVEpK?=
- =?utf-8?B?cmtYSVhJV21vbC94MW12cnNvaTlITDRnL3B1a1lKdmI4U21mMWZuQUtqQ1Uv?=
- =?utf-8?B?QUZlZVVUbzlaSURPRFpIZjQ4UmZvRHVIYTB1UjJ0cVNDcUxBUUF0RXZidGMw?=
- =?utf-8?B?UWVmTnJBdFpscHJCRWxLTGNvS0oyT0xqYmdLZkZDSTY3NVJxWUpTODFieFlr?=
- =?utf-8?B?WkR1Q1NCWHJrNThWOW5UU0IreWdITEZubjBXbXY4MkJrQzB1U0lwMWFSZDly?=
- =?utf-8?B?TlJnb0xXYi9lUmJEMWFCcmFoZXdlY20rUlcyYmxEM0lCS2dCTW5VYzBqUlNE?=
- =?utf-8?B?OUMwQnFhemZISWtPV29CWlVJOVh6UU1XNVhNUXNPL0NsUkY1aUUzODJPQStU?=
- =?utf-8?B?a0psekRwRjlBUGl5TUVpMVp1eXNLcW8zbll6Z0hnWFdDTFh4K2crUVh5QkhV?=
- =?utf-8?Q?VQuLqTalIvRtODEiqtFvAI4sGX6emREDG+VMk=3D?=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR18MB5368.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230032)(366008)(376006)(1800799016)(38070700010);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?utf-8?B?MlpmL0NtQXBDMjhTb1hQMjV0ZmN0RGU1bHlwVzRqb2F1eTEyWUdKSGxIQk1q?=
- =?utf-8?B?N29VN2hjSDlPb21lK0FiSnBIZzdodk5uRmNiUG5SNUs2eFZYY0hHNU9OSkNm?=
- =?utf-8?B?RXArQTVsNldVUDhOVnkyRTQ2MFpzb01JbDU2TEpsQS9WZmlwc243dWlxNENG?=
- =?utf-8?B?QmY1T1loU24xV2Nhc2IyeHFzbGpEN0NMb25JK3RVT3N6OUN6VnhUWlRsSHIy?=
- =?utf-8?B?ZWxkTjV2WVJpMm5RNnd0RzdzUEdoOU1qZzJEd1liYlVmaWJoMDVtNnNPR0w5?=
- =?utf-8?B?SHgvelZ0dHloaHZPWEJ6MHExcEczWkJRdzZmNUR5NEhUV1lMYTJSamNodHR6?=
- =?utf-8?B?RDdMK0xqSVZjNnNnUkQvUHl0Z3U4c2pMTG1vaGFWSWtDb29DaGd5dmlENzZJ?=
- =?utf-8?B?UWRFL1VSSFRTWU5vUkhoRVd0L0EvZVNVQ08zbGVYQzlFYjBPNFRQb0RYY055?=
- =?utf-8?B?eEsyTkNrcGdLV1BtOGo1Yjkrc0kxRUQ5VTNRSXp0TTY2R1lIRXJUdExtNEY3?=
- =?utf-8?B?VHBzd0tCalhqNjJyM3VwWWVlVDQ1Mzlod3BteUlCSHBVVHRxa1NkRDVaZHR2?=
- =?utf-8?B?YVlYSkVkUloxdnJWdzQwR0hHOVNZNHR0TkpiRkVIeTVQbE82OHJFOFpWd25L?=
- =?utf-8?B?MGEydW5nMUE0bFZLZ3ZmbFZRR0RHY29UaFVTSEZNbG92KzR0Y1QrNXhEdk5C?=
- =?utf-8?B?SExmdGFKdjlOQ2ZnRzQyZThmdzFXK3NuQ2Y3QVhDdnFtZUZNWkpJYlpyeUo1?=
- =?utf-8?B?MkdRcTZHTnBlMjB0dzFYdXd5aldaSFNQZktPaytXVEtiR2hKeVJ3b2YxVmlX?=
- =?utf-8?B?U01kTG5TVkFENUNtcHBQYXcxVzU5a0EvQ0t1cnN2ZDYrOUZYdSt0eFVJRDRh?=
- =?utf-8?B?OFBtaHFTdGU2NDYvaW4zMkt0RTREMUpETHlLbmwvbFlWb09CdjFCaUZ3TVBp?=
- =?utf-8?B?dXpXc3NwTzlMUGRLenpqaU9EdEdpQ25CYjNqQXBOSjdoZjRrYzVab0VWQXo3?=
- =?utf-8?B?TkczamNCbDZ5aGJvc0ZvT3V6QlZZdUFCL3VJZjd6TEx2ejV6N05LOTZuY1pq?=
- =?utf-8?B?dFdMNXJaMGRwcXVKWXREYW5XK2dzWXpTcXp2ZGwzbmpXY1lWekd3OVRZRDhB?=
- =?utf-8?B?WEkveUJMdVdRUi9SQ2NWM1MyQi9WV21DMHEwUTB6SGh1S0xYMXBYNUJUbFBk?=
- =?utf-8?B?eVRMbWtZNXo4Mk1Fa1d0U3pMajVtaGEwQkM0bUFxdzdzeXIyeVlKSzl4Umcx?=
- =?utf-8?B?bXBrSVl3bU91QU9INmtoQ0Jza2ptRWdIdE91VjRkM2lQRXlXQXMwLzBzZnZI?=
- =?utf-8?B?US9PSTZRRk4rYjhwS21DUG9YODJKMkNrNUxmMVFVbWUrd01ySzF2M2NJeXAy?=
- =?utf-8?B?VmQ1dHArQUVKQjJ0cEpVdk1EMlU1aSt2YnViLzVTMmR0UHNWTE5meTZxNTFE?=
- =?utf-8?B?aDlucml5T2pFeW05eGV0NCs4UnlrSHY3dXAvWTdyQnl0Zk4zUnp2TUM5U25D?=
- =?utf-8?B?bWxNOE9vTW9zYnI0UFBRcThPMDgzR0dzOUM5L2xveWFSaU5admxoNHBPOHlw?=
- =?utf-8?B?dHZMZ1lkL2pSSHRERHVOTUp1bjIzNkJha1BRYld3dDA1WW5QWS9XZ3g1Wmlq?=
- =?utf-8?B?MU5kQk5YUDJOR0lKM0liZUo5YnQ2OEM3OXJoTlR3cEtWOVpuVmZjcnZQU3h6?=
- =?utf-8?B?alp4TXFMKzBsS0J6Uy91ajRsajF5YUJJZ1M2S1BYWTVYN05QRUpOSHRILzdO?=
- =?utf-8?B?YmlpMHRpRDJXUVh1YWRSZGxaS09udktsYmluSEFzUGtUeC9hNlRvWnhuNXpV?=
- =?utf-8?B?M2lIRElMYmpHb2JQSGY4ZEE5V1ZpMW95N3dNb0VqOTBHdTBXWDNjRkFNU2lD?=
- =?utf-8?B?Q0gyKzJRMHI2eUtWdmtyM3h6Z0w2NFdKbi9DU1JCRlNxOWxsRFZJbG5wL2Uw?=
- =?utf-8?B?bHVqUXRweGtvZG5GbTV3clB0MlZzaFF2Z0NDSW1lTDBMWHBqL2drbFhKMjZa?=
- =?utf-8?B?VHVxcCtIaWVQV2JUWW9PMnIra3FZTWRUUERJZGVBZi9Hb2JtNVdDaVd1TW5T?=
- =?utf-8?B?L1N5YmRycFNTSDFWeU8yemJHbFFjdWZQNHhpY0J5cWJXNERjV3ViMlltVWd6?=
- =?utf-8?Q?W9/Q=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC45CA34
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 09:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718184214; cv=none; b=npkj+uhrnm7ZZGxTVPURgVf2r5k+TupMti5yZEiRYKgawXEYVuADqt5JQlQl4bdddbt+k9plmAqvnmEZQl/DlRmlSxWbON00ghAz09bXnTqKQSaOlR7TpgOqPCQiHyZc7yXuDlfJ9qYfg2UZr2YRhDJXK0KVqe5jUOpNsA2015c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718184214; c=relaxed/simple;
+	bh=iLt/ilr2LuP/tKI+lJ7ptKmdm5nnJ+DEiNuS/HP/A0c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fg3ui2jQ37eDttX/Idv8lZeVmp7/P7xQbR++AoSqjUD9gR2mrBGf4wEh372nhNqpIedZuivosYZPzhbcQg9iTe+rq6moEw0lK7accRypjxAgA5GtwX0zoHLy5SSy0TL40cFAzfRVVbSmPjPDCQmKViQrH6NiCAHczt2hbzPRy6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dhLUvhJN; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718184212; x=1749720212;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=iLt/ilr2LuP/tKI+lJ7ptKmdm5nnJ+DEiNuS/HP/A0c=;
+  b=dhLUvhJNb0RweZMMZd3bRITb7PRP13fHdKbvC+C4XvxtDcbENePiwwGD
+   ml+bPKXfwXhwRZSWn3usun5TlCAbUIjfdAox5+mbcdJjJncTsCq5ljmdw
+   nc3KizmETiBPwbr7/zuzAP9Y6tSJfjeqggVv3Vu83Kgr/R51qHCPL4lBQ
+   NmYoRaelgLRouEamtRwWrH0WGDIK/LDd8056roXCfdWsAnyncdiNf1Nfj
+   vMFEGddyXO4qnVulf/gvR5CWByhRC0+IzmsuJ9lqmrOdqBzEuyK05BUWA
+   iPYbVqVG7IdOKFfXwuBffa1KtvkjHXzGoCtI73fYCmEeWF2EOHzo+Ch3R
+   g==;
+X-CSE-ConnectionGUID: Z5lSzn7VTpCdAknWw2P89A==
+X-CSE-MsgGUID: 2khlv4flQBKtHSbrPbLk6w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="14732055"
+X-IronPort-AV: E=Sophos;i="6.08,232,1712646000"; 
+   d="scan'208";a="14732055"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 02:23:31 -0700
+X-CSE-ConnectionGUID: EYoD265pSkWKDyIPr9VlHQ==
+X-CSE-MsgGUID: ubAFLb9yTt+/MVNTcD70cQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,232,1712646000"; 
+   d="scan'208";a="39839843"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.51]) ([10.124.227.51])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 02:23:24 -0700
+Message-ID: <04932fb5-1ab4-4f8e-90dc-4f1a71feefb6@intel.com>
+Date: Wed, 12 Jun 2024 17:23:21 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR18MB5368.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 734ac1fd-cc0f-46d7-8cce-08dc8ac13712
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jun 2024 09:22:43.6792
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 9Mye/37kw3p8ljuRGbpLVygGbU/3+vloZbaolJJ4lAwiH6X7Z3VOz1zJjAazX4GNJ11Fl9PXHEvZiKMamm8oFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR18MB4518
-X-Proofpoint-GUID: x1kbCqDMDHFeEHeum9WwNcZjeeePifyp
-X-Proofpoint-ORIG-GUID: x1kbCqDMDHFeEHeum9WwNcZjeeePifyp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-12_05,2024-06-11_01,2024-05-17_01
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 17/65] i386/tdx: Adjust the supported CPUID based on
+ TDX restrictions
+To: "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <eduardo@habkost.net>,
+ Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
+ <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
+Cc: kvm@vger.kernel.org, qemu-devel@nongnu.org,
+ Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
+ Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
+ <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+References: <20240229063726.610065-1-xiaoyao.li@intel.com>
+ <20240229063726.610065-18-xiaoyao.li@intel.com>
+ <511a147e-bc01-7fab-24d7-4ae66a6d1c44@intel.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <511a147e-bc01-7fab-24d7-4ae66a6d1c44@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-DQo+IFN1YmplY3Q6IFJlOiBbRVhURVJOQUxdIFJlOiBbUEFUQ0hdIHZkcGE6IEFkZCBzdXBwb3J0
-IGZvciBuby1JT01NVSBtb2RlDQo+IA0KPiBPbiBUdWUsIEp1biA0LCAyMDI0IGF0IDU6MjnigK9Q
-TSBTcnVqYW5hIENoYWxsYSA8c2NoYWxsYUBtYXJ2ZWxsLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiA+
-IFN1YmplY3Q6IFtFWFRFUk5BTF0gUmU6IFtQQVRDSF0gdmRwYTogQWRkIHN1cHBvcnQgZm9yIG5v
-LUlPTU1VIG1vZGUNCj4gPiA+DQo+ID4gPiBQcmlvcml0aXplIHNlY3VyaXR5IGZvciBleHRlcm5h
-bCBlbWFpbHM6IENvbmZpcm0gc2VuZGVyIGFuZCBjb250ZW50DQo+ID4gPiBzYWZldHkgYmVmb3Jl
-IGNsaWNraW5nIGxpbmtzIG9yIG9wZW5pbmcgYXR0YWNobWVudHMNCj4gPiA+DQo+ID4gPiAtLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLQ0KPiA+ID4gLS0gT24gVGh1LCBNYXkgMzAsIDIwMjQgYXQgNjoxOOKAr1BNIFNydWph
-bmEgQ2hhbGxhDQo+ID4gPiA8c2NoYWxsYUBtYXJ2ZWxsLmNvbT4NCj4gPiA+IHdyb3RlOg0KPiA+
-ID4gPg0KPiA+ID4gPiBUaGlzIGNvbW1pdCBpbnRyb2R1Y2VzIHN1cHBvcnQgZm9yIGFuIFVOU0FG
-RSwgbm8tSU9NTVUgbW9kZSBpbiB0aGUNCj4gPiA+ID4gdmhvc3QtdmRwYSBkcml2ZXIuIFdoZW4g
-ZW5hYmxlZCwgdGhpcyBtb2RlIHByb3ZpZGVzIG5vIGRldmljZQ0KPiA+ID4gPiBpc29sYXRpb24s
-IG5vIERNQSB0cmFuc2xhdGlvbiwgbm8gaG9zdCBrZXJuZWwgcHJvdGVjdGlvbiwgYW5kDQo+ID4g
-PiA+IGNhbm5vdCBiZSB1c2VkIGZvciBkZXZpY2UgYXNzaWdubWVudCB0byB2aXJ0dWFsIG1hY2hp
-bmVzLiBJdA0KPiA+ID4gPiByZXF1aXJlcyBSQVdJTyBwZXJtaXNzaW9ucyBhbmQgd2lsbCB0YWlu
-dCB0aGUga2VybmVsLg0KPiA+ID4gPiBUaGlzIG1vZGUgcmVxdWlyZXMgZW5hYmxpbmcgdGhlDQo+
-ID4gPiAiZW5hYmxlX3Zob3N0X3ZkcGFfdW5zYWZlX25vaW9tbXVfbW9kZSINCj4gPiA+ID4gb3B0
-aW9uIG9uIHRoZSB2aG9zdC12ZHBhIGRyaXZlci4gVGhpcyBtb2RlIHdvdWxkIGJlIHVzZWZ1bCB0
-byBnZXQNCj4gPiA+ID4gYmV0dGVyIHBlcmZvcm1hbmNlIG9uIHNwZWNpZmljZSBsb3cgZW5kIG1h
-Y2hpbmVzIGFuZCBjYW4gYmUNCj4gPiA+ID4gbGV2ZXJhZ2VkIGJ5IGVtYmVkZGVkIHBsYXRmb3Jt
-cyB3aGVyZSBhcHBsaWNhdGlvbnMgcnVuIGluIGNvbnRyb2xsZWQNCj4gZW52aXJvbm1lbnQuDQo+
-ID4gPg0KPiA+ID4gSSB3b25kZXIgaWYgaXQncyBiZXR0ZXIgdG8gZG8gaXQgcGVyIGRyaXZlcjoN
-Cj4gPiA+DQo+ID4gPiAxKSB3ZSBoYXZlIGRldmljZSB0aGF0IHVzZSBpdHMgb3duIElPTU1VLCBv
-bmUgZXhhbXBsZSBpcyB0aGUgbWx4NQ0KPiA+ID4gdkRQQSBkZXZpY2UNCj4gPiA+IDIpIHdlIGhh
-dmUgc29mdHdhcmUgZGV2aWNlcyB3aGljaCBkb2Vzbid0IHJlcXVpcmUgSU9NTVUgYXQgYWxsIChi
-dXQNCj4gPiA+IHN0aWxsIHdpdGgNCj4gPiA+IHByb3RlY3Rpb24pDQo+ID4NCj4gPiBJZiBJIHVu
-ZGVyc3RhbmQgY29ycmVjdGx5LCB5b3XigJlyZSBzdWdnZXN0aW5nIHRoYXQgd2UgY3JlYXRlIGEg
-bW9kdWxlDQo+ID4gcGFyYW1ldGVyIHNwZWNpZmljIHRvIHRoZSB2ZHBhIGRyaXZlci4gVGhlbiwg
-d2UgY2FuIGFkZCBhIGZsYWcgdG8gdGhlIOKAmHN0cnVjdA0KPiB2ZHBhX2RldmljZeKAmQ0KPiA+
-IGFuZCBzZXQgdGhhdCBmbGFnIHdpdGhpbiB0aGUgdmRwYSBkcml2ZXIgYmFzZWQgb24gdGhlIG1v
-ZHVsZSBwYXJhbWV0ZXIuDQo+ID4gRmluYWxseSwgd2Ugd291bGQgdXNlIHRoaXMgZmxhZyB0byB0
-YWludCB0aGUga2VybmVsIGFuZCBnbyBpbiBuby1pb21tdQ0KPiA+IHBhdGggaW4gdGhlIHZob3N0
-LXZkcGEgZHJpdmVyPw0KPiANCj4gSWYgaXQncyBwb3NzaWJsZSwgSSB3b3VsZCBsaWtlIHRvIGF2
-b2lkIGNoYW5naW5nIHRoZSB2RFBBIGNvcmUuDQo+IA0KPiBUaGFua3MNCkFjY29yZGluZyB0byBt
-eSB1bmRlcnN0YW5kaW5nIG9mIHRoZSBkaXNjdXNzaW9uIGF0IHRoZQ0KaHR0cHM6Ly9sb3JlLmtl
-cm5lbC5vcmcvYWxsLzIwMjQwNDIyMTY0MTA4LW11dHQtc2VuZC1lbWFpbC1tc3RAa2VybmVsLm9y
-ZywNCk1pY2hhZWwgaGFzIHN1Z2dlc3RlZCBmb2N1c2luZyBvbiBpbXBsZW1lbnRpbmcgYSBuby1J
-T01NVSBtb2RlIGluIHZkcGEuDQpNaWNoYWVsLCBjb3VsZCB5b3UgcGxlYXNlIGNvbmZpcm0gaWYg
-aXQncyBmaW5lIHRvIHRyYW5zZmVyIGFsbCB0aGVzZSByZWxldmFudA0KbW9kaWZpY2F0aW9ucyB0
-byBNYXJ2ZWxsJ3MgdmRwYSBkcml2ZXI/DQoNClRoYW5rcy4NCj4gDQo+ID4gPg0KPiA+ID4gVGhh
-bmtzDQo+ID4gPg0KPiA+ID4gPg0KPiA+ID4gPiBTaWduZWQtb2ZmLWJ5OiBTcnVqYW5hIENoYWxs
-YSA8c2NoYWxsYUBtYXJ2ZWxsLmNvbT4NCj4gPiA+ID4gLS0tDQo+ID4gPiA+ICBkcml2ZXJzL3Zo
-b3N0L3ZkcGEuYyB8IDIzICsrKysrKysrKysrKysrKysrKysrKysrDQo+ID4gPiA+ICAxIGZpbGUg
-Y2hhbmdlZCwgMjMgaW5zZXJ0aW9ucygrKQ0KPiA+ID4gPg0KPiA+ID4gPiBkaWZmIC0tZ2l0IGEv
-ZHJpdmVycy92aG9zdC92ZHBhLmMgYi9kcml2ZXJzL3Zob3N0L3ZkcGEuYyBpbmRleA0KPiA+ID4g
-PiBiYzRhNTFlNDYzOGIuLmQwNzFjMzAxMjVhYSAxMDA2NDQNCj4gPiA+ID4gLS0tIGEvZHJpdmVy
-cy92aG9zdC92ZHBhLmMNCj4gPiA+ID4gKysrIGIvZHJpdmVycy92aG9zdC92ZHBhLmMNCj4gPiA+
-ID4gQEAgLTM2LDYgKzM2LDExIEBAIGVudW0gew0KPiA+ID4gPg0KPiA+ID4gPiAgI2RlZmluZSBW
-SE9TVF9WRFBBX0lPVExCX0JVQ0tFVFMgMTYNCj4gPiA+ID4NCj4gPiA+ID4gK2Jvb2wgdmhvc3Rf
-dmRwYV9ub2lvbW11Ow0KPiA+ID4gPiArbW9kdWxlX3BhcmFtX25hbWVkKGVuYWJsZV92aG9zdF92
-ZHBhX3Vuc2FmZV9ub2lvbW11X21vZGUsDQo+ID4gPiA+ICsgICAgICAgICAgICAgICAgICB2aG9z
-dF92ZHBhX25vaW9tbXUsIGJvb2wsIDA2NDQpOw0KPiA+ID4gPiArTU9EVUxFX1BBUk1fREVTQyhl
-bmFibGVfdmhvc3RfdmRwYV91bnNhZmVfbm9pb21tdV9tb2RlLA0KPiA+ID4gIkVuYWJsZQ0KPiA+
-ID4gPiArVU5TQUZFLCBuby1JT01NVSBtb2RlLiAgVGhpcyBtb2RlIHByb3ZpZGVzIG5vIGRldmlj
-ZSBpc29sYXRpb24sDQo+ID4gPiA+ICtubyBETUEgdHJhbnNsYXRpb24sIG5vIGhvc3Qga2VybmVs
-IHByb3RlY3Rpb24sIGNhbm5vdCBiZSB1c2VkIGZvcg0KPiA+ID4gPiArZGV2aWNlIGFzc2lnbm1l
-bnQgdG8gdmlydHVhbCBtYWNoaW5lcywgcmVxdWlyZXMgUkFXSU8NCj4gPiA+ID4gK3Blcm1pc3Np
-b25zLCBhbmQgd2lsbCB0YWludCB0aGUga2VybmVsLiAgSWYgeW91IGRvIG5vdCBrbm93IHdoYXQg
-dGhpcyBpcw0KPiBmb3IsIHN0ZXAgYXdheS4NCj4gPiA+ID4gKyhkZWZhdWx0OiBmYWxzZSkiKTsN
-Cj4gPiA+ID4gKw0KPiA+ID4gPiAgc3RydWN0IHZob3N0X3ZkcGFfYXMgew0KPiA+ID4gPiAgICAg
-ICAgIHN0cnVjdCBobGlzdF9ub2RlIGhhc2hfbGluazsNCj4gPiA+ID4gICAgICAgICBzdHJ1Y3Qg
-dmhvc3RfaW90bGIgaW90bGI7DQo+ID4gPiA+IEBAIC02MCw2ICs2NSw3IEBAIHN0cnVjdCB2aG9z
-dF92ZHBhIHsNCj4gPiA+ID4gICAgICAgICBzdHJ1Y3QgdmRwYV9pb3ZhX3JhbmdlIHJhbmdlOw0K
-PiA+ID4gPiAgICAgICAgIHUzMiBiYXRjaF9hc2lkOw0KPiA+ID4gPiAgICAgICAgIGJvb2wgc3Vz
-cGVuZGVkOw0KPiA+ID4gPiArICAgICAgIGJvb2wgbm9pb21tdV9lbjsNCj4gPiA+ID4gIH07DQo+
-ID4gPiA+DQo+ID4gPiA+ICBzdGF0aWMgREVGSU5FX0lEQSh2aG9zdF92ZHBhX2lkYSk7IEBAIC04
-ODcsNiArODkzLDEwIEBAIHN0YXRpYw0KPiA+ID4gPiB2b2lkIHZob3N0X3ZkcGFfZ2VuZXJhbF91
-bm1hcChzdHJ1Y3Qgdmhvc3RfdmRwYSAqdiwgIHsNCj4gPiA+ID4gICAgICAgICBzdHJ1Y3QgdmRw
-YV9kZXZpY2UgKnZkcGEgPSB2LT52ZHBhOw0KPiA+ID4gPiAgICAgICAgIGNvbnN0IHN0cnVjdCB2
-ZHBhX2NvbmZpZ19vcHMgKm9wcyA9IHZkcGEtPmNvbmZpZzsNCj4gPiA+ID4gKw0KPiA+ID4gPiAr
-ICAgICAgIGlmICh2LT5ub2lvbW11X2VuKQ0KPiA+ID4gPiArICAgICAgICAgICAgICAgcmV0dXJu
-Ow0KPiA+ID4gPiArDQo+ID4gPiA+ICAgICAgICAgaWYgKG9wcy0+ZG1hX21hcCkgew0KPiA+ID4g
-PiAgICAgICAgICAgICAgICAgb3BzLT5kbWFfdW5tYXAodmRwYSwgYXNpZCwgbWFwLT5zdGFydCwg
-bWFwLT5zaXplKTsNCj4gPiA+ID4gICAgICAgICB9IGVsc2UgaWYgKG9wcy0+c2V0X21hcCA9PSBO
-VUxMKSB7IEBAIC05ODAsNiArOTkwLDkgQEANCj4gPiA+ID4gc3RhdGljIGludCB2aG9zdF92ZHBh
-X21hcChzdHJ1Y3Qgdmhvc3RfdmRwYSAqdiwgc3RydWN0IHZob3N0X2lvdGxiDQo+ICppb3RsYiwN
-Cj4gPiA+ID4gICAgICAgICBpZiAocikNCj4gPiA+ID4gICAgICAgICAgICAgICAgIHJldHVybiBy
-Ow0KPiA+ID4gPg0KPiA+ID4gPiArICAgICAgIGlmICh2LT5ub2lvbW11X2VuKQ0KPiA+ID4gPiAr
-ICAgICAgICAgICAgICAgZ290byBza2lwX21hcDsNCj4gPiA+ID4gKw0KPiA+ID4gPiAgICAgICAg
-IGlmIChvcHMtPmRtYV9tYXApIHsNCj4gPiA+ID4gICAgICAgICAgICAgICAgIHIgPSBvcHMtPmRt
-YV9tYXAodmRwYSwgYXNpZCwgaW92YSwgc2l6ZSwgcGEsIHBlcm0sIG9wYXF1ZSk7DQo+ID4gPiA+
-ICAgICAgICAgfSBlbHNlIGlmIChvcHMtPnNldF9tYXApIHsgQEAgLTk5NSw2ICsxMDA4LDcgQEAg
-c3RhdGljIGludA0KPiA+ID4gPiB2aG9zdF92ZHBhX21hcChzdHJ1Y3Qgdmhvc3RfdmRwYSAqdiwN
-Cj4gPiA+IHN0cnVjdCB2aG9zdF9pb3RsYiAqaW90bGIsDQo+ID4gPiA+ICAgICAgICAgICAgICAg
-ICByZXR1cm4gcjsNCj4gPiA+ID4gICAgICAgICB9DQo+ID4gPiA+DQo+ID4gPiA+ICtza2lwX21h
-cDoNCj4gPiA+ID4gICAgICAgICBpZiAoIXZkcGEtPnVzZV92YSkNCj4gPiA+ID4gICAgICAgICAg
-ICAgICAgIGF0b21pYzY0X2FkZChQRk5fRE9XTihzaXplKSwgJmRldi0+bW0tPnBpbm5lZF92bSk7
-DQo+ID4gPiA+DQo+ID4gPiA+IEBAIC0xMjk4LDYgKzEzMTIsNyBAQCBzdGF0aWMgaW50IHZob3N0
-X3ZkcGFfYWxsb2NfZG9tYWluKHN0cnVjdA0KPiA+ID4gdmhvc3RfdmRwYSAqdikNCj4gPiA+ID4g
-ICAgICAgICBzdHJ1Y3QgdmRwYV9kZXZpY2UgKnZkcGEgPSB2LT52ZHBhOw0KPiA+ID4gPiAgICAg
-ICAgIGNvbnN0IHN0cnVjdCB2ZHBhX2NvbmZpZ19vcHMgKm9wcyA9IHZkcGEtPmNvbmZpZzsNCj4g
-PiA+ID4gICAgICAgICBzdHJ1Y3QgZGV2aWNlICpkbWFfZGV2ID0gdmRwYV9nZXRfZG1hX2Rldih2
-ZHBhKTsNCj4gPiA+ID4gKyAgICAgICBzdHJ1Y3QgaW9tbXVfZG9tYWluICpkb21haW47DQo+ID4g
-PiA+ICAgICAgICAgY29uc3Qgc3RydWN0IGJ1c190eXBlICpidXM7DQo+ID4gPiA+ICAgICAgICAg
-aW50IHJldDsNCj4gPiA+ID4NCj4gPiA+ID4gQEAgLTEzMDUsNiArMTMyMCwxNCBAQCBzdGF0aWMg
-aW50IHZob3N0X3ZkcGFfYWxsb2NfZG9tYWluKHN0cnVjdA0KPiA+ID4gdmhvc3RfdmRwYSAqdikN
-Cj4gPiA+ID4gICAgICAgICBpZiAob3BzLT5zZXRfbWFwIHx8IG9wcy0+ZG1hX21hcCkNCj4gPiA+
-ID4gICAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiA+ID4gPg0KPiA+ID4gPiArICAgICAgIGRv
-bWFpbiA9IGlvbW11X2dldF9kb21haW5fZm9yX2RldihkbWFfZGV2KTsNCj4gPiA+ID4gKyAgICAg
-ICBpZiAoKCFkb21haW4gfHwgZG9tYWluLT50eXBlID09IElPTU1VX0RPTUFJTl9JREVOVElUWSkg
-JiYNCj4gPiA+ID4gKyAgICAgICAgICAgdmhvc3RfdmRwYV9ub2lvbW11ICYmIGNhcGFibGUoQ0FQ
-X1NZU19SQVdJTykpIHsNCj4gPiA+ID4gKyAgICAgICAgICAgICAgIGFkZF90YWludChUQUlOVF9V
-U0VSLCBMT0NLREVQX1NUSUxMX09LKTsNCj4gPiA+ID4gKyAgICAgICAgICAgICAgIGRldl93YXJu
-KCZ2LT5kZXYsICJBZGRpbmcga2VybmVsIHRhaW50IGZvciBub2lvbW11DQo+ID4gPiA+ICsgb24N
-Cj4gPiA+IGRldmljZVxuIik7DQo+ID4gPiA+ICsgICAgICAgICAgICAgICB2LT5ub2lvbW11X2Vu
-ID0gdHJ1ZTsNCj4gPiA+ID4gKyAgICAgICAgICAgICAgIHJldHVybiAwOw0KPiA+ID4gPiArICAg
-ICAgIH0NCj4gPiA+ID4gICAgICAgICBidXMgPSBkbWFfZGV2LT5idXM7DQo+ID4gPiA+ICAgICAg
-ICAgaWYgKCFidXMpDQo+ID4gPiA+ICAgICAgICAgICAgICAgICByZXR1cm4gLUVGQVVMVDsNCj4g
-PiA+ID4gLS0NCj4gPiA+ID4gMi4yNS4xDQo+ID4gPiA+DQo+ID4NCg0K
+On 5/31/2024 4:47 PM, Duan, Zhenzhong wrote:
+> 
+> On 2/29/2024 2:36 PM, Xiaoyao Li wrote:
+>> According to Chapter "CPUID Virtualization" in TDX module spec, CPUID
+>> bits of TD can be classified into 6 types:
+>>
+>> ------------------------------------------------------------------------
+>> 1 | As configured | configurable by VMM, independent of native value;
+>> ------------------------------------------------------------------------
+>> 2 | As configured | configurable by VMM if the bit is supported natively
+>>      (if native)   | Otherwise it equals as native(0).
+>> ------------------------------------------------------------------------
+>> 3 | Fixed         | fixed to 0/1
+>> ------------------------------------------------------------------------
+>> 4 | Native        | reflect the native value
+>> ------------------------------------------------------------------------
+>> 5 | Calculated    | calculated by TDX module.
+>> ------------------------------------------------------------------------
+>> 6 | Inducing #VE  | get #VE exception
+>> ------------------------------------------------------------------------
+>>
+>> Note:
+>> 1. All the configurable XFAM related features and TD attributes related
+>>     features fall into type #2. And fixed0/1 bits of XFAM and TD
+>>     attributes fall into type #3.
+>>
+>> 2. For CPUID leaves not listed in "CPUID virtualization Overview" table
+>>     in TDX module spec, TDX module injects #VE to TDs when those are
+>>     queried. For this case, TDs can request CPUID emulation from VMM via
+>>     TDVMCALL and the values are fully controlled by VMM.
+>>
+>> Due to TDX module has its own virtualization policy on CPUID bits, it 
+>> leads
+>> to what reported via KVM_GET_SUPPORTED_CPUID diverges from the supported
+>> CPUID bits for TDs. In order to keep a consistent CPUID configuration
+>> between VMM and TDs. Adjust supported CPUID for TDs based on TDX
+>> restrictions.
+>>
+>> Currently only focus on the CPUID leaves recognized by QEMU's
+>> feature_word_info[] that are indexed by a FeatureWord.
+>>
+>> Introduce a TDX CPUID lookup table, which maintains 1 entry for each
+>> FeatureWord. Each entry has below fields:
+>>
+>>   - tdx_fixed0/1: The bits that are fixed as 0/1;
+>>
+>>   - depends_on_vmm_cap: The bits that are configurable from the view of
+>>                TDX module. But they requires emulation of VMM
+>>                when configured as enabled. For those, they are
+>>                not supported if VMM doesn't report them as
+>>                supported. So they need be fixed up by checking
+>>                if VMM supports them.
+> 
+> Previously I thought bits configurable for TDX module are emulated by 
+> TDX module,
+> 
+> it looks not. Just curious why doesn't those bits belong to "Inducing 
+> #VE" type?
+
+Because when TD guest queries this type of CPUID leaf, it doesn't get #VE.
+
+The bits in this category are free to be configured as on/off by VMM and 
+passed to TDX module via TD_PARAM. Once they get configured, they are 
+queried directly by TD guest without getting #VE.
+
+The problem is whether VMM allows them to be configured freely. E.g., 
+for features TME and PCONFIG, they are configurable. However when VMM 
+configures them to 1, VMM needs to provide the support of related MSRs 
+of them. If VMM cannot provide such support, VMM should be allow user to 
+configured to 1.
+
+That's why we have this kind of type.
+
+BTW, we are going to abondan the solution that let QEMU to maintain the 
+CPUID configurability table in this series. Next version we will come up 
+with
+
+> Then guest can get KVM reported capabilities with tdvmcall directly.
+> 
+>>
+>>   - inducing_ve: TD gets #VE when querying this CPUID leaf. The result is
+>>                  totally configurable by VMM.
+>>
+>>   - supported_on_ve: It's valid only when @inducing_ve is true. It 
+>> represents
+>>             the maximum feature set supported that be emulated
+>>             for TDs.
+> This is never used together with depends_on_vmm_cap, maybe one variable 
+> is enough?
+>>
+>> By applying TDX CPUID lookup table and TDX capabilities reported from
+>> TDX module, the supported CPUID for TDs can be obtained from following
+>> steps:
+>>
+>> - get the base of VMM supported feature set;
+>>
+>> - if the leaf is not a FeatureWord just return VMM's value without
+>>    modification;
+>>
+>> - if the leaf is an inducing_ve type, applying supported_on_ve mask and
+>>    return;
+>>
+>> - include all native bits, it covers type #2, #4, and parts of type #1.
+>>    (it also includes some unsupported bits. The following step will
+>>     correct it.)
+>>
+>> - apply fixed0/1 to it (it covers #3, and rectifies the previous step);
+>>
+>> - add configurable bits (it covers the other part of type #1);
+>>
+>> - fix the ones in vmm_fixup;
+>>
+>> (Calculated type is ignored since it's determined at runtime).
+>>
+>> Co-developed-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   target/i386/cpu.h     |  16 +++
+>>   target/i386/kvm/kvm.c |   4 +
+>>   target/i386/kvm/tdx.c | 263 ++++++++++++++++++++++++++++++++++++++++++
+>>   target/i386/kvm/tdx.h |   3 +
+>>   4 files changed, 286 insertions(+)
+>>
+>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>> index 952174bb6f52..7bd604f802a1 100644
+>> --- a/target/i386/cpu.h
+>> +++ b/target/i386/cpu.h
+>> @@ -787,6 +787,8 @@ uint64_t 
+>> x86_cpu_get_supported_feature_word(FeatureWord w,
+>>   /* Support RDFSBASE/RDGSBASE/WRFSBASE/WRGSBASE */
+>>   #define CPUID_7_0_EBX_FSGSBASE          (1U << 0)
+>> +/* Support for TSC adjustment MSR 0x3B */
+>> +#define CPUID_7_0_EBX_TSC_ADJUST        (1U << 1)
+>>   /* Support SGX */
+>>   #define CPUID_7_0_EBX_SGX               (1U << 2)
+>>   /* 1st Group of Advanced Bit Manipulation Extensions */
+>> @@ -805,8 +807,12 @@ uint64_t 
+>> x86_cpu_get_supported_feature_word(FeatureWord w,
+>>   #define CPUID_7_0_EBX_INVPCID           (1U << 10)
+>>   /* Restricted Transactional Memory */
+>>   #define CPUID_7_0_EBX_RTM               (1U << 11)
+>> +/* Cache QoS Monitoring */
+>> +#define CPUID_7_0_EBX_PQM               (1U << 12)
+>>   /* Memory Protection Extension */
+>>   #define CPUID_7_0_EBX_MPX               (1U << 14)
+>> +/* Resource Director Technology Allocation */
+>> +#define CPUID_7_0_EBX_RDT_A             (1U << 15)
+>>   /* AVX-512 Foundation */
+>>   #define CPUID_7_0_EBX_AVX512F           (1U << 16)
+>>   /* AVX-512 Doubleword & Quadword Instruction */
+>> @@ -862,10 +868,16 @@ uint64_t 
+>> x86_cpu_get_supported_feature_word(FeatureWord w,
+>>   #define CPUID_7_0_ECX_AVX512VNNI        (1U << 11)
+>>   /* Support for VPOPCNT[B,W] and VPSHUFBITQMB */
+>>   #define CPUID_7_0_ECX_AVX512BITALG      (1U << 12)
+>> +/* Intel Total Memory Encryption */
+>> +#define CPUID_7_0_ECX_TME               (1U << 13)
+>>   /* POPCNT for vectors of DW/QW */
+>>   #define CPUID_7_0_ECX_AVX512_VPOPCNTDQ  (1U << 14)
+>> +/* Placeholder for bit 15 */
+>> +#define CPUID_7_0_ECX_FZM               (1U << 15)
+>>   /* 5-level Page Tables */
+>>   #define CPUID_7_0_ECX_LA57              (1U << 16)
+>> +/* MAWAU for MPX */
+>> +#define CPUID_7_0_ECX_MAWAU             (31U << 17)
+>>   /* Read Processor ID */
+>>   #define CPUID_7_0_ECX_RDPID             (1U << 22)
+>>   /* Bus Lock Debug Exception */
+>> @@ -876,6 +888,8 @@ uint64_t 
+>> x86_cpu_get_supported_feature_word(FeatureWord w,
+>>   #define CPUID_7_0_ECX_MOVDIRI           (1U << 27)
+>>   /* Move 64 Bytes as Direct Store Instruction */
+>>   #define CPUID_7_0_ECX_MOVDIR64B         (1U << 28)
+>> +/* ENQCMD and ENQCMDS instructions */
+>> +#define CPUID_7_0_ECX_ENQCMD            (1U << 29)
+>>   /* Support SGX Launch Control */
+>>   #define CPUID_7_0_ECX_SGX_LC            (1U << 30)
+>>   /* Protection Keys for Supervisor-mode Pages */
+>> @@ -893,6 +907,8 @@ uint64_t 
+>> x86_cpu_get_supported_feature_word(FeatureWord w,
+>>   #define CPUID_7_0_EDX_SERIALIZE         (1U << 14)
+>>   /* TSX Suspend Load Address Tracking instruction */
+>>   #define CPUID_7_0_EDX_TSX_LDTRK         (1U << 16)
+>> +/* PCONFIG instruction */
+>> +#define CPUID_7_0_EDX_PCONFIG           (1U << 18)
+>>   /* Architectural LBRs */
+>>   #define CPUID_7_0_EDX_ARCH_LBR          (1U << 19)
+>>   /* AMX_BF16 instruction */
+>> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+>> index 0e68e80f4291..389b631c03dd 100644
+>> --- a/target/i386/kvm/kvm.c
+>> +++ b/target/i386/kvm/kvm.c
+>> @@ -520,6 +520,10 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState 
+>> *s, uint32_t function,
+>>           ret |= 1U << KVM_HINTS_REALTIME;
+>>       }
+>> +    if (is_tdx_vm()) {
+>> +        tdx_get_supported_cpuid(function, index, reg, &ret);
+>> +    }
+>> +
+>>       return ret;
+>>   }
+>> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+>> index 756058f2ed4a..85d96140b450 100644
+>> --- a/target/i386/kvm/tdx.c
+>> +++ b/target/i386/kvm/tdx.c
+>> @@ -15,11 +15,129 @@
+>>   #include "qemu/error-report.h"
+>>   #include "qapi/error.h"
+>>   #include "qom/object_interfaces.h"
+>> +#include "standard-headers/asm-x86/kvm_para.h"
+>>   #include "sysemu/kvm.h"
+>> +#include "sysemu/sysemu.h"
+>>   #include "hw/i386/x86.h"
+>>   #include "kvm_i386.h"
+>>   #include "tdx.h"
+>> +#include "../cpu-internal.h"
+>> +
+>> +#define TDX_SUPPORTED_KVM_FEATURES  ((1U << KVM_FEATURE_NOP_IO_DELAY) 
+>> | \
+>> +                                     (1U << KVM_FEATURE_PV_UNHALT) | \
+>> +                                     (1U << KVM_FEATURE_PV_TLB_FLUSH) 
+>> | \
+>> +                                     (1U << KVM_FEATURE_PV_SEND_IPI) | \
+>> +                                     (1U << KVM_FEATURE_POLL_CONTROL) 
+>> | \
+>> +                                     (1U << 
+>> KVM_FEATURE_PV_SCHED_YIELD) | \
+>> +                                     (1U << 
+>> KVM_FEATURE_MSI_EXT_DEST_ID))
+>> +
+>> +typedef struct KvmTdxCpuidLookup {
+>> +    uint32_t tdx_fixed0;
+>> +    uint32_t tdx_fixed1;
+>> +
+>> +    /*
+>> +     * The CPUID bits that are configurable from the view of TDX module
+>> +     * but require VMM's support when wanting to enable them.
+>> +     *
+>> +     * For those bits, they cannot be enabled if VMM (KVM/QEMU) 
+>> doesn't support
+>> +     * them.
+>> +     */
+>> +    uint32_t depends_on_vmm_cap;
+>> +
+>> +    bool inducing_ve;
+>> +    /*
+>> +     * The maximum supported feature set for given inducing-#VE leaf.
+>> +     * It's valid only when .inducing_ve is true.
+>> +     */
+>> +    uint32_t supported_value_on_ve;
+>> +} KvmTdxCpuidLookup;
+>> +
+>> + /*
+>> +  * QEMU maintained TDX CPUID lookup tables, which reflects how 
+>> CPUIDs are
+>> +  * virtualized for guest TDs based on "CPUID virtualization" of TDX 
+>> spec.
+>> +  *
+>> +  * Note:
+>> +  *
+>> +  * This table will be updated runtime by tdx_caps reported by KVM.
+>> +  *
+>> +  */
+>> +static KvmTdxCpuidLookup tdx_cpuid_lookup[FEATURE_WORDS] = {
+>> +    [FEAT_1_EDX] = {
+>> +        .tdx_fixed0 =
+>> +            BIT(10) /* Reserved */ | BIT(20) /* Reserved */ | 
+>> CPUID_IA64,
+>> +        .tdx_fixed1 =
+>> +            CPUID_MSR | CPUID_PAE | CPUID_MCE | CPUID_APIC |
+>> +            CPUID_MTRR | CPUID_MCA | CPUID_CLFLUSH | CPUID_DTS,
+>> +        .depends_on_vmm_cap =
+>> +            CPUID_ACPI | CPUID_PBE,
+>> +    },
+>> +    [FEAT_1_ECX] = {
+>> +        .tdx_fixed0 =
+>> +            CPUID_EXT_VMX | CPUID_EXT_SMX | BIT(16) /* Reserved */,
+>> +        .tdx_fixed1 =
+>> +            CPUID_EXT_CX16 | CPUID_EXT_PDCM | CPUID_EXT_X2APIC |
+>> +            CPUID_EXT_AES | CPUID_EXT_XSAVE | CPUID_EXT_RDRAND |
+>> +            CPUID_EXT_HYPERVISOR,
+>> +        .depends_on_vmm_cap =
+>> +            CPUID_EXT_EST | CPUID_EXT_TM2 | CPUID_EXT_XTPR | 
+>> CPUID_EXT_DCA,
+>> +    },
+>> +    [FEAT_8000_0001_EDX] = {
+>> +        .tdx_fixed1 =
+>> +            CPUID_EXT2_NX | CPUID_EXT2_PDPE1GB | CPUID_EXT2_RDTSCP |
+>> +            CPUID_EXT2_LM,
+>> +    },
+>> +    [FEAT_7_0_EBX] = {
+>> +        .tdx_fixed0 =
+>> +            CPUID_7_0_EBX_TSC_ADJUST | CPUID_7_0_EBX_SGX | 
+>> CPUID_7_0_EBX_MPX,
+>> +        .tdx_fixed1 =
+>> +            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_RTM |
+>> +            CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_SMAP |
+>> +            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
+>> +            CPUID_7_0_EBX_SHA_NI,
+>> +        .depends_on_vmm_cap =
+>> +            CPUID_7_0_EBX_PQM | CPUID_7_0_EBX_RDT_A,
+>> +    },
+>> +    [FEAT_7_0_ECX] = {
+>> +        .tdx_fixed0 =
+>> +            CPUID_7_0_ECX_FZM | CPUID_7_0_ECX_MAWAU |
+>> +            CPUID_7_0_ECX_ENQCMD | CPUID_7_0_ECX_SGX_LC,
+>> +        .tdx_fixed1 =
+>> +            CPUID_7_0_ECX_MOVDIR64B | CPUID_7_0_ECX_BUS_LOCK_DETECT,
+>> +        .depends_on_vmm_cap =
+>> +            CPUID_7_0_ECX_TME,
+>> +    },
+>> +    [FEAT_7_0_EDX] = {
+>> +        .tdx_fixed1 =
+>> +            CPUID_7_0_EDX_SPEC_CTRL | CPUID_7_0_EDX_ARCH_CAPABILITIES |
+>> +            CPUID_7_0_EDX_CORE_CAPABILITY | 
+>> CPUID_7_0_EDX_SPEC_CTRL_SSBD,
+>> +        .depends_on_vmm_cap =
+>> +            CPUID_7_0_EDX_PCONFIG,
+>> +    },
+>> +    [FEAT_8000_0008_EBX] = {
+>> +        .tdx_fixed0 =
+>> +            ~CPUID_8000_0008_EBX_WBNOINVD,
+>> +        .tdx_fixed1 =
+>> +            CPUID_8000_0008_EBX_WBNOINVD,
+>> +    },
+>> +    [FEAT_XSAVE] = {
+>> +        .tdx_fixed1 =
+>> +            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
+>> +            CPUID_XSAVE_XSAVES,
+>> +    },
+>> +    [FEAT_6_EAX] = {
+>> +        .inducing_ve = true,
+>> +        .supported_value_on_ve = CPUID_6_EAX_ARAT,
+>> +    },
+>> +    [FEAT_8000_0007_EDX] = {
+>> +        .inducing_ve = true,
+>> +        .supported_value_on_ve = -1U,
+>> +    },
+>> +    [FEAT_KVM] = {
+>> +        .inducing_ve = true,
+>> +        .supported_value_on_ve = TDX_SUPPORTED_KVM_FEATURES,
+>> +    },
+>> +};
+>>   static TdxGuest *tdx_guest;
+>> @@ -31,6 +149,151 @@ bool is_tdx_vm(void)
+>>       return !!tdx_guest;
+>>   }
+>> +static inline uint32_t host_cpuid_reg(uint32_t function,
+>> +                                      uint32_t index, int reg)
+>> +{
+>> +    uint32_t eax, ebx, ecx, edx;
+>> +    uint32_t ret = 0;
+>> +
+>> +    host_cpuid(function, index, &eax, &ebx, &ecx, &edx);
+>> +
+>> +    switch (reg) {
+>> +    case R_EAX:
+>> +        ret = eax;
+>> +        break;
+>> +    case R_EBX:
+>> +        ret = ebx;
+>> +        break;
+>> +    case R_ECX:
+>> +        ret = ecx;
+>> +        break;
+>> +    case R_EDX:
+>> +        ret = edx;
+>> +        break;
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+>> +/*
+>> + * get the configurable cpuid bits (can be set to 0 or 1) reported by 
+>> TDX module
+>> + * from tdx_caps.
+>> + */
+>> +static inline uint32_t tdx_cap_cpuid_config(uint32_t function,
+>> +                                            uint32_t index, int reg)
+>> +{
+>> +    struct kvm_tdx_cpuid_config *cpuid_c;
+>> +    int ret = 0;
+>> +    int i;
+>> +
+>> +    if (tdx_caps->nr_cpuid_configs <= 0) {
+>> +        return ret;
+>> +    }
+>> +
+>> +    for (i = 0; i < tdx_caps->nr_cpuid_configs; i++) {
+>> +        cpuid_c = &tdx_caps->cpuid_configs[i];
+>> +        /* 0xffffffff in sub_leaf means the leaf doesn't require a 
+>> sublesf */
+>> +        if (cpuid_c->leaf == function &&
+>> +            (cpuid_c->sub_leaf == 0xffffffff || cpuid_c->sub_leaf == 
+>> index)) {
+>> +            switch (reg) {
+>> +            case R_EAX:
+>> +                ret = cpuid_c->eax;
+>> +                break;
+>> +            case R_EBX:
+>> +                ret = cpuid_c->ebx;
+>> +                break;
+>> +            case R_ECX:
+>> +                ret = cpuid_c->ecx;
+>> +                break;
+>> +            case R_EDX:
+>> +                ret = cpuid_c->edx;
+>> +                break;
+>> +            default:
+>> +                return 0;
+>> +            }
+>> +        }
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+>> +static FeatureWord get_cpuid_featureword_index(uint32_t function,
+>> +                                               uint32_t index, int reg)
+>> +{
+>> +    FeatureWord w;
+>> +
+>> +    for (w = 0; w < FEATURE_WORDS; w++) {
+>> +        FeatureWordInfo *f = &feature_word_info[w];
+>> +
+>> +        if (f->type == MSR_FEATURE_WORD || f->cpuid.eax != function ||
+>> +            f->cpuid.reg != reg ||
+>> +            (f->cpuid.needs_ecx && f->cpuid.ecx != index)) {
+>> +            continue;
+>> +        }
+>> +
+>> +        return w;
+>> +    }
+>> +
+>> +    return w;
+>> +}
+>> +
+>> +/*
+>> + * TDX supported CPUID varies from what KVM reports. Adjust the 
+>> result by
+>> + * applying the TDX restrictions.
+>> + */
+>> +void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
+>> +                             uint32_t *ret)
+>> +{
+>> +    /*
+>> +     * it's KVMM + QEMU 's capabilities of what CPUID bits is 
+>> supported or
+>> +     * can be emulated as supported.
+>> +     */
+>> +    uint32_t vmm_cap = *ret;
+>> +    FeatureWord w;
+>> +
+>> +    /* Only handle features leaves that recognized by 
+>> feature_word_info[] */
+>> +    w = get_cpuid_featureword_index(function, index, reg);
+>> +    if (w == FEATURE_WORDS) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (tdx_cpuid_lookup[w].inducing_ve) {
+>> +        *ret &= tdx_cpuid_lookup[w].supported_value_on_ve;
+>> +        return;
+>> +    }
+>> +
+>> +    /*
+>> +     * Include all the native bits as first step. It covers types
+>> +     * - As configured (if native)
+>> +     * - Native
+>> +     * - XFAM related and Attributes realted
+> s/realted/related
+>> +     *
+>> +     * It also has side effect to enable unsupported bits, e.g., the
+>> +     * bits of "fixed0" type while present natively. It's safe because
+>> +     * the unsupported bits will be masked off by .fixed0 later.
+>> +     */
+>> +    *ret |= host_cpuid_reg(function, index, reg);
+> 
+> Looks KVM capabilities are merged with native bits, is this intentional?
+
+yes, if we change the order, it would be more clear for you I guess.
+
+	host_cpuid_reg() | kvm_capabilities
+
+The base is host's native value, while any bit that absent from native 
+but KVM can emulate is also added to base.
+
+> Thanks
+> 
+> Zhenzhong
+> 
+>> +
+>> +    /* Adjust according to "fixed" type in tdx_cpuid_lookup. */
+>> +    *ret |= tdx_cpuid_lookup[w].tdx_fixed1;
+>> +    *ret &= ~tdx_cpuid_lookup[w].tdx_fixed0;
+>> +
+>> +    /*
+>> +     * Configurable cpuids are supported unconditionally. It's mainly to
+>> +     * include those configurable regardless of native existence.
+>> +     */
+>> +    *ret |= tdx_cap_cpuid_config(function, index, reg);
+>> +
+>> +    /*
+>> +     * clear the configurable bits that require VMM emulation and VMM 
+>> doesn't
+>> +     * report the support.
+>> +     */
+>> +    *ret &= ~(tdx_cpuid_lookup[w].depends_on_vmm_cap & ~vmm_cap);
+>> +
+>> +    /* special handling */
+>> +    if (function == 1 && reg == R_ECX && !enable_cpu_pm) {
+>> +        *ret &= ~CPUID_EXT_MONITOR;
+>> +    }
+>> +}
+>> +
+>>   enum tdx_ioctl_level{
+>>       TDX_VM_IOCTL,
+>>       TDX_VCPU_IOCTL,
+>> diff --git a/target/i386/kvm/tdx.h b/target/i386/kvm/tdx.h
+>> index d5b4c179fbf7..f62fe8ece982 100644
+>> --- a/target/i386/kvm/tdx.h
+>> +++ b/target/i386/kvm/tdx.h
+>> @@ -26,4 +26,7 @@ bool is_tdx_vm(void);
+>>   #define is_tdx_vm() 0
+>>   #endif /* CONFIG_TDX */
+>> +void tdx_get_supported_cpuid(uint32_t function, uint32_t index, int reg,
+>> +                             uint32_t *ret);
+>> +
+>>   #endif /* QEMU_I386_TDX_H */
+
 
