@@ -1,176 +1,254 @@
-Return-Path: <kvm+bounces-19450-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19451-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B339054B7
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 16:04:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56BE490556F
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 16:42:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B16FC1F223CE
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:04:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42E851C20AAE
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B74817DE1E;
-	Wed, 12 Jun 2024 14:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EC617E909;
+	Wed, 12 Jun 2024 14:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U6LYRqwY"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AUilJGAK"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2045.outbound.protection.outlook.com [40.107.92.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFACF17C221
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718201069; cv=none; b=ZWX3+AHnjvhcPJF4fPJ2bljbDl3H7Ku0cDst61z/z1C6OvVh8bHZK5mIDTGubUiB1W/9fgcuUoY2UFwDYz+DqVUP5nSkpEZpfW4ovUjLuGunVTq9oFpZ9ZGTozAU+H2Do0sLl6dpMFi8dvYkch7omzkqyQ9kLUZsv/uH94bOA2o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718201069; c=relaxed/simple;
-	bh=n6rQcdlTzLyq3J1ACt2i5X2K8jWLz6x7Pyg6vl9BQmw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jG+myaUG3MKRQcYxFmGCF6ARXt9v8ADqc41tpjYfsmtnJTpH9l0dJBSHuYDQWfMTV8pqDYdeuM7gpUa/ZNNee5rmvklEJx88YXu/eJQofLiuF6/OVy9SMakanRMSjBDLPsGeMD9zNUk/66migb1LaZ1UjAZlwBn169YLlQZu5qU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U6LYRqwY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718201066;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VHS87YElUOWkANf6E72nxalS03lPC9WT8JCafxHD7gY=;
-	b=U6LYRqwYxyWLr04hHswdwO9ZRdR4ZPeKdGsOIvYw8tIjPgK9bZjFFfK7i2gXaqtGafnZzp
-	9WAX8Z3i4FteN5dRfLxylxZFWhUeYyQZsr4LPB9n8UpOOdthccdFNryLL9/zwO405fyr6W
-	AwDsj9uwkqTPSYjNdcPdD8Td5t4d2dM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-287-_NhRRhR9ObOufsA6rturtQ-1; Wed, 12 Jun 2024 10:04:23 -0400
-X-MC-Unique: _NhRRhR9ObOufsA6rturtQ-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b06ce632b3so23454756d6.3
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 07:04:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718201063; x=1718805863;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VHS87YElUOWkANf6E72nxalS03lPC9WT8JCafxHD7gY=;
-        b=VaXPbLw5VxMTMP/+u9w0Rr9C6Q+f8q+4CXenofWhaEuQDK4ybIsItJFXSQNDy5RgIB
-         qZTxHLNJ/+sbWypSJYLcui913zfXZpd0LkZw72S+dDJQiyUV+eXuMc9/COrsq46Tqtk+
-         ms3y2xGlTyKFMY0r27zmyOcbBbOmLeFwQqZfT3VwJmT+7EE2Kj6Mg48knJVRbV/xX0m6
-         sA3dq8MezZuojyBhF4NnJcKR/8XyNSUmUfkRbDHddAJ9aUTyVLNUWAsQyT/pyCjHvl1D
-         ux3Ld3s8AYbk7wIqfTcZHpqaqrpWqjwLONIv7i5GKl4wXBEOv1XhiM+6oB2NzV0QINf6
-         Cmvw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4GucGDrxeIF55DooDLrLQG7+epRQ+9oJV1Gv0gAW79s1RzAf3HF57W49/2HwNAqouN0NmkrTSFbbUDDG4W6ACm0k/
-X-Gm-Message-State: AOJu0YyHW2A9bF56gxL4ezWCpN6aQNtXB3iMVLteK9o++nqCJfSnuQmD
-	CeBdWq3hvMvP7wZzx4Wy3BRHY17fkSHedfkY5joXDuTex4oacbz2nmbbshTsZYg+19Gr6nyBYn7
-	RJ8SYGyHU+iTWKTaDlZGbB8Qzpm9fO1OQNol+08XQ/lUNIY26nw==
-X-Received: by 2002:a05:6214:2b90:b0:6b0:7821:4026 with SMTP id 6a1803df08f44-6b1a6c57871mr20407266d6.52.1718201062945;
-        Wed, 12 Jun 2024 07:04:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHis29s85ghN1wCvWNHSB3z3fEhPObl0T66oMycOn7F9OWRQIQYakS2Z/8aehOyVDRyZ6GOEQ==
-X-Received: by 2002:a05:6214:2b90:b0:6b0:7821:4026 with SMTP id 6a1803df08f44-6b1a6c57871mr20406306d6.52.1718201062563;
-        Wed, 12 Jun 2024 07:04:22 -0700 (PDT)
-Received: from [192.168.0.4] (ip-109-43-176-68.web.vodafone.de. [109.43.176.68])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a1515903sm958436d6.58.2024.06.12.07.04.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Jun 2024 07:04:22 -0700 (PDT)
-Message-ID: <6086ef5e-48e7-40f3-b0a7-ff67b20aeae3@redhat.com>
-Date: Wed, 12 Jun 2024 16:04:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9135917DE39;
+	Wed, 12 Jun 2024 14:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718203328; cv=fail; b=EXtXDNcd8sdlDloO0RjOwvnx3oR2OiPvTV6wY1yxNuxNN3ww5a1Lnmutq6ayj4ySysyZVtEiwyd7PX6W9WjuXEtGzdJbi/47ILY80gEqSSVSHPVjK2ih7lb094oRLpmyQ8sf5ce4RqwkHeWIARO7j9xgNmU5rU1KpBV4Tott67k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718203328; c=relaxed/simple;
+	bh=SFqCkHUeE3AHSEOm3msfGxs+Lvp80UWncGnPong7t1c=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PBZxT/v11OmP7cttm9Hdo05d9iKXj4/3JjDZKA73ugnrfiIN+TV9O3D7QUE/3IxG90x+ifyf8D5m+/+w+BHoJqmYstFqxr5nzmvFvGVPz+GgDjd9aYgKoZzCA6fLjcIeKtG9yceHwHCo3b+3jgMtg7Z278SF4hwQBsLlffbgXqY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AUilJGAK; arc=fail smtp.client-ip=40.107.92.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Qp8TLqbQY61DmwFMdUb75YW/l5uxJtqjMG+bU6qpJjk053WCjUGsnKrEYSAy8tedXC5M+WS6nrO2KNT2xkDnsS5+W/Sv2kp+tup6ILwkWZSHqMHY0ss92SzvkJ4KLA1aclY2Y1ofv7fJYiylvmZJvuMcDfibr4EtZfnNeIY7EGfwVQMhgiQhlHE4u18deIG86GsVJyBM++JQoZkhGSHyfXKGUVMn+GN6UfjLcyC6L+jIfNWeECrfvGe17a2roxRbt9E1y+6viQqrmbZVKZ0XQF+WDKgtnP8vpkWNgSCArl+2NCW+LT8Uk6vcboeY71W7rBagxkPeCF7ALnlqWYykyw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OkCY+4tbGXjEF8K1vmFpcBU8+jjVXdPukq/lyAhySeI=;
+ b=nGIlSoNyrm1v3W4COMzYR1okdWyfWrR48B091Mx35L8qjmWnj0/krWKWAWnhkQ7jFxIiHMNasf8PQ5xUjlVjMsBcj4qVZHOUuIZJ/HGDSmtKWYvIUyePx+3ojRwV18vv/5VovYw+BrtZJOT6wD1OFdDfVK6X3nBR80VHbdJBQZjCPhB0FFaY6lYJjCOHpVqcsXVUerFMB+UsMky7B3UxW4O7k0ie8DQONgwMVBurmxaFROmHnsRHiq9VZMKD9MnPJGTidZlgxYksn+0xCF9VOPhATJ+W6x3fN3dEATdmzbE+oMaX5iu0dYJijIS24uHhyKfGpGATShGBiQ3O6uMApw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OkCY+4tbGXjEF8K1vmFpcBU8+jjVXdPukq/lyAhySeI=;
+ b=AUilJGAKsOTnzp1g8NFG4EHaq0ATnYHafa5jVINfUjEIpemnXChOUW1KtPLoZ+2Sc9tFHJEjsc47plxnyzGLDMWsrt+NS9rAbfJD5R9kIN2Z9cKCSC8A0IF3aOA63OfRX7U0o1JMI9UZLdvne5YlEueyxcql0kbzyos9vqH0cMw=
+Received: from MN2PR19CA0040.namprd19.prod.outlook.com (2603:10b6:208:19b::17)
+ by DS7PR12MB9041.namprd12.prod.outlook.com (2603:10b6:8:ea::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.37; Wed, 12 Jun
+ 2024 14:42:03 +0000
+Received: from BN3PEPF0000B36D.namprd21.prod.outlook.com
+ (2603:10b6:208:19b:cafe::f0) by MN2PR19CA0040.outlook.office365.com
+ (2603:10b6:208:19b::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.19 via Frontend
+ Transport; Wed, 12 Jun 2024 14:42:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN3PEPF0000B36D.mail.protection.outlook.com (10.167.243.164) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7677.0 via Frontend Transport; Wed, 12 Jun 2024 14:42:02 +0000
+Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 12 Jun
+ 2024 09:42:01 -0500
+From: Babu Moger <babu.moger@amd.com>
+To: <pbonzini@redhat.com>, <seanjc@google.com>
+CC: <babu.moger@amd.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH v2] KVM: Fix Undefined Behavior Sanitizer(UBSAN) error
+Date: Wed, 12 Jun 2024 09:41:51 -0500
+Message-ID: <b8723d39903b64c241c50f5513f804390c7b5eec.1718203311.git.babu.moger@amd.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <98ad0dab3a2c66834e50e6d465dcae47dd80758b.1717436464.git.babu.moger@amd.com>
+References: <98ad0dab3a2c66834e50e6d465dcae47dd80758b.1717436464.git.babu.moger@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] s390/virtio_ccw: fix config change notifications
-To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
- Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
- virtualization@lists.linux.dev, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Boqiao Fu <bfu@redhat.com>, Sebastian Mitterle <smitterl@redhat.com>
-References: <20240611214716.1002781-1-pasic@linux.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=thuth@redhat.com; keydata=
- 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
-In-Reply-To: <20240611214716.1002781-1-pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B36D:EE_|DS7PR12MB9041:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5a9f2c26-19de-4309-925a-08dc8aedd307
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230032|1800799016|82310400018|376006|36860700005;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?dTFlLY1zD1sVeAH4twj9ygoiLWo84y1NIOsP5wU5c0upGuljLW+uWe9J5xFa?=
+ =?us-ascii?Q?52btuWCUBKZE74PA2dmQMv0e3HxeSchcITBCl9ct2Racph+kv0PY8q0QhYlx?=
+ =?us-ascii?Q?nmbtgIPyBnvwotZ9KJB0yNGTzGSl09hpLqYheasbr6x5DKKzsFi3XCcya4D+?=
+ =?us-ascii?Q?n/rQP6C+P5XsNn+CglWz/yC0CoAcfMYflkmQ1DE/fYB+GSCXTvehPOBeVQf5?=
+ =?us-ascii?Q?BR46L/UMu0+LDO2qZdzQH3yO0pI2BJDaJjIiYBeOdz9D2smKvAl4V3i+785c?=
+ =?us-ascii?Q?M3QikmZ/0SNicVeOJXsnf/lV2bHPPv/2BOMWFnrzfsxdgIouV5xp9oCk5nbh?=
+ =?us-ascii?Q?4NpY8fK+S736u7MX1Pruy4VGLqe7gf8NNmKBllG9Y38dRyqeK7Nw6xZbJIew?=
+ =?us-ascii?Q?stixuwveU/Ev70EV/6BHdKi3+QeVOIIiPOWDD/fgPYpv5Zsjeq5Z2ch615AZ?=
+ =?us-ascii?Q?qcLD1KX8d7qwWeXOXPGeSFdB24s4m/D6OhqKzdLBdLj/IpvnUCUTjMgSAucs?=
+ =?us-ascii?Q?IXrQ5+mrjYGmAiei3m2ZGKHIw0NvbAJiSAiLE3FOQ6RxNLJqGtRlay+Hybjp?=
+ =?us-ascii?Q?km8tfKaGCtZM/FeAFBWGSxahFS5pSXU5o7oZGfoMyyyZTlKtx4NDJ+wdaxWL?=
+ =?us-ascii?Q?sedPPT0+I7P0uDFCxsEnm7mwhrO81rteoXjGa/1Erg2rEVxKzH2ACLNb3QR5?=
+ =?us-ascii?Q?WoGcSwpkSSAi5R3ZW0QEiBvjYJU2iEXzuCknrhr8Cdk3uJ9bt25PVBsOma+P?=
+ =?us-ascii?Q?ZwYzjo3ODmrKGxUvfJJVOefrKJH9QIaXEdS9mQVB+iLiTgu7M/xR+Ko75WWW?=
+ =?us-ascii?Q?OinHO+NZeunmYiL+Yi0PFufnsnSktEY2LbNVMcg8lQ5fGph3uQHMxPu+rxt1?=
+ =?us-ascii?Q?S775bQJqFCXLs1EXBoLxmqqnBC5bd0hAN6KHJXHJemtHAHzoGGDjH2Q6LZNn?=
+ =?us-ascii?Q?WS73A3Sy085tVYnxavn4agMR7j30Cc5pJdE4Gi992ZxAHYPyDO0YyGb5ncXX?=
+ =?us-ascii?Q?PwdOyiQkHvWvg6MIxHPpXKyGu/BBozqYT54P9Zk2P8WZO3PAUHkBEUYWQX97?=
+ =?us-ascii?Q?+DMjrNS4Ki2KT3a/NO9j+aOJhD/kN9PRyvVVaT/eJr8YwmgUFFmDv1wNq2/G?=
+ =?us-ascii?Q?DEUIG2QcBZbfIpWjUzlCJFxG9kC5d9ncnGdON0jQWKWM8BUUBM/NontdBOYN?=
+ =?us-ascii?Q?+LXOy7dM9Fgfp0MTB4E2XINUty78uzhOwSVztz8CowcfyYdd3zlxLo92r7Ej?=
+ =?us-ascii?Q?8rq3b479vb1HGWc+Gb0+k+Y1Jq84Y0kdZyz6aGYVh2JGyQRa1G2BPOgbKa2N?=
+ =?us-ascii?Q?HEap88RU8Y3X59QGF+bMmGEFh0wroCLQzyyI8efS8orWfgxQD4dYZMsI7Wjq?=
+ =?us-ascii?Q?6mxTPEaNLGTAzxHy4UUrJUmcIbO24gcBswOTKpaUWIjt21mScA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230032)(1800799016)(82310400018)(376006)(36860700005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2024 14:42:02.9638
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5a9f2c26-19de-4309-925a-08dc8aedd307
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN3PEPF0000B36D.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9041
 
-On 11/06/2024 23.47, Halil Pasic wrote:
-> Commit e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-> broke configuration change notifications for virtio-ccw by putting the
-> DMA address of *indicatorp directly into ccw->cda disregarding the fact
-> that if !!(vcdev->is_thinint) then the function
-> virtio_ccw_register_adapter_ind() will overwrite that ccw->cda value
-> with the address of the virtio_thinint_area so it can actually set up
-> the adapter interrupts via CCW_CMD_SET_IND_ADAPTER.  Thus we end up
-> pointing to the wrong object for both CCW_CMD_SET_IND if setting up the
-> adapter interrupts fails, and for CCW_CMD_SET_CONF_IND regardless
-> whether it succeeds or fails.
-> 
-> To fix this, let us save away the dma address of *indicatorp in a local
-> variable, and copy it to ccw->cda after the "vcdev->is_thinint" branch.
-> 
-> Reported-by: Boqiao Fu <bfu@redhat.com>
-> Reported-by: Sebastian Mitterle <smitterl@redhat.com>
-> Fixes: e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
-> I know that checkpatch.pl complains about a missing 'Closes' tag.
-> Unfortunately I don't have an appropriate URL at hand. @Sebastian,
-> @Boqiao: do you have any suggetions?
+System throws this following UBSAN: invalid-load error when the very first
+VM is powered up on a freshly booted host machine. Happens only with 2P or
+4P (multiple sockets) systems.
 
-Closes: https://issues.redhat.com/browse/RHEL-39983
-?
+{  688.429145] ------------[ cut here ]------------
+[  688.429156] UBSAN: invalid-load in arch/x86/kvm/../../../virt/kvm/kvm_main.c:655:10
+[  688.437739] load of value 160 is not a valid value for type '_Bool'
+[  688.444760] CPU: 370 PID: 8246 Comm: CPU 0/KVM Not tainted 6.8.2-amdsos-build58-ubuntu-22.04+ #1
+[  688.444767] Hardware name: AMD Corporation Sh54p/Sh54p, BIOS WPC4429N 04/25/2024
+[  688.444770] Call Trace:
+[  688.444777]  <TASK>
+[  688.444787]  dump_stack_lvl+0x48/0x60
+[  688.444810]  ubsan_epilogue+0x5/0x30
+[  688.444823]  __ubsan_handle_load_invalid_value+0x79/0x80
+[  688.444827]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.444836]  ? flush_tlb_func+0xe9/0x2e0
+[  688.444845]  kvm_mmu_notifier_invalidate_range_end.cold+0x18/0x4f [kvm]
+[  688.444906]  __mmu_notifier_invalidate_range_end+0x63/0xe0
+[  688.444917]  __split_huge_pmd+0x367/0xfc0
+[  688.444928]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.444931]  ? alloc_pages_mpol+0x97/0x210
+[  688.444941]  do_huge_pmd_wp_page+0x1cc/0x380
+[  688.444946]  __handle_mm_fault+0x8ee/0xe50
+[  688.444958]  handle_mm_fault+0xe4/0x4a0
+[  688.444962]  __get_user_pages+0x190/0x840
+[  688.444972]  get_user_pages_unlocked+0xe0/0x590
+[  688.444977]  hva_to_pfn+0x114/0x550 [kvm]
+[  688.445007]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445011]  ? __gfn_to_pfn_memslot+0x3b/0xd0 [kvm]
+[  688.445037]  kvm_faultin_pfn+0xed/0x5b0 [kvm]
+[  688.445079]  kvm_tdp_page_fault+0x123/0x170 [kvm]
+[  688.445109]  kvm_mmu_page_fault+0x244/0xaa0 [kvm]
+[  688.445136]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445138]  ? kvm_io_bus_get_first_dev+0x56/0xf0 [kvm]
+[  688.445165]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445171]  ? svm_vcpu_run+0x329/0x7c0 [kvm_amd]
+[  688.445186]  vcpu_enter_guest+0x592/0x1070 [kvm]
+[  688.445223]  kvm_arch_vcpu_ioctl_run+0x145/0x8a0 [kvm]
+[  688.445254]  kvm_vcpu_ioctl+0x288/0x6d0 [kvm]
+[  688.445279]  ? vcpu_put+0x22/0x50 [kvm]
+[  688.445305]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445307]  ? kvm_arch_vcpu_ioctl_run+0x346/0x8a0 [kvm]
+[  688.445335]  __x64_sys_ioctl+0x8f/0xd0
+[  688.445343]  do_syscall_64+0x77/0x120
+[  688.445353]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445355]  ? fire_user_return_notifiers+0x42/0x70
+[  688.445363]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445365]  ? syscall_exit_to_user_mode+0x82/0x1b0
+[  688.445372]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445377]  ? do_syscall_64+0x86/0x120
+[  688.445380]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445383]  ? do_syscall_64+0x86/0x120
+[  688.445388]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445392]  ? do_syscall_64+0x86/0x120
+[  688.445396]  ? srso_alias_return_thunk+0x5/0xfbef5
+[  688.445400]  ? do_syscall_64+0x86/0x120
+[  688.445404]  ? do_syscall_64+0x86/0x120
+[  688.445407]  ? do_syscall_64+0x86/0x120
+[  688.445410]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+[  688.445416] RIP: 0033:0x7fdf2ed1a94f
+[  688.445421] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24 10 00 00 00 48 89
+		     44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00 00 0f 05 <41>
+		     89 c0 3d 00 f0 ff ff 77 1f 48 8b 44 24 18 64 48 2b 04 25 28 00
+[  688.445424] RSP: 002b:00007fc127bff460 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+[  688.445429] RAX: ffffffffffffffda RBX: 000000000000ae80 RCX: 00007fdf2ed1a94f
+[  688.445432] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000016
+[  688.445434] RBP: 00005586f80dc350 R08: 00005586f6a0af10 R09: 00000000ffffffff
+[  688.445436] R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
+[  688.445438] R13: 0000000000000001 R14: 0000000000000cf8 R15: 0000000000000000
+[  688.445443]  </TASK>
+[  688.445444] ---[ end trace ]---
 
-Anyway, I've tested the patch and it indeed fixes the problem with 
-virtio-balloon and the link state for me:
+However, VM boots up fine without any issues and operational.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+The error is due to invalid assignment in kvm invalidate range end path.
+There is no arch specific handler for this case and handler is assigned
+to kvm_null_fn(). This is an empty function and returns void. Return value
+of this function is assigned to boolean variable. UBSAN complains about
+this incompatible assignment when kernel is compiled with CONFIG_UBSAN.
+
+Fix the issue by breaking out of memslot loop when the handler is null.
+
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+v2: Updated with Sean's patch. Added his sign-off-by.
+---
+ virt/kvm/kvm_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 14841acb8b95..d65d3aa99650 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -651,7 +651,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+ 					range->on_lock(kvm);
+ 
+ 				if (IS_KVM_NULL_FN(range->handler))
+-					break;
++					goto mmu_unlock;
+ 			}
+ 			r.ret |= range->handler(kvm, &gfn_range);
+ 		}
+@@ -660,6 +660,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
+ 	if (range->flush_on_ret && r.ret)
+ 		kvm_flush_remote_tlbs(kvm);
+ 
++mmu_unlock:
+ 	if (r.found_memslot)
+ 		KVM_MMU_UNLOCK(kvm);
+ 
+-- 
+2.34.1
 
 
