@@ -1,111 +1,94 @@
-Return-Path: <kvm+bounces-19381-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19382-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4532090485F
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 03:23:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7952690486E
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 03:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3CA01F23AB0
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 01:23:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BDAD1C22002
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 01:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6934B4A3F;
-	Wed, 12 Jun 2024 01:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 463CA63BF;
+	Wed, 12 Jun 2024 01:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R5+0wxIW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="q9kqe8ah"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A991443D
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 01:23:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D984A15
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 01:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718155417; cv=none; b=M0UK6PQj+WNPFOAwZy7TEmgITAJ4fiMt4M62a2c3MIoTFnmM4bZ+EPFTAVNH4CS59j5C1xJSGGRftdf0Bqiqgp8I3wszjTugsRrPuwMNU1Br3FqwSLi39CgprdeqjSK3o8d9Wxry+38RDVRmkvnirnd3wvOQHvlyLTyRI8dfRJw=
+	t=1718155885; cv=none; b=gYwF/2wJFIUM6ZYClEymAI1i31p5Faqs7UX/OE4M1bKutMk+8d1n9JTCMBhJh0aOv3ZRhfvzsIBwgSFBI6mKCUunkvfmgmDQuLLMf7XiNca4Gyhy1E2RcmThPis25j4D4KK9YzrbsJEECHdyUwwMmki3oU182DrRo5YqXFbvLpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718155417; c=relaxed/simple;
-	bh=9joCK+5QYCvw814DBtCIuJ51y0uYUX8Tgug9gGwYU58=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RaID2bKXAtlETvonqqFSXd1NHFC9GocDwayxJ/Z6EAvf4b80eppDX54bcQ6LOt/ZXrKcjcZI7BvKG4dpFbZuzZasLNYesHK38Zu8vdQ3/c/aSXrm5wHlZQDFsZRUcPfLTAMcYroju8BeIMbgWeXHuzzBTCABoc+tRDR2w/KY8Rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R5+0wxIW; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1718155885; c=relaxed/simple;
+	bh=iTJ+y+yUYurbot1d/zZMuCMgrR5OjCYsg4h2tP6dM08=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=jauPOUNsosKuSariajOMP1puWjDs7FIxuj4vvEs/YL50WmOpb5BIZ+LiYW/6PXStQBU/QvgDe3eLrVHS6a63IVtjhVojSixlSKeDFpjo5vdSqoGkDq9soi1QgKN6zeOFQacHeKFdxfosp2IrXRjxRU+n1no10ImWjoyEaAXBOfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=q9kqe8ah; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dfa744fe2f9so10353875276.0
-        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 18:23:36 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-62a080977a5so31295967b3.0
+        for <kvm@vger.kernel.org>; Tue, 11 Jun 2024 18:31:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718155415; x=1718760215; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9RzYaJguaQI8ezMD1wLQZOMHWWd0f/qf7YACXyF/8fY=;
-        b=R5+0wxIWSbXYi5W3HQoiMfntIpjoSAqwbPLG/wTzn1CPAAg3NTzLTYY8zOs8Ljl+NA
-         adq18X8NIhl45m1IJX721TW/A8Otu5wOYlz7yhbkpUWjPXJqpcRtIzL0ld0rcjmbbLsI
-         ohlaxfeJpjDZRNfQYDk4Ykzz0mWmuWlnCoz3Y2R8GDR/fKJuXETn91b/KiCwWaN/Phwf
-         bcZN+1I9Jq6b2p2fkmoZtrt0wuf3OLbMLd/pT23z7Tjkdc13tu1hgqyA1NKMbUwzUisd
-         LIem6s1loda08mc3qCmFIDQENMCwfS++TZG9ELpnD9dQzxnCPNK1RHoFDoKJ7Qu0wCiX
-         nDCg==
+        d=google.com; s=20230601; t=1718155883; x=1718760683; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ar9pYcOp2XX0p6wb+X/64p4KFgEtV0/Aspp8aMtT5ao=;
+        b=q9kqe8ah6UWiHYnkSQl43YPWAjNb56rY3jGsF1TK78XiH6Mz1rUoalSeKH7lZmHIeu
+         5PVZd+5mUi21bK+cZSHsoBctEaZQhKEdy8uhK0J4KOjSta8LVraZwf5MLdA9SFt89YSK
+         elVgXaAZuYWpZ1MsbetEqxQBmiri2l+F83LGWQjf64IGPVHRryrLVNfgxaS7h3XRcRZJ
+         +jnB9KP/F7JmCuUhjxbZyWfc9Z69q0ovTVEScusBxxBJhcrJIpzT8FwA+dW86dMFFse2
+         0JLIOmH5vKNltIQSNZG098HC4FF7MesUZu6ets77Ar3I+6EFs6TDUHP7H7DC6hpv0Vcb
+         ItQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718155415; x=1718760215;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9RzYaJguaQI8ezMD1wLQZOMHWWd0f/qf7YACXyF/8fY=;
-        b=CrPPHcK441aHdQk7XZU/gUeG9KIexasjeE49JBs/oxIe09xiNZ7+Z0S1FuEwZ/9xqM
-         CNp0CDjeFQQ1DD67oqEZkHuj+r2TgOUghng4Hk4XVzfIHixBh2oMTO7L38zlIU76M3W8
-         m/JK0eyTY9JY+zm8Uqtp9pKDh4IcEEiZt331Mx7ASD5oW4DUW2owfuuiZFam1C9GJzD4
-         aXc3E3BWDfiPAS6pTSpAtr3a3qktF9PitOYkw7IK/xIbSgq1qfHVOUBqUqaxkUxNdczT
-         9Ej+YRHI3+1I3zAmPJU6g3q9vwOjoBA1/cT1oLf5M5RrlEjDojzyCiIMZ7vXOZVEi4td
-         bxWg==
-X-Gm-Message-State: AOJu0YyGWnYM8TbM484HvmcUVFciVjS2nlL9UaIQImlITZbsXF+C3oms
-	4OV63Djk6QEnZyNl2xn5aPoxsReabrpl1gWrC4f3vYhQJ0ljFrN9wYCKDECo8p6u6DnNKTOSq30
-	XTQ==
-X-Google-Smtp-Source: AGHT+IEjJZGRKCQcHh9FXJ7J1f//y7xo6LzdBEJEvjj24wLGzsUbimQAjBo7Ve3dQ7CFgjY96N6Qv0fPgkU=
+        d=1e100.net; s=20230601; t=1718155883; x=1718760683;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ar9pYcOp2XX0p6wb+X/64p4KFgEtV0/Aspp8aMtT5ao=;
+        b=c5h9UZxtLjQh0mIfZEa/PC9lE3LtbbjHSdFd3uo+PyJQS9eNjeAoB8W3pBnJMXNS1J
+         m1/NWp1sW0R5NVkTUjRaWpuOK3Bky8UB6Q93Wktg5Hc9vSerf9gefqmM5qxDkcYtK57S
+         LHR5VxFi04vKEzYxU7S4i1aesIE4V1weZNFTRJsRlVbyTPXsT+V9/WzEv4wvzOFGhqqy
+         wQv1AGfntYgPdHuHJ+OvItvp7tEkcWd6/oz2iO/fd44xbG2Yg7iwuGtGw7dTA4LimoZR
+         UtjAqIRQL/NIfOKzcHnzRWb0Bn9eQObIkv5vbvWDUR1Y7RfSQ/h42xL42fLic68krQF5
+         n54A==
+X-Gm-Message-State: AOJu0YxA9AGl3NyXmgbp0QfQFPjenQqQfCdwvTMFlBg1l9jTb77txIIO
+	V36nM8FYaksk6CTR5SezIuGS7rXhHVX2zTdfhAOn87giAX2OdU0gCcPj9fz57yFOJIOPkoXBQdo
+	Gtg==
+X-Google-Smtp-Source: AGHT+IHjsmkw6gcJpOYLaVOJnx0DSozjS1LUCiStBXBbuhGBJOoAQwoomO7H5cEoCaK9cwKJGkA7Y6cmS2s=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2b0c:b0:dfa:b47e:b99f with SMTP id
- 3f1490d57ef6-dfe65f78355mr33849276.2.1718155415290; Tue, 11 Jun 2024 18:23:35
- -0700 (PDT)
-Date: Tue, 11 Jun 2024 18:18:46 -0700
-In-Reply-To: <20240507133103.15052-1-wei.w.wang@intel.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:f:b0:627:96bd:b1e with SMTP id
+ 00721157ae682-62fbaa3d8d7mr1514547b3.10.1718155883247; Tue, 11 Jun 2024
+ 18:31:23 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 11 Jun 2024 18:31:19 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240507133103.15052-1-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.45.2.505.gda0bf45e8d-goog
-Message-ID: <171805499012.3417292.16148545321570928307.b4-ty@google.com>
-Subject: Re: [PATCH v4 0/3] KVM/x86: Enhancements to static calls
+Message-ID: <20240612013119.426771-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2024.06.12 - Paravirt Scheduling
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, Wei Wang <wei.w.wang@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Vineeth Pillai <vineeth@bitbyteword.org>, Joel Fernandes <joel@joelfernandes.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 07 May 2024 21:31:00 +0800, Wei Wang wrote:
-> This patchset introduces the kvm_x86_call() and kvm_pmu_call() macros to
-> streamline the usage of static calls of kvm_x86_ops and kvm_pmu_ops. The
-> current static_call() usage is a bit verbose and can lead to code
-> alignment challenges, and the addition of kvm_x86_ prefix to hooks at the
-> static_call() sites hinders code readability and navigation. The use of
-> static_call_cond() is essentially the same as static_call() on x86, so it
-> is replaced by static_call() to simplify the code. The changes have gone
-> through my tests (guest launch, a few vPMU tests, live migration tests)
-> without an issue.
-> 
-> [...]
+Tomorrow's topic is PV scheduling.  My apologies for the late reminder, I don't
+have a good excuse other than its become tradition to procrastinate on sending
+the agenda.
 
-Applied to kvm-x86 static_calls.  I may or may not rebase these commits
-depending on what all gets queued for 6.10.  There are already three conflicts
-that I know of, but they aren't _that_ annoying.  Yet.  :-)
+https://lore.kernel.org/all/20240403140116.3002809-1-vineeth@bitbyteword.org
 
-Thanks!
+Advanced warning #2, no PUCK on June 19th or July 3rd (US holidays).
 
-[1/3] KVM: x86: Replace static_call_cond() with static_call()
-      https://github.com/kvm-x86/linux/commit/161827082760
-[2/3] KVM: x86: Introduce kvm_x86_call() to simplify static calls of kvm_x86_ops
-      https://github.com/kvm-x86/linux/commit/aebed32e4985
-[3/3] KVM: x86/pmu: Add kvm_pmu_call() to simplify static calls of kvm_pmu_ops
-      https://github.com/kvm-x86/linux/commit/4dbd1f66c5bf
-
---
-https://github.com/kvm-x86/linux/tree/next
+Future Schedule:
+June 19th - CANCELED
+June 26th - No Topic
+July  3rd - CANCELED
 
