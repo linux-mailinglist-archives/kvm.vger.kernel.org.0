@@ -1,73 +1,145 @@
-Return-Path: <kvm+bounces-19438-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19439-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD23190512A
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 13:12:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6464905130
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 13:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F21F71C2153D
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 11:12:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83EC11F23518
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 11:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DCE216F0D1;
-	Wed, 12 Jun 2024 11:12:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C2016F274;
+	Wed, 12 Jun 2024 11:13:57 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from njjs-sys-mailin01.njjs.baidu.com (mx311.baidu.com [180.101.52.76])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860103D388
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 11:12:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.101.52.76
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E680716F0D1;
+	Wed, 12 Jun 2024 11:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718190735; cv=none; b=cVSflCNiedWS6Dj9h095Wdt74yQfb/e6Z4Y2Pfamgn2m5YXMxo1yHz/UsI6Ll6y6w1a8XTJscNa+9BhbAS2LWsPxeXtKl0IfdCR13hc5eqOgdlzAqhrax9T4BrhUNdTY2yFAOA6/nLlgbk3xFmQlscLRx9wZA0DdzheB4yAHH2w=
+	t=1718190837; cv=none; b=QJvZ0SNYFvcETct08XKnbnjRgYTRVMm2vaPMwb3gpf1UGMitsKpUQ8c+/bR5/yLclilURNqdLtl2ACbfuQn8YSwoybs0pmsLyL2a6b4+fbVuNycUu1jC3AvrXrFj39qvKkSOfohdvg5HS8ciM3x+qQWmUQe9G2/pKcnaM2cvjkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718190735; c=relaxed/simple;
-	bh=YQwgEUtsefX4di3nvwQxGdV373+fZcCIXxWpKEcr2wc=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=dGeGzrUbSBpsXwJrWHfkNq2YCw/967vbt/oHh942mFsYiF3l7I4oJR23QC0SPO/hOP9NZqQmIDpojOJ5AmWx0xaqX7ggg6JTarrJy51ZcvTpLyOGHIqoscwALvXUeleF3+DH0hf5OPA3p/5NLNzQLhNWmAd28QzKB4ucJpEko7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=180.101.52.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 0DE0E7F00047;
-	Wed, 12 Jun 2024 19:12:04 +0800 (CST)
-From: Li RongQing <lirongqing@baidu.com>
-To: kvm@vger.kernel.org
-Cc: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH][v1] x86/kvm: Fix the decrypted pages free in kvmclock
-Date: Wed, 12 Jun 2024 19:12:01 +0800
-Message-Id: <20240612111201.18012-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.9.4
+	s=arc-20240116; t=1718190837; c=relaxed/simple;
+	bh=tGPupE+j4PNoFUUhCfT2XJ/QhRvNfK0mEe6nInmY/cE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TnpMBYhcXl89SILb98yESXpxa7CoU68IpcjtkQ6rXkd4PM0duWRkqr5xXm1cb7pIw/KZN1pbJ0rHMbfKtwPuIIn2R4/SpV7S1c5Vafjj56q5ts3V6GPu5yED5DrhgMug7qRUWWYDuAlSRRs+db71QOO2W2IwTPlR0XjbTfIWt/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5F421595;
+	Wed, 12 Jun 2024 04:14:18 -0700 (PDT)
+Received: from [10.162.42.15] (e116581.arm.com [10.162.42.15])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 471543F73B;
+	Wed, 12 Jun 2024 04:13:45 -0700 (PDT)
+Message-ID: <6bd821a3-9dbe-499c-ae17-afce70076299@arm.com>
+Date: Wed, 12 Jun 2024 16:43:41 +0530
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] selftests: kvm: remove print_skip()
+To: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+ Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ James Morse <james.morse@arm.com>, Suzuki K Poulose
+ <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>,
+ David Hildenbrand <david@redhat.com>, Sean Christopherson
+ <seanjc@google.com>, Haibo Xu <haibo1.xu@intel.com>,
+ Anup Patel <anup@brainfault.org>, Andrew Jones <ajones@ventanamicro.com>,
+ Aaron Lewis <aaronlewis@google.com>, Thomas Huth <thuth@redhat.com>,
+ Maciej Wieczor-Retman <maciej.wieczor-retman@intel.com>,
+ Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kernel@collabora.com, Shuah Khan <skhan@linuxfoundation.org>,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Dev Jain <dev.jain@arm.com>
+References: <20240612104500.425012-1-usama.anjum@collabora.com>
+Content-Language: en-US
+From: Dev Jain <dev.jain@arm.com>
+In-Reply-To: <20240612104500.425012-1-usama.anjum@collabora.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When set_memory_decrypted() fails, pages may be left fully or partially
-decrypted. before free the pages to return pool, it should be encrypted
-via set_memory_encrypted(), or else this could lead to functional or
-security issues, if encrypting the pages fails, leak the pages
 
-Fixes: 6a1cac56f41f ("x86/kvm: Use __bss_decrypted attribute in shared variables")
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- arch/x86/kernel/kvmclock.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 6/12/24 16:14, Muhammad Usama Anjum wrote:
+>
+>
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> index 4f5881d4ef66d..695c45635d257 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_cpuid.c
+> @@ -144,10 +144,9 @@ int main(int argc, char *argv[])
+>   	free((void *)hv_cpuid_entries);
+>   
+>   	if (!kvm_cpu_has(X86_FEATURE_VMX) ||
+> -	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS)) {
+> -		print_skip("Enlightened VMCS is unsupported");
+> -		goto do_sys;
+> -	}
+> +	    !kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS))
+> +		ksft_exit_skip("Enlightened VMCS is unsupported\n");
+> +
 
-diff --git a/arch/x86/kernel/kvmclock.c b/arch/x86/kernel/kvmclock.c
-index 5b2c152..5e9f9d2 100644
---- a/arch/x86/kernel/kvmclock.c
-+++ b/arch/x86/kernel/kvmclock.c
-@@ -228,7 +228,8 @@ static void __init kvmclock_init_mem(void)
- 		r = set_memory_decrypted((unsigned long) hvclock_mem,
- 					 1UL << order);
- 		if (r) {
--			__free_pages(p, order);
-+			if (!set_memory_encrypted((unsigned long)hvclock_mem, 1UL << order))
-+				__free_pages(p, order);
- 			hvclock_mem = NULL;
- 			pr_warn("kvmclock: set_memory_decrypted() failed. Disabling\n");
- 			return;
--- 
-2.9.4
+Isn't it incorrect to delete 'goto do_sys'? ksft_exit_skip() will exit and the
+program will never jump to that label. At other places too you have deleted the 'goto'.
 
+
+>   	vcpu_enable_evmcs(vcpu);
+>   	hv_cpuid_entries = vcpu_get_supported_hv_cpuid(vcpu);
+>   	test_hv_cpuid(hv_cpuid_entries, true);
+> @@ -155,10 +154,8 @@ int main(int argc, char *argv[])
+>   
+>   do_sys:
+>   	/* Test system ioctl version */
+> -	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID)) {
+> -		print_skip("KVM_CAP_SYS_HYPERV_CPUID not supported");
+> -		goto out;
+> -	}
+> +	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID))
+> +		ksft_exit_skip("KVM_CAP_SYS_HYPERV_CPUID not supported\n");
+>   
+>   	test_hv_cpuid_e2big(vm, NULL);
+>   
+> diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> index 949e08e98f315..d37212a27990b 100644
+> --- a/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> +++ b/tools/testing/selftests/kvm/x86_64/hyperv_extended_hypercalls.c
+> @@ -47,10 +47,8 @@ int main(void)
+>   
+>   	/* Verify if extended hypercalls are supported */
+>   	if (!kvm_cpuid_has(kvm_get_supported_hv_cpuid(),
+> -			   HV_ENABLE_EXTENDED_HYPERCALLS)) {
+> -		print_skip("Extended calls not supported by the kernel");
+> -		exit(KSFT_SKIP);
+> -	}
+> +			   HV_ENABLE_EXTENDED_HYPERCALLS))
+> +		ksft_exit_skip("Extended calls not supported by the kernel\n");
+>   
+>   	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
+>   	run = vcpu->run;
+> diff --git a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> index 57f157c06b393..1dcb37a1f0be9 100644
+> --- a/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/ucna_injection_test.c
+> @@ -273,10 +273,8 @@ int main(int argc, char *argv[])
+>   	kvm_ioctl(vm->kvm_fd, KVM_X86_GET_MCE_CAP_SUPPORTED,
+>   		  &supported_mcg_caps);
+>   
+> -	if (!(supported_mcg_caps & MCG_CMCI_P)) {
+> -		print_skip("MCG_CMCI_P is not supported");
+> -		exit(KSFT_SKIP);
+> -	}
+> +	if (!(supported_mcg_caps & MCG_CMCI_P))
+> +		ksft_exit_skip("MCG_CMCI_P is not supported\n");
+>   
+>   	ucna_vcpu = create_vcpu_with_mce_cap(vm, 0, true, ucna_injection_guest_code);
+>   	cmcidis_vcpu = create_vcpu_with_mce_cap(vm, 1, false, cmci_disabled_guest_code);
 
