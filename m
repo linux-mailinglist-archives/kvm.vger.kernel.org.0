@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-19454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23FC590558A
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 16:46:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABB3090558B
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 16:46:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A23A01F23B49
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:46:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB02EB21D01
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 14:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A7817F4F5;
-	Wed, 12 Jun 2024 14:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3647017F501;
+	Wed, 12 Jun 2024 14:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HzbNcj80"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODqIPSOC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C9F717F4E0
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D546F17F4ED
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718203552; cv=none; b=ZOECbF094Jc80nD8k7xcWbEh/4jrP/OBZhRdweIUu1dR6OWzNLrdCkErPPpJCzbytaTl40mbtiP1Vzja7EGe+4tESucSt2eAtVi2G5/de7LfYoTqkZkbHLumG3Oldmeaj8FMchuiwTpsYNIhxyZJ8l+YUqn0/ALPsnemQDkoEHs=
+	t=1718203553; cv=none; b=edgzf+TwF/4dixJmgvetgzNFCAvOj0oaUz7seafJQ6nQ4TVpdWrKmMZsm9CpwQa0p6uTdyFSwO5xFlBR7K+Q+kg28WjM2P4hA3m3XlPQQ3OZm11Tu/boZKeYSQfLMpjOSB7j3GI76pBQtfIHkO0g+QyXMYFd1au6wWOGKZI/eus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718203552; c=relaxed/simple;
-	bh=xujwh6lH2Bs1x9EAbKCi6M+2vDidaWbKqXLLxpfVlaU=;
+	s=arc-20240116; t=1718203553; c=relaxed/simple;
+	bh=prygXyc2CjFiGgmw21MZ2CoC1VKsVtXn642Jr7lv5N4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=t926PByBkfQ2Fbw2Kxln4DmWO205N3S/1y9tszEucXwn8cUYSV9fYRDnDJhyIEbbdTiR/iessfFU5jX70L8+IsI64s5quzmWmodZ0+BJAhAuUEeKgsrQ9fg54gvepvqsD79kDZhI5T09MkAxOQSsvfSY7bmiQReu1/OI3jFyFNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HzbNcj80; arc=none smtp.client-ip=209.85.218.50
+	 MIME-Version; b=IyRl3L/oVUtk9MdCXzGAmNj73WypeORaDx3P+lR6SVGcQUrp37r/cdrZ1tArY5xtpFsjXfjuAv1UT1gFsYW7HT8MI7lb3kkMRe0u736MCb7zMeobZke3m6gfWN9Q7xZHmSnPN+1ZA2bEfayqdUXNf5wzKjEHY1NkFokdYVuIsa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ODqIPSOC; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a63359aaacaso329418466b.1
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 07:45:49 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-57ca81533d0so1605714a12.0
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 07:45:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718203548; x=1718808348; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1718203550; x=1718808350; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AfDoPk7aBDLgtejyaw77/ZfknsZulE2TGCGFLzn+aIU=;
-        b=HzbNcj80S+LDtCGjkEWcU1tJNgOAbZx9Gioeu1z6Mo7hD6pDkjgK1z0SugLNK3q6IJ
-         xt4uAD2NWpO3TLwEOdd9USuWzToNm5lvdeN+J1lWqRXOtUQPE6BXMjmwgVVKEm3uHCEy
-         ZxvT0/4KD8bdlnHEKZj4n/tJiUahgQvoh933aE1kfBzOgNIWS5dilhzqQ7ewtXv511ZJ
-         7Udc85327j5/GQNLmq+mOB09NHzEOT7hJ4zAQfWMocxVR2mlx+/lvE552dYJZu7CG8Ij
-         Q9qfLs0c0KOTcXb0zRBQ/HvUvVE4Qk4uefzaopoqo3RhtoNOe+2MwY68sDz3pRga0+XC
-         zj0g==
+        bh=W39EJR6BkfNLyaz3oo06mjRwnSViVBqQpmbUWo8omS0=;
+        b=ODqIPSOCRg9ALV0R7coFFkpFMj3lZTQAAv8+Lw3QetXxwWZaFV+5kGAMW6Eh85feLe
+         n2ZGQetl2EGACh7DaYVMocZCiLrIIua3SWMzFDc3gTtxI42ayZRHJwVSGQMAa8mupnV4
+         5PLNcubk5IcJlBWtadgZC5UMK42O+Am5SCArkHC8QJcIxxWvS/sLtYPJGrRX8ejnSkIm
+         Xec/QAhd9bxGKVcfSkah7fZhlXWpZib+HpN3BinLZw4R3Rr8vsfrPdRu+egXlXWaBqeH
+         pk6REYs0b681Kd3mBpLPn+xIR8FZC8pRlGngIutrWiocc9rdaKgK72u8jMPk+mkzkv32
+         1+Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718203548; x=1718808348;
+        d=1e100.net; s=20230601; t=1718203550; x=1718808350;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=AfDoPk7aBDLgtejyaw77/ZfknsZulE2TGCGFLzn+aIU=;
-        b=b0A85atAhKYS9umX2D3qNThlhEp2EFV31gppT+/OTc1Rxvn8A/DOEbA9B5lmrENvhw
-         dG2H0w2fKlqT2Vy7QNKNmNYLC0daQ9KsD3H8XLnKLNgYX6V60CwKs/7rs5ak72PPG/eJ
-         uU61/BSW/spOTGqdrezOptB1o2HkJkNG7/qz4kEcWwC8udQ+icDqP061iX9UIKS/xi1F
-         WaZm5clHkvDWvvz370VXGRs54gcvRS+2xu5r9sd+j8V/ws2jD4eHd9kJi489E3MqlfH9
-         VpiZ/RLtccc9cWESoT8Y3zmazZsj+EMS7K/FR2T2DViDycUTWydXScH9D1d3XoKQS79/
-         BXzw==
-X-Gm-Message-State: AOJu0Yyr4hp6/rzVepSfxMLWrgsEgKVKI2qIisMYUVzJ41056mMST03N
-	nEHo6Btdz5y1Nfo+HCaPNR8BBMhTulaUNwEa/XIEgUqcs4wwj3TDkl8QeRPt
-X-Google-Smtp-Source: AGHT+IFzK5eY/Usal7HeP2vxeXVqhelcKfp+29RioGHFusgC1cgqXiBD1USzDI/GQDWrPFwnSgn9Pg==
-X-Received: by 2002:a17:906:f6d4:b0:a6f:467d:19ec with SMTP id a640c23a62f3a-a6f47cbc19cmr132611366b.18.1718203547580;
-        Wed, 12 Jun 2024 07:45:47 -0700 (PDT)
+        bh=W39EJR6BkfNLyaz3oo06mjRwnSViVBqQpmbUWo8omS0=;
+        b=SpfqUCjlxmBRd0XLbxgBQcg6p3Y00i/yHHUTMGmMQcgnuRmPpC1BANDpcdC7gaLX41
+         3IAnt7bmgm4YxA/IKoKMMensnLycaRctUva6EMljuQRLfjfIqF30VsHsTt8EfoxrsX69
+         M0Pm0bMmOd4YTpH6twMOkpPEps6pw3gVDH+BjgAzQKSseQHfG37WnlDSP1H8A/oj/bBR
+         5VcAowEjd92XyvsrEwImGBel/aeqEDGXpAiQUTLm7YoWA8Ys5kl+7HEUi1c3+XTLaQ8H
+         jBH0yah8Kr+vSfxBCkiOUZ72M+B4s0VS0ISUsIWQHetnh1pL19EZe1JUGSLA9axkMCxg
+         DU2g==
+X-Gm-Message-State: AOJu0YzRdwmToH1ZLJ4gtmQr1wN273npH71jQljggRynIvdWJzRCEI9L
+	SvdKCEBif6R1esxYnv9fuELfh/SoVc6RBpeR96SOo991bFLrqHagQIzb1/AQ
+X-Google-Smtp-Source: AGHT+IFS5OM9ZCk3tGmg6Nzwlqe2nkzS/IDogU1CDjyPVmobpgy6ZNGBeqBEsJqMh+A+giFIwp7XdA==
+X-Received: by 2002:a17:906:b895:b0:a6f:386f:6835 with SMTP id a640c23a62f3a-a6f386f6e10mr354792066b.4.1718203549315;
+        Wed, 12 Jun 2024 07:45:49 -0700 (PDT)
 Received: from vasant-suse.suse.cz ([2001:9e8:ab7c:f800:473b:7cbe:2ac7:effa])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f18bbf3cbsm456440366b.1.2024.06.12.07.45.46
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f18bbf3cbsm456440366b.1.2024.06.12.07.45.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 07:45:47 -0700 (PDT)
+        Wed, 12 Jun 2024 07:45:48 -0700 (PDT)
 From: vsntk18@gmail.com
 To: kvm@vger.kernel.org
 Cc: vsntk18@gmail.com,
@@ -75,9 +75,9 @@ Cc: vsntk18@gmail.com,
 	pbonzini@redhat.com,
 	seanjc@google.com,
 	vkarasulli@suse.de
-Subject: [kvm-unit-tests PATCH v8 02/12] x86: Move architectural code to lib/x86
-Date: Wed, 12 Jun 2024 16:45:29 +0200
-Message-Id: <20240612144539.16147-3-vsntk18@gmail.com>
+Subject: [kvm-unit-tests PATCH v8 03/12] lib: Define unlikely()/likely() macros in compiler.h
+Date: Wed, 12 Jun 2024 16:45:30 +0200
+Message-Id: <20240612144539.16147-4-vsntk18@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240612144539.16147-1-vsntk18@gmail.com>
 References: <20240612144539.16147-1-vsntk18@gmail.com>
@@ -91,289 +91,43 @@ Content-Transfer-Encoding: 8bit
 
 From: Vasant Karasulli <vkarasulli@suse.de>
 
-This enables sharing common definitions across testcases and lib/.
+So that they can be shared across testcases and lib/.
+Linux's x86 instruction decoder refrences them.
 
 Signed-off-by: Vasant Karasulli <vkarasulli@suse.de>
 ---
- {x86 => lib/x86}/svm.h | 105 --------------------------------------
- x86/svm.c              |   2 +-
- x86/svm_npt.c          |   2 +-
- x86/svm_tests.c        |   2 +-
- x86/svm_tests.h        | 113 +++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 116 insertions(+), 108 deletions(-)
- rename {x86 => lib/x86}/svm.h (76%)
- create mode 100644 x86/svm_tests.h
+ lib/linux/compiler.h | 3 +++
+ x86/kvmclock.c       | 4 ----
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/x86/svm.h b/lib/x86/svm.h
-similarity index 76%
-rename from x86/svm.h
-rename to lib/x86/svm.h
-index 308daa55..0fc64be7 100644
---- a/x86/svm.h
-+++ b/lib/x86/svm.h
-@@ -372,22 +372,6 @@ struct __attribute__ ((__packed__)) vmcb {
+diff --git a/lib/linux/compiler.h b/lib/linux/compiler.h
+index bf3313bd..9f4ef162 100644
+--- a/lib/linux/compiler.h
++++ b/lib/linux/compiler.h
+@@ -121,5 +121,8 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
+ 	__u.__val;					\
+ })
 
- #define LBR_CTL_ENABLE_MASK BIT_ULL(0)
++#define unlikely(x)	__builtin_expect(!!(x), 0)
++#define likely(x)	__builtin_expect(!!(x), 1)
++
+ #endif /* !__ASSEMBLY__ */
+ #endif /* !__LINUX_COMPILER_H */
+diff --git a/x86/kvmclock.c b/x86/kvmclock.c
+index f9f21032..487c12af 100644
+--- a/x86/kvmclock.c
++++ b/x86/kvmclock.c
+@@ -5,10 +5,6 @@
+ #include "kvmclock.h"
+ #include "asm/barrier.h"
 
--struct svm_test {
--	const char *name;
--	bool (*supported)(void);
--	void (*prepare)(struct svm_test *test);
--	void (*prepare_gif_clear)(struct svm_test *test);
--	void (*guest_func)(struct svm_test *test);
--	bool (*finished)(struct svm_test *test);
--	bool (*succeeded)(struct svm_test *test);
--	int exits;
--	ulong scratch;
--	/* Alternative test interface. */
--	void (*v2)(void);
--	int on_vcpu;
--	bool on_vcpu_done;
--};
--
- struct regs {
- 	u64 rax;
- 	u64 rbx;
-@@ -408,93 +392,4 @@ struct regs {
- 	u64 rflags;
- };
-
--typedef void (*test_guest_func)(struct svm_test *);
--
--int run_svm_tests(int ac, char **av, struct svm_test *svm_tests);
--u64 *npt_get_pte(u64 address);
--u64 *npt_get_pde(u64 address);
--u64 *npt_get_pdpe(u64 address);
--u64 *npt_get_pml4e(void);
--bool smp_supported(void);
--bool default_supported(void);
--bool vgif_supported(void);
--bool lbrv_supported(void);
--bool tsc_scale_supported(void);
--bool pause_filter_supported(void);
--bool pause_threshold_supported(void);
--void default_prepare(struct svm_test *test);
--void default_prepare_gif_clear(struct svm_test *test);
--bool default_finished(struct svm_test *test);
--bool npt_supported(void);
--bool vnmi_supported(void);
--int get_test_stage(struct svm_test *test);
--void set_test_stage(struct svm_test *test, int s);
--void inc_test_stage(struct svm_test *test);
--void vmcb_ident(struct vmcb *vmcb);
--struct regs get_regs(void);
--void vmmcall(void);
--void svm_setup_vmrun(u64 rip);
--int __svm_vmrun(u64 rip);
--int svm_vmrun(void);
--void test_set_guest(test_guest_func func);
--
--extern struct vmcb *vmcb;
--
--static inline void stgi(void)
--{
--    asm volatile ("stgi");
--}
--
--static inline void clgi(void)
--{
--    asm volatile ("clgi");
--}
+-#define unlikely(x)	__builtin_expect(!!(x), 0)
+-#define likely(x)	__builtin_expect(!!(x), 1)
 -
 -
--
--#define SAVE_GPR_C                              \
--        "xchg %%rbx, regs+0x8\n\t"              \
--        "xchg %%rcx, regs+0x10\n\t"             \
--        "xchg %%rdx, regs+0x18\n\t"             \
--        "xchg %%rbp, regs+0x28\n\t"             \
--        "xchg %%rsi, regs+0x30\n\t"             \
--        "xchg %%rdi, regs+0x38\n\t"             \
--        "xchg %%r8, regs+0x40\n\t"              \
--        "xchg %%r9, regs+0x48\n\t"              \
--        "xchg %%r10, regs+0x50\n\t"             \
--        "xchg %%r11, regs+0x58\n\t"             \
--        "xchg %%r12, regs+0x60\n\t"             \
--        "xchg %%r13, regs+0x68\n\t"             \
--        "xchg %%r14, regs+0x70\n\t"             \
--        "xchg %%r15, regs+0x78\n\t"
--
--#define LOAD_GPR_C      SAVE_GPR_C
--
--#define ASM_PRE_VMRUN_CMD                       \
--                "vmload %%rax\n\t"              \
--                "mov regs+0x80, %%r15\n\t"      \
--                "mov %%r15, 0x170(%%rax)\n\t"   \
--                "mov regs, %%r15\n\t"           \
--                "mov %%r15, 0x1f8(%%rax)\n\t"   \
--                LOAD_GPR_C                      \
--
--#define ASM_POST_VMRUN_CMD                      \
--                SAVE_GPR_C                      \
--                "mov 0x170(%%rax), %%r15\n\t"   \
--                "mov %%r15, regs+0x80\n\t"      \
--                "mov 0x1f8(%%rax), %%r15\n\t"   \
--                "mov %%r15, regs\n\t"           \
--                "vmsave %%rax\n\t"              \
--
--
--
--#define SVM_BARE_VMRUN \
--	asm volatile ( \
--		ASM_PRE_VMRUN_CMD \
--                "vmrun %%rax\n\t"               \
--		ASM_POST_VMRUN_CMD \
--		: \
--		: "a" (virt_to_phys(vmcb)) \
--		: "memory", "r15") \
--
- #endif
-diff --git a/x86/svm.c b/x86/svm.c
-index e715e270..251e9ed6 100644
---- a/x86/svm.c
-+++ b/x86/svm.c
-@@ -2,7 +2,7 @@
-  * Framework for testing nested virtualization
-  */
-
--#include "svm.h"
-+#include "svm_tests.h"
- #include "libcflat.h"
- #include "processor.h"
- #include "desc.h"
-diff --git a/x86/svm_npt.c b/x86/svm_npt.c
-index b791f1ac..c248a66f 100644
---- a/x86/svm_npt.c
-+++ b/x86/svm_npt.c
-@@ -1,4 +1,4 @@
--#include "svm.h"
-+#include "svm_tests.h"
- #include "vm.h"
- #include "alloc_page.h"
- #include "vmalloc.h"
-diff --git a/x86/svm_tests.c b/x86/svm_tests.c
-index c81b7465..0f206632 100644
---- a/x86/svm_tests.c
-+++ b/x86/svm_tests.c
-@@ -1,4 +1,4 @@
--#include "svm.h"
-+#include "svm_tests.h"
- #include "libcflat.h"
- #include "processor.h"
- #include "desc.h"
-diff --git a/x86/svm_tests.h b/x86/svm_tests.h
-new file mode 100644
-index 00000000..fcf3bcb5
---- /dev/null
-+++ b/x86/svm_tests.h
-@@ -0,0 +1,107 @@
-+#ifndef X86_SVM_TESTS_H
-+#define X86_SVM_TESTS_H
-+
-+#include "x86/svm.h"
-+
-+struct svm_test {
-+	const char *name;
-+	bool (*supported)(void);
-+	void (*prepare)(struct svm_test *test);
-+	void (*prepare_gif_clear)(struct svm_test *test);
-+	void (*guest_func)(struct svm_test *test);
-+	bool (*finished)(struct svm_test *test);
-+	bool (*succeeded)(struct svm_test *test);
-+	int exits;
-+	ulong scratch;
-+	/* Alternative test interface. */
-+	void (*v2)(void);
-+	int on_vcpu;
-+	bool on_vcpu_done;
-+};
-+
-+typedef void (*test_guest_func)(struct svm_test *);
-+
-+int run_svm_tests(int ac, char **av, struct svm_test *svm_tests);
-+u64 *npt_get_pte(u64 address);
-+u64 *npt_get_pde(u64 address);
-+u64 *npt_get_pdpe(u64 address);
-+u64 *npt_get_pml4e(void);
-+bool smp_supported(void);
-+bool default_supported(void);
-+bool vgif_supported(void);
-+bool lbrv_supported(void);
-+bool tsc_scale_supported(void);
-+bool pause_filter_supported(void);
-+bool pause_threshold_supported(void);
-+void default_prepare(struct svm_test *test);
-+void default_prepare_gif_clear(struct svm_test *test);
-+bool default_finished(struct svm_test *test);
-+bool npt_supported(void);
-+bool vnmi_supported(void);
-+int get_test_stage(struct svm_test *test);
-+void set_test_stage(struct svm_test *test, int s);
-+void inc_test_stage(struct svm_test *test);
-+void vmcb_ident(struct vmcb *vmcb);
-+struct regs get_regs(void);
-+void vmmcall(void);
-+void svm_setup_vmrun(u64 rip);
-+int __svm_vmrun(u64 rip);
-+int svm_vmrun(void);
-+void test_set_guest(test_guest_func func);
-+
-+extern struct vmcb *vmcb;
-+
-+static inline void stgi(void)
-+{
-+    asm volatile ("stgi");
-+}
-+
-+static inline void clgi(void)
-+{
-+    asm volatile ("clgi");
-+}
-+
-+#define SAVE_GPR_C                              \
-+        "xchg %%rbx, regs+0x8\n\t"              \
-+        "xchg %%rcx, regs+0x10\n\t"             \
-+        "xchg %%rdx, regs+0x18\n\t"             \
-+        "xchg %%rbp, regs+0x28\n\t"             \
-+        "xchg %%rsi, regs+0x30\n\t"             \
-+        "xchg %%rdi, regs+0x38\n\t"             \
-+        "xchg %%r8, regs+0x40\n\t"              \
-+        "xchg %%r9, regs+0x48\n\t"              \
-+        "xchg %%r10, regs+0x50\n\t"             \
-+        "xchg %%r11, regs+0x58\n\t"             \
-+        "xchg %%r12, regs+0x60\n\t"             \
-+        "xchg %%r13, regs+0x68\n\t"             \
-+        "xchg %%r14, regs+0x70\n\t"             \
-+        "xchg %%r15, regs+0x78\n\t"
-+
-+#define LOAD_GPR_C      SAVE_GPR_C
-+
-+#define ASM_PRE_VMRUN_CMD                       \
-+                "vmload %%rax\n\t"              \
-+                "mov regs+0x80, %%r15\n\t"      \
-+                "mov %%r15, 0x170(%%rax)\n\t"   \
-+                "mov regs, %%r15\n\t"           \
-+                "mov %%r15, 0x1f8(%%rax)\n\t"   \
-+                LOAD_GPR_C                      \
-+
-+#define ASM_POST_VMRUN_CMD                      \
-+                SAVE_GPR_C                      \
-+                "mov 0x170(%%rax), %%r15\n\t"   \
-+                "mov %%r15, regs+0x80\n\t"      \
-+                "mov 0x1f8(%%rax), %%r15\n\t"   \
-+                "mov %%r15, regs\n\t"           \
-+                "vmsave %%rax\n\t"              \
-+
-+#define SVM_BARE_VMRUN \
-+	asm volatile ( \
-+		ASM_PRE_VMRUN_CMD \
-+                "vmrun %%rax\n\t"               \
-+		ASM_POST_VMRUN_CMD \
-+		: \
-+		: "a" (virt_to_phys(vmcb)) \
-+		: "memory", "r15") \
-+
-+#endif
+ struct pvclock_vcpu_time_info __attribute__((aligned(4))) hv_clock[MAX_CPU];
+ struct pvclock_wall_clock wall_clock;
+ static unsigned char valid_flags = 0;
 --
 2.34.1
 
