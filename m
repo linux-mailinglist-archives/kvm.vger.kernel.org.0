@@ -1,250 +1,337 @@
-Return-Path: <kvm+bounces-19420-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19422-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BF73904E25
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 10:29:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96572904ED5
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 11:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A03BDB24D13
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 08:29:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD93CB23E4D
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 09:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB32F16D30F;
-	Wed, 12 Jun 2024 08:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3806716D9A6;
+	Wed, 12 Jun 2024 09:11:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="elcgWg1b"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U5xrjmpf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8954D7404F
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 08:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BE7BE78;
+	Wed, 12 Jun 2024 09:11:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718180946; cv=none; b=JbAWTgjeKSHMqMSt4KlP/czm1+mCgGTiSpvO/XhAnw7aNXqPt0zhgmKUN3uiS8+GrWaXXfjux64D7RBW3M6L9+zObSAN3Jp/0LgF9zaX+Ef6QRDRn/hVK41ZGcNgJUZ3HAleT1POcqRs5tuOHkzmNax6qfOIYkaUcLlcNRDxKRY=
+	t=1718183509; cv=none; b=G82Od/wjaTki3/XFbSXgECWF7WNTFSeR5YOECi/5LEJXmIF1Y5KoujtvePAW0Z42/UykRlx1tKy925SvotzlUpa9zfC/N96uxbI0X9h5IjnSTieEpMdheE2HTMiA1mIk+gEGQn9TpAUcief4O7YSd4TqofUIGLTN8zMKgXx3dcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718180946; c=relaxed/simple;
-	bh=tnsFj3xarSZjBfOEha/shi7k/q3DMKKZs+BnOozwJmE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J5kT3yoSTF1um8sPnnHRLDuMM89atemTeZB4WOcLlYdSh2i2koRqSkmdyGjpARMTzXalfBnCFJdG+/5n0zCG326bI06h3UDmqWVVEGXxdcf46DeqKFUTRkFmzjduZf5MhoC0cbFOMw+CnytMReSiFyHwTwByGjPJew+g1t7MLvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=elcgWg1b; arc=none smtp.client-ip=198.175.65.15
+	s=arc-20240116; t=1718183509; c=relaxed/simple;
+	bh=uHHbRBCTiJ34kbeRIJM+Nw7RNe5FB8UcM4OyBaMx2Jk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GlIxYPiSklI2JKzHp6ldw7BKlosT2hAHLi8PYcIhqAnK3cdBVQq3aEoslir8GkkmReL8DDWW0ngzVDacRYlqBXO+QHm/oWNKLXyU+W1wWMqNg7oGPNaCFzdvspt+uq8cu5tlF7ZbTnrLAAyRMP5jl37pquRXQBm13bMvC/uCqWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U5xrjmpf; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718180945; x=1749716945;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=tnsFj3xarSZjBfOEha/shi7k/q3DMKKZs+BnOozwJmE=;
-  b=elcgWg1bvhPUF8KLqCgKHGxtfogbGTrdWX4hoF5DQkLaZN8a/1NW2FS/
-   j5FWAcps88P/lACBHJgYDIKcB/8IgVWrR6FSJqvik205tz9Ec1h5ejkMo
-   C5sFEAUjEohVognSwcTBTdzMl9RHldHOVMPtcZYCTDxeqOtE/BH7FNI/w
-   kx8HcIarfpcdn1gg9SH5naN/6eVGZTUwDbLWM8W3cPDJffWw5H1KoNAJP
-   rHzXAgqIOrBu8sD1TFWk/blQRRvpS7hFXhkoQJfEMG3ut4DenuROaZWGl
-   DoOc1cv1bUFH2hfcguqKkQSGyla4QmCRY33ETECIL4FQDLUCHz2haUxDc
-   Q==;
-X-CSE-ConnectionGUID: VKOxykXtRXWDo7lwIcLHZA==
-X-CSE-MsgGUID: 5tWMAW1OTTuD3+OOZ+WHvg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="18710855"
+  t=1718183508; x=1749719508;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uHHbRBCTiJ34kbeRIJM+Nw7RNe5FB8UcM4OyBaMx2Jk=;
+  b=U5xrjmpfG6kcIHs07BoB/g0A8bfjHXVASuoF/Y0sNg6eZh/dsiU1YAvA
+   xBbymNxRqYqJxDpXXaWrV2ZzqpiNAsbivm1/2uxMTzRFofaA94e8mtpE5
+   8DtABq4cWnOdBPdtC/f7rcp00Gn1q8OIMmD51HaJ0hBiSu4rP9O8XD051
+   CEfrE61kJmcTLrbkCyVw+N6d7XGPE2+GmeZk21kYEkeJB7/k34HU9LrK3
+   La7RQDhOWRc+elA/7k8VJ03B5wfs6IKiK2hx4bUDTiuYX94g4HC/Lpf6t
+   X5uwEMwZwxf87x3NR01jmhoWX/JRnQbIE0CWBbslEPzLDYuJ6jFGmoQcX
+   w==;
+X-CSE-ConnectionGUID: jlYsa1XASVWyep98n6HMow==
+X-CSE-MsgGUID: 8KHQRwRfSdK3IPtDsHCJzA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11100"; a="32471837"
 X-IronPort-AV: E=Sophos;i="6.08,232,1712646000"; 
-   d="scan'208";a="18710855"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 01:29:04 -0700
-X-CSE-ConnectionGUID: jlcWsIirR0mR+ipt3FugoA==
-X-CSE-MsgGUID: EcTQyWlRTViFDHpV1SIrNQ==
+   d="scan'208";a="32471837"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 02:11:47 -0700
+X-CSE-ConnectionGUID: KJv0yy49TpKfXdtNEZCfqw==
+X-CSE-MsgGUID: BGIpTBxDQWG9p72u13GTVQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,232,1712646000"; 
-   d="scan'208";a="40183566"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.51]) ([10.124.227.51])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jun 2024 01:28:57 -0700
-Message-ID: <90739246-f008-4cf2-bcf5-8a243e2b13d4@intel.com>
-Date: Wed, 12 Jun 2024 16:28:53 +0800
+   d="scan'208";a="40357291"
+Received: from lkp-server01.sh.intel.com (HELO 628d7d8b9fc6) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 12 Jun 2024 02:11:40 -0700
+Received: from kbuild by 628d7d8b9fc6 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sHK14-0001Oc-16;
+	Wed, 12 Jun 2024 09:11:38 +0000
+Date: Wed, 12 Jun 2024 17:11:20 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>, mpe@ellerman.id.au,
+	tpearson@raptorengineering.com, alex.williamson@redhat.com,
+	linuxppc-dev@lists.ozlabs.org, aik@amd.com
+Cc: oe-kbuild-all@lists.linux.dev, npiggin@gmail.com,
+	christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
+	naveen.n.rao@linux.ibm.com, gbatra@linux.vnet.ibm.com,
+	brking@linux.vnet.ibm.com, sbhat@linux.ibm.com, aik@ozlabs.ru,
+	jgg@ziepe.ca, ruscur@russell.cc, robh@kernel.org,
+	linux-kernel@vger.kernel.org, joel@jms.id.au, kvm@vger.kernel.org,
+	msuchanek@suse.de, oohall@gmail.com, mahesh@linux.ibm.com,
+	jroedel@suse.de, vaibhav@linux.ibm.com, svaidy@linux.ibm.com
+Subject: Re: [PATCH v3 6/6] powerpc/iommu: Reimplement the
+ iommu_table_group_ops for pSeries
+Message-ID: <202406121640.yr6LK5HJ-lkp@intel.com>
+References: <171810901192.1721.18057294492426295643.stgit@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 25/65] i386/tdx: Add property sept-ve-disable for
- tdx-guest object
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
- <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>,
- Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, kvm@vger.kernel.org, qemu-devel@nongnu.org,
- Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
- Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
- <isaku.yamahata@gmail.com>, Chenyi Qiang <chenyi.qiang@intel.com>,
- Zhenzhong Duan <zhenzhong.duan@intel.com>
-References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-26-xiaoyao.li@intel.com> <ZmGTXP36B76IRalJ@redhat.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <ZmGTXP36B76IRalJ@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171810901192.1721.18057294492426295643.stgit@linux.ibm.com>
 
-On 6/6/2024 6:45 PM, Daniel P. Berrangé wrote:
-> Copying  Zhenzhong Duan as my point relates to the proposed libvirt
-> TDX patches.
-> 
-> On Thu, Feb 29, 2024 at 01:36:46AM -0500, Xiaoyao Li wrote:
->> Bit 28 of TD attribute, named SEPT_VE_DISABLE. When set to 1, it disables
->> EPT violation conversion to #VE on guest TD access of PENDING pages.
->>
->> Some guest OS (e.g., Linux TD guest) may require this bit as 1.
->> Otherwise refuse to boot.
->>
->> Add sept-ve-disable property for tdx-guest object, for user to configure
->> this bit.
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
->> Acked-by: Markus Armbruster <armbru@redhat.com>
->> ---
->> Changes in v4:
->> - collect Acked-by from Markus
->>
->> Changes in v3:
->> - update the comment of property @sept-ve-disable to make it more
->>    descriptive and use new format. (Daniel and Markus)
->> ---
->>   qapi/qom.json         |  7 ++++++-
->>   target/i386/kvm/tdx.c | 24 ++++++++++++++++++++++++
->>   2 files changed, 30 insertions(+), 1 deletion(-)
->>
->> diff --git a/qapi/qom.json b/qapi/qom.json
->> index 220cc6c98d4b..89ed89b9b46e 100644
->> --- a/qapi/qom.json
->> +++ b/qapi/qom.json
->> @@ -900,10 +900,15 @@
->>   #
->>   # Properties for tdx-guest objects.
->>   #
->> +# @sept-ve-disable: toggle bit 28 of TD attributes to control disabling
->> +#     of EPT violation conversion to #VE on guest TD access of PENDING
->> +#     pages.  Some guest OS (e.g., Linux TD guest) may require this to
->> +#     be set, otherwise they refuse to boot.
->> +#
->>   # Since: 9.0
->>   ##
->>   { 'struct': 'TdxGuestProperties',
->> -  'data': { }}
->> +  'data': { '*sept-ve-disable': 'bool' } }
-> 
-> So this exposes a single boolean property that gets mapped into one
-> specific bit in the TD attributes:
-> 
->> +
->> +static void tdx_guest_set_sept_ve_disable(Object *obj, bool value, Error **errp)
->> +{
->> +    TdxGuest *tdx = TDX_GUEST(obj);
->> +
->> +    if (value) {
->> +        tdx->attributes |= TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
->> +    } else {
->> +        tdx->attributes &= ~TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
->> +    }
->> +}
-> 
-> If I look at the documentation for TD attributes
-> 
->    https://download.01.org/intel-sgx/latest/dcap-latest/linux/docs/Intel_TDX_DCAP_Quoting_Library_API.pdf
-> 
-> Section "A.3.4. TD Attributes"
-> 
-> I see "TD attributes" is a 64-bit int, with 5 bits currently
-> defined "DEBUG", "SEPT_VE_DISABLE", "PKS", "PL", "PERFMON",
-> and the rest currently reserved for future use. This makes me
-> wonder about our modelling approach into the future ?
-> 
-> For the AMD SEV equivalent we've just directly exposed the whole
-> field as an int:
-> 
->       'policy' : 'uint32',
-> 
-> For the proposed SEV-SNP patches, the same has been done again
-> 
-> https://lists.nongnu.org/archive/html/qemu-devel/2024-06/msg00536.html
-> 
->       '*policy': 'uint64',
-> 
-> 
-> The advantage of exposing individual booleans is that it is
-> self-documenting at the QAPI level, but the disadvantage is
-> that every time we want to expose ability to control a new
-> bit in the policy we have to modify QEMU, libvirt, the mgmt
-> app above libvirt, and whatever tools the end user has to
-> talk to the mgmt app.
-> 
-> If we expose a policy int, then newly defined bits only require
-> a change in QEMU, and everything above QEMU will already be
-> capable of setting it.
-> 
-> In fact if I look at the proposed libvirt patches, they have
-> proposed just exposing a policy "int" field in the XML, which
-> then has to be unpacked to set the individual QAPI booleans
-> 
->    https://lists.libvirt.org/archives/list/devel@lists.libvirt.org/message/WXWXEESYUA77DP7YIBP55T2OPSVKV5QW/
-> 
-> On balance, I think it would be better if QEMU just exposed
-> the raw TD attributes policy as an uint64 at QAPI, instead
-> of trying to unpack it to discrete bool fields. This gives
-> consistency with SEV and SEV-SNP, and with what's proposed
-> at the libvirt level, and minimizes future changes when
-> more policy bits are defined.
+Hi Shivaprasad,
 
-The reasons why introducing individual bit of sept-ve-disable instead of 
-a raw TD attribute as a whole are that
+kernel test robot noticed the following build warnings:
 
-1. other bits like perfmon, PKS, KL are associated with cpu properties, 
-e.g.,
+[auto build test WARNING on powerpc/fixes]
+[also build test WARNING on awilliam-vfio/next awilliam-vfio/for-linus linus/master v6.10-rc3]
+[cannot apply to powerpc/next next-20240612]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-	perfmon -> pmu,
-	pks -> pks,
-	kl -> keylokcer feature that QEMU currently doesn't support
+url:    https://github.com/intel-lab-lkp/linux/commits/Shivaprasad-G-Bhat/powerpc-iommu-Move-pSeries-specific-functions-to-pseries-iommu-c/20240611-203313
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git fixes
+patch link:    https://lore.kernel.org/r/171810901192.1721.18057294492426295643.stgit%40linux.ibm.com
+patch subject: [PATCH v3 6/6] powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries
+config: powerpc64-randconfig-001-20240612 (https://download.01.org/0day-ci/archive/20240612/202406121640.yr6LK5HJ-lkp@intel.com/config)
+compiler: powerpc64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240612/202406121640.yr6LK5HJ-lkp@intel.com/reproduce)
 
-If allowing configuring attribute directly, we need to deal with the 
-inconsistence between attribute vs cpu property.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406121640.yr6LK5HJ-lkp@intel.com/
 
-2. people need to know the exact bit position of each attribute. I don't 
-think it is a user-friendly interface to require user to be aware of 
-such details.
+All warnings (new ones prefixed by >>):
 
-For example, if user wants to create a Debug TD, user just needs to set 
-'debug=on' for tdx-guest object. It's much more friendly than that user 
-needs to set the bit 0 of the attribute.
+   arch/powerpc/platforms/pseries/iommu.c: In function 'spapr_tce_create_table':
+>> arch/powerpc/platforms/pseries/iommu.c:1953:22: warning: variable 'entries_shift' set but not used [-Wunused-but-set-variable]
+    1953 |         unsigned int entries_shift;
+         |                      ^~~~~~~~~~~~~
+   arch/powerpc/platforms/pseries/iommu.c: In function 'spapr_tce_unset_window':
+>> arch/powerpc/platforms/pseries/iommu.c:2166:24: warning: variable 'pci' set but not used [-Wunused-but-set-variable]
+    2166 |         struct pci_dn *pci;
+         |                        ^~~
 
 
->> +
->>   /* tdx guest */
->>   OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
->>                                      tdx_guest,
->> @@ -529,6 +549,10 @@ static void tdx_guest_init(Object *obj)
->>       qemu_mutex_init(&tdx->lock);
->>   
->>       tdx->attributes = 0;
->> +
->> +    object_property_add_bool(obj, "sept-ve-disable",
->> +                             tdx_guest_get_sept_ve_disable,
->> +                             tdx_guest_set_sept_ve_disable);
->>   }
->>   
->>   static void tdx_guest_finalize(Object *obj)
->> -- 
->> 2.34.1
->>
-> 
-> With regards,
-> Daniel
+vim +/entries_shift +1953 arch/powerpc/platforms/pseries/iommu.c
 
+  1940	
+  1941	static long spapr_tce_create_table(struct iommu_table_group *table_group, int num,
+  1942					   __u32 page_shift, __u64 window_size, __u32 levels,
+  1943					   struct iommu_table **ptbl)
+  1944	{
+  1945		struct pci_dev *pdev = iommu_group_get_first_pci_dev(table_group->group);
+  1946		u32 ddw_avail[DDW_APPLICABLE_SIZE];
+  1947		struct ddw_create_response create;
+  1948		unsigned long liobn, offset, size;
+  1949		unsigned long start = 0, end = 0;
+  1950		struct ddw_query_response query;
+  1951		const __be32 *default_prop;
+  1952		struct failed_ddw_pdn *fpdn;
+> 1953		unsigned int entries_shift;
+  1954		unsigned int window_shift;
+  1955		struct device_node *pdn;
+  1956		struct iommu_table *tbl;
+  1957		struct dma_win *window;
+  1958		struct property *win64;
+  1959		struct pci_dn *pci;
+  1960		u64 win_addr;
+  1961		int len, i;
+  1962		long ret;
+  1963	
+  1964		if (!is_power_of_2(window_size) || levels > 1)
+  1965			return -EINVAL;
+  1966	
+  1967		window_shift = order_base_2(window_size);
+  1968		entries_shift = window_shift - page_shift;
+  1969	
+  1970		mutex_lock(&dma_win_init_mutex);
+  1971	
+  1972		ret = -ENODEV;
+  1973	
+  1974		pdn = pci_dma_find_parent_node(pdev, table_group);
+  1975		if (!pdn || !PCI_DN(pdn)) { /* Niether of 32s|64-bit exist! */
+  1976			dev_warn(&pdev->dev, "No dma-windows exist for the node %pOF\n", pdn);
+  1977			goto out_failed;
+  1978		}
+  1979		pci = PCI_DN(pdn);
+  1980	
+  1981		/* If the enable DDW failed for the pdn, dont retry! */
+  1982		list_for_each_entry(fpdn, &failed_ddw_pdn_list, list) {
+  1983			if (fpdn->pdn == pdn) {
+  1984				dev_info(&pdev->dev, "%pOF in failed DDW device list\n", pdn);
+  1985				goto out_unlock;
+  1986			}
+  1987		}
+  1988	
+  1989		tbl = iommu_pseries_alloc_table(pci->phb->node);
+  1990		if (!tbl) {
+  1991			dev_dbg(&pdev->dev, "couldn't create new IOMMU table\n");
+  1992			goto out_unlock;
+  1993		}
+  1994	
+  1995		if (num == 0) {
+  1996			bool direct_mapping;
+  1997			/* The request is not for default window? Ensure there is no DDW window already */
+  1998			if (!is_default_window_request(table_group, page_shift, window_size)) {
+  1999				if (find_existing_ddw(pdn, &pdev->dev.archdata.dma_offset, &len,
+  2000						      &direct_mapping)) {
+  2001					dev_warn(&pdev->dev, "%pOF: 64-bit window already present.", pdn);
+  2002					ret = -EPERM;
+  2003					goto out_unlock;
+  2004				}
+  2005			} else {
+  2006				/* Request is for Default window, ensure there is no DDW if there is a
+  2007				 * need to reset. reset-pe otherwise removes the DDW also
+  2008				 */
+  2009				default_prop = of_get_property(pdn, "ibm,dma-window", NULL);
+  2010				if (!default_prop) {
+  2011					if (find_existing_ddw(pdn, &pdev->dev.archdata.dma_offset, &len,
+  2012							      &direct_mapping)) {
+  2013						dev_warn(&pdev->dev, "%pOF: Attempt to create window#0 when 64-bit window is present. Preventing the attempt as that would destroy the 64-bit window",
+  2014							 pdn);
+  2015						ret = -EPERM;
+  2016						goto out_unlock;
+  2017					}
+  2018	
+  2019					restore_default_dma_window(pdev, pdn);
+  2020	
+  2021					default_prop = of_get_property(pdn, "ibm,dma-window", NULL);
+  2022					of_parse_dma_window(pdn, default_prop, &liobn, &offset, &size);
+  2023					/* Limit the default window size to window_size */
+  2024					iommu_table_setparms_common(tbl, pci->phb->bus->number, liobn,
+  2025								    offset, 1UL << window_shift,
+  2026								    IOMMU_PAGE_SHIFT_4K, NULL,
+  2027								    &iommu_table_lpar_multi_ops);
+  2028					iommu_init_table(tbl, pci->phb->node, start, end);
+  2029	
+  2030					table_group->tables[0] = tbl;
+  2031	
+  2032					mutex_unlock(&dma_win_init_mutex);
+  2033	
+  2034					goto exit;
+  2035				}
+  2036			}
+  2037		}
+  2038	
+  2039		ret = of_property_read_u32_array(pdn, "ibm,ddw-applicable",
+  2040					&ddw_avail[0], DDW_APPLICABLE_SIZE);
+  2041		if (ret) {
+  2042			dev_info(&pdev->dev, "ibm,ddw-applicable not found\n");
+  2043			goto out_failed;
+  2044		}
+  2045		ret = -ENODEV;
+  2046	
+  2047		pr_err("%s: Calling query %pOF\n", __func__, pdn);
+  2048		ret = query_ddw(pdev, ddw_avail, &query, pdn);
+  2049		if (ret)
+  2050			goto out_failed;
+  2051		ret = -ENODEV;
+  2052	
+  2053		len = window_shift;
+  2054		if (query.largest_available_block < (1ULL << (len - page_shift))) {
+  2055			dev_dbg(&pdev->dev, "can't map window 0x%llx with %llu %llu-sized pages\n",
+  2056					1ULL << len, query.largest_available_block,
+  2057					1ULL << page_shift);
+  2058			ret = -EINVAL; /* Retry with smaller window size */
+  2059			goto out_unlock;
+  2060		}
+  2061	
+  2062		if (create_ddw(pdev, ddw_avail, &create, page_shift, len)) {
+  2063			pr_err("%s: Create ddw failed %pOF\n", __func__, pdn);
+  2064			goto out_failed;
+  2065		}
+  2066	
+  2067		win_addr = ((u64)create.addr_hi << 32) | create.addr_lo;
+  2068		win64 = ddw_property_create(DMA64_PROPNAME, create.liobn, win_addr, page_shift, len);
+  2069		if (!win64)
+  2070			goto remove_window;
+  2071	
+  2072		ret = of_add_property(pdn, win64);
+  2073		if (ret) {
+  2074			dev_err(&pdev->dev, "unable to add DMA window property for %pOF: %ld", pdn, ret);
+  2075			goto free_property;
+  2076		}
+  2077		ret = -ENODEV;
+  2078	
+  2079		window = ddw_list_new_entry(pdn, win64->value);
+  2080		if (!window)
+  2081			goto remove_property;
+  2082	
+  2083		window->direct = false;
+  2084	
+  2085		for (i = 0; i < ARRAY_SIZE(pci->phb->mem_resources); i++) {
+  2086			const unsigned long mask = IORESOURCE_MEM_64 | IORESOURCE_MEM;
+  2087	
+  2088			/* Look for MMIO32 */
+  2089			if ((pci->phb->mem_resources[i].flags & mask) == IORESOURCE_MEM) {
+  2090				start = pci->phb->mem_resources[i].start;
+  2091				end = pci->phb->mem_resources[i].end;
+  2092					break;
+  2093			}
+  2094		}
+  2095	
+  2096		/* New table for using DDW instead of the default DMA window */
+  2097		iommu_table_setparms_common(tbl, pci->phb->bus->number, create.liobn, win_addr,
+  2098					    1UL << len, page_shift, NULL, &iommu_table_lpar_multi_ops);
+  2099		iommu_init_table(tbl, pci->phb->node, start, end);
+  2100	
+  2101		pci->table_group->tables[num] = tbl;
+  2102		set_iommu_table_base(&pdev->dev, tbl);
+  2103		pdev->dev.archdata.dma_offset = win_addr;
+  2104	
+  2105		spin_lock(&dma_win_list_lock);
+  2106		list_add(&window->list, &dma_win_list);
+  2107		spin_unlock(&dma_win_list_lock);
+  2108	
+  2109		mutex_unlock(&dma_win_init_mutex);
+  2110	
+  2111		goto exit;
+  2112	
+  2113	remove_property:
+  2114		of_remove_property(pdn, win64);
+  2115	free_property:
+  2116		kfree(win64->name);
+  2117		kfree(win64->value);
+  2118		kfree(win64);
+  2119	remove_window:
+  2120		__remove_dma_window(pdn, ddw_avail, create.liobn);
+  2121	
+  2122	out_failed:
+  2123		fpdn = kzalloc(sizeof(*fpdn), GFP_KERNEL);
+  2124		if (!fpdn)
+  2125			goto out_unlock;
+  2126		fpdn->pdn = pdn;
+  2127		list_add(&fpdn->list, &failed_ddw_pdn_list);
+  2128	
+  2129	out_unlock:
+  2130		mutex_unlock(&dma_win_init_mutex);
+  2131	
+  2132		return ret;
+  2133	exit:
+  2134		/* Allocate the userspace view */
+  2135		pseries_tce_iommu_userspace_view_alloc(tbl);
+  2136		tbl->it_allocated_size = spapr_tce_get_table_size(page_shift, window_size, levels);
+  2137	
+  2138		*ptbl = iommu_tce_table_get(tbl);
+  2139	
+  2140		return 0;
+  2141	}
+  2142	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
