@@ -1,81 +1,80 @@
-Return-Path: <kvm+bounces-19507-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19508-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B444C905D8D
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:19:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA71A905D94
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 23:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 619CA283C50
-	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:19:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56EA6283A15
+	for <lists+kvm@lfdr.de>; Wed, 12 Jun 2024 21:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 075DE86AE3;
-	Wed, 12 Jun 2024 21:19:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0567C1272A7;
+	Wed, 12 Jun 2024 21:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G5pqxlWO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2UMGOmvp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC082839F1
-	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2E084D35
+	for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 21:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718227146; cv=none; b=mvcwBpHFkBH6+5KC5AYIy9syHRC/WV2uTXrWccMJbT4uLvCU2H55Atu05Ql+6E5C7pePoMClL8PatXEuOjGcm26wB/EscRQcPuqZlarfrv+ekbin7FSZBVVIBIEjVwrgkX/ed6YmRqtkn2VZ80xg6o0T8LBzr5g03BBtCW7gEBY=
+	t=1718227255; cv=none; b=Fa9/l+c0aCCn16snufHTtm4uzJ0Jr9pVglmwizeh6XHGb11MToZDjI9D7CwyM030+/JFOXaq94wC3Yg1C8qJ2N1coZDS6FAmlfnN+NVgvCWyoOx1wZ2vIoUWCnbYs3tWVtslq4qf+dmKO6zs25AN/enwyI9OIng7WRNKI6u7+tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718227146; c=relaxed/simple;
-	bh=MLQYv2BaMO1JDh6FRxrn0183u2i/RhneG1bZBn24Djw=;
+	s=arc-20240116; t=1718227255; c=relaxed/simple;
+	bh=1GcSncPwqKEQjxsMosB7/O2aygmUJPI07VDJmC37b5E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Elyp2zE24N9tof/8SLhnVBfEMmFoHs9i1MPXo3hIWUkPF3stwOUk+LnZ+EhDTesITU0syK3W+GJhc0fJnBfg5PIiwz777TRPxKV1EP2S8wuRQ0SuicjQZwnQjNN8kEYhqZNHZyyTJoM38QgO8fn4p0Af4Zvs7wjCKiLBf/wHVOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G5pqxlWO; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=BKYykDgqJh0v37lgqjz67S+elmJu3ycfS69MtNz0gPE0Q6G+xXmt2R551kdGvt05wZ9NuxX6bdLa+2VBsewVRCWgoaF+nQu6FqFEKzwbP+N/ePQIezT0m+oL8g30EoG/wbBmaSkJjDa0vH48hwTafE84ak5yeaVJVvtxrBHcEWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2UMGOmvp; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6f18f1ec8d8so261368a12.3
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:19:04 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1f847870542so2458925ad.2
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 14:20:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718227144; x=1718831944; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718227252; x=1718832052; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZgahXDJi4rwKNqUUVFC+2hJQOZ9hbHHAlaLc98a2hms=;
-        b=G5pqxlWOVTlPvxIPYTb6ajek2CMU9ErhvUwqRFJ98IjN9n4GVFiqbemxT4129b9puw
-         dUnJ+7k7avpS5B/6VXMJLbrbkOVSuuDBYxpKHk0AnTyy1CC5oL315PbVcPB8iFpuQcLc
-         9uSjNDPPhxVHpINbPujkEq9OvSWd3Z2c6smuTXPDUMeUy+vPSy+W/aUFQD0XKMGk0IVq
-         51xIfLhIxNaVeEBFate14JJsLqDm1YLI7Pqg/EYbOUZWlsVkZzsb28YdLr4Vw5uzCN1O
-         9MIXrZG8OqsAbLdfkQzrzW4ixYOGNEHNrHq9YR/oXdwzpMRpFbfb+VRlh4wVLAzOUstq
-         ZPZg==
+        bh=a4s5wFvfeNJXCJWEmUtUY237craFIfNnXh+7wQwiZM8=;
+        b=2UMGOmvpfuxZFXk9IV9IutXeotId8EYUzKxQe4/pzSKzalDUMuUMEqCZ5S5+bCP5+m
+         SSHuT//O0SB2zqV4FxFGPHmmZGLwPSP56Y1+PxVV6hhGDtQ6R2IcJwamT9EcJ7LMdEjO
+         HltO6YBhQ5oSis1c/KH9H/H/EXXqwu6pKt6rSzWzEOx+N6ioUBcRUr6UIX4Ak2hqLOS4
+         YR1Ka/kf6HBxDtfcKPPQ5TOYZ8bkDAGDxplSzY1EWkF6+3ahoxzvrmZ/5xGlAvT4BWhd
+         VQ41E3iDlGaeha/vh3q5coQbWOCCC8yQRr7AcyCV2yD1Hm9oYxHtmdEVxYp0BcielSdp
+         jVJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718227144; x=1718831944;
+        d=1e100.net; s=20230601; t=1718227252; x=1718832052;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZgahXDJi4rwKNqUUVFC+2hJQOZ9hbHHAlaLc98a2hms=;
-        b=ppQkBzrBSNP4U+YQxSxI+Pyfi4E9iUgnWy+U0ox7kN88RgW3Dypj78XGP/432tetpe
-         C3ktnuboLsn7M8BC0pcowyMafVRNcem7UCG8FhhFs33bpCzxcmJyIHRvFRW9q8KSWkd0
-         Tcrh2czQOrYryftoJoo7pSLllKiLlU0KKIMS0JpdoKT1sEmWoD+HJ07A06QzbLx/eNjk
-         IHOau6YX2pfNX/GXSHbv0MZJnGk8zT5fknqRJ7isBYsWggFAJg5+8UHPM48Z0H56/5pF
-         8Ox3ASjRQBUlcFK4xyqrPV3UwgPRZdQefdjFgqyV6AkQe/ctLIwiiRbiooybRg2zXprz
-         aYcg==
-X-Forwarded-Encrypted: i=1; AJvYcCWaSzJ/04Ua4rBhZ71kkz2hY5YTiBspT1FXaCRGdFsLu4qT2mxUuWlXLrbWQrDx821APUBfegBTTTdNcsF3afz8MMEg
-X-Gm-Message-State: AOJu0YyVKuY85PpimwslxT/tLJWytMUSyRrh/Uw9bBVV2Uo9hOLKOcwv
-	/KTFcVieu5f4GNzAvD+iVj83LXvJiPc8urwQK9RJbeVXop772dMvOLRiwjK11URQa1zKNg5cO7I
-	fRA==
-X-Google-Smtp-Source: AGHT+IEyX+BvqryxMRr9G0bMzgAJHpudMNKKmYw7eyQeJ8a3uw3AhkQsT+dsqu7wlsIWbs8crlNnEDE965o=
+        bh=a4s5wFvfeNJXCJWEmUtUY237craFIfNnXh+7wQwiZM8=;
+        b=IkpI7uoPxnaTQPxLNLgxGjM37eev9D95p0lN1N7lOn34cX9I3oIYj22uWNtPyI2bbW
+         edKJKXpQsgKFKvNKYjIXhPpN+PLdYROMIx6No+PsWi4qjht22wXZYONWwvVn0v05F0JS
+         6myepW7Eph9bv9W3cuXjKcvrszhI7Kh5ZE0OCQiWlijmyA0BifGWN9G7AmbLlc42HiO1
+         jRVq76fLJR17VeJjvohEzgFV8jdJpQdzItPHcBjAnb7+HzJyjZ9dl7fFwKJQXjTdewco
+         62C88rCHqxvsP1ySWej09ld2Ug+yM63HgtuwlZndinesAfYL/Ijp9IA0FNwJKn13rU87
+         bokA==
+X-Forwarded-Encrypted: i=1; AJvYcCWQIbvouYIqihR6XfztEpffVc7Ue3V+Dul9KNd0hvtx2UDGkj+6NO3UJt5wnMd/kSSXYFCXWCWpZfYBaJsEiyJ3hxqs
+X-Gm-Message-State: AOJu0Ywtwe+q16Mc0jvwPkL0h72DYpunG5EY9PyIgQIS2b4n3nz5EWch
+	Snv+iKKKD16KLrHbQaKHSHfA5QauABp6BlpRPloMfWBs6FS/MC8P7H7seM1WSk/dWp8BIIa4k3O
+	2gQ==
+X-Google-Smtp-Source: AGHT+IF236fVTqan1xeFH5dPPmgc0NM7zLynRwigfEMIC3iJa54rvvA/hW7i8p+BK04gMU89grxKlGMEn9I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:451:b0:6e9:66a5:408d with SMTP id
- 41be03b00d2f7-6fae27627b0mr6025a12.1.1718227144135; Wed, 12 Jun 2024 14:19:04
+ (user=seanjc job=sendgmr) by 2002:a17:903:234f:b0:1f3:f8c:55d5 with SMTP id
+ d9443c01a7336-1f83b55b4b7mr84625ad.2.1718227252048; Wed, 12 Jun 2024 14:20:52
  -0700 (PDT)
-Date: Wed, 12 Jun 2024 14:19:02 -0700
-In-Reply-To: <20240207172646.3981-7-xin3.li@intel.com>
+Date: Wed, 12 Jun 2024 14:20:50 -0700
+In-Reply-To: <20240207172646.3981-8-xin3.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-7-xin3.li@intel.com>
-Message-ID: <ZmoQxjksn5bWhlBA@google.com>
-Subject: Re: [PATCH v2 06/25] KVM: VMX: Defer enabling FRED MSRs save/load
- until after set CPUID
+References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-8-xin3.li@intel.com>
+Message-ID: <ZmoRMp_-CXC9QqPK@google.com>
+Subject: Re: [PATCH v2 07/25] KVM: VMX: Set intercept for FRED MSRs
 From: Sean Christopherson <seanjc@google.com>
 To: Xin Li <xin3.li@intel.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
@@ -87,18 +86,43 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Feb 07, 2024, Xin Li wrote:
-> Clear FRED VM entry/exit controls when initializing a vCPU, and set
-> these controls only if FRED is enumerated after set CPUID.
+> @@ -7774,10 +7777,12 @@ static void update_intel_pt_cfg(struct kvm_vcpu *vcpu)
+>  static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  {
+>  	struct vcpu_vmx *vmx = to_vmx(vcpu);
+> +	bool fred_enumerated;
+>  
+>  	kvm_governed_feature_check_and_set(vcpu, X86_FEATURE_FRED);
+> +	fred_enumerated = guest_can_use(vcpu, X86_FEATURE_FRED);
+
+"enumerated" isn't correct.  Userspace can enumerate FRED to the guest even if
+FRED is unsupported in KVM.
+
+Planning for a future where this becomes guest_cpu_cap_has(), maybe "has_fred"?
+
+> -	if (guest_can_use(vcpu, X86_FEATURE_FRED)) {
+> +	if (fred_enumerated) {
+>  		vm_entry_controls_setbit(vmx, VM_ENTRY_LOAD_IA32_FRED);
+>  		secondary_vm_exit_controls_setbit(vmx,
+>  						  SECONDARY_VM_EXIT_SAVE_IA32_FRED |
+> @@ -7788,6 +7793,16 @@ static void vmx_vcpu_config_fred_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  						    SECONDARY_VM_EXIT_SAVE_IA32_FRED |
+>  						    SECONDARY_VM_EXIT_LOAD_IA32_FRED);
+>  	}
+> +
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP0, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP1, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP2, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_RSP3, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_STKLVLS, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP1, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP2, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_SSP3, MSR_TYPE_RW, !fred_enumerated);
+> +	vmx_set_intercept_for_msr(vcpu, MSR_IA32_FRED_CONFIG, MSR_TYPE_RW, !fred_enumerated);
+>  }
+>  
+>  static void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> -- 
+> 2.43.0
 > 
-> FRED VM entry/exit controls need to be set to establish context
-> sufficient to support FRED event delivery immediately after VM entry
-> and exit.  However it is not required to save/load FRED MSRs for
-> a non-FRED guest, which aren't supposed to access FRED MSRs.
-
-Does this actually provide a measurable performance boost?  If not, just do the
-unnecessary load/store on entry/exit.
-
-Generally speaking, the only time KVM dynamically toggles entry/exit controls is
-when KVM wants to run the guest with a host value, e.g. with the host's
-PERF_GLOBAL_CTRL.
 
