@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-19596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 067C09078EB
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 18:57:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BD16907932
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 19:01:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 181661C24AB9
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 16:57:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E199EB2212D
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 17:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94C77149C6A;
-	Thu, 13 Jun 2024 16:57:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CA714A091;
+	Thu, 13 Jun 2024 17:01:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0/fb2Y2b"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ADEac/KR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6189512FB15
-	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 16:57:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DD81474D8
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 17:01:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718297865; cv=none; b=FPtakI6c+KPPWMXoNzPcQFp8lAHjusRxDE8kIgsEl/POqx3V5KCQXxHNeeMV6V4nkKbkaTUZ4UUzPP94I8vK3pL6ANm/V86r+bEvZMP7ueWBN4TwX/HJF5ktdBOxHSiyl1MotGx4ZTGOT/Wc9kUJrH2aIpXFoOLmiDvWZHg6Cds=
+	t=1718298092; cv=none; b=rmmNkK1WUbw300XdEtNahx0IQJqbTPCLexNYEKh2sh7pTYwWDG4wGqsKbJ0zppPYvfmkqvAC+R5trIxSnx6VwYBW+ApEbxJzAR3YscpYXASsLeXAINzLPe05xfyM9rjWEQovHczM5byJkqCzUW3DMBoYUnn3sEopijqa0ZJSnyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718297865; c=relaxed/simple;
-	bh=vL3n1P+q2IBBOi6oygriT7cY6UeZAqtzHG3QyT41Bkk=;
+	s=arc-20240116; t=1718298092; c=relaxed/simple;
+	bh=0lQAT2+KMVRgoQfAgOXbFpy27kuZJljG825RDkACMEY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=C1NXM6Ts3tXlyNPAtPcgHr4LlDLwM0XM7M7O6FnAFnBaxYjvhIOoW4p1i+wvGr43HJkRly6Bj1R11dfDjEG9tz8lxPJnXawvAXaubWZgjjeWziaD20gvrv7N5oDz9K9Kito9FsyD4kR5Luvl5FlnDlw5JLsElTomj1fznAyvHYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0/fb2Y2b; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=JdSSz94xzx+qFuxl/WckHuOXqwiE6wIHm65JbrejXpiunIjaOWJchryUprdtf7tMD3jGLJBo2R3bqKifz+dptjK/LN626S2yMuDqOL0LUE2+uDzEQ8BMkhPL2ryNSyZE+hVwpSjOYEpiUEXymvMQsmw7ZkQS/UQ0t/TBJWjuUko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ADEac/KR; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-63128f5eb5bso15911097b3.2
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 09:57:44 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c2e7719d30so1048334a91.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 10:01:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718297863; x=1718902663; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718298091; x=1718902891; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4d54lSkwQxb+qpzxsG/q3gJ1Ug5mGtZ+nd2FA07+/50=;
-        b=0/fb2Y2bOgaCrpafZwTD9ZWi+uqEz6qzoiuoaRcMDmxKVwE7jOQIDH1lWZVxE7ZJPm
-         Gm9K2IyGlOtkq5tbQoiZFviBLeKDX7tfLK+iWHF66m489WHVLObKNoSsFugQgVn+WpVf
-         KG55Z9TKkQ7qfoDzjLZWAAIn8UnOpo32J234a3jV9fCh3DWBes5VwPnie0DDhdAyhouU
-         0fNAp2ECFb6Ws4g6MfGoGT9oSqL78qLuD/0EeprzD2l9XizwZZCUHe4xUglLSW6PYSoe
-         d89ns3zEQZssnwOXTViWaZc1HJ2fE8XrbE2zZEjf15HjLRw2lurXChV/a21feJaHE7Lr
-         f3AA==
+        bh=XStJnbLK4V1qhVKaIcxt2hEnuPMBNwhPJrtY0iEHhTg=;
+        b=ADEac/KRHgff2C9IepoV7zzOz6xmZ8nc89FX03seKfRMKn907bPjGbTmCTH9eAsUu2
+         aBGU72SZ8aBrK8fAjnZL1yQxV4DQ830AOUTlZRaDJDNe6QaUUohoWAyMiPBxpGwzcNT8
+         lIVc/2gFQboPK6Fv5op1Ouq+1uw+vOAccO6L6Wp48++zRL39p0fzMnZog52djMe9vw3k
+         o9SdfCOPto6z3LSTOayJdRBtHChp43dLyS2FIgMfgIkd94jBhZndNTpZsJSErAucg5sR
+         h6kpBLkiKNqxtPCpQxzxcXgC3WKvMjRvqpF4AOuP7m1Un0bKZv8KBkswQKfqvQOGfgLm
+         yoDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718297863; x=1718902663;
+        d=1e100.net; s=20230601; t=1718298091; x=1718902891;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4d54lSkwQxb+qpzxsG/q3gJ1Ug5mGtZ+nd2FA07+/50=;
-        b=lnhxsJ3+N+8SP795B0rJ7bHZ6WUa6R9mk03oe4JN5q36AqSI/hbLlW7hZHcb5NO4au
-         SW6abzJpwES1vCuEWGbQ8uPLNNYOgFh6jVrgwR0Nw8JQWEUAwnbwE3uLBxE+RfTwhl70
-         66gbLUn0DewhI6kQe6Zx6eVmluhAkecNp5oqeE3zTL0Oh/vQF/Gy6mKxJO4t9fQGPlm6
-         0M3hc/KHOLwIog9x/Q/L9EiReuobrxv/RoxMbcr5KfHAbTGsCty9lZApmUlck/muIo91
-         NSeDiIxtMbXiCZpHHQWT/PlJsp2FDtBGAloUoM7J+xtdptLlEKSuvTHL/lMH1blawITE
-         6vFg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfQgvzOZkJ0LzzswNBeaEGoguSDObXk1kM4CfHIleAcJfqVGz6x10mqV0fdW/6KOB/DCEHEEYjEfxV9k+yBxOhitor
-X-Gm-Message-State: AOJu0YxWaJOEUOywZTES6GweRHp94ZxCHSx13FavQMptUDDU0SF488FI
-	NfH6NVHbvV3p2Y3kEny+px1xewsvg0me+oOxSCxmEs5I0QrRXUO7R7qC1XS5ybMmYQw6ywLw8z/
-	wmw==
-X-Google-Smtp-Source: AGHT+IEYQjre4Uvteh6kfBtG71/rE+jFaH2gbIc1og+uNbgyV0WUL2F6w9jh8gI3FyDLev3v/l4STVjq0oQ=
+        bh=XStJnbLK4V1qhVKaIcxt2hEnuPMBNwhPJrtY0iEHhTg=;
+        b=YQVyICA8r03ciBP9oPh82tuS1a4NSydZuwo1P4gE6wAQYRIWUYr1InleIczOnLl/HO
+         DWKVziD8JC2J9LWvsmOp6pAFg3hoERT+ZPFGb6UYhWiqfRJLKyhQ5y7Kde/BVvLjQxbq
+         yyiyl1QQpq2DE0r0oMRImTVjkohwU3RYDfCHct1CsoJcTTMxXbCqQmH+l/CYs3z92rFs
+         wi4BBPk7hiKxpAdliTgoFspxtcIkytO783FObgrOH+NTL0y4dMoAk5wyxezjkZHajIN6
+         YZLgQeXjt88OGwMC51bbTdYwfsg0vD9gDGnW7KBiFycAXPM+61yjCq0RBy+LBfPztn48
+         HMPg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdNhMNER+rsQXrFrfLU0+0TRJIAfEQwwZ+DkrjXgCBancXiAQRS9bB6+wjzsc40FqBq7/J12xJHp5eI+sm4IYaghjS
+X-Gm-Message-State: AOJu0YxGPa8euar7Z2l90H0mi2VhLMr/mVRi8gfu205pCshaQ+P7gohi
+	Stj+COxCAoJDA/Kaw2N8kug9nLJoYJuEGhB/KnpxNfZZwJincpggPzMXABNJQCRuLhWHzEmJFyr
+	Ifg==
+X-Google-Smtp-Source: AGHT+IGY0fQD4689v6rLCIHgS6868CkRehhGNu4lanKhlcUUceleGb6rw06vnZTUAaafVZSYbUgXh/S7jdE=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6706:b0:622:cd98:3b89 with SMTP id
- 00721157ae682-63224b005fcmr8987b3.9.1718297863344; Thu, 13 Jun 2024 09:57:43
+ (user=seanjc job=sendgmr) by 2002:a17:90a:c7d0:b0:2c3:c8b:f634 with SMTP id
+ 98e67ed59e1d1-2c4da9c8aefmr1011a91.0.1718298090662; Thu, 13 Jun 2024 10:01:30
  -0700 (PDT)
-Date: Thu, 13 Jun 2024 09:57:41 -0700
-In-Reply-To: <20240207172646.3981-13-xin3.li@intel.com>
+Date: Thu, 13 Jun 2024 10:01:29 -0700
+In-Reply-To: <20240207172646.3981-14-xin3.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-13-xin3.li@intel.com>
-Message-ID: <ZmslBVWkRHAjIXrE@google.com>
-Subject: Re: [PATCH v2 12/25] KVM: VMX: Handle FRED event data
+References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-14-xin3.li@intel.com>
+Message-ID: <Zmsl6WtT40-u4Pkn@google.com>
+Subject: Re: [PATCH v2 13/25] KVM: VMX: Handle VMX nested exception for FRED
 From: Sean Christopherson <seanjc@google.com>
 To: Xin Li <xin3.li@intel.com>
 Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
@@ -86,40 +86,50 @@ Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Feb 07, 2024, Xin Li wrote:
-> @@ -7382,6 +7419,24 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+> @@ -725,8 +733,28 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu,
+>  		vcpu->arch.exception.injected = false;
+>  		vcpu->arch.exception.pending = false;
 >  
->  	vmx_disable_fb_clear(vmx);
->  
-> +	/*
-> +	 * %cr2 needs to be saved after a VM exit and restored before a VM
-> +	 * entry in case a VM exit happens immediately after delivery of a
-> +	 * guest #PF but before guest reads %cr2.
-> +	 *
-> +	 * A FRED guest should read its #PF faulting linear address from
-> +	 * the event data field in its FRED stack frame instead of %cr2.
-> +	 * But the FRED 5.0 spec still requires a FRED CPU to update %cr2
-> +	 * in the normal way, thus %cr2 is still updated even for a FRED
-> +	 * guest.
-> +	 *
-> +	 * Note, an NMI could interrupt KVM:
-> +	 *   1) after VM exit but before CR2 is saved.
-> +	 *   2) after CR2 is restored but before VM entry.
-> +	 * And a #PF could happen durng NMI handlng, which overwrites %cr2.
-> +	 * Thus exc_nmi() should save and restore %cr2 upon entering and
-> +	 * before leaving to make sure %cr2 not corrupted.
-> +	 */
+> +		/*
+> +		 * A #DF is NOT a nested event per its definition, however per
+> +		 * FRED spec 5.0 Appendix B, its delivery determines the new
+> +		 * stack level as is done for events occurring when CPL = 0.
+> +		 */
 
-This is 99.9% noise.  What software does or does not do with respect to CR2 is
-completely irrelevant.  The *only* thing that matters is the architectural
-behavior, and architecturally guest CR2 _must_ be up-to-date at all times because
-CR2 accesses cannot be intercepted.  So, just say:
+Similar to my comments about CR2, this is mostly noise.  Unless I'm missing a
+patch, KVM is not responsible for emulating the stack level stuff, and so there
+is zero reason to mention it, because it's not relevant to the KVM code.  Simply
+say that #DF is defined to not be a nested exception.
 
-	/*
-	 * Note, even though FRED delivers the faulting linear address via the
-	 * event data field on the stack, CR2 is still updated.
-	 */
+		/* #DF is NOT a nested event, per its definition. */
 
->  	if (vcpu->arch.cr2 != native_read_cr2())
->  		native_write_cr2(vcpu->arch.cr2);
->  
+
+> +		vcpu->arch.exception.nested = false;
+> +
+>  		kvm_queue_exception_e(vcpu, DF_VECTOR, 0);
+>  	} else {
+> +		/*
+> +		 * FRED spec 5.0 Appendix B: delivery of a nested exception
+> +		 * determines the new stack level as is done for events
+> +		 * occurring when CPL = 0.
+> +		 *
+> +		 * IOW, FRED event delivery of an event encountered in ring 3
+> +		 * normally uses stack level 0 unconditionally.  However, if
+> +		 * the event is an exception nested on any earlier event,
+> +		 * delivery of the nested exception will consult the FRED MSR
+> +		 * IA32_FRED_STKLVLS to determine which stack level to use.
+> +		 */
+
+And drop this entirely.  The above does not help the reader understand _why_ KVM
+sets nested=true for FRED.  E.g. there's no CPL check here.
+
+IMO, this code is entirely self-explanatory; KVM is quite obviously handling a
+back-to-back exceptions, and it doesn't take a big mental leap to grok that FRED
+tracks that information by describing the second exception as "nested".
+
+> +		vcpu->arch.exception.nested = kvm_is_fred_enabled(vcpu);
+> +
+>  		/* replace previous exception with a new one in a hope
+>  		   that instruction re-execution will regenerate lost
+>  		   exception */
 
