@@ -1,92 +1,102 @@
-Return-Path: <kvm+bounces-19549-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19550-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E0C7906464
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 08:50:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E43AA906467
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 08:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 344901C22613
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 06:49:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73DAC2854FD
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 06:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2E9137C4E;
-	Thu, 13 Jun 2024 06:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A406137C3B;
+	Thu, 13 Jun 2024 06:49:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DN3HQJsK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M9CSiT8d"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0475F2119
-	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 06:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07210137933
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 06:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718261384; cv=none; b=HmlYeBhJHqyBkrdRJWWUH2NK38rHJ61/1E4L2BbQzTjur6+nZtN6JzRCKpvxVwM+BTiiZkUhtvnoNdmS0unddk/+IPNnzOYksKOGkRxhyOed1i4Q4v4y5B4FuzCzk2o7xQm7EcVIwhDXCOI8vg3rE6ZEoL1F1lurWGc3hbrn0ds=
+	t=1718261397; cv=none; b=dEY8mEdeiiw2BRVU0Imax9fS3GQPk/za5yAtmpYWQOzY7pXTa54j26YHMnmIk9pQ0CYzk1ndYlkAsJMu/f3B9TbmBRB4GJazLNCcZlJhaA2JgnqytbCyxYL9hfHsg2Isw5igZhSynvtpBdd+91+ZKDN4AKoorTdUuncyzlg67Fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718261384; c=relaxed/simple;
-	bh=nOI9j21ZgI3I0MQ5EhathzuyzKyOMxQisKyvdWlhhdA=;
+	s=arc-20240116; t=1718261397; c=relaxed/simple;
+	bh=Q9ytFUaZFqi/5BMymYxqCA95wvqaeZhoarb+e5F9yPI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qAhkiCuGVw2GAUYb0zVdaTWMhsCmMUiv8FuLJeT7D/aPJEu0dxPcJ9RZ5jBEQP0rdltNkDWY37/HLGWAC6rOjZT2zKCVYImVz2kjgLFOj5JcCQAenivDIXCFO7Hy6ssVtv/RVuURdcb9jzCDRgPoEO7tLTr2zV97VXBsKxEIpG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DN3HQJsK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718261379;
+	 Content-Type:Content-Disposition:In-Reply-To; b=UFstLM5ocnbK9winfJ/q0HaWlPWCMsElKT9zLXFFwfnK7Ch5Q9VMf/id7eYIBzcL+4zMG06Xr+cjDA19hEjgSP7DzVoiKrfJC5fN1yPEFyqQJghSBUfVGJ1S2NKlK/t++wOikiISRZzfcs3BkM+hSGgY244XLuX0XBzKRdxfeaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M9CSiT8d; arc=none smtp.client-ip=95.215.58.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: seanjc@google.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718261393;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/CbSxasg15SB+kyQXKy/dPIg+1PKI2NcVPeH5mNpLbA=;
-	b=DN3HQJsKk3VrNcnEUXYwMdHPFbzYJDIOv82JFW/h1KtjgN4QlRUZhxWUy+PEIZ/WVL4rG1
-	I76r8Caw+0MM4u+xM4t1t4T2aCMjC/ppnXdJiGuX6G7ygInJJSU2aHhvsEha8y7r0hXy/I
-	gEMqUBbPjD2bpWdD+oJd5C5a/zfE89I=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-45-sg5Kytz3Pmqa-TWdPqs-cw-1; Thu, 13 Jun 2024 02:49:34 -0400
-X-MC-Unique: sg5Kytz3Pmqa-TWdPqs-cw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-35f09791466so365608f8f.2
-        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 23:49:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718261371; x=1718866171;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/CbSxasg15SB+kyQXKy/dPIg+1PKI2NcVPeH5mNpLbA=;
-        b=jPluGrP8/10XIDVAZGMNuKuFIc8KzEu+nC3lsZND5N5y4DpfzXifXs+FXYvoXA+wKr
-         fjyYeDDhqW3RbKwApBo2fiKQxXClddMQ8F22g5N3ZxEB0FMfdEdClWOY/qOfcqUkYSn8
-         wmZsdSMeTzIP+0x4TtiewFUQGZAE9i091Drt0b0heRmClBP4sNDOc8vTC3iIhF18U6bH
-         /1CDNCEkkc1itJY8M8lUpozejk9TjsjWZLTh4Cb1vYYnKYLxRnWeB16a0ZojdapwUUHc
-         qAc5yIq5RaokwXp3xy0r/YkeyzK1Ouszg/r1rKUfaKWZIDMU27mhBZKvxpF2vug+19cw
-         MUWA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/PwBCXaGB91zMkD3fuijiYNNTx3lIoZHqaYr2qj9GxseEM8BsKhYKowVmGoykxqdk4eTr9VtFVSYtO4/qhc9ZdS9v
-X-Gm-Message-State: AOJu0YyVgdjZMTSiSHZd2zsCmbU8ZDFFOZzkfTLi3ve6tszU7/oqBOvw
-	5Wz3rmnrNy7zzdRj0z75vwzqO4mat+chHPu9WYgB0A1Oq7vP1+Bvb6mclDOa72d/R6m80P+Fa13
-	3XZz24jmEGPj5jYj7WHO7TACjYV1tuBRhT0MCpV0nvppgItHdIA==
-X-Received: by 2002:a5d:4ac3:0:b0:355:161:b7e6 with SMTP id ffacd0b85a97d-35fdf7ae574mr2690500f8f.41.1718261371374;
-        Wed, 12 Jun 2024 23:49:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE2zc9YTuq67HAYl0S1ZCAGfDX9FHmtCsB3op2ROZqV+XTOIEDmRzmfD9lHK2sqlkU4bC7xmQ==
-X-Received: by 2002:a5d:4ac3:0:b0:355:161:b7e6 with SMTP id ffacd0b85a97d-35fdf7ae574mr2690467f8f.41.1718261370362;
-        Wed, 12 Jun 2024 23:49:30 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:341:5539:9b1a:2e49:4aac:204e])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509c89dsm764954f8f.25.2024.06.12.23.49.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jun 2024 23:49:29 -0700 (PDT)
-Date: Thu, 13 Jun 2024 02:49:25 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, Cindy Lu <lulu@redhat.com>,
-	dtatulea@nvidia.com, jasowang@redhat.com,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
-Message-ID: <20240613024756-mutt-send-email-mst@kernel.org>
-References: <20240611053239.516996-1-lulu@redhat.com>
- <20240611185810.14b63d7d@kernel.org>
- <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
- <20240612031356-mutt-send-email-mst@kernel.org>
- <ZmlMuGGY2po6LLCY@nanopsycho.orion>
+	bh=dUgr+f5/S1BYrMzUIzzHoZq+nuXyyf5V0WdYC25Cd8s=;
+	b=M9CSiT8dKaHTw3piv1V6oTj1KqOQyfs8CvaI3RQ5vdJYFt99RH8vNd3LFbE9PIVk8OwVas
+	XLz0PROCqSuYLAzNwIijJmurJ/2zA913Ie50WmEJwiiEM6WIAqspuiwNr8jfX+PHrPS0PA
+	FrxV+3EAzC1TIsW+x5UmXdQ/vywRTBQ=
+X-Envelope-To: yuzhao@google.com
+X-Envelope-To: jthoughton@google.com
+X-Envelope-To: akpm@linux-foundation.org
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: ankita@nvidia.com
+X-Envelope-To: axelrasmussen@google.com
+X-Envelope-To: catalin.marinas@arm.com
+X-Envelope-To: dmatlack@google.com
+X-Envelope-To: rientjes@google.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: corbet@lwn.net
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: rananta@google.com
+X-Envelope-To: ryan.roberts@arm.com
+X-Envelope-To: shahuang@redhat.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: weixugc@google.com
+X-Envelope-To: will@kernel.org
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-doc@vger.kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: linux-mm@kvack.org
+Date: Wed, 12 Jun 2024 23:49:43 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, James Houghton <jthoughton@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: Re: [PATCH v5 8/9] mm: multi-gen LRU: Have secondary MMUs
+ participate in aging
+Message-ID: <ZmqWhw3eKzwwWUHN@linux.dev>
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-9-jthoughton@google.com>
+ <ZmnGlpBR91TyI3Lt@google.com>
+ <CAOUHufYCmYNngmS=rOSAQRB0N9ai+mA0aDrB9RopBvPHEK42Ng@mail.gmail.com>
+ <ZmnZmj8iVmcLf8fo@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -95,41 +105,44 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZmlMuGGY2po6LLCY@nanopsycho.orion>
+In-Reply-To: <ZmnZmj8iVmcLf8fo@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jun 12, 2024 at 09:22:32AM +0200, Jiri Pirko wrote:
-> Wed, Jun 12, 2024 at 09:15:44AM CEST, mst@redhat.com wrote:
-> >On Wed, Jun 12, 2024 at 08:29:53AM +0200, Jiri Pirko wrote:
-> >> Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
-> >> >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
-> >> >> Add new UAPI to support the mac address from vdpa tool
-> >> >> Function vdpa_nl_cmd_dev_config_set_doit() will get the
-> >> >> MAC address from the vdpa tool and then set it to the device.
-> >> >> 
-> >> >> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
-> >> >
-> >> >Why don't you use devlink?
-> >> 
-> >> Fair question. Why does vdpa-specific uapi even exist? To have
-> >> driver-specific uapi Does not make any sense to me :/
-> >
-> >I am not sure which uapi do you refer to? The one this patch proposes or
-> >the existing one?
+On Wed, Jun 12, 2024 at 10:23:38AM -0700, Sean Christopherson wrote:
+> On Wed, Jun 12, 2024, Yu Zhao wrote:
+> > I do think there can be false negatives but we have not been able to
+> > measure their practical impacts since we disabled the flush on some
+> > host MMUs long ago (NOT by MGLRU), e.g., on x86 and ppc,
+> > ptep_clear_flush_young() is just ptep_test_andclear_young().
 > 
-> Sure, I'm sure pointing out, that devlink should have been the answer
-> instead of vdpa netlink introduction. That ship is sailed,
+> Aha!  That's what I was missing, I somehow didn't see x86's ptep_clear_flush_young().
 
-> now we have
-> unfortunate api duplication which leads to questions like Jakub's one.
-> That's all :/
+Heh, well the helper name isn't exactly giving any hints...
 
+> That begs the question, why does KVM flush TLBs on architectures that don't need
+> to?  And since kvm_mmu_notifier_clear_young() explicitly doesn't flush, are there
+> even any KVM-supported architectures for which the flush is mandatory?
+> 
+> Skipping the flush on KVM x86 seems like a complete no-brainer.
+> 
+> Will, Marc and/or Oliver, what are arm64's requirements in this area?  E.g. I see
+> that arm64's version of __ptep_clear_flush_young() does TLBI but not DSB.  Should
+> KVM be doing something similar?  Can KVM safely skip even the TBLI?
 
+Short answer, yes, KVM can elide TLBIs when clearing AF.
 
-Yea there's no point to argue now, there were arguments this and that
-way.  I don't think we currently have a lot
-of duplication, do we?
+Long answer: Software needs to be extremely careful to ensure that TLBI
+elision doesn't lead to a failure to uphold break-before-make requirements,
+if we're only concerned with architecture-specific requirements. IOW, the AF
+cannot be used as a hint for the presence of TLB entries for a given PTE.
+
+There's the obvious failure of skipping TLBIs for old pages when
+unmapping, but that isn't an architecture-specific issue.
+
+So, since KVM/arm64 doesn't play any games with the AF at stage-2, leaving
+out a TLBI when aging ought to be fine.
 
 -- 
-MST
-
+Thanks,
+Oliver
 
