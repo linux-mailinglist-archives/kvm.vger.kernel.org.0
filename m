@@ -1,112 +1,138 @@
-Return-Path: <kvm+bounces-19611-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19612-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC319907BD7
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 20:57:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 463CC907BEE
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 21:01:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BF64282D81
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 18:57:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C60C11F22F09
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 19:01:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A775A14C586;
-	Thu, 13 Jun 2024 18:57:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F41C15217E;
+	Thu, 13 Jun 2024 19:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G+ueFLQP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qYca01sR"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8184714B064
-	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 18:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E3F14E2F2
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 19:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718305053; cv=none; b=VFr3od7/yZ2F70lkgaXQBfIGxHKt6M8Rq1QKZapeNQmS8fxDROLlkmgwDb1kSk7sWcCK2pHb/YK7Cp+YYiH9XHYySJIN8+AIp2mdcQ5opO3nmAbu6xKJfh2JT1bz/HI9/2RSjVB8EryOWa9zCmi3GLyXXOBsompdv1Hk5xfE8OQ=
+	t=1718305268; cv=none; b=eRkx/DWO0V0wl5T5+BiWQpFv58lY9HXvGJNGMINBlMWZ+zUvKAwrMXgZCcx3MptE/5D082BIB2FGL4IsHzmFkjHOtZSNaOq60fu+46DYbTiqzkF7DFdUATm9SlxcrIDx54EzleOX94wUsvaL99zDvVB2TxN3QQE++uvkjdT4+Yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718305053; c=relaxed/simple;
-	bh=tSGg8GhzkVKrJZ6e6lZkA8/ZUCa4bAOubkF1I12udL4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CHvsZIAwdcBPSSZUnVSbb1EHwQ02oJDfH4JpKqoBc26nLxfGMisjyPwKoe2bDz1l/5jB0gSFeZ5ryAR0oA8m+3SnjJR8qQhLIbEm9xYrNXh12cepRHRf8NGUt0l+fciej+Ifl1JxZi29lwFmOtqDOLzYkByqxF1CgYqN34VTEEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G+ueFLQP; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1718305268; c=relaxed/simple;
+	bh=EdM3NFAHtqf7iO6j5P+sTJg6E55g7ZvNba3lzMdLcdE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bYHqS4+KcNKUMBRsF94QMHckpacYjQcQmf0HTwfbMFqI2VbItbeLfL1tr1rQdPxnK9ffRon1H2v9Nqqa9En9UDUQ9Ro7tv6tye+dCAAm9wegRvsj9OqD/MenRvSXjOFGDFjHnkxcpK5wJylZxkJIFghsrm6Ke0gQDmYNP+tFX7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qYca01sR; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62f3c5f5bf7so22232837b3.0
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 11:57:32 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62cf0ed7761so26717807b3.1
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 12:01:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718305051; x=1718909851; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C5Fndbx/eA449NVcOCPdnOjxiUO14w1zakbsrpN7bkY=;
-        b=G+ueFLQPrvYGJO1ILHQSKacSbWHY318hzKz/2Cxe6D+AkjO2OisZeOGFNsiXDXX4Hi
-         BFR4lTMpdFPcR+PTZzmlBkctfvO6ZCz27Ul1tEP9zu9uEoKvgHhVpL4DwPelKTOyV/Pw
-         BUV/I1ZXnnTpSDlVGNwXr8eeAuQI2sl5j4+l1fjU5cm+u9phuTOMjPiMKqUx9TmkiEkm
-         rQJon4fE7Uo2hLHbq1H4wAdV2CycVtfkzJYntR64dcbPeWpZwpYupuFJy7BS1KaoVB+T
-         GLuXNUNOZCKBq2zT5nFBHZJaGclkxF86ISe0fbIYlkco5+pYasz+H8JOyHFg2ForjwX1
-         Qr5w==
+        d=google.com; s=20230601; t=1718305266; x=1718910066; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4scoAI3xWobVP6E+XRq1RKOC326O2un8fjhuaP6CeHI=;
+        b=qYca01sRmt9Aj9brAT+UPLIs7l0+oYKqRqCdLIFggseMPqFNIvCGdQKYzu3G6LkuRf
+         /6IXUddcTmCvfrhLk+OKM7VPwHlga6pXoBhVev3J9CEn50qyZH9xA/OERr0AIXYu6eIQ
+         HmN4mVEDGQ0om0bLFmUIQ+HOtvgfhTZIZXW4sqfy9LGH+TmTT/5zm5gZdAsMFzLFPb5N
+         LgD1sRo3jvYXQCoQKfsuerzbTFNBITMNqF1S1cyT6Rec4SVBYlkdWiP1MuowViX/IV3b
+         zjWyZzIlgbu0CeJqHuQXKILlTCfXw0sitpV+e2bA+HCL1XqxFyzeMx47UUnk3i2cf/S7
+         /XIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718305051; x=1718909851;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=C5Fndbx/eA449NVcOCPdnOjxiUO14w1zakbsrpN7bkY=;
-        b=jmUdvAsa6NDV9qVVaKGKHsRU2rmgTsvMejQxxENe9uO/0FK+ijSHpS+4kj6q4Q4UWI
-         KmIZSAMWCKbDLfrbOa924o4jcyVBUOB8EOZQeVyPlaa6xiHp1V+8IKKmXB1V6QoKB55I
-         am71NYk7DJXeRX+vLlNM7PjaidtCKXTMFkk5TstyasVSq5x8VUDPbkG/2pjFsW9oHGwp
-         tlrTDwOZmitXuJqSqFh90dy2MWRwWaMAy22swx9O3PCQuGnONNaYDa084yXvcxeCvXPx
-         wGilc8ZFnzuZDXUdyOU8v5UniUJ5SidtL8hDmGVGA8yPf1mkXMTDgV4cO+TCZ9Kt1apC
-         kDTg==
-X-Forwarded-Encrypted: i=1; AJvYcCXFE0MpiJd1u9Ila/slNll6mU20fXii+eHHJUakfG99F55H6T8vY6iU+1KM+GEha5BD93QwlGkUha575d8IvxFc2Yzz
-X-Gm-Message-State: AOJu0YxfDRcIZkXi4SKa/VHQb5DOk21kkQQwYz7qXZvkj6kBR0oWBMOk
-	G6HY62wBfsfiYDfTZyiDzZyuBsIfaoOqikimFt1fRZ6ZgZN6aSNMT8Be3XZzuQW3fEWyQUCKhUz
-	oxg==
-X-Google-Smtp-Source: AGHT+IEtwzPPtdTb/6r1+Lt3zX+YRN2khdPMq6WUaa3M6+7UwQdtsLyL+FOBLDIaz3NH6he0KFHlOzU1XFo=
+        d=1e100.net; s=20230601; t=1718305266; x=1718910066;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4scoAI3xWobVP6E+XRq1RKOC326O2un8fjhuaP6CeHI=;
+        b=L52/SUymcEKP94/nBUvET28a838CZyTb1MDkIOV3q29NRJH3ppCwmHt9cZp5fOBAoF
+         VfkRQNGbjDJFj9PgLj3qOjOzCH2UN9WgJgSyzuy2pbkYobi7Df92u4N0LTP8CC3iHwUw
+         xRfU6MRs1VhcWz0jpPiAW7wYAkt1cSwZX/dB6nzSvO0fspHAN0hzYxZWC5M/w8/SqL96
+         Mm3JzOL+owW9DMRJA/v0ZJ+gjNDFRe7/9vYJ2Rs7dHS0/mM4rA9MWtg6Msaqu+DnV5SX
+         6onFJcr9d3D+/VAVtJvp6+onplpdmQh/7X4a/VCZ8Mefcjfac42iQ6I9EszxKxHT3/9v
+         Vq7Q==
+X-Gm-Message-State: AOJu0Yw3w7c1uGvHH9qkivS2TIzPwiKbalAyS3EXqg4KQNGUkim0xo5r
+	+xL3WMwWslj8AuNDTpIXXHE7X733BNy/ZGhnlElntkvpP59IWQrvCKtTkJLZuHREXcN+rgzrw/5
+	PFw==
+X-Google-Smtp-Source: AGHT+IEz/kaKBHJHUJSiWymGtpYz5LODHuIW1raDtRMykoNrYAMEWe+IYh3gOJ/yB9zn1NGxXheewdBDEx8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:398:b0:61b:e689:7347 with SMTP id
- 00721157ae682-6322216bf24mr873747b3.2.1718305051510; Thu, 13 Jun 2024
- 11:57:31 -0700 (PDT)
-Date: Thu, 13 Jun 2024 11:57:30 -0700
-In-Reply-To: <ade2de8f-8f63-45fb-a01a-096d048dd971@collabora.com>
+ (user=seanjc job=sendgmr) by 2002:a25:bfc7:0:b0:dfa:ff74:f262 with SMTP id
+ 3f1490d57ef6-dfefed12278mr647712276.2.1718305266142; Thu, 13 Jun 2024
+ 12:01:06 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu, 13 Jun 2024 12:01:03 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240612104500.425012-1-usama.anjum@collabora.com>
- <20240612104500.425012-2-usama.anjum@collabora.com> <Zmnwhx0Y0qh0x03J@google.com>
- <ade2de8f-8f63-45fb-a01a-096d048dd971@collabora.com>
-Message-ID: <ZmtBGn1rgFu8tcgl@google.com>
-Subject: Re: [PATCH 2/2] selftests: kvm: replace exit() with ksft_exit_fail_msg()
+X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
+Message-ID: <20240613190103.1054877-1-seanjc@google.com>
+Subject: [PATCH] KVM: nVMX: Update VMCS12_REVISION comment to state it should
+ never change
 From: Sean Christopherson <seanjc@google.com>
-To: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Anup Patel <anup@brainfault.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kernel@collabora.com, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jun 13, 2024, Muhammad Usama Anjum wrote:
-> > As above, AFAICT it comes from Google's internal test infrastructure (KVM selftests
-> > came from Google).
-> > 
-> >> Its even better if we use ksft_exit_fail_msg() which will print out "Bail
-> >> out" meaning the test exited without completing. This string is TAP protocol
-> >> specific.
-> > 
-> > This is debatable and not obviously correct.  The documentation says:
-> > 
-> >   Bail out!
-> >   As an emergency measure a test script can decide that further tests are
-> >   useless (e.g. missing dependencies) and testing should stop immediately. In
-> >   that case the test script prints the magic words
-> > 
-> > which suggests that a test should only emit "Bail out!" if it wants to stop
-> > entirely.  We definitely don't want KVM selftests to bail out if a TEST_ASSERT()
-> > fails in one testcase.
-> But KVM tests are bailing out if assert fails, exit(254) is being called
-> which stops the further execution of the test cases.
+Rewrite the comment above VMCS12_REVISION to unequivocally state that the
+ID must never change.  KVM_{G,S}ET_NESTED_STATE have been officially
+supported for some time now, i.e. changing VMCS12_REVISION would break
+userspace.
 
-Not if the TEST_ASSERT() fires from within a test fixture, in which case the
-magic in tools/testing/selftests/kselftest_harness.h captures the failure but
-continues on with the next test.
+Opportunistically add a blurb to the CHECK_OFFSET() comment to make it
+explicitly clear that new fields are allowed, i.e. that the restriction
+on the layout is all about backwards compatibility.
+
+No functional change intended.
+
+Cc: Jim Mattson <jmattson@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/vmx/vmcs12.h | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
+index 01936013428b..56fd150a6f24 100644
+--- a/arch/x86/kvm/vmx/vmcs12.h
++++ b/arch/x86/kvm/vmx/vmcs12.h
+@@ -188,12 +188,13 @@ struct __packed vmcs12 {
+ };
+ 
+ /*
+- * VMCS12_REVISION is an arbitrary id that should be changed if the content or
+- * layout of struct vmcs12 is changed. MSR_IA32_VMX_BASIC returns this id, and
+- * VMPTRLD verifies that the VMCS region that L1 is loading contains this id.
++ * VMCS12_REVISION is KVM's arbitrary ID for the layout of struct vmcs12.  KVM
++ * enumerates this value to L1 via MSR_IA32_VMX_BASIC, and checks the revision
++ * ID during nested VMPTRLD to verify that L1 is loading a VMCS that adhere's
++ * to KVM's virtual CPU definition.
+  *
+- * IMPORTANT: Changing this value will break save/restore compatibility with
+- * older kvm releases.
++ * DO NOT change this value, as it will break save/restore compatibility with
++ * older KVM releases.
+  */
+ #define VMCS12_REVISION 0x11e57ed0
+ 
+@@ -206,7 +207,8 @@ struct __packed vmcs12 {
+ #define VMCS12_SIZE		KVM_STATE_NESTED_VMX_VMCS_SIZE
+ 
+ /*
+- * For save/restore compatibility, the vmcs12 field offsets must not change.
++ * For save/restore compatibility, the vmcs12 field offsets must not change,
++ * although appending fields and/or filling gaps is obviously allowed.
+  */
+ #define CHECK_OFFSET(field, loc) \
+ 	ASSERT_STRUCT_OFFSET(struct vmcs12, field, loc)
+
+base-commit: e4e9e1067138e5620cf0500c3e5f6ebfb9d322c8
+-- 
+2.45.2.627.g7a2c4fd464-goog
+
 
