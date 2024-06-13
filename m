@@ -1,149 +1,121 @@
-Return-Path: <kvm+bounces-19531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9651B905FBB
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 02:32:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B23FB905FBF
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 02:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 231DAB22655
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 00:32:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 974DA1C21235
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 00:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39DCB644;
-	Thu, 13 Jun 2024 00:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400C68472;
+	Thu, 13 Jun 2024 00:32:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eF1VsvRJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fHP6Lqug"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA15C652;
-	Thu, 13 Jun 2024 00:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 075238BEC
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 00:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718238723; cv=none; b=kz9IZJ9RGCIZLnXXGS6F/hkIPFo0YG7XXGqdkRhoh61r72EGJLJozUcb4hR1sRD47Uq0BQeFESSWH45fbtz465gmzMWcnSItmUK84AI4gn0ghPzgcu5J/Vc2MnA8FGHDvYMNONreYzWtk9uSWZPzNBdquN1fC6Glp7CVYF4ah80=
+	t=1718238769; cv=none; b=J/xHQc19EMiG1/6RB+1Rbq/cXXUI/M54o1DkkAy0rfUrq0/g404Tf3I7igAyuzepso0zWmJcXrhTdBo7hnNrCQPn1+9yWPUb60oyWMwDH94JULN8ACV5cRkeqbxDrcos+vTnFMvwGeSUgzN06VAVKa6UD76BiOs7+j90ri27Rgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718238723; c=relaxed/simple;
-	bh=+UbqprezWqxEbhKmSRaDsTwuur4mIfjSb1NUN/fCVbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K4dh9MDL+JHFhrN4K326PI0WduhfcrP0KhZ1vsSROdINZ2B3ogPVKOXnB1Uo+H6O0BytOPqf++V2LhEY9pWfWM0ZnHgVJz2s55AWHMeKQlVmJQpe5brMpR3xllEF7YQuuU8s60sUHVwGOlPGsfkvyKPqZdAOSthwo7h2J7Y9lRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=eF1VsvRJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45E47C116B1;
-	Thu, 13 Jun 2024 00:32:00 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="eF1VsvRJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718238717;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GLUb85oLbjyoG+FcfWhggv8KT8bN6SBWkCY+yvZAHV8=;
-	b=eF1VsvRJdSDlt+jjhJiKZ5eDDi+CCrqpbP2qILiWHB7HfEnI5D10gtd4TmY1udoArULYFC
-	3p47U2iNEXteOz8cl56PqFBBedrFExfiroU7FcnCZmp/raJumk5hGsmXBZe7KI+jDx3FRz
-	mt6afVKn9JVqLJRPjTB0wjVVNYzZzWI=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0c052d48 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 13 Jun 2024 00:31:57 +0000 (UTC)
-Date: Thu, 13 Jun 2024 02:31:53 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <Zmo9-YGraiCj5-MI@zx2c4.com>
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
+	s=arc-20240116; t=1718238769; c=relaxed/simple;
+	bh=wIdpjxSTQcJcaSC2QLNCzSZfTuBcHdMrdFb9Tzcw6jo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GGoae3a5iORfjz2piv2p/H56S3HOG6LZ2w367vmlOp+Z2JzKDdyN9HMT4aEAb6jxD7t9Z+DRUoUdRqfF6eJsxKhJQeQZFhzRqg1MuVRxawpttEDjg6829ApgsNOypfbtvZhFlHwSukbGG+sJKU3z/AZzLVb9ybd2JOq36kuzzoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fHP6Lqug; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6b06446f667so2264896d6.2
+        for <kvm@vger.kernel.org>; Wed, 12 Jun 2024 17:32:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718238767; x=1718843567; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3mbR6XjTl+XtcpIp/RRx4D+3ymHI9xlwahgvOSA+M8I=;
+        b=fHP6LqugiUmQeOvdYwn6Rh+jTvkTCyjb2QedaiKrpV1Wnc3a+d0yk/22TALkP39ftT
+         nNaK1FIBRmApJo7D+rnooOl9B4X5SYrUebhyv+oN8DenjPgTOW6zJJ3kcIf0xA9v6a7H
+         kIoUkfwaQa6g4T3JuVTiW/ixiSNLo02kDK7/ctSVGTDy3SF9fj0Ta3TxnHhIcJLc4ZWN
+         8XVsRHmayYGBOYfrb9GcIbAarqmRAjxXr47MpG/IEgpgjTgOFz8MmlkSeI7+Hnq20nhB
+         N5Tcd9edhZRVUUa1pLNdvMjKM98ws1EyUtB/+w8O8OBcLfz0ET5qjpt4YEUQfAoKFyPg
+         cURQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718238767; x=1718843567;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3mbR6XjTl+XtcpIp/RRx4D+3ymHI9xlwahgvOSA+M8I=;
+        b=mJt+594WR2Lfyok9pUMXI9hhqnMGlHrAz4+P1HNz24zCxrlEaVAN00Bc8BFXQS4jcM
+         lM2/YR1d9xQ+XD2Jni6IZwbCYKq9rve7Uhcio2ylGNDtfzsBAqO898TvNBI0z5k41qPm
+         q04mEtMnuIazZcvtiQRPT17D8r6vuyZR3kTvcrR8UULi+EO1g5eDmm3U2aNsfWRpMyLD
+         wum14WG6YYRr3ob1ccmLzFZW84kkmqqr6sxZO4xg8bNjuyTkfgQQmnN6ET/uKrGi11Hb
+         dT1+swvL8t2PwtWWYa4R1d1jEwejINEJlHxt1QaMK73FMVt42PaDPI65G2i41KImyZ0+
+         S+OA==
+X-Forwarded-Encrypted: i=1; AJvYcCXyxJ68Nye6K50QgbP8UMw2X70HpI2pmXDBIgYKgsemm19ok5uqK774tkSGxeqpqQDk0RyDmSM7QGTCJ4UbotmjkNDg
+X-Gm-Message-State: AOJu0Yz7CGvBZiQ+X+hKvyqqzSPC/Iqx6/vYKI1aJg1yKhEHdVDmHmSx
+	25jkKDvn97aICyhGfH3CW42XSsJLn3KVQ6gsp5whP7qH0lWNLF9IPNrw3kQbNu0=
+X-Google-Smtp-Source: AGHT+IHFPjnZjBLu4CJatyVfxKESSD90OLqXHRp1aUlpSK6t2DyCI0DsxgS0il+4700/wqvrt+Kc3Q==
+X-Received: by 2002:a05:6214:4285:b0:6b0:78f6:8484 with SMTP id 6a1803df08f44-6b192028b32mr38503156d6.30.1718238766772;
+        Wed, 12 Jun 2024 17:32:46 -0700 (PDT)
+Received: from localhost.localdomain ([185.221.23.200])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b2a5f017c5sm1238316d6.137.2024.06.12.17.32.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jun 2024 17:32:46 -0700 (PDT)
+From: jiaqingtong97@gmail.com
+To: zhaotianrui@loongson.cn,
+	maobibo@loongson.cn,
+	chenhuacai@kernel.org,
+	kernel@xen0n.name
+Cc: loongarch@lists.linux.dev,
+	kvm@vger.kernel.org,
+	Jia Qingtong <jiaqingtong97@gmail.com>
+Subject: [PATCH] LoongArch: KVM: always make pte yong in page map's fast path
+Date: Thu, 13 Jun 2024 08:32:17 +0800
+Message-ID: <20240613003217.129303-1-jiaqingtong97@gmail.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Zmov7ZaL-54T9GiM@zx2c4.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 13, 2024 at 01:31:57AM +0200, Jason A. Donenfeld wrote:
-> On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > when the callback only performs kmem_cache_free. Use
-> > > > kfree_rcu() directly.
-> > > > 
-> > > > The changes were done using the following Coccinelle semantic patch.
-> > > > This semantic patch is designed to ignore cases where the callback
-> > > > function is used in another way.
-> > > 
-> > > How does the discussion on:
-> > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > reflect on this series? IIUC we should hold off..
-> > 
-> > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > where the kmem_cache is destroyed during module unload.
-> > 
-> > OK, I might as well go through them...
-> > 
-> > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > 	Needs to wait, see wg_allowedips_slab_uninit().
-> 
-> Right, this has exactly the same pattern as the batman-adv issue:
-> 
->     void wg_allowedips_slab_uninit(void)
->     {
->             rcu_barrier();
->             kmem_cache_destroy(node_cache);
->     }
-> 
-> I'll hold off on sending that up until this matter is resolved.
+From: Jia Qingtong <jiaqingtong97@gmail.com>
 
-BTW, I think this whole thing might be caused by:
+It seems redundant to check if pte is yong before the call to
+kvm_pte_mkyoung in kvm_map_page_fast.
+Just remove the check.
 
-    a35d16905efc ("rcu: Add basic support for kfree_rcu() batching")
+Signed-off-by: Jia Qingtong <jiaqingtong97@gmail.com>
+---
+ arch/loongarch/kvm/mmu.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-The commit message there mentions:
+diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+index 98883aa23ab8..a46befcf85dc 100644
+--- a/arch/loongarch/kvm/mmu.c
++++ b/arch/loongarch/kvm/mmu.c
+@@ -551,10 +551,8 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+ 	}
+ 
+ 	/* Track access to pages marked old */
+-	new = *ptep;
+-	if (!kvm_pte_young(new))
+-		new = kvm_pte_mkyoung(new);
+-		/* call kvm_set_pfn_accessed() after unlock */
++	new = kvm_pte_mkyoung(*ptep);
++	/* call kvm_set_pfn_accessed() after unlock */
+ 
+ 	if (write && !kvm_pte_dirty(new)) {
+ 		if (!kvm_pte_write(new)) {
 
-    There is an implication with rcu_barrier() with this patch. Since the
-    kfree_rcu() calls can be batched, and may not be handed yet to the RCU
-    machinery in fact, the monitor may not have even run yet to do the
-    queue_rcu_work(), there seems no easy way of implementing rcu_barrier()
-    to wait for those kfree_rcu()s that are already made. So this means a
-    kfree_rcu() followed by an rcu_barrier() does not imply that memory will
-    be freed once rcu_barrier() returns.
+base-commit: eb36e520f4f1b690fd776f15cbac452f82ff7bfa
+-- 
+2.45.1
 
-Before that, a kfree_rcu() used to just add a normal call_rcu() into the
-list, but with the function offset < 4096 as a special marker. So the
-kfree_rcu() calls would be treated alongside the other call_rcu() ones
-and thus affected by rcu_barrier(). Looks like that behavior is no more
-since this commit.
-
-Rather than getting rid of the batching, which seems good for
-efficiency, I wonder if the right fix to this would be adding a
-`should_destroy` boolean to kmem_cache, which kmem_cache_destroy() sets
-to true. And then right after it checks `if (number_of_allocations == 0)
-actually_destroy()`, and likewise on each kmem_cache_free(), it could
-check `if (should_destroy && number_of_allocations == 0)
-actually_destroy()`. This way, the work is delayed until it's safe to do
-so. This might also mitigate other lurking bugs of bad code that calls
-kmem_cache_destroy() before kmem_cache_free().
-
-Jason
 
