@@ -1,110 +1,175 @@
-Return-Path: <kvm+bounces-19566-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19567-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89DF0906746
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 10:44:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEAC69067E0
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 10:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FDA01F22548
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 08:44:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4B59B24DA5
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 08:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FA31419B4;
-	Thu, 13 Jun 2024 08:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CF113DDDD;
+	Thu, 13 Jun 2024 08:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GsEmIpuS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DTMTNpPd"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA7543144;
-	Thu, 13 Jun 2024 08:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBCB313D628
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 08:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718268136; cv=none; b=nuU0oXaSJzxnwC62DrfZoPCSa1VHvwQToI+7Aj/B9Gc+HiwKL9TwXy9RFJc44PdvIT1VCbAoom13jV4CJX5ZhPq++Lj9FplUxP5aaGw7Ce/+kaILO23CbZ0JxRZePHk10o9moSyc5KY6F4xw9xrKhVEvTLVtRL+dgdxlvW6gxBQ=
+	t=1718268883; cv=none; b=Z8EhkxzEEAE42stNwuUXXnXxtHTgmq0FY6/Q/u1YFYhXRdQweGDwC619hw/OG3DeLjflHgeNyntjy4/CowyvjZIi9IRMYJ0wymeTPgLfCeaijdHfL7Hg9w0k0RWLp3SHtI5jWjm8a0clWMu51XNVuSeKqJsgyVEAm2BmbVBM+ZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718268136; c=relaxed/simple;
-	bh=4DwpPwkA6d/p4ccA/BSLWy4Hrj0gghbBTVqHDH0Z++Q=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wg0gu7hN0JAJlPfGBhyXM5l6Bur5zQjSJXltYs8lAt4pkzJKUbx0S+RjM4mSAuAsnjgo7SJ6HrZjNKpjj56FBR468Xdwc27aTQqEE7WYUM14LXIrML0nbIBiKrx6JXj1Ovj+yH0PkPmN/GyanZrDXWdqZ0dC0Rpt87P4rBuiG94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GsEmIpuS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078A6C2BBFC;
-	Thu, 13 Jun 2024 08:42:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718268136;
-	bh=4DwpPwkA6d/p4ccA/BSLWy4Hrj0gghbBTVqHDH0Z++Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GsEmIpuSpzvHxJjmq/ZuB0OjgbYPlf+U7Auma22lPgAsd1ViTHQZIa3XYkeUqURrM
-	 f2LnudOXXDNv15BFUFdWeXjgxjptS7NWx0lP5MslfZ1WxK+KBpJ1SoKovz1EiP0QSe
-	 4FbcVEsd+CQCaoKjx1CuneKkQJ/xrpeDh/5JEgxwac2T2srqM+RqGP8X1693Sp41Z+
-	 1phlJf5D/vj2EU8DFCSSthmofK+r9Q8aEw8Ggy+o8apNcovNvBNi7r17+EQ4EwQTNI
-	 Ez+YB2pwNDIpAaQSwczIZLkk4jWD+/pyblk2Wa3ZIOkIqi9oHA1jorvObl3f3dUdOv
-	 Vtp/IMZfd4LPA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sHg29-003Tbn-Hm;
-	Thu, 13 Jun 2024 09:42:13 +0100
-Date: Thu, 13 Jun 2024 09:42:13 +0100
-Message-ID: <86zfrpjkt6.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Shaoqin Huang <shahuang@redhat.com>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	kvmarm@lists.linux.dev,
-	Eric Auger <eauger@redhat.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	James Morse
- <james.morse@arm.com>,
-	kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [RFC PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1 writable
-In-Reply-To: <7f1ca739-42f5-4e3a-a0c9-b1eac4522a97@redhat.com>
-References: <20240612023553.127813-1-shahuang@redhat.com>
-	<Zmkyi39Pz6Wqll-7@linux.dev>
-	<8634pilbja.wl-maz@kernel.org>
-	<7f1ca739-42f5-4e3a-a0c9-b1eac4522a97@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1718268883; c=relaxed/simple;
+	bh=8IpmT6gSMCi5SqpAaalYKEec6jbByuMR5uslPkrV8XU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pYPLPeNOXcWiLTSk9V8/ymfQBYBT5QVOPufA1xC9djgJPtzyiaSE56D/bVOK73d1BC3qY3R/PJupaNmNApnnKCf/53nDpQbP+hg4CTdPJhcvQ0DadeiBv6qQBoM6iFsF/Ho1StUj2P26WcA9gVh5TmDU0qnFNMhcHxBg9ZXJJEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DTMTNpPd; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a6265d48ec3so103525466b.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 01:54:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718268879; x=1718873679; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OSosgpSQsH3wF5+acrPONfzVPkjEd+Wi3xrEgOavQvA=;
+        b=DTMTNpPd721a/FNrn+nQdLY0Wu2bmiRNUo9zwrkE6JEyrt3J5h1x5y0Nc11cvEKqHq
+         7oSEJXXmnrLQq9u6dzNgnLcZ8FC6nayTOvegBE0gicX69mh6dC45GxJVSxruNA4IXJbg
+         EZi5o/raybOvR1xzwTl+WgEq7eG3tYPopiJWtO89jOcgnoWDi/bi1SzCJ5AAoPD9zXDw
+         2HJ5b1gxVGzXm2j79cTgd+jK7U3QjjfdDkb1oPLybmf1DkDKP5lB2y62dET7sunF/v+q
+         RqCtFa9b+HbXIbEilTP9K7yjrZ2LdMDbAf4cKVyZ8stTdj9Ic9JECdLXwr1SdoWus7hZ
+         kWCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718268879; x=1718873679;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OSosgpSQsH3wF5+acrPONfzVPkjEd+Wi3xrEgOavQvA=;
+        b=eLqQ1HeuE9W+ynbmRY0LznpsFYQPaYBaflsnTi4PTnRp/lVu2Tb05BJ3bBUJcOf/wX
+         uGeO7hhkh9wvAwKAIXPQ3/D2WuDGri37ljtBi3f4cF8v8gVh/2msLGbTraUZcAGhLVuQ
+         dAexhx/h98qLEhSpS7//cgBjkn0OBy6bBDzLSun9kRG55gL9ayFCEpXWXuxB/ZOlbeXo
+         fxu4YR3ekg67nWEIdlfBUpQ8B6QIsEXok0XDgWngcZLzkXTEzZiyx8QKkJ1chFNup9H7
+         I2TesHWGBeKJS2FtnBDLOJMVGoTc9mV3Km6ZJto1z/aKNj+WWp3o+UVb+YBnwjFdNDvh
+         p/mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXTt4BykzRnD4D1YLTA88Nmtlnu67kYEaLRBovorib2nkDXJHfkK6t+U1UUonCyuwQAIVKPX8Ku16RYjM07ckgQ0tGB
+X-Gm-Message-State: AOJu0YyouP9tMcHMA5duftWV/AQmYUQjz2EUwM7aKnYFKTnnkYefE3PA
+	IA62wUXkqrnEEK8DlPbcsC79DmdCOhbgZ8inkfoSJ8hzhy0trVz8HcR2/fk8KF0=
+X-Google-Smtp-Source: AGHT+IFSKrJ8w4FyvGIuF2YLGd5N2judWSHl/BPRtdMcekWFGCtPgkKSJ0KoLlp2so+7sZANrQJZ3g==
+X-Received: by 2002:a17:906:6bc1:b0:a6f:3155:bb89 with SMTP id a640c23a62f3a-a6f47d5f3c8mr229050366b.70.1718268878803;
+        Thu, 13 Jun 2024 01:54:38 -0700 (PDT)
+Received: from [192.168.69.100] ([176.176.148.226])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56da40a0sm50331866b.10.2024.06.13.01.54.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jun 2024 01:54:38 -0700 (PDT)
+Message-ID: <31ba8570-9009-4530-934d-3b73b07520d0@linaro.org>
+Date: Thu, 13 Jun 2024 10:54:34 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: shahuang@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, eauger@redhat.com, sebott@redhat.com, cohuck@redhat.com, catalin.marinas@arm.com, james.morse@arm.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, suzuki.poulose@arm.com, will@kernel.org, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 9/9] contrib/plugins: add ips plugin example for cost
+ modeling
+To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: David Hildenbrand <david@redhat.com>, Ilya Leoshkevich
+ <iii@linux.ibm.com>, Daniel Henrique Barboza <danielhb413@gmail.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+ Mark Burton <mburton@qti.qualcomm.com>, qemu-s390x@nongnu.org,
+ Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
+ Laurent Vivier <lvivier@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Alexandre Iooss <erdnaxe@crans.org>, qemu-arm@nongnu.org,
+ Alexander Graf <agraf@csgraf.de>, Nicholas Piggin <npiggin@gmail.com>,
+ Marco Liebel <mliebel@qti.qualcomm.com>, Thomas Huth <thuth@redhat.com>,
+ Roman Bolshakov <rbolshakov@ddn.com>, qemu-ppc@nongnu.org,
+ Mahmoud Mandour <ma.mandourr@gmail.com>, Cameron Esfahani <dirty@apple.com>,
+ Jamie Iles <quic_jiles@quicinc.com>,
+ "Dr. David Alan Gilbert" <dave@treblig.org>,
+ Richard Henderson <richard.henderson@linaro.org>
+References: <20240612153508.1532940-1-alex.bennee@linaro.org>
+ <20240612153508.1532940-10-alex.bennee@linaro.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20240612153508.1532940-10-alex.bennee@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 13 Jun 2024 09:31:45 +0100,
-Shaoqin Huang <shahuang@redhat.com> wrote:
+On 12/6/24 17:35, Alex Bennée wrote:
+> From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 > 
-> If we don't care about the FEAT_CNTSC right now. Could I fix the
-> compile issue and respin this again without the background of enabling
-> migration between MtCollins and AmpereOne, and just keep the
-> information of the different BT field between different machine?
+> This plugin uses the new time control interface to make decisions
+> about the state of time during the emulation. The algorithm is
+> currently very simple. The user specifies an ips rate which applies
 
-As I said, I think this patch is valuable. But maybe you should
-consider tackling the full register, rather than only addressing a
-single field.
+... IPS rate (Instructions Per Second) which ...
 
-Thanks,
+> per core. If the core runs ahead of its allocated execution time the
+> plugin sleeps for a bit to let real time catch up. Either way time is
+> updated for the emulation as a function of total executed instructions
+> with some adjustments for cores that idle.
+> 
+> Examples
+> --------
+> 
+> Slow down execution of /bin/true:
+> $ num_insn=$(./build/qemu-x86_64 -plugin ./build/tests/plugin/libinsn.so -d plugin /bin/true |& grep total | sed -e 's/.*: //')
+> $ time ./build/qemu-x86_64 -plugin ./build/contrib/plugins/libips.so,ips=$(($num_insn/4)) /bin/true
+> real 4.000s
+> 
+> Boot a Linux kernel simulating a 250MHz cpu:
+> $ /build/qemu-system-x86_64 -kernel /boot/vmlinuz-6.1.0-21-amd64 -append "console=ttyS0" -plugin ./build/contrib/plugins/libips.so,ips=$((250*1000*1000)) -smp 1 -m 512
+> check time until kernel panic on serial0
+> 
+> Tested in system mode by booting a full debian system, and using:
+> $ sysbench cpu run
+> Performance decrease linearly with the given number of ips.
+> 
+> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+> Message-Id: <20240530220610.1245424-7-pierrick.bouvier@linaro.org>
+> ---
+>   contrib/plugins/ips.c    | 164 +++++++++++++++++++++++++++++++++++++++
+>   contrib/plugins/Makefile |   1 +
+>   2 files changed, 165 insertions(+)
+>   create mode 100644 contrib/plugins/ips.c
+> 
+> diff --git a/contrib/plugins/ips.c b/contrib/plugins/ips.c
+> new file mode 100644
+> index 0000000000..db77729264
+> --- /dev/null
+> +++ b/contrib/plugins/ips.c
+> @@ -0,0 +1,164 @@
+> +/*
+> + * ips rate limiting plugin.
 
-	M.
+The plugin names are really to packed to my taste (each time I look for
+one I have to open most source files to figure out the correct one); so
+please ease my life by using a more descriptive header at least:
 
--- 
-Without deviation from the norm, progress is not possible.
+      Instructions Per Second (IPS) rate limiting plugin.
+
+Thanks.
+
+> + * This plugin can be used to restrict the execution of a system to a
+> + * particular number of Instructions Per Second (ips). This controls
+> + * time as seen by the guest so while wall-clock time may be longer
+> + * from the guests point of view time will pass at the normal rate.
+> + *
+> + * This uses the new plugin API which allows the plugin to control
+> + * system time.
+> + *
+> + * Copyright (c) 2023 Linaro Ltd
+> + *
+> + * SPDX-License-Identifier: GPL-2.0-or-later
+> + */
+
 
