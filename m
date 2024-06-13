@@ -1,147 +1,153 @@
-Return-Path: <kvm+bounces-19588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D77907582
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 16:43:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B347C90758E
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 16:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 162F61C225FE
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 14:43:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC27D1C22C29
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 14:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 051B414601C;
-	Thu, 13 Jun 2024 14:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C0E14658B;
+	Thu, 13 Jun 2024 14:47:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RKJFOfg5"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BrZ4uC1S"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B7D399;
-	Thu, 13 Jun 2024 14:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C64884A41
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 14:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718289798; cv=none; b=D9DsRlb4/D04a+WltEhTd+RxcXsF2wI9Q/Vn5DyHvk5RL80qAeR1Wifkw4prnWMC5j+4/G1Z9EMg0G8vhZF6b0eVjOMG+Qs84glvgR1WwTTkoNlcf8YZmutlipv73Fm2oxRy89dtBQKYtZTc4k2c5EqDn1mzvnwQVjUyifiXdFE=
+	t=1718290021; cv=none; b=Ap9eypx/E/wWEsCt1Zb/d3qNJtLaSKweijvyNu/f+jjc6RMUAnd2P+q+NoVckOj+8WEVseAOvcuy3wWYrXR0u8u+0fPmNoDumfqPbZrGvmiz5muvkwsxnpUKu/m1w0sXvt79LgQtg5Dvjo1i72IE+5vVnqwaKlvd1F/YYK2HvCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718289798; c=relaxed/simple;
-	bh=MNLHafA+Ciwm9ca/YPOlFYz5pnxVndCTdaEEfb5f84Y=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VMDYtrPPPQr3pW3eMJK/WyOHQj4k4DeyiT/8Q8W+C6xZhBTpmu8NYVmW4Iv5oJ4j07305gZlnZjhgtnWXgudCa+GGpz985gvp8IprfQ/koixpxU6GR5+RMSeM5obQH1a1pLVG6PmqF+tnQsuxSTAndI5/fg19CwjUi59VGq8WTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RKJFOfg5; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45DBv55Z015855;
-	Thu, 13 Jun 2024 14:43:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:subject:from:to:cc:date:in-reply-to:references
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	MNLHafA+Ciwm9ca/YPOlFYz5pnxVndCTdaEEfb5f84Y=; b=RKJFOfg5jMYlpIKq
-	NgLlGlqnlABBtOVKsjOoNzfQchuM6mUiSdIX8e5pzvghQnPks3k/m6GfB+3+t1yQ
-	kiHIMXg4qXGELJrRLNWAe6fKGXdpxJOjTs1SUTy0Fe5Sc9VpVNQgFQGhNKUUD+tV
-	R9X2NO72Rw5gZd1O2r6iHBvmbh90I9ofMlpjL77l/MFLre3lzM9RlNvOpZUNhJR2
-	mDKBUJXlp7QK1L0KEXWderLvHUjrw+xfdNFoLADAPUKRsw5WM8dh0N7q4cCfXwkk
-	+ozymA8NUXmBPo1RLiNw00v6P360NZLTUQ/Jc0F74+HH4dQtYEYI6Q0detX52PMJ
-	iOMcYA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yqr0vssf1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 14:43:14 +0000 (GMT)
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45DEhE6V010922;
-	Thu, 13 Jun 2024 14:43:14 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yqr0vssey-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 14:43:14 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45DD8U6X028690;
-	Thu, 13 Jun 2024 14:43:13 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yn1murrvg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 14:43:13 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45DEhAUp56885742
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Jun 2024 14:43:12 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EC97258063;
-	Thu, 13 Jun 2024 14:43:09 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 45B545806A;
-	Thu, 13 Jun 2024 14:43:08 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.123.97])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 13 Jun 2024 14:43:08 +0000 (GMT)
-Message-ID: <aea0fbb0d44748bb4419495d6d95485e585f65f0.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] s390/virtio_ccw: fix config change notifications
-From: Eric Farman <farman@linux.ibm.com>
-To: Halil Pasic <pasic@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: Boqiao Fu <bfu@redhat.com>, Sebastian Mitterle <smitterl@redhat.com>
-Date: Thu, 13 Jun 2024 10:43:07 -0400
-In-Reply-To: <20240611214716.1002781-1-pasic@linux.ibm.com>
-References: <20240611214716.1002781-1-pasic@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+	s=arc-20240116; t=1718290021; c=relaxed/simple;
+	bh=1MArYuP6I1dClO6hSyL6b2nGGuXkYlYntxPoE89mMzU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GQhmPx1UNHZ5Ao1Ois8THtYH0khnqs7EqMRi0yIaLgk3GwqMq6K8QQcyoSwB7T5TkKyFmzTtarnXqTVlUcYV2OJ+BIkV6v9ZYFNK4q0pCPVvh8mBPS2UnhJaGmcrkA0QOz0zBknntLgH+qxMNS75068Hlt4ykiRFGSshZ89G6zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BrZ4uC1S; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-35f27eed98aso1047682f8f.2
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 07:46:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1718290018; x=1718894818; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tEhA82aLo515aHuKOusFSDP7HypmZDcV4M3zBsA32mk=;
+        b=BrZ4uC1SdEomPnkod9VXyxyPPX+d0RLpk8uoPh3lqBl+lE/gS7Q+gz/mFVzOk/YLcD
+         kNTdduTZmqtYpKR/wLRMH8c0P0hBSgWyqJvutXSuy2p3hzVYLJ0GuX2gmzE2onPviAKF
+         ac+iRHg+2rSEnt2k/OUXGDkBj3Ji1ovUHymrR3Csv0sY9CnT2gwWbwdNpblTa35A8zWh
+         VDxdJNxWPoV6T02Yhe2vGaokPVWJ9LZZKmpSu+dA9ZR0px+XWnil9dxNikjqKVLj8CCU
+         kZBNbNKJPgFKHUf9PbDV8UtZwAuQMRZQnTfBZthKA/ekbMysrf5SvFEJjLs0zKwU7cxm
+         yvBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718290018; x=1718894818;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tEhA82aLo515aHuKOusFSDP7HypmZDcV4M3zBsA32mk=;
+        b=FIsMfGf/eRZRYBQpLctv+nDhwbVx4MQK9VSwLarugaLcS81fpwQzuRabQEZoxvgHz3
+         b6ahyYikbHzurbg2TXmFRapxBxYOXEDdugTBuuJJJxqvCneonjpW9su8ODg882Si/ukN
+         yleEWu+S3/822ngNPUF+VbaYLzxMoQDRhJaxwPgDvsBU+em1N7uY5SoPSAkg34wMZDn8
+         MFs6glAOwmQb6HFHgIWUSyvEUdrEFz2Wr9HM/37+xKp4NY/Aw5U/gKfQL8K4vGDHZX+d
+         hc4KcRIGeeeKi0Ex4h8Bv7tDrNo7msCnbXJPu6wtjqowEEJTkVIzS/Svh3C/KVqOadJh
+         xk8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUxvZkVAWWBelejlAsdOvn2qDtXJmzTDLCe3oOGLRTbEULsa4pQSVU1IvyZkt3BsQl3srMClCyAsi43QJ2HNGbbVUVW
+X-Gm-Message-State: AOJu0YwTiJq/3qUM+edGtGsBvpuUszRyBkKGKEmELun7V/9UO8sMvM4w
+	R30XLE2QvEFWmc5TDFRKj0ychb7uKCKHscaGTLsZTrY4fHVIJj5IPLFhRnDdGhc=
+X-Google-Smtp-Source: AGHT+IFslhxHNDMgZ32+cIy2OchmE6E7iuuKQlnGpNTfS9dQJEFOYr+dynThX3TNYtBBkCIb1pwd6g==
+X-Received: by 2002:a5d:648f:0:b0:35f:2550:e276 with SMTP id ffacd0b85a97d-35fdf779d20mr5238834f8f.5.1718290017479;
+        Thu, 13 Jun 2024 07:46:57 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750ad10esm1888491f8f.64.2024.06.13.07.46.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 07:46:56 -0700 (PDT)
+Date: Thu, 13 Jun 2024 16:46:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Cindy Lu <lulu@redhat.com>,
+	dtatulea@nvidia.com, jasowang@redhat.com,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <ZmsGXRrSgUbccoHp@nanopsycho.orion>
+References: <20240611053239.516996-1-lulu@redhat.com>
+ <20240611185810.14b63d7d@kernel.org>
+ <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+ <20240612031356-mutt-send-email-mst@kernel.org>
+ <ZmlMuGGY2po6LLCY@nanopsycho.orion>
+ <20240613024756-mutt-send-email-mst@kernel.org>
+ <Zmqd45TnVVZYPwp8@nanopsycho.orion>
+ <20240613034647-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XlhU8Oxnafd1emPskSXGiTk1rdePy1qK
-X-Proofpoint-ORIG-GUID: moV_gGsPmA9CWHT4ECPWkM9LYP6jqp6v
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-13_07,2024-06-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- clxscore=1011 malwarescore=0 mlxscore=0 bulkscore=0 impostorscore=0
- mlxlogscore=788 priorityscore=1501 spamscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406130105
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240613034647-mutt-send-email-mst@kernel.org>
 
-On Tue, 2024-06-11 at 23:47 +0200, Halil Pasic wrote:
-> Commit e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-> broke configuration change notifications for virtio-ccw by putting
-> the
-> DMA address of *indicatorp directly into ccw->cda disregarding the
-> fact
-> that if !!(vcdev->is_thinint) then the function
-> virtio_ccw_register_adapter_ind() will overwrite that ccw->cda value
-> with the address of the virtio_thinint_area so it can actually set up
-> the adapter interrupts via CCW_CMD_SET_IND_ADAPTER.=C2=A0 Thus we end up
-> pointing to the wrong object for both CCW_CMD_SET_IND if setting up
-> the
-> adapter interrupts fails, and for CCW_CMD_SET_CONF_IND regardless
-> whether it succeeds or fails.
->=20
-> To fix this, let us save away the dma address of *indicatorp in a
-> local
-> variable, and copy it to ccw->cda after the "vcdev->is_thinint"
-> branch.
->=20
-> Reported-by: Boqiao Fu <bfu@redhat.com>
-> Reported-by: Sebastian Mitterle <smitterl@redhat.com>
-> Fixes: e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-> Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> ---
-> I know that checkpatch.pl complains about a missing 'Closes' tag.
-> Unfortunately I don't have an appropriate URL at hand. @Sebastian,
-> @Boqiao: do you have any suggetions?
-> ---
-> =C2=A0drivers/s390/virtio/virtio_ccw.c | 4 +++-
-> =C2=A01 file changed, 3 insertions(+), 1 deletion(-)
+Thu, Jun 13, 2024 at 09:50:54AM CEST, mst@redhat.com wrote:
+>On Thu, Jun 13, 2024 at 09:21:07AM +0200, Jiri Pirko wrote:
+>> Thu, Jun 13, 2024 at 08:49:25AM CEST, mst@redhat.com wrote:
+>> >On Wed, Jun 12, 2024 at 09:22:32AM +0200, Jiri Pirko wrote:
+>> >> Wed, Jun 12, 2024 at 09:15:44AM CEST, mst@redhat.com wrote:
+>> >> >On Wed, Jun 12, 2024 at 08:29:53AM +0200, Jiri Pirko wrote:
+>> >> >> Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
+>> >> >> >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
+>> >> >> >> Add new UAPI to support the mac address from vdpa tool
+>> >> >> >> Function vdpa_nl_cmd_dev_config_set_doit() will get the
+>> >> >> >> MAC address from the vdpa tool and then set it to the device.
+>> >> >> >> 
+>> >> >> >> The usage is: vdpa dev set name vdpa_name mac **:**:**:**:**:**
+>> >> >> >
+>> >> >> >Why don't you use devlink?
+>> >> >> 
+>> >> >> Fair question. Why does vdpa-specific uapi even exist? To have
+>> >> >> driver-specific uapi Does not make any sense to me :/
+>> >> >
+>> >> >I am not sure which uapi do you refer to? The one this patch proposes or
+>> >> >the existing one?
+>> >> 
+>> >> Sure, I'm sure pointing out, that devlink should have been the answer
+>> >> instead of vdpa netlink introduction. That ship is sailed,
+>> >
+>> >> now we have
+>> >> unfortunate api duplication which leads to questions like Jakub's one.
+>> >> That's all :/
+>> >
+>> >
+>> >
+>> >Yea there's no point to argue now, there were arguments this and that
+>> >way.  I don't think we currently have a lot
+>> >of duplication, do we?
+>> 
+>> True. I think it would be good to establish guidelines for api
+>> extensions in this area.
+>> 
+>> >
+>> >-- 
+>> >MST
+>> >
+>
+>
+>Guidelines are good, are there existing examples of such guidelines in
+>Linux to follow though? Specifically after reviewing this some more, I
 
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
+Documentation directory in general.
+
+
+>think what Cindy is trying to do is actually provisioning as opposed to
+>programming.
+>
+>-- 
+>MST
+>
 
