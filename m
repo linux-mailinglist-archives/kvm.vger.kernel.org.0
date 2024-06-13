@@ -1,57 +1,54 @@
-Return-Path: <kvm+bounces-19591-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19592-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2153C90760A
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 17:06:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB6890763B
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 17:12:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D0F12825ED
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 15:06:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20411F264AD
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 15:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75804149C46;
-	Thu, 13 Jun 2024 15:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8F214A081;
+	Thu, 13 Jun 2024 15:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BsvcVPrx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLFhTImn"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6E953E31;
-	Thu, 13 Jun 2024 15:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE2317C72;
+	Thu, 13 Jun 2024 15:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718291191; cv=none; b=hOQWu7RcR5tjDOI1BYxWSH0QeljgFZnr9VmLyIRQyyrkp2MA8JETZ8B8kfviur1iNq2zLZ70kumX8liDknPuJx72o4Sw7e9pP3eVVkT/2lSCMtEPdQJzlf7xxSm1bmgH/YVpWZlG7Sd2A1rn9XvhyEUmSJW8FpHA6oDMm7ZELzQ=
+	t=1718291526; cv=none; b=ZYBtLcMnkkUpgH9gWaYdSP1E3WsXAbtcV1Ou0r35pzXvwUdT23rcln3irB4mBzZsAj9rfeFVSv5BnqT/UaA7xG0od50wy4R4WCd34CjJdplH/sKH8uHmiV6CwabuVZCRkN/mj4p1QH3tbtClVkg0rf3o4Gb7uBsRi5Zbfca6RYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718291191; c=relaxed/simple;
-	bh=wgsmED+LXJqE3La/bOLyHDsAdYsz1Isrd2OZaovkeiA=;
+	s=arc-20240116; t=1718291526; c=relaxed/simple;
+	bh=Js8RVIcQWrK8SBzBs0EgFN3NPMVLrfZVEqHlgM+8ujY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SefNXXEgiokPOZj1MwSoT5Um0V3uOYIxDEnp5na3pd1hlPU1l2UCe4z6TKY5d+Am6tK88ev9eGR5Qz7YxCivUDnPT/6nxKQjqN80qP2dVMXzmLb/8EkoR3+V9sS1VmDzjyTmH2cnOw3t/GAoSJrpD8CmR4cCMZw2xP8IxA6gO8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BsvcVPrx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE25BC2BBFC;
-	Thu, 13 Jun 2024 15:06:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fb9Rrr7NXtNhvCWyjuERHOori/5Sw77A71qaSzaLu6IA9TpS7vs1lrZ9ml88P3mFeRMSmPrrcokKwWsq9r0kblGU4p8XPFXJKA5fRer9rQqURUZwf4KE5k3m+IIJQzG8UjPeOXhfBb/A+UFch+7mZlDH2XWNqLY6Sw6E45hQHLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLFhTImn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4A1C2BBFC;
+	Thu, 13 Jun 2024 15:12:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718291190;
-	bh=wgsmED+LXJqE3La/bOLyHDsAdYsz1Isrd2OZaovkeiA=;
+	s=k20201202; t=1718291526;
+	bh=Js8RVIcQWrK8SBzBs0EgFN3NPMVLrfZVEqHlgM+8ujY=;
 	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=BsvcVPrxieuyVR6+qllHztbJhLvGWba7+HmN+SIlEElKHi1Zd9/dzBPedwRMCli8S
-	 FKpRyagelBFngmKn9sPg3P02A8uzaYcHLSm4ZCiJ23ukBHqE6QmQhU0xzrnx/01bBh
-	 4tqDsCvxFzIiuHlyJwzZGNFrhx54EIpgDvaMQ8HYCqaDWvzmMTunrp+TKCyPqaNDLa
-	 /GbEdfXKY54P/m5SCsGf4TMotsXHaXBrs3REfjdxZBx/wm+QlwVSdjc5u2RbCBB4ta
-	 WRq65TWMuPnHdq4aaao+h9OYo4/mhtegaJrK22Z05AWdgoiz0bQKHsta3wVVF+fskZ
-	 CT+12OJKFo+6g==
+	b=PLFhTImnGBfruVfem7uoDdRQY9dt85NU9uz9NI1nWR1Tl8ZwZA2Rn8Oo+pStfyXsV
+	 EcyX+RV9PlAq8NGbBuCq1xDrwXHGIZbMJoy9lp/uxPIyy3x1VXFO0lRdU9guvTXWpK
+	 fWfovpAiSyeT2cI38X08BEvOMCHEP5MPP0MmNOwv9CguIjdgxn95t02Yg8rhsTjHrv
+	 JMsJdorpaWlfhjWGwd4su7F+sxA8gjgfARcKbZKcoULYJLtjoN0Cnd2hb1zWGCyIw6
+	 EdYmQujOfzjZ7hZCGpSCTtFxQu7IFk8SsutSm4TeEzC3kDQYyJTjRTvS5rNl7PGpcJ
+	 CzwVznRaVDJlg==
 Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 7A44DCE09E0; Thu, 13 Jun 2024 08:06:30 -0700 (PDT)
-Date: Thu, 13 Jun 2024 08:06:30 -0700
+	id A66DDCE09E0; Thu, 13 Jun 2024 08:12:05 -0700 (PDT)
+Date: Thu, 13 Jun 2024 08:12:05 -0700
 From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
 	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
 	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
 	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
@@ -62,119 +59,94 @@ Cc: Vlastimil Babka <vbabka@suse.cz>,
 	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
 	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
 	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Vlastimil Babka <vbabka@suse.cz>
 Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
  kmem_cache_free callback
-Message-ID: <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
+Message-ID: <6595ff2a-690e-4d6c-9be5-eb83f2df23fa@paulmck-laptop>
 Reply-To: paulmck@kernel.org
 References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
  <20240612143305.451abf58@kernel.org>
  <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
- <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
- <Zmru7hhz8kPDPsyz@pc636>
+ <Zmov7ZaL-54T9GiM@zx2c4.com>
+ <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
+ <Zmrkkel0Fo4_g75a@zx2c4.com>
+ <e06440e2-9121-4c92-8bf2-945977987052@paulmck-laptop>
+ <Zmr-KPG9F6w-uzys@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Zmru7hhz8kPDPsyz@pc636>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zmr-KPG9F6w-uzys@zx2c4.com>
 
-On Thu, Jun 13, 2024 at 03:06:54PM +0200, Uladzislau Rezki wrote:
-> On Thu, Jun 13, 2024 at 05:47:08AM -0700, Paul E. McKenney wrote:
-> > On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
-> > > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > > > when the callback only performs kmem_cache_free. Use
-> > > > > > kfree_rcu() directly.
-> > > > > > 
-> > > > > > The changes were done using the following Coccinelle semantic patch.
-> > > > > > This semantic patch is designed to ignore cases where the callback
-> > > > > > function is used in another way.
-> > > > > 
-> > > > > How does the discussion on:
-> > > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > > > reflect on this series? IIUC we should hold off..
-> > > > 
-> > > > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > > > where the kmem_cache is destroyed during module unload.
-> > > > 
-> > > > OK, I might as well go through them...
-> > > > 
-> > > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > > > 	Needs to wait, see wg_allowedips_slab_uninit().
-> > > 
-> > > Also, notably, this patch needs additionally:
-> > > 
-> > > diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> > > index e4e1638fce1b..c95f6937c3f1 100644
-> > > --- a/drivers/net/wireguard/allowedips.c
-> > > +++ b/drivers/net/wireguard/allowedips.c
-> > > @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
-> > > 
-> > >  void wg_allowedips_slab_uninit(void)
-> > >  {
-> > > -	rcu_barrier();
-> > >  	kmem_cache_destroy(node_cache);
-> > >  }
-> > > 
-> > > Once kmem_cache_destroy has been fixed to be deferrable.
-> > > 
-> > > I assume the other patches are similar -- an rcu_barrier() can be
-> > > removed. So some manual meddling of these might be in order.
+On Thu, Jun 13, 2024 at 04:11:52PM +0200, Jason A. Donenfeld wrote:
+> On Thu, Jun 13, 2024 at 05:46:11AM -0700, Paul E. McKenney wrote:
+> > How about a kmem_cache_destroy_rcu() that marks that specified cache
+> > for destruction, and then a kmem_cache_destroy_barrier() that waits?
 > > 
-> > Assuming that the deferrable kmem_cache_destroy() is the option chosen,
-> > agreed.
-> >
-> <snip>
-> void kmem_cache_destroy(struct kmem_cache *s)
-> {
-> 	int err = -EBUSY;
-> 	bool rcu_set;
+> > I took the liberty of adding your name to the Google document [1] and
+> > adding this section:
 > 
-> 	if (unlikely(!s) || !kasan_check_byte(s))
-> 		return;
-> 
-> 	cpus_read_lock();
-> 	mutex_lock(&slab_mutex);
-> 
-> 	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
-> 
-> 	s->refcount--;
-> 	if (s->refcount)
-> 		goto out_unlock;
-> 
-> 	err = shutdown_cache(s);
-> 	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
-> 	     __func__, s->name, (void *)_RET_IP_);
-> ...
-> 	cpus_read_unlock();
-> 	if (!err && !rcu_set)
-> 		kmem_cache_release(s);
-> }
-> <snip>
-> 
-> so we have SLAB_TYPESAFE_BY_RCU flag that defers freeing slab-pages
-> and a cache by a grace period. Similar flag can be added, like
-> SLAB_DESTROY_ONCE_FULLY_FREED, in this case a worker rearm itself
-> if there are still objects which should be freed.
-> 
-> Any thoughts here?
+> Cool, though no need to make me yellow!
 
-Wouldn't we also need some additional code to later check for all objects
-being freed to the slab, whether or not that code is  initiated from
-kmem_cache_destroy()?
+No worries, Jakub is also colored yellow.  People added tomorrow
+will be cyan if I follow my usual change-color ordering.  ;-)
 
-Either way, I am adding the SLAB_DESTROY_ONCE_FULLY_FREED possibility,
-thank you! [1]
+> > > But then, if that mechanism generally works, we don't really need a new
+> > > function and we can just go with the first option of making
+> > > kmem_cache_destroy() asynchronously wait. It'll wait, as you described,
+> > > but then we adjust the tail of every kfree_rcu batch freeing cycle to
+> > > check if there are _still_ any old outstanding kmem_cache_destroy()
+> > > requests. If so, then we can splat and keep the old debugging info we
+> > > currently have for finding memleaks.
+> > 
+> > The mechanism can always be sabotaged by memory-leak bugs on the part
+> > of the user of the kmem_cache structure in play, right?
+> > 
+> > OK, but I see your point.  I added this to the existing
+> > "kmem_cache_destroy() Lingers for kfree_rcu()" section:
+> > 
+> > 	One way of preserving this debugging information is to splat if
+> > 	all of the slab’s memory has not been freed within a reasonable
+> > 	timeframe, perhaps the same 21 seconds that causes an RCU CPU
+> > 	stall warning.
+> > 
+> > Does that capture it?
+> 
+> Not quite what I was thinking. Your 21 seconds as a time-based thing I
+> guess could be fine. But I was mostly thinking:
+> 
+> 1) kmem_cache_destroy() is called, but there are outstanding objects, so
+>    it defers.
+> 
+> 2) Sometime later, a kfree_rcu_work batch freeing operation runs.
+
+Or not, if there has been a leak and there happens to be no outstanding
+kfree_rcu() memory.
+
+> 3) At the end of this batch freeing, the kernel notices that the
+>    kmem_cache whose destruction was previously deferred still has
+>    outstanding objects and has not been destroyed. It can conclude that
+>    there's thus been a memory leak.
+
+And the batch freeing can be replicated across CPUs, so it would be
+necessary to determine which was last to do this effective.  Don't get
+me wrong, this can be done, but the performance/latency tradeoffs can
+be interesting.
+
+> In other words, instead of having to do this based on timers, you can
+> just have the batch freeing code ask, "did those pending kmem_cache
+> destructions get completed as a result of this last operation?"
+
+I agree that kfree_rcu_work-batch time is a good time to evaluate slab
+(and I have added this to the document), but I do not believe that it
+can completely replace timeouts.
 
 							Thanx, Paul
-
-[1] https://docs.google.com/document/d/1v0rcZLvvjVGejT3523W0rDy_sLFu2LWc_NR3fQItZaA/edit?usp=sharing
 
