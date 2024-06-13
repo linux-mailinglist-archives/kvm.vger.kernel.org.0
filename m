@@ -1,213 +1,213 @@
-Return-Path: <kvm+bounces-19538-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19539-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C099062C7
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 05:39:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974D19062D0
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 05:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D79951C2174C
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 03:39:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7644B2339E
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 03:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1158A12F382;
-	Thu, 13 Jun 2024 03:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E17130E40;
+	Thu, 13 Jun 2024 03:40:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/Q38vJo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="2YWrbQls"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2088.outbound.protection.outlook.com [40.107.244.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC998130A40;
-	Thu, 13 Jun 2024 03:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718249883; cv=none; b=KRGkE0ok+wbYnTorTmGyFNa6iDPjgFcO66NRaihIrWax6yjmlEGXI2R5MVdljD/82LPZuQtW2zs1x+PC8eePOvIvdLva8h+ANWh/PIWqJIMhNMw4gw8SNj+BCEj1ol7nefqZorcEGx5MmFr8nRCbaAjx1P4bYUGlcfQlB7xvfHA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718249883; c=relaxed/simple;
-	bh=MUF6QJIs92YjVFx9pLVup9B1X4v/FOHgXQ+Q1ulGSY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HW+9VwlcPz5RihUx6mpz0y4hErm5jUTcRWbLAo1ssOQ/imt9cTFXtfOJ1e5as9RT3dXmiFL2HJtY7/oK5vOzmWFwYLdpr6xv4EknNAtSIR5eGbKqatsI54Onvvh7v4SuOb12Kew5sogp2Zxa28SlOHeNVEcxCQJMk3+AS1g6uKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/Q38vJo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7817BC2BBFC;
-	Thu, 13 Jun 2024 03:38:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718249882;
-	bh=MUF6QJIs92YjVFx9pLVup9B1X4v/FOHgXQ+Q1ulGSY8=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=D/Q38vJoRXlXt5XW/4wGVxDR3Ve5LY0YeIOEeyXy3NbqhqX2dZ1j6M305bUwT45/t
-	 UDuYraBOn5RJGcB5wbPp0mVvgGhhjTHGq9Z0Flg5xyFBTSbQm63u8OHLMVmMqygIG8
-	 n9Bktxt8XPwCkrGEjHdwaonD6xgWh8Godtd+lRtFFTJN7g05LyY6qtQ9CoXmzs1IMm
-	 s3wJnTMklP71T4XudKIUo3akJ/RvcV6b0A4eh6dGBbeQLpeU8YyAJJTIYJ6rHLoz8s
-	 fp4CPkLTgzE6dVIPWUBEYXDVCE07lQXMRXq4lTfYFbtT2/hHBATfDcVAbYnccY1Jab
-	 dAuGuN0IsVTKA==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 1975FCE0DEA; Wed, 12 Jun 2024 20:38:02 -0700 (PDT)
-Date: Wed, 12 Jun 2024 20:38:02 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
- <Zmo9-YGraiCj5-MI@zx2c4.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A696E126F1D;
+	Thu, 13 Jun 2024 03:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718250054; cv=fail; b=D1eVCZqb/7e0cEUAv+hbPjQznn7hqMUgSoNqiQReXfqnzMs668Z7Gp1DYa+agXCjlTLP6QcoUT4nPJ3r+OHQM+/jzXN33ltyTikBhEsYWybrUtAk8tOE9OiYbUVSqplOPJuSaxxDypsk0qu2vgmkhP/jvCgvjzG88XtuwXsrgew=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718250054; c=relaxed/simple;
+	bh=J7MSE9WEJAwrqj0fkwrrPDLhZdVnUdbnE3PikGnVvC8=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CifnaxM+TznFe9EJYywjoi20c/O1i7WL7Nrny3FcB8r4Jee1RAFNxeNNdqvNdTd4jZWa1MwF/JcxZXEau/Mc9WH36bAazKgiJR/ud+3j+GXIOA5HQC9KZCMrFH4GBtphIS56F2z3CfYgIYqU4h9GmUgi9abv0NoqVT7W1UFLC0Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=2YWrbQls; arc=fail smtp.client-ip=40.107.244.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cRz78y9uvTh9qMgEWBKf+imhQpGOCEl9TL6LLgqbtpFTYbnkqGfmyq50uIaApEt0pjaNzSN4eHIHmE/6zxp9UN9itAVesA6Op9XiypuKtdCvUJ8LOtqjO0OVuC+zzwC9QLiobUdNrn7IOJxEYWJS3HftdBdPrs9ZTyp1IwP1LIlCbep44OS3qW0GfFXrSOEiZJ9nzaB8bcRaA+rEDyUPVZWOYDarQhJq1cV4VALi0h78XjRYiF+gLA8AOtnkZ7jg1Lrr3dBdbODMFRPqCkUYQSl/vG0FCQ8ynaFvbqPPbdec8VWSYapzRG8vg06QEp1vVIqKNTW1piuMatjaJtEHjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LhY6V0rnylAoV/mF+AGEm+tRD8SdhuYv3WLQkkSnld4=;
+ b=mQmBmh0l9HKHKMf5gs8Yc/SPSheQcp/45KwIwUr3/0ddwQXtgm5NiQP6Ya5JfXFiAV7MWGePVIt1MJiejMCwDSogoHcNYTXBDMzySqkMqTY7e6vWRbtKFKuZpMzQB/6XPz+pwYcEEABl83F65AU3VL2d+ZqOn04W4NtVEK6bw7riREVFziMc97cmgjsgPX7KMAysosgVoR35NwS00idK9G7GXfGlPOZtTK3AWyG5WVV126fCiXLpbLb/Q+EEFRIInmYlOo0PuwvGt3fBmHUCa4SZ5uONZtk9vUhc6VVm1oDhY1Vtkd/DSKgSQ5YuZVpqUnz6LyJ9Ch14g6+nN0HqwA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LhY6V0rnylAoV/mF+AGEm+tRD8SdhuYv3WLQkkSnld4=;
+ b=2YWrbQlsaUCdfboyU48NVSj8v57U/Vkv8vZ1KdsKB38MFb14fWTm6naN/PXVEY1q2FvvSa1NeqJlkzZ0Nqg+iXGRVg19ZV8aJwOZWRiUsRqMMtv+dtdut/0jP+3iymHNmJ74MnV0rTOwAG9+LJyYzdMOA7TTmybDUwv6KMccxUc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ PH7PR12MB6588.namprd12.prod.outlook.com (2603:10b6:510:210::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.20; Thu, 13 Jun
+ 2024 03:40:50 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::b890:920f:cf3b:5fec%3]) with mapi id 15.20.7633.036; Thu, 13 Jun 2024
+ 03:40:50 +0000
+Message-ID: <b1d00573-7234-2b72-89e1-db120395ff12@amd.com>
+Date: Thu, 13 Jun 2024 09:10:44 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.0.3
+Subject: Re: [PATCH v9 01/24] virt: sev-guest: Use AES GCM crypto library
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+ kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+ dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+ pbonzini@redhat.com
+References: <20240531043038.3370793-1-nikunj@amd.com>
+ <20240531043038.3370793-2-nikunj@amd.com>
+ <20240612171710.GDZmnYFizmJoS5nMS1@fat_crate.local>
+From: "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20240612171710.GDZmnYFizmJoS5nMS1@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA1PR01CA0165.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:71::35) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zmo9-YGraiCj5-MI@zx2c4.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|PH7PR12MB6588:EE_
+X-MS-Office365-Filtering-Correlation-Id: a2111e93-6bec-41ec-30c3-08dc8b5a9e2d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230034|376008|1800799018|366010|7416008;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?R0FHTkp6OFVXbmN6cWprNlhNZ2VDNnFXb2w5K3RCUllVNW9iajl0VUtrcndl?=
+ =?utf-8?B?a3lQN1ZBYWdaOS9kYnFMQW1rMnUxaVI5LzZDc1l4UU45bVFSS0NaVGpMUjJK?=
+ =?utf-8?B?cXZiamxac0lnMVJSYnJTNERaSHRxcW9tUVROWG9vRmZOOGZGQmMvUXdHWVB2?=
+ =?utf-8?B?T2FFY3NWMmJvaGUyRTlzeHF4WDZtV3d5ZnVQZXJPN2ZvSit4TXlpVWwvUE5i?=
+ =?utf-8?B?S01BdGVJR1pGdit0TnNqVld2UUczNmNvaXpXb3Q3Q2hjRjJKckVkc2liWHhn?=
+ =?utf-8?B?eUhBeWlWLzlmdDR3emFLSUlGUU1OUnFUUTdUYXVUNFByQUQ1YUVsWTVxTEZY?=
+ =?utf-8?B?dGg2K1didGxUajg5RGYvbWhYT000V2g0V3FDaElLUnRnQUdoSkJ4RVM3VHhZ?=
+ =?utf-8?B?Qm8yZldzTnFBeVNpUVo5RW1UWXpGVmtnUzRwSUFkdnQ0MFhIRjFvNWhwL0ZH?=
+ =?utf-8?B?d1hRYUJscmY3cVA4aEdJZzNta2xFWjdYNE9UcHIxQ0dzUUVNZ0tLaUxuR0py?=
+ =?utf-8?B?QVEzS2gxaVpKRytNOGZHRnhpRnM0OW91STFPT3QvM3NHcDBOd2IxalZLRzM3?=
+ =?utf-8?B?aTZseXRIdDhoaGNzMHgrekZjVmQ1YWFjOVFZSkFZYzFkMDVHUWRIbXVzMndz?=
+ =?utf-8?B?RDhNYTI5K0l4SlpQN3E5Rlc2bThYZ04vY2RZVWlIZjh4SnNxNUgvSXdHVUdp?=
+ =?utf-8?B?bG1JS1pCMTM0U2hkVHdESnhNeSt0SFpJSyt3bGQ3MEhBNUhJWTd4NThQd1lN?=
+ =?utf-8?B?UWJ0OGZpUnB1TURiZUNPRHd4ZmgwNzJvenh2TXMzYnNjQ2lCREZ1WHVZZjBE?=
+ =?utf-8?B?TmNqVlVsandYb29kV29hcmV4T29ldUlRRkM4ekNnOGUrbWxGdHp3ZlpPclE5?=
+ =?utf-8?B?Z2xGV096dXRuakd0UzU1U25jbE5nQ1RHYlZQbmxXVkVhRnB3R1orcTdkcGR3?=
+ =?utf-8?B?VU45cGVmaUx1M3AxdThobU9FNFlyRkFiaUtWMHZFNEdnTnZIMTBKMUZtWGtY?=
+ =?utf-8?B?WElSU2FyR2QvUDFES3h1dlFRNXArYW9pUm1WQ01NK2FXMms2N3JhMGpDNkdw?=
+ =?utf-8?B?dTBaVDc0Zy9EV1V2NnJBOWd1ZTFGMTFIOEtsTWhJbXZMM3ZyeDFtUjFHRG9s?=
+ =?utf-8?B?cUQwVzB2aE85anVKcUJzcFNpeEJRc0lYWDA5cHAyM2xhVWlMVzc1ZjVmREZQ?=
+ =?utf-8?B?dmJUbitMOHYwVjFxUFpMQ1p5ODE4RjNHdTJ0SHRWNDlHYWpxMmQ1TlJjOTd2?=
+ =?utf-8?B?enIwa0dUZFRiMXBjMTlqN3UyZ2ZSNFY0Q2NMVEJOVHZDTFEyRUdWMS9scEFB?=
+ =?utf-8?B?MFlqYjdpZ2tVS2F6RWFQSDZ0ZFRzYjE4NmNkQnFmcmo2NDlhNjdkcGlrSlJk?=
+ =?utf-8?B?cDhHK3hSenZ2WGhRL3Vua3M1WGcyaEtkZ3VTdUIrdXZHMGtDZFNxSXJ1M0h5?=
+ =?utf-8?B?d1JjTXdRaXE1ZWxIbk45OUE3Vm93YkUvV2paTzl2TFBRa2JBL0RDa3FLRlp1?=
+ =?utf-8?B?aDdSRnlOV1hub2UxV3ArZ0dyWXFyTldNTG0wOXZCc1k3cWhpM3J0QzJuQUEw?=
+ =?utf-8?B?Nm9ibTNLL2hOUkJYSWt0cWRsUHlNTTMrWUVrdE9OeTBZTEZNSkpIeWFYR2hF?=
+ =?utf-8?B?WDFSVGUyaU1zQWdyU2Q4dHA0b1NZanBrYS9PZzFWTWYvVy9oZnZYYTdscE5h?=
+ =?utf-8?B?eVo4eUR2MDl3SkVTYi94QVo1dlBOM3dIbC8waWdOQzNZTHJXb0lqVHNnMkM4?=
+ =?utf-8?Q?fXrGfMBoIIKz2CtLcKiSo8gDRIYIaY6f0gCE0Zt?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230034)(376008)(1800799018)(366010)(7416008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QXhaNEhyM3hPTnNGc2t3cUVKODNsdHZ4RWxxMngxS0d0Wk15aDB0bTdwMVlJ?=
+ =?utf-8?B?cy9KaU1Bb2s0ZFJCeWJNdHlISElVejRDQVNBWnk1Z09uVDM0a0tEZTJKZyty?=
+ =?utf-8?B?MC92RnNmUy8xYkR6TVA2QnErdk9rU01rV1plSDIxaVpqWE5nWTFrMWttSjQz?=
+ =?utf-8?B?alE5dHNab3JwUE1POUJ4b0tYVEhCMDlVV2tpbU05enE5dWMxQkxBTFRpOE02?=
+ =?utf-8?B?THFlVVJyL1JCcHFBMWdDV3JtaG9KekxHenRXeEtkdTVnODRSeUtnclgvYVhU?=
+ =?utf-8?B?Skp0ak14MEhwbVhMQjF6OFVTdVBVd3NRMSt3bG43UFd1ZXhPMWkydEgrdFZG?=
+ =?utf-8?B?aFhNc05iaDlsQXJJK2o5djltN0w1L2pDbVpVTHAxUG1MQmRVWnhYTHpiczEv?=
+ =?utf-8?B?UklVNTJoM044dEVLT0tZbHIrWmFiTkRwS0RMN1BIWVBEamR1OUtoNVlrTTRM?=
+ =?utf-8?B?NkZNUTliU0xoQ3FpT2FsU2VuYXZ0TjJUdm5URzRTbHRPQ0hleFR4ellDUnp3?=
+ =?utf-8?B?eGN5bHQzMGQvL3ZiVys0ZjJFdXphME9SSXd0eEh2bUNRbUpJK2VSRU5yK2Z6?=
+ =?utf-8?B?eDVrN09SeDV1WUVLSVlEUlJwSnMxUUtYalVhV0I4ZkJRSXg1b1UwaEtDVGdy?=
+ =?utf-8?B?c1hERkxQQUsxdVo1WXVWam4xNlZZdVZwdEpxWi9jelNRUDlKeS9Zd1czWnpR?=
+ =?utf-8?B?TVhjM1hUK0R4REMwOGsxM0Q1QXRiWWtveVpXd3FJQWNFZVlsK0Y4SE1qUHdJ?=
+ =?utf-8?B?ck5vVkZRekFBNU5QWHFCbnkxbk5uMkhsZVVUV1JoVmxTQ3dNUE40eXhTQWhZ?=
+ =?utf-8?B?RWFpdEZ3YUxlOU0xOVhrMDFOai95SGZBSUZiZXo2MlhoeXArZGdYMEdYOVNa?=
+ =?utf-8?B?aFVkNHI1YmRaL3hta0ZJUlFzcTRmWnBCSXA5R3NzdkdDV3RJdWIwU3BBWjFx?=
+ =?utf-8?B?eE1KUmNoN0ZMT3pycjZVWXZvdUNFSXpkZ2orVUNnbzhJK2drY28yRWRLTzZ0?=
+ =?utf-8?B?R3k2MzM4aWpDclJ2dzVjOWZHNjhYZnFPdWZQM0dMcEwycU5uNmtRSFBKajV6?=
+ =?utf-8?B?TE1JeVNwTFFsVEh6WVR2M1E4aGpuT0tyZCtNcUl0blRFN2VoWVdZVllUcDlU?=
+ =?utf-8?B?b1RXRUZFc2tOUm54bDdqb2hKUmEvVTdPNTU5c3RyTkxxbmZsRW1GS3NCRmRH?=
+ =?utf-8?B?cjRBenU2VE1kZDJUamNPd3dBU054MGpkMDFVS2p5TFR5UitkTjdMM1hPMTVl?=
+ =?utf-8?B?M3dxNkRuMlZzSXByeEZVbW45T0dBME93bG8xellGVTQ3VWVTT1A4MDdjbTFh?=
+ =?utf-8?B?c2dGdEV3My81VmlOazdWK2dPUHZKT2RjWnVDMWZUcVlPbnhlbVNXRDlxSjRY?=
+ =?utf-8?B?TEd4T203SzRxc2M5VHRKV0ZVNEZaUG13WWZuTElEdGl6R0djZW1LYWt0ZmJa?=
+ =?utf-8?B?RVV3ekE0TlR6cjlKc2lSNzhmSzl0WU9jUVV2Z0UyYTZlYzF3N2lpeSt4TkhT?=
+ =?utf-8?B?S2ZrcWRGZi9PSGN4aGR3R2pEMlNPalRFUzRkUWUvc25UNjlWQjdzWjlXd3Fm?=
+ =?utf-8?B?ZW9NeGJMa0FCNnN0cEtsY1J5M0RZU2d4K0tjQzVtV0Vua1h3Q3JUWThmb3RV?=
+ =?utf-8?B?WHBBRituUXN1SW04SUNEWGdmNmpuS1BjdlJtQXVZVmM5UmoyTkNCUjk0L0x5?=
+ =?utf-8?B?ZUg1WFBZUVpEbkZxT08veGs4UXlHWDNLcENNKzRyb2FDbHVGV284eCtCa1kr?=
+ =?utf-8?B?RzJvenMyYU00cnQ0ZU9OZnFmVmlmTGhDY2xCRkV6NVgwK0w2WFBvQytEVmww?=
+ =?utf-8?B?dENDQ3R0aUNtb2JZc0cyT3lZY2l0TVR5c21xSXl1T2M3TVMvVGVoWGxDS01h?=
+ =?utf-8?B?NlpLNUgwMFVrUitpaTd3bmJOZ0hpcW0rRkFKbzFCaVlhaysyQi83UFVzOENN?=
+ =?utf-8?B?VEZYRjYwNUhxaHlKMW1IVVFMay9LK0xmemlBOVUrUVR6WVdEU1FrOFRPL1pN?=
+ =?utf-8?B?UVR1Qjh5aVpTcUozeThQanNYVkEzaUZVYnk2RUNBbFYzcDRMalJuM3V2aFR4?=
+ =?utf-8?B?SlR6b252S1RMeEdvTnA0TGZNUXJUWlg2TWNkcGM5YjRJTGYwcDdYeGZsVnVx?=
+ =?utf-8?Q?B9pEalH954ZYmF+0Xyhl49LXG?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2111e93-6bec-41ec-30c3-08dc8b5a9e2d
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jun 2024 03:40:50.0274
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jS1X6EphbURILVq1bcOLxqbpcdm6zz1yWUHgYCDK0F496/Ha3rrXSvWIu9mYVHVpbGIGgGlNugWcdzfFP0Y2XQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6588
 
-On Thu, Jun 13, 2024 at 02:31:53AM +0200, Jason A. Donenfeld wrote:
-> On Thu, Jun 13, 2024 at 01:31:57AM +0200, Jason A. Donenfeld wrote:
-> > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > > when the callback only performs kmem_cache_free. Use
-> > > > > kfree_rcu() directly.
-> > > > > 
-> > > > > The changes were done using the following Coccinelle semantic patch.
-> > > > > This semantic patch is designed to ignore cases where the callback
-> > > > > function is used in another way.
-> > > > 
-> > > > How does the discussion on:
-> > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > > reflect on this series? IIUC we should hold off..
-> > > 
-> > > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > > where the kmem_cache is destroyed during module unload.
-> > > 
-> > > OK, I might as well go through them...
-> > > 
-> > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > > 	Needs to wait, see wg_allowedips_slab_uninit().
-> > 
-> > Right, this has exactly the same pattern as the batman-adv issue:
-> > 
-> >     void wg_allowedips_slab_uninit(void)
-> >     {
-> >             rcu_barrier();
-> >             kmem_cache_destroy(node_cache);
-> >     }
-> > 
-> > I'll hold off on sending that up until this matter is resolved.
+
+On 6/12/2024 10:47 PM, Borislav Petkov wrote:
+> On Fri, May 31, 2024 at 10:00:15AM +0530, Nikunj A Dadhania wrote:
+>> The sev-guest driver encryption code uses Crypto API for SNP guest
+>> messaging to interact with AMD Security processor. For enabling SecureTSC,
+>> SEV-SNP guests need to send a TSC_INFO request guest message before the
+>> smpboot phase starts. Details from the TSC_INFO response will be used to
+>> program the VMSA before the secondary CPUs are brought up. The Crypto API
+>> is not available this early in the boot phase.
+>>
+>> In preparation of moving the encryption code out of sev-guest driver to
+>> support SecureTSC and make reviewing the diff easier, start using AES GCM
+>> library implementation instead of Crypto API.
+>>
+>> Drop __enc_payload() and dec_payload() helpers as both are pretty small and
+>> can be moved to the respective callers.
 > 
-> BTW, I think this whole thing might be caused by:
+> Please use this streamlined commit message for your next submission:
 > 
->     a35d16905efc ("rcu: Add basic support for kfree_rcu() batching")
+> "The sev-guest driver encryption code uses the crypto API for SNP guest messaging
+> with the AMD Security processor. In order to enable secure TSC, SEV-SNP guests
+> need to send such a TSC_INFO message before the APs are booted. Details from the 
+> TSC_INFO response will then be used to program the VMSA before the APs are 
+> brought up.
 > 
-> The commit message there mentions:
+> However, the crypto API is not available this early in the boot process.
 > 
->     There is an implication with rcu_barrier() with this patch. Since the
->     kfree_rcu() calls can be batched, and may not be handed yet to the RCU
->     machinery in fact, the monitor may not have even run yet to do the
->     queue_rcu_work(), there seems no easy way of implementing rcu_barrier()
->     to wait for those kfree_rcu()s that are already made. So this means a
->     kfree_rcu() followed by an rcu_barrier() does not imply that memory will
->     be freed once rcu_barrier() returns.
+> In preparation for moving the encryption code out of sev-guest to support secure
+> TSC and to ease review, switch to using the AES GCM library implementation
+> instead.
 > 
-> Before that, a kfree_rcu() used to just add a normal call_rcu() into the
-> list, but with the function offset < 4096 as a special marker. So the
-> kfree_rcu() calls would be treated alongside the other call_rcu() ones
-> and thus affected by rcu_barrier(). Looks like that behavior is no more
-> since this commit.
+> Drop __enc_payload() and dec_payload() helpers as both are small and can be
+> moved to the respective callers."
+> 
 
-You might well be right, and thank you for digging into this!
+Sure
 
-> Rather than getting rid of the batching, which seems good for
-> efficiency, I wonder if the right fix to this would be adding a
-> `should_destroy` boolean to kmem_cache, which kmem_cache_destroy() sets
-> to true. And then right after it checks `if (number_of_allocations == 0)
-> actually_destroy()`, and likewise on each kmem_cache_free(), it could
-> check `if (should_destroy && number_of_allocations == 0)
-> actually_destroy()`. This way, the work is delayed until it's safe to do
-> so. This might also mitigate other lurking bugs of bad code that calls
-> kmem_cache_destroy() before kmem_cache_free().
-
-Here are the current options being considered, including those that
-are completely brain-dead:
-
-o	Document current state.  (Must use call_rcu() if module
-	destroys slab of RCU-protected objects.)
-
-	Need to review Julia's and Uladzislau's series of patches
-	that change call_rcu() of slab objects to kfree_rcu().
-
-o	Make rcu_barrier() wait for kfree_rcu() objects.  (This is
-	surprisingly complex and will wait unnecessarily in some cases.
-	However, it does preserve current code.)
-
-o	Make a kfree_rcu_barrier() that waits for kfree_rcu() objects.
-	(This avoids the unnecessary waits, but adds complexity to
-	kfree_rcu().  This is harder than it looks, but could be done,
-	for example by maintaining pairs of per-CPU counters and handling
-	them in an SRCU-like fashion.  Need some way of communicating the
-	index, though.)
-
-	(There might be use cases where both rcu_barrier() and
-	kfree_rcu_barrier() would need to be invoked.)
-
-	A simpler way to implement this is to scan all of the in-flight
-	objects, and queue each (either separately or in bulk) using
-	call_rcu().  This still has problems with kfree_rcu_mightsleep()
-	under low-memory conditions, in which case there are a bunch
-	of synchronize_rcu() instances waiting.  These instances could
-	use SRCU-like per-CPU arrays of counters.  Or just protect the
-	calls to synchronize_rcu() and the later frees with an SRCU
-	reader, then have the other end call synchronize_srcu().
-
-o	Make the current kmem_cache_destroy() asynchronously wait for
-	all memory to be returned, then complete the destruction.
-	(This gets rid of a valuable debugging technique because
-	in normal use, it is a bug to attempt to destroy a kmem_cache
-	that has objects still allocated.)
-
-o	Make a kmem_cache_destroy_rcu() that asynchronously waits for
-	all memory to be returned, then completes the destruction.
-	(This raises the question of what to is it takes a "long time"
-	for the objects to be freed.)
-
-o	Make a kmem_cache_free_barrier() that blocks until all
-	objects in the specified kmem_cache have been freed.
-
-o	Make a kmem_cache_destroy_wait() that waits for all memory to
-	be returned, then does the destruction.  This is equivalent to:
-
-		kmem_cache_free_barrier(&mycache);
-		kmem_cache_destroy(&mycache);
-
-Uladzislau has started discussions on the last few of these:
-https://lore.kernel.org/all/ZmnL4jkhJLIW924W@pc636/
-
-I have also added this information to a Google Document for
-easier tracking:
-https://docs.google.com/document/d/1v0rcZLvvjVGejT3523W0rDy_sLFu2LWc_NR3fQItZaA/edit?usp=sharing
-
-Other thoughts?
-
-							Thanx, Paul
+Regards
+Nikunj
 
