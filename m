@@ -1,79 +1,101 @@
-Return-Path: <kvm+bounces-19592-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19593-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB6890763B
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 17:12:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6E690779E
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 17:56:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A20411F264AD
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 15:12:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C6E71F2315F
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 15:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8F214A081;
-	Thu, 13 Jun 2024 15:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B2B12EBC2;
+	Thu, 13 Jun 2024 15:56:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PLFhTImn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SmGpTdQ0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE2317C72;
-	Thu, 13 Jun 2024 15:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9C32BB04
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 15:56:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718291526; cv=none; b=ZYBtLcMnkkUpgH9gWaYdSP1E3WsXAbtcV1Ou0r35pzXvwUdT23rcln3irB4mBzZsAj9rfeFVSv5BnqT/UaA7xG0od50wy4R4WCd34CjJdplH/sKH8uHmiV6CwabuVZCRkN/mj4p1QH3tbtClVkg0rf3o4Gb7uBsRi5Zbfca6RYA=
+	t=1718294200; cv=none; b=V7mznXkMidOe183dttBxm9aUL60SoFR/kO3Fak1+jesL86A1Fdum0ZQZ3H2g+wiVNlXyBOzbkvbo/hhy/OLMEd4xeDNxkpPGGXvKxovwRl1mYTSb5xCArUqNbRPwwHZt/wQnnqAyYgUcuBUhNopo0PRsmfYu7ZAul+dxUNSBf7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718291526; c=relaxed/simple;
-	bh=Js8RVIcQWrK8SBzBs0EgFN3NPMVLrfZVEqHlgM+8ujY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fb9Rrr7NXtNhvCWyjuERHOori/5Sw77A71qaSzaLu6IA9TpS7vs1lrZ9ml88P3mFeRMSmPrrcokKwWsq9r0kblGU4p8XPFXJKA5fRer9rQqURUZwf4KE5k3m+IIJQzG8UjPeOXhfBb/A+UFch+7mZlDH2XWNqLY6Sw6E45hQHLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PLFhTImn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4A1C2BBFC;
-	Thu, 13 Jun 2024 15:12:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718291526;
-	bh=Js8RVIcQWrK8SBzBs0EgFN3NPMVLrfZVEqHlgM+8ujY=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=PLFhTImnGBfruVfem7uoDdRQY9dt85NU9uz9NI1nWR1Tl8ZwZA2Rn8Oo+pStfyXsV
-	 EcyX+RV9PlAq8NGbBuCq1xDrwXHGIZbMJoy9lp/uxPIyy3x1VXFO0lRdU9guvTXWpK
-	 fWfovpAiSyeT2cI38X08BEvOMCHEP5MPP0MmNOwv9CguIjdgxn95t02Yg8rhsTjHrv
-	 JMsJdorpaWlfhjWGwd4su7F+sxA8gjgfARcKbZKcoULYJLtjoN0Cnd2hb1zWGCyIw6
-	 EdYmQujOfzjZ7hZCGpSCTtFxQu7IFk8SsutSm4TeEzC3kDQYyJTjRTvS5rNl7PGpcJ
-	 CzwVznRaVDJlg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id A66DDCE09E0; Thu, 13 Jun 2024 08:12:05 -0700 (PDT)
-Date: Thu, 13 Jun 2024 08:12:05 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <6595ff2a-690e-4d6c-9be5-eb83f2df23fa@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
- <Zmo9-YGraiCj5-MI@zx2c4.com>
- <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com>
- <e06440e2-9121-4c92-8bf2-945977987052@paulmck-laptop>
- <Zmr-KPG9F6w-uzys@zx2c4.com>
+	s=arc-20240116; t=1718294200; c=relaxed/simple;
+	bh=CnL2wkkIbEGtC/SWlVURu8sMQFMqBajpjMRHk4Ifyu8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=so/t6XlI1KSF17BY0I99eC6/A6It5a58lwsEI+DbfDXD/t3ayts2wLuvVO4abzr0kbYl9RhtrptfqH6CDSLEqwcrd2zd+m5tL4GQZjqeasfRJ25eYmrRxpX12KX82eE3o+YmW216XG79lKJXfBkSwpHBJ57Z0c893etIQafbO2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=SmGpTdQ0; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ebeefb9a7fso11952221fa.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 08:56:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718294197; x=1718898997; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8YtzJE9zAkjTgDWzFu3+UQx6DXuF/sVtVwjxO60G1W0=;
+        b=SmGpTdQ0nXs3Zprz7ZqgEnwUryKbWYugxSIIwp55QIEgpyE0znoK3lA7HRqQN5DiVZ
+         S9xfyUtxUG8feZoaAU8kmxCW5RaAj2yaq4kPH8vy3kgPZdo6daj27uYmBGj09f04D4vn
+         /dYY5kxPd2qVlZoSeWXz+QfY/dkZT48QpY0N8k4GetzMgw0A99SZXUFd/9LxPeBmSfd6
+         Hd3qZxhU+hGcPmdXt50CDkVxqQkgoVwUQmIUsqVNPKtqQ1L5HTNgD/7QlTOAiyQcvRIW
+         aBXGRDMFTo0K4uZvsC8UnDwo3btsIPmLJwq55YZyy0Y73C5Ebfd7CLzgtjbBD/hHqePH
+         oBcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718294197; x=1718898997;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8YtzJE9zAkjTgDWzFu3+UQx6DXuF/sVtVwjxO60G1W0=;
+        b=HqJVvApd398S8BU28v8bocCHWr+SoasnHw2eW1Ho3w5A/Eq7MIwTCWZqSd2VUH/1ID
+         jJyqj/8nqhcnNYY79rHWTKSbfexu/ypzfKH0sleaL1WS+4tE1IzeGgJZboDcBpDcYJCb
+         UyCo8Z6xXEvqUx/0a1BiUbrrFD+cyMEKa+yH5huv9vwKdr1lZ0eaP933iABssnOb7nbO
+         2On5/jBiJ3UsEhGQqJTyO042ChuKIsfATX186Yeb53r4dlCqW17NGzd/T/xkQQT2GKmj
+         j72e15MP06+BHrk1i4MaQsrRFC64OBjskbFm9q9b8mJbAgHOToizonIvXoBUKaeliruI
+         KhIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVrJnr6bz89aWL3srCwCy9QE3/QSGdYgsKWWSotCs4jkyOx+1GcrQaxjU8vSFHTL6UgdgbiznrnfNhnYL8LtoQfIYwn
+X-Gm-Message-State: AOJu0YyzAt4e1TwKOBmS7mt2s4oTfoDzfPtzuK97F+63zDF1wLR5Pu4p
+	VYOY5kGErQsVKsNK69RFPPWe0v1AWjFA1oV0qGpT9ZcrwuuISDzi5YvZ2eF/lEo=
+X-Google-Smtp-Source: AGHT+IHJaYZKsvz64jRvX35XKihrVj916LiCpv7D+1hg0yA075wN+w0ZLiWmKimWI+45ynqIxOrYNQ==
+X-Received: by 2002:a05:6512:6c:b0:52c:8024:1db with SMTP id 2adb3069b0e04-52ca6e9a378mr100980e87.63.1718294196984;
+        Thu, 13 Jun 2024 08:56:36 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422874de5d5sm66893595e9.33.2024.06.13.08.56.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 08:56:36 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id F36735F7A1;
+	Thu, 13 Jun 2024 16:56:35 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Cc: qemu-devel@nongnu.org,  David Hildenbrand <david@redhat.com>,  Ilya
+ Leoshkevich <iii@linux.ibm.com>,  Daniel Henrique Barboza
+ <danielhb413@gmail.com>,  Marcelo Tosatti <mtosatti@redhat.com>,  Paolo
+ Bonzini <pbonzini@redhat.com>,  Pierrick Bouvier
+ <pierrick.bouvier@linaro.org>,  Mark Burton <mburton@qti.qualcomm.com>,
+  qemu-s390x@nongnu.org,  Peter Maydell <peter.maydell@linaro.org>,
+  kvm@vger.kernel.org,  Laurent Vivier <lvivier@redhat.com>,  Halil Pasic
+ <pasic@linux.ibm.com>,  Christian Borntraeger <borntraeger@linux.ibm.com>,
+  Alexandre Iooss <erdnaxe@crans.org>,  qemu-arm@nongnu.org,  Alexander
+ Graf <agraf@csgraf.de>,  Nicholas Piggin <npiggin@gmail.com>,  Marco
+ Liebel <mliebel@qti.qualcomm.com>,  Thomas Huth <thuth@redhat.com>,  Roman
+ Bolshakov <rbolshakov@ddn.com>,  qemu-ppc@nongnu.org,  Mahmoud Mandour
+ <ma.mandourr@gmail.com>,  Cameron Esfahani <dirty@apple.com>,  Jamie Iles
+ <quic_jiles@quicinc.com>,  "Dr. David Alan Gilbert" <dave@treblig.org>,
+  Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 8/9] plugins: add time control API
+In-Reply-To: <c4d36875-c70d-4e2c-b3a8-c50459c9db0f@linaro.org> ("Philippe
+	=?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Thu, 13 Jun 2024 10:57:22
+ +0200")
+References: <20240612153508.1532940-1-alex.bennee@linaro.org>
+	<20240612153508.1532940-9-alex.bennee@linaro.org>
+	<c4d36875-c70d-4e2c-b3a8-c50459c9db0f@linaro.org>
+Date: Thu, 13 Jun 2024 16:56:35 +0100
+Message-ID: <87r0d0vnt8.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -81,72 +103,36 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Zmr-KPG9F6w-uzys@zx2c4.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jun 13, 2024 at 04:11:52PM +0200, Jason A. Donenfeld wrote:
-> On Thu, Jun 13, 2024 at 05:46:11AM -0700, Paul E. McKenney wrote:
-> > How about a kmem_cache_destroy_rcu() that marks that specified cache
-> > for destruction, and then a kmem_cache_destroy_barrier() that waits?
-> > 
-> > I took the liberty of adding your name to the Google document [1] and
-> > adding this section:
-> 
-> Cool, though no need to make me yellow!
+Philippe Mathieu-Daud=C3=A9 <philmd@linaro.org> writes:
 
-No worries, Jakub is also colored yellow.  People added tomorrow
-will be cyan if I follow my usual change-color ordering.  ;-)
+> On 12/6/24 17:35, Alex Benn=C3=A9e wrote:
+>> Expose the ability to control time through the plugin API. Only one
+>> plugin can control time so it has to request control when loaded.
+>> There are probably more corner cases to catch here.
+>> From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>
+> Some of your patches include this dubious From: header, maybe strip?
 
-> > > But then, if that mechanism generally works, we don't really need a new
-> > > function and we can just go with the first option of making
-> > > kmem_cache_destroy() asynchronously wait. It'll wait, as you described,
-> > > but then we adjust the tail of every kfree_rcu batch freeing cycle to
-> > > check if there are _still_ any old outstanding kmem_cache_destroy()
-> > > requests. If so, then we can splat and keep the old debugging info we
-> > > currently have for finding memleaks.
-> > 
-> > The mechanism can always be sabotaged by memory-leak bugs on the part
-> > of the user of the kmem_cache structure in play, right?
-> > 
-> > OK, but I see your point.  I added this to the existing
-> > "kmem_cache_destroy() Lingers for kfree_rcu()" section:
-> > 
-> > 	One way of preserving this debugging information is to splat if
-> > 	all of the slab’s memory has not been freed within a reasonable
-> > 	timeframe, perhaps the same 21 seconds that causes an RCU CPU
-> > 	stall warning.
-> > 
-> > Does that capture it?
-> 
-> Not quite what I was thinking. Your 21 seconds as a time-based thing I
-> guess could be fine. But I was mostly thinking:
-> 
-> 1) kmem_cache_destroy() is called, but there are outstanding objects, so
->    it defers.
-> 
-> 2) Sometime later, a kfree_rcu_work batch freeing operation runs.
+I think because my original RFC patches went via Pierrick before pulling
+back into my tree. I can clean those up.
 
-Or not, if there has been a leak and there happens to be no outstanding
-kfree_rcu() memory.
+>
+>> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+>> [AJB: tweaked user-mode handling]
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> Message-Id: <20240530220610.1245424-6-pierrick.bouvier@linaro.org>
+>> ---
+>> plugins/next
+>>    - make qemu_plugin_update_ns a NOP in user-mode
+>> ---
+>>   include/qemu/qemu-plugin.h   | 25 +++++++++++++++++++++++++
+>>   plugins/api.c                | 35 +++++++++++++++++++++++++++++++++++
+>>   plugins/qemu-plugins.symbols |  2 ++
+>>   3 files changed, 62 insertions(+)
 
-> 3) At the end of this batch freeing, the kernel notices that the
->    kmem_cache whose destruction was previously deferred still has
->    outstanding objects and has not been destroyed. It can conclude that
->    there's thus been a memory leak.
-
-And the batch freeing can be replicated across CPUs, so it would be
-necessary to determine which was last to do this effective.  Don't get
-me wrong, this can be done, but the performance/latency tradeoffs can
-be interesting.
-
-> In other words, instead of having to do this based on timers, you can
-> just have the batch freeing code ask, "did those pending kmem_cache
-> destructions get completed as a result of this last operation?"
-
-I agree that kfree_rcu_work-batch time is a good time to evaluate slab
-(and I have added this to the document), but I do not believe that it
-can completely replace timeouts.
-
-							Thanx, Paul
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
