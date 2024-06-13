@@ -1,130 +1,85 @@
-Return-Path: <kvm+bounces-19576-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19577-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8030D907278
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 14:48:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3BF09072F0
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 14:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 938171C225C7
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 12:48:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 674F2B2341E
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 12:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC87144D2D;
-	Thu, 13 Jun 2024 12:47:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BuhuVSpb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63EFC13E3F9;
+	Thu, 13 Jun 2024 12:54:14 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5B3384;
-	Thu, 13 Jun 2024 12:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E321DDDB;
+	Thu, 13 Jun 2024 12:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718282829; cv=none; b=IihzUwtXiOSg1hP7QYftH9EPDx/Olaa9+UAk9t5ycJcDh4CsGhZcDlrrvLN77F6B9KLlK6QmkOtAMLM8iwv9Yae0xw4wzYfRFAymdDn8d3q1+WgOqPQWr0ZpfGfXtZkehbRQKTywJZabIt2ZbegO/DvFbsKUBFRn8QxoRyQ/AWY=
+	t=1718283253; cv=none; b=pDod5xyFswlSu+bg4QbZjJBWk4PSuZ3M25A6wMoNzRRCqrOYUB2pAtLPluvx4vp49SyfYiBJaIz0EhDyGsESW+MYCiiuzCTu1QodI/4CRYIRpS+ZGbc/2QoXLQtPN7I7YbPCBriabeOvYDlrcKK9s8DzD/Sxqh3L865uTrCwM/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718282829; c=relaxed/simple;
-	bh=Vzv0i5AjIrgsjm2KrIFQ5g0zkd8OKZuFz8J9hczkvVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SJEy1X1N+tG/siJlZYDY8kbyPZi3I12R+s4wWzwDGXxEglP8eKHcEfksnj/ewPw2BdfCjXsaAlbPufZSpJyIBDT93dhWRuL5eGwFYXzhfI2eJbCeMDTQo0aXXV5vsKQODmR2WEVtqjuvZHwzplX2w0krkjYknU+WbpKZQtjqdXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BuhuVSpb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01E35C4AF1D;
-	Thu, 13 Jun 2024 12:47:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718282829;
-	bh=Vzv0i5AjIrgsjm2KrIFQ5g0zkd8OKZuFz8J9hczkvVU=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=BuhuVSpbcTx/eXjea/TKS5UUyJyZDKgBNGNojdYjNvJlbKf8f0REK48qN1G00QK7t
-	 ZvvD3sCDrXWlChEjzvItORVcr37gzulSj0d0CfSPbA83U6r5VftQqojy80MOvG23a1
-	 hY4PfyCfuqcnSaALxQyZ/vHNn0szv9zgi06Lvy5Ymsf4b+QclQogfP1kyeQbjXsHNE
-	 KeoVUHKhGcgsG1cxPpec1vzYgQIEkfZMDItRc5n3MrVKB0vQ1/D9qXOZfEF84mWmDk
-	 L9JoHz+GitlIQlt2tEf+5mTalIBsiIhFOB/1V6xe9T/Fc0cNhX3rsh7C2TcMNBTHJf
-	 6oTzHy6k9vjnw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id B3435CE3F3B; Thu, 13 Jun 2024 05:47:08 -0700 (PDT)
-Date: Thu, 13 Jun 2024 05:47:08 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
-	linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Vlastimil Babka <vbabka@suse.cz>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
+	s=arc-20240116; t=1718283253; c=relaxed/simple;
+	bh=J18AC9C3HBhsFS6ts2hpGgSXZdois+TGb2T/FrA5fpU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IOhzD5+abw64kbjtrQW+tT1dOKMyDCRJ9q14hXS3kLPuI+6Uhpoji3f3/DlR2X/Kr0JWfgalDYqt31lgLk03vGEPSl5VcoT6Noj0dMGj7yvIBW8ybvMJafpFNYiefEkBHolM2tRTHxna3Q4tWVuWn9iBStXdaqqHuexdxqB0XI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8Cx_erw62pmyYMGAA--.26243S3;
+	Thu, 13 Jun 2024 20:54:08 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxDMfv62pm+70eAA--.9804S2;
+	Thu, 13 Jun 2024 20:54:07 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: Remove duplicated zero clear with dirty_bitmap buffer
+Date: Thu, 13 Jun 2024 20:54:07 +0800
+Message-Id: <20240613125407.1126587-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZmrfA1p2zSVIaYam@zx2c4.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxDMfv62pm+70eAA--.9804S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
-> On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > when the callback only performs kmem_cache_free. Use
-> > > > kfree_rcu() directly.
-> > > > 
-> > > > The changes were done using the following Coccinelle semantic patch.
-> > > > This semantic patch is designed to ignore cases where the callback
-> > > > function is used in another way.
-> > > 
-> > > How does the discussion on:
-> > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > reflect on this series? IIUC we should hold off..
-> > 
-> > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > where the kmem_cache is destroyed during module unload.
-> > 
-> > OK, I might as well go through them...
-> > 
-> > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > 	Needs to wait, see wg_allowedips_slab_uninit().
-> 
-> Also, notably, this patch needs additionally:
-> 
-> diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> index e4e1638fce1b..c95f6937c3f1 100644
-> --- a/drivers/net/wireguard/allowedips.c
-> +++ b/drivers/net/wireguard/allowedips.c
-> @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
-> 
->  void wg_allowedips_slab_uninit(void)
->  {
-> -	rcu_barrier();
->  	kmem_cache_destroy(node_cache);
->  }
-> 
-> Once kmem_cache_destroy has been fixed to be deferrable.
-> 
-> I assume the other patches are similar -- an rcu_barrier() can be
-> removed. So some manual meddling of these might be in order.
+Since dirty_bitmap pointer is allocated with function __vcalloc(),
+there is __GFP_ZERO flag set in the implementation about this function
+__vcalloc_noprof(). It is not necessary to clear dirty_bitmap buffer
+with zero again.
 
-Assuming that the deferrable kmem_cache_destroy() is the option chosen,
-agreed.
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+---
+ virt/kvm/kvm_main.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-							Thanx, Paul
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 14841acb8b95..c7d4a041dcfa 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1669,9 +1669,6 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
+ 			r = kvm_alloc_dirty_bitmap(new);
+ 			if (r)
+ 				return r;
+-
+-			if (kvm_dirty_log_manual_protect_and_init_set(kvm))
+-				bitmap_set(new->dirty_bitmap, 0, new->npages);
+ 		}
+ 	}
+ 
+
+base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
+-- 
+2.39.3
+
 
