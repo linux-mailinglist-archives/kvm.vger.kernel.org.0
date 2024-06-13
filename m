@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-19631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19632-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909FD907D61
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 22:20:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18E18907D62
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 22:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2177F282BE6
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 20:20:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90181B29250
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 20:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACD413A252;
-	Thu, 13 Jun 2024 20:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA946EB5B;
+	Thu, 13 Jun 2024 20:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UvhE5h5S"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jR/JQoYd"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517B81494BC
-	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 20:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117C614B091
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 20:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718309938; cv=none; b=BfI1utz4Fn+liMO0oo86qBEgtKJFklbNvrM4xCdpGYAuuIckfX+RBemVCyM7DcyQcPIQndMDGWeWDgLLEG9oz4/oVxT2bjOAI1ypG0rjUEQ2asNAshbquiLsyDJvLXH6gTYfP/4eDOeJQ8ehhnXrn4VzE+t2Hevqr9cNIWQvQUU=
+	t=1718309944; cv=none; b=MaOpsc9NpUbUmQMee1PZeL6bMrwvvLHoRVp6veinxowHBLg2RnYWVlSfbFlxvY72ImZhhleEJq4rqJUL2gNGiAGH3djlZlZZruEwbSkyQR7oDU8ZQ8Oa0UtKGC+Zfgf7R8elGlaMXPTOpElnltFPIKcRSOEQYtVd9+NTVQZfzrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718309938; c=relaxed/simple;
-	bh=Nd1zR3qVzwfSq3pK/xhfElA+Dvfml9cbHq8wbNH4bDo=;
+	s=arc-20240116; t=1718309944; c=relaxed/simple;
+	bh=8EVw4Patq8tqLuKmLiBggCmUM/SMzQpxdFoZhJvK7U0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rLQ8hYO9SwHK6YO+EaC/Cfg1z74bRGrHJ55C9CW1ZrpDGX5jbaAsVB/QKSst3XSMj9XNT7IjmXC1GNCWm8a3qcmma/6WgphSjlIZMBbGjUgh2FkJ7KxRoZa1sVMrtwJR+xzSj0MuA8ef3OCgA3GIuLgA4QSMI2IoJOyU5bEMUuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UvhE5h5S; arc=none smtp.client-ip=95.215.58.180
+	 MIME-Version; b=OeQM0NFclCWeUmezyAS4X3+KdDVxptx9cVVyameRRPor2mobpoozOV6TwNumYZS3nexkRhE7TSnY17l6led0H82CAR488EF4m9ov2ncxHWnG+uRDkboGtTLWmjIo7GguKy92vaN25Bsp+rT467PbnLmaPUCkqMEUMLaO2BZp/F4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jR/JQoYd; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718309935;
+	t=1718309937;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=lurBkmTiXsQRuEPJm1jOCsTlH6E/g+spAtItDlE7qKQ=;
-	b=UvhE5h5SJWz4EujALgnmnPx4lqYyt1VLrFDsVqPP3/5xV29rAQ11VHnnRSTJ5jSJrnyHuz
-	rCCkMjNP5GZfmambTOqurGiAS6RULZE0cjmn6LqWFiLv4awbszZQwiJQ9GWOiwK3+dWDju
-	c2avybFJS+by4np7v7FMf1kiIEWnkqw=
+	bh=QrdCJhG75DjFmIYu1xxn9evIUFTScRdvab9ZbjCGheY=;
+	b=jR/JQoYdU/XGIV8u891uIugRhjOGiHHcjrc+YPWXaG7qiKefXKMjquwUzd0m2fxbdDI2Xz
+	IuskMSQYn+Zn5r06bN8XRaoMDnguIf+g7Ls/vtV8HmOujoeaa8yRqlIwylir3pbNfH7+e/
+	PYI9VJcmZfyh+ghor/kmvTkmzl10rsk=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -59,9 +59,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v2 14/15] KVM: arm64: nv: Add additional trap setup for CPTR_EL2
-Date: Thu, 13 Jun 2024 20:17:55 +0000
-Message-ID: <20240613201756.3258227-15-oliver.upton@linux.dev>
+Subject: [PATCH v2 15/15] KVM: arm64: Allow the use of SVE+NV
+Date: Thu, 13 Jun 2024 20:17:56 +0000
+Message-ID: <20240613201756.3258227-16-oliver.upton@linux.dev>
 In-Reply-To: <20240613201756.3258227-1-oliver.upton@linux.dev>
 References: <20240613201756.3258227-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -73,63 +73,50 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-From: Marc Zyngier <maz@kernel.org>
+Allow SVE and NV to mix now that everything is in place to handle it
+correctly.
 
-We need to teach KVM a couple of new tricks. CPTR_EL2 and its
-VHE accessor CPACR_EL1 need to be handled specially:
-
-- CPACR_EL1 is trapped on VHE so that we can track the TCPAC
-  and TTA bits
-
-- CPTR_EL2.{TCPAC,E0POE} are propagated from L1 to L2
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/arm.c    | 5 -----
+ arch/arm64/kvm/nested.c | 3 +--
+ 2 files changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index b0b1935a3626..d30fee61fb17 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -87,11 +87,23 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_fpsimd32(vcpu);
- 	}
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9996a989b52e..e2c934728f73 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -1419,11 +1419,6 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
+ 	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features))
+ 		return -EINVAL;
  
-+	if (!vcpu_has_nv(vcpu))
-+		goto write;
-+
-+	/*
-+	 * The architecture is a bit crap (what a surprise): an EL2 guest
-+	 * writing to CPTR_EL2 via CPACR_EL1 can't set any of TCPAC or TTA,
-+	 * as they are RES0 in the guest's view. To work around it, trap the
-+	 * sucker using the very same bit it can't set...
-+	 */
-+	if (vcpu_el2_e2h_is_set(vcpu) && is_hyp_ctxt(vcpu))
-+		val |= CPTR_EL2_TCPAC;
-+
- 	/*
- 	 * Layer the guest hypervisor's trap configuration on top of our own if
- 	 * we're in a nested context.
- 	 */
--	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-+	if (is_hyp_ctxt(vcpu))
- 		goto write;
+-	/* Disallow NV+SVE for the time being */
+-	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features) &&
+-	    test_bit(KVM_ARM_VCPU_SVE, &features))
+-		return -EINVAL;
+-
+ 	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
+ 		return 0;
  
- 	cptr = vcpu_sanitised_cptr_el2(vcpu);
-@@ -115,6 +127,11 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
- 	if (!(SYS_FIELD_GET(CPACR_ELx, ZEN, cptr) & BIT(0)))
- 		val &= ~CPACR_ELx_ZEN;
+diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+index 6813c7c7f00a..0aefc3e1b9a7 100644
+--- a/arch/arm64/kvm/nested.c
++++ b/arch/arm64/kvm/nested.c
+@@ -41,13 +41,12 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
+ 		break;
  
-+	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S2POE, IMP))
-+		val |= cptr & CPACR_ELx_E0POE;
-+
-+	val |= cptr & CPTR_EL2_TCPAC;
-+
- write:
- 	write_sysreg(val, cpacr_el1);
- }
+ 	case SYS_ID_AA64PFR0_EL1:
+-		/* No AMU, MPAM, S-EL2, RAS or SVE */
++		/* No AMU, MPAM, S-EL2, or RAS */
+ 		val &= ~(GENMASK_ULL(55, 52)	|
+ 			 NV_FTR(PFR0, AMU)	|
+ 			 NV_FTR(PFR0, MPAM)	|
+ 			 NV_FTR(PFR0, SEL2)	|
+ 			 NV_FTR(PFR0, RAS)	|
+-			 NV_FTR(PFR0, SVE)	|
+ 			 NV_FTR(PFR0, EL3)	|
+ 			 NV_FTR(PFR0, EL2)	|
+ 			 NV_FTR(PFR0, EL1));
 -- 
 2.45.2.627.g7a2c4fd464-goog
 
