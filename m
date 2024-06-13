@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-19572-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19573-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F82C906DC5
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 14:04:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E44907004
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 14:25:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0050AB21EF8
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 12:03:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DAF328956D
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 12:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9EE2149DE3;
-	Thu, 13 Jun 2024 11:59:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A3E145338;
+	Thu, 13 Jun 2024 12:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MeI8MH8G"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hfCrzpDL"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B7A1465A5;
-	Thu, 13 Jun 2024 11:59:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF725143C46;
+	Thu, 13 Jun 2024 12:22:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718279953; cv=none; b=eEym6XUlUHeUQRetdQhs0+47Dkdfu2OTsn15opGPDEGokTYX2GBZeCdngY2X+SvKdyopFI47HtfHEPBnGyGFt3z2xNMu1/qTfvERLK4nNiELDL55B5LO89rU95IDYtpRRsB1+QQxNWUD7YUaAW1BzXwoRKjoc5rueP5urWanqiQ=
+	t=1718281371; cv=none; b=PsM8I/KnMWmEPIOIERLRTKFoIf1LpGEc6gb7bb/n+7fH7QFbAffVl33vm+HJ85OSYFyMbMPmsPZjZYMtqlTvJljS8vbsaZG0QNMfsarY3CLyZrXSegE4rQXMfu/pOnNWzI0efTcjap0F3ASMvoauX9OLHRk4b8HyM8sTRUUuAlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718279953; c=relaxed/simple;
-	bh=0ciGaQw5y4u0nJS5KStWIT6J+uYIGGdbCRp7w2Mw+jw=;
+	s=arc-20240116; t=1718281371; c=relaxed/simple;
+	bh=D26C2QGAWbo4I1JNfd9NGM4IGwcESsf+jS9RBEkH0RY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YchvrFWeIFsKcYdk0GjcYRko0HN+7Eacstq6pQecX1GLwEXVAvWZVQFnwrgu4p+yfUgU91pP0/8IWfllQKeW8B5E5pfOqa0CRICQOB+/YQ28Xvz2DkqNXc6jF110/wxOJyvEEskBploeA+/sL1HwsfZ+7y1fulsRpE/nZrTKmlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=MeI8MH8G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FEAAC4AF4D;
-	Thu, 13 Jun 2024 11:59:10 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=CY2Yf/1cbSaCVVOeeAxNbsOnX+tYIvAsLI9WFjekWGPkWUMJRoL3ndlyyjSUGu0y9Axo7h/waDAzS4qvbVyCwxOs5bS804ZvBbLlepwsBScxrw0nH89G4ue1zovf+WzyWCsaqo+q9l63mSEgfv2GUwoCJHCsDMgBI5hJvC9rTEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=hfCrzpDL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46929C32786;
+	Thu, 13 Jun 2024 12:22:49 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MeI8MH8G"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hfCrzpDL"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718279946;
+	t=1718281367;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2oQoeraeqQaQpCY62eMS55dJmmDU2cLnySqsO1DV0bg=;
-	b=MeI8MH8G9GaVwTubn3zbemt8iMGjhWu2xlRT5g6xh1L4MS9g8vj3/b4L5Io4CIm+PbC/28
-	K4kTBBhke2rM7bNZ2dv8VC/fK7/9r4oKXzXHf3Yt4ENzPLvg7XFBUp90WP45io3c2/cs6Q
-	JMbCSdFZKlgC96+RmMCLxV7PaJ3gRO0=
+	bh=zijv6FPIt5hCtiuqrLBHgYuKfY1FOvo07a77dKOwqRA=;
+	b=hfCrzpDLzmbNtF/sSyUwD/q4E2PbjKj9Fna9CH4V+V4vPbeuYBlZyE1WHIwBmUUgtmwa4e
+	hkAMHeSicVC3lwYY/+b0ttk/c79NH8Y9GniehbCUO4Tz+G6YoeBDfmgGgVjY7xbdbEJGet
+	Tjg4BjizrxilahviyNABzJbhoTcy7oY=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ebdb63be (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 13 Jun 2024 11:59:05 +0000 (UTC)
-Date: Thu, 13 Jun 2024 13:58:59 +0200
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 199f6b88 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 13 Jun 2024 12:22:46 +0000 (UTC)
+Date: Thu, 13 Jun 2024 14:22:41 +0200
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: "Paul E. McKenney" <paulmck@kernel.org>
 Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
@@ -65,10 +65,13 @@ Cc: Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
 	Vlastimil Babka <vbabka@suse.cz>
 Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
  kmem_cache_free callback
-Message-ID: <ZmrfA1p2zSVIaYam@zx2c4.com>
+Message-ID: <Zmrkkel0Fo4_g75a@zx2c4.com>
 References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
  <20240612143305.451abf58@kernel.org>
  <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <Zmov7ZaL-54T9GiM@zx2c4.com>
+ <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,50 +80,52 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+In-Reply-To: <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
 
-On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > when the callback only performs kmem_cache_free. Use
-> > > kfree_rcu() directly.
-> > > 
-> > > The changes were done using the following Coccinelle semantic patch.
-> > > This semantic patch is designed to ignore cases where the callback
-> > > function is used in another way.
-> > 
-> > How does the discussion on:
-> >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > reflect on this series? IIUC we should hold off..
+On Wed, Jun 12, 2024 at 08:38:02PM -0700, Paul E. McKenney wrote:
+> o	Make the current kmem_cache_destroy() asynchronously wait for
+> 	all memory to be returned, then complete the destruction.
+> 	(This gets rid of a valuable debugging technique because
+> 	in normal use, it is a bug to attempt to destroy a kmem_cache
+> 	that has objects still allocated.)
 > 
-> We do need to hold off for the ones in kernel modules (such as 07/14)
-> where the kmem_cache is destroyed during module unload.
+> o	Make a kmem_cache_destroy_rcu() that asynchronously waits for
+> 	all memory to be returned, then completes the destruction.
+> 	(This raises the question of what to is it takes a "long time"
+> 	for the objects to be freed.)
+
+These seem like the best two options.
+
+> o	Make a kmem_cache_free_barrier() that blocks until all
+> 	objects in the specified kmem_cache have been freed.
 > 
-> OK, I might as well go through them...
+> o	Make a kmem_cache_destroy_wait() that waits for all memory to
+> 	be returned, then does the destruction.  This is equivalent to:
 > 
-> [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> 	Needs to wait, see wg_allowedips_slab_uninit().
+> 		kmem_cache_free_barrier(&mycache);
+> 		kmem_cache_destroy(&mycache);
 
-Also, notably, this patch needs additionally:
+These also seem fine, but I'm less keen about blocking behavior.
 
-diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-index e4e1638fce1b..c95f6937c3f1 100644
---- a/drivers/net/wireguard/allowedips.c
-+++ b/drivers/net/wireguard/allowedips.c
-@@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
+Though, along the ideas of kmem_cache_destroy_rcu(), you might also
+consider renaming this last one to kmem_cache_destroy_rcu_wait/barrier().
+This way, it's RCU focused, and you can deal directly with the question
+of, "how long is too long to block/to memleak?"
 
- void wg_allowedips_slab_uninit(void)
- {
--	rcu_barrier();
- 	kmem_cache_destroy(node_cache);
- }
+Specifically what I mean is that we can still claim a memory leak has
+occurred if one batched kfree_rcu freeing grace period has elapsed since
+the last call to kmem_cache_destroy_rcu_wait/barrier() or
+kmem_cache_destroy_rcu(). In that case, you quit blocking, or you quit
+asynchronously waiting, and then you splat about a memleak like we have
+now.
 
-Once kmem_cache_destroy has been fixed to be deferrable.
-
-I assume the other patches are similar -- an rcu_barrier() can be
-removed. So some manual meddling of these might be in order.
+But then, if that mechanism generally works, we don't really need a new
+function and we can just go with the first option of making
+kmem_cache_destroy() asynchronously wait. It'll wait, as you described,
+but then we adjust the tail of every kfree_rcu batch freeing cycle to
+check if there are _still_ any old outstanding kmem_cache_destroy()
+requests. If so, then we can splat and keep the old debugging info we
+currently have for finding memleaks.
 
 Jason
 
