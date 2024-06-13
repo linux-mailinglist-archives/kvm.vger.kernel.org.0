@@ -1,137 +1,196 @@
-Return-Path: <kvm+bounces-19612-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19613-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463CC907BEE
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 21:01:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE5D4907C4D
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 21:19:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C60C11F22F09
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 19:01:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64942287AA6
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 19:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F41C15217E;
-	Thu, 13 Jun 2024 19:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9DD156886;
+	Thu, 13 Jun 2024 19:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qYca01sR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oAZM3koF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E3F14E2F2
-	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 19:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67944156872
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 19:17:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718305268; cv=none; b=eRkx/DWO0V0wl5T5+BiWQpFv58lY9HXvGJNGMINBlMWZ+zUvKAwrMXgZCcx3MptE/5D082BIB2FGL4IsHzmFkjHOtZSNaOq60fu+46DYbTiqzkF7DFdUATm9SlxcrIDx54EzleOX94wUsvaL99zDvVB2TxN3QQE++uvkjdT4+Yg=
+	t=1718306249; cv=none; b=qDDw6fTr+ISFAbvu/tnJ1KcjKEcs4jjld4Duuq5z7GNz/zFRo4zxPv0te1eEEpdEm9VkkaPL0RhmEtWLOkpeX6/x4Fl5btfR/7E6n+szZjpVLxMOe1YcdjWXXODLsTs7Q/z4aCexjre+C67zEqCp7HRKkn6hDWcCZYGft1pLLuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718305268; c=relaxed/simple;
-	bh=EdM3NFAHtqf7iO6j5P+sTJg6E55g7ZvNba3lzMdLcdE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bYHqS4+KcNKUMBRsF94QMHckpacYjQcQmf0HTwfbMFqI2VbItbeLfL1tr1rQdPxnK9ffRon1H2v9Nqqa9En9UDUQ9Ro7tv6tye+dCAAm9wegRvsj9OqD/MenRvSXjOFGDFjHnkxcpK5wJylZxkJIFghsrm6Ke0gQDmYNP+tFX7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qYca01sR; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1718306249; c=relaxed/simple;
+	bh=WK0O8EnFbOwkpXmWKUkM/27ZG7npYR+IRP8iuvWgRXE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WFidc9j2DKFZn6KFiANUYPDJh7/MKd+qUpOBYMK1u4X9T+tOUyI3FuZxH+6ixIqSYPGImCfe/YT5irG3fJMTl4rFVZHTPTjVDtNNEt/sZ8AQCDFOKgzuax7i759o66eou1xScyupaq+QSRa6fHiHhyWxHe+M9bQ/i6zfNWvbfiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oAZM3koF; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62cf0ed7761so26717807b3.1
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 12:01:06 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-70428cb18c3so1208208b3a.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 12:17:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718305266; x=1718910066; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4scoAI3xWobVP6E+XRq1RKOC326O2un8fjhuaP6CeHI=;
-        b=qYca01sRmt9Aj9brAT+UPLIs7l0+oYKqRqCdLIFggseMPqFNIvCGdQKYzu3G6LkuRf
-         /6IXUddcTmCvfrhLk+OKM7VPwHlga6pXoBhVev3J9CEn50qyZH9xA/OERr0AIXYu6eIQ
-         HmN4mVEDGQ0om0bLFmUIQ+HOtvgfhTZIZXW4sqfy9LGH+TmTT/5zm5gZdAsMFzLFPb5N
-         LgD1sRo3jvYXQCoQKfsuerzbTFNBITMNqF1S1cyT6Rec4SVBYlkdWiP1MuowViX/IV3b
-         zjWyZzIlgbu0CeJqHuQXKILlTCfXw0sitpV+e2bA+HCL1XqxFyzeMx47UUnk3i2cf/S7
-         /XIA==
+        d=google.com; s=20230601; t=1718306247; x=1718911047; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mws2MIaSpabprW+K0B5XGTiUggUTIjO34wnCF45aV+E=;
+        b=oAZM3koFsS51+9F1eTsmeQAh9lkGDoMGSC8wU67ETdcYyjQqS0Lssqq9Z4IkfYEoQ2
+         ToDY2/GhpKzGeOEama1y7KJTrpExsCnjTBM9CzMFWbb5LSRp6csH/MKb7su4pEBY9QvI
+         JFPykggbrtMwUFtzB4p6J4zfdBGvioxKlBeyvbVVnCh9S3OWj9zYv+N0tqM/shjnliN3
+         jbmnPr9X4Wwx++p5ucMUjwkX3CMXuiDBnvbzF0iEBtPfBOXt793RwZWDHrIHEdnRdpI0
+         QQ4sEq8W85UFs9DiZKzyLmvmg/6BUWmZiqVIPk08vy3qQ63eo5BmA7I6Adx4b6wR+9+9
+         OH5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718305266; x=1718910066;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4scoAI3xWobVP6E+XRq1RKOC326O2un8fjhuaP6CeHI=;
-        b=L52/SUymcEKP94/nBUvET28a838CZyTb1MDkIOV3q29NRJH3ppCwmHt9cZp5fOBAoF
-         VfkRQNGbjDJFj9PgLj3qOjOzCH2UN9WgJgSyzuy2pbkYobi7Df92u4N0LTP8CC3iHwUw
-         xRfU6MRs1VhcWz0jpPiAW7wYAkt1cSwZX/dB6nzSvO0fspHAN0hzYxZWC5M/w8/SqL96
-         Mm3JzOL+owW9DMRJA/v0ZJ+gjNDFRe7/9vYJ2Rs7dHS0/mM4rA9MWtg6Msaqu+DnV5SX
-         6onFJcr9d3D+/VAVtJvp6+onplpdmQh/7X4a/VCZ8Mefcjfac42iQ6I9EszxKxHT3/9v
-         Vq7Q==
-X-Gm-Message-State: AOJu0Yw3w7c1uGvHH9qkivS2TIzPwiKbalAyS3EXqg4KQNGUkim0xo5r
-	+xL3WMwWslj8AuNDTpIXXHE7X733BNy/ZGhnlElntkvpP59IWQrvCKtTkJLZuHREXcN+rgzrw/5
-	PFw==
-X-Google-Smtp-Source: AGHT+IEz/kaKBHJHUJSiWymGtpYz5LODHuIW1raDtRMykoNrYAMEWe+IYh3gOJ/yB9zn1NGxXheewdBDEx8=
+        d=1e100.net; s=20230601; t=1718306247; x=1718911047;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mws2MIaSpabprW+K0B5XGTiUggUTIjO34wnCF45aV+E=;
+        b=iIQuRaCWTN8qVugy8rCMz0zmrvRv6zAUVGbQfGEIlj7XlhKvprf35h6DihHuAB/1xg
+         jY046J/byUjgwsMwuUcFp5OdZabZsaXoTMhYpbQFWeLqgRBmIL+M2f36sOuKPD9pw37q
+         cQeEks8ZVGzySPg79pWR5ByLuRMznNb6r06/K4wfScR4R/S9yFvI2ugrtVmhWyzsZJwe
+         2kLL8DVvwd72Dis0jrKfMn5M94qjaS46ChAE8yIAK7eh5pBftBijZDN8N141DQiZoV9I
+         b+JVI7sS+Jln7q4UsHjBiZD1NgXexPGZC90sUF2FUvV0HD2tZsjm7lvdC3JSjcZNu48g
+         mfwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVxqjWveS34AmhyVJLkDRsZBSX/RtFr74T0GTXtIVhaHDeCOUy1SH7ZCS1V16gCPKytLZlCH4jYjlJT9dnE9mjqnHy+
+X-Gm-Message-State: AOJu0YztvleGReTGQbG+Ml+Xqonw0F1FNusUogCMYhpcOWufCk86EMu2
+	vtNj/B6hTyzu9IQs1h0sbniXxEgo/pwMe4KaBbn9tVN3Sih0e1lNjAyXvau0jlpyuD626Lzyagr
+	Kiw==
+X-Google-Smtp-Source: AGHT+IGLEmys20qbkgdABrkxxvz+kgf995x6jgSnv4NUe3WC6bbRVbCvqXkmtYi3k70EMue7mRQDd5lVWWc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:bfc7:0:b0:dfa:ff74:f262 with SMTP id
- 3f1490d57ef6-dfefed12278mr647712276.2.1718305266142; Thu, 13 Jun 2024
- 12:01:06 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu, 13 Jun 2024 12:01:03 -0700
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3319:b0:705:c8b8:c517 with SMTP id
+ d2e1a72fcca58-705d710ba55mr28066b3a.1.1718306246532; Thu, 13 Jun 2024
+ 12:17:26 -0700 (PDT)
+Date: Thu, 13 Jun 2024 12:17:25 -0700
+In-Reply-To: <20240613021920.46508-1-flyingpeng@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
-Message-ID: <20240613190103.1054877-1-seanjc@google.com>
-Subject: [PATCH] KVM: nVMX: Update VMCS12_REVISION comment to state it should
- never change
+References: <20240613021920.46508-1-flyingpeng@tencent.com>
+Message-ID: <ZmtFxVTnzS8z3n5m@google.com>
+Subject: Re: [PATCH]  KVM/x86: increase frame warning limit in emulate when
+ using KASAN or KCSAN
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To: flyingpenghao@gmail.com
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, 
+	Peng Hao <flyingpeng@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Rewrite the comment above VMCS12_REVISION to unequivocally state that the
-ID must never change.  KVM_{G,S}ET_NESTED_STATE have been officially
-supported for some time now, i.e. changing VMCS12_REVISION would break
-userspace.
+On Thu, Jun 13, 2024, flyingpenghao@gmail.com wrote:
+> From: Peng Hao <flyingpeng@tencent.com>
+> 
+>  When building kernel with clang, which will typically
+>  have sanitizers enabled, there is a warning about a large stack frame.
+> 
+> arch/x86/kvm/emulate.c:3022:5: error: stack frame size (2520) exceeds limit (2048)
+> in 'emulator_task_switch' [-Werror,-Wframe-larger-than]
+> int emulator_task_switch(struct x86_emulate_ctxt *ctxt,
+>     ^
+> 599/2520 (23.77%) spills, 1921/2520 (76.23%) variables
+> 
+> so increase the limit for configurations that have KASAN or KCSAN enabled for not
+> breaking the majority of builds.
 
-Opportunistically add a blurb to the CHECK_OFFSET() comment to make it
-explicitly clear that new fields are allowed, i.e. that the restriction
-on the layout is all about backwards compatibility.
+Overriding -Wframe-larger-than in KVM isn't maintainble or robust, and KVM shouldn't
+discard the userspace configuration.
 
-No functional change intended.
+Can you provide the relevant pieces of your .config?  KVM already guards against
+KASAN, so maybe it's just KCSAN that's problematic?  If that's the case, then I
+believe the below two patches will do the trick.
 
-Cc: Jim Mattson <jmattson@google.com>
+If KVM_WERROR is enabled because WERROR is enabled, then that's working as intended,
+i.e. the problem is in the config, not in KVM.
+
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 13 Jun 2024 12:03:13 -0700
+Subject: [PATCH 1/2] KVM: x86: Disallow KVM_WERROR if KCSAN and/or KMSAN is
+ enabled
+
+Extend KVM_WERROR's incompatibility list to include KCSAN and KMSAN, in
+addition to the existing KASAN restriction.  Like KASAN, KCSAN and KMSAN
+require more memory and can cause problems with FRAME_WARN.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmcs12.h | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ arch/x86/kvm/Kconfig | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmcs12.h b/arch/x86/kvm/vmx/vmcs12.h
-index 01936013428b..56fd150a6f24 100644
---- a/arch/x86/kvm/vmx/vmcs12.h
-+++ b/arch/x86/kvm/vmx/vmcs12.h
-@@ -188,12 +188,13 @@ struct __packed vmcs12 {
- };
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index 80e5afde69f4..e12733574e92 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -61,13 +61,14 @@ config KVM
  
- /*
-- * VMCS12_REVISION is an arbitrary id that should be changed if the content or
-- * layout of struct vmcs12 is changed. MSR_IA32_VMX_BASIC returns this id, and
-- * VMPTRLD verifies that the VMCS region that L1 is loading contains this id.
-+ * VMCS12_REVISION is KVM's arbitrary ID for the layout of struct vmcs12.  KVM
-+ * enumerates this value to L1 via MSR_IA32_VMX_BASIC, and checks the revision
-+ * ID during nested VMPTRLD to verify that L1 is loading a VMCS that adhere's
-+ * to KVM's virtual CPU definition.
-  *
-- * IMPORTANT: Changing this value will break save/restore compatibility with
-- * older kvm releases.
-+ * DO NOT change this value, as it will break save/restore compatibility with
-+ * older KVM releases.
-  */
- #define VMCS12_REVISION 0x11e57ed0
+ config KVM_WERROR
+ 	bool "Compile KVM with -Werror"
+-	# Disallow KVM's -Werror if KASAN is enabled, e.g. to guard against
+-	# randomized configs from selecting KVM_WERROR=y, which doesn't play
+-	# nice with KASAN.  KASAN builds generates warnings for the default
+-	# FRAME_WARN, i.e. KVM_WERROR=y with KASAN=y requires special tuning.
+-	# Building KVM with -Werror and KASAN is still doable via enabling
+-	# the kernel-wide WERROR=y.
+-	depends on KVM && ((EXPERT && !KASAN) || WERROR)
++	# Disallow KVM's -Werror if one or more sanitizers that requires extra
++	# memory is enabled, e.g. to guard against randomized configs selecting
++	# KVM_WERROR=y.  Sanitizers often trip FRAME_WARN in KVM, i.e. enabling
++	# sanitizers+KVM_WERROR typically requires a hand-tuned config.
++	#
++	# Note, building KVM with -Werror and sanitizers is still doable via
++	# enabling the kernel-wide WERROR=y.
++	depends on KVM && ((EXPERT && (!KASAN && !KCSAN && !KMSAN)) || WERROR)
+ 	help
+ 	  Add -Werror to the build flags for KVM.
  
-@@ -206,7 +207,8 @@ struct __packed vmcs12 {
- #define VMCS12_SIZE		KVM_STATE_NESTED_VMX_VMCS_SIZE
- 
- /*
-- * For save/restore compatibility, the vmcs12 field offsets must not change.
-+ * For save/restore compatibility, the vmcs12 field offsets must not change,
-+ * although appending fields and/or filling gaps is obviously allowed.
-  */
- #define CHECK_OFFSET(field, loc) \
- 	ASSERT_STRUCT_OFFSET(struct vmcs12, field, loc)
 
 base-commit: e4e9e1067138e5620cf0500c3e5f6ebfb9d322c8
+-- 
+2.45.2.627.g7a2c4fd464-goog
+
+From 2e20a81fbafb10eae6727fdf314404b67b449492 Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 13 Jun 2024 12:06:36 -0700
+Subject: [PATCH 2/2] KVM: x86: Disallow KVM_WERROR with sanitizers iff
+ FRAME_WARN is enabled
+
+Allow KVM_WERROR to be enabled alongside sanitizers if FRAME_WARN is
+disabled, as the sanitizers are problematic only because they increase the
+stack footprint and cause FRAME_WARN to fire, i.e. KVM isn't fundamentally
+incompatible with the sanitizers.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/Kconfig | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+index e12733574e92..34f047426a71 100644
+--- a/arch/x86/kvm/Kconfig
++++ b/arch/x86/kvm/Kconfig
+@@ -62,13 +62,14 @@ config KVM
+ config KVM_WERROR
+ 	bool "Compile KVM with -Werror"
+ 	# Disallow KVM's -Werror if one or more sanitizers that requires extra
+-	# memory is enabled, e.g. to guard against randomized configs selecting
+-	# KVM_WERROR=y.  Sanitizers often trip FRAME_WARN in KVM, i.e. enabling
+-	# sanitizers+KVM_WERROR typically requires a hand-tuned config.
++	# memory is enabled and FRAME_WARN is also enabled, e.g. to guard
++	# against randomized configs selecting KVM_WERROR=y.  Sanitizers often
++	# trip FRAME_WARN in KVM, i.e. enabling sanitizers+KVM_WERROR typically
++	# requires a hand-tuned config.
+ 	#
+ 	# Note, building KVM with -Werror and sanitizers is still doable via
+ 	# enabling the kernel-wide WERROR=y.
+-	depends on KVM && ((EXPERT && (!KASAN && !KCSAN && !KMSAN)) || WERROR)
++	depends on KVM && ((EXPERT && ((!KASAN && !KCSAN && !KMSAN) || FRAME_WARN=0)) || WERROR)
+ 	help
+ 	  Add -Werror to the build flags for KVM.
+ 
 -- 
 2.45.2.627.g7a2c4fd464-goog
 
