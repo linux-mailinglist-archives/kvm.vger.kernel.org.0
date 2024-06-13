@@ -1,209 +1,186 @@
-Return-Path: <kvm+bounces-19606-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19607-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89204907AC0
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 20:14:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B9AD907AD6
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 20:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4CCBB22C86
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 18:14:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A51E1C225B9
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 18:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E9314D2BC;
-	Thu, 13 Jun 2024 18:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC3514AD0C;
+	Thu, 13 Jun 2024 18:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jR/4hRHI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MHTItqr0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4001614B96D;
-	Thu, 13 Jun 2024 18:13:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465CD1304AB
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 18:16:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718302433; cv=none; b=nXpBOBzOpX6pscU6B7TWZtTAEzKr5ITJyR2hw0NEofAnjqfI2n5zMQHfwX8s7QthcOMz9u1TD+9JKzBO7y4Eb7T++vIIfzrVKnoUxf4qLhrtCckUA2stxmsS9HkqDIaNqfa9KHuQT55U6+gvYusG7BZVVfxZk3hPXq5wgHT2gFE=
+	t=1718302585; cv=none; b=Ahpqrgi3k7XJx9UVlZs+W4msGDKApRLMaJhLjDrnVMWqXDpHhEhYpxY+mVahNDM3T702p2+sUBDQ9xtANSBhVwfEVizWxwppVJobbFgqPMVZqRRQRA+/vt3KCgtL1KTOjm3xTDd5VkVGOBJHI1ZCqGPTqpyJtzWoiB/RCC0jKrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718302433; c=relaxed/simple;
-	bh=fTIU120VbeRegu4fENGIN2pJl0vJUhORQvgqaO97OJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K8tjbkIM7wbcaaSTT780vXxwFmpPD9v8z8a4DgcXxFt+BXHyMpipXSynG5ZC2sZ+69DzalOYQmA3DuDy3+dvN7cwUzAgeDI4nSrAzo6o+WnPmVCwTxM/5e8g/eYG1MnyjjgAJtpkDqsWl/cTJ5GcOzHGsl+gVXoSqTqsJUCaQUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jR/4hRHI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8EEBC32786;
-	Thu, 13 Jun 2024 18:13:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718302432;
-	bh=fTIU120VbeRegu4fENGIN2pJl0vJUhORQvgqaO97OJA=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=jR/4hRHIvjnr0HuKMd6n8Jn2KplP88ALqz/jBpAKC7iDEoEz5yTd6fMxpCs6goNdu
-	 n8elfLSow/niMrJmWbjyCFHbgDgF7GshXU3IoT7xdE5GNXUmv9oEGHq2mjc20rGLwp
-	 q0fYO1vllub6LyzhOYauiWoAoj8VOrLrRS7uM4A5UortmkOXNr3XN6j9g1Q0nw5rZI
-	 B++vgmEbZiZmvCkQbcm552PFvnT2ReJyoa6yOeebtcW7WCh7SbYjGbpp0bBNshQbGt
-	 UgwL7TFo2YOcNsL7tdoefLVWkIgw8OEUPXV25zDiL5YxSslrNLs6bwA797sM/3Spyz
-	 ebnTt6JASQjTg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 56F78CE0760; Thu, 13 Jun 2024 11:13:52 -0700 (PDT)
-Date: Thu, 13 Jun 2024 11:13:52 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
- <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
- <Zmru7hhz8kPDPsyz@pc636>
- <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
- <Zmsuswo8OPIhY5KJ@pc636>
- <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
+	s=arc-20240116; t=1718302585; c=relaxed/simple;
+	bh=VMV5npPvx2LlJ/v0Vts5oDRx4jTMhD7qJPkKX8wCExc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dquCKiCTSWeAeDjw0xuZaY5cECvE6hKk0l4fvfN3ANAdC21rsyZP+FaFDAZsfOMKHNGfpZx8G8Fgh9vnCfBrJQaJDfo3vylu9JegdNSsScFSjWXAF6m0n1wYfz9me+91YUOdWc46RBuYLiAirT8vmMUgdZRgME1BCMGgIKMzuC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MHTItqr0; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dfa7a8147c3so2251223276.3
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 11:16:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718302583; x=1718907383; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HubYKewLWWkCbdNX6Kwg7NPcQhWO6deKo+vfavaox7o=;
+        b=MHTItqr0GeqGwp1JpLq43jq01LcN4VRBo2IuHaYCbElbTmbcu5vo21tyGQ760OpBDe
+         OwPuKRcDxssUN6/U7pCNfsCzweWVCBgbPITtOsGghjEBpNiJ6zxif7+qbE5C7pnT6FWe
+         yZTOAtnKzMWzuRnlDAaMZlHblH6S5X4Pb5YStYpK+YW8DF+QY0F4xUNxH6QZuxKp3BuM
+         0u+RDEWMzylCRj9KJhXUUeuKmS5eG8BhS5XLRVWfMbwDiBQz2EILzMdcs1ZF67rylWOp
+         5kLP15leUAqStIXqFuEn32fvJU0Wtn2Ex7K04SWC4PN2Dc4OmcYyZEi4sfdBlsKDuQzp
+         mCXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718302583; x=1718907383;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HubYKewLWWkCbdNX6Kwg7NPcQhWO6deKo+vfavaox7o=;
+        b=hjTNd9z/7dOHUi4w2FW9PhQZPmbQ0bJ1GpNT6G8tK3novUlHUtaZiX64ej8HX0HloW
+         lsABCRsLgZe8SUC4cskmAr0iBAy+khSz62ZEB1GO7x55jZry2HHbjMmVCHdGkMINO1Va
+         xRaPJIjdwzXgM5AZ+XcR+JaDKePW4uhB7r3EdWOVp8tkRhnInfmlPAlHCS2BuwQPVdBa
+         uouqkvIHyW/f4ziEiGAfqmjTJfrNuK/pdAhNmnI6Wl8YxGOBFunqbYVSAxB3uiQFVf4Y
+         su3xgXnhoLRqXXrEcz4DYZ5/AR2Eby67QNTb3umwGrMUkwb3VlRWsF/sQTlo0UQqkRl1
+         hx/A==
+X-Forwarded-Encrypted: i=1; AJvYcCV0uTK58/0nX8WHj4EnhQESKl8l1+OXRdsuIJEQ8Ni2N6HJpqoNpYUc5Z3n3ElCfnQC0uwGSLaYuINBRCagr37xnK6L
+X-Gm-Message-State: AOJu0YyOy2iCy/rZ/wkTGVFajlXbZYe5Zs/hOgOk8UnIt5WwQG53b8WE
+	C4lhO8fqeIhq4aLzH4OrFlmj5HamxbCHtpTw/tHJ77g9zEgDUySL08xrMzsXUWupd4YOjVpxNhS
+	JFg==
+X-Google-Smtp-Source: AGHT+IEpFkCu5iSBXcf5Bl0AwgjGARJpjeA/2ZZwxq9LggA19KheODvNkc7FkwL6B4GvsjAsggv5UiEcpBo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:706:b0:dff:ee8:14d6 with SMTP id
+ 3f1490d57ef6-dff15454a8bmr84096276.10.1718302583316; Thu, 13 Jun 2024
+ 11:16:23 -0700 (PDT)
+Date: Thu, 13 Jun 2024 11:16:21 -0700
+In-Reply-To: <20240207172646.3981-19-xin3.li@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZmszOd5idhf2Cb-v@pc636>
+Mime-Version: 1.0
+References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-19-xin3.li@intel.com>
+Message-ID: <Zms3dVgcuObZOwRR@google.com>
+Subject: Re: [PATCH v2 18/25] KVM: nVMX: Add a prerequisite to
+ SHADOW_FIELD_R[OW] macros
+From: Sean Christopherson <seanjc@google.com>
+To: Xin Li <xin3.li@intel.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	pbonzini@redhat.com, corbet@lwn.net, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	shuah@kernel.org, vkuznets@redhat.com, peterz@infradead.org, 
+	ravi.v.shankar@intel.com, xin@zytor.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jun 13, 2024 at 07:58:17PM +0200, Uladzislau Rezki wrote:
-> On Thu, Jun 13, 2024 at 10:45:59AM -0700, Paul E. McKenney wrote:
-> > On Thu, Jun 13, 2024 at 07:38:59PM +0200, Uladzislau Rezki wrote:
-> > > On Thu, Jun 13, 2024 at 08:06:30AM -0700, Paul E. McKenney wrote:
-> > > > On Thu, Jun 13, 2024 at 03:06:54PM +0200, Uladzislau Rezki wrote:
-> > > > > On Thu, Jun 13, 2024 at 05:47:08AM -0700, Paul E. McKenney wrote:
-> > > > > > On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
-> > > > > > > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
-> > > > > > > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
-> > > > > > > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
-> > > > > > > > > > Since SLOB was removed, it is not necessary to use call_rcu
-> > > > > > > > > > when the callback only performs kmem_cache_free. Use
-> > > > > > > > > > kfree_rcu() directly.
-> > > > > > > > > > 
-> > > > > > > > > > The changes were done using the following Coccinelle semantic patch.
-> > > > > > > > > > This semantic patch is designed to ignore cases where the callback
-> > > > > > > > > > function is used in another way.
-> > > > > > > > > 
-> > > > > > > > > How does the discussion on:
-> > > > > > > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
-> > > > > > > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
-> > > > > > > > > reflect on this series? IIUC we should hold off..
-> > > > > > > > 
-> > > > > > > > We do need to hold off for the ones in kernel modules (such as 07/14)
-> > > > > > > > where the kmem_cache is destroyed during module unload.
-> > > > > > > > 
-> > > > > > > > OK, I might as well go through them...
-> > > > > > > > 
-> > > > > > > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
-> > > > > > > > 	Needs to wait, see wg_allowedips_slab_uninit().
-> > > > > > > 
-> > > > > > > Also, notably, this patch needs additionally:
-> > > > > > > 
-> > > > > > > diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
-> > > > > > > index e4e1638fce1b..c95f6937c3f1 100644
-> > > > > > > --- a/drivers/net/wireguard/allowedips.c
-> > > > > > > +++ b/drivers/net/wireguard/allowedips.c
-> > > > > > > @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
-> > > > > > > 
-> > > > > > >  void wg_allowedips_slab_uninit(void)
-> > > > > > >  {
-> > > > > > > -	rcu_barrier();
-> > > > > > >  	kmem_cache_destroy(node_cache);
-> > > > > > >  }
-> > > > > > > 
-> > > > > > > Once kmem_cache_destroy has been fixed to be deferrable.
-> > > > > > > 
-> > > > > > > I assume the other patches are similar -- an rcu_barrier() can be
-> > > > > > > removed. So some manual meddling of these might be in order.
-> > > > > > 
-> > > > > > Assuming that the deferrable kmem_cache_destroy() is the option chosen,
-> > > > > > agreed.
-> > > > > >
-> > > > > <snip>
-> > > > > void kmem_cache_destroy(struct kmem_cache *s)
-> > > > > {
-> > > > > 	int err = -EBUSY;
-> > > > > 	bool rcu_set;
-> > > > > 
-> > > > > 	if (unlikely(!s) || !kasan_check_byte(s))
-> > > > > 		return;
-> > > > > 
-> > > > > 	cpus_read_lock();
-> > > > > 	mutex_lock(&slab_mutex);
-> > > > > 
-> > > > > 	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
-> > > > > 
-> > > > > 	s->refcount--;
-> > > > > 	if (s->refcount)
-> > > > > 		goto out_unlock;
-> > > > > 
-> > > > > 	err = shutdown_cache(s);
-> > > > > 	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
-> > > > > 	     __func__, s->name, (void *)_RET_IP_);
-> > > > > ...
-> > > > > 	cpus_read_unlock();
-> > > > > 	if (!err && !rcu_set)
-> > > > > 		kmem_cache_release(s);
-> > > > > }
-> > > > > <snip>
-> > > > > 
-> > > > > so we have SLAB_TYPESAFE_BY_RCU flag that defers freeing slab-pages
-> > > > > and a cache by a grace period. Similar flag can be added, like
-> > > > > SLAB_DESTROY_ONCE_FULLY_FREED, in this case a worker rearm itself
-> > > > > if there are still objects which should be freed.
-> > > > > 
-> > > > > Any thoughts here?
-> > > > 
-> > > > Wouldn't we also need some additional code to later check for all objects
-> > > > being freed to the slab, whether or not that code is  initiated from
-> > > > kmem_cache_destroy()?
-> > > >
-> > > Same away as SLAB_TYPESAFE_BY_RCU is handled from the kmem_cache_destroy() function.
-> > > It checks that flag and if it is true and extra worker is scheduled to perform a
-> > > deferred(instead of right away) destroy after rcu_barrier() finishes.
-> > 
-> > Like this?
-> > 
-> > 	SLAB_DESTROY_ONCE_FULLY_FREED
-> > 
-> > 	Instead of adding a new kmem_cache_destroy_rcu()
-> > 	or kmem_cache_destroy_wait() API member, instead add a
-> > 	SLAB_DESTROY_ONCE_FULLY_FREED flag that can be passed to the
-> > 	existing kmem_cache_destroy() function.  Use of this flag would
-> > 	suppress any warnings that would otherwise be issued if there
-> > 	was still slab memory yet to be freed, and it would also spawn
-> > 	workqueues (or timers or whatever) to do any needed cleanup work.
-> > 
-> >
-> The flag is passed as all others during creating a cache:
-> 
->   slab = kmem_cache_create(name, size, ..., SLAB_DESTROY_ONCE_FULLY_FREED | OTHER_FLAGS, NULL);
-> 
-> the rest description is correct to me.
+On Wed, Feb 07, 2024, Xin Li wrote:
+> @@ -32,48 +32,48 @@ BUILD_BUG_ON(1)
+>   */
+>  
+>  /* 16-bits */
+> -SHADOW_FIELD_RW(GUEST_INTR_STATUS, guest_intr_status)
+> -SHADOW_FIELD_RW(GUEST_PML_INDEX, guest_pml_index)
+> -SHADOW_FIELD_RW(HOST_FS_SELECTOR, host_fs_selector)
+> -SHADOW_FIELD_RW(HOST_GS_SELECTOR, host_gs_selector)
+> +SHADOW_FIELD_RW(GUEST_INTR_STATUS, guest_intr_status, cpu_has_vmx_apicv())
+> +SHADOW_FIELD_RW(GUEST_PML_INDEX, guest_pml_index, cpu_has_vmx_pml())
+> +SHADOW_FIELD_RW(HOST_FS_SELECTOR, host_fs_selector, true)
+> +SHADOW_FIELD_RW(HOST_GS_SELECTOR, host_gs_selector, true)
+>  
+>  /* 32-bits */
+> -SHADOW_FIELD_RO(VM_EXIT_REASON, vm_exit_reason)
+> -SHADOW_FIELD_RO(VM_EXIT_INTR_INFO, vm_exit_intr_info)
+> -SHADOW_FIELD_RO(VM_EXIT_INSTRUCTION_LEN, vm_exit_instruction_len)
+> -SHADOW_FIELD_RO(IDT_VECTORING_INFO_FIELD, idt_vectoring_info_field)
+> -SHADOW_FIELD_RO(IDT_VECTORING_ERROR_CODE, idt_vectoring_error_code)
+> -SHADOW_FIELD_RO(VM_EXIT_INTR_ERROR_CODE, vm_exit_intr_error_code)
+> -SHADOW_FIELD_RO(GUEST_CS_AR_BYTES, guest_cs_ar_bytes)
+> -SHADOW_FIELD_RO(GUEST_SS_AR_BYTES, guest_ss_ar_bytes)
+> -SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control)
+> -SHADOW_FIELD_RW(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control)
+> -SHADOW_FIELD_RW(EXCEPTION_BITMAP, exception_bitmap)
+> -SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE, vm_entry_exception_error_code)
+> -SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field)
+> -SHADOW_FIELD_RW(VM_ENTRY_INSTRUCTION_LEN, vm_entry_instruction_len)
+> -SHADOW_FIELD_RW(TPR_THRESHOLD, tpr_threshold)
+> -SHADOW_FIELD_RW(GUEST_INTERRUPTIBILITY_INFO, guest_interruptibility_info)
+> -SHADOW_FIELD_RW(VMX_PREEMPTION_TIMER_VALUE, vmx_preemption_timer_value)
+> +SHADOW_FIELD_RO(VM_EXIT_REASON, vm_exit_reason, true)
+> +SHADOW_FIELD_RO(VM_EXIT_INTR_INFO, vm_exit_intr_info, true)
+> +SHADOW_FIELD_RO(VM_EXIT_INSTRUCTION_LEN, vm_exit_instruction_len, true)
+> +SHADOW_FIELD_RO(VM_EXIT_INTR_ERROR_CODE, vm_exit_intr_error_code, true)
+> +SHADOW_FIELD_RO(IDT_VECTORING_INFO_FIELD, idt_vectoring_info_field, true)
+> +SHADOW_FIELD_RO(IDT_VECTORING_ERROR_CODE, idt_vectoring_error_code, true)
+> +SHADOW_FIELD_RO(GUEST_CS_AR_BYTES, guest_cs_ar_bytes, true)
+> +SHADOW_FIELD_RO(GUEST_SS_AR_BYTES, guest_ss_ar_bytes, true)
+> +SHADOW_FIELD_RW(CPU_BASED_VM_EXEC_CONTROL, cpu_based_vm_exec_control, true)
+> +SHADOW_FIELD_RW(PIN_BASED_VM_EXEC_CONTROL, pin_based_vm_exec_control, true)
+> +SHADOW_FIELD_RW(EXCEPTION_BITMAP, exception_bitmap, true)
+> +SHADOW_FIELD_RW(VM_ENTRY_EXCEPTION_ERROR_CODE, vm_entry_exception_error_code, true)
+> +SHADOW_FIELD_RW(VM_ENTRY_INTR_INFO_FIELD, vm_entry_intr_info_field, true)
+> +SHADOW_FIELD_RW(VM_ENTRY_INSTRUCTION_LEN, vm_entry_instruction_len, true)
+> +SHADOW_FIELD_RW(TPR_THRESHOLD, tpr_threshold, true)
+> +SHADOW_FIELD_RW(GUEST_INTERRUPTIBILITY_INFO, guest_interruptibility_info, true)
+> +SHADOW_FIELD_RW(VMX_PREEMPTION_TIMER_VALUE, vmx_preemption_timer_value, cpu_has_vmx_preemption_timer())
+>  
+>  /* Natural width */
+> -SHADOW_FIELD_RO(EXIT_QUALIFICATION, exit_qualification)
+> -SHADOW_FIELD_RO(GUEST_LINEAR_ADDRESS, guest_linear_address)
+> -SHADOW_FIELD_RW(GUEST_RIP, guest_rip)
+> -SHADOW_FIELD_RW(GUEST_RSP, guest_rsp)
+> -SHADOW_FIELD_RW(GUEST_CR0, guest_cr0)
+> -SHADOW_FIELD_RW(GUEST_CR3, guest_cr3)
+> -SHADOW_FIELD_RW(GUEST_CR4, guest_cr4)
+> -SHADOW_FIELD_RW(GUEST_RFLAGS, guest_rflags)
+> -SHADOW_FIELD_RW(CR0_GUEST_HOST_MASK, cr0_guest_host_mask)
+> -SHADOW_FIELD_RW(CR0_READ_SHADOW, cr0_read_shadow)
+> -SHADOW_FIELD_RW(CR4_READ_SHADOW, cr4_read_shadow)
+> -SHADOW_FIELD_RW(HOST_FS_BASE, host_fs_base)
+> -SHADOW_FIELD_RW(HOST_GS_BASE, host_gs_base)
+> +SHADOW_FIELD_RO(EXIT_QUALIFICATION, exit_qualification, true)
+> +SHADOW_FIELD_RO(GUEST_LINEAR_ADDRESS, guest_linear_address, true)
+> +SHADOW_FIELD_RW(GUEST_RIP, guest_rip, true)
+> +SHADOW_FIELD_RW(GUEST_RSP, guest_rsp, true)
+> +SHADOW_FIELD_RW(GUEST_CR0, guest_cr0, true)
+> +SHADOW_FIELD_RW(GUEST_CR3, guest_cr3, true)
+> +SHADOW_FIELD_RW(GUEST_CR4, guest_cr4, true)
+> +SHADOW_FIELD_RW(GUEST_RFLAGS, guest_rflags, true)
+> +SHADOW_FIELD_RW(CR0_GUEST_HOST_MASK, cr0_guest_host_mask, true)
+> +SHADOW_FIELD_RW(CR0_READ_SHADOW, cr0_read_shadow, true)
+> +SHADOW_FIELD_RW(CR4_READ_SHADOW, cr4_read_shadow, true)
+> +SHADOW_FIELD_RW(HOST_FS_BASE, host_fs_base, true)
+> +SHADOW_FIELD_RW(HOST_GS_BASE, host_gs_base, true)
+>  
+>  /* 64-bit */
+> -SHADOW_FIELD_RO(GUEST_PHYSICAL_ADDRESS, guest_physical_address)
+> -SHADOW_FIELD_RO(GUEST_PHYSICAL_ADDRESS_HIGH, guest_physical_address)
+> +SHADOW_FIELD_RO(GUEST_PHYSICAL_ADDRESS, guest_physical_address, true)
+> +SHADOW_FIELD_RO(GUEST_PHYSICAL_ADDRESS_HIGH, guest_physical_address, true)
 
-Good catch, fixed, thank you!
+This is not a net postive for readability or maintability.  I don't hate the
+idea, it just needs MOAR MACROs :-)  E.g. add a layer for the common case where
+the field unconditionally exists.
 
-							Thanx, Paul
+#ifndef __SHADOW_FIELD_RO
+#define __SHADOW_FIELD_RO(x, y, c)
+#endif
+#ifndef __SHADOW_FIELD_RW
+#define __SHADOW_FIELD_RW(x, y, c)
+#endif
+
+#define SHADOW_FIELD_RO(x, y) __SHADOW_FIELD_RO(x, y, true)
+#define SHADOW_FIELD_RW(x, y) __SHADOW_FIELD_RW(x, y, true)
 
