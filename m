@@ -1,150 +1,112 @@
-Return-Path: <kvm+bounces-19634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53835907E58
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 23:51:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59EFF907F87
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 01:35:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5525B211AE
-	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 21:50:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C2AF1C21432
+	for <lists+kvm@lfdr.de>; Thu, 13 Jun 2024 23:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E16F14B091;
-	Thu, 13 Jun 2024 21:50:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E726156890;
+	Thu, 13 Jun 2024 23:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ahtnjbfp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4sasEoIn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D08E5A4FD;
-	Thu, 13 Jun 2024 21:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8B714EC49
+	for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 23:33:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718315449; cv=none; b=NujhTdHsm0fJKRTdPpULNJ1hrlBtJOcvYbPFwEf5gcaZQhhFrhZkfW0EfdYmpHqnaowgMn5oYzx/27qRXERGcnHcU8EkWjqYN/0sWEpjAfwE7m/XZWibh4IFw/YT0fFg2hhTEmvCZ5FYrgz0CrJTEH1CDi+jbcUYQ3hMwBAcA8U=
+	t=1718321610; cv=none; b=XSXTgQrz3mJKSdY0Z8+ia3mRsC1qHr5HS7y5nT0FyTg4hBs/P+iwvNJHcOmV3d7ehryg2MuDqTHi8sbVdYKSyzc8tVr8QE6esOmp9pmv1cT0kGfa5fA5mwRTIn9W9higFu/1cn9xmuCYQmy+LilOxWjq1b5DeT+A4uFEh1m/1eo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718315449; c=relaxed/simple;
-	bh=E1LZ2qD4h47Nm0fqTgahufLnfYId7G2BDN4j2DBKUCk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Y6chLNkbTkTC0BEKwlxEavS7GIuMrDqzUmw5Ec9KYihUuduoRQRLXT6EGdfsVpjDK8oJTF5ulxRr0bONlEmGIVZWq718KvDBS4xiTdd8mV1RXS4TOZ6pjQnVpdgD+YqsHOQRcm9iKJpJHqXEOdlhYiAM36ppxYZZbp2d5EiPCYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ahtnjbfp; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45DLlh9b031385;
-	Thu, 13 Jun 2024 21:50:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:references:content-type
-	:in-reply-to:mime-version; s=pp1; bh=XfZH3QdHnUhyEF5FH3erh0hNNk8
-	Aq0lyphP1+FusXOQ=; b=AhtnjbfpjiJr5bCvMnSzcUf8TyNL9iGvyW019pquIcV
-	5h5PwSosD+VKRTVPhuC4Al2vgT+BmchWoJ/ySStw/IDgz8THzr4UspieTGYvViVC
-	ScNoLnms23vLDeh6JiDWAq18fZDK08aVd3Aml3pE0D2De6V4lE9ASxfmP3SXz1bB
-	ZN577x3kGLyq5bAhBd6dLLEq4O25S0fEMGxqlQRJdAAiJMCIhP1xZkChx/nJO0A2
-	kVudq5s6/jGHe+PlzlJ/L2NIVd5Dx4xd28mh5/m2zUDemIb3vvVjN6Kmo2/7Be/s
-	S+WWofgE77M6VwD4nisZ8UoxVn6ZeODTrqwZNUwON8w==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yr76mg9hh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 21:50:45 +0000 (GMT)
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45DLojbd002840;
-	Thu, 13 Jun 2024 21:50:45 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yr76mg9hf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 21:50:45 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45DKZtQm027243;
-	Thu, 13 Jun 2024 21:50:44 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yn211c1r2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 13 Jun 2024 21:50:44 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45DLocP956688914
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 13 Jun 2024 21:50:40 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9CF8220040;
-	Thu, 13 Jun 2024 21:50:38 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 070F720043;
-	Thu, 13 Jun 2024 21:50:38 +0000 (GMT)
-Received: from localhost (unknown [9.171.17.6])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 13 Jun 2024 21:50:37 +0000 (GMT)
-Date: Thu, 13 Jun 2024 23:50:36 +0200
-From: Vasily Gorbik <gor@linux.ibm.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, linux-s390@vger.kernel.org,
-        virtualization@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Boqiao Fu <bfu@redhat.com>,
-        Sebastian Mitterle <smitterl@redhat.com>
-Subject: Re: [PATCH 1/1] s390/virtio_ccw: fix config change notifications
-Message-ID: <your-ad-here.call-01718315436-ext-6568@work.hours>
-References: <20240611214716.1002781-1-pasic@linux.ibm.com>
- <6086ef5e-48e7-40f3-b0a7-ff67b20aeae3@redhat.com>
- <20240613152115.48b00798.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240613152115.48b00798.pasic@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Zh5pS27zY4hCl2nM5Z-JIj_yqJcTPm8n
-X-Proofpoint-GUID: ISNNOKrlGBlJTnIO7-XUbGs6B1Of3jyG
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1718321610; c=relaxed/simple;
+	bh=qAt2UhvpvEnOSzh/aTun94gQOxAFglIb1x68LgT5u/U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rVLt9RgR8XCDSstY/L9YTiog5QjWPV98PedVSGrO7M0hGiGPTCVrvPNh0ELQoYvbBB9NzzYQLFmIztlQOuabxjWgqFJy7oy3o05hPhsRG536wyORFjKdMZ24qLC6RXoPU9nzS0r+L5Zf1wwdV3m9ewGB/8vi662BiSxLXrL+Zss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4sasEoIn; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-df771b5e942so2455703276.2
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 16:33:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718321606; x=1718926406; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S/IekIUszeeugklFzZ/8PWVNYpSQN15CTup3urqE43g=;
+        b=4sasEoInUqj1CeNY/ryElq34gXJktIoRPvl46p/YjtKF/YaLvsItdqF90lJeAoBwHr
+         xuj/4z8sx9kBxvVigH9tIzjDRKfVqaak12gq8Tt0Ra5mdgHJwbUStxyCr9CzKGBmmPOw
+         xcroUBlF0+aF4gEQqz5YuJ5ERwKRzlNHPHijfPa7364q9DElP3vccPzSjSyIyPbUzaa3
+         Bnq8iB5XkxlIgZYOgawDvc7CutvMu3Wokx1UKihu6heFWIfnmRqQNKGgrBewUfqsiLF9
+         tDkbWQ+Bk1DmlLBQFygDsmBzuvgZh9x8a3CjTSQ/RMmDw89BAfLYhhsF6bgVFE42Sqdi
+         Tm7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718321606; x=1718926406;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=S/IekIUszeeugklFzZ/8PWVNYpSQN15CTup3urqE43g=;
+        b=TQbf8nfij0Oz0d2LZXsJW4+1/4xmYnOa4SpIvNLVXqY5ezKEHRPPSgWgpjwLhfK8Xl
+         iMlLj2HqIe13xzYojJxHrlE2zO7PbulklRwA7ANgx3ocAGl51RvDDMdPFLguYb4Nv7Xf
+         y5ceLgXsD/5C3831ILqFiR4QbLIFrfDACAUDnrY0ZGnopjQvIcd4gug8RsQwKAOYXiX7
+         DO25UNzxBOnKSQllmZTk0VXguaF+DGi1IN3xNIhlwr/uTnfBxKvoZU7qVBvyqT9E/wKH
+         +1tstuBe1tZY8/a9VkBTw0BVgvmnWOMKEyUklhbtB5BNLbeMUnPMt6LfjEIZhmlg35R8
+         eEOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4kK7kUk3FQ9gMu92GSyl6s2si4JdxsajJBIQWP9dHh6mSCQ3r91IMuDRx05Gu5qsVoyCx/xkoj/ePcBIH35vPQ0M4
+X-Gm-Message-State: AOJu0YyjZFBJicRASQUkeUt9pApNh03hvHMFRoRNDE7CbWj9JjGMfIBh
+	Yhny6yfdZ+FxCQjp5abPLuQmJuo6C/13wDAnithc0REku3h99iWsnj/N0hRvPuf6HoEo5W9wW7q
+	62Q==
+X-Google-Smtp-Source: AGHT+IELUA3WIM5Wphps0xkQTRhby+UDCJjkk/RQ2PxIjMMY045f/NVk5on7zOgMXu0rVeJlBwRipETmKZ0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:adcf:0:b0:dfb:c58:6beb with SMTP id
+ 3f1490d57ef6-dff153d0fdfmr32821276.4.1718321606405; Thu, 13 Jun 2024 16:33:26
+ -0700 (PDT)
+Date: Thu, 13 Jun 2024 16:33:24 -0700
+In-Reply-To: <ZmthZVGmgcM5NQEm@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-13_13,2024-06-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 mlxlogscore=447 bulkscore=0 suspectscore=0
- malwarescore=0 mlxscore=0 adultscore=0 clxscore=1011 phishscore=0
- spamscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2405170001 definitions=main-2406130154
+Mime-Version: 1.0
+References: <20240611215805.340664-1-seanjc@google.com> <ZmthZVGmgcM5NQEm@google.com>
+Message-ID: <ZmuBxFwWLAReYUn1@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Clean up function comments for dirty
+ logging APIs
+From: Sean Christopherson <seanjc@google.com>
+To: David Matlack <dmatlack@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, Jun 13, 2024 at 03:21:15PM +0200, Halil Pasic wrote:
-> On Wed, 12 Jun 2024 16:04:15 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
+On Thu, Jun 13, 2024, David Matlack wrote:
+> On 2024-06-11 02:58 PM, Sean Christopherson wrote:
+> > I don't actually care too much about the comment itself, I really just want to
+> > get rid of the annoying warnings (I was *very* tempted to just delete the extra
+> > asterisk), so if anyone has any opinion whatsoever...
 > 
-> > On 11/06/2024 23.47, Halil Pasic wrote:
-> > > Commit e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-> > > broke configuration change notifications for virtio-ccw by putting the
-> > > DMA address of *indicatorp directly into ccw->cda disregarding the fact
-> > > that if !!(vcdev->is_thinint) then the function
-> > > virtio_ccw_register_adapter_ind() will overwrite that ccw->cda value
-> > > with the address of the virtio_thinint_area so it can actually set up
-> > > the adapter interrupts via CCW_CMD_SET_IND_ADAPTER.  Thus we end up
-> > > pointing to the wrong object for both CCW_CMD_SET_IND if setting up the
-> > > adapter interrupts fails, and for CCW_CMD_SET_CONF_IND regardless
-> > > whether it succeeds or fails.
-> > > 
-> > > To fix this, let us save away the dma address of *indicatorp in a local
-> > > variable, and copy it to ccw->cda after the "vcdev->is_thinint" branch.
-> > > 
-> > > Reported-by: Boqiao Fu <bfu@redhat.com>
-> > > Reported-by: Sebastian Mitterle <smitterl@redhat.com>
-> > > Fixes: e3e9bda38e6d ("s390/virtio_ccw: use DMA handle from DMA API")
-> > > Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
-> > > ---
-> > > I know that checkpatch.pl complains about a missing 'Closes' tag.
-> > > Unfortunately I don't have an appropriate URL at hand. @Sebastian,
-> > > @Boqiao: do you have any suggetions?  
-> > 
-> > Closes: https://issues.redhat.com/browse/RHEL-39983
-> > ?
-> 
-> Yep! That is a public bug tracker bug. Qualifies!
-> @Vasily: Can you guys pick hat one up when picking the patch?
+> I vote to drop it and document the nuance around PML in the function
 
-Sure, applied. Thanks!
+As in, drop the function comment entirely?  I'm definitely a-ok with that too.
+
+> > @@ -1373,14 +1354,26 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+> >  }
+> >  
+> >  /**
+> > - * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
+> > - * PT level pages.
+> > + * kvm_arch_mmu_enable_log_dirty_pt_masked - (Re)Enable dirty logging for a set
+> > + * of GFNs
+> >   *
+> > - * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
+> > - * enable dirty logging for them.
+> > + * @kvm: kvm instance
+> > + * @slot: slot to containing the gfns to dirty log
+> > + * @gfn_offset: start of the BITS_PER_LONG pages we care about
+> 
+> Someone once told me to avoid using "we" in comments :)
+
+Darn copy+paste.
 
