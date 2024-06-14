@@ -1,128 +1,98 @@
-Return-Path: <kvm+bounces-19653-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19654-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97DB90831F
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 07:01:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F6C9083F4
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 08:46:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE6301C2149A
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 05:01:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 033641C222E8
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 06:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC85A1474B7;
-	Fri, 14 Jun 2024 05:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38731487E9;
+	Fri, 14 Jun 2024 06:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RSDsRTdp"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="CsA+U6BJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [217.72.192.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298852F43
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 05:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372D913664A;
+	Fri, 14 Jun 2024 06:46:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718341263; cv=none; b=PUykEV4uH8D76e7AZbpbd94S5HeR/1ghC+gBXuM03cg9yhUGHKQdiE+SFF51Kn7NQPWn+XOvAezdNirsPTVs8umCImA/u5kivNB/5ClLaf0MKGofnW3L039cnnFd3z5dQL3DGpqvH9Ir+igNcgEk5swHniqXccwCBWRabBFfyUE=
+	t=1718347571; cv=none; b=OyM/r0yQTN7GqSOemiVhoqt2SOACxbtG2C9ksCtyog3LlExHJ8a+OJa93GA1yFOEvIqocFVumel4B31vewlQIR9EgzHekSPc3vAhIu8B2rtfKNVCPK/TZtKOj2UJM9iCjs4LuG7e42cAv4hJPFFWTCCVdf42voepuTP0veRmC2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718341263; c=relaxed/simple;
-	bh=unI3L0rqP6h/sPw8j/2gQP67uQSqdIefSCxe/Ukecx4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R1EVv1AthIMh4+t/6ypnV10qa+kBccG3t2veaaLDKJUbXDSyy0i4lM95OGBkhNdvrkPJiJM8cEubOWZVdRGReEP63mjOWDfDHzAFvrg2aDz0ANo33lCZ2RcXvqBIHg/tCFM5+V8frxa4WQmxQf9P4y7sXxv0Y7sBl1BmaISXaw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=RSDsRTdp; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-35f2c9e23d3so1874351f8f.0
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 22:01:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718341260; x=1718946060; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v0HUgUlG9vEDCQkG97tpkj3YnGaT01iQTHtx0RmuTwc=;
-        b=RSDsRTdpraAHdlblduBVTZ3l5XTrk+dkZzw4Hbep7eEcs7bo0VWeMM11YK2pIo31No
-         B87c/Nr4dReiOGGnz7/mWZbZdF7jWuGbKS4Q/L0FcTqpx3kAioCp6CEYu9UJTkM1iTJp
-         uED3KbETZMsn2f0QkItVuAf3aa+n46p5UYkSlg4tJYPziKXgKR6HMmWY8abVsZ9bjhvK
-         HbB7ckrA1AdxJMndCA0hVVyDt9cxRMTEUbC7mRdASNOWC+oFF9Eex8BsASZSkyhERBCo
-         MV8oBY4rYWaa8qDaw5ZTAV9KW6/wZ8G71lzGHZpQ8jCNIl1Cd2VtR2FnQSlKLd65Vqmq
-         KZWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718341260; x=1718946060;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v0HUgUlG9vEDCQkG97tpkj3YnGaT01iQTHtx0RmuTwc=;
-        b=Zd4U1viaOPFIzXA2knEEd71DeQwP0CTLlaCBPkJVaqdL2xAUOxMJ/ndtPleHmC7nBr
-         h8HoUCyrSw0AkI5rUbfg4IGB5x7hYKHUq+yuuPL1sUdQGXnrTXHuzrEn9RWSCA8Q3CJA
-         RzxhwwHv82lEHlXW0fWdcfKWUOnrAPJ2frsIhUUN3ikidcsNLmwA/SWxzP5PSD6twfga
-         60J/xZhy0zHWsnXu4nfTpaEpbYlXL/5XfUVp0dS+a3Am9WRflp9n2IQsaXnJuY3T5Uqr
-         S5/fg1lqZQJ2J/FkcaH3ZlrvdbJs07/ZJLi3B5Axg8CvuSbQP4yLenDYuSnw28w8wxAE
-         ogcw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBt9XDK1pMnyPdvOB7IXlogrbjoQiwzZtn8dzX/oCwAOMpI6Z3N4lW4w15LZfZJvq2Grk0Tqu3FcZYAM6CP1UTI68A
-X-Gm-Message-State: AOJu0YzDgGP4pf6nUt0Qdy9focdcztkkQ4oDXIBm7lOLQWMtgT8dvRaN
-	E6h2hLoY2WvG9FrTLO1QZynzD0idxw5XWJNIlrv6j/nIQmlMu0xoah/qS1FffB4ftZZEqHlGVfc
-	g
-X-Google-Smtp-Source: AGHT+IGPB1MGLUnBZL8a7B9fGtRl0d/bVZarsDuhFdm934/bCtuNxQOG73AJASrw6TwdGPdoAQ405A==
-X-Received: by 2002:a5d:6e10:0:b0:360:728d:8439 with SMTP id ffacd0b85a97d-3607a4c864fmr1464554f8f.2.1718341260141;
-        Thu, 13 Jun 2024 22:01:00 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36075104954sm3274027f8f.99.2024.06.13.22.00.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 Jun 2024 22:00:59 -0700 (PDT)
-Date: Fri, 14 Jun 2024 08:00:54 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Yi Wang <foxywang@tencent.com>, Paolo Bonzini <pbonzini@redhat.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] KVM: fix an error code in kvm_create_vm()
-Message-ID: <29ed61a4-5f06-4c27-aed4-5ac3de3f45ae@moroto.mountain>
-References: <02051e0a-09d8-49a2-917f-7c2f278a1ba1@moroto.mountain>
- <ZmuF2PsVot33fS1x@google.com>
+	s=arc-20240116; t=1718347571; c=relaxed/simple;
+	bh=YH7LKrwSFCa+CoKU0LWv/vYqquj8BHHJLekmHbOSkzk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=ha8cBCAdEURAldWdOksNcLUpN/QhEzaz0wkvJGVs4g9yXNJdi4ZeCPxwLuGkMOn6MclYes/F7UD4u7IJu2fIRDufqBfZj0kWLcIeXg4PL8njLyJVHK/lXP40R9BXYvsEnG17zTuR2Rh6gFmC3eg7dgGJealCMRMiALTMvhslRZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=CsA+U6BJ; arc=none smtp.client-ip=217.72.192.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1718347552; x=1718952352; i=markus.elfring@web.de;
+	bh=5zlFpg3ORlkfLRd5irYj/EAogjoqsKYjaMjqGShyL7Y=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=CsA+U6BJOimHdtLSvECgevR/IcYLGzd3Ds5NdwM1xn0odtTgkhkTNq4IANoztDLd
+	 mEvBaz2AZgbS7yFh+e8+q2pCs0yC2jLEh7n2u8A5gBcDZHF2Ow5hp8YGWb1+rtui8
+	 4PlZSyavq2cjEI5UflWckVrQcX7U/GesNM6xdy8q88fYacB8ZhklC0KnvOaSoSu7O
+	 Ls3x8ZEWhuZ96B81LNGOnla7QPoqn1gv69ISQDJBdYYD8zgpEzrsySe6tmB/1Ha4H
+	 IM5jfLfT2JVt3AR011C/2VzSFmqxOdLd7pj19H3ecHvlEEAJFJw/XUHMksz+N97Jv
+	 WwSDJfTcUbYR34kmsg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1M1JAm-1sFGbi1CvK-00Du3P; Fri, 14
+ Jun 2024 08:45:52 +0200
+Message-ID: <93ec485a-8620-4f24-80b2-0e08107c6287@web.de>
+Date: Fri, 14 Jun 2024 08:45:26 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZmuF2PsVot33fS1x@google.com>
+User-Agent: Mozilla Thunderbird
+To: Dan Carpenter <dan.carpenter@linaro.org>, kvm@vger.kernel.org,
+ Yi Wang <foxywang@tencent.com>
+Cc: kernel-janitors@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ =?UTF-8?Q?Christian_Borntr=C3=A4ger?= <borntraeger@linux.ibm.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+References: <02051e0a-09d8-49a2-917f-7c2f278a1ba1@moroto.mountain>
+Subject: Re: [PATCH] KVM: fix an error code in kvm_create_vm()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <02051e0a-09d8-49a2-917f-7c2f278a1ba1@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:kse9iwq86q4OapouTZFjQRTEBswgWxJ0dRt+ZHSdFA2UOHOq3Ew
+ OwT1xgCN0hZnc3qUpN3/1Q1UixgusEBeeTOjXt/Jb9guplTH65wgSCPSrxxU+2/LrZi1QZ2
+ wA5DOJXH6360dLOVNmJB/CPMbQEjs19xApq2zy10lFWXLixfwGEIteY/12Vzc25fZhkyGyx
+ 4APKh+JKW3jcpjQ3d/5Ag==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:UAoW34K0xjM=;2HaTklojmuEO1RhTtNKZoOu7tjY
+ h68lhrk/rGShI+dRDf0yHUwheQ6BTOIH6enIara9fNKlgPo6bM6wwPSCPSneZIrRb+i8xVdKF
+ 62vr+fYt/ftcv78pI2bxXXM4Jp1e/kqeBYWO63Aju7W5wz/RRvXyzc30rA21ck788IRSzLvvV
+ p/DDbM09MBYVhLGeutpqL38IYf8e+hg+cJd2XaB+cXFKBmzNCiKSJSqTXi2RTg4FfqUxLXELW
+ 4n4jbjwkV+Kmg6jBHjh8CLfOPPKRIqs85fkliSpAkni+VS3iOJcSiTazVqJMvqBHZ0D2QpgWM
+ J3NPLHqlpqmBO3us68/bvDKbLpDTpvpK9sJWB0Ix26fh0fTt0IgX0yDi4CSfwF2otoeOqX2/A
+ NDVAkOO7h9H1t1tYoV6Q9TwVwjjQ7NERtlghVyRC7H3jRpREES0/U3gxBE/iYOXzaHGiIW772
+ M839wQqx2bgupubVcXhoD4v2kN1Tn7/pHgmq+3JlXbbnis0zNqxn7oHBg/Demeh7KBwLf3rqe
+ dL0Kf53NHBWYYziMpvgXThWJzQxAWtLMVD7zcImI4ALNYqp6jvaz8EdnJDDHEWjv7GO3vcu04
+ InTJUctO91cnc99Zkfk7t/QarRPB4aKKTh5s+RwPScc81P1I5o1FxCX+XjhYQ908mgaJD3i0g
+ ABYdxAgVmZH/fFcSRcI4YwRr2xpnXjwiVN/Vr6T6p9mS0y009wNTyqzs4lSPBEk7nHCrs/fKZ
+ aCSPk+MNFsHudL4BgphN6QQpEAuUlgoNDWb8pWN4hjiAPV7qIidi4TGhUw+dUt/djOvRxJ31x
+ OHMOpqpJJ72qquMo9eiHKOOiAeE0UBJD5sSNcy7gpdcVs=
 
-On Thu, Jun 13, 2024 at 04:50:48PM -0700, Sean Christopherson wrote:
-> On Thu, Jun 13, 2024, Dan Carpenter wrote:
-> > This error path used to return -ENOMEM from the where r is initialized
-> > at the top of the function.  But a new "r = kvm_init_irq_routing(kvm);"
-> > was introduced in the middle of the function so now the error code is
-> > not set and it eventually leads to a NULL dereference.  Set the error
-> > code back to -ENOMEM.
-> > 
-> > Fixes: fbe4a7e881d4 ("KVM: Setup empty IRQ routing when creating a VM")
-> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > ---
-> >  virt/kvm/kvm_main.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 07ec9b67a202..ea7e32d722c9 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1212,8 +1212,10 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
-> >  	for (i = 0; i < KVM_NR_BUSES; i++) {
-> >  		rcu_assign_pointer(kvm->buses[i],
-> >  			kzalloc(sizeof(struct kvm_io_bus), GFP_KERNEL_ACCOUNT));
-> > -		if (!kvm->buses[i])
-> > +		if (!kvm->buses[i]) {
-> > +			r = -ENOMEM;
-> >  			goto out_err_no_arch_destroy_vm;
-> > +		}
-> >  	}
-> 
-> Drat.  Any objection to tweaking this slightly to guard against similar bugs in
-> the future?  If not, I'll apply+push the below.
+> This error path used to return -ENOMEM from the where r is initialized
+=E2=80=A6
+                                                  place where the local va=
+riable =E2=80=9Cr=E2=80=9D =E2=80=A6?
 
-No objections from me.  :)
-
-regards,
-dan carpenter
-
+Regards,
+Markus
 
