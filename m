@@ -1,135 +1,113 @@
-Return-Path: <kvm+bounces-19651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29283908238
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 04:58:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23380908254
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 05:10:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCEE81F239D8
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 02:58:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C130B2387A
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 03:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8691836C2;
-	Fri, 14 Jun 2024 02:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F871836E1;
+	Fri, 14 Jun 2024 03:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4Yr4z1u"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1606D801;
-	Fri, 14 Jun 2024 02:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7516D157E7D
+	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 03:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718333898; cv=none; b=s4BVW3oOg7fUduZ8LmGZ7p9VDR8Zpyi4Gq35oQN4Z1p2W2Dogtpdv/iC9YNK01VvHWQ5lSqvGpO6pw9Z58UwbhYJzkbRf/S5cHzFdKmTD2lYDO17vuA8GIm5XGliqZ/DoS4EugW6+JVBWEZ4+0mrAsb6Gm+NnNFhDNid/bRNoTU=
+	t=1718334606; cv=none; b=IH7mZe2YbD6AOllPQVlc3n2J6Nffoyd49jdildzwcLxvnapmyi1ueFyB5C9/ru8GqYLnb6Pw+hCIzHgCFTSpDNcz7akue/PB7rvn0Rl6+SFBm7LuWVWOncV/IzdWjlaF+50AqhrK+pOqiA6JJp0dQjWEw+GfBaJXMlsvtEXtlWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718333898; c=relaxed/simple;
-	bh=/qaUwTmFTohtImbhL/sGW1eeZWtwNzwPZFtjccd2G7s=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=YLWzsc1gYdlK64nb3o25vf9vmvwUbJTKOS96JcLKKZ/4n3PK1K+yW9l2LYYXATKzpeOTdfS4X3pOOeVOGvTIXPE5aFvQathPrpWHwJdU3kQjSHNGIghoARmsezhIBbBEHtTWeyOxQhRbdff1ZuGnZkRUR/S+domw55xwr5q1qGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8CxvOrDsWtmKMEGAA--.27070S3;
-	Fri, 14 Jun 2024 10:58:11 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxDMfBsWtmRakfAA--.12078S3;
-	Fri, 14 Jun 2024 10:58:11 +0800 (CST)
-Subject: Re: [PATCH] KVM: Discard zero mask with function kvm_dirty_ring_reset
+	s=arc-20240116; t=1718334606; c=relaxed/simple;
+	bh=LyBxCMircokcDHU4idnC4n56+LwmqWq8TJC6W85EVYQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=DhnSTdIACl6Xj/PxdM0vCiyMN9B1XF/Bkk/lm3PLgQqUxyG17wXcbOehguSD3f0oMDM1clOjbEYas5/+1xpC1g4R4hKb05797oDytBDK2QkV4GkexgncXYJY6V8BQ/Aa9j8wxUVCSJjnSdea/SxYu18L1nG0UrGRL32reon2nmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H4Yr4z1u; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718334603;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Yk6EyGnaPcearZ4LMXgS8jkfUau2xtx0QwaUz09Y2n0=;
+	b=H4Yr4z1uWwLikz0Aef5xOewpoJ4PeuD2hXxjJCFQWB95LM1DFOJIT4ux2SWM4261QPwhRq
+	hqJqrzgCt8gm7dBYIaKZC7ozlyGy+9FxCZLjJJqbZA+2LVjGKvBy+WzB3yVTP+C4xwQ8Xe
+	eFkwiKxUkvqRku4Smb8juCO6eDzHNbc=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-68-GOumfiA0MMq8ilxwnduHig-1; Thu, 13 Jun 2024 23:10:01 -0400
+X-MC-Unique: GOumfiA0MMq8ilxwnduHig-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7954f774295so182082685a.2
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 20:10:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718334601; x=1718939401;
+        h=content-transfer-encoding:mime-version:user-agent:date:cc:to:from
+         :subject:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yk6EyGnaPcearZ4LMXgS8jkfUau2xtx0QwaUz09Y2n0=;
+        b=XWraor1h1LAlWAnU6eFdF62VjG/W7+GoVeGUIkYNbOyoDhGUamEBBLiTyHKXjDKLPy
+         Y7Vz3FuCY9V+4BQmaH8wKllhg6XRnm7nHuqK6eIwDAmJrLweVeomUZD/6CC+e8H9SOt9
+         1ofw1NKpEL/mePttNEuwD8QvYNuaxcvJqc++owQzvdH2vBwrNcuKkJW2+vLhsfRUe+gi
+         cWKSPMUSV5AYPQW6fITpj6U8lGHDxCc5rNOlFCOHgj2HiQ4x9Hp+wTm0au1sNPlOK0+r
+         xmbcVB1Qm4sUa+2u8nas/HN8a03cXczW4ewrrv2vknpZzjdvoIEbn7r0QBskqlhSD1KN
+         Tg5A==
+X-Gm-Message-State: AOJu0YzQVtjLAUSSbvlrCpCJWTj9In7HKkOku+5Kr6/mrR8DTfBnxGkz
+	L1eVym48gTFzrI9ZuUZOa/ZMp6HdhPj8nf6btYmkeBT0vNiSrgLtctwXsakzZWkl1MstVDG6bI1
+	VEBH6O8DqKjC6V519qvM9iFdHTV8xFuWDT7RLM19nAVR5JjwMQLrTEMPfPA==
+X-Received: by 2002:a05:620a:254e:b0:795:5ee3:f147 with SMTP id af79cd13be357-798d258e4b2mr125550085a.62.1718334600790;
+        Thu, 13 Jun 2024 20:10:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEAh0VXcQf97mzDE3WbTP4ZYZVftr8+A7hIvvdvQTh88gOy8dU6gaLfK5M4cx8mG0xttpEWBw==
+X-Received: by 2002:a05:620a:254e:b0:795:5ee3:f147 with SMTP id af79cd13be357-798d258e4b2mr125549085a.62.1718334600450;
+        Thu, 13 Jun 2024 20:10:00 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-798abe4f35dsm105669985a.122.2024.06.13.20.10.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jun 2024 20:10:00 -0700 (PDT)
+Message-ID: <f6bca5b0f9fc1584ef73d8ef71ac25e2c656b81e.camel@redhat.com>
+Subject: kvm selftest 'msr' fails on some skylake cpus
+From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240613122803.1031511-1-maobibo@loongson.cn>
- <Zmsg8ciwSp1a_864@google.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <3cf851a2-be51-f227-82a4-090de01bc8be@loongson.cn>
-Date: Fri, 14 Jun 2024 10:58:09 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Cc: kvm@vger.kernel.org
+Date: Thu, 13 Jun 2024 23:09:59 -0400
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Zmsg8ciwSp1a_864@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxDMfBsWtmRakfAA--.12078S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7CF4fKr43CFWxAF1xWF47Jrc_yoW8Cw17pF
-	s3t3WkGF4Svas0g39xAw1DXrnIv392qFykJFyDGw4DK3sIyr15W3WUta40vrnruF1xAFyf
-	AF4aqF47ZF17CwcCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE
-	14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
-	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
-	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtw
-	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
-	67AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr
-	0_Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU7Mmh
-	UUUUU
+Content-Transfer-Encoding: 7bit
+
+Hi!
+
+This kvm unit test tests that all reserved bits of the MSR_IA32_FLUSH_CMD #GP, but apparently
+on some systems this test fails.
+
+For example I reproduced this on:
+
+model name	: Intel(R) Xeon(R) CPU E3-1260L v5 @ 2.90GHz
+stepping	: 3
+microcode	: 0xf0
 
 
+As I see in the 'vmx_vcpu_after_set_cpuid', we passthough this msr to the guest AS IS,
+thus the unit test tests the microcode.
 
-On 2024/6/14 上午12:43, Sean Christopherson wrote:
-> On Thu, Jun 13, 2024, Bibo Mao wrote:
->> Function kvm_reset_dirty_gfn may be called with parameters cur_slot /
->> cur_offset / mask are all zero, it does not represent real dirty page.
->> It is not necessary to clear dirty page in this condition. Also return
->> value of macro __fls() is undefined if mask is zero which is called in
->> funciton kvm_reset_dirty_gfn(). Here just discard it.
->>
->> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->> ---
->>   virt/kvm/dirty_ring.c | 6 ++++--
->>   1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
->> index 86d267db87bb..05f4c1c40cc7 100644
->> --- a/virt/kvm/dirty_ring.c
->> +++ b/virt/kvm/dirty_ring.c
->> @@ -147,14 +147,16 @@ int kvm_dirty_ring_reset(struct kvm *kvm, struct kvm_dirty_ring *ring)
->>   				continue;
->>   			}
->>   		}
->> -		kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
->> +		if (mask)
->> +			kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
->>   		cur_slot = next_slot;
->>   		cur_offset = next_offset;
->>   		mask = 1;
->>   		first_round = false;
->>   	}
->>   
->> -	kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
->> +	if (mask)
->> +		kvm_reset_dirty_gfn(kvm, cur_slot, cur_offset, mask);
-> 
-> Given that mask must be checked before __fls(), just do:
-That is ok for me. To be frankly I am not familiar with kvm common code,
-I submit this patch just when I look through the migration source code.
+So I suspect that the test actually caught a harmless microcode bug.
 
-Regards
-Bibo Mao
-> 
-> diff --git a/virt/kvm/dirty_ring.c b/virt/kvm/dirty_ring.c
-> index 86d267db87bb..7bc74969a819 100644
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -55,6 +55,9 @@ static void kvm_reset_dirty_gfn(struct kvm *kvm, u32 slot, u64 offset, u64 mask)
->          struct kvm_memory_slot *memslot;
->          int as_id, id;
->   
-> +       if (!mask)
-> +               return;
-> +
->          as_id = slot >> 16;
->          id = (u16)slot;
-> 
+What do you think we should do to workaround this? Maybe disable this check on
+affected cpus or turn it into a warning because MSR_IA32_FLUSH_CMD reserved bits
+test doesn't test KVM?
+
+Best regards,
+	Maxim Levitsky
 
 
