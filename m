@@ -1,141 +1,154 @@
-Return-Path: <kvm+bounces-19641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19642-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 928CD908041
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 02:49:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C67908046
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 02:49:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BA8F283924
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 00:49:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9154D1C217B9
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 00:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164F44A3D;
-	Fri, 14 Jun 2024 00:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC16C8BE2;
+	Fri, 14 Jun 2024 00:49:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dtrXvUsG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joOpebNT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0389E1C27
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 00:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916281854
+	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 00:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718326141; cv=none; b=DEy9+jkrenR1iBA/vQR4M1CsJxmjBgDl2zPmyy+RXuVVszyg9q6e9eS/sJfrGn8/WrJ8+dHgnAnoxaFrHMGF94roZ3SszNIzRHlAg8/Jpqj6kIJ/EKl/c6xOiyAfqe8gBgi9PXbYXRj1aKDo2PlQcu5Yh8wf+SpVP6qY1Q4xbAc=
+	t=1718326179; cv=none; b=k2Q92PpV/Lg8qmFzSTFIPv0Td8EYzbhP0kFQkUx4Jegc2vFNSapFgzQqW3ZrU5Y3+fW8kXDrasGkM6yrrf3R1UOA2/R2Ou4Ot8z0SZCmSYZ/2HOCOJiZ/AZ3opbOw+ZNmJGpFGxfH3gQ78mBDjLlis6861jagK1YOguMlBBw4rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718326141; c=relaxed/simple;
-	bh=EzpkdrF+lhKU70e/G955Esb8W0Pby1fF9pS1lclAB+w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UtzPJ/DlIxp973YODyd38NGpWeh07z3UK+4U6c04zYc4q7Q0i0dWrgAH8ijCJogoYC+Bht+gnPuVXQahHJ2O+nDp1HNAcI9/4atuQ35Nxo7T3WZyDqTW8XQxE1uMr+KT6Lg9Nw0wIgCFhh7Ng9OY/XTO7YK5E3WoOHFLj11QVs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dtrXvUsG; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f70ec6ff8bso85915ad.0
-        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 17:48:59 -0700 (PDT)
+	s=arc-20240116; t=1718326179; c=relaxed/simple;
+	bh=RC57j+AFq7qEMzV3k7wcHFKfBu67kGuTJyxXVfTp/mU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=VmYxN2fSozvwMmDhGQHqUoM2L2YmktAnDkSCPr6i00yz1gWBvQgcl8T6yQNcEL7qCqLyyG9EUtBcaZD2S2mexdbKcqXOFdyfsddadglrtgvbwn1kx+1GJ+1/iHynZH8gStu1sw1RWJFRuzA8hRdNPFxKYwmdi2j0eQiV6oHmlP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=joOpebNT; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-681bc7f50d0so1979129a12.0
+        for <kvm@vger.kernel.org>; Thu, 13 Jun 2024 17:49:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718326139; x=1718930939; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1718326178; x=1718930978; darn=vger.kernel.org;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Cs3I7xb2JkPfyVWwhfDDItDBDpUbWjmYdCsu/iDXVRE=;
-        b=dtrXvUsGBzM1zr29vh5hOYKxdIP6P+az+QDjYj+sTaJISBKwtwTBtLAaSW0OmGlF/Z
-         EQwiVPrASgXAUNZ/Zn4NrHLj4zZPIQDEhEZCW7lOePlu+P6BsECJWwVWkQQjHNoy4LFB
-         09iHDkeUqcqg3O3mTZLt+MpPvnmo38wmcLDhOezFRdBPWz3pJFkOYpFNd0IpBZ6GTi1o
-         AXlKf5kAHprVLwYwzFpOz2LbPDTUJKISjGugc2fmVKP7CQTH7vrN3RNJ2klO6j7FsVFC
-         4UotxyN4r+/4trESUfUfFS8rUxCVU65xmMUAViiz0EM342z6iHz4I6WW/0W20Tk1oCbU
-         4Q1w==
+        bh=Gm4Hb6i7fbrnH7R8cmzEba7HagJEj2yQb038IW/8vDY=;
+        b=joOpebNTls5SEx4i17pllq4DgphaMHWJxo3nwhSNI8366I3NEkUcHDkN/Rng0cGDUt
+         uYe2+f8Ek1cbPyooXq0p6SpzpF8f4hWCOvgtk7hihXYd8rYWcZAdNM7jQbuSl25BElfh
+         62/+u9CuXVDJjaralNs2zEZ2PYJv0o4WumHRkVFA48Cz3cbcdhrwK67eSNqCA5y2U9en
+         m5a2fAACJkaybSOPYIPw0E7Y2Z98mQNN7EUmazFOpWxAxJPQEk05ZDg5ZNt/e53KQCxb
+         3IehWgs1vz2Gkl/k5RUG8FTC5MocMOSa8pevrf+hJoSzhSVz5IF28XYk5MAV8IIlJ1tc
+         xDFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718326139; x=1718930939;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cs3I7xb2JkPfyVWwhfDDItDBDpUbWjmYdCsu/iDXVRE=;
-        b=E3E1lZh5cyCYqmm8qbkiVemruXsG1aCABaczp20baj3R3uUkand7VVWA/d0UfQTSQl
-         BdPdhCKTo6YgWy0TNkS314wXsQVsvFKQm4sIg4EZDfsrz8uLAC6ZFJuQ7ePEw4YKqu+f
-         B5tYx8qQmKlOA+T+XotlKfn1mRKBQXVASP2h8WRxAQJ4xvBG8SIe6F1wfqhFM/HCD5IM
-         6nJ00ZfTMasKsNLuot7FaZKoLgPhdsXEn8UQYFJSFSxXdszGL9qhyiBGO4yU+p4+444c
-         01QQjFKEKhxSTUfp6eco41Ghw+gy3f2mpSS/KUOzxrZxUX47QU4/CTbGTEdAQ73hnaU6
-         CbuA==
-X-Forwarded-Encrypted: i=1; AJvYcCVqpfslN27UrAGb9DRaSUKR3HBlHMGkyX/N/aYot5ufYIODB8oZFIh0ZGzr5/I6wYdk4arttYvcEu6uiSybicbNm7gB
-X-Gm-Message-State: AOJu0Yw2aHOamK1/sW+qLo3KvzkiCMeqRdGCbH6QQ4p7ug1csLsGHIWL
-	h1+SNdVK8a4o3gDGRW6YB6rd4IKEdlMobkNAHXhK5s5AlXuOIjH6CtZ3njakpFNa6xCB3OaY0nY
-	OZCfPo/pRps2RNjlV1ZvRP5LP67QsfyRBwjPv
-X-Google-Smtp-Source: AGHT+IG4rh9cysMLIjJvQTQbAGIfEWjp8FbFtGimlgyhxAwv6QoKwTYp7w2DNRBP89lE6kBTdOWPtAittybnD94st7Y=
-X-Received: by 2002:a17:902:b782:b0:1e4:35b9:cce0 with SMTP id
- d9443c01a7336-1f86777297bmr804415ad.9.1718326138884; Thu, 13 Jun 2024
- 17:48:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718326178; x=1718930978;
+        h=in-reply-to:references:to:from:subject:cc:message-id:date
+         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Gm4Hb6i7fbrnH7R8cmzEba7HagJEj2yQb038IW/8vDY=;
+        b=r2OBGPS5eevj+pbULgoBE6jRg92T6txtTU8DBWLfUDuTEDloM9jF1FHY5Dour34Yha
+         y1Sxl0Wie2i6onChZAq5n7e1hvfl3NqonIvbpIkx5meYJR7E+9+0u8gFgu1Zw548y2U6
+         NJSBAclLj/3PDFW9x9aoWY13+dfRm1iS/JpkPKAx8pJtu+3RmUcNur0L62Y+rIdMkwLJ
+         zTaDi+qNuY3xzigpSANZr3s/LC8/wlyUmkqO6b69H/cYC0a0T4q9DiAsI6FkyiznsvJ2
+         yG/4Z6MnlxlGwIos5wOuD+hoAMYIbANdeIhldAAwMuaXBNIax+JonDZMmKAoNF6BrrFv
+         oIQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXL2djfb6q7e5mKqYrba8NlCsyU3MMWpuHXYpfvZbPNIu88cygbSeKn+6SihklG6PxB+VJhx01ZJe4L3W17qTiNB9Sm
+X-Gm-Message-State: AOJu0YycihZ1c9EujLaI4WMZ4vhM3qMBsZRpNeVYaCtHZVYnVZ0R2t7w
+	FfqgAuqIKuA0jWpe81ckRTDlq6nNqlr/fkf1QJeFAXBUadSzakM5
+X-Google-Smtp-Source: AGHT+IGaYtmVmP0hU994O0pYGub/6u85qNL2lfgJDZUt+zy83kH0//h95HIZI/E35utcJdwAqy1jtg==
+X-Received: by 2002:a17:903:40d2:b0:1f6:ed6d:7890 with SMTP id d9443c01a7336-1f84e2cc0b3mr62423245ad.16.1718326177771;
+        Thu, 13 Jun 2024 17:49:37 -0700 (PDT)
+Received: from localhost (220-235-199-47.tpgi.com.au. [220.235.199.47])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f855ee6a7bsm20424075ad.159.2024.06.13.17.49.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Jun 2024 17:49:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240611002145.2078921-1-jthoughton@google.com>
- <20240611002145.2078921-5-jthoughton@google.com> <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
- <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
- <ZmidYAWKU1HANKU6@linux.dev> <ZmiqXUwMXtUGanQc@google.com> <ZmqXRhFSoE38foh6@linux.dev>
-In-Reply-To: <ZmqXRhFSoE38foh6@linux.dev>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 13 Jun 2024 17:48:22 -0700
-Message-ID: <CADrL8HXhGFWwHt728Bg15x1YxJmS=WD8z=KJc_Koaah=OvHDwg@mail.gmail.com>
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, Yu Zhao <yuzhao@google.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 14 Jun 2024 10:49:31 +1000
+Message-Id: <D1ZBSHN37PW8.DY3DATNS27IE@gmail.com>
+Cc: "Andrew Jones" <andrew.jones@linux.dev>, "Janosch Frank"
+ <frankja@linux.ibm.com>, "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+ =?utf-8?q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH] Bump Fedora version to 40
+From: "Nicholas Piggin" <npiggin@gmail.com>
+To: "Thomas Huth" <thuth@redhat.com>, <kvm@vger.kernel.org>, "Paolo Bonzini"
+ <pbonzini@redhat.com>
+X-Mailer: aerc 0.17.0
+References: <20240607065147.63226-1-thuth@redhat.com>
+In-Reply-To: <20240607065147.63226-1-thuth@redhat.com>
 
-On Wed, Jun 12, 2024 at 11:53=E2=80=AFPM Oliver Upton <oliver.upton@linux.d=
-ev> wrote:
+On Fri Jun 7, 2024 at 4:51 PM AEST, Thomas Huth wrote:
+> Version 37 is out of date, let's use a supported one instead.
 >
-> On Tue, Jun 11, 2024 at 12:49:49PM -0700, Sean Christopherson wrote:
-> > On Tue, Jun 11, 2024, Oliver Upton wrote:
-> > > On Tue, Jun 11, 2024 at 09:49:59AM -0700, James Houghton wrote:
-> > > > I think consolidating the callbacks is cleanest, like you had it in
-> > > > v2. I really wasn't sure about this change honestly, but it was my
-> > > > attempt to incorporate feedback like this[3] from v4. I'll consolid=
-ate
-> > > > the callbacks like you had in v2.
-> > >
-> > > My strong preference is to have the callers expectations of the
-> > > secondary MMU be explicit. Having ->${BLAH}_fast_only() makes this
-> > > abundantly clear both at the callsite and in the implementation.
-> >
-> > Partially agreed.  We don't need a dedicated mmu_notifier API to achiev=
-e that
-> > for the callsites, e.g. ptep_clear_young_notify() passes fast_only=3Dfa=
-lse, and a
-> > new ptep_clear_young_notify_fast_only() does the obvious.
-> >
-> > On the back end, odds are very good KVM is going to squish the "fast" a=
-nd "slow"
-> > paths back into a common helper, so IMO having dedicated fast_only() AP=
-Is for the
-> > mmu_notifier hooks doesn't add much value in the end.
-> >
-> > I'm not opposed to dedicated hooks, but I after poking around a bit, I =
-suspect
-> > that passing a fast_only flag will end up being less cleaner for all pa=
-rties.
->
-> Yeah, I think I'm headed in the same direction after actually reading
-> the MM side of this, heh.
+> The "xsave" test now tries to execute more tests with TCG, but one
+> of them is failing with the QEMU from Fedora 40, so we have to
+> disable the xsave test for now.
+> The problem will be fixed in QEMU 9.1 with this patch here:
+> https://lore.kernel.org/qemu-devel/20240603100405.619418-1-pbonzini@redha=
+t.com/
 
-Yeah, I agree. What I have now for v6 is that the test_young() and
-clear_young() notifiers themselves now take a `bool fast_only`. When
-called with the existing helpers (e.g. `mmu_notifier_test_young()`,
-`fast_only` is false, and I have new helpers (e.g.
-`mmu_notifier_test_young_fast_only()`) that will set `fast_only` to
-true. Seems clean to me. Thanks!
+Could make them kfail and keep it running.
+
+But anyway this works for me.
+
+Acked-by: Nicholas Piggin <npiggin@gmail.com>
+
+> And there is also an additional problem with the "realmode" test. As
+> diagnosed by Paolo: "It turns out that with some versions of clang,
+> realmode.flat has become big enough that it overlaps the stack used
+> by the multiboot option ROM loader. The result is that a couple
+> instructions are overwritten." Thus disable the realmode test in the
+> Clang build until the problem is fixed.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  .gitlab-ci.yml | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+> index 2af47328..b689a0c9 100644
+> --- a/.gitlab-ci.yml
+> +++ b/.gitlab-ci.yml
+> @@ -1,4 +1,4 @@
+> -image: fedora:37
+> +image: fedora:40
+> =20
+>  before_script:
+>   - dnf update -y
+> @@ -216,7 +216,6 @@ build-x86_64:
+>        vmexit_ple_round_robin
+>        vmexit_tscdeadline
+>        vmexit_tscdeadline_immed
+> -      xsave
+>        | tee results.txt
+>   - if grep -q FAIL results.txt ; then exit 1 ; fi
+> =20
+> @@ -268,7 +267,6 @@ build-clang:
+>        pks
+>        pku
+>        rdpru
+> -      realmode
+>        rmap_chain
+>        setjmp
+>        sieve
+> @@ -289,7 +287,6 @@ build-clang:
+>        vmexit_ple_round_robin
+>        vmexit_tscdeadline
+>        vmexit_tscdeadline_immed
+> -      xsave
+>        | tee results.txt
+>   - grep -q PASS results.txt && ! grep -q FAIL results.txt
+> =20
+
 
