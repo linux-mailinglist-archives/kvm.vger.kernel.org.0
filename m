@@ -1,224 +1,309 @@
-Return-Path: <kvm+bounces-19675-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19676-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95FFE908CCA
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 15:56:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8499A908D38
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 16:18:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88E2B1C263A3
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 13:56:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 916471C2100F
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 14:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C65CEAD6;
-	Fri, 14 Jun 2024 13:56:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFDF17C96;
+	Fri, 14 Jun 2024 14:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="dLfUj49/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="enGq2mrG"
 X-Original-To: kvm@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2057.outbound.protection.outlook.com [40.92.59.57])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15FABE65;
-	Fri, 14 Jun 2024 13:55:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.59.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718373360; cv=fail; b=gpkcIzoTo3Lrt2GheGa3mb3POlN1Dm5htcgHJRU0xa1IDszohdBg/bhtl7Zqa8cyv69kdoV9uODupUa7toiRuhzr+z7NGT5TRsNUoPE9+7r875pjSZ5dz2UaadCHNIG1cmYktzV6T9ORReCVHeoKid7LNbkYRYRheelZ2QSapjg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718373360; c=relaxed/simple;
-	bh=PbcR8chyGrvRobCuehcXslLl+Q50d6BejioPRAdAJOM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hJAIiv35YQLCeSdKUDHSYg7MVXggAS6GfYauyMxF616sgXMRa8V6Av7ZkZMahcJZIHpk5iVjSjCC2pkV2vMVe7g/EKJGAyYXFiqYr5a7HZ+e9BpM2vV+No+yRfcXBZCr5EhHQqhxVwS9ms6A6ZXrZCribfXqPOfMf/8VqE31DGg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=dLfUj49/; arc=fail smtp.client-ip=40.92.59.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E2DaS/H4saj1To0E2acGxi9jQxMWbt2h3MTmV8TzgP7IRyVGzFAEKdk7ar4yOec9XFsXvf3C7eAVDBJf+27cDiWizU7MZwIigGldJElLXEOc9hoIBgWrwGEcIuFHSwNyb/SIIOHFjyWytu34Ls7fjyNYsFq/5WbpXKyJDjG841ghaCncL5I8d9ymFL13b8yiVPflN+v8ogoHEjqzXNE18t8HfuLjwFftfDym8f52JQzRn/sSWOAHtoCsSi64ZO8YRzLvFAE4Qb6oEFWRRh5pC4xtRJrkFlbD5kHKSv7BJ4zS7dKSau/SzymB9vVqjJNyIf+aNIEIPTgXuBT60CkgZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Vbq4SBZ24qmRTbz8LqgCwYGwTDk8D5Sa4oWquQYwEhM=;
- b=SLlDDuglFE/1LZjte4Y48COo1ICmM1G8iWWGiIzpzhI6rC5zqfU4DQJG/NtVpngm5B8Y14ht9HB1TdrgkIcKBVkmFXcKDitK2B4cCanVzcHgv4BL3gxyc7auAhnMGawQPUos7dI7JtRvG7lWKZxHutM0eIowWYkHduUkyEyerW4T4ulbsHM6Fkiq+H6IXasVDXKwBxdBcAMQqc5EmupHT7/K1K6Elxwyzpl7NRWUls11GcEpZHYmr/JYfn39VoxyJ1zk/cz9GbmmRgbCDtwiaDWJtQOgciKaA/5yMrLffx4EN15769WAlr5qJ3qebdGp+K4UZ6TRkqxckSuvmhLzOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vbq4SBZ24qmRTbz8LqgCwYGwTDk8D5Sa4oWquQYwEhM=;
- b=dLfUj49/C5ACfMGcm2Rkvk1bXciMnwKmjzKs+MveUT+BPo1Sat3EHFQbdnNTFYpIYQ/m0MmMwtMBZm8DeAGjVJe2sdi4+oW463rfzL+EJzL/lJ7co5n1QzKn2pwiZw5jJRMyI+Cn7tlmLLnEFKquTEtZ7HU2ZZfBC1wt0BSAKfTncRDRM0SLrGSiWLjFsPdPimJlFaNfY0hGUeW6FY9+bKBjdOW24z6QFuCt1DrFwTCFA1aDa6Pd9osC5Jvomv3uGYLrG/WOhFsuEbEmKkWKLFP3ervGf28H3W8KqTBGv0kgxd4jMGqMQNH62zcP0Apvd/5B1xJWI0K3NPQh7bldyg==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by PAXP194MB1469.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:1a8::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.24; Fri, 14 Jun
- 2024 13:55:51 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930%3]) with mapi id 15.20.7677.024; Fri, 14 Jun 2024
- 13:55:51 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: sgarzare@redhat.com,
-	edumazet@google.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	stefanha@redhat.com,
-	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: Marco Pinna <marco.pinn95@gmail.com>,
-	Luigi Leonardi <luigi.leonardi@outlook.com>
-Subject: [PATCH net-next 2/2] vsock/virtio: avoid enqueue packets when work queue is empty
-Date: Fri, 14 Jun 2024 15:55:43 +0200
-Message-ID:
- <AS2P194MB21706E349197C1466937052C9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240614135543.31515-1-luigi.leonardi@outlook.com>
-References: <20240614135543.31515-1-luigi.leonardi@outlook.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [zmAx0oZ3aW9aLNZjpKtjFc1D5puwy8oS]
-X-ClientProxiedBy: MI0P293CA0015.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:44::8) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240614135543.31515-3-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C423317552;
+	Fri, 14 Jun 2024 14:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718374651; cv=none; b=liDL/DFaXH1QvQGTpjXm03EbwJhJ4nWopR1tFETGD/kQoLtSjX91cF6CXSaiPcHHVxO/UU/819g3hz/X4eP/qwYxA7j8G3OB5g+qx/bvKxQjba0KlbhXjcDil9a3GlTOLox9oLhu20i4hpKcg4MRsGWWWiAB9ErMfkFgCwm9Z0Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718374651; c=relaxed/simple;
+	bh=HzM1P2wltArweRMwNc/uraZDA3v7C8Lye0dy8r17d1I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AGYNChaWj+OA6WJCnHxEvQlRLDGwuxB6RXaiCcxFKs3MQ6/eA5JuKksgx3aLzwcfGM6UbWV9X2RNeBeaekV5kNDo1NynWZ/hndkaiUgKgrB5s8HcVj08zbcm9W2PeRph8oicTb5CBq9HyFMchzRx1G204fY/3CRjt2wx/vlksAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=enGq2mrG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BAB0C2BD10;
+	Fri, 14 Jun 2024 14:17:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718374650;
+	bh=HzM1P2wltArweRMwNc/uraZDA3v7C8Lye0dy8r17d1I=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=enGq2mrGXyiDflnlp/G6BJQ/cZy8IDUJwULK32R+JqiwL41iLspanhyQbz+Kexpv7
+	 oKiBDdcOvH1KGM+cYlFEsrV+mqTDrKrZTe6Em5VGzzQWU1m3QHPSQ3+Ek4j1hiNakO
+	 y2jCxd/gwPMc+ubNmuR/C/IEFneWdnJbu/uYqu6Rm1RHxsZUXY0ajrjyEipZnI4rK6
+	 oMJESYEoCfmaKYoj+hABuXDw+0LBUYVW8YIHcq0hngIgzKaNKgxFK6XfVh7lYKbwFS
+	 n8TaSFwroDltDo97A/mqYxLlZoClIe3aMuKzKut+n/7H257rxEgJIdKAZPs1SZFGFr
+	 6qA6nECcSxM9Q==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id E8314CE0760; Fri, 14 Jun 2024 07:17:29 -0700 (PDT)
+Date: Fri, 14 Jun 2024 07:17:29 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: Vlastimil Babka <vbabka@suse.cz>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <addbec8f-a67c-4191-8a3c-1181488947cb@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <ZmrfA1p2zSVIaYam@zx2c4.com>
+ <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
+ <Zmru7hhz8kPDPsyz@pc636>
+ <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
+ <Zmsuswo8OPIhY5KJ@pc636>
+ <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
+ <ZmszOd5idhf2Cb-v@pc636>
+ <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
+ <Zmw5FTX752g0vtlD@pc638.lan>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|PAXP194MB1469:EE_
-X-MS-Office365-Filtering-Correlation-Id: 76ae548f-9d8b-46db-c92a-08dc8c79b3b9
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199025|3412199022|440099025|1710799023;
-X-Microsoft-Antispam-Message-Info:
-	WW/B1PvIk5+eqfQhx3R2kSqmMKWbQevi5x8gs1W3/3v/3NrEFRxD2ig37z7hTazVM2HqZizQKLNnLfQS8+ZOhVx/ZODmeNnqpwyIjddVTLqB3uVUR99KMHSHODY4syjMDpIouP5hAM9IGX9Tz50G7YX8+KYWMN9otMLm6N5f9I9yUQ0yfoqgG2qDs+vQ9MT8REdNFQrn8T7QSNLNnTdt1ylMF9zT+bPqNPrrG0tDA+Em0d1d0/iI5Xn1KbRVbzoFO9npNsfeM1a4ge9F0R6I/c7lBsqy4X8GIsLURSxi+sFHn+/vnV0/HaiNZ4ZWY+fotIWHOw+U7CG10XsZb1yfKLTt2YGjOTnjwwNo16PfirBzKTKyxnnd5nxOmkoyAzjbxHT2EEf4T/SlUfRbAoprtWo+ZFLVy5cJTvpvb0Aw3Lnv+GpNI/2XKxZsWWH5fsmFxrY0617zFBRWJF0oMD4aA7O7YbPecsse59AFQst2vHAzojwDbWGJ6qDLmi0mg1hng60Uo7c5gKXE6gwZaszUSBXR4eqiFsZjmkumusHsGbRizDy/s6k8GU1H5WXFyT9S/cBlcgGBP5Fz7pS2J7xzxVXO4ztG3E9Ggz9u7WY6fq5M5qNJTVxlvThMyLxNC/kU
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?38IOLlKAPMECLKOWiFCXC/SnZAHV6noRMaF1OMct1BM9BEK55wniP5uzjmYd?=
- =?us-ascii?Q?7DQPghEZPFAzC8sHropJnPYBf+CG8arg76HB8UmHPGDlh6pkBoc/Xo1Sspk6?=
- =?us-ascii?Q?vqtce8CUZLGH6lJYzOpouRwURQMGKUNgx34TVcwlMufx8quHemUisL/ov/kb?=
- =?us-ascii?Q?fb8XOdjpEKABkfpt0dga5ZuItbWTPGAWi6HCuO7bWgIpoA5TtFoI8KSH8CW7?=
- =?us-ascii?Q?/PQJNTdndUVGli50j5flyL85ZcJ7mtkLdakS4x7lYfRfmKSaLZhYRsuI5wIP?=
- =?us-ascii?Q?2axe6bBI0oeYQQwaGT6QLl5/4b7ybI4+ALeFgl6xSVz8S/ZSl4ltRwBTVrSE?=
- =?us-ascii?Q?xDaMNpi5pRL31/rR4kVNIqbVWZQ8pwRVyfY5JI9g4YYKOM4AS4iGerkH6V5K?=
- =?us-ascii?Q?1stn6HaHv3fiw9geawr9dMptNNFThOx7HP5nqulhhAopw/dfBpTLu3yBxRmd?=
- =?us-ascii?Q?mD3nyeEuMYfmUAbN3BUic9Al1pimZys10RLsyt0iEY4vG0lrosRWqGfs58x8?=
- =?us-ascii?Q?bWloyzfe2IhuYf/m7uIjfYKA5LIgmCHbtE23Aur0bVRBpPCwOD3HUS63poeC?=
- =?us-ascii?Q?nBeSRWhpBmiZ3b2nuyfLRwolZCoxuVBBo0fZYjcDKvu4VuY/UeN4iDgAzQX7?=
- =?us-ascii?Q?LXVuOWol2Nw7Dn413pOCYWqOPV4X/uCysmjOc8IB6dQYrI/UvNxdvN7ACxLg?=
- =?us-ascii?Q?OndpO8sZqF+jzH+7jcNYzvI1Xx/I+h0iXQHGJp6zvzOsGSX/3UPXG5M+pgwk?=
- =?us-ascii?Q?OtIw2S9IB6r6vbCv3lIfphdfgsp6LXsleAWqO4JMhlJnIjZp5DX/bPL5Deky?=
- =?us-ascii?Q?GHZBV7zIbOKId4JUe9/CNkIraT+8oDo7Mw/cPKlQVdCJtYtUsD3ZDoLDtpga?=
- =?us-ascii?Q?SsKx3Tuf5spBQhdTuNDMjMjcNb/fxve8Y+qpl7ojrkwXDppELXkxPvu0kCzj?=
- =?us-ascii?Q?//4KFLCx9gN/OKgrQsCJxgLnEBlqwI42Yb/1LYTk1HPyyXXrRUrE/oQj83Ez?=
- =?us-ascii?Q?Esmz/cPLBN9GDKOypfsaBFWZMDWgL9QfF+Xv2mb2DvvxoW8poBwZTakFKmw+?=
- =?us-ascii?Q?lYQBJG8uu4opw6uIdqldUM2Uv9d2iRWWnMSANzZnUGVM6UPRseGCFPo2CqmM?=
- =?us-ascii?Q?Alvd1UI2RIPSIo4UXUXMZB55c5EQ8219GE+CSrMBbOuqj6Lg7Qfa7psfSkH2?=
- =?us-ascii?Q?aFY2Z8gK5xsBTeedydfh0ZAthGOXXae6M46vMVr8PrXI/Cs8ibFQroIO2Rmc?=
- =?us-ascii?Q?OzRba2sgKKapYxDj/V/S?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76ae548f-9d8b-46db-c92a-08dc8c79b3b9
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2024 13:55:51.5906
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP194MB1469
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zmw5FTX752g0vtlD@pc638.lan>
 
-From: Marco Pinna <marco.pinn95@gmail.com>
+On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
+> On Thu, Jun 13, 2024 at 11:13:52AM -0700, Paul E. McKenney wrote:
+> > On Thu, Jun 13, 2024 at 07:58:17PM +0200, Uladzislau Rezki wrote:
+> > > On Thu, Jun 13, 2024 at 10:45:59AM -0700, Paul E. McKenney wrote:
+> > > > On Thu, Jun 13, 2024 at 07:38:59PM +0200, Uladzislau Rezki wrote:
+> > > > > On Thu, Jun 13, 2024 at 08:06:30AM -0700, Paul E. McKenney wrote:
+> > > > > > On Thu, Jun 13, 2024 at 03:06:54PM +0200, Uladzislau Rezki wrote:
+> > > > > > > On Thu, Jun 13, 2024 at 05:47:08AM -0700, Paul E. McKenney wrote:
+> > > > > > > > On Thu, Jun 13, 2024 at 01:58:59PM +0200, Jason A. Donenfeld wrote:
+> > > > > > > > > On Wed, Jun 12, 2024 at 03:37:55PM -0700, Paul E. McKenney wrote:
+> > > > > > > > > > On Wed, Jun 12, 2024 at 02:33:05PM -0700, Jakub Kicinski wrote:
+> > > > > > > > > > > On Sun,  9 Jun 2024 10:27:12 +0200 Julia Lawall wrote:
+> > > > > > > > > > > > Since SLOB was removed, it is not necessary to use call_rcu
+> > > > > > > > > > > > when the callback only performs kmem_cache_free. Use
+> > > > > > > > > > > > kfree_rcu() directly.
+> > > > > > > > > > > > 
+> > > > > > > > > > > > The changes were done using the following Coccinelle semantic patch.
+> > > > > > > > > > > > This semantic patch is designed to ignore cases where the callback
+> > > > > > > > > > > > function is used in another way.
+> > > > > > > > > > > 
+> > > > > > > > > > > How does the discussion on:
+> > > > > > > > > > >   [PATCH] Revert "batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks"
+> > > > > > > > > > >   https://lore.kernel.org/all/20240612133357.2596-1-linus.luessing@c0d3.blue/
+> > > > > > > > > > > reflect on this series? IIUC we should hold off..
+> > > > > > > > > > 
+> > > > > > > > > > We do need to hold off for the ones in kernel modules (such as 07/14)
+> > > > > > > > > > where the kmem_cache is destroyed during module unload.
+> > > > > > > > > > 
+> > > > > > > > > > OK, I might as well go through them...
+> > > > > > > > > > 
+> > > > > > > > > > [PATCH 01/14] wireguard: allowedips: replace call_rcu by kfree_rcu for simple kmem_cache_free callback
+> > > > > > > > > > 	Needs to wait, see wg_allowedips_slab_uninit().
+> > > > > > > > > 
+> > > > > > > > > Also, notably, this patch needs additionally:
+> > > > > > > > > 
+> > > > > > > > > diff --git a/drivers/net/wireguard/allowedips.c b/drivers/net/wireguard/allowedips.c
+> > > > > > > > > index e4e1638fce1b..c95f6937c3f1 100644
+> > > > > > > > > --- a/drivers/net/wireguard/allowedips.c
+> > > > > > > > > +++ b/drivers/net/wireguard/allowedips.c
+> > > > > > > > > @@ -377,7 +377,6 @@ int __init wg_allowedips_slab_init(void)
+> > > > > > > > > 
+> > > > > > > > >  void wg_allowedips_slab_uninit(void)
+> > > > > > > > >  {
+> > > > > > > > > -	rcu_barrier();
+> > > > > > > > >  	kmem_cache_destroy(node_cache);
+> > > > > > > > >  }
+> > > > > > > > > 
+> > > > > > > > > Once kmem_cache_destroy has been fixed to be deferrable.
+> > > > > > > > > 
+> > > > > > > > > I assume the other patches are similar -- an rcu_barrier() can be
+> > > > > > > > > removed. So some manual meddling of these might be in order.
+> > > > > > > > 
+> > > > > > > > Assuming that the deferrable kmem_cache_destroy() is the option chosen,
+> > > > > > > > agreed.
+> > > > > > > >
+> > > > > > > <snip>
+> > > > > > > void kmem_cache_destroy(struct kmem_cache *s)
+> > > > > > > {
+> > > > > > > 	int err = -EBUSY;
+> > > > > > > 	bool rcu_set;
+> > > > > > > 
+> > > > > > > 	if (unlikely(!s) || !kasan_check_byte(s))
+> > > > > > > 		return;
+> > > > > > > 
+> > > > > > > 	cpus_read_lock();
+> > > > > > > 	mutex_lock(&slab_mutex);
+> > > > > > > 
+> > > > > > > 	rcu_set = s->flags & SLAB_TYPESAFE_BY_RCU;
+> > > > > > > 
+> > > > > > > 	s->refcount--;
+> > > > > > > 	if (s->refcount)
+> > > > > > > 		goto out_unlock;
+> > > > > > > 
+> > > > > > > 	err = shutdown_cache(s);
+> > > > > > > 	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
+> > > > > > > 	     __func__, s->name, (void *)_RET_IP_);
+> > > > > > > ...
+> > > > > > > 	cpus_read_unlock();
+> > > > > > > 	if (!err && !rcu_set)
+> > > > > > > 		kmem_cache_release(s);
+> > > > > > > }
+> > > > > > > <snip>
+> > > > > > > 
+> > > > > > > so we have SLAB_TYPESAFE_BY_RCU flag that defers freeing slab-pages
+> > > > > > > and a cache by a grace period. Similar flag can be added, like
+> > > > > > > SLAB_DESTROY_ONCE_FULLY_FREED, in this case a worker rearm itself
+> > > > > > > if there are still objects which should be freed.
+> > > > > > > 
+> > > > > > > Any thoughts here?
+> > > > > > 
+> > > > > > Wouldn't we also need some additional code to later check for all objects
+> > > > > > being freed to the slab, whether or not that code is  initiated from
+> > > > > > kmem_cache_destroy()?
+> > > > > >
+> > > > > Same away as SLAB_TYPESAFE_BY_RCU is handled from the kmem_cache_destroy() function.
+> > > > > It checks that flag and if it is true and extra worker is scheduled to perform a
+> > > > > deferred(instead of right away) destroy after rcu_barrier() finishes.
+> > > > 
+> > > > Like this?
+> > > > 
+> > > > 	SLAB_DESTROY_ONCE_FULLY_FREED
+> > > > 
+> > > > 	Instead of adding a new kmem_cache_destroy_rcu()
+> > > > 	or kmem_cache_destroy_wait() API member, instead add a
+> > > > 	SLAB_DESTROY_ONCE_FULLY_FREED flag that can be passed to the
+> > > > 	existing kmem_cache_destroy() function.  Use of this flag would
+> > > > 	suppress any warnings that would otherwise be issued if there
+> > > > 	was still slab memory yet to be freed, and it would also spawn
+> > > > 	workqueues (or timers or whatever) to do any needed cleanup work.
+> > > > 
+> > > >
+> > > The flag is passed as all others during creating a cache:
+> > > 
+> > >   slab = kmem_cache_create(name, size, ..., SLAB_DESTROY_ONCE_FULLY_FREED | OTHER_FLAGS, NULL);
+> > > 
+> > > the rest description is correct to me.
+> > 
+> > Good catch, fixed, thank you!
+> > 
+> And here we go with prototype(untested):
 
-This introduces an optimization in virtio_transport_send_pkt:
-when the work queue (send_pkt_queue) is empty the packet is
-put directly in the virtqueue reducing latency.
+Thank you for putting this together!  It looks way simpler than I would
+have guessed, and quite a bit simpler than I would expect it would be
+to extend rcu_barrier() to cover kfree_rcu().
 
-In the following benchmark (pingpong mode) the host sends
-a payload to the guest and waits for the same payload back.
+> <snip>
+> diff --git a/include/linux/slab.h b/include/linux/slab.h
+> index 7247e217e21b..700b8a909f8a 100644
+> --- a/include/linux/slab.h
+> +++ b/include/linux/slab.h
+> @@ -59,6 +59,7 @@ enum _slab_flag_bits {
+>  #ifdef CONFIG_SLAB_OBJ_EXT
+>  	_SLAB_NO_OBJ_EXT,
+>  #endif
+> +	_SLAB_DEFER_DESTROY,
+>  	_SLAB_FLAGS_LAST_BIT
+>  };
+>  
+> @@ -139,6 +140,7 @@ enum _slab_flag_bits {
+>   */
+>  /* Defer freeing slabs to RCU */
+>  #define SLAB_TYPESAFE_BY_RCU	__SLAB_FLAG_BIT(_SLAB_TYPESAFE_BY_RCU)
+> +#define SLAB_DEFER_DESTROY __SLAB_FLAG_BIT(_SLAB_DEFER_DESTROY)
+>  /* Trace allocations and frees */
+>  #define SLAB_TRACE		__SLAB_FLAG_BIT(_SLAB_TRACE)
+>  
+> diff --git a/mm/slab_common.c b/mm/slab_common.c
+> index 1560a1546bb1..99458a0197b5 100644
+> --- a/mm/slab_common.c
+> +++ b/mm/slab_common.c
+> @@ -45,6 +45,11 @@ static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work);
+>  static DECLARE_WORK(slab_caches_to_rcu_destroy_work,
+>  		    slab_caches_to_rcu_destroy_workfn);
+>  
+> +static LIST_HEAD(slab_caches_defer_destroy);
+> +static void slab_caches_defer_destroy_workfn(struct work_struct *work);
+> +static DECLARE_DELAYED_WORK(slab_caches_defer_destroy_work,
+> +	slab_caches_defer_destroy_workfn);
+> +
+>  /*
+>   * Set of flags that will prevent slab merging
+>   */
+> @@ -448,6 +453,31 @@ static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work)
+>  	}
+>  }
+>  
+> +static void
+> +slab_caches_defer_destroy_workfn(struct work_struct *work)
+> +{
+> +	struct kmem_cache *s, *s2;
+> +
+> +	mutex_lock(&slab_mutex);
+> +	list_for_each_entry_safe(s, s2, &slab_caches_defer_destroy, list) {
+> +		if (__kmem_cache_empty(s)) {
+> +			/* free asan quarantined objects */
+> +			kasan_cache_shutdown(s);
+> +			(void) __kmem_cache_shutdown(s);
+> +
+> +			list_del(&s->list);
+> +
+> +			debugfs_slab_release(s);
+> +			kfence_shutdown_cache(s);
+> +			kmem_cache_release(s);
+> +		}
 
-Tool: Fio version 3.37-56
-Env: Phys host + L1 Guest
-Payload: 4k
-Runtime-per-test: 50s
-Mode: pingpong (h-g-h)
-Test runs: 50
-Type: SOCK_STREAM
+My guess is that there would want to be a splat if the slab stuck around
+for too long, but maybe that should instead be handled elsewhere or in
+some other way?  I must defer to you guys on that one.
 
-Before (Linux 6.8.11)
-------
-mean(1st percentile):     722.45 ns
-mean(overall):           1686.23 ns
-mean(99th percentile):  35379.27 ns
+							Thanx, Paul
 
-After
-------
-mean(1st percentile):     602.62 ns
-mean(overall):           1248.83 ns
-mean(99th percentile):  17557.33 ns
+> +	}
+> +	mutex_unlock(&slab_mutex);
+> +
+> +	if (!list_empty(&slab_caches_defer_destroy))
+> +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> +}
+> +
+>  static int shutdown_cache(struct kmem_cache *s)
+>  {
+>  	/* free asan quarantined objects */
+> @@ -493,6 +523,13 @@ void kmem_cache_destroy(struct kmem_cache *s)
+>  	if (s->refcount)
+>  		goto out_unlock;
+>  
+> +	/* Should a destroy process be deferred? */
+> +	if (s->flags & SLAB_DEFER_DESTROY) {
+> +		list_move_tail(&s->list, &slab_caches_defer_destroy);
+> +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> +		goto out_unlock;
+> +	}
+> +
+>  	err = shutdown_cache(s);
+>  	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
+>  	     __func__, s->name, (void *)_RET_IP_);
+> <snip>
 
-Co-developed-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
-Signed-off-by: Marco Pinna <marco.pinn95@gmail.com>
----
- net/vmw_vsock/virtio_transport.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
-
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index c930235ecaec..e89bf87282b2 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -214,7 +214,9 @@ virtio_transport_send_pkt(struct sk_buff *skb)
- {
- 	struct virtio_vsock_hdr *hdr;
- 	struct virtio_vsock *vsock;
-+	bool use_worker = true;
- 	int len = skb->len;
-+	int ret = -1;
- 
- 	hdr = virtio_vsock_hdr(skb);
- 
-@@ -235,8 +237,34 @@ virtio_transport_send_pkt(struct sk_buff *skb)
- 	if (virtio_vsock_skb_reply(skb))
- 		atomic_inc(&vsock->queued_replies);
- 
--	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
--	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-+	/* If the send_pkt_queue is empty there is no need to enqueue the packet.
-+	 * Just put it on the ringbuff using virtio_transport_send_skb.
-+	 */
-+
-+	if (skb_queue_empty_lockless(&vsock->send_pkt_queue)) {
-+		bool restart_rx = false;
-+		struct virtqueue *vq;
-+
-+		mutex_lock(&vsock->tx_lock);
-+
-+		vq = vsock->vqs[VSOCK_VQ_TX];
-+
-+		ret = virtio_transport_send_skb(skb, vq, vsock, &restart_rx);
-+		if (ret == 0) {
-+			use_worker = false;
-+			virtqueue_kick(vq);
-+		}
-+
-+		mutex_unlock(&vsock->tx_lock);
-+
-+		if (restart_rx)
-+			queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-+	}
-+
-+	if (use_worker) {
-+		virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
-+		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
-+	}
- 
- out_rcu:
- 	rcu_read_unlock();
--- 
-2.45.2
 
 
