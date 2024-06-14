@@ -1,123 +1,140 @@
-Return-Path: <kvm+bounces-19680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4559B908DA6
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 16:40:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 398B1908DBB
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 16:46:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EACF61F244F0
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 14:40:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99B5DB28DA5
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 14:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8BD10A0D;
-	Fri, 14 Jun 2024 14:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A283D182B2;
+	Fri, 14 Jun 2024 14:46:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJftpeaU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e64ZmcbP"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7EC8EAE5
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 14:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB73817BA9;
+	Fri, 14 Jun 2024 14:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718376014; cv=none; b=Ryyb1EjEojqyzI01F1cGXmuVnRwfdyS88ZrkhtkwWOvBVlfcAq10sP3GKNwhQokyxGnsveUGKLRVWfOeaJaq0p5a7zQm5okSJP1FCBHBtCqjZYQ3HyuV2dr2iGavch6qGUmBY0ozkpdnncn7mlPvZqgd+aszcOTyuCTM4Zff8oI=
+	t=1718376375; cv=none; b=OolhDto/ssMwZx7cN689U3xjVGcEpCbDfu+eoE65diiJhJof0NabQKgOd8ww5LaS5iAeHhouTtoZoCCBYngimEXhDgPBysGdMVkfjPePkM9eYbdrsUbkp4OvIV3usj8vEgH1ghddqfLAYd4sevSPKV16eoixjw0bHi7eXNww20I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718376014; c=relaxed/simple;
-	bh=V+j0eTBGfNMTjfAN5fGbwz4kgOLveZl9pdrHD3yNXXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SgYP827Q9wsCXPGti94ipdE7Yd76WnmQrNO3JNHAjEpir57Qp/1oeU9AxiQsB4GOLKt/eS/v+glzb8wNa9mE7m2dWaB59A107bCMnIcLYBYeprUFtUJJp/Dxba70fVyuqJQoNuO3u8gX2pUY7GHffSkCVTjClG1rrgI4lyNpEjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YJftpeaU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718376011;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qt5NcoDJbY+6/rjcnHVm1O4k+qFDbB1MVLu9nqhSjFs=;
-	b=YJftpeaU95fEI+KyXSthC50JQTqHHzfhggwykE1/tZo4GSH4ezD32crAe/+9g7kmMS2iYw
-	XJ1o6/hwLM3U5y9HWXK69XmX5bNvqLB4jJNC1h/d4meGcrS1Rrn+ptDb2KOYt2A+jkkewy
-	cdKQRPK/dxHJhcPugN5vWLZlQ34rLRY=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-354-vS-gkHk3NkaJHHW8XxurKA-1; Fri, 14 Jun 2024 10:40:10 -0400
-X-MC-Unique: vS-gkHk3NkaJHHW8XxurKA-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52c091e4413so2102652e87.2
-        for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 07:40:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718376008; x=1718980808;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qt5NcoDJbY+6/rjcnHVm1O4k+qFDbB1MVLu9nqhSjFs=;
-        b=LxqjBtxhmS8n6ttkKcBgQJLV1k72Bj3SQg1DXpQhkuVCSo3XDlIysE4dFcVl/tshWA
-         p8NkorSoDBWB0qdQc0Y6vf7s7r9SbcqfWYhLPnQl8UhI4pmhLfV+b0L7r5yw7oQzUq6V
-         Yb4utosVHxXLoaIDDKz/s07smsQmzroMq2sUx64g5oFf3jU4vPp0ZSTqFuaisNcEYe1I
-         y08MC12VZ4/SKyv0Mrbytk3Yuicc7VZpSvDHfUKtdVrIQPDhX9RxfkCweCS+PxhS4bef
-         IWjdh8ZLx9cS5RaXo0kxdP6DwhdCAwLyq5CQ1S/7z9jlJkU+ZXC7G9Gcv1ORCsqlOT3d
-         BHNw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2L+p+J/HYJUp9OcLLPUiR6jrxK8Q/S7u93HlrMjb9uebEkoQOKXz8l46AR2riJi63aIJQ/zvCg3phUVhH5PadSDL3
-X-Gm-Message-State: AOJu0Yy/nBgFyj6Bp9CGmke1WPkLSyqU7boBkXcLWlfLnvBpOpXzDtWM
-	DXGpW2zCfz1OfC3dH8z0Wc40Zl8MM63PIYgYKUBmUJ3pblk5ap0zGpdCIas5GNEgV9CzicN5PTi
-	E4XI+k+kGC/KJtNWzycCbpkP7d01vSABd2jMAKQLJW2Nw6Surnw==
-X-Received: by 2002:a19:e014:0:b0:52c:98b1:36d9 with SMTP id 2adb3069b0e04-52ca6e9da28mr2241957e87.62.1718376008742;
-        Fri, 14 Jun 2024 07:40:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEX3v8Wn+67KK53vRvZL7N4S0NTRO/vH3/5y85IBEbKT1mz68C2tnhNAWikvnfX+3y8Ft3XvQ==
-X-Received: by 2002:a19:e014:0:b0:52c:98b1:36d9 with SMTP id 2adb3069b0e04-52ca6e9da28mr2241946e87.62.1718376008400;
-        Fri, 14 Jun 2024 07:40:08 -0700 (PDT)
-Received: from sgarzare-redhat ([147.229.117.1])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56ed39ddsm196069566b.142.2024.06.14.07.40.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 07:40:07 -0700 (PDT)
-Date: Fri, 14 Jun 2024 16:40:03 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <luigi.leonardi@outlook.com>
-Cc: edumazet@google.com, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, kuba@kernel.org, kvm@vger.kernel.org, stefanha@redhat.com, 
-	pabeni@redhat.com, davem@davemloft.net
-Subject: Re: [PATCH net-next 0/2] vsock: avoid queuing on workqueue if
- possible
-Message-ID: <mfhi5is5533xyt4nlbpifrg6mpx3rye4n4vfg736irsae5tfx6@2aiorapp2uos>
-References: <AS2P194MB2170EB1827729FB1666311FA9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1718376375; c=relaxed/simple;
+	bh=xsQtZpEJDOrdnBJYSovlHe1ZmVqfDD6Gyi/ImZOHD20=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aUB7647sZRL6FX0JYJ/rA8lWk24KaLr16thdP7k2+JpBpYQC78T2VdAbWj7qSDCiJXhwJnb9nO08e5CN2c+12szxkANSl/PhZ5BhY/9Xo/Vp736MNwnqiVGLeQd5zj7kq5sG38zuQegyNNasQJelTyU6UNNzZe8aDKv3x80QS6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e64ZmcbP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F1AC3277B;
+	Fri, 14 Jun 2024 14:46:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718376375;
+	bh=xsQtZpEJDOrdnBJYSovlHe1ZmVqfDD6Gyi/ImZOHD20=;
+	h=From:To:Cc:Subject:Date:From;
+	b=e64ZmcbPRiWGq5dZFHfjnqmZ+BZioQz3KH6FzSLQua8M3NgX8rugnxCWxrwcUGaF3
+	 hjG3/56JxF7Mk3iLhh93E1S/ZPp1Ubi8Wi1nBtDPaER06Q8LSx3nHMJj6l3D7z1lo7
+	 fjeYmlEO/S2LtBPteRK3rO2wmOysYypWGVgMYS9Ec7m7eLPWF2Ubq+waw/TV/kjEfV
+	 rVyFFwC/ZbhBMaSoo8NIcr27UCKX0DcotO1n5fIavBBMJz9oqdVxhWdFwLOJ68HYf1
+	 MQtudKTk5RmtipyE6yk8K5EhpwJmXQs9C47iT8JextNFCsg5wxUIYeQeIurJDeL8mP
+	 5WbxKHVYS79oQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sI8Bx-003wb4-MV;
+	Fri, 14 Jun 2024 15:46:13 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Christoffer Dall <christoffer.dall@arm.com>,
+	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Subject: [PATCH v3 00/16] KVM: arm64: nv: Shadow stage-2 page table handling
+Date: Fri, 14 Jun 2024 15:45:36 +0100
+Message-Id: <20240614144552.2773592-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <AS2P194MB2170EB1827729FB1666311FA9AC22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, Jun 14, 2024 at 03:55:41PM GMT, Luigi Leonardi wrote:
->This patch series introduces an optimization for vsock/virtio to reduce latency:
->When the guest sends a packet to the host, and the workqueue is empty,
->if there is enough space, the packet is put directly in the virtqueue.
+Here's the thurd version of the shadow stage-2 handling for NV
+support on arm64.
 
-Thanks for working on this!!
+* From v2 [2]
 
-I left few small comments.
-I'm at DevConf this weekend, so I'll do a better review and some testing
-next week.
+  - Simplified the S2 walker by dropping a bunch of redundant
+    fields from the walker info structure
 
-Stefano
+  - Added some more lockdep assertions (Oliver)
 
->
->The first one contains some code refactoring.
->More details and some performance tests in the second patch.
->
->Marco Pinna (2):
->  vsock/virtio: refactor virtio_transport_send_pkt_work
->  vsock/virtio: avoid enqueue packets when work queue is empty
->
-> net/vmw_vsock/virtio_transport.c | 166 +++++++++++++++++++------------
-> 1 file changed, 104 insertions(+), 62 deletions(-)
->
->-- 
->2.45.2
->
+  - Added more precise comments for the TTL-like annotations
+    in the shadow S2 (Oliver)
+
+* From v1 [1]
+
+  - Reworked the allocation of shadow S2 structures at init time to be
+    slightly clearer
+
+  - Lots of small cleanups
+
+  - Rebased on v6.10-rc1
+
+[1] https://lore.kernel.org/r/20240409175448.3507472-1-maz@kernel.org
+
+Christoffer Dall (2):
+  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+
+Marc Zyngier (14):
+  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+  KVM: arm64: nv: Handle shadow stage 2 page faults
+  KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+  KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+  KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+  KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+  KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+  KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+  KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+  KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
+    information
+  KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+  KVM: arm64: nv: Add handling of range-based TLBI operations
+  KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+
+ arch/arm64/include/asm/esr.h        |   1 +
+ arch/arm64/include/asm/kvm_asm.h    |   2 +
+ arch/arm64/include/asm/kvm_host.h   |  36 ++
+ arch/arm64/include/asm/kvm_mmu.h    |  26 +
+ arch/arm64/include/asm/kvm_nested.h | 127 +++++
+ arch/arm64/include/asm/sysreg.h     |  17 +
+ arch/arm64/kvm/arm.c                |  11 +
+ arch/arm64/kvm/hyp/vhe/switch.c     |  51 +-
+ arch/arm64/kvm/hyp/vhe/tlb.c        | 147 ++++++
+ arch/arm64/kvm/mmu.c                | 213 ++++++--
+ arch/arm64/kvm/nested.c             | 781 +++++++++++++++++++++++++++-
+ arch/arm64/kvm/reset.c              |   6 +
+ arch/arm64/kvm/sys_regs.c           | 398 ++++++++++++++
+ 13 files changed, 1775 insertions(+), 41 deletions(-)
+
+-- 
+2.39.2
 
 
