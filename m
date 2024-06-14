@@ -1,138 +1,181 @@
-Return-Path: <kvm+bounces-19670-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19671-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82D5908C64
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 15:21:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B1B3908C6A
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 15:25:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D492288DC1
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 13:21:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7C452821D9
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 13:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B8719AA42;
-	Fri, 14 Jun 2024 13:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FDE19AA76;
+	Fri, 14 Jun 2024 13:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tbNPPDH/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T+UIlMOM"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90EE18C05;
-	Fri, 14 Jun 2024 13:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECD71474C6;
+	Fri, 14 Jun 2024 13:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718371257; cv=none; b=NyIdR25n9Iy9+Ruuc3meEJGtg2bdao2cByjFTwM/jpRlCZrBy+OfvcdmcRRbO9WY1faGiewNqfDL6IrOYXjmxrxjKK4jFp9BxCojyRn4TOh93105xn7bmaGf9f9juK/7PYjR2ZKnz3b9sbg03KapRqEGlXGtqZecvvrc+tG1fH8=
+	t=1718371511; cv=none; b=U7gvR86Zqlvembl+QEnT/dv4EfH09rFQeghuhSRhu87qYHbEOANgjTGWKzHe5ZhU0pw2Oxk5bxZ7Ut3tV0CtuoKlAlzjf4aDyIKvj9NxTN0jCaX6zXwCfSQfn55bgpU6rGPf9DL8bBuAioYPODoju1Pg5poleVSAgZGShvewLTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718371257; c=relaxed/simple;
-	bh=0OIRru52fRlzhCGs2tHFFXy/+aeZhVjWXO72oWyFPUA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VxPRJ4qi/whKDyUN+Dx15IwFd14pYyESLWQh3p01mE16ufpbMmr+iKcxSnYVbsYq+ydgFWmeMnQ9VeZUypgSsuLcJFFDB2ATOVQfWj0IvAJvPUOWP3iBnLh6zltUl6Q3PiVlFug7XbLVKxIespUeRIhHsesMqMFB1apiGzkwnrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tbNPPDH/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C1F4C2BD10;
-	Fri, 14 Jun 2024 13:20:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718371257;
-	bh=0OIRru52fRlzhCGs2tHFFXy/+aeZhVjWXO72oWyFPUA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tbNPPDH/NFHO5b2wsxcpPeRTaWnYzmEXsSC2OVTOxmffpX4FjzfTIydAbsylery1M
-	 Wql0hnndcoIShMXrd90W6n3e4pKzbkSyOfDj6VEa2a3LGw9k1K4v6A4ITjCFv5cJZR
-	 pEzKnMwQC9wTOiKiF1Qj8xUVb/XgG/liQOAaMkWLiikN/9e8LlqbJ4Ee8q6EVMta6O
-	 JXzFD2SCP9poUenKMD8LHTmOyDrGWcqBPoKdok035EvIVwNhygz5SH7Ak3oBU0ajqM
-	 oCEiwIkp9gBC61WTf/2UIigYdwF/7ItCz7sVgzxEzsfKZDfxlQripQ00kxhzdemO+r
-	 lqDK/JoB2TZhw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sI6rP-003vQ3-87;
-	Fri, 14 Jun 2024 14:20:55 +0100
-Date: Fri, 14 Jun 2024 14:20:54 +0100
-Message-ID: <86plsjk6dl.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvmarm@lists.linux.dev,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v2 03/15] KVM: arm64: nv: Handle CPACR_EL1 traps
-In-Reply-To: <20240613201756.3258227-4-oliver.upton@linux.dev>
-References: <20240613201756.3258227-1-oliver.upton@linux.dev>
-	<20240613201756.3258227-4-oliver.upton@linux.dev>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1718371511; c=relaxed/simple;
+	bh=PodNgtK+CFxkcM1xg2YMWxubqXt7QosyFJw5EQkc+Os=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h2yIHkaXW9bpntOQItLsTQWM7WIfA461rpiJgJ6sSm3yQtiZUtAcb1hZ6NPPjQF3O7bG5ZbB6AxBwBHu58cBBovWRcaacT+PN1xwBYUgJJTsUvybCnelAiYPSJaaHI0CCCRmaSiPlAUWkuDRopMfuJbih6xNfM6hAYBlqwBMbZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T+UIlMOM; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718371509; x=1749907509;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PodNgtK+CFxkcM1xg2YMWxubqXt7QosyFJw5EQkc+Os=;
+  b=T+UIlMOMGKtHjRlC0mSbpOQDEul+UymqUj88yAeN4QoEw2uTHxH5XdMt
+   JgiLI7jXKyRfjVHoE7BV5I/5+B0/mmR4pPLHLlNXGd/CUkApWJBicC82a
+   GWgwb5v3wzf4kJpcw9lqDVdn/zI+z2rAFhUGNxXi52v8Y91DPaa+axg8f
+   mrPE1WmNDsQIrCrKGntagcl2C6OwFeGQVCtXC2OWPDYCVhX05U3xa7TB1
+   /zQKn9TiJaO5mzg36D4MoN/LJ2927v80XRv/Rcwvoo7mWo5z+6OKiLkn3
+   fkSnIzvM+GFAajJFLkC31Q/VkSw44vUts8Kmwa5lzgUalylsfl1TRn+iq
+   g==;
+X-CSE-ConnectionGUID: 6PMhbOzORCWZqVDD7yG2DA==
+X-CSE-MsgGUID: 8L+oe9l+RTWUl8gyoT0Kiw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11103"; a="15380521"
+X-IronPort-AV: E=Sophos;i="6.08,237,1712646000"; 
+   d="scan'208";a="15380521"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2024 06:25:08 -0700
+X-CSE-ConnectionGUID: 8QN9I4/STiyppCp86fjhJg==
+X-CSE-MsgGUID: oLaBGBtXR2aEW9t2ihg8PQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,237,1712646000"; 
+   d="scan'208";a="40635695"
+Received: from lkp-server01.sh.intel.com (HELO 9e3ee4e9e062) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 14 Jun 2024 06:25:03 -0700
+Received: from kbuild by 9e3ee4e9e062 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sI6vM-0001Ln-0t;
+	Fri, 14 Jun 2024 13:25:00 +0000
+Date: Fri, 14 Jun 2024 21:24:07 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shivaprasad G Bhat <sbhat@linux.ibm.com>, mpe@ellerman.id.au,
+	tpearson@raptorengineering.com, alex.williamson@redhat.com,
+	linuxppc-dev@lists.ozlabs.org, aik@amd.com
+Cc: oe-kbuild-all@lists.linux.dev, npiggin@gmail.com,
+	christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
+	naveen.n.rao@linux.ibm.com, gbatra@linux.vnet.ibm.com,
+	brking@linux.vnet.ibm.com, sbhat@linux.ibm.com, aik@ozlabs.ru,
+	jgg@ziepe.ca, ruscur@russell.cc, robh@kernel.org,
+	linux-kernel@vger.kernel.org, joel@jms.id.au, kvm@vger.kernel.org,
+	msuchanek@suse.de, oohall@gmail.com, mahesh@linux.ibm.com,
+	jroedel@suse.de, vaibhav@linux.ibm.com, svaidy@linux.ibm.com
+Subject: Re: [PATCH v3 6/6] powerpc/iommu: Reimplement the
+ iommu_table_group_ops for pSeries
+Message-ID: <202406142110.r97Ts8Xm-lkp@intel.com>
+References: <171810901192.1721.18057294492426295643.stgit@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, tabba@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <171810901192.1721.18057294492426295643.stgit@linux.ibm.com>
 
-On Thu, 13 Jun 2024 21:17:44 +0100,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> From: Marc Zyngier <maz@kernel.org>
-> 
-> Handle CPACR_EL1 accesses when running a VHE guest. In order to
-> limit the cost of the emulation, implement it ass a shallow exit.
-> 
-> In the other cases:
-> 
-> - this is a nVHE L1 which will write to memory, and we don't trap
-> 
-> - this is a L2 guest:
-> 
->   * the L1 has CPTR_EL2.TCPAC==0, and the L2 has direct register
->    access
-> 
->   * the L1 has CPTR_EL2.TCPAC==1, and the L2 will trap, but the
->     handling is defered to the general handling for forwarding
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
-> ---
->  arch/arm64/kvm/hyp/vhe/switch.c | 32 +++++++++++++++++++++++++++++++-
->  1 file changed, 31 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> index d7af5f46f22a..fed36457fef9 100644
-> --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> @@ -262,10 +262,40 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	return true;
->  }
->  
-> +static bool kvm_hyp_handle_cpacr_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
-> +{
-> +	u64 esr = kvm_vcpu_get_esr(vcpu);
-> +	int rt;
-> +
-> +	if (!is_hyp_ctxt(vcpu) || esr_sys64_to_sysreg(esr) != SYS_CPACR_EL1)
-> +		return false;
-> +
-> +	rt = kvm_vcpu_sys_get_rt(vcpu);
-> +
-> +	if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ) {
-> +		vcpu_set_reg(vcpu, rt, __vcpu_sys_reg(vcpu, CPTR_EL2));
-> +	} else {
-> +		vcpu_write_sys_reg(vcpu, vcpu_get_reg(vcpu, rt), CPTR_EL2);
-> +		__activate_cptr_traps(vcpu);
+Hi Shivaprasad,
 
-This doesn't bisect, as this helper is only introduced in patch #10.
-You probably want to keep it towards the end of the series.
+kernel test robot noticed the following build errors:
 
-Thanks,
+[auto build test ERROR on powerpc/fixes]
+[also build test ERROR on awilliam-vfio/next awilliam-vfio/for-linus linus/master v6.10-rc3]
+[cannot apply to powerpc/next next-20240613]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-	M.
+url:    https://github.com/intel-lab-lkp/linux/commits/Shivaprasad-G-Bhat/powerpc-iommu-Move-pSeries-specific-functions-to-pseries-iommu-c/20240611-203313
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git fixes
+patch link:    https://lore.kernel.org/r/171810901192.1721.18057294492426295643.stgit%40linux.ibm.com
+patch subject: [PATCH v3 6/6] powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries
+config: powerpc64-randconfig-r133-20240614 (https://download.01.org/0day-ci/archive/20240614/202406142110.r97Ts8Xm-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 78ee473784e5ef6f0b19ce4cb111fb6e4d23c6b2)
+reproduce: (https://download.01.org/0day-ci/archive/20240614/202406142110.r97Ts8Xm-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406142110.r97Ts8Xm-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from arch/powerpc/platforms/pseries/iommu.c:16:
+   In file included from include/linux/mm.h:2253:
+   include/linux/vmstat.h:500:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     500 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     501 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:507:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     507 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     508 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:519:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     519 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     520 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:528:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     528 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     529 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> arch/powerpc/platforms/pseries/iommu.c:1839:47: error: use of undeclared identifier 'dev_has_iommu_table'; did you mean 'device_iommu_capable'?
+    1839 |         ret = iommu_group_for_each_dev(group, &pdev, dev_has_iommu_table);
+         |                                                      ^~~~~~~~~~~~~~~~~~~
+         |                                                      device_iommu_capable
+   include/linux/iommu.h:1079:20: note: 'device_iommu_capable' declared here
+    1079 | static inline bool device_iommu_capable(struct device *dev, enum iommu_cap cap)
+         |                    ^
+   arch/powerpc/platforms/pseries/iommu.c:1953:15: warning: variable 'entries_shift' set but not used [-Wunused-but-set-variable]
+    1953 |         unsigned int entries_shift;
+         |                      ^
+   arch/powerpc/platforms/pseries/iommu.c:2166:17: warning: variable 'pci' set but not used [-Wunused-but-set-variable]
+    2166 |         struct pci_dn *pci;
+         |                        ^
+   7 warnings and 1 error generated.
+
+
+vim +1839 arch/powerpc/platforms/pseries/iommu.c
+
+  1829	
+  1830	static struct pci_dev *iommu_group_get_first_pci_dev(struct iommu_group *group)
+  1831	{
+  1832		struct pci_dev *pdev = NULL;
+  1833		int ret;
+  1834	
+  1835		/* No IOMMU group ? */
+  1836		if (!group)
+  1837			return NULL;
+  1838	
+> 1839		ret = iommu_group_for_each_dev(group, &pdev, dev_has_iommu_table);
+  1840		if (!ret || !pdev)
+  1841			return NULL;
+  1842		return pdev;
+  1843	}
+  1844	
 
 -- 
-Without deviation from the norm, progress is not possible.
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
