@@ -1,171 +1,191 @@
-Return-Path: <kvm+bounces-19664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E06BB908A3F
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 12:39:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 896F4908A8E
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 12:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26A6F285519
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 10:39:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45E47285DCB
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 10:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF7E1946B4;
-	Fri, 14 Jun 2024 10:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53277195800;
+	Fri, 14 Jun 2024 10:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U3TtmkNs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DV10GltX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8A4D193099
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 10:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC2A1922C1;
+	Fri, 14 Jun 2024 10:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718361577; cv=none; b=m6M4L9qHXWfMzqEwu5ObT5j8o/iDDycpehVGV0/GetPSoNZEUcXNYTItfE4MijmK6CUmnFHwoftfNUQvFib6uQ5DRwaHilrJdY3eoHF4nchUu+jgz73iNtSQ8kVsC0/+/xLx6MKiPPcZl5rebGzTevbWp/yHxGSeuy7xgtQob+E=
+	t=1718362584; cv=none; b=Q5owF8s4f1gpgeLxsyKVQdPGsq5W/QygRSAWO4hvBRcirFcDakd58fP3Af+YjawzVgAyO3HTUdqmgN5peytSmiaegkoG0PkTAROEyCbVL9NFVL+1Q85hBVjijFx2fCw5TStO2tJTQ9cWzgfwBxA2WS7LW29uNAtCyEiBJabXdX8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718361577; c=relaxed/simple;
-	bh=/GCCN8jL7Y/IEfV9+i0Jq0ctsa3bAQ7MRBdMdvfCly4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=u9CRXSUBcDSPAXO5V6AasyX0IJO5Mxyid+dmRWaY9b1z6HW6VIOHpg2/yvcMMTUs4ITNRFYbZc+lwN9gjkCmcr1aZp33XuJEYH0d3cqGhVgL0EcCMP1CA0E72QNIzYtlud8R/hKBKfnEEWDcq7tAUNTSPViJ6wYFgS2+fjCaS14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U3TtmkNs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718361574;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bX0Eh7iMeDGS2UEYZBvNcA+ah/v80YAMcEfPqR+uczg=;
-	b=U3TtmkNs9x+JP2x9ijQ+483ewDb5kjAQ3W/W3cFPi6Njy1ed+SE3hWBB8pZrXJ5P0wbXe+
-	iChiAlFoXUwXl+XmGIhGE9ldrCHLzfpVOjASWASW3SkI+PbU0xQ7yASlMjisqXoo1wU9gv
-	MWAFKj1hBi038dn3OW2KcO1cVhYQrUk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-194-U-QQro7hNG-XAffrrp_98Q-1; Fri,
- 14 Jun 2024 06:39:33 -0400
-X-MC-Unique: U-QQro7hNG-XAffrrp_98Q-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 13A31195608F;
-	Fri, 14 Jun 2024 10:39:32 +0000 (UTC)
-Received: from toolbox.redhat.com (unknown [10.39.193.248])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 372781956050;
-	Fri, 14 Jun 2024 10:39:25 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
-	Michael Roth <michael.roth@amd.com>,
-	=?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
+	s=arc-20240116; t=1718362584; c=relaxed/simple;
+	bh=5r7N6D6dt9wZFpML6W5hQT17FrsvSr8pDDgZbtyQJxI=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nixCPYxz5OQxDf9L0qnMXX9IY7Jr1vtpuK+hxqhdT8u+hWYegaZYvWe1crjb6dtBFOPIxlW9MxwTsb/kpDJSKYwc3slqftGa76KtYTxbQTpJ7dJFQ1WjAp0Np2Q07RpDnBcSmhyHqRM6W6VUQO8TJhVXe3WbJ/XR+QER4RRvf/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DV10GltX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11F2BC2BD10;
+	Fri, 14 Jun 2024 10:56:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718362584;
+	bh=5r7N6D6dt9wZFpML6W5hQT17FrsvSr8pDDgZbtyQJxI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DV10GltXSd/EIg2rB7Xf04cuZUoSGGDbDmEeqtS6kxNYDGhg1cEoCDfPfLWCnlUeL
+	 d+Ejjeik53bWFr9AfuKnu0a1L113gROx/xUkYhZR4c818nr9/G+ZcPigmzI+xBXuF8
+	 7rRBob3FzU28w1ffsqp7tbGwCpsDL41eb9SB1Fz32NUmq1/Lqe/5+gSQDeukqw88U3
+	 M4X1kn5/6eD5eutV3wcGXTDGBAVTxpWOfninRuhTrsgv5vWCLT5cxg84F7vrIrpyhT
+	 JkEiQlKSx9HF5UWKNKmTH6iGtWbXhtAnFgg5NZkmMdVwQPsKwvRjAfJjCRe/tNPo2e
+	 K5sM0PRixkBgA==
+Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sI4bV-003tck-Q4;
+	Fri, 14 Jun 2024 11:56:21 +0100
+Date: Fri, 14 Jun 2024 11:56:20 +0100
+Message-ID: <87bk433i97.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
 	kvm@vger.kernel.org,
-	Markus Armbruster <armbru@redhat.com>,
-	Eric Blake <eblake@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [PATCH] i386: revert defaults to 'legacy-vm-type=true' for SEV(-ES) guests
-Date: Fri, 14 Jun 2024 11:39:24 +0100
-Message-ID: <20240614103924.1420121-1-berrange@redhat.com>
+	Fuad Tabba <tabba@google.com>,
+	Jintack Lim <jintack.lim@linaro.org>,
+	Christoffer Dall <christoffer.dall@arm.com>
+Subject: Re: [PATCH v2 01/15] KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
+In-Reply-To: <20240613201756.3258227-2-oliver.upton@linux.dev>
+References: <20240613201756.3258227-1-oliver.upton@linux.dev>
+	<20240613201756.3258227-2-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.104.136.29
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, tabba@google.com, jintack.lim@linaro.org, christoffer.dall@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The KVM_SEV_INIT2 ioctl was only introduced in Linux 6.10, which will
-only have been released for a bit over a month when QEMU 9.1 is
-released.
+On Thu, 13 Jun 2024 21:17:42 +0100,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> From: Jintack Lim <jintack.lim@linaro.org>
+> 
+> Give precedence to the guest hypervisor's trap configuration when
+> routing an FP/ASIMD trap taken to EL2. Take advantage of the
+> infrastructure for translating CPTR_EL2 into the VHE (i.e. EL1) format
+> and base the trap decision solely on the VHE view of the register. The
+> in-memory value of CPTR_EL2 will always be up to date for the guest
+> hypervisor (more on that later), so just read it directly from memory.
+> 
+> Bury all of this behind a macro keyed off of the CPTR bitfield in
+> anticipation of supporting other traps (e.g. SVE).
+> 
+> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> [maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
+>  all the hard work actually being done by Chase Conklin]
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> [ oliver: translate nVHE->VHE format for testing traps; macro for reuse
+>  in other CPTR_EL2.xEN fields ]
+> Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h    | 43 +++++++++++++++++++++++++
+>  arch/arm64/include/asm/kvm_nested.h     |  1 -
+>  arch/arm64/kvm/handle_exit.c            | 16 ++++++---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h |  3 ++
+>  4 files changed, 58 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 501e3e019c93..c3c5a5999ed7 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -11,6 +11,7 @@
+>  #ifndef __ARM64_KVM_EMULATE_H__
+>  #define __ARM64_KVM_EMULATE_H__
+>  
+> +#include <linux/bitfield.h>
+>  #include <linux/kvm_host.h>
+>  
+>  #include <asm/debug-monitors.h>
+> @@ -599,4 +600,46 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
+>  
+>  	kvm_write_cptr_el2(val);
+>  }
+> +
+> +/*
+> + * Returns a 'sanitised' view of CPTR_EL2, translating from nVHE to the VHE
+> + * format if E2H isn't set.
+> + */
+> +static inline u64 vcpu_sanitised_cptr_el2(const struct kvm_vcpu *vcpu)
+> +{
+> +	u64 cptr = __vcpu_sys_reg(vcpu, CPTR_EL2);
+> +
+> +	if (!vcpu_el2_e2h_is_set(vcpu))
+> +		cptr = translate_cptr_el2_to_cpacr_el1(cptr);
+> +
+> +	return cptr;
+> +}
+> +
+> +static inline bool ____cptr_xen_trap_enabled(const struct kvm_vcpu *vcpu,
+> +					     unsigned int xen)
+> +{
+> +	switch (xen) {
+> +	case 0b00:
+> +	case 0b10:
+> +		return true;
+> +	case 0b01:
+> +		return vcpu_el2_tge_is_set(vcpu) && !vcpu_is_el2(vcpu);
+> +	case 0b11:
+> +	default:
+> +		return false;
+> +	}
+> +}
+> +
+> +#define __guest_hyp_cptr_xen_trap_enabled(vcpu, xen)				\
+> +	(!vcpu_has_nv(vcpu) ? false :						\
+> +	 ____cptr_xen_trap_enabled(vcpu,					\
+> +				   SYS_FIELD_GET(CPACR_ELx, xen,		\
+> +						 vcpu_sanitised_cptr_el2(vcpu))))
+> +
+> +static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
+> +{
+> +	return __guest_hyp_cptr_xen_trap_enabled(vcpu, FPEN);
+> +}
+> +
+> +
+>  #endif /* __ARM64_KVM_EMULATE_H__ */
+> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+> index 5e0ab0596246..5d55f76254c3 100644
+> --- a/arch/arm64/include/asm/kvm_nested.h
+> +++ b/arch/arm64/include/asm/kvm_nested.h
+> @@ -75,5 +75,4 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
+>  	return false;
+>  }
+>  #endif
+> -
+>  #endif /* __ARM64_KVM_NESTED_H */
 
-The SEV(-ES) support in QEMU has been present since 2.12 dating back
-to 2018. With this in mind, the overwhealming majority of users of
-SEV(-ES) are unlikely to be running Linux >= 6.10, any time in the
-forseeable future.
+nit: spurious change.
 
-IOW, defaulting new QEMU to 'legacy-vm-type=false' means latest QEMU
-machine types will be broken out of the box for most SEV(-ES) users.
-Even if the kernel is new enough, it also affects the guest measurement,
-which means that their existing tools for validating measurements will
-also be broken by the new default.
+Aside from that:
 
-This is not a sensible default choice at this point in time. Revert to
-the historical behaviour which is compatible with what most users are
-currently running.
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 
-This can be re-evaluated a few years down the line, though it is more
-likely that all attention will be on SEV-SNP by this time. Distro
-vendors may still choose to change this default downstream to align
-with their new major releases where they can guarantee the kernel
-will always provide the required functionality.
+	M.
 
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
----
- hw/i386/pc.c      |  1 -
- qapi/qom.json     | 12 ++++++------
- target/i386/sev.c |  7 +++++++
- 3 files changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 0469af00a7..b65843c559 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -82,7 +82,6 @@
- GlobalProperty pc_compat_9_0[] = {
-     { TYPE_X86_CPU, "x-l1-cache-per-thread", "false" },
-     { TYPE_X86_CPU, "guest-phys-bits", "0" },
--    { "sev-guest", "legacy-vm-type", "true" },
-     { TYPE_X86_CPU, "legacy-multi-node", "on" },
- };
- const size_t pc_compat_9_0_len = G_N_ELEMENTS(pc_compat_9_0);
-diff --git a/qapi/qom.json b/qapi/qom.json
-index 8bd299265e..714ebeec8b 100644
---- a/qapi/qom.json
-+++ b/qapi/qom.json
-@@ -912,12 +912,12 @@
- # @handle: SEV firmware handle (default: 0)
- #
- # @legacy-vm-type: Use legacy KVM_SEV_INIT KVM interface for creating the VM.
--#                  The newer KVM_SEV_INIT2 interface syncs additional vCPU
--#                  state when initializing the VMSA structures, which will
--#                  result in a different guest measurement. Set this to
--#                  maintain compatibility with older QEMU or kernel versions
--#                  that rely on legacy KVM_SEV_INIT behavior.
--#                  (default: false) (since 9.1)
-+#                  The newer KVM_SEV_INIT2 interface, from Linux >= 6.10, syncs
-+#                  additional vCPU state when initializing the VMSA structures,
-+#                  which will result in a different guest measurement. Toggle
-+#                  this to control compatibility with older QEMU or kernel
-+#                  versions that rely on legacy KVM_SEV_INIT behavior.
-+#                  (default: true) (since 9.1)
- #
- # Since: 2.12
- ##
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 004c667ac1..16029282b7 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -2086,6 +2086,13 @@ sev_guest_instance_init(Object *obj)
-     object_property_add_uint32_ptr(obj, "policy", &sev_guest->policy,
-                                    OBJ_PROP_FLAG_READWRITE);
-     object_apply_compat_props(obj);
-+
-+    /*
-+     * KVM_SEV_INIT2 was only introduced in Linux 6.10. Avoid
-+     * breaking existing users of SEV, since the overwhealming
-+     * majority won't have a new enough kernel for a long time
-+     */
-+    sev_guest->legacy_vm_type = true;
- }
- 
- /* guest info specific sev/sev-es */
 -- 
-2.45.1
-
+Without deviation from the norm, progress is not possible.
 
