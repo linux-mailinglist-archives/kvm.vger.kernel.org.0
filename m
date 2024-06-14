@@ -1,281 +1,365 @@
-Return-Path: <kvm+bounces-19706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4166F9091EB
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 19:42:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 917BB909235
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 20:24:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE3E01F237A8
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 17:42:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D17E1F22D90
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 18:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D2217BB23;
-	Fri, 14 Jun 2024 17:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33C8F19EEBF;
+	Fri, 14 Jun 2024 18:24:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LdehSqGp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vHaYLmnf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD852D52A
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 17:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3219ADB3
+	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 18:23:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718386965; cv=none; b=IDKsoPZa9amjqq+HD3iyw6XTMhFgGR4Ewf0NWkQ5TkfdYDxjY09iWqVBv+KZsahqkfygmLwv1CXDwagkMU+KZdvu/BftXhn8uoSszeuyUoOHVrxLXQcy6bjWTS87/kutsAGEjQ3MFllnQoOUxRrDanJmfSjoDJNITZ/D8YiSsvw=
+	t=1718389441; cv=none; b=mmN1WP5k1r52j1/LQ/ByKI3YM9klVQo0oXixanhY3jANzI4audnst5TnTnXykNqPP99/hMd+bBrY1sxZVhXUNluRiXpFzVJvlFzdQo/mHBPXVG8y5QZiOn7LkC1GgMhcMHqybLEaDe1/HVF6m8VnCSBAmF64AG5To8myQupnIAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718386965; c=relaxed/simple;
-	bh=bM1NMWKhTvBKDhiJvIABPQf7fWj9FQUyC1EGuMSIoHw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fVeg/uJtnTPCnX6maTwNvBHK3zTurRiszM6xYJQ/4iWwcYHnqsx4KrxX1FCuICulwV3SFGZsIhW6dX5d72tJVFKh8SwMsqiSwXc2ptuQ0jCf4J6z8D+O/j2MixntYXt3Tuis02PAeQhInHPN4OWZqRHmzMPBD7CugXLIRVe7fGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LdehSqGp; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7042882e741so2051471b3a.2
-        for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 10:42:43 -0700 (PDT)
+	s=arc-20240116; t=1718389441; c=relaxed/simple;
+	bh=zcjF8Xyqocy3s2Ob4L1Ckw1n/AyByxuNgc2fQwpZZjA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=R1NQ0b1O346V5uj2MoF57FFJL0yIEIRqYMZRp3HHIr1LjoqDEIO2yHNgvKXm5PrRlzkn0DSppdwrg6+e61fZC0tK5aEedgyJFFu9TSA8Zo8tQLB+eMQzM2ar4MENxAcoW6jk6UY6txxT4oLsp/1xFJUYfoskydGmKG2xsUTmXKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vHaYLmnf; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-44219bacafeso37791cf.1
+        for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 11:23:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718386963; x=1718991763; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bM1NMWKhTvBKDhiJvIABPQf7fWj9FQUyC1EGuMSIoHw=;
-        b=LdehSqGpLjVkI5CYPAWFfMwsyNv4rzx/x/Y3YSPbKJ5TIBpDamNvTt7becDQt/noQ5
-         Ra+XrfW5h8hmk8bjxac/w74sUJuBx++BakyoaY4uUY4FuobGG9/lZeiaD2XrCga88P8e
-         EWC+x0wfp1paWw6JAd7aWBRgzFIBr4tuevLM/5BPvqDEwRA6f+z7Q1p1vFL1kT6YqnWZ
-         4JNrHi+P47iDdK4KgomtX9qSCjESoF9FdqD34kEH+A6bBaLgEbzWICsbeNMd8CDYCygv
-         WEJxkNsXB94ChvvnYe/8qwLD42HiDKw3VD4kvziL2VUBlogJCQ2vpTBz2a7BiWNDUIZu
-         1plg==
+        d=google.com; s=20230601; t=1718389438; x=1718994238; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+e1S7VxRmA5wGFSxD1T8KbdKKkr/h73427zkqEMDfd4=;
+        b=vHaYLmnfxMNuQT8vUKcjP9wN1n2fnXFsSANNwAoMMf1AObr66qwr3ObJRMa9+GJxBe
+         ywiJy78Xi4F/eQ9kE9mhRmI0v9SuSxlTGyPEOUCygu3PPvPOETm/gQhe1x84pYn+RFNi
+         7ZrX92LpMOaDELhc7LkiKiXPBHGT9QbUj6kxK2rPwJ+qXbDkZVu37M41gx3aODmNUFNc
+         RWt3OY7SbpvEdC+Py31V55rriQZI9m0A8QmrXn/NrjYejOrag1upVvSzUxjg/K/2FQKC
+         DfTGORjLlgsaX7fnhj4Jl61uzlkmUk5fWEeJbDaD3lTirYKZqWGDG553xiez89JrN+8m
+         LZRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718386963; x=1718991763;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bM1NMWKhTvBKDhiJvIABPQf7fWj9FQUyC1EGuMSIoHw=;
-        b=OKbZphpfLWNWdQicf2e50b3x8PBvskendAg/mgQND2DXTTbZ5bbrz+expyiPLWbPSa
-         QPP+2Id7eLI0x9wUQSn/+zxYixSucPzVNL9UDl6obrV7kFSWX5YMZrqOlZp5jX75t/7/
-         eDtwmMfYBR9Mo/ukirL3yFm0v/t0qRrsoD7LE4mfs4qt0iNolJrnF42lzj1gZWBfrKP5
-         ZDZIn5eiB9lIX28B2V/SnvCNvK9u2Y5ITEcvRU8fg+spYe2rU1FqJ0mO1+8k2o3tmRTD
-         OpNhADugGw+Lk43KiQfGRsOvglvxCTFGygOZ/t0Otg+V4XzsPpS5ESYuh67p1yWIFpu6
-         qQBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7InD0aGKO62lsUM71hY+MmfqQjlqGFFWBTLclKUX4MrbjvubxNoTK+UXQw09yCT0VrIvL2MrblsUAj19bhTv3ET6g
-X-Gm-Message-State: AOJu0Yz/wFDJXduz/q9Arh88huLlkzJRWD/Ro7IcuQ8NgRVFCgB9kpni
-	OPmyclOAEHyb+HEQ6bhZ9pvp+bBEa/A1tZNAH7VwtFxW2UELY+TaxVrA5O2k0kY=
-X-Google-Smtp-Source: AGHT+IEoSaj3uBMyNJHa+eM4H4IxiceSs8RIwrbyXlxmUTZWZTP9MCMC60FWMm4vkRSUxTEM/gfVyg==
-X-Received: by 2002:a05:6a20:6a1e:b0:1b6:ed32:4613 with SMTP id adf61e73a8af0-1bae7e340ecmr4153548637.2.1718386963038;
-        Fri, 14 Jun 2024 10:42:43 -0700 (PDT)
-Received: from ?IPV6:2604:3d08:9384:1d00:5b09:8db7:b002:cf61? ([2604:3d08:9384:1d00:5b09:8db7:b002:cf61])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-705ccb3d231sm3305580b3a.112.2024.06.14.10.42.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Jun 2024 10:42:42 -0700 (PDT)
-Message-ID: <777e1b13-9a4f-4c32-9ff7-9cedf7417695@linaro.org>
-Date: Fri, 14 Jun 2024 10:42:41 -0700
+        d=1e100.net; s=20230601; t=1718389438; x=1718994238;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+e1S7VxRmA5wGFSxD1T8KbdKKkr/h73427zkqEMDfd4=;
+        b=LWRVnxxyQffbfFmenCAJEEYYKbNZsZVVQ2H8/w34Wy2xdBZwAd3Xu8YYdpwVUvTG83
+         1UEDkGXkWePAdYwQGgrV6Lhx15CaMtlpva5jDwV9v9b/v/KlYwB65Jpan/Hqq+GsJVnR
+         KAsuMKh7MAiJ/3r5naN0ewIYb69j0hZDiEUqXARn1/KL4D4LEhE/2Hym5w8ujfqbgu9D
+         m+vzmBJDzwP0t6QGQWEXm588tNy1FJAq12mRRnIk7wIkOSunNDvGZxhiiALxm6gOPvRn
+         rHTxHOH49CZHxTTlxZjMutw628aEK2dnQYDF8NfAyx4l1m2RpGPqZaT1rOjWyzz5AhQg
+         KEbw==
+X-Forwarded-Encrypted: i=1; AJvYcCUMeGf1vPTvx7ULYehBZBjwLgHnV5tzOVMXvE/QIuqNCF4VpGC7MsQA3VqPFUcvyavEEVgwQxHPrrMtq2UjZduVU+Mw
+X-Gm-Message-State: AOJu0Yx6Ml8WTWvEH7LU1SE1JqfV07GLtmC2UjCHlOYZQa9W88XsSo1X
+	7BiGqi1mb5lAr++bDYBMiJYM/Nez/PJENxrsEcR3LpcD/+8MpT+t0+RtACnsP+uM4eodABBl9wd
+	RDJAHtgIO/0ULIR6vsjCGlKrTL6W4DoJtg9A+
+X-Google-Smtp-Source: AGHT+IH+9subwK96UF5eNA7C1xIBVfzLuBaLXzzEgBSMa1vnBDab4AZtlky3wQKAROgOb6aooh80p+OgpnovU+m6mmo=
+X-Received: by 2002:ac8:5a08:0:b0:441:630e:110a with SMTP id
+ d75a77b69052e-4434f82a2e6mr155091cf.17.1718389438198; Fri, 14 Jun 2024
+ 11:23:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 9/9] contrib/plugins: add ips plugin example for cost
- modeling
-Content-Language: en-US
-To: "Dr. David Alan Gilbert" <dave@treblig.org>,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>,
- Ilya Leoshkevich <iii@linux.ibm.com>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Mark Burton <mburton@qti.qualcomm.com>, qemu-s390x@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
- Laurent Vivier <lvivier@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Alexandre Iooss <erdnaxe@crans.org>, qemu-arm@nongnu.org,
- Alexander Graf <agraf@csgraf.de>, Nicholas Piggin <npiggin@gmail.com>,
- Marco Liebel <mliebel@qti.qualcomm.com>, Thomas Huth <thuth@redhat.com>,
- Roman Bolshakov <rbolshakov@ddn.com>, qemu-ppc@nongnu.org,
- Mahmoud Mandour <ma.mandourr@gmail.com>, Cameron Esfahani <dirty@apple.com>,
- Jamie Iles <quic_jiles@quicinc.com>,
- Richard Henderson <richard.henderson@linaro.org>
-References: <20240612153508.1532940-1-alex.bennee@linaro.org>
- <20240612153508.1532940-10-alex.bennee@linaro.org>
- <ZmoM2Sac97PdXWcC@gallifrey>
-From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-In-Reply-To: <ZmoM2Sac97PdXWcC@gallifrey>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+References: <20240611002145.2078921-1-jthoughton@google.com>
+ <20240611002145.2078921-5-jthoughton@google.com> <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
+ <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
+ <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
+ <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
+ <ZmxsCwu4uP1lGsWz@google.com>
+In-Reply-To: <ZmxsCwu4uP1lGsWz@google.com>
+From: James Houghton <jthoughton@google.com>
+Date: Fri, 14 Jun 2024 11:23:21 -0700
+Message-ID: <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
+Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
+To: Sean Christopherson <seanjc@google.com>
+Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
+	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
+	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgRGF2ZSwNCg0KT24gNi8xMi8yNCAxNDowMiwgRHIuIERhdmlkIEFsYW4gR2lsYmVydCB3
-cm90ZToNCj4gKiBBbGV4IEJlbm7DqWUgKGFsZXguYmVubmVlQGxpbmFyby5vcmcpIHdyb3Rl
-Og0KPj4gRnJvbTogUGllcnJpY2sgQm91dmllciA8cGllcnJpY2suYm91dmllckBsaW5hcm8u
-b3JnPg0KPj4NCj4+IFRoaXMgcGx1Z2luIHVzZXMgdGhlIG5ldyB0aW1lIGNvbnRyb2wgaW50
-ZXJmYWNlIHRvIG1ha2UgZGVjaXNpb25zDQo+PiBhYm91dCB0aGUgc3RhdGUgb2YgdGltZSBk
-dXJpbmcgdGhlIGVtdWxhdGlvbi4gVGhlIGFsZ29yaXRobSBpcw0KPj4gY3VycmVudGx5IHZl
-cnkgc2ltcGxlLiBUaGUgdXNlciBzcGVjaWZpZXMgYW4gaXBzIHJhdGUgd2hpY2ggYXBwbGll
-cw0KPj4gcGVyIGNvcmUuIElmIHRoZSBjb3JlIHJ1bnMgYWhlYWQgb2YgaXRzIGFsbG9jYXRl
-ZCBleGVjdXRpb24gdGltZSB0aGUNCj4+IHBsdWdpbiBzbGVlcHMgZm9yIGEgYml0IHRvIGxl
-dCByZWFsIHRpbWUgY2F0Y2ggdXAuIEVpdGhlciB3YXkgdGltZSBpcw0KPj4gdXBkYXRlZCBm
-b3IgdGhlIGVtdWxhdGlvbiBhcyBhIGZ1bmN0aW9uIG9mIHRvdGFsIGV4ZWN1dGVkIGluc3Ry
-dWN0aW9ucw0KPj4gd2l0aCBzb21lIGFkanVzdG1lbnRzIGZvciBjb3JlcyB0aGF0IGlkbGUu
-DQo+IA0KPiBBIGZldyByYW5kb20gdGhvdWdodHM6DQo+ICAgIGEpIEFyZSB0aGVyZSBhbnkg
-ZGVmaW5pdGlvbnMgb2Ygd2hhdCBhIHBsdWdpbiB0aGF0IGNvbnRyb2xzIHRpbWUNCj4gICAg
-ICAgc2hvdWxkIGRvIHdpdGggYSBsaXZlIG1pZ3JhdGlvbj8NCg0KSXQncyBub3Qgc29tZXRo
-aW5nIHRoYXQgd2FzIGNvbnNpZGVyZWQgYXMgcGFydCBvZiB0aGlzIHdvcmsuDQoNCj4gICAg
-YikgVGhlIHNsZWVwIGluIG1pZ3JhdGlvbi9kaXJ0eXJhdGUuYyBwb2ludHMgb3V0IGdfdXNs
-ZWVwIG1pZ2h0DQo+ICAgICAgIHNsZWVwIGZvciBsb25nZXIsIHNvIHJlYWRzIHRoZSBhY3R1
-YWwgd2FsbCBjbG9jayB0aW1lIHRvDQo+ICAgICAgIGZpZ3VyZSBvdXQgYSBuZXcgJ25vdycu
-DQoNClRoZSBjdXJyZW50IEFQSSBtZW50aW9ucyB0aW1lIHN0YXJ0cyBhdCAwIGZyb20gcWVt
-dSBzdGFydHVwLiBNYXliZSB3ZSANCmNvdWxkIGNvbnNpZGVyIGluIHRoZSBmdXR1cmUgdG8g
-Y2hhbmdlIHRoaXMgYmVoYXZpb3IgdG8gcmV0cmlldmUgdGltZSANCmZyb20gYW4gZXhpc3Rp
-bmcgbWlncmF0ZWQgbWFjaGluZS4NCg0KPiAgICBjKSBBIGZ1biB0aGluZyB0byBkbyB3aXRo
-IHRoaXMgd291bGQgYmUgdG8gZm9sbG93IGFuIGV4dGVybmFsIHNpbXVsYXRpb24NCj4gICAg
-ICAgb3IgMm5kIHFlbXUsIHRyeWluZyB0byBrZWVwIHRoZSB0d28gZnJvbSBydW5uaW5nIHRv
-byBmYXIgcGFzdA0KPiAgICAgICBlYWNoIG90aGVyLg0KPiANCg0KQmFzaWNhbGx5LCB0byBz
-bG93IHRoZSBmaXJzdCBvbmUsIHdhaXRpbmcgZm9yIHRoZSByZXBsaWNhdGVkIG9uZSB0byAN
-CmNhdGNoIHVwPw0KDQo+IERhdmUgPg0KPj4gRXhhbXBsZXMNCj4+IC0tLS0tLS0tDQo+Pg0K
-Pj4gU2xvdyBkb3duIGV4ZWN1dGlvbiBvZiAvYmluL3RydWU6DQo+PiAkIG51bV9pbnNuPSQo
-Li9idWlsZC9xZW11LXg4Nl82NCAtcGx1Z2luIC4vYnVpbGQvdGVzdHMvcGx1Z2luL2xpYmlu
-c24uc28gLWQgcGx1Z2luIC9iaW4vdHJ1ZSB8JiBncmVwIHRvdGFsIHwgc2VkIC1lICdzLy4q
-OiAvLycpDQo+PiAkIHRpbWUgLi9idWlsZC9xZW11LXg4Nl82NCAtcGx1Z2luIC4vYnVpbGQv
-Y29udHJpYi9wbHVnaW5zL2xpYmlwcy5zbyxpcHM9JCgoJG51bV9pbnNuLzQpKSAvYmluL3Ry
-dWUNCj4+IHJlYWwgNC4wMDBzDQo+Pg0KPj4gQm9vdCBhIExpbnV4IGtlcm5lbCBzaW11bGF0
-aW5nIGEgMjUwTUh6IGNwdToNCj4+ICQgL2J1aWxkL3FlbXUtc3lzdGVtLXg4Nl82NCAta2Vy
-bmVsIC9ib290L3ZtbGludXotNi4xLjAtMjEtYW1kNjQgLWFwcGVuZCAiY29uc29sZT10dHlT
-MCIgLXBsdWdpbiAuL2J1aWxkL2NvbnRyaWIvcGx1Z2lucy9saWJpcHMuc28saXBzPSQoKDI1
-MCoxMDAwKjEwMDApKSAtc21wIDEgLW0gNTEyDQo+PiBjaGVjayB0aW1lIHVudGlsIGtlcm5l
-bCBwYW5pYyBvbiBzZXJpYWwwDQo+Pg0KPj4gVGVzdGVkIGluIHN5c3RlbSBtb2RlIGJ5IGJv
-b3RpbmcgYSBmdWxsIGRlYmlhbiBzeXN0ZW0sIGFuZCB1c2luZzoNCj4+ICQgc3lzYmVuY2gg
-Y3B1IHJ1bg0KPj4gUGVyZm9ybWFuY2UgZGVjcmVhc2UgbGluZWFybHkgd2l0aCB0aGUgZ2l2
-ZW4gbnVtYmVyIG9mIGlwcy4NCj4+DQo+PiBTaWduZWQtb2ZmLWJ5OiBQaWVycmljayBCb3V2
-aWVyIDxwaWVycmljay5ib3V2aWVyQGxpbmFyby5vcmc+DQo+PiBNZXNzYWdlLUlkOiA8MjAy
-NDA1MzAyMjA2MTAuMTI0NTQyNC03LXBpZXJyaWNrLmJvdXZpZXJAbGluYXJvLm9yZz4NCj4+
-IC0tLQ0KPj4gICBjb250cmliL3BsdWdpbnMvaXBzLmMgICAgfCAxNjQgKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+PiAgIGNvbnRyaWIvcGx1Z2lucy9NYWtl
-ZmlsZSB8ICAgMSArDQo+PiAgIDIgZmlsZXMgY2hhbmdlZCwgMTY1IGluc2VydGlvbnMoKykN
-Cj4+ICAgY3JlYXRlIG1vZGUgMTAwNjQ0IGNvbnRyaWIvcGx1Z2lucy9pcHMuYw0KPj4NCj4+
-IGRpZmYgLS1naXQgYS9jb250cmliL3BsdWdpbnMvaXBzLmMgYi9jb250cmliL3BsdWdpbnMv
-aXBzLmMNCj4+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+PiBpbmRleCAwMDAwMDAwMDAwLi5k
-Yjc3NzI5MjY0DQo+PiAtLS0gL2Rldi9udWxsDQo+PiArKysgYi9jb250cmliL3BsdWdpbnMv
-aXBzLmMNCj4+IEBAIC0wLDAgKzEsMTY0IEBADQo+PiArLyoNCj4+ICsgKiBpcHMgcmF0ZSBs
-aW1pdGluZyBwbHVnaW4uDQo+PiArICoNCj4+ICsgKiBUaGlzIHBsdWdpbiBjYW4gYmUgdXNl
-ZCB0byByZXN0cmljdCB0aGUgZXhlY3V0aW9uIG9mIGEgc3lzdGVtIHRvIGENCj4+ICsgKiBw
-YXJ0aWN1bGFyIG51bWJlciBvZiBJbnN0cnVjdGlvbnMgUGVyIFNlY29uZCAoaXBzKS4gVGhp
-cyBjb250cm9scw0KPj4gKyAqIHRpbWUgYXMgc2VlbiBieSB0aGUgZ3Vlc3Qgc28gd2hpbGUg
-d2FsbC1jbG9jayB0aW1lIG1heSBiZSBsb25nZXINCj4+ICsgKiBmcm9tIHRoZSBndWVzdHMg
-cG9pbnQgb2YgdmlldyB0aW1lIHdpbGwgcGFzcyBhdCB0aGUgbm9ybWFsIHJhdGUuDQo+PiAr
-ICoNCj4+ICsgKiBUaGlzIHVzZXMgdGhlIG5ldyBwbHVnaW4gQVBJIHdoaWNoIGFsbG93cyB0
-aGUgcGx1Z2luIHRvIGNvbnRyb2wNCj4+ICsgKiBzeXN0ZW0gdGltZS4NCj4+ICsgKg0KPj4g
-KyAqIENvcHlyaWdodCAoYykgMjAyMyBMaW5hcm8gTHRkDQo+PiArICoNCj4+ICsgKiBTUERY
-LUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vci1sYXRlcg0KPj4gKyAqLw0KPj4gKw0K
-Pj4gKyNpbmNsdWRlIDxzdGRpby5oPg0KPj4gKyNpbmNsdWRlIDxnbGliLmg+DQo+PiArI2lu
-Y2x1ZGUgPHFlbXUtcGx1Z2luLmg+DQo+PiArDQo+PiArUUVNVV9QTFVHSU5fRVhQT1JUIGlu
-dCBxZW11X3BsdWdpbl92ZXJzaW9uID0gUUVNVV9QTFVHSU5fVkVSU0lPTjsNCj4+ICsNCj4+
-ICsvKiBob3cgbWFueSB0aW1lcyBkbyB3ZSB1cGRhdGUgdGltZSBwZXIgc2VjICovDQo+PiAr
-I2RlZmluZSBOVU1fVElNRV9VUERBVEVfUEVSX1NFQyAxMA0KPj4gKyNkZWZpbmUgTlNFQ19J
-Tl9PTkVfU0VDICgxMDAwICogMTAwMCAqIDEwMDApDQo+PiArDQo+PiArc3RhdGljIEdNdXRl
-eCBnbG9iYWxfc3RhdGVfbG9jazsNCj4+ICsNCj4+ICtzdGF0aWMgdWludDY0X3QgbWF4X2lu
-c25fcGVyX3NlY29uZCA9IDEwMDAgKiAxMDAwICogMTAwMDsgLyogaXBzIHBlciBjb3JlLCBw
-ZXIgc2Vjb25kICovDQo+PiArc3RhdGljIHVpbnQ2NF90IG1heF9pbnNuX3Blcl9xdWFudHVt
-OyAvKiB0cmFwIGV2ZXJ5IE4gaW5zdHJ1Y3Rpb25zICovDQo+PiArc3RhdGljIGludDY0X3Qg
-dmlydHVhbF90aW1lX25zOyAvKiBsYXN0IHNldCB2aXJ0dWFsIHRpbWUgKi8NCj4+ICsNCj4+
-ICtzdGF0aWMgY29uc3Qgdm9pZCAqdGltZV9oYW5kbGU7DQo+PiArDQo+PiArdHlwZWRlZiBz
-dHJ1Y3Qgew0KPj4gKyAgICB1aW50NjRfdCB0b3RhbF9pbnNuOw0KPj4gKyAgICB1aW50NjRf
-dCBxdWFudHVtX2luc247IC8qIGluc24gaW4gbGFzdCBxdWFudHVtICovDQo+PiArICAgIGlu
-dDY0X3QgbGFzdF9xdWFudHVtX3RpbWU7IC8qIHRpbWUgd2hlbiBsYXN0IHF1YW50dW0gc3Rh
-cnRlZCAqLw0KPj4gK30gdkNQVVRpbWU7DQo+PiArDQo+PiArc3RydWN0IHFlbXVfcGx1Z2lu
-X3Njb3JlYm9hcmQgKnZjcHVzOw0KPj4gKw0KPj4gKy8qIHJldHVybiBlcG9jaCB0aW1lIGlu
-IG5zICovDQo+PiArc3RhdGljIGludDY0X3Qgbm93X25zKHZvaWQpDQo+PiArew0KPj4gKyAg
-ICByZXR1cm4gZ19nZXRfcmVhbF90aW1lKCkgKiAxMDAwOw0KPj4gK30NCj4+ICsNCj4+ICtz
-dGF0aWMgdWludDY0X3QgbnVtX2luc25fZHVyaW5nKGludDY0X3QgZWxhcHNlZF9ucykNCj4+
-ICt7DQo+PiArICAgIGRvdWJsZSBudW1fc2VjcyA9IGVsYXBzZWRfbnMgLyAoZG91YmxlKSBO
-U0VDX0lOX09ORV9TRUM7DQo+PiArICAgIHJldHVybiBudW1fc2VjcyAqIChkb3VibGUpIG1h
-eF9pbnNuX3Blcl9zZWNvbmQ7DQo+PiArfQ0KPj4gKw0KPj4gK3N0YXRpYyBpbnQ2NF90IHRp
-bWVfZm9yX2luc24odWludDY0X3QgbnVtX2luc24pDQo+PiArew0KPj4gKyAgICBkb3VibGUg
-bnVtX3NlY3MgPSAoZG91YmxlKSBudW1faW5zbiAvIChkb3VibGUpIG1heF9pbnNuX3Blcl9z
-ZWNvbmQ7DQo+PiArICAgIHJldHVybiBudW1fc2VjcyAqIChkb3VibGUpIE5TRUNfSU5fT05F
-X1NFQzsNCj4+ICt9DQo+PiArDQo+PiArc3RhdGljIHZvaWQgdXBkYXRlX3N5c3RlbV90aW1l
-KHZDUFVUaW1lICp2Y3B1KQ0KPj4gK3sNCj4+ICsgICAgaW50NjRfdCBlbGFwc2VkX25zID0g
-bm93X25zKCkgLSB2Y3B1LT5sYXN0X3F1YW50dW1fdGltZTsNCj4+ICsgICAgdWludDY0X3Qg
-bWF4X2luc24gPSBudW1faW5zbl9kdXJpbmcoZWxhcHNlZF9ucyk7DQo+PiArDQo+PiArICAg
-IGlmICh2Y3B1LT5xdWFudHVtX2luc24gPj0gbWF4X2luc24pIHsNCj4+ICsgICAgICAgIC8q
-IHRoaXMgdmNwdSByYW4gZmFzdGVyIHRoYW4gZXhwZWN0ZWQsIHNvIGl0IGhhcyB0byBzbGVl
-cCAqLw0KPj4gKyAgICAgICAgdWludDY0X3QgaW5zbl9hZHZhbmNlID0gdmNwdS0+cXVhbnR1
-bV9pbnNuIC0gbWF4X2luc247DQo+PiArICAgICAgICB1aW50NjRfdCB0aW1lX2FkdmFuY2Vf
-bnMgPSB0aW1lX2Zvcl9pbnNuKGluc25fYWR2YW5jZSk7DQo+PiArICAgICAgICBpbnQ2NF90
-IHNsZWVwX3VzID0gdGltZV9hZHZhbmNlX25zIC8gMTAwMDsNCj4+ICsgICAgICAgIGdfdXNs
-ZWVwKHNsZWVwX3VzKTsNCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAgICB2Y3B1LT50b3RhbF9p
-bnNuICs9IHZjcHUtPnF1YW50dW1faW5zbjsNCj4+ICsgICAgdmNwdS0+cXVhbnR1bV9pbnNu
-ID0gMDsNCj4+ICsgICAgdmNwdS0+bGFzdF9xdWFudHVtX3RpbWUgPSBub3dfbnMoKTsNCj4+
-ICsNCj4+ICsgICAgLyogYmFzZWQgb24gdG90YWwgbnVtYmVyIG9mIGluc3RydWN0aW9ucywg
-d2hhdCBzaG91bGQgYmUgdGhlIG5ldyB0aW1lPyAqLw0KPj4gKyAgICBpbnQ2NF90IG5ld192
-aXJ0dWFsX3RpbWUgPSB0aW1lX2Zvcl9pbnNuKHZjcHUtPnRvdGFsX2luc24pOw0KPj4gKw0K
-Pj4gKyAgICBnX211dGV4X2xvY2soJmdsb2JhbF9zdGF0ZV9sb2NrKTsNCj4+ICsNCj4+ICsg
-ICAgLyogVGltZSBvbmx5IG1vdmVzIGZvcndhcmQuIEFub3RoZXIgdmNwdSBtaWdodCBoYXZl
-IHVwZGF0ZWQgaXQgYWxyZWFkeS4gKi8NCj4+ICsgICAgaWYgKG5ld192aXJ0dWFsX3RpbWUg
-PiB2aXJ0dWFsX3RpbWVfbnMpIHsNCj4+ICsgICAgICAgIHFlbXVfcGx1Z2luX3VwZGF0ZV9u
-cyh0aW1lX2hhbmRsZSwgbmV3X3ZpcnR1YWxfdGltZSk7DQo+PiArICAgICAgICB2aXJ0dWFs
-X3RpbWVfbnMgPSBuZXdfdmlydHVhbF90aW1lOw0KPj4gKyAgICB9DQo+PiArDQo+PiArICAg
-IGdfbXV0ZXhfdW5sb2NrKCZnbG9iYWxfc3RhdGVfbG9jayk7DQo+PiArfQ0KPj4gKw0KPj4g
-K3N0YXRpYyB2b2lkIHZjcHVfaW5pdChxZW11X3BsdWdpbl9pZF90IGlkLCB1bnNpZ25lZCBp
-bnQgY3B1X2luZGV4KQ0KPj4gK3sNCj4+ICsgICAgdkNQVVRpbWUgKnZjcHUgPSBxZW11X3Bs
-dWdpbl9zY29yZWJvYXJkX2ZpbmQodmNwdXMsIGNwdV9pbmRleCk7DQo+PiArICAgIHZjcHUt
-PnRvdGFsX2luc24gPSAwOw0KPj4gKyAgICB2Y3B1LT5xdWFudHVtX2luc24gPSAwOw0KPj4g
-KyAgICB2Y3B1LT5sYXN0X3F1YW50dW1fdGltZSA9IG5vd19ucygpOw0KPj4gK30NCj4+ICsN
-Cj4+ICtzdGF0aWMgdm9pZCB2Y3B1X2V4aXQocWVtdV9wbHVnaW5faWRfdCBpZCwgdW5zaWdu
-ZWQgaW50IGNwdV9pbmRleCkNCj4+ICt7DQo+PiArICAgIHZDUFVUaW1lICp2Y3B1ID0gcWVt
-dV9wbHVnaW5fc2NvcmVib2FyZF9maW5kKHZjcHVzLCBjcHVfaW5kZXgpOw0KPj4gKyAgICB1
-cGRhdGVfc3lzdGVtX3RpbWUodmNwdSk7DQo+PiArfQ0KPj4gKw0KPj4gK3N0YXRpYyB2b2lk
-IGV2ZXJ5X3F1YW50dW1faW5zbih1bnNpZ25lZCBpbnQgY3B1X2luZGV4LCB2b2lkICp1ZGF0
-YSkNCj4+ICt7DQo+PiArICAgIHZDUFVUaW1lICp2Y3B1ID0gcWVtdV9wbHVnaW5fc2NvcmVi
-b2FyZF9maW5kKHZjcHVzLCBjcHVfaW5kZXgpOw0KPj4gKyAgICBnX2Fzc2VydCh2Y3B1LT5x
-dWFudHVtX2luc24gPj0gbWF4X2luc25fcGVyX3F1YW50dW0pOw0KPj4gKyAgICB1cGRhdGVf
-c3lzdGVtX3RpbWUodmNwdSk7DQo+PiArfQ0KPj4gKw0KPj4gK3N0YXRpYyB2b2lkIHZjcHVf
-dGJfdHJhbnMocWVtdV9wbHVnaW5faWRfdCBpZCwgc3RydWN0IHFlbXVfcGx1Z2luX3RiICp0
-YikNCj4+ICt7DQo+PiArICAgIHNpemVfdCBuX2luc25zID0gcWVtdV9wbHVnaW5fdGJfbl9p
-bnNucyh0Yik7DQo+PiArICAgIHFlbXVfcGx1Z2luX3U2NCBxdWFudHVtX2luc24gPQ0KPj4g
-KyAgICAgICAgcWVtdV9wbHVnaW5fc2NvcmVib2FyZF91NjRfaW5fc3RydWN0KHZjcHVzLCB2
-Q1BVVGltZSwgcXVhbnR1bV9pbnNuKTsNCj4+ICsgICAgLyogY291bnQgKGFuZCBldmVudHVh
-bGx5IHRyYXApIG9uY2UgcGVyIHRiICovDQo+PiArICAgIHFlbXVfcGx1Z2luX3JlZ2lzdGVy
-X3ZjcHVfdGJfZXhlY19pbmxpbmVfcGVyX3ZjcHUoDQo+PiArICAgICAgICB0YiwgUUVNVV9Q
-TFVHSU5fSU5MSU5FX0FERF9VNjQsIHF1YW50dW1faW5zbiwgbl9pbnNucyk7DQo+PiArICAg
-IHFlbXVfcGx1Z2luX3JlZ2lzdGVyX3ZjcHVfdGJfZXhlY19jb25kX2NiKA0KPj4gKyAgICAg
-ICAgdGIsIGV2ZXJ5X3F1YW50dW1faW5zbiwNCj4+ICsgICAgICAgIFFFTVVfUExVR0lOX0NC
-X05PX1JFR1MsIFFFTVVfUExVR0lOX0NPTkRfR0UsDQo+PiArICAgICAgICBxdWFudHVtX2lu
-c24sIG1heF9pbnNuX3Blcl9xdWFudHVtLCBOVUxMKTsNCj4+ICt9DQo+PiArDQo+PiArc3Rh
-dGljIHZvaWQgcGx1Z2luX2V4aXQocWVtdV9wbHVnaW5faWRfdCBpZCwgdm9pZCAqdWRhdGEp
-DQo+PiArew0KPj4gKyAgICBxZW11X3BsdWdpbl9zY29yZWJvYXJkX2ZyZWUodmNwdXMpOw0K
-Pj4gK30NCj4+ICsNCj4+ICtRRU1VX1BMVUdJTl9FWFBPUlQgaW50IHFlbXVfcGx1Z2luX2lu
-c3RhbGwocWVtdV9wbHVnaW5faWRfdCBpZCwNCj4+ICsgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgY29uc3QgcWVtdV9pbmZvX3QgKmluZm8sIGludCBhcmdj
-LA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjaGFy
-ICoqYXJndikNCj4+ICt7DQo+PiArICAgIGZvciAoaW50IGkgPSAwOyBpIDwgYXJnYzsgaSsr
-KSB7DQo+PiArICAgICAgICBjaGFyICpvcHQgPSBhcmd2W2ldOw0KPj4gKyAgICAgICAgZ19h
-dXRvKEdTdHJ2KSB0b2tlbnMgPSBnX3N0cnNwbGl0KG9wdCwgIj0iLCAyKTsNCj4+ICsgICAg
-ICAgIGlmIChnX3N0cmNtcDAodG9rZW5zWzBdLCAiaXBzIikgPT0gMCkgew0KPj4gKyAgICAg
-ICAgICAgIG1heF9pbnNuX3Blcl9zZWNvbmQgPSBnX2FzY2lpX3N0cnRvdWxsKHRva2Vuc1sx
-XSwgTlVMTCwgMTApOw0KPj4gKyAgICAgICAgICAgIGlmICghbWF4X2luc25fcGVyX3NlY29u
-ZCAmJiBlcnJubykgew0KPj4gKyAgICAgICAgICAgICAgICBmcHJpbnRmKHN0ZGVyciwgIiVz
-OiBjb3VsZG4ndCBwYXJzZSAlcyAoJXMpXG4iLA0KPj4gKyAgICAgICAgICAgICAgICAgICAg
-ICAgIF9fZnVuY19fLCB0b2tlbnNbMV0sIGdfc3RyZXJyb3IoZXJybm8pKTsNCj4+ICsgICAg
-ICAgICAgICAgICAgcmV0dXJuIC0xOw0KPj4gKyAgICAgICAgICAgIH0NCj4+ICsgICAgICAg
-IH0gZWxzZSB7DQo+PiArICAgICAgICAgICAgZnByaW50ZihzdGRlcnIsICJvcHRpb24gcGFy
-c2luZyBmYWlsZWQ6ICVzXG4iLCBvcHQpOw0KPj4gKyAgICAgICAgICAgIHJldHVybiAtMTsN
-Cj4+ICsgICAgICAgIH0NCj4+ICsgICAgfQ0KPj4gKw0KPj4gKyAgICB2Y3B1cyA9IHFlbXVf
-cGx1Z2luX3Njb3JlYm9hcmRfbmV3KHNpemVvZih2Q1BVVGltZSkpOw0KPj4gKyAgICBtYXhf
-aW5zbl9wZXJfcXVhbnR1bSA9IG1heF9pbnNuX3Blcl9zZWNvbmQgLyBOVU1fVElNRV9VUERB
-VEVfUEVSX1NFQzsNCj4+ICsNCj4+ICsgICAgdGltZV9oYW5kbGUgPSBxZW11X3BsdWdpbl9y
-ZXF1ZXN0X3RpbWVfY29udHJvbCgpOw0KPj4gKyAgICBnX2Fzc2VydCh0aW1lX2hhbmRsZSk7
-DQo+PiArDQo+PiArICAgIHFlbXVfcGx1Z2luX3JlZ2lzdGVyX3ZjcHVfdGJfdHJhbnNfY2Io
-aWQsIHZjcHVfdGJfdHJhbnMpOw0KPj4gKyAgICBxZW11X3BsdWdpbl9yZWdpc3Rlcl92Y3B1
-X2luaXRfY2IoaWQsIHZjcHVfaW5pdCk7DQo+PiArICAgIHFlbXVfcGx1Z2luX3JlZ2lzdGVy
-X3ZjcHVfZXhpdF9jYihpZCwgdmNwdV9leGl0KTsNCj4+ICsgICAgcWVtdV9wbHVnaW5fcmVn
-aXN0ZXJfYXRleGl0X2NiKGlkLCBwbHVnaW5fZXhpdCwgTlVMTCk7DQo+PiArDQo+PiArICAg
-IHJldHVybiAwOw0KPj4gK30NCj4+IGRpZmYgLS1naXQgYS9jb250cmliL3BsdWdpbnMvTWFr
-ZWZpbGUgYi9jb250cmliL3BsdWdpbnMvTWFrZWZpbGUNCj4+IGluZGV4IDBiNjRkMmMxZTMu
-LjQ0OWVhZDExMzAgMTAwNjQ0DQo+PiAtLS0gYS9jb250cmliL3BsdWdpbnMvTWFrZWZpbGUN
-Cj4+ICsrKyBiL2NvbnRyaWIvcGx1Z2lucy9NYWtlZmlsZQ0KPj4gQEAgLTI3LDYgKzI3LDcg
-QEAgZW5kaWYNCj4+ICAgTkFNRVMgKz0gaHdwcm9maWxlDQo+PiAgIE5BTUVTICs9IGNhY2hl
-DQo+PiAgIE5BTUVTICs9IGRyY292DQo+PiArTkFNRVMgKz0gaXBzDQo+PiAgIA0KPj4gICBp
-ZmVxICgkKENPTkZJR19XSU4zMikseSkNCj4+ICAgU09fU1VGRklYIDo9IC5kbGwNCj4+IC0t
-IA0KPj4gMi4zOS4yDQo+Pg0K
+On Fri, Jun 14, 2024 at 9:13=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Jun 13, 2024, James Houghton wrote:
+> > On Tue, Jun 11, 2024 at 5:34=E2=80=AFPM Sean Christopherson <seanjc@goo=
+gle.com> wrote:
+> > > A flag would also avoid an indirect call and thus a RETPOLINE when CO=
+NFIG_RETPOLINE=3Dy,
+> > > i.e. would be a minor optimization when KVM doesn't suppport fast agi=
+ng.  But that's
+> > > probably a pretty unlikely combination, so it's probably not a valid =
+argument.
+> > >
+> > > So, I guess I don't have a strong opinion?
+> >
+> > (Sorry for the somewhat delayed response... spent some time actually
+> > writing what this would look like.)
+> >
+> > I see what you mean, thanks! So has_fast_aging might be set by KVM if
+> > the architecture sets a Kconfig saying that it understands the concept
+> > of fast aging, basically what the presence of this v5's
+> > test_clear_young_fast_only() indicates.
+>
+> It would need to be a runtime setting, because KVM x86-64 with tdp_mmu_en=
+abled=3Dfalse
+> doesn't support fast aging (uses the shadow MMU even for TDP).
+
+I see. I'm not sure if it makes sense to put this in `ops` as you
+originally had it then (it seems like a bit of a pain anyway). I could
+just make it a member of `struct mmu_notifier` itself.
+
+> > So just to be clear, for test_young(), I intend to have a patch in v6
+> > to elide the shadow MMU check if the TDP MMU indicates Accessed. Seems
+> > like a pure win; no reason not to include it if we're making logic
+> > changes here anyway.
+>
+> I don't think that's correct.  The initial fast_only=3Dfalse aging should=
+ process
+> shadow MMUs (nested TDP) and TDP MMUs, otherwise a future fast_only=3Dfal=
+se would
+> get a false positive on young due to failing to clear the Accessed bit in=
+ the
+> shadow MMU.  E.g. if page X is accessed by both L1 and L2, then aged, and=
+ never
+> accessed again, the Accessed bit would still be set in the page tables fo=
+r L2.
+
+For clear_young(fast_only=3Dfalse), yeah we need to check and clear
+Accessed for both MMUs. But for test_young(fast_only=3Dfalse), I don't
+see why we couldn't just return early if the TDP MMU reports young.
+
+> My thought for MMU_NOTIFY_WAS_FAST below (which again is a bad name) is t=
+o
+> communicate to MGLRU that the page was found to be young in an MMU that s=
+upports
+> fast aging, i.e. that looking around at other SPTEs is worth doing.
+
+That makes sense; I don't think this little test_young() optimization
+affects that.
+
+> > > > > So rather than failing the fast aging, I think what we want is to=
+ know if an
+> > > > > mmu_notifier found a young SPTE during a fast lookup.  E.g. somet=
+hing like this
+> > > > > in KVM, where using kvm_has_shadow_mmu_sptes() instead of kvm_mem=
+slots_have_rmaps()
+> > > > > is an optional optimization to avoid taking mmu_lock for write in=
+ paths where a
+> > > > > (very rare) false negative is acceptable.
+> > > > >
+> > > > >   static bool kvm_has_shadow_mmu_sptes(struct kvm *kvm)
+> > > > >   {
+> > > > >         return !tdp_mmu_enabled || READ_ONCE(kvm->arch.indirect_s=
+hadow_pages);
+> > > > >   }
+> > > > >
+> > > > >   static int __kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range =
+*range,
+> > > > >                          bool fast_only)
+> > > > >   {
+> > > > >         int young =3D 0;
+> > > > >
+> > > > >         if (!fast_only && kvm_has_shadow_mmu_sptes(kvm)) {
+> > > > >                 write_lock(&kvm->mmu_lock);
+> > > > >                 young =3D kvm_handle_gfn_range(kvm, range, kvm_ag=
+e_rmap);
+> > > > >                 write_unlock(&kvm->mmu_lock);
+> > > > >         }
+> > > > >
+> > > > >         if (tdp_mmu_enabled && kvm_tdp_mmu_age_gfn_range(kvm, ran=
+ge))
+> > > > >                 young =3D 1 | MMU_NOTIFY_WAS_FAST;
+> >
+> > The most straightforward way (IMHO) to return something like `1 |
+> > MMU_NOTIFY_WAS_FAST` up to the MMU notifier itself is to make
+> > gfn_handler_t return int instead of bool.
+>
+> Hrm, all the options are unpleasant.  Modifying gfn_handler_t to return a=
+n int
+> will require an absurd amount of churn (all implementations in all archic=
+tures),
+> and I don't love that the APIs that return true/false to indicate "flush"=
+ would
+> lose their boolean-ness.
+>
+> One idea would be to add kvm_mmu_notifier_arg.aging_was_fast or so, and t=
+hen
+> refactor kvm_handle_hva_range_no_flush() into a dedicated aging helper, a=
+nd have
+> it morph the KVM-internal flag into an MMU_NOTIFIER flag.  It's not perec=
+t either,
+> but it requires far less churn and keeps some of the KVM<=3D>mmu_notifer =
+details in
+> common KVM code.
+
+SGTM. I think this will work. Thanks!
+
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 7b9d2633a931..c11a359b6ff5 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -258,6 +258,7 @@ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
+>  #ifdef CONFIG_KVM_GENERIC_MMU_NOTIFIER
+>  union kvm_mmu_notifier_arg {
+>         unsigned long attributes;
+> +       bool aging_was_fast;
+>  };
+>
+>  struct kvm_gfn_range {
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 436ca41f61e5..a936f6bedd97 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -685,10 +685,10 @@ static __always_inline int kvm_handle_hva_range(str=
+uct mmu_notifier *mn,
+>         return __kvm_handle_hva_range(kvm, &range).ret;
+>  }
+>
+> -static __always_inline int kvm_handle_hva_range_no_flush(struct mmu_noti=
+fier *mn,
+> -                                                        unsigned long st=
+art,
+> -                                                        unsigned long en=
+d,
+> -                                                        gfn_handler_t ha=
+ndler)
+> +static __always_inline int kvm_age_hva_range(struct mmu_notifier *mn,
+> +                                            unsigned long start,
+> +                                            unsigned long end,
+> +                                            bool flush_if_young)
+>  {
+>         struct kvm *kvm =3D mmu_notifier_to_kvm(mn);
+>         const struct kvm_mmu_notifier_range range =3D {
+> @@ -696,11 +696,14 @@ static __always_inline int kvm_handle_hva_range_no_=
+flush(struct mmu_notifier *mn
+>                 .end            =3D end,
+>                 .handler        =3D handler,
+>                 .on_lock        =3D (void *)kvm_null_fn,
+> -               .flush_on_ret   =3D false,
+> +               .flush_on_ret   =3D flush_if_young,
+>                 .may_block      =3D false,
+> +               .aging_was_fast =3D false,
+>         };
+>
+> -       return __kvm_handle_hva_range(kvm, &range).ret;
+> +       bool young =3D __kvm_handle_hva_range(kvm, &range).ret;
+> +
+> +       return (int)young | (range.aging_was_fast ? MMU_NOTIFIER_FAST_AGI=
+NG : 0);
+>  }
+>
+>  void kvm_mmu_invalidate_begin(struct kvm *kvm)
+> @@ -865,7 +868,7 @@ static int kvm_mmu_notifier_clear_flush_young(struct =
+mmu_notifier *mn,
+>  {
+>         trace_kvm_age_hva(start, end);
+>
+> -       return kvm_handle_hva_range(mn, start, end, kvm_age_gfn);
+> +       return kvm_age_hva_range(mn, start, end, true);
+>  }
+>
+>  static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
+> @@ -875,20 +878,7 @@ static int kvm_mmu_notifier_clear_young(struct mmu_n=
+otifier *mn,
+>  {
+>         trace_kvm_age_hva(start, end);
+>
+> -       /*
+> -        * Even though we do not flush TLB, this will still adversely
+> -        * affect performance on pre-Haswell Intel EPT, where there is
+> -        * no EPT Access Bit to clear so that we have to tear down EPT
+> -        * tables instead. If we find this unacceptable, we can always
+> -        * add a parameter to kvm_age_hva so that it effectively doesn't
+> -        * do anything on clear_young.
+> -        *
+> -        * Also note that currently we never issue secondary TLB flushes
+> -        * from clear_young, leaving this job up to the regular system
+> -        * cadence. If we find this inaccurate, we might come up with a
+> -        * more sophisticated heuristic later.
+> -        */
+> -       return kvm_handle_hva_range_no_flush(mn, start, end, kvm_age_gfn)=
+;
+> +       return kvm_age_hva_range(mn, start, end, false);
+>  }
+>
+>  static int kvm_mmu_notifier_test_young(struct mmu_notifier *mn,
+> @@ -897,8 +887,7 @@ static int kvm_mmu_notifier_test_young(struct mmu_not=
+ifier *mn,
+>  {
+>         trace_kvm_test_age_hva(address);
+>
+> -       return kvm_handle_hva_range_no_flush(mn, address, address + 1,
+> -                                            kvm_test_age_gfn);
+> +       return kvm_age_hva_range(mn, address, address + 1, false);
+>  }
+>
+>  static void kvm_mmu_notifier_release(struct mmu_notifier *mn,
+>
+>
+> > > The change, relative to v5, that I am proposing is that MGLRU looks a=
+round if
+> > > the page was young in _a_ "fast" secondary MMU, whereas v5 looks arou=
+nd if and
+> > > only if _all_ secondary MMUs are fast.
+> > >
+> > > In other words, if a fast MMU had a young SPTE, look around _that_ MM=
+U, via the
+> > > fast_only flag.
+> >
+> > Oh, yeah, that's a lot more intelligent than what I had. I think I
+> > fully understand your suggestion; I guess we'll see in v6. :)
+> >
+> > I wonder if this still makes sense if whether or not an MMU is "fast"
+> > is determined by how contended some lock(s) are at the time.
+>
+> No.  Just because a lock wasn't contended on the initial aging doesn't me=
+an it
+> won't be contended on the next round.  E.g. when using KVM x86's shadow M=
+MU, which
+> takes mmu_lock for write for all operations, an aging operation could get=
+ lucky
+> and sneak in while mmu_lock happened to be free, but then get stuck behin=
+d a large
+> queue of operations.
+>
+> The fast-ness needs to be predictable and all but guaranteed, i.e. lockle=
+ss or in
+> an MMU that takes mmu_lock for read in all but the most rare paths.
+
+Aging and look-around themselves only use the fast-only notifiers, so
+they won't ever wait on a lock (well... provided KVM is written like
+that, which I think is a given). should_look_around() will use the
+slow notifier because it (despite its name) is responsible for
+accurately determining if a page is young lest we evict a young page.
+
+So in this case where "fast" means "lock not contended for now", I
+don't think it's necessarily wrong for MGLRU to attempt to find young
+pages, even if sometimes it will bail out because a lock is
+contended/held for a few or even a majority of the pages. Not doing
+look-around is the same as doing look-around and finding that no pages
+are young.
+
+Anyway, I don't think this bit is really all that important unless we
+can demonstrate that KVM participating like this actually results in a
+measurable win.
 
