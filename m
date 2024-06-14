@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-19645-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19646-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD657908072
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 03:02:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1300908074
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 03:04:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5CDF1C21211
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 01:02:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FDCC2841D2
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 01:04:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1B82107;
-	Fri, 14 Jun 2024 01:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83BF1C3D;
+	Fri, 14 Jun 2024 01:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J3eE0NDj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SlNfTSKJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086B7163
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 01:02:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E2B7184E
+	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 01:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718326968; cv=none; b=i5YiH4UAJGKaSpgnFdxv1B7OEFmhEVIt2FWsyuITJoKqKhhW3ilAkIM+Ue5TsrjRqSxjMDo95YFT9fCIunRj6N9ROocf4mh5YYzUcpAoah0NCDKuIvnPz26cyaS4xjPhk1SeeC7WwunXwmtH0Okfi9aQ6906FvfPSLHqJKw1Egw=
+	t=1718327089; cv=none; b=bb4G4GgJZe4bcCDiYrUY7KmIYlAs5I9ehnpyHQy384GfjfNyhIJv3uLLUHp+Qj4IeMRIH8z1bCSeoBWj6v1ofaiNcRyNeUkzXYrP0jZB9FCHPDRN44kEMAVkGy/Rx0Z3Kf31HJ9xAgCR076/eJX138eOBMDVBMLcfvPzqAl76Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718326968; c=relaxed/simple;
-	bh=tFRlYn2K3HB7GCAI89e1+dbTZ6mOUkfUgxVIHYjH+XU=;
+	s=arc-20240116; t=1718327089; c=relaxed/simple;
+	bh=D53EUNtisD/7B6C3C/nJAv5wz7xFtVP26feE2TvDBds=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TYayKCqB3HiiDOX1FfBPUQ1gso5SaVl5eBLuL26IcLlxlxUPty2GvUAg87gL3DDJyaNJUEaR3VicslwVGd5SKHaRIgyBtXigAwWVcnd9sI1VVO9/9/5HibQ3mo31xdJ85emZaRRuuWINpkNdZoOc2s0nSvqiEvEwhvfFO/Pj7z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J3eE0NDj; arc=none smtp.client-ip=198.175.65.20
+	 In-Reply-To:Content-Type; b=eQWosLj7vDiIBBgmTG/gIzwqpB51LRN80h/cLEyldFyvXoF111ZhWHTB72l460AaMx9MerO4fq3EmTIxvsegw1F8sdxLc78fPe/jxoet/10CQoNuuYyg39FkyZk6L2ZN0GMzpIoVsGvbOB7+TMtV8/9nhuQMUFlPLkiWHK01zxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SlNfTSKJ; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718326967; x=1749862967;
+  t=1718327088; x=1749863088;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=tFRlYn2K3HB7GCAI89e1+dbTZ6mOUkfUgxVIHYjH+XU=;
-  b=J3eE0NDjZE7ZKst9TSwxZBOyUnwRp9M0t+iIR+VSSlEvcS+uBXY/l5KS
-   R58daeAnlhfU+gvmoZf1t2U6flIT188kwuZX0eEt672jKfaXXI7/L7V1a
-   KhGkNwib/+z7Vuef3krjCF+QvLr2wbAbaiEojoW6oAth2zDlpV54ImOQE
-   40S85MdgS85TUykOpiPGavkW7u6MnLsavw4f3/H45C8sSopYnh2fJvicR
-   w90YwoJF1YCz7fUGi5YXUU3nzDCoSssEZ1gm7hAL1SaMPPaj39gkmiIaW
-   Osuhv9cLH1vIz7g40lmKr/Valo+hm9etEi8eXHeVDOsJtD1/yVbm/xhxz
+  bh=D53EUNtisD/7B6C3C/nJAv5wz7xFtVP26feE2TvDBds=;
+  b=SlNfTSKJMifkGqqmkAAJvP3xdpYjfD9v/CQ0CCB1RPmGvZse9vtv+ouk
+   4tDaY4mHvWNw7QfI4liyIYpL85mMGJtO7obZSFIfkCXVDiDKtZK0UQoXV
+   gKgYo5F04W21eKlDN2f4e1vukLWEnN/yapai3l4u2dnUuxZXdb+aT25BD
+   tGMHrfCAS6/XTG5XHpSA+wFfmQrNZZ3kGTat2NHafoqHJGBOxVBWMxSnw
+   6pXVIAA9bpR7LpA/lBN0JARHIRqmsBFw5LREEcVZQ7Bnd42XxHQu5lOJ8
+   lfIctdTWISK8QwOx53GYQ5KyqdjJJ+oWm/x4pMJ4ku/ApZw7ofgukkF1n
    g==;
-X-CSE-ConnectionGUID: QCo6o32iRwaXXt1if/sFag==
-X-CSE-MsgGUID: Ydo9u3saSuaLmNzasn6btQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11102"; a="15031202"
+X-CSE-ConnectionGUID: UyMPSGolTJCcRI2i8q8Iuw==
+X-CSE-MsgGUID: 6MjJOqk/QZas/Bz5f9uI3g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11102"; a="32672790"
 X-IronPort-AV: E=Sophos;i="6.08,236,1712646000"; 
-   d="scan'208";a="15031202"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 18:02:47 -0700
-X-CSE-ConnectionGUID: JQOMG1KcRJCFrkc821OyIw==
-X-CSE-MsgGUID: ZL1yDBfUSwSK4I0y1Idc5w==
+   d="scan'208";a="32672790"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 18:04:47 -0700
+X-CSE-ConnectionGUID: +I0WkiJ3R+GhmvqUMIPdUA==
+X-CSE-MsgGUID: BEMWjHzIRbaZx8vlix0PJA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,236,1712646000"; 
-   d="scan'208";a="40446982"
+   d="scan'208";a="71547836"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.227.51]) ([10.124.227.51])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 18:02:39 -0700
-Message-ID: <df0a17b0-16a8-44bf-8862-551b81d93cac@intel.com>
-Date: Fri, 14 Jun 2024 09:02:36 +0800
+  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jun 2024 18:04:35 -0700
+Message-ID: <a5d434b5-c1c2-451c-9181-3c9eacbc2999@intel.com>
+Date: Fri, 14 Jun 2024 09:04:33 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,58 +67,212 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 17/65] i386/tdx: Adjust the supported CPUID based on
- TDX restrictions
+Subject: Re: [PATCH v5 25/65] i386/tdx: Add property sept-ve-disable for
+ tdx-guest object
 To: "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand <david@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <eduardo@habkost.net>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, David Hildenbrand
+ <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Eduardo Habkost <eduardo@habkost.net>,
  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
  =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
  Yanan Wang <wangyanan55@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Ani Sinha <anisinha@redhat.com>, Peter Xu <peterx@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?=
- <berrange@redhat.com>, Eric Blake <eblake@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ Cornelia Huck <cohuck@redhat.com>, Eric Blake <eblake@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Marcelo Tosatti
+ <mtosatti@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
  Michael Roth <michael.roth@amd.com>, Claudio Fontana <cfontana@suse.de>,
  Gerd Hoffmann <kraxel@redhat.com>, Isaku Yamahata
  <isaku.yamahata@gmail.com>, "Qiang, Chenyi" <chenyi.qiang@intel.com>
 References: <20240229063726.610065-1-xiaoyao.li@intel.com>
- <20240229063726.610065-18-xiaoyao.li@intel.com>
- <511a147e-bc01-7fab-24d7-4ae66a6d1c44@intel.com>
- <04932fb5-1ab4-4f8e-90dc-4f1a71feefb6@intel.com>
- <SJ0PR11MB67447DFF37D0F1A0EF25F6A192C12@SJ0PR11MB6744.namprd11.prod.outlook.com>
+ <20240229063726.610065-26-xiaoyao.li@intel.com> <ZmGTXP36B76IRalJ@redhat.com>
+ <90739246-f008-4cf2-bcf5-8a243e2b13d4@intel.com>
+ <SJ0PR11MB674430CD121A9F91D818A67092C12@SJ0PR11MB6744.namprd11.prod.outlook.com>
 Content-Language: en-US
 From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <SJ0PR11MB67447DFF37D0F1A0EF25F6A192C12@SJ0PR11MB6744.namprd11.prod.outlook.com>
+In-Reply-To: <SJ0PR11MB674430CD121A9F91D818A67092C12@SJ0PR11MB6744.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 6/13/2024 4:26 PM, Duan, Zhenzhong wrote:
->>>> +     *
->>>> +     * It also has side effect to enable unsupported bits, e.g., the
->>>> +     * bits of "fixed0" type while present natively. It's safe because
->>>> +     * the unsupported bits will be masked off by .fixed0 later.
->>>> +     */
->>>> +    *ret |= host_cpuid_reg(function, index, reg);
->>> Looks KVM capabilities are merged with native bits, is this intentional?
->> yes, if we change the order, it would be more clear for you I guess.
+On 6/13/2024 4:35 PM, Duan, Zhenzhong wrote:
+> 
+> 
+>> -----Original Message-----
+>> From: Li, Xiaoyao <xiaoyao.li@intel.com>
+>> Subject: Re: [PATCH v5 25/65] i386/tdx: Add property sept-ve-disable for
+>> tdx-guest object
 >>
->> 	host_cpuid_reg() | kvm_capabilities
+>> On 6/6/2024 6:45 PM, Daniel P. Berrangé wrote:
+>>> Copying  Zhenzhong Duan as my point relates to the proposed libvirt
+>>> TDX patches.
+>>>
+>>> On Thu, Feb 29, 2024 at 01:36:46AM -0500, Xiaoyao Li wrote:
+>>>> Bit 28 of TD attribute, named SEPT_VE_DISABLE. When set to 1, it
+>> disables
+>>>> EPT violation conversion to #VE on guest TD access of PENDING pages.
+>>>>
+>>>> Some guest OS (e.g., Linux TD guest) may require this bit as 1.
+>>>> Otherwise refuse to boot.
+>>>>
+>>>> Add sept-ve-disable property for tdx-guest object, for user to configure
+>>>> this bit.
+>>>>
+>>>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>>>> Acked-by: Gerd Hoffmann <kraxel@redhat.com>
+>>>> Acked-by: Markus Armbruster <armbru@redhat.com>
+>>>> ---
+>>>> Changes in v4:
+>>>> - collect Acked-by from Markus
+>>>>
+>>>> Changes in v3:
+>>>> - update the comment of property @sept-ve-disable to make it more
+>>>>     descriptive and use new format. (Daniel and Markus)
+>>>> ---
+>>>>    qapi/qom.json         |  7 ++++++-
+>>>>    target/i386/kvm/tdx.c | 24 ++++++++++++++++++++++++
+>>>>    2 files changed, 30 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/qapi/qom.json b/qapi/qom.json
+>>>> index 220cc6c98d4b..89ed89b9b46e 100644
+>>>> --- a/qapi/qom.json
+>>>> +++ b/qapi/qom.json
+>>>> @@ -900,10 +900,15 @@
+>>>>    #
+>>>>    # Properties for tdx-guest objects.
+>>>>    #
+>>>> +# @sept-ve-disable: toggle bit 28 of TD attributes to control disabling
+>>>> +#     of EPT violation conversion to #VE on guest TD access of PENDING
+>>>> +#     pages.  Some guest OS (e.g., Linux TD guest) may require this to
+>>>> +#     be set, otherwise they refuse to boot.
+>>>> +#
+>>>>    # Since: 9.0
+>>>>    ##
+>>>>    { 'struct': 'TdxGuestProperties',
+>>>> -  'data': { }}
+>>>> +  'data': { '*sept-ve-disable': 'bool' } }
+>>>
+>>> So this exposes a single boolean property that gets mapped into one
+>>> specific bit in the TD attributes:
+>>>
+>>>> +
+>>>> +static void tdx_guest_set_sept_ve_disable(Object *obj, bool value, Error
+>> **errp)
+>>>> +{
+>>>> +    TdxGuest *tdx = TDX_GUEST(obj);
+>>>> +
+>>>> +    if (value) {
+>>>> +        tdx->attributes |= TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
+>>>> +    } else {
+>>>> +        tdx->attributes &= ~TDX_TD_ATTRIBUTES_SEPT_VE_DISABLE;
+>>>> +    }
+>>>> +}
+>>>
+>>> If I look at the documentation for TD attributes
+>>>
+>>>     https://download.01.org/intel-sgx/latest/dcap-
+>> latest/linux/docs/Intel_TDX_DCAP_Quoting_Library_API.pdf
+>>>
+>>> Section "A.3.4. TD Attributes"
+>>>
+>>> I see "TD attributes" is a 64-bit int, with 5 bits currently
+>>> defined "DEBUG", "SEPT_VE_DISABLE", "PKS", "PL", "PERFMON",
+>>> and the rest currently reserved for future use. This makes me
+>>> wonder about our modelling approach into the future ?
+>>>
+>>> For the AMD SEV equivalent we've just directly exposed the whole
+>>> field as an int:
+>>>
+>>>        'policy' : 'uint32',
+>>>
+>>> For the proposed SEV-SNP patches, the same has been done again
+>>>
+>>> https://lists.nongnu.org/archive/html/qemu-devel/2024-
+>> 06/msg00536.html
+>>>
+>>>        '*policy': 'uint64',
+>>>
+>>>
+>>> The advantage of exposing individual booleans is that it is
+>>> self-documenting at the QAPI level, but the disadvantage is
+>>> that every time we want to expose ability to control a new
+>>> bit in the policy we have to modify QEMU, libvirt, the mgmt
+>>> app above libvirt, and whatever tools the end user has to
+>>> talk to the mgmt app.
+>>>
+>>> If we expose a policy int, then newly defined bits only require
+>>> a change in QEMU, and everything above QEMU will already be
+>>> capable of setting it.
+>>>
+>>> In fact if I look at the proposed libvirt patches, they have
+>>> proposed just exposing a policy "int" field in the XML, which
+>>> then has to be unpacked to set the individual QAPI booleans
+>>>
+>>>
+>> https://lists.libvirt.org/archives/list/devel@lists.libvirt.org/message/WXWX
+>> EESYUA77DP7YIBP55T2OPSVKV5QW/
+>>>
+>>> On balance, I think it would be better if QEMU just exposed
+>>> the raw TD attributes policy as an uint64 at QAPI, instead
+>>> of trying to unpack it to discrete bool fields. This gives
+>>> consistency with SEV and SEV-SNP, and with what's proposed
+>>> at the libvirt level, and minimizes future changes when
+>>> more policy bits are defined.
 >>
->> The base is host's native value, while any bit that absent from native
->> but KVM can emulate is also added to base.
-> Imagine there is a 'type native' bit that's absent from native but KVM emulated,
-> With above code we pass 1 to tdx module but it wants native 0, is it an issue?
+>> The reasons why introducing individual bit of sept-ve-disable instead of
+>> a raw TD attribute as a whole are that
+>>
+>> 1. other bits like perfmon, PKS, KL are associated with cpu properties,
+>> e.g.,
+>>
+>> 	perfmon -> pmu,
+>> 	pks -> pks,
+>> 	kl -> keylokcer feature that QEMU currently doesn't support
+>>
+>> If allowing configuring attribute directly, we need to deal with the
+>> inconsistence between attribute vs cpu property.
+> 
+> What about defining those bits associated with cpu properties reserved
+> But other bits work as Daniel suggested way.
 
-yes, it will have issue but it's not "we pass 1 to tdx_module".
+I don't understand. Do you mean we provide the interface to configure 
+raw 64 bit attributes while some bits of it are reserved?
 
-"Native" bit is not configurable in the view of TDX module, and QEMU/KVM 
-cannot configure it. But it does causes mismatch in above case that QEMU 
-sees the bit is supported while in the TD the bit is not supported.
+> Thanks
+> Zhenzhong
+> 
+>>
+>> 2. people need to know the exact bit position of each attribute. I don't
+>> think it is a user-friendly interface to require user to be aware of
+>> such details.
+>>
+>> For example, if user wants to create a Debug TD, user just needs to set
+>> 'debug=on' for tdx-guest object. It's much more friendly than that user
+>> needs to set the bit 0 of the attribute.
+>>
+>>
+>>>> +
+>>>>    /* tdx guest */
+>>>>    OBJECT_DEFINE_TYPE_WITH_INTERFACES(TdxGuest,
+>>>>                                       tdx_guest,
+>>>> @@ -529,6 +549,10 @@ static void tdx_guest_init(Object *obj)
+>>>>        qemu_mutex_init(&tdx->lock);
+>>>>
+>>>>        tdx->attributes = 0;
+>>>> +
+>>>> +    object_property_add_bool(obj, "sept-ve-disable",
+>>>> +                             tdx_guest_get_sept_ve_disable,
+>>>> +                             tdx_guest_set_sept_ve_disable);
+>>>>    }
+>>>>
+>>>>    static void tdx_guest_finalize(Object *obj)
+>>>> --
+>>>> 2.34.1
+>>>>
+>>>
+>>> With regards,
+>>> Daniel
+> 
 
-This is one of the reason why we are going to drop the solution that 
-QEMU maintains the CPUID configurability in this series.
 
