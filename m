@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-19717-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19718-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79071909360
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 22:29:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A29909361
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 22:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BAF41F22FA6
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 20:29:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70CA9288071
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 20:29:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 390BB1AB51B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE4581AB53E;
 	Fri, 14 Jun 2024 20:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="TzcGQvEH"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="qGTNRSE+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49FA1836F9
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 20:29:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EA3D18412B
+	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 20:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718396948; cv=none; b=o6saXUtdp9Ka6zlHUHlh0j1iSc76+GW0tgZX1CdRqlnDmNXJvXdQ2UVGQs8MV2wc4Bk6w/BI6ccbEGlW+VBu3j99Kx5EmBOA6PubrkyKMlJPjBkZ2DjQymLluYealyhKzb03F03VPwSPg8T2h3W13i8FUzAc7Fe5yBPc+mPbed0=
+	t=1718396949; cv=none; b=CMPVxd5iTqjRhbSonxBP60EuPtwRAzNNybtwTpJdFT2/THdTNicXrX0UQEOIs4prbgD6OlcZAh8BkhGuVHE/YMvfj4HRL0r4OWwwJo+8/79epZsMRWjvM34EswJ0BUpSU+NtRQBeDIGGj2PzgVWFCXyjKQmgntuB+X4DlGx/3ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718396948; c=relaxed/simple;
-	bh=1waVZBSBgmkVTRzD47YLiwSpWUY2zTLGJrDORugnwOA=;
+	s=arc-20240116; t=1718396949; c=relaxed/simple;
+	bh=Pd2HdXuVe2UBhoq2K89r5XG0/ruO202WXRk+Va9TcqY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M/Enctvev4+B/Rv1kXlHiISFsIo22XDfFnGGXNHm1aGkQZxLPY8W0isoWHlG8/VeAGXgbMkrAaaDUpAPeDIaTeOhCsNE59n6uYWHcKiLQ8zb42R26eJgKpczVOyrz0UhvkbDa7rE3BCBMsBU/RXazqsjEH+agdNlvvS4pTZ4hhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=TzcGQvEH; arc=none smtp.client-ip=209.85.167.53
+	 MIME-Version; b=ATIuexFpBv5VXR4TljTZa5ODtedGlSyRa7+RMdt7MkBJmJmV5JgRaqOV/M6qm+B+31kZCvWiCUWyOun8WfP66wcZWZ7YXlIBo2InJ9vHcjd7Fa7uZq5tl2LZkteMWVHwqBIaiWwsM11ERX3/szsa/m3P4w7/Qa/XlouRYzPn+bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=qGTNRSE+; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-52bbf73f334so2811981e87.2
-        for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 13:29:06 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-57cb9efd8d1so3651624a12.0
+        for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 13:29:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1718396945; x=1719001745; darn=vger.kernel.org;
+        d=grsecurity.net; s=grsec; t=1718396946; x=1719001746; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TM0RpYUvwtwCNY9Q6H4dViSdw/nY+sKwQUbKlWbVJNw=;
-        b=TzcGQvEHwh5tOM+Mg3zJe8JOtluHWkK4v7xS3Hu6gqnCTS3SAxsy1vyzhj9hrKrgP5
-         /kDLvQa3pna10rsVw2lY+k6ZY8qf6eeNy4rn+wDfnO1JSLCfFkr4bjbH/rwd57iz12xW
-         YkredxNO7Uhxqej1ZMb6SUSaCfaeytMVo/VJTn0cXH+R/XC075D4sB82KT0AjV5U/mqz
-         iMDXjyY5r4+aNbvwuDMrS06R/aGMLXErXD+EZrum8yRQC5mFtgXDQE+nNWBdc6C6am8+
-         p7HWulf2GMhLQd5LCRTfelhf/PaGkZ0DevpZQzd9Y246vRVkaprS34R3EEACbSCcgbWm
-         xk3A==
+        bh=YDvFl+EPL3F7DYWyyu2ZaTt9wg+uT9SOWROUYajJpQk=;
+        b=qGTNRSE+0/ReIJPqFXn8KEGcMc8ilrPDJWrU3HbdEzpayNXdrZuRJkr3cOfSRKBkFA
+         Zst0Gcj91kBI7KYJCI2pa65YnMjkyih8r4VvPPNudOK2665lrGqxCzvxs800qNuXsWa7
+         i7Py8Fi7s1Wb05l8GOtX7+z6gieLRvdBW/RvkhZ6x8PkfON9P0tnyp6Lua2e0RdbJZad
+         uWAxVpghXz6GDsXiW0mSC/7nHhshYxy9Vv7cV+64+8tIijAh7+l8R1AE6hdfNUNtfbrI
+         UW2gEFAVzbfCfYI3DCE0Tz54cuV8wNEYYA6zcfnPWR46VmCkKpBuVC7Mhywak7rjUyVO
+         T2Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718396945; x=1719001745;
+        d=1e100.net; s=20230601; t=1718396946; x=1719001746;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TM0RpYUvwtwCNY9Q6H4dViSdw/nY+sKwQUbKlWbVJNw=;
-        b=EdamRTuR1YtKIMpUoh7Cnt0/C3Kp2eL7tv6U6I+EMF1eG5dpn8PlfIhv2RimBHRMqa
-         pQKjC+ZkcqsFSInzd1555ZqZRES8veORIHgBrGRW3w9LCDF6X1EIgKUyBR5bC8+rV++g
-         Guqv0IrfwbZFKyw2SgJTc9H/QFV4Nqeo6b5qAMdJANl/P6o9yWhfIFbd/M3Z+ysVONpi
-         irhooDf8Qvi2DST+MwGh+XuCW7Kww5ehvTeGWmBsnWHPvdelS8nAbk45iCK3fA8by+yd
-         TB5vnVGiAPQragEX6Hfe9VDpITtDSfa5ounWB/pNtbsYscCUsf3LJhdrG40DWFjG8mfa
-         fiMA==
-X-Gm-Message-State: AOJu0YxnofnTyHrPO1faP47i3gPQZ7y1SKZTi7OTQHCgQmgpHgvOfG/0
-	xwABQsphveJfUoTBOdvcMgvWO6VCecetM3icvvvhqIhYVS5n/Gsa6+k/iGSV3FA=
-X-Google-Smtp-Source: AGHT+IH0pnDNNADT+RIDBfDocnjEDQBm9SFNoNatGvNoCsRLbL/2wERti+n4EFLVtNtRtVTXr4XMrw==
-X-Received: by 2002:a05:6512:41a:b0:52c:8933:d743 with SMTP id 2adb3069b0e04-52ca6e91534mr2399101e87.47.1718396944893;
-        Fri, 14 Jun 2024 13:29:04 -0700 (PDT)
+        bh=YDvFl+EPL3F7DYWyyu2ZaTt9wg+uT9SOWROUYajJpQk=;
+        b=GUDdxOljTUTieU2uWO5kwFzIesU3DR5PWjko7kxYQn1VoMR20LYcYL70PNBadyJN6Q
+         UDfRMi02imCo2qyeIzHIC70/2LMpg7eKYLTC5aAygFjMpCt13YQS9fe5PrDGH4EFycBx
+         WoIcViUvjCY2x57b5fNjf9tXf1opTYwRvdHSEuT8HQPiT8vCuEDGqzEMhQMgT9s+utBz
+         C4H7RT0xg1WK/Ridcp7ost+ERaRqCR0epLF7Xp8JlDoUSQJQ79kM7xqn9KSOzIEXvQAa
+         xsJn25m0v2o7fIDgqbK22NVoWHTmmG6ldl6c2gt9HzQ9lPy7TVHxtu07UZpj2/RJg8iy
+         1Kqw==
+X-Gm-Message-State: AOJu0YzbLMFlz+4MR+Aknwkh8pX59K+xtobHg1563X7uw0CGzYuoAIDe
+	oqY1tLYdOj7OQnPyqI/y5W0sU1s7zfzhW5U6CEhO/4QcEmfu34EisX+tka4kgOQ=
+X-Google-Smtp-Source: AGHT+IE/Fu7sIvNHatCktQF57qVLGzqP8NIDqZ0rpV7HIZCCBXqmuqPGGPxxUFO8NGSgy+dpQsvPNw==
+X-Received: by 2002:a17:906:d7a2:b0:a6f:1c58:754a with SMTP id a640c23a62f3a-a6f5245cd05mr425115166b.24.1718396945762;
+        Fri, 14 Jun 2024 13:29:05 -0700 (PDT)
 Received: from bell.fritz.box (p200300f6af332a00214df27025e50a49.dip0.t-ipconnect.de. [2003:f6:af33:2a00:214d:f270:25e5:a49])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56ed3685sm217474166b.126.2024.06.14.13.29.04
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56ed3685sm217474166b.126.2024.06.14.13.29.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jun 2024 13:29:04 -0700 (PDT)
+        Fri, 14 Jun 2024 13:29:05 -0700 (PDT)
 From: Mathias Krause <minipli@grsecurity.net>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org,
 	Mathias Krause <minipli@grsecurity.net>
-Subject: [PATCH v3 2/5] KVM: x86: Limit check IDs for KVM_SET_BOOT_CPU_ID
-Date: Fri, 14 Jun 2024 22:28:56 +0200
-Message-Id: <20240614202859.3597745-3-minipli@grsecurity.net>
+Subject: [PATCH v3 3/5] KVM: x86: Prevent excluding the BSP on setting max_vcpu_ids
+Date: Fri, 14 Jun 2024 22:28:57 +0200
+Message-Id: <20240614202859.3597745-4-minipli@grsecurity.net>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240614202859.3597745-1-minipli@grsecurity.net>
 References: <20240614202859.3597745-1-minipli@grsecurity.net>
@@ -85,39 +85,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Do not accept IDs which are definitely invalid by limit checking the
-passed value against KVM_MAX_VCPU_IDS and 'max_vcpu_ids' if it was
-already set.
+From: Sean Christopherson <seanjc@google.com>
 
-This ensures invalid values, especially on 64-bit systems, don't go
-unnoticed and lead to a valid id by chance when truncated by the final
-assignment.
+If the BSP vCPU ID was already set, ensure it doesn't get excluded when
+limiting vCPU IDs via KVM_CAP_MAX_VCPU_ID.
 
-Fixes: 73880c80aa9c ("KVM: Break dependency between vcpu index in vcpus array and vcpu_id.")
-Co-developed-by: Sean Christopherson <seanjc@google.com>
+[mks: provide commit message, code by Sean]
 Signed-off-by: Mathias Krause <minipli@grsecurity.net>
 ---
-v3:
-- check against arch.max_vcpu_ids too, if already set (Sean)
-- switch to else-if instead of goto (Sean)
-
- arch/x86/kvm/x86.c | 3 +++
- 1 file changed, 3 insertions(+)
+ arch/x86/kvm/x86.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 082ac6d95a3a..686606f61dee 100644
+index 686606f61dee..eeb35fb1573a 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -7222,6 +7222,9 @@ int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+@@ -6701,7 +6701,9 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 			break;
+ 
  		mutex_lock(&kvm->lock);
- 		if (kvm->created_vcpus)
- 			r = -EBUSY;
-+		else if (arg > KVM_MAX_VCPU_IDS ||
-+			 (kvm->arch.max_vcpu_ids && arg > kvm->arch.max_vcpu_ids))
-+			r = -EINVAL;
- 		else
- 			kvm->arch.bsp_vcpu_id = arg;
- 		mutex_unlock(&kvm->lock);
+-		if (kvm->arch.max_vcpu_ids == cap->args[0]) {
++		if (kvm->arch.bsp_vcpu_id > cap->args[0]) {
++			;
++		} else if (kvm->arch.max_vcpu_ids == cap->args[0]) {
+ 			r = 0;
+ 		} else if (!kvm->arch.max_vcpu_ids) {
+ 			kvm->arch.max_vcpu_ids = cap->args[0];
 -- 
 2.30.2
 
