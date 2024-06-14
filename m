@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-19665-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19666-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 896F4908A8E
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 12:56:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96220908AAF
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 13:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45E47285DCB
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 10:56:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239D21F2849F
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 11:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53277195800;
-	Fri, 14 Jun 2024 10:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5448F1957E4;
+	Fri, 14 Jun 2024 11:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DV10GltX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GRKlFEPu"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC2A1922C1;
-	Fri, 14 Jun 2024 10:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA2712EBCC;
+	Fri, 14 Jun 2024 11:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718362584; cv=none; b=Q5owF8s4f1gpgeLxsyKVQdPGsq5W/QygRSAWO4hvBRcirFcDakd58fP3Af+YjawzVgAyO3HTUdqmgN5peytSmiaegkoG0PkTAROEyCbVL9NFVL+1Q85hBVjijFx2fCw5TStO2tJTQ9cWzgfwBxA2WS7LW29uNAtCyEiBJabXdX8=
+	t=1718363674; cv=none; b=Wq6cuPjHHBOEGvM8mPe8kk7gXhkEaihI8PD2cP1QTNM6b9cVpGLM8VNnzTxUYXRH+EEHTPle5UvJ5Zeqdgiu9f8NdNIIwAyTkZ84vpB3XcDLZCuq39023gmJDUREwIyxfrColGhNxvnXmnnz2kbz0Nl5kiSXvc62L7nCB4ftUbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718362584; c=relaxed/simple;
-	bh=5r7N6D6dt9wZFpML6W5hQT17FrsvSr8pDDgZbtyQJxI=;
+	s=arc-20240116; t=1718363674; c=relaxed/simple;
+	bh=lhlmxNTzACpYsFyN2wyOKSAxA0zRyk6hLY+uw6e/V1U=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nixCPYxz5OQxDf9L0qnMXX9IY7Jr1vtpuK+hxqhdT8u+hWYegaZYvWe1crjb6dtBFOPIxlW9MxwTsb/kpDJSKYwc3slqftGa76KtYTxbQTpJ7dJFQ1WjAp0Np2Q07RpDnBcSmhyHqRM6W6VUQO8TJhVXe3WbJ/XR+QER4RRvf/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DV10GltX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11F2BC2BD10;
-	Fri, 14 Jun 2024 10:56:24 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jQ0jw/+CrMLf+IF1zKqjW1y7DzxA6jSS+4xgFKDB43L3X2hI2KnYpFIlRMwgiWLdf7vnPe6G42fl9UKjHK2C9NfxuVeNktuFQYPvs/N45xrkuOQzhU8ahHtb67NHjnxFESojQA6t+ojdZXUGipRx1NGLcw4ebZRfNovAwU1Rn2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GRKlFEPu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0677FC2BD10;
+	Fri, 14 Jun 2024 11:14:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718362584;
-	bh=5r7N6D6dt9wZFpML6W5hQT17FrsvSr8pDDgZbtyQJxI=;
+	s=k20201202; t=1718363674;
+	bh=lhlmxNTzACpYsFyN2wyOKSAxA0zRyk6hLY+uw6e/V1U=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DV10GltXSd/EIg2rB7Xf04cuZUoSGGDbDmEeqtS6kxNYDGhg1cEoCDfPfLWCnlUeL
-	 d+Ejjeik53bWFr9AfuKnu0a1L113gROx/xUkYhZR4c818nr9/G+ZcPigmzI+xBXuF8
-	 7rRBob3FzU28w1ffsqp7tbGwCpsDL41eb9SB1Fz32NUmq1/Lqe/5+gSQDeukqw88U3
-	 M4X1kn5/6eD5eutV3wcGXTDGBAVTxpWOfninRuhTrsgv5vWCLT5cxg84F7vrIrpyhT
-	 JkEiQlKSx9HF5UWKNKmTH6iGtWbXhtAnFgg5NZkmMdVwQPsKwvRjAfJjCRe/tNPo2e
-	 K5sM0PRixkBgA==
+	b=GRKlFEPu082dCB2u64JN73iI+mUjbqdENos+zhhF/FO+WPiauqQ84mBPWoMq2ytzq
+	 gpCrcJcqzbQ+TxhbuHozw3TisyzqmX/KjGt6C0R0SA9VcazRGi11L28Lt9AM5N3ats
+	 qkbe/qPCwXqS7MidpYZJFnKP61ejouJ2I4IHVXSPCuRCsAA1BJqOdxRW6XJzZTy+Lx
+	 mk5PXI1yu/iWEL7z6pGWeO/r8IFz9KpPnjJfsrHySZhu7ExTl2oLDf377UEg89uPOn
+	 /CJo6CuXLlCYdg8PmBUgEJCBTapU42yoOphePJvkFIkOwS/TkGMgPcP9ttkfsmmHfI
+	 yPup4ilFHnVyA==
 Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sI4bV-003tck-Q4;
-	Fri, 14 Jun 2024 11:56:21 +0100
-Date: Fri, 14 Jun 2024 11:56:20 +0100
-Message-ID: <87bk433i97.wl-maz@kernel.org>
+	id 1sI4t5-003tna-OH;
+	Fri, 14 Jun 2024 12:14:31 +0100
+Date: Fri, 14 Jun 2024 12:14:30 +0100
+Message-ID: <87a5jn3hex.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Oliver Upton <oliver.upton@linux.dev>
 Cc: kvmarm@lists.linux.dev,
@@ -56,13 +56,11 @@ Cc: kvmarm@lists.linux.dev,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	kvm@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>,
-	Jintack Lim <jintack.lim@linaro.org>,
-	Christoffer Dall <christoffer.dall@arm.com>
-Subject: Re: [PATCH v2 01/15] KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
-In-Reply-To: <20240613201756.3258227-2-oliver.upton@linux.dev>
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 05/15] KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
+In-Reply-To: <20240613201756.3258227-6-oliver.upton@linux.dev>
 References: <20240613201756.3258227-1-oliver.upton@linux.dev>
-	<20240613201756.3258227-2-oliver.upton@linux.dev>
+	<20240613201756.3258227-6-oliver.upton@linux.dev>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,115 +72,114 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, tabba@google.com, jintack.lim@linaro.org, christoffer.dall@arm.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, kvm@vger.kernel.org, tabba@google.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 13 Jun 2024 21:17:42 +0100,
+On Thu, 13 Jun 2024 21:17:46 +0100,
 Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> From: Jintack Lim <jintack.lim@linaro.org>
+> Load the guest hypervisor's ZCR_EL2 into the corresponding EL1 register
+> when restoring SVE state, as ZCR_EL2 affects the VL in the hypervisor
+> context.
 > 
-> Give precedence to the guest hypervisor's trap configuration when
-> routing an FP/ASIMD trap taken to EL2. Take advantage of the
-> infrastructure for translating CPTR_EL2 into the VHE (i.e. EL1) format
-> and base the trap decision solely on the VHE view of the register. The
-> in-memory value of CPTR_EL2 will always be up to date for the guest
-> hypervisor (more on that later), so just read it directly from memory.
-> 
-> Bury all of this behind a macro keyed off of the CPTR bitfield in
-> anticipation of supporting other traps (e.g. SVE).
-> 
-> Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
-> Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
-> [maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
->  all the hard work actually being done by Chase Conklin]
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> [ oliver: translate nVHE->VHE format for testing traps; macro for reuse
->  in other CPTR_EL2.xEN fields ]
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 > ---
->  arch/arm64/include/asm/kvm_emulate.h    | 43 +++++++++++++++++++++++++
->  arch/arm64/include/asm/kvm_nested.h     |  1 -
->  arch/arm64/kvm/handle_exit.c            | 16 ++++++---
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  3 ++
->  4 files changed, 58 insertions(+), 5 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h       | 4 ++++
+>  arch/arm64/kvm/hyp/include/hyp/switch.h | 3 ++-
+>  2 files changed, 6 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 501e3e019c93..c3c5a5999ed7 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -11,6 +11,7 @@
->  #ifndef __ARM64_KVM_EMULATE_H__
->  #define __ARM64_KVM_EMULATE_H__
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index 8170c04fde91..e01e6de414f1 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -844,6 +844,10 @@ struct kvm_vcpu_arch {
 >  
-> +#include <linux/bitfield.h>
->  #include <linux/kvm_host.h>
+>  #define vcpu_sve_max_vq(vcpu)	sve_vq_from_vl((vcpu)->arch.sve_max_vl)
 >  
->  #include <asm/debug-monitors.h>
-> @@ -599,4 +600,46 @@ static __always_inline void kvm_reset_cptr_el2(struct kvm_vcpu *vcpu)
->  
->  	kvm_write_cptr_el2(val);
+> +#define vcpu_sve_zcr_el1(vcpu)						\
+> +	(unlikely(is_hyp_ctxt(vcpu)) ? __vcpu_sys_reg(vcpu, ZCR_EL2) :	\
+> +				       __vcpu_sys_reg(vcpu, ZCR_EL1))
+> +
+
+I have the feeling this abstracts the access at the wrong level. It's
+not that it gives the wrong result, but it hides the register and is
+only concerned with the *value*.
+
+In turn, it makes the helper unusable with the *write* side, as shown
+in patch 7.
+
+>  #define vcpu_sve_state_size(vcpu) ({					\
+>  	size_t __size_ret;						\
+>  	unsigned int __vcpu_vq;						\
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 5ecd2600d9df..71a93e336a0c 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -317,7 +317,8 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+>  	sve_cond_update_zcr_vq(vcpu_sve_max_vq(vcpu) - 1, SYS_ZCR_EL2);
+>  	__sve_restore_state(vcpu_sve_pffr(vcpu),
+>  			    &vcpu->arch.ctxt.fp_regs.fpsr);
+> -	write_sysreg_el1(__vcpu_sys_reg(vcpu, ZCR_EL1), SYS_ZCR);
+> +
+> +	write_sysreg_el1(vcpu_sve_zcr_el1(vcpu), SYS_ZCR);
 >  }
-> +
-> +/*
-> + * Returns a 'sanitised' view of CPTR_EL2, translating from nVHE to the VHE
-> + * format if E2H isn't set.
-> + */
-> +static inline u64 vcpu_sanitised_cptr_el2(const struct kvm_vcpu *vcpu)
-> +{
-> +	u64 cptr = __vcpu_sys_reg(vcpu, CPTR_EL2);
-> +
-> +	if (!vcpu_el2_e2h_is_set(vcpu))
-> +		cptr = translate_cptr_el2_to_cpacr_el1(cptr);
-> +
-> +	return cptr;
-> +}
-> +
-> +static inline bool ____cptr_xen_trap_enabled(const struct kvm_vcpu *vcpu,
-> +					     unsigned int xen)
-> +{
-> +	switch (xen) {
-> +	case 0b00:
-> +	case 0b10:
-> +		return true;
-> +	case 0b01:
-> +		return vcpu_el2_tge_is_set(vcpu) && !vcpu_is_el2(vcpu);
-> +	case 0b11:
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +#define __guest_hyp_cptr_xen_trap_enabled(vcpu, xen)				\
-> +	(!vcpu_has_nv(vcpu) ? false :						\
-> +	 ____cptr_xen_trap_enabled(vcpu,					\
-> +				   SYS_FIELD_GET(CPACR_ELx, xen,		\
-> +						 vcpu_sanitised_cptr_el2(vcpu))))
-> +
-> +static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
-> +{
-> +	return __guest_hyp_cptr_xen_trap_enabled(vcpu, FPEN);
-> +}
-> +
-> +
->  #endif /* __ARM64_KVM_EMULATE_H__ */
-> diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-> index 5e0ab0596246..5d55f76254c3 100644
-> --- a/arch/arm64/include/asm/kvm_nested.h
-> +++ b/arch/arm64/include/asm/kvm_nested.h
-> @@ -75,5 +75,4 @@ static inline bool kvm_auth_eretax(struct kvm_vcpu *vcpu, u64 *elr)
->  	return false;
->  }
->  #endif
-> -
->  #endif /* __ARM64_KVM_NESTED_H */
+>  
+>  /*
 
-nit: spurious change.
+I would instead propose the following:
 
-Aside from that:
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index aeb1c567dfad..2c3eff0031eb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -845,9 +845,8 @@ struct kvm_vcpu_arch {
+ 
+ #define vcpu_sve_max_vq(vcpu)	sve_vq_from_vl((vcpu)->arch.sve_max_vl)
+ 
+-#define vcpu_sve_zcr_el1(vcpu)						\
+-	(unlikely(is_hyp_ctxt(vcpu)) ? __vcpu_sys_reg(vcpu, ZCR_EL2) :	\
+-				       __vcpu_sys_reg(vcpu, ZCR_EL1))
++#define vcpu_sve_zcr_elx(vcpu)						\
++	(unlikely(is_hyp_ctxt(vcpu)) ? ZCR_EL2 : ZCR_EL1)
+ 
+ #define vcpu_sve_state_size(vcpu) ({					\
+ 	size_t __size_ret;						\
+diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+index bb2ef3166c63..947486a111e1 100644
+--- a/arch/arm64/kvm/fpsimd.c
++++ b/arch/arm64/kvm/fpsimd.c
+@@ -179,10 +179,7 @@ void kvm_arch_vcpu_put_fp(struct kvm_vcpu *vcpu)
+ 			 * If the vCPU is in the hyp context then ZCR_EL1 is
+ 			 * loaded with its vEL2 counterpart.
+ 			 */
+-			if (is_hyp_ctxt(vcpu))
+-				__vcpu_sys_reg(vcpu, ZCR_EL2) = zcr;
+-			else
+-				__vcpu_sys_reg(vcpu, ZCR_EL1) = zcr;
++			__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)) = zcr;
+ 
+ 			/*
+ 			 * Restore the VL that was saved when bound to the CPU,
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index 0a6935a18490..ad8dec0b450b 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -330,7 +330,7 @@ static inline void __hyp_sve_restore_guest(struct kvm_vcpu *vcpu)
+ 	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu))
+ 		sve_cond_update_zcr_vq(__vcpu_sys_reg(vcpu, ZCR_EL2), SYS_ZCR_EL2);
+ 
+-	write_sysreg_el1(vcpu_sve_zcr_el1(vcpu), SYS_ZCR);
++	write_sysreg_el1(__vcpu_sys_reg(vcpu, vcpu_sve_zcr_elx(vcpu)), SYS_ZCR);
+ }
+ 
+ /*
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+which makes the helper select the correct guest register for the
+context, and only that. In turn, the write side is much cleaner and
+symmetry is restored.
+
+Thanks,
 
 	M.
 
