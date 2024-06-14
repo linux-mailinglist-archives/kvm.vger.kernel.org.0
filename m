@@ -1,111 +1,134 @@
-Return-Path: <kvm+bounces-19711-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19712-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336BA9092FC
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 21:34:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0404909326
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 22:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 466B51C22AC5
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 19:34:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A58EC1F23BAD
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 20:06:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB581AB527;
-	Fri, 14 Jun 2024 19:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253BE1A01B6;
+	Fri, 14 Jun 2024 20:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Piy7/8cY"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MgG14NrV"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC8D26AD7;
-	Fri, 14 Jun 2024 19:33:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EAE16D4D5
+	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 20:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718393638; cv=none; b=dl+pCGeNQ2hQSLtgfDQar0YVr9tBn9Xoz2YTqbNxPUcjA5EyTrRwu28myy0oAxeTQPeEPS22PYLNrJfmvyLvdkP9gO7iYohkokIA9Pc4bp+o5prIwXozRfeY3lEfzN2eIHPNb4JzWvQH3afgsMAzTOG61BJ7TsQuZkdpAhpevJM=
+	t=1718395613; cv=none; b=iO3CE8lFpSKBMGSy5Dfn/2GAyvIACZ/tJg5a33N7dLFTFg5uCT9ht18VikAW88ZsRFaM2kVeJbupt+vik1CpDG/xU4TAlq6mxjbKQqtH3UW5pj6g7oYZ7QyjVcG4UapCDATqpgxG5uiROK0MXg0MBZPG2O8aKZ1z/e37IVcyPRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718393638; c=relaxed/simple;
-	bh=un2DKs68DVerlXBeKlpV6w20TzStZ/MgihGnCdsi2EU=;
+	s=arc-20240116; t=1718395613; c=relaxed/simple;
+	bh=fHT+mvpZyNYtfRAmvwVtbsv48ZDUcasSZ243A7w5E9M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A5O4zg/6E5qHVKs3c8INeozn/yCj0lrM3OGaEMV7P0Y+0O6D3bR5gNgd0fArTmglhgLXkhnUt9aaXO5/h15zYzD7wXiR0UN589jbazD6q4dym9gA+Vto8AlS7sSREOCzwnnHCyWpZbIV1PVG7l0ghBlmbsBxDjKYnTtbJPzKCQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Piy7/8cY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF8CBC2BD10;
-	Fri, 14 Jun 2024 19:33:55 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Piy7/8cY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718393634;
+	 Content-Type:Content-Disposition:In-Reply-To; b=OLlxFK45gpKOCwIo6bFpaSAUgYBVChOJ6pD7eaguLS7OTDhTscM9qiWrm66NDzhVVTG0S4aovYlzc4JDts8AGs3VTQj/lQNrIPe+1k9NNcCyRsN7nBkoMMo7TPhE3Qpx1pjIad1WkzGweWKY7LENEzcs5CKtbrb3jkG1j0//hCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MgG14NrV; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: maz@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718395608;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=DXA9wvv5IhNhdgqqoog09hrS0W28PIbc3nCXFgq2mxA=;
-	b=Piy7/8cYE5kX8QxCb1ovvf7Oew+mzdXJL4F6If9Frkz4X0RUzqFF12WjwrhUhRlUy+iIKO
-	DoV+j//Avs/4vzAsOjkSD1yxY/bbFo9eXQkn/oEw9txGMiy9XDfptZ5hiqtMHXpzOrUrXv
-	cPfOpW6hB2UusbVHO75CZUsDVUtb8kw=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6d22401f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 14 Jun 2024 19:33:52 +0000 (UTC)
-Date: Fri, 14 Jun 2024 21:33:45 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <ZmybGZDbXkw7JTjc@zx2c4.com>
-References: <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <ZmrfA1p2zSVIaYam@zx2c4.com>
- <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
- <Zmru7hhz8kPDPsyz@pc636>
- <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
- <Zmsuswo8OPIhY5KJ@pc636>
- <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
- <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
- <Zmw5FTX752g0vtlD@pc638.lan>
+	bh=wRCBzoKitu7R8WzPS6XSmQokXRgP3Oseo1hUL0yrJXM=;
+	b=MgG14NrVXtRa217e5lweWqgVQps5JZo31w1/IGcVEJD0rA8tMlnfs4glwW+wnu8CgKEu5U
+	nERLCX8RY4tphYgf6nOiyDZ0xkWnqtYEnlrhYJNl3reIfyzbLGB2Rnk1QKt19Co+aFUm8M
+	v5gBa1pKyR8Rl8XKs+JqkP3FyJdcDTY=
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: tabba@google.com
+Date: Fri, 14 Jun 2024 20:06:43 +0000
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, kvm@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>
+Subject: Re: [PATCH v2 03/15] KVM: arm64: nv: Handle CPACR_EL1 traps
+Message-ID: <Zmyi0-JIy2956RnF@linux.dev>
+References: <20240613201756.3258227-1-oliver.upton@linux.dev>
+ <20240613201756.3258227-4-oliver.upton@linux.dev>
+ <86plsjk6dl.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zmw5FTX752g0vtlD@pc638.lan>
+In-Reply-To: <86plsjk6dl.wl-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
-> +	/* Should a destroy process be deferred? */
-> +	if (s->flags & SLAB_DEFER_DESTROY) {
-> +		list_move_tail(&s->list, &slab_caches_defer_destroy);
-> +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
-> +		goto out_unlock;
-> +	}
+On Fri, Jun 14, 2024 at 02:20:54PM +0100, Marc Zyngier wrote:
+> On Thu, 13 Jun 2024 21:17:44 +0100,
+> Oliver Upton <oliver.upton@linux.dev> wrote:
+> > 
+> > From: Marc Zyngier <maz@kernel.org>
+> > 
+> > Handle CPACR_EL1 accesses when running a VHE guest. In order to
+> > limit the cost of the emulation, implement it ass a shallow exit.
+> > 
+> > In the other cases:
+> > 
+> > - this is a nVHE L1 which will write to memory, and we don't trap
+> > 
+> > - this is a L2 guest:
+> > 
+> >   * the L1 has CPTR_EL2.TCPAC==0, and the L2 has direct register
+> >    access
+> > 
+> >   * the L1 has CPTR_EL2.TCPAC==1, and the L2 will trap, but the
+> >     handling is defered to the general handling for forwarding
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+> > ---
+> >  arch/arm64/kvm/hyp/vhe/switch.c | 32 +++++++++++++++++++++++++++++++-
+> >  1 file changed, 31 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index d7af5f46f22a..fed36457fef9 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -262,10 +262,40 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  	return true;
+> >  }
+> >  
+> > +static bool kvm_hyp_handle_cpacr_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > +{
+> > +	u64 esr = kvm_vcpu_get_esr(vcpu);
+> > +	int rt;
+> > +
+> > +	if (!is_hyp_ctxt(vcpu) || esr_sys64_to_sysreg(esr) != SYS_CPACR_EL1)
+> > +		return false;
+> > +
+> > +	rt = kvm_vcpu_sys_get_rt(vcpu);
+> > +
+> > +	if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ) {
+> > +		vcpu_set_reg(vcpu, rt, __vcpu_sys_reg(vcpu, CPTR_EL2));
+> > +	} else {
+> > +		vcpu_write_sys_reg(vcpu, vcpu_get_reg(vcpu, rt), CPTR_EL2);
+> > +		__activate_cptr_traps(vcpu);
+> 
+> This doesn't bisect, as this helper is only introduced in patch #10.
+> You probably want to keep it towards the end of the series.
 
-Wouldn't it be smoother to have the actual kmem_cache_free() function
-check to see if it's been marked for destruction and the refcount is
-zero, rather than polling every one second? I mentioned this approach
-in: https://lore.kernel.org/all/Zmo9-YGraiCj5-MI@zx2c4.com/ -
+Ah, derp, I wanted to use the kvm_hyp_handle_sysreg_vhe() you introduced
+for the subsequent patch. I'll just move them both.
 
-    I wonder if the right fix to this would be adding a `should_destroy`
-    boolean to kmem_cache, which kmem_cache_destroy() sets to true. And
-    then right after it checks `if (number_of_allocations == 0)
-    actually_destroy()`, and likewise on each kmem_cache_free(), it
-    could check `if (should_destroy && number_of_allocations == 0)
-    actually_destroy()`. 
-
-Jason
+-- 
+Thanks,
+Oliver
 
