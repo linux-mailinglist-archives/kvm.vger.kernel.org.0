@@ -1,242 +1,211 @@
-Return-Path: <kvm+bounces-19667-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19668-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B944F908AB7
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 13:24:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04C13908BAA
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 14:29:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD0861C235EF
-	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 11:24:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A28681F22168
+	for <lists+kvm@lfdr.de>; Fri, 14 Jun 2024 12:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6D11953BB;
-	Fri, 14 Jun 2024 11:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F941991D4;
+	Fri, 14 Jun 2024 12:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="b1g42sgy"
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="OCXJ+COK"
 X-Original-To: kvm@vger.kernel.org
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2099.outbound.protection.outlook.com [40.107.14.99])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2036413B2AD
-	for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 11:23:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.14.99
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718364237; cv=fail; b=tE0wCpCULkTRgAAdFCGaZfOfvQ4jtoXc1CBLGaBcwmTpksaQbL80D7Lf9mZ3ByL+GZjp15dUEP/VZ9YyxEoX46RB3H8zfJKH4QVOmHE9wGaBsseldjkjGHkT6mDasICwQbKDsGh9QuhnWmWmq008e98C3NsNlM/rwRs2IWfP6kE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718364237; c=relaxed/simple;
-	bh=b+oKN0JtwlHJprplxju76aKOwbp8gduhSSKW4YsGiZY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GlJifayDi27U8CNykFpetG5QlJFIt2AbUznQpcAUpoeXgDpz8uGOZoL5bDLK3SGjPKlmQorVtBjGlDmk4rkKKshnTkpgGU+XBjSyATSrDuqKK1NFJcj/DShmZcnvYVpUVCBIjLSoomOqq5Whu3zRWsvoC1wl1IAaxzbFRsniMAg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com; spf=pass smtp.mailfrom=virtuozzo.com; dkim=pass (2048-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b=b1g42sgy; arc=fail smtp.client-ip=40.107.14.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=virtuozzo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=virtuozzo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=i8YIYPe4ZJx0VIQp8Y7kihlWdLKMOdp2sI8ngLM+sfivHBuQMqlrMqOAUxwLERIND1m9N5jtiBDmOnDLHv2bRri9jl8BeBUuQESh9gOt/HrQV7GQ6MfZ7TUThDb/43mG1eq1pzq4DIf0ZBHb3OdGXcolrFy3ZNSo3XJYt6UsyMB6SvHfRl0fUcf1S0pSILW3yrjT38ZBueHSYSKu5E+ioXTz2iiAN9VePAP9WhwOiPvb0CZHQDghtcesGwRvPl0G3pDyBeajJ2/oBySCYPqatHzWfpphR6lm9zFhHukAuznO+FZhKVwSlC6IlkAkbMJGy07/PzZdAhBHVvO8Sxr2Qg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8rTisjdU4IwnT/g13nrXQsOkdmmfHkt8Q1YRiLH5hCc=;
- b=GdLiTj03aW/iaeoMRFe8+vcejA5FoaUrQRo5GcenxoBq5XZE4wZO4kvP9n3FG/LWse6zuOK5p/dhgmqKX6Ow4ivqH5owMVf7jP7AFAu+0QureLS09xlP/jQNrWxX+dg53aUHen3v2xn94ZbwJ5RR2zFaIKvwyxRJjQC2+yaBJ/34Bf9GZlyKL3WAIib6y3J4SSFGEZOmkp/kAGVRBJ1i1Oo9MqBr0MdXEkwfblNIh3eBCXdWh9YcnWCgjjKKfMvMTkfE2iuDAUmo6KYZeg4uGn/XwRmV+53rbKZhBp470k6SKwz7vYrCjpyknN/5NfWvCWX7e7dxY4tRA2JgfQyF5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8rTisjdU4IwnT/g13nrXQsOkdmmfHkt8Q1YRiLH5hCc=;
- b=b1g42sgy2J033mlvqkC0cOJh82ZDqnnmlsiVoiZYAdV5nHLjK1ZRyj995F+cgQyHtjDXG/Uqcpx/HOoPnxV7ytnFhU0weoKC/x8y+MY+0X84Vms3ls5BSmnallBKkRNmxGwicHNDffv5r7Xak9POImMhBU2u0sbJ0ECW7/DLEu8jMDh/4kxGLFSgJOzlbCE2lFVbYKkyFifEhpmuzlI5hvbN9gPa1klQ+XecSFwSi1YYOlY7RLXoBJhQqNCGsrCOJegc3xChEBrV52O+hQ1hfVkITx4bizc7F10QY5rtqShcB+EUBuqpivitILOGrdfTEelK1LDBgLW3ZrlWzmQdvg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=virtuozzo.com;
-Received: from DBAPR08MB5830.eurprd08.prod.outlook.com (2603:10a6:10:1a7::12)
- by AS8PR08MB8707.eurprd08.prod.outlook.com (2603:10a6:20b:563::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7633.36; Fri, 14 Jun
- 2024 11:23:51 +0000
-Received: from DBAPR08MB5830.eurprd08.prod.outlook.com
- ([fe80::574e:cc8a:6519:efdf]) by DBAPR08MB5830.eurprd08.prod.outlook.com
- ([fe80::574e:cc8a:6519:efdf%3]) with mapi id 15.20.7677.024; Fri, 14 Jun 2024
- 11:23:51 +0000
-Message-ID: <3fcc1210-a4c9-4391-9583-a2263dbe6e72@virtuozzo.com>
-Date: Fri, 14 Jun 2024 13:23:49 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] Fix Issue: When VirtIO Backend providing VIRTIO_BLK_F_MQ
- feature, The file system of the front-end OS fails to be mounted.
-To: Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
- Lynch <lynch.wy@gmail.com>
-Cc: jasowang@redhat.com, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, vzdevel <devel@openvz.org>,
- Alexander Atanasov <alexander.atanasov@virtuozzo.com>
-References: <5bc57d8a-88c3-2e8a-65d4-670e69d258af@virtuozzo.com>
- <20240517053451.25693-1-Lynch.wy@gmail.com>
- <af6817c2-ddee-4e69-9e55-37b0133c1d3b@virtuozzo.com>
-Content-Language: en-US
-From: Konstantin Khorenko <khorenko@virtuozzo.com>
-In-Reply-To: <af6817c2-ddee-4e69-9e55-37b0133c1d3b@virtuozzo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AS4P195CA0037.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:20b:65a::26) To DBAPR08MB5830.eurprd08.prod.outlook.com
- (2603:10a6:10:1a7::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273F4198840;
+	Fri, 14 Jun 2024 12:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718368162; cv=none; b=VZVV+MZ7ikMaWofyIHwU9gtTVpeEPPfJx7bDhO7AW3sl+73PqK0acPLZPvrChZqgOILdE6xe47c5SVdqS4pOyuqACLSKnBDu3drNtsCwuVvfGu6OhzwdY8DNauZI/2P0D7vNjPQS6up+7Kfom+P+Ou40w8BEd2YFbDWmSESIpGI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718368162; c=relaxed/simple;
+	bh=cBmpqiI4smYWZBQIHnTdgHbfzxQKIz6BboeBUIk/BBE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lAlldUrUEeOK+pbPjKd/zhw49nF0q3xsRSag2NMNkmU26r2lSGyZm4lziDaDlB/RlVa1HA6nop82mvRTOn68bbonbuw8B+/mdLKUuEzT9qRkLKM5GTlancHqtlDGlLP8x/zw7OA8bRk9d3Hs5vYj4PLKuVOIYnniLTgyqOhVeEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=OCXJ+COK; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1718368156;
+	bh=7O5o/6HkAr/0K4wsEW3vA0ECN5IMlfvMhmIkuXxjohA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OCXJ+COKRCZZcN3OHnZ69GN6ZwN/MzaovDVJGHxI2Z0z/Ep+ZZE32twF1yqXY8M4w
+	 otnL7hJAJwNkxcykbkSrQKJE0LI/r0WvhiTqoRj8APOWpTfHPnjhirEPxwYPaiA+3b
+	 QsCzipD/+ygtbTjEHvS3s7GkhMWAg3tzr65xQxKh9FEt0cBLMNAR45J6ffoAy6P+Jf
+	 nHo7NqXMswJirnlEFuCH+cMTP5oMREv3XrA5BCj2b9kzmBFRn6YULce1lcIuNPA6xF
+	 JhK5smGOGp1C0gEGB5HHclieK5jRlcXQ+PQMfVTqQeYY9mqSWOq8P3Iy+l+4VE84RP
+	 MunDRQHjL3lyA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4W0z9R3h4jz4wcl;
+	Fri, 14 Jun 2024 22:29:15 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: <linuxppc-dev@lists.ozlabs.org>
+Cc: linux-fsdevel@vger.kernel.org,
+	brauner@kernel.org,
+	aik@amd.com,
+	paulus@samba.org,
+	torvalds@linux-foundation.org,
+	kvm@vger.kernel.org,
+	tpearson@raptorengineering.com,
+	sbhat@linux.ibm.com
+Subject: [PATCH] KVM: PPC: Book3S HV: Prevent UAF in kvm_spapr_tce_attach_iommu_group()
+Date: Fri, 14 Jun 2024 22:29:10 +1000
+Message-ID: <20240614122910.3499489-1-mpe@ellerman.id.au>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBAPR08MB5830:EE_|AS8PR08MB8707:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6aed0c13-ffc8-4f29-720a-08dc8c6477c2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|376011|1800799021;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TWJ5OHZSWi9kclArcXdrWkhuQWxneldyK2h0S0lnV3E4OXFJL3oyV3d4aXVl?=
- =?utf-8?B?ck9DUVVlaVNHTUNuMGtmYWIxOEZvam13U2dPVk9ub0RRVGUvUDFYSDJpUnNL?=
- =?utf-8?B?V2l6NWUrcHJ5Qkh4THhiS1c4QjhVdk9zNzBDRlVRanFuN1lpek9JOEg2Wmds?=
- =?utf-8?B?OFZzMTVsd3pQa3VxcFpWWFFnRndBem00aUMrZWpVTnNMVmJrNWZWS0FmV0hq?=
- =?utf-8?B?U3U5TGtHU2prOGNlUjNkdlYrcTNpYTFKYzJ6WmQwTHJKRVlmbUF1SGRZSzJw?=
- =?utf-8?B?dzNVRnVCVzZpUldzTUNvVDhlcHNqdmpZbkg5d2o5S040OXpKb0tlTlVsSXhB?=
- =?utf-8?B?cUxYTDNhNTQ3SjBpaVltOFNvb3pLYk1mUHJCWVdUcWxCZFJRcHk2cnhlK01X?=
- =?utf-8?B?MGM3RHdseGNPbHNZaTRnSHZQTXU0Umw0bmplMVp5dE00S0c2S2s4bDJzamlW?=
- =?utf-8?B?MTQ4VFlUcW1UOXJjZHNpTnVPb0YwODF5eVAzZ1hzbllOY1BmYVJ6a3ljMWFO?=
- =?utf-8?B?eWdid2xVeWxVOTMzcUYvanZoV3BxN0IxRXpCMnBHcit2c0Z0WkloUVNmNFlM?=
- =?utf-8?B?eE1scGI4ZFgyYkQzN3VPLzh2QUtGK3ZVd0djdDVjL1lmcHhkbnMxdDRyWGFs?=
- =?utf-8?B?QWVGMXlxTmpMK1Y0RG05VkxuQUNiMFAwWGxxVWV4M3RYcHhUWmFLdCt5QTZ2?=
- =?utf-8?B?YVVLSDAvTTZ1M0k4R3AyRlVkclNVQStPVGlGMnRPM3U0NkxqU0VjeitITmZB?=
- =?utf-8?B?UkhqS3NmYW1mZDhBYU4rbklnKzB5VmNzWHdCSitQbmc3ZHRITzBqVWY2bUJF?=
- =?utf-8?B?S21xVHdPeTdvbWhNU1MwdmlVcUxpN2xIYmhZRFdwUXJHekk1L01USXpBVzM3?=
- =?utf-8?B?bU9JQU9XY05zN29xZHV6cGpnY2RMc1FMTzRqNi85Ykl3c3FRRHZwVFFiVng3?=
- =?utf-8?B?K0xXY2tDeDhYaHRLVE9ic09US2ZlZzB2VktIZDJ4eFJyemsrYjA4Mlo2SE1z?=
- =?utf-8?B?WEllTVlTQnpWbk9qWEgxRGtJLzlKYmpDWDA0cng2LzR5SFc0VlJlYXM1MFA5?=
- =?utf-8?B?amhqRisva0hOR05Ta0lrSTFQNGE2MHI3aVZwUUw4a1c5djFWSHpwc2dWc2cw?=
- =?utf-8?B?bnUxSlc3YktBaGY4aERseUkzbmNCa0dMNUlIZmNBYng3WnE1eVk1a1NEZTRj?=
- =?utf-8?B?Y1hzblNpRnl0bjA3b21odCtvaGFPYVRYNUlCam5jczVKMGJFeEgrWjI1UXR6?=
- =?utf-8?B?TE5zbFcrSm5wTU1WT1VWQ3hmYkdvaGJzRHY3bWFDaFhoNGtuUTRjWFRKdTA2?=
- =?utf-8?B?WVZCakZqcVdvOVkyUjN5MGV6M3dZazUwd1ZWSC9uZGllUXJOVWd0UmxVeEgx?=
- =?utf-8?B?UDJBSXlzb2VxT1JSZGc1UWJlUWRnck9YZ3NCUzh5RTJyMlJSbm85b0RFOXJ5?=
- =?utf-8?B?YXRLT3UwMzBIc2UycENpVElGVXVrQWlabFQyZGNEczFEdW1GKy9FWE5HeERM?=
- =?utf-8?B?RDZORG95eEhtQ0RwcXZhL2xWM1kwUkJsc2RFcStEcE45c3h5NFVmZUVQMytN?=
- =?utf-8?B?dE1jdldBR3piYjcycERocmhDSndhMFA0VUpvNXE0bTduUzFWQ0Q2VStvd1da?=
- =?utf-8?B?YTRzYW95K1NnT1RZenRxQWxwSVNxY0VQL01TbE9FbXdIZlFpd3g2aDl0VzYw?=
- =?utf-8?B?eXpBZVU5MU5zU2tCQS9naENpUGxFdVZKeDhPcE1hWkpoYmQxZ1VHN0p4ZmJi?=
- =?utf-8?Q?8AjD6Swlh6qcxCgdHc2HIFxs+ja39NJCheplOWL?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBAPR08MB5830.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(376011)(1800799021);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VzZDWCtXdm9sU1JCZlcyYy90RjVEQWRQTGRIUktQM2lOSWNPbzNuV0xGa2Ru?=
- =?utf-8?B?WmFIQ050NVdiamgwTG84T25IWkVVOFlsMDNvckkwU0Z2S1JaQ0lQazJRMDcz?=
- =?utf-8?B?VnhETndoN0dMMVIxczFKZUlYWFdERjZpZTF1QVpJVWhYNTRSaTlBYXpkODk4?=
- =?utf-8?B?L0JYczRYUC9MNmVsRTdJbTcrSHMvUmQ1Tiswd2NVMFU1ZGxXNWdlSnJrd2hG?=
- =?utf-8?B?WXZMcVNzQnNXcnlGcE04T09ZWXR1SUF0UlF1RDlpMTlLSG1xdDlTUVBXODJY?=
- =?utf-8?B?blBEOW5WbUhmT29yNjhuZGZuSHpucGswYmV3SXFYN3RGeGtLVE9JeGFLQkQy?=
- =?utf-8?B?RkFmWktVZ1pJbzFlSjdYYVNBWGR6ZjhpaFdaWUhsc2hlM3p5NmNVd1R1eTRK?=
- =?utf-8?B?TVp1QnpsUEgvanJ0dHE3SUV1TVppa05xb2NySlZtSUJmTTFsVkQ5Sm9acHhN?=
- =?utf-8?B?RjlWNmpDTUUzb0pqZHVHamxsWkZYOUxVUFpPK0c1SVhxalk5SlU5Z1JmRmFT?=
- =?utf-8?B?VldrS25vZ3RCaVpDdllDZ0NrZ0NMd3RRbHFPUnZFWThmYnFTZk1HZExpL0E0?=
- =?utf-8?B?ZVNXNm1hR3I4M0gxaWgvVWJzYW1BaUR5MFl6NGNuQkFVeHZMV1g0Szg3S0pU?=
- =?utf-8?B?Z1FqR21rVTBYdnZLZFhJUjZRYXRTOVYyNklGZHRHcHViV1BHZ1d0Q3pmVmxq?=
- =?utf-8?B?S0dOc294dGdPeHRCU2pUbmVxWDlpZ29GY0ZKbXJOaUdyUmY1OThybGtKUlZC?=
- =?utf-8?B?YjJOZ1pHWEZQZ0VTYWgzbUpKS0JCUEtlL0h0bVlxQjZRNVVuTUU5ZElzYmxW?=
- =?utf-8?B?bHZvQS9JbCsyTmUxemVxQXpnanByZWowT2xiQzJsR2JTVWg0Q2s4VVF3b242?=
- =?utf-8?B?VGJ6T0t4eERKWXVsRFM3QjdXWXlpcnVFR2gwcm5VbEpGZ09MUU8zYS90UlEr?=
- =?utf-8?B?MWEwYnpqaEVSSjZNeFJyTmlBaS9JSkJZbGd0UEl2NXJHN25odzk1NDA2R2lz?=
- =?utf-8?B?TkRNSUZNM3U3QnVReU03MUxxWnlqd2IvUEQyRHBDSXpMLzFEdlE1Q001N1N2?=
- =?utf-8?B?Y3Y3dFJHd3BJUW4xcFpBUFp3dytqdHdYaFhNaWlFdVk3UU1hUEhjZXdmeEJs?=
- =?utf-8?B?dUhQOWVhNWJYQXNTeGorWHFUbDV3cWFhZ0VhT3E2S2srL0tuaG9mejluaSs5?=
- =?utf-8?B?VENxMXlmS3RTbm1nc2ZWS05kbStyS2JQMUdxakQ0MWNiSENWdlgyTXUreFBH?=
- =?utf-8?B?VXV3Z1BaeUpMVS9QaUFRNVVVVm1rY1hvcGd0RGt1UmZ6Y3JvZE9GRW82Y2hV?=
- =?utf-8?B?TEF6UW5LRkdjeGdLeEYwL3JLbEwzdTZTWit1WjFCVWNaTzRqU0RiU0h1VHN3?=
- =?utf-8?B?aWgyc2REejNxWUJGd0hxZ0Z1ckw5MTQ3M0lQWkJYR0RTSUlZR0g4OTBoR2NH?=
- =?utf-8?B?SHQvdnJhT0xyNmVjL0hpYzVLMCsyY2hXOFhOODd6VW5MY0FjSmN0bVBhb3R3?=
- =?utf-8?B?VmpGU0dha0Y3YkhkVmMvUEoyWkFIcTdESHhlYVRma1RTemVjSG1LS0V2ZWVX?=
- =?utf-8?B?cytkamM0YXRjeXYwOTVQSmF3LzAwUDZyZkVhRklDTUdWZStuY0YrNzM1ZUFm?=
- =?utf-8?B?VEVxRWJzdGEwaysyeTZERHhrOVZNdU8vNjhId1MrQk1VWDA0NURmNXNDZm5F?=
- =?utf-8?B?TkFteW5DVW5EUlIxWnNBcFFHd0VNL29NTDk4c3oxNjJtbkRtWW5GL1d6ZUdD?=
- =?utf-8?B?RjFHZ1VIZVlZU2FjMkpEMzJueGtKTVhCakxwdngwcHFndm5kdHNCU2lDaFNi?=
- =?utf-8?B?dGVUTVpiOGpLMlBBWFpwUWlMT3BkaWRraWFFVzAxdE1DVGFZVmVPVlNiNjFa?=
- =?utf-8?B?SkdiYWpmSzFLZE85bEk0cEE1eGNXL2o3MXdYSWxOSlVzcjQrZWZOYzR5Ujla?=
- =?utf-8?B?d0ZtWHQ3bEk5Z2w1MnJYMW1ldGVyNnBZS1BJb0pRcERNZHBFVnNlejJjUE1y?=
- =?utf-8?B?WHdxMjhSOS9tWGtySnM4RHZDRWljbXJ3bUxMNVU0Y3RweU9PUm9VQStKWG5k?=
- =?utf-8?B?T3BOeUlFaVNaWGc1bERPblp5am1Rek1yemV1TktVYW5waXdVNVF2VG8ySGwy?=
- =?utf-8?B?Mm85WGcva2VqUDZsRkFuQ0UxdlA5QlpqRzd4M2FuUEdTeDFFRWlkZno1bE9Q?=
- =?utf-8?B?UWc9PQ==?=
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6aed0c13-ffc8-4f29-720a-08dc8c6477c2
-X-MS-Exchange-CrossTenant-AuthSource: DBAPR08MB5830.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jun 2024 11:23:51.5731
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l1ca7o3FabwSPBTX1msW58YS94ks2Xsw7UpLMo+PKHfChd3B2pBwwejaBWdOraKfZvE6Bx+uUB5uVZAWe2o1pg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB8707
+Content-Transfer-Encoding: 8bit
 
-Hi Lynch, Andrey,
+Al reported a possible use-after-free (UAF) in kvm_spapr_tce_attach_iommu_group().
 
-thank you for the patch, but can you please describe the problem it fixes in a bit more details?
-i see that the patch preserves original req->sector, but why/how that becomes important in case 
-VIRTIO_BLK_F_MQ feature is set?
+It looks up `stt` from tablefd, but then continues to use it after doing
+fdput() on the returned fd. After the fdput() the tablefd is free to be
+closed by another thread. The close calls kvm_spapr_tce_release() and
+then release_spapr_tce_table() (via call_rcu()) which frees `stt`.
 
-Thank you.
+Although there are calls to rcu_read_lock() in
+kvm_spapr_tce_attach_iommu_group() they are not sufficient to prevent
+the UAF, because `stt` is used outside the locked regions.
 
---
-Best regards,
+With an artifcial delay after the fdput() and a userspace program which
+triggers the race, KASAN detects the UAF:
 
-Konstantin Khorenko,
-Virtuozzo Linux Kernel Team
+  BUG: KASAN: slab-use-after-free in kvm_spapr_tce_attach_iommu_group+0x298/0x720 [kvm]
+  Read of size 4 at addr c000200027552c30 by task kvm-vfio/2505
+  CPU: 54 PID: 2505 Comm: kvm-vfio Not tainted 6.10.0-rc3-next-20240612-dirty #1
+  Hardware name: 8335-GTH POWER9 0x4e1202 opal:skiboot-v6.5.3-35-g1851b2a06 PowerNV
+  Call Trace:
+    dump_stack_lvl+0xb4/0x108 (unreliable)
+    print_report+0x2b4/0x6ec
+    kasan_report+0x118/0x2b0
+    __asan_load4+0xb8/0xd0
+    kvm_spapr_tce_attach_iommu_group+0x298/0x720 [kvm]
+    kvm_vfio_set_attr+0x524/0xac0 [kvm]
+    kvm_device_ioctl+0x144/0x240 [kvm]
+    sys_ioctl+0x62c/0x1810
+    system_call_exception+0x190/0x440
+    system_call_vectored_common+0x15c/0x2ec
+  ...
+  Freed by task 0:
+   ...
+   kfree+0xec/0x3e0
+   release_spapr_tce_table+0xd4/0x11c [kvm]
+   rcu_core+0x568/0x16a0
+   handle_softirqs+0x23c/0x920
+   do_softirq_own_stack+0x6c/0x90
+   do_softirq_own_stack+0x58/0x90
+   __irq_exit_rcu+0x218/0x2d0
+   irq_exit+0x30/0x80
+   arch_local_irq_restore+0x128/0x230
+   arch_local_irq_enable+0x1c/0x30
+   cpuidle_enter_state+0x134/0x5cc
+   cpuidle_enter+0x6c/0xb0
+   call_cpuidle+0x7c/0x100
+   do_idle+0x394/0x410
+   cpu_startup_entry+0x60/0x70
+   start_secondary+0x3fc/0x410
+   start_secondary_prolog+0x10/0x14
 
-On 17.05.2024 11:09, Andrey Zhadchenko wrote:
-> Hi
-> 
-> Thank you for the patch.
-> vhost-blk didn't spark enough interest to be reviewed and merged into
-> the upstream and the code is not present here.
-> I have forwarded your patch to relevant openvz kernel mailing list.
-> 
-> On 5/17/24 07:34, Lynch wrote:
->> ---
->>    drivers/vhost/blk.c | 6 ++++--
->>    1 file changed, 4 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vhost/blk.c b/drivers/vhost/blk.c
->> index 44fbf253e773..0e946d9dfc33 100644
->> --- a/drivers/vhost/blk.c
->> +++ b/drivers/vhost/blk.c
->> @@ -251,6 +251,7 @@ static int vhost_blk_bio_make(struct vhost_blk_req *req,
->>    	struct page **pages, *page;
->>    	struct bio *bio = NULL;
->>    	int bio_nr = 0;
->> +	sector_t sector_tmp;
->>    
->>    	if (unlikely(req->bi_opf == REQ_OP_FLUSH))
->>    		return vhost_blk_bio_make_simple(req, bdev);
->> @@ -270,6 +271,7 @@ static int vhost_blk_bio_make(struct vhost_blk_req *req,
->>    		req->bio = req->inline_bio;
->>    	}
->>    
->> +	sector_tmp = req->sector;
->>    	req->iov_nr = 0;
->>    	for (i = 0; i < iov_nr; i++) {
->>    		int pages_nr = iov_num_pages(&iov[i]);
->> @@ -302,7 +304,7 @@ static int vhost_blk_bio_make(struct vhost_blk_req *req,
->>    				bio = bio_alloc(GFP_KERNEL, pages_nr_total);
->>    				if (!bio)
->>    					goto fail;
->> -				bio->bi_iter.bi_sector  = req->sector;
->> +				bio->bi_iter.bi_sector  = sector_tmp;
->>    				bio_set_dev(bio, bdev);
->>    				bio->bi_private = req;
->>    				bio->bi_end_io  = vhost_blk_req_done;
->> @@ -314,7 +316,7 @@ static int vhost_blk_bio_make(struct vhost_blk_req *req,
->>    			iov_len		-= len;
->>    
->>    			pos = (iov_base & VHOST_BLK_SECTOR_MASK) + iov_len;
->> -			req->sector += pos >> VHOST_BLK_SECTOR_BITS;
->> +			sector_tmp += pos >> VHOST_BLK_SECTOR_BITS;
->>    		}
->>    
->>    		pages += pages_nr;
+Fix it by delaying the fdput() until `stt` is no longer in use, which
+is effectively the entire function. To keep the patch minimal add a call
+to fdput() at each of the existing return paths. Future work can convert
+the function to goto or __cleanup style cleanup.
+
+With the fix in place the test case no longer triggers the UAF.
+
+Reported-by: Al Viro <viro@zeniv.linux.org.uk>
+Closes: https://lore.kernel.org/all/20240610024437.GA1464458@ZenIV/
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+---
+ arch/powerpc/kvm/book3s_64_vio.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+I'll plan to merge this via the powerpc/fixes tree, unless anyone thinks otherwise.
+
+cheers
+
+diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
+index b569ebaa590e..3ff3de9a52ac 100644
+--- a/arch/powerpc/kvm/book3s_64_vio.c
++++ b/arch/powerpc/kvm/book3s_64_vio.c
+@@ -130,14 +130,16 @@ long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+ 	}
+ 	rcu_read_unlock();
+ 
+-	fdput(f);
+-
+-	if (!found)
++	if (!found) {
++		fdput(f);
+ 		return -EINVAL;
++	}
+ 
+ 	table_group = iommu_group_get_iommudata(grp);
+-	if (WARN_ON(!table_group))
++	if (WARN_ON(!table_group)) {
++		fdput(f);
+ 		return -EFAULT;
++	}
+ 
+ 	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i) {
+ 		struct iommu_table *tbltmp = table_group->tables[i];
+@@ -158,8 +160,10 @@ long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+ 			break;
+ 		}
+ 	}
+-	if (!tbl)
++	if (!tbl) {
++		fdput(f);
+ 		return -EINVAL;
++	}
+ 
+ 	rcu_read_lock();
+ 	list_for_each_entry_rcu(stit, &stt->iommu_tables, next) {
+@@ -170,6 +174,7 @@ long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+ 			/* stit is being destroyed */
+ 			iommu_tce_table_put(tbl);
+ 			rcu_read_unlock();
++			fdput(f);
+ 			return -ENOTTY;
+ 		}
+ 		/*
+@@ -177,6 +182,7 @@ long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+ 		 * its KVM reference counter and can return.
+ 		 */
+ 		rcu_read_unlock();
++		fdput(f);
+ 		return 0;
+ 	}
+ 	rcu_read_unlock();
+@@ -184,6 +190,7 @@ long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+ 	stit = kzalloc(sizeof(*stit), GFP_KERNEL);
+ 	if (!stit) {
+ 		iommu_tce_table_put(tbl);
++		fdput(f);
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -192,6 +199,7 @@ long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+ 
+ 	list_add_rcu(&stit->next, &stt->iommu_tables);
+ 
++	fdput(f);
+ 	return 0;
+ }
+ 
+-- 
+2.45.1
+
 
