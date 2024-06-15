@@ -1,103 +1,108 @@
-Return-Path: <kvm+bounces-19727-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19728-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811BD9094E7
-	for <lists+kvm@lfdr.de>; Sat, 15 Jun 2024 02:03:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B029F9094E9
+	for <lists+kvm@lfdr.de>; Sat, 15 Jun 2024 02:03:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A12751C20F21
-	for <lists+kvm@lfdr.de>; Sat, 15 Jun 2024 00:03:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 616391F21E12
+	for <lists+kvm@lfdr.de>; Sat, 15 Jun 2024 00:03:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506BB2FB2;
-	Sat, 15 Jun 2024 00:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2AFC19D881;
+	Sat, 15 Jun 2024 00:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XnwD1lOS"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wW2HkaXB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B29E624
-	for <kvm@vger.kernel.org>; Sat, 15 Jun 2024 00:03:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0398825
+	for <kvm@vger.kernel.org>; Sat, 15 Jun 2024 00:03:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718409786; cv=none; b=ltUDxImDqwzUeKuvxzMjvoFHwXvnOkB4GvNl+j7wvIRBQpeL6GQRe1C1VbVZp8Qi47nv0IGhS5cEP3LFlYfqg+8VKDECmFDQusr0jPpmRZPkdQ8Ga65+VSsXmegNXD9PECWSiKInFLR0qnZ57EQaNe9K88tahox27DdLYKAS5pc=
+	t=1718409792; cv=none; b=HMW3Y8NSEsPyDfOlryRLW40xOeMi2OtWXXBHIvGNHexjFwj5IZw6OGRD4Qc1rk0zvCt3f82uIprIyvzh4XNVcQlk1eIno0WfUYEny5fpGwdVeATvZhb/V/mkZnOjIG/GerFbIEB4Lu/OYp7dlwazTBcBzh3iyo7dMJljT/sJ5Qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718409786; c=relaxed/simple;
-	bh=ckSubXPnhKnNiVj/54x8Q0EJzPrAh+WV8AbmQVVrhOo=;
+	s=arc-20240116; t=1718409792; c=relaxed/simple;
+	bh=+W+P3ghI0cdEDSRq5OBbGrcTA7SHJqzSNkDVo/UHYFA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Whozz9I3UAxNvjrJ5VWq0xssxQgbS7cCOEmLxEvSGC3XGLwBTx5FTWs83R6wEUz7dqE+q0nTvfgDYWPKcttuPMHatOjbUIZvR2X2CnIPfS1b8PeN+SfVf6ai1+CZs36rD8ACZbuAgFTNRdhH+IGY7LMIiXK27r5KxDCLYVl62+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XnwD1lOS; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=dXmfCdURv4spUDpfvA4NWxwhn96E+pAfeYcz08aoTtd1Yixnek3rKdkKtIdMdX/St55OK8vjONgH48Gd/13vT7ZOcFM409C5p5SFWgT0NRXbvps2RvX2pFtAsDVUp0gk27sv0vX5teyd/GqIufLUlDTq41EjWVASrJR/Jtwqgk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wW2HkaXB; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-705e5f5618dso381813b3a.0
-        for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 17:03:05 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c2def267dcso2421328a91.1
+        for <kvm@vger.kernel.org>; Fri, 14 Jun 2024 17:03:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718409784; x=1719014584; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718409791; x=1719014591; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mdWG57If2wiUtVgSeqsrLCBP+D2JtONZMYQed/ktHFU=;
-        b=XnwD1lOS4ERdaU/0/CvTLwl/KfQyW5a7FhTR8SJIO9RIvIWxTiWykcHZpZtfnDzjb2
-         PdYB4ndPfWMoA/ixUsOIFL9zXp5vf4bTwvKz1VEiIp+XrazcDZD0Fk2We2Vv3DkhLpi4
-         CYNRKiVexBT7x9zC7oi1XjDa5pYhKAX8OXUG+xWe8GRqFFw4kYjILXVE4pobC9HINdy3
-         Rf45szj5r4c4xzcXHLLBIam7DsSWIfqhqd36gieINxaRivzuGJZRQjDT1sO88n7d5n7I
-         9QnT3917wKwrWi26I//Pf3/6Yqhn5Xavz83kUPM4q/iEDn64yMrxKS+do71i9BgXwx3F
-         135Q==
+        bh=+hxROs2pSwoWeVVbtORAVOqp5Opz2REudhGLc29IbW8=;
+        b=wW2HkaXBZDgc2LydB7jPCFP/7lzSy/lFjjYf1gSi2mg5mgH+wpqCSeK0ALlwzRSiL+
+         wTOWt9Ild/9VbTZxFGzz0M7blk21IRkBaLX4/OyVO0nJddd/Pxb51ea8Dp/9V19N3Cw5
+         XZ1KWrWaoHCAyKIKLN9ozSzgyzF5/84q0U+xle5m+veX6OuGdNJV8Y//q0AuZPIlKRfV
+         FVV1beL0Vq6YqlDvBUEUcD9KVMDukpR4YmCt/yRaq6ZtuX6CX19ZjXjvfmCqt2yMJI/q
+         WUSwwKCkt3E0zg6aBVmal1jSi3zWhe2WXkKVVwl9XIqfV7fXb+EoCLoM2l0o4nhQROQY
+         qCug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718409784; x=1719014584;
+        d=1e100.net; s=20230601; t=1718409791; x=1719014591;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mdWG57If2wiUtVgSeqsrLCBP+D2JtONZMYQed/ktHFU=;
-        b=xPtcXLlr8RwL25hPJTKLLpjbcP3k0zpR1mzpvkpqAka1dkY7pIrT9BzStwCOUA4793
-         WCVbDwyv32uhDqyjQnba5oOWlaYdAyZUKr/zq9nqq6WU7M5GlfXIfwaEuplD4RYL75u2
-         RG+JR+l5vZ+zFLXEatJOZg5r1rz0V3KzCaFzAvvV5XbexvaZsVNmqgk6It/8sMJtGKTH
-         u9byFNrrpl+pTo6FR6kBZ5I9povSaSLx31XaOdXTmy5oPsCKcVWY+CScMjYYR2FEbSYU
-         D4TsOQvhWkiR6DxabQzrXb8KwpV3Z7hLOOJ0RghpSosFp+GQFx8QCp8bftfvZOuGUHOK
-         xxDg==
-X-Forwarded-Encrypted: i=1; AJvYcCXmscUYtRM2atvm2ywTfdV/9oY0YFFQ+DphAUiFYwgFAqdkAFyfBQbimZDS0RjH15pmyFQEiY6D8NgsIPKLeT5FRCM6
-X-Gm-Message-State: AOJu0Yw67M3Xl08sUKf2HvutSZvMOVKQq8NiRYbjKhtU6VxQEc5QmA95
-	WpdNHOBKlbtTq2BnP1ZqJqhAh22Gyk5213ZmCzU8WtxOEwIbrZkn4igIDeoTTSAaLMLomxjHPYL
-	Sbw==
-X-Google-Smtp-Source: AGHT+IE75Eg8FJSE4bq9aZ/BYnEr+ouKJwiOKS/K41JZNvFHP5zQ4Tli5g5aeYCspFPmah9r+g6Cdwx3w0Q=
+        bh=+hxROs2pSwoWeVVbtORAVOqp5Opz2REudhGLc29IbW8=;
+        b=AXU6+Yb++mn7pB+ZWyfAIaz7mbCB8E1CxZCf0ZzxEV/zPClQfCGTvmXxcwt9BONUBJ
+         KlTGDTXb1r9E5M/fWl0tY+XAxPa59S30qR4jilvOcx84aNhb7KDlAAvWb9BEakChl5Qx
+         F72hnEW+FL785DDgVyWwmnM4EOPJTGq/OaU7WBRWX7nibSab1qxepkWGP3NHo1sfKejG
+         dGEWkPSfBqiC5EdJwxFQiPymMrhfvVuXmEwT483KWYsrkx+5yjkp7N/1uASGw+hJXEcf
+         S0t3eLX7B3ivBVs7Na4rV702SD42w2xMUJobDgHZWjgO5EL58OZ6Fm/t09lfP7TNq1Vd
+         lOyg==
+X-Gm-Message-State: AOJu0YzVhOMIMyyoaEKwhuFMBn6eqFIMpiQrvc4wD4cBmxsHOiVdDTze
+	z5oFT0VpkahDc4592vJEgzfYRLnAljJvljCqVEFWnIHxsOFITJLpFxyamkDt3xN8SI+3Lad+lRa
+	Gvg==
+X-Google-Smtp-Source: AGHT+IEERIqsC1UTv45yfRqzlHV/LWimdqDoNgj35hhhJGbPhJwssS4xc0wqdW3ZZjB5Gf6V3u6siEnfZoM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:300b:b0:704:3ab0:86bb with SMTP id
- d2e1a72fcca58-705d71fa325mr40352b3a.4.1718409784313; Fri, 14 Jun 2024
- 17:03:04 -0700 (PDT)
-Date: Fri, 14 Jun 2024 17:02:51 -0700
-In-Reply-To: <02051e0a-09d8-49a2-917f-7c2f278a1ba1@moroto.mountain>
+ (user=seanjc job=sendgmr) by 2002:a17:903:1d0:b0:1f7:1706:ad6e with SMTP id
+ d9443c01a7336-1f8625bb60amr122735ad.3.1718409790709; Fri, 14 Jun 2024
+ 17:03:10 -0700 (PDT)
+Date: Fri, 14 Jun 2024 17:02:53 -0700
+In-Reply-To: <20240611220512.2426439-1-dmatlack@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <02051e0a-09d8-49a2-917f-7c2f278a1ba1@moroto.mountain>
+References: <20240611220512.2426439-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.45.2.627.g7a2c4fd464-goog
-Message-ID: <171840971654.1410787.550758149243431657.b4-ty@google.com>
-Subject: Re: [PATCH] KVM: fix an error code in kvm_create_vm()
+Message-ID: <171840976539.1411172.12319335016391468926.b4-ty@google.com>
+Subject: Re: [PATCH v4 0/4] KVM: x86/mmu: Rework TDP MMU eager page splitting
+ SP allocations
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Yi Wang <foxywang@tencent.com>, 
-	Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	David Matlack <dmatlack@google.com>
+Cc: kvm@vger.kernel.org, Bibo Mao <maobibo@loongson.cn>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 13 Jun 2024 17:33:16 +0300, Dan Carpenter wrote:
-> This error path used to return -ENOMEM from the where r is initialized
-> at the top of the function.  But a new "r = kvm_init_irq_routing(kvm);"
-> was introduced in the middle of the function so now the error code is
-> not set and it eventually leads to a NULL dereference.  Set the error
-> code back to -ENOMEM.
+On Tue, 11 Jun 2024 15:05:08 -0700, David Matlack wrote:
+> Rework the TDP MMU eager page splitting code to always drop mmu_lock
+> when allocation shadow pages, to avoid causing lock contention with vCPU
+> threads during CLEAR_DIRTY_LOG (where mmu_lock is held for write).
 > 
+> The first patch changes KVM to always drop mmu_lock lock and the
+> subsequent patches clean up and simplify the code now that conditional
+> locking is gone.
 > 
 > [...]
 
-Applied to kvm-x86 generic, with the fixup I suggested and a massaged changelog
-to address Markus' feedback.  Thanks again!
+Applied to kvm-x86 mmu, thanks!
 
-[1/1] KVM: fix an error code in kvm_create_vm()
-      https://github.com/kvm-x86/linux/commit/5c1f50ab7fcb
+[1/4] KVM: x86/mmu: Always drop mmu_lock to allocate TDP MMU SPs for eager splitting
+      https://github.com/kvm-x86/linux/commit/cf3ff0ee24d6
+[2/4] KVM: x86/mmu: Hard code GFP flags for TDP MMU eager split allocations
+      https://github.com/kvm-x86/linux/commit/e1c04f7a9f42
+[3/4] KVM: x86/mmu: Unnest TDP MMU helpers to allocate SPs for eager splitting
+      https://github.com/kvm-x86/linux/commit/3d4a5a45ca26
+[4/4] KVM: x86/mmu: Avoid reacquiring RCU if TDP MMU fails to allocate an SP
+      https://github.com/kvm-x86/linux/commit/0089c055b560
 
 --
 https://github.com/kvm-x86/linux/tree/next
