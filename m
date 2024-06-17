@@ -1,80 +1,99 @@
-Return-Path: <kvm+bounces-19796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0273C90B5F5
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 18:13:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 871D590B626
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 18:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A85A1C22D13
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28724283635
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEC11B966;
-	Mon, 17 Jun 2024 16:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACE714A602;
+	Mon, 17 Jun 2024 16:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGMxqYUW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITz8R4jh"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17C514AAD;
-	Mon, 17 Jun 2024 16:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B8D14A095
+	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 16:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718640750; cv=none; b=p2O8ZIn2XWHOgro7v7mTcv/QRte6RWyKnvtOm8UVXKYQbhwotFN0FSm696tR+X7Z3+DFS2uXaNbIHdzPml1+qeU0hAMtcIlC9MJltBhNE/GHXIlQIXwgK7u14+BiIUMHBX6RIHVsbRS3ArUb6czl1u0g3XbTnDpzt/xyaAYdngo=
+	t=1718641229; cv=none; b=QFsXYQc/Sn0Y+Yx/Yrb72E1hjwCO/nnuswUYvYtOthaLeg8HcKSl0FDww8/XefoqUiEj46tjhCxfnAhL4hL+XXeesdlCMGY9My+eL07NhCalslzu3Jxm2BcaSNdwovBP3vDlue4GY+lM8/XwhRImf8eWF5JW5uaKatwhlmm+Hxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718640750; c=relaxed/simple;
-	bh=+gtWCVLAIwVN9QYLGAITeupOhR87qFGefwq+Ci8vsv0=;
+	s=arc-20240116; t=1718641229; c=relaxed/simple;
+	bh=1YMKriBvPLE/aY5scq43G0zWcXPtBM3EQFqBpiwdFiM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lfnytt5vgpt/qTYkazNmCj5dc9kqUO22kjx11ElBlvjb7D/Bi/9Yid22KdLowk5y6/TuJyA0svj4P+aUy0x5+9ju2xuTmft0IhNKryGrZJweZzv9s4O+243AVw9B5jr72lOGffK966IFgK95AcmUbu+bEOzx8ooSMACSPLetZ4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGMxqYUW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45957C3277B;
-	Mon, 17 Jun 2024 16:12:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718640749;
-	bh=+gtWCVLAIwVN9QYLGAITeupOhR87qFGefwq+Ci8vsv0=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=tGMxqYUWUZidJOkTYRC4FVvYBSBOWSgclx4qkkf2YhB76G0qNpmpl3h3ZG/PV3BOy
-	 xlZXdbbOvZ6jW6KZZoE8jW1tSsMXb9BTJYiUY+4BFP1x4DLKJ88c59xgouIGwbGnfH
-	 pzOLAUlBJvqVtt/nGes5ftIvMNsA0KW74j39YxI7CsKwDMIstY8QCTis+Vm1d09ssf
-	 Brg/opMBq5bCqKivChkp0axZbqIBv6L47ipGD98z9wwNolXOn9myeZNXKM1TRS3DUb
-	 bJJ9eMBF03SfToJMq6gfQl4IveoZO6GqEFk38XBSPXCG+yBO8oun6MjojXjI6saj96
-	 ETfYabYghHfAQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id C3424CE09F5; Mon, 17 Jun 2024 09:12:28 -0700 (PDT)
-Date: Mon, 17 Jun 2024 09:12:28 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	"Uladzislau Rezki (Sony)" <urezki@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
- <20240612143305.451abf58@kernel.org>
- <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
- <Zmov7ZaL-54T9GiM@zx2c4.com>
- <Zmo9-YGraiCj5-MI@zx2c4.com>
- <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com>
- <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WscX7n2U0XF4ftXgs+JDg/8uxrG9apN0Uh4g6Jq7lk3pgQE32gldeo8Lbqdyl4tyXAovaOr8TkVjf2CG6aKO2vABPZhTIfIW/gY4W0ZxfLrGDUbXGjtMqLq24nxCmJw1q+M96D4VVntv1AJzLo5U7M0iFcBLeQq4pDMAkVRhzaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ITz8R4jh; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718641227;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IQRV2hrWRZz2oGiqD2uRSCHZ36VaQn0Ap0e/dg5aYkA=;
+	b=ITz8R4jhxuUj/44sC6IR7AzAUGz6FbybDCr57UoUEmtxVrUEvcUPdWSUtJeuOXbcYfdNQ6
+	ajICeAEbXA6r2+HBPGdiaUS08yShTPn92IaIBwLLR4Fkuiu2N5bK+bNnKWXI/EIEkILyvE
+	PWWpdW+0ZqYWoVucNK6oZc2Yjft925U=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-112-R6Ye1p3UOIiDr8WinK4uxg-1; Mon, 17 Jun 2024 12:20:25 -0400
+X-MC-Unique: R6Ye1p3UOIiDr8WinK4uxg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42153125d3eso33049585e9.2
+        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 09:20:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718641224; x=1719246024;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IQRV2hrWRZz2oGiqD2uRSCHZ36VaQn0Ap0e/dg5aYkA=;
+        b=ZwatgwKNzv6H+EvXSmHyMXdf/RR88cexbOOxJbY8uE+PvrvYTj8BAc69NcEt+r7HQQ
+         kZmfot+/XdHEmZJCV6AELzssAo6athzwzvTQuJCmaSVSeCsOGSTH0srPpcMWemv2hO6U
+         46fM47Lmrel2HmPjpMZhH2VX0hqg1Sn9Az2f6ywEa9TPEhPgn2zpXTfBnwVW0tRQWUgm
+         O68865S1pIuFlQ6E5jg+yylE4FnHJ2FJgsxxN8bJ3pPQF09GKDXitVs0/dfH+IRuwBVN
+         VdDPHHO2mhWxD9GPbFOID4FwaAYwiWJnI/jNIr1DgiZq7n94sDmCDMDDmFRXBWpZHCM4
+         5GQw==
+X-Forwarded-Encrypted: i=1; AJvYcCU3ckE5Y2iB4Ml1MG1UiMGKYCa/FzAEV81ngTYaSsvmsaZ5i/7ueYnHq0YYk9Gysrq+OM+1odD0kzliTNIWcv/B5NRr
+X-Gm-Message-State: AOJu0YxYx2bDI19PP9owiGDcikzMm7pxFw5xeZtRpD5gHZVoiCqtrAYT
+	+lD/Oab6201BLsjlwamm4eXptUT9aeKMIUpPVFk4v6RLlpfSgjVAB3sdNt0onWdAgFh8uwku6XS
+	6a3UBgu+WkyC8nOtGKaVHsPax96PsgbC5j5LeyQ2YMYQFG+IWew==
+X-Received: by 2002:a05:600c:4b23:b0:421:79a1:bd16 with SMTP id 5b1f17b1804b1-423048264f6mr100417115e9.16.1718641224473;
+        Mon, 17 Jun 2024 09:20:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHzccSMh+gGntzm0iGboVzC+6fVzzvRfTEWxR0IH3kumTR3OICOIsQlYAnDEfRgmcC5ufh2ZQ==
+X-Received: by 2002:a05:600c:4b23:b0:421:79a1:bd16 with SMTP id 5b1f17b1804b1-423048264f6mr100416835e9.16.1718641224002;
+        Mon, 17 Jun 2024 09:20:24 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:17c:d4a1:48dc:2f16:ab1d:e55a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422d0be1424sm169109495e9.12.2024.06.17.09.20.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 09:20:23 -0700 (PDT)
+Date: Mon, 17 Jun 2024 12:20:19 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, Parav Pandit <parav@nvidia.com>,
+	Jason Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <20240617121929-mutt-send-email-mst@kernel.org>
+References: <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+ <CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
+ <PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAETXPWG2BvyqSc@nanopsycho.orion>
+ <PH0PR12MB5481F6F62D8E47FB6DFAD206DCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAgefA1ge11bbFp@nanopsycho.orion>
+ <PH0PR12MB548116966222E720D831AA4CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAz8xchRroVOyCY@nanopsycho.orion>
+ <20240617094314-mutt-send-email-mst@kernel.org>
+ <20240617082002.3daaf9d4@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,77 +102,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+In-Reply-To: <20240617082002.3daaf9d4@kernel.org>
 
-On Mon, Jun 17, 2024 at 05:10:50PM +0200, Vlastimil Babka wrote:
-> On 6/13/24 2:22 PM, Jason A. Donenfeld wrote:
-> > On Wed, Jun 12, 2024 at 08:38:02PM -0700, Paul E. McKenney wrote:
-> >> o	Make the current kmem_cache_destroy() asynchronously wait for
-> >> 	all memory to be returned, then complete the destruction.
-> >> 	(This gets rid of a valuable debugging technique because
-> >> 	in normal use, it is a bug to attempt to destroy a kmem_cache
-> >> 	that has objects still allocated.)
+On Mon, Jun 17, 2024 at 08:20:02AM -0700, Jakub Kicinski wrote:
+> On Mon, 17 Jun 2024 09:47:21 -0400 Michael S. Tsirkin wrote:
+> > I don't know what this discussion is about, at this point.
+> > For better or worse, vdpa gained interfaces for provisioning
+> > new devices. Yes the solution space was wide but it's been there
+> > for years so kind of too late to try and make people
+> > move to another interface for that.
+> > 
+> > Having said that, vdpa interfaces are all built around
+> > virtio spec. Let's try to stick to that.
 > 
-> This seems like the best option to me. As Jason already said, the debugging
-> technique is not affected significantly, if the warning just occurs
-> asynchronously later. The module can be already unloaded at that point, as
-> the leak is never checked programatically anyway to control further
-> execution, it's just a splat in dmesg.
+> But the virtio spec doesn't allow setting the MAC...
+> I'm probably just lost in the conversation but there's hypervisor side
+> and there is user/VM side, each of them already has an interface to set
+> the MAC. The MAC doesn't matter, but I want to make sure my mental model
+> matches reality in case we start duplicating too much..
 
-Works for me!
+An obvious part of provisioning is specifying the config space
+of the device.
 
-> > Specifically what I mean is that we can still claim a memory leak has
-> > occurred if one batched kfree_rcu freeing grace period has elapsed since
-> > the last call to kmem_cache_destroy_rcu_wait/barrier() or
-> > kmem_cache_destroy_rcu(). In that case, you quit blocking, or you quit
-> > asynchronously waiting, and then you splat about a memleak like we have
-> > now.
-> 
-> Yes so we'd need the kmem_cache_free_barrier() for a slab kunit test (or the
-> pessimistic variant waiting for the 21 seconds), and a polling variant of
-> the same thing for the asynchronous destruction. Or we don't need a polling
-> variant if it's ok to invoke such a barrier in a schedule_work() workfn.
-> 
-> We should not need any new kmem_cache flag nor kmem_cache_destroy() flag to
-> burden the users of kfree_rcu() with. We have __kmem_cache_shutdown() that
-> will try to flush everything immediately and if it doesn't succeed, we can
-> assume kfree_rcu() might be in flight and try to wait for it asynchronously,
-> without any flags.
+-- 
+MST
 
-That does sound like a very attractive approach.
-
-> SLAB_TYPESAFE_BY_RCU is still handled specially because it has special
-> semantics as well.
-> 
-> As for users of call_rcu() with arbitrary callbacks that might be functions
-> from the module that is about to unload, these should not return from
-> kmem_cache_destroy() with objects in flight. But those should be using
-> rcu_barrier() before calling kmem_cache_destroy() already, and probably we
-> should not try to handle this automagically? Maybe one potential change with
-> the described approach is that today they would get the "cache not empty"
-> warning immediately. But that wouldn't stop the module unload so later the
-> callbacks would try to execute unmapped code anyway. With the new approach
-> the asynchronous handling might delay the "cache not empty" warnings (or
-> not, if kmem_cache_free_barrier() would finish before a rcu_barrier() would)
-> so the unmapped code execution would come first. I don't think that would be
-> a regression.
-
-Agreed.
-
-There are some use cases where a call_rcu() from a module without an
-rcu_barrier() would be OK, for example, if the callback function was
-defined in the core kernel and either: (1) The memory was from kmalloc()
-or (2) The memory was from kmem_cache_alloc() and your suggested
-changes above have been applied.  My current belief is that these are
-too special of cases to be worth optimizing for, so that the rule should
-remain "If you use call_rcu() in a module, you must call rcu_barrier()
-within the module-unload code."
-
-There have been discussions of having module-unload automatically invoke
-rcu_barrier() if needed, but thus far we have not come up with a good
-way to do this.  Challenges include things like static inline functions
-from the core kernel invoking call_rcu(), in which case how to figure
-out that the rcu_barrier() is not needed?
-
-							Thanx, Paul
 
