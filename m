@@ -1,121 +1,190 @@
-Return-Path: <kvm+bounces-19760-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19761-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5135390A7BB
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 09:52:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A129090A81F
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 10:07:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E851A1F24923
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 07:52:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D7491F2470D
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 08:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C09A190078;
-	Mon, 17 Jun 2024 07:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E18D0190049;
+	Mon, 17 Jun 2024 08:07:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HjkVRWqS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jDNnOtPK"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2CBC190076
-	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 07:51:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E25618628D;
+	Mon, 17 Jun 2024 08:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718610713; cv=none; b=dpUwb2AEfPMhrNA+oB4JOY/EsFUpveo11o4idtepu2+Jm3U2K8UV8ScnOPkS6STRJX3rM1flhBCHl5i+fVM2WkWKPmMVc7Cdy8x8mt0Q76nQPVWozLldGF0G+fRDwc2hZdfq5/qRv+NvDdqVoVZ1hf3G+hdPuRWIYAsXYD0unGQ=
+	t=1718611657; cv=none; b=Kvb3EuOzOGrRMxUOX69PBoVMjvSNcFfSkKLvfmlXmdFnfAEpdrqxYfxHnYA6uV+uAXmPQZDUiyjwbv2CxVW3q9bWoFw8occE1nio70EQxzHSdQY1Am8R6gX+RrFqGMn22kS7WLtpEHyNcPY+VganIXj8gSA36DtSwMP8yqse4OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718610713; c=relaxed/simple;
-	bh=+C9CpexBYFfnMpqRsSGyPaSylMt0LZhxG8Bqf4uE1vc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IT7zgndSH3sd7H2YofVTqzL8ba6kMXA/H/8HYnr0M4KWEwcjTVvo+yNUbXYNqvYkgTsd7vXMMBIWU7fgWJT+fGpOdkCsxOTICWqGH/OeGYWKUv7puLuSyVAixTjNZ5gYl/cNfVX9zwZsuAR3Tn0nys5BoxZnhJHT4k7Uvax4Gyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HjkVRWqS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718610710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ARgZIxE+11qj8ADHfG2c1X50fN5kwjd0+5g/sQvCIdY=;
-	b=HjkVRWqSsLn6L3faKyJoPD5jZlN0E9psfNZuYA+acUsbjfDZeubfNqEbx6T5LOF5wbAl5n
-	/kt4rxFVH/ZsyZmxEdlVD1ULS7sUo2+Zbm60sRAZUevpvi6oM8ZRlE1y2nJ8JsLeHwKlxS
-	BhZtxyi9zGCSzqg7fsLRN4FUA5jQ5Ic=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-172-EvbxRgEbPD6jpdHMnAQEew-1; Mon,
- 17 Jun 2024 03:51:47 -0400
-X-MC-Unique: EvbxRgEbPD6jpdHMnAQEew-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A045019560B3;
-	Mon, 17 Jun 2024 07:51:45 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id AAF4F1956087;
-	Mon, 17 Jun 2024 07:51:43 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v1 2/2] KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-Date: Mon, 17 Jun 2024 03:51:31 -0400
-Message-Id: <20240617075131.1006173-3-shahuang@redhat.com>
-In-Reply-To: <20240617075131.1006173-1-shahuang@redhat.com>
-References: <20240617075131.1006173-1-shahuang@redhat.com>
+	s=arc-20240116; t=1718611657; c=relaxed/simple;
+	bh=36kcjfNBQBQ7BrQRqoUTR+7LEakNMlF6+LyRwnMX5tk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k24IroASq707ttC4A9kGTVmbMFXRnFo0CzK5a5Vzi1LG998kn7Oh+FO9ID8xdLVC0MBtNRXbf4dApRX8T9E/eyvR5jUmSYcD1AMVu6FHgkyiGW9Ykw29rEpLHdQlnU3ND5LQlVY4bIqFUe15ZV16f3NESrvgGMLdOdMt8e7sDWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jDNnOtPK; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718611656; x=1750147656;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=36kcjfNBQBQ7BrQRqoUTR+7LEakNMlF6+LyRwnMX5tk=;
+  b=jDNnOtPK4UUANfd07YB1A3Rb1tuo8DD18yRW4WXGWf5dErItnui8j8kY
+   AG0HDn2yL1AVzq5OHL8qOdsCC4bbsfa7j6eg1flxs9iaPiCRAWIYIBcXY
+   nGNkFKWGGed5XnNtMs4Fm4n867ulADBiYAYHlPvN81+HQRlpqKzdOl1Gk
+   eboZdFFrOZWUxpjKMYHzS15WIX8Z0RjaG96VbFUB375Hlezp4kVUJduGQ
+   ra3A3rapx/cyw7LtHDx6yOouf6pyv1ZLl9GUOc0d5dp413LrjcR2xQ9Jk
+   OjJGDxep4xThOmcp9QnbD9TV210UD/s6H1kKFYN+lHlWPQtagZ7O7Ppoq
+   Q==;
+X-CSE-ConnectionGUID: WntByvsQRQ6Ecb5RFlCnbQ==
+X-CSE-MsgGUID: 53Wvj70VQ2urVkHweMTvHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11105"; a="37952311"
+X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
+   d="scan'208";a="37952311"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 01:07:35 -0700
+X-CSE-ConnectionGUID: 8kKG7+d4RvqauFqpa3eQIw==
+X-CSE-MsgGUID: Dk4GaEnPRH+Qn1mfBjt3UA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
+   d="scan'208";a="41253740"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orviesa009.jf.intel.com with ESMTP; 17 Jun 2024 01:07:31 -0700
+Date: Mon, 17 Jun 2024 16:07:29 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+	erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	Binbin Wu <binbin.wu@linux.intel.com>
+Subject: Re: [PATCH v19 085/130] KVM: TDX: Complete interrupts after tdexit
+Message-ID: <20240617080729.j5nottky5bjmgdmf@yy-desk-7060>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <aa6a927214a5d29d5591a0079f4374b05a82a03f.1708933498.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aa6a927214a5d29d5591a0079f4374b05a82a03f.1708933498.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
 
-Add test for the BT field in the ID_AA64PFR1_EL1 register.
+On Mon, Feb 26, 2024 at 12:26:27AM -0800, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> This corresponds to VMX __vmx_complete_interrupts().  Because TDX
+> virtualize vAPIC, KVM only needs to care NMI injection.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
+> ---
+> v19:
+> - move tdvps_management_check() to this patch
+> - typo: complete -> Complete in short log
+> ---
+>  arch/x86/kvm/vmx/tdx.c | 10 ++++++++++
+>  arch/x86/kvm/vmx/tdx.h |  4 ++++
+>  2 files changed, 14 insertions(+)
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 83dcaf5b6fbd..b8b168f74dfe 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -535,6 +535,14 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	 */
+>  }
+>
+> +static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
+> +{
+> +	/* Avoid costly SEAMCALL if no nmi was injected */
+> +	if (vcpu->arch.nmi_injected)
+> +		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
+> +							      TD_VCPU_PEND_NMI);
+> +}
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Looks this leads to NMI injection delay or even won't be
+reinjected if KVM_REQ_EVENT is not set on the target cpu
+when more than 1 NMIs are pending there.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index 16e2338686c1..5381b8ec5562 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -133,6 +133,11 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
- 	REG_FTR_END,
- };
- 
-+static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
-+	REG_FTR_END,
-+};
-+
- static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ECV, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, EXS, 0),
-@@ -199,6 +204,7 @@ static struct test_feature_reg test_regs[] = {
- 	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
- 	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
- 	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
-+	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
- 	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
--- 
-2.40.1
+On normal VM, KVM uses NMI window vmexit for injection
+successful case to rasie the KVM_REQ_EVENT again for remain
+pending NMIs, see handle_nmi_window(). KVM also checks
+vectoring info after VMEXIT for case that the NMI is not
+injected successfully in this vmentry vmexit round, and
+raise KVM_REQ_EVENT to try again, see __vmx_complete_interrupts().
 
+In TDX, consider there's no way to get vectoring info or
+handle nmi window vmexit, below checking should cover both
+scenarios for NMI injection:
+
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index e9c9a185bb7b..9edf446acd3b 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -835,9 +835,12 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
+ {
+        /* Avoid costly SEAMCALL if no nmi was injected */
+-       if (vcpu->arch.nmi_injected)
++       if (vcpu->arch.nmi_injected) {
+                vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
+                                                              TD_VCPU_PEND_NMI);
++               if (vcpu->arch.nmi_injected || vcpu->arch.nmi_pending)
++                       kvm_make_request(KVM_REQ_EVENT, vcpu);
++       }
+ }
+
+> +
+>  struct tdx_uret_msr {
+>  	u32 msr;
+>  	unsigned int slot;
+> @@ -663,6 +671,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+>  	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+>  	trace_kvm_exit(vcpu, KVM_ISA_VMX);
+>
+> +	tdx_complete_interrupts(vcpu);
+> +
+>  	return EXIT_FASTPATH_NONE;
+>  }
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 44eab734e702..0d8a98feb58e 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -142,6 +142,8 @@ static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
+>  			 "Invalid TD VMCS access for 16-bit field");
+>  }
+>
+> +static __always_inline void tdvps_management_check(u64 field, u8 bits) {}
+> +
+>  #define TDX_BUILD_TDVPS_ACCESSORS(bits, uclass, lclass)				\
+>  static __always_inline u##bits td_##lclass##_read##bits(struct vcpu_tdx *tdx,	\
+>  							u32 field)		\
+> @@ -200,6 +202,8 @@ TDX_BUILD_TDVPS_ACCESSORS(16, VMCS, vmcs);
+>  TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
+>  TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
+>
+> +TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
+> +
+>  static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
+>  {
+>  	struct tdx_module_args out;
+> --
+> 2.25.1
+>
+>
 
