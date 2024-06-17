@@ -1,99 +1,105 @@
-Return-Path: <kvm+bounces-19797-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19798-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871D590B626
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 18:20:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0670290B663
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 18:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28724283635
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:20:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DEB71C22FE7
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACE714A602;
-	Mon, 17 Jun 2024 16:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4199E15A861;
+	Mon, 17 Jun 2024 16:31:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ITz8R4jh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzsoFndl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B8D14A095
-	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 16:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0165158DD4;
+	Mon, 17 Jun 2024 16:30:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718641229; cv=none; b=QFsXYQc/Sn0Y+Yx/Yrb72E1hjwCO/nnuswUYvYtOthaLeg8HcKSl0FDww8/XefoqUiEj46tjhCxfnAhL4hL+XXeesdlCMGY9My+eL07NhCalslzu3Jxm2BcaSNdwovBP3vDlue4GY+lM8/XwhRImf8eWF5JW5uaKatwhlmm+Hxg=
+	t=1718641861; cv=none; b=OETSlEzlt6Ld1ESHkJ6ob/keXD6zd0rwUg5CizZw+w8gk7nARDX1I2hYzBBx5vW4rT3GGcEq+R6gJU+5KPTrrCzrd47VDfNhuMYZAmQ4M9pJH1fdOEzfzWudYGeeR70eoD5y6RmpZtjXJMC8zyggPtMwob+LUcpoQH1zJ6IhUUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718641229; c=relaxed/simple;
-	bh=1YMKriBvPLE/aY5scq43G0zWcXPtBM3EQFqBpiwdFiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WscX7n2U0XF4ftXgs+JDg/8uxrG9apN0Uh4g6Jq7lk3pgQE32gldeo8Lbqdyl4tyXAovaOr8TkVjf2CG6aKO2vABPZhTIfIW/gY4W0ZxfLrGDUbXGjtMqLq24nxCmJw1q+M96D4VVntv1AJzLo5U7M0iFcBLeQq4pDMAkVRhzaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ITz8R4jh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718641227;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IQRV2hrWRZz2oGiqD2uRSCHZ36VaQn0Ap0e/dg5aYkA=;
-	b=ITz8R4jhxuUj/44sC6IR7AzAUGz6FbybDCr57UoUEmtxVrUEvcUPdWSUtJeuOXbcYfdNQ6
-	ajICeAEbXA6r2+HBPGdiaUS08yShTPn92IaIBwLLR4Fkuiu2N5bK+bNnKWXI/EIEkILyvE
-	PWWpdW+0ZqYWoVucNK6oZc2Yjft925U=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-R6Ye1p3UOIiDr8WinK4uxg-1; Mon, 17 Jun 2024 12:20:25 -0400
-X-MC-Unique: R6Ye1p3UOIiDr8WinK4uxg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42153125d3eso33049585e9.2
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 09:20:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718641224; x=1719246024;
+	s=arc-20240116; t=1718641861; c=relaxed/simple;
+	bh=N+Qryf05FJj1hGepJO+grejqagGTDFVxmTmLFR24LxA=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XJv0QkfMjbcK6LvuLikCBtyxRNLBz++eE3esTISmsjxaBhzJqCUERXfBBS60Qreg8xq+WvMAbSu5kei1SxCoWXS+lWeOTKuho9tSdexO9gsMHAbOkSnh7gzHVygKu3E3q6g7XlFuR4K4Gh081Frn1OX6GfeL6vSZHLc9wqevgFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzsoFndl; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ebe6495aedso42867981fa.0;
+        Mon, 17 Jun 2024 09:30:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718641858; x=1719246658; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=P18NXjBrMly2kaNOMkzQiyWW0KiEt9TV5gbmtLRhdnE=;
+        b=IzsoFndljoYmFfZmzKjWO0y7B8sVwieQnmonFcQGhlZk1LiRZ/S6QKGZTV1AKY6MH+
+         6Vo+dLGcTL2Vv2E/pbRdL38QYElOjdFR8jOBiNPW24IS5BW+kzEXNRdMfSb9jp6Ewean
+         pDtMwixWFQYsCKbih32MNuZt+7FYYR3Canr74iZmOl7oNsNfXhLak7c8W7V9cG5pdB9Q
+         HrlN4xolvduCdgGprtGxzeywjmEPKiNZP2HSjGCiomeulNM76EJnFG4d0qJI36fgjWP0
+         xgkppzYOtcJyXQZzuZ5NPzja5a2AEHarQdyPfuJTuJFTRRYVUU68+4e02NCGBiWFAUFv
+         +kyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718641858; x=1719246658;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IQRV2hrWRZz2oGiqD2uRSCHZ36VaQn0Ap0e/dg5aYkA=;
-        b=ZwatgwKNzv6H+EvXSmHyMXdf/RR88cexbOOxJbY8uE+PvrvYTj8BAc69NcEt+r7HQQ
-         kZmfot+/XdHEmZJCV6AELzssAo6athzwzvTQuJCmaSVSeCsOGSTH0srPpcMWemv2hO6U
-         46fM47Lmrel2HmPjpMZhH2VX0hqg1Sn9Az2f6ywEa9TPEhPgn2zpXTfBnwVW0tRQWUgm
-         O68865S1pIuFlQ6E5jg+yylE4FnHJ2FJgsxxN8bJ3pPQF09GKDXitVs0/dfH+IRuwBVN
-         VdDPHHO2mhWxD9GPbFOID4FwaAYwiWJnI/jNIr1DgiZq7n94sDmCDMDDmFRXBWpZHCM4
-         5GQw==
-X-Forwarded-Encrypted: i=1; AJvYcCU3ckE5Y2iB4Ml1MG1UiMGKYCa/FzAEV81ngTYaSsvmsaZ5i/7ueYnHq0YYk9Gysrq+OM+1odD0kzliTNIWcv/B5NRr
-X-Gm-Message-State: AOJu0YxYx2bDI19PP9owiGDcikzMm7pxFw5xeZtRpD5gHZVoiCqtrAYT
-	+lD/Oab6201BLsjlwamm4eXptUT9aeKMIUpPVFk4v6RLlpfSgjVAB3sdNt0onWdAgFh8uwku6XS
-	6a3UBgu+WkyC8nOtGKaVHsPax96PsgbC5j5LeyQ2YMYQFG+IWew==
-X-Received: by 2002:a05:600c:4b23:b0:421:79a1:bd16 with SMTP id 5b1f17b1804b1-423048264f6mr100417115e9.16.1718641224473;
-        Mon, 17 Jun 2024 09:20:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHzccSMh+gGntzm0iGboVzC+6fVzzvRfTEWxR0IH3kumTR3OICOIsQlYAnDEfRgmcC5ufh2ZQ==
-X-Received: by 2002:a05:600c:4b23:b0:421:79a1:bd16 with SMTP id 5b1f17b1804b1-423048264f6mr100416835e9.16.1718641224002;
-        Mon, 17 Jun 2024 09:20:24 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:17c:d4a1:48dc:2f16:ab1d:e55a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422d0be1424sm169109495e9.12.2024.06.17.09.20.21
+        bh=P18NXjBrMly2kaNOMkzQiyWW0KiEt9TV5gbmtLRhdnE=;
+        b=NQfNJUHQ+lyHYNcxnNI1Md1WHmQmRcDvErix9HmkKdp5drJjJZ1i6LoKRqt6Wf7sDO
+         OkXJM3GLjZ1lpnGN+mP/ISU94l5tv6iJUrFQW8Uz3y6zYCMVxLsDrZQuUS6lHgSb0eEN
+         DmxMcPxDUslRakWqA6+yjPptK3tBdzNIrFF98f0ks3Oa95nI9fs4hrw8cmK7YmXeKWj+
+         /amXkr7/TWvmcOU1r0a3wJIIURE8a7piZbYpKvc6Lao98SBypMMEUyX4v1rqSvlkb8s5
+         ulY9myrT/n8crUZ1goFbRsbMregU8lbpfQ2+K7Rol4Qs/XEIYnJnsKL6aXDeP+3YT3n5
+         pOyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVleeA6xn5BOtkxGX4FWGbpeD4/T15dmo5/xbFDclKPkKGFuhMDZeG75nHijC0OdUuR8lYbJoIxBtUqOcHDWDzJREwr0L2lJMwsOoe5oIJw4VuE7Cd0hffwAYqI5j6N+THUNWZxPMO8U4Y8HC9nQQ5FalzoJmhbSbF3oQKCMIJZgZhTkrN7M4bzMNLQAYf9VR13wKEc7PWMAc5+//Y45ZhpLdTrxzld10oJWGO6OJd9eIhIJADE+jLVgkuhx5HoyVaDmLw7KSuUA2WH+3B6G4z8mnHHg9oovCwzpeZROGElqtV5kJG1OhvZ+526deYv4eOOHAjNG2G0tVCyp6TadECmVrD2iU0O1ZfjTTleo1T6AB0DkpIglliEIsCdrjHExcwxQ2f/txa9/oKp4MExRbBhh/RM1t0JbYhttty0f1NK5Ryexlnixss7jN9yUw==
+X-Gm-Message-State: AOJu0YxbktrJ7Srt36nbvYrAZRHcU9Zr0H5CPczrYiaj5mUd5Z4QICvM
+	QcSq/gkJ0Lrt6uq+F3oGNC8fSnyqBwiZ40HuWOS2UGo0mKxMaS2V
+X-Google-Smtp-Source: AGHT+IEPhqe0DMj4rMlaXsMOCbhrl4lbGG1gPjCGb7ivFIirSumn2PP7mfmxsW/9BAzDd49k/bprGA==
+X-Received: by 2002:a2e:9cd6:0:b0:2eb:fdd3:8fa2 with SMTP id 38308e7fff4ca-2ec0e5c5816mr68620871fa.13.1718641857513;
+        Mon, 17 Jun 2024 09:30:57 -0700 (PDT)
+Received: from pc636 (host-90-233-216-238.mobileonline.telia.com. [90.233.216.238])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec05c78400sm14106751fa.84.2024.06.17.09.30.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 09:20:23 -0700 (PDT)
-Date: Mon, 17 Jun 2024 12:20:19 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Parav Pandit <parav@nvidia.com>,
-	Jason Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
-Message-ID: <20240617121929-mutt-send-email-mst@kernel.org>
-References: <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
- <CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
- <PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <ZnAETXPWG2BvyqSc@nanopsycho.orion>
- <PH0PR12MB5481F6F62D8E47FB6DFAD206DCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <ZnAgefA1ge11bbFp@nanopsycho.orion>
- <PH0PR12MB548116966222E720D831AA4CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <ZnAz8xchRroVOyCY@nanopsycho.orion>
- <20240617094314-mutt-send-email-mst@kernel.org>
- <20240617082002.3daaf9d4@kernel.org>
+        Mon, 17 Jun 2024 09:30:57 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Mon, 17 Jun 2024 18:30:53 +0200
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZnBkvYdbAWILs7qx@pc636>
+References: <Zmru7hhz8kPDPsyz@pc636>
+ <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
+ <Zmsuswo8OPIhY5KJ@pc636>
+ <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
+ <ZmszOd5idhf2Cb-v@pc636>
+ <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
+ <Zmw5FTX752g0vtlD@pc638.lan>
+ <ZmybGZDbXkw7JTjc@zx2c4.com>
+ <ZnA_QFvuyABnD3ZA@pc636>
+ <ZnBOkZClsvAUa_5X@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -102,29 +108,100 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240617082002.3daaf9d4@kernel.org>
+In-Reply-To: <ZnBOkZClsvAUa_5X@zx2c4.com>
 
-On Mon, Jun 17, 2024 at 08:20:02AM -0700, Jakub Kicinski wrote:
-> On Mon, 17 Jun 2024 09:47:21 -0400 Michael S. Tsirkin wrote:
-> > I don't know what this discussion is about, at this point.
-> > For better or worse, vdpa gained interfaces for provisioning
-> > new devices. Yes the solution space was wide but it's been there
-> > for years so kind of too late to try and make people
-> > move to another interface for that.
+On Mon, Jun 17, 2024 at 04:56:17PM +0200, Jason A. Donenfeld wrote:
+> On Mon, Jun 17, 2024 at 03:50:56PM +0200, Uladzislau Rezki wrote:
+> > On Fri, Jun 14, 2024 at 09:33:45PM +0200, Jason A. Donenfeld wrote:
+> > > On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
+> > > > +	/* Should a destroy process be deferred? */
+> > > > +	if (s->flags & SLAB_DEFER_DESTROY) {
+> > > > +		list_move_tail(&s->list, &slab_caches_defer_destroy);
+> > > > +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> > > > +		goto out_unlock;
+> > > > +	}
+> > > 
+> > > Wouldn't it be smoother to have the actual kmem_cache_free() function
+> > > check to see if it's been marked for destruction and the refcount is
+> > > zero, rather than polling every one second? I mentioned this approach
+> > > in: https://lore.kernel.org/all/Zmo9-YGraiCj5-MI@zx2c4.com/ -
+> > > 
+> > >     I wonder if the right fix to this would be adding a `should_destroy`
+> > >     boolean to kmem_cache, which kmem_cache_destroy() sets to true. And
+> > >     then right after it checks `if (number_of_allocations == 0)
+> > >     actually_destroy()`, and likewise on each kmem_cache_free(), it
+> > >     could check `if (should_destroy && number_of_allocations == 0)
+> > >     actually_destroy()`. 
+> > > 
+> > I do not find pooling as bad way we can go with. But your proposal
+> > sounds reasonable to me also. We can combine both "prototypes" to
+> > one and offer.
 > > 
-> > Having said that, vdpa interfaces are all built around
-> > virtio spec. Let's try to stick to that.
+> > Can you post a prototype here?
 > 
-> But the virtio spec doesn't allow setting the MAC...
-> I'm probably just lost in the conversation but there's hypervisor side
-> and there is user/VM side, each of them already has an interface to set
-> the MAC. The MAC doesn't matter, but I want to make sure my mental model
-> matches reality in case we start duplicating too much..
+> This is untested, but the simplest, shortest possible version would be:
+> 
+> diff --git a/mm/slab.h b/mm/slab.h
+> index 5f8f47c5bee0..907c0ea56c01 100644
+> --- a/mm/slab.h
+> +++ b/mm/slab.h
+> @@ -275,6 +275,7 @@ struct kmem_cache {
+>  	unsigned int inuse;		/* Offset to metadata */
+>  	unsigned int align;		/* Alignment */
+>  	unsigned int red_left_pad;	/* Left redzone padding size */
+> +	bool is_destroyed;		/* Destruction happens when no objects */
+>  	const char *name;		/* Name (only for display!) */
+>  	struct list_head list;		/* List of slab caches */
+>  #ifdef CONFIG_SYSFS
+> diff --git a/mm/slab_common.c b/mm/slab_common.c
+> index 1560a1546bb1..f700bed066d9 100644
+> --- a/mm/slab_common.c
+> +++ b/mm/slab_common.c
+> @@ -494,8 +494,8 @@ void kmem_cache_destroy(struct kmem_cache *s)
+>  		goto out_unlock;
+> 
+>  	err = shutdown_cache(s);
+> -	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
+> -	     __func__, s->name, (void *)_RET_IP_);
+> +	if (err)
+> +		s->is_destroyed = true;
+>
+Here if an "err" is less then "0" means there are still objects
+whereas "is_destroyed" is set to "true" which is not correlated
+with a comment:
 
-An obvious part of provisioning is specifying the config space
-of the device.
+"Destruction happens when no objects"
 
--- 
-MST
+>  out_unlock:
+>  	mutex_unlock(&slab_mutex);
+>  	cpus_read_unlock();
+> diff --git a/mm/slub.c b/mm/slub.c
+> index 1373ac365a46..7db8fe90a323 100644
+> --- a/mm/slub.c
+> +++ b/mm/slub.c
+> @@ -4510,6 +4510,8 @@ void kmem_cache_free(struct kmem_cache *s, void *x)
+>  		return;
+>  	trace_kmem_cache_free(_RET_IP_, x, s);
+>  	slab_free(s, virt_to_slab(x), x, _RET_IP_);
+> +	if (s->is_destroyed)
+> +		kmem_cache_destroy(s);
+>  }
+>  EXPORT_SYMBOL(kmem_cache_free);
+> 
+> @@ -5342,9 +5344,6 @@ static void free_partial(struct kmem_cache *s, struct kmem_cache_node *n)
+>  		if (!slab->inuse) {
+>  			remove_partial(n, slab);
+>  			list_add(&slab->slab_list, &discard);
+> -		} else {
+> -			list_slab_objects(s, slab,
+> -			  "Objects remaining in %s on __kmem_cache_shutdown()");
+>  		}
+>  	}
+>  	spin_unlock_irq(&n->list_lock);
+> 
+Anyway it looks like it was not welcome to do it in the kmem_cache_free()
+function due to performance reason.
 
+--
+Uladzislau Rezki
 
