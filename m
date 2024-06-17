@@ -1,207 +1,144 @@
-Return-Path: <kvm+bounces-19781-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19782-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B022F90B2B0
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:45:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C69E90B2A0
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AED66B262E5
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 14:31:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21FAE1F26C49
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 14:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4828C19B58D;
-	Mon, 17 Jun 2024 13:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283C01D052C;
+	Mon, 17 Jun 2024 13:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dsmH4dZE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQKPf0Iq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03461B3F2A
-	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 13:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743F11CF3FD;
+	Mon, 17 Jun 2024 13:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718632051; cv=none; b=Jl4eGYr0xKHaDyY41rVtHSFYBylf3szx9FuLr+aNEe5Q/axG+FD111Gz3JpyySBWzXqrj/+xrHw/HC9WE7bgPN/mjWioJfXvNygQ9SytmuCUPqFj5hv0EaG0aSbQu3NjZe8RQ/lDKLasv5C6yrt70/cNUiceae6MDSIjIiD/gwc=
+	t=1718632264; cv=none; b=bTirE9dSE3NmoVZu+hH+I8X8BvI5i9HPoMYyAc3zFEJCLBB2qLuoh6vONS0Cnhba/wYRQAM7HTnd7rRw+S5iEsJ5EfgfDSsRDU4buOcJdmB9uV0qOZYofpY+zPPg1jj8Yi5S6hbLxFAC0J0JkDvJ+xFLD497TOCNbaslEXzD/1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718632051; c=relaxed/simple;
-	bh=9vMowxz1Q+3I2YwsUDY+sWrqcLKaTWtnkDjXYlErIX0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YuLuwzJvI/onIUnjTLoo9Kfi/2sSWeRLxnWP1VEXavj+DBFyOZNB6VEPUPH6FoKvBHyvwEP7eOJpbl660QgkK01Vh54NRZ7DEym2XVUisLiNvEPxd46NNFky+U5XhneXWEtR01HprkcWm4Vxfv2/V8/+CIFNLdz+S1r1P5aVVVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dsmH4dZE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718632048;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DxMIasYgmKOwN2Uh/eYVqv+BqAex9HFyWItgJcmfmCI=;
-	b=dsmH4dZE0HueNly4q5+oEVHbuC+g4yekrGde/O4pZrpZCEk0ioOW/J46is5WDdqtJ9jkrT
-	g3AA5HnjUY8jts5YQIvm1+EO8cadgca2sZ17/LQvYxQjHcDIGl7IFVaqcvIkhwdGH5mwFK
-	vPQT8Aqx+eZQX5KlOE5kI3YTdHfWW6k=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-411-71ijZc8IOF-KiU1u47W-5g-1; Mon, 17 Jun 2024 09:47:26 -0400
-X-MC-Unique: 71ijZc8IOF-KiU1u47W-5g-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-421739476b3so38309715e9.2
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 06:47:26 -0700 (PDT)
+	s=arc-20240116; t=1718632264; c=relaxed/simple;
+	bh=WxO8wJJZE1Xds5hTG7TDExzo+Qsu32A6Rbf++HOL+EU=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GpvFiYgvD/axcnwSi4Jgr7aJ6itQPCQO8b4p/elxCZjQOoTgIddOX6Dhp9XkxoDp85qYzXMtFdDI6f0+ZRPguY2CDk97D7/Qq308weuh1K1oQazH1REZa2zTKlhjS/kAEQal6QRt/hP7zveLTbDw5JRSvWcc4ij4p0nDNATGbFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQKPf0Iq; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-52c9034860dso5472308e87.2;
+        Mon, 17 Jun 2024 06:51:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718632261; x=1719237061; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7cjNgaPzx0K8Q2oE0VGfsHosS8QVWGPVVkZ0XS7HEDg=;
+        b=TQKPf0IqytFGGsqE2xDfJV+Yc75aA1GVgfltTY4XrrInwMIVCjx3BGZ2HlTDbMRnwJ
+         XRHsBKL6tbX9NklWtBn9G1kVOhmNQf4sMe56ykL4PUGZ+bBMRgt1fz+lzjHrFshmpNxt
+         3Ehb8nqYu4SNJbsYu2Bwvhy5GBpgF65YoUnh7r2JG0a43q7ag4ikgaBefGieszSUKUWC
+         +u/2IQY8h9V7c0/zz5Hxr4gjkM5QFZr/JR/tjbY6QKgCwcETuc+nXlJJ6diNXpu3XsHz
+         D8kOZYnSg7vFdFf8AIlVMJziVAtBXbYMqyg1pq73R2g3Q6wjMqZRH9KgQeucspWy6cKp
+         Dkug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718632045; x=1719236845;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DxMIasYgmKOwN2Uh/eYVqv+BqAex9HFyWItgJcmfmCI=;
-        b=wNsS+HRSxpmhos6Og+Ux5/os+KalHHPnrMyOgaxH7YU7HMkl2cVZoOQFxHYI6OVnto
-         SzEJRQ/u1QSz9L8PJ4LL0XrLI8AlvMT87UivluBSp0vMsD8vQCmHqOfnLtp12DfBY6ur
-         GwQY9qEAsfP3wTk+tvyD4CEkxqLp64mvrGEy6fBqYkRIm8CAd7CTRCeOFZkei0Yo9t+F
-         DJnwFEf6wYPFG9y6VFIfNJxFsLkRaQ7Nw7IwF3Njm85geft/R47SZHdQMGYRzss0qJa7
-         4ZYOVoU/kOISyXlYKqU2RhPWiHw9mLPI3JvNnwCAmObWkDi7rOeTPqmKGlqA4rTj9DEC
-         FLqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWalYFPBM+O6TzL3Hgtfu+lt575BSMlJGljY78ZVowOUUU1gOA7IOgvc8+WERNOSHdHNtsEhZkYCbPp0JlSlg1GGCNn
-X-Gm-Message-State: AOJu0YxWIF6xmMZwRcV958lgWL3gTF8Kv3yRk+fxq025wZvIU9SmB3jT
-	GOln9J9WgpsCDHIzobBcwoQfGZirtIanwX/ThRNohXY3fYjpgqHWkQWP4X2NgloQLD8UgQL8HHt
-	14p6wtmWIWmzzv5ahRXMDyNwp6YXh95F6OpktmQ9SjL7TRDIZ2A==
-X-Received: by 2002:a05:600c:3b06:b0:422:1705:7549 with SMTP id 5b1f17b1804b1-42304844acamr91904715e9.25.1718632045323;
-        Mon, 17 Jun 2024 06:47:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFDkRJ1ZBxBFsxD0RRnuf9bQWNjc837sVUfnG+M/dHrjMGzbYj/nvXPGpSefPzRBftuhU0mNA==
-X-Received: by 2002:a05:600c:3b06:b0:422:1705:7549 with SMTP id 5b1f17b1804b1-42304844acamr91904525e9.25.1718632044859;
-        Mon, 17 Jun 2024 06:47:24 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:7439:b500:58cc:2220:93ce:7c4a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750acd7csm11936995f8f.52.2024.06.17.06.47.23
+        d=1e100.net; s=20230601; t=1718632261; x=1719237061;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7cjNgaPzx0K8Q2oE0VGfsHosS8QVWGPVVkZ0XS7HEDg=;
+        b=S5d4QM/PuVCo0B+/u/BEqzUjwZ8ms1Lw1DBKm5kTN5i6tr3nlSagb4MBnIrTIWsJkg
+         Pz7MfNY025VUpsD0JIgCOOo2f989iq+vCYGHpAK5rYzwOvyvahVKnZUBkEEGPTzs0ojV
+         7eCXSFUwbNm0pYkPZi2TWrWueX6THHNq5uxskxggkRuRVlqhvKeTRw0n4+/uvcLVDfaN
+         XEoJ0SGtVT/3xSvVtGkHyRTi0vGthUKB+VLI7LkXgTGq9J0cnLB3GjynDlO13N76kTc9
+         gLKiczHppRV8IEEF4H81SgrEJzU3LsRF4z/Tfgj/FbUAFIDKm+nRt8xX1XbxuX0WAWU/
+         0/Yg==
+X-Forwarded-Encrypted: i=1; AJvYcCVry97e54w1jMONLsqTN3iQPG8Q/In8s2mmyp6yrh7swqNFmafo9ZrgACCJX413o79jJuAlozTDaI+xcffuD2a5oica049dt4qVMgnn+hu+Gj46IWYL8/upcCeT9Ph6+wWA9I7QGpkoDsP9X71dG/ly8osgu3lDA5aLHV7x7pYU3aAKY4bFjE91XHnVURxT9u06fOl7UhoVEIbupdMaczqYAuW50sNXHyAufRcxsimtk0hVPg/ceQqUXExfaK9u8445wj2+eF8eukwbHmcAObsoR6M/jSKqKlpV6qswmF0/JGIQRlk3Ttq4B4M3JY4XibBSRdmOAhFM4yG1momRIxQif0HajIWaLUvjmSCH1ZKw0P4cy2wRMTqHmayzjPiaExUbrndO7xOupsbjVLTMZEPOmoXJAR45vaR2SaEb5rVLzuHiIvlvuB0/GspkTg==
+X-Gm-Message-State: AOJu0Yx44HaNSMGdV8qLfWJ7IGbEjTpeF3P27BEN/w/6rJODn8eFFjCW
+	GMV8zZ9B7K28Z7pPIpftBQfPKUcN3OdYimvSvk9ZIElfLSUFCAPd
+X-Google-Smtp-Source: AGHT+IHJ0CsNfqdOT8NJ8/aEvcd12bZPn1WcmZOT2dLARsLKNTs8V+RbkzjWhHb4g1pZvloY+oCxkw==
+X-Received: by 2002:a19:5e15:0:b0:51d:9f10:71b7 with SMTP id 2adb3069b0e04-52ca6e6812fmr7404820e87.28.1718632260306;
+        Mon, 17 Jun 2024 06:51:00 -0700 (PDT)
+Received: from pc636 (host-90-233-216-238.mobileonline.telia.com. [90.233.216.238])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-52ca2887d56sm1239456e87.263.2024.06.17.06.50.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 06:47:24 -0700 (PDT)
-Date: Mon, 17 Jun 2024 09:47:21 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Parav Pandit <parav@nvidia.com>, Jason Wang <jasowang@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>, Cindy Lu <lulu@redhat.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
-Message-ID: <20240617094314-mutt-send-email-mst@kernel.org>
-References: <20240611053239.516996-1-lulu@redhat.com>
- <20240611185810.14b63d7d@kernel.org>
- <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
- <CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
- <PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <ZnAETXPWG2BvyqSc@nanopsycho.orion>
- <PH0PR12MB5481F6F62D8E47FB6DFAD206DCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <ZnAgefA1ge11bbFp@nanopsycho.orion>
- <PH0PR12MB548116966222E720D831AA4CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <ZnAz8xchRroVOyCY@nanopsycho.orion>
+        Mon, 17 Jun 2024 06:50:59 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Mon, 17 Jun 2024 15:50:56 +0200
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZnA_QFvuyABnD3ZA@pc636>
+References: <ZmrfA1p2zSVIaYam@zx2c4.com>
+ <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
+ <Zmru7hhz8kPDPsyz@pc636>
+ <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
+ <Zmsuswo8OPIhY5KJ@pc636>
+ <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
+ <ZmszOd5idhf2Cb-v@pc636>
+ <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
+ <Zmw5FTX752g0vtlD@pc638.lan>
+ <ZmybGZDbXkw7JTjc@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZnAz8xchRroVOyCY@nanopsycho.orion>
+In-Reply-To: <ZmybGZDbXkw7JTjc@zx2c4.com>
 
-On Mon, Jun 17, 2024 at 03:02:43PM +0200, Jiri Pirko wrote:
-> Mon, Jun 17, 2024 at 01:48:02PM CEST, parav@nvidia.com wrote:
-> >
-> >> From: Jiri Pirko <jiri@resnulli.us>
-> >> Sent: Monday, June 17, 2024 5:10 PM
-> >> 
-> >> Mon, Jun 17, 2024 at 11:44:53AM CEST, parav@nvidia.com wrote:
-> >> >
-> >> >> From: Jiri Pirko <jiri@resnulli.us>
-> >> >> Sent: Monday, June 17, 2024 3:09 PM
-> >> >>
-> >> >> Mon, Jun 17, 2024 at 04:57:23AM CEST, parav@nvidia.com wrote:
-> >> >> >
-> >> >> >
-> >> >> >> From: Jason Wang <jasowang@redhat.com>
-> >> >> >> Sent: Monday, June 17, 2024 7:18 AM
-> >> >> >>
-> >> >> >> On Wed, Jun 12, 2024 at 2:30 PM Jiri Pirko <jiri@resnulli.us> wrote:
-> >> >> >> >
-> >> >> >> > Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
-> >> >> >> > >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
-> >> >> >> > >> Add new UAPI to support the mac address from vdpa tool
-> >> >> >> > >> Function
-> >> >> >> > >> vdpa_nl_cmd_dev_config_set_doit() will get the MAC address
-> >> >> >> > >> from the vdpa tool and then set it to the device.
-> >> >> >> > >>
-> >> >> >> > >> The usage is: vdpa dev set name vdpa_name mac
-> >> >> >> > >> **:**:**:**:**:**
-> >> >> >> > >
-> >> >> >> > >Why don't you use devlink?
-> >> >> >> >
-> >> >> >> > Fair question. Why does vdpa-specific uapi even exist? To have
-> >> >> >> > driver-specific uapi Does not make any sense to me :/
-> >> >> >>
-> >> >> >> It came with devlink first actually, but switched to a dedicated uAPI.
-> >> >> >>
-> >> >> >> Parav(cced) may explain more here.
-> >> >> >>
-> >> >> >Devlink configures function level mac that applies to all protocol
-> >> >> >devices
-> >> >> (vdpa, rdma, netdev) etc.
-> >> >> >Additionally, vdpa device level mac can be different (an additional
-> >> >> >one) to
-> >> >> apply to only vdpa traffic.
-> >> >> >Hence dedicated uAPI was added.
-> >> >>
-> >> >> There is 1:1 relation between vdpa instance and devlink port, isn't it?
-> >> >> Then we have:
-> >> >>        devlink port function set DEV/PORT_INDEX hw_addr ADDR
-> >> >>
-> >> >Above command is privilege command done by the hypervisor on the port
-> >> function.
-> >> >Vpda level setting the mac is similar to a function owner driver setting the
-> >> mac on the self netdev (even though devlink side has configured some mac for
-> >> it).
-> >> >For example,
-> >> >$ ip link set dev wlan1 address 00:11:22:33:44:55
-> >> 
-> >> Hmm, under what sceratio exacly this is needed?
-> >The administrator on the host creating a vdpa device for the VM wants to configure the mac address for the VM.
-> >This administrator may not have the access to the devlink port function.
-> >Or he may just prefer a different MAC (theoretical case).
+On Fri, Jun 14, 2024 at 09:33:45PM +0200, Jason A. Donenfeld wrote:
+> On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
+> > +	/* Should a destroy process be deferred? */
+> > +	if (s->flags & SLAB_DEFER_DESTROY) {
+> > +		list_move_tail(&s->list, &slab_caches_defer_destroy);
+> > +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
+> > +		goto out_unlock;
+> > +	}
 > 
-> Right, but that is not reason for new uapi but rather reason to alter
-> existing devlink model to have the "host side". We discussed this many
-> times.
+> Wouldn't it be smoother to have the actual kmem_cache_free() function
+> check to see if it's been marked for destruction and the refcount is
+> zero, rather than polling every one second? I mentioned this approach
+> in: https://lore.kernel.org/all/Zmo9-YGraiCj5-MI@zx2c4.com/ -
 > 
+>     I wonder if the right fix to this would be adding a `should_destroy`
+>     boolean to kmem_cache, which kmem_cache_destroy() sets to true. And
+>     then right after it checks `if (number_of_allocations == 0)
+>     actually_destroy()`, and likewise on each kmem_cache_free(), it
+>     could check `if (should_destroy && number_of_allocations == 0)
+>     actually_destroy()`. 
 > 
-> >
-> >> I mean, the VM that has VDPA device can actually do that too. 
-> >VM cannot do. Virtio spec do not allow modifying the mac address.
-> 
-> I see. Any good reason to not allow that?
-> 
-> 
-> >
-> >> That is the actual function owner.
-> >vdpa is not mapping a whole VF to the VM.
-> >It is getting some synthetic PCI device composed using several software (kernel) and user space layers.
-> >so VM is not the function owner.
-> 
-> Sure, but owner of the netdev side, to what the mac is related. That is
-> my point.
+I do not find pooling as bad way we can go with. But your proposal
+sounds reasonable to me also. We can combine both "prototypes" to
+one and offer.
 
+Can you post a prototype here?
 
-I don't know what this discussion is about, at this point.
-For better or worse, vdpa gained interfaces for provisioning
-new devices. Yes the solution space was wide but it's been there
-for years so kind of too late to try and make people
-move to another interface for that.
+Thanks!
 
-Having said that, vdpa interfaces are all built around
-virtio spec. Let's try to stick to that.
-
-
--- 
-MST
-
+--
+Uladzislau Rezki
 
