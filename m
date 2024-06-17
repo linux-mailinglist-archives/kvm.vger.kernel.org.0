@@ -1,242 +1,277 @@
-Return-Path: <kvm+bounces-19813-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19814-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6C9190B9D1
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 20:37:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE27790B9ED
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 20:42:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F99A1F248C4
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 18:37:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C66101C23BCE
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 18:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CBF3198833;
-	Mon, 17 Jun 2024 18:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52274198E6D;
+	Mon, 17 Jun 2024 18:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fcWV5tXU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SwLOWmne"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E4FDDD7
-	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 18:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17D415ECDB;
+	Mon, 17 Jun 2024 18:42:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718649457; cv=none; b=AJkManR+r29OR1J8j0ejHgPQNvEg/2AEAfU1NldgBZPWpMp+PZpfGJcjGwC56wLCIDrQqwOutlViwFxVMG00tTSz7cIWYH7VYoZFm+6BLhid0gLkdDI3Yt6rDaX+ZTwRDEkfLUWlEqGv/PI3yiML8rqMEXJMt9WrQ0RB4g8cwQg=
+	t=1718649736; cv=none; b=ipdEG2MxfBH6ah1tHJPzW4+x174hnF6XZy+akdDZxFjy3duwQCT/lmV5KBdPVza/nFUfMggVhqCZqN5DN4KxofVnJlWzzBDmopsCLCRtAEm1cfyVtSNZ0yuTv+FMtaGnB9HjqXbczpFQt/S91Mvv40Q45O9C7w06C4REgs0Ugfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718649457; c=relaxed/simple;
-	bh=fyrpp2yF4aIYKTN8cDgvs3STrDN8prieilqUnx09/SI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sL6BjLqwPJZ4mDH660V4EWD/F+ioDEOhQOQJtDOH32N8PQQpg8TDR1cgLvgnrgCWQAGE1LZycuMPkLK0Qll+d5UdJaF0tcO6rZklnFOaKkYghG6aBxGVT54/YpXfSixNjgxUKHbNmFY2IbruFvwOM+ngjpASi6OpzfUJsPDcEHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fcWV5tXU; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c30144b103so3734034a91.0
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 11:37:36 -0700 (PDT)
+	s=arc-20240116; t=1718649736; c=relaxed/simple;
+	bh=Flz2Pil2geTTJPxA2CBnOZsQd4N0qDIllekhZBSDWlc=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C3HPX2fyS78d7CFkJbjv3pvVSbLkc9v0zy07nUrrIG5ZJdFVohZKmQg3ppmlSj2G2TtXzL97/T5ZvwKwKUb7DCYIEcvI1YSi/z70u5ihmqkLp4YQ1Z4UCgoXLkRTQiBjA3dHX4y2jq1kNPwpV7saWPUFmw5KGA1uagE4nOb51EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SwLOWmne; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-52bc29c79fdso6411089e87.1;
+        Mon, 17 Jun 2024 11:42:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718649455; x=1719254255; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VVb9bJW/yXgkQj+PV0cMLcdHxyPeYBELQ67LgqP0P74=;
-        b=fcWV5tXUiqEpCzFRoxZr+WucJQG5JRNMWYy+mP0FN5rW+jApKOlh6e1fEckgnXrRP4
-         q1zN/SJFJEtROdXdxseB9eJDlOZ1Adsry2kg9XJvpXlEbJWekudlATEWDdLsCjEeGawF
-         pBkNR4jwy1TqYBy5fepgkJlCeLBcp2YNzI/UN7A9OkTNBQvMzen0Hko/JlgO7642Nbct
-         Ff8sCteaptJYKoys5nuvBwzhr6mkMd+isTozXWyqc2Y5NMLS1XylCXlUPVYFedVGEIFG
-         GkwuqcroRFmjbTnY7ZZ1u4Mp6EEiB+VaOj5FGCxHcDu9zimudPTA7tSCqJhObWXv6mgG
-         b5CQ==
+        d=gmail.com; s=20230601; t=1718649733; x=1719254533; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+jO2FlPNmcOLf+hC3upZKg3SDI4/5kwrnW8GkxW5YVg=;
+        b=SwLOWmnegBDu0JkvO8Nk44GF2tkUWJquyl78o3MaKsdamsvDPkuile/bqycsEgFeF7
+         8s33oHaK6l/o743r8T5vismpctgIlDtjjllhCfzevHkT+v+hfpf4ZwQNnlWOHYdOCaIk
+         xK+w8r94y3an1iV5Stw7kumo8GZ7uLcBfrLQTHxbRTtZ8hP8KcKCSc9bXUuwZykj86ME
+         x69lW4t7agK2tRS0aZhqHAlf0AcG5fWl7W6/xJDv0Yc3P7fILbomIs13vHnECCpCfWnM
+         jRa/hXtYC5cYMbixNz2uaJyEiiS49XVkqe9pC9L0qoZQcc4CnAZg2PzexSiYEsFER4Pz
+         Zbjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718649455; x=1719254255;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VVb9bJW/yXgkQj+PV0cMLcdHxyPeYBELQ67LgqP0P74=;
-        b=mc1QxTArJf02AAUl6cxqiJsdI/8a9UEYWk50Gf11nGf4tbhih1Cg6OGXVk6YVVVWbv
-         DVRz1VsTWgP1bG7GV3SI3UM2EW+KJhd/hN1TuVH/EIZ2xBbqJzDMAl0ILgVS95dhfdRa
-         hfLK5zw+cx7RhKpbNvSZpYspcBJcjkha0lFuIWAmgh0gsiK2jYUYBWjaa0CQLS+UWJ+G
-         LD1HYK9f95xPvTN86RU/l9jSZxe42S6YqauFwreTagUWUGTLBgYFOmc8bbldeMtHXy2g
-         8c1zbG5nrgdGOvCk0ms3b0V5/CrJnvqy+tJSFweXEjXcdXl7xTlp/9+ZJA/wSy1ubBfm
-         8cYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW1w7veQhktLoYhsMD/EhiGbveOpQyTLtq6Vv3Yrebbbmrwfqr/y2H9mM0YMxqPZ12x7rI6M6arWqjgRrdCrMKXGmWz
-X-Gm-Message-State: AOJu0YxV9PIdPyh1g7EKd7fRiuBo0TjSBB0nhiyctMKJ9saZNQiEkCo3
-	FTKtHkuWy1d1pmIHrY49ocl/ggM+ClAZUqcAFSo+CpJ+5YCDCWGgwLekb24cX5q4t0sPYh7jQcG
-	y6A==
-X-Google-Smtp-Source: AGHT+IF3ovJSiOKecScB3AmrwPx3A35/rUgMT/905FvA0ZGLjFKkhGdKFyVMw2sGINH1wDrN4Gap7jytJ8g=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:9cb:b0:2c4:e074:de83 with SMTP id
- 98e67ed59e1d1-2c6c9221593mr1951a91.2.1718649455060; Mon, 17 Jun 2024 11:37:35
- -0700 (PDT)
-Date: Mon, 17 Jun 2024 11:37:27 -0700
-In-Reply-To: <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1718649733; x=1719254533;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+jO2FlPNmcOLf+hC3upZKg3SDI4/5kwrnW8GkxW5YVg=;
+        b=r3s+YBbYVCO1EXoT35oXlqzer01navZiyQ8ZKgXuh5Dvu2NaMzoGPcIbVkyhuMxY81
+         te72gjyDM0a3Y6SD21PH+tC5PBVK2z1scxiueUAPYnXKnK4xIW1nnHmqJM+Whgzeg/Qq
+         e1q1gMvzV8MYF3latzb+6758KqPKJ0Mcr2AodbqJUEYe1ZpjXlRuiGjASO1xb5wV8bsI
+         jWcKrDXIPaMYObErrIMb6t6A7isZ2hGBCOE7PqED7uj2sBZKmf3SI2WcJuT8SFArN5qU
+         4B1MSVtzK6SvXZV7WOrePmGOEu8OPACy1oZoReF6q9KCwjkNeATEzvGBrdywZW3qz1bN
+         5rNg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBIoYHB9zvqJj4LsEW2GeviCD5HM88aqJbhuk47uLFXWV9FivIwO6Y5hRIr2Pimuh/QSQ55rvni9Np4X6kzm4wjbq+9SEl92AeLUb9bVIXW67DdTudWrJRre01EQ5Yx3IVwVtndrMEpc3uir/incEz9Qv0vhsVf73sxDC0IeRKnItKYpN76lzxTy8ZpxKGo6Ngkulb2IrgN5LBWEizXOgrp3xovPWWtF77qezmnjDxPFaws/stttvTlJQxoJXPmYvCitoTsL9SCH7LQbi7cImAeHuGTsiP9vJoxh++axXZWGZ9zygTOgTfG6uvnc3vG1CPGuzY1LhhVtQCMon4h2Fs+wtadwid4j3O//wbZhLTWURZ99MWaUPqAaRmOhZwRlByMN1dO/HArmpSudpMX/511257pJID0mUKXB7r/pdfGBBNhOQ/+rYHjOwisQ==
+X-Gm-Message-State: AOJu0YwVFGEmtLJjAKw5bzc7E2Lo58Cs6RtBmVGcfv1YkiQzcDnHEZkj
+	llZs4TMim1bpGZhR6H/p9hq/cumeC3MuulPqnANwthc9DKr4A425
+X-Google-Smtp-Source: AGHT+IG+He9esutTE4DcK6Uo+MkQ9CT1wI+N+kkdrm92KSfS1cK189MGjfkb18QFb85ZwtxeC6GLJw==
+X-Received: by 2002:a05:6512:549:b0:521:cc8a:46dd with SMTP id 2adb3069b0e04-52ca6e56e2dmr7855127e87.11.1718649732281;
+        Mon, 17 Jun 2024 11:42:12 -0700 (PDT)
+Received: from pc636 (host-185-121-47-193.sydskane.nu. [185.121.47.193])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56db6182sm540019666b.51.2024.06.17.11.42.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 11:42:11 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Mon, 17 Jun 2024 20:42:09 +0200
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: paulmck@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	"Uladzislau Rezki (Sony)" <urezki@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZnCDgdg1EH6V7w5d@pc636>
+References: <20240609082726.32742-1-Julia.Lawall@inria.fr>
+ <20240612143305.451abf58@kernel.org>
+ <baee4d58-17b4-4918-8e45-4d8068a23e8c@paulmck-laptop>
+ <Zmov7ZaL-54T9GiM@zx2c4.com>
+ <Zmo9-YGraiCj5-MI@zx2c4.com>
+ <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
+ <Zmrkkel0Fo4_g75a@zx2c4.com>
+ <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAOUHufYGqbd45shZkGCpqeTV9wcBDUoo3iw1SKiDeFLmrP0+=w@mail.gmail.com>
- <CADrL8HVHcKSW3hiHzKTit07gzo36jtCZCnM9ZpueyifgNdGggw@mail.gmail.com>
- <ZmioedgEBptNoz91@google.com> <CADrL8HU_FKHTz_6d=xhVLZFDQ_zQo-zdB2rqdpa2CKusa1uo+A@mail.gmail.com>
- <ZmjtEBH42u7NUWRc@google.com> <CADrL8HUW2q79F0FsEjhGW0ujij6+FfCqas5UpQp27Epfjc94Nw@mail.gmail.com>
- <ZmxsCwu4uP1lGsWz@google.com> <CADrL8HVDZ+m_-jUCaXf_DWJ92N30oqS=_9wNZwRvoSp5fo7asg@mail.gmail.com>
- <ZmzPoW7K5GIitQ8B@google.com> <CADrL8HW3rZ5xgbyGa+FXk50QQzF4B1=sYL8zhBepj6tg0EiHYA@mail.gmail.com>
-Message-ID: <ZnCCZ5gQnA3zMQtv@google.com>
-Subject: Re: [PATCH v5 4/9] mm: Add test_clear_young_fast_only MMU notifier
-From: Sean Christopherson <seanjc@google.com>
-To: James Houghton <jthoughton@google.com>
-Cc: Yu Zhao <yuzhao@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
-	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
-	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
 
-On Mon, Jun 17, 2024, James Houghton wrote:
-> On Fri, Jun 14, 2024 at 4:17=E2=80=AFPM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> >
-> > On Fri, Jun 14, 2024, James Houghton wrote:
-> > > On Fri, Jun 14, 2024 at 9:13=E2=80=AFAM Sean Christopherson <seanjc@g=
-oogle.com> wrote:
-> > > >
-> > > > On Thu, Jun 13, 2024, James Houghton wrote:
-> > > > > I wonder if this still makes sense if whether or not an MMU is "f=
-ast"
-> > > > > is determined by how contended some lock(s) are at the time.
-> > > >
-> > > > No.  Just because a lock wasn't contended on the initial aging does=
-n't mean it
-> > > > won't be contended on the next round.  E.g. when using KVM x86's sh=
-adow MMU, which
-> > > > takes mmu_lock for write for all operations, an aging operation cou=
-ld get lucky
-> > > > and sneak in while mmu_lock happened to be free, but then get stuck=
- behind a large
-> > > > queue of operations.
-> > > >
-> > > > The fast-ness needs to be predictable and all but guaranteed, i.e. =
-lockless or in
-> > > > an MMU that takes mmu_lock for read in all but the most rare paths.
-> > >
-> > > Aging and look-around themselves only use the fast-only notifiers, so
-> > > they won't ever wait on a lock (well... provided KVM is written like
-> > > that, which I think is a given).
-> >
-> > Regarding aging, is that actually the behavior that we want?  I thought=
- the plan
-> > is to have the initial test look at all MMUs, i.e. be potentially slow,=
- but only
-> > do the lookaround if it can be fast.  IIUC, that was Yu's intent (and p=
-eeking back
-> > at v2, that is indeed the case, unless I'm misreading the code).
->=20
-> I believe what I said is correct. There are three separate things going o=
-n here:
->=20
-> 1. Aging (when we hit the low watermark, scan PTEs to find young pages)
-> 2. Eviction (pick a page to evict; if it is definitely not young, evict i=
-t)
-> 3. Look-around (upon finding a page is young upon attempted eviction,
-> check adjacent pages if they are young too)
+On Mon, Jun 17, 2024 at 07:23:36PM +0200, Vlastimil Babka wrote:
+> On 6/17/24 6:12 PM, Paul E. McKenney wrote:
+> > On Mon, Jun 17, 2024 at 05:10:50PM +0200, Vlastimil Babka wrote:
+> >> On 6/13/24 2:22 PM, Jason A. Donenfeld wrote:
+> >> > On Wed, Jun 12, 2024 at 08:38:02PM -0700, Paul E. McKenney wrote:
+> >> >> o	Make the current kmem_cache_destroy() asynchronously wait for
+> >> >> 	all memory to be returned, then complete the destruction.
+> >> >> 	(This gets rid of a valuable debugging technique because
+> >> >> 	in normal use, it is a bug to attempt to destroy a kmem_cache
+> >> >> 	that has objects still allocated.)
+> >> 
+> >> This seems like the best option to me. As Jason already said, the debugging
+> >> technique is not affected significantly, if the warning just occurs
+> >> asynchronously later. The module can be already unloaded at that point, as
+> >> the leak is never checked programatically anyway to control further
+> >> execution, it's just a splat in dmesg.
+> > 
+> > Works for me!
+> 
+> Great. So this is how a prototype could look like, hopefully? The kunit test
+> does generate the splat for me, which should be because the rcu_barrier() in
+> the implementation (marked to be replaced with the real thing) is really
+> insufficient. Note the test itself passes as this kind of error isn't wired
+> up properly.
+> 
+> Another thing to resolve is the marked comment about kasan_shutdown() with
+> potential kfree_rcu()'s in flight.
+> 
+> Also you need CONFIG_SLUB_DEBUG enabled otherwise node_nr_slabs() is a no-op
+> and it might fail to notice the pending slabs. This will need to change.
+> 
+> ----8<----
+> diff --git a/lib/slub_kunit.c b/lib/slub_kunit.c
+> index e6667a28c014..e3e4d0ca40b7 100644
+> --- a/lib/slub_kunit.c
+> +++ b/lib/slub_kunit.c
+> @@ -5,6 +5,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/module.h>
+>  #include <linux/kernel.h>
+> +#include <linux/rcupdate.h>
+>  #include "../mm/slab.h"
+>  
+>  static struct kunit_resource resource;
+> @@ -157,6 +158,26 @@ static void test_kmalloc_redzone_access(struct kunit *test)
+>  	kmem_cache_destroy(s);
+>  }
+>  
+> +struct test_kfree_rcu_struct {
+> +	struct rcu_head rcu;
+> +};
+> +
+> +static void test_kfree_rcu(struct kunit *test)
+> +{
+> +	struct kmem_cache *s = test_kmem_cache_create("TestSlub_kfree_rcu",
+> +				sizeof(struct test_kfree_rcu_struct),
+> +				SLAB_NO_MERGE);
+> +	struct test_kfree_rcu_struct *p = kmem_cache_alloc(s, GFP_KERNEL);
+> +
+> +	kasan_disable_current();
+> +
+> +	KUNIT_EXPECT_EQ(test, 0, slab_errors);
+> +
+> +	kasan_enable_current();
+> +	kfree_rcu(p, rcu);
+> +	kmem_cache_destroy(s);
+> +}
+> +
+>  static int test_init(struct kunit *test)
+>  {
+>  	slab_errors = 0;
+> @@ -177,6 +198,7 @@ static struct kunit_case test_cases[] = {
+>  
+>  	KUNIT_CASE(test_clobber_redzone_free),
+>  	KUNIT_CASE(test_kmalloc_redzone_access),
+> +	KUNIT_CASE(test_kfree_rcu),
+>  	{}
+>  };
+>  
+> diff --git a/mm/slab.h b/mm/slab.h
+> index b16e63191578..a0295600af92 100644
+> --- a/mm/slab.h
+> +++ b/mm/slab.h
+> @@ -277,6 +277,8 @@ struct kmem_cache {
+>  	unsigned int red_left_pad;	/* Left redzone padding size */
+>  	const char *name;		/* Name (only for display!) */
+>  	struct list_head list;		/* List of slab caches */
+> +	struct work_struct async_destroy_work;
+> +
+>  #ifdef CONFIG_SYSFS
+>  	struct kobject kobj;		/* For sysfs */
+>  #endif
+> @@ -474,7 +476,7 @@ static inline bool is_kmalloc_cache(struct kmem_cache *s)
+>  			      SLAB_NO_USER_FLAGS)
+>  
+>  bool __kmem_cache_empty(struct kmem_cache *);
+> -int __kmem_cache_shutdown(struct kmem_cache *);
+> +int __kmem_cache_shutdown(struct kmem_cache *, bool);
+>  void __kmem_cache_release(struct kmem_cache *);
+>  int __kmem_cache_shrink(struct kmem_cache *);
+>  void slab_kmem_cache_release(struct kmem_cache *);
+> diff --git a/mm/slab_common.c b/mm/slab_common.c
+> index 5b1f996bed06..c5c356d0235d 100644
+> --- a/mm/slab_common.c
+> +++ b/mm/slab_common.c
+> @@ -44,6 +44,8 @@ static LIST_HEAD(slab_caches_to_rcu_destroy);
+>  static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work);
+>  static DECLARE_WORK(slab_caches_to_rcu_destroy_work,
+>  		    slab_caches_to_rcu_destroy_workfn);
+> +static void kmem_cache_kfree_rcu_destroy_workfn(struct work_struct *work);
+> +
+>  
+>  /*
+>   * Set of flags that will prevent slab merging
+> @@ -234,6 +236,7 @@ static struct kmem_cache *create_cache(const char *name,
+>  
+>  	s->refcount = 1;
+>  	list_add(&s->list, &slab_caches);
+> +	INIT_WORK(&s->async_destroy_work, kmem_cache_kfree_rcu_destroy_workfn);
+>  	return s;
+>  
+>  out_free_cache:
+> @@ -449,12 +452,16 @@ static void slab_caches_to_rcu_destroy_workfn(struct work_struct *work)
+>  	}
+>  }
+>  
+> -static int shutdown_cache(struct kmem_cache *s)
+> +static int shutdown_cache(struct kmem_cache *s, bool warn_inuse)
+>  {
+>  	/* free asan quarantined objects */
+> +	/*
+> +	 * XXX: is it ok to call this multiple times? and what happens with a
+> +	 * kfree_rcu() in flight that finishes after or in parallel with this?
+> +	 */
+>  	kasan_cache_shutdown(s);
+>  
+> -	if (__kmem_cache_shutdown(s) != 0)
+> +	if (__kmem_cache_shutdown(s, warn_inuse) != 0)
+>  		return -EBUSY;
+>  
+>  	list_del(&s->list);
+> @@ -477,6 +484,32 @@ void slab_kmem_cache_release(struct kmem_cache *s)
+>  	kmem_cache_free(kmem_cache, s);
+>  }
+>  
+> +static void kmem_cache_kfree_rcu_destroy_workfn(struct work_struct *work)
+> +{
+> +	struct kmem_cache *s;
+> +	int err = -EBUSY;
+> +	bool rcu_set;
+> +
+> +	s = container_of(work, struct kmem_cache, async_destroy_work);
+> +
+> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
+It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
+wanted to avoid initially. Since you do it asynchronous can we just repeat
+and wait until it a cache is furry freed?
 
-Ah, I now see the difference between #1 and #2, and your responses make a l=
-ot more
-sense.  Thanks!
+I am asking because inventing a new kfree_rcu_barrier() might not be so
+straight forward.
 
-> > If KVM _never_ consults shadow (nested TDP) MMUs, then a VM running an =
-L2 will
-> > end up with hot pages (used by L2) swapped out.
->=20
-> The shadow MMU is consulted at eviction time -- only at eviction time.
-> So pages used by L2 won't be swapped out unless they're still cold at
-> eviction time.
->=20
-> In my (and Yu's) head, not being able to do aging for nested TDP is ok
-> because running nested VMs is much more rare than running non-nested
-> VMs. And in the non-nested case, being able to do aging is a strict
-> improvement over what we have now.
-
-Yes and no.  Running nested VMs is indeed rare when viewing them as a perce=
-ntage
-of all VMs in the fleet, but for many use cases, the primary workload of a =
-VM is
-to run nested VMs.  E.g. say x% of VMs in the fleet run nested VMs, where '=
-x' is
-likely very small, but for those x% VMs, they run nested VMs 99% of the tim=
-e
-(completely made up number).
-
-So yes, I completely agree that aging for non-nested VMs is a strict improv=
-ement,
-but I also think don't think we should completely dismiss nested VMs as a p=
-roblem
-not worth solving.
-
-> We could look into being able to do aging with the shadow MMU, but I
-> don't think that should necessarily block this series.
-
-...
-
-> > Ooh!  Actually, after fiddling a bit to see how feasible fast-aging in =
-the shadow
-> > MMU would be, I'm pretty sure we can do straight there for nested TDP. =
- Or rather,
-> > I suspect/hope we can get close enough for an initial merge, which woul=
-d allow
-> > aging_is_fast to be a property of the mmu_notifier, i.e. would simplify=
- things
-> > because KVM wouldn't need to communicate MMU_NOTIFY_WAS_FAST for each n=
-otification.
-> >
-> > Walking KVM's rmaps requires mmu_lock because adding/removing rmap entr=
-ies is done
-> > in such a way that a lockless walk would be painfully complex.  But if =
-there is
-> > exactly _one_ rmap entry for a gfn, then slot->arch.rmap[...] points di=
-rectly at
-> > that one SPTE.  And with nested TDP, unless L1 is doing something uncom=
-mon, e.g.
-> > mapping the same page into multiple L2s, that overwhelming vast majorit=
-y of rmaps
-> > have only one entry.  That's not the case for legacy shadow paging beca=
-use kernels
-> > almost always map a pfn using multiple virtual addresses, e.g. Linux's =
-direct map
-> > along with any userspace mappings.
-=20
-...
-
-> Hmm, interesting. I need to spend a little bit more time digesting this.
->=20
-> Would you like to see this included in v6? (It'd be nice to avoid the
-> WAS_FAST stuff....) Should we leave it for a later series? I haven't
-> formed my own opinion yet.
-
-I would say it depends on the viability and complexity of my idea.  E.g. if=
- it
-pans out more or less like my rough sketch, then it's probably worth taking=
- on
-the extra code+complexity in KVM to avoid the whole WAS_FAST goo.
-
-Note, if we do go this route, the implementation would need to be tweaked t=
-o
-handle the difference in behavior between aging and last-minute checks for =
-eviction,
-which I obviously didn't understand when I threw together that hack-a-patch=
-.
-
-I need to think more about how best to handle that though, e.g. skipping GF=
-Ns with
-multiple mappings is probably the worst possible behavior, as we'd risk evi=
-cting
-hot pages.  But falling back to taking mmu_lock for write isn't all that de=
-sirable
-either.
+--
+Uladzislau Rezki
 
