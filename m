@@ -1,154 +1,109 @@
-Return-Path: <kvm+bounces-19758-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19759-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33BCD90A7B3
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 09:51:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ACD890A7B6
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 09:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD8FE1F24920
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 07:51:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37DDA283D0A
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 07:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B0A18FDA6;
-	Mon, 17 Jun 2024 07:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031C8190052;
+	Mon, 17 Jun 2024 07:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vQ85Xupg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvcpbp1L"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733BD38396;
-	Mon, 17 Jun 2024 07:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B16518F2C3
+	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 07:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718610701; cv=none; b=e7HlzFe/Mef0mbyFcRPc7OIifp5zuq/QNujbQnCcaB2eD6VmaYFRossxlWDYKeUey5sXr6DdyuLK3Lzl7uzylC6G2f4OaPbmZQK1T9RxG+cW/DKu3eLH0WWKeEI3h4G1bY4Qx5Qwmc8CXHnk8aXCvVPqm3ntawnWBX+UBhyUHHY=
+	t=1718610710; cv=none; b=j2xGoUjoTjt87oAG2GkCKHdyaPg1ohxouI3ogMQAnTrqf5fTVthL2p8jugYJ/UbJnY/b0oX3ubAotdd0K/4fnnev0AdLEwr4W1nFZfgMLcNGrU9zAePe+Y40BadZW+1oUZjxn7bpRBX/IkD8ZqapWf5WD7dvVctDjrDQt5vh69s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718610701; c=relaxed/simple;
-	bh=NG8gvLsGeGERZcnN9LKe5/vwkRczxp/GUoWZxf+l7ME=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rAZJ6JELNk8GN51oOq8oB6q80zl6cQPL6dnsiUiykM7mHvXF85ijWQu3m5KP8CuFSx/xjHGFhjj8cEX0nfv9avtTOYEDqRd8+fO0tLOD0c9HFte8mpfupxVcEiXkFdtGklLzJg2eA2CA/L9I0Ks4uDuyUouGpJoGOEvJDucqwIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vQ85Xupg; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=IAmKegLYI+0e826keswLRf8FGni5PR5ZQKaV8HRzyrU=; b=vQ85Xupglat8LtsLeL3JFW9akS
-	FbnIJABe9IR7/BZY3pzSg0IESab/IIpQvTUyjwOsi1nWVgMiBHw6aNkbEt/vDNWV5KzQ61PQPUiBz
-	CJxQ9zujfWM2bEPI3ubIS+lFg2ypvCdr5KfcuaBEEqarM5huIcxWVPm5JWNoa6wvBGXqeOpgwnBvk
-	b4Z+jJMzAvU78zgIxbG5jVonU3bo/lAL9OmfRm6bbU2SwrIy6be6a2+1j//ZO1N88I0ThlNrdvx1p
-	ZM+B3fWx0sSlmuHpCv4Upz6kM4ohLlbZMSpYuPYp24ZdUis+SJwczJYp9logGtSxUpmQpWKiW7D+5
-	g8T42pkg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sJ799-00000001v2O-3R7x;
-	Mon, 17 Jun 2024 07:51:25 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 332EB30088D; Mon, 17 Jun 2024 09:51:23 +0200 (CEST)
-Date: Mon, 17 Jun 2024 09:51:23 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: "Liang, Kan" <kan.liang@linux.intel.com>
-Cc: Mingwei Zhang <mizhang@google.com>,
-	Sean Christopherson <seanjc@google.com>,
+	s=arc-20240116; t=1718610710; c=relaxed/simple;
+	bh=mproEs7n+ddFpkKXDlP2Smw07PE40yTNGmUf0E6+5Zs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=k9B8tzx9rO0PQnMe+eMA6cBxH+3PmdyJtlAlMoHg23VR51EsUGsskSb5fpyaHgKgQSQU6rDq+3QpGnV+KEg+efx34PYywxA1O4VOD/IUnrbVrEWEY3jdwxqJS5J2xW5fLl/kD4F3IOKwJfYqIlkmGQlvQ8dAksej8VHOvnIjUV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gvcpbp1L; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718610706;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BW4VAsHAD5rQXt1LXI/66mtVgyz0sOVi0R128fdor2M=;
+	b=gvcpbp1LUJaNLQCzE81irxggspYWBZGQ01p7IR70ovc5Pl2MEwS6y28wLlLSH2agxASml3
+	8yItOs94+rX8zIKrYCg7PMbmKbH/7stg8AjCLtr5vfcuqH4931GMga3ZstJ3HI+bNqX5WN
+	DM4hPhKBCMOd3liqSiEv2Bqti613dHA=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-595-eYIEDCG1OhSnxDpFyTq0Ag-1; Mon,
+ 17 Jun 2024 03:51:43 -0400
+X-MC-Unique: eYIEDCG1OhSnxDpFyTq0Ag-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E941019560AF;
+	Mon, 17 Jun 2024 07:51:40 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A91481956087;
+	Mon, 17 Jun 2024 07:51:36 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
-	Xiong Zhang <xiong.y.zhang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Kan Liang <kan.liang@intel.com>,
-	Zhenyu Wang <zhenyuw@linux.intel.com>,
-	Manali Shukla <manali.shukla@amd.com>,
-	Sandipan Das <sandipan.das@amd.com>,
-	Jim Mattson <jmattson@google.com>,
-	Stephane Eranian <eranian@google.com>,
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
-	gce-passthrou-pmu-dev@google.com,
-	Samantha Alt <samantha.alt@intel.com>,
-	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
-	maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
-	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
-Subject: Re: [PATCH v2 07/54] perf: Add generic exclude_guest support
-Message-ID: <20240617075123.GX40213@noisy.programming.kicks-ass.net>
-References: <20240506053020.3911940-8-mizhang@google.com>
- <20240507085807.GS40213@noisy.programming.kicks-ass.net>
- <902c40cc-6e0b-4b2f-826c-457f533a0a76@linux.intel.com>
- <20240611120641.GF8774@noisy.programming.kicks-ass.net>
- <0a403a6c-8d55-42cb-a90c-c13e1458b45e@linux.intel.com>
- <20240612111732.GW40213@noisy.programming.kicks-ass.net>
- <e72c847f-a069-43e4-9e49-37c0bf9f0a8b@linux.intel.com>
- <20240613091507.GA17707@noisy.programming.kicks-ass.net>
- <3755c323-6244-4e75-9e79-679bd05b13a4@linux.intel.com>
- <f4da2fb2-fa09-4d2b-a78d-1b459ada6d09@linux.intel.com>
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v1 0/2] KVM: arm64: Making BT Field in ID_AA64PFR1_EL1 writable
+Date: Mon, 17 Jun 2024 03:51:29 -0400
+Message-Id: <20240617075131.1006173-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f4da2fb2-fa09-4d2b-a78d-1b459ada6d09@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Thu, Jun 13, 2024 at 02:04:36PM -0400, Liang, Kan wrote:
-> >>  static enum event_type_t get_event_type(struct perf_event *event)
-> >> @@ -3340,9 +3388,14 @@ ctx_sched_out(struct perf_event_context
-> >>  	 * would only update time for the pinned events.
-> >>  	 */
-> >>  	if (is_active & EVENT_TIME) {
-> >> +		bool stop;
-> >> +
-> >> +		stop = !((ctx->is_active & event_type) & EVENT_ALL) &&
-> >> +		       ctx == &cpuctx->ctx;
-> >> +			
-> >>  		/* update (and stop) ctx time */
-> >>  		update_context_time(ctx);
-> >> -		update_cgrp_time_from_cpuctx(cpuctx, ctx == &cpuctx->ctx);
-> >> +		update_cgrp_time_from_cpuctx(cpuctx, stop);
-> 
-> For the event_type == EVENT_GUEST, the "stop" should always be the same
-> as "ctx == &cpuctx->ctx". Because the ctx->is_active never set the
-> EVENT_GUEST bit.
-> Why the stop is introduced?
+In this patch series, we try to make more register fields writable like
+ID_AA64PFR1_EL1.BT since this can benifit the migration between some of the
+machines which have different BT values.
 
-Because the ctx_sched_out() for vPMU should not stop time, only the
-'normal' sched-out should stop time.
+Changelog:
+----------
+RFCv1 -> v1:
+  * Fix the compilation error.
+  * Delete the machine specific information and make the description more
+    generable.
 
+RFCv1: https://lore.kernel.org/all/20240612023553.127813-1-shahuang@redhat.com/
 
-> >> @@ -3949,6 +4015,8 @@ ctx_sched_in(struct perf_event_context *
-> >>  		return;
-> >>  
-> >>  	if (!(is_active & EVENT_TIME)) {
-> >> +		/* EVENT_TIME should be active while the guest runs */
-> >> +		WARN_ON_ONCE(event_type & EVENT_GUEST);
-> >>  		/* start ctx time */
-> >>  		__update_context_time(ctx, false);
-> >>  		perf_cgroup_set_timestamp(cpuctx);
-> >> @@ -3979,8 +4047,11 @@ ctx_sched_in(struct perf_event_context *
-> >>  		 * the exclude_guest events.
-> >>  		 */
-> >>  		update_context_time(ctx);
-> >> -	} else
-> >> +		update_cgrp_time_from_cpuctx(cpuctx, false);
-> 
-> 
-> In the above ctx_sched_out(), the cgrp_time is stopped and the cgrp has
-> been set to inactive.
-> I think we need a perf_cgroup_set_timestamp(cpuctx) here to restart the
-> cgrp_time, Right?
+Shaoqin Huang (2):
+  KVM: arm64: Allow BT field in ID_AA64PFR1_EL1 writable
+  KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
 
-So the idea was to not stop time when we schedule out for the vPMU, as
-per the above.
+ arch/arm64/kvm/sys_regs.c                         | 2 +-
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
-> Also, I think the cgrp_time is different from the normal ctx->time. When
-> a guest is running, there must be no cgroup. It's OK to disable the
-> cgrp_time. If so, I don't think we need to track the guest_time for the
-> cgrp.
-
-Uh, the vCPU thread is/can-be part of a cgroup, and different guests
-part of different cgroups. The CPU wide 'guest' time is all time spend
-in guets, but the cgroup view of things might differ, depending on how
-the guets are arranged in cgroups, no?
-
-As such, we need per cgroup guest tracking.
+-- 
+2.40.1
 
 
