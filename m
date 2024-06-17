@@ -1,288 +1,308 @@
-Return-Path: <kvm+bounces-19748-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19749-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29EE990A1AC
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 03:20:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA3C190A1D2
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 03:39:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33871B21806
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 01:20:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 772461F21A23
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 01:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469578480;
-	Mon, 17 Jun 2024 01:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DCA6AA1;
+	Mon, 17 Jun 2024 01:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="n0cCjMS6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DOiGUCld"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92490DDC9;
-	Mon, 17 Jun 2024 01:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4C7441F
+	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 01:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718587243; cv=none; b=X8hqlS2SLewgnkbMIfpwuJ1JcTN8Qa2GneucNjK79mMLYoUDK3t1l6FGmpNV3etCl5e4ANsR3Pss1FpgHWdOlNr5/tpQv3u4wiFgqXNUwfRJ7adDtzCERDwb4/YIqJAEolG0J+q4y+FeACigQyUW97aPstI2ZCr3CXofDFNLojo=
+	t=1718588344; cv=none; b=dRyu8lnVOL2jUIGXEtgAYvq4L+wDGgoxfKrKiPIYfxTjEOOjMI9Mpmbfy5N6Fdj33vzm52KVGbLM6nS9sdhsWsHvRExghtPz5RQaDO+4ct9sgvxt/Z/GClUE0rf8LsS22+4jwhU+j8zcoWIYzTLMukSs/HXQcgFhtMMK4m/YK/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718587243; c=relaxed/simple;
-	bh=KrCVu5lgKQY6fzqaeV8xA84C9bbqRdhrHvdzoQI1BLs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F8zxfjjK01R9BQgNFNWyUmDXT99TOoMoZfi3zUJEEonRweA912Sh42jBKLc/gsqqc6rWx5vP8LAaFkdYjg0fTOQ84X3xWKJhtYe5RBFaxBOgyD0q3iXQ8eqMdO1Ep4J6ZPL4EFPvaExDi9MQR6ARBpKtHsmJFiI16hwnTDtboJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=n0cCjMS6; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718587242; x=1750123242;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=KrCVu5lgKQY6fzqaeV8xA84C9bbqRdhrHvdzoQI1BLs=;
-  b=n0cCjMS6XRmsuJz0q+7IRfQ/iO9p2GkjeFOSJ9mxr1NwtQaGEE7jmPml
-   FP02441rH8dkwHQUHTbRE6uoSEsuGoFBUE0iWToNcSQJQT1ceIzjv4iJ9
-   E9D+PmtNdl37C6XQueux/+AjctyTPUEyWaVXKAJZKQDXeXUekI/vhux/g
-   NK/KSZnqCGvfbj1Id0U8v7nGst7YCsghmAb3B4jXfxHN/jp4W2FBK01Wh
-   yY8ECZOgAEB8wRRwSEf5Zg1yyWBTBPGebAHEgC7JsYiyPqDMYB1dCfHGk
-   j3IofmVTwhjpbO/q6Z8HkkRLIRynEdO8oDClbDzuf2/XAMmYX9Ql1Nhih
-   A==;
-X-CSE-ConnectionGUID: M/m8wsKGSfyULW08zXCHnw==
-X-CSE-MsgGUID: serxwB81R2CAHUrKwuiUgw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11105"; a="32945786"
-X-IronPort-AV: E=Sophos;i="6.08,243,1712646000"; 
-   d="scan'208";a="32945786"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2024 18:20:41 -0700
-X-CSE-ConnectionGUID: 3LFei8X/RDqWa4lfpcW7xQ==
-X-CSE-MsgGUID: 5mZ66enSRmWQxdT6Pp2c7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,243,1712646000"; 
-   d="scan'208";a="45491592"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.234.76]) ([10.124.234.76])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jun 2024 18:20:38 -0700
-Message-ID: <c45a1448-09ee-4750-bf86-28295dfc6089@linux.intel.com>
-Date: Mon, 17 Jun 2024 09:20:36 +0800
+	s=arc-20240116; t=1718588344; c=relaxed/simple;
+	bh=k8B6CyPX87IjUzz7seUSs4GVLFkNFi53nX/v1ygsxqE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NtYa53hNvNlAaEKVtX5UlZzgStGKfBUMNa/pV91HP5R3BGpxcu2XfoEK5F2OnG7dSrbrVxrW5fOdfw+3rtvluN56xOvEvYY5l36qJNNGCMI62OhdMgDky1Cq6y84lyMolwIro8uHj0Y/xtBBBkrGphM7vE24a/f0HHHv8l2z19k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DOiGUCld; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718588341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DzIM7qnWYIFeQ+gqXw747w+YYItd7hOOn+I2wLHGpfY=;
+	b=DOiGUCldbedFvQRi2q14Q3h0nfwm71ItGLs430I+dcrkfyjNE7S7C6CI83Tg0ZNf3mQOAa
+	b0vSXofhDPkZQqZg7BwXAomKMJz5zxwtP1pc/GIdL1FBlIHlmuygRsZCNFSqm+mph0YRxd
+	dq0pJHhI2d8fDcZGyAkiD8yDYg149ms=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-411-tdNpHOHWNliO-6CPjG5h7w-1; Sun, 16 Jun 2024 21:38:55 -0400
+X-MC-Unique: tdNpHOHWNliO-6CPjG5h7w-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2c508eab7b2so1551052a91.1
+        for <kvm@vger.kernel.org>; Sun, 16 Jun 2024 18:38:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718588334; x=1719193134;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DzIM7qnWYIFeQ+gqXw747w+YYItd7hOOn+I2wLHGpfY=;
+        b=kgk5gW8s0eK1n6lfhdbhUmbSjWGYnCyjoBySPb4uQrkD4oS2SMj1xWB3utuB9WedTe
+         7Pby0ndK2TwydomK/GppxFZs1luU9hGrHQ9q5y5Pdmpu6C4Au23s5I2DBXMsNqDkxIEZ
+         9hjfW85Dn5lhTGbdpiTpIku3RsWldxcHCZ/0vg9pvrOzC7qghx4pkxRNaRNVs8jIdJR5
+         AHWxX8AlG/7BGAgBTQVGfEComRmeXImE68ZCOUaAXUrsaCxetTVTp80gpFeIgSp14jF7
+         7fcA7vCSDObfFw2DIJjxlIudMmTbaHA+4It64ecMy0o5QGweeMDDCdMjmOHXtGnTDYX/
+         UNvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+ZfsA33t6ue0ZoohEK1ue/At3kZ2RxAvVfr184Qz+KzYDwETnm4aOYqF0K+8ZwXUdCVxy4ALRFr2epQFGKqnNBaWh
+X-Gm-Message-State: AOJu0YymMrnopEu7Xu6ptEbVarDwdiq+XCrN/tSU7ipN5HnCxw6u8XB0
+	2eSEnr1u/c/IVe3WkQE3k3aVbz69Vl32eWtMIrpRG9n6dkPX9N/eJlGoJ+6NS16QW845N3IuZzG
+	ibw9dCHPY9obxgYtbgADTP1gC+btpI4bWCCWr/KPb3ALYViukXfK5Z3YuwFTak6hTj0RoazUJ9z
+	IVNOkHBQwyeR2H5RwdfUvztOs/
+X-Received: by 2002:a17:90b:211:b0:2c4:eab5:1973 with SMTP id 98e67ed59e1d1-2c4eab519e5mr6160864a91.7.1718588333988;
+        Sun, 16 Jun 2024 18:38:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGwZz7p7KBMVoKQsWbUa2YZvpl3gfjWd+0CYkYTRuUauj3YoG4KAqcmyRmQsUjcTV4F78QvUvhymm8jDxyuwoo=
+X-Received: by 2002:a17:90b:211:b0:2c4:eab5:1973 with SMTP id
+ 98e67ed59e1d1-2c4eab519e5mr6160851a91.7.1718588333562; Sun, 16 Jun 2024
+ 18:38:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 117/130] KVM: TDX: Silently ignore INIT/SIPI
-To: isaku.yamahata@intel.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <4a4225de42be0f7568c5ecb5c22f2029f8e91d62.1708933498.git.isaku.yamahata@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <4a4225de42be0f7568c5ecb5c22f2029f8e91d62.1708933498.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240530101823.1210161-1-schalla@marvell.com> <CACGkMEsxPfck-Ww6CHSod5wP5xLOpS3t2B8qhTL0=PoE3koCGQ@mail.gmail.com>
+ <DS0PR18MB5368E02C4DE7AA96CCD299E0A0F82@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <CACGkMEs+s7JEvLXBdyQbj36Y8WSbHXqF2d9HNP3v7CPRPoocXg@mail.gmail.com>
+ <DS0PR18MB5368CD9E8E3432A9D19D8C8FA0C02@DS0PR18MB5368.namprd18.prod.outlook.com>
+ <20240612083001-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240612083001-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 17 Jun 2024 09:38:41 +0800
+Message-ID: <CACGkMEtzm9PHP5OoM-3-4e7JPvPmGn2vdLtzx03gzWfDv6OjkQ@mail.gmail.com>
+Subject: Re: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mode
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Srujana Challa <schalla@marvell.com>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, Vamsi Krishna Attunuru <vattunuru@marvell.com>, 
+	Shijith Thotton <sthotton@marvell.com>, Nithin Kumar Dabilpuram <ndabilpuram@marvell.com>, 
+	Jerin Jacob <jerinj@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Wed, Jun 12, 2024 at 8:32=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
 >
-> The TDX module API doesn't provide API for VMM to inject INIT IPI and SIPI.
-> Instead it defines the different protocols to boot application processors.
-> Ignore INIT and SIPI events for the TDX guest.
+> On Wed, Jun 12, 2024 at 09:22:43AM +0000, Srujana Challa wrote:
+> >
+> > > Subject: Re: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mo=
+de
+> > >
+> > > On Tue, Jun 4, 2024 at 5:29=E2=80=AFPM Srujana Challa <schalla@marvel=
+l.com> wrote:
+> > > >
+> > > > > Subject: [EXTERNAL] Re: [PATCH] vdpa: Add support for no-IOMMU mo=
+de
+> > > > >
+> > > > > Prioritize security for external emails: Confirm sender and conte=
+nt
+> > > > > safety before clicking links or opening attachments
+> > > > >
+> > > > > -----------------------------------------------------------------=
+---
+> > > > > -- On Thu, May 30, 2024 at 6:18=E2=80=AFPM Srujana Challa
+> > > > > <schalla@marvell.com>
+> > > > > wrote:
+> > > > > >
+> > > > > > This commit introduces support for an UNSAFE, no-IOMMU mode in =
+the
+> > > > > > vhost-vdpa driver. When enabled, this mode provides no device
+> > > > > > isolation, no DMA translation, no host kernel protection, and
+> > > > > > cannot be used for device assignment to virtual machines. It
+> > > > > > requires RAWIO permissions and will taint the kernel.
+> > > > > > This mode requires enabling the
+> > > > > "enable_vhost_vdpa_unsafe_noiommu_mode"
+> > > > > > option on the vhost-vdpa driver. This mode would be useful to g=
+et
+> > > > > > better performance on specifice low end machines and can be
+> > > > > > leveraged by embedded platforms where applications run in contr=
+olled
+> > > environment.
+> > > > >
+> > > > > I wonder if it's better to do it per driver:
+> > > > >
+> > > > > 1) we have device that use its own IOMMU, one example is the mlx5
+> > > > > vDPA device
+> > > > > 2) we have software devices which doesn't require IOMMU at all (b=
+ut
+> > > > > still with
+> > > > > protection)
+> > > >
+> > > > If I understand correctly, you=E2=80=99re suggesting that we create=
+ a module
+> > > > parameter specific to the vdpa driver. Then, we can add a flag to t=
+he =E2=80=98struct
+> > > vdpa_device=E2=80=99
+> > > > and set that flag within the vdpa driver based on the module parame=
+ter.
+> > > > Finally, we would use this flag to taint the kernel and go in no-io=
+mmu
+> > > > path in the vhost-vdpa driver?
+> > >
+> > > If it's possible, I would like to avoid changing the vDPA core.
+> > >
+> > > Thanks
+> > According to my understanding of the discussion at the
+> > https://lore.kernel.org/all/20240422164108-mutt-send-email-mst@kernel.o=
+rg,
+> > Michael has suggested focusing on implementing a no-IOMMU mode in vdpa.
+> > Michael, could you please confirm if it's fine to transfer all these re=
+levant
+> > modifications to Marvell's vdpa driver?
+> >
+> > Thanks.
 >
-> There are two options. 1) (silently) ignore INIT/SIPI request or 2) return
-> error to guest TDs somehow.  Given that TDX guest is paravirtualized to
-> boot AP, the option 1 is chosen for simplicity.
 >
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/include/asm/kvm-x86-ops.h |  1 +
->   arch/x86/include/asm/kvm_host.h    |  2 ++
->   arch/x86/kvm/lapic.c               | 19 +++++++++++-------
->   arch/x86/kvm/svm/svm.c             |  1 +
->   arch/x86/kvm/vmx/main.c            | 32 ++++++++++++++++++++++++++++--
->   arch/x86/kvm/vmx/tdx.c             |  4 ++--
->   6 files changed, 48 insertions(+), 11 deletions(-)
+> All I said is that octeon driver can be merged without this support.
+> Then work on no-iommu can start separately.
 >
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index 22d93d4124c8..85c04aad6ab3 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -149,6 +149,7 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
->   KVM_X86_OP(msr_filter_changed)
->   KVM_X86_OP(complete_emulated_msr)
->   KVM_X86_OP(vcpu_deliver_sipi_vector)
-> +KVM_X86_OP(vcpu_deliver_init)
->   KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
->   KVM_X86_OP_OPTIONAL(get_untagged_addr)
->   KVM_X86_OP_OPTIONAL_RET0(gmem_max_level)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index bb8be091f996..2686c080820b 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1836,6 +1836,7 @@ struct kvm_x86_ops {
->   	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
->   
->   	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
-> +	void (*vcpu_deliver_init)(struct kvm_vcpu *vcpu);
->   
->   	/*
->   	 * Returns vCPU specific APICv inhibit reasons
-> @@ -2092,6 +2093,7 @@ void kvm_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
->   void kvm_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
->   int kvm_load_segment_descriptor(struct kvm_vcpu *vcpu, u16 selector, int seg);
->   void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
-> +void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu);
->   
->   int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
->   		    int reason, bool has_error_code, u32 error_code);
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 8025c7f614e0..431074679e83 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -3268,6 +3268,16 @@ int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
->   	return 0;
->   }
->   
-> +void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu)
-> +{
-> +	kvm_vcpu_reset(vcpu, true);
-> +	if (kvm_vcpu_is_bsp(vcpu))
-> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> +	else
-> +		vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_deliver_init);
-> +
->   int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
->   {
->   	struct kvm_lapic *apic = vcpu->arch.apic;
-> @@ -3299,13 +3309,8 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
->   		return 0;
->   	}
->   
-> -	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events)) {
-> -		kvm_vcpu_reset(vcpu, true);
-> -		if (kvm_vcpu_is_bsp(apic->vcpu))
-> -			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> -		else
-> -			vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
-> -	}
-> +	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events))
-> +		static_call(kvm_x86_vcpu_deliver_init)(vcpu);
->   	if (test_and_clear_bit(KVM_APIC_SIPI, &apic->pending_events)) {
->   		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
->   			/* evaluate pending_events before reading the vector */
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index f76dd52d29ba..27546d993809 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -5037,6 +5037,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->   	.complete_emulated_msr = svm_complete_emulated_msr,
->   
->   	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
-> +	.vcpu_deliver_init = kvm_vcpu_deliver_init,
->   	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
->   };
->   
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index 4f3b872cd401..84d2dc818cf7 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -320,6 +320,14 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
->   }
->   #endif
->   
-> +static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return true;
+>
+> Whether this belongs in the driver or the core would depend on
+> what the use-case is. I have not figured it out yet.
+> What you describe seems generic not card-specific though.
+> Jason why do you  want this in the driver?
 
-Since for TD, INIT is always blocked, then in kvm_apic_accept_events(), 
-the code path to handle INIT/SIPI delivery will not be called, i.e, the 
-OPs .vcpu_deliver_init() and .vcpu_deliver_sipi_vector() are never 
-called for TD.
-Seems no need to add the new interface  vcpu_deliver_init or the new 
-wrapper vt_vcpu_deliver_sipi_vector().
+For two reasons:
 
-And consider the INIT/SIPI for TD:
-- Normally, for TD, INIT ans SIPI should not be set in APIC's 
-pending_events.
-   Maybe we can call KVM_BUG_ON() in vt_apic_init_signal_blocked() for TD?
-- If INIT and SIPI are allowed be set in APIC's pending_events for 
-somehow, the current code has a problem, it will never clear INIT bit in 
-APIC's pending_events.
-   Then kvm_apic_accept_events() needs to execute more check code if 
-INIT was once set.
-   INIT bit should be cleared with this assumption.
+1) no-IOMMU mode have security implications, make it per driver is
+less intrusive
+2) I don't know what does "no-IOMMU" mean for software device or
+device with on-chip IOMMU
 
+Thanks
 
-
-> +
-> +	return vmx_apic_init_signal_blocked(vcpu);
-> +}
-> +
->   static void vt_apicv_pre_state_restore(struct kvm_vcpu *vcpu)
->   {
->   	struct pi_desc *pi = vcpu_to_pi_desc(vcpu);
-> @@ -348,6 +356,25 @@ static void vt_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
->   	vmx_deliver_interrupt(apic, delivery_mode, trig_mode, vector);
->   }
->   
-> +static void vt_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
-> +{
-> +	if (is_td_vcpu(vcpu))
-> +		return;
-> +
-> +	kvm_vcpu_deliver_sipi_vector(vcpu, vector);
-> +}
-> +
-> +static void vt_vcpu_deliver_init(struct kvm_vcpu *vcpu)
-> +{
-> +	if (is_td_vcpu(vcpu)) {
-> +		/* TDX doesn't support INIT.  Ignore INIT event */
-> +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> +		return;
-> +	}
-> +
-> +	kvm_vcpu_deliver_init(vcpu);
-> +}
-> +
->   static void vt_flush_tlb_all(struct kvm_vcpu *vcpu)
->   {
->   	if (is_td_vcpu(vcpu)) {
-> @@ -744,13 +771,14 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   #endif
->   
->   	.check_emulate_instruction = vmx_check_emulate_instruction,
-> -	.apic_init_signal_blocked = vmx_apic_init_signal_blocked,
-> +	.apic_init_signal_blocked = vt_apic_init_signal_blocked,
->   	.migrate_timers = vmx_migrate_timers,
->   
->   	.msr_filter_changed = vt_msr_filter_changed,
->   	.complete_emulated_msr = kvm_complete_insn_gp,
->   
-> -	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
-> +	.vcpu_deliver_sipi_vector = vt_vcpu_deliver_sipi_vector,
-> +	.vcpu_deliver_init = vt_vcpu_deliver_init,
->   
->   	.get_untagged_addr = vmx_get_untagged_addr,
->   
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index d9b36373e7d0..4c7c83105342 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -769,8 +769,8 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
->   void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->   {
->   
-> -	/* Ignore INIT silently because TDX doesn't support INIT event. */
-> -	if (init_event)
-> +	/* vcpu_deliver_init method silently discards INIT event. */
-> +	if (KVM_BUG_ON(init_event, vcpu->kvm))
->   		return;
->   	if (KVM_BUG_ON(is_td_vcpu_created(to_tdx(vcpu)), vcpu->kvm))
->   		return;
+>
+> > >
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > > >
+> > > > > > Signed-off-by: Srujana Challa <schalla@marvell.com>
+> > > > > > ---
+> > > > > >  drivers/vhost/vdpa.c | 23 +++++++++++++++++++++++
+> > > > > >  1 file changed, 23 insertions(+)
+> > > > > >
+> > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c index
+> > > > > > bc4a51e4638b..d071c30125aa 100644
+> > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > @@ -36,6 +36,11 @@ enum {
+> > > > > >
+> > > > > >  #define VHOST_VDPA_IOTLB_BUCKETS 16
+> > > > > >
+> > > > > > +bool vhost_vdpa_noiommu;
+> > > > > > +module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
+> > > > > > +                  vhost_vdpa_noiommu, bool, 0644);
+> > > > > > +MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode,
+> > > > > "Enable
+> > > > > > +UNSAFE, no-IOMMU mode.  This mode provides no device isolation=
+,
+> > > > > > +no DMA translation, no host kernel protection, cannot be used =
+for
+> > > > > > +device assignment to virtual machines, requires RAWIO
+> > > > > > +permissions, and will taint the kernel.  If you do not know wh=
+at this is
+> > > for, step away.
+> > > > > > +(default: false)");
+> > > > > > +
+> > > > > >  struct vhost_vdpa_as {
+> > > > > >         struct hlist_node hash_link;
+> > > > > >         struct vhost_iotlb iotlb;
+> > > > > > @@ -60,6 +65,7 @@ struct vhost_vdpa {
+> > > > > >         struct vdpa_iova_range range;
+> > > > > >         u32 batch_asid;
+> > > > > >         bool suspended;
+> > > > > > +       bool noiommu_en;
+> > > > > >  };
+> > > > > >
+> > > > > >  static DEFINE_IDA(vhost_vdpa_ida); @@ -887,6 +893,10 @@ static
+> > > > > > void vhost_vdpa_general_unmap(struct vhost_vdpa *v,  {
+> > > > > >         struct vdpa_device *vdpa =3D v->vdpa;
+> > > > > >         const struct vdpa_config_ops *ops =3D vdpa->config;
+> > > > > > +
+> > > > > > +       if (v->noiommu_en)
+> > > > > > +               return;
+> > > > > > +
+> > > > > >         if (ops->dma_map) {
+> > > > > >                 ops->dma_unmap(vdpa, asid, map->start, map->siz=
+e);
+> > > > > >         } else if (ops->set_map =3D=3D NULL) { @@ -980,6 +990,9=
+ @@
+> > > > > > static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_io=
+tlb
+> > > *iotlb,
+> > > > > >         if (r)
+> > > > > >                 return r;
+> > > > > >
+> > > > > > +       if (v->noiommu_en)
+> > > > > > +               goto skip_map;
+> > > > > > +
+> > > > > >         if (ops->dma_map) {
+> > > > > >                 r =3D ops->dma_map(vdpa, asid, iova, size, pa, =
+perm, opaque);
+> > > > > >         } else if (ops->set_map) { @@ -995,6 +1008,7 @@ static =
+int
+> > > > > > vhost_vdpa_map(struct vhost_vdpa *v,
+> > > > > struct vhost_iotlb *iotlb,
+> > > > > >                 return r;
+> > > > > >         }
+> > > > > >
+> > > > > > +skip_map:
+> > > > > >         if (!vdpa->use_va)
+> > > > > >                 atomic64_add(PFN_DOWN(size), &dev->mm->pinned_v=
+m);
+> > > > > >
+> > > > > > @@ -1298,6 +1312,7 @@ static int vhost_vdpa_alloc_domain(struct
+> > > > > vhost_vdpa *v)
+> > > > > >         struct vdpa_device *vdpa =3D v->vdpa;
+> > > > > >         const struct vdpa_config_ops *ops =3D vdpa->config;
+> > > > > >         struct device *dma_dev =3D vdpa_get_dma_dev(vdpa);
+> > > > > > +       struct iommu_domain *domain;
+> > > > > >         const struct bus_type *bus;
+> > > > > >         int ret;
+> > > > > >
+> > > > > > @@ -1305,6 +1320,14 @@ static int vhost_vdpa_alloc_domain(struc=
+t
+> > > > > vhost_vdpa *v)
+> > > > > >         if (ops->set_map || ops->dma_map)
+> > > > > >                 return 0;
+> > > > > >
+> > > > > > +       domain =3D iommu_get_domain_for_dev(dma_dev);
+> > > > > > +       if ((!domain || domain->type =3D=3D IOMMU_DOMAIN_IDENTI=
+TY) &&
+> > > > > > +           vhost_vdpa_noiommu && capable(CAP_SYS_RAWIO)) {
+> > > > > > +               add_taint(TAINT_USER, LOCKDEP_STILL_OK);
+> > > > > > +               dev_warn(&v->dev, "Adding kernel taint for noio=
+mmu
+> > > > > > + on
+> > > > > device\n");
+> > > > > > +               v->noiommu_en =3D true;
+> > > > > > +               return 0;
+> > > > > > +       }
+> > > > > >         bus =3D dma_dev->bus;
+> > > > > >         if (!bus)
+> > > > > >                 return -EFAULT;
+> > > > > > --
+> > > > > > 2.25.1
+> > > > > >
+> > > >
+> >
+>
 
 
